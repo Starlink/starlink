@@ -39,6 +39,11 @@
 {        Added GIF, TIFF, and PGM conversions.
 {     1996 March 4 (MJC):
 {        Some tidying, and reintegration with old version.
+{     1997 August 1 (MJC):
+{        Added DA2NDF, FITS2NDF, and NDF2DA tasks and help.  Added
+{        automatic conversions for STREAM and GZIP.  Added FITS synonym
+{        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
+{        write one format per line for clarity.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -57,12 +62,15 @@ setenv CONVERT_HELP INSTALL_HELP/convert
 {
 { First define the commands.
 define    ASCII2NDF   $CONVERT_DIR/ascii2ndf
+define    DA2NDF      $CONVERT_DIR/da2ndf
 define    DST2NDF     $CONVERT_DIR/dst2ndf
+define    FITS2NDF    $CONVERT_DIR/fits2ndf
 define    GASP2NDF    $CONVERT_DIR/gasp2ndf
 defstring GIF2NDF  SH $CONVERT_DIR/gif2ndf
 define    IRAF2NDF    $CONVERT_DIR/iraf2ndf
 define    IRCAM2NDF   $CONVERT_DIR/ircam2ndf
 define    NDF2ASCII   $CONVERT_DIR/ndf2ascii
+define    NDF2DA      $CONVERT_DIR/ndf2da
 define    NDF2DST     $CONVERT_DIR/ndf2dst
 define    NDF2FITS    $CONVERT_DIR/ndf2fits
 define    NDF2GASP    $CONVERT_DIR/ndf2gasp
@@ -81,12 +89,15 @@ defstring CONHELP  SH $CONVERT_DIR/conhelp
 { Define CONVERT's help from ICL.
 defhelp CONVERT    $CONVERT_HELP 0
 defhelp ASCII2NDF  $CONVERT_HELP ASCII2NDF 
+defhelp DA2NDF     $CONVERT_HELP DA2NDF 
 defhelp DST2NDF    $CONVERT_HELP DST2NDF 
+defhelp FITS2NDF   $CONVERT_HELP FITS2NDF 
 defhelp GASP2NDF   $CONVERT_HELP GASP2NDF 
 defhelp GIF2NDF    $CONVERT_HELP GIF2NDF 
 defhelp IRAF2NDF   $CONVERT_HELP IRAF2NDF 
 defhelp IRCAM2NDF  $CONVERT_HELP IRCAM2NDF 
 defhelp NDF2ASCII  $CONVERT_HELP NDF2ASCII 
+defhelp NDF2DA     $CONVERT_HELP NDF2DA
 defhelp NDF2DST    $CONVERT_HELP NDF2DST 
 defhelp NDF2FITS   $CONVERT_HELP NDF2FITS 
 defhelp NDF2GASP   $CONVERT_HELP NDF2GASP 
@@ -100,12 +111,15 @@ defhelp UNF2NDF    $CONVERT_HELP UNF2NDF
 
 { Now define the full-name commands.
 define    CON_ASCII2NDF   $CONVERT_DIR/ascii2ndf
+define    CON_DA2NDF      $CONVERT_DIR/da2ndf
 define    CON_DST2NDF     $CONVERT_DIR/dst2ndf
+define    CON_FITS2NDF    $CONVERT_DIR/fits2ndf
 define    CON_GASP2NDF    $CONVERT_DIR/gasp2ndf
 defstring CON_GIF2NDF  SH $CONVERT_DIR/gif2ndf
 define    CON_IRAF2NDF    $CONVERT_DIR/iraf2ndf
 define    CON_IRCAM2NDF   $CONVERT_DIR/ircam2ndf
 define    CON_NDF2ASCII   $CONVERT_DIR/ndf2ascii
+define    CON_NDF2DA      $CONVERT_DIR/ndf2da
 define    CON_NDF2DST     $CONVERT_DIR/ndf2dst
 define    CON_NDF2FITS    $CONVERT_DIR/ndf2fits
 define    CON_NDF2GASP    $CONVERT_DIR/ndf2gasp
@@ -121,12 +135,15 @@ define    CON_UNF2NDF     $CONVERT_DIR/unf2ndf
 {
 defhelp CON_CONVERT    $CONVERT_HELP 0
 defhelp CON_ASCII2NDF  $CONVERT_HELP ASCII2NDF 
+defhelp CON_DA2NDF     $CONVERT_HELP DA2NDF 
 defhelp CON_DST2NDF    $CONVERT_HELP DST2NDF 
+defhelp CON_FITS2NDF   $CONVERT_HELP FITS2NDF 
 defhelp CON_GASP2NDF   $CONVERT_HELP GASP2NDF 
 defhelp CON_GIF2NDF    $CONVERT_HELP GIF2NDF 
 defhelp CON_IRAF2NDF   $CONVERT_HELP IRAF2NDF 
 defhelp CON_IRCAM2NDF  $CONVERT_HELP IRCAM2NDF 
 defhelp CON_NDF2ASCII  $CONVERT_HELP NDF2ASCII 
+defhelp CON_NDF2DA     $CONVERT_HELP NDF2DA
 defhelp CON_NDF2DST    $CONVERT_HELP NDF2DST 
 defhelp CON_NDF2FITS   $CONVERT_HELP NDF2FITS 
 defhelp CON_NDF2GASP   $CONVERT_HELP NDF2GASP 
@@ -145,11 +162,65 @@ defhelp CON_UNF2NDF    $CONVERT_HELP UNF2NDF
 
 {  Formats recognised when accessing pre-existing datasets.
 setenv NDF_FORMATS_IN ~
-'FITS(.fit),FIGARO(.dst),IRAF(.imh),GASP(.hdr),UNFORMATTED(.unf),UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),COMPRESSED(.sdf.Z)'
+'FITS(.fit),~
+FIGARO(.dst),~
+IRAF(.imh),~
+STREAM(.da),~
+UNFORMATTED(.unf),~
+UNF0(.dat),~
+ASCII(.asc),~
+TEXT(.txt),~
+GIF(.gif),~
+TIFF(.tif)\,
+GASP(.hdr),~
+COMPRESSED(.sdf.Z),~
+GZIP(.sdf.gz),~
+FITS(.fits),~
+FITS(.fts),~
+FITS(.FTS),~
+FITS(.FITS),~
+FITS(.FIT),~
+FITS(.lilo),~
+FITS(.lihi),~
+FITS(.silo),~
+FITS(.sihi),~
+FITS(.mxlo),~
+FITS(.rilo),~
+FITS(.rihi),~
+FITS(.vdlo),~
+FITS(.vdhi),~
+STREAM(.str)'
 
 {  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT ~
-'.,FITS(.fit),FIGARO(.dst),IRAF(.imh),GASP(.hdr),UNFORMATTED(.unf),UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif),COMPRESSED(.sdf.Z)'
+'FITS(.fit),~
+FIGARO(.dst),~
+IRAF(.imh),~
+STREAM(.da),~
+UNFORMATTED(.unf),~
+UNF0(.dat),~
+ASCII(.asc),~
+TEXT(.txt),~
+GIF(.gif),~
+TIFF(.tif)\,
+GASP(.hdr),~
+COMPRESSED(.sdf.Z),~
+GZIP(.sdf.gz),~
+FITS(.fits),~
+FITS(.fts),~
+FITS(.FTS),~
+FITS(.FITS),~
+FITS(.FIT),~
+FITS(.lilo),~
+FITS(.lihi),~
+FITS(.silo),~
+FITS(.sihi),~
+FITS(.mxlo),~
+FITS(.rilo),~
+FITS(.rihi),~
+FITS(.vdlo),~
+FITS(.vdhi),~
+STREAM(.str)'
 
 {  Define format-conversion commands.
 {  ==================================
@@ -238,6 +309,17 @@ setenv NDF_TO_UNF0 ~
 '$CONVERT_DIR/convertndf to ~
 ''^fmt'' ''^dir'' ''^name'' ''^type'' ''^ndf'''
 
+{  STREAM (direct-access) conversions
+{  ----------------------------------
+setenv NDF_FROM_STREAM ~
+'$CONVERT_DIR/convertndf from ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^ndf'''
+
+setenv NDF_TO_STREAM ~
+'$CONVERT_DIR/convertndf to ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^ndf'''
+
+
 {  ASCII conversions (with FITS headers):
 {  --------------------------------------
 setenv NDF_FROM_ASCII ~
@@ -299,6 +381,26 @@ else
 endif
 endproc
 converttemp2
+
+{  GZIP compression conversions:
+{  -----------------------------
+{
+setenv NDF_FROM_GZIP ~
+'$CONVERT_DIR/convertndf from ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^ndf'''
+
+setenv NDF_TO_GZIP ~
+'$CONVERT_DIR/convertndf to ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^ndf'''
+
+hidden proc converttemp3
+if getenv("HDS_SCRATCH") <> ""
+   setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_Z_^name"
+else
+   setenv NDF_TEMP_GZIP 'temp_Z_^name'
+endif
+endproc
+converttemp3
 
 {  DEBUG
 {  -----
