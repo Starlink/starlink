@@ -16,8 +16,8 @@ dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_CC
-AC_PROG_CPP
 AC_PROG_FC
+AC_PROG_FPP(substitute)
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
@@ -30,7 +30,7 @@ dnl   Check if BSD bcopy function is available, if not should use memmove.
 AC_CHECK_FUNCS(memmove bcopy)
 
 dnl   Need to know the size of a pointer for CNF_PVAL
-dnl   (see CNF_PAR.c and Makefile.am)
+dnl   (see CNF_PAR.fpp and Makefile.am)
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(uint32_t)
 

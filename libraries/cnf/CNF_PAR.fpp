@@ -1,17 +1,15 @@
-* Process this file with cpp to produce CNF_PAR
+* Process this file with fpp to produce CNF_PAR
 #include <config.h>
 
 *+
 *  Name:
-*     CNF_PAR.c
+*     CNF_PAR.fpp
 
 *  Purpose:
 *     Define public global constants for the CNF_ system.
 
 *  Language:
 *     Starlink Fortran 77
-*     (despite the .c extension -- this is not a C file, but it is only
-*     portable to run cpp on files with a .c extension).
 
 *  Type of Module:
 *     Platform-specific global constants include file.
@@ -25,7 +23,7 @@
 *     size of the return value from CNF_PVAL is large enough to hold
 *     a C pointer.
 *
-*     Process this file with cpp to produce the actual CNF_PAR file,
+*     Process this file with fpp to produce the actual CNF_PAR file,
 *     expanding the SIZEOF_VOIDP token below.
 
 *  Copyright:
@@ -47,7 +45,7 @@
 *        that was removed during the initial autoconfing.
 *      17-AUG-2004 (TIMJ):
 *        Add CNF_PREG declaration
-*     {enter_further_changes_here}
+*      {For further changes, see the CVS history}
 
 *-
 

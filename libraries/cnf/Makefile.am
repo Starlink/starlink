@@ -23,17 +23,18 @@ C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
 f77.h: cnf.h
 	$(LN_S) cnf.h f77.h
 
-# CNF_PAR.c is a _Fortran_ file which is run through cpp to pick up
-# definitions from config.h.
-CNF_PAR: CNF_PAR.c
+# CNF_PAR.fpp requires defintions from config.h
+CNF_PAR.f: CNF_PAR.fpp
+	$(FPP) -I. $(FPPFLAGS) $(CPPFLAGS) $< $(FPP_OUTPUT)
+CNF_PAR: CNF_PAR.f
 	rm -f CNF_PAR CNF_PAR.tmp
-	echo "* Generated from CNF_PAR.c by Makefile.am" >CNF_PAR.tmp
-	$(CPP) -I$(srcdir) CNF_PAR.c | grep '^      ' >>CNF_PAR.tmp \
+	echo "* Generated from CNF_PAR.fpp by Makefile.am" >CNF_PAR.tmp
+	grep '^      ' CNF_PAR.f >>CNF_PAR.tmp \
 	    && mv CNF_PAR.tmp CNF_PAR
 
 BUILT_SOURCES = f77.h
 
-CLEANFILES = f77.h CNF_PAR
+CLEANFILES = f77.h CNF_PAR CNF_PAR.f CNF_PAR.tmp
 
 # Testing
 
