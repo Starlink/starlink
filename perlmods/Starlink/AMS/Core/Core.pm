@@ -360,7 +360,7 @@ sub adamtask {
     } else {
       $ENV{ADAM_TASK_TYPE} = 'A';
     }
-    print STDOUT "ADAM_TASK_TYPE = $ENV{ADAM_TASK_TYPE}\n";
+    # print STDOUT "ADAM_TASK_TYPE = $ENV{ADAM_TASK_TYPE}\n";
 
     # Set the message system name as well
     if (exists $ENV{ICL_TASK_NAME}) {
