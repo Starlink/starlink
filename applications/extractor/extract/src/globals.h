@@ -9,10 +9,9 @@
 *
 *	Contents:	global declarations.
 *
-*	Last modify:   29/04/98 (EB):
+*	Last modify:   25/05/99 (EB):
 *                      02/11/98 (AJC)
 *                        Add initialise flag
-*	Last modify:	28/11/98 (EB):
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -31,7 +30,7 @@ int                     initprintf; /* Initialization in initcat */
 
 sexcatstruct		cat;
 prefstruct		prefs;
-picstruct		thefield1, thefield2;
+picstruct		thefield1,thefield2, thewfield1,thewfield2;
 objstruct		flagobj;
 obj2struct		flagobj2;
 extern obj2struct	outobj2;
