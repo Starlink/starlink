@@ -139,6 +139,14 @@ the main DSSSL stylesheet for the LaTeX stylesheet.
       (process-children)
       (literal " ]"))))
 
+(element note
+  (make command name: "footnote"
+	(process-children)))
+;; do nothing with the notecontents element -- the NOTE element produces
+;; footnotes rather than endnotes
+(element notecontents
+  (empty-sosofo))
+
 (element draftnote
   (make command name: "textbf"
 	(literal "Draft Note:")
