@@ -741,7 +741,7 @@ c      ENDIF
       END IF
 
 *  Create and map data quality
-      CALL BDI_MAPUB( OUTFID, 'Quality/QGOOD', 'WRITE', QPTR, STATUS )
+      CALL BDI_MAPUB( OUTFID, 'Quality', 'WRITE/QGOOD', QPTR, STATUS )
       CALL BDI_PUT0UB( OUTFID, 'QualityMask', QUAL__MASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'Error creating output quality array' )
