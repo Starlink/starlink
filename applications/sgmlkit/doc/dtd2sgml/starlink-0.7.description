@@ -3,7 +3,7 @@
 <!DOCTYPE dtddescription SYSTEM "dtddescription.dtd" [
 <!ENTITY dtdsumm SYSTEM "starlink-0.7.dtdsummary">
 <!NOTATION XML SYSTEM ''>
-<!-- commentary actually in /home/norman/s/commentary/sgml -->
+<!-- commentary is preserved here, but we don't use it -->
 <!ENTITY dtdcomm SYSTEM "starlink-0.7.commentary" NDATA XML>
 <!ENTITY progdtd SYSTEM 'programcode-0.7.description' NDATA XML>
 ]>
@@ -11,7 +11,8 @@
 
 <!-- Fixed attributes not documented -->
 
-<dtddescription docelem="sun" commentary="dtdcomm">
+<!-- dtddescription docelem="sun" commentary="dtdcomm" -->
+<dtddescription docelem="sun">
 
 &dtdsumm;
 

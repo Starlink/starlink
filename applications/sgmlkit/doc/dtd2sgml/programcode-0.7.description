@@ -3,12 +3,13 @@
   <!ENTITY dtdsummary SYSTEM 'programcode-0.7.dtdsummary'>
   <!NOTATION XML SYSTEM ''>
   <!ENTITY sundtd SYSTEM 'starlink-0.7.description' NDATA XML>
-  <!-- commentary actually in /home/norman/s/commentary -->
+  <!-- commentary is preserved here, but we don't use it -->
   <!ENTITY comm SYSTEM 'programcode-0.7.commentary' NDATA XML>
 ]>
 <!-- $Id$ -->
 
-<dtddescription docelem="programcode" commentary="comm">
+<!-- dtddescription docelem="programcode" commentary="comm" -->
+<dtddescription docelem="programcode">
 
 &dtdsummary;
 
