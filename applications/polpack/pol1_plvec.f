@@ -557,9 +557,9 @@
                   CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
 
                   IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL CAT_PUT0D( RACAT, W1( NPIX, NROW ), .FALSE., 
+                     CALL CAT_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
      :                               STATUS )
-                     CALL CAT_PUT0D( DECCAT, W2( NPIX, NROW ), .FALSE., 
+                     CALL CAT_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
      :                               STATUS )
                   END IF
 
@@ -785,9 +785,9 @@
                   CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
 
                   IF( EQMAP .NE. AST__NULL ) THEN
-                     CALL CAT_PUT0D( RACAT, W1( NPIX, NROW ), .FALSE., 
+                     CALL CAT_PUT0D( RACAT, W1( PIX, ROW ), .FALSE., 
      :                               STATUS )
-                     CALL CAT_PUT0D( DECCAT, W2( NPIX, NROW ), .FALSE., 
+                     CALL CAT_PUT0D( DECCAT, W2( PIX, ROW ), .FALSE., 
      :                               STATUS )
                   END IF
 
