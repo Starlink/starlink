@@ -1,4 +1,4 @@
-<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.7//EN" [
   <!ENTITY dblib.dsl	SYSTEM "dblib.dsl">
 ]>
 
@@ -46,7 +46,7 @@ parent of the node.
   <type>node-list
   <description>list of nodes we want the ancestors of
 <authorlist>
-<authorref id=iso10179 note='10.2.3'>
+<author id=iso10179>ISO 10179    <!-- 10.2.3 -->
 <codebody>
 (define (ancestors nl)
   (node-list-map (lambda (snl)
@@ -76,7 +76,7 @@ and otherwise returns <code>#f</>.
   <type>singleton-node-list
   <description>node to be tested against
 <authorlist>
-<authorref id=iso10179 note='10.2.2'>
+<author id=iso10179>ISO 10179 <!-- 10.2.2 -->
 <codebody>
 (define (node-list-contains? nl snl)
   (node-list-reduce nl
@@ -97,7 +97,7 @@ nl which is equal to a preceding member of nl is removed.
   <type>node-list
   <description>node-list to be filtered
 <authorlist>
-<authorref id=iso10179 note='10.2.2'>
+<author id=iso10179>ISO 10179 <!-- 10.2.2 -->
 <codebody>
 (define (node-list-remove-duplicates nl)
   (node-list-reduce nl
@@ -117,7 +117,7 @@ of the other arguments.  The result shall contain no duplicates.  With
 no arguments, an empty node-list shall be returned.
 <returnvalue type=node-list>List of nodes
 <authorlist>
-<authorref id=iso10179 note='10.2.2'>
+<author id=iso10179>ISO 10179 <!-- 10.2.2 -->
 <codebody>
 (define (node-list-difference #!rest args)
   (if (null? args)
@@ -149,7 +149,7 @@ return #f.
   <type>node-list
   <description>The node-list which is to be filtered
 <authorlist>
-<authorref id=iso10179 note='10.2.2'>
+<author id=iso10179>ISO 10179 <!-- 10.2.2 -->
 <codebody>
 (define (node-list-filter proc nl)
   (node-list-reduce nl
@@ -170,7 +170,7 @@ node-list containing just that member
   <type>node-list
   <description>The node-list which is to be split
 <authorlist>
-<authorref id=iso10179 note='10.2.2'>
+<author id=iso10179>ISO 10179 <!-- 10.2.2 -->
 <codebody>
 (define (node-list->list nl)
   (reverse (node-list-reduce nl

@@ -37,7 +37,7 @@ is preserved.
   <type>list of strings
   <description>List of GIs which indicates which elements are to be
   selected from the node list.
-<authorlist><authorref id="nw">
+<authorlist><author id=nw>Norm Walsh
 <codebody>
 (define (node-list-filter-by-gi nodelist gilist)
   (let loop ((result (empty-node-list)) (nl nodelist))
@@ -223,7 +223,7 @@ Returns the first ancestor of 'nd' whose GI that is a member of 'gilist'.
   <type>list of strings
   <description>List of strings indicating the set of GIs we want to
   select
-<authorlist><authorref id=nw>
+<authorlist><authorref id=nw>Norm Walsh
 <codebody>
 (define (ancestor-member nd gilist)
   (if (node-list-empty? nd)
