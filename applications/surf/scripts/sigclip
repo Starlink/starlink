@@ -27,10 +27,30 @@ die "Usage: sigclip NDF NSIGMA\n" if $#ARGV != 1;
 ($ndf, $nsigma) = @ARGV;
 
 $status = &NDF::SAI__OK;
+$good = $status;
 
 # Check for file
-($froot, $junk) = split('\.',$ndf);
--e "$froot.sdf" || die "File $ndf.sdf not found\n";
+
+# Remove trailing sdf
+$ndf =~ s/\.sdf$//;
+
+# Check that files exists simply by doing an ndf_find
+# and checking for good status.
+
+ndf_find(&NDF::DAT__ROOT, $ndf, $indf, $status);
+
+if ($status == $good) {
+  print "Using the NDF $ndf...\n";
+  $usethis = $ndf;
+  ndf_annul($indf, $status);
+} else {
+  err_rep(' ',"SIGCLIP: $ndf does not appear to be an NDF", $status);
+  err_annul($status);
+  exit;
+}
+
+# Get the root name for later on (in case a section was specified)
+($ndfroot, $junk) = split(/\.|\(/,$ndf);
 
 
 # Run stats
@@ -45,16 +65,24 @@ die "STATS finished abnormally...stopping (status = $exstat)\n"
 $max = $mean + ($nsigma * $sigma);
 $min = $mean - ($nsigma * $sigma);
 
+die "Bad status returning from par_get - Status = $status)\n"
+  if ($status != $good);
+
 # Run thresh
 
-$out = $ndf."_clip";
+$out = $ndfroot."_clip";
 $exstat = 
   system("$kappa/thresh $ndf OUT=$out THRLO=$min NEWLO=bad THRHI=$max newhi=bad");
 
 die "THRESH finished abnormally...stopping (status = $exstat)\n" 
   if ($exstat != 0);
 
-print "Clipped data written to $out.sdf\n";
+if (-e "$out.sdf") {
+  print "Clipped data written to $out.sdf\n";
+} else {
+  print "Warning - failed to write $out.sdf\n";
+}
+
 
 __END__
 *+
@@ -93,12 +121,6 @@ __END__
 *  Implementation Status:
 *     - The program must have two arguments. Parameters are not requested
 *       if an argument is omitted from the command line.
-*     - The output of STATS is not displayed therefore no error message is
-*       reported if STATS can not access the NDF (usually because the NDF
-*       has been specified incorrectly). If sigclip freezes without printing
-*       any output this is usually because STATS is waiting for input. You
-*       can check if the NDF has been specified correctly  by running it
-*       through STATS outside of sigclip and examining the output.
 
 *-
 *.
