@@ -47,6 +47,8 @@
 *        Original version.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     29-AUG-2004 (TIMJ):
+*        Use ONE_FIND_FILE
 *     {enter_changes_here}
 
 *  Bugs:
@@ -63,6 +65,7 @@
       INCLUDE 'MSG_PAR'         ! Message system parameters
       INCLUDE 'FIO_ERR'         ! FIO error codes
       INCLUDE 'PAR_ERR'         ! Parameter system errors
+      INCLUDE 'ONE_ERR'         ! Errors from FIND_FILE
       
 *  Arguments Returned:
       CHARACTER * ( * ) FILNAM
@@ -75,10 +78,8 @@
 *  External References:
       INTEGER CHR_LEN
       EXTERNAL CHR_LEN          ! Used length of string
-      INTEGER FIND_FILE
-      EXTERNAL FIND_FILE        ! Lists files in directory
-      INTEGER FIND_FILE_END
-      EXTERNAL FIND_FILE_END    ! Ends find_file context
+      LOGICAL ONE_FIND_FILE
+      EXTERNAL ONE_FIND_FILE        ! Lists files in directory
       
 *  Local Variables:
       CHARACTER * ( MSG__SZMSG ) BUF ! General character buffer
@@ -92,7 +93,6 @@
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in string
       INTEGER IFILE             ! File index
-      INTEGER LSTAT             ! Local status
       INTEGER N                 ! Number of files located
       INTEGER NAMGRP            ! File name group
       INTEGER TYPGRP            ! File types group
@@ -101,6 +101,7 @@
       LOGICAL CONT              ! Continue
       LOGICAL COMMEN            ! Line is a comment
       LOGICAL FIRST             ! First time in while loop
+      LOGICAL FOUND             ! Found a file ok
 *.
 
 *  Check inherited global status.
@@ -136,8 +137,8 @@
             FSPEC = CCDDIR( I )( :CHR_LEN( CCDDIR( 1 ) ) )//'/*.DAT'
             CONTXT = 0
  2          CONTINUE
-            LSTAT =  FIND_FILE( FSPEC, FILE, CONTXT )
-            IF ( LSTAT .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN 
+            FOUND =  ONE_FIND_FILE( FSPEC, .TRUE., FILE, CONTXT, STATUS)
+            IF ( FOUND .AND. STATUS .EQ. SAI__OK ) THEN 
 
 *  Have a list of files to read, store name and then derive type.
                N = N + 1
@@ -192,7 +193,9 @@
                   GO TO 3
                END IF
             END IF
-            LSTAT = FIND_FILE_END( CONTXT )
+*  Clear find_file context and reset NOFILES status
+            IF (STATUS .EQ. ONE__NOFILES) CALL ERR_ANNUL( STATUS )
+            CALL ONE_FIND_FILE_END( CONTXT, STATUS )
          END IF
  1    CONTINUE
 

@@ -20,12 +20,15 @@
 #  Authors:
 #     PWD: Peter Draper (Starlink)
 #     MBT: Mark Taylor (Starlink)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 
 #  History:
-#     11-JAN-2001:
+#     11-JAN-2001 (MBT):
 #        Rewrote combining ccdpack_link_adam and 
 #        ccdpack_graphics_link_adam into the same script, and added
 #        flags for graphics system selection.
+#     29-AUG-2004 (TIMJ):
+#        Use one_link
 #-
 
 #  Initialise link options - default is no graphics linking.
@@ -75,7 +78,7 @@
 #  which eliminates all except the last reference to each library.
       echo "`fio_link` `trn_link` `pda_link` \
             `chr_link` `prm_link` `psx_link` \
-            `ard_link` `ndg_link` `grp_link` \
+            `ard_link` `ndg_link` `grp_link` `one_link`\
             `ams_link_adam` \
             $graphargs -lpda" \
           | awk 'BEGIN{RS=" ";FS="\n"}

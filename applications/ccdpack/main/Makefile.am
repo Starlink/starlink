@@ -77,7 +77,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_box.f ccd1_gsrt.f ccd1_gszff.f ccd1_sgare.f ccd1_ordg.f ccd1_tran.f \
  ccd1_fspec.f ccd1_slice.f ccd1_grdel.f
 
-CSUBSRC = ccd1_exec.c slv.c find_file.c \
+CSUBSRC = ccd1_exec.c slv.c \
  tcltalk.c tclbg.c ndf.c ndfdrawpair.c ccdputs.c \
  ccdAppInit.c ccdaux.c ndgexpand.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c \
