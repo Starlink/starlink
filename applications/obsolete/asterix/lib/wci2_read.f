@@ -161,7 +161,11 @@
       SYSOK = .FALSE.
 
 *  Introduce the identifier to the PSF system
-      CALL PSF_INTRO( ARGS(1), IPSF, STATUS )
+      IF ( ARGS(1) .EQ. ADI__NULLID ) THEN
+        CALL PSF_INTRO( ARGS(2), IPSF, STATUS )
+      ELSE
+        CALL PSF_INTRO( ARGS(1), IPSF, STATUS )
+      END IF
       IF ( STATUS .EQ. SAI__OK ) THEN
         HASPIX = .TRUE.
       ELSE

@@ -955,14 +955,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 *      Status check
       IF (STATUS.NE.SAI__OK) RETURN
 
-	do ibin=1,dims(1)
-          print *,frbnd1(1,ibin),frbnd1(2,ibin)
-	enddo
-        print *,' '
-	do ibin=1,nbin(1)
-          print *,tobnd1(1,ibin),tobnd1(2,ibin)
-	enddo
-
 *  set up array of flags to record whether output bins have been filled
       CALL DYN_MAPB(7,NBIN,FPTR,STATUS)
 
@@ -1130,6 +1122,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                       RIH(IAX)=1
                     ENDDO
 
+	print *,i1,frbnd1(1,i1),frbnd1(2,i1),ril(1),rih(1)
 
 *  if donor is to be included then loop through receptor bins containing it
                     IF (INCLUDE) THEN
@@ -1232,6 +1225,8 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                                       ENDIF
 
                                     ENDDO
+
+	print *,'   ',dbot(1),dtop(1),rbot(1),rtop(1),fract
 
 *  add relevant bits to receptor bin
                                     IF (VOK.AND.QOK) THEN
