@@ -1090,7 +1090,7 @@ dd-MMM-yyyy.
 
 <codebody>
 (define (get-best-figurecontent nl req-not)
-  (if (node-list-empty? nl)
+  (if (or (not nl) (node-list-empty? nl))
       #f
       (let* ((this-one (node-list-first nl))
 	     (is-figurecontent? (string=? (gi this-one)
