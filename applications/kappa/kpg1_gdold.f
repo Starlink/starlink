@@ -100,6 +100,9 @@
 *        original current picture rather than the new DATA picture.
 *     10-AUG-2000 (DSB):
 *        Modified to allow negative margins.
+*     9-JAN-2001 (DSB):
+*        Clip ancillary pictures so that they are contained within the Frame
+*        picture, not the original current picture.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -354,11 +357,11 @@
          END IF
 
 *  Clip the bounds of the new picture so that it does not extend outside the 
-*  original current picture.
-         PXL = MAX( CXL, MIN( CXR, PXL ) )
-         PXR = MAX( CXL, MIN( CXR, PXR ) )
-         PYB = MAX( CYB, MIN( CYT, PYB ) )
-         PYT = MAX( CYB, MIN( CYT, PYT ) )
+*  FRAME picture.
+         PXL = MAX( FXL, MIN( FXR, PXL ) )
+         PXR = MAX( FXL, MIN( FXR, PXR ) )
+         PYB = MAX( FYB, MIN( FYT, PYB ) )
+         PYT = MAX( FYB, MIN( FYT, PYT ) )
 
 *  Create a PGPLOT viewport with these bounds and save it as a picture 
 *  within the FRAME picture (but only if it has non-zero size). The world
