@@ -308,6 +308,7 @@
 
 *        Put the frequency and time information into the axis arrays. Where
 *        does X1 come from!
+            X1 = 0.0
             SPARR(1) = 1.0/(DX*LSECT)
             SPARR(2) = SPARR(1)
             CALL BDI_AXPUT1R( PFID, 1, 'SpacedData', 2, SPARR,

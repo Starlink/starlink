@@ -1260,6 +1260,7 @@ c     REAL                 TRIGGER               !current trigger time
       IF( POS_FILE_OK)THEN
           CURRENT_KEY = BARY_MJD2HK(MJD_CURRENT)
 * read ATT POS SAT file
+           POS.UT = 0
 *          READ(LUN_POS,KEYGE=CURRENT_KEY)POS
 *read ATT POS SAT record into local variables
           UT = POS.UT
