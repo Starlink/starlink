@@ -3003,7 +3003,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *      Get response name by prompting
         CALL USI_PROMT( 'MASK', 'Name of Asterix spatial response file',
      :                  STATUS )
-        CALL USI_TASSOCI( 'MASK', '*', 'READ', SID, INPRIM, STATUS )
+        CALL USI_TASSOCI( 'MASK', '*', 'READ', SID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         CALL USI_CANCL( 'MASK', STATUS )
         IN_DATASET = .FALSE.
