@@ -113,7 +113,8 @@
 *     21-NOV-2000 (DSB):
 *        Added in corrections from MT to avoid numeric overflows in the case 
 *        of signed integral data types with a large dynamic range.
-
+*     28-NOV-2000 (DSB):
+*        More fixes from MT related to typing of MINV and MAXV.
 *     {enter_further_changes_here}
 
 *-
@@ -237,7 +238,8 @@
       ELSE
 
 *  The extreme values must not exceed the integer dynamic range.
-         IF ( MAXV .GT. VAL__MAXI .OR. MINV .LT. VAL__MINI ) THEN
+         IF ( VAL_<T>TOI( MAXV ) .GT. VAL__MAXI .OR. 
+     :        VAL_<T>TOI( MINV ) .LT. VAL__MINI ) THEN
             INTVAL = .FALSE.
          ELSE
 
@@ -317,12 +319,12 @@
       LIMITS( 2 ) = 1.0D0 - LIMITS( 1 )
       DO I = 1, NFRAC
          IF ( FRAC( I ) .LE. LIMITS( 1 ) ) THEN
-            VALUES( I ) = MINV
+            VALUES( I ) = NUM_<T>TOD( MINV )
             CLFRAC( I ) = FRAC( I )
             LOWER = LOWER + 1
 
          ELSE IF ( FRAC( I ) .GE. LIMITS( 2 ) ) THEN
-            VALUES( I ) = MAXV
+            VALUES( I ) = NUM_<T>TOD( MAXV )
             CLFRAC( I ) = FRAC( I )
             UPPER = UPPER - 1
          END IF
