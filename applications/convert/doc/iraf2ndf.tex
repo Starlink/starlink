@@ -27,8 +27,9 @@
       \sstexamplesubsection{
          iraf2ndf ell\_galaxy new\_galaxy
       }{
-         Converts the IRAF image ell\_galaxy (comprising files
-         ell\_galaxy.imh and ell\_galaxy.hdr) to an NDF called new\_galaxy.
+         Converts the IRAF image ell\_galaxy (comprising
+         files {\tt ell\_galaxy.imh} and {\tt ell\_galaxy.hdr}) to an NDF
+         called new\_galaxy.
       }
    }
    \sstnotes{
@@ -36,10 +37,10 @@
       \sstitemlist{
 
          \sstitem
-         The NDF data array is copied from the {\tt "}.pix{\tt "} file.
+         The NDF data array is copied from the {\tt ".pix"} file.
 
          \sstitem
-         The title of the IRAF image (object i\_title in the {\tt "}.imh{\tt "}
+         The title of the IRAF image (object i\_title in the {\tt ".imh"}
          header file) becomes the NDF title.
 
          \sstitem
@@ -62,17 +63,13 @@
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: NDF2IRAF.
+      \CONVERT: NDF2IRAF.
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         It is only available on VMS, SunOS, and Ultrix systems.  On
-         Solaris 2.3 systems the version built on SunOS can be used in
-         compatibility mode, but there is no guarantee that this will
-         work for all IRAF images.  At the time of writing there was no
-         working IRAF imfort library available for Alpha/OSF1.
+         It is only supported for sun4\_Solaris and alpha\_OSF1 systems.
 
          \sstitem
          Only handles one-, two-, and three-dimensional IRAF files.

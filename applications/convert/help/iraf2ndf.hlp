@@ -53,8 +53,22 @@ name of the image and the date of the format conversion.
    these macros are not part of the IMFORT interface specification.
    It is possible that these may be changed in the future, so
    beware.
+2 External_Routines_Used
+   IRAF IMFORT subroutine library:
+      IMOPEN(), IMGSIZ(), IMGKWC(), IMCLOS(), IMEMSG()
+   Home-grown routines:
+      NLINES(), NHIST(), GETLIN(), GETHIS()
+2 References
+   -  IRAF User Handbook Volume 1A
+   "A User's Guide to FORTRAN Programming in IRAF, The IMFORT
+   Interface", by Doug Tody
+2 Machine-specific_features_used
+   -  Linking
+   See makefile
 2 Keywords
    CONVERT, IRAF
+2 *
+   Bugs:
 2 Authors
 RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 
@@ -82,12 +96,25 @@ MJC: Malcolm J. Currie (STARLINK)
  1993 September 30 (MJC):
     Do not copy standard FITS headers already added to the FITS
     extension.
+
+ 08-AUG-1995 (GJP):
+    Modified the method used to obtain the date/time string to
+    avoid the use of pointer. Gave up PSX_ASCTIME and used
+    PSX_CTIME instead.
+
+ 09-AUG 1995 (GJP):
+    Removed erroneous mention of LIN2MAP, PREFITS and PUTLIN.
+
+ 09-AUG-1995 (GJP):
+    Added the ability to generate a sensible error message when
+    IMOPEN fails - as would happen if the file requested did
+    not exist.
+
+ 11-AUG-1995 (GJP):
+    Added a check to see if any header lines were found before
+    calling GETLIN to obtain them.
 2 Implementation_Status
-   -  It is only available on VMS, SunOS, and Ultrix systems.  On
-   Solaris 2.3 systems the version built on SunOS can be used in
-   compatibility mode, but there is no guarantee that this will
-   work for all IRAF images.  At the time of writing there was no
-   working IRAF imfort library available for Alpha/OSF1.
+   -  It is only supported for sun4_Solaris and alpha_OSF1 systems.
 
    -  Only handles one-, two-, and three-dimensional IRAF files.
 

@@ -67,11 +67,7 @@
 *     beware.
 
 *  Implementation Status:
-*     -  It is only available on VMS, SunOS, and Ultrix systems.  On
-*     Solaris 2.3 systems the version built on SunOS can be used in
-*     compatibility mode, but there is no guarantee that this will
-*     work for all IRAF images.  At the time of writing there was no
-*     working IRAF imfort library available for Alpha/OSF1.
+*     -  It is only supported for sun4_Solaris and alpha_OSF1 systems.
 *     -  Only handles one-, two-, and three-dimensional IRAF files.
 *     -  The NDF produced has type _WORD or _REAL corresponding to the
 *     type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
@@ -87,18 +83,17 @@
 *  External Routines Used:
 *     IRAF IMFORT subroutine library:
 *        IMOPEN(), IMGSIZ(), IMGKWC(), IMCLOS(), IMEMSG()
-*     Home grown routines:
-*        LIN2MAP(), NLINES(), NHIST(), GETLIN(), PREFITS(),
-*        PUTLIN(), GETHIS()
+*     Home-grown routines:
+*        NLINES(), NHIST(), GETLIN(), GETHIS()
 
 *  References:
 *     -  IRAF User Handbook Volume 1A
-*     A User's Guide to FORTRAN Programming in IRAF, The IMFORT
-*     Interface, by Doug Tody
+*     "A User's Guide to FORTRAN Programming in IRAF, The IMFORT
+*     Interface", by Doug Tody.
 
 *  Machine-specific features used:
 *     -  Linking
-*     See MMS file or makefile
+*     See makefile
 
 *  Keywords:
 *     CONVERT, IRAF
@@ -126,7 +121,20 @@
 *     1993 September 30 (MJC):
 *        Do not copy standard FITS headers already added to the FITS
 *        extension.
-*     {enter_further_changes_here}
+*     08-AUG-1995 (GJP):
+*        Modified the method used to obtain the date/time string to
+*        avoid the use of pointer. Gave up PSX_ASCTIME and used
+*        PSX_CTIME instead.
+*     09-AUG 1995 (GJP):
+*        Removed erroneous mention of LIN2MAP, PREFITS and PUTLIN.
+*     09-AUG-1995 (GJP):
+*        Added the ability to generate a sensible error message when
+*        IMOPEN fails - as would happen if the file requested did 
+*        not exist.
+*     11-AUG-1995 (GJP):
+*        Added a check to see if any header lines were found before 
+*        calling GETLIN to obtain them.
+**     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -190,7 +198,6 @@
       CHARACTER * ( STRLEN ) IMERRM ! IMFORT error message text
       CHARACTER * ( STRLEN ) IRAFIL ! Input IRAF image name
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Type of the NDF
-      INTEGER JUNKIT             ! Junk variable for unwanted numbers
       INTEGER K                  ! Loop counter
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF axes
       INTEGER LINENO             ! Line number
@@ -210,7 +217,6 @@
       INTEGER PNTR( 1 )          ! Pointer to NDF data array
       CHARACTER * ( 132 ) TITLE  ! Title of the NDF 
       CHARACTER * ( 25 ) TIMEST  ! The time in an ascii string.
-      INTEGER TSTRUCT            ! The time structure from psx_localtime
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF axes
       INTEGER XLINES             ! Number of NDF extension lines
       INTEGER XDIMS( 1 )         ! Number of dimensions in FITS
@@ -232,13 +238,19 @@
             
 *  Convert file name to lower case.
 *      CALL CHR_LCASE( IRAFIL )
-
+       
 *  Access mode is 1 for read only and 3 for read and write access.
       ACCESS = 1
 
-*  Open the IRAF image
+*  Open the IRAF image.
       CALL IMOPEN( IRAFIL, ACCESS, IMDESC, ERR )
-      IF ( ERR .NE. 0 ) GOTO 999
+      IF ( ERR .NE. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'IRAF2NDF_IRAFERR',
+     :     'IRAF2NDF: Error found while loading the IRAF file. ',
+     :     STATUS )
+         GOTO 999
+      END IF
 
 *  Obtain the shape of the IRAF image.
 *  ===================================
@@ -246,7 +258,7 @@
 *  Obtain the dimensions and pixeltype of the IRAF image.
       CALL IMGSIZ( IMDESC, DIMS, MDIM, DTYPE, ERR )
       IF ( ERR .NE. 0 ) GOTO 999
-
+      
 *  Check the data type of the input image.  It must be real (6) or
 *  signed word (3).
       IF ( DTYPE .NE. 6 .AND. DTYPE .NE. 3 ) THEN
@@ -298,7 +310,7 @@
 
 *  Create the output NDF.
 *  ======================
-
+      
 *  Start an NDF context.
       CALL NDF_BEGIN
       
@@ -316,7 +328,6 @@
       ELSE
          CALL PSX_CALLOC( NCOLS, ITYPE, LIPNTR, STATUS )
       END IF
-
       IF ( STATUS .NE. SAI__OK ) GOTO 980
       
 *  Pass the Image descriptor, image dimensions, line buffer,
@@ -333,7 +344,7 @@
       END IF
 
       IF ( STATUS .NE. SAI__OK ) GOTO 980
-      
+            
 *  Get and validate header and history records.
 *  ============================================
 
@@ -345,7 +356,7 @@
       CALL MSG_SETI( 'NH', NHDRLI )
       CALL MSG_OUTIF( MSG__VERB, ' ', 'There are ^NH header lines '/
      :  /'to propagate.', STATUS )
-
+     
 *  Call RAHM's SPP routine nhist.x to discover the number of history
 *  lines in the image.  These are records of what IRAF has done to this
 *  particular file.  They become FITS HISTORY lines.
@@ -359,7 +370,7 @@
 *  maximum of 511.  Once the history area is full, later additions are
 *  truncated or lost.
       CALL NHIST( IMDESC, NHISTL, NCHARS )
-
+     
 *  Check for empty lines.
       EMPTY = 0
       DO 5 K = 1, NHISTL
@@ -378,7 +389,7 @@
 *  Check whether each history entry is properly terminated by a newline
 *  character.  In the history area, each entry should be terminated
 *  with a newline character.  We should never go more than FITSHI
-*  characters without encountering a newline. Any more than FITSHI
+*  characters without encountering a newline.  Any more than FITSHI
 *  chars will not fit into a FITS standard HISTORY line.
       IF ( NCHARS .GT. FITSHI .AND. NHISTL .LE. 1 ) THEN
          NHISTL = 0
@@ -390,7 +401,7 @@
          CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of HISTORY lines '/
      :     /'in the header is ^NHISTL', STATUS )
       END IF
-
+     
 *  Calculate the size of the FITS extension.
 *  =========================================
 
@@ -398,9 +409,11 @@
 *  SIMPLE =        T  / Comment.....
 *
 *  Otherwise, will have to add it. The FITS extension should, after
-*  all, contain lines conforming to the FITS standard.
-      CALL GETLIN( IMDESC, 1, CARD )
+*  all, contain lines conforming to the FITS standard. Only carried out if 
+*  a header was found.
 
+      CARD=' '
+      IF ( NHDRLI .GT. 0 ) CALL GETLIN( IMDESC, 1, CARD )
       ADFITS = .FALSE.
       IF ( INDEX( CARD( 1:8 ), 'SIMPLE' ) .EQ. 0 .OR.
      :     CARD( 30:30 ) .NE. 'T' ) THEN
@@ -416,8 +429,8 @@
 *  mandatory card images are added there needs to be three lines for
 *  SIMPLE, BITPIX, and NAXIS cards, and one card for each dimension in
 *  MDIM (NAXISn keyword).  In practice some of the mandatory FITS
-*  headers may be present, and the extension will need to be truncated
-*  at the end.
+*  headers may not be present, and the extension will need to be
+*  truncated at the end.
       XLINES = NHDRLI + NHISTL + 2 + 1
 
       IF ( ADFITS ) XLINES = XLINES + 3 + MDIM
@@ -428,7 +441,7 @@
 *  Set the first member of an array to the dimensionality of the
 *  80-character array required.
       XDIMS( 1 ) = XLINES
-
+      
 *  Create the NDF extension.
       CALL NDF_XNEW( NDF, 'FITS', '_CHAR*80', 1, XDIMS, FITLOC, STATUS )
             
@@ -508,7 +521,6 @@
 *  array element after inserting the header lines.
       LINENO = LINENO + NHDRLI - NREJEC
 
-
 *  Append the history records in the FITS extension.
 *  =================================================
 
@@ -554,7 +566,7 @@
 
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                 %VAL( FITSLN ) )
+     :                %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
@@ -568,14 +580,10 @@
 *  Find the current time count.
       CALL PSX_TIME( NTICKS, STATUS )
       CALL MSG_SETC( 'IRAFIL', IRAFIL )
-
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Find the date and time.
-         CALL PSX_LOCALTIME( NTICKS, JUNKIT, JUNKIT, JUNKIT, JUNKIT,
-     :                       JUNKIT, JUNKIT, JUNKIT, JUNKIT, JUNKIT,
-     :                       TSTRUCT, STATUS )
-         CALL PSX_ASCTIME( TSTRUCT, TIMEST, STATUS )
+         CALL PSX_CTIME( NTICKS, TIMEST, STATUS )
 
 *  Create the history text.
          CALL MSG_SETC( 'TIME', TIMEST )
@@ -588,7 +596,7 @@
       
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                 %VAL( FITSLN ) )
+     :                %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
@@ -607,7 +615,7 @@
 
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                 %VAL( FITSLN ) )
+     :                %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
