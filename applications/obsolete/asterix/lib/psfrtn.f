@@ -429,7 +429,7 @@
       END
 
 *+  PSF_ANAL_INIT - Analytic defined PSF initialisation
-      SUBROUTINE PSF_ANAL_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_ANAL_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -465,8 +465,6 @@
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -494,6 +492,7 @@
       REAL			W1, W2			! Widths
 
       INTEGER                 	BEG, IC           ! Character pointers
+      INTEGER			INST			! Instance data
       INTEGER                 	X_AX,Y_AX,E_AX,T_AX	! Axis numbers
 
       LOGICAL                 	X_OK, Y_OK        	! Axes ok?
@@ -526,6 +525,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Identify spatial axes
+      CALL ADI_CGET0I( PSID, 'Instance', INST, STATUS )
       CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Tell the user about the pixel size if we have a dataset.
@@ -1406,7 +1406,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_ASCA_INIT - ASCA psf initialisation
-      SUBROUTINE PSF_ASCA_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_ASCA_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -1442,8 +1442,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -1469,14 +1467,33 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       INTEGER			ABPTR			! Axis bounds array
       INTEGER			DIMS(ADI__MXDIM), NDIM	! Dataset dimensions
+      INTEGER			FID			! File identifier
+      INTEGER			I,J			!
       INTEGER			SLOT			! Psf slot number
       INTEGER			X_AX,Y_AX,E_AX,T_AX
 
       LOGICAL			PHADEF			! PHA band defined?
+*
+*  Local Data:
+*
+      LOGICAL			FIRST
+	SAVE			FIRST
+      DATA			FIRST/.TRUE./
 *-
 
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Clear pointer arrays for ASCA psfs
+      IF ( FIRST ) THEN
+        DO I = 1, AS_NSP
+          DO J = 1,  AS_NE
+            AS_GPTR(J,I) = 0
+            AS_SPTR(J,I) = 0
+          END DO
+        END DO
+        FIRST = .FALSE.
+      END IF
 
 *  Get directory containing FTOOLS calibrations
       CALL PSX_GETENV( 'AST_FTOOLS_CALDB', AS_CALDB, STATUS )
@@ -1517,6 +1534,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       IF ( PHADEF ) THEN
 
 *    Locate INSTRUMENT box
+        CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
         CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
         CALL CMP_GET0R( ILOC, 'RCHANLO', RCLO, STATUS )
         CALL CMP_GET0R( ILOC, 'RCHANHI', RCHI, STATUS )
@@ -1695,7 +1713,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 
 *+  PSF_EXOLE_INIT - EXOSAT LE psf initialisation
-      SUBROUTINE PSF_EXOLE_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_EXOLE_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -1728,8 +1746,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -1836,7 +1852,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
-      SUBROUTINE PSF_PWFC_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_PWFC_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -1868,10 +1884,10 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
       EXTERNAL			PSF_PWFC
+*  Local Variables:
+      INTEGER			FID			! Dataset handle
 *-
 
 *  Check inherited global status
@@ -1879,6 +1895,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *  Ensure CAL is initialised
       CALL PSF_WFC_CALIN( STATUS )
+
+*  Get file id
+      CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
 
 *  Load data from dataset
       CALL PSF_WFC_LOADD( FID, .FALSE., PSID, STATUS )
@@ -2177,7 +2196,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RADIAL_INIT - Radially defined PSF initialisation
-      SUBROUTINE PSF_RADIAL_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_RADIAL_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -2210,8 +2229,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -2839,7 +2856,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_RESPFILE_INIT - Response defined PSF initialisation
-      SUBROUTINE PSF_RESPFILE_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_RESPFILE_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -2876,8 +2893,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -2887,6 +2902,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       REAL 			PSF1_GETAXDR
       REAL 			PSF1_GETAXTOR
+      EXTERNAL			PSF_RESPFILE
+      EXTERNAL			PSF_RESPFILE_CLOSE
+      EXTERNAL			PSF_RESPFILE_HINT
 *
 *    Local variables :
 *
@@ -2910,6 +2928,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			DIMS(5), NDIM		! Response full size
       INTEGER			DPTR, IPTR		! Response data
       INTEGER			DX, DY			!
+      INTEGER			FID			! Dataset handle
       INTEGER			FSTAT			! i/o status code
       INTEGER                 	IAX			! Loop over axes
       INTEGER                 	NELM 			! Number of elements mapped
@@ -2924,13 +2943,14 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       LOGICAL			RADIAL			! Radial response?
 *-
 
-*    Check status
+*  Check inherited status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Extract locator
+*  Extract locator
+      CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
       CALL ADI1_GETLOC( FID, LOC, STATUS )
 
-*    Does the dataset have an attached spatial response?
+*  Does the dataset have an attached spatial response?
       CALL HDX_FIND( LOC, 'MORE.ASTERIX.SPATIAL_RESP', SLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL MSG_PRNT( 'Found spatial response in dataset...' )
@@ -2939,7 +2959,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       ELSE
 
-*      Annul error
+*    Annul error
         CALL ERR_ANNUL( STATUS )
 
 *    Get response name by prompting
@@ -3081,141 +3101,16 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *  Reset workspace
       CALL PSF0_SETID0I( PSID, 'Rptr', 0, STATUS )
 
+*  Set methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_RESPFILE, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_RESPFILE_HINT, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Close', PSF_RESPFILE_CLOSE, STATUS )
+
 *  Abort point
  99   CONTINUE
 
       END
 
-*+  PSF_SHARE_CLOSE - Close down Asterix in this image
-      SUBROUTINE PSF_SHARE_CLOSE( )
-*
-*    Description :
-*
-*     Free any resources allocated to the PSFLIB image.
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     07 Nov 89 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*-
-
-*    New error context
-      CALL ERR_MARK( STATUS )
-
-*    Back to old error context
-      CALL ERR_RLSE( STATUS )
-
-      END
-
-*+  PSF_SHARE_INIT - Start up Asterix in this image
-      SUBROUTINE PSF_SHARE_INIT( NMOD, MODULES, STATUS )
-*
-*    Description :
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     07 Nov 89 : Original (DJA)
-*     16 Dec 93 : Added RESPFILE psf (DJA)
-*     12 Jan 94 : Added ASCA psf (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_ASCA_CMN'
-      INCLUDE 'PSF_XRT_PSPC_CMN'
-*
-*    Status :
-*
-      INTEGER                  STATUS                  ! Run-time error
-*
-*    Export :
-*
-      INTEGER                  NMOD                    ! # modules
-      CHARACTER*(*)            MODULES(*)              ! Module names
-*
-*    Local constants :
-*
-      INTEGER                  PSFLIB_NMOD             !
-        PARAMETER              ( PSFLIB_NMOD = 10 )
-*
-*    Local variables :
-*
-      INTEGER                  I, J                    ! Loop over models
-*
-*    Local data :
-*
-      CHARACTER*20             MODS(PSFLIB_NMOD)
-      DATA                     MODS/'ANAL',
-     :                              'ASCA',
-     :                              'EXOLE',
-     :                              'PWFC',
-     :                              'RADIAL',
-     :                              'RESPFILE',
-     :                              'TABULAR',
-     :                              'WFC',
-     :                              'XRT_HRI',
-     :                              'XRT_PSPC'/
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Reset the SYSTEM_INIT flag in each common block
-      AS_INIT = .TRUE.
-      RX_CB_OPEN = .FALSE.
-
-*    Clear pointer arrays for ASCA psfs
-      DO I = 1, AS_NSP
-        DO J = 1,  AS_NE
-          AS_GPTR(J,I) = 0
-          AS_SPTR(J,I) = 0
-        END DO
-      END DO
-
-*    Return models available
-      IF ( PSFLIB_NMOD .LE. PSF_NMAX ) THEN
-        NMOD = PSFLIB_NMOD
-        DO I = 1, PSFLIB_NMOD
-          MODULES(I) = MODS(I)
-        END DO
-      END IF
-
-*    Tidy up
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'PSF_SHARE_INIT', STATUS )
-      END IF
-
-      END
 
 *+  PSF_TABULAR - 2D user supplied psf handler
       SUBROUTINE PSF_TABULAR( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
@@ -3357,7 +3252,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_INIT - Tabular defined PSF initialisation
-      SUBROUTINE PSF_TABULAR_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_TABULAR_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -3394,8 +3289,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -3775,7 +3668,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_WFC_INIT - Initialise the WFC survey psf system
-      SUBROUTINE PSF_WFC_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_WFC_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -3807,10 +3700,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
       EXTERNAL			PSF_WFC
+*  Local Variables:
+      INTEGER			FID			! Dataset handle
 *-
 
 *  Check inherited global status
@@ -3818,6 +3711,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Ensure CAL is initialised
       CALL PSF_WFC_CALIN( STATUS )
+
+*  Get file
+      CALL ADI_CGET0I( PSID, 'FileID', FID, STATUS )
 
 *  Load data from file
       CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
@@ -5099,7 +4995,7 @@ c     :                           S2 = 4.0419,
       END
 
 *+  PSF_XRT_PSPC_INIT - XRT PSPC psf initialisation
-      SUBROUTINE PSF_XRT_PSPC_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -5135,8 +5031,6 @@ c     :                           S2 = 4.0419,
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -5164,12 +5058,24 @@ c     :                           S2 = 4.0419,
 
       LOGICAL                  OK		      	!
       LOGICAL                  PHADEF		      	! PHA band defined?
+*
+*  Local Data:
+*
+      LOGICAL			FIRST
+	SAVE			FIRST
+      DATA			FIRST/.TRUE./
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get mask name
+*  First time?
+      IF ( FIRST ) THEN
+        RX_CB_OPEN = .FALSE.
+        FIRST = .FALSE.
+      END IF
+
+*  Get mask name
       CALL USI_PROMT( 'MASK',
      :                'PSPC psf option (LIST for descriptions)',
      :                STATUS )
@@ -5296,7 +5202,7 @@ c     :                           S2 = 4.0419,
 
 
 *+  PSF_XRT_HRI_INIT - XRT HRI psf initialisation
-      SUBROUTINE PSF_XRT_HRI_INIT( PSID, FID, INST, STATUS )
+      SUBROUTINE PSF_XRT_HRI_INIT( PSID, STATUS )
 *
 *    Description :
 *
@@ -5329,8 +5235,6 @@ c     :                           S2 = 4.0419,
 *    Import :
 *
       INTEGER			PSID
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
 *
 *    Status :
 *
