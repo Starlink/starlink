@@ -18,9 +18,7 @@ MANIFEST=$(prefix)/manifests
 #         dependency order.
 #     Obsolete components
 ALL_TARGETS = \
-	$(MANIFEST)/adam \
 	$(MANIFEST)/agi \
-	$(MANIFEST)/ams \
 	$(MANIFEST)/ard \
 	$(MANIFEST)/ast \
 	$(MANIFEST)/astrom \
@@ -35,7 +33,6 @@ ALL_TARGETS = \
 	$(MANIFEST)/daophot \
 	$(MANIFEST)/dipso \
 	$(MANIFEST)/docfind \
-	$(MANIFEST)/dtask \
 	$(MANIFEST)/echomop \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/esp \
@@ -52,7 +49,6 @@ ALL_TARGETS = \
 	$(MANIFEST)/gsd \
 	$(MANIFEST)/gwm \
 	$(MANIFEST)/hds \
-	$(MANIFEST)/hdspar \
 	$(MANIFEST)/hdstools \
 	$(MANIFEST)/hdstrace \
 	$(MANIFEST)/hlp \
@@ -66,20 +62,15 @@ ALL_TARGETS = \
 	$(MANIFEST)/jpl \
 	$(MANIFEST)/kappa \
 	$(MANIFEST)/kaprh \
-	$(MANIFEST)/lex \
 	$(MANIFEST)/mag \
 	$(MANIFEST)/mers \
 	$(MANIFEST)/messgen \
-	$(MANIFEST)/messys \
-	$(MANIFEST)/misc \
-	$(MANIFEST)/msp \
 	$(MANIFEST)/nbs \
 	$(MANIFEST)/ndf \
 	$(MANIFEST)/ndg \
 	$(MANIFEST)/news \
 	$(MANIFEST)/one \
 	$(MANIFEST)/par \
-	$(MANIFEST)/parsecon \
 	$(MANIFEST)/pda \
 	$(MANIFEST)/pgp \
 	$(MANIFEST)/photom \
@@ -95,12 +86,8 @@ ALL_TARGETS = \
 	$(MANIFEST)/sgs \
 	$(MANIFEST)/shl \
 	$(MANIFEST)/sla \
-	$(MANIFEST)/sock \
 	$(MANIFEST)/spt \
 	$(MANIFEST)/sst \
-	$(MANIFEST)/string \
-	$(MANIFEST)/subpar \
-	$(MANIFEST)/task \
 	$(MANIFEST)/tcl \
 	$(MANIFEST)/tk \
 	$(MANIFEST)/trn \
