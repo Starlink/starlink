@@ -111,11 +111,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     10 Aug 1995 (DJA):
 *        Original version.
+*     11 Feb 1997 (RB):
+*        Cope with TABID and extensions not found
 *     {enter_changes_here}
 
 *  Bugs:
@@ -197,7 +200,7 @@
       CALL ADI2_CFIND_HDU( FITID, LHDU(:HLEN), CREATE, HDUID,
      :                     DIDCRE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      if ( hduid .eq. adi__nullid ) goto 99
+      if ( HDUID .EQ. ADI__NULLID ) GOTO 99
 
 *  Did we just create the primary HDU?
       IF ( DIDCRE .AND. (LHDU(:HLEN).EQ.'PRIMARY') ) THEN
@@ -590,6 +593,7 @@
 
 *        Not found and no more HDUs?
             ELSE IF ( .NOT. FOUND .AND. .NOT. MORE ) THEN
+              HDUID = ADI__NULLID
 
 *          Mark as having scanned inputs
               CALL ADI_CPUT0L( HCID, 'ScannedAll', .TRUE., STATUS )
@@ -922,6 +926,9 @@ c         END IF
 
 *  Initialise
       ID = ADI__NULLID
+
+*  Can't do much if there's no table ID
+      IF ( TABID .EQ. ADI__NULLID ) RETURN
 
 *  Does the HDU exist in the container property list?
       CALL ADI_THERE( TABID, '.'//NAME, THERE, STATUS )
