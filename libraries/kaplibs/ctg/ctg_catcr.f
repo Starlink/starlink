@@ -34,11 +34,14 @@
 
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     12-OCT-2004 (TIMJ):
+*        Use PSX_REMOVE rather than CTG1_RM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,7 +108,11 @@
          CALL CHR_APPND( DIR, FILE, IAT )
          CALL CHR_APPND( BN, FILE, IAT )
          CALL CHR_APPND( TYP, FILE, IAT )
-         CALL CTG1_RM( FILE( : IAT ), STATUS )
+         IF (STATUS .EQ. SAI__OK) THEN
+*  We do not care about error messages from the remove
+            CALL PSX_REMOVE( FILE( : IAT ), STATUS )
+            IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL( STATUS )
+         END IF
       END IF
 
 *  Create the catalogue.
