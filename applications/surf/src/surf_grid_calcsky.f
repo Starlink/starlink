@@ -180,6 +180,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.6  1999/07/26 20:38:01  timj
+*     Improve the checking for 0.0. Some indenting.
+*
 *     Revision 1.5  1999/07/17 02:56:38  timj
 *     Further refinement of the sky removal using model.
 *
@@ -477,8 +480,8 @@
 
                IF (I .EQ. 1) THEN
                   CALL MSG_SETC('TSK',TSKNAME)
-                  CALL MSG_OUTIF(MSG__QUIET,' ','^TSK: The model '//
-     :                 'covers a smaller area than the data',
+                  CALL MSG_OUTIF(MSG__QUIET,' ','^TSK Warning: '//
+     :                 'The model covers a smaller area than the data',
      :                 STATUS)
                END IF
             END IF
@@ -526,15 +529,30 @@
             CALL PAR_GET0R('PA', MODEL_PA, STATUS)
 
 *     Allocate some memory to store the chopped image
-         STATS_PTR = 0
-         STATS_END = 0
-         CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,STATS_END, 
-     :        STATUS)
+            STATS_PTR = 0
+            STATS_END = 0
+            CALL SCULIB_MALLOC(3 * NX * NY * VAL__NBR, STATS_PTR,
+     :           STATS_END, STATUS)
 
 *     Add the dual beam
-         CALL SURFLIB_CALC_CHOPPED_IMAGE( 2, MODEL_THROW, MODEL_PA,
-     :        NX, NY, %VAL(MODEL_PTR), %VAL(STATS_PTR), .FALSE.,
-     :        0, 0, STATUS)
+            CALL SURFLIB_CALC_CHOPPED_IMAGE( 2, MODEL_THROW, MODEL_PA,
+     :           NX, NY, %VAL(MODEL_PTR), %VAL(STATS_PTR), .FALSE.,
+     :           0, 0, STATUS)
+
+*     Write to disk - to test the dual beam
+*            LBND(1) = 1
+*            LBND(2) = 1
+*            UBND(1) = NX
+*            UBND(2) = NY
+*            CALL NDF_PLACE(DAT__ROOT, 'model_test', ITEMP, STATUS)
+*            CALL NDF_NEW('_REAL',2,LBND,UBND, ITEMP, GRNDF, STATUS)
+*            CALL NDF_MAP(GRNDF, 'DATA','_REAL', 'WRITE', GRPNTR,
+*     :           ITEMP, STATUS)
+*            CALL VEC_RTOR(.FALSE., NX * NY, 
+*     :           %VAL(STATS_PTR), 
+*     :           %VAL(GRPNTR), IERR, NERR, STATUS)
+*            CALL NDF_UNMAP(GRNDF, '*', STATUS)
+*            CALL NDF_ANNUL(GRNDF, STATUS)
 
          ELSE
 
@@ -785,7 +803,12 @@
             OFFSET = (J-1) * N_BOLS(I)
 
 *     Need to remove all the points that are exactly 0.0D0 since
-*     these do not provide a measure of the sky
+*     these do not provide a measure of the sky - ie the model fits
+*     the data precisely which probably indicates that the
+*     self-generated model only had one point in the relevant bin.
+*     This is only relevant when using a self-generated model.
+*     This is turned off when using an external model since then
+*     the zeroes are relevant.
 
             NGOOD = 0
             DO K = 1, N_BOLS(I)
@@ -794,8 +817,8 @@
      :              %VAL(DATA_PTR(I) + ((K-1) + OFFSET) * VAL__NBR),
      :              RTEMP, IERR, NERR, STATUS)
 
-*       Skip if zero
-               IF (RTEMP .NE. 0.0) THEN
+*       Skip if zero (but not if we are using an external model)
+               IF (RTEMP .NE. 0.0 .OR. HAVE_MODEL) THEN
                   CALL VEC_RTOR(.FALSE., 1, RTEMP,
      :                 %VAL(SCRATCH2_PTR + NGOOD*VAL__NBR),
      :                 IERR, NERR, STATUS)
@@ -805,7 +828,7 @@
      :                 IERR, NERR, STATUS)
 
                   NGOOD = NGOOD + 1
-                  
+
                END IF
 
             END DO
