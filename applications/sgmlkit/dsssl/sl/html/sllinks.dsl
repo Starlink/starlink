@@ -194,7 +194,7 @@ it produces an <funcname/error/.
 				    (string-append %starlink-document-server%
 						   url "#xref_")
 				    ;(href-to docelem reffrag: #f)
-				    (href-to docelem force-frag: "#xref_")
+				    (href-to docelem force-frag: "xref_")
 				    ))))
 		  (if linktext
 		      (literal linktext)
