@@ -203,7 +203,8 @@ it produces an <funcname/error/.
 	(cond
 	 (docelem (error (string-append "DOCXREF: target " xrefent
 					" has document type " (gi docelem)
-					": expected DOCUMENTSUMMARY")))
+					": expected "
+					(normalize "documentsummary"))))
 	 (xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
 					      " has a SYSTEM id")))
 	 (xrefent-gen-sysid (error (string-append
