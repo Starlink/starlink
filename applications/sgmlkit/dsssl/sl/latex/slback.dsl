@@ -126,14 +126,19 @@ update elements which refer to them.
 	    (process-node-list (element-with-id
 				(attribute-string (normalize "author"))))
 	    (literal ", "
-		     (format-date (attribute-string (normalize "date")))))))
+		     (format-date (attribute-string (normalize "date")))))
+      (collect-updates (literal "Changes in version "
+				(attribute-string (normalize "number"))))))
+
   (element distribution
     (collect-updates (literal "Distribution "
 			      (attribute-string (normalize "string")))))
+
   (element change
     (collect-updates (literal
 		      "Change "
 		      (format-date (attribute-string (normalize "date"))))))
+
   (element update
     (make sequence
       (make empty-command name: "item")
