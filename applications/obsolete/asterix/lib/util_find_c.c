@@ -194,10 +194,6 @@ F77_SUBROUTINE(util_findfile_int)( CHARACTER(deft), CHARACTER(wspec),
         {
         d_name = dent->d_name;
 
-#ifdef sun4_Solaris
-  d_name -= 2;
-#endif
-
         if ( !strcmp(d_name,".") ||		/* Skip these entries */
              !strcmp(d_name,"..") ) continue;
           {
