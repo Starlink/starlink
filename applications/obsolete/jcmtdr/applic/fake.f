@@ -18,6 +18,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
+*     Tim Jenness (JACH::TIMJ)
 *     {enter_new_authors_here}
 
 *  History:
@@ -29,6 +30,8 @@
 *     13-JUN-1994 (REVAD::HME): Disuse DSA_WRUSER.
 *     14-OCT-1994 (REVAD::JFL): Safeguard against problems with maps straddling
 *                               2pi -> 0 boundary in RA.
+*     28-MAR-2003 (JACH:TIMJ): Fix warning for TS2MAP
+*                              NELM is now initialised
 *     {enter_changes_here}
 
 *  Bugs:
@@ -155,7 +158,7 @@
 *  check that it doesn't contain a TSDAT structure which would mean that
 *  the data is in `time-sorted' form
 
-      CALL DTA_CRNAM ('INPUT', 'MORE.JCMT.TSDAT', 0, 0, DTA_NAME,
+      CALL DTA_CRNAM ('IN', 'MORE.JCMT.TSDAT', 0, 0, DTA_NAME,
      :   DSTAT)
       CALL DTA_STRUC (DTA_NAME, STRUC, DSTAT)
       IF (DSTAT .EQ. 0) THEN
@@ -180,7 +183,9 @@
       END IF
 
 *  Check the LST values are present and map them
+*  Needs to be done after we have worked out the size of the array
 
+      CALL DSA_DATA_SIZE ('IN', 2, NDIM, DIMS, NELM, STATUS)
       CALL DTA_CRNAM (JCMT_DTA_NAME, 'LST.DATA_ARRAY', 0, 0, DTA_NAME, 
      :   DSTAT)
       CALL DTA_MRVARD (DTA_NAME, NELM, ADDRESS, DSTAT)
