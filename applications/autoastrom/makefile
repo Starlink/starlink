@@ -284,14 +284,12 @@ help:
 #  Defaults.
 #  ========
 #
-#  This section defines default macros and should rarely need changing.
-#  The values given here should be overridden externally to adapt to
-#  the local system setup (either use the mk script or use environment
-#  variables and invoke "make" with the "-e" option).
+#  This section defines default macros and should rarely need
+#  changing.  They are configured using autoconf.
 
 #  Name of computer hardware/OS combination.
 
-SYSTEM = unknown
+SYSTEM = ix86_Linux
 
 #  Name used to distinguish platform-specific source files.
 
@@ -304,7 +302,7 @@ STARLINK = /star
 
 #  Path of the Perl binary we will use
 
-STARPERL = $(STARLINK)/Perl/bin/perl
+STARPERL = /stardev/Perl/bin/perl
 
 #  Pathnames of Starlink sub-directories that may be referenced when
 #  building this package.
@@ -330,39 +328,46 @@ EXPORT = .
 
 #  Default macros for compiling C and Fortran source code.
 
-#FC = c89
-#CFLAGS = -O
-FC = fort77
-FFLAGS = -O
-CXX = CC
+FC=g77
+FFLAGS=-fno-second-underscore -g -O2
+CC=gcc
+CFLAGS=-g -O2
+CXX=g++
 
-#  Command for forming a link to a file.
-LINK = ln
+#  Command for forming a link to a file.  The autoconf documentation
+#  recommends that links should be made in the directory of the link
+#  target, since it's possible that LN_S='cp -p'.
+LINK = ln -s
 
 #  Command for "randomizing" an object library.  The default acts as a
 #  null command.
-RANLIB = :
+RANLIB = ranlib
 
 #  Commands for adding to and extracting from an archive file (.tar).
-TAR_IN = tar cf
-TAR_OUT = tar xf
+TAR_IN=tar -cvhf
+TAR_OUT=tar -xf
+#  These are not currently configured using the configure script, but
+#  everything reasonable has some usable version of tar.
+#TAR_IN = tar cf
+#TAR_OUT = tar xf
 
 #  Commands for adding, deleting and extracting files to/from an object 
 #  archive (.a).
-AR_IN = ar -r
-AR_DEL = ar -d
-AR_OUT = ar -x
+#unused AR_IN = ar -r
+#unused AR_DEL = ar -d
+#unused AR_OUT = ar -x
 
 #  Default file type extension for a shareable library and command for
 #  building a shareable library (the default acts as a null command).
-SHARE = .so
-BLD_SHR = :
+#unused SHARE = .so
+#unused BLD_SHR = :
 
-# Force-delete
+# Force-delete; not configured
 RMF = rm -f
 
 #  Environment settings for calls to ./configure
-CONFENVS = INSTALL= LINK= CFLAGS= CXX=$(CXX) CC=$(CC) F77=$(FC) FFLAGS="$(FFLAGS)"
+#CONFENVS = INSTALL= LINK= CFLAGS= CXX=$(CXX) CC=$(CC) F77=$(FC) FFLAGS="$(FFLAGS)"
+CONFENVS = unset INSTALL;
 
 #------------------------------------------------------------------------------
 ###############################################################################
@@ -1114,8 +1119,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 		test $$? != 1
 	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
 		$(RMF) $(EXPORT)/$(PKG_NAME).tar.Z
-	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z \
-		$(EXPORT)/$(PKG_NAME).tar.Z
+	cd $(EXPORT); $(LINK) $(PKG_NAME)-$(PKG_VERS).tar.Z $(PKG_NAME).tar.Z
 
 # Make the source tarball.  This should really only be run in a copy
 # of the source which has been freshly exported from CVS, rather than
@@ -1269,8 +1273,10 @@ astrom/makefile: astrom/makefile.in
 #  this means that libast_wcslib is rather old: see comments in
 #  moggy/config/configure.in and moggy/SkyCatHoles.c)
 $(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
-	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
-	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
+	cd catlib && $(CONFENVS) make
+	cd catlib && $(CONFENVS) make install
+#	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
+#	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 	ar -d $@ slasubs.o
 	@ echo "NOTE: removed slasubs.o from $@"
 	echo 'char glsfwd(); int main() { glsfwd(); return 0; }' >conftest.c
@@ -1319,6 +1325,9 @@ moggy/Makefile.in astrom/makefile.in:
 		exit 1; \
 	fi
 	test -d moggy -a -d astrom || $(TAR_OUT) $(PKG_NAME)_source.tar
+
+VERSION:
+	echo $(PKG_VERS) >VERSION
 
 ##  Propagate the version number
 #autoastrom autoastrom.news makefile moggy/Moggy.pm: VERSION
