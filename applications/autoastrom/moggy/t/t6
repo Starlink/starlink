@@ -10,7 +10,7 @@ test -n "$PERLBIN" || exit 1
 # (down to the definition of $puss) is _duplicated_ on stdout. 
 # I don't understand this one tiny bit.
 
-AUTOASTROM_DIR=`cd ../..; echo $PWD`;	export AUTOASTROM_DIR
+AUTOASTROM_DIR=`cd ../..; pwd`;	export AUTOASTROM_DIR
 TESTDIR=$PWD;				export TESTDIR
 # Name the report file t<number>*.tmp, so it's deleted by the driver at the end
 REPORTFILE=t6.report.tmp;		export REPORTFILE
@@ -30,13 +30,13 @@ print STDERR "TestDir=$TestDir  ReportFile=$ReportFile\n";
 my $moggylocation = undef;
 foreach $loc ("$ENV{AUTOASTROM_DIR}/moggy", 
 	      "$ENV{AUTOASTROM_DIR}/moggy/moggy") {
+    print STDERR "Searching for moggy in $loc\n";
     if (-f $loc && -x $loc) {
 	$moggylocation = $loc;
 	last;
     }
 }
-defined ($moggylocation)
-  || die "Can't locate moggy program\n";
+defined ($moggylocation) || die "t6: Can't locate moggy program\n";
 print STDERR "moggylocation=$moggylocation\n";
 
 
