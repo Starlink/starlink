@@ -379,24 +379,24 @@
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, IOBS, EL, VAL__BADI,
      :                   %VAL( WPNTR ), BAD, FSTAT )
 
-            CALL CON_THRSI( .TRUE., EL, %VAL( WPNTR ), 0, VAL__BADI,
-     :                      VAL__MAXI, VAL__MAXI, %VAL( PNTR( 1 ) ),
+            CALL CON_THRSI( .TRUE., EL, %VAL( WPNTR ), 0, VAL__MAXI,
+     :                      VAL__BADI, VAL__MAXI, %VAL( PNTR( 1 ) ),
      :                      NREP, NREPHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IOBS, IOBS, EL, VAL__BADR,
      :                   %VAL( WPNTR ), BAD, FSTAT )
 
-            CALL CON_THRSR( .TRUE., EL, %VAL( WPNTR ), 0.0, VAL__BADR,
-     :                      VAL__MAXR, VAL__MAXR, %VAL( PNTR( 1 ) ),
+            CALL CON_THRSR( .TRUE., EL, %VAL( WPNTR ), 0.0, VAL__MAXR,
+     :                      VAL__BADR, VAL__MAXR, %VAL( PNTR( 1 ) ),
      :                      NREP, NREPHI, STATUS )
       
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, IOBS, EL, VAL__BADD,
      :                   %VAL( WPNTR ), BAD, FSTAT )
       
-            CALL CON_THRSD( .TRUE., EL, %VAL( WPNTR ), 0.0D0, VAL__BADD,
-     :                      VAL__MAXD, VAL__MAXD, %VAL( PNTR( 1 ) ),
+            CALL CON_THRSD( .TRUE., EL, %VAL( WPNTR ), 0.0D0, VAL__MAXD,
+     :                      VAL__BADD, VAL__MAXD, %VAL( PNTR( 1 ) ),
      :                      NREP, NREPHI, STATUS )
 
          ELSE
