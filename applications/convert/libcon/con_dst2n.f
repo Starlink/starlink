@@ -437,9 +437,34 @@
 *               Create the composite name at level 2.
                   CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT )
 
+*               Find the form of the NDF.
+*               =========================
+
+*               Find which type of NDF form is required by finding out
+*               whether bad pixels and/or quality are present in the
+*               DST file.
+
+*               Test for the structure containing the data array.
+                  IF ( NAME1 .EQ. 'Z' ) THEN
+
+*                  Test for the bad-pixel flag.
+                     IF ( NAME2 .EQ. 'FLAGGED' ) THEN
+
+*                     Obtain the value of the bad-pixel flag.
+                        CALL DTA_RDVARI( LEVEL2, 1, IFLAG, DSTAT )
+                        FLAGGD = IFLAG .NE. 0
+
+*                  Test for the presence of quality.
+                     ELSE IF ( NAME2 .EQ. 'QUALITY' ) THEN
+                        QUPRES = .TRUE.
+                     END IF
+                  END IF
+
+*               See which extensions are required.
+*               ==================================
+
 *               Check to determine if any second-level objects require
 *               OUTPUT.MORE or OUTPUT.MORE.FIGARO.
-
                   IF ( ( .NOT. MOREFG .OR. .NOT. FITS ) .AND.
      :                   .NOT. ANAXIS ) THEN
 
@@ -462,17 +487,6 @@
 *                        MORE.FIGARO structure must be created.
                            MORE = .TRUE.
                            MOREFG = .TRUE.
-
-*                     Test for the bad-pixel flag.
-                        ELSE IF ( NAME2 .EQ. 'FLAGGED' ) THEN
-
-*                        Obtain the value of the bad-pixel flag.
-                           CALL DTA_RDVARI( LEVEL2, 1, IFLAG, DSTAT )
-                           FLAGGD = IFLAG .NE. 0
-
-*                     Test for the presence of quality.
-                        ELSE IF ( NAME2 .EQ. 'QUALITY' ) THEN
-                           QUPRES = .TRUE.
                         END IF
 
 *                  Test for the OBS structure.
