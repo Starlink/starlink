@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstRefine
+#     GaiaAstRefine
 
 #  Type of Module:
 #     [incr Tk] class
@@ -25,7 +25,7 @@
 
 #  Invocations:
 #
-#        StarAstRefine object_name [configuration options]
+#        GaiaAstRefine object_name [configuration options]
 #
 #     This creates an instance of a StarAstRefince object. The return is
 #     the name of the object.
@@ -49,21 +49,23 @@
 #     TopLevelWidget
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     11-DEC-1997 (PDRAPER):
+#     11-DEC-1997 (PWD):
 #        Original version.
+#     23-MAY-2000 (PWD):
+#        Renamed GaiaAstRefine.
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarAstRefine {}
+itk::usual GaiaAstRefine {}
 
-itcl::class gaia::StarAstRefine {
+itcl::class gaia::GaiaAstRefine {
 
    #  Inheritances:
    #  -------------
@@ -130,7 +132,7 @@ itcl::class gaia::StarAstRefine {
       #  Add window help.
       global gaia_dir
       add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_dir/StarAstRefine.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstRefine.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 

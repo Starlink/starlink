@@ -715,7 +715,7 @@ itcl::class gaia::Gaia {
    #  Make an AST refine WCS toolbox or make it visible.
    public method make_astrefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstRefine $w_.\#auto \
+         GaiaAstRefine $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \

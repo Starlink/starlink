@@ -26,7 +26,7 @@ FILES        = \
  StarArdLine.tcl StarArdList.tcl StarArdPixel.tcl StarArdPoly.tcl \
  StarArdPrim.tcl StarArdRect.tcl StarArdRotBox.tcl StarArdRow.tcl \
  StarArdTool.tcl GaiaAstCopy.tcl GaiaAstDefine.tcl GaiaAstGrid.tcl \
- GaiaAstReference.tcl StarAstRefine.tcl StarAstSystem.tcl \
+ GaiaAstReference.tcl GaiaAstRefine.tcl StarAstSystem.tcl \
  StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
  GaiaDemo.tcl StarEnterObject.tcl StarLabelCheck.tcl GaiaPatch.tcl \
  GaiaApPhotom.tcl GaiaOptPhotom.tcl GaiaPhotomDetails.tcl \
@@ -44,7 +44,7 @@ FILES        = \
  GaiaOptPhotom.hlp GaiaPatch.hlp GaiaPositions.hlp GaiaSearch.hlp \
  GaiaSextractor.hlp GaiaTextImport.hlp GaiaAst.hlp GaiaAstCopy.hlp \
  GaiaAstDefine.hlp GaiaAstGrid.hlp GaiaAstReference.hlp \
- StarAstRefine.hlp StarAstSystem.hlp StarBlink.hlp \
+ GaiaAstRefine.hlp StarAstSystem.hlp StarBlink.hlp \
  skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
  adamtask.tcl
 
