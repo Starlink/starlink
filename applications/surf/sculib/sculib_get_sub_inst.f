@@ -166,7 +166,7 @@
 *  Put all possible answers in a string
  
          IF (N_SUB .GT. 0) THEN
-            SUBLIST = ''
+            SUBLIST = ' '
             IPOSN = 0
             CALL CHR_APPND(SUB_INSTRUMENT(1), SUBLIST, IPOSN)
             DO I = 2, N_SUB
