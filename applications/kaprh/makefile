@@ -557,8 +557,8 @@ IRAF_DATA =
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sunxxx.tex 
-HYPERTEXT_DOCS = sunxxx.htx
+LATEX_DOCS = sun239.tex 
+HYPERTEXT_DOCS = sun239.htx
 
 #  List of documentation files.
 

@@ -54,7 +54,7 @@ GENERIC_SOURCES = $(KAPSUB_GEN)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kaprh.tar.
-UNIX_OTHERS = makefile mk sunxxx.tex kaprh.news 
+UNIX_OTHERS = makefile mk sun239.tex kaprh.news 
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
@@ -62,7 +62,7 @@ UNIX_RELEASE =  $(UNIX_OTHERS) kaprh.star-hlp kaprh.ifd $(KAPRH_SOURCE) \
 $(KAPRH_SUB) $(KAPSUB_SOURCES) 
 
 #  The contents of kaprh.tar.
-UNIX_TOTAL = kaprh_source.tar makefile mk sunxxx.tex sunxxx.htx_tar \
+UNIX_TOTAL = kaprh_source.tar makefile mk sun239.tex sun239.htx_tar \
 kaprh.news kaprh_sub.tar kapsub_sub.tar kaprh_ifls.tar kaprh_iraf.tar
 
 #  Target for use by the grp command.
