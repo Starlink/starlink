@@ -3301,10 +3301,14 @@ dnl    it's allowed to play there, too.
     ./configure --prefix=$prefix --cache-file=config.cache
 )
 
+STAR_SPECIAL_INSTALL_COMMAND([cd unix;
+	$(MAKE) INSTALL_ROOT=$$DESTDIR install])
+
 AC_CONFIG_FILES([Makefile component.xml])
 AC_OUTPUT
-</verbatim>
-            Note that we must use <code>STAR_DEFAULTS</code>, and we
+</verbatim></p>
+
+          <p>Note that we must use <code>STAR_DEFAULTS</code>, and we
             must <em>not</em> use <code>AC_CONFIG_SUBDIRS</code>, for
 	    the reason described in the comments above, even
             though configuring the subdirectories is exactly what we
@@ -3312,6 +3316,19 @@ AC_OUTPUT
             exactly what we need to do to configure Tcl -- you might
             need to do different things for different third-party
             packages.</p>
+
+          <p>As described in
+            <ref id="macro-special-install-command"/>, this adapts the 
+            standard Makefile <code>install</code> target so that it
+            uses the given command to make an installation.  Note that
+            the version of autoconf which generated the Tcl
+            <code>Makefile.in</code> template was one which used the
+            <code>INSTALL_ROOT</code> variable instead of the
+            <code>DESTDIR</code> variable used by more modern
+            versions, and so we have to adjust this in this command
+            line.  This <code>DESTDIR</code> variable is important, as
+            it is used during the installation of the component, to do
+            a staged installation.</p>
 
           <p>The <code>Makefile.am</code> file is even simpler:
 <verbatim>
@@ -3324,22 +3341,8 @@ default: all
 
 $(RECURSIVE_TARGETS):
         cd unix; $(MAKE) $@
-
-STAR_SPECIAL_INSTALL_COMMAND = cd unix; \
-	$(MAKE) INSTALL_ROOT=$$DESTDIR install
 </verbatim>
-            As described in
-            <ref id="variable-special-install-command"/>, this adapts the 
-            standard Makefile <code>install</code> target so that it
-            uses the given command to make an installation.  Note that
-            the version of autoconf which generated the Tcl
-            <code>Makefile.in</code> template was one which used the
-            <code>INSTALL_ROOT</code> variable instead of the
-            <code>DESTDIR</code> variable used by more modern
-            versions, and so we have to adjust this in this command
-            line.  This <code>DESTDIR</code> variable is important, as
-            it is used during the installation of the component, to do
-            a staged installation.</p>
+</p>
 
           <p>After writing the <code>Makefile.am</code> and
             <code>configure.ac</code> files, all you need to do is run
@@ -4710,22 +4713,22 @@ AC_SUBST(STAR_MANIFEST_DIR)
             <code>configure.ac</code> file in the tree, you will have
             to add this for each one.</p>
 
-          <p>See also <ref id="variable-special-install-command"/>.</p>
+          <p>See also <ref id="macro-special-install-command"/>.</p>
         </subsect>
 
-        <subsect id="variable-special-install-command"
+        <subsect id="macro-special-install-command"
             export="export">
           <subhead>
-            <title>Makefile.am variable STAR_SPECIAL_INSTALL_COMMAND</title>
+            <title>STAR_SPECIAL_INSTALL_COMMAND</title>
           </subhead>
 
           <p>Third-party sources will not come with a
             <code>make install</code> target which installs a manifest.  It is
             reasonably easy to add such support, however, as
             described in <ref id="config-tclsys"/>.  The crucial
-            feature is the installation command declared in
-            <code>STAR_SPECIAL_INSTALL_COMMAND</code>.  If this
-            variable is present in a <code>Makefile.am</code> file,
+            feature is the installation command declared in the macro
+            <code>STAR_SPECIAL_INSTALL_COMMAND</code>.  If this macro
+            variable is present in a <code>configure.ac</code> file,
             then Starlink automake will generate an
             <code>install</code> target which uses this command to do
             the installation, in such a way that a manifest file can
@@ -4748,12 +4751,13 @@ AC_SUBST(STAR_MANIFEST_DIR)
               </li>
             </ol>
             The example shown in <ref id="config-tclsys"/> shows a use
-            of this variable which satisfies these constraints.</p>
+            of this macro which satisfies these constraints.</p>
 
-          <p>The command may be as complicated as you like, but must
-            be on a single line, possibly continued over several lines
-            of the <code>Makefile.am</code> file by escaping the
-            end-of-line characters.</p>
+          <p>The command may be as complicated as you like, but note
+            that it is collapsed onto a single line by autoconf, so
+            although you may spread the macro argument over several
+            lines for readability, each command <em>must</em> be
+            separated by a semicolon (or double-ampersand or double-bar).</p>
 
           <p>The generated Makefile rule requires that the makefile
             variables <code>$(PACKAGE_NAME)</code> and
