@@ -61,6 +61,9 @@ dnl    before any Makefile is run.  Another way of putting this is
 dnl    that, in order for this rule to be discovered and included in a
 dnl    Makefile, we must _already_ have an up-to-date acinclude.m4,
 dnl    which means that the rule is completely redundant.
+#
+# Always create a manifest-install target
+_STAR_MAKE_MANIFEST
 ])# STAR_DEFAULTS
 
 # STAR_FACILITY_CODE(code, [msgfile=$PACKAGE_err.msg])
@@ -86,12 +89,13 @@ EOD
 ])# STAR_FACILITY_CODE
 
 
-# STAR_MAKE_MANIFEST
+# _STAR_MAKE_MANIFEST
 # ------------------
 #
 # At install time, also make a manifest, by adding the install target
 # `manifest-install'.  This wraps the autodiscovered install command
-# using the script install-with-manifest.
+# using the script install-with-manifest.  Internal macro, called from
+# within STAR_DEFAULTS.
 #
 # This isn't completely satisfactory, since the install-with-manifest
 # script (currently) simply appends names to a file called MANIFEST,
@@ -109,13 +113,25 @@ EOD
 #
 # Dependency: the makefile fragment below relies on starconf correctly
 # including install-with-manifest.in
-AC_DEFUN([STAR_MAKE_MANIFEST],
+AC_DEFUN([_STAR_MAKE_MANIFEST],
 [#
 AC_REQUIRE([_STAR_BOILERPLATE])
+dnl   The $[]@ quoting below is because $@ means rest-of-args to m4
 cat >>$STAR_BOILERPLATE <<\_EOD
-manifest-install: install-with-manifest
-	echo "#MANIFEST" >MANIFEST
+# Create install-manifest.xml file, using the MANIFEST file generated
+# by install-with-manifest
+install-manifest.xml: install-with-manifest
+	rm -f MANIFEST; touch MANIFEST
 	$(MAKE) INSTALL=./install-with-manifest install
+	rm -f $[]@
+	echo "<?xml version='1.0'?>"             >$[]@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >>$[]@
+	echo "<manifest component='$(PACKAGE)'>" >>$[]@
+	echo "<files>"                           >>$[]@
+	cat MANIFEST                             >>$[]@
+	echo "</files>"                          >>$[]@
+	echo "</manifest>"                       >>$[]@
+	rm -f MANIFEST
 # The following rule is redundant (install-with-manifest.in must exist
 # in order for ./configure to run without error), but leave it in for
 # its documentation value.
@@ -123,7 +139,7 @@ install-with-manifest.in:
 	./starconf.status
 _EOD
 AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
-])# STAR_MAKE_MANIFEST
+])# _STAR_MAKE_MANIFEST
 
 
 
