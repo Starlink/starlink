@@ -130,7 +130,6 @@
       INTEGER                   IDPTR                   ! Input data values
       INTEGER			IFID			! Input dataset id
       INTEGER                   IQPTR                   ! Input quality values
-      INTEGER                   NAX                     ! Number of axes
       INTEGER                   NDIM                    ! Input dimensionality
       INTEGER                   ODIMS(ADI__MXDIM)       ! Output dimensions
       INTEGER                   ODPTR                   ! Output data
@@ -245,7 +244,7 @@
 
 *      Copy axes
           JAX = 1
-          DO IAX = 1, NAX
+          DO IAX = 1, NDIM
             IF ( IAX .NE. AXIS ) THEN
               CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX, STATUS )
               JAX = JAX + 1
