@@ -133,13 +133,6 @@
          DO INTEGRATION = 1, N_INTEGRATIONS
             DO EXPOSURE = 1, N_EXPOSURES
 
-
-               CALL MSG_SETI('NI', INTEGRATION)
-               CALL MSG_SETI('NE', EXPOSURE)
-
-               CALL MSG_OUT(' ','3POS_DECONV: Processing exposure ^NE'//
-     :              ' of integration ^NI', STATUS)
-
                CALL SCULIB_FIND_SWITCH (DEMOD_POINTER, 1,
      :           N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, N_POS,
      :           1, EXPOSURE, INTEGRATION, MEASUREMENT, SCAN_START,
@@ -150,11 +143,20 @@
                   CALL MSG_SETI ('E', EXPOSURE)
                   CALL MSG_SETI ('I', INTEGRATION)
                   CALL MSG_SETI ('M', MEASUREMENT)
-                  CALL MSG_OUT (' ', 'SCULIB: no data for exp ^E '//
-     :              'in int ^I, meas ^M', STATUS)
+                  CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :                 'SCULIB: no data for exp ^E '//
+     :                 'in int ^I, meas ^M', STATUS)
                ELSE
 
 *  OK, there is some data for this scan
+
+                  CALL MSG_SETI('NI', INTEGRATION)
+                  CALL MSG_SETI('NE', EXPOSURE)
+
+                  CALL MSG_OUTIF(MSG__NORM, ' ',
+     :                 '3POS_DECONV: Processing exposure ^NE'//
+     :                 ' of integration ^NI', STATUS)
+
 
                   N_SCAN = SCAN_END - SCAN_START + 1
  
