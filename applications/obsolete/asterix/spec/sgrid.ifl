@@ -17,9 +17,8 @@ INTERFACE SGRID
       HELP 'Either a single spectrum, or an object containing refs to spectra'
    ENDPARAMETER
 
-   PARAMETER REDSHIFT
+   PARAMETER Z
       TYPE '_REAL'
-      KEYWORD 'Z'
       VPATH 'GLOBAL,DEFAULT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.REDSHIFT'
@@ -27,10 +26,9 @@ INTERFACE SGRID
       HELP 'Redshift to be applied to source spectrum'
    ENDPARAMETER
 
-   PARAMETER FIT_MOD
+   PARAMETER MODEL
       POSITION 2
       TYPE 'UNIV'
-      KEYWORD 'MODEL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -226,17 +224,15 @@ INTERFACE SGRID
       HELP   'Enter integer values separated by spaces/commas, eg. 0,2,3'
    ENDPARAMETER
 
-   PARAMETER MAX_IT
+   PARAMETER MAX
       TYPE '_INTEGER'
-      KEYWORD 'MAX'
       VPATH 'CURRENT,PROMPT'
       PROMPT 'Max. no. of iterations'
       HELP 'Program will terminate after N iterations, but can be reinvoked'
    ENDPARAMETER
 
-   PARAMETER MINSLOPE
+   PARAMETER MINS
       TYPE '_REAL'
-      KEYWORD 'MINS'
       VPATH 'CURRENT,DEFAULT'
       DEFAULT 20.0
       HELP 'Terminating chi-squared slope. Default 20. Smaller => more fussy.'
@@ -267,8 +263,7 @@ INTERFACE SGRID
       PROMPT 'Subtract minimum value of statistic from grid'
    ENDPARAMETER
 
-   PARAMETER UPDATE
-      KEYWORD 'UP'
+   PARAMETER UP
       TYPE '_LOGICAL'
       VPATH 'PROMPT'
       PPATH 'DEFAULT'

@@ -2,7 +2,6 @@ INTERFACE SPLOT
 
    PARAMETER INP
       TYPE 'UNIV'
-      KEYWORD 'INP'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_DATA'
@@ -22,9 +21,8 @@ INTERFACE SPLOT
       DEFAULT 100
       PROMPT 'Number of energy channels'
    ENDPARAMETER
-   PARAMETER REDSHIFT
+   PARAMETER Z
       TYPE '_REAL'
-      KEYWORD 'Z'
       VPATH 'GLOBAL,DEFAULT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.REDSHIFT'
@@ -32,9 +30,8 @@ INTERFACE SPLOT
       HELP 'Redshift applied to source spectrum (plot will be as observed here)'
    ENDPARAMETER
 
-   PARAMETER FIT_MOD
+   PARAMETER MODEL
       TYPE 'UNIV'
-      KEYWORD 'MODEL'
       VPATH 'GLOBAL,PROMPT'
       PPATH 'GLOBAL'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
@@ -52,7 +49,6 @@ INTERFACE SPLOT
 
    PARAMETER OUT
       TYPE 'UNIV'
-      KEYWORD 'OUT'
       ASSOCIATION '->GLOBAL.BINDS'
       PROMPT 'Output'
       HELP 'Name of graphical dataset to be produced'
