@@ -4706,5 +4706,5 @@ f        This routine applies to all Objects.
 *--
 */
 
-   return AST__VMAJOR*1E6 + AST_VMINOR*1E3 + AST__RELEASE;
+   return AST__VMAJOR*1E6 + AST__VMINOR*1E3 + AST__RELEASE;
 }

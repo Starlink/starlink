@@ -43,6 +43,8 @@
 *        Added AST_GETACTIVEUNIT.
 *     14-FEB-2003 (DSB):
 *        Added new values for WcsMap projections.
+*     30-APR-2003 (DSB):
+*        Added AST_VERSION.
 *-
 
 *  Length of character string returned by a character function.
@@ -67,6 +69,7 @@
       INTEGER AST_CLONE
       INTEGER AST_COPY
       INTEGER AST_GETI
+      INTEGER AST_VERSION
       LOGICAL AST_GETL
       LOGICAL AST_ISAOBJECT
       LOGICAL AST_TEST

@@ -45,6 +45,8 @@
 *        Added AST_NULL.
 *     14-JUL-1997 (RFWS):
 *        Add AST_EXEMPT function.
+*     30-APR-2003 (DSB):
+*        Add AST_VERSION function.
 *-
 */
 
@@ -104,6 +106,16 @@ F77_INTEGER_FUNCTION(ast_clone)( INTEGER(THIS),
    astAt( "AST_CLONE", NULL, 0 );
    astWatchSTATUS(
       RESULT = astP2I( astClone( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_version)( ) {
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_VERSION", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astVersion;
    )
    return RESULT;
 }

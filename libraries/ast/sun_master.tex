@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {25th February 2003}
+\newcommand{\stardocdate}      {30th April 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -18891,30 +18891,15 @@ trailing ``Z'' character to the end of DATE-OBS keyword values.
 \item The FitsChan class has been modified to use latest list of FITS-WCS 
 projections, as described in the FITS-WCS paper II, "Representations of
 celestial coordinates in FITS" (Calabretta \& Greisen, draft dated 23
-April 2002). One consequence of this is that the polynomial correction
+April 2002). Support has been retained for the polynomial correction
 terms which previous drafts have allowed to be associated with TAN
-projections are no longer available. However, support for an AST-specific
-projection code "TPN" has been introduced into the FitsChan and WcsMap
-classes which retains the old behaviour of the TAN projection (i.e.
-allows polynomial correction terms to be associated with longitude and/or
-latitude axes). Existing TAN headers which include projection parameters
-are translated into ``TPN'' by the astRead method, as are TNX and DSS
-c+
-headers. The astWrite method produces TPN headers when using FITS-WCS
-c-
-f+
-headers. The AST\_WRITE routine produces TPN headers when using FITS-WCS
-f-
-encoding if the FrameSet requires a TAN projection with polynomial
-correction terms. Obviously, these TPN headers will not be recognized by
-other FITS readers unless the reader uses the AST library internally.
-This anomolous situation will hopefully be cleared up when the FITS-WCS
-paper IV is published, which specifies how such corrections should be
-encoded in a FITS header.
+projections. 
 
-\item The WcsMap class has additional projection types of AST\_\_TPN (see
-above) and AST\_\_SZP. In addition, the usage of projection parameters
-has been brought into line with the the FITS-WCS paper II. 
+\item The WcsMap class has additional projection types of AST\_\_TPN
+(which implements a distorted TAN projection) and AST\_\_SZP. The AST__TAN
+projection type now represents a simple TAN projection and has no 
+associated projection parameters. In addition, the usage of projection 
+parameters has been brought into line with the the FITS-WCS paper II. 
 
 \item The WcsMap class has been modified so that a "get" operation on a
 projection parameter attribute will return the default value defined in the
@@ -19079,6 +19064,15 @@ modified to reduce the chance of it ``missing'' small curve sections,
 such as may be produced if a grid line cuts across the plot very close to
 a corner. Previously, these missed sections could sometimes result in 
 axis labels being omitted.
+
+\item A new function
+c+
+(astVersion)
+c-
+f+
+(AST\_VERSION)
+f-
+has been added to return the version of the AST library in use.
 
 \item Bugs have been fixed in the Plot class which caused serious problems
 when plotting high precision data. These problems could range from the

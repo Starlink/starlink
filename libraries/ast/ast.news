@@ -4,8 +4,8 @@ AST Library
 now available.
 
    AST provides a comprehensive range of facilities for attaching
-world coordinate systems (such as RA/Dec) to astronomical data, for
-retrieving and interpreting that information and for generating
+world coordinate systems (such as RA/Dec, frequency, etc) to astronomical 
+data, for retrieving and interpreting that information and for generating
 graphical output based on it.
 
    The library should be of interest to anyone writing astronomical
