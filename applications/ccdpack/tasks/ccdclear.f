@@ -202,6 +202,7 @@
 *  Get the mode which we're going to work in. Either we will clear
 *  all global parameters or a specific list.
       CALL PAR_GET0L( 'BYNAME', BYNAME, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( BYNAME ) THEN
 
 *  Need a list of names.
