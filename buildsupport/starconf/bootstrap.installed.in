@@ -45,12 +45,18 @@ else
 fi
 
 
-# Bootstrap any child directories
+# Bootstrap any child directories, but don't object if there's no
+# bootstrap file present.
 for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
-    if test -n "$d" -a -d "$d"; then
+    if test -n "$d" -a -d "$d" -a -f "$d/bootstrap"; then
         echo "Bootstrapping $d..."
-        (cd $d; ./bootstrap)
+        if test -x $d/bootstrap; then
+            (cd $d; ./bootstrap)
+        else
+            echo "bootstrap: file $d/bootstrap exists but is not executable"
+            echo "bootstrap: file $d/bootstrap exists but is not executable" >&2
+        fi
     fi
 done
 
