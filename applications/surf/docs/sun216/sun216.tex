@@ -42,12 +42,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {216.6}
+\newcommand{\stardocnumber}    {216.7}
 \newcommand{\stardocauthors}   {T. Jenness, J.~F. Lightfoot\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {4 November 1999}
+\newcommand{\stardocdate}      {6 July 2000}
 \newcommand{\stardoctitle}     {SURF -- SCUBA User Reduction Facility}
-\newcommand{\stardocversion}   {1.5}
+\newcommand{\stardocversion}   {1.6}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {%
 \scusoft\ is a set of ADAM tasks necessary for reducing demodulated 
@@ -119,6 +119,7 @@ descriptions of each task.
 \newcommand{\extflat}{\htmlref{\task{extract\_flat}}{EXTRACT_FLAT}}
 \newcommand{\scushift}{\htmlref{\task{scushift}}{SCUSHIFT}}
 \newcommand{\scuclip}{\htmlref{\task{scuclip}}{SCUCLIP}}
+\newcommand{\scuclkerr}{\htmlref{\task{scuclkerr}}{SCUCLKERR}}
 \newcommand{\scanrlb}{\htmlref{\task{scan\_rlb}}{SCAN_RLB}}
 \newcommand{\dspbol}{\htmlref{\task{dspbol}}{DSPBOL}}
 \newcommand{\pltbol}{\htmlref{\task{pltbol}}{PLTBOL}}
@@ -154,6 +155,7 @@ descriptions of each task.
 \newcommand{\fourier}{\xref{\task{fourier}}{sun95}{FOURIER}}
 \newcommand{\hislist}{\xref{\task{hislist}}{sun95}{HISLIST}}
 \newcommand{\ndffits}{\xref{\task{ndf2fits}}{sun55}{NDF2FITS}}
+\newcommand{\ndftoascii}{\xref{\task{ndf2ascii}}{sun55}{NDF2ASCII}}
 \newcommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
 \newcommand{\hdstrace}{\xref{\task{hdstrace}}{sun102}{}}
 \newcommand{\psmerge}{\xref{\task{psmerge}}{sun164}{}}
@@ -1268,7 +1270,10 @@ or by just setting SCUBA\_PREFIX:
 \end{verbatim}
 \end{myquote}
 Note that the current directory is not searched in the second case (since the
-software adds the prefix before trying to load the file).
+software adds the prefix before trying to load the file). The \scusetenv\
+command can be used to set this variable (this command is especially useful
+when reducing data at the Joint Astronomy Centre as DATADIR is also set
+correctly).
 
 
 
@@ -1390,7 +1395,7 @@ Task & Short & Long & Verbose \\ \hline
 
 \subsection{Other useful environment variables}
 
-Two non-\scusoft\ environment variables can be used to affect the
+Three non-\scusoft\ environment variables can be used to affect the
 behaviour of \scusoft.
 
 \begin{description}
@@ -1418,8 +1423,16 @@ Another useful environment variable is
 variable is set, parameter abbreviation is turned on (e.g., PIXSIZE\_OUT
 can be referenced as PIX).
 
+\item[ADAM\_EXIT] \mbox{}
+
+If this environment variable is set when an ADAM task terminates, the calling
+process will exit with system status set to 1 if the ADAM status was set, or 0
+if the ADAM status was okay. This is useful when writing shell scripts.
+
 \end{description}
 
+All the ADAM environment variables are listed in
+\xref{SUN/144}{sun144}{ADAM_environment_variables} \cite{adam}.
 
 \section{\xlabel{outline}Basic outline of SCUBA data reduction\label{outline}}
 
@@ -1607,7 +1620,9 @@ the data before regridding (or passing it to an external program for
 further processing). Obviously this task should not be used to simply
 examine the data, \Kappa\ tasks such as \display\ and \linplot\
 can do that; this task gives you the position of each bolometer in addition
-to the data value.
+to the data value. Additionally, the \scubamem\ task can be used  for finding
+the chop positions (although it would then be necessary to use
+the \convert\ \ndftoascii\ task to generate a text file).
 
 \end{itemize}
 
@@ -1947,7 +1962,7 @@ in turn, with spikes identified and removed, all within a few seconds.
 \item \Figaro\ \sclean
 
 The \sclean\ task allows users to simply click on bad points to remove them.
-This routine has been designed for SCUBA despking and therefore understands
+This routine has been designed for SCUBA despiking and therefore understands
 SCUBA quality. \sclean\ provides an integrated despiking environment showing
 the 2-D image and a 1-D slice, allowing points to be marked bad (or good)
 in either window. More information can be found in the \Figaro\ documentation.
@@ -2851,9 +2866,11 @@ this means an image per wave-plate position). \intrebin\ ensures that the sky
 rotation angle and the waveplate angle are stored in the FITS headers (using
 the ANGROT and WPLATE keywords respectively). At this point the images can
 either be processed by scripts to calculate the Q and U
-images\footnote{Available from your support scientist if required} or use the
+images\footnote{Available from your support scientist if required although the
+ORAC-DR pipeline recipes are now preferred} or use the
 \polpack\ data reduction system (version 2 or higher) which fits a sine wave
-to each pixel in the input images. The following example uses \polpack.
+to each pixel in the input images. The following example uses \polpack\ and is
+similar to the approach used by the ORAC-DR \cite{oracdr} polarimetry recipes \cite{scuorac}.
 
 Assuming the output of \intrebin\ is stored in file \texttt{omc1\_reb.sdf}
 (remembering that this file will contain an image per waveplate position named
@@ -2924,6 +2941,15 @@ to do this in \intrebin\ by making sure that all images are regridded
 relative to the same RA/Dec centre -- the resulting images will all
 be aligned to the same pixel grid.
 
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=4in]{sun216_omc1vec.eps}
+\caption{Polarisation E vectors around OMC-1 at 850 microns.}
+\label{omc1_vectors}
+\end{center}
+\end{figure}
+
+
 In many cases, a more reliable approach to calculating the IQU cubes with
 satisfactory variance information is to use the \polstack\ task on a set of 16
 images and use that to generate 4 images with associated variances. These
@@ -2950,20 +2976,59 @@ This catalogue can then be binned using \polbin, sections selected using
 \catselect (part of \cursa) and plotted using \polplot. An example
 image of OMC-1 can be seen in Fig.\ \ref{omc1_vectors}.
 
-For more information on \polpack\ see \xref{{SUN/223}}{sun223}{} \cite{polpack}.
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=4in]{sun216_omc1vec.eps}
-\caption{Polarisation E vectors around OMC-1 at 850 microns.}
-\label{omc1_vectors}
-\end{center}
-\end{figure}
+For more information on \polpack\ see \xref{{SUN/223}}{sun223}{}
+\cite{polpack}.
 
 For photometry observations the output from \scuphot\ can be
 exported to a single-pixel data reduction system, or alternatively,
 processed as under-sampled images and reduced through \polpack\ as
 described above.
+
+\section{\xlabel{citing_surf}Citing SURF\label{citing}}
+
+If you wish to cite SCUBA in a paper the recommended reference is
+
+\begin{quote}
+Holland~W.~S., Robson~E.I., Gear~W.K., Lightfoot~J.~F., Jenness~T.,
+Ivison~R.~J., Stevens~J.~A., Cunningham~C.~R., Ade~P.~A.~R.,
+Griffin~M.~J., Duncan~W.~D., Murphy~J.~A., Naylor~D.~A., 1999,
+\textit{MNRAS}, \textbf{303}, 659
+\end{quote}
+
+If you wish to cite this manual the recommended reference is:
+
+\begin{quote}
+Jenness~T., Lightfoot~J.F., 2000, Starlink User Note 216, Starlink
+Project, CLRC
+\end{quote}
+
+The recommended reference for the sky removal algorithm is:
+
+\begin{quote}
+Jenness~T., Lightfoot~J.~F., Holland~W.~S., 1998, 
+\textit{``Removing Sky contributions from SCUBA data''} in \textit{Advanced
+Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
+Proc. SPIE \textbf{3357}, 548
+\end{quote}
+
+The recommended reference for the Emerson 2 deconvolution algorithm
+as implemented in SURF is:
+
+\begin{quote}
+Jenness~T., Holland~W.~S., Chapin~E., Lightfoot~J.F., Duncan~W.~D., 2000,
+\textit{``Dual-beam rastering and deconvolution techniques for SCUBA''}, in
+\textit{Astronomical Data Analysis Software and Systems X}, ASP Conf. Ser., in
+press.
+\end{quote}
+
+The recommended reference for the ORAC-DR SCUBA data reduction pipeline is:
+
+\begin{quote}
+Jenness~T., Economou~F.,  1999, ``\textit{The SCUBA Data Reduction Pipeline:
+ORAC-DR at the JCMT}'', in \textit{Astronomical Data Analysis Software and
+Systems VIII}, ASP Conf.\ Ser., \textbf{172}, 171
+\end{quote}
+
 
 \section{\xlabel{future}Future Work\label{future}}
 
@@ -2978,11 +3043,6 @@ Upgrades currently on the work list are:
 
 \item Support for heterodyne receiver beam maps.
 
-\item Enhancements to the reduction pipeline software (\scuquick):
-      The ORAC data reduction \cite{oracdr} system is now in use at 
-      the telescope. Contact the
-      author if you are interested in testing the SCUBA pipeline.
-
 \end{itemize}
 
 If you wish to suggest new tasks or write your own extensions to the 
@@ -2993,6 +3053,59 @@ in SSN/72 \cite{ssn72}.
 
 
 \section{\xlabel{relnotes}Release Notes\label{relnotes}}
+
+\subsection{Changes in Version 1.6}
+
+This includes important changes to the \skydip\ task (relating
+to default values of fitting parameters) and a fix for the \texttt{SCUVAX}
+clock error problem.
+
+\begin{description}
+
+\item[\textbf{New Tasks}] \mbox{}
+
+\begin{itemize}
+\item \scuclkerr\ can be used to determine possible clock errors
+    in the acquisition system.
+\end{itemize}
+
+
+\item[\textbf{Changes to existing tasks}] \mbox{}
+
+\begin{itemize}
+\item Add correction for the \texttt{SCUVAX} clock error problem.
+
+\item Skydips now `know'  the correct values to use as defaults for ETA\_TEL,
+T\_COLD and T\_HOT.
+
+\item In \remsky\ the outer ring of bolometers can be specified using \texttt{R-1} (i.e.\ it counts from the outside in if you use a negative ring number)
+
+\item \scuover\ is now a little cleverer (and the text can be a different
+    color to the circles) and uses PGPLOT rather than the old SGS plotting
+    system.
+
+ \item \scunoise\ works on Windows NT.
+
+ \item If the second LST provided to \remsky\ is less than the first
+    LST it is now assumed that the time refers to the following day.
+
+\end{itemize}
+
+\item[\textbf{Bug Fixes}] \mbox{}
+
+\begin{itemize}
+\item Fixed error when \scuphot\ runs in the pipeline where occasionally the
+    parabola fit of the complete coadd could give incorrect answers.
+
+\item Can now combine data taken at almost the same wavelengths (a 20 micron
+    difference is allowed) when using \rebin.
+
+ \item Output file from \remdbm\ now no longer contains \texttt{CHOP\_*}
+keywords 
+
+\end{itemize}
+
+\end{description}
 
 \subsection{Changes in Version 1.5}
 
@@ -3470,11 +3583,15 @@ Emerson~D.~T., \textit{A.S.P. Conf. Ser} \textbf{75}, 309
 Jenness~T., Lightfoot~J.~F., Holland~W.~S., 1998, 
 \textit{``Removing Sky contributions from SCUBA data''} in \textit{Advanced
 Technology MMW, Radio and Terahertz Telescopes}, Philips~T.~G. (ed),
-Proc. SPIE \textbf{3357}, in press
+Proc. SPIE \textbf{3357}, 548
 
 \bibitem{specx}
 Matthews~H.~E., Jenness~T., 1997,
 \textit{The Specx cookbook}, \xref{Starlink Cookbook 8}{sc8}{}
+
+\bibitem{adam}
+Chipperfield~A.~J., 1999,
+\textit{ADAM}, \xref{Starlink User Note 144}{sun144}{}
 
 \bibitem{R92}
 Richer~J.~S., 1992, {\it MNRAS}, {\bf 254}, 165
@@ -3523,6 +3640,12 @@ Economou~F., Bridger~A., Wright~G.~S., Rees~N.~P., Jenness~T., 1998,
 \emph{Astronomical Data Analysis Software and Systems VII}, Albrecht~R.,
 Hook~R.~N., Bushouse~H.~A. (eds), ASP Conference Series, \textbf{145}, 195
 
+\bibitem{scuorac}
+Jenness~T., Economou~.F., 1999, \textit{The SCUBA Data Reduction Pipeline:
+ORAC-DR at the JCMT}, in \textit{Astronomical Data Analysis Software and
+Systems VIII}, Mehringer~D.~M., Plante~R.~L., Roberts~D.~A. (eds),
+ASP Conf.\ Ser., \textbf{172}, 171
+
 
 \bibitem{polpack}
 Berry~D.~S., Gledhill~T.~M., 1999, 
@@ -3549,6 +3672,11 @@ Berry,~D.~S., 1996,
 
 \bibitem{skydip}
 Duncan,~W.~D., SCUBA project documentation, SCU/WDD/31.1/1093
+
+\bibitem{scdsn2}
+Archibald,~E., Wagg~J.~W., Jenness~T., 2000, 
+\textit{Calculating Sky Opacities: a re-analysis for SCUBA data},
+SCUBA Calibration Database System Note 002
 
 \bibitem{Perl}
 Wall~L., Christiansen~T., Schwartz~R.~L., 1996, 
@@ -3605,6 +3733,7 @@ process individual switches.}{surf:resw}
 \quickdes{SCUBA2MEM}{Calculates bolometer positions with chops}{surf:scuba2mem}
 \quickdes{SCUCAT}{Concatenates photometry results into a single NDF.}{surf:scucat}
 \quickdes{SCUCLIP}{Perform sigma clipping of each bolometer}{surf:scuclip}
+\quickdes{SCUCLKERR}{Determine potential inconsistency in the SCUBA time headers}{surf:scuclkerr}
 \quickdes{SCUHELP}{Interactive help system}{surf:scuhelp}
 \quickdes{SCULOG}{Provide detailed descriptions of all observation data.}{surf:sculog}
 \quickdes{SCUMAKEWT}{Generate fourier weights of chop function}{surf:scumakewt}
@@ -3661,6 +3790,8 @@ to a text file.
 \item[\htmlref{REDUCE\_NOISE}{REDUCE_NOISE}:] Process demodulated noise data.
 
 \item[\htmlref{SCUBA2MEM}{SCUBA2MEM}:] Calculate bolometer positions
+
+\item[\htmlref{SCUCLKERR}{SCUCLKERR}:] Determine potential inconsistency in the SCUBA time headers
 
 \item[\htmlref{SCUHELP}{SCUHELP}:] Interactive help system.
 
@@ -5542,6 +5673,8 @@ proceeding.
          The local sidereal time at which SECOND\_TAU was
          the zenith sky opacity, in hh mm ss.ss format. The default value
 	 is that of FIRST\_LST (usually the case for a constant tau).
+         If this value is less than FIRST\_LST it is assumed you
+         are referring to the following day.
       }
       \sstsubsection{
          SECOND\_TAU = REAL (Read)
@@ -7430,6 +7563,14 @@ can be the number of the observation rather than the full filename.
          that all switches should be reduced. Default is 0.
       }
       \sstsubsection{
+         TARRAY = LOGICAL (Read)
+      }{
+        Controls whether the T\_COLD parameters are read as an array
+        of values (true) or read as a sequence of scalars (false) . 
+        This parameter is useful if the command is to be run in batch mode.
+        Default is false.
+      }
+      \sstsubsection{
          T\_COLD = REAL (Read)
       }{
          Temperature of the cold load when processing skydip data.
@@ -7684,6 +7825,11 @@ can be the number of the observation rather than the full filename.
       can be added back onto the data -- this should protect against removing
       flux from MAP data.
 
+      If a SKY NDF is found in the REDS extension, it is assumed that
+      the sky variation has already been determined (eg by \calcsky) and
+      this sky signature is removed. The 'ADD' parameter is ignored in
+      this case.
+
    }
    \sstusage{
       remsky in out
@@ -7711,6 +7857,8 @@ can be the number of the observation rather than the full filename.
    id   & Bolometer id       &     h7 or c14 \\
    r\textit{n}   & Ring number        &     r1 (for the first ring) \\ 
         &                    &     r5 (for the outer ring of the SHORT array)\\
+        &                    &     r-1 (for the outer ring)\\
+        &                    &     r-2 (one ring in from outer ring)\\
    all  & All bolometers     &     all  (select the entire array) \\
    \end{tabular}
 
@@ -7735,6 +7883,7 @@ remove the bolometer(s) from the list. The definitions of ring number and
  \ [all,-r3,g1]   &                  all pixels except ring 3 but with\\
    &                                      G1 (which happens to be in r3)\\
  \ [all,-r1,-r2,-r3,-r4,-r5]  &      Selects the central pixel \\            
+ \ [all,-r-1]     &                  Selects all except outer ring\\
 
  \end{tabular}
 
@@ -8557,6 +8706,79 @@ menu.
 }
 
 
+\newpage
+\label{surf:scuclkerr}
+\sstroutine{
+   SCUCLKERR
+}{
+   Determine the possible error in the times stored in the data header
+}{
+   \sstdescription{
+      This routine calculates the error in the times stored in the
+      data header. It performs a self-consistency check to determine
+      the local sidereal time from the Azimuth and elevation information
+      (that comes directly from the telescope) and compares this to
+      the LST stored in the header.
+   }
+   \sstusage{
+      scuclkerr filename
+   }
+   \sstparameters{
+      \sstsubsection{
+         CLOCKERR = REAL (Write)
+      }{
+         On exit, the clock error, in seconds,  determined from the header.
+      }
+      \sstsubsection{
+         DANG = REAL (Write)
+      }{
+         Error in the array rotation angle due to the clock error (degrees)
+      }
+      \sstsubsection{
+         DR = REAL (Write)
+      }{
+         Positional error at the edge of the array for this particular
+         observation. In arcseconds.
+         Edge is defined as a radius of 70 arcseconds.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The name of the NDF containing to be tested.
+      }
+      \sstsubsection{
+         MSG\_FILTER = CHAR (Read)
+      }{
+         Message filter level. Default is NORM.
+      }
+      \sstsubsection{
+         LAG = REAL (Write).
+      }{
+         The discrepancy between the LST stored in the FITS header
+         and the LST when data acquisition begins. This provides
+         a measure of the lag in starting up the observation (including
+         slew times). The value is stored in seconds.
+      }
+      \sstsubsection{
+         MJD = DOUBLE (Write)
+      }{
+         Modified Julian Date of start of observation corrected for the
+         lag time and the clock error.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The calculated clock error is only accurate to about 15 seconds.
+      }
+   }
+   \sstdiytopic{
+      References
+    }{
+      Jenness, T., 2000, \htmladdnormallink{JCMT Technical Report TR/001/84}{http://www.jach.hawaii.edu/JACdocs/JCMT/tr/001/84}
+    }
+}
 
 
 \newpage
@@ -10170,9 +10392,12 @@ the files produced with SCUBA\_SUFFIX=long):
       \sstsubsection{
          ETA\_TEL = REAL (Read)
       }{
-         The telescope efficiency. Must be between 0 and 1.0.
-         A negative value allows this parameter to be free.
-         The default value is read from the file header.
+        The telescope efficiency. If available the current telescope value 
+        is used as the default.  Values must be between 0 and 1.0. 
+        A negative value allows this parameter to be free.
+        For data taken before 26 April 2000, the default values supplied
+        for 850 and 450 are provided by the routine rather than being
+        read from the FITS header.
       }
       \sstsubsection{
          ETA\_TEL\_ERR = REAL (Write)
@@ -10207,6 +10432,12 @@ the files produced with SCUBA\_SUFFIX=long):
       }{
          The name of the output file that contains the measured
          sky temperatures.
+      }
+      \sstsubsection{
+         RESIDUAL = REAL (Write)
+      }{
+         Absolute difference between the model and the data (in Kelvin).
+         i.e.\ $ \sum{ abs( Data - Model)}$
       }
       \sstsubsection{
          SIGMA = REAL (Write)
@@ -10895,8 +11126,10 @@ WAVELEN =             0.000862 / Wavelength of the observation (metres)
 FREQ    =      347787074245.94 / Frequency of observation (Hz)
 FILTER  = '450     '           / Filter name
 SCUPROJ = 'RJ      '           / SCUBA output coordinate system
-SCUPIXSZ=                    1 /  Pixel size (arcsec)
-DATE-OBS= '1997-04-08'         / Date of first observation
+SCUPIXSZ=                    1 / Pixel size (arcsec)
+DATE-OBS= '08/04/97'           / Date of first observation
+DATE    = '2000-07-06T02:35:49'/ file creation date (YYYY-MM-DDThh:mm:ss UTC)
+ORIGIN  = 'SCUBA User Reduction Facility (SURF)'/  Origin of the FITS file
 OBSRA   =      194.04654166665 / RA of map centre (degrees; deprecated)
 OBSDEC  =     -5.7894722222218 / Dec. of map centre (degrees; deprecated)
 \end{verbatim}
@@ -11113,6 +11346,20 @@ where $T_\mathrm{lapse}$ is the temperature drop per kilometre altitude
 has a value of 3.669383.
 
 For more information see \cite{skydip}.
+
+\subsection{Calibration}
+
+The choice for \texttt{T\_HOT} and \texttt{T\_COLD} critically affects the
+result of the skydip fit. The default values for the hot and cold temperatures
+are usually stored in the data header but occasionally these values are
+redetermined and the header values must be over-ruled.  As of version 1.6 of
+\scusoft\ the cold load temperature (as well as the default telescope
+efficiency, $\eta_\mathrm{tel}$) for the 850 and 450-$\mu$m filters is
+suggested from a lookup table rather than the data headers. Also, the hot load
+temperature is now known to be wavelength dependent and an adjustment of 
+-1K (at 850 microns) and -3K (at 450 microns) is now automatically applied
+to the value stored in the header. More details on skydip calibration
+can be found in Archibald et al \cite{scdsn2}.
 
 \subsection{Removing bad skydip data from the fit}
 \label{skydips_eg}
@@ -11366,6 +11613,16 @@ In summary, \manic\ should be given the following parameters: \param{ONDIM}=1,
 \param{ZRANGE}=\textit{default} 
 (where \textit{default} is the default value suggested for the parameter)
 
+Alternatively, it should be possible to use \ndfcopy\ to extract the
+NDF section, using the TRIM parameter to reduce the resultant section
+to 2 dimensions.
+
+\begin{myquote}
+\begin{verbatim}
+% ndfcopy '19971008_dem_0039(3,,)'  TRIM TRIMWCS
+\end{verbatim}
+\end{myquote}
+
 
 \item Normalise the calibrator signal by using \cdiv\ to divide the result
 from \manic\ by \textit{n\_jiggles} (384 in this example):
@@ -11435,8 +11692,9 @@ file calsig\_450\_850\_photom.sdf.
 \sculog, \scushift\ and the scripts \scuquick, \qdraw, \remdbm, \chgnacent,
 \setbolwt\  and \sigclip\ do not form part of
 the \scusoft\ monolith and are all written in perl \cite{Perl}. They all use
-the \xref{Perl NDF module}{sun222}{} \cite{ndfperl}  and therefore require at least version 5.003 of perl. The
-perl NDF binary will be installed as /star/bin/ndfperl on Starlink sites.
+the \xref{Perl NDF module}{sun222}{} \cite{ndfperl} and therefore require at
+least version 5.003 of perl. The perl NDF binary will be installed as
+\texttt{/star/Perl/bin/perl} on Starlink sites.
 \xref{NDFPERL}{sun222}{} is distributed by Starlink and 
 can also be obtained from
 \htmladdnormallinkfoot{JCMT software web pages}{http://www.jach.hawaii.edu/JACpublic/JCMT/software/perl/}.

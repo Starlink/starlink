@@ -43,6 +43,7 @@ SCAN_RLB        - Remove linear baselines from SCAN/MAP data
 SCUBA2MEM       - Calculate bolometer positions including chops
 SCUCAT          - Concatenate photometry results into a single file
 SCUCLIP         - Perform sigma clipping of each bolometer
+SCUCLKERR       - Determine potential error in the SCUBA time headers
 SCUHELP         - This help system
 SCULOG          - Provide detailed descriptions of all observation data
 SCUMAKEWT       - Generate fourier weights of chop function
@@ -76,6 +77,7 @@ SKYSUM          - Generate a summary of skydip observations
 EXTRACT_FLAT    - Write the flatfield information to a text file
 REDUCE_NOISE    - Process demodulated noise data.
 SCUBA2MEM       - Calculate bolometer positions
+SCUCLKERR       - Determine potential error in SCUBA time headers
 SCUHELP         - This help system
 SCUPA           - Show position angle of array (requires Kappa)
 SCUQUICK        - Script to automate SURF data reduction
@@ -216,6 +218,42 @@ using the following format:
           bolometer from integration 3.
 
 1 Release_notes
+
+2 New_in_version_1_6
+
+Important changes to SKYDIP and a fix for the clock error problem.
+
+3 New_Tasks
+
+  - SCUCLKERR can be used to determine possible clock errors
+    in the acquisition system.
+
+3 Changes_to_existing_tasks
+
+  - Add correction for the SCUVAX clock error problem
+
+  - Skydips now 'know' the correct value for ETA_TEL, T_COLD and T_HOT
+
+  - In REMSKY the outer ring of bolometers can be specified using R-1
+    (ie it counts from the outside in if you use a negative ring number)
+
+  - SCUOVER is now a little cleverer (and the text can be a different
+    color to the circles)
+
+  - SCUNOISE works on Windows NT.
+
+  - If the second LST provided to REMSKY is less than the first
+    LST it is now assumed that the time refers to the following day.
+
+3 Bug_Fixes
+
+  - Fixed error when SCUPHOT runs in the pipeline where occasionally the
+    parabola fit of the complete coadd could give incorrect answers.
+
+  - Can now combine data taken at almost the same wavelengths (a 20 micron
+    difference is allowed) when using REBIN.
+
+  - Output file from REMDBM now no longer contains CHOP_* keywords
 
 2 New_in_version_1_5
 
@@ -1662,7 +1700,8 @@ OUT = NDF (Write)
 SECOND_LST = CHAR (Read)
    The local sidereal time at which SECOND_TAU was
    the zenith sky opacity, in hh mm ss.ss format. The default value is
-   that of FIRST_LST.
+   that of FIRST_LST. If this value is less than FIRST_LST it is assumed you
+   are referring to the following day.
 3 SECOND_TAU
 SECOND_TAU = REAL (Read)
    The zenith sky opacity after the observation. The default value is that
@@ -2936,6 +2975,11 @@ SPIKE_LEVEL = INTEGER (Read)
 SWITCH = INTEGER (Read)
    Parameter to indicate which switch to extract. A value of 0 means
    that all switches should be reduced. Default is 0.
+3 TARRAY = LOGICAL (Read)
+   Controls whether the T_COLD parameters are read as an array
+   of values (true) or read as a sequence of scalars (false) . 
+   This parameter is useful if the command is to be run in batch mode.
+   Default is false.
 3 T_COLD
 T_COLD = REAL (Read)
    Temperature of the cold load when processing skydip data. The default 
@@ -3117,6 +3161,13 @@ Description:
    added back on to the data - this should protect against removing 
    flux from MAP data.   
 
+   If a SKY NDF is found in the REDS extension, it is assumed that
+   the sky variation has already been determined (eg by CALCSKY) and
+   this sky signature is removed. The 'ADD' parameter is ignored in
+   this case.
+
+
+
 2 Parameters
 For information on individual parameters, select from the list below:
 3 ADD
@@ -3137,6 +3188,8 @@ BOLOMETERS = CHAR (Read)
         id         Bolometer id   H7 or C14
         rn         Ring number    r1 (for the inner ring) and
                                   r5 (for the outer ring of the SHORT array)
+                                  r-1 (for the outer ring)
+                                  r-2 (one ring in from outer ring)
         all        All bolometers all (select the entire array)
 
     Each value must be comma separated but can be preceded by a minus
@@ -3158,6 +3211,7 @@ BOLOMETERS = CHAR (Read)
      [all,-r3,g1]                     all pixels except ring 3 but with
                                       G1 (which happens to be in r3)
      [all,-r1,-r2,-r3,-r4,-r5]        Selects the central pixel          
+     [all,-r-1]                       Selects all except the outer ring
 
    Note that the bolometer sum is calculated sequentially so that
    [all,-all,h7] would leave you with bolometer H7.
@@ -3646,7 +3700,59 @@ TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
    Kappa task SETBB to unset quality bit 5.
 
 
+1 SCUCLKERR
+Determine the possible error in the times stored in the data header
 
+Usage:
+
+   scuclkerr filename
+
+Description:
+
+   This routine calculates the error in the times stored in the
+   data header. It performs a self-consistency check to determine
+   the local sidereal time from the Azimuth and elevation information
+   (that comes directly from the telescope) and compares this to
+   the LST stored in the header.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CLOCKERR
+CLOCKERR = REAL (Write)
+   On exit, the clock error, in seconds,  determined from the header.
+3 DANG
+DANG = REAL (Write)
+   Error in the array rotation angle due to the clock error (degrees)
+3 DR
+DR = REAL (Write)
+   Positional error at the edge of the array for this particular
+   observation. In arcseconds.
+   Edge is defined as a radius of 70 arcseconds.
+3 IN
+IN = NDF (Read)
+   The name of the NDF containing to be tested.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 LAG
+LAG = REAL (Write).
+   The discrepancy between the LST stored in the FITS header
+   and the LST when data acquisition begins. This provides
+   a measure of the lag in starting up the observation (including
+   slew times). The value is stored in seconds.
+3 MJD
+MJD = DOUBLE (Write)
+   Modified Julian Date of start of observation corrected for the
+   lag time and the clock error.
+2 Notes
+- The calculated clock error is only accurate to about 15 seconds.
+2 Copyright
+   Copyright (C) 2000 Particle Physics and Astronomy
+   Research Council. All Rights Reserved.
+2 References
+   Jenness T., 2000, JCMT Technical Report TR/001/84
+     <http://www.jach.hawaii.edu/JACdocs/JCMT/tr/001/84>
+2 Authors
+TIMJ: Tim Jenness (JAC)
 
 1 SCULOG
 Produce summary of SCUBA observations
@@ -4596,6 +4702,7 @@ Description:
    This application takes raw SKYDIP data and calculates tau, eta_tel
    and B by fitting. Sky brightness temperatures are calculated for
    different airmasses and then fitted with a model of the sky.
+
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
@@ -4623,10 +4730,12 @@ CVAR = LOGICAL (Read)
    the fixed variance is the mean of all the calculated variances.
 3 ETA_TEL
 ETA_TEL = REAL (Read)
-   The telescope efficiency. Must be between 0 and 1.0.
-   A negative value allows this parameter to be free. The default value
-   is taken from the header information associated with the observation.
-3 ETA_TEL_ERR
+   The telescope efficiency. If available the current telescope value 
+   is used as the default.  Values must be between 0 and 1.0. 
+   A negative value allows this parameter to be free.
+   For data taken before 26 April 2000, the default values supplied
+   for 850 and 450 are provided by the routine rather than being
+   read from the FITS header.3 ETA_TEL_ERR
 ETA_TEL_ERR = REAL (Write)
    Error in the fitted value of ETA_TEL. Set to bad if the fit has failed.
 3 ETA_TEL_FIT
@@ -4646,6 +4755,9 @@ MSG_FILTER = CHAR (Read)
 OUT = CHAR (Write)
    The name of the output file that contains the measured
    sky temperatures.
+3 RESIDUAL (Write)
+   Absolute difference between the model and the data in Kelvin.
+   i.e. Sum( Abs(Data - model) )
 3 SIGMA
 SIGMA = REAL (Write)
   Standard deviation of the residuals of the fit (Kelvin).
