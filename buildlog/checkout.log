@@ -2353,6 +2353,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourIcon.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourStore.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ComponentColourControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ConfigurationStore.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/Configurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalDocument.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalField.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/FontChangedEvent.java
@@ -2383,6 +2384,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/config.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/delete.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/exit.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/reset.gif
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/update.gif
 cvs checkout: Updating java/source/astgui/src/testcases
 U java/source/astgui/src/testcases/TestPlotConfigFrame.java
 cvs checkout: Updating java/source/axis
@@ -5459,6 +5461,8 @@ cvs checkout: Updating java/source/diva/src/main/uk
 cvs checkout: Updating java/source/diva/src/main/uk/ac
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva
+U java/source/diva/src/main/uk/ac/starlink/diva/Base64InputStream.java
+U java/source/diva/src/main/uk/ac/starlink/diva/Base64OutputStream.java
 U java/source/diva/src/main/uk/ac/starlink/diva/DragRegion.java
 U java/source/diva/src/main/uk/ac/starlink/diva/Draw.java
 U java/source/diva/src/main/uk/ac/starlink/diva/DrawActions.java
@@ -5485,6 +5489,7 @@ U java/source/diva/src/main/uk/ac/starlink/diva/InterpolatedCurveManipulator.jav
 U java/source/diva/src/main/uk/ac/starlink/diva/RangeManipulator.java
 U java/source/diva/src/main/uk/ac/starlink/diva/TestDrawActions.java
 U java/source/diva/src/main/uk/ac/starlink/diva/XRangeFigure.java
+U java/source/diva/src/main/uk/ac/starlink/diva/package.html
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/geom
 U java/source/diva/src/main/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/images
@@ -5513,8 +5518,10 @@ U java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/HermiteSplineInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/InterpolatedCurveIterator.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/Interpolator.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/InterpolatorFactory.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/LinearInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/PolynomialInterp.java
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/package.html
 cvs checkout: Updating java/source/dom4j
 cvs checkout: Updating java/source/dom4j/docs
 cvs checkout: Updating java/source/dom4j/docs/dom4j

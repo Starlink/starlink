@@ -296,7 +296,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/java
-     [copy] Copying 44 files to /apps/cvsbuild/java/source/astgui/build/java
+     [copy] Copying 45 files to /apps/cvsbuild/java/source/astgui/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/astgui/build/java
      [echo] Executing JNIHDS target: javadoc-sources
 
@@ -348,7 +348,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 845 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 850 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing JSky target: javadoc-sources
 
@@ -388,6 +388,8 @@ javadoc-sources:
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/java
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/mirage/build/java
      [echo] Executing TOPCAT target: javadoc-sources
 
 javadoc-sources:
@@ -413,11 +415,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1764 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1777 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 49 seconds
+Total time: 1 minute 6 seconds
