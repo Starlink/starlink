@@ -323,6 +323,9 @@
 *     16-DEC-1998 (PDRAPER):
 *        Added OVERRIDE parameter to control the behaviour when
 *        only some of the datasets are paired.
+*     20-JAN-1999 (PDRAPER):
+*        Sorted out workspace problems for incomplete matching
+*        (IPBEEN and IPQUE increased to NOPEN from NMATCH).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -931,8 +934,8 @@
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPGRA, STATUS )
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPSPAN, STATUS )
       CALL CCD1_MALL( NMATCH * 4, '_INTEGER', IPSUB, STATUS )
-      CALL CCD1_MALL( NMATCH, '_INTEGER', IPQUE, STATUS )
-      CALL CCD1_MALL( NMATCH, '_LOGICAL', IPBEEN, STATUS )
+      CALL CCD1_MALL( NOPEN, '_INTEGER', IPQUE, STATUS )
+      CALL CCD1_MALL( NOPEN, '_LOGICAL', IPBEEN, STATUS )
                            
 *  Look for a maximum likelihood span of the graph of positions (each
 *  position is treated as a node, the node-node transformations are

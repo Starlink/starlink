@@ -26,7 +26,7 @@
 *     NW = INTEGER (Given)
 *        The number of weights given
 *     NNODES = INTEGER (Given)
-*        The number of nodes whoose positions were intercompared to
+*        The number of nodes whose positions were intercompared to
 *        generate the weighting data. The intercomaprison loop is
 *        assumed to be of the form.
 *             do i = 1, nnodes - 1
