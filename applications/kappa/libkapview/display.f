@@ -904,7 +904,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP( 'DISPLAY_ERR4B', 'The Mapping from the '//
      :                    'current WCS co-ordinate Frame to pixel '//
-     :                    'co-ordinates is undefined ast the image '//
+     :                    'co-ordinates is undefined at the image '//
      :                    'centre.', STATUS )
             CALL ERR_REP( 'DISPLAY_ERR4C',  'Try displaying a section'//
      :                    ' of the image, or changing the current '//
