@@ -518,6 +518,7 @@
       character*(DAT__SZNAM) name
       logical valid
       integer dummy
+      character*(DAT__SZLOC) ploc
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
