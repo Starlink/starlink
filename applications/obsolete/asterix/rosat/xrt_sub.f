@@ -1770,7 +1770,7 @@ D          WRITE(1,*)HEAD.OFFAX
       INTEGER NQEMAX
       PARAMETER (NQEMAX=25)
       REAL OFFMAX
-      PARAMETER (OFFMAX=22)
+      PARAMETER (OFFMAX=22.0)
 *    Local variables :
       CHARACTER*132 QEFILE
       CHARACTER*(DAT__SZLOC) QLOC
@@ -1814,11 +1814,11 @@ D          WRITE(1,*)HEAD.OFFAX
        DO YLP=1,NY
 *
 *    Calculate off axis angle in arcmins
-          XOFF = XCENT + (XLP-NX/2.0) * XSCALE
-          YOFF = YCENT + (YLP-NY/2.0) * YSCALE
+          XOFF = XCENT + (REAL(XLP)-REAL(NX)/2.0) * XSCALE
+          YOFF = YCENT + (REAL(YLP)-REAL(NY)/2.0) * YSCALE
           OFFAX = SQRT(XOFF*XOFF + YOFF*YOFF) * 60.0
 *  limit radial extent to prevent silly values
-          OFFAX=MAX(OFFAX,OFFMAX)
+          OFFAX=MIN(OFFAX,OFFMAX)
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
@@ -3519,7 +3519,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       ENDIF
 
 *  limit radial extent to prevent silly values
-      OFF=MAX(OFFAX,OFFMAX)
+      OFF=MIN(OFFAX,OFFMAX)
 
 *
 *    Set vignetting correction according to formula in HRI calibration
