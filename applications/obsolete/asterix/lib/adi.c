@@ -2795,7 +2795,11 @@ void adix_mtaid( ADIobj id, ADImta *mta, ADIstatus status )
 
   _chk_stat;
 
-  if ( _krnl_q(id) && ! _han_q(id) ) {
+  if ( _null_q(id) ) {
+    adic_setecs( ADI__NOTSET, "Cannot construct MTA for null identifier", status );
+    }
+
+  else if ( _krnl_q(id) && ! _han_q(id) ) {
     adic_setecs( ADI__ILLKOP, "Cannot construct MTA for kernel object", status );
     }
   else
