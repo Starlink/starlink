@@ -77,10 +77,11 @@
 *    Status :
 	INTEGER STATUS
 *    Local variables :
-	RECORD/DATASET/ OBDAT		! Observed dataset (dummy structure)
-	RECORD/PREDICTION/ PREDDAT	! Data predicted by model
-	RECORD/INSTR_RESP/ INSTR	! Instrument response
-	RECORD /MODEL_SPEC/ MODEL	! Model specification
+c	RECORD/DATASET/ OBDAT		! Observed dataset (dummy structure)
+c	RECORD/PREDICTION/ PREDDAT	! Data predicted by model
+c	RECORD/INSTR_RESP/ INSTR	! Instrument response
+c	RECORD /MODEL_SPEC/ MODEL	! Model specification
+        INTEGER IMOD
 
 	CHARACTER*100 BGOBJ		! B/g dataset name
 	CHARACTER*100 FILE		! File name
@@ -124,7 +125,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM Version 2.2-0' )
+	PARAMETER		( VERSION = 'SSIM Version 2.2-1' )
 *-
 
 *  Version
@@ -177,9 +178,9 @@
       CALL SFIT_GETZ( Z, STATUS )
 
 *  Set up the only OBDAT component needed (no. of channels, taken from response)
-      CALL ADI_CGET0I( INSTR.R_ID, 'NCHAN', NCHAN, STATUS )
-      OBDAT.NDAT = NCHAN
-      OBDAT.V_ID = ADI__NULLID
+      CALL ADI_CGET0I( INSTR_RESP_R_ID(1), 'NCHAN', NCHAN, STATUS )
+      DATASET_NDAT(1) = NCHAN
+      DATASET_V_ID(1) = ADI__NULLID
 
 *  Output dataset
       CALL BDI_NEW( 'Spectrum', 1, NCHAN, 'REAL', SPID, STATUS )
@@ -188,12 +189,13 @@
 
 *  Set up PREDDAT (no workspace required)
       PREDDAT.CONVOLVE = .TRUE.
-      CALL FIT_PREDSET( IFID, 1, .FALSE., OBDAT, PREDDAT, STATUS )
+      CALL FIT_PREDSET( IFID, 1, .FALSE., 1, 1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Apply redshift to model space energy bounds
-      CALL SFIT_APPRED( Z, PREDDAT.NMBOUND, %VAL(PREDDAT.MLBNDPTR),
-     :                  %VAL(PREDDAT.MUBNDPTR), STATUS )
+      CALL SFIT_APPRED( Z, PREDICTION_NMBOUND(1),
+     :                  %VAL(PREDICTION_MLBNDPTR(1)),
+     :                  %VAL(PREDICTION_MUBNDPTR(1)), STATUS )
 
 *  Copy ancillary stuff
       CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
@@ -213,9 +215,11 @@
       CALL DCI_PUTID( OFID, DETID, STATUS )
 
 *  Copy ChannelSpec from response matrix to output axis
-      CALL ADI_CMAPR( INSTR.R_ID, 'ChannelSpec', 'READ', CHPTR, STATUS )
+      CALL ADI_CMAPR( INSTR_RESP_R_ID(1), 'ChannelSpec', 'READ', CHPTR,
+     :                STATUS )
       CALL BDI_AXPUT1R( OFID, 1, 'Data', NCHAN, %VAL(CHPTR), STATUS )
-      CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec', CHPTR, STATUS )
+      CALL ADI_CUNMAP( INSTR_RESP_R_ID(1), 'ChannelSpec', CHPTR,
+     :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *  Map data etc and write labels
@@ -234,11 +238,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Workspace for model stack
-      CALL SFIT_MAPMODSTK( 1, PREDDAT, MODEL.STACKPTR, STATUS )
+      CALL SFIT_MAPMODSTK( 1, MODEL_SPEC_STACKPTR(IMOD), STATUS )
 
 *  Calculate predicted data
-      CALL FIT_PREDDAT( 1, 1, OBDAT, INSTR, PREDDAT, MODEL, PARAM,
-     :                  1, %VAL(DPTR), STATUS )
+      CALL FIT_PREDDAT( 1, 1, IMOD, PARAM, 1, %VAL(DPTR), STATUS )
 
 *  Map background data and ...
       IF ( BG ) THEN
