@@ -47,6 +47,7 @@
         END IF
       ELSE
         CALL USI_ANNUL( 'OUT', STATUS )
+	call hds_show( 'LOCATORS', STATUS )
       END IF
 
       END
@@ -294,7 +295,7 @@
 	CALL HSI_PTXT( SID, HLINES, HTEXT, STATUS )
 
 *    Release the dataset
-	CALL USI_CANCL( 'SSUB', STATUS )
+	CALL USI_ANNUL( 'SSUB', STATUS )
 
 *    Tidy up
  99     IF ( STATUS .NE. SAI__OK ) THEN
