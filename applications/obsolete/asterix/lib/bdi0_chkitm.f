@@ -111,9 +111,10 @@
         LOGICAL			CHR_INSET
 
 *  Local Constants:
-      CHARACTER*58		AXSUBS
+      CHARACTER*69		AXSUBS
         PARAMETER		( AXSUBS =
-     :   'DATA,WIDTH,LABEL,UNITS,NORMALISED,LOWIDTH,HIWIDTH' )
+     :   'SPACEDDATA,DATA,WIDTH,LABEL,UNITS,NORMALISED,'/
+     :       /'LOWIDTH,HIWIDTH' )
       CHARACTER*100		SUBS
         PARAMETER		( SUBS =
      :   'DATA,VARIANCE,ERROR,QUALITY,QUALITYMASK,LABEL,UNITS,'/
@@ -252,6 +253,8 @@
                     LITEM(8:) = 'LoWidth'
                   ELSE IF ( LCOP(8:ILEN) .EQ. 'HIWIDTH' ) THEN
                     LITEM(8:) = 'HiWidth'
+                  ELSE IF ( LCOP(8:ILEN) .EQ. 'SPACEDDATA' ) THEN
+                    LITEM(8:) = 'SpacedData'
                   END IF
 
                 ELSE
