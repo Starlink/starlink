@@ -296,10 +296,10 @@
             ACTION(1) = 'Input dataset {INP}'
             CALL MSG_SETI( 'NDAT', NELM )
             CALL MSG_SETI( 'NSECT', NSECT )
-            CALL MSG_SETI( 'LSECT', LSECT )
 
             CALL MSG_MAKE( 'Original ^NDAT data points split into '/
      :                                  /'^NSECT', ACTION(2), TLEN )
+            CALL MSG_SETI( 'LSECT', LSECT )
             CALL MSG_MAKE( 'sections, each containing ^LSECT values.',
      :                                               ACTION(3), TLEN )
 
