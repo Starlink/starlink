@@ -12,10 +12,10 @@
 #
 #  Description:
 #     This is a driver script to run one of the filter programs in
-#     the EXTREME package which modifies source code.  If it is invoked
-#     under the name 'do_xxx' it will try to invoke the filter 'xxx'.
+#     the EXTREME package which modifies source code.  It should be 
+#     invoked under the name 'do_xxx' to run the filter 'xxx'.
 #     For each of its command line arguments (files) it:
-#        - Invokes the filter xxx
+#        - Runs the filter xxx
 #        - Writes a line to the file ./xxx.log saying how many lines were
 #          changed
 #        - If and only if changes were made, it writes the modified file
@@ -48,6 +48,9 @@
       destdir="./$filter.changed"
       logfile="./$filter.log"
       cmp_scr="cmp_$filter.pl"
+
+#  Set up temporary file for buffering warnings.
+      warnfile="$destdir/.tmp.warnings"
 
 #  Check command line arguments.
       if [ ! "$*" ] 
@@ -94,11 +97,13 @@
          outfile="$destdir/$f"
 
 #  Do the processing
-         $filter $infile $outfile 2>&1 | \
-         while read errtext
-         do
-            printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$errtext" "***"
-         done
+         rm -f $warnfile
+         if $filter $infile $outfile > $warnfile 2>&1 
+         then
+            :
+         else
+            echo >>warnfile "$filter exited with non-zero status"
+         fi
 
 #  See if the processing made any changes.  Remove the output file if not.
          changed=`diff $infile $outfile | grep -c "^<"`
@@ -155,7 +160,7 @@
             fi
             if [ "$warn" ]
             then
-               printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+               echo $warn >> $warnfile
             else
                :
             fi
@@ -173,7 +178,7 @@
                :
             else
                warn="Possible error in modifications?"
-               printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+               echo $warn >> $warnfile
             fi
          else
             :
@@ -185,11 +190,11 @@
             if [ "$changed" != "0" ]
             then
                if [ "`diff $infile $outfile | grep '^> ' \
-                                            | sed 's/ *$//; s/^> //' \
+                                            | sed 's/!.*//; s/ *$//; s/^> //' \
                                             | awk 'length(\$0)>72'`" ]
                then
                   warn="Line extended past column 72?"
-                  printf "%-3s  %-20s %-40s  %-3s\n" "***" "$f:" "$warn" "***"
+                  echo $warn >> $warnfile
                else
                   :
                fi
@@ -199,6 +204,24 @@
          else
             :
          fi
+
+#  Print any warnings to standard output - no need to repeat the same ones.
+         if [ -s $warnfile ]
+         then
+            sed "s/$filter: //" < $warnfile | sort | uniq -c | \
+            while read count errtext
+            do
+               if [ "$count" = "1" ]
+               then
+                  printf "%-20s %3s   %-48s  \n" "$f:" "   " "$errtext"
+               else
+                  printf "%-20s %3s x %-48s  \n" "$f:" "$count" "$errtext"
+               fi
+            done
+         else
+            :
+         fi
+         rm -f $warnfile
 
 #  Write to log file.
          printf >>$logfile "%-30s  %4d lines changed\n" "$infile" "$changed"

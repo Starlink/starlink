@@ -6,28 +6,42 @@
 
 #  Get name of filter.
       my( $filter ) = $name;
-      $name =~ s/cmp_//;
-      $name =~ s/\.pl//;
+      $filter =~ s/cmp_//;
+      $filter =~ s/\.pl//;
 
 #  Open.
+      if ( @ARGV < 1 || @ARGV >2 ) {
+         die( "Usage: $name file [ modified-file ]\n" );
+      }
       my( $f1, $f2 ) = @ARGV[ 0, 1 ];
       open( F1, "<$f1" ) or die( "Failed to open $f1\n" );
-      open( F2, "<$f2" ) or die( "Failed to open $f2\n" );
+      if ( defined( $f2 ) ) {
+         open( F2, "<$f2" ) or die( "Failed to open $f2\n" );
+      }
+      else {
+         my( $cmd ) = "$filter $f1";
+         open( F2, "$cmd |" ) or die( "Failed to pipe from '$cmd'\n" );
+      }
 
 #  Get normalised text.
       my( $s1 ) = normalise( $filter, join( "", <F1> ) );
       my( $s2 ) = normalise( $filter, join( "", <F2> ) );
 
 #  Close.
-      close( F1 );
-      close( F2 );
+      close( F1 ) or die( "Trouble with first file\n" );
+      close( F2 ) or die( "Trouble with second file\n" );
 
 #  Compare.
       if ( $s1 eq $s2 ) {
          exit( 0 );
       }
       else {
-         print( " *** Edit error?\n" );
+         my( @s1 ) = split( "\n", $s1 );
+         my( @s2 ) = split( "\n", $s2 );
+         my( $l1, $l2 );
+         my( $n ) = 0;
+         while ( ( $l1 = shift( @s1 ) ) eq ( $l2 = shift( @s2 ) ) ) { $n++; }
+         print( " *** Edit error near line $n?:\n$l1\n$l2\n" );
          exit( 1 );
       }
 
@@ -50,7 +64,7 @@
 #  inscnf: Gets rid of continuation lines, spaces, and (most) CNF_PVAL 
 #  invocations.
       if ( $filter =~ /inscnf/ ) {
-         s/^\* *inscnf:.*$//g;
+         s/^\* *inscnf:.*\n//g;
          s/^ *include *'cnf_par' *(!.*)?\n//mig;
          s/\n[^*cCdD!]....[^ 0]//g;
          s/ *//g;
@@ -59,18 +73,19 @@
 
 #  crepint: Changes INT_BIG back to int and collapses spaces.
       elsif ( $filter =~ /crepint/ ) {
-         s%^/\* *crepint:.*\*/ *$%%msg;
+         s%^/\* *crepint:.*?\*/ *\n%%msg;
          s/INT_BIG/int/g;
-         s/\s+/ /g;
+         s/  +/ /g;
       }
 
 #  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
 #  to INTEGER.
       elsif ( $filter =~ /frepint/ ) {
-         s/^\* *frepint:.*$//g;
+         s/^\t/      /mg;
+         s%^/\* *frepint:.*?\*/ *\n%%msg;
          s/\n[^*cCdD!]....[^ 0]//g;
-         s/ *//g;
-         s/^\s*integer\*8/integer/mig;
+         s/^([ \t]*integer) *\* *8/$1/mig;
+         s/[ \t]+/ /g;
       }
 
 #  Return normalised text.
