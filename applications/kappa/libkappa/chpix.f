@@ -97,11 +97,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 25 (MJC):
 *        Original NDF version.
+*     27-FEB-1998 (DSB):
+*        Use NUM_ functions to convert lower precision integer values to 
+*        _INTEGER when calling PAR_MIX0I.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -311,8 +315,9 @@
 *  Byte
 *  ----
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, VAL__MINB, VAL__MAXB,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
+            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_BTOI( VAL__MINB ), 
+     :                      NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE., 
+     :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
@@ -329,8 +334,9 @@
 *  Unsigned Byte
 *  -------------
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, VAL__MINUB,
-     :                      VAL__MAXUB, 'Bad', .FALSE., CVALUE, STATUS )
+            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_UBTOI( VAL__MINUB ),
+     :                      NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE., 
+     :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
@@ -347,8 +353,9 @@
 *  Word
 *  ----
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, VAL__MINW, VAL__MAXW,
-     :                      'Bad', .FALSE., CVALUE, STATUS )
+            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_WTOI( VAL__MINW ),
+     :                       NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE., 
+     :                       CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
@@ -365,8 +372,9 @@
 *  Unsigned Word
 *  -------------
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, VAL__MINUW,
-     :                      VAL__MAXUW, 'Bad', .FALSE., CVALUE, STATUS )
+            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_UWTOI( VAL__MINUW ),
+     :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE., 
+     :                      CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
             IF ( CVALUE .EQ. 'BAD' ) THEN
