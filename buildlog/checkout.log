@@ -5507,6 +5507,7 @@ U java/source/diva/src/main/uk/ac/starlink/diva/images/width5.gif
 U java/source/diva/src/main/uk/ac/starlink/diva/images/width6.gif
 U java/source/diva/src/main/uk/ac/starlink/diva/images/xrange.gif
 cvs checkout: Updating java/source/diva/src/main/uk/ac/starlink/diva/interp
+U java/source/diva/src/main/uk/ac/starlink/diva/interp/AbstractInterpolator.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/AkimaSplineInterp.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/BasicInterpolatorFactory.java
 U java/source/diva/src/main/uk/ac/starlink/diva/interp/CubicSplineInterp.java
@@ -8232,6 +8233,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/CoordinateGeneratorListe
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/DataColumnGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/DataColumnGenerator.java.first
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/DataLimitControls.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/DeblendFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/DecimalComboBoxEditor.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/DecimalDialog.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ErrorColumnGenerator.java
@@ -8249,6 +8251,9 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitViewModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineProperties.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineRenderer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LocalLineIDManager.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLine.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLineTableModel.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/ModelLineView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/MultiTableView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/NumberCellRenderer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotChangedEvent.java
@@ -8467,6 +8472,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LevMarq.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LevMarqFunc.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/LineInterpolator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LorentzFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LorentzGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/LorentzInterp.java
@@ -8910,13 +8916,17 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/TopCat2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Up.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/ab3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_n.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_n_pad.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s_pad.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/concat4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exit.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exrows.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/false.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
@@ -8929,11 +8939,13 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/match1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/selrows3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/sigma0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/spoints5.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/trash2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/true.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/venn2.gif
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images/treeview

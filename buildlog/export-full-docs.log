@@ -249,6 +249,7 @@ javadoc-sources:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
 
@@ -263,7 +264,6 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
@@ -287,10 +287,6 @@ javadoc-sources:
   [javadoc]  filtering them, extracting features from them (e.g. aspect
   [javadoc]  ratio), and then passing the extracted features into a classifier
   [javadoc]  that performs classification on the feature set.  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
-  [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Used when figure is changed (i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] "The timeout for single/double/triple/.."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -303,7 +299,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A node that is also a graph, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/DashedPathRecognizer.java:71: warning - Tag @see: missing #: "DashedPathRecognizer(SceneRecognizer, double, double, double)"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
@@ -343,14 +338,6 @@ javadoc-sources:
   [javadoc] <li>stroke filtering utilities</li>
   [javadoc] <li>out-of-the-box recognizers</li>
   [javadoc] <li>etc</li> </ol> </P>"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!-- -->figure creation, removal and transformations."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
@@ -382,7 +369,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:67: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
@@ -447,11 +434,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
-  [javadoc] "Return if the Interpolator is full, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
-  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
   [javadoc] "Return if the Interpolator is full, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -766,16 +748,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: DecimalField
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: SelectCharacters
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!-- -->figure creation, removal and transformations."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!-- --> composite figure
@@ -851,11 +825,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e. the X axis intersection with the Y axis). "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxisLabels.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstFigureStore.java:84: warning - Tag @link: reference not found: DrawActions
@@ -879,7 +853,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:49: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:47: warning - Tag @see: reference not found: AstNumerLabels
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:67: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsEdges.html...
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1039,6 +1013,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ImageTransducer.java:30: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/InterpolateStrokeFilter.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LineRecognizer.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/LLRSceneMetric.html...
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
@@ -1054,17 +1030,15 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/ModedIncrRecognizer.html...
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g. zooming).  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeLengthStrokeFilter.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/NormalizeTimeStrokeFilter.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/PanRecognizer.java:25: warning - @rating is an unknown tag.
@@ -1256,21 +1230,20 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/TransformContext.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/BackgroundedCompositeFigure.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:191: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/toolbox/LabelFigure.html...
   [javadoc] "Get the point at which this figure is "anchored." This
   [javadoc]  will be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/PointConstraint.html...
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." A snap means that the output value of the point
@@ -1278,6 +1251,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/SelectionModel.html...
   [javadoc] "Add an array of objects to the selection."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1461,29 +1435,18 @@ javadoc-sources:
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawGraphicMenu
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/FigureChangedEvent.html...
-  [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Used when figure is changed (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:77: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:93: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AbstractInterpolator.java:31: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AbstractInterpolator.java:45: warning - Tag @link: reference not found: interpolate
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:77: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:93: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:29: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:43: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:25: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:39: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:31: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:45: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/interp/Interpolator.html...
-  [javadoc] "Return if the Interpolator is full, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
-  [javadoc]  further vectices."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:28: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:42: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:175: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:200: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:23: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:37: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:24: warning - Tag @link: reference not found: setValues
@@ -1503,7 +1466,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 582 warnings
+  [javadoc] 575 warnings
 
 install:
 
@@ -1701,10 +1664,11 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1108 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 1109 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 108 files to /apps/cvsbuild/starjava/docs
      [echo] Executing HELP target: install
 
@@ -2119,251 +2083,15 @@ prepare:
 check_packages:
 
 build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 48 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing SPLAT target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] make: Nothing to be done for `build'.
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
-
-install:
-[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 211 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 224 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Mirage target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing TOPCAT target: install
-
-prepare:
-
-check_packages:
-
-build_demo:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
-
-build:
-
-docs_check:
-
-docs:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/plot.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 148 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 46 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing Treeview target: install
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Coco target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing RV target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing FROG target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
-
-export-full-docs:
-      [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
-
-BUILD SUCCESSFUL
-Total time: 10 minutes 27 seconds
+    [javac] Compiling 22 source files to /apps/cvsbuild/java/source/sog/build/classes
+    [javac] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOGNavigatorImageDisplay.java:78: uk.ac.starlink.sog.SOGNavigatorImageDisplay should be declared abstract; it does not define getPlotColour() in uk.ac.starlink.sog.SOGNavigatorImageDisplay
+    [javac] public class SOGNavigatorImageDisplay
+    [javac]        ^
+    [javac] Note: /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotometryWorker.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+    [javac] 1 error
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/sog/build.xml:416: Compile failed; see the compiler error output for details.
+
+Total time: 6 minutes 58 seconds

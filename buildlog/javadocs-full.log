@@ -39,7 +39,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/diva/build/java
-     [copy] Copying 853 files to /apps/cvsbuild/java/source/diva/build/java
+     [copy] Copying 854 files to /apps/cvsbuild/java/source/diva/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/diva/build/java
      [echo] Executing HELP target: javadoc-sources
 
@@ -135,7 +135,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 158 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 163 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -347,10 +347,6 @@ javadoc-sources:
   [javadoc]  filtering them, extracting features from them (e.g. aspect
   [javadoc]  ratio), and then passing the extracted features into a classifier
   [javadoc]  that performs classification on the feature set.  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
-  [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Used when figure is changed (i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] "The timeout for single/double/triple/.."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -363,7 +359,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A node that is also a graph, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/DashedPathRecognizer.java:71: warning - Tag @see: missing #: "DashedPathRecognizer(SceneRecognizer, double, double, double)"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
@@ -403,14 +398,6 @@ javadoc-sources:
   [javadoc] <li>stroke filtering utilities</li>
   [javadoc] <li>out-of-the-box recognizers</li>
   [javadoc] <li>etc</li> </ol> </P>"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!-- -->figure creation, removal and transformations."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
@@ -442,7 +429,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:67: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
@@ -507,11 +494,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
-  [javadoc] "Return if the Interpolator is full, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
-  [javadoc]  further vectices."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
   [javadoc] "Return if the Interpolator is full, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -826,16 +808,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: DecimalField
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: SelectCharacters
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!-- -->figure creation, removal and transformations."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
-  [javadoc]  events that allow users of any derived figures to be made aware of
-  [javadoc]  any changes, i.e.<!"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!-- --> composite figure
@@ -939,7 +913,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:49: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:47: warning - Tag @see: reference not found: AstNumerLabels
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:67: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsEdges.html...
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1521,29 +1495,18 @@ javadoc-sources:
   [javadoc] "Send when a figure is changed (i.e."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawGraphicMenu
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/FigureChangedEvent.html...
-  [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Used when figure is changed (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:77: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:93: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AbstractInterpolator.java:31: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AbstractInterpolator.java:45: warning - Tag @link: reference not found: interpolate
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:77: warning - Tag @link: reference not found: setCoords
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:93: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:29: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/AkimaSplineInterp.java:43: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:25: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/CubicSplineInterp.java:39: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:31: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/HermiteSplineInterp.java:45: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:163: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/interp/Interpolator.html...
-  [javadoc] "Return if the Interpolator is full, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return if the Interpolator is full, i.e. will ignore or refuse any
-  [javadoc]  further vectices."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:28: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:42: warning - Tag @link: reference not found: interpolate
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:175: warning - Tag @link: reference not found: setCoords
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/Interpolator.java:200: warning - Tag @link: reference not found: setCoords
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:23: warning - Tag @link: reference not found: setValues
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/LinearInterp.java:37: warning - Tag @link: reference not found: interpolate
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/interp/PolynomialInterp.java:24: warning - Tag @link: reference not found: setValues
@@ -1563,7 +1526,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 582 warnings
+  [javadoc] 575 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 23 seconds
+Total time: 1 minute 30 seconds
