@@ -23,6 +23,7 @@ proc CCDInitialize { } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -30,6 +31,8 @@ proc CCDInitialize { } {
 #        Original version.
 #     13-NOV-1995 (PDRAPER):
 #        Added initialization of CCDirflats.
+#     3-JUL-2001 (MBT):
+#        Added initialization of USESET.
 #     {enter_further_changes_here}
 
 #-
@@ -43,6 +46,7 @@ proc CCDInitialize { } {
 #  Set some global parameters.
    set CCDglobalpars(LOGTO) BOTH
    set CCDglobalpars(LOGFILE) CCDPACK.LOG
+   set CCDglobalpars(USESET) FALSE
    set CCDglobalpars(SATURATE) FALSE
    set CCDglobalpars(SETSAT) TRUE
    set CCDglobalpars(GENVAR) FALSE
