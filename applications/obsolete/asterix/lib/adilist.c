@@ -253,7 +253,7 @@ void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
 /* the cell insertion point from the last iteration if any, otherwise the
 /* user's list variable */
       if ( test < 0 ) {
-        ipoint = _CDR(curp);
+        ipoint = &_CDR(curp);
         curp = *ipoint;
         }
       }
