@@ -43,7 +43,7 @@
 *     written at the normal reporting level.
 
 *  Usage:
-*     drawsig ndf nsigma [axis] [comp] [sigcol] [linestyle]
+*     drawsig ndf nsigma [axis] [comp]
 
 *  ADAM Parameters:
 *     AXIS = LITERAL (Read)
