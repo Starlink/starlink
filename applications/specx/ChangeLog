@@ -1,5 +1,7 @@
 2000-05-18  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* src/title.inc: Up the version number to 6.7-7
+
 	* exprt/calc_image.f (CALC_IMAGE): Allow for bigger format for new 
 	IF -- this will make it easier to spot an incorrect calculation.
 
