@@ -1,0 +1,522 @@
+#!/bin/csh 
+#+
+#  Name:
+#     CCDBIG
+
+#  Purpose:
+#     Tests CCDPACK functionality for a variety of image sizes.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script creates a series of test frames using CCDGENERATE. It
+#     then executes various of the CCDPACK Atasks simulating a
+#     reduction sequence. Intermediary results are displayed (if requested)
+#     The process is repeated for increasingly large images:
+#     both the size of the image in pixels and the number of objects
+#     per image is changed.
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-APR-1992 (PDRAPER):
+#        Original version.
+#     29-JUN-1993 (PDRAPER):
+#     	 Changed to include automated alignment.
+#     18-JUL-1995 (PDRAPER):
+#        Now references $CCDPACK_DIR instead of editting INSTALL at
+#        install time.
+#     22-APR-1998 (MBT):
+#        Modified to deal with increasingly large image sizes.
+#        Name changed to ccdbig from (ccdexercise).
+#     {enter_further_changes_here}
+#-
+#
+      onintr EXIT
+
+#  Initialise CCDPACK within this shell.
+#
+#  See if the ccdpack startup command exists
+      set startup_com=`alias ccdpack | grep ccdpack`
+      if ( "$startup_com" == "" ) then
+	 source /star/etc/cshrc
+      endif
+
+#  Ensure CCDPACK commands are available
+      ccdpack
+
+#  Establish the current directory as ADAM_USER and clear 
+#  any global values already existing 
+      setenv ADAM_USER $cwd
+      if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
+	 ccdclear accept 
+      endif
+
+#  Copy required files from source directory.
+      if ( -e $CCDBIG_DIR/ccdbig_obj.dat ) cp $CCDBIG_DIR/ccdbig_obj.dat .
+      if ( -e $CCDBIG_DIR/ccdtest_ard.dat ) cp $CCDBIG_DIR/ccdtest_ard.dat .
+      if ( ! -e ccdbig_obj.dat ) then
+        echo "Can't find file of objects ccdbig_obj.dat - aborting"
+        goto EXIT
+      endif
+
+#  Does the user want to see image display activity?
+      echo -n "DISPLAY - Display device (! for none) > "
+      set device = $<
+      if ( "$device" == "\!\!" || "$device" == "" ) then
+         goto EXIT
+      else
+         if ( "$device" == "\!" ) then
+            set device = "NONE"
+         endif
+      endif
+
+#  If we're going to use a device we need KAPPA.
+      if ( "$device" != "NONE" ) then
+         kappa
+         idset $device \\
+         gdset $device \\
+         gdclear \\
+         paldef \\
+         palentry colour=white palnum=0 \\
+      endif
+
+#  Write some startup info to the log file
+      set timelogfile=ccdbig_time.log
+      printf '\n\n\n\n'                                   >>$timelogfile
+      uname -a                                            >>$timelogfile
+      uptime                                              >>$timelogfile
+      date                                                >>$timelogfile 
+      du -sk $PWD                                         >>$timelogfile
+      printf "\n%7s%7s%12s\n\n" 'Pixels ' Objects Command >>$timelogfile 
+
+#  Set up alias for logging run times to a file.
+      set tmpfile = ./tmpfile
+      alias startwatch 'time >$tmpfile; set tstart = "`cat $tmpfile`"'
+      alias stopwatch  'time >$tmpfile; set tstop  = "`cat $tmpfile`"'
+      alias timelog    'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >>$timelogfile ; timediff "$tstart" "$tstop" >>$timelogfile'
+
+#  Loop over sizes of images
+      foreach frame_pixels (500 1000 1500 2000 2500 3000)
+         @ field_pixels = ($frame_pixels * 12) / 10
+
+#  Loop over number of objects in frame
+         foreach density (1 5 25)
+            @ objects = ($frame_pixels * $frame_pixels * $density) / 100000
+            if ($objects < 6) set objects = 6
+
+#  Generate file containing objects for use by ccdgenerate:
+#  First strip comments and blank lines,
+#  then select fields and scale by image size.
+            rm -f ccdtest_obj.dat
+            sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
+          | awk 'NR <= '$objects' { print $1, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
+          > ccdtest_obj.dat
+
+#  Set up geometry of CCD.
+#  This matches (and must match) the prescription used in ccdgenerate.
+            set minlobias = 3
+            @   maxhibias = $frame_pixels - 5 + 1
+            @   lobias = ($frame_pixels * 5) / 100
+            @   hibias = $frame_pixels - ( ($frame_pixels * 6) / 100 )
+            if ($lobias < $minlobias) set lobias = $minlobias
+            if ($hibias > $maxhibias) set hibias = $maxhibias
+            @   loframe = $lobias + 1
+            @   hiframe = $hibias - 1
+
+#  Try to locate the ARD file which goes with the test. If this is 
+#  not found then proceed without it.
+            echo " "
+            echo "  Setting the characteristics of the CCD device using the "
+            echo "  CCDSETUP routine."
+            echo " "
+            if ( -e ccdtest_ard.dat ) then
+
+#  Found the ARD file setup CCDPACK appropriately.
+#  We use the same ARD file regardless of size.  This is probably OK.
+               startwatch
+               ccdsetup \
+                  bounds="[1,$lobias,$hibias,$frame_pixels]" \
+                  extent="[$loframe,$hiframe,1,$frame_pixels]" \
+                  adc=1 \
+                  rnoise=9.95 \
+                  logto=both \
+                  logfile=ccdtest.log \
+                  preserve=true \
+                  direction=x \
+                  mask=ccdtest_ard.dat \
+                  reset accept
+               stopwatch
+               timelog ccdsetup
+#              end ccdsetup
+            else
+               echo "Cannot locate ARD file; mask not applied"
+
+#  Do the "device" setup without an ARD file.
+               startwatch
+               ccdsetup \
+                  bounds="[1,$lobias,$hibias,$frame_pixels]" \
+                  extent="[$loframe,$hiframe,1,$frame_pixels]" \
+                  adc=1 \
+                  rnoise=10.0 \
+                  logto=both \
+                  logfile=ccdtest.log \
+                  preserve=true \
+                  direction=x \
+                  reset accept
+#              end ccdsetup
+               stopwatch
+               timelog ccdsetup
+            endif
+
+#  Try to locate the file containing the long list of objects.
+#  If this does not exist then exit.
+            if ( ! -e ccdbig_obj.dat ) then
+               echo "Can't find file ccdbig_obj.dat of objects"
+               goto EXIT
+            endif
+
+#  Create the test frames.
+#  They are displaced a bit from each other in a reasonably random way.
+            echo " "
+            echo "  Creating the test data. "
+            echo " "
+            echo "  The test data consists of :-"
+            echo "     4 bias frames    "
+            echo "     4 flatfields     "
+            echo "     4 object fields. "
+            echo " "
+            echo "  The target data is a simulated galaxy cluster in which the"
+            echo "  telescope position has been moved between exposures."
+            echo " "
+            @ x1lo = 1 + ($field_pixels *  5) / 100 
+            @ x2lo = 1 + ($field_pixels * 20) / 100
+            @ x3lo = 1
+            @ x4lo = 1 + ($field_pixels * 18) / 100
+            @ y1lo = 1
+            @ y2lo = 1 + ($field_pixels *  5) / 100
+            @ y3lo = 1 + ($field_pixels * 20) / 100
+            @ y4lo = 1 + ($field_pixels * 18) / 100
+            @ x1hi = $x1lo + $frame_pixels - 1
+            @ x2hi = $x2lo + $frame_pixels - 1
+            @ x3hi = $x3lo + $frame_pixels - 1
+            @ x4hi = $x4lo + $frame_pixels - 1
+            @ y1hi = $y1lo + $frame_pixels - 1
+            @ y2hi = $y2lo + $frame_pixels - 1
+            @ y3hi = $y3lo + $frame_pixels - 1
+            @ y4hi = $y4lo + $frame_pixels - 1
+            ccdgenerate \
+               nseq=4 \
+               ubnds="[$x1hi,$y1hi,$x2hi,$y2hi,$x3hi,$y3hi,$x4hi,$y4hi]" \
+               lbnds="[$x1lo,$y1lo,$x2lo,$y2lo,$x3lo,$y3lo,$x4lo,$y4lo]" \
+     	       file=ccdtest_obj.dat \
+     	       accept
+#           end ccdgenerate
+            stopwatch
+            timelog ccdgenerate
+
+#  If display capability is enabled then display one DATA frame.
+            if ( "$device" != "NONE" ) then
+               echo " "
+               echo "  Displaying one raw target frame."
+               echo " "
+               startwatch
+               lutheat \
+                  accept
+#              end lutheat
+               stopwatch
+               timelog lutheat
+               startwatch
+               display \
+                  in=data1 \
+                  mode=percentiles \
+                  percentiles='[2,98]' \
+                  accept
+#              end display
+               stopwatch
+               timelog display
+            endif
+ 
+#  Add note to logfile.
+            echo " "
+            echo "  Adding a note to the logfile. "
+            echo " "
+            set name = `who am i`
+            ccdnote \
+               '"'$name : exercising CCDPACK \
+                  with $objects objects \
+                  in $frame_pixels \* $frame_pixels frames'"' \
+               accept
+#           end ccdnote
+ 
+#  Make a BIAS frame.
+            echo " "
+            echo "  Producing a master bias calibration frame. This is produced"
+            echo "  by median stacking the ordinary bias frames. This process"
+            echo "  reduces the noise introduced in debiassing."
+            echo " "
+            startwatch
+            makebias \
+               in='bias*' \
+               out=master_bias \
+               accept
+#           end makebias
+            stopwatch
+            timelog makebias
+
+#  DEBIAS all frames (including flatfields)
+            startwatch
+            debias \
+               in='"data?,ff?"' \
+               out='debias_*' \
+               accept
+#           end debias
+            stopwatch
+            timelog debias
+
+#  Display all the debiassed frames.
+           if ( "$device" != "NONE" ) then
+              echo " "
+              echo "  Displaying debiassed target frame. Note the absence of the"
+              echo "  bias strips (which were along the Y edges) and the removal"
+              echo "  of defective regions. The flatfields have also been debiassed"
+              echo "  but are not displayed."
+              echo " "
+              gdclear \\
+              startwatch
+              display \
+                 in=debias_data1 \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+              stopwatch
+              timelog display
+           endif
+
+#  Create a flat field master
+           echo " "
+           echo "   Producing a master flatfield. This frame will be used to correct"
+           echo "   for the sensitivity variations in the detector response and"
+           echo "   any variations in the optical throughput (vignetting)."
+           echo "   As in the creation of the master bias frame median stacking is"
+           echo "   used to combine a series of flatfields."
+           echo " "
+           startwatch
+           makeflat \
+              in='debias_ff?' \
+              out=master_flat \
+              accept
+#          end makeflat
+           stopwatch
+           timelog makeflat
+
+#  Display the master flatfield.
+           if ( "$device" != "NONE" ) then 
+              echo " "
+              echo "  Displaying master flatfield (the flatfield used in this case"
+              echo "  is a ramp, normal flatfields are not like this). "
+              echo " "
+              gdclear \\
+              startwatch
+              display \
+                 in=master_flat \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+              stopwatch
+              timelog display
+           endif
+
+#  Flatfield all the DATA frames
+           echo " "
+           echo "  Flatfielding all the target frames."
+           echo " "
+           startwatch
+           flatcor \
+              in='debias_data?' \
+              out='*|debias|reduced|' \
+              accept
+#          end flatcor
+           stopwatch
+           timelog flatcor
+           if ( "$device" != "NONE" ) then
+              echo " "
+              echo "  Displaying one flatfielded target frame."
+              echo " "
+              gdclear \\
+              startwatch
+              lutheat \
+                 accept
+#             end lutheat
+              stopwatch
+              timelog lutheat
+              startwatch
+              display \
+                 in=reduced_data1 \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+              stopwatch
+              timelog display
+           endif
+
+#  Now proceed to test out some alignment functionality.
+           echo " "
+           echo "  CCDPACK will now attempt to realign the target frames to"
+           echo "  produce a complete mosaic of whole of the target region."
+           echo " "
+
+#  Locate all the objects on the frames
+           echo " " 
+           echo "  The first stage of the automated registration process is"
+           echo "  to detect the positions of objects (stars and galaxies)."
+           echo "  "
+           startwatch
+           findobj \
+              in='reduced_data?' \
+              outlist='*.find' \
+              percentile=95 \
+              binfrac=0 \
+              accept
+#          end findobj
+           stopwatch
+           timelog findobj
+           if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+              echo " "
+              echo "  Displaying the positions of the object which have been"
+              echo "  detected."
+              echo " "
+              startwatch
+              plotlist \
+                 inlist='reduced_data1' \
+                 palnum=4 \
+                 mtype=23 \
+                 accept
+#             end plotlist
+              stopwatch
+              timelog plotlist
+           endif
+     	
+#  Determine matches between the positions.
+           echo " "
+           echo "  After locating the objects it is now necessary to determine"
+           echo "  which objects correspond."
+           echo " "
+           startwatch
+           findoff \
+              inlist='reduced_data?' \
+              ndfnames=true \
+              outlist='*.off' \
+              accept
+#          end findoff
+           stopwatch
+           timelog findoff
+           if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+              echo " "
+              echo "  Displaying the labels of objects which have been matched."
+              echo " "
+              startwatch
+              plotlist \
+                 inlist='reduced_data1' \
+                 palnum=3 \
+                 mtype=-1 \
+                 thick=2 \
+                 msize=1.5 \
+                 accept
+#             end plotlist
+              stopwatch
+              timelog plotlist
+           endif
+
+#  Set the registration structures.
+           echo " "
+           echo "  Now that the object-object correspondence is known it is"
+           echo "  possible to work out the inter-NDF transformations."
+           echo "  The next routine does this for a range of different"
+           echo "  transformation types. It also writes the information into the"
+           echo "  NDFs so that other routines may use it."
+           echo " "
+           startwatch
+           register \
+              inlist='reduced_data?' \
+              fittype=1 \
+              accept
+#          end register
+           stopwatch
+           timelog register
+
+#  Resample the data.
+           echo " "
+           echo "  The reduced NDFs will now be resampled to the same coordinate"
+           echo "  system. After this is performed they can then be combined"
+           echo "  (after determining normalising scale and zero points which "
+           echo "  take into account any variations in sky transparency and "
+           echo "  exposure time) into a single frame which shows the complete"
+           echo "  data coverage for the target area."
+           echo " "
+           startwatch
+           tranndf \
+              in='reduced_data?' \
+              out='*|reduced|resamp|' \
+              accept
+#          end tranndf
+           stopwatch
+           timelog tranndf
+
+#  Normalise it.
+           echo " "
+           echo "  Normalising and combining the aligned datasets."
+           echo " "
+           startwatch
+           makemos \
+              in='resamp_data?' \
+              scale=true \
+              zero=true \
+              out=mosaic \
+              accept
+#          end makemos
+           stopwatch
+           timelog makemos
+
+#  Display the final mosaic.
+           if ( "$device" != "NONE" ) then 
+              echo " "
+              echo "  Displaying the final mosaic."
+              echo " "
+              gdclear \\
+              startwatch
+              display \
+                 in=mosaic \
+                 mode=percentiles \
+                 percentiles='[2,98]' \
+                 accept
+#             end display
+              stopwatch
+              timelog display
+           endif
+
+#  Exercise is completed.
+           ccdnote \
+              '"Exercise completed"' \
+              accept
+#          end ccdnote
+
+        end        # density loop
+
+     end           # frame_pixels loop
+
+#  Exit label
+     EXIT:
+     exit
+# @(#)ccdexercise	2.6     12/5/96     2
