@@ -148,7 +148,6 @@
                 YW=YYW
               ELSE
 
-              IF (FIRST) THEN
 
                 NX = 9
                 NY = 9
