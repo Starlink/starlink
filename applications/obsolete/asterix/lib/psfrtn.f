@@ -1693,7 +1693,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_PWFC - Interrogate the calibration database
-      SUBROUTINE PSF_PWFC( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+      SUBROUTINE PSF_PWFC( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
      :                                                  ARRAY, STATUS )
 *
 *    Description :
@@ -1727,44 +1727,47 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT
-      REAL                     DX, DY, X0, Y0
-      REAL                     QX,QY
-      INTEGER                  NX,NY
-      LOGICAL                  INTEG
+      INTEGER                  	PSID, NX, NY
+      REAL                      DX, DY, X0, Y0, QX, QY
+      LOGICAL                  	INTEG
 *
 *    Export :
 *
-      REAL                     ARRAY(NX,NY)            ! Psf data
+      REAL                     	ARRAY(NX,NY)            ! Psf data
 *
 *    Status :
 *
-      INTEGER                  STATUS                  ! Run-time error
+      INTEGER                  	STATUS                  ! Run-time error
 *
 *    Local variables :
 *
-      REAL                     LDX, LQX                ! Local copies for CAL
+      DOUBLE PRECISION		DMJD			! MJD
+      REAL			ENER			! Energy
+      REAL                      LDX, LQX                ! Local copies for CAL
+      INTEGER			FID			! Filter id
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    CAL doesn't handle coordinates as you'd expect!
+*  CAL doesn't handle coordinates as you'd expect!
       LDX = ABS(DX)
       LQX = ABS(QX)
 
+*  Extract data need by CAL
+      CALL PSF0_GETID0D( PSID, 'MJD', DMJD, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Filter', FID, STATUS )
+      CALL PSF0_GETID0R( PSID, 'Energy', ENER, STATUS )
+
+*  Switch on integrated flag
       IF ( INTEG ) THEN
-        CALL CAL_PSFT2D( WF_MJD(SLOT), WF_FID(SLOT), WF_ENERGY(SLOT),
-     :                   -X0, LDX, NX, Y0, ABS(DY), NY, QX*(DX/LDX),
-     :                   QY,ARRAY,STATUS )
+        CALL CAL_PSFT2D( DMJD, FID, ENER, -X0, LDX, NX, Y0, ABS(DY),
+     :                   NY, QX*(DX/LDX), QY,ARRAY,STATUS )
       ELSE
-        CALL CAL_PSF2D( WF_MJD(SLOT), WF_FID(SLOT), WF_ENERGY(SLOT),
-     :                  -X0, ABS(DX), NX, Y0,
+        CALL CAL_PSF2D( DMJD, FID, ENER, -X0, ABS(DX), NX, Y0,
      :                  ABS(DY), NY, QX*(DX/LDX), QY, ARRAY,STATUS )
       END IF
 
@@ -1794,7 +1797,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
 *
 *    Status :
@@ -1811,7 +1813,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       IF ( WF_CALOK ) THEN
 C         CALL CAL_CLOSE( IGNORE )
         WF_CALOK= .FALSE.
-        WF_INIT = .FALSE.
 
         IF ( IGNORE .NE. SAI__OK ) THEN
           CALL MSG_PRNT( 'WARNING : An error occurred releasing'/
@@ -1824,6 +1825,107 @@ C         CALL CAL_CLOSE( IGNORE )
 
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
       SUBROUTINE PSF_PWFC_INIT( PSID, SLOT, FID, INST, STATUS )
+*
+*    Description :
+*
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     14 Mar 1996 (DJA):
+*        Use PSF_WFC_LOADD to load datset info
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+*
+*    Status :
+*
+      INTEGER                  STATUS                  ! Run-time error
+*
+*    Import :
+*
+      INTEGER			PSID
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Ensure CAL is initialised
+      CALL PSF_WFC_CALIN( STATUS )
+
+*  Load data from dataset
+      CALL PSF_WFC_LOADD( FID, .FALSE., PSID, STATUS )
+
+      END
+
+
+
+*+  PSF_WFC_CALIN - Initialise the WFC cal library
+      SUBROUTINE PSF_WFC_CALIN( STATUS )
+*
+*    Description :
+*
+*    Method :
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     14 Mar 1996 (DJA):
+*        Original version
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_WFC_CMN'
+*
+*    Status :
+*
+      INTEGER                  STATUS                  ! Run-time error
+*-
+
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  System already initialised?
+      IF ( .NOT. WF_CALOK ) THEN
+        CALL CAL_INIT( STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_REP( ' ', 'Unable to open WFC calibration '/
+     :         /'database. Check assignment of CAL_WFC_MASTER '/
+     :         /'environment variable.', STATUS )
+        ELSE
+          WF_CALOK = .TRUE.
+        END IF
+      END IF
+
+      END
+
+
+*+  PSF_WFC_LOADD - Load detector info from file and store in PSID
+      SUBROUTINE PSF_PWFC_LOADD( FID, ISSUR, PSID, STATUS )
 *
 *    Description :
 *
@@ -1865,85 +1967,72 @@ C         CALL CAL_CLOSE( IGNORE )
 *
 *    Import :
 *
-      INTEGER			PSID
-      INTEGER			SLOT			! Psf slot number
-      INTEGER			FID			! Dataset handle
-      INTEGER			INST			! Instance data
+      INTEGER			PSID,FID
+      LOGICAL			ISSUR
 *
 *    Functions :
 *
-      INTEGER                  CAL_FILT_S2N
-      INTEGER                  CHR_LEN
+      INTEGER                   CAL_FILT_S2N
+      INTEGER                   CHR_LEN
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   ILOC                    ! INSTRUMENT locator
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Locator from FID
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SORT locator
-      CHARACTER*80             CID                     ! Filter description
+      CHARACTER*(DAT__SZLOC)    LOC                     ! Locator from FID
+      CHARACTER*(DAT__SZLOC)    SLOC                    ! SORT locator
+      CHARACTER*80              CID                     ! Filter description
 
-      REAL                     IRIS                    ! Sort iris value
+      DOUBLE PRECISION		MJD			! MJD of observation
 
-      INTEGER                  CALFN                   ! CAL filter id
-      INTEGER                  IFILT                   ! Dataset filter id
+      REAL			ENER			! Energy for filter
+      REAL                      IRIS                    ! Sort iris value
+
+      INTEGER                   CALFN                   ! CAL filter id
+      INTEGER                   IFILT                   ! Dataset filter id
+      INTEGER			MCP			! Detector number
       INTEGER			TIMID			! Timing info
 
-      LOGICAL                  FILTER_OK, IRIS_OK      ! Sort components there?
+      LOGICAL                  DATASET,FILTER_OK, IRIS_OK      ! Sort components there?
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    System already initialised?
-      IF ( .NOT. WF_CALOK ) THEN
-        CALL CAL_INIT( STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_PRNT( 'Unable to open WFC calibration database.' )
-          CALL MSG_PRNT( 'Check assignment of CAL_WFC_MASTER '/
-     :                                       /'logical name.' )
-        ELSE
-          WF_CALOK = .TRUE.
-        END IF
-      END IF
-
-*    Set the SURVEY flag
-      WF_SURVEY(SLOT) = .FALSE.
+*  Set the SURVEY flag
+      CALL PSF0_SETID0L( PSID, 'Survey', ISSUR, STATUS )
       IRIS_OK = .FALSE.
       FILTER_OK = .FALSE.
 
-*    Extract locator
+*  Extract locator
       CALL ADI1_GETLOC( FID, LOC, STATUS )
 
 *    Is locator valid
-      CALL DAT_VALID( LOC, WF_DATASET(SLOT), STATUS )
-      IF ( WF_DATASET(SLOT) ) THEN
+      CALL DAT_VALID( LOC, DATASET, STATUS )
+      IF ( DATASET ) THEN
 
-*      Store locator
-        WF_MCP(SLOT) = 2
-
-*      Try and get MJD from dataset
+*    Try and get MJD from dataset
         CALL TCI_GETID( FID, TIMID, STATUS )
-        CALL ADI_CGET0D( TIMID, 'MJDObs', WF_MJD(SLOT), STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDObs', MJD, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-	  WF_MJD(SLOT) = 48000.0D0
+	  MJD = 48000.0D0
         END IF
+        CALL PSF0_SETID0D( PSID, 'MJD', MJD, STATUS )
 
-*      Get the detector id from CAL
-        CALL CIN_SET_DET( WF_MJD(SLOT), WF_MCP(SLOT), STATUS )
+*    Get the detector id from CAL
+        CALL CIN_SET_DET( MJD, MCP, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL MSG_PRNT( 'No detector id present - '/
      :        /'assuming detector 2 for psf access' )
           STATUS = SAI__OK
-          WF_MCP(SLOT) = 2
+          MCP = 2
         END IF
+        CALL PSF0_SETID0I( PSID, 'MCP', MCP, STATUS )
 
-*      Get filter id
-        CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
-        CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
+*    Get filter id
+        CALL ADI1_LOCSORT( FID, .FALSE., SLOC, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
 
-*        Look for filter id
+*      Look for filter id
           CALL CMP_GET0I( SLOC, 'FILTER', IFILT, STATUS )
           IF ( (IFILT.LT.1) .OR. (IFILT.GT.8) .OR.
      :                    (STATUS .NE. SAI__OK) ) THEN
@@ -1995,17 +2084,24 @@ C         CALL CAL_CLOSE( IGNORE )
             CALL MSG_PRNT( 'Invalid filter name /^NAM/' )
           END IF
         END DO
-        WF_FID(SLOT) = CALFN
 
-*      Warn user if no filter or iris
+*    Warn user if no filter
         IF ( .NOT. FILTER_OK ) THEN
-          WF_FID(SLOT) = CAL_FILT_S2N( 'P1' )
+          IF ( ISSUR ) THEN
+            CALL MSG_SETC( 'PD', 'S1a' )
+            CALFN = CAL_FILT_S2N( 'S1a' )
+          ELSE
+            CALL MSG_SETC( 'PD', 'P1' )
+            CALFN = CAL_FILT_S2N( 'P1' )
+          END IF
           CALL MSG_PRNT( 'Unable to get filter id from dataset -'/
-     :                                     /' defaulting to ...' )
+     :                                     /' defaulting to ^PD' )
         END IF
+        CALL PSF0_SETID0I( PSID, 'Filter', CALFN, STATUS )
 
 *      Use filter to get stuff - inform user and store energy
-        CALL CAL_FILT_INFO( WF_FID(SLOT), CID, WF_ENERGY(SLOT), STATUS )
+        CALL CAL_FILT_INFO( CALFN, CID, ENER, STATUS )
+        CALL PSF0_SETID0R( PSID, 'Energy', ENER, STATUS )
         CALL MSG_SETC( 'ID', CID )
         CALL MSG_PRNT( '   Filter ^ID')
 
@@ -2015,14 +2111,15 @@ C         CALL CAL_CLOSE( IGNORE )
      :                          /' - defaulting to 2.5 degrees' )
         END IF
 
-*      Convert IRIS value to radians
-        WF_IRIS(SLOT) = IRIS * MATH__DTOR
+*    Convert IRIS value to radians and store
+        CALL PSF0_SETID0R( PSID, 'Iris', IRIS * MATH__DTOR, STATUS )
 
  69     CONTINUE
 
       END IF
 
       END
+
 
 *+  PSF_RADIAL - 1D user supplied psf handler
       SUBROUTINE PSF_RADIAL( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
@@ -3348,7 +3445,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       TB_INIT = .TRUE.
       RF_INIT = .TRUE.
       RD_INIT = .TRUE.
-      WF_INIT = .TRUE.
       WF_CALOK = .FALSE.
       RX_INIT = .TRUE.
       RX_CB_OPEN = .FALSE.
@@ -3851,7 +3947,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_WFC - Interrogate the calibration database for survey psf
-      SUBROUTINE PSF_WFC( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+      SUBROUTINE PSF_WFC( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
      :                                                 ARRAY, STATUS )
 *
 *    Description :
@@ -3885,46 +3981,48 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT
-      REAL                     DX, DY, X0, Y0
-      REAL                     QX,QY
-      INTEGER                  NX,NY
-      LOGICAL                  INTEG
+      INTEGER                   PSID, NX, NY
+      REAL                      DX, DY, X0, Y0, QX, QY
+      LOGICAL                   INTEG
 *
 *    Export :
 *
-      REAL                     ARRAY(-NX/2:NX/2,-NY/2:NY/2)
+      REAL                      ARRAY(-NX/2:NX/2,-NY/2:NY/2)
 *
 *    Status :
 *
-      INTEGER                  STATUS                  ! Run-time error
+      INTEGER                   STATUS                  ! Run-time error
 *
 *    Local variables :
 *
-      REAL                     LDX, LQX                ! Local copies for CAL
+      DOUBLE PRECISION		DMJD			! MJD
+
+      REAL			ENER			! Energy
+      REAL			IRIS			! Iris for integration
+      REAL                      LDX, LQX                ! Local copies for CAL
+
+      INTEGER			FID			! Filter id
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    CAL doesn't handle coordinates as you'd expect!
+*  CAL doesn't handle coordinates as you'd expect!
       LDX = ABS(DX)
       LQX = ABS(QX)
 
-      IF ( INTEG ) THEN
-        CALL CAL_PSFT2D_SUR( WF_MJD(SLOT), WF_FID(SLOT),WF_ENERGY(SLOT),
-     :                       .FALSE., 0.0, WF_IRIS(SLOT), LDX, NX,
+*  Extract data need by CAL
+      CALL PSF0_GETID0D( PSID, 'MJD', DMJD, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Filter', FID, STATUS )
+      CALL PSF0_GETID0R( PSID, 'Iris', IRIS, STATUS )
+      CALL PSF0_GETID0R( PSID, 'Energy', ENER, STATUS )
+
+*  Ignore integration flag
+      CALL CAL_PSFT2D_SUR( MJD, FID, ENER, .FALSE., 0.0, IRIS, LDX, NX,
      :                     ABS(DY), NY, QX*(DX/LDX), QY,ARRAY,STATUS )
-      ELSE
-        CALL CAL_PSFT2D_SUR( WF_MJD(SLOT), WF_FID(SLOT),WF_ENERGY(SLOT),
-     :                       .FALSE., 0.0, WF_IRIS(SLOT), LDX, NX,
-     :                     ABS(DY), NY, QX*(DX/LDX),QY,ARRAY,STATUS )
-      END IF
 
       END
 
@@ -3978,17 +4076,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    History :
 *
-*     10 Jul 89 : Original ( DJA )
-*     23 Apr 90 : Checks detector and filter info from dataset (DJA)
-*     19 May 90 : Bit more robust if no sort data present (DJA)
-*     23 May 90 : Changed over to new CAL system. This routine now controls
-*                 the survey psf. See PWFC for pointed phase psf. (DJA)
-*     26 Jun 90 : Asks user for filter if none found (DJA)
-*     28 Jun 90 : Issues warning if filter selected is not a survey
-*                 filter (DJA)
-*      7 Jul 90 : Suppress warning if no BASE_MJD (DJA)
-*     17 Jul 90 : Filter translation table added (DJA)
-*     19 Jul 90 : Filter translation using WFC_FILT_CONV (DJA)
+*     14 Mar 1996 (DJA):
+*        Use PSF_WFC_LOADD to load datset info
 *
 *    Type definitions :
 *
@@ -3997,10 +4086,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'MATH_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Status :
 *
@@ -4012,150 +4097,16 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			SLOT			! Psf slot number
       INTEGER			FID			! Dataset handle
       INTEGER			INST			! Instance data
-*
-*    Functions :
-*
-      INTEGER                  CAL_FILT_S2N
-      INTEGER                  CHR_LEN
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC)   ILOC                    ! INSTRUMENT locator
-      CHARACTER*(DAT__SZLOC)	LOC                    ! Dataset locator
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SORT locator
-      CHARACTER*80             CID                     ! Filter description
-
-      REAL                     IRIS                    ! Sort iris value
-
-      INTEGER                  CALFN                   ! CAL filter no.
-      INTEGER                  IFILT                   ! Dataset filter code
-      INTEGER			TIMID			! Timing info
-
-      LOGICAL                  FILTER_OK, IRIS_OK      !
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    System already initialised?
-      IF ( .NOT. WF_CALOK ) THEN
-         CALL CAL_INIT( STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL MSG_PRNT( 'Unable to open WFC calibration database.' )
-            CALL MSG_PRNT( 'Check assignment of CAL_WFC_MASTER '/
-     :                                         /'logical name.' )
-         ELSE
-            WF_CALOK = .TRUE.
-         END IF
+*  Ensure CAL is initialised
+      CALL PSF_WFC_CALIN( STATUS )
 
-      END IF
-
-*    Set the SURVEY flag
-      WF_SURVEY(SLOT) = .TRUE.
-      IRIS_OK = .FALSE.
-      FILTER_OK = .FALSE.
-
-*    Extract locator
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
-
-*  Is locator valid
-      CALL DAT_VALID( LOC, WF_DATASET(SLOT), STATUS )
-      IF ( WF_DATASET(SLOT) ) THEN
-
-*    Store locator
-        WF_MCP(SLOT) = 2
-
-*    Try and get MJD from dataset
-        CALL TCI_GETID( FID, TIMID, STATUS )
-        CALL ADI_CGET0D( TIMID, 'MJDObs', WF_MJD(SLOT), STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_ANNUL( STATUS )
-          WF_MJD(SLOT) = 48000.0D0
-        END IF
-
-*       Get the detector id from CAL
-         CALL CIN_SET_DET( WF_MJD(SLOT), WF_MCP(SLOT), STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL MSG_PRNT( 'No detector id present - '/
-     :            /'assuming detector 2 for psf access' )
-            STATUS = SAI__OK
-            WF_MCP(SLOT) = 2
-         END IF
-
-*       Locate components in dataset
-        CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
-        CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
-
-*          Look for filter id
-            CALL CMP_GET0I( SLOC, 'FILTER', IFILT, STATUS )
-            IF ( ( IFILT .LT. 1 ) .OR. ( IFILT .GT. 8 ) .OR.
-     :                              ( STATUS .NE. SAI__OK) ) THEN
-               CALL ERR_ANNUL(STATUS)
-               CALL MSG_SETI( 'N', IFILT )
-               CALL MSG_PRNT( 'Invalid filter id code ^N' )
-            ELSE
-               CALL WFC_FILT_CONV( IFILT, CALFN, STATUS )
-               FILTER_OK = .TRUE.
-            END IF
-
-*          Get iris value
-            CALL DAT_THERE( SLOC, 'IRIS', IRIS_OK, STATUS )
-            IF ( IRIS_OK ) THEN
-               CALL CMP_GET0R( SLOC, 'IRIS', IRIS, STATUS )
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL(STATUS)
-                  IRIS_OK = .FALSE.
-               ELSE IF ( IRIS .LT. 0.001 ) THEN
-                  CALL MSG_PRNT( 'WARNING : bad IRIS value,'/
-     :                                    /' check dataset' )
-                  IRIS_OK = .FALSE.
-               END IF
-            END IF
-
-*          Tidy up
-            CALL DAT_ANNUL( SLOC, STATUS )
-
-         ELSE
-           CALL ERR_ANNUL( STATUS )
-
-         END IF
-
-*       Get filter from user if none supplied
-         CALL USI_PROMT( 'AUX', 'Enter filter id (S1A/B,S2A/B)',STATUS )
-         DO WHILE ( .NOT. FILTER_OK )
- 20         CALL USI_GET0C( 'AUX', CID, STATUS )
-            CALL USI_CANCL( 'AUX', STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 69
-            CALFN = CAL_FILT_S2N( CID(:CHR_LEN(CID)) )
-            IF ( ( CALFN .GE. 1 ) .AND. ( CALFN .LE. 8) ) THEN
-               FILTER_OK = .TRUE.
-            ELSE
-               CALL MSG_SETC( 'NAM', CID )
-               CALL MSG_PRNT( 'Invalid filter name /^NAM/' )
-            END IF
-         END DO
-         WF_FID(SLOT) = CALFN
-
-*       Use filter to get stuff - inform user and store energy
-         CALL CAL_FILT_INFO( WF_FID(SLOT), CID,
-     :                       WF_ENERGY(SLOT), STATUS )
-         CALL MSG_SETC( 'ID', CID )
-         CALL MSG_PRNT( '   Filter ^ID')
-
-         IF ( .NOT. IRIS_OK ) THEN
-            IRIS = 2.5
-            CALL MSG_PRNT( 'Unable to get IRIS value from dataset'/
-     :                            /' - defaulting to 2.5 degrees' )
-         END IF
-
-*       Convert IRIS value to radians
-         WF_IRIS(SLOT) = IRIS * MATH__DTOR
-
- 69      CONTINUE
-
-      END IF
+*  Load data from file
+      CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
 
       END
 
