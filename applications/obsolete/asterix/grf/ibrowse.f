@@ -556,7 +556,8 @@
       CHARACTER*12 OPTIONS
       BYTE Q
       INTEGER IXP,IYP,IXPMAX,IYPMAX
-      INTEGER IX,IY,I,J
+      INTEGER IX,IY
+      INTEGER I,J,II,JJ
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
       INTEGER XPID,YPID,XPMID,YPMID,DID(NX,NY),FID,OID,XID,YID
@@ -582,7 +583,6 @@
         SIGNIF=.FALSE.
         QUAL=.FALSE.
         ISCALE=0
-	print *,1
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
@@ -590,7 +590,6 @@
         CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
-	print *,2
         NAME='DATA'
         DO I=1,NX
           DO J=1,NY
@@ -607,24 +606,19 @@
             CALL NBS_FIND_ITEM(I_NBID,NAME,DID(I,J),STATUS)
           ENDDO
         ENDDO
-	print *,3
         CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
-	print *,4
 
 *  get device size
         CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
         CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
-	print *,5
 
 *  get plot window parameters
         CALL PGQVP(3,XP1,XP2,YP1,YP2)
         CALL PGQWIN(XW1,XW2,YW1,YW2)
-	print *,6
 
         XSCALE=(XW2-XW1)/(XP2-XP1)
         YSCALE=(YW2-YW1)/(YP2-YP1)
-	print *,7
 
         FLAG=0
         DO WHILE (FLAG.EQ.0)
@@ -632,12 +626,11 @@
 *  get current cursor position in device coords
           CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
           CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
-	print *,8
+          IYP=IYPMAX-IYP
 
 *  convert to world coords
           XW=XW1+(REAL(IXP)-XP1)*XSCALE
           YW=YW1+(REAL(IYP)-YP1)*YSCALE
-	print *,9
 
 *  convert to other frames
           CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
@@ -645,27 +638,27 @@
           CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
           CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
 
-*  get pixel number
+*  get pixel numbers for box being inspected
           IX=INT(XP+0.5)
           IY=INT(YP+0.5)
 
-*  get centre and size of box in world coords and pixels
-          CALL IMG_PIXTOWORLD(REAL(IX),REAL(IY),XC,YC,STATUS)
-          DX=REAL(NX)*ABS(I_XSCALE)/2.0
-          DY=REAL(NY)*ABS(I_YSCALE)/2.0
-          I1=MAX(I_IX1,IX-NX/2)
-          I2=MIN(I_IX2,IX+NX/2)
-          J1=MAX(I_IY1,IY-NY/2)
-          J2=MIN(I_IY2,IY+NY/2)
+          I1=IX-NX/2
+          I2=IX+NX/2
+          J1=IY-NY/2
+          J2=IY+NY/2
 
 *  write data values to noticeboard
           STRING=' '
-	print *,10
 
-          DO J=J2,J1,-1
+          JJ=0
+          DO J=J1,J2
+
+            JJ=JJ+1
+            II=0
 
             DO I=I1,I2
 
+              II=II+1
               IF (J.LT.I_IY1.OR.J.GT.I_IY2.OR.
      :                      I.LT.I_IX1.OR.I.GT.I_IX2) THEN
                 STRING=' '
@@ -707,17 +700,15 @@
                 ENDIF
               ENDIF
 
-c              CALL NBS_PUT_CVALUE(DID(I,J),0,STRING,STATUS)
+              CALL NBS_PUT_CVALUE(DID(II,JJ),0,STRING,STATUS)
 
             ENDDO
 
           ENDDO
-	print *,11
 
           CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
           CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
-	print *,12
 
         ENDDO
 
