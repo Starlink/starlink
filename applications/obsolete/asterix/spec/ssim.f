@@ -59,6 +59,8 @@
 *                        SPEC_CMN_RZ (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     21 Apr 95 : V1.8-1 Updated data interface (DJA)
+*     14 Jun 95 : V1.8-2 Ensure effective exposure is updated in the
+*                        Poisson error case (DJA)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -120,7 +122,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM VERSION 1.8-1' )
+	PARAMETER		( VERSION = 'SSIM VERSION 1.8-2' )
 *-
 
 *  Version
@@ -197,6 +199,7 @@
         CALL TCI_GETID( IFID, TIMID, STATUS )
         CALL ADI_CPUT0R( TIMID, 'ObsLength', TOBS, STATUS )
         CALL ADI_CPUT0R( TIMID, 'Exposure', TOBS, STATUS )
+        CALL ADI_CPUT0R( TIMID, 'EffExposure', TOBS, STATUS )
         CALL TCI_PUTID( OFID, TIMID, STATUS )
       END IF
 
