@@ -47,6 +47,7 @@
       CHARACTER*2  CPLP                         ! Parameter number as a char.
       CHARACTER*30 HKNAME                       ! Name of HK parameter
       CHARACTER*40 FNAME                        ! Name for output file
+      CHARACTER*75 BUFFER
 *
       REAL RMIN,RMAX                            ! Min and max array values
       REAL HKMIN,HKMAX                          ! User selected min and max
@@ -100,7 +101,7 @@
       INTEGER NROWS                                ! Fits table, no of rows
       INTEGER NHDU                                 ! Fits header, unit
       INTEGER VARIDAT                              ! Fitsio variable
-      INTEGER IFIELD,TFIELDS            ! Fits header, no fields per rows
+      INTEGER IFIELD,JFIELD,KFIELD,TFIELDS          ! Fits header, no fields per rows
       INTEGER BLOCK
 
       CHARACTER*20  EXTNAME                         ! File extension name
@@ -331,24 +332,45 @@
       ENDDO
 
 *  Display available parameters
+      CALL MSG_BLNK()
       CALL MSG_PRNT('Available parameters are:')
       IF ( LEVR ) THEN
 *  EVRATE extension
         CALL FTMAHD(IUNIT, EVNHDU, TTYPE, STATUS)
         CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
      :         TUNIT, EXTNAME, VARIDAT, STATUS)
+        JFIELD=0
+        BUFFER=' '
         DO IFIELD=1,TFIELDS
-          CALL MSG_PRNT('    '//TTYPE(IFIELD))
+          JFIELD=JFIELD+1
+          KFIELD=(JFIELD-1)*12
+          BUFFER(KFIELD:)=TTYPE(IFIELD)
+          IF (JFIELD.EQ.6) THEN
+            CALL MSG_PRNT(BUFFER)
+            JFIELD=0
+            BUFFER=' '
+          ENDIF
         ENDDO
+        IF (JFIELD.GT.0) CALL MSG_PRNT(BUFFER)
       ENDIF
       IF ( LATT) THEN
 *  ASPECT extension
         CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
         CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
      :         TUNIT, EXTNAME, VARIDAT, STATUS)
+        JFIELD=0
+        BUFFER=' '
         DO IFIELD=1,TFIELDS
-          CALL MSG_PRNT('    '//TTYPE(IFIELD))
+          JFIELD=JFIELD+1
+          KFIELD=(JFIELD-1)*12
+          BUFFER(KFIELD:)=TTYPE(IFIELD)
+          IF (JFIELD.EQ.6) THEN
+            CALL MSG_PRNT(BUFFER)
+            JFIELD=0
+            BUFFER=' '
+          ENDIF
         ENDDO
+        IF (JFIELD.GT.0) CALL MSG_PRNT(BUFFER)
       ENDIF
 
 *
