@@ -1,7 +1,8 @@
       SUBROUTINE KPS1_SPARUW( CFRM, MAP,  DIM1, DIM2, ARRAY, LBND, 
      :                        ISIZE, RANGE,
-     :                        GAUSS, NXY, POS, SCALE, RUNITS, LOGF, FD,
-     :                        PNMIN, IDS, GOTIDS, AXISR, THETA, FWHM, 
+     :                        GAUSS, NXY, POS, LOGF, FD,
+     :                        PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
+     :                        GOTIDS, AXISR, THETA, FWHM, 
      :                        GAMMA, WIDTH, SIG, STATUS )
 *+
 *  Name:
@@ -16,8 +17,9 @@
 
 *  Invocation:
 *     CALL KPS1_SPARUW( CFRM, MAP, DIM1, DIM2, ARRAY, LBND, ISIZE, RANGE,
-*                        GAUSS, NXY, POS, SCALE, RUNITS, LOGF, FD,
-*                        PNMIN, IDS, GOTIDS, AXISR, THETA, FWHM, GAMMA, 
+*                        GAUSS, NXY, POS, LOGF, FD,
+*                        PNMIN, PAXISR, PORIEN, PFWHM, PGAMMA, IDS, 
+*                        GOTIDS, AXISR, THETA, FWHM, GAMMA, 
 *                        WIDTH, SIG, STATUS )
 
 *  Description:
@@ -57,15 +59,6 @@
 *     POS( NXY, 2 ) = DOUBLE PRECISION (Given)
 *        Each line comprises the approximate x then y positions of a 
 *        star centre.
-*     SCALE = REAL (Given)
-*        The scale factor to convert pixels to the physical units given
-*        by argument RUNITS.  This factor is applied to the reported
-*        and logged seeing size, and to the radial distances in the
-*        plotted profile.
-*     RUNITS = CHARACTER * ( * ) (Read)
-*        The units of the radial profile after applying argument SCALE
-*        to the pixel steps.  It gets used to make the default abscissa
-*        label in the plot.
 *     LOGF = LOGICAL (Given)
 *        Logging switch.  If true the results of the analysis, including
 *        a table of parameters for each star, and indiciating omitted
@@ -77,6 +70,18 @@
 *     PNMIN = CHARACTER * ( * ) (Given)
 *        The name of a parameter which will be used to decide
 *        whether to plot the profile along the minor or major axis.
+*     PAXISR = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the mean axis ratio.
+*     PORIEN = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the mean major axis orientation.
+*     PFWHM = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the mean minor axis width.
+*     PGAMMA = CHARACTER * ( * ) (Given)
+*        The name of an output parameter which will be used to store
+*        the exponent in the radial star profile.
 *     IDS( NXY ) = INTEGER (Given)
 *        An array of integer identifiers for the supplied positions. Only
 *        accessed if GOTIDS is .TRUE.
@@ -142,8 +147,7 @@
 *        Converted graphics to AST/PGPLOT and removed PNMINT, PNMAJT,
 *        PNOUTT, and PNFONT.
 *     20-SEP-1999 (DSB):
-*        Changed POS to _DOUBLE and swapped its indices to use AST.
-*        Added arguments IDS, GOTIDS.
+*        Big changes for AST version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,12 +174,14 @@
       LOGICAL GAUSS
       REAL RANGE
       INTEGER NXY
-      REAL SCALE
       DOUBLE PRECISION POS( NXY, 2 )
-      CHARACTER * ( * ) RUNITS
       LOGICAL LOGF
       INTEGER FD
       CHARACTER * ( * ) PNMIN
+      CHARACTER * ( * ) PAXISR
+      CHARACTER * ( * ) PORIEN
+      CHARACTER * ( * ) PFWHM
+      CHARACTER * ( * ) PGAMMA
       INTEGER IDS( NXY )
       LOGICAL GOTIDS
 
@@ -253,6 +259,7 @@
       REAL PRF( 4 )              ! Profile parameters
       REAL RSCALE                ! Scale factor for converting radial distance into bins (per star)
       REAL RSCL2                 ! Scale factor for converting radial distance into bins (mean star)
+      REAL SCALE                 ! Factor to convert pixels into "arc" distance
       REAL SIG0                  ! Star sigma across minor axis
       REAL SIGMA                 ! Mean profile sigma across minor axis
       REAL STAAXS                ! Star axis ratio
@@ -563,6 +570,10 @@
 
       CALL MSG_BLANK( STATUS )
 
+*  Now write them to the output parameters.
+      CALL PAR_PUT0R( PAXISR, AXROUT, STATUS )
+      CALL PAR_PUT0R( PORIEN, ANGOUT*57.29578, STATUS )
+
 *  Find scale factors and the numbers of radial bins.
 *  ==================================================
       IF ( NGOOD .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -690,6 +701,10 @@
                CALL FIO_WRITE( FD, BUFFER( :21 ), STATUS )
             END IF
          END IF
+
+*  Now write them to the output parameters.
+         CALL PAR_PUT0R( PFWHM, FWHM*SCALE, STATUS )
+         CALL PAR_PUT0R( PGAMMA, GAMMA, STATUS )
 
       ELSE
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
