@@ -8659,16 +8659,17 @@ proc Paste {} {
 
          if { $dx == "" } {
             set dx 0
-            while { [FindPosn "CX CY" [list $cx $cy] 4] != "" } {
-               incr dx 5
-               set cx [expr $cx + $dx]
-               set cy [expr $cy + $dx]
+            set ccx $cx
+            set ccy $cy
+            while { [FindPosn "CX CY" [list $ccx $ccy] 5] != "" } {
+               incr dx 7
+               set ccx [expr $cx + $dx]
+               set ccy [expr $cy + $dx]
             }
-         } {
-            set cx [expr $cx + $dx]
-            set cy [expr $cy + $dx]
-         }
+         } 
 
+         set cx [expr $cx + $dx]
+         set cy [expr $cy + $dx]
 
 # Append a unique string to the position tags.
          set tag [GetPosn $i TAG copy copy]
