@@ -32,6 +32,8 @@
 *        The global status.
 
 *  Parameters used:
+*     DEZERO = _LOGICAL (Read)
+*        Perform zero point corrections?
 *     MAXIT = _INTEGER (Read)
 *        The maximum number of rejection iterations to perform. 
 *     NSIGMA = _REAL (Read)
@@ -147,6 +149,7 @@
       INTEGER IPT                ! Pointer to analyser transmission factors
       INTEGER IPNREJ             ! Pointer to no. of rejected pixels storage
       INTEGER IPTVAR             ! Pointer to input mean variance estimates
+      INTEGER IPZERO             ! Pointer to input NDF zero points
       INTEGER IWCS               ! Pointer to output WCS FramSet
       INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
       INTEGER MAXIT              ! Max. no. of rejection iterations to perform
@@ -157,6 +160,7 @@
       INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
       INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
+      LOGICAL DEZERO             ! Perform zero point corrections?
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
       LOGICAL SETVAR             ! Store input variance estimates?
@@ -175,6 +179,7 @@
       IPEPS = 0
       IPTVAR = 0
       IPNREJ = 0
+      IPZERO = 0
       IGRP2 = GRP__NOID      
 
 *  Begin an NDF context.
@@ -195,6 +200,9 @@
       CALL PSX_CALLOC( NNDF, '_INTEGER', IPAID, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPT, STATUS )
       CALL PSX_CALLOC( NNDF, '_REAL', IPEPS, STATUS )
+
+*  Allocate workspace to hold the input NDF zero point estimates.
+      CALL PSX_CALLOC( NNDF, '_REAL', IPZERO, STATUS )
 
 *  Allocate workspace to estimates of mean variance in each input NDF.
       CALL PSX_CALLOC( NNDF, '_REAL', IPTVAR, STATUS )
@@ -385,10 +393,18 @@
       IF( WSCH .EQ. 2 ) THEN
          CALL PAR_GET0I( 'SMBOX', SMBOX, STATUS )
          SMBOX = MAX( 0, SMBOX )
+
+*  Also see if the estimated variances should be stored in the input NDFs. 
          CALL PAR_GET0L( 'SETVAR', SETVAR, STATUS )
+
+*  Also see if zero point corrections should be applied to the input
+*  arrays.
+         CALL PAR_GET0L( 'DEZERO', DEZERO, STATUS )
+
       ELSE
          SMBOX = 1
          SETVAR = .FALSE.
+         DEZERO = .FALSE.
       END IF
 
 *  Calcualte the I,Q,U values.        
@@ -396,7 +412,7 @@
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
      :                 INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, SMBOX/2, 
-     :                 SETVAR, MNFRAC, STATUS )
+     :                 SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), STATUS )
 
 *  Tidy up.
 *  ========
@@ -410,6 +426,7 @@
       IF( IPEPS .NE. 0 ) CALL PSX_FREE( IPEPS, STATUS )
       IF( IPTVAR .NE. 0 ) CALL PSX_FREE( IPTVAR, STATUS )
       IF( IPNREJ .NE. 0 ) CALL PSX_FREE( IPNREJ, STATUS )
+      IF( IPZERO .NE. 0 ) CALL PSX_FREE( IPZERO, STATUS )
 
 *  Delete the group holding analyser identifiers.
       IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )

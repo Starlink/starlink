@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI,
-     :                       EPS, DIM3, STOKES, NSIGMA, TVAR, TOL, CONV, 
-     :                       NREJ, DOUT, STATUS )
+     :                       EPS, ZERO, DIM3, STOKES, NSIGMA, TVAR, TOL, 
+     :                       DEZERO, CONV, NREJ, DOUT, STATUS )
 *+
 *  Name:
 *     POL1_SNGCT
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI, EPS, 
-*                      DIM3, STOKES, NSIGMA, TVAR, TOL, CONV, NREJ,
-*                      DOUT, STATUS )
+*                      ZERO, DIM3, STOKES, NSIGMA, TVAR, TOL, DEZERO, 
+*                      CONV, NREJ, DOUT, STATUS )
 
 *  Description:
 *     This routine rejects input intensity values which deviate by more
@@ -42,6 +42,10 @@
 *        The analyser angle for the current NDF. In radians.
 *     EPS = REAL (Given)
 *        The analyser efficiency factor for the current NDF.
+*     ZERO = REAL (Given)
+*        The zero point correction for the input NDF. This value should 
+*        be addedonto the data values read from the NDF before using the 
+*        data values.
 *     DIM3 = INTEGER (Given)
 *        No. of planes in STOKES.
 *     STOKES( NEL, DIM3 ) = REAL (Given)
@@ -57,6 +61,8 @@
 *        this iteration, and the number rejected during the previous 
 *        iteration (as supplied in NREJ) is less than TOL, then the NDF
 *        is presumed to have converged.
+*     DEZERO = LOGICAL (Given)
+*        Should the zero point correction be displayed at ILEVEL > 2?
 *     CONV = LOGICAL (Given and Returned)
 *        Return .FALSE. if this NDF has not yet converged. Unchanged
 *        otherwise. Supplied value is ignored if ITER is zero.
@@ -105,6 +111,7 @@
       REAL T
       REAL PHI
       REAL EPS
+      REAL ZERO
       INTEGER DIM3
       REAL STOKES( NEL, DIM3 )
       REAL NSIGMA
@@ -178,10 +185,11 @@
 
 *  Store bad value if the squared residual is too large. Otherwise, copy
 *  the supplied input data value.
-               IF( ( DIN( I ) - EXPECT )**2 .GT. VIN( I )*VARFAC ) THEN
+               IF( ( DIN( I ) + ZERO - EXPECT )**2 .GT. 
+     :               VIN( I )*VARFAC ) THEN
                   DOUT( I ) = VAL__BADR
                ELSE
-                  DOUT( I ) = DIN( I )
+                  DOUT( I ) = DIN( I ) + ZERO
                END IF
 
 *  If any of the input values are bad, return a bad output value.
@@ -232,6 +240,12 @@
                CALL MSG_SETR( 'NOISE', SQRT( TVAR ) )
                CALL MSG_OUT( 'POL1_SNGFL_MSG3', '      RMS '//
      :                       'noise estimate: ^NOISE', STATUS )
+            END IF
+
+            IF( DEZERO ) THEN
+               CALL MSG_SETR( 'ZERO', ZERO )
+               CALL MSG_OUT( 'POL1_SNGFL_MSG3b', '      Zero-point '//
+     :                       'correction: ^ZERO', STATUS )
             END IF
 
 *  If required, warn the user if no good pixels remain in this NDF.

@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW,
-     :                       DIM3, STOKES, LBND, UBND, WORK, TVAR, VEST, 
-     :                       STATUS )
+     :                       DEZERO, DIM3, STOKES, LBND, UBND, WORK, 
+     :                       TVAR, VEST, WORK2, ZERO, STATUS )
 *+
 *  Name:
 *     POL1_SNGVN
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW,
+*     CALL POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW, DEZERO,
 *                      DIM3, STOKES, LBND, UBND, WORK, TVAR, VEST,
-*                      STATUS )
+*                      WORK2, ZERO, STATUS )
 
 *  Description:
 *     This routine estimates the input variances. The supplied Stokes
@@ -51,6 +51,8 @@
 *     HW = INTEGER (Given)
 *        The half size of the box to use when smoothing squared residuals.
 *        The full size used is 2*HW + 1.
+*     DEZERO = LOGICAL (Given)
+*        Perform zero point corrections?
 *     DIM3 = INTEGER (Given)
 *        Number of planes in STOKES.
 *     STOKES( EL, DIM3 ) = REAL (Given)
@@ -66,6 +68,11 @@
 *        estimate is available.
 *     VEST( EL ) = REAL (Returned)
 *        Estimate of the variance of the input data at each pixel.
+*     WORK2( EL ) = REAL (Given and Returned)
+*        Another work array.
+*     ZERO( NNDF ) = REAL (Returned)
+*        The zero point for each NDF. The returned values should be added
+*        onto the values read from the input DATA arrays.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -102,6 +109,7 @@
       REAL EPS( NNDF )
       INTEGER EL
       INTEGER HW
+      LOGICAL DEZERO 
       INTEGER DIM3
       REAL STOKES( EL, DIM3 )
       INTEGER LBND( 3 )
@@ -113,6 +121,8 @@
 
 *  Arguments Returned:
       REAL VEST( EL )
+      REAL WORK2( EL )
+      REAL ZERO( NNDF )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -156,7 +166,8 @@
 *  returns the mean squared residual (i.e. the mean variance) in the 
 *  current NDF.
          CALL POL1_SNGVA( EL, %VAL( IPDIN ), T( I ), PHI( I ), EPS( I ), 
-     :                    DIM3, STOKES, WORK, VEST, TVAR( I ), STATUS )
+     :                    DIM3, STOKES, WORK, VEST, TVAR( I ), WORK2, 
+     :                    DEZERO, ZERO( I ), STATUS )
 
 *  End the NDF context.
          CALL NDF_END( STATUS )

@@ -1,7 +1,7 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
      :                       EPS, TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, 
      :                       MAXIT, NSIGMA, ILEVEL, HW, SETVAR, MNFRAC,
-     :                       STATUS )
+     :                       DEZERO, ZERO, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, EPS, 
 *                      TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, MAXIT, NSIGMA,
-*                      ILEVEL, HW, SETVAR, MNFRAC, STATUS )
+*                      ILEVEL, HW, SETVAR, MNFRAC, DEZERO, ZERO, STATUS )
 
 *  Description:
 *     This routine calculates Stokes vectors from a set of single-beam 
@@ -120,6 +120,10 @@
 *        multiplied by the number of input NDFs which have good values 
 *        for the pixel. The number is rounded to the nearest integer and 
 *        limited to at least 3. 
+*     DEZERO = LOGICAL (Given)
+*        Perform zero point corrections?
+*     ZERO( NNDF ) = REAL (Returned)
+*        The zero points for the input NDFs.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -169,6 +173,9 @@
       INTEGER HW
       LOGICAL SETVAR
       REAL MNFRAC
+
+*  Arguments Returned:
+      REAL ZERO( NNDF )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -325,12 +332,13 @@
 
 *  If required, update the image holding the estimated variance at each
 *  pixel with in the input images. All input images are assumed to have
-*  the same variance at any given pixel position. IPN is used as
-*  temporary work space.
+*  the same variance at any given pixel position. IPIE1 and IPIE2 are used 
+*  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
             CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
-     :                       DIM3, %VAL( IPDOUT ), LBND, UBND, 
-     :                       %VAL( IPN ), TVAR, %VAL( IPVEST ), STATUS )
+     :                       DEZERO, DIM3, %VAL( IPDOUT ), LBND, UBND, 
+     :                       %VAL( IPIE1 ), TVAR, %VAL( IPVEST ), 
+     :                       %VAL( IPIE2 ), ZERO, STATUS )
          END IF
 
 *  Display the iteration number of required.
@@ -404,8 +412,9 @@
 *  intensity values are accepted.
          CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
      :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
-     :                    DIM3, %VAL( IPDOUT ), NSIGMA, TVAR( I ), 
-     :                    TOL, CONV, NREJ( I ), %VAL( IPDCUT ), STATUS )
+     :                    ZERO( I ), DIM3, %VAL( IPDOUT ), NSIGMA, 
+     :                    TVAR( I ), TOL, DEZERO, CONV, NREJ( I ), 
+     :                    %VAL( IPDCUT ), STATUS )
 
 *  Update the total number of pixels rejected from all images.
          TOTREJ = TOTREJ + NREJ( I )

@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGVA( EL, DIN, T, PHI, EPS, DIM3, STOKES, SUM1, 
-     :                       SUM2, TVAR, STATUS )
+     :                       SUM2, TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGVA( EL, DIN, T, PHI, EPS, DIM3, STOKES, SUM1, SUM2, 
-*                      TVAR, STATUS )
+*                      TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *  Description:
 *     For each pixel, this routine finds the residual between the
@@ -51,6 +51,14 @@
 *        The mean squared residual in the supplied image. Returned as
 *        VAL__BADR if the supplied image has no good data. Should be
 *        supplied equal to VAL__BADR if no estimate is available.
+*     WORK( EL ) = REAL (Given and Returned)
+*        A work array.
+*     DEZERO = LOGICAL (Given)
+*        If .FALSE., then ZERO is always returned as 0.0. Otherwise,
+*        its value is equal to the mean of the residuals for this image.
+*     ZERO = REAL (Returned)
+*        The zero point for this input NDF. The returned value should be
+*        added on to the values stored in DIN before using the DIN value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -90,48 +98,54 @@
 *  Arguments Given and Returned:
       REAL SUM1( EL )
       REAL SUM2( EL )
+      REAL WORK( EL )
 
 *  Arguments Returned:
       REAL TVAR 
+      REAL ZERO
 
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER NBIN
+      PARAMETER ( NBIN = 1000 )
+
 *  Local Variables:
+      INTEGER HI
+      INTEGER HIST( NBIN )
       INTEGER I    
+      INTEGER J
+      INTEGER LO
+      INTEGER POP
       INTEGER TSUM1
+      REAL DELTA
+      REAL DHI    
+      REAL DLO
       REAL EXPECT
       REAL K1
       REAL K2
       REAL K3
+      REAL MAXRES
+      REAL MINRES
+      REAL RES
       REAL SQRES
       REAL TLIM
       REAL TSUM2   
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Inialise.
-      TSUM1 = 0
-      TSUM2 = 0.0
-
-*  Set up the highest squared residual value which will be included in
-*  the estimate of the mean squared residual for the current image.
-*  Very large square residuals are not included since they are probably
-*  caused by stars etc. The limit corresponds to 4 times the previous
-*  standard deviation estimate. No limit is imposed if there is no
-*  previous estimate of the standard deviation.
-      IF( TVAR .NE. VAL__BADR ) THEN
-         TLIM = 16.0*TVAR
-      ELSE
-         TLIM = VAL__MAXR
-      END IF
-
 *  Store some constants.
       K1 = 0.5*T
       K2 = EPS*COS( 2*PHI )
       K3 = EPS*SIN( 2*PHI )
+
+*  Increment the max and min residual values.
+      MAXRES = VAL__MINR 
+      MINRES = VAL__MAXR
 
 *  Do each pixel.
       DO I = 1, EL
@@ -147,19 +161,121 @@
             EXPECT = K1*( STOKES( I, 1 ) + K2*STOKES( I, 2 ) 
      :                                   + K3*STOKES( I, 3 ) )
 
-*  Form the squared residual.
-            SQRES = ( EXPECT - DIN( I ) )**2
+*  Store the residual.
+            RES = EXPECT - DIN( I ) 
+            WORK( I ) = RES
+
+*  Increment the max and min residual values.
+            MAXRES = MAX( MAXRES, RES )
+            MINRES = MIN( MINRES, RES )
+
+*  Store a bad value if no residual can be found.
+         ELSE
+            WORK( I ) = VAL__BADR
+         END IF
+
+      END DO
+
+*  Set up the size of each histogram bin.
+      DELTA = ( MAXRES - MINRES )/NBIN
+
+*  If no zero point corrections are to be performed, use a zero point of
+*  0.0.
+      IF( .NOT. DEZERO ) THEN
+         ZERO = 0.0
+
+*  Otherwise, if delta is zero, the mean variance value is equal to the 
+*  maximum residual (and the minimum residual). In this case there is no 
+*  need to form the histogram.
+      ELSE IF( DELTA .EQ. 0 ) THEN
+         ZERO = MAXRES
+
+*  Otherwise,
+      ELSE
+
+*  Initialise the histogram to hold zeros in every bin.
+         DO J = 1, NBIN
+            HIST( J ) = 0
+         END DO
+
+*  Bin the residuals stored in the image formed above.
+         DO I = 1, EL
+            IF( WORK( I ) .NE. VAL__BADR ) THEN
+               J = INT( ( WORK( I ) - MINRES )/DELTA ) + 1
+               J = MAX( 1, MIN( NBIN, J ) )
+               HIST( J ) = HIST( J ) + 1
+            END IF
+         END DO
+
+*  Count the total histogram population.
+         POP = 0
+         DO J = 1, NBIN
+            POP = POP + HIST( J )
+         END DO
+
+*  For the cumulative populations at the 5% and 95% points in the
+*  histogram.
+         LO = NINT( 0.05*REAL( POP ) )
+         HI = NINT( 0.95*REAL( POP ) )
+
+*  Find the data value corresponding to these percentiles.
+         J = 1
+         POP = HIST( J )
+         DO WHILE( POP .LT. LO .AND. J .LE. NBIN ) 
+            J = J + 1
+            POP = POP + HIST( J )
+         END DO
+         DLO = ( J - 1 )*DELTA + MINRES
+
+         DO WHILE( POP .LT. HI .AND. J .LE. NBIN ) 
+            J = J + 1
+            POP = POP + HIST( J )
+         END DO
+         DHI = J*DELTA + MINRES
+
+*  Find the mean of the residuals between these two limits.
+         TSUM1 = 0
+         TSUM2 = 0.0
+         DO I = 1, EL
+            RES = WORK( I )
+            IF( RES .NE. VAL__BADR ) THEN
+               IF( RES .GE. DLO .AND. RES .LE. DHI ) THEN
+                  TSUM2 = TSUM2 + RES
+                  TSUM1 = TSUM1 + 1
+               END IF
+            END IF
+         END DO                  
+
+         IF( TSUM1 .EQ. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POL1_SNGVA_ERR1', 'All data rejected '//
+     :                    'while estimating variances.', STATUS )
+            GO TO 999
+         ELSE
+            ZERO = TSUM2/TSUM1
+         END IF
+
+      END IF
+
+*  Increment the supplied running sum image. Do each pixel.
+      TSUM1 = 0
+      TSUM2 = 0.0
+
+      DO I = 1, EL
+
+*  Check the residual is good.
+         IF( WORK( I ) .NE. VAL__BADR ) THEN
+
+*  Form the squared residual, correcting for zero point drift.
+            SQRES = ( WORK( I ) - ZERO )**2
 
 *  Increment the running sum images.
             SUM1( I ) = SUM1( I ) + 1.0      
             SUM2( I ) = SUM2( I ) + SQRES
 
-*  Increment the running sum values for this single image, but only if
-*  this residual is not very large.
-            IF( SQRES .LT. TLIM ) THEN
-               TSUM1 = TSUM1 + 1
-               TSUM2 = TSUM2 + SQRES
-            END IF
+*  Increment the running sum values for this single image.
+            TSUM1 = TSUM1 + 1
+            TSUM2 = TSUM2 + SQRES
 
          END IF
 
@@ -171,5 +287,7 @@
       ELSE
          TVAR = VAL__BADR
       END IF
+
+ 999  CONTINUE
 
       END
