@@ -43,6 +43,8 @@
 #        Replace reduce and ccdalign scripts by super-script equivalents.
 #     10-MAR-1999 (MBT):
 #        Added entries for ASTIMP and ASTEXP.
+#     15-APR-1999 (MBT):
+#        Added entry for WCSREG.
 #     {enter_changes_here}
 #
 #-
@@ -147,6 +149,9 @@
 #
       alias tranndf '$CCDPACK_DIR/tranndf'
       alias ccd_tranndf '$CCDPACK_DIR/tranndf'
+#
+      alias wcsreg '$CCDPACK_DIR/wcsreg'
+      alias ccd_wcsreg '$CCDPACK_DIR/wcsreg'
 #
       alias ccdwww '$CCDPACK_DIR/ccdwww'
       alias ccd_ccdwww '$CCDPACK_DIR/ccdwww'
