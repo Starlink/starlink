@@ -8,11 +8,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {26th April 2001}
+\newcommand{\stardocdate}      {6th November 2001}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -504,6 +504,28 @@ This produces an executable image called {\bf prog}. The
 \verb+kaplibs_dev+ command creates soft links within the current
 directory to the various include files provided by KAPLIBS. These are
 removed by the \verb+kaplibs_dev remove+ command.
+
+\subsection{Linking with Native PGPLOT}
+The commands described above will link the application with the Starlink
+GKS version of the PGPLOT graphics library. If you wish to link with the
+{\em native} version of PGPLOT, then include the switch ``-nogks'' as follows:
+
+\small
+\verb#      % kaplibs_dev#
+\verb#      % alink adamprog.f# `\verb#kaplibs_link_adam -nogks#`
+\verb#      % kaplibs_dev remove#
+\normalsize
+
+This will include native PGPLOT in the link list, and cause all GKS and IDI 
+related items to be removed.
+
+\section{Changes in Version 1.1}
+\begin{itemize}
+\item The ``-nogks'' switch has been added to the
+\verb#kaplibs_link_adam# command, allowing applications to be linked with
+native PGPLOT instead of the Starlink GKS-based PGPLOT.
+\end{itemize}
+
 
 \appendix
 
