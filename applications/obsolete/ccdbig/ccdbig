@@ -629,4 +629,4 @@
 #  Exit label
      EXIT:
      exit
-# @(#)ccdexercise	2.6     12/5/96     2
+# $Id: ccdbig_link_adam,v 1.2 1998/07/01 16:46:44 mbt Exp $
