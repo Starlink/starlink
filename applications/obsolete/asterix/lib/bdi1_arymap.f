@@ -1,5 +1,5 @@
       SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR,
-     :                        NELM, STATUS )
+     :                        NELM, WBPTR, STATUS )
 *+
 *  Name:
 *     BDI1_ARYMAP
@@ -11,7 +11,8 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR, NELM, STATUS )
+*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR, NELM,
+*                       WBPTR, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -31,6 +32,8 @@
 *        The mapped data address
 *     NELM = INTEGER (returned)
 *        Number of mapped data elements
+*     WBPTR = INTEGER (returned)
+*        Write back procedure address
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -105,10 +108,15 @@
       LOGICAL			MAPDYN
 
 *  Arguments Returned:
-      INTEGER			PTR, NELM
+      INTEGER			PTR, NELM, WBPTR
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			BDI1_ARYWB
+      EXTERNAL			UTIL_PLOC
+        INTEGER			UTIL_PLOC
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ACLOC			! ARRAY component
@@ -134,6 +142,7 @@
       MMODE = 'loc'
       FPTR = 0
       SLOC = DAT__NOLOC
+      WBPTR = UTIL_PLOC( BDI1_ARYWB )
 
 *  Construct HDS type
       HTYPE = '_'//TYPE
