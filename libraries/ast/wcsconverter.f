@@ -74,7 +74,7 @@
 * 
 * Set the value of CDMatrix, unless it has already been set.
 * 
-      IF( .NOT. AST_TEST( CD, 'CDMATRIX', STATUS ) ) THEN
+      IF( .NOT. AST_TEST( FC, 'CDMATRIX', STATUS ) ) THEN
          CALL AST_SETL( FC, 'CDMATRIX', AST_GETL( FC, 'CDMATRIX', 
      :                                            STATUS ),
      :               STATUS )     
