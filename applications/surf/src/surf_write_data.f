@@ -1,17 +1,20 @@
-      SUBROUTINE REDS_WRITE_DATA( FD, NPTS, IN_DATA, IN_VARIANCE,
+      SUBROUTINE SURF_WRITE_DATA( FD, NPTS, IN_DATA, IN_VARIANCE,
      :     BOL_RA, BOL_DEC, STATUS)
 *+
 *  Name:
 *     EXTRACT_DATA
 
+*  Purpose:
+*     Write bolometer positions and values to text file
+
 *  RealName: 
-*     REDS_WRITE_DATA (Use first name for help files)
+*     SURF_WRITE_DATA (Use first name for help files)
  
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL REDS_WRITE_DATA( FD, NPTS, IN_DATA, IN_VARIANCE,
+*     CALL SURF_WRITE_DATA( FD, NPTS, IN_DATA, IN_VARIANCE,
 *    : BOL_RA, BOL_DEC, STATUS )
  
 *  Description:
@@ -40,25 +43,23 @@
 *  ADAM parameters:
 *     FILE = FILENAME (Write)
 *        The name of the ASCII file used for storing the data.
-*     REF = NDF (Read)
-*        The name of the first NDF to be rebinned. The name may also be the
-*        name of an ASCII text file containing NDF and parameter values.
-*        See the notes. REF can be a SCUBA section.
-*     IN = NDF (Read)
+*     IN = CHAR (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
-*        IN can be a SCUBA section.
+*        IN can include a SCUBA section.
 *        Like the REF parameter this parameter accepts a text file.
-*     LAT_OUT = _CHAR (Read)
+*     LAT_OUT = CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
 *        is that of the map centre of the first map.
-*     LONG_OUT = _CHAR (Read)
+*     LONG_OUT = CHAR (Read)
 *        The longitude of the output map centre. The supplied default value 
 *        is that of the map centre of the first map.
 *     LOOP = LOGICAL (Read)
 *        Task will ask for multiple input files if true. Only REF is read
 *        if noloop.
-*     OUT_COORDS = _CHAR (Read)
+*     MSG_FILTER = CHAR (Read)
+*         Message filter level. Default is NORM.
+*     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
 *        - AZ:  Azimuth/elevation offsets 
@@ -67,18 +68,22 @@
 *        - RB:  RA/Dec (B1950)
 *        - RJ:  RA/Dec (J2000)
 *        - RD:  RA/Dec (epoch of observation)
-*        - GA:  Galactic coordinates (J2000)
-*     SHIFT_DX = _REAL (Read)
+*        - GA:  Galactic coordinates (J2000
+*     REF = CHAR (Read)
+*        The name of the first NDF to be rebinned. The name may also be the
+*        name of an ASCII text file containing NDF and parameter values.
+*        See the notes. REF can include a SCUBA section.
+*     SHIFT_DX = REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
-*     SHIFT_DY = _REAL (Read)
+*     SHIFT_DY = REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinate frame.
-*     USE_SECTION = _LOGICAL (Read)
+*     USE_SECTION = LOGICAL (Read)
 *        If you wish to discard the data specified by the SCUBA Section
 *        then select 'no'. If you wish to rebin a map using only
 *        the specified section select 'yes'.
-*     WEIGHT = _REAL (Read)
+*     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
 
 *  Notes:
@@ -101,6 +106,9 @@
 *     Missing parameters are requested. This means it is not possible to
 *     specify SHIFT_DX (position 3) without specifying the WEIGHT.
 *     Also note that SCUBA sections can be specified with any input NDF.
+
+*  Related Applications:
+*     SURF: REBIN, BOLREBIN, INTREBIN, CHANGE_QUALITY
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
