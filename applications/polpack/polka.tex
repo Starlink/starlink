@@ -256,7 +256,7 @@ Stokes vectors may also be produced. The mains steps involved are:
 
 \begin{itemize}
 \item Extraction of the required sub-regions from each input image.
-\item Independant sky subtraction within each aligned sub-region.
+\item Independent sky subtraction within each aligned sub-region.
 \item Alignment of all extracted sub-regions using stars within the field.
 \item Calculation of a Stokes vector for each pixel.
 \end{itemize}
@@ -355,7 +355,7 @@ BE USED for polarimeter data.
 
 In all cases, the coefficients of the mappings are determined by
 performing a least squares fit between the positions in the two images.
-The images are resampled using either nearest-neighbour or bi-linear
+The images are re-sampled using either nearest-neighbour or bi-linear
 interpolation once all required mappings have been determined, and any
 sky background has been subtracted.
 
@@ -385,7 +385,7 @@ File}}{POLKA_FILE_MENU} menu) can be used to save the current state of
 POLKA to a disk file at any time. This includes information describing
 any identified features, masks, sky regions etc. This information may be
 restored using the \htmlref{{\em Restore}}{POLKA_RESTORE} command. This
-facility enables execution of POLKA to be interupted and continued at a
+facility enables execution of POLKA to be interrupted and continued at a
 later time.
 
 \subsection {\mylabel{POLKA_SBEAM_TUT}Single-beam Mode}
@@ -406,13 +406,13 @@ The first thing to do is to activate POLKA, specifying the input and
 output images, and the operation mode. In fact dual-beam mode is the
 default so you do not need to specify it explicitly. For instance, if you
 want to process all images in the current directory matching the wild-card 
-template {\bf m101\_%}, putting the output $O$-ray intensity images
+template {\bf m101\_?}, putting the output $O$-ray intensity images
 in {\bf m101\_a\_O}, {\bf m101\_b\_O}, etc, the output $E$-ray intensity
 images in {\bf m101\_a\_E}, {\bf m101\_b\_E}, etc, and the Stokes vector
 in {\bf cube} then run POLKA as follows:
 
 \begin{verbatim}
-   % polka in='m101_%' out_o='*_O' out_e='*_E' out_s=cube
+   % polka in='m101_?' out_o='*_O' out_e='*_E' out_s=cube
 \end{verbatim}
 
 Note, the quotes are only needed to prevent the wild-card characters
@@ -762,7 +762,7 @@ all the information needed to create the output files is available, and
 you should have confidence in the mappings. Press the \htmlref{{\em
 Exit}}{POLKA_EXIT} button in the \htmlref{{\em File}}{POLKA_FILE_MENU}
 menu. The process of extracting the mask areas, fitting and subtracting
-the sky background, resampling the intensity images, and calculating the
+the sky background, re-sampling the intensity images, and calculating the
 Stokes vectors will then commence. This can take a significant length of
 time for anything other than very small images. For this reason a pop-up
 window appears showing what is happening, which images have been
@@ -796,7 +796,7 @@ basis of their purpose and position with the interface.
 
 \subsection {\mylabel{POLKA_FILE_MENU}The {\em File} Menu}
 The {\em File} menu provides access to commands which control
-temporary interuption of POLKA,
+temporary interruption of POLKA,
 termination of POLKA, and the creation of the output images. They are:
 
 \subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} 
@@ -806,7 +806,7 @@ simple dialog box ( you are asked for confirmation if you specify the
 name of an existing file).
 
 The created file can be used later to restore the current conditions.
-This can be useful, for instance, if you want to interupt POLKA before
+This can be useful, for instance, if you want to interrupt POLKA before
 the output data files have been created. You may then re-start POLKA
 later on, and use the \htmlref{{\em Restore}}{POLKA_RESTORE} command to
 restore the conditions which existed when the dump file was created.
@@ -827,7 +827,7 @@ current information is first cleared.
 If the supplied dump file contains information for too many images (i.e.
 more than is available in the current invocation of POLKA), then the
 extra information is ignored. If there are two few images described in
-the dump file, then the extra images are left unchnaged.
+the dump file, then the extra images are left unchanged.
 
 \subsubsection {\mylabel{POLKA_SAVE}{\em Save}} Causes the output images to be
 created, based on the current set of image feature positions and area masks. If
@@ -884,7 +884,7 @@ sub-menu containing a list of all the supplied images. Clicking on the
 required image will cause the \htmlref{{\em Edit a
 mapping}}{POLKA_EDIT_MAPPING_DIALOG} dialog box to be displayed.
 
-\subsubsection {\mylabel{POLKA_COPY}{\em Paste}} Pastes any previously
+\subsubsection {\mylabel{POLKA_PASTE}{\em Paste}} Pastes any previously
 copied polygons onto the display. This entry is disabled unless one or
 more polygons have been copied using the \htmlref{{\em Copy}}{POLKA_COPY}
 entry in the {\em Edit} menu. The new polygon belongs to the class of
@@ -1593,7 +1593,7 @@ mappings.
 \subsubsection {\mylabel{POLKA_REF_IMAGE}The {\em Ref. Image} Button}
 This button displays a menu of the supplied input images. The selected
 image becomes the source of the reference objects selected by the other
-controls in the ``{\em Reference} box.
+controls in the ``{\em Reference}'' box.
 
 \subsubsection {\mylabel{POLKA_ACCEPT}The {\em Accept} Button}
 Pressing this button causes an image feature to be identified for each
@@ -1777,7 +1777,7 @@ Only those items which were selected when the OK button was pressed are
 included in the re-displayed status area.
 \item [Apply] - Re-displays the status area, but does not close the
 dialog box.
-\item [Cancel] - CLoses the dialog box, ignoring any changes which have
+\item [Cancel] - Closes the dialog box, ignoring any changes which have
 been made to the display list.
 \item [ClearAll] - Clears all the check-buttons (does not close the dialog box).
 \item [SetAll] - Sets all the check-buttons (does not close the dialog box).
@@ -1871,12 +1871,48 @@ and clicking the left mouse button.
 \end{itemize}
 
 \subsection {\mylabel{POLKA_IMAGE_SCALING}Select the Displayed Data Range}
-To be written.
+The \htmlref{{\em \% not white}}{POLKA_WHITE} and \htmlref{{\em \% black}}
+{POLKA_BLACK} controls in the \htmlref{{\em Display Controls}}
+{POLKA_DISPLAY_CONTROLS} box (to the left of the image) can be used to
+change the data values corresponding to black and white in the displayed
+image. These first specifies the percentages of the displayed pixels
+which are to be shown as black, and the second gives the percentages of the 
+displayed pixels which are to be shown as grey (i.e. anything other than
+pure white). For instance, if you give values of 4 and 92 for these, then
+4 \% of the displayed pixels will be pure black, and 8 \% (i.e. $100-92$)
+will be pure white. The rest will be somewhere in between.
+
+Note, these values give percentages of the {\em displayed} pixels.
+Therefore, changing the pixels included in the display (for instance by 
+zooming, or changing the centre position) will in general change the data
+values corresponding to the specified percentages, resulting in a
+different grey-scale. To prevent this happening, the actual data values
+used for black and white can be locked at the current values using the 
+\htmlref{{\em Lock Scaling}}{POLKA_LOCK_SCALING} button. If this is done,
+the {\em \% black} and {\em \% not white} widgets have no effect until the
+{\em Lock Scaling} button is released.
 
 \subsection {\mylabel{POLKA_AREA_SELECTION}Select an Area of the Image}
-To be written.
+Several operations (such as the \htmlref{{\em Zoom}}{POLKA_ZOOM} and
+\htmlref{{\em Delete}}{POLKA_DELETE} buttons, and the \htmlref{{\em
+Stats}}{POLKA_STATS_EFFECT} effect) expect an area of the displayed image
+to be ``selected'' before the operation is used. A selected area is a
+rectangular region of the image, chosen by pressing the left mouse button
+over the image and then dragging the mouse while holding the button down.
+The area is marked by a box (the colour is normally red, but can be
+changed using the \htmlref{{\em Options}}{POLKA_OPTIONS_MENU} menu). 
 
-\subsection {\mylabel{POLKA_AREA_SELECTION}Make the Image Display Bigger}
+Any operation which uses a selection box will remove it upon completion,
+but it may also be removed by pressing the \htmlref{{\em Cancel}}{POLKA_CANCEL}
+button in the \htmlref{{\em Display Controls}}{POLKA_DISPLAY_CONTROLS} area
+(useful if you decide not to proceed with the operation).
+
+An area which extends beyond the edges of the displayed image can be
+selected by dragging the pointer outside the display area. The selection
+box is not drawn beyond the boundaries of the display, but its full extent
+will be used never-the-less.
+
+\subsection {\mylabel{POLKA_BIGGER_IMAGE}Make the Image Display Bigger}
 The re-sizing facilities of the window manager cannot be used to change
 the size of the image display area. The only way to make the display
 bigger is to re-run POLKA, giving a larger value for the
@@ -1886,7 +1922,23 @@ can reduce the area occupied by the rest of the GUI, thus making it
 possible to use a larger value of DPI.
 
 \subsection {\mylabel{POLKA_IDENTIFYING_FEATURES}Identify Image Features}
-To be written.
+To identify a star-like feature within the displayed image, position the
+pointer or cross-hair over the feature and click the left button. If
+necessary the imaged can be \htmlref{zoomed}{POLKA_ZOOM} first to make the
+feature position easier to identify. If the \htmlref{{\em Feature
+Size}}{POLKA_FEATURE_SIZE} has been set to a non-zero value in the
+the \htmlref{{\em Options}} {POLKA_OPTIONS_MENU} menu, then the supplied
+feature position will be refined using a centroiding process.
+
+To facilitate identification of image features, the features from another
+image (or ray) can be displayed as \htmlref{reference}{POLKA_REFERENCE}
+markers. 
+
+You will be required to supply a numerical label for the feature unless
+no other images yet have any features (in which case a label will be
+generated automatically). The simplest way to do this is to click on 
+the corresponding reference marker. The new feature will then inherit the
+label of the reference marker.
 
 \subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
 Use the \htmlref{{\em Dump}}{POLKA_DUMP} and \htmlref{{\em
@@ -1899,7 +1951,7 @@ can then re-start POLKA later, and use {\em Restore} to read the text
 file created by {\em Dump}. This puts POLKA into the state it was
 in  when the dump file was created.
 
-\subsection {\mylabel{POLKA_EDITING_POLYGONS}Use pre-aligned images}
+\subsection {\mylabel{POLKA_PREALIGNED_IMAGES}Use pre-aligned images}
 If your images are already in alignment (or nearly in alignment), then
 you do not need to identify feature positions, masks, etc, for every image.
 Instead, just identify features and masks within one of the images and then 
