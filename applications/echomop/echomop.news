@@ -1,3 +1,16 @@
+1 ECHOMOP_v3.3-6_release
+
+ Bugfix release:
+
+ o You can now select option 4.2 independently of option 4.1, on Linux
+   (this turned out to be a general option-parsing problem on Linux -- 
+   it was impossible to select _any_ suboption).
+ o New `parameter' version for echmenu: `echmenu version' reports the
+   echomop version number and exits immediately.
+ o The demo had become out of date; fixed.
+ o Minor tidyups required to HTML help pages.
+ o SUN/152 preened -- no significant changes required.
+
 1 ECHOMOP_v3.3-0_release
 
  This item describes the release of ECHOMOP V3.3-0, in particular,
