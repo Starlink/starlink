@@ -299,6 +299,9 @@ program was configured.
 <update versionid="upd5">
 Rewritten to cover new special commands, particularly support for cropping.
 </update>
+<update versionid="upd7">
+Added documentation of imageformat special.
+</update>
 
 
 <p>dvi2bitmap recognises several DVI special commands, and emits a
@@ -319,9 +322,10 @@ recognises are:
 <dd>Makes other special-commands in this same special affect
 defaults.  See those commands for details.
 
-<dt><code>outputfile my_filename</code>
+<dt><code>outputfile &lt;filename&gt;</code>
 <dd>The output file used for the current page will be named
-<code/my_filename.gif/.  A filename extension will be added if none is
+<code/filename.gif/ (if the output type were `gif').  A filename
+extension will be added if none is 
 present, or if it does not match the output type selected.  If the
 <code/default/ command has been given, then this instead specifies the
 default filename pattern, and the `filename' should contain a single
@@ -345,6 +349,17 @@ at <code/&lt;dimen&gt;/ points from the appropriate edge of the
 (<ref id=usage.options>) have the effect of setting initial defaults.
 In the absence of either of these, the initial crop is exactly at the
 bounding box.
+
+<dt><code/default imageformat &lt;format&gt;/
+<dd>Set the default image format, which should be one of the keywords
+`xbm', `gif', `png'.  This is equivalent to specifying the image
+format through the <code/-t/ option (section <ref id=usage.options>).
+<p>The keyword is just <code/imageformat/, but you must specify the
+<code/default/ keyword when you
+specify <code/imageformat/; this is for consistency, and makes it
+clear that this is setting a default format rather than setting the
+format only for the next image (that's not implemented at present, but
+could be added).
 
 </dl>
 
