@@ -66,6 +66,7 @@ sub ThrowError {
 
 package AstObjectPtr;
 
+# Looks like AST is smart enough 
 sub Set {
   my $self = shift;
   
@@ -94,10 +95,14 @@ sub Set {
 
 sub Get {
   my $self = shift;
-  my $string = shift;
+  my @strings = @_;
   
-  my $value = $self->GetC( $string );
-  return $value;
+  my %hash;
+  foreach my $i ( 0 ... $#strings ) {
+     $hash{$strings[$i]} = $self->GetC( $strings[$i] );
+  }  
+  return wantarray ? %hash : $hash{$strings[0]};
+    
 }
 
 # Rebless cloned/copied object into the original class
