@@ -31,9 +31,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.10  1996/12/17 20:30:31  timj
-*     Add final ELSE to see if task is not recognised
+*     Revision 1.11  1996/12/18 00:17:27  timj
+*     Add SCUOVER
 *
+c Revision 1.10  1996/12/17  20:30:31  timj
+c Add final ELSE to see if task is not recognised
+c
 c Revision 1.9  1996/11/18  02:25:49  timj
 c Add REMSKY
 c
@@ -134,6 +137,10 @@ c
       ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
          CALL REDS_SCUCAT (STATUS)
+
+      ELSE IF (NAME .EQ. 'SCUOVER') THEN
+
+         CALL REDS_SCUOVER (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUHELP') THEN
 
