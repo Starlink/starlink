@@ -24,7 +24,12 @@ Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another \emph{etc}.
 
+- The SkyFrame class now supports a value of "J2000" for System. This
+system is an equatorial system based on the mean dynamical equator and
+equinox at J2000, and differs slightly from an FK5(J2000) system.
+
 - Methods have been added to the FitsChan class to allow values for named
 keywords to be changed or added.
+
 
 17/11/04

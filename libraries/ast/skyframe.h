@@ -74,6 +74,8 @@
 *     19-APR-2004 (DSB):
 *        Added SkyRef, SkyRefIs, SkyRefP and AlignOffset attributes.
 *        Simplified prologue.
+*     2-DEC-2004 (DSB):
+*        Added System "J2000"
 *-
 */
 
@@ -99,7 +101,8 @@
 #define AST__SUPERGALACTIC 7
 #define AST__ICRS          8
 #define AST__HELIOECLIPTIC 9
-#define AST__UNKNOWN       10
+#define AST__J2000         10
+#define AST__UNKNOWN       11
 
 #endif
 

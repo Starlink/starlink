@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.18}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {17th November 2004}
+\newcommand{\stardocdate}      {2nd December 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -20576,6 +20576,15 @@ means of creating Regions of specific shape. Facilities provided by the
 Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another \emph{etc}.
+
+\item The SkyFrame class now supports a value of ``J2000'' for System.
+This system is an equatorial system based on the mean dynamical equator and
+equinox at J2000, and differs slightly from an FK5(J2000) system.
+
+\item A new class called KeyMap has been added. A KeyMap can be used to
+store a collection of vector or scalar values or Objects, indexed by a 
+character string rather than an integer.
+
 
 \item Methods 
 c+

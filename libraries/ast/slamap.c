@@ -74,6 +74,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Added HFK5Z and FK5HZ conversion functions.
 *     28-SEP-2003 (DSB):
 *        - Added HEEQ and EQHE conversion functions.
+*     2-DEC-2004 (DSB):
+*        - Added J2000H and HJ2000 conversion functions.
 *class--
 */
 
@@ -108,6 +110,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define AST__SLA_FK5HZ  20       /* FK5 J2000.0 to ICRS, no pm or parallax */
 #define AST__HEEQ       21       /* Helio-ecliptic to equatorial */
 #define AST__EQHE       22       /* Equatorial to helio-ecliptic */
+#define AST__J2000H     23       /* Dynamical J2000 to ICRS */
+#define AST__HJ2000     24       /* ICRS to dynamical J2000 */
 
 /* Maximum number of arguments required by an SLALIB conversion. */
 #define MAX_SLA_ARGS 4
@@ -115,11 +119,12 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 /* The alphabet (used for generating keywords for arguments). */
 #define ALPHABET "abcdefghijklmnopqrstuvwxyz"
 
-/* Angle conversion */
-#define PI 3.141592653589793238462643
+/* Angle conversion (PI is from the SLALIB slamac.h file) */
+#define PI 3.1415926535897932384626433832795028841971693993751
 #define PIBY2 (PI/2.0)
 #define D2R (PI/180.0)
 #define R2D (180.0/PI)
+#define AS2R (PI/648000.0)
 
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
@@ -190,6 +195,7 @@ static void Haec( double, double[3][3], double[3] );
 static void Haqc( double, double[3][3], double[3] );
 static void Gsec( double, double[3][3], double[3] );
 static void STPConv( double, int, int, int, double[3], double *[3], int, double[3], double *[3] );
+static void J2000H( int, int, double *, double * );
 
 /* Member functions. */
 /* ================= */
@@ -306,6 +312,10 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 *           Convert helio-ecliptic to ecliptic coordinates.
 *        AST__EQHE( DATE )
 *           Convert ecliptic to helio-ecliptic coordinates.
+*        AST__J2000H( )
+*           Convert dynamical J2000 to ICRS.
+*        AST__HJ2000( )
+*           Convert ICRS to dynamical J2000.
 
 *  Notes:
 *     - The specified conversion is appended only if the SlaMap's
@@ -479,6 +489,12 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "EQHE" ) ) {
       result = AST__EQHE;
+
+   } else if ( astChrMatch( cvt_string, "J2000H" ) ) {
+      result = AST__J2000H;
+
+   } else if ( astChrMatch( cvt_string, "HJ2000" ) ) {
+      result = AST__HJ2000;
 
    }
 
@@ -718,6 +734,18 @@ static const char *CvtString( int cvt_code, const char **comment,
       *comment = "Equatorial to helio-ecliptic";
       *nargs = 1;
       arg[ 0 ] = "Modified Julian Date of observation";
+      break;
+
+   case AST__J2000H:
+      result = "J2000H";
+      *comment = "J2000 equatorial (dynamical) to ICRS";
+      *nargs = 0;
+      break;
+
+   case AST__HJ2000:
+      result = "HJ2000";
+      *comment = "ICRS to J2000 equatorial (dynamical)";
+      *nargs = 0;
       break;
 
    }
@@ -1286,7 +1314,70 @@ static void Hprc( double mjd, double obs[3], double mat[3][3], double offset[3] 
       mat[ i ][ 2 ] = zhpr[ i ];
       offset[ i ] = obs[ i ];
    } 
+}
 
+static void J2000H( int forward, int npoint, double *alpha, double *delta ){
+/*
+*  Name:
+*     J2000H
+
+*  Purpose:
+*     Convert dynamical J2000 equatorial coords to ICRS.
+
+*  Type:
+*     Private member function.
+
+*  Synopsis:
+*     #include "slamap.h"
+*     void J2000H( int forward, int npoint, double *alpha, double *delta )
+
+*  Class Membership:
+*     SlaMap method.
+
+*  Description:
+*     This function converts the supplied dynamical J2000 equatorial coords 
+*     to ICRS (or vice-versa).
+
+*  Parameters:
+*     forward
+*        Do forward transformation?
+*     npoint
+*        Number of points to transform.
+*     alpha
+*        Pointer to longitude values.
+*     delta
+*        Pointer to latitude values.
+*/
+
+/* Local Variables: */
+   int i;                  /* Loop count */
+   double rmat[3][3];      /* J2000 -> ICRS rotation matrix */
+   double v1[3];           /* J2000 vector */
+   double v2[3];           /* ICRS vector */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the J2000 to ICRS rotation matrix (supplied by P.T. Wallace) */
+   slaDeuler( "XYZ", -0.0068192*AS2R, 0.0166172*AS2R, 0.0146000*AS2R, 
+              rmat );
+
+/* Loop round all points. */
+   for( i = 0; i < npoint; i++ ) {
+
+/* Convert from (alpha,delta) to 3-vector */
+      slaDcs2c( alpha[ i ], delta[ i ], v1 );
+
+/* Rotate the 3-vector */
+      if( forward ) {
+         slaDmxv( rmat, v1, v2 );
+      } else {
+         slaDimxv( rmat, v1, v2 );
+      }      
+
+/* Convert from 3-vector to (alpha,delta) */
+      slaDcc2s( v2, alpha + i, delta + i );
+   }
 }
 
 void astSTPConv1_( double mjd, int in_sys, double in_obs[3], double in[3], 
@@ -2220,17 +2311,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                SWAP_ARGS( AST__SLA_AMP, 0, 1 )
                SWAP_ARGS( AST__SLA_MAP, 0, 1 )
 
-/* Ecliptic coordinates to J2000.0 equatorial. */
+/* Ecliptic coordinates to FK5 J2000.0 equatorial. */
 /* ------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_ECLEQ, AST__SLA_EQECL )
 
-/* Galactic coordinates to J2000.0 equatorial. */
+/* Galactic coordinates to FK5 J2000.0 equatorial. */
 /* ------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_GALEQ, AST__SLA_EQGAL )
 
-/* ICRS coordinates to J2000.0 equatorial. */
+/* ICRS coordinates to FK5 J2000.0 equatorial. */
 /* ------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_HFK5Z, AST__SLA_FK5HZ )
@@ -2240,20 +2331,25 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_GALSUP, AST__SLA_SUPGAL )
 
-/* J2000 equatorial coordinates to Helioprojective-Cartesian. */
-/* ---------------------------------------------------------- */
+/* FK5 J2000 equatorial coordinates to Helioprojective-Cartesian. */
+/* -------------------------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__EQHPC, AST__HPCEQ )
 
-/* J2000 equatorial coordinates to Helioprojective-Radial. */
-/* ------------------------------------------------------- */
+/* FK5 J2000 equatorial coordinates to Helioprojective-Radial. */
+/* ----------------------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__EQHPR, AST__HPREQ )
 
-/* J2000 equatorial coordinates to Helio-ecliptic. */
-/* ------------------------------------------------------- */
+/* FK5 J2000 equatorial coordinates to Helio-ecliptic. */
+/* --------------------------------------------------- */
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__EQHE, AST__HEEQ )
+
+/* Dynamical J2000.0 to ICRS. */
+/* -------------------------- */
+/* Exchange the transformation code for its inverse. */
+               SWAP_CODES( AST__J2000H, AST__HJ2000 )
 
             }
 
@@ -2424,6 +2520,13 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                              PAIR_CVT( AST__HEEQ, AST__EQHE ) ) &&
                            EQUAL( cvtargs[ istep ][ 0 ],
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Eliminate redundant dynamical J2000 coordinate conversions. */
+/* ----------------------------------------------------------- */
+               } else if ( PAIR_CVT( AST__J2000H, AST__HJ2000 ) ||
+                           PAIR_CVT( AST__HJ2000, AST__J2000H ) ) {
                   istep++;
                   keep = 0;
 
@@ -2662,14 +2765,16 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "FK54Z" (BEPOCH): Convert FK5 to FK4 (no proper motion or parallax).
 *     - "AMP" (DATE,EQ): Convert geocentric apparent to mean place.
 *     - "MAP" (EQ,DATE): Convert mean place to geocentric apparent.
-*     - "ECLEQ" (DATE): Convert ecliptic coordinates to J2000.0 equatorial.
-*     - "EQECL" (DATE): Convert equatorial J2000.0 to ecliptic coordinates.
-*     - "GALEQ": Convert galactic coordinates to J2000.0 equatorial.
-*     - "EQGAL": Convert J2000.0 equatorial to galactic coordinates.
-*     - "HFK5Z" (JEPOCH): Convert ICRS coordinates to J2000.0 equatorial.
-*     - "FK5HZ" (JEPOCH): Convert J2000.0 equatorial coordinates to ICRS.
+*     - "ECLEQ" (DATE): Convert ecliptic coordinates to FK5 J2000.0 equatorial.
+*     - "EQECL" (DATE): Convert equatorial FK5 J2000.0 to ecliptic coordinates.
+*     - "GALEQ": Convert galactic coordinates to FK5 J2000.0 equatorial.
+*     - "EQGAL": Convert FK5 J2000.0 equatorial to galactic coordinates.
+*     - "HFK5Z" (JEPOCH): Convert ICRS coordinates to FK5 J2000.0 equatorial.
+*     - "FK5HZ" (JEPOCH): Convert FK5 J2000.0 equatorial coordinates to ICRS.
 *     - "GALSUP": Convert galactic to supergalactic coordinates.
 *     - "SUPGAL": Convert supergalactic coordinates to galactic.
+*     - "J2000H": Convert dynamical J2000.0 to ICRS.
+*     - "HJ2000": Convert ICRS to dynamical J2000.0.
 *
 *     For example, to use the "ADDET" conversion, which takes a single
 *     argument EQ, you should consult the documentation for the SLALIB
@@ -3382,6 +3487,19 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                               AST__HAQ, NULL, p );
                   }
 	       }
+               break;
+
+/* Convert dynamical J2000.0 to ICRS. */
+/* ---------------------------------- */
+/* Apply the conversion to each point. */
+	    case AST__J2000H:
+               J2000H( forward, npoint, alpha, delta );
+               break;
+
+/* Convert ICRS to dynamical J2000.0  */
+/* ---------------------------------- */
+	    case AST__HJ2000:
+               J2000H( !(forward), npoint, alpha, delta );
                break;
 
          }

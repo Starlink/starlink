@@ -123,6 +123,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added SkyRef, SkyRefIs, SkyRefP and AlignOffset attributes.
 *     8-SEP-2004 (DSB):
 *        Added astResolvePoints method.
+*     2-DEC-2004 (DSB):
+*        Added System "J2000"
 *class--
 */
 
@@ -2804,6 +2806,14 @@ static const char *GetTitle( AstFrame *this_frame ) {
                            astFmtDecimalYr( slaEpj( equinox ), 9 ) );
 	    break;
 
+/* J2000 equatorial coordinates. */
+/* ----------------------------- */
+/* Based on the dynamically determined mean equator and equinox of J2000,
+   rather than on a model such as FK4 or FK5 */
+	 case AST__J2000:
+	    pos = sprintf( buff, "J2000 equatorial %s", word );
+	    break;
+
 /* ICRS coordinates. */
 /* ----------------- */
 /* ICRS is only like RA/Dec by co-incidence, it is not really an
@@ -3169,10 +3179,10 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->Angle = Angle;
    frame->Distance = Distance;
    frame->Norm = Norm;
-   frame->Offset = Offset;
-   frame->Offset2 = Offset2;
    frame->Resolve = Resolve;
    frame->ResolvePoints = ResolvePoints;
+   frame->Offset = Offset;
+   frame->Offset2 = Offset2;
    frame->ValidateSystem = ValidateSystem;
    frame->SystemString = SystemString;
    frame->SystemCode = SystemCode;
@@ -3246,6 +3256,7 @@ static int IsEquatorial( AstSystemType system ) {
               ( system == AST__FK4_NO_E ) ||
               ( system == AST__ICRS ) ||
               ( system == AST__FK5 ) ||
+              ( system == AST__J2000 ) ||
               ( system == AST__GAPPT ) );
 
 /* Return the result. */
@@ -3443,6 +3454,13 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
             TRANSFORM_2( "PREC", equinox_J, 2000.0 );
          }
 
+/* From J2000. */
+/* ----------- */
+/* Convert from J2000 to ICRS, then from ICRS to FK5. */
+      } else if ( system == AST__J2000 ) {
+         TRANSFORM_0( "J2000H" )
+         TRANSFORM_1( "HFK5Z", epoch_J );
+
 /* From geocentric apparent. */
 /* ------------------------- */
 /* This conversion is supported directly by SLALIB. */
@@ -3520,13 +3538,20 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
          }
 
 /* Align in FK5. */
-/* --------------- */
+/* ------------- */
 /* We simply need to apply a precession correction for the change of
    equinox.  Omit even this if the required equinox is J2000.0. */
       } else if ( align_sys == AST__FK5 ) {
          if ( equinox_J != 2000.0 ) {
             TRANSFORM_2( "PREC", 2000.0, equinox_J )
          }
+
+/* Align in J2000. */
+/* --------------- */
+/* Mov from FK5 to ICRS, and from ICRS to J2000. */
+      } else if ( align_sys == AST__J2000 ) {
+         TRANSFORM_1( "FK5HZ", epoch_J )
+         TRANSFORM_0( "HJ2000" )
 
 /* Align in geocentric apparent. */
 /* ------------------------------- */
@@ -3661,6 +3686,13 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( align_sys == AST__ICRS ) {
          TRANSFORM_1( "HFK5Z", epoch_J )
 
+/* From J2000. */
+/* ----------- */
+/* From J2000 to ICRS, and from ICRS to FK5. */
+      } else if ( align_sys == AST__J2000 ) {
+         TRANSFORM_0( "J2000H" )
+         TRANSFORM_1( "HFK5Z", epoch_J )
+
 /* From supergalactic coordinates. */
 /* ------------------------------- */
 /* Convert to galactic coordinates and then to FK5 J2000.0
@@ -3745,6 +3777,13 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( system == AST__ICRS ) {
          TRANSFORM_1( "FK5HZ", epoch_J )
+
+/* To J2000. */
+/* --------- */
+/* From FK5 to ICRS, then from ICRS to J2000. */
+      } else if ( system == AST__J2000 ) {
+         TRANSFORM_1( "FK5HZ", epoch_J )
+         TRANSFORM_0( "HJ2000" )
 
 /* To supergalactic coordinates. */
 /* ----------------------------- */
@@ -6385,6 +6424,9 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
                astChrMatch( "Equatorial", system ) ) {
       result = AST__FK5;
 
+   } else if ( astChrMatch( "J2000", system ) ) {
+      result = AST__J2000;
+
    } else if ( astChrMatch( "ICRS", system ) ) {
       result = AST__ICRS;
 
@@ -6478,6 +6520,10 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
    case AST__FK5:
       result = "FK5";
+      break;
+
+   case AST__J2000:
+      result = "J2000";
       break;
 
    case AST__ICRS:

@@ -9931,6 +9931,13 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        - "FK5" or "EQUATORIAL": The modern FK5 (barycentric) equatorial
 *        coordinate system. This should be qualified by an Equinox value.
 *
+*        - "J2000": An equatorial coordinate system based on the mean
+*        dynamical equator and equinox of the J2000 epoch. The dynamical
+*        equator and equinox differ slightly from those used by the FK5
+*        model, and so a "J2000" SkyFrame will differ slightly from an
+*        "FK5(Equinox=J2000)" SkyFrame. The J2000 System need not be 
+*        qualified by an Equinox value
+*
 *        - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
 *        equatorial coordinate system, which gives the apparent positions
 *        of sources relative to the true plane of the Earth's equator and

@@ -37,6 +37,8 @@
 *        SLA_RVLG, SLA_RVGALC.
 *     11-JUN-2003 (DSB):
 *        Added SLA_GEOC, SLA_HFK5Z and SLA_FK5HZ.
+*     2-DEC-2004 (DSB):
+*        Added SLA_DEULER.
 */
 
 /* Macros */
@@ -48,6 +50,7 @@
 #include "memory.h"              /* Memory allocation facilities */
 #include "error.h"               /* Error reporting facilities */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
+#include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "slalib.h"              /* Prototypes for C SLALIB functions */
 
 /* Function implementations. */
@@ -1213,3 +1216,44 @@ void slaGeoc ( double p, double h, double *r, double *z ) {
    *r = R;
    *z = Z;
 }
+
+
+F77_SUBROUTINE(sla_deuler)( CHARACTER(ORDER),
+                            DOUBLE(PHI),
+                            DOUBLE(THETA),
+                            DOUBLE(PSI),
+                            DOUBLE_ARRAY(RMAT)
+                            TRAIL(ORDER) );
+
+void slaDeuler ( char *order, double phi, double theta, double psi,
+                 double rmat[3][3] ) {
+
+   DECLARE_CHARACTER(ORDER,4);
+   DECLARE_DOUBLE(PHI);
+   DECLARE_DOUBLE(THETA);
+   DECLARE_DOUBLE(PSI);
+   DECLARE_DOUBLE_ARRAY(RMAT,9);
+   int i,j;
+
+   PHI   = phi;
+   THETA = theta;
+   PSI   = psi;
+
+   astStringExport( order, ORDER, 4 );
+
+   F77_CALL (sla_deuler) ( CHARACTER_ARG(ORDER),
+                           DOUBLE_ARG(&PHI),
+                           DOUBLE_ARG(&THETA),
+                           DOUBLE_ARG(&PSI),
+                           DOUBLE_ARRAY_ARG(RMAT) 
+                           TRAIL_ARG(ORDER) );
+
+   for ( i = 0; i < 3; i++ ) {
+      for ( j = 0; j < 3; j++ ) rmat[ i ][ j ] = RMAT[ i + 3 * j ];
+   }
+
+}
+
+
+
+
