@@ -103,9 +103,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.15  1996/11/02 01:22:19  timj
-*     Tweak 'arameters' in header
+*     Revision 1.16  1996/11/05 02:08:04  timj
+*     Set BAD_PIXEL flag for DATA and VARIANCE
 *
+c Revision 1.15  1996/11/02  01:22:19  timj
+c Tweak 'arameters' in header
+c
 c Revision 1.14  1996/11/02  00:52:10  timj
 c Use NDF_ASSOC and REF parameter.
 c Tweak the header
@@ -1860,6 +1863,9 @@ c
          CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
      :     %val(OUT_QUALITY_PTR))
       END IF
+
+*  There will be bad pixels in the output map.
+      CALL NDF_SBAD(.TRUE.,OUT_NDF,'Data,Variance', STATUS)
 
 *  get some workspace for the `total weight' array and the scratch area
 *  used by SCULIB_BESSEL_REGRID_1
