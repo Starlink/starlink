@@ -176,7 +176,7 @@
       IF (MODE .EQ. 'C') THEN
 *
 *  Get root name of FITS file
-         CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+         CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append filename extension of FITS file containing header information
          FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *
@@ -193,7 +193,6 @@
 *
 *  Read in FITS header
          ORIGIN = 'RDF'
-         CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
          CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *
          IF ( STATUS .NE. SAI__OK ) GOTO 999

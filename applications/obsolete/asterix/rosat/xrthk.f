@@ -139,7 +139,7 @@
       END IF
 *
 *  Get root name of FITS file
-      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+      CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *  Does file exist?
@@ -161,9 +161,9 @@
          CALL MSG_PRNT('XRTHK : ERROR - Opening file ^FNAM ')
          GOTO 999
       ENDIF
+
 *  FITS RDF files only
       ORIGIN = 'RDF'
-      CALL USI_PUT0C( 'ORIGIN', ORIGIN, STATUS )
 *  Read header
       CALL RAT_RDHEAD(IUNIT1, ORIGIN, STATUS)
       IF (STATUS .NE. SAI__OK) THEN
@@ -370,7 +370,7 @@
 *         Map the input array - initially try the EVENTRATE file, if this
 *         fails try the ATTITUDE file
 *
-            IF ( .NOT.(LEVR .OR. LATT)) THEN
+            IF ( .NOT. (LEVR .OR. LATT)) THEN
               CALL MSG_PRNT('XRTHK : ERROR - cannot find EVRATE or'
      :        // ' ASPECT extension')
               GOTO 999
@@ -423,7 +423,7 @@
                END IF
             END IF
 *
-            IF ( LATT  .AND. COLNO .EQ. 0) THEN
+            IF ( LATT .EQ. .TRUE. .AND. COLNO .EQ. 0) THEN
 *  Move to the correct position in FITS file
                CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
 *  Renew header information

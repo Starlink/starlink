@@ -87,7 +87,7 @@
       END IF
 *
 *  Get root name of FITS file
-      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+      CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *  Does file exist?
@@ -99,8 +99,6 @@
          GOTO 999
       END IF
 *
-      ORIGIN = 'RDF'
-      CALL USI_PUT0C( 'ORIGIN', ORIGIN, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
       CALL MSG_PRNT('SHOWXRT : Using FITS file : '// FILENAME)
@@ -116,6 +114,7 @@
       ENDIF
 *
 *  Read in header
+      ORIGIN = 'RDF'
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *
       IF ( STATUS .NE. SAI__OK ) GOTO 999

@@ -2274,7 +2274,7 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
       ENDIF
 *
 *  Get root name of FITS file
-      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+      CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
       CALL MSG_PRNT('XRTSUB : Using FITS file : '// FILENAME)
@@ -3351,7 +3351,6 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
       ENDIF
 *
       ORIGIN = 'RDF'
-      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *

@@ -236,7 +236,7 @@
       END IF
 *
 *  Get root name of FITS file
-      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+      CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *  Does file exist?
@@ -260,7 +260,6 @@
       ENDIF
 *
       ORIGIN = 'RDF'
-      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *

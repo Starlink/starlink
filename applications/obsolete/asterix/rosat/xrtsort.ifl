@@ -24,14 +24,6 @@
                VPATH   'PROMPT'
      ENDPARAMETER
 
-     PARAMETER ORIGIN
-               TYPE     '_CHAR'
-               PROMPT   'Origin of datafiles (MPE,US,RDF)'
-               vpath    'DEFAULT'
-               DEFAULT  'AUTO'
-               IN       'MPE','US','RDF','AUTO'
-     ENDPARAMETER
-
      PARAMETER TYPE
                TYPE    '_CHAR'
                PROMPT  'Output data type - Event(E) Binned(B)'
@@ -514,27 +506,6 @@
                VPATH   'PROMPT'
                HELP    'Enter in decimal degrees'
                DEFAULT  0.0
-     ENDPARAMETER
-
-     PARAMETER FITSROOT
-               TYPE     '_CHAR'
-               PROMPT   'Rootname of FITS files'
-               PPATH    'CURRENT'
-               VPATH    'DEFAULT'
-     ENDPARAMETER
-
-     PARAMETER ALL
-               TYPE     '_LOGICAL'
-               PROMPT   'Process all files associated with the observation'
-               PPATH    'DEFAULT'
-               VPATH    'DEFAULT'
-               DEFAULT  'TRUE'
-     ENDPARAMETER
-
-     PARAMETER HOTSPOTS
-               TYPE     '_LOGICAL'
-               VPATH    'DEFAULT'
-               DEFAULT  'TRUE'
      ENDPARAMETER
 
 ENDINTERFACE

@@ -688,7 +688,6 @@
          ENDIF
 *
          ORIGIN = 'RDF'
-         CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
          CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *
@@ -836,7 +835,6 @@ D            WRITE(3,*)EXPOS(TLP)
       END IF
 *
       ORIGIN = 'RDF'
-      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *
@@ -1202,7 +1200,6 @@ D            WRITE(3,*)EXPOS(TLP)
       END IF
 *
       ORIGIN = 'RDF'
-      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *

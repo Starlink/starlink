@@ -127,7 +127,7 @@
       END IF
 *
 *  Get root name of FITS file
-      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+      CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
 *  Append extension of FITS extension containing header
       SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *  Does file exist?
@@ -151,7 +151,6 @@
       ENDIF
 *
       ORIGIN = 'RDF'
-      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
 *  Read in FITS header
       CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
 *
@@ -2622,7 +2621,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 *     A special case for HRI. If it can't find a PI channel then it
 *     maps to the PHA channel.
-      IF (.NOT. PI) THEN
+      IF ( PI ) THEN
           CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
           CALL FTGCVJ(IUNIT,6,FBEG,1,NROWS,0,%VAL(PTRA(7)),
      :    ANYF,STATUS)
@@ -3426,39 +3425,3 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
       END
 
-**********************************************************************
-
-*         PRINT *,'NELEMS',NELEMS
-*         PRINT *,'SDATA(1)',SDATA(1,1,1,1,1,1,1)
-*         PRINT *,'SDIM1',SDIM1
-*         PRINT *,'SDIM2',SDIM2
-*         PRINT *,'SDIM3',SDIM3
-*         PRINT *,'SDIM4',SDIM4
-*         PRINT *,'SDIM5',SDIM5
-*         PRINT *,'SDIM6',SDIM6
-*         PRINT *,'SDIM7',SDIM7
-*         PRINT *,'BDATA(1)',BDATA(1,1,1,1,1,1,1)
-*         PRINT *,'MDIM1',MDIM1
-*         PRINT *,'MDIM2',MDIM2
-*         PRINT *,'MRES',MRES
-*         PRINT *,'SMASK',SMASK
-*         PRINT *,'BMASK',BMASK
-*         PRINT *,'SRT_QUAL_MORE',SRT_QUAL_MORE
-*         PRINT *,'MAXBAD',MAXBAD
-*         PRINT *,'NBAD',NBAD
-*         PRINT *,'STBAD',STBAD(1)
-*         PRINT *,'ENBAD',ENBAD(1)
-*         PRINT *,'XWIDTH',XWIDTH
-*         PRINT *,'YWIDTH',YWIDTH
-*         PRINT *,'XDWID',XDWID
-*         PRINT *,'YDWID',YDWID
-*         PRINT *,'TWIDTH',TWIDTH
-*         PRINT *,'PWIDTH',PWIDTH
-*         PRINT *,'EWIDTH',EWIDTH
-*         PRINT *,'BXWIDTH',BXWIDTH
-*         PRINT *,'BYWIDTH',BYWIDTH
-*         PRINT *,'NRBIN',NRBIN
-*         PRINT *,'NAZBIN',NAZBIN
-*         PRINT *,'ELIPA2',ELIPA2
-*         PRINT *,'ELIPB2',ELIPB2
-*         PRINT *,'BADEV',BADEV,
