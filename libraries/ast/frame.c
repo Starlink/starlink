@@ -110,6 +110,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Updated astConvert prologue again.
 *     15-FEB-1998 (RFWS):
 *        Added astUnformat.
+*     2-MAR-1999 (RFWS);
+*        Fixed missing STATUS arguments in examples for AST_FINDFRAME
+*        prologue.
 *class--
 */
 
@@ -2199,7 +2202,7 @@ f        accepted. Otherwise, the next DOMAINLIST field is considered
 
 *  Examples:
 c     result = astFindFrame( target, astFrame( 3, "" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 3, ' ' ), ' ', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 3, ' ', STATUS ), ' ', STATUS )
 *        Searches for a 3-dimensional coordinate system in the target
 *        Frame (or FrameSet). No attributes have been set in the
 c        template Frame (created by astFrame), so no restriction has
@@ -2209,7 +2212,7 @@ f        template Frame (created by AST_FRAME), so no restriction has
 c        found will be returned as part of the "result" FrameSet.
 f        found will be returned as part of the RESULT FrameSet.
 c     result = astFindFrame( target, astSkyFrame( "" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( ' ' ), ' ', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( ' ', STATUS ), ' ', STATUS )
 *        Searches for a celestial coordinate system in the target
 *        Frame (or FrameSet). The type of celestial coordinate system
 c        is unspecified, so astFindFrame will return the first one
@@ -2222,14 +2225,14 @@ f        found as part of the RESULT FrameSet. If the target is
 *        If no celestial coordinate system can be found, a value of
 *        AST__NULL will be returned without error.
 c     result = astFindFrame( target, astSkyFrame( "System=FK5" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'System=FK5' ), ' ', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'System=FK5', STATUS ), ' ', STATUS )
 *        Searches for an equatorial (FK5) coordinate system in the
 *        target. The Equinox value for the coordinate system has not
 *        been specified, so will be obtained from the target. If the
 *        target is a FrameSet, its Current attribute will be updated
 *        to indicate which SkyFrame was used to obtain this value.
 c     result = astFindFrame( target, astFrame( 2, "" ), "sky,pixel," );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 2, ' ' ), 'SKY,PIXEL,', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 2, ' ', STATUS ), 'SKY,PIXEL,', STATUS )
 *        Searches for a 2-dimensional coordinate system in the
 *        target. Initially, a search is made for a suitable coordinate
 *        system whose Domain attribute has the value "SKY". If this
@@ -2243,17 +2246,17 @@ f        coordinate system is returned as part of the RESULT
 *        applying built-in conversions to any of the Frames in the
 *        target will a value of AST__NULL be returned.
 c     result = astFindFrame( target, astFrame( 1, "Domain=WAVELENGTH" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'Domain=WAVELENGTH' ),' ',STATUS)
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'Domain=WAVELENGTH', STATUS ),' ',STATUS)
 *        Searches for any 1-dimensional coordinate system in the
 *        target which has the domain "WAVELENGTH".
 c     result = astFindFrame( target, astFrame( 1, "" ), "wavelength" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, ' ' ), 'WAVELENGTH', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, ' ', STATUS ), 'WAVELENGTH', STATUS )
 *        This example has exactly the same effect as that above. It
 *        illustrates the equivalence of the template's Domain attribute
 c        and the fields in the "domainlist" string.
 f        and the fields in the DOMAINLIST string.
 c     result = astFindFrame( target, astFrame( 1, "MaxAxes=3" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'MaxAxes=3' ), ' ', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_FRAME( 1, 'MaxAxes=3', STATUS ), ' ', STATUS )
 *        This is a more advanced example which will search for any
 *        coordinate system in the target having 1, 2 or 3
 c        dimensions. The Frame returned (as part of the "result"
@@ -2266,7 +2269,7 @@ f        dimensions. The Frame returned (as part of the RESULT
 *        3-dimensional) coordinate system found, we could set the
 *        PreserveAxes attribute to a non-zero value in the template.
 c     result = astFindFrame( target, astSkyFrame( "Permute=0" ), "" );
-f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'Permute=0' ), ' ', STATUS )
+f     RESULT = AST_FINDFRAME( TARGET, AST_SKYFRAME( 'Permute=0', STATUS ), ' ', STATUS )
 *        Searches for any celestial coordinate system in the target,
 *        but only finds one if its axes are in the conventional
 *        (longitude,latitude) order and have not been permuted
