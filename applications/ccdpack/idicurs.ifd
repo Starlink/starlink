@@ -133,7 +133,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 600
+            default 450
             prompt {Width of display window in pixels}
             helpkey *
          }

@@ -30,7 +30,7 @@
                                 # Display percentile values
             type _DOUBLE
             access UPDATE
-            vpath CURRENT PROMPT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default 2 98
             prompt {Display percentiles}
@@ -110,7 +110,7 @@
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 400
+            default 600
             prompt {Height of display window in pixels}
             helpkey *
          }
