@@ -451,7 +451,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *    Import :
       RECORD /XRT_HEAD/ HEAD                     ! Defines MAXRAN
 *
-      REAL EXPO_TIM                              ! Total time in TIM_SEL
+      DOUBLE PRECISION EXPO_TIM                  ! Total time in TIM_SEL
       DOUBLE PRECISION OARR(MAXRAN*2)            ! ON-OFF TIM_SEL times
       INTEGER NTIM
       DOUBLE PRECISION TIME(NTIM)                ! Times of HK data
@@ -630,7 +630,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
       DOUBLE PRECISION TBAD(MAXRAN*2)            ! Bad times (s/c clock units)
       DOUBLE PRECISION TFIRST(MAXRAN*2)          ! Workspace
       DOUBLE PRECISION TOUT(MAXRAN*2)            ! Workspace
-      REAL EXPO_TIM                              ! Exposure time
+      DOUBLE PRECISION EXPO_TIM                  ! Exposure time
 *    Import-Export :
 *    Export :
       INTEGER NGOOD                              ! Number of good time windows
@@ -734,7 +734,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
       DOUBLE PRECISION OARR(MAXRAN*2)            ! TIM_SEL values
       DOUBLE PRECISION TOUT(MAXRAN*2)            ! TIM_SEL values
-      REAL EXPO_TIM                              ! Exposure time
+      DOUBLE PRECISION EXPO_TIM                  ! Exposure time
 *    Import/Export :
       INTEGER NGOOD                              ! Number of good time windows
       DOUBLE PRECISION TGOOD(MAXRAN*2)           ! Good times (MJD)
