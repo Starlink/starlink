@@ -12359,7 +12359,9 @@ default value.
       of the displayed positions may be controlled using parameter STYLE.
 
       Positions may be reported in several different co-ordinate Frames
-      (see parameter FRAME).
+      (see parameter FRAME). Optionally, the corresponding pixel 
+      co-ordinates at each position may also be reported (see parameter
+      SHOWPIXEL).
 
       The picture or pictures within which positions are required can be
       selected in several ways (see parameters MODE and NAME).
@@ -12593,6 +12595,17 @@ default value.
          messages describing the use of the cursor is controlled by the
          parameter INFO. [FALSE]
       }
+
+      \sstsubsection{
+         SHOWPIXEL = \_LOGICAL (Read)
+      }{
+         If TRUE, the pixel co-ordinates of each selected position are
+         shown on a separate line, following the co-ordinates requested  
+         using parameter FRAME. If pixel co-ordinates are being displayed
+         anyway (see parameter FRAME) then a value of FALSE is used for. 
+         SHOWPIXEL. [current value]
+      }
+
       \sstsubsection{
          STYLE = LITERAL (Read)
       }{
@@ -13200,7 +13213,7 @@ default value.
          CLEAR = \_LOGICAL (Read)
       }{
          TRUE if the current picture is to be cleared before the image is
-         displayed. [FALSE]
+         displayed. [current value]
       }
       \sstsubsection{
          COMP = LITERAL (Read)
@@ -38332,7 +38345,7 @@ plotting application.
 
             \item The following new parameters have been added: DESCRIBE,
                   EPOCH, FRAME, GEODESIC, INFO, LASTDIM, LASTPOS, MARKER,
-                  MAXPOS, MINPOS, OUTLIST, QUIET, STYLE.
+                  MAXPOS, MINPOS, OUTLIST, QUIET, SHOWPIXEL, STYLE.
          
             \item The following parameters have been modified:
                \begin{description}
@@ -38378,6 +38391,8 @@ plotting application.
                                centre of the picture. These co-ordinates
                                should be expressed within the current 
                                co-ordinate Frame of the NDF.
+                  \item [CLEAR] The default value is now the current value
+                               instead of FALSE.
                   \item [FILL] The default value is now TRUE if the input
                                NDF is 1-dimensional, and FALSE otherwise.
                   \item [XMAGN] This used to be the number of device
