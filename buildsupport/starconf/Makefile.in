@@ -524,7 +524,7 @@ starconf: make-starconf \
 	./make-starconf \
 		!starconf.m4 \
 		*?bootstrap:bootstrap.installed
-make-starconf: make-starconf.in
+make-starconf: make-starconf.in configure.ac
 	rm -f make-starconf.tmp make-starconf
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
 	mv make-starconf.tmp make-starconf
