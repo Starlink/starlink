@@ -202,7 +202,7 @@
 *    Create an output file
       CALL DAT_TYPE(LOC(1), TYPE, STATUS)
 *
-      CALL USI_ASSOCO('OUTPUT', TYPE, LOCO, STATUS)
+      CALL USI_ASSOCO('OUT', TYPE, LOCO, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *

@@ -119,10 +119,10 @@
       CALL AST_INIT()
 
 *    Obtain data object, access and check it.
-      CALL USI_ASSOCI ('INPUT', 'READ', ILOC, INPRIM, STATUS)
+      CALL USI_ASSOCI ('INP', 'READ', ILOC, INPRIM, STATUS)
 
 *    Create a POWER_SPECTRUM object.
-      CALL USI_ASSOCO ('OUTPUT', 'POWER_SPECTRUM', OLOC, STATUS)
+      CALL USI_ASSOCO ('OUT', 'POWER_SPECTRUM', OLOC, STATUS)
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99

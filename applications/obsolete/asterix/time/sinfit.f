@@ -112,10 +112,10 @@
       CALL AST_INIT
 
 *    Obtain data object name.
-      CALL USI_ASSOCI ('INPUT', 'READ', INLOC, PRIM, STATUS)
+      CALL USI_ASSOCI ('INP', 'READ', INLOC, PRIM, STATUS)
 
 *    Create output dataset
-      CALL USI_ASSOCO ('OUTPUT', 'POWER_SPECTRUM', OUTLOC, STATUS)
+      CALL USI_ASSOCO ('OUT', 'POWER_SPECTRUM', OUTLOC, STATUS)
 
 *    Map input data.
       CALL BDA_CHKDATA (INLOC, OK, NDIMS, LDIM, STATUS)
@@ -200,9 +200,9 @@
       END IF
 
 *    User input.
-      CALL USI_GET0R ('BASE_FREQ',      BASEFREQ, STATUS)
-      CALL USI_GET0R ('FREQ_INCREMENT', FREQSTEP, STATUS)
-      CALL USI_GET0I ('NO_OF_FREQS',    NFREQ,    STATUS)
+      CALL USI_GET0R ('BASE',      BASEFREQ, STATUS)
+      CALL USI_GET0R ('INC', FREQSTEP, STATUS)
+      CALL USI_GET0I ('NUM',    NFREQ,    STATUS)
       CALL USI_GET0L ('PHASE',          PHASE,    STATUS)
 
 *    Create dynamic arrays
