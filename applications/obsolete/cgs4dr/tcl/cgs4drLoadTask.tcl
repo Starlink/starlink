@@ -8,8 +8,12 @@ proc cgs4drLoadTask {task} {
 
 # Cred4
    if {$ltask == "cred4"} {
-     exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.cred4 $env(CGS4_CONFIG)/standard.cred4
-     exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.cred4 $env(CGS4_CONFIG)/STANDARD.cred4
+     if {[file exists $env(CGS4_CONFIG)/standard.cred4]==0} {
+       exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.cred4 $env(CGS4_CONFIG)/standard.cred4
+     }
+     if {[file exists $env(CGS4_CONFIG)/STANDARD.cred4]==0} {
+       exec /usr/bin/cp $env(CGS4DR_ROOT)/standard.cred4 $env(CGS4_CONFIG)/STANDARD.cred4
+     }
      if {[file exists $env(CGS4_CONFIG)/default.cred4]==0} {
        exec /usr/bin/cp $env(CGS4DR_ROOT)/default.cred4 $env(CGS4_CONFIG)/default.cred4
      }
