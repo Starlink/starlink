@@ -526,6 +526,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *     8-NOV-2004 (DSB):
 *        - In Norm1, try more alternative "other axis" values before
 *        accepting that a tick mark value cannot be normalised.
+*     2-FEB-2005 (DSB):
+*        - Avoid using astStore to allocate more storage than is supplied
+*        in the "data" pointer. This can cause access violations since 
+*        astStore will then read beyond the end of the "data" area.
 *class--
 */
 
@@ -22526,7 +22530,8 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
             units = astGetUnit( this, axis );
             if( units && units[0] ){
                ulen = ChrLen( units );
-               new_text = astStore( NULL, (void *) text, tlen + ulen + 4 );
+               new_text = astMalloc( tlen + ulen + 4 );
+               if( new_text ) memcpy( new_text, text, tlen );
                
                text = new_text + tlen;
 

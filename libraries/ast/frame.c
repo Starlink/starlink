@@ -176,6 +176,10 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     29-NOV-2004 (DSB):
 *        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from 
 *        axis attribute names if the Frame only has one axis.
+*     2-FEB-2005 (DSB):
+*        - Avoid using astStore to allocate more storage than is supplied
+*        in the "data" pointer. This can cause access violations since 
+*        astStore will then read beyond the end of the "data" area.
 *class--
 */
 
@@ -1826,7 +1830,8 @@ L1:
 
 /* Take a copy of the supplied name, allowing 3 extra characters for the
    axis specifier "(1)". */
-      axis_attrib = astStore( NULL, attrib, len + 4 );
+      axis_attrib = astMalloc( len + 4 );
+      if( axis_attrib ) memcpy( axis_attrib, attrib, len );
 
 /* Indicate we should free the axis_attrib memory. */
       free_axis_attrib = 1;
@@ -4154,7 +4159,8 @@ L1:
 
 /* Take a copy of the supplied name, allowing 3 extra characters for the
    axis specifier "(1)". */
-      axis_attrib = astStore( NULL, attrib, len + 4 );
+      axis_attrib = astMalloc( len + 4 );
+      if( axis_attrib ) memcpy( axis_attrib, attrib, len );
 
 /* Indicate we should free the axis_attrib memory. */
       free_axis_attrib = 1;
@@ -7436,7 +7442,8 @@ L1:
 
 /* Take a copy of the supplied setting, allowing 3 extra characters for the
    axis specifier "(1)". */
-      axis_setting = astStore( NULL, setting, len + 4 );
+      axis_setting = astMalloc( len + 4 );
+      if( axis_setting ) memcpy( axis_setting, setting, len );
 
 /* Indicate we should free the axis_setting memory. */
       free_axis_setting = 1;
@@ -8402,7 +8409,8 @@ L1:
 
 /* Take a copy of the supplied name, allowing 3 extra characters for the
    axis specifier "(1)". */
-      axis_attrib = astStore( NULL, attrib, len + 4 );
+      axis_attrib = astMalloc( len + 4 );
+      if( axis_attrib ) memcpy( axis_attrib, attrib, len );
 
 /* Indicate we should free the axis_attrib memory. */
       free_axis_attrib = 1;

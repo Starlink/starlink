@@ -40,6 +40,10 @@
 *        constant in the the "1/60" node).
 *     18-JAN-2005 (DSB):
 *        Fix memory leaks.
+*     2-FEB-2005 (DSB):
+*        - Avoid using astStore to allocate more storage than is supplied
+*        in the "data" pointer. This can cause access violations since 
+*        astStore will then read beyond the end of the "data" area.
 */
 
 /* Module Macros. */
@@ -2276,14 +2280,15 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
 */
 
 /* Local Variables: */
-   char buff[200];
    char *a;
+   char buff[200];
    const char *arg0;
    const char *arg1;
    char *result;
    int larg0;
    int larg1;          
    int lbuff;
+   int tlen;
    int par;
    UnitNode *newtree;
 
@@ -2332,13 +2337,12 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    MathMap function, append a single space before and after the name. */
    } else if( newtree->opcode ==  OP_LDVAR ) {
       if( !mathmap && !top ){ 
-         result = astStore( NULL, " ", strlen( newtree->name) + 3 );
-         if( astOK ) {
-            a = result + 1;
-            strcpy( a, newtree->name );
-            a += strlen( newtree->name);
-            *(a++) = ' ';
-            *(a++) = 0;
+         tlen = strlen( newtree->name );
+         result = astMalloc( tlen + 3 );
+         if( result ) {
+            result[ 0 ] = ' ';
+            memcpy( result + 1, newtree->name, tlen );
+            memcpy( result + tlen + 1, " ", 2 );
          }  
       } else {
          result = astStore( NULL, newtree->name, strlen( newtree->name) + 1 );
@@ -2350,15 +2354,17 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
       if( mathmap ) {
-         result = astStore( NULL, "log10(", larg0 + 8 );
+         result = astMalloc( larg0 + 8 );
+         if( result ) memcpy( result, "log10(", 7 );
          a = result + 6;
       } else { 
-         result = astStore( NULL, "log(", larg0 + 6 );
+         result = astMalloc( larg0 + 6 );
+         if( result ) memcpy( result, "log(", 5 );
          a = result + 4;
       }
-      if( astOK ){
-         strcpy( a, arg0 );
-         strcpy( a + larg0, ")" );
+      if( result ){
+         memcpy( a, arg0, larg0 + 1 );
+         memcpy( a + larg0, ")", 2 );
       }
       arg0 = astFree( (void *) arg0 );
 
@@ -2366,35 +2372,39 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
       if( mathmap ) {
-         result = astStore( NULL, "log(", larg0 + 6 );
+         result = astMalloc( larg0 + 6 );
+         if( result ) memcpy( result, "log(", 5 );
          a = result + 4;
       } else {
-         result = astStore( NULL, "ln(", larg0 + 5 );
+         result = astMalloc( larg0 + 5 );
+         if( result ) memcpy( result, "ln(", 4 );
          a = result + 3;
       }
       if( astOK ){
-         strcpy( a, arg0 );
-         strcpy( a + larg0, ")" );
+         memcpy( a, arg0, larg0 );
+         memcpy( a + larg0, ")", 2 );
       }
       arg0 = astFree( (void *) arg0 );
 
    } else if( newtree->opcode ==  OP_EXP ) {  
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
-      result = astStore( NULL, "exp(", larg0 + 6 );
-      if( astOK ){
-         strcpy( result + 4, arg0 );
-         strcpy( result + 4 + larg0, ")" );
+      result = astMalloc( larg0 + 6 );
+      if( result ){
+         memcpy( result, "exp(", 5 );
+         memcpy( result + 4, arg0, larg0 );
+         memcpy( result + 4 + larg0, ")", 2 );
       }
       arg0 = astFree( (void *) arg0 );
 
    } else if( newtree->opcode ==  OP_SQRT ) { 
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
-      result = astStore( NULL, "sqrt(", larg0 + 7 );
-      if( astOK ){
-         strcpy( result + 5, arg0 );
-         strcpy( result + 5 + larg0, ")" );
+      result = astMalloc( larg0 + 7 );
+      if( result ){
+         memcpy( result, "sqrt(", 6 );
+         memcpy( result + 5, arg0, larg0 );
+         memcpy( result + 5 + larg0, ")", 2 );
       }
       arg0 = astFree( (void *) arg0 );
 
@@ -2416,7 +2426,8 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       if( newtree->arg[ 0 ]->narg == 2 ||
           (newtree->arg[ 0 ]->opcode == OP_LDVAR && !mathmap) ) {
          par = 1;
-         result = astStore( NULL, "(", larg0 + larg1 + 7 );
+         result = astMalloc( larg0 + larg1 + 7 );
+         if( result ) memcpy( result, "(", 2 );
          a = result + 1;
       } else {
          par = 0;
@@ -2424,15 +2435,15 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
          a = result;
       }
 
-      if( astOK ) {
-         strcpy( a, arg0 );
+      if( result ) {
+         memcpy( a, arg0, larg0 );
          a += larg0;
          if( par ) *(a++) = ')';
-         strcpy( a, "**(" );
+         memcpy( a, "**(", 4 );
          a += 3;
-         strcpy( a, arg1 );
+         memcpy( a, arg1, larg1 );
          a += larg1;
-         strcpy( a, ")" );
+         memcpy( a, ")", 2 );
          a++;
          *a = 0;
       }
@@ -2452,17 +2463,18 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
 
       if( newtree->arg[ 1 ]->narg == 2 ) {
          par = 1;
-         result = astStore( NULL, arg0, larg0 + larg1 + 4 );
+         result = astMalloc( larg0 + larg1 + 4 );
       } else {
          par = 0;
-         result = astStore( NULL, arg0, larg0 + larg1 + 2 );
+         result = astMalloc( larg0 + larg1 + 2 );
       }
-      a = result + larg0;
 
-      if( astOK ) {
+      if( result ) {
+         memcpy( result, arg0, larg0 );
+         a = result + larg0;
          *(a++) = '/';
          if( par ) *(a++) = '(';
-         strcpy( a, arg1 );
+         memcpy( a, arg1, larg1 );
          a += larg1;
          if( par ) *(a++) = ')';
          *a = 0;
@@ -2495,7 +2507,8 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
          if( newtree->arg[ 0 ]->opcode == OP_DIV ||
              newtree->arg[ 0 ]->opcode == OP_POW ) {
             par = 1;
-            result = astStore( NULL, "(", larg0 + larg1 + 4 );
+            result = astMalloc( larg0 + larg1 + 4 );
+            if( result ) result[ 0 ] = '(';
             a = result + 1;
          } else {
             par = 0;
@@ -2503,12 +2516,12 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
             a = result;
          }
    
-         if( astOK ) {
-            strcpy( a, arg0 );
+         if( result ) {
+            memcpy( a, arg0, larg0 );
             a += larg0;
             if( par ) *(a++) = ')';
             *(a++) = '*';
-            strcpy( a, arg1 );
+            memcpy( a, arg1, larg1 );
             a += larg1;
             *a = 0;
          }
@@ -2752,9 +2765,11 @@ static AstMapping *MakeMapping( UnitNode *tree ) {
 
 /* Allocate memory for the transformation functions, plus an extra
    character for the trailing null. */
-         fwdfun = astStore( NULL, "output_units=", lfwd + 1 );
-         invfun = astStore( NULL, "input_units=", linv + 1 );
-         if( astOK ) {
+         fwdfun = astMalloc( lfwd + 1 );
+         invfun = astMalloc( linv + 1 );
+         if( invfun ) {
+            memcpy( fwdfun, "output_units=", 14 );
+            memcpy( invfun, "input_units=", 13 );
  
 /* Append the expressions following the equals signs. */
             strcpy( fwdfun + 13, fwdexp );

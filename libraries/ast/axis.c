@@ -55,6 +55,10 @@ f     only within textual output (e.g. from AST_WRITE).
 *        to be used.
 *        - If the conversion code is of integer type (e.g. "%d") cast value 
 *        to integer before printing. 
+*     2-FEB-2005 (DSB):
+*        - Avoid using astStore to allocate more storage than is supplied
+*        in the "data" pointer. This can cause access violations since 
+*        astStore will then read beyond the end of the "data" area.
 *class--
 */
 
@@ -1529,6 +1533,7 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
    int len;             /* Used length of format string */
    int minus;           /* Was a '-' flag found? */
    int plus;            /* Was a '+' flag found? */
+   int rlen;            /* Length of result */
    int space;           /* Was a ' ' flag found? */
 
 /* Initialise. */
@@ -1634,10 +1639,12 @@ static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
    "." and "*", change the asterisk to the supplied "digs" value. */
          if( a[ 0 ] == '.' && a[ 1 ] == '*' ) {
 
-/* Allocate memory to hold the extended format string (allowing 
-   20 characters for formatting the digs value - just in case something like
+/* Allocate memory to hold the extended format string (allowing 20
+   characters for formatting the digs value - just in case something like
    INT_MAX is supplied by mistake), and store the existing string in it. */
-            new = astStore( NULL, result, strlen( result ) + 22 );
+            rlen = strlen( result );
+            new = astMalloc( rlen + 22 );
+            if( new ) memcpy( new, result, rlen + 1 );
 
 /* Put the precision into the new string, following the field width. */
             b = new + ( a - result );

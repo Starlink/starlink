@@ -63,6 +63,10 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *  History:
 *     4-NOV-2002 (DSB):
 *        Original version.
+*     2-FEB-2005 (DSB):
+*        - Avoid using astStore to allocate more storage than is supplied
+*        in the "data" pointer. This can cause access violations since 
+*        astStore will then read beyond the end of the "data" area.
 *class--
 */
 
@@ -330,9 +334,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Create a new attribute name from the original by appending the string
    "(1)" and then use the parent ClearAttrib method. */
-      new_attrib = astStore( NULL, attrib, len + 4 );
-      if( astOK ) {
-         strcpy( new_attrib + len, "(1)" ); 
+      new_attrib = astMalloc( len + 4 );
+      if( new_attrib ) {
+         memcpy( new_attrib, attrib, len );
+         memcpy( new_attrib + len, "(1)", 4 ); 
          (*parent_clearattrib)( this_object, new_attrib );
          new_attrib = astFree( new_attrib );
       }
@@ -811,9 +816,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Create a new attribute name from the original by appending the string
    "(1)" and then use the parent GetAttrib method. */
-      new_attrib = astStore( NULL, attrib, len + 4 );
-      if( astOK ) {
-         strcpy( new_attrib + len, "(1)" ); 
+      new_attrib = astMalloc( len + 4 );
+      if( new_attrib ) {
+         memcpy( new_attrib, attrib, len );
+         memcpy( new_attrib + len, "(1)", 4 ); 
          result = (*parent_getattrib)( this_object, new_attrib );
          new_attrib = astFree( new_attrib );
       }
@@ -2943,11 +2949,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Create a new setting string from the original by appending the string
    "(1)" to the end of the attribute name and then use the parent SetAttrib 
    method. */
-      new_setting = astStore( NULL, setting, len + 4 );
-      if( astOK ) {
+      new_setting = astMalloc( len + 4 );
+      if( new_setting ) {
+         memcpy( new_setting, setting, len + 1 );
          a = strchr( new_setting, '=' );
          namelen = a - new_setting;
-         strcpy( a, "(1)" );
+         memcpy( a, "(1)", 4 );
          a += 3;
          strcpy( a, setting + namelen );
          (*parent_setattrib)( this_object, new_setting );
@@ -4613,9 +4620,10 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Create a new attribute name from the original by appending the string
    "(1)" and then use the parent TestAttrib method. */
-      new_attrib = astStore( NULL, attrib, len + 4 );
-      if( astOK ) {
-         strcpy( new_attrib + len, "(1)" ); 
+      new_attrib = astMalloc( len + 4 );
+      if( new_attrib ) {
+         memcpy( new_attrib, attrib, len );
+         memcpy( new_attrib + len, "(1)", 4 ); 
          result = (*parent_testattrib)( this_object, new_attrib );
          new_attrib = astFree( new_attrib );
       }

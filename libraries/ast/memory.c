@@ -115,7 +115,7 @@ static void (*memcheckfun)( void * );
 
 /* Prototypes for Private Functions. */
 /* ================================= */
-static int IsDynamic( void *ptr );
+static int IsDynamic( const void *ptr );
 static unsigned long Magic( void *ptr, size_t size );
 
 #ifdef DEBUG
@@ -517,7 +517,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
    return new;
 }
 
-static int IsDynamic( void *ptr ) {
+static int IsDynamic( const void *ptr ) {
 /*
 *  Name:
 *     IsDynamic
@@ -530,7 +530,7 @@ static int IsDynamic( void *ptr ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     int IsDynamic( void *ptr )
+*     int IsDynamic( const void *ptr )
 
 *  Description:
 *     This function takes a pointer to a region of memory and tests if
@@ -867,7 +867,7 @@ void *astRealloc_( void *ptr, size_t size ) {
    return result;   
 }
 
-size_t astSizeOf_( void *ptr ) {
+size_t astSizeOf_( const void *ptr ) {
 /*
 *+
 *  Name:
@@ -881,7 +881,7 @@ size_t astSizeOf_( void *ptr ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     size_t astSizeOf( void *ptr )
+*     size_t astSizeOf( const void *ptr )
 
 *  Description:
 *     This function returns the size of a region of dynamically
@@ -1008,6 +1008,26 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
       new = astMalloc( size );
       if ( astOK ) {
          if ( ptr ) ptr = astFree( ptr );
+
+#ifdef AST_DYNREAD_CHECK
+
+/* Check we are not reading from beyond the end of a dynamically
+   allocated memory block. This can cause access violations on some
+   systems (e.g. cygwin). */
+
+   int rep = astReporting( 0 );
+   int dyn = IsDynamic( data );
+   astReporting( rep );
+   if( astStatus == AST__PTRIN ) astClearStatus;
+   if( dyn ) {
+      if( size > astSizeOf( data ) ) {
+         astError( AST__INTER, "astStore: Size of copy (%d) exceeds size "
+                   "of source (%d) (internal AST programming error).", size, 
+                   astSizeOf( data ) );
+      }
+   }
+#endif
+
          (void) memcpy( new, data, size );
 
 /* If memory allocation failed, do not free the old memory but return

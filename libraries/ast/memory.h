@@ -96,7 +96,7 @@ int astChrMatchN_( const char *, const char *, size_t );
 char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
 int astSscanf_( const char *str, const char *format, ...);
-size_t astSizeOf_( void * );
+size_t astSizeOf_( const void * );
 void *astFree_( void * );
 void *astGrow_( void *, int, size_t );
 void *astMalloc_( size_t );
