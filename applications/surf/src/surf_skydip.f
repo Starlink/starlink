@@ -32,7 +32,9 @@
 *     IN = NDF (Read)
 *        The name of the raw skydip data file or of the file processed
 *        by REDUCE_SWITCH.
-*     B_FIT = REAL (Read)
+*     B_FIT = REAL (Write)
+*        The fitted value of the B parameter.
+*     B_VAL = REAL (Read)
 *        The B parameter (filter transmission). This efficiency factor
 *        must be between 0 and 1. A negative value allows this parameter
 *        to be free.
@@ -46,6 +48,10 @@
 *        The telescope efficiency. If available the current telescope value 
 *        is used as the default.  Values must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
+*     ETA_TEL = REAL (Write)
+*        The fitted value of ETA_TEL.
+*     GOODFIT = LOGICAL (Write)
+*        Flag to indicate whether the fit was good (TRUE) or bad (FALSE).
 *     MODEL_OUT = CHAR (Write)
 *        The name of the output file that contains the fitted sky
 *        temperatures.
@@ -58,10 +64,16 @@
 *        The name of the sub-instrument whose data are to be
 *        selected from the input file and fitted. Permitted 
 *        values are SHORT, LONG, P1100, P1350 and P2000
+*     TAUZ_FIT = REAL (Write)
+*        The fitted sky opacity for the selected sub instrument.
 *     T_COLD = REAL (Read)
 *        Temperature of the cold load. The default value is
 *        taken from the input file. This parameter is ignored if the
 *        REDUCE_SWITCH'ed data is supplied.
+*     WAVELENGTH = REAL (Write)
+*        The wavelength of the fitted data.
+*     XISW = REAL (Write)
+*        The reduced chi square of the fit.
 
 *  Examples:
 *     skydip jun10_dem_0002 short \
@@ -116,6 +128,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.24  1998/01/12 21:01:43  timj
+*     Add output parameters and update header to reflect change.
+*
 *     Revision 1.23  1998/01/07 20:21:35  timj
 *     Make sure that Model airmass range matches the airmass range of the
 *     data.
@@ -336,6 +351,7 @@ c
       INTEGER PLACE                     ! A placeholder
       REAL    QSORT(SCUBA__MAX_INT)     ! Scratch space for SCULIB_STATR
       LOGICAL RESW                      ! Was the data reduce_switched
+      REAL    REXISQ                    ! Reduced chi square
       INTEGER RUN_NUMBER                ! run number of observation
       LOGICAL SKYDIP                    ! .TRUE. if not RAW data
       INTEGER SLICE_PTR                 ! Pointer to start of slice
@@ -898,7 +914,7 @@ c
 *     Get the fit parameters
 
       CALL PAR_GET0R ('ETA_TEL', ETA_TEL, STATUS )
-      CALL PAR_GET0R ('B_FIT', B, STATUS )
+      CALL PAR_GET0R ('B_VAL', B, STATUS )
 
 *     Ask whether we are using a fixed variance or the actual variance.
 
@@ -913,7 +929,7 @@ c
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY,JSKY_VAR,
      :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
-     :        B_FIT, TAUZ_FIT, STATUS)
+     :        B_FIT, TAUZ_FIT, REXISQ, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             FITFAIL = .FALSE.
@@ -924,6 +940,15 @@ c
             NFILES =1
          ENDIF
       END IF
+
+*     Store the fit parameters
+      
+      CALL PAR_PUT0L('GOODFIT', .NOT.FITFAIL, STATUS)
+      CALL PAR_PUT0R('TAUZ_FIT', TAUZ_FIT, STATUS)
+      CALL PAR_PUT0R('B_FIT', B_FIT, STATUS)
+      CALL PAR_PUT0R('ETA_TEL_FIT', ETA_TEL_FIT, STATUS)
+      CALL PAR_PUT0R('XISQ', REXISQ, STATUS)
+      CALL PAR_PUT0R('WAVELENGTH', WAVE, STATUS)
 
 *     Now create output files
 *     Only create model if we fitted okay
