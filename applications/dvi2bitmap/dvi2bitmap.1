@@ -124,7 +124,7 @@ has the same effect as
 .I "-G, --font-gen=[[boolean]|command[=script]]"
 Switch automatic generation of fonts off and on.
 If 
-.I --fontgen=command
+.I --font-gen=command
 is given, then the command specified at compile time is used to
 generate fonts.  If, further, a font-generation script is specified, then it
 will be used instead of the default.  The specified script is a
@@ -189,7 +189,7 @@ if any fonts were missing.  The
 .I "-n"
 is for brevity and consistency with other tools -- the behaviour can
 be more rationally specified as
-.I "--process=preamble-only"
+.I "--process=nodvi,nopostamble"
 .TP
 .I "-o, --output=[filename-pattern]"
 Choose the output filename pattern.  The value is a 
@@ -362,7 +362,11 @@ Only one of
 and
 .I --query=all-fontgen
 should be specified -- if more than one appears, only the last
-one is respected.
+one is respected.  In each of these four cases, plus their short
+forms, font-generation is automatically suppressed.  This is probably
+what you want (it's not obvious why you're querying this otherwise),
+but if you do not want this, then you can reenable font generation with 
+.I --font-gen=true
 .TP
 .I --query=paper
 Show the list of paper sizes which are predefined for the
@@ -434,17 +438,37 @@ Display the version number and compilation options, and exit.
 Specifies the processing to be done.
 Keywords are as follows
 .IP
-.I options-only=[boolean]
-: if true, then do not process a DVI file at all, and do not require one to be
-present on the command line.  Useful with some of the
-.I "--query"
+.I dvi
+and
+.I nodvi
+: enable or disable processing of the DVI file.  If disabled, we do
+not require a DVI file to be present on the command line.  The 
+.I nodvi
+option is useful with some of the 
+.I --query
 options.
 .IP
-.I preamble-only=[boolean]
-: if true, then only examine the preamble (and therefore necessarily
-also the postamble) of the DVI file.
+.I postamble
+and
+.I nopostamble
+: enable or disable processing of the DVI postamble.  If dvi2bitmap is
+called to invoke a non-seekable device such as a pipe, you should
+disable processing of the postamble.  Disabling the postamble
+processing is incompatible with the 
+.I --query
+options which examine the fonts in the file.  By default, both the
+DVI body and the postamble are processed.
 .IP
-.I blur=[boolean]
+.I --process=preamble-only
+: shorthand for 
+.I --process=nodvi,nopostamble.  Only the preamble is examined.
+This can be expressed more compactly with the conventional
+.I -n
+option.
+.IP
+.I blur
+and
+.I noblur
 : if true, blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
@@ -454,15 +478,21 @@ option to magnify the DVI file, and then the
 .I "--scale"
 option to scale it back down to the correct size.
 .IP
-.I transparent=[boolean]
-: if true, this makes the output bitmap have a transparent background, if
+.I transparent
+and
+.I notransparent
+: option 
+.I transparent
+makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
 .I "--output-type"
 .IP
-.I crop=[boolean]
-: if true, specifies that you want the output bitmap to
+.I crop
+and
+.I nocrop
+: if set, this specifies that you want the output bitmap to
 be cropped.  This is true by default, so you'll most often use the
-.I "crop=false"
+.I nocrop
 to specify that you do not want the output cropped
 (for example, if you're using the
 .I "--paper-size"
