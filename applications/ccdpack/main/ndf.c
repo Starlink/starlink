@@ -84,6 +84,18 @@
 *        of the NDF.  Each element is a two element list giving the 
 *        lower and upper pixel index bound.
 *
+*     ndfob-or-ndfsetob centroid x y frame zoom
+*        This gives the centroided position of the object near the 
+*        point which has coordinates (x,y) in the coordinates of
+*        frame.  Zoom gives the zoom factor at which the object was
+*        identified by the user, on the basis that if the display
+*        of the image is all squashed up small the user is unlikely
+*        to have selected positions to pixel accuracy.
+*
+*        The frame may be specified either as a numerical frame index,
+*        as a domain name, or as one of the special strings "BASE"
+*        or "CURRENT".
+*
 *     ndfob-or-ndfsetob destroy
 *        Releases resources associated with the object.  For an
 *        ndf object it will annul the associated NDF; for an
@@ -379,6 +391,7 @@
    routine. */
       if ( ! strcmp( command, "addframe" ) ||
            ! strcmp( command, "bbox" ) ||
+           ! strcmp( command, "centroid" ) ||
            ! strcmp( command, "destroy" ) ||
            ! strcmp( command, "display" ) ||
            ! strcmp( command, "frameatt" ) ||
@@ -660,6 +673,7 @@
                                "Should be one of -",
                                "\n    addframe baseframe coeffs ?newdomain?",
                                "\n    bbox frame",
+                               "\n    centroid x y frame zoom",
                                "\n    bounds", 
                                "\n    destroy",
                                "\n    display ?-resamp? device loperc hiperc "
@@ -936,6 +950,177 @@
          }
       }
 
+
+/**********************************************************************/
+/* "centroid" command                                                 */
+/**********************************************************************/
+      else if ( ! strcmp( command, "centroid" ) ) {
+         int badtype;
+         int done;
+         int i;
+         int *iframes;
+         int maxit;
+         int ssize;
+         int xdim;
+         int ydim;
+         double cscale;
+         double gxacc;
+         double gxc;
+         double gyacc;
+         double gyc;
+         double maxshift;
+         double toler;
+         double xacc;
+         double xc;
+         double yacc;
+         double yc;
+         double zoom;
+         Ndf1 *ndf1;
+         AstMapping *map;
+         const F77_LOGICAL_TYPE true = F77_TRUE;
+
+/* Check syntax. */
+         if ( objc != 6 ) {
+            Tcl_WrongNumArgs( interp, 2, objv, "x y frame zoom" );
+            return TCL_ERROR;
+         }
+
+/* Allocate some memory. */
+         iframes = malloc( nndf * sizeof( int ) );
+         if ( tclmemok( interp, iframes ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Interpret the frame argument. */
+         if ( NdfGetIframesFromObj( interp, objv[ 4 ], ndfset, iframes )
+              != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Get the numerical arguments. */
+         if ( Tcl_GetDoubleFromObj( interp, objv[ 2 ], &xc ) != TCL_OK ||
+              Tcl_GetDoubleFromObj( interp, objv[ 3 ], &yc ) != TCL_OK ||
+              Tcl_GetDoubleFromObj( interp, objv[ 5 ], &zoom) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+
+/* Set up some parameters for the centroid location. */
+         cscale = max( 1.0, 1.0 / zoom );
+         ssize = (int) rint( cscale * 9.0 );
+         maxshift = cscale * 5.5;
+         toler = min( 0.5, cscale * 0.05 );
+         maxit = 5;
+
+/* Go through the NDFs in the ndfset looking for one which contains the
+   point.  No account is taken of the possibility that the point falls
+   within the bounds of more than 1 NDF, but this isn't a very likely
+   eventuality for normal data. */
+         done = 0;
+         for ( i = 0; i < nndf; i++ ) {
+            ndf1 = ndfs[ i ]->content.ndf1;
+
+/* Get the dimensions of the NDF. */
+            xdim = ndf1->ubnd[ 0 ] - ndf1->lbnd[ 0 ] + 1;
+            ydim = ndf1->ubnd[ 1 ] - ndf1->lbnd[ 1 ] + 1;
+
+/* Map the points from its coordinates in the selected frame to GRID 
+   coordinates. */
+            ASTCALL(
+               map = astGetMapping( ndfs[ i ]->wcs, iframes[ i ], AST__BASE );
+               astTran2( map, 1, &xc, &yc, 1, &gxc, &gyc );
+            )
+
+/* See if the point is within this NDF. */
+            if ( !done && gxc >= 0.5 && gxc <= 0.5 + (double) xdim 
+                       && gyc >= 0.5 && gyc <= 0.5 + (double) ydim ) {
+
+/* Ensure that the NDF is mapped. */
+               if ( ! ndf1->mapped ) {
+                  STARCALL(
+                     domapdata( ndf1, status );
+                  )
+               }
+
+/* Define a macro to call a type-dependent function. */
+#define CASE_CENT(Xccdtype,Xcnftype,Xgentype) \
+                  case Xccdtype: \
+                     F77_CALL(ccg1_cen##Xgentype)( \
+                               DOUBLE_ARG(&gxc), DOUBLE_ARG(&gyc), \
+                               Xcnftype##_ARG(ndf1->data), \
+                               INTEGER_ARG(&xdim), INTEGER_ARG(&ydim), \
+                               INTEGER_ARG(&ssize), LOGICAL_ARG(&true), \
+                               DOUBLE_ARG(&maxshift), \
+                               INTEGER_ARG(&maxit), DOUBLE_ARG(&toler), \
+                               DOUBLE_ARG(&gxacc), DOUBLE_ARG(&gyacc), \
+                               INTEGER_ARG(status) ); \
+                     break;
+
+/* Use the macro we have defined to invoke one of the typed centroiding
+   subroutines. */
+               STARCALL(
+                  errMark();
+                  badtype = 0;
+                  switch( CCD_TYPE( ndf1->mtype ) ) {
+                     CASE_CENT(CCD_TYPE_B,BYTE,b)
+                     CASE_CENT(CCD_TYPE_UB,UBYTE,ub)
+                     CASE_CENT(CCD_TYPE_W,WORD,w)
+                     CASE_CENT(CCD_TYPE_UW,UWORD,uw)
+                     CASE_CENT(CCD_TYPE_I,INTEGER,i)
+                     CASE_CENT(CCD_TYPE_R,REAL,r)
+                     CASE_CENT(CCD_TYPE_D,DOUBLE,d)
+                     default:
+                        badtype = 1;
+                  }
+                  if ( ! badtype ) {
+                     if ( *status == SAI__OK ) {
+                        done = 1;
+                     }
+                     else {
+                        errAnnul( status );
+                     }
+                  }
+                  errRlse();
+                  if ( badtype ) {
+                     *status = SAI__ERROR;
+                     errRep( "OFFSET_BADTYP", "Bad type value", status );
+                  }
+               )
+
+/* Undefine the macro. */
+#undef CASE_CENT
+
+/* The centroid has been found.  Transform the coordinates back to those
+   of the selected frame. */
+               if ( done ) {
+                  ASTCALL(
+                     astTran2( map, 1, &gxacc, &gyacc, 0, &xacc, &yacc );
+                  )
+               }
+
+/* Clear up AST objects. */
+               ASTCALL(
+                  astAnnul( map );
+               )
+            }
+         }
+
+/* Free allocated memory. */
+         free( iframes );
+
+/* Construct the result. */
+         if ( done ) {
+            result = Tcl_NewListObj( 0, NULL );
+            Tcl_ListObjAppendElement( interp, result, 
+                                      Tcl_NewDoubleObj( xacc ) );
+            Tcl_ListObjAppendElement( interp, result,
+                                      Tcl_NewDoubleObj( yacc ) );
+         }
+         else {
+            result = Tcl_NewStringObj( "Centroiding failed", -1 );
+            Tcl_SetObjResult( interp, result );
+            return TCL_ERROR;
+         }
+      }
 
 /**********************************************************************/
 /* "destroy" command                                                  */
@@ -1609,6 +1794,7 @@
                                "Should be one of -",
                                "\n    addframe baseframe coeffs ?newdomain?",
                                "\n    bbox frame",
+                               "\n    centroid x y frame zoom",
                                "\n    destroy",
                                "\n    display ?-resamp? device loperc hiperc "
                                              "frame ?plotstyle?",
