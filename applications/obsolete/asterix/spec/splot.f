@@ -84,7 +84,8 @@
 *        Nov 93: V1.7-4 Complete rebuild and new features (RJV)
 *     19 Mar 94: V1.7-5 Model component plot (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     24 Apr 95 : V1.8-1 Updated input and model data interfaces (DJA)
+*     24 Apr 95 : V1.8-1 Updated input and model data interfaces. Use
+*                        ADI style response matrices (DJA)
 *
 *    Type definitions :
 	IMPLICIT NONE
@@ -1367,15 +1368,28 @@
 
       ENDIF
 
-*     no bounds available, so derive them by interpoln from response matrix
-      IF(.NOT.CBOUNDS)THEN
+*  No bounds available, so derive them by interpoln from response matrix.
+*  Can only do this for ASTERIX style responses - not likely to be a
+*  problem for non-ASTERIX responses anyhow.
+      IF ( .NOT. CBOUNDS ) THEN
+
+        CALL ADI_CSIZE( INSTR.R_ID, 'RMF', NRESP, STATUS )
+        CALL ADI_CMAPI( INSTR.R_ID, 'ChannelIndices', 'READ', CIPTR,
+     :                  STATUS )
+        CALL ADI_CMAPI( INSTR.R_ID, 'EnergyIndices', 'READ', EIPTR,
+     :                  STATUS )
+        CALL ADI_CMAPR( INSTR.R_ID, 'RMF', 'READ', RPTR, STATUS )
         CALL MSG_PRNT('Deriving channel energies & widths '
      :        //'from response matrix')
-        CALL SPEC_CHEN(NVAL,INSTR.NRESP,
-     :            %val(INSTR.MIPTR),%val(INSTR.DIPTR),
-     :                %val(INSTR.RESPTR),%val(PFXPTR),%val(PXPTR),
-     :                                          %val(PWPTR),STATUS)
-      ENDIF
+        CALL SPEC_CHEN( NVAL, NRESP, %VAL(CIPTR), %VAL(EIPTR),
+     :                  %VAL(RPTR), %val(PFXPTR), %val(PXPTR),
+     :                                   %val(PWPTR), STATUS )
+
+        CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelIndices', CIPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR.R_ID, 'EnergyIndices', EIPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR.R_ID, 'RMF', RPTR, STATUS )
+
+      END IF
 
 *   Interpolate to give predicted model space fluxes at channel energies
       CALL MATH_LINTERP(NFIT,%val(PFXPTR),%val(PFDPTR),
