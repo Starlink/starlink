@@ -15,7 +15,7 @@
 #ifndef vms
 
 #include "sae_par.h"
-#include "sys/termio.h"
+#include "termio.h"
 #include "f77.h"
 #include "asterix.h"
 
