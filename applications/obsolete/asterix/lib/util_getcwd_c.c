@@ -98,7 +98,7 @@
 /* UNIX definitions
  */
 #else
-#include <sys/param.h>			/* Brings in getwd and MAXPATHLEN */
+#include <unistd.h>
 
 #endif
 
@@ -115,7 +115,7 @@ F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
 
 #if defined(VAX)
 #else
-   char ptest[MAXPATHLEN];
+   char *ptest;
 #endif
 
 /* Check inherited global status on entry */
@@ -142,18 +142,20 @@ F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
   if ( pthstr ) cnf_free( pthstr );
 #else
 
-/* Set status from getwd result */
-  *status = getwd( ptest ) ? SAI__OK : SAI__ERROR;
+/* Get working directory */
+  ptest = getcwd( NULL, 0 );
 
 /* Will we have to truncate the text? */
-  if ( strlen(ptest) > pathnm_length ) {
+  if ( ! ptest ) {
     *status = SAI__ERROR;
-    ems_rep_c( " ", "Text truncated copying current directory name", status );
+    ems_rep_c( " ", "Out of memory getting current directory name", status );
     }
   else {
 
 /* Export C string to Fortran */
     cnf_exprt( ptest, pathnm, pathnm_length );
+
+    free( ptest );
     }
 #endif
 
