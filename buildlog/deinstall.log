@@ -199,31 +199,26 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/coco/.coco.install
      [echo] Executing RV target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/rv/.rv.install
      [echo] Executing FROG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 BUILD SUCCESSFUL
-Total time: 23 seconds
+Total time: 19 seconds

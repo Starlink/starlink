@@ -388,7 +388,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 126 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 127 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 10 empty directories to 1 empty directory under /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -430,7 +430,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/java
-     [copy] Copying 11 files to /apps/cvsbuild/java/source/vo/build/java
+     [copy] Copying 17 files to /apps/cvsbuild/java/source/vo/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -495,4 +495,4 @@ javadoc-sources:
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:561: No supported regular expression matcher found
 
-Total time: 46 seconds
+Total time: 40 seconds

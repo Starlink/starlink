@@ -50,6 +50,8 @@ build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
     [javac] Compiling 50 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 18 files to /apps/cvsbuild/java/source/util/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/util/lib/util
      [echo] Executing Task target: build
 
 prepare:
@@ -196,7 +198,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 121 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 122 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -272,13 +274,15 @@ prepare:
 
 check_packages:
 
+ws_sources_check:
+
 ws_sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/java
-[axis-wsdl2java] WSDL2Java http://nvo.stsci.edu/voregistry/registry.asmx?WSDL
+[axis-wsdl2java] WSDL2Java file:/apps/cvsbuild/java/source/vo/src/wsdl/registry.wsdl
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/vo/build/classes
-    [javac] Compiling 90 source files to /apps/cvsbuild/java/source/vo/build/classes
+    [javac] Compiling 96 source files to /apps/cvsbuild/java/source/vo/build/classes
      [echo] Executing JAIUtil target: build
 
 prepare:
@@ -449,7 +453,7 @@ build:
      [copy] Copied 5 empty directories to 2 empty directories under /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 69 files to /apps/cvsbuild/java/source/treeview/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/treeview/lib/treeview
      [echo] Executing Coco target: build
 
 prepare:
@@ -506,4 +510,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 30 seconds
+Total time: 1 minute 22 seconds

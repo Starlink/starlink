@@ -204,18 +204,14 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/topcat/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/bin
    [delete] Deleting directory /apps/cvsbuild/java/source/topcat/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/topcat/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/topcat/etc
      [echo] Executing Treeview target: clean
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/bin
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
      [echo] Executing Coco target: clean
 
 clean:
@@ -232,10 +228,8 @@ clean:
 
 clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/bin
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/docs
-   [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 26 seconds
+Total time: 17 seconds

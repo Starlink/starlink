@@ -9675,6 +9675,7 @@ cvs checkout: Updating java/source/table/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table
 U java/source/table/src/main/uk/ac/starlink/table/AbstractStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ArrayColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/BeanStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/BlankColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnData.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
@@ -9821,6 +9822,7 @@ cvs checkout: Updating java/source/table/src/testcases/uk/ac
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
 U java/source/table/src/testcases/uk/ac/starlink/table/AutoStarTable.java
+U java/source/table/src/testcases/uk/ac/starlink/table/BeanTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/FormatsTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/RowListTableTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/RowSubsetTest.java
@@ -10264,6 +10266,7 @@ cvs checkout: Updating java/source/treeview/src/etc/demo/zip
 U java/source/treeview/src/etc/demo/zip/hello.jar
 U java/source/treeview/src/etc/demo/zip/hello_src.zip
 cvs checkout: Updating java/source/treeview/src/lib
+U java/source/treeview/src/lib/apache-tar.jar
 U java/source/treeview/src/lib/commons-net-1.0.0.jar
 cvs checkout: Updating java/source/treeview/src/main
 cvs checkout: Updating java/source/treeview/src/main/uk
@@ -10502,6 +10505,8 @@ U java/source/util/build.xml
 cvs checkout: Updating java/source/util/src
 cvs checkout: Updating java/source/util/src/etc
 U java/source/util/src/etc/logging.properties
+cvs checkout: Updating java/source/util/src/lib
+U java/source/util/src/lib/apache-bzip2.jar
 cvs checkout: Updating java/source/util/src/main
 cvs checkout: Updating java/source/util/src/main/uk
 cvs checkout: Updating java/source/util/src/main/uk/ac
@@ -10616,19 +10621,28 @@ U java/source/vo/src/main/uk/ac/starlink/vo/BeanTableModel.java
 U java/source/vo/src/main/uk/ac/starlink/vo/CheckBoxMenu.java
 U java/source/vo/src/main/uk/ac/starlink/vo/ConeSearch.java
 U java/source/vo/src/main/uk/ac/starlink/vo/ConeSearchDialog.java
+U java/source/vo/src/main/uk/ac/starlink/vo/DoubleValueField.java
 U java/source/vo/src/main/uk/ac/starlink/vo/MetaColumnModel.java
 U java/source/vo/src/main/uk/ac/starlink/vo/RegistryInterrogator.java
 U java/source/vo/src/main/uk/ac/starlink/vo/RegistryPanel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryQuery.java
 U java/source/vo/src/main/uk/ac/starlink/vo/RegistryQueryPanel.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryServiceTableLoadDialog.java
 U java/source/vo/src/main/uk/ac/starlink/vo/RegistryTable.java
+U java/source/vo/src/main/uk/ac/starlink/vo/RegistryTableLoadDialog.java
+U java/source/vo/src/main/uk/ac/starlink/vo/SiapQuery.java
+U java/source/vo/src/main/uk/ac/starlink/vo/SiapTableLoadDialog.java
 U java/source/vo/src/main/uk/ac/starlink/vo/ValueConverter.java
-U java/source/vo/src/main/uk/ac/starlink/vo/ValueField.java
+U java/source/vo/src/main/uk/ac/starlink/vo/ValueFieldPanel.java
 cvs checkout: Updating java/source/vo/src/testcases
 cvs checkout: Updating java/source/vo/src/testcases/uk
 cvs checkout: Updating java/source/vo/src/testcases/uk/ac
 cvs checkout: Updating java/source/vo/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/vo/src/testcases/uk/ac/starlink/vo
 U java/source/vo/src/testcases/uk/ac/starlink/vo/RegistryTest.java
+U java/source/vo/src/testcases/uk/ac/starlink/vo/UpToDateTest.java
+cvs checkout: Updating java/source/vo/src/wsdl
+U java/source/vo/src/wsdl/registry.wsdl
 cvs checkout: Updating java/source/votable
 U java/source/votable/.properties
 U java/source/votable/build.xml
