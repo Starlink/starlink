@@ -330,7 +330,8 @@
               CALL DYN_MAPR( 1, NELM, WPTR, STATUS )
 
 *          Convert to values to half-widths
-              CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
+              CALL BDI1_INVNT_V2HW( NELM, %VAL(PTR), %VAL(WPTR),
+     :                              STATUS )
 
 *          Free mapped data
               CALL BDI1_UNMAP_INT( PSID, STATUS )
@@ -358,12 +359,6 @@
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
-
-*    If mapping went ok, store the pointer in the return argument
-        CALL ADI_NEWV0I( PTR, OARG, STATUS )
-
-*    Release the object
-        CALL DAT_ANNUL( CLOC, STATUS )
 
       ELSE
 
