@@ -1,0 +1,67 @@
+## CONHELP - Gives help about CONVERT.
+
+#+
+#  Name:
+#     CONHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 July 30 (MJC):
+#	 Original version.
+#     {enter_any_changes_here}
+
+#-
+
+
+interface CONHELP
+
+   helplib        CONVERT_HELP:
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+      helpkey     '*'
+   endparameter
+
+endinterface
+
