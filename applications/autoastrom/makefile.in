@@ -282,7 +282,7 @@ help:
 
 #  Name of computer hardware/OS combination.
 
-SYSTEM = @SYSTEM@
+SYSTEM = @BUILD_SYSTEM@
 
 #  Name used to distinguish platform-specific source files.
 
@@ -396,7 +396,7 @@ PKG_VERS = @PACKAGE_VERSION@
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk VERSION $(DOCUMENTATION) \
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in mk VERSION $(DOCUMENTATION) \
 	$(MATCHPROG).tar
 
 #  Source directory for catlib is ./catlib; the directory it's
@@ -1129,8 +1129,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar:
-	cd astrom && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
-	cd moggy && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
+	cd astrom && sh bootstrap || \
+		{ echo "Need newer version of autoconf!"; false; }
+	cd moggy && AUTOMAKE='automake --foreign' autoreconf || \
+		{ echo "Need newer version of autoconf!"; false; }
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 # Do not include the t/images directory -- large files!
