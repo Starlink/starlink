@@ -191,8 +191,8 @@
 *      Store the object as a component of the BinDS object
           CALL BDI0_STOINV( ARGS(1), ITEM, ITID, STATUS )
 
-*      Locate the BDI private storage for the item, creating if required
-          CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+*      Locate the private storage for the item, creating if required
+          CALL ADI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *      Map the invented object
           CALL ADI_MAPL( ITID, 'WRITE', PTR, STATUS )
@@ -209,7 +209,7 @@
           CALL ADI_UNMAP( ARGS(4), IPTR, STATUS )
 
 *      Release storage
-          CALL BDI1_UNMAP_INT( ARGS(1), ARGS(2), PSID, STATUS )
+          CALL ADI0_UNMAP( ARGS(1), ARGS(2), PSID, STATUS )
 
         END IF
 

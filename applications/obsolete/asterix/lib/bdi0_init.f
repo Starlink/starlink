@@ -95,7 +95,8 @@
       EXTERNAL			BDI1_GET
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_PUT
-      EXTERNAL			BDI1_UNMAP
+
+      EXTERNAL			BDI0_UNMAP
 
       EXTERNAL			BDI2_SCMAP
 
@@ -157,7 +158,7 @@
 
         CALL ADI_DEFFUN(
      :       'FileItemUnmap(_,_HDSfile,_CHAR,_INTEGER)',
-     :                   BDI1_UNMAP, DID, STATUS )
+     :                   BDI0_UNMAP, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemPut(_,_HDSfile,_CHAR,_)',

@@ -144,8 +144,8 @@
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
 
-*    Locate the BDI private storage for the item, creating if required
-        CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+*    Locate the private storage for the item, creating if required
+        CALL ADI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Map the array
         CALL BDI1_ARYMAP( ARGS(1), CLOC, TYPE, MODE, NDIM, DIMS, PSID,
@@ -167,8 +167,8 @@
 *      Store the object as a component of the BinDS object
           CALL BDI0_STOINV( ARGS(1), ITEM, ITID, STATUS )
 
-*      Locate the BDI private storage for the item, creating if required
-          CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+*      Locate the private storage for the item, creating if required
+          CALL ADI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *      Map the invented object
           CALL ADI_MAP( ITID, TYPE, MODE, PTR, STATUS )

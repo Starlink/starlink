@@ -182,7 +182,7 @@
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
 
 *    Private storage for axis data
-        CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
+        CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
      :                    STATUS )
 
 *    Create invented object and map
@@ -210,7 +210,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Private storage for axis data
-        CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
+        CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
      :                    STATUS )
 
 *    Map it
@@ -225,7 +225,7 @@
         CALL BDI1_INVNT_V2W( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *    Free mapped file data and mapped item
-        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+        CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
 *    Set the WriteBack function
@@ -372,8 +372,8 @@
 *    Create invented object
         CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
 
-*    Locate the BDI private storage for the data, creating if required
-        CALL BDI0_LOCPST( BDID, 'Data', .TRUE., PSID, STATUS )
+*    Locate the private storage for the data, creating if required
+        CALL ADI0_LOCPST( BDID, 'Data', .TRUE., PSID, STATUS )
 
 *    Map it
         CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
@@ -398,7 +398,7 @@
 
 *    Unmap the invented object and the file data
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
-        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+        CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
 
 *    Set the WriteBack function
         IF ( .NOT. RMODE ) THEN
@@ -422,8 +422,8 @@
 *    Copy file data to invented object if appropriate
         IF ( .NOT. WMODE ) THEN
 
-*      Locate the BDI private storage for the variance, creating if required
-          CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
+*      Locate the private storage for the variance, creating if required
+          CALL ADI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
 
 *      Map it
           CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
@@ -446,7 +446,7 @@
 
 *      Unmap the invented object and the file data
           CALL ADI_UNMAP( ITID, WPTR, STATUS )
-          CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+          CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
 
 *      Release storage
           CALL ADI_ERASE( PSID, STATUS )
@@ -470,8 +470,8 @@
 *    Create invented object
         CALL ADI_NEW( TYPE, NDIM, DIMS, ITID, STATUS )
 
-*    Locate the BDI private storage for the variance, creating if required
-        CALL BDI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
+*    Locate the private storage for the variance, creating if required
+        CALL ADI0_LOCPST( BDID, 'Variance', .TRUE., PSID, STATUS )
 
 *    Map it
         CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
@@ -496,7 +496,7 @@
 
 *    Unmap the invented object and the file data
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
-        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+        CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
@@ -511,7 +511,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
 *    Private storage for axis data
-        CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
+        CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Data', .TRUE., PSID,
      :                    STATUS )
 
 *    Map it
@@ -523,7 +523,7 @@
      :                   .FALSE., WLOC, TNDIM, TDIMS, STATUS )
         IF ( WLOC .NE. DAT__NOLOC ) THEN
 
-          CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Width', .TRUE., WPSID,
+          CALL ADI0_LOCPST( BDID, ITEM(1:7)//'Width', .TRUE., WPSID,
      :                      STATUS )
 
           CALL BDI1_ARYMAP( BDID, WLOC, 'REAL', 'READ', NDIM, DIMS,
@@ -547,10 +547,10 @@
      :                        %VAL(PTR2), %VAL(WPTR), STATUS )
 
 *    Free mapped file data and mapped item
-        CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+        CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
         CALL ADI_UNMAP( ITID, WPTR, STATUS )
         IF ( PTR2 .NE. 0 ) THEN
-          CALL BDI1_UNMAP_INT( BDID, HFID, WPSID, STATUS )
+          CALL ADI0_UNMAP( BDID, HFID, WPSID, STATUS )
           CALL DAT_ANNUL( WLOC, STATUS )
         END IF
 
@@ -569,8 +569,8 @@
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( CLOC .NE. DAT__NOLOC ) THEN
 
-*      Locate the BDI private storage for the item, creating if required
-          CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
+*      Locate the private storage for the item, creating if required
+          CALL ADI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *      Map it
           CALL BDI1_ARYMAP( BDID, CLOC, TYPE, 'READ', NDIM, DIMS,
@@ -584,7 +584,7 @@
           CALL BDI1_INVNT_W2HW( NELM, %VAL(PTR), %VAL(WPTR), STATUS )
 
 *      Free mapped data
-          CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+          CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
           CALL ADI_UNMAP( ITID, WPTR, STATUS )
 
         ELSE
@@ -597,8 +597,8 @@
      :                     .FALSE., CLOC, NDIM, DIMS, STATUS )
           IF ( CLOC .NE. DAT__NOLOC ) THEN
 
-*        Locate the BDI private storage for the item, creating if required
-            CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
+*        Locate the private storage for the item, creating if required
+            CALL ADI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *        Is width defined by array type?
             CALL DAT_TYPE( CLOC, LTYPE, STATUS )
@@ -630,7 +630,7 @@
             END IF
 
 *        Unmap axis data
-            CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
+            CALL ADI0_UNMAP( BDID, HFID, PSID, STATUS )
 
 *        Free mapped data
             CALL ADI_UNMAP( ITID, WPTR, STATUS )
