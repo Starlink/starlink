@@ -94,14 +94,14 @@
         DO WHILE (RFMTOK.AND.RANGESTR(I:I).NE.DOLLAR)
 
 *        One colon per dimension
-          IF ((RANGESTR(I:I).EQ.COLON)      .OR.
-     &        (RANGESTR(I:I).EQ.SEMICOLON)) THEN
+          IF (RANGESTR(I:I).EQ.COLON) THEN
             NCOLON=NCOLON+1
             RFMTOK=(NCOLON.LE.NDIMS)
 
 *          comma separating dimensions must have been preceded by
 *          correct number of colons
-          ELSEIF (RANGESTR(I:I).EQ.COMMA) THEN
+          ELSEIF (RANGESTR(I:I).EQ.COMMA .OR.
+     &        RANGESTR(I:I).EQ.SEMICOLON) THEN
             RFMTOK=(NCOLON.EQ.IDIM)
             IDIM=IDIM+1
 
