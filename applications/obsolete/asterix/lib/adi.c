@@ -210,9 +210,6 @@ ADIobj ADIcvStdOut      = ADI__nullid;
 
 static ADIobj   ADI_G_stdmcf = ADI__nullid;
 
-static ADIblock *last_bt=NULL;
-static ADIidIndex last_ibt = 9;
-
 char *adix_idd( ADIobj id )
   {
   ADIblock	*b;
@@ -228,12 +225,7 @@ char *adix_iddt( ADIobj id, ADIclassDef **cdef )
   ADIblock	*b;
   ADIidIndex	ib = _ID_IBLK(id);
 
-  if ( ib == last_ibt )
-    b = last_bt;
-  else {
-    last_ibt = ib;
-    b = last_bt = ADI_G_blks[ib];
-    }
+  b = ADI_G_blks[ib];
 
   *cdef = b->cdef;
 
