@@ -1,6 +1,6 @@
 *+  SFIT_OPETABLE - Write an error table to a specified o/p unit
       SUBROUTINE SFIT_OPETABLE( NPAR, PARAM, NEPAR, PARS, LE, UE,
-     :                          PEGCODE, MODEL, OCI, STATUS )
+     :                          FROZEN, PEGCODE, MODEL, OCI, STATUS )
 *
 *    Description :
 *
@@ -20,6 +20,7 @@
 *      8 Dec 92 : Original (DJA)
 *     25 Jul 94 : Converted to use AIO system (DJA)
 *     22 Jan 96 : Added NEPAR and PARS (DJA)
+*     24 Jan 96 : Added FROZEN array (DJA)
 *
 *    Type definitions :
 *
@@ -28,7 +29,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -47,6 +47,7 @@
       INTEGER			PARS(*)	  ! Pars with new errors
       REAL                  LE(NPAR)      ! Parameter lower bounds
       REAL                  UE(NPAR)      ! Parameter upper bounds
+      LOGICAL			FROZEN(NPAR)
       INTEGER               PEGCODE(NPAR) ! Pegging codes
       RECORD /MODEL_SPEC/   MODEL	  ! Model specification
       INTEGER			OCI			! AIO stream id
@@ -125,7 +126,7 @@
 *      Make model parameter upper case if this is one of the parameters
 *      whose errors have been found on this iteration
         PNAM = MODEL.PARNAME(J)
-        IF ( ISNEW ) THEN
+        IF ( ISNEW .AND. .NOT. FROZEN(J) ) THEN
           CALL CHR_UCASE( PNAM )
         END IF
 
