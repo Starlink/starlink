@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="adamnet">
+  <version>1.0</version>
+  <path>libraries/pcs/adamnet</path>
+  <description>Implements the ADAM networking process. It interfaces
+  the ADAM intertask communication software on unix to TCP/IP, thereby
+  allowing ADAM tasks on different machines to communicate with one
+  another. </description>
+  <dependencies>
+    <build> sae messys adam ams msp sock messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.D.Kelly (REVAD::BDK)</name>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>

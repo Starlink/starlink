@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/adamnet</path>
+  <description>Implements the ADAM networking process. It interfaces
+  the ADAM intertask communication software on unix to TCP/IP, thereby
+  allowing ADAM tasks on different machines to communicate with one
+  another. </description>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.D.Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Brian K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>b.k.mcilwrath@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+</component>
