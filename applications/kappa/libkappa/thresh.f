@@ -139,6 +139,8 @@
 *     6-DEC-2000 (DSB):
 *        Allow THRLO to be greater than THRHI in order to exclude a range
 *        of data values.
+*     6-JUL-2001 (DSB):
+*        Correct setting of bad pixel flag in output.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -427,7 +429,7 @@
 *  If there may have been bad values substituted, set the bad-pixel
 *  flag.
       IF ( COMP .NE. 'QUALITY' )
-     :  CALL NDF_SBAD( BAD, NDFO, COMP, STATUS )
+     :  CALL NDF_SBAD( BAD .OR. BPFLAG, NDFO, COMP, STATUS )
 
 *  Write an error report if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
