@@ -2025,14 +2025,15 @@ itcl::class gaia::GaiaSextractor {
       $astrocat delete
 
       #  Now open the catalogue window.
-      set astrocat [cat::AstroCat::open_catalog_window $catalogue \
-                       [code $itk_option(-image)] $itk_option(-astrocat)]
+      set astrocat [gaia::GaiaSearch::new_local_catalog \
+                       $catalogue [code $itk_option(-image)] \
+                       $itk_option(-astrocat)]
 
       #  Now display the catalogue.
       if { $astrocat == {} } {
 
-         #  Switch searching back on and kick window to reload the
-         #  catalogue.
+         #  Catalogue window exists, switch searching back on and kick
+         #  it to force a reload.
          $itk_option(-astrocat)::allow_searches 1
          set_maxobjs_ $catalogue
          set_plot_symbols_ $astrocatnames_($catalogue)

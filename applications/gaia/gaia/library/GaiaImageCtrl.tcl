@@ -488,6 +488,10 @@ itcl::class gaia::GaiaImageCtrl {
    #  Load a FITS file (internal version: use -file option/public
    #  variable), modified to deal with image slices.
    public method load_fits_ {} {
+      
+      #  See if the image should be saved (image server types).
+      check_save
+      
       #  Deal with any slice specification.
       set image $itk_option(-file)
       set i1 [string last {(} $image]
@@ -522,6 +526,8 @@ itcl::class gaia::GaiaImageCtrl {
          clear
       }
       update_title
+      apply_history $itk_option(-file)
+      component colorramp update_colors
    }
 
    #  Check if any other instance of this class is displaying the

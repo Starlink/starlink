@@ -239,6 +239,56 @@ itcl::class gaia::GaiaSearch {
       label_selected_object
    }
 
+   #  This member procedure is used to open a window for the named
+   #  local catalogue, or reuse the existing one for the catalog, if it
+   #  is already open. It assumes that the local catalogue exists.
+   #
+   #    name      is the long name of catalogue
+   #
+   #    id        is an optional unique id to be associated with a new
+   #              catalogue widget. 
+   #
+   #    classname is the name of the AstroCat subclass to use to
+   #              create new catalogue widgets (defaults to "AstroCat"). 
+   #
+   #    debug     is a flag: if true, run queries in foreground
+   #
+   #    w         should be the top level window of the caller, if specified
+   public proc new_local_catalog {name {id ""} {classname AstroCat}
+                                  {debug 0} {type "catalog"} {w ""}} { 
+
+      #  Check for existing catalogue.
+      set i "$name,$id"
+      if {[info exists instances_($i)] && [winfo exists $instances_($i)]} {
+         utilRaiseWindow $instances_($i)
+         if {"[$instances_($i).cat servtype]" == "local"} {
+
+            #  Start a search to update the window.
+            $instances_($i) search
+         }
+         return
+      }
+
+      #  If $w was specified, put the window under that top level window
+      #  so we get the window numbers right (for cloning, see TopLevelWidget).
+      if {[winfo exists $w]} {
+         set instname $w.ac[incr n_instances_]
+      } else {
+         set instname .ac[incr n_instances_]
+      }
+
+      #  Create the new window.
+      set instances_($i) \
+         [$classname $instname \
+             -id $id \
+             -debug $debug \
+             -catalog $name \
+             -catalogtype catalog \
+             -tcs 0 \
+             -transient 0 \
+             -center 0]
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 
