@@ -66,21 +66,16 @@ AM_CFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
 # that it has to load a libgwm twice.
 
 libtclAdam_la_SOURCES = $(ADAM_ROUTINES)
-libtclAdam_la_LIBADD = `ams_link_adam` `ems_link_adam` @TCL_LIBS@
 
 libtkGwm_la_SOURCES = $(GWM_ROUTINES)
-libtkGwm_la_LIBADD = `gwm_link_adam` `chr_link_adam` `ems_link_adam` \
-	@TCL_LIBS@ @TK_LIBS@
 
-# Note that linking against libtclAdam.la automatically links in the
-# relevant AMS libraries from the libtclAdam line above
 atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
-atclsh_LDADD = `nbs_link` libtclAdam.la @TCL_LIBS@
+atclsh_LDADD = `nbs_link` `ams_link_adam` `ems_link_adam` \
+      libtclAdam.la @TCL_LIBS@
 
-# Note that linking against libtclAdam and libtkGwm automatically
-# brings in AMS and GWM libraries from the lib definition above
 awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
 awish_LDADD = `nbs_link` `chr_link_adam` \
+        `gwm_link_adam` `ems_link_adam` `ams_link_adam` \
 	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@
 
 # Define what is to be done with which sets of files.
