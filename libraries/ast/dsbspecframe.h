@@ -90,6 +90,7 @@ typedef struct AstDSBSpecFrameVtab {
    void (* ClearSideBand)( AstDSBSpecFrame * );
    void (* SetSideBand)( AstDSBSpecFrame *, int );
 
+   double (* GetImagFreq)( AstDSBSpecFrame * );
 
 } AstDSBSpecFrameVtab;
 #endif
@@ -139,6 +140,8 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *, size_t, AstDSBSpecFrameVtab *,
    int astTestSideBand_( AstDSBSpecFrame * );
    void astClearSideBand_( AstDSBSpecFrame * );
    void astSetSideBand_( AstDSBSpecFrame *, int );
+
+   double astGetImagFreq_( AstDSBSpecFrame * );
 #endif
 
 /* Function interfaces. */
@@ -216,5 +219,7 @@ astINVOKE(V,astClearSideBand_(astCheckDSBSpecFrame(this)))
 #define astSetSideBand(this,val) \
 astINVOKE(V,astSetSideBand_(astCheckDSBSpecFrame(this),val))
 
+#define astGetImagFreq(this) \
+astINVOKE(V,astGetImagFreq_(astCheckDSBSpecFrame(this)))
 #endif
 #endif
