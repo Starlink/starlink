@@ -3,6 +3,7 @@
 % ? Specify used packages
 % \usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
+\usepackage[english]{babel}    %  Ensure sensible hyphenation (esp. linux)
 % ? End of specify used packages
 
 \pagestyle{myheadings}
@@ -15,11 +16,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {225.1(Draft)}
-\newcommand{\stardocauthors}   {M. B. Taylor}
-\newcommand{\stardocdate}      {19 January 1999}
+\newcommand{\stardocnumber}    {225.2}
+\newcommand{\stardocauthors}   {M.\ B.\ Taylor}
+\newcommand{\stardocdate}      {10 December 1999}
 \newcommand{\stardoctitle}     {SCB --- Source Code Browser}
-\newcommand{\stardocversion}   {1.0-1}
+\newcommand{\stardocversion}   {1.1-0}
 \newcommand{\stardocmanual}    {Use and installation guide}
 \newcommand{\stardocabstract}  {
 This document describes the installation and use of SCB, 
@@ -364,20 +365,20 @@ using {\tt compress} or {\tt gzip} (and named with a suffix .Z or .gz
 respectively).
 The former of these is the usual format if the sources are in
 their usual location, {\tt /star/sources}.
-If undefined at build time and run time, SCB\_SOURCES 
+If undefined at install time and run time, SCB\_SOURCES 
 defaults to {\tt \$STARLINK/sources}.
 \item[SCB\_INDEX]
 The directory containing the index files (around 5--10 Mbyte for the full
 Starlink source collection).
-If undefined at build time and run time, SCB\_INDEX defaults to
+If undefined at install time and run time, SCB\_INDEX defaults to
 {\tt \$INSTALL/etc/scb}.
 \item[SCB\_BROWSER\_TMP]
 The directory used by the browser program to store temporary files. 
-If undefined at build time and run time, SCB\_BROWSER\_TMP defaults to
+If undefined at install time and run time, SCB\_BROWSER\_TMP defaults to
 {\tt /usr/tmp/scb}.
 \item[SCB\_INDEXER\_TMP]
 The directory used by the indexer program to store temporary files. 
-If undefined at build time and run time, SCB\_INDEXER\_TMP defaults to
+If undefined at install time and run time, SCB\_INDEXER\_TMP defaults to
 {\tt /usr/tmp/scb}.
 \item[HTX\_SERVER]
 The URL of an HTTP server which will provide HTX versions of the Starlink
@@ -389,16 +390,9 @@ Thus if the {\tt /star/docs} directory is being served, the URL of
 the top of that tree will do.
 If undefined at build time, HTX\_SERVER defaults to 
 {\tt http://star-www.rl.ac.uk/cgi-bin/htxserver/}.
-\item[MIMETYPES\_FILE]
-This should give the location of a MIME type mapping file,
-which can probably be found named {\tt mime.types}
-as part of the HTTP server installation.
-It is used for the CGI script
-to serve some non-text documents as their proper MIME types,
-but not much functionality is lost if it does not point to a suitable file.
 \end{description}
-It is possible to change the defaults from the built values by
-modifying the file {\tt \$PERL\_MOD\_DIR/Scb.pm}.
+It is possible to change the defaults from the installed values by
+modifying the file {\tt \$SCB\_DIR/Scb.pm}.
 
 An example site installation from source files might go as follows:
 \begin{quote}
@@ -408,7 +402,6 @@ An example site installation from source files might go as follows:
     ...
 % setenv SCB_BROWSER_TMP /scratch/scb/browser
 % setenv SCB_INDEXER_TMP /scratch/scb/indexer
-% setenv MIMETYPES_FILE /usr/local/etc/httpd/conf/mime.types
 % setenv INSTALL /star
 % mk install
     ...
@@ -441,12 +434,6 @@ This is not a very serious handicap, but can be fixed by
 installing GDBM or BSD DB, which are available in the public domain.
 Typically, BSD DB will be installed on a Linux or Digital Unix system,
 but a Solaris system may lack all of the preferred implementations. 
-
-
-SCB requires Perl 5
-and has been tested using the version distributed with the 
-Starlink software collection. 
-Other versions of Perl may work, but have not been tested.
 
 
 \subsection{\xlabel{sec:install-cgi}\label{sec:install-cgi}Installing the CGI script}
@@ -482,7 +469,7 @@ and a line like the following to the {\tt conf/srm.conf} file:
 ScriptAlias /cgi-bin/star/ /star/bin/cgi/
 \end{verbatim}
 \end{quote}
-Alternatively, the script {\tt /star/bin/cgi/scb.pl} may be copied 
+Alternatively, the script INSTALL{\tt /bin/cgi/scb.pl} may be copied 
 into an existing CGI directory;
 if correctly installed it should still work if its name or location 
 are changed.
@@ -498,12 +485,14 @@ In particular, heavy use may be made of the following resources:
 \begin{description}
 \item[CPU time] 
 Parsing source files to add the HTML tags is done on the fly by 
-the browser program, and while for most of the source files this 
-is quite fast, for some of the very large files it can 
-take a matter of seconds or even minutes.
+the browser program.
+On the whole this is pretty fast - few will take more than a couple of
+seconds to serve, but very large source files, or very many concurrent
+requests, might put a significant load on the system.
 \item[Memory]
-Again the parsing can take a significant amount of memory when the
-file to be parsed is very large.
+Again memory use should be fairly modest, but if the browser gets into
+trouble tagging a large source file it might briefly take a big
+chunk of memory.
 \item[Temporary disk space]
 Temporary files will created in the SCB\_BROWSER\_TMP directory
 if it is necessary to unpack tar archives.  The problem is most acute
@@ -530,14 +519,49 @@ in the SCB\_SOURCES directory
 \end{description}
 
 
+\subsection{\xlabel{sec:startup}\label{sec:startup}Using the commands}
+
+If you are going to use any of the commands in the package from the
+Unix C shell you should issue the command
+\begin{quote}
+\begin{verbatim}
+% source $INSTALL/scb/scb.csh
+\end{verbatim}
+\end{quote}
+or just
+\begin{quote}
+\begin{verbatim}
+% scb
+\end{verbatim}
+\end{quote}
+This sets up aliases for the package commands 
+({\tt scbindex}, {\tt scb}, {\tt dbmcat} and {\tt scbcp})
+and also sets up, and informs you of, some of 
+the important environment variable settings, as follows:
+\begin{quote}
+\begin{verbatim}
+   Source Code Browser (SCB) version 1.1-0.  See SUN/225 for help.
+ 
+   Environment variable settings:
+      SCB_INDEX         /star/etc/scb
+      SCB_SOURCES       /stardev/sources
+      SCB_BROWSER_TMP   /usr/tmp/scb
+      SCB_INDEXER_TMP   /usr/tmp/scbindexer
+\end{verbatim}
+\end{quote}
+These can be changed if you want, for instance, to build an index in 
+a different place to the default.
+The exact meaning of these environment variables is explained in 
+section \ref{sec:install}.
+
 
 
 
 \section{\xlabel{sec:indexing}\label{sec:indexing}Generating the index
-         ({\tt scbindex.pl})}
+         ({\tt scbindex})}
 
 In order for the browser to work, indexes of the source files must be
-generated.  This is done by the script {\tt scbindex.pl}, installed
+generated.  This is done by the script {\tt scbindex}, installed
 by default in {\tt /star/bin}.
 The following subsections explain how to use this program to
 build an index.  In most cases, only an index of the whole Starlink
@@ -551,7 +575,7 @@ To index the whole of the source collection, simply invoke the
 indexer program as follows:
 \begin{quote}
 \begin{verbatim}
-% scbindex.pl
+% scbindex
 \end{verbatim}
 \end{quote}
 This will 
@@ -559,7 +583,8 @@ read the source files from the directory specified in SCB\_SOURCES,
 write the index files to the directory specified in SCB\_INDEX,
 and print to the screen each index entry as it is encountered.
 If the entire Starlink source code collection is installed, 
-this will take a matter of hours.  Some indication of how far the indexing
+this will typically take around about an hour of elapsed time. 
+Some indication of how far the indexing
 has progressed can be seen by looking at which package is currently
 being indexed (the package name is given before the `{\tt \#}' sign on the 
 printed lines, e.g. lines which look like
@@ -583,7 +608,7 @@ In this case only the changed packages are named on the command line,
 e.g.
 \begin{quote}
 \begin{verbatim}
-% scbindex.pl ast polpack ndf
+% scbindex ast polpack ndf
 \end{verbatim}
 \end{quote}
 The packages so named will be taken from the SCB\_SOURCES directory in
@@ -594,7 +619,7 @@ run it in the background, possibly {\tt renice}d, with the output
 redirected elsewhere, e.g.:
 \begin{quote}
 \begin{verbatim}
-% nice +4 scbindex.pl >& scbindex.log &
+% nice +4 scbindex >& scbindex.log &
 \end{verbatim}
 \end{quote}
 If the machine will be used by other people while the indexing 
@@ -612,12 +637,12 @@ original when it is complete, like this:
 \begin{verbatim}
 % setenv SCB_INDEX /usr/tmp/tmp_index
 % mkdir $SCB_INDEX
-% scbcp.pl /star/etc/scb $SCB_INDEX
-% scbindex.pl pack1 pack2
-% scbcp.pl $SCB_INDEX /star/etc/scb
+% scbcp /star/etc/scb $SCB_INDEX
+% scbindex pack1 pack2
+% scbcp $SCB_INDEX /star/etc/scb
 \end{verbatim}
 \end{quote}
-Use of the {\tt scbcp.pl} utility is explained in 
+Use of the {\tt scbcp} utility is explained in 
 section \ref{sec:scbcp}.
 
 The index files created in the SCB\_INDEX directory should 
@@ -627,7 +652,7 @@ sparse, and {\em appear} much bigger than they are,
 so that {\tt ls~-l} makes them look very large, 
 while {\tt du} or {\tt ls~-s} gives their true size.
 Copying the indexes should be done using the supplied utility
-{\tt scbcp.pl} (see section \ref{sec:scbcp}), 
+{\tt scbcp} (see section \ref{sec:scbcp}), 
 not the Unix {\tt cp} command; the latter would
 work, but might result in inefficient use of disk space.
 
@@ -640,7 +665,7 @@ it is also possible to index source code from elsewhere,
 by giving the pathname of the directory
 or tarfile containing the source.
 In this way a personalised index can be created: 
-suppose that {\tt scbindex.pl} has already been run 
+suppose that {\tt scbindex} has already been run 
 on all the source code in {\tt /star/sources}, 
 writing index files in {\tt /star/etc/scb}, as described in 
 the previous section, 
@@ -653,20 +678,20 @@ you can do the following:
 \begin{quote}
 \begin{verbatim}
 % setenv SCB_INDEX ~/star/etc/scb
-% scbcp.pl /star/etc/scb $SCB_INDEX
-% scbindex.pl ~/star/sources/figaro
+% scbcp /star/etc/scb $SCB_INDEX
+% scbindex ~/star/sources/figaro
 \end{verbatim}
 \end{quote}
 --- first a private copy is made of the global indexes using 
-the supplied {\tt scbcp.pl} utility (see section \ref{sec:scbcp}),
-and then the Figaro parts are overwritten using {\tt scbindex.pl}.
+the supplied {\tt scbcp} utility (see section \ref{sec:scbcp}),
+and then the Figaro parts are overwritten using {\tt scbindex}.
 If the modified sources were 
 in a compressed tar file in the current directory, 
 rather than in \verb|~/star/sources|,
 then the last line above could be replaced by
 \begin{quote}
 \begin{verbatim}
-% scbindex.pl ./figaro.tar.Z
+% scbindex ./figaro.tar.Z
 \end{verbatim}
 \end{quote}
 It would be possible to make a personal index containing Figaro only,
@@ -678,12 +703,12 @@ To make use of the personalised index, rather than the one set as
 the default at install time, the following must be done:
 \begin{description}
 \item[Command line use]
-For using the extractor program {\tt scb.pl} from the command line, 
+For using the extractor program {\tt scb} from the command line, 
 set the environment variable SCB\_INDEX to the directory containing
 the indexes, in the same way as during the index build as described
 above.
 \item[CGI browser use]
-For using {\tt scb.pl} in HTML mode, then append 
+For using {\tt scb} in HTML mode, then append 
 `{\tt ?indexdir=directoryname}' to the script's URL.
 Thus if your index is in {\tt /home/user/star/etc/scb}
 and the browser is installed in {\tt /cgi-bin/star/} on server
@@ -707,9 +732,9 @@ the web server.
 
 
 \section{\xlabel{sec:extract}\label{sec:extract}Viewing the source code
-         ({\tt scb.pl})}
+         ({\tt scb})}
 
-This section explains how to use the extractor program, {\tt scb.pl},
+This section explains how to use the extractor program, {\tt scb},
 to view source code from the Starlink source tree,
 assuming that an index has been built as explained in 
 section \ref{sec:indexing}.
@@ -726,7 +751,7 @@ indexing and extraction is done.
 
 Whether or not the package has been installed as a CGI script,
 it should be 
-possible to use the extractor program, {\tt scb.pl},
+possible to use the extractor program, {\tt scb},
 to view the source code from the Unix shell.
 
 \subsubsection{\xlabel{sec:extract-name}\label{sec:extract-name}{\tt name} argument (basic use)}
@@ -735,13 +760,13 @@ At its simplest, a file is extracted by giving just the
 requested filename or routine as an argument to the extractor:
 \begin{quote}
 \begin{verbatim}
-% scb.pl name=dsa_data_size
+% scb name=dsa_data_size
 \end{verbatim}
 \end{quote}
 or equivalently:
 \begin{quote}
 \begin{verbatim}
-% scb.pl dsa_data_size
+% scb dsa_data_size
 \end{verbatim}
 \end{quote}
 finds the file which contains the routine `{\tt dsa\_data\_size}'
@@ -753,7 +778,7 @@ generally used in the usual Unix ways.
 For instance to save it to a local file {\tt file.f}:
 \begin{quote}
 \begin{verbatim}
-% scb.pl dsa_data_size >file.f
+% scb dsa_data_size >file.f
 figaro#figaro_dsa.tar>dsa/dsa_dat_sz.f
 \end{verbatim}
 \end{quote}
@@ -766,7 +791,7 @@ Files can be extracted by their filename instead,
 so that
 \begin{quote}
 \begin{verbatim}
-% scb.pl dsa_dat_sz.f >file.f
+% scb dsa_dat_sz.f >file.f
 figaro#figaro_dsa.tar>dsa/dsa_dat_sz.f
 \end{verbatim}
 \end{quote}
@@ -798,7 +823,7 @@ To ensure that you get the one in HLP, specify it on the
 command line using the `{\tt package=}' argument:
 \begin{quote}
 \begin{verbatim}
-% scb.pl help.f package=hlp
+% scb help.f package=hlp
 \end{verbatim}
 \end{quote}
 Note that the package argument only serves as a hint to the
@@ -808,13 +833,13 @@ but it does exist in another package, then that one is retrieved.
 Thus, given that there is no file {\tt help.f} in CCDPACK,
 \begin{quote}
 \begin{verbatim}
-% scb.pl help.f package=ccdpack
+% scb help.f package=ccdpack
 \end{verbatim}
 \end{quote}
 and 
 \begin{quote}
 \begin{verbatim}
-% scb.pl help.f
+% scb help.f
 \end{verbatim}
 \end{quote}
 will give the same result, which is one or other of the {\tt help.f}
@@ -823,13 +848,13 @@ files from either POLMAP or HLP (picked more or less at random).
 The `{\tt package=}' part may be omitted, so that 
 \begin{quote}
 \begin{verbatim}
-scb.pl help.f hlp
+scb help.f hlp
 \end{verbatim}
 \end{quote}
 is equivalent to 
 \begin{quote}
 \begin{verbatim}
-scb.pl help.f package=hlp
+scb help.f package=hlp
 \end{verbatim}
 \end{quote}
 
@@ -858,7 +883,7 @@ all the files and routines whose names contain `fit' followed
 by `gauss', the following command can be used:
 \begin{quote}
 \begin{verbatim}
-% scb.pl 'fit.*gauss' type=regex
+% scb 'fit.*gauss' type=regex
 
 Files:
 ech_fit_gaussian.f       => echomop#echomop_source.tar>ech_fit_gaussian.f
@@ -878,14 +903,14 @@ If the {\tt package} argument is given as well as the {\tt type=regex}
 argument, then only the package specified will be searched.
 
 More flexible pattern matching searches are possible 
-with inventive use of the {\tt dbmcat.pl} command described
+with inventive use of the {\tt dbmcat} command described
 in section \ref{sec:dbmcat}.
 
 
 
 \subsubsection{\xlabel{sec:extract-flags}\label{sec:extract-flags}Command line flags}
 
-There are two command line flags which can be supplied to {\tt scb.pl}.
+There are two command line flags which can be supplied to {\tt scb}.
 Neither is required very often, but they are documented here for completeness.
 \begin{description}
 \item[-html]
@@ -905,7 +930,7 @@ If the {\tt -exact} flag is given then these variations are not attempted.
 
 \subsection{\xlabel{sec:extract-cgi}\label{sec:extract-cgi}Browsing using HTML}
 
-If the extractor program {\tt scb.pl} has been installed
+If the extractor program {\tt scb} has been installed
 as a CGI program as described in section \ref{sec:install-cgi}
 then the Starlink source code can be browsed as a set of 
 hypertext pages hyperlinked together 
@@ -1079,8 +1104,8 @@ This section is not required reading for users of the package.
 
 \subsection{\xlabel{sec:internals-indexes}\label{sec:internals-indexes}Index files}
 
-The indexing program {\tt scbindex.pl} builds disk-based indexes, and the 
-extractor program, which is the same as the browser program  {\tt scb.pl},
+The indexing program {\tt scbindex} builds disk-based indexes, and the 
+extractor program, which is the same as the browser program  {\tt scb},
 interrogates them.  There are three indexes:
 \begin{description}
 \item[Tasks]
@@ -1156,7 +1181,7 @@ More detailed documentation of the implementation of these indexes
 can be found in the {\tt StarIndex.pm} module itself.
 
 It is possible to examine the File and Routines indexes 
-directly from the command line by using the supplied {\tt dbmcat.pl}
+directly from the command line by using the supplied {\tt dbmcat}
 utility (see section \ref{sec:dbmcat}).
 
 
@@ -1180,35 +1205,35 @@ take as input the raw source code and output the same text
 with added HTML-like tags indicating where functions are defined 
 and where they are called.
 
-One routine is supplied for tagging C source and one for 
-Fortran.  
-Each uses routines from the module {\tt Tag.pm}
-which is designed to make it fairly painless to write a
-reasonably successful tagging program in Perl.
+One routine is supplied for tagging C source and one for Fortran.  
+These are currently implemented as external programs 
+written using {\tt lex} and {\tt yacc}, with rather simplified 
+views of the grammars of the languages.
+A previous version of the package contained tagging routines written
+in Perl, and contained supporting routines to assist in writing new 
+taggers in Perl; this is no longer distributed but can
+be made available on request.
+
 The SCB package has been designed to make
 replacing one of the language-specific tagging modules 
 (for instance with a more efficient or more accurate one),
 or adding a new one (for instance for a different language), 
-fairly easy---aspects of this 
-procedure are documented in the modules {\tt Scb.pm} and {\tt Tag.pm},
-while the existing tagging modules {\tt CTag.pm} and {\tt FortranTag.pm}
-serve as examples.
+fairly easy --- aspects of this 
+procedure are documented in the module {\tt Scb.pm}.
 
 The existing tagging routines are good enough to generate 
 accurate indexing information and hypertext 
 for a large majority of the source files in the
-Starlink software collection, but could be improved upon:
-they can be quite inefficient on memory and slow
-for the largest source files, and can be fooled into misinterpreting
-the source code, e.g.\ the C module sometimes gets confused by conditional
-compilation directives, and the Fortran one fails to identify
-statement function definitions.
+Starlink software collection, but they are not perfectly accurate,
+and could no doubt be improved upon.
+It is however impossible to do it perfectly without walking the
+include files, which would make the browser far too slow.
 
 
 
 \subsection{\xlabel{sec:internals-indexer}\label{sec:internals-indexer}Operation of the indexer program}
 
-The function of the indexer program {\tt scbindex.pl} 
+The function of the indexer program {\tt scbindex} 
 is to go through
 each of the Starlink packages in turn, writing the name and 
 location of each task, file and function into the appropriate 
@@ -1241,7 +1266,7 @@ the current package has been indexed.
 
 \subsection{\xlabel{sec:internals-extractor}\label{sec:internals-extractor}Operation of the extractor program}
 
-The extractor program {\tt scb.pl} functions in two main modes;
+The extractor program {\tt scb} functions in two main modes;
 as a normal program which can be invoked from the Unix shell and
 outputs plain text (described in section \ref{sec:extract-commandline}),
 and as a CGI program which is run under the control of an HTTP server
@@ -1351,9 +1376,9 @@ that is required is to move around in it.
 \section{\xlabel{sec:utilities}\label{sec:utilities}Additional utilities}
 
 As well as the principal programs
-{\tt scbindex.pl} (section \ref{sec:indexing})
+{\tt scbindex} (section \ref{sec:indexing})
 and 
-{\tt scb.pl} (section \ref{sec:extract}),
+{\tt scb} (section \ref{sec:extract}),
 a couple of additional utilities are supplied with the package.
 These are not necessary for normal operation 
 of the package but may prove useful to those making more 
@@ -1362,9 +1387,9 @@ involved use of it.
 
 
 
-\subsection{\xlabel{sec:dbmcat}\label{sec:dbmcat}{\tt dbmcat.pl}}
+\subsection{\xlabel{sec:dbmcat}\label{sec:dbmcat}{\tt dbmcat}}
 
-The {\tt dbmcat.pl} utility directly examines the DBM files 
+The {\tt dbmcat} utility directly examines the DBM files 
 in which the File and Routine indexes are kept 
 (see section \ref{sec:internals-indexes}.
 
