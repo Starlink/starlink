@@ -583,6 +583,7 @@ sub fits_get_nth_item (\@$) {
 #         Keyword
 
 # OUTPUT: Value
+#     'NOT FOUND' is returned if the key can not be found
 
 sub fits_get_item (\@$) {
 
@@ -627,7 +628,7 @@ sub fits_extract_key_val ($) {
   $value =~ s/^\s+//;  # Remove leading whitespace
   $value =~ s/\s+$//;  # Remove trailing whitespace
 
-  $value = "NOT FOUND" unless ($value =~ /./);
+  $value = '' unless ($value =~ /./);
   $keyword = "NONE" unless ($keyword =~ /./);
 
   return($keyword, $value, $comment);
