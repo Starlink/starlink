@@ -151,24 +151,11 @@
 
   This is a minor update to CCDPACK. 
 
-  A new median stacking method "FASTMED" has been introduced. When
-  used on stacks of 50 images this is typically about 60-70% faster
-  than the existing weighted median. This is very fast as it also
-  usually lies within 10% of the time taken to calculate the mean.
+  The applications MAKEMOS and MAKEFLAT have been modified to generate
+  output variances based on the scatter of the input images.
 
-  The CCDALIGN application has been changed so that images of
-  different sizes are now correctly displayed at different scales.
-
-  The FLATCOR application has been changed to trap divide by zero
-  on Linux and OSF/1.
-
-  The FINDOBJ application has been changed so that not detecting
-  any objects on an image may be accepted without causing an error. 
-  The number of objects detected on each frame is now output via an
-  environmental variable.
-
-  There was a problem, under Linux, with the DEBIAS application not
-  accepting a saturation value. This is now fixed.
+  A parameter OVERRIDE has been added to FINDOFF. This now stops
+  the program if a partial solution to the registration is found.
 
 1 CALCOR
 Subtracts a scaled dark or flash calibration image from a series of
@@ -4376,6 +4363,17 @@ CLEAN = _LOGICAL (Read)
    strutures and sharp edges may be real and can be protected
    against removal by setting this parameter FALSE.
    [TRUE]
+3 GENVAR
+GENVAR = _LOGICAL (Read)
+   If TRUE and USEVAR is also FALSE, then "variances" for the
+   output image will be generated using the natural variation in
+   the input images. These values can be used to estimate the
+   quality of the output flatfield.
+
+   Note that for this option to work well you should have many
+   images and that a minimum of 2 contributing values for an
+   output pixel are required (MINPIX will have a minimum of 2).
+   [FALSE]
 3 GAMMA
 GAMMA = _REAL (Read)
    The number of standard deviations by which a value has to
@@ -4483,7 +4481,7 @@ MINPIX = _INTEGER (Read)
    The minimum number of good (ie. not BAD) pixels required which
    are required to contribute to the value of an output pixel.
    Output pixels not meeting this requirement are set BAD.
-   [1]
+   [1|2]
 3 NITER
 NITER = _INTEGER (Read)
    The number of refining iterations performed if METHOD = "MODE".
@@ -4502,6 +4500,12 @@ SIGMAS = _REAL (Read)
    variances exist then one is estimated from the population of
    values.
    [4.0]
+3 USEVAR
+USEVAR = _LOGICAL (Read)
+   If TRUE and all the input images contain error information
+   (variances), then these will be used as weights during image
+   combination and will be propagated to the output image.
+   [TRUE]
 3 TITLE
 TITLE = LITERAL (Read)
    Title for the output image.
@@ -4672,15 +4676,25 @@ CMPVAR = _LOGICAL (Read)
    [TRUE]
 3 GENVAR
 GENVAR = _LOGICAL (Read)
-   If GENVAR is set to TRUE and all the input images supplied
+   If GENVAR is set to TRUE and all the input NDFs supplied
    contain statistical error (variance) information, then
    variance information will also be calculated for the output
-   mosaic image, provided that USEVAR is also TRUE. Otherwise,
-   if GENVAR is set to FALSE (or if any input image does not
-   contain variance information), then no output variance values
-   will be generated.  This parameter is only used if all the
-   input images contain variance information.
-   [TRUE]
+   mosaic NDF, provided that USEVAR is also TRUE.
+
+   Otherwise if GENVAR is TRUE and either USEVAR is FALSE or some
+   of the input NDFs do not contain error information, then output
+   variances will be generated using the natural variations in the
+   input data. Obviously this method should only be used if there
+   are many input datasets, which also provide good coverage of
+   the output area. If this option is chosen only regions of the
+   output image that have data from at least 2 input images will
+   processed. Normally only 1 contributing image is required.
+
+   The default for this parameter depends on the presence of error
+   information in the input NDFs. If all have error information
+   then the default is TRUE, otherwise it is FALSE.
+
+   [DYNAMIC]
 3 IN
 IN = LITERAL (Read and [optionally] Write)
    A list of the names of the input images which are to be combined
@@ -5027,6 +5041,11 @@ USEVAR = _LOGICAL (Read)
    scale-factor corrections are being applied. Alternatively,
    explicit weights may be given for each input image via the
    WEIGHTS parameter.
+
+   If you want to add estimated variances to the output image
+   (based on the natural variations of the input images) and all
+   your input images contain variances then you will need to set
+   this parameter FALSE (see GENVAR).
    [TRUE]
 3 WEIGHTS
 WEIGHTS( ) = _REAL (Read)
@@ -5209,6 +5228,8 @@ makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
 
       - SKYSUP  -- dynamically defaulted
 
+      - GENVAR  -- dynamically defaulted
+
       - SCALE   -- always FALSE
 
       - ZERO    -- always FALSE
@@ -5230,9 +5251,10 @@ makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
    be set and reset using the CCDSETUP and CCDCLEAR commands.
 2 Copyright
    Copyright (C) 1992 Science & Engineering Research Council
+   Copyright (C) 1998-1999 Central Laboratory of the Research Councils
+
 2 Authors
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
-
 PDRAPER: Peter Draper (STARLINK)
 2 History
  5-AUG-1992 (RFWS):

@@ -15,12 +15,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.9}
+\newcommand{\stardocnumber}    {139.10}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {18 November 1998}
+\newcommand{\stardocdate}      {27 January 1999}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 2.3-0}
+\newcommand{\stardocversion}   {Version 2.3-1}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -8468,6 +8468,21 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          the next \qt{cleaning} iteration is performed.
          [3.0]
       }
+
+      \sstsubsection{
+         GENVAR = \_LOGICAL (Read)
+      } {
+         If TRUE and USEVAR is also FALSE, then ``variances'' for the
+         output image will be generated using the natural variation in
+         the input images. These values can be used to estimate the
+         quality of the output flatfield.
+
+         Note that for this option to work well you should have many
+         images and that a minimum of 2 contributing values for an
+         output pixel are required (MINPIX will have a minimum of 2).
+         [FALSE]
+      }
+
       \sstsubsection{
          IN = LITERAL (Read)
       } {
@@ -8600,7 +8615,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          The minimum number of good (ie. not BAD) pixels required which
          are required to contribute to the value of an output pixel.
          Output pixels not meeting this requirement are set BAD.
-         [1]
+         [1|2]
       }
       \sstsubsection{
          NITER = \_INTEGER (Read)
@@ -8625,6 +8640,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \qt{CLIPMED} this value is the pixel variance if one exists,
          otherwise one is etimated from the population of values.
          [4.0]
+      }
+      \sstsubsection{
+         USEVAR = \_LOGICAL (Read)
+      } {
+         If TRUE and all the input images contain error information
+         (variances), then these will be used as weights during image
+         combination and will be propagated to the output image.
+         [TRUE]
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -8818,15 +8841,25 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \sstsubsection{
          GENVAR = \_LOGICAL (Read)
       } {
-         If GENVAR is set to TRUE and all the input images supplied
+         If GENVAR is set to TRUE and all the input NDFs supplied
          contain statistical error (variance) information, then
          variance information will also be calculated for the output
-         mosaic image, provided that USEVAR is also TRUE. Otherwise,
-         if GENVAR is set to FALSE (or if any input image does not
-         contain variance information), then no output variance values
-         will be generated.  This parameter is only used if all the
-         input images contain variance information.
-         [TRUE]
+         mosaic NDF, provided that USEVAR is also TRUE.
+
+         Otherwise if GENVAR is TRUE and either USEVAR is FALSE or some
+         of the input NDFs do not contain error information, then output
+         variances will be generated using the natural variations in the
+         input data. Obviously this method should only be used if there
+         are many input datasets, which also provide good coverage of
+         the output area. If this option is chosen only regions of the
+         output image that have data from at least 2 input images will
+         processed. Normally only 1 contributing image is required.
+
+         The default for this parameter depends on the presence of error
+         information in the input NDFs. If all have error information
+         then the default is TRUE, otherwise it is FALSE.
+
+         [DYNAMIC]
       }
       \sstsubsection{
          IN = LITERAL (Read and [optionally] Write)
@@ -9215,24 +9248,30 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \sstsubsection{
          USEVAR = \_LOGICAL (Read)
       } {
-         The value of this parameter specifies whether statistical
-         error (variance) information contained in the input images
-         should be used to weight the input data when they are combined
-         to produce the output mosaic. This parameter is only used if
-         all the input images contain variance information, in which case
-         the default behaviour is to use this information to correctly
-         weight the data values being combined. If output variances are
-         to be generated (specified by the GENVAR parameter) then this
-         parameter (and GENVAR) should be set TRUE.
+        The value of this parameter specifies whether statistical
+        error (variance) information contained in the input NDFs
+        should be used to weight the input data when they are combined
+        to produce the output mosaic. This parameter is only used if
+        all the input NDFs contain variance information, in which case
+        the default behaviour is to use this information to correctly
+        weight the data values being combined. If output variances are
+        to be generated (specified by the GENVAR parameter) then this
+        parameter (and GENVAR) should be set TRUE.
 
-         If insufficient input variance information is available, or if
-         USEVAR is set to FALSE, then weights are instead derived from
-         the scale-factor corrections applied to each image (see the
-         WEIGHTS parameter for details); unit weight is used if no
-         scale-factor corrections are being applied. Alternatively,
-         explicit weights may be given for each input image via the
-         WEIGHTS parameter.
-         [TRUE]
+        If insufficient input variance information is available, or if
+        USEVAR is set to FALSE, then weights are instead derived from
+        the scale-factor corrections applied to each NDF (see the
+        WEIGHTS parameter for details); unit weight is used if no
+        scale-factor corrections are being applied. Alternatively,
+        explicit weights may be given for each input NDF via the
+        WEIGHTS parameter.
+
+        If you want to add estimated variances to the output image
+        (based on the natural variations of the input images) and all
+        your input images contain variances then you will need to set
+        this parameter FALSE (see GENVAR).
+
+        [TRUE]
       }
       \sstsubsection{
          WEIGHTS( ) = \_REAL (Read)
@@ -9449,16 +9488,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          \sstitem
             SKYSUP  -- dynamically defaulted
-
+         \sstitem 
+            GENVAR  -- dynamically defaulted
          \sstitem
             SCALE   -- always FALSE
-
          \sstitem
             ZERO    -- always FALSE
-
          \sstitem
             MODIFY  -- always FALSE
-
          \sstitem
             TITLE   -- always \qt{Output from MAKEMOS}
 
@@ -12792,7 +12829,7 @@ The propagation of QUALITY in the \xroutine{MAKEBIAS},
 \xroutine{TRANNDF} when
 propagating QUALITY has been corrected.
 
-\subsection{This release 2.3-0}
+\subsection{Release 2.3-0}
 A minor update to CCDPACK.
 \begin{itemize}
   \item A new median stacking method ``FASTMED'' has been introduced. When
@@ -12812,6 +12849,17 @@ A minor update to CCDPACK.
 
 \item There was a problem, under Linux, with the \xroutine{DEBIAS} 
       application not accepting a saturation value. This is now fixed.
+\end{itemize}
+
+\subsection{This release 2.3-1}
+A minor update to CCDPACK.
+\begin{itemize}
+\item The applications \xroutine{MAKEMOS} and \xroutine{MAKEFLAT} have
+  been modified to generate output variances based on the scatter of
+  the input images.
+\item A parameter OVERRIDE has been added to \xroutine{FINDOFF}. This
+  now stops the program if a partial solution to the registration is
+  found.
 \end{itemize}
 
 \begin{latexonly}

@@ -2,24 +2,12 @@
  
   This is a minor update to CCDPACK. 
 
-  A new median stacking method "FASTMED" has been introduced. When
-  used on stacks of 50 images this is typically about 60-70% faster
-  than the existing weighted median. This is very fast as it also
-  usually lies within 10% of the time taken to calculate the mean.
+  The applications MAKEMOS and MAKEFLAT have been modified to generate
+  output variances based on the scatter of the input images.
 
-  The CCDALIGN application has been changed so that images of
-  different sizes are now correctly displayed at different scales.
+  A parameter OVERRIDE has been added to FINDOFF. This now stops
+  the program if a partial solution to the registration is found.
 
-  The FLATCOR application has been changed to trap divide by zero
-  on Linux and OSF/1.
-
-  The FINDOBJ application has been changed so that not detecting
-  any objects on an image may be accepted without causing an error. 
-  The number of objects detected on each frame is now output via an
-  environmental variable.
-
-  There was a problem, under Linux, with the DEBIAS application not
-  accepting a saturation value. This is now fixed.
 
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 

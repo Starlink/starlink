@@ -73,7 +73,7 @@
 *        If TRUE and USEVAR is also FALSE, then "variances" for the
 *        output image will be generated using the natural variation in
 *        the input images. These values can be used to estimate the
-*        reliability of the output flatfield.
+*        quality of the output flatfield.
 *
 *        Note that for this option to work well you should have many
 *        images and that a minimum of 2 contributing values for an
