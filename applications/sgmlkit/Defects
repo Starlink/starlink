@@ -1,0 +1,87 @@
+# All the defects, suggestions and TODOs
+#
+# If it's not in here, I don't plan to do anything about it (which
+# probably means I've forgotten about it, and you should remind
+# me). 
+
+### General DTD
+
+Implement a FOREIGN element (Mark)
+	Support such things as <foreign/et. al./
+
+Non-sentence-ending periods (Rodney)
+	Abbrev element?  nbsp entity?
+
+LaTeX as alt format (DSB)
+	Some documents could use a specialised layout for some section
+	headings.  Possibly include a LaTeX-formatted element, which
+	could be used as an _alternative_, but legitimately ignored.
+
+hours and degrees elements (ACD)
+	Clive even supplied SGML _and_ LaTeX to support this!
+
+admonition (Norman/Mark)
+	At same level as BLOCKQUOTE, with a couple of `class'
+	attributes.  Could one of these classes be `quotation'?
+
+bibliography within source document (prog meeting)
+	Some folk don't (want to) use BibTeX, so it might be worth
+	supporting bib elements within the document.
+
+
+### Programcode DTD
+
+allow `&' in codeprologue (prog meeting)
+	More flexibility in content models
+
+programcode content modifications (Mark, and prog meeting)
+	Use SST elements.
+
+shortrefs in programcode DTD (Mark)
+	Shortrefs to make lists in prologues tidier.  Nice, but I'm
+	always nervous of having too much cleverness in this area,
+	because the more shortrefs there are, the easier it is to type
+	one by accident, and so provoke a completely unintelligible
+	error message.
+
+AUTHORREF element (Mark, 14 Sept)
+	`The AUTHORLIST element is a nasty example of SGML forcing one
+	to write something which one otherwise wouldn't want to'.
+
+DL/DD/DT/BLOCKQUOTE in prologues (Mark, 14 Sept)
+	Easy, I think.
+
+
+### Down-converters
+
+nested CODE elements (Mark)
+	CODE elements within other elements like STRONG don't always
+	come out in tt-type.
+
+process picture environment with maths in DC (Mark)
+	Should be fairly easy.
+
+SDATA entities (Norman/Mark)
+	...are a mess.  Perhaps this should wait until I build and
+	incorporate OpenJade 1.3, which has map-sdata-entity support,
+	when I can do it properly.
+
+DT element in LaTeX (Norman)
+	Tweak the generated LaTeX so that {description} \item s are
+	cleverer about spacing.
+
+REF/maths in DT in LaTeX doesn't insert text (Mark, mail of 9 Sept)
+	Haven't investigated
+
+LaTeX pages are smaller than standard, and different positioning (Mark)
+
+KBD in VERBATIM doesn't work (Mark)
+
+
+
+$Revision$ $Date$
+
+# Local Variables:
+# mode:text
+# fill-prefix: "	"
+# End:
