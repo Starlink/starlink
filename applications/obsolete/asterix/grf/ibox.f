@@ -47,16 +47,20 @@
 *  get box position
         CALL IMG_GETBOX('XCENT','YCENT','XWID','YWID',XC,YC,DX,DY,
      :                                                      STATUS)
-
+	print *,'A'
 *  set region mask
         CALL IMG_SETWHOLE(STATUS)
+	print *,'B'
         CALL IMG_SETBOX(XC,YC,DX,DY,STATUS)
+	print *,'C'
 
 *  store box parameters
         CALL IMG_STOREBOX(XC,YC,DX,DY,STATUS)
+	print *,'D'
 
 *  mark box
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
+	print *,'E'
 
       ENDIF
 
