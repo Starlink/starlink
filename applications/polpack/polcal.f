@@ -341,7 +341,10 @@
 *     has a celestial co-ordinate Frame within its WCS information. Otherwise, 
 *     the reference direction will be the second pixel axis. The POLANAL
 *     Frame in the WCS component of the output NDF is updated to describe
-*     the new reference direction.
+*     the new reference direction. Angles are always measured positive in the
+*     same sense as rotation from the first image axis (X) to the second image
+*     axis (Y) (this will be equivalent to rotation from north through 
+*     east if the image has conventional WCS information).
 *     -  WCS and AXIS components are propagated from the first supplied
 *     input image to the output cube. 
 
