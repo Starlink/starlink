@@ -319,7 +319,7 @@ install:
 prepare:
 
 check_packages:
-[available] Dec 18, 2003 5:25:47 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 19, 2003 5:23:33 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -611,7 +611,6 @@ webstart:
 
 dist:
      [copy] Copying 283 files to /apps/cvsbuild/java/source/diva/docs/diva
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -646,6 +645,7 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -705,7 +705,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/votable
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/votable
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 43 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -1057,4 +1057,4 @@ install:
 [loggedcopy] Copying 134 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 47 seconds
+Total time: 5 minutes 19 seconds

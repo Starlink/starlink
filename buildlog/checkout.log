@@ -9053,6 +9053,7 @@ U java/source/util/src/main/uk/ac/starlink/util/images/help.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/special.gif
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/text
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.dtd
+U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.xsd
 U java/source/util/src/main/uk/ac/starlink/util/text/astrores.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/helpset_1_0.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/map_1_0.dtd
@@ -9100,6 +9101,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/Param.java
 U java/source/votable/src/main/uk/ac/starlink/votable/RowStepper.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Table.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableBodies.java
+U java/source/votable/src/main/uk/ac/starlink/votable/TableCopier.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TabularData.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java
@@ -9107,7 +9109,6 @@ U java/source/votable/src/main/uk/ac/starlink/votable/VOStarTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableDOMBuilder.java
-U java/source/votable/src/main/uk/ac/starlink/votable/VOTableFormatException.java
 U java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Values.java
 U java/source/votable/src/main/uk/ac/starlink/votable/package.html

@@ -289,7 +289,7 @@ install:
 prepare:
 
 check_packages:
-[available] Dec 18, 2003 5:57:08 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 19, 2003 5:54:15 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -623,7 +623,7 @@ dist:
 
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 43 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -923,4 +923,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 37 seconds
+Total time: 5 minutes 17 seconds
