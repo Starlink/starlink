@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 ##  GAIA is a little different in that it uses three pre-existing
-##  directories (which are autoconfed using the their own methodologies). 
-##  These do most of the work, this is just a wrapper for extracting 
+##  directories (which are autoconfed using the their own methodologies).
+##  These do most of the work, this is just a wrapper for extracting
 ##  the parts needed and installing them.
 
-##  All scripts and programs are built elsewhere, so we do not need to 
+##  All scripts and programs are built elsewhere, so we do not need to
 ##  associate these with sources, so installation as scripts of various kinds
 ##  will do.
 dist_bin_SCRIPTS = $(TCL_FILES) $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) \
@@ -33,7 +33,7 @@ GAIA_LIB_FILES =  \
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
- gaia_swish gaia_stcl gaiaMon 
+ gaia_swish gaia_stcl gaiaMon
 
 GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc \
  tab2cat.ifc asc2tab.ifc tab2asc.ifc
@@ -47,7 +47,7 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 
 bin_MONOLITHS = gaiaMon
 gaiaMon_SOURCES =
-gaiaMon_TASKS = $(GAIA_TASKS) 
+gaiaMon_TASKS = $(GAIA_TASKS)
 
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
@@ -68,10 +68,8 @@ $(TCL_FILES):
 	export TK_LIBRARY; unset TK_LIBRARY;\
 	./configure --prefix=$${pwd}/built;\
 	make -e World)
-	for f in $(SCRIPT_PLACES) ""; do \
-	   if test -f "$$f"; then \
-	      cp -p $$f . ;\
-	   else :; fi;\
+	for f in $(SCRIPT_PLACES); do \
+	   cp -p $${f} . ;\
 	done
 
 ##  Build Skycat component.
@@ -103,17 +101,12 @@ $(GAIA_FILES): $(TCL_FILES) $(SKYCAT_FILES)
 	STARLINK=$(STARCONF_DEFAULT_STARLINK); export STARLINK;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
-	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES) ""; do \
-	   if test -f "built/bin/$${f}"; then \
-	      cp -p built/bin/$${f} .;\
-	   else :; fi;\
+	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES); do \
+	  cp -p built/bin/$${f} . ;\
 	done
-	for f in $(GAIA_LIB_FILES) ""; do \
-	   if test -f "built/lib/gaia/$${f}"; then \
-	      cp -p built/lib/gaia/$${f} .;\
-	   else :; fi;\
+	for f in $(GAIA_LIB_FILES); do \
+	   cp -p built/lib/gaia/$${f} . ;\
 	done
-
 
 ##  Clean recurses into these directories.
 clean-local:
@@ -132,9 +125,9 @@ MAINTAINERCLEANFILES =
 ##  Need all the source code in the sub-directories.
 EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps
 
-##  Additional files. These have traditionally gone into bindir. 
+##  Additional files. These have traditionally gone into bindir.
 ##  Not having frame.sdf there would be an issue. Use a trick to get these
-##  installed. 
+##  installed.
 gaiasupportdir = $(bindir)
 gaiasupport_DATA = demodata.tar
 
