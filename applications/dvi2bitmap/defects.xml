@@ -91,7 +91,7 @@ font-reading, when it always returned 10pt.</p>
 </resolution>
 </defect>
 
-<defect status="fixed"
+<defect status="closed"
 	originator="Walter Boehm"
 	originatoremail="boehm@isis.wu-wien.ac.at"
 	date="13-Sep-2000">
