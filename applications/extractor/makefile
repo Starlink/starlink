@@ -452,7 +452,7 @@ I_SUB1 = assoc.h astrom.h back.h bpro.h check.h clean.h define.h \
          fitshead.h fitsutil.h flag.h globals.h growth.h \
          interpolate.h key.h mydefs.h neurro.h param.h photom.h \
          plist.h poly.h prefs.h psf.h retina.h sexhead.h sexhead1.h \
-         sexheadsc.h som.h types.h weight.h
+         sexheadsc.h som.h types.h weight.h image.h
 
 I_SUB2 =
 

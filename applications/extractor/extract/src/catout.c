@@ -15,12 +15,16 @@
 *                          Assume 1 block header for FITS.
 *                       25/11/98 (PWD):
 *                          SKYCAT_ASCII files where closed before the
-*                          skycattail string was written, this crashed 
+*                          skycattail string was written, this crashed
 *                          on Linux.
 *	Last modify:	28/12/98 (EB):
+*                       09/04/99 (PWD):
+*                          Added restore for objkey. The dynamic
+*                          memory entries in this list are "destroyed"
+*                          and need to be restored if a second pass is
+*                          made (i.e. when run from ICL).
 *
-*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-*/
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
@@ -38,6 +42,7 @@
 catstruct	*fitscat;
 tabstruct	*objtab;
 FILE		*ascfile;
+keystruct       *saveobjkey = NULL;
 
 /******************************* readcatparams *******************************/
 /*
@@ -51,7 +56,19 @@ void	readcatparams(char *filename)
    int		i, size;
 
 /* Prepare the OBJECTS tables*/
-    objtab = new_tab("OBJECTS");
+   objtab = new_tab("OBJECTS");
+
+/* Save/Restore objkey to initial value (some of these are changed by
+   key manipulations and need to be restored on second pass).*/
+   if ( saveobjkey == NULL ) 
+     {
+       saveobjkey = malloc( sizeof( objkey ) );
+       memcpy( saveobjkey, objkey, sizeof( objkey ) );
+     } 
+   else 
+     {
+       memcpy( objkey, saveobjkey, sizeof( objkey ) );
+     }
 
   if ((infile = fopen(filename,"r")) == NULL)
     error(EXIT_FAILURE, "*ERROR*: can't read ", filename);
@@ -105,17 +122,17 @@ void	readcatparams(char *filename)
   updateparamflags();
 
 /* Go back to multi-dimensional arrays for memory allocation */
-  if (cat.nparam)
-    for (i=objtab->nkey, key=objtab->key; i--; key = key->nextkey) 
+  if (cat.nparam) 
+    for (i=objtab->nkey, key=objtab->key; i--; key = key->nextkey)
       if (key->naxis)
         {
 /*------ Only outobj2 vectors are dynamic */
-        if (!*((char **)key->ptr))
-          {
-          QMALLOC(*((char **)key->ptr), char, key->nbytes);
-          key->ptr = *((char **)key->ptr);
-          key->allocflag = 1;
-          }
+          if ( !*((char **)key->ptr))
+            {
+              QMALLOC( *((char **)key->ptr), char, key->nbytes);
+              key->ptr = *((char **)key->ptr);
+              key->allocflag = 1;
+            }
         }
 
   return;
@@ -167,7 +184,7 @@ void	updateparamflags()
 			| FLAG(obj2.thetaw) | FLAG(obj2.aw) | FLAG(obj2.cxxw)
 			| FLAG(obj2.npixw) | FLAG(obj2.fdnpixw)
 			| FLAG(obj2.fwhmw);
-  
+
   FLAG(obj2.peakxw) |= FLAG(obj2.peakyw) | FLAG(obj2.peakalphas);
   FLAG(obj.peakx) |= FLAG(obj.peaky) | FLAG(obj2.peakxw);
 
@@ -251,7 +268,7 @@ void	updateparamflags()
   for (i=0; i<NISO; i++)
     FLAG(obj.iso[0]) |= FLAG(obj.iso[i]);
 
-  return; 
+  return;
   }
 
 

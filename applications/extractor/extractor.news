@@ -20,6 +20,9 @@
  A serious bug calculating the CLASS_STAR parameter (which is only 
  revealed on Digital UNIX systems) has been fixed.
 
+ The MAG_APER parameter now works correctly under ICL (and TCL). This
+ was crashing during a second run.
+
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
