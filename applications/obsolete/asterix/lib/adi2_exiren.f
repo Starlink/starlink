@@ -122,22 +122,22 @@
      :     (INDEX(SYSNAME,'vms').EQ.0) ) THEN
 
 *    Get length of filename
-        FLEN = CHR_LEN(FILE)
+        FLEN = CHR_LEN(FNAME)
 
 *    Does file exist?
-        INQUIRE( FILE=FILE(:FLEN), EXIST=THERE )
+        INQUIRE( FILE=FNAME(:FLEN), EXIST=THERE )
         IF ( THERE ) THEN
 
 *      Does a backup file already exist?
-          INQUIRE( FILE=FILE(:FLEN)//'~', EXIST=THERE )
+          INQUIRE( FILE=FNAME(:FLEN)//'~', EXIST=THERE )
 
 *      If so, delete it
           IF ( THERE ) THEN
-            CALL UTIL_DELETE( FILE(:FLEN)//'~', STATUS )
+            CALL UTIL_DELETE( FNAME(:FLEN)//'~', STATUS )
           END IF
 
 *      Rename old file
-          CALL UTIL_RENAME( FILE(:FLEN), FILE(:FLEN)//'~', STATUS )
+          CALL UTIL_RENAME( FNAME(:FLEN), FNAME(:FLEN)//'~', STATUS )
 
         END IF
 
