@@ -109,15 +109,59 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Show verbose output from AUTOASTROM}
       set values_(verbose) 0
 
-      #  Whether to keep any temporary files.
-      $Options add checkbutton -label {Keep temps} \
-         -variable [scope values_(keeptemps)] \
-         -onvalue 1 \
-         -offvalue 0
-      $short_help_win_ add_menu_short_help $Options \
-         {Keep temps} \
-         {Keep temporary files created by AUTOASTROM (debug only)}
+      if { $itk_option(-expert) } {
+
+         #  Whether to use match or findoff.
+         $Options add checkbutton -label {Use match} \
+            -variable [scope values_(usematch)] \
+            -onvalue 1 \
+            -offvalue 0
+         $short_help_win_ add_menu_short_help $Options \
+            {Use match} \
+            {Use the "match" algorithm, otherwise "findoff"}
+
+         #  Whether to remove defects. Note more expertise could be
+         #  added to define the area and ellipticity.
+         $Options add checkbutton -label {Remove defects} \
+            -variable [scope values_(defects)] \
+            -onvalue 1 \
+            -offvalue 0
+         $short_help_win_ add_menu_short_help $Options \
+            {Remove defects} \
+            {Attempt to remove defects from detection catalogue}
+
+         #  Whether to keep any temporary files.
+         $Options add checkbutton -label {Keep temps} \
+            -variable [scope values_(keeptemps)] \
+            -onvalue 1 \
+            -offvalue 0
+         $short_help_win_ add_menu_short_help $Options \
+            {Keep temps} \
+            {Keep temporary files created by AUTOASTROM (debug only)}
+
+         #  Whether to see process messages.
+         $Options add checkbutton -label {Show messages} \
+            -variable [scope values_(messages)] \
+            -onvalue 1 \
+            -offvalue 0
+         $short_help_win_ add_menu_short_help $Options \
+            {Show messages} \
+            {Show any communication messages}
+
+         #  Show the command used to run AUTOASTROM.
+         $Options add checkbutton -label {Show command} \
+            -variable [scope values_(command)] \
+            -onvalue 1 \
+            -offvalue 0
+         $short_help_win_ add_menu_short_help $Options \
+            {Show command} \
+            {Show the arguments used in the AUTOASTROM command}
+      }
       set values_(keeptemps) 0
+      set values_(usematch) 1
+      set values_(messages) 0
+      set values_(defects) 1
+      set values_(command) 0
 
       #  Add window help.
       add_help_button astrometry "Astrometry Overview..."
@@ -223,8 +267,20 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Only attempt a linear fit (otherwise attempt distortion)}
       set values_(linear) 1
 
+      #  Number of objects downloaded from reference catalogue.
+      if { $itk_option(-expert) } {
+         itk_component add maxobj {
+            LabelEntry $w_.maxobj \
+               -text "Max catalogue objects:" \
+               -labelwidth $lwidth \
+               -textvariable [scope values_(maxobj)]
+         }
+      }
+      set values_(maxobj) 500
+
       #  Choose an calibration catalogue. This should contain
-      #  all the remote reference RA and Dec catalogues.
+      #  all the remote reference RA and Dec catalogues and when in
+      #  expert mode all the local ones too.
       itk_component add refcat {
          set m [util::LabelMenu $w_.refcat \
                    -text "Reference catalogue:" \
@@ -236,6 +292,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
       add_short_help $itk_component(refcat) \
          {Choose a reference catalogue}
       add_reference_catalogues_
+      ::bind [$itk_component(refcat) component mb] <1> \
+         [code $this add_reference_catalogues_]
 
       #  Region for showing the output from AUTOASTROM.
       itk_component add status {
@@ -289,6 +347,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
       pack $itk_component(guess) -side top -pady 5 -padx 5
       pack $itk_component(invert) -side top -fill x -pady 5 -padx 5
       pack $itk_component(linear) -side top -fill x -pady 5 -padx 5
+      if { $itk_option(-expert) } {
+         pack $itk_component(maxobj) -side top -fill x -pady 5 -padx 5
+      }
       pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
       pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
@@ -303,11 +364,22 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
       #  Do a guess.
       fits_based_guess_
+
+      #  Set various unique (to this instance) file names.
+      set solution_catalogue_ "${solution_catalogues_}[incr count_].ASC"
+      set bestfitlog_ "${bestfitlogs_}[incr count_].Log"
    }
 
    #  Destructor:
    #  -----------
    destructor  {
+
+      #  Remove temporary files.
+      if { [info exists temp_files_] } {
+         foreach f [array names temp_files_] {
+            catch {file delete $f} msg
+         }
+      }
       if { $autoastrom_ != {} } {
          $autoastrom_ delete_sometime
       }
@@ -358,6 +430,13 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Run autoastrom to perform the fit.
    public method fit {} {
+      #  Look busy and do work in another method (so that its possible
+      #  to exit it as a block, busy just evals the command).
+      busy {
+         do_fit_
+      }
+   }
+   protected method do_fit_ {} {
       global env
 
       set image [$itk_option(-rtdimage) fullname]
@@ -366,110 +445,195 @@ itcl::class gaia::GaiaAutoAstromSimple {
          set image [$namer_ ndfname 0]
          set diskimage [$namer_ diskfile]
 
-         busy {
-            #  Establish a control object for this foreign task,
-            #  if not already done.
-            if { $autoastrom_ == {} } {
-               set autoastrom_ [GaiaForeignExec \#auto \
-                                   -use_error 1 \
-                                   -keepnewlines 0 \
-                                   -show_output $itk_component(status) \
-                                   -preprocess [code $this clean_] \
-                                   -notify [code $this completed_] \
-                                   -application \
-                                   $env(AUTOASTROM_DIR)/autoastrom]
-            }
+         #  Establish a control object for this foreign task,
+         #  if not already done.
+         if { $autoastrom_ == {} } {
+            set autoastrom_ [GaiaForeignExec \#auto \
+                                -use_error 1 \
+                                -keepnewlines 0 \
+                                -show_output $itk_component(status) \
+                                -preprocess [code $this clean_] \
+                                -notify [code $this completed_] \
+                                -application \
+                                $env(AUTOASTROM_DIR)/autoastrom]
+         }
 
-            #  Clear the log window.
-            $itk_component(status) clear 0 end
+         #  Clear the log window.
+         $itk_component(status) clear 0 end
 
-            #  Remove previous results.
-            catch {::file delete -force "autoastrom_tmp"} msg
-            catch {::file delete -force "$solution_"} msg
-            set error_messages_ {}
+         #  Remove previous results.
+         catch {::file delete -force "autoastrom_tmp"} msg
+         set error_messages_ {}
 
-            #  Construct WCS bootstrap source.
-            if { $values_(wcssource) == "Y" } {
-               set wcssource "--obsdata=source=AST:FITS"
+         if { $itk_option(-expert) } {
+
+            #  In expert mode there are two types of catalogues,
+            #  remote and local. Local catalogues include remote
+            #  catalogues that have been downloaded into GAIA (and
+            #  are displayed in a catalogue window). Clearly all
+            #  local catalogues need a disk presence so that
+            #  AUTOASTROM can see them.
+
+            #  Verify the reference catalogue. If this is local if
+            #  needs to be available in TAB format with the current
+            #  contents of the window (this can be editted).
+            if { [string match {local_*} $values_(refcat)] } {
+               regsub "local_" $values_(refcat) {} realname
+
+               #  Try to get the associated window.
+               set catwin [::cat::AstroCat::get_instance $realname]
+               set tempname "${temp_catalogues_}[incr count_].TAB"
+               if { $catwin != {} } {
+                  $catwin save_to_file $tempname
+               } else {
+                  #  Plain unopened local catalogue. Open it and
+                  #  make a copy.
+                  if { [file exists $realname] } {
+                     catch {
+                        $astrocat_ open $realname
+                        set url [$astrocat_ url $realname]
+                        file copy -force -- $url $tempname
+                     } msg
+                     if { $msg !={} } {
+                        error_dialog $msg
+                        return
+                     }
+                  } else {
+                     error_dialog "$realname doesn't exist"
+                     return
+                  }
+               }
+               set temp_files_($tempname) 1
+               set refcat "--catalogue=$tempname"
             } else {
-               #  Do this carefully, obsdata doesn't like spaces.
-               set wcssource "--obsdata=source=USER"
-               append wcssource ",ra=[string trim $values_(racentre)]"
-               append wcssource ",dec=[string trim $values_(deccentre)]"
-               append wcssource ",scale=[string trim $values_(imagescale)]"
-               append wcssource ",angle=[string trim $values_(angle)]"
-               append wcssource ",invert=[string trim $values_(invert)]"
+               set refcat "--catalogue=$values_(refcat)"
             }
+         } else {
+            set refcat "--catalogue=$values_(refcat)"
+         }
 
-            #  Level of fit.
-            if { $values_(linear) } {
-               set fitopts "--maxfit=6"
-            } else {
-               set fitopts "--maxfit=9"; # or maybe 7.
-            }
+         #  Construct WCS bootstrap source.
+         if { $values_(wcssource) == "Y" } {
+            set wcssource "--obsdata=source=AST:FITS"
+         } else {
+            #  Do this carefully, obsdata doesn't like spaces.
+            set wcssource "--obsdata=source=USER"
+            append wcssource ",ra=[string trim $values_(racentre)]"
+            append wcssource ",dec=[string trim $values_(deccentre)]"
+            append wcssource ",scale=[string trim $values_(imagescale)]"
+            append wcssource ",angle=[string trim $values_(angle)]"
+            append wcssource ",invert=[string trim $values_(invert)]"
+         }
 
-            #  Verbosity
-            if { $values_(verbose) } {
-               set verbosity "--verbose"
-            } else {
-               set verbosity "--noverbose"
-            }
+         #  Level of fit.
+         if { $values_(linear) } {
+            set fitopts "--maxfit=6"
+         } else {
+            set fitopts "--maxfit=9"; # or maybe 7.
+         }
 
-            #  Keep temporary files (debugging).
-            if { $values_(keeptemps) } {
-               set keeptemps "--keeptemps"
-            } else {
-               set keeptemps "--nokeeptemps"
-            }
+         #  Maximum number of catalogue objects.
+         set maxobj "--maxobj=[expr int($values_(maxobj))]"
 
-            #  Run program, monitoring output...
+         #  Verbosity
+         if { $values_(verbose) } {
+            set verbosity "--verbose"
+         } else {
+            set verbosity "--noverbose"
+         }
 
-            set args "$wcssource \
-               --match=match \
-               --skycatconfig=$env(CATLIB_CONFIG) \
-               --catalogue=$values_(refcat) \
-               --noinsert \
-               --keepfits=$solution_ \
-               --temp=autoastrom_tmp \
-               --matchcatalogue=$solution_catalogue_ \
-               --nomessages \
-               $fitopts \
-               $verbosity \
-               $keeptemps \
-               --bestfitlog=$bestfitlog_"
+         #  Process messages
+         if { $values_(messages) } {
+            set messages "--messages"
+         } else {
+            set messages "--nomessages"
+         }
 
-            #--catalogue=temp.TAB \
-            #  Use local SExtractor catalogue...
-            #--xxxccdcat=ngc1275.autoext
-            puts "Running: $args $image"
-            catch {eval $autoastrom_ runwith $args \$image} msg
-            #if { "$msg" != "" && "$msg" != "0" } {
-            #   warning_dialog "$msg"
-            #}
-            if { $error_messages_ != {} } {
-               warning_dialog "$error_messages"
-            }
+         #  Keep temporary files (debugging).
+         if { $values_(keeptemps) } {
+            set keeptemps "--keeptemps"
+         } else {
+            set keeptemps "--nokeeptemps"
+         }
+
+         #  Matching algorithm.
+         if { $values_(usematch) } {
+            set matchargs "--match=match"
+         } else {
+            set matchargs "--match=findoff"
+         }
+
+         #  Defect removal.
+         if { $values_(defects) } {
+            set defects "--defects=remove"
+         } else {
+            set defects "--defects=warn"
+         }
+
+         #  Name of solution fits file.
+         set fitssolution_ "${solutions_}[incr count_].fits"
+
+         #  Create the full set of arguments.
+         set args \
+            "$wcssource\
+                $matchargs\
+                $maxobj\
+                --skycatconfig=$env(CATLIB_CONFIG)\
+                $refcat\
+                --noinsert\
+                --keepfits=$fitssolution_\
+                --temp=autoastrom_tmp\
+                --matchcatalogue=$solution_catalogue_\
+                $fitopts\
+                $verbosity\
+                $messages\
+                $keeptemps\
+                $defects\
+                --bestfitlog=$bestfitlog_"
+
+         #  Use local SExtractor catalogue...
+         #--xxxccdcat=ngc1275.autoext
+
+         #  Report command arguments used (for repeat outside of GAIA).
+         if { $values_(command) } {
+            puts "AUTOASTROM arguments:"
+            puts "  $args $image"
+         }
+
+         #  Run program, monitoring output...
+         catch {eval $autoastrom_ runwith $args \$image} msg
+
+         #  Report any AUTOASTROM error messages (usually not seen
+         #  as the application exit status preempts).
+         if { $error_messages_ != {} } {
+            warning_dialog "$error_messages"
          }
       }
    }
 
    protected method completed_ {} {
-      if { [file exists $solution_] } {
+      if { [file exists $fitssolution_] } {
 
          #  Report the best fit parameters.
          if { [file exists $bestfitlog_] } {
             report_bestfit_
+            set temp_files_($bestfitlog_) 1
          }
 
          #  Need to read the file to extract the solution so GAIA can
          #  display this. Simplest thing to do is read as a new image
          #  and copy the WCS.
-         $itk_option(-rtdimage) astcopy $solution_
+         $itk_option(-rtdimage) astcopy $fitssolution_
          $itk_option(-rtdimage) astreplace
          notify_
 
+         #  Do this before catalogue display which may block.
+         set temp_files_($fitssolution_) 1
+         set fitssolution_ {}
+
          #  Re-draw the positions used in the solution.
          display_solution_cat_
+
       } else {
          error_dialog "Failed to determine a solution"
       }
@@ -552,8 +716,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
    }
 
    #  Configure the reference catalogue window menu to show the
-   #  available catalogues. These are the "remote" catalogues
-   #  available to GAIA. A suitable default is chosen.
+   #  available catalogues. Usually these are the "remote" catalogues
+   #  available to GAIA, but in expert mode this can also include all
+   #  the local catalogues. USNO at ESO is the default as for AUTOASTROM.
    protected method add_reference_catalogues_ {} {
 
       #  Get list of catalogues.
@@ -562,6 +727,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
          return
       }
 
+      $itk_component(refcat) clear
       if {[llength $catalog_list]} {
          foreach i $catalog_list {
             set longname [$astrocat_ longname $i]
@@ -574,6 +740,49 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
          #  Set the default.
          set values_(refcat) "usno@eso"
+      }
+
+      if { $itk_option(-expert) } {
+
+         $itk_component(refcat) add_separator
+
+         #  Include local catalogues and catalogues that have been
+         #  displayed locally.
+
+         #  First truely local catalogues.
+         if { [catch {set catalog_list [lsort [$astrocat_ info "local"]]} msg] } {
+            error_dialog $msg
+            return
+         }
+
+         #  Do not display the history table.
+         set seen(history) 1
+
+         if {[llength $catalog_list]} {
+            foreach i $catalog_list {
+               set shortname [$astrocat_ shortname $i]
+               if { ! [info exists seen($shortname)] } {
+                  $itk_component(refcat) add \
+                     -label "local $shortname" \
+                     -value $shortname \
+                     -command [code $this set_value_ refcat local_${i}]
+                  set seen($shortname) 1
+               }
+            }
+         }
+
+         #  Now ones that are displayed (and may have been modified) locally.
+         foreach f [::cat::AstroCat::instances] {
+            set catalogue [$f cget -catalog]
+            set shortname [$astrocat_ shortname $catalogue]
+            if { ! [info exists seen($shortname)] } {
+               set longname [$astrocat_ longname $catalogue]
+               $itk_component(refcat) add \
+                  -label "local $longname" \
+                  -value $shortname \
+                  -command [code $this set_value_ refcat local_${catalogue}]
+            }
+         }
       }
    }
 
@@ -595,7 +804,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
       $itk_component(invert) configure -state $state
    }
 
-   #  Display the solution positions.
+   #  Display the solution positions. Note this may not return if the
+   #  window is created (waits for toplevel to be destroyed).
    protected method display_solution_cat_ {} {
 
       #  Open the catalogue window. Returns {} if already around.
@@ -690,6 +900,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  Configuration options: (public variables)
    #  ----------------------
 
+   #  Expert mode.
+   itk_option define -expert expert Expert 1
+
    #  Name of rtdimage widget.
    itk_option define -rtdimage rtdimage RtdImage {} {}
 
@@ -727,17 +940,36 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  Any error messages issued by AUTOASTROM.
    protected variable error_messages_ {}
 
+   #  List of locally created files that should be removed on exit.
+   protected variable temp_files_
+
+   #  Name of the solution fits file about to be created.
+   protected variable fitssolution_ {}
+
+   #  Name of file to store the catalogue of positions produced by the
+   #  fit.
+   protected variable solution_catalogue_ {}
+
+   #  Name of file used to store the best fit parameters.
+   protected variable bestfitlog_ {}
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Name of file to store the solution.
-   common solution_ GaiaAutoAstSolution.fits
+   #  Base name of files used to store the solutions.
+   common solutions_ "GaiaAutoAstSolution"
 
-   #  Name of file to store the catalogue of positions used in fit.
-   common solution_catalogue_ GaiaAutoAstSolutionPos.ASC
+   #  Base name of files used to store the fit positions.
+   common solution_catalogues_ "GaiaAutoAstSolutionPos"
 
-   #  Name of file to store the best fit parameters.
-   common bestfitlog_ GaiaAutoAstromFit.Log
+   #  Base name of file to store the best fit parameters.
+   common bestfitlogs_ "GaiaAutoAstromFit"
+
+   #  Base name of file to store a local copy of a catalogue.
+   common temp_catalogues_ "GaiaAutoAstromCopy"
+
+   #  Unique number for generating names. Increment when used.
+   common count_ 0
 
    # C++ astrocat object used here to access catalog entries
    common astrocat_ [astrocat ::gaia::.cat]

@@ -279,10 +279,15 @@ itcl::class gaia::GaiaSearch {
 
       #  Save these to a temporary catalogue.
       set name "GaiaTableExtract[incr count_].TAB"
-      $results_ save_to_file  $name $selected [$results_ get_headings]
+      $results_ save_to_file $name $selected [$results_ get_headings]
 
       #  And display it.
       new_local_catalog $name $itk_option(-id) gaia::GaiaSearch
+   }
+
+   #  Save table to a named file.
+   public method save_to_file {filename} {
+      $results_ save_to_named_file $filename
    }
 
    #  Override plot to stop use of image WCS system if asked.

@@ -817,7 +817,7 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -notify_cmd [code $this redraw_specials_ 1] \
-            -clone_cmd [code $this make_toolbox astdefine 1] \
+            -clone_cmd [code $this make_toolbox autoastrom 1] \
             -really_die $cloned
       }
    }

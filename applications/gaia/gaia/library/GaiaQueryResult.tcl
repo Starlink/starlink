@@ -71,7 +71,7 @@ itcl::class gaia::GaiaQueryResult {
    }
 
    #  Remove the currently selected rows from a local catalog file
-   method remove_selected {} {
+   public method remove_selected {} {
       set file [$astrocat url]
       set info [get_selected]
 
@@ -93,7 +93,7 @@ itcl::class gaia::GaiaQueryResult {
    #  This method is called with the data for a new object to add to a
    #  local catalog. The row is added to the local catalog file and the
    #  command is evaluated.
-   method enter_object {command info} {
+   public method enter_object {command info} {
       if {[check_row $info]} {
          return
       }
@@ -113,7 +113,7 @@ itcl::class gaia::GaiaQueryResult {
    #  This method is called with the new data to replace the data for
    #  the selected object/row in the local catalog. The command is
    #  evaluated when done.
-   method replace_object {command old_data new_data} {
+   public method replace_object {command old_data new_data} {
       if {[check_row $new_data]} {
          return
       }
@@ -151,7 +151,7 @@ itcl::class gaia::GaiaQueryResult {
    #  Override TableList::new_info so we can define the sizes of the
    #  columns using C code to speed things up. Also stop use of WCS
    #  info, this also speeds things up.
-   method new_info {} {
+   public method new_info {} {
       #  Determine the sizes of the columns, provided that -format
       #  isn't set.
       if { ! $formats_flag_ } {
@@ -161,8 +161,13 @@ itcl::class gaia::GaiaQueryResult {
    }
 
    #  Override print to avoid bug. This method shouldn't exist.
-   method print {fd} {
+   public method print {fd} {
       TableList::print $fd
+   }
+
+   #  Save the results to a named file.
+   public method save_to_named_file {filename} {
+      save_to_file $filename $info_ $headings_
    }
 
    #  Configuration options (public variables):
