@@ -53,6 +53,9 @@
           CALL IMG_GETCACHE(I_VOK,I_QOK,STATUS)
           CALL IMG_CACHE(STATUS)
           I_MEM=.TRUE.
+          IF (I_GUI) THEN
+            CALL IMG_NBPUT0I('CACHE',1,STATUS)
+          ENDIF
         ELSEIF (MODE.EQ.'TOG') THEN
           IF (I_MEM) THEN
             CALL IMG_TOGGLE(STATUS)
@@ -66,6 +69,8 @@
           IF (I_MEM) THEN
             CALL IMG_DELCACHE(STATUS)
             I_MEM=.FALSE.
+            IF (I_GUI) THEN
+              CALL IMG_NBPUT0I('CACHE',0,STATUS)
           ELSE
             CALL MSG_PRNT('AST_ERR: no image currently in cache')
           ENDIF
