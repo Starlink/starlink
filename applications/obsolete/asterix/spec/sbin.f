@@ -101,6 +101,8 @@
 *        Updated data interface
 *      4 Dec 1995 V2.0-0 (DJA):
 *        ADI port
+*     11 Mar 1996 V2.0-1 (DJA):
+*        Fixed silly quality bug from ADI port
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,7 +122,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'SBIN Version V2.0-0' )
+        PARAMETER		( VERSION = 'SBIN Version V2.0-1' )
 
 *  Local Variables:
       REAL 			SUM			! Data sum
@@ -172,7 +174,7 @@
 *    Get total counts taking account of any QUALITY
         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAPUB( IFID, 'Data', 'READ', IQPTR, STATUS )
+          CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
           CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
           CALL ARR_SUM1RQ( INVAL, %VAL(IDPTR), %VAL(IQPTR), MASK, SUM,
      :                     STATUS )

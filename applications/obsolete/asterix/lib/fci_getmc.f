@@ -132,7 +132,7 @@
 *      Write control data
           CALL ADI_CPUT0I( 'MaxIt', NITMAX, STATUS )
           CALL ADI_CPUT0I( 'UpdateInterval', NUP, STATUS )
-          CALL ADI_CPUT0I( 'MinSlope', MINSLO, STATUS )
+          CALL ADI_CPUT0R( 'MinSlope', MINSLO, STATUS )
 
         END IF
 

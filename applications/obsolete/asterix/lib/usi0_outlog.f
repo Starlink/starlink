@@ -94,18 +94,18 @@
             BPOS = CHR_LEN(BUF)
             CALL USI0_OUTLOG_F77( BUF, BPOS, CTX_CSTR(USI_ICTX)
      :              (1:CTX_CLEN(USI_ICTX)), .FALSE., STATUS )
-            CALL USI0_OUTLOG_F77( BUF, BPOS, ' '//USI_CTX(USI_ICTX).
-     :           PSTRING(1:USI_CTX(USI_ICTX).PLEN), .FALSE.,
-     :                            STATUS )
+c            CALL USI0_OUTLOG_F77( BUF, BPOS, ' '//USI_CTX(USI_ICTX).
+c     :           PSTRING(1:USI_CTX(USI_ICTX).PLEN), .FALSE.,
+c     :                            STATUS )
             CALL USI0_OUTLOG_F77( BUF, BPOS, ''', STATUS )', .TRUE.,
      :                            STATUS )
 
           ELSE
             CALL FIO_WRITE( USI_LOGFID, CTX_CSTR(USI_ICTX)
      :              (1:CTX_CLEN(USI_ICTX))//' '//LC, STATUS )
-            CALL FIO_WRITE( USI_LOGFID,
-     :            USI_CTX(USI_ICTX).PSTRING(:USI_CTX(USI_ICTX).PLEN),
-     :            STATUS )
+c            CALL FIO_WRITE( USI_LOGFID,
+c     :            USI_CTX(USI_ICTX).PSTRING(:USI_CTX(USI_ICTX).PLEN),
+c     :            STATUS )
 
           END IF
 

@@ -115,7 +115,8 @@
       CALL UDI0_CHKNTY( TYPE, LTYPE, STATUS )
 
 *  Write the type string
-      CALL ADI_CPUT0C( ID, 'TYPE', LTYPE, STATUS )
+      CALL ADI_CPUT0C( ID, 'TYPE', LTYPE(:CHR_LEN(LTYPE)),
+     :                 STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_SETTYP', STATUS )
