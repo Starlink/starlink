@@ -77,7 +77,6 @@
         USI_ICTX = USI_ICTX + 1
         USI_CTX(USI_ICTX).TYPE = PSYS
         USI_CTX(USI_ICTX).PLEN = 0
-        USI_CTX(USI_ICTX).PSTORE = DAT__NOLOC
 
 *  Warn if not found
       ELSE
