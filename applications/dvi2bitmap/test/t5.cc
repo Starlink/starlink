@@ -184,7 +184,9 @@ int main (int argc, char** argv)
     try {
 	
 	DviFile *dvif = new DviFile(argc > 1 ? argv[1] : "t5.dvi",
-				    PkFont::dpiBase(), 1.0);
+				    PkFont::dpiBase(), // resolution
+				    1.0, // overall magnification
+				    true); // read postamble
 	const DviFile::FontSet* fs = dvif->getFontSet();
     
 	DviFile::FontSet::const_iterator dvii = fs->begin();
