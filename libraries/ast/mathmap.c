@@ -186,15 +186,22 @@ typedef enum {
    OP_ABS,                       /* Absolute value (sign removal) */
    OP_ACOS,                      /* Inverse cosine (radians) */
    OP_ACOSD,                     /* Inverse cosine (degrees) */
+   OP_ACOSH,                     /* Inverse hyperbolic cosine */
+   OP_ACOTH,                     /* Inverse hyperbolic cotangent */
+   OP_ACSCH,                     /* Inverse hyperbolic cosecant */
+   OP_ASECH,                     /* Inverse hyperbolic secant */
    OP_ASIN,                      /* Inverse sine (radians) */
    OP_ASIND,                     /* Inverse sine (degrees) */
    OP_ASINH,                     /* Inverse hyperbolic sine */
    OP_ATAN,                      /* Inverse tangent (radians) */
    OP_ATAND,                     /* Inverse tangent (degrees) */
+   OP_ATANH,                     /* Inverse hyperbolic tangent */
    OP_CEIL,                      /* C ceil function (round up) */
    OP_COS,                       /* Cosine (radians) */
    OP_COSD,                      /* Cosine (degrees) */
    OP_COSH,                      /* Hyperbolic cosine */
+   OP_COTH,                      /* Hyperbolic cotangent */
+   OP_CSCH,                      /* Hyperbolic cosecant */
    OP_EXP,                       /* Exponential function */
    OP_FLOOR,                     /* C floor function (round down) */
    OP_INT,                       /* Integer value (round towards zero) */
@@ -203,7 +210,9 @@ typedef enum {
    OP_LOG10,                     /* Base 10 logarithm */
    OP_NINT,                      /* Fortran NINT function (round to nearest) */
    OP_POISS,                     /* Poisson random number */
+   OP_SECH,                      /* Hyperbolic secant */
    OP_SIN,                       /* Sine (radians) */
+   OP_SINC,                      /* Sinc function [= sin(x)/x] */
    OP_SIND,                      /* Sine (degrees) */
    OP_SINH,                      /* Hyperbolic sine */
    OP_SQR,                       /* Square */
@@ -315,16 +324,23 @@ static const Symbol symbol[] = {
    { "abs("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ABS      },
    { "acos("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOS     },
    { "acosd("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOSD    },
+   { "acosh("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOSH    },
+   { "acoth("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACOTH    },
+   { "acsch("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ACSCH    },
    { "aint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_INT      },
+   { "asech("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASECH    },
    { "asin("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIN     },
    { "asind("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASIND    },
    { "asinh("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ASINH    },
    { "atan("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAN     },
    { "atand("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATAND    },
+   { "atanh("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ATANH    },
    { "ceil("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_CEIL     },
    { "cos("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COS      },
    { "cosd("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSD     },
    { "cosh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COSH     },
+   { "coth("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_COTH     },
+   { "csch("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_CSCH     },
    { "exp("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_EXP      },
    { "fabs("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_ABS      },
    { "floor("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_FLOOR    },
@@ -334,7 +350,9 @@ static const Symbol symbol[] = {
    { "log10("      ,  6,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_LOG10    },
    { "nint("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_NINT     },
    { "poisson("    ,  8,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_POISS    },
+   { "sech("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SECH     },
    { "sin("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIN      },
+   { "sinc("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SINC     },
    { "sind("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SIND     },
    { "sinh("       ,  5,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SINH     },
    { "sqr("        ,  4,  0,  1,  1,  0, 19,  1,  1,  0,  1,  OP_SQR      },
@@ -1501,9 +1519,13 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    int narg;                     /* Number of function arguments */
    int ncode;                    /* Number of opcodes to process */
    int point;                    /* Loop counter for stack vector elements */
+   int sign;                     /* Argument is non-negative? */
    int tos;                      /* Top of stack index */
    static double d2r;            /* Degrees to radians conversion factor */
+   static double log2;           /* Natural logarithm of 2.0 */
    static double r2d;            /* Radians to degrees conversion factor */
+   static double rsafe_sq;       /* Reciprocal of "safe_sq" */
+   static double safe_sq;        /* Huge value that can safely be squared */
    static int init = 0;          /* Initialisation performed? */
    unsigned long b1;             /* Block of bits from first argument */
    unsigned long b2;             /* Block of bits from second argument */
@@ -1514,11 +1536,22 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    if ( !astOK ) return;
 
 /* If this is the first invocation of this function, then initialise
-   the trigonometrical conversion factors. */
+   constant values. */
    if ( !init ) {
+
+/* Trigonometrical conversion factors. */
       pi = acos( -1.0 );
       r2d = 180.0 / pi;
       d2r = pi / 180.0;
+
+/* Natural logarithm of 2.0. */
+      log2 = log( 2.0 );
+
+/* This value must be safe to square without producing overflow, yet
+   large enough that adding or subtracting 1.0 from the square makes no
+   difference. We also need its reciprocal. */
+      safe_sq = 0.9 * sqrt( DBL_MAX );
+      rsafe_sq = 1.0 / safe_sq;
 
 /* Note that initialisation has been performed. */
       init = 1;
@@ -2169,19 +2202,43 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
                                      acos( x ) : AST__BAD )
             ARG_1( OP_ACOSD,    *y = ( ABS( x ) <= 1.0 ) ?
                                      acos( x ) * r2d : AST__BAD )
+            ARG_1( OP_ACOSH,    *y = ( x < 1.0 ) ? AST__BAD :
+                                     ( ( x > safe_sq ) ? log( x ) + log2 :
+                                       log( x + sqrt( x * x - 1.0 ) ) ) )
+            ARG_1( OP_ACOTH,    *y = ( ABS( x ) <= 1.0 ) ? AST__BAD :
+                                     0.5 * ( log( ( x + 1.0 ) /
+                                                  ( x - 1.0 ) ) ) )
+            ARG_1( OP_ACSCH,    *y = ( ( x == 0.0 ) ? AST__BAD :
+                                       ( sign = ( x >= 0.0 ), x = ABS( x ),
+                                       ( sign ? 1.0 : -1.0 ) *
+                                       ( ( x < rsafe_sq ) ? log2 - log( x ) :
+                                         ( x = 1.0 / x,
+                                       log( x + sqrt( x * x + 1.0 ) ) ) ) ) ) )
+            ARG_1( OP_ASECH,    *y = ( ( x <= 0 ) || ( x > 1.0 ) ) ? AST__BAD :
+                                       ( ( x < rsafe_sq ) ? log2 - log( x ) :
+                                         ( x = 1.0 / x,
+                                           log( x + sqrt( x * x - 1.0 ) ) ) ) )
             ARG_1( OP_ASIN,     *y = ( ABS( x ) <= 1.0 ) ?
                                      asin( x ) : AST__BAD )
             ARG_1( OP_ASIND,    *y = ( ABS( x ) <= 1.0 ) ?
                                      asin( x ) * r2d : AST__BAD )
-            ARG_1( OP_ASINH,    *y = ( x >= 0.0 ) ?
-                                     log( x + sqrt( x * x + 1.0 ) ) :
-                                     -log( -x + sqrt( x * x + 1.0 ) ) )
+            ARG_1( OP_ASINH,    *y = ( sign = ( x >= 0.0 ), x = ABS( x ),
+                                       ( sign ? 1.0 : -1.0 ) *
+                                       ( ( x > safe_sq ) ? log( x ) + log2 :
+                                         log( x + sqrt( x * x + 1.0 ) ) ) ) )
             ARG_1( OP_ATAN,     *y = atan( x ) )
             ARG_1( OP_ATAND,    *y = atan( x ) * r2d )
+            ARG_1( OP_ATANH,    *y = ( ABS( x ) >= 1.0 ) ? AST__BAD :
+                                     0.5 * ( log( ( 1.0 + x ) /
+                                                  ( 1.0 - x ) ) ) )
             ARG_1( OP_CEIL,     *y = ceil( x ) )
             ARG_1( OP_COS,      *y = cos( x ) )
             ARG_1( OP_COSD,     *y = cos( x * d2r ) )
             ARG_1( OP_COSH,     *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
+            ARG_1( OP_COTH,     *y = ( x = tanh( x ), SAFE_DIV( 1.0, x ) ) )
+            ARG_1( OP_CSCH,     *y = ( x = CATCH_MATHS_OVERFLOW( sinh( x ) ),
+                                       ( x == AST__BAD ) ?
+                                       0.0 : SAFE_DIV( 1.0, x ) ) )
             ARG_1( OP_EXP,      *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
             ARG_1( OP_FLOOR,    *y = floor( x ) )
             ARG_1( OP_INT,      *y = INT( x ) )
@@ -2191,7 +2248,10 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
             ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
                                      floor( x + 0.5 ) : ceil( x - 0.5 ) )
             ARG_1( OP_POISS,    *y = Poisson( rcontext, x ) )
+            ARG_1( OP_SECH,     *y = ( x = CATCH_MATHS_OVERFLOW( cosh( x ) ),
+                                       ( x == AST__BAD ) ? 0.0 : 1.0 / x ) )
             ARG_1( OP_SIN,      *y = sin( x ) )
+            ARG_1( OP_SINC,     *y = ( x == 0.0 ) ? 1.0 : sin( x ) / x )
             ARG_1( OP_SIND,     *y = sin( x * d2r ) )
             ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
             ARG_1( OP_SQR,      *y = SAFE_MUL( x, x ) )
@@ -6084,16 +6144,28 @@ c     - acos(x): Inverse cosine of "x", in radians.
 f     - ACOS(X): Inverse cosine of X, in radians.
 c     - acosd(x): Inverse cosine of "x", in degrees.
 f     - ACOSD(X): Inverse cosine of X, in degrees.
+c     - acosh(x): Inverse hyperbolic cosine of "x".
+f     - ACOSH(X): Inverse hyperbolic cosine of X.
+c     - acoth(x): Inverse hyperbolic cotangent of "x".
+f     - ACOTH(X): Inverse hyperbolic cotangent of X.
+c     - acsch(x): Inverse hyperbolic cosecant of "x".
+f     - ACSCH(X): Inverse hyperbolic cosecant of X.
 c     - aint(x): Integer part of "x" (round towards zero), same as int(x).
 f     - AINT(X): Integer part of X (round towards zero), same as INT(X).
+c     - asech(x): Inverse hyperbolic secant of "x".
+f     - ASECH(X): Inverse hyperbolic secant of X.
 c     - asin(x): Inverse sine of "x", in radians.
 f     - ASIN(X): Inverse sine of X, in radians.
 c     - asind(x): Inverse sine of "x", in degrees.
 f     - ASIND(X): Inverse sine of X, in degrees.
+c     - asinh(x): Inverse hyperbolic sine of "x".
+f     - ASINH(X): Inverse hyperbolic sine of X.
 c     - atan(x): Inverse tangent of "x", in radians.
 f     - ATAN(X): Inverse tangent of X, in radians.
 c     - atand(x): Inverse tangent of "x", in degrees.
 f     - ATAND(X): Inverse tangent of X, in degrees.
+c     - atanh(x): Inverse hyperbolic tangent of "x".
+f     - ATANH(X): Inverse hyperbolic tangent of X.
 c     - atan2(x1, x2): Inverse tangent of "x1/x2", in radians.
 f     - ATAN2(X1, X2): Inverse tangent of X1/X2, in radians.
 c     - atan2d(x1, x2): Inverse tangent of "x1/x2", in degrees.
@@ -6108,6 +6180,10 @@ c     - cosd(x): Cosine of "x" in degrees.
 f     - COSD(X): Cosine of X in degrees.
 c     - cosh(x): Hyperbolic cosine of "x".
 f     - COSH(X): Hyperbolic cosine of X.
+c     - coth(x): Hyperbolic cotangent of "x".
+f     - COTH(X): Hyperbolic cotangent of X.
+c     - csch(x): Hyperbolic cosecant of "x".
+f     - CSCH(X): Hyperbolic cosecant of X.
 c     - dim(x1, x2): Returns "x1-x2" if "x1" is greater than "x2", otherwise 0.
 f     - DIM(X1, X2): Returns X1-X2 if X1 is greater than X2, otherwise 0.
 c     - exp(x): Exponential function of "x".
@@ -6154,12 +6230,16 @@ c     - rand(x1, x2): Random sample from a uniform distribution in the
 c       range "x1" to "x2" inclusive.
 f     - RAND(X1, X2): Random sample from a uniform distribution in the
 f       range X1 to X2 inclusive.
+c     - sech(x): Hyperbolic secant of "x".
+f     - SECH(X): Hyperbolic secant of X.
 c     - sign(x1, x2): Absolute value of "x1" with the sign of "x2"
 c       (transfer of sign).
 f     - SIGN(X1, X2): Absolute value of X1 with the sign of X2
 f       (transfer of sign).
 c     - sin(x): Sine of "x" in radians.
 f     - SIN(X): Sine of X in radians.
+c     - sinc(x): Sinc function of "x" [= "sin(x)/x"].
+f     - SINC(X): Sinc function of X [= SIN(X)/X].
 c     - sind(x): Sine of "x" in degrees.
 f     - SIND(X): Sine of X in degrees.
 c     - sinh(x): Hyperbolic sine of "x".
