@@ -154,6 +154,9 @@
 *        Modified to include the BASEPIC Frame in the returned Plot.
 *     14-OCT-1999 (DSB):
 *        Added CURPIC Frame.
+*     14-FEB-2000 (DSB):
+*        Set BASEPIC and CURPIC Format to %.3f to avoid loads of
+*        unnecessary digits being displayed by programs such as GDSTATE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -378,7 +381,8 @@
      :                     'co-ordinates in the AGI BASE picture.,'//
      :                     'Symbol(1)=X,Symbol(2)=Y,'//
      :                     'Label(1)=Horizontal offset,'//
-     :                     'Label(2)=Vertical offset',
+     :                     'Label(2)=Vertical offset,'//
+     :                     'Format(1)=%.3f,Format(2)=%.3f',
      :                     STATUS )
 
 *  Save the original current Frame index.
@@ -440,7 +444,8 @@
      :                     'co-ordinates in the current AGI picture.,'//
      :                     'Symbol(1)=X,Symbol(2)=Y,'//
      :                     'Label(1)=Horizontal offset,'//
-     :                     'Label(2)=Vertical offset',
+     :                     'Label(2)=Vertical offset,'//
+     :                     'Format(1)=%.3f,Format(2)=%.3f',
      :                     STATUS )
 
 *  Save the original current Frame index.
