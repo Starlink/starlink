@@ -1446,257 +1446,346 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
           state is, and how to handle it.</p>
 
         <p>Since most of the details here are rather intricate, here
-          are a few FAQs which might save you reading them.
-          <dl>
-            <dt>How do I get rid of state in a checked-out directory?</dt>
-            <dd>
-              <p>One of <kbd>make clean</kbd>, <kbd>make
-                  distclean</kbd> or <kbd>make maintainer-clean</kbd>
-                should do what you want.  The first gets rid of
-                compiled files, the second everything but distributed
-                files, and the third returns the directory to an
-                almost pristine state, though without deleting
-                <code>./configure</code> or the files it needs to
-                run.</p>
-              <p>The nuclear option for clearing state from a
-                directory <code>ping</code> is to delete it and check
-                it out afresh:
-                <verbatim>
+          are a few FAQs which might save you reading them.</p>
+
+        <subsubsect id="state-faqs">
+          <subhead>
+            <title>State FAQs</title>
+          </subhead>
+
+          <p>
+            <dl>
+              <dt>How do I get rid of state in a checked-out directory?</dt>
+              <dd>
+                <p>One of <kbd>make clean</kbd>, <kbd>make
+                    distclean</kbd> or <kbd>make maintainer-clean</kbd>
+                  should do what you want.  The first gets rid of
+                  compiled files, the second everything but distributed
+                  files, and the third returns the directory to an
+                  almost pristine state, though without deleting
+                  <code>./configure</code> or the files it needs to
+                  run.</p>
+                <p>The nuclear option for clearing state from a
+                  directory <code>ping</code> is to delete it and check
+                  it out afresh:
+<verbatim>
 % cd ..
 % rm -rf ping # or: mv ping ping-old
 % cvs update -d ping
 </verbatim>
-                though do make sure that you have no modified but
-                uncommited files left within <code>ping</code>.</p>
-            </dd>
+                  though do make sure that you have no modified but
+                  uncommited files left within <code>ping</code>.</p>
+              </dd>
 
-            <dt>Why does <kbd>make world</kbd> not do anything?</dt>
-            <dd>
-              <p>The <kbd>make world</kbd> build works by comparing
-                timestamps of the <em>installed</em> files in the
-                manifests directory -- that is, in something like
-                <code>/my-star/manifests</code>, outside of the build
-                tree.  It only checks whether each component was
-                <em>installed</em> after each of the components it
-                depends on.  If you wish to use this to (rebuild and)
-                reinstall a given component, then simply delete the
-                manifest file for the component in question and re-run
-                <kbd>make world</kbd>.</p>
-              <p>Alternatively, <kbd>make</kbd> in the top-level
-                checkout directory will recurse, and invoke <kbd>make
-                  all</kbd> in each of its children, and thus bring
-                the whole tree up to date.</p>
-              <p>You can check the default installation location --
-                shown as <code>/my-star</code> above -- with
-                <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
-            </dd>
+              <dt>How do I start again?</dt>
+              <dd>
+                <p>As mentioned above, <code>make
+                    maintainer-clean</code> in the top level should
+                  recurse and make <code>maintainer-clean</code> in each
+                  of the children.  That unmakes and unconfigures
+                  everything, but doesn't undo the bootstrapping.  The
+                  bootstrapping done by <code>./bootstrap</code> doesn't
+                  depend on any state except the contents of the
+                  manifest files, and to undo that, you need only delete
+                  the manifest.</p>
 
-            <dt>I know the buildsupport tools have been updated in the
-              repository.  What's the best way to install the new
-              versions locally?</dt>
-            <dd>
-              <p>The most straightforward way is to update your
-                checkout of the component in question, then invoke
-                <kbd>./configure; make; make install-manifest</kbd>
-                within that checkout directory.</p>
-              <p>Alternatively, and much as described above, you could
-                update your checkout of the component in question,
-                then delete its manifest file and run <kbd>make
-                  world</kbd> from the top level of the checkout.</p>
-            </dd>
+                <p>For maintainer-clean to work, one sometimes needs
+                  to make extra declarations in
+                  <code>Makefile.am</code>.  There could well be
+                  components where maintainer-clean doesn't work as
+                  fully as it ought.  Do mention those if you spot them.
+                </p>
+              </dd>
 
-            <dt>How do I determine where a component is installed?</dt>
-            <dd>
-              <p>In a variety of ways.  In the list below, each mechanism
-                effectively supplies the default for the mechanism
-                before it.
-                <ol>
-                  <li>
-                    <p>You can specify an installation prefix at
-                      install time:
-                      <verbatim>
+              <dt>How do I determine where a component is installed?</dt>
+              <dd>
+                <p>In a variety of ways.  In the list below, each mechanism
+                  effectively supplies the default for the mechanism
+                  before it.
+                  <ol>
+                    <li>
+                      <p>You can specify an installation prefix at
+                        install time:
+<verbatim>
 % make prefix=/odd/place install # or install-manifest
 </verbatim>
-                      This might break your installation if there was
-                      a prefix baked in to your component at build
-                      time.  Do this only if you have a particular
-                      reason for doing so, and know what you're doing.</p>
-                  </li>
-                  <li>
-                    <p>At make time:
-                      <verbatim>
+                        This might break your installation if there was
+                        a prefix baked in to your component at build
+                        time.  Do this only if you have a particular
+                        reason for doing so, and know what you're doing.</p>
+                    </li>
+                    <li>
+                      <p>At make time:
+<verbatim>
 % make prefix=/odd/place
 </verbatim>
-                      This builds your component with the Makefile
-                      variable <code>${prefix}</code> set to the given
-                      value.  The component will be installed into
-                      this location at install time, unless you
-                      override the location as described above.  See
-                      the discussion of `installation directory
-                      variables' in <ref id="automakeoverview"/>.</p>
-                  </li>
-                  <li>
-                    <p>At configure time:
-                      <verbatim>
+                        This builds your component with the Makefile
+                        variable <code>${prefix}</code> set to the given
+                        value.  The component will be installed into
+                        this location at install time, unless you
+                        override the location as described above.  See
+                        the discussion of `installation directory
+                        variables' in <ref id="automakeoverview"/>.</p>
+                    </li>
+                    <li>
+                      <p>At configure time:
+<verbatim>
 % ./configure --prefix=/odd/place
 </verbatim>
-                      This is usually the most appropriate way to do this.</p>
-                  </li>
-                  <li>
-                    <p>By setting a `sticky variable':
-                      <verbatim>
+                        This is usually the most appropriate way to do
+                        this.</p>
+                    </li>
+                    <li>
+                      <p>By setting a `sticky variable':
+<verbatim>
 % ./starconf.status STARCONF_DEFAULT_PREFIX=/odd/place
 </verbatim>
-                      This sets the default for the
-                      <code>./configure</code> script's
-                      <code>--prefix</code> option.</p>
-                  </li>
-                  <li>
-                    <p>By configuring <em>starconf</em>:
-                      <verbatim>
+                        This sets the default for the
+                        <code>./configure</code> script's
+                        <code>--prefix</code> option.</p>
+                    </li>
+                    <li>
+                      <p>By configuring <em>starconf</em>:
+<verbatim>
 % pwd
 .../buildsupport/starconf
 % ./configure STARCONF_DEFAULT_PREFIX=/odd/place
 ...
 % make; make install-manifest
 </verbatim>
-                      This sets the default for all directories
-                      configured using this <em>starconf</em> application.
-                      This is effectively what you do when you set the
-                      environment variable
-                      <code>STARCONF_DEFAULT_PREFIX</code> before you
-                      run the top-level <code>./bootstrap</code>
-                      script, as described in <ref
-                        id="bootstrapping"/>.</p>
-                  </li>
-                </ol>
-              </p>
-            </dd>
-          </dl>
-        </p>
+                        This sets the default for all directories
+                        configured using this <em>starconf</em> application.
+                        This is effectively what you do when you set the
+                        environment variable
+                        <code>STARCONF_DEFAULT_PREFIX</code> before you
+                        run the top-level <code>./bootstrap</code>
+                        script, as described in <ref
+                          id="bootstrapping"/>.</p>
+                    </li>
+                  </ol>
+                </p>
+              </dd>
 
-        <p>Here are the details.</p>
+              <dt>OK, now I've changed my mind about where I want components
+                to be installed -- the `prefix'.  How do I tell the
+                build system?</dt>
 
-        <p><em>Autotool state</em>: The most obvious state within the
-          tree is the existence of the <code>configure</code> and
-          <code>Makefile.in</code> files which are the generated by
-          autoconf and automake.  Files <code>config.h.in</code> and
-          <code>aclocal.m4</code>, are also part of this process,
-          inasmuch as they are generated by autoreconf:
-          <code>config.h.in</code> is based on the declarations
-          within <code>configure.ac</code>; <code>aclocal.m4</code> is a
-          local cache of m4 macros, drawn from the autoconf, automake
-          and libtool installations, plus the contents of
-          <code>acinclude.m4</code> (see below for this).  Other objects
-          generated by the autotools are the cache directory
-          <code>autom4te.cache</code> and the tool links
-          <code>config.guess</code>, <code>config.sub</code>,
-          <code>depcomp</code>, <code>install-sh</code>,
-          <code>ltmain.sh</code>, <code>missing</code> and
-          <code>stamp-h1</code>.  All of this can be happily blown away
-          by hand, and a lot of it is removed by <kbd>make
-            maintainer-clean</kbd>, though this doesn't remove things like
-          <code>config.h.in</code> which are required for
-          <code>./configure</code> to run.  Most of this state is
-          maintained reliably by the dependencies within
-          <code>Makefile.in</code> -- for example if you update
-          <code>Makefile.am</code>, then a simple <kbd>make</kbd> will
-          remake <code>Makefile.in</code> and regenerate
-          <code>Makefile</code> before using the new
-          <code>Makefile</code> to do the build.  If you have removed
-          this state or suspect that it may be out of date, then
-          autoreconf will always regenerate it -- it's always safe to
-          rerun autoreconf.</p>
+              <dd>
+                <p>Easy.  Set the <code>STARCONF_...</code> variables
+                  as you want them, as described in <ref
+                    id="bootstrapping"/>, and in the top level of the
+                  checkout, do
+<verbatim>
+% rm &lt;my-star&gt;/manifests/starconf
+% ./bootstrap
+</verbatim>
+                  The first command forces the bootstrap to remake and
+                  reinstall the starconf component (since its manifest
+                  file is present, it would not otherwise bother),
+                  taking the current values of the <code>STARCONF_...</code>
+                  variables into account, and
+                  the second command simply calls the bootstrap
+                  script, which overwrites the little state
+                  associated with it.</p>
 
-        <p><em>Configuration state</em>: When <code>./configure</code>
-          runs, its most obvious effect is to transform the
-          <code>.in</code> files into their corresponding configured
-          results.  However at the same time, it creates a log file in
-          <code>config.log</code> (which can be handy to examine if a
-          configure script fails or appears to give wrong answers), a
-          cache in <code>config.cache</code> if you ran
-          <code>./configure</code> with the <code>-C</code> option, it
-          creates the directory-specific <code>./libtool</code> script,
-          and it creates a file <code>config.status</code>.  This last
-          file holds most of <code>./configure</code>'s state, and can
-          be used to either regenerate a particular file
-          (<kbd>./config.status Makefile</kbd>) or else to update itself
-          (<kbd>./config.status --recheck</kbd> has the effect of
-          rerunning <code>./configure</code> with the same options such
-          as <code>--prefix</code> which were given to the
-          <code>./configure</code> script last time).  You won't often
-          have to run <code>./config.status</code> yourself, but it's
-          reassuring to know what it's doing when the makefile runs it
-          for you.  It is always regenerated afresh by running
-          <code>./configure</code>.</p>
+                <p>For more details, see the notes on state in <ref
+                    id="state-details"/>.</p>
+              </dd>
 
-        <p><em>Build state</em>: The compiled files are obviously part
-          of the build state, and can be removed by <kbd>make
-            clean</kbd> and regenerated with plain <kbd>make</kbd>.  Less
-          obviously part of this state are the directory
-          <code>.libs</code>, which is libtool's' workspace and holds
-          different types of objects and libraries, and
-          <code>.deps</code>, which holds dependency information gleaned
-          as part of the last build.  Less obviously still are those
-          (few) <code>.in</code> files which are configured as part of
-          the build.  As mentioned in <ref id="automakeoverview"/>,
-          so-called `installation directory variables' should be
-          substituted at make time rather than build time, with a
-          hand-written makefile rule in <code>Makefile.am</code>.</p>
+              <dt>Why does <kbd>make world</kbd> not do anything?</dt>
+              <dd>
+                <p>The <kbd>make world</kbd> build works by comparing
+                  timestamps of the <em>installed</em> files in the
+                  manifests directory -- that is, in something like
+                  <code>/my-star/manifests</code>, outside of the build
+                  tree.  It only checks whether each component was
+                  <em>installed</em> after each of the components it
+                  depends on.  If you wish to use this to (rebuild and)
+                  reinstall a given component, then simply delete the
+                  manifest file for the component in question and re-run
+                  <kbd>make world</kbd>.</p>
+                <p>Alternatively, <kbd>make</kbd> in the top-level
+                  checkout directory will recurse, and invoke <kbd>make
+                    all</kbd> in each of its children, and thus bring
+                  the whole tree up to date.</p>
+                <p>You can check the default installation location --
+                  shown as <code>/my-star</code> above -- with
+                  <kbd>./starconf-status --show STARCONF_DEFAULT_PREFIX</kbd></p>
+              </dd>
 
-        <p><em>Starconf state</em>: The <ref id="starconf">starconf
-            section</ref> described the <code>starconf.status</code>
-          script, and some of the state that it holds on behalf of the
-          starconf application.  This is deliberately sticky state, and
-          this file is intended to be checked in to the repository.  As
-          well as holding your default installation locations, it also
-          holds some files which are maintained by the starconf
-          application but associated with your component, which includes
-          the standard <code>./bootstrap</code> script and the
-          collection of starconf m4 macros <code>starconf.m4</code>.  
-          The starconf application and the standard bootstrap script
-          both run <code>./starconf.status</code> at the correct time,
-          but you can also run it yourself if you think you need to.
-          Running <code>./starconf.status</code> unpacks these two (only
-          two at present) files and in the latter case copies it to
-          overwrite <code>acinclude.m4</code>, as hinted above.  This
-          means that these files are kept with your application, but if
-          starconf is updated, then this update will propagate to all
-          components, since the standard <code>./bootstrap</code> script
-          re-invokes starconf if it can.  You can delete this file, and
-          regenerate it by running starconf either explicitly, or
-          implicitly through <code>./bootstrap</code>.</p>
+              <dt>I know the buildsupport tools have been updated in the
+                repository.  What's the best way to install the new
+                versions locally?</dt>
+              <dd>
+                <p>The most straightforward way is to update your
+                  checkout of the component in question, then invoke
+                  <kbd>./configure; make; make install-manifest</kbd>
+                  within that checkout directory.</p>
+                <p>Alternatively, and much as described above, you could
+                  update your checkout of the component in question,
+                  then delete its manifest file and run
+                  <kbd>./bootstrap --buildsupport-only</kbd> in the
+                  top level of the checkout.</p>
+              </dd>
 
-        <p><em>Build tree and installation state</em>: The last
-          noteworthy state is that in the build tree as a whole.  The
-          top-level makefile requires some state in order to manage its
-          bootstrapping `make world' build.  This build is organised by
-          representing the build and link dependencies between
-          components by makefile dependencies between the components'
-          installed manifests, which are installed in the
-          <code>.../manifests</code> directory alongside, and at the
-          same time, as the component is installed by the
-          <code>install-manifest</code> target.  Thus this is state held
-          <em>outside of the build tree</em>.  If the `make world' build
-          sees that a manifest file is up-to-date with respect to the
-          dependencies expressed in <code>Makefile.dependencies</code>,
-          it makes <em>no attempt to build it</em>, even if the
-          component itself has been updated and itself needs rebuilding
-          and reinstalling.  A slight wrinkle here is that the
-          `buildsupport' tools -- namely starconf and the autotools --
-          are not explicitly listed as being a dependency of anything,
-          since they are in fact a dependency of everything.  Since they
-          are rather a special case, these are built within the
-          top-level bootstrap script, and the best way to run that `by
-          hand' is via the command <kbd>./bootstrap
-            --buildsupport-only</kbd>, noting that the remarks about
-          dependencies above apply to this process also.  Thus, if you
-          update a component -- including one of the buildsupport
-          components -- and wish the top-level `make world' build to
-          notice this, the best way to do this is to first delete that
-          component's manifest file from the installation tree.  This
-          process might change slightly with starconf developments
-          (see <ref id="developments"/>).</p>
+              <dt>What does this mean: <code>required file
+                  `./install-sh' not found</code></dt>
+              <dd>
+                <p>It means that you need to run
+                  <em>autoreconf</em> with different options.</p>
+
+                <p>You have just run <em>autoreconf</em> by hand
+                  (haven't you?) and it is complaining that it cannot
+                  find the <code>./install-sh</code> file which
+                  <em>automake</em> requires (in fact
+                  <em>autoreconf</em> has spotted a
+                  <code>Makefile.am</code> in your directory, and so has
+                  invoked <em>automake</em>, and it is this which is
+                  reporting the error).  Give <em>autoreconf</em> the
+                  <code>--install --symlink</code> options, which
+                  installs required files, and does so by symlinking
+                  rather than copying them.</p>
+
+              </dd>
+
+            </dl>
+          </p>
+        </subsubsect>
+
+        <subsubsect id="state-details">
+          <subhead>
+            <title>State: the details</title>
+          </subhead>
+
+          <p><em>Autotool state</em>: The most obvious state within the
+            tree is the existence of the <code>configure</code> and
+            <code>Makefile.in</code> files which are the generated by
+            autoconf and automake.  Files <code>config.h.in</code> and
+            <code>aclocal.m4</code>, are also part of this process,
+            inasmuch as they are generated by autoreconf:
+            <code>config.h.in</code> is based on the declarations
+            within <code>configure.ac</code>; <code>aclocal.m4</code> is a
+            local cache of m4 macros, drawn from the autoconf, automake
+            and libtool installations, plus the contents of
+            <code>acinclude.m4</code> (see below for this).  Other objects
+            generated by the autotools are the cache directory
+            <code>autom4te.cache</code> and the tool links
+            <code>config.guess</code>, <code>config.sub</code>,
+            <code>depcomp</code>, <code>install-sh</code>,
+            <code>ltmain.sh</code>, <code>missing</code> and
+            <code>stamp-h1</code>.  All of this can be happily blown away
+            by hand, and a lot of it is removed by <kbd>make
+              maintainer-clean</kbd>, though this doesn't remove things like
+            <code>config.h.in</code> which are required for
+            <code>./configure</code> to run.  Most of this state is
+            maintained reliably by the dependencies within
+            <code>Makefile.in</code> -- for example if you update
+            <code>Makefile.am</code>, then a simple <kbd>make</kbd> will
+            remake <code>Makefile.in</code> and regenerate
+            <code>Makefile</code> before using the new
+            <code>Makefile</code> to do the build.  If you have removed
+            this state or suspect that it may be out of date, then
+            autoreconf will always regenerate it -- it's always safe to
+            rerun autoreconf.</p>
+
+          <p><em>Configuration state</em>: When <code>./configure</code>
+            runs, its most obvious effect is to transform the
+            <code>.in</code> files into their corresponding configured
+            results.  However at the same time, it creates a log file in
+            <code>config.log</code> (which can be handy to examine if a
+            configure script fails or appears to give wrong answers), a
+            cache in <code>config.cache</code> if you ran
+            <code>./configure</code> with the <code>-C</code> option, it
+            creates the directory-specific <code>./libtool</code> script,
+            and it creates a file <code>config.status</code>.  This last
+            file holds most of <code>./configure</code>'s state, and can
+            be used to either regenerate a particular file
+            (<kbd>./config.status Makefile</kbd>) or else to update itself
+            (<kbd>./config.status --recheck</kbd> has the effect of
+            rerunning <code>./configure</code> with the same options such
+            as <code>--prefix</code> which were given to the
+            <code>./configure</code> script last time).  You won't often
+            have to run <code>./config.status</code> yourself, but it's
+            reassuring to know what it's doing when the makefile runs it
+            for you.  It is always regenerated afresh by running
+            <code>./configure</code>.</p>
+
+          <p><em>Build state</em>: The compiled files are obviously part
+            of the build state, and can be removed by <kbd>make
+              clean</kbd> and regenerated with plain <kbd>make</kbd>.  Less
+            obviously part of this state are the directory
+            <code>.libs</code>, which is libtool's' workspace and holds
+            different types of objects and libraries, and
+            <code>.deps</code>, which holds dependency information gleaned
+            as part of the last build.  Less obviously still are those
+            (few) <code>.in</code> files which are configured as part of
+            the build.  As mentioned in <ref id="automakeoverview"/>,
+            so-called `installation directory variables' should be
+            substituted at make time rather than build time, with a
+            hand-written makefile rule in <code>Makefile.am</code>.</p>
+
+          <p><em>Starconf state</em>: The <ref id="starconf">starconf
+              section</ref> described the <code>starconf.status</code>
+            script, and some of the state that it holds on behalf of the
+            starconf application.  This is deliberately sticky state, and
+            this file is intended to be checked in to the repository.  As
+            well as holding your default installation locations, it also
+            holds some files which are maintained by the starconf
+            application but associated with your component, which includes
+            the standard <code>./bootstrap</code> script and the
+            collection of starconf m4 macros <code>starconf.m4</code>.  
+            The starconf application and the standard bootstrap script
+            both run <code>./starconf.status</code> at the correct time,
+            but you can also run it yourself if you think you need to.
+            Running <code>./starconf.status</code> unpacks these two (only
+            two at present) files and in the latter case copies it to
+            overwrite <code>acinclude.m4</code>, as hinted above.  This
+            means that these files are kept with your application, but if
+            starconf is updated, then this update will propagate to all
+            components, since the standard <code>./bootstrap</code> script
+            re-invokes starconf if it can.  You can delete this file, and
+            regenerate it by running starconf either explicitly, or
+            implicitly through <code>./bootstrap</code>.</p>
+
+          <p><em>Build tree and installation state</em>: The last
+            noteworthy state is that in the build tree as a whole.  The
+            top-level makefile requires some state in order to manage its
+            bootstrapping `make world' build.  This build is organised by
+            representing the build and link dependencies between
+            components by makefile dependencies between the components'
+            installed manifests, which are installed in the
+            <code>.../manifests</code> directory alongside, and at the
+            same time, as the component is installed by the
+            <code>install-manifest</code> target.  Thus this is state held
+            <em>outside of the build tree</em>.  If the `make world' build
+            sees that a manifest file is up-to-date with respect to the
+            dependencies expressed in <code>Makefile.dependencies</code>,
+            it makes <em>no attempt to build it</em>, even if the
+            component itself has been updated and itself needs rebuilding
+            and reinstalling.  A slight wrinkle here is that the
+            `buildsupport' tools -- namely starconf and the autotools --
+            are not explicitly listed as being a dependency of anything,
+            since they are in fact a dependency of everything.  Since they
+            are rather a special case, these are built within the
+            top-level bootstrap script, and the best way to run that `by
+            hand' is via the command <kbd>./bootstrap
+              --buildsupport-only</kbd>, noting that the remarks about
+            dependencies above apply to this process also.  Thus, if you
+            update a component -- including one of the buildsupport
+            components -- and wish the top-level `make world' build to
+            notice this, the best way to do this is to first delete that
+            component's manifest file from the installation tree.  This
+            process might change slightly with starconf developments
+            (see <ref id="developments"/>).</p>
+
+          <p><em>CVS state</em>: This isn't really part of the build
+            system as such, but this seems a good place to point out, or
+            reassure you, that all the state for a CVS checkout
+            directory is in the files in the CVS subdirectory, and that
+            all the repository state for the directory is in the files
+            in the corresponding directory within the repository.</p>
+
+        </subsubsect>
 
       </subsect>
 
