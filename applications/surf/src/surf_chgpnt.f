@@ -279,6 +279,7 @@
      :     .OR. OBSERVING_MODE .EQ. 'POINTING') THEN
 
 *     find and report the start and finish LST of the observation
+*     Should merge with identical code in EXTINCTION and SKYDIP
 
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'STSTART', STEMP, STATUS)
@@ -288,6 +289,9 @@
                STEMP (ITEMP:ITEMP) = ' '
             END IF
          END DO
+         ITEMP = INDEX (STEMP, '.') ! Remove the decimal places
+         STEMP = STEMP(:ITEMP-1)
+
          CALL MSG_SETC ('START_LST', STEMP)
          
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STEND',
@@ -298,6 +302,9 @@
                STEMP (ITEMP:ITEMP) = ' '
             END IF
          END DO
+         ITEMP = INDEX (STEMP, '.') ! Remove the decimal places
+         STEMP = STEMP(:ITEMP-1)
+
          CALL MSG_SETC ('END_LST', STEMP)
          CALL MSG_SETC('PKG', PACKAGE)
          
