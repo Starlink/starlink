@@ -87,10 +87,6 @@
       INCLUDE 'ADI_PAR'
       INCLUDE 'PSS_PAR'
 *
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
-*
 *    Global variables :
 *
       INCLUDE 'PSS_ASTROM_CMN'
