@@ -238,6 +238,12 @@ PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML"	entities-html.ent
 PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"	entities-latex.ent
 PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN"	entities-plain.ent
 
+	-- ISO Latin 1 entity set for Unicode/XML.  I'm not sure that
+           this use of the `public text display version' is correct.
+	   --
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//Unicode"   	ISOent/xml/iso-lat1.ent
+PUBLIC "-//Starlink//ENTITIES Additional entities//EN//Unicode"	entities-unicode.ent
+
 	-- DSSSL DTDs, added from Jade1.1.1 --
 PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" dsssl/fot.dtd
 PUBLIC "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN" dsssl/dsssl.dtd
