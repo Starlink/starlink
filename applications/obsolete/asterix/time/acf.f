@@ -319,7 +319,7 @@
         ELSE
           SPARR(1) = 0.0
           SPARR(2) = SCALE
-          CALL BDI_AXPUT1R( OFID, I, 'Data', 2, SPARR, STATUS )
+          CALL BDI_AXPUT1R( OFID, I, 'SpacedData', 2, SPARR, STATUS )
           CALL BDI_AXPUT0C( OFID, I, 'Label', 'Lag', STATUS )
           CALL BDI_AXPUT0C( OFID, I, 'Units', UNITS, STATUS )
         END IF
