@@ -299,7 +299,7 @@
 
 /* General purpose static buffers.
  */
-   char buffer[ 4096 ];
+   static char buffer[ 4096 ];
 
 /* Machinery for calling ndfdisplay as a background process.
  */

@@ -61,7 +61,7 @@
 
 /* Global variables. */
    extern int errno;
-   char buffer[ BUFLENG ];          /* General purpose buffer */             
+   static char buffer[ BUFLENG ];          /* General purpose buffer */
 
 /* Static functions. */
    static char *ccdTclEval( ccdTcl_Interp *cinterp, char *cmd, int *status );
