@@ -19,11 +19,11 @@ CLEANFILES=starconf make-starconf starconf.m4
 # make-starconf allows filenames to be preceded by options `-xxx'.
 # Option q: files which are _not_ thus prefixed are always unpacked; files
 # with the `q' are unpacked only if starconf detects certain features
-# in the configure.ac.
+# in the configure.ac, or if the file needs to be updated.
 #
 # Filenames preceded with `f' are always unpacked, overwriting any more
 # recent file in the directory; those without are only
-# unpacked if there is no file present (again, this is now an empty set).
+# unpacked if there is no file present.
 starconf: make-starconf \
 		starconf.m4 \
 		bootstrap.installed
