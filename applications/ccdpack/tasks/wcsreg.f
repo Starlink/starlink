@@ -79,6 +79,21 @@
 *        are used by preference.  You should not normally include the
 *        CCD_SET domain in this list; for details of how this domain
 *        is treated specially, see the USESET parameter.
+*
+*        Note that this parameter is an array of strings, so that either
+*        the whole list should be surrounded by square brackets, or
+*        each element should be surrounded by double quotes.  The
+*        whole thing may need to be protected from the Unix shell
+*        by using, e.g., single quotes.
+*
+*        Supplying the null value (!) is equivalent to specifying the
+*        current domain of the reference NDF.  The effect of this
+*        is to retain the alignment already given by the Current
+*        coordinates of each image, but to ensure that the pixels
+*        are aligned with the pixels of the reference image.
+*        This will result in the images being aligned in a coordinate
+*        system suitable for resampling with TRANNDF.
+*        [!]
 *     IN = LITERAL (Read)
 *        A list of the names of the NDFs which are to be aligned.  The
 *        names should be separated by commas and may include wildcards.
@@ -115,6 +130,12 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     NAMELIST = LITERAL (Read)
+*        The name of an output file in which to record all the images
+*        to which new coordinate systems were successfully added.
+*        This may not be the same as the IN list if OVERRIDE is set
+*        true.
+*        [wcsreg.lis]
 *     OUTDOMAIN = LITERAL (Read)
 *        This gives the name of the domain for the new frame which is
 *        added to the WCS components of the NDFs on successful 
@@ -131,6 +152,10 @@
 *        insert new frames in those NDFs which can be reached from the 
 *        one indicated by REFPOS, making no change to the others, except
 *        to remove any frames in the domain OUTDOMAIN which already exist.
+*
+*        The NAMELIST parameter can be used to record which images were
+*        successfully registered when OVERRIDE is true (if OVERRIDE is
+*        false, then it will be the same as IN unless the program fails).
 *        [FALSE]
 *     REFPOS = _INTEGER (Read)
 *        The position within the IN list which corresponds to the 
@@ -183,16 +208,18 @@
 *        component using the ASTIMP application.  The name FINAL is
 *        used for the new domain added to the WCS component.
 *    
-*     wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
+*     wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 domains=!
 *        Here wcsreg is being used with a somewhat different intent.
-*        The images named are already fully aligned in  SKY
-*        coordinates, but executing this command has the effect of
+*        The images named are already fully aligned in their 
+*        current coordinates but executing this command has the effect of
 *        aligning them in a new coordinate system which is a copy of
 *        the pixel coordinate system of 'skyfr2'.  Since this has
 *        units which are the size of pixels, the resulting image files
-*        are suitable for resampling using TRANNDF.  This would not
-*        have been the case for the files initially, since the SKY
-*        coordinates have units of radians.
+*        are suitable for resampling using TRANNDF.  Supposing that
+*        they were originally aligned in SKY coordinates they could
+*        not have been resampled by TRANNDF in their initial state,
+*        since the SKY coordinates have units of radians, which 
+*        are much too large compared to pixels.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
@@ -238,6 +265,7 @@
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'FIO_PAR'          ! Standard FIO constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR system error constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
 *  Status:
@@ -275,7 +303,7 @@
       INTEGER MAP                ! AST pointer to mapping between framesets
       INTEGER NNDF               ! Number of NDFs in input set
       INTEGER NEDGE              ! Number of edges in the conversion graph
-      INTEGER NSTEP              ! Number of steps in subgraph PATH
+      INTEGER NSTEP( CCD1__MXNDF ) ! Number of steps in subgraph PATH
       INTEGER NDMN               ! Number of domains in list
       INTEGER OUTFR              ! AST pointer to output frame
       INTEGER PATH( 4, CCD1__MXNDF ) ! Subgraph giving mapping path
@@ -284,6 +312,7 @@
       INTEGER WCSOUT             ! WCS component with new frame added
       INTEGER WORK( 4, CCD1__MXNDF ) ! Workspace array
       INTEGER WORK2( CCD1__MXNDF ) ! Workspace array
+      INTEGER XDMN               ! Number of extra domains for Set handling
       LOGICAL COMPL              ! Completeness of graph
       LOGICAL OVERRD             ! Whether to continue if graph is incomplete
       LOGICAL USESET             ! Use Set alignment information?
@@ -325,16 +354,47 @@
 *  Determine whether we are to use Set header alignment information.
       CALL PAR_GET0L( 'USESET', USESET, STATUS )
 
+*  Read in the NDF identifier, WCS component and Set header information
+*  for each NDF.
+      DO 3 I = 1, NNDF
+         CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF( I ), STATUS )
+         CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
+         IF ( USESET ) THEN
+            CALL CCD1_SETRD( INDF( I ), AST__NULL, SNAME( I ), SINDEX,
+     :                       JSET, STATUS )
+         END IF
+ 3    CONTINUE
+
+*  Get the index of the reference NDF.
+      CALL PAR_GET0I( 'REFPOS', REFPOS, STATUS )
+      IF ( REFPOS .GT. NNDF .OR. REFPOS .LT. 1 ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'NNDF', NNDF )
+         CALL ERR_REP( 'WCSREG_BADREFPOS', 
+     :    'WCSREG: REFPOS must be in the range 1 to ^NNDF.', STATUS )
+         GO TO 99
+      END IF
+
 *  Get the list of domains; if we are doing Set-based alignment, then
 *  slip the CCD_SET domain in at the head of the list.
       IF ( USESET ) THEN
          DMNS( 1 ) = 'CCD_SET'
-         CALL PAR_GET1C( 'DOMAINS', MXDMN - 1, DMNS( 2 ), NDMN, STATUS )
-         NDMN = NDMN + 1
+         XDMN = 1
       ELSE
-         CALL PAR_GET1C( 'DOMAINS', MXDMN, DMNS, NDMN, STATUS )
+         XDMN = 0
       END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      CALL PAR_GET1C( 'DOMAINS', MXDMN - XDMN, DMNS( 1 + XDMN ), NDMN,
+     :                STATUS )
+      NDMN = NDMN + XDMN
+
+*  If we have a null response, treat it specially.
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         DMNS( 1 + XDMN ) = AST_GETC( IWCS( REFPOS ), 'Domain', STATUS )
+         NDMN = 1 + XDMN
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
+         GO TO 99
+      END IF
 
 *  Normalise the domains to upper case without blanks.
       DO 1 I = 1, NDMN
@@ -354,31 +414,10 @@
       CALL CCD1_DLCAT( DMNS, NDMN, ',', DMNLST, STATUS )
 
 *  Report an error if the domain list is empty.
-      IF ( DMNLST .EQ. ' ' ) THEN
+      IF ( DMNLST .EQ. ' ' .OR. STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'WCSREG_NODMNS', 
-     :        'WCSREG: No valid domains were specified.', STATUS )
-         GO TO 99
-      END IF
-
-*  Read in the NDF identifier, WCS component and Set header information
-*  for each NDF.
-      DO 3 I = 1, NNDF
-         CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF( I ), STATUS )
-         CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
-         IF ( USESET ) THEN
-            CALL CCD1_SETRD( INDF( I ), AST__NULL, SNAME( I ), SINDEX,
-     :                       JSET, STATUS )
-         END IF
- 3    CONTINUE
-
-*  Get the index of the reference NDF.
-      CALL PAR_GET0I( 'REFPOS', REFPOS, STATUS )
-      IF ( REFPOS .GT. NNDF .OR. REFPOS .LT. 1 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NNDF', NNDF )
-         CALL ERR_REP( 'WCSREG_BADREFPOS', 
-     :    'WCSREG: REFPOS must be in the range 1 to ^NNDF.', STATUS )
+     :        'WCSREG: Invalid domain list was specified.', STATUS )
          GO TO 99
       END IF
 
@@ -478,13 +517,13 @@
 *  Find the best path through the graph from the Current frame of this
 *  frameset to the reference frame in the reference frameset.
          CALL CCD1_GRPTH( %VAL( IPGRA ), NEDGE, I, REFPOS, WORK, WORK2,
-     :                    PATH, NSTEP, STATUS )
+     :                    PATH, NSTEP( I ), STATUS )
 
 *  Check whether a successful path was found.
-         IF ( NSTEP .GT. 0 ) THEN 
+         IF ( NSTEP( I ) .GT. 0 ) THEN 
 
 *  Use the path through the graph to find the mapping.
-            CALL CCD1_PTHMP( IWCS, PATH, NSTEP, DMNS, MAP, STATUS )
+            CALL CCD1_PTHMP( IWCS, PATH, NSTEP( I ), DMNS, MAP, STATUS )
 
 *  Prepare a copy of the old WCS frameset of the NDF and ensure it has
 *  a Base frame in the GRID domain (otherwise the NDF system will
@@ -503,7 +542,7 @@
             IF ( I .EQ. REFPOS ) THEN
                CALL CCD1_MSG( ' ', '          (reference NDF)', STATUS )
             ELSE
-               DO 5 J = 1, NSTEP
+               DO 5 J = 1, NSTEP( I )
                   WRITE( BUFFER, '( 8X, I4, ''  ->'', I4, 12X, A )' )
      :               PATH( 1, J ), PATH( 2, J ), DMNS( PATH( 3, J ) )
                   CALL CCD1_MSG( ' ', BUFFER, STATUS )
@@ -528,6 +567,11 @@
          CALL NDF_PTWCS( WCSOUT, INDF( I ), STATUS )
 
  4    CONTINUE
+
+*  Write the names of the successfully registered NDFs to a list.
+      CALL CCD1_LNAMM( 'NAMELIST', 1, NNDF, 
+     :                 '# WCSREG - successfully registered NDF list',
+     :                 INGRP, NSTEP, .TRUE., STATUS )
 
 *  Error exit label.
  99   CONTINUE
