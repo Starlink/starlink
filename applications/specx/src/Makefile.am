@@ -26,8 +26,8 @@ specx_LDADD = \
 ../scl/libscl.la \
 ../term/libterm.la \
 ../graph/libgraph.la \
-../tek/libtek.la \
 ../mapdis4/libmapdis4.la \
+../tek/libtek.la \
 ../mv4/libmv4.la \
 ../plots/libplots.la \
 ../util/libutil.la \
