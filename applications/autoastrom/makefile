@@ -751,14 +751,12 @@ install:
 #
 #  Install the LaTeX and XML documentation, giving it world read permission,
 #  leaving the source copy in place.
-
 	for f in $(XML_DOCS) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
-
 	if test -n "$(LATEX_TARBALL)"; then \
            pwd=`pwd`;\
            (cd $(INSTALL_DOCS) && \
