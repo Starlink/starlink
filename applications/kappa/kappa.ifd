@@ -9631,6 +9631,8 @@ iraf! {
 
       action look {
 
+         helplib {$KAPPA_HELP}
+
          parameter again {
             type _LOGICAL
             prompt {List another region?}
