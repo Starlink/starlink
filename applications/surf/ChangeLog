@@ -1,3 +1,8 @@
+2002-09-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Make sure that
+	XIOLD is initialised first time around the loop.
+
 2002-09-13  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* starlink/surf.news: Add release notes for 1.6-9

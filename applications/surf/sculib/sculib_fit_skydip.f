@@ -133,6 +133,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.21  2002/09/16 05:16:27  timj
+*     Make sure we initialise XIOLD to something
+*
 *     Revision 1.20  2000/07/10 21:09:30  timj
 *     Documentation tweaks for V1.6
 *
@@ -434,6 +437,14 @@
          QUALITY = 0
          LOOPING = .TRUE.
          ITERATION = 0
+
+*     We need to make sure that our XIOLD is much different to XISQ
+*     on entry to the loop otherwise we will end up aborting incorrectly.
+*     Easiest thing is simply to set XIOLD to -XISQ. This will still
+*     allow us to abort if we fit the data perfectly on entry but is
+*     difficult to fake (and it does not really matter if XIOLD-XISQ
+*     is so small that we meet XICUT)
+         XIOLD = - XISQ
 
          DO WHILE (LOOPING)
             CALL SCULIB_FIT_FUNCTION (SCULIB_SKYDIP_XISQ, XICUT, 
