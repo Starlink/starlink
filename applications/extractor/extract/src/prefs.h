@@ -14,7 +14,7 @@
 *                          Removed ".fits" as default output file
 *                          extension.
 *                       15/02/00 (PWD):
-*                          Added RAD_THRESH
+*                          Added RAD_TYPE, RAD_THRESH.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -106,6 +106,8 @@ pkeystruct key[] =
   {"MEMORY_PIXSTACK", P_INT, &prefs.mem_pixstack, 1000, 10000000},
   {"RAD_THRESH", P_FLOATLIST, prefs.rad, 0,0, -BIG, BIG,
    {""}, 0, 3, &prefs.nrad, 1},
+  {"RAD_TYPE", P_KEY, &prefs.rad_type, 0, 0, 0.0, 0.0,
+   {"SB","INT",""}, 0, 1, &prefs.nrad_type, 1},
   {"PARAMETERS_NAME", P_STRING, prefs.param_name},
   {"PHOT_APERTURES", P_FLOATLIST, prefs.apert, 0,0, 0.0,2*MAXPICSIZE,
    {""}, 1, MAXNAPER, &prefs.naper},

@@ -18,7 +18,7 @@
 *                         Merged 2.1.5 sources in which above is
 *                         correctly fixed.
 *                       15/02/00 (PWD):
-*                         Added rad member.
+*                         Added rad_type and rad members.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -509,7 +509,10 @@ typedef struct
 /*----- customize */
   double	mama_corflex;
   int		fitsunsigned_flag;			/* Force unsign FITS */
-  float         rad[3];                                 /* radii specs */
+  enum	{RAD_SB, RAD_INT}
+		rad_type;				/* radii units */
+  int           nrad_type;
+  double        rad[3];                                 /* radii specs */
   int           nrad;                                   /* nb of params */
   }	prefstruct;
 
