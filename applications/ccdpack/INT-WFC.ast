@@ -1,12 +1,12 @@
 #+
 #  Name:
-#     WFC-b.ast
+#     INT-WFC.ast
 #
 #  Purpose:
 #     AST file for INT WFC mosaic camera.
 #
 #  Usage:
-#     astimp astfile=WFC-b.ast in
+#     astimp astfile=INT-WFC.ast in
 #
 #  Description:
 #     This file is an AST file describing the relative positioning of
@@ -20,8 +20,9 @@
 #
 #     and exporting using a command like:
 #
-#        astexp baseframe=pixel idtyp=fitsid fitsid=chipname 
-#               fitsrot=rotskypa outdomain=WFC-B
+#        astexp astfile=INT-WFC.ast baseframe=pixel outdomain=INT-WFC \
+#               idtyp=fitsid fitsid=chipname fitsrot=rotskypa 
+#               outtitle='"INT wide field camera undistorted"'
 #
 #     The transformations represented by this file are those which 
 #     map the original pixel coordinates (Xi,Yi) to the transformed 
@@ -91,9 +92,9 @@
        End Frame
     Frm2 = 	# Frame number 2
        Begin Frame 	# Coordinate system description
-          Title = "Undistorted and positioned INT WFC mosaic (exported)" 	# Title of coordinate system
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
           Naxes = 2 	# Number of coordinate axes
-          Domain = "WFC-B" 	# Coordinate system domain
+          Domain = "INT-WFC" 	# Coordinate system domain
           Ax1 = 	# Axis number 1
              Begin Axis 	# Coordinate axis
                 Label = "Mosaic common X coordinate" 	# Axis Label
@@ -177,9 +178,9 @@
        End Frame
     Frm2 = 	# Frame number 2
        Begin Frame 	# Coordinate system description
-          Title = "Undistorted and positioned INT WFC mosaic (exported)" 	# Title of coordinate system
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
           Naxes = 2 	# Number of coordinate axes
-          Domain = "WFC-B" 	# Coordinate system domain
+          Domain = "INT-WFC" 	# Coordinate system domain
           Ax1 = 	# Axis number 1
              Begin Axis 	# Coordinate axis
                 Label = "Mosaic common X coordinate" 	# Axis Label
@@ -263,9 +264,9 @@
        End Frame
     Frm2 = 	# Frame number 2
        Begin Frame 	# Coordinate system description
-          Title = "Undistorted and positioned INT WFC mosaic (exported)" 	# Title of coordinate system
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
           Naxes = 2 	# Number of coordinate axes
-          Domain = "WFC-B" 	# Coordinate system domain
+          Domain = "INT-WFC" 	# Coordinate system domain
           Ax1 = 	# Axis number 1
              Begin Axis 	# Coordinate axis
                 Label = "Mosaic common X coordinate" 	# Axis Label
@@ -349,9 +350,9 @@
        End Frame
     Frm2 = 	# Frame number 2
        Begin Frame 	# Coordinate system description
-          Title = "Undistorted and positioned INT WFC mosaic (exported)" 	# Title of coordinate system
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
           Naxes = 2 	# Number of coordinate axes
-          Domain = "WFC-B" 	# Coordinate system domain
+          Domain = "INT-WFC" 	# Coordinate system domain
           Ax1 = 	# Axis number 1
              Begin Axis 	# Coordinate axis
                 Label = "Mosaic common X coordinate" 	# Axis Label
