@@ -1,10 +1,10 @@
-      SUBROUTINE SCULIB_BESSEL_REGRID_2 (IN_DATA, IN_VARIANCE,
-     :  WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
+      SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA,
+     :  IN_VARIANCE, WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
      :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
      :  CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
 *+
 *  Name:
-*     SCULIB_BESSEL_REGRID_2
+*     SCULIB_WTFN_REGRID_2
 
 *  Purpose:
 
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_BESSEL_REGRID_2 (IN_DATA, IN_VARIANCE,
+*     SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA, IN_VARIANCE,
 *    :  WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_WEIGHT, STATUS)
@@ -20,6 +20,10 @@
 *  Description:
 
 *  Arguments:
+*     DIAMETER                       = REAL (given)
+*        size of dish
+*     RES                            = INTEGER (Given)
+*        number of resolution elements per scale length
 *     IN_DATA (NPIX)                   = REAL (Given)
 *        The input data values.
 *     IN_VARIANCE (NPIX)               = REAL (Given)
@@ -54,8 +58,7 @@
 *        the convolution weight for each output pixel.
 *     WEIGHTSIZE                       = INTEGER (Given)
 *        radius of weight function in scale units (SCUIP__FILTRAD for BESSEL, 1 for LINEAR)
-*     WTFN (SCUIP__RES1 * SCUIP__RES1 +   = REAL (Given)
-*     :     SCUIP__RES2 * (SCUIP__FILTRAD * SCUIP__FILTRAD))
+*     WTFN (RES * RES * WEIGHTSIZE * WEIGHTSIZE) = REAL (Given)
 *        convolution weighting function
 *     STATUS                           = INTEGER (Given and Returned)
 *        The global status.
@@ -75,9 +78,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
-      INCLUDE 'REDS_SYS'
 
 *  Arguments Given:
+      REAL DIAMETER
+      REAL RES
       INTEGER NPIX
       REAL IN_DATA (NPIX)
       REAL IN_VARIANCE (NPIX)
@@ -93,8 +97,7 @@
       REAL TOTAL_WEIGHT (NI,NJ)
       REAL WAVELENGTH
       INTEGER WEIGHTSIZE
-      REAL WTFN(SCUIP__RES1 * SCUIP__RES1 +
-     :     SCUIP__RES2 * (SCUIP__FILTRAD * SCUIP__FILTRAD))
+      REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE)
 
 *  Arguments Returned:
       REAL CONV_DATA_SUM (NI, NJ)
@@ -135,11 +138,18 @@
       INTEGER  FILTER_RAD_SQ
       REAL SCALE
       REAL SCALESQ
+      REAL RES_SCAL
+      REAL RAD_OV_SCAL
+
+      REAL SMALL
 *   local data
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+* Set up small to prevent comparing REAL to 0.0
+
+      SMALL = VAL__SMLR * 10.0
 
 *  set x and y axis pixel increments, x increases to left hence -ve.
 
@@ -148,7 +158,7 @@
 
 * Some time saving squares
 
-      FILTER1_SQ = SCUIP__RES1 * SCUIP__RES1
+      FILTER1_SQ = RES * RES
       FILTER_RAD_SQ = WEIGHTSIZE * WEIGHTSIZE
 
 *  ..extent of convolution function in units of output pixels
@@ -158,6 +168,10 @@
 
       SCALESQ = SCALE * SCALE
       
+      RAD_OV_SCAL = FILTER_RAD_SQ / SCALESQ
+      RES_SCAL = FILTER1_SQ * SCALESQ
+
+
       RTEMP = REAL(WEIGHTSIZE) * RES_ELEMENT / PIXSPACE
       PIX_RANGE = INT (RTEMP) + 1
 
@@ -179,49 +193,50 @@
             DO JOUT = MAX(1,JNEAR-PIX_RANGE), MIN(NJ,JNEAR+PIX_RANGE)
                DO IOUT = MAX(1,INEAR-PIX_RANGE), MIN(NI,INEAR+PIX_RANGE)
 
-*  work out x,y offset of current output pixel
-
-                  YPIX = REAL (JOUT-JCEN) * YINC
-                  XPIX = REAL (IOUT-ICEN) * XINC
-
-*  distance between output and input pixels, in SCALE LENGTHS**2 units
- 
-                  RPIX = (YPIX-REAL(Y(PIX)))**2 + 
-     :              (XPIX-REAL(X(PIX)))**2
-
-                  RPIX = RPIX * SCALESQ
-
-* Now work out which part of the weight function t ouse
-
-                  WT = 0.0
-                  IF (RPIX .LT. FILTER_RAD_SQ) THEN
-                     IF (RPIX .GT. 1.0) THEN
-                        ICPIX = NINT(FILTER1_SQ + (RPIX-1.0)
-     :                       * SCUIP__RES2)
-                     ELSE
-                        ICPIX = NINT(FILTER1_SQ * RPIX)
-                     ENDIF
-                     WT = WTFN(ICPIX+1)
-
-                  END IF
-
 *  add into the convolution result and weight arrays unless TOTAL_WEIGHT
 *  of output is zero, signifying output pixel is beyond limits of
 *  mapped area. The coaddition is normalised by the `total weight' 
 *  associated with this input pixel.
 
-                  IF (TOTAL_WEIGHT (IOUT,JOUT) .NE. 0.0) THEN
+                  IF (TOTAL_WEIGHT (IOUT,JOUT) .GT. SMALL) THEN
 
-                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (INEAR,JNEAR)
+*  work out x,y offset of current output pixel
+
+                     YPIX = REAL (JOUT-JCEN) * YINC
+                     XPIX = REAL (IOUT-ICEN) * XINC
+
+*  distance between output and input pixels, in arcsec**2 units
+ 
+                     RPIX = (YPIX-REAL(Y(PIX)))**2 + 
+     :                    (XPIX-REAL(X(PIX)))**2
+
+* Now work out which part of the weight function to use
+* I used to do this:
+*     RPIX = RPIX * SCALESQ    ! Distance in scale lengths**2
+*     IF (RPIX .LT. radius**2) THEN
+*           ICPIX = NINT(FILTER1_SQ * RPIX)
+*     etc..
+*     Remove RPIX * SCALESQ since this is not really necessary
+
+                     WT = 0.0
+*     Is the distance close enough? If so find the weight value
+                     IF (RPIX .LT. RAD_OV_SCAL) THEN
+                        ICPIX = NINT(RES_SCAL * RPIX)
+                        WT = WTFN(ICPIX+1)
+                     END IF
+
+* Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT
+                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (IOUT,JOUT)
 
                      CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) + 
-     :                 WWEIGHT
+     :                    WWEIGHT
                      CONV_DATA_SUM (IOUT,JOUT) = 
-     :                 CONV_DATA_SUM (IOUT,JOUT) + 
-     :                 WWEIGHT * IN_DATA(PIX)
+     :                    CONV_DATA_SUM (IOUT,JOUT) + 
+     :                    WWEIGHT * IN_DATA(PIX)
                      CONV_VARIANCE_SUM (IOUT,JOUT) =
-     :                 CONV_VARIANCE_SUM (IOUT,JOUT) +
-     :                 (WWEIGHT)**2 * IN_VARIANCE (PIX)
+     :                    CONV_VARIANCE_SUM (IOUT,JOUT) +
+     :                    (WWEIGHT)**2 * IN_VARIANCE (PIX)
+
                   END IF
 
                END DO
