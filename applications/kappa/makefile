@@ -663,7 +663,7 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
 kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
 kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f \
-kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medv.f
+kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f
 
 MEM_F_ROUTINES = mem2d.f
 
