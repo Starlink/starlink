@@ -35538,6 +35538,11 @@ than 2 axes.
   \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
 previously reported if double precision data is displayed which requires
 compression to fit in the display.
+  \item \htmlref{DIV}{DIV} now stores standard Starlink bad values in the
+output NDF for any pixel where the denominator NDF has a zero value. This
+used to be the case only on Solaris. Correct behaviour on Linux and
+Digital UNIX has required the removal of the facility for trapping
+floating overflow conditions which used to be available on Solaris.
   \item \htmlref{DRAWSIG}{DRAWSIG} changed to avoid spurious clearing of
 X displays when using two or more GWM windows under ICL.
   \item \htmlref{FFCLEAN}{FFCLEAN} bug fixed which caused parameter
@@ -35563,6 +35568,8 @@ element.
 from n-D cubes being processed.
   \item  \htmlref{TRANMAKE}{TRANMAKE} no longer reports a compilation error 
 if a null value is given for parameter CLASS.
+  \item All applications now consider IEEE NaN and Inf values to be 
+equivalent to the appropriate standard Starlink BAD values. 
 \end{itemize}
 
 The following applications now propagate the WCS component of an NDF

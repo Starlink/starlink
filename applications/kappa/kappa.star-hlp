@@ -3441,6 +3441,12 @@ The applications affected by these, and any other, changes are:
      double precision data is displayed which requires compression to fit 
      in the display.
 
+  o  DIV now stores standard Starlink bad values in the output NDF for any
+     pixel where the denominator NDF has a zero value. This used to be
+     the case only on Solaris. Correct behaviour on Linux and Digital UNIX
+     has required the removal of the facility for trapping floating
+     overflow conditions which used to be available on Solaris.
+
   o  DRAWSIG changed to avoid spurious clearing of X displays when using 
      two or more GWM windows under ICL.
 
@@ -3466,6 +3472,9 @@ The applications affected by these, and any other, changes are:
 
   o  TRANMAKE no longer reports a compilation error if a null value is given 
      for parameter CLASS.
+
+  o  All applications now consider IEEE NaN and Inf values to be
+     equivalent to the appropriate standard Starlink BAD values. 
 
 The following applications now propagate the WCS component of an NDF
 structure: 
