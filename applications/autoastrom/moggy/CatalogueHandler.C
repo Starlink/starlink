@@ -551,8 +551,11 @@ double CatalogueHandler::CatalogueRow::mag()
     double value;
     if (!parent_.has_mag())
 	throw MoggyException ("No MAG for row");
-    if (parent_.queryResult_.get(num_, parent_.mag_col(), value))
-	throw MoggyException ("Can't get MAG for row");
+    try {
+        parent_.queryResult_.get(num_, parent_.mag_col(), value);
+    } catch (...) {
+        value = 99.0; // Just a bad magnitude, no need to overreact.
+    }
     return value;
 }
 
