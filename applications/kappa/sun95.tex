@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.16}
 \newcommand{\stardocnumber}    {95.16}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {3 May 2000}
+\newcommand{\stardocdate}      {17 May 2000}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.15-1}
+\newcommand{\stardocversion}   {0.15-2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -36018,7 +36018,8 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       axis system, or an individual variance or width component; the
       replacement of one or more individual values; assignment of the
       whole array using Fortran-like mathematical expressions, or values
-      in a text file, or to pixel co-ordinates.
+      in a text file, or to pixel co-ordinates, or by copying from
+      another NDF.
 
       If an AXIS structure does not exist, a new one whose centres are
       pixel co-ordinates is created before any modification.
@@ -36103,6 +36104,17 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          default is the current value.
       }
       \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+         A template NDF containing axis arrays. These arrays will be
+         copied into the NDF given by parameter NDF. All axes are copied.
+         The other parameters are only accessed if a null (!) value is 
+         supplied for LIKE. If the NDF being modified extends beyond the
+         edges of the template NDF, then the template axis arrays will be
+         extrapolated to cover the entire NDF. This is done using linear
+         extrapolation through the last two extreme axis values. {\tt [!]}
+      }
+      \sstsubsection{
          MODE = LITERAL (Read)
       }{
          The mode of the modification.  It can be one of the following:
@@ -36155,6 +36167,13 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          setaxis ff mode=delete
       }{
          This erases the axis structure from the NDF called ff.
+      }
+      \sstexamplesubsection{
+         setaxis ff like=hh
+      }{
+         This creates axis structures in the NDF called ff by copying
+         them from the NDF called hh, extrapolating them as necessary to
+         cover ff.
       }
       \sstexamplesubsection{
          setaxis abell4 1 expr exprs={\tt "}CENTRE $+$ 0.1 $*$ (INDEX-1){\tt "}
@@ -45313,7 +45332,7 @@ name is defined.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V0.15-0\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.15-2\label{se:changes}}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -45326,7 +45345,7 @@ new parameters.
 
 \begin{quote}
 \emph{ Scripts which make use of any of the removed or modified parameters
-will fail when run with KAPPA V0.15-0. Such scripts will need to be changed
+will fail when run with KAPPA V0.15-2. Such scripts will need to be changed
 to take account of the new features introduced in this release. Check the
 lists below for details.}
 \end{quote}
@@ -45527,6 +45546,13 @@ The following applications have been modified:
 
             \end{description}
 
+      \end{itemize}
+
+   \item [\htmlref{SETAXIS}{SETAXIS}] \mbox{}
+      \begin{itemize}
+         \item Axis structures can now be added to an NDF by copying them
+         from another NDF. The template NDF is specified using the new
+         parameter LIKE.
       \end{itemize}
 
    \item [\htmlref{SURFIT}{SURFIT}] \mbox{}

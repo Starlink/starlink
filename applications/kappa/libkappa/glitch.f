@@ -371,14 +371,17 @@
 
 *  Report the number of pixel replaced.
       IF( NREP .EQ. 0 ) THEN
-         CALL MSG_OUT( 'GLITCH_MSG1', '   No pixels replaced.', STATUS )
+         CALL MSG_OUT( 'GLITCH_MSG1', '   No good pixels replaced.', 
+     :                  STATUS )
 
       ELSE IF( NREP .EQ. 1 ) THEN
-         CALL MSG_OUT( 'GLITCH_MSG2', '   One pixel replaced.', STATUS )
+         CALL MSG_OUT( 'GLITCH_MSG2', '   One good pixel replaced.',
+     :                  STATUS )
 
       ELSE
          CALL MSG_SETI( 'N', NREP )
-         CALL MSG_OUT( 'GLITCH_MSG3', '   ^N pixels replaced.', STATUS )
+         CALL MSG_OUT( 'GLITCH_MSG3', '   ^N good pixels replaced.',
+     :                  STATUS )
       END IF
 
       CALL MSG_BLANK( STATUS )

@@ -238,10 +238,10 @@
 
                   IF( VAR ) VOUT( I0, J0 ) = NEWVAR 
 
-               END IF
+*  Increment the number of modified pixels.
+                  NREP = NREP + 1
 
-*  Increment the number of replaced pixels.
-               NREP = NREP + 1
+               END IF
 
             END IF
 

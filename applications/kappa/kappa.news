@@ -197,6 +197,10 @@
 	  value of the first usable star, in the data units of the input
 	  NDF.
 
+     - SETAXIS: Axis structures can now be added to an NDF by copying 
+       them from another NDF. The template NDF is specified using the 
+       new parameter LIKE.
+
      - SURFIT: A new output parameter called RMS has been added. The 
        RMS deviation of the fit from the original data (per pixel) is 
        stored in this output parameter on exit.
