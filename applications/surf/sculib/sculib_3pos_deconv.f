@@ -9,8 +9,11 @@
 *        To achieve this it cycles through the scans making up the 
 *     observation, calling SCULIB_FIND_SWITCH to locate the start and
 *     finish indices of each scan in the demodulated data array. If
-*     a scan is too long to be handled by the routine an error message
-*     will be output and the routine will return with bad status.
+*     SCULIB_FIND_SWITCH indicates that there is no data for this scan,
+*     which may happen if the observation was aborted, then no further
+*     action is taken. If a scan is too long to be handled by the routine
+*     an error message will be output and the routine will return with
+*     bad status.
 *        Otherwise, SCULIB_GENSYCONFN and SCULIB_3POS_CONFN will be
 *     called to generate the convolution functions needed to deconvolve
 *     the chop. The routine then cycles through the bolometers, calling 
@@ -65,6 +68,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'                        ! for VAL__BADI
 *    Import :
       INTEGER N_EXPOSURES
       INTEGER N_INTEGRATIONS
@@ -133,18 +137,29 @@
      :           1, EXPOSURE, INTEGRATION, MEASUREMENT, SCAN_START,
      :           SCAN_END, STATUS)
 
-               N_SCAN = SCAN_END - SCAN_START + 1
+               IF ((SCAN_START .EQ. VAL__BADI) .OR.
+     :             (SCAN_START .EQ. 0))        THEN
+                  CALL MSG_SETI ('E', EXPOSURE)
+                  CALL MSG_SETI ('I', INTEGRATION)
+                  CALL MSG_SETI ('M', MEASUREMENT)
+                  CALL MSG_OUT (' ', 'SCULIB: no data for exp ^E '//
+     :              'in int ^I, meas ^M', STATUS)
+               ELSE
 
-               IF (2*N_SCAN + 1 .GT. MAX_CONV) THEN
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETI ('LEN', N_SCAN)
-                     CALL MSG_SETI ('MAX', (MAX_CONV - 1) / 2)
-                     CALL ERR_REP (' ', 'SCULIB_3POS_DECONV: scan '//
-     :                 'longer (^LEN) than maximum allowed (^MAX)',
-     :                 STATUS)
+*  OK, there is some data for this scan
+
+                  N_SCAN = SCAN_END - SCAN_START + 1
+ 
+                  IF (2*N_SCAN + 1 .GT. MAX_CONV) THEN
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETI ('LEN', N_SCAN)
+                        CALL MSG_SETI ('MAX', (MAX_CONV - 1) / 2)
+                        CALL ERR_REP (' ', 'SCULIB_3POS_DECONV: '//
+     :                    'scan longer (^LEN) than maximum allowed '//
+     :                    '(^MAX)', STATUS)
+                     END IF
                   END IF
-               END IF
 
 *  the data should contain NO information at the spatial frequency of the
 *  half-chop throw (distance between -ve spike and central spike of chop)
@@ -155,10 +170,10 @@
 *  with the scan data. This is NOD2's `symmetric function'. SCULIB_GENSYCONFN
 *  generates the required function.
 
-               NORM = 1.0
+                  NORM = 1.0
 
-               CALL SCULIB_GENSYCONFN (BEAM_SEP, SAMPLE_DX, N_SCAN,
-     :           N_CONV, SY_CONV_FUNCTION, STATUS)
+                  CALL SCULIB_GENSYCONFN (BEAM_SEP, SAMPLE_DX, N_SCAN,
+     :              N_CONV, SY_CONV_FUNCTION, STATUS)
 
 *  The deconvolution of the chop-beam could be managed by dividing the FT 
 *  of the map by the FT of the beam chop, then calculating the inverse
@@ -167,54 +182,58 @@
 *  beam chop. This is the `asymmetric function' used in NOD2 and
 *  SCULIB_3POS_CONFN calculates it for the 3-position chop.
 
-               CALL SCULIB_3POS_CONFN (BEAM_SEP, SAMPLE_DX, N_SCAN, 
-     :           N_CONV, AS_CONV_FUNCTION, STATUS)
+                  CALL SCULIB_3POS_CONFN (BEAM_SEP, SAMPLE_DX, N_SCAN, 
+     :              N_CONV, AS_CONV_FUNCTION, STATUS)
 
 *  now cycle through the bolometers
 
-               DO BOL = 1, N_BOL
+                  DO BOL = 1, N_BOL
 
 *  copy the scan data from the input array to the input scratch array
 
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     DO POS = SCAN_START, SCAN_END
-                        SCRATCH1_DATA (POS - SCAN_START + 1) =
-     :                    IN_DATA (BOL,POS)
-                        SCRATCH1_VARIANCE (POS - SCAN_START + 1) =
-     :                    IN_VARIANCE (BOL,POS)
-                        SCRATCH1_QUALITY (POS - SCAN_START + 1) =
-     :                    IN_QUALITY (BOL,POS)
-                     END DO
-                  END IF
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        DO POS = SCAN_START, SCAN_END
+                           SCRATCH1_DATA (POS - SCAN_START + 1) =
+     :                       IN_DATA (BOL,POS)
+                           SCRATCH1_VARIANCE (POS - SCAN_START + 1) =
+     :                       IN_VARIANCE (BOL,POS)
+                           SCRATCH1_QUALITY (POS - SCAN_START + 1) =
+     :                       IN_QUALITY (BOL,POS)
+                        END DO
+                     END IF
 
 *  do the convolutions
 
-                  CALL SCULIB_CONVOLVE (SCRATCH1_DATA,
-     :              SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
-     :              SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
-     :              SCRATCH2_DATA, SCRATCH2_VARIANCE, 
-     :              SCRATCH2_QUALITY, STATUS)
+                     CALL SCULIB_CONVOLVE (SCRATCH1_DATA,
+     :                 SCRATCH1_VARIANCE, SCRATCH1_QUALITY, 
+     :                 SY_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
+     :                 SCRATCH2_DATA, SCRATCH2_VARIANCE, 
+     :                 SCRATCH2_QUALITY, STATUS)
 
-                  CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
-     :              SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
-     :              AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
-     :              SCRATCH1_DATA, SCRATCH1_VARIANCE, 
-     :              SCRATCH1_QUALITY, STATUS)
+                     CALL SCULIB_CONVOLVE (SCRATCH2_DATA,
+     :                 SCRATCH2_VARIANCE, SCRATCH2_QUALITY, 
+     :                 AS_CONV_FUNCTION, N_SCAN, N_CONV, N_SCAN, NORM,
+     :                 SCRATCH1_DATA, SCRATCH1_VARIANCE, 
+     :                 SCRATCH1_QUALITY, STATUS)
 
 *  copy the convolved data from the output scratch array to the appropriate
 *  position in the output array
 
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     DO POS = SCAN_START, SCAN_END
-                        OUT_DATA (BOL,POS) = 
-     :                    SCRATCH1_DATA (POS - SCAN_START + 1)
-                        OUT_VARIANCE (BOL,POS) = 
-     :                    SCRATCH1_VARIANCE (POS - SCAN_START + 1)
-                        OUT_QUALITY (BOL,POS) = 
-     :                    SCRATCH1_QUALITY (POS - SCAN_START + 1)
-                     END DO
-                  END IF
-               END DO
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        DO POS = SCAN_START, SCAN_END
+                           OUT_DATA (BOL,POS) = 
+     :                       SCRATCH1_DATA (POS - SCAN_START + 1)
+                           OUT_VARIANCE (BOL,POS) = 
+     :                       SCRATCH1_VARIANCE (POS - SCAN_START + 1)
+                           OUT_QUALITY (BOL,POS) = 
+     :                       SCRATCH1_QUALITY (POS - SCAN_START + 1)
+                        END DO
+                     END IF
+
+                  END DO
+
+               END IF
+
             END DO
          END DO
       END DO
