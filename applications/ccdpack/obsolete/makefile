@@ -429,7 +429,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.4-0b
+PKG_VERS = 3.0-0b
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -788,7 +788,8 @@ DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = sun139.tex sun139geo.eps sun139reg.eps sun139red.eps
+LATEX_DOCS = sun139.tex sun139geo.eps sun139reg.eps sun139red.eps \
+             sun139mos.eps sun139driz.eps
 HYPERTEXT_DOCS = sun139.htx
 HYPERTEXT_HELP = ccdpack.htx
 
