@@ -1,0 +1,6 @@
+2004-07-19  Brad Cavanagh  <b.cavanagh@jach.hawaii.edu>
+
+	* Versions/Versions.pm: introduce starversion_ge, starversion_le
+
+
+
