@@ -193,8 +193,8 @@
 
 
 *+  PSF_ENERGY_PFL_SPEC - Invoke library routine for profiling
-      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, PSID, X0, Y0, NFRAC, FRAC,
-     :                                            RADII, STATUS )
+      SUBROUTINE PSF_ENERGY_PFL_SPEC( ROUTINE, PSID, X0, Y0, NFRAC,
+     :                                        FRAC, RADII, STATUS )
 *
 *    Description :
 *

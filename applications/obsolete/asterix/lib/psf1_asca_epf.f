@@ -1,4 +1,5 @@
-      SUBROUTINE PSF1_ASCA_EPF( PSID, X0, Y0, NEEF, EEFS, RADII, STATUS )
+      SUBROUTINE PSF1_ASCA_EPF( PSID, X0, Y0, NEEF, EEFS, RADII,
+     :                          STATUS )
 *+
 *  Name:
 *     PSF1_ASCA_EPF
