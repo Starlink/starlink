@@ -17,7 +17,7 @@
 *     a binary table within the current FITS file.
 *
 *     To propagate the OBJECT substructure this routine creates a binary
-*     table of constant width (210 bytes) with one row per fibre.  The
+*     table of constant width (224 bytes) with one row per fibre.  The
 *     total number of rows is obtained from component NUM_FIBRES.  If a
 *     possible OBJECT component is missing from the NDF, a null column
 *     is written for that component.  The columns inherit the data
@@ -52,7 +52,7 @@
 *     open.
 
 *  References:
-*     Bailey, J.A. 1996, 2dF Software Report 14, version 0.3.
+*     Bailey, J.A. 1996,97, 2dF Software Report 14, versions 0.3, 0.5.
 
 *  [optional_subroutine_items]...
 *  Authors:
@@ -62,7 +62,10 @@
 *  History:
 *     1997 January 14 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 10 (MJC):
+*        Added FILENAME to the FIELD structure.  Used latest version of
+*        the OBJECT structure.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -95,7 +98,7 @@
       INTEGER MXCOMP             ! Maximum number of components in the
                                  ! OBJECT structure or fields in the
                                  ! binary table
-      PARAMETER ( MXCOMP = 13 )
+      PARAMETER ( MXCOMP = 16 )
 
 *  Local Variables:
       CHARACTER * ( 80 ) BUFFER  ! BUFFER for writing error messages
@@ -141,22 +144,24 @@
 *  Local Data:
       DATA TDESC / 'Object name', 'J2000 mean Right Ascension',
      :             'J2000 mean Declination', 'X position', 'Y position',
+     :             'X position error', 'Y position error',
      :             'Button angle', 'P (programme object) or S (sky)',
-     :             'Priority', 'Object magnitude',
+     :             'Pivot number', 'Object magnitude',
      :             'Programme identification', 'Comments',
-     :             'A or B if beam switching',
+     :             'Retractor name', 'A or B if beam switching',
      :             'Beam-switch partner fibre' /
 
-      DATA TFORM / '80A', '1D', '1D', '1J', '1J', '1D', '1A',
-     :             '1I', '1D', '1J', '80A', '1A', '1I' /
+      DATA TFORM / '80A', '1D', '1D', '1J', '1J', '1I', '1I', '1D',
+     :             '1A', '1I', '1D', '1J', '80A', '10A', '1A', '1I' /
 
-      DATA TTYPE / 'NAME', 'RA', 'DEC', 'X', 'Y', 'THETA', 'TYPE',
-     :             'PRIORITY', 'MAGNITUDE', 'PID', 'COMMENT',
-     :             'SWITCHFIELD', 'SWITCHPARTNER' /
+      DATA TTYPE / 'NAME', 'RA', 'DEC', 'X', 'Y', 'XERR', 'YERR',
+     :             'THETA', 'TYPE', 'PIVOT', 'MAGNITUDE', 'PID',
+     :             'COMMENT', 'RETRACTOR', 'SWITCHFIELD',
+     :             'SWITCHPARTNER' /
 
       DATA TUNIT / ' ', 'radians', 'radians', 'microns', 'microns',
-     :             'radians', ' ', ' ', 'magnitudes', ' ', ' ', ' ',
-     :             ' ' /
+     :             'microns', 'microns', 'radians', ' ', ' ',
+     :             'magnitudes', ' ', ' ', ' ', ' ', 'fibre number' /
 
 *.
 
@@ -232,26 +237,27 @@
          CALL CHR_APPND( CN, CRDNAM, NC )
 
 *  Process by data type.
-         IF ( I .EQ. 1 .OR. I .EQ. 7 .OR.
-     :        I .EQ. 11 .OR. I .EQ. 12 ) THEN
+         IF ( I .EQ. 1  .OR. I .EQ. 9 .OR. I .EQ. 13 .OR.
+     :        I .EQ. 14 .OR. I .EQ. 15 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYS( FUNIT, CRDNAM, ' ', 'String null value',
      :                   FSTAT )
 
          ELSE IF ( I .EQ. 2 .OR. I .EQ. 3 .OR.
-     :             I .EQ. 6 .OR. I .EQ. 9 ) THEN
+     :             I .EQ. 8 .OR. I .EQ. 11 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYS( FUNIT, CRDNAM, -999.0D0, 0, 'Null value',
      :                   FSTAT )
 
-         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 10 ) THEN
+         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADI, 'Null value', FSTAT )
 
-         ELSE IF ( I .EQ. 8 .OR. I .EQ. 13 ) THEN
+         ELSE IF ( I .EQ. 6 .OR. I. EQ. 7 .OR.
+     :             I .EQ. 10 .OR. I .EQ. 16 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADW, 'Null value', FSTAT )
@@ -285,6 +291,9 @@
 
 *  Write additional header cards based upon the OBJECT structure.
 *  ==============================================================
+
+*  First write a blank link to separate these headers.
+      CALL FTPREC( FUNIT, ' ', FSTAT )
 
 *  Get a locator to the OBJECT structure.
       CALL DAT_FIND( LOC, 'OBJECT', OLOC, STATUS )
@@ -457,7 +466,14 @@
             CALL DAT_GET0C( CLOC, CVALUE, STATUS )
             CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
             NC = CHR_LEN( CVALUE( :64 ) )
-            CALL FTPKYS( FUNIT, 'LABEL', CVALUE( :NC ), ' ', FSTAT )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), ' ', FSTAT )
+
+*  FILENAME
+         ELSE IF ( KEYWRD .EQ. 'FILENAME' ) THEN
+            CALL DAT_GET0C( CLOC, CVALUE, STATUS )
+            CALL CHR_TRCHR( NULL, ' ', CVALUE, STATUS )
+            NC = CHR_LEN( CVALUE( :68 ) )
+            CALL FTPKYS( FUNIT, KEYWRD, CVALUE( :NC ), ' ', FSTAT )
 
          END IF
 
@@ -489,8 +505,8 @@
 
 *  Process by data type.  Start with the character arrays.
 *  -------------------------------------------------------
-         IF ( I .EQ. 1 .OR. I .EQ. 7 .OR.
-     :        I .EQ. 11 .OR. I .EQ. 12 ) THEN
+         IF ( I .EQ. 1  .OR. I .EQ. 9 .OR. I .EQ. 13 .OR.
+     :        I .EQ. 14 .OR. I .EQ. 15 ) THEN
 
             IF ( THERE ) THEN
 
@@ -523,7 +539,7 @@
 *  Double-precision components
 *  ---------------------------
          ELSE IF ( I .EQ. 2 .OR. I .EQ. 3 .OR.
-     :             I .EQ. 6 .OR. I .EQ. 9 ) THEN
+     :             I .EQ. 8 .OR. I .EQ. 11 ) THEN
 
             IF ( THERE ) THEN
 
@@ -547,7 +563,7 @@
 
 *  Integer components
 *  ------------------
-         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 10 ) THEN
+         ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
 
             IF ( THERE ) THEN
 
@@ -571,7 +587,8 @@
 
 *  Word components
 *  ---------------
-         ELSE IF ( I .EQ. 8 .OR. I .EQ. 13 ) THEN
+         ELSE IF ( I .EQ. 6 .OR. I. EQ. 7 .OR.
+     :             I .EQ. 10 .OR. I .EQ. 16 ) THEN
 
             IF ( THERE ) THEN
 
