@@ -3,19 +3,47 @@
  details about a specific POLPACK command or more-general information
  such as what POLPACK can do and how to use it.  If you need assistance
  using this help system, enter "Using_help" in response to the
- "Topic?" prompt. 
+ "Topic?" prompt. A full description of POLPACK is available in SUN/223.
 
 1 Introduction
 
-POLPACK comprises applications which facilitiate the reduction of imaging
-polarimetry data. Both dual-beam and single beam data can be processed.
-POLPACK handles bad pixels, and processes quality, variance, and other
-information stored within NDFs (cf. SUN/33). It can also process
-data in other formats, such as FITS and IRAF, using an automatic-data
-conversion facility (SUN/55, SSN/20).
+POLPACK is a package of applications for mapping the linear or circular
+polarization of extended astronomical objects, using data obtained from a
+dual-beam polarimeter. It is assumed that the analyser is stepped in
+units of 45 degrees and that no rotation occurs between target exposures.
+Other assumptions regarding the specific form of the data or the
+polarimeter have, as far as possible, been avoided.
 
-POLPACK commands are available from both the UNIX C-shell (and
-variants) and from the ICL command language.  
+POLPACK processes data in NDF format. This is the standard data format
+used by most Starlink software, and is described fully in SUN/33.
+However, other astronomical data formats may also be processed using
+transparent on-the-fly data conversion facilities provided by the NDF
+subroutine library. The use of these facilities is described in SUN/55.
+
+POLPACK commands are available from both the UNIX C-shell (and variants)
+and from the ICL command language.  The facilities provided by POLPACK
+include:
+
+   o  alignment of images on the sky.
+   o  extraction of $O$ and $E$ images from a single frame.
+   o  sky subtraction.
+   o  calculation of Stokes parameters.
+   o  binning of Stokes parameters.
+   o  creation of catalogues of polarization vectors.
+   o  graphical display of vector maps.
+
+POLPACK does not provide facilities for performing instrumental
+corrections such as flat-fielding, de-biassing, etc. Such corrections
+should be applied to the data before using POLPACK, so that POLPACK can
+assume that pixel values are proportional to the combined intensity of
+sky and object. 
+
+POLPACK can, however, apply certain corrections to the supplied data when
+calculating Stokes parameters. These corrections take account of any
+differences in the exposure times between raw frames, and any difference
+in the sensitivity of the two channels of the dual-beam polarimeter. They
+rely on redundancy in the supplied data, and require a specific set of
+analyser positions to be used (described in SUN/223).
 
 Type ? to see the main help topics.
 
@@ -55,12 +83,12 @@ Type ? to see the main help topics.
    underscores.  Each word of the keyword may be abbreviated,
    e.g. "Colour_Set" can be shortened to "C_S".
 
-   3) The characters "%" and "*" act as wildcards, where the percent
+   3) The characters "%" and "*" act as wild-cards, where the percent
    sign matches any single character, and asterisk matches any
    sequence of characters.  Thus to display information on all
-   available topics, type an asterisk (*) in reply to a hrlp prompt.
+   available topics, type an asterisk (*) in reply to a help prompt.
 
-   4) If a word contains but does end with an asterisk wildcard, it
+   4) If a word contains but does end with an asterisk wild-card, it
    must not be truncated.
 
    5) The entered string must not contain leading or embedded spaces.
@@ -87,4 +115,194 @@ Type ? to see the main help topics.
   3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
       topic, the help facility provides a description of the specified
       subtopic.
+
+1 Group Expressions
+
+Several of the POLPACK applications have parameters which are described
+as being associated with "groups" (or "lists") of objects. For instance,
+the POLKA parameter IN specifies a group of input data files, and the
+POLPLOT parameter STYLE specifies a group of plotting attributes. A
+"group expression" is the string typed in by the user in response to a
+prompt for such a parameter. It should identify the members of the
+required group in any of the following ways:
+
+  o  As a comma separated list ( e.g. "12.1, 23.2, 1.3" or 
+     "HH1_B1S1,HH2_B1S2" ). 
+
+  o  By reading them from a text file (see "Indirection").
+
+  o  By modifying an existing group of objects using editing specified 
+     within the group expression (see "Modification").
+
+If the supplied group expression is terminated with a minus sign, the
+user is re-prompted for another group expression. The objects specified
+by this second group expression are added to those specified by the
+first. This re-prompting continues until a group expression is supplied
+which does not end with a minus sign.
+
+Certain classes of objects have additional features, for instance if the
+objects are the names of data files, then wild-card characters are
+allowed in the supplied values.
+
+2 Indirection
+
+It is sometimes convenient to store the strings specifying the objects to
+be used within a text file. The name of the text file can then be given
+in response to a prompt for a group expression, rather than giving a long
+list of explicit values. This is done by preceding the name of the text
+file with an up-arrow ("^") character. For instance, the group expression
+"^style.dat" would result in the file style.dat being opened and the
+strings read from the file. Each line within the file is considered to be
+a group expression, and is processed in the same way as a group
+expression supplied directly. In particular, a text file may contain
+references to other text files. If the file style.dat contained the
+following two lines:
+
+   grid=1,colour(grid)=red,border=1
+   colour(border)=red,^labels.dat
+
+then the strings grid=1, colour(grid)=red, border=1 and colour(border)=red 
+would be returned to the application, and in addition the file labels.dat
+would be searched for further strings. This nesting of text files can go
+down to seven levels. Text files may also contain comments. Anything
+occurring after a "#" character is ignored. To ignore an entire line the
+# character must be in column 1 (any blanks in front of the # character
+are considered to be significant).
+
+2 Modification
+
+A group of objects can be given by specifying some editing to apply to
+another already existing group of objects. For instance, if the string
+new_*b|_ds|_im| was given in response to a request for a group
+expression, then the following steps occur:
+
+  o   Each element in some existing group of objects (identified in 
+      the description of the parameter concerned) is substituted 
+      in turn for the "*" character.
+  o   Any occurrences of the string "_ds" is replaced by the string 
+     "_im".
+  o   The string "b" is added to the end of the string.
+  o   The string "new_" is added to the start of the string.
+
+Thus if the existing group contained the strings file1_ds and file2_ds,
+the resulting group would be new_file1_imb and new_file2_imb. Note, this
+facility is only available if the parameter description identifies an
+existing group which will be used as the basis for the modified strings.
+
+2 Groups of Data Files
+
+If a group expression is used to specify a list of input data files, then
+file names may be specified which contain wild card characters ("*" and
+"?"). These will be expanded into a list of explicit file names before
+returning the group to the application. Note, group expressions
+containing wild-cards must be enclosed in quotes if they are supplied on
+the command line (this prevents the shell from expanding the wild-cards
+itself).
+
+If the final character in a group expression is a colon (:), then a list
+of the data files represented by the group expression (minus the colon)
+is displayed, but no data files are actually added to the group of files
+to be processed. The user is then re-prompted for another group
+expression. Note, this facility only applies to group expressions
+representing existing data files, not data files which are to be created
+by the application.
+
+2 Examples
+
+If an application asks for a group of input data files, the following 
+are all possible responses:
+
+
+1)  b1,b2,b3,b4
+
+This means "Use the NDFs stored in files b1.sdf, b2.sdf,
+b3.sdf and b4.sdf". If automatic format conversion is being 
+used, an example such as:
+
+  b1.fit,b2,fit,b3,fit,b4.fit
+
+is also legal, and reads the corresponding FITS files.
+
+
+2)  cena_b1-
+
+This means "Use cena_b1.sdf and then (because of the minus sign
+at the end) ask the user for more data files".
+
+
+3)  *
+
+This means "Use all accessible data files in the current directory". 
+
+
+4)  hh1_b1s*_ds
+
+This means "Use hh1_b1s1_ds.sdf, hh1_b1s2_ds.sdf, etc".
+
+
+5)  ^files.lis
+
+This means "Read the names of data files from the text file files.lis."
+
+
+6)  ../data/*
+
+This means "Use all accessible data files contained in the directory 
+../data".
+
+
+If an application asks for a group of output data files, the following 
+are possible responses:
+
+
+1)  file1,file2,file3
+
+This means "Create file1.sdf, file2.sdf and file3.sdf".
+
+
+2)  ^out.dat
+
+This means "Read the names of the output data files from text file out.dat".
+
+
+3)   *_ds
+
+This means "Append the string "_ds" to the end of all the input data 
+file names.
+
+
+4)  ../bk/*|_ds|_bk|
+
+This means "Substitute the string "_bk" for all  occurrences of the string
+"_ds" in the  input data file names, and put the files in directory ../bk".
+
+
+Group expressions can be used to specify objects other than data files.
+For instance,  if an application asks for a group of pixels to
+be specified by  their X and Y pixel indices, then the pixels (10,11),
+(21,-10) and (0,0) could be specified in any of the following ways:
+
+
+1)  10,11,21,-10,0,0  
+
+This gives the indices as a comma separated list.
+
+
+2)  10,11-
+    21,-10-
+    0,0
+
+Ending each line with a minus sign causes the user to be re-prompted for
+more values.
+
+
+3)  ^pixels.dat
+
+The file pixels.dat is read. The file could contain the  following four 
+lines:
+
+#  Approximate star centres.
+   10,11
+   21,-10
+   0,0
 
