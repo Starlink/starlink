@@ -31,11 +31,11 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/FIT_PAR'
+      INCLUDE 'FIT_PAR'
 *
 *    Structure declarations :
 *
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/FIT_STRUC'
+      INCLUDE 'FIT_STRUC'
 *
 *    Import :
 *
@@ -148,7 +148,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/MATH_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -541,7 +541,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE '/lsoft1/asterix/newast/kernel/lib/inc/MATH_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
