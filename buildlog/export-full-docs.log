@@ -291,11 +291,11 @@ javadoc-sources:
   [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Used when figure is changed (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] "The timeout for single/double/triple/.."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The timeout for single/double/triple/.. clicks,
   [javadoc]  in milliseconds."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/modular/CompositeNode.java:16: warning - The first sentence is interpreted to be:
@@ -1961,7 +1961,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2340,4 +2339,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 10 minutes 8 seconds
+Total time: 10 minutes 18 seconds
