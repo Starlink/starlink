@@ -96,8 +96,8 @@
 *        new-lines (see SUN/95 section "Specifying Groups of Objects"
 *        which is within the section "Parameters"). The suntax for each 
 *        expression is fortran-like; see the "Examples" section below, and 
-*        the AST_MATHMAP documentation in SUN/210 for details. Only used 
-*        when MAPTYPE=MATH.
+*        the Appendix entitled "Using MathMaps" in SUN/95 for details. Only 
+*        used when MAPTYPE=MATH.
 *     FRAME = LITERAL (Read)
 *        A string specifying the basis Frame. If a null value is supplied
 *        the current co-ordinate Frame in the NDF is used. The string can 
