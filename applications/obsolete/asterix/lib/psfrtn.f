@@ -39,7 +39,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_ANAL_CMN'
@@ -389,7 +388,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Import :
@@ -430,7 +428,7 @@
       END
 
 *+  PSF_ANAL_INIT - Analytic defined PSF initialisation
-      SUBROUTINE PSF_ANAL_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_ANAL_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -462,14 +460,14 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ANAL_CMN'
 *
 *    Import :
 *
-      INTEGER                 SLOT(2)            ! PSF handle
-      CHARACTER*(DAT__SZLOC)  LOC                ! Dataset locator
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -525,16 +523,16 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Identify spatial axes
-      CALL PSF1_GETAXID( SLOT(2), X_AX, Y_AX, E_AX, T_AX, STATUS )
+      CALL PSF1_GETAXID( INST, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *    Tell the user about the pixel size if we have a dataset.
-      X_OK = PSF1_GETAXOK( SLOT(2), X_AX, STATUS )
-      Y_OK = PSF1_GETAXOK( SLOT(2), Y_AX, STATUS )
-      X_DR = PSF1_GETAXDR( SLOT(2), X_AX, STATUS )
-      Y_DR = PSF1_GETAXDR( SLOT(2), Y_AX, STATUS )
-      X_TOR = PSF1_GETAXTOR( SLOT(2), X_AX, STATUS )
-      Y_TOR = PSF1_GETAXTOR( SLOT(2), Y_AX, STATUS )
-      CALL PSF1_GETAXTXT( SLOT(2), X_AX, LABEL, UNITS, STATUS )
+      X_OK = PSF1_GETAXOK( INST, X_AX, STATUS )
+      Y_OK = PSF1_GETAXOK( INST, Y_AX, STATUS )
+      X_DR = PSF1_GETAXDR( INST, X_AX, STATUS )
+      Y_DR = PSF1_GETAXDR( INST, Y_AX, STATUS )
+      X_TOR = PSF1_GETAXTOR( INST, X_AX, STATUS )
+      Y_TOR = PSF1_GETAXTOR( INST, Y_AX, STATUS )
+      CALL PSF1_GETAXTXT( INST, X_AX, LABEL, UNITS, STATUS )
 
 *    Are dataset axes ok?
       IF ( X_OK .AND. Y_OK .AND. .NOT.
@@ -552,7 +550,7 @@
 *    Check on each possibility
       IF ( STR_ABBREV(CHOICE,'GAUSSIAN') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_GAUSS
+        AN_KIND(SLOT) = ANAL_GAUSS
 
 *      We need a width for the gaussian
         PROMPT = 'Gaussian FWHM in '//UNITS(:CHR_LEN(UNITS))
@@ -563,12 +561,12 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Convert it to radians
-        AN_PW(SLOT(1),1) = GWIDTH*X_TOR
-        AN_PW(SLOT(1),2) = GWIDTH*Y_TOR
+        AN_PW(SLOT,1) = GWIDTH*X_TOR
+        AN_PW(SLOT,2) = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'KING') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_KING
+        AN_KIND(SLOT) = ANAL_KING
 
         CALL USI_PROMT( 'AUX', 'King core radius (in '/
      :           /UNITS(:CHR_LEN(UNITS))//') and index', STATUS )
@@ -583,7 +581,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT(1),1), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,1), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing core radius' )
@@ -594,7 +592,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT(1),2), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,2), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing profile index' )
@@ -604,11 +602,11 @@
         END IF
 
 *      Convert core radius to radians
-        AN_PW(SLOT(1),1) = AN_PW(SLOT(1),1) * X_TOR
+        AN_PW(SLOT,1) = AN_PW(SLOT,1) * X_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'LORENTZ') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_LORENTZ
+        AN_KIND(SLOT) = ANAL_LORENTZ
 
 *      We need a width for the Lorentzian
         PROMPT = 'Lorentzian HWHM in '//UNITS(:CHR_LEN(UNITS))
@@ -619,12 +617,12 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Convert it to radians
-        AN_PW(SLOT(1),1) = GWIDTH*X_TOR
-        AN_PW(SLOT(1),2) = GWIDTH*Y_TOR
+        AN_PW(SLOT,1) = GWIDTH*X_TOR
+        AN_PW(SLOT,2) = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'TOPHAT') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_TOPHAT
+        AN_KIND(SLOT) = ANAL_TOPHAT
 
 *      Get width of tophat
         PROMPT = 'Tophat full width in '//UNITS(:CHR_LEN(UNITS))
@@ -633,11 +631,11 @@
         CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
-        AN_PW(SLOT(1),1) = GWIDTH*X_TOR
+        AN_PW(SLOT,1) = GWIDTH*X_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'TRIANGLE') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_TRIANGLE
+        AN_KIND(SLOT) = ANAL_TRIANGLE
 
 *      Get width of tophat
         PROMPT = 'Triangle zero-point full width in '//UNITS
@@ -647,12 +645,12 @@
         CALL USI_CANCL( 'AUX', STATUS )
 
 *      Convert it to radians
-        AN_PW(SLOT(1),1) = GWIDTH*X_TOR
-        AN_PW(SLOT(1),2) = GWIDTH*Y_TOR
+        AN_PW(SLOT,1) = GWIDTH*X_TOR
+        AN_PW(SLOT,2) = GWIDTH*Y_TOR
 
       ELSE IF ( STR_ABBREV(CHOICE,'FLAT_TRI') ) THEN
 
-        AN_KIND(SLOT(1)) = ANAL_FLAT_TRI
+        AN_KIND(SLOT) = ANAL_FLAT_TRI
 
         CALL MSG_PRNT( 'Please supply full-width at zero response'/
      :                  /' (FWZR) and full-width half-max (FWHM)' )
@@ -669,7 +667,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT(1),1), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,1), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing FWZR' )
@@ -679,7 +677,7 @@
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
-          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT(1),2), STATUS )
+          CALL CHR_CTOR( FTPAR(BEG:IC), AN_PW(SLOT,2), STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
             CALL MSG_PRNT( 'Error parsing FWHM' )
@@ -688,24 +686,25 @@
 
         END IF
 
-        IF ( AN_PW(SLOT(1),1) .LT. AN_PW(SLOT(1),2) ) THEN
+        IF ( AN_PW(SLOT,1) .LT. AN_PW(SLOT,2) ) THEN
           CALL MSG_PRNT( 'The zero point full width can''t be LESS'/
      :                                            /' than the FWHM!' )
           GOTO 49
         END IF
 
 *      Convert them both to radians
-        AN_PW(SLOT(1),1) = AN_PW(SLOT(1),1)*X_TOR
-        AN_PW(SLOT(1),2) = AN_PW(SLOT(1),2)*Y_TOR
+        AN_PW(SLOT,1) = AN_PW(SLOT,1)*X_TOR
+        AN_PW(SLOT,2) = AN_PW(SLOT,2)*Y_TOR
 
       ELSE
-        CALL ERR_REP( ' ', 'Unrecognised PSF specifier', STATUS )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Unrecognised PSF specifier', STATUS )
+
       END IF
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from PSF_ANAL_INIT', STATUS )
+        CALL AST_REXIT( 'PSF_ANAL_INIT', STATUS )
       END IF
 
       END
@@ -763,7 +762,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ANAL_CMN'
 *
@@ -925,7 +923,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
@@ -1600,7 +1597,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
 *
@@ -1650,7 +1646,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -1701,7 +1696,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       END
 
 *+  PSF_ASCA_INIT - ASCA psf initialisation
-      SUBROUTINE PSF_ASCA_INIT( PSLOT, LOC, STATUS )
+      SUBROUTINE PSF_ASCA_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -1729,14 +1724,14 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_ASCA_CMN'
 *
 *    Import :
 *
-      INTEGER                 PSLOT(2)           ! PSF handle
-      CHARACTER*(DAT__SZLOC)  LOC
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -1749,15 +1744,10 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Local variables :
 *
       CHARACTER*20            MASK              ! Mask name
-
-      INTEGER                 SLOT              !
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Set up as user defined
-      SLOT = PSLOT(1)
 
 *    Get mask name
       CALL USI_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
@@ -1827,7 +1817,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Import :
@@ -1952,7 +1941,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
 *
@@ -2020,7 +2008,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
 *
@@ -2050,7 +2037,7 @@ C         CALL CAL_CLOSE( IGNORE )
       END
 
 *+  PSF_PWFC_INIT - Initialise the WFC pointed psf system
-      SUBROUTINE PSF_PWFC_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_PWFC_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -2092,8 +2079,9 @@ C         CALL CAL_CLOSE( IGNORE )
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! PSF slot id
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Dataset locator
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Functions :
 *
@@ -2104,6 +2092,7 @@ C         CALL CAL_CLOSE( IGNORE )
 *
       CHARACTER*(DAT__SZLOC)   HLOC                    ! HEADER locator
       CHARACTER*(DAT__SZLOC)   ILOC                    ! INSTRUMENT locator
+      CHARACTER*(DAT__SZLOC)   LOC                     ! Locator from FID
       CHARACTER*(DAT__SZLOC)   SLOC                    ! SORT locator
       CHARACTER*80             CID                     ! Filter description
 
@@ -2112,10 +2101,11 @@ C         CALL CAL_CLOSE( IGNORE )
       INTEGER                  BDA                     ! BDA identifier
       INTEGER                  CALFN                   ! CAL filter id
       INTEGER                  IFILT                   ! Dataset filter id
+      INTEGER			TIMID			! Timing info
 
       LOGICAL                  FILTER_OK, IRIS_OK      ! Sort components there?
       LOGICAL                  THERE
-      LOGICAL                  I_THERE, S_THERE, B_THERE
+      LOGICAL                  I_THERE, S_THERE
 *-
 
 *    Check status
@@ -2138,6 +2128,9 @@ C         CALL CAL_CLOSE( IGNORE )
       IRIS_OK = .FALSE.
       FILTER_OK = .FALSE.
 
+*    Extract locator
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
+
 *    Is locator valid
       CALL DAT_VALID( LOC, WF_DATASET(SLOT), STATUS )
       IF ( WF_DATASET(SLOT) ) THEN
@@ -2146,24 +2139,15 @@ C         CALL CAL_CLOSE( IGNORE )
         CALL BDA_FIND( LOC, BDA, STATUS )
 
 *      Store locator
-        WF_LOC(SLOT) = LOC
         WF_MCP(SLOT) = 2
 
 *      Try and get MJD from dataset
-        CALL BDA_CHKHEAD_INT( BDA, THERE, STATUS )
-        B_THERE = .FALSE.
-        IF ( THERE ) THEN
-          CALL BDA_LOCHEAD_INT( BDA, HLOC, STATUS )
-          CALL DAT_THERE(HLOC,'BASE_MJD',B_THERE,STATUS)
-          IF ( B_THERE ) THEN
-            CALL CMP_GET0D( HLOC, 'BASE_MJD', WF_MJD(SLOT), STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-              CALL ERR_ANNUL(STATUS)
-              B_THERE = .FALSE.
-            END IF
-          END IF
+        CALL TCI_GETID( FID, TIMID, STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDObs', WF_MJD(SLOT), STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+	  WF_MJD(SLOT) = 48000.0D0
         END IF
-        IF ( .NOT. B_THERE ) WF_MJD(SLOT) = 48000.0D0
 
 *      Get the detector id from CAL
         CALL CIN_SET_DET( WF_MJD(SLOT), WF_MCP(SLOT), STATUS )
@@ -2174,14 +2158,10 @@ C         CALL CAL_CLOSE( IGNORE )
           WF_MCP(SLOT) = 2
         END IF
 
-*      Locate components in dataset
-        CALL BDA_CHKINSTR_INT( BDA, I_THERE, STATUS )
-        IF ( I_THERE ) THEN
-          CALL BDA_LOCINSTR_INT( BDA, ILOC, STATUS )
-          CALL DAT_THERE( ILOC, 'SORT', S_THERE, STATUS )
-        END IF
-        IF ( I_THERE .AND. S_THERE ) THEN
-          CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
+*      Get filter id
+        CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
+        CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Look for filter id
           CALL CMP_GET0I( SLOC, 'FILTER', IFILT, STATUS )
@@ -2214,6 +2194,9 @@ C         CALL CAL_CLOSE( IGNORE )
 
 *        Tidy up
           CALL DAT_ANNUL( SLOC, STATUS )
+
+        ELSE
+          CALL ERR_ANNUL( STATUS )
 
         END IF
 
@@ -2551,7 +2534,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RADIAL_INIT - Radially defined PSF initialisation
-      SUBROUTINE PSF_RADIAL_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_RADIAL_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -2585,8 +2568,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
-      INTEGER                 SLOT              ! PSF handle
-      CHARACTER*(DAT__SZLOC)  LOC
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -2599,7 +2583,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Local variables :
 *
       CHARACTER*80            TNAME             ! Table file name
-      CHARACTER               TLOC*(DAT__SZLOC) ! Table file ptr
       CHARACTER*40            UNITS             ! Axis units
 
       REAL                    BASE, SCALE       ! Axis attributes
@@ -2610,6 +2593,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                 DIMS(DAT__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
+      INTEGER			TFID			! Tabular dataset
       INTEGER                 WPTR              ! Ptr to axis width data
 
       LOGICAL                 OK                ! General validity check
@@ -2627,11 +2611,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Try to open file
-      CALL HDS_OPEN( TNAME(:CHR_LEN(TNAME)), 'READ', TLOC, STATUS )
+      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), '*', 'READ', TFID,
+     :                STATUS )
 
 *    Check the data
-      CALL BDA_FIND( TLOC, BDA, STATUS )
-      CALL BDA_CHKDATA_INT( BDA, VALID, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( TFID, VALID, NDIM, DIMS, STATUS )
       IF ( VALID ) THEN
 
         IF ( NDIM .NE. 1 ) THEN
@@ -2641,18 +2625,17 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Map if ok
-        CALL BDA_MAPDATA_INT( BDA, 'READ', DPTR, STATUS )
+        CALL BDI_MAPDATA( TFID, 'READ', DPTR, STATUS )
 
 *      If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
-          RD_LOC(SLOT) = TLOC
           RD_DIM(SLOT) = DIMS(1)
           CALL DYN_MAPR( 1, DIMS(1), RD_DPTR(SLOT), STATUS )
           CALL ARR_COP1R( DIMS(1), %VAL(DPTR),
      :                    %VAL(RD_DPTR(SLOT)), STATUS )
 
 *        Get axis info
-          CALL BDA_CHKAXVAL_INT( BDA, 1, OK, RD_REG(SLOT),
+          CALL BDI_CHKAXVAL( TFID, 1, OK, RD_REG(SLOT),
      :                           DIMS(1), STATUS )
 
 *        Profile bin positions and heights
@@ -2661,8 +2644,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *        Regular axis?
           IF ( RD_REG(SLOT) ) THEN
-            CALL BDA_GETAXVAL_INT( BDA, 1, BASE, SCALE, DIMS(1),
-     :                                                  STATUS )
+            CALL BDI_GETAXVAL( TFID, 1, BASE, SCALE, DIMS(1), STATUS )
 
 *          Fill axis values array
             CALL ARR_REG1R( BASE, SCALE, DIMS(1),
@@ -2676,19 +2658,19 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           ELSE
 
 *          Map axis data
-            CALL BDA_MAPAXVAL_INT( BDA, 1, APTR, STATUS )
+            CALL BDI_MAPAXVAL( TFID, 1, APTR, STATUS )
             CALL ARR_COP1R( DIMS(1), %VAL(APTR), %VAL(RD_APTR(SLOT)),
      :                      STATUS )
 
 *          And the widths
-            CALL BDA_MAPAXWID_INT( BDA, 1, WPTR, STATUS )
+            CALL BDI_MAPAXWID( TFID, 1, WPTR, STATUS )
             CALL ARR_COP1R( DIMS(1), %VAL(WPTR),
      :                      %VAL(RD_WPTR(SLOT)), STATUS )
 
           END IF
 
 *        Get axis units
-          CALL BDA_GETAXUNITS_INT( BDA, 1, UNITS, STATUS )
+          CALL BDI_GETAXUNITS( TFID, 1, UNITS, STATUS )
 
 *        Convert axis units
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
@@ -2713,13 +2695,13 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Release from BDA
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
-        CALL BDA_RELEASE_INT( BDA, STATUS )
-        CALL HDS_CLOSE( TLOC, STATUS )
+        CALL BDI_RELEASE( TFID, STATUS )
+        CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from PSF_RADIAL_INIT', STATUS )
+        CALL AST_REXIT( 'PSF_RADIAL_INIT', STATUS )
       END IF
 
       END
@@ -3165,7 +3147,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_RESPFILE_INIT - Response defined PSF initialisation
-      SUBROUTINE PSF_RESPFILE_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_RESPFILE_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3203,8 +3185,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
-      INTEGER            	SLOT(2)              	! PSF handle
-      CHARACTER*(DAT__SZLOC)  	LOC			! Dataset locator
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -3506,10 +3489,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise BDA and DYN packages
-      CALL BDA_INIT()
-      CALL DYN_INIT()
-
 *    Reset the SYSTEM_INIT flag in each common block
       AN_INIT = .TRUE.
       AS_INIT = .TRUE.
@@ -3681,7 +3660,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_INIT - Tabular defined PSF initialisation
-      SUBROUTINE PSF_TABULAR_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_TABULAR_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -3718,8 +3697,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
-      INTEGER                 SLOT              ! PSF handle
-      CHARACTER*(DAT__SZLOC)  LOC
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -3733,7 +3713,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       CHARACTER*(DAT__SZLOC)  PLOC              ! PSF structure locator
       CHARACTER*80            TNAME             ! Table file name
-      CHARACTER               TLOC*(DAT__SZLOC) ! Table file ptr
       CHARACTER*40            UNITS             ! Spatial units
 
       REAL                    BASE, SCALE       ! Axis quantities
@@ -3742,6 +3721,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                 DIMS(DAT__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
+      INTEGER			TFID			! Table identifier
 
       LOGICAL                 ELEVS_OK          ! Energy levels structure ok?
       LOGICAL                 PSF_OK            ! PSF structure there?
@@ -3760,11 +3740,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Try to open file
-      CALL HDS_OPEN( TNAME(:CHR_LEN(TNAME)), 'READ', TLOC, STATUS )
+      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), '*', 'READ', TFID,
+     :                STATUS )
 
 *    Check the data
-      CALL BDA_FIND( TLOC, BDA, STATUS )
-      CALL BDA_CHKDATA_INT( BDA, VALID, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( TFID, VALID, NDIM, DIMS, STATUS )
       IF ( VALID ) THEN
 
         IF ( NDIM .NE. 2 ) THEN
@@ -3773,10 +3753,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Map if ok
-        CALL BDA_MAPDATA_INT( BDA, 'READ', DPTR, STATUS )
+        CALL BDI_MAPDATA( TFID, 'READ', DPTR, STATUS )
 
 *      Get axis units
-        CALL BDA_GETAXUNITS_INT( BDA, 1, UNITS, STATUS )
+        CALL BDI_GETAXUNITS( TFID, 1, UNITS, STATUS )
         CALL CONV_UNIT2R( UNITS, TB_TOR(SLOT), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
@@ -3784,12 +3764,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Get axis values
-        CALL BDA_GETAXVAL_INT( BDA, 1, BASE, SCALE, DIMS(1), STATUS )
+        CALL BDI_GETAXVAL( TFID, 1, BASE, SCALE, DIMS(1), STATUS )
         TB_TOR(SLOT) = ABS(TB_TOR(SLOT)*SCALE)
 
 *      If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
-          TB_LOC(SLOT) = TLOC
           TB_DIMS(SLOT,1) = DIMS(1)
           TB_DIMS(SLOT,2) = DIMS(2)
           CALL DYN_MAPR( 2, DIMS, TB_DPTR(SLOT), STATUS )
@@ -3825,13 +3804,13 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Release from BDA
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
-        CALL BDA_RELEASE_INT( BDA, STATUS )
-        CALL HDS_CLOSE( TLOC, STATUS )
+        CALL BDI_RELEASE( TFID, STATUS )
+        CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( ' ', '...from PSF_TABULAR_INIT', STATUS )
+        CALL AST_REXIT( 'PSF_TABULAR_INIT', STATUS )
       END IF
 
       END
@@ -4130,7 +4109,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_WFC_INIT - Initialise the WFC survey psf system
-      SUBROUTINE PSF_WFC_INIT( SLOT, LOC, STATUS )
+      SUBROUTINE PSF_WFC_INIT( SLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -4174,8 +4153,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! PSF slot id
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Dataset locator
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Functions :
 *
@@ -4194,6 +4174,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  BDA                     ! BDA identifier
       INTEGER                  CALFN                   ! CAL filter no.
       INTEGER                  IFILT                   ! Dataset filter code
+      INTEGER			TIMID			! Timing info
 
       LOGICAL                  FILTER_OK, IRIS_OK      !
       LOGICAL                  THERE
@@ -4221,32 +4202,23 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IRIS_OK = .FALSE.
       FILTER_OK = .FALSE.
 
-*    Is locator valid
+*    Extract locator
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
+
+*  Is locator valid
       CALL DAT_VALID( LOC, WF_DATASET(SLOT), STATUS )
       IF ( WF_DATASET(SLOT) ) THEN
 
-*       Get BDA identifier
-         CALL BDA_FIND( LOC, BDA, STATUS )
+*    Store locator
+        WF_MCP(SLOT) = 2
 
-*       Store locator
-         WF_LOC(SLOT) = LOC
-         WF_MCP(SLOT) = 2
-
-*       Try and get MJD from dataset
-         CALL BDA_CHKHEAD_INT( BDA, THERE, STATUS )
-         B_THERE = .FALSE.
-         IF ( THERE ) THEN
-            CALL BDA_LOCHEAD_INT( BDA, HLOC, STATUS )
-            CALL DAT_THERE(HLOC,'BASE_MJD',B_THERE,STATUS )
-            IF ( B_THERE ) THEN
-               CALL CMP_GET0D( HLOC, 'BASE_MJD', WF_MJD(SLOT), STATUS )
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  B_THERE = .FALSE.
-                  CALL ERR_ANNUL(STATUS)
-               END IF
-            END IF
-         END IF
-         IF ( .NOT. B_THERE ) WF_MJD(SLOT) = 48000.0D0
+*    Try and get MJD from dataset
+        CALL TCI_GETID( FID, TIMID, STATUS )
+        CALL ADI_CGET0D( TIMID, 'MJDObs', WF_MJD(SLOT), STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          WF_MJD(SLOT) = 48000.0D0
+        END IF
 
 *       Get the detector id from CAL
          CALL CIN_SET_DET( WF_MJD(SLOT), WF_MCP(SLOT), STATUS )
@@ -4258,12 +4230,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
          END IF
 
 *       Locate components in dataset
-         CALL BDA_CHKINSTR_INT( BDA, I_THERE, STATUS )
-         IF ( I_THERE ) THEN
-            CALL BDA_LOCINSTR_INT( BDA, ILOC, STATUS )
-            CALL DAT_THERE( ILOC, 'SORT', S_THERE, STATUS )
-         END IF
-         IF ( I_THERE .AND. S_THERE ) THEN
+        CALL ADI1_LOCINSTR( FID, .FALSE., ILOC, STATUS )
+        CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
+         IF ( STATUS .EQ. SAI__OK ) THEN
             CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
 
 *          Look for filter id
@@ -4294,6 +4263,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *          Tidy up
             CALL DAT_ANNUL( SLOC, STATUS )
+
+         ELSE
+           CALL ERR_ANNUL( STATUS )
 
          END IF
 
@@ -5295,7 +5267,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_XRT_PSPC_INIT - XRT PSPC psf initialisation
-      SUBROUTINE PSF_XRT_PSPC_INIT( PSLOT, LOC, STATUS )
+      SUBROUTINE PSF_XRT_PSPC_INIT( PSLOT, FID, INST, STATUS )
 *
 *    Description :
 *
@@ -5330,8 +5302,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Import :
 *
-      INTEGER                 PSLOT(2)           ! PSF handle
-      CHARACTER*(DAT__SZLOC)  LOC
+      INTEGER			SLOT			! Psf slot number
+      INTEGER			FID			! Dataset handle
+      INTEGER			INST			! Instance data
 *
 *    Status :
 *
@@ -5344,6 +5317,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
+      CHARACTER*(DAT__SZLOC)	CBLOC			! Cube locator
+
       CHARACTER*132           FNAME             ! File name of cube
       CHARACTER*20            MASK              ! Mask name
 
@@ -5355,9 +5330,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Set up as user defined
-      SLOT = PSLOT(1)
 
 *    Get mask name
       CALL USI_PROMT( 'MASK',
@@ -5397,7 +5369,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
 *        Open the file
-          CALL HDS_OPEN( FNAME, 'READ', RX_CB_LOC, STATUS )
+          CALL ADI_FOPEN( FNAME, '*', 'READ', RX_CB_ID, STATUS )
+          CALL ADI1_GETLOC( RX_CB_ID, CBLOC, STATUS )
 
 *        Abort if failed
           IF ( STATUS .NE. SAI__OK ) THEN
@@ -5406,23 +5379,23 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           END IF
 
 *        Map the 2 components
-          CALL CMP_MAPN( RX_CB_LOC, 'DATA_ARRAY', '_REAL', 'READ',
+          CALL CMP_MAPN( CBLOC, 'DATA_ARRAY', '_REAL', 'READ',
      :                   3, RX_CB_PPTR, CDIMS, STATUS )
           RX_CB_NRBIN = CDIMS(1)
           RX_CB_NOBIN = CDIMS(2)
           RX_CB_NEBIN = CDIMS(3)
-          CALL CMP_MAPN( RX_CB_LOC, 'RBINSIZE', '_REAL', 'READ',
+          CALL CMP_MAPN( CBLOC, 'RBINSIZE', '_REAL', 'READ',
      :                   2, RX_CB_RPTR, CDIMS, STATUS )
 
 *        Get off-axis angle axis attributes
-          CALL BDA_GETAXVAL( RX_CB_LOC, 2, RX_CB_OBASE,
+          CALL BDI_GETAXVAL( RX_CB_ID, 2, RX_CB_OBASE,
      :                       RX_CB_OSCALE, CDIMS(2), STATUS )
 
 *        Map energy axis data and widths if present
-          CALL BDA_MAPAXVAL( RX_CB_LOC, 'READ', 3, RX_CB_EAPTR,STATUS )
-          CALL BDA_CHKAXWID( RX_CB_LOC, 3, OK, UNIF, CDIMS(3), STATUS )
+          CALL BDI_MAPAXVAL( RX_CB_ID, 'READ', 3, RX_CB_EAPTR,STATUS )
+          CALL BDI_CHKAXWID( RX_CB_ID, 3, OK, UNIF, CDIMS(3), STATUS )
           IF ( OK ) THEN
-            CALL BDA_MAPAXWID( RX_CB_LOC, 'READ', 3,
+            CALL BDI_MAPAXWID( RX_CB_ID, 'READ', 3,
      :                         RX_CB_EWPTR, STATUS )
           ELSE
             RX_CB_EWPTR = 0
