@@ -333,7 +333,7 @@
             LLOG = 6
 
 *        Create the environment variable
-            CALL gns_1PTENV(LOGNAM(:LLOG), CDEV(:LDEV) )
+            CALL PSX_PUTENV(LOGNAM(:LLOG), CDEV(:LDEV), STATUS)
 
 *        Construct the GKS_xxxx environment string for xwindow devices
             WRITE( CM, '(SP,I10)' ) IWKTYP
@@ -345,7 +345,7 @@
 
 *        Create the environment variable
                IF (LOGNAM(:LLOG).NE. CDEV(:LDEV)) THEN
-                  CALL gns_1PTENV(LOGNAM(:LLOG), CDEV(:LDEV) )
+                  CALL PSX_PUTENV(LOGNAM(:LLOG), CDEV(:LDEV), STATUS)
                ENDIF
             ENDIF
 
