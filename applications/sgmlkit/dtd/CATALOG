@@ -180,6 +180,10 @@ PUBLIC "-//Starlink//DTD DSSSL Source Code 0.5//EN"	dssslcode-0.5.dtd
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.3//EN"	dssslcode-0.3.dtd
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
 
+	-- Starlink variant of HTML --
+	-- See notes within file. --
+PUBLIC "-//Starlink//DTD Starlink HTML 3//EN"		starhtml.dtd
+
 	-- The following DTDs are used only internally to the SGML
 	   application, so they shouldn't have public identifiers.
 	   --
@@ -198,8 +202,15 @@ PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"	../dsssl/sl/common/
 PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"	../dsssl/sl/html/slparams.dsl
 PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"	../dsssl/sl/latex/slparams.dsl
 
-
 	-- Following public-ids are for non-Starlink entities --
+
+	-- HTML 4 --
+PUBLIC "-//W3C//DTD HTML 4.0//EN"			html4/strict.dtd
+PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"		html4/loose.dtd
+PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN"		html4/frameset.dtd
+PUBLIC "-//W3C//ENTITIES Latin1//EN//HTML"		html4/HTMLlat1.ent
+PUBLIC "-//W3C//ENTITIES Special//EN//HTML"		html4/HTMLspecial.ent
+PUBLIC "-//W3C//ENTITIES Symbols//EN//HTML"		html4/HTMLsymbol.ent
 
 	-- OASIS exchange table model.
 	   See http://www.oasis-open.org/html/a503.htm
