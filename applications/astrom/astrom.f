@@ -14,9 +14,7 @@
 *  This version is for the Unix systems on Starlink DECstations and
 *  Suns.  The program expects a list of arguments of the form
 *  `keyword=value'.  It interprets these keywords as filenames, filename
-*  prefixes or options as described below.  The program works in
-*  conjunction with a shell script, which slightly enhances the
-*  interface by defaulting keywords.
+*  prefixes or options as described below.
 *
 *  The recognised keywords are:
 *
@@ -26,6 +24,13 @@
 *    log       easily-parseable log file, reporting status and errors
 *    fits      prefix for generated FITS files
 *    wcsstyle  style of FITS WCS headers generated
+*
+*  If the 'input' keyword is omitted, it defaults to 'astrom.dat', and if
+*  the 'report' keyword is omitted, it defaults to 'astrom.lis'.  Either of
+*  the input or the report filename may be given as '-', indicating the
+*  standard input or standard output respectively.  You may give a
+*  filename without the keyword: the first such name is assigned to
+*  'input', and the second to 'report'.
 *
 *  Called:  IARGC, GETARG, tpt_OPW, tpt_OPR, tpt_ASTRML
 *
@@ -48,13 +53,14 @@
       INTEGER LUINP,LUREP,LUSYN,LULOG,LU,I,J,N
       INTEGER ARGN
       INTEGER ACTION
+      LOGICAL ANONARG
 
       INTEGER IARGC
 
 *   Defaults
-      LUINP=UNITIN              ! standard input
-      LUREP=UNITOUT             ! standard output
-      LUSYN=UNITOUT
+      LUINP=0                   ! sentinel value
+      LUREP=0                   ! sentinel value
+      LUSYN=UNITOUT             ! standard output
       LULOG=0
       FITSFN=' '                ! suppresses generation of FITS files
       FITSWCSSTYLE=DEFWCSSTYLE
@@ -72,44 +78,69 @@
          J=I
          IF (ARG(1:1).EQ.'-') THEN
             ARGNAME=ARG
+            ANONARG=.FALSE.
          ELSE
-            DO WHILE (ARG(J:J).NE.'=')
+            DO WHILE (ARG(J:J).NE.'=' .AND. ARG(J:J).NE.' ')
                J=J+1
                IF (J.EQ.NFILE) GO TO 9015
             ENDDO
-            ARGNAME=ARG(I:J-1)
-            J=J+1
-            I=J
-            DO WHILE (ARG(J:J).NE.' ')
+            IF (ARG(J:J).EQ.' ') THEN
+               ANONARG=.TRUE.
+               ARGVALUE=ARG(I:J-1)
+            ELSE
+               ANONARG=.FALSE.
+               ARGNAME=ARG(I:J-1)
                J=J+1
-               IF (J.GE.NFILE) GO TO 9015
-            ENDDO
-            ARGVALUE=ARG(I:J-1)
+               I=J
+               DO WHILE (ARG(J:J).NE.' ')
+                  J=J+1
+                  IF (J.GE.NFILE) GO TO 9015
+               ENDDO
+               ARGVALUE=ARG(I:J-1)
+            ENDIF
          ENDIF
 
-         IF (ARGNAME(1:5).EQ."input") THEN
-            LUINP=11
-            LU=LUINP
-            FILE=ARGVALUE
-            CALL OPR(LU,FILE,J)
-            IF (J.NE.0) GO TO 9020
-         ELSE IF (ARGNAME(1:6).EQ."report") THEN
-            LUREP=13
-            LU=LUREP
-            FILE=ARGVALUE
-            CALL OPW(LU,FILE,J)
-            IF (J.NE.0) GO TO 9020
+         IF ((ANONARG .AND. (LUINP.EQ.0))
+     :        .OR. ARGNAME(1:5).EQ."input") THEN
+*         Have we specified stdin?
+            IF (ARGVALUE(1:2).EQ.'- ') THEN
+               LUINP=UNITIN
+*               write(*,2000)'input',lu,'stdin'
+            ELSE
+               LUINP=11
+               LU=LUINP
+               FILE=ARGVALUE
+               CALL OPR(LU,FILE,J)
+*               write(*,2000)'input',lu,file
+               IF (J.NE.0) GO TO 9020
+            ENDIF
+         ELSE IF ((ANONARG .AND. (LUREP.EQ.0))
+     :           .OR. ARGNAME(1:6).EQ."report") THEN
+*         Have we specified stdout?
+            IF (ARGVALUE(1:2).EQ.'- ') THEN
+               LUREP=UNITOUT
+*               write(*,2000)'report',lu,'stdout'
+            ELSE
+               LUREP=13
+               LU=LUREP
+               FILE=ARGVALUE
+               CALL OPW(LU,FILE,J)
+*               write(*,2000)'report',lu,file
+               IF (J.NE.0) GO TO 9020
+            ENDIF
          ELSE IF (ARGNAME(1:7).EQ."summary") THEN
             LUSYN=16
             LU=LUSYN
             FILE=ARGVALUE
             CALL OPW(LU,FILE,J)
+*            write(*,2000)'summary',lu,file
             IF (J.NE.0) GO TO 9020
          ELSE IF (ARGNAME(1:3).EQ."log") THEN
             LULOG=19
             LU=LULOG
             FILE=ARGVALUE
             CALL OPW(LU,FILE,J)
+*            write(*,2000)'log',lu,file
             IF (J.NE.0) GO TO 9020
          ELSE IF (ARGNAME(1:4).EQ."fits") THEN
             FITSFN=ARGVALUE
@@ -127,6 +158,26 @@
          ARGN=ARGN+1
       ENDDO
 
+      IF (LUINP.EQ.0) THEN
+*      input= specifier wasn't given
+         LUINP=11
+         LU=LUINP
+         FILE='astrom.dat'
+         CALL OPR(LU,FILE,J)
+*         write(*,2000) 'input',lu,file
+         IF (J.NE.0) GO TO 9020
+      ENDIF
+      IF (LUREP.EQ.0) THEN
+*      report= specifier wasn't given
+         LUREP=13
+         LU=LUREP
+         FILE='astrom.lis'
+         CALL OPW(LU,FILE,J)
+*         write(*,2000) 'report',lu,file
+         IF (J.NE.0) GO TO 9020
+      ENDIF
+
+* 2000 format (1x,a,': unit ',i2,' connected to ',a)
 
 *   Don't do anything with the FITS filename template -- leave that to astrml
 
