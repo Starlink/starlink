@@ -532,6 +532,7 @@ $(MANIFEST)/esp: \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
