@@ -231,6 +231,8 @@
 #     7-DEC-1998 (DSB):
 #        Corrected TCL linking, and updated libraries to TCL_VERS = 7.6
 #        and TK_VERS = 4.2.
+#     31-AUG-1999 (DSB):
+#        Updated NDG library.
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -538,12 +540,15 @@ ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
-F_NDG = ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
-ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_creat.f ndg1_fparx.f \
-ndg1_appen.f ndg_crexp.f ndg1_hcut.f \
-ndg_delet.f ndg1_hfind.f ndg1_ndfch.f ndg_annul.f \
-ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f \
-ndg1_sdfex.f ndg1_ndfdl.f
+F_NDG = ndg1_appen.f ndg1_hfind.f ndg1_pshdb.f ndg_asexp.f \
+ndg_ndfas.f ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_ndfcr.f \
+ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_ndfpr.f ndg1_fparx.f \
+ndg1_ndfch.f ndg1_sdfex.f ndg_crexp.f ndg1_hcut.f ndg1_ndfdl.f \
+ndg_ndfcp.f ndg_setsz.f ndg1_match.f ndg1_subst.f \
+ndg_assoc.f ndg_creat.f ndg_again.f ndg_assoc1.f \
+ndg_creat1.f ndg_crep1.f ndg_prop1.f ndg_assocl.f ndg_creatl.f \
+ndg_crepl.f ndg_propl.f ndg_start.f ndg_state.f ndg_tidy.f
+
 
 KAPGEN_F_ROUTINES = \
 bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
@@ -790,10 +795,11 @@ PLATFORM_F =
 
 #  Block data routines.
 
-BLOCK_DATA = $(KAPGEN_BLOCK_DATA) $(IRA_BLOCK_DATA)
+BLOCK_DATA = $(KAPGEN_BLOCK_DATA) $(IRA_BLOCK_DATA) $(NDG_BLOCK_DATA)
 
 KAPGEN_BLOCK_DATA = ctm_xcols.f
 IRA_BLOCK_DATA = ira1_init.f
+NDG_BLOCK_DATA = ndg1_init.f
 
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
@@ -1070,7 +1076,7 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_NDG) $(I_NDG) $(C_NDG) :
+$(F_NDG) $(I_NDG) $(C_NDG) $(NDG_BLOCK_DATA):
 	$(TAR_OUT) ndg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1147,7 +1153,7 @@ FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
 
 IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o) $(IRA_BLOCK_DATA:.f=.o) 
 
-O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o)
+O_NDG = $(F_NDG:.f=.o) $(C_NDG:.c=.o) $(NDG_BLOCK_DATA:.f=.o)
 
 KAPGEN_OBJECT_FILES = $(KAPGEN_F_ROUTINES:.f=.o) $(KAPGEN_BLOCK_DATA:.f=.o) \
                       $(KAPGEN_C_ROUTINES:.c=.o)
@@ -2355,7 +2361,7 @@ fts_sub.tar:
 	$(TAR_IN) fts_sub.tar $(FITS_F_ROUTINES) $(FITS_C_ROUTINES)
 
 ndg_source.tar:
-	$(TAR_IN) ndg_sub.tar $(F_NDG) $(C_NDG) $(I_NDG)
+	$(TAR_IN) ndg_sub.tar $(F_NDG) $(C_NDG) $(I_NDG) $(NDG_BLOCK_DATA)
 
 ira_sub.tar:
 	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA)
@@ -3487,27 +3493,43 @@ ncropn.o:	 SAE_PAR PAR_ERR
 ndfcopy.o:	 SAE_PAR PAR_ERR NDF_PAR
 ndfpack_mon.o:	 SAE_PAR
 ndftrace.o:	 SAE_PAR DAT_PAR NDF_PAR PRM_PAR AST_PAR NUM_DEC_CVT NUM_DEF_CVT
-ndg1_appen.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR
-ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_lasto.o:	 SAE_PAR
-ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
-ndg1_ndfdl.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
-ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
-ndg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
-ndg_crexp.o:	 SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
-ndg_ndfas.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfcr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_ndfpr.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
-ndg_test.o:	 SAE_PAR GRP_PAR
+ndg1_appen.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR
+ndg1_chscn.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_expan.o:    SAE_PAR GRP_PAR DAT_PAR
+ndg1_hcut.o:     SAE_PAR DAT_PAR NDF_ERR
+ndg1_hfind.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_hsplt.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_init.o:	 DAT_PAR NDG_CONST GRP_PAR NDG_COM
+ndg1_lasto.o:    SAE_PAR
+ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
+ndg1_ndfch.o:    SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
+ndg1_ndfdl.o:    SAE_PAR GRP_PAR DAT_PAR
+ndg1_pshdb.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshde.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_pshdf.o:    SAE_PAR DAT_PAR NDF_ERR
+ndg1_sdfex.o:    SAE_PAR GRP_PAR DAT_PAR
+ndg1_subst.o:	 SAE_PAR
+ndg_again.o:	 SAE_PAR DAT_PAR NDG_CONST NDG_COM
+ndg_asexp.o:     SAE_PAR NDG_CONST NDG_ERR GRP_PAR
+ndg_assoc.o:     SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
+ndg_assoc1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_assocl.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR SUBPAR_PAR NDG_CONST PAR_ERR NDG_COM
+ndg_creat.o:     SAE_PAR GRP_PAR PAR_ERR
+ndg_creat1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_creatl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR NDG_CONST NDG_COM
+ndg_crep1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_crepl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR PAR_ERR SUBPAR_PAR NDG_CONST NDG_COM
+ndg_crexp.o:     SAE_PAR DAT_PAR GRP_PAR NDG_CONST PSX_ERR
+ndg_ndfas.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfcp.o:	 SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfcr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_ndfpr.o:     SAE_PAR DAT_PAR NDF_PAR GRP_PAR NDG_CONST
+ndg_prop1.o:	 SAE_PAR GRP_PAR NDF_PAR
+ndg_propl.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR SUBPAR_PAR NDG_CONST PAR_ERR NDG_COM
+ndg_setsz.o:	 SAE_PAR GRP_PAR
+ndg_start.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR NDG_CONST NDG_COM
+ndg_state.o:	 SAE_PAR DAT_PAR NDG_CONST NDG_COM
+ndg_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR NDG_CONST NDG_COM
 noglobals.o:	 SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:	 SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 normal.o:	 SAE_PAR

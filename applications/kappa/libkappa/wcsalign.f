@@ -254,6 +254,8 @@
 *        Modified to use AST_RESAMPLE
 *     5-AUG-1999 (DSB):
 *        Tidied up.
+*     30-AUG-1999 (DSB):
+*        Changed call to NDG_ANNUL/DELET to NDF_ANNUL/DELET.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -446,14 +448,14 @@
      :                    LBND, UBND, ERRLIM, MAXPIX, STATUS )
 
 *  Annul the input NDF identifier.
-         CALL NDG_ANNUL( INDF1, STATUS )
+         CALL NDF_ANNUL( INDF1, STATUS )
 
 *  If an error has occurred, delete the output NDF, otherwise just 
 *  annul its identifier.
          IF( STATUS .NE. SAI__OK ) THEN
-            CALL NDG_DELET( INDF2, STATUS )
+            CALL NDF_DELET( INDF2, STATUS )
          ELSE
-            CALL NDG_ANNUL( INDF2, STATUS )
+            CALL NDF_ANNUL( INDF2, STATUS )
          END IF
 
 *  If an error occurred processing the current input NDF...
