@@ -245,15 +245,15 @@
             CALL MSG_SETI( 'NGOOD', NGOOD )
             CALL MSG_SETC( 'NDF', NAME )
 
-            CALL MSG_OUT( 'POL1_SNGRJ_MSG1', 'Iter: ^ITER  Rejected: '//
-     :                    '^NREJ  Remaining: ^NGOOD -- ''^NDF''', 
-     :                    STATUS )
+            CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   Iter: ^ITER  '//
+     :                    'Rejected: ^NREJ  Remaining: ^NGOOD -- '//
+     :                    '''^NDF''', STATUS )
 
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
             CALL MSG_SETC( 'NDF', NAME )
             CALL MSG_SETI( 'ITER', ITER )
-            CALL MSG_OUT( 'POL1_SNGRJ_MSG1', 'WARNING: No usable '//
+            CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   WARNING: No usable '//
      :                    'pixels remain in ''^NDF'' after ^ITER '//
      :                    'rejection iterations.', STATUS )
          END IF

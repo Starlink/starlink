@@ -44,7 +44,7 @@ polimp.ifl polimp.tab polka.f polka.ifl polpack.c polpack.csh \
 polpack.hlp polpack.icl polpack_link_adam polpack_mon.ifl \
 polpack_mon.f polpack_test polplot.f polplot.ifl polvec.f polvec.ifl \
 pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
-tick.bit vertex.bit wrndf.f \
+tick.bit vertex.bit wrndf.f pol1_dbeam.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f  pol1_snghd.f  \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f
 

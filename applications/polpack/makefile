@@ -307,7 +307,7 @@ GENERIC = $(STAR_BIN)/generic
 
 #  Pathname to directories holding KAPPA libraries.
  
-KAPPA_SOURCE = $(STARLINK)/sources/kappa
+KAPPA_SOURCE = /dsbwork/kappa
 
 #  Tcl/Tk 
 
@@ -430,7 +430,7 @@ pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
 pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
 polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
-polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f \
+polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f
 
@@ -507,8 +507,8 @@ TEST_SCRIPT = $(PKG_NAME)_test
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun223.tex
-HYPERTEXT_DOCS = sun223.htx
-HYPERTEXT_HELP = polka.htx 
+HYPERTEXT_DOCS = 
+HYPERTEXT_HELP = 
 FIGURES = sun223_figures
 
 #  List of documentation files.
@@ -1457,6 +1457,7 @@ pol1_cm3rr.o:	 SAE_PAR
 pol1_cpctd.o:	 SAE_PAR PRM_PAR
 pol1_cpctr.o:	 SAE_PAR PRM_PAR
 pol1_ctclm.o:	 SAE_PAR PRM_PAR
+pol1_dbeam.o:	 SAE_PAR DAT_PAR
 pol1_deftb.o:	 SAE_PAR GRP_PAR
 pol1_dulbm.o:	 SAE_PAR PRM_PAR NDF_PAR DAT_PAR PAR_ERR
 pol1_fillr.o:	 SAE_PAR
