@@ -52,7 +52,7 @@ New release.  Documentation tidyups.  Mentioned new support for PNG graphics.
 Described problems finding fonts.
 </distribution>
 
-<distribution string="0.8" date="08-June-2000" author="ng" versionid=v0-8>
+<distribution string="0.8" date="08-Jun-2000" author="ng" versionid=v0-8>
 Documented changes to list of specials (foreground and background
 colours, and strut).
 </distribution>
@@ -111,6 +111,7 @@ dvi2bitmap
     [-f font-path] [-r resolution] [-m magnification] [-P[BbTt]]
     [-s scalefactor] [-t pbm|gif|xbm] [-o output] [-b(h|w) size]
     [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFt]]
+    [-R[fb] int,int,int]
     [-p num] [-l num] [-pp ranges]
     dvi-file
 </verbatim>
@@ -269,16 +270,16 @@ dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
 
 <dt><code/-P[BbTt]>
 <dd>Specifies processing of the output bitmap.
-<code/-PB> blurs the bitmap, making a half-hearted attempt to make a
+<code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
 generated, a better way is to use the <code/-m> option to magnify the
 DVI file, and then the <code/-s> option to scale it back down to the
 correct size.
-<p>The <code/-PT> option makes the output bitmap have a transparent
+<p>The <code/-Pt> option makes the output bitmap have a transparent
 background, if 
 that's supported by the particular format you choose using option
-<code/-t>.  The options <code/-Pb> and <code/-Pt> disable blurring and
+<code/-t>.  The options <code/-PB> and <code/-PT> disable blurring and
 transparency, respectively.
 <p>By default, bitmaps are not blurred, but are transparent if possible.
 <p>For PNG files, the output bitmap uses a
@@ -325,6 +326,12 @@ when making such transparent PNGs.  I'd welcome advice on this point.
 <dd>Specifies the output resolution, in pixels-per-inch.  This is used
 when deciding which PK files to use.  The default is 110, but see
 <code/&ddash;enable-fontgen> in <ref id=install.nonstarlink/>.
+
+<dt><code/-R[fb] int,int,int>
+<dd>Specifies the foreground (<code/-Rf>) or background (<code/-Rb>)
+colour, as an RGB triple (<code/-R> stands for RGB: <code/-c> was
+already in use).  The integers must be in the range [0,255], and can
+be specified in decimal, octal or hex (ie, <code/127=0177=0x7f>).
 
 <dt><code/-s scalefactor>
 <dd>Reduces the linear size of the output bitmap by a factor
@@ -411,10 +418,12 @@ could be added).
 blue</code> 
 <dd>Sets the (default) foreground and background colours for text.
 This works, as long as you specify the colour change before any text
-is output, since you can't, at present, change the colours after
-that.  Specifically, you can't change the colours for a fragment of
-text in the middle of a page.  The colours are specified as a set of
-three integers in the (inclusive) range 0--255.
+is output, since you can't, at present, change the colours after that.
+Specifically, you can't change the colours for a fragment of text in
+the middle of a page; for this reason, and as with <code/imageformat>
+you should at present always include the <code/default> keyword when
+using this special.    The integers must be in the range [0,255], and can
+be specified in decimal, octal or hex (ie, <code/127=0177=0x7f>).
 
 <dt><code>strut left right top bottom</code>
 <dd>This places a `strut' in the generated file.  Using the usual TeX
@@ -900,12 +909,8 @@ and build it as usual, ignoring the warnings about the missing main
 
 <p>Bugs:
 <ul>
-<li>When you form a bitmap containing only a character which
-doesn't sit on the baseline, such as a minus character, the bounding
-box of the bitmap will, in general, be such that the bitmap will
-appear in the HTML sitting on the text baseline, which isn't right.
-One response to this is `don't do that'; another response is for me to
-find some more cunning way to calculate the bounding box.
+<li>There are way too many options.  I'd better switch to using 
+<code/getopts/ as soon as I get the chance.
 
 </ul>
 
