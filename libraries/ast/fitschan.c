@@ -17191,6 +17191,14 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
                }
             }
 
+/* If CTYPE indicates a TAN projection, we will not yet have a WcsMap
+   unless some projection parameters were found above. In which case,
+   create a normal AST__TAN (i.e. a tan projection without corrections). */
+            if( !map2 && latprj == AST__TAN ) {
+               map2 = (AstMapping *) astWcsMap( naxes, latprj, axlon + 1, 
+                                                axlat + 1, "" );
+            } 
+
 /* Invert the WcsMap to get a DEprojection. */
             astInvert( map2 );
 
