@@ -288,6 +288,7 @@
       char *settings;
       int *pixbloc;
       float *gbox;
+      float *vp;
       double *bbox;
       double psize;
       double zoom;
@@ -882,8 +883,10 @@
          int *pixbloc;
          char *device;
          char *settings;
+         float aspect;
          float factor;
          float gbox[ 4 ];
+         float vp[ 4 ];
          float xplo;
          float xphi; 
          float yplo;
@@ -988,16 +991,30 @@
          for ( i = 0; i < 4; i++ ) gbox[ i ] = (float) bbox[ i ];
 
 /* Set the viewport to use all of the available surface, within the 
-   constraint that the correct aspect ratio is retained. */
+   constraint that the correct aspect ratio is retained.  Doing this
+   directly by using cpgwnad() can introduce small inaccuracies. */
          cpgsvp( 0.0, 1.0, 0.0, 1.0 );
-         cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+         cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
+         vp[ 0 ] = 0.0;
+         vp[ 1 ] = 1.0;
+         vp[ 2 ] = 0.0;
+         vp[ 3 ] = 1.0;
+         aspect = ( xphi - xplo ) / ( yphi - yplo )
+                * ( gbox[ 3 ] - gbox[ 1 ] ) / ( gbox[ 2 ] - gbox[ 0 ] );
+         if ( aspect > 1.0 ) {
+            aspect = 1.0 / aspect;
+            vp[ 0 ] = 0.5 * ( 1.0 - aspect );
+            vp[ 1 ] = 0.5 * ( 1.0 + aspect );
+         }
+         else if ( aspect < 1.0 ) {
+            vp[ 2 ] = 0.5 * ( 1.0 - aspect );
+            vp[ 3 ] = 0.5 * ( 1.0 + aspect );
+         }
+         cpgsvp( vp[ 0 ], vp[ 1 ], vp[ 2 ], vp[ 3 ] );
+         cpgswin( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
 
 /* Get the viewport size in pixels. */
          cpgqvp( 3, &xplo, &xphi, &yplo, &yphi );
-         xplo = (int) ( xplo + 0.5 );
-         xphi = (int) ( xphi + 0.5 );
-         yplo = (int) ( yplo + 0.5 );
-         yphi = (int) ( yphi + 0.5 );
 
 /* Close PGPLOT down for now. */
          cpgclos();
@@ -1035,6 +1052,7 @@
          args.pixbloc = pixbloc;
          args.gbox = gbox;
          args.bbox = bbox;
+         args.vp = vp;
          args.psize = psize;
          args.zoom = ndfset->plotarray->zoom;
          args.wcs = wcs;
@@ -1874,6 +1892,7 @@
       char *settings = pargs->settings;
       int *pixbloc = pargs->pixbloc;
       float *gbox = pargs->gbox;
+      float *vp = pargs->vp;
       double *bbox = pargs->bbox;
       double psize = pargs->psize;
       double zoom = pargs->zoom;
@@ -1889,8 +1908,8 @@
              Tcl_NewStringObj( "Failed to open plotting device", -1 ) );
          return TCL_ERROR;
       }
-      cpgsvp( 0.0, 1.0, 0.0, 1.0 );
-      cpgwnad( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
+      cpgsvp( vp[ 0 ], vp[ 1 ], vp[ 2 ], vp[ 3 ] );
+      cpgswin( gbox[ 0 ], gbox[ 2 ], gbox[ 1 ], gbox[ 3 ] );
 
 /* Begin PGPLOT buffering. */
       cpgbbuf();
