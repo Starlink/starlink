@@ -73,6 +73,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.11  1997/05/22 01:16:07  timj
+*     Check that this is SKYDIP data.
+*
 *     Revision 1.10  1997/04/15 18:30:30  timj
 *     Remove debugging print statement.
 *
@@ -309,6 +312,15 @@ c
       CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation ',
      :     STATUS)
+
+*     Check that this is a SKYDIP observation
+
+      IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
+         CALL MSG_SETC('TASK', TSKNAME)
+         STATUS = SAI__ERROR
+         CALL ERR_REP(' ', '^TASK: This is not a SKYDIP observation',
+     :        STATUS)
+      END IF
 
 
 *  check that the history of the input file is OK
