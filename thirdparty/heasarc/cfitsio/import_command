@@ -1,0 +1,10 @@
+#
+# Commands used to import the "cfitsio" subdirectory sources from the
+# heasarc release tarball.
+#
+
+#  Released version.
+cvs import -ko -I! -m "CFITSIO-2-4-40b" thirdparty/heasarc/cfitsio/cfitsio CFITSIO V2-4-40b
+
+#  Update when added to CVS.
+cvs import -ko -I! -m "CFITSIO-2-4-90" thirdparty/heasarc/cfitsio/cfitsio CFITSIO V2-4-90
