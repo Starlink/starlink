@@ -121,7 +121,7 @@ F77_CALL/{S}\(			{ count(); return(F77_CALL); }
 0[xX]{H}+{IS}?			{ count(); return(CONSTANT); }
 0{D}+{IS}?			{ count(); return(CONSTANT); }
 {D}+{IS}?			{ count(); return(CONSTANT); }
-'(\\.|[^\\'])+'			{ count(); return(CONSTANT); }
+'(\\.|[^\\'])+'			{ ecount(); return(CONSTANT); }
 
 {D}+{E}{FS}?			{ count(); return(CONSTANT); }
 {D}*"."{D}+({E})?{FS}?		{ count(); return(CONSTANT); }
@@ -213,7 +213,7 @@ extern int yyleng;
 
 /* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
-      yylval = (char *) malloc( yyleng + 1 );
+      yylval = (char *) memok( malloc( yyleng + 1 ) );
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );

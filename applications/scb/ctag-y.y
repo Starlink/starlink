@@ -334,8 +334,9 @@ identifier
          vname++;
 
 /* Work out how much space the output string requires and allocate it. */
-      string = (char *) malloc( strlen( attrib ) + strlen( fname ) 
-                              + strlen( vname ) + ( f77flag ? 13 : 12 ) );
+      string = (char *) memok( malloc( strlen( attrib ) + strlen( fname ) +
+                                       strlen( vname ) + 
+                                       ( f77flag ? 13 : 12 ) ) );
 
 /* Write the whole input text into the output string. */
       strcpy( string, fname );

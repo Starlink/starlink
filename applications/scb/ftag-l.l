@@ -215,7 +215,7 @@ SPACE			[ \t]*
 
 /* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
-      yylval = (char *) malloc( yyleng + 1 );
+      yylval = (char *) memok( malloc( yyleng + 1 ) );
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );

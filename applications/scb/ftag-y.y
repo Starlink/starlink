@@ -496,7 +496,7 @@ token_brac
 /* Work out how much space is needed for the final string and allocate it. */
       leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13
            + ( ( genpos != NULL ) ? ( ( strlen( rname ) + 8 ) * 9 + 2 ) : 0 );
-      string = (char *) malloc( leng );
+      string = (char *) memok( malloc( leng ) );
 
 /* Write the whole input text into the output string. */
       strcpy( string, name );
@@ -553,7 +553,7 @@ token_brac
 
 /* Find out how many characters we need and allocate it. */
       leng = strlen( attrib ) + strlen( name ) + strlen( rname ) + 20;
-      string = (char *) malloc( leng );
+      string = (char *) memok( malloc( leng ) );
 
 /* Write any text up to and including the first quote. */
       i = strcspn( name, "'" ) + 1;
@@ -690,10 +690,10 @@ token_brac
       rname = refname( name );
 
 /* Add the normalised name to the end of the linked list of array names. */
-      listlast->next = (ELEMENT *) malloc( sizeof( ELEMENT ) );
+      listlast->next = (ELEMENT *) memok( malloc( sizeof( ELEMENT ) ) );
       listlast = listlast->next;
       listlast->next = NULL;
-      listlast->text = (char *) malloc( strlen( rname ) + 1 );
+      listlast->text = (char *) memok( malloc( strlen( rname ) + 1 ) );
       strcpy( listlast->text, rname );
    }
 
