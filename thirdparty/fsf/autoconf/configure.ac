@@ -26,6 +26,11 @@ AC_INIT([GNU Autoconf], [2.59], [bug-autoconf@gnu.org])
 AC_SUBST([PACKAGE_NAME])dnl
 AC_CONFIG_SRCDIR([ChangeLog])
 
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# This causes the `install-manifest' target to be included in Makefile.in
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 

@@ -31,6 +31,11 @@ AC_CONFIG_AUX_DIR(lib)
 
 AC_CANONICAL_BUILD
 
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# This causes the `install-manifest' target to be included in Makefile.in
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
+
 # Save the AUTOCONF setting before AM_INIT_AUTOMAKE overrides it;
 # this way we can run Autoconf tests from configure without being
 # bothered by `missing'.
