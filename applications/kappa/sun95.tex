@@ -277,6 +277,7 @@
 \newcommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
 \newcommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
 \newcommand{\JCMTDRref}{\xref{{\footnotesize JCMTDR}}{sun132}{}}
+\newcommand{\KAPRHref}{\xref{{\footnotesize KAPRH}}{sun239}{}}
 \newcommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}}
 \newcommand{\NDFextref}[1]{\xref{#1}{sun33}{}}
 \newcommand{\PDAref}{\xref{PDA}{sun194}{}}
@@ -42294,6 +42295,28 @@ and HDS data types is as follows:
 
 \newpage
 \begin{htmlonly}
+
+\section{Retired Applications}
+\xlabel{CONTOVER}
+\xlabel{GREYPLOT}
+\xlabel{INSPECT}
+\xlabel{MOSAIC}
+\xlabel{QUILT}
+\xlabel{SNAPSHOT}
+\xlabel{TURBOCONT}
+
+The following commands used to be part of KAPPA but have now been
+``retired'' to the \KAPRHref package:
+\begin{itemize}
+\item \xref{CONTOVER}{sun239}{CONTOVER}
+\item \xref{GREYPLOT}{sun239}{GREYPLOT}
+\item \xref{INSPECT}{sun239}{INSPECT}
+\item \xref{MOSAIC}{sun239}{MOSAIC}
+\item \xref{QUILT}{sun239}{QUILT}
+\item \xref{SNAPSHOT}{sun239}{SNAPSHOT}
+\item \xref{TURBOCONT}{sun239}{TURBOCONT}
+\end{itemize}
+
 \section{Release Notes---V0.8-5}
 
 \subsection{Global changes}
@@ -44702,7 +44725,7 @@ The following new applications have been added:
 \subsection{Removed Commands}
 The following obsolete commands have been removed from KAPPA -
 alternatives are indicate below. Many of these commands have been
-archived in a new package called KAPRH in order to satisfy any occasional
+archived in a new package called \KAPRHref in order to satisfy any occasional
 need that may occur for them (see SUN/239).
 \begin{description}
 \item [CONTOVER] Use \htmlref{CONTOUR}{CONTOUR} instead setting parameter
