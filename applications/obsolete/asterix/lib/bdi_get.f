@@ -384,9 +384,13 @@
 *      Extract extrema and convert to base and scale
           CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
           CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), 1, SPARR(1), STATUS )
-          CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), DIMS(AXNO), SPARR(2),
-     :                     STATUS )
-          SPARR(2) = (SPARR(2) - SPARR(1))/REAL(DIMS(AXNO)-1)
+          IF ( DIMS(AXNO) .GT. 1 ) THEN
+            CALL ARR_ELEM1R( AXPTR, DIMS(AXNO), DIMS(AXNO), SPARR(2),
+     :                       STATUS )
+            SPARR(2) = (SPARR(2) - SPARR(1))/REAL(DIMS(AXNO)-1)
+          ELSE
+            SPARR(2) = 1.0
+          END IF
 
 *      Unmap the axis
           CALL BDI_AXUNMAP( ID, AXNO, 'Data', AXPTR, STATUS )
