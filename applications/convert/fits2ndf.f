@@ -398,14 +398,14 @@
 *        a FITS binary-table extension whose EXTNAME keyword's value is
 *        NDF_CLASS.  Note: no error is reported if this extension does
 *        not exist within the FITS file.
-*        -  The FIBRES extension is created using another binary table
-*        whose EXTNAME keyword's value is FIBRES.  The OBJECT
+*        -  The FIBRES extension is created from another FITS binary
+*        table whose EXTNAME keyword's value is FIBRES.  The OBJECT
 *        substructure's component names, data types, and values are
 *        taken from the binary-table columns themselves, and the
 *        components of the FIELD substructure are extracted from
-*        recognised keywords in the binary-table's header.  Note:
-*        no error is reported if this extension does not exist within
-*        the FITS file.
+*        recognised keywords in the binary-table's header.  Note: no
+*        error is reported if this extension does not exist within the
+*        FITS file.
 *        -  Other IMAGE and BINTABLE extensions are propagated to the
 *        NDF extension.  It uses the extension name and type found in
 *        the EXTNAME and EXTTYPE keywords, or names it NDF_EXT_n for
