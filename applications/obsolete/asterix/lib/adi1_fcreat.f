@@ -129,7 +129,7 @@
       ELSE
 
 *      Get object class
-        CALL ADI_CLASS( ID, ICLASS, STATUS )
+        CALL ADI_CLASS( ID, HTYPE, STATUS )
 
         NDIM = 0
 
