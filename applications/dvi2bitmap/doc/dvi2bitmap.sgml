@@ -41,9 +41,9 @@ Added page-selection features, and documented them.
 Add &ddash;enable-fake-progname.
 </distribution>
 
-<change date="19-SEP-1999" versionid="post-upd6">
-Documentation tweaks.
-</change>
+<distribution string="1.0-7" date="27-SEP-1999" author="ng" versionid=upd7>
+New release.
+</distribution>
 
 </history>
 
@@ -80,7 +80,7 @@ This HTML documentation is also available as a
 <webref url='dvi2bitmap.single.html' >single file</webref>
 ]]>
 
-<p>This document matches version 1.0-6 of the program (you can see
+<p>This document matches version 1.0-7 of the program (you can see
 what version you have with the command <kbd/dvi2bitmap -V/).  This
 should currently be regarded as beta software.
 
@@ -130,7 +130,7 @@ to support other modes of use.
 <update versionid="post-upd5">Added documentation of -p, -l, -pp
 options.  Note that the old -l and -L options have changed into the
 new -L and -LL options.</update>
-<update versionid="post-upd6">Clarified the -p, -l and -pp options.</update>
+<update versionid="upd7">Clarified the -p, -l and -pp options.</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
@@ -570,7 +570,7 @@ Largely rewrote the configuration instructions, in an attempt to make
 them clearer.
 </update>
 <update versionid="upd6">Mentioned &ddash;enable-fake-progname</update>
-<update versionid="post-upd6">Described &ddash;enable-fontgen.</update>
+<update versionid="upd7">Described &ddash;enable-fontgen.</update>
 
 
 <p>To configure and build:
@@ -725,7 +725,7 @@ or
 depending on your shell.
 
 <subsubsect id=install.web2c>Obtaining the <code/kpathsea/ library
-<update versionid="post-upd6">Improved instructions on getting the
+<update versionid="upd7">Improved instructions on getting the
 kpathsea library source.</update>
 
 <p>Not all &tex; distributions install the <code/kpathsea/ library,
