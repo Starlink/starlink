@@ -12,11 +12,15 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
+AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Look for tcl/tk system
 STAR_PATH_TCLTK(8.2, [tk])
+AC_CHECK_HEADERS([tcl.h tk.h])
+
+STAR_CHECK_PROGS([generic])
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
@@ -30,15 +34,12 @@ dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun238)
 
-dnl    List the set of active subdirectories.
-dnl    This must be kept up-to-date by hand.
-dnl    The list is available as the substitution variable @subdirs@.
-dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS(aif fts ira irq ctg lpg kpg kgs kapgrf)
-
 dnl    If you wish to configure extra files, you can add them to this
-dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml])
+dnl    declaration.  List of subdirectories must match SUBDIRS in Makefile.am
+AC_CONFIG_FILES([Makefile component.xml
+    aif/Makefile  ira/Makefile     kgs/Makefile
+    ctg/Makefile  irq/Makefile     kpg/Makefile
+    fts/Makefile  kapgrf/Makefile  lpg/Makefile])
 AC_CONFIG_FILES([kaplibs_link_adam],[chmod +x kaplibs_link_adam])
 
 dnl    This is the bit that does the actual work

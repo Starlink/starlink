@@ -8,7 +8,6 @@ AC_CONFIG_SRCDIR([cshrc.in])
 STAR_DEFAULTS
 STAR_DECLARE_DEPENDENCIES(build, [hlp])
 STAR_CHECK_PROGS(hlib)
-STAR_HELP_FILES(adam_packages.shl)
 
 AC_CONFIG_FILES([Makefile component.xml])
 

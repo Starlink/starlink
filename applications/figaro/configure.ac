@@ -20,7 +20,16 @@ dnl    Need to find out whether we need this
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
+AC_PROG_FC
+AC_PROG_FPP
+AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
+STAR_MONOLITHS
+
+STAR_CNF_COMPATIBLE_SYMBOLS
+AC_C_BIGENDIAN
+AC_FC_LIBRARY_LDFLAGS
+AC_FC_RECL_UNIT
 
 dnl    Dependences on Starlink packages
 STAR_DECLARE_DEPENDENCIES(build, [pda agi grp ndf fio])
@@ -30,14 +39,18 @@ STAR_CHECK_PROGS(hlib)
 
 dnl    We have a SUN document, so we should probably tell people it's there.
 STAR_LATEX_DOCUMENTATION(sun86)
-STAR_DOCS_FILES(sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech3.eps sun86_ech4.eps sun86_ech5.eps sun86_hard.eps sun86_icont.eps sun86_igrey.eps sun86_imag2.eps sun86_imag3.eps sun86_imag.eps sun86_spec2.eps sun86_spec.eps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml figaro.csh figaro.icl)
-
-dnl    Need to go into sub-directories.
-AC_CONFIG_SUBDIRS([appcb appsub dsa dta fda fig fibre fit fitres fla gen gkd graph ich jty main opt par spext sploop tio twoutil unix work util figaro1 figaro2 figaro3 figaro4 figaro5])
+AC_CONFIG_FILES([Makefile component.xml figaro.csh figaro.icl
+    appcb/Makefile   figaro1/Makefile  fla/Makefile    par/Makefile
+    appsub/Makefile  figaro2/Makefile  gen/Makefile    spext/Makefile
+    data/Makefile    figaro3/Makefile  gkd/Makefile    sploop/Makefile
+    dsa/Makefile     figaro4/Makefile  graph/Makefile  tio/Makefile
+    dta/Makefile     figaro5/Makefile  ich/Makefile    twoutil/Makefile
+    fda/Makefile     fighelp/Makefile  jty/Makefile    unix/Makefile
+    fibre/Makefile   fit/Makefile      main/Makefile   util/Makefile
+    fig/Makefile     fitres/Makefile   opt/Makefile    work/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

@@ -28,8 +28,7 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun53)
 
-AC_CONFIG_SUBDIRS([libmodel libplot libetc])
-
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([Makefile component.xml
+    libetc/Makefile libmodel/Makefile libplot/Makefile])
 
 AC_OUTPUT

@@ -30,7 +30,6 @@ STAR_DECLARE_DEPENDENCIES([link],  [gns ems chr gks])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun85)
-STAR_DOCS_FILES(sun85_diag1.eps)
 
 STAR_MESSGEN(sgs_err.msg)
 

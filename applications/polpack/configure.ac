@@ -20,11 +20,10 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS(ifd2star)
-STAR_CHECK_PROGS(awish)
-STAR_CHECK_PROGS(atclsh)
+STAR_CHECK_PROGS([ifd2star awish atclsh hlib])
 STAR_CHECK_PROGS(prohlp,sst)
-STAR_CHECK_PROGS(hlib)
+
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
@@ -35,9 +34,9 @@ dnl    No use dependencies
 STAR_LATEX_DOCUMENTATION(sun223)
 STAR_PREDIST_SOURCES(polka.tex)
 
-AC_CONFIG_SUBDIRS([polsub ccdpack])
 
-AC_CONFIG_FILES([Makefile component.xml polpack_mon.f polpack.ifd])
+AC_CONFIG_FILES([Makefile component.xml polpack_mon.f polpack.ifd
+    ccdpack/Makefile polsub/Makefile polsub/pol1_ptvrc.f polsub/pol1_ptvrs.f])
 AC_CONFIG_FILES(Polka.tcl, [chmod +x Polka.tcl])
 AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
 

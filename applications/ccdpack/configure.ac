@@ -4,11 +4,12 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR(ccdexercise)
 STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
+AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_CHECK_PROGS(hlib)
-STAR_CHECK_PROGS(ifd2star)
+
+STAR_CHECK_PROGS([hlib ifd2star generic])
 AC_FC_LIBRARY_LDFLAGS
 
 STAR_MESSGEN(user_err.msg)
@@ -28,12 +29,16 @@ LD_LIBRARY_PATH="${STARLINK}/lib:${LD_LIBRARY_PATH}"
 AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
 AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
 
+dnl   Check for fpu_control.h, this isn't available for all  
+dnl   GCC implementations 
+AC_CHECK_HEADERS([fpu_control.h])
+
 # Check availability of [incr Tcl].  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
 # be built.
 have_itcl=1
-AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl])
-AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl])
+AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl])
+AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk -ltcl])
 AC_MSG_CHECKING([whether to use incr tcl])
 if test -n "$have_itcl"
 then
@@ -53,9 +58,10 @@ STAR_DECLARE_DEPENDENCIES([build],[chr agi ard ast chr fio ndf pgplot prm psx tr
 STAR_DECLARE_DEPENDENCIES(configure, [tcl tk itcl])
 
 STAR_LATEX_DOCUMENTATION(sun139)
-STAR_DOCS_FILES([sun139geo.eps sun139reg.eps sun139red.eps sun139mos.eps sun139driz.eps sun139outsky.eps sun139outclear.eps sun139outim.eps])
 
-AC_CONFIG_SUBDIRS([tasks gen help main])
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_FILES([Makefile component.xml ccdpack.ifd CCD1_PAR])
+AC_CONFIG_FILES([Makefile component.xml ccdpack.ifd CCD1_PAR
+    gen/Makefile  help/Makefile  main/Makefile  tasks/Makefile])
+AC_CONFIG_FILES([gen/dgeneric], [chmod +x gen/dgeneric])
+
 AC_OUTPUT

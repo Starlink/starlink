@@ -22,7 +22,9 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
+AC_PROG_MAKE_SET
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS
@@ -31,22 +33,66 @@ dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf gwm])
 STAR_DECLARE_DEPENDENCIES(link,  [ems gwm starx])
 
+dnl    Terminal control
+AC_HEADER_STDC
+AC_PATH_XTRA
+AC_CHECK_HEADERS([termios.h termio.h sgtty.h sys/ioctl.h X11/DECWmHints.h X11/Xlib.h])
+AC_CHECK_FUNCS([isatty ioctl])
+
+dnl    Fortran features (mostly for ./base/*)
+AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_RECL_UNIT
+AC_FC_CHECK_INTRINSICS(char)
+
+dnl    We need to work out how to get the date and time
+AC_FC_CHECK_INTRINSICS([CLOCK ITIME IDATE DATE])
+
+dnl    How to bypass Fortran I/O
+AC_FC_CHECK_INTRINSICS([FGETC FPUTC FLUSH])
+
+dnl    How to get the environment and process ID
+AC_FC_CHECK_INTRINSICS([GETENV GETPID])
+
+dnl    How to manipulate bits
+AC_FC_CHECK_INTRINSICS([LSHIFT SHIFTL RSHIFT SHIFTR ISHFT])
+AC_FC_CHECK_INTRINSICS([AND IAND OR IOR])
+
+dnl    How to work out where the last non blank character is
+AC_FC_CHECK_INTRINSICS([LNBLNK LEN_TRIM])
+
+dnl    How to translate a Fortran unit to a Unix file descriptor
+AC_FC_CHECK_INTRINSICS([GETFD GETFILEP ISATTY])
+
+
+
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun83)
-STAR_DOCS_FILES(sun83-c1.eps sun83-c2.eps sun83-c3.eps sun83-c4.eps sun83-c5.eps)
+dnl STAR_DOCS_FILES(sun83-c1.eps sun83-c2.eps sun83-c3.eps sun83-c4.eps sun83-c5.eps)
 
-dnl    There is a .msg file in this directory, and this adds Makefile
-dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files
-dnl    which correspond to it.
 STAR_MESSGEN(gks_err.msg)
 
-dnl    If you wish to configure extra files, you can add them to this
-dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_HEADERS(config.h)
 
-dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([include base data call drivers])
+dnl    We recurse into subdirectories -- see SUBDIRS in Makefile.am
+AC_CONFIG_FILES([Makefile component.xml
+    base/Makefile base/gkioop.f call/Makefile
+    data/Makefile data/emf/Makefile data/fonts/Makefile data/wdts/Makefile
+    include/Makefile include/gkmc.par.fpp])
 
-dnl    This is the bit that does the actual work
+dnl    Not all the driver subdirectories are autoconfed, only...
+DRIVER_SUBDIRS="canon cgmi cgmo mi mo postscript regis tek4010 wiss xwindows"
+dnl    ...must match the list below
+AC_CONFIG_FILES([drivers/Makefile
+    drivers/canon/Makefile drivers/cgmi/Makefile
+    drivers/cgmo/Makefile drivers/mi/Makefile drivers/mo/Makefile
+    drivers/postscript/Makefile drivers/regis/Makefile drivers/tek4010/Makefile
+    drivers/wiss/Makefile drivers/xwindows/Makefile])
+
+dnl    Substitute this list into the drivers/Makefile.in, along with a
+dnl    generated list of the corresponding libraries
+AC_SUBST(DRIVER_SUBDIRS)
+DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([a-z0-9]*\)+\1/libgks_driver_\1.la+g'`
+AC_SUBST(DRIVER_LIBLIST)
+
 AC_OUTPUT

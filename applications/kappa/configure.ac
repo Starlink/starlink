@@ -20,11 +20,10 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS(ifd2star)
-STAR_CHECK_PROGS(awish)
-STAR_CHECK_PROGS(atclsh)
+STAR_CNF_COMPATIBLE_SYMBOLS
+
+STAR_CHECK_PROGS([ifd2star awish atclsh hlib generic])
 STAR_CHECK_PROGS(prohlp,sst)
-STAR_CHECK_PROGS(hlib)
 
 
 dnl    Build dependencies for this package.
@@ -35,8 +34,13 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun95 sun221)
 
-AC_CONFIG_SUBDIRS([kapsub ccdpack atools libndfpack libkapview libkappa])
 
-AC_CONFIG_FILES(Makefile component.xml kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd lutedit.tcl stardemo.tcl adamMessageRelay, [chmod +x lutedit.tcl adamMessageRelay stardemo.tcl])
+AC_CONFIG_FILES([Makefile component.xml
+    kappa_mon.f ndfpack_mon.f kapview_mon.f kappa.ifd
+    atools/Makefile   kapsub/Makefile    libkapview/Makefile
+    ccdpack/Makefile  libkappa/Makefile  libndfpack/Makefile])
+AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
+AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
+AC_CONFIG_FILES(stardemo.tcl,     [chmod +x stardemo.tcl])
 
 AC_OUTPUT

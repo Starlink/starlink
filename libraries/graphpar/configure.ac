@@ -16,6 +16,12 @@ AC_CONFIG_SRCDIR([sun113.tex])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+AC_PROG_FC
+AC_PROG_LIBTOOL
+STAR_MONOLITHS
+
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl    Declare the build and use dependencies for this package
 dnl    The dependencies should expand to include each of the
 dnl    subpackages as they are added to the system
@@ -27,12 +33,7 @@ dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun113)
 
-dnl    List the set of active subdirectories.
-dnl    This must be kept up-to-date by hand.
-dnl    The list is available as the substitution variable @subdirs@.
-dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS(gkspar pgppar sgspar)
-
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([Makefile component.xml
+    gkspar/Makefile pgppar/Makefile sgspar/Makefile])
 
 AC_OUTPUT

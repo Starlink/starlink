@@ -44,10 +44,7 @@ STAR_MESSGEN(agi_err.msg)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml])
-
-dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([agp])
+AC_CONFIG_FILES([Makefile component.xml agp/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

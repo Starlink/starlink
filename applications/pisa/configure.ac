@@ -33,9 +33,6 @@ STAR_CHECK_PROGS(hlib)
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun109)
 
-dnl    Extra files to go with documents.
-STAR_DOCS_FILES(sun109fig.ps)
-
 dnl    Configure files.
 AC_CONFIG_FILES([Makefile component.xml start pisa.icl])
 

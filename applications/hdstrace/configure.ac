@@ -17,8 +17,11 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
-
 STAR_MONOLITHS
+
+STAR_CNF_COMPATIBLE_SYMBOLS
+
+STAR_CHECK_PROGS([generic])
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
@@ -28,8 +31,6 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun102)
 
-AC_CONFIG_SUBDIRS([tra])
-
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([Makefile component.xml tra/Makefile])
 
 AC_OUTPUT

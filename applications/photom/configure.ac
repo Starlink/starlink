@@ -23,10 +23,15 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
+STAR_CHECK_PROGS([hlib])
+
 dnl    Conditional compile for missing symbols on Mac OSX. Using this in
 dnl    an odd way, essentially to check whether we're on a Mac. If we are
 dnl    we need to link against this library, it will be included by default
 dnl    if it exists in this case.
+dnl
+dnl    XXX This is very probably redundant.  This check is also now done
+dnl    within STAR_DEFAULTS
 AC_CHECK_LIB(cc_dynamic, restFP)
 
 dnl dependances on starlink packages
@@ -38,14 +43,11 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    We have a SUN document, we should probably tell people its there
 STAR_LATEX_DOCUMENTATION(sun45)
-STAR_DOCS_FILES(sun45fig.ps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml photomstart.icl photom_init)
-
-dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([subs tasks help])
+AC_CONFIG_FILES([Makefile component.xml photomstart.icl photom_init
+    help/Makefile subs/Makefile tasks/Makefile])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

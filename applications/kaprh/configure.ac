@@ -19,9 +19,10 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS(ifd2star)
+
+STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CHECK_PROGS([ifd2star hlib generic])
 STAR_CHECK_PROGS(prohlp,sst)
-STAR_CHECK_PROGS(hlib)
 
 
 dnl    Build dependencies for this package.
@@ -29,8 +30,6 @@ STAR_DECLARE_DEPENDENCIES([build], [ast kaplibs hds fio gks gns idi mers ndf prm
 
 STAR_LATEX_DOCUMENTATION(sun239)
 
-AC_CONFIG_SUBDIRS([kapsub])
-
-AC_CONFIG_FILES(Makefile component.xml kaprh_mon.f kaprh.ifd)
+AC_CONFIG_FILES(Makefile component.xml kaprh_mon.f kaprh.ifd kapsub/Makefile)
 
 AC_OUTPUT

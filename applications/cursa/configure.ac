@@ -33,8 +33,6 @@ STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp])
 
 STAR_LATEX_DOCUMENTATION([sun190 ssn76])
 
-AC_CONFIG_SUBDIRS([libcap])
-
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml libcap/Makefile])
 
 AC_OUTPUT

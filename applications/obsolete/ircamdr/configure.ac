@@ -31,8 +31,12 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun41)
 
-AC_CONFIG_SUBDIRS([aif aspker atlib goodies kergen kersub mapgl rapgen rapsub trace io2ro_f obsrap_f plt2d_f polrap_f rapi2d_f])
-
-AC_CONFIG_FILES(Makefile component.xml ircamdr)
+AC_CONFIG_FILES([Makefile component.xml ircamdr
+    aif/Makefile      kersub/Makefile    rapgen/Makefile
+    aspker/Makefile   mapgl/Makefile     rapi2d_f/Makefile
+    atlib/Makefile    misc/Makefile      rapsub/Makefile
+    goodies/Makefile  obsrap_f/Makefile  trace/Makefile
+    io2ro_f/Makefile  plt2d_f/Makefile
+    kergen/Makefile   polrap_f/Makefile])
 
 AC_OUTPUT

@@ -36,9 +36,6 @@ STAR_DECLARE_DEPENDENCIES([link],  [ ])
 dnl  Documentation is uncomplicated
 STAR_LATEX_DOCUMENTATION(sun87)
 
-dnl binary files for staretc directory
-STAR_ETC_FILES( jpleph.dat )
-
 AC_CONFIG_FILES(Makefile component.xml)
 
 AC_OUTPUT

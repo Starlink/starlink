@@ -16,15 +16,22 @@ STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
 STAR_MONOLITHS
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_CHECK_PROGS(ifd2star)
-STAR_CHECK_PROGS(hlib)
-STAR_CHECK_PROGS(csh)
+dnl    Open specifiers
+AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(carriagecontrol='LIST')
+
+dnl    What unit does OPEN's recl specifier assume?
+AC_FC_RECL_UNIT
+
+
+STAR_CHECK_PROGS([ifd2star hlib csh])
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
@@ -34,8 +41,7 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun32)
 
-AC_CONFIG_SUBDIRS([libchart applic])
-
-AC_CONFIG_FILES(Makefile component.xml chart.ifd)
+AC_CONFIG_FILES([Makefile component.xml chart.ifd
+    libchart/Makefile applic/Makefile])
 
 AC_OUTPUT
