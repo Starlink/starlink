@@ -1,10 +1,11 @@
 /* To do:
-      o Implement MapMerge.
-      o Tidy and import error codes.
-      o Sort lists of opcodes, symbols, etc. and ensure that all functions
-        are present.
-      o Add >=, ==, etc. operators.
+      o Fully implement << and >> operators (efficiently!) and assign
+        them their correct evaluation priorities.
+      o Look at implementing other bitwise operators.
+      o Implement random number generators.
+      o Add Seed attribute for above.
       o Write Fortran interface.
+      o Tidy .h file.
       o Write user documentation.
       o Sort out how to implement x ? a : b efficiently (using a mask stack
         maybe?).
@@ -60,42 +61,28 @@
 /* ============= */
 /* Interface definitions. */
 /* ---------------------- */
+#include "channel.h"             /* I/O channels */
 #include "error.h"               /* Error reporting facilities */
+#include "mapping.h"             /* Coordinate mappings (parent class) */
+#include "mathmap.h"             /* Interface definition for this class */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
-#include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "pointset.h"            /* Sets of points */
 #include "unitmap.h"             /* Unit Mapping */
-#include "channel.h"             /* I/O channels */
-
-#include "mathmap.h"
-
 
 /* Error code definitions. */
 /* ----------------------- */
 #include "ast_err.h"             /* AST error codes */
-#define AST__CONIN 1
-#define AST__UDVOF 2
-#define AST__DELIN 3
-#define AST__MLPAR 4
-#define AST__WRNFA 5
-#define AST__MIOPR 6
-#define AST__MIOPA 7
-#define AST__MRPAR 8
-#define AST__MISVN 9
-#define AST__VARIN 10
-#define AST__DUVAR 11
-#define AST__NORHS 12
 
 /* C header files. */
 /* --------------- */
 #include <ctype.h>
+#include <errno.h>
 #include <limits.h>
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
 
 /* Module Variables. */
 /* ================= */
@@ -118,7 +105,22 @@ typedef enum {
    OP_LDCON,                     /* Load constant */
    OP_LDVAR,                     /* Load variable */
    OP_LDBAD,                     /* Load bad value (AST__BAD) */
+   OP_LDRAD,                     /* Load floating radix (FLT_RADIX) */
+   OP_LDRND,                     /* Load rounding mode (FLT_ROUNDS) */
+   OP_LDMDIG,                    /* Load # mantissa digits (DBL_MANT_DIG) */
+   OP_LDDIG,                     /* Load # decimal digits (DBL_DIG) */
+   OP_LDMINE,                    /* Load minimum exponent (DBL_MIN_EXP) */
+   OP_LDMIN10E,                  /* Min. decimal exponent (DBL_MIN_10_EXP) */
+   OP_LDMAXE,                    /* Load maximum exponent (DBL_MAX_EXP) */
+   OP_LDMAX10E,                  /* Max. decimal exponent (DBL_MAX_10_EXP) */
+   OP_LDMAX,                     /* Load largest value (DBL_MAX) */
+   OP_LDEPS,                     /* Load relative precision (DBL_EPSILON) */
+   OP_LDMIN,                     /* Load smallest value (DBL_MIN) */
+   OP_LDPI,                      /* Load pi */
+   OP_LDE,                       /* Load e (base of natural logarithms) */
+   OP_NOT,                       /* Boolean NOT */
    OP_NEG,                       /* Negate (change sign) */
+   OP_ISBAD,                     /* Test for bad value */
    OP_SQRT,                      /* Square root */
    OP_LOG,                       /* Natural logarithm */
    OP_LOG10,                     /* Base 10 logarithm */
@@ -139,14 +141,26 @@ typedef enum {
    OP_COSH,                      /* Hyperbolic cosine */
    OP_TANH,                      /* Hyperbolic tangent */
    OP_ABS,                       /* Absolute value (sign removal) */
-   OP_CEIL,                      /* C ceil function (rounding up) */
+   OP_INT,                       /* Integer value (round towards zero) */
+   OP_CEIL,                      /* C ceil function (round up) */
    OP_FLOOR,                     /* C floor function (round down) */
    OP_NINT,                      /* Fortran NINT function (round to nearest) */
+   OP_OR,                        /* Boolean OR */
+   OP_AND,                       /* Boolean AND */
+   OP_XOR,                       /* Boolean exclusive OR */
+   OP_EQV,                       /* Fortran logical .EQV. operation */
+   OP_EQ,                        /* Relational equal */
+   OP_NE,                        /* Not equal */
+   OP_LT,                        /* Less than */
+   OP_LE,                        /* Less than or equal */
+   OP_GT,                        /* Greater than */
+   OP_GE,                        /* Greater than or equal */
+   OP_SHFTL,                     /* Shift bits left */
    OP_ADD,                       /* Add */
    OP_SUB,                       /* Subtract */
    OP_MUL,                       /* Multiply */
    OP_DIV,                       /* Divide */
-   OP_PWR,                       /* Raise to power */
+   OP_POW,                       /* Raise to power */
    OP_MIN,                       /* Minimum of 2 or more values */
    OP_MAX,                       /* Maximum of 2 or more values */
    OP_DIM,                       /* Fortran DIM (positive difference) fn. */
@@ -174,53 +188,95 @@ typedef struct {
 } Symbol;
 
 /* This initialises an array of Symbol structures to hold data on all
-   the supported symbols. */
+   the supported symbols. The order is not important except that earlier
+   symbols should not be abbreviations of later ones. The end of the
+   array is indicated by an element with a NULL "text" component. */
 static const Symbol symbol[] = {
-   { ""       ,  0,  0,  0,  0,  0, 10, 10,  0,  1,  0,  OP_LDVAR  },
-   { ""       ,  0,  0,  0,  0,  0, 10, 10,  0,  1,  0,  OP_LDCON  },
-   { ")"      ,  1,  1,  0,  0,  0,  2, 10, -1,  0,  0,  OP_NULL   },
-   { "("      ,  1,  0,  1,  1,  0, 10,  1,  1,  0,  0,  OP_NULL   },
-   { "-"      ,  1,  1,  1,  0,  0,  4,  4,  0, -1,  0,  OP_SUB    },
-   { "+"      ,  1,  1,  1,  0,  0,  4,  4,  0, -1,  0,  OP_ADD    },
-   { "**"     ,  2,  1,  1,  0,  0,  9,  6,  0, -1,  0,  OP_PWR    },
-   { "*"      ,  1,  1,  1,  0,  0,  5,  5,  0, -1,  0,  OP_MUL    },
-   { "/"      ,  1,  1,  1,  0,  0,  5,  5,  0, -1,  0,  OP_DIV    },
-   { ","      ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL   },
-   { "-"      ,  1,  0,  1,  0,  1,  8,  7,  0,  0,  0,  OP_NEG    },
-   { "+"      ,  1,  0,  1,  0,  1,  8,  7,  0,  0,  0,  OP_NULL   },
-   { "sqrt("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_SQRT   },
-   { "log("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_LOG    },
-   { "log10(" ,  6,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_LOG10  },
-   { "exp("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_EXP    },
-   { "sin("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_SIN    },
-   { "cos("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_COS    },
-   { "tan("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_TAN    },
-   { "sind("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_SIND   },
-   { "cosd("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_COSD   },
-   { "tand("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_TAND   },
-   { "asin("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ASIN   },
-   { "acos("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ACOS   },
-   { "atan("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ATAN   },
-   { "asind(" ,  6,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ASIND  },
-   { "acosd(" ,  6,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ACOSD  },
-   { "atand(" ,  6,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ATAND  },
-   { "sinh("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_SINH   },
-   { "cosh("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_COSH   },
-   { "tanh("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_TANH   },
-   { "abs("   ,  4,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ABS    },
-   { "fabs("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_ABS    },
-   { "ceil("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_CEIL   },
-   { "floor(" ,  6,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_FLOOR  },
-   { "nint("  ,  5,  0,  1,  1,  0, 10,  1,  1,  0,  1,  OP_NINT   },
-   { "min("   ,  4,  0,  1,  1,  0, 10,  1,  1, -1, -2,  OP_MIN    },
-   { "max("   ,  4,  0,  1,  1,  0, 10,  1,  1, -1, -2,  OP_MAX    },
-   { "dim("   ,  4,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_DIM    },
-   { "mod("   ,  4,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_MOD    },
-   { "sign("  ,  5,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_SIGN   },
-   { "atan2(" ,  6,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_ATAN2  },
-   { "atan2d(",  7,  0,  1,  1,  0, 10,  1,  1, -1,  2,  OP_ATAN2D },
-   { "<bad>"  ,  5,  0,  0,  0,  0, 10, 10,  0,  1,  0,  OP_LDBAD  },
-   { NULL     ,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  OP_NULL   }
+   { ""            ,  0,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDVAR    },
+   { ""            ,  0,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDCON    },
+   { "<bad>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDBAD    },
+   { "<radix>"     ,  7,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDRAD    },
+   { "<rounds>"    ,  8,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDRND    },
+   { "<mant_dig>"  , 10,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMDIG   },
+   { "<dig>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDDIG    },
+   { "<min_exp>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMINE   },
+   { "<min_10_exp>", 12,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMIN10E },
+   { "<max_exp>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAXE   },
+   { "<max_10_exp>", 12,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAX10E },
+   { "<max>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMAX    },
+   { "<epsilon>"   ,  9,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDEPS    },
+   { "<min>"       ,  5,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDMIN    },
+   { "<pi>"        ,  4,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDPI     },
+   { "<e>"         ,  3,  0,  0,  0,  0, 14, 14,  0,  1,  0,  OP_LDE      },
+   { "(int)"       ,  5,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_INT      },
+   { ")"           ,  1,  1,  0,  0,  0,  2, 14, -1,  0,  0,  OP_NULL     },
+   { "("           ,  1,  0,  1,  1,  0, 14,  1,  1,  0,  0,  OP_NULL     },
+   { "<<"          ,  2,  1,  1,  1,  0,  8,  8,  0, -1,  0,  OP_SHFTL    },
+   { ".eqv."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_EQV      },
+   { ".neqv."      ,  6,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
+   { ".xor."       ,  5,  1,  1,  1,  0,  3,  3,  0, -1,  0,  OP_XOR      },
+   { "||"          ,  2,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
+   { ".or."        ,  4,  1,  1,  1,  0,  4,  4,  0, -1,  0,  OP_OR       },
+   { "&&"          ,  2,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
+   { ".and."       ,  5,  1,  1,  1,  0,  5,  5,  0, -1,  0,  OP_AND      },
+   { "=="          ,  2,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_EQ       },
+   { ".eq."        ,  4,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_EQ       },
+   { "!="          ,  2,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_NE       },
+   { ".ne."        ,  4,  1,  1,  1,  0,  6,  6,  0, -1,  0,  OP_NE       },
+   { "<="          ,  2,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LE       },
+   { ".le."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LE       },
+   { "<"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LT       },
+   { ".lt."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_LT       },
+   { ">="          ,  2,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GE       },
+   { ".ge."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GE       },
+   { ">"           ,  1,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GT       },
+   { ".gt."        ,  4,  1,  1,  1,  0,  7,  7,  0, -1,  0,  OP_GT       },
+   { "-"           ,  1,  1,  1,  0,  0,  8,  8,  0, -1,  0,  OP_SUB      },
+   { "+"           ,  1,  1,  1,  0,  0,  8,  8,  0, -1,  0,  OP_ADD      },
+   { "**"          ,  2,  1,  1,  0,  0, 13, 10,  0, -1,  0,  OP_POW      },
+   { "*"           ,  1,  1,  1,  0,  0,  9,  9,  0, -1,  0,  OP_MUL      },
+   { "/"           ,  1,  1,  1,  0,  0,  9,  9,  0, -1,  0,  OP_DIV      },
+   { "     ,"      ,  1,  1,  1,  1,  0,  2,  2,  0,  0,  0,  OP_NULL     },
+   { "!"           ,  1,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_NOT      },
+   { ".not."       ,  5,  0,  1,  1,  0, 12, 11,  0,  0,  0,  OP_NOT      },
+   { "-"           ,  1,  0,  1,  0,  1, 12, 11,  0,  0,  0,  OP_NEG      },
+   { "+"           ,  1,  0,  1,  0,  1, 12, 11,  0,  0,  0,  OP_NULL     },
+   { "isbad("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ISBAD    },
+   { "sqrt("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SQRT     },
+   { "log("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_LOG      },
+   { "log10("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_LOG10    },
+   { "exp("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_EXP      },
+   { "sin("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SIN      },
+   { "cos("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COS      },
+   { "tan("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TAN      },
+   { "sind("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SIND     },
+   { "cosd("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COSD     },
+   { "tand("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TAND     },
+   { "asin("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ASIN     },
+   { "acos("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ACOS     },
+   { "atan("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ATAN     },
+   { "asind("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ASIND    },
+   { "acosd("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ACOSD    },
+   { "atand("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ATAND    },
+   { "sinh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_SINH     },
+   { "cosh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_COSH     },
+   { "tanh("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_TANH     },
+   { "abs("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ABS      },
+   { "fabs("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_ABS      },
+   { "int("        ,  4,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_INT      },
+   { "ceil("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_CEIL     },
+   { "floor("      ,  6,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_FLOOR    },
+   { "nint("       ,  5,  0,  1,  1,  0, 14,  1,  1,  0,  1,  OP_NINT     },
+   { "pow("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_POW      },
+   { "dim("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_DIM      },
+   { "mod("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_MOD      },
+   { "fmod("       ,  5,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_MOD      },
+   { "sign("       ,  5,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_SIGN     },
+   { "atan2("      ,  6,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_ATAN2    },
+   { "atan2d("     ,  7,  0,  1,  1,  0, 14,  1,  1, -1,  2,  OP_ATAN2D   },
+   { "min("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1, -2,  OP_MIN      },
+   { "max("        ,  4,  0,  1,  1,  0, 14,  1,  1, -1, -2,  OP_MAX      },
+   { NULL          ,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  OP_NULL     }
 };
 
 /* These variables identify indices in the above array which hold
@@ -241,6 +297,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * )
 static const char *GetAttrib( AstObject *, const char * );
 static int GetSimpFI( AstMathMap * );
 static int GetSimpIF( AstMathMap * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestSimpFI( AstMathMap * );
 static int TestSimpIF( AstMathMap * );
@@ -248,22 +305,22 @@ static void CleanFunctions( int, const char *[], char *** );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearSimpFI( AstMathMap * );
 static void ClearSimpIF( AstMathMap * );
-static void CompileExpression( const char *, int, const char *[], int **, double **, int * );
-static void CompileMapping( int, int, const char *[], const char *[], int ***, int ***, double ***, double ***, int *, int * );
+static void CompileExpression( const char *, const char *, int, const char *[], int **, double **, int * );
+static void CompileMapping( const char *, int, int, const char *[], const char *[], int ***, int ***, double ***, double ***, int *, int * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void EvaluationSort( const double [], int, int [], int **, int * );
-static void ExtractExpressions( int, const char *[], char *** );
-static void ExtractVariables( int, const char *[], char *** );
+static void ExtractExpressions( const char *, int, const char *[], char *** );
+static void ExtractVariables( const char *, int, const char *[], char *** );
 static void InitVtab( AstMathMapVtab * );
-static void ParseConstant( const char *, int, int *, double * );
+static void ParseConstant( const char *, const char *, int, int *, double * );
 static void ParseName( const char *, int, int * );
-static void ParseVariable( const char *, int, int, const char *[], int *, int * );
+static void ParseVariable( const char *, const char *, int, int, const char *[], int *, int * );
 static void SetAttrib( AstObject *, const char * );
 static void SetSimpFI( AstMathMap *, int );
 static void SetSimpIF( AstMathMap *, int );
-static void ValidateSymbol( const char *, int, int, int *, int **, int **, int *, double ** );
+static void ValidateSymbol( const char *, const char *, int, int, int *, int **, int **, int *, double ** );
 static void VirtualMachine( int, int, const double **, const int *, const double *, int, double * );
 
 /* Member functions. */
@@ -423,7 +480,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
-static void CompileExpression( const char *exprs, int nvar, const char *var[],
+static void CompileExpression( const char *method, const char *exprs,
+                               int nvar, const char *var[],
                                int **code, double **con, int *stacksize ) {
 /*
 *  Name:
@@ -437,7 +495,8 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void CompileExpression( const char *exprs, int nvar, const char *var[],
+*     void CompileExpression( const char *method, const char *exprs,
+*                             int nvar, const char *var[],
 *                             int **code, double **con, int *stacksize )
 
 *  Class Membership:
@@ -450,6 +509,10 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
 *     expression on a push-down stack.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be compiled. This is case sensitive and should contain no white
@@ -601,7 +664,7 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
    validate it, updating the parenthesis level and argument count
    information at the same time. */
       if ( found ) {
-         ValidateSymbol( exprs, iend, sym, &lpar, &argcount, &opensym,
+         ValidateSymbol( method, exprs, iend, sym, &lpar, &argcount, &opensym,
                          &ncon, con );
 
 /* If it was not one of the standard symbols, then check if the next
@@ -610,14 +673,14 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
       } else {
          if ( opernext ) {
             astError( AST__MIOPR,
-                      "Missing or invalid operator in the expression "
+                      "%s: Missing or invalid operator in the expression "
                       "\"%.*s\".",
-                      istart + 1, exprs );
+                      method, istart + 1, exprs );
 
 /* If the next symbol was expected to be an operand, then it may be a
    constant, so try to parse it as one. */
          } else {
-            ParseConstant( exprs, istart, &iend, &c );
+            ParseConstant( method, exprs, istart, &iend, &c );
             if ( astOK ) {
 
 /* If successful, set the symbol number to "symbol_ldcon" (load
@@ -635,7 +698,8 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
 /* If the symbol did not parse as a constant, then it may be a
    variable name, so try to parse it as one. */
                } else {
-                  ParseVariable( exprs, istart, nvar, var, &ivar, &iend );
+                  ParseVariable( method, exprs, istart, nvar, var,
+                                 &ivar, &iend );
                   if ( astOK ) {
 
 /* If successful, set the symbol to "symbol_ldvar" (load variable) and
@@ -655,9 +719,9 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
    missing operand in the expression, so report an error. */
                      } else {
                         astError( AST__MIOPA,
-                                  "Missing or invalid operand in the "
+                                  "%s: Missing or invalid operand in the "
                                   "expression \"%.*s\".",
-                                  istart + 1, exprs );
+                                  method, istart + 1, exprs );
                      }
                   }
                }
@@ -699,15 +763,15 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
    operator on the end of the expression, so report an error. */
       if ( !opernext ) {
          astError( AST__MIOPA,
-                   "Missing or invalid operand in the expression \"%s\".",
-                   exprs );
+                   "%s: Missing or invalid operand in the expression \"%s\".",
+                   method, exprs );
 
 /* If the final parenthesis level is positive, then there is a missing
    right parenthesis, so report an error. */
       } else if ( lpar > 0 ) {
          astError( AST__MRPAR,
-                   "Missing right parenthesis in the expression \"%s\".",
-                   exprs );
+                   "%s: Missing right parenthesis in the expression \"%s\".",
+                   method, exprs );
       }
    }
 
@@ -734,7 +798,7 @@ static void CompileExpression( const char *exprs, int nvar, const char *var[],
    }
 }
 
-static void CompileMapping( int nin, int nout,
+static void CompileMapping( const char *method, int nin, int nout,
                             const char *fwdfun[], const char *invfun[],
                             int ***fwdcode, int ***invcode,
                             double ***fwdcon, double ***invcon,
@@ -751,7 +815,7 @@ static void CompileMapping( int nin, int nout,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void CompileMapping( int nin, int nout,
+*     void CompileMapping( const char *method, int nin, int nout,
 *                          const char *fwdfun[], const char *invfun[],
 *                          int ***fwdcode, int ***invcode,
 *                          double ***fwdcon, double ***invcon,
@@ -767,6 +831,10 @@ static void CompileMapping( int nin, int nout,
 *     functions on a push-down stack.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     nin
 *        Number of input variables for the MathMap.
 *     nout
@@ -878,7 +946,7 @@ static void CompileMapping( int nin, int nout,
    of the inverse transformation functions. Report a contextual error if
    anything is wrong. */
    if ( astOK ) {
-      ExtractVariables( nin, invfun, &var );
+      ExtractVariables( method, nin, invfun, &var );
       if ( !astOK ) astError( astStatus,
                               "Error in inverse transformation function." );
    }
@@ -887,7 +955,7 @@ static void CompileMapping( int nin, int nout,
    transformation functions. Report a contextual error if anything is
    wrong. */
    if ( astOK ) {
-      ExtractExpressions( nout, fwdfun, &exprs );
+      ExtractExpressions( method, nout, fwdfun, &exprs );
       if ( !astOK ) astError( astStatus,
                               "Error in forward transformation function." );
    }
@@ -903,7 +971,8 @@ static void CompileMapping( int nin, int nout,
    the resulting opcodes and constants in the arrays allocated above. */
       if ( astOK ) {
          for ( ifun = 0; ifun < nout; ifun++ ) {
-            CompileExpression( exprs[ ifun ], nin, (const char **) var,
+            CompileExpression( method, exprs[ ifun ],
+                               nin, (const char **) var,
                                &( *fwdcode )[ ifun ], &( *fwdcon )[ ifun ],
                                &stacksize );
 
@@ -933,7 +1002,7 @@ static void CompileMapping( int nin, int nout,
    of the forward transformation functions. Report a contextual error if
    anything is wrong. */
    if ( astOK ) {
-      ExtractVariables( nout, fwdfun, &var );
+      ExtractVariables( method, nout, fwdfun, &var );
       if ( !astOK ) astError( astStatus,
                               "Error in forward transformation function." );
    }
@@ -942,7 +1011,7 @@ static void CompileMapping( int nin, int nout,
    transformation functions. Report a contextual error if anything is
    wrong. */
    if ( astOK ) {
-      ExtractExpressions( nin, invfun, &exprs );
+      ExtractExpressions( method, nin, invfun, &exprs );
       if ( !astOK ) astError( astStatus,
                               "Error in inverse transformation function." );
    }
@@ -958,7 +1027,8 @@ static void CompileMapping( int nin, int nout,
    the resulting opcodes and constants in the arrays allocated above. */
       if ( astOK ) {
          for ( ifun = 0; ifun < nin; ifun++ ) {
-            CompileExpression( exprs[ ifun ], nout, (const char **) var,
+            CompileExpression( method, exprs[ ifun ],
+                               nout, (const char **) var,
                                &( *invcode )[ ifun ], &( *invcon )[ ifun ],
                                &stacksize );
 
@@ -1203,7 +1273,8 @@ static void EvaluationSort( const double con[], int nsym, int symlist[],
    }
 }
 
-static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
+static void ExtractExpressions( const char *method, int nfun,
+                                const char *fun[], char ***exprs ) {
 /*
 *  Name:
 *     ExtractExpressions
@@ -1216,7 +1287,8 @@ static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ExtractExpressions( int nfun, const char *fun[], char ***exprs )
+*     void ExtractExpressions( const char *method, int nfun,
+*                              const char *fun[], char ***exprs )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1232,6 +1304,10 @@ static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
 *     (i.e. they are not compiled).
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     nfun
 *        The number of functions to be analysed.
 *     fun
@@ -1299,8 +1375,8 @@ static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
    error and quit. */
             } else {
                astError( AST__NORHS,
-                         "Missing right hand side in function %d: \"%s\".",
-                         ifun + 1, fun[ ifun ] );
+                         "%s: Missing right hand side in function %d: \"%s\".",
+                         method, ifun + 1, fun[ ifun ] );
                break;
             }
 
@@ -1321,8 +1397,8 @@ static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
    error, citing the first instance of a missing "=" sign. */
    if ( astOK && ( nud != 0 ) && ( nud != nfun ) ) {
       astError( AST__NORHS,
-                "Missing right hand side in function %d: \"%s\".",
-                iud + 1, fun[ iud ] );
+                "%s: Missing right hand side in function %d: \"%s\".",
+                method, iud + 1, fun[ iud ] );
    }
 
 /* If an error occurred, or all the expressions were absent, then free any
@@ -1332,7 +1408,8 @@ static void ExtractExpressions( int nfun, const char *fun[], char ***exprs ) {
    }
 }
 
-static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
+static void ExtractVariables( const char *method, int nfun, const char *fun[],
+                              char ***var ) {
 /*
 *  Name:
 *     ExtractVariables
@@ -1345,7 +1422,8 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ExtractVariables( int nfun, const char *fun[], char ***var )
+*     void ExtractVariables( const char *method, int nfun, const char *fun[],
+*                            char ***var )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1357,6 +1435,10 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
 *     wrong with the variable names obtained.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     nfun
 *        The number of functions to be analysed.
 *     fun
@@ -1410,12 +1492,12 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
          if ( !nc ) {
             if ( c ) {
                astError( AST__MISVN,
-                         "Function %d has no left hand side: \"%s\".",
-                         ifun + 1, fun[ ifun ] );
+                         "%s: Function %d has no left hand side: \"%s\".",
+                         method, ifun + 1, fun[ ifun ] );
             } else {
                astError( AST__MISVN,
-                         "Variable name number %d is missing.",
-                         ifun + 1 );
+                         "%s: Variable name number %d is missing.",
+                         method, ifun + 1 );
             }
             break;
          }
@@ -1443,8 +1525,8 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
    have an invalid variable name, so report an error and quit. */
          if ( ( iend < 0 ) || ( *var )[ ifun ][ iend + 1 ] ) {
             astError( AST__VARIN,
-                      "Variable name number %d is invalid: \"%s\".",
-                      ifun + 1, ( *var )[ ifun ] );
+                      "%s: Variable name number %d is invalid: \"%s\".",
+                      method, ifun + 1, ( *var )[ ifun ] );
             break;
          }
       }
@@ -1459,9 +1541,9 @@ static void ExtractVariables( int nfun, const char *fun[], char ***var ) {
 /* If a duplicate variable name is found, report an error and quit. */
             if ( !strcmp( ( *var )[ i1 ], ( *var )[ i2 ] ) ) {
                astError( AST__DUVAR,
-                         "Duplicate variable name \"%s\" in functions %d and "
-                         "%d.",
-                         ( *var )[ i1 ], i1 + 1, i2 + 1 );
+                         "%s: Duplicate variable name \"%s\" in functions "
+                         "%d and %d.",
+                         method, ( *var )[ i1 ], i1 + 1, i2 + 1 );
                break;
             }
          }
@@ -1650,6 +1732,7 @@ static void InitVtab( AstMathMapVtab *vtab ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1658,8 +1741,291 @@ static void InitVtab( AstMathMapVtab *vtab ) {
                "Transformation using mathematical functions" );
 }
 
-static void ParseConstant( const char *exprs, int istart, int *iend,
-                           double *con ) {
+static int MapMerge( AstMapping *this, int where, int series, int *nmap,
+                     AstMapping ***map_list, int **invert_list ) {
+/*
+*  Name:
+*     MapMerge
+
+*  Purpose:
+*     Simplify a sequence of Mappings containing a MathMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int MapMerge( AstMapping *this, int where, int series, int *nmap,
+*                   AstMapping ***map_list, int **invert_list )
+
+*  Class Membership:
+*     MathMap method (over-rides the protected astMapMerge method
+*     inherited from the Mapping class).
+
+*  Description:
+*     This function attempts to simplify a sequence of Mappings by
+*     merging a nominated MathMap in the sequence with its neighbours,
+*     so as to shorten the sequence if possible.
+*
+*     In many cases, simplification will not be possible and the
+*     function will return -1 to indicate this, without further
+*     action.
+*
+*     In most cases of interest, however, this function will either
+*     attempt to replace the nominated MathMap with one which it
+*     considers simpler, or to merge it with the Mappings which
+*     immediately precede it or follow it in the sequence (both will
+*     normally be considered). This is sufficient to ensure the
+*     eventual simplification of most Mapping sequences by repeated
+*     application of this function.
+*
+*     In some cases, the function may attempt more elaborate
+*     simplification, involving any number of other Mappings in the
+*     sequence. It is not restricted in the type or scope of
+*     simplification it may perform, but will normally only attempt
+*     elaborate simplification in cases where a more straightforward
+*     approach is not adequate.
+
+*  Parameters:
+*     this
+*        Pointer to the nominated MathMap which is to be merged with
+*        its neighbours. This should be a cloned copy of the MathMap
+*        pointer contained in the array element "(*map_list)[where]"
+*        (see below). This pointer will not be annulled, and the
+*        MathMap it identifies will not be modified by this function.
+*     where
+*        Index in the "*map_list" array (below) at which the pointer
+*        to the nominated MathMap resides.
+*     series
+*        A non-zero value indicates that the sequence of Mappings to
+*        be simplified will be applied in series (i.e. one after the
+*        other), whereas a zero value indicates that they will be
+*        applied in parallel (i.e. on successive sub-sets of the
+*        input/output coordinates).
+*     nmap
+*        Address of an int which counts the number of Mappings in the
+*        sequence. On entry this should be set to the initial number
+*        of Mappings. On exit it will be updated to record the number
+*        of Mappings remaining after simplification.
+*     map_list
+*        Address of a pointer to a dynamically allocated array of
+*        Mapping pointers (produced, for example, by the astMapList
+*        method) which identifies the sequence of Mappings. On entry,
+*        the initial sequence of Mappings to be simplified should be
+*        supplied.
+*
+*        On exit, the contents of this array will be modified to
+*        reflect any simplification carried out. Any form of
+*        simplification may be performed. This may involve any of: (a)
+*        removing Mappings by annulling any of the pointers supplied,
+*        (b) replacing them with pointers to new Mappings, (c)
+*        inserting additional Mappings and (d) changing their order.
+*
+*        The intention is to reduce the number of Mappings in the
+*        sequence, if possible, and any reduction will be reflected in
+*        the value of "*nmap" returned. However, simplifications which
+*        do not reduce the length of the sequence (but improve its
+*        execution time, for example) may also be performed, and the
+*        sequence might conceivably increase in length (but normally
+*        only in order to split up a Mapping into pieces that can be
+*        more easily merged with their neighbours on subsequent
+*        invocations of this function).
+*
+*        If Mappings are removed from the sequence, any gaps that
+*        remain will be closed up, by moving subsequent Mapping
+*        pointers along in the array, so that vacated elements occur
+*        at the end. If the sequence increases in length, the array
+*        will be extended (and its pointer updated) if necessary to
+*        accommodate any new elements.
+*
+*        Note that any (or all) of the Mapping pointers supplied in
+*        this array may be annulled by this function, but the Mappings
+*        to which they refer are not modified in any way (although
+*        they may, of course, be deleted if the annulled pointer is
+*        the final one).
+*     invert_list
+*        Address of a pointer to a dynamically allocated array which,
+*        on entry, should contain values to be assigned to the Invert
+*        attributes of the Mappings identified in the "*map_list"
+*        array before they are applied (this array might have been
+*        produced, for example, by the astMapList method). These
+*        values will be used by this function instead of the actual
+*        Invert attributes of the Mappings supplied, which are
+*        ignored.
+*
+*        On exit, the contents of this array will be updated to
+*        correspond with the possibly modified contents of the
+*        "*map_list" array.  If the Mapping sequence increases in
+*        length, the "*invert_list" array will be extended (and its
+*        pointer updated) if necessary to accommodate any new
+*        elements.
+
+*  Returned Value:
+*     If simplification was possible, the function returns the index
+*     in the "map_list" array of the first element which was
+*     modified. Otherwise, it returns -1 (and makes no changes to the
+*     arrays supplied).
+
+*  Notes:
+*     - A value of -1 will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstMapping *new;              /* Pointer to replacement Mapping */
+   AstMathMap *mathmap1;         /* Pointer to first MathMap */
+   AstMathMap *mathmap2;         /* Pointer to second MathMap */
+   char **fwd1;                  /* Pointer to first forward function array */
+   char **fwd2;                  /* Pointer to second forward function array */
+   char **inv1;                  /* Pointer to first inverse function array */
+   char **inv2;                  /* Pointer to second inverse function array */
+   int ifun;                     /* Loop counter for functions */
+   int imap1;                    /* Index of first Mapping */
+   int imap2;                    /* Index of second Mapping */
+   int imap;                     /* Loop counter for Mappings */
+   int invert1;                  /* Invert flag for first MathMap */
+   int invert2;                  /* Invert flag for second MathMap */
+   int nin1;                     /* Number input coords for first MathMap */
+   int nout1;                    /* Number output coords for first MathMap */
+   int nout2;                    /* Number output coords for second MathMap */
+   int result;                   /* Result value to return */
+   int simplify;                 /* Mappings may simplify? */
+
+/* Initialise the returned result. */
+   result = -1;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* MathMaps are only worth simplifying if they occur in series. */
+   simplify = series;
+   
+/* If simplification appears possible, then obtain the indices of the
+   nominated mapping and of the one which follows it. Check that a
+   mapping exists for the second index. */
+   if ( simplify ) {
+      imap1 = where;
+      imap2 = imap1 + 1;
+      simplify = ( imap2 < *nmap );
+   }
+
+/* If OK, check whether the class of both Mappings is "MathMap" (a
+   MathMap can only combine with another MathMap). */
+   if ( simplify ) {
+      simplify = !strcmp( astGetClass( ( *map_list )[ imap1 ] ), "MathMap" );
+   }
+   if ( astOK && simplify ) {
+      simplify = !strcmp( astGetClass( ( *map_list )[ imap2 ] ), "MathMap" );
+   }
+      
+/* If still OK, obtain pointers to the two MathMaps and the associated
+   invert flag values. */
+   if ( astOK && simplify ) {
+      mathmap1 = (AstMathMap *) ( *map_list )[ imap1 ];
+      mathmap2 = (AstMathMap *) ( *map_list )[ imap2 ];
+      invert1 = ( *invert_list )[ imap1 ];
+      invert2 = ( *invert_list )[ imap2 ];
+
+/* Depending on the invert flag values, obtain the SimpFI or SimpIF
+   attribute value from each MathMap and check whether they are set so as
+   to permit simplification. */
+      simplify = ( ( invert1 ? astGetSimpIF( mathmap1 ) :
+                               astGetSimpFI( mathmap1 ) ) &&
+                   ( invert2 ? astGetSimpFI( mathmap2 ) :
+                               astGetSimpIF( mathmap2 ) ) );
+   }
+
+/* If still OK, obtain the effective numbers of input coordinates for
+   the first MathMap and output coordinates for the second. Take account
+   of the associated invert flags and the way the Invert attribute of
+   each MathMap is currently set. */
+   if ( astOK && simplify ) {
+      nin1 = ( invert1 == astGetInvert( mathmap1 ) ) ?
+             astGetNin( mathmap1 ) : astGetNout( mathmap1 );
+      nout2 = ( invert2 == astGetInvert( mathmap2 ) ) ?
+              astGetNout( mathmap2 ) : astGetNin( mathmap2 );
+
+/* Simplification is only possible if these two numbers are equal
+   (otherwise the the two MathMaps cannot be identical). */
+      simplify = ( nin1 == nout2 );
+   }
+
+/* If still OK, obtain the effective number of output coordinates for
+   the first MathMap, using the same technique as above. */
+   if ( astOK && simplify ) {
+      nout1 = ( invert1 == astGetInvert( mathmap1 ) ) ?
+              astGetNout( mathmap1 ) : astGetNin( mathmap1 );
+         
+/* Obtain a pointer to the array of effective forward transformation
+   functions for the first MathMap (allowing for the associated invert
+   flag). Similarly, obtain a pointer to the effective inverse
+   transformation functions for the second MathMap. */
+      fwd1 = !invert1 ? mathmap1->fwdfun : mathmap1->invfun;
+      inv2 = !invert2 ? mathmap2->invfun : mathmap2->fwdfun;
+
+/* Loop to check whether these two sets of functions are
+   identical. The MathMaps cannot be merged unless they are. */
+      for ( ifun = 0; ( ifun < nout1 ) && astOK; ifun++ ) {
+         simplify = !strcmp( fwd1[ ifun ], inv2[ ifun ] );
+         if ( !simplify ) break;
+      }
+   }
+
+/* If OK, repeat the above process to compare the effective inverse
+   transformation functions of the first MathMap with the forward
+   functions of the second one. */
+   if ( astOK && simplify ) {
+      inv1 = !invert1 ? mathmap1->invfun : mathmap1->fwdfun;
+      fwd2 = !invert2 ? mathmap2->fwdfun : mathmap2->invfun;
+      for ( ifun = 0; ( ifun < nout2 ) && astOK; ifun++ ) {
+         simplify = !strcmp( inv1[ ifun ], fwd2[ ifun ] );
+         if ( !simplify ) break;
+      }
+   }
+
+/* If the two MathMaps can be merged, create a UnitMap as a
+   replacement. */
+   if ( astOK && simplify ) {
+      new = (AstMapping *) astUnitMap( nin1, "" );
+
+/* If OK, annul the pointers to the original MathMaps. */
+      if ( astOK ) {
+         ( *map_list )[ imap1 ] = astAnnul( ( *map_list )[ imap1 ] );
+         ( *map_list )[ imap2 ] = astAnnul( ( *map_list )[ imap2 ] );
+
+/* Insert the pointer to the replacement UnitMap and store the
+   associated invert flag. */
+         ( *map_list )[ imap1 ] = new;
+         ( *invert_list )[ imap1 ] = 0;
+
+/* Loop to move the following Mapping pointers and invert flags down
+   in their arrays to close the gap. */
+         for ( imap = imap2 + 1; imap < *nmap; imap++ ) {
+            ( *map_list )[ imap - 1 ] = ( *map_list )[ imap ];
+            ( *invert_list )[ imap - 1 ] = ( *invert_list )[ imap ];
+         }
+
+/* Clear the final entry in each array. */
+         ( *map_list )[ *nmap - 1 ] = NULL;
+         ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+         ( *nmap )--;
+         result = imap1;
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static void ParseConstant( const char *method, const char *exprs,
+                           int istart, int *iend, double *con ) {
 /*
 *  Name:
 *     ParseConstant
@@ -1672,8 +2038,8 @@ static void ParseConstant( const char *exprs, int istart, int *iend,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ParseConstant( const char *exprs, int istart, int *iend,
-*                         double *con )
+*     void ParseConstant( const char *method, const char *exprs,
+*                         int istart, int *iend, double *con )
 
 *  Class Membership:
 *     MathMap member function.
@@ -1695,6 +2061,10 @@ static void ParseConstant( const char *exprs, int istart, int *iend,
 *     The constant must not have a sign (+ or -) in front of it.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be parsed.
@@ -1833,8 +2203,8 @@ static void ParseConstant( const char *exprs, int istart, int *iend,
    then report an error. */
       if ( astOK && !valid ) {
          astError( AST__CONIN,
-                   "Invalid constant syntax in the expression \"%.*s\".",
-                   *iend + 1, exprs );
+                   "%s: Invalid constant syntax in the expression \"%.*s\".",
+                   method, *iend + 1, exprs );
       }
 
 /* If an error occurred, reset the output values. */
@@ -1908,7 +2278,8 @@ static void ParseName( const char *exprs, int istart, int *iend ) {
    }
 }
 
-static void ParseVariable( const char *exprs, int istart, int nvar,
+static void ParseVariable( const char *method, const char *exprs,
+                           int istart, int nvar,
                            const char *var[], int *ivar, int *iend ) {
 /*
 *  Name:
@@ -1922,7 +2293,8 @@ static void ParseVariable( const char *exprs, int istart, int nvar,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ParseVariable( const char *exprs, int istart, int nvar,
+*     void ParseVariable( const char *method, const char *exprs,
+*                         int istart, int nvar,
 *                         const char *var[], int *ivar, int *iend )
 
 *  Class Membership:
@@ -1947,6 +2319,10 @@ static void ParseVariable( const char *exprs, int istart, int nvar,
 *     embedded white space.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        to be parsed.
@@ -2005,9 +2381,9 @@ static void ParseVariable( const char *exprs, int istart, int nvar,
    values. */
       if ( !found ) {
          astError( AST__UDVOF,
-                   "Undefined variable or function in the expression "
+                   "%s: Undefined variable or function in the expression "
                    "\"%.*s\".",
-                   *iend + 1, exprs );
+                   method, *iend + 1, exprs );
          *ivar = -1;
          *iend = -1;
       }
@@ -2289,9 +2665,9 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
    return result;
 }
 
-static void ValidateSymbol( const char *exprs, int iend, int sym,
-                            int *lpar, int **argcount, int **opensym,
-                            int *ncon, double **con ) {
+static void ValidateSymbol( const char *method, const char *exprs,
+                            int iend, int sym, int *lpar, int **argcount,
+                            int **opensym, int *ncon, double **con ) {
 /*
 *  Name:
 *     ValidateSymbol
@@ -2304,9 +2680,9 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
 
 *  Synopsis:
 *     #include "mathmap.h"
-*     void ValidateSymbol( const char *exprs, int iend, int sym,
-*                          int *lpar, int **argcount, int **opensym,
-*                          int *ncon, double **con )
+*     void ValidateSymbol( const char *method, const char *exprs,
+*                          int iend, int sym, int *lpar, int **argcount,
+*                          int **opensym, int *ncon, double **con )
 
 *  Class Membership:
 *     MathMap member function.
@@ -2321,6 +2697,10 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
 *     and delimiters. Other symbols are accepted automatically.
 
 *  Parameters:
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function.
+*        This method name is used solely for constructing error messages.
 *     exprs
 *        Pointer to a null-terminated string containing the expression
 *        being parsed. This is only used for constructing error messages.
@@ -2395,9 +2775,10 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
    count of zero at the current level of parenthesis), then report an
    error. */
          if ( ( *lpar <= 0 ) || ( ( *argcount )[ *lpar - 1 ] == 0 ) ) {
-            astError( AST__DELIN,
-                      "Spurious comma encountered in the expression \"%.*s\".",
-                      iend + 1, exprs );
+            astError( AST__COMIN,
+                      "%s: Spurious comma encountered in the expression "
+                      "\"%.*s\".",
+                      method, iend + 1, exprs );
 
 /* If a comma is valid, then increment the argument count at the
    current level of parenthesis. */
@@ -2436,8 +2817,9 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
    compiled, so report an error. */
          if ( *lpar == 0 ) {
             astError( AST__MLPAR,
-                      "Missing left parenthesis in the expression \"%.*s\".",
-                      iend + 1, exprs );
+                      "%s: Missing left parenthesis in the expression "
+                      "\"%.*s\".",
+                      method, iend + 1, exprs );
 
 /* If the parenthesis level is valid and the symbol which opened this
    level of parenthesis was a function call with a fixed number of
@@ -2450,9 +2832,9 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
             if ( ( *argcount )[ *lpar - 1 ] !=
                  symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) {
                astError( AST__WRNFA,
-                         "Wrong number of function arguments in the "
+                         "%s: Wrong number of function arguments in the "
                          "expression \"%.*s\".",
-                         iend + 1, exprs );
+                         method, iend + 1, exprs );
 
 /* If the number of arguments is valid, decrement the parenthesis
    level. */
@@ -2471,9 +2853,9 @@ static void ValidateSymbol( const char *exprs, int iend, int sym,
             if ( ( *argcount )[ *lpar - 1 ] <
                  ( -symbol[ ( *opensym )[ *lpar - 1 ] ].nargs ) ) {
                astError( AST__WRNFA,
-                         "Insufficient function arguments in the expression "
-                         "\"%.*s\".",
-                         iend + 1, exprs );
+                         "%s: Insufficient function arguments in the "
+                         "expression \"%.*s\".",
+                         method, iend + 1, exprs );
 
 /* If the number of arguments is valid, increase the size of the
    constants array and check for errors. */
@@ -2601,6 +2983,9 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    static double r2d;            /* Radians to degrees conversion factor */
    static int init = 0;          /* Initialisation performed? */
 
+   static double pow2[ 2000 ];
+   static int ipow;
+
 /* Check the global error status. */
    if ( !astOK ) return;
    
@@ -2610,6 +2995,11 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
       pi = acos( -1.0 );
       r2d = 180.0 / pi;
       d2r = pi / 180.0;
+
+      pow2[ 0 ] = 1.0;
+      for ( ipow = 0; ipow < 2000 && pow2[ ipow ] <= DBL_MAX / 2.0; ipow++ ) {
+         pow2[ ipow + 1 ] = pow2[ ipow ] * 2.0;
+      }
 
 /* Note that initialisation has been performed. */
       init = 1;
@@ -2694,6 +3084,33 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 /* Break out of the "case" block. */ \
       break;
 
+/* One-argument boolean operation. */
+/* ------------------------------- */
+/* This macro is similar in function to ARG_1 above, except that no
+   checks are made for bad argument values. It is intended for use with
+   boolean functions where bad values are handled explicitly. */
+#define ARG_1B(oper,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Obtain a pointer to the top stack element (vector). */ \
+      xv = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining the argument value \
+   and a pointer to the element. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         x = xv[ point ]; \
+         y = xv + point; \
+\
+/* Perform the processing, which uses the element's value and then \
+   assigns the result to this element. */ \
+         {function;} \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
 /* Two-argument operation. */
 /* ----------------------- */
 /* This macro performs a two-argument operation, which processes the
@@ -2737,6 +3154,37 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
       DO_ARG_2(function) \
       break;
 
+/* Two-argument boolean operation. */
+/* ------------------------------- */
+/* This macro is similar in function to ARG_2 above, except that no
+   checks are made for bad argument values. It is intended for use with
+   boolean functions where bad values are handled explicitly. */
+#define ARG_2B(oper,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Obtain pointers to the top two stack elements (vectors), decreasing \
+   the top of stack index by one. */ \
+      xv2 = stack[ tos-- ]; \
+      xv1 = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining the value of both \
+   arguments and a pointer to the element which is to receive the \
+   result. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         x1 = xv1[ point ]; \
+         x2 = xv2[ point ]; \
+         y = xv1 + point; \
+\
+/* Perform the processing, which uses the two argument values and then \
+   assigns the result to the appropriate top of stack element. */ \
+         {function;} \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
 /* We now define some macros for performing mathematical operations in
    a "safe" way - i.e. trapping numerical problems such as overflow and
    invalid arguments and translating them into the AST__BAD value. */
@@ -2745,6 +3193,12 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 /* --------------- */
 /* This is just shorthand. */
 #define ABS(x) ( ( (x) >= 0.0 ) ? (x) : -(x) )
+
+/* Integer part. */
+/* ------------- */
+/* This implements rounding towards zero without involving conversion
+   to an integer (which could overflow). */
+#define INT(x) ( ( (x) >= 0.0 ) ? floor( (x) ) : ceil( (x) ) )
 
 /* Trap maths overflow. */
 /* -------------------- */
@@ -2781,6 +3235,56 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
    overflow and return the appropriate result. */ \
       ( ( errno == EDOM ) || \
         ( ( errno == ERANGE ) && ( tmp == HUGE_VAL ) ) ) ? AST__BAD : tmp \
+   )
+
+/* Tri-state boolean OR. */
+/* --------------------- */
+/* This evaluates a boolean OR using tri-state logic. For example,
+   "a||b" may evaluate to 1 if "a" is bad but "b" is non-zero, so that
+   the normal rules of bad value propagation do not apply. */
+#define TRISTATE_OR(x1,x2) \
+\
+/* Test if the first argument is bad. */ \
+   ( (x1) == AST__BAD ) ? ( \
+\
+/* If so, test the second argument. */ \
+      ( ( (x2) == 0.0 ) || ( (x2) == AST__BAD ) ) ? AST__BAD : 1.0 \
+   ) : ( \
+\
+/* Test if the second argument is bad. */ \
+      ( (x2) == AST__BAD ) ? ( \
+\
+/* If so, test the first argument. */ \
+         ( (x1) == 0.0 ) ? AST__BAD : 1.0 \
+\
+/* If neither argument is bad, use the normal OR operator. */ \
+      ) : ( \
+         ( (x1) != 0.0 ) || ( (x2) != 0.0 ) \
+      ) \
+   )
+
+/* Tri-state boolean AND. */
+/* ---------------------- */
+/* This evaluates a boolean AND using tri-state logic. */
+#define TRISTATE_AND(x1,x2) \
+\
+/* Test if the first argument is bad. */ \
+   ( (x1) == AST__BAD ) ? ( \
+\
+/* If so, test the second argument. */ \
+      ( (x2) != 0.0 ) ? AST__BAD : 0.0 \
+   ) : ( \
+\
+/* Test if the second argument is bad. */ \
+      ( (x2) == AST__BAD ) ? ( \
+\
+/* If so, test the first argument. */ \
+         ( (x1) != 0.0 ) ? AST__BAD : 0.0 \
+\
+/* If neither argument is bad, use the normal AND operator. */ \
+      ) : ( \
+         ( (x1) != 0.0 ) && ( (x2) != 0.0 ) \
+      ) \
    )
 
 /* Safe addition. */
@@ -2913,60 +3417,99 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 
 /* Loading a constant involves incrementing the constant count and
    assigning the next constant's value to the top of stack element. */
-            ARG_0( OP_LDCON,  value = con[ icon++ ], *y = value )
+            ARG_0( OP_LDCON,    value = con[ icon++ ], *y = value )
 
 /* Loading a variable involves obtaining the variable's index by
    consuming a constant (as above), and then copying the variable's
    values into the top of stack element. */
-            ARG_0( OP_LDVAR,  ivar = (int) ( con[ icon++ ] + 0.5 ),
-                              *y = ptr_in[ ivar ][ point ] )
+            ARG_0( OP_LDVAR,    ivar = (int) ( con[ icon++ ] + 0.5 ),
+                                *y = ptr_in[ ivar ][ point ] )
 
 /* Loading a "bad" value simply means assigning AST__BAD to the top of
    stack element. */
-            ARG_0( OP_LDBAD,  , *y = AST__BAD )
+            ARG_0( OP_LDBAD,    , *y = AST__BAD )
+
+/* The following load constants associated with the (double) floating
+   point representation into the top of stack element. */
+            ARG_0( OP_LDRAD,    , *y = (double) FLT_RADIX )
+            ARG_0( OP_LDRND,    , *y = (double) FLT_ROUNDS )
+            ARG_0( OP_LDMDIG,   , *y = (double) DBL_MANT_DIG )
+            ARG_0( OP_LDDIG,    , *y = (double) DBL_DIG )
+            ARG_0( OP_LDMINE,   , *y = (double) DBL_MIN_EXP )
+            ARG_0( OP_LDMIN10E, , *y = (double) DBL_MIN_10_EXP )
+            ARG_0( OP_LDMAXE,   , *y = (double) DBL_MAX_EXP )
+            ARG_0( OP_LDMAX10E, , *y = (double) DBL_MAX_10_EXP )
+            ARG_0( OP_LDEPS,    , *y = DBL_EPSILON )
+            ARG_0( OP_LDMIN,    , *y = DBL_MIN )
+            ARG_0( OP_LDMAX,    , *y = DBL_MAX )
+
+/* The following load mathematical constants into the top of stack
+   element. */
+            ARG_0( OP_LDPI,     value = acos( -1.0 ), *y = value )
+            ARG_0( OP_LDE,      value = exp( 1.0 ),   *y = value )
 
 /* The following 1-argument operations simply evaluate a function of
    the top of stack element and assign the result to the same element. */
-            ARG_1( OP_NEG,    *y = -x )
-            ARG_1( OP_SQRT,   *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
-            ARG_1( OP_LOG,    *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
-            ARG_1( OP_LOG10,  *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
-            ARG_1( OP_EXP,    *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
-            ARG_1( OP_SIN,    *y = sin( x ) )
-            ARG_1( OP_COS,    *y = cos( x ) )
-            ARG_1( OP_TAN,    *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
-            ARG_1( OP_SIND,   *y = sin( x * d2r ) )
-            ARG_1( OP_COSD,   *y = cos( x * d2r ) )
-            ARG_1( OP_TAND,   *y = tan( x * d2r ) )
-            ARG_1( OP_ASIN,   *y = ( ABS( x ) <= 1.0 ) ? asin( x ) : AST__BAD )
-            ARG_1( OP_ACOS,   *y = ( ABS( x ) <= 1.0 ) ? acos( x ) : AST__BAD )
-            ARG_1( OP_ATAN,   *y = atan( x ) )
-            ARG_1( OP_ASIND,  *y = ( ABS( x ) <= 1.0 ) ? asin( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ACOSD,  *y = ( ABS( x ) <= 1.0 ) ? acos( x ) * r2d :
-                                                         AST__BAD )
-            ARG_1( OP_ATAND,  *y = atan( x ) * r2d )
-            ARG_1( OP_SINH,   *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
-            ARG_1( OP_COSH,   *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
-            ARG_1( OP_TANH,   *y = tanh( x ) )
-            ARG_1( OP_ABS,    *y = ABS( x ) )
-            ARG_1( OP_CEIL,   *y = ceil( x ) )
-            ARG_1( OP_FLOOR,  *y = floor( x ) )
-            ARG_1( OP_NINT,   *y = (int) ( ( x >= 0 ) ? x + 0.5 : x - 0.5 ) )
+            ARG_1( OP_NOT,      *y = ( x == 0.0 ) )
+            ARG_1( OP_NEG,      *y = -x )
+            ARG_1B( OP_ISBAD,   *y = ( x == AST__BAD ) )
+            ARG_1( OP_SQRT,     *y = ( x >= 0.0 ) ? sqrt( x ) : AST__BAD )
+            ARG_1( OP_LOG,      *y = ( x > 0.0 ) ? log( x ) : AST__BAD )
+            ARG_1( OP_LOG10,    *y = ( x > 0.0 ) ? log10( x ) : AST__BAD )
+            ARG_1( OP_EXP,      *y = CATCH_MATHS_OVERFLOW( exp( x ) ) )
+            ARG_1( OP_SIN,      *y = sin( x ) )
+            ARG_1( OP_COS,      *y = cos( x ) )
+            ARG_1( OP_TAN,      *y = CATCH_MATHS_OVERFLOW( tan( x ) ) )
+            ARG_1( OP_SIND,     *y = sin( x * d2r ) )
+            ARG_1( OP_COSD,     *y = cos( x * d2r ) )
+            ARG_1( OP_TAND,     *y = tan( x * d2r ) )
+            ARG_1( OP_ASIN,     *y = ( ABS( x ) <= 1.0 ) ?
+                                     asin( x ) : AST__BAD )
+            ARG_1( OP_ACOS,     *y = ( ABS( x ) <= 1.0 ) ?
+                                     acos( x ) : AST__BAD )
+            ARG_1( OP_ATAN,     *y = atan( x ) )
+            ARG_1( OP_ASIND,    *y = ( ABS( x ) <= 1.0 ) ?
+                                     asin( x ) * r2d : AST__BAD )
+            ARG_1( OP_ACOSD,    *y = ( ABS( x ) <= 1.0 ) ?
+                                     acos( x ) * r2d : AST__BAD )
+            ARG_1( OP_ATAND,    *y = atan( x ) * r2d )
+            ARG_1( OP_SINH,     *y = CATCH_MATHS_OVERFLOW( sinh( x ) ) )
+            ARG_1( OP_COSH,     *y = CATCH_MATHS_OVERFLOW( cosh( x ) ) )
+            ARG_1( OP_TANH,     *y = tanh( x ) )
+            ARG_1( OP_ABS,      *y = ABS( x ) )
+            ARG_1( OP_INT,      *y = INT( x ) )
+            ARG_1( OP_CEIL,     *y = ceil( x ) )
+            ARG_1( OP_FLOOR,    *y = floor( x ) )
+            ARG_1( OP_NINT,     *y = ( x >= 0 ) ?
+                                     floor( x + 0.5 ) : ceil( x - 0.5 ) )
 
 /* These 2-argument operations evaluate a function of the top two
    entries on the stack. */
-            ARG_2( OP_ADD,    *y = SAFE_ADD( x1, x2 ) )
-            ARG_2( OP_SUB,    *y = SAFE_SUB( x1, x2 ) )
-            ARG_2( OP_MUL,    *y = SAFE_MUL( x1, x2 ) )
-            ARG_2( OP_DIV ,   *y = SAFE_DIV( x1, x2 ) )
-            ARG_2( OP_PWR,    *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
-            ARG_2( OP_SIGN,   *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
-                                   x1 : -x1 )
-            ARG_2( OP_DIM,    *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
-            ARG_2( OP_MOD,    *y = ( x2 != 0.0 ) ? fmod( x1, x2 ) : AST__BAD )
-            ARG_2( OP_ATAN2,  *y = atan2( x1, x2 ) )
-            ARG_2( OP_ATAN2D, *y = atan2( x1, x2 ) * r2d )
+            ARG_2( OP_EQV,      *y = ( ( x1 != 0.0 ) == ( x2 != 0.0 ) ) )
+            ARG_2( OP_XOR,      *y = ( ( x1 != 0.0 ) != ( x2 != 0.0 ) ) )
+            ARG_2B( OP_OR,      *y = TRISTATE_OR( x1, x2 ) )
+            ARG_2B( OP_AND,     *y = TRISTATE_AND( x1, x2 ) )
+            ARG_2( OP_EQ,       *y = ( x1 == x2 ) )
+            ARG_2( OP_NE,       *y = ( x1 != x2 ) )
+            ARG_2( OP_LE,       *y = ( x1 <= x2 ) )
+            ARG_2( OP_LT,       *y = ( x1 < x2 ) )
+            ARG_2( OP_GE,       *y = ( x1 >= x2 ) )
+            ARG_2( OP_GT,       *y = ( x1 > x2 ) )
+            ARG_2( OP_SHFTL,    *y = ( ( ( tmp = INT( x2 ) ) >= 0.0 )  &&
+                                       ( tmp <= (double) ipow ) ) ?
+                                     INT( x1 ) * pow2[ (int) tmp ] : AST__BAD )
+            ARG_2( OP_ADD,      *y = SAFE_ADD( x1, x2 ) )
+            ARG_2( OP_SUB,      *y = SAFE_SUB( x1, x2 ) )
+            ARG_2( OP_MUL,      *y = SAFE_MUL( x1, x2 ) )
+            ARG_2( OP_DIV ,     *y = SAFE_DIV( x1, x2 ) )
+            ARG_2( OP_POW,      *y = CATCH_MATHS_ERROR( pow( x1, x2 ) ) )
+            ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
+                                     x1 : -x1 )
+            ARG_2( OP_DIM,      *y = ( x1 > x2 ) ? x1 - x2 : 0.0 )
+            ARG_2( OP_MOD,      *y = ( x2 != 0.0 ) ?
+                                     fmod( x1, x2 ) : AST__BAD )
+            ARG_2( OP_ATAN2,    *y = atan2( x1, x2 ) )
+            ARG_2( OP_ATAN2D,   *y = atan2( x1, x2 ) * r2d )
 
 /* These operations take a variable number of arguments, the actual
    number being determined by consuming a constant. We then loop to
@@ -2999,11 +3542,16 @@ static void VirtualMachine( int npoint, int ncoord_in, const double **ptr_in,
 /* Undefine macros local to this function. */
 #undef ARG_0
 #undef ARG_1
+#undef ARG_1B
 #undef DO_ARG_2
 #undef ARG_2
+#undef ARG_2B
 #undef ABS
+#undef INT
 #undef CATCH_MATHS_OVERFLOW
 #undef CATCH_MATHS_ERROR
+#undef TRISTATE_OR
+#undef TRISTATE_AND
 #undef SAFE_ADD
 #undef SAFE_SUB
 #undef SAFE_MUL
@@ -3669,7 +4217,8 @@ AstMathMap *astInitMathMap_( void *mem, size_t size, int init,
 /* Compile the cleaned functions. From the returned pointers (if
    successful), we can now tell which transformations (forward and/or
    inverse) are defined. */
-   CompileMapping( nin, nout, (const char **) fwdfun, (const char **) invfun,
+   CompileMapping( "astInitMathMap", nin, nout,
+                   (const char **) fwdfun, (const char **) invfun,
                    &fwdcode, &invcode, &fwdcon, &invcon,
                    &fwdstack, &invstack );
 
@@ -3902,7 +4451,8 @@ AstMathMap *astLoadMathMap_( void *mem, size_t size, int init,
             if ( TestSimpIF( new ) ) SetSimpIF( new, new->simp_if );
 
 /* Compile the MathMap's transformation functions. */
-            CompileMapping( new->ninv, new->nfwd,
+            CompileMapping( "astLoadMathMap",
+                            new->ninv, new->nfwd,
                             (const char **) new->fwdfun,
                             (const char **) new->invfun,
                             &new->fwdcode, &new->invcode,
