@@ -86,9 +86,10 @@
 *  External References:
       EXTERNAL        		ADI2_OPEN
       EXTERNAL        		ADI2_FCREAT
-      EXTERNAL        		ADI2_FTRACE
-      EXTERNAL        		ADI2_FCOMIT
+      EXTERNAL        		ADI2_FCLONE
       EXTERNAL        		ADI2_FCLOSE
+      EXTERNAL        		ADI2_FCOMIT
+      EXTERNAL        		ADI2_FTRACE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
       EXTERNAL        		BDI2_SETLNK
@@ -116,6 +117,8 @@
 *  File system methods
       CALL ADI_DEFMTH( 'FileClose(_FITSfile)', ADI2_FCLOSE, DID,
      :                   STATUS )
+      CALL ADI_DEFMTH( 'FileClone(_FITSfile,_CHAR)', ADI2_FCLONE, DID,
+     :                 STATUS )
       CALL ADI_DEFMTH( 'FileCommit(_FITSfile)', ADI2_FCOMIT, DID,
      :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
