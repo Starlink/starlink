@@ -14,6 +14,7 @@
 *      16 Sep 94 : V1.7-3  updates data min/max (RJV)
 *      14 Dec 94 : V1.8-0  only patches within current region (RJV)
 *      16 Dec 94 : V1.8-1  paste mode (RJV)
+*       4 Dec 95 : V2.0-0  GUI version (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -30,7 +31,7 @@
       CHARACTER*20 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPATCH Version 1.8-1')
+      PARAMETER (VERSION = 'IPATCH Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -404,6 +405,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import/export :
@@ -422,10 +424,12 @@
       REAL XC,YC,DX,DY
       REAL X,Y
       INTEGER I,J,II,JJ,I1,I2,J1,J2,II1,II2,JJ1,JJ2
+      INTEGER FID,FLAG,NB
       BYTE MASK
       LOGICAL LEFT,RIGHT
 *-
       IF (STATUS.EQ.SAI__OK) THEN
+
 
 *  get source box for pasting
         CALL MSG_BLNK()
@@ -437,49 +441,68 @@
 *  create a mask to exclude previously patched pixels
         MASK=BIT_ANDUB(I_MASK_W,BIT_NOTUB(QUAL__PATCHED))
 
-
-        CALL MSG_PRNT(
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+          CALL MSG_PRNT(
+     :     'Select centres of areas to paste to...')
+        ELSE
+          CALL MSG_PRNT(
      :     'Select centres of areas to paste to - X to exit...')
+        ENDIF
 
-        CH=' '
-        RIGHT=.FALSE.
         X=XC
         Y=YC
-        DO WHILE (.NOT.RIGHT.AND.CH.NE.'X'.AND.CH.NE.'x'.AND.
-     :                                     STATUS.EQ.SAI__OK)
+        FLAG=0
+        DO WHILE (FLAG.EQ.0.AND.STATUS.EQ.SAI__OK)
 
-          CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
 
-          CALL IMG_BOXTOBOX(X,Y,DX,DY,II1,II2,JJ1,JJ2,STATUS)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(X,Y,STATUS)
+          ELSE
+            CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
+            IF (RIGHT.OR.CH.EQ.'X'.OR.CH.EQ.'x') THEN
+              FLAG=1
+            ENDIF
+          ENDIF
 
-          DO JJ=JJ1,JJ2
-            DO II=II1,II2
+          IF (FLAG.EQ.0) THEN
 
-              IF (BIT_ANDUB(Q(II,JJ),MASK).NE.QUAL__GOOD.AND.
+            CALL IMG_BOXTOBOX(X,Y,DX,DY,II1,II2,JJ1,JJ2,STATUS)
+
+            DO JJ=JJ1,JJ2
+              DO II=II1,II2
+
+                IF (BIT_ANDUB(Q(II,JJ),MASK).NE.QUAL__GOOD.AND.
      :                                    IMG_INREG(II,JJ)) THEN
 
-                I=MIN(I_NX,MAX(1,I1+(II-II1)))
-                J=MIN(I_NY,MAX(1,J1+(JJ-JJ1)))
+                  I=MIN(I_NX,MAX(1,I1+(II-II1)))
+                  J=MIN(I_NY,MAX(1,J1+(JJ-JJ1)))
 
-                D(II,JJ)=D(I,J)
-                Q(II,JJ)=QUAL__PATCHED
-                IF (I_VOK) THEN
-                  V(II,JJ)=V(I,J)
+                  D(II,JJ)=D(I,J)
+                  Q(II,JJ)=QUAL__PATCHED
+                  IF (I_VOK) THEN
+                    V(II,JJ)=V(I,J)
+                  ENDIF
+
                 ENDIF
 
-              ENDIF
-
+              ENDDO
             ENDDO
-          ENDDO
 
-          I_PMIN=I_DMIN
-          I_PMAX=I_DMAX
+            I_PMIN=I_DMIN
+            I_PMAX=I_DMAX
 
 
-          CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
+            CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,II1,II2,JJ1,JJ2,
      :                .TRUE.,%VAL(I_XPTR_W),%VAL(I_YPTR_W),0,0,
      :                             D,I_PMIN,I_PMAX,Q,MASK,STATUS)
 
+          ENDIF
+
+
+          IF (I_GUI) THEN
+            CALL NBS_GET_VALUE(FID,0,VAL__NBR,FLAG,NB,STATUS)
+          ENDIF
 
 
         ENDDO
