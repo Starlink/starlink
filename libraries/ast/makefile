@@ -383,7 +383,7 @@ frameset.h grismmap.h intramap.h loader.h lutmap.h mapping.h \
 mathmap.h matrixmap.h memory.h object.h pcdmap.h \
 permmap.h plot.h pointset.h polymap.h skyaxis.h skyframe.h specframe.h \
 specmap.h slamap.h sphmap.h unit.h unitmap.h wcsmap.h winmap.h \
-zoommap.h xmlchan.h shiftmap.h
+zoommap.h xml.h xmlchan.h shiftmap.h
 
 #  The following include files are associated with various externally
 #  supplied software items.
@@ -430,7 +430,7 @@ funitmap.c fwcsmap.c fwinmap.c fshiftmap.c fxmlchan.c fzoommap.c grismmap.c intr
 loader.c lutmap.c mapping.c mathmap.c matrixmap.c \
 memory.c object.c pcdmap.c permmap.c plot.c fpolymap.c polymap.c \
 pointset.c skyaxis.c skyframe.c specframe.c specmap.c slamap.c sphmap.c \
-unit.c unitmap.c wcsmap.c winmap.c shiftmap.c xmlchan.c zoommap.c 
+unit.c unitmap.c wcsmap.c winmap.c shiftmap.c xml.c xmlchan.c zoommap.c 
 
 
 #  The default error reporting module.
