@@ -424,6 +424,12 @@
 
 #  Create the GWM widget.
             if { $isndf } {
+
+#  Display might be time-consuming: post a busy window.
+               set waitwin [ waiter $itk_component(choosearea).wait \
+                                    -text "Drawing image [ $ndf name ]" ]
+
+#  Construct the GWM widget.
                set gwmname [ winfo id $itk_component(choosearea) ]_$index
                itk_component add plot$index:display {
                   gwm $itk_component(plot$index).gwm \
@@ -445,10 +451,13 @@
                      high=[ lindex $scalevals 1 ] \
                      margin=0 \
                      style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  " "Displaying image [ $ndf name ]" $itk_interior
+                  "
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0
+
+#  Remove the busy window.
+               destroy $waitwin
 
 #  This is a blank window; write instructions to the user.
             } else {

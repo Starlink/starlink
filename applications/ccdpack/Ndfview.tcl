@@ -262,9 +262,8 @@
             return
          }
 
-#  Set the cursor busy.
-         set curs [ $canvas cget -cursor ]
-         $canvas configure -cursor watch
+#  Post a busy window.
+         set waitwin [ waiter $canvas.wait -text "Drawing image $ndfname" ]
 
 #  If the NDF has not been displayed before (but not if only its display
 #  attributes have changed) then update the title bar and info panel.
@@ -305,7 +304,7 @@
                margin=0 \
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
-            " "Displaying image [ $ndf name ]" $itk_interior
+            "
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
@@ -313,8 +312,8 @@
 #  Call any inherited 'display' method.
          chain
 
-#  Return the cursor to its normal state.
-         $canvas configure -cursor $curs
+#  Return control to the user.
+         destroy $waitwin
       }
 
 
