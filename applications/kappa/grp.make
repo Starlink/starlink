@@ -55,8 +55,8 @@ fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
 fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
 fitswrite.par flip.par fourier.par gausmooth.par gdclear.par gdnames.par \
 gdset.par gdstate.par glitch.par globals.par hiscom.par \
-hislist.par hisset.par histat.par histeq.par histogram.par idclear.par \
-idset.par idstate.par div.par \
+hislist.par hisset.par histat.par histeq.par histogram.par \
+div.par \
 log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par \
 lutread.par lutsave.par lutview.par \
@@ -96,7 +96,7 @@ fitswrite.hlp flip.hlp fourier.hlp gausmooth.hlp gdclear.hlp gdnames.hlp \
 gdset.hlp gdstate.hlp glitch.hlp getting_started.hlp globals.hlp \
 graphics_database.hlp hints.hlp hds_data_types.hlp colcomp.hlp \
 hiscom.hlp hislist.hlp hisset.hlp histat.hlp histeq.hlp histogram.hlp \
-ardplot.hlp idclear.hlp idset.hlp idstate.hlp \
+ardplot.hlp \
 interaction_mode.hlp kaphelp.hlp kappa.hlp kstest.hlp laplace.hlp \
 linplot.hlp log10.hlp logar.hlp loge.hlp look.hlp lucy.hlp lutable.hlp \
 lutbgyrw.hlp lutwarm.hlp lutcol.hlp lutcont.hlp lutfc.hlp lutgrey.hlp \
@@ -148,8 +148,8 @@ sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
 wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
-gdstate.ifl idclear.ifl idset.ifl \
-idstate.ifl ardplot.ifl linplot.ifl lutable.ifl \
+gdstate.ifl \
+ardplot.ifl linplot.ifl lutable.ifl \
 lutsave.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
 ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
@@ -277,8 +277,8 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
-elprof.f gdclear.f gdnames.f gdset.f gdstate.f idclear.f \
-idset.f idstate.f linplot.f lutable.f lutedit.f \
+elprof.f gdclear.f gdnames.f gdset.f gdstate.f \
+linplot.f lutable.f lutedit.f \
 lutsave.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \

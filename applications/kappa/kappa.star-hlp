@@ -2153,7 +2153,6 @@ THRESH      - Edits an NDF such that array values below and above two
 3 Device_selection
 GDNAMES     - Shows which graphics devices are available.
 GDSET       - Selects a current graphics device.
-IDSET       - Selects a current image-display device.
 OVSET       - Selects a current image-display overlay.
 
 3 Display_control
@@ -2161,8 +2160,6 @@ CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
 GDCLEAR     - Clears a graphics device and purges its database entries.
 GDSTATE     - Shows the current status of a graphics device.
-IDCLEAR     - Clears an image display and purges its database entries.
-IDSTATE     - Shows the current status of an image display.
 OVCLEAR     - Clears an image-display overlay.
 
 3 Graphics_database
@@ -3617,9 +3614,6 @@ list), or RGB intensities.  For example,
  
 would make palette index 1 sky blue and index 14 a pale yellow.
 Once you have a palette you like, save it in an NDF with PALSAVE.
-IDSTATE reports the current palette colours by name, picking the
-nearest named colour from the standard colour set given in
-"Colour_Set".
 
 The palette has limited direct use in KAPPA so far, but it is
 expected to grow as more applications support different colouring
@@ -10603,7 +10597,7 @@ gdclear current
 gdclear xw
    Clears the xw device and purges its graphics database entries.
 2 Related_Applications
-   KAPPA: GDSET, GDSTATE, IDCLEAR, OVCLEAR.
+   KAPPA: GDSET, GDSTATE, OVCLEAR.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -10867,7 +10861,7 @@ that "Normalised Device Co-ordinates" were normalised so that the
 longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
 are normalised so that the shorter of the two axes has length 1.0.
 2 Related_Applications
-   KAPPA: IDSTATE.
+   KAPPA: GDSET.
 2 Authors
 RFWS: R.F. Warren-Smith (STARLINK)
 
@@ -12586,293 +12580,6 @@ TDCA: Tim Ash (STARLINK)
    -  All non-complex numeric data types can be handled.
 
    -  Any number of NDF dimensions is supported.
-1 IDCLEAR
-Clears an image display and purges its database entries.
-
-Usage:
-
-   idclear [device] [current]
-
-Description:
-
-   This application software resets an image-display device. In effect
-   the device is cleared.  It purges the graphics-database entries
-   for the device.  Optionally, only the current picture is cleared
-   and the database unchanged.  (Note that the clearing of the current
-   picture may not work on some image-display devices.)
-2 Parameters
-For information on individual parameters, select from the list below:
-3 CURRENT
-CURRENT = _LOGICAL (Read)
-   If true then only the current picture is cleared. [FALSE]
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The graphics device to be cleared. [Current image-display
-   device]
-2 Examples
-idclear
-   Clears the current image display and purges its graphics
-   database entries.
-
-idclear current
-   Clears the current picture on the current image display.
-
-idclear xwindows
-   Clears the xwindows device and purges its graphics-database
-   entries.
-2 Related_Applications
-   KAPPA: GDCLEAR, IDSTATE, OVCLEAR.
-2 Authors
-MJC: Malcolm J. Currie  (STARLINK)
-2 History
- 1991 Apr 30 (MJC):
-    Original version.
-
- 1992 March 3 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-1 IDSET
-Selects a current image-display device.
-
-Usage:
-
-   idset device
-
-Description:
-
-   This application selects a current image-display device. This
-   device will be used for all applications requiring an
-   image-display until changed explicitly.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The image-display device to become the current image-display
-   device.  The device must be in one of the following GNS
-   categories: IMAGE_DISPLAY, IMAGE_OVERLAY, MATRIX_PRINTER, or
-   WINDOW, and have at least 24 colour indices or greyscale
-   intensities.
-2 Examples
-idset xwindows
-   Makes the xwindows device the current image-display device.
-2 Related_Applications
-   KAPPA: GDSET, IDSTATE, OVSET; Figaro: SOFT.
-2 Authors
-MJC: Malcolm J. Currie  (STARLINK)
-2 History
- 1991 June 27 (MJC):
-    Original version.
-1 IDSTATE
-Shows the current status of a graphics device.
-
-Usage:
-
-   idstate [device] [frame]
-
-Description:
-
-   This application displays information about the current graphics
-   database picture on a graphics device, including the extreme axis
-   values in any requested co-ordinate Frame (see parameter FRAME).
-   Information is written to various output parameters for use by
-   other applications, and is also written to the screen by default
-   (see parameter REPORT). An outline may be drawn around the current
-   picture if required (see parameter OUTLINE).
-2 Parameters
-For information on individual parameters, select from the list below:
-3 COMMENT
-COMMENT = LITERAL (Write)
-   The comment of the current picture.  Up to 132 characters
-   will be written.
-3 DESCRIBE
-DESCRIBE = _LOGICAL (Read)
-   If TRUE, a detailed description is displayed of the co-ordinate
-   Frame in which the picture bounds are reported (see parameter
-   FRAME). [current value]
-3 DEVICE
-DEVICE = DEVICE (Read)
-   Name of the graphics device about which information is
-   required. [Current graphics device]
-3 DOMAIN
-DOMAIN = LITERAL (Write)
-   The Domain name of the current co-ordinate Frame for the current
-   picture.
-3 EPOCH
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an
-   epoch value is needed to qualify it. This is the epoch at
-   which the displayed sky co-ordinates were determined. It should
-   be given as a decimal years value, with or without decimal places
-   ("1996.8" for example). Such values are interpreted as a Besselian
-   epoch if less than 1984.0 and as a Julian epoch otherwise.
-3 FRAME
-FRAME = LITERAL (Read)
-   A string determining the co-ordinate Frame in which the bounds
-   of the current picture are to be reported. When a picture is
-   created by an application such as PICDEF, DISPLAY, etc, WCS
-   information describing the available co-ordinate systems are stored
-   with the picture in the graphics database. This application can
-   report bounds in any of the co-ordinate Frames stored with the
-   current picture. The string supplied for FRAME can be one of the
-   following:
-
-   - A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, etc. The
-   special domain AGI_WORLD is used to refer to the world co-ordinate
-   system stored in the AGI graphics database. This can be useful if
-   no WCS information was store with the picture when it was created.
-
-   - An integer value giving the index of the required Frame.
-
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
-   section "Sky Co-ordinate Systems" in SUN/95).
-
-   If a null value (!) is supplied, bounds are reported in the
-   co-ordinate Frame which was current when the picture was created.
-   [!]
-3 LABEL
-LABEL = LITERAL (Write)
-   The label of the current picture.  It is blank if there is no
-   label.
-3 NAME
-NAME = LITERAL (Write)
-   The name of the current picture.
-3 OUTLINE
-OUTLINE = _LOGICAL (Read)
-   If OUTLINE is TRUE, then an outline will be drawn around the
-   current picture to indicate its position. [FALSE]
-3 REFNAM
-REFNAM = LITERAL (Write)
-   The reference object associated with the current picture.  It
-   is blank if there is no reference object.  Up to 132 characters
-   will be written.
-3 REPORT
-REPORT = _LOGICAL (Read)
-   If this is FALSE the state of the graphics device is not
-   reported, merely the results are written to the output
-   parameters.  It is intended for use within procedures. [TRUE]
-3 STYLE
-STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the outline (see parameter OUTLINE). The format
-   of the axis values reported on the screen may also be controlled.
-
-   A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported).
-
-   The appearance of the outline is controlled by the attributes
-   Colour(Border), Width(Border), etc (the synonym "Outline" may be
-   used in place of "Border"). In addition, the following attributes
-   may be set in order to control the appearance of the formatted axis
-   values reported on the screen: Format, Digits, Symbol, Unit. These
-   may be suffixed with an axis number (e.g. "Digits(2)") to refer to
-   the values displayed for a specific axis. [current value]
-3 X1
-X1 = LITERAL (Write)
-   The lowest value found within the current picture for axis 1 of the
-   requested co-ordinate Frame (see parameter FRAME).
-3 X2
-X2 = LITERAL (Write)
-   The highest value found within the current picture for axis 1 of the
-   requested co-ordinate Frame (see parameter FRAME).
-3 Y1
-Y1 = LITERAL (Write)
-   The lowest value found within the current picture for axis 2 of the
-   requested co-ordinate Frame (see parameter FRAME).
-3 Y2
-Y2 = LITERAL (Write)
-   The highest value found within the current picture for axis 2 of the
-   requested co-ordinate Frame (see parameter FRAME).
-2 Examples
-idstate
-   Shows the status of the current graphics device. The bounds of
-   the picture are displayed in the current co-ordinate Frame of
-   the picture.
-
-idstate ps_l basepic
-   Shows the status of the ps_l device. The bounds of the picture
-   are displayed in the BASEPIC Frame (normalised device co-ordinates
-   in which the short of the two dimensions of the display surface
-   has length 1.0).
-
-idstate outline frame=pixel style="'colour=red,width=3'"
-   Shows the status of the current graphics device and draws a
-   thick, red outline around the current database picture. The
-   bounds of the picture are displayed in the PIXEL co-ordinate
-   Frame (if available).
-
-idstate refnam=(ndfname)
-   Shows the status of the current graphics device.  If there
-   is a reference data object, its name is written to the ICL
-   variable NDFNAME.
-
-idstate x1=(x1) x2=(x2) y1=(y1) y2=(y2) frame=basepic
-   Shows the status of the current graphics device.  The bounds
-   of the current picture in normalised device co-ordinates
-   are written to the ICL variables: X1, X2, Y1, Y2.
-2 Notes
--  The displayed bounds are the extreme axis values found anywhere
-within the current picture. In some situations these extreme
-values may not occur on the edges of the picture. For instance, if
-the current picture represents a region including the north
-celestial pole, then displaying the picture bounds in celestial
-co-ordinates will give a declination upper limit of +90 degrees,
-whilst the RA limits will be 0 hours and (close to) 24 hours.
-
--  Previous versions of this application reported bounds in
-"Normalised Device Co-ordinates". Similar functionality is now
-provided by setting parameter FRAME to "BASEPIC". Be aware though,
-that "Normalised Device Co-ordinates" were normalised so that the
-longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
-are normalised so that the shorter of the two axes has length 1.0.
-2 Related_Applications
-   KAPPA: IDSTATE.
-2 Authors
-RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
-2 History
- 1-DEC-1989 (RFWS):
-    Original version.
-
- 13-DEC-1989 (RFWS):
-    Added call to MSG_SYNC to synchonise message system and
-    graphical output.
-
- 1990 Jan 16 (MJC):
-    Added output of the current picture's label, if it exists.
-
- 1991 February 8 (MJC):
-    Added output of the current picture's reference object, if it
-    exists.
-
- 1991 March 24 (MJC):
-    Converted to SST prologue.
-
- 1991 August 20 (MJC):
-    Added output parameters and REPORT parameter.
-
- 7-JAN-2000 (DSB):
-    Big changes for the first AST/PGPLOT version.
 1 Image-display_Interface
 
 KAPPA utilises IDI (Image-display Interface) for some interactions
@@ -12924,7 +12631,6 @@ mode.
 First we display an image on the xw windows device.
  
      ICL> gdset xw
-     ICL> idset xw
      ICL> display $KAPPA_DIR/ccdframec mode=pe \ 
      Data will be scaled from 2366.001 to 2614.864. 
      ICL> globals 
@@ -20542,7 +20248,7 @@ ovclear current
 ovclear xoverlay
    Clears the xoverlay device.
 2 Related_Applications
-   KAPPA: GDCLEAR, IDCLEAR, OVSET.
+   KAPPA: GDCLEAR, OVSET.
 2 Authors
 MJC: Malcolm J. Currie  (STARLINK)
 2 History
@@ -23268,7 +22974,7 @@ You may receive an error message, which says failed to store
 such-and-such picture in the graphics database.  For some reason the
 database was corrupted due to reasons external to KAPPA.  Don't
 worry, usually your plot will have appeared, and to fix the problem
-run GDCLEAR/IDCLEAR or delete the database file
+run GDCLEAR or delete the database file
 ($AGI_USER/agi_<node>.sdf, where you substitute your system's node
 name for <node>).  You will need to redraw the last plot if you
 still require it, say for interaction.
@@ -25353,12 +25059,10 @@ unnecessary prompting.  However, there is an ulterior motive as well.
 The selection of devices outside of the graphics applications
 enables us to perform other necessary actions just once.
 
-There are commands for selecting each type of device: GDSET, IDSET
-and OVSET for the graphics device, image display and overlay
-respectively.  For example,
+There are commands for selecting each type of device: GDSET
+and OVSET for the graphics device and overlay respectively.  For example,
  
-     ICL> idset xwindows
-     % gdset ps_l
+     ICL> gdset xwindows
  
 A selection remains in force until you change it via another
 device-selecting command, use NOGLOBALS, or delete the globals
@@ -25450,7 +25154,6 @@ The following tells KAPPA that these are the current devices.
 These remain as global parameters, so you probably will not need to
 issue these commands that often.
 
-     % idset xwindows
      % gdset x2windows
      % ovset xoverlay
 
@@ -27794,10 +27497,6 @@ HISTAT      - Computes ordered statistics for an NDF's pixels using
               an histogram.
 HISTEQ      - Performs an histogram equalisation on an NDF.
 HISTOGRAM   - Computes an histogram of an NDF's values.
-IDCLEAR     - Clears an image display and purges its database
-              entries.
-IDSET       - Selects a current image-display device.
-IDSTATE     - Shows the current status of an image display.
 KAPHELP     - Gives help about KAPPA.
 KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
 LAPLACE     - Performs a Laplacian convolution as an edge detector

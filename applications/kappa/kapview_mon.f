@@ -164,18 +164,6 @@
          ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
             CALL GDSTATE( STATUS )
 
-*  Clears an image display and purges its database entries.
-         ELSE IF ( NAME .EQ. 'IDCLEAR' ) THEN
-            CALL GDCLEAR( STATUS )
-
-*  Selects a current image-display device.
-         ELSE IF ( NAME .EQ. 'IDSET' ) THEN
-            CALL IDSET ( STATUS )
-
-*   Shows the current status of an image display.
-         ELSE IF ( NAME .EQ. 'IDSTATE' ) THEN
-            CALL IDSTATE( STATUS )
-
 *  Draws a line plot of a 1-d NDF's data values against their axis
 *  co-ordinates.
          ELSE IF ( NAME .EQ. 'LINPLOT' ) THEN

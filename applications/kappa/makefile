@@ -515,8 +515,6 @@ KAPVIEW_F_ROUTINES = \
 ardplot.f colcomp.f contour.f \
 cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
-idclear.f \
-idset.f idstate.f \
 linplot.f lutable.f \
 lutsave.f lutview.f lutedit.f \
 mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
@@ -2355,9 +2353,6 @@ histogram.o:	 SAE_PAR PAR_PAR PAR_ERR NDF_PAR PRM_PAR AST_PAR NUM_DEC_CVT NUM_DE
 hstdsp.o:	 SAE_PAR
 hstlo.o:	 SAE_PAR
 hstrep.o:	 SAE_PAR
-idclear.o:	 SAE_PAR
-idset.o:	 SAE_PAR CTM_PAR
-idstate.o:	 SAE_PAR DAT_PAR AST_PAR
 imlst.o:	 SAE_PAR PRM_PAR
 inhi.o:	 SAE_PAR DAT_PAR PAR_ERR
 inpe.o:	 SAE_PAR PAR_ERR
