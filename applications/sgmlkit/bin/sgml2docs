@@ -172,17 +172,21 @@ tempdest=tmp.stamp
 # are significant issues about version skew, since this script does
 # depend rather heavily on the dvi2bitmap version, but on the other,
 # this logic is just begging to go wrong somewhere....
-DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
-if [ $DVI2BITMAPVERSION -lt 9 ]; then
-    echo "Using" $DVI2BITMAP "at"
-    which `echo $DVI2BITMAP | awk '{print $1}'`
-    echo "Need dvi2bitmap version 0.9+, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
-    exit 1
-fi
+#DVI2BITMAPVERSION=`$DVI2BITMAP -V | sed -n '1s/[-.,]/ /gp'|awk '{print $3}'`
+d2bv=`$DVI2BITMAP -V | sed -n '1s/.*\([0-9][0-9]*\)\.\([0-9][0-9]*\)\([^0-9]*\([0-9][0-9]*\)\).*/\1 \2 \4 \3/p' | awk '{print $2}'`
+case $d2bv in
+	9|10|11) d2bv10=false;;
+	*) 
+		echo "Using" $DVI2BITMAP "at"
+		which `echo $DVI2BITMAP | awk '{print $1}'`
+		echo "Need dvi2bitmap version 0.9--0.11, but $DVI2BITMAP is version "`$DVI2BITMAP -V|sed -n 1p`
+		exit 1
+		;;
+esac
 
 PROGNAME=`basename $0`
 
-tidy-up ()
+tidyup ()
 {
     if $DEBUGGING; then
 	echo "$PROGNAME:I: Work directory $WORKDIR not deleted"
@@ -195,7 +199,7 @@ tidy-up ()
 	fi
     fi
 }
-trap tidy-up 0
+trap tidyup 0
 
 # Start parsing the arguments
 
@@ -247,7 +251,13 @@ while [ $# -gt 0 ]; do
 	    fi
 	    ;;
 	--ignore-manifest) USEMANIFEST=false ;;
-	--quiet) VERBOSE=false; DVI2BITMAP="$DVI2BITMAP -q" ;;
+	--quiet) VERBOSE=false
+            case $d2bv in
+                9)  DVI2BITMAP="$DVI2BITMAP -q" ;;
+                10) DVI2BITMAP="$DVI2BITMAP --verbose=quiet" ;;
+                11) DVI2BITMAP="$DVI2BITMAP --verbose=quiet" ;;
+            esac
+       		;;
 	--debug) DEBUGGING=true ;;
 	--help) echo $USAGE; exit 0;;
 	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
@@ -349,6 +359,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: SGMLNORM=$SGMLNORM"
     echo "$PROGNAME:I: LIBDIR=$LIBDIR"
     echo "$PROGNAME:I: DVI2BITMAP=$DVI2BITMAP"
+    echo "$PROGNAME:I: dvi2bitmap version is $d2bv"
     echo "$PROGNAME:I: LATEX=$LATEX"
     echo "$PROGNAME:I: BIBTEX=$BIBTEX"
     echo "$PROGNAME:I: WORKDIR=$WORKDIR"
@@ -356,6 +367,7 @@ if $DEBUGGING; then
     echo "$PROGNAME:I: TARGETFORMAT=$TARGETFORMAT"
     echo "$PROGNAME:I: NORMTYPE=$NORMTYPE"
 fi
+
 
 
 
@@ -400,18 +412,38 @@ if [ $TARGETFORMAT -eq 0 ]; then
     if [ -s "$ROOT.imgeq.list" ]; then
 	# Find dvi2bitmap's default format
 	# Default to gif if the dvi2bitmap version doesn't have the -Qt option
-	#imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif gif) | awk '{print $2}'`
+        case $d2bv in
+            9)  imgfmt=`($DVI2BITMAP -Qt 2>/dev/null || echo gif gif) | awk '{print $2}'`
+                ;;
+            10) imgfmt=`$DVI2BITMAP --query=types --process=options-only | awk '{print $2}'`
+                ;;
+            11) imgfmt=`$DVI2BITMAP --query=types --process=options | awk '{print $2}'`
+                ;;
+        esac
+
 	# Force the image format to be gif -- PNG transparency isn't
 	# yet well-enough supported in browsers.
-	imgfmt='gif'
+	#imgfmt='gif'
 	$VERBOSE && echo "$PROGNAME:I: $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list"
 	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
 	$VERBOSE && echo "$PROGNAME:I: $LATEX $ROOT.imgeq.tex"
 	$run $LATEX $ROOT.imgeq.tex $OUTPUTDEST
 
-	$VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 3 -s 3 -Pt $ROOT.imgeq.dvi" 
-	$run $DVI2BITMAP -m 3 -s 3 -Pt -q -Qb $ROOT.imgeq.dvi >dvi2bitmap.log
+        case $d2bv in
+            9)  
+                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP -m 3 -s 3 -Pt $ROOT.imgeq.dvi" 
+                $run $DVI2BITMAP -m 3 -s 3 -Pt -q -Qb $ROOT.imgeq.dvi >dvi2bitmap.log
+                ;;
+            10)
+                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP --magnification=3 --scale=3 --process=transparency=true $ROOT.imgeq.dvi"
+                $run $DVI2BITMAP --magnification=3 --scale=3 --process=transparent=true --verbose=quiet --query=bitmaps $ROOT.imgeq.dvi >dvi2bitmap.log
+                ;;
+            11)
+                $VERBOSE && echo "$PROGNAME:I: $DVI2BITMAP --magnification=3 --scale=3 --process=transparency $ROOT.imgeq.dvi"
+                $run $DVI2BITMAP --magnification=3 --scale=3 --process=transparent --verbose=quiet --query=bitmaps $ROOT.imgeq.dvi >dvi2bitmap.log
+                ;;
+        esac
 
 	if [ -r dvi2bitmap.log -a -r $ROOT.imgeq.labelmap ]; then
 	    awk '
