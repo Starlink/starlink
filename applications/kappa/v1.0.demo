@@ -80,12 +80,13 @@ demo v1.0 {
       command {Obey ndfpack wcsframe "ndf=temp frame=pixel"}
       command {Obey kapview display "in=temp(-228:120,225:515) mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/warm_lut style=def accept"}
 
-      pause 3
-
       text "Graphics applications are no longer restricted to 8-bit
-      displays, so you can now have different colour tables in one display."
+      displays, so you can now have different colour tables in one
+      display. On 8-bit displays the above pictures will share a common
+      colour table, but on 16 or 24 bit displays each picture will have
+      its own colour table."
 
-      pause 5
+      pause 10
 
       command {Obey kappa sqorst "in=$KAPPA_DIR/m57(-228:120,225:515) out=temp factors=\[1.5,1\]"}
       command {Obey kapview picdef "mode=cc aspect=1.5 fraction=0.5"}
@@ -147,13 +148,13 @@ demo v1.0 {
       the old TRANSFORMER application, with the difference that REGRID
       correctly propagates WCS information."
 
-      pause 8
+      pause 6
 
       text "The above right hand image of m57 has been created by resampling 
       the left hand image using REGRID so that the radius axis is horizontal and the
       angle axis is vertical."
 
-      pause 7
+      pause 5
 
       command {Obey kapview gdclear ""}
       text "The old commands for creating and editing colour tables have
@@ -161,15 +162,6 @@ demo v1.0 {
       interface which allows colour tables to be manipulated in many ways."
 
       pause 7
-
-      text "The LUTEDIT interface will now be started. This KAPPA demo will
-      pause until you close the LUTEDIT interface."
-
-      pause 4
-
-      command {exec $KAPPA_DIR/lutedit.tcl}
-
-
 
       command {exec rm -f nullstyle.tmp}
       command {exec rm -f stardemo.tmp}

@@ -180,12 +180,12 @@
 # associated with the last one within the supplied file (or files) is used.
 
 
-#  Describe the package. Note, the PKG_VERS string is replaced by
+#  Describe the package. Note, the 1.0-1 string is replaced by
 #  the package version number when the kappa.tar.Z release file is created. 
 #  This is done by script $KAPPA_REF/make_unix_release.
 package {
    name "KAPPA"
-   version "PKG_VERS"
+   version "1.0-1"
    email "ussc@star.rl.ac.uk"
    url "http://www.ast.man.ac.uk/~dsb/kappa/kappa.html"
    sun "sun95"
@@ -264,9 +264,13 @@ lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^$KAPPA_DIR/sty0 accept"}
 
 # LISTSHOW: For some unknown reason, DAT_CLONE reports an "invalid locator" 
 # error within PAR_PUT0I for output parameter DIM unless a value is assigned 
-# to DIM. This does not happen from ICL or Unix shells.
-      command {Obey kappa listshow "incat=./stardemo plot=hline quiet=no dim=2 accept"}
-      command {exec rm -f stardemo.FIT}
+# to DIM. This does not happen from ICL or Unix shells. Also, for some
+# reason, listshow fails sometimes claiming that the FITS file has
+# incorrect headers and so cannot be accessed. This can be fixed by using a
+# copy of the file created by listmake.
+      command {exec cp stardemo.FIT sss.FIT}
+      command {Obey kappa listshow "incat=sss plot=hline quiet=no dim=2 accept"}
+      command {exec rm -f stardemo.FIT sss.FIT}
 
       text "KAPPA can access data in several common astronomical formats.
       It does this by converting data to and from a \"native\" format
@@ -377,7 +381,7 @@ lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^$KAPPA_DIR/sty0 accept"}
 
       command {Obey kapview gdclear "current=yes"}
       command {exec cp $KAPPA_DIR/ccdframec.sdf ./}
-      command {Obey ndfpack wcsadd "ndf=./ccdframec frame=pixel domain=oldpixel"}
+      command {Obey ndfpack wcsadd "ndf=./ccdframec maptype=unit frame=pixel domain=oldpixel"}
       command {Obey kappa rotate "angle=30 in=./ccdframec out=./a"}
       command {Obey kapview palentry "palnum=14 colour=indianred4"}
       command {Obey kapview display "in=./a margin=\! style=^$KAPPA_DIR/sty3 badcol=indianred4 accept"}
@@ -407,32 +411,32 @@ lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^$KAPPA_DIR/sty0 accept"}
       suitable plug-in data readers such as provided by <htx:sun55
       CONVERT>)."
 
-      command {Obey ndfpack fitslist "in=$KAPPA_DIR/m31"}
-      alpha on
-      pause 12
+       command {Obey ndfpack fitslist "in=$KAPPA_DIR/m31"}
+       alpha on
+       pause 12
 
-      text "<emph NDF Facilities:> All the main attributes of data files
-      in the the native NDF format can be controlled and examined.
-      Variance arrays, Axis arrays, <for etc> can be created, data
-      processing history can be examined and modified."
-
-      command {Obey ndfpack ndftrace "ndf=$KAPPA_DIR/m31"}
-      pause 10
-
-      text "<emph Image Generation:> Artificial images can be created
-      using any general algebraic expression. Noise (Gaussian or Poisson)
-      may be added. Regions of missing data in real images may be filled
-      in by a automatically created smoothly varying function. Polynomial
-      or spline surfaces may be fitted to selected areas in real images
-      and then used to create artificial images representing the fit."
-
-      pause 1
-      alpha off
+       text "<emph NDF Facilities:> All the main attributes of data files
+       in the the native NDF format can be controlled and examined.
+       Variance arrays, Axis arrays, <for etc> can be created, data
+       processing history can be examined and modified."
+ 
+       command {Obey ndfpack ndftrace "ndf=$KAPPA_DIR/m31"}
+       pause 10
+ 
+       text "<emph Image Generation:> Artificial images can be created
+       using any general algebraic expression. Noise (Gaussian or Poisson)
+       may be added. Regions of missing data in real images may be filled
+       in by a automatically created smoothly varying function. Polynomial
+       or spline surfaces may be fitted to selected areas in real images
+       and then used to create artificial images representing the fit."
+ 
+       pause 1
+       alpha off
    }
 
-#  A new step is needed here (???) otherwise, the AGA database is not cleared properly.
+#  A new step is needed here (???) otherwise, the AGI database is not cleared 
+#  properly.
    step {
-      command {Obey kapview gdclear ""}
       command {Obey kappa maths "exp='sin(XA*XB*0.005)/(XA*XA+XB*XB)' type=_real lbound=\[-100,-100\] ubound=\[100,100\] out=a"}
       command {Obey kapview display "in=./a mode=per percentiles=\[1,99\] style='title=SIN( X*Y*0.005 )/( X*X + Y*Y )'"}
       command {exec rm -f ./a.sdf}

@@ -2073,6 +2073,8 @@ proc Command {command} {
 
       if { [catch {eval $command} mess] } {
          Message "Error executing command \"$command\" - $mess"
+      } else {
+         Diag "         $mess"
       }
    }
    return 1
@@ -2738,7 +2740,7 @@ proc ResumeDemo {} {
 }
 
 
-proc Resize {} {
+proc Resize { init } {
 #+
 #  Name:
 #     Resize
@@ -2788,10 +2790,12 @@ proc Resize {} {
    }
 
 # Establish the graphics and image display devices.
-   Obey kapview lutable "mapping=linear coltab=grey device=$DEVICE" 1
-   Obey kapview paldef "device=$DEVICE" 1
-   Obey kapview gdclear "device=$DEVICE" 1
-   Obey kapview gdset "device=$DEVICE" 1
+   if { $init } {
+      Obey kapview lutable "mapping=linear coltab=grey device=$DEVICE" 1
+      Obey kapview paldef "device=$DEVICE" 1
+      Obey kapview gdclear "device=$DEVICE" 1
+      Obey kapview gdset "device=$DEVICE" 1
+   }
    set DOING ""
 
 #  Re-instate the original binding for Configure.
@@ -2876,8 +2880,12 @@ proc AdamReset {} {
       }
 
 #  Re-establish the graphics devices.
+      after 1000
       Obey kapview gdset "device=$DEVICE" 1
+
+      after 1000
       Obey kapview gdclear ""
+
    }
    return 1
 }
@@ -2897,10 +2905,9 @@ proc Head {text} {
 }
 
 proc Alpha {state} {
-   global CAN
    global CHECK_DEMO
    global DEMO_FILE
-   global ALPHATEXT
+   global AF
 
    Diag "      $state"
 
@@ -2909,16 +2916,12 @@ proc Alpha {state} {
    if { !$CHECK_DEMO } {
 
       if { $state == "on" } {   
-         if { [$CAN find withtag alpha] == "" } {
-            MakeAlpha 
-         } { 
-            $ALPHATEXT delete 1.0 end
-         }
+         MakeAlpha 
 
       } elseif { $state == "off" } {   
-         if { [$CAN find withtag alpha] != "" } {
-            $CAN delete alpha
-         }
+         if { [info exists AF] && [winfo exists $AF] } {
+            wm withdraw $AF
+         } 
 
       } {
          if { [info exists DEMO_FILE] } {
@@ -3476,17 +3479,17 @@ proc SetHtxTag {widget tag} {
 }
 
 proc MakeAlpha {} {
-   global CAN
    global ALPHATEXT
    global TT_FONT
    global AF
+   global CAN
 
 #  Create a frame containing a text widget and a scroll bar if this has
 #  not already been done.
    if { ![info exists AF] } {
 
 # Create the Frame.
-      set AF [frame $CAN.fr]      
+      set AF [toplevel .stardemoAlpha]      
 
 # Create the scroll bar.
       set sc [scrollbar $AF.sc -command "$AF.lab yview" -width 15 -relief sunken]
@@ -3500,19 +3503,18 @@ proc MakeAlpha {} {
       pack $sc -side right -fill y
       pack $ALPHATEXT -side left -fill both -expand 1 
 
-#      pack $AF -expand 1 -fill both
+# Put the text window in the top right corner and make it the saem size
+# as the canvas.
+      update idletasks
+      regsub {\+1\+1} [winfo geometry $CAN] "\-1\+1" res
+      wm geometry $AF $res
 
-# Adjust the width of the frame so that it occupies exactly the
-# full width available.
-   update idletasks
-      $AF configure -height [winfo height $CAN]
-      $AF configure -width [winfo width $CAN]
-
+# If the toplevel already exists, ensure it is visible and empty the text
+# widget.
+   } else {
+       $ALPHATEXT delete 1.0 end
+       wm deiconify $AF
    }
-
-# Add the frame to the canvas as a window canvas item.
-   $CAN create window 0 0 -anchor nw -tags alpha -window $AF \
-        -height [winfo height $CAN] -width [winfo width $CAN] 
 
 }
 
