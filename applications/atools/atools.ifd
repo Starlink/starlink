@@ -412,7 +412,7 @@ iraf! {
 
          helplib {$ATOOLS_HELP}
 
-         parameter frame1 {
+         parameter iframe1 {
             position 2
             type LITERAL
             prompt {The index or Domain of the input-end Frame}
@@ -421,7 +421,7 @@ iraf! {
             helpkey *
           }
 
-         parameter frame2 {
+         parameter iframe2 {
             position 3
             type LITERAL
             prompt {The index or Domain of the output-end Frame}

@@ -88,10 +88,10 @@
      :                 STATUS )
 
 *  Get the index of the first Frame.
-      CALL ATL1_GTFRM( 'FRAME1', IAST, IFRM1, STATUS )
+      CALL ATL1_GTFRM( 'IFRAME1', IAST, IFRM1, STATUS )
 
 *  Get the index of the second Frame.
-      CALL ATL1_GTFRM( 'FRAME2', IAST, IFRM2, STATUS )
+      CALL ATL1_GTFRM( 'IFRAME2', IAST, IFRM2, STATUS )
 
 *  Get the required Mapping.
       RESULT = AST_GETMAPPING( IAST, IFRM1, IFRM2, STATUS )
