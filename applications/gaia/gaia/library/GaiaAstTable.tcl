@@ -701,7 +701,7 @@ itcl::class gaia::GaiaAstTable {
       }
       $itk_component(table) remove_selected
       set id [lindex [lindex $selected 0] 0]
-      delete_mark_ $id
+      remove_mark_ $id
 
       # update the display
       redraw
