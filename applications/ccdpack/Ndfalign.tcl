@@ -364,9 +364,6 @@
 
 #  Call the inherited deactivate method.
          chain
-
-#  Unset all canvas bindings.
-         unbindall
       }
 
 
