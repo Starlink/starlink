@@ -789,6 +789,6 @@
       END IF
 
 *  Release the logical-unit.
-      CALL FIO_GUNIT( FUNIT, STATUS )
+      CALL FIO_PUNIT( FUNIT, STATUS )
 
       END
