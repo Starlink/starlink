@@ -1407,13 +1407,18 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       YC=YTOT/REAL(NPIX)
       HX=0.5*SCALE(1)
       HY=0.5*SCALE(2)
+	print*,hx,hy
       OFFSET=REAL(IXMIN-1)*SCALE(1)
+	print*,offset
       XMIN=BASE(1) +OFFSET -HX
       OFFSET=REAL(IXMAX-1)*SCALE(1)
+	print*,offset
       XMAX=BASE(1)+ OFFSET +HX
       OFFSET=REAL(IYMIN-1)*SCALE(2)
+	print*,offset
       YMIN=BASE(2)+ OFFSET -HY
       OFFSET=REAL(IYMAX-1)*SCALE(2)
+	print*,offset
       XMAX=BASE(2)+ OFFSET +HY
 
 	print*,xmin,xmax,ymin,ymax
