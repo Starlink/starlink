@@ -34,7 +34,7 @@ $!    altered.
 $!
 $! Prior Requirements:
 $!    It is assumed that you are logged in for ADAM and Figaro
-$!    development (the procedure CONVERT_DIR:CONVERTDEV.COM will do
+$!    development (the procedure CONVERT_DIR:CON_DEV.COM will do
 $!    this) and you are currently in the directory where CONVERT is to
 $!    be built.  
 $!
