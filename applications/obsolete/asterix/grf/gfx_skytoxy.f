@@ -35,13 +35,13 @@
       ELSE IF ( FRAME .EQ. 2 ) THEN
         LCEL(1) = AZ * MATH__DDTOR
         LCEL(2) = EL * MATH__DDTOR
-        CALL WCI_CNS2S( LCEL, G_ECLSYS, G_SYSID, EQU, STATUS )
+        CALL WCI_CNS2S( G_ECLSYS, LCEL, G_SYSID, EQU, STATUS )
 
 *  Galactic supplied?
       ELSE IF ( FRAME .EQ. 3 ) THEN
         LCEL(1) = AZ * MATH__DDTOR
         LCEL(2) = EL * MATH__DDTOR
-        CALL WCI_CNS2S( LCEL, G_GALSYS, G_SYSID, EQU, STATUS )
+        CALL WCI_CNS2S( G_GALSYS, LCEL, G_SYSID, EQU, STATUS )
 
       END IF
 

@@ -41,13 +41,13 @@
 
 *  Ecliptic required?
       ELSE IF ( FRAME .EQ. 2 ) THEN
-        CALL WCI_CNS2S( EQU, G_SYSID, G_ECLSYS, LCEL, STATUS )
+        CALL WCI_CNS2S( G_SYSID, EQU, G_ECLSYS, LCEL, STATUS )
         AZ = LCEL(1) * MATH__DRTOD
         EL = LCEL(2) * MATH__DRTOD
 
 *  Galactic required?
       ELSE IF ( FRAME .EQ. 3 ) THEN
-        CALL WCI_CNS2S( EQU, G_SYSID, G_GALSYS, LCEL, STATUS )
+        CALL WCI_CNS2S( G_SYSID, EQU, G_GALSYS, LCEL, STATUS )
         AZ = LCEL(1) * MATH__DRTOD
         EL = LCEL(2) * MATH__DRTOD
 
