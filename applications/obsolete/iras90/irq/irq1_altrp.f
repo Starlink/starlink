@@ -160,6 +160,7 @@
 
 *  Initialise the returned syntax error pointer to zero.
       ERRPNT = 0
+      LSYM = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN

@@ -162,6 +162,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise
+      EDGE1 = 0
+      EDGE2 = 0
+
 *  Find the start and end of the scan section covered by all included
 *  detectors.
       CALL IRC_TRUNC( IDC, NDETS, DETIND, START, FINISH, STATUS )
