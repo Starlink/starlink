@@ -163,6 +163,9 @@
 *        Modified to handle cases where input catalogue contains only 2
 *        positions and the box size is an exact integral part of the 
 *        axis range.
+*     7-APR-2003 (DSB):
+*        Modified to propagate AXIS Frame from catalogue WCS FrameSet to
+*        the AXIS structures of the output NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -212,6 +215,7 @@
       INTEGER CLEN               ! Used length of a string
       INTEGER CMAP               ! Pointer to an AST Mapping
       INTEGER DID                ! Index of data column in GI array
+      INTEGER FS                 ! FrameSet connecting GRID and AXIS Frames
       INTEGER GI( MAXID )        ! CAT identifiers for columns to be read
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IDTYPD             ! CAT component type for COLDAT
@@ -285,7 +289,12 @@
       REAL X0                    ! X at bottom left of bottom left cell
       REAL Y0                    ! Y at bottom left of bottom left cell
       REAL Z0                    ! Z at bottom left of bottom left cell
-
+      INTEGER IAXIS              ! Index of AXIS Frame
+      INTEGER IPIX               ! Index of PIXEL Frame
+      INTEGER AXMAP              ! PIXEL -> AXIS Mapping
+      INTEGER AXFRM              ! The AXIS Frame
+      INTEGER I                  ! Loop index
+      INTEGER FRM                ! Frame pointer
 *.
 
 *  Check the inherited global status.
@@ -627,6 +636,16 @@
             TMAP = AST_SIMPLIFY( AST_CMPMAP( WINMAP, CMAP, .TRUE., ' ', 
      :                                       STATUS ), STATUS )
 
+*  Remove the AXIS Frame in the output NDF default FrameSet, so that any
+*  AXIS Frame in the catalogue WCS FrameSet will be retained. 
+            DO I = 1, AST_GETI( IWCSO, 'NFRAME', STATUS )
+               FRM = AST_GETFRAME( IWCSO, I, STATUS )
+               IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+     :                       'AXIS' ) THEN
+                  CALL AST_REMOVEFRAME( IWCSO, I, STATUS )
+               END IF     
+            END DO
+
 *  Add the input catalogues WCS FrameSet into the default FrameSet
 *  obtained from the output NDF.  
             CALL AST_ADDFRAME( IWCSO, AST__BASE, TMAP, IWCS, STATUS )
@@ -834,8 +853,9 @@
          END IF
 
 *  Store the Axis values.
-         CALL POL1_AXSET( GOTZ, TR2, NXBIN, NYBIN, NZBIN, %VAL( IPAX1 ), 
-     :                    %VAL( IPAX2 ), %VAL( IPAX3 ), STATUS )
+         CALL POL1_AXSET( GOTZ, AST__NULL, TR2, NXBIN, NYBIN, NZBIN, 
+     :                    %VAL( IPAX1 ), %VAL( IPAX2 ), %VAL( IPAX3 ), 
+     :                    STATUS )
 
 *  Store the Axes Label and Units strings.  
          CALL CAT_TIQAC( GI( XID ), 'NAME', LABEL, STATUS )
@@ -871,6 +891,91 @@
             CLEN = CHR_LEN( UNITS )
             IF( CLEN .GT. 0 ) CALL NDF_ACPUT( UNITS( : CLEN ), INDF,
      :                                        'UNITS', 3, STATUS )
+         END IF
+
+*  If the COLX, COLY, COLZ values are known to be pixel co-ordinates,
+*  create AXIS structures in the output NDF holding values from the AXIS
+*  Frame of the WCS FrameSet (if any) inherited from the catalogue.
+      ELSE IF( SHAPE ) THEN 
+
+*  Get the indices of the AXIS and PIXEL Frames in the output NDF FrameSet.
+         IAXIS = AST__NOFRAME
+         DO I = 1, AST_GETI( IWCSO, 'NFRAME', STATUS )
+            FRM = AST_GETFRAME( IWCSO, I, STATUS )
+
+            IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+     :                    'AXIS' ) THEN
+               IAXIS = I
+
+            ELSE IF( AST_GETC( FRM, 'DOMAIN', STATUS ) .EQ. 
+     :              'PIXEL' ) THEN
+               IPIX = I
+            END IF     
+
+         END DO
+
+*  If found, get the Mapping from PIXEL to AXIS. 
+         IF( IAXIS .NE. AST__NOFRAME ) THEN
+            AXMAP = AST_GETMAPPING( IWCSO, IPIX, IAXIS, STATUS )
+
+*  Erase any existing AXIS structures in the output NDF.
+            CALL NDF_RESET( INDF, 'AXIS', STATUS )
+
+*  Map the AXIS Centre arrays. This will produce default AXIS values
+*  equaivelent to PIXEL values. 
+            CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'UPDATE', IPAX1, 
+     :                     NEL, STATUS )
+            CALL NDF_AMAP( INDF, 'CENTRE', 2, '_REAL', 'UPDATE', IPAX2, 
+     :                     NEL, STATUS )
+            IF( GOTZ ) THEN 
+               CALL NDF_AMAP( INDF, 'CENTRE', 3, '_REAL', 'UPDATE', 
+     :                        IPAX3, NEL, STATUS )
+            ELSE
+               IPAX3 = IPAX1
+            END IF
+
+*  Store the Axis values.
+            CALL POL1_AXSET( GOTZ, AXMAP, TR2, NXBIN, NYBIN, NZBIN, 
+     :                       %VAL( IPAX1 ), %VAL( IPAX2 ), 
+     :                       %VAL( IPAX3 ), STATUS )
+
+*  Store the Axes Label and Units strings.  
+            AXFRM = AST_GETFRAME( IWCSO, IAXIS, STATUS )
+
+            LABEL = AST_GETC( AXFRM, 'LABEL(1)', STATUS )
+            CLEN = CHR_LEN( LABEL )
+            IF( CLEN .GT. 0 ) CALL NDF_ACPUT( LABEL( : CLEN ), INDF,
+     :                                        'LABEL', 1, STATUS )
+
+            UNITS = AST_GETC( AXFRM, 'UNIT(1)', STATUS )
+            CLEN = CHR_LEN( UNITS )
+            IF( CLEN .GT. 0 ) CALL NDF_ACPUT( UNITS( : CLEN ), INDF,
+     :                                        'UNITS', 1, STATUS )
+
+            LABEL = AST_GETC( AXFRM, 'LABEL(2)', STATUS )
+            CLEN = CHR_LEN( LABEL )
+            IF( CLEN .GT. 0 ) CALL NDF_ACPUT( LABEL( : CLEN ), INDF,
+     :                                        'LABEL', 2, STATUS )
+
+            UNITS = AST_GETC( AXFRM, 'UNIT(2)', STATUS )
+            CLEN = CHR_LEN( UNITS )
+            IF( CLEN .GT. 0 ) CALL NDF_ACPUT( UNITS( : CLEN ), INDF,
+     :                                        'UNITS', 2, STATUS )
+
+            IF( GOTZ ) THEN
+
+               LABEL = AST_GETC( AXFRM, 'LABEL(3)', STATUS )
+               CLEN = CHR_LEN( LABEL )
+               IF( CLEN .GT. 0 ) CALL NDF_ACPUT( LABEL( : CLEN ), INDF,
+     :                                           'LABEL', 3, STATUS )
+	       
+               UNITS = AST_GETC( AXFRM, 'UNIT(3)', STATUS )
+               CLEN = CHR_LEN( UNITS )
+               IF( CLEN .GT. 0 ) CALL NDF_ACPUT( UNITS( : CLEN ), INDF,
+     :                                           'UNITS', 3, STATUS )
+
+            END IF
+
          END IF
 
       END IF
