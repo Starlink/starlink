@@ -59,6 +59,8 @@
 #     22-NOV-1999 (PDRAPER):
 #        Added focus_follows_mouse option to stop funny effects
 #        with click-to-focus + autoraise under CDE.
+#     06-DEC-1999 (PDRAPER):
+#        Added Norman Gray's ESP toolbox. Commented out as not ready.
 #     {enter_changes_here}
 
 #-
@@ -508,7 +510,7 @@ itcl::class gaia::Gaia {
       bind $w_ <Control-e> [code $this make_toolbox astsystem]
 
       add_menuitem $m command "Object detection...  " \
-         {Automatically detect and parameterize objects...} \
+         {Automatically detect and parameterize objects} \
 	 -command [code $this make_toolbox sextractor] \
 	 -accelerator {Control-j}
       bind $w_ <Control-j> [code $this make_toolbox sextractor]
@@ -518,6 +520,10 @@ itcl::class gaia::Gaia {
 	 -command [code $this make_toolbox contour] \
 	 -accelerator {Control-h}
       bind $w_ <Control-h> [code $this make_toolbox contour]
+
+      #add_menuitem $m command "Surface photometry...  " \
+      #   {Perform interactive galaxy surface photometry} \
+      #   -command [code $this make_toolbox esp] \
 
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
@@ -784,6 +790,19 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox contour 1]
+      }
+   }
+
+   #  Make an ESP toolbox.
+   public method make_esp_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaEsp .\#auto \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image]\
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox esp 1]
       }
    }
 

@@ -113,7 +113,7 @@ itcl::class gaia::GaiaEsp {
 	itk_component add back {
 	    gaia::StarLabelWidgetChild $w_.back \
 		    -text "Background" \
-		    -labelwidth $lwidth
+		    -labelwidth $lwidth -anchor w
 	}
 	set cs [$itk_component(back) childsite]
 	entry $cs.b -textvariable [scope values_($this,back)] -width 10
@@ -2313,7 +2313,7 @@ ardfile
 
     private method toggle_isselfc_ {} {
 	if {$values_($this,selfcflag)} {
-	    $itk_component(mult-selfc) configure -state disable
+	    $itk_component(mult-selfc) configure -state disabled
 	    add_short_help $itk_component(diag-b) \
 		{Draw a circle: expected galaxy diameter}
 	} else {

@@ -73,7 +73,7 @@ itcl::class gaia::GaiaImageCtrl {
       bindtags $canvas_ $tags
 
       #  Add bindings to zoom the main window about the cursor position.
-      $canvas_ bind $imageId_ <Shift-1> [code $this zoomin]
+      $canvas_ bind $imageId_ <Shift-1> [code eval $this zoomin]
       $canvas_ bind $imageId_ <Shift-2> [code eval $this zoomout]
 
       #  Create an object for handling image names.
@@ -616,7 +616,6 @@ itcl::class gaia::GaiaImageCtrl {
    #  Select a region of the image and zoom to show as much of it as
    #  possible.
    public method zoomin {} {
-
       #  Record current zoom.
       save_zoom_
 
