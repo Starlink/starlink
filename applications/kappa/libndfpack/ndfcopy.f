@@ -150,6 +150,10 @@
 *        Added propagation of the WCS component.
 *     12-APR-2000 (DSB):
 *        Added TRIM, TRIMWCS and USEAXIS parameters.
+*     13-FEB-2003 (DSB):
+*        Modified to avoid use of KPG1_ASGET since it automatically
+*        removes WCS axes corresponding to insignificant pixel axes, but
+*        we only want this to happen if TRIMWCS is true.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,6 +174,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER COMP(3)*(DAT__SZNAM)! NDF array component names
       CHARACTER LOC1*(DAT__SZLOC)! Locator to the output NDF
@@ -180,16 +187,22 @@
       CHARACTER LOC4C*(DAT__SZLOC)! Locator to a single input AXIS structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
+      CHARACTER TTL*80           ! Frame title
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop index
+      INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
+      INTEGER ICURR              ! Index of original current Frame
       INTEGER IERR               ! Index of first numerical error
       INTEGER IP1                ! Pointer to mapped input array
       INTEGER IP2                ! Pointer to mapped output array
+      INTEGER IPERM( NDF__MXDIM )! Output axis index for each input axis
       INTEGER IWCS               ! WCS FrameSet for output
       INTEGER IWCS2              ! WCS FrameSet from input
       INTEGER LBND( NDF__MXDIM ) ! Template NDF lower bounds
+      INTEGER LTTL               ! Length of title
+      INTEGER MAP                ! Axis permutation Mapping
       INTEGER NCOMP              ! No. of components in AXIS structure
       INTEGER NDF1               ! Input NDF identifier
       INTEGER NDF2               ! Template NDF identifier
@@ -198,8 +211,11 @@
       INTEGER NDIM               ! Number of template dimensions
       INTEGER NERR               ! Number of numerical errors
       INTEGER NEWAX              ! New output axis index
+      INTEGER NEWFRM             ! Replacement Frame
+      INTEGER NFC                ! Number of frame axes
       INTEGER OLDAX              ! Old output axis index
-      INTEGER SDIM( NDF__MXDIM ) ! Indices of significant pixel axes
+      INTEGER OPERM( NDF__MXDIM )! Input axis index for each output axis
+      INTEGER PM                 ! Axis permutation Mapping
       INTEGER SIGDIM             ! No. of significant pixel indices
       INTEGER SLBND( NDF__MXDIM )! Significant axis lower bounds
       INTEGER SUBND( NDF__MXDIM )! Significant axis upper bounds
@@ -247,8 +263,31 @@
          CALL ERR_RLSE
       END IF
 
+*  Find the number of significant axes (i.e. axes panning more than 1
+*  pixel). First find the number of dimensions.
+      CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+
+*  Loop round each dimension, counting the significant axes. Also set up
+*  axis permutation arrays which can be used to create an AST PermMap if
+*  required.
+      SIGDIM = 0
+      DO I = 1, NDIM
+         IF ( LBND( I ) .LT. UBND( I ) ) THEN
+            SIGDIM = SIGDIM + 1
+            SLBND( SIGDIM ) = LBND( I )
+            SUBND( SIGDIM ) = UBND( I )
+            OPERM( SIGDIM ) = I
+            IPERM( I ) = SIGDIM
+         ELSE
+            IPERM( I ) = -1
+         END IF
+      END DO
+
 *  See if pixel axes spanning a single pixel are to be removed.
       CALL PAR_GET0L( 'TRIM', TRIM, STATUS )
+
+*  If there are no insignificant axes, there is nothing to trim.
+      IF( SIGDIM .EQ. NDIM ) TRIM = .FALSE.
 
 *  If not, copy all components from the input NDF (or section) to create 
 *  the output NDF.
@@ -263,32 +302,82 @@
          CALL LPG_PROP( NDF1, 'Title,Label,Units,History', 'OUT', NDF3, 
      :                  STATUS )
 
+*  Get the WCS FrameSet from the input NDF. 
+         CALL KPG1_GTWCS( NDF1, IWCS, STATUS )
+
+*  Create a PermMap which goes from the NDIM-dimensional GRID Frame to
+*  a SIGDIM_dimensional copy of the GRID Frame, supplying a value of 1.0
+*  for the insignificant axes.
+         PM = AST_PERMMAP( NDIM, IPERM, SIGDIM, OPERM, 1.0D0, ' ',
+     :                     STATUS ) 
+
+*  Create a SIGDIM-dimensional GRID Frame, then add it into the WCS FrameSet, 
+*  deleting the original. Note, the Mapping returned by AST_PICKAXES
+*  supplies AST__BAD for the insignificant axes and so we use the better
+*  PermMap created above.
+         CALL AST_INVERT( IWCS, STATUS )
+         NEWFRM = AST_PICKAXES( IWCS, SIGDIM, OPERM, MAP, STATUS ) 
+         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PM, NEWFRM, STATUS ) 
+         CALL AST_REMOVEFRAME( IWCS, ICURR, STATUS )
+         CALL AST_INVERT( IWCS, STATUS )
+
 *  See if the current WCS co-ordinate Frame is to be modified so that it
 *  has the same number of axes as the pixel Frame.
          CALL PAR_GET0L( 'TRIMWCS', TRMWCS, STATUS )
 
-*  Find the number of significant axes (i.e. axes panning more than 1
-*  pixel). First find the number of dimensions.
-         CALL NDF_DIM( NDF1, NDF__MXDIM, DIM, NDIM, STATUS )
+*  Get the number of axes in the original Current Frame.
+         NFC = AST_GETI( IWCS, 'NAXES', STATUS )
 
-*  Loop round each dimension, counting the significant axes.
-         SIGDIM = 0
-         DO I = 1, NDIM
-            IF ( DIM( I ) .GT. 1 ) SIGDIM = SIGDIM + 1
-         END DO
+*  If there are no exces WCS axes, there is nothing to trim.
+         IF( NFC .LE. SIGDIM ) TRMWCS = .FALSE.
 
-*  Get the trimmed WCS FrameSet to be stored in the output NDF. 
-         CALL KPG1_ASGET( NDF1, SIGDIM, .TRUE., TRMWCS, .FALSE., SDIM, 
-     :                    SLBND, SUBND, IWCS, STATUS )
+*  If requested, delete excess WCS axes.
+         IF( TRMWCS ) THEN 
 
-*  The above call will have copied the NDF Title to the WCS current Frame
-*  Title if the Frame had no Title set. We want this application to do a
-*  straight copy, so this behaviour is not what we want. CHeck the Title
-*  attribute in the original input WCS current Frame, and if not set, clear
-*  the Title in the WCS FrameSet returned above.
-         CALL KPG1_GTWCS( NDF1, IWCS2, STATUS )
-         IF( .NOT. AST_TEST( IWCS2, 'Title', STATUS ) ) THEN
-            CALL AST_CLEAR( IWCS, 'Title', STATUS )
+*  If the Current Frame has too many axes, a PermMap is used to select
+*  SIGDIM axes from those available in the Current Frame. A value of AST__BAD 
+*  is assigned to the other axes by this PermMap. If the selected axes are 
+*  not independant of the other axes, then these AST__BAD values will result 
+*  in bad values on all axes when points are transformed from the trimmed 
+*  Current Frame to the GRID (or any other) Frame. Ideally, the value 
+*  assigned to the "non-slected" axes by the PermMap would vary in order to 
+*  ensure that points transformed into the GRID Frame reside in the slice 
+*  selected above. This may be possible with a future release of AST, which may
+*  include a "SubMap" class for doing this. Until then, the best that we
+*  can do is to assign AST__BAD values to the non-selected axes. At least
+*  this will work in the common cases.
+
+*  Get the required number of axis selections. A resonable guess should
+*  be to assume a one-to-one correspondance between Current and Base axes.
+*  Therefore, use the significant axes selected above as the defaults to be
+*  used if a null (!) parameter value is supplied.
+            DO I = 1, SIGDIM
+               IAXIS( I ) = OPERM( I )
+            END DO
+
+            CALL KPG1_GTAXI( 'USEAXIS', IWCS, SIGDIM, IAXIS, STATUS )
+
+*  Create a new Frame by picking the selected axes from the original
+*  Current Frame. This also returns a PermMap which goes from the 
+*  original Frame to the new one, using AST__BAD values for the
+*  un-selected axes.
+            NEWFRM = AST_PICKAXES( IWCS, SIGDIM, IAXIS, MAP, STATUS )
+
+*  If the original Current Frame is a CmpFrame, the Frame created from
+*  the above call to AST_PICKAXES may not have inherited its Title. If
+*  the Frame created above has no Title, but the original Frame had, then
+*  copy the original Frame's Title to the new Frame.
+            IF( AST_TEST( IWCS, 'TITLE', STATUS ) .AND.
+     :          .NOT. AST_TEST( NEWFRM, 'TITLE', STATUS ) ) THEN
+               TTL = AST_GETC( IWCS, 'TITLE', STATUS )
+               LTTL = MAX( 1, CHR_LEN( TTL ) )
+               CALL AST_SETC( NEWFRM, 'TITLE', TTL( : LTTL ), STATUS )
+            END IF
+
+*  Add this new Frame into the FrameSet. It becomes the Current Frame.
+            CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAP, NEWFRM, STATUS )
+
          END IF
 
 *  Modify the bounds of the output NDF so that the significant axes
@@ -326,7 +415,7 @@
 
 *  Loop round each re-ordered axis in the output NDF.
             DO NEWAX = 1, SIGDIM
-               OLDAX = SDIM( NEWAX )
+               OLDAX = OPERM( NEWAX )
 
 *  Get locators to the appropriate cells of the old and new AXIS arrays.
                CALL DAT_CELL( LOC2, 1, NEWAX, LOC2C, STATUS ) 
