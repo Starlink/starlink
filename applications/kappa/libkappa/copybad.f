@@ -113,9 +113,9 @@
       INTEGER IN                        ! Identifier for IN (input)
       INTEGER NBAD                      ! Number of bad pixels in output
       INTEGER OUT                       ! Identifier for OUT (output)
-      INTEGER P_OUT( 1 )                ! Pointer to OUT's data array
-      INTEGER P_OUTV( 1 )               ! Pointer to OUT's variance array
-      INTEGER P_REF( 1 )                ! Pointer to REF's data array
+      INTEGER P_OUT                     ! Pointer to OUT's data array
+      INTEGER P_OUTV                    ! Pointer to OUT's variance array
+      INTEGER P_REF                     ! Pointer to REF's data array
       INTEGER REF                       ! Identifier for REF (input)
       LOGICAL BAD                       ! Bad pixels present ?
       LOGICAL VAR                       ! Varience array present in IN ?
