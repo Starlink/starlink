@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/ref</path>
+  <description>Routines for Handling References to HDS Objects</description>
+  <abstract><p> It is sometimes useful to use the Hierarchical Data
+  System HDS (SUN/92) to store references or pointers to other HDS
+  objects. For instance, this allows the same data object to be used
+  in several places without the need to have more than one copy.  The
+  REF library is provided to facilitate this data object
+  referencing process and the subsequent accessing of objects
+  which have been referenced in this way.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
