@@ -167,6 +167,10 @@
 *        Prologue re-written.
 *     02-JUN-1998 (TMG):
 *        Added extra workspace array IPID to hold character identifiers
+*     4-JUN-1998 (DSB):
+*        Modified allocation of IPID workspace to include length of each
+*        character identifier. Extended image identifiers from max of 10
+*        characters to 30 characters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -193,13 +197,19 @@
 *  Local Constants:
       INTEGER MAXIN              ! Maximim number of input images
       PARAMETER ( MAXIN = 1024 )
+
       INTEGER MAXSET             ! Maximum number of polarsation sets
       PARAMETER ( MAXSET = 256 )
+
       CHARACTER * ( 1 ) LEFT     ! Determines the order of the O and E
                                  ! ray in the calculations.
       PARAMETER ( LEFT = 'O' )
+
       REAL DTOR                  ! Degrees to radians conversion factor
       PARAMETER( DTOR = 1.7453293E-2 )
+
+      INTEGER IDLEN              ! Max. length of an image identifier string
+      PARAMETER ( IDLEN = 30 ) 
 
 *  Local Variables:
       INTEGER NDFIN( MAXIN )     ! Input NDF identifiers
@@ -259,13 +269,13 @@
       REAL F, VF                 ! F factor and its variance
       
       CHARACTER * ( 8 )  PMODE   ! Polarimetry mode (LINEAR or CIRCULAR)
-      CHARACTER * ( 10 ) IMGID( MAXIN )
+      CHARACTER * ( IDLEN ) IMGID( MAXIN )
                                  ! Image ID descriptor
       CHARACTER * ( 1 ) RAY( MAXIN )
                                  ! Image ray identifer.
       CHARACTER * ( NDF__SZTYP ) TYPE
                                  ! NDF data type
-      CHARACTER * ( 10 ) ID( 4, MAXSET )
+      CHARACTER * ( IDLEN ) ID( 4, MAXSET )
                                  ! Image ID string
       CHARACTER * ( 40 ) TITLE   ! Title for output NDF
       CHARACTER * ( 40 ) LABEL   ! Label for output NDF
@@ -729,7 +739,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       ENDIF
 
 * Allocate Space to hold a character identifer for each pair.
-      CALL PSX_CALLOC( NPAIR, '_CHAR', IPID, STATUS )
+      CALL PSX_CALLOC( IDLEN*NPAIR, '_CHAR', IPID, STATUS )
       
 *  Calculate the time-dependent instrumental efficiency (E factor). This
 *  gives the relative efficiency of the instrument between exposures.

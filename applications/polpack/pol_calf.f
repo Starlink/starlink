@@ -67,7 +67,7 @@
 *     SKYSUP = REAL (Given)
 *        Sky level suppression factor to use when performing image
 *        intercomparisons.
-*     IMGID( 4, NSET ) = CHARACTER * ( 10 ) (Given)
+*     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
 *        Image identifiers.
 *     ILEVEL = INTEGER (Given)
 *        Specifies the level of information to be output.
@@ -100,6 +100,8 @@
 *        value.
 *     02-JUN-1998 (TMG):
 *        Dimension IPDIN, IPVIN and IMGID correctly.
+*     4-JUN-1998 (DSB):
+*        Removed 10 character restrictions on image identifiers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -129,7 +131,7 @@
       REAL TOLZ
       INTEGER MAXIT
       REAL SKYSUP
-      CHARACTER * ( 10 ) IMGID( 4, NSET )
+      CHARACTER * ( * ) IMGID( 4, NSET )
       INTEGER ILEVEL
       
 *  Arguments Given and Returned:
@@ -281,18 +283,18 @@
      :         '( 5X, ''---------------------------------------'' )' )
                   CALL MSG_OUT( ' ', STRING, STATUS )
                   CALL MSG_BLANK( STATUS )
-                  WRITE( STRING, '( 5X, A10, ''(E)'' )' )
+                  WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 2, ISET )
                   CALL MSG_OUT( ' ', STRING , STATUS )
                   WRITE( STRING,
-     :               '( 5X, A10, ''(O)'', 4X, F6.3 )' )
+     :               '( 5X, A, ''(O)'', 4X, F6.3 )' )
      :                 IMGID( 1, ISET ), F1
                   CALL MSG_OUT( ' ', STRING, STATUS )
-                  WRITE( STRING, '( 5X, A10, ''(E)'' )' )
+                  WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 1, ISET )
                   CALL MSG_OUT( ' ', STRING , STATUS )
                   WRITE( STRING,
-     :            '( 5X, A10, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
+     :            '( 5X, A, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
      :              'E8.3 )' ), IMGID( 2, ISET ), F2, FEST( NEST ),
      :                          VFEST( NEST )
                   CALL MSG_OUT( ' ', STRING, STATUS )
@@ -355,18 +357,18 @@
 * estimates.
 
                IF ( ILEVEL .GT. 1 ) THEN
-                  WRITE( STRING, '( 5X, A10, ''(E)'' )' )
+                  WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 4, ISET )
                   CALL MSG_OUT( ' ', STRING , STATUS )
                   WRITE( STRING,
-     :               '( 5X, A10, ''(O)'', 4X, F6.3 )' )
+     :               '( 5X, A, ''(O)'', 4X, F6.3 )' )
      :                 IMGID( 3, ISET ), F1
                   CALL MSG_OUT( ' ', STRING, STATUS )
-                  WRITE( STRING, '( 5X, A10, ''(E)'' )' )
+                  WRITE( STRING, '( 5X, A, ''(E)'' )' )
      :                 IMGID( 3, ISET )
                   CALL MSG_OUT( ' ', STRING , STATUS )
                   WRITE( STRING,
-     :            '( 5X, A10, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
+     :            '( 5X, A, ''(O)'', 4X, F6.3, 4X, F6.3, 2X, '//
      :              'E8.3 )' ) IMGID( 4, ISET ), F2, FEST( NEST ),
      :                         VFEST( NEST )
                   CALL MSG_OUT( ' ', STRING, STATUS )

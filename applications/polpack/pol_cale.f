@@ -5,7 +5,7 @@
      :                     STATUS )
 *+
 * Name:
-*    POL_CALE
+*     POL_CALE
 
 *  Purpose:
 *     To calculate time dependent (exposure) scale factors for dual beam
@@ -73,9 +73,9 @@
 *     SKYSUP = REAL (Given)
 *        Sky level suppression factor to use when performing image
 *        intercomparisons. Also used here for the E factor refinement.
-*     IMGID( 4, NSET ) = CHARACTER * ( 10 ) (Given)
+*     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
 *        Image identifiers.
-*     ID( NPAIR ) = CHARACTER * ( 10 ) (Given)
+*     ID( NPAIR ) = CHARACTER * ( * ) (Given)
 *        Image Identifiers.
 *     ILEVEL = INTEGER (Given)
 *        Specifies the level of information to be output.
@@ -130,6 +130,8 @@
 *     02-JUN-1998 (TMG):
 *        Correctly dimension IPDIN, IPVIN, IMGID, IPVOUT, IPDOUT. Add extra
 *        passed array ID.
+*     4-JUN-1998 (DSB):
+*        Removed 10 character restriction on image identifiers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,8 +164,8 @@
       REAL ETOL
       INTEGER IPDIN( 8, NSET )
       INTEGER IPVIN( 8, NSET )
-      CHARACTER * ( 10 ) IMGID( 4, NSET )
-      CHARACTER * ( 10 ) ID( NPAIR )
+      CHARACTER * ( * ) IMGID( 4, NSET )
+      CHARACTER * ( * ) ID( NPAIR )
       DOUBLE PRECISION WEIGHT( NPAIR )
       INTEGER ILEVEL
       
@@ -421,7 +423,7 @@
 
             DO IPAIR = 1, NPAIR
               WRITE( STRING,
-     :           '( 5X, A10, 5X, F6.4, 4X, F6.4 )' )
+     :           '( 5X, A, 5X, F6.4, 4X, F6.4 )' )
      :           ID( IPAIR ), EEST( IPAIR ), ZEST( IPAIR )
               CALL MSG_OUT( ' ', STRING, STATUS )
             ENDDO
@@ -465,7 +467,7 @@
             CALL MSG_OUT( ' ', STRING, STATUS )
    
             DO IPAIR = 1, NPAIR
-               WRITE( STRING, '( 3X, A10, 2X, F6.4 )' )
+               WRITE( STRING, '( 3X, A, 2X, F6.4 )' )
      :                ID( IPAIR ), EEST( IPAIR )
                CALL MSG_OUT( ' ', STRING, STATUS )
             ENDDO
