@@ -16,8 +16,9 @@ snx_aglab.f snx_agsav.f snx_agwv.f snx_ezrxy.f snx_wrtst.f
 
 # Testing
 
-TESTS = snx_test
+TESTS = snx_test.sh
 check_PROGRAMS = snx_test
+check_SCRIPTS = snx_test.sh
 
 snx_test_SOURCES = snx_test.fpp
 snx_test_LDADD = libsnx.la `sgs_link` `ncar_link` 
