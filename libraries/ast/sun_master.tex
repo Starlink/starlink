@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {30th April 2003}
+\newcommand{\stardocdate}      {16th July 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -618,6 +618,7 @@ either direction: either from the {\em{input}} coordinate space to the
 {\em{output,}} or {\em{vice versa.}} The first of these is termed the
 {\em{forward}} transformation and the other the {\em{inverse}}
 transformation.
+
 
 {\bf{Further reading:}} For a more complete discussion of Mappings,
 see~\secref{ss:mappings}.
@@ -4907,6 +4908,21 @@ f+
 If the Mapping you have happens to be the wrong way around,
 AST\_INVERT allows you to correct the problem.
 f-
+
+\subsection{Finding the Rate of Change of a Mapping Output}
+The
+c+
+astRate
+c-
+f+
+AST_RATE
+f-
+function can be used to find the rate of change of any Mapping output
+with respect to any Mapping input, at a given input position. The method
+used produces good accuracy (typically a relative error of 10E-10 or
+less) but may require the Mapping to be evaluated 100 or more times. 
+An estimate of the second derivative is also produced by this function.
+
 
 \subsection{Reporting Coordinate Transformations}
 
@@ -18917,8 +18933,7 @@ f-
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V2.0}
+\subsection{Changes Introduced in V2.0}
 
 Note, Frame descriptions created using AST V2.0 will not be readable by 
 applications linked with earlier versions of AST. This applies to Frame
@@ -19082,5 +19097,33 @@ omission of some tick marks to complete failure to produce a plot.
 
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V2.0 and V3.0 (the
+current version):
+
+\begin{enumerate}
+
+\item The 
+c+
+astRate
+c-
+f+
+AST_RATE
+f-
+function has been added which allows an estimate to be made of the rate of 
+change of a Mapping output with respect to one of the Mapping inputs. 
+
+
+\end{enumerate}
+
+Programs which are statically linked will need to be re-linked in
+order to take advantage of these new facilities.
+
+
 
 \end{document}
