@@ -40,12 +40,14 @@ f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Mappings:
 *
 c     - astInvert: Invert a Mapping
+c     - astMapBox: Find a bounding box for a Mapping
 c     - astSimplify: Simplify a Mapping
 c     - astTran1: Transform 1-dimensional coordinates
 c     - astTran2: Transform 2-dimensional coordinates
 c     - astTranN: Transform N-dimensional coordinates
 c     - astTranP: Transform N-dimensional coordinates held in separate arrays
 f     - AST_INVERT: Invert a Mapping
+f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_SIMPLIFY: Simplify a Mapping
 f     - AST_TRAN1: Transform 1-dimensional coordinates
 f     - AST_TRAN2: Transform 2-dimensional coordinates
@@ -112,8 +114,8 @@ typedef struct MapData {
    AstMapping *mapping;          /* Pointer to the Mapping */
    AstPointSet *pset_in;         /* Pointer to input PointSet */
    AstPointSet *pset_out;        /* Pointer to output PointSet */
-   const double *lbnd;           /* Pointer to lower constraints on input */
-   const double *ubnd;           /* Pointer to upper constraints on input */
+   double *lbnd;                 /* Pointer to lower constraints on input */
+   double *ubnd;                 /* Pointer to upper constraints on input */
    double **ptr_in;              /* Pointer to input PointSet coordinates */
    double **ptr_out;             /* Pointer to output PointSet coordinates */
    int coord;                    /* Index of output coordinate to optimise */
@@ -166,6 +168,7 @@ static void Dump( AstObject *, AstChannel * );
 static void GlobalBounds( MapData *, double *, double *, double [], double [] );
 static void InitVtab( AstMappingVtab * );
 static void Invert( AstMapping * );
+static void MapBox( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 static void MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
 static void SetAttrib( AstObject *, const char * );
@@ -180,53 +183,6 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 
 /* Member functions. */
 /* ================= */
-
-void astMapBox( AstMapping *this,
-                const double lbnd_in[], const double ubnd_in[],
-                int coord_out, double *lbnd_out, double *ubnd_out,
-                double xl[], double xu[] ) {
-
-   MapData mapdata;
-   double *x_l;
-   double *x_u;
-   int ncoord;
-   int coord;
-   
-   ncoord = astGetNin( this );
-
-   mapdata.mapping = this;
-   mapdata.nin = ncoord;
-   mapdata.nout = astGetNout( this );
-   mapdata.coord = coord_out;
-   mapdata.forward = 1;
-   mapdata.lbnd = lbnd_in;
-   mapdata.ubnd = ubnd_in;
-   mapdata.pset_in = astPointSet( 1, ncoord, "" );
-   mapdata.pset_out = astPointSet( 1, mapdata.nout, "" );
-   mapdata.ptr_in = astGetPoints( mapdata.pset_in );
-   mapdata.ptr_out = astGetPoints( mapdata.pset_out );
-
-   x_l = astMalloc( sizeof( double ) * (size_t) ncoord );
-   x_u = astMalloc( sizeof( double ) * (size_t) ncoord );
-   if ( astOK ) {
-      *lbnd_out = *ubnd_out = AST__BAD;
-      for ( coord = 0; coord < ncoord; coord++ ) {
-         x_l[ coord ] = x_u[ coord ] = AST__BAD;
-      }
-      SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
-      GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
-   }
-   mapdata.pset_in = astAnnul( mapdata.pset_in );
-   mapdata.pset_out = astAnnul( mapdata.pset_out );
-   x_l = astFree( x_l );
-   x_u = astFree( x_u );
-   if ( !astOK ) {
-      astError( astStatus, "Unable to find a bounding box for a %s.",
-                astGetClass( this ) );
-   }
-}
-
-/*************************************/
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1376,6 +1332,7 @@ static void InitVtab( AstMappingVtab *vtab ) {
    vtab->GetTranForward = GetTranForward;
    vtab->GetTranInverse = GetTranInverse;
    vtab->Invert = Invert;
+   vtab->MapBox = MapBox;
    vtab->MapList = MapList;
    vtab->MapMerge = MapMerge;
    vtab->ReportPoints = ReportPoints;
@@ -1598,6 +1555,255 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 
 /* return the result. */
    return result;
+}
+
+static void MapBox( AstMapping *this,
+                    const double lbnd_in[], const double ubnd_in[],
+                    int forward, int coord_out,
+                    double *lbnd_out, double *ubnd_out,
+                    double xl[], double xu[] ) {
+/*
+*+
+*  Name:
+*     astMapBox
+
+*  Purpose:
+*     Find a bounding box for a Mapping.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void astMapBox( AstMapping *this,
+*                     const double lbnd_in[], const double ubnd_in[],
+*                     int forward, int coord_out,
+*                     double *lbnd_out, double *ubnd_out,
+*                     double xl[], double xu[] );
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function allows you to find the "bounding box" which just
+*     encloses another box after it has been transformed by a Mapping
+*     (using either its forward or inverse transformation). A typical
+*     use might be to calculate the size which an image would have
+*     after being transformed by the Mapping.
+*
+*     The function works on one dimension at a time. When supplied
+*     with the lower and upper bounds of a rectangular region (box) of
+*     input coordinate space, it finds the lowest and highest values
+*     taken by a nominated output coordinate within that
+*     region. Optionally, it also returns the input coordinates where
+*     these bounding values are attained. It should be used repeatedly
+*     if the extent of the bounding box is required in more than one
+*     dimension.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     lbnd_in
+*        Pointer to an array of double, with one element for each
+*        Mapping input coordinate. This should contain the lower bound
+*        of the input box in each dimension.
+*     ubnd_in
+*        Pointer to an array of double, with one element for each
+*        Mapping input coordinate. This should contain the upper bound
+*        of the input box in each dimension.
+*
+*        Note that it is permissible for the lower bound to exceed the
+*        corresponding upper bound, as the values will simply be
+*        swapped before use.
+*     forward
+*        If this value is non-zero, then the Mapping's forward
+*        transformation will be used to transform the input
+*        box. Otherwise, its inverse transformation will be used.
+*
+*        (If the inverse transformation is selected, then references
+*        to "input" and "output" coordinates in this description
+*        should be transposed. For example, the size of the "lbnd_in"
+*        and "ubnd_in" arrays should match the number of output
+*        coordinates, as given by the Mapping's Nout attribute.)
+*     coord_out
+*        The (zero-based) index of the output coordinate for which the
+*        lower and upper bounds are required.
+*     lbnd_out
+*        Pointer to a double in which to return the lowest value taken
+*        by the nominated output coordinate within the specified
+*        region of input coordinate space.
+*     ubnd_out
+*        Pointer to a double in which to return the highest value
+*        taken by the nominated output coordinate within the specified
+*        region of input coordinate space.
+*     xl
+*        An optional pointer to an array of double, with one element
+*        for each Mapping input coordinate. If given, this array will
+*        be filled with the coordinates of an input point (although
+*        not necessarily a unique one) for which the nominated output
+*        coordinate takes the lower bound value returned in
+*        "*lbnd_out".
+*
+*        If these coordinates are not required, a NULL pointer may be
+*        supplied.
+*     xu
+*        An optional pointer to an array of double, with one element
+*        for each Mapping input coordinate. If given, this array will
+*        be filled with the coordinates of an input point (although
+*        not necessarily a unique one) for which the nominated output
+*        coordinate takes the upper bound value returned in
+*        "*ubnd_out".
+*
+*        If these coordinates are not required, a NULL pointer may be
+*        supplied.
+
+*  Notes:
+*     - Any input points which are transformed by the Mapping to give
+*     output coordinates containing the value AST__BAD are regarded as
+*     invalid and are ignored, They will make no contribution to
+*     determining the output bounds, even although the nominated
+*     output coordinate might still have a valid value at such points.
+*     - An error will occur if the required output bounds cannot be
+*     found. Typically, this might occur if all the input points which
+*     the function considers turn out to be invalid (see above). The
+*     number of points considered before generating such an error is
+*     quite large, however, so this is unlikely to occur by accident
+*     unless valid points are restricted to a very small subset of the
+*     input coordinate space.
+*     - The values returned via "lbnd_out", "ubnd_out", "xl" and "xu"
+*     will be set to the value AST__BAD if this function should fail
+*     for any reason. Their initial values on entry will not be
+*     altered if the function is invoked with the global error status
+*     set.
+*-
+
+*  Implementation Notes:
+*     - This function implements the basic astMapBox method available
+*     via the protected interface to the Mapping class. The public
+*     interface to this method is provided by the astMapBoxId_
+*     function.
+*/
+
+/* Local Variables: */
+   MapData mapdata;              /* Structure to describe Mapping function */
+   double *x_l;                  /* Pointer to coordinate workspace */
+   double *x_u;                  /* Pointer to coordinate workspace */
+   int coord;                    /* Loop counter for coordinates. */
+   int nin;                      /* Effective number of input coordinates */
+   int nout;                     /* Effective number of output coordinates */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain the effective numbers of input and output coordinates for
+   the Mapping, taking account of which transformation is to be
+   used. */
+   nin = forward ? astGetNin( this ) : astGetNout( this );
+   nout = forward ? astGetNout( this ) : astGetNin( this );
+
+/* Check that the output coordinate index supplied is valid and report
+   an error if it is not. Use public (one-based) coordinate numbering
+   in the error message. */
+   if ( astOK ) {
+      if ( ( coord_out < 0 ) || ( coord_out >= nout ) ) {
+         astError( AST__BADCI, "astMapBox(%s): Output coordinate index (%d) "
+                   "invalid - it should be in the range 1 to %d.",
+                   astGetClass( this ), coord_out + 1, nout );
+      }
+   }
+
+/* Initialise a MapData structure to describe the Mapping function
+   whose limits are to be found... */
+   if ( astOK ) {
+
+/* Since it may be evaluated many times. we attempt to simplify the
+   Mapping supplied. */
+      mapdata.mapping = astSimplify( this );
+
+/* Store the number of input/output coordinates and the index of the
+   output coordinate in which we are interested. */
+      mapdata.nin = nin;
+      mapdata.nout = nout;
+      mapdata.coord = coord_out;
+
+/* Note which Mapping transformation is being used. */
+      mapdata.forward = forward;
+
+/* Store pointers to the arrays of input coordinate bounds. */
+      mapdata.lbnd = astMalloc( sizeof( double ) * (size_t) nin );
+      mapdata.ubnd = astMalloc( sizeof( double ) * (size_t) nin );
+
+/* Create PointSets for passing coordinate data to and from the
+   Mapping. */
+      mapdata.pset_in = astPointSet( 1, nin, "" );
+      mapdata.pset_out = astPointSet( 1, nout, "" );
+
+/* Obtain pointers to these PointSets' coordinate arrays. */
+      mapdata.ptr_in = astGetPoints( mapdata.pset_in );
+      mapdata.ptr_out = astGetPoints( mapdata.pset_out );
+
+/* Allocate workspace for the returned input coordinates. */
+      x_l = astMalloc( sizeof( double ) * (size_t) nin );
+      x_u = astMalloc( sizeof( double ) * (size_t) nin );
+      if ( astOK ) {
+
+/* Initialise the output bounds and corresponding input coordinates to
+   "unknown". */
+         *lbnd_out = *ubnd_out = AST__BAD;
+         for ( coord = 0; coord < nin; coord++ ) {
+            x_l[ coord ] = x_u[ coord ] = AST__BAD;
+
+/* Initialise the input bounds, ensuring they are the correct way
+   around (if not already supplied this way). */
+            mapdata.lbnd[ coord ] = ( lbnd_in[ coord ] < ubnd_in[ coord ] ) ?
+                                      lbnd_in[ coord ] : ubnd_in[ coord ];
+            mapdata.ubnd[ coord ] = ( ubnd_in[ coord ] > lbnd_in[ coord ] ) ?
+                                      ubnd_in[ coord ] : lbnd_in[ coord ];
+         }
+
+/* First examine a set of special input points to obtain an initial
+   estimate of the required output bounds. */
+         SpecialBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+
+/* Then attempt to refine this estimate using a global search
+   algorithm. */
+         GlobalBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
+
+/* If an error occurred, generate a contextual error message. */
+         if ( !astOK ) {
+            astError( astStatus, "Unable to find a bounding box for a %s.",
+                      astGetClass( this ) );
+         }
+      }
+
+/* If required, return the input coordinate values which correspond
+   with the output bounds found. */
+      for ( coord = 0; astOK && ( coord < nin ); coord++ ) {
+         if ( xl ) xl[ coord ] = x_l[ coord ];
+         if ( xu ) xu[ coord ] = x_u[ coord ];
+      }
+
+/* Annul the simplified Mapping pointer and the temporary
+   PointSets. Also free the workspace. */
+      mapdata.mapping = astAnnul( mapdata.mapping );
+      mapdata.pset_in = astAnnul( mapdata.pset_in );
+      mapdata.pset_out = astAnnul( mapdata.pset_out );
+      mapdata.lbnd = astFree( mapdata.lbnd );
+      mapdata.ubnd = astFree( mapdata.ubnd );
+      x_l = astFree( x_l );
+      x_u = astFree( x_u );
+   }
+      
+/* If an error occurred, then return bad bounds values and
+   coordinates. */
+   if ( !astOK ) {
+      *lbnd_out = AST__BAD;
+      *ubnd_out = AST__BAD;
+      for ( coord = 0; coord < nin; coord++ ) {
+         if ( xl ) xl[ coord ] = AST__BAD;
+         if ( xu ) xu[ coord ] = AST__BAD;
+      }
+   }
 }
 
 static double MapFunction( const MapData *mapdata, const double in[],
@@ -4861,6 +5067,14 @@ void astInvert_( AstMapping *this ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,Invert))( this );
 }
+void astMapBox_( AstMapping *this,
+                 const double lbnd_in[], const double ubnd_in[], int forward,
+                 int coord_out, double *lbnd_out, double *ubnd_out,
+                 double xl[], double xu[] ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Mapping,MapBox))( this, lbnd_in, ubnd_in, forward,
+                                       coord_out, lbnd_out, ubnd_out, xl, xu );
+}
 void astMapList_( AstMapping *this, int series, int invert, int *nmap,
                   AstMapping ***map_list, int **invert_list ) {
    if ( !astOK ) return;
@@ -4915,4 +5129,217 @@ void astTranP_( AstMapping *this, int npoint,
    (**astMEMBER(this,Mapping,TranP))( this, npoint,
                                       ncoord_in, ptr_in,
                                       forward, ncoord_out, ptr_out );
+}
+
+/* Public Interface Function Prototypes. */
+/* ------------------------------------- */
+/* The following functions have public prototypes only (i.e. no
+   protected prototypes), so we must provide local prototypes for use
+   within this module. */
+void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
+
+/* Special interface function implementations. */
+/* ------------------------------------------- */
+void astMapBoxId_( AstMapping *this,
+                   const double lbnd_in[], const double ubnd_in[],
+                   int forward, int coord_out,
+                   double *lbnd_out, double *ubnd_out,
+                   double xl[], double xu[] ) {
+/*
+*++
+*  Name:
+c     astMapBox
+f     AST_MAPBOX
+
+*  Purpose:
+*     Find a bounding box for a Mapping.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astMapBox( AstMapping *this,
+c                     const double lbnd_in[], const double ubnd_in[],
+c                     int forward, int coord_out,
+c                     double *lbnd_out, double *ubnd_out,
+c                     double xl[], double xu[] );
+f     CALL AST_MAPBOX( THIS, LBND_IN, UBND_IN, FORWARD, COORD_OUT,
+f                      LBND_OUT, UBND_OUT, XL, XU, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+c     This function allows you to find the "bounding box" which just
+c     encloses another box after it has been transformed by a Mapping
+c     (using either its forward or inverse transformation). A typical
+c     use might be to calculate the size which an image would have
+c     after being transformed by the Mapping.
+f     This routine allows you to find the "bounding box" which just
+f     encloses another box after it has been transformed by a Mapping
+f     (using either its forward or inverse transformation). A typical
+f     use might be to calculate the size which an image would have
+f     after being transformed by the Mapping.
+*
+c     The function works on one dimension at a time. When supplied
+c     with the lower and upper bounds of a rectangular region (box) of
+c     input coordinate space, it finds the lowest and highest values
+c     taken by a nominated output coordinate within that
+c     region. Optionally, it also returns the input coordinates where
+c     these bounding values are attained. It should be used repeatedly
+c     if the extent of the bounding box is required in more than one
+c     dimension.
+f     The routine works on one dimension at a time. When supplied with
+f     the lower and upper bounds of a rectangular region (box) of
+f     input coordinate space, it finds the lowest and highest values
+f     taken by a nominated output coordinate within that region. It
+f     also returns the input coordinates where these bounding values
+f     are attained. It should be used repeatedly if the extent of the
+f     bounding box is required in more than one dimension.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping.
+c     lbnd_in
+f     LBND_IN( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of double, with one element for each
+c        Mapping input coordinate. This should contain the lower bound
+c        of the input box in each dimension.
+f        An array with one element for each Mapping input
+f        coordinate. This should contain the lower bound of the input
+f        box in each dimension.
+c     ubnd_in
+f     UBND_IN( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of double, with one element for each
+c        Mapping input coordinate. This should contain the upper bound
+c        of the input box in each dimension.
+f        An array with one element for each Mapping input
+f        coordinate. This should contain the upper bound of the input
+f        box in each dimension.
+*
+*        Note that it is permissible for the lower bound to exceed the
+*        corresponding upper bound, as the values will simply be
+*        swapped before use.
+c     forward
+f     FORWARD = LOGICAL (Given)
+c        If this value is non-zero, then the Mapping's forward
+c        transformation will be used to transform the input
+c        box. Otherwise, its inverse transformation will be used.
+f        If this value is .TRUE., then the Mapping's forward
+f        transformation will be used to transform the input
+f        box. Otherwise, its inverse transformation will be used.
+*
+c        (If the inverse transformation is selected, then references
+c        to "input" and "output" coordinates in this description
+c        should be transposed. For example, the size of the "lbnd_in"
+c        and "ubnd_in" arrays should match the number of output
+c        coordinates, as given by the Mapping's Nout attribute.)
+f        (If the inverse transformation is selected, then references
+f        to "input" and "output" coordinates in this description
+f        should be transposed. For example, the size of the LBND_IN
+f        and UBND_IN arrays should match the number of output
+f        coordinates, as given by the Mapping's Nout attribute.)
+c     coord_out
+f     COORD_OUT = INTEGER (Given)
+*        The index of the output coordinate for which the lower and
+*        upper bounds are required. This should be at least one, and
+*        no larger than the number of Mapping output coordinates.
+c     lbnd_out
+f     LBND_OUT = DOUBLE PRECISION (Returned)
+c        Pointer to a double in which to return the lowest value taken
+c        by the nominated output coordinate within the specified
+c        region of input coordinate space.
+f        The lowest value taken by the nominated output coordinate
+f        within the specified region of input coordinate space.
+c     ubnd_out
+f     UBND_OUT = DOUBLE PRECISION (Returned)
+c        Pointer to a double in which to return the highest value
+c        taken by the nominated output coordinate within the specified
+c        region of input coordinate space.
+f        The highest value taken by the nominated output coordinate
+f        within the specified region of input coordinate space.
+c     xl
+f     XL( * ) = DOUBLE PRECISION (Returned)
+c        An optional pointer to an array of double, with one element
+c        for each Mapping input coordinate. If given, this array will
+c        be filled with the coordinates of an input point (although
+c        not necessarily a unique one) for which the nominated output
+c        coordinate attains the lower bound value returned in
+c        "*lbnd_out".
+c
+c        If these coordinates are not required, a NULL pointer may be
+c        supplied.
+f        An array with one element for each Mapping input
+f        coordinate. This will be filled with the coordinates of an
+f        input point (although not necessarily a unique one) for which
+f        the nominated output coordinate attains the lower bound value
+f        returned in LBND_OUT.
+c     xu
+f     XU( * ) = DOUBLE PRECISION (Returned)
+c        An optional pointer to an array of double, with one element
+c        for each Mapping input coordinate. If given, this array will
+c        be filled with the coordinates of an input point (although
+c        not necessarily a unique one) for which the nominated output
+c        coordinate attains the upper bound value returned in
+c        "*ubnd_out".
+c
+c        If these coordinates are not required, a NULL pointer may be
+c        supplied.
+f        An array with one element for each Mapping input
+f        coordinate. This will be filled with the coordinates of an
+f        input point (although not necessarily a unique one) for which
+f        the nominated output coordinate attains the upper bound value
+f        returned in UBND_OUT.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - Any input points which are transformed by the Mapping to give
+*     output coordinates containing the value AST__BAD are regarded as
+*     invalid and are ignored, They will make no contribution to
+*     determining the output bounds, even although the nominated
+*     output coordinate might still have a valid value at such points.
+c     - An error will occur if the required output bounds cannot be
+c     found. Typically, this might occur if all the input points which
+c     the function considers turn out to be invalid (see above). The
+c     number of points considered before generating such an error is
+c     quite large, however, so this is unlikely to occur by accident
+c     unless valid points are restricted to a very small subset of the
+c     input coordinate space.
+f     - An error will occur if the required output bounds cannot be
+f     found. Typically, this might occur if all the input points which
+f     the routine considers turn out to be invalid (see above). The
+f     number of points considered before generating such an error is
+f     quite large, however, so this is unlikely to occur by accident
+f     unless valid points are restricted to a very small subset of the
+f     input coordinate space.
+c     - The values returned via "lbnd_out", "ubnd_out", "xl" and "xu"
+c     will be set to the value AST__BAD if this function should fail
+c     for any reason. Their initial values on entry will not be
+c     altered if the function is invoked with the AST error status
+c     set.
+f     - The values returned via LBND_OUT, UBND_OUT, XL and XU will be
+f     set to the value AST__BAD if this function should fail for any
+f     reason. Their initial values on entry will not be altered if the
+f     function is invoked with the AST error status set.
+*--
+
+*  Implementation Notes:
+*     This function implements the public interface for the astMapBox
+*     method. It is identical to astMapBox_ except that the nominated
+*     output coordinate given in "coord_out" is decremented by one
+*     before use.  This is to allow the public interface to use
+*     one-based coordinate numbering (internally, zero-based
+*     coordinate numbering is used).
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Invoke the protected version of this function with the "coord_out"
+   value decremented. */
+   astMapBox_( this, lbnd_in, ubnd_in, forward, coord_out - 1,
+               lbnd_out, ubnd_out, xl, xu );
 }

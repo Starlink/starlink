@@ -303,11 +303,16 @@ AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
 /* -------------------------------- */
 AstMapping *astSimplify_( AstMapping * );
 void astInvert_( AstMapping * );
-void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
 void astTranN_( AstMapping *, int, int, int, const double (*)[], int, int, int,double (*)[] );
 void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[] );
+
+#if defined(astCLASS)            /* Protected */
+void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
+#else
+void astMapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
+#endif
 
 #if defined(astCLASS)            /* Protected */
 AstPointSet *astTransform_( AstMapping *, AstPointSet *, int, AstPointSet * );
@@ -367,8 +372,6 @@ astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
-#define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
-astINVOKE(V,astMapBox_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this)))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout))
@@ -378,6 +381,14 @@ astINVOKE(V,astTran2_(astCheckMapping(this),npoint,xin,yin,forward,xout,yout))
 astINVOKE(V,astTranN_(astCheckMapping(this),npoint,ncoord_in,indim,in,forward,ncoord_out,outdim,out))
 #define astTranP(this,npoint,ncoord_in,ptr_in,forward,ncoord_out,ptr_out) \
 astINVOKE(V,astTranP_(astCheckMapping(this),npoint,ncoord_in,ptr_in,forward,ncoord_out,ptr_out))
+
+#if defined(astCLASS)            /* Protected */
+#define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
+astINVOKE(V,astMapBox_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
+#else
+#define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
+astINVOKE(V,astMapBoxId_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
+#endif
 
 #if defined(astCLASS)            /* Protected */
 #define astClearInvert(this) \
