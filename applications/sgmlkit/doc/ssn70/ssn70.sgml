@@ -123,7 +123,7 @@ There will be a proper distribution before 1 June.
 <px>Thoroughly revised documentation of upconverters.
 
 <change date='2-Jun-2000' versionid='v0-7-2' author=ng>
-<px>Some restructuring.
+<px>Some restructuring.  Preparing for distribution
 
 </history>
 
@@ -856,7 +856,15 @@ text which might itself include SGML comments <code><![CDATA[<!--
 
 <p>Sometimes, it is necessary to have parts of your document which
 vary depending on whether the document is to be viewed on paper or
-online.  The Starlink general DTD defines two parameter entities
+online.  In general, the best way to manage this is using the <ref
+id=el.sun.span>span</ref> element (see <ref id=str.span/>), but this
+is limited to use <em/within> paragraphs.  If you need to
+conditionally include higher-level chunks of material, you will have
+to resort to the blunter instrument of a marked section.  We may add a
+suitable element to the DTD in future -- probably called <code/div> --
+and deprecate this method.
+
+<p>The Starlink general DTD defines two parameter entities
 <code/&percent;Only.paper> and <code/&percent;Only.web>, which you can
 use to include or ignore text in a marked section.  By default, both
 of these are set to the string 
@@ -1777,6 +1785,31 @@ elements is to reflexively put a space after all occurrences of
 <code/&amp;> and <code/&lt;>: this will keep the SGML parser from
 interfering, and make no difference to &latex, which ignores all
 spaces in maths mode anyway.
+
+<subsect id=str.span export>Output depending on media type
+<update versionid="v0-7-2">Added this section</px>
+
+<p>Includes
+<ref id='el.sun.span' >span</ref>.
+
+<p>In certain circumstances, you need to make the text of your
+document sensitive to the output medium.  For example, when
+documenting a routine prologue (which documentation might reasonably
+be expected to be read in a character-based format such as a HLP
+file), you might want to write
+<verbatim><![CDATA[
+The length is
+<span media='screen,print'><m>x=r\sin \theta</m></span>
+<span media='tty'><code>x = r * sin(theta)</code></span>
+]]></verbatim>
+to give different versions based on the intended output format.  For
+further details, and the list of output media, see 
+<ref id=el.sun.span>the span documentation</ref>.
+
+<p>Note that this element can control output only <em/within> a
+paragraph.  We may add another element -- probably called <code/div> --
+which functions higher up the element hierarchy, but until then, you
+will need to use <ref id=markup.ms.variants>marked sections</ref>.
 
 <sect id=doccode export>Documenting source code
 <update versionid=v0-6-1>Mention coderef</update>
@@ -3216,11 +3249,11 @@ documentation for details).
 <li>Examine the marked up prologues by hand to see if the markup looks 
 semantically correct.  In particular keep an eye out for
    <ul compact>
-   <li>Blocks marked up <ref id=el.programcode.verbatim>verbatim</ref> 
+   <li>Blocks marked up <ref id=el.sun.verbatim>verbatim</ref> 
        which shouldn't be
-   <li>Blocks not marked up <ref id=el.programcode.verbatim>verbatim</ref> 
+   <li>Blocks not marked up <ref id=el.sun.verbatim>verbatim</ref> 
        which should be
-   <li>Single element <ref id=el.programcode.ul>ul</ref> lists which could 
+   <li>Single element <ref id=el.sun.ul>ul</ref> lists which could 
        more appropriately be marked up otherwise
    </ul>
 </ul>
@@ -3250,7 +3283,7 @@ the new prologues can be altered.
 If they will be used for generating HLP files (viewed on a character
 terminal) as well as the SUN descriptions, then alternative 
 forms of such parts should be retained using the 
-<ref id=el.programcode.span>span</ref>
+<ref id=el.sun.span>span</ref>
 element with a `media' attribute of `tty' for ASCII
 output and `screen,print' for &latex; output.
 
@@ -3557,6 +3590,10 @@ DSSSL stylesheets</webref>.
 structure.  Though I haven't agreed with all his suggestions, future
 users of this kit have a lot to thank him for in terms of the
 flexibility and usability of the DTD.
+
+<p>We should like to thank Rodney Warren-Smith, Martin Bly, Peter
+Draper and David Berry for detailed discussions and criticisms in
+several <em/long> meetings during this Kit's development.
 
 <appendices>
 
@@ -3937,9 +3974,56 @@ distributed as part of the SGML kit.
 <codecollection doc="supportbinaries" id=supportprogs>
 <codecollection doc="upconv.bin" id=upconvprogs>
 
+<sect id=appx.general.dtd export>The Starlink General DTD
+
+<p>This section includes a list of all the elements in the Starlink
+General DTD.  For a thematic treatment of the elements, see 
+<ref id=structure/>, and the groups in <ref id=table.elements/>.
+
+<p>The elements listed here are shown as children of the top-level
+element <code>&lt;sun></code>, because this is the most general of the
+document types described in <ref id=str.structure/>.  However, the
+listing here does not <em/quite> document the SUN DTD, since it
+includes the <ref id=el.sun.docdate>docdate</ref> element which is
+only available in those document types which do <em/not> have the
+`Versioning' feature (see <ref id=str.structure/> and 
+<ref id=str.history/>).
+
+<subsect id=appx.general.elementlist export>Element listing
+
+<p>The following element listing includes all the elements and
+attributes defined in the Starlink General DTD.  This includes a
+number of attributes with a <em/fixed> value (indicated by a default
+keyword of <code/#FIXED>).  These are for internal use by the DTD and
+the applications which process it, and are not documented further.
+
+&starlinkdtddoc;
+
+<sect id=appx.programcode.dtd export>The Programcode DTD
+
+<p>See <ref id=doccode/> for an overview of documenting code.
+
+<p>The programcode DTD described here is the same for all languages.
+When you invoke it, however, you do so using a document type
+declaration specific to the language of the program being documented.
+See <ref id=doccode.languages/> for details.
+
+<p>As noted above, in <ref id=doccode.elements/>, the programcode
+includes the same paragraph model as the Starlink General DTD.  In the
+element listing below, therefore, these are not duplicated separately,
+but instead consist of a reference to the appropriate part of the
+General DTD's documentation.
+
+<subsect id=appx.programcode.elementlist export>Element listing
+
+&programcodedtddoc;
+
 <sect id=appx.system export>The Starlink SGML set for maintainers
 <update versionid="post-0.2">Very substantial additions -- this
 section was barely present before.</update>
+<update versionid='v0-7-2'>Relocated this section to end of
+appendices.</update>
+
 
 <p>This section is a technical reference for maintainers of the
 Starlink SGML set.  The documentation here may be provisional, or
@@ -4383,11 +4467,13 @@ generate them as the interface.
 style sheets
 
 <codecollection doc="dsssl.params">
-<!--
-These are long-winded, and not terribly useful to the general reader.
+<![ %Only.web [
+<!-- These are long-winded, and not terribly useful to the general
+     reader.  Since they're all tiny, as well, they take up a _lot_ of
+     paper. -->
 <codecollection doc="dsssl.common">
 <codecollection doc="dsssl.lib">
--->
+]]>
 
 <subsect id=appx.system.software export>Other supporting software
 
@@ -4573,50 +4659,6 @@ however, you can obtain a copy on <webref
 url="http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/" >my
 dvi2bitmap page</webref>.
 ]]>
-
-<sect id=appx.general.dtd export>The Starlink General DTD
-
-<p>This section includes a list of all the elements in the Starlink
-General DTD.  For a thematic treatment of the elements, see 
-<ref id=structure/>, and the groups in <ref id=table.elements/>.
-
-<p>The elements listed here are shown as children of the top-level
-element <code>&lt;sun></code>, because this is the most general of the
-document types described in <ref id=str.structure/>.  However, the
-listing here does not <em/quite> document the SUN DTD, since it
-includes the <ref id=el.sun.docdate>docdate</ref> element which is
-only available in those document types which do <em/not> have the
-`Versioning' feature (see <ref id=str.structure/> and 
-<ref id=str.history/>).
-
-<subsect id=appx.general.elementlist export>Element listing
-
-<p>The following element listing includes all the elements and
-attributes defined in the Starlink General DTD.  This includes a
-number of attributes with a <em/fixed> value (indicated by a default
-keyword of <code/#FIXED>).  These are for internal use by the DTD and
-the applications which process it, and are not documented further.
-
-&starlinkdtddoc;
-
-<sect id=appx.programcode.dtd export>The Programcode DTD
-
-<p>See <ref id=doccode/> for an overview of documenting code.
-
-<p>The programcode DTD described here is the same for all languages.
-When you invoke it, however, you do so using a document type
-declaration specific to the language of the program being documented.
-See <ref id=doccode.languages/> for details.
-
-<p>As noted above, in <ref id=doccode.elements/>, the programcode
-includes the same paragraph model as the Starlink General DTD.  In the
-element listing below, therefore, these are not duplicated separately,
-but instead consist of a reference to the appropriate part of the
-General DTD's documentation.
-
-<subsect id=appx.programcode.elementlist export>Element listing
-
-&programcodedtddoc;
 
 <sect id=appx.releasenotes export>Release Notes
 

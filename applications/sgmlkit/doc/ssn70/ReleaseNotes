@@ -3,278 +3,49 @@
      $Id$
      -->
 
-<subsect id=release-0.6 export>Release Notes, version DR-0.6
+<subsect id=release-0.7 export>Release Notes, version DR-0.7
 
-<p>This is developers' release 0.6.
+<p>This is developers' release 0.7.
+
+<p>This is the first release intended to be practically useful to
+those not directly connected with the SGML project.  It is not a final
+release: still to come is some fine-tuning of the document structure
+(probably, and in the light of the anticipated flood of comments and
+suggestions), some redesigning of the format of the output, and an
+otherwise invisible (we hope) reimplementation of the back-end,
+building on the experience we gained in the first attempt, and
+possibly shifting to new tools.
+
+<p>That provisionality aside, this release should be able to do
+everything the old <code/star2html> system could do, and more, with the
+potential for <em/much> more in the future.
 
 <subsubsect>New in this release
 
-<p><ul>
+<p>Substantial additions, including
+<ul>
 
-<li>The down-conversion is now driven by a script, <code/sgml2docs>,
-as described in <ref id=proc.sgml2docs/>.  This required a non-trivial
-amount of internal rearrangement, none of which should be visible to
-authors.
+<li>The handling of routine prologues is now complete (see <ref
+id=doccode/>).  The formatted
+output of these has been designed to appear very much like the old LaTeX
+and <code/star2html> format, except where implementation
+considerations made this particularly tricky.
 
-<li>Significantly upgraded the error handling in the case where a
-<code/docxref> cross-reference target cannot be resolved.  The
-stylesheet does not complain in this case, but instead synthesises a
-reference to the RAL document server, as long as the public identifier
-is in the correct format.  Jade still gives a warning in this case
-(which it's not easy to turn off), but it doesn't invalidate the
-document.
+<li>There is a down-converter to translate routine prologues into
+<code/HLP> text (see <ref id=proc.sgml2hlp/>).
 
-<!--
-<li>There was a minor conflict in the list of hyperlinking
-requirements.  I implemented the requirements that the `top' file in
-the <code/.htx> directory be <code/index.html> and that the filenames
-shouldn't include the document name.  However, having
-<code/index.html> confuses <code/hlink>, which seems to need the file
-to be called <code/sunxxx.html>.  So now the top file is still called
-<code/sunxxx.html> but the component files have short opaque names.
-<code/hlink>, <code/showme> and <code/findme> work fine, now that the
-<code/sgml2docs> script normalises the Jade output in a
-post-processing step.
--->
+<li>Added a <ref id=el.sun.span>span</ref> element to allow you to
+select variants depending on the output media type.
 
-<li>The SGML declaration was changed in such a way that IDs within the
-document are now case-sensitive.  This could not be done without
-making all the other SGML in the application case-sensitive as well.
-This required substantial reorganisation.  As well as forcing the
-whole system to be a little tighter (no bad thing), this helps pave
-the way for an eventual XML version of the DTD (XML has a fixed
-declaration which makes documents case-sensitive).
-
-<li>The paragraph-content parts of the General DTD was split off into
-a separate DTD fragment, <code/paracontent-0.6.dtd>, and the
-programcode DTD was modified to incorporate that, so that all of this
-structure is now available within the programcode DTD.
-
-<li>The paracontent and General DTDs were made fully compatible with
-XML, by use of suitably cunning parameter entities (MOO, MXX, etc, and
-Full.SGML.Only) in the DTD.
-
-<li>The &latex; down-converter now supports the most important of the
-Oasis Table attributes.  The HTML down-converter should follow soon.
-
-<li>The dtddescription DTD and associated utilities (in <code
-type="fspath">doc/dtd2sgml</code>) have been converted to XML, and a
-system for including comments on the DTD has been implemented.  This
-isn't <em/quite> live yet, but should be available immediately after
-this release, to support discussion on the release 0.7 DTDs.
+<li>The upconverters have been significantly developed (see <ref
+id=upconvert/>).
 
 </ul>
-
-<subsubsect>Decisions from 1999 September 24 meeting, Durham
-
-
-<subsubsubsect>Packaging and Installation
-<p><dl compact>
-
-<dt>Multi-platform support deferred.
-<dd>No action required.
-
-<dt>Everything packaged as one lump. Norman and Martin to decide how 
-     to arrange packing details (build, installation).
-<dd><code/dvi2bitmap> incorporated into package.
-
-<dt>Makefile to support all standard targets.
-<dd>Done
-
-<dt>Do not produce document summaries when sgmlstar is installed.
-<dd>Done.
-
-<dt>No documentation processing when standard packages are installed.
-Each package has printable (optional), HTML and SGML.
-<dd>Documentation build at export time.  HTX and &latex; documentation
-included in package, but no SGML.  This is because SGML files can, in
-general, include files from elsewhere, either as simple inclusions (as
-is the case for the DTD documentation in this document), or as
-subdocument references (as is the case for any program source code
-marked up in the programcode DTD.  This makes packaging of the SGML
-source not necessarily trivial.  It can, of course, still be done if
-we feel there's a need for it, but it's not done in the case of this
-package.
-
-</dl>
-
-<subsubsubsect>Running Down Converters 
-<p><dl compact> 
-<dt>Need simple commands <code/sgml2latex> and <code/sgml2html>
-instead of makefile, leaving no temporary files (even in the event of
-failure), and doing all necessary processing (maths, backmatter, etc).  
-<dd>Script <code/sgml2docs> provided.  See notes above.
-
-<dt>All HTML files to go in a <code/.htx> sub-directory;
-The document name should not be included in the HTML file names;
-The top level HTML file should be <code/index.html>;
-Need shorter names for html files;
-There should be no links within the <code/.htx> directory.
-<dd>All done.
-
-<dt>Need a fix for line breaks within tags in <code/htx> index file;
-Findme, showme and hlink should all work.
-<dd>Jade output now normalised in a post-processing step, and the HTX
-programs now work.
-
-</dl>
-
-<subsubsubsect>Hyperlinking
-<p><dl>
-<dt>Must be able to process documents which refer to other starlink
-documents which are not available (i.e. allow unresolved FPIs);
-Must function in the absence of some (or all) document summaries;
-In the absence of referenced documents, the URLs referring to the
-unavailable documents should produce standard HTX remote reference 
-to the document server at RAL.
-<dd>Supported, by making the error-handling code much more
-sophisticated.  See above.
-
-<dt>There should be an ID index page at the end of the HTML version,
-containing links back to referenced points within the document. Each
-page should have a link to the start of its entries in the ID index.
-<dd>Done
-
-<dt>Keep open the possibility of using document summaries as an option.
-For the moment, we will not generate or distribute such summaries (but 
-we may change this later).
-<dd>Use of document summaries is still the documented way, but I've
-added a note that the public identifier can be unresolved without error.
-
-</dl>
-  
-<subsubsubsect>&latex; Output
-<p><dl>
-<dt>Everyone to pass commented &latex; output to Mark or Norman.
-<dd>Done at meeting.
-
-<dt>Table of contents: move it to the front.
-<dd>Done.  Settable through <code/--options> flag to <code/sgml2docs>.
-
-<dt>Look-and-feel: reproduce original &latex; appearance.
-<dd>Page size fixed.
-
-<dt>Down-converter should have two flags (defaulting to yes) to indicate
-     if each appendix or section should start on a new page.
-<dd>Done.  Settable through <code/--options> flag to <code/sgml2docs>.
-
-<dt>Tables: implement alignment, rules, colspan.
-<dd>Done.  Implementation is not complete, but has most of &latex;
-functionality.
-
-<dt>Authors should manually replace tabbing environments within &latex;
-documents before running the up-converter. The up-converter should 
-issue a warning if it finds a tabbing environment.
-<dd>No action needed.
-
-<dt>Optional inclusion of section headings in table of contents will not
-be supported.
-<dd>No action needed.
-
-<dt>Need increased sloppiness in line wrapping.
-<dd>I haven't addressed this here, since it's only RH 6.0 which is
-affected by a distribution bug, and RH 6.1 is already available.
-
-<dt>Verbatim text (displayed only) needs to be a bit smaller.
-<dd>Done.
-
-</dl>
-
-<subsubsubsect>HTML Appearance
-<p><dl>
-<dt>Look-and-feel: be guided by ease of implementation, but if possible,
-     try to reproduce the current style (for instance, do not specify a
-     background colour).
-<dd>??
-
-<dt>Navigation buttons: retain the system used by <code/latex2html>.
-<dd>??
-
-<dt>Move the abstract off the front page.
-<dd>??
-
-<dt>RAL links should be combined into the CCLRC link.
-<dd>??
-
-<dt>Down-converter should only add the standard copyright statement
-     (available from MJB).
-<dd>??
-
-<dt>Hard copy: retrieve .ps files from RAL server.
-<dd>??
-
-<dt>Section numbers: keep them in the HTML, but slim down their use in
-     the table of contents.
-<dd>??
-
-<dt>Alignment of in-line gifs and bitmaps needs to be corrected.
-<dd>Done
-
-</dl>
-
-<subsubsect>Decisions from 1999 October meeting, RAL
-
-<p>This is the subset of decisions from that meeting which refer to
-the DTD specifically.
-<dl compact>
-
-<dt>The "publicity" level of a prologue should be indicated by the
-number of + and - signs at the beginning and end as follows:
-`*+'   = private
-`*++'  = protected (i.e. for internal docs)
-`*+++' = public (i.e. for external docs)
-<dd>
-Not done yet, but half-hour's work for me, probably less for Mark.
-
-<dt>"givenandreturned" should become two separate attributes "given" and
-"returned", defaulting to "given" if neither are specified.
-<dd>Done.
-
-<dt>"othernote" should be renamed "diytopic"
-We need to be able to include "diytopics" anywhere in the prologue,
-not just within a "notelist". This will probably mean doing away with
-"notelists".
-<dd>Done.  It's not particluarly pretty, but it's done.
-
-<dt>We need to be able to classify prologues using keywords. This
-requires a "keywordlist" element in the codeprologue DTD. One or zero
-of these should be allowed in each prologue, and they should provide
-two name spaces (e.g. using "keyword" elements for public keywords,
-and "group" elements for private keywords). 
-
-<dd>Done.  See <ref id=el.programcode.softwarekeywords
-text='softwarekeywords'/> and <ref id=el.programcode.userkeywords
-text='userkeywords'/> elements.
-
-<dt>The design for obsolete IDs in release 0.3 was accepted.
-<dd>Implemented.  See <ref id='el.sun.mapidlist' text='mapidlist'/>.
-
-<dt>Including graphics files in-line in the main document is not needed.
-<dd>OK -- although not terribly useful, it's reasonably easy in fact, and
-if you include MetaPost source as a graphics format, it's implemented!
-
-<dt>Foreign words to be introduced using the <code>foreign</code> tag.
-Non-"full stop" dot to be "&dot;"
-<dd>Done.  See <ref id=el.sun.foreign text='foreign'/> element.
-
-<dt>"docxref" should not generate any "magic" text, and they should be
-allowed in code prologues.
-<dd>Further discussed at March 2000 Cambridge meeting.
-
-</dl>
-
-<subsubsect>Decisions from 2000 March 23 meeting, Cambridge
-
-<p>One of the decisions was to make a snapshot release as quickly as
-possible, so no other decisions from this meeting have been
-implemented yet.  There was a decision to implement a system for
-commenting on DTD elements.  That has been almost done, and it will
-appear ready for the discussion on releasee 0.7 elements.
 
 
 
 <subsubsect>Outstanding issues
 
-<p>There is now a defects list, available on the web at
-<url>http://www.astro.gla.ac.uk/users/norman/star/sgml/project/Defects</url>.
+<p>The defects list has changed.  Its URL is now
+<url>http://www.astro.gla.ac.uk/users/norman/star/sgml/project/defects.html</url>.
 
