@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.22}
-\newcommand{\stardocnumber}    {95.22}
+\newcommand{\stardocsource}    {sun95.23}
+\newcommand{\stardocnumber}    {95.23}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {10th December 2002}
+\newcommand{\stardocdate}      {9th January 2003}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -41043,7 +41043,8 @@ plot (7k).
       }{
          A string specifying the new co-ordinate Frame. If a null parameter
          value is supplied, then the current Frame is left unchanged. The
-         string can be one of the following:
+         suggested default is the Domain (or index if the Domain is not
+         set) of the current Frame. The string can be one of the following:
 
          \sstitemlist{
 
@@ -45795,7 +45796,7 @@ If you have applications which used to link against any of these
 libraries, you should now include {\tt `kaplibs\_link\_adam`} in your
 linking command.
 
-\section{\xlabel{se_changes}Release Notes---V1.0\label{se:changes}}
+\section{Release Notes---V1.0}
 
 This release is a significant milestone in the history oF KAPPA, marking
 the completion of several conversion processes which have been under way
@@ -46064,6 +46065,27 @@ The following applications have been modified:
    \item [\htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
       \begin{itemize}
          \item Can now be used with NDFs of any dimensionality.
+      \end{itemize}
+
+\end{description}
+
+\section{\xlabel{se_changes}Release Notes---V1.1\label{se:changes}}
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{description}
+
+   \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
+      \begin{itemize}
+         \item The default plotting style now results in the axis units being
+               included in the axis labels.
+      \end{itemize}
+
+   \item [\htmlref{WCSFRAME}{WCSFRAME}] \mbox{}
+      \begin{itemize}
+         \item The suggested default for the FRAME parameter is now the
+               Domain (or index if the Domain is blank) of the original
+               current Frame in the supplied NDF.
       \end{itemize}
 
 \end{description}
