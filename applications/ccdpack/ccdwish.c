@@ -303,7 +303,8 @@
    This will cause the autoloader to look there for various library files. */
       ccddir = getenv( "CCDPACK_DIR" );
       if ( ccddir != NULL ) {
-         setenv( "TCLLIBPATH", ccddir, 0 );
+         setenv( "TCL_LIBRARY", ccddir, 0 );
+         setenv( "TK_LIBRARY", ccddir, 0 );
          setenv( "ITCL_LIBRARY", ccddir, 0 );
          setenv( "ITK_LIBRARY", ccddir, 0 );
       }
