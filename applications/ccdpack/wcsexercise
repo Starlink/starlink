@@ -322,7 +322,6 @@
       register \
          inlist='data-??' \
 	 fittype=2 \
-         outformat=wcs \
 	 reset accept
 #     end register
 
