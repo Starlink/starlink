@@ -1,27 +1,24 @@
  INTERFACE SETRANGES
 
-    PARAMETER VALUE_OBJECT
+    PARAMETER INPUT_VALUE
        POSITION 1
        TYPE 'UNIV'
-       KEYWORD 'INPUT_VALUE'
        PROMPT 'Value object'
        VPATH  'PROMPT'
        HELP 'Primitive 1D array for which value limits will be specified'
     ENDPARAMETER
 
-    PARAMETER RANGE_OBJECT
+    PARAMETER INPUT_RANGE
        POSITION 2
        TYPE 'UNIV'
-       KEYWORD 'INPUT_RANGE'
        PROMPT 'Range object'
        VPATH  'PROMPT'
        HELP 'Primitive 1D array from which ranges will be derived'
     ENDPARAMETER
 
-    PARAMETER VALUE_RANGES
+    PARAMETER LIMITS
        POSITION 3
        TYPE '_REAL'
-       KEYWORD 'LIMITS'
        PROMPT 'Limits'
        VPATH 'PROMPT'
        HELP 'Lower and upper limit  e.g. Min,Max or 1D(2) HDS obj'
@@ -30,7 +27,6 @@
     PARAMETER RANGES
        POSITION 4
        TYPE '_CHAR'
-       KEYWORD 'RANGES'
        PPATH 'CURRENT'
     ENDPARAMETER
 
