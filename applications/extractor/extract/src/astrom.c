@@ -76,7 +76,8 @@ void initastrom( picstruct *field ) {
      lm[2] = 0.0;
      lm[3] = 1.0;
      as->lindet = lm[0]*lm[3] - lm[1]*lm[2];
-     warning ( "WORLD-parameters"," will be incorrect" );
+     warning ( "WORLD-parameters", " will be incorrect as your image does "
+               "not have a valid WCS" );
    }
 
    /* Override astrometric definitions only if user supplies a pixel-scale */
