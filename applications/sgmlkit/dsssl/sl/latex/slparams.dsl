@@ -206,7 +206,12 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 % Make \\nonumber a no-op, so it can't cause confusion
 \\let\\nonumber\\relax
 <!-- Other bits and bobs -->
-\\def\\Underscore{\\ifmmode _\\else\\texttt{\\char\"5F}\\fi}
+\\def\\CharUnderscore{\\ifmmode _\\else\\texttt{\\char\"5F}\\fi}
+\\def\\CharDquote{\\texttt{\\char\"22}}
+\\def\\CharBackslash{\\texttt{\\char\"5C}}
+\\def\\CharLangle{\\texttt{\\char\"3C}}
+\\def\\CharRangle{\\texttt{\\char\"3E}}
+\\def\\CharVbar{\\texttt{\\char\"7C}}
 \\def\\Eqnref#1{Eqn.~(#1)}
 <!-- Angle formatting macros.  See slmisc.dsl -->
 \\def\\hmsangle#1{#1^{\\rm h}}
