@@ -128,7 +128,7 @@
       IF ( (ITEM(1:5) .EQ. 'Axis_') .AND. (ITEM(7:).LE.' ') ) THEN
 
 *    Locate object to be got
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC,
+        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM, CLOC,
      :                   NDIM, DIMS, STATUS )
 
 *    Copy components
@@ -146,7 +146,7 @@
      :          (ITEM(8:17).EQ.'SpacedData') ) THEN
 
 *    Locate object to be got
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Data', .TRUE.,
+        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM(:7)//'Data',
      :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Extract spaced parameters
@@ -166,7 +166,7 @@
      :          (ITEM(8:18).EQ.'ScalarWidth') ) THEN
 
 *    Locate object to be got
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Width', .TRUE.,
+        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM(:7)//'Width',
      :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Extract spaced parameters
@@ -185,7 +185,7 @@
       ELSE IF ( ITEM .EQ. 'MagicFlag' ) THEN
 
 *    Locate primary data array
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), 'Data', .TRUE.,
+        CALL BDI1_CREAT( ARGS(1), ARGS(2), 'Data',
      :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Is the array a structure? If not, rename it, create a structure and
@@ -219,7 +219,7 @@
       ELSE
 
 *    Locate object to be got
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC,
+        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM, CLOC,
      :                   NDIM, DIMS, STATUS )
 
 *    Everything ok?

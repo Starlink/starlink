@@ -1,17 +1,17 @@
-      SUBROUTINE BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC,
+      SUBROUTINE BDI1_CFIND( MID, HID, ITEM, CREATE, DELETE, CLOC,
      :                       CNDIM, CDIMS, STATUS )
 *+
 *  Name:
 *     BDI1_CFIND
 
 *  Purpose:
-*     Locate HDS component for a given item, creating if required
+*     Locate HDS component for a given item, creating/deleting if required
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC, CNDIM, CDIMS, STATUS )
+*     CALL BDI1_CFIND( MID, HID, ITEM, CREATE, DELETE, CLOC, CNDIM, CDIMS, STATUS )
 
 *  Description:
 *     Locate HDS component for a given item, creating if required. If the
@@ -28,6 +28,8 @@
 *        BDI data item
 *     CREATE = LOGICAL (given)
 *        Create structures if they don't exist?
+*     DELETE = LOGICAL (given)
+*        Delete named item?
 *     CLOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locator to object matching item. If the item does not exist
 *        the CLOC is set to the symbolic value DAT__NOLOC
@@ -96,7 +98,7 @@
 *     22 Feb 1996 (DJA):
 *        Changes in string concatenation for Linux port
 *      4 Mar 1996 (DJA):
-*        Added Grouping element
+*        Added Grouping element and deletion facility
 *     {enter_changes_here}
 
 *  Bugs:
@@ -114,7 +116,7 @@
 *  Arguments Given:
       INTEGER			MID, HID
       CHARACTER*(*)		ITEM
-      LOGICAL			CREATE
+      LOGICAL			CREATE, DELETE
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC)	CLOC
@@ -191,7 +193,7 @@
 *    Should create structure array object depending on presence
 *    of magic flag
         IF ( ISBIND ) THEN
-          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, TYPE,
+          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, DELETE, TYPE,
      :                      NDIM, DIMS, THERE, CLOC, STATUS )
         ELSE
           CALL DAT_CLONE( LOC, CLOC, STATUS )
@@ -215,7 +217,7 @@
 *    Define dimensions
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
-        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, RTYPE, NDIM,
+        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, DELETE, RTYPE, NDIM,
      :                    DIMS, THERE, CLOC, STATUS )
 
 *  Axis container
@@ -224,7 +226,7 @@
 *    Define dimensions
         CALL BDI1_CFIND0( 1, NDIM, CNDIM, CDIMS )
 
-        CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, 'AXIS', 1,
+        CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, DELETE, 'AXIS', 1,
      :                    NDIM, THERE, CLOC, STATUS )
 
 *  Top-level text components whose names are the same as their HDS counterparts
@@ -257,16 +259,16 @@
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
 *    Look for container
-        CALL BDI1_CFIND1( LOC, 'ERROR', CREATE, 'ERROR', 0, 0,
+        CALL BDI1_CFIND1( LOC, 'ERROR', CREATE, .FALSE., 'ERROR', 0, 0,
      :                    THERE, ELOC, STATUS )
 
 *    If present, look for lower or upper component
         IF ( THERE ) THEN
           IF ( ITEM .EQ. 'LoError' ) THEN
-            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, RTYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, DELETE, RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           ELSE
-            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, RTYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, DELETE, RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           END IF
           CALL DAT_ANNUL( ELOC, STATUS )
@@ -277,7 +279,7 @@
       ELSE IF ( ITEM(1:2) .EQ. 'Ax' ) THEN
 
 *    Look for top-level axis array
-        CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, 'AXIS', 1, NDIM,
+        CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, .FALSE., 'AXIS', 1, NDIM,
      :                    THERE, CLOC, STATUS )
 
 *    User is interested in a particular axis
@@ -298,25 +300,25 @@
 *      Switch depending on the axis item required
           IF ( ITEM(8:) .EQ. 'Units' ) THEN
 
-            CALL BDI1_CFIND1( ALOC, 'UNITS', CREATE, '_CHAR*40', 0, 0,
-     :                        THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( ALOC, 'UNITS', CREATE, DELETE, '_CHAR*40',
+     :                        0, 0, THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Label' ) THEN
 
-            CALL BDI1_CFIND1( ALOC, 'LABEL', CREATE, '_CHAR*80', 0, 0,
-     :                        THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( ALOC, 'LABEL', CREATE, DELETE, '_CHAR*80',
+     :                        0, 0, THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
 
-            CALL BDI1_CFIND1( ALOC, 'NORMALISED', CREATE, '_LOGICAL',
-     :                        0, 0, THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( ALOC, 'NORMALISED', CREATE, DELETE,
+     :                        '_LOGICAL', 0, 0, THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Data' ) THEN
 
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, DELETE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
@@ -324,7 +326,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, DELETE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'LoWidth' ) THEN
@@ -332,7 +334,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, DELETE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'HiWidth' ) THEN
@@ -340,7 +342,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, RTYPE,
+            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, DELETE, RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .LE. ' ' ) THEN
@@ -364,8 +366,8 @@
           CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
 *      Does grouping array exist?
-          CALL BDI1_CFIND1( ALOC, 'GROUPING', CREATE, '_INTEGER', NDIM,
-     :                        DIMS, THERE, CLOC, STATUS )
+          CALL BDI1_CFIND1( ALOC, 'GROUPING', CREATE, DELETE,
+     :                  '_INTEGER', NDIM, DIMS, THERE, CLOC, STATUS )
 
         END IF
 
@@ -373,8 +375,8 @@
       ELSE IF ( (ITEM.EQ.'Quality') .OR. (ITEM.EQ.'QualityMask') ) THEN
 
 *    Does top level QUALITY structure exist?
-        CALL BDI1_CFIND1( LOC, 'QUALITY', CREATE, 'QUALITY', 0, 0,
-     :                    THERE, QLOC, STATUS )
+        CALL BDI1_CFIND1( LOC, 'QUALITY', CREATE, DELETE, 'QUALITY',
+     :                    0, 0, THERE, QLOC, STATUS )
         IF ( THERE ) THEN
 
 *      Switch on item
@@ -385,8 +387,8 @@
             CALL BDI1_CFIND0( 0, 0, CNDIM, CDIMS )
 
 *        Does bad bits mask exist?
-            CALL BDI1_CFIND1( QLOC, 'BADBITS', CREATE, '_UBYTE', 0, 0,
-     :                        THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( QLOC, 'BADBITS', CREATE, DELETE, '_UBYTE',
+     :                        0, 0, THERE, CLOC, STATUS )
 
 *      The quality array
           ELSE IF ( ITEM .EQ. 'Quality' ) THEN
@@ -395,8 +397,8 @@
             CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
 *        Does quality array exist?
-            CALL BDI1_CFIND1( QLOC, 'QUALITY', CREATE, '_UBYTE', NDIM,
-     :                        DIMS, THERE, CLOC, STATUS )
+            CALL BDI1_CFIND1( QLOC, 'QUALITY', CREATE, DELETE, '_UBYTE',
+     :                        NDIM, DIMS, THERE, CLOC, STATUS )
 
           END IF
 
@@ -500,11 +502,11 @@
 
 
 
-      SUBROUTINE BDI1_CFIND1( LOC, NAME, CREATE, TYPE, NDIM, DIMS,
-     :                        THERE, CLOC, STATUS )
+      SUBROUTINE BDI1_CFIND1( LOC, NAME, CREATE, DELETE, TYPE, NDIM,
+     :                        DIMS, THERE, CLOC, STATUS )
 *+
 *  Name:
-*     BDI1_CFIND
+*     BDI1_CFIND1
 
 *  Purpose:
 *     Locate HDS component for a given item, creating if required
@@ -513,7 +515,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_CFIND1( LOC, NAME, CREATE, TYPE, NDIM, DIMS, THERE,
+*     CALL BDI1_CFIND1( LOC, NAME, CREATE, DELETE, TYPE, NDIM, DIMS, THERE,
 *                       CLOC, STATUS )
 
 *  Description:
@@ -528,6 +530,8 @@
 *        The name of the component
 *     CREATE = LOGICAL (given)
 *        Create component if it doesn't exist?
+*     DELETE = LOGICAL (given)
+*        Delete component if it exists?
 *     TYPE = CHARACTER*(*) (given)
 *        The type of the component if we have to create it
 *     NDIM = INTEGER (given)
@@ -607,7 +611,7 @@
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		NAME, TYPE
       INTEGER			NDIM, DIMS(*)
-      LOGICAL			CREATE
+      LOGICAL			CREATE, DELETE
 
 *  Arguments Returned:
       LOGICAL			THERE
@@ -632,7 +636,15 @@
 
 *  Does the named object exist?
       CALL DAT_THERE( LOC, NAME, THERE, STATUS )
-      IF ( CREATE .AND. .NOT. THERE ) THEN
+      IF ( DELETE ) THEN
+
+*    Delete it
+        IF ( THERE ) THEN
+          CALL DAT_ERASE( LOC, NAME, STATUS )
+        END IF
+        CLOC = DAT__NOLOC
+
+      ELSE IF ( CREATE .AND. .NOT. THERE ) THEN
 
 *    Make sure type and dimensionality are specified
         IF ( (TYPE.EQ.'*unknown*') .OR. (NDIM.EQ.-1) ) THEN
@@ -673,7 +685,7 @@
       END IF
 
 *  Locate if object exists
-      IF ( THERE ) THEN
+      IF ( THERE .AND. .NOT. DELETE ) THEN
         CALL DAT_FIND( LOC, NAME, CLOC, STATUS )
       END IF
 

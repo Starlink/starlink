@@ -125,7 +125,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate object to be got
-      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC,
+      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., .FALSE., CLOC,
      :                 NDIM, DIMS, STATUS )
 
 *  Everything ok?
