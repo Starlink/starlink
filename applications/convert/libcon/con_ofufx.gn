@@ -1,0 +1,120 @@
+      SUBROUTINE CON_OFUF<T>( FD, EL, A, NOVPRE, STATUS )
+*+
+*  Name:
+*     CON_OFUFx
+
+*  Purpose:
+*     Writes an array to an unformatted file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CON_OFUFx( FD, EL, A, NOVPRE, STATUS )
+
+*  Description:
+*     This routine converts a numeric array into character form, and
+*     writes it to an output sequential unformatted file.
+
+*  Arguments:
+*     FD = INTEGER (Given)
+*        File descriptor of the output unformatted file.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     A( EL ) = ? (Given)
+*        Input array.
+*     NOVPRE = INTEGER (Given)
+*        The number of data values per record of the output file.
+*        The resulting number of longwords per record must not exceed
+*        8191.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     array supplied to the routine must have the data type specified.
+
+*  Prior Requirements:
+*     The unformatted file must be open for write access.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1992 September 17 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Data-storage constants
+
+*  Arguments Given:
+      INTEGER FD
+      INTEGER EL
+      <TYPE> A( EL )
+      INTEGER NOVPRE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER FIOSTA             ! Fortran I/O status
+      INTEGER I                  ! Loop counter for file records
+      INTEGER J                  ! Loop counter for values per record
+      INTEGER K                  ! Index of the array element
+      INTEGER LUN                ! Logical unit number
+      INTEGER NREC               ! Number of records
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the logical unit number of the file.
+      CALL FIO_UNIT( FD, LUN, STATUS )
+
+*  Copy the values.
+*  ================
+
+*  Find the number of records to write.
+      NREC = ( EL - 1 ) / NOVPRE + 1
+
+*  Loop for each record.
+      K = 0
+      DO  I = 1, NREC
+
+*  Write a record of the values.
+         WRITE( LUN, IOSTAT=FIOSTA ) ( A( J ), J = K + 1, K + NOVPRE )
+
+*  Watch for an error.  Make an informative report, setting status to
+*  bad, and exit.
+         IF ( FIOSTA .NE. 0 ) THEN
+            CALL MSG_SETI( 'I', I )
+            CALL FIO_REP( LUN, ' ', FIOSTA,
+     :        'Error writing data record number ^I to file ^FNAME.  '/
+     :        /'Reason was ^IOSTAT.', STATUS )
+            GOTO 999
+         END IF
+
+*  Increment the array index. 
+         K = K + NOVPRE
+      END DO
+
+  999 CONTINUE
+
+      END
