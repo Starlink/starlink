@@ -12,13 +12,18 @@
 #
 # $Id$
 
-if [ $# != 2 ]; then
-    echo "Usage: $0 path-to-dvi2bitmap test-DVI-file"
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 path-to-dvi2bitmap test-DVI-file [output-file-root]"
     exit 1
 fi
 
 d2bpath=$1
 infile=$2
+if test -n "$3"; then
+    opfroot=$3
+else
+    opfroot=test-output
+fi
 
 # Check that kpsewhich is in the path.  Can't reliably use `which' here,
 # since it's sometimes a stoopid script.
@@ -34,9 +39,9 @@ if [ -z "$KPW" ]; then
 fi
 
 # Force the output filename, and set what file we expect to be generated
-opfmt='-o test-output-%d'
+opfmt="-o $opfroot-%d"
 defaultftype=`$d2bpath -Qt | awk '/^Qt/{print $2}'`
-opfname="test-output-1.$defaultftype"
+opfname="$opfroot-1.$defaultftype"
 rm -f $opfname
 
 preline='vvvvvvvvvvvvvvvvvvvv'
