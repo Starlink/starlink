@@ -5,15 +5,19 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions for extraction of connected pixels from
 *			a pixmap.
 *
-*	Last modify:	07/10/99
+*	Last modify:	02/04/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
 
 #include	<math.h>
 #include	<stdio.h>
@@ -21,6 +25,7 @@
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"back.h"
 #include	"check.h"
 #include	"clean.h"
@@ -41,7 +46,7 @@ INPUT   Measurement field pointer,
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP & Leiden & ESO)
-VERSION 28/11/98
+VERSION 02/04/2003
  ***/
 void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 		int nffield, picstruct *wfield, picstruct *dwfield)
@@ -68,7 +73,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
    int			*start, *end, ymax;
 
 /*----- Beginning of the main loop: Initialisations  */
-  cat.ntotal = cat.ndetect = 0;
+  thecat.ntotal = thecat.ndetect = 0;
 
 /* cfield is the detection field in any case */
   cfield = dfield? dfield:field;
@@ -127,6 +132,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
   QMALLOC(start, int, stacksize);
   QMALLOC(end, int, stacksize);
   lutzalloc(w,h);
+  allocparcelout();
   if (prefs.filter_flag)
     {
     QMALLOC(cdscan, PIXTYPE, stacksize);
@@ -166,6 +172,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
 
 /*----- Allocate memory for the pixel list */
   init_plist();
+
   if (!(pixel = objlist.plist = malloc(nposize=prefs.mem_pixstack*plistsize)))
     error(EXIT_FAILURE, "Not enough memory to store the pixel stack:\n",
         "           Try to decrease MEMORY_PIXSTACK");
@@ -519,7 +526,7 @@ void	scanimage(picstruct *field, picstruct *dfield, picstruct **pffield,
     if (!((yl+1)%16))
       NPRINTF(OUTPUT, "\33[1M> Line:%5d  "
 		"Objects: %8d detected / %8d sextracted\n\33[1A",
-	yl+1, cat.ndetect, cat.ntotal);
+	yl+1, thecat.ndetect, thecat.ntotal);
 /*--------------------- End of the loop over the y's -----------------------*/
     }
 

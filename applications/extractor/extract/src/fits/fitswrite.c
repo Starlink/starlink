@@ -9,11 +9,15 @@
 *
 *	Contents:	low-level functions for writing LDAC FITS catalogs.
 *
-*	Last modify:	13/11/97
-*                       26/11/98 (PWD): Added global initialisations.
+*	Last modify:	13/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef	HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -22,8 +26,8 @@
 #include	"fitscat_defs.h"
 #include	"fitscat.h"
 
-char	*lineout_buf = NULL, padbuf[FBSIZE]; /* PWD: modification here */
-int	lineout_size = 0, nlineout = 0; /* PWD: modification here */
+char	*lineout_buf, padbuf[FBSIZE];
+int	lineout_size, nlineout;
 
 /****** save_cat ***************************************************************
 PROTO	void save_cat(catstruct *cat, char *filename)
@@ -33,7 +37,7 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	Any preexisting file with name filename is overwritten.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	07/04/97
+VERSION	08/05/2002
  ***/
 void	save_cat(catstruct *cat, char *filename)
 
@@ -47,8 +51,13 @@ void	save_cat(catstruct *cat, char *filename)
 
   tab = cat->tab;
 /*Go through each segment in the right order to save data*/
-  for (i=cat->ntab; i--;)
+  for (i=0; i<cat->ntab; i++)
     {
+/*-- Make sure that the tab header is primary or extension! */
+    if (i)
+      ext_head(tab);
+    else
+      prim_head(tab);
     save_tab(cat, tab);
     while (!((tab=tab->nexttab)->nseg));
     }
@@ -68,7 +77,7 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/97
+VERSION	13/12/2002
  ***/
 void	save_tab(catstruct *cat, tabstruct *tab)
 
@@ -76,19 +85,19 @@ void	save_tab(catstruct *cat, tabstruct *tab)
    catstruct	*tabcat;
    keystruct	*key;
    tabstruct	*keytab;
+   KINGSIZE_T	tabsize;
+   KINGLONG	size;
    int		b,j,k,o, nbytes,nkey,nobj,spoonful,
-		size,tabsize, tabflag, larrayin,larrayout;
+		tabflag, larrayin,larrayout;
    char		*buf, *inbuf, *outbuf, *fptr,*ptr;
-#ifdef	BSWAP
    int		esize;
-#endif
 
 /*  Make the table parameters reflect its content*/
   update_tab(tab);
 /*  The header itself*/
   tabflag = update_head(tab)==RETURN_OK?1:0;
+  QFTELL(cat->file, tab->headpos, cat->filename);
   QFWRITE(tab->headbuf, tab->headnblock*FBSIZE, cat->file, cat->filename);
-  tab->bodypos = ftell(cat->file);
 /*  Allocate memory for the output buffer */
   tabsize = 0;
   if (tabflag)
@@ -129,13 +138,12 @@ void	save_tab(catstruct *cat, tabstruct *tab)
           ptr = key->ptr? (char *)key->ptr+nbytes*o:inbuf+key->pos;
           for (b=nbytes; b--;)
             *(fptr++) = *(ptr++);
-#ifdef	BSWAP
-          if (key->ptr)
-            {
-            esize = t_size[key->ttype];
-            swapbytes(fptr-nbytes, esize, nbytes/esize);
-            }
-#endif
+          if (bswapflag)
+            if (key->ptr)
+              {
+              esize = t_size[key->ttype];
+              swapbytes(fptr-nbytes, esize, nbytes/esize);
+              }
           }
         QFWRITE(outbuf, larrayout, cat->file, cat->filename);
         }
@@ -155,19 +163,17 @@ void	save_tab(catstruct *cat, tabstruct *tab)
     {
 /*-- If segment is not a binary table, save it ``as it is'' */
 /*-- We use a limited-size buffer ``in case of'' */
-    tabsize = size = tab->tabsize;
+    size = tabsize = tab->tabsize;
     if (tabsize)
       {
       if (tab->bodybuf)
         {
 /*------ A body is present in memory and needs to be written */
-#ifdef BSWAP
-        swapbytes(tab->bodybuf, tab->bytepix, tabsize/tab->bytepix);
-#endif
-        QFWRITE(tab->bodybuf, tabsize, cat->file, cat->filename);
-#ifdef BSWAP
-        swapbytes(tab->bodybuf, tab->bytepix, tabsize/tab->bytepix);
-#endif
+        if (bswapflag)
+          swapbytes(tab->bodybuf, tab->bytepix, tabsize/tab->bytepix);
+        QFWRITE(tab->bodybuf, (size_t)tabsize, cat->file, cat->filename);
+        if (bswapflag)
+          swapbytes(tab->bodybuf, tab->bytepix, tabsize/tab->bytepix);
         }
       else
 /*------ The body should be copied from the source tab */
@@ -196,7 +202,7 @@ void	save_tab(catstruct *cat, tabstruct *tab)
 /* FITS padding*/
   size = PADEXTRA(tabsize);
   if (size)
-    QFWRITE(padbuf, size, cat->file, cat->filename);
+    QFWRITE(padbuf, (size_t)size, cat->file, cat->filename);
 
   return;
   }
@@ -210,7 +216,7 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	23/01/97
+VERSION	13/12/2002
  ***/
 void	init_writeobj(catstruct *cat, tabstruct *tab)
 
@@ -224,9 +230,10 @@ void	init_writeobj(catstruct *cat, tabstruct *tab)
   if (update_head(tab) != RETURN_OK)
     error(EXIT_FAILURE, "*Error*: Not a binary table: ", tab->extname);
 
+  QFTELL(cat->file, tab->headpos, cat->filename);
   QFWRITE(tab->headbuf, tab->headnblock*FBSIZE, cat->file, cat->filename);
 /* Store the current position */
-  tab->bodypos = ftell(cat->file);
+  QFTELL(cat->file, tab->bodypos, cat->filename);
 
 /* Allocate memory for the output buffer  (or increase it if done already) */
   if (lineout_buf)
@@ -266,7 +273,7 @@ INPUT	Destination catalog
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	23/01/97
+VERSION	18/02/2000
  ***/
 int	write_obj(tabstruct *tab)
 
@@ -274,19 +281,18 @@ int	write_obj(tabstruct *tab)
    keystruct	*key;
    char		*pin, *pout;
    int		b,k;
-#ifdef	BSWAP
    int		esize;
-#endif
 
   key = tab->key;
   pout = lineout_buf;
   for (k=tab->nkey; k--; key = key->nextkey)
     {
     pin = key->ptr;
-#ifdef BSWAP
-    esize = t_size[key->ttype];
-    swapbytes(pin, esize, key->nbytes/esize);
-#endif
+    if (bswapflag)
+      {
+      esize = t_size[key->ttype];
+      swapbytes(pin, esize, key->nbytes/esize);
+      }
     for (b=key->nbytes; b--;)
       *(pout++) = *(pin++);
     }
@@ -305,13 +311,14 @@ INPUT	catalog structure,
 OUTPUT	-.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	13/11/97
+VERSION	13/12/2002
  ***/
 void	end_writeobj(catstruct *cat, tabstruct *tab)
 
   {
    keystruct	*key;
-   int		k, pos, size;
+   OFF_T	pos;
+   int		k, size;
 
 /* Make the table parameters reflect its content*/
   key = tab->key;
@@ -326,14 +333,15 @@ void	end_writeobj(catstruct *cat, tabstruct *tab)
   size = PADEXTRA(tab->tabsize);
   if (size)
     QFWRITE(padbuf, size, cat->file, cat->filename);
-  pos = ftell(cat->file);
-  QFSEEK(cat->file,tab->bodypos-FBSIZE*tab->headnblock,SEEK_SET,cat->filename);
+  QFTELL(cat->file, pos, cat->filename);
+  QFSEEK(cat->file, tab->headpos, SEEK_SET, cat->filename);
   QFWRITE(tab->headbuf, FBSIZE*tab->headnblock, cat->file, cat->filename);
   QFSEEK(cat->file, pos, SEEK_SET, cat->filename);
 
   if (!(--nlineout))
     {
-    QFREE(lineout_buf);
+    free(lineout_buf);
+    lineout_buf = NULL;
     lineout_size = 0;
     }
 

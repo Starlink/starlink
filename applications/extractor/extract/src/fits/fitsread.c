@@ -11,9 +11,16 @@
 *
 *	Last modify:	28/11/98 (EB):
 *                       26/11/98 (PWD): Added global initialisations
+*	Last modify:	29/06/2002
+*                                (EB): 2.3
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifdef	HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -31,7 +38,7 @@ INPUT	Filename,
 OUTPUT	catstruct pointer.
 NOTES	Returns NULL if no file with name \<filename\> is found.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	22/08/96
+VERSION	07/05/2002
  ***/
 catstruct	*read_cat(char *filename)
 
@@ -44,12 +51,15 @@ catstruct	*read_cat(char *filename)
   strcpy(cat->filename, filename);
   if (open_cat(cat, READ_ONLY) != RETURN_OK)
     {
-    free_cat(cat, 1);
+    free_cat(&cat, 1);
     return NULL;
     }
 
   if (map_cat(cat) != RETURN_OK)
-    error (EXIT_FAILURE, "Cannot map ", filename);
+    {
+    free_cat(&cat, 1);
+    return NULL;
+    }
 
   return cat;
   }
@@ -155,7 +165,7 @@ INPUT	Table which will be accessed from disk (provided by init_readobj()),
 OUTPUT	The number of table lines that remain to be read.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	07/04/97
+VERSION	18/02/2000
  ***/
 int	read_obj(tabstruct *keytab, tabstruct *tab)
 
@@ -163,9 +173,7 @@ int	read_obj(tabstruct *keytab, tabstruct *tab)
    keystruct	*key;
    char		*pin, *pout;
    int		b,k;
-#ifdef	BSWAP
    int		esize;
-#endif
 
   QFREAD(linein_buf,keytab->naxisn[0],keytab->cat->file,keytab->cat->filename);
   key = tab->key;
@@ -174,10 +182,11 @@ int	read_obj(tabstruct *keytab, tabstruct *tab)
       {
       pin = linein_buf+key->pos;
       pout = key->ptr;
-#ifdef BSWAP
-      esize = t_size[key->ttype];
-      swapbytes(pin, esize, key->nbytes/esize);
-#endif
+      if (bswapflag)
+        {
+        esize = t_size[key->ttype];
+        swapbytes(pin, esize, key->nbytes/esize);
+        }
       for (b=key->nbytes; b--;)
         *(pout++) = *(pin++);
       }
@@ -195,7 +204,7 @@ INPUT	Table which will be accessed from disk (provided by init_readobj()),
 OUTPUT	RETURN_OK if the object has been accessed, RETURN_ERROR otherwise.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	23/06/97
+VERSION	28/02/2000
  ***/
 int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
 
@@ -204,9 +213,7 @@ int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
    char		*pin, *pout;
    size_t	n;
    int		b,k;
-#ifdef	BSWAP
    int		esize;
-#endif
 
   if ((n=keytab->naxisn[0]*pos) >= keytab->tabsize)
     return RETURN_ERROR;
@@ -218,10 +225,11 @@ int	read_obj_at(tabstruct *keytab, tabstruct *tab, long pos)
       {
       pin = linein_buf+key->pos;
       pout = key->ptr;
-#ifdef BSWAP
-      esize = t_size[key->ttype];
-      swapbytes(pin, esize, key->nbytes/esize);
-#endif
+      if (bswapflag)
+        {
+        esize = t_size[key->ttype];
+        swapbytes(pin, esize, key->nbytes/esize);
+        }
       for (b=key->nbytes; b--;)
         *(pout++) = *(pin++);
       }
