@@ -49,6 +49,8 @@ extern int  F77_EXTERNAL_NAME(lib$find_file)( CHARACTER(wspec),
  */
 #else
 
+extern F77_LOGICAL_TYPE F77_EXTERNAL_NAME(util_findfile_aux);
+
 #include "dirent.h"
 
 
