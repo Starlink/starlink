@@ -100,11 +100,15 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 16 (MJC):
 *        Original version based on R.F. Warren-Smith's FILLIN.
+*     21-MAY-1998 (DSB):
+*        Added protection against division by zero if there are any
+*        zero variance values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -447,7 +451,9 @@
  
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( INARR( I, J ) .NE. VAL__BAD<T> .AND.
-     :                    INVAR( I, J ) .NE. VAL__BAD<T> ) THEN
+     :                    INVAR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                    OUTVAR( I, J ) .GT. 0<CONST> ) THEN
+     
                         DLAST( 1 ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( 1 ) = 1<CONST> / OUTVAR( I, J )
  
@@ -465,7 +471,8 @@
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BAD<T> .AND.
-     :                       OUTVAR( I, J ) .NE. VAL__BAD<T> ) THEN
+     :                       OUTVAR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                       OUTVAR( I, J ) .GT. 0<CONST> ) THEN
                            WTLAST( 1 ) = WTLAST( 1 ) + 1<CONST> /
      :                                   OUTVAR( I, J )
                            DLAST( 1 ) = DLAST( 1 ) +
@@ -501,7 +508,8 @@
  
 *  If the input pixel and variance are valid, reset the weighted sums.
                      IF ( OUTARR( I, J ) .NE. VAL__BAD<T> .AND.
-     :                    OUTVAR( I, J ) .NE. VAL__BAD<T> ) THEN
+     :                    OUTVAR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                    OUTVAR( I, J ) .GT. 0<CONST> ) THEN
                         DLAST( I ) = OUTARR( I, J ) / OUTVAR( I, J )
                         WTLAST( I ) = 1<CONST> / OUTVAR( I, J )
  
@@ -518,7 +526,8 @@
 *  If this pixel or variance has been replaced before, add it into the
 *  current weighted sums for this line.
                         IF ( OUTARR( I, J ) .NE. VAL__BAD<T> .AND.
-     :                       OUTVAR( I, J ) .NE. VAL__BAD<T> ) THEN
+     :                       OUTVAR( I, J ) .NE. VAL__BAD<T> .AND.
+     :                       OUTVAR( I, J ) .GT. 0<CONST> ) THEN
                            WTLAST( I ) = WTLAST( I ) + 1<CONST> /
      :                                   OUTVAR( I, J )
                            DLAST( I ) = DLAST( I ) +
