@@ -5733,6 +5733,7 @@ c        REAL XX,XP,YP
 *  form input
           IF (I_FORM) THEN
             CALL IMG_FORMOK(FOK,STATUS)
+            IF (FOK) THEN
               CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
               CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
               CALL IMG_NBGET0R('PAR_R3',IRAD,STATUS)
@@ -6223,7 +6224,7 @@ c        REAL XX,XP,YP
         FLAG=0
         CALL NBS_PUT_VALUE(ID,0,VAL__NBI,FLAG,STATUS)
         DO WHILE (FLAG.EQ.0)
-          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+          CALL NBS_GET_VALUE(ID,0,VAL__NBI,FLAG,NB,STATUS)
         ENDDO
         OK=(FLAG.EQ.1)
 
