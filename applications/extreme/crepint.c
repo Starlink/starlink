@@ -11,8 +11,8 @@
 *
 *  Description:
 *     This program is a filter which takes C source code and replaces 
-*     any occurrences of the type specifier `int' by the identifier
-*     `INT_BIG'.  This identifier should then be assigned a preprocessor 
+*     occurrences of the type specifier `int' by the identifier
+*     `INT_BIG'.  This identifier can then be assigned a preprocessor 
 *     value of a suitable integral type (int or long) either using an
 *     include file or with a -DINT_BIG=xxx flag on the C compiler.
 *
@@ -21,7 +21,7 @@
 *     specifiers will be left alone.
 *
 *     If a use of int appears to be declaring a symbol called `main' or
-*     `argc', then this will be left alone too, and a message written
+*     `argc', then this will be left alone too, and a warning written
 *     to standard error to the effect that it is not being changed.
 *
 *     Additionally, references to the limit.h macros INT_MAX, INT_MIN 
@@ -43,8 +43,9 @@
 *
 *     In the case of potentially dangerous format strings, for
 *     convenience a comment is inserted in the output code on the line
-*     before the format string is used.  The comment will contain the
-*     character string `crepint: '.
+*     before the function call is made.  The comment will contain the
+*     character string `crepint: '.  The warning to standard error 
+*     notes that the comment line has been inserted.
 *
 *     The program does not make all changes which are required to effect
 *     this conversion.  The following constructions are likely to cause
@@ -65,6 +66,10 @@
 *
 *     The program tries to adjust padding whitespace outside comments 
 *     so that the spacing of the output looks OK.
+*
+*     No changes are made to comment lines so that, for instance, the 
+*     Synopsis stanza of function prologues will not have formal argument 
+*     types changed from 'int' to 'INT_BIG'.
 *       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
