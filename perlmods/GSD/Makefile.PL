@@ -23,15 +23,21 @@ if ($^O eq 'solaris') {
 
 # Uncomment this if you are explicitly linking with libarrays
 # $arrays = "-Larrays -larrays";
- 
+
 $libs = "$arrays $mathlibs";
 
 WriteMakefile(
     'NAME'      => 'GSD',
     'VERSION_FROM' => 'GSD.pm',
     'LIBS'      => "-L$StarConfig{Star_Lib} -lgsd $libs",
+    'PREREQ_PM' => {
+                              'Test' => undef,
+                             },
     'DEFINE'    => '',
     'INC'       => "-I$StarConfig{Star_Inc}",
     dist          => { COMPRESS => "gzip -9f" },
+   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+     (ABSTRACT_FROM => 'GSD.pm',
+      AUTHOR     => 'Tim Jenness <t.jenness@jach.hawaii.edu>') : ()),
     );
 
