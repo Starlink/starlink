@@ -5843,7 +5843,7 @@ proc GetFeature {cx cy rlabel} {
             }
          }
 
-#  Adjust the number of positions to exclude any which could be
+#  Adjust the number of positions to exclude any which could not be
 #  centroided.
          set np [expr $np - $nbad]
 
@@ -5851,7 +5851,7 @@ proc GetFeature {cx cy rlabel} {
          if { $nbad > 1 } {
             Message "Accurate positions could not be found for $nbad features."
          } elseif { $nbad > 0 } {
-            Message "An accurate position could not be found for the feature."
+            Message "An accurate position could not be found for 1 feature."
          }
 
 # If the position could not be centroided, indicate we have no good
