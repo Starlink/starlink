@@ -1,6 +1,7 @@
 # Makefile for the various forms of ECHOMOP documentation.
 
-
+STAR2HTML = @STAR2HTML@
+HLINK = @HLINK@
 
 # Following might be overridden on the command line (by the parent makefile)
 LATEX_DOCS=sun152.latex_tar
@@ -17,7 +18,8 @@ $(HYPERTEXT_DOCS): sun152/sun152.htx/sun152.html
 # The LaTeX2html commands needs some preprocessing.  The .tex file has
 # the magic within it.
 sun152/sun152.htx/sun152.html: sun152/sun152.tex
-	cd sun152; sed -n 's/^%%S2HPOST//p' sun152.tex | csh
+	cd sun152; sed -n 's/^%%S2HPOST//p' sun152.tex | \
+	  STAR2HTML=$(STAR2HTML) HLINK=$(HLINK) /bin/sh
 
 # Bundle up the HTML version of the HELP.  Filename must match that
 # required by the makefile in the parent directory.

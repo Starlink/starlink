@@ -23,8 +23,8 @@ AC_SET_MAKE
 
 STAR_MONOLITHS
 
-# Find program to compile help libraries
-STAR_CHECK_PROGS(hlib)
+# Find program to compile help libraries, and star2html, for doc/Makefile
+STAR_CHECK_PROGS(hlib star2html hlink)
 
 STAR_DECLARE_DEPENDENCIES(build, [cnf fio hds hlp mers ndf par pda pgp prm sae sla mers])
 STAR_DECLARE_DEPENDENCIES(build, kaplibs, link)
@@ -36,5 +36,5 @@ STAR_DECLARE_DEPENDENCIES(build, kaplibs, link)
 STAR_LATEX_DOCUMENTATION(sun152,
                          [sun152.htx_tar sun152.latex_tar echomop_hyper.tar])
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml doc/Makefile])
 AC_OUTPUT

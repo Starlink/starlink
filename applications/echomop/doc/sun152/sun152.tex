@@ -344,7 +344,7 @@ and 2-D distortion fitting and extraction.
 %%S2HPOST    else
 %%S2HPOST        useaux=
 %%S2HPOST    fi
-%%S2HPOST    star2html -a "${AUTH_NAME}" -m "${AUTH_EMAIL}" $useaux \
+%%S2HPOST    ${STAR2HTML:=star2html} -a "${AUTH_NAME}" -m "${AUTH_EMAIL}" $useaux \
 %%S2HPOST            -t "${DOC_TITLE}" ${DOC_CODE}
 %%S2HPOST
 %%S2HPOST# Generate Perl script to do the work.
@@ -458,7 +458,7 @@ and 2-D distortion fitting and extraction.
 %%S2HPOST    echo '! Hyperlinking document against Master Document Set at RAL.'
 %%S2HPOST    cd ..
 %%S2HPOST    HTX_PATH=.; export HTX_PATH
-%%S2HPOST    hlink .
+%%S2HPOST    ${HLINK:=hlink} .
 %%S2HPOST    echo '! Hyperlink done.'
 %%S2HPOST    echo '! star2html post-processing complete.'
 %%S2HPOST
