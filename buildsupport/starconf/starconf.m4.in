@@ -4,11 +4,31 @@
 
 
 
-# STAR_DEFAULTS
-# -------------
-# Defaults for Starlink configure.ac files
+# STAR_DEFAULTS(options='')
+# -------------------------
+# Defaults for Starlink configure.ac files.  The optional OPTIONS
+# argument holds a space-separated list of option keywords, of which
+# the only one at present is `per-package-dirs', which causes
+# applications and help to be installed in a package-specific
+# directory.
+#
 AC_DEFUN([STAR_DEFAULTS],
 [#
+_star_per_package_dirs=false
+for opt in $1 NONE
+do
+    case $opt in
+        per-package-dirs)
+            _star_per_package_dirs=true
+            ;;
+        NONE)
+            ;;
+        *)
+            echo "Unrecognised [STAR_DEFAULTS] option $1 ignored"
+            ;;
+    esac
+done
+
 # Ensure that STARLINK has a value, defaulting to
 # !!STARCONF_DEFAULT_STARLINK!!.  Note that this directory may be
 # different from /star, and reflects the value of
@@ -42,11 +62,16 @@ AC_DEFUN([STAR_DEFAULTS],
 test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
 AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
 
+if $_star_per_package_dirs; then
+    bindir="$bindir/$PACKAGE_NAME"
+    AC_MSG_NOTICE([STAR_DEFAULTS has per-package-dirs option: bindir=$bindir])
+fi
+
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
 # ./configure squeal if the package is re-configured with an
 # inconsistent value of this variable.
-AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
+AC_ARG_VAR(STARLINK, [Location of a current Starlink tree (used if necessary)])dnl
 
 # AC_SUBST the STARLINK variable.  Macro AC_ARG_VAR does this anyway,
 # but automake doesn't know that (in 1.6 at least): however any
@@ -69,29 +94,18 @@ FCFLAGS="$FCFLAGS -I$STARLINK/include"
 FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
 LDFLAGS="$LDFLAGS -L$STARLINK/lib"
-# Note that the following imply that we are expecting to find
-# pre-installed versions of includes and libraries in the same
-# locations we plan to install new ones.  That is, I think, what we
-# expect.
-#FFLAGS="$FFLAGS -I$STARLINK/include${includedir}"
-#CFLAGS="$CFLAGS -I${includedir}"
-#LDFLAGS="$LDFLAGS -L${libdir}"
 
-# Dependency declarations and checks (see macros
-# [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
+
+# Dependency declarations and checks.
 # Everything is dependent on starconf, so we don't have to declare that 
-# for each package separately.  STAR_DEPENDENCIES_ATTRIBUTES is currently
-# not used.
-dnl STAR_BUILD_DEPENDENCIES=''
-dnl AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
-dnl STAR_USE_DEPENDENCIES=''
-dnl AC_SUBST(STAR_USE_DEPENDENCIES)dnl
+# for each package separately.
+# STAR_DEPENDENCIES_ATTRIBUTES is currently not used.
 STAR_DEPENDENCIES_ATTRIBUTES=''
 STAR_DEPENDENCIES_CHILDREN=''
 AC_SUBST(STAR_DEPENDENCIES_ATTRIBUTES)
 AC_SUBST(STAR_DEPENDENCIES_CHILDREN)
 
-# List of message files.  Used to signal to automake
+# List of message files.  Used to signal to automake.
 STAR_MESSGEN_SOURCES=
 AC_SUBST(STAR_MESSGEN_SOURCES)
 
@@ -135,7 +149,7 @@ AC_SUBST(PACKAGE_VERSION)
 
 
 # STAR_MESSGEN(msgfile-list)
-# ----------------------------------------
+# --------------------------
 #
 # Handle generating message, error, and facility files.
 #
@@ -180,6 +194,7 @@ AC_DEFUN([STAR_MESSGEN],
               _STAR_EXTRA_DIST(fac_${_s_faccode}_err)
           done
           STAR_DECLARE_DEPENDENCIES([sourceset], [messgen])
+          STAR_CHECK_PROGS(messgen)
 ])# STAR_MESSGEN
 
 
@@ -290,8 +305,8 @@ func_two_();
 # The second, optional, argument gives an explicit list of the targets
 # which are build.  If this is _not_ specified, then a standard list
 # is used (.tex, .ps and .tar_htx) and corresponding rules added to
-# the generated makefile.  If it is specified (to any value, including
-# ''), then its value is a list of files which are to be added to the
+# the generated makefile.  If it is specified, it must be non-null,
+# and its value is a list of files which are to be added to the
 # distribution, and no extra Makefile rules are added.  Thus if users need
 # anything complicated done, they should use this second argument and
 # provide rules for satisfying the given targets.
@@ -309,9 +324,93 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                         _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                         STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
                     done
-                    dnl STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
+                    dnl STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
+                    STAR_CHECK_PROGS([star2html])
                    ])dnl
 ])# STAR_LATEX_DOCUMENTATION
+
+
+# STAR_CHECK_PROGS(progs-to-check-for)
+# ------------------------------------
+#
+# For each of the programs in PROGS-TO-CHECK-FOR, define a variable
+# whose name is the upcased version of the program name, and whose
+# value is the full path to that program, or the expected installation
+# location of that program if no absolute path can be found.  Because
+# of this default behaviour, this macro should _only_ be used for
+# locating Starlink programs such as messgen or alink, and not as a
+# general replacement for AC_CHECK_PROG.  Any characters in the
+# program outside of the set of alphanumerics and underscores are
+# normalised to underscores.
+#
+# For example:
+#     STAR_CHECK_PROGS(messgen)
+# would define the variable MESSGEN to have the full path to the
+# messgen application.
+#
+# Calls AC_SUBST and AC_ARG_VAR on the generated variable name.
+#
+# This is the analogue of AC_CHECK_PROG, except that: (1) the variable
+# name defaults to the program name, (2) the variable value if the
+# program is not found is the path to the anticipated installation
+# location of the program, so that the macro does not fail in this
+# case.  This is useful for locating Starlink programs, as it means we
+# can use this macro to produce absolute paths to programs, even
+# before they have been installed (in this case we are presumably
+# doing a top-level configure of the Starlink tree, and the Makefile
+# will ensure that the required files are installed before the current
+# package actually uses it.
+#
+# The current value of the PATH variable is augmented by the location
+# of the binary installation directory, using the current default
+# value of the prefix, and by the $STARLINK/bin directory.
+AC_DEFUN([STAR_CHECK_PROGS],
+         [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
+          AC_FOREACH([ProgramName], [$1],
+                     [AC_PATH_PROG(_STAR_UPCASE(m4_bpatsubst(ProgramName,
+                                                             [[^0-9a-zA-Z_]], 
+                                                             [_])),
+                                   ProgramName,
+                                   [\$(bindir)/ProgramName],
+                                   [$default_bindir:$STARLINK/bin:$PATH])
+                      AC_ARG_VAR(_STAR_UPCASE(m4_bpatsubst(ProgramName,
+                                                           [[^0-9a-zA-Z_]], 
+                                                           [_])),
+                                 [Location of the ]ProgramName[ application])])
+])# STAR_CHECK_PROGS
+          
+
+
+# STAR_MONOLITHS
+# --------------
+# Declare that we will be creating monoliths.  This does whatever
+# configuration is necessary to handle these.
+#
+# Note that the declarations done in the Makefile.am, declaring the
+# name of the monolith and the names and source files of the tasks,
+# are slightly redundant inasmuch as some of that information could be
+# implied.  However, this is required to be explicit for clarity and
+# consistency, and so accomodate the (currently unexploited)
+# possibility that the tasks and .ifl files longer have the
+# one-task-per-file relationship they have now.
+AC_DEFUN([STAR_MONOLITHS],
+         [dnl Installation in monoliths.am uses $(LN_S)
+          AC_REQUIRE([AC_PROG_LN_S])dnl
+
+          # To build monoliths, we need both compifl to build the .ifc
+          # files (in the parsecon component), and alink
+          # to link the monoliths (in dtask).
+          STAR_DECLARE_DEPENDENCIES(build, [parsecon dtask])
+
+          # So try to find alink and compifl.
+          STAR_CHECK_PROGS([compifl alink])
+
+          # When we're building monoliths, we will almost certainly be
+          # using Fortran, and so we might as well include this,
+          # partly in case the user forgets, but also because this is
+          # reasonably part of the default setup required for monoliths.
+          STAR_CNF_COMPATIBLE_SYMBOLS
+])# STAR_MONOLITHS
 
 
 # STAR_HELP_FILES(helpfiles)
@@ -512,12 +611,10 @@ fi
 
 # _STAR_UPCASE(string)
 # --------------------
-# Expands to STRING with all letters translated to uppercase.  Not
-# currently used in fact.
+# Expands to STRING with all letters translated to uppercase.
 AC_DEFUN([_STAR_UPCASE],
-         [m4_translit([$1],
-                      [abcdefghijklmnopqrstuvwxyz],
-                      [ABCDEFGHIJKLMNOPQRSTUVWXYZ])])
+         [m4_translit([$1], [a-z], [A-Z])])
+##         [m4_translit(m4_bpatsubst([$1], [[^0-9a-zA-Z_]], [_]), [a-z], [A-Z])])
 
 
 # _STAR_EXTRADIR_COMMON(dir-type, file-list)
@@ -527,19 +624,28 @@ AC_DEFUN([_STAR_UPCASE],
 # `etc', `docs', and `FILE-LIST' is a list of files to be installed in
 # the directory STAR_[DIR-TYPE]_DIR.  This works by defining and
 # AC_SUBSTing the variables `starX_STARDATA and
-# starXdir for X=dir-type (eg, `stardocs_STARDATA' and `stardocdir').
+# starXdir for X=dir-type (eg, `stardocs_STARDATA' and `stardocsdir').
 # The form of these variables is governed by the data.am template in automake.
 # Starlink-automake recognises the `primary' STARDATA and handles it
 # appropriately.
+#
+# Specialcase 'help': help is one of the directories (the other is bin)
+# which is affected by the $_star_per_package_dir variable; if it's
+# true, then add the $PACKAGE_NAME to the starhelpdir.  There are
+# others: see PWD's message of 2004-02-16:
+# <http://www.jiscmail.ac.uk/cgi-bin/wa.exe?A2=ind0402&L=stardev&T=0&F=&S=&P=5153>
 AC_DEFUN([_STAR_EXTRADIR_COMMON],
          [m4_ifval([$1], [], [AC_FATAL([$0: called with zero args])])dnl
           m4_ifval([$2], [], [AC_FATAL([$0: called with only one arg])])dnl
           if test "X[$]star$1_STARDATA" = X; then
               # First time
-##              [STAR_]_STAR_UPCASE($1)[_DIR]='$(prefix)/$1'
-##              AC_SUBST([STAR_]_STAR_UPCASE($1)[_DIR])dnl
               AC_SUBST(star$1_STARDATA)dnl
-              AC_SUBST(star$1[]dir, '$(prefix)/$1')dnl
+              star$1[]dir='$(prefix)/$1'
+              m4_if([$1], [help],
+                    [if $_star_per_package_dirs; then
+                         star$1[]dir=star$1[]dir/$PACKAGE_NAME
+                     fi])
+              AC_SUBST(star$1[]dir)
           fi
           star$1_STARDATA="[$]star$1_STARDATA $2"
 ])# _STAR_EXTRADIR_COMMON
