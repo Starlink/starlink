@@ -1,0 +1,75 @@
+/* Part of dvi2bitmap.
+   Copyright 1999, Particle Physics and Astronomy Research Council.
+   See file LICENCE for conditions.
+
+   $Id$
+*/
+
+
+/* Define as 1 if you do NOT have <cstdio> headers.  In this case, we use
+   <stdio.h> rather than standard <cstdio> */
+#define NO_CSTD_INCLUDE 0
+
+/* Define as 1 if you have <assert.h> and <sstream> (as opposed to
+   older <strstream>) */
+#undef HAVE_ASSERT_H
+#undef HAVE_SSTREAM
+
+/* Define as 1 if you want to enable generation of GIFs */
+#define ENABLE_GIF 0
+
+/* Define PATH_SEP to be the path separator.  The default colon is for
+   unix, but MS-DOS uses a semicolon. */
+#define PATH_SEP ':'
+
+/* The alpha cxx compiler currently (v6.0) needs to be invoked with 
+   __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
+   streams library.  See Digital C++ v6.0 manual, section 7.1.2.
+   This is defined by default when the compiler is invoked with
+   `-std strict_ansi', but that's a little harder to arrange in
+   here. */
+#undef __USE_STD_IOSTREAM
+
+/* Define as 1 if you want to enable use of the kpathsea library.  The
+   following options have an effect only if this is enabled. */
+#define ENABLE_KPATHSEA 0
+
+/* Define MKTEXPK to be the path to the mktexpk program, or leave
+   undefined if not known, not available, or we should not use it. */
+#undef MKTEXPK
+
+/* Define MAKETEXPK to be the path to the MakeTeXPK program, or leave
+   undefined if not known, not available, or we should not use it.
+   The mktexpk program is newer (I think), and should be used in
+   preference. */
+#undef MAKETEXPK
+
+/* Define ENABLE_FONT_GEN to be 1 if you wish fonts to be generated
+   automatically.  This works only if the use of the kpathsea library
+   is enabled. */
+#define ENABLE_FONT_GEN 0
+
+/* Define DEFAULT_MFMODE and DEFAULT_RESOLUTION to be the default
+   Metafont mode and resolution which should be used when generating
+   fonts.  These two parameters must be consistent with each other.
+   For examples, see the file modes.mf, which is either available as
+   part of your TeX distribution, or from CTAN.  If not defined,
+   internal defaults will be used.  */
+#undef DEFAULT_MFMODE
+#undef DEFAULT_RESOLUTION
+
+/* Set DEFAULT_TEXMFCNF to be the location of the texmf.cnf file which
+   the kpathsea library is to use.  This will be overridden by a value
+   of TEXMFCNF set in the program's environment. */
+#undef DEFAULT_TEXMFCNF
+
+/* The texmf.cnf file uses the value of variables SELFAUTO..., and
+   sets these based on the location of the program's binary.  Some
+   (broken!) configuration files have the VARTEXFONTS variable
+   depending on these, and this means that font generation fails
+   unless the dvi2bitmap program is installed along with the other
+   dviware binaries.  If you have such a configuration file, and you
+   can't or don't want to install the program with the other dviware,
+   then you can define this variable to the location of a binary that
+   is in the `correct' place. */
+#undef FAKE_PROGNAME
