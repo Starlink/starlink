@@ -283,6 +283,9 @@
       
       END DO
 
+*  Now remove any escape characters from the returned names.
+      CALL GRP1_RMESC( SLOT2, SIZE0 + 1, CMN_GSIZE( SLOT2 ), STATUS )
+
 *  Jump to here if an error occurs.
  999  CONTINUE
 

@@ -6,14 +6,14 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.4}
-\newcommand{\stardocnumber}    {150.4}
+\newcommand{\stardocsource}    {sun150.5}
+\newcommand{\stardocnumber}    {150.5}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {19th January 1996}
+\newcommand{\stardocdate}      {27th August 1999}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
-\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocversion}   {Version 3.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1135,6 +1135,59 @@ comment character to the end of the line, so a new group expression may be
 given on the next line. Note, blank lines are {\em not} ignored. Each blank line
 within a text file will result in a blank name being added to the group.
 
+\subsection{Escaping the Special Characters in a Group Expression}
+If is possible to specify that a given character be used as an ``escape
+character'' within group expressions. This facility is normally
+suppressed, but an application can choose to switch it on by assigning a
+value to the ESCAPE control character associated with a group (see
+section \ref{SEC:CC}). If this is done, any special meaning associated
+with a character within a group expression is ignored if the character is
+preceeded by an escape character. The escape characters themselves are
+not included in the resulting names if they preceed any of the other
+``special'' control characters. Note, escape characters which do not
+preceed another control character {\em are} included in the resulting
+names.
+
+For instance, the group expression:
+
+\small
+\begin{verbatim}
+      * | A
+\end{verbatim}
+\normalsize
+
+would normally result in an error because the ``\verb+|+'' character
+would be taken as the start of an incomplete specification for some
+editing to apply to the preceeding text (assuming the application has not
+changed the default editing behaviour). If, in fact, the user wants this
+string to be accepted as a literal string (maybe representing a Unix
+piping operation for instance), then the ``\verb+|+'' should be escaped.
+Assuming the application chooses to use the backslash character
+``\verb+\+'' as the escape character, then this can be done by entering
+the following group expression:
+
+\small
+\begin{verbatim}
+      * \| A
+\end{verbatim}
+\normalsize
+
+The ``\verb+\+'' character results in the ``\verb+|+'' character being
+treated as part of the required string, rather than as the start of an
+editing specification. The string returned to the application is then
+``\verb+* | A+'' (note, the escape character has been removed). Any
+escape characters which do not preceed special characters are included
+literaly in the returned string. So, for instance, if the group
+expression was:
+
+\small
+\begin{verbatim}
+      \* \| A
+\end{verbatim}
+\normalsize
+
+the string ``\verb+\* | A+'' would be returned to the application.
+
 \subsection{The Order of Names Within a Group}
 Names are stored within a group in the order in which they are specified in the
 group expression. For instance, if the file F1.DAT contained the following two
@@ -1481,7 +1534,7 @@ to hold the results.
 \subsection{\label{SEC:CC}Changing the Characters Used to Control the Syntax of Group
 Expressions}
 
-A set of eleven ``control characters'' are used to indicate various items of
+A set of ``control characters'' are used to indicate various items of
 syntax within
 a group expression. Each group is created with a set of default control
 characters, but these can be changed by subsequent calls to \htmlref{GRP\_SETCC}{GRP_SETCC}. Each
@@ -1535,6 +1588,16 @@ The CLOSE\_KERNEL character defaults to ``\}''.
 \item [NULL] - This is a character which can be assigned to any other control
 character to suppress use of that control character (see below). The NULL
 character defaults to ``\%''.
+
+\item [ESCAPE] - This is a character which can be used to ``escape'' another
+control character within a group expression. If a GRP control character is 
+encountered within a group expression, its special meaning is ignored
+and it is treated literally if it is preceeded by an escape character.
+Such escape characters are removed before storing the corresponding
+strings in the returned group (escape character which do not preceed
+another control character are not removed). Escape characters can 
+themselves be escaped. By default, the escape character is equal to the
+null character (i.e. escaping is not available by default).
 
 \end{description}
 
@@ -3268,7 +3331,14 @@ environment}
          \sstitem
          NULL: (Default {\tt "}\%{\tt "}) The name given to the character which can
          be assigned to other control characters to suppress checks for
-         those control characters.
+         those control characters.  If this is changed, any other characters
+         currently set to the null character are also changed to the new NULL
+         character.
+
+         \sstitem
+         ESCAPE: (Default to the NULL character) The name given to the 
+         character which can be used to escape control characters within 
+         a group expression.
       }
    }
 }
@@ -3502,6 +3572,24 @@ finding the head of an owner-slave chain.
 size of the group identified by argument IGRP2. If the group has zero size on
 entry then argument SIZE is returned equal to one.
 \end{itemize}
+\end{enumerate}
+
+\section{Changes and New Features in V3.0}
+The following changes have occurred in the GRP\_ system since version 2.0:
+
+\begin{enumerate}
+
+\item An escape control character can now be defined which allows other
+control characters within a group expression to be treated literally 
+(i.e. their usual special meaning is suppressed and they are trated like a 
+normal text character if they are preceeded by an escape character). By 
+default, no escape character is defined.
+
+\item If the NULL control character is changed using GRP\_SETCC, then any
+other control characters which are equal to the old NULL character are
+changed to the new NULL character, so long as the same call to GRP\_SETCC
+does not explicitly set their value to something else.
+
 \end{enumerate}
 
 \section{Changes and New Features in V2.0}

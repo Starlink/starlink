@@ -88,6 +88,8 @@
 *  History:
 *     26-JAN-1994 (DSB):
 *        Original version.
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,11 +126,13 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string.
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       CHARACTER CH               ! Current character
       CHARACTER CLNCC            ! Close nest control character
       CHARACTER DELCC            ! Delimiter control character
+      CHARACTER ESCCC            ! The escape character
       CHARACTER KCLCC            ! Close kernel control character
       CHARACTER KOPCC            ! Open kernel control character
       CHARACTER OPNCC            ! Open nest control character
@@ -146,6 +150,7 @@
       LOGICAL CLNOK              ! Close nest control character defined?
       LOGICAL DEL                ! Is current character a delimiter?
       LOGICAL DELOK              ! Delimiter control character defined?
+      LOGICAL ESCOK              ! Is the escape character defined?
       LOGICAL KCL                ! Is current character a "close kernel"
       LOGICAL KCLOK              ! Close kernel control character defined?
       LOGICAL KOK                ! Can a kernel expression be started?
@@ -156,14 +161,6 @@
       LOGICAL SEP                ! Is current character a separator?
       LOGICAL SEPOK              ! Separator control character defined?
 
-*  Statement functions for comparing a given character with each of the
-*  used control characters.
-      DEL( CH ) = ( CH .EQ. DELCC ) .AND. DELOK
-      SEP( CH ) = ( CH .EQ. SEPCC ) .AND. SEPOK
-      OPN( CH ) = ( CH .EQ. OPNCC ) .AND. OPNOK
-      CLN( CH ) = ( CH .EQ. CLNCC ) .AND. CLNOK
-      KOP( CH ) = ( CH .EQ. KOPCC ) .AND. KOPOK
-      KCL( CH ) = ( CH .EQ. KCLCC ) .AND. KCLOK
 *.
 
 *  Check inherited global status.
@@ -186,6 +183,7 @@
       CALL GRP1_CONC( SLOT, GRP__PCLNC, CLNCC, CLNOK, STATUS )
       CALL GRP1_CONC( SLOT, GRP__POPKC, KOPCC, KOPOK, STATUS )
       CALL GRP1_CONC( SLOT, GRP__PCLKC, KCLCC, KCLOK, STATUS )
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCCC, ESCOK, STATUS )
 
 *  Initialise the returned pointers to indicate that all strings are
 *  blank.
@@ -242,15 +240,23 @@
          DO I = FIRST, LAST
             CH = TEXT ( I : I )
 
+*  Classify the character.
+            OPN = GRP1_CHKCC( TEXT, I, OPNCC, ESCCC, ESCOK ) .AND. OPNOK
+            CLN = GRP1_CHKCC( TEXT, I, CLNCC, ESCCC, ESCOK ) .AND. CLNOK
+            KOP = GRP1_CHKCC( TEXT, I, KOPCC, ESCCC, ESCOK ) .AND. KOPOK
+            KCL = GRP1_CHKCC( TEXT, I, KCLCC, ESCCC, ESCOK ) .AND. KCLOK
+            SEP = GRP1_CHKCC( TEXT, I, SEPCC, ESCCC, ESCOK ) .AND. SEPOK
+            DEL = GRP1_CHKCC( TEXT, I, DELCC, ESCCC, ESCOK ) .AND. DELOK
+
 *  If the current character is an OPEN_NEST delimiter, increment
 *  the associated nesting level.
-            IF( OPN( CH ) ) THEN
+            IF( OPN ) THEN
                NESTN = NESTN + 1
 
 *  If the current character is a CLOSE_NEST delimiter, decrement the
 *  associated nesting level. Report an error and abort if the nesting
 *  level goes negative.
-            ELSE IF( CLN( CH ) ) THEN
+            ELSE IF( CLN ) THEN
                NESTN = NESTN - 1
                IF( NESTN .LT. 0 ) THEN
                   STATUS = GRP__INVEL
@@ -272,7 +278,7 @@
 
 *  If the current character is an opening kernel delimiter, increment
 *  the kernel nesting level. 
-               IF( KOP( CH ) ) THEN
+               IF( KOP ) THEN
                   NESTK = NESTK + 1
 
 *  Kernel expressions may only be started if they are separated by an
@@ -313,7 +319,7 @@
 *  expressions may not be started until after the next element
 *  delimiter. Report an error and abort if the kernel nesting level
 *  goes negative.
-               ELSE IF( KCL( CH ) ) THEN
+               ELSE IF( KCL ) THEN
                   NESTK = NESTK - 1
                   KOK = .FALSE.
                   IF( NESTK .LT. 0 ) THEN
@@ -351,7 +357,7 @@
 *  If the current character is a substitution string separator,
 *  increment the number of substitution characters found since the
 *  last reset. 
-               ELSE IF( SEP( CH ) ) THEN
+               ELSE IF( SEP ) THEN
                   NSEPCC = NSEPCC + 1
 
 *  If the current nesting level is zero, return the position of the
@@ -380,8 +386,11 @@
                         CALL CHR_FANDL( TEXT( I + 1 : LAST ), N, L )
                         IF( N .LE. L ) THEN
                            N = N + I
-                           IF( .NOT. DEL( TEXT( N : N ) ) .AND.
-     :                         .NOT. KCL( TEXT( N : N ) ) ) THEN
+                           IF( 
+     :          .NOT. ( GRP1_CHKCC( TEXT, N, DELCC, ESCCC, ESCOK ) .AND. 
+     :                  DELOK ) .AND.
+     :          .NOT. ( GRP1_CHKCC( TEXT, N, KCLCC, ESCCC, ESCOK ) .AND. 
+     :                  KCLOK ) ) THEN
                               STATUS = GRP__INVEL
                               CALL MSG_SETC( 'TEXT', TEXT )
                               CALL ERR_REP( 'GRP1_PAREL_ERR8',
@@ -399,7 +408,7 @@
 *  new kernel expression may now be started. If the current kernel
 *  nesting level is zero, indicate that more elements remain to be
 *  checked, and leave the loop.
-               ELSE IF( DEL( CH ) ) THEN
+               ELSE IF( DEL ) THEN
                   KOK = .TRUE.
 
 *  Report an error and abort if a element delimiter is found within a

@@ -47,6 +47,8 @@
 *  History:
 *     26-JAN-1994 (DSB):
 *        Original version.
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,8 +83,11 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Function giving used length of a string
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
 
 *  Local Variables:
+      CHARACTER ESCCC*1          ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       INTEGER F                  ! Index of first used character
       INTEGER K1                 ! Start of kernel
       INTEGER K2                 ! End of kernel
@@ -123,6 +128,9 @@
 *  Get the groups current SEPARATOR control character.
       CALL GRP1_CONC( SLOT, GRP__PMSPC, SEPCC, SEPOK, STATUS )
 
+*  Get the groups current ESCAPE control character.
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCCC, ESCOK, STATUS )
+
 *  Loop round until no more editing is required.
       MORE = .TRUE.
       DO WHILE( MORE .AND. STATUS .EQ. SAI__OK ) 
@@ -143,9 +151,12 @@
 *  If a substitution is specified, get the string to be replaced, and
 *  the string with which to replace it.
          IF( T2 .GE. T1 ) THEN
-            SEP1 = INDEX( OUT( T1 : T2 ), SEPCC ) + T1 - 1
-            SEP2 = INDEX( OUT( SEP1 + 1 : T2 ), SEPCC ) + SEP1
-            SEP3 = INDEX( OUT( SEP2 + 1 : T2 ), SEPCC ) + SEP2
+            SEP1 = GRP1_INDEX( OUT( T1 : T2 ), SEPCC, ESCCC, ESCOK ) 
+     :             + T1 - 1
+            SEP2 = GRP1_INDEX( OUT( SEP1 + 1 : T2 ), SEPCC, ESCCC, 
+     :                         ESCOK ) + SEP1
+            SEP3 = GRP1_INDEX( OUT( SEP2 + 1 : T2 ), SEPCC, ESCCC,
+     :                         ESCOK ) + SEP2
 
 *  Save the old string and its length.
             OLD = OUT( SEP1 + 1 : SEP2 - 1 )

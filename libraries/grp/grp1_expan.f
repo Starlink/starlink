@@ -99,6 +99,8 @@
 *        Original version
 *     19-JAN-1994 (DSB):
 *        Completely re-written to use group expression kernels.
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,10 +145,13 @@
 
 *  External References:
       EXTERNAL GRP1_INIT         ! Initalise GRP common blocks.
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       CHARACTER EFILE*(GRP__SZNAM)! File in which the supplied element
                                  ! was given.
+      CHARACTER ESCCC*1          ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       INTEGER FIRST              ! Index of first character to be checked
       CHARACTER INDCC*1          ! Groups current indirection character
       LOGICAL INDOK              ! .TRUE. if INDCC can be used.
@@ -191,6 +196,7 @@
       ELSE 
          CALL GRP1_CONC( SLOT2, GRP__PINDC, INDCC, INDOK, STATUS )
          CALL GRP1_CONC( SLOT2, GRP__PMNMC, MNMCC, MNMOK, STATUS )
+         CALL GRP1_CONC( SLOT2, GRP__PESCC, ESCCC, ESCOK, STATUS )
 
 *  Initialise a flag indicating that no Fortran unit number has yet been
 *  obtained.
@@ -273,7 +279,8 @@
 
 *  If the first non-blank character is the group's indirection
 *  character, this is an indirection element.
-                     IF( GRPEXP( F : F ) .EQ. INDCC .AND. INDOK ) THEN
+                     IF( GRP1_CHKCC( GRPEXP, F, INDCC, ESCCC, ESCOK ) 
+     :                   .AND. INDOK ) THEN
 
 *  Report an error if the file name is null.
                         IF( F .GE. L .AND. STATUS .EQ. SAI__OK ) THEN
@@ -323,7 +330,8 @@
 *  This is a modification ELEMENT if a basis group was supplied, and if
 *  the element consists of just the NAME_TOKEN control character.
                         IF( BSIZE .GT. 0 .AND. MNMOK .AND.
-     :                      GRPEXP( F : L ) .EQ. MNMCC ) THEN
+     :                      F .EQ. L .AND. GRP1_CHKCC( GRPEXP, F, 
+     :                      MNMCC, ESCCC, ESCOK ) ) THEN
 
 *  Copy the basis group into the output group.
                            CALL GRP1_MODIF( BSIZE, SLOT1, SLOT2, GINDEX,

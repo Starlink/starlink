@@ -50,6 +50,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,9 +78,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL CHR_LEN
-      INTEGER CHR_LEN            ! Function giving used length of a
-                                 ! string.
+      INTEGER CHR_LEN            ! Function giving used length of a string
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       CHARACTER C*1              ! A character fromthe expression.
@@ -96,6 +98,8 @@
       INTEGER END                ! Position of the last character of the
                                  ! current element, within the group
                                  ! expression.
+      CHARACTER ESCC*1           ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       INTEGER EXPLEN             ! The no. of characters in the group
                                  ! expression.
       LOGICAL MORE               ! True if more elements are to be
@@ -119,11 +123,12 @@
       CALL GRP1_CONC( SLOT, GRP__PDELC, DELC, DELOK, STATUS )
       CALL GRP1_CONC( SLOT, GRP__POPNC, OPNC, OPNOK, STATUS )
       CALL GRP1_CONC( SLOT, GRP__PCLNC, CLNC, CLNOK, STATUS )
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
 
 *  If the COMMENT control character is in use, find the start of any
 *  comment in the string.
       IF( COMOK ) THEN
-         COMM = INDEX( GRPEXP, COMC )
+         COMM = GRP1_INDEX( GRPEXP, COMC, ESCC, ESCOK )
       ELSE
          COMM = 0
       END IF
@@ -168,7 +173,8 @@
  10      CONTINUE
 
          IF( DELOK ) THEN
-            END = INDEX( GRPEXP( POINT: ), DELC ) + POINT - 2
+            END = GRP1_INDEX( GRPEXP( POINT: ), DELC, ESCC, ESCOK ) 
+     :            + POINT - 2
          ELSE
             END = POINT - 2
          END IF
@@ -184,10 +190,12 @@
             DO CC = POINT, END
                C = GRPEXP( CC : CC )
 
-               IF( C .EQ. OPNC .AND. OPNOK ) THEN
+               IF( GRP1_CHKCC( GRPEXP, CC, OPNC, ESCC, ESCOK ) 
+     :             .AND. OPNOK ) THEN
                   NLEVEL = NLEVEL + 1
 
-               ELSE IF( C .EQ. CLNC .AND. CLNOK ) THEN
+               ELSE IF( GRP1_CHKCC( GRPEXP, CC, CLNC, ESCC, ESCOK ) 
+     :                  .AND. CLNOK ) THEN
                   NLEVEL = NLEVEL - 1
 
                END IF

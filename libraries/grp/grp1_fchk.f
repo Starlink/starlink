@@ -43,6 +43,8 @@
 *        Modified to look at the last character in a group expression
 *        rather than at the last element in a group (argument GRPEXP
 *        added).
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,14 +71,16 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL CHR_LEN
-      INTEGER CHR_LEN            ! Function giving used length of a
-                                 ! string.
+      INTEGER CHR_LEN            ! Function giving used length of a string.
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       INTEGER COM                ! Index of the comment character
       CHARACTER COMC*1           ! Groups current omment character.
       LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
+      CHARACTER ESCC*1          ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       CHARACTER FLAGC*1          ! Groups current flag character.
       LOGICAL FLAGOK             ! .TRUE. if FLAGC is not NULL.
       INTEGER LASTC              ! Position of last non-blank character.
@@ -88,6 +92,9 @@
 *  Initialise FLAG to be .FALSE.
       FLAG = .FALSE.
 
+*  Get the group's current escape character.
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
+
 *  Get the group's current comment character.
       CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
 
@@ -96,7 +103,7 @@
 
 *  Search for the first occurrence of the comment character in the 
 *  supplied group expression.
-         COM = INDEX( GRPEXP, COMC )
+         COM = GRP1_INDEX( GRPEXP, COMC, ESCC, ESCOK )
 
 *  If a comment character was found, set the rest of the group 
 *  expression blank (including the comment character itself).
@@ -118,7 +125,7 @@
 
 *  See if the last non-blank character is the same as the group's flag
 *  character.
-            FLAG = GRPEXP( LASTC : LASTC ) .EQ. FLAGC
+            FLAG = GRP1_CHKCC( GRPEXP, LASTC, FLAGC, ESCC, ESCOK )
 
 *  If it is, remove the flag character.
             IF( FLAG ) GRPEXP( LASTC : LASTC ) = ' '            

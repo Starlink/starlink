@@ -25,6 +25,8 @@
 *        Original version
 *     13-JAN-1994 (DSB):
 *        GRP__POPKC and GRP__PCLKC added
+*     27-AUG-1999 (DSB):
+*        GRP__PESCC added.
 *     {enter_further_changes_here}
 
 *-
@@ -91,11 +93,11 @@
 
 *  The number of control characters.
       INTEGER GRP__NCHAR
-      PARAMETER ( GRP__NCHAR = 11 )
+      PARAMETER ( GRP__NCHAR = 12 )
 
-*  Default control characters.
+*  Default control characters. 
       CHARACTER GRP__DEFCC*(GRP__NCHAR)
-      PARAMETER ( GRP__DEFCC = '^#,*|()-%{}' )
+      PARAMETER ( GRP__DEFCC = '^#,*|()-%{}%' )
 
 *  Position (within GRP__DEFCC) of the character used to indicate
 *  indirection through a text file.
@@ -157,6 +159,11 @@
 *  kernel within a group expression or element.
       INTEGER GRP__PCLKC
       PARAMETER ( GRP__PCLKC = 11 )
+
+*  Position (within GRP__DEFCC) of the character used to escaped a
+*  control character within a group expression or element.
+      INTEGER GRP__PESCC
+      PARAMETER ( GRP__PESCC = 12 )
 
 *  Max. length of a control character name.
       INTEGER GRP__SZWRD

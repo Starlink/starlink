@@ -31,6 +31,9 @@
 *     31-AUG-1994 (DSB):
 *        Modified to include tests of the kernel facilities introduced in
 *        V2.0
+*     27-AUG-1999 (DSB):
+*        Corrected calls from MSG_SETC to MSG_SETI. Added testing of
+*        escape characters.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,6 +74,9 @@
 *  character.
       CALL GRP_SETCC( IGRP, 'IND', '+', STATUS )
 
+*  Set the escape character to "\".
+      CALL GRP_SETCC( IGRP, 'ESC', '\\', STATUS )
+
 *  Obtain a list of names and put them in the group just created. Append 
 *  the letter B to them using a kernel.
       CALL GRP_GRPEX( '{+grp_test.dat}B', GRP__NOID, IGRP, SIZE, ADDED,
@@ -79,7 +85,7 @@
 *  Report an error if the group does not contain 4 names.
       IF( STATUS .EQ. SAI__OK .AND. SIZE .NE. 4 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'SIZE', SIZE )
+         CALL MSG_SETI( 'SIZE', SIZE )
          CALL ERR_REP( 'GRP_TEST_ERR1',
      : 'GRP_TEST: No. of names in test group (^SIZE) should be 4.',
      :                 STATUS )
@@ -88,12 +94,12 @@
 *  Get the second name in the group.
       CALL GRP_GET( IGRP, 2, 1, NAME, STATUS )
 
-*  Report an error if the name is not "TWOB".
-      IF( STATUS .EQ. SAI__OK .AND. NAME .NE. 'TWOB' ) THEN
+*  Report an error if the name is not "TWO\|B".
+      IF( STATUS .EQ. SAI__OK .AND. NAME .NE. 'TWO\\|B' ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'NAME', NAME )
          CALL ERR_REP( 'GRP_TEST_ERR2',
-     : 'GRP_TEST: Second test name (^NAME) should be "TWOB"',
+     : 'GRP_TEST: Second test name (^NAME) should be "TWO\\|B"',
      :                 STATUS )
       END IF
 
@@ -103,7 +109,7 @@
 *  Report an error if the index is not 3.
       IF( STATUS .EQ. SAI__OK .AND. INDX .NE. 3 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'INDEX', INDX )
+         CALL MSG_SETI( 'INDEX', INDX )
          CALL ERR_REP( 'GRP_TEST_ERR3',
      : 'GRP_TEST: Index of name "HELLOB" (^INDEX) should be 3. ',
      :                 STATUS )
@@ -113,7 +119,7 @@
       CALL GRP_INFOI( IGRP, 1, 'DEPTH', DEPTH, STATUS )
       IF( STATUS .EQ. SAI__OK .AND. DEPTH .NE. 1 ) THEN
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'DEPTH', DEPTH )
+         CALL MSG_SETI( 'DEPTH', DEPTH )
          CALL ERR_REP( 'GRP_TEST_ERR4',
      :           'GRP_TEST: Depth of first name (^DEPTH) should be 1. ',
      :                 STATUS )

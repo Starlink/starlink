@@ -25,6 +25,8 @@
 *        Original version
 *     26-JAN-1994 (DSB):
 *        OPEN_KERNEL and CLOSE_KERNEL control character names added.
+*     27-AUG-1999 (DSB):
+*        ESCAPE control character name added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,7 +81,8 @@
      : 'FLAG',
      : 'NULL',
      : 'OPEN_KERNEL',
-     : 'CLOSE_KERNEL' /
+     : 'CLOSE_KERNEL',
+     : 'ESCAPE' /
 
 *.
 

@@ -1,7 +1,7 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V2.1) of the GRP library is now available. It fixes a bug
-which caused the GRP_GROUP subroutine to fail to report a null parameter 
-error under certain conditions.
+A new release (V3.0) of the GRP library is now available. It includes
+new facilities to allow control characters to be escaped within group
+expresions.
 

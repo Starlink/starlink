@@ -96,6 +96,8 @@
 *  History:
 *     26-JAN-1994 (DSB):
 *        Original version.
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -135,11 +137,15 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       INTEGER COM                ! Index of the comment character
       CHARACTER COMC*1           ! Groups current omment character.
       LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
+      CHARACTER ESCC*1           ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       INTEGER FL                 ! Value of F on previous pass
       LOGICAL FPASS              ! Is this the first pass thru the loop?
       INTEGER K1L                ! Value of K1 on previous pass
@@ -168,13 +174,16 @@
       T1 = 1
       T2 = 0
 
+*  Get the group's current escape character.
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
+
 *  Get the group's current comment character.
       CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
 
 *  If a comment character is defined search for the first occurrence 
 *  of the comment character in the supplied group expression.
       IF( COMOK ) THEN
-         COM = INDEX( TEXT, COMC )
+         COM = GRP1_INDEX( TEXT, COMC, ESCC, ESCOK )
 
 *  If a comment was found, remove it.
          IF( COM .GT. 0 ) TEXT( COM : ) = ' '

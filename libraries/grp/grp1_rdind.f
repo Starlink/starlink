@@ -66,6 +66,8 @@
 *  History:
 *     19-JAN-1994 (DSB):
 *        Original version.
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,12 +103,16 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
+      LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
       INTEGER COM                ! Index of the comment character
       CHARACTER COMC*1           ! Groups current omment character.
       LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
       LOGICAL EOF                ! Has end of file has been reached ?
+      CHARACTER ESCC*1           ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       CHARACTER FLAGC*1          ! Current flag character
       LOGICAL FLAGOK             ! Is a flag character defined?
       CHARACTER GEXP*(GRP__SZNAM)! A group expression read from a file
@@ -139,6 +145,9 @@
      :                 '"^MESSAGE".', STATUS )
          GO TO 999
       END IF
+
+*  Get the group's current escape character.
+      CALL GRP1_CONC( SLOT, GRP__PESCC, ESCC, ESCOK, STATUS )
 
 *  Get the group's current comment and flag characters.
       CALL GRP1_CONC( SLOT, GRP__PCOMC, COMC, COMOK, STATUS )
@@ -177,7 +186,7 @@
 
 *  Search for the first occurrence of the comment character in the 
 *  group expression.
-            COM = INDEX( GEXP, COMC )
+            COM = GRP1_INDEX( GEXP, COMC, ESCC, ESCOK )
 
 *  If a comment character was found, set the rest of the group 
 *  expression blank (including the comment character itself).
@@ -197,7 +206,8 @@
 
 *  See if the last character is a flag character.
             IF( TLEN .GT. 0 ) THEN
-               FLAG = GEXP( TLEN : TLEN ) .EQ. FLAGC .AND. FLAGOK
+               FLAG = GRP1_CHKCC( GEXP, TLEN, FLAGC, ESCC, ESCOK ) .AND. 
+     :                FLAGOK
             ELSE
                FLAG = .FALSE.
             END IF

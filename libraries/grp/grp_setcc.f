@@ -87,7 +87,12 @@
 *     to close a "kernel" within a group expression.
 *     -  NULL: (Default "%") The name given to the character which can
 *     be assigned to other control characters to suppress checks for
-*     those control characters.
+*     those control characters. If this is changed, any other characters
+*     currently set to the null character are also changed to the new NULL
+*     character.
+*     - ESCAPE: (Default to the NULL character) The name given to the 
+*     character which can be used to escape control characters within 
+*     a group expression.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -98,6 +103,9 @@
 *        Original version
 *     26-JAN-1994 (DSB):
 *        OPEN_KERNEL and CLOSE_KERNEL added.
+*     27-AUG-1999 (DSB):
+*        Added ESCAPE to prologue. Update any CCs which are set to the
+*        null character if the null character is changed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,6 +165,7 @@
       INTEGER NMATCH             ! No. of matches between defined
                                  ! control character names and the
                                  ! current word.
+      CHARACTER NULL0*1          ! The original NULL control character.
       CHARACTER NULLCC*1         ! The NULL control character.
       LOGICAL OPNULL             ! True if OPEN_NEST is set to NULL.
       INTEGER SLOT               ! Index within common arrays at which
@@ -191,6 +200,10 @@
 *  characters.
       ELSE
          CHARS = CMN_CHARS( SLOT )
+
+*  Store the original value of the NULL control character in a local 
+*  variable.
+         NULL0 = CHARS( GRP__PNULC : GRP__PNULC )
 
 *  Find the used length of the control character list.
          ULEN = CHR_LEN( CCLIST )
@@ -294,6 +307,18 @@
 *  Store the value of the NULL control character in a local variable for
 *  fast access.
             NULLCC = CHARS( GRP__PNULC : GRP__PNULC )
+
+*  If the NULL character has changed, update any other characters which
+*  were previously set to the null character so that they are equal to
+*  the new NULL character. Do not update them if they have explicitly
+*  been assigned a new value.
+            IF( NULLCC .NE. NULL0 ) THEN         
+               DO I = 1, GRP__NCHAR - 1
+                  TESTCC = CHARS( I : I )
+                  IF( CMN_CHARS( SLOT )( I : I ) .EQ. TESTCC .AND.
+     :                TESTCC .EQ. NULL0 ) CHARS( I : I ) = NULLCC
+               END DO
+            END IF
 
 *  Check that no two control characters are the same. If so, report an
 *  error. Note, any control character may have the same value as the

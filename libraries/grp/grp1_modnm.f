@@ -50,6 +50,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     27-AUG-1999 (DSB):
+*        Added control character escape facility.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,12 +86,12 @@
 
 *  External References:
       EXTERNAL GRP1_INIT         ! Initalise GRP common blocks.
-
-      EXTERNAL CHR_LEN
       INTEGER CHR_LEN            ! Function giving used length of a string.
-
+      INTEGER GRP1_INDEX         ! Finds un-escaped control characters
 
 *  Local Variables:
+      CHARACTER ESCC*1           ! The escape character
+      LOGICAL ESCOK              ! Is the escape character defined?
       CHARACTER MSPC*1           ! Character used to separate
                                  ! substitution strings within the
                                  ! modification element.
@@ -116,13 +118,16 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Get the groups current ESCAPE control character.
+      CALL GRP1_CONC( SLOT2, GRP__PESCC, ESCC, ESCOK, STATUS )
+
 *  Get the groups current SEPARATOR control character.
       CALL GRP1_CONC( SLOT2, GRP__PMSPC, MSPC, MSPOK, STATUS )
 
 *  Get the position of the first separator character. If it is the last
 *  or first character in the string then the element is not a vlaid
 *  modification element.
-      SEP1 = INDEX( ELEM, MSPC )
+      SEP1 = GRP1_INDEX( ELEM, MSPC, ESCC, ESCOK )
       IF( SEP1 .EQ. 1 .OR. SEP1 .EQ. LEN( ELEM ) ) THEN
          STATUS = GRP__BADME
          GO TO 999
@@ -132,7 +137,7 @@
 *  between the first and second separators is null, or if the second
 *  separator is the last character in the string then the element is
 *  not a vlaid modification element.
-      SEP2 = INDEX( ELEM( SEP1 + 1 : ), MSPC ) + SEP1
+      SEP2 = GRP1_INDEX( ELEM( SEP1 + 1 : ), MSPC, ESCC, ESCOK ) + SEP1
       IF( SEP2 .LE. SEP1 + 1 .OR. SEP2 .EQ. LEN( ELEM ) ) THEN
          STATUS = GRP__BADME
          GO TO 999
@@ -142,7 +147,7 @@
 *  found, or if there are any non-blank characters remaining after the
 *  third separator then the element is not a vlaid modification
 *  element.
-      SEP3 = INDEX( ELEM( SEP2 + 1 : ), MSPC ) + SEP2
+      SEP3 = GRP1_INDEX( ELEM( SEP2 + 1 : ), MSPC, ESCC, ESCOK ) + SEP2
       IF( SEP3 .LE. SEP2 .OR. SEP3 .NE. CHR_LEN( ELEM ) ) THEN
          STATUS = GRP__BADME
          GO TO 999
