@@ -175,8 +175,8 @@
       private variable master          ;# Master window (probably the parent)
       private variable waitwin         ;# Toplevel waiter window
       private common Tickerbitmap      ;# Bitmaps for the animation
+      private common CCDdir $env(CCDPACK_DIR)
 
-      global CCDdir
       foreach i { 1 2 3 4 5 6 7 8 } {
          set Tickerbitmap($i) "$CCDdir/c$i.xbm"
       }
