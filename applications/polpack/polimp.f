@@ -271,7 +271,6 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'GRP_PAR'          ! GRP parameters
-      INCLUDE 'PAR_ERR'          ! PAR error codes
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -318,15 +317,12 @@
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            NNDF, STATUS )
 
-*  Check the error status.
-      IF( STATUS .NE. SAI__OK ) GO TO 99
-
 *  Access the control table for items in the FITS block. 
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
 
 *  If succesful, get the file name.
       FNAME = '<unknown>'
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( TOPEN ) THEN
          CALL FIO_FNAME( FDIN, FNAME, STATUS )
 
 *  Transform the input table into word separated GRP groups (dynamic
@@ -358,10 +354,9 @@
      :      '  Error processing FITS control table: ^FNAME', STATUS )
          END IF
 
-*  If a null parameter value was given for TABLE, annul the error and set 
-*  up groups representing the default table.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
+*  If no control table was opened, set up groups representing the default 
+*  table.
+      ELSE 
          CALL POL1_DEFTB( FITGRP, DESGRP, STATUS )
       END IF
 
