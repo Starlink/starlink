@@ -1476,7 +1476,7 @@ EXE_2_OBJECT = $(EXE_2_SOURCE_F:.f=.o) $(EXE_2_SOURCE_C:.c=.o)
 OBJECT_LIBRARIES = \
    libcommand.a libexprt.a libexternal.a libreduce.a libscl.a libfitting.a \
    libplots.a libterm.a libmapdis4.a libtek.a libplots.a libmapdis4.a \
-   libmv4.a libfv4.a libutil.a libastro.a libgraph.a libutil.a libgen.a libvms.a \
+   libmv4.a libfv4.a libutil.a libgraph.a libastro.a libgen.a libvms.a \
    libgetaline.a libreadline.a
 
 libastro.a: $(O_SUB1)
