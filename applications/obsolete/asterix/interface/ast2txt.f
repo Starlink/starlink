@@ -77,7 +77,7 @@
 *     export, usage:public
 
 *  Copyright:
-*     Copyright (C) University of Birmingham, 1995
+*     Copyright (C) University of Birmingham, 1996
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -96,6 +96,8 @@
 *        New data interfaces
 *     12 Sep 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*      3 Apr 1996 V2.0-1 (DJA):
+*        Added output of grouping array
 *     {enter_changes_here}
 
 *  Bugs:
@@ -115,7 +117,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EXPORT Version V2.0-0' )
+        PARAMETER		( VERSION = 'EXPORT Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*80              LABUN(2)                ! Label & units
@@ -129,6 +131,7 @@
       INTEGER                   AWPTR(ADI__MXDIM)       ! Axis width ptr
       INTEGER                   DIMS(ADI__MXDIM)        ! Dimensions
       INTEGER                   DPTR                    ! Ptr to data
+      INTEGER                   GPTR                    ! Ptr to grouping
       INTEGER                   IAX                     ! Loop over axes
       INTEGER			IFID			! Input file identifier
       INTEGER                   IMASK                   ! Input quality mask
@@ -145,6 +148,7 @@
       LOGICAL                   DECREASING              ! Axis values decreasing?
       LOGICAL                   DOK                     ! DATA ok?
       LOGICAL                   EOK                     ! ERRORS ok?
+      LOGICAL                   GOK                     ! GROUP ok?
       LOGICAL                   IMPREAD                 ! IMPORT readable
       LOGICAL			OK			! Validity check
       LOGICAL                   QOK                     ! QUALITY ok?
@@ -195,6 +199,12 @@
       CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
       IF ( VOK ) THEN
         CALL BDI_MAPR( IFID, 'Variance', 'READ', VPTR, STATUS )
+      END IF
+
+*  Check grouping
+      CALL BDI_CHK( IFID, 'Grouping', GOK, STATUS )
+      IF ( GOK ) THEN
+        CALL BDI_MAPI( IFID, 'Grouping', 'READ', GPTR, STATUS )
       END IF
 
 *  Any axes?
@@ -303,6 +313,11 @@
           CALL EXPORT_WRITE( OFD, 'QUALITY ^MASK', STATUS )
         END IF
 
+*    Grouping
+        IF ( GOK ) THEN
+          CALL EXPORT_WRITE( OFD, 'GROUP', STATUS )
+        END IF
+
 *    Asymmetric errors if present
         IF ( EOK ) THEN
           CALL EXPORT_WRITE( OFD, 'LOERROR', STATUS )
@@ -324,8 +339,8 @@
       CALL EXPORT_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4), DIMS(5),
      :                 DIMS(6), DIMS(7), NDIM,
      :                 AOK, APTR, AWOK, AWPTR,
-     :                 DOK, %VAL(DPTR), QOK, %VAL(QPTR),
-     :                 VOK, %VAL(VPTR), OFD, STATUS )
+     :                 DOK, %VAL(DPTR), QOK, %VAL(QPTR), GOK,
+     :                 %VAL(GPTR), VOK, %VAL(VPTR), OFD, STATUS )
 
 *  Release input
       CALL USI_CANCL( 'INP', STATUS )
@@ -344,7 +359,7 @@
 *+  EXPORT_INT - Write data arrays to output file
       SUBROUTINE EXPORT_INT( L1, L2, L3, L4, L5, L6, L7, NDIM,
      :                       AOK, APTR, AWOK, AWPTR,
-     :                       DOK, DATA, QOK, QUAL, VOK, VAR,
+     :                       DOK, DATA, QOK, QUAL, GOK, GRP, VOK, VAR,
      :                       FD, STATUS )
 *    Description :
 *     <description of what the subroutine does - for user info>
@@ -380,7 +395,9 @@
       INTEGER                 APTR(ADI__MXDIM)       ! Axis data vals
       LOGICAL                 AWOK(ADI__MXDIM)       ! Axis width present?
       INTEGER                 AWPTR(ADI__MXDIM)      ! Axis width vals
-      LOGICAL                 DOK, QOK, VOK          ! Items there?
+      LOGICAL                 DOK, QOK, GOK, VOK          ! Items there?
+      INTEGER		      GRPL1,L2,L3,L4,      	! Group values
+     :                                L5,L6,L7)
       REAL                    DATA(L1,L2,L3,L4,      ! Data values
      :                                L5,L6,L7)
       BYTE                    QUAL(L1,L2,L3,L4,      ! QUALITY values
@@ -405,6 +422,7 @@
       INTEGER                 COL                    ! Character position
       INTEGER                 CMAX                   ! Last column used
       INTEGER                 DCOL                   ! DATA column
+      INTEGER                 GCOL                   ! GROUP column
       INTEGER                 I,J,K,L,M,N,O          ! Loops over data
       INTEGER                 IAX                    ! Loop over axes
       INTEGER                 QCOL                   ! QUALITY column
@@ -437,6 +455,10 @@
       IF ( QOK ) THEN
         QCOL = COL
         COL = COL + 5
+      END IF
+      IF ( GOK ) THEN
+        GCOL = COL
+        COL = COL + 10
       END IF
       IF ( VOK ) THEN
         VCOL = COL
@@ -565,6 +587,12 @@
                     IF ( QOK ) THEN
                       WRITE( LINE(QCOL:QCOL+3), '(I4)' )
      :                                           QUAL(I,J,K,L,M,N,O)
+                    END IF
+
+*                  Group value
+                    IF ( GOK ) THEN
+                      WRITE( LINE(GCOL:GCOL+8), '(I8)' )
+     :                                           GRP(I,J,K,L,M,N,O)
                     END IF
 
 *                  Variance value
