@@ -96,4 +96,8 @@ edit = sed \
 	-e 's,@VERSION\@,$(VERSION),g'
 
 @PREDIST@polka.htx_tar: polka.tex
-starhelp_DATA = polka.htx_tar
+
+# Polka needs to be installed as other .htx_tar files but into starhelp
+# starhelp_DATA is used earlier
+polkahelpdir = $(starhelpdir)
+polkahelp_DATA = polka.htx_tar
