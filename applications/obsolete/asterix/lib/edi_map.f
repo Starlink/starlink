@@ -122,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check correct type
-      CALL EDI0_CHKDER( ID, STATSU )
+      CALL EDI0_CHKDER( ID, STATUS )
 
 *  First function argument is the identifier
       ARGS(1) = ID

@@ -85,7 +85,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID
@@ -95,17 +94,10 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-      LOGICAL			AST_QPKGI
-        EXTERNAL		AST_QPKGI
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Check initialised
-      IF ( .NOT. AST_QPKGI( EDI__PKG ) ) CALL EDI0_INIT( STATUS )
 
 *  Check object id
       CALL EDI0_CHKDER( ID, STATUS )

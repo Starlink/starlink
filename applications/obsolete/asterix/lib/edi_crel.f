@@ -103,7 +103,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID, NDIM, DIMS(*)
@@ -118,8 +117,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      LOGICAL			AST_QPKGI
-        EXTERNAL		AST_QPKGI
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
@@ -130,8 +127,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check initialised
-      IF ( .NOT. AST_QPKGI( EDI__PKG ) ) CALL EDI0_INIT( STATUS )
+*  Check correct type
+      CALL EDI0_CHKDER( ID, STATUS )
 
 *  Create new list object
       CALL ADI_NEW0( 'EventList', LID, STATUS )
