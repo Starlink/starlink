@@ -49,7 +49,7 @@
 *        follows:
 *
 *                 1) NDF slice specifications
-*                 2) HDS paths
+*                 2) Data paths (HDS path or foreign extension specifier)
 *                 3) File types
 *                 4) Base file names
 *                 5) Directory paths
@@ -82,6 +82,8 @@
 *        Check that nothing is written beyond the end of SEARCH string.
 *     10-APR-2000 (DSB):
 *        Added argument VERB.
+*     18-JUL-2000 (DSB):
+*        Added support for foreign extension specifiers.
 *     {enter_further_changes_here}
 
 *-
@@ -121,10 +123,11 @@
       CHARACTER BN*50              ! File basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
       CHARACTER FTEMP*(GRP__SZNAM) ! File template
+      CHARACTER FXS*200            ! Foreign extension specifier
       CHARACTER LOC*(DAT__SZLOC)   ! Locator for top-level object
       CHARACTER LOC2*(DAT__SZLOC)  ! Locator for component object
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
-      CHARACTER PATH*(GRP__SZNAM)  ! HDS path field
+      CHARACTER PATH*(GRP__SZNAM)  ! Data path 
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
       CHARACTER SEC*50             ! File NDF/HDS section
       CHARACTER SEARCH*(MXSRCH)    ! The total search string
@@ -133,7 +136,6 @@
       CHARACTER STORED*(GRP__SZNAM)! Text to store in the supplied group
       CHARACTER SUF*50             ! File suffix
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
-      INTEGER DOT                ! Index of next "."
       INTEGER F                  ! Index of first non-blank character
       INTEGER I                  ! Loop count
       INTEGER IAT                ! Used length of a string
@@ -142,15 +144,15 @@
       INTEGER IGRP3              ! Group holding remaining text
       INTEGER IGRPB              ! Group holding base name fields
       INTEGER IGRPD              ! Group holding directory fields
-      INTEGER IGRPH              ! Group holding HDS path fields
+      INTEGER IGRPH              ! Group holding data path fields
       INTEGER IGRPS              ! Group holding NDF slice fields
       INTEGER IGRPT              ! Group holding file type fields
       INTEGER L                  ! Index of last non-blank character
       INTEGER NC                 ! No. of characters in string
       INTEGER NMATCH             ! No. of matching file types
-      INTEGER PAR                ! Index of next "("
       INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
+      LOGICAL OK                 ! Was NDF slice OK?
       LOGICAL PURGE              ! Purge duplicate file names?
 *.
 
@@ -192,14 +194,14 @@
          CALL GRP_SOWN( IGRPB, IGRPT, STATUS )
       END IF
 
-*  The file types group is owned by a group holding the HDS paths.
+*  The file types group is owned by a group holding the data paths.
       CALL GRP_OWN( IGRPT, IGRPH, STATUS )
       IF( IGRPH .EQ. GRP__NOID ) THEN
-         CALL GRP_NEW( 'HDS path', IGRPH, STATUS )
+         CALL GRP_NEW( 'Data path', IGRPH, STATUS )
          CALL GRP_SOWN( IGRPT, IGRPH, STATUS )
       END IF
 
-*  The HDS paths group is owned by a group holding the NDF slices.
+*  The data paths group is owned by a group holding the NDF slices.
       CALL GRP_OWN( IGRPH, IGRPS, STATUS )
       IF( IGRPS .EQ. GRP__NOID ) THEN
          CALL GRP_NEW( 'NDF slice', IGRPS, STATUS )
@@ -223,7 +225,7 @@
      :    TEMPLT( L : L ) .EQ. '`' ) THEN
          CALL NDG1_APPEN( IGRP2, IGRP3, TEMPLT, ' ', STATUS )
 
-*  Indicate that duplicate file names should bnot be purged.
+*  Indicate that duplicate file names should not be purged.
          PURGE = .FALSE.
 
 *  Otherwise, split the template into directory, basename, suffix and
@@ -252,12 +254,32 @@
      :                       STATUS )
          END IF
 
+*  See if there is a foreign extension specifier included in the suffix
+*  (a trailing string enclosed in square brackets). If so, save it and 
+*  remove it form the suffix.
+         CALL NDG1_FORXT( SUF, F, L, STATUS )
+         IF( F .LE. L ) THEN
+            FXS = SUF( F : L )
+            SUF( F : L ) = ' ' 
+         ELSE
+            FXS = ' '
+         END IF
+
+*  Construct the total trailing string following the file type.
+         REST = ' '
+         IAT = 0
+         CALL CHR_APPND( FXS, REST, IAT )
+         CALL CHR_APPND( SEC, REST, IAT )
+
 *  From now on, if no suffix was given, use ".*" so that we pick up files 
 *  with any of the types included in NDF_FORMATS_IN. But indicate that
 *  duplicate files with different file types should be purged.
          IF( SUF .EQ. ' ' ) THEN
             SUF = '.*'
             PURGE = .TRUE.
+
+*  If a suffix was given, remove any foreign extension specifier (any
+*  trailing string enclosed in matching square brackets).
          ELSE
             PURGE = .FALSE.
          END IF
@@ -275,7 +297,7 @@
 
 *  If it does, append a wildcard template to the total file search string
 *  which will match files with the given base name and the current
-*  catalogue file type. Append a trailing space by incrementing SLEN.
+*  file type. Append a trailing space by incrementing SLEN.
                FTEMP = ' '
                IAT = 0
                CALL CHR_APPND( DIR, FTEMP, IAT )
@@ -293,7 +315,7 @@
 
 *  Get a list of all matching files, appending them to IGRP2.
          IF( SLEN .GT. 0 ) THEN
-            CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), SEC, 
+            CALL NDG1_APPEN( IGRP2, IGRP3, SEARCH( : SLEN ), REST, 
      :                       STATUS )
          END IF
 
@@ -406,13 +428,44 @@
 *  The file spec cannot be used if it is a .sdf file.
             IF( TYP .NE. NDG__NDFTP ) THEN
 
-*  Non-HDS files cannot have a component path. Any remaining text must
-*  be an NDF slice if the file is usable.
-               PATH = ' '
-               SLICE = REST
+*  Split the remaining text up into a data path (i.e. a foreign extension
+*  specifier) and NDF section. If a FXS was given, append it to the end
+*  of the returned NDF spec.
+               F = INDEX( REST, '[' )
+               L = INDEX( REST, ']' )
+               IF( F .GT. 0 .AND. L .GT. F ) THEN
+                  PATH = REST( F : L )
+                  SLICE = REST( L + 1 : )
+                  CALL CHR_APPND( PATH, STORED, IAT )
+               ELSE
+                  PATH = ' '
+                  SLICE = REST
+               END IF
 
-*  The file spec can be used if the REST text is blank.
-               IF( REST .EQ. ' ' ) THEN
+*  If an NDF slice specification was given, check that it starts with "(",
+*  ends with ")" and has no other parentheses in it. If a good slice is
+*  found, append it to the end of the returned NDF spec.
+               OK = .TRUE.
+               IF( SLICE .NE. ' ' ) THEN
+                  OK = .FALSE.
+                  CALL CHR_FANDL( SLICE, F, L )
+                  IF( SLICE( F : F ) .EQ. '(' .AND. 
+     :                SLICE( L : L ) .EQ. ')' ) THEN
+                     IF( F + 1 .LE. L - 1 ) THEN
+                        IF( INDEX( SLICE( F + 1 : L - 1 ), ')' ) .EQ. 0
+     :                      .AND.
+     :                      INDEX( SLICE( F + 1 : L - 1 ), '(' ) .EQ. 0
+     :                    ) THEN
+                             OK = .TRUE.
+                             CALL CHR_APPND( SLICE( F : L ), STORED, 
+     :                                       IAT )
+                        END IF
+                     END IF
+                  END IF
+               END IF
+
+*  If any slice was OK, store the NDF spec in the returned group.
+               IF( OK ) THEN
                   CALL GRP_PUT( IGRP, 1, STORED( : IAT ), 0, STATUS )
                   FOUND = .TRUE.
 
@@ -423,36 +476,6 @@
                   CALL GRP_PUT( IGRPH, 1, PATH, 0, STATUS )
                   CALL GRP_PUT( IGRPS, 1, SLICE, 0, STATUS )
 
-*  If the REST text is not blank, the file can only be used if REST looks
-*  like it may be an NDF slice specification (i.e. if it starts with "(",
-*  ends with ")" and has no other parentheses in it).
-               ELSE
-                  CALL CHR_FANDL( REST, F, L )
-                  IF( REST( F : F ) .EQ. '(' .AND. 
-     :                REST( L : L ) .EQ. ')' ) THEN
-                     IF( F + 1 .LE. L - 1 ) THEN
-                        IF( INDEX( REST( F + 1 : L - 1 ), ')' ) .EQ. 0
-     :                      .AND.
-     :                      INDEX( REST( F + 1 : L - 1 ), '(' ) .EQ. 0
-     :                    ) THEN
-
-*  REST looks like an NDF slice spec, so append it to the end of the 
-*  file spec and store it in the returned group.
-                           CALL CHR_APPND( REST, STORED, IAT )
-                           CALL GRP_PUT( IGRP, 1, STORED( : IAT ), 0, 
-     :                                   STATUS )
-                           FOUND = .TRUE.
-
-*  Store individual fields in the supplemental groups.
-                           CALL GRP_PUT( IGRPD, 1, DIR, 0, STATUS )
-                           CALL GRP_PUT( IGRPB, 1, NAM, 0, STATUS )
-                           CALL GRP_PUT( IGRPT, 1, TYP, 0, STATUS )
-                           CALL GRP_PUT( IGRPH, 1, PATH, 0, STATUS )
-                           CALL GRP_PUT( IGRPS, 1, SLICE, 0, STATUS )
-
-                        END IF
-                     END IF
-                  END IF
                END IF
             END IF
          END IF

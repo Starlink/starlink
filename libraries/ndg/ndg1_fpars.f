@@ -23,11 +23,11 @@
 *        The directory path (ending at the final "\" in the spec).
 *     BN = CHARACTER * ( * ) (Returned)
 *        The file base name. Ends with the character preceeding the first
-*        "." or "(" following the directory path.
+*        "." or "(" or "[" following the directory path.
 *     SUF = CHARACTER * ( * ) (Returned)
 *        Any string following the file base name, and preceeding any 
 *        opening parenthesis. SUF will either be blank, or begin with a
-*        dot.
+*        dot or a "[".
 *     SEC = CHARACTER * ( * ) (Returned)
 *        Any parenthesised string following the suffix.
 *     STATUS = INTEGER (Given and Returned)
@@ -40,6 +40,9 @@
 *  History:
 *     9-SEP-1999 (DSB):
 *        Original version.
+*     18-JUL-2000 (DSB):
+*        Use "[" as an additional delimiter for the basename, in order to
+*        allow for foreign extension specifiers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -74,10 +77,11 @@
       INTEGER DIRBEG             ! Index of first character in directory
       INTEGER DIREND             ! Index of last character in directory
       INTEGER DOT                ! Index of dot
+      INTEGER FXS                ! Index of opening square bracket 
+      INTEGER LSPEC              ! Length of spec
       INTEGER PAR                ! Index of opening parenthesis
       INTEGER SUFBEG             ! Index of first character in suffix
       INTEGER SUFEND             ! Index of last character in suffix
-      INTEGER LSPEC              ! Length of spec
 *.
 
 *  Initialise
@@ -104,19 +108,21 @@
 
 *  Find the first dot following the start of the basename.
       DOT = INDEX( SPEC( BNBEG : ), '.' )
+      IF( DOT .EQ. 0 ) DOT = 100000
 
 *  Find the first "(" following the start of the basename (a potential 
 *  NDF slice or HDS cell specification).
       PAR = INDEX( SPEC( BNBEG : ), '(' )
+      IF( PAR .EQ. 0 ) PAR = 100000
 
-*  The end of the current file basename is marked by the earlier of the two.
-      IF( DOT .EQ. 0 ) THEN
-         BNEND = PAR - 1
-      ELSE IF( PAR .EQ. 0 ) THEN
-         BNEND = DOT - 1
-      ELSE
-         BNEND = MIN( PAR, DOT ) - 1
-      END IF
+*  Find the first "[" following the start of the basename (a potential 
+*  foreign extension specifier).
+      FXS = INDEX( SPEC( BNBEG : ), '[' )
+      IF( FXS .EQ. 0 ) FXS = 100000
+
+*  The end of the current file basename is marked by the earlier of the
+*  three.
+      BNEND = MIN( DOT, MIN( PAR, FXS ) ) - 1
 
 *  If no end marker was found use the whole string. 
       IF( BNEND .EQ. -1 ) THEN
@@ -128,13 +134,12 @@
       END IF
 
 *  The file suffix is any string following the basename, extending
-*  to the first "(", or the end of the string (if there is no "(" ).
+*  to the first "]" or "(" or the end of the string (which ever is first).
       SUFBEG = BNEND + 1
-      IF( PAR .GT. 0 ) THEN
-         SUFEND = PAR + BNBEG - 2
-      ELSE
-         SUFEND = LSPEC
-      END IF
+      FXS = INDEX( SPEC( SUFBEG : ), ']' )
+      IF( FXS .EQ. 0 ) FXS = 100000
+      SUFEND = MIN( LSPEC, MIN( PAR + BNBEG, FXS + SUFBEG ) 
+     :                     + BNBEG - 2 )
 
 *  Extract the fields into separate variables.
       IF( DIRBEG .LE. DIREND ) DIR = SPEC( DIRBEG : DIREND )
