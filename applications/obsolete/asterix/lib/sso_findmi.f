@@ -93,7 +93,7 @@
             SSO_MI_USED(N) = .TRUE.
             SSO_MI_DS(N) = NDS
             SSO_MI_TYPE(N) = TYPE
-            SSO_MI_FLD(N) = FLD
+            SSO_MI_FNAM(N) = FLD
             SSO_MI_PTR(N) = 0
             SSO_MI_MAPPED(N) = .FALSE.
 
