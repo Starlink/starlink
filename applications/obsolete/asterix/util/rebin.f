@@ -10,7 +10,7 @@
 *
 *     When VARIANCEs are rebinned they are no longer independent of the VARIANCE
 *     in adjacent bins. If a rebinned dataset is rebinned again the effect of
-*     this is to artificially lower the VARIANCEs.
+*     this is artificially to lower the VARIANCEs.
 *    Bugs :
 *    Authors :
 *     Jim Peden (BHVAD::JCMP)
@@ -864,14 +864,8 @@
      :              (II(5),II5),(II(6),II6),(II(7),II7)
         LOGICAL LOFOUND,HIFOUND
         LOGICAL INCLUDE		! whether donor bin to be included
-      integer j
 *-
 
-        open(1,file='lp.lis',status='NEW')
-        do j=1,50
-          write(1,'(1x,2(g15.6,4x))') bnds(1,j,1),bnds(2,j,1)
-        enddo
-        close(1)
 
 *      Status check
       IF (STATUS.NE.SAI__OK) RETURN
