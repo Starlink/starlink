@@ -1,0 +1,55 @@
+1 KAPHELP
+Gives help about CONVERT.
+
+Usage:
+
+   CONHELP [TOPIC] [SUBTOPIC] [SUBSUBTOPIC] [SUBSUBSUBTOPIC]
+
+Description:
+
+   Displays help about CONVERT.  The help information has classified
+   and alphabetical lists of commands, general information about
+   CONVERT and related material; it describes individual commands in
+   detail.
+
+   Here are some of the main options:
+      CONHELP
+         No parameter is given so the introduction and the top-level
+         help index is displayed.
+      CONHELP application/topic
+         This gives help about the specified application or topic.
+      CONHELP application/topic subtopic
+         This lists help about a subtopic of the specified
+         application or topic. The hierarchy of topics has a maximum
+         of four levels.
+      CONHELP SUMMARY
+         This shows a one-line summary of each application.
+
+   Once in the help library, it can be navigated in the normal
+   way.  CTRL/Z (on VMS) and CTRL/D (on UNIX) to exit from any level,
+   and <CR> to move up a level in the hierarchy.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 TOPIC
+TOPIC = LITERAL (Read)
+   Topic for which help is to be given. [" "]
+3 SUBTOPIC
+SUBTOPIC = LITERAL (Read)
+   Subtopic for which help is to be given. [" "]
+3 SUBSUBTOPIC
+SUBSUBTOPIC = LITERAL (Read)
+   Subsubtopic for which help is to be given. [" "]
+3 SUBSUBSUBTOPIC
+SUBSUBSUBTOPIC = LITERAL (Read)
+   Subsubsubtopic for which help is to be given. [" "]
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1993 July 30 (MJC):
+    Original based on KAPHELP.
+
+ {enter_any_changes_here}
+2 Implementation_Status
+   -  Uses the portable help system.
+
+   -  The help libraries are slightly different for VMS and UNIX.
