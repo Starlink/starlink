@@ -51,6 +51,10 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.3  1999/07/29 21:53:30  timj
+*     Add status checking for sculib_ranged.
+*     Parametrize the max size of grid.
+*
 *     Revision 1.2  1998/02/03 00:11:39  timj
 *     Change upper limit of map size to 4096 pixels.
 *
@@ -84,10 +88,14 @@
       INTEGER I_CENTRE
       INTEGER J_CENTRE
 
-*     Status
+*  Status:
       INTEGER STATUS
 
-*     Local Variables:
+*  Local Constants:
+      INTEGER MAX_PIX             ! Maximum number of pixels allowed for grid
+      PARAMETER ( MAX_PIX = 4096 )
+
+*  Local Variables:
       DOUBLE PRECISION DTEMP      ! Scratch double
       DOUBLE PRECISION DTEMP1     ! Scratch double
       INTEGER          I          ! Loop variable
@@ -108,18 +116,18 @@
 *     Find range of data
       
       CALL SCULIB_RANGED (%val(X_PTR(1)), 1,
-     :     N_PTS(1), XMAX, XMIN)
+     :     N_PTS(1), XMAX, XMIN, STATUS)
       CALL SCULIB_RANGED (%val(Y_PTR(1)), 1,
-     :     N_PTS(1), YMAX, YMIN)
+     :     N_PTS(1), YMAX, YMIN, STATUS)
          
       IF (N_FILES .GT. 1) THEN
          DO I = 1, N_FILES
             CALL SCULIB_RANGED (%val(X_PTR(I)), 1,
-     :           N_PTS(I), DTEMP, DTEMP1)
+     :           N_PTS(I), DTEMP, DTEMP1, STATUS)
             XMAX = MAX (XMAX,DTEMP)
             XMIN = MIN (XMIN,DTEMP1)
             CALL SCULIB_RANGED (%val(Y_PTR(I)), 1,
-     :           N_PTS(I), DTEMP, DTEMP1)
+     :           N_PTS(I), DTEMP, DTEMP1, STATUS)
             YMAX = MAX (YMAX,DTEMP)
             YMIN = MIN (YMIN,DTEMP1)
          END DO
@@ -130,19 +138,22 @@
 *     slightly oversized to allow edge effects to be countered during the
 *     convolution.
 
-      IF (PIXEL_SZ .GT. 0.0) THEN
+      IF (PIXEL_SZ .GT. 0.0 .AND. STATUS .EQ. SAI__OK) THEN
          NX = NINT (REAL(XMAX - XMIN) / PIXEL_SZ) + 10
          NY = NINT (REAL(YMAX - YMIN) / PIXEL_SZ) + 10
          I_CENTRE = NINT (REAL(XMAX) / PIXEL_SZ) + 5
          J_CENTRE = NINT (REAL(-YMIN) / PIXEL_SZ) + 5
       END IF
 
-      IF ((NX .GT. 4096) .OR. (NY .GT. 4096)) THEN
+      IF ((NX .GT. MAX_PIX) .OR. (NY .GT. MAX_PIX)) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
+            CALL MSG_SETI('MX', MAX_PIX)
+            CALL MSG_SETI('NX', NX)
+            CALL MSG_SETI('NY', NY)
             CALL ERR_REP (' ', 'CALC_OUTPUT_GRID: output map is too '//
      :           'big, having one or both dimensions greater '//
-     :           'than 1000 pixels', STATUS)
+     :           'than ^MX pixels (size is ^NX x ^NY)', STATUS)
          END IF
       END IF
 
