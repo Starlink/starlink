@@ -1,7 +1,7 @@
       SUBROUTINE SURF_ADD_DBM ( STATUS )
 *+
 *  Name:
-*     SCUMAKEWT
+*     ADD_DBM
 
 *  Purpose:
 *     Generate a dual beam map from a single beam map
@@ -76,6 +76,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/01/12 02:55:26  timj
+*     Correct task name in header (was SCUMAKEWT)
+*
 *     Revision 1.1  1999/01/12 02:51:24  timj
 *     First version
 *
