@@ -31,9 +31,10 @@ IN = NDF (Read)
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
    The number of data values per record of the output file.  It
-   should be in the range 1 to 8191, unless the array is double
-   precision, when the upper limit is 4095.  The suggested
-   default is the current value. [The first dimension of the NDF]
+   should be in the range 1 to n, where n is 32764 divided by
+   the number of bytes per data value.  The suggested
+   default is the current value. [The first dimension of the NDF
+   (or n if this is smaller)]
 3 OUT
 OUT = FILENAME (Write)
    Name of the output sequential unformatted file.  The file will
@@ -138,6 +139,8 @@ MJC: Malcolm J. Currie (STARLINK)
 2 History
  1992 September 16 (MJC):
     Original version.
+ 1993 August 25 (MJC):
+    Corrected the calculations of record lengths.
 2 Implementation_Status
    -  The value of bad pixels is not written to a FITS-like header
    record with keyword BLANK.
