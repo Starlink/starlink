@@ -174,10 +174,10 @@
       ELSE IF ( MTYPE(FC:FC) .EQ. 'D' ) THEN
         SIZE = VAL__NBD
       ELSE IF ( (MTYPE(FC:FC) .EQ. 'W') .OR.
-      :         (MTYPE(FC:FC+1) .EQ. 'UW') ) THEN
+     :          (MTYPE(FC:FC+1) .EQ. 'UW') ) THEN
         SIZE = VAL__NBW
       ELSE IF ( (MTYPE(FC:FC) .EQ. 'B') .OR.
-      :         (MTYPE(FC:FC+1) .EQ. 'UB') ) THEN
+     :          (MTYPE(FC:FC+1) .EQ. 'UB') ) THEN
         SIZE = VAL__NBB
       ELSE
         CALL MSG_SETC( 'TYPE', MTYPE )
