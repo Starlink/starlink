@@ -5,7 +5,7 @@
                               ! converted to upper case.
       CHARACTER CTG__WILD1*1  ! Single-character wildcard.
       CHARACTER CTG__WILD2*1  ! Multi-character wildcard.
-      CHARACTER CTG__FMTIN*108! List of catalogue formats supported by CAT
+      CHARACTER CTG__FMTIN*150! List of catalogue formats supported by CAT
       CHARACTER CTG__FMTOUT*20! Default list of output catalogue formats 
 
       PARAMETER (

@@ -1,6 +1,6 @@
       SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, 
      :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND, 
-     :                       UBND, WORK1, WORK2, WORK3, STATUS )
+     :                       UBND, WORK1, WORK2, WORK3, WORK4, STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW, 
 *                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, 
-*                      WORK3, STATUS )
+*                      WORK3, WORK4, STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a 
@@ -64,6 +64,8 @@
 *     WORK3( SZBAT, * ) = REAL (Returned)
 *        Work array. The second dimension should be equal to NCOL - 4 if
 *        GOTRD is .TRUE., or NCOL - 2 otherwise.
+*     WORK4( SZBAT ) = CHARACTER * ( * ) (Returned)
+*        Work array for character ID strings.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -115,6 +117,7 @@
       DOUBLE PRECISION WORK1( SZBAT, NDIM ) 
       DOUBLE PRECISION WORK2( SZBAT, 2 ) 
       REAL WORK3( SZBAT, * ) 
+      CHARACTER WORK4( SZBAT )*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -151,6 +154,7 @@
       INTEGER I                  ! Loop index
       INTEGER IAT                ! Length of formatted value
       INTEGER IC                 ! Index of saved row nearest to field centre
+      INTEGER IDTYPE             ! Data type fo teh ID column
       INTEGER IGA                ! Index into GA
       INTEGER IRAN               ! Index of next random row number
       INTEGER IROW               ! Index of first row in bacth
@@ -160,9 +164,11 @@
       INTEGER KK                 ! Loop index
       INTEGER K0                 ! Loop index
       INTEGER MRAN               ! Number of unique random rows
+      INTEGER NC                 ! Number of characters
       INTEGER RANROW( NRAN )     ! Random row numbers
       INTEGER SAVRAN             ! No. of random rows saved so far
       INTEGER UNIT               ! Fortran IO unit for output text file
+      LOGICAL CHARID             ! Are existing ID stored as characters?
       LOGICAL MAKEID             ! Create ID values?
       LOGICAL READX              ! Do we still need to read the X column?
       LOGICAL READY              ! Do we still need to read the Y column?
@@ -195,6 +201,14 @@
 
 *  See if we need to construct ID values.
       MAKEID = ( GCOL( IDCOL ) .EQ. CAT__NOID )
+
+*  Store a flag indicating if existing ID values are stored as characters
+      IF( .NOT. MAKEID ) THEN 
+         CALL CAT_TIQAI( GCOL( IDCOL ), 'DTYPE', IDTYPE, STATUS )
+         CHARID = ( IDTYPE .EQ. CAT__TYPEC ) 
+      ELSE
+         CHARID = .FALSE.
+      END IF
 
 *  Store some random row numbers. The X/Y and RA/DEC values at these rows
 *  are saved in local arrays as the rows are accessed. The row which is 
@@ -287,10 +301,18 @@
 
 *  Read the remaining columns.
             DO I = 5, NCOL
-               IF( MAKEID .AND. I .EQ. IDCOL ) THEN 
-                  DO KK = 1, BATSZ
-                     WORK3( KK, I - 4 ) = KK + IROW - 1
-                  END DO
+               IF( I .EQ. IDCOL ) THEN 
+                  IF( MAKEID ) THEN 
+                     DO KK = 1, BATSZ
+                        WORK3( KK, I - 4 ) = KK + IROW - 1
+                     END DO
+                  ELSE IF( CHARID ) THEN
+                     CALL POL1_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
+     :                                WORK4, STATUS )     
+                  ELSE 
+                     CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+     :                                WORK3( 1, I - 4 ), STATUS )
+                  END IF      
                ELSE
                   CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                             WORK3( 1, I - 4 ), STATUS )     
@@ -345,8 +367,20 @@
                WRITE( UNIT, * ) '{', X, Y, ' \\'
                WRITE( UNIT, * ) RA, DEC, ' \\'
                DO J = 1, NCOL - 4, 4
-                  K0 = MIN( 3, NCOL - 4 - J )
-                  WRITE( UNIT, * ) ( WORK3( I, J + K ), K = 0, K0),' \\'
+                  DO K = 0, MIN( 3, NCOL - 4 - J )
+                     IF( J + K + 4 .EQ. IDCOL ) THEN
+                        IF( CHARID ) THEN 
+                           WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
+     :                                                  '"'
+                        ELSE
+                           WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                        END IF
+                     ELSE
+                        WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                     END IF
+                  END DO
+                  WRITE( UNIT, * ) ' \\'
+
                END DO
                WRITE( UNIT, * ) '} \\'
 
@@ -377,10 +411,18 @@
 
 *  Read the remaining columns.
             DO I = 3, NCOL
-               IF( MAKEID .AND. I .EQ. IDCOL ) THEN 
-                  DO KK = 1, BATSZ
-                     WORK3( KK, I - 2 ) = KK + IROW - 1
-                  END DO
+               IF( I .EQ. IDCOL ) THEN 
+                  IF( MAKEID ) THEN 
+                     DO KK = 1, BATSZ
+                        WORK3( KK, I - 2 ) = KK + IROW - 1
+                     END DO
+                  ELSE IF( CHARID ) THEN
+                     CALL POL1_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
+     :                                WORK4, STATUS )     
+                  ELSE
+                     CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+     :                                WORK3( 1, I - 2 ), STATUS )     
+                  END IF      
                ELSE
                   CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                             WORK3( 1, I - 2 ), STATUS )     
@@ -398,8 +440,19 @@
 *  tell tcl to ignore the line break.
                WRITE( UNIT, * ) '{', X, Y, ' \\'
                DO J = 1, NCOL - 2, 4
-                  K0 = MIN( 3, NCOL - 2 - J )
-                  WRITE( UNIT, * ) ( WORK3( I, J + K ), K = 0, K0),' \\'
+                  DO K = 0, MIN( 3, NCOL - 2 - J )
+                     IF( J + K + 2 .EQ. IDCOL ) THEN
+                        IF( CHARID ) THEN 
+                           WRITE( UNIT, '(A1,A,A1,$)' ) '"',WORK4( I ),
+     :                                                  '"'
+                        ELSE
+                           WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                        END IF
+                     ELSE
+                        WRITE( UNIT, '(G13.6,$)' ) WORK3( I, J + K )
+                     END IF
+                  END DO
+                  WRITE( UNIT, * ) ' \\'
                END DO
                WRITE( UNIT, * ) '} \\'
 
@@ -458,6 +511,7 @@
             YC = YRAN( IC )
             RAC = RARAN( IC )
             DECC = DECRAN( IC )
+            SS = 0.0D0
 
 *  We have found our estimate of the field centre in RA/DEC (the values
 *  for row IC). We now need an estimate of the pixel scale.  Loop round
