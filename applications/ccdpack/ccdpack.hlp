@@ -158,6 +158,8 @@
      XREDUCE: Starts the automated CCD data reduction GUI.
 
 1 Changes_this_release
+1 CCDPACK_major_update
+
   This is a major update to CCDPACK.
 
   * CCDPACK has been revised to be aware of, and use, the World Coordinate
@@ -168,7 +170,7 @@
           New tasks:
              ASTEXP - Exports AST frameset information from NDFs to file
              ASTIMP - Imports AST frameset information from file to NDFs
-             WCSEDIT - Adds, removes, makes current frames in WCS component
+             WCSEDIT - Modifies and examines frames in WCS component
              WCSREG - Aligns NDFs using multiple WCS component frames
           New script:
              WCSEXERCISE - test WCS-related functionality (not IRAF)
@@ -178,9 +180,15 @@
        TRANSFORM structures stored in the .MORE.CCDPACK extension.
        All applications retain the option of using the previous
        functionality for backwards compatibility however.
+
+       The position list coordinates dealt with by FINDOFF and 
+       REGISTER are now by default converted from pixel coordinates to
+       the Current coordinate system before use (USEWCS parameter).  
+       In addition FINDOFF can optionally restrict attempted object
+       matches to regions expected to overlap (RESTRICT parameter).
           Affected tasks:
              FINDOFF   (new parameters MAXDISP, RESTRICT, USEWCS)
-             REGISTER  (new parameters OUTDOMAIN, OUTFORMAT)
+             REGISTER  (new parameters OUTDOMAIN, OUTFORMAT, USEWCS)
              TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
                                        EPOCHOUT, WCSFILE)
              TRANNDF   (new parameter  USEWCS)
@@ -197,7 +205,8 @@
              MAKECAL
              MAKEFLAT
 
-     - The package now requires AST 1.3 to build.
+     - The package now requires AST 1.4 to build.
+
 
   * A new application, DRIZZLE, has been introduced.  This resamples and
     combines images in one step, optionally normalising them at the same
