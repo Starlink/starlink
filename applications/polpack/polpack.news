@@ -1,8 +1,9 @@
 1 POLPACK
 
- Version 3.0 of POLPACK (an applications package for processing imaging 
+ Version 3.0-5 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
- The main changes since V2.1-5 are:
+ The main changes since V2.0-15 (the version on the last Starlink CD) 
+ are:
 
    o  Multi-waveband data (i.e. Spectropolarimetry data) can now be
    processed and displayed.
@@ -22,4 +23,29 @@
    and pixel values along any spectral channel axis present in a vector
    catalogue. These commands are not intended for interactive use, and
    are not documented in SUN/223.
+
+   o  POLKA now checks that the required versions of KAPPA and CCDPACK 
+   are available before proceeding.
+
+   o  The current co-ordinate Frame in the output cube created by POLCAL
+   is now 3-dimensional instead of 2-dimensional. A STOKES axis has been
+   attached to the third pixel axis.
+
+   o  A new parameter called TRIMBAD has been added to POLCAL to enable
+   the output cube to be trimmed to exclude any borders of bad pixels.
+
+   o  POLBIN now chooses the bin locations so that the XY origin is always
+   placed at the corner of a bin
+
+   o  POLBIN and POLVEC have a new parameter RADEC which allows RA and DEC
+   columns to be added to the output catalogues, so long as suitable WCS
+   information is available.
+
+   o  POLPLOT now allows the key to be placed inside the vector map by
+   giving a negative value for the KEYPOS parameter. The text included in
+   the key can be specified using the Title attribute of parameter
+   KEYSTYLE.
+
+   o  The default vector scaling used by POLPLOT has been improved in
+   cases where debiassing causes many zero length vectors to be present.
 
