@@ -20,7 +20,7 @@ colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
-ira_err ndg_const ndg_err kpg_ast kpg_par grf.h style.def
+ira_err ndg_const ndg_err kpg_ast kpg_par grf.h style.def tkast.tcl
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
