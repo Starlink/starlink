@@ -47,8 +47,8 @@
 *-
 
       IF(STATUS.EQ.SAI__OK) THEN
-        CALL ADI1_GETLOC(LOC,ID,STATUS)
-        CALL SSO_GETPAR1<T>( ID, FILE, PAR, MAXVAL, VALUE,
+        CALL ADI1_GETLOC(ID,LOC,STATUS)
+        CALL SSO_GETPAR1<T>( LOC, FILE, PAR, MAXVAL, VALUE,
      :                                         ACTVAL, STATUS )
         IF ( STATUS.NE.SAI__OK ) THEN
           CALL AST_REXIT( 'SSI_GETPAR1<T>', STATUS )

@@ -50,7 +50,7 @@
 *    Status ok?
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-        CALL ADI1_GETLOC( LOC, ID, STATUS )
+        CALL ADI1_GETLOC( ID, LOC, STATUS )
         CALL SSO_GETPAR0<T>( LOC, FILE, PAR, VALUE, STATUS )
 
 *      Tidy up
