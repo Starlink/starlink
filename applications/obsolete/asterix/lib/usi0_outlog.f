@@ -23,7 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
 *
 *    Global variables :
@@ -44,18 +43,19 @@
       CHARACTER*1		LC			! Line continuation
 
       INTEGER			BPOS			! Character index
+      INTEGER			NPAR			! # supplied pars
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Check we are logging
+*  Check we are logging
       IF ( USI_LOGGING ) THEN
 
-*      New error context
+*    New error context
         CALL ERR_MARK
 
-*      Switch on mode
+*    Switch on mode
         IF ( USI_LOGIMODE .EQ. USI__L_ICL ) THEN
           LC = '~'
 
@@ -66,22 +66,23 @@
 
         END IF
 
-*      Command line only
-        IF ( USI_CTX(USI_ICTX).PLEN .EQ. 0 ) THEN
+*    Number of parameters supplied
+        CALL ADI_NCMP( CTX_PST(USI_ICTX), NPAR, STATUS )
+
+*    Command line only
+        IF ( NPAR .EQ. 0 ) THEN
 
           IF ( USI_LOGIMODE .EQ. USI__L_CALL ) THEN
             BUF = '      CALL AST_EXEC( '''
             BPOS = CHR_LEN(BUF) + 1
-            CALL USI0_OUTLOG_F77( BUF, BPOS, USI_CTX(USI_ICTX).
-     :              CSTRING(1:USI_CTX(USI_ICTX).CLEN), .FALSE.,
-     :                            STATUS )
+            CALL USI0_OUTLOG_F77( BUF, BPOS, CTX_CSTR(USI_ICTX)
+     :              (1:CTX_CLEN(USI_ICTX)), .FALSE., STATUS )
             CALL USI0_OUTLOG_F77( BUF, BPOS, ''', STATUS )', .TRUE.,
      :                            STATUS )
 
           ELSE
-            CALL FIO_WRITE( USI_LOGFID,
-     :            USI_CTX(USI_ICTX).CSTRING(:USI_CTX(USI_ICTX).CLEN),
-     :            STATUS )
+            CALL FIO_WRITE( USI_LOGFID, CTX_CSTR(USI_ICTX)
+     :              (1:CTX_CLEN(USI_ICTX)), STATUS )
 
           END IF
 
@@ -91,9 +92,8 @@
           IF ( USI_LOGIMODE .EQ. USI__L_CALL ) THEN
             BUF = '      CALL AST_EXEC( '''
             BPOS = CHR_LEN(BUF)
-            CALL USI0_OUTLOG_F77( BUF, BPOS, USI_CTX(USI_ICTX).
-     :                 CSTRING(1:USI_CTX(USI_ICTX).CLEN), .FALSE.,
-     :                            STATUS )
+            CALL USI0_OUTLOG_F77( BUF, BPOS, CTX_CSTR(USI_ICTX)
+     :              (1:CTX_CLEN(USI_ICTX)), .FALSE., STATUS )
             CALL USI0_OUTLOG_F77( BUF, BPOS, ' '//USI_CTX(USI_ICTX).
      :           PSTRING(1:USI_CTX(USI_ICTX).PLEN), .FALSE.,
      :                            STATUS )
@@ -101,9 +101,8 @@
      :                            STATUS )
 
           ELSE
-            CALL FIO_WRITE( USI_LOGFID,
-     :            USI_CTX(USI_ICTX).CSTRING(:USI_CTX(USI_ICTX).CLEN)/
-     :                   /' '//LC, STATUS )
+            CALL FIO_WRITE( USI_LOGFID, CTX_CSTR(USI_ICTX)
+     :              (1:CTX_CLEN(USI_ICTX))//' '//LC, STATUS )
             CALL FIO_WRITE( USI_LOGFID,
      :            USI_CTX(USI_ICTX).PSTRING(:USI_CTX(USI_ICTX).PLEN),
      :            STATUS )
@@ -146,7 +145,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
 *
 *    Global variables :

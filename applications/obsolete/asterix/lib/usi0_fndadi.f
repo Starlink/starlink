@@ -11,8 +11,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI_CMN'
 *    Import :
       CHARACTER*(*)          PAR       ! Parameter name
 *    Export :
@@ -20,31 +18,24 @@
 *    Status :
       INTEGER                STATUS
 *    Local variables :
-      INTEGER I
+      INTEGER PSID
 *-
 
 *  Check inherited global status
       IF (STATUS.NE.SAI__OK) RETURN
 
+*  Initialise
       ID = ADI__NULLID
 
-      I=1
+*  Locate parameter storage
+      CALL USI0_FNDPSL( PAR, .FALSE., PSID, STATUS )
 
-*  Scan list to find first empty slot
-      DO WHILE ( (ID.EQ.ADI__NULLID) .AND. (I.LE.USI__NMAX))
-
-*    Slot in use?
-        IF ( DS(I).USED ) THEN
-
-*      Parameter matches?
-          IF ( PAR .EQ. DS(I).PAR ) THEN
-            ID = DS(I).ADI_ID
-          ELSE
-            I = I + 1
-          END IF
-
-        END IF
-
-      END DO
+*  Found it?
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
+        CALL ADI_ERASE( PSID, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
+      END IF
 
       END

@@ -23,7 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
 *
 *    Global variables :

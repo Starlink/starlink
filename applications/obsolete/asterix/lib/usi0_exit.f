@@ -23,8 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI0_PAR'
 *
 *    Global variables :
 *
@@ -41,12 +39,12 @@
 *  USI initialised?
       IF ( USI_SYINIT ) THEN
 
-*      Unwind contexts
+*    Unwind contexts
         DO WHILE ( USI_ICTX .GT. 0 )
           CALL USI0_RLSE( STATUS )
         END DO
 
-*      Close log file if open
+*    Close log file if open
         IF ( USI_LOGGING ) THEN
           CALL FIO_CLOSE( USI_LOGFID, STATUS )
         END IF

@@ -23,8 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI0_PAR'
 *
 *    Global variables :
 *
@@ -40,7 +38,7 @@
 *
 *    External references :
 *
-      EXTERNAL			USI_BLK
+      EXTERNAL			USI0_BLK
 *
 *    Functions :
 *
@@ -63,9 +61,8 @@
 *  Identify parameter system by name
       PSYS = 1
       FOUND = .FALSE.
-      DO WHILE ( (PSYS.LE.USI_NPSYS) .AND. .NOT. FOUND )
-        IF ( CHR_SIMLR( FORM, USI_PSYS(PSYS).NAME
-     :                (:USI_PSYS(PSYS).NLEN) ) ) THEN
+      DO WHILE ( (PSYS.LE.USI_NPS) .AND. .NOT. FOUND )
+        IF ( CHR_SIMLR( FORM, PS_NAME(PSYS)(:PS_NLEN(PSYS)) ) ) THEN
           FOUND = .TRUE.
         ELSE
           PSYS = PSYS + 1
@@ -74,9 +71,15 @@
 
 *  Start new context if found
       IF ( FOUND ) THEN
+
+*    Increment context
         USI_ICTX = USI_ICTX + 1
-        USI_CTX(USI_ICTX).TYPE = PSYS
-        USI_CTX(USI_ICTX).PLEN = 0
+
+*    Store type
+        CTX_TYPE(USI_ICTX) = PSYS
+
+*    Create parameter store
+        CALL ADI_NEW0( 'STRUC', CTX_PST(USI_ICTX), STATUS )
 
 *  Warn if not found
       ELSE

@@ -50,12 +50,15 @@
       INTEGER             	LEVELS              	! Levels of object
       INTEGER             	MAXLINES            	! Max # of output lines
       INTEGER			PID			! ADI identifier
+      INTEGER			PSID			! ADI identifier
       INTEGER             	RBRACKPOS           	! Position of a "}"
       INTEGER             	USE                 	! Current line
       INTEGER             	SLEN, WLEN          	! String lengths
+
+      LOGICAL			ISTEMP			! Temporary?
 *-
 
-*  Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check number of input lines
@@ -84,14 +87,33 @@
 *        Extract parameter name
             PARNAME = TEXT(I)((LBRACKPOS+1):(RBRACKPOS-1))
             CALL CHR_UCASE(PARNAME)
-            CALL USI0_FNDADI( PARNAME, PID, STATUS )
+            CALL USI0_FNDPSL( PARNAME, .FALSE., PSID, STATUS )
 
 *        Parameter name is ok - get identifier
             IF ( PID .NE. ADI__NULLID ) THEN
 
+*          Is it a temporary
+              CALL ADI_CGET0L( PSID, 'TEMP', ISTEMP, STATUS )
+              IF ( ISTEMP ) THEN
+                CALL ADI_CGET0C( PSID, 'VALUE', PATH, STATUS )
+
+                USE = USE + 1
+                SLEN = CHR_LEN(PATH)
+                WORK(USE) = TEXT(I)(1:(LBRACKPOS-1))//'Value : '
+                WLEN = CHR_LEN(WORK(USE)) + 1
+                IF ( (SLEN+WLEN) .GT. LEN(TEXT(1)) ) THEN
+                  USE = USE + 1
+                  WLEN = WLEN - 5
+                  CALL CHR_FILL( ' ', WORK(USE) )
+                END IF
+                WORK(USE) = WORK(USE)(:WLEN)//PATH(:SLEN)
+
+              ELSE
+                CALL ADI_CGET0I( PSID, 'ID', PID, STATUS )
+
 *          Do a trace on the object
-              CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
-              IF ( STATUS .NE. SAI__OK ) GOTO 99
+                CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
+                IF ( STATUS .NE. SAI__OK ) GOTO 99
                 USE = USE + 1
                 WORK(USE) = TEXT(I)(1:(LBRACKPOS-1))//'File : '
                 SLEN = CHR_LEN(FILE)
@@ -117,6 +139,9 @@
                   END IF
                   WORK(USE) = WORK(USE)(:WLEN)//PATH(:SLEN)
                 END IF
+
+                END IF
+                CALL ADI_ERASE( PSID, STATUS )
 
               ELSE
                 USE = USE + 1

@@ -31,15 +31,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *  Global Variables:
       INCLUDE 'USI_CMN'			! USI initialisation
 *        USI_SYINIT = LOGICAL (Returned)
 *           System initialised flag
-
-*  External references:
-      EXTERNAL USI_BLK
 
 *  Status:
       INTEGER                   STATUS

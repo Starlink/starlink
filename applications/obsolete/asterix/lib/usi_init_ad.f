@@ -31,7 +31,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *  Global Variables:
       INCLUDE 'USI_CMN'			! USI initialisation
@@ -39,7 +38,7 @@
 *           System initialised flag
 
 *  External references:
-      EXTERNAL USI_BLK
+      EXTERNAL USI0_BLK
 
 *  Status:
       INTEGER                   STATUS
@@ -49,31 +48,28 @@
       INTEGER			CALLID			! CALLABLE system
 *.
 
-*    Not already initialised?
+*  Not already initialised?
       IF ( .NOT. USI_SYINIT ) THEN
 
-*      Clear status
+*    Clear status
         STATUS = SAI__OK
 
-*      Zero the dataset system
-        CALL USI0_DSINIT()
-
-*      Install the ADAM system
+*    Install the ADAM system
         CALL USI0_DEFADAM( ADAMID, STATUS )
 
 *      Install the CALLABLE system
 c        CALL USI0_DEFCALL( CALLID, STATUS )
 
-*      Now initialised
+*    Now initialised
         USI_SYINIT = .TRUE.
 
-*      Logging state
+*    Logging state
         CALL USI0_DEFLOG( STATUS )
 
-*      Define first context
+*    Define first context
         CALL USI0_MARK( 'ADAM', STATUS )
 
-*      Load command arguments
+*    Load command arguments
         CALL USI0_SETCL1( STATUS )
 
       END IF

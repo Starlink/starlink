@@ -26,10 +26,6 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
 *
-*    Global variables :
-*
-      INCLUDE 'USI_CMN'
-*
 *    Import :
 *
       CHARACTER*(*)		PAR			! Parameter name
@@ -43,10 +39,6 @@
 *
       INTEGER 			STATUS
 *
-*    External references :
-*
-      EXTERNAL			USI_BLK
-*
 *    Local variables :
 *
       INTEGER			RPTR			! Facility routine
@@ -54,11 +46,6 @@
 
 *    New error context
       CALL ERR_MARK
-
-*    Check USI initialised
-      IF ( .NOT. USI_SYINIT ) THEN
-        CALL USI_INIT( STATUS )
-      END IF
 
 *    Locate the DASSOC facility in this context
       CALL USI0_LOCRTN( USI__F_DASSOC, RPTR, STATUS )

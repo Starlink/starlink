@@ -135,9 +135,9 @@
 
 *    Store in common
         IF ( BASEID .EQ. ADI__NULLID ) THEN
-          CALL USI0_STOREI( OUT(:EP), ID, 'O', STATUS )
+          CALL USI0_STOREI( OUT(:EP), ID, 'O', .FALSE., STATUS )
         ELSE
-          CALL USI0_STOREI( OUT(:EP), BASEID, 'O', STATUS )
+          CALL USI0_STOREI( OUT(:EP), BASEID, 'O', .FALSE., STATUS )
         END IF
 
       END IF

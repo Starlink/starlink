@@ -23,8 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI0_PAR'
 *
 *    Global variables :
 *
@@ -42,7 +40,7 @@
 *
 *    External references :
 *
-      EXTERNAL			USI_BLK
+      EXTERNAL			USI0_BLK
       EXTERNAL			UTIL_PLOC
         INTEGER                   UTIL_PLOC
 *-
@@ -57,7 +55,7 @@
       ELSE
 
 *      Set routine pointer
-        USI_PSYS(PSYS).RTN(CODE) = UTIL_PLOC(RTN)
+        PS_RTN(CODE,PSYS) = UTIL_PLOC(RTN)
 
       END IF
 

@@ -23,8 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI0_PAR'
 *
 *    Global variables :
 *
@@ -33,10 +31,6 @@
 *    Status :
 *
       INTEGER 			STATUS
-*
-*    External references :
-*
-      EXTERNAL			USI_BLK
 *-
 
 *  Check existing count
@@ -46,8 +40,11 @@
 
 *  Export data to external environment
 
+*  Reset context data
+      CTX_TYPE(USI_ICTX) = 0
+      CALL ADI_ERASE( CTX_PST(USI_ICTX), STATUS )
+
 *  Lower context count
-      USI_CTX(USI_ICTX).TYPE = 0
       USI_ICTX = USI_ICTX - 1
 
       END

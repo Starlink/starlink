@@ -15,7 +15,6 @@
 *    Global variables :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *

@@ -1,5 +1,5 @@
 *+  USI0_STOREI - Stores ADI identifier in internal common
-      SUBROUTINE USI0_STOREI( PAR, ID, IO, STATUS )
+      SUBROUTINE USI0_STOREI( PAR, ID, IO, ISTEMP, STATUS )
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -10,49 +10,39 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI_CMN'
 *    Import :
       CHARACTER*(*)          PAR       ! Parameter name
       INTEGER			ID			! Parameter identifier
       CHARACTER*1            IO	       ! input or output
+      LOGICAL			ISTEMP
 *    Export :
 
 *    Status :
       INTEGER                STATUS
 *    Local variables :
-      INTEGER I
-      LOGICAL SPARE
+      INTEGER			PSID			! Parameter storage
 *-
 
-      IF (STATUS.EQ.SAI__OK) THEN
-        I=1
-        SPARE=.FALSE.
-*  scan list to find first empty slot
-        DO WHILE (.NOT.SPARE.AND.I.LE.USI__NMAX)
-          IF (.NOT.(DS(I).USED)) THEN
-            SPARE=.TRUE.
-          ELSE
-            I=I+1
-          ENDIF
-        ENDDO
+*  Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-        IF (SPARE) THEN
-          DS(I).PAR=PAR
-          DS(I).USED=.TRUE.
-          DS(I).IO=IO
-          DS(I).ADI_ID = ID
-          CALL ADI_CPUT0C( ID, '.USI_PAR', PAR, STATUS )
+*  Locate parameter slot
+      CALL USI0_FNDPSL( PAR, .TRUE., PSID, STATUS )
 
-        ELSE
-          STATUS=SAI__ERROR
-          CALL ERR_REP(' ', 'Maximum number of datasets exceeded',
-     ;                  STATUS )
-        ENDIF
+*  Store data
+      CALL ADI_CPUT0C( PSID, 'IO', IO, STATUS )
+      CALL ADI_CPUT0I( PSID, 'ID', ID, STATUS )
+      CALL ADI_CPUT0L( PSID, 'TEMP', ISTEMP, STATUS )
 
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL AST_REXIT( 'USI0_STOREI', STATUS )
-        ENDIF
-      ENDIF
+*  Release parameter slot
+      CALL ADI_ERASE( PSID, STATUS )
+
+*  Mark identifier as belonging to USI
+      CALL ADI_CPUT0C( ID, '.USI_PAR', PAR, STATUS )
+
+*  Report any problems
+      IF (STATUS.NE.SAI__OK) THEN
+        CALL AST_REXIT( 'USI0_STOREI', STATUS )
+      END IF
+
       END

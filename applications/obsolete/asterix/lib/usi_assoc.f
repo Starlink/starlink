@@ -118,6 +118,7 @@
       INTEGER			EP, PPOS		! Character pointers
       INTEGER			FLEN			! Length of FNAME
       INTEGER			NDIG			! Chars used in SSTR
+      INTEGER			PSID			! Parameter storage
       INTEGER			SCL			! Length of scalar data
       INTEGER			TFID			! Temp ADI object
 
@@ -170,7 +171,7 @@
           END IF
 
 *    Last try is a numeric value
-        ELSE
+        ELSE IF ( INDEX('01234567890+-.',FNAME(1:1)) .GT. 0 ) THEN
 
 *      Try reading as a number
           CALL CHR_CTOD( FNAME, DVAL, STATUS )
@@ -222,6 +223,13 @@
       END IF
 
 *  Store in common
-      CALL USI0_STOREI( PAR(:EP), ID, 'I', STATUS )
+      CALL USI0_STOREI( PAR(:EP), ID, 'I', SCALAR, STATUS )
+
+*  Store value if appropriate
+      IF ( SCALAR ) THEN
+        CALL USI0_FNDPSL( PAR(:EP), .FALSE., PSID, STATUS )
+        CALL ADI_CPUT0C( PSID, 'VALUE', FNAME, STATUS )
+        CALL ADI_ERASE( PSID, STATUS )
+      END IF
 
       END

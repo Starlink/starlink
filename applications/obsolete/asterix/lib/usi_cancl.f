@@ -23,12 +23,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'USI_CMN'
 *
 *    Import :
 *
@@ -38,10 +33,6 @@
 *
       INTEGER 			STATUS
 *
-*    External references :
-*
-      EXTERNAL			USI_BLK
-*
 *    Local variables :
 *
       INTEGER			RPTR			! Facility routine
@@ -49,11 +40,6 @@
 
 *    New error context
       CALL ERR_MARK
-
-*    Check USI initialised
-      IF ( .NOT. USI_SYINIT ) THEN
-        CALL USI_INIT( )
-      END IF
 
 *    Locate the CANCL facility in this context
       CALL USI0_LOCRTN( USI__F_CANCL, RPTR, STATUS )

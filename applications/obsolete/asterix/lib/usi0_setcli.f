@@ -23,8 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI0_PAR'
 *
 *    Global variables :
 *
@@ -44,7 +42,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Define the string
-      USI_CTX(USI_ICTX).CSTRING = CSTRING(1:CLEN)
-      USI_CTX(USI_ICTX).CLEN = CLEN
+      CTX_CSTR(USI_ICTX) = CSTRING(1:CLEN)
+      CTX_CLEN(USI_ICTX) = CLEN
 
       END

@@ -150,7 +150,7 @@
         END IF
 
 *    Store in common
-        CALL USI0_STOREI( OUT(:EP), ID, 'O', STATUS )
+        CALL USI0_STOREI( OUT(:EP), ID, 'O', .FALSE., STATUS )
 
       END IF
 

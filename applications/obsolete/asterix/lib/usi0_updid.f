@@ -10,33 +10,28 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'USI_CMN'
 *    Import :
       CHARACTER*(*)          PAR       ! Parameter name
       INTEGER			ID			! Parameter identifier
 *    Status :
       INTEGER                STATUS
 *    Local variables :
-      INTEGER I
-      LOGICAL FOUND
+      INTEGER			PSID			! Parameter storage
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
-        I=1
-        FOUND = .FALSE.
-*  scan list to find first empty slot
-        DO WHILE (.NOT.FOUND.AND.I.LE.USI__NMAX)
-          IF ( DS(I).USED .AND. (PAR.EQ.DS(I).PAR) ) THEN
-            FOUND=.TRUE.
-          ELSE
-            I=I+1
-          ENDIF
-        ENDDO
 
-        IF ( FOUND ) THEN
-          DS(I).ADI_ID = ID
+*    Locate parameter storage
+        CALL USI0_FNDPSL( PAR, .FALSE., PSID, STATUS )
+
+*    Found ok?
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Update identifier
+          CALL ADI_CPUT0I( PSID, 'ID', ID, STATUS )
+          CALL ADI_ERASE( PSID, STATUS )
+
+*      Make link from identifier to USI
           CALL ADI_CPUT0C( ID, '.USI_PAR', PAR, STATUS )
 
         ELSE

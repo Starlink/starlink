@@ -31,7 +31,6 @@
 
 *  Global constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *  Global Variables:
       INCLUDE 'USI_CMN'			! USI initialisation

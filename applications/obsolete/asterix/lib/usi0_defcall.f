@@ -23,7 +23,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'USI0_PAR'
 *
 *    Export :
@@ -36,7 +35,6 @@
 *
 *    External references :
 *
-      EXTERNAL			USI_BLK
       EXTERNAL                  SPAR_GET0L
       EXTERNAL                  SPAR_GET0I
       EXTERNAL                  SPAR_GET0R

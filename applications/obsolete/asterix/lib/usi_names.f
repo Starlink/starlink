@@ -83,7 +83,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Global Variables:
       INCLUDE 'USI_CMN'                                 ! USI common block
@@ -107,14 +106,21 @@
 
 *  Local Variables:
       CHARACTER*4		FSTR			! File number string
+      CHARACTER*1		IO			! Access mode
       CHARACTER*1		LMODE			! Local copy of MODE
       CHARACTER*255		NAME, PATH		! Trace info
 
       INTEGER			CID			! Array cell identifier
       INTEGER			FNDIG			! # digits used in FSTR
       INTEGER			I			! Loop over USI slots
+      INTEGER			ID			! Associated object
       INTEGER			LEVELS			! Trace depth
       INTEGER			NLINE			! # lines of text
+      INTEGER			NPAR			! # parameters active
+      INTEGER			PSID			! Parameter storage
+
+      LOGICAL			ISTEMP			! Temporary value?
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -126,43 +132,79 @@
 
 *  Count the number of files matching the mode
       NLINE = 0
-      DO I = 1, USI__NMAX
-        IF ( DS(I).USED .AND. (DS(I).IO.EQ.LMODE) ) NLINE = NLINE + 1
+      CALL ADI_NCMP( CTX_PST(USI_ICTX), NPAR, STATUS )
+      DO I = 1, NPAR
+        CALL ADI_INDCMP( CTX_PST(USI_ICTX), I, PSID, STATUS )
+        CALL ADI_THERE( PSID, 'IO', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0C( PSID, 'IO', IO, STATUS )
+          IF ( IO .EQ. LMODE ) NLINE = NLINE + 1
+        END IF
+        CALL ADI_ERASE( PSID, STATUS )
       END DO
 
 *  Create return value
       CALL ADI_NEW1C( NLINE, STRNGS, STATUS )
 
-*  Count the number of files matching the mode
+*  Construct the text lines
       NLINE = 0
-      DO I = 1, USI__NMAX
-        IF ( DS(I).USED .AND. (DS(I).IO.EQ.LMODE) ) THEN
+      DO I = 1, NPAR
 
-*      Increment file counter
-          NLINE = NLINE + 1
-          CALL CHR_ITOC( NLINE, FSTR, FNDIG )
+*    Access I'th parameter
+        CALL ADI_INDCMP( CTX_PST(USI_ICTX), I, PSID, STATUS )
 
-*      Perform trace
-          CALL ADI_FTRACE( DS(I).ADI_ID, LEVELS, PATH, NAME, STATUS )
+*    Association?
+        CALL ADI_THERE( PSID, 'IO', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0C( PSID, 'IO', IO, STATUS )
+          IF ( IO .EQ. LMODE ) THEN
 
-*      Locate character array cell
-          CALL ADI_CELL( STRNGS, 1, NLINE, CID, STATUS )
+*        Increment file counter
+            NLINE = NLINE + 1
+            CALL CHR_ITOC( NLINE, FSTR, FNDIG )
 
-*      Construct string separating bits with nulls
-          IF ( LEVELS .GT. 1 ) THEN
-            CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
+*        Is object a temporary?
+            CALL ADI_CGET0L( PSID, 'TEMP', ISTEMP, STATUS )
+            IF ( ISTEMP ) THEN
+              CALL ADI_CGET0C( PSID, 'VALUE', NAME, STATUS )
+              CALL ADI_PUT0C( CID, 'Input datset '//FSTR(:FNDIG)//':'//
+     :                      NUL//NAME(:CHR_LEN(NAME))//NUL, STATUS )
+
+            ELSE
+
+*          Perform trace
+              CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
+              CALL ADI_FTRACE( ID, LEVELS, PATH, NAME, STATUS )
+
+*          Locate character array cell
+              CALL ADI_CELL( STRNGS, 1, NLINE, CID, STATUS )
+
+*          Construct string separating bits with nulls
+              IF ( LEVELS .GT. 1 ) THEN
+              CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
      :                      NUL//NAME(:CHR_LEN(NAME))//NUL//
      :                      'Input object '//FSTR(:FNDIG)//':'//NUL//
      :                      PATH(:CHR_LEN(PATH)), STATUS )
-          ELSE
-            CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
-     :                      NUL//NAME(:CHR_LEN(NAME)), STATUS )
+              ELSE
+              CALL ADI_PUT0C( CID, 'Input dataset '//FSTR(:FNDIG)//':'//
+     :                        NUL//NAME(:CHR_LEN(NAME)), STATUS )
+              END IF
+
+            END IF
+
+*        Release array cell
+            CALL ADI_ERASE( CID, STATUS )
+
+*      End of mode match test
           END IF
 
-*      Release array cell
-          CALL ADI_ERASE( CID, STATUS )
-
+*    End of association test
         END IF
+
+*    Release parameter store
+        CALL ADI_ERASE( PSID, STATUS )
+
+*  Next parameter
       END DO
 
 *  Report any errors

@@ -81,13 +81,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
-
-*  Global Variables:
-      INCLUDE 'USI_CMN'                                 ! USI common block
-*       USI_INIT = LOGICAL (given)
-*         USI class definitions loaded?
 
 *  Arguments Given:
       CHARACTER*(*)		PAR
@@ -95,45 +88,35 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  Local Constants:
-      CHARACTER*1		BLANK
-        PARAMETER		( BLANK = ' ' )
-
 *  Local Variables:
-      INTEGER 			N			! USI slot
+      INTEGER 			ID			! Associated object
+      INTEGER 			PSID			! Parameter storage
 
-      LOGICAL 			FOUND			! Found a parameter?
-      LOGICAL 			VALID			! Locator valid?
+      LOGICAL 			THERE			! Object exists?
 *.
 
 *  New error context
       CALL ERR_BEGIN( STATUS )
 
-*  Look for parameter
-      N = 1
-      FOUND = .FALSE.
-      DO WHILE ( .NOT. FOUND .AND. (N.LE.USI__NMAX) )
-        IF ( DS(N).USED ) THEN
-          IF (PAR.EQ.(DS(N).PAR)) THEN
-            FOUND = .TRUE.
-          ELSE
-            N = N + 1
-          END IF
-        ELSE
-          N = N + 1
-        END IF
-      END DO
+*  Look for object associated with the parameter
+      CALL USI0_FNDPSL( PAR, .FALSE., PSID, STATUS )
 
 *  Parameter was found?
-      IF ( FOUND ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*    Close the file
-        CALL ADI_FCLOSE( DS(N).ADI_ID, STATUS )
+*    Association?
+        CALL ADI_THERE( PSID, 'ID', THERE, STATUS )
+        IF ( THERE ) THEN
 
-*    Reset slots for re-use
-        DS(N).ADI_ID = ADI__NULLID
-        DS(N).USED = .FALSE.
-        DS(N).IO = BLANK
+*      Close the file
+          CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
+          CALL ADI_FCLOSE( ID, STATUS )
+
+*      Destroy association objects
+          CALL ADI_CERASE( PSID, 'IO', STATUS )
+          CALL ADI_CERASE( PSID, 'ID', STATUS )
+
+        END IF
 
       END IF
 
