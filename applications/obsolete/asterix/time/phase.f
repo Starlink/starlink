@@ -159,7 +159,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Create & map output phase axis
-      CALL BDI_AXMAPR( OFID, TAXIS, 'WRITE', OUTAXPTR, STATUS )
+      CALL BDI_AXMAPR( OFID, TAXIS, 'Data', 'WRITE', OUTAXPTR, STATUS )
       CALL BDI_AXPUT0C( OFID, TAXIS, 'Label', 'Phase', STATUS )
       CALL BDI_AXPUT0C( OFID, TAXIS, 'Units', 'unitless', STATUS )
 
