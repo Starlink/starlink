@@ -228,7 +228,7 @@ build:
 prepare:
 
 check_packages:
-[available] Apr 22, 2003 4:05:26 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 23, 2003 4:06:30 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -558,4 +558,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 56 seconds
+Total time: 57 seconds

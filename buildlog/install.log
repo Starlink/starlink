@@ -72,7 +72,6 @@ javadocs:
 dist:
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/jsky
@@ -283,7 +282,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 22, 2003 4:15:06 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 23, 2003 4:16:10 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
