@@ -171,4 +171,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/rv/docs
 
 BUILD SUCCESSFUL
-Total time: 7 seconds
+Total time: 6 seconds
