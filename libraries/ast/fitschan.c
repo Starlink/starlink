@@ -16281,17 +16281,16 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     - "FITS-IRAF": Encodes coordinate system information in FITS
 *     header cards using the conventions described in the document
 *     "World Coordinate Systems Representations Within the FITS
-*     Format" by R.J. Hanisch and D.G. Wells, 1988 (available by ftp
-*     from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z). This
-*     encoding is currently employed by the IRAF data analysis
-*     facility, so its use will facilitate data exchange with
-*     IRAF. Its main advantages are that it is a stable convention
-*     which approximates to a sub-set of the propsed FITS-WCS encoding
-*     (above). This makes it suitable as an interim method for storing
-*     coordinate system information in FITS headers until the FITS-WCS
-*     encoding becomes stable. Since many datasets currently use the
-*     FITS-IRAF encoding, conversion of data from FITS-IRAF to the
-*     final form of FITS-WCS is likely to be well supported.
+*     Format" by R.J. Hanisch and D.G. Wells, 1988.  This encoding is
+*     currently employed by the IRAF data analysis facility, so its
+*     use will facilitate data exchange with IRAF. Its main advantages
+*     are that it is a stable convention which approximates to a
+*     sub-set of the propsed FITS-WCS encoding (above). This makes it
+*     suitable as an interim method for storing coordinate system
+*     information in FITS headers until the FITS-WCS encoding becomes
+*     stable. Since many datasets currently use the FITS-IRAF
+*     encoding, conversion of data from FITS-IRAF to the final form of
+*     FITS-WCS is likely to be well supported.
 *
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
@@ -16477,9 +16476,9 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     form "CDiiijjj", which is also in use, is recognised when
 *     reading an Object, but is never written.
 *
-*     You should not attempt to mix the FITS-IRAF and FITS-WCS
-*     encodings within the same FitsChan, since keyword clashes may
-*     occur.
+*     You should not normally attempt to mix the FITS-IRAF and
+*     FITS-WCS encodings within the same FitsChan, since there is a
+*     risk that keyword clashes may occur.
 
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
