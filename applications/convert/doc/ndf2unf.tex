@@ -38,10 +38,9 @@
       \sstsubsection{
          NOPEREC = \_INTEGER (Read)
       }{
-         The number of data values per record of the output file.
-         On UNIX systems it must be positive.  The suggested default is the
-         the current value. {\tt{[}}The first dimension of the NDF
-         (or {\em{n}} if this is smaller){\tt{]}}
+         The number of data values per record of the output file.  It
+         must be positive.  The suggested default is the current value.
+         {\tt{[}}The first dimension of the NDF{\tt{]}}
       }
       \sstsubsection{
          OUT = FILENAME (Write)
@@ -128,7 +127,7 @@
 
             \sstitem
                If the input NDF contains TITLE, LABEL or UNITS components
-               these are stored with the keywords TITLE, LABEL or BUNITS
+               these are stored with the keywords TITLE, LABEL or BUNIT
                respectively.
 
             \sstitem
@@ -141,7 +140,7 @@
                \item NAXIS, and NAXIS{\em{n}} are derived from the dimensions of the
                NDF data array as described above, so these items are not
                copied from the NDF FITS extension.
-               \item The TITLE, LABEL, and BUNITS descriptors are only copied
+               \item The TITLE, LABEL, and BUNIT descriptors are only copied
                if no TITLE, LABEL, and UNITS NDF components respectively
                have already been copied into these headers.
                \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}},

@@ -30,10 +30,9 @@ IN = NDF (Read)
    NDF if one exists, otherwise it is the current value.
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
-   The number of data values per record of the output file.  On
-   UNIX systems it must be positive.  The suggested default is
-   the the current value. [The first dimension of the NDF (or n
-   if this is smaller)]
+   The number of data values per record of the output file.  It
+   must be positive.  The suggested default is the current value.
+   [The first dimension of the NDF]
 3 OUT
 OUT = FILENAME (Write)
    Name of the output sequential unformatted file.  The file will
@@ -99,7 +98,7 @@ The details of the conversion are as follows:
 
       -  If the input NDF contains TITLE, LABEL or UNITS
       components these are stored with the keywords TITLE, LABEL
-      or BUNITS respectively.
+      or BUNIT respectively.
 
       -  If the input NDF contains a FITS extension, the FITS
       items may be written to the FITS-like header, with the
@@ -109,7 +108,7 @@ The details of the conversion are as follows:
          o  NAXIS, and NAXISn are derived from the dimensions of
          the NDF data array as described above, so these items
          are not copied from the NDF FITS extension.
-         o  The TITLE, LABEL, and BUNITS descriptors are only
+         o  The TITLE, LABEL, and BUNIT descriptors are only
          copied if no TITLE, LABEL, and UNITS NDF components
          respectively have already been copied into these
          headers.

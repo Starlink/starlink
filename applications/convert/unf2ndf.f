@@ -148,7 +148,7 @@
 *           created by this application's sister, NDF2UNF.  BITPIX is
 *           ignored for QUALITY data; type _UBYTE is used.
 *           o  NAXIS, and NAXISn define the shape of the NDF.
-*           o  The TITLE, LABEL, and BUNITS are copied to the NDF
+*           o  The TITLE, LABEL, and BUNIT are copied to the NDF
 *           TITLE, LABEL, and UNITS NDF components respectively.
 *           o  The CDELTn, CRVALn, CTYPEn, and CUNITn keywords make
 *           linear axis structures within the NDF.  CUNITn define the

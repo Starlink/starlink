@@ -42,10 +42,9 @@
 *        Input NDF data structure.  The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
-*        The number of data values per record of the output file.  On
-*        UNIX systems it must be positive.  The suggested default is
-*        the the current value. [The first dimension of the NDF (or n
-*        if this is smaller)]
+*        The number of data values per record of the output file.  It
+*        must be positive.  The suggested default is the current value.
+*        [The first dimension of the NDF]
 *     OUT = FILENAME (Write)
 *        Name of the output sequential unformatted file.  The file will
 *        normally have variable-length records when there is a header,
@@ -103,7 +102,7 @@
 *           be ignored.
 *           -  If the input NDF contains TITLE, LABEL or UNITS
 *           components these are stored with the keywords TITLE, LABEL
-*           or BUNITS respectively.
+*           or BUNIT respectively.
 *           -  If the input NDF contains a FITS extension, the FITS
 *           items may be written to the FITS-like header, with the
 *           following exceptions:
@@ -112,7 +111,7 @@
 *              o  NAXIS, and NAXISn are derived from the dimensions of
 *              the NDF data array as described above, so these items
 *              are not copied from the NDF FITS extension.
-*              o  The TITLE, LABEL, and BUNITS descriptors are only
+*              o  The TITLE, LABEL, and BUNIT descriptors are only
 *              copied if no TITLE, LABEL, and UNITS NDF components
 *              respectively have already been copied into these
 *              headers.
@@ -399,7 +398,7 @@
 *           are present, the values in the NDF FITS extension are
 *           copied.  If any are non-linear all FITS axis information is
 *           lost.
-*         TITLE, LABEL, BUNITS - the values held in NDF TITLE, LABEL,
+*         TITLE, LABEL, BUNIT - the values held in NDF TITLE, LABEL,
 *           and UNITS are used if present, otherwise any values found in
 *           the FITS extension are used.
 
@@ -443,7 +442,7 @@
             END = I .EQ. NCARD .AND. DESCR( 1:3 ) .NE. 'END'
 
 *  Leave out BITPIX, NAXIS, NAXISn, and possibly CDELTn, CRVALn,
-*  CRTYPEn, CTYPEn, TITLE, LABEL, and BUNITS as described above.  Note
+*  CRTYPEn, CTYPEn, TITLE, LABEL, and BUNIT as described above.  Note
 *  CROTAn are also excluded.
             IF ( ( INDEX( DESCR, 'NAXIS' ) .EQ. 0 ) .AND.
      :        ( INDEX( DESCR, 'BITPIX' ) .EQ. 0 ) .AND.
@@ -456,7 +455,7 @@
      :        ( INDEX( DESCR, 'CTYPE' ) .EQ. 0 .OR. .NOT. AXLFND ) .AND.
      :        ( INDEX( DESCR, 'CUNIT' ) .EQ. 0 .OR. .NOT. AXUFND ) .AND.
      :        ( INDEX( DESCR, 'LABEL' ) .EQ. 0 .OR. .NOT. LABFND ) .AND.
-     :        ( INDEX( DESCR, 'BUNITS') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
+     :        ( INDEX( DESCR, 'BUNIT') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
      :        ( INDEX( DESCR, 'TITLE') .EQ. 0 .OR. .NOT. TITFND ) ) THEN
 
 *  This code assumes that the FITS header will begin with the mandatory

@@ -48,7 +48,7 @@
 *        -  BITPIX is derived from the type of the NDF data array.
 *        -  NAXIS, and NAXISn are derived from the dimensions of 
 *           the NDF data array.
-*        -  The TITLE, LABEL, and BUNITS descriptors are derived from
+*        -  The TITLE, LABEL, and BUNIT descriptors are derived from
 *           the TITLE, LABEL, and UNITS NDF components respectively.
 *        -  The CDELTn, CRVALn, CTYPEn and CUNITn descriptors are
 *           derived from a set of linear NDF AXIS structures. 
@@ -652,7 +652,7 @@
 *  ==================
 *   
 *  If an NDF units component is found, this is copied to the FITS
-*  BUNITS header.
+*  BUNIT header.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
       IF ( THERE ) THEN
 
@@ -661,7 +661,7 @@
          CALL NDF_CLEN( NDF, 'UNITS', NCT, STATUS )
          NCT = CHR_LEN( VALUE( :MIN( SZFITS, NCT ) ) )
          IF ( NCT .GT. 0 ) THEN
-            DESCR( 1:8 ) = 'BUNITS  '
+            DESCR( 1:8 ) = 'BUNIT   '
 
 *  Look to see if the units string is longer than a normal character
 *  value (18 characters).  If it is not, append a comment in the
