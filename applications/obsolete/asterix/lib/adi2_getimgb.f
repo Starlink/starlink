@@ -105,6 +105,7 @@
 
 *  Local Variables:
       INTEGER			ADIMS(ADI__MXDIM)	! Actual dimensions
+      INTEGER			ANDIM			! Actual dimensionality
       INTEGER			FPIX(ADI__MXDIM)	! 1st pix to extract
       INTEGER			FSTAT			! FITSIO status code
       INTEGER			I			! Loop over dims
@@ -141,6 +142,7 @@
      :               ANYF, FSTAT )
         IF ( FSTAT .NE. 0 ) THEN
           CALL ADI2_FITERP( FSTAT, STATUS )
+        END IF
 
 *    Pad if required
         IF ( PAD ) THEN
