@@ -193,8 +193,8 @@
         ELSE
           STATUS = SAI__ERROR
           CALL MSG_SETC( 'IT', ITEM )
-          CALL ERR_REP( ' ', 'Unable to get item ^IT data from HDS file',
-     :                STATUS )
+          CALL ERR_REP( ' ', 'Unable to get item ^IT data from '/
+     :                  /'HDS file', STATUS )
         END IF
 
       END IF
