@@ -115,8 +115,11 @@
       CHARACTER * ( 8 ) COMP( 3 ) ! Array components to process
       CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF array
       CHARACTER * ( NDF__SZTYP ) TYPE ! Array component numeric type
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix component of linear mapping
+      DOUBLE PRECISION OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
       INTEGER DIM( NDF__MXDIM )  ! NDF dimension sizes
       INTEGER EL                 ! Number of elements mapped
+      INTEGER I                  ! Axis index
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Dimension to reverse pixels along
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel index bounds
@@ -313,14 +316,14 @@
          END DO
    
 *  Now change the scale factor for the flipped axis to -1.0
-         MATRIX( NDIMI*( IDIM - 1 ) + IDIM ) = -1.0D0
+         MATRIX( NDIM*( IDIM - 1 ) + IDIM ) = -1.0D0
 
 *  Set the offset for the flipped axis.
-         CALL NDF_DIM( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+         CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
          OFFSET( IDIM ) = DBLE( UBND( IDIM ) + LBND( IDIM ) - 1 )
 
 *  Propagate the WCS component.
-         CALL KPG1_ASPRP( NDIMI, NDFI, NDFO, MATRIX, OFFSET, STATUS )
+         CALL KPG1_ASPRP( NDIM, NDF1, NDF2, MATRIX, OFFSET, STATUS )
 
       END IF
 
