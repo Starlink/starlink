@@ -1,0 +1,62 @@
+#+
+#  Name:
+#     ccdpack_style.def
+
+#  Purpose:
+#     Default style file for plots in CCDPACK.
+
+#  Description:
+#     This file gives the default style values passed to AST for 
+#     specifying the appearance of AST plots in certain CCDPACK 
+#     graphical applications.  In some cases, these defaults can
+#     be overridded by use of an ADAM parameter, normally called 
+#     'STYLE'.
+
+#  Authors:
+#     Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-JAN-2001 (MBT):
+#        Original version.  Took values from the corresponding KAPPA
+#        default style file.
+#-
+
+#  Set values for general attributes recognised by all applications:
+#  =================================================================
+
+#  Speed up plotting of borders, grids, etc, by reducing the Tol attribute.
+      tol=0.002
+
+#  Always draw a border around the regions of the plot containing
+#  valid co-ordinates. Make it twice wider the default width.
+      border=1
+      width(border)=2.0
+
+#  Include textual labels describing the axes.
+      textlab(1)=1
+      textlab(2)=1
+
+#  Set colours for various elements of the plot.
+      colour(border)=4
+      colour(grid)=3
+      colour(ticks)=3
+      colour(numlab)=5
+      colour(axes)=3
+
+#  Set the size of the text to use for numerical and textual axis labels.
+#  These are slightly smaller than the default sizes of 1.0.
+      size(numlab)=0.8
+      size(textlab)=0.9
+
+#  Set the gaps between the axes and the associated textual labels. The default
+#  is 0.01.
+      textlabgap(1)=0.05
+      textlabgap(2)=0.05
+
+#  Make the ticks marks (both major and minor) longer. The defaults are
+#  0.015 for major ticks and 0.007 for minor ticks.
+      majticklen(1)=0.02
+      majticklen(2)=0.02
+      minticklen(1)=0.01
+      minticklen(2)=0.01
