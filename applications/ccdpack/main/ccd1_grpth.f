@@ -211,7 +211,8 @@
 *  If investigation of this edge is not conclusive, and the path
 *  is not longer than the best candidate yet, recurse further 
 *  into it.
-            IF ( .NOT. ( SUCCES .OR. FAIL ) .AND. STEP .LT. NSTEP ) THEN
+            IF ( .NOT. ( SUCCES .OR. FAIL ) .AND. 
+     :         ( .NOT. DONE .OR. STEP .LE. NSTEP ) ) THEN
                NODEC = WORK( 2, STEP )
                WORK2( STEP ) = I
                STEP = STEP + 1
