@@ -1,0 +1,115 @@
+# Perl script to test Moggy.pm
+
+test -n "$PERLBIN" || exit 1
+
+# This Perl script writes its output to a temporary file `t6report',
+# which we cat to stdout at the end.  A more obvious thing to do is to 
+# simply have the script writing to stdout, but this fails in a
+# bizarre fashion: the script below works OK when stdout is a
+# terminal, but stdout is redirected, the output from the first query
+# (down to the definition of $puss) is _duplicated_ on stdout. 
+# I don't understand this one bit.
+
+export AUTOASTROM_DIR=$PWD/..
+
+$PERLBIN -w <<'EOD'
+use lib '..';
+use Moggy;
+
+open (REPORT, '>t6report') || die "Can't open REPORT";
+
+$cat = Moggy->new('dummy@home',
+  'file:///home/norman/s/src/astrom/w/autoastrom/moggy/test/local.config');
+$cat->radius("10");
+$cat->maxrow('10');
+$cat->point('17:27:9.5',     ' 74 : 20 : 8');
+
+$cat->status_ok() || die "Calling new and setting parameters failed";
+
+print REPORT "Moggy catname: ", $cat->catname(), "\n";
+print REPORT "  Point      : ";
+foreach $num (@{$cat->point()}) {
+    print REPORT " <$num> ";
+}
+print REPORT "\n";
+print REPORT "  Searchtype : ", $cat->searchtype(), "\n";
+print REPORT "  Radius     : ", $cat->radius(), "\n";
+print REPORT "  MaxRows    : ", $cat->maxrow(), "\n";
+print REPORT "  Status     : ", ($cat->status_ok() ? "OK" : "BAD"), "\n";
+
+$cat->query() || die "Query to dummy\@home failed";
+
+$colref = $cat->resultcolumns();
+$resref = $cat->result();
+
+$ncols = $cat->resultncols();
+$nrows = $cat->resultnrows();
+print REPORT "  $nrows x $ncols:";
+for ($i = 0; $i<=$#{$colref}; $i++) {
+    print REPORT " <${$colref}[$i]>";
+}
+print REPORT "\n";
+for ($i = 0; $i<$nrows; $i++) {
+    for ($j=0; $j<$ncols; $j++) {
+	print REPORT "    ", $resref->[$i]->[$j];
+    }
+    print REPORT "\n";
+}
+
+$puss = $cat->new('usno@eso');
+#$puss = Moggy->new('usno@eso');
+#$puss = Moggy->new('dummy@home',
+#  'file:///home/norman/s/src/astrom/w/autoastrom/moggy/test/local.config');
+$puss->point(' 17 ',' 27 ',' 9.5 ','     74','20','8');
+$puss->otherpoint('17:37:9.5', "74: 20 : 8");
+$puss->searchtype('box');
+$puss->maxrow('20');
+
+$puss->status_ok() || die "Calling new and setting parameters failed";
+
+print REPORT "\n\nMoggy catname: ", $puss->catname(), "\n";
+print REPORT "  Point      : ";
+foreach $num (@{$puss->point()}) {
+    print REPORT " <$num> ";
+}
+print REPORT "\n";
+print REPORT "  OtherPoint : ";
+foreach $num (@{$puss->otherpoint()}) {
+    print REPORT " <$num> ";
+}
+print REPORT "\n";
+print REPORT "  Searchtype : ", $puss->searchtype(), "\n";
+print REPORT "  MaxRows    : ", $puss->maxrow(), "\n";
+print REPORT "  Status     : ", ($puss->status_ok() ? "OK" : "BAD"), "\n";
+
+$puss->query() || die "Query to usno\@eso failed";
+
+$colref = $puss->resultcolumns();
+$resref = $puss->result();
+
+$ncols = $puss->resultncols();
+$nrows = $puss->resultnrows();
+print REPORT "  $nrows x $ncols:";
+for ($i = 0; $i<=$#{$colref}; $i++) {
+    print REPORT " <${$colref}[$i]>";
+}
+print REPORT "\n";
+for ($i = 0; $i<$nrows; $i++) {
+    for ($j=0; $j<$ncols; $j++) {
+	print REPORT "    ", $resref->[$i]->[$j];
+    }
+    print REPORT "\n";
+}
+
+
+exit 0;
+EOD
+
+perlrval=$?
+
+if [ $perlrval = 0 ]; then
+    cat t6report
+    rm -f t6report
+fi
+    
+exit $perlrval;
