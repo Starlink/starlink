@@ -389,7 +389,7 @@
             NFIT=PREDDAT(N).NMDAT
             IFPTR=PREDDAT(N).DPTR
             NVAL=OBDAT(N).NDAT
-            DSLOC=OBDAT(N).DLOC
+            CALL ADI1_GETLOC( OBDAT(N).D_ID, DSLOC, STATUS )
             IDPTR=OBDAT(N).DPTR
             NSET=OBDAT(N).SETINDEX
             QOK=((OBDAT(N).QPTR).NE.0)
@@ -465,9 +465,6 @@
               IG=IG+1
 
             ENDIF
-
-
-
 
 * Photon space plot
             IF (PPLOT) THEN
@@ -2620,8 +2617,6 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
 
 
 
-
-
 *+
       SUBROUTINE SPLOT_MPLOT_COPY(OLOC,NCHAN,NTERM,COMPSPEC,SAVE,STATUS)
 *    Description :
@@ -2765,7 +2760,6 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Structure definitions :
 *    Import :
@@ -2789,7 +2783,6 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
         ENDDO
 
       ENDIF
-
 
       END
 

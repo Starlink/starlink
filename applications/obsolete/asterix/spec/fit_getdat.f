@@ -69,7 +69,7 @@
 *     dataset, and its channel range is checked against that of the data.
 *     In the special case of spectral sets, a 2D array is accessed as a set
 *     of 1D spectra, AXIS(1) being the spectral dimension. In this case
-*     OBDAT.DLOC points to the same container file for each member of the
+*     OBDAT.D_ID points to the same container file for each member of the
 *     set, and OBDAT.SETINDEX indicates the position in the set. For normal
 *     spectra OBDAT.SETINDEX is set to zero.
 *     The quantity SSCALE is used to scale the fit statistic to give a number
@@ -386,23 +386,25 @@
 	      CALL MSG_PRNT('    Not background-subtracted')
 	    ENDIF
 
-*      Locate b/g data
-	    CALL BDA_LOCAST(DCLOC(N),ALOC,STATUS)
-	    CALL DAT_FIND(ALOC,'BGREF',BRLOC,STATUS)
-	    CALL REF_GET(BRLOC,'READ',BLOC(N),STATUS)
-	    IF(STATUS.NE.SAI__OK)THEN
-	      CALL ERR_ANNUL(STATUS)
-	      BG=.FALSE.
-	    ELSE
-	      BG=.TRUE.
-              CALL ADI1_PUTLOC( BLOC(N), BFID(N), STATUS )
-	    END IF
-	    CALL DAT_VALID(BRLOC,VALID,STATUS)
-	    IF(VALID) CALL DAT_ANNUL(BRLOC,STATUS)
+*        Check existance of b/g data
+            CALL FRI_CHK( DCFID(N), 'BGND', BG, STATUS )
+            IF ( BG ) THEN
+
+*          Open b/g data
+              CALL FRI_FOPEN( DCFID(N), 'BGND', '*', 'READ', BFID(N),
+     :                        STATUS )
+
+	      IF ( STATUS .NE. SAI__OK ) THEN
+	        CALL ERR_ANNUL( STATUS )
+	        BG = .FALSE.
+	      ELSE
+                CALL ADI1_PUTLOC( BLOC(N), BFID(N), STATUS )
+	      END IF
+            END IF
 
 *      Check that background data array is same size as main data array
-	    IF(BG)THEN
-	      CALL BDI_CHKDATA( BFID(N),OK,NBDIM,BDIMS,STATUS)
+	    IF ( BG ) THEN
+	      CALL BDI_CHKDATA( BFID(N), OK, NBDIM, BDIMS, STATUS )
 	      IF(STATUS.NE.SAI__OK)THEN
 	        CALL ERR_FLUSH(STATUS)
 	        BG=.FALSE.
@@ -499,7 +501,6 @@
 	    ENDIF
 
 *       Set up name, locator and set position
-	    CALL DAT_CLONE(DCLOC(N),OBDAT(NDS).DLOC,STATUS)
             CALL ADI_CLONE( DCFID(N), OBDAT(NDS).D_ID, STATUS )
 
 	    IF(SPECSET(N))THEN
@@ -527,7 +528,7 @@ D	    print *,'index,specno:- ',index,specno
 	      LDIM(2)=SPECNO
 	      UDIM(1)=DIMS(1)
 	      UDIM(2)=SPECNO
-	      CALL BDA_LOCDATA(OBDAT(NDS).DLOC,CLOC,STATUS)
+	      CALL BDA_LOCDATA( DCLOC(N), CLOC, STATUS )
 	      CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SLOC(NDS),STATUS)
 
 D	      print *,'dat__mxdim,obdat(n).idim,obdat(n).ndim: ',dat__mxdim,
@@ -568,7 +569,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	    CALL BDI_CHKVAR(OBDAT(NDS).D_ID,OK,NDIM,DIMS,STATUS)
 	    IF(OK)THEN
 	      IF(SPECSET(N))THEN
-	        CALL BDA_LOCVAR(OBDAT(NDS).DLOC,CLOC,STATUS)
+	        CALL BDA_LOCVAR( DCLOC(N), CLOC, STATUS )
 	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SVLOC(NDS),STATUS)
 	        CALL DAT_MAPV(SVLOC(NDS),'_REAL','READ',OBDAT(NDS).VPTR,
      :          NACT,STATUS)
@@ -593,7 +594,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	    IF(QUAL)THEN
 	      IF(SPECSET(N))THEN
 	        CALL BDI_GETMASK(OBDAT(NDS).D_ID,MASK,STATUS)
-	        CALL BDA_LOCQUAL(OBDAT(NDS).DLOC,CLOC,STATUS)
+	        CALL BDA_LOCQUAL( DCLOC(N), CLOC, STATUS )
 	        CALL DAT_SLICE(CLOC,2,LDIM,UDIM,SQLOC(NDS),STATUS)
 	        CALL DAT_MAPV(SQLOC(NDS),'_UBYTE','READ',PTR,NACT,STATUS)
 	        CALL DYN_MAPL(1,OBDAT(NDS).NDAT,OBDAT(NDS).QPTR,STATUS)
@@ -657,7 +658,6 @@ D	    print *,'ldim,udim :',ldim,udim
 	    ENDIF
 
 *          Default value for background object
-            OBDAT(NDS).BLOC = DAT__NOLOC
             OBDAT(NDS).B_ID = ADI__NULLID
 
 *       For likelihood case, Set up OBDAT.TEFF and get background data
@@ -666,7 +666,6 @@ D	    print *,'ldim,udim :',ldim,udim
 	      IF(BG)THEN
 
 *              Store background object
-                OBDAT(NDS).BLOC = BLOC(N)
                 OBDAT(NDS).B_ID = BFID(N)
 
 *         Find and map b/g data array
