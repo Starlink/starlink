@@ -17,6 +17,7 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      do not exist then they are created. 
 #
 #      Clones are specified by an integer number less than 1000.
+#      The special number -1 indicates that a number should be generated.
 #
 #   Notes:
 #
