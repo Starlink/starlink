@@ -114,7 +114,11 @@ case $system in
 	# Darwin can be powerpc or i386
 	ARCH=`uname -p`
 	EXT="darwin"
-	CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
+	# the -D_FILE_OFFSET_BITS compiler flag is only
+	# needed to support Large FITS files greater than 2.1 GB.
+	# Using this flag caused the Fortran wrappers to break
+	# for at least one combination of C and Fortran compilers.
+	# CFLAGS="$CFLAGS -D_FILE_OFFSET_BITS=64"
 	;;
     SunOS-4*)
 	ARCH="sun"
@@ -330,7 +334,7 @@ AC_SUBST(my_shmem)
 # some systems define flock_t, for others we have to define it ourselves
 # -------------------------------------------------------------------------
 
-AC_MSG_CHECKING("do we have flock_t defined")
+AC_MSG_CHECKING("do we have flock_t defined in sys/fcntl.h")
 AC_TRY_COMPILE([#include <sys/fcntl.h>
 ], [
 flock_t filler;
@@ -339,6 +343,16 @@ AC_DEFINE(HAVE_FLOCK_T)
 AC_MSG_RESULT("yes") 
 ], AC_MSG_RESULT("no") )
 
+if test "$HAVE_FLOCK_T" != 1; then
+   AC_MSG_CHECKING("do we have flock_t defined in sys/flock.h")
+   AC_TRY_COMPILE([#include <sys/flock.h>
+   ], [
+   flock_t filler;
+   ], [
+   AC_DEFINE(HAVE_FLOCK_T)
+   AC_MSG_RESULT("yes") 
+   ], AC_MSG_RESULT("no") )
+fi
 
 # -------------------------------------------------------------------------
 # there are some idiosyncrasies with semun defs (used in semxxx). Solaris
