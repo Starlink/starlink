@@ -20,9 +20,8 @@ INTERFACE PSS
     HELP 'A filename, a real value, or ! for none'
   ENDPARAMETER
 
-  PARAMETER RESULTS
+  PARAMETER OUT
     TYPE 'FILENAME'
-    KEYWORD 'OUT'
     ASSOCIATION '->GLOBAL.SSDS'
     POSITION 3
     VPATH 'PROMPT'
@@ -165,9 +164,8 @@ INTERFACE PSS
     HELP    'Sources above this threshold will be output, those below rejected'
   ENDPARAMETER
 
-  PARAMETER PSF_CON
+  PARAMETER PSFCON
     TYPE '_LOGICAL'
-    KEYWORD 'PSFCON'
     DEFAULT Y
     VPATH 'PROMPT'
     PPATH 'DYNAMIC,DEFAULT'
@@ -209,9 +207,8 @@ INTERFACE PSS
     PROMPT 'Enable diagnostic mode'
   ENDPARAMETER
 
-  PARAMETER DIAGOPT
+  PARAMETER DOPT
     TYPE 'LITERAL'
-    KEYWORD 'DOPT'
     VPATH 'PROMPT'
     PPATH 'DEFAULT'
     PROMPT 'Diagnostic mode options'
@@ -220,7 +217,6 @@ INTERFACE PSS
 
   PARAMETER DDAT
     TYPE 'LITERAL'
-    KEYWORD 'DOPT'
     VPATH 'PROMPT'
     PPATH 'DEFAULT'
     PROMPT 'Diagnostic mode data'
