@@ -759,8 +759,9 @@
 
 *  Fill the centres' array using the step size (usually in arcseconds)
 *  such that the centre of the axis is 0.
-                  CALL CON_SSAZR( EL, PLTSCL, -REAL( EL ) * 0.5 *
-     :                            PLTSCL, %VAL( AXPNTR ), STATUS )
+                  CALL CON_SSAZR( EL, DBLE( PLTSCL ),
+     :                            -DBLE( EL ) * 0.5D0 * DBLE( PLTSCL ),
+     :                            %VAL( AXPNTR ), STATUS )
 
 *  Unmap the axis-centre array.
                   CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )
