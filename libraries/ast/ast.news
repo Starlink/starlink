@@ -15,6 +15,9 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+o  The Mapping class has a new method to calculate the co-efficients of 
+a linear approximation to a Mapping.
+
 o  The Format attribute for simple Frames and SkyFrames has been extended.
 It has always been possible, in both classes, to specify a precision by
 including a dot in the Format value followed by an integer (e.g. "dms.1"

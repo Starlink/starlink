@@ -43,6 +43,7 @@ f     following routines may also be applied to all Mappings:
 *
 c     - astDecompose: Decompose a Mapping into two component Mappings
 c     - astInvert: Invert a Mapping
+c     - astLinearApprox: Calculate a linear approximation to a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
 c     - astRate: Calculate the rate of change of a Mapping output
 c     - astResample<X>: Resample a region of a data grid
@@ -53,6 +54,7 @@ c     - astTranN: Transform N-dimensional coordinates
 c     - astTranP: Transform N-dimensional coordinates held in separate arrays
 f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_INVERT: Invert a Mapping
+f     - AST_LINEARAPPOX: Calculate a linear approximation to a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_RATE: Calculate the rate of change of a Mapping output
 f     - AST_RESAMPLE<X>: Resample a region of a data grid
@@ -120,6 +122,12 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        usually the case.
 *     6-SEP-2004 (DSB):
 *        Make astRate more robust by adding checks for unusal conditions.
+*     20-SEP-2004 (DSB):
+*        Make the LinearApprox function public and change its interface
+*        to be more appropriate for public use. This involved swapping the
+*        direction of the fit (the original astLinearApprox fitted the
+*        inverse transformation, but the public version now fits the forwrd
+*        transformation).
 *class--
 */
 
@@ -274,6 +282,7 @@ static int InterpolateNearestUB( int, const int *, const int *, const unsigned c
 static int InterpolateNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, const double *const *, int, unsigned int, unsigned int *, unsigned int * );
 static int InterpolateNearestUL( int, const int *, const int *, const unsigned long int *, const unsigned long int *, int, const int *, const double *const *, int, unsigned long int, unsigned long int *, unsigned long int * );
 static int InterpolateNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, const double *const *, int, unsigned short int, unsigned short int *, unsigned short int * );
+static int LinearApprox( AstMapping *, const double *, const double *, double, double * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MaxI( int, int );
 static int MinI( int, int );
@@ -2041,6 +2050,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->GetTranForward = GetTranForward;
    vtab->GetTranInverse = GetTranInverse;
    vtab->Invert = Invert;
+   vtab->LinearApprox = LinearApprox;
    vtab->MapBox = MapBox;
    vtab->MapList = MapList;
    vtab->MapMerge = MapMerge;
@@ -5444,92 +5454,108 @@ f        The global status.
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
 }
 
-double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
-                          const double *lbnd, const double *ubnd, double tol ) {
+static int LinearApprox( AstMapping *this, const double *lbnd, 
+                         const double *ubnd, double tol, double *fit ) {
 /*
-*+
+*++
 *  Name:
-*     astLinearApprox
+c     astLinearApprox
+f     AST_LINEARAPPROX
 
 *  Purpose:
 *     Obtain a linear approximation to a Mapping, if appropriate.
 
 *  Type:
-*     Protected function.
+*     Public virtual function.
 
 *  Synopsis:
 *     #include "mapping.h"
-*     double *astLinearApprox( AstMapping *this, int ndim_in, int ndim_out,
-*                              const double *lbnd, const double *ubnd, 
-*                              double tol )
+c     int astLinearApprox( AstMapping *this, const double *lbnd, 
+c                          const double *ubnd, double tol, double *fit )
+f     RESULT = AST_LINEARAPPROX( THIS, LBND, UBND, TOL, FIT )
 
 *  Class Membership:
-*     Mapping member function.
+*     Mapping function.
 
 *  Description:
-*     This function tests the inverse coordinate transformation
-*     implemented by a Mapping over a range of output coordinates
-*     spanning a grid into which resampled values are to be placed. If
+*     This function tests the forward coordinate transformation
+*     implemented by a Mapping over a given range of input coordinates. If
 *     the transformation is found to be linear to a specified level of
 *     accuracy, then an array of fit coefficients is returned. These
 *     may be used to implement a linear approximation to the Mapping's
-*     inverse transformation within the specified range of output
-*     coordinates. If the transformation is not sufficiently linear,
-*     no coefficients are returned.
+*     forward transformation within the specified range of output coordinates. 
+*     If the transformation is not sufficiently linear, no coefficients 
+*     are returned.
 
 *  Parameters:
-*     this
-*        Pointer to the Mapping, whose inverse transformation (as
-*        indicated by its TranInverse attribute) must be defined.
-*     ndim_in
-*        The number of input dimensions for the Mapping. This should
-*        equal the Mapping's Nin attribute and should be at least 1.
-*     ndim_out
-*        The number of output dimensions for the Mapping. This should
-*        equal the Mapping's Nout attribute and should be at least 1.
-*     lbnd
-*        Pointer to an array of doubles with "ndim_out"
-*        elements. These should specify the lower bounds of the output
-*        grid and hence the lower bounds of the region of output
-*        coordinate space over which linearity is required.
-*     ubnd
-*        Pointer to an array of doubles with "ndim_out"
-*        elements. These should specify the upper bounds of the output
-*        grid and hence the upper bounds of the region of output
-*        coordinate space over which linearity is required.
-*     tol
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping. 
+c     lbnd
+f     LBND( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of doubles
+f        An array
+*        containing the lower bounds of a box defined within the input 
+*        coordinate system of the Mapping. The number of elements in this 
+*        array should equal the value of the Mapping's Nin attribute. This
+*        box should specify the region over which linearity is required.
+f     UBND( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of doubles
+f        An array
+*        containing the upper bounds of the box specifying the region over
+*        which linearity is required.
+c     tol
+f     TOL = DOUBLE PRECISION (Given)
 *        The maximum permitted deviation from linearity, expressed as
-*        a positive Cartesian displacement in the input coordinate
-*        space. If a linear fit to the Mapping's inverse
-*        transformation deviates from the true transformation by more
-*        than this amount at any point which is tested, then no fit
+*        a positive Cartesian displacement in the output coordinate
+*        space of the Mapping. If a linear fit to the forward
+*        transformation of the Mapping deviates from the true transformation 
+*        by more than this amount at any point which is tested, then no fit
 *        coefficients will be returned.
+*     fit
+*     FIT( * ) = DOUBLE PRECISION (Given)
+c        Pointer to an array of doubles 
+f        An array
+*        in which to return the co-efficients of the linear
+*        approximation to the specified transformation. This array should
+*        have at least "( Nin + 1 ) * Nout", elements. The first Nout elements 
+*        hold the constant offsets for the transformation outputs. The 
+*        remaining elements hold the gradients. So if the Mapping has 2 inputs 
+*        and 3 outputs the linear approximation to the forward transformation 
+*        is:
+*
+*           X_out = result[0] + result[3]*X_in + result[4]*Y_in 
+*
+*           Y_out = result[1] + result[5]*X_in + result[6]*Y_in 
+*
+*           Z_out = result[2] + result[7]*X_in + result[8]*Y_in
 
 *  Returned Value:
-*     If the inverse transformation is sufficiently linear, the
-*     function returns a pointer to a dynamically allocated double
-*     array of fit coefficients. This should be freed by the caller
-*     (e.g. using astFree) when no longer required.
-*
-*     If the inverse transformation is not sufficiently linear, then a NULL
-*     pointer is returned.
-*
-*     The first 'ndim_in' elements hold the constant offsets for the
-*     Mapping input axes. The remaining elements hold the gradients. So if 
-*     the Mapping has 3 inputs and 2 outputs the transformation is:
-*
-*     X_in = result[0] + result[3]*X_out + result[4]*Y_out 
-*     Y_in = result[1] + result[5]*X_out + result[6]*Y_out 
-*     Z_in = result[2] + result[7]*X_out + result[8]*Y_out
-*
-*     Thus the returned array will contain ( ( ndim_out + 1 ) * ndim_in )
-*     elements.
+c     astLinearApprox()
+f     AST_LINEARAPPOX = LOGICAL
+*        If the forward transformation is sufficiently linear,
+c        a non-zero value is returned. Otherwise zero is returned 
+f        .TRUE is returned. Otherwise .FALSE. is returned
+*        and the fit co-efficients are set to AST__BAD.
 
 *  Notes:
-*     - A NULL pointer will be returned if this function is invoked
+*     - This function fits the Mapping's forward transformation. To fit
+*     the inverse transformation, the Mapping should be inverted using
+c     astInvert
+f     AST_INVERT
+*     before invoking this function.
+c     - A value of zero
+f     - A value of .FALSE.
+*     will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
-*-
+*--
+
+*  Implementation Deficiencies:
+*     Sub-classes which implement linear mappings should probably
+*     over-ride this function to get better accuracy and faster execution, 
+*     but currently they do not.
+
 */
 
 /* Local Variables: */
@@ -5541,161 +5567,162 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
    double **ptr_in_t;            /* Input coordinate array pointers */
    double **ptr_out_f;           /* Output coordinate array pointers */
    double **ptr_out_t;           /* Output coordinate array pointers */
-   double *fit;                  /* Pointer to array of fit coefficients */
    double *grad;                 /* Pointer to matrix of gradients */
    double *zero;                 /* Pointer to array of zero point values */
    double diff;                  /* Difference in coordinate values */
    double err;                   /* Sum of squared error */
-   double frac;                  /* Fraction of output coordinate range */
+   double frac;                  /* Fraction of input coordinate range */
    double in1;                   /* Input coordinate value */
    double in2;                   /* Input coordinate value */
+   double indiff;                /* Difference in input coordinate values */
    double out1;                  /* Output coordinate value */
    double out2;                  /* Output coordinate value */
-   double outdiff;               /* Difference in output coordinate values */
    double x0;                    /* Coordinate of grid centre */
-   double y;                     /* Input coordinate (transformed) */
+   double y;                     /* Output coordinate (transformed) */
    double yfit;                  /* Coordinate resulting from fit */
    double z;                     /* Sum for calculating zero points */
    int *vertex;                  /* Pointer to flag array for vertices */
-   int coord_in;                 /* Loop counter for input coordinates. */
-   int coord_out;                /* Loop counter for output coordinates */
+   int coord_in;                 /* Loop counter for input coordinates */
+   int coord_out;                /* Loop counter for output coordinates. */
    int done;                     /* All vertices visited? */
    int face1;                    /* Index of first face coordinates */
    int face2;                    /* Index of second face coordinates */
    int face;                     /* Loop counter for faces */
    int ii;                       /* Index into gradient matrix */
    int linear;                   /* Mapping is linear? */
+   int nc;                       /* Number of coeffs in fit */
+   int ndim_in;                  /* Number of Mapping inputs */
+   int ndim_out;                 /* Number of Mapping outputs */
    int npoint;                   /* Number of test points required */
    int point;                    /* Counter for points */
+   int result;                   /* Returned flag */
 
 /* Initialise. */
-   fit = NULL;
+   result = 0;
    
 /* Check the global error status. */
-   if ( !astOK ) return fit;
+   if ( !astOK ) return result;
 
 /* Further initialisation. */
    linear = 1;
    grad = NULL;
    zero = NULL;
 
-/* Allocate space for the fit coefficients. The fit goes from the output
-   space of the Mapping (which has "nout" axes) to the input space of the
-   Mapping (which has "nin" axes). So there will be "nin" rows of
-   coefficients (one for each Mapping input), and each row will have
-   "nout+1" values (one constant term plus one coefficient for each
-   Mapping output), making a total of "nin*(nout+1)". */
-   fit = astMalloc( sizeof( double ) *
-                    (size_t) ( ( ndim_out + 1 ) * ndim_in ) );
-      
-/* Create a PointSet to hold output coordinates and obtain a pointer
+/* Get the number of Mapping output and inputs. */
+   ndim_in = astGetNin( this );
+   ndim_out = astGetNout( this );
+
+/* Store the number of coefficients in the fit.*/
+   nc = ( ndim_in + 1 ) * ndim_out;
+
+/* Create a PointSet to hold input coordinates and obtain a pointer
    to its coordinate arrays. */
-   pset_out_f = astPointSet( 2 * ndim_out, ndim_out, "" );
-   ptr_out_f = astGetPoints( pset_out_f );
+   pset_in_f = astPointSet( 2 * ndim_in, ndim_in, "" );
+   ptr_in_f = astGetPoints( pset_in_f );
    if ( astOK ) {
 
 /* Set up and transform an initial set of points. */
 /* ---------------------------------------------- */
-/* Loop to set up output coordinates at the centre of each face of the
-   output grid, storing them in the PointSet created above. */
+/* Loop to set up input coordinates at the centre of each face of the
+   input grid, storing them in the PointSet created above. */
       point = 0;
-      for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-            ptr_out_f[ coord_out ][ point ] =
-               0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+      for ( face = 0; face < ( 2 * ndim_in ); face++ ) {
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            ptr_in_f[ coord_in ][ point ] =
+               0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
          }
-         ptr_out_f[ face / 2 ][ point ] = ( face % 2 ) ?
+         ptr_in_f[ face / 2 ][ point ] = ( face % 2 ) ?
                                           ubnd[ face / 2 ] : lbnd[ face / 2 ];
          point++;
       }
    }
 
-/* Transform these coordinates into the input grid's coordinate system
+/* Transform these coordinates into the output grid's coordinate system
    and obtain an array of pointers to the resulting coordinate
    data. */
-   pset_in_f = astTransform( this, pset_out_f, 0, NULL );
-   ptr_in_f = astGetPoints( pset_in_f );
+   pset_out_f = astTransform( this, pset_in_f, 1, NULL );
+   ptr_out_f = astGetPoints( pset_out_f );
    if ( astOK ) {
 
 /* Fit a linear approximation to the points. */
 /* ----------------------------------------- */
 /* Obtain pointers to the locations in the fit coefficients array
    where the gradients and zero points should be stored. */
-      grad = fit + ndim_in;
+      grad = fit + ndim_out;
       zero = fit;
 
 /* On the assumption that the transformation applied above is
    approximately linear, loop to determine the matrix of gradients and
    the zero points which describe it. */
       ii = 0;
-      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
          z = 0.0;
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
 
-/* Find the indices of opposite faces in each output dimension. */
-            face1 = 2 * coord_out;
+/* Find the indices of opposite faces in each input dimension. */
+            face1 = 2 * coord_in;
             face2 = face1 + 1;
 
 /* Obtain the input and output coordinates at these face centres. */
-            out1 = ptr_out_f[ coord_out ][ face1 ];
-            out2 = ptr_out_f[ coord_out ][ face2 ];
             in1 = ptr_in_f[ coord_in ][ face1 ];
             in2 = ptr_in_f[ coord_in ][ face2 ];
+            out1 = ptr_out_f[ coord_out ][ face1 ];
+            out2 = ptr_out_f[ coord_out ][ face2 ];
 
 /* Check whether any transformed coordinates are bad. If so, the
    transformation cannot be linear, so give up trying to fit it. */
-            if ( ( in1 == AST__BAD ) || ( in2 == AST__BAD ) ) {
+            if ( ( out1 == AST__BAD ) || ( out2 == AST__BAD ) ) {
                linear = 0;
                break;
             }
 
 /* If possible, determine the gradient along this dimension, storing
    it in the appropriate element of the gradient matrix. */
-            outdiff = out2 - out1;
-            if ( outdiff != 0.0 ) {
-               grad[ ii++ ] = ( in2 - in1 ) / outdiff;
+            indiff = in2 - in1;
+            if ( indiff != 0.0 ) {
+               grad[ ii++ ] = ( out2 - out1 ) / indiff;
             } else {
                grad[ ii++ ] = 0.0;
             }
 
 /* Accumulate the sum used to determine the zero point. */
-            z += ( in1 + in2 );
+            z += ( out1 + out2 );
          }
 
 /* Also quit the outer loop if a linear fit cannot be obtained. */
          if ( !linear ) break;
 
 /* Determine the average zero point from all dimensions. */
-         zero[ coord_in ] = z / (double) ( 2 * ndim_out );
+         zero[ coord_out ] = z / (double) ( 2 * ndim_in );
       }
 
 /* If a linear fit was obtained, its zero points will be appropriate
-   to an output coordinate system with an origin at the centre of the
-   output grid (we assume this to simplify the calculations above). To
-   correct for this, we transform the actual output coordinates of the
+   to an input coordinate system with an origin at the centre of the
+   input grid (we assume this to simplify the calculations above). To
+   correct for this, we transform the actual input coordinates of the
    grid's centre through the matrix of gradients and subtract the
    resulting coordinates from the zero point values. The zero points
-   are then correct for the actual input and output coordinate systems
+   are then correct for the actual output and input coordinate systems
    we are using. */
       if ( linear ) {
          ii = 0;
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               x0 = 0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-               zero[ coord_in ] -= grad[ ii++ ] * x0;
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+               x0 = 0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
+               zero[ coord_out ] -= grad[ ii++ ] * x0;
             }
          }
       }
    }
 
 /* Annul the pointers to the PointSets used above. */
-   pset_in_f = astAnnul( pset_in_f );
    pset_out_f = astAnnul( pset_out_f );
+   pset_in_f = astAnnul( pset_in_f );
 
 /* Calculate the number of test points required. */
 /* --------------------------------------------- */
 /* If we have obtained a linear fit above, it will (by construction)
-   be exact at the centre of each face of the output grid. However, it
+   be exact at the centre of each face of the input grid. However, it
    may not fit anywhere else. We therefore set up some test points to
    determine if it is an adequate approximation elsewhere. */
    if ( astOK && linear ) {
@@ -5703,104 +5730,104 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
 /* Calculate the number of test points required to place one at each
    vertex of the grid. */
       npoint = 1;
-      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
          npoint *= 2;
       }
 
 /* Now calculate the total number of test points required, also
    allowing one at the centre, one at half the distance to each face,
    and one at half the distance to each vertex. */
-      npoint = 1 + 2 * ( ndim_out + npoint );
+      npoint = 1 + 2 * ( ndim_in + npoint );
 
-/* Set up test points in the output coordinate system. */
+/* Set up test points in the input coordinate system. */
 /* --------------------------------------------------- */   
 /* Create a PointSet to hold the test coordinates and obtain an array
    of pointers to its coordinate data. */
-      pset_out_t = astPointSet( npoint, ndim_out, "" );
-      ptr_out_t = astGetPoints( pset_out_t );
+      pset_in_t = astPointSet( npoint, ndim_in, "" );
+      ptr_in_t = astGetPoints( pset_in_t );
       if ( astOK ) {
 
-/* If the output array is 1-dimensional, the face and vertex positions
+/* If the input array is 1-dimensional, the face and vertex positions
    calculated below will co-incide. Therefore, we simply distribute
-   the required number of test points uniformly throughout the output
+   the required number of test points uniformly throughout the input
    coordinate range (avoiding the end-points, where the fit has been
    obtained). The coordinates are stored in the PointSet created
    above. */
-         if ( ndim_out == 1 ) {
+         if ( ndim_in == 1 ) {
             for ( point = 0; point < npoint; point++ ) {
                frac = ( (double) ( point + 1 ) ) / (double) ( npoint + 1 );
-               ptr_out_t[ 0 ][ point ] = ( 1.0 - frac ) * lbnd[ 0 ] +
+               ptr_in_t[ 0 ][ point ] = ( 1.0 - frac ) * lbnd[ 0 ] +
                                          frac * ubnd[ 0 ];
             }
 
 /* Otherwise, generate one point at the grid centre. */
          } else {
             point = 0;
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               ptr_out_t[ coord_out ][ point ] =
-                  0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+            for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+               ptr_in_t[ coord_in ][ point ] =
+                  0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
             }
             point++;
 
 /* Similarly generate a point half way between the grid centre and the
    centre of each face. */
-            for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
-               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-                  ptr_out_t[ coord_out ][ point ] =
-                     0.5 * ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+            for ( face = 0; face < ( 2 * ndim_in ); face++ ) {
+               for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                  ptr_in_t[ coord_in ][ point ] =
+                     0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
                }
-               ptr_out_t[ face / 2 ][ point ] =
+               ptr_in_t[ face / 2 ][ point ] =
                   0.5 * ( ( ( ( face % 2 ) ? ubnd[ face / 2 ] :
                                              lbnd[ face / 2 ] ) ) +
-                          ptr_out_t[ face / 2 ][ 0 ] );
+                          ptr_in_t[ face / 2 ][ 0 ] );
                point++;
             }
 
 /* Allocate workspace and initialise flags for identifying the
    vertices. */
-            vertex = astMalloc( sizeof( int ) * (size_t) ndim_out );
+            vertex = astMalloc( sizeof( int ) * (size_t) ndim_in );
             if ( astOK ) {
-               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-                  vertex[ coord_out ] = 0;
+               for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                  vertex[ coord_in ] = 0;
                }
 
-/* Now loop to visit each output grid vertex. */
+/* Now loop to visit each input grid vertex. */
                done = 0;
                do {
 
 /* Generate a test point at each vertex. */
-                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-                     ptr_out_t[ coord_out ][ point ] = vertex[ coord_out ] ?
-                                                       ubnd[ coord_out ] :
-                                                       lbnd[ coord_out ];
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     ptr_in_t[ coord_in ][ point ] = vertex[ coord_in ] ?
+                                                       ubnd[ coord_in ] :
+                                                       lbnd[ coord_in ];
 
 /* Also place one half way between the grid centre and each vertex. */
-                     ptr_out_t[ coord_out ][ point + 1 ] =
-                        0.5 * ( ptr_out_t[ coord_out ][ point ] +
-                                ptr_out_t[ coord_out ][ 0 ] );
+                     ptr_in_t[ coord_in ][ point + 1 ] =
+                        0.5 * ( ptr_in_t[ coord_in ][ point ] +
+                                ptr_in_t[ coord_in ][ 0 ] );
                   }
                   point += 2;
 
 /* Now update the array of vertex flags to identify the next vertex. */
-                  coord_out = 0;
+                  coord_in = 0;
                   do {
 
 /* The least significant dimension which does not have its upper bound
    as one of the vertex coordinates is changed to use its upper bound
    in the next vertex. */
-                     if ( !vertex[ coord_out ] ) {
-                        vertex[ coord_out ] = 1;
+                     if ( !vertex[ coord_in ] ) {
+                        vertex[ coord_in ] = 1;
                         break;
 
 /* Any less significant dimensions whose upper bounds are already
    being used are changed to use their lower bounds in the next
    vertex. */
                      } else {
-                        vertex[ coord_out ] = 0;
+                        vertex[ coord_in ] = 0;
 
 /* All vertices have been visited when the most significant dimension
    is changed back to using its lower bound. */
-                        done = ( ++coord_out == ndim_out );
+                        done = ( ++coord_in == ndim_in );
                      }
                   } while ( !done );
                } while ( !done );
@@ -5812,11 +5839,11 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
 
 /* Transform the test points. */
 /* -------------------------- */
-/* Use the Mapping to transform the test points into the input grid's
+/* Use the Mapping to transform the test points into the output grid's
    coordinate system, obtaining a pointer to the resulting arrays of
-   input coordinates. */
-         pset_in_t = astTransform( this, pset_out_t, 0, NULL );
-         ptr_in_t = astGetPoints( pset_in_t );
+   output coordinates. */
+         pset_out_t = astTransform( this, pset_in_t, 1, NULL );
+         ptr_out_t = astGetPoints( pset_out_t );
 
 /* Test the linear fit for accuracy. */
 /* --------------------------------- */
@@ -5829,22 +5856,22 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
 /* Initialise the fitting error for the current point. */
                err = 0.0;
 
-/* Obtain each input coordinate (produced by using the Mapping) in
+/* Obtain each output coordinate (produced by using the Mapping) in
    turn and check that it is not bad. If it is, then the
    transformation is not linear, so give up testing the fit. */
                ii = 0;
-               for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-                  y = ptr_in_t[ coord_in ][ point ];
+               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                  y = ptr_out_t[ coord_out ][ point ];
                   if ( y == AST__BAD ) {
                      linear = 0;
                      break;
                   }
 
-/* Apply the fitted transformation to the output coordinates to obtain
-   the approximate input coordinate value. */
-                  yfit = zero[ coord_in ];
-                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-                     yfit += grad[ ii++ ] * ptr_out_t[ coord_out ][ point ];
+/* Apply the fitted transformation to the input coordinates to obtain
+   the approximate output coordinate value. */
+                  yfit = zero[ coord_out ];
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     yfit += grad[ ii++ ] * ptr_in_t[ coord_in ][ point ];
                   }
 
 /* Form the sum of squared differences between the Mapping's
@@ -5856,7 +5883,7 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
 /* Quit the outer loop if the Mapping is found to be non-linear. */
                if ( !linear ) break;
 
-/* Test if the Cartesian distance between the true input coordinate
+/* Test if the Cartesian distance between the true output coordinate
    and the approximate one exceeds the accuracy tolerance. If this
    happens for any test point, we declare the Mapping non-linear and
    give up. */
@@ -5868,18 +5895,22 @@ double *astLinearApprox_( AstMapping *this, int ndim_in, int ndim_out,
          }
 
 /* Annul the pointers to the PointSets used above. */
-         pset_in_t = astAnnul( pset_in_t );
+         pset_out_t = astAnnul( pset_out_t );
       }
-      pset_out_t = astAnnul( pset_out_t );
+      pset_in_t = astAnnul( pset_in_t );
    }
 
 /* If an error occurred, or the Mapping was found to be non-linear,
-   then free the space allocated for the fit coefficients, clearing
-   the returned pointer value. */
-   if ( !astOK || !linear ) fit = astFree( fit );
+   then set the coefficients to AST_BAD. Otherwise, set the returned flag
+   to indicate that the fit was succesful. */
+   if ( !astOK || !linear ) {
+      for( ii = 0; ii < nc; ii++ ) fit[ ii ] = AST__BAD;
+   } else {
+      result = 1;
+   }
 
 /* Return the result. */
-   return fit;
+   return result;
 }
 
 static double LocalMaximum( const MapData *mapdata, double acc, double fract,
@@ -8651,6 +8682,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    int dimx;                     /* Dimension with maximum section extent */
    int divide;                   /* Sub-divide the output section? */
    int i;                        /* Loop count */
+   int isLinear;                 /* Is the transformation linear? */
    int mxdim;                    /* Largest output section dimension size */
    int npix;                     /* Number of pixels in output section */
    int npoint;                   /* Number of points for obtaining a fit */
@@ -8733,9 +8765,11 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    use astLinearApprox. */
    } else {
 
-/* Allocate memory for floating point bounds */
+/* Allocate memory for floating point bounds and for the coefficient array */
       flbnd = astMalloc( sizeof( double )*(size_t) ndim_out );
       fubnd = astMalloc( sizeof( double )*(size_t) ndim_out );
+      linear_fit = astMalloc( sizeof( double )*
+                              (size_t) ( ndim_in*( ndim_out + 1 ) ) );
       if( astOK ) {
 
 /* Copy the bounds into these arrays */
@@ -8744,11 +8778,18 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
             fubnd[ i ] = (double) ubnd[ i ];
          }
 
-/* Get the linear approximation to the inverse transformation. */
-         linear_fit = astLinearApprox( this, ndim_in, ndim_out, flbnd, fubnd, 
-                                       tol );
+/* Get the linear approximation to the inverse transformation. The
+   astLinearApprox function fits the forward transformation so temporarily
+   invert the Mapping in order to get a fit to the inverse transformation. */
+         astInvert( this );
+         isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
+         astInvert( this );
+
+/* Free the coeff array if the inverse transformation is not linear. */
+         if( !isLinear ) linear_fit = astFree( linear_fit );
+
       } else {
-         linear_fit = NULL;
+         linear_fit = astFree( linear_fit );
       }
 
 /* Free resources */
@@ -13460,6 +13501,11 @@ void astTranP_( AstMapping *this, int npoint,
    (**astMEMBER(this,Mapping,TranP))( this, npoint,
                                       ncoord_in, ptr_in,
                                       forward, ncoord_out, ptr_out );
+}
+int astLinearApprox_( AstMapping *this, const double *lbnd, 
+                       const double *ubnd, double tol, double *fit ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Mapping,LinearApprox))( this, lbnd, ubnd, tol, fit );
 }
 
 /* Public Interface Function Prototypes. */

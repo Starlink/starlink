@@ -100,6 +100,8 @@
 *           Decompose a Mapping into two component Mappings.
 *        astInvert
 *           Invert a Mapping.
+*        astLinearApprox
+*           Form a linear approximation to a Mapping
 *        astMapBox
 *           Find a bounding box for a Mapping.
 *        astRate
@@ -247,6 +249,8 @@
 *        Added protected astInitMappingVtab method.
 *     10-JUL-2003 (DSB):
 *        Added method astRate.
+*     20-SEP-2004 (DSB):
+*        Added method astLinearApprox.
 *--
 */
 
@@ -341,6 +345,7 @@ typedef struct AstMappingVtab {
    int (* GetReport)( AstMapping * );
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
+   int (* LinearApprox)( AstMapping *this, const double *lbnd, const double *ubnd, double tol, double *fit );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
    int (* ResampleB)( AstMapping *, int, const int [], const int [], const signed char [], const signed char [], int, void (*)(), const double [], int, double, int, signed char, int, const int [], const int [], const int [], const int [], signed char [], signed char [] );
    int (* ResampleD)( AstMapping *, int, const int [], const int [], const double [], const double [], int, void (*)(), const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
@@ -411,6 +416,7 @@ int astResampleUI_( AstMapping *, int, const int [], const int [], const unsigne
 int astResampleUL_( AstMapping *, int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, void (*)(), const double [], int, double, int, unsigned long int, int, const int [], const int [], const int [], const int [], unsigned long int [], unsigned long int [] );
 int astResampleUS_( AstMapping *, int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, void (*)(), const double [], int, double, int, unsigned short int, int, const int [], const int [], const int [], const int [], unsigned short int [], unsigned short int [] );
 void astInvert_( AstMapping * );
+int astLinearApprox_( AstMapping *this, const double *lbnd, const double *ubnd, double tol, double *fit );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
 void astTranN_( AstMapping *, int, int, int, const double *, int, int, int, double * );
@@ -427,7 +433,6 @@ double astRateId_( AstMapping *, double *, int, int, double * );
 #endif
 
 #if defined(astCLASS)            /* Protected */
-double *astLinearApprox_( AstMapping *, int, int, const double *, const double *, double );
 AstPointSet *astTransform_( AstMapping *, AstPointSet *, int, AstPointSet * );
 int astGetInvert_( AstMapping * );
 int astGetNin_( AstMapping * );
@@ -491,6 +496,8 @@ astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_v
 
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
+#define astLinearApprox(this,lbnd,ubnd,tol,fit) \
+astINVOKE(V,astLinearApprox_(astCheckMapping(this),lbnd,ubnd,tol,fit)) 
 #define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
 #define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
@@ -538,7 +545,6 @@ astINVOKE(V,astRateId_(astCheckMapping(this),at,ax1,ax2,d2))
 #endif
 
 #if defined(astCLASS)            /* Protected */
-#define astLinearApprox astLinearApprox_
 #define astClearInvert(this) \
 astINVOKE(V,astClearInvert_(astCheckMapping(this)))
 #define astClearReport(this) \

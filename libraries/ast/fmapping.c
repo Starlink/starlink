@@ -17,6 +17,7 @@
 *     AST_DECOMPOSE
 *     AST_INVERT
 *     AST_ISAMAPPING
+*     AST_LINEARMAPPING
 *     AST_RESAMPLE<X>
 *     AST_SIMPLIFY
 *     AST_TRAN1
@@ -25,7 +26,7 @@
 *     AST_RATE
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2004 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -212,6 +213,26 @@ F77_LOGICAL_FUNCTION(ast_isamapping)( INTEGER(THIS),
    astAt( "AST_ISAMAPPING", NULL, 0 );
    astWatchSTATUS(
       RESULT = astIsAMapping( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
+   )
+   return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_linearapprox)( INTEGER(THIS),
+                                        DOUBLE_ARRAY(LBND),
+                                        DOUBLE_ARRAY(UBND),
+                                        DOUBLE(TOL),
+                                        DOUBLE_ARRAY(FIT),
+                                        INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(LBND)
+   GENPTR_DOUBLE_ARRAY(UBND)
+   GENPTR_DOUBLE(TOL)
+   GENPTR_DOUBLE_ARRAY(FIT)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_LINEARAPPROX", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astLinearApprox( astI2P( *THIS ), LBND, UBND, *TOL, FIT );
    )
    return RESULT;
 }
