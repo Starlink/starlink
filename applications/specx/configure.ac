@@ -47,11 +47,19 @@ AC_CHECK_FUNCS([readline add_history])
 
 
 dnl    Build dependencies
-STAR_DECLARE_DEPENDENCIES([build], [shl gsd pgplot fio psx chr ndf])
+STAR_DECLARE_DEPENDENCIES([build], [shl gsd pgplot fio psx chr ndf figaro])
+
+dnl    Documentation
+STAR_LATEX_DOCUMENTATION( sun17/ sc8/ )
+
+dnl  But we also need to define the docs subdirs
+DOCS_SUBDIRS="hlp sun17 sc8"
+AC_SUBST(DOCS_SUBDIRS)
+
 
 dnl    Need to build subdir makefiles
 
-AC_CONFIG_FILES([Makefile component.xml astro/Makefile command/Makefile exprt/Makefile external/Makefile fitting/Makefile fv4/Makefile gen/Makefile getaline/Makefile graph/Makefile mapdis4/Makefile mv4/Makefile plots/Makefile reduce/Makefile scl/Makefile tek/Makefile term/Makefile util/Makefile vms/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile component.xml astro/Makefile command/Makefile exprt/Makefile external/Makefile fitting/Makefile fv4/Makefile gen/Makefile getaline/Makefile graph/Makefile mapdis4/Makefile mv4/Makefile plots/Makefile reduce/Makefile scl/Makefile tek/Makefile term/Makefile util/Makefile vms/Makefile src/Makefile docs/Makefile docs/hlp/Makefile docs/sun17/Makefile docs/sc8/Makefile])
 
 AC_CONFIG_FILES([src/TITLE])
 AC_CONFIG_FILES([getaline/getaline_link],[chmod +x getaline/getaline_link])

@@ -11,7 +11,7 @@ SPECX is a general purpose mm and submm
 spectral line data reduction system.
    </p></abstract>
   <dependencies >
-    <build>shl</build><build>gsd</build><build>pgplot</build><build>fio</build><build>psx</build><build>chr</build><build>ndf</build>
+    <build>shl</build><build>gsd</build><build>pgplot</build><build>fio</build><build>psx</build><build>chr</build><build>ndf</build><build>figaro</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -36,6 +36,6 @@ spectral line data reduction system.
       <uname>ajc</uname>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun17 sc8 </documentation>
   <bugreports>t.jenness@jach.hawaii.edu</bugreports>
 </component>
