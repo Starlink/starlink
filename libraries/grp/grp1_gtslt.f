@@ -101,6 +101,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_CHARS( GRP__MAXG ) = CHARACTER*(GRP__NCHAR) (Write)
 *           The control characters used to define the syntax of group
 *           expressions. A set of characters stored in a single string
@@ -212,7 +213,8 @@
 *  is required by UNIX. There is no corresponding dummy argument in the
 *  code for GRP1_SETC.
       CALL GRP1_SETC( 1, GRP__INITN, GRP__INITN,
-     :                %VAL( CMN_NMPNT( SLOT ) ), ' ', STATUS,
+     :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
+     :                ' ', STATUS,
      :                %VAL( GRP__SZNAM ) )
 
 *  Get a pointer to an integer array (known as MOD_GROUP), storing it
@@ -223,7 +225,7 @@
 
 *  Set the contents of MOD_GROUP to GRP__NOID.
       CALL GRP1_SETI( 1, GRP__INITN, GRP__NOID, GRP__INITN,
-     :                %VAL( CMN_MGPNT( SLOT ) ), STATUS )
+     :                %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), STATUS )
 
 *  Get a pointer to an integer array (known as MOD_INDEX), storing it
 *  in common (the size will always be the same as NAMES).
@@ -233,7 +235,7 @@
 
 *  Set the contents of MOD_INDEX to zero.
       CALL GRP1_SETI( 1, GRP__INITN, 0, GRP__INITN,
-     :                %VAL( CMN_MIPNT( SLOT ) ), STATUS )
+     :                %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ), STATUS )
 
 *  Get a pointer to an integer array (known as LEVEL), storing it
 *  in common (the size will always be the same as NAMES).
@@ -243,7 +245,7 @@
 
 *  Set the contents of LEVEL to zero.
       CALL GRP1_SETI( 1, GRP__INITN, 0, GRP__INITN,
-     :                %VAL( CMN_LVPNT( SLOT ) ), STATUS )
+     :                %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ), STATUS )
 
 *  Get a pointer to an integer array ( known as FILE_INDEX). This is
 *  extended as necessary by other GRP routines.
@@ -252,7 +254,7 @@
 
 *  Set the contents of FILE_INDEX to zero.
       CALL GRP1_SETI( 1, GRP__INITN, 0, GRP__INITN,
-     :                %VAL( CMN_INPNT( SLOT ) ), STATUS )
+     :                %VAL( CNF_PVAL( CMN_INPNT( SLOT ) ) ), STATUS )
 
 *  The number of used entries in these arrays (called the "group size")
 *  will not be the same as the total array size if there are any spare

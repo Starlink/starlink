@@ -61,6 +61,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
 *           The index of the last entry in each group.
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
@@ -120,7 +121,7 @@
 *  argument in the code for GRP1_GETC.
          ELSE
             CALL GRP1_GETC( CMN_GSIZE( SLOT ),
-     :                      %VAL( CMN_NMPNT( SLOT ) ),
+     :                      %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
      :                      I, NAMES( I - INDEX + 1 ), STATUS,
      :                      %VAL( GRP__SZNAM ) )
 

@@ -60,6 +60,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_CHARS( GRP__MAXG ) = CHARACTER*(GRP__NCHAR) (Read and Write)
 *           The control characters used to define the syntax of group
 *           expressions. A set of characters stored in a single string
@@ -144,14 +145,21 @@
 *  and are required by UNIX. There are no corresponding dummy arguments
 *  in the code for GRP1_IPURG.
       CALL GRP1_IPURG( CMN_UPPER( SLOT1 ), CMN_SIZE( SLOT1 ),
-     :           %VAL( CMN_NMPNT( SLOT1 ) ), %VAL( CMN_MGPNT( SLOT1 ) ),
-     :           %VAL( CMN_MIPNT( SLOT1 ) ), %VAL( CMN_LVPNT( SLOT1 ) ),
-     :           %VAL( CMN_INPNT( SLOT1 ) ), CMN_GSIZE( SLOT1 ),
-     :           CMN_SIZE( SLOT2 ), %VAL( CMN_NMPNT( SLOT2 ) ),
-     :           %VAL( CMN_MGPNT( SLOT2 ) ), %VAL( CMN_MIPNT( SLOT2 ) ),
-     :           %VAL( CMN_LVPNT( SLOT2 ) ), %VAL( CMN_INPNT( SLOT2 ) ),
+     :           %VAL( CNF_PVAL( CMN_NMPNT( SLOT1 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_MGPNT( SLOT1 ) ) ),
+     :           %VAL( CNF_PVAL( CMN_MIPNT( SLOT1 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT1 ) ) ),
+     :           %VAL( CNF_PVAL( CMN_INPNT( SLOT1 ) ) ), 
+     :           CMN_GSIZE( SLOT1 ),
+     :           CMN_SIZE( SLOT2 ), 
+     :           %VAL( CNF_PVAL( CMN_NMPNT( SLOT2 ) ) ),
+     :           %VAL( CNF_PVAL( CMN_MGPNT( SLOT2 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_MIPNT( SLOT2 ) ) ),
+     :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT2 ) ) ), 
+     :           %VAL( CNF_PVAL( CMN_INPNT( SLOT2 ) ) ),
      :           CMN_GSIZE( SLOT2 ), STATUS ,
-     :           %VAL( GRP__SZNAM ), %VAL( GRP__SZNAM ) )
+     :           %VAL( GRP__SZNAM ), 
+     :           %VAL( GRP__SZNAM ) )
 
 *  Set the case sensitivity flag and control characters for the output
 *  group.

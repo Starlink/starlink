@@ -75,6 +75,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_MGPNT( GRP__MAXG ) = INTEGER (Read)
@@ -117,13 +118,16 @@
 *  the length of each character string in the mapped NAMES array, and
 *  is required by UNIX. There is no corresponding dummy argument in the
 *  code for GRP1_GETC.
-         CALL GRP1_GETC( CMN_GSIZE( SLOT ), %VAL( CMN_NMPNT( SLOT ) ),
+         CALL GRP1_GETC( CMN_GSIZE( SLOT ), 
+     :                   %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
      :                INDEX, NAME, STATUS, %VAL( GRP__SZNAM ) )
 
 *  Get the supplementary information.
          CALL GRP1_GSUPP( INDEX, CMN_GSIZE( SLOT ),
-     :             %VAL( CMN_LVPNT( SLOT ) ), %VAL( CMN_INPNT( SLOT ) ),
-     :             %VAL( CMN_MGPNT( SLOT ) ), %VAL( CMN_MIPNT( SLOT ) ),
+     :             %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_INPNT( SLOT ) ) ),
+     :             %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ),
      :             LEVEL, IFILE, MODGP, MODIN, STATUS )
 
 *  If the index was out of bounds, return null information.

@@ -59,6 +59,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_FLPNT( GRP__MAXG ) = INTEGER (Read and Write)
 *           Pointers to the mapped FILES array of each group.
 *        CMN_FLSIZ( GRP__MAXG ) = INTEGER (Read and Write)
@@ -103,7 +104,8 @@
 *  specifies the length of each character string in the mapped array,
 *  and is required by UNIX. There is no corresponding dummy argument in
 *  the code for GRP1_GETC.
-      CALL GRP1_GETC( CMN_FLSIZ( SLOT ), %VAL( CMN_FLPNT( SLOT ) ),
+      CALL GRP1_GETC( CMN_FLSIZ( SLOT ), 
+     :                %VAL( CNF_PVAL( CMN_FLPNT( SLOT ) ) ),
      :                INDEX, FILE, STATUS, %VAL( GRP__SZNAM ) )
 
  999  CONTINUE

@@ -62,6 +62,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
@@ -112,7 +113,8 @@
 *  required by UNIX. There is no corresponding dummy argument in the
 *  code for GRP1_FIND.
       CALL GRP1_FIND( CMN_UPPER( SLOT ), CMN_GSIZE( SLOT ), START,
-     :                %VAL( CMN_NMPNT( SLOT ) ), NAME, INDEX, STATUS,
+     :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
+     :                NAME, INDEX, STATUS,
      :                %VAL( GRP__SZNAM ) )
 
 *  If an error occurred, give a context message and ensure that the

@@ -83,6 +83,7 @@
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Write)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_MGPNT( GRP__MAXG ) = INTEGER (Write)
@@ -156,7 +157,8 @@
 
 *  Initialize the new names to be blank.
          CALL GRP1_SETC( FSTNEW, NEWSIZ, NEWSIZ,
-     :                   %VAL( CMN_NMPNT( SLOT ) ), ' ', STATUS,
+     :                   %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
+     :                   ' ', STATUS,
      :                   %VAL( GRP__SZNAM ) )
 
 *  MOD_GROUP...
@@ -165,7 +167,7 @@
 
 *  Initialise the new integer data.
          CALL GRP1_SETI( FSTNEW, NEWSIZ, GRP__NOID, NEWSIZ,
-     :                   %VAL( CMN_MGPNT( SLOT ) ), STATUS )
+     :                   %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), STATUS )
 
 *  MOD_INDEX...
 *  Extend the memory mapped to the integer data.
@@ -173,7 +175,7 @@
 
 *  Initialise the new integer data.
          CALL GRP1_SETI( FSTNEW, NEWSIZ, 0,  NEWSIZ,
-     :                   %VAL( CMN_MIPNT( SLOT ) ), STATUS )
+     :                   %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ), STATUS )
 
 *  LEVEL...
 *  Extend the memory mapped to the integer data.
@@ -181,7 +183,7 @@
 
 *  Initialise the new integer data.
          CALL GRP1_SETI( FSTNEW, NEWSIZ, 0, NEWSIZ,
-     :                   %VAL( CMN_LVPNT( SLOT ) ), STATUS )
+     :                   %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ), STATUS )
 
 *  IFILE...
 *  Extend the memory mapped to the integer data.
@@ -189,7 +191,7 @@
 
 *  Initialise the new integer data.
          CALL GRP1_SETI( FSTNEW, NEWSIZ, 0, NEWSIZ,
-     :                   %VAL( CMN_INPNT( SLOT ) ), STATUS )
+     :                   %VAL( CNF_PVAL( CMN_INPNT( SLOT ) ) ), STATUS )
 
 *  Store the new array size in common.
          CMN_SIZE( SLOT ) = NEWSIZ
@@ -203,9 +205,12 @@
 *  ...and store the information in the group.
          IF( CMN_GSIZE( SLOT ) .GT. 0 ) THEN
             CALL GRP1_IPUT( INDX,
-     :             CMN_GSIZE( SLOT ), %VAL( CMN_NMPNT( SLOT ) ),
-     :             %VAL( CMN_LVPNT( SLOT ) ), %VAL( CMN_INPNT( SLOT ) ),
-     :             %VAL( CMN_MGPNT( SLOT ) ), %VAL( CMN_MIPNT( SLOT ) ),
+     :             CMN_GSIZE( SLOT ), 
+     :             %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
+     :             %VAL( CNF_PVAL( CMN_LVPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_INPNT( SLOT ) ) ),
+     :             %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), 
+     :             %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ),
      :             NAME, LEVEL, IFILE, MODGP, MODIN, STATUS,
      :             %VAL( GRP__SZNAM ) )
          END IF
