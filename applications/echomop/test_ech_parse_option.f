@@ -7,6 +7,8 @@
       call testn ('  5.6    ')
       call testn ('  7.  ')
       call testn ('7')
+      call testn (' -71 ')
+      call testn (' +72')
       call testn (' 888')
       call testn ('99   ')
       call testn ('   10  ')

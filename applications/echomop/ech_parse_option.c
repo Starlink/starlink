@@ -23,7 +23,10 @@
    and optionally a suboption.  If both are present, then `class' is
    set to be character `2' and both `option' and `suboption' are
    returned set; if only one is present, `class' is set to `1', and
-   only `option' is set.
+   only `option' is set.  The integer may be negative, but it must not
+   have an explicit plus sign -- this is tested against "+", fails to
+   match, and is therefore returned as an error ("+" is a _really_
+   dumb thing to use for `yes'!)
 
    Sets `class' to be `x' on any error.
 
@@ -116,7 +119,9 @@ F77_SUBROUTINE(ech_parse_option) (CHARACTER(line),
 	printf ("empty\n");
 #endif
     }
-    else if (isdigit(*l))	/* line starts with a number */
+    else if (isdigit(*l) || *l=='-')	/* line starts with a number
+					   (note, don't match "+" --
+					   see note at top) */
     {
 	/* it's an option, or option.suboption, specifier */
 	int nconv;
