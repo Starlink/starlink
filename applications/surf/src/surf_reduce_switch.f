@@ -90,22 +90,23 @@
 *  Implementation status:
 *      - Deals with QUALITY arrays
 
-*  Authors :
+*  Authors:
 *     JFL: J.Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 
-*    Authors :
-*     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+*  History:
 *     $Id$
 *     24-JUL-1995: original version.
 *     10-JUN-1996: modified to handle PHOTOM mode (JFL).
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
-*     Revision 1.10  1996/11/02 01:21:45  timj
-*     Add ADAM to header
+*     Revision 1.11  1996/11/02 01:41:38  timj
+*     Fix bug in History header
 *
+c Revision 1.10  1996/11/02  01:21:45  timj
+c Add ADAM to header
+c
 c Revision 1.9  1996/10/31  18:07:24  timj
 c Add support for SCUBAWAVE and RAMPWAVE chop functions.
 c
@@ -113,7 +114,7 @@ c Revision 1.8  1996/10/30  03:01:39  timj
 c Use VEC_ITOI instead of SCULIB_COPYI.
 c Rewrite header to new Starlink standard.
 c
-*    endhistory
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
