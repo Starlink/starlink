@@ -167,28 +167,19 @@
 *  Local Variables:
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
-      BYTE             BIT_VALUE       ! Temporary byte
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! dU4 Nasmyth coord of bolometers
-      INTEGER          BOL_S (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
-                                          ! array containing 1 for bolometers
-                                          ! selected in data-spec, 0 otherwise
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! bolometer types
       BYTE             BTEMP           ! Temporary byte
-      INTEGER          BYTE_END        ! Mask byte array
-      INTEGER          BYTE_PTR        ! Mask byte array
       INTEGER          DATA_OFFSET     ! Offset for pointer arrays
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       INTEGER          DUMMY_ENDVAR_PTR
                                        ! Pointer to end of dummy var
       INTEGER          DUMMY_VARIANCE_PTR
                                        ! Pointer to dummy variance
-      INTEGER          EXP_S (SCUBA__MAX_EXP)! array containing 1 for
-                                          ! exposures selected in
-                                          ! data-spec, 0 otherwise
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
       INTEGER          FILE_DATA_PTR   ! pointer to main data array in input
@@ -202,9 +193,6 @@
       INTEGER          I               ! DO loop index
       INTEGER          IERR            ! Position of error from VEC_
       INTEGER          INTEGRATION     ! integration index in DO loop
-      INTEGER          INT_S (SCUBA__MAX_INT)! array containing 1 for
-                                       ! integration selected by
-                                       ! data-spec, 0 otherwise
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
@@ -268,9 +256,6 @@
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
       INTEGER          MEASUREMENT     ! Counter in do loop
-      INTEGER          MEAS_S (SCUBA__MAX_MEAS) ! array containing 1 for
-                                          ! measurement selected by
-                                          ! data-spec, 0 otherwise
       INTEGER          NDIM            ! the number of dimensions in an array
       INTEGER          NERR            ! Number of errors from VEC_
       INTEGER          NREC            ! number of history records in input
@@ -294,10 +279,6 @@
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
-      LOGICAL          POS_SELECTED       ! .TRUE. if selected data were
-                                          ! specified by P=....
-      INTEGER          POS_S_END          ! end of VM holding POS_S
-      INTEGER          POS_S_PTR          ! start of VM holding POS_S
       LOGICAL          REBIN           ! .TRUE. if REBIN application has 
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
@@ -317,16 +298,24 @@
       LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       LOGICAL          SWITCH_EXPECTED ! Should the section include SWITCH(NO)
-      INTEGER          SWITCH_S (SCUBA__MAX_SWITCH)
-                                          ! array that has 1 for
-                                          ! switches selected by
-                                          ! data-spec, 0 otherwise
       INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
       LOGICAL          USE_INTS        ! How to use the specified ints
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Initialise all the pointers
+      BOL_RA_PTR = 0
+      BOL_RA_END = 0
+      BOL_DEC_PTR = 0
+      BOL_DEC_END = 0
+      DUMMY_VARIANCE_PTR = 0
+      DUMMY_ENDVAR_PTR = 0
+      DATA_PTR = 0
+      DATA_END = 0
+      VARIANCE_END =0
+      VARIANCE_PTR = 0
+      
 *     get some general descriptive parameters of the observation
 
       CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC,
@@ -710,7 +699,7 @@
             FILE_VARIANCE_PTR = DUMMY_VARIANCE_PTR
          END IF               
       END IF
-      
+
 *     map the DEM_PNTR and LST arrays and check their dimensions
 
       CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
@@ -837,12 +826,6 @@
 *     If there a SCUBA section has been specified then we need to apply it
       IF (NSPEC .GT. 0) THEN
 
-*     Get some memory
-
-         POS_S_PTR = 0
-         CALL SCULIB_MALLOC (N_POS * VAL__NBI, POS_S_PTR, 
-     :        POS_S_END, STATUS)
-
 *     Is section good or bad
 
          IF (SECPAR) THEN
@@ -856,53 +839,15 @@
 *     section to be set bad and not the section itself.
          USE_INTS = .NOT.USE_INTS
 
-*     Use a byte array to decode sections
-*     Setup a byte array to keep track of the sections
-*     I do this so that I can handle multiple sections (the bytes
-*     are only switched on or off and so can handle overlap of different
-*     sections)
-
-         BYTE_PTR = 0
-         BYTE_END = 0
-         CALL SCULIB_MALLOC(N_POS * N_BOL * VAL__NBUB, BYTE_PTR,
-     :        BYTE_END, STATUS)
-
-*     If we are using section then fill array with 0 and then set selected
-*     regions to 1. Reverse if I am selecting the rest.
-
-         IF (USE_INTS) THEN
-            BIT_VALUE = 1
-            BTEMP = 0
-         ELSE
-            BIT_VALUE = 0
-            BTEMP = 1
-         END IF
-         CALL SCULIB_CFILLB(N_POS * N_BOL, BTEMP, %VAL(BYTE_PTR))
-
 *     decode the data specifications
          
          SWITCH_EXPECTED = .FALSE.
-         
-         DO I = 1, NSPEC
-         
-            CALL SCULIB_DECODE_SPEC (DATA_SPEC(I),%val(IN_DEM_PNTR_PTR),
-     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
-     :           N_POS, N_BOL, SWITCH_EXPECTED,
-     :           POS_SELECTED, %val(POS_S_PTR), SWITCH_S, EXP_S, 
-     :           INT_S, MEAS_S, BOL_S, STATUS)
 
-*     Set the byte array to reflect this particular section
-            CALL SCULIB_SET_QUAL (.TRUE.,%val(BYTE_PTR), N_BOL, N_POS,
-     :           1, BOL_S, %val(POS_S_PTR), 0, BIT_VALUE, STATUS)
-        
-         END DO
-
-*     Set the data to bad corresponding to this section
-         CALL SCULIB_SET_DATA (.TRUE., N_BOL, N_POS, 1, %VAL(BYTE_PTR), 
-     :        VAL__BADR, %val(DATA_PTR), STATUS)
-
-         CALL SCULIB_FREE ('BYTE_PTR', BYTE_PTR, BYTE_END, STATUS)
-         CALL SCULIB_FREE ('POS_S', POS_S_PTR, POS_S_END, STATUS)
+         CALL SCULIB_MASK_DATA(USE_INTS, 'REAL', NSPEC, DATA_SPEC,
+     :        %VAL(IN_DEM_PNTR_PTR), 1, N_EXPOSURES, N_INTEGRATIONS,
+     :        N_MEASUREMENTS, N_POS, N_BOL, 1, SWITCH_EXPECTED,
+     :        VAL__BADR, BTEMP, 0, .TRUE., DATA_PTR,
+     :        STATUS)
 
       END IF
 
@@ -981,7 +926,5 @@
       IF (IN_REDSX_LOC .NE. DAT__NOLOC) THEN
          CALL DAT_ANNUL (IN_REDSX_LOC, STATUS)
       END IF
-
-
 
       END
