@@ -57,6 +57,8 @@
 *      5 May 93 : V1.7-0 Enable observation date to be overriden (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     24 Apr 95 : V1.8-1 Updated data interfaces (DJA)
+*     15 Jan 1996 V2.0-0 (DJA):
+*        ADI port
 *
 *    Type definitions :
 *
@@ -79,9 +81,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC             ! Locator to input file
-      CHARACTER*(DAT__SZTYP) TYPE             ! Dataset type
-
       CHARACTER*132 HTEXT(5)                   ! Text for history
       CHARACTER*40 INSTR                      ! Instrument name
       CHARACTER*70 CALINFO                    ! Information about WFC filter
@@ -99,7 +98,7 @@
       INTEGER HTLEN                           ! # of lines of history
       INTEGER			IFID			! Input dataset id
       INTEGER CF_PTR, ID_PTR,RF_PTR, RFE_PTR  ! SSDS list data pointers
-      INTEGER NELM,NDIM,DIMS(DAT__MXDIM)
+      INTEGER NELM,NDIM,DIMS(ADI__MXDIM)
       INTEGER DIN, DOUT                       ! Pointers to input and out data
       INTEGER VIN, VOUT                       ! Pointers to input and out var.
       INTEGER QIN, QOUT                       ! Pointers to input and out Qual.
@@ -118,7 +117,6 @@
 
       LOGICAL			EXPCOR			! Exposure corrected?
       LOGICAL			GOTMJD			! Got MJD from input?
-      LOGICAL INPRIM                          ! Is the input data primitive ?
       LOGICAL IS_SET                          ! Is SSDS compound?
       LOGICAL LVAR,LQUAL                      ! Is variance/quality present ?
       LOGICAL OK                              ! Is object ok ?
@@ -129,42 +127,26 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-         PARAMETER 		( VERSION = 'WFCSPEC Version 1.8-1' )
+         PARAMETER 		( VERSION = 'WFCSPEC Version 2.0-0' )
 *-
 
-*    Announce version
+*  Announce version
       CALL MSG_PRNT(VERSION)
 
-*    Initialise ASTERIX
+*  Initialise ASTERIX
       CALL AST_INIT
 
-*    Start up CAL
+*  Start up CAL
       CALL CAL_INIT( STATUS )
 
-*    Get input file
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
+*  Get input file
+      CALL USI_ASSOC( 'INP', 'BinDS|SSDS', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check input file
+*  Is it a SSDS?
+      CALL ADI_DERVD( IFID, 'SSDS', SSDS, STATUS )
 
-*    Can't be primitive
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      IF ( INPRIM ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Input data cannot be primitive', STATUS )
-        GOTO 99
-      END IF
-
-*   Is it a SSDS?
-      CALL DAT_TYPE( ILOC, TYPE, STATUS )
-      IF ( TYPE(1:4) .EQ. 'SSDS' )THEN
-        SSDS = .TRUE.
-      ELSE
-        SSDS = .FALSE.
-      END IF
-
-*    Case of SSDS
+*  Case of SSDS
       IF ( SSDS ) THEN
 
 *      Check for POSIT structure, otherwise nothing much to report
@@ -228,7 +210,7 @@
 
       END IF
 
-*    Check that it's WFC data
+*  Check that it's WFC data
       CALL DCI_GETID( TFID, DETID, STATUS )
       CALL ADI_CGET0C( DETID, 'Instrument', INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -241,7 +223,7 @@
         GOTO 99
       END IF
 
-*    Get filter ident from INSTRUMENT box
+*  Get filter ident from INSTRUMENT box
       CALL ADI_CGET0I( DETID, 'Filter', IFILT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ','Can''t find FILTER - no response set up',
@@ -291,14 +273,13 @@
       ELSE
 
 *   Data array must have only one element (but could be n-dimensional)
-        CALL BDI_CHKDATA(IFID, OK, NDIM, DIMS, STATUS)
+        CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+        CALL BDI_GETNEL( IFID, NELM, STATUS )
         IF ( .NOT. OK .OR. STATUS .NE. SAI__OK ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Error finding input data array', STATUS )
           GOTO 99
         END IF
-        ONED = ( NDIM .EQ. 1 )
-        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
         IF ( NELM .NE. 1 ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Data array must have a single element',
@@ -314,46 +295,46 @@
         END IF
 
 *   Check for variance and quality
-        CALL BDI_CHKVAR( IFID, LVAR, NDIM, DIMS, STATUS)
+        CALL BDI_CHK( IFID, 'Variance', LVAR, STATUS)
         IF(.NOT. LVAR .OR. STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('No variance array in input file')
           CALL ERR_ANNUL(STATUS)
 	  LVAR=.FALSE.
         END IF
-        CALL BDI_CHKQUAL( IFID, LQUAL, NDIM, DIMS, STATUS)
+        CALL BDI_CHK( IFID, 'Quality', LQUAL, STATUS)
         IF(STATUS .NE. SAI__OK) THEN
           CALL ERR_ANNUL(STATUS)
           LQUAL=.FALSE.
         END IF
       END IF
 
-* Create output file
-      CALL USI_TASSOCO( 'OUT', 'SPECTRUM', OFID, STATUS )
+*  Create output file
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL BDI_LINK( 'Spectrum', 1, 1, 'REAL', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-* Create standard components in output file
-      CALL BDI_CREBDS(OFID,1,1,.TRUE.,LVAR,LQUAL,STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 99
-      CALL BDI_PUTTITLE(OFID,'WFC spectrum',STATUS)
-      CALL BDI_PUTLABEL(OFID,'Intensity',STATUS)
-      CALL BDI_PUTUNITS(OFID,'count/s',STATUS)
-      CALL BDI_PUTAXLABEL(OFID,1,'Channel',STATUS)
-      CALL BDI_PUTAXVAL(OFID,1,1.0,1.0,1,STATUS)
-      CALL BDI_PUTAXWID(OFID,1,1.0,STATUS)
+*  Create standard components in output file
+      CALL BDI_PUT0C( OFID, 'Title', 'WFC SPECTRUM', STATUS )
+      CALL BDI_PUT0C( OFID, 'Label', 'Intensity', STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', 'count/s', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Channel', STATUS )
+      SPARR(1) = 1.0
+      SPARR(2) = 1.0
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0R( OFID, 1, 'ScalarWidth', 1.0, STATUS )
 
-* Copy across data (+variance and quality if available) and MORE box
-
-*   MORE box
-      CALL BDI_COPMORE( TFID, OFID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPANC( TFID, 'grf', OFID, STATUS )
       IF(STATUS .NE. SAI__OK) CALL ERR_FLUSH(STATUS)
 
-*   Map output data
-      CALL BDI_MAPDATA(OFID, 'WRITE', DOUT, STATUS)
+*  Map output data
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DOUT, STATUS )
       IF ( LVAR ) THEN
-        CALL BDI_MAPVAR(OFID, 'WRITE', VOUT, STATUS)
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VOUT, STATUS )
       END IF
       IF ( LQUAL ) THEN
-        CALL BDI_MAPQUAL(OFID,'WRITE',QOUT,STATUS)
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QOUT, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
 
 *   SSDS case
@@ -365,11 +346,11 @@
           CALL ARR_COP1R( 1, FLUXERR*FLUXERR, %VAL(VOUT), STATUS )
         END IF
 
-*   NDF case
+*  Binned dataset case
       ELSE
 
-*      Copy across data value
-        CALL BDI_MAPDATA( IFID, 'READ', DIN, STATUS )
+*    Copy across data value
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DIN, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'Error transferring data value', STATUS )
@@ -377,9 +358,9 @@
         END IF
         CALL ARR_COP1R( 1, %VAL(DIN), %VAL(DOUT), STATUS )
 
-*     ..and variance
+*    ..and variance
         IF ( LVAR )THEN
-          CALL BDI_MAPVAR( IFID, 'READ', VIN, STATUS )
+          CALL BDI_MAPR( IFID, 'Variance', 'READ', VIN, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_PRNT( 'Error transferring variance value' )
             CALL ERR_ANNUL( STATUS )
@@ -387,9 +368,9 @@
           CALL ARR_COP1R( 1, %VAL(VIN), %VAL(VOUT), STATUS )
         END IF
 
-*     ..and quality
+*    ..and quality
         IF ( LQUAL ) THEN
-          CALL BDI_MAPQUAL(IFID, 'READ', QIN, STATUS)
+          CALL BDI_MAPUB( IFID, 'Quality', 'READ', QIN, STATUS)
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_PRNT( 'Error transferring quality value' )
             CALL ERR_ANNUL( STATUS  )
@@ -399,15 +380,15 @@
 
       END IF
 
-* Tell user about filter
-      CALL CAL_FILT_INFO(CALFILT,CALINFO,PKEN,STATUS)
+*  Tell user about filter
+      CALL CAL_FILT_INFO( CALFILT, CALINFO, PKEN, STATUS )
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
       CALL MSG_PRNT(' ')
       CALL MSG_PRNT('Filter: '//CALINFO)
       CALL MSG_SETR('PK',PKEN)
       CALL MSG_PRNT('        Response centred at ^PK eV')
 
-* Get decimal MJD of observation start
+*  Get decimal MJD of observation start
       CALL TCI_GETID( OFID, TIMID, STATUS )
       CALL ADI_CGET0D( TIMID, 'MJDObs', DMJD, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -418,7 +399,7 @@
         GOTMJD = .TRUE.
       END IF
 
-*    Override MJD?
+*  Override MJD?
       IF ( GOTMJD ) THEN
         CALL USI_GET0L( 'OVERRIDE', OVERRIDE, STATUS )
       ELSE
@@ -432,7 +413,7 @@
         CALL USI_GET0D( 'OBSMJD', DMJD, STATUS )
       END IF
 
-* Create energy response
+*  Create energy response
       CALL ERI0_INIT( STATUS )
       CALL ADI_NEW0( 'AsterixRMF', RMFID, STATUS )
       CALL ADI_CPUT0I( RMFID, 'NCHAN', 1, STATUS )
@@ -469,10 +450,10 @@
       CALL ADI_CPUT1R( RMFID, 'Channels', 2, CEBND, STATUS )
 
 *  Write the response
-      CALL ERI_PUTIDS( OFID, RMFID, ADI__NULLID, STATUS )
+      CALL ERI_PUTIDS( OFID, 1, 1, RMFID, ADI__NULLID, STATUS )
 
 *  Write history component
-      CALL HSI_ADD(OFID,VERSION,STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       HTEXT(1) = 'Set up WFC energy response structure '
       IF ( SSDS ) THEN
         CALL MSG_SETI( 'N', ISRC )
@@ -485,22 +466,11 @@
       CALL USI_TEXT( 2, HTEXT, HTLEN, STATUS )
       CALL HSI_PTXT( OFID, HTLEN, HTEXT, STATUS )
 
-*    Release TFID
-      CALL BDI_RELEASE( TFID, STATUS )
-
-*    Release OUTPUT
-      CALL BDI_RELEASE( OFID, STATUS )
+*  Release input and output
+      CALL USI_ANNUL( 'INP', STATUS )
       CALL USI_ANNUL( 'OUT', STATUS )
 
-*    Release input
-      IF ( SSDS ) THEN
-        CALL SSI_RELEASE( IFID, STATUS )
-      ELSE
-        CALL BDI_RELEASE( IFID, STATUS )
-      END IF
-      CALL USI_ANNUL( 'INP', STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -526,7 +496,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
         DOUBLE PRECISION DMJD                   ! Double prec. MJD of obs start
         INTEGER FILT                            ! Filter number
@@ -592,17 +561,17 @@
 	END IF
       END DO
 
-	THRESH=MAXRESP/100.0
-	I=MAXEN
-	DO WHILE ((RESP(I).GT.THRESH).AND.(I.GT.1))
-	  I=I-1
-	END DO
-	CHBND(1)=ESPEC(I)
-	I=MAXEN
-	DO WHILE ((RESP(I).GT.THRESH).AND.(I.LT.NEN))
-	  I=I+1
-	END DO
-	CHBND(2)=ESPEC(I)
+      THRESH = MAXRESP/100.0
+      I = MAXEN
+      DO WHILE ((RESP(I).GT.THRESH).AND.(I.GT.1))
+	I = I - 1
+      END DO
+      CHBND(1) = ESPEC(I)
+      I = MAXEN
+      DO WHILE ((RESP(I).GT.THRESH).AND.(I.LT.NEN))
+	I = I + 1
+      END DO
+      CHBND(2) = ESPEC(I)
 
 *  Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -713,7 +682,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Status :
