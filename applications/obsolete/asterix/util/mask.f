@@ -110,7 +110,7 @@
       INTEGER                   IDUM                    ! Unused from BDI_GET
       INTEGER			OFID			! File identifier
 
-      BYTE 			MASK                    ! The mask value
+      BYTE 			BMASK                   ! The mask value
 *.
 
 *  Check inherited global status.
@@ -126,17 +126,17 @@
       CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', OFID, STATUS )
 
 *  Get current mask and use as default
-      CALL BDI_GET( OFID, 'QualityMask', 'UBYTE', 0, 0, MASK, IDUM,
+      CALL BDI_GET( OFID, 'QualityMask', 'UBYTE', 0, 0, BMASK, IDUM,
      :              STATUS )
-      CALL STR_BTOC( MASK, MSTR, STATUS )
+      CALL STR_BTOC( BMASK, MSTR, STATUS )
       CALL USI_DEF0C( 'MASK', MSTR, STATUS )
 
 *  Get new mask
       CALL USI_GET0C( 'MASK', MSTR, STATUS )
 
 *  Set the new mask
-      CALL STR_CTOB( MSTR, MASK, STATUS )
-      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, MASK, STATUS )
+      CALL STR_CTOB( MSTR, BMASK, STATUS )
+      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BMASK, STATUS )
 
 *  Tidy up
       CALL AST_CLOSE()
