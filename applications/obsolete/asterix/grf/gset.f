@@ -4684,6 +4684,7 @@
               IF (ISEL.EQ.1) THEN
                 CALL MSG_PRNT('Multiple dataset:-')
               ENDIF
+              CALL MSG_BLNK()
               CALL MSG_SETI('NDF',NDFS(ISEL))
               CALL MSG_PRNT(' processing NDF ^NDF...')
 *  from component of multiple dataset
@@ -4698,7 +4699,6 @@
 *  interrogate Control Block for each attribute
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'ALL'.OR.SWITCH.EQ.'DEF') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Default attributes(*):-')
             CALL GCB_GETI('DEFAULT_WIDTH',OK,IVAL,STATUS)
             IF (.NOT.OK) THEN
@@ -4783,10 +4783,10 @@
                 ENDIF
               ENDIF
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'POL') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('PolyLine:-')
             CALL GCB_GETL('POLY_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4816,9 +4816,9 @@
      :                        'PolyLineStyle=^STY   '//
      :                        'PolyLineWidth=^WID   '//
      :                        'PolyLineColour=^COL')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'STE') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('StepLine:-')
             CALL GCB_GETL('STEP_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4848,9 +4848,9 @@
      :                        'StepLineStyle=^STY   '//
      :                        'StepLineWidth=^WID   '//
      :                        'StepLineColour=^COL')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'ERR') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('ErrorBars:-')
             CALL GCB_GETL('ERR_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4880,9 +4880,9 @@
      :                        'ErrorBarShape=^SHA   '//
      :                        'ErrorBarLineWidth=^WID   '//
      :                        'ErrorBarColour=^COL')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'POI') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Points:-')
             CALL GCB_GETL('POINT_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4919,9 +4919,9 @@
      :                        'PointSize=^SIZ   '//
      :                        'PointBoldness=^BOL   '//
      :                        'PointColour=^COL')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'SUR') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Surface:-')
             CALL GCB_GETL('SURF_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4937,9 +4937,9 @@
             ENDIF
             CALL MSG_PRNT('  SurfaceFlag=^FLG   '//
      :                         'SurfaceViewingAngle=^ANG')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'PIX') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Pixel:-')
             CALL GCB_GETL('PIX_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -4984,9 +4984,9 @@
      :                          'PixelScalingMin=^MIN   '//
      :                          'PixelScalingMax=^MAX')
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'CON') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Contours:-')
             CALL GCB_GETL('CONT_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -5035,10 +5035,10 @@
 
             ENDDO
 
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'POS') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Position:-')
             CALL GCB_GETR('POS_X1',OK,RVAL,STATUS)
             IF (OK) THEN
@@ -5066,11 +5066,11 @@
             ENDIF
             CALL MSG_PRNT('  LeftEdge=^X1   RightEdge=^X2   '//
      :                  'BottomEdge=^Y1   TopEdge=^Y2')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'AXE'.OR.
      :               SWITCH.EQ.'XAX'.OR.SWITCH.EQ.'YAX') THEN
 
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Axes:-')
             CALL MSG_PRNT('  General-')
             CALL GCB_GETI('AXES_WIDTH',OK,IVAL,STATUS)
@@ -5200,9 +5200,9 @@
             ENDIF
             CALL MSG_PRNT('  BottomLimit=^LO   '//
      :                                   'TopLimit=^HI')
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'GRI') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Grid:-')
             CALL GCB_GETI('GRID_FRAME',OK,IVAL,STATUS)
             IF (OK) THEN
@@ -5219,9 +5219,9 @@
             ELSE
               CALL MSG_PRNT('  CoordGridFlag=Off')
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'KEY') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Key:-')
             CALL GCB_GETL('KEY_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -5257,6 +5257,7 @@
             ELSE
               CALL MSG_PRNT('  KeyFlag=Off')
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'LAB'.OR.SWITCH.EQ.'XLA')
      :                                                        THEN
@@ -5344,6 +5345,7 @@
             CALL MSG_PRNT('    Font=^FON   CharSize=^SIZ   '//
      :                  'Boldness=^BOL   Offset=^OFF   '//
      :                  'Colour=^COL')
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'TIT') THEN
@@ -5430,9 +5432,9 @@
      :                          'Justification=^JUS')
               ENDDO
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'STA') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('ID-stamp:-')
             CALL GCB_GETL('STAMP_FLAG',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
@@ -5446,10 +5448,10 @@
             ELSE
               CALL MSG_PRNT('  IDStampFlag=Off')
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'NOT') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Annotation:')
             CALL GCB_GETI('NOTE_N',OK,N,STATUS)
             IF (.NOT.OK) THEN
@@ -5520,10 +5522,10 @@
               ENDDO
 
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'MAR') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Markers:-')
             CALL GCB_GETI('MARKER_N',OK,N,STATUS)
             IF (.NOT.OK) THEN
@@ -5580,10 +5582,10 @@
      :                           'Boldness=^BOL   Colour=^COL')
               ENDDO
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'SHA') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('Shapes:-')
             CALL GCB_GETI('SHAPE_N',OK,N,STATUS)
             IF (.NOT.OK) THEN
@@ -5670,10 +5672,10 @@
 
               ENDDO
             ENDIF
+            CALL MSG_BLNK()
           ENDIF
 
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'COL') THEN
-            CALL MSG_BLNK()
             CALL MSG_PRNT('ColourTable:-')
             CALL GCB_GETL('COLOUR_RGB',OK,LVAL,STATUS)
             IF (OK.AND.LVAL) THEN
