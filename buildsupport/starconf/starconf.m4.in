@@ -1132,7 +1132,7 @@ else
         if test -f $srcdir/$_t$_star_tmp; then
             (cd $srcdir; rm -f $_t; $LN_S $_t$_star_tmp $_t)
         else
-            AC_MSG_ERROR([platform $_star_tmp matched, but no file $_t$_star_tmp found])
+            AC_MSG_WARN([platform $_star_tmp matched, but no file $_t$_star_tmp found])
         fi
     done
 fi
