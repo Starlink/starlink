@@ -21,15 +21,20 @@
 *        %VAL( CNF_PVAL( IPTR ) )
 *
 *     If the call to CNF_PVAL is already present no change is made.
-*     Lines with no references to the %VAL directive are left alone,
-*     except that trailing whitespace may be stripped.
+*     Lines with no references to the %VAL directive are left alone.
 *
-*     The program must also insert a line including the CNF_PAR 
-*     include file.
+*     Additionally, for each program unit in which a call to CNF_PVAL
+*     has been made, an attempt is made to insert a line like
 *
-*     Attention is paid to fortran 77 source format, so that lines are
+*        INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
+*
+*     This is inserted after the last INCLUDE line which already exists
+*     in the program unit.  If there are no INCLUDE lines there, this
+*     line is not inserted, and a warning message is output.
+*
+*     Attention is paid to Fortran 77 source format, so that lines are
 *     more than 72 characters long are avoided (unless they were there
-*     in the first place.
+*     in the first place).
 *
 *     Characters '\r' (carriage return) and '\t' (tab) might possibly
 *     cause erroneous line breaking - if any are encountered a warning
@@ -45,6 +50,17 @@
 *     line breaks are done, where possible, following the usage in, e.g.,
 *     KAPPA.  An attempt is made copy the style of case usage and bracket 
 *     spacing from the input.
+*
+*     This program wraps ALL occurrences of %VAL in a call to CNF_PVAL,
+*     unless they are already so wrapped.  If it suspects that %VAL
+*     may not be a legitimate candidate for this treatment, it will
+*     output a warning message to standard error.  It will do this in
+*     the following cases:
+*       - %VAL is on the last argument in the argument list (this 
+*         suggests that it might be a trailing string length)
+*       - The argument of %VAL looks like an integer constant
+*       - The argument of %VAL looks like a Starlink-style symbolic 
+*         constant (has two adjacent underscore characters).
 *
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -282,7 +298,7 @@
 /* Keep track of bracket nesting. */
                   if ( tokid[ i ] == '(' ) {
                      if ( level < MAXNEST + 1 ) level++;
-                     if ( i && tokid[ i - 1 ] == TOKEN )
+                     if ( i && tokid[ i - 1 ] == IDENTIFIER )
                         calltok[ level ] = i - 1;
                      else
                         calltok[ level ] = 0;
@@ -314,7 +330,7 @@
 
 /* Warn if the content of the %VAL looks like it contains a symbolic 
    constant (i.e. something with two consecutive underscores in its name. */
-                     if ( tokid[ i + 3 ] == TOKEN ) {
+                     if ( tokid[ i + 3 ] == IDENTIFIER ) {
                         for ( j = tokpos[ i + 3 ]; j < tokpos[ i + 4 ] - 1; 
                               j++ ) {
                            if ( buf[ j ].chr == '_' && 
