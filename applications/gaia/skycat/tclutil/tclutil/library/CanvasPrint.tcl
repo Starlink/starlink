@@ -109,7 +109,7 @@ itcl::class util::CanvasPrint {
 		     -rotate [set $w_.rotate]]
 	
 	if {"$x0" == ""} {
-	    lassign [$itk_option(-canvas) box all] x0 y0 x1 y1
+	    lassign [$itk_option(-canvas) bbox all] x0 y0 x1 y1
 	}
 
 	if {$itk_option(-show_headers)} {

@@ -19,12 +19,12 @@ itcl::class tCanvasDraw {
 		-canvasbackground black
 	}
 	pack $itk_component(canvas) -fill both -expand 1
-	set canvas [$itk_component(canvas) component canvas]
+	set canvas_ [$itk_component(canvas) component canvas]
 
 	# canvas draw tool
 	itk_component add draw {
 	    CanvasDraw $w_.draw	\
-		-canvas $canvas \
+		-canvas $canvas_ \
 		-withdraw 1 \
 		-transient 1 \
 		-center 0
@@ -59,7 +59,7 @@ itcl::class tCanvasDraw {
     # print the contents of the canvas (without the image)
 
     method print {} {
-	utilReUseWidget CanvasPrint $w_.print
+	utilReUseWidget CanvasPrint $w_.print -canvas $canvas_
     }
 
 
@@ -67,6 +67,9 @@ itcl::class tCanvasDraw {
     ::foreach i {one way to add dynamic methods} {
 	method $i {args} [::format {puts "called method %s with args $args"} $i]
     }
+
+    # name of canvas widget
+    protected variable canvas_ {}
 }
 
 util::TopLevelWidget::start tCanvasDraw
