@@ -1,5 +1,5 @@
-      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, ENDIM, EDIMS, PSID, PTR,
-     :                        NELM, STATUS )
+      SUBROUTINE BDI1_ARYMAP( BID, LOC, TYPE, MODE, ENDIM, EDIMS,
+     :                        PSID, PTR, NELM, STATUS )
 *+
 *  Name:
 *     BDI1_ARYMAP
@@ -11,12 +11,14 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, ENDIM, EDIMS, PSID, PTR, NELM, STATUS )
+*     CALL BDI1_ARYMAP( BID, LOC, TYPE, MODE, ENDIM, EDIMS, PSID, PTR, NELM, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
+*     BID = INTEGER (given)
+*        ADI identifier of top of object chain
 *     LOC = CHARACTER*(DAT__SZLOC) (given)
 *        Locator to array
 *     TYPE = CHARACTER*(*) (given)
@@ -103,7 +105,7 @@
 *  Arguments Given:
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE
-      INTEGER			PSID, ENDIM, EDIMS(*)
+      INTEGER			BID, PSID, ENDIM, EDIMS(*)
 
 *  Arguments Returned:
       INTEGER			PTR, NELM
@@ -185,9 +187,9 @@
       ELSE IF ( ENELM .NE. NELM ) THEN
         CALL ADI_NAME( PSID, ITEM, STATUS )
         CALL MSG_SETC( 'IT', ITEM )
-        CALL BDI0_DESCID( BID, 'F', STATUS )
+c        CALL BDI0_DESCID( BID, 'F', STATUS )
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'The dimensions of item ^IT in file ^F '/
+        CALL ERR_REP( ' ', 'The dimensions of item ^IT '/
      :           /'differ from those expected - check the program '/
      :                /'which created this file', STATUS )
         GOTO 99

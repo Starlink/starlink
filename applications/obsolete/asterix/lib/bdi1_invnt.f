@@ -1,4 +1,4 @@
-a      SUBROUTINE BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE,
+      SUBROUTINE BDI1_INVNT( BDID, HFID, ITEM, TYPE, MODE,
      :                       ITID, NDIM, DIMS, WBPTR, STATUS )
 *+
 *  Name:

@@ -121,6 +121,7 @@
       INTEGER			C1, C2			! Character pointers
       INTEGER			IITEM			! Item counter
       INTEGER			LITL			! Used length of LITEM
+      INTEGER			LSTAT			! Local status
       INTEGER			PSID			! Private item storage
       INTEGER			MCOUNT			! Object map count
       INTEGER			OARG			! Return value
@@ -184,8 +185,10 @@
             CALL ADI_ERASE( OARG, STATUS )
           ELSE IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
-            CALL ERR_REP( 'BDI_MAP_1', 'Unable to map item ^ITEM',
-     :                    STATUS )
+            LSTAT = SAI__OK
+            CALL BDI_DESCID( ID, 'F', STATUS )
+            CALL ERR_REP( 'BDI_MAP_1', 'Unable to map item '/
+     :                    /'^ITEM in file ^F', STATUS )
           ELSE
             PTRS(IITEM) = 0
           END IF
