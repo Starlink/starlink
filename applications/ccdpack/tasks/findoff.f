@@ -99,10 +99,27 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     MAXDISP = _DOUBLE (Read)
+*        This parameter gives the maximum acceptable displacement in 
+*        pixels between the original alignment of the NDFs and the
+*        alignment in which the objects are matched.  If frames have
+*        to be displaced more than this value to obtain a match, the
+*        match is rejected.  This will be of use when USEWCS is set 
+*        and the alignment defined by the WCS components of the 
+*        NDFs is fairly accurate.  It should be set to the maximum
+*        expected inaccuracy in that alignment.  If null, arbitrarily 
+*        large displacements are allowed, although note that a 
+*        similar restriction is effectively imposed by setting the
+*        RESTRICT parameter.
+*        [!]
 *     MINMATCH = _INTEGER (Read)
 *        This parameter specifies the minimum number of positions
 *        which must be matched for a comparison of two lists to be 
-*        deemed successful. This must be greater than 2.
+*        deemed successful.  Small values (especially less than 3) of
+*        this parameter can lead to a high probability of false matches,
+*        and are only advisable for very sparsely populated lists
+*        and/or small values of the MAXDISP parameter (presumably in
+*        conjunction with USEWCS).
 *        [3]
 *     MINSEP = _DOUBLE (Read)
 *        Positions which are very close may cause false matches by being
@@ -361,6 +378,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -384,6 +402,8 @@
 *     20-JAN-1999 (PDRAPER):
 *        Sorted out workspace problems for incomplete matching
 *        (IPBEEN and IPQUE increased to NOPEN from NMATCH).
+*     30-MAR-1999 (MBT):
+*        Changed to deal with WCS components of NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -400,6 +420,7 @@
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'PAR_ERR'          ! PAR error codes
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -409,6 +430,7 @@
       CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer for reading in data
       CHARACTER * ( CCD1__BLEN ) LINE1 ! Line buffer for writing out text
       CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
+      CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
       DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
@@ -417,6 +439,7 @@
       DOUBLE PRECISION COMFAC   ! Completeness factor
       DOUBLE PRECISION ERROR    ! Error in input positions
       DOUBLE PRECISION MINSEP   ! Minimum input data separation
+      DOUBLE PRECISION MAXDIS   ! Maximum displacement for matching
       DOUBLE PRECISION NEDFAC   ! Minimum completeness factor required
       DOUBLE PRECISION XOFF( CCD1__MXLIC ) ! Determined X translation
       DOUBLE PRECISION XOFFN( CCD1__MXLIS ) ! Final X translation
@@ -538,6 +561,16 @@
       CALL PAR_DEF0D( 'MINSEP', ERROR * 5.0D0, STATUS )
       CALL PAR_GET0D( 'MINSEP', MINSEP, STATUS )
 
+*  Get the maximum displacement allowed between frames, relative to
+*  their original positioning, either using WCS information or not.
+*  A zero value of MAXDIS represents a null value of the parameter.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      CALL PAR_GET0D( 'MAXDISP', MAXDIS, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         MAXDIS = 0D0
+         CALL ERR_ANNUL( STATUS )
+      END IF
+
 *  Get the minimum completeness factor which is ok.
       CALL PAR_GET0D( 'COMPLETE', NEDFAC, STATUS )
       NEDFAC = MAX( 0.0D0, MIN( NEDFAC, 1.0D0 ) )
@@ -548,7 +581,7 @@
 
 *  Get the minimum number of positions which are required for a match.
       CALL PAR_GET0I( 'MINMATCH', MINMAT, STATUS )
-      MINMAT = MAX( 2, MINMAT )
+      MINMAT = MAX( 1, MINMAT )
 
 *  Get the operation mode. FAST which uses the statistical analysis or
 *  .NOT.FAST which uses the straight-forward distance comparison.
@@ -659,6 +692,14 @@
 *  And the rest of the parameters.
       CALL MSG_SETD( 'ERROR', ERROR )
       CALL CCD1_MSG( '  ', '  Error in positions: ^ERROR', STATUS )
+      IF ( MAXDIS .NE. 0D0 ) THEN
+         CALL MSG_SETD( 'MAXDIS', MAXDIS )
+         CALL CCD1_MSG( ' ', 
+     :    '  Maximum displacement allowed: ^MAXDIS', STATUS )
+      ELSE
+         CALL CCD1_MSG( ' ', 
+     :    '  Arbitrarily large displacements allowed', STATUS )
+      END IF
       CALL MSG_SETD( 'MINSEP', MINSEP )
       CALL CCD1_MSG( '  ',
      : '  Minimum distance between positions: ^MINSEP', STATUS )
@@ -833,7 +874,7 @@
 *  Set and output header labels.
       LINE1 = '    List  List  No. matches  Completeness  Status   '
       LINE2 = '    ----  ----  -----------  ------------  ------   '
-      IF ( FAST .AND. FSAFE ) THEN
+      IF ( ( FAST .AND. FSAFE ) .OR. MINMAT .EQ. 1 ) THEN
          LINE1( 53: ) = 'Algorithm  '
          LINE2( 53: ) = '---------  '
       END IF
@@ -857,6 +898,8 @@
 
 *  Is this match ok?
             OK = .TRUE.
+            FAILED = .FALSE.
+            METHOD = ' '
 
 *  Now get workspace arrays for matching routines (plus 2 for CCD1_SOFF
 *  sorting routines).
@@ -881,7 +924,6 @@
 
 *  Check memory allocations succeeded.
             IF ( STATUS .NE. SAI__OK ) GO TO 99
-            FAILED = .FALSE.
 
             IF ( USEWCS ) THEN
 
@@ -994,19 +1036,44 @@
 
                END IF
 
-*  Check if we have enough points in each list to satisfy the matching
-*  criteria.
-               IF ( NUMI1 .LT. MINMAT .OR. NUMI2 .LT. MINMAT )
-     :            OK = .FALSE.
-
             END IF
 
+*  Check if we have enough points in each list to satisfy the matching
+*  criteria.
+            IF ( NUMI1 .LT. MINMAT .OR. NUMI2 .LT. MINMAT )
+     :         OK = .FALSE.
+
 *  Generate the offset statistics.
-            IF ( FAST .AND. OK ) THEN 
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            IF ( ( NUMI1 .EQ. 1 .OR. NUMI2 .EQ. 1 ) .AND. OK ) THEN
+
+*  One or both lists have only one object.  Treat as a special case.
+               METHOD = 'SNGL'
+               CALL CCD1_SNGL( MAXDIS,
+     :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
+     :                         %VAL( IPRBN1 ), NUMI1,
+     :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
+     :                         %VAL( IPRBN2 ), NUMI2,
+     :                         %VAL( IPXO1( COUNT ) ),
+     :                         %VAL( IPYO1( COUNT ) ),
+     :                         %VAL( IPXO2( COUNT ) ),
+     :                         %VAL( IPYO2( COUNT ) ), NMAT( COUNT ),
+     :                         XOFF( COUNT ), YOFF( COUNT ),
+     :                         %VAL( IPRAN1 ), %VAL( IPRAN2 ), STATUS )
+
+*  If the match was successful, completeness must be unity.
+               IF ( STATUS .EQ. SAI__OK ) THEN
+                  COMFAC = 1D0
+               ELSE
+                  COMFAC = 0D0
+               END IF
+
+            ELSE IF ( FAST .AND. OK ) THEN
 
 *  Perform matching using histogram of X and Y offsets refined through
 *  iteration.
-               CALL CCD1_STAO( ERROR,
+               METHOD = 'FAST'
+               CALL CCD1_STAO( ERROR, MAXDIS,
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ), 
      :                         %VAL( IPRBN1 ), NUMI1,
      :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
@@ -1059,16 +1126,17 @@
 *  Perform matching using the straight-forward distance comparisons
 *  if this is required.
             IF ( ( .NOT. FAST .OR. ( FSAFE .AND. FAILED ) ) 
-     :         .AND. OK ) THEN 
+     :         .AND. METHOD .NE. 'SNGL' .AND. OK ) THEN 
             
 *  Get workspace and perform comparison.
+               METHOD = 'SLOW'
                CALL CCD1_MALL( NPOSS, '_DOUBLE', IPWRK2, STATUS )
                CALL CCD1_MALL( NPOSS, '_INTEGER', IPWRK3, STATUS )
                CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK4, 
      :                         STATUS )
                CALL CCD1_MALL( NREC( J ) + 2, '_INTEGER', IPWRK5, 
      :                         STATUS )
-               CALL CCD1_SOFF( ERROR,
+               CALL CCD1_SOFF( ERROR, MAXDIS, 
      :                         %VAL( IPXI1 ), %VAL( IPYI1 ),
      :                         %VAL( IPRBN1 ), NUMI1,
      :                         %VAL( IPXI2 ), %VAL( IPYI2 ),
@@ -1126,16 +1194,9 @@
             ELSE
                 LINE( 44: ) = 'rejected'
             END IF
-            IF ( FAST .AND. FSAFE ) THEN
-               IF ( FAILED ) THEN
-                  LINE( 56: ) = 'SLOW'
-               ELSE
-                  LINE( 56: ) = 'FAST'
-               END IF
-            END IF
-            IF ( CNV .NE. AST__NULL ) THEN
-               LINE( 64: ) = DOMAIN
-            END IF
+            IF ( ( FAST .AND. FSAFE ) .OR. MINMAT .EQ. 1 )
+     :         LINE( 56: ) = METHOD
+            IF ( CNV .NE. AST__NULL ) LINE( 64: ) = DOMAIN
 
 *  And write the line of information
             CALL CCD1_MSG( ' ', LINE, STATUS )

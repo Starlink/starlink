@@ -17,6 +17,8 @@
 #     	 Now FINDOFF.
 #     09-FEB-1998 (MBT):
 #        Added USEWCS.
+#     30-MAR-1999 (MBT):
+#        Added MAXDISP.
 #     {enter_further_changes_here}
 
 #-
@@ -158,6 +160,16 @@ interface FINDOFF
       default FALSE
       prompt  'Restrict possible matches to apparently overlapping zones'
       helpkey '*'
+   endparameter
+
+   parameter MAXDISP
+      type     _DOUBLE
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Maximum displacement of frames relative to initial positioning'
+      helpkey  '*'
    endparameter
 
    parameter MINSEP
