@@ -4495,8 +4495,8 @@ M Makefile.dependencies
             </dd>
 
             <dt>I want to install symbolic links at install time.  How?</dt>
-            <dd>That counts as `weird' for the purposes of this
-              discussion.  See the next item.</dd>
+            <dd><p>That counts as `weird' for the purposes of this
+              discussion.  See the next item.</p></dd>
 
             <dt>I want to do weird things at install time.  How?</dt> 
             <dd>
