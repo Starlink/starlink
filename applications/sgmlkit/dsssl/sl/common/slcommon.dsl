@@ -920,12 +920,14 @@ with a non-existent file.
   doesn't have a public id, it must have a system-id, so we must
   prepend the correct SGML declaration.  Do this by calling
   <funcname/entity-generated-system-id/ on the entity.
-  <p>The crucial thing here is to realise that a `system identifier'
+  <p>The crucial thing here is to realise that a `formal system identifier'
   (the argument of <funcname/sgml-parse/) is <em/not/ necessarily a
-  single file.  As described in clause A.6 (?) of the HyTime spec, and
-  also on the <webref url='http://www.jclark.com/' >SP pages</webref>,
-  it can consist of several <em/storage object identifiers/, which are
-  concatenated.
+  single file.  As described in clause A.6 (specifically A.6.4.3) of
+  the HyTime spec, and also on the <webref
+  url='http://www.jclark.com/sp/sysid.htm' >SP pages</webref>, it can
+  consist of several <em/storage object identifiers/, which are
+  concatenated.  A simple filename, lacking the SOS start-tag, is an
+  `informal system identifier'.
 <returnvalue type="node-list">Document element, or <code/#f/ on error.
 <argumentlist>
 <parameter>ent-name
