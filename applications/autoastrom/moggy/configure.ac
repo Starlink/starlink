@@ -22,6 +22,11 @@ dnl AC_CONFIG_AUX_DIR(config)
 dnl   Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_RANLIB
+
+dnl   Similarly, check for uncompress and gzip programs
+AC_PATH_PROG(PROGUNCOMPRESS, uncompress)
+AC_PATH_PROG(PROGGZIP, gzip)
 
 dnl   For printing messages...
 AC_SUBST(ECHO_C)
@@ -63,15 +68,7 @@ done
 if test -z "$PERLPATH"; then
     AC_MSG_ERROR([Can't find a suitable Perl in $starpath])
 fi
-dnl echo PERLPATH=$PERLPATH
 AC_SUBST(PERLPATH)
-
-dnl   Similarly, check for uncompress and gzip programs
-AC_PATH_PROG(PROGUNCOMPRESS, uncompress)
-AC_PATH_PROG(PROGGZIP, gzip)
-
-dnl   Check for other tools
-AC_PROG_RANLIB
 
 dnl   Use C++ to compile test programs
 AC_LANG([C++])
@@ -132,7 +129,6 @@ if test $flagschecked = no; then
     AC_MSG_RESULT([unknown!])
     AC_MSG_ERROR([Can't work out how to compile programs with streams support])
 fi
-dnl echo "CXXFLAGS=$CXXFLAGS"
 
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
 AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
