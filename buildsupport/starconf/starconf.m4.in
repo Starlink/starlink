@@ -387,6 +387,12 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # grubbing round manifest files at some point, but the
 # starconf-finder, which is the eventual default, knows about this
 # case, and could take care of it.
+#
+# No, I've changed my mind again.  If the program isn't found, then
+# simply have the AC_PATH_PROG default to bare ProgramName.  This is
+# probably adequate, and if so probably more robust than relying on
+# more and more layers of indirection.  We probably will need to
+# revisit this.  Again.
 AC_DEFUN([STAR_CHECK_PROGS],
          [eval default_bindir=`echo $bindir | sed 's,\${exec_prefix},$ac_default_prefix,'`
           AC_FOREACH([ProgramName], [$1],
@@ -396,15 +402,15 @@ AC_DEFUN([STAR_CHECK_PROGS],
                                                           [_])))
                       AC_PATH_PROG(star_prog,
                                    ProgramName,
-                                   [],
+                                   ProgramName,
                                    [$default_bindir:$STARLINK/bin:$PATH])
-                      if test -z "$star_prog"; then
-                          if test -x $STARLINK/bin/starconf-finder; then
-                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
-                          else
-                              star_prog=ProgramName
-                          fi
-                      fi
+#                      if test -z "$star_prog"; then
+#                          if test -x $STARLINK/bin/starconf-finder; then
+#                              star_prog="$STARLINK/bin/starconf-finder ProgramName"
+#                          else
+#                              star_prog=ProgramName
+#                          fi
+#                      fi
                       AC_ARG_VAR(star_prog,
                                  [Location of the ]ProgramName[ application])])
 ])# STAR_CHECK_PROGS
