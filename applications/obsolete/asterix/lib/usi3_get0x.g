@@ -145,8 +145,10 @@
           STATUS = PAR__NULL
 
         ELSE
+          CSTAT = 0
           CALL CHR_CTO<T>( CVAL, VALUE, CSTAT )
           IF ( (CT.NE.'C') .AND. (CSTAT.NE.0) ) THEN
+	PRINT *,CSTat
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Conversion error from '/
      :                  /'character to <COMM>', STATUS )
