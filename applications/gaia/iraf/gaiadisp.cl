@@ -9,7 +9,7 @@
 
 procedure gaia ( image, plane )
    string image       { prompt = "Name of image to display" }
-   int plane          { 0, min=0, max=999, prompt = "Image plane" }
+   int plane          { 1, min=1, prompt = "Image plane" }
 
 begin
    string realname
