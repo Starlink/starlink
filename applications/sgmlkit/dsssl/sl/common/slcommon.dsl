@@ -800,9 +800,9 @@ then a link should be made, using the URL in <code/cdr/.
 			     " has not been exported, so may not be linked to")
 	      #f)
 	(case urlpolicy
-	  (("NONE")
+	  (((normalize "none"))
 	   (cons #f #f))	; policy satisfied - no link
-	  (("EXPLICIT")
+	  (((normalize "explicit"))
 	   (if urlpath
 	       (cons #f (or no-urls
 			    (string-append %starlink-document-server%
@@ -812,7 +812,7 @@ then a link should be made, using the URL in <code/cdr/.
 	       (cons (string-append "element with id " id
 				    " has no URLPATH attribute")
 		     #f)))
-	  (("AUTOMATIC")
+	  (((normalize "automatic"))
 	   (if urlpath
 	       (cons (string-append "element with id " id
 				    " has an URLPATH attribute present")
@@ -914,12 +914,10 @@ with a non-existent file.
   is a completely different parse from the main one.  That means that
   it has the default SGML declaration, which has <code/NAMECASE
   GENERAL NO/.  Unless we prepend the correct declaration, this isn't
-  parsed properly.  The variable <funcname/%starlink-decl-entity%/ is
-  defined in the General DTD to point to the declaration, so if the
-  string entity name that we're asked to call <funcname/sgml-parse/ on
-  doesn't have a public id, it must have a system-id, so we must
-  prepend the correct SGML declaration.  Do this by calling
-  <funcname/entity-generated-system-id/ on the entity.
+  parsed properly.  The entity <funcname/%starlink-decl-entity%/ is
+  defined in the General DTD to point to the declaration, and we must
+  prepend this entity to the entity we have been asked to parse.  Do
+  this by calling <funcname/entity-generated-system-id/ on the entity.
   <p>The crucial thing here is to realise that a `formal system identifier'
   (the argument of <funcname/sgml-parse/) is <em/not/ necessarily a
   single file.  As described in clause A.6 (specifically A.6.4.3) of
@@ -933,13 +931,16 @@ with a non-existent file.
 <parameter>ent-name
   <type>string
   <description>String containing entity declared in current context
+<parameter keyword default='#t'>prepend-decl
+  <type>boolean
+  <description>If true (default), prepend the proper SGML declaration
 <codebody>
-(define (document-element-from-entity str)
-  (let* ((pubid (entity-public-id str))
-	 (fsi (if pubid
-		  (entity-generated-system-id str)
+(define (document-element-from-entity str #!key (prepend-decl #t))
+  (let* (;(pubid (entity-public-id str))
+	 (fsi (if prepend-decl
 		  (string-append (entity-generated-system-id %starlink-decl-entity%)
-				 (entity-generated-system-id str)))))
+				 (entity-generated-system-id str))
+		  (entity-generated-system-id str))))
     (if fsi
 	(document-element (sgml-parse fsi))
 	(error (string-append "Can't generate file from entity " str)))))
@@ -1491,6 +1492,38 @@ GI of the node, and the node.  This is useful when combinde with
 		    (lambda (result nd)
 		      (append result (list (cons (gi nd) nd))))
 		    '()))
+
+<routine>
+<routinename>node-list-split-by-gi
+<description>Split a node-list into a list of node-lists.
+<returnvalue type='list of node-lists'>List of node-lists, each
+one of which is either a single node whose GI is a member of `gilist',
+or a non-empty sequence of nodes whose GIs are not members of
+`gilist'.  Preserves order.
+<argumentlist>
+<parameter>nodelist
+  <type>node-list
+  <description>The list of nodes to be split
+<parameter>gilist
+  <type>list of strings
+  <description>A list of GIs at which to split the node-list
+<codebody>
+(define (node-list-split-by-gi nodelist gilist)
+  (let loop ((nllist '())		;list of node-lists
+	     (tnl (empty-node-list))	;current node-list of non-matched nodes
+	     (nl nodelist))		;unprocessed node-list
+    (if (node-list-empty? nl)
+	(if (node-list-empty? tnl) nllist (append nllist (list tnl)))
+	(let ((g (gi (node-list-first nl))))
+	  (if (and g (member g gilist))
+	      (loop (append nllist (if (node-list-empty? tnl)
+				       (list (node-list-first nl))
+				       (list tnl (node-list-first nl))))
+		    (empty-node-list)
+		    (node-list-rest nl))
+	      (loop nllist
+		    (node-list tnl (node-list-first nl))
+		    (node-list-rest nl)))))))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
 <routine>
