@@ -44,6 +44,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.3  1997/11/12 00:06:01  timj
+*     Make sure that the input string can not equal the output string.
+*
 *     Revision 1.2  1997/11/08 00:40:58  timj
 *     Add the chopping '!' facility
 *
@@ -156,5 +159,15 @@
 *     Now just append the new suffix
       IPOSN = CHR_LEN(OUT_STRING)
       CALL CHR_APPND(SUFFIX, OUT_STRING, IPOSN)
+
+*     Check that OUT_STRING does not equal the input string.
+*     If it does we should add a little something to the end
+
+      IF (OUT_STRING .EQ. IN_STRING) THEN
+
+         CALL CHR_APPND('_-', OUT_STRING, IPOSN)
+
+      END IF
+
 
       END
