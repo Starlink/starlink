@@ -5051,11 +5051,13 @@ proc Message {message} {
 #-
    global F_OWNER
    global TOP
+   global env
 
-# If the top level window has not yet been created, then write the
-# message to standard output.
+# If the top level window has not yet been created, message to standard 
+# output (so long as we are not running from ICL or IRAF - in these cases
+# the message is lost since writing to standard output seems to upset IRAF).
    if { ![info exists TOP] } {
-      puts $message
+      if { ![info exists env(ICL_TASK_NAME)] } { puts $message }
 
 # Otherwise, display the message in a dialog box.
    } {
