@@ -1,7 +1,12 @@
+2005-03-04  Tim Jenness  <tjenness@cpan.org>
+
+	* Tk/Tk.pm: Extensive rewrite. Now mostly works and is consistent
+	with the PGPLOT equivalent. Tk can not support rotated text.
+
 2005-02-03  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* AST.xs: Fix Channel and XmlChan source functions. Sometimes the source
-	function is triggered after object constructor.
+	* AST.xs: Fix Channel and XmlChan source functions. Sometimes the
+	source function is triggered after object constructor.
 
 2004-12-29  Tim Jenness  <timj@jach.hawaii.edu>
 
@@ -25,7 +30,7 @@
 
 	* t/keymap.t: Add tests for astKeyMap
 	
-        * AST.xs: Allow module to compile with both variants of astRate.
+	* AST.xs: Allow module to compile with both variants of astRate.
           Now only returns the second derivative if the version of astRate
           supports that.
 
