@@ -382,7 +382,6 @@
          CALL MSG_PRNT('** Error reading header info from ^INAME **')
       ENDIF
 
-      RETURN
       END
 
 *+  RAT-PUTHEAD - Create HEAD structure
@@ -516,11 +515,17 @@
 *    Local variables :
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
       INTEGER DUMMY			! Value not used
+      character*(DAT__SZNAM) name
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
+        call dat_valid(loc,valid,status)
+        print *,valid
+
 	print *,'finding ',object
-      CALL DAT_FIND(LOC,OBJECT,ALOC,STATUS)
+        call dat_name(loc,name,status)
+        print *,name
+      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
 
