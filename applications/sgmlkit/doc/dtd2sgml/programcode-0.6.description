@@ -1,0 +1,357 @@
+<!DOCTYPE dtddescription SYSTEM 'dtddescription.dtd' [
+  <!ENTITY dtdsummary SYSTEM 'programcode-0.6.dtdsummary'>
+  <!ENTITY sundtd CDATA 'sun'>
+]>
+<!-- $Id$ -->
+
+<dtddescription docelem=programcode>
+
+&dtdsummary;
+
+<element gi='argumentlist'>
+<p>The list of arguments/parameters to a function.  Note that this is
+different from the <elemref gi='parameterlist'> element, which is the
+list of parameters to an ADAM task.
+
+<attribute name='none'>
+<p>If this attribute is present, it indicates that the function has no
+arguments.  In this case, there should be no <elemref gi=parameter> content.
+
+<element gi='attribution'>
+<p>See <elemref dtd=sundtd gi='attribution'>
+
+<element gi='author'>
+<p>Describes the author of a function.
+
+<p>The <elemref self gi='author'> element includes full details about
+an author and has a required ID attribute, the <elemref
+gi='authorref'> element simply refers to an <elemref self gi='author'>
+element elsewhere using an IDREF.  We need the distinction since it
+follows from the fact that the element has a (unique) ID attribute,
+that a document can have only one <elemref self gi='author'> element
+per author.  If the actual text of a document is scattered amongst
+several source-code files, then it would be appropriate for the
+scattered files to have <elemref gi='authorref'> elements, and for the
+corresponding <elemref self gi='author'> element to be in a <elemref
+gi='codegroup'> element in a `master' file which collects together
+the source-code files for documentation purposes.
+
+<attribute name='id'>
+<p>A unique ID for the author.  This is used within <elemref
+gi='authorref'> and <elemref gi=change> elements.
+
+<attribute name='affiliation'>
+<p>An optional affiliation for the author.  It contains text such as
+`Starlink, University of Glasgow'.
+
+<attribute name='email'>
+<p>An email address for the author.
+
+<attribute name='webpage'>
+<p>A URL for the author.
+
+<element gi='authorlist'>
+<p>Contains the collection of authors who have contributed to a
+particular function.  Authors who have indirectly contributed code --
+perhaps a package you've based the function on -- can be credited in
+the <elemref gi='otherauthors'> element.
+
+<element gi='authornote'>
+<p>Optional further information about an author.  This might be
+particularly useful when the author is one of those consigned to the
+<elemref gi=otherauthors> element.
+
+<p>For example, in the DSSSL code
+written for this SGML project, the ISO standard document describing
+DSSSL was used to supply various functions which were not implemented
+as primitives in the Jade system.  The standard was therefore listed
+as an `other author' of some parts of the code, with a note explaining
+this in the <elemref self gi=authornote> element.
+
+<element gi='authorref'>
+<p>A reference to an author whose details are in the <elemref
+gi=author> element referred to by the ID attribute.
+
+<attribute name='id'>
+<p>The link to the <elemref gi=author> element.
+
+<attribute name='note'>
+<p>A note giving further information about the author, in this
+context.  For example, ISO 10179 was listed as an `author' of some of
+the routines in the DSSSL stylesheet, and this attribute was used to
+list the section of the standard where the code was defined.
+
+<element gi='blockquote'>
+<p>See <elemref dtd=sundtd gi='blockquote'>
+
+<element gi='bugs'>
+<p>A note of any bugs known in this routine.
+
+<element gi='change'>
+<p>A description of a change made to the code.
+
+<attribute name='author'>
+<p>The ID of the author who made the change, linking to a previous
+<elemref gi=author> element.
+<attribute name='date'>
+<p>The date the change was made.  Format is dd-MMM-yyyy -- a two-digit
+day of month, a three-letter abbreviation for the month (uppercase),
+and a four-digit year.
+
+<element gi='cite'>
+<p>See <elemref dtd=sundtd gi='cite'>
+<element gi='code'>
+<p>See <elemref dtd=sundtd gi='code'>
+
+<element gi='codebody'>
+<p>The actual code of the function.
+
+<attribute name='empty'>
+<p>The <elemref gi=codebody> element is required, buf if there is no
+code actually included within the document, so that the element is
+empty, then this may be indicated by the presence of this attribute.
+
+<element gi='codegroup'>
+<p>A codegroup is a collection of functions or other
+code which can sensibly be grouped together.
+There's no particular semantics implied by the
+grouping, as far as this DTD is (currently)
+concerned.
+
+<p>However, the DTDs which include this programcode DTD may add
+semantics to this element.  For example, the DSSSL DTD maps this
+element to the <code/style-specification/ element in the DSSSL architecture.
+
+<attribute name='language'>
+<p>The programming language used by the code within the group.  This
+will be set by the DTD which includes this programcode DTD, and you
+need not (indeed cannot) set it.
+
+<element gi='codeopener'>
+<p>The Traditional way of laying out functions in Starlink source code
+is to give the function declaration, then its documentation, and then
+the code body.  This element exists to reflect this.  By design, you
+will typically not need to give it explicitly.  If you do need to
+concern yourself about this (perhaps because you are generating SGML
+using a script, then the usage is:
+<example>
+   &lt;routine>
+   &lt;codeopener>
+   subroutine try
+   &lt;routineprologue>
+     &lt;routinename>try
+     ...
+   &lt;codebody>
+   print hello
+   return
+</example>
+
+<element gi='codereference'>
+<p>Make a link to code in another document.  There is no defined
+semantics attached to this link in general, but it might be used to
+document a dependency between two modules, such as a source code file
+depending on an include file.
+
+<p>The document referred to should be marked up using this programcode DTD.
+
+<p>As with the <elemref gi=codegroup> element, the DSSSL DTD adds
+semantics to this element.  It maps this element to the
+<code/external-specification/ element in the DSSSL architecture.
+
+<attribute name='docid'>
+<p>An ID within the target document, if required.
+
+<attribute name='doc'>
+<p>A subdoc entity which references the document being linked to.
+
+<element gi='colspec'>
+<p>See <elemref dtd=sundtd gi='colspec'>
+
+<element gi='copyright'>
+<p>A copyright statement attached to the code.
+
+<element gi='description'>
+<p>A detailed description of the code to follow.  If this is
+extensive, then a brief statement should be included within the
+optional <elemref gi=purpose> element.
+
+<element gi='dd'>
+<p>See <elemref dtd=sundtd gi='dd'>
+<element gi='dl'>
+<p>See <elemref dtd=sundtd gi='dl'>
+
+<element gi='docblock'>
+<p>A block of documentation, introducing either a complete document,
+or one of the <elemref gi=codegroup> or <elemref gi=codereference> blocks.
+
+<element gi='dt'>
+<p>See <elemref dtd=sundtd gi='dt'>
+<element gi='em'>
+<p>See <elemref dtd=sundtd gi='em'>
+<element gi='entry'>
+<p>See <elemref dtd=sundtd gi='entry'>
+
+<element gi='example'>
+<p>The text of an example.  This is followed by a separate description
+element.
+
+<element gi='examplelist'>
+<p>A list of examples.
+
+<element gi='funcname'>
+<p>Another function name presumably in the same collection of code.
+There are no restrictions on what function names you can list here.
+The formatting system might, for example, be able to make a link to
+the documentation of that function, if it can find it.
+
+<element gi='history'>
+<p>The change history for the document or block.  The changes should
+be in chronological order, with newest last.
+
+<element gi='implementationstatus'>
+<p>A string (I don't actually know of guidelines for what should be in
+here).
+
+
+<element gi='invocation'>
+<p>An example of how to invoke the function or task.
+
+<element gi='kbd'>
+<p>See <elemref dtd=sundtd gi='kbd'>
+<element gi='li'>
+<p>See <elemref dtd=sundtd gi='li'>
+<element gi='line'>
+<p>See <elemref dtd=sundtd gi='line'>
+<element gi='linespecific'>
+<p>See <elemref dtd=sundtd gi='linespecific'>
+<element gi='m'>
+<p>See <elemref dtd=sundtd gi='m'>
+<element gi='meqnarray'>
+<p>See <elemref dtd=sundtd gi='meqnarray'>
+<element gi='mequation'>
+<p>See <elemref dtd=sundtd gi='mequation'>
+<element gi='mlabel'>
+<p>See <elemref dtd=sundtd gi='mlabel'>
+<element gi='mline'>
+<p>See <elemref dtd=sundtd gi='mline'>
+
+<element gi='name'>
+<p>The author/function/parameter name, depending on context.
+
+<element gi='notelist'>
+<p>A list of other notes, each with an arbitrary title.
+
+<element gi='ol'>
+<p>See <elemref dtd=sundtd gi='ol'>
+
+<element gi='otherauthors'>
+<p>Other contributors to a package, with a less direct involvement with
+it than would be appropriate for inclusion in an <elemref gi=author>
+element.
+
+<element gi='othernames'>
+<p>Sometimes a function will have a generic form, as well as specific
+forms for, for example, single and double precision.  In this case,
+the function's generic name can be given in the <elemref
+gi=routinename>'s <elemref gi=name> element, and other names for it
+can be included as <elemref self gi=othernames>.
+
+<element gi='othernote'>
+<p>A note, which will be displayed in the same format as the other
+headings in this context.
+
+<element gi='p'>
+<p>See <elemref dtd=sundtd gi='p'>
+
+<element gi='parameter'>
+<p>A single parameter for a function.
+<attribute name='direction'>
+<p>Indicates whether the parameter is passed in to the function,
+set by the function, and so on.  In some languages (such as 
+DSSSL), all parameters are read-only, and so the corresponding DTD
+might default this.
+<attribute name='default'>
+<p>The default value, if this parameter is optional and omitted.
+<attribute name='optional'>
+<p>This attribute is present if the parameter is optional.
+Optional means that
+the parameter will be defaulted if omitted,
+and keyword means that the parameter is
+specified with a keyword.  Both mechanisms
+are used in both DSSSL and IDL (for
+example). 
+
+<element gi='parameterlist'>
+<p>The list of parameters to an ADAM task.  Note that this is
+different from the <elemref gi='argumentlist'> element, which is the
+list of parameters to a function.
+
+<element gi='programcode'>
+<p>The top level element
+
+<element gi='purpose'>
+<p>A brief description of the function being documented.  If this is
+missing, then the contents of the <elemref gi=description> are used
+instead, but if that element has a lot of content, then you should
+provide a <elemref self gi=purpose> element, to be used in contexts
+where only a brief function description is required.
+
+<element gi='px'>
+<p>See <elemref dtd=sundtd gi='px'>
+<element gi='quote'>
+<p>See <elemref dtd=sundtd gi='quote'>
+
+<p>The return value of a function.  If there is none, then the
+attribute none should be present.
+
+<element gi='returnvalue'>
+<p>The return value of the function.
+<attribute name='none'>
+<p>If there is no return value, then supply this attribute.
+<attribute name='type'>
+<p>A string indicating the type of the return value of the function.
+
+<element gi='routine'>
+<p>The documentation for a single routine.  Most of the element
+content of this element is optional, so it can be used equally well
+to document code which does not have things like parameters,
+returnvalues, and the like.
+
+<element gi='routinename'>
+<p>The name of the routine being documented.
+
+<element gi='routineprologue'>
+<p>This is the header which documents the routine, or other code, to follow.
+
+<element gi='row'>
+<p>See <elemref dtd=sundtd gi='row'>
+<element gi='strong'>
+<p>See <elemref dtd=sundtd gi='strong'>
+<element gi='tabular'>
+<p>See <elemref dtd=sundtd gi='tabular'>
+<element gi='tbody'>
+<p>See <elemref dtd=sundtd gi='tbody'>
+<element gi='tgroup'>
+<p>See <elemref dtd=sundtd gi='tgroup'>
+<element gi='thead'>
+<p>See <elemref dtd=sundtd gi='thead'>
+
+<element gi='title'>
+<p>The title of the document, or code block.
+
+<element gi='type'>
+<p>The type of a parameter, as a string.
+
+<element gi='ul'>
+<p>See <elemref dtd=sundtd gi='ul'>
+<element gi='url'>
+<p>See <elemref dtd=sundtd gi='url'>
+
+<element gi='usage'>
+<p>An example of the usage of this function (how is this different
+from `invocation'?)
+
+<element gi='verbatim'>
+<p>See <elemref dtd=sundtd gi='verbatim'>
+<element gi='webref'>
+<p>See <elemref dtd=sundtd gi='webref'>
