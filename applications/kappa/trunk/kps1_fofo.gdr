@@ -102,7 +102,6 @@
                                  ! part of FFT of data)
       INTEGER FM                 ! 2 * MP1H ---  reflection axis
       INTEGER FN                 ! 2 * NP1H ---  reflection axis 
-      INTEGER IFAIL              ! NAG error status
       INTEGER J                  ! Column counter
       INTEGER JLIM               ! Upper limit of J in untangling
                                  ! section
