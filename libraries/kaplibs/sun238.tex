@@ -444,7 +444,7 @@ related items to be removed.
 
 \section{Changes in Version 2.7}
 \begin{itemize}
-\item A new routine LPG_REPLA has been added. It controls a new option
+\item A new routine LPG\_REPLA has been added. It controls a new option
    which allows a single NDF to be used as both input and output for an adam task. 
    The default is for this option to be disabled.
 \end{itemize}
@@ -477,9 +477,9 @@ AST\_NORM) before writing them to the output catalogue.
 \begin{itemize}
 \item Script \verb+kaplibs_link+ has been added to enable linking of standalone 
 applications.
-\item The routine KPG1_DSFRM has been modified to include details of AST 
+\item The routine KPG1\_DSFRM has been modified to include details of AST 
 SpecFrames. \emph{The argument list has also been changed.}
-\item The routine KPG1_ASMRG has been modified to attempt alignment in 
+\item The routine KPG1\_ASMRG has been modified to attempt alignment in 
 Domain SPECTRAL.
 \end{itemize}
 
@@ -488,13 +488,13 @@ Domain SPECTRAL.
 \item The ``-nogks'' switch has been added to the
 \verb#kaplibs_link_adam# command, allowing applications to be linked with
 native PGPLOT instead of the Starlink GKS-based PGPLOT.
-\item The routine KPG1_WRLST now allows the user to choose the
+\item The routine KPG1\_WRLST now allows the user to choose the
 co-ordinate system in which the positions are stored in the catalogue
 columns. This is done using two ADAM parameters called COLFRAME and
 COLEPOCH (these names are hard-wired into the routine to encourage
 conformity). Consequently, applications which use this routine should add
 definitions for these two parameters to their IFL files.
-\item The routine KPG1_RDLST can now read positions from catalogues which
+\item The routine KPG1\_RDLST can now read positions from catalogues which
 do not contain a WCS FrameSet, in certain special cases. That is, if the
 catalogue contains columsn called RA and DEC, or X and Y. 
 \item The IRAS90 IRQ library has been included. IRQ is used to manage
@@ -503,7 +503,7 @@ textual representations of NDF Quality bits.
 
 \section{Changes in Version 2.1}
 \begin{itemize}
-\item The KPG1_CPSTY routine has been added to copy AST Plotting styles
+\item The KPG1\_CPSTY routine has been added to copy AST Plotting styles
 from one graphical element to another.
 \end{itemize}
 
