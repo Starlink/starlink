@@ -23,6 +23,10 @@
 *                          memory entries in this list are "destroyed"
 *                          and need to be restored if a second pass is
 *                          made (i.e. when run from ICL).
+*                       11/11/99 (PWD):
+*                          Stopped on-off initialisation of SKYCAT
+*                          format string. This was causing problems
+*                          under Tcl/ICL. 
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
@@ -327,13 +331,17 @@ void	initcat(picstruct *field)
         if (i>1)
            {
            fprintf(ascfile, "\t%s", key->name);
-           if (!initprintf)
-              {
+
+           /*  PWD: always initialise format for writing SKYCAT fields */
+           sprintf(gstr, "\t%s", key->printf);
+           strcpy(key->printf, gstr);
+/*            if (!initprintf) */
+/*               { */
 /* Once and once only insert \t into k->printf */
-              sprintf(gstr, "\t%s", key->printf);
-              strcpy(key->printf, gstr);
-              }
-           }
+/*                 sprintf(gstr, "\t%s", key->printf); */
+/*                 strcpy(key->printf, gstr); */
+/*               } */
+           } 
         else
            fprintf(ascfile, key->name);
         }
