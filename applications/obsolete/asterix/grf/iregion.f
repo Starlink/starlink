@@ -111,8 +111,8 @@
             CALL IREGION_WHOLE(STATUS)
           ELSEIF (MODE.EQ.'SLI') THEN
             CALL IREGION_SLICE(SUBMODE,EXCLUDE,STATUS)
-          ELSEIF (MODE.EQ.'GTE') THEN
-            CALL IREGION_GTE(SUBMODE,EXCLUDE,STATUS)
+          ELSEIF (MODE.EQ.'CON') THEN
+            CALL IREGION_CONTOUR(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'SHO') THEN
             CALL IREGION_SHOW(STATUS)
           ELSEIF (MODE.EQ.'LIS') THEN
@@ -703,7 +703,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE(MODE,EXCLUDE,STATUS)
+      SUBROUTINE IREGION_CONTOUR(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -733,12 +733,12 @@
 
         CALL USI_GET0R('LEV',LEV,STATUS)
 
-        CALL IREGION_GTE_SUB(LEV,%val(I_DPTR),MODE,EXCLUDE,
+        CALL IREGION_CONTOUR_SUB(LEV,%val(I_DPTR),MODE,EXCLUDE,
      :                               %val(I_REG_PTR),STATUS)
         I_REG_TYPE='COMPLEX'
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_GTE',STATUS)
+          CALL ERR_REP(' ','from IREGION_CONTOUR',STATUS)
         ENDIF
 
       ENDIF
@@ -748,7 +748,7 @@
 
 
 *+
-      SUBROUTINE IREGION_GTE_SUB(LEV,D,MODE,EXCLUDE,REG,STATUS)
+      SUBROUTINE IREGION_CONTOUR_SUB(LEV,D,MODE,EXCLUDE,REG,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -852,7 +852,7 @@
 
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_GTE_SUB',STATUS)
+          CALL ERR_REP(' ','from IREGION_CONTOUR_SUB',STATUS)
         ENDIF
 
       ENDIF
@@ -1126,14 +1126,14 @@ c        ENDIF
      :      MODE.EQ.'ANN'.OR.		! annulus
      :      MODE.EQ.'ELL'.OR.		! ellipse
      :      MODE.EQ.'SLI'.OR.		! rectangular slice
-     :      MODE.EQ.'GTE'.OR.		! >= level
-     :      MODE.EQ.'IMP') THEN		! ARD text
+     :      MODE.EQ.'CON') THEN		! >= level
 
            MERGE=.TRUE.
 
         ELSEIF (MODE.EQ.'WHO'.OR.
      :          MODE.EQ.'SHO'.OR.
      :          MODE.EQ.'EXP'.OR.
+     :          MODE.EQ.'CON'.OR.
      :          MODE.EQ.'INV'.OR.
      :          MODE.EQ.'LIS') THEN
 
@@ -1226,7 +1226,7 @@ c        ENDIF
      :/' CIRcle  - circular region     BOX     - box parallel to axes',
      : ' POLygon - irregular polygon   SLICE   - rectangular slice',
      : ' ANNulus - annular region      ELLipse - elliptical region',
-     : ' WHOle   - whole image         GTE     - pixels >= level',
+     : ' CONTOUR - within contour      WHOle   - whole image',
      : ' SHOw    - outline all regions LISt    - list ARD text',
      : ' IMPort  - input ARD           EXPort  - output ARD'/
       INTEGER ILINE
@@ -1266,15 +1266,18 @@ c        ENDIF
 *    Function declarations :
 *    Local constants :
       INTEGER NLINE
-      PARAMETER (NLINE=6)
+      PARAMETER (NLINE=9)
 *    Local variables :
       CHARACTER*79 TEXT(NLINE)
-     :/' ',
-     : ' ',
-     : ' ',
-     : ' ',
-     : ' ',
-     : ' '/
+     :/' NEW     - discard previous region and start new definition ',
+     : ' ADD     - add a new region to previous definition',
+     : ' OR      -  "     "    "     "    "         "',
+     : ' AND     - select only overlap of new region with existing one',
+     : ' NOT     - select pixels outside the specified region',
+     : ' EXClude -   "      "       "     "      "       "',
+     : ' ORNOT   - add pixels outside new region to existing region',
+     : ' ANDNOT  - select overlap of pixels outside new region',
+     : '           with existing region'/
       INTEGER ILINE
 *-
 
