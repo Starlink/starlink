@@ -4394,19 +4394,25 @@ sub handle_minor_options
 
 sub handle_starlink
 {
-#     &define_variable ('STAR_MANIFESTDIR'
-#     &define_variable('INSTALL_MANIFEST',
-#                      './install-with-manifest $(INSTALL)',
-#                      INTERNAL);
-#     require_variables ()
+#     my $wantmanifest = 
+#       defined($starlink_seen_features{star_defaults})
+#         && $starlink_seen_features{star_defaults};
+    my $manifestdir = var ('STAR_MANIFEST_DIR');
+    my $wantmanifest = $manifestdir;
+    my $havelatex =
+      defined($starlink_seen_features{latexdocs})
+        && $starlink_seen_features{latexdocs};
 
     $output_rules .= &file_contents ('starlink',
-                                     new Automake::Location
+                                     new Automake::Location,
+                                     INSTALLMANIFEST => $wantmanifest,
+                                     LATEXDOCS => $havelatex,
                                     );
 
     if (defined($starlink_seen_features{messgen}))
       {
-          # Generate build rules for the messgen application
+          # Generate build rules for the messgen application.
+          # The hash value consists of a list of .msg files.
           foreach my $msg (split(' ', $starlink_seen_features{messgen}))
             {
                 my $fac = '';
@@ -4463,51 +4469,6 @@ sub handle_starlink
     &define_variable ('INSTALL_STARDATA',
                       '$(INSTALL_DATA)',
                       INTERNAL);
-    
-    # The variable and installation work below isn't entirely
-    # dissimilar to am_install_var(), except that here we don't
-    # actually expose the *_STAR variables in the Makefile.am file,
-    # and so don't actually use `STAR' as a `primary'.
-    #
-#     foreach my $extradir (sort keys %starlink_extra_dirs)
-#       {
-#           my $Extradir = $extradir;
-#           $Extradir =~ tr /a-z/A-Z/;
-#           my $name = 'STAR_' . $Extradir . '_DIR';
-#           # This is almost define_pretty_variable, except that the $cond is
-#           # always true, and the `owner' is VAR_CONFIGURE, not VAR_AUTOMAKE
-#           if (! vardef ($name, TRUE))
-#             {
-#                 Automake::Variable::define ($name,
-#                                             VAR_CONFIGURE,
-#                                             '',
-#                                             TRUE,
-#                                             subst $name,
-#                                             '',
-#                                             INTERNAL,
-#                                             VAR_PRETTY);
-#                 rvar($name)->rdef(TRUE)->set_seen;
-#             }
-#
-#           $output_rules .= &file_contents ('data', INTERNAL,
-#                                            INSTALL => 1,
-#                                            BASE => 1,
-#                                            EXEC => 0,
-#                                            DIR => $extradir,
-#                                            NDIR => $extradir,
-#                                            PRIMARY => 'STAR',
-#                                            ONE_PRIMARY => 'STAR',
-#                                            DIST => 0,
-#                                            DISTVAR => '', # redundant
-#                                           )
-#             if $starlink_extra_dirs{$extradir};
-#       }
-#
-#     # The above produces install rules which do their installation
-#     # using $(INSTALL_STAR): give this a value (we could hack it by
-#     # setting ONE_PRIMARY to 'DATA', but that's unlikely to be
-#     # robust).
-#     &define_variable('INSTALL_STAR', '$(INSTALL_DATA)', INTERNAL);
 }
 
 ################################################################
@@ -4613,8 +4574,9 @@ sub scan_autoconf_traces ($)
 		m4_include => 1,
 		m4_sinclude => 1,
 		sinclude => 1,
+                STAR_DEFAULTS => 0,
+                STAR_LATEX_DOCUMENTATION => 1,
                 STAR_MESSGEN => 1,
-#                _STAR_EXTRADIR_COMMON => 1,
 	      );
 
   my $traces = ($ENV{AUTOCONF} || 'autoconf') . " ";
@@ -4775,6 +4737,14 @@ sub scan_autoconf_traces ($)
 		if $mtime > $configure_deps_greatest_timestamp;
 	    }
 	}
+      elsif ($macro eq 'STAR_DEFAULTS')
+        {
+            $starlink_seen_features{star_defaults} = 1;
+        }
+      elsif ($macro eq 'STAR_LATEX_DOCUMENTATION')
+        {
+            $starlink_seen_features{latexdocs} = 1;
+        }
       elsif ($macro eq 'STAR_MESSGEN')
         {
             if (defined($starlink_seen_features{messgen}))
@@ -4786,11 +4756,6 @@ sub scan_autoconf_traces ($)
                   $starlink_seen_features{messgen} = $args[1];
               }
         }
-#       elsif ($macro eq '_STAR_EXTRADIR_COMMON')
-#         {
-#           print "seen _STAR_EXTRADIR_COMMON($args[1])\n";
-#           $starlink_extra_dirs{$args[1]} = 1;
-#         }
   }
 
   $tracefh->close;
@@ -4899,20 +4864,7 @@ sub check_startree_standards
     {
       # In top level (or only) directory
       #print "Check startree standards\n";
-#      require_conf_file ("$am_file.am", STARTREE, 'install-with-manifest');
     }
-  # Note that we want a STAR_MANIFEST_DIR created, but don't automatically
-  # create a target which installs into it.
-#                 Automake::Variable::define ($name,
-#                                             VAR_CONFIGURE,
-#                                             '',
-#                                             TRUE,
-#                                             subst $name,
-#                                             '',
-#                                             INTERNAL,
-#                                             VAR_PRETTY);
-#                 rvar($name)->rdef(TRUE)->set_seen;
-#  $starlink_extra_dirs{manifest} = 0;
 }
 
 # Do any extra checking for GNU standards.
