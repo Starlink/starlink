@@ -350,19 +350,22 @@ int main (int argc, char **argv)
         }
     }
 
+    /* Perform the SIGFPE-on-denormalized test; we examine the results later */
     sigfpe_on_denormalized_test();
 
     /*
      * Set the precisions (globally, so they're visible in par_f).
      *
-     * IEEE single- and double-precision floating point requires 9 and
-     * 17 decimal digits, respectively, in order that any decimal
-     * number represent one and only one binary number.  The argument
-     * is not obvious (it's not just ceil(-log10(epsilon)), for
-     * example), and is given in, for example, David Goldberg, `What
-     * every computer scientist should know about floating-point
-     * arithmetic', Computing Surveys, March 1991 (reprinted in Sun's
-     * `Numerical Computation Guide' for example).  Note that these
+     * IEEE single- and double-precision floating point require 6-9
+     * and 15-17 significant digits, respectively, in order that any
+     * decimal number represent one and only one binary number.  The
+     * argument is not trivial -- it's not just ceil(-log10(epsilon)),
+     * for example -- and is given in, for example, David Goldberg,
+     * `What every computer scientist should know about floating-point
+     * arithmetic' (section `Binary to decimal conversion'), Computing
+     * Surveys, March 1991, reprinted in Sun's `Numerical Computation
+     * Guide' (see pp18-22 and pp214-6; on the web at
+     * <http://docs.sun.com/app/docs/doc/806-7996>).  Note that these
      * numbers include the leading digit, so that the number of
      * decimal places which should be printed is xxx_precision-1.
      *
@@ -916,13 +919,20 @@ void par_fp(const int size, const char* name, void* valp)
 #endif /* TEST_CODE */
 
     if (COutput) {
+        /* 
+         * The values {float,double}_precision indicate the maximum
+         * number of significant figures required to represent a
+         * float uniquely as a decimal.  The number of decimal places
+         * required (this is what `precision' specifies for the %e
+         * format) is therefore one less than this.
+         */
         if (issingle)
             /* Include trailing F to indicate a single-precision constant */
             fprintf(COutput, "#define %s %.*eF\n",
-                    name, float_precision, N.v.f);
+                    name, float_precision-1, N.v.f);
         else
             fprintf(COutput, "#define %s %.*le\n",
-                    name, double_precision, N.v.d);
+                    name, double_precision-1, N.v.d);
     }
 }
 
