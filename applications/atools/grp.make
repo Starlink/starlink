@@ -20,7 +20,7 @@ astskyframe.ifl astskyframe.f asttest.f asttest.ifl astunitmap.f \
 astunitmap.ifl atl1_gtgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
 atl1_ptobj.f atl1_rm.c atl1_setop.f atlhelp.f atlhelp.ifl atools.csh \
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
-kpg1_gtgrp.f
+kpg1_gtgrp.f atl1_rdgrp.f
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc astaddframe.par astclear.par astget.par astset.par \
