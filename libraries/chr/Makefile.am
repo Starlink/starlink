@@ -53,3 +53,8 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
         test_ucase.f test_upper.f test_wild.f 
 
+TESTS = chr_test
+check_PROGRAMS = chr_test
+
+chr_test_SOURCES = chr_test.f $(TEST_ROUTINES)
+chr_test_LDADD = libchr.la
