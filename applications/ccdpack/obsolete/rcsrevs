@@ -1,9 +1,9 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V4.0-14.
+#  Package CCDPACK version V4.0-16.
 #  
-makefile: 1.85
+makefile: 1.88
 mk: 1.5
-sun139.tex: 1.109
+sun139.tex: 1.113
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -12,7 +12,7 @@ sun139driz.eps: 1.1
 sun139outsky.eps: 1.2
 sun139outclear.eps: 1.3
 sun139outim.eps: 1.2
-ccdpack.news: 1.52
+ccdpack.news: 1.56
 ccdhelp.f: 1.1
 gethlp.f: 1.1
 gthlpi.f: 1.1
@@ -43,9 +43,9 @@ ccdpack_red.f: 1.2
 ccdpack_reg.f: 1.9
 ccdpack_res.f: 1.3
 ccdpack_scr.f: 1.3
-ccdpack.hlp: 1.84
+ccdpack.hlp: 1.89
 ccdwish.c: 1.15
-grf_ccdpack.c: 1.1
+grf_ccdpack.c: 1.2
 ccdpack.ifd: 1.15
 makebias.ifd: 1.7
 debias.ifd: 1.7
@@ -89,13 +89,13 @@ ccdalign.ifd: 1.12
 xreduce.ifd: 1.2
 ccdhelp.ifd: 1.2
 ccdfork: 1.1
-ccdexercise: 1.9
-wcsexercise: 1.11
-setexercise: 1.9
+ccdexercise: 1.10
+wcsexercise: 1.12
+setexercise: 1.10
 ccdpack_back: 1.1
 xreduce: 1.3
 ccdexecute: 1.2
-ccdwww: 1.1
+ccdwww: 1.2
 geometry: 1.1
 ccdpack_ex1.csh: 1.1
 ccdpack_ex2.csh: 1.1
@@ -159,7 +159,7 @@ CCDGetFileUpdate.tcl: 1.4
 CCDIssueError.tcl: 1.4
 CCDIssueInfo.tcl: 1.3
 CCDLocateHelpFile.tcl: 1.1
-CCDMain.tcl: 1.6
+CCDMain.tcl: 1.7
 CCDMakeUnique.tcl: 1.1
 CCDMonitorTask.tcl: 1.3
 CCDNDFDoImport.tcl: 1.5
@@ -183,7 +183,7 @@ CCDSaveRestoreFile.tcl: 1.2
 CCDSetCCDGlobals.tcl: 1.4
 CCDSetGenGlobals.tcl: 1.3
 CCDSetIconBitmap.tcl: 1.2
-CCDShowHelp.tcl: 1.2
+CCDShowHelp.tcl: 1.3
 CCDTaskError.tcl: 1.2
 CCDUpdateColourLists.tcl: 1.1
 CCDUpdateFactorLists.tcl: 1.1
@@ -218,7 +218,7 @@ CCDGetColour.tcl: 1.2
 CCDMax.tcl: 1.1
 CCDMin.tcl: 1.1
 CCDRestartTask.tcl: 1.1
-CCDGeometryMain.tcl: 1.4
+CCDGeometryMain.tcl: 1.5
 CCDTaskRegistry.tcl: 1.2
 CCDTaskStart.tcl: 1.1
 CCDCheckReduce.tcl: 1.1
@@ -226,7 +226,7 @@ CCDInitialize.tcl: 1.2
 CCDTaskQuery.tcl: 1.1
 CCDGeomSetPercent.tcl: 1.2
 CCDExit.tcl: 1.4
-CCDFileMonitorMain.tcl: 1.3
+CCDFileMonitorMain.tcl: 1.4
 CCDDoPresent.tcl: 1.1
 CCDTkWidget.tcl: 1.1
 CCDCcdWidget.tcl: 1.1
@@ -316,7 +316,7 @@ ccd1_decl4.f: 1.1
 ccd1_dlcat.f: 1.1
 ccd1_dmprg.f: 1.3
 ccd1_docmp.f: 1.1
-ccd1_domos.f: 1.6
+ccd1_domos.f: 1.7
 ccd1_drawa.f: 1.1
 ccd1_dtrn.f: 1.2
 ccd1_duesc.f: 1.1
@@ -748,14 +748,14 @@ flatcor.f: 1.12
 findcent.f: 1.12
 idicurs.f: 1.26
 findobj.f: 1.13
-register.f: 1.36
+register.f: 1.38
 tranlist.f: 1.12
 plotlist.f: 1.14
 findoff.f: 1.38
 pairndf.f: 1.33
 ccdedit.f: 1.6
 makemos.f: 1.17
-tranndf.f: 1.16
+tranndf.f: 1.18
 drizzle.f: 1.24
 astimp.f: 1.21
 astexp.f: 1.21
@@ -823,7 +823,7 @@ processing_lists_of_data.hlp: 1.2
 ccdshow.hlp: 1.5
 reduce.hlp: 1.2
 command_descriptions.hlp: 1.4
-register.hlp: 1.9
+register.hlp: 1.10
 debias.hlp: 1.7
 schedule.hlp: 1.3
 findcent.hlp: 1.4
