@@ -276,14 +276,14 @@ KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
 fc_lut.sdf.alpha_OSF1 heat_lut.sdf.alpha_OSF1 ikon_lut.sdf.alpha_OSF1 \
 ramps_lut.sdf.alpha_OSF1 spectrum_lut.sdf.alpha_OSF1 zebra_lut.sdf.alpha_OSF1 \
 ccdframec.sdf.alpha_OSF1 comwest.sdf.alpha_OSF1 spectrum.sdf.alpha_OSF1 \
-m31.sdf.alpha_OSF1
+m31.sdf.alpha_OSF1 iras.sdf.alpha_OSF1
 
 # The contents of the kappa_data_ix86_Linux.tar file:
 KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf.ix86_Linux ccdframec.sdf.ix86_Linux \
 comwest.sdf.ix86_Linux cont_lut.sdf.ix86_Linux fc_lut.sdf.ix86_Linux \
 heat_lut.sdf.ix86_Linux ikon_lut.sdf.ix86_Linux ramps_lut.sdf.ix86_Linux \
 spectrum.sdf.ix86_Linux spectrum_lut.sdf.ix86_Linux zebra_lut.sdf.ix86_Linux \
-m31.sdf.ix86_Linux
+m31.sdf.ix86_Linux iras.sdf.ix86_Linux
 
 # The contents of the kappa_data_sun4_Solaris.tar file:
 KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf.sun4_Solaris \
@@ -291,7 +291,7 @@ ccdframec.sdf.sun4_Solaris comwest.sdf.sun4_Solaris cont_lut.sdf.sun4_Solaris \
 fc_lut.sdf.sun4_Solaris heat_lut.sdf.sun4_Solaris ikon_lut.sdf.sun4_Solaris \
 ramps_lut.sdf.sun4_Solaris spectrum.sdf.sun4_Solaris \
 spectrum_lut.sdf.sun4_Solaris zebra_lut.sdf.sun4_Solaris \
-m31.sdf.sun4_Solaris
+m31.sdf.sun4_Solaris iras.sdf.sun4_Solaris
 
 
 # The contents of the kappa_ifls.tar file:
