@@ -71,6 +71,7 @@
  *     23-MAR-2004 (TIMJ):
  *        Add search for _ext external data files to be concatenated
  *        with the MESSGEN error codes.
+ *        Allow the error id to have an underscore (eg VD_SAVNOTALL)
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -304,7 +305,7 @@ process_file(char *filename)
 		return;
 	    }
 	    p = buffer;
-	    while(isalnum(*p)) {
+	    while(isalnum(*p) || *p == '_') {
 		message_ident[p-buffer] = *p;
 		p++;
 	    }
