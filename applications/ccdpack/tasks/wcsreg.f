@@ -77,9 +77,9 @@
 *        (the indirection character is "^").
 *
 *        If the application is successful, a new frame with a domain
-*        determined by the OUTDOMAIN parameter will be added containing
-*        the alignment information.  This frame will be made the new 
-*        Current domain.
+*        determined by the OUTDOMAIN parameter will be added to each of
+*        the IN files containing the alignment information.  This frame 
+*        will be made the new Current frame.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -124,10 +124,12 @@
 *        [FALSE]
 *     REFPOS = _INTEGER (Read)
 *        The position within the IN list which corresponds to the 
-*        reference NDF.  For each domain in DOMAINS, alignment will
-*        be attempted with the reference NDF first, and the mapping 
-*        between the output frame and the first matching name in 
-*        DOMAINS is a unit mapping.
+*        reference NDF.  The registration frame is a copy of (and 
+*        unitmapped to) the Current frame of the reference NDF,
+*        and for each other NDF the program tries to find a path from
+*        it to the reference NDF going from one NDF to another only
+*        when they both have frames in the same one of the entries in
+*        the DOMAINS list. 
 *        [1]
 
 *  Examples:
@@ -318,6 +320,12 @@
 *  It takes the value of the frameset's initial Current frame.
       JREF = AST_GETI( IWCS( REFPOS ), 'Current', STATUS )
 
+*  Construct the output registration frame as a doctored copy of the 
+*  Current frame of the reference NDF.
+      OUTFR = AST_GETFRAME( IWCS( REFPOS ), JREF, STATUS )
+      CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
+      CALL AST_SETC( OUTFR, 'Domain', OUTDM, STATUS )
+
 *  Check that the reference NDF has at least one frame in the supplied
 *  domain list.
       CALL CCD1_FRDM( IWCS( REFPOS ), DMNLST, JLST, STATUS )
@@ -375,11 +383,6 @@
             GO TO 99
          END IF
       END IF
-
-*  Construct the new frame.
-      OUTFR = AST_FRAME( 2, ' ', STATUS )
-      CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
-      CALL AST_SETC( OUTFR, 'Domain', OUTDM, STATUS )
 
 *  Exit if there's trouble.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
