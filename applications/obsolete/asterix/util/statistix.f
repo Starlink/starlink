@@ -140,6 +140,8 @@
 *        Updated data interface
 *     30 Aug 1995 V2.0-0 (DJA):
 *        Full ADI port.
+*      9 Feb 1996 V2.0-1 (DJA):
+*        Protect against nvalid = 1 in chi-squared calculation
 *     {enter_changes_here}
 
 *  Bugs:
@@ -160,7 +162,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'STATISTIX Version V2.0-0' )
+        PARAMETER		( VERSION = 'STATISTIX Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*150          PATH               ! HDS path to input object
@@ -1069,7 +1071,7 @@
 
 *    Calculate reduced chi square for fit of data to mean.
       CHISQUARE = 0.0D0
-      IF ( VAROK ) THEN
+      IF ( VAROK .AND. (NVALID .GT. 1) ) THEN
         DO I = 1, N
           IF ( WGT(I) .GT. 0.0D0 ) THEN
             CHISQUARE = CHISQUARE + ((DATA(I)-MEAN)**2 * WGT(I))
@@ -1078,10 +1080,8 @@
         CHISQUARE = CHISQUARE / ( DBLE(NVALID) - 1.0D0 )
 
 *      Calculate Equivalent normal Z
-        IF ( NVALID .GT. 0 ) THEN
-          ENZ = SQRT(2*CHISQUARE*(DBLE(NVALID)-1.0D0))-
+        ENZ = SQRT(2*CHISQUARE*(DBLE(NVALID)-1.0D0))-
      :               SQRT(2*(DBLE(NVALID)-1.0D0)-1.0D0)
-        END IF
 
       END IF
 

@@ -64,6 +64,7 @@
 *      4 May 94 : V1.7-3  Upgraded i.o to use AIO (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *      8 Feb 95 : V1.8-1  Fixed bug in multi-page output (DJA)
+*      8 Feb 1996 : V1.8-2 Use new USI routine (DJA)
 *
 *    Type definitions :
 *
@@ -131,6 +132,7 @@
       INTEGER               NSRC                      ! # sources in SSDS
       INTEGER               NFLD                      ! # fields to display
       INTEGER               NFLDF                     ! Filtered NFLD
+      INTEGER			SFID			! Input file id
 
       LOGICAL               DOERR                     ! Output field errors?
       LOGICAL               HEADER                    ! Display a header?
@@ -143,7 +145,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSDUMP Version 1.8-0' )
+        PARAMETER           ( VERSION = 'SSDUMP Version 1.8-2' )
 *-
 
 *    Check status
@@ -161,15 +163,16 @@
       CALL CHR_FILL( '-', DASHES )
 
 *    Get input object from user
-      CALL SSO_ASSOCI( 'INP', 'READ', SLOC, IS_SET, STATUS )
+      CALL USI_ASSOC( 'INP', 'SSDS', 'READ', SFID, STATUS )
+      CALL ADI1_GETLOC( SFID, SLOC, STATUS )
 
-*    Check for POSIT structure, otherwise nothing much to report
-      CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+*  Get number of sources
+      CALL SSI_GETNSRC( SFID, NSRC, STATUS )
 
-*    Output field errors?
+*  Output field errors?
       CALL USI_GET0L( 'ERRORS', DOERR, STATUS )
 
-*    Open device
+*  Open device
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
 *    Locate book-keeping structure
@@ -451,7 +454,7 @@
       END IF
 
 *    Close
- 69   CALL SSO_RELEASE( SLOC, STATUS )
+ 69   CALL SSI_RELEASE( SFID, STATUS )
 
 *    Close output channel
       CALL AIO_CANCL( 'DEV', STATUS )

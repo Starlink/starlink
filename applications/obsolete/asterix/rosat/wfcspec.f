@@ -291,8 +291,8 @@
 *    Check that it has been normalised to count/sec
         CALL PRF_GET( IFID, 'CORRECTED.EXPOSURE', EXPCOR, STATUS )
         IF ( .NOT. EXPCOR ) THEN
-          CALL MSG_PRNT( '!! WARNING : Data does not appear to '/
-     :                   /'exposure corrected', STATUS )
+          CALL MSG_PRNT( '!! WARNING : Data does not appear to be '/
+     :                   /'exposure corrected' )
         END IF
 
 *    Check for variance and quality

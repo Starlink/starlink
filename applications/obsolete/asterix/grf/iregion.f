@@ -25,6 +25,7 @@
       CHARACTER*16 CMD
       CHARACTER*8 MODE,SUBMODE
       INTEGER RPTR
+      INTEGER ID
       LOGICAL EXCLUDE
       LOGICAL MERGE
 *    Version :
@@ -122,6 +123,13 @@
           CALL DYN_UNMAP(I_REG_PTR,STATUS)
           I_REG_PTR=RPTR
         ENDIF
+
+*  if running from GUI - save region type to noticeboard
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'REGION',ID,STATUS)
+          CALL NBS_PUT_CVALUE(ID,0,I_REG_TYPE,STATUS)
+        ENDIF
+
 
       ENDIF
 
