@@ -47,15 +47,8 @@ set keepard = TRUE
 
 
 #  Initialize starlink environment
-#debug
-      set ccdpack_dir = $CCDPACK_DIR
-      set kappa_dir = $KAPPA_DIR
-
       source /star/etc/cshrc
       source /star/etc/login
-#debug
-      setenv CCDPACK_DIR $ccdpack_dir
-      setenv KAPPA_DIR $kappa_dir
 
 #  Ensure CCDPACK commands are available
       ccdpack
@@ -224,13 +217,6 @@ set keepard = TRUE
      	       file=ccdtest_obj.dat \
      	       accept
 #           end ccdgenerate
-
-#  Temporary fix for inconsistent versions of CCDPACK on Sun and Linux:
-            foreach digit (1 2 3 4)
-               if -e BIAS${digit}.sdf mv BIAS${digit}.sdf bias${digit}.sdf
-               if -e DATA${digit}.sdf mv DATA${digit}.sdf data${digit}.sdf
-               if -e   FF${digit}.sdf mv   FF${digit}.sdf   ff${digit}.sdf
-            end
 
 #  Apply masking directly to the frames if we're not using the ARD file
 #  implicitly
