@@ -1,0 +1,31 @@
+INTERFACE SSHOW
+
+   PARAMETER FIT_MOD
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      ASSOCIATION '<-GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object to contain spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER DEVICE
+     POSITION 2
+     KEYWORD 'DEV'
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     DEFAULT 'TERMINAL'
+     PROMPT 'Output to'
+     HELP 'Valid responses :TERMINAL,PRINTER,OLDFILE,NEWFILE,filename'
+   ENDPARAMETER
+
+   PARAMETER GENUS
+      TYPE 'LITERAL'
+      KEYWORD 'GEN'
+      DEFAULT 'SPEC'
+      VPATH 'DEFAULT,NOPROMPT'
+   ENDPARAMETER
+
+ENDINTERFACE

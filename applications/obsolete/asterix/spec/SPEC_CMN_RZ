@@ -1,0 +1,12 @@
+*+  SPEC_CMN_RZ - common block for RZ grids
+*
+*  Global variables :
+      CHARACTER*(DAT__SZLOC) 	S_RZLOC(NDSMAX)		! RZ cube locators
+      REAL			S_TLO, S_THI		! Temp extrema
+      INTEGER			S_NTLO, S_NTHI		! Error counts
+      LOGICAL			S_EBUF			! Error buffering on?
+      LOGICAL			S_FIRST			! First time through?
+
+      COMMON /SPEC_CMN_RZ/ 	S_FIRST, S_EBUF, S_TLO,
+     :                          S_THI, S_NTLO, S_NTHI
+      COMMON /SPEC_CMN_RZ_C/ 	S_RZLOC

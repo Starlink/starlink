@@ -1,0 +1,41 @@
+*+  SPLOT_CMN - common blocks for SPLOT
+
+      CHARACTER*(DAT__SZLOC) DSLOC
+      INTEGER NDS				! number of datasets
+      INTEGER NVAL,NFIT				! num. data and model values
+      INTEGER IDPTR				! pointer to input data
+      INTEGER IVPTR				! pointer to input var.
+      INTEGER IFPTR				! pointer to input fit
+      INTEGER DDPTR,DVPTR,DXPTR,DWPTR,DQPTR	! pointers to data space
+						! data
+      INTEGER DFDPTR				! pointer to fit data
+      INTEGER DRDPTR				! pointer to residuals
+      INTEGER PDPTR,PVPTR,PXPTR,PWPTR		! pointers to photon-space
+						! data
+      INTEGER PFDPTR,PFXPTR			! pointers to photon-space
+						! fit
+      INTEGER PIDPTR				! pointer to fit data
+						! interpolated to data
+						! bin centres
+      INTEGER PRDPTR,PRVPTR,PRQPTR		! pointers to photon-space
+						! residuals
+      INTEGER MCDPTR(MAXCOMP)			! model component data ptrs.
+      INTEGER MTDPTR				! total model data pointer
+      INTEGER MCXPTR				! x-axis for model plot
+      INTEGER ELPTR,EUPTR			! energy channel boundaries
+						! for model plot
+
+      LOGICAL VOK,QOK
+      LOGICAL DPLOT,PPLOT,DRPLOT,PRPLOT
+      LOGICAL MPLOT,EAXIS,LOGAX,OVERLAY
+      BYTE MASK
+
+      COMMON /SPLOT_CMN/ NDS,NVAL,NFIT,DDPTR,DVPTR,DXPTR,DWPTR,DQPTR,
+     :                   DFDPTR,DRDPTR,PDPTR,PVPTR,PXPTR,PWPTR,
+     :                   PFDPTR,PFXPTR,PIDPTR,PRDPTR,PRVPTR,PRQPTR,
+     :                   MCXPTR,MCDPTR,MTDPTR,ELPTR,EUPTR,
+     :                   IDPTR,IVPTR,IFPTR,VOK,QOK,
+     :                   DPLOT,PPLOT,DRPLOT,PRPLOT,MPLOT,EAXIS,
+     :                   LOGAX,OVERLAY,
+     :                   MASK
+      COMMON /SPLOT_CMN_C/ DSLOC

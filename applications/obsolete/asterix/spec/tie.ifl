@@ -1,0 +1,57 @@
+INTERFACE TIE
+
+   PARAMETER FIT_MOD
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object containing fit model specification'
+   ENDPARAMETER
+
+   PARAMETER ADD
+      TYPE '_LOGICAL'
+      DEFAULT N
+      PROMPT 'Add a tie'
+      VPATH 'DEFAULT'
+      PPATH 'DEFAULT'
+      HELP  'If specified, add a new tie to the tie list'
+   ENDPARAMETER
+
+   PARAMETER SHOW
+      TYPE '_LOGICAL'
+      DEFAULT N
+      PROMPT 'Show tie(s)'
+      VPATH 'DEFAULT'
+      PPATH 'DEFAULT'
+      HELP  'If specified, list ties in the model specification'
+   ENDPARAMETER
+
+   PARAMETER CANCEL
+      TYPE '_LOGICAL'
+      DEFAULT N
+      PROMPT 'Cancel tie(s)'
+      VPATH 'DEFAULT'
+      PPATH 'DEFAULT'
+      HELP  'If specified, removed specified ties.'
+   ENDPARAMETER
+
+   PARAMETER NUM
+      POSITION 1
+      TYPE 'LITERAL'
+      DEFAULT '*'
+      PROMPT 'Tie numbers'
+      PPATH 'DYNAMIC,DEFAULT'
+      HELP 'Tie numbers to cancel or display'
+   ENDPARAMETER
+
+   PARAMETER PARS
+      POSITION 2
+      TYPE '_INTEGER'
+      PROMPT 'Parameters to tie together'
+      VPATH 'PROMPT'
+      HELP 'Parameters specified will be tied together'
+   ENDPARAMETER
+
+ENDINTERFACE

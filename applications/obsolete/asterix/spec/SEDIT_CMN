@@ -1,0 +1,23 @@
+*+  SEDIT_CMN - Common block for SEDIT application
+*
+*    Author :
+*
+*     David J. Allan (ROSAT,BHVAD::DJA)
+*
+*    History :
+*
+*      4 Aug 93 : Original (DJA)
+*-
+
+      INTEGER         W_STATUS, W_BIG, W_HELP, W_DISP
+      INTEGER         SNX, SNY, DNX, DNY
+      LOGICAL         SCREEN
+      CHARACTER*128   DLINE(NPAMAX+MAXCOMP)
+      INTEGER         FLINE(MAXCOMP)
+      INTEGER         NPAR(MAXCOMP), NCOMP
+      INTEGER         DSTART, NLINE, CLINE, CCOL
+      COMMON          /SEDIT_CMN/ W_STATUS, W_BIG, W_HELP,
+     :                  W_DISP, SNX, SNY, DNX, DNY, SCREEN,
+     :                  DSTART, NLINE, FLINE, NPAR, CLINE,
+     :                  NCOMP, CCOL
+      COMMON          /SEDIT_CMNC/ DLINE

@@ -1,0 +1,31 @@
+INTERFACE FREEZE
+
+   PARAMETER FIT_MOD
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object containing fit model specification'
+   ENDPARAMETER
+
+   PARAMETER PARAMS
+      POSITION 1
+      TYPE '_INTEGER'
+      KEYWORD 'PAR'
+      PROMPT 'Parameter numbers'
+      HELP 'Numbers of parameters to be frozen (in square brackets if >1)'
+   ENDPARAMETER
+
+   PARAMETER VALS
+      POSITION 2
+      TYPE '_REAL'
+      KEYWORD 'VALS'
+      PROMPT 'Parameter values'
+      VPATH 'DEFAULT'
+      DEFAULT !
+      HELP 'New values for parameters to be frozen (in square brackets if >1)'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,77 @@
+INTERFACE SPLOT
+
+   PARAMETER INP
+      TYPE 'UNIV'
+      KEYWORD 'INP'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      PROMPT 'Data'
+      HELP 'Either a single dataset, or an object containing refs to datasets'
+   ENDPARAMETER
+   PARAMETER ELOW
+      TYPE '_REAL'
+      PROMPT 'Lower energy bound'
+   ENDPARAMETER
+   PARAMETER EUPP
+      TYPE '_REAL'
+      PROMPT 'Upper energy bound'
+   ENDPARAMETER
+   PARAMETER NCHAN
+      TYPE '_INTEGER'
+      DEFAULT 100
+      PROMPT 'Number of energy channels'
+   ENDPARAMETER
+   PARAMETER REDSHIFT
+      TYPE '_REAL'
+      KEYWORD 'Z'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      HELP 'Redshift applied to source spectrum (plot will be as observed here)'
+   ENDPARAMETER
+
+   PARAMETER FIT_MOD
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Name of data object containing model specification'
+   ENDPARAMETER
+
+   PARAMETER MODE
+      POSITION 1
+      TYPE 'LITERAL'
+      PPATH 'DYNAMIC'
+      PROMPT 'Plot mode'
+      HELP 'Reply with HELP for a full list'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      TYPE 'UNIV'
+      KEYWORD 'OUT'
+      ASSOCIATION '->GLOBAL.BINDS'
+      PROMPT 'Output'
+      HELP 'Name of graphical dataset to be produced'
+   ENDPARAMETER
+
+   PARAMETER SAVE
+     TYPE '_LOGICAL'
+     VPATH 'DEFAULT'
+     DEFAULT N
+     PROMPT 'Save mode'
+     HELP 'Save to multiple dataset instead of plotting directly'
+  ENDPARAMETER
+
+  PARAMETER DEV
+    TYPE '_CHAR'
+    PROMPT 'Device'
+    PPATH 'Current'
+    HELP 'Graphics device to plot to'
+  ENDPARAMETER
+
+
+ENDINTERFACE

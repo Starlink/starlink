@@ -1,0 +1,29 @@
+interface SBIN
+  parameter INP
+    position 1
+    type 'UNIV'
+    prompt 'Input'
+    help 'Name of HDS dataset or structure containing input spectrum'
+  endparameter
+  parameter OUT
+    position 2
+    type 'UNIV'
+    prompt 'Output'
+    help 'HDS file to contain rebinned output spectrum'
+  endparameter
+  parameter OPT
+    position 3
+    type '_INTEGER'
+    default 1
+    prompt 'Mode option'
+    help '1= specify no. of bins   2= specify min. bin content'
+  endparameter
+  parameter NBIN
+    type '_INTEGER'
+    prompt 'Number of bins'
+  endparameter
+  parameter MIN
+    type '_REAL'
+    prompt 'Minimum bin content'
+  endparameter
+endinterface

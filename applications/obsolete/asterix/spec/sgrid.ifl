@@ -1,0 +1,320 @@
+INTERFACE SGRID
+
+   PARAMETER LIK
+      TYPE '_LOGICAL'
+      KEYWORD 'LIK'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+      HELP 'Likelihood (Y) or chis-squared (N) fit?'
+   ENDPARAMETER
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'INP'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      PROMPT 'Data'
+      HELP 'Either a single spectrum, or an object containing refs to spectra'
+   ENDPARAMETER
+
+   PARAMETER REDSHIFT
+      TYPE '_REAL'
+      KEYWORD 'Z'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      HELP 'Redshift to be applied to source spectrum'
+   ENDPARAMETER
+
+   PARAMETER FIT_MOD
+      POSITION 2
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Name of data object containing spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER PARS
+      POSITION 3
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Fit parameter for grid axes'
+      HELP   'Enter parameter numbers separated by commas or spaces'
+   ENDPARAMETER
+
+   PARAMETER ERR
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT,PROMPT'
+      PPATH 'DEFAULT'
+      DEFAULT N
+      PROMPT 'Axis ranges from 1 sigma error bounds'
+      help 'Take default axis ranges from parameter errors rather than allowed range'
+   ENDPARAMETER
+
+   PARAMETER AXIS1
+      TYPE   'LITERAL'
+      PROMPT 'Range of 1st grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS2
+      TYPE 'LITERAL'
+      PROMPT 'Range of 2nd grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS3
+      TYPE 'LITERAL'
+      PROMPT 'Range of 3rd grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS4
+      TYPE 'LITERAL'
+      PROMPT 'Range of 4th grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS5
+      TYPE 'LITERAL'
+      PROMPT 'Range of 5th grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS6
+      TYPE 'LITERAL'
+      PROMPT 'Range of 6th grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER AXIS7
+      TYPE 'LITERAL'
+      PROMPT 'Range of 7th grid axis'
+      VPATH  'PROMPT'
+      PPATH  'DYNAMIC'
+      HELP   'Enter in standard range format, ie. lo:hi'
+   ENDPARAMETER
+
+   PARAMETER NBIN1
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 1st axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN2
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 2nd axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN3
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 3rd axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN4
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 4th axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN5
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 5th axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN6
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 6th axis'
+   ENDPARAMETER
+
+   PARAMETER NBIN7
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PROMPT 'Number of grid values in 7th axis'
+   ENDPARAMETER
+
+   PARAMETER LOG1
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 1st axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG2
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 2nd axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG3
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 3rd axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG4
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 4th axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG5
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 5th axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG6
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 6th axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER LOG7
+      TYPE '_LOGICAL'
+      DEFAULT N
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Logarithmic spaced bins in 7th axis'
+      HELP 'If specified, then bins are equally spaced in log(parameter) value'
+   ENDPARAMETER
+
+   PARAMETER GPARS
+      TYPE '_INTEGER'
+      DEFAULT 0
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      PROMPT 'Parameter(s) to be gridded (0 for fit statistic)'
+      HELP   'Enter integer values separated by spaces/commas, eg. 0,2,3'
+   ENDPARAMETER
+
+   PARAMETER MAX_IT
+      TYPE '_INTEGER'
+      KEYWORD 'MAX'
+      VPATH 'CURRENT,PROMPT'
+      PROMPT 'Max. no. of iterations'
+      HELP 'Program will terminate after N iterations, but can be reinvoked'
+   ENDPARAMETER
+
+   PARAMETER MINSLOPE
+      TYPE '_REAL'
+      KEYWORD 'MINS'
+      VPATH 'CURRENT,DEFAULT'
+      DEFAULT 20.0
+      HELP 'Terminating chi-squared slope. Default 20. Smaller => more fussy.'
+   ENDPARAMETER
+
+   PARAMETER OPT
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      DEFAULT 1
+      PPATH 'DEFAULT'
+      PROMPT 'How to specify grid axes'
+      HELP '1 = All linear, 2 = All logarithmic, 3 = Prompt for each'
+   ENDPARAMETER
+
+   PARAMETER AUTO
+      TYPE '_LOGICAL'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      DEFAULT Y
+      PROMPT 'Automatic naming of output files'
+   ENDPARAMETER
+
+   PARAMETER SUBSTAT
+      TYPE '_LOGICAL'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      DEFAULT N
+      PROMPT 'Subtract minimum value of statistic from grid'
+   ENDPARAMETER
+
+   PARAMETER UPDATE
+      KEYWORD 'UP'
+      TYPE '_LOGICAL'
+      VPATH 'PROMPT'
+      PPATH 'DEFAULT'
+      DEFAULT N
+      PROMPT 'Update model with best fit parameter set'
+      HELP   'Sets current model parameter to grid point where statistic is minimised'
+   ENDPARAMETER
+
+   PARAMETER OUTROOT
+      TYPE  'LITERAL'
+      VPATH 'PROMPT'
+      PROMPT 'Root for automatically named files'
+      HELP   'Files will be named <OUTROOT>_g<n> where <n> is the grid parameter number'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      TYPE  'UNIV'
+      VPATH 'PROMPT'
+      ASSOCIATION '->GLOBAL.BINDS'
+      PROMPT 'Output filename'
+   ENDPARAMETER
+
+   PARAMETER OUT2
+      TYPE 'UNIV'
+      VPATH 'PROMPT'
+      PROMPT 'Output filename for 2nd grid'
+   ENDPARAMETER
+
+   PARAMETER OUT3
+      TYPE 'UNIV'
+      VPATH 'PROMPT'
+      PROMPT 'Output filename for 3rd grid'
+   ENDPARAMETER
+
+   PARAMETER OUT4
+      TYPE 'UNIV'
+      VPATH 'PROMPT'
+      PROMPT 'Output filename for 4th grid'
+   ENDPARAMETER
+
+   PARAMETER OUT5
+      TYPE 'UNIV'
+      VPATH 'PROMPT'
+      PROMPT 'Output filename for 5th grid'
+   ENDPARAMETER
+
+ENDINTERFACE

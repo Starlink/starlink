@@ -1,0 +1,62 @@
+INTERFACE SEDIT
+
+   PARAMETER FIT_MOD
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object to contain spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER MODEL_SPEC
+      POSITION 2
+      TYPE 'LITERAL'
+      PROMPT 'Enter model specification'
+      HELP 'Character string specifying composite model  e.g. AB*(BR+LG)'
+   ENDPARAMETER
+
+   PARAMETER PAR
+      POSITION 3
+      TYPE '_INTEGER'
+      PROMPT 'Enter component number'
+   ENDPARAMETER
+
+   PARAMETER PARS
+      POSITION 4
+      TYPE 'LITERAL'
+      PROMPT 'Enter component numbers'
+      HELP 'Syntax is normal Asterix list notation, eg. 1:* or 2,3,4 or 1-3,5'
+   ENDPARAMETER
+
+   PARAMETER VALUES
+      POSITION 5
+      TYPE 'LITERAL'
+      PROMPT 'New values'
+      HELP 'Enter 1,2 or 3 numbers'
+   ENDPARAMETER
+
+   PARAMETER OPTION
+      POSITION 6
+      TYPE 'LITERAL'
+      PROMPT 'Enter option (A,L,F,T,P,NP,NM,RE,X)'
+      HELP 'A-Alter, L-List, F-Freeze, T-Thaw, P-Print, NP-New Params, NM-New Model, RE-Reset errors, X-Exit'
+   ENDPARAMETER
+
+   PARAMETER GENUS
+      TYPE 'LITERAL'
+      KEYWORD 'GEN'
+      DEFAULT 'SPEC'
+      VPATH 'DEFAULT,NOPROMPT'
+   ENDPARAMETER
+
+   PARAMETER SCREEN
+      TYPE '_LOGICAL'
+      DEFAULT N
+      PROMPT 'Work in screen mode'
+      VPATH 'DEFAULT,PROMPT'
+      PPATH 'DEFAULT'
+   ENDPARAMETER
+
+ENDINTERFACE

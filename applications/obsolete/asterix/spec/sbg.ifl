@@ -1,0 +1,21 @@
+INTERFACE SBG
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'INP'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      PROMPT 'Data'
+      HELP 'Must be a single spectrum, or spectral_set'
+   ENDPARAMETER
+
+   PARAMETER BGFILE
+      POSITION 2
+      TYPE 'UNIV'
+      KEYWORD 'BGFILE'
+      PROMPT 'Background'
+      HELP 'Name of associated b/g dataset - "!" will delete existing reference'
+   ENDPARAMETER
+
+ENDINTERFACE

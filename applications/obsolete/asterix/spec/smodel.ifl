@@ -1,0 +1,56 @@
+INTERFACE SMODEL
+
+   PARAMETER GENUS
+      TYPE 'LITERAL'
+      KEYWORD 'GEN'
+      PROMPT 'Model genus'
+      HELP 'Class of models required: SPEC, STAT etc'
+   ENDPARAMETER
+
+   PARAMETER FIT_MOD
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Dataset to contain model'
+      HELP 'Data object to contain spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER OVERRIDE
+      POSITION 2
+      TYPE '_LOGICAL'
+      KEYWORD 'OVER'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+      PROMPT 'Override with new model specification?'
+      HELP 'If NO then model form is retained, but parameters can be changed'
+   ENDPARAMETER
+
+   PARAMETER MODEL_SPEC
+      POSITION 3
+      TYPE 'LITERAL'
+      KEYWORD 'SPEC'
+      PROMPT 'Model specification'
+      HELP 'Character string specifying composite model  e.g. AB*(BR+LG)'
+   ENDPARAMETER
+
+   PARAMETER VALUES
+      POSITION 4
+      TYPE 'LITERAL'
+      KEYWORD 'VALS'
+      PROMPT 'New values'
+      HELP 'Carriage return to accept defaults, or enter 1,2 or 3 numbers'
+   ENDPARAMETER
+
+   PARAMETER RESET
+      TYPE '_LOGICAL'
+      PROMPT 'Reset parameter values'
+      DEFAULT N
+      PPATH 'DEFAULT'
+      VPATH 'DEFAULT,PROMPT'
+      HELP 'If specified, parameter values and limits will be reset to original values'
+   ENDPARAMETER
+
+ENDINTERFACE

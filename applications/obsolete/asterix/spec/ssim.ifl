@@ -1,0 +1,67 @@
+INTERFACE SSIM
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'UNIV'
+      KEYWORD 'INP'
+      PROMPT 'Object containing instrument response'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      HELP 'Name of object containing INSTR_RESP component'
+   ENDPARAMETER
+
+   PARAMETER FIT_MOD
+      POSITION 2
+      TYPE 'UNIV'
+      KEYWORD 'MODEL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Name of data object containing spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER BG_DATA
+      POSITION 3
+      TYPE 'UNIV'
+      KEYWORD 'BG'
+      DEFAULT !
+      PROMPT 'Background spectrum'
+      HELP 'This will be added to the source spectrum - return ! for no b/g'
+   ENDPARAMETER
+
+   PARAMETER POISS_ERRS
+      POSITION 4
+      TYPE '_LOGICAL'
+      KEYWORD 'POISS'
+      PROMPT 'Add Poisson noise?'
+      HELP 'If Y then Poisson noise is added to simulated spectrum'
+   ENDPARAMETER
+
+   PARAMETER OBS_LENGTH
+      POSITION 5
+      TYPE '_REAL'
+      KEYWORD 'OBLEN'
+      PROMPT 'Observation length'
+      HELP 'Duration in seconds'
+   ENDPARAMETER
+
+   PARAMETER REDSHIFT
+      TYPE '_REAL'
+      KEYWORD 'Z'
+      VPATH 'GLOBAL,DEFAULT'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      HELP 'Redshift to be applied to source spectrum'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      POSITION 6
+      TYPE 'UNIV'
+      KEYWORD 'OUT'
+      ASSOCIATION '->GLOBAL.GRAFDS'
+      PROMPT 'Output spectrum'
+      HELP 'Container file for simulated spectrum'
+   ENDPARAMETER
+
+ENDINTERFACE
