@@ -5,7 +5,7 @@
 #   Copyright 2001, 2003, Council for the Central Laboratory of the Research Councils
 #
 #   This program is part of the Starlink Software Distribution: see
-#   http://www.starlink.ac.uk 
+#   http://www.starlink.ac.uk
 #
 #   autoastrom is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -1166,7 +1166,7 @@ sub tidy_and_shutdown {
     print STDERR "Autoastrom finishing\n" if $verbose;
 
     # Get rid of all the temporary files we've accumulated.
-    if ($deletetemps && -d $tempDir && -w $tempDir) {
+    if ($deletetemps && defined($tempDir) && -d $tempDir && -w $tempDir) {
 	print STDERR "Getting rid of temporary files\n";
 	system "rm -Rf $tempDir";
 	$deletetemps = 0;	# don't come here again
