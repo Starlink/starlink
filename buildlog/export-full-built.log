@@ -203,7 +203,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
@@ -492,6 +491,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -756,7 +756,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Oct 23, 2004 5:41:52 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Oct 24, 2004 5:42:13 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -771,4 +771,4 @@ docs:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/topcat/build.xml:1118: Fatal error during transformation
 
-Total time: 3 minutes 4 seconds
+Total time: 2 minutes 56 seconds
