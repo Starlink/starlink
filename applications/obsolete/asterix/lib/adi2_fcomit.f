@@ -215,8 +215,6 @@
       INTEGER			IKEY			! Loop over keys
       INTEGER			KID			! Keyword object
       INTEGER			LUN			! Logical unit number
-      INTEGER			NAXES(ADI__MXDIM)	! Dimensions
-      INTEGER			NAXIS			! Dimensionality
       INTEGER			NKEY			! # of keywords
 
       LOGICAL			COMIT			! Value committed?

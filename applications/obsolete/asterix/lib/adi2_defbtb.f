@@ -151,7 +151,7 @@
       END IF
 
 *  Free the buffer
-      CALL ADI2_ERASE( HID, STATUS )
+      CALL ADI_ERASE( HID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
