@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 5;
 use Data::Dumper;
 use Tk;
 
@@ -16,7 +16,8 @@ Starlink::AST::Begin();
 
 # FITS File
 # ---------
-my $file = File::Spec->catfile( "PGPLOT", "t", "m31.fit" );
+#my $file = File::Spec->catfile( "PGPLOT", "t", "m31.fit" );
+my $file = File::Spec->catfile( "..", "PGPLOT", "t", "m31.fit" );
 
 # Get FITS Header
 # ---------------
