@@ -48,6 +48,8 @@
 *        Now just does standard NDF headers.
 *     02-DEC-1997 (PWD):
 *        Modified to write NDF dimensional headers.
+*     18-JUN-1999 (PWD):
+*        Removed NHEAD increment. This was a bug.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -117,7 +119,6 @@
 *  point is wrong, should use NaNs..., but we'll go along with things
 *  for now.
       IF ( BAD ) THEN
-         NHEAD = NHEAD + 1
          IF ( BITPIX .EQ. -32 ) THEN
             WRITE( VALUE, '(G24.17)') VAL__BADR
          ELSE IF ( BITPIX .EQ. 32 ) THEN
