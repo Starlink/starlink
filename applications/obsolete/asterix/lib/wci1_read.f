@@ -274,8 +274,12 @@
         IF ( .NOT. PAOK ) PA = 0D0
         IF ( REG(1) .AND. REG(2) ) THEN
           CALL WCI_NEWPX( DIMS, BASE, SCALE, UNITS, PA, PIXID, STATUS )
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            HASPIX = .FALSE.
+          END IF
         ELSE
-	  PRINT *, 'Irregular axes, not yet!'
+c  	  PRINT *, 'Irregular axes, not yet!'
         END IF
       END IF
 
