@@ -85,7 +85,8 @@
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
 *     MSG_FILTER = CHAR (Read)
-*        Message filter level. Default is NORM. No verbose messages are used.
+*        Message filter level. Default is NORM. In verbose mode the location
+*        of each spike is reported.
 *     NSIGMA = REAL (Read)
 *        Nsigma from mean at which 'spikes' begin.
 *     OUT = NDF (Write)
@@ -112,6 +113,9 @@
 
 *    History :
 *     $Log$
+*     Revision 1.4  1997/12/19 03:17:05  timj
+*     Write out total number of spikes removed.
+*
 *     Revision 1.3  1997/11/30 01:40:01  timj
 *     Add some documentation.
 *
@@ -180,6 +184,7 @@
       INTEGER      NREC                 ! number of history records in file
       REAL         NSIGMA               ! sigma cut-off for spike
                                         ! detection
+      INTEGER      NSPIKES              ! Total number of spikes detected
       INTEGER      N_BOL                ! number of bolometers measured 
       INTEGER      N_EXPOSURES          ! number of exposures per integration
       INTEGER      N_FITS               ! number of FITS lines read from file
@@ -426,11 +431,32 @@
      :     %val(IN_DATA_PTR), %val(IN_VARIANCE_PTR),
      :     %val(IN_QUALITY_PTR), BADBIT, NSIGMA,
      :     %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :     %val(OUT_QUALITY_PTR), STATUS)
+     :     %val(OUT_QUALITY_PTR), NSPIKES, STATUS)
 
-*  unmap the main data array
+*     unmap the main data array
 
          CALL NDF_UNMAP (OUTNDF, '*', STATUS)
+
+*     Report the total number of spikes if greater than 0
+         IF (NSPIKES .GT. 1) THEN
+            CALL MSG_SETI('NS', NSPIKES)
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: ^NS spikes '//
+     :           'detected.', STATUS)
+
+         ELSE IF (NSPIKES .EQ. 1) THEN
+            CALL MSG_SETI('NS', NSPIKES)
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: ^NS spike '//
+     :           'detected.', STATUS)
+
+         ELSE
+            CALL MSG_SETC('TSK', TSKNAME)
+            CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: No spikes '//
+     :           'detected.', STATUS)
+
+         END IF
+
       END IF
 
 *  tidy up
