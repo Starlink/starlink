@@ -104,7 +104,6 @@
       DOUBLE PRECISION TAU               ! zenith optical depth of fit
       DOUBLE PRECISION X_G               ! fudge factor
       DOUBLE PRECISION B
-      DOUBLE PRECISION TAU
       DOUBLE PRECISION J_AMB
       DOUBLE PRECISION J_TEL
       DOUBLE PRECISION AIRMASS_IN
