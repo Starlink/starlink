@@ -47,6 +47,7 @@ proc cgs4drExit {taskname cmd} {
       $P4Task kill
       $Red4Task kill
       $Cred4Task kill
+      cgs4drAdamnet stop
       adamtask.exit
       exit 0
 
@@ -96,6 +97,7 @@ proc cgs4drExit {taskname cmd} {
       } elseif {[string match $Red4Task $local_task]} {
         $taskname kill
       }
+      cgs4drAdamnet stop
       adamtask.exit
       exit 0
     } else {
