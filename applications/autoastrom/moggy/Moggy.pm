@@ -610,7 +610,7 @@ sub resulthascolumn ($$) {
 	$colname =~ s+^/++;
 	$colname =~ s+/$++;
     } else {
-	$colname = '^'.$colname.'$';
+	$colname = "^$colname\$"; # '^'.$colname.'$';
     }
 
     my $cols = $self->{RESULTCOLUMNS};
@@ -662,7 +662,9 @@ sub version ($) {
     return "$VERSION, ${$self->{_MOGGYPMVERSION}}, moggy version $self->{MOGGYVERSION}";
 }
 
-# Debugging method -- send the debug string to moggy.
+# Debugging method -- send the debug string to moggy.  Argument is a
+# sequence of keywords chosen from `moggy', `commandparse',
+# `asthandler' and `cataloguehandler', separated by non-characters.
 sub debug ($) {
     my $self = shift;
     my $dbgstring = shift;
@@ -677,7 +679,7 @@ sub debug ($) {
 	$dbgstring = lc($dbgstring);
 	my $mask = 0;
 	my $kwd;
-	foreach $kwd (split (' ', $dbgstring)) {
+	foreach $kwd (split (/[^a-zA-Z]+/, $dbgstring)) {
 	    $mask += $kwdtomask{$kwd} if (defined($kwdtomask{$kwd}));
 	}
 	print STDERR "Debugging: <$dbgstring> -> $mask\n";
