@@ -18,6 +18,9 @@ tsp_mon_LDADD = libtsp.la `$(srcdir)/tsp_link_adam` ../figaro/fda/libfda.la \
 	-lfigich -lfiggen
 tsp_mon_TASKS = $(TSP_F_ROUTINES:.f=)
 
+noinst_MESSAGES = USER_ERR
+BUILT_SOURCES = USER_ERR
+
 TESTS = tsp_test
 check_SCRIPTS = tsp_test
 
