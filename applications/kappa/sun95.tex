@@ -267,7 +267,6 @@
 \newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
 \newcommand{\FITSref}{\htmladdnormallink{FITS}{http://www.gsfc.nasa.gov/astro/fits/fits\_{}home.html}}
 \newcommand{\GAIAref}{\xref{GAIA}{sun214}{}}
-\newcommand{\GKSref}{\xref{GKS}{sun83}{}}
 \newcommand{\GWMref}{\xref{GWM}{sun130}{}}
 \newcommand{\HDSref}{\xref{HDS}{sun92}{}}
 \newcommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}}{sun102}{}}
@@ -285,7 +284,6 @@
 \newcommand{\PISAref}{\xref{{\footnotesize PISA}}{sun109}{}}
 \newcommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
 \newcommand{\PSMERGEref}{\xref{{\footnotesize PSMERGE}}{sun164}{}}
-\newcommand{\SGSref}{\xref{SGS}{sun85}{}}
 \newcommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
 \newcommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
 
@@ -904,7 +902,7 @@ Additional functionality can be added piecemeal to the relevant
 package.  New user interfaces, such as graphical, could be layered
 within the toolkit for obtaining parameters and so make the
 enhancement available to all applications that make use of those
-tools.  A recent example of this approach has allowed us to access
+tools.  An example of this approach has allowed us to access
 `foreign data formats' throughout Starlink packages, because the
 packages use a common infrastructure library.
 
@@ -914,7 +912,7 @@ unified by sharing the same basic data structure---the
 an $n$-dimensional data array that can store most astronomical data such
 as spectra, images and spectral-line data cubes.  The NDF may also
 contain information like a title, axis labels and units, error and
-quality arrays.  There are also places in the NDF, called {\em
+quality arrays, and WCS information.  There are also places in the NDF, called {\em
 extensions}, to store any ancillary data associated with the data
 array, even other NDFs.
 
@@ -933,27 +931,20 @@ time-series polarimetry (\TSPref ), instrument-specific (\CGSDRref ,
 \IRASref , \IRCAMPACKref , \JCMTDRref ) {\it etc.}  {\em Thus the
 functionality of {\footnotesize KAPPA} should not be regarded in isolation.}
 
-Nor should {\footnotesize KAPPA} be perceived as a rival to {\footnotesize FIGARO}.
-As {\footnotesize FIGARO} {\em applications\/} become more integrated with
-Starlink packages, for example by using the NDF library, they should
-be seen as complementary, with {\footnotesize FIGARO} concentrating on
-spectroscopy and {\footnotesize KAPPA} image processing.  Of course, there is
-some duplication for historical and ease-of-use reasons.
-
 In a wider context, {\footnotesize KAPPA} offers facilities not in \IRAFref ,
 for instance handling of data errors, quality masking, a graphics
 database, availability from the shell, as well as more $n$-dimensional
 applications, widespread use of data axes, and a different style. It
 integrates with instrument packages developed at UK observatories.
-With the automatic data conversion and the likelihood that {\footnotesize
-KAPPA} and other Starlink packages will be available from within the
+With the automatic data conversion and the availability of {\footnotesize
+KAPPA} and other Starlink packages from within the
 {\footnotesize IRAF} command language, you should be able to pick the
 best of the relevant tools from both systems to get the job done.
 
 \subsection{Functionality of KAPPA}
 
 \subsubsection{Applications}
-Currently, {\footnotesize KAPPA} has about 160 commands that are available
+Currently, {\footnotesize KAPPA} has about 180 commands that are available
 both from the UNIX C-shell and from the \ICLref\ command language.
 They provide the following facilities for data processing:
 
@@ -977,7 +968,7 @@ whose variances are too large}{ERRCLIP};
 \htmlref{rotate}{ROTATE}, \htmlref{shift}{SLIDE},
 \htmlref{reshape}{RESHAPE}, subset, change
 dimensionality;
-\item forming image mosaics; normalisation of NDF pairs;
+\item normalisation of NDF pairs;
 \item \htmlref{compression and expansion of images}{cl:compexp};
 \item \htmlref{generalised resampling}{cl:resample} of NDFs using
 arbitrary transformations;
@@ -1029,15 +1020,7 @@ since it copies extensions to any NDFs that it creates.
 
 {\footnotesize KAPPA} can also process data in other formats, such as FITS
 and {\footnotesize IRAF}, using an automatic-data conversion facility
-(SUN/55, SSN/20).  For historical reasons, 20 commands in {\footnotesize KAPPA}
-still use the old \htmlref{IMAGE format}{ap:IMAGEformat}
-\latexonly{(Appendix~\ref{ap:IMAGEformat})}, which does not include
-all the features of the NDF.  A low-priority conversion process is
-underway to transform the remaining to use the NDF-access
-interface\latexonly{ (SUN/33)}.  Once completed {\footnotesize KAPPA} can
-finally reach version 1.0.  See
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
-KAPPA applications}{ap:full}} for details of which applications use the NDF.
+(SUN/55, SSN/20).  
 
 Although oriented to image processing, many commands will work on NDFs
 of arbitrary dimension and others operate on both spectra and images.
@@ -1047,21 +1030,6 @@ undergo automatic data conversion to produce the desired result.
 
 {\footnotesize KAPPA}'s graphics are device independent.  X-windows is 
 supported.
-
-\subsection{Support}
-{\footnotesize KAPPA} receives a high level of support, and bug reports
-are dealt with promptly.
-
-It is continuing to be developed and additional applications
-functionality are envisaged. [If you wish to suggest new tasks or
-enhancements to existing ones please contact the Starlink Software
-Librarian {\tt ussc@star.rl.ac.uk}.  Small jobs
-may be undertaken quite quickly.  Requests involving substantial
-pieces of work need to gain the support of others to be included in
-Starlink's software plans, and so the best way to influence the
-priority given to {\footnotesize KAPPA} is to contact the chairman of the
-Image Processing Software Strategy Group.  The Starlink World Wide Web
-pages will periodically contain news of plans and work in progress.]
 
 \subsection{This document}
 This document is arranged as follows.  First are two annotated {\footnotesize
@@ -1082,7 +1050,7 @@ daunting.  Actually, most of this manual comprises descriptions of each
 application.  The best way to learn the basics is to try some example
 sessions.
 
-Login to a colour X-terminal or workstation.  Then enter the commands
+Login to a colour workstation or X-terminal.  Then enter the commands
 following the prompts shown below.  The {\tt \%} is the shell prompt
 string, which you don't type.  As we go along there will be
 commentary explaining what is happening and why.  Let's begin. 
@@ -1101,7 +1069,7 @@ only be issued once per login session.  Thus you will see
 
 \small
 \begin{verbatim}
-      KAPPA commands are now available -- (Version 0.14-5)
+      KAPPA commands are now available -- (Version 1.0)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
@@ -1296,7 +1264,16 @@ the table with a greyscale ramp from white to black,
 \end{verbatim}
 \normalsize
 
-we see a blurred image of the ubiquitous Comet West on the screen.
+what happens depends on your workstation hardware and settings. If your
+graphics system is set to 256 colours (technically, an \emph{8-bit
+pseudo-colour visual}), then the effects of the above LUTNEG command will
+be immediately visible, and you will see a blurred image of the
+ubiquitous Comet West on the screen. If, on the other hand, your graphics
+system is set to 16 bit or 24 bit graphics, then the effects of the
+LUTNEG command will only become visible when you next display an image.
+In this case, re-invoking the above DISPLAY command will make the image
+appear correctly with the requested grey scale colour table.
+
 
 The \htmlref{ACCEPT keyword}{se:parspeckey} is a very useful feature.
 It tells an application to accept all the suggested defaults.  In this
@@ -1313,24 +1290,38 @@ metacharacters to watch out for when using {\footnotesize KAPPA} include {\tt
 
 Next we want to make the image colourful.  There are a number of
 predefined lookup tables, or you may create and modify your own.  Here
-we've given the X-window a spectrum-like colour table. 
+we've given the X-window a ``warm'' brown-yellow colour
+table\footnote{Again, you will need to re-display the image to see the
+effects of this command unless your graphics system is set to 256
+colours.}:
 
 \small
 \begin{verbatim}
-     % lutspec
+     % lutwarm
+\end{verbatim}
+\normalsize
+
+If you are not happy with this colour table, you may want to explore a
+wider range of colour tables using the LUTEDIT command which provides a 
+complete graphical user interface for manpulating and viewing colour
+tables.
+
+\small
+\begin{verbatim}
+     % lutedit image=$KAPPA_DIR/comwest
 \end{verbatim}
 \normalsize
 
 \subsection{From ICL}
-\ICLref\ is currently the standard command language
-designed for use with Starlink applications, like {\footnotesize KAPPA}.  The
-main advantages for the {\footnotesize KAPPA} user are that shell
-metacharacters like {\tt []()$\backslash$"} need not be escaped;
-command names may be abbreviated; far fewer executables need be
-loaded, and therefore it is slightly faster than using the shell when
-you want to invoke more than a few commands on a busy system; there is
-a wide selection of intrinsic functions and floating-point arithmetic;
-and results may be passed between applications via {\footnotesize ICL}
+\ICLref\ is a command language designed for use with Starlink applications,
+such as {\footnotesize KAPPA}. It is now of some antiquity but is still in
+use. The main advantages for the {\footnotesize KAPPA} user are that
+shell metacharacters like {\tt []()$\backslash$"} need not be escaped;
+command names may be abbreviated; far fewer executables need be loaded,
+and therefore it is slightly faster than using the shell when you want to
+invoke more than a few commands on a busy system; there is a wide
+selection of intrinsic functions and floating-point arithmetic; and
+results may be passed between applications via {\footnotesize ICL}
 variables.  However, in these two demonstrations the command languages
 are interchangeable apart from the accept backslash.
 
@@ -1353,7 +1344,7 @@ You should see something like the following.
 
 \small
 \begin{verbatim}
-    ICL (UNIX) Version 3.1 14/09/95
+    ICL (UNIX) Version 3.1-9 14/02/2000
 
     Loading installed package definitions...
 
@@ -1363,7 +1354,7 @@ You should see something like the following.
 
      ICL> kappa
  
-        KAPPA commands are now available (Version 0.13).
+        KAPPA commands are now available (Version 1.0).
  
         Type `help kappa' or `kaphelp' for help on KAPPA commands.
  
@@ -1526,7 +1517,7 @@ the first procedure we've invoked there is a short pause while all the
 \normalsize
 
 Next we decide to make a hard copy of the bas-relief image. 
-\htmlref{DISPLAY}{DISPLAY} does this and adds a key of grey levels
+\htmlref{DISPLAY}{DISPLAY} does this and can add a key of grey levels
 and their corresponding values.  The chosen device is {\tt ps\_l};
 this overrides the {\tt xwindows} device for the duration of DISPLAY. 
 If this name isn't recognised at your site, issue the
@@ -1536,7 +1527,7 @@ wider limits to reduce the glare.
 
 \small
 \begin{verbatim}
-     ICL> display key=yes device=ps_l
+     ICL> display key=yes device="/PS"
      IN - NDF to be displayed /@comwest_bas/ >
      MODE - Method to define the scaling limits /'SCALE'/ >
      LOW - Low value for display /187.5625/ > 11
@@ -1552,7 +1543,7 @@ the command as if you were in the shell, like we do below.
 
 \small
 \begin{verbatim}
-     ICL> !lpr -P1 gks74.ps
+     ICL> !lpr -P1 pgplot.ps
 \end{verbatim}
 \normalsize
 
@@ -1646,7 +1637,7 @@ you'll see message from {\footnotesize KAPPA} telling you which version is
 ready for use.
 
 So what do you get for your trouble?  Appendix~\ref{ap:summary} lists
-in alphabetical order the 181 commands and their functions, and
+in alphabetical order all the commands and their functions, and
 \latexelsehtml{Appendix~\ref{ap:classified}}{there}
 is a \htmlref{classified list}{ap:classified} of the same commands.
 Many examples are given in subsequent sections.
@@ -1710,6 +1701,48 @@ ICL>} prompts in the examples and description
 interchangeable unless noted otherwise.}}
 
 \subsection{\xlabel{se_kaphelp}Obtaining Help\label{se:kaphelp}}
+
+\subsubsection{\xlabel{se_hypertext}Hypertext Help\label{se:hypertext}}
+
+A modified version of this document exists in hypertext form.  One way
+to access it is to use the
+\xref{{\tt showme}}{sun188}{displaying_parts_of_documents} command
+
+\small
+\begin{verbatim}
+     % showme sun95
+\end{verbatim}
+\normalsize
+and a Web browser will appear, presenting the index to the hypertext
+form of this document.  The hypertext permits easy location of
+referenced documents and applications.  It also includes colour
+illustrations.
+
+The \xref{{\tt findme}}{sun188}{performing_keyword_searches}
+command lets you search the Starlink documents by
+keywords.  For instance,
+
+\small
+\begin{verbatim}
+     % findme masking
+\end{verbatim}
+\normalsize
+searches the document looking for the word ``masking'' in
+them.  The level of searching depends on whether a match is found.
+The search starts with the document title, the page (section)
+titles, and finally the document text.  The deeper the search,
+the longer it will take.  There are switches provided to limit the
+level of the search.  The search string may include {\bf sed} or 
+{\bf grep} regular expressions.  See \xref{SUN/188}{sun188}{}
+or enter
+
+\small
+\begin{verbatim}
+     % findme findme
+     % findme showme 
+\end{verbatim}
+\normalsize
+to learn more about the {\tt findme} and {\tt showme} commands.
 
 \subsubsection{Entering the Help System}
 To access the KAPPA help use \htmlref{KAPHELP}{KAPHELP}.
@@ -1814,48 +1847,6 @@ directly via the command
      ICL> kaphelp summary
 \end{verbatim}
 \normalsize
-
-\subsubsection{\xlabel{se_hypertext}Hypertext Help\label{se:hypertext}}
-
-A modified version of this document exists in hypertext form.  One way
-to access it is to use the
-\xref{{\tt showme}}{sun188}{displaying_parts_of_documents} command
-
-\small
-\begin{verbatim}
-     % showme sun95
-\end{verbatim}
-\normalsize
-and a Web browser will appear, presenting the index to the hypertext
-form of this document.  The hypertext permits easy location of
-referenced documents and applications.  It also includes colour
-illustrations.
-
-The \xref{{\tt findme}}{sun188}{performing_keyword_searches}
-command lets you search the Starlink documents by
-keywords.  For instance,
-
-\small
-\begin{verbatim}
-     % findme masking
-\end{verbatim}
-\normalsize
-searches the document looking for the word ``masking'' in
-them.  The level of searching depends on whether a match is found.
-The search starts with the document title, the page (section)
-titles, and finally the document text.  The deeper the search,
-the longer it will take.  There are switches provided to limit the
-level of the search.  The search string may include {\bf sed} or 
-{\bf grep} regular expressions.  See \xref{SUN/188}{sun188}{}
-or enter
-
-\small
-\begin{verbatim}
-     % findme findme
-     % findme showme 
-\end{verbatim}
-\normalsize
-to learn more about the {\tt findme} and {\tt showme} commands.
 
 \subsection{Changing the Current Directory in ICL}
 You should change default directories in \ICLref\ using its
@@ -2074,26 +2065,7 @@ parameter description.
 \normalsize
 gives details of all parameters in application
 \htmlref{MEDIAN}{MEDIAN}.  Other packages have similar help
-commands.\latexelsehtml{\footnote{IMAGE-format applications
-(Appendix~\ref{ap:IMAGEformat}) have their parameter help arranged
-differently.  For each parameter there is a line that begins {\tt
-vpath} which tells the parameter system from where it should try to
-obtain a value or values for that parameter.  If it does not begin
-{\tt 'PROMPT'} the parameter will be defaulted.  A vpath of {\tt
-'DEFAULT'} indicates that the parameter will take the value given by
-the default field; a vpath of {\tt 'DYNAMIC'} means that the
-application has computed a suitable default, usually depending on the
-values of other parameters or the dimensions of your data
-array.}}{\footnote{\htmlref{IMAGE-format}{ap:IMAGEformat} applications
-have their parameter help arranged differently.  For each parameter
-there is a line that begins {\tt vpath} which tells the parameter
-system from where it should try to obtain a value or values for that
-parameter.  If it does not begin {\tt 'PROMPT'} the parameter will be
-defaulted.  A vpath of {\tt 'DEFAULT'} indicates that the parameter
-will take the value given by the default field; a vpath of {\tt
-'DYNAMIC'} means that the application has computed a suitable default,
-usually depending on the values of other parameters or the dimensions
-of your data array.}} If you want to override one of these defaults,
+commands. If you want to override one of these defaults,
 then you must specify the parameter's value on the command line.
 
 When you are prompted you will usually be given a suggested default
@@ -2146,25 +2118,22 @@ example comprising a loop within an application.
 
 \small
 \begin{verbatim}
-     INPIC - Image to be inspected /@horsehead/ >
-     Title = KAPPA - Gauss
-     Array is 109 by 64 pixels
-     CHOICE - Peep, Examine or List /'P'/ >
 
-     XCEN - x centre pixel index of 7x7 box /55/ > 60
-     YCEN - y centre pixel index of 7x7 box /32/ > 28
+     NDF - NDF to examine /@horsehead > 
+     CENTRE - Position at the centre of the listing /'64 64'/ > 100 120
         .              .               .              .
         .              .               .              .
         .              .               .              .
-     ANOTHER - Another inspection ? /YES/ >
-     CHOICE - Peep, Examine or List /'P'/ >
+     CENTRE - Position at the centre of the listing /'100 120'/ >
+     SIZE - The dimensions (in pixels) of the area to be listed /7/ > 
+        .              .               .              .
+        .              .               .              .
+        .              .               .              .
 
-     XCEN - x centre co-ordinate of 7x7 box /60/ > 66
-     YCEN - y centre co-ordinate of 7x7 box /28/ >
 \end{verbatim}
 \normalsize
 and so on.  Notice that the current values of the centres are the
-suggested values at the second pair of prompts.
+suggested values at the second prompt.
 
 Current values of parameters are stored in a {\em parameter file}, and
 so they persist between sessions.  For tasks run from the shell, this
@@ -2205,10 +2174,6 @@ given below.
 \newline
 \newline
 \begin{tabular}{@{\hspace{5ex}}l@{~~ --- ~~}l}
-{\tt GLOBAL.COORD\_SYSTEM}    & Current co-ordinate system\footnote{The
-use of this parameter is being phased out. See 
-\latexelsehtml{Section~\ref{se:co-ordsystem}}{the section on 
-\htmlref{Co-ordinate Systems}{se:co-ordsystem}}.}.\\
 {\tt GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
 {\tt GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
 {\tt GLOBAL.INTERACTIONMODE}  & Current interaction mode. \\
@@ -2220,15 +2185,9 @@ use of this parameter is being phased out. See
 the suggested default value for the next prompt for an NDF structure
 or foreign data format.  The same applies to the current lookup table
 and transformation structure.  However, the remaining, including the
-three graphics global parameters are defaulted---you will not be
+graphics global parameter are defaulted---you will not be
 prompted.  Details of how to control these parameters are given in the
-relevant sections
-\latexelsehtml{later---Section~\ref{se:devglobal} for the graphics devices,
-Section~\ref{se:interaction} for the interaction mode, and
-Section~\ref{se:co-ordsystem} for the co-ordinate systems.}{on
-\htmlref{Selecting a Graphics Device}{se:devglobal},
-\htmlref{Interaction Mode}{se:interaction}, and
-\htmlref{Co-ordinate Systems}{se:co-ordsystem}.}
+relevant sections.
 
 The values of all global parameters may be inspected with the
 \htmlref{GLOBALS}{GLOBALS} task.  You can make them undefined using
@@ -2242,7 +2201,6 @@ The values of all global parameters may be inspected with the
      The current lookup table file is     : @$KAPPA_DIR/spectrum_lut
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
-     The current co-ordinate system is    : WORLD
 \end{verbatim}
 \normalsize
 In the above example no interaction mode is defined.  The next time
@@ -2377,20 +2335,6 @@ parameters.  This can be achieved by entering {\tt ??} to the prompt.
 You can then delve anywhere in the help information.  When you exit the
 help system you're reprompted for the parameter.
 
-For the old, \htmlref{IMAGE-format}{ap:IMAGEformat} applications, the
-{\tt ?} does not enter the help system, and so the help is limited to
-an unsatisfactory and miserly 120 characters:
-
-\small
-\begin{verbatim}
-     DIRN - Direction of ramping > ?
-       1 = L-R : 2 = R-L : 3 = B-T : 4 = T-B, where L is left, R is right, B is bott
-     om and T is top
-     DIRN - Direction of ramping > ?
-\end{verbatim}
-\normalsize
-Fortunately, this form of parameter help is virtually phased out.
-
 \subsection{\xlabel{se_parmenu}Menus\label{se:parmenu}}
 
 Some parameters offer menus from which you select an option.
@@ -2511,21 +2455,7 @@ pixels in blue.
 
 If you give an ambiguous keyword, the parameter system will present
 the list of possible keywords and ask you to select the one you
-intended.  Suppose you want to display an image surrounded by axes
-annotated using the NCAR fount, and you think that there is only one
-parameter starting with F.
-
-\small
-\begin{verbatim}
-     % display axes f=ncar
-     !! Ambiguous keyword F used on the command line
-     !  Matches with FILL
-     !           and FONT
-       - Specify the keyword unambiguously > fo
-\end{verbatim}
-\normalsize
-When reprompted you just give an unambiguous abbreviation for the
-desired parameter, that being FONT in this example.
+intended.  
 
 \subsubsection{\xlabel{se_parposition}Position\label{se:parposition}}
 
@@ -2543,10 +2473,7 @@ trailing parameters may be omitted---NEWLO and NEWHI in the above
 example---but intermediate ones may not.  The position of a parameter
 can be found in the {\tt Usage} heading in
 \latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{application
-specifications}{ap:full}} or the help for the application.\footnote{In
-\htmlref{IMAGE-format}{ap:IMAGEformat} applications
-look in the help topic of the same name at the level beneath the topic
-{\tt Parameters} in a given application.}
+specifications}{ap:full}} or the help for the application.
 
 \subsubsection{\xlabel{se_keyvspar}Keyword versus Positional Parameters
 \label{se:keyvspar}}
@@ -2559,6 +2486,7 @@ consideration is that some parameters do not have defined positions
 because they are normally defaulted.  Keywords may also be
 \htmlref{abbreviated}{se:parabbrev}\latexonly{(Section~\ref{se:parabbrev})}.
 Thus the keyword technique is recommended for most parameters,
+
 especially in scripts and procedures. Unabbreviated keywords insulate
 scripts against new keywords and positional changes that are sometimes
 needed.
@@ -2578,7 +2506,7 @@ For instance,
 
 \small
 \begin{verbatim}
-     ICL> centroid blob init=[51,42] mode=i
+     ICL> centroid blob init="51,42" mode=i
 \end{verbatim}
 \normalsize
 will determine the centroid near the point (51,42) in the NDF called
@@ -2686,13 +2614,9 @@ thumb is that parameters for output files (images, lookup tables and
 text) will not have a default, but the remainder will.  There are some
 exceptions, such as where null is the default for optional files.
 Consulting the description of the parameters should give the suggested
-defaults, where appropriate.\footnote{This information is not given in
-the old-style (\htmlref{IMAGE-format}{ap:IMAGEformat}) documentation.
-For these you can look at the interface information in the KAPPA help
-library given for each parameter, or the interface file itself
-({\tt{\$KAPPA\_DIR/kappa\_mon.ifl}}).  If a parameter is given a suggested
+defaults, where appropriate. If a parameter is given a suggested
 default it will have a line beginning {\tt ppath} or a {\tt default}
-line.} If you want to use ACCEPT for an automatic procedure or batch
+line. If you want to use ACCEPT for an automatic procedure or batch
 job you could do some tests to find which parameters get prompted and
 then put them on the command line in your procedure.
 
@@ -3196,8 +3120,8 @@ You can obtain vector values too.
 \normalsize
 
 This displays the image otherndf surrounded by axes, but the plot's
-axis labels originate from another dataset called myndf.\footnote{
-The {\tt style} parameter specifies the appearance of the annotated axes,
+axis labels originate from another dataset called myndf
+\footnote{ The {\tt style} parameter specifies the appearance of the annotated axes,
 and is given as a comma-separated group of \emph{attribute settings}, each
 of which is a {\tt name=value} string specifying the attribute name and
 value. In this case, we assign values to the two attributes {\tt label(1)}
@@ -3206,7 +3130,7 @@ prevent the parameter system splitting the string at the commas. The
 string must then also be enclosed in double quotes to prevent the UNIX shell
 from interpreting the parantheses and equals signs. A simpler way of
 specifying a ploting style is to put the attribute settings in a 
-\htmlref{text file}{se:style} \latexonly{(see Section~\ref{se:style})}.}
+\htmlref{text file}{se:style} \latexonly{(see Section~\ref{se:style})}.}.
 There are more examples in the \xref{{\sl C-Shell Cookbook}}{sc4}{}.
 
 At the time of writing, ICL only permits scalar variables.  To do the
@@ -3238,14 +3162,47 @@ file, and hence permits PARGET to work.
 
 You can find the list of available devices and their names with task
 \htmlref{GDNAMES}{GDNAMES}.  Names can be abbreviated provided they
-remain unambiguous.
+remain unambiguous. Two alternative naming schemes are supported, and
+the list produced by GDNAMES will include both; 
+
+\begin{description}
+\item [PGPLOT] A general graphics device specification is of the form
+\verb+<file>/<type>+, where \verb+<type>+ indicates the type of the
+graphics device (\emph{e.g.} postscript printer, X-window, \emph{etc.})
+and \verb+<file>+ is an optional string which indicates either a file in
+which the graphical output should be stored or a specification for a
+particular device of the specified type. For instance, \verb+m31.ps/VPS+
+produces a file called \verb+m31.ps+ containing output suitable for
+sending to a postscript printer in portrait mode, and
+\verb+xwindows2/GWM+ sends graphical output to the GWM X-window with name
+\verb+xwindows2+. If the \verb+<file>+ string is omitted, a default
+device-dependant value is used (for instance, \verb+pgplot.ps+ for
+postscipt files and \verb+xwindows+ for X-windows).
+
+\item [GNS] For compatibility with previous versions of {\footnotesize KAPPA} 
+graphics devices may also be specified using a scheme which approximates
+closely to that of the Starlink Graphics workstation Name Service (GNS)
+library (see \xref{SUN/188}{sun188}{}). In this scheme a complete
+workstation specification is of the form \verb+<type>;<file>+. This is
+very similar to the PGPLOT scheme described above, but the device type
+and file are swapped round, and the separator is a semi-colon instead of
+a slash. As for PGPLOT, the device file can be omitted, in which case a
+default is used, but note that \emph{in this case the semi-colon should
+also be omitted}. The only supported devices are those for which PGPLOT
+drivers are available. If a device was also available in the GKS-based
+graphics systems previously used by {\footnotesize KAPPA}, then you can
+refer to it either using its PGPLOT device type or its GNS device type.
+
+\end{description}
+
+In either scheme, either the device type or the file name or the entire
+device specification may be replaced by a logical name, in which case the
+value of the logical name will be used instead.
+
 
 \subsubsection{\xlabel{se_devglobal}Global Parameters\label{se:devglobal}}
 
 There is a global parameter for the graphics device.
-\begin{description}
-\item [Graphics Device] --- The device used for graphics.
-\end{description}
 The purpose of this global parameter is ostensibly to prevent
 unnecessary prompting. However, there is an ulterior motive as well. 
 The selection of devices outside of the graphics applications enables
@@ -3259,10 +3216,10 @@ There is a command for selecting the current graphics device:
      ICL> gdset xwindows
 \end{verbatim}
 \normalsize
-A selection remains in force until you change it via another
-device-selecting command, use \htmlref{NOGLOBALS}{NOGLOBALS}, or delete
-the globals file.  The current choices can be inspected via the
-\htmlref{GLOBALS}{GLOBALS} command.   If the
+
+A selection remains in force until you change it using GDSET again, use
+\htmlref{NOGLOBALS}{NOGLOBALS}, or delete the globals file.  The current
+choice can be inspected via the \htmlref{GLOBALS}{GLOBALS} command. If the
 global parameter is undefined you will be prompted for the device if an
 application requires it.
 
@@ -3278,11 +3235,11 @@ some applications, by position.  Here is an example.
 
 \subsubsection{\xlabel{se_x-windows}X-windows\label{se:x-windows}}
 
-The most commonly used devices are X-windows.  These can require a
-little preparation before you select a device.  Starlink graphics use
+The most commonly used devices are X-windows.  These can require a little
+preparation before you select a device.  Starlink graphics use
 \GWMref\ to manage windows.  It enables a window to persist between
-separate applications; or to be shared by \GKSref\ applications,
-and even programmes running on different machines.  See
+separate applications; or to be shared by different applications,
+potentially even running on different machines.  See
 \xref{SUN/130}{sun130}{} for details of {\footnotesize GWM} and how to
 change your X-defaults file ({\tt{\$HOME/.Xdefaults}}), but the salient
 points are given below.
@@ -3342,11 +3299,10 @@ Don't ask why.  This
 confusing name rule applies also to all but the first window of the
 maximum of four windows allowed.
 
-The device names can be abbreviated, to give unambiguous names.  Thus
-you can enter {\tt xw} for the xwindows device;
-{\tt x2w} for the x2windows device; and so on.  This is the reason for 
-having device names as
-they are.  
+The device names can be abbreviated, to give unambiguous names.  Thus you
+can enter {\tt xw} for the xwindows device; {\tt x2w} for the x2windows
+device; and so on.  This is the reason for having device names as they
+are.
 
 The following tells {\footnotesize KAPPA} that this is the current device.
 This remains as a global parameter, so you probably will not need to
@@ -3362,20 +3318,21 @@ issue this command that often.
 \subsection{Composite Hardcopy Plots}
 
 {\footnotesize KAPPA} applications are modular so that you can build up
-more-complicated plots, and possibly add annotations with other
-packages especially \PONGOref\@.  This is fine if the device is
-some sort of screen.  However, when it is a hardcopy device,
-\GKSref\ creates a separate file for each task you run.  So how
-do you get the composite plot out on paper?  Well you can't just
-append these files to create a single output.
+more-complicated plots, and possibly add annotations with other packages
+especially \PONGOref\@.  This is fine if the device is some sort of
+screen.  However, when it is a hardcopy device, \PGPLOTref\ puts the
+output from a command into a single disk file.  So how do you get the
+composite plot out on paper?  Well you can't just append these files to
+create a single output.
 
 What you must do is as follows.
 \begin{itemize}
 \item  Select an encapsulated PostScript device, be it colour or monochrome.
-\item  Produce your graphics.  This will normally create files called
-{\tt gks74.ps}, {\tt gks74.ps.1} {\it etc.}\  The first file it creates
-has a last digit of one more than in the name of the last output file
-you created in the directory.
+\item  Produce your graphics, being careful to rename the output file
+(usually \verb+pgplot.ps+) created by each command to avoid it being
+over-written by the output from the next command. Alternatively, you can
+specified the device to use separately when running each command, including an
+explicit unique file name in each device specification (see above).
 \item Use \PSMERGEref\ to combine the plots.
 \end{itemize}
 
@@ -3386,49 +3343,31 @@ on an image.
 \begin{verbatim}
     % gdset epsfcol_l
     % display $KAPPA_DIR/comwest lut=$KAPPA_DIR/spectrum_lut mode=ra axes
-    % contour noclear device=epsfcol_l mode=au \\
-    % psmerge gks74.ps* > myplot.ps
-    % rm gks74.ps*
+    % mv pgplot.ps display.ps
+    % contour noclear mode=au \\
+    % mv pgplot.ps contour.ps
+    % psmerge display.ps contour.ps  > myplot.ps
+    % rm display.ps contour.ps 
 \end{verbatim}
 \normalsize
+
+or alternatively:
+
+\small
+\begin{verbatim}
+    % display $KAPPA_DIR/comwest device="epsfcol_l;display.ps" \
+              lut=$KAPPA_DIR/spectrum_lut mode=ra axes
+    % contour noclear device="epsfcol_l;contour.ps" mode=au \\
+    % psmerge display.ps contour.ps  > myplot.ps
+    % rm display.ps contour.ps 
+\end{verbatim}
+\normalsize
+
 You then print {\tt myplot.ps} to the colour PostScript printer.
 PSMERGE also has options for scaling and rotating plots.
 
-You can specify the output file name by appending the name to the
-file, such as \linebreak
-{\tt ps\_p;/home/scratch/dro/horse.ps}, which would place
-the graphics output into file \linebreak 
-{\tt /home/scratch/dro/horse.ps}.
-
 \newpage
 \section{\xlabel{se_style}Plotting Styles and Attributes\label{se:style}}
-
-\begin{quote}
-
-{\em 
-
-{\footnotesize KAPPA} is currently undergoing major changes in the
-way it creates graphics. Previously, graphical output was created using
-the SGS and NCAR plotting packages, with limited control over the
-appearance of the final plot provided using a collection of applications
-parameters, each of which specified a single attribute of the plot.
-
-This section describes the new system which is based on the AST subroutine
-library (see \xref{SUN/210}{}{sun210}) and the \PGPLOTref\ plotting 
-package. The new system provides more detailed control of the appearance
-of the plot, with a single application parameter being used to specify
-values for all the required plotting attributes.
-
-The new (converted) applications are identified by the fact that they
-have a parameter called STYLE, which is used to access the required
-plotting attributes. Further applications will be converted in subsequent
-releases of {\footnotesize KAPPA}. For the moment, the GKS version of
-PGPLOT distributed by Starlink is used within {\footnotesize KAPPA}. Once
-all graphical applications have been converted to use PGPLOT, the native
-version will be used instead of the GKS version.
-
-}
-\end{quote}
 
 \subsection{\xlabel{se_styles}Plotting Styles and Attributes\label{se:styles}}
 
@@ -4699,51 +4638,34 @@ additional attributes are described \hyperref{here}{in section }{}{se:frmatt}.
 \newpage
 \section{\xlabel{se_datastr}Data structures\label{se:datastr}}
 
-In an ideal world you would not need to know how your data are stored.
-It would be transparent. (The trendies call it object orientation.) To
-some extent Starlink applications achieve that through standard, but
-extensible, data structures, and the ability to apparently operate on
-other formats through the so-called \htmlref{`on-the-fly
-conversion'}{se:autoconvert} (see
+In an ideal world you would not need to know how your data are stored. It
+would be transparent. Starlink applications attempt to achieve this
+through standard, but extensible, data structures, and the ability to
+apparently operate on other formats through the so-called
+\htmlref{`on-the-fly conversion'}{se:autoconvert} (see
 \latexonly{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
-However, for historical reasons there are a number of data formats in
-Starlink software, and at the moment {\footnotesize KAPPA} is no exception in
-that it has two formats.
 
-The main one is the official standard data format for Starlink
-applications---the \NDFextref{NDF}\ (Extensible $N$-dimensional Data
-Format, SUN/33).  The second is the historical and flawed
-\htmlref{IMAGE structure}{ap:IMAGEformat}, which is gradually being
-phased out, and only affects twenty-one commands (the functionality of
-which can mostly be achieved with other applications).  Both formats,
-though, use \HDSref\ which has numerous advantages, not least that
-{\em HDS files are portable between operating systems}; both have file
-extension {\tt .sdf}.
+The official standard data format used by Starlink applications is the
+\NDFextref{NDF}\ (Extensible $N$-dimensional Data Format, SUN/33).  The
+data in an NDF is stored using \HDSref\ which has numerous advantages,
+not least that {\em HDS files are portable between operating systems};
+both have file extension {\tt .sdf}.
 
-The NDF is more detailed and has been carefully designed to facilitate
-processing by both general applications like {\footnotesize KAPPA} and
-specialist packages.  It contains an $n$-dimensional data array that
-can store most astronomical data such as spectra, images and
-spectral-line data cubes.  The NDF may also contain other items such as a
-title, axis labels and units, error and quality arrays, and World
-Co-ordinate System (WCS) information.  There are
-also places in the NDF, called {\em extensions}, to store any
-ancillary data associated with the data array, even other NDFs.
+The NDF has been carefully designed to facilitate processing by both
+general applications like {\footnotesize KAPPA} and specialist packages.
+It contains an $n$-dimensional data array that can store most
+astronomical data such as spectra, images and spectral-line data cubes.
+The NDF may also contain other items such as a title, axis labels and
+units, error and quality arrays, and World Co-ordinate System (WCS)
+information.  There are also places in the NDF, called {\em extensions},
+to store any ancillary data associated with the data array, even other
+NDFs.
 
-The two formats and the meaning of their components are described in
-\latexelsehtml{Appendices~\ref{ap:NDFformat} and
-\ref{ap:IMAGEformat}.}{in \htmlref{NDF standard components}{ap:NDFformat} and
-\htmlref{IMAGE data format}{ap:IMAGEformat}.}  The former
-includes the commands for manipulating the components.  Suffice to say
-here that the IMAGE format is more or less a degenerate form of the NDF,
-and so both formats can be used in parallel throughout {\footnotesize KAPPA};
-those applications using the IMAGE format will have restricted
-functionality, for example limited co-ordinate and quality processing, an
-inability to handle \htmlref{NDF sections}{se:ndfsect}
-\latexonly{(Section~\ref{se:ndfsect})}, and cannot use the
-`on-the-fly' data-conversion scheme.
+The NDF format and its components are described more fully in
+\latexelsehtml{Appendices~\ref{ap:NDFformat},}{\htmlref{NDF standard components}
+{ap:NDFformat},}  which includes commands for manipulating the components.  
 
-Both formats permit arrays to have seven dimensions, but some
+The NDF format permits arrays to have seven dimensions, but some
 applications only handle one-dimensional and/or two-dimen\-sional data
 arrays.  The data and variance arrays are not constrained to a single
 data type.  Valid types are the \htmlref{HDS numeric primitive
@@ -4763,8 +4685,7 @@ two-dimensional.
 
 \subsection{Looking at the Data Structures}
 
-You can look at a summary of the \NDFref{NDF}\ or
-\htmlref{IMAGE}{ap:IMAGEformat} structure using the task
+You can look at a summary of an \NDFref{NDF}\ structure using the task
 \htmlref{NDFTRACE}{NDFTRACE}, and obtain the values of NDF extension
 components with the {\tt \htmlref{setext}{SETEXT} option=get} command.
 \HDSTRACEref\ \latexonly{(SUN/102)} can be used to look at array values and
@@ -4801,19 +4722,13 @@ the machine on which you issue the command. If you don't do this, every
 time you access the data in your \NDFref{NDF}, this conversion
 process occurs. NATIVE also replaces any IEEE
 floating point NaN or Inf values with the appropriate Starlink bad value.
-In the C-shell you can use a {\bf foreach} construct to process several
-files.  The following converts all the HDS files in the current
-directory.
+The following converts all the HDS files in the current directory.
 
 \small
 \begin{verbatim}
-     % foreach file (*.sdf)
-     > native $file:r
-     > echo Converted $file
-     > end
+     % native "*"
 \end{verbatim}
 \normalsize
-The \verb+>+ is a prompt from the shell.
 
 \newpage
 \section{\xlabel{se_ndfsect}NDF Sections\label{se:ndfsect}}
@@ -4824,16 +4739,13 @@ spectrum between nominated wavelengths, or a plane of a cube.  You
 could use \htmlref{NDFCOPY}{NDFCOPY} or \htmlref{MANIC}{MANIC} in some
 circumstances to make a new NDF containing the required data, but this
 would be inconvenient as you would need more disc space, and to invent
-and remember a new filename. In addition, MANIC currently does not
-fully support the NDF, and so you could lose axis information, for
-example.  You will be pleased to learn that there is a succinct and
+and remember a new filename. 
+You will be pleased to learn that there is a succinct and
 powerful alternative that obviates the need to create a new file---the
 NDF section.  The application just processes a `rectangular' subset,
 or section, of the NDF that you nominate.  Certainly, it requires you
 to learn a little syntax, but after you use it a few times it will
-seem cheap at the price for the advantages it offers.  Please note
-however, that sections cannot be given to an
-\htmlref{IMAGE-format}{ap:IMAGEformat} application.
+seem cheap at the price for the advantages it offers.
 
 An NDF section is defined by specifying the bounds of the portion of
 the NDF to be processed immediately following the name of the NDF.
@@ -4990,10 +4902,10 @@ displaced so that it is centred on pixel (10,~20).
 A further variation is that numerical values in subscript expressions
 may be specified either as integers, in which case they refer to pixel
 indices, or as floating-point numbers, in which case they refer to
-{\em axis\/} (or {\em data}) co-ordinates 
-\latexelsehtml{(for a description of {\em data\/} co-ordinates, see
-Section~\ref{se:dataco-ordinates}).}{(see \htmlref{data
-co-ordinates}{se:dataco-ordinates} for a description).}  Here a
+{\em axis\/} co-ordinates 
+\latexelsehtml{(for a description of {\em AXIS\/} co-ordinates, see
+Section~\ref{se:domains}).}{(see \htmlref{``Co-ordinate Frames, Axes and
+Domains''}{se:domains} for a description).}  Here a
 ``floating-point'' number is one containing a decimal point and/or an
 exponent.  Double-precision arithmetic is used to process these
 values, but either double- or single-precision notation may be used
@@ -5324,11 +5236,11 @@ This command limits the number of colours used by the X-window to
 Creating X-windows with too many colours can restrict the availability of
 colours for other X applications.
 
-First of all we make the X-window the current graphics device and image
-display (as described in \latexelsehtml{Section~\ref{se:devglobal}).}{in
-\htmlref{global device names}{se:devglobal}.)}  These will remain in force
-until changed.  The following commands would not be necessary if the
-global parameters already had these values:
+First of all we make the X-window the current graphics device 
+(as described in \latexelsehtml{Section~\ref{se:devglobal}).}{in
+\htmlref{global device names}{se:devglobal}.)}  This selection will remain in force
+until changed.  The following command would not be necessary if the
+global parameter already had this value:
 
 \small
 \begin{verbatim}
@@ -6140,7 +6052,7 @@ graphics device. Each Frame is referred to by a \emph{Domain name} (see
 \hyperref{here}{section }{}{se:domains} for more information about
 co-ordinate Frames and Domains). 
 
-The following three Domains may be used to specify positions within any 
+The following Domains may be used to specify positions within any 
 picture:
 
 \begin{description}
@@ -6219,14 +6131,13 @@ Having produced a pretty picture in an X-window, how do we get it onto a
 piece of paper? There are basically two ways. The simplest way is to copy
 the pixel values from the X-window into a PostScript file, and then print
 the file on a suitable PostScript printer. {\tt GIMP}, or {\tt xv} can be 
-used to do this, using the {\tt Grab} and {\tt Save} commands on the main 
-control panel. The figures in
+used to do this, using the {\tt Grab} and {\tt Save} commands. The figures in
 this chapter were created using this method. It's easy --- but the results
 only have the resolution of your X screen (typically 72 dots per inch)
 which is usually not good enough for general publication.
 
 The second method is more involved, but retains the full resolution of
-your PostScript printer (typically 300 or 600 dots per inch), producing
+your PostScript printer (typically 600 dots per inch or more), producing
 far superior results. It involves running all the {\footnotesize KAPPA}
 applications again, but using a suitable encapsulated PostScript graphics
 device instead of the X-windows device used earlier in this chapter.
@@ -6266,42 +6177,39 @@ device as follows:
 \normalsize
 
 \subsubsection{The PostScript Files}
+
 Having selected a suitable encapsulated PostScript graphics device, each
-{\footnotesize KAPPA} application will produce one or more output files in
-your current directory containing PostScript commands. With the current
-GKS-based graphics system, the first such file will be called {\tt
-gks74.ps}. Subsequent files have a sequence number added to the end of
-their names. Thus, the second PostScript file to be created will be
-called {\tt gks74.ps.1}, the third will be called {\tt gks74.ps.2}, {\it
-etc}.
+{\footnotesize KAPPA} application will produce an output file in your
+current directory containing PostScript commands. These files can be
+examined without needing to be printed by using the {\tt ghostview}
+program. By default, the output file will be called {\tt pgplot.ps}. 
 
-These files can be examined without needing to be printed by using the 
-{\tt ghostview} program. Note, some {\footnotesize KAPPA} applications
-produce more than one file each time they are run. Usually, only one of
-these files will contain any actual drawing commands --- the others will
-just contain commmand definitions and other set-up information. So if 
-you get a blank screen using {\tt ghostview}, don't worry... just try the
-next PostScript file!
-
-It is usually a good idea to delete any existing GKS PostScript files in
-your current directory before starting to create a new plot. This ensures
-that you do not include any files from a previous plot by mistake.
+\begin{quote}
+\emph{ Note, subsequent graphics commands will over-write any file
+created by earlier graphics commands. For this reason you should 
+rename the output file after running each graphics command. An
+alternative approach is to assign a unique value to the DEVICE parameter 
+for each graphics command (rather than just allowing it to default to the
+value of the global parameter set using GDSET). For instance,
+\emph{{\tt DEVICE="epsf\_l;contour.ps"}} would cause the command to write its
+output to file {\tt contour.ps}.}
+\end{quote}
 
 \subsubsection{Combining the Files into a Single File}
 Once all applications have been run, you will have a potentially long
-list of GKS PostScript files in your current directory. These need to be
+list of PostScript files in your current directory. These need to be
 stacked together to produce a single PostScript file which can either be
 printed or included in a document. To do this, we use 
 PSMERGE as follows\footnote{You can include all the PostScript files,
-including those which do not contain any actual drawing commands.}:
+including any which do not contain any actual drawing commands.}:
 
 \small
 \begin{verbatim}
-   % psmerge gks74.ps gks74.ps.1 gks74.ps.2 gks74.ps.3 > total.ps
+   % psmerge display.ps contour.ps stars.ps > total.ps
 \end{verbatim}
 \normalsize
 
-This stacks the first four GKS PostScript files into a single file called
+This stacks the three specified PostScript files into a single file called
 {\tt total.ps}. This will be a normal ({\it i.e.} not encapsulated) PostScript
 file, so you can print it, but it will be difficult to include it in a
 document. If you include the {\tt -e} option when running 
@@ -6309,7 +6217,7 @@ PSMERGE, then an encapsulated PostScript file is created instead:
 
 \small
 \begin{verbatim}
-   % psmerge -e gks74.ps gks74.ps.1 gks74.ps.2 gks74.ps.3 > total.eps
+   % psmerge -e display.ps contour.ps stars.ps > total.ps
 \end{verbatim}
 \normalsize
 
@@ -6319,29 +6227,7 @@ when being printed.
 Note, the order in which you supply the input files is important because
 later files are pasted ``on top of'' earlier files, and so can potentially
 obscure them. In general, you need to list the input files in the order
-in which they were created. You may try using a Unix wild-card to allow the 
-shell to list the input files:
-
-\small
-\begin{verbatim}
-   % psmerge -e gks74.ps* > total.eps
-\end{verbatim}
-\normalsize
-
-This works so long as there are no more than ten input files. This is
-because the shell considers the file name {\tt gks74.ps.10} to come
-before the file name {\tt gks74.ps.2} when ordered alphabetically. What
-you want is for the files to be listed in \emph{numerical} order, not
-alphabetical order. To achieve this, you can list the files explicitly
-yourself, or use the Unix {\tt ls} command to list all GKS PostScript
-files in order of the time they were created. To do this, you would use
-the {\tt -r} and {\tt -t} options:
-
-\small
-\begin{verbatim}
-   % psmerge -e `ls -rt gks74.ps*` > total.eps
-\end{verbatim}
-\normalsize
+in which they were created. 
 
 PSMERGE has other facilities which allow you to scale,
 shift and rotate individual input files before including them in the 
@@ -6364,18 +6250,6 @@ Frame using LISTMAKE. This creates a \emph{positions list} file
 containing these positions, together with associated WCS information.
 You then supply this file to LISTSHOW which marks the positions on the 
 graphics device in any of the ways provided by CURSOR.
-
-Another less significant difference is that the colour lookup table
-cannot be ``remembered'' when displaying images on a PostScript device.
-This means that you must specify the lookup table explicitly each time
-an image is displayed using the LUT parameter of application
-\htmlref{DISPLAY}{DISPLAY}. You may find that images displayed on
-PostScript devices come out with an inverted colour table. If this happens,
-reverse the order of the maximum and minimum data values to be displayed,
-or specify an explicit colour table using the LUT parameter. There are
-several colour tables stored in {\tt \$KAPPA\_DIR}, all with names ending
-in {\tt \_lut.sdf}. For instance, {\tt \$KAPPA\_DIR/grey\_lut.sdf} is a 
-monochrome colour table.
 
 \subsubsection{Using X-windows to Produce a Prototype}
 
@@ -6507,16 +6381,7 @@ much vertical space between the components of the plot. To avoid this we
 only use the bottom third (roughly) of the page --- that is, we pretend
 that the top of our ``page'' is at 0.6 instead of 1.454659.
 
-We start off by delete any existing GKS PostScript files, so that they
-are not included in our final plot:
-
-\small
-\begin{verbatim}
-   % rm gks74.ps*
-\end{verbatim}
-\normalsize
-
-We now create a FRAME picture at the left hand side of the page covering
+We first create a FRAME picture at the left hand side of the page covering
 the full height of our reduced ``page'' and 0.6 of the width. We specify
 the upper and lower bounds of the picture within the BASEPIC Frame, using
 the limits found above, giving the FRAME picture the label ``main'' so
@@ -6529,6 +6394,7 @@ optical image within it, including annotated axes:
    % piclabel main
    % display m31 axes mode=perc percentiles=\[30,99\] style="'colour=black,size=0.6'" \
              margin=\[0.2,0.02\] 
+   % mv pgplot.ps display1.ps
 \end{verbatim}
 \normalsize
 
@@ -6540,19 +6406,11 @@ the MARGIN parameter when running DISPLAY in order to reduce the margin
 on the right hand side of the image. By default, DISPLAY leaves a
 margin equal to 0.2 of the width of the DATA picture. We reduced this to
 0.02 to make more room for the other components of the plot (the first
-value supplied for MARGIN is the bottom margin and is left at 0.2).
-
-If you now do:
-
-\small
-\begin{verbatim}
-   % ls gks74.ps*
-\end{verbatim}
-\normalsize
-
-you will see that already there are several GKS PostScript files in your
-current directory, created by PICDEF and DISPLAY. There will be more by the
-time we have finished!
+value supplied for MARGIN is the bottom margin and is left at 0.2). Note
+the {\tt mv} command at the end of the above sequence. This renames the
+output postscript file created by DISPLAY so that it is not over-written
+by subsequent graphics commands. Throughout the rest of this example, we
+will save each required postscript file in this way.
 
 We now draw a box over this image to mark the ``selected region''
 indicated in Figure~ \latexelsehtml{\ref{fi:agi3}}{3}. In this
@@ -6568,6 +6426,7 @@ OUTCAT parameter. In either case, we use LISTSHOW to draw the box:
      POSITION - A position for the output list /!/ > 0:39:25.0 40:54:17
      POSITION - A position for the output list /!/ > 
    % listshow boxpos plot=box style='colour=black'
+   % mv pgplot.ps box.ps
 \end{verbatim}
 \normalsize
 
@@ -6595,9 +6454,11 @@ with twice the default width:
 \begin{verbatim}
    % display 'm31(173:213,79:114)' border noaxes mode=scale low=3889 high=10854.78 \
               borstyle='width=2'
+   % mv pgplot.ps display2.ps
    % picdata
    % piclabel mag
    % contour noclear noaxes nokey iras mode=perc percentiles=\[55,75,95\]
+   % mv pgplot.ps contour.ps
 \end{verbatim}
 \normalsize
 
@@ -6619,6 +6480,7 @@ top of the Frame:
      POSITION - A position for the output list /!/ > 0.8 0.6
      POSITION - A position for the output list /!/ > 
    % listshow ttlpos plot=text strings='"IRAS 12 \gmm contours"' just=bc
+   % mv pgplot.ps title.ps
 \end{verbatim}
 \normalsize
 
@@ -6640,6 +6502,7 @@ the predominantly dark background of the image:
      POSITION - A position for the output list /!/ > 0:39:56.5 40:50:27
      POSITION - A position for the output list /!/ > 
    % listshow prfpos plot=chain marker=3 style="'colour=white,width=3'"
+   % mv pgplot.ps line.ps
 \end{verbatim}
 \normalsize
 
@@ -6662,7 +6525,9 @@ did when prototyping:
 \begin{verbatim}
    % picdef mode=xy lbound=\[0.6,0.0\] ubound=\[1.0,0.3\] outline=no
    % linplot m31_prof style=^style1 keystyle='size=0.7'
+   % mv pgplot.ps m31_prof.ps 
    % linplot iras_prof noclear noalign style=^style2
+   % mv pgplot.ps iras_prof.ps 
 \end{verbatim}
 \normalsize
 
@@ -6818,6 +6683,7 @@ parameter NAME to BASE (we also revert to drawing in black):
      POSITION - A position for the output list /!/ > 0.6473798 0.5838399
      POSITION - A position for the output list /!/ > 
    % listshow war1pos plot=poly style='colour=black' name=base
+   % mv pgplot.ps war1.ps 
 \end{verbatim}
 \normalsize
 
@@ -6831,16 +6697,18 @@ same way:
      POSITION - A position for the output list /!/ > 0.9524395 0.3159827
      POSITION - A position for the output list /!/ > 
    % listshow war2pos plot=poly name=base
+   % mv pgplot.ps war2.ps 
 \end{verbatim}
 \normalsize
 
 We now have separate PostScript files containing the output from all the
-above applications. These are stacked together to produce the final 
-encapsulated PostScript file:
+above applications. These are stacked together in the order they were
+created to produce the final encapsulated PostScript file:
 
 \small
 \begin{verbatim}
-   % psmerge -e `ls -rt gks74.ps*` > total.eps
+   % psmerge -e display1.ps box.ps display2.ps contour.ps title.ps \
+                line.ps m31_prof.ps iras_prof.ps war1.ps war2.ps > total.eps
 \end{verbatim}
 \normalsize
 
@@ -6865,260 +6733,7 @@ The file {\tt total.eps} is displayed in Figure~ \latexelsehtml{\ref{fi:agi9}}{9
 \end{htmlonly}
 
 \newpage
-\section{\xlabel{se_co-ordsystem}Co-ordinate Systems
-\label{se:co-ordsystem}}
-
-\begin{quote}
-
-{\em 
-
-{\footnotesize KAPPA} is currently undergoing major changes in the
-way it handles co-ordinate information. The new system uses the
-\htmlref{WCS}{apndf:wcs}
-(\emph{World Co-ordinate System}) component of the \NDFref{NDF}\
-structure to allow access to a much wider range of co-ordinate systems
-than has previously been available. For this reason, you will find some
-inconsistencies in the way co-ordinate information is handled by
-different applications. This situation will be rectified once all
-applications have been modified to use the WCS component. Until then,
-please pay particular attention to the descriptions of the co-ordinate
-handling facilities of each application you use. 
-
-The new (converted) applications are identified by the fact that their
-descriptions in
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
-KAPPA applications}{ap:full}} include references to the ``WCS
-component'' or to ``WCS information''. In the new system, each NDF has a
-``current co-ordinate Frame''. The converted applications use this
-co-ordinate Frame when referring to any position within the NDF, for
-instance when producing axis annotation, or requesting a position from
-the user. Each NDF has its own current co-ordinate Frame, and the global
-parameter GLOBAL.COORD\_SYSTEM (see
-\latexelsehtml{Section~\ref{se:parglobals}}
-{section \htmlref{Globals}{se:parglobals}}) is ignored. These application
-do not have a {\tt COSYS} parameter which has previously been used to
-specify a co-ordinate system.
-
-In the previous system, there was a ``global'' co-ordinate system which
-was used by all applications irrespective of the contents of the NDF.
-This co-ordinate system was either \emph{data} or \emph{world} and was
-obtained by each application using a {\tt COSYS} parameter. These
-parameters were associated with the global parameter GLOBAL.COORD\_SYSTEM.
-
-The rest of this section describes the old pre-WCS system and will be
-removed when the conversion process is complete. The new system is
-described in
-\latexelsehtml{Section~\ref{se:wcsuse}}
-{the section \htmlref{Using World Co-ordinate Systems}{se:wcsuse}}).
-Information which is common to both systems (for instance the definition
-of pixel co-ordinates) is included in both sections.
-
-}
-\end{quote}
-
-{\footnotesize KAPPA} uses a number of co-ordinate systems; this section
-describes them, and how to select one.  \htmlref{NDFTRACE}{NDFTRACE}
-reports the bounds of an NDF in these various co-ordinate systems.
-
-\subsection{\xlabel{se_pixelindices}Pixel Indices\label{se:pixelindices}}
-
-The elements in an \NDFref{NDF's}\ array can be addressed by their
-$n$-dimensional integer pixel indices.  The first or {\em origin\/}
-pixel in an NDF need not have pixel index equal to one in each
-dimension, though it usually will.  An NDF can have an arbitrary
-origin.  By adjusting the origins of NDFs with
-\htmlref{SETORIGIN}{SETORIGIN} you may combine the NDFs differently.  For
-example, ADD adds two NDFs where they overlap. The overlap is defined
-in terms of pixel indices. Thus only those pixels with the same pixel
-index in both NDFs will be added.  The resultant NDF is the addition
-in the intersection of the two input NDFs.
-
-If you wish to select rectangular sections of pixels within an NDF
-indices are fine and precise.  Since they are integer quantities,
-these indices cannot represent a continuous co-ordinate system,
-although the information stored in an NDF will almost always require
-that positions within it be describable to sub-pixel accuracy.  For
-example, when \htmlref{CENTROID}{CENTROID} determines the position of
-a star in a 2-dimensional image it will inevitably give rise to a
-non-integer result, for which a continuous ($x$-$y$) co-ordinate
-system is required.
-
-\subsection{\xlabel{se_pixelco-ordinates}Pixel Co-ordinates
-\label{se:pixelco-ordinates}}
-
-There are a number of ways in which a continuous co-ordinate system
-can be defined for a regular array of pixels. In the absence of
-other information, the Starlink convention is to use a {\em pixel
-co-ordinate system\/} in which a pixel with indices ($i,j$) has its
-centre at the position
-
-\begin{quote}
-\begin{center}
-($i-\frac{1}{2},j-\frac{1}{2}$)
-\end{center}
-\end{quote}
-
-and is taken to be one unit in extent in each dimension.
-Pixel (1,1) would therefore be centred at the position (0.5,0.5) and would
-have its `lower' and `upper' corners located at positions (0.0,0.0) and
-(1.0,1.0) respectively, as follows
-
-\begin{quote}
-\begin{center}
-
-\setlength{\unitlength}{1.0mm}
-\begin{picture}(15,25)(0,-7.5)
-
-\thicklines
-\put(0,0){\line(1,0){10}}
-\put(10,0){\line(0,1){10}}
-\put(10,10){\line(-1,0){10}}
-\put(0,10){\line(0,-1){10}}
-\put(5,5){\circle*{0.7}}
-
-\thinlines
-\put(0,-4){\vector(0,1){3}}
-\put(0,-5){\makebox(0,0)[tr]{(0.0,0.0)}}
-\put(10,14){\vector(0,-1){3}}
-\put(10,15){(1.0,1.0)}
-\put(14,5){\vector(-1,0){8}}
-\put(15,5){\makebox(0,0)[l]{(0.5,0.5)}}
-
-\end{picture}
-\end{center}
-\end{quote}
-
-This makes it possible to refer to fractional pixel positions---in
-this case within a 2-dimensional array, although the principle can
-obviously be extended to other numbers of dimensions. 
-
-\subsection{\xlabel{se_dataco-ordinates}Data Co-ordinates
-\label{se:dataco-ordinates}}
-
-The pixel co-ordinate system described above defines how to convert pixel
-indices into a set of continuous co-ordinates and therefore introduces a
-co-ordinate {\em axis\/} which runs along each dimension of the NDF, as
-follows
-
-\begin{quote}
-\begin{center}
-
-\setlength{\unitlength}{0.65mm}
-\begin{picture}(70,57)(-10,-7)
-
-\multiput(10,10)(0,3){11}{\line(1,0){45}}
-\multiput(10,10)(3,0){16}{\line(0,1){30}}
-\put(32.5,43){\makebox(0,0)[b]{\scriptsize NDF Pixel Array}}
-
-\thicklines
-\put(0,0){\vector(1,0){60}}
-\put(25,-5){\bf Axis 1}
-\put(0,0){\vector(0,1){45}}
-\put(0,48){\makebox(0,0)[b]{\bf Axis 2}}
-
-\end{picture}
-\end{center}
-\end{quote}
-
-The use of the pixel size to determine the units of these axes is rather
-restrictive, however, and in practice we may want to use more realistic
-physical units. This would allow a spectrum to be calibrated in
-wavelength, for instance, or the output from a plate-measuring machine
-to be related to axes calibrated in microns.   In {\footnotesize KAPPA}
-these are called {\em Data\/} co-ordinates.
-
-The NDF's {\em axis\/} components are designed to hold the extra information
-needed to define more useful co-ordinate systems, so that realistic axes can
-be associated with a NDF, along with {\em labels\/} and {\em units\/} for
-these axes.
-
-\subsection{\xlabel{se_selectcosys}Selecting a Co-ordinate System
-\label{se:selectcosys}}
-
-The pixel co-ordinate system is the default choice, and although it is
-intended to be used only in the absence of other information,
-{\footnotesize KAPPA} offers you a choice of co-ordinate system, even if
-your NDF has physical co-ordinates in its axis centres.
-
-There is a \htmlref{global parameter}{se:parglobals}---the current
-co-ordinate system---that may be {\tt WORLD} or {\tt DATA}.  It is set
-by a parameter called COSYS in each application that processes data
-co-ordinates. For instance,
-
-\small
-\begin{verbatim}
-     % greyplot cosys=w axes \\
-     % centroid
-\end{verbatim}
-\normalsize
-makes the axes about the displayed image and the centroid positions in
-the following task appear in pixel co-ordinates, regardless of whether
-there are axes present or not.
-
-Conversely,
-
-\small
-\begin{verbatim}
-     % greyplot cosys=d axes \\
-     % centroid
-\end{verbatim}
-\normalsize
-makes the axes about the displayed image and the centroid positions
-appear in data co-ordinates, {\em provided there are axes present.}
-Of course, the axes may just have a pixel co-ordinate system.
-
-If the global parameter is undefined, applications will adopt 
-a suitable default, depending on the application.  All default to
-{\tt "Data"} except \htmlref{ARDMASK}{ARDMASK}, CENTROID, 
-\htmlref{FITSURFACE}{FITSURFACE}, \htmlref{PSF}{PSF},
-\htmlref{SEGMENT}{SEGMENT}, \htmlref{TRANSFORMER}{TRANSFORMER}, and
-\htmlref{ZAPLIN}{ZAPLIN}.
-
-When you draw a plot or an image, the graphics database records the
-co-ordinate extents of the picture.  What was not said explicitly was
-which co-ordinate system.  Looking at the output from
-\htmlref{GDSTATE}{GDSTATE} and \htmlref{CURSOR}{CURSOR} shows that the
-database deals in world co-ordinates.  Graphics packages like
-\GKSref\ require co-ordinates to be linear and increase from left to
-right and bottom to top.  This is not necessarily the case for
-physical axes.  So are we going to lose our co-ordinate system between
-applications?  No\ldots well almost certainly not. {\footnotesize KAPPA}
-strives to find a linear transformation between your data co-ordinates
-and pixel co-ordinates, or a logarithmic one in some cases.  If it
-succeeds the transformation is stored in the database.  Thus if you
-display an image with offsets in arc-minutes along both axes,
-you can then use CURSOR to identify the offsets in arc-minutes of positions 
-on the screen.
-
-\newpage
 \section{\xlabel{se_wcsuse}Using World Co-ordinate Systems\label{se:wcsuse}}
-
-\begin{quote}
-
-{\em 
-
-{\footnotesize KAPPA} is currently undergoing major changes in the
-way it handles co-ordinate information. This section describes the new
-system which is based on the \htmlref{WCS}{apndf:wcs}
-(\emph{World Co-ordinate System}) component of the \NDFref{NDF}\
-structure. See 
-\latexelsehtml{Section~\ref{se:co-ordsystem}}
-{the section \htmlref{Co-ordinate Systems}{se:co-ordsystem}} for a
-description of the old system (based on the use of the COSYS
-parameter) which is being replaced.
-
-The new (converted) applications are identified by the fact that their
-descriptions in
-\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
-{\footnotesize KAPPA} applications}{ap:full}} include references to the ``WCS
-component'' or to ``WCS information''. These applications no longer have a 
-COSYS parameter.
-
-The older applications are identified by the fact they make no reference
-to the WCS component, and have a COSYS parameter. 
-
-}
-\end{quote}
 
 \subsection{\xlabel{se_pixgrd}Pixel Indices, Pixel Co-ordinates, and Grid
 Co-ordinates\label{se:pixgrd}}
@@ -7462,14 +7077,9 @@ are exceptions to this rule:
 
 \begin{itemize}
 
-\item Applications which still use the old IMAGE-format data structures
-(see \latexelsehtml{Section~\ref{se:datastr}}{``\htmlref{Data Structures}
-{se:datastr}''}). {\it e.g.}\ \htmlref{SQORST}{SQORST}, \htmlref{MANIC}{MANIC},
-{\it etc.}
-
 \item Applications in which positions in the output NDF are
 not linearly related to corresponding positions in the input NDF 
-({\it e.g.}\ \htmlref{TRANSFORMER}{TRANSFORMER}, \htmlref{ELPROF}{ELPROF},
+({\it e.g.}\ \htmlref{ELPROF}{ELPROF},
 \htmlref{CHAIN}{CHAIN}, \htmlref{RESHAPE}{RESHAPE}).
 
 \item Applications in which the output NDF is not a direct representation
@@ -7535,15 +7145,11 @@ will erase the IRAS90 and FITS extensions from the NDF \verb+m31+.
 
 \subsection{Using SETSKY to Add a Celestial Co-ordinate Frame to an NDF}
 As mentioned in the previous section, the \htmlref{SETSKY}{SETSKY}
-application stores astrometry information within an NDF in the form of an
-IRAS90 astrometry structure. Such structures are limited in several ways
-compared to a full WCS component, but can none-the-less be used by other
-{\footnotesize KAPPA} applications. It is hoped that SETSKY will be replaced
-at some point in the future with a fully compliant WCS application.
+application stores astrometry information within an NDF in the form of
+either a WCS component or an IRAS90 astrometry structure. 
 
 To use SETSKY, you need to know the celestial co-ordinates at a set of
-points within the image. You may be able to find these, for instance,
-using software such as CHART (see \xref{SUN/32}{sun32}{}), or by comparing
+points within the image. You may be able to find these by comparing
 your image with other images, such as those available from the 
 Digitised Sky Survey, which already have astrometry information
 associated with them. You create a text file holding the pixel and
@@ -7569,7 +7175,7 @@ third gives the pixel X co-ordinates, and the fourth gives the pixel Y
 co-ordinates.
 
 If this file is called \verb+pos.dat+, then the following command can be
-used to create the IRAS90 astrometry structure:
+used to create a WCS component:
 
 \small
 \begin{verbatim}
@@ -7598,8 +7204,7 @@ the smallest RMS position error.
 
 An alternative way to add a celestial co-ordinate Frame to an NDF is to
 use the facilities of GAIA (see \xref{SUN/214}{sun214}{}). This provides
-much more sophisticated facilities, and creates a standard WCS
-component instead of an IRAS90 astrometry structure.
+much more sophisticated facilities.
 
 \subsection{\xlabel{se_frmatt}Frame Attributes\label{se:frmatt}}
 
@@ -8284,13 +7889,15 @@ of an NDF, and change the values of those which are not read-only.
 
 We have seen the different co-ordinate systems {\footnotesize KAPPA} uses.
 Now we address how the applications obtain co-ordinate information
-itself.  Applications that require co-ordinates are being modified to
-permit a variety of mechanisms for obtaining those
-co-ordinates.\footnote{Those converted so far include
-\htmlref{ARDMASK}{ARDMASK}, CENTROID, 
-\htmlref{SEGMENT}{SEGMENT}, and \htmlref{ZAPLIN}{ZAPLIN}.}
-The possibilities are as follows.
+itself.  Applications often permit a variety of mechanisms for obtaining those
+co-ordinates. Typical possibilities are as follows.
 \begin{description}
+\item [Catalogue] --- In this mode the application reads a file
+containing a positions list. This can either be a FITS binary
+table, or a text file in STL format, and can contain WCS Information
+allowing positions within the catalogue to be aligned with other data.
+Positions lists can be created by several applications such as CURSOR,
+LISTMAKE, CENTROID, \emph{etc.}
 \item [Cursor] --- This mode utilises the cursor of the current graphics
 device.  For this to work the array must already be displayed as an
 image, or a contour plot, or line plot (provided the application handles
@@ -8301,9 +7908,7 @@ the parameter system, usually in response to prompting.
 containing a list of co-ordinates in free format, one object per record.
 There may be commentary lines in the file beginning with {\tt \#} or
 {\tt !}.  The format and syntax of the files are {\it ad hoc}, and are
-described in the application documentation.\footnote{A standard and
-far-more powerful syntax for defining co-ordinates and regions within
-arrays has been designed.}
+described in the application documentation.
 \end{description}
 
 Applications that permit these options have a parameter, called
@@ -8408,34 +8013,62 @@ Such co-ordinate files can also be created interactively with images by
 \section{\xlabel{se_coltab}Graphics Device Colour Table and Palette
 \label{se:coltab}}
 
-An graphice device has a colour table (sometimes called the video lookup
-table) which converts integer values in the display's memory into the
-colours that you see on the monitor. There are usually somewhere
-between 64 and 256 entries or {\em indices\/} in the colour table that
-are numbered consecutively increasing from 0.  For example, if there
-were 256 colour indices then you would be able display 256 different
-colours simultaneously; and when you display an image your data values
-would be scaled to map onto the integer range of the colour indices,
-0--255.
+The \PGPLOTref\ graphics package which is used by {\footnotesize KAPPA} 
+draws images and line graphics using a set of ``pens''. The number of pens 
+available is limited to 256, even on 16 or 24 bit graphics devices which
+nominally have ``millions'' of colours. On 8 bit graphics devices, the
+number of available pens may be less than 256 if any other applications
+have ``grabbed'' colours for their own use\footnote{Netscape is notorious 
+for this. If you have problems allocating sufficient colours, try killing
+any netscape browsers you have running.}. 
 
-In many systems the full colour table is used.  This has the
-disadvantage that if you want to annotate images with captions or axes,
-plot coloured borders about images, plot graphs {\it etc.}\, yet
-simultaneously display
-images with certain colour tables, there may be conflict of interests.
-For instance, a linear greyscale colour table's first few colour indices
-will be almost black.  By default, these same indices, particularly
-index 1, are used by the graphics system for line graphics, thus
-any plots will be invisible.  If you reset colour index 1 to white, the
-appearance of your image alters.   Whenever you alter the colour table
-to enhance the look of your image, it will affect the line graphics.
+Each PGPLOT pen draws in a single colour, but you can choose what that
+colour will be for each pen. This allocation of colours to pens is called
+the PGPLOT ``colour table''. Each pen has a corresponding integer
+\emph{index} within the table. On 8-bit graphics devices you can allocate
+any arbitrary combination of red, green and blue to a pen (each colour is
+specified as an ``intensity'' in the range zero to one). On 16 and 24 bit
+devices you can only allocate one of the ``millions'' of colours known to
+the graphics device. For instance, on 16 bit devices it is common to
+allocate 5 bits each to the red and blue intensity and the remaining 6
+bits to the green intensity. This means that red and blue can only be set
+accurate to 1 part in 32 on these devices, which may result in colours
+not being exactly as you want them.
+
+On an 8-bit device, any changes which you make to the colour table are
+immediately reflected in the visual appearance of the display. For
+instance, if you set pen 1 to red, then draw something using pen 1, it
+will appear red on the screen. If you then change pen 1 to blue, the
+previously drawn graphics will immediately change colour without you
+needing to re-draw them. This is \emph{not} usually true for 16 and 24 bit
+devices. That is, changing pen colours will usually have no effect on
+previously drawn graphics. In order to see the effects of the changed pen
+colour, you will need to re-display the graphics.
+
+In many image procesing and visualisation systems the full colour table
+is used to draw images.  This has the disadvantage that if you want to
+annotate images with captions or axes, plot coloured borders about
+images, plot graphs {\it etc.}\, yet simultaneously display images with
+certain colour tables, there may be conflict of interests. For instance,
+a linear greyscale colour table's first few pens will be almost
+black. By default, these same pens, particularly pen 1, are used by
+the graphics system for line graphics, thus any plots will be invisible.
+If you reset colour pen 1 to white, the appearance of your image
+alters. Whenever you alter the colour table to enhance the look of your
+image, it will affect the line graphics.
 
 To circumvent this dilemma, {\footnotesize KAPPA} reserves a portion of the
 colour table, called the {\em palette}, that is unaffected by changes
 to the rest of the colour table. It is shown schematically below.  The
-palette currently contains a fixed 16 indices.  $N$ is the total
-number of indices.  In {\footnotesize KAPPA} the remainder of colour indices
-is called the {\em colour table}.
+palette currently contains a fixed 16 pens.  $N$ is the total
+number of pens.  In {\footnotesize KAPPA} the remainder of the pens 
+is called the {\em colour table}. It is easy to confuse this use of the
+term {\em colour table}, with the PGPLOT colour table described above. To
+sumarize again, in {\footnotesize KAPPA} the ``colour table'' is that
+part of the PGPLOT colour table which has not been reserved for annotation
+(\emph{i.e.} the whole colour table minus the first 16 pens which form the
+annotation \emph{pallette}). The context should usually make it obvious
+which understanding of the phrase ``colour table'' is being used.
 
 \begin{center}
 \begin{picture}(136,28)
@@ -8481,19 +8114,18 @@ is called the {\em colour table}.
 
 \subsection{\xlabel{se_lookuptables}Lookup Tables\label{se:lookuptables}}
 
-In order to distinguish between the set of colours in the physical image
-display (the colour table) and some external table of colours, the latter
-is called a {\em lookup table}. Lookup tables comprise a series of
-red, green and blue (RGB) intensities, each normalised to 1.0; they may
-be stored in NDFs---indeed some are provided with {\footnotesize KAPPA}---or
+A list of colours to be allocated to each pen in the colour table is
+called a \emph{lookup table}. Lookup tables comprise a series of red,
+green and blue (RGB) intensities, each normalised to 1.0; they may be
+stored in NDFs---indeed some are provided with {\footnotesize KAPPA}---or
 be coded within applications.
 
 A lookup table may be transferred into the display's colour table.
-However, the number of indices in the colour table is usually not the
+However, the number of pens in the colour table is usually not the
 same as the number of colours in the lookup table and so a simple
 substitution is not possible.  Therefore, {\footnotesize KAPPA} squeezes
 or stretches the lookup table to make it fit in the available number of
-colour-table indices.  Normally, linear interpolation between adjacent
+colour-table pens. Normally, linear interpolation between adjacent
 lookup-table entries defines the resultant colour, though you can select
 a nearest-neighbour algorithm.  The latter is suited to lookup tables
 with sharp boundaries between contrasting colours, {\it{e.g.}}\ a series of
@@ -8532,15 +8164,12 @@ not have a palette, since
      ICL> lutsave pirated full
 \end{verbatim}
 \normalsize
-will save the full set of colour indices to the NDF.
+will save the full set of pens (including the first 16) to the NDF.
 
 \subsection{\xlabel{se_mancoltab}Manipulating Colour Tables
 \label{se:mancoltab}}
-
-{\footnotesize KAPPA} provides a number of commands for adjusting a colour
-table.  \htmlref{LUTEDIT}{LUTEDIT} provides a complete
-graphical-user-interface which allows colour tables to be created or
-modified in many different ways. 
+\htmlref{LUTEDIT}{LUTEDIT} provides a complete graphical-user-interface which
+allows colour tables to be created or modified in many different ways.
 
 \subsection{\xlabel{se_creluts}Creating Lookup Tables\label{se:creluts}}
 
@@ -8609,19 +8238,29 @@ For example,
 would make palette index 1 sky blue and index 14 a pale yellow.  Once
 you have a palette you like, save it in an NDF with
 \htmlref{PALSAVE}{PALSAVE}.  
-The palette has limited {\em direct\/} use in {\footnotesize KAPPA} so far,
-but it is expected to grow as more applications support different
-colouring of the components of a plot.  One example, is in
-\htmlref{DISPLAY}{DISPLAY} where you can have a coloured border for
-effect (as seen on television news programmes).  The colour of the
-border is selected from the palette or the nearest colour in the
-palette is used.
 
-Indirectly, the appearance of existing plots may be changed.  Palette
-entry 0 is the background colour, and entries 1--5 correspond to
-\SGSref\  pens or \PGPLOTref\ colour indices of the same number.  By
-choosing a palette colour equal to the background colour, features may
-be `erased'.
+Palette entry 0 is the background colour. By choosing a palette colour
+equal to the background colour, features may be `erased'.
+
+\subsection{Persistence of Palettes and Colour Tables}
+PGPLOT re-initializes the palette and colour table each time it is
+started up, wiping out the colours you had previously selected with such
+care! For this reason, KAPPA keeps a copy of the ``current'' palette and
+colour table in a special file. Each time a graphics application is run,
+the current colour table and palette are read back from this file, and
+used to reset the pen colours in the PGPLOT colour table before any
+drawing is performed. Some application change the colour table or palette;
+PALENTRY, LUTABLE, {\em etc.}. When such applications terminates, they
+write the modified colour table or palette back to the file so that it will
+be used by subsequent graphics applications.
+
+Separate palettes and colour tables are maintained for each known
+graphics device, so running LUTGREY on an xwindows device will have no
+effect on the colour table used for postscript devices (for instance).
+The palettes for all known devices are stored in a file called {\tt
+kappa\_palette.sdf} located within your ADAM directory (usually
+\$HOME/adam). The colour tables for all known devices are stored in a
+file called {\tt kappa\_lut.sdf} located within the same directory.
 
 \newpage
 \section{\xlabel{se_masking}Masking, Bad Values, and Quality\label{se:masking}}
@@ -9064,11 +8703,11 @@ pixels, use the \htmlref{GLITCH}{GLITCH} command.
 
 \small
 \begin{verbatim}
-     % glitch old new where=bad
+     % glitch old new mode=bad
 \end{verbatim}
 \normalsize
-This replaces the bad values in the data array (it is yet to support
-variance) with the median of the eight neighbouring pixels.  This works
+This replaces the bad values in the data and variance arrays with the median 
+of the eight neighbouring pixels.  This works
 fine for isolated bad pixels but not for large blocks.  If your data are
 generally flat, large areas can be replaced using the
 \htmlref{FILLBAD}{FILLBAD} task.
@@ -9762,9 +9401,9 @@ delete this file.
 
 \subsubsection{Reading FITS Files}
 
-Until comparatively recently there was officially no such thing as
-disc FITS.  However, for many years {\it ad hoc}\ implementations have
-existed.  Of these, \htmlref{FITSDIN}{FITSDIN} will handle files
+For many years there was officially no such thing as
+disc FITS.  However, {\it ad hoc}\ implementations have
+existed for a long time.  Of these, \htmlref{FITSDIN}{FITSDIN} will handle files
 adhering to the FITS rules for blocking (and more), but it doesn't
 process byte-swapped `FITS' files.  Thus it can process files with
 fixed-length records of semi-arbitrary length; so, for example, files
@@ -10191,9 +9830,9 @@ beginning with {\tt \{ } are comments.
 \begin{verbatim}
      PROC FLASH INPIC
      {
-     { Procedure for displaying an image without scaling and a yellow border.
+     { Procedure for displaying an image without scaling.
      {
-        DISPLAY IN=(INPIC) MODE=FL BORDER BCOLOUR=Yellow
+        DISPLAY IN=(INPIC) MODE=FL 
      END PROC
 \end{verbatim}
 \normalsize
@@ -10826,22 +10465,30 @@ the help source, shell scripts, {\footnotesize ICL} procedures, and test data
 are in {\tt kappa\_source.tar}.  There is also a Starlink standard
 {\tt makefile} and {\tt mk} script.
 
+Many of the general purpose subroutines which previously formed part of
+{\footnotesize KAPPA} have now been moved into a separate software item
+called {\footnotesize KAPLIBS} (see \xref{SUN/238}{sun238}{}).
+{\footnotesize KAPPA} itself now links against the libraries
+in {\footnotesize KAPLIBS}.
+
 Here is a worked example.  Suppose that you have
 \htmlref{\_REAL}{ap:HDStypes}-type datasets for which you want to
 compute statistics including the skewness and kurtosis.  One way is to
 modify STATS.  First to save typing define environment variables, say
-STAR and KAP to point to where the Starlink software and {\footnotesize
-KAPPA} source is stored.  Next we extract the source files to change.
+STAR and KAPPA and KAPLIBS to point to where the Starlink software,
+{\footnotesize KAPPA} and {\footnotesize KAPLIBS} source is stored.  Next
+we extract the source files to change.
 
 \small
 \begin{verbatim}
      % setenv STAR /star
-     % setenv KAP /star/kappa
-     % tar xf $KAP/kappa_sub.tar stats.
-     % tar xf $KAP/kappa_ifls.tar stats.ifl
-     % tar xf $KAP/kapgen_sub.tar kpg1_statr.f
-     % tar xf $KAP/kapgen_sub.tar kpg1_stdsr.f
-     % tar xf $KAP/kappa_source.tar kappa_link_adam
+     % setenv KAPPA /star/sources/kappa
+     % setenv KAPLIBS /star/sources/kaplibs
+     % tar xf $KAPPA/kappa_sub.tar stats.
+     % tar xf $KAPPA/kappa_ifls.tar stats.ifl
+     % tar xf $KAPLIBS/kapgen_sub.tar kpg1_statr.f
+     % tar xf $KAPLIBS/kapgen_sub.tar kpg1_stdsr.f
+     % tar xf $KAPPA/kappa_source.tar kappa_link_adam
 \end{verbatim}
 \normalsize
 
@@ -10860,6 +10507,7 @@ Next some soft links to include files need to be made.
      % ndf_dev
      % prm_dev
      % par_dev
+     % kaplibs_dev
 \end{verbatim}
 \normalsize
 For some other application and subroutines, you can find what is
@@ -10867,14 +10515,14 @@ needed by trying to compile them and see which include files the
 compiler cannot locate.  You then invoke the appropriate package
 definitions: {\em pkg}{\tt \_dev}, where {\em pkg\/} is the three-letter
 package abbreviation.  Now compile the modified code.  This is for
-OSF/1
+OSF/1:
 
 \small
 \begin{verbatim}
      % f77 -O -c -nowarn stats.f kpg1_statr.f kpg1_stdsr.f
 \end{verbatim}
 \normalsize
-and this is for Solaris.
+and this is for Solaris:
 
 \small
 \begin{verbatim}
@@ -10883,18 +10531,22 @@ and this is for Solaris.
 \normalsize
 The {\tt -nowarn} and {\tt -w} prevent warning messages appearing.
 
+And this is for Linux:
+
+\small
+\begin{verbatim}
+     % g77 -fno-second-underscore -O -c stats.f kpg1_statr.f kpg1_stdsr.f
+\end{verbatim}
+\normalsize
+
 Now link the task to produce a new {\tt stats} executable.
 
 \small
 \begin{verbatim}
      % alink stats.o -o stats kpg1_statr.o kpg1_stdsr.o \
-     $KAPPA_DIR/libkapgen.a -L$STAR/lib `./kappa_link_adam`
+     -L$STAR/lib `./kappa_link_adam`
 \end{verbatim}
 \normalsize
-For other tasks you may need more KAPPA object libraries in addition
-to {\tt libkapgen.a}.  There is a full list in {\tt \$KAP/makefile}
-(look for {\tt OBJECT\_LIBRARIES}).  If you add further libraries, add
-them in the order given within the makefile.
 
 If you want to use {\footnotesize KAPPA} subroutines for your own application
 here are words of warning: {\em the code may undergo alterations of
@@ -10993,21 +10645,22 @@ abbreviated.
 
 \section{Acknowledgements}
 
-Several people have contributed complete {\footnotesize KAPPA} programmes, or
-have upgraded earlier versions, or have written original code (which
-eventually became included in {\footnotesize KAPPA} after reworking). Rodney
-Warren-Smith converted several of the old IMAGE applications to use
-the NDF\_ library, and supplied several other programmes, especially
-ones that now form the basis of NDFPACK. Other contributions have come
-from Steven Beard, Wei Gong, Rhys Morris, Jo Murray, Grant Privett,
-and Richard Saxton.  The original {\footnotesize KAPPA} was derived from Mark
-McCaughrean's {\footnotesize RAPI2D} and Ken Hartley's {\footnotesize ASPIC Kernel},
-though little remains.  Thanks also to Rodney Warren-Smith for
-permitting this document to include a few modified pages of his SUN/33
-on NDF sections and co-ordinate systems; and to many useful
-suggestions from users and programmers over the years including Chris
-Clayton, Peter Draper, Jim Emerson, Horst Meyerdierks, Andy Scott, and
-Martin Shaw.  Mike Lawden helped produce the quick-reference card.
+Several people have contributed complete {\footnotesize KAPPA}
+programmes, or have upgraded earlier versions, or have written original
+code (which eventually became included in {\footnotesize KAPPA} after
+reworking). Rodney Warren-Smith converted several of the old IMAGE
+applications to use the NDF\_ library, and supplied several other
+programmes, especially ones that now form the basis of NDFPACK. Other
+contributions have come from Mark Taylor, Alasdair Allen, Steven Beard,
+Wei Gong, Rhys Morris, Jo Murray, Grant Privett, and Richard Saxton.  The
+original {\footnotesize KAPPA} was derived from Mark McCaughrean's
+{\footnotesize RAPI2D} and Ken Hartley's {\footnotesize ASPIC Kernel},
+though little remains.  Thanks also to Rodney Warren-Smith for permitting
+this document to include a few modified pages of his SUN/33 on NDF
+sections and co-ordinate systems; and to many useful suggestions from
+users and programmers over the years including Chris Clayton, Peter
+Draper, Jim Emerson, Horst Meyerdierks, Andy Scott, and Martin Shaw.
+Mike Lawden helped produce the quick-reference card.
 
 \newpage
 \appendix
@@ -40892,7 +40545,8 @@ such as \FITSref\ or \IRAFref\@.
 \newpage
 \section{\xlabel{ap_IMAGEformat}IMAGE data format\label{ap:IMAGEformat}}
 
-The IMAGE format as used by some of {\footnotesize KAPPA} is a simple
+The IMAGE format as used by some commands in earlier versions of
+{\footnotesize KAPPA} is a simple
 \HDSref\ structure, comprising a floating-point data array, a character title,
 and the maximum and minimum data values.  It is variant of the
 original Wright-Giddings IMAGE structure.  There are others is use
@@ -40911,7 +40565,7 @@ below using the \HDSTRACEref\latexonly{ (SUN/102)} notation; see
    End of Trace.
 \end{verbatim}
 
-Currently, the DATA\_ARRAY may have up to seven dimensions.
+The DATA\_ARRAY may have up to seven dimensions.
 IMAGE structures are associated with parameters like INPIC and OUTPIC.
 The TITLE object of new IMAGE structures takes the value of the
 parameter OTITLE.  DATA\_MIN and DATA\_MAX are now ignored.
@@ -40926,8 +40580,9 @@ the processing does not invalidate its values.  IMAGE applications
 also handle most {\em simple\/} NDFs correctly (those where the data
 array is an array of numbers at the second level of the hierarchical
 structure).  This similarity in formats enables NDF and IMAGE
-applications to work in co-operation, and the conversion within
-{\footnotesize KAPPA} can be undertaken piecemeal.  Note that the primitive
+applications to work in co-operation, and so the conversion within
+{\footnotesize KAPPA} was undertaken piecemeal over several years. 
+Note that the primitive
 variant is no longer the norm for NDFs, since for example, it does not
 support origin information.
 
@@ -43604,8 +43259,31 @@ linking command.
 
 \subsection{General Changes}
 \begin{itemize}
+
+\item Graphics applications are now linked with native PGPLOT, instead
+of the Starlink GKS-based version of PGPLOT. Graphics device names can be
+given either in the native PGPLOT style (\emph{e.g.} ``/CPS'' for
+landscape colour encapsulated postscript) or in the equivalent
+traditional Starlink style (\emph{e.g.} ``epsfcol\_l''). Note, postscript
+output is now written to a file called \verb+pgplot.ps+ by default, and
+each graphics command will over-write any existing file with this name.
+That is, no sequence number is added to the end of the file name as used
+to be the case with the GKS version of PGPLOT. In order to avoid
+over-writing previous graphics files, you can specify an alternative 
+output file to use when giving the device name, as in the following 
+examples; \verb+fred.ps/CPS+ or \verb+epsfcol_l;fred.ps+.
+
+\item The distinction getween graphics devices and image displays has
+been removed. All graphics output from all commands now goes to the 
+current \emph{graphics device} set with GDSET. The ID... commands have been
+removed.
+
+\item Support for overlay devices has been removed since there are no
+native PGPLOT drivers for them. The OV... commands have been removed.
+
 \item Colours can now be specified as RGB intensity triplets, or as HTML
 colour codes, in addition to the previous forms.
+
 \item 
 Each picture in the graphics database now has a co-ordinate Frame with
 Domain ``NDC'' associated with it. This Frame covers the whole graphics
@@ -43649,6 +43327,14 @@ need that may occur for them (see SUN/239).
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{GDSET}{GDSET}] \mbox{}
+      \begin{itemize}
+         \item If a postscript device is selected, GDSET now reports the name of the 
+          file to which postscript output will be written, together with
+          a warning to the effect that each subsequent graphics command will
+          over-write this file.
+      \end{itemize}
 
    \item [\htmlref{LUTABLE}{LUTABLE}] \mbox{}
       \begin{itemize}
