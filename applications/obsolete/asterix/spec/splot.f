@@ -197,6 +197,8 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
       CHARACTER*20 		DEV			! Graphics device
       CHARACTER*20 		COMPSPEC(MAXCOMP)	! spec for individual components
 
+      DOUBLE PRECISION		LNDFAC
+
       REAL 			PARAM(NPAMAX)		! Model parameters
       REAL 			LB(NPAMAX)		! Parameter lower bounds
       REAL 			UB(NPAMAX)		! Parameter upper bounds
@@ -275,7 +277,7 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
 *    Get observed data and response
         CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
         CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', 1, .FALSE.,
-     :                   .FALSE., NDS, NGOOD, SSCALE, STATUS )
+     :                   .FALSE., NDS, NGOOD, SSCALE, LNDFAC, STATUS )
         NDMAX = DATASET_NDAT(1)
         NFMAX = PREDICTION_NMDAT(1)
 

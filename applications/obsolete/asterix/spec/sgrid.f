@@ -197,6 +197,7 @@ c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
       CHARACTER*80           	TEXT               	! Various o/p text
 
       DOUBLE PRECISION       	STATMIN            	! Fit statistic
+      DOUBLE PRECISION       	LNDFAC
 
       REAL                   BASE, SCALE        ! Grid axis values
       REAL                   LB(NPAMAX)		! Parameter lower bounds
@@ -281,7 +282,7 @@ c     RECORD /PREDICTION/    	PREDDAT(NDSMAX)    	! Data predicted by model
       CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
       WORKSPACE = .TRUE.
       CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
-     :                 CHISTAT, NDS, NGOOD, SSCALE, STATUS )
+     :                 CHISTAT, NDS, NGOOD, SSCALE, LNDFAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Look for redshift

@@ -225,6 +225,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 
       DOUBLE PRECISION 		STAT			! Fit statistic
       DOUBLE PRECISION 		FPROB			! Fit probability
+      DOUBLE PRECISION 		LNDFAC
 
       REAL 			PARAM(NPAMAX)		! Model parameters
       REAL 			LB(NPAMAX)		! Parameter lower bounds
@@ -293,7 +294,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
       WORKSPACE = .TRUE.
       CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
      :                 (.NOT. LIKSTAT), NDS,
-     :                 NGOOD, SSCALE, STATUS )
+     :                 NGOOD, SSCALE, LNDFAC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Look for redshift
@@ -333,7 +334,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 *    Evaluate the statistic
         CALL FIT_APPTIE( IMOD, .FALSE., PARAM, LB, UB, STATUS )
         CALL FIT_STAT( NDS, IMOD, PARAM, FSTAT,
-     :                    FIT_PREDDAT, STAT, STATUS )
+     :                 FIT_PREDDAT, STAT, LNDFAC, STATUS )
 
 *    Report value of statistic
         CALL SFIT_OPSTAT( FSTAT, STAT, SSCALE, NGOOD, OCI, STATUS )
@@ -350,7 +351,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 
 *  Perform fit iteration
       CALL FIT_MIN( NDS, IMOD, MCTRL, OPCHAN, .TRUE.,
-     :              NPAR, LB, UB, FROZEN, SSCALE, FSTAT,
+     :              NPAR, LB, UB, FROZEN, SSCALE, LNDFAC, FSTAT,
      :              FIT_PREDDAT, PARAM, DPAR, PEGGED,
      :              STAT, FINISHED, FITERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -379,7 +380,8 @@ c     RECORD /MODEL_SPEC/ 	MODEL			! Model specification
 	CALL MSG_BLNK()
 	CALL MSG_PRNT( 'Calculating approximate parameter errors' )
 	CALL FIT_PARERR(NDS,IMOD,NPAR,PARAM,LB,UB,DPAR,
-     :    FROZEN,PEGGED,SSCALE,FSTAT,FIT_PREDDAT,PARSIG,STATUS)
+     :                  FROZEN,PEGGED,SSCALE,FSTAT,FIT_PREDDAT,
+     :                  PARSIG,LNDFAC,STATUS)
         CALL ARR_COP1R( NPAR, PARSIG, LE, STATUS )
         CALL ARR_COP1R( NPAR, PARSIG, UE, STATUS )
 
