@@ -373,7 +373,7 @@
           CALL BDI_AXMAPR( OFID, J, 'Data', 'READ', AXPTR(J), STATUS )
           CALL QUALITY_AXRAN (DIMS(J),NAXRANGES(J),AXRANGES(1,1,J),
      :                     %VAL(AXPTR(J)),DIR(J),PIXRNG(1,1,J),STATUS)
-          CALL BDI_UNAXMAP( OFID, J, 'Data', AXPTR(J), STATUS )
+          CALL BDI_AXUNMAP( OFID, J, 'Data', AXPTR(J), STATUS )
 
         END DO
 
