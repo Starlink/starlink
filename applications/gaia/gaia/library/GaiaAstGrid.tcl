@@ -1553,7 +1553,10 @@ itcl::class gaia::GaiaAstGrid {
          set Xformat_($this,sep) b
       }
       if { [info exists Xformat_($this,l)] } {
-         set Xformat_($this,sep) g ; # was l
+         set Xformat_($this,sep) l
+      }
+      if { [info exists Xformat_($this,g)] } {
+         set Xformat_($this,sep) g
       }
 
       set format [$itk_option(-rtdimage) astget "format(2)"]
@@ -1573,8 +1576,11 @@ itcl::class gaia::GaiaAstGrid {
       if { [info exists Yformat_($this,b)] } {
          set Yformat_($this,sep) b
       }
-      if { [info exists Xformat_($this,l)] } {
-         set Yformat_($this,sep) g ;# was l
+      if { [info exists Yformat_($this,l)] } {
+         set Yformat_($this,sep) l
+      }
+      if { [info exists Yformat_($this,g)] } {
+         set Yformat_($this,sep) g
       }
 
       #  And set the widgets to the correct values if necessary.
@@ -1872,8 +1878,7 @@ itcl::class gaia::GaiaAstGrid {
       {{Plus Sign} {+} {Leading Zeros} z {Degrees} d {Hours} h
        {Minutes} m {Seconds} s}
    protected variable sepmap_ \
-      { {:} i  {blank} b {h/dms} g}
-      #{ {:} i  {blank} b {h/dms} l}
+      { {:} i  {blank} b {h/dms} l {h/d'"} g}
 
    #  Width of labels & value fields.
    protected variable lwidth_ 17
