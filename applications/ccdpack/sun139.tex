@@ -1163,7 +1163,7 @@ telescope points at).
 \item \text{FLAT}: The flatfields.
 \item \text{BIAS}: The bias frames
 \item \text{DARK}: Any dark count frames (not usual).
-\item \text{FLASH}: Any pre-flash frames (very usual).
+\item \text{FLASH}: Any pre-flash frames (very unusual).
 \end{itemize}
 
 There are also several extra types that are used to define the
@@ -12934,8 +12934,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       then you should use the normal setup and data organization
       techniques.
 
-      If you choose a detector setup file or have none you will need
-      to organize your data into different frame types (bias, flat,
+      If you do not choose a detector setup file or have none you will
+      need to organize your data into different frame types (bias, flat,
       target etc.), so either use a naming scheme that allows you to
       distinguish between them using wildcard patterns or create lists
       of the names in files.
