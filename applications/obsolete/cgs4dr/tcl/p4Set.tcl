@@ -1,4 +1,4 @@
-proc p4Set taskname {
+proc p4Set {taskname} {
 #-
 # Displays a dialog box with controls for everything else and sets them upon exit
 #-
