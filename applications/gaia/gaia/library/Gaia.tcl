@@ -169,7 +169,16 @@ itcl::class gaia::Gaia {
    }
 
    #  Quit the application. Really.... Rtd doesn't have the exit.
+   #  If being paranoid then ask for confirmation.
    public method quit {} {
+      if { ! $itk_option(-quiet_exit) } { 
+         if { ! [confirm_dialog \
+                    "Are you sure you want to exit the application?" $w_]} {
+            return
+         }
+      }
+      
+      #  Permission supplied so continue with exit.
       delete object $w_
       after idle exit
    }
@@ -226,6 +235,10 @@ itcl::class gaia::Gaia {
 
       #  Center image first time.
       after 0 [code $image_ center]
+
+      #  XXX DEBUGGING CODE XXX
+      source GaiaTextImport.tcl 
+      gaia::GaiaTextImport .imp
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -341,8 +354,7 @@ itcl::class gaia::Gaia {
       lappend skycat_images $itk_component(image)
    }
    
-   #  Delete a window, just destroy it really.
-   #  are not removed correctly.
+   #  Delete a this object.
    public method delete_window {} {
       delete object $w_
    }
@@ -363,10 +375,14 @@ itcl::class gaia::Gaia {
       
       #  Close also needs the command changing to delete the object.
       $m entryconfigure "Close" \
-	 -label "Delete Window" \
+	 -label "Close Window" \
 	 -accelerator {Control-d} \
 	 -command [code $this delete_window]
       bind $w_  <Control-d> [code $this delete_window]
+      add_menu_short_help $m "Close Window" \
+         {Close this window, exit application if last}
+      add_menu_short_help $m "New Window" \
+         {Create a new main window}
       $m entryconfigure "Print..." -accelerator {Control-p}
       bind $w_  <Control-p> [code $image_ print]
       bind $w_  <Control-n> [code $this clone]
@@ -1311,6 +1327,10 @@ itcl::class gaia::Gaia {
             tk_focusFollowsMouse
          }
       }
+
+   #  Option to inhibit the display of the exit application dialog.
+   #  UKIRT requested this for 14,000 ft anoxia cases!
+   itk_option define -quiet_exit quiet_exit Quiet_Exit 1
 
    # -- Protected variables --
 

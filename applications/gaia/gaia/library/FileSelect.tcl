@@ -76,6 +76,9 @@
 #
 # Peter W. Draper 27 Jan 97  added -filter_types option to allow caller
 #                            to see a list of "known" file extensions. 
+#                 30 Mar 00  added changes to add a file filter
+#                            when user just types in a directory
+#                            (which doesn't then show any files).
 
 itk::usual FileSelect {}
 
@@ -384,11 +387,25 @@ itcl::class util::FileSelect {
     # entry text.
 
     protected method _setfilter {{d ""} {f ""}} {
-	if {$d == ""} {set d [file dirname [$fs(filter) get]]}
-	if {$f == ""} {set f [file tail [$fs(filter) get]]}
-
-	$fs(filter) delete 0 end
-	$fs(filter) insert 0 "$d/$f"
+       if { $d == "" } { 
+          set filt [$fs(filter) get]
+          if { [file isdirectory $filt] } {
+             set d $filt
+          } else {
+             set d [file dirname $filt]
+          }
+       }
+       if {$f == ""} {
+          set filt [$fs(filter) get]
+          if { [file isdirectory $filt] } {
+             set f $last_filter_type_
+          } else {
+             set f [file tail $filt]
+          }
+       }
+       $fs(filter) delete 0 end
+       $fs(filter) insert 0 "$d/$f"
+       set last_filter_type_ $f
     }
 
     # Update the selection based on the 
@@ -437,24 +454,28 @@ itcl::class util::FileSelect {
     # Mark the default button as filter.
 
     protected method _filtercmd {} {
-	set seldir [file dirname [$fs(filter) get]]
-
-	if {![file exists $seldir]} {
-	    return
-	}
-
-	cd $seldir
-
-	configure -dir "[pwd]"
-	configure -filter "[file tail [$fs(filter) get]]"
-	set _selection "$itk_option(-dir)/"
-
-	_setfilter
-	_setselection
-	_filldirlist
-	_fillfilelist
-
-	_defaultbtn filter
+       set filt [$fs(filter) get]
+       if { [file isdirectory $filt] } { 
+          set seldir $filt
+       } else {
+          set seldir [file dirname $filt]
+       }
+       if {![file exists $seldir]} {
+          return
+       }
+       
+       cd $seldir
+       set $seldir [pwd]
+       _setfilter $seldir
+       configure -dir $seldir
+       configure -filter "[file tail [$fs(filter) get]]"
+       set _selection "$itk_option(-dir)/"
+       
+       _setselection
+       _filldirlist
+       _fillfilelist
+       
+       _defaultbtn filter
     }
 
     # ------------------------------------------------------------------
@@ -582,6 +603,7 @@ itcl::class util::FileSelect {
        set dirname [file dirname [$fs(filter) get]]
        $fs(filter) delete 0 end
        $fs(filter) insert 0 $dirname/$type
+       set last_filter_type_ $type
        update
        _filtercmd
     }
@@ -706,6 +728,9 @@ itcl::class util::FileSelect {
     protected variable _selection "./"
     protected variable fs
     protected variable _initialized 0
+
+    # Last filter type.
+    protected variable last_filter_type_ "*.*"
 
 }
 
