@@ -35,72 +35,28 @@
 *        required flatfield.
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
-*     OUT = FILE (Write)
+*     FILE = FILE (Write)
 *        The name of the ascii file to which the flatfield information
 *        will be written
 
 *  Examples:
-*     flatfield 19971017_dem_0002 oldflat.dat
+*     extract_flat 19971017_dem_0002 oldflat.dat
 *        This will read the flatfield from 19971017_dem_0002.sdf and
 *        write it to a text file
 
 *  Related Applications:
 *     SURF: CHANGE_FLAT, FLATFIELD
 
-*  Algorithm:
-*        The data array of the IN file should have dimensions (N_BOLS,N_POS) 
-*     for most observing modes, where N_BOLS was the number of bolometers 
-*     measured and N_POS the number of times they were measured. In PHOTOM 
-*     mode the data array will have dimensions (N_BOLS,N_POS,3), where the 
-*     last dimension reflects the 3 different reduction algorithms used by 
-*     the REDUCE_SWITCH application depending which `beam' the bolometer was 
-*     assumed to be working in.
-*        The identities of the bolometers taking the data are read from the
-*     .MORE.SCUBA.BOL_CHAN and .MORE.SCUBA.BOL_ADC arrays in the IN file
-*     and the appropriate flatfield values read from the .MORE.SCUBA.BOL_CALB
-*     array. The data for each bolometer are multiplied by the corresponding
-*     flatfield value and written to the OUT file.
-*        The application will not run on input files that have not previously
-*     been processed by the REDUCE_SWITCH application or which have already
-*     had FLATFIELD run on them.
 
 *  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (JACH)
 
 *  History:
-*     $Id$
-*     18-JUN-1996: Original version.
 *     $Log$
-*     Revision 1.1  1997/10/28 02:52:41  timj
-*     Initial revision
+*     Revision 1.2  1997/10/28 03:08:37  timj
+*     Tidy up header.
 *
-*     Revision 1.12  1997/09/03 23:58:31  timj
-*     Automatically supply the output filename.
-*
-*     Revision 1.11  1997/07/03 19:05:40  timj
-*     Propogate axes to output
-*
-*     Revision 1.10  1997/06/12 23:49:12  timj
-*     Doc updates
-*     Use SURF_PAR and change name
-*
-*     Revision 1.9  1997/04/30 02:31:08  timj
-*     Rationalise calling.
-*     Add MSG_OUTIF, PKG and TSKNAME.
-*
-*     Revision 1.8  1997/03/06 20:03:05  timj
-*     tweak header
-*
-c Revision 1.7  1996/11/02  01:39:40  timj
-c Remove space from History : header
-c
-c Revision 1.6  1996/11/02  01:23:28  timj
-c Change name to FLATFIELD
-c
-c Revision 1.5  1996/10/31  18:22:55  timj
-c Added modern Starlink header.
-c
 *     {enter_further_changes_here}
  
 *  Bugs:
