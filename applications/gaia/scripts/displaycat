@@ -16,11 +16,13 @@ exec $GAIA_DIR/gaia_stcl $0 ${1+"$@"}
 #      in the base clone.
 #
 #   Authors:
-#      Peter W. Draper (PDRAPER):
+#      Peter W. Draper (PWD):
 #
 #   History:
-#      13-MAR-2001 (PDRAPER):
+#      13-MAR-2001 (PWD):
 #         Original version.
+#      18-NOV-2003 (PWD): 
+#         Modified to create a GAIA catalogue window, not a Skycat one.
 #-
 #.
 
@@ -116,10 +118,10 @@ set cmd "winfo parent $ctrlwidget"
 set gaia [send_to_gaia remotetcl $cmd]
 
 #  And display the catalogue window.
-set cmd "cat::AstroCat::open_catalog_window \
+set cmd "::cat::AstroCat::open_catalog_window \
             $catalogue \
             $ctrlwidget \
-            ::skycat::SkySearch \
+            ::gaia::GaiaSearch \
             0 $gaia"
 set astrocat [send_to_gaia remotetcl $cmd]
 close $gaia_fd
