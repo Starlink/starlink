@@ -90,7 +90,17 @@ itcl::class gaia::GaiaConvertTable {
 
       #  Get the file type so we can invoke the correct filter.
       set type [file extension $in]
-      
+
+      #  FITS types may reference extensions.
+      if { [string match {.fits*} "$type"] } {
+         set type ".fits"
+      } elseif { [string match {.fit*} "$type"] } {
+         set type ".fit"
+      }
+
+      puts "in = $in, type = $type"
+
+      #  Start up filter.
       if { $to_filter_($type) == {} } {
          global env
          set to_filter_($type) [GaiaForeignExec \#auto \
@@ -100,6 +110,7 @@ itcl::class gaia::GaiaConvertTable {
 
       #  Now attempt the conversion.
       set cmd [format $to_cmd_ $in $out]
+      puts  "cmd = $cmd"
       if { $now } {
          catch {eval $to_filter_($type) runnow $cmd} msg
          if { $msg == "1" || $msg == "0" } {
@@ -119,6 +130,13 @@ itcl::class gaia::GaiaConvertTable {
 
       #  Get the file type so we can invoke the correct filter.
       set type [file extension $out]
+
+      #  FITS types may reference extensions.
+      if { [string match {.fits*} "$type"] } {
+         set type ".fits"
+      } elseif { [string match {.fit*} "$type"] } {
+         set type ".fit"
+      }
 
       if { $from_filter_($type) == {} } {
          global env

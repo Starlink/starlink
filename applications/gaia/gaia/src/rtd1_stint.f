@@ -20,9 +20,9 @@ C----------------------------------------------------------------------
       INTEGER*2 IORD
       INTEGER*2 MORD, MORD1, MORD12, MORD21
       INTEGER*2 IN, NT, M, N
-      REAL*4    XT
+      DOUBLE PRECISION    XT
 C                             Everett Interpolation internal variables:
-      REAL*4    BCOEF(49), SV(14)
+      DOUBLE PRECISION BCOEF(49), SV(14)
       INTEGER*2 MORD2, IS0, NVALS
       COMMON /RTD1_CEVI/ BCOEF, SV, MORD2, IS0, NVALS
       COMMON /RTD1_STCOM/ MORD, MORD1, MORD12, MORD21
@@ -46,11 +46,11 @@ C                                   Compute the BCOEF array:
 C
          DO 40 N = 1,NT,2
             BCOEF(IN+N) = -BCOEF(IN+N)
- 40         CONTINUE
- 50      CONTINUE
-C                                    Set up pointer constants:
+ 40      CONTINUE
+ 50   CONTINUE
+C     Set up pointer constants:
       IS0   = MORD2 + 1
       NVALS = IS0  + IS0
-C
+C     
  999  RETURN
       END

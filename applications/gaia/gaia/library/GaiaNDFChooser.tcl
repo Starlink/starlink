@@ -255,7 +255,9 @@ itcl::class gaia::GaiaNDFChooser {
    protected method select_image_ndf_ {ndf {component "data"}} {
       busy {
          $image_ hdu $ndf $component
-         puts "fullname = [$image_ fullname]"
+         $itk_option(-image) configure -component $component
+         $itk_option(-image) update_title
+         
          for {set i 0} {$i < $num_images_} {incr i} {
             if {[info exists ext_($i,frame)]} {
                if {"$ext_($i,ndf)" == "$ndf"} {
@@ -281,6 +283,8 @@ itcl::class gaia::GaiaNDFChooser {
       #  Set the NDF for the image
       busy {
          $image hdu $ndf "data"
+         $itk_option(-image) configure -component "data"
+         $im update_title
       }
 
       #  Need to add 2 bindings: one for the image, one for the background

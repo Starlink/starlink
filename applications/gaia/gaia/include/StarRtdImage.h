@@ -52,15 +52,15 @@ extern "C" {
 //  Image options (used for image configuration).
 //
 class StarRtdImageOptions : public RtdImageOptions {
-public:
-  char *ast_tag;                // canvas tag for all ast graphics
-  char *component;              // NDF component to display
-  int plot_wcs;                 // Scale and orient plot symbols using
-                                // WCS system if available
-
-  StarRtdImageOptions()
-    : ast_tag(NULL), component(NULL), plot_wcs(1)
-    {}
+  public:
+   char *ast_tag;          // Canvas tag for all ast graphics
+   char *component;        // NDF component to display
+   int plot_wcs;           // Scale and orient plot symbols using WCS
+                           // system if available 
+   
+   StarRtdImageOptions()
+      : ast_tag(NULL), component(NULL), plot_wcs(1)
+      {}
 };
 
 //  Define the Tk config options here so that derived classes can add
@@ -73,239 +73,257 @@ public:
     {TK_CONFIG_STRING, "-component", NULL, NULL, "data", GAIA_OPTION(component), 0}, \
     {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}
 
-
 class StarRtdImage : public Skycat {
 
-public:
+  public:
 
-  //  Constructor
-  StarRtdImage(Tcl_Interp*, const char* instname, int argc, char** argv,
-	     Tk_ImageMaster master, const char* imageType,
-	     Tk_ConfigSpec* specs = (Tk_ConfigSpec*)NULL,
-	     RtdImageOptions* options = (RtdImageOptions*)NULL);
+   //  Constructor
+   StarRtdImage( Tcl_Interp *interp, const char *instname, int argc,
+                 char **argv, Tk_ImageMaster master, const char *imageType,
+                 Tk_ConfigSpec *specs = (Tk_ConfigSpec *)NULL,
+                 RtdImageOptions *options = (RtdImageOptions *)NULL );
 
-  //  Destructor
-  ~StarRtdImage();
+   //  Destructor
+   ~StarRtdImage();
 
-  //  Entry point from tcl to create a image.
-  static int CreateImage( Tcl_Interp *, char *, int, char **, Tk_ImageType *,
-                          Tk_ImageMaster, ClientData * );
+   //  Entry point from tcl to create a image.
+   static int CreateImage( Tcl_Interp *, char *, int, char **, Tk_ImageType *,
+                           Tk_ImageMaster, ClientData * );
 
-  //  Run a foreign procedure.
-  int foreignCmd( int argc, char *argv[] );
+   //  Run a foreign procedure.
+   int foreignCmd( int argc, char *argv[] );
 
-  //  Get the NDF origin information.
-  int originCmd( int argc, char *argv[] );
+   //  Get the NDF origin information.
+   int originCmd( int argc, char *argv[] );
 
-  //  Plot an astrometry grid.
-  int plotgridCmd( int argc, char *argv[] );
+   //  Plot an astrometry grid.
+   int plotgridCmd( int argc, char *argv[] );
 
-  //  Return if we are really using X shared memory
-  int usingxshmCmd( int argc, char *argv[] );
+   //  Return if we are really using X shared memory
+   int usingxshmCmd( int argc, char *argv[] );
 
-  //  Return the value of an AST attribute of the main AstFrameSet.
-  int astgetCmd( int argc, char *argv[] );
+   //  Return the value of an AST attribute of the main AstFrameSet.
+   int astgetCmd( int argc, char *argv[] );
 
-  //  Create a new FITS channel
-  int astcreateCmd( int argc, char *argv[] );
+   //  Create a new FITS channel
+   int astcreateCmd( int argc, char *argv[] );
 
-  //  Replace the existing WCS FrameSet.
-  int astreplaceCmd( int argc, char *argv[] );
+   //  Replace the existing WCS FrameSet.
+   int astreplaceCmd( int argc, char *argv[] );
 
-  //  Restore an old WCS FrameSet.
-  int astrestoreCmd( int argc, char *argv[] );
+   //  Restore an old WCS FrameSet.
+   int astrestoreCmd( int argc, char *argv[] );
 
-  //  Delete a FITS channel.
-  int astdeleteCmd( int argc, char *argv[] );
+   //  Delete a FITS channel.
+   int astdeleteCmd( int argc, char *argv[] );
 
-  //  Store a FITS card in a FITS channel.
-  int aststoreCmd( int argc, char *argv[] );
+   //  Store a FITS card in a FITS channel.
+   int aststoreCmd( int argc, char *argv[] );
 
-  //  Clear a FITS channel.
-  int astresetCmd( int argc, char *argv[] );
+   //  Clear a FITS channel.
+   int astresetCmd( int argc, char *argv[] );
 
-  //  Read a FITS channel.
-  int astreadCmd( int argc, char *argv[] );
+   //  Read a FITS channel.
+   int astreadCmd( int argc, char *argv[] );
 
-  //  Refine the image mapping to include a transform to a new set of
-  //  positions.
-  int astrefineCmd( int argc, char *argv[] );
+   //  Refine the image mapping to include a transform to a new set of
+   //  positions.
+   int astrefineCmd( int argc, char *argv[] );
 
-  //  Write out local FrameSet using given encoding.
-  int astwriteCmd( int argc, char *argv[] );
+   //  Write out local FrameSet using given encoding.
+   int astwriteCmd( int argc, char *argv[] );
 
-  //  Get a copy of the WCS from another file.
-  int astcopyCmd( int argc, char *argv[] );
+   //  Get a copy of the WCS from another file.
+   int astcopyCmd( int argc, char *argv[] );
 
-  //  Assign a linear transform to a WCS.
-  int astassignCmd( int argc, char *argv[] );
+   //  Assign a linear transform to a WCS.
+   int astassignCmd( int argc, char *argv[] );
 
-  //  Fix the original WCS to be the current image WCS (which may
-  //  be a replacement one).
-  int astfixCmd( int argc, char *argv[] );
+   //  Fix the original WCS to be the current image WCS (which may
+   //  be a replacement one).
+   int astfixCmd( int argc, char *argv[] );
 
-  //  Straight-forward conversion from WCS position to X,Y.
-  int astwcs2pixCmd( int argc, char *argv[] );
+   //  Straight-forward conversion from WCS position to X,Y.
+   int astwcs2pixCmd( int argc, char *argv[] );
 
-  //  Straight-forward conversion from X,Y position to WCS.
-  int astpix2wcsCmd( int argc, char *argv[] );
+   //  Straight-forward conversion from X,Y position to WCS.
+   int astpix2wcsCmd( int argc, char *argv[] );
 
-  //  Derive simple statistics for creating WCS systems from scratch.
-  int astbootstatsCmd( int argc, char *argv[] );
+   //  Derive simple statistics for creating WCS systems from scratch.
+   int astbootstatsCmd( int argc, char *argv[] );
 
-  //  Set the celestial coordinate system.
-  int astsystemCmd( int argc, char *argv[] );
+   //  Set the celestial coordinate system.
+   int astsystemCmd( int argc, char *argv[] );
 
-  //  Write the current image and if new WCS (if modified) to a file.
-  int dumpCmd( int argc, char *argv[] );
+   //  Write the current image and if new WCS (if modified) to a file.
+   int dumpCmd( int argc, char *argv[] );
 
-  //  Colorramp command, with pseudo WCS.
-  int colorrampCmd( int argc, char *argv[] );
+   //  Colorramp command, with pseudo WCS.
+   int colorrampCmd( int argc, char *argv[] );
 
-  //  List of percentiles.
-  int percentCmd( int argc, char *argv[] );
+   //  List of percentiles.
+   int percentCmd( int argc, char *argv[] );
 
-  //  Enable remote control interface.
-  int remoteCmd( int argc, char *argv[] );
+   //  Enable remote control interface.
+   int remoteCmd( int argc, char *argv[] );
 
-  //  Draw a Skycat-like ellipse and rotbox
-  virtual int draw_symbol(const char *shape,
-                  double x, double y, const char *xy_units,
-                  double radius, const char *radius_units,
-                  const char *bg, const char *fg,
-                  const char *symbol_tags,
-                  double ratio = 1., double angle = 0.,
-                  const char *label = NULL, const char *label_tags = NULL);
-  virtual int draw_ellipse(double x, double y, const char *xy_units,
-                   double radius, const char *radius_units,
-                   const char *bg, const char *fg,
-                   const char *symbol_tags,
-                   double ratio = 1., double angle = 0.0,
-                   const char *label = NULL, const char *label_tags = NULL);
-  virtual int draw_rotbox(double x, double y, const char *xy_units,
-                  double radius, const char *radius_units,
-                  const char *bg, const char *fg,
-                  const char *symbol_tags,
-                  double ratio = 1., double angle = 0.0,
-                  const char *label = NULL, const char *label_tags = NULL);
+   //  Draw a Skycat-like ellipse and rotbox
+   virtual int draw_symbol(const char *shape,
+                           double x, double y, const char *xy_units,
+                           double radius, const char *radius_units,
+                           const char *bg, const char *fg,
+                           const char *symbol_tags,
+                           double ratio = 1., double angle = 0.,
+                           const char *label = NULL, const char *label_tags = NULL);
+   virtual int draw_ellipse(double x, double y, const char *xy_units,
+                            double radius, const char *radius_units,
+                            const char *bg, const char *fg,
+                            const char *symbol_tags,
+                            double ratio = 1., double angle = 0.0,
+                            const char *label = NULL, const char *label_tags = NULL);
+   virtual int draw_rotbox(double x, double y, const char *xy_units,
+                           double radius, const char *radius_units,
+                           const char *bg, const char *fg,
+                           const char *symbol_tags,
+                           double ratio = 1., double angle = 0.0,
+                           const char *label = NULL, const char *label_tags = NULL);
 
-  //  Get a file from the WWW.
-  int urlgetCmd( int argc, char *argv[] );
+   //  Get a file from the WWW.
+   int urlgetCmd( int argc, char *argv[] );
 
-  //  Set the colour of blank pixels.
-  int blankcolorCmd( int argc, char *argv[] );
+   //  Set the colour of blank pixels.
+   int blankcolorCmd( int argc, char *argv[] );
 
-  //  Slice command (X and Y coordinates).
-  int sliceCmd( int argc, char *argv[] );
+   //  Slice command (X and Y coordinates).
+   int sliceCmd( int argc, char *argv[] );
 
-  //  Contour command.
-  int contourCmd( int argc, char *argv[] );
+   //  Contour command.
+   int contourCmd( int argc, char *argv[] );
 
-  //  HDU command.
-  int hduCmd( int argc, char *argv[] );
+   //  HDU command.
+   int hduCmd( int argc, char *argv[] );
 
-  //  Replacement mband command, also allows for pixels and non-celestial.
-  gbandCmd( int argc, char *argv[] );
+   //  Replacement mband command, also allows for pixels and non-celestial.
+   gbandCmd( int argc, char *argv[] );
 
-protected:
+   //  Fullname command.
+   int fullNameCmd( int argc, char *argv[] );
 
-  //  Pointer to structure that holds the image configuration options.
-  StarRtdImageOptions *staroptionsPtr_;
+   //  "isfits" command.
+   int isfitsCmd( int argc, char *argv[] );
 
-  //  Redefined from parent class to check configuration options.
-  virtual int configureImage(int argc, char* argv[], int flags);
+  protected:
 
-  //  Call a named member function.
-  virtual int call( const char*, int, int, char** );
+   //  Pointer to structure that holds the image configuration options.
+   StarRtdImageOptions *staroptionsPtr_;
 
-  //  Return an ImageData object, given an ImageIO object reference.
-  virtual ImageData* makeImage(ImageIO);
+   //  Redefined from parent class to check configuration options.
+   virtual int configureImage(int argc, char* argv[], int flags);
 
-  //  Load an image file and return a pointer to the ImageData object for it.
-  virtual ImageData* getStarImage(const char* filename, 
-				  const char* slice,
-				  const char* path);
+   //  Call a named member function.
+   virtual int call( const char*, int, int, char** );
 
-  //  Load an image.
-  virtual int loadFile();
+   //  Return an ImageData object, given an ImageIO object reference.
+   virtual ImageData *makeImage(ImageIO);
 
-  //  Return the AST graphics item tag.
-  char *ast_tag() const { return staroptionsPtr_->ast_tag; }
+   //  Load an image file and return a pointer to the ImageData object for it.
+   virtual ImageData *getStarImage( const char *filename,
+                                    const char *slice,
+                                    const char *path );
 
-  //  Return the NDF component displayed.
-  char *component() const { return staroptionsPtr_->component; }
+   //  Load an image.
+   virtual int loadFile();
 
-  //  Return whether to scale and orient plotting symbols using the WCS
-  int plot_wcs() const { return staroptionsPtr_->plot_wcs; }
+   //  Return the AST graphics item tag.
+   char *ast_tag() const { return staroptionsPtr_->ast_tag; }
 
-  //  Test if file extension is known to NDF.
-  int isNDFtype( const char *);
+   //  Return the NDF component displayed.
+   char *component() const { return staroptionsPtr_->component; }
 
-  //  Parse and test image name.
-  int parseName( const char *imagename, char **fullname,
-		 char **slice, char **path );
+   //  Return whether to scale and orient plotting symbols using the WCS
+   int plot_wcs() const { return staroptionsPtr_->plot_wcs; }
 
-  //  Check if the named file exists.
-  int fileExists( const char *filename );
+   //  Test if file extension is known to NDF.
+   int isNDFtype( const char *);
 
-  //  Pointer to the original FrameSet.
-  AstFrameSet *origset_;
+   //  Parse and test image name.
+   int parseName( const char *imagename, char **fullname,
+                  char **slice, char **path );
 
-  //  Pointer to a new FrameSet (during manipulation).
-  AstFrameSet *newset_;
+   //  Check if the named file exists.
+   int fileExists( const char *filename );
 
-  //  Pointer to the old WCS FrameSet (used to restore existing system).
-  AstFrameSet *oldset_;
+   //  Pointer to the original FrameSet.
+   AstFrameSet *origset_;
 
-  //  Pointers to available FITS channels.
-  enum {MAX_CHANNELS = 8};
-  AstFitsChan *channels_[MAX_CHANNELS];
+   //  Pointer to a new FrameSet (during manipulation).
+   AstFrameSet *newset_;
 
-  //  Determine a linear mapping between two sets of positions.
-  int mapPositions( int iframe, AstFrameSet *fset,
-                    int fittype, double *xold,
-                    double *yold, double *xnew,
-                    double *ynew, int npoints );
+   //  Pointer to the old WCS FrameSet (used to restore existing system).
+   AstFrameSet *oldset_;
 
-  //  Add a linear mapping to a Frame in a FrameSet
-  int addLinear( int iframe, AstFrameSet *fset, double *tr, int fittype=5 );
+   //  Pointers to available FITS channels.
+   enum {MAX_CHANNELS = 8};
+   AstFitsChan *channels_[MAX_CHANNELS];
 
-  //  Create and store a FITS card in a FITS channel.
-  void storeCard( AstFitsChan *channel, const char *keyword, const char *value,
-                  const char *comment, int overwrite = 1 );
+   //  Determine a linear mapping between two sets of positions.
+   int mapPositions( int iframe, AstFrameSet *fset,
+                     int fittype, double *xold,
+                     double *yold, double *xnew,
+                     double *ynew, int npoints );
 
-  //  Create and initialise a new FITS channel.
-  void initChannel( int slot );
+   //  Add a linear mapping to a Frame in a FrameSet
+   int addLinear( int iframe, AstFrameSet *fset, double *tr, int fittype=5 );
 
-  //  Decode a linear transformation into parts.
-  void decodeLinear( double tr[6], double &xz, double &yz,
-                    double &xs, double &ys, double &perp,
-                    double &orient );
+   //  Create and store a FITS card in a FITS channel.
+   void storeCard( AstFitsChan *channel, const char *keyword, const char *value,
+                   const char *comment, int overwrite = 1 );
 
-  //  Get canvas positions of 3 points -- centre, north and east.
-  int get_compass(double x, double y, const char* xy_units,
-                  double radius, const char* radius_units,
-                  double ratio, double angle,
-                  double& cx, double& cy, double& nx, double& ny,
-                  double& ex, double& ey);
+   //  Create and initialise a new FITS channel.
+   void initChannel( int slot );
 
-  //  Return a pointer to the StarWCS object for the image, or NULL on error
-  StarWCS* getStarWCSPtr(ImageData* image = (ImageData*)NULL);
+   //  Decode a linear transformation into parts.
+   void decodeLinear( double tr[6], double &xz, double &yz,
+                      double &xs, double &ys, double &perp,
+                      double &orient );
 
-  //  Create a basic GRID/PIXEL coordinates domain FrameSet.
-  AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image = NULL );
+   //  Get canvas positions of 3 points -- centre, north and east.
+   int get_compass(double x, double y, const char* xy_units,
+                   double radius, const char* radius_units,
+                   double ratio, double angle,
+                   double& cx, double& cy, double& nx, double& ny,
+                   double& ex, double& ey);
 
-  //  Create AST plot for drawing grids and contours to canvas.
-  AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
-                       int full, int image, double region[] );
- private:
+   //  Return a pointer to the StarWCS object for the image, or NULL on error
+   StarWCS* getStarWCSPtr(ImageData* image = (ImageData*)NULL);
 
-  // Copy constructor -- not defined.
-  StarRtdImage( const StarRtdImage&) ;
+   //  Create a basic GRID/PIXEL coordinates domain FrameSet.
+   AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image = NULL );
 
-  // Return true if there is an image and it has a celestial
-  // coordinate system.
-  int isCelestial();
+   //  Create AST plot for drawing grids and contours to canvas.
+   AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
+                        int full, int image, double region[] );
+
+   //  Implementation of hdu command for FITS files.
+   int fitsHduCmd( const ImageIO &imio, int argc, char *argv[] );
+
+   //  Implementation of hdu command for NDF files.
+   int ndfHduCmd( const ImageIO &imio, int argc, char *argv[] );
+
+   //  Change the displayed NDF to another (or another component).
+   int ndfCmdSet( int argc, char *argv[], NDFIO *ndf );
+
+   //  Get list of NDF properties.
+   int ndfCmdList( int argc, char *argv[], NDFIO *ndf );
+
+  private:
+
+   // Copy constructor -- not defined.
+   StarRtdImage( const StarRtdImage&) ;
+
+   // Return true if there is an image and it has a celestial
+   // coordinate system.
+   int isCelestial();
 };
 
 #endif // StarRtdImage

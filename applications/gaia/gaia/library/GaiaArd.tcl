@@ -491,7 +491,8 @@ itcl::class gaia::GaiaArd {
          }
 
          #  Get the name of the current image.
-         set image [$itk_option(-rtdimage) cget -file]
+         #set image [$itk_option(-rtdimage) cget -file]
+         set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
@@ -575,7 +576,8 @@ itcl::class gaia::GaiaArd {
          }
 
          #  Get the name of the current image.
-         set image [$itk_option(-rtdimage) cget -file]
+         #set image [$itk_option(-rtdimage) cget -file]
+         set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
@@ -638,7 +640,8 @@ itcl::class gaia::GaiaArd {
 	   }
 
 	   #  Get the name of the current image.
-	   set image [$itk_option(-rtdimage) cget -file]
+	   #set image [$itk_option(-rtdimage) cget -file]
+	   set image [$itk_option(-rtdimage) fullname]
 	   if { $image != "" } {
 	      $namer_ configure -imagename $image
 	      set image [$namer_ ndfname]
@@ -676,7 +679,8 @@ itcl::class gaia::GaiaArd {
       }
 
       #  Get the name of the current image.
-      set image [$itk_option(-rtdimage) cget -file]
+      #set image [$itk_option(-rtdimage) cget -file]
+      set image [$itk_option(-rtdimage) fullname]
       if { $image != "" } {
 	 $namer_ configure -imagename $image
 	 set image [$namer_ ndfname]

@@ -67,18 +67,22 @@
  *  History:
  *     17-JUN-1996 (PWD):
  *        Added argument processing.
+ *     20-JAN-2000 (PWD):
+ *        Added byte swapping changes.
  */
 
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <netinet/in.h>
 #include "StarRtdForeignCmds.h"
 #include "f77.h"
 #include "cnf.h"
 #include "sae_par.h"
 #include "ems.h"
 #include "ems_par.h"
+
 #define MAXFILE 132
 #define FRACTION 0.05
 #define MAX(a,b) ( (a) > (b) ) ? (a) : (b)
@@ -118,11 +122,11 @@ extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId), LOGICAL(grab),
                                    POINTER(q), LOGICAL(haveQual));
 
 static void *copyImagetoWork( enum ImageDataType type,
-                              void *imagePtr,
+                              void *imagePtr, int swap, 
                               int nx, int x1, int y1, int x2, int y2);
 static void copyWorktoImage( enum ImageDataType type,
                              void *imagePtr,
-                             void *workPtr,
+                             void *workPtr, int swap,
                              int nx, int x1, int y1, int x2, int y2);
 
 int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
@@ -314,13 +318,16 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
       undoInfo.ny = ny;
       size = ( x2 - x1 + 1 ) * ( y2 - y1 + 1 );
       if ( size > 0 ) {
-        undoInfo.imagePtr = copyImagetoWork( info->type, info->imageData,
+        undoInfo.imagePtr = copyImagetoWork( info->type,
+                                             info->imageData,
+                                             info->swap,
                                              nx, x1, y1, x2, y2 );
 
         /* Do the same for the quality component if necessary */
         if ( haveQual == F77_TRUE ) {
-          undoInfo.qualPtr = copyImagetoWork( BYTE_IMAGE, (void *)qualPtr,
-                                              nx, x1, y1, x2, y2 );
+           undoInfo.qualPtr = copyImagetoWork( BYTE_IMAGE, 
+                                               (void *)qualPtr, 0,
+                                               nx, x1, y1, x2, y2 );
         }
       } else {
         undoInfo.imagePtr = (void *) NULL;
@@ -346,12 +353,13 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         ys2 = MIN( ys2, ny );
         f = (F77_POINTER_TYPE) copyImagetoWork( info->type,
                                                 info->imageData,
+                                                info->swap, 
                                                 nx, xs1, ys1, xs2, ys2 );
         
         /* Do the same for the quality component if necessary */
         if ( haveQual == F77_TRUE ) {
           q = (F77_POINTER_TYPE) copyImagetoWork( BYTE_IMAGE,
-                                                  (void *)qualPtr,
+                                                  (void *)qualPtr, 0,
                                                   nx, xs1, ys1, xs2,
                                                   ys2 );
         } else {
@@ -398,12 +406,13 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
       xs1 = MAX( xs1, 0 );
       ys1 = MAX( ys1, 0 );
       copyWorktoImage( info->type, info->imageData, (void *) f,
+                       info->swap,
                        info->nx, xs1, ys1, xs2, ys2 );
 
       /* Do the same for the quality component if necessary */
       if ( haveQual == F77_TRUE ) {
-        copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, (void *) q,
-                         info->nx, xs1, ys1, xs2, ys2 );
+         copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, (void *) q, 0,
+                          info->nx, xs1, ys1, xs2, ys2 );
       }
     }
 
@@ -444,6 +453,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
       x2 = undoInfo.x2;
       y2 = undoInfo.y2;
       copyWorktoImage( info->type, info->imageData, undoInfo.imagePtr,
+                       info->swap,
                        nx, x1, y1, x2, y2 );
       undoInfo.imagePtr = (void *) NULL;
       if ( undoInfo.qualPtr != (byte *)NULL ) {
@@ -456,7 +466,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         /* Do the same for the quality component if necessary */
         if ( haveQual == F77_TRUE ) {
           copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, 
-                           (void *)undoInfo.qualPtr,
+                           (void *)undoInfo.qualPtr, 0,
                            nx, x1, y1, x2, y2 );
           undoInfo.qualPtr = (void *) NULL;
         }
@@ -484,7 +494,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
  */
 
 void *copyImagetoWork( enum ImageDataType type,
-                       void *imagePtr,
+                       void *imagePtr, int swap,
                        int nx, int x1, int y1, int x2, int y2)
 {
   signed char *scPtr, *scArr;
@@ -500,66 +510,55 @@ void *copyImagetoWork( enum ImageDataType type,
   size = ( x2 - x1 + 1 ) * ( y2 - y1 + 1 );
 
   switch ( type ) {
-  case  BYTE_IMAGE:
-    scArr = (signed char *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(signed char) );
-    scPtr = (signed char *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *scPtr++ = scArr[nx*j+i];
-      }
-    }
-    break;
-  case  X_IMAGE:
-    ucArr = (unsigned char *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(unsigned char) );
-    ucPtr = (unsigned char *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *ucPtr++ = ucArr[nx*j+i];
-      }
-    }
-    break;
-  case  SHORT_IMAGE:
-    sArr = (short *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(short) );
-    sPtr = (short *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *sPtr++ = sArr[nx*j+i];
-      }
-    }
-    break;
-  case  USHORT_IMAGE:
-    usArr = (unsigned short *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(unsigned short) );
-    usPtr = (unsigned short *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *usPtr++ = usArr[nx*j+i];
-      }
-    }
-    break;
-  case  LONG_IMAGE:
-    iArr = (int *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(int) );
-    iPtr = (int *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *iPtr++ = iArr[nx*j+i];
-      }
-    }
-    break;
-  case  FLOAT_IMAGE:
-    fArr = (float *) imagePtr;
-    sectPtr = (void *) malloc( size * sizeof(float) );
-    fPtr = (float *) sectPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        *fPtr++ = fArr[nx*j+i];
-      }
-    }
-    break;
+     case BYTE_IMAGE:
+     case X_IMAGE:
+        scArr = (unsigned char *) imagePtr;
+        sectPtr = (void *) malloc( size * sizeof(unsigned char) );
+        scPtr = (unsigned char *) sectPtr;
+        for( j=y1; j < y2; j++ ) {
+           for( i=x1; i < x2; i++ ) {
+              *scPtr++ = scArr[nx*j+i];
+           }
+        }
+        break;
+     case SHORT_IMAGE:
+     case USHORT_IMAGE:
+        sArr = (unsigned short *) imagePtr;
+        sectPtr = (void *) malloc( size * sizeof(unsigned short) );
+        sPtr = (unsigned short *) sectPtr;
+        if ( swap ) {
+           for( j=y1; j < y2; j++ ) {
+              for( i=x1; i < x2; i++ ) {
+                 *sPtr++ = ntohs( sArr[nx*j+i] );
+              }
+           }
+        } else {
+           for( j=y1; j < y2; j++ ) {
+              for( i=x1; i < x2; i++ ) {
+                 *sPtr++ = sArr[nx*j+i];
+              }
+           }
+        }
+        break;
+     case LONG_IMAGE:
+     case FLOAT_IMAGE:
+        iArr = (unsigned int *) imagePtr;
+        sectPtr = (void *) malloc( size * sizeof(unsigned int) );
+        iPtr = (unsigned int *) sectPtr;
+        if ( swap ) {
+           for( j=y1; j < y2; j++ ) {
+              for( i=x1; i < x2; i++ ) {
+                 *iPtr++ = ntohl( iArr[nx*j+i] );
+              }
+           }
+        } else {
+           for( j=y1; j < y2; j++ ) {
+              for( i=x1; i < x2; i++ ) {
+                 *iPtr++ = iArr[nx*j+i];
+              }
+           }
+        }
+        break;
   }
   return sectPtr;
 }
@@ -571,73 +570,68 @@ void *copyImagetoWork( enum ImageDataType type,
 void copyWorktoImage( enum ImageDataType type,
                       void *imagePtr,
                       void *workPtr,
-                      int nx, int x1, int y1, int x2, int y2)
+                      int swap,
+                      int nx, int x1, int y1, int x2, int y2 )
 {
-  signed char *scPtr, *scArr;
-  unsigned char *ucPtr, *ucArr;
-  short *sPtr, *sArr;
-  unsigned short *usPtr, *usArr;
-  int *iPtr, *iArr;
-  float *fPtr, *fArr;
-  int i, j;
+   signed char *scPtr, *scArr;
+   unsigned char *ucPtr, *ucArr;
+   short *sPtr, *sArr;
+   unsigned short *usPtr, *usArr;
+   int *iPtr, *iArr;
+   float *fPtr, *fArr;
+   int i, j;
 
-  switch ( type ) {
-  case  BYTE_IMAGE:
-    scArr = (signed char *) imagePtr;
-    scPtr = (signed char *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        scArr[nx*j+i] = *scPtr++;
-      }
-    }
-    break;
-  case  X_IMAGE:
-    ucArr = (unsigned char *) imagePtr;
-    ucPtr = (unsigned char *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        ucArr[nx*j+i] = *ucPtr++;
-      }
-    }
-    break;
-  case  SHORT_IMAGE:
-    sArr = (short *) imagePtr;
-    sPtr = (short *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-              sArr[nx*j+i] = *sPtr++;
-      }
-    }
-    break;
-  case  USHORT_IMAGE:
-    usArr = (unsigned short *) imagePtr;
-    usPtr = (unsigned short *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        usArr[nx*j+i] = *usPtr++;
-      }
-    }
-    break;
-  case  LONG_IMAGE:
-    iArr = (int *) imagePtr;
-    iPtr = (int *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        iArr[nx*j+i] = *iPtr++;
-      }
-    }
-    break;
-  case  FLOAT_IMAGE:
-    fArr = (float *) imagePtr;
-    fPtr = (float *) workPtr;
-    for( j=y1; j < y2; j++ ) {
-      for( i=x1; i < x2; i++ ) {
-        fArr[nx*j+i] = *fPtr++;
-      }
-    }
-    break;
-  }
-
-  /*  Finally free the workspace. */
-  free( workPtr );
+   switch ( type ) {
+      case BYTE_IMAGE:
+      case X_IMAGE:
+         scArr = (signed char *) imagePtr;
+         scPtr = (signed char *) workPtr;
+         for( j=y1; j < y2; j++ ) {
+            for( i=x1; i < x2; i++ ) {
+               scArr[nx*j+i] = *scPtr++;
+            }
+         }
+         break;
+      case SHORT_IMAGE:
+      case USHORT_IMAGE:
+         usArr = (unsigned short *) imagePtr;
+         usPtr = (unsigned short *) workPtr;
+         if ( swap ) {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                  usArr[nx*j+i] = ntohs( *usPtr );  
+                  usPtr++;                         /* ntohs could be macro */
+               }
+            }
+         } else {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                  usArr[nx*j+i] = *usPtr++;
+               }
+            }
+         }
+         break;
+      case LONG_IMAGE:
+      case FLOAT_IMAGE:
+         iArr = (unsigned int *) imagePtr;
+         iPtr = (unsigned int *) workPtr;
+         if ( swap ) {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                  iArr[nx*j+i] = ntohl( *iPtr );
+                  iPtr++;
+               }
+            }
+         } else {
+            for( j=y1; j < y2; j++ ) {
+               for( i=x1; i < x2; i++ ) {
+                  iArr[nx*j+i] = *iPtr++;
+               }
+            }
+         }
+         break;
+   }
+   
+   /*  Finally free the workspace. */
+   free( workPtr );
 }

@@ -117,6 +117,13 @@
 //        WCS, if the default encoding isn't Native (this happens -
 //        sometimes - when the channel contains a known WCS that is
 //        illegal?).
+//     12-JAN-2000 (PWD):
+//        Returned to hdu command. Now enabled for FITS images and
+//        NDFs. NDFs do not support the full range of commands as no
+//        catalogue access is available. The fully qualified names of
+//        the displayed image is now returned via the "fullname"
+//        command, which should be used in preference to the "-file"
+//        option, which may just name the container file.
 //     01-FEB-2000 (PWD):
 //        Override RTD "remote" command so that we use GaiaRtdRemote
 //        instead of RtdImageRemote class. This cleans up the control
@@ -133,6 +140,7 @@
 #include <sys/stat.h>
 #include <float.h>
 #include "tcl.h"
+#include <netinet/in.h>
 
 #include "define.h"
 #include "util.h"
@@ -172,37 +180,39 @@ public:
   int min_args;                                      // Minimum number of args
   int max_args;                                      // Maximum number of args
 } subcmds_[] = {
-  { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
-  { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
-  { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
-  { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
-  { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
-  { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
-  { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
-  { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
-  { "astread",       &StarRtdImage::astreadCmd,      1, 1 },
-  { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
-  { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
-  { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
-  { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
-  { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
-  { "astsystem",     &StarRtdImage::astsystemCmd,    2, 2 },
-  { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
-  { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
-  { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
-  { "colorramp",     &StarRtdImage::colorrampCmd,    0, 2 },
-  { "contour",       &StarRtdImage::contourCmd,      1, 6 },
-  { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
-  { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
-  { "gband",         &StarRtdImage::gbandCmd,        6, 6 },
-  { "hdu",           &StarRtdImage::hduCmd,          0, 6 },
-  { "origin",        &StarRtdImage::originCmd,       2, 2 },
-  { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
-  { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
-  { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
-  { "slice",         &StarRtdImage::sliceCmd,       11, 11},
-  { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
-  { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 }
+   { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
+   { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
+   { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
+   { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
+   { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
+   { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
+   { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
+   { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
+   { "astread",       &StarRtdImage::astreadCmd,      1, 1 },
+   { "astrefine",     &StarRtdImage::astrefineCmd,    4, 4 },
+   { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
+   { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
+   { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
+   { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
+   { "astsystem",     &StarRtdImage::astsystemCmd,    2, 2 },
+   { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
+   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
+   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
+   { "colorramp",     &StarRtdImage::colorrampCmd,    0, 2 },
+   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
+   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
+   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
+   { "fullname",      &StarRtdImage::fullNameCmd,     0, 0 },
+   { "gband",         &StarRtdImage::gbandCmd,        6, 6 },
+   { "hdu",           &StarRtdImage::hduCmd,          0, 6 },
+   { "isfits",        &StarRtdImage::isfitsCmd,       0, 0 },
+   { "origin",        &StarRtdImage::originCmd,       2, 2 },
+   { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
+   { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
+   { "remote",        &StarRtdImage::remoteCmd,       0, 1 },
+   { "slice",         &StarRtdImage::sliceCmd,       11, 11},
+   { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
+   { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 }
 };
 
 //+
@@ -231,8 +241,8 @@ static Tk_ImageType starRtdImageType = {
 // image "configure" subcommand. (ALLAN)
 //-
 static Tk_ConfigSpec configSpecs_[] = {
-    GAIA_OPTIONS,		// See Gaia.h: defines option list
-    {TK_CONFIG_END,     NULL,           NULL, NULL, NULL, 0,                  0}
+   GAIA_OPTIONS,              // See Gaia.h: defines option list
+   {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
 };
 
 // From BLT package (now locally because this routine was deleted with blt2.1).
@@ -302,11 +312,11 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp, char *name, int argc,
 
   //  Now Create the image.
   StarRtdImage *im = new StarRtdImage( interp, name, argc, argv, master,
-				       starRtdImageType.name,
-				       configSpecs_, options);
+                                       starRtdImageType.name,
+                                       configSpecs_, options);
     if (im && im->status() == TCL_OK) {
-	*clientDataPtr = (ClientData) im;
-	return im->initImage(argc, argv);  // ALLAN: moved here from constructor
+        *clientDataPtr = (ClientData) im;
+        return im->initImage(argc, argv);  // ALLAN: moved here from constructor
     }
     return TCL_ERROR;
 }
@@ -330,24 +340,25 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp, char *name, int argc,
 //     Nothing.
 //
 //-
-StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname, int argc, char** argv,
-			   Tk_ImageMaster master, const char* imageType,
-			   Tk_ConfigSpec* specs, RtdImageOptions* options)
-    : Skycat(interp, instname, argc, argv, master, imageType, specs, options),
-    staroptionsPtr_((StarRtdImageOptions*)options),
-    origset_(NULL),
-    newset_(NULL),
-    oldset_(NULL)
+StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname, 
+                           int argc, char** argv,
+                           Tk_ImageMaster master, const char* imageType,
+                           Tk_ConfigSpec* specs, RtdImageOptions* options)
+   : Skycat(interp, instname, argc, argv, master, imageType, specs, options),
+     staroptionsPtr_((StarRtdImageOptions*)options),
+     origset_(NULL),
+     newset_(NULL),
+     oldset_(NULL)
 {
 #ifdef _DEBUG_
-  cout << "Created StarRtdImage object " << endl;
+   cout << "Created StarRtdImage object " << endl;
 #endif
+   
+   // Define the TCL interpreter for any AST errors.
+   errTcl_Init( interp );
 
-  // Define the TCL interpreter for any AST errors.
-  errTcl_Init( interp );
-
-  // Initialise all the Channel slots.
-  for ( int i=0; i < MAX_CHANNELS; i++ ) channels_[i] = NULL;
+   // Initialise all the Channel slots.
+   for ( int i=0; i < MAX_CHANNELS; i++ ) channels_[i] = NULL;
 }
 
 
@@ -425,169 +436,169 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 // slices, must be processed by the NDF library.
 //-
 ImageData* StarRtdImage::getStarImage(const char* filename,
-				      const char* slice,
-				      const char* path)
+                                      const char* slice,
+                                      const char* path)
 {
-  // Check if the file extension is one known to the NDF library
-  // (excluding FITS). If not then pass the image to be read using
-  // the FitsIO or NDFIO classes as appropriate. These are then passed
-  // to ImageData via which any further control is made.
-  const char* type = fileSuffix( filename );
-  ImageIO imio;
+   // Check if the file extension is one known to the NDF library
+   // (excluding FITS). If not then pass the image to be read using
+   // the StarFitsIO or NDFIO classes as appropriate. These are then passed
+   // to ImageData via which any further control is made.
+   const char* type = fileSuffix( filename );
+   ImageIO imio;
 
-  //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
-  //  for a compressed FITS file.
-  char* p = (char *) strchr( filename, '.' );
-  int isfits = 1;
-  if ( p && ! strstr( p, ".fit" ) ) {
+   //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
+   //  for a compressed FITS file.
+   char* p = (char *) strchr( filename, '.' );
+   int isfits = 1;
+   if ( p && ! strstr( p, ".fit" ) ) {
       isfits = 0;
-  }
+   }
 
-  if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
-    if ( slice || path ) {
+   if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
+      if ( slice || path ) {
 
-      //  Construct a complete name, including the slice and or path
-      //  name. Note if a HDS path is given then we must avoid
-      //  including the file extension.
-      int len = strlen( filename ) + 1;
-      if ( slice ) len += strlen( slice );
-      if ( path ) len += strlen( path );
-      char *fullname = new char[len];
-      strcpy( fullname, filename );
-      if ( path ) {
-	p = strstr( fullname, type ) - 1;
-	strcpy( p, path );
+         //  Construct a complete name, including the slice and or path
+         //  name. Note if a HDS path is given then we must avoid
+         //  including the file extension.
+         int len = strlen( filename ) + 1;
+         if ( slice ) len += strlen( slice );
+         if ( path ) len += strlen( path );
+         char *fullname = new char[len];
+         strcpy( fullname, filename );
+         if ( path ) {
+            p = strstr( fullname, type ) - 1;
+            strcpy( p, path );
+         }
+         if ( slice ) strcat( fullname, slice );
+
+         //  Open image.
+         imio = NDFIO::read( fullname, component() );
+         delete fullname;
+
+      } else {
+
+         //  Plain name so just open image.
+         imio = NDFIO::read( filename, component() );
       }
-      if ( slice ) strcat( fullname, slice );
+   }  else {
 
-      //  Open image.
-      imio = NDFIO::read( fullname, component() );
-      delete fullname;
+      //  Note: Use special FITS class so that we can use AST for
+      //  dealing with astrometry.
+      imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
+   }
+   if ( imio.status() != 0 ) {
+      return (ImageData *) NULL;
+   }
 
-    } else {
-
-      //  Plain name so just open image.
-      imio = NDFIO::read( filename, component() );
-    }
-  }  else {
-
-    //  Note: since some Starlink routines access the raw data and
-    //  expect it to be already byte-swapped, if needed, we have to
-    //  use a special class that makes a memory copy of the image, if
-    //  needed.
-    imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
-  }
-  if ( imio.status() != 0 ) {
-    return (ImageData *) NULL;
-  }
-
-  //  Return the new image.
-  return makeImage( imio );
+   //  Return the new image.
+   return makeImage( imio );
 }
 
-
-//+
-// Make a new image from the given ImageIO object and return a pointer to
-// a derived class of ImageData specialized in that type of image.
+//+ 
+//  StarRtdImage::makeImage
 //
-// Note that pointers to ImageIORep subclasses, such as FitsIO, StarFitsIO
-// and NDFIO are automatically converted to an ImageIO object through a special
-// constructor.
+//  Make a new image from the given ImageIO object and return a
+//  pointer to a derived class of ImageData specialized in that type
+//  of image.
 //
-// This method overrides the parent version to make sure that the
-// GAIA features also work here. We need to make sure that the correct
-// classes are initialized, in particular, the StarWCS class.
+//  Note that pointers to ImageIORep subclasses, such as StarFitsIO
+//  and NDFIO are automatically converted to an ImageIO object through
+//  a special constructor.
 //
-// (XXX what about byte swapping for shared memory images (rtdimage mmap
-//  and shm commands, real-time interface) ? Do we want to do that here?).
+//  This method overrides the parent version to make sure that the
+//  GAIA features also work here. We need to make sure that the
+//  correct classes are initialized, in particular, the StarWCS class.
+//
+//  (XXX what about byte swapping for shared memory images (rtdimage
+//  mmap and shm commands, real-time interface) ? Do we want to do
+//  that here?).
 //-
-ImageData* StarRtdImage::makeImage(ImageIO imio)
+ImageData *StarRtdImage::makeImage( ImageIO imio )
 {
-  // Make sure that we use the StarWCS class and not the inherited default
-  // SAOWCS class
-  WCSRep* rep = imio.wcs().rep();
-  if (! rep || strcmp(rep->classname(), "StarWCS") != 0) {
+   // Make sure that we use the StarWCS class and not the inherited default
+   // SAOWCS class
+   WCSRep* rep = imio.wcs().rep();
+   if ( ! rep || strcmp(rep->classname(), "StarWCS" ) != 0) {
       const char* header = "";
       if (! imio.isclear())  // if image is not cleared, set WCS header
-	  header = (const char*)imio.header().ptr();
+         header = (const char*)imio.header().ptr();
       WCS wcs(new StarWCS(header));
       if (wcs.status() != 0)
-	  return (ImageData*)NULL;
+         return (ImageData*)NULL;
       imio.wcs(wcs);  // this sets the WCS object to use for this image
-  }
-
-  return ImageData::makeImage(name(), imio, verbose());
+   }
+   
+   return ImageData::makeImage(name(), imio, verbose());
 }
-
 
 //+
 // Load an image file and display it.
 //-
 int StarRtdImage::loadFile()
 {
-  // Used to save and restore image transformation parameters.
-  ImageDataParams p;
+   // Used to save and restore image transformation parameters.
+   ImageDataParams p;
 
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::loadFile (" << file() << ")" << endl;
+   cout << "Called StarRtdImage::loadFile (" << file() << ")" << endl;
 #endif
 
-  //  Release any local FrameSets (these are associated with the
-  //  previous image).
-  if ( newset_ ) {
-    newset_ = (AstFrameSet *) astAnnul( newset_ );
-  }
-  if ( oldset_ ) {
-    oldset_ = (AstFrameSet *) astAnnul( oldset_ );
-  }
-  if ( origset_ ) {
-    origset_ = (AstFrameSet *) astAnnul( origset_ );
-  }
-
-  //  -file may have been set to "", clear current image and just return.
-  if (strlen(file()) == 0) {
-    return clearCmd(0, NULL);
-  }
-
-  //  If we have an existing image then release it.
-  if ( image_ ) {
-    image_->saveParams(p);
-    delete image_;
-    image_ = (ImageData *) NULL;
-    updateViews();
-  }
-
-  //  Check that the image exists and parse it.
-  char *name;
-  char *slice;
-  char *path;
-  if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
-    if ( name ) delete name;
-    if ( slice ) delete slice;
-    if ( path ) delete path;
-    return error( file(), " is not an image" );
-  }
-
-  //  Create the image.
-  ImageData* image = getStarImage( name, slice, path );
-
-  //  Release resources and return an error if image couldn't be
-  //  created for some reason.
-  delete name;
-  if ( slice ) delete slice;
-  if ( path ) delete path;
-  if (! image ) {
-    return TCL_ERROR;
-  }
-
-  //  Store image reference.
-  image_ = image;
-
-  //  Restore transformations.
-  image_->restoreParams(p, !autoSetCutLevels_);
-
-  //  Initialise the new image.
-  return initNewImage();
+   //  Release any local FrameSets (these are associated with the
+   //  previous image).
+   if ( newset_ ) {
+      newset_ = (AstFrameSet *) astAnnul( newset_ );
+   }
+   if ( oldset_ ) {
+      oldset_ = (AstFrameSet *) astAnnul( oldset_ );
+   }
+   if ( origset_ ) {
+      origset_ = (AstFrameSet *) astAnnul( origset_ );
+   }
+   
+   //  -file may have been set to "", clear current image and just return.
+   if (strlen(file()) == 0) {
+      return clearCmd(0, NULL);
+   }
+   
+   //  If we have an existing image then release it.
+   if ( image_ ) {
+      image_->saveParams(p);
+      delete image_;
+      image_ = (ImageData *) NULL;
+      updateViews();
+   }
+   
+   //  Check that the image exists and parse it.
+   char *name;
+   char *slice;
+   char *path;
+   if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
+      if ( name ) delete name;
+      if ( slice ) delete slice;
+      if ( path ) delete path;
+      return error( file(), " is not an image" );
+   }
+   
+   //  Create the image.
+   ImageData* image = getStarImage( name, slice, path );
+   
+   //  Release resources and return an error if image couldn't be
+   //  created for some reason.
+   delete name;
+   if ( slice ) delete slice;
+   if ( path ) delete path;
+   if (! image ) {
+      return TCL_ERROR;
+   }
+   
+   //  Store image reference.
+   image_ = image;
+   
+   //  Restore transformations.
+   image_->restoreParams(p, !autoSetCutLevels_);
+   
+   //  Initialise the new image.
+   return initNewImage();
 }
 
 //+
@@ -595,38 +606,42 @@ int StarRtdImage::loadFile()
 //-
 StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
 {
-  if (!image) {
-    image = image_;
-  }
-  WCSRep *p = image->wcs().rep();
-  if (p && strcmp(p->classname(), "StarWCS") == 0) {
-    return (StarWCS *) p;
-  }
-  error("internal error: expected class StarWCS, not ", p->classname());
-  return NULL;
+   if (!image) {
+      image = image_;
+   }
+   WCSRep *p = image->wcs().rep();
+   if ( p && strcmp(p->classname(), "StarWCS" ) == 0) {
+      return (StarWCS *) p;
+   }
+   error( "internal error: expected class StarWCS, not ",
+          p->classname() );
+   return NULL;
 }
 
 //+
 // Return if coordinate system is celestial.
 //-
 int StarRtdImage::isCelestial() {
-  StarWCS* wcsp = getStarWCSPtr();
-  return wcsp->isCelestial();
+   StarWCS* wcsp = getStarWCSPtr();
+   return wcsp->isCelestial();
 }
 
-//+
-// Dump the displayed image to a file. This overrides the method used
-// by RtdImage, as we make sure that the current WCS is used as part
-// of the output FITS headers (overwriting what exists there
-// already) if the original WCS has been overwritten (a sign that at
-// least some WCS modification has been attempted).
+//+ 
+//   StarRtdImage::dumpCmd
 //
-// Two encodings of the WCS can be written. The first is uses the
-// default encoding of a channel that contains the image FITS headers.
-// Normally this is a native encoding which is accurate and can be
-// output to an NDF WCS component. A second attempt to encode the WCS
-// is made if a suitable encoding form passed as an optional argument
-// (normally this will be FITS-WCS or DSS).
+//   Dump the displayed image to a file. This overrides the method
+//   used by RtdImage, as we make sure that the current WCS is used as
+//   part of the output FITS headers (overwriting what exists there
+//   already) if the original WCS has been overwritten (a sign that at
+//   least some WCS modification has been attempted).
+//
+//   Two encodings of the WCS can be written. The first is uses the
+//   default encoding of a channel that contains the image FITS
+//   headers.  Normally this is a native encoding which is accurate
+//   and can be output to an NDF WCS component. A second attempt to
+//   encode the WCS is made if a suitable encoding form passed as an
+//   optional argument (normally this will be FITS-WCS or DSS).
+//
 //-
 int StarRtdImage::dumpCmd( int argc, char *argv[] )
 {
@@ -641,16 +656,16 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
   if ( image_ ) {
     if ( origset_ ) {
 
-      // WCS has been played with. Attempt to write the current WCS
-      // out to the FITS headers. We do this by reading the existing
-      // FITS headers into a channel, attempting to repeat the process
-      // of reading an object (thus removing the associated FITS
-      // headers) and then attempt to write the new WCS object, plus
-      // a native object (as a backup in case other system cannot be
-      // written).
+      //  WCS has been played with. Attempt to write the current WCS
+      //  out to the FITS headers. We do this by reading the existing
+      //  FITS headers into a channel, attempting to repeat the
+      //  process of reading an object (thus removing the associated
+      //  FITS headers) and then attempt to write the new WCS object,
+      //  plus a native object (as a backup in case other system
+      //  cannot be written).
       AstFitsChan *chan = (AstFitsChan *)astFitsChan( NULL, NULL, "" );
 
-      // Now add all the current FITS headers to this channel.
+      //  Now add all the current FITS headers to this channel.
       Mem oldhead = image_->header();
       char *oldptr = (char *) oldhead.ptr();
       int oldsize = oldhead.size();
@@ -676,8 +691,8 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         }
       }
 
-      // Read a WCS system from the channel to simulate the initial
-      // read (which removed an object).
+      //  Read a WCS system from the channel to simulate the initial
+      //  read (which removed an object).
       astClear( chan, "Card" );
       AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
       if ( !astOK ) astClearStatus;
@@ -685,15 +700,15 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         tmpset = (AstFrameSet *) astAnnul( tmpset );
       }
 
-      // Now we can try to add the WCS encoding. The encoding type of
-      // the channel is either set to "Native" or (sometimes!) the
-      // type of the WCS object just read. The first attempt to update
-      // will use whatever this is set to. If this fails then an
-      // attempt to write a native encoding will be made, if the type
-      // wasn't native.
+      //  Now we can try to add the WCS encoding. The encoding type of
+      //  the channel is either set to "Native" or (sometimes!) the
+      //  type of the WCS object just read. The first attempt to
+      //  update will use whatever this is set to. If this fails then
+      //  an attempt to write a native encoding will be made, if the
+      //  type wasn't native.
       StarWCS* wcsp = getStarWCSPtr();
       if ( !wcsp ) {
-	return TCL_ERROR;
+         return TCL_ERROR;
       }
       AstFrameSet *newwcs = wcsp->astWCSClone();
       nwrite = astWrite( chan, newwcs );
@@ -729,35 +744,35 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         }
       }
 
-      // Now try with the given encoding (which shouldn't be native),
-      // if this is the same as that just written then we'll just get
-      // the same values again (all encodings except native will only
-      // have one representations).
+      //  Now try with the given encoding (which shouldn't be native),
+      //  if this is the same as that just written then we'll just get
+      //  the same values again (all encodings except native will only
+      //  have one representations).
       if ( argc == 2 ) {
-	astSet( chan, "Encoding=%s", argv[1] );
-	nextra = astWrite( chan, newwcs );
-	if ( astOK && nextra != 0 ) {
+        astSet( chan, "Encoding=%s", argv[1] );
+        nextra = astWrite( chan, newwcs );
+        if ( astOK && nextra != 0 ) {
           saved = 1;
         }
         if ( !astOK ) astClearStatus;
       }
       if ( nwrite != 0 || nextra != 0 ) {
 
-	// Write the FITS channel out to a Mem object and use it to
-	// replace the existing headers.
-	ncard = astGetI( chan, "Ncard" );
-	Mem newhead = Mem( 80 * ( ncard + 1 ), 0 );
-	char *newptr = (char *) newhead.ptr();
-	astClear( chan, "Card" );
-	int i;
-	for ( i = 0; i < ncard; i++, newptr += 80 ) {
-	  astFindFits( chan, "%f", card, 1 );
-	  memcpy( newptr, card, 80 );
-	}
-	strcpy( newptr, "END" );
-	newptr += 3;
-	for ( i = 0; i < 77; i++, newptr++ ) *newptr = ' ';
-	image_->header( newhead ); // XXX how is old header released?
+        //  Write the FITS channel out to a Mem object and use it to
+        //  replace the existing headers.
+        ncard = astGetI( chan, "Ncard" );
+        Mem newhead = Mem( 80 * ( ncard + 1 ), 0 );
+        char *newptr = (char *) newhead.ptr();
+        astClear( chan, "Card" );
+        int i;
+        for ( i = 0; i < ncard; i++, newptr += 80 ) {
+          astFindFits( chan, "%f", card, 1 );
+          memcpy( newptr, card, 80 );
+        }
+        strcpy( newptr, "END" );
+        newptr += 3;
+        for ( i = 0; i < 77; i++, newptr++ ) *newptr = ' ';
+        image_->header( newhead ); // XXX how is old header released?
       }
       chan = (AstFitsChan *) astAnnul( chan );
       newwcs = (AstFrameSet *) astAnnul( newwcs );
@@ -784,72 +799,71 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 //+
 //  StarRtdImage::configureImage
 //
-// This procedure is called to process an argv/argc list, plus
-// the Tk option database, in order to configure (or reconfigure)
-// a image.
+//  This procedure is called to process an argv/argc list, plus the Tk
+//  option database, in order to configure (or reconfigure) a image.
 //
-// Redefined here to check which changes were made and then
-// pass responsibility on to TkImage. Note that this method
-// is a copy of the body of RtdImage::configureImage with our
-// modifications. We need this to ensure that the correct
-// configSpecs_ are used.
+//  Redefined here to check which changes were made and then pass
+//  responsibility on to TkImage. Note that this method is a copy of
+//  the body of RtdImage::configureImage with our modifications. We
+//  need this to ensure that the correct configSpecs_ are used.
 //-
 int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::configureImage" << endl;
+   cout << "Called StarRtdImage::configureImage" << endl;
 #endif
-  if (TkImage::configureImage(argc, argv, flags) != TCL_OK)
-    return TCL_ERROR;
+   if ( TkImage::configureImage( argc, argv, flags ) != TCL_OK ) {
+      return TCL_ERROR;
+   }
+   int status = TCL_OK;
+   int reset = 0;
 
-  int status = TCL_OK;
-  int reset = 0;
+   //  Note if we are using X shared memory.
+   usingXShm_ = haveXShm_ && usexshm();
 
-  // Note if we are using X shared memory.
-  usingXShm_ = haveXShm_ && usexshm();
+   //  Find out which options were specified and process them if
+   //  necessary (note: Tk sets a flag in the config entry when the
+   //  option is specified. We use the OFFSET macro defined above as
+   //  an efficient way to compare options).
+   for ( Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++ ) {
+      if ( p->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
 
-  // Find out which options were specified and process them
-  // if necessary (note: Tk sets a flag in the config entry when
-  // the option is specified. We use the OFFSET macro defined above
-  // as an efficient way to compare options).
-  for (Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++) {
-    if (p->specFlags & TK_CONFIG_OPTION_SPECIFIED) {
-      switch(p->offset) {
-
-      case GAIA_OPTION(usexshm):
-        if (initialized_) {
-          deleteXImage();
-          reset++;
-        }
-        break;
-
-      case GAIA_OPTION(displaymode):
-      case GAIA_OPTION(shm_header):
-      case GAIA_OPTION(shm_data):
-        if (initialized_)
-          reset++;
-        break;
-
-      case GAIA_OPTION(fitWidth):
-      case GAIA_OPTION(fitHeight):
-        if (initialized_) {
-          if (image_ && fitWidth() && fitHeight()) {
-            image_->shrinkToFit(fitWidth(), fitHeight());
-          }
-          reset++;
-        }
-        break;
-
-      case GAIA_OPTION(file):
-        status = loadFile();
-        break;
+         switch( p->offset ) {
+            case GAIA_OPTION(usexshm):
+               if (initialized_) {
+                  deleteXImage();
+                  reset++;
+               }
+               break;
+               
+            case GAIA_OPTION(displaymode):
+            case GAIA_OPTION(shm_header):
+            case GAIA_OPTION(shm_data):
+               if (initialized_)
+                  reset++;
+               break;
+               
+            case GAIA_OPTION(fitWidth):
+            case GAIA_OPTION(fitHeight):
+               if (initialized_) {
+                  if (image_ && fitWidth() && fitHeight()) {
+                     image_->shrinkToFit(fitWidth(), fitHeight());
+                  }
+                  reset++;
+               }
+               break;
+               
+            case GAIA_OPTION(file):
+               status = loadFile();
+               break;
+         }
       }
-    }
-  }
-
-  if (reset)
-    return resetImage();
-  return status;
+   }
+   
+   if ( reset ) {
+      return resetImage();
+   }
+   return status;
 }
 
 //+
@@ -872,55 +886,75 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 int StarRtdImage::foreignCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::foreignCmd" << endl;
+   cout << "Called StarRtdImage::foreignCmd" << endl;
 #endif
 
-  // Stop if no image loaded.
-  if ( !image_ ) {
-    return TCL_OK;
-  }
-
-  // Check number of arguments.
-  if ( argc != 2 ) {
-    set_result( "number of arguments wrong, require 2: command qualifiers" );
-    return TCL_ERROR;
-  }
-
-  // Now check for its existence and invoke it.
+   // Stop if no image loaded.
+   if ( !image_ ) {
+      return TCL_OK;
+   }
+   
+   // Check number of arguments.
+   if ( argc != 2 ) {
+      set_result( "number of arguments wrong, require 2: command qualifiers" );
+      return TCL_ERROR;
+   }
+   
+   // Now check for its existence and invoke it.
   for ( unsigned int i = 0; i < sizeof( foreigncmds_ ) / sizeof( *foreigncmds_)
-          ; i++ ) {
-    StarRtdForeignCmds *t = &foreigncmds_[i];
+           ; i++ ) {
+     StarRtdForeignCmds *t = &foreigncmds_[i];
     if ( strcmp( t->name, argv[0] ) == 0 ) {
-      //  Matched a command so construct the image information and
-      // invoke it.
-      StarImageInfo *info = new StarImageInfo;
-      char *id = image_->image().get("NDFID");
-      if ( id ) {
-	info->NDFid = atoi( id );
-      } else {
-	info->NDFid = 0;
-      }
-      ImageIO imageIO = image_->image();
-      info->imageData = (void *) imageIO.dataPtr();
-      info->type = (ImageDataType) image_->dataType();
-      info->nx = (int) image_->width();
-      info->ny = (int) image_->height();
-      info->interp = interp_;
+       
+       //  Matched a command so construct the image information and
+       //  invoke it.
+       StarImageInfo *info = new StarImageInfo;
+       ImageIO imio = image_->image();
+       ImageIO *imptr = &imio;
 
-      char *errStr;
-      int result = ( *t->fptr )( info, argv[1], &errStr );
-      delete info;
-      if ( result ) {
-        updateImage();
-        return TCL_OK;
-      } else {
-        set_result( errStr );
-        free( (void *) errStr );
-        return TCL_ERROR;
-      }
+       //  Look for NDF identifier.
+       char *id = imio.get( "NDFID" );
+       if ( id ) {
+          info->NDFid = atoi( id );
+       } else {
+          info->NDFid = 0;
+       }
+       info->imageData = (void *) imio.dataPtr();
+       info->type = (ImageDataType) image_->dataType();
+       info->nx = (int) image_->width();
+       info->ny = (int) image_->height();
+       info->interp = interp_;
+
+       //  If the image representation is byte swapped (i.e. FITS on
+       //  some architectures) then inform foreign method that it
+       //  needs to deal with this.
+       if ( imptr->nativeByteOrder() ) {
+          info->swap = 0;
+       } else {
+          int dsize = abs( imptr->bitpix() ) / 8;
+          FITS_LONG l = 1;
+          if ( ntohl( l ) == l || dsize == 1 ) {
+             info->swap = 0;
+          } else {
+             info->swap = 1;
+          }
+       }
+
+       //  Invoke foreign command.
+       char *errStr;
+       int result = ( *t->fptr )( info, argv[1], &errStr );
+       delete info;
+       if ( result ) {
+          updateImage();
+          return TCL_OK;
+       } else {
+          set_result( errStr );
+          free( (void *) errStr );
+          return TCL_ERROR;
+       }
     }
   }
-
+  
   // Foreign command not found.
   return error( "unknown foreign command");
 }
@@ -1631,16 +1665,16 @@ int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
   if ( argc == 1 ) {
     if ( *argv[0] == 'o' ) {
       if ( origset_ ) {
-	wcsp->astWCSReplace( origset_ );
+        wcsp->astWCSReplace( origset_ );
 
-	//  Update any views to use this information.
-	if (updateViews(2) != TCL_OK) {
-	  return TCL_ERROR;
-	} else {
-	  return TCL_OK;
-	}
+        //  Update any views to use this information.
+        if (updateViews(2) != TCL_OK) {
+          return TCL_ERROR;
+        } else {
+          return TCL_OK;
+        }
       } else {
-	return error("no original WCS system available");
+        return error("no original WCS system available");
       }
     } else {
       // Unidentified argument.
@@ -1658,7 +1692,7 @@ int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
 
       //  Update any views to use this information.
       if (updateViews(2) != TCL_OK)
-	return TCL_ERROR;
+         return TCL_ERROR;
     }
   }
   return TCL_OK;
@@ -1859,7 +1893,7 @@ int StarRtdImage::mapPositions( int iframe, AstFrameSet *fset,
     double xz, yz, xs, ys, perp, orient;
     decodeLinear( tr, xz, yz, xs, ys, perp, orient );
     sprintf( result, "%f %f %f %f %f %f %f %f %f %f %f %f %f",
-	     resid, tr[0], tr[1], tr[2], tr[3], tr[4], tr[5],
+             resid, tr[0], tr[1], tr[2], tr[3], tr[4], tr[5],
              xz, yz, xs, ys, perp, orient );
     set_result( result );
     return 1;
@@ -1956,30 +1990,30 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
       //  Local, so make sure that astcreate has already been called
       //  (or this function once before).
       if ( !newset_ ) {
-        return error("cannot use a local WCS system as none is "
-  		   "available (see astcreate, or use this command "
-  		   "once previously with source 'image')");
+         return error("cannot use a local WCS system as none is "
+                      "available (see astcreate, or use this command "
+                      "once previously with source 'image')");
       }
     }
     break;
     default: {
-      return error( source,
-  		  ": unknown WCS source, should be 'image' or 'local'");
+       return error( source,
+                     ": unknown WCS source, should be 'image' or 'local'");
     }
   }
-
+  
   //  Decode the parameters which should be the transformation
   //  coefficients.
   double tr[6];
   for ( int i = 1; i < 7; i++ ) {
-    if ( Tcl_GetDouble( interp_, argv[i], &tr[i-1] ) != TCL_OK ) {
-      return error( argv[i], " is not a number" );
-    }
+     if ( Tcl_GetDouble( interp_, argv[i], &tr[i-1] ) != TCL_OK ) {
+        return error( argv[i], " is not a number" );
+     }
   }
-
+  
   //  Now set the transform.
   if ( ! addLinear( AST__BASE, newset_, tr ) ) {
-    return error( "failed to add linear transform to WCS");
+     return error( "failed to add linear transform to WCS");
   }
   return TCL_OK;
 }
@@ -2025,15 +2059,15 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
       //  (or this function once before).
       if ( !newset_ ) {
         return error("cannot use a local WCS system as none is "
-  		   "available (see astcreate, or use this command "
-  		   "once previously with source 'image')");
+                     "available (see astcreate, or use this command "
+                     "once previously with source 'image')");
       }
       astPtr = (AstFrameSet *) astClone( newset_ );
     }
     break;
     default: {
       return error( argv[0],
-  		  ": unknown WCS source, should be 'image' or 'local'");
+                    ": unknown WCS source, should be 'image' or 'local'");
     }
   }
 
@@ -2567,7 +2601,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 
       StarWCS* wcsp = getStarWCSPtr();
       if (!wcsp)
-	  return TCL_ERROR;
+         return TCL_ERROR;
 
       newset_ = wcsp->astWCSCopy();
     }
@@ -2576,15 +2610,15 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
       //  Local, so make sure that astcreate has already been called
       //  (or this function once before).
       if ( !newset_ ) {
-        return error("cannot use a local WCS system as none is "
-		     "available (see astcreate, or use this command "
-		     "once previously with source 'image')");
+         return error("cannot use a local WCS system as none is "
+                      "available (see astcreate, or use this command "
+                      "once previously with source 'image')");
       }
     }
     break;
     default: {
-      return error( source,
-		    ": unknown WCS source, should be 'image' or 'local'");
+       return error( source,
+                     ": unknown WCS source, should be 'image' or 'local'");
     }
   }
 
@@ -2618,7 +2652,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     } else {
       cvt = (AstFrameSet *) astAnnul( cvt );
       return error ( "failed to convert from existing system "
-		     "to new system");
+                     "to new system");
     }
   }
   return TCL_OK;
@@ -2915,226 +2949,227 @@ int StarRtdImage::blankcolorCmd( int argc, char *argv[] )
 int StarRtdImage::sliceCmd(int argc, char *argv[])
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::sliceCmd (" << argc << ")" << endl;
+   cout << "Called StarRtdImage::sliceCmd (" << argc << ")" << endl;
 #endif
-  if (!image_)
-    return TCL_OK;
+   if (!image_) {
+      return TCL_OK;
+   }
 
-  //  Convert line extent to image coords.
-  double rx0, ry0, rx1, ry1;
-  if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL,
-                       rx0, ry0, argv[6], "image") != TCL_OK
-      || convertCoordsStr(0, argv[4], argv[5], NULL, NULL,
-                          rx1, ry1, argv[6], "image") != TCL_OK) {
-    return TCL_ERROR;
-  }
+   //  Convert line extent to image coords.
+   double rx0, ry0, rx1, ry1;
+   if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL,
+                        rx0, ry0, argv[6], "image") != TCL_OK
+       || convertCoordsStr(0, argv[4], argv[5], NULL, NULL,
+                           rx1, ry1, argv[6], "image") != TCL_OK) {
+      return TCL_ERROR;
+   }
 
-  //  Get distance between endpoints (add a little to be safe).
-  int x0 = int(rx0), y0 = int(ry0), x1 = int(rx1), y1 = int(ry1);
-  int w = abs(x1-x0) + 1;
-  int h = abs(y1-y0) + 1;
-  int dist = (int)sqrt(w*w + h*h) + 4;
+   //  Get distance between endpoints (add a little to be safe).
+   int x0 = int(rx0), y0 = int(ry0), x1 = int(rx1), y1 = int(ry1);
+   int w = abs(x1-x0) + 1;
+   int h = abs(y1-y0) + 1;
+   int dist = (int)sqrt(w*w + h*h) + 4;
 
-  double* ivvalues = new double[dist*2];
-  double* xyvalues = new double[dist*2];
+   double* ivvalues = new double[dist*2];
+   double* xyvalues = new double[dist*2];
 
-  //  Fill the xyvalues array and set numValues to the actual number of points
-  int numValues = image_->getSpectrum(ivvalues, x0, y0, x1, y1);
+   //  Fill the xyvalues array and set numValues to the actual number of points
+   int numValues = image_->getSpectrum( ivvalues, x0, y0, x1, y1 );
 
-  //  Convert the slice indices to the equivalent X and Y coordinates.
-  //  To do this we reproduce the algorithm of image->getSpectrum.
-  int i = 0;
-  if (y1 == y0) {
-
-    //  Horizontal line (modified to run the direction as supplied).
-    if ( x0 < x1 ) {
-      for (int x = x0; x <= x1; x++) {
-	xyvalues[i*2] = x;
-	xyvalues[i*2+1] = y0;
-	i++;
-      }
-    } else {
-      for (int x = x0; x >= x1; x--) {
-	xyvalues[i*2] = x;
-	xyvalues[i*2+1] = y0;
-	i++;
-      }
-
-      //  The data values are also reversed in this case.
-      int j = numValues - 1;
-      for ( i = 0; i < numValues/2; i++ ) {
-	swap( ivvalues[i*2+1], ivvalues[j*2+1] );
-	j--;
-      }
-    }
-  } else if (x1 == x0) {
-
-    //  Vertical line (modified to run the direction as supplied).
-    if ( y0 < y1 ) {
-      for (int y = y0; y <= y1; y++) {
-	xyvalues[i*2] = x0;
-	xyvalues[i*2+1] = y;
-	i++;
-      }
-    } else {
-      for (int y = y0; y >= y1; y--) {
-	xyvalues[i*2] = x0;
-	xyvalues[i*2+1] = y;
-	i++;
-      }
-
-      //  The data values are also reversed in this case.
-      int j = numValues - 1;
-      for ( i = 0; i < numValues/2; i++ ) {
-	swap( ivvalues[i*2+1], ivvalues[j*2+1] );
-	j--;
-      }
-    }
-  } else {
-
-    // sloped line
-    // use Bresenham midpoint line scan-conversion algorithm
-    // see: Computer Graphics Princ. a. Pract., 2nd Ed., p. 78
-    // also see x11r5/mit/server/ddx/cfb/cfbline.c, cfbbres.c
-
-    int x = x0;
-    int y = y0;
-    int e, e1, e2, e3;		// bresenham error and increments
-    int len;			// length of segment
-    int adx = x1 - x0;		// abs values of dx and dy
-    int ady = y1 - y0;
-    int signdx = 1;		// sign of dx and dy
-    int signdy = 1;
-
-    if (adx < 0) {
-	adx = -adx;
-	signdx = -1;
-    }
-    if (ady < 0) {
-	ady = -ady;
-	signdy = -1;
-    }
-
-    // start pixel
-    xyvalues[i*2] = x;
-    xyvalues[i*2+1] = y;
-    i++;
-
-    if (adx > ady) {
-      // X major axis;
-      e1 = ady << 1;
-      e2 = e1 - (adx << 1);
-      e3 = e2 - e1;
-      e = -adx;
-      len = adx;
-      while (len--) {
-	e += e1;
-	x += signdx;
-	if (e >= 0) {
-	  y += signdy;
-	  e += e3;
-	}
-	xyvalues[i*2] = x;
-	xyvalues[i*2+1] = y;
-	i++;
-      }
-    } else {
-      // Y major axis
-      e1 = adx << 1;
-      e2 = e1 - (ady << 1);
-      e3 = e2 - e1;
-      e = -ady;
-      len = ady;
-      while(len--) {
-	e += e1;
-	y += signdy;
-	if (e >= 0) {
-	  x += signdx;
-	  e += e3;
-	}
-	xyvalues[i*2] = x;
-	xyvalues[i*2+1] = y;
-	i++;
-      }
-    }
-  }
-
-  //  Strip out any blank values, if needed. Do this now to preserve
-  //  X-Y correspondence. The replacement value is 0.0, which is as
-  //  unlikely to occur as any other value and will still look odd
-  //  when a long run of values occur.
-  if ( image_->haveBlank() ) {
-    double blank = image_->getBlank();
-    int inblank = 0;
-    int start = 0;
-    double fill = 0.0;
-    for ( i = 0; i < numValues; i++ ) {
-      if ( inblank ) {
-	//  In a region of blanks. If this pixel is blank continue,
-	//  otherwise it is the end of the region and need to fill the
-	//  blank segment with the mean of the end points.
-	if ( ivvalues[i*2+1] != blank ) {
-	  inblank = 0;
-
-	  //  Trap start of line was blank.
-	  if ( start == -1 ) {
-	    fill = ivvalues[i*2+1];
-            start = 0;
-	  } else {
-	    fill = ( ivvalues[start*2+1] + ivvalues[i*2+1] ) * 0.5;
-	  }
-	  int j;
-	  for ( j = start; j <= i; j++ ) {
-	    ivvalues[j*2+1] = fill;
-	  }
-	}
-      } else if ( ivvalues[i*2+1] == blank ) {
-
-	//  Start of blank region.
-	inblank = 1;
-	start = i - 1;
-
-	//  Trap end of line is only blank.
-	if ( i == numValues - 1 ) {
-	  ivvalues[i*2+1] = ivvalues[(i-1)*2+1] ;
-	}
-      }
-    }
-
-    //  If still inblank at end of line use start value, unless this
-    //  is also blank, in which case use 0.
-    if ( inblank ) {
-      if ( start == -1 ) {
-	start = 0;
-      }
-      if ( ivvalues[start*2+1] == blank ) {
-	fill = 0.0;
+   //  Convert the slice indices to the equivalent X and Y coordinates.
+   //  To do this we reproduce the algorithm of image->getSpectrum.
+   int i = 0;
+   if ( y1 == y0 ) {
+      
+      //  Horizontal line (modified to run the direction as supplied).
+      if ( x0 < x1 ) {
+         for ( int x = x0; x <= x1; x++ ) {
+            xyvalues[i*2] = x;
+            xyvalues[i*2+1] = y0;
+            i++;
+         }
       } else {
-	fill = ivvalues[start*2+1] == blank;
-      }
-      for ( i = start; i < numValues; i++ ) {
-	ivvalues[i*2+1] = fill;
-      }
-    }
-  }
+         for ( int x = x0; x >= x1; x-- ) {
+            xyvalues[i*2] = x;
+            xyvalues[i*2+1] = y0;
+            i++;
+         }
 
-  //  Convert the index/value and x/y pairs into Blt vectors.
-  if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
-                       ivvalues, argv[7], argv[8]) != TCL_OK) {
-    delete xyvalues;
-    delete ivvalues;
-    return TCL_ERROR;
-  }
-  if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
-                       xyvalues, argv[9], argv[10]) != TCL_OK) {
-    delete xyvalues;
-    delete ivvalues;
-    return TCL_ERROR;
-  }
-  delete xyvalues;
-  delete ivvalues;
+         //  The data values are also reversed in this case.
+         int j = numValues - 1;
+         for ( i = 0; i < numValues/2; i++ ) {
+            swap( ivvalues[i*2+1], ivvalues[j*2+1] );
+            j--;
+         }
+      }
+   } else if  (x1 == x0 ) {
 
-  return set_result(numValues);
+      //  Vertical line (modified to run the direction as supplied).
+      if ( y0 < y1 ) {
+         for ( int y = y0; y <= y1; y++ ) {
+            xyvalues[i*2] = x0;
+            xyvalues[i*2+1] = y;
+            i++;
+         }
+      } else {
+         for ( int y = y0; y >= y1; y-- ) {
+            xyvalues[i*2] = x0;
+            xyvalues[i*2+1] = y;
+            i++;
+         }
+         
+         //  The data values are also reversed in this case.
+         int j = numValues - 1;
+         for ( i = 0; i < numValues/2; i++ ) {
+            swap( ivvalues[i*2+1], ivvalues[j*2+1] );
+            j--;
+         }
+      }
+   } else {
+      
+      // sloped line
+      // use Bresenham midpoint line scan-conversion algorithm
+      // see: Computer Graphics Princ. a. Pract., 2nd Ed., p. 78
+      // also see x11r5/mit/server/ddx/cfb/cfbline.c, cfbbres.c
+      
+      int x = x0;
+      int y = y0;
+      int e, e1, e2, e3;        // bresenham error and increments
+      int len;                  // length of segment
+      int adx = x1 - x0;        // abs values of dx and dy
+      int ady = y1 - y0;
+      int signdx = 1;           // sign of dx and dy
+      int signdy = 1;
+      
+      if (adx < 0) {
+         adx = -adx;
+         signdx = -1;
+      }
+      if (ady < 0) {
+         ady = -ady;
+         signdy = -1;
+      }
+      
+      // start pixel
+      xyvalues[i*2] = x;
+      xyvalues[i*2+1] = y;
+      i++;
+      
+      if (adx > ady) {
+         // X major axis;
+         e1 = ady << 1;
+         e2 = e1 - (adx << 1);
+         e3 = e2 - e1;
+         e = -adx;
+         len = adx;
+         while (len--) {
+            e += e1;
+            x += signdx;
+            if (e >= 0) {
+               y += signdy;
+               e += e3;
+            }
+            xyvalues[i*2] = x;
+            xyvalues[i*2+1] = y;
+            i++;
+         }
+      } else {
+         // Y major axis
+         e1 = adx << 1;
+         e2 = e1 - (ady << 1);
+         e3 = e2 - e1;
+         e = -ady;
+         len = ady;
+         while(len--) {
+            e += e1;
+            y += signdy;
+            if (e >= 0) {
+               x += signdx;
+               e += e3;
+            }
+            xyvalues[i*2] = x;
+            xyvalues[i*2+1] = y;
+            i++;
+         }
+      }
+   }
+   
+   //  Strip out any blank values, if needed. Do this now to preserve
+   //  X-Y correspondence. The replacement value is 0.0, which is as
+   //  unlikely to occur as any other value and will still look odd
+   //  when a long run of values occur.
+   if ( image_->haveBlank() ) {
+      double blank = image_->getBlank();
+      int inblank = 0;
+      int start = 0;
+      double fill = 0.0;
+      for ( i = 0; i < numValues; i++ ) {
+         if ( inblank ) {
+            //  In a region of blanks. If this pixel is blank continue,
+            //  otherwise it is the end of the region and need to fill the
+            //  blank segment with the mean of the end points.
+            if ( ivvalues[i*2+1] != blank ) {
+               inblank = 0;
+               
+               //  Trap start of line was blank.
+               if ( start == -1 ) {
+                  fill = ivvalues[i*2+1];
+                  start = 0;
+               } else {
+                  fill = ( ivvalues[start*2+1] + ivvalues[i*2+1] ) * 0.5;
+               }
+               int j;
+               for ( j = start; j <= i; j++ ) {
+                  ivvalues[j*2+1] = fill;
+               }
+            }
+         } else if ( ivvalues[i*2+1] == blank ) {
+            
+            //  Start of blank region.
+            inblank = 1;
+            start = i - 1;
+            
+            //  Trap end of line is only blank.
+            if ( i == numValues - 1 ) {
+               ivvalues[i*2+1] = ivvalues[(i-1)*2+1] ;
+            }
+         }
+      }
+      
+      //  If still inblank at end of line use start value, unless this
+      //  is also blank, in which case use 0.
+      if ( inblank ) {
+         if ( start == -1 ) {
+            start = 0;
+         }
+         if ( ivvalues[start*2+1] == blank ) {
+            fill = 0.0;
+         } else {
+            fill = ivvalues[start*2+1] == blank;
+         }
+         for ( i = start; i < numValues; i++ ) {
+            ivvalues[i*2+1] = fill;
+         }
+      }
+   }
+   
+   //  Convert the index/value and x/y pairs into Blt vectors.
+   if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
+                        ivvalues, argv[7], argv[8]) != TCL_OK) {
+      delete xyvalues;
+      delete ivvalues;
+      return TCL_ERROR;
+   }
+   if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
+                        xyvalues, argv[9], argv[10]) != TCL_OK) {
+      delete xyvalues;
+      delete ivvalues;
+      return TCL_ERROR;
+   }
+   delete xyvalues;
+   delete ivvalues;
+   
+   return set_result(numValues);
 }
 
 //
@@ -3258,7 +3293,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //       the default preferences are used. A typical response to this
 //       parameter might be:
 //
-//	   { {colour(curve)=2,width(curve)=0.015}
+//         { {colour(curve)=2,width(curve)=0.015}
 //           {colour(curve)=3,width(curve)=0.012}
 //           {colour(curve)=4,width(curve)=0.010}
 //           {colour(curve)=5,width(curve)=0.008}
@@ -3464,10 +3499,28 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       //  Create a contour object, setting the contour levels, and
       //  line attributes.
       Contour contour( imageIO, plot, levels, nlevels,
-                       (const char **)prefs, nprefs );
+                       (const char **) prefs, nprefs );
 
       //  Establish if plotting is careful or fast.
       contour.setCareful( careful );
+
+      //  Tell the contour object if it needs to byte swap the image
+      //  data. This is only necessary if the image is FITS on a non
+      //  bigendian machine.
+      ImageIO *imptr = &imageIO;
+      int swap = 0;
+      if ( imptr->nativeByteOrder() ) {
+         swap = 0;
+      } else {
+         int dsize = abs( imptr->bitpix() ) / 8;
+         FITS_LONG l = 1;
+         if ( ntohl( l ) == l || dsize == 1 ) {
+            swap = 0;
+         } else {
+            swap = 1;
+         }
+      }
+      contour.setSwap( swap );
 
       //  Set the region of image to contour (tuned to match grid plots).
       if ( ncoords > 0 ) {
@@ -3734,18 +3787,274 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
 //   StarRtdImage::hduCmd
 //
 //   Purpose:
-//      Overrides the "hdu" command of Skycat. None of this
-//      functionality is implemented in GAIA, and at present cannot be
-//      (because we byte swap FITS files these are memory mapped and
-//      not available for access by the FitsIO library).
+//      Overrides the "hdu" command of Skycat to add in NDF support.
+//      See the Skycat documentation for what this does.
 //
 //-
 int StarRtdImage::hduCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::hduCmd" << endl;
+   cout << "Called StarRtdImage::hduCmd" << endl;
 #endif
-  return error( "Sorry the HDU commands are not available" );
+   if ( ! image_ ) {
+      return TCL_OK;
+   }
+   
+   //  Check that we have a known data representation.
+   ImageIO imio = image_->image();
+   if ( ! imio.rep() ) {
+      return error( "Unknown data representation, "
+                    "\"hdu\" command only available for FITS and NDF" );
+   }
+   if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
+        strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
+      return fitsHduCmd( imio, argc, argv );
+      
+   } else if ( strcmp(imio.rep()->classname(), "NDFIO" ) == 0 ) {
+      return ndfHduCmd( imio, argc, argv );
+      
+   } else {
+      return error( "Unknown data format, "
+                    "\"hdu\" command only available for FITS and NDF" );
+   }
+}
+
+//+
+//   StarRtdImage::fitsHduCmd
+//
+//   Implement the hdu command for FITS files.
+//
+//-
+int StarRtdImage::fitsHduCmd( const ImageIO &imio, int argc, char *argv[] )
+{
+  //  Cannot pass FITS files directly to Skycat as it only works with
+  //  FitsIO objects, not StarFitsIO, so repeat Skycat functionality.
+  FitsIO *fits = (FitsIO *) imio.rep();
+
+  // <path> hdu  (return the current HDU number)
+  if ( argc == 0 ) {
+    return set_result( fits->getHDUNum() );
+  }
+
+  // <path> hdu count
+  if ( strcmp(argv[0], "count" ) == 0 ) {
+    return set_result( fits->getNumHDUs() );
+  }
+
+  // <path> hdu type ?number?
+  if ( strcmp(argv[0], "type") == 0 ) {
+    return hduCmdType( argc, argv, fits );
+  }
+
+  // <path> hdu listheadings
+  // (return a list of table headings matching the "hdu list" output)
+  if ( strcmp(argv[0], "listheadings") == 0 ) {
+    return set_result( "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3"
+                       " CRPIX1 CRPIX2" );
+  }
+
+  // <path> hdu headings ?$number?
+  if ( strcmp(argv[0], "headings") == 0 ) {
+    return hduCmdHeadings( argc, argv, fits );
+  }
+
+  // <path> hdu get ?number? ?$filename? ?$entry?"
+  if ( strcmp(argv[0], "get") == 0 ) {
+    return hduCmdGet( argc, argv, fits );
+  }
+
+  // <path> hdu create $type $extname $headings $tform $data
+  if (strcmp(argv[0], "create") == 0) {
+    return hduCmdCreate( argc, argv, fits );
+  }
+
+  // <path> hdu delete $number
+  if ( strcmp(argv[0], "delete" ) == 0 ) {
+    return hduCmdDelete( argc, argv, fits );
+  }
+
+  // <path> hdu list
+  if ( strcmp(argv[0], "list" ) == 0 ) {
+    int ret = hduCmdList( argc, argv, fits );
+    return ret;
+  }
+
+  // <path> hdu set $number
+  if (strcmp( argv[0], "set" ) == 0 ) {
+    return hduCmdSet( argc, argv, fits );
+  }
+
+  // <path> hdu $number (Set the current HDU)
+  return hduCmdSet( argc, argv, fits );
+}
+
+//+
+//   StarRtdImage::ndfHduCmd
+//
+//   Implement the hdu command for NDF container files.
+//
+//   Notes:
+//      For NDFIO data, we will map hdu commands to work with a single
+//      HDS container file. This may be a single NDF with image
+//      components (variance and quality), or a series of NDFs. Only
+//      NDFs at the level of the HDS path name given are used (no over
+//      the top searching of container file is used).
+//-
+int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
+{
+  NDFIO *ndf = (NDFIO *) imio.rep();
+
+  // <path> hdu  (return the current HDU number)
+  if ( argc == 0 ) {
+     return set_result( ndf->getNDFNum() );
+  }
+
+  // <path> hdu count
+  if ( strcmp(argv[0], "count" ) == 0 ) {
+     return set_result( ndf->getNumNDFs() );
+  }
+
+  // <path> hdu type ?number? Only type available are NDFs.
+  if ( strcmp(argv[0], "type") == 0 ) {
+     return set_result( "NDF" );
+  }
+
+  // <path> hdu listheadings
+  // (return a list of table headings matching the "hdu list" output)
+  if ( strcmp(argv[0], "listheadings") == 0 ) {
+     return set_result( "number name  naxis1  naxis2 hasvar hasqual" );
+  }
+
+  // <path> hdu headings ?$number?  Table command not implemented
+  if ( strcmp(argv[0], "headings") == 0 ) {
+     return error( "Table commands not supported for NDFs" );
+  }
+
+  // <path> hdu get ?number? ?$filename? ?$entry?"
+  if ( strcmp(argv[0], "get") == 0 ) {
+     return error( "Table commands not supported for NDFs" );
+  }
+
+  // <path> hdu create $type $extname $headings $tform $data
+  if (strcmp(argv[0], "create") == 0) {
+     return error( "Table commands not supported for NDFs" );
+  }
+
+  // <path> hdu delete $number
+  if ( strcmp(argv[0], "delete" ) == 0 ) {
+     return error( "Table commands not supported for NDFs" );
+  }
+
+  // <path> hdu list
+  if ( strcmp(argv[0], "list" ) == 0 ) {
+     return ndfCmdList( argc, argv, ndf );
+  }
+
+  // <path> hdu set $number
+  if (strcmp( argv[0], "set" ) == 0 ) {
+     return ndfCmdSet( argc, argv, ndf );
+  }
+
+  // <path> hdu $number (Set the current HDU)
+  return ndfCmdSet( argc, argv, ndf );
+}
+
+//+
+//  StarRtdImage::ndfCmdSet
+//
+//  Purpose:
+//     Implements the NDF equivalent of the "hdu set" command.
+//     This displays the required NDF and its component from the list
+//     of NDFs available in the current container file.
+//-
+int StarRtdImage::ndfCmdSet(int argc, char** argv, NDFIO* ndf)
+{
+
+   //  First argument is an optional "set".
+   if (strcmp(argv[0], "set") == 0) {
+      argc--;
+      argv++;
+   }
+
+   //  Expect a number identifying the NDF and the data component.
+   if (argc != 2) {
+      return error("wrong number of args: expected NDF_number NDF_component");
+   }
+
+   //  Get a (reference counted) copy of the image
+   ImageIO imio = image_->image();
+
+   //  Extract the arguments and set the NDFIO to this NDF/component.
+   int num = 0;
+   if ( Tcl_GetInt( interp_, argv[0], &num ) != TCL_OK ) {
+      return TCL_ERROR;
+   }
+   if ( ! ndf->setDisplayable( num, argv[1] ) ) {
+      return TCL_ERROR;
+   }
+
+   //  Save image transformation parameters to restore later.
+   ImageDataParams p;
+   image_->saveParams(p);
+
+   //  Delete old image.
+   delete image_;
+   image_ = NULL;
+   updateViews();
+
+   //  Re-initialize the image from the given NDF/component
+   ImageData* im = makeImage( imio );
+   if ( ! im ) {
+      return TCL_ERROR;
+   }
+   image_ = im;
+
+   //  The WCS info will be different in this NDF.
+   imio.wcsinit();
+
+   //  Restore transformations.
+   // image_->restoreParams( p, !autoSetCutLevels_ );
+   image_->restoreParams( p );
+
+   //  Update the display.
+   return initNewImage();
+}
+
+//+
+//  StarRtdImage::ndfCmdList
+//
+//  Purpose:
+//     Implement NDF equivalent of the "hdu list" command. This
+//     returns a list of NDF names, their dimensions and whether
+//     they have variance and quality components.
+//
+//-
+int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
+{
+   int numNDFs = ndf->getNumNDFs();
+   if ( numNDFs <= 0 ) {
+      return TCL_OK;  // empty return list
+   }
+
+   //  Loop though all NDFs getting the required information.
+   ostrstream os;
+   for ( int i = 1; i <= numNDFs; i++ ) {
+      char name[80], naxis[32], naxis1[32], naxis2[32];
+      char hasvar[32], hasqual[32];
+      ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );
+      os << "{"
+         << i
+         << " {" << name    << "}"
+         << " {" << naxis1  << "}"
+         << " {" << naxis2  << "}"
+         << " {" << hasvar  << "}"
+         << " {" << hasqual << "}"
+         << "} ";
+   }
+   os << ends;
+   set_result( os.str() );
+   delete os.str();
+   return TCL_OK;
 }
 
 //+
@@ -3793,7 +4102,6 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
     double high = rtdimagedata->highCut();
     double width = image_->width();
     double scale = ( high - low ) / width;
-    cout << "range = " << low << "," << high << endl;
     tr[0] = low ;
     tr[1] = scale;
     tr[2] = 0.0;
@@ -3852,7 +4160,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
   double *levels = new double[nlevels];
   for ( int index = 0; index < nlevels; index++ ) {
     if ( Tcl_GetDouble( interp_, levelsArgv[index],
-			&levels[index] ) != TCL_OK ) {
+                        &levels[index] ) != TCL_OK ) {
       Tcl_Free( (char *) levelsArgv );
       delete [] levels;
       return error( levelsArgv[index], "is not a valid number");
@@ -3892,14 +4200,14 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
       prev = count;
       count += (int)(xyvalues[j*2+1]);
       if ( count >= cutoff) {
-	levels[i] = xyvalues[j*2];
-	if ( j != numValues - 1 ) {
-	  double interp = 1.0 - ( double(cutoff) - double(prev) ) /
-	                        ( double(count) - double(prev) );
-	  levels[i] = xyvalues[(j+1)*2] -
-	            ( xyvalues[(j+1)*2] - levels[i] ) * interp;
-	}
-	break;
+         levels[i] = xyvalues[j*2];
+         if ( j != numValues - 1 ) {
+            double interp = 1.0 - ( double(cutoff) - double(prev) ) /
+               ( double(count) - double(prev) );
+            levels[i] = xyvalues[(j+1)*2] -
+               ( xyvalues[(j+1)*2] - levels[i] ) * interp;
+         }
+         break;
       }
     }
   }
@@ -4007,8 +4315,8 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     //  about hh/dd:mm:ss, so convert back to native from "degrees"
     double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1, ra2 = x1, dec2 = y0;
     if (   canvasToWorldCoords(ra0, dec0, 0) != TCL_OK
-	|| canvasToWorldCoords(ra1, dec1, 0) != TCL_OK
-	|| canvasToWorldCoords(ra2, dec2, 0) != TCL_OK ) {
+           || canvasToWorldCoords(ra1, dec1, 0) != TCL_OK
+           || canvasToWorldCoords(ra2, dec2, 0) != TCL_OK ) {
       return TCL_OK;
     }
     ra0 *= R2D;
@@ -4033,11 +4341,11 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     //  Just image coordinates.
     double ra0 = x0, dec0 = y0, ra1 = x1, dec1 = y1;
     if (   canvasToImageCoords(ra0, dec0, 0) != TCL_OK
-	|| canvasToImageCoords(ra1, dec1, 0) != TCL_OK ) {
+           || canvasToImageCoords(ra1, dec1, 0) != TCL_OK ) {
       return TCL_OK;
     }
     double dist = sqrt(( ra1 - ra0 ) * ( ra1 - ra0 ) +
-		       ( dec1 - dec0 ) * ( dec1 - dec0 ));
+                       ( dec1 - dec0 ) * ( dec1 - dec0 ));
     sprintf( distStr, "%g", dist );
     if (show_angle) {
       double width = fabs( ra1 - ra0 );
@@ -4052,13 +4360,13 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
   //  try to keep the labels out of the way so they don't block anything
   double mx = (x0 + x1)/2;
   double my = (y0 + y1)/2;
-  int offset = 10;		// offset of labels from lines
+  int offset = 10;               // offset of labels from lines
 
-  char* diag_anchor = "c";	// label anchors
+  char* diag_anchor = "c";       // label anchors
   char* width_anchor = "c";
   char* height_anchor = "c";
 
-  int diag_xoffset = 0,	// x,y offsets for labels
+  int diag_xoffset = 0,          // x,y offsets for labels
     diag_yoffset = 0,
     width_yoffset = 0,
     height_xoffset = 0;
@@ -4102,16 +4410,16 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 
   //  Set diagonal line coords
   sprintf(buf, "%s coords mband_line %g %g %g %g\n",
-	  canvas, x0, y0, x1, y1);
+          canvas, x0, y0, x1, y1);
   Tcl_Eval(interp_, buf);
 
   //  Adjust labels
   sprintf(buf, "%s coords mband_diag_text %g %g\n",
-	  canvas, mx+diag_xoffset, my+diag_yoffset);
+          canvas, mx+diag_xoffset, my+diag_yoffset);
   Tcl_Eval(interp_, buf);
 
   sprintf(buf, "%s itemconfig mband_diag_text -text %s -anchor %s\n",
-	  canvas, distStr, diag_anchor);
+          canvas, distStr, diag_anchor);
   Tcl_Eval(interp_, buf);
 
   sprintf(buf, "%s bbox mband_diag_text\n", canvas);
@@ -4122,21 +4430,21 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     return TCL_OK;
 
   sprintf(buf, "%s coords mband_diag_rect %g %g %g %g\n",
-	  canvas,  rx0, ry0, rx1, ry1);
+          canvas,  rx0, ry0, rx1, ry1);
   Tcl_Eval(interp_, buf);
 
   if (show_angle) {
     //  Set angle line coords
     sprintf(buf, "%s coords mband_angle %g %g %g %g %g %g\n",
-	    canvas, x0, y0, x1, y0, x1, y1);
+            canvas, x0, y0, x1, y0, x1, y1);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s coords mband_width_text %g %g\n",
-	    canvas, mx, y0+width_yoffset);
+            canvas, mx, y0+width_yoffset);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s itemconfig mband_width_text -text %s -anchor %s\n",
-	    canvas, widthStr, width_anchor);
+            canvas, widthStr, width_anchor);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s bbox mband_width_text\n", canvas);
@@ -4145,15 +4453,15 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
       return TCL_OK;
     sprintf(buf, "%s coords mband_width_rect %g %g %g %g\n",
-	    canvas,  rx0, ry0, rx1, ry1);
+            canvas,  rx0, ry0, rx1, ry1);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s coords mband_height_text %g %g\n",
-	    canvas, x1+height_xoffset, my);
+            canvas, x1+height_xoffset, my);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s itemconfig mband_height_text -text %s -anchor %s\n",
-	    canvas, heightStr, height_anchor);
+            canvas, heightStr, height_anchor);
     Tcl_Eval(interp_, buf);
 
     sprintf(buf, "%s bbox mband_height_text\n", canvas);
@@ -4162,7 +4470,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
     if (sscanf(interp_->result, "%lf %lf %lf %lf", &rx0, &ry0, &rx1, &ry1) != 4)
       return TCL_OK;
     sprintf(buf, "%s coords mband_height_rect %g %g %g %g\n",
-	    canvas,  rx0, ry0, rx1, ry1);
+            canvas,  rx0, ry0, rx1, ry1);
     Tcl_Eval(interp_, buf);
   }
   else {
@@ -4216,98 +4524,98 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
 //
 //-
 int StarRtdImage::parseName( const char *imagename, char **fullname,
-			     char **slice, char **path )
+                             char **slice, char **path )
 {
 
-  //  Create the output strings.
-  int namelen = strlen( imagename ) + 1;
-  *fullname = new char[namelen];
-  *slice = new char[namelen];
-  *path = new char[namelen];
-  strcpy( *fullname, imagename );
+   //  Create the output strings.
+   int namelen = strlen( imagename ) + 1;
+   *fullname = new char[namelen];
+   *slice = new char[namelen];
+   *path = new char[namelen];
+   strcpy( *fullname, imagename );
 
-  //  Look for a slice at the end of the file name. This needs to be
-  //  removed while we do other tests.
-  char *left = strrchr( *fullname, '(');
-  char *right = strrchr( *fullname, ')');
-  if ( left && right ) {
-    strcpy( *slice, left );
-    *left = '\0';
-  } else {
-    delete *slice;
-    *slice = NULL;
-  }
+   //  Look for a slice at the end of the file name. This needs to be
+   //  removed while we do other tests.
+   char *left = strrchr( *fullname, '(');
+   char *right = strrchr( *fullname, ')');
+   if ( left && right ) {
+      strcpy( *slice, left );
+      *left = '\0';
+   } else {
+      delete *slice;
+      *slice = NULL;
+   }
 
-  //  See if fullname is now just an existing file known to NDF.
-  const char* type = fileSuffix( *fullname );
-  if ( isNDFtype( type ) ) {
+   //  See if fullname is now just an existing file known to NDF.
+   const char* type = fileSuffix( *fullname );
+   if ( isNDFtype( type ) ) {
 
-    //  Check that name is a file, if so nothing to do except to check
-    //  that it is a regular file.
-    if ( ! fileExists( *fullname ) ) {
+      //  Check that name is a file, if so nothing to do except to check
+      //  that it is a regular file.
+      if ( ! fileExists( *fullname ) ) {
+         delete *fullname;
+         *fullname = NULL;
+         if ( slice ) {
+            delete *slice;
+            *slice = NULL;
+         }
+         delete *path;
+         *path = NULL;
+         return error( imagename, " cannot be accessed" );
+      } else {
+         delete *path;
+         *path = (char *) NULL;
+         return TCL_OK;
+      }
+   } else {
+
+      //  Could be FITS file. No funny possibilities for these names.
+      char* p = strchr( *fullname, '.' );
+      if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
+
+         //  Is a FITS name, does file exist? If not assume might be NDF
+         //  component and pass on.
+         if ( fileExists( *fullname ) ) {
+            if ( slice ) {
+               delete *slice;
+               *slice = NULL;
+            }
+            delete *path;
+            *path = NULL;
+            return TCL_OK;
+         }
+      }
+   }
+
+   //  OK. File as given doesn't correspond to a disk file. Either the
+   //  name is wrong, or we may have a path to a HDS component. Look
+   //  for a component name which should be after the ".sdf" string,
+   //  but before the slice.
+   int found = 0;
+   char *sdf = strstr( *fullname, ".sdf" );
+   if ( sdf ) {
+      sdf += 4;
+      if ( *sdf == '.' ) {
+         strcpy( *path, sdf );
+         *sdf = '\0';
+
+         //  OK fullname should be a filename.
+         found = fileExists( *fullname );
+      }
+   }
+   if ( found ) {
+      return TCL_OK;
+   } else {
       delete *fullname;
       *fullname = NULL;
-      if ( slice ) {
-	delete *slice;
-	*slice = NULL;
+      if ( *slice ) {
+         delete *slice;
+         *slice = NULL;
       }
       delete *path;
       *path = NULL;
       return error( imagename, " cannot be accessed" );
-    } else {
-      delete *path;
-      *path = (char *) NULL;
-      return TCL_OK;
-    }
-  } else {
-
-    //  Could be FITS file. No funny possibilities for these names.
-    char* p = strchr( *fullname, '.' );
-    if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
-
-      //  Is a FITS name, does file exist? If not assume might be NDF
-      //  component and pass on.
-      if ( fileExists( *fullname ) ) {
-	if ( slice ) {
-	  delete *slice;
-	  *slice = NULL;
-	}
-	delete *path;
-	*path = NULL;
-	return TCL_OK;
-      }
-    }
-  }
-
-  //  OK. File as given doesn't correspond to a disk file. Either the
-  //  name is wrong, or we may have a path to a HDS component, or the . Look
-  //  for a component name which should be after the ".sdf" string,
-  //  but before the slice.
-  int found = 0;
-  char *sdf = strstr( *fullname, ".sdf" );
-  if ( sdf ) {
-    sdf += 4;
-    if ( *sdf == '.' ) {
-      strcpy( *path, sdf );
-      *sdf = '\0';
-
-      //  OK fullname should be a filename.
-      found = fileExists( *fullname );
-    }
-  }
-  if ( found ) {
-    return TCL_OK;
-  } else {
-    delete *fullname;
-    *fullname = NULL;
-    if ( *slice ) {
-      delete *slice;
-      *slice = NULL;
-    }
-    delete *path;
-    *path = NULL;
-    return error( imagename, " cannot be accessed" );
-  }
+   }
 }
 
 //+
@@ -4323,29 +4631,29 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
 int StarRtdImage::isNDFtype( const char *type )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::isNDFType" << endl;
+   cout << "Called StarRtdImage::isNDFType" << endl;
 #endif
 
-  // If the type is already known do things quickly.
-  if ( strstr( type, "fit" ) ) {  // allan: 27.4.98: check all FITS types
-    return 0;                     // including fits.gz, gzfits, fit, fits, cfits...
-  } else if ( strcmp( type, "sdf" ) == 0 ) {
-    return 1;
-  } else {
+   // If the type is already known do things quickly.
+   if ( strstr( type, "fit" ) ) {  // allan: 27.4.98: check all FITS types
+      return 0;                     // including fits.gz, gzfits, fit, fits, cfits...
+   } else if ( strcmp( type, "sdf" ) == 0 ) {
+      return 1;
+   } else {
 
-    //  Check if the type is present in the NDF_FORMATS_IN environment
-    //  variable.
-    const char *ndf_formats = getenv( "NDF_FORMATS_IN" );
-    if ( ndf_formats ) {
-      if ( strstr( ndf_formats, type ) != 0 ) {
-        return 1;
+      //  Check if the type is present in the NDF_FORMATS_IN environment
+      //  variable.
+      const char *ndf_formats = getenv( "NDF_FORMATS_IN" );
+      if ( ndf_formats ) {
+         if ( strstr( ndf_formats, type ) != 0 ) {
+            return 1;
+         } else {
+            return 0;
+         }
       } else {
-        return 0;
+         return 0;
       }
-    } else {
-      return 0;
-    }
-  }
+   }
 }
 
 //+
@@ -4359,13 +4667,119 @@ int StarRtdImage::isNDFtype( const char *type )
 //-
 int StarRtdImage::fileExists( const char *filename )
 {
-  struct stat buf;
-  if ( stat( filename, &buf ) == 0 ) {
-    if ( S_ISREG( buf.st_mode ) != 0 ) {
-      return 1;
-    }
-  }
-  return 0;
+   struct stat buf;
+   if ( stat( filename, &buf ) == 0 ) {
+      if ( S_ISREG( buf.st_mode ) != 0 ) {
+         return 1;
+      }
+   }
+   return 0;
+}
+
+//+
+//   StarRtdImage::fullNameCmd
+//
+//
+//   Purpose:
+//      Returns the fullname of the currently displayed image.
+//      This is different to the configuration option "-file" in that
+//      the FITS HDU or NDF extension is also folded into the returned
+//      value. This makes the name suitable for passing to external
+//      routines that are required to access the same image (rather
+//      than just the same file).
+//-
+int StarRtdImage::fullNameCmd( int argc, char *argv[] )
+{
+
+   //  See what kind of image type we have.
+   ImageIO imio = image_->image();
+   int isndf = 0;
+   if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
+        strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
+      isndf = 0;
+   } else if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
+      isndf = 1;
+   } else {
+      return error( "Unknown data format (internal error)" );
+   }
+
+   if ( isndf ) {
+      //  Parse the filename into bits
+      char *name;
+      char *slice;
+      char *path;
+      if ( parseName( file(), &name, &slice, &path ) != TCL_OK ) {
+         if ( name ) delete name;
+         if ( slice ) delete slice;
+         if ( path ) delete path;
+         return error( file(), " is not a known NDF (internal error)" );
+      }
+
+      //  Get "HDU" number and construct the fullname.
+      NDFIO *ndf = (NDFIO *) imio.rep();
+      int nndf = ndf->getNDFNum();
+      
+      //  Need NDF path
+      char ndfpath[80], naxis[32], naxis1[32], naxis2[32];
+      char hasvar[32], hasqual[32];
+      ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
+      char buffer[1024];
+
+      if ( strcmp( ndfpath, file() ) == 0 ) {
+         //  Top-level NDF, just return name.
+         set_result( file() );
+      } else {
+         //  Sub-NDF, so need path (which has slice information
+         //  appended already).
+         strcpy( buffer, name );
+         char *start = strstr( buffer, ndfpath );
+         if ( start != NULL ) {
+            *start ='\0';
+         }
+         strcat( buffer, ndfpath );
+         set_result( buffer );
+      }
+      if ( name ) delete name;
+      if ( slice ) delete slice;
+      if ( path ) delete path;
+   } else {
+      
+      //  FITS file, just need the name and the HDU number (if any).
+      FitsIO *fits = (FitsIO *) imio.rep();
+      int hdu = fits->getHDUNum();
+      if ( hdu == 1 ) { 
+         set_result( file() );
+      } else {
+         char buffer[1024];
+         sprintf( buffer, "%s{%d}", file(), hdu );
+         set_result( buffer );
+      }
+   }
+   return TCL_OK;
+}
+
+//+
+//   StarRtdImage::isfitsCmd
+//
+//
+//   Purpose:
+//      Returns whether the displayed image is a FITS file or not.
+//-
+int StarRtdImage::isfitsCmd( int argc, char *argv[] )
+{
+
+   //  See what kind of image type we have.
+   ImageIO imio = image_->image();
+   int isfits = 0;
+   if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
+        strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
+      isfits = 1;
+   } else if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
+      isfits = 0;
+   } else {
+      return error( "Unknown data format" );
+   }
+   return set_result( isfits );
 }
 
 //+

@@ -20,11 +20,11 @@
  *
  *      -file is the name of the file that will contain the slice. If
  *            this isn't an NDF then it should be a supported foreign
- *            data file. 
+ *            data file.
  *
  *      -line end points of the line in pixel indices (integers).
  *
- *      -nelem is the number of pixels the output slice will contain. 
+ *      -nelem is the number of pixels the output slice will contain.
  *
  *      -name is the name of the image from which the slice is being
  *            taken.
@@ -47,6 +47,8 @@
  *  History:
  *     25-NOV-1997 (PWD):
  *        Original version.
+ *     20-JAN-2000 (PWD):
+ *        Added byte swapping changes.
  */
 
 #include <stdio.h>
@@ -63,6 +65,7 @@
 /*  Function prototypes */
 
 extern F77_SUBROUTINE(rtd_slice)( CHARACTER(name), POINTER(image),
+                                  LOGICAL(swap),
                                   CHARACTER(type), INTEGER(nx),
                                   INTEGER(ny), INTEGER(xs1), INTEGER(ys1),
                                   INTEGER(xs2), INTEGER(ys2),
@@ -86,6 +89,7 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
   DECLARE_INTEGER(ys1);                 /* Lower Y value */
   DECLARE_INTEGER(ys2);                 /* Upper Y value */
   DECLARE_POINTER(image);               /* Pointer to image data. */
+  DECLARE_LOGICAL(swap);                /* Data is byte swapped */
 
   /* Local variables: */
   int i, j;
@@ -161,15 +165,21 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
   image = (F77_POINTER_TYPE) info->imageData;
   nx = (F77_INTEGER_TYPE) info->nx;
   ny = (F77_INTEGER_TYPE) info->ny;
+  if ( info->swap ) {
+     swap = F77_TRUE;
+  } else {
+     swap = F77_FALSE;
+  }
 
   /*  Call Fortran routine to do the work. */
   ems_mark_c();
   F77_CALL(rtd_slice)( CHARACTER_ARG(name), POINTER_ARG(&image),
-                       CHARACTER_ARG(type), INTEGER_ARG(&nx),
-                       INTEGER_ARG(&ny), INTEGER_ARG(&xs1),
-                       INTEGER_ARG(&ys1), INTEGER_ARG(&xs2),
-                       INTEGER_ARG(&ys2), INTEGER_ARG(&nelem),
-                       CHARACTER_ARG(file), INTEGER_ARG(&status)
+                       LOGICAL_ARG(&swap), CHARACTER_ARG(type),
+                       INTEGER_ARG(&nx), INTEGER_ARG(&ny),
+                       INTEGER_ARG(&xs1), INTEGER_ARG(&ys1),
+                       INTEGER_ARG(&xs2), INTEGER_ARG(&ys2),
+                       INTEGER_ARG(&nelem), CHARACTER_ARG(file),
+                       INTEGER_ARG(&status)
                        TRAIL_ARG(name) TRAIL_ARG(type) TRAIL_ARG(file));
   if ( status != SAI__OK ) {
 

@@ -1,5 +1,5 @@
-      SUBROUTINE RTD_SLICE( NAME, IPIN, TYPE, NX, NY, XLOW, YLOW, XHIGH, 
-     :                      YHIGH, NELEM, FILE, STATUS )
+      SUBROUTINE RTD_SLICE( NAME, IPIN, SWAP, TYPE, NX, NY, XLOW, YLOW,
+     :                      XHIGH, YHIGH, NELEM, FILE, STATUS )
 
 *+
 *  Name:
@@ -19,14 +19,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL RTD_SLICE( NAME, IPIN, TYPE, NX, NY, XLOW, YLOW, XHIGH, 
-*                      YHIGH, NELEM, FILE, STATUS )
+*      CALL RTD_SLICE( NAME, IPIN, SWAP, TYPE, NX, NY, XLOW, YLOW,
+*                      XHIGH, YHIGH, NELEM, FILE, STATUS )
 
 *  Arguments:
 *     NAME = CHARACTER * ( * ) (Given)
 *        Name of the image being processed (used in history record).
 *     IPIN = INTEGER (Given)
 *        Pointer to the image data.
+*     SWAP = LOGICAL (Given)
+*        Whether data is byte swapped.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The data type of the image. In a form understood by HDS.
 *     NX = INTEGER (Given)
@@ -51,8 +53,8 @@
 *        The global status (not SAI__OK when an error occurs).
 
 *  Notes:
-*     - This routine is designed to be called from RTD, the real-time
-*     display tool and is not intended for use in other ways.
+*     - This routine is designed to be called from GAIA, and is not
+*       intended for use in other ways. 
 *
 *     - Any bad pixels are just ignored.
 
@@ -85,6 +87,7 @@
 *  Arguments Given:
       CHARACTER * ( * ) NAME
       INTEGER IPIN
+      LOGICAL SWAP
       CHARACTER * ( * ) TYPE
       INTEGER NX
       INTEGER NY
@@ -102,10 +105,10 @@
       CHARACTER * ( NDF__SZHIS ) TEXT( 3 ) ! History text
       INTEGER PLACE             ! NDF placeholder
       INTEGER UBND( 1 )         ! Upper bound of NDF
-      REAL DELX                 ! Increment in X
-      REAL DELY                 ! Increment in Y
-      REAL X                    ! Current X position
-      REAL Y                    ! Current Y position
+      DOUBLE PRECISION DELX     ! Increment in X
+      DOUBLE PRECISION DELY     ! Increment in Y
+      DOUBLE PRECISION X        ! Current X position
+      DOUBLE PRECISION Y        ! Current Y position
       INTEGER INDF              ! NDF identifier
       INTEGER I                 ! Loop variable
       INTEGER EL                ! Number of elements in slice
@@ -133,8 +136,8 @@
             CALL RTD1_STINT( 3 )
 
 *  Work through the elements of the spectrum...
-            DELX = ( XHIGH - XLOW ) / REAL( NELEM - 1 )
-            DELY = ( YHIGH - YLOW ) / REAL( NELEM - 1 )
+            DELX = ( XHIGH - XLOW ) / DBLE( NELEM - 1 )
+            DELY = ( YHIGH - YLOW ) / DBLE( NELEM - 1 )
             X = XLOW
             Y = YLOW
 
@@ -142,49 +145,49 @@
             IF ( TYPE .EQ. '_BYTE' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPB( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              %VAL( ISPEC ) )
+     :                              SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPUB( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                               %VAL( ISPEC ) )
+     :                               SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPW( X, Y, NX, NY, %VAL( IPIN ), I,
-     ;                              %VAL( ISPEC ) )
+     ;                              SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPUW( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                               %VAL( ISPEC ) )
+     :                               SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPI( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                        %VAL( ISPEC ) )
+     :                              SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPR( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              %VAL( ISPEC ) )
+     :                              SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                DO I = 1, NELEM
                   CALL RTD1_ETERPD( X, Y, NX, NY, %VAL( IPIN ), I,
-     :                              %VAL( ISPEC ) )
+     :                              SWAP, %VAL( ISPEC ) )
                   X = X + DELX
                   Y = Y + DELY
                END DO
@@ -196,7 +199,7 @@
      :                     'possible programming error', STATUS )
             END IF
 
-*     Add some history to the NDF about how it was created. 
+*     Add some history to the NDF about how it was created.
             CALL NDF_HCRE( INDF, STATUS )
             CALL MSG_SETI( 'NX', NX )
             CALL MSG_SETI( 'NY', NY )
@@ -207,7 +210,7 @@
             CALL MSG_SETC( 'NAME' , NAME )
             TEXT( 1 ) = 'Slice written by GAIA'
             TEXT( 2 ) = 'Original file: ^NAME'
-            TEXT( 3 ) = 
+            TEXT( 3 ) =
      :      'Pixel end points of slice: ^XLOW,^YLOW ^XHIGH,^YHIGH'
             CALL NDF_HPUT( ' ', 'GAIA', .TRUE., 3, TEXT, .TRUE.,
      :                     .FALSE., .FALSE., INDF, STATUS )

@@ -295,7 +295,7 @@ f.o:
 	$(FC) -c $(FFLAGS) $<
 
 # Starlink include file dependencies
-FINCLUDES = GRP_PAR NDF_PAR SAE_PAR CAT_PAR CAT_ERR
+FINCLUDES = GRP_PAR NDF_PAR SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 ardstat.o: GRP_PAR NDF_PAR SAE_PAR
 autocrop.o: NDF_PAR SAE_PAR
 cat2tab.o: SAE_PAR CAT_PAR PAR_ERR

@@ -1,6 +1,6 @@
-      SUBROUTINE RTD1_CEN<T>( XINIT, YINIT, IMAGE, NCOL, NLINE, ISIZE,
-     :                        SIGN, MAXSHF, MAXIT, TOLER, XACC, YACC,
-     :                        STATUS )
+      SUBROUTINE RTD1_CEN<T>( XINIT, YINIT, IMAGE, SWAP, NCOL, NLINE, 
+     :                        ISIZE, SIGN, MAXSHF, MAXIT, TOLER, XACC, 
+     :                        YACC, STATUS )
 *+
 *  Name:
 *     RTD1_CEN
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL RTD1_CEN<T>( XINIT, YINIT, IMAGE, NCOL, NLINE, ISIZE, SIGN,
-*                      MAXSHF, MAXIT, TOLER, XACC, YACC, STATUS )
+*     CALL RTD1_CEN<T>( XINIT, YINIT, IMAGE, SWAP, NCOL, NLINE, ISIZE, SIGN,
+*                       MAXSHF, MAXIT, TOLER, XACC, YACC, STATUS )
 
 *  Description:
 *     The routine locates the centroid of image features by forming
@@ -30,6 +30,8 @@
 *        Initial guess at y position of object feature.
 *     IMAGE( NCOL, NLINE ) = <COMM> (Given)
 *        The data.
+*     SWAP = LOGICAL (Given)
+*        Data is byte swapped.
 *     NCOL = INTEGER (Given)
 *        First dimension of IMAGE.
 *     NLINE = INTEGER (Given)
@@ -63,16 +65,18 @@
 
 *  Authors:
 *     RFWS: Rodney Warren-Smith (Durham Polarimetry Group)
-*     PDRAPER: Peter Draper (STARLINK)
+*     PWD: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     - (RFWS):
 *        Original version - Durham local version of EDRS.
-*     9-JUL-1992 (PDRAPER):
+*     9-JUL-1992 (PWD):
 *        Changed prologue, converted to ADAM and made generic.
-*     12-DEC-1997 (PDRAPER):
+*     12-DEC-1997 (PWD):
 *        Renamed RTD1_CENX (was CCG1_CEN) now part of GAIA.
+*     20-JAN-2000 (PWD):
+*        Added byte swap changes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -91,6 +95,7 @@
       INTEGER NCOL
       INTEGER NLINE
       <TYPE> IMAGE( NCOL, NLINE )
+      LOGICAL SWAP
       INTEGER ISIZE
       LOGICAL SIGN
       DOUBLE PRECISION MAXSHF
@@ -110,7 +115,12 @@
       INTEGER MAXSID             ! Maximum size of search square side.
       PARAMETER ( MAXSID = 51 )
 
+*  External References:
+      EXTERNAL GAI1_BSWAP<T>     ! Byte swapping function.
+      <TYPE> GAI1_BSWAP<T>
+
 *  Local Variables:
+      <TYPE> DVAL                ! Image data value
       DOUBLE PRECISION PSNCNG    ! Position change from initial
       DOUBLE PRECISION SHIFT     ! Shift from last position
       DOUBLE PRECISION VAL       ! Dummy value
@@ -195,23 +205,47 @@
 
 *  Scan search the whole of the search area, forming x and y profiles
 *  from all valid pixels.
-         DO 30 J = 1, NSAMP
-            JPOSN = JSTART + J
-            IF ( ( JPOSN .GE. 1 ) .AND. ( JPOSN .LE. NLINE ) ) THEN
-               DO 20 I = 1, NSAMP
-                  IPOSN = ISTART + I
-                  IF ( ( IPOSN .GE. 1 ) .AND. ( IPOSN .LE. NCOL ) ) THEN
-                     IF ( IMAGE( IPOSN, JPOSN ) .NE.VAL__BAD<T> ) THEN
-                        VAL = NUM_<T>TOD( IMAGE( IPOSN, JPOSN ) )
-                        XAV( I ) = XAV( I ) + VAL
-                        YAV( J ) = YAV( J ) + VAL
-                        NXAV( I ) = NXAV( I ) + 1
-                        NYAV( J ) = NYAV( J ) + 1
+         IF ( SWAP ) THEN 
+            DO 30 J = 1, NSAMP
+               JPOSN = JSTART + J
+               IF ( ( JPOSN .GE. 1 ) .AND. ( JPOSN .LE. NLINE ) ) THEN
+                  DO 20 I = 1, NSAMP
+                     IPOSN = ISTART + I
+                     IF ( ( IPOSN .GE. 1 ) .AND. ( IPOSN .LE. NCOL ) )
+     :               THEN
+                        DVAL = GAI1_BSWAP<T>( IMAGE( IPOSN, JPOSN ) )
+                        IF ( DVAL .NE.VAL__BAD<T> ) THEN
+                           VAL = NUM_<T>TOD( DVAL )
+                           XAV( I ) = XAV( I ) + VAL
+                           YAV( J ) = YAV( J ) + VAL
+                           NXAV( I ) = NXAV( I ) + 1
+                           NYAV( J ) = NYAV( J ) + 1
+                        ENDIF
                      ENDIF
-                  ENDIF
-   20          CONTINUE
-            ENDIF
-   30    CONTINUE
+ 20               CONTINUE
+               ENDIF
+ 30         CONTINUE
+         ELSE 
+            DO 31 J = 1, NSAMP
+               JPOSN = JSTART + J
+               IF ( ( JPOSN .GE. 1 ) .AND. ( JPOSN .LE. NLINE ) ) THEN
+                  DO 21 I = 1, NSAMP
+                     IPOSN = ISTART + I
+                     IF ( ( IPOSN .GE. 1 ) .AND. ( IPOSN .LE. NCOL ) ) 
+     :               THEN
+                        DVAL = IMAGE( IPOSN, JPOSN )
+                        IF ( DVAL .NE.VAL__BAD<T> ) THEN
+                           VAL = NUM_<T>TOD( DVAL )
+                           XAV( I ) = XAV( I ) + VAL
+                           YAV( J ) = YAV( J ) + VAL
+                           NXAV( I ) = NXAV( I ) + 1
+                           NYAV( J ) = NYAV( J ) + 1
+                        ENDIF
+                     ENDIF
+ 21                  CONTINUE
+               ENDIF
+ 31         CONTINUE
+         END IF
 
 *  Evaluate those x profile bins which contain at least 1 valid pixel,
 *  invert the results if sign is set false. Also determine the position

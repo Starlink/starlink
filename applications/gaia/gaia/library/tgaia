@@ -71,6 +71,7 @@ if test -r $GAIA_DIR/gaiaMain.tcl ; then
     fi
 
 #  And run up the interface.
+    #MALLOC_CHECK_=1;export MALLOC_CHECK_
     time $GAIA_DIR/gaia_wish $GAIA_DIR/gaiaMain.tcl ${1+"$@"}
 
   else

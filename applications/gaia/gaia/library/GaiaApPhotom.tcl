@@ -576,7 +576,8 @@ itcl::class gaia::GaiaApPhotom {
          } else {
             set skymag_ 0
          }
-         set image [$itk_option(-rtdimage) cget -file]
+         #set image [$itk_option(-rtdimage) cget -file]
+         set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
@@ -603,6 +604,7 @@ itcl::class gaia::GaiaApPhotom {
             blt::busy hold $w_
             update idletasks
             catch {file delete GaiaPhotomOut.Dat}
+            puts "PHOTOM: processing image: $image"
             eval $autophotom_ runwith \
                in=$image \
                infile=GaiaPhotomIn.Dat \
@@ -648,7 +650,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Append the measurements to a file. Adds a comment containing the
    #  image name.
    method append_objects {{filename ""}} {
-     set comment "[$itk_option(-rtdimage) cget -file ]"
+     set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
 	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {

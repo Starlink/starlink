@@ -266,7 +266,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  And add to the menu.
       foreach w $images {
-         set name [$w cget -file]
+         set name [[$w get_image] fullname]
          set clone [[winfo toplevel $w] cget -number]
          $itk_component(targets) add \
             -label "$name ($clone)" \

@@ -21,6 +21,7 @@
 
 //  Include files:
 #include <sys/types.h>
+#include <netinet/in.h>
 extern "C" {
 #include "ast.h"
 #include "img.h"
@@ -82,6 +83,9 @@ public:
   //  Get the careful contouring plotting flag.
   int getCareful() { return careful_;}
 
+  //  Set whether image data is byte swapped
+  int setSwap( const int swap ) { swap_ = swap; }
+
  protected:
   //  Pointer to imageIO object. This has the image data and its type.
   ImageIO imageio_;
@@ -112,6 +116,10 @@ public:
   //  Whether the coordinates are to be drawn quickly, or carefully.
   int careful_;
 
+  //  Whether the image data is byte swapped (from the machine native
+  //  form).
+  int swap_;
+
   //  Release existing contours.
   void freeLevels();
 
@@ -134,6 +142,52 @@ public:
   GENERATE_ARRAYVAL(unsigned short);
   GENERATE_ARRAYVAL(FITS_LONG);
   GENERATE_ARRAYVAL(float);
+
+  //  Get byte swapped pixel value from 2D array, "span" is second
+  //  dimension. Cannot use a macro as need to be aware of the data
+  //  size in bytes.
+  inline char swapArrayVal( const char *arrayPtr, const int& span,
+                            const int &ix, const int& iy )
+     {
+        return arrayPtr[iy*span + ix]; 
+     }
+
+  inline unsigned char swapArrayVal( const unsigned char *arrayPtr,
+                                     const int& span, const int &ix, 
+                                     const int& iy )
+     {
+        return arrayPtr[iy*span + ix]; 
+     }
+
+  inline short swapArrayVal( const short *arrayPtr, const int& span,
+                             const int &ix, const int& iy )
+     {
+        return (short)ntohs((unsigned short)arrayPtr[iy*span + ix]); 
+     }
+
+  inline unsigned short swapArrayVal( const unsigned short *arrayPtr, 
+                                      const int& span, const int &ix, 
+                                      const int& iy )
+     {
+        return ntohs(arrayPtr[iy*span + ix]); 
+     }
+
+  inline FITS_LONG swapArrayVal( const FITS_LONG *arrayPtr, 
+                                 const int& span,
+                                 const int &ix,
+                                 const int& iy )
+     {
+        return ntohl(arrayPtr[iy*span + ix]); 
+     }
+
+  inline float swapArrayVal( const float *arrayPtr, const int& span,
+                             const int &ix, const int& iy )
+     {
+        union { unsigned FITS_LONG raw; float typed; } ret;
+        ret.typed = arrayPtr[iy*span + ix];
+        ret.raw = ntohl(ret.raw);
+        return ret.typed;
+     }
 
   //  Set an element of an array.
 #define GENERATE_SETARRAYVAL( T ) \
@@ -185,6 +239,21 @@ public:
   GENERATE_BADPIX(unsigned short, VAL__BADUS);
   GENERATE_BADPIX(FITS_LONG, VAL__BADI);
   GENERATE_BADPIX(float, VAL__BADF);
+
+  //  Test for a BAD pixel within the current cell, swapped version.
+#define GENERATE_SWAPBADPIX( T, BADVAL ) \
+   inline int swapBadpix( const T *image, const int& span, \
+                      const int& i, const int& j ) \
+      { return ( swapArrayVal( image, span, i    , j     ) == BADVAL ) || \
+               ( swapArrayVal( image, span, i + 1, j     ) == BADVAL ) || \
+               ( swapArrayVal( image, span, i + 1, j + 1 ) == BADVAL ) || \
+               ( swapArrayVal( image, span, i    , j + 1 ) == BADVAL ); }
+  GENERATE_SWAPBADPIX(char, VAL__BADB);
+  GENERATE_SWAPBADPIX(unsigned char, VAL__BADUB);
+  GENERATE_SWAPBADPIX(short, VAL__BADS);
+  GENERATE_SWAPBADPIX(unsigned short, VAL__BADUS);
+  GENERATE_SWAPBADPIX(FITS_LONG, VAL__BADI);
+  GENERATE_SWAPBADPIX(float, VAL__BADF);
 
   //  Distance between two points, double and int versions.
   inline double rdist( const double x[], const double y[], 

@@ -610,7 +610,7 @@ itcl::class gaia::GaiaContour {
 
       #  Add the local rtdimage, this needs to be selected
       #  first.
-      set name [$itk_option(-image) cget -file]
+      set name [$itk_option(-rtdimage) fullname]
       $itk_component(targets) add \
          -label "$name ($itk_option(-number))" \
          -value "$itk_option(-image)" \
@@ -619,12 +619,14 @@ itcl::class gaia::GaiaContour {
       #  And add to the menu.
       foreach w $images {
          if { $w != $itk_option(-image) } {
-            set name [$w cget -file]
-            set clone [[winfo toplevel $w] cget -number]
-            $itk_component(targets) add \
-               -label "$name ($clone)" \
-               -value "$w" \
-               -command [code $this set_target_ "$w"]
+            if { [winfo exists $w] } { 
+               set name [[$w get_image] fullname]
+               set clone [[winfo toplevel $w] cget -number]
+               $itk_component(targets) add \
+                  -label "$name ($clone)" \
+                  -value "$w" \
+                  -command [code $this set_target_ "$w"]
+            }
          }
       }
 

@@ -288,7 +288,8 @@ itcl::class gaia::GaiaEsp {
 	# delete the results of any previous run from _this_ toolbox
 	delete_canvas_graphics_ esp_out$w_
 
-	set image [$itk_option(-rtdimage) cget -file]
+	#set image [$itk_option(-rtdimage) cget -file]
+	set image [$itk_option(-rtdimage) fullname]
 	if {$image != {}} {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
@@ -1209,7 +1210,8 @@ itcl::class gaia::GaiaEsp {
 	    exec rm $hsub_wfile_
 	}
 
-	set image [$itk_option(-rtdimage) cget -file]
+	#set image [$itk_option(-rtdimage) cget -file]
+	set image [$itk_option(-rtdimage) fullname]
 	if {$image != {}} {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]

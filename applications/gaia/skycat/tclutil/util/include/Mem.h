@@ -14,7 +14,10 @@
  * Allan Brighton  07 Mar 96  Created
  *                 03 Dec 96  added filename() method to return mmap filename 
  *                            or NULL if mmap is not being used. 
- * D.Hopkinson      21/01/97  Added constructor to use when multi-buffering shared memory.
+ * D.Hopkinson      21/01/97  Added constructor to use when
+ *                            multi-buffering  shared memory.
+ * Peter W. Draper  23/01/00  Added constructor and methods for
+ *                            accepting a piece of malloc'd memory.
  */
 
 #include <stdio.h>
@@ -26,6 +29,7 @@ struct MemRep {
     int owner;			// true if we should delete the shm when no longer needed
     int refcnt;			// count of the number of reference to this memory area
     void* ptr;			// pointer to memory area
+    int newmem;               // memory allocated using "new"
     int shmId;			// shared memory id, or -1 if not shared
     int shmNum;                 // shm buffer number, if multi-buffering
     int semId;                  // Semaphore ID for locking shm
@@ -47,7 +51,11 @@ struct MemRep {
     MemRep(int size, int useShm, int verbose);
     
     // mmap the given file, create/extend if nbytes > 0
-    MemRep(const char *filename, int flags, int prot, int share, int nbytes, int owner, int verbose);
+    MemRep(const char *filename, int flags, int prot, int share, 
+           int nbytes, int owner, int verbose);
+
+    // accept pointer to malloc'd memory.
+    MemRep(void *inptr, int size, int owner);  
 
     // destructor
     ~MemRep();
@@ -112,6 +120,9 @@ public:
 
     // Constructor to use when multi-buffering shared memory.
     Mem(int size, int shmId, int owner, int verbose, int shmNum, int semId);
+
+    // Accept pointer to malloc'd memory
+    Mem(void *ptr, int size, int owner);
 
     // copy constructor, just copy ptr and increment ref count
     Mem(const Mem& m) 

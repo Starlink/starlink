@@ -15,6 +15,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 10/01/00  Changed so that uses FITS byte ordering
+ *                           (needed to allow HDU access).
  */
 
 #include "FitsIO.h"
@@ -26,30 +28,38 @@
  * for the sake of reference counting.
  */
 class StarFitsIO : public FitsIO {
-public:   
-    // constructor 
-    StarFitsIO(int width, int height, int bitpix, double bzero, 
-	   double bscale, const Mem& header, const Mem& data);
+   public:   
 
-    // destructor
-    ~StarFitsIO() {}
+      // Constructor 
+      StarFitsIO(int width, int height, int bitpix, double bzero, 
+                 double bscale, const Mem& header, const Mem& data,
+                 fitsfile *fitsio);
+      
+      // Destructor
+      ~StarFitsIO() {};
+      
+      // Return the class name as a string
+      const char* classname() const {return "StarFitsIO";}
+      
+      // Read a FITS file and return a pointer to an allocated StarFitsIO object
+      // NULL if an error occurred
+      static StarFitsIO* read(const char* filename, int memOptions = 0);
 
-    // return true if this class uses native byte ordering
-    // (FITS uses network byte order, but we swap the bytes in this class first).
-    int nativeByteOrder() const {return 1;}
+      // Initialize world coordinates (based on the image header)
+      int wcsinit();
 
-    // return the class name as a string
-    const char* classname() const {return "StarFitsIO";}
+      // Return an allocated FitsIO object, given the Mem objects for the
+      // header and data and the cfitsio handle to use to access the file.
+      static StarFitsIO* initialize(Mem& header, Mem& data, fitsfile* fitsio);
 
-    // read a FITS file and return a pointer to an allocated StarFitsIO object
-    // NULL if an error occurred
-    static StarFitsIO* read(const char* filename, int memOptions = 0);
+      // Return an allocated FitsIO object, given the Mem object for the
+      // file header (header.ptr() should point to the entire FITS file
+      // contents.) 
+      static StarFitsIO* initialize(Mem& header);
 
-    // write the data to a FITS file 
-    int write(const char *filename) const;
-
-    // initialize world coordinates (based on the image header)
-    int wcsinit();
+      // Return an allocated FitsIO object, given the Mem objects for the
+      // header and data.
+      static StarFitsIO* initialize(Mem& header, Mem& data);
 };
 
 #endif _StarFitsIO_h_

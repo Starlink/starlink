@@ -125,7 +125,7 @@ itcl::class gaia::GaiaImagePick {
       puts $fd "# $time"
 
       #  Get the image name.
-      set name [$target_image_ cget -file]
+      set name [$target_image_ fullname]
 
       #  Get all the values.
       set x [$itk_component(x) cget -value]

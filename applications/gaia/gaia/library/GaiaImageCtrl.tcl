@@ -378,10 +378,11 @@ itcl::class gaia::GaiaImageCtrl {
    #  Update the toplevel window header and icon name to include the name
    #  of the file being displayed.
    public method update_title {} {
-      set file "[file tail $itk_option(-file)]"
+      set file "[file tail [$image_ fullname]]"
       set w [winfo toplevel $w_]
       wm title $w "GAIA::Skycat: $file ([$w cget -number])"
       wm iconname $w $file
+      puts "Component = [$image_ cget -component]"
    }
 
    #  Add a generated image to display the colors in the colormap
@@ -432,9 +433,9 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
-   #  Reload the image file, if there is one
-   #  (redefined from parent class, since we use different mmap flags here
-   #  that cause the inherited version to not work).
+   #  Reload the image file, if there is one (redefined from parent
+   #  class, since we use different mmap flags here that cause the
+   #  inherited version to not work).
    public method reopen {} {
        set file [$image_ cget -file]
        if {"$file" != ""} {
@@ -455,9 +456,7 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Special case: if input file is a FITS file then we can only
       #  save it as a fits file. NDFs may be saved as other formats.
-      $namer_ configure -imagename $itk_option(-file)
-      set exten [$namer_ type]
-      if {  $exten == ".fit" || $exten == ".fits" } {
+      if { [$image_ isfits] } {
          set file [get_file_ $dir $pattern {{any * } {FITS *.fits} {FIT *.fit}}]
       } else {
          set file [get_file_ $dir $pattern $itk_option(-file_types)]
@@ -726,6 +725,61 @@ itcl::class gaia::GaiaImageCtrl {
       lassign [$canvas_ xview] lastzoom_($nlastzoom_,XS) dummy
       lassign [$canvas_ yview] lastzoom_($nlastzoom_,YS) dummy
       incr nlastzoom_
+   }
+
+   #  Display a popup window listing the HDUs in the current image.
+   public method display_fits_hdus {} {
+      if { [$image_ isfits] } {
+         utilReUseWidget gaia::GaiaHduChooser $w_.hdu \
+            -image $this \
+            -center 0 \
+            -transient 0
+      } else {
+         utilReUseWidget gaia::GaiaNDFChooser $w_.ndfhdu \
+            -image $this \
+            -center 0 \
+            -transient 0
+      }
+   }
+
+   #  Update the popup window listing the HDUs in the current image
+   #  Override to select between the FITS and NDF versions of this
+   #  window.
+   public method update_fits_hdus {} {
+      if { [$image_ isfits] } {
+
+         #  Displaying FITS now, if NDF last time remove popup.
+         if { [winfo exists $w_.ndfhdu] } {
+            after idle "destroy $w_.ndfhdu"
+         }
+         SkyCatCtrl::update_fits_hdus
+      } else {
+
+         #  Displaying NDF now, if FITS last time remove popup.
+         if { [winfo exists $w_.hdu] } {
+            after idle "destroy $w_.hdu"
+         }
+
+         #  Get number of HDUs.
+         if { [catch { set n [$image_ hdu count] } ] } {
+            set n 0
+         }
+
+         #  Display and hide window automatically as needed.
+         if { [winfo exists $w_.ndfhdu] } {
+            if { $n > 1 } {
+               after idle [code $w_.ndfhdu show_hdu_list]
+            } else {
+               after idle "destroy $w_.ndfhdu"
+            }
+         } else {
+            #  If there is more than one HDU, display the HDU select
+            #  window.
+            if { $n > 1 } {
+                display_fits_hdus
+            }
+         }
+      }
    }
 
    #  Configuration options.

@@ -18,80 +18,115 @@
 //    Copyright (C) 1998 Central Laboratory of the Research Councils
 
 //  History:
-//     28-JUN-1996 (PDRAPER):
+//     28-JUN-1996 (PWD):
 //        Start again for RTD version 2.3.
 //     16-Mar-1998 (Allan Brighton, ESO)
 //        Updated for Skycat/Gaia plugin (get() methods)
 //        Removed static put_keyword, blankImage methods (not used)
 //        Changed constructor to initialize WCS object.
-
+//     18-JAN-2000 (PWD):
+//        Add changes to support a "hdu" command for NDFs.
 //-
 
 #include <stdio.h>
 #include <iostream.h>
 
-// allan: changed from wcslib.h to avoid name conflicts after upgrade to wcssubs-2.3
-#include "fitshead.h"   
+// ALLAN: changed from wcslib.h to avoid name conflicts after upgrade
+// to wcssubs-2.3.
+#include "fitshead.h"
 
 #include "ImageIO.h"
 #include "rtdNDF.h"
 
 class NDFIO : public ImageIORep {
+
 private:
-    // set wcslib header length for searching
-    static void set_header_length(const Mem& header);
-    void set_header_length() const;
 
-protected:   
+   //  Set wcslib header length for searching.
+   static void set_header_length(const Mem& header);
+   void set_header_length() const;
 
-  //  Type of data component we have mapped.
-  char component_[20];
-  
+protected:
+   
+   //  Current NDF identifier.
+   int ndfid_;
+   
+   //  Current NDF data component.
+   char component_[20];
+   
+   //  Current NDF index.
+   int curd_;
+   
+   //  Information structure for NDF displayables.
+   void *NDFinfo_;
+   
 public:
-
-  //  Constructor.
-  NDFIO( int width, int height, int bitpix, double bzero, 
-         double bscale, const Mem &header, const Mem &data, 
-         const char *component );
-
-  //  Destructor (frees the NDF).
-  ~NDFIO();
-
-  // initialize world coordinates (based on the image header)
-  int wcsinit();
-
-  //  Read an NDF and return a pointer to an allocated NDFIO object
-  //  NULL if an error occurred.
-  static NDFIO *read( const char *filename, const char *component, int memOptions = 0 );
-
-  // return true if this class uses native byte ordering
-  // (The ndf library does the swapping already, so return 1 here).
-  int nativeByteOrder() const {return 1;}
-
-  // return the class name as a string
-  const char* classname() const {return "NDFIO";}
-
-  //  Write the data to a new NDF.
-  int write( const char *filename ) const;
-
-  // find and set value for the given FITS keyword and return 0 if OK (found)
-  int get(const char* keyword, double& val) const;
-  int get(const char* keyword, float& val) const;
-  int get(const char* keyword, int& val) const;
-  int get(const char* keyword, long& val) const;
-  int get(const char* keyword, unsigned char& val) const;
-  int get(const char* keyword, unsigned short& val) const;
-  int get(const char* keyword, short& val) const;
-
-  // find and return the value for the given FITS keyword, or NULL if not found
-  char* get(const char* keyword) const;
-
-  //  Write a (ASCII formatted) copy of the FITS header to the given stream.
-  int getFitsHeader(ostream& os) const;
-
-  // Return the NDF component that is mapped.
-  char *component() const { return (char *) component_; }
-
+   
+   //  Constructor.
+   NDFIO( void *NDFinfo, int curd, const char *component,
+          int ndfid, int width, int height, int bitpix, double bzero,
+          double bscale, const Mem& header, const Mem& data );
+   
+   //  Destructor (frees the NDF).
+   ~NDFIO();
+   
+   //  Initialize world coordinates (based on the image header).
+   int wcsinit();
+   
+   //  Read an NDF and return a pointer to an allocated NDFIO object
+   //  NULL if an error occurred.
+   static NDFIO *read( const char *filename, const char *component,
+                       int useShr = 0 );
+   
+   //  Return true if this class uses native byte ordering (The ndf
+   //  library does the swapping already, so return 1 here).
+   int nativeByteOrder() const { return 1; }
+   
+   //  Return the class name as a string.
+   const char* classname() const { return "NDFIO"; }
+   
+   //  Write the data to a new NDF.
+   int write( const char *filename ) const;
+   
+   //  Find and set value for the given FITS keyword and return 0 if
+   //  OK (found).
+   int get( const char* keyword, double& val ) const;
+   int get( const char* keyword, float& val ) const;
+   int get( const char* keyword, int& val ) const;
+   int get( const char* keyword, long& val ) const;
+   int get( const char* keyword, unsigned char& val ) const;
+   int get( const char* keyword, unsigned short& val ) const;
+   int get( const char* keyword, short& val ) const;
+   
+   //  Find and return the value for the given FITS keyword, or NULL
+   //  if not found.
+   char* get( const char* keyword ) const;
+   
+   //  Write a (ASCII formatted) copy of the FITS header to the given
+   //  stream.
+   int getFitsHeader( ostream& os ) const;
+   
+   //  Return the NDF component that is mapped.
+   char *component() const { return (char *) component_; }
+   
+   //  Return the NDF identifier.
+   int getNDFID() { return ndfid_; }
+   
+   //  Return number of NDFs that can current be displayed.
+   int getNumNDFs();
+   
+   //  Index of NDF current available for display.
+   int getNDFNum() { return curd_; }
+   
+   //  Check in NDF has the specified component.
+   int checkComponent( int index, const char *component );
+   
+   //  Set the current NDF and component.
+   int setDisplayable( int index, const char *component );
+   
+   //  Get printable NDF information.
+   void getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
+                    char *hasvar, char *hasqual );
 };
 
 #endif // _NDFIO_h_

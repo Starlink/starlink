@@ -20,7 +20,7 @@
 //     C++
 
 //  Copyright:
-//     Copyright (C) 1998 Central Laboratory of the Research Councils
+//     Copyright (C) 2000 Central Laboratory of the Research Councils
 
 //  Inherits:
 //     LocalCatalog
@@ -40,12 +40,14 @@
 //     what happens in GAIA).
 
 //  Authors:
-//     Peter W. Draper (PDRAPER):
+//     Peter W. Draper (PWD):
 //     {enter_new_authors_here}
 
 //  History:
-//     28-JUN-1996 (PDRAPER):
+//     28-JUN-1996 (PWD):
 //        Original version, based on LocalCatalog.
+//     28-JAN-2000 (PWD):
+//        Changed to handle FITS extensions.
 //     {enter_changes_here}
 
 //-
@@ -239,12 +241,12 @@ int GaiaLocalCatalog::freeCat() {
 int GaiaLocalCatalog::is_foreign( const char *name )
 {
   const char *type = fileSuffix( name );
-  if ( strcasecmp( type, "fit" )  == 0 ||
-       strcasecmp( type, "fits" ) == 0 ||
-       strcasecmp( type, "gsc" )  == 0 ||
-       strcasecmp( type, "asc" )  == 0 ||
-       strcasecmp( type, "lis" )  == 0 ||
-       strcasecmp( type, "txt" )  == 0 ) {
+  if ( strncasecmp( type, "fit", 3 )  == 0 ||
+       strncasecmp( type, "fits", 4 ) == 0 ||
+       strncasecmp( type, "gsc", 3 )  == 0 ||
+       strncasecmp( type, "asc", 3 )  == 0 ||
+       strncasecmp( type, "lis", 3 )  == 0 ||
+       strncasecmp( type, "txt", 3 )  == 0 ) {
     return 1;
   } else {
     return 0;
@@ -264,7 +266,8 @@ int GaiaLocalCatalog::convertTo( int now )
 
     //  Make sure we're ok to attempt a conversion.
     if ( ! startConvert() ) {
-      return 0;
+       cout << "Failed to start convertTo" << endl;
+       return 0;
     }
 
     //  Convert to a temporary file.
@@ -272,7 +275,9 @@ int GaiaLocalCatalog::convertTo( int now )
     sprintf( buf, "%s to %s %s %d", convertTable_, realname_,
              filename_, now );
     if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
-      return 0;
+       cout << buf << endl;
+       cout << "command failed:" << interp_->result << endl;
+       return 0;
     }
   }
 

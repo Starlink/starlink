@@ -207,7 +207,8 @@ itcl::class gaia::GaiaImageSpectrum {
       $image_ convert coords $x1 $y1 canvas xe ye image
 
       #  Get the name of the current image.
-      set image [$image_ cget -file]
+      #set image [$image_ cget -file]
+      set image [$image_ fullname]
       if { $image != "" } {
 	 $namer_ configure -imagename $image
 	 set image [$namer_ ndfname]

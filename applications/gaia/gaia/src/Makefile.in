@@ -51,7 +51,11 @@ FSRCS           =  rtd_rdndf.f rtd_wrndf.f rtd1_wndfh.f rtd1_crfit.f \
                    rtd1_binom.f rtd_cent.f rtd1_isrt.f rtd1_chead.f \
 		   rtd1_dewcs.f gai_c2tab.f gai1_nxtab.f gai_t2cat.f \
 	           gai1_t2cn.f gai1_t2cg.f gai1_s2ang.f gai_a2tab.f \
-	           gai_t2asc.f
+	           gai_t2asc.f \
+                   gai1_bswapb.f  gai1_bswapi.f  gai1_bswapub.f  \
+                   gai1_bswapw.f gai1_bswapd.f  gai1_bswapr.f  \
+                   gai1_bswapuw.f
+
 
 GSRCS           =  rtd_cpx.gen rtd1_mstx.gen rtd1_sufitx.gen \
                    rtd1_dofilx.gen rtd1_statx.gen rtd1_gbndx.gen \
@@ -219,7 +223,7 @@ rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR PSX_ERR
 slice.o: DAT_PAR NDF_PAR SAE_PAR
 
 LINKS = SAE_PAR PRM_PAR DAT_PAR NDF_PAR GRP_PAR FIO_ERR NUM_DEC_CVT \
-        NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR
+        NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR PSX_ERR
 
 SAE_PAR:	$(STAR_INC)/sae_par
 	  $(LINK) $? $@

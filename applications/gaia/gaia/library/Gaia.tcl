@@ -24,7 +24,7 @@
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
 
 #  Inherits:
 #     Methods and configuration options of SkyCat (and Rtd).
@@ -383,6 +383,13 @@ itcl::class gaia::Gaia {
       bind $w_  <Control-i> [code $image_ pick_dialog]
       bind $w_  <Control-f> [code $image_ view_fits_header]
 
+      #  HDUs are for NDFs too.
+      $m entryconfigure "Select FITS HDU..." \
+         -label "Select FITS HDU/NDF..."
+      add_menu_short_help $m "Select FITS HDU/NDF..." \
+         {Display the available FITS HDUs and NDFs}
+
+      #  Change background and blank pixel colours.
       set index [$m index "Magnification"]
       incr index
       insert_menuitem $m $index cascade "Blank pixel color" \
@@ -530,6 +537,10 @@ itcl::class gaia::Gaia {
 	    {Print a labelled copy of color ramp to postscript} \
 	    -command [code $this print_ramp_]
       }
+   }
+
+   #  Saving graphics with the image doesn't work so disable it.
+   protected method add_graphics_save_menu_item {} {
    }
 
    #  Make or clone a GAIA toolbox.

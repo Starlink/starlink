@@ -377,7 +377,7 @@ itcl::class gaia::GaiaImagePanel {
    method updateValues {} {
       if {$itk_option(-showobject)} {
          set s [$image_ object]
-         set f [file tail [$image_ cget -file]]
+         set f [file tail [$image_ fullname]]
          if { "z$s" == "z" } {
             $itk_component(object) config -value "$f"
          } else {

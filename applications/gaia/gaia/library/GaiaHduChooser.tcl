@@ -110,7 +110,7 @@ itcl::class gaia::GaiaHduChooser {
       if { "[string index $name 0]" != "/"} {
          set fname [pwd]/$name
       } else {
-         set fname $catalogue
+         set fname $name
       }
       return $fname
    }

@@ -1942,7 +1942,8 @@ itcl::class gaia::GaiaSextractor {
          #  Get name of the image we need to use for measuring. We
          #  also need the detection image, which is the displayed
          #  image by default.
-         set image [$itk_option(-rtdimage) cget -file]
+         #set image [$itk_option(-rtdimage) cget -file]
+         set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]

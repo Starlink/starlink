@@ -26,9 +26,9 @@
 //     contours, or a set for each contour
 //
 //     The "careful_" member variable indicates that contours should
-//     be drawn using geodesics, rather than plain
-//     straight-lines. Drawing straight-lines is faster, but could be
-//     confused when using difficult astrometries.
+//     be drawn using geodesics, rather than plain straight-lines.
+//     Drawing straight-lines is faster, but could be confused when
+//     using difficult astrometries.
 //
 //     See the descriptions with the member functions (here and in the
 //     associated class definition file) for how to use this class.
@@ -116,49 +116,50 @@ extern "C" {
 Contour::Contour( const ImageIO imio, const AstPlot *plot,
                   const double levels[], const int nlevels,
                   const char *prefs[], const int nprefs )
-: imageio_(imio),
-  plot_(NULL),
-  nlevels_(0),
-  levels_(NULL),
-  nprefs_(0),
-  prefs_(NULL),
-  xlower_(1),
-  ylower_(1),
-  xsize_(0),
-  ysize_(0),
-  careful_(1),
-  userBuffer_(NULL)
+   : imageio_(imio),
+     plot_(NULL),
+     nlevels_(0),
+     levels_(NULL),
+     nprefs_(0),
+     prefs_(NULL),
+     xlower_(1),
+     ylower_(1),
+     xsize_(0),
+     ysize_(0),
+     careful_(1),
+     swap_(0),
+     userBuffer_(NULL)
 {
 
-  //  Make a clone of the plot and simplify it. This adds a new
-  //  Current Frame into the Plot. This can help to speed up the
-  //  drawing, and also avoids the possibility of the Mapping going
-  //  via a Frame in which the positions are undefined
-  if ( plot != (AstPlot *) NULL ) {
-    plot_ = (AstPlot *) astClone( plot );
-    AstMapping *oldmap = (AstMapping *) astGetMapping( plot_,
-                                                       AST__BASE,
-                                                       AST__CURRENT );
-    AstMapping *newmap = (AstMapping *) astSimplify( oldmap );
-    AstFrame *frame = (AstFrame *) astGetFrame( plot_, AST__CURRENT );
-    astAddFrame( plot_, AST__BASE, newmap, frame );
+   //  Make a clone of the plot and simplify it. This adds a new
+   //  Current Frame into the Plot. This can help to speed up the
+   //  drawing, and also avoids the possibility of the Mapping going
+   //  via a Frame in which the positions are undefined
+   if ( plot != (AstPlot *) NULL ) {
+      plot_ = (AstPlot *) astClone( plot );
+      AstMapping *oldmap = (AstMapping *) astGetMapping( plot_,
+                                                         AST__BASE,
+                                                         AST__CURRENT );
+      AstMapping *newmap = (AstMapping *) astSimplify( oldmap );
+      AstFrame *frame = (AstFrame *) astGetFrame( plot_, AST__CURRENT );
+      astAddFrame( plot_, AST__BASE, newmap, frame );
 
-    //  Release intermediary products.
-    astAnnul( oldmap );
-    astAnnul( newmap );
-    astAnnul( frame );
-  }
+      //  Release intermediary products.
+      astAnnul( oldmap );
+      astAnnul( newmap );
+      astAnnul( frame );
+   }
 
-  //  Copy the contour levels.
-  if ( nlevels > 0 ) {
-    setLevels( levels, nlevels );
-  }
+   //  Copy the contour levels.
+   if ( nlevels > 0 ) {
+      setLevels( levels, nlevels );
+   }
 
-  //  And the preferences, usually one per contour level. This should
-  //  consist of AST attributes (i.e. "width(curve)=1,colour(curve)=2").
-  if ( nprefs > 0 ) {
-    setPrefs( prefs, nprefs );
-  }
+   //  And the preferences, usually one per contour level. This should
+   //  consist of AST attributes (i.e. "width(curve)=1,colour(curve)=2").
+   if ( nprefs > 0 ) {
+      setPrefs( prefs, nprefs );
+   }
 }
 
 //
@@ -166,22 +167,22 @@ Contour::Contour( const ImageIO imio, const AstPlot *plot,
 //
 Contour::~Contour()
 {
-  //  Free all resources:
-  //  Clone of the plot.
-  if ( plot_ != (AstPlot *) NULL ) {
-    plot_ = (AstPlot *) astAnnul( plot_ );
-  }
+   //  Free all resources:
+   //  Clone of the plot.
+   if ( plot_ != (AstPlot *) NULL ) {
+      plot_ = (AstPlot *) astAnnul( plot_ );
+   }
 
-  //  Contour levels.
-  freeLevels();
+   //  Contour levels.
+   freeLevels();
 
-  //  Preferences.
-  freePrefs();
+   //  Preferences.
+   freePrefs();
 
-  //  User preferences buffer.
-  if ( userBuffer_ != (char *) NULL ) {
-    delete userBuffer_;
-  }
+   //  User preferences buffer.
+   if ( userBuffer_ != (char *) NULL ) {
+      delete userBuffer_;
+   }
 }
 
 //
@@ -189,24 +190,24 @@ Contour::~Contour()
 //
 void Contour::setLevels( const double levels[], const int nlevels )
 {
-  freeLevels();
-  if ( nlevels > 0 ) {
-    levels_ = new double[nlevels];
-    for ( int i = 0; i < nlevels; i++ ) {
-      levels_[i] = levels[i];
-    }
-    nlevels_ = nlevels;
-  }
+   freeLevels();
+   if ( nlevels > 0 ) {
+      levels_ = new double[nlevels];
+      for ( int i = 0; i < nlevels; i++ ) {
+         levels_[i] = levels[i];
+      }
+      nlevels_ = nlevels;
+   }
 }
 
 //
 //  Release existing contours.
 //
 void Contour::freeLevels() {
-  if ( nlevels_ > 0 ) {
-    delete [] levels_;
-    nlevels_ = 0;
-  }
+   if ( nlevels_ > 0 ) {
+      delete [] levels_;
+      nlevels_ = 0;
+   }
 }
 
 //
@@ -214,10 +215,10 @@ void Contour::freeLevels() {
 //
 double Contour::getLevel( const int ilevel )
 {
-  if ( ilevel < nlevels_ ) {
-    return levels_[ilevel];
-  }
-  return DBL_MIN;
+   if ( ilevel < nlevels_ ) {
+      return levels_[ilevel];
+   }
+   return DBL_MIN;
 }
 
 //
@@ -225,18 +226,18 @@ double Contour::getLevel( const int ilevel )
 //
 void Contour::setPrefs( const char *prefs[], const int nprefs )
 {
-  //  Release any existing preferences.
-  freePrefs();
+   //  Release any existing preferences.
+   freePrefs();
 
-  //  And set the new ones.
-  if ( nprefs > 0 ) {
-    prefs_ = new char *[nprefs];
-    for ( int i = 0; i < nprefs; i++ ) {
-      prefs_[i] = new char[strlen(prefs[i])];
-      strcpy( prefs_[i], prefs[i] );
-    }
-    nprefs_ = nprefs;
-  }
+   //  And set the new ones.
+   if ( nprefs > 0 ) {
+      prefs_ = new char *[nprefs];
+      for ( int i = 0; i < nprefs; i++ ) {
+         prefs_[i] = new char[strlen(prefs[i])];
+         strcpy( prefs_[i], prefs[i] );
+      }
+      nprefs_ = nprefs;
+   }
 }
 
 //
@@ -244,13 +245,13 @@ void Contour::setPrefs( const char *prefs[], const int nprefs )
 //
 void Contour::freePrefs()
 {
-  if ( nprefs_ > 0 ) {
-    for ( int i = 0; i < nprefs_; i++ ) {
-      delete [] prefs_[i];
-    }
-    delete [] prefs_;
-    nprefs_ = 0;
-  }
+   if ( nprefs_ > 0 ) {
+      for ( int i = 0; i < nprefs_; i++ ) {
+         delete [] prefs_[i];
+      }
+      delete [] prefs_;
+      nprefs_ = 0;
+   }
 }
 
 //
@@ -259,14 +260,14 @@ void Contour::freePrefs()
 //
 char *Contour::getPrefs( const int ipref )
 {
-  if ( ipref < nprefs_ ) {
-    if ( userBuffer_ != (char *) NULL ) {
-      delete userBuffer_;
-    }
-    userBuffer_ = new char[strlen(prefs_[ipref])];
-    return userBuffer_;
-  }
-  return NULL;
+   if ( ipref < nprefs_ ) {
+      if ( userBuffer_ != (char *) NULL ) {
+         delete userBuffer_;
+      }
+      userBuffer_ = new char[strlen(prefs_[ipref])];
+      return userBuffer_;
+   }
+   return NULL;
 }
 
 //
@@ -275,10 +276,10 @@ char *Contour::getPrefs( const int ipref )
 void Contour::setRegion( const int xlower, const int ylower,
                          const int xsize, const int ysize )
 {
-  xlower_ = xlower;
-  ylower_ = ylower;
-  xsize_ = xsize;
-  ysize_ = ysize;
+   xlower_ = xlower;
+   ylower_ = ylower;
+   xsize_ = xsize;
+   ysize_ = ysize;
 }
 
 //
@@ -286,10 +287,10 @@ void Contour::setRegion( const int xlower, const int ylower,
 //
 void Contour::getRegion( int& xlower, int& ylower, int& xsize, int& ysize )
 {
-  xlower = xlower_;
-  ylower = ylower_;
-  xsize = xsize_;
-  ysize = ysize_;
+   xlower = xlower_;
+   ylower = ylower_;
+   xsize = xsize_;
+   ysize = ysize_;
 }
 
 //
@@ -297,130 +298,171 @@ void Contour::getRegion( int& xlower, int& ylower, int& xsize, int& ysize )
 //
 int Contour::drawContours()
 {
-  //  Local variables.
-  double cval;
-  AstPlot *lplot;
-  int ndrawn = 0;
-  int totaldrawn = 0;
+   //  Local variables.
+   double cval;
+   AstPlot *lplot;
+   int ndrawn = 0;
+   int totaldrawn = 0;
 
-  //  Get image data properties.
-  void *image = (void *)imageio_.dataPtr();
-  int nx = imageio_.width();
-  int ny= imageio_.height();
-  int type = imageio_.bitpix();
-  double bscale = imageio_.bscale();
-  double bzero = imageio_.bzero();
+   //  Get image data properties.
+   void *image = (void *) imageio_.dataPtr();
+   int nx = imageio_.width();
+   int ny= imageio_.height();
+   int type = imageio_.bitpix();
+   double bscale = imageio_.bscale();
+   double bzero = imageio_.bzero();
 
-  //  Make sure the part of the image to draw is sane.
-  int xsize = xsize_;
-  int ysize = ysize_;
-  int xlower = xlower_;
-  int ylower = ylower_;
-  if ( xsize <= 0 || xsize > nx ) xsize = nx;
-  if ( ysize <= 0 || ysize > ny ) ysize = ny;
-  if ( xlower <= 0 || xlower > nx ) xlower = 1;
-  if ( ylower <= 0 || ylower > ny ) ylower = 1;
+   //  Make sure the part of the image to draw is sane.
+   int xsize = xsize_;
+   int ysize = ysize_;
+   int xlower = xlower_;
+   int ylower = ylower_;
+   if ( xsize <= 0 || xsize > nx ) xsize = nx;
+   if ( ysize <= 0 || ysize > ny ) ysize = ny;
+   if ( xlower <= 0 || xlower > nx ) xlower = 1;
+   if ( ylower <= 0 || ylower > ny ) ylower = 1;
 
-  //  Get some workspace for locating pixels that have already been
-  //  "done".
-  char *done = new char[xsize * ysize];
+   //  Get some workspace for locating pixels that have already been
+   //  "done".
+   char *done = new char[xsize * ysize];
 
-  //  Scan through each contour level.
-  for ( int icont = 0; icont < nlevels_; icont++ ) {
-    cval = levels_[icont];
+   //  Scan through each contour level.
+   for ( int icont = 0; icont < nlevels_; icont++ ) {
+      cval = levels_[icont];
 
-    //  Correct the contour level for any scale and zero factors (FITS 
-    //  scaled images only).
-    cval = ( cval - bzero ) / bscale;
+      //  Correct the contour level for any scale and zero factors (FITS
+      //  scaled images only).
+      cval = ( cval - bzero ) / bscale;
 
-    // If different properties are being used, produce a modified Plot
-    // which draws curves with the pen style supplied for this
-    // contour.
-    if ( nprefs_ > 1 && icont < nprefs_ ) {
+      // If different properties are being used, produce a modified Plot
+      // which draws curves with the pen style supplied for this
+      // contour.
+      if ( nprefs_ > 1 && icont < nprefs_ ) {
 
-      // Take a deep copy of the supplied Plot. This Plot will be
-      // modified using the supplied attribute settings. A copy is
-      // used so that the original plotting attributes can be
-      // re-instated later.
-      lplot = (AstPlot *) astCopy( plot_ );
+         // Take a deep copy of the supplied Plot. This Plot will be
+         // modified using the supplied attribute settings. A copy is
+         // used so that the original plotting attributes can be
+         // re-instated later.
+         lplot = (AstPlot *) astCopy( plot_ );
 
-      //  Set the AST Attribute settings from properties lists.
-        astSet( lplot, prefs_[icont] );
-    } else {
+         //  Set the AST Attribute settings from properties lists.
+         astSet( lplot, prefs_[icont] );
+      } else {
 
-      //  If the same properties are being used for all contours, just
-      //  clone the supplied Plot pointer.
-      lplot = (AstPlot *) astClone( plot_ );
+         //  If the same properties are being used for all contours, just
+         //  clone the supplied Plot pointer.
+         lplot = (AstPlot *) astClone( plot_ );
 
-      //  And set the values. If any are available.
-      if ( nprefs_ > 0 ) {
-        astSet( lplot, prefs_[0] );
+         //  And set the values. If any are available.
+         if ( nprefs_ > 0 ) {
+            astSet( lplot, prefs_[0] );
+         }
       }
-    }
 
-    //  If not plotting carefully then need to to (re-)establish the
-    //  attributes of the line by hand (not using astPolyCurve). Do
-    //  this now rather than every line segment, but remember do not
-    //  do any AST graphics (else these will be ignored).
-    if ( ! careful_ ) {
-      double colour = astGetD( lplot, "Colour(Curve)" );
-      astGAttr( GRF__COLOUR, colour, (double *)NULL, GRF__LINE );
-      double width = astGetD( lplot, "Width(Curve)" );
-      astGAttr( GRF__WIDTH, width, (double *)NULL, GRF__LINE );
-      double style = astGetI( lplot, "Style(Curve)" );
-      astGAttr( GRF__STYLE, style, (double *)NULL, GRF__LINE );
-    }
+      //  If not plotting carefully then need to to (re-)establish the
+      //  attributes of the line by hand (not using astPolyCurve). Do
+      //  this now rather than every line segment, but remember do not
+      //  do any AST graphics (else these will be ignored).
+      if ( ! careful_ ) {
+         double colour = astGetD( lplot, "Colour(Curve)" );
+         astGAttr( GRF__COLOUR, colour, (double *)NULL, GRF__LINE );
+         double width = astGetD( lplot, "Width(Curve)" );
+         astGAttr( GRF__WIDTH, width, (double *)NULL, GRF__LINE );
+         double style = astGetI( lplot, "Style(Curve)" );
+         astGAttr( GRF__STYLE, style, (double *)NULL, GRF__LINE );
+      }
 
-    //  Initialise the store of cells done.
-    memset( done, '\0', xsize * ysize * sizeof( char ) );
+      //  Initialise the store of cells done.
+      memset( done, '\0', xsize * ysize * sizeof( char ) );
 
-    //  Scan for this contour and plot it. Call appropriate member for
-    //  data format.
-    switch ( type ) {
-    case BYTE_IMAGE:
-      ndrawn = scanImage( (char *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    case X_IMAGE:
-      ndrawn = scanImage( (unsigned char *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    case USHORT_IMAGE:
-      ndrawn = scanImage( (ushort *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    case SHORT_IMAGE:
-      ndrawn = scanImage( (short *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    case LONG_IMAGE:
-      ndrawn = scanImage( (FITS_LONG *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    case FLOAT_IMAGE:
-      ndrawn = scanImage( (float *) image, nx, ny, lplot, cval,
-                          xlower, ylower, xsize, ysize, done );
-      break;
-    default:
-      ndrawn = 0;
-    }
-    totaldrawn += ndrawn;
+      //  Scan for this contour and plot it. Call appropriate member for
+      //  data format.
+      switch ( type ) {
+         case BYTE_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (char *) image, nx, ny, lplot, cval,
+                                       xlower, ylower, xsize, ysize, done );
+            } else {
+               ndrawn = scanNativeImage( (char *) image, nx, ny, lplot, cval,
+                                         xlower, ylower, xsize, ysize, done );
 
-    //  Annul the temporary copy of the supplied Plot which was used
-    //  to do the drawing.
-    lplot = (AstPlot *) astAnnul( lplot );
+            }
+            break;
+         case X_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (unsigned char *) image, nx, ny,
+                                       lplot, cval, xlower, ylower, xsize,
+                                       ysize, done ); 
+            } else {
+               ndrawn = scanNativeImage( (unsigned char *) image, nx, ny,
+                                         lplot, cval, xlower, ylower, xsize,
+                                         ysize, done ); 
+            }
+            break;
+         case USHORT_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (ushort *) image, nx, ny,
+                                       lplot, cval, xlower, ylower,
+                                       xsize, ysize, done ); 
+            } else {
+               ndrawn = scanNativeImage( (ushort *) image, nx, ny,
+                                         lplot, cval, xlower, ylower,
+                                         xsize, ysize, done ); 
+            }
+            break;
+         case SHORT_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (short *) image, nx, ny, lplot,
+                                       cval, xlower, ylower, xsize,
+                                       ysize, done ); 
+            } else {
+               ndrawn = scanNativeImage( (short *) image, nx, ny, lplot,
+                                         cval, xlower, ylower, xsize,
+                                         ysize, done ); 
+            }
+            break;
+         case LONG_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (FITS_LONG *) image, nx, ny,
+                                       lplot, cval, xlower, ylower,
+                                       xsize, ysize, done );
+            } else {
+               ndrawn = scanNativeImage( (FITS_LONG *) image, nx, ny,
+                                         lplot, cval, xlower, ylower,
+                                         xsize, ysize, done );
+            }
+            break;
+         case FLOAT_IMAGE:
+            if ( swap_ ) {
+               ndrawn = scanSwapImage( (float *) image, nx, ny, lplot,
+                                       cval, xlower, ylower, xsize,
+                                       ysize, done ); 
+            } else {
+               ndrawn = scanNativeImage( (float *) image, nx, ny, lplot,
+                                         cval, xlower, ylower, xsize,
+                                         ysize, done ); 
+            }
+            break;
+         default:
+            ndrawn = 0;
+      }
+      totaldrawn += ndrawn;
 
-    //  Abort if failing:
-    if ( ! astOK ) {
-      break;
-    }
-  }
+      //  Annul the temporary copy of the supplied Plot which was used
+      //  to do the drawing.
+      lplot = (AstPlot *) astAnnul( lplot );
 
-  //  Free the workspace.
-  delete [] done;
+      //  Abort if failing:
+      if ( ! astOK ) {
+         break;
+      }
+   }
 
-  //  Return number of points drawn.
-  return totaldrawn;
+   //  Free the workspace.
+   delete [] done;
+   
+   //  Return number of points drawn.
+   return totaldrawn;
 }
 
 //
@@ -429,57 +471,56 @@ int Contour::drawContours()
 void Contour::contPlot( const AstPlot *plot, const int npts,
                         const double x[], const double y[] )
 {
-  if ( careful_ ) {
-    //  Carefully draw geodesics.
+   if ( careful_ ) {
+      //  Carefully draw geodesics.
+      
+      //  Copy each point into a correctly formatted buffer.
+      double xydata[2][MAXPTS];
+      for ( int i = 0; i < npts; i++ ) {
+         xydata[0][i] = x[i];
+         xydata[1][i] = y[i];
+      }
+      
+      //  Draw the geodesic.
+      astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
 
-    //  Copy each point into a correctly formatted buffer.
-    double xydata[2][MAXPTS];
-    for ( int i = 0; i < npts; i++ ) {
-      xydata[0][i] = x[i];
-      xydata[1][i] = y[i];
-    }
-    
-    //  Draw the geodesic.
-    astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
-    
-  } else {
+   } else {
+      
+      //  Draw straight-lines (graphics surface wise) at the resolution
+      //  of the contoured image for speed. Note that line attributes
+      //  should be established before calling this routine.
 
-    //  Draw straight-lines (graphics surface wise) at the resolution
-    //  of the contoured image for speed. Note that line attributes
-    //  should be established before calling this routine.
-
-    //  First transform positions to graphics coordinates.
-    double xgraph[MAXPTS], ygraph[MAXPTS];
-    astTran2( plot, npts, x, y, 0, xgraph, ygraph );
-    
-    //  Now go positions breaking for BAD values.
-    float xfloat[MAXPTS], yfloat[MAXPTS];
-    int igood = 0;
-    for ( int i = 0; i < npts; i++ ) {
-      if ( xgraph[i] != AST__BAD && ygraph[i] != AST__BAD ) {
-        xfloat[igood] = (float) xgraph[i]; 
-        yfloat[igood] = (float) ygraph[i]; 
-        igood++;
-
-        //  Skip to next position.
-        continue;
+      //  First transform positions to graphics coordinates.
+      double xgraph[MAXPTS], ygraph[MAXPTS];
+      astTran2( plot, npts, x, y, 0, xgraph, ygraph );
+      
+      //  Now go positions breaking for BAD values.
+      float xfloat[MAXPTS], yfloat[MAXPTS];
+      int igood = 0;
+      for ( int i = 0; i < npts; i++ ) {
+         if ( xgraph[i] != AST__BAD && ygraph[i] != AST__BAD ) {
+            xfloat[igood] = (float) xgraph[i];
+            yfloat[igood] = (float) ygraph[i];
+            igood++;
+            
+            //  Skip to next position.
+            continue;
+         }
+         
+         //  BAD point, so plot what we have and break line.
+         if ( igood > 0 ) {
+            astGLine( igood, xfloat, yfloat );
+         }
+         igood = 0;
       }
 
-      //  BAD point, so plot what we have and break line.
+      //  Plot all remaining positions.
       if ( igood > 0 ) {
-        astGLine( igood, xfloat, yfloat );
+         astGLine( igood, xfloat, yfloat );
       }
       igood = 0;
-    }
-
-    //  Plot all remaining positions.
-    if ( igood > 0 ) {
-      astGLine( igood, xfloat, yfloat );
-    }
-    igood = 0;
-  }
+   }
 }
-
 
 //  Define members that are data type dependent. See
 //  ContourTemplates.C for which ones.

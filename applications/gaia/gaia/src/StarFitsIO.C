@@ -11,6 +11,10 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  24/03/95  Created
+ * Peter W. Draper 11/01/00  Rewrite, only purpose now is to
+ *                           initialise WCS using StarWCS object.
+ * Peter W. Draper 25/01/00  Now merges primary FITS headers with
+ *                           extension headers, if reading an extension.
  */
 static const char* const rcsId="@(#) $Id$";
 
@@ -28,97 +32,175 @@ static const char* const rcsId="@(#) $Id$";
 #include "StarWCS.h"
 #include "StarFitsIO.h"
 
+/*
+ * create and return a temporary file with a copy of stdin.
+ * The argument is a char array large enough to hold the filename.
+ */
+static char* getFromStdin(char* filename)
+{
+    sprintf(filename, "/tmp/fits%d", getpid());
+    FILE* f = fopen(filename, "w");
+    if (!f) {
+        sys_error("could not create temp file: ", filename);
+        return NULL;
+    }
+    char buf[1024];
+    int n;
+    while((n = fread(buf, 1, sizeof(buf), stdin)) > 0) {
+        if (fwrite(buf, 1, n, f) != n) {
+            sys_error("error writing temp file: ", filename);
+            return NULL;
+        }
+    }
+    fclose(f);
+    return filename;
+}
+
 
 /*
  * constructor 
  */
 StarFitsIO::StarFitsIO(int width, int height, int bitpix, double bzero, 
-	       double bscale, const Mem& header, const Mem& data)
-    : FitsIO(width, height, bitpix, bzero, bscale, header, data)
-{
-    // byte swap the data
-    status_ = byteSwapData();
-}
-
+                       double bscale, const Mem& header, 
+                       const Mem& data, fitsfile* fitsio)
+  : FitsIO(width, height, bitpix, bzero, bscale, header, data, fitsio)
+{}
 
 /*
  * Read a FITS file and return an initialized StarFitsIO object for it,
- * or NULL if there are errors.
+ * or NULL if there are errors. 
  *
- * If filename is "-", stdin is read into a temp image file and used as
- * the input.
+ * If filename is "-", stdin is read into a temp image file and used
+ *  as the input.
  *
  * The Mem class is used to speed up loading the file. The optional
  * mem_options control whether the memory is mapped read-only or
- * read/write (see class Mem).
+ * read/write (see class Mem).  
  *
- * The data is automatically byte swapped (see constructor).
+ *  Note this is copy of FitsIO::read member so that we can return a
+ *  StarFitsIO object, rather than a FitsIO one.
  */
 StarFitsIO* StarFitsIO::read(const char* filename, int mem_options)
 {
-    // if the file is read-only and read-write access was requested, read
-    // the file into memory rather than returning an error.
-    int roflag = 0;
-    if (mem_options && Mem::FILE_RDWR && access(filename, W_OK) != 0) {
-	roflag++;
-	mem_options = 0;
-    }
-
-    FitsIO* fits = FitsIO::read(filename, mem_options);
-    if (!fits)
-	return (StarFitsIO*)NULL;
+    FILE *f;
+    char  tmpfile[1024];
+    int istemp = 0;
     
-    // check if we need to make a copy of the data (if the file was read-only)
-    Mem header, data;
-    if (roflag) {
-	// make a memory copy of the header and data
-	header = Mem(fits->header().length(), 0);
-	data = Mem(fits->data().length(), 0);
-	if (header.status() != 0 || data.status() != 0) 
-	    return (StarFitsIO*)NULL;
-	memcpy(header.ptr(), fits->header().ptr(), fits->header().length());
-	memcpy(data.ptr(), fits->data().ptr(), fits->data().length());
-    } 
-    else {
-	// quick reference counted copy
-	header = fits->header();
-	data = fits->data();
+    tmpfile[0] = '\0';
+    if (strcmp(filename, "-") == 0) { // use stdin
+        // we have to use seek later, so copy to a temp file first
+        filename =  getFromStdin(tmpfile);
+        if (filename == NULL)
+            return NULL;
+        istemp++;
     }
+    
+    // check the file extension for recognized compression types
+    filename = check_compress(filename, tmpfile, sizeof(tmpfile), istemp, 1, 0);
+    if (filename == NULL) {
+        if (istemp)
+            unlink(tmpfile);
+        return NULL;
+    }
+    
+    // map image file to memory to speed up image loading
+    if (mem_options == 0 && access(filename, W_OK) == 0)
+        mem_options = Mem::FILE_RDWR;
 
-    // use class StarFitsIO to handle byte swapping
-    StarFitsIO* sfits = new StarFitsIO(fits->width(), fits->height(), fits->bitpix(), 
-				       fits->bzero(), fits->bscale(), header, data);
-    delete fits;
-    if (sfits->status() != 0) {
-	delete sfits;
-	return (StarFitsIO*)NULL;
-    }
-    return sfits;
+    Mem header(filename, mem_options, 0);
+    if (header.status() != 0) 
+        return NULL;
+
+    if (istemp)
+        unlink(filename);       // will be deleted by the OS later
+
+    return initialize(header);
 }
 
-
-/* 
- * write a fits file from the data and header, if present
+/*
+ * This static method returns an allocated FitsIO object given a Mem object
+ * containing the data for the file. (header points to the data for the entire
+ * file...).
+ *
+ *  Rewrite from FitsIO to return StarFitsIO.
  */
-int StarFitsIO::write(const char *filename) const
+StarFitsIO* StarFitsIO::initialize(Mem& header)
 {
-    FitsIO fits(width_, height_, bitpix_, bzero_, bscale_, header_, data_);
+    fitsfile* fitsio = openFitsMem(header);
+    if (!fitsio)
+      return NULL;
+  
+    long headStart = 0, dataStart = 0, dataEnd = 0;
+    int status = 0;
+    if (fits_get_hduaddr(fitsio, &headStart, &dataStart, &dataEnd,
+                         &status) != 0) { 
+        cfitsio_error();
+        return NULL;
+    }
 
-    // byte swap the data
-    if (fits.byteSwapData() != 0)
-	return 1;
-    
-    // write the file
-    return fits.write(filename);
+    if (header.length() < (dataEnd - headStart)) {
+        const char* filename = header.filename();
+        if (filename)
+            log_message("FITS file has the wrong size (too short): %s",
+                        filename); 
+        else 
+            log_message("FITS data has the wrong size (too short)");
+    }
+
+    // The data part is the same mmap area as the header, with an offset
+    Mem data(header);
+    header.length(dataStart - headStart);  // set usable length of header
+    data.offset(dataStart);    // set offset for data
+    data.length(dataEnd-dataStart);
+
+    return initialize(header, data, fitsio);
 }
-
+/*
+ *  This static method returns an allocated FitsIO object, given the cfitsio
+ *  handle.
+ *
+ *  Rewrite from FitsIO to return StarFitsIO.
+ */
+StarFitsIO* StarFitsIO::initialize(Mem& header, Mem& data, fitsfile* fitsio)
+{    
+    int bitpix = 0, width = 0, height = 0;
+    double bzero = 0.0, bscale = 1.0;
+    get(fitsio, "NAXIS1", width);
+    get(fitsio, "NAXIS2", height);
+    get(fitsio, "BITPIX", bitpix);
+    get(fitsio, "BSCALE", bscale);
+    get(fitsio, "BZERO", bzero);
+    
+    return new StarFitsIO( width, height, bitpix, bzero, bscale, header,
+                           data, fitsio); 
+}
 
 /*
  * initialize world coordinates (based on the image header)
  */
 int StarFitsIO::wcsinit()
 {
-    wcs_ = WCS(new StarWCS((const char*)header_.ptr()));
-    return wcs_.status();
+   //   If there are multiple HDUs, merge the primary header with 
+   //   the extension header to get all of the WCS info.
+   if ( getNumHDUs() > 1 ) {
+      int length = header_.length() + primaryHeader_.length();
+      mergedHeader_ = Mem(length+1, 0);
+      if ( mergedHeader_.status() == 0 ) {
+         strncpy( (char *)mergedHeader_.ptr(), 
+                  (char *)header_.ptr(), 
+                  header_.length() );
+         
+         strncpy( ( (char *)mergedHeader_.ptr() ) + header_.length(), 
+                  (char *)primaryHeader_.ptr(), 
+                  primaryHeader_.length() );
+         
+         ( (char *)mergedHeader_.ptr() )[length] = '\0';
+         
+         wcs_ = WCS(new StarWCS( (const char *)mergedHeader_.ptr() ) );
+         return wcs_.status();
+      }
+   }
+   wcs_ = WCS(new StarWCS( (const char *)header_.ptr() ) );
+   return wcs_.status();
 }
 
