@@ -10,6 +10,19 @@ call_package_ant:
 
 export:
 
+prepare:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/junit/lib/junit
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/junit/lib/junit
+
+jars:
+      [jar] Updating jar: /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/junit.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/junit/lib/junit/src.jar
+
+webstart:
+
 dist:
 
 create_archives:
@@ -33,6 +46,7 @@ build:
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/tamfits/lib/tamfits
       [jar] Building jar: /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/tamfits/lib/tamfits/tamfits.jar
 
 javadoc_check:
 
@@ -55,6 +69,8 @@ javadocs:
   [javadoc] Generating /apps/cvsbuild/java/source/tamfits/docs/tamfits/javadocs/stylesheet.css...
   [javadoc] 3 warnings
 
+webstart:
+
 dist:
      [copy] Copying 6 files to /apps/cvsbuild/java/source/tamfits/docs/tamfits
 
@@ -68,6 +84,27 @@ create_archives:
 
 export:
 
+prepare:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/axis/lib/axis
+     [copy] Copying 16 files to /apps/cvsbuild/java/source/axis/lib/axis
+
+jars:
+      [jar] Updating jar: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-core.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.4.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/tt-bytecode.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
+
+webstart:
+
 dist:
 
 create_archives:
@@ -79,6 +116,22 @@ create_archives:
      [echo] Executing Jetty target: export
 
 export:
+
+prepare:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jetty/lib/jetty
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/jetty/lib/jetty
+
+jars:
+      [jar] Updating jar: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.crimson.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.apache.jasper.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.xml.jaxp.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/javax.servlet.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+
+webstart:
 
 dist:
 
@@ -98,13 +151,14 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 29 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 30 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 8 files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
       [jar] Building jar: /apps/cvsbuild/java/source/util/lib/util/util.jar
       [zip] Building zip: /apps/cvsbuild/java/source/util/lib/util/util_src.zip
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/util/lib/util/util.jar
 
 javadoc_check:
 
@@ -139,6 +193,8 @@ javadocs:
   [javadoc] 1 error
   [javadoc] 8 warnings
 
+webstart:
+
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/bin
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/etc
@@ -166,6 +222,7 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/task/lib/task/task.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/task/lib/task/task.jar
 
 javadoc_check:
 
@@ -181,11 +238,13 @@ javadocs:
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
 
+webstart:
+
 dist:
 
 create_archives:
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/task/build.xml:516: /apps/cvsbuild/java/source/task/bin not found.
+file:/apps/cvsbuild/java/source/task/build.xml:570: /apps/cvsbuild/java/source/task/bin not found.
 
-Total time: 2 minutes 26 seconds
+Total time: 2 minutes 59 seconds

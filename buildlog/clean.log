@@ -9,6 +9,7 @@ call_package_ant:
      [echo] Executing JUnit target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/junit/lib
      [echo] Executing tamfits target: clean
 
 clean:
@@ -18,9 +19,11 @@ clean:
      [echo] Executing axis target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/axis/lib
      [echo] Executing Jetty target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jetty/lib
      [echo] Executing UTIL target: clean
 
 clean:
@@ -195,4 +198,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 10 seconds
+Total time: 18 seconds

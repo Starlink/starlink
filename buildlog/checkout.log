@@ -4080,22 +4080,6 @@ U java/source/axis/docs/axis/apiDocs/org/apache/axis/wsdl/toJava/class-use/Write
 U java/source/axis/docs/axis/apiDocs/org/apache/axis/wsdl/toJava/class-use/WriterFactory.html
 cvs checkout: Updating java/source/axis/lib
 cvs checkout: Updating java/source/axis/lib/axis
-U java/source/axis/lib/axis/axis-ant.jar
-U java/source/axis/lib/axis/axis.jar
-U java/source/axis/lib/axis/axis.war
-U java/source/axis/lib/axis/commons-discovery.LICENSE
-U java/source/axis/lib/axis/commons-discovery.jar
-U java/source/axis/lib/axis/commons-logging.LICENSE
-U java/source/axis/lib/axis/commons-logging.jar
-U java/source/axis/lib/axis/jaxrpc.jar
-U java/source/axis/lib/axis/log4j-1.2.4.LICENSE
-U java/source/axis/lib/axis/log4j-1.2.4.jar
-U java/source/axis/lib/axis/log4j-core.jar
-U java/source/axis/lib/axis/log4j.properties
-U java/source/axis/lib/axis/saaj.jar
-U java/source/axis/lib/axis/tt-bytecode.jar
-U java/source/axis/lib/axis/wsdl4j.LICENSE
-U java/source/axis/lib/axis/wsdl4j.jar
 cvs checkout: Updating java/source/axis/src
 cvs checkout: Updating java/source/axis/src/lib
 U java/source/axis/src/lib/axis-ant.jar
@@ -5556,6 +5540,7 @@ cvs checkout: Updating java/source/fits/src/main/uk/ac
 cvs checkout: Updating java/source/fits/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/fits/src/main/uk/ac/starlink/fits
 U java/source/fits/src/main/uk/ac/starlink/fits/AddableHeader.java
+U java/source/fits/src/main/uk/ac/starlink/fits/BintableStarTable.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsArrayBuilder.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsNdxHandler.java
@@ -6312,11 +6297,6 @@ U java/source/jetty/docs/jetty/org/mortbay/xml/package-summary.html
 U java/source/jetty/docs/jetty/org/mortbay/xml/package-tree.html
 cvs checkout: Updating java/source/jetty/lib
 cvs checkout: Updating java/source/jetty/lib/jetty
-U java/source/jetty/lib/jetty/javax.servlet.jar
-U java/source/jetty/lib/jetty/javax.xml.jaxp.jar
-U java/source/jetty/lib/jetty/org.apache.crimson.jar
-U java/source/jetty/lib/jetty/org.apache.jasper.jar
-U java/source/jetty/lib/jetty/org.mortbay.jetty.jar
 cvs checkout: Updating java/source/jetty/src
 cvs checkout: Updating java/source/jetty/src/lib
 U java/source/jetty/src/lib/javax.servlet.jar
@@ -6368,6 +6348,15 @@ U java/source/jniast/src/jni/jniast.h
 U java/source/jniast/src/jni/jniast_libraries
 U java/source/jniast/src/jni/makefile
 U java/source/jniast/src/jni/mk
+cvs checkout: Updating java/source/jniast/src/lib
+U java/source/jniast/src/lib/README.updates
+cvs checkout: Updating java/source/jniast/src/lib/i386
+U java/source/jniast/src/lib/i386/jniast_libs.jar
+cvs checkout: Updating java/source/jniast/src/lib/sparc
+U java/source/jniast/src/lib/sparc/jniast_libs.jar
+cvs checkout: Updating java/source/jniast/src/lib/x86
+U java/source/jniast/src/lib/x86/jniast.dll
+U java/source/jniast/src/lib/x86/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/main
 cvs checkout: Updating java/source/jniast/src/main/uk
 cvs checkout: Updating java/source/jniast/src/main/uk/ac
@@ -6444,6 +6433,15 @@ U java/source/jnihds/src/jni/HDSObject.c
 U java/source/jnihds/src/jni/jnihds_libraries
 U java/source/jnihds/src/jni/makefile
 U java/source/jnihds/src/jni/mk
+cvs checkout: Updating java/source/jnihds/src/lib
+U java/source/jnihds/src/lib/README.updates
+cvs checkout: Updating java/source/jnihds/src/lib/i386
+U java/source/jnihds/src/lib/i386/jnihds_libs.jar
+cvs checkout: Updating java/source/jnihds/src/lib/sparc
+U java/source/jnihds/src/lib/sparc/jnihds_libs.jar
+cvs checkout: Updating java/source/jnihds/src/lib/x86
+U java/source/jnihds/src/lib/x86/jnihds.dll
+U java/source/jnihds/src/lib/x86/jnihds_libs.jar
 cvs checkout: Updating java/source/jnihds/src/main
 cvs checkout: Updating java/source/jnihds/src/main/uk
 cvs checkout: Updating java/source/jnihds/src/main/uk/ac
@@ -7194,8 +7192,6 @@ U java/source/junit/docs/junit/testinfected/logo.gif
 U java/source/junit/docs/junit/testinfected/testing.htm
 cvs checkout: Updating java/source/junit/lib
 cvs checkout: Updating java/source/junit/lib/junit
-U java/source/junit/lib/junit/junit.jar
-U java/source/junit/lib/junit/src.jar
 cvs checkout: Updating java/source/junit/src
 cvs checkout: Updating java/source/junit/src/lib
 U java/source/junit/src/lib/junit.jar
@@ -8169,6 +8165,9 @@ U java/source/splat/src/main/uk/ac/starlink/splat/plot/DragRegion.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/FigureChangedEvent.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/FigureListener.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/FigureProps.java
+U java/source/splat/src/main/uk/ac/starlink/splat/plot/InterpolatedCurve2D.java
+U java/source/splat/src/main/uk/ac/starlink/splat/plot/InterpolatedCurveFigure.java
+U java/source/splat/src/main/uk/ac/starlink/splat/plot/InterpolatedCurveIterator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/MouseMotionTracker.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PathPlotFigure.java
 U java/source/splat/src/main/uk/ac/starlink/splat/plot/PlotCompositeFigure.java
@@ -8320,6 +8319,8 @@ cvs checkout: Updating java/source/src/docs/javaapi
 U java/source/src/docs/javaapi/README
 U java/source/src/docs/javaapi/package-list
 cvs checkout: Updating java/source/src/docs/webstart
+U java/source/src/docs/webstart/.htaccess
+U java/source/src/docs/webstart/QUICKSTART
 U java/source/src/docs/webstart/README
 cvs checkout: Updating java/source/src/etc
 U java/source/src/etc/LICENCE.txt
@@ -8422,6 +8423,8 @@ cvs checkout: Updating java/source/table/src/testcases/uk
 cvs checkout: Updating java/source/table/src/testcases/uk/ac
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table
+U java/source/table/src/testcases/uk/ac/starlink/table/AutoStarTable.java
+U java/source/table/src/testcases/uk/ac/starlink/table/FormatsTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui
 U java/source/table/src/testcases/uk/ac/starlink/table/gui/StarTableNodeChooserTest.java
@@ -8973,7 +8976,9 @@ U java/source/treeview/src/testcases/uk/ac/starlink/treeview/ModelTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeChooserTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeviewTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp
+U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp.3
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demotxt.cmp
+U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demotxt.cmp.3
 cvs checkout: Updating java/source/util
 U java/source/util/.properties
 U java/source/util/build.xml
@@ -8992,6 +8997,7 @@ U java/source/util/src/main/uk/ac/starlink/util/DataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/ErrorDialog.java
 U java/source/util/src/main/uk/ac/starlink/util/FileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
+U java/source/util/src/main/uk/ac/starlink/util/IOUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
@@ -9035,6 +9041,7 @@ cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink/util
 U java/source/util/src/testcases/uk/ac/starlink/util/DOMUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/DataSourceTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/IOUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/NodeDescendantsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/TestCaseTest.java

@@ -193,6 +193,7 @@ call_package_ant:
      [echo] Executing JUnit target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/junit/lib
      [echo] Executing tamfits target: clean
 
 clean:
@@ -202,9 +203,11 @@ clean:
      [echo] Executing axis target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/axis/lib
      [echo] Executing Jetty target: clean
 
 clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jetty/lib
      [echo] Executing UTIL target: clean
 
 clean:
@@ -400,7 +403,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 36 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 37 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -470,7 +473,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
-     [copy] Copying 11 files to /apps/cvsbuild/java/source/fits/build/java
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/fits/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -511,7 +514,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 164 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 167 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -540,11 +543,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1580 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1590 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 46 seconds
+Total time: 1 minute 47 seconds

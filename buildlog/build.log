@@ -11,6 +11,7 @@ call_package_ant:
 prepare:
 
 build:
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/junit/lib/junit
      [echo] Executing tamfits target: build
 
 prepare:
@@ -25,13 +26,13 @@ build:
 prepare:
 
 build:
-      [jar] Updating jar: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+     [copy] Copying 16 files to /apps/cvsbuild/java/source/axis/lib/axis
      [echo] Executing Jetty target: build
 
 prepare:
 
 build:
-      [jar] Updating jar: /apps/cvsbuild/java/source/jetty/lib/jetty/org.mortbay.jetty.jar
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/jetty/lib/jetty
      [echo] Executing UTIL target: build
 
 prepare:
@@ -40,7 +41,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 29 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 30 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 8 files to /apps/cvsbuild/java/source/util/build/classes
      [echo] Executing Task target: build
 
@@ -215,7 +216,7 @@ build:
 prepare:
 
 check_packages:
-[available] Nov 14, 2003 4:08:19 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Nov 25, 2003 4:09:09 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -347,7 +348,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/classes
-    [javac] Compiling 11 source files to /apps/cvsbuild/java/source/fits/build/classes
+    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/fits/build/classes
      [echo] Executing DIVA target: build
 
 prepare:
@@ -432,7 +433,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 166 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 169 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 64 files to /apps/cvsbuild/java/source/splat/build/classes
@@ -576,9 +577,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 27 seconds
+Total time: 1 minute 17 seconds
