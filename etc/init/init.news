@@ -1,0 +1,132 @@
+
+ INIT is the bundle that contains the Starlink initialisation 
+ files required by users in order to use the USSC.
+
+ History:
+    v1.1-25 12-DEC-2003
+       Fixed STARJAVA adding to path when /star/bin
+       exists.
+
+    v1.1-24 27-MAY-2003
+       Added command definitions for AUTOASTROM.
+       JCMTDR now for linux in adam_packages.shl. 
+       SPLAT, moved to StarJava, added other StarJava
+       commands. 
+       Chenged Perl config.
+
+    v1.1-21 04-DEC-2002
+       Added command definitions for HDSTOOLS.
+
+    v1.1-20 02-OCT-2002
+       Modified alias definitions for ORACDR.
+
+    v1.1-19 03-MAY-2002
+       Added aliases for NAOS.
+       Corrected typo in DATACUBE alias definitions.
+
+    v1.1-18 11-APR-2002
+       Added alaises/environment variables for DATACUBE.
+
+    v1.1-17 23-MAR-2002
+       Added aliases/environment variables for KAPRH, ATOOLS.
+
+    v1.1-16 31-JAN-2002
+       Added new aliases/environment variables for SPLAT and XRT.
+       Modified PERL initialisation to find and use Perl version number.
+       Modified cshrc to use 'notinst' script instead of old alias syntax.
+       Removed old TWODSPEC definitions.
+       Updated adam_packages.hlp.
+       Minor cosmetics.
+
+    v1.1-15 28-JAN-2002
+       Added JRE and JDK path code to login.
+
+    v1.1-14 06-DEC-2001
+       Added new alias for Michelle to ORACDR setup in cshrc.
+
+    v1.1-13 21-MAY-2001
+       Corrected Perl initialisation in login file.
+
+    v1.1-12 24-OCT-2000
+       Added new aliases for ORAC-DR.
+
+    v1.1-11 17-OCT-2000
+       Added FLUXES_DIR and JPL_DIR.
+
+    v1.1-10 24-MAR-2000
+       Corrected POLPACK definitions in ICL startup.
+
+    v1.1-9 04-FEB-2000
+       Added ORAC-DR environment variables and command definitions.
+       Modified FIGARO_PROG_N definition so that TWODSPEC tasks work.
+
+    v1.1-8 01-JUL-1999
+       Modified logic for setting PERL5LIB, TCL_LIBRARY and TK_LIBRARY.
+       Changed INSTALL -> INSTALL_ROOT in login and cshrc to allow
+          string 'INSTALL' to be used in search during login.
+
+    v1.1-7 23-FEB-1999
+       Added PERL5LIB definition for PERL to login.
+
+    v1.1-6 27-JAN-1999
+       Added definition ot PGPLOT_DIR to login for Native-PGPLOT.
+
+    v1.1-5 13-JAN-1998
+       Added new command definitions for EXTRACTOR.
+       Changed ASTERIX command definitions.
+       Removed NDFPERL and RPS definitions.
+       Removed /usr/ucblib from LD_LIBRARY_PATH for Solaris 2.
+
+    v1.1-4 04-AUG-1998
+       Added new command definitions for POLPACK.
+
+    v1.1-3 27-MAY-1998
+       Changed logic for definition of PERL5LIB to allow pre-definition.
+
+    v1.1-2 24-FEB-1998
+       Added definition of PERL5LIB to login for NDFPERL.
+
+    v1.1-1 05-FEB-1998
+       Modified SPECDRE startup commands in cshrc for merger with FIGARO.
+       Removed SPECDRE_DIR environment variable from login.
+       Edited adam_packages.hlp text to depreciate CATPAC, IRAS90 and NDPROGS.
+
+    v1.1-0 18-AUG-1997
+       Integrated version for all systems.
+
+    v1.0-15 08-AUG-1997
+       Added definitions for SURF to cshrc, login and icl_login_sys.icl.
+       Added help text for SURF to adam_packages.hlp.
+ 
+    v1.0-14 09-JUN-1997
+       Modified default alias for commands not available to be of the form
+ 
+             alias fred 'cat /star/etc/not_installed; :  >& /dev/null'
+ 
+          so that any command line arguments (files etc) do not get directed
+          to stdout.
+ 
+    v1.0-12 23-MAY-1997
+       Added TCL_LIBRARY and TK_LIBRARY environment variables to login.
+ 
+    v1.0-11 09-MAY-1997
+       Added aliases for FLUXES to cshrc.
+ 
+    v1.0-10 07-MAY-1997
+       Added environment variable PHOTOM_HELP to login.
+
+    v1.0-8 06-MAR-1997
+       Added environment variable and aliases for GAIA.
+ 
+    v1.0-7 03-MAR-1997
+       Removed CATAPP aliases.
+ 
+    v1.0-2 13-MAY-1996
+       Modified ESP startup to search on esp.csh instead of espstart.
+
+    v1.0-1 25-APR-1996:
+       Added support for Intel PC / Linux systems.
+
+    v1.0-0 24-MAR-1996:
+       Initial version for UltraSparc tests.
+

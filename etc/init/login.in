@@ -1,0 +1,546 @@
+#+
+#  Date: 2003.12.12
+#  File: INSTALL_ETC/login
+#  Version: PKG_VERS
+#
+#  This file must be sourced before Starlink software can be used.
+#  This may be done at login time by adding the command:
+#            source INSTALL_ETC/login
+#  to your .login file.
+#-
+
+#  Add Starlink directories to relevant paths 
+
+#     Append INSTALL_BIN, INSTALL_BIN/startcl and INSTALL_STARJAVA/bin
+#     to PATH, clear path first.
+
+set tmppath = ${PATH}
+if (`echo ${tmppath} | grep -c ':INSTALL_BIN/startcl:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_BIN/startcl:#:#g'`
+
+if (`echo ${tmppath} | grep -c ':INSTALL_BIN/startcl$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_BIN/startcl##g'`
+
+if (`echo ${tmppath} | grep -c '^INSTALL_BIN/startcl'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#INSTALL_BIN/startcl:##g'`
+
+if (`echo ${tmppath} | grep -c ':INSTALL_BIN:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_BIN:#:#g'`
+
+if (`echo ${tmppath} | grep -c ':INSTALL_BIN$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_BIN##g'`
+
+if (`echo ${tmppath} | grep -c '^INSTALL_BIN'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#INSTALL_BIN:##g'`
+
+if (`echo ${tmppath} | grep -c ':INSTALL_STARJAVA/bin:'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_STARJAVA/bin:#:#g'`
+
+if (`echo ${tmppath} | grep -c ':INSTALL_STARJAVA/bin$'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#:INSTALL_STARJAVA/bin##g'`
+
+if (`echo ${tmppath} | grep -c '^INSTALL_STARJAVA/bin'` != 0) \
+    set tmppath = `echo ${tmppath} | sed -e 's#INSTALL_STARJAVA:##g'`
+
+setenv PATH ${tmppath}:INSTALL_BIN/startcl:INSTALL_BIN:INSTALL_STARJAVA/bin
+
+
+#
+#     Prepend Starlink JRE (and JDK) paths to PATH.
+#     Do JRE after JDK so that the JRE takes precidence.
+
+set JREHOME = INSTALL_ROOT/java/jrehome
+set JDKHOME = INSTALL_ROOT/java/jdkhome
+
+if ( -f ${JDKHOME} ) setenv PATH `cat ${JDKHOME}`/bin:${PATH}
+if ( -f ${JREHOME} ) setenv PATH `cat ${JREHOME}`/bin:${PATH}
+unset JREHOME JDKHOME
+
+#     Check if LD_LIBRARY_PATH is set
+#     (needed on
+#        Sparc/Solaris 2.x, 
+#        Sparc/SunOS 4.1.x,
+#        Alpha/Digital Unix
+#        Intel/Linux
+#     systems)
+#     If set, check if it contains:
+#              INSTALL_LIB 
+#              INSTALL_SHARE 
+#              /usr/openwin/lib 
+#        Append them if not already included
+#     Else
+#        if OSF/1, set LD_LIBRARY_PATH as INSTALL_SHARE
+#        if Linux, set LD_LIBRARY_PATH as INSTALL_SHARE
+#        if Solaris 2.x, set LD_LIBRARY_PATH with all three 
+#        if SunOS 4.x, set LD_LIBRARY_PATH as INSTALL_SHARE
+#     End
+
+#  Is LD_LIBRARY_PATH set?
+
+if ( ${?LD_LIBRARY_PATH} ) then
+
+#  LD_LIBRARY_PATH is set.  Search it for required components and
+#  Set apropriate flag variables.
+
+   set foundit_one = "no"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c ':INSTALL_LIB'` != 0 ) set foundit_one = "yes"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c '^INSTALL_LIB'` != 0 ) set foundit_one = "yes"
+
+   set foundit_two = "no"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c ':/usr/openwin/lib'` != 0 ) set foundit_two = "yes"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c '^/usr/openwin/lib'` != 0 ) set foundit_two = "yes"
+
+   set foundit_four = "no"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c ':INSTALL_SHARE'` != 0 ) set foundit_four = "yes"
+   if (`echo ${LD_LIBRARY_PATH} | grep -c '^INSTALL_SHARE'` != 0 ) set foundit_four = "yes"
+
+#  Add required components to end of LD_LIBRARY_PATH if flag variables
+#  indicate they are not present.
+
+   if ( $foundit_one == "no" && -e INSTALL_ROOT/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:INSTALL_LIB:INSTALL_STARJAVA/lib/sparc
+   if ( $foundit_one == "no" && -e INSTALL_ROOT/sun4 ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:INSTALL_LIB:INSTALL_STARJAVA/lib/sparc
+   if ( $foundit_two == "no" && -e INSTALL_ROOT/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/openwin/lib:INSTALL_STARJAVA/lib/sparc
+   if ( $foundit_four == "no" && -e INSTALL_ROOT/alpha_OSF1 ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:INSTALL_SHARE:INSTALL_STARJAVA/lib/alpha
+   if ( $foundit_four == "no" && -e INSTALL_ROOT/ix86_Linux ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:INSTALL_SHARE:INSTALL_STARJAVA/lib/i386
+   if ( $foundit_four == "no" && -e INSTALL_ROOT/sun4_Solaris ) setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:INSTALL_SHARE:INSTALL_STARJAVA/lib/sparc
+   unset foundit_one foundit_two foundit_three foundit_four
+
+else
+
+#  LD_LIBRARY_PATH is not set.  Add required components.
+
+   if ( -e INSTALL_ROOT/alpha_OSF1 ) setenv LD_LIBRARY_PATH INSTALL_SHARE:INSTALL_STARJAVA/lib/alpha
+   if ( -e INSTALL_ROOT/ix86_Linux ) setenv LD_LIBRARY_PATH INSTALL_SHARE:INSTALL_STARJAVA/lib/i386
+   if ( -e INSTALL_ROOT/sun4_Solaris ) setenv LD_LIBRARY_PATH INSTALL_SHARE:INSTALL_LIB:/usr/openwin/lib:INSTALL_STARJAVA/lib/sparc
+   if ( -e INSTALL_ROOT/sun4 ) setenv LD_LIBRARY_PATH INSTALL_LIB:INSTALL_STARJAVA/lib/sparc
+endif
+
+#
+#  PGPLOT  (native version)
+if ( ! ${?PGPLOT_DIR} ) then
+   setenv PGPLOT_DIR INSTALL_BIN/
+endif
+
+#
+#  TCLSYS
+if ( -e INSTALL_ROOT/dates/tclsys_datestamp ) then
+   set tclsys_install=`grep INSTALL INSTALL_ROOT/dates/tclsys_datestamp | awk -F: '{print $2}' - `
+   if ( "INSTALL_ROOT" != ${tclsys_install} ) then
+      setenv TCL_LIBRARY INSTALL_LIB
+      setenv TK_LIBRARY INSTALL_LIB
+   endif
+   unset tclsys_install
+endif
+
+#
+#  WWW server.  If WWW_HOME is not defined, point it
+#  to the Starlink WWW server at RAL.
+if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
+
+#
+#  HTX browser.  If HTX_BROWSER is not defined, set it to netscape.
+if ( ! ${?HTX_BROWSER} ) setenv HTX_BROWSER netscape
+
+#
+#  MAN pages.  If none defined, create a default, then add to it.
+if ( ! ${?MANPATH} ) setenv MANPATH /usr/share/man:/usr/man:/usr/local/man:/usr/openwin/man
+setenv MANPATH INSTALL_ROOT/local/man:INSTALL_ROOT/man:${MANPATH} # Starlink
+if ( -d /usr/local/teTeX/man ) setenv MANPATH /usr/local/teTeX/man:${MANPATH} # LaTeX2e
+if ( -d INSTALL_ROOT/Perl/man ) setenv MANPATH INSTALL_ROOT/Perl/man:${MANPATH} # Perl
+
+#
+#  Optional package definitions
+
+#
+#  ASTERIX
+if ( -e INSTALL_BIN/asterix/startup.icl ) then
+   setenv AST_ROOT INSTALL_BIN/asterix
+endif
+
+#
+#  ATOOLS
+if ( -e INSTALL_BIN/atools/atools.csh ) then
+   setenv ATOOLS_DIR INSTALL_BIN/atools
+   setenv ATOOLS_HELP INSTALL_HELP/atools/atools
+endif
+
+#
+#  AUTOASTROM
+if ( -e INSTALL_BIN/autoastrom/autoastrom ) then
+   setenv AUTOASTROM_DIR INSTALL_BIN/autoastrom
+endif
+
+#
+#  CATPAC
+if ( -e INSTALL_BIN/catpac/catpac ) then
+   setenv CATPAC_DIR INSTALL_BIN/catpac
+   setenv CATPAC_HELP INSTALL_BIN/catpac/catpac
+   setenv CATPAC_DEMO INSTALL_BIN/catpac
+endif
+
+#
+#  CCDPACK
+if ( -e INSTALL_BIN/ccdpack/ccdpack.csh ) then
+   setenv CCDPACK_DIR INSTALL_BIN/ccdpack
+   setenv CCDPACK_HELP INSTALL_HELP/ccdpack/ccdpack
+endif
+
+#
+#  CGS4DR
+if ( -e INSTALL_BIN/cgs4dr/cgs4dr ) then
+   setenv CGS4DR_ROOT INSTALL_BIN/cgs4dr
+endif
+
+#
+#  CONVERT
+if ( -e INSTALL_BIN/convert/convert.csh ) then
+   setenv CONVERT_DIR INSTALL_BIN/convert
+   setenv CONVERT_HELP INSTALL_HELP/convert/convert
+endif
+
+#
+#  CURSA
+if ( -e INSTALL_BIN/cursa/cursa.csh ) then
+   setenv CURSA_DIR INSTALL_BIN/cursa
+endif
+
+#
+#  DAOPHOT
+if ( -e INSTALL_BIN/daophot/daophot ) then
+   setenv DAOPHOT_DIR INSTALL_BIN/daophot
+endif
+
+#
+#  DATACUBE
+if ( -e INSTALL_BIN/datacube/datacube.csh ) then
+   setenv DATACUBE_DIR INSTALL_BIN/datacube
+endif
+
+#
+#  ESP
+if ( -e INSTALL_BIN/esp/esp.csh) then
+   setenv ESP_DIR INSTALL_BIN/esp
+   setenv ESP_HELP INSTALL_HELP/esp/esp
+endif
+
+#
+#  EXTRACTOR
+if ( -e INSTALL_BIN/extractor/extractor.csh) then
+   setenv EXTRACTOR_DIR INSTALL_BIN/extractor
+   setenv EXTRACTOR_HELP INSTALL_HELP/extractor/extractor
+endif
+
+#
+#  FIGARO
+if ( -e INSTALL_BIN/figaro/figaro.csh ) then
+   setenv FIG_DIR INSTALL_BIN/figaro
+   setenv FIG_HELP INSTALL_HELP/figaro/figaro
+   setenv FIG_HTML INSTALL_ROOT/docs/sun86.htx
+   setenv FIGARO_FORMATS ndf,dst
+   setenv FIGARO_PROG_S INSTALL_ETC/figaro
+   setenv FIGARO_PROG_N INSTALL_BIN/figaro
+endif
+
+#
+#  FLUXES
+if ( -e INSTALL_BIN/fluxes/fluxes.csh ) then
+setenv FLUXES_DIR INSTALL_BIN/fluxes
+endif
+
+#
+#  FORMLOAD
+if ( -e INSTALL_BIN/formload ) then
+setenv FORMLOAD_DIR INSTALL_ETC/formload
+endif
+
+#
+#  GAIA
+if ( -e INSTALL_BIN/gaia/gaia.csh ) then
+   setenv GAIA_DIR INSTALL_BIN/gaia
+endif
+
+#
+#  HDSTOOLS
+if ( -e INSTALL_BIN/hdstools/hdstools.csh ) then
+   setenv HDSTOOLS_DIR INSTALL_BIN/hdstools
+   setenv HDSTOOLS_HELP INSTALL_HELP/hdstools/hdstools.shl
+endif
+
+#
+#  HDSTRACE
+if ( -e INSTALL_BIN/hdstrace ) then
+   setenv HDSTRACE_DIR INSTALL_BIN
+   setenv HDSTRACE_HELP INSTALL_HELP/hdstrace.shl
+endif
+
+#
+#  ICL
+if ( -e INSTALL_BIN/icl ) then
+   setenv ADAM_PACKAGES INSTALL_HELP/adam_packages.shl
+   setenv ICL_LOGIN_SYS INSTALL_ETC/icl_login_sys.icl
+endif
+ 
+#
+#  IRAS90
+if ( -e INSTALL_BIN/iras90/iras90 ) then
+   setenv IRAS90_DIR INSTALL_BIN/iras90
+   setenv IRAS90_HELP INSTALL_HELP/iras90
+endif  
+if ( -e INSTALL_ROOT/iras90/iras90 ) then
+   setenv IRAS90_SOURCE INSTALL_ROOT/iras90
+endif
+
+#
+#  IRCAMDR
+if ( -e INSTALL_BIN/ircamdr/ircamdr ) then
+   setenv LIRCAMDIR INSTALL_BIN/ircamdr
+endif
+
+#
+#  IRCAMPACK
+if ( -e INSTALL_BIN/ircampack/ircampack.csh ) then
+   setenv IRCAMPACK_DIR INSTALL_BIN/ircampack
+   setenv IRCAMPACK_HELP INSTALL_HELP/ircampack/ircampack
+endif
+
+#
+#  JCMTDR
+if ( -e INSTALL_BIN/jcmtdr/start ) then
+   setenv JCMTDR_DIR INSTALL_BIN/jcmtdr
+   setenv JCMTDR_HELP INSTALL_HELP/jcmtdr/jcmtdr
+   setenv JCMTDR_HTML INSTALL_HELP/jcmtdr/html
+endif
+
+#
+#  JPL
+if ( -e INSTALL_ETC/jpl/jpleph.dat ) then
+   setenv JPL_DIR INSTALL_ETC/jpl
+endif
+
+#
+#  KAPPA
+if ( -e INSTALL_BIN/kappa/kappa.csh ) then
+   setenv KAPPA_DIR INSTALL_BIN/kappa
+   setenv KAPPA_HELP INSTALL_HELP/kappa/kappa
+endif
+
+#
+#  KAPRH
+if ( -e INSTALL_BIN/kaprh/kaprh.csh ) then
+   setenv KAPRH_DIR INSTALL_BIN/kaprh
+   setenv KAPRH_HELP INSTALL_HELP/kaprh/kaprh
+endif
+
+#
+#  NDPROGS
+if ( -e INSTALL_BIN/ndprogs/ndprogs.csh ) then
+   setenv NDPROGS_DIR INSTALL_BIN/ndprogs
+   setenv NDPROGS_HELP INSTALL_HELP/ndprogs/ndprogshelp
+endif
+
+#
+#  ORAC-DR
+if ( -e INSTALL_BIN/oracdr/etc/oracdr_start.csh ) then
+   setenv ORAC_DIR INSTALL_BIN/oracdr
+   setenv ORAC_PERL5LIB ${ORAC_DIR}/lib/perl5
+   setenv ORAC_CAL_ROOT ${ORAC_DIR}/cal
+endif
+
+#
+#  PERIOD
+if ( -e INSTALL_BIN/period/period_main ) then
+   setenv PERIOD_HELP INSTALL_HELP/period
+endif
+
+#set perl_version = `INSTALL_ROOT/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
+#echo PERL version is ${perl_version}
+#
+#  PERL
+#if ( -e INSTALL_ROOT/dates/perl_datestamp ) then
+#   set perl_install=`grep INSTALL INSTALL_ROOT/dates/perl_datestamp | awk -F: '{print $2}' - `
+#   if ( "INSTALL_ROOT" != ${perl_install} ) then
+#      set perl_version = `INSTALL_ROOT/Perl/bin/perl -e 'use Config;' -e 'print $Config{'version'};'`
+#      if ( -e INSTALL_ROOT/Perl/perl_sys ) then
+#         set perl_sys=`cat INSTALL_ROOT/Perl/perl_sys`
+#         if ( ! ${?PERL5LIB} ) then
+#            setenv PERL5LIB INSTALL_ROOT/Perl/lib/perl5/${perl_version}/${perl_sys}
+#         else
+#            setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/${perl_version}/${perl_sys}
+#         endif
+#         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/${perl_version}
+#         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
+#         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl/${perl_version}
+#         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl
+#      endif
+#   endif
+#   unset perl_install perl_version
+#endif
+
+
+#
+#  PERL
+if ( -e INSTALL_ROOT/dates/perl_datestamp ) then
+   set perl_install=`grep INSTALL INSTALL_ROOT/dates/perl_datestamp | awk -F: '{print $2}' - `
+   if ( "INSTALL_ROOT" != ${perl_install} ) then
+      set perl_version = 5.8.0
+      if ( -e INSTALL_ROOT/Perl/perl_sys ) then
+         set perl_sys=`cat INSTALL_ROOT/Perl/perl_sys`
+         if ( ! ${?PERL5LIB} ) then
+            setenv PERL5LIB INSTALL_ROOT/Perl/lib/perl5/${perl_version}/${perl_sys}
+         else
+            setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/${perl_version}/${perl_sys}
+         endif
+         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/${perl_version}
+         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl/${perl_version}/${perl_sys}
+         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl/${perl_version}
+         setenv PERL5LIB ${PERL5LIB}:INSTALL_ROOT/Perl/lib/perl5/site_perl
+      endif
+   endif
+   unset perl_install perl_version
+endif
+
+
+#
+#  PHOTOM
+if ( -e INSTALL_BIN/photom/photom_init ) then
+   setenv PHOTOM_DIR INSTALL_BIN/photom
+   setenv PHOTOM_HELP INSTALL_HELP/photom/photomhelp
+endif
+
+#
+#  PISA
+if ( -e INSTALL_BIN/pisa/start ) then
+   setenv PISA_DIR INSTALL_BIN/pisa
+   setenv PISA_HELP INSTALL_HELP/pisa/pisahelp
+endif
+
+#
+#  POLMAP
+if ( -e INSTALL_BIN/polmap/polmap.csh ) then
+   setenv POLMAP_DIR INSTALL_BIN/polmap
+endif
+
+#
+#  POLPACK
+if ( -e INSTALL_BIN/polpack/polpack.csh ) then
+   setenv POLPACK_DIR INSTALL_BIN/polpack
+endif
+
+#
+#  PONGO
+if ( -e INSTALL_BIN/pongo/pongo.icl ) then
+   setenv PONGO_BIN INSTALL_BIN/pongo
+   setenv PONGO_HELP INSTALL_HELP/pongo/pongohelp
+   setenv PONGO_EXAMPLES INSTALL_BIN/examples/pongo
+endif
+
+#
+#  REPACK
+if ( -e INSTALL_BIN/repack/repack.csh ) then
+   setenv REBIN INSTALL_BIN/repack
+   setenv RECAL INSTALL_ETC/repack
+   setenv REDOCS INSTALL_BIN/repack
+   setenv REHELP INSTALL_HELP/repack
+endif
+
+#
+#  SPECDRE
+#  Withdrawn Spring-1998, merged with Figaro
+
+#
+#  SPECX
+if ( -e INSTALL_BIN/specx/specxstart ) then
+   setenv SYS_SPECX INSTALL_BIN/specx
+   setenv SPECX_HELP INSTALL_HELP/specx/specx
+endif
+
+#
+#  SPLAT
+ if ( -e INSTALL_STARJAVA/bin/splat/splat ) then
+    setenv SPLAT_DIR INSTALL_STARJAVA/bin/splat
+ endif
+
+#
+#  FROG
+ if ( -e INSTALL_STARJAVA/bin/frog ) then
+    setenv FROG_DIR INSTALL_STARJAVA/bin/frog
+ endif
+
+#
+#  SOG
+ if ( -e INSTALL_STARJAVA/bin/sog ) then
+    setenv SOG_DIR INSTALL_STARJAVA/bin/sog
+ endif
+
+#
+#  JSKY
+ if ( -e INSTALL_STARJAVA/bin/jsky ) then
+    setenv JSKY_DIR INSTALL_STARJAVA/bin/jsky
+ endif
+
+#
+#  NDTOOLS
+ if ( -e INSTALL_STARJAVA/bin/ndtools ) then
+    setenv NDTOOLS_DIR INSTALL_STARJAVA/bin/ndtools
+ endif
+
+#
+#  SOAPSERVER
+ if ( -e INSTALL_STARJAVA/bin/soapserver ) then
+    setenv SOAPSERVER_DIR INSTALL_STARJAVA/bin/soapserver
+ endif
+
+
+#
+#  SURF
+if ( -e INSTALL_BIN/surf/surf.csh ) then
+   setenv SURF_DIR INSTALL_BIN/surf
+   setenv SURF_HELP INSTALL_HELP/surf/surf
+endif
+
+#
+#  SX
+if ( -e INSTALL_BIN/sx/dx.csh ) then
+   setenv SX_DIR INSTALL_BIN/sx
+endif
+
+#
+#  TSP
+if ( -e INSTALL_BIN/tsp/tsp.csh ) then
+   setenv TSP_DIR INSTALL_BIN/tsp
+endif
+
+#
+#  TWODSPEC
+# if ( -e INSTALL_BIN/twodspec/twodspec.csh ) then
+#    setenv TWODSPEC_DIR INSTALL_BIN/twodspec
+# endif
+
+#
+#  WFCPACK
+if ( -e INSTALL_BIN/wfcpack/wfcpack.csh ) then
+   setenv WFCBIN INSTALL_BIN/wfcpack
+   setenv WFCCAL INSTALL_ETC/wfcpack
+   setenv WFCDOCS INSTALL_BIN/wfcpack
+   setenv WFCHELP INSTALL_HELP/wfcpack
+endif
+
+#
+#  XRT
+if ( -f INSTALL_BIN/xrt/xrt.csh ) then
+   setenv XRT_ROOT INSTALL_ROOT
+endif
+
+#
+#  Run local Starlink login script if it exists
+if ( -e INSTALL_ROOT/local/etc/login ) then
+   source INSTALL_ROOT/local/etc/login
+endif
+
+#
+#  Set the flag to indicate this has been sourced
+setenv STAR_LOGIN
+
+
+
+#.

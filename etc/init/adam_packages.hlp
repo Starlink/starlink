@@ -1,0 +1,681 @@
+0 PACKAGES
+The following ADAM applications packages are available from Starlink:
+
++ASTERIX - X-ray data analysis.         *CATPAC  - Catalogue applications.
+ CCDPACK - CCD data reduction.          *CGS4DR  - CGS4 data reduction.
+ CONVERT - Data format conversion.       DAOPHOT - Stellar photometry.
+ ESP - Extended Surface Photometry.  EXTRACTOR - Astronomical source detection.
+ FIGARO  - General data-reduction.       HDSTOOLS - HDS file editing   
+ *IRAS90  - IRAS data analysis.         *IRCAMDR - IRCAM3 data reduction.       
+ JCMTDR  - JCMT data reduction.          KAPPA   - Image processing.            
+*NDPROGS - n-D data reduction.           PHOTOM  - Aperture photometry.
+ PISA    - Position, Intensity and Shape Analysis.
+ PONGO   - Interactive Data Plotting.    POLPACK - polarimetry data reduction.
+ SPECDRE - Spectroscopy Data Reduction (now part of FIGARO).
+*STARMAN - Stellar Photometry and Image/Table handling.
+ SURF    - SCUBA User Reduction Facility
+ TSP     - Time series and polarimetry data analysis.
+ UTILITIES -  Miscellaneous useful tools.
+*WFCPACK - ROSAT WFC data reduction.     XRT - Rosat/XRT data tools.
+
+ (*) indicates applications not available on Linux.
+ (+) indicated withdrawn package.
+
+1 ASTERIX
+
+[ The Asterix Package has been withdrawn from the Starlink Software
+  distribution.  However, the commands to start the Asterix system
+  have remained in the Starlink initialisation scripts to provide
+  for continued use of the Asterix system distributed by University of 
+  Birmingham. ]
+
+ASTERIX is a collection of applications written to analyse astronomical
+data in the X-ray waveband.  Many of these applications are general
+purpose and are capable of analysing any data which is received in the
+correct format.  It uses the standard Starlink NDF and employs the
+QUALITY array as a means of identifying bad pixels. It does NOT
+recognise magic values.
+
+The package has been designed to be instrument independent and
+currently has interfaces to all Exosat instruments and the ROSAT WFC.
+
+To start Asterix, you need to type:
+
+% asterix             {defines Asterix environment} 
+% icl                 {starts ICL}
+ICL> asterix          {defines Asterix commands}
+
+To get help on an Asterix command type "asthelp command_name" from
+either ICL or the Unix shell. 
+
+An introduction to using Asterix can be found in SUN/98.
+
+1 CATPAC
+
+ **** The CATPAC package is now deprecated and is no longer maintained. ****
+ **** Users are advised to use the CURSA package for catalogue access.  ****
+ **** CATPAC will be withdrawn from the USSC some time in the future.   ****
+
+CATPAC is the STARLINK CATalogue applications PACkage.  A range of
+applications have been provided to report, create, delete, search, join
+and merge catalogues.  In addition applications that manipulate
+information about catalogues and  applications that manipulate the data
+in catalogues are included.  Although some of the applications are
+specifically for manipulating astronomical catalogues the package
+includes general applications suitable for any tabular data.
+
+Those users familiar with the STARLINK SCAR Package should recognise
+most of the applications because CATPAC will eventually replace SCAR.
+CATPAC contains  several functions not found in SCAR.
+
+To start CATPAC, you should type:
+
+      ICL> CATPAC
+
+or to use from the shell, type:
+
+      % catpac
+
+SUN/120 gives full details of CATPAC.
+
+*** Not available on Linux systems ***
+
+1 CCDPACK
+
+ The functionality of CCDPACK relates to two main areas.  The first
+ covers the reduction of data to remove the instrumental signature
+ (debiassing, flatfielding etc.).  The second is concerned with
+ registration and mosaicing.  A full listing of the CCDPACK tasks with
+ a brief description of their purpose is found under the help topic
+ "Classified_Commands".
+ 
+ A major aim of CCDPACK is to help in the processing of large amounts
+ of data. Consequently all CCDPACK routines process lists of data and
+ log useful information using an internal logging system.
+
+ The package is initialised (shell or ICL) using the CCDPACK command.  
+ The hypertext help system can be activated using the `ccdwww' command.
+ The standard help can be obtained by typing `ccdhelp' or `ccdhelp 
+ "taskname"'.  Help can also be accessed at any prompt by returning a "?".
+
+ CCDPACK v2.0 has a GUI based automated data reduction facility.  To use
+ it, you need an X display.  To start it, type:
+
+    % ccdpack
+    % xreduce
+
+ from the shell.
+
+ Full details of CCDPACK are given in SUN/139.
+
+2 Classified_Commands
+
+ The main CCDPACK routines are.
+
+    MAKEBIAS - produces a bias calibration NDF
+
+    DEBIAS   - debiases NDFs either by bias calibration NDF 
+               subtraction or by interpolation, applies bad data 
+               masks, extracts a subset of the data area, produces 
+               variances applies saturation values
+
+    MAKECAL  - produces calibration NDFs for flash or dark counts
+
+    CALCOR   - performs dark or flash count corrections
+
+    MAKEFLAT - produces a calibration flatfield NDF
+
+    FLATCOR  - performs the flatfield correction on a list of NDFs
+
+    FINDCENT - centroids NDF image features
+
+    FINDOBJ  - locates and centroids NDF image features
+
+    FINDOFF  - Performs pattern-matching between position lists 
+               related by simple offsets.
+
+    IDICURS  - reads co-ordinates from a graphics device (allows
+               zooming and panning)
+
+    MAKEMOS  - makes NDF mosaics by combining and (optionally) 
+               normalising
+
+    PAIRNDF  - displays and manipulates NDF pairs to allow easy
+               registration (offsets only)
+
+    PLOTLIST - draws position markers on a graphics display
+
+    REGISTER - determines transformations between lists of positions
+
+    TRANLIST - transforms lists of positions
+
+    TRANNDF  - transforms (resamples) NDFs
+
+    CCDALIGN - determines general inter-NDF transformations
+
+ Routines which support the function of the main tasks are.
+
+    CCDSETUP - sets up the CCDPACK global parameters; 
+               should be used first
+
+    CCDCLEAR - clears the current global parameters
+
+    CCDNOTE  - adds a note to the log file
+
+    CCDSHOW  - displays the current values of any CCDPACK global
+               parameters
+
+    CCDBATCH - saves the current ADAM environment and writes
+               initialising batch commands (VMS specific)
+
+    LISTLOG  - lists the contents of a logfile. The output may be
+               written to a printable file (VMS only)
+
+    CCDEDIT  - edits the CCDPACK extensions of NDFs
+
+    CCDNDFAC - accesses a list of NDFs, writing their names to a file
+
+1 CGS4DR
+
+  CGS4DR, the integrated system for reducing CGS4 data should be started
+  from the Unix shell, thus:
+
+      % cgs4dr <data> <UTdate> <format>
+
+  where <data> is a data directory, <UTdate> is the UT date of the
+  observations and <format> is the format (ndf or dst). E.g., 
+
+      % cgs4dr /usr/local/scratch/pnd/19940811 940811 ndf
+
+  This release is a `stop-gap' release which provides a limited sub-set
+  of the functionality of the VMS system and runs under an ICL command 
+  line interface. This interface is documented in SUN/27 and users are
+  strongly urged to read that document before proceeding.
+
+  This release supports:
+
+    1) The reduction of BIAS, DARK, FLAT, ARC, OBJECT and SKY data in
+       either DST or NDF format into uncalibrated reduced observations
+       and groups;
+
+    2) Calibration of ARCs into reduced CALIBRATION frames;
+
+    3) The reduction of BIAS, DARK, FLAT, ARC, OBJECT and SKY data in
+       either DST or NDF format into calibrated reduced observations
+       and groups;
+
+    4) Observation filing, dividing by a standard source and the automated
+       extraction of spectra.
+
+  It does _not_ support any other features.
+
+*** Not available on Linux systems ***
+
+1 CONVERT
+ The CONVERT package contains some of the numerous format-conversion
+ routines which are necessary to translate data files to and from the
+ Starlink standard n-Dimensional-data format (NDF) described in
+ SUN/33 and SGP/38.  CONVERT commands are available from ICL and UNIX
+ shell.
+
+ The commands available are:
+
+     ASCII2NDF -- Converts an ASCII file to an NDF.
+     DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
+     GASP2NDF  -- Converts an image in GASP format to an NDF.
+     GIF2NDF   -- Converts a GIF file to an NDF.
+     IRAF2NDF  -- Converts an IRAF image to an NDF.
+     IRCAM2NDF -- Converts an IRCAM data file to a series of NDFs.
+     NDF2ASCII -- Converts an NDF to an ASCII file.
+     NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
+     NDF2FITS  -- Converts an NDF to a FITS file.
+     NDF2GASP  -- Converts a two-dimensional NDF into a GASP image.
+     NDF2GIF   -- Converts a two-dimensional NDF into a GIF file.
+     NDF2IRAF  -- Converts an NDF to an IRAF (OIF) image.
+     NDF2PGM   -- Converts a two-dimensional NDF into a PGM file.
+     NDF2TIFF  -- Converts a two-dimensional NDF into a TIFF file.
+     NDF2UNF   -- Converts an NDF to a sequential unformatted file.
+     TIFF2NDF  -- Converts a TIFF file to an NDF.
+     UNF2NDF   -- Converts a sequential unformatted file to an NDF.
+
+ Full details can be found in SUN/55.
+
+ To make all the format-conversion routines available, type
+
+     ICL> convert
+
+1 DAOPHOT
+
+DAOPHOT is a stellar photometry package written by Peter Stetson at
+DAO.  The package performs various tasks including finding objects,
+aperture photometry, obtaining the point-spread function, and
+profile-fitting photometry.  Profile fitting in crowded regions is
+performed iteratively which improves the accuracy of the photometry.
+The package does not directly use an image display, which has made it
+easily transportable, and DAOPHOT is in use all round the world.  The
+Starlink version uses image data written in NDF format.
+
+Three additional routines have been supplied which allow results
+obtained with DAOPHOT to be displayed on an image device.
+
+ o DAOGREY will display a grey scale image of the data on a suitable device.
+
+ o DAOPLOT will indicate the positions of objects found with DAOPHOT on top 
+   of the grey image.
+
+ o DAOCURS will allow positions to be measured from the screen.
+
+DAOPHOT is normally run from the Unix shell, more details may be found 
+in SUN/42.
+
+1 ESP
+
+ESP (standing for Extended Surface Photometry) is a package of routines
+that deal with various aspects of obtaining galaxy profiles.  They may
+be subdivided thus:
+
+    ELLPRO, ELLFOU and SECTOR      -  Profile generation.
+    HISTPEAK, LOBACK and HSUB      -  Background determination.
+    FASTMED, MASK, SKEW and TOPPED -  Image preparation.
+    GRAPHS                         -  Presentation of results.
+    CORR, SELFC, SELFCW and MIXUP  -  Object detection/enhancement.
+
+To activate the ESP commands, type:
+
+    ICL> esp
+
+ESP is fully detailed in SUN/180.
+
+1 EXTRACTOR
+
+EXTRACTOR is a program for automatically detecting objects on an
+astronomical image and building a catalogue of their properties. It is
+particularly suited for the reduction of large scale galaxy-survey
+data, but also performs well on other astronomical images.
+
+EXTRACTOR is a development of Emmanuel Bertin's SExtractor
+(Source-Extractor) program repackaged for use in the Starlink Software
+Environment.  This means that it uses the Starlink parameter system,
+accepts images in NDF format and uses the AST library for astrometry.
+
+To enable the EXTRACTOR commands, type:
+
+    ICL> extractor
+
+EXTRACTOR is described in SUN/226.
+
+1 FIGARO
+
+FIGARO is a data-reduction system written by Keith Shortridge at AAO.
+Although most users will find Figaro to be of greatest use in the
+reduction of spectroscopic data, it also has powerful image and
+data-cube manipulation facilities and a photometry package.  In many
+ways it is a descendent of Spica, possessing virtually all of the same
+reduction facilities, but its different methods of operation and data
+storage offer significant improvements in features and performance.
+Starlink recommends Figaro as the most complete available spectroscopic
+data-reduction system.
+
+For some years, Figaro has been available as a Starlink package quite
+distinct from and unconnected with ADAM (see SUN/86).  The ADAM version
+of Figaro uses the same applications code as the stand alone version.
+Running Figaro from ICL allows procedures to be used to sequence Figaro
+commands, and this, combined with the use of a single monolith, gives a
+significant speed increase over the stand alone system if multiple
+commands are issued.
+
+With the Spring-1998 CD-ROM distribution, the SPECDRE package application
+set has been merged into FIGARO.  SUN/86 gives details.
+
+1 HDSTOOLS
+
+  HDSTOOLS consists of a number tools for inspecting and editing HDS files.
+  They are slight modifications of the tools available in the Asterix
+  package, which is no longer supported.
+
+  The tools are:
+
+  HCOPY    - Copy HDS data objects.
+  HCREATE  - Create an HDS data object of specified type and dimensions.
+  HDELETE  - Delete an HDS object.
+  HDIR     - Produce a simple summary of an HDS object.
+  HDISPLAY - Display the contents of a primitive HDS object.
+  HFILL    - Fill an HDS data object with a specified value.
+  HGET     - Return information about an object.
+  HHELP    - Obtain HELP on the HDSTOOLS package.
+  HMODIFY  - Modify the value of an HDS object.
+  HREAD    - Read a file into an HDS object.
+  HRENAME  - Rename an HDS data object.
+  HRESET   - Change state of a primitive HDS object to undefined.
+  HRESHAPE - Reshape an HDS object.
+  HRETYPE  - Change the type of an HDS structure object.
+  HTAB     - Display one or more vector objects in table form.
+ 
+ SUN/245 contains details of the tools available.
+
+1 IRAS90 
+
+ **** The IRAS90 package is now deprecated and is no longer maintained. ****
+ **** It will be withdrawn from the USSC some time in the future.       ****
+
+The IRAS90 package is a set of applications for reducing and analysing
+IRAS Survey and Pointed Observation data.  It does not have any
+facilities for handling Low Resolution Spectrometer data, or catalogue
+data.
+
+To start IRAS90, you should type:
+
+    % iras90
+
+ *********************************************************************
+ *     IRAS90  is not available under ICL on Unix platforms          *
+ *********************************************************************
+
+Full details of how to use IRAS90 on Unix are given in SUN/161.
+
+*** Not available on Linux systems ***
+
+2 Commands
+
+The main IRAS90 routines are:
+
+    BACKCRDD  -  Remove a background from a group of CRDD files.
+    DESTCRDD  -  Equalise detector offsets within a group of CRDD files.
+    FFIELD    -  Identify the ISSA fields covering a given position.
+    HISTORY   -  Display history from a group of NDFs.
+    I90HELP   -  Display help on IRAS90.
+    IRASTRACE -  Display IRAS extension information from a group of NDF.
+    MAPCRDD   -  Map a group of CRDD files into an image.
+    NEWUNITS  -  Change the system of units in which an NDF is stored.
+    POSCRDD   -  Locate the closest CRDD files to a given position.
+    PREPARE   -  Prepare a FITS image for use by other IRAS90 routines.
+    QUALTOBAD -  Set NDF pixels bad which have a given set of qualities.
+    REMQUAL   -  Remove the definition of pixel qualities from an NDF.
+    SETQUAL   -  Assign a quality to a group of pixels in an NDF.
+    SHOWQUAL  -  Display the qualities currently defined within an NDF.
+    SIMCRDD   -  Generate simulated CRDD from a supplied trial sky image.
+    SKYALIGN  -  Align images using internally stored astrometric 
+                 information.
+    SKYBOX    -  Report extent and position of a rectangular region of 
+                 the sky.
+    SKYGRID   -  Annotate a picture with a celestial coordinates grid.
+    SKYLINE   -  Draw meridians, parallels and great circles over an image.
+    SKYMARK   -  Draw markers over an image at specified celestial
+                 coordinates.
+    SKYPOS    -  Transform positions between image and celestial 
+                 coordinates.
+    SKYWRITE  -  Write text over an image at specified celestial
+                 coordinates.
+    TRACECRDD -  Graphically display detector data streams from a CRDD file.
+
+1 IRCAMDR
+
+The IRCAMDR package is designed to reduce and analyse IRCAM3 data, but 
+can handle old IRCAM1/2 data, and any suitable data in NDF form.
+
+IRCAMDR is started from the shell prompt (%) thus:
+
+    % ircamdr
+
+SUN/41 gives full details of the commands available within IRCAMDR, and
+there is a hypertext version available (`showme sun41' or `findme ircamdr' 
+in the shell).
+
+Although IRCAMDR runs under ICL, it may only be started from the shell.
+
+*** Not available on Linux systems ***
+
+1 JCMTDR
+
+The JCMTDR package is a set of applications based on Figaro, for the
+reduction of continuum mapping data obtained with UKT14 on the JCMT.
+
+To start JCMTDR, type:
+
+    ICL> jcmtdr
+
+Further help may be obtained by:
+
+    ICL> help jcmtdr 
+
+SUN/132 contains full details of the JCMTDR applications. 
+
+1 KAPPA
+
+KAPPA -- the Kernel APplication PAckage -- currently comprises
+applications for general image processing, many of which will function
+with data of dimensionality other than two; data visualisation, with
+flexible control of the location and size of pictures; and the
+manipulation of NDF components.  Some of KAPPA's main features are fast
+algorithms; the handling of bad pixels and quality, processing of data
+errors, a help system, extensive error reporting, the utilisation of
+the AGI graphics database, and graphics-device independence via GKS and
+IDI.  Many applications work generically, that is handle all
+non-complex data types directly, for efficiency.  KAPPA is fully
+described in SUN/95.
+
+To make the commands of KAPPA available, type:
+
+    ICL> kappa
+
+1 NDPROGS
+
+ **** The NDPROGS package is now deprecated and is no longer maintained. ****
+ **** It will be withdrawn from the USSC some time in the future.        ****
+
+ NDPROGS is a Figaro based set of applications for manipulating and 
+ reducing n-Dimensional data sets.
+
+ NDPROGS may be accessed by typing:
+
+    ICL> ndprogs
+
+ Further details may be found in the NDPROGS help library:
+
+    ICL> ndprogshelp
+
+ or in SUN/19.
+
+*** Not available on Linux systems ***
+
+1 PHOTOM
+
+PHOTOM performs aperture photometry.  It has two basic modes of
+operation: using an interactive display to specify the positions for
+the measurements, or obtaining those positions from a file.  The
+aperture is circular or elliptical and the size and shape can be varied
+interactively on the display, or by entering values from the keyboard
+or parameter system.  The background sky level can be sampled
+interactively by manually positioning the aperture, or automatically
+from an annulus surrounding the object.
+
+PHOTOM accepts data files in NDF format (ref SGP/38).  Files can be
+converted from BDF to NDF using the BDF2NDF command of the CONVERT
+package (ref SUN/55).
+
+For more details of PHOTOM, see SUN/45.
+
+To run PHOTOM from ICL, type:
+
+    ICL> photom
+
+1 PISA
+
+PISA stands for Position, Intensity and Shape Analysis, and is the
+group name for a package of routines that deal with the location and
+parameterisation of objects on an image frame.
+
+For more details, see SUN/109.
+
+1 POLPACK
+
+POLPACK is a polarimetry package with full support for both single-beam and
+dual-beam polarimetry data.
+
+To run POLPACK from ICL, type:
+
+    ICL> polpack
+
+POLPACK is described in Starlink User Note 223 (SUN/223).
+
+1 PONGO
+
+PONGO is a set of applications for interactively plotting data. These
+applications are written to behave in a similar way to MONGO (SUN/64),
+but using PGPLOT (SUN/15) as their plotting package.  PONGO offers
+greater functionality than MONGO and is integrated within the STARLINK
+ADAM environment, meaning that the benefits of ICL (SG/5) and AGI
+(SUN/48) can be fully exploited.
+
+To start PONGO, type
+
+       % pongo
+
+To obtain help on any PONGO command, type
+
+       ICL> help <command>
+
+The PONGO Introduction topic provides a brief introduction to PONGO.
+
+1 SPECDRE
+
+ **** The SPECDRE package has been merged with the FIGARO package. ****
+ **** Please see the FIGARO package help or the FIGARO document    ****
+ **** SUN/86 for more information.                                 ****
+
+1 STARMAN
+
+STARMAN is a stellar photometry package designed for the reduction of
+data from imaging systems.  Its main components are:
+
+  o  crowded-field photometry programs
+
+  o  aperture photometry programs
+
+  o  a star finding program
+
+  o  a CCD reduction program.
+
+Image and table handling are served by a large number of programs which
+have a general use in photometry and other types of work.
+
+The package is a coherent whole, for use in the entire process of
+stellar photometry from raw images to the final standard-system
+magnitudes and their plotting as colour-magnitude and colour-colour
+diagrams.
+
+STARMAN is available from the shell command line, or from ICL.  To use
+STARMAN, first initialise the command line versions, then load the command
+definitions into ICL, thus:
+
+
+   % starman
+   % icl
+   ICL> starman
+
+STARMAN is extensively documented in the User's Guide, SUN/141.  To
+obtain on line help, type `starmanhelp' at the shell command line or
+within ICL.
+
+*** Not available on Linux systems ***
+
+1 SURF
+
+SURF is the SCUBA User Reduction Facility, a data reduction system written
+at the Joint Astronomy Centre (JACH), Hawaii, for reducing data obtained 
+with the Sub-mm Common-User Bolometer Array (SCUBA) at the James Clerk
+Maxwell Telescope.  Map, photometry and skydip observing modes are supported.
+
+SURF is available from ICL thus:
+
+    ICL> surf
+
+Starlink User Note 216 (SUN/216) gives full details on SURF and there is
+a SCUBA photometry cookbook in the Starlink Cookbook series, SC/10.
+
+  *** The full features of SURF require PERL, PERLMODS and STARPERL to ***
+  *** be installed.                                                    ***
+
+1 TSP
+
+TSP is an astronomical data reduction package which handles time series
+data and polarimetric data.  The essence of the system is a common data
+format in which time series polarimetry data can be represented.  This
+format is based on the Starlink standard data format described in
+SGP/38.  In particular, the polarimetry example given in that document
+is the basis for the TSP data format.
+
+TSP is an ADAM Monolith and is normally run from the ICL command language.
+It uses the HDS data system for data storage and the NCAR/SGS/GKS packages
+for graphics.  The system is fully described in SUN/66.
+
+2 CURRENT_USE
+
+TSP is currently used to process data from the following instruments:
+
+ o Spectropolarimetry data obtained with the AAO Pockels cell
+   spectropolarimeter in conjunction with either IPCS or CCD detectors.
+
+ o Time series polarimetry obtained with the Hatfield Polarimeter
+   at either UKIRT or AAT.
+
+ o Time series polarimetry obtained with the University of Turku
+   UBVRI polarimeter.
+
+ o Five channel time series photometry obtained with the Hatfield
+   polarimeter at the AAT in its high speed photometry mode.
+
+ o Time series infrared photometry obtained with the AAO Infrared
+   Photometer Spectrometer (IRPS).
+
+ o Time series optical photometry obtained using the HSP3 high speed
+   photometry package at the AAT.
+
+1 UTILITIES
+The following miscellaneous applications are available:
+
+  HDSTRACE  - HDS structure tracing (Ref SUN/102)
+  TAPECREATE - Tape Device Dataset creation (Ref SUN/171)
+
+To use them, just type the application name in response to the ICL> prompt.
+
+1 WFCPACK
+
+ WFCPACK is the unix port of the former VAX/VMS package WFCSORT, used for
+ converting ROSAT Wide Field Camera (WFC) data to Asterix (HDS) data format
+ and for some of the more common data reduction tasks needed for WFC data.
+
+ WFCPACK is required for converting WFC data obtained during the pointed
+ phase of the ROSAT mission.
+
+ To use WFCPACK, first initialise ASTERIX and WFCPACK, then enter ICL and
+ load WFCPACK, thus:
+
+   % aststart
+   % wfcstart
+   % icl
+   ICL> wfcpack
+
+ To obtain help on WFCPACK, type `wfchelp' after loading WFCPACK in ICL, or
+ from the shell command line.
+
+ WFCPACK is fully documented in SUN/62.  A hypertext version is available.
+ Type `findme wfcpack' or `showme sun62' from the shell command line.
+ (requires a hypertext browser and Xwindows display).
+
+ *** Not available on Linux systems ***
+
+1 XRT
+
+ XRT is a set of tools for ROSAt/XRT data access, extracted from the
+ Asterix package.
+
+ To initialise the XRT tools, start XRT from the shell prompt, enter
+ ICL, then load the command definitions:
+
+   % xrt
+   % icl
+   ICL> xrt
+
+ The XRT command set is the same as that available in AXTERIX. 
+
