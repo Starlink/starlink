@@ -52,7 +52,8 @@ in mode make-manifest-mode in sl.dsl
 		       (make-notecontents)
 		       (make-bibliography)
 		       (make-updatelist))
-		     system-id: (backmatter-sys-id))
+		     system-id: (backmatter-sys-id)
+		     force-chunk: #t)
       (empty-sosofo)))
 
 (define (make-manifest-backmatter)
@@ -203,7 +204,8 @@ Support notes as endnotes.
 			 (make element gi: "dl"
 			       (with-mode extract-notecontents
 				 (process-node-list notelist))))
-		       system-id: (notes-sys-id)))))
+		       system-id: (notes-sys-id)
+		       force-chunk: #t))))
 
 <routine>
 <description>
@@ -245,7 +247,8 @@ the data of the CITATION element.
 							     (bibliography-frag-id)))
 				     (literal "Bibliography")))
 			 (make fi data: bibcontents))
-		       system-id: (bibliography-sys-id))
+		       system-id: (bibliography-sys-id)
+		       force-chunk: #t)
 	(empty-sosofo))))
 
 <routine>
@@ -269,7 +272,8 @@ update elements which refer to them.
 				   (literal "Change history")))
 		       (with-mode extract-updatelist
 			 (process-node-list (getdocinfo 'history))))
-		     system-id: (updatelist-sys-id))
+		     system-id: (updatelist-sys-id)
+		     force-chunk: #t)
       (empty-sosofo)))
 
 ;(define (make-updatelist)
