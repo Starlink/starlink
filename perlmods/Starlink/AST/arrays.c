@@ -623,7 +623,7 @@ void* get_mortalspace( int n, char packtype ) {
    int * dummy;
    
    if (packtype!='f' && packtype!='i' && packtype!='d'
-       && packtype!='u' && packtype!='s')
+       && packtype!='u' && packtype!='s' && packtype!='v')
      croak("Programming error: invalid type conversion specified to get_mortalspace");
 
    work = sv_2mortal(newSVpv("", 0));
