@@ -131,6 +131,8 @@
 *        Added Q,U and V outputs.
 *     6-APR-1999 (DSB):
 *        Added rotation of reference direction (ANGRT).
+*     12-MAY-1999 (DSB):
+*        Corrected calculation of variances for P and Theta (linear mode).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -435,17 +437,18 @@
                         VQ = ( Q2 * VIIN + VQIN )/( I**2 )
                         VU = ( U2 * VIIN + VUIN )/( I**2 )
 
-*  Find the average variance of the normalised Q and U.
-                        EPS2 = 0.5*( VQ + VU )
+*  Fractional polarisation.
+                        EPS2 = ( Q2 * VQ + U2 * VU )/P2
 
-*  Percentage polarisation.
+*  Percentage polarisation
                         VP = 10000.0 * EPS2
 
-*  Polarisation angle (degs).
-                        VT = RTOD * RTOD * 0.25 * EPS2 / P2
-
-*  Polarised intensity.
+*  Polarized intensity.
                         VIP = P2*VI + I*I*EPS2
+
+*  Polarisation angle (degs).
+                        VT = RTOD * RTOD * ( Q2 * VU + U2 *VQ )/
+     :                                     ( 4.0*P2*P2 )
 
 *  If any of the variances are negative store bad results.
                         IF ( VIP .LT. 0.0 .OR. VI .LT. 0.0 .OR.
