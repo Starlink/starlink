@@ -438,7 +438,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (USE_CALIBRATOR) THEN
-            CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS, BADBIT,
+            CALL SCULIB_DIV_CALIBRATOR (N_BOLS * N_POS,
      :        %val(DEMOD_DATA_PTR), %val(DEMOD_VARIANCE_PTR),
      :        %val(DEMOD_CALIBRATOR_PTR), %val(DEMOD_QUALITY_PTR))
          END IF
