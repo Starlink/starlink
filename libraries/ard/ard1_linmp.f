@@ -208,7 +208,7 @@
 
 *  The current test point is mapped using the candidate matrix. 
          DO I = 1, NOUT
-            A( I ) = ORIG( I );
+            A( I ) = ORIG( I )
             DO J = 1, NIN
                A( I ) = A( I ) + OUT( J, I )*IN( NIN + 2*ITEST, J )
             END DO

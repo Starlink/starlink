@@ -202,15 +202,15 @@
                   IF( STATUS .NE. SAI__OK ) THEN
 
                      IF( AXIS .GE. 1 ) THEN
-                        CALL MSG_SETC( 'L', '''' );
+                        CALL MSG_SETC( 'L', '''' )
                         CALL MSG_SETC( 'L', DOM )
                         CALL MSG_SETC( 'L', ' '//LAB )
-                        CALL MSG_SETC( 'L', '''' );
+                        CALL MSG_SETC( 'L', '''' )
                      ELSE
-                        CALL MSG_SETC( 'L', '''Axis' );
-                        CALL MSG_SETC( 'L', ' ' );
+                        CALL MSG_SETC( 'L', '''Axis' )
+                        CALL MSG_SETC( 'L', ' ' )
                         CALL MSG_SETI( 'L', AXIS )
-                        CALL MSG_SETC( 'L', '''' );
+                        CALL MSG_SETC( 'L', '''' )
                      END IF
 
                      CALL MSG_SETC( 'DESC', ELEM( I : J ) )
