@@ -83,6 +83,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,8 @@
 *        Original version.
 *     1996 July 26 (MJC):
 *        Uses improved validation routine.
+*     4-JUN-1998 (DSB):
+*        Corrected typo in final context error message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -241,7 +244,7 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FITSTEXT_ERR',
      :     'FITSTEXT: Unable to transfer the FITS header information '/
-     :     /'form the text file to the NDF FITS extension.', STATUS )
+     :     /'from the text file to the NDF FITS extension.', STATUS )
       END IF
 
       END

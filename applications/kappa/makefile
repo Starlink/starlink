@@ -222,6 +222,8 @@
 #        Add IRAF inter-operability
 #     1998 March 9 (AJC):
 #        Add links to lookup tables for IRAF
+#     2-JUN-1998 (DSB):
+#        Version 0.12. Various bug fixes...
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -410,7 +412,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.11
+PKG_VERS = 0.12
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
