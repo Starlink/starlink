@@ -9,9 +9,10 @@
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 PERLBIN=@PERL@
+ECHONONL=@ECHONONL@
 
 test: local.config ../moggy
-	PERLBIN=$(PERLBIN) ./runtests && touch test
+	PERLBIN=$(PERLBIN) ECHONONL='$(ECHONONL)' ./runtests && touch test
 
 t3.run: t3.C ../util.o
 	$(CXX) $(CXXFLAGS) -o $@ t3.C ../util.o
