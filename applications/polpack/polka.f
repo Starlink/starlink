@@ -68,7 +68,9 @@
 *     output data files are created. Once initiated, no further interaction on
 *     the part of the user is required. This is the computationally intensive
 *     bit. The GUI makes use of various applications from POLPACK, KAPPA and 
-*     CCDPACK to perform all these tasks.
+*     CCDPACK to perform all these tasks. Note, if the find the image
+*     display area too small for comfort you can make it bigger using the
+*     DPI parameter described below.
 *     
 *     A step-by-step tutorial on the use of the GUI is available within the
 *     "Help" menu at the right hand end of the menu bar (see also the STARTHELP

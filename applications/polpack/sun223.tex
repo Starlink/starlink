@@ -987,11 +987,13 @@ images:
 A Graphical User Interface (GUI) is created for this purpose, including
 an image display area in which any of the input images may be displayed,
 and controls to select any of the above features (see Figure
-~\ref{fig:polka}). Once the required features have been supplied, POLKA
-commences the processing of the supplied data frames. This may take a
-significant length of time depending on your hardware, and the size and
-number of your images. A window displays the progress being made during
-this phase.
+~\ref{fig:polka}). Note, if you find the image display area uncomfortably
+small, it can be made larger by assigning a suitable value to the DPI
+parameter when POLKA is started. Once the required features have been
+supplied, POLKA commences the processing of the supplied data frames.
+This may take a significant length of time depending on your hardware,
+and the size and number of your images. A window displays the progress
+being made during this phase.
 
 \begin{latexonly}
   \begin{figure}[htpb]
@@ -2979,7 +2981,9 @@ for NDF applications.
       output data files are created. Once initiated, no further interaction on
       the part of the user is required. This is the computationally intensive
       bit. The GUI makes use of various applications from POLPACK, \xref{KAPPA}{sun95}{} and
-      \xref{CCDPACK}{sun139}{} to perform all these tasks.
+      \xref{CCDPACK}{sun139}{} to perform all these tasks. Note, if the find 
+      the image display area too small for comfort you can make it bigger 
+      using the DPI parameter described below.
 
       A step-by-step tutorial on the use of the GUI is available within the
       \texttt{"}Help\texttt{"} menu at the right hand end of the menu bar (see also the STARTHELP
