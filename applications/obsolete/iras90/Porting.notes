@@ -1,0 +1,110 @@
+IRAS90 Porting notes
+
+These are notes associated with the (untested) port to Linux.
+
+ - All include files changed from lower case to upper case (easier
+   for case-less operating systems).
+
+ - Some variables were initialised after warnings from -Wall
+
+ - IFL files and startup scripts integrated into a single ifd files
+
+ - all demo programs can be built from the makefile
+   (make check will work where appropriate)
+
+The following nag routines are used in iras90:
+
+  e01baf
+     ctemz0.f
+     ctemz1.f
+     irc1_imcoi.f
+  e02bcf
+     ctemz4.f
+     irc1_imcoi.f
+  e02bdf
+     ctemz1.f
+  e02bbf
+     ctemz2.f
+  f04aef
+     irm_lintr.f
+  g02caf
+     irc1_sbfit.f
+
+Other porting notes:
+
+irq1_sbad1.f
+  - needed some changes (removal of IZEXT) that may have lead
+    to errors.
+
+ffield.f
+  - jint replaced with call to aint
+    hr, deg, min, sec were all floats.
+  - Some formats fixed for prompting
+
+pscont
+  - not ported to use kaprh for plotting
+    [since turbocont is now obsolete, should be using kappa contour]
+
+NDG
+  - Now uses standalone NDG rather than private NDG.
+    Calls to NDG_ANNUL replaced with NDF_ANNUL
+    Calls to NDG_DELET replaced with NDF_DELET
+
+		ANNUL	DELETE	Init	INCLUDE
+
+  backcrdd.f	X	X	X
+  cdcra9.f			X
+  deglcrdd.f	X
+  destcrdd.f	X	X
+  dgcra4.f			X
+  find02.f			X
+  find03.f				X
+  find11.f				X
+  find13.f				X
+  find23.f				X
+  find27.f				X
+  find29.f				X
+  find39.f			X
+  find40.f				X
+  find45.f				X
+  history.f	X		X
+  i90help.f					SHL
+  irastrace.f	X
+  mapca0.f	X
+  mapca2.f	X
+  mapca5.f	X
+  mapcrdd.f	X
+  newunits.f	X	X	X
+  poina6.f			X
+  poina8.f			X
+  poind1.f			X
+  pointcrdd.f			X
+  posca0.f			X
+  posca1.f			X
+  posca4.f	X
+  poscrdd.f	X
+  prepa7.f	X	X
+  prepare.f	X
+  prepb1.f			X
+  prepc2.f	X
+  qualtobad.f	X	X	X
+  remqual.f	X
+  setimage.f	X
+  setqual.f	X		X
+  showqual.f	X		X
+  simcb1.f	X
+  simcrdd.f	X	X
+  skyalign.f	X	X
+  skyphot.f			X
+  skypos.f			X
+  skywrite.f					Remove CHR_LEN
+  smara3.f					Remove CHR_LEN
+  sphoz1.f					Fix FIO_WRITE
+  sphoz2.f					Fix FIO_WRITE
+  swria0.f					Remove CHR_LEN
+  swria2.f			X
+  swria4.f					Remove CHR_LEN
+  traca6.f			X
+  tracb5.f			X
+  tracecrdd.f	X
+
