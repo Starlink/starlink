@@ -58,6 +58,7 @@
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *        Tidy refs to CNF routines
 *      8-JAN-2002 (AJC):
 *        #include <string.h>
+*      22-SEP-2004 (TIMJ):
+*        Use asctime_r if present
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,12 +82,19 @@
 *-----------------------------------------------------------------------------
 */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 /* Global Constants:		.					    */
 
 #include <string.h>              /* C string library                        */
 #include <time.h>		 /* C time library			    */
 #include "f77.h"		 /* C - Fortran interface		    */
 #include "sae_par.h"		 /* ADAM constants			    */
+
+/* Number of characters mandated by asctime for buffer space */
+#define SZ_ASCTIME 26
 
 
 F77_SUBROUTINE(psx_asctime)( POINTER(tstrct), CHARACTER(string),
@@ -100,8 +110,11 @@ F77_SUBROUTINE(psx_asctime)( POINTER(tstrct), CHARACTER(string),
 /* Local Variables:							    */
 
    int i;			 /* Loop counter			    */
-   char time_s[26];		 /* The string returned by asctime	    */
+   char time_s[SZ_ASCTIME+1];	 /* The string returned by asctime	    */
    struct tm *tstrctc;           /* C version of pointer                    */
+#if HAVE_ASCTIME && !HAVE_ASCTIME_R
+   char * temps;                 /* Pointer to string returned by asctime */
+#endif
 
 /* Check inherited global status.					    */
 
@@ -113,7 +126,20 @@ F77_SUBROUTINE(psx_asctime)( POINTER(tstrct), CHARACTER(string),
 
 /* Convert the time structure and copy it to time_s.                        */
 
-   strcpy( time_s, asctime( tstrctc ) );
+#if HAVE_ASCTIME_R
+   asctime_r( tstrctc, time_s );
+#else
+# if HAVE_ASCTIME
+   temps = asctime( tstrctc );
+   if (temps) {
+     strncpy( time_s, temps, (size_t)SZ_ASCTIME );
+   } else {
+     strcpy( time_s, "<undefined>" );
+   }
+# else
+#  error Unable to locate asctime function
+# endif
+#endif
 
 /* Remove the newline character at the end of the string.		    */
 
