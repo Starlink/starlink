@@ -8,8 +8,8 @@ Starlink::HDSPACK - routines for high level HDS manipulation
 
   use Starlink::HDSPACK;
 
-  copobj("file.more.fits","file1.more", $status);
-  delobj("file.more.fits");
+  $status = copobj("file.more.fits","file1.more", $status);
+  $status = delobj("file.more.fits", $status);
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ sub retrieve_locs {
 
 }
 
-=item copobj
+=item B<copobj>
 
 Copy an HDS object to a specified output structure.
 
@@ -226,7 +226,7 @@ sub copobj {
   return $status;
 }
 
-=item delobj
+=item B<delobj>
 
 Delete the named object structure.
 
