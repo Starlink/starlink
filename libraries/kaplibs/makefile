@@ -468,7 +468,7 @@ PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR PAR_ERR PRM_PAR GRP_PAR GRP_ERR \
                     CAT_PAR PSX_ERR SUBPAR_PAR NDF_PAR NUM_DEF_CVT \
-                    NUM_DEC_CVT 
+                    NUM_DEC_CVT MSG_PAR AST_PAR FIO_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -602,18 +602,21 @@ LPG_CONST:   lpg_const;           $(LINK) $? $@
 LPG_COM:     lpg_com;             $(LINK) $? $@
 FTS_PAR:     fts_par;             $(LINK) $? $@
 
-SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
-DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
-PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
-PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
-GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
-GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
+AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
-PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
-SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
+DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
+FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
+GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
+GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
+MSG_PAR:   $(STAR_INC)/msg_par;   $(LINK) $? $@
 NDF_PAR:   $(STAR_INC)/ndf_par;   $(LINK) $? $@
 NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
 NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
+PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
+PRM_PAR:   $(STAR_INC)/prm_par;   $(LINK) $? $@
+PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
+SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 

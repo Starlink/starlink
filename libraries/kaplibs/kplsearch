@@ -6,7 +6,7 @@
 
 #  Purpose:
 #     Display names of kaplibs routines (see SUN/238) which contain
-#     a given search phrase in their "Purpose" string.
+#     a given search phrase in their short description.
 
 #  Language:
 #     tcl
@@ -14,9 +14,9 @@
 #  Description:
 #     This script displays names of kaplibs routines which contain
 #     a given search phrase (or any of its sub-strings) in their 
-#     "Purpose" information. By default, routines from all the KAPLIB 
-#     libraries are included, but the search can be restricted to 
-#     particular libraries by specifying one or more of the library 
+#     short description ("Purpose"). By default, routines from all the 
+#     KAPLIBS libraries are included, but the search can be restricted 
+#     to particular libraries by specifying one or more of the library 
 #     selection options (-aif, -ctg, etc).
 
 #  Invocation:
@@ -27,13 +27,15 @@
 #                  (default is to match any sub-phrases).
 #     -alpha       sort matching routine names alphabetically
 #                  (default is to sort by relevance).
+#     -names       search the routines names for the search phrase
+#                  instead of the routine short descriptions.
 #     -whole       match only whole words
 #                  (default is to match sub-words).
-#     -aif         include AIF_ routines in the results
-#     -ctg         include CTG_ routines in the results
-#     -lpg         include LPG_ routines in the results
-#     -fts         include FTS1_ routines in the results
-#     -kpg         include KPG1_ routines in the results
+#     -aif         include AIF_ routines in the results.
+#     -ctg         include CTG_ routines in the results.
+#     -lpg         include LPG_ routines in the results.
+#     -fts         include FTS1_ routines in the results.
+#     -kpg         include KPG1_ routines in the results.
 
 #  Authors:
 #     DSB: David S. Berry (Starlink)
@@ -163,6 +165,7 @@ proc search {test words} {
    set wholeword 0
    set sort "w"
    set prefs ""
+   set searchnames 0
 
 #  Check each command line argument.
    set ok 1
@@ -170,6 +173,9 @@ proc search {test words} {
 
       if { $arg == "-exact" } {
          set whole 1
+
+      } elseif { $arg == "-names" } {
+         set searchnames 1
 
       } elseif { $arg == "-whole" } {
          set wholeword 1
@@ -215,9 +221,9 @@ proc search {test words} {
       puts ""
       puts "Displays names of kaplibs routines (see SUN/238) which contain"
       puts "a given search phrase (or any of its sub-strings) in their"
-      puts "\"Purpose\" information. By default, routines from all the KAPLIB"
-      puts "libraries are included, but the search can be restricted to"
-      puts "particular libraries by specifying one or more of the library"
+      puts "short descriptions, or names. By default, routines from all the"
+      puts "KAPLIBS libraries are included, but the search can be restricted"
+      puts "to particular libraries by specifying one or more of the library"
       puts "selection options (-aif, -ctg, etc)."
       puts ""
       puts "usage: kplsearch \[options\] <search phrase>"
@@ -227,6 +233,8 @@ proc search {test words} {
       puts "               (default is to match any sub-phrases)"
       puts "  -alpha       sort matching routine names alphabetically"
       puts "               (default is to sort by relevance)"
+      puts "  -names       search the routines names for the search phrase"
+      puts "               instead of the routine short descriptions."
       puts "  -whole       match only whole words"
       puts "               (default is to match sub-words)"
       puts "  -aif         include AIF_ routines in the results"
@@ -279,14 +287,24 @@ proc search {test words} {
 #  If matching whole phrase only...
    if { $whole } {
       foreach name $routines {
-         set w [search $purpose($name) $words]
+         if { $searchnames } {
+            set text $name
+         } else {
+            set text $purpose($name)
+         }  
+         set w [search $text $words]
          if { $w > 0.0 } { set weight($name) $w }
       }
 
 #  If sub-phrases can be matched...
    } else {
       foreach name $routines {
-         set w [subsearch $purpose($name) $words]
+         if { $searchnames } {
+            set text $name
+         } else {
+            set text $purpose($name)
+         }  
+         set w [subsearch $text $words]
          if { $w > 0.0 } { set weight($name) $w }
       }
    }
