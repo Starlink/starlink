@@ -782,7 +782,7 @@
             IF ( GETS .AND.
      :           ( ABS( SS ) .GT. ABS( TOLS * SCALE ) ) ) THEN
                STATUS = USER__002
-               CALL MSG_SETR( 'TOLS', ABS( TOLS * SCALE ) )
+               CALL MSG_SETD( 'TOLS', ABS( DBLE( TOLS ) * SCALE ) )
                CALL MSG_SETI( 'MAXIT', MAX( MAXIT, 1 ) )
                CALL MSG_SET<T>( 'DS', SS )
                CALL ERR_REP( 'CCD1_CMPR<T>_DS',
@@ -797,7 +797,7 @@
             IF ( GETZ .AND.
      :           ( ABS( ZZ ) .GT. ABS( TOLZ * SCALE ) ) ) THEN
                STATUS = USER__002
-               CALL MSG_SETR( 'TOLZ', ABS( TOLZ * SCALE ) )
+               CALL MSG_SETD( 'TOLZ', ABS( DBLE( TOLZ ) * SCALE ) )
                CALL MSG_SETI( 'MAXIT', MAX( MAXIT, 1 ) )
                CALL MSG_SET<T>( 'DZ', ZZ )
                CALL ERR_REP( 'CCD1_CMPR<T>_DZ',
