@@ -89,6 +89,7 @@
         CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
 *  otherwise get locator to open dataset
       ELSE
+        CALL USI_INIT()
         IF (G_MULTI) THEN
           LOC=G_MLOC
         ELSE
@@ -107,16 +108,16 @@
 *  get device if not already open
         CALL GDV_STATUS(ACTIVE,STATUS)
         IF (.NOT.ACTIVE) THEN
-          CALL PAR_GET0C('DEV',DEV,STATUS)
+          CALL USI_GET0C('DEV',DEV,STATUS)
         ELSE
 *  otherwise see if display surface to be cleared
-          CALL PAR_GET0L('CLEAR',CLEAR,STATUS)
+          CALL USI_GET0L('CLEAR',CLEAR,STATUS)
           CALL GDV_FRESH(FRESH,STATUS)
         ENDIF
 
 
 *  see if user-id and date wanted on plot
-        CALL PAR_GET0L('ID',ID,STATUS)
+        CALL USI_GET0L('ID',ID,STATUS)
 
 *  open device, clear display, set default attributes
         IF (.NOT.ACTIVE) THEN
@@ -154,6 +155,12 @@
         ENDIF
 
         CALL GCB_DETACH(STATUS)
+
+        CALL AST_CLOSE()
+
+      ELSE
+
+        CALL USI_CLOSE()
 
       ENDIF
 

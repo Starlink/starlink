@@ -39,6 +39,7 @@
 
       ELSE
 *  close previous data if loaded
+        CALL USI_INIT()
         IF (G_MULTI) THEN
           CALL HDS_CLOSE(G_MLOC,STATUS)
         ELSE
@@ -49,7 +50,7 @@
       ENDIF
 
 *  get input image
-      CALL PAR_GET0C('INP',GDAT,STATUS)
+      CALL USI_GET0C('INP',GDAT,STATUS)
       CALL HDS_OPEN(GDAT,'UPDATE',ILOC,STATUS)
       CALL DAT_PRIM(ILOC,PRIM,STATUS)
 
@@ -78,9 +79,9 @@
 *  get graphics device
         CALL GDV_STATUS(ACTIVE,STATUS)
         IF (.NOT.ACTIVE.AND.STATUS.EQ.SAI__OK) THEN
-          CALL PAR_GET0C('DEV',DEV,STATUS)
-          CALL PAR_GET0I('NX',NX,STATUS)
-          CALL PAR_GET0I('NY',NY,STATUS)
+          CALL USI_GET0C('DEV',DEV,STATUS)
+          CALL USI_GET0I('NX',NX,STATUS)
+          CALL USI_GET0I('NY',NY,STATUS)
           CALL MSG_PRNT('Opening device...')
           CALL GDV_OPEN(DEV,NX,NY,STATUS)
         ENDIF
@@ -97,4 +98,8 @@
 
       ENDIF
 
+      CALL USI_CLOSE()
+
       END
+
+

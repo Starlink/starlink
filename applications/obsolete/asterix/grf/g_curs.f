@@ -43,7 +43,7 @@
 *  is current dataset multiple
           IF (G_MULTI) THEN
 *  if so get required plot number
-            CALL PAR_GET0I('PLOT',PLOT,STATUS)
+            CALL USI_GET0I('PLOT',PLOT,STATUS)
 *  and recreate coordinate transformation
             CALL GTR_RECALL(PLOT,XV1,XV2,YV1,YV2,ABS,
      :                              XW1,XW2,YW1,YW2,SCALED,STATUS)
@@ -62,8 +62,8 @@
           ENDIF
         ENDIF
 
-        CALL PAR_GET0L('MARK',MARK,STATUS)
-        CALL PAR_GET0L('BOX',BOX,STATUS)
+        CALL USI_GET0L('MARK',MARK,STATUS)
+        CALL USI_GET0L('BOX',BOX,STATUS)
         X1=0.0
         Y1=0.0
 
@@ -73,8 +73,8 @@
           CALL GFX_CURSOR(X1,Y1,LEFT,RIGHT,STATUS)
 
 *  output to parameter system
-          CALL PAR_PUT0R('X1',X1,STATUS)
-          CALL PAR_PUT0R('Y1',Y1,STATUS)
+          CALL USI_PUT0R('X1',X1,STATUS)
+          CALL USI_PUT0R('Y1',Y1,STATUS)
 
           IF (.NOT.BOX.AND.MARK) THEN
             CALL PGPOINT(1,X1,Y1,2)
@@ -87,8 +87,8 @@
             CALL GFX_CURSOR(X2,Y2,LEFT,RIGHT,STATUS)
 
 *  output to parameter system
-            CALL PAR_PUT0R('X2',X2,STATUS)
-            CALL PAR_PUT0R('Y2',Y2,STATUS)
+            CALL USI_PUT0R('X2',X2,STATUS)
+            CALL USI_PUT0R('Y2',Y2,STATUS)
 
             IF (MARK) THEN
               CALL PGMOVE(X1,Y1)

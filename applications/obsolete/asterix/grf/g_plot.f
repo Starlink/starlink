@@ -23,11 +23,11 @@
       REAL X,Y
       LOGICAL KEY,LEFT,RIGHT
 *-
-      CALL PAR_GET0L('KEY',KEY,STATUS)
+      CALL USI_GET0L('KEY',KEY,STATUS)
 
       IF (KEY) THEN
-        CALL PAR_GET0R('X',X,STATUS)
-        CALL PAR_GET0R('Y',Y,STATUS)
+        CALL USI_GET0R('X',X,STATUS)
+        CALL USI_GET0R('Y',Y,STATUS)
       ELSE
         CALL MSG_PRNT('Select point to plot to...')
         CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)

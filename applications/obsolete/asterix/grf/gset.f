@@ -74,19 +74,19 @@
       ENDIF
 
 *  see if diagnostic dump wanted
-      CALL PAR_GET0L('DUMP',DUMP,STATUS)
+      CALL USI_GET0L('DUMP',DUMP,STATUS)
 
       IF (.NOT.DUMP.AND.STATUS.EQ.SAI__OK) THEN
 
 *  get control parameter keyword
         HELP=.TRUE.
         DO WHILE (HELP.AND.STATUS.EQ.SAI__OK)
-          CALL PAR_GET0C('SWITCH',SWITCH,STATUS)
+          CALL USI_GET0C('SWITCH',SWITCH,STATUS)
           CALL CHR_UCASE(SWITCH)
           SWITCH=SWITCH(:3)
           IF (SWITCH.EQ.'HEL') THEN
             CALL GSET_HELP(STATUS)
-            CALL PAR_CANCL('SWITCH',STATUS)
+            CALL USI_CANCL('SWITCH',STATUS)
           ELSE
             HELP=.FALSE.
           ENDIF
@@ -97,10 +97,10 @@
         ENDIF
 
 *  cancel show or set
-        CALL PAR_GET0L('SHOW',SHOW,STATUS)
-        CALL PAR_GET0L('OFF',CANCEL,STATUS)
+        CALL USI_GET0L('SHOW',SHOW,STATUS)
+        CALL USI_GET0L('OFF',CANCEL,STATUS)
         IF (.NOT.CANCEL) THEN
-          CALL PAR_GET0L('CANCEL',CANCEL,STATUS)
+          CALL USI_GET0L('CANCEL',CANCEL,STATUS)
         ENDIF
 
       ENDIF
@@ -593,9 +593,9 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  are default axes to be suppressed
-        CALL PAR_PROMT('SUPPRESS','Are axes to be suppressed',
+        CALL USI_PROMT('SUPPRESS','Are axes to be suppressed',
      :                                                 STATUS)
-        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+        CALL USI_GET0L('SUPPRESS',SUPPRESS,STATUS)
 
         IF (SUPPRESS) THEN
 
@@ -616,73 +616,73 @@
         ELSE
 
 *  get individual control parameters - NULL means no change
-          CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+          CALL USI_GET0I('WIDTH',WIDTH,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETW=.FALSE.
           ENDIF
 
-          CALL PAR_GET0I('FONT',FONT,STATUS)
+          CALL USI_GET0I('FONT',FONT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETF=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          CALL USI_GET0R('SIZE',SIZE,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETS=.FALSE.
           ENDIF
 
-          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          CALL USI_GET0I('BOLD',BOLD,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETB=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('TICK',TICK,STATUS)
+          CALL USI_GET0R('TICK',TICK,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETT=.FALSE.
           ENDIF
 
-          CALL PAR_GET0I('DIV',DIV,STATUS)
+          CALL USI_GET0I('DIV',DIV,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETD=.FALSE.
           ENDIF
 
-          CALL PAR_GET0C('OPT',OPT,STATUS)
+          CALL USI_GET0C('OPT',OPT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETO=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('LO',LO,STATUS)
+          CALL USI_GET0R('LO',LO,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETLO=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('HI',HI,STATUS)
+          CALL USI_GET0R('HI',HI,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETHI=.FALSE.
           ENDIF
 
-          CALL PAR_GET0L('LOG',LOGAX,STATUS)
+          CALL USI_GET0L('LOG',LOGAX,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETL=.FALSE.
           ENDIF
 
-          CALL PAR_GET0L('RADEC',RADEC,STATUS)
+          CALL USI_GET0L('RADEC',RADEC,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETRADEC=.FALSE.
           ENDIF
 
-          CALL PAR_GET0L('SCALE',SCALE,STATUS)
+          CALL USI_GET0L('SCALE',SCALE,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETSCALE=.FALSE.
@@ -938,9 +938,9 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  are all labels to be suppressed
-        CALL PAR_PROMT('SUPPRESS','Are all labels to be suppressed',
+        CALL USI_PROMT('SUPPRESS','Are all labels to be suppressed',
      :                                                       STATUS)
-        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+        CALL USI_GET0L('SUPPRESS',SUPPRESS,STATUS)
 
         IF (SUPPRESS) THEN
           TEXT=' '
@@ -952,31 +952,31 @@
         ELSE
 
 *  get individual control parameters - NULL means no change
-          CALL PAR_GET0C('TEXT',TEXT,STATUS)
+          CALL USI_GET0C('TEXT',TEXT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETT=.FALSE.
           ENDIF
 
-          CALL PAR_GET0I('FONT',FONT,STATUS)
+          CALL USI_GET0I('FONT',FONT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETF=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          CALL USI_GET0R('SIZE',SIZE,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETS=.FALSE.
           ENDIF
 
-          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          CALL USI_GET0I('BOLD',BOLD,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETB=.FALSE.
           ENDIF
 
-          CALL PAR_GET0R('OFFSET',OFFSET,STATUS)
+          CALL USI_GET0R('OFFSET',OFFSET,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
             SETO=.FALSE.
@@ -1182,27 +1182,27 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_DEF0C('OPT','PC',STATUS)
-        CALL PAR_GET0C('OPT',OPT,STATUS)
+        CALL USI_DEF0C('OPT','PC',STATUS)
+        CALL USI_GET0C('OPT',OPT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETO=.FALSE.
         ENDIF
-        CALL PAR_CANCL('OPT',STATUS)
+        CALL USI_CANCL('OPT',STATUS)
 
-        CALL PAR_GET0I('FONT',FONT,STATUS)
+        CALL USI_GET0I('FONT',FONT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETF=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
+        CALL USI_GET0R('SIZE',SIZE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
+        CALL USI_GET0I('BOLD',BOLD,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETB=.FALSE.
@@ -1374,7 +1374,7 @@
 
 *  get individual control parameters - NULL means no change
 
-        CALL PAR_GET0C('TEXT',TEXT,STATUS)
+        CALL USI_GET0C('TEXT',TEXT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SET=.FALSE.
@@ -1548,33 +1548,33 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETW=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('STYLE',STYLE,STATUS)
+        CALL USI_GET0I('STYLE',STYLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('FONT',FONT,STATUS)
+        CALL USI_GET0I('FONT',FONT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETF=.FALSE.
         ENDIF
 
 
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
+        CALL USI_GET0R('SIZE',SIZE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETSZ=.FALSE.
@@ -1759,19 +1759,19 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('STYLE',STYLE,STATUS)
+        CALL USI_GET0I('STYLE',STYLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETW=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
@@ -1947,19 +1947,19 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('STYLE',STYLE,STATUS)
+        CALL USI_GET0I('STYLE',STYLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETW=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
@@ -2139,25 +2139,25 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('SYMBOL',SYMBOL,STATUS)
+        CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
+        CALL USI_GET0I('BOLD',BOLD,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETB=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
+        CALL USI_GET0R('SIZE',SIZE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETZ=.FALSE.
@@ -2341,14 +2341,14 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0C('SCALING',SCALING,STATUS)
+        CALL USI_GET0C('SCALING',SCALING,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETSCA=.FALSE.
         ELSE
           CALL CHR_UCASE(SCALING)
           IF (SCALING(:3).EQ.'CYC') THEN
-            CALL PAR_GET0I('CYCLES',CYCLES,STATUS)
+            CALL USI_GET0I('CYCLES',CYCLES,STATUS)
             IF (STATUS.EQ.PAR__NULL) THEN
               CALL ERR_ANNUL(STATUS)
             ELSE
@@ -2357,13 +2357,13 @@
           ENDIF
         ENDIF
 
-        CALL PAR_GET0R('MIN',MIN,STATUS)
+        CALL USI_GET0R('MIN',MIN,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETMIN=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('MAX',MAX,STATUS)
+        CALL USI_GET0R('MAX',MAX,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETMAX=.FALSE.
@@ -2561,25 +2561,25 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET1R('LEVELS',GCB__MXCONTLEV,LEVS,NLEV,STATUS)
+        CALL USI_GET1R('LEVELS',GCB__MXCONTLEV,LEVS,NLEV,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETL=.FALSE.
         ENDIF
 
-        CALL PAR_GET1I('STYLE',GCB__MXCONTLEV,STYLE,NSTYLE,STATUS)
+        CALL USI_GET1I('STYLE',GCB__MXCONTLEV,STYLE,NSTYLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET1I('WIDTH',GCB__MXCONTLEV,WIDTH,NWIDTH,STATUS)
+        CALL USI_GET1I('WIDTH',GCB__MXCONTLEV,WIDTH,NWIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETW=.FALSE.
         ENDIF
 
-        CALL PAR_GET1I('COLOUR',GCB__MXCONTLEV,COLOUR,NCOL,STATUS)
+        CALL USI_GET1I('COLOUR',GCB__MXCONTLEV,COLOUR,NCOL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
@@ -2773,7 +2773,7 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0R('ANGLE',ANGLE,STATUS)
+        CALL USI_GET0R('ANGLE',ANGLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETA=.FALSE.
@@ -2938,13 +2938,13 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('FRAME',FRAME,STATUS)
+        CALL USI_GET0I('FRAME',FRAME,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETF=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('POS',POS,STATUS)
+        CALL USI_GET0I('POS',POS,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETP=.FALSE.
@@ -3115,19 +3115,19 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('SHAPE',SHAPE,STATUS)
+        CALL USI_GET0I('SHAPE',SHAPE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETS=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETW=.FALSE.
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETC=.FALSE.
@@ -3323,9 +3323,9 @@
         ENDIF
 
 *  are titles to be suppressed altogether
-        CALL PAR_PROMT('SUPPRESS','Are all titles to be suppressed',
+        CALL USI_PROMT('SUPPRESS','Are all titles to be suppressed',
      :                                                       STATUS)
-        CALL PAR_GET0L('SUPPRESS',SUPPRESS,STATUS)
+        CALL USI_GET0L('SUPPRESS',SUPPRESS,STATUS)
 
         IF (SUPPRESS) THEN
 
@@ -3341,8 +3341,8 @@
             N1=0
           ENDIF
           N2=N1+1
-          CALL PAR_DEF0I('NUM',N2,STATUS)
-          CALL PAR_GET0I('NUM',N2,STATUS)
+          CALL USI_DEF0I('NUM',N2,STATUS)
+          CALL USI_GET0I('NUM',N2,STATUS)
           IF (N2.GT.N1) THEN
             N2=N1+1
           ENDIF
@@ -3352,7 +3352,7 @@
           RPT=.TRUE.
           N3=N2
           DO WHILE (RPT)
-            CALL PAR_GET0C('TEXT',TEXT,STATUS)
+            CALL USI_GET0C('TEXT',TEXT,STATUS)
             IF (STATUS.EQ.PAR__NULL) THEN
               CALL ERR_ANNUL(STATUS)
               RPT=.FALSE.
@@ -3366,7 +3366,7 @@
             ENDIF
             IF (RPT) THEN
               N3=N3+1
-              CALL PAR_CANCL('TEXT',STATUS)
+              CALL USI_CANCL('TEXT',STATUS)
             ENDIF
           ENDDO
 
@@ -3374,7 +3374,7 @@
             CALL GCB_SETI('TITLE_N',N3,STATUS)
           ENDIF
 
-          CALL PAR_GET0I('FONT',FONT,STATUS)
+          CALL USI_GET0I('FONT',FONT,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -3383,7 +3383,7 @@
             ENDDO
           ENDIF
 
-          CALL PAR_GET0I('BOLD',BOLD,STATUS)
+          CALL USI_GET0I('BOLD',BOLD,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -3392,7 +3392,7 @@
             ENDDO
           ENDIF
 
-          CALL PAR_GET0R('SIZE',SIZE,STATUS)
+          CALL USI_GET0R('SIZE',SIZE,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -3401,7 +3401,7 @@
             ENDDO
           ENDIF
 
-          CALL PAR_GET0C('JUST',JUST,STATUS)
+          CALL USI_GET0C('JUST',JUST,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -3569,8 +3569,8 @@
           N1=0
         ENDIF
         N2=N1+1
-        CALL PAR_DEF0I('NUM',N2,STATUS)
-        CALL PAR_GET0I('NUM',N2,STATUS)
+        CALL USI_DEF0I('NUM',N2,STATUS)
+        CALL USI_GET0I('NUM',N2,STATUS)
 
         IF (N2.GT.N1) THEN
           N2=N1+1
@@ -3578,56 +3578,56 @@
         ENDIF
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0C('TEXT',TEXT,STATUS)
+        CALL USI_GET0C('TEXT',TEXT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1C('NOTE_TEXT',N2,1,TEXT,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('X',X,STATUS)
+        CALL USI_GET0R('X',X,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('NOTE_X',N2,1,X,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('Y',Y,STATUS)
+        CALL USI_GET0R('Y',Y,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('NOTE_Y',N2,1,Y,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('ANGLE',ANGLE,STATUS)
+        CALL USI_GET0R('ANGLE',ANGLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('NOTE_ANGLE',N2,1,ANGLE,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('FONT',FONT,STATUS)
+        CALL USI_GET0I('FONT',FONT,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('NOTE_FONT',N2,1,FONT,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
+        CALL USI_GET0I('BOLD',BOLD,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('NOTE_BOLD',N2,1,BOLD,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
+        CALL USI_GET0R('SIZE',SIZE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('NOTE_SIZE',N2,1,SIZE,STATUS)
         ENDIF
 
-        CALL PAR_GET0C('JUST',JUST,STATUS)
+        CALL USI_GET0C('JUST',JUST,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -3635,7 +3635,7 @@
           CALL GCB_SET1C('NOTE_JUST',N2,1,JUST,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -3798,8 +3798,8 @@
           N1=0
         ENDIF
         N2=N1+1
-        CALL PAR_DEF0I('NUM',N2,STATUS)
-        CALL PAR_GET0I('NUM',N2,STATUS)
+        CALL USI_DEF0I('NUM',N2,STATUS)
+        CALL USI_GET0I('NUM',N2,STATUS)
 
         IF (N2.GT.N1) THEN
           N2=N1+1
@@ -3807,49 +3807,49 @@
         ENDIF
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0I('SYMBOL',SYMBOL,STATUS)
+        CALL USI_GET0I('SYMBOL',SYMBOL,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('MARKER_SYMBOL',N2,1,SYMBOL,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('X',X,STATUS)
+        CALL USI_GET0R('X',X,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('MARKER_X',N2,1,X,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('Y',Y,STATUS)
+        CALL USI_GET0R('Y',Y,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('MARKER_Y',N2,1,Y,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('BOLD',BOLD,STATUS)
+        CALL USI_GET0I('BOLD',BOLD,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('MARKER_BOLD',N2,1,BOLD,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('SIZE',SIZE,STATUS)
+        CALL USI_GET0R('SIZE',SIZE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('MARKER_SIZE',N2,1,SIZE,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('MARKER_COLOUR',N2,1,COLOUR,STATUS)
         ENDIF
 
-        CALL PAR_GET0L('NUMBER',NUMBER,STATUS)
+        CALL USI_GET0L('NUMBER',NUMBER,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -4010,8 +4010,8 @@
           N1=0
         ENDIF
         N2=N1+1
-        CALL PAR_DEF0I('NUM',N2,STATUS)
-        CALL PAR_GET0I('NUM',N2,STATUS)
+        CALL USI_DEF0I('NUM',N2,STATUS)
+        CALL USI_GET0I('NUM',N2,STATUS)
 
         IF (N2.GT.N1) THEN
           N2=N1+1
@@ -4019,7 +4019,7 @@
         ENDIF
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0C('TYPE',TYPE,STATUS)
+        CALL USI_GET0C('TYPE',TYPE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -4027,14 +4027,14 @@
           CALL GCB_SET1C('SHAPE_TYPE',N2,1,TYPE,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('X',X,STATUS)
+        CALL USI_GET0R('X',X,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1R('SHAPE_X',N2,1,X,STATUS)
         ENDIF
 
-        CALL PAR_GET0R('Y',Y,STATUS)
+        CALL USI_GET0R('Y',Y,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -4042,15 +4042,15 @@
         ENDIF
 
         IF (TYPE.EQ.'VECTOR') THEN
-          CALL PAR_PROMT('DATA1','X offset',STATUS)
+          CALL USI_PROMT('DATA1','X offset',STATUS)
         ELSEIF (TYPE.EQ.'CIRCLE') THEN
-          CALL PAR_PROMT('DATA1','Radius',STATUS)
+          CALL USI_PROMT('DATA1','Radius',STATUS)
         ELSEIF (TYPE.EQ.'ELLIPSE') THEN
-          CALL PAR_PROMT('DATA1','Semi-major axis',STATUS)
+          CALL USI_PROMT('DATA1','Semi-major axis',STATUS)
         ELSEIF (TYPE.EQ.'BOX') THEN
-          CALL PAR_PROMT('DATA1','X width',STATUS)
+          CALL USI_PROMT('DATA1','X width',STATUS)
         ENDIF
-        CALL PAR_GET0R('DATA1',DATA1,STATUS)
+        CALL USI_GET0R('DATA1',DATA1,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -4059,13 +4059,13 @@
 
         IF (TYPE.NE.'CIRCLE') THEN
           IF (TYPE.EQ.'VECTOR') THEN
-            CALL PAR_PROMT('DATA2','Y offset',STATUS)
+            CALL USI_PROMT('DATA2','Y offset',STATUS)
           ELSEIF (TYPE.EQ.'ELLIPSE') THEN
-            CALL PAR_PROMT('DATA2','Ratio of axes',STATUS)
+            CALL USI_PROMT('DATA2','Ratio of axes',STATUS)
           ELSEIF (TYPE.EQ.'BOX') THEN
-            CALL PAR_PROMT('DATA2','Y width',STATUS)
+            CALL USI_PROMT('DATA2','Y width',STATUS)
           ENDIF
-          CALL PAR_GET0R('DATA2',DATA2,STATUS)
+          CALL USI_GET0R('DATA2',DATA2,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -4074,8 +4074,8 @@
         ENDIF
 
         IF (TYPE.EQ.'ELLIPSE') THEN
-          CALL PAR_PROMT('DATA3','Angle',STATUS)
-          CALL PAR_GET0R('DATA3',DATA3,STATUS)
+          CALL USI_PROMT('DATA3','Angle',STATUS)
+          CALL USI_GET0R('DATA3',DATA3,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -4083,21 +4083,21 @@
           ENDIF
         ENDIF
 
-        CALL PAR_GET0I('WIDTH',WIDTH,STATUS)
+        CALL USI_GET0I('WIDTH',WIDTH,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('SHAPE_WIDTH',N2,1,WIDTH,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('STYLE',STYLE,STATUS)
+        CALL USI_GET0I('STYLE',STYLE,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
           CALL GCB_SET1I('SHAPE_STYLE',N2,1,STYLE,STATUS)
         ENDIF
 
-        CALL PAR_GET0I('COLOUR',COLOUR,STATUS)
+        CALL USI_GET0I('COLOUR',COLOUR,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
         ELSE
@@ -4236,25 +4236,25 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get individual control parameters - NULL means no change
-        CALL PAR_GET0R('X1',X1,STATUS)
+        CALL USI_GET0R('X1',X1,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETX1=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('X2',X2,STATUS)
+        CALL USI_GET0R('X2',X2,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETX2=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('Y1',Y1,STATUS)
+        CALL USI_GET0R('Y1',Y1,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETY1=.FALSE.
         ENDIF
 
-        CALL PAR_GET0R('Y2',Y2,STATUS)
+        CALL USI_GET0R('Y2',Y2,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETY2=.FALSE.
@@ -4450,11 +4450,11 @@
         SETNEG=.TRUE.
 
 *  read in colour table
-        CALL DAT_ASSOC('TABLE','READ',TLOC,STATUS)
+        CALL USI_DASSOC('TABLE','READ',TLOC,STATUS)
 
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
-          CALL PAR_GET0L('RGB',RGB,STATUS)
+          CALL USI_GET0L('RGB',RGB,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             CALL ERR_ANNUL(STATUS)
           ELSE
@@ -4498,7 +4498,7 @@
           ENDDO
         ENDIF
 
-        CALL PAR_GET0L('NEG',NEG,STATUS)
+        CALL USI_GET0L('NEG',NEG,STATUS)
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL(STATUS)
           SETNEG=.FALSE.

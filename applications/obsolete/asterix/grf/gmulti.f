@@ -63,12 +63,12 @@
 
       HELP=.TRUE.
       DO WHILE (HELP.AND.STATUS.EQ.SAI__OK)
-        CALL PAR_GET0C('SWITCH',SWITCH,STATUS)
+        CALL USI_GET0C('SWITCH',SWITCH,STATUS)
         CALL CHR_UCASE(SWITCH)
         SWITCH=SWITCH(:3)
         IF (SWITCH.EQ.'HEL') THEN
           CALL GMULTI_HELP(STATUS)
-          CALL PAR_CANCL('SWITCH',STATUS)
+          CALL USI_CANCL('SWITCH',STATUS)
         ELSE
           HELP=.FALSE.
         ENDIF
@@ -137,7 +137,7 @@
 *  construct parameter name
           GRAFPAR='INP'//ICHAR(:NCHAR)
 *  get locator to dataset to be added
-          CALL DAT_ASSOC(GRAFPAR,'READ',GLOC,STATUS)
+          CALL USI_DASSOC(GRAFPAR,'READ',GLOC,STATUS)
           CALL GMD_QMULT(GLOC,MULTI,STATUS)
           IF (.NOT.MULTI) THEN
             CALL GFX_NDFTYPE(GLOC,STATUS)
@@ -177,12 +177,12 @@
 
 *  delete mode
       ELSEIF (DEL.AND.STATUS.EQ.SAI__OK) THEN
-        CALL PAR_GET0I('NDF',IGRAF,STATUS)
+        CALL USI_GET0I('NDF',IGRAF,STATUS)
         CALL GMD_DELNDF(LOC,IGRAF,STATUS)
 
 *  split mode
       ELSEIF (SPLIT.AND.STATUS.EQ.SAI__OK) THEN
-        CALL DAT_ASSOC('INP1','READ',GLOC,STATUS)
+        CALL USI_DASSOC('INP1','READ',GLOC,STATUS)
         CALL BDA_CHKDATA(GLOC,OK,NDIM,DIMS,STATUS)
         IF (OK.AND.NDIM.EQ.2) THEN
           CALL GMULTI_SPLIT(GLOC,DIMS(1),DIMS(2),LOC,STATUS)
@@ -471,18 +471,18 @@
         SETX=.TRUE.
         SETY=.TRUE.
 
-        CALL PAR_GET0L('CANCEL',CANCEL,STATUS)
+        CALL USI_GET0L('CANCEL',CANCEL,STATUS)
 * cancel ?
         IF (CANCEL) THEN
           CALL GMD_CANLAYOUT(LOC,STATUS)
         ELSE
 *  otherwise get x by y
-          CALL PAR_GET0I('NX',NX,STATUS)
+          CALL USI_GET0I('NX',NX,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             SETX=.FALSE.
             CALL ERR_ANNUL(STATUS)
           ENDIF
-          CALL PAR_GET0I('NY',NY,STATUS)
+          CALL USI_GET0I('NY',NY,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             SETY=.FALSE.
             CALL ERR_ANNUL(STATUS)
@@ -531,7 +531,7 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL PAR_GET0L('CANCEL',CANCEL,STATUS)
+        CALL USI_GET0L('CANCEL',CANCEL,STATUS)
         IF (CANCEL) THEN
           CALL GMD_CANPLOTS(LOC,STATUS)
         ELSE
@@ -539,7 +539,7 @@
           CALL GMD_QPLOTS(LOC,NPLOT,STATUS)
 
 *  get plot number
-          CALL PAR_GET0I('PLOT',PLOT,STATUS)
+          CALL USI_GET0I('PLOT',PLOT,STATUS)
           IF (PLOT.GT.NPLOT+1) THEN
             PLOT=NPLOT+1
             CALL MSG_SETI('NPL',NPLOT)
@@ -547,8 +547,8 @@
             CALL MSG_PRNT(' ** only ^NPL plots already defined '//
      :                      '- new plot will be ^PLO')
           ENDIF
-          CALL PAR_GET0I('BASE',BASE,STATUS)
-          CALL PAR_GET0C('OVLY',OVLY,STATUS)
+          CALL USI_GET0I('BASE',BASE,STATUS)
+          CALL USI_GET0C('OVLY',OVLY,STATUS)
           IF (STATUS.EQ.PAR__NULL) THEN
             OVLY=' '
             CALL ERR_ANNUL(STATUS)
