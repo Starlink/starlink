@@ -67,6 +67,8 @@
             CALL IREGION_POLYGON(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ANN') THEN
             CALL IREGION_ANNULUS(EXCLUDE,STATUS)
+          ELSEIF (MODE.EQ.'ELL') THEN
+            CALL IREGION_ELLIPSE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'WHO') THEN
             CALL IREGION_WHOLE(STATUS)
           ELSEIF (MODE.EQ.'SLI') THEN
@@ -175,6 +177,51 @@
       ENDIF
 
       END
+
+
+
+
+*+
+      SUBROUTINE IREGION_ELLIPSE(EXCLUDE,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+      LOGICAL EXCLUDE
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      REAL XC,YC,ANGLE,MAJOR,MINOR
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL IMG_GETELLIPSE('XC','YC','ANGLE','MAJOR','MINOR',
+     :                           XC,YC,ANGLE,MAJOR,MINOR,STATUS)
+        CALL IMG_SETELLIPSE(XC,YC,ANGLE,MAJOR,MINOR,EXCLUDE,STATUS)
+
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_ELLIPSE',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
 
 
 
