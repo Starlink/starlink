@@ -39,7 +39,6 @@
         ENDDO
 
         IF (SPARE) THEN
-          DS(I).ADIFPN =.TRUE.
           DS(I).PAR=PAR
           DS(I).USED=.TRUE.
           DS(I).IO=IO
