@@ -8031,9 +8031,7 @@ could say:
    \sstdescription{
       This attribute specifies the FK5 J2000.0 declination of a reference
       point on the sky. See the description of attribute \htmlref{RefRA}{RefRA} for details.
-      This attribute has an undefined value bu default, resulting in an
-      error being reported if any calculation is performed which needs a value
-      for this attribute.
+      This attribute has a default value of zero.
    }
    \sstattributetype{
       String.
@@ -8058,10 +8056,7 @@ could say:
       {\tt{"}}hh:mm:ss.ss{\tt{"}} is used for RefRA, and
       {\tt{"}}dd:mm:ss.s{\tt{"}} is used for RefDec.
 
-      Both RefRA and RefDec have undefined values by default, resulting in an
-      error being reported if any calculation is performed which needs a value
-      for this attribute. Explicit values must be set for the RefRA and 
-      RefDec attributes to overcome this.
+      RefRA has a default value of zero.
    }
    \sstattributetype{
       String.
@@ -8076,12 +8071,7 @@ could say:
       This attribute specifies the frequency corresponding to zero
       velocity. It is used when converting between between velocity-based
       spectral coordinate systems and and other coordinate systems (such as 
-      frequency, wavelength, energy, etc).
-
-      The default value is undefined resulting in an error being reported
-      if an attempt is made to convert between a velocity system and a 
-      non-velocity system. If you want to work entirely within one system or 
-      the other, it is not necessary to assign a value to this attribute. 
+      frequency, wavelength, energy, etc). The default value is 1.0E5 GHz.
 
       When setting a new value for this attribute, the new value can be
       supplied either directly as a frequency, or indirectly as a wavelength
@@ -8120,8 +8110,8 @@ could say:
       frame specified by the StdOfRest attribute when accessed using
       WCSATTRIB.
 
-      The default value is zero, resulting in the {\tt{"}}Source{\tt{"}} standard of
-      rest being equivalent to the {\tt{"}}Heliocentric{\tt{"}} standard of rest.
+      The default value corresponds to zero velocity within the
+      restframe specified by the {\tt StdOfRest} attribute.
    }
    \sstattributetype{
       Floating point.
