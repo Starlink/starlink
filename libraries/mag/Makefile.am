@@ -21,7 +21,7 @@ libmag_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES) \
 libmag_adam_la_SOURCES = $(F_ROUTINES_ADAM) \
 	$(include_MESSAGES) $(PRIVATE_INCLUDES) $(BLOCKDATA_ADAM)
 
-include_MESSAGES = MAG_ERR MIO_ERR mio_err.h
+include_MESSAGES = MAG_ERR 
 noinst_MESSAGES = MIO_ERR mio_err.h
 
 PRIVATE_INCLUDES = MAGGO_SCL MAGIO_CMN MAGPA_SCL MAGSCL_PAR MAG_SYS \
@@ -54,7 +54,7 @@ BLOCKDATA_ADAM = mag_blk.f
 C_ROUTINES = ioc.c
 
 
-BUILT_SOURCES = $(include_MESSAGES)
+BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES)
 
 
 # magtest is ADAM monolith
