@@ -753,7 +753,8 @@ m31_issa_12a.sdf cobe.sdf scumos.sdf
 
 STYLE_FILES = kappa_style.def kappa_ardplot_style.def kappa_lutview_style.def \
 kappa_keystyle.def kappa_linplot_keystyle.def kappa_vecplot_keystyle.def \
-kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def
+kappa_display_keystyle.def sty0 sty1 sty2 sty3 kappa_contour_keystyle.def \
+kappa_drawnorth_style.def
 
 #  Define the package demo files for use with stardemo.tcl
 
