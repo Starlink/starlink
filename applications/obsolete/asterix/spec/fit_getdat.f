@@ -294,14 +294,14 @@
 	    CALL DAT_ANNUL(LOC,STATUS)
 	  ENDDO
 	ENDIF
-	IF(STATUS.NE.SAI__OK) GOTO 9000
+	IF(STATUS.NE.SAI__OK) GOTO 99
 
 * Abort if maximum permitted number of datasets is exceeded
 	IF(NDSC.GT.NDSMAX)THEN
 	  STATUS=SAI__ERROR
 	  CALL ERR_REP('BADNDS','Maximum number of input datasets exceeded',
      :    STATUS)
-	  GOTO 9000
+	  GOTO 99
 	ENDIF
 
 * Loop through dataset containers
@@ -322,11 +322,11 @@
 
 *    Check main data array
 	  CALL BDA_CHKDATA(DCLOC(N),OK,NDIM,DIMS,STATUS)
-	  IF(STATUS.NE.SAI__OK) GOTO 9000
+	  IF(STATUS.NE.SAI__OK) GOTO 99
 	  IF(.NOT.OK)THEN
 	    STATUS=SAI__ERROR
 	    CALL ERR_REP('BADDAT','Error accessing data array',STATUS)
-	    GOTO 9000
+	    GOTO 99
 	  ENDIF
 
 *      Check that spectrum is exposure corrected (i.e in ct/s)
@@ -354,7 +354,7 @@
 	      ELSE
 	        CALL ERR_REP(' ','No exposure times found in dataset',
      :          STATUS)
-	        GOTO 9000
+	        GOTO 99
 	      ENDIF
 	    ENDIF
 
@@ -402,7 +402,7 @@
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP(' ','Background array does not match'//
      :          ' data array',STATUS)
-	        GOTO 9000
+	        GOTO 99
 	      ENDIF
 
 *      Abort if b/g has been subtracted, but is not available
@@ -410,7 +410,7 @@
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP('NOBG','Subtracted background data is'//
      :          ' not available',STATUS)
-	        GOTO 9000
+	        GOTO 99
 	      ENDIF
 
 *      Has background been exposure corrected? (We will require raw count
@@ -441,7 +441,7 @@
 	      CALL ERR_REP('BADDIM','Spectral set has incorrect '//
      :        'dimensionality',STATUS)
 	    ENDIF
-	    IF(STATUS.NE.SAI__OK) GOTO 9000
+	    IF(STATUS.NE.SAI__OK) GOTO 99
 	    CALL MSG_SETI('NSPEC',DIMS(2))
 	    CALL MSG_PRNT('Spectral set containing ^NSPEC spectra')
 	    IF(DETNO(N).GT.0)THEN
@@ -480,7 +480,7 @@
 	      STATUS=SAI__ERROR
 	      CALL ERR_REP('BADNDS','Maximum number of input datasets '//
      :        'exceeded',STATUS)
-	      GOTO 9000
+	      GOTO 99
 	    ENDIF
 
 *       Set up name, locator and set position
@@ -531,7 +531,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	      ENDDO
 	      CALL BDA_MAPDATA(OBDAT(NDS).DLOC,'READ',OBDAT(NDS).DPTR,
      :        STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 9000
+	      IF(STATUS.NE.SAI__OK) GOTO 99
 	    ENDIF
 
 *         For likelihood case scale to give raw counts, & accumulate SSCALE
@@ -540,7 +540,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).DPTR,STATUS)
 	      CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :        %VAL(OBDAT(NDS).DPTR),STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 9000
+	      IF(STATUS.NE.SAI__OK) GOTO 99
 	      CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).DPTR))
 	    ENDIF
 
@@ -568,7 +568,7 @@ D    :        obdat(nds).idim,obdat(nds).ndim
 	        OBDAT(NDS).VPTR=0			! Flag
 	      ENDIF
 	    ENDIF
-	    IF(STATUS.NE.SAI__OK) GOTO 9000
+	    IF(STATUS.NE.SAI__OK) GOTO 99
 
 *          Get quality
 	    CALL BDA_CHKQUAL(OBDAT(NDS).DLOC,QUAL,NDIM,DIMS,STATUS)
@@ -619,7 +619,7 @@ D	    print *,'ldim,udim :',ldim,udim
 *          Map weights as 1D array
 	    IF(WEIGHTS)THEN
 	      CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).WPTR,STATUS)
-	      IF(STATUS.NE.SAI__OK) GOTO 9000
+	      IF(STATUS.NE.SAI__OK) GOTO 99
 	    ELSE
 	      OBDAT(NDS).WPTR=0				! Flag
 	    ENDIF
@@ -632,7 +632,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	      CALL MSG_SETI('NDS',NDS)
 	      STATUS=SAI__ERROR
 	      CALL ERR_REP('NO_GOOD','No good data in dataset ^NDS',STATUS)
-	      GOTO 9000
+	      GOTO 99
 	    ELSE
 	      NGOOD=NGOOD+NGDAT
 	    ENDIF
@@ -660,7 +660,7 @@ D	    print *,'ldim,udim :',ldim,udim
 
 *           Simple BDA_ map for straight b/g spectrum
 	          CALL BDA_MAPDATA(BLOC(N),'READ',OBDAT(NDS).BPTR,STATUS)
-	          IF(STATUS.NE.SAI__OK) GOTO 9000
+	          IF(STATUS.NE.SAI__OK) GOTO 99
 	        ENDIF
 
 *           Scale b/g to give raw counts if it has been exposure corrected
@@ -669,7 +669,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	          CALL DYN_MAPR(1,OBDAT(NDS).NDAT,OBDAT(NDS).BPTR,STATUS)
 	          CALL ARR_COP1R(OBDAT(NDS).NDAT,%VAL(PTR),
      :            %VAL(OBDAT(NDS).BPTR),STATUS)
-	          IF(STATUS.NE.SAI__OK) GOTO 9000
+	          IF(STATUS.NE.SAI__OK) GOTO 99
 	          CALL ARR_MULTR(TEFF,OBDAT(NDS).NDAT,%VAL(OBDAT(NDS).BPTR))
 	        ENDIF
 
@@ -708,7 +708,7 @@ D	    print *,'ldim,udim :',ldim,udim
 *      Look for instrument response, set up INSTR if found, and report
 	      CALL FIT_GETINS( OBDAT(NDS).DLOC, SPECNO,
      :               PREDDAT(NDS).CONVOLVE, INSTR(NDS), STATUS )
-	      IF(STATUS.NE.SAI__OK) GOTO 9000
+	      IF(STATUS.NE.SAI__OK) GOTO 99
             END IF
 
 	    IF(PREDDAT(NDS).CONVOLVE)THEN
@@ -718,7 +718,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	        STATUS=SAI__ERROR
 	        CALL ERR_REP('BAD_DIM','Convolution with instrument response'
      :          //' is only supported for 1D data at present',STATUS)
-	        GOTO 9000
+	        GOTO 99
 	      ENDIF
 	    ENDIF
 
@@ -729,7 +729,7 @@ D	    print *,'ldim,udim :',ldim,udim
 	ENDDO
 
 *  Set up ADI stuff
-      IF ( STATUS .EQ. SAI__OK ) THEN
+ 99   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Input is not a set?
         IF ( OBDAT(1).SETINDEX .EQ. 0 ) THEN
