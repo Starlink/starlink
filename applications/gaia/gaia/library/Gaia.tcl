@@ -238,7 +238,9 @@ itcl::class gaia::Gaia {
 
       #  XXX DEBUGGING CODE XXX
       source GaiaTextImport.tcl 
-      gaia::GaiaTextImport .imp
+      gaia::GaiaTextImport .imp \
+         -outfile temp.ast -infile test.ASC -format ast \
+         -show_infile 0 -show_outfile 0
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or

@@ -674,7 +674,7 @@ itcl::class gaia::GaiaTextImport {
                   set values_($this,y) 3
                   set y 3
                }
-            } elseif { $ncolumns == 3 } {
+            } elseif { $ncolumns_ == 3 } {
 
                #  Only three columns. Defaults are id, ra, dec.
                if { $id == -1 && $ra == -1 && $dec == -1 &&
