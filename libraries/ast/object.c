@@ -69,6 +69,7 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     1-FEB-1996 (RFWS):
@@ -94,6 +95,9 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *        Fixed bug in algorithm for encoding Object IDs.
 *     15-SEP-1999 (RFWS)
 *        Made astAnnulId accessible from protected code.
+*     12-APR-2000 (DSB):
+*        Zero all memory allocated for a new Object in InitObject before
+*        storing any new values in the memory.
 *class--
 */
 
@@ -2811,6 +2815,10 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 /* Obtain a pointer to the new Object. */
    if ( astOK ) {
       new = (AstObject *) mem;
+
+/* Zero the entire new Object structure (to prevent accidental re-use
+   of any of its values after deletion). */
+      (void) memset( new, 0, new->size );
 
 /* If necessary, initialise the virtual function table. */
 /* ---------------------------------------------------- */
