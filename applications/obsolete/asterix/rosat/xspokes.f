@@ -82,6 +82,7 @@
       INTEGER HTYPE                                ! Fits header, style
       INTEGER MXCOL                                ! Max number of columns
         PARAMETER (MXCOL = 512)
+      INTEGER NFILES                               ! Number of FITS files
       INTEGER NROWS                                ! Fits table, no of rows
       INTEGER NHDU                                 ! Fits header, unit
       INTEGER VARIDAT                              ! Fitsio variable
@@ -91,11 +92,12 @@
       INTEGER MAXRAW                               ! Max value
         PARAMETER (MAXRAW = 500)
 *
-      CHARACTER*132 FROOT                           ! Root of FITS filename
-      CHARACTER*132 FILENAME
-
       CHARACTER*20  EXTNAME                         ! File extension name
-      CHARACTER*5   ORIGIN
+      CHARACTER*100 FILES(MAXRAW)                   ! List of FITS files
+      CHARACTER*500 FITSDIR                         ! FITS directory
+      CHARACTER*132 FROOT                           ! Root of FITS filename
+      CHARACTER*500 SRT_ROOTNAME                    ! Dir and file name
+      CHARACTER*5   ORIGIN                          ! FITS file type
       CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
       CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
       CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
@@ -177,16 +179,26 @@
 *
 *  Get root name of FITS file
          CALL USI_GET0C ('ROOTNAME', FROOT, STATUS )
+
 *  Append filename extension of FITS file containing header information
-         FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+         SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
 *
-         CALL MSG_PRNT('XSPOKES : Using FITS file : '// FILENAME)
+*  Does file exist?
+      CALL UTIL_FINDFILE('.', SRT_ROOTNAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+*  If file not in current directory prompt for path
+      IF (NFILES .LE. 0) THEN
+        CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+        SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//SRT_ROOTNAME
+      END IF
+         CALL MSG_PRNT('XSPOKES : Using FITS file : '// SRT_ROOTNAME)
 *
 *  Open the FITS file
          CALL FIO_GUNIT(IUNIT, STATUS)
-         CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+         CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
          IF ( STATUS .NE. SAI__OK ) THEN
-	    CALL MSG_SETC('FNAM', FILENAME)
+	    CALL MSG_SETC('FNAM', SRT_ROOTNAME)
             CALL MSG_PRNT('XSPOKES : Error - opening file ^FNAM **')
             GOTO 999
          ENDIF
@@ -202,15 +214,26 @@
          CALL FIO_PUNIT(IUNIT, STATUS)
 *
 *  Append filename extension of FITS file containing attitude data
-         FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_anc.fits'
-*
-         CALL MSG_PRNT('XSPOKES : Using FITS file : '// FILENAME)
+         SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_anc.fits'
+
+*  Does file exist?
+      CALL UTIL_FINDFILE('.', SRT_ROOTNAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+
+*  If file not in current directory prompt for path
+      IF (NFILES .LE. 0) THEN
+        CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+        SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//SRT_ROOTNAME
+      END IF
+         CALL MSG_PRNT('XSPOKES : Using FITS file : '// SRT_ROOTNAME)
+
+         CALL MSG_PRNT('XSPOKES : Using FITS file : '// SRT_ROOTNAME)
 *
 *  Open the FITS fIle
          CALL FIO_GUNIT(IUNIT,STATUS)
-         CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+         CALL FTOPEN(IUNIT,SRT_ROOTNAME,0,BLOCK,STATUS)
          IF (STATUS .NE. SAI__OK ) THEN
-	    CALL MSG_SETC('FNAM',FILENAME)
+	    CALL MSG_SETC('FNAM',SRT_ROOTNAME)
             CALL MSG_PRNT('XSPOKES : Error - opening file ^FNAM')
             CALL MSG_PRNT('Try defining the spokes with the cursor')
             GOTO 999
