@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-## First declare various groups of files.  These were initially extracted
-## from the grp.make file, as constructed by the SDT newdev command
+# First declare various groups of files.  These were initially extracted
+# from the grp.make file, as constructed by the SDT newdev command
 GRP_C_ROUTINES = \
     axis.c \
     c2f77.c \
@@ -74,8 +74,8 @@ GRP_C_ROUTINES = \
     xmlchan.c \
     zoommap.c
 
-#  Header files which contribute to the "ast.h" file, organised to correspond
-#  with the class hierarchy.
+# Header files which contribute to the "ast.h" file, organised to correspond
+# with the class hierarchy.
 AST_H_FILES = \
     xml.h \
     wcstrig.h \
@@ -119,7 +119,7 @@ AST_H_FILES = \
           fitschan.h \
           xmlchan.h 
 
-#  All the (C) include files in the library
+# All the (C) include files required to build the library.
 GRP_C_INCLUDE_FILES = \
     $(AST_H_FILES) \
     c2f77.h \
@@ -134,14 +134,22 @@ GRP_C_INCLUDE_FILES = \
     wcstrig.h \
     xmlchan.h
 
+# The following list should include AST_PAR, but that must not be
+# distributed, and so it is listed separately in
+# nodist_libast_la_SOURCES below.
 GRP_F_INCLUDE_FILES = \
-    AST_PAR \
     GRF_PAR \
     AST_ERR
 
 LATEX_DOCUMENTATION_FILES = \
     sun210.tex \
     sun211.tex
+
+DOCUMENTATION_PRODUCTS = \
+	$(PAPER_DOCUMENTATION) $(HYPER_DOCUMENTATION)
+PAPER_DOCUMENATION = \
+	sun210.tex sun211.tex sun210.ps sun211.ps
+HYPER_DOCUMENTATION = sun210.htx_tar sun211.htx_tar
 
 POSTSCRIPT_FIGURES = \
     cmpframe.eps \
@@ -203,8 +211,10 @@ WCSLIB_FILES = \
 #    makeh
 ## ... to here
 
-bin_SCRIPTS = ast_link ast_link_adam
-noinst_SCRIPTS = makeh ast_cpp
+bin_SCRIPTS = ast_link
+dist_bin_SCRIPTS = ast_link_adam
+noinst_SCRIPTS = ast_cpp
+dist_noinst_SCRIPTS = makeh
 # Scripts are not distributed by default (since they might be derived objects)
 # Add these to the distribution below.  In fact, it would be useful
 # and straightforward  to make ast_link{,_adam} derived, since they
@@ -212,8 +222,11 @@ noinst_SCRIPTS = makeh ast_cpp
 # them.  This might be a requirement for scripts which supported
 # linking against shared libraries.
 
-# Headers required by library users.         
-include_HEADERS = ast.h AST_PAR AST_ERR GRF_PAR
+# Headers required by library users.  Both of the following lines
+# indicate headers which are installed.
+include_HEADERS = AST_ERR GRF_PAR
+# Following are generated, so should not be distributed.
+nodist_include_HEADERS = ast.h AST_PAR
 
 lib_LTLIBRARIES = \
     libast.la \
@@ -230,8 +243,12 @@ libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
-    ast_err.h \
-    ast.h
+    ast_err.h
+# AST_PAR is really part of GRP_F_INCLUDE_FILES, but it must not be
+# distributed, so list it separately.
+nodist_libast_la_SOURCES = \
+    ast.h \
+    AST_PAR
 
 #  The default error reporting module.
 libast_err_la_SOURCES = err_null.c
@@ -256,20 +273,11 @@ libast_slalib_la_SOURCES = sla.c
 #  Modules adapted from the wcslib library.
 libast_wcslib_la_SOURCES = proj.c wcstrig.c tpn.c
 
+# The following files are built by the targets in this makefile.
+MAINTAINERCLEANFILES = error.h version.h builddocs addversion \
+	ast.h $(DOCUMENTATION_PRODUCTS)
 
 # Special cases start here
-
-# Documentation
-sun210.tex sun211.tex sun210.ps sun211.ps: sun211_figures
-	./builddocs
-
-sun211_figures: sun210_figures
-	$(LN_S) sun210_figures sun211_figures
-
-# ast.h depends on the error-facility files.
-# Requires STAR_FACILITY_CODE to be specified in configure.ac
-ast.h: $(AST_H_FILES) ast_err.h makeh
-	@PERL@ ./makeh $(AST_H_FILES) >$@
 
 # The AST_PAR include file is produced by compiling the astbad.c
 # program and editing its output into the ast_par.source file (while
@@ -280,16 +288,27 @@ noinst_PROGRAMS = astbad
 astbad_SOURCES = astbad.c pointset.h
 AST_PAR: ast_par.source astbad
 	sed -e 's/<AST__BAD>/'`./astbad | tr 'E' 'D'`'/' ast_par.source >$@
-	rm -f astbad
 
-
-## EXTRA_DIST = ast_par.source
-## EXTRA_DIST = ast_par.source ast_link ast_link_adam makeh
-
-# AST_ERR and ast_err.h are `generated source files', and so must be generated
-# before any other compilations are done
+# ast_link is generated from ast_link.in; ast_link_adam does not
+# need configuration, and so is not mentioned in AC_CONFIG_FILES within
+# configure.ac, and so is not distributed automatically.
 #
-# AST_PAR is als a generated source file, but it should _not_ be
+# makeh is required in order to build ast.h after distribution (see below).
+EXTRA_DIST = ast_par.source
+
+# ast.h depends on the error-facility files.  ast.h _could_ be made
+# before distribution, but since it's generated from other distributed
+# files, it's more robust to distribute makeh and make ast.h on the
+# build host.
+ast.h: $(AST_H_FILES) ast_err.h makeh
+	@PERL@ ./makeh $(AST_H_FILES) >$@
+
+# AST_ERR and ast_err.h are `generated source files', and so must be
+# generated before any other compilations are done.  Note that these
+# files are generated on the distribution host, and so this
+# declaration has no effect post-distribution.
+#
+# AST_PAR is also a generated source file, but it should _not_ be
 # included in the list of BUILT_SOURCES, otherwise `make' tries to make
 # it before it makes the `astbad' program it depends on.  Instead,
 # just rely on the dependencies expressed in the main body above to
@@ -299,10 +318,41 @@ BUILT_SOURCES = AST_ERR ast_err.h
 #  Form a second link to the main object library. This is used when a second
 #  pass through the library is needed during linking.
 install-exec-local: libast.la
-	cd  $(DESTDIR)$(libdir); rm -f libast_pass2.a; $(LN_S) $(DESTDIR)$(libdir)/libast.a libast_pass2.a
+	cd $(DESTDIR)$(libdir) && \
+		rm -f libast_pass2.a && \
+		$(LN_S) $(DESTDIR)$(libdir)/libast.a libast_pass2.a
 	if test -n "$$MANIFEST_FILE"; then \
 	    echo "$(DESTDIR)$(libdir)/libast_pass2.a" >>$$MANIFEST_FILE; \
 	fi
+
+# Make pre-distribution files.  These are files which are required for
+# building the distribution, but are not themselves distributed.
+# The source files here should be mentioned in STAR_PREDIST_SOURCES in
+# configure.ac
+@PREDIST@predist_subs = sed \
+@PREDIST@    -e 's,@star_facilitycode\@,$(star_facilitycode),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_MAJOR\@,$(PACKAGE_VERSION_MAJOR),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_MINOR\@,$(PACKAGE_VERSION_MINOR),' \
+@PREDIST@    -e 's,@PACKAGE_VERSION_RELEASE\@,$(PACKAGE_VERSION_RELEASE),' \
+@PREDIST@    -e 's,@PERL\@,$(PERL),'
+@PREDIST@error.h: error.h.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@version.h: version.h.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@
+@PREDIST@builddocs: builddocs.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@; chmod +x $@
+@PREDIST@addversion: addversion.in
+@PREDIST@	rm -f $@; $(predist_subs) $< >$@; chmod +x $@
+
+# Documentation
+@PREDIST@$(PAPER_DOCUMENTATION): sun211_figures builddocs addversion
+@PREDIST@	./builddocs
+
+# The contents of the sun211_figures directory is identical to that
+# sun210_figures
+sun211_figures: sun210_figures
+	$(LN_S) sun210_figures sun211_figures
 
 # Installation check
 
