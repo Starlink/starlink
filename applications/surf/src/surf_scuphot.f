@@ -155,6 +155,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.27  1999/05/16 03:48:55  timj
+*     Check PHOT_BB before freeing memory
+*
 *     Revision 1.26  1999/05/15 04:19:49  timj
 *     Add STATUS checking to SCULIB_COADD
 *
@@ -1517,12 +1520,14 @@ c
 *     free memory
 
       DO BEAM = 1, SCUBA__MAX_BEAM
-         CALL SCULIB_FREE ('INT_D', INT_D_PTR(BEAM), INT_D_END(BEAM),
-     :        STATUS)
-         CALL SCULIB_FREE ('INT_V', INT_V_PTR(BEAM), INT_V_END(BEAM),
-     :        STATUS)
-         CALL SCULIB_FREE ('INT_Q', INT_Q_PTR(BEAM), INT_Q_END(BEAM),
-     :        STATUS)
+         IF (PHOT_BB(BEAM) .NE. 0) THEN
+            CALL SCULIB_FREE ('INT_D', INT_D_PTR(BEAM), INT_D_END(BEAM),
+     :           STATUS)
+            CALL SCULIB_FREE ('INT_V', INT_V_PTR(BEAM), INT_V_END(BEAM),
+     :           STATUS)
+            CALL SCULIB_FREE ('INT_Q', INT_Q_PTR(BEAM), INT_Q_END(BEAM),
+     :           STATUS)
+         END IF
       END DO
 
 *     close the input file

@@ -1,4 +1,7 @@
-1999-05-14  Tim Jenness  <timj@jach.hawaii.edu>
+1999-05-14  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* src/surf_scuphot.f:  Check PHOT_BB before freeing memory (since 
+	INT_*_PTR are undefined for PHOT_BB=0)
 
 	* src/surf_scuphot.f: Add status checking to SCULIB_COADD 
 
