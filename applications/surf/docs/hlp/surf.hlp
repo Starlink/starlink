@@ -223,8 +223,10 @@ This is a minor upgrade.
   - REBIN can now combine 256 input files.
 
   - The guard ring has been turned on for LINEAR and GAUSSIAN regridding.
-    (It had been turned off in v1.2). A new parameter (USEGRD) can be used
+    (It had been turned off in v1.2). A new parameter (GUARD) can be used
     to turn the bolometer guard ring on or off.
+
+  - The output image from REMDBM now contains axis information.
 
 3 Minor_fixes
 
@@ -543,6 +545,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 GUARD
+GUARD = LOGICAL (Read)
+   Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
 3 WEIGHT
 WEIGHT = REAL (Read)
    The relative weight that should be assigned to each dataset.
@@ -1814,6 +1823,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 GUARD
+GUARD = LOGICAL (Read)
+   Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
 3 WEIGHT
 WEIGHT = REAL (Read)
    The relative weight that should be assigned to each dataset.
@@ -2490,6 +2506,13 @@ TIMES = LOGICAL (Read)
    Note that, in general, the number of pixels in the output grid
    exceeds the number of independent beams in the image.
    The data can be accessed as OUT.more.reds.times. Default is FALSE.
+3 GUARD
+GUARD = LOGICAL (Read)
+   Controls whether the bolometer guard ring should be used during
+   the regridding process. The guard ring enforces zero flux at the
+   edge of the regridded image. Should be turned off if flux is present
+   at the edge. Default is to use the guard ring for LINEAR, BESSEL
+   and GAUSSIAN rebin modes.
 3 WEIGHT
 WEIGHT = REAL (Read)
    The relative weight that should be assigned to each dataset.
