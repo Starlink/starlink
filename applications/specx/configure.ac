@@ -32,6 +32,8 @@ AC_CHECK_HEADERS([readline/readline.h])
 AC_CHECK_HEADERS([readline/history.h])
 AC_CHECK_FUNCS([rindex index strchr strrchr])
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl    Note that we readline currently depends on termcap
 dnl    so to build with readline we need to find something in termcap
 dnl    Do not know what happens if this all changes
