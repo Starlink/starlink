@@ -3451,17 +3451,52 @@ a particular component of the plot (the qualifiers are case-insensitive and
 unambiguous abbreviations may be used):
 
 \begin{verse}
-{\tt Axes}: Axis lines drawn through tick marks within the plotting area 
-around annotated axes, drawn if attribute {\tt DrawAxes} is given a
-non-zero value.\\
+{\tt Axes}: Axis lines drawn through tick marks within the plotting area,
+drawn if attribute {\tt DrawAxes} is given a
+non-zero value. Values set using ``Axes'' are
+only only used if axis-specific values have not been set using ``Axis1''
+or ``Axis2''. Thus, ``Axes'' provides default values for ``Axis1'' and
+``Axis2''. \\
+{\tt Axis1}: An axis line drawn through tick marks on axis 1 within the 
+plotting area, drawn if attribute {\tt DrawAxes} is given a
+non-zero value. Values specified using ``Axis1'' override any supplied
+using ``Axes''. \\
+{\tt Axis2}: An axis line drawn through tick marks on axis 2 within the 
+plotting area, drawn if attribute {\tt DrawAxes} is given a
+non-zero value. Values specified using ``Axis2'' override any supplied
+using ``Axes''. \\
 {\tt Border}: The plot border, drawn if attribute {\tt Border} is given a non-zero value.\\
 {\tt Curves}: Curves drawn over the top of a plot ({\it e.g.} contours, data curves, {\it etc}).\\
 {\tt Grid}: The grid lines, drawn if attribute {\tt Grid} is given a non-zero value.\\
 {\tt Markers}: Graphical markers (symbols) drawn over a plot.\\
-{\tt NumLab}: Numerical axis labels drawn around annotated axes.\\
+{\tt NumLabs}: Numerical axis labels drawn around annotated axes.
+Values set using ``NumLabs'' are
+only only used if axis-specific values have not been set using ``NumLabs1''
+or ``NumLabs2''. Thus, ``NumLabs'' provides default values for ``NumLabs1'' 
+and ``NumLabs2''. \\
+{\tt NumLabs1}: Numerical labels drawn along axis 1. Values specified using 
+``NumLabs1'' override any supplied using ``NumLabs''. \\
+{\tt NumLabs2}: Numerical labels drawn along axis 2. Values specified using 
+``NumLabs2'' override any supplied using ``NumLabs''. \\
 {\tt Strings}: Text strings drawn over a plot (except for axis labels and plot title).\\
-{\tt TextLab}: Descriptive axis labels drawn around annotated axes.\\
-{\tt Ticks}: Tick marks (both major and minor) drawn along annotated axes.\\
+{\tt TextLabs}: Descriptive axis labels drawn around annotated axes.
+Values set using ``TextLabs'' are
+only only used if axis-specific values have not been set using ``TextLab1''
+or ``TextLab2''. Thus, ``TextLabs'' provides default values for ``TextLab1'' 
+and ``TextLab2''. \\
+{\tt TextLab1}: Descriptive label for axis 1. Values specified using 
+``TextLab1'' override any supplied using ``TextLabs''. \\
+{\tt TextLab2}: Descriptive label for axis 2. Values specified using 
+``TextLab2'' override any supplied using ``TextLabs''. \\
+{\tt Ticks}: Tick marks (both major and minor) drawn along annotated axes.
+Values set using ``Ticks'' are
+only only used if axis-specific values have not been set using ``Ticks1''
+or ``Ticks2''. Thus, ``Ticks'' provides default values for ``Ticks1'' 
+and ``Ticks2''. \\
+{\tt Ticks1}: Tick marks (both major and minor) drawn along axis 1.
+Values specified using ``Ticks1'' override any supplied using ``Ticks''. \\
+{\tt Ticks2}: Tick marks (both major and minor) drawn along axis 2.
+Values specified using ``Ticks2'' override any supplied using ``Ticks''. \\
 {\tt Title}: The title drawn at the top of a plot.
 \end{verse}
 
@@ -43737,6 +43772,10 @@ native PGPLOT drivers for them. The OV... commands have been removed.
 
 \item Colours can now be specified as RGB intensity triplets, or as HTML
 colour codes, in addition to the previous forms.
+
+\item The appearance of textual labels, numerical labels, tick marks,
+and axes can now be specified independantly for the two axes of a plot.
+See \hyperref{here}{section }{}{se:styles}.
 
 \item 
 Each picture in the graphics database now has a co-ordinate Frame with
