@@ -716,7 +716,8 @@ int StarRtdImage::isCelestial()
 //   file is FITS, in which case FITS-WCS overrides Native as the
 //   default. A second attempt to encode the WCS is made if a suitable
 //   encoding form passed as an optional argument (normally this will
-//   be FITS-WCS or DSS). 
+//   be FITS-WCS or DSS) and a successful FITS- WCS has not already
+//   been written.
 //
 //   The return from this function is either TCL_OK for success 
 //   or TCL_ERROR for failure. Either way the return may have
@@ -797,8 +798,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 // the correct thing to do for an NDF, but NDF
                 // channels should always read since they have PIXEL
                 // etc., so just need to test for FITS image.
-                ImageIO imio = image_->image();
-                if ( strcmp( imio.rep()->classname(), "NDFIO" ) != 0 ) {
+                if ( isfits() ) {
                     astSet( chan, "Encoding=FITS-WCS" );
                     default_encoding = astGetC( chan, "Encoding" );
                 }
@@ -867,23 +867,30 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
 
             //  Now try with the given encoding (which shouldn't be
-            //  native), if this is the same as that just written then
-            //  we'll just get the same values again (all encodings
-            //  except native will only have one representations).
+            //  native), if this is the same as that just written, or
+            //  is just another FITS-* encoding then do nothing. To
+            //  many FITS encodings are a bad things (mixes CD, PC
+            //  etc. keywords which is difficult to maintain). Note
+            //  DSS gets through.
             if ( argc == 2 ) {
-                astSet( chan, "Encoding=%s", argv[1] );
-                nextra = astWrite( chan, newwcs );
+                if ( strcmp( argv[1], default_encoding ) != 0 &&
+                     ( strncmp( argv[1], "FITS-", 5 ) == 0 &&
+                       strncmp( default_encoding, "FITS-", 5 ) != 0 )
+                    ) {
+                    astSet( chan, "Encoding=%s", argv[1] );
+                    nextra = astWrite( chan, newwcs );
 
-                if ( astOK && nextra != 0 ) {
-                    saved = 1;
-                    message << "WCS: saved WCS using additional encoding: " 
-                            << argv[1] << endl;
-                } 
-                else {
-                    message << "WCS: failed to save WCS using "
-                            << "additional encoding: " << argv[1] << endl;
+                    if ( astOK && nextra != 0 ) {
+                        saved = 1;
+                        message << "WCS: saved WCS using additional encoding: " 
+                                << argv[1] << endl;
+                    } 
+                    else {
+                        message << "WCS: failed to save WCS using "
+                                << "additional encoding: " << argv[1] << endl;
+                    }
+                    if ( !astOK ) astClearStatus;
                 }
-                if ( !astOK ) astClearStatus;
             }
             if ( nwrite != 0 || nextra != 0 ) {
 
@@ -910,13 +917,20 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         if ( result == TCL_OK ) {
             if ( origset_ ) {
                 if ( saved && native && ( nextra == 0 ) ) {
-                    message << "WCS: warning, your modified WCS "
-                            << "could only be saved as an AST native "
-                            << "encoding, this will limit its "
-                            << "usefulness to AST compatible programs "
-                            << "(GAIA, KAPPA, EXTRACTOR etc.)" 
-                            << endl;
-                    result = TCL_ERROR;
+                    if ( isfits() ) {
+                        message << "WCS: warning, your modified WCS "
+                                << "could only be saved as an AST native "
+                                << "encoding, this will limit its "
+                                << "usefulness to AST compatible programs "
+                                << "(GAIA, KAPPA, EXTRACTOR etc.)" 
+                                << endl;
+                        result = TCL_ERROR;
+                    }
+                    else {
+                        //  Just native is fine for NDFs.
+                        message << "WCS: your modified WCS was "
+                                << "successfully saved" << endl;
+                    }
                 } else if ( !saved ) {
                     message << "WCS: error, failed to save your modified WCS "
                             << endl;
@@ -4053,16 +4067,10 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
         return error( "unknown data representation, "
                       "\"hdu\" command only available for FITS and NDF" );
     }
-    if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
-         strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
+    if ( isfits() ) {
         return fitsHduCmd( imio, argc, argv );
-
-    } else if ( strcmp(imio.rep()->classname(), "NDFIO" ) == 0 ) {
-        return ndfHduCmd( imio, argc, argv );
-
     } else {
-        return error( "unknown data format, "
-                      "\"hdu\" command only available for FITS and NDF" );
+        return ndfHduCmd( imio, argc, argv );
     }
 }
 
@@ -4968,20 +4976,9 @@ int StarRtdImage::fileExists( const char *filename )
 //-
 int StarRtdImage::fullNameCmd( int argc, char *argv[] )
 {
-
-    //  See what kind of image type we have.
     ImageIO imio = image_->image();
-    int isndf = 0;
-    if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
-         strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
-        isndf = 0;
-    } else if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
-        isndf = 1;
-    } else {
-        return error( "Unknown data format (internal error)" );
-    }
 
-    if ( isndf ) {
+    if ( ! isfits() ) {
         //  Parse the filename into bits
         char *name;
         char *fitsext;
@@ -5041,25 +5038,32 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
 //+
 //   StarRtdImage::isfitsCmd
 //
-//
 //   Purpose:
 //      Returns whether the displayed image is a FITS file or not.
 //-
 int StarRtdImage::isfitsCmd( int argc, char *argv[] )
 {
+    return set_result( isfits() );
+}
 
+//+
+//   StarRtdImage::isfits
+//
+//   Purpose:
+//      Returns whether the displayed image is a FITS file or not.
+//- 
+int StarRtdImage::isfits()
+{
     //  See what kind of image type we have.
     ImageIO imio = image_->image();
     int isfits = 0;
     if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
          strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
         isfits = 1;
-    } else if ( strcmp( imio.rep()->classname(), "NDFIO" ) == 0 ) {
-        isfits = 0;
     } else {
-        return error( "unknown data format" );
+        isfits = 0;
     }
-    return set_result( isfits );
+    return isfits;
 }
 
 //+

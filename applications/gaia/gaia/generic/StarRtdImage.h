@@ -288,6 +288,9 @@ class StarRtdImage : public Skycat {
    //  Test if file extension is known to NDF.
    int isNDFtype( const char *);
 
+   //  Test if file is FITS or not.
+   int isfits();
+
    //  Parse and test image name.
    int parseName( const char *imagename, char **fullname,
                   char **fitsext, char **slice, char **path );

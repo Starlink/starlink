@@ -227,10 +227,17 @@
             END IF
          END IF
 
-*  Use the header information to construct the FITS extension, and
-*  then check this for a WCS system that can be stored as an NDF
-*  component. The header information that we have replaces any that
-*  exists already (it should be fundermentally the same).
+*  Look for a WCS that can be saved in the NDF WCS component. Note this
+*  also removes an AST native encoding from the FITS headers, if used.
+         CALL RTD1_DEWCS( HEAD, NHEAD, .TRUE., IWCS, STATUS )
+         IF ( IWCS .NE. AST__NULL ) THEN
+            CALL NDF_PTWCS( IWCS, IDNEW, STATUS )
+            CALL AST_ANNUL( IWCS, STATUS )
+         END IF
+
+*  Use the header information to construct the FITS extension. The
+*  header information that we have replaces any that exists already (it
+*  should be fundamentally the same).
          CALL NDF_XSTAT( IDNEW, 'FITS', THERE, STATUS )
          IF ( THERE ) THEN
             CALL NDF_XDEL( IDNEW, 'FITS', STATUS )
@@ -241,13 +248,6 @@
          CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', IPFIT, NFITS,
      :                  STATUS )
          CALL RTD1_CHEAD( HEAD, NHEAD, %VAL( IPFIT ), STATUS, %VAL(80) )
-
-*  Look for a WCS that can be saved in the NDF WCS component.
-         CALL RTD1_DEWCS( HEAD, NHEAD, IWCS, STATUS )
-         IF ( IWCS .NE. AST__NULL ) THEN
-            CALL NDF_PTWCS( IWCS, IDNEW, STATUS )
-            CALL AST_ANNUL( IWCS, STATUS )
-         END IF
          CALL DAT_UNMAP( FITLOC, STATUS )
 
 *  Take control of the NDF history component, by giving values to

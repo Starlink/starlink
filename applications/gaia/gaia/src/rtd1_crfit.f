@@ -323,8 +323,8 @@
 *  Add the default NDF WCS (GRID, PIXEL and AXIS) if no WCS component
 *  exists in the NDF or FITS headers.
       IF ( .NOT. EXISTS ) THEN 
-         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, IWCS, STATUS, 
-     :                    %VAL(80) )
+         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, .FALSE., IWCS, 
+     :                    STATUS, %VAL(80) )
          IF ( IWCS .EQ. AST__NULL ) THEN 
             CALL NDF_GTWCS( NDF, IWCS, STATUS )
             CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
