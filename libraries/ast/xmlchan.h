@@ -53,7 +53,7 @@
 /* ------- */
 
 /* URI defining the starlink AST XML namespace */
-#define AST__XMLNS  "http://www.starlink.ac.uk/"
+#define AST__XMLNS  "http://www.starlink.ac.uk/ast/xml/"
 
 #if defined(astCLASS)            /* Protected */
 #endif
