@@ -119,27 +119,27 @@
         CALL ADI_REQPKG( 'history', STATUS )
 
 *    Define history copiers
-        CALL ADI_DEFMTH( 'CopyHistory(HDSfile,HDSfile)', HSI1_COPY,
+        CALL ADI_DEFMTH( 'CopyHistory(_HDSfile,_HDSfile)', HSI1_COPY,
      :                   DID, STATUS )
 
 *    Data extractors & modifiers
-        CALL ADI_DEFMTH( 'GetHistoryCtrl(HDSfile)', HSI1_GETCTR,
+        CALL ADI_DEFMTH( 'GetHistoryCtrl(_HDSfile)', HSI1_GETCTR,
      :                   DID, STATUS )
-        CALL ADI_DEFMTH( 'GetHistoryRec(HDSfile,INTEGER)', HSI1_GETREC,
-     :                   DID, STATUS )
-        CALL ADI_DEFMTH( 'PutHistoryCtrl(HDSfile,HistoryControl)',
+        CALL ADI_DEFMTH( 'GetHistoryRec(_HDSfile,_INTEGER)',
+     :                   HSI1_GETREC, DID, STATUS )
+        CALL ADI_DEFMTH( 'PutHistoryCtrl(_HDSfile,_HistoryControl)',
      :                   HSI1_PUTCTR, DID, STATUS )
 
 *    Checkers
-        CALL ADI_DEFMTH( 'ChkHistory(HDSfile)', HSI1_OK,
+        CALL ADI_DEFMTH( 'ChkHistory(_HDSfile)', HSI1_OK,
      :                   DID, STATUS )
 
 *    Creators of new history
-        CALL ADI_DEFMTH( 'AddHistory(HDSfile,CHAR)', HSI1_ADD,
+        CALL ADI_DEFMTH( 'AddHistoryText(_HDSfile,_CHAR[])', HSI1_PTXT,
      :                   DID, STATUS )
-        CALL ADI_DEFMTH( 'AddHistoryText(HDSfile,CHAR)', HSI1_PTXT,
+        CALL ADI_DEFMTH( 'AddHistory(_HDSfile,_CHAR)', HSI1_ADD,
      :                   DID, STATUS )
-        CALL ADI_DEFMTH( 'NewHistory(HDSfile)', HSI1_NEW,
+        CALL ADI_DEFMTH( 'NewHistory(_HDSfile)', HSI1_NEW,
      :                   DID, STATUS )
 
 *    Now initialised

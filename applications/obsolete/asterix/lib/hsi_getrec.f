@@ -113,7 +113,7 @@
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
 *  Store first argument
-      IARG(1) = FID
+      CALL ADI_GETFILE( FID, IARG(1), STATUS )
 
 *  Store the record number
       CALL ADI_NEWV0I( IREC, IARG(2), STATUS )

@@ -118,8 +118,8 @@
 *  Check initialised
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
-*  Store first argument
-      IARG(1) = IFID
+*  Get base file object
+      CALL ADI_GETFILE( IFID, IARG(1), STATUS )
 
 *  Temporary string for command name
       CALL ADI_NEWV1C( NLINE, TEXT, IARG(2), STATUS )

@@ -102,6 +102,7 @@
       EXTERNAL                  HSI0_BLK                ! Ensures inclusion
 
 *  Local Variables:
+      INTEGER			FILID			! Base file identifier
       INTEGER			OARG			! Method output value
 *.
 
@@ -111,8 +112,11 @@
 *  Check initialised
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
+*  Locate base file
+      CALL ADI_GETFILE( IFID, FILID, STATUS )
+
 *  Invoke method
-      CALL ADI_EXEC( 'ChkHistory', 1, IFID, OARG, STATUS )
+      CALL ADI_EXEC( 'ChkHistory', 1, FILID, OARG, STATUS )
 
 *  Extract logical value
       CALL ADI_GET0L( OARG, OK, STATUS )

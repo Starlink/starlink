@@ -115,7 +115,7 @@
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
 *  Create argument list
-      ARGS(1) = FID
+      CALL ADI_GETFILE( FID, ARGS(1), STATUS )
       ARGS(2) = HCID
 
 *  Simply invoke the method

@@ -98,6 +98,7 @@
       EXTERNAL                  HSI0_BLK                ! Ensures inclusion
 
 *  Local Variables:
+      INTEGER			FILID			! Base file identifier
       INTEGER			OARG			! Unused method return
 *.
 
@@ -107,8 +108,11 @@
 *  Check initialised
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
+*  Get base file
+      CALL ADI_GETFILE( IFID, FILID, STATUS )
+
 *  Invoke method
-      CALL ADI_EXEC( 'NewHistory', 1, IFID, OARG, STATUS )
+      CALL ADI_EXEC( 'NewHistory', 1, FILID, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_NEW', STATUS )

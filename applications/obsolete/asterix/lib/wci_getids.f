@@ -114,6 +114,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			FILID			! Base file identifier
       INTEGER			RESID			! Method output data
 
       LOGICAL			THERE			! Component exists?
@@ -130,8 +131,11 @@
       PRJID = ADI__NULLID
       SYSID = ADI__NULLID
 
+*  Get base file object
+      CALL ADI_GETFILE( ID, FILID, STATUS )
+
 *  Simply invoke the ReadWCS method
-      CALL ADI_EXEC( 'ReadWCS', 1, ID, RESID, STATUS )
+      CALL ADI_EXEC( 'ReadWCS', 1, FILID, RESID, STATUS )
 
 *  If ok, extract results
       IF ( (STATUS .EQ. SAI__OK) .AND. (RESID.NE.ADI__NULLID) ) THEN

@@ -118,7 +118,7 @@
       IF ( .NOT. WCI_INIT ) CALL WCI1_INIT( STATUS )
 
 *  Construct input arguments
-      IARG(1) = ID
+      CALL ADI_GETFILE( ID, IARG(1), STATUS )
       IARG(2) = PIXID
       IARG(3) = PRJID
       IARG(4) = SYSID

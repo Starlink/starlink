@@ -102,7 +102,7 @@
       EXTERNAL                  HSI0_BLK                ! Ensures inclusion
 
 *  Local Variables:
-      INTEGER			IARG(2)			! Method inputs
+      INTEGER			IFFID, OFFID		! File identifiers
       INTEGER			OARG			! Output from method
 *.
 
@@ -112,10 +112,12 @@
 *  Check initialised
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
+*  Get base file objects
+      CALL ADI_GETFILE( IFID, IFFID, STATUS )
+      CALL ADI_GETFILE( OFID, OFFID, STATUS )
+
 *  Invoke the CopyHistory method
-      IARG(1) = IFID
-      IARG(2) = OFID
-      CALL ADI_EXEC( 'CopyHistory', 2, IARG, OARG, STATUS )
+      CALL ADI_EXEC2( 'CopyHistory', IFFID, OFFID, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_COPY', STATUS )
