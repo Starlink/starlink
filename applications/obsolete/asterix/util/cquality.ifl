@@ -33,6 +33,14 @@ INTERFACE CQUALITY
     HELP      'i.e. clear temporary bad quality values'
   ENDPARAMETER
 
+  PARAMETER OUTSIDE
+    TYPE '_LOGICAL'
+    VPATH 'DEFAULT'
+    DEFAULT F
+    PROMPT 'Outside of circle'
+    HELP 'Set quality for region outside specified circle'
+  ENDPARAMETER
+
   PARAMETER SET
     TYPE      '_LOGICAL'
     VPATH     'DEFAULT'
