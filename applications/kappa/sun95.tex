@@ -11509,6 +11509,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Performs a trigonometric  transformation on a data array.}
 \menuitem{VECPLOT}{
  Plots a 2-dimensional vector map.}
+\menuitem{VERSION}{
+ Check the version number of the installed package.}
 \menuitem{WCSADD}{
 Adds a new co-ordinate Frame into the WCS component of an NDF.}
 \menuitem{WCSALIGN}{
@@ -12198,6 +12200,8 @@ functions as follows.
  Gives help about {\footnotesize KAPPA}.
 \classitem{LISTMAKE}
  Create a catalogue holding a positions list.
+\classitem{VERSION}
+ Check the version number of the installed package.
 \end{description}
 \end{description}
 \end{small}
@@ -40320,6 +40324,89 @@ plot (7k).
 \end{htmlonly}
 
 \sstroutine{
+   VERSION
+}{
+   Checks the package version number
+}{
+   \sstdescription{
+      This application will display the installed package version number,
+      or compare the version number of the installed package against a
+      specified version number, reporting whether the installed package
+      is older, or younger, or equal to the specified version.
+   }
+   \sstusage{
+      version [compare]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMPARE = LITERAL (Read)
+      }{
+         A string specifying the version number to be compared to the
+         version of the installed package. If a null (!) value is supplied,
+         the version string of the installed package is displayed, but no
+         comparison takes place. If a non-null value is supplied, the
+         version of the installed package is not displayed.
+
+         The supplied string should be in the format {\tt "}V$<$ddd$>$.$<$ddd$>$-$<$ddd$>$,
+         where {\tt "}$<$ddd$>${\tt "} represents a set of digits. The leading {\tt "}V{\tt "} can be
+         omitted, as can any number of trailing fields (missing trailing
+         fields default to zero). {\tt [!]}
+      }
+      \sstsubsection{
+         RESULT = INTEGER (Write)
+      }{
+         If a value is given for the COMPARE parameter, then RESULT is
+         set to one of the following values:
+
+         \sstitemlist{
+
+            \sstitem
+            1 -- The installed package is older than the version number
+            specified by the COMPARE parameter.
+
+            \sstitem
+            0 -- The version of the installed package is equal to the
+            version specified by the COMPARE parameter.
+
+            \sstitem
+            -1 -- The installed package is younger than the version number
+            specified by the COMPARE parameter.
+
+         }
+         The same value is also written to standard output.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         version
+      }{
+         Displays the version number of the installed package.
+      }
+      \sstexamplesubsection{
+         version compare={\tt "}V0.14-1{\tt "}
+      }{
+         Compares the version of the installed package with the version
+         {\tt "}V0.14-1{\tt "}, and sets the RESULT parameter appropriately. For
+         instance, if the installed package was {\tt "}V0.13-6{\tt "} then RESULT
+         would be set to -1. If the installed package was {\tt "}V0.14-1{\tt "},
+         RESULT would be set to 0. If the installed package was {\tt "}V0.14-2{\tt "}
+         RESULT would be set to $+$1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The package version number is obtained from the {\tt "}version{\tt "} file
+         in the directory containing the package{\tt '}s installed executable files.
+         This file is created when the package is installed using the {\tt "}mk
+         install{\tt "} command. An error will be reported if this file cannot be
+         found.
+      }
+   }
+}
+
+\sstroutine{
    WCSADD
 }{
    Adds a new co-ordinate Frame into the WCS component of an NDF
@@ -44436,6 +44523,8 @@ The following applications have been modified:
 \begin{description}
    \item [\htmlref{SCATTER}{SCATTER}] -- Displays a scatter plot between
     data in two n-dimension NDFs.
+   \item [\htmlref{VERSION}{VERSION}] -- Check the version number of the 
+    installed package.
 \end{description}
 
 \subsection{Other Changes}
@@ -45157,6 +45246,8 @@ functions as follows.
  Gives help about {\footnotesize KAPPA}.
 \classitem{LISTMAKE}
  Create a catalogue holding a positions list.
+\classitem{VERSION}
+ Check the version number of the installed package.
 \end{description}
 \end{description}
 

@@ -33,6 +33,9 @@
      - A new applications SCATTER to perform simple scatter plots of the
      values in two NDFs.
 
+     - A new applications VERSION which checks the version number of the
+     installed package.
+
      - DISPLAY now has a KEY parameter which causes a colour ramp to be
      drawn to the right of the image.
 
