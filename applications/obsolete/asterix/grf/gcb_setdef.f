@@ -18,8 +18,6 @@
 *    Local constants :
 *    Local variables :
       REAL RVAL
-      REAL R,G,B
-      INTEGER C1,C2
       INTEGER IVAL
       LOGICAL OK
 *-
@@ -36,34 +34,9 @@
             IVAL=1
           ENDIF
           CALL PGSLW(IVAL)
-          CALL GCB_GETI('DEFAULT_BGND',OK,IVAL,STATUS)
-          IF (.NOT.OK) THEN
-            IVAL=0
-          ENDIF
-          IF (IVAL.EQ.0) THEN
-            R=0.0
-            G=0.0
-            B=0.0
-          ELSE
-            CALL PGQCR(IVAL,R,G,B)
-          ENDIF
-          CALL PGQCOL(C1,C2)
-          CALL PGSCR(C1,R,G,B)
           CALL GCB_GETI('DEFAULT_COLOUR',OK,IVAL,STATUS)
           IF (.NOT.OK) THEN
             IVAL=1
-          ENDIF
-          IF (IVAL.EQ.0) THEN
-            R=0.0
-            G=0.0
-            B=0.0
-            IVAL=1
-            CALL PGSCR(1,R,G,B)
-          ELSEIF (IVAL.EQ.1) THEN
-            R=1.0
-            G=1.0
-            B=1.0
-            CALL PGSCR(1,R,G,B)
           ENDIF
           CALL PGSCI(IVAL)
           CALL GCB_GETI('DEFAULT_FONT',OK,IVAL,STATUS)
