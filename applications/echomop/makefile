@@ -1269,13 +1269,15 @@ install:
 #  libraries must be edited into this, and execute permission given.
 #  Leave the original file in place.
 	if test -n "$(STARTUP_SCRIPT)"; then \
-           for f in $(STARTUP_SCRIPT) ""; do \
-              sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
-                  -e s#INSTALL_HELP#$(INSTALL_HELP)# \
-                  -e s#PKG_VERS#$(PKG_VERS)# \
-                 $$f >$(INSTALL_BIN)/$$f ;\
-              chmod 755 $(INSTALL_BIN)/$$f ;\
-            done; \
+	    for f in $(STARTUP_SCRIPT) ""; do \
+		if test -n "$$f"; then \
+		    sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
+			-e s#INSTALL_HELP#$(INSTALL_HELP)# \
+			-e s#PKG_VERS#$(PKG_VERS)# \
+			$$f >$(INSTALL_BIN)/$$f ;\
+		    chmod 755 $(INSTALL_BIN)/$$f ;\
+		fi; \
+	    done; \
         else :; fi
 #
 #  Install the Latex documentation, giving it world read permission,
@@ -1311,8 +1313,12 @@ install:
 	if test -n "$(HYPERTEXT_DOCS)"; then \
 	    pwd=`pwd`; \
 	    (cd $(INSTALL_DOCS); $(TAR_OUT) $$pwd/$(HYPERTEXT_DOCS)); \
-	    HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
-		$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	    if test -x $(STAR_BIN)/hlink; then \
+		HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
+		    $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	    else \
+		echo "Can't find $(STAR_BIN)/hlink -- not relinked"; \
+	    fi; \
 	fi
 #
 #  Install the date stamp file and make it read-only to prevent its
@@ -1469,11 +1475,13 @@ do_deinstall:
 #  during installation, we remove the installed copy, if present, and
 #  then ensure that the original exists.
 	- if test -n "$(STARTUP_SCRIPT)"; then \
-             for f in $(STARTUP_SCRIPT) ""; do \
-                if test -f $(INSTALL_BIN)/$$f; then \
-                   rm -f $(INSTALL_BIN)/$$f;\
-                else :; fi ; \
-                $(MAKE) $$f; \
+	    for f in $(STARTUP_SCRIPT) ""; do \
+		if test -n "$$f"; then \
+		    if test -f $(INSTALL_BIN)/$$f; then \
+			rm -f $(INSTALL_BIN)/$$f;\
+		    else :; fi ; \
+		    $(MAKE) $$f; \
+		fi; \
              done; \
         else :; fi
 #
@@ -1506,8 +1514,12 @@ do_deinstall:
 	    for f in `$(TAR_LIST) $(HYPERTEXT_DOCS) | sed 1q`; do \
 		rm -Rf $(INSTALL_DOCS)/$$f ;\
 	    done; \
-	    HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
-		$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	    if test -x $(STAR_BIN)/hlink; then \
+		HTX_PATH=$(STAR_DOCS):$(STAR_HELP) \
+		    $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	    else \
+		echo "Can't find $(STAR_BIN)/hlink -- not relinked"; \
+	    fi; \
 	fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
