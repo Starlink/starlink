@@ -115,8 +115,19 @@
       IF ( PTR .NE. 0 ) THEN
         CALL DYN0_FIND( PTR, SLOT, STATUS )
 
-*    Unmap it
-        CALL DYN0_UNMAP( SLOT, STATUS )
+*    If error locating pointer...
+        IF ( STATUS .NE. SAI__OK ) THEN
+
+*      Flush the error and continue
+          CALL ERR_FLUSH( STATUS )
+
+*    Otherwise found ok
+        ELSE
+
+*      Unmap it
+          CALL DYN0_UNMAP( SLOT, STATUS )
+
+        END IF
 
       END IF
 
