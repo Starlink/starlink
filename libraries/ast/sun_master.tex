@@ -2313,7 +2313,7 @@ f+
 *  output WCS information to it using the same encoding method as the
 *  input dataset.
       CALL AST_SET( FITSCHAN2, 'Card=1, Encoding=' // ENCODE, STATUS )
-      IF ( AST_WRITE( FITSCHAN2, WCSINFO2, STATUS ) .EQ. 0 ) {
+      IF ( AST_WRITE( FITSCHAN2, WCSINFO2, STATUS ) .EQ. 0 ) THEN
 
 *  If this didn't work (the WCS FrameSet has become too complex), then
 *  use the native AST encoding instead.
@@ -9060,7 +9060,7 @@ if you wish.
 
 By default ({\em{i.e.}}\ if the Base or Current attribute is un-set),
 the first Frame added to a FrameSet becomes its base Frame and the
-last one added becomes its base Frame.\footnote{Although this is
+last one added becomes its current Frame.\footnote{Although this is
 reversed if the FrameSet's Invert attribute is non-zero.} Whenever a
 new Frame is added to a FrameSet, the Current attribute is modified so
 that the new Frame becomes the current one. This behaviour is
@@ -13783,7 +13783,7 @@ f+
       IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
 *  2.
-         CALL AST_SETC( FITSCHAN, "Encoding", ENCODE, STATUS )
+         CALL AST_SETC( FITSCHAN, 'Encoding', ENCODE, STATUS )
          IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
 *  3.
