@@ -147,57 +147,67 @@ while test $# -gt 0; do
     CPPFLAGS="$CPPFLAGS -I$1/include"
     LIBS="$LIBS -L$1/lib"
   else
-    AC_MSG_RESULT(not found -- ignored)
+    AC_MSG_RESULT(not found)
+    AC_MSG_ERROR(STARLINK directory $1 not found)
   fi
   shift
 done
 
 
+
+dnl   Now that we've found the /star directories, check that ast.h is
+dnl   there.  There was a problem with ast.h which meant it caused the
+dnl   Tru64 C++ compiler to object.  This is certainly fixed by AST
+dnl   1.8-1.  This is more direct than the obvious alternative of
+dnl   testing for the preprocessor constants AST_{MAJOR,MINOR}_VERS.
 AC_CHECK_HEADER(ast.h)
-AC_MSG_CHECKING(whether your AST library is new enough)
-AC_TRY_RUN(#include <ast.h>
-int main()
-{
-#ifdef AST_MAJOR_VERS
-if (AST_MAJOR_VERS >= 1 && AST_MINOR_VERS >= 8) return 0; else return 1;
-#else
-return 1
-#endif
-}, 
+AC_MSG_CHECKING(whether your AST headers are usable)
+AC_TRY_COMPILE([extern "C" {
+#include <ast.h>
+}],,
   AC_MSG_RESULT(ok),
-  AC_MSG_RESULT(no)
-  AC_MSG_WARN([Your AST library APPEARS to be too old.
-I'll keep going but if there's a problem building the software this
-might be the cause]),
-  AC_MSG_WARN([I can't tell if your AST library is new enough.
-I'll guess it is and hope for the best]))
-
-dnl   The following would be neater (it doesn't require a
-dnl   compilation), but I can't work out how to make it use the LIBS
-dnl   and CPPFLAGS settings which we've produced above.
-dnl dnl   Now that we've found the /star directories, check that ast.h is
-dnl dnl   there.  There was a problem with ast.h which meant it caused the
-dnl dnl   Tru64 C++ compiler to object.  This is certainly fixed by AST
-dnl dnl   1.8-1.  As an imperfect test, check if AST_MAJOR_VERS is defined.
-dnl AC_CHECK_HEADER(ast.h)
-dnl AC_MSG_CHECKING(whether your AST library is new enough)
-dnl AC_EGREP_CPP(yes,
-dnl [#include <ast.h>
-dnl #ifdef AST_MAJOR_VERS
-dnl yes
-dnl #endif],
-dnl   AC_MSG_RESULT(ok),
-dnl   AC_MSG_RESULT(no)
-dnl   AC_MSG_WARN([Your AST library APPEARS to be too old.
-dnl I'll keep going but if there's a problem building the software this
-dnl might be the cause]))
-dnl AC_CHECK_LIB(ast, astIsAFrameSet)
+  AC_MSG_RESULT(not on this platform)
+  AC_MSG_ERROR(consider defining STARLINK to point to a newer distribution))
 
 
-AC_SUBST(CATLIBDIR)
+
+dnl   We don't at present need to link against wcslib (though I
+dnl   thought we did, at one point).  Should we need to again, this is
+dnl   how:
+dnl
+dnl wcs_libdir=../wcslib/C
+dnl AC_ARG_WITH(wcslib,
+dnl [  --with-wcslib=path      Path to dir containing libwcs.a (used only if needed)],
+dnl   if test "$withval" = yes; then
+dnl     : # do nothing
+dnl   elif test -z "$withval" -o "$withval" = no; then
+dnl     wcs_libdir=X
+dnl   else
+dnl     wcs_libdir=$withval
+dnl   fi)
+dnl 
+dnl AC_SUBST(WCSLIB)
+dnl AC_CHECK_LIB(ast_wcslib, glsfwd, , 
+dnl   AC_DEFINE(NEEDGLSFUNCS)
+dnl   if test $wcs_libdir = "X"; then
+dnl     AC_MSG_ERROR([--without-wcslib specified but need wcslib])
+dnl   else
+dnl     AC_DEFINE(WCSLIB,-L$wcs_libdir -lwcs)
+dnl   fi)
+
+
+dnl   Check whether the version of AST which we'll be linking against
+dnl   still has the proj.o module within it (from wcslib).  Newer
+dnl   versions don't (or rather do, but modified and renamed).
+AC_SUBST(ASTHASOLDPROJ)
+AC_CHECK_LIB(ast_wcslib, airfwd, ASTHASOLDPROJ=yes, ASTHASOLDPROJ=no)
+
+
+
 dnl   Find where the SkyCat cat library has been installed.
+AC_SUBST(CATLIBDIR)
 AC_ARG_WITH(catlib,
-[  --with-catlib[=path]    Give non-default location of SkyCat installation],
+[  --with-catlib[=path]    Give non-default location of SkyCat installation dir],
   if test "$withval" = "yes"; then
     # Default place
     CATLIBDIR=../catlib
@@ -209,43 +219,6 @@ AC_ARG_WITH(catlib,
   CATLIBDIR=../catlib)
 
 
-
-dnl dnl   AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
-dnl dnl   Specify (or at least check) the location of the cat library.
-dnl dnl
-dnl dnl   This had better work, since the program depends absolutely on
-dnl dnl   the presence of this library.  The option --without-cat works,
-dnl dnl   in the sense that support for the library is not compiled in,
-dnl dnl   but the program as a whole doesn't work in that case, so it's
-dnl dnl   pretty pointless.
-dnl dnl
-dnl dnl AC_SUBST(CATOBJ)
-dnl AC_ARG_WITH(cat,
-dnl [  --with-cat[=path]       Use skycat, giving optional path to library],
-dnl   if test "$withval" = "yes"
-dnl   then
-dnl     AC_CHECK_HEADER(cat/AstroCatalog.h,
-dnl     AC_CHECK_LIB(cat, main,
-dnl       AC_DEFINE(ENABLE_CAT) 
-dnl       LIBS="$LIBS -lcat"))
-dnl   elif test "$withval" != "no"
-dnl   then
-dnl     safe_CPPFLAGS="$CPPFLAGS"
-dnl     CPPFLAGS="$CPPFLAGS -I$withval/include"
-dnl     safe_LIBS="$LIBS"
-dnl     LIBS="$LIBS -L$withval/lib -lcat"
-dnl     AC_CHECK_HEADER(cat/AstroCatalog.h,
-dnl       AC_CHECK_LIB(cat, main,
-dnl         AC_DEFINE(ENABLE_CAT) 
-dnl         safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
-dnl         safe_LIBS="$safe_LIBS -L$withval/lib -lcat"))
-dnl     CPPFLAGS="$safe_CPPFLAGS"
-dnl     LIBS="$safe_LIBS"
-dnl   fi,
-dnl   AC_CHECK_HEADER(cat/AstroCatalog.h,
-dnl     AC_CHECK_LIB(cat, main,
-dnl       AC_DEFINE(ENABLE_CAT) 
-dnl       LIBS="$LIBS -lcat")))
 
 
 AC_OUTPUT(Makefile t/Makefile)
