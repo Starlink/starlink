@@ -268,8 +268,9 @@
 #      export AR_IN
       export AR_OUT
       export BLD_SHR
-#      export CC
-#      export CFLAGS
+      export CC
+      export CFLAGS
+      export CXX
       export FC
       export FFLAGS
       export LINK
@@ -301,6 +302,7 @@
 #'f() ld -shared -update_registry $(INSTALL)/share/so_locations -o $$1 $$2 $$3 \
 #-lfor -lFutil -lUfor -lm -lots -lc; f'
                CC='cc'
+               CXX='cxx'
                CFLAGS='-I$(STAR_INC) -O -std1'
                FC='f77'
                FFLAGS='-O'
@@ -354,7 +356,9 @@
                AR_OUT='ar -x'
                BLD_SHR='f() ld -G -o $$1 $$2; f'
                CC='cc'
-               CFLAGS='-I$(STAR_INC) -O -K PIC -I/usr/openwin/include -Dmapunit=__mapunit'
+	       CXX='CC'  # requires /opt/SUNWspro
+               CFLAGS='-I$(STAR_INC) -O'
+               #CFLAGS='-I$(STAR_INC) -O -K PIC -I/usr/openwin/include -Dmapunit=__mapunit'
                FC='f77'
                FFLAGS='-O -PIC'
                LINK='ln -s'
@@ -372,7 +376,9 @@
                AR_OUT='ar x'
                BLD_SHR='f() { ld -shared -soname $$1 -o $$1 $$2;}; f'
                CC='gcc'
-               CFLAGS='-fPIC -O2 -I/usr/X11R6/include'
+	       CXX='g++'
+               CFLAGS='-fPIC -O2'
+               #CFLAGS='-fPIC -O2 -I/usr/X11R6/include'
                FC='g77'
                FFLAGS='-fno-second-underscore -O2 -w -fPIC'
                LINK='ln -s'
