@@ -32,33 +32,33 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.228 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.333 sec
 
-    [junit] Testcase: testGetChildElementByName took 0.111 sec
-    [junit] Testcase: testGetTextContent took 0.021 sec
-    [junit] Testcase: testRelativizeDOM took 0.092 sec
+    [junit] Testcase: testGetChildElementByName took 0.145 sec
+    [junit] Testcase: testGetTextContent took 0.031 sec
+    [junit] Testcase: testRelativizeDOM took 0.151 sec
     [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.373 sec
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.382 sec
 
-    [junit] Testcase: testData took 1.099 sec
-    [junit] Testcase: testIntro took 1.001 sec
-    [junit] Testcase: testStream took 0.734 sec
-    [junit] Testcase: testHybridStream took 0.515 sec
-    [junit] Testcase: testCombo1 took 0.837 sec
+    [junit] Testcase: testData took 1.054 sec
+    [junit] Testcase: testIntro took 0.977 sec
+    [junit] Testcase: testStream took 0.788 sec
+    [junit] Testcase: testHybridStream took 0.514 sec
+    [junit] Testcase: testCombo1 took 0.863 sec
     [junit] Testcase: testResourceStream took 0.182 sec
     [junit] Testsuite: uk.ac.starlink.util.NodeDescendantsTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.117 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.116 sec
 
-    [junit] Testcase: testTraversal took 0.111 sec
+    [junit] Testcase: testTraversal took 0.11 sec
     [junit] Testsuite: uk.ac.starlink.util.SourceReaderTest
-    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.251 sec
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.252 sec
 
-    [junit] Testcase: testGetDOM took 0.246 sec
+    [junit] Testcase: testGetDOM took 0.247 sec
     [junit] Testsuite: uk.ac.starlink.util.TestCaseTest
-    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.243 sec
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.247 sec
 
-    [junit] Testcase: testFlags took 0.216 sec
-    [junit] Testcase: testAssertSource took 0.022 sec
+    [junit] Testcase: testFlags took 0.22 sec
+    [junit] Testcase: testAssertSource took 0.021 sec
     [junit] Testsuite: uk.ac.starlink.util.XMLUtilTest
     [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.095 sec
 
@@ -212,18 +212,18 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.ast.AstTest
-    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.727 sec
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.373 sec
     [junit] ------------- Standard Output ---------------
     [junit] Headless environment - no Plot testing
     [junit] ------------- ---------------- ---------------
 
-    [junit] Testcase: testAstObject took 0.168 sec
-    [junit] Testcase: testChannel took 0.004 sec
+    [junit] Testcase: testAstObject took 0.147 sec
+    [junit] Testcase: testChannel took 0.003 sec
     [junit] Testcase: testFitsChan took 0.021 sec
-    [junit] Testcase: testFrame took 0.006 sec
+    [junit] Testcase: testFrame took 0.005 sec
     [junit] Testcase: testFrameSet took 0.003 sec
     [junit] Testcase: testGeometry took 0.004 sec
-    [junit] Testcase: testMapping took 0.43 sec
+    [junit] Testcase: testMapping took 0.099 sec
     [junit] Testcase: testPlot took 0.068 sec
     [junit] Testcase: testAstConstants took 0.01 sec
     [junit] Testcase: testSpecMap took 0.002 sec
@@ -273,10 +273,10 @@ compile-tests:
 
 run-tests:
     [junit] Testsuite: uk.ac.starlink.hds.HDSObjectTest
-    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.264 sec
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 3.113 sec
 
-    [junit] Testcase: testConstants took 0.127 sec
-    [junit] Testcase: testFileOperations took 0.01 sec
+    [junit] Testcase: testConstants took 2.975 sec
+    [junit] Testcase: testFileOperations took 0.009 sec
     [junit] Testcase: testObject took 0 sec
     [junit] Testcase: testProperties took 0.002 sec
     [junit] Testcase: testGet took 0.017 sec
@@ -299,14 +299,14 @@ compile-tests:
 
 run-tests:
     [junit] Running uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.157 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.168 sec
     [junit] Testsuite: uk.ac.starlink.hdx.HdxTest
-    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.157 sec
+    [junit] Tests run: 11, Failures: 0, Errors: 11, Time elapsed: 0.168 sec
 
     [junit] ------------- Standard Error -----------------
-    [junit] Sep 14, 2003 4:19:41 AM uk.ac.starlink.util.Loader starjavaDirectory
+    [junit] Sep 15, 2003 4:19:49 AM uk.ac.starlink.util.Loader starjavaDirectory
     [junit] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
-    [junit] Sep 14, 2003 4:19:41 AM uk.ac.starlink.hds.HDSPackage isAvailable
+    [junit] Sep 15, 2003 4:19:49 AM uk.ac.starlink.hds.HDSPackage isAvailable
     [junit] WARNING: JNIHDS native library not on java.library.path - no NDF/HDS access
     [junit] ------------- ---------------- ---------------
     [junit] Testcase: testURIResolution(uk.ac.starlink.hdx.HdxTest):	Caused an ERROR
@@ -382,4 +382,4 @@ run-tests:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/hdx/build.xml:908: Test uk.ac.starlink.hdx.HdxTest failed
 
-Total time: 28 seconds
+Total time: 31 seconds
