@@ -19,6 +19,8 @@
 #        Add HELP
 #     1997 June 12 (TimJ)
 #        Add MSG_FILTER
+#     1997 July 18 (TimJ)
+#        Change IN to be _CHAR
 #-
 
    INTERFACE SKYDIP
@@ -45,7 +47,7 @@
 
       PARAMETER IN
         POSITION 1 
-        TYPE     NDF
+        TYPE     '_CHAR'
         PROMPT   'Name of input file containing demodulated data'
 	HELPKEY '*'
       ENDPARAMETER
