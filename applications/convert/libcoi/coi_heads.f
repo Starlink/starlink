@@ -19,10 +19,10 @@
 *     it with IRAF OIF-format headers.  If the FITS mandatory headers
 *     are missing, they are inserted prior to the copy.  Following the
 *     headers, records from the IRAF history information are written
-*     as HISTORY cards in the airlock.  Next some information
-*     (application and time) concerning the conversion process are
-*     appended to the airlock HISTORY cards.  Finally, an END card is
-*     written.
+*     as HISTORY cards in the airlock (any records > 70 characters will
+*     be truncated with ...).  Next some information (application and
+*     time) concerning the conversion process are appended to the
+*     airlock HISTORY cards.  Finally, an END card is written.
 *
 *     To prevent HISTORY headers that originated from an NDF's HISTORY
 *     records from duplicating and multiplying in the airlock, and to
@@ -43,8 +43,8 @@
 *        line to the NDF's FITS airlock.
 *     PROHIS = LOGICAL (Given)
 *        If .TRUE., NDF-style HISTORY records are restored to HISTORY
-*        records.  If .FALSE., any such headers are merely propagated to
-*        the FITS airlock.
+*        records.  If .FALSE., any such headers are merely propagated
+*        to the FITS airlock.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -55,12 +55,23 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 July 22 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 18 (AJC):
+*        Remove checks for bad history records.
+*          Last line needn't be terminated with newline
+*          Overlong lines are truncated with ...
+*        Blank lines are removed correctly.
+*        Remove use of CHR_MOVE (obsolete).
+*        Remove unnecessary initialisations of CARD.
+*     1997 November 23 (MJC):
+*        Propagate blank lines from the IRAF history records.  Wrap
+*        comments at 72.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -95,12 +106,6 @@
       INTEGER FITSLN             ! Length of a FITS header
       PARAMETER ( FITSLN = 80 )
 
-      INTEGER FITSHI             ! Length of a FITS HISTORY value
-      PARAMETER ( FITSHI = 70 )
-
-      INTEGER LENHIS             ! Length of IRAF image history area 
-      PARAMETER ( LENHIS = 511 )
-
 *  Local Variables:
       LOGICAL ADFITS             ! Are there FITS keywords not present
                                  ! in the IRAF image which must be
@@ -109,12 +114,11 @@
       CHARACTER * ( FITSLN ) CARD ! FITS card image
       INTEGER DIMS( NDF__MXDIM ) ! Length of axes
       INTEGER DTYPE              ! IRAF data-type code
-      INTEGER EMPTY              ! Number of empty IRAF History lines
       INTEGER ERR                ! IRAF error indicator
       CHARACTER * ( DAT__SZLOC ) FITLOC ! Locator to the FITS extension
       INTEGER FIPNTR( 1 )        ! Pointer to FITS extension
-      CHARACTER * ( FITSHI ) HISTRN ! Somewhere to put the whole
-                                 ! history string of the IRAF image
+      CHARACTER * ( FITSLN ) HISTRN ! Line from the IRAF image history
+                                 ! area
       INTEGER K                  ! Loop counter
       INTEGER LINENO             ! Line number
       INTEGER MDIM               ! Number of axes
@@ -144,47 +148,21 @@
 *  lines in the image.  These are records of what IRAF has done to this
 *  particular file.  They become FITS HISTORY lines.
 *
-*  The HISTORY area of an IRAF image is currently 511 characters long.
-*  It contains several items detailing what has happened to an image,
-*  e.g. `New copy of gal1' etc.  Each item is terminated by a newline,
-*  while the whole history area is terminated by a SPP end-of-string
-*  (EOS) character.  The NCHARS parameter reveals how many characters
-*  are in the IRAF history area, currently (1992 October) this is a
-*  maximum of 511.  Once the history area is full, later additions are
-*  truncated or lost.
+*  The HISTORY area of an IRAF image is a fixed number of characters
+*  long (see imhdr.h SZ_IMHIST).  It contains several items detailing
+*  what has happened to an image, e.g. `New copy of gal1' etc.  Each
+*  item is terminated by a newline, while the whole history area is
+*  terminated by a SPP end-of-string (EOS) character.  The NCHARS
+*  parameter reveals how many characters are in the IRAF history area.
+*  Once the history area is full, later additions are truncated or
+*  lost.
       CALL NHIST( IMDESC, NHISTL, NCHARS )
-     
-*  Check for empty lines.
-      IF ( NHISTL .GT. 0 ) THEN
-         EMPTY = 0
-         DO 5 K = 1, NHISTL
-            CARD = ' '
-            CALL GETHIS( IMDESC, K, HISTRN )
-            IF ( CHR_LEN( HISTRN ) .EQ. 0 ) EMPTY = EMPTY + 1
-    5    CONTINUE
-
-*  Derive the number of non-blank header lines
-         NHISTL = NHISTL - EMPTY
-      END IF
-
-*  Check whether each history entry is properly terminated by a newline
-*  character.  In the history area, each entry should be terminated
-*  with a newline character.  We should never go more than FITSHI
-*  characters without encountering a newline.  Any more than FITSHI
-*  chars will not fit into a FITS standard HISTORY line.
-      IF ( NCHARS .GT. FITSHI .OR. NHISTL .LE. 1 ) THEN
-         NHISTL = 0
-         CALL MSG_OUT( ' ', 'HISTORY parsing error.  The history '/
-     :     /'information in the IRAF image is too long or not '/
-     :     /'delimited by newlines.', STATUS )
 
 *  Report the number of IRAF history records when verbose reporting is
 *  switched on.
-      ELSE
-         CALL MSG_SETI( 'NHISTL', NHISTL )
-         CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of IRAF history '/
+      CALL MSG_SETI( 'NHISTL', NHISTL )
+      CALL MSG_OUTIF( MSG__VERB, ' ', 'Number of IRAF history '/
      :     /'lines is ^NHISTL', STATUS )
-      END IF
      
 *  Calculate the size of the FITS extension.
 *  =========================================
@@ -192,9 +170,9 @@
 *  Get the first header line to see if it contains
 *  SIMPLE =        T  / Comment.....
 *
-*  Otherwise, will have to add it. The FITS extension should, after
-*  all, contain lines conforming to the FITS standard. Only carried out if 
-*  a header was found.
+*  Otherwise, will have to add it.  The FITS extension should, after
+*  all, contain lines conforming to the FITS standard.  Only carried
+*  out if a header was found.
       CARD=' '
       IF ( NHEAD .GT. 0 ) CALL GETLIN( IMDESC, 1, CARD )
       ADFITS = .FALSE.
@@ -234,7 +212,7 @@
       
 *  Create the NDF extension.
       CALL NDF_XNEW( NDF, 'FITS', '_CHAR*80', 1, XDIMS, FITLOC, STATUS )
-            
+
 *  Map the array so that it can be passed to subroutines for filling.
       CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', FIPNTR, XLINES,
      :               STATUS )
@@ -277,12 +255,9 @@
 *  have been written).
       DO K = LINENO, LINENO + NHEAD - 1
 
-*  Only obtain the card if it has not already been rejected or used, say
-*  for NDF HISTORY records.
+*  Only obtain the card if it has not already been rejected or used,
+*  say for NDF HISTORY records.
          IF ( RETAIN( K - LINENO + 1 ) ) THEN
-
-*  Initialise the card.
-            CARD = ' '
 
 *  Extract each line in the user area.
             CALL GETLIN( IMDESC, K - LINENO + 1, CARD )
@@ -323,24 +298,22 @@
 
 *  Update the position in the FITS header to index the first empty
 *  array element after inserting the header lines.
-*      LINENO = LINENO + NHEAD - NREJEC - NSKIP
       LINENO = NFITSA
 
 *  Append the history records in the FITS extension.
 *  =================================================
 
 *  Loop for each history line.
-      DO K = LINENO, LINENO + NHISTL - 1
-
-*  Initialise the card.
-         CARD = ' '
+      DO K = 1, NHISTL
 
 *  Extract the history line.
-         CALL GETHIS( IMDESC, K - LINENO + 1 , HISTRN )
+         CALL GETHIS( IMDESC, K , HISTRN )
+         NCHARS = CHR_LEN( HISTRN )
 
-*  Prefix the FITS HISTORY keyword.
-         CALL CHR_MOVE( 'HISTORY', CARD( 1: ) )
-         CALL CHR_MOVE( HISTRN, CARD( 10: ) )
+*  Construct the FITS HISTORY card.   Use an ellipsis to indicate where
+*  the IRAF history record is too long to fit within a FITS card.
+         CARD = 'HISTORY  ' // HISTRN( 1:FITSLN-10 )
+         IF ( NCHARS .GT. FITSLN-10 ) CARD( 78: ) = '...'
 
 *  Report the FITS HISTORY line in verbose-message mode.
          CALL MSG_SETC( 'CARD', CARD )      
@@ -348,12 +321,10 @@
 
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, K, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
-     :                   %VAL( FITSLN ) )
+         CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ),
+     :                   STATUS, %VAL( FITSLN ) )
+         LINENO = LINENO + 1
       END DO
-
-*  Update LINENO to point to the last element of the array.
-      LINENO = LINENO + NHISTL
 
 *  Insert a history record in the FITS extension for the conversion.
 *  =================================================================
@@ -362,12 +333,9 @@
 *  format HISTORY line to the FITS extension to say where the image
 *  came from.
 
-*  Initialise the card.
-      CARD = ' '
-
 *  Copy information to a string
-      CALL CHR_MOVE( 'HISTORY Image converted using STARLINK'/
-     :  /' utility IRAF2NDF from the IRAF image', CARD ) 
+      CARD = 'HISTORY Image converted using STARLINK utility IRAF2NDF'/
+     :        /' from the IRAF image'
 
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
@@ -378,9 +346,6 @@
       
 *  Increment the position in the FITS header.
       LINENO =  LINENO + 1
-      
-*  Initialise the line.
-      CARD = ' '
       
 *  Find the current time count.
       CALL PSX_TIME( NTICKS, STATUS )
@@ -412,17 +377,14 @@
 *  Write the termination card image in the FITS extension.
 *  =======================================================      
 
-*  Initialise the line.
-      CARD = ' '
-
 *  Write the card.      
-      CALL CHR_MOVE( 'END', CARD )
+      CARD = 'END'
 
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
      :                %VAL( FITSLN ) )
 
-*  Report the HISTORY line in verbose-message mode.
+*  Report the line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
 
 *  Tidy the extension.
