@@ -4403,7 +4403,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           P_SCALE = O2_S1/RTOS
 
 *      Cube handling
-        ELSE IF ( OPT .EQ. PSF_PSPC__VARP ) THEN
+        ELSE IF ( OPT .EQ. 'VRP' ) THEN
 
 *        Select energy bin
           EBIN = PSF_XRT_PSPC_EBIN( RX_CB_NEBIN, %VAL(RX_CB_EAPTR),
