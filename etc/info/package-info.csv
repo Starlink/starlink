@@ -11,7 +11,7 @@ ATOOLS	S	yes
 AUTOASTROM	S		Norman Gray		Being reimplemented by JAC	
 CAT	U	yes		CLRC		
 CATPAC	U	obsolete			Not in sources, not autoconfed	
-CCDPACK	S	yes			long standing correction	
+CCDPACK	S	yes		CLRC, apart from obsolete dir		
 CFITSIO	U	thirdparty			AJC,MJB (No doc),(external pkg)		
 CGS4DR	S		Frossie Economou			
 CHART	S	obsolete	Clive Davenhall			
@@ -20,7 +20,7 @@ CNF	S	yes		CLRC
 COCO	U	yes				
 CONVERT	X	yes			MJC takes this	
 CURSA	S	yes		CLRC		
-DAOPHOT	S	yes			Starlink version with NDF support		
+DAOPHOT	S	yes	Mark Taylor	Peter Stetson/DAO	Starlink version with NDF support		
 DATACUBE	S	yes				
 DIPSO	S	yes			needs SGS, NCAR, SNX	
 DOCFIND	U	yes				
@@ -34,7 +34,7 @@ EMS	S	yes		CLRC
 ESP	S	yes			Refactoring required	
 EXPECT	S		Dave Terrett			
 EXTRACTOR	S	yes		CLRC		
-EXTREME	U	yes		CLRC	
+EXTREME	U	yes	Mark Taylor	CLRC	
 FIGARO	S	yes				
 FINDCOORDS	U	yes			Missing cursa.cfg	
 FIO	S	yes			Needs per-compiler syserr, not per-OS		
@@ -54,7 +54,7 @@ GSD	J		Tim Jenness		Linux Port V1.0
 GV	S		Brian McIlwrath			
 GWM	X	yes	Dave Terrett			
 HDS	U	yes				
-HDSTOOLS	S	yes				
+HDSTOOLS	S	yes		CLRC + University of Birmingham		
 HDSTRACE	S	yes				
 HLP	S	yes			Have C version	
 HTX	U	yes		CLRC		
@@ -72,7 +72,7 @@ IRCAMDR	J	obsolete	Frossie Economou		De-nagged
 IRCAMPACK	S	obsolete	David Berry		Not autoconfed	
 ISPELL	S		Brian McIlwrath			
 ITCL	U	thirdparty	
-IUEDR	S		Mark Taylor	CLRC		
+IUEDR	U		Mark Taylor	CLRC		
 JCMTDR	J		Tim Jenness		Needs Figaro libs	
 JED	U		Brian McIlwrath			
 JNIAST	U	java	Mark Taylor	CLRC		
@@ -130,7 +130,7 @@ RUNTIME	U		Software Librarian		Needed for distribution, but does not build anyth
 RV	S	yes				
 SAE	X	yes				
 SAOIMAGE	S		Software Librarian		external pkg	
-SCB	U	yes		CLRC	Requires classic-style source tree		
+SCB	U	yes	Mark Taylor	CLRC	Requires classic-style source tree		
 SGS	S	yes				
 SHL	S	yes			
 SKYCAL	X		John Thorstensen		external pkg	
