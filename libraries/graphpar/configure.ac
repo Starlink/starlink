@@ -25,7 +25,7 @@ STAR_DEFAULTS
 dnl    Declare the build and use dependencies for this package
 dnl    The dependencies should expand to include each of the
 dnl    subpackages as they are added to the system
-STAR_DECLARE_DEPENDENCIES([build], [gkspar pgppar sgspar gns])
+STAR_DECLARE_DEPENDENCIES([build], [sae chr ems par mers starx gks gns pgp sgs])
 dnl    There are no `link' or `use' dependencies, because there is no way this
 dnl    package can be `used' -- it's just a wrapper
 

@@ -26,13 +26,9 @@ STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae gks par])
-STAR_DECLARE_DEPENDENCIES([link],  [gns gks gwm starx ems])
-
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
