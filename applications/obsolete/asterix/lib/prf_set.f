@@ -20,7 +20,7 @@
 *        ADI identifier of dataset
 *     FLAG = CHARACTER*(*) (given)
 *        The name of the flag
-*     VALUE = LOGICAL (given)
+*     VALUE = LOGICAL (returned)
 *        The value of the flag
 *     STATUS = INTEGER (given and returned)
 *        The global status.
@@ -73,6 +73,8 @@
 *  History:
 *     15 Feb 1995 (DJA):
 *        Original version.
+*     23 Jan 1996 (DJA)
+*        Proper ADI version
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,163 +87,42 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
-      INCLUDE 'DAT_PAR'					! HDS constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset id
-      CHARACTER*(*)		FLAG			! Flag name
-      LOGICAL			VALUE			! Flag value
+      INTEGER			ID
+      CHARACTER*(*)		FLAG
+      LOGICAL			VALUE
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! Temporary !
+      INTEGER			IARG(4)			! Method inputs
+      INTEGER			OARG			! Method return value
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get locator and invoke HDS version
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
-      CALL PRF1_SET( LOC, FLAG, VALUE, STATUS )
+*  Get linked file object
+      IARG(1) = ID
+      CALL ADI_GETLINK( ID, IARG(2), STATUS )
+
+*  Store flag name
+      CALL ADI_NEWV0C( FLAG, IARG(3), STATUS )
+
+*  Store flag value
+      CALL ADI_NEWV0L( VALUE, IARG(4), STATUS )
+
+*  Execute the method
+      CALL ADI_EXEC( 'SetProFlag', 4, IARG, OARG, STATUS )
+
+*  Free temps
+      CALL ADI_ERASE( IARG(3), STATUS )
+      CALL ADI_ERASE( IARG(4), STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF_SET', STATUS )
-
-      END
-
-
-
-*+  PRF1_SET - Set a specified PROCESSING flag
-      SUBROUTINE PRF1_SET( LOC, NAME, VALUE, STATUS )
-*
-*    Description :
-*
-*     Sets the value of a named processing flag. The name is given as
-*     the HDS structure after the MORE.ASTERIX.PROCESSING object, eg.
-*     CORRECTED.EXPOSURE or BGND_SUBTRACTED.
-*
-*    Method :
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (ROSAT,BHVAD::DJA)
-*
-*    History :
-*
-*     12 Nov 93 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Import :
-*
-      CHARACTER*(DAT__SZLOC)	LOC			! Top-level dataset
-      CHARACTER*(*)		NAME			! Processing flag name
-      LOGICAL                   VALUE			! Processing flag value
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC)	FLOC			! Flag object
-      CHARACTER*(DAT__SZLOC)	PLOC			! PROCESSING object
-      CHARACTER*(DAT__SZLOC)	TLOC			! Cursor locator
-      CHARACTER*(DAT__SZNAM)	CNAME			! Component name
-
-      INTEGER			DPOS			! Dot position
-      INTEGER			I			! Structure loop
-      INTEGER			IC			! Character index
-
-      LOGICAL                   THERE			! Component exists?
-*
-*    Local data :
-*
-      CHARACTER*(DAT__SZNAM)    SNAMES(3)               ! Sub-stucture names
-      DATA                      SNAMES/'MORE','ASTERIX',
-     :                                 'PROCESSING'/
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Does PROCESSING component exist?
-      CALL HDX_FIND( LOC, 'MORE.ASTERIX.PROCESSING', PLOC, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*      Ignore last status
-        CALL ERR_ANNUL( STATUS )
-
-*      Create the processing structure
-        CALL DAT_CLONE( LOC, TLOC, STATUS )
-        DO I = 1, 3
-          IF ( I .GT. 1 ) THEN
-            CALL DAT_ANNUL( TLOC, STATUS )
-            TLOC = PLOC
-          END IF
-          CALL DAT_THERE( TLOC, SNAMES(I), THERE, STATUS )
-          IF ( .NOT. THERE ) THEN
-            CALL DAT_NEW( TLOC, SNAMES(I), 'EXTENSION', 0, 0, STATUS )
-          END IF
-          CALL DAT_FIND( TLOC, SNAMES(I), PLOC, STATUS )
-        END DO
-        CALL DAT_ANNUL( TLOC, STATUS )
-
-      END IF
-
-*    Is this a structured flag, ie. more than a sub-component of PROCESSING?
-      IC = 1
-      IF ( INDEX(NAME,'.') .GT. 0 ) THEN
-
-*      Process sub-component names in the flag name
-        CALL DAT_CLONE( PLOC, TLOC, STATUS )
- 20     DPOS = INDEX(NAME(IC:),'.')
-        IF ( DPOS .GT. 0 ) THEN
-          CNAME = NAME(IC:IC+DPOS-2)
-          IF ( IC .GT. 1 ) THEN
-            CALL DAT_ANNUL( TLOC, STATUS )
-            TLOC = FLOC
-          END IF
-          CALL DAT_THERE( TLOC, CNAME, THERE, STATUS )
-          IF ( .NOT. THERE ) THEN
-            CALL DAT_NEW( TLOC, CNAME, 'EXTENSION', 0, 0, STATUS )
-          END IF
-          CALL DAT_FIND( TLOC, CNAME, FLOC, STATUS )
-          IC = IC + DPOS
-          IF ( STATUS .EQ. SAI__OK) GOTO 20
-        END IF
-        CALL DAT_ANNUL( TLOC, STATUS )
-
-*    Simple one-level flag
-      ELSE
-        CALL DAT_CLONE( PLOC, FLOC, STATUS )
-
-      END IF
-
-*    Write the flag value
-      CALL HDX_PUTL( FLOC, NAME(IC:), 1, VALUE, STATUS )
-
-*    Free flag container structure
-      CALL DAT_ANNUL( FLOC, STATUS )
-
-*    Free PROCESSING structure
-      CALL DAT_ANNUL( PLOC, STATUS )
-
-*    Report any errors (these would be HDS bugs, the sensible errors having
-*    been trapped above).
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF1_SET', STATUS )
 
       END

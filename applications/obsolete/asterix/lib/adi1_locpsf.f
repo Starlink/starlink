@@ -128,7 +128,7 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'ADI1_LOCINSTR', STATUS )
+        CALL AST_REXIT( 'ADI1_LOCPSF', STATUS )
       END IF
 
       END

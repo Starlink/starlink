@@ -73,6 +73,8 @@
 *  History:
 *     15 Feb 1995 (DJA):
 *        Original version.
+*     23 Jan 1996 (DJA)
+*        Proper ADI version
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,7 +87,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
-      INCLUDE 'DAT_PAR'					! HDS constants
       INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
@@ -99,130 +100,28 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! Temporary !
-
-      INTEGER			FID
-
-      LOGICAL			ISHDS			! HDS object?
+      INTEGER			IARG(3)			! Method inputs
+      INTEGER			OARG			! Method return value
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Derived from HDSfile?
-      VALUE = .FALSE.
-      CALL ADI_GETFILE( ID, FID, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE IF ( FID .NE. ADI__NULLID ) THEN
+*  Get linked file object
+      IARG(1) = ID
+      CALL ADI_GETLINK( ID, IARG(2), STATUS )
 
-        CALL ADI_DERVD( FID, 'HDSfile', ISHDS, STATUS )
-        IF ( ISHDS ) THEN
+*  Store flag name
+      CALL ADI_NEWV0C( FLAG, IARG(3), STATUS )
 
-*      Get locator and invoke HDS version
-          CALL ADI1_GETLOC( FID, LOC, STATUS )
-          CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
-        END IF
-      END IF
+*  Execute the method
+      CALL ADI_EXEC( 'GetProFlag', 3, IARG, OARG, STATUS )
+
+*  Extract return value
+      CALL ADI_GET0L( OARG, VALUE, STATUS )
+      CALL ADI_ERASE( OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF_GET', STATUS )
-
-      END
-
-
-
-*+  PRF1_GET - Is a specified PROCESSING flag set?
-      SUBROUTINE PRF1_GET( LOC, NAME, VALUE, STATUS )
-*
-*    Description :
-*
-*     Returns the value of a named processing flag. The name is given as
-*     the HDS structure after the MORE.ASTERIX.PROCESSING object, eg.
-*     CORRECTED.EXPOSURE or BGND_SUBTRACTED.
-*
-*    Method :
-*
-*     If the flag exists, its value is returned. Otherwise the flag is
-*     assumed to be false.
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*
-*     David J. Allan (ROSAT,BHVAD::DJA)
-*
-*    History :
-*
-*     12 Nov 93 : Original (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Import :
-*
-      CHARACTER*(DAT__SZLOC)	LOC			! Top-level dataset
-      CHARACTER*(*)		NAME			! Processing flag name
-*
-*    Export :
-*
-      LOGICAL                   VALUE			! Processing flag value
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*(DAT__SZLOC)	FLOC			! Flag object
-      CHARACTER*(DAT__SZLOC)	PLOC			! PROCESSING object
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Default is flag not set
-      VALUE = .FALSE.
-
-*    Does PROCESSING component exist?
-      CALL HDX_FIND( LOC, 'MORE.ASTERIX.PROCESSING', PLOC, STATUS )
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*      Does named flag exist?
-        CALL HDX_FIND( PLOC, NAME, FLOC, STATUS )
-        IF ( STATUS .EQ. SAI__OK ) THEN
-
-*        Get flag value
-          CALL DAT_GET0L( FLOC, VALUE, STATUS )
-          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            VALUE = .FALSE.
-          END IF
-
-*        Free flag structure
-          CALL DAT_ANNUL( FLOC, STATUS )
-
-        ELSE
-          CALL ERR_ANNUL( STATUS )
-        END IF
-
-*      Free PROCESSING structure
-        CALL DAT_ANNUL( PLOC, STATUS )
-
-      ELSE
-        CALL ERR_ANNUL( STATUS )
-      END IF
-
-*    Report any errors (these would be HDS bugs, the sensible errors having
-*    been trapped above).
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'PRF1_GET', STATUS )
 
       END

@@ -109,6 +109,9 @@
       EXTERNAL			GMI1_NEWLNK
       EXTERNAL			GMI1_SETLNK
 
+      EXTERNAL			PRF1_GET
+      EXTERNAL			PRF1_SET
+
       EXTERNAL			SSI1_NEWLNK
 
       EXTERNAL			UDI1_COPANC
@@ -182,6 +185,12 @@
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'NewLink(_SSDSset,_HDSfile)', SSI1_NEWLNK,
      :                 DID, STATUS )
+
+*  Processing flag setting
+      CALL ADI_DEFMTH( 'GetProFlag(_,_HDSfile,_CHAR)', PRF1_GET,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetProFlag(_,_HDSfile,_CHAR,_LOGICAL)',
+     :                 PRF1_SET, DID, STATUS )
 
 *  Ancillary copying
       CALL ADI_DEFMTH( 'CopyAncillary(_,_HDSfile,_,_HDSfile,_CHAR)',

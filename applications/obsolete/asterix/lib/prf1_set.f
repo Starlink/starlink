@@ -111,7 +111,6 @@
       INTEGER			IC			! Character index
 
       LOGICAL                   THERE			! Component exists?
-      LOGICAL                   VALUE			! Flag value
 *
 *    Local data :
 *
@@ -124,10 +123,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the file locator
-      CALL ADI1_GETLOC( IARG(2), LOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
 
 *  Get flag name and value
-      CALL ADI_GET0C( IARG(3), NAME, STATUS )
+      CALL ADI_GET0C( ARGS(3), NAME, STATUS )
 
 *  Does PROCESSING component exist?
       CALL ADI1_FIND( LOC, 'MORE.ASTERIX.PROCESSING', PLOC, STATUS )
@@ -183,7 +182,7 @@
       END IF
 
 *  Write the flag value
-      CALL ADI1_CCA2HL( IARG(4), ' ', FLOC, NAME(IC:), STATUS )
+      CALL ADI1_CCA2HL( ARGS(4), ' ', FLOC, NAME(IC:), STATUS )
 
 *  Free flag container structure
       CALL DAT_ANNUL( FLOC, STATUS )

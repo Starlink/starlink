@@ -114,14 +114,14 @@
       VALUE = .FALSE.
 
 *  Get file locator
-      CALL ADI1_GETLOC( IARG(2), LOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
 
 *  Does PROCESSING component exist?
       CALL ADI1_FIND( LOC, 'MORE.ASTERIX.PROCESSING', PLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Extract processing flag name
-        CALL ADI_GET0C( IARG(3), NAME, STATUS )
+        CALL ADI_GET0C( ARGS(3), NAME, STATUS )
 
 *    Does named flag exist?
         CALL ADI1_FIND( PLOC, NAME, FLOC, STATUS )
