@@ -80,3 +80,11 @@
 
   Peter Draper 23th June 1999.
 
+
+--------------------
+
+New changes:
+
+    added percentiles to contour generation
+    "automatic" and "percent" now correctly use the image to be
+    contoured not the displayed image.
