@@ -195,6 +195,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialise variables
+      NEXCL = 0
+      THRESH = 0.0
+      VARNCE = 0.0
+
 *  Make sure the box size is odd, and count the number of pixels in the
 *  box.
       NBOX=1
