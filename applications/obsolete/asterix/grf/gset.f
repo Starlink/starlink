@@ -3575,9 +3575,9 @@
               IVAL=0
             ENDIF
             CALL MSG_SETI('BG',IVAL)
-            CALL MSG_PRNT('  LineWidth=^WID   LineStyle=^STY   '//
-     :                  'CharFont=^FON   CharSize=^SIZ   '//
-     :                  'Colour=^COL BackGroundCol=^BG')
+            CALL MSG_PRNT('  LineWidth=^WID  LineStyle=^STY  '//
+     :                  'CharFont=^FON  CharSize=^SIZ  '//
+     :                  'Colour=^COL  BckGndCol=^BG')
             CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'ALL') THEN

@@ -41,7 +41,7 @@
             IVAL=1
           ENDIF
           CALL PGSCI(IVAL)
-          CALL GCB_GETI('DEFAULT_BGDN',OK,IVAL,STATUS)
+          CALL GCB_GETI('DEFAULT_BGND',OK,IVAL,STATUS)
           IF (.NOT.OK) THEN
             IVAL=0
           ENDIF
