@@ -7101,7 +7101,7 @@ Draws +/-n standard-deviation lines on a line plot.
 
 Usage:
 
-   drawsig ndf nsigma [axis] [comp] [sigcol] [linestyle]
+   drawsig ndf nsigma [axis] [comp]
 
 Description:
 
@@ -7113,7 +7113,8 @@ Description:
    You can plot the lines horizontally or vertically as appropriate.
    The lines extend the full width or height of the plot's data
    area.  Up to five different multiples of the standard deviation
-   may be presented in this fashion.
+   may be presented in this fashion. Each line can be drawn with a
+   different style (see parameter STYLE).
 
    The application also computes statistics for those array values
    that lie between each pair of plotted lines.  In other words it
@@ -7149,17 +7150,6 @@ COMP = LITERAL (Read)
 DEVICE = DEVICE (Read)
    The graphics device to draw the sigma lines on.
    [Current graphics device]
-3 LINESTYLE
-LINESTYLE = _INTEGER (Read)
-   Line style to be used.  The allowed values produce the
-   following styles.
-        1 = solid
-        2 = dashed
-        3 = dotted
-        4 = dot-dashed
-
-   LINESTYLE defaults to the current value, which is initially 3,
-   giving dotted lines. []
 3 NDF
 NDF = NDF (Read)
    The NDF structure containing the data array whose error limits
@@ -7174,32 +7164,46 @@ NSIGMA() = _REAL (Read)
    Number of standard deviations about the mean at which the
    lines should be drawn.  The null value or 0.0 causes a line to
    be drawn at the mean value.
-3 SIGCOL
-SIGCOL = _INTEGER (Read)
-   The colour in which to draw any graphics specified by
-   parameter LINESTYLE.  The options are described below.
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the lines.
 
-     "MAX"          - The maximum colour index used for the
-                      display of the image.
-     "MIN"          - The minimum colour index used for the
-                      display of the image.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
 
-   If the colour is to remain unaltered as the lookup table is
-   manipulated choose an integer between 0 and 15, or a named
-   colour.  The suggested default is the current value.
-3 THICK
-THICK = _REAL (Read)
-   The thickness of the lines in the plot, where 1.0 is the
-   normal thickness.  It must take a value in the range
-   0.5--10.0.  [1.0]
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The attributes Colour(Curves), Width(Curves), etc, can be used
+   to specify the style for the lines. These values apply to all
+   lines unless subsequent attributes over-ride them. Attributes for
+   individual clipping levels can be given by replacing "Curves" above
+   by a string of the form "Nsig<i>" where "<i>" is an integer
+   index into the list of clipping levels supplied for parameter
+   NSIGMA. Thus, "Colour(Nsig1)" will set the colour for the lines
+   associated with the first clipping level, etc. The attribute
+   settings can be restricted to one of the two lines by appending
+   either a "+" or a "-" to the "Nsig<i>" string. Thus,
+   "Width(Nsig2-)" sets the line width for the lower of the two
+   lines associated with the second clipping level, and "Width(Nsig2-)"
+   sets the width for the upper of the two lines. [current value]
 2 Examples
-drawsig nsigma=3 linestyle=1
+drawsig nsigma=3 style='style=1'
    This draws solid horizontal lines on the last DATA picture on
    the current graphics device located at plus and minus 3
    standard deviations about the mean.  The statistics come from
@@ -7210,12 +7214,16 @@ drawsig phot 2.5
    lines about the mean for the data in the NDF called phot on
    the default graphics device.
 
+drawsig phot 2.5 style='"colour(nsig1-)=red,colour(nsig1+)=green"'
+   As above, but the lower line is drawn in red and the upper line
+   is drawn in green.
+
 drawsig cluster [2,3] X Error
    This draws vertical lines at plus and minus 2 and 3
    standard deviations about the mean for the error data in the
    NDF called cluster on the default graphics device.
 
-drawsig device=xwindows phot(20:119) 3 linestyle=3 sigcol=red
+drawsig device=xwindows phot(20:119) 3 style="'colour=red,style=4'"
    This draws red dotted horizontal lines on the xwindows device
    at +/- 3 standard deviations using the 100 pixels in NDF
    phot(20:119).
@@ -7229,6 +7237,8 @@ within this picture.
 TIMJ: Tim Jenness (JACH)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1996 October 14 (TIMJ):
     Original version
@@ -7237,6 +7247,15 @@ MJC: Malcolm J. Currie (STARLINK)
     Expanded the documentation.  Fixed a bug that caused the final
     line always to be solid.  Added AXIS parameter.  Standardised
     the code style.  Renamed parameter LINSTYLE to LINESTYLE.
+
+ 6-MAY-1998 (DSB):
+    Update the GKS workstation after changing polyline
+    representations, and do not re-instate original representations
+    at end. This prevents the screen being cleared when the
+    workstation is closed.
+
+ 27-OCT-1999 (DSB):
+    Major changes to use AST/PGPLOT for the graphics.
 2 Implementation_Status
    -  This routine correctly processes the DATA, VARIANCE, and
    QUALITY, components of the NDF.

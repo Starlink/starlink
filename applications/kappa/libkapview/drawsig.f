@@ -29,7 +29,7 @@
 *     The lines extend the full width or height of the plot's data
 *     area.  Up to five different multiples of the standard deviation
 *     may be presented in this fashion. Each line can be drawn with a
-*     different style.
+*     different style (see parameter STYLE).
 *
 *     The application also computes statistics for those array values
 *     that lie between each pair of plotted lines.  In other words it
