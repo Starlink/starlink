@@ -86,6 +86,7 @@
 *                         selection mechanism a bit more modular (DJA)
 *     21 Dec 94 : V1.8-5  Changed to new ARD (RJV)
 *     15 Feb 95 : V1.8-6  Removed old stuff as well so that it links! (DJA)
+*     24 Apr 95 : V1.8-7  Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -94,7 +95,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
@@ -116,77 +117,74 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) AUXLOC                 ! Auxilliary data object
-      CHARACTER*(DAT__SZLOC) DLOC                   ! Locator to data array
-      CHARACTER*(DAT__SZLOC) ILOC                   ! Locator to input file
-      CHARACTER*(DAT__SZLOC) OLOC                   ! Locator to output file
-      CHARACTER*80           AXLABEL(DAT__MXDIM)    ! Axis labels
-      CHARACTER*(PAR__SZNAM) PAR                    ! Parameter name
-      CHARACTER*8            MODQUAL                ! Quality to modify
-      CHARACTER*80           TEXT(2)                ! History text
-      CHARACTER*8            QVAL                   ! Quality value
-      CHARACTER*40           DEF                    ! Default value string
+      CHARACTER*80           	AXLABEL(ADI__MXDIM)    	! Axis labels
+      CHARACTER*(PAR__SZNAM) 	PAR                    	! Parameter name
+      CHARACTER*8            	MODQUAL                	! Quality to modify
+      CHARACTER*80           	TEXT(2)                	! History text
+      CHARACTER*8            	QVAL                   	! Quality value
+      CHARACTER*40           	DEF                    	! Default value string
 
-      REAL                   AXLO(DAT__MXDIM)       ! lo axis value
-      REAL                   AXHI(DAT__MXDIM)       ! hi axis value
-      REAL                   DIR(DAT__MXDIM)        ! axis direction indicator
-      REAL                   AXRANGES(2,MX_BNDS,DAT__MXDIM)  ! Axis ranges
-      REAL                   DMIN, DMAX             ! Data min, max
-      REAL                   DRANGES(2,MX_BNDS)     ! Data ranges
+      REAL                   	AXLO(ADI__MXDIM)       ! lo axis value
+      REAL                   	AXHI(ADI__MXDIM)       ! hi axis value
+      REAL                   	DIR(ADI__MXDIM)        ! axis direction indicator
+      REAL                   	AXRANGES(2,MX_BNDS,ADI__MXDIM)  ! Axis ranges
+      REAL                   	DMIN, DMAX             	! Data min, max
+      REAL                   	DRANGES(2,MX_BNDS)     	! Data ranges
 
-      INTEGER                AXPTR(DAT__MXDIM)      ! Mapped axes
-      INTEGER                CPTR                   ! Pointer to dynamic
-                                                    ! array
-      INTEGER                TCPTR                   ! Pointer to dynamic
-                                                    ! array
-      INTEGER                DIMS(DAT__MXDIM)       ! Length of each dimension
-      INTEGER                DPTR                   ! Pointer to mapped
-                                                    ! data array
-      INTEGER                I, J                   ! Loop counters
-      INTEGER                JUNK
-      INTEGER                NAXES                  ! Number of selected
-                                                    ! axes
-      INTEGER                NAXRANGES(DAT__MXDIM)  ! Number of ranges
-                                                    ! for each axis
-      INTEGER                NCH                    ! # changed pixels
-      INTEGER                NDIM                   ! Number of dimensions
-      INTEGER                NDRANGES               ! Number of data ranges
-      INTEGER                NELM                   ! Number of data points
-      INTEGER                NFROM                  ! # user selected points
-      INTEGER                NLINES                 ! Number of TEXT lines
-      INTEGER                PIXRNG(2,MX_BNDS,DAT__MXDIM)    ! Pixel ranges
-      INTEGER                QDIMS(DAT__MXDIM)      ! Length of each dimension
-      INTEGER                QNDIM                  ! Number of dimensions
-      INTEGER                QPTR                   ! Pointer to mapped
-                                                    ! QUALITY
-      INTEGER                AXES(DAT__MXDIM)       ! Selected axes
+      INTEGER			AFID			! Auxilliary dataset id
+      INTEGER                	AXES(ADI__MXDIM)       	! Selected axes
+      INTEGER                	AXPTR(ADI__MXDIM)      	! Mapped axes
+      INTEGER                	CPTR                   	! Dynamic array
+      INTEGER			DFID			! Data comp'n id
+      INTEGER                	DIMS(ADI__MXDIM)       	! Dataset dimensions
+      INTEGER                	DPTR                   	! Pointer to mapped
+							!   data array
+      INTEGER                	I, J                   	! Loop counters
+      INTEGER			IFID			! Input dataset id
+      INTEGER                	JUNK
+      INTEGER                	NAXES                  	! # selected axes
+      INTEGER                	NAXRANGES(ADI__MXDIM)  	! Number of ranges
+							! for each axis
+      INTEGER                	NCH                    	! # changed pixels
+      INTEGER                	NDIM                   	! Number of dimensions
+      INTEGER                	NDRANGES               	! Number of data ranges
+      INTEGER                	NELM                   	! Number of data points
+      INTEGER                	NFROM                  	! # user selected points
+      INTEGER                	NLINES                 	! Number of TEXT lines
+      INTEGER			OFID			! Output dataset id
+      INTEGER                	PIXRNG(2,MX_BNDS,ADI__MXDIM)    ! Pixel ranges
+      INTEGER                	QDIMS(ADI__MXDIM)      	! Length of each dimension
+      INTEGER                	QNDIM                  	! Number of dimensions
+      INTEGER                	QPTR                   	! Pointer to mapped
+							!   QUALITY
+      INTEGER                	TCPTR                   ! Dynamic array
 
-      BYTE                   BQVAL		    ! Quality value
+      BYTE                   	BQVAL		    	! Quality value
 
-      LOGICAL                AXSEL                  ! Select on axis ranges?
-      LOGICAL                DATSEL                 ! Select on data ranges?
-      LOGICAL                FSEL                   ! Select on spatial file ?
-      LOGICAL                GOTAUX                 ! Got auxilliary file ?
-      LOGICAL 		     MAGIC		    ! Select on magic values?
-      LOGICAL                MODESET                ! Mode selected
-      LOGICAL                INPRIM                 ! Is input primitive?
-      LOGICAL                OK                     ! OK?
-      LOGICAL                OVERWRITE              ! Overwrite input dataset
-      LOGICAL        	     Q_IGNORE		    ! Mode switches
-      LOGICAL        	     Q_RESTORE
-      LOGICAL        	     Q_SET
-      LOGICAL        	     Q_AND
-      LOGICAL        	     Q_OR
-      LOGICAL        	     Q_EOR
-      LOGICAL        	     Q_NOT
-      LOGICAL                QSEL                   ! Select QUALITY
-                                                    ! Value to modify?
-      LOGICAL                SEL(DAT__MXDIM)        ! Select this axis?
+      LOGICAL                	AXSEL                  	! Select on axis ranges?
+      LOGICAL                	DATSEL                 	! Select on data ranges?
+      LOGICAL                	FSEL                   	! Select on spatial file ?
+      LOGICAL                	GOTAUX                 	! Got auxilliary file ?
+      LOGICAL 		     	MAGIC		    	! Select on magic values?
+      LOGICAL                	MODESET                	! Mode selected
+      LOGICAL                	INPRIM                 	! Is input primitive?
+      LOGICAL                	OK                     	! OK?
+      LOGICAL                	OVERWRITE              	! Overwrite input dataset
+      LOGICAL        	     	Q_IGNORE		! Mode switches
+      LOGICAL        	     	Q_RESTORE
+      LOGICAL        	     	Q_SET
+      LOGICAL        	     	Q_AND
+      LOGICAL        	     	Q_OR
+      LOGICAL        	     	Q_EOR
+      LOGICAL        	     	Q_NOT
+      LOGICAL                	QSEL                    ! Select QUALITY
+                                                        !   value to modify?
+      LOGICAL                	SEL(ADI__MXDIM)        	! Select this axis?
 *
 *    Version id :
 *
-      CHARACTER*80           VERSION
-        PARAMETER            ( VERSION = 'QUALITY Version 1.8-6' )
+      CHARACTER*80           	VERSION
+        PARAMETER            	( VERSION = 'QUALITY Version 1.8-7' )
 *-
 
 *    Version id
@@ -200,15 +198,16 @@
 
 *    Get input
       IF ( OVERWRITE ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
-        OLOC = ILOC
+        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        OFID = IFID
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'R', ILOC, OLOC, INPRIM, STATUS )
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
       END IF
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
 
 *    Check DATA
-      CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
       IF (.NOT. OK) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Invalid dataset', STATUS )
@@ -298,14 +297,14 @@
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Check QUALITY
-      CALL BDA_CHKQUAL( OLOC, OK, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHKQUAL( OFID, OK, QNDIM, QDIMS, STATUS )
 
       IF ( .NOT. OK ) THEN
         IF ( Q_SET .OR. Q_IGNORE ) THEN
-          CALL BDA_CREQUAL( OLOC, NDIM, DIMS, STATUS )
-          CALL BDA_MAPQUAL( OLOC, 'WRITE', QPTR, STATUS )
+          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
+          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
 
         ELSE
           STATUS = SAI__ERROR
@@ -314,14 +313,14 @@
 
         END IF
       ELSE
-        CALL BDA_MAPQUAL( OLOC, 'UPDATE', QPTR, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
       END IF
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Adjust size of array to 7 D
-      DO I = NDIM + 1, DAT__MXDIM
+      DO I = NDIM + 1, ADI__MXDIM
         DIMS(I) = 1
       END DO
 
@@ -331,16 +330,16 @@
 
 *    Auxilliary data object?
       IF ( DATSEL .OR. MAGIC ) THEN
-        CALL USI_ASSOCI( 'AUXIN', 'READ', AUXLOC, INPRIM, STATUS )
+        CALL USI_TASSOCI( 'AUXIN', '*', 'READ', AFID, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           CALL ERR_ANNUL( STATUS )
           GOTAUX = .FALSE.
-          CALL DAT_CLONE( ILOC, DLOC, STATUS )
+	  CALL ADI_CLONE( IFID, DFID, STATUS )
         ELSE IF ( STATUS .NE. SAI__OK ) THEN
           GOTO 99
         ELSE
           GOTAUX = .TRUE.
-          CALL DAT_CLONE( AUXLOC, DLOC, STATUS )
+	  CALL ADI_CLONE( AFID, DFID, STATUS )
         END IF
       END IF
 
@@ -351,11 +350,11 @@
       IF ( AXSEL ) THEN
 
 *      Display axes
-        CALL QUALITY_DISPAX( OLOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
+        CALL QUALITY_DISPAX( OFID, NDIM, DIMS, AXLABEL, AXLO, AXHI,
      :                                                DIR, STATUS )
 
 *      Construct allowed ranges
-        DO I = 1, DAT__MXDIM
+        DO I = 1, ADI__MXDIM
           NAXRANGES(I) = 1
           AXRANGES(1,1,I) = AXLO(I)
           AXRANGES(2,1,I) = AXHI(I)
@@ -397,10 +396,10 @@
      :                   AXRANGES(1,1,J), NAXRANGES(J), STATUS )
 
 *      Convert axis value ranges to pixel ranges
-          CALL BDA_MAPAXVAL (OLOC, 'R', J, AXPTR(J), STATUS)
+          CALL BDI_MAPAXVAL (OFID, 'R', J, AXPTR(J), STATUS)
           CALL QUALITY_AXRAN (DIMS(J),NAXRANGES(J),AXRANGES(1,1,J),
      :                     %VAL(AXPTR(J)),DIR(J),PIXRNG(1,1,J),STATUS)
-          CALL BDA_UNMAPAXVAL( OLOC, J, STATUS )
+          CALL BDI_UNMAPAXVAL( OFID, J, STATUS )
 
         END DO
 
@@ -417,12 +416,12 @@
 
 *      Read some axis values if not read already
         IF ( .NOT. AXSEL ) THEN
-          CALL QUALITY_DISPAX( ILOC, NDIM, DIMS, AXLABEL, AXLO, AXHI,
+          CALL QUALITY_DISPAX( IFID, NDIM, DIMS, AXLABEL, AXLO, AXHI,
      :                                                  DIR, STATUS )
         END IF
 
 *      Read ARD file and set pixel values wanted
-        CALL QUALITY_SETFSEL( ILOC, NDIM, DIMS, AXLO, AXHI,
+        CALL QUALITY_SETFSEL( IFID, NDIM, DIMS, AXLO, AXHI,
      :                                %VAL(TCPTR), STATUS )
 
 *      AND it with our existing array
@@ -435,7 +434,7 @@
       IF ( DATSEL ) THEN
 
 *      Map data and get its range (ignoring quality)
-        CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
+        CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
         CALL ARR_RANG1R( NELM, %VAL(DPTR), DMIN, DMAX, STATUS )
 
         CALL MSG_PRNT( ' ' )
@@ -474,7 +473,7 @@
       IF ( MAGIC ) THEN
 
 *      Set up selection array
-        CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
+        CALL BDI_MAPDATA( DFID, 'READ', DPTR, STATUS )
         CALL QUALITY_SETMSEL( NELM, %VAL(DPTR), %VAL(TCPTR), STATUS )
 
 *      AND it with our existing array
@@ -558,7 +557,7 @@
       END IF
 
 *    Write output quality
-      CALL BDA_UNMAPQUAL( OLOC, STATUS )
+      CALL BDI_UNMAPQUAL( OFID, STATUS )
 
 *    Inform user of altered points
       IF ( AXSEL .AND. DATSEL ) THEN
@@ -578,19 +577,18 @@
      :                            /' ^NFROM points in ^FROM' )
 
 *    Write history
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       NLINES = 1
       IF ( QSEL ) THEN
         TEXT(2) = ' Only points having QUALITY = '//MODQUAL//' altered'
         NLINES  = 2
       END IF
 
-      CALL HIST_PTXT( OLOC, NLINES, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
 
 *    Auxilliary array used?
       IF ( GOTAUX ) THEN
-        CALL BDA_RELEASE( DLOC, STATUS )
-        CALL DAT_ANNUL( DLOC, STATUS )
+        CALL BDI_RELEASE( DFID, STATUS )
       END IF
 
 *    Exit
@@ -602,8 +600,8 @@
 
 
 *+  QUALITY_DISPAX - Display axes
-      SUBROUTINE QUALITY_DISPAX (LOC,NDIM,DIMS,AXLABEL,
-     :                                  AXLO,AXHI,DIR, STATUS)
+      SUBROUTINE QUALITY_DISPAX( FID, NDIM, DIMS, AXLABEL,
+     :                           AXLO, AXHI, DIR, STATUS )
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -624,12 +622,11 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) LOC                ! locator to container object
-
+      INTEGER			FID			! ADI dataset id
       INTEGER                NDIM               ! Number of dimensions
       INTEGER                DIMS(*)            ! Length of each axis
 *
@@ -647,9 +644,7 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) CELL               ! Locator to AXIS DATA_ARRAY cell
-      CHARACTER*(DAT__SZLOC) AXLOC              ! Locator to AXIS structure
-
+      INTEGER			APTR			! Axis values ptr
       INTEGER                I                  ! loop variable
       INTEGER                SIZ                ! dummy
 
@@ -666,28 +661,26 @@
 
       DO I = 1, NDIM
 *  get label
-        CALL BDA_GETAXLABEL (LOC, I, AXLABEL(I), STATUS)
+        CALL BDI_GETAXLABEL( FID, I, AXLABEL(I), STATUS )
         CALL MSG_SETI ('I', I)
         CALL MSG_SETC ('NAME', AXLABEL(I))
         CALL MSG_PRNT (' ^I ^NAME')
 
 *  check values
-        CALL BDA_CHKAXVAL (LOC, I, OK, REG, SIZ, STATUS)
+        CALL BDI_CHKAXVAL( FID, I, OK, REG, SIZ, STATUS )
 
 * find lo and hi values
         IF ( REG ) THEN
-          CALL BDA_GETAXVAL (LOC, I, BASE, SCALE, SIZ, STATUS)
+          CALL BDI_GETAXVAL( FID, I, BASE, SCALE, SIZ, STATUS )
           AXLO(I) = BASE
           AXHI(I) = BASE + (SIZ - 1) * SCALE
 
          ELSE
-           CALL BDA_LOCAXVAL( LOC, I, AXLOC, STATUS )
-           CALL DAT_CELL( AXLOC, 1, 1, CELL, STATUS )
-           CALL DAT_GET0R( CELL, AXLO(I), STATUS )
-           CALL DAT_ANNUL( CELL, STATUS )
-           CALL DAT_CELL( AXLOC, 1, DIMS(I), CELL, STATUS )
-           CALL DAT_GET0R( CELL, AXHI(I), STATUS )
-           CALL DAT_ANNUL( CELL, STATUS )
+           CALL BDI_MAPAXVAL( FID, 'READ', I, APTR, STATUS )
+           CALL ARR_ELEM1R( APTR, SIZ, 1, AXLO(I), STATUS )
+           CALL ARR_ELEM1R( APTR, SIZ, SIZ, AXHI(I), STATUS )
+           CALL BDI_UNMAPAXVAL( FID, I, STATUS )
+
          END IF
 
 *  set direction indicator
@@ -711,7 +704,6 @@
 *    Type definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
       INTEGER                MX_BNDS            ! max no. permissible bounds
         PARAMETER           (MX_BNDS = 100)
@@ -757,7 +749,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
@@ -781,7 +773,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *    Initialise
-      CALL ARR_SUMDIM( DAT__MXDIM, DIMS, NELM )
+      CALL ARR_SUMDIM( ADI__MXDIM, DIMS, NELM )
       CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
 
       CALL QUALITY_SETAXSEL_INT(DIMS(1),DIMS(2),DIMS(3),DIMS(4),DIMS(5),
@@ -863,7 +855,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -919,7 +910,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *    Import :
       INTEGER                LEN                    ! Number of data points
@@ -990,7 +980,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 
 *    Import :
       INTEGER                LEN                    ! Number of data points
@@ -1029,7 +1018,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                LEN                    ! Number of data points
       BYTE                   QVAL
@@ -1069,7 +1057,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                LEN                    ! Number of data points
       BYTE                   QVAL
@@ -1109,7 +1096,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                LEN                    ! Number of data points
       BYTE                   QVAL
@@ -1149,7 +1135,6 @@
 *    Type Definitions :
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                LEN                    ! Number of data points
       LOGICAL                SELECT(*)              ! Alter this quality?
@@ -1205,7 +1190,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Import :
@@ -1284,7 +1268,6 @@
 *        Try again if duff
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
-            STATUS = SAI__OK
             CALL MSG_SETC( 'RESP', QSTR(:QLEN) )
             CALL MSG_PRNT( 'Invalid quality specification /^RESP/'/
      :                                            /' - try again' )
@@ -1321,13 +1304,13 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)	LOC              	! Locator to datafile
+      INTEGER			FID			! ADI dataset id
       INTEGER 			NDIM                    ! # of data dimensions
-      INTEGER 			DIM(DAT__MXDIM)         ! Data dimensions
+      INTEGER 			DIM(ADI__MXDIM)         ! Data dimensions
       REAL 			AXLO(NDIM),AXHI(NDIM)   ! Axis ranges
 *
 *    Export :
@@ -1350,7 +1333,7 @@
 *-
 
 *    Initialise
-      CALL ARR_SUMDIM( DAT__MXDIM, DIM, NELM )
+      CALL ARR_SUMDIM( ADI__MXDIM, DIM, NELM )
       CALL ARR_INIT1L( .FALSE., NELM, SELECT, STATUS )
 
 *    Open the ARD file
@@ -1358,9 +1341,9 @@
       CALL ARX_READ('ARDFILE',ARDID,STATUS)
 
 *    Find the X and Y axis dimensions
-      CALL AXIS_GET( LOC, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS )
+      CALL AXIS_TGET( FID, 'X pos', 'XDIM', NDIM, IMAX(1), STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
-      CALL AXIS_GET( LOC, 'Y pos', 'YDIM', NDIM, IMAX(2), STATUS )
+      CALL AXIS_TGET( FID, 'Y pos', 'YDIM', NDIM, IMAX(2), STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 999
 
 *    Create a dynamic array to hold the mask for the image region
@@ -1374,8 +1357,8 @@
       ENDIF
 
 *  Read the image axis units from the datafile
-      CALL BDA_GETAXUNITS(LOC, IMAX(1), UNITS(1), STATUS)
-      CALL BDA_GETAXUNITS(LOC, IMAX(2), UNITS(2), STATUS)
+      CALL BDI_GETAXUNITS( FID, IMAX(1), UNITS(1), STATUS)
+      CALL BDI_GETAXUNITS( FID, IMAX(2), UNITS(2), STATUS)
 
 *  Calculate the scale values of each axis
       DO LP=1,2
@@ -1390,9 +1373,9 @@
 
 *    Modify the full quality mask with the 2-d one just produced
       CALL QUALITY_SETFSEL_ADDMASK( MDIM(1), MDIM(2), %val(MPNTR),
-     :                              IMAX(1),
-     :         IMAX(2), DIM(1), DIM(2), DIM(3), DIM(4), DIM(5), DIM(6),
-     :         DIM(7), SELECT )
+     :                              IMAX(1), IMAX(2), DIM(1), DIM(2),
+     :                              DIM(3), DIM(4), DIM(5), DIM(6),
+     :                              DIM(7), SELECT )
 
 *    Close the ARD file
       CALL ARX_CLOSE(ARDID,STATUS)
@@ -1423,7 +1406,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Import :
 *
@@ -1438,7 +1421,7 @@
 *
 *    Local variables :
 *
-      INTEGER LP1,LP2,LP3,LP4,LP5,LP6,LP7,LPVAL(DAT__MXDIM)
+      INTEGER LP1,LP2,LP3,LP4,LP5,LP6,LP7,LPVAL(ADI__MXDIM)
 *-
 
       DO LP7=1,DIM7
