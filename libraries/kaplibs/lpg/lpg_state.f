@@ -50,6 +50,8 @@
 
 *  Global Variables:
       INCLUDE 'LPG_COM'          ! LPG global variables
+*        DISAB = (Read)
+*           A flag indicating if looping is currently disabled.
 *        PNAME2( LPG__MXPAR ) = CHARACTER * ( DAT__SZNAM ) (Read and Write)
 *           The names of known application parameters.
 *        NPAR2 = INTEGER (Read and Write)
@@ -77,6 +79,12 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If looping is currently disabled, just call PAR_STATE and exit.
+      IF( DISAB ) THEN
+         CALL PAR_STATE( PARAM, STATE, STATUS )
+         GO TO 999
+      END IF
 
 *  Convert the supplied parameter name to upper case.
       UPAR = PARAM
