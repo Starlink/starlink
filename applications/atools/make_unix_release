@@ -62,12 +62,14 @@
       end
 
 #  Create the on-line help file.
+      res history.help
       $ATOOLS_DEV/bin/make_history_help
       foreach file (`grp user_tasks`)
          prohlp in=$file out=$file.help
       end
       cat atools.star-hlp *.help > new.hlp
       mv new.hlp atools.star-hlp
+      repl history.help
       rm *.help
 
 #  Generate the ifl files, and the icl and csh start-up scripts. 
