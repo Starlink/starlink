@@ -39,8 +39,8 @@
 *        The blocking factor for the output file.  It must be a positive
 *        integer between 1 and 10.
 *     ORIGIN = CHARACTER * ( * ) (Given)
-*        The name of the institution were the FITS file originates.
-*        This is used to create the ORIGIN kcard in the FITS header.
+*        The name of the institution where the FITS file originates.
+*        This is used to create the ORIGIN card in the FITS header.
 *        A blank value gives a default of "Starlink Project, U.K.".
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the contents of the FITS extension, if present, are
@@ -96,9 +96,11 @@
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
 *          extension are used (provided parameter PROFITS is true).
-*        ORIGIN and DATE --- are created automatically.  However the
-*          former may be overriden by an ORIGIN card in the NDF
-*          extension.
+*        DATE --- is created automatically.
+*        ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
+*          extension, unless you supply a value through argument
+*          ORIGIN other than the default "Starlink Project, U.K." or
+*          a blank string.
 *        EXTNAME --- is the component name of the object from the COMP
 *          argument when the EXTNAME appears in the primary header or
 *          an IMAGE extension.  In a binary-table derived from an NDF
@@ -168,6 +170,8 @@
 *        Changed the data type of the 2dF fibres extension.
 *     1997 December 2 (MJC):
 *        Initialised the second FITSIO status.
+*     1998 January 5 (MJC):
+*        Use ORIGIN argument as intended.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -438,7 +442,7 @@
 *  First write the standard headers, and merge in the FITS extension
 *  when requested to do so.
          CALL COF_WHEAD( NDF, ARRNAM( ICOMP ), FUNIT, BPOUT, PROPEX,
-     :                   STATUS )
+     :                   ORIGIN, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.
