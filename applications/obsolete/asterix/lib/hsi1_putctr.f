@@ -126,7 +126,7 @@
         IF ( .NOT. THERE ) THEN
           CALL DAT_NEW0C( HLOC, 'UPDATE_MODE', 10, STATUS )
         END IF
-        CALL CMP_GET0C( HLOC, 'UPDATE_MODE', CVERB, STATUS )
+        CALL CMP_PUT0C( HLOC, 'UPDATE_MODE', CVERB, STATUS )
 
 *    Release top-level object
         CALL DAT_ANNUL( HLOC, STATUS )
