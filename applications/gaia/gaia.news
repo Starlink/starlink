@@ -2,6 +2,33 @@
 
   New to this release:
 
+    - A number of new catalogues and image servers are now available. 
+      To access these delete your skycat.cfg file (found in ~/.skycat)
+      and restart GAIA. Some highlights are 2MASS, USNO B1.0 and GSC II.
+
+    - A new configuration option "-extended_precision" has been
+      added. This makes GAIA work at approximately milli-arcsecond
+      resolution. This option can be switched on using the new 
+      "File"->"Startup options" window.
+
+    - The pixel table now highlights the maximum and minimum values and
+      the orientation of the Y-axis has been flipped so that the
+      sense of the values is the same as that in the image.
+
+    - The command-line options of GAIA can now be configured using the
+      new "File"->"Startup options" window. The set of options
+      selected are used whenever GAIA starts up (this removes the
+      tedious need to either specify these on the command-line, or 
+      add them to your X resources).
+
+    - A new configuration option "-show_hdu_chooser" has been
+      added. By default when you open a FITS or HDS file that contains
+      more than one image the HDU chooser appears so that you can select
+      between the images. On some occasions (mainly when running GAIA
+      under remote control) this behaviour is unwanted and the chooser
+      should remain inactive. This option can be controlled using the new 
+      "File"->"Startup options" window.
+
     - When North and East are interchanged the "Show all coordinates"
       displayed the wrong coordinates in the left and right columns,
       and incorrectly formatted RA as DD:MM:SS and Dec as HH:MM:SS. 
@@ -10,21 +37,6 @@
     - The direction arrows shown in the pan window could be displayed 
       at the wrong size, again when North and East were interchanged. 
       This problem is now fixed.
-   
-    - The command-line options of GAIA can now be configured using the
-      new "File"->"Startup options" window. The set of options
-      selected are used whenever GAIA starts up (this removes the
-      tedious need to either specify these on the command-line, or 
-      add them to your X resources).
-
-    - A new configuration option "-extended_precision" has been
-      added. This makes GAIA work at approximately milli-arcsecond
-      resolution. This option can be switched on using the new 
-      "File"->"Startup options" window.
-
-    - A number of new catalogues and image servers are now available. 
-      To access these delete your skycat.cfg file (found in ~/.skycat)
-      and restart GAIA. Some highlights are 2MASS, USNO B1.0 and GSC II.
 
     - Fixed shape ellipses in the aperture photometry toolbox were
       actually created using an inverted zoom factor correction (so

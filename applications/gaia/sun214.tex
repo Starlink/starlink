@@ -297,8 +297,8 @@ GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
 display and catalogue browsing tool, developed as part of the
 \htmladdnormallinkfoot{VLT}{http://www.eso.org/vlt/} project at
-\htmladdnormallinkfoot{ESO}{http://www.eso.org/}. SkyCat is free software
-under the terms of the GNU copyright.
+\htmladdnormallinkfoot{ESO}{http://www.eso.org/}. SkyCat and GAIA are 
+free software under the terms of the GNU copyright.
 
 \section{\xlabel{getting_started}Getting Started}
 
@@ -777,7 +777,8 @@ are best set using the \mytt{Startup options...} window located in the
  -focus\_follows\_mouse & Image and entry focus follows mouse pointer \\
  -visual             & X visual (pseudocolor, truecolor, visual id)\\
  -quiet\_exit        & Issue a warning before exiting GAIA (default 0)\\
- -extended\_precision & Display RA and Dec at milli-arcsecond resolution
+ -extended\_precision & Display RA and Dec at milli-arcsecond resolution\\
+ -show\_hdu\_chooser   & Automatically show the HDU chooser (default 1)
 \end{tabular}
 }
 
@@ -985,40 +986,52 @@ This release contains a few updates.
      formats. This should make better use of the full page by default.
 \end{itemize}
 
-\subsection{This release - 2.6-10}
+\subsection{This release - 2.6-11}
 
 New to this release:
 \begin{itemize}
 
-    \item When North and East are interchanged the \mytt{Show all
-    coordinates} toolbox displayed the wrong coordinates in the left
-    and right columns, and incorrectly formatted RA as DD:MM:SS and
-    Dec as HH:MM:SS. These problems are now fixed.
+   \item A number of new catalogues and image servers are now
+   available. To access these delete your skycat.cfg file (found in
+   \mytt{\~{}/.skycat/}) and restart GAIA. Some highlights are 2MASS
+   and USNO B1.0 from CDS and GSC II from ESO.
 
-    \item The direction arrows shown in the pan window could be
-    displayed at the wrong size, again when North and East were
-    interchanged. This problem is now fixed.
-   
-    \item The command-line options of GAIA can now be configured using
-    the new \mytt{File->Startup options} window. The set of options
-    selected are used whenever GAIA starts up (this removes the
-    tedious need to either specify these on the command-line, or add
-    them to your X resources).
+   \item The pixel table now highlights the maximum and minimum values
+   and the orientation of the Y-axis has been flipped so that the
+   sense of the values is the same as that in the image.
 
-    \item A new configuration option \mytt{-extended\_precision} has
-    been added. This makes GAIA work at approximately milli-arcsecond
-    resolution. This option can be switched on using the new
-    \mytt{File->Startup options} window.
+   \item A new configuration option \mytt{-extended\_precision} has
+   been added. This makes GAIA work at approximately milli-arcsecond
+   resolution. This option can be switched on using the new
+   \mytt{File->Startup options} window.
 
-    \item A number of new catalogues and image servers are now available. 
-      To access these delete your skycat.cfg file (found in ~/.skycat)
-      and restart GAIA. Some highlights are 2MASS and USNO B1.0 from
-      CDS and GSC II from ESO.
+   \item A new configuration option \mytt{-show\_hdu\_chooser} has been
+   added. By default when you open a FITS or HDS file that contains
+   more than one image the HDU chooser appears so that you can select
+   between the images. On some occasions (mainly when running GAIA
+   under remote control) this behaviour is unwanted and the chooser
+   should remain inactive. This option can be switched on using the new
+   \mytt{File->Startup options} window.
 
-    \item Fixed shape ellipses in the aperture photometry toolbox were
-      actually created using an inverted zoom factor correction (so
-      either shrank or expanded in the wrong sense). This now works
-      correctly. 
+   \item The command-line options of GAIA can now be configured using
+   the new \mytt{File->Startup options} window. The set of options
+   selected are used whenever GAIA starts up (this removes the tedious
+   need to either specify these on the command-line, or add them to
+   your X resources).
+
+   \item When North and East are interchanged the \mytt{Show all
+   coordinates} toolbox displayed the wrong coordinates in the left
+   and right columns, and incorrectly formatted RA as DD:MM:SS and Dec
+   as HH:MM:SS. These problems are now fixed.
+
+   \item The direction arrows shown in the pan window could be
+   displayed at the wrong size, again when North and East were
+   interchanged. This problem is now fixed.
+
+   \item Fixed shape ellipses in the aperture photometry toolbox were
+   actually created using an inverted zoom factor correction (so
+   either shrank or expanded in the wrong sense). This now works
+   correctly.
 
 \end{itemize}
 
