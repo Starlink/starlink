@@ -84,6 +84,11 @@ STAR_LATEX_DOCUMENTATION(sg5)
 
 STAR_MESSGEN(uface_err.msg)
 
+dnl    Dependencies
+STAR_DECLARE_DEPENDENCIES([build],[pcs cnf sae])
+STAR_DECLARE_DEPENDENCIES([link],[pcs cnf hlp nbs hds])
+
+
 AM_CONFIG_HEADER(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
