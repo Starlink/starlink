@@ -244,7 +244,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Propogate an NDF to contain the results.
-      CALL NDF_PROP(NDF1,'Data','OUT',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'Data,WCS','OUT',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Set the output NDF data type to real.
@@ -264,15 +264,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Determine the pixel size.
-      CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-
-*   Check that the pixel size is not too small.
-      IF (PSIZE.LT.SKE1__VSMAL) THEN
-         STATUS=SAI__ERROR
-         CALL ERR_REP(' ','The pixel size supplied is too small.',
-     :                STATUS)
-         GOTO 9999
-      END IF
+      CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
 
 *   Check that the resultant radius isnt too small.
       RADIUS=NINT(WIDTH/PSIZE/2.)

@@ -12,6 +12,8 @@
 #  History:
 #     14-JUN-1993 (GJP):
 #     	 Original version.
+#     26-OCT-1999 (MBT):
+#        Modified COSYS to accept value 'C'.
 #     {enter_changes_here}
 
 #-
@@ -78,7 +80,7 @@ interface LOBACK
     prompt 'World or data co-ordinates'
     ppath 'current,default'
     vpath 'prompt'
-    in 'd','D','w','W'
+    in 'd','D','w','W','c','C'
     default 'D'
     helpkey '*'
   endparameter

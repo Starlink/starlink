@@ -8,6 +8,7 @@
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
 #     NG: Norman Gray (Starlink, GLA)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -16,6 +17,8 @@
 #     25-Feb-1998 (NG):
 #	Add PSIZE and FWHM parameters to allow display of gaussian
 #	parameters as FWHM/arcsecs
+#     26-OCT-1999 (MBT):
+#        MOdified COSYS to accommodate WCS aware changes.
 #     {enter_changes_here}
 
 #-    
@@ -202,16 +205,16 @@ interface GAUFIT
     helpkey *
   endparameter
 
-  parameter COSYS    # World co-ordinates or data co-ordinates.
+  parameter COSYS    # Coordinate types
     type '_CHAR'
     access 'read'
     keyword 'COSYS'
-    prompt 'Use world or data co-ordinates to define a pixel'
+    prompt '(W)orld, (D)ata or (C)urrent frame co-ords to define pixel?'
 #    ppath 'current,default'
 #	Norman added global, 19980610
     ppath 'global,current,default'
     vpath 'prompt'
-    in 'd','D','w','W'
+    in 'd','D','w','W','c','C'
     default 'D'
     helpkey *
   endparameter

@@ -59,7 +59,8 @@
 *     COLOUR = _INTEGER (Read)
 *        Colour of the pen used to mark source centres.
 *     COSYS = _CHAR (Read)
-*        Use world or data co-ordinate system? (D=data W=world)
+*        What co-ordinate system to use?  D=data, W=world, C=Current
+*        frame of WCS component.
 *     IMGDEV = _DEVICE (Read) 
 *        Name of the graphics device on which the results graph should 
 *        be displayed.
@@ -323,32 +324,6 @@
       CALL PAR_GET0R('ANGOFF',ANGOFF,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
       
-*   Look at the command line value for PSIZE.
-*   A NULL value (`!') may be entered here - indicates sizes should be 
-*   shown in pixels, rather than converted to arcsec
-*   Require that the size be strictly positive - 1 micro-arcsec is 
-*   Infeasibly small, and non-zero.
-*
-*   The PSIZE parameter is used internally to encode both the pixel size, 
-*   and whether FWHM or sigma is to be displayed.  
-*   psize positive means display FWHM rather than sigma.  
-*   abs(psize) is pixel size in arcsec.  
-*   abs(psize)<1e-6 means display in units of pixels
-      CALL ERR_MARK
-      CALL PAR_MINR ('PSIZE', 1e-6, STATUS)
-      CALL PAR_GET0R ('PSIZE', PSIZE, STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-*      Negative pixel size flags `no size known'
-         PSIZE = 1e-7
-         CALL ERR_ANNUL (STATUS)
-      ENDIF
-      CALL ERR_RLSE
-
-*   Do we display FWHM or sigma?  (see psize in gau1_cmode for discussion)
-      CALL PAR_GET0L ('FWHM', DISPFWHM, STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (.NOT.DISPFWHM) PSIZE = -PSIZE
-
 *   Begin an NDF context.                               
       CALL NDF_BEGIN
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -431,6 +406,31 @@
      :                'No sources were defined. Aborting!',STATUS)
          GOTO 9999
       END IF
+
+*   Look at the command line value for PSIZE.
+*   A NULL value (`!') may be entered here - indicates sizes should be 
+*   shown in pixels, rather than converted to arcsec
+*   Require that the size be strictly positive - 1 micro-arcsec is 
+*   Infeasibly small, and non-zero.
+*
+*   The PSIZE parameter is used internally to encode both the pixel size, 
+*   and whether FWHM or sigma is to be displayed.  
+*   psize positive means display FWHM rather than sigma.  
+*   abs(psize) is pixel size in arcsec.  
+*   abs(psize)<1e-6 means display in units of pixels
+      CALL ERR_MARK
+      CALL ESP1_GTPSZ (NDF1, PSIZE, STATUS)
+      IF (STATUS.EQ.PAR__NULL) THEN
+*      Negative pixel size flags `no size known'
+         PSIZE = 1e-7
+         CALL ERR_ANNUL (STATUS)
+      ENDIF
+      CALL ERR_RLSE
+
+*   Do we display FWHM or sigma?  (see psize in gau1_cmode for discussion)
+      CALL PAR_GET0L ('FWHM', DISPFWHM, STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 9999
+      IF (.NOT.DISPFWHM) PSIZE = -PSIZE
 
 *   Get which fit method we're to use.
       call par_get0l ('LSQFIT', lsqfit, status)
@@ -535,7 +535,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *   Propogate the bits of the source NDF required.
-      CALL NDF_PROP(NDF1,'DATA','MODEL',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'DATA,WCS','MODEL',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998
  
 *   Get the type of image to be created and convert to upper case.
@@ -774,7 +774,7 @@
       END 
 
 
-      SUBROUTINE GAU1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,
+      SUBROUTINE GAU1_FILER(FIOID,INDF,COSYS,
      :                      NSOUR,XC,YC,RLIM,HINT,FWHM,STATUS)
 *+
 *  Name:
@@ -797,7 +797,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL GAU1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,NSOUR,
+*      CALL GAU1_FILER(FIOID,INDF,COSYS,NSOUR,
 *                      XC,YC,RLIM,HINT,FWHM,STATUS)    
 
 *  Description:
@@ -819,15 +819,11 @@
 *  Arguments:               
 *     FIOID = INTEGER (Given)
 *        FIO identifier for the input file.
-*     LBND(2) = INTEGER (Given)
-*        Lower bound of the image.
-*     UBND(2) = INTEGER (Given)
-*        Upper bound of the image.
-*     PRANGE(2) = INTEGER (Given)
-*        Size of each image axis.
+*     INDF = INTEGER (Given)
+*        NDF identifier for the image.
 *     COSYS *(256) = CHARACTER (Given)
 *        Character defining whether the co-ordinates provided 
-*        are world or data format. 
+*        are world, data or current frame format. 
 *     NSOUR = INTEGER (Returned)
 *        Number of sources to be profiled.
 *     XC(10,2) = REAL (Returned)
@@ -850,10 +846,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     9-Mar-1996 (GJP)
 *     (Original version)
+*     26-OCT-1999 (MBT):
+*        Modified to cope with COSYS=C.
 
 *  Bugs:
 *     None known.
@@ -873,9 +872,7 @@
       CHARACTER *(256) COSYS          ! Option choice defining the
                                       ! coordinate system being used
       INTEGER FIOID                   ! FIO identifier for the input file
-      INTEGER LBND(NDF__MXDIM)        ! Lower bounds of image axes 
-      INTEGER PRANGE(2)               ! Size of each image axis
-      INTEGER UBND(NDF__MXDIM)        ! Upper bounds of image axes
+      INTEGER INDF                    ! NDF identifier for image
       LOGICAL FWHM                    ! Are we using FWHM rather than sigma?
 
 *  Arguments returned:
@@ -981,107 +978,63 @@
 
                END IF
 
+*            Get coordinates.
+
+*            Start new error context. 
+               FAIL=.FALSE.
+               IF (STATUS.NE.SAI__OK) GO TO 666
+               CALL ERR_MARK
+
+*            Change strings in character buffer into numeric coordinate
+*            values.
+               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+     :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
+     :                        VALUE(2),STATUS)
+
+*            If there was an error in the conversion, warn and cease to
+*            consider this line.
+               IF (STATUS.NE.SAI__OK) THEN
+                  CALL ERR_FLUSH(STATUS)
+                  CALL MSG_OUT(' ','Bad text line.',STATUS)
+                  CALL ERR_RLSE
+                  GOTO 666
+               END IF
+
+*            Exit error context.
+               CALL ERR_RLSE
+
+*            Get extra values in line (hints).
+
 *            Look at those words found.
                FAIL=.FALSE.
-               DO 20 J=1,6-FAILN  
+               IF (FAILN.EQ.0) THEN
+                  DO 20 J=3,6-FAILN  
                 
-*               Start an new error context.
-                  CALL ERR_MARK                        
+*                  Start an new error context.
+                     CALL ERR_MARK                        
 
-*               Examine word.
-                  STRING=BUFFER(INDEX(1,J):INDEX(2,J))
-                  CALL CHR_CTOR(STRING,VALUE(J),STATUS)
+*                  Examine word.
+                     STRING=BUFFER(INDEX(1,J):INDEX(2,J))
+                     CALL CHR_CTOR(STRING,VALUE(J),STATUS)
 
-*               Display the cause of any problem.
-                  IF (STATUS.NE.SAI__OK) THEN
-                     FAIL=.TRUE.
-                     CALL ERR_ANNUL(STATUS)
-                     IF (J.EQ.1) CALL MSG_OUT(' ',
-     :                  'X co-ordinate not a number.',STATUS)
-                     IF (J.EQ.2) CALL MSG_OUT(' ',
-     :                  'Y co-ordinate not a number.',STATUS)
-                     IF (J.EQ.3) CALL MSG_OUT(' ',
-     :                  'Angle not a number.',STATUS)      
-                     IF (J.EQ.4) CALL MSG_OUT(' ',
-     :                  'Sa not a number.',STATUS)      
-                     IF (J.EQ.5) CALL MSG_OUT(' ',
-     :                  'Sb not a number.',STATUS)      
-                     IF (J.EQ.6) CALL MSG_OUT(' ',
-     :                  'Peak not a number.',STATUS)      
-                  END IF
+*                  Display the cause of any problem.
+                     IF (STATUS.NE.SAI__OK) THEN
+                        FAIL=.TRUE.
+                        CALL ERR_ANNUL(STATUS)
+                        IF (J.EQ.3) CALL MSG_OUT(' ',
+     :                     'Angle not a number.',STATUS)      
+                        IF (J.EQ.4) CALL MSG_OUT(' ',
+     :                     'Sa not a number.',STATUS)      
+                        IF (J.EQ.5) CALL MSG_OUT(' ',
+     :                     'Sb not a number.',STATUS)      
+                        IF (J.EQ.6) CALL MSG_OUT(' ',
+     :                     'Peak not a number.',STATUS)      
+                     END IF
 
-*               End error context.
-                  CALL ERR_RLSE
+*                  End error context.
+                     CALL ERR_RLSE
 
- 20            CONTINUE
-
-*            Stop looking at this line since less than two valid
-*            numbers were found.
-               IF ((FAIL).AND.(FAILN.GT.0)) THEN 
-
-*               Indicate that the line of text did not contain two numbers.
-                  CALL MSG_OUT(' ','Bad text line in the '//
-     :                         ' input file.',STATUS)
-                  GOTO 666
-
-               END IF
-               
-*            Check that the two co-ordinates are within the image.
-               FAIL=.FALSE.
-               DO 30 J=1,2
-
-*               Check the value is within allowed range.
-                  IF (COSYS.EQ.'W') THEN
-
-*                  World co-ordinates.
-
-*                  Check that the co-ordinate value input is legal.
-                    IF ((VALUE(J).GE.LBND(J)).AND.
-     :                 (VALUE(J).LE.UBND(J))) THEN
-     
-*                    Value within range so assign.
-                       VALUE(J)=VALUE(J)-LBND(J)+1
-
-                    ELSE
-                                 
-*                    Set the fail flag since the point selected 
-*                    is not on the image.
-                       CALL MSG_OUT(' ',
-     :                   'Co-ordinate not on the image.',
-     :                   STATUS)
-                       FAIL=.TRUE.
-                    
-                    END IF
-                         
-                 ELSE
-
-*                 DATA pixel co-ordinates.
-
-*                  Check that the co-ordinate value input is legal.
-                    IF ((VALUE(J).LT.1.0).OR.
-     :                 (VALUE(J).GT.PRANGE(J))) THEN
-
-*                    Set the fail flag since the point selected 
-*                    is not on the image.
-                       CALL MSG_OUT(' ',
-     :                    'Co-ordinate not on the image.',
-     :                    STATUS)
-                       FAIL=.TRUE.
-                                 
-                    END IF
-
-                  END IF
- 
- 30            CONTINUE
-
-*            Stop looking at this line since one of the co-ordinates
-*            was not on the image.
-               IF (FAIL) THEN 
-
-*               Indicate that the line of text did not contain two numbers.
-                  CALL MSG_OUT(' ','Bad text line.',STATUS)
-                  GOTO 666
-
+ 20               CONTINUE
                END IF
 
 *            Assign the values to the arrays and increment the
@@ -1089,7 +1042,7 @@
                NSOUR=NSOUR+1
                XC(NSOUR,1)=VALUE(1)
                YC(NSOUR,1)=VALUE(2)
-               IF (FAILN.EQ.0) THEN          
+               IF (FAILN.EQ.0.OR.FAIL) THEN          
                   RLIM(NSOUR)= (VALUE(3)+VALUE(4))/2.
                   HINT(3,NSOUR)=VALUE(3) ! angle
                   HINT(1,NSOUR)=VALUE(4) ! sigma_a
@@ -1307,15 +1260,13 @@
 *   sizes in pixels, rather than arcsec.  A NULL value (`!') indicates
 *   sizes should be shown in pixels.
 *   Otherwise, use the default.
-      call err_mark
-      call par_minr ('PSIZE', 1e-6, status)
-      CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-      if (status .eq. par__null) then
-         psize = 1e-7
-         call err_annul (status)
-      endif
-      call err_rlse
-      IF (STATUS.NE.SAI__OK) GOTO 9999
+      CALL ERR_MARK
+      CALL ESP1_GTPSZ (NDF1, PSIZE, STATUS)
+      IF (STATUS.EQ.PAR__NULL) THEN
+         PSIZE = 1E-7
+         CALL ERR_ANNUL (STATUS)
+      END IF
+      CALL ERR_RLSE
           
 *   Do we work in FWHM or sigma?  (see psize in gau1_cmode for discussion)
       CALL PAR_GET0L ('FWHM', FWHM, STATUS)
@@ -1323,7 +1274,7 @@
       IF (.NOT.FWHM) PSIZE = -PSIZE
 
 *   Obtain the co-ordinates of the sources required.
-      CALL GAU1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,
+      CALL GAU1_FILER(FIOID,NDF1,COSYS,
      :                NSOUR,XCO,YCO,RLIM,HINT,fwhm,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
     
@@ -1414,7 +1365,7 @@
       CALL MSG_BLANK(STATUS)        
 
 *   Propogate the bits of the source NDF required.
-      CALL NDF_PROP(NDF1,'DATA','MODEL',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'DATA,WCS','MODEL',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
  
 *   Get the type of image to be created and convert to upper case.

@@ -48,8 +48,8 @@
 
 *  ADAM Parameters:
 *     COSYS = _CHAR (Read) 
-*        Defines whether the co-ordinates are provided as data
-*        (COSYS='D') or world (COSYS='W'). 
+*        What co-ordinate system to use?  D=data, W=world, C=Current
+*        frame of WCS component.
 *     IN = _NDF (Read)
 *        The name of the NDF data structure/file that is to be 
 *        examined.
@@ -131,11 +131,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-Jun-1993 (GJP)
 *     (Original version)
+*     26-OCT-1999 (MBT):
+*        Modified to cope with COSYS=C.
 
 *-
 
@@ -152,11 +155,12 @@
       INTEGER STATUS                  ! Global status
 
 *  Local Variables:
-      CHARACTER *(256) COSYS          ! Character defining whether the 
-                                      ! co-ordinates provided 
-                                      ! are world or data.
+      CHARACTER *(256) COSYS          ! Character defining the 
+                                      ! co-ordinate types
       CHARACTER *(256) FTEXT          ! Formatting string
       CHARACTER *(256) TEXT           ! Output string
+      CHARACTER *(256) XSTR           ! Formatted X co-ordinate
+      CHARACTER *(256) YSTR           ! Formatted Y co-ordinate
       LOGICAL EXCLAIM                 ! Was the file name used !?
       LOGICAL FILINP                  ! Was the input file name acceptable?
       LOGICAL THIRD                   ! Is the third column the number of 
@@ -197,6 +201,8 @@
                                       ! to be examined
       INTEGER WIDE                    ! Minimum width of the box from
                                       ! which pixels will be taken
+      INTEGER XLEN                    ! Length of formatted X co-ordinate
+      INTEGER YLEN                    ! Length of formatted Y co-ordinate
       DOUBLE PRECISION MODE(4)        ! Estimates of the image mode value 
       DOUBLE PRECISION SDEV(2)        ! Estimate of the standard deviation
                                       ! of the modal value and its standard deviation
@@ -293,8 +299,7 @@
       CALL CHR_UCASE(COSYS)
 
 *   Obtain the co-ordinates of the image locations/galaxies required.
-      CALL LOB1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,
-     :                NGALS,XC,YC,NPIX,STATUS)
+      CALL LOB1_FILER(FIOID,NDF1,COSYS,NGALS,XC,YC,NPIX,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Loop round for all image locations provided.
@@ -367,21 +372,14 @@
             END IF
 
 *         Create an appropriately formatted output string.
-            IF (COSYS.EQ.'W') THEN
 
-*            Original co-ordinates were in world form.
-               CALL MSG_FMTR('X','F8.1',XC(I)-1+LBND(1))
-               CALL MSG_FMTR('Y','F8.1',YC(I)-1+LBND(2))
- 
-            ELSE
- 
-*            Original co-ordinates were in pixel/data form.
-               CALL MSG_FMTR('X','F8.1',XC(I))
-               CALL MSG_FMTR('Y','F8.1',YC(I))
-
-            END IF
-
-*         Set up the formatting strings.
+*         Co-ordinates.
+            CALL ESP1_PR2S(COSYS,NDF1,XC(I),YC(I),XSTR,YSTR,XLEN,YLEN,
+     :                     STATUS)
+            FTEXT='A8'
+            IF (LEN(XSTR).GT.8.OR.LEN(YSTR).GT.8) FTEXT='A14'
+            CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN)) 
+            CALL MSG_FMTC('Y',FTEXT,YSTR(1:YLEN))
 
 *         Mode values.
             FTEXT='F8.1'
@@ -585,8 +583,7 @@
       END
 
 
-      SUBROUTINE LOB1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,
-     :                      NGALS,XC,YC,NPIX,STATUS)
+      SUBROUTINE LOB1_FILER(FIOID,INDF,COSYS,NGALS,XC,YC,NPIX,STATUS)
 *+
 *  Name:
 *     LOB1_FILER
@@ -607,7 +604,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL LOB1_FILER(FIOID,LBND,UBND,PRANGE,COSYS,NGALS,XC,YC,NPIX,STATUS)    
+*      CALL LOB1_FILER(FIOID,INDF,COSYS,NGALS,XC,YC,NPIX,STATUS)    
 
 *  Description:
 *     Opens a user specified text file and reads from it a list of co-ordinates
@@ -620,12 +617,8 @@
 *  Arguments:               
 *     FIOID = INTEGER (Given)
 *        FIO identifier for the input file.
-*     LBND(2) = INTEGER (Given)
-*        Lower bound of the image.
-*     UBND(2) = INTEGER (Given)
-*        Upper bound of the image.
-*     PRANGE(2) = INTEGER (Given)
-*        Size of each image axis.
+*     INDF = INTEGER (Given)
+*        NDF identifier for the image.
 *     COSYS *(256) = CHARACTER (Given)
 *        Character defining whether the co-ordinates provided 
 *        are world or data format. 
@@ -643,10 +636,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     29-APR-1993 (GJP)
 *     (Original version)
+*     26-OCT-1999 (MBT)
+*        Modified to cope with COSYS=C.
 
 *-
 
@@ -662,9 +658,7 @@
       CHARACTER *(256) COSYS          ! Option choice defining how the
                                       ! pixel data format to be input
       INTEGER FIOID                   ! FIO identifier for the input file
-      INTEGER LBND(2)                 ! Lower bounds of image axes 
-      INTEGER PRANGE(2)               ! Size of each image axis
-      INTEGER UBND(2)                 ! Upper bounds of image axes
+      INTEGER INDF                    ! NDF identifier for image
 
 *  Arguments returned:
       INTEGER NGALS                   ! The number of galaxies to be profiled
@@ -685,14 +679,14 @@
       LOGICAL FAIL
       CHARACTER *(80) BUFFER          ! Character string input from the file
       CHARACTER *(80) STRING          ! Part of the input string
+      INTEGER FAILN                   ! Failure count
       INTEGER I                       ! A loop counter
+      INTEGER INDEX(2,3)              ! Word start/ends in the input string
       INTEGER INDEXE                  ! End of a word in the buffer string
       INTEGER INDEXS                  ! Start of a word in the buffer string
       INTEGER LINE                    ! Line counter
       INTEGER NCHAR                   ! Number of characters
-      REAL VALUE                      ! Temporary storage
-      REAL XTEMP                      ! Temporary storage
-      REAL YTEMP                      ! Temporary storage
+      REAL VALUE(3)                   ! Temporary storage
 *.
 
 *   Check the inherited global status.
@@ -726,9 +720,11 @@
 
 *             Find the x and y co-ordinates by looking for words in the BUFFER.
                FAIL=.FALSE.
+               FAILN=0
                INDEXE=-1
-               XTEMP=-1E10
-               YTEMP=-1E10                             
+               VALUE(1)=-1E10
+               VALUE(2)=-1E10                             
+               VALUE(3)=1E0
 
                DO 10 I = 1,3
 
@@ -738,151 +734,110 @@
 *               Start a new error context.
                   CALL ERR_MARK
 
-*                  Look for the words.
-                     INDEXS = INDEXE + 1
-                     CALL CHR_FIWS(BUFFER,INDEXS,STATUS)
-                     INDEXE = INDEXS
-                     CALL CHR_FIWE(BUFFER,INDEXE,STATUS)
+*               Look for the words.
+                  INDEXS = INDEXE + 1
+                  CALL CHR_FIWS(BUFFER,INDEXS,STATUS)
+                  INDEXE = INDEXS
+                  CALL CHR_FIWE(BUFFER,INDEXE,STATUS)
 
-*                  Set the fail flag if the word extraction failed.
-                     IF (STATUS.NE.SAI__OK) THEN
-                        FAIL=.TRUE.
-                        CALL ERR_ANNUL(STATUS)
-                        CALL MSG_FMTI('LINE','I5',LINE)
-                        CALL MSG_OUT(' ',
-     :                   'A word was missing from line ^LINE ',
-     :                   STATUS)
-                     END IF
+*               Store the locations of the words in the string.
+                  INDEX(1,I)=INDEXS
+                  INDEX(2,I)=INDEXE
+
+*               Set the fail flag if the word extraction failed.
+*               Increment times failed counter.
+                  IF (STATUS.NE.SAI__OK) THEN
+                     FAIL=.TRUE.
+                     FAILN=FAILN+1
+                     CALL ERR_ANNUL(STATUS)
+                     CALL MSG_FMTI('LINE','I5',LINE)
+                     CALL MSG_OUT(' ',
+     :                'A word was missing from line ^LINE ',STATUS)
+                  END IF
 
 *               End error context.
                   CALL ERR_RLSE
 
-*               Try to extract a number from the word if a word was
-*               successfully obtained.
-                  IF (.NOT.FAIL) THEN
-
-*                  Start an new error context.
-                     CALL ERR_MARK
-                        
-*                  Check each word to check that it is a number.
-                     STRING=BUFFER(INDEXS:INDEXE)
-                     CALL CHR_CTOR(STRING,VALUE,STATUS)
-
-                     IF (STATUS.NE.SAI__OK) THEN
-                        FAIL=.TRUE.
-                        CALL ERR_ANNUL(STATUS)
-                        CALL MSG_FMTI('LINE','I5',LINE)
-                        CALL MSG_OUT(' ',
-     :                   'A word was not a number in line ^LINE ',
-     :                   STATUS)
-                     ELSE
-
-*                     Check that it is not the third value from the line.
-                        IF (I.NE.3) THEN
-
-*                        Check the value is within allowed range.
-                           IF (COSYS.EQ.'W') THEN
-
-*                           Check that the co-ordinate value input is legal.
-                              IF ((VALUE.GE.LBND(I)).AND.
-     :                               (VALUE.LE.UBND(I))) THEN
-
-*                              Value within range so assign.
-                                 VALUE=VALUE-LBND(I)+1
-                                 IF (I.EQ.1) XTEMP=VALUE
-                                 IF (I.EQ.2) YTEMP=VALUE
-
-                              ELSE
-                                 
-*                              Set the fail flag since the point selected 
-*                              is not on the image.
-                                 CALL MSG_FMTI('LINE','I5',LINE)
-                                 CALL MSG_OUT(' ',
-     :                           'Co-ordinates not within the image'//
-     :                           ' on line ^LINE ',STATUS)
-                                 FAIL=.TRUE.
-                    
-                              END IF
-                         
-                           ELSE
-
-*                           Check that the co-ordinate value input is legal.
-                              IF ((VALUE.GE.1.0).AND.
-     :                            (VALUE.LE.PRANGE(I))) THEN
-
-*                              Value within range so assign.
-                                 IF (I.EQ.1) XTEMP=VALUE
-                                 IF (I.EQ.2) YTEMP=VALUE
-
-                              ELSE
-
-*                              Set the fail flag since the point selected 
-*                              is not on the image.
-                                 CALL MSG_FMTI('LINE','I5',LINE)
-                                 CALL MSG_OUT(' ',
-     :                           'Co-ordinates not within the image'//
-     :                           ' on line ^LINE ',STATUS)
-                                 FAIL=.TRUE.
-                                 
-                              END IF
-
-                           END IF
-
-                        END IF
-
-*                     Assign the values to the arrays and increment the
-*                     counter.
-                        IF (I.EQ.3) THEN                          
-                           NGALS=NGALS+1
-                           XC(NGALS)=XTEMP
-                           YC(NGALS)=YTEMP
-                           IF (.NOT.FAIL) THEN
-                              NPIX(NGALS)=INT(VALUE)
-                           ELSE
-                              NPIX(NGALS)=1
-                              CALL MSG_OUT(' ',
-     :                          'Dummy third column used.',STATUS)
-                           END IF     
-                        END IF
-
-*                     Stop any further points being taken from the file.
-                        IF (NGALS.EQ.LOB__NGALS) THEN
-                           ABORT=.TRUE.  
-                           FAIL=.TRUE.
-                        END IF
-
-                     END IF
-
-*                  End the current error context.
-                     CALL ERR_RLSE
-
-                  ELSE
-
-*                  Cope with a duff third column.
-                     IF ((I.EQ.3).AND.
-     :                  (XTEMP.GT.-1E9).AND.(YTEMP.GT.-1E9)) THEN  
-                           NGALS=NGALS+1
-                           XC(NGALS)=XTEMP
-                           YC(NGALS)=YTEMP
-                           NPIX(NGALS)=1
-                           CALL MSG_OUT(' ',
-     :                          'Dummy third column used.',STATUS)
-
-*                     Stop any further points being taken from the file.
-                        IF (NGALS.EQ.LOB__NGALS) THEN
-                           ABORT=.TRUE.  
-                           FAIL=.TRUE.
-                        END IF
-     
-                     END IF
-
-                  END IF
-  
  10            CONTINUE
+               
+*            Stop looking at this line of text since two words are not
+*            present.
+               IF (FAILN.GT.1) THEN
+
+*               Indicate that the line of text did not contain two numbers.
+                  CALL MSG_OUT(' ','Bad text line.',STATUS)
+                  GOTO 666
+
+               END IF
+
+*            Get coordinates.
+
+*            Start new error context. 
+               FAIL=.FALSE.
+               IF (STATUS.NE.SAI__OK) GO TO 666
+               CALL ERR_MARK
+
+*            Change strings in character buffer into numeric coordinate
+*            values.
+               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+     :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
+     :                        VALUE(2),STATUS)
+
+*            If there was an error in the conversion, warn and cease to
+*            consider this line.
+               IF (STATUS.NE.SAI__OK) THEN
+                  CALL ERR_FLUSH(STATUS)
+                  CALL MSG_OUT(' ','Bad text line.',STATUS)
+                  CALL ERR_RLSE
+                  GOTO 666
+               END IF
+
+*            Exit error context.
+               CALL ERR_RLSE
+
+*            Get third value if there were three strings.
+               IF (FAILN.EQ.0) THEN
+
+*               Enter new error context.
+                  CALL ERR_MARK
+
+*               Perform conversion of third string.
+                  STRING=BUFFER(INDEX(1,3):INDEX(2,3))
+                  CALL CHR_CTOR(STRING,VALUE(3),STATUS)
+
+*               Deal with failed conversion.
+                  IF (STATUS.NE.SAI__OK) THEN
+                     FAIL=.TRUE.
+                     CALL ERR_ANNUL(STATUS)
+                  END IF
+
+*               Exit error context.
+                  CALL ERR_RLSE
+               END IF
+
+*            Cope with a duff third column.
+               IF (FAIL) THEN
+                  CALL MSG_OUT(' ','Dummy third column used.',STATUS)
+                  VALUE(3)=1
+               END IF
+
+*            Assign the values to the arrays and increment the counter.
+               IF (VALUE(1).GT.-1E9.AND.VALUE(2).GT.-1E9) THEN
+                  NGALS=NGALS+1
+                  XC(NGALS)=VALUE(1)
+                  YC(NGALS)=VALUE(2)
+                  NPIX(NGALS)=INT(VALUE(3))
+               END IF
+
+*            Stop any further points being taken from the file.
+               IF (NGALS.EQ.LOB__NGALS) THEN
+                  ABORT=.TRUE.
+                  FAIL=.TRUE.
+               END IF
 
             END IF
 
-         END IF
+ 666     END IF
 
       END DO
      
@@ -2682,8 +2637,7 @@
 *     WHICH = INTEGER (Given)
 *        Used to show which part of the text file is to be created. 
 *     COSYS *(256) = CHAR (Given)
-*        Denotes whether world or pixel/data co-ordinates are
-*        being used to define locations on the image.
+*        Type of co-ordinates used to represent locations on the image.
 *     NDF1 = INTEGER (Given)
 *        NDF identifier for the image.
 *     XCO = REAL (Given)
@@ -2708,10 +2662,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     12-JUN-1993 (GJP)
 *     (Original version)
+*     26-OCT-1999 (MBT):
+*        Modified to cope with COSYS=C.
 
 *  Bugs:
 *     None known.
@@ -2753,9 +2710,13 @@
       CHARACTER *(80) LINE            ! FIO line output length
       CHARACTER *(MSG__SZMSG) NAME    ! NDF name
       CHARACTER *(80) TEXT            ! Temporary storage
+      CHARACTER *(80) XSTR            ! X co-ordinate string
+      CHARACTER *(80) YSTR            ! Y co-ordinate string
       INTEGER I                       ! Temporary variable
       INTEGER J                       ! Temporary variable
       INTEGER NCHAR                   ! Length of output string
+      INTEGER XLEN                    ! Length of formatted X co-ordinate
+      INTEGER YLEN                    ! Length of formatted Y co-ordinate
 
 *.
 
@@ -2841,21 +2802,13 @@
       IF ((WHICH.EQ.2).AND.(OPENF)) THEN
 
 *      Create an appropriately formatted output string.
-         IF (COSYS.EQ.'W') THEN
 
-*         Original co-ordinates were in world form.
-            CALL MSG_FMTR('X','F8.1',XCO-1+LBND(1))
-            CALL MSG_FMTR('Y','F8.1',YCO-1+LBND(2))
- 
-         ELSE
- 
-*         Original co-ordinates were in pixel/data form.
-            CALL MSG_FMTR('X','F8.1',XCO)
-            CALL MSG_FMTR('Y','F8.1',YCO)
-
-         END IF
-
-*      Set up the formatting strings.
+*      Co-ordinates.
+         CALL ESP1_PR2S(COSYS,NDF1,XCO,YCO,XSTR,YSTR,XLEN,YLEN,STATUS)
+         FTEXT='A8'
+         IF (XLEN.GT.8.OR.YLEN.GT.8) FTEXT='A14'
+         CALL MSG_FMTC('X',FTEXT,XSTR(1:XLEN))
+         CALL MSG_FMTC('Y',FTEXT,YSTR(1:YLEN))
 
 *      Mode values.
          FTEXT='F8.1'

@@ -69,8 +69,8 @@
 *        Colour of the pen used to mark the position of the galaxy
 *        centre.
 *     COSYS=_CHAR (Read) 
-*        Use world or data co-ordinates for image pixel positions?
-*        (W=world, D=data)
+*        What co-ordinate system to use?  D=data, W=world, C=Current
+*        frame of WCS component.
 *     CURSOR=_LOGICAL (Read)
 *        Whether the galaxy locations are to be identified using the 
 *        graphics cursor or the keyboard. Cursor/mouse is used if 
@@ -1941,18 +1941,7 @@
          END IF
 
 *      Get the pixel size value.
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
-            CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-            IF (PSIZE.LE.0.0) THEN
-*            Display message and annul the parameter.
-               CALL MSG_OUT(' ','The pixel size supplied, is not '//
-     :                      'feasible.',STATUS)
-               CALL PAR_CANCL('PSIZE',STATUS)
-            ELSE
-               INOKAY=.TRUE.
-            END IF
-         END DO
+         CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999 
         
 *      Get the zero point for the surface brightness scale/graphs.
@@ -2565,7 +2554,7 @@
       END
   
 
-      SUBROUTINE ELF1_FILER(FIOID,BACK,LBND,UBND,PRANGE,COSYS,
+      SUBROUTINE ELF1_FILER(FIOID,BACK,INDF,COSYS,
      :                      NGALS,XC,YC,BACKS,STATUS)
 *+
 *  Name:
@@ -2586,7 +2575,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*      CALL ELF1_FILER(FIOID,BACK,LBND,UBND,PRANGE,COSYS,NGALS,
+*      CALL ELF1_FILER(FIOID,BACK,INDF,COSYS,NGALS,
 *                      XC,YC,BACKS,STATUS)    
 
 *  Description:
@@ -2610,15 +2599,11 @@
 *        FIO identifier for the input file.
 *     BACK = REAL (Given)
 *        The image global background value. Units counts.
-*     LBND(2) = INTEGER (Given)
-*        Lower bound of the image.
-*     UBND(2) = INTEGER (Given)
-*        Upper bound of the image.
-*     PRANGE(2) = INTEGER (Given)
-*        Size of each image axis.
+*     INDF = INTEGER (Given)
+*        NDF identifier for the image.
 *     COSYS *(256) = CHARACTER (Given)
 *        Character defining whether the co-ordinates provided 
-*        are world or data format. 
+*        are world, data or current frame format. 
 *     NGALS = INTEGER (Returned)
 *        Number of galaxies to be profiled.
 *     XC(ELF__NGALS) = REAL (Returned)
@@ -2633,10 +2618,13 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 
 *  History:
 *     9-JUL-1993 (GJP)
 *     (Original version)
+*     26-OCT-1995 (MBT)
+*        Modified to deal with COSYS=C.
 
 *  Bugs:
 *     None known.
@@ -2655,10 +2643,8 @@
 *  Arguments Given:                              
       CHARACTER *(256) COSYS          ! Option choice defining how the
                                       ! pixel data format to be input
+      INTEGER INDF                    ! NDF identifier for image
       INTEGER FIOID                   ! FIO identifier for the input file
-      INTEGER LBND(NDF__MXDIM)        ! Lower bounds of image axes 
-      INTEGER PRANGE(2)               ! Size of each image axis
-      INTEGER UBND(NDF__MXDIM)        ! Upper bounds of image axes
       REAL BACK                       ! Global background count value
 
 *  Arguments returned:
@@ -2687,7 +2673,8 @@
       INTEGER INDEXS                  ! Start of a word in the buffer string
       INTEGER NCHAR                   ! Number of characters
       REAL VALUE(3)                   ! Temporary storage of co-ordinates and
-                                      ! background value.
+                                      ! background
+
 *.
 
 *   Check the inherited global status.
@@ -2762,102 +2749,55 @@
 
                END IF
 
-*            Look at those words found.
-               FAIL=.FALSE.
-               DO 20 J=1,3-FAILN  
+*            Decode the background value if there were three strings.
+               IF (FAILN.EQ.0) THEN
 
-*               Start an new error context.
-                  CALL ERR_MARK                        
+*               Enter new error context.
+                  CALL ERR_MARK
 
-*               Examine word.
-                  STRING=BUFFER(INDEX(1,J):INDEX(2,J))
-                  CALL CHR_CTOR(STRING,VALUE(J),STATUS)
+*               Perform conversion of third string to background value.
+                  STRING=BUFFER(INDEX(1,3):INDEX(2,3))
+                  CALL CHR_CTOR(STRING,VALUE(3),STATUS)
 
-*               Display the cause of any problem.
+*               If there was an error warn and cease to consider this 
+*               line.
                   IF (STATUS.NE.SAI__OK) THEN
                      FAIL=.TRUE.
-                     CALL ERR_ANNUL(STATUS)
-                     IF (J.EQ.1) CALL MSG_OUT(' ',
-     :                  'X co-ordinate not a number.',STATUS)
-                     IF (J.EQ.2) CALL MSG_OUT(' ',
-     :                  'Y co-ordinate not a number.',STATUS)
-                     IF (J.EQ.3) CALL MSG_OUT(' ',
-     :                  'Background not a number.',STATUS)      
+                     CALL ERR_FLUSH(STATUS)
+                     CALL MSG_OUT(' ','Background not a number',STATUS)
+                     CALL ERR_RLSE
+                     GO TO 666
                   END IF
 
-*               End of error context.
+*               Exit error context.
                   CALL ERR_RLSE
-
- 20            CONTINUE
-
-*            Stop looking at this line since less than two valid
-*            numbers were found.
-               IF ((FAIL).AND.(FAILN.GT.0)) THEN 
-
-*               Indicate that the line of text did not contain two numbers.
-                  CALL MSG_OUT(' ','Bad text line.',STATUS)
-                  GOTO 666
-
                END IF
 
-*            Check that the two co-ordinates are within the image.
+*            Get coordinates.
+
+*            Start new error context.
                FAIL=.FALSE.
-               DO 30 J=1,2
+               IF (STATUS.NE.SAI__OK) GO TO 666
+               CALL ERR_MARK
 
-*               Check the value is within allowed range.
-                    IF (COSYS.EQ.'W') THEN
+*            Change strings in character buffer into numeric coordinate
+*            values.
+               CALL ESP1_S2PR(COSYS,INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
+     :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
+     :                        VALUE(2),STATUS)
 
-*                  World co-ordinates.
-
-*                  Check that the co-ordinate value input is legal.
-                    IF ((VALUE(J).GE.LBND(J)).AND.
-     :                 (VALUE(J).LE.UBND(J))) THEN
-
-*                    Value within range so assign.
-                       VALUE(J)=VALUE(J)-LBND(J)+1
-
-                    ELSE
-                                 
-*                    Set the fail flag since the point selected 
-*                    is not on the image.
-                       CALL MSG_OUT(' ',
-     :                   'Co-ordinate not on the image.',
-     :                   STATUS)
-                       FAIL=.TRUE.
-                    
-                    END IF
-                         
-                 ELSE
-
-*                  DATA pixel co-ordinates.
-
-*                  Check that the co-ordinate value input is legal.
-                    IF ((VALUE(J).LT.1.0).OR.
-     :                 (VALUE(J).GT.PRANGE(J))) THEN
-
-*                    Set the fail flag since the point selected 
-*                    is not on the image.
-                       CALL MSG_OUT(' ',
-     :                    'Co-ordinate not on the image.',
-     :                    STATUS)
-                       FAIL=.TRUE.
-                                 
-                    END IF
-
-                 END IF
-
- 30            CONTINUE
-
-*            Stop looking at this line since one of the co-ordinates
-*            was not on the image.
-               IF (FAIL) THEN 
-
-*               Indicate that the line of text did not contain two numbers.
+*            If there was an error in the conversion, warn and cease to
+*            consider this line.
+               IF (STATUS.NE.SAI__OK) THEN
+                  CALL ERR_FLUSH(STATUS)
                   CALL MSG_OUT(' ','Bad text line.',STATUS)
+                  CALL ERR_RLSE
                   GOTO 666
-
                END IF
 
+*            Exit error context.
+               CALL ERR_RLSE
+          
 *            Assign the values to the arrays and increment the
 *            counter.
                NGALS=NGALS+1
@@ -3434,11 +3374,6 @@
       END DO
       IF (STATUS.NE.SAI__OK) GOTO 9999 
 
-*   Get the sampling radius maximum.
-      CALL PAR_GET0R('RLIM',RLIM,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (RLIM.LE.PSIZE) RLIM=ELF__RLIM
-
 *   Should the default ellipse isophotal settings be used.
 *   Look on the command line for an input.
 *   Otherwise, use the value specified in elf_par.
@@ -3452,20 +3387,14 @@
       END IF
 
 *   Get the pixel size value.
-      INOKAY=.FALSE.
-      DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
-         CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-         IF (PSIZE.LE.0.0) THEN
-*         Display message and annul the parameter.
-            CALL MSG_OUT(' ','The pixel size supplied, is not '//
-     :                   'feasible.',STATUS)
-            CALL PAR_CANCL('PSIZE',STATUS)
-         ELSE
-            INOKAY=.TRUE.
-         END IF
-      END DO
+      CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999 
       
+*   Get the sampling radius maximum.
+      CALL PAR_GET0R('RLIM',RLIM,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 9999
+      IF (RLIM.LE.PSIZE) RLIM=ELF__RLIM
+
 *   Get the zero point for the surface brightness scale/graphs.
       CALL PAR_GET0R('ZEROP',ZEROP,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
@@ -3500,7 +3429,7 @@
       END IF
            
 *   Obtain the co-ordinates of the galaxies required.
-      CALL ELF1_FILER(FIOID,BACK,LBND,UBND,PRANGE,COSYS,
+      CALL ELF1_FILER(FIOID,BACK,NDF1,COSYS,
      :                NGALS,XC,YC,BACKS,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
@@ -4653,11 +4582,14 @@
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     16-MAR-1993 (GJP)
 *     (Original version)
+*     26-OCT-1999 (MBT)
+*        Modified to cope with COSYS=C.
 
 *  Bugs:
 *     None known.
@@ -4682,6 +4614,7 @@
       CHARACTER *(256) COSYS          ! Option choice defining how the
                                       ! pixel data format to be input
       CHARACTER *(MSG__SZMSG) FILE    ! NDF file name
+      CHARACTER *(256) STRINP(2)      ! String array for character input
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL ANGCON                  ! Position angle convention
       LOGICAL AUTOL                   ! Is an estimate of the galaxy centre
@@ -4779,35 +4712,28 @@
 *      Get the pixel to be used as the galaxy centre.
          IND=2
          IND2=2
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
 
-*         Get the input.
-            CALL PAR_GET1R('ORIGIN',IND,INP,IND2,STATUS)
-            XCO=INP(1)
-            YCO=INP(2)
+*      Get the input as strings.
+ 11      CONTINUE
+         CALL PAR_EXACC('ORIGIN',2,STRINP,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 9999
 
-*         Check that the co-ordinate values input are legal.
-            IF (COSYS.EQ.'W') THEN
-               IF ((XCO.GE.LBND(1)).AND.(XCO.LE.UBND(1))
-     :            .AND.(YCO.GE.LBND(2)).AND.(YCO.LE.UBND(2))) 
-     :            INOKAY=.TRUE.
-               XCO=XCO-LBND(1)+1
-               YCO=YCO-LBND(2)+1
-            ELSE
-               IF ((XCO.GE.1.0).AND.(XCO.LE.PRANGE(1))
-     :            .AND.(YCO.GE.1.0).AND.(YCO.LE.PRANGE(2))) 
-     :            INOKAY=.TRUE.
-            END IF
+*      Begin error context.
+         CALL ERR_MARK
 
-            IF (.NOT.INOKAY) THEN
-               CALL MSG_OUT(' ','The position supplied, is not '//
-     :                      'within the image.',STATUS)
-               CALL PAR_CANCL('ORIGIN',STATUS)
-            END IF
+*      Turn input coordinates into pixel coordinates.
+         CALL ESP1_S2PR(COSYS,NDF1,STRINP(1),STRINP(2),XCO,YCO,STATUS)
 
-         END DO
-         IF (STATUS.NE.SAI__OK) GOTO 9999 
+*      Check whether the coordinate input went smoothly.
+         IF (STATUS.NE.SAI__OK) THEN
+            CALL ERR_FLUSH(STATUS)
+            CALL ERR_RLSE
+            CALL PAR_CANCL('ORIGIN',STATUS)
+            GO TO 11
+         END IF
+
+*      End error context.
+         CALL ERR_RLSE
 
 *      Determine whether or not the origin given is to be used throughout the
 *      profiling.
@@ -4833,11 +4759,6 @@
          END DO
          IF (STATUS.NE.SAI__OK) GOTO 9999 
 
-*      Get the sampling radius.
-         CALL PAR_GET0R('RLIM',RLIM,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 9999
-         IF (RLIM.LE.PSIZE) RLIM=ELF__RLIM
-
 *      Use the default ellipse isophotal separation value? 
 *      Look on the command line for an output.
 *      Otherwise, use the value specified in elf_par.
@@ -4851,19 +4772,13 @@
          END IF
 
 *      Get the pixel size value.
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
-            CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-            IF (PSIZE.LE.0.0) THEN
-*            Display message and annul the parameter.
-               CALL MSG_OUT(' ','The pixel size supplied, is not '//
-     :                      'feasible.',STATUS)
-               CALL PAR_CANCL('PSIZE',STATUS)
-            ELSE
-               INOKAY=.TRUE.
-            END IF
-         END DO
+         CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999 
+
+*      Get the sampling radius.
+         CALL PAR_GET0R('RLIM',RLIM,STATUS)
+         IF (STATUS.NE.SAI__OK) GOTO 9999
+         IF (RLIM.LE.PSIZE) RLIM=ELF__RLIM
 
 *      Get the zero point for the surface brightness scale/graphs.
          CALL PAR_GET0R('ZEROP',ZEROP,STATUS)

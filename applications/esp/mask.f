@@ -97,7 +97,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Propogate the bits of the source NDF required.
-      CALL NDF_PROP(NDF1,'DATA','OUT',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'DATA,WCS','OUT',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Set the output NDF data type to real.

@@ -9,6 +9,7 @@
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
 #     NG: Norman Gray (Starlink, Glasgow)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -16,6 +17,8 @@
 #        Original version.
 #     18 August 1998 (NG)
 #	Added MINMOD parameter
+#     25-OCT-1999 (MBT):
+#        Modified ORIGIN and COSYS to  accomodate WCS aware changes.
 #     {enter_changes_here}
 
 #-    
@@ -147,14 +150,14 @@ interface ELLPRO
     helpkey '*'
   endparameter
 
-  parameter COSYS    # World co-ordinates or data co-ordinates.
+  parameter COSYS    # Coordinate types
     type '_CHAR'
     access 'read'
     keyword 'COSYS'
-    prompt 'Use world or data co-ordinates to define a pixel'
+    prompt '(W)orld, (D)ata or (C)urrent frame co-ords to define pixel?'
     ppath 'current,default'
     vpath 'prompt'
-    in 'd','D','w','W'
+    in 'd','D','w','W','c','C'
     default 'D'
     helpkey '*'
   endparameter
@@ -184,7 +187,7 @@ interface ELLPRO
   endparameter
 
    parameter ORIGIN     # The origin point from which the sector extends.
-    type '_REAL'
+    type '_CHAR'
     access 'read'
     keyword 'ORIGIN'
     prompt 'Indices of the origin'

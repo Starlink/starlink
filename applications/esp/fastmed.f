@@ -158,7 +158,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Propogate an NDF to contain the results.
-      CALL NDF_PROP(NDF1,'Data','OUT',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'Data,WCS','OUT',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Set the output NDF data type to real.

@@ -7,11 +7,14 @@
 
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     16-JUL-1993 (GJP):
 #        Original version.
+#     26-OCT-1999 (MBT):
+#        Modified ORIGIN and COSYS to accomodate WCS aware changes.
 #     {enter_changes_here}
 
 #-    
@@ -156,14 +159,14 @@ interface ELLFOU
     helpkey '*'
   endparameter
 
-  parameter COSYS    # World co-ordinates or data co-ordinates.
+  parameter COSYS    # Coordinate types
     type '_CHAR'
     access 'read'
     keyword 'COSYS'
-    prompt 'Use world or data co-ordinates to define a pixel'
+    prompt '(W)orld, (D)ata or (C)urrent frame co-ords to define pixel?'
     ppath 'current,default'
     vpath 'prompt'
-    in 'd','D','w','W'
+    in 'd','D','w','W','c','C'
     default 'D'
     helpkey '*'
   endparameter
@@ -193,7 +196,7 @@ interface ELLFOU
   endparameter
  
   parameter ORIGIN     # The origin point for the galaxy.
-    type '_REAL'
+    type '_CHAR'
     access 'read'
     keyword 'ORIGIN'
     prompt 'Indices of the origin'

@@ -229,7 +229,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Propogate an NDF to contain the results.
-      CALL NDF_PROP(NDF1,'Data','OUT',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'Data,WCS','OUT',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Set the output NDF data type as real.
@@ -250,7 +250,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Determine the pixel size.
-      CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
+      CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Check that the pixel size is not too small.

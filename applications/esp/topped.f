@@ -183,7 +183,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Propogate an NDF to contain the results.
-      CALL NDF_PROP(NDF1,'Data','OUT',NDF2,STATUS)
+      CALL NDF_PROP(NDF1,'Data,WCS','OUT',NDF2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Set the output NDF data type to real.
@@ -209,13 +209,8 @@
       END IF
 
 *   Get the pixel size.
-      CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
+      CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (PSIZE.LT.TOP1__VSMAL) THEN
-         STATUS=SAI__ERROR
-         CALL ERR_REP(' ','The pixel size is too small.',STATUS)
-         GOTO 9999
-      END IF
 
 *   Determine the radius of the circular area about a bright pixel 
 *   within which all the pixels are to be set to bad.

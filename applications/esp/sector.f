@@ -99,7 +99,8 @@
 *     COLOUR = _INTEGER (Read)
 *        Colour used when showing the galaxy centre and profiling radius.
 *     COSYS = _CHAR (Read)
-*        Use a data or world co-ordinate system? (D=data W=world).
+*        What co-ordinate system to use?  D=data, W=world, C=Current
+*        frame of WCS component.
 *     CURSOR = _LOGICAL (Read)
 *        Whether the galaxy location is to be identified using the 
 *        graphics cursor or the keyboard.
@@ -602,18 +603,7 @@
          IF (STATUS.NE.SAI__OK) GOTO 9999 
 
 *      Get the pixel size value.
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
-            CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-            IF (PSIZE.LE.0.0) THEN
-*            Display message and annul the parameter.
-               CALL MSG_OUT(' ','The pixel size supplied, is not '//
-     :                      'feasible.',STATUS)
-               CALL PAR_CANCL('PSIZE',STATUS)
-            ELSE
-               INOKAY=.TRUE.
-            END IF
-         END DO
+         CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999 
         
 *      Convert the length in arc secs to length in pixels.
@@ -1015,6 +1005,7 @@
                                       ! pixel data format to be input
       CHARACTER *(256) RADISP         ! Option choice defining how the
                                       ! radius data is to be displayed
+      CHARACTER *(256) STRINP(2)      ! String array for character input
       LOGICAL AGAIN                   ! Look at another part of the image?
       LOGICAL AUTOL                   ! Is an estimate of the galaxy centre
                                       ! position to be made?
@@ -1104,35 +1095,28 @@
 *      Get the pixel to be used as the galaxy centre.
          IND=2
          IND2=2
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
 
-*         Get the input.
-            CALL PAR_GET1R('ORIGIN',IND,INP,IND2,STATUS)
-            XCO=INP(1)
-            YCO=INP(2)
-
-*         Check that the co-ordinate values input are legal.
-            IF (COSYS.EQ.'W') THEN
-               IF ((XCO.GE.LBND(1)).AND.(XCO.LE.UBND(1))
-     :            .AND.(YCO.GE.LBND(2)).AND.(YCO.LE.UBND(2))) 
-     :            INOKAY=.TRUE.
-               XCO=XCO-LBND(1)+1
-               YCO=YCO-LBND(2)+1
-            ELSE
-               IF ((XCO.GE.1.0).AND.(XCO.LE.PRANGE(1))
-     :            .AND.(YCO.GE.1.0).AND.(YCO.LE.PRANGE(2))) 
-     :            INOKAY=.TRUE.
-            END IF
-
-            IF (.NOT.INOKAY) THEN
-               CALL MSG_OUT(' ','The position supplied, is not '//
-     :                      'within the image.',STATUS)
-               CALL PAR_CANCL('ORIGIN',STATUS)
-            END IF
-
-         END DO
+*      Get the input as strings.
+ 11      CONTINUE
+         CALL PAR_EXACC('ORIGIN',2,STRINP,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999 
+
+*      Begin error context.
+         CALL ERR_MARK
+
+*      Turn input coordinates into pixel coordinates.
+         CALL ESP1_S2PR(COSYS,NDF1,STRINP(1),STRINP(2),XCO,YCO,STATUS)
+
+*      Check whether the coordinate input went smoothly.
+         IF (STATUS.NE.SAI__OK) THEN
+            CALL ERR_FLUSH(STATUS)
+            CALL ERR_RLSE
+            CALL PAR_CANCL('ORIGIN',STATUS)
+            GO TO 11
+         END IF
+
+*      End error context.
+         CALL ERR_RLSE
 
 *      Get the position angle for the sector.
          CALL PAR_GET0R('POSANG',POSANG,STATUS)
@@ -1170,18 +1154,7 @@
          IF (STATUS.NE.SAI__OK) GOTO 9999 
 
 *      Get the pixel size value.
-         INOKAY=.FALSE.
-         DO WHILE ((.NOT.INOKAY).AND.(STATUS.EQ.SAI__OK))
-            CALL PAR_GET0R('PSIZE',PSIZE,STATUS)
-            IF (PSIZE.LE.0.0) THEN
-*            Display message and annul the parameter.
-               CALL MSG_OUT(' ','The pixel size supplied, is not '//
-     :                      'feasible.',STATUS)
-               CALL PAR_CANCL('PSIZE',STATUS)
-            ELSE
-               INOKAY=.TRUE.
-            END IF
-         END DO
+         CALL ESP1_GTPSZ(NDF1,PSIZE,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9999 
 
 *      Convert the length in arc secs to length in pixels.
