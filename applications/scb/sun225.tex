@@ -358,7 +358,7 @@ These variables are:
 \begin{description}
 \item[SCB\_SOURCES]
 The directory containing the Starlink source code.  
-This directory must contain nothing but Starlink source packages,
+This directory should contain nothing but Starlink source packages,
 each of which must be {\em either\/} in a directory named after the package
 {\em or\/} in a tar file named {\tt package.tar}, optionally compressed
 using {\tt compress} or {\tt gzip} (and named with a suffix .Z or .gz 
@@ -400,6 +400,9 @@ An example site installation might go as follows:
 \end{verbatim}
 \end{quote}
 
+SCB requires Perl 5.  It was developed using version 5.004_04.
+Earlier versions of Perl may work, but have not been tested.
+
 
 \subsection{\label{sec:install-cgi}Installing the CGI script}
 
@@ -428,9 +431,11 @@ Options ExecCGI
 and a line like the following to the {\tt conf/srm.conf} file:
 \begin{quote}
 \begin{verbatim}
-ScriptAlias /star/cgi-bin/ /star/bin/cgi/
+ScriptAlias /cgi-bin/star/ /star/bin/cgi/
 \end{verbatim}
 \end{quote}
+Alternatively, the script {\tt /star/bin/cgi/scb.pl} may be copied 
+into an existing CGI directory.
 Setting up the CGI program can usually only 
 be done by the system manager.
 
@@ -473,10 +478,7 @@ then no temporary disk space will be used, and much reduced disk
 activity will be required by the browser program.
 The disadvantage of doing this is increased use of disk space
 in the SCB\_SOURCES directory 
-(by around 220MB for the full unbuilt USSC), 
-and also slower running of the
-indexer program (since it checks all files outside of the tar files
-as well as all files inside them).
+(by around 220MB for the full unbuilt USSC). 
 \end{itemize}
 
 
@@ -509,7 +511,7 @@ write the index files to the directory specified in SCB\_INDEX,
 and print to the screen each index entry as it is encountered.
 If the entire Starlink source code collection is installed, 
 this will take a matter of hours.  Some indication of how far the indexing
-has progressed can be seen by seeing which package is currently
+has progressed can be seen by looking at which package is currently
 being indexed (the name is given before the `\#' sign on the 
 printed lines, e.g. lines which look like
 \begin{quote}
@@ -654,10 +656,10 @@ section \ref{sec:indexing}.
 The browser system tries to come up with the requested section of
 source code, but for one reason and another sometimes fails to 
 do so.  
-For more insight into why it behaves as it does, and 
-how it might be coaxed into behaving otherwise, 
-section \ref{sec:internals} gives some explanation of how the
-indexing and extraction is done.
+% For more insight into why it behaves as it does, and 
+% how it might be coaxed into behaving otherwise, 
+% section \ref{sec:internals} gives some explanation of how the
+% indexing and extraction is done.
 
 
 \subsection{Command line operation}
@@ -668,7 +670,7 @@ to view the source code from the Unix shell.
 
 \subsubsection{Basic use}
 
-At its simplest, this is simply done by giving the 
+At its simplest, this is done by giving just the 
 requested filename or routine as an argument to the extractor:
 \begin{quote}
 \begin{verbatim}
@@ -754,13 +756,13 @@ files from either POLMAP or HLP (picked more or less at random).
 The `{\tt package=}' part may be omitted, so that 
 \begin{quote}
 \begin{verbatim}
-`{\tt scb.pl help.f hlp}'
+scb.pl help.f hlp
 \end{verbatim}
 \end{quote}
 is equivalent to 
 \begin{quote}
 \begin{verbatim}
-`{\tt scb.pl help.f package=hlp}'.
+scb.pl help.f package=hlp
 \end{verbatim}
 \end{quote}
 
@@ -846,7 +848,8 @@ like {\tt http://host.domain/cgi-bin/star/scb.pl}
 if you have built your own index).
 
 
-\subsubsection{\label{BROWSER-HELP}Locating a source file}
+\subsubsection{Locating a source file}
+\label{BROWSER-HELP} 
 
 The top level page of the source code browser is a form
 with the following parts:
@@ -946,7 +949,8 @@ will be presented using a viewer appropriate to the type.
 The title of the HTML document
 (normally displayed in the title bar of your browser)
 is the location of the file in 
-the source tree.  The notation is quite easy to understand: 
+the source tree.  The notation is specific to this package,
+but quite easy to understand: 
 it's like a Unix pathname except that
 a `\#' sign denotes inclusion in a package, 
 and a 
