@@ -24,8 +24,8 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [sae prm hds chr ems])
-STAR_DECLARE_DEPENDENCIES([link],  [hds ems chr prm])
+STAR_DECLARE_DEPENDENCIES([build], [chr cnf ems hds mers prm sae])
+STAR_DECLARE_DEPENDENCIES([link],  [hds mers chr prm])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
