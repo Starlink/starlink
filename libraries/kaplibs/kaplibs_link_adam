@@ -1,4 +1,4 @@
-echo -lkpg -lira -llpg -lctg -lfts -laif -lkapgrf \
+echo -lkapgen -lira -llpg -lctg -lfits -laif -lkapgrf \
            `agi_link_adam` `ast_link_adam -mygrf` `cat_link_adam` \
            `chr_link_adam` `hds_link_adam` `err_link_adam` \
            `fio_link_adam` `gks_link_adam` `gns_link_adam` \

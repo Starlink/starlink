@@ -870,7 +870,8 @@ OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a libkpg.a libkapgrf.a
+OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfits.a \
+                   libkapgen.a libkapgrf.a
 
 libaif.a: $(AIF_OBJECT_FILES)
 	$(AR_IN) $@ $?
@@ -888,11 +889,11 @@ libctg.a: $(CTG_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-libkpg.a: $(KPG_OBJECT_FILES)
+libkapgen.a: $(KPG_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
-libfts.a: $(FTS_OBJECT_FILES)
+libfits.a: $(FTS_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
