@@ -313,6 +313,13 @@ $!  Fetch the VMS IRAF libraries.
 $!
 $    CMS FETCH'CF' IRAF_VMS_LIBRARIES
 $!
+$!  Documentation.
+$!  ==============
+$!
+$!  Fetch the paper documentation.
+$!
+$    CMS FETCH'CF' DOC
+$!
 $!  Installation Test.
 $!  ==================
 $!

@@ -147,6 +147,7 @@ $!
 $!  Delete the temporary files.
 $!
 $    DELETE GENERIX.TMP;*,SPLIT_GENERIC.COM;*,GENERIC_EXPAND.COM;*
+$    DELETE CON_GENERIX.LIS;*
 $!
 $!  Delete the original generic source code.
 $!
@@ -196,6 +197,13 @@ $!  prefixes.
 $!
 $    CMS FETCH'CF' UNIX_BUILDING
 $    RENAME UNIX_MAKEFILE. MAKEFILE.
+$!
+$!  Documentation.
+$!  ==============
+$!
+$!  Fetch the paper documentation.
+$!
+$    CMS FETCH'CF' DOC
 $!
 $!  Test data for installation test.
 $!  ================================
