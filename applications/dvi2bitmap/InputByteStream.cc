@@ -348,15 +348,15 @@ int InputByteStream::openSourceSpec(string srcspec)
 
     if (srcfn.size() > 0) {
 	assert(fd < 0);
-	fd = open(srcfn.c_str(), O_RDONLY);
-	if (verbosity_ > normal)
-	    cerr << "InputByteStream: opening osfile:" << srcfn 
-		 << (fd >= 0 ? " OK" : " failed") << endl;
-	if (fd < 0) {
-	    string errstr = strerror (errno);
-	    throw InputByteStreamError
-		    ("InputByteStream: can\'t open file " + srcfn
-		     + " to read (" + errstr + ")");
+        fd = open(srcfn.c_str(), O_RDONLY);
+        if (verbosity_ > normal)
+            cerr << "InputByteStream: opening osfile:" << srcfn 
+                 << (fd >= 0 ? " OK" : " failed") << endl;
+        if (fd < 0) {
+            string errstr = strerror (errno);
+            throw InputByteStreamError
+                ("InputByteStream: can't open file " + srcfn
+                 + " to read (" + errstr + ")");
 	}
     }
     assert(fd >= 0);
@@ -526,10 +526,14 @@ void InputByteStream::read_buf_()
     }
     
     assert(fd_ >= 0 && buf_ != 0);
-    
+
+ read_again:
     ssize_t bufcontents = read(fd_, buf_, buflen_);
     if (bufcontents < 0)
     {
+        if (errno == EINTR)     // interrupted system call
+            goto read_again;
+        
 	string errmsg = strerror(errno);
 	throw InputByteStreamError
 		("InputByteStream::read_buf_:"+fname_+": read error ("
