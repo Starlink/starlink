@@ -13,6 +13,10 @@
 #     which allows selection of a matching set of points on each one.
 #
 #  External Variables:
+#     ERROR = string (Returned)
+#        If returned as a non-empty string, this should give the text
+#        of an error to be presented to the user.  This indicates that
+#        the routine did not complete successfully.
 #     MARKSTYLE = string (Given and Returned)
 #        A string, in the form of comma-separated att=value pairs,
 #        indicating how markers should be plotted on the image.
@@ -85,6 +89,7 @@
             eval set $pair
          }
       }
+      set ERROR ""
 
 #  Initialise screen.
       wm withdraw .
@@ -117,6 +122,8 @@
       [ .vref component exit ] configure \
          -balloonstr "Start marking points on other images"
       .vref configure -markstyle showindex=1
+      [ .vref component abort ] configure \
+         -cmd [ code "set ERROR {User aborted GUI}; .vref deactivate" ]
       catch { unset basichelp }
       lappend basichelp \
    "Use this viewer to mark objects on the image." \
@@ -139,24 +146,25 @@
 #  Get the user to pick points.
       .vref activate
       tkwait variable status$ref
-      set npref [ llength [ .vref points ] ]
-      ccdputs -log "    $npref points marked initially."
-      ccdputs -log "  "
+      if { $ERROR == "" } {
+         set npref [ llength [ .vref points ] ]
+         ccdputs -log "    $npref points marked initially."
+         ccdputs -log "  "
 
 #  Get display preferences from the reference viewer so that they can be 
 #  propagated to subsequent windows and passed back to the calling routine.
-      set WINX [ winfo width .vref ]
-      set WINY [ winfo height .vref ]
-      set ZOOM [ .vref cget -zoom ]
-      set MAXCANV [ .vref maxcanvas ]
-      set PERCLO [ lindex [ .vref cget -percentiles ] 0 ]
-      set PERCHI [ lindex [ .vref cget -percentiles ] 1 ]
-      set MARKSTYLE [ .vref cget -markstyle ]
+         set WINX [ winfo width .vref ]
+         set WINY [ winfo height .vref ]
+         set ZOOM [ .vref cget -zoom ]
+         set MAXCANV [ .vref maxcanvas ]
+         set PERCLO [ lindex [ .vref cget -percentiles ] 0 ]
+         set PERCHI [ lindex [ .vref cget -percentiles ] 1 ]
+         set MARKSTYLE [ .vref cget -markstyle ]
 
 #  Allow the user to muck about with the list for the reference NDF 
 #  while the later ones are being modified.
-      .vref configure -status active
-      [ .vref component exit ] configure -state disabled
+         .vref configure -status active
+         [ .vref component exit ] configure -state disabled
 
 #  Try to place the new viewer next to the reference viewer on the screen
 #  if it will fit.  If not, positioning is left to the window manager.
@@ -164,44 +172,46 @@
 #  in the wrong place by the size of the wm's decorations.  I don't know
 #  how to correct this without mapping the window first, which would be
 #  a bit untidy.
-      set xgap 20
-      set ygap 40
-      set xsize $WINX
-      set ysize $WINY
-      set rxpos [ winfo x .vref ]
-      set rypos [ winfo y .vref ]
-      set minxpos 0
-      set minypos 0
-      set maxxpos [ expr [ winfo screenwidth .vref ] - $xsize ]
-      set maxypos [ expr [ winfo screenheight .vref ] - $ysize ]
-      set impossible 0.01
-      set geometry ${xsize}x${ysize}
-      set setposition 0
-      if {    [ set xpos [ expr $rxpos + $xsize + $xgap ] ] <= $maxxpos && \
-              [ set ypos $rypos ] != $impossible \
-           || [ set ypos [ expr $rypos + $ysize + $ygap ] ] <= $maxypos && \
-              [ set xpos $rxpos ] != $impossible \
-           || [ set xpos [ expr $rxpos - $xsize - $xgap ] ] >= $minxpos && \
-              [ set ypos $rypos ] != $impossible \
-           || [ set ypos [ expr $rypos - $ysize - $ygap ] ] >= $minypos && \
-              [ set xpos $rxpos ] != $impossible } {
-         set setposition 1
-         append geometry +${xpos}+${ypos}
-      }
+         set xgap 20
+         set ygap 40
+         set xsize $WINX
+         set ysize $WINY
+         set rxpos [ winfo x .vref ]
+         set rypos [ winfo y .vref ]
+         set minxpos 0
+         set minypos 0
+         set maxxpos [ expr [ winfo screenwidth .vref ] - $xsize ]
+         set maxypos [ expr [ winfo screenheight .vref ] - $ysize ]
+         set impossible 0.01
+         set geometry ${xsize}x${ysize}
+         set setposition 0
+         if {    [ set xpos [ expr $rxpos + $xsize + $xgap ] ] <= $maxxpos && \
+                 [ set ypos $rypos ] != $impossible \
+              || [ set ypos [ expr $rypos + $ysize + $ygap ] ] <= $maxypos && \
+                 [ set xpos $rxpos ] != $impossible \
+              || [ set xpos [ expr $rxpos - $xsize - $xgap ] ] >= $minxpos && \
+                 [ set ypos $rypos ] != $impossible \
+              || [ set ypos [ expr $rypos - $ysize - $ygap ] ] >= $minypos && \
+                 [ set xpos $rxpos ] != $impossible } {
+            set setposition 1
+            append geometry +${xpos}+${ypos}
+         }
 
 #  Construct a viewer for marking points on the other NDFs.
-      ndfview .v \
-                 -watchstatus status \
-                 -percentiles [ list $PERCLO $PERCHI ] \
-                 -zoom $ZOOM \
-                 -maxpoints $MAXPOS \
-                 -geometry $geometry \
-                 -markstyle $MARKSTYLE
-      [ .v component exit ] configure -balloonstr "Finish marking this image"
+         ndfview .v \
+                    -watchstatus status \
+                    -percentiles [ list $PERCLO $PERCHI ] \
+                    -zoom $ZOOM \
+                    -maxpoints $MAXPOS \
+                    -geometry $geometry \
+                    -markstyle $MARKSTYLE
+         [ .v component exit ] configure -balloonstr "Finish marking this image"
+         [ .v component abort ] configure \
+            -cmd [ code "set ERROR {User aborted GUI}; .v deactivate" ]
 
 #  Alter the help text somewhat to reflect the current state of play.
-      set helplines $basichelp
-      lappend helplines \
+         set helplines $basichelp
+         lappend helplines \
    "For each of the images displayed, mark the same objects as have been" \
    "indicated on the reference image.  You do not have to mark all the points" \
    "on each image, but each object marked should have the same index number" \
@@ -212,89 +222,92 @@
    "" \
    "The reference image will remain visible, and you can add points to it" \
    "at any time."
-      .vref configure -helptext [ join $helplines "\n" ]
+         .vref configure -helptext [ join $helplines "\n" ]
 
 #  Associate the help window of the new viewer with the help window of 
 #  the reference NDF's viewer's window.
-      [ .v component help ] configure -redirect [ .vref component help ]
+         [ .v component help ] configure -redirect [ .vref component help ]
 
 #  Create a warning dialog, which may be used if the user fails to select
 #  any points on one of the NDFs.
-      set warntext [ join { "No points have been marked on this image."
-                            "Registration will be impossible unless"
-                            "some points are selected on the image."  } "\n" ]
-      set warnbox [ iwidgets::messagedialog .warn \
-                       -modality application \
-                       -bitmap questhead \
-                       -title "CCDALIGN: No points" \
-                       -master .v \
-                       -text $warntext ]
-      $warnbox buttonconfigure Cancel -text "Next image"
-      $warnbox buttonconfigure OK -text "Try again"
-      $warnbox hide Help
-      
+         set warntext [ join { "No points have been marked on this image."
+                               "Registration will be impossible unless"
+                               "some points are selected on the image." } "\n" ]
+         set warnbox [ iwidgets::messagedialog .warn \
+                          -modality application \
+                          -bitmap questhead \
+                          -title "CCDALIGN: No points" \
+                          -master .v \
+                          -text $warntext ]
+         $warnbox buttonconfigure Cancel -text "Next image"
+         $warnbox buttonconfigure OK -text "Try again"
+         $warnbox hide Help
 
 #  Loop through the other NDFs getting a list of points from each one.
 #  Exclude the reference NDF, since that one stays posted all the time.
-      set i 0
-      set done 0
-      foreach ndfset $ndfsets {
-         if { $i != $ref } {
-            incr done
+         set i 0
+         set done 0
+         foreach ndfset $ndfsets {
+            if { $i != $ref && $ERROR == "" } {
+               incr done
 
 #  Configure the viewer.
-            set ndfset [ eval ndfset [ lindex $ndfsets $i ] ]
-            .v configure -title "$title: %n (#$done/$nother)"
-            .v clearpoints
-            .v loadndf $ndfset $MAXCANV
-            if { $done == 1 && $setposition } { 
-               wm deiconify .v
-               wm geometry .v $geometry
-            }
-            ccdputs -log \
-            "  Mark points on image #$done/$nother, [ $ndfset name ]:"
+               set ndfset [ eval ndfset [ lindex $ndfsets $i ] ]
+               .v configure -title "$title: %n (#$done/$nother)"
+               .v clearpoints
+               .v loadndf $ndfset $MAXCANV
+               if { $done == 1 && $setposition } { 
+                  wm deiconify .v
+                  wm geometry .v $geometry
+               }
+               ccdputs -log \
+               "  Mark points on image #$done/$nother, [ $ndfset name ]:"
 
 #  Activate the viewer and get the user to mark points.  Ensure that he/she
 #  doesn't hit the exit button accidentally without marking any points.
-            set tryagain 1
-            while { $tryagain } {
-               set tryagain 0
-               .v activate
-               tkwait variable status
-               if { [ llength [ .v points ] ] == 0 } {
-                  $warnbox center .v
-                  set tryagain [ $warnbox activate ]
+               set tryagain 1
+               while { $tryagain && $ERROR == "" } {
+                  set tryagain 0
+                  .v activate
+                  tkwait variable status
+                  if { [ llength [ .v points ] ] == 0 } {
+                     $warnbox center .v
+                     set tryagain [ $warnbox activate ]
+                  }
                }
-            }
 
 #  Record the position list.
-            ccdputs -log "    [ llength [ .v points ] ] points marked."
-            ccdputs -log "  "
-            set pts($i) [ .v points ]
+               ccdputs -log "    [ llength [ .v points ] ] points marked."
+               ccdputs -log "  "
+               set pts($i) [ .v points ]
 
 #  Tidy up.
-            $ndfset destroy
+               $ndfset destroy
+            }
+            incr i
          }
-         incr i
+         destroy .v
       }
-      destroy .v
+
+      if { $ERROR == "" } {
 
 #  Get list of points for the reference NDF.  We do this last since it may
 #  have been modified while the other NDFs are being marked.
-      set pts($ref) [ .vref points ]
-      if { [ llength $pts($ref) ] != $npref } {
-         set npref [ llength $pts($ref) ]
-         ccdputs -log \
-            "  Changes made to reference image, [ $refndfset name ]:"
-         ccdputs -log \
-            "    $npref points marked in total."
-         ccdputs -log "  "
-      }
+         set pts($ref) [ .vref points ]
+         if { [ llength $pts($ref) ] != $npref } {
+            set npref [ llength $pts($ref) ]
+            ccdputs -log \
+               "  Changes made to reference image, [ $refndfset name ]:"
+            ccdputs -log \
+               "    $npref points marked in total."
+            ccdputs -log "  "
+         }
 
 #  Construct the list of all points for return to calling program.
-      for { set i 0 } { $i < $nndfset } { incr i } {
-         lappend POINTS $pts($i)
-         lappend NPOINT [ llength $pts($i) ]
+         for { set i 0 } { $i < $nndfset } { incr i } {
+            lappend POINTS $pts($i)
+            lappend NPOINT [ llength $pts($i) ]
+         }
       }
 
 #  Destroy remaining windows.

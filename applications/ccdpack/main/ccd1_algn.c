@@ -148,6 +148,7 @@
       DECLARE_CHARACTER( fsetname, GRP__SZNAM );
       char ndfname[ GRP__SZNAM + 1 ];
       char setname[ GRP__SZNAM + 1 ];
+      char *errtext;
 
 /* Check the inherited status. */
       if ( *status != SAI__OK ) return;
@@ -201,7 +202,20 @@
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "ccdalign.tcl", status );
 
-/* Retrieve the variables set by the script. */
+/* Check for abnormal exit. */
+      if ( *status == SAI__OK ) {
+         errtext = ccdTclGetC( cinterp, "set ERROR", status );
+         if ( *status == SAI__OK && *errtext ) {
+            *status = SAI__ERROR;
+            msgSetc( "TEXT", errtext );
+            errRep( " ", "CCD1_ALGN_ERR: ^TEXT", status );
+         }
+         else if ( *status != SAI__OK ) {
+            errAnnul( status );
+         }
+      }
+
+/* Retrieve the other variables set by the script. */
       if ( *status == SAI__OK ) {
          fmt = "lindex [ lindex [ lindex $POINTS %d ] %d ] %d";
          for ( i = 0; i < *nset; i++ ) {
