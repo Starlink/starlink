@@ -1033,9 +1033,8 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
       ELSE
         ROTA = ATAN2D(Y0,-X0)
       END IF
-
       IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
-      ROTA = (ROTA - REAL(AZIM(IRAD))) * MATH__DTOR
+      ROTA = (ROTA - REAL(AZIM(IRAD))+180.0) * MATH__DTOR
 
 *    SIS or GIS?
       SIS = ( AS_INSTR(SLOT) .EQ. 'SIS' )
@@ -1473,7 +1472,7 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *    Get mask name
       CALL USI_PROMT( 'MASK', 'ASCA detector (GIS or SIS)', STATUS )
-      CALL USI_DEF0C( 'MASK', 'SIS', STATUS )
+      CALL USI_DEF0C( 'MASK', 'GIS', STATUS )
  10   CALL USI_GET0C( 'MASK', MASK, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
