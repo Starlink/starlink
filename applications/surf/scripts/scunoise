@@ -30,6 +30,12 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.8  1999/04/20 23:30:17  rpt
+#        New default location at JCMT on summit disk
+#
+#        Revision 1.8  1999/04/16 14:39:00  rpt
+#        New default location at JCMT on summit disk.
+#
 #        Revision 1.7  1999/02/27 04:24:29  timj
 #        Fix with new location
 #
@@ -244,6 +250,7 @@ sub set_disks {
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
   } elsif ($domain eq "jcmt") {
+    push(@disk,"/net/ieie/jcmtarchive");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
     push(@disk,"/net/luu/scubadata");
@@ -711,6 +718,8 @@ sub scandisk {
 	if ($location =~ /luu/) {
 	  $sem = find_sem($obsdate);
 	  $location = "${location}/${sem}/${obsdate}";
+	} elsif ($location =~ /ieie/) {
+	  $location = "${location}/${obsdate}";
 	} elsif ($location =~ /^\/net/) {
 	  $location = "${location}/${obsdate}/ro";
 	}
@@ -830,6 +839,8 @@ sub getfile {
 	    if ($location =~ /luu/) {
               $sem = find_sem($obsdate);
 	      $location = "${location}/${sem}/${obsdate}";
+	    } elsif ($location =~ /ieie/) {
+	      $location = "${location}/${obsdate}";
 	    } elsif ($location =~ /^\/net/) {
 	      $location = "${location}/${obsdate}/ro";
 	    }
