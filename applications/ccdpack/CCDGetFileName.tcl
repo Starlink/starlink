@@ -1,4 +1,4 @@
-   proc CCDGetFileName { Topwin title } {
+   proc CCDGetFileName { Topwin title image } {
 
 #+
 #  Name:
@@ -23,6 +23,12 @@
 #        The name of the top-level widget which contains the form.
 #     title = string (read)
 #        The title of the window (use this to indicate the context).
+#     image = boolean (read)
+#        If true, then the intention is to get an image file; if false
+#        the intention is to get any type of file.  Currently the
+#        difference is that if image is true any HDS container file
+#        which is encountered is passed to ndgexpand in order to 
+#        look inside it for NDF structures.
 
 #  Global parameters:
 #     CCDimportfile = filename (write)
@@ -35,6 +41,11 @@
 #        this procedure extends the interface to allow selection
 #        from the list. The list format is pairs of symbolic names
 #        and the associated filter types.
+#     CCDndfcontainers = array (write)
+#        An array giving the name of the HDS container file for each
+#        NDF which has been encountered (will only be affected if
+#        images is true).
+
 
 #  Authors:
 #     PDRAPER: Peter Draper (Starlink - Durham University)
@@ -61,6 +72,9 @@
 #        Converted to use a list of filters.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     25-JUN-2001 (MBT):
+#        Added image parameter, and made it keep track of what NDF is in
+#        what container file with CCDndfcontainers global.
 #     {enter_further_changes_here}
 
 #-
@@ -71,6 +85,7 @@
       global CCDimportexists
       global CCDimportfilter
       global CCDcurrentdirectory
+      global CCDndfcontainers
       global gotfilename         ;# Special to this procedure
 #.
 
@@ -230,7 +245,7 @@
 #  "Filter" button. Updates the current directory lists and adds a menu
 #  item for the directory (also updates CCDcurrentdirectory).
       $Choice addbutton Filter \
-         "CCDGetFileUpdate $Filebox $Directbox $Directory $Filefilter 0
+         "CCDGetFileUpdate $Filebox $Directbox $Directory $Filefilter $image
           CCDRecordDirectoryinMenu $Menu Options \
              \[$Directory get\] $Directory $Choice Filter
          "
@@ -290,7 +305,9 @@
          set CCDimportfile [$Selected get]
 
 #  Does the file exist and is it an ordinary one?
-         set CCDimportexists [file isfile $CCDimportfile]
+         set CCDimportexists \
+             [expr [file isfile $CCDimportfile] || \
+                   ( $image && [llength [ndgexpand $CCDimportfile]] == 1 )]
 
 #  Set the current file filter.
          set CCDimportfilter [$Filefilter get]
