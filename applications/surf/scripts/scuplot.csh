@@ -187,7 +187,7 @@ endif
 # ----------------------------------------------------------------------
 # Photometry?
 #
-if (`${kap}fitslist ${sdf} | fgrep -ci photom` == 1) then
+if (`${kap}/fitslist ${sdf} | fgrep -ci photom` == 1) then
   set phsec = "(,,2)"
 endif
 
@@ -254,19 +254,19 @@ while (${iset} < ${nsets})
   REDRAW:
 
   if ( "$mode" == "r" ) then
-    ${kap}mlinplot "${sdf}${phsec}" device=xwindows cosys=world \
+    ${kap}/mlinplot "${sdf}${phsec}" device=xwindows cosys=world \
                    absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
     if ( "$ddf" != "" ) then
-      ${kap}mlinplot "${ddf}${phsec}" device=x2windows cosys=world \
+      ${kap}/mlinplot "${ddf}${phsec}" device=x2windows cosys=world \
                      absaxs=2 ylimit=\[${ymn},${ymx}\] "lnindx=${bolset}"
     endif
   else
-     ${kap}linplot mode=line lincol=red device=xwindows \
+     ${kap}/linplot mode=line lincol=red device=xwindows \
            $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
            'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
            >& /dev/null
     if ( "$ddf" != "" ) then
-      ${kap}linplot mode=line noclear lincol=green device=xwindows \
+      ${kap}/linplot mode=line noclear lincol=green device=xwindows \
            $ddf'('${bol}',)' axlim 'ordlim=['$mn','$mx']' 'abslim=\!' \
            'pltitl="'${sdf}: bolometer ${bol}'"' cosys=world >& /dev/null
     endif
@@ -334,8 +334,8 @@ while (${iset} < ${nsets})
     set pmx = `echo $limits | awk -F" " '{print $NF}'`
     if ( "$pmn" == "" || "$pmx" == "x" ) then
        echo "Cursor: Left button: New plot center; Right button: Accept"
-       ${kap}cursor >& /dev/null
-       set pmn = `${kap}parget xc cursor`
+       ${kap}/cursor >& /dev/null
+       set pmn = `${kap}/parget xc cursor`
        set pmx = `echo "$pmn + 0.5" | bc | cut -d"." -f1`
        set pmn = $pmx
     endif
@@ -389,15 +389,15 @@ while (${iset} < ${nsets})
     set point = `echo "$point" | sed s/"-"/":"/g | sed s/" "/":"/g `
     if ( "$point" == "p" || "$point" == "p " ) then
        echo "Cursor: Left button: Bad channel; Right button: Accept"
-       ${kap}cursor >& /dev/null
-       set point = `${kap}parget xc cursor`
+       ${kap}/cursor >& /dev/null
+       set point = `${kap}/parget xc cursor`
        set point = `echo "$point + 0.5" | bc | cut -d"." -f1`
        set point = "p${point}"
     endif
     echo " Flagging quality $point BAD"
-    ${sur}change_quality "'${sdf}{b${bol};${point}}'" yes  > /dev/null
+    ${sur}/change_quality "'${sdf}{b${bol};${point}}'" yes  > /dev/null
 
-    ${kap}linplot mode=line noclear lincol=green device=xwindows \
+    ${kap}/linplot mode=line noclear lincol=green device=xwindows \
           $sdf'('${bol}','${plim}')' axlim 'ordlim=['$ymn','$ymx']' \
           'abslim=\!' cosys=world 'pltitl="'${sdf}: bolometer ${bol}'"' \
           >& /dev/null
@@ -406,7 +406,7 @@ while (${iset} < ${nsets})
     set accept = $<
     if ( $accept =~ [Nn]* ) then
        echo " Resetting quality ${point} GOOD"
-       ${sur}change_quality "'${sdf}{b${bol};${point}}'" no  > /dev/null
+       ${sur}/change_quality "'${sdf}{b${bol};${point}}'" no  > /dev/null
     else
        echo " Accepted."
        set plim = "";
@@ -680,6 +680,9 @@ exit
 *
 *  History:
 *     $Log$
+*     Revision 1.4  1998/12/09 03:18:27  timj
+*     Add '/' between task name and directory name.
+*
 *     Revision 1.3  1998/06/15 20:22:30  timj
 *     Use $SURF_DIR and $KAPPA_DIR
 *
