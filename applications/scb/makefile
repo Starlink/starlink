@@ -371,8 +371,8 @@ PERL_MODULES = Tag.pm CTag.pm FortranTag.pm Scb.pm StarIndex.pm
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = 
-HYPERTEXT_DOCS = 
+LATEX_DOCS = sun226.tex
+HYPERTEXT_DOCS = sun226.htx
 
 #  List of documentation files.
 
@@ -453,8 +453,8 @@ INSTALL_CGI = $(INSTALL_BIN)/cgi
 #  those above) and rules to create them.
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_PERL_MOD) $(INSTALL_CGI) \
-               $(SCB_INDEX) \
-               $(INSTALL_DATES)
+               $(INSTALL_DOCS) $(INSTALL_DATES) \
+               $(SCB_INDEX)
 
 $(INSTALL_DIRS): 
 	mkdir -p $@
