@@ -1,4 +1,4 @@
-#!/star/bin/awish
+#!STAR_BIN/awish
 #+
 #  Name:
 #     stardemo.tcl
