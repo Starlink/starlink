@@ -20,7 +20,7 @@
 *     on the current image-display device. The minimum and maximum data
 *     values to be displayed can be selected in several ways (see
 *     parameter MODE). Data values outside these limits are displayed
-*     with the colour of the nearest limit. A colour ramp showing the 
+*     with the colour of the nearest limit. A key showing the 
 *     relationship between colour and data value can be displayed (see
 *     parameter KEY).
 *
@@ -148,12 +148,13 @@
 *        The input NDF structure containing the data to be displayed.
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key to the colour table is to be produced to the right
-*        of the display. This takes the form of a colour ramp, annotated
-*        with data value. The appearance of this key can be controlled using
-*        parameter KEYSTYLE, and its horizontal position can be controlled 
-*        using parameter KEYPOS. If the key is required in a different
-*        location, set KEY=NO and use application LUTVIEW after
-*        displaying the image. [TRUE]
+*        of the display. This can take the form of a colour ramp, a
+*        coloured histogram of pen indices, or graphs of RGB intensities,
+*        all annotated with data value. The form and appearance of this key 
+*        can be controlled using parameter KEYSTYLE, and its horizontal 
+*        position can be controlled using parameter KEYPOS. If the key is 
+*        required in a different location, set KEY=NO and use application 
+*        LUTVIEW after displaying the image. [TRUE]
 *     KEYPOS = _REAL (Read)
 *        A value giving the gap between the right hand edge of the display
 *        and the left hand edge of the key, given as a fraction of the
@@ -186,7 +187,18 @@
 *
 *        Axis 1 is always the "data value" axis. So for instance, to set 
 *        the label for the data value axis, assign a value to "Label(1)" 
-*        in the supplied style. [current value] 
+*        in the supplied style. 
+*
+*        To get a ramp key (the default), specify "form=ramp". To
+*        get a histogram key (a coloured histogram of pen indices), 
+*        specify "form=histogram". To get a graph key (three curves of
+*        RGB intensities), specify "form=graph". If a histogram key 
+*        is produced, the population axis can be either logarithmic or 
+*        linear. To get a logarithmic population axis, specify "logpop=1". 
+*        To get a linear population axis, specify "logpop=0" (the default). 
+*        To annotate the long axis with pen numbers instead of pixel value, 
+*        specify "pennums=1" (the default, "pennums=0", shows pixel 
+*        values). [current value]
 *     LOW = _DOUBLE (Read)
 *        The data value corresponding to the lowest pen in the colour 
 *        table.  All smaller data values are set to the lowest colour
@@ -511,9 +523,11 @@
 *        Added NULL argument to KPG1_GTPOS call.
 *     18-OCT-1999 (DSB):
 *        Added parameters KEY, KEYPOS and KEYSTYLE.
-*     26-OCTOBER-1999 (DSB):
+*     26-OCT-1999 (DSB):
 *        Made MARGIN give margins as fraction of current picture instead
 *        of DATA picture.
+*     23-OCT-2001 (DSB):
+*        Changed to remove limit on size of colour table.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -550,14 +564,8 @@
                                ! display
       PARAMETER ( MINCOL = 8 + CTM__RSVPN )
 
-      INTEGER MXLUTE           ! Maximum lookup table entry
-      PARAMETER ( MXLUTE = CTM__MXPEN )
-
       INTEGER NDIM             ! Dimensionality required
       PARAMETER( NDIM = 2 )
-
-      INTEGER NPRICL           ! Number of primary colours
-      PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
       CHARACTER COMP*8         ! Component to be displayed
@@ -614,7 +622,6 @@
       LOGICAL ALIGN            ! DATA picture aligned with a previous picture?
       LOGICAL AXES             ! Annotated axes are to be drawn?
       LOGICAL BAD              ! Bad pixels are present in the image?
-      LOGICAL BBOX             ! Was border a simple bounding box?
       LOGICAL BORDER           ! Border to be drawn?
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
       LOGICAL KEY              ! Produce a colour ramp as a key?
@@ -628,7 +635,6 @@
       REAL GUBND( NDIM )       ! High grid co-ord bounds of PGPLOT window
       REAL KEYPOS              ! Horizontal position of key
       REAL KWID                ! Width to reserve for the KEY (if any)
-      REAL LUT( NPRICL, 0:MXLUTE ) ! Lookup table
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
       REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
@@ -1065,27 +1071,24 @@
 *  Obtain the array dimensions.
       CALL NDF_DIM( INDF4, NDIM, LDIMS, NDIMS, STATUS )
 
-*  Null status means do not read a lookup table.
+*  Null status means do not read a new lookup table. Instead, we will use
+*  the existing table.
       IF ( STATUS .EQ. PAR__NULL ) THEN
+
+*  Annul the error.
          CALL ERR_ANNUL( STATUS )
 
+*  If a new lookup table was supplied, load it instead of the users LUT.
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Map the lookup table to the colour table by interpolation or by
 *  nearest neighbour?
          CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
 
-*  If the structure was found then read in the lookup table.
-         CALL KPG1_LUTIN( LDIMS( 2 ), %VAL( LPNTR( 1 ) ),
-     :                    UP - LP + 1, NN, LUT, STATUS )
-
 *  Install the lookup table into image-display colour table.
-*  The lookup table follows the palette, hence the offset in the
-*  colour index.
-         DO  I = 0, UP - LP 
-            CALL PGSCR( I + LP, LUT( 1, I ), LUT( 2, I ),
-     :                  LUT( 3, I ) )
-         END DO
+         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( LPNTR( 1 ) ), LP, UP, NN,
+     :                    STATUS )
+
       END IF
 
 *  End the NDF context.
@@ -1165,7 +1168,7 @@
          CALL KPG1_LUTKY( IPICK, 'KEYSTYLE', REAL( DHI ), REAL( DLO ), 
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
      :                    ( Y2 - Y1 )*0.1, ( Y2 - Y1 )*0.1, 'CL',
-     :                    %VAL( IPWORK ), STATUS )
+     :                    NX*NY, %VAL( IPCOL ), STATUS )
 
 *  Report a context message if anything went wrong.
          IF( STATUS .NE. SAI__OK ) THEN
@@ -1268,6 +1271,7 @@
 
       END IF
 
+
 *  Shutdown procedure.
 *  ===================
  999  CONTINUE
@@ -1289,3 +1293,4 @@
       END IF
 
       END
+
