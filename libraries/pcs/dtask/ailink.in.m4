@@ -124,7 +124,8 @@ ifelse(SCRIPTNAME, alink,
 #        26-APR-2004 (NG):
 #          Generate both alink.in and ilink.in from ailink.in.m4.
 #          Do linking using dtask_libtool.
-#          
+#        1-AUG-2004 (NG): For subsequent modifications, see the CVS
+#          commit notes for successive revisions.
 #-
 
 # Strip off `our' options from the beginning of the list of arguments
@@ -297,7 +298,7 @@ then
     @CC@ -c @CFLAGS@ $CARGS
 fi
 
-cat >dtask_applic.f <<FOO
+cat >dtask_applic.f <<EOD
 *+  DTASK_APPLIC_DEACT - routine to call an A-task routine
       SUBROUTINE DTASK_APPLIC ( CONTEXT, ACTCODE, ANAME, ACTPTR, SEQ,
      :  VALUE, SCHEDTIME, REQUEST, STATUS ) 
@@ -393,7 +394,7 @@ ifelse(SCRIPTNAME, alink,
       CALL TASK_GET_CURRINFO ( SEQ, VALUE, SCHEDTIME, REQUEST, LSTAT ) 
 
       END
-FOO
+EOD
 
 LIBTOOL=${DTASK_LIBTOOL-@bindir@/dtask_libtool}
 echo LIBTOOL=$LIBTOOL
@@ -414,24 +415,25 @@ then
 fi
 
 # Compile dtask_applic.f
-cmpdtask="$LIBTOOL --mode=compile @FC@ -static $extra_mode_args @FCFLAGS@ \
-        -c -o dtask_applic.o dtask_applic.f"
+cmpdtask="$LIBTOOL --mode=compile @FC@ $extra_mode_args @FCFLAGS@ \
+        -c dtask_applic.f"
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
 # Link this using the C compiler, linking in the Fortran runtime in FCLIBS
-linkcmd="$LIBTOOL --mode=link @CC@ $extra_mode_args -o $EXENAME \
+linkcmd="$LIBTOOL --mode=link @CC@ @CFLAGS@ $extra_mode_args -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
-        dtask_applic.o \
+        dtask_applic.lo \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
         `dtask_link_adam` \
-         @FCLIBS@"
+        @FCLIBS@"
 
 # Substitute any -lX options which refer to a libtool library
-# @libdir@/libX.la, with an explicit reference to that library.  We
+# @libdir@/libX.la,
+# with an explicit reference to that library.  We
 # could be more sophisticated and recognise them also in directories
 # indicated in -L options, but that's more than we need right now.
 xlinkcmd=
@@ -453,8 +455,10 @@ if $includedebug
 then
     : nothing
 else
-    $verbose && echo "rm -f dtask_applic.[fo] dtask_wrap.[co]"
-    rm -f dtask_applic.[fo] dtask_wrap.[co]
+    # Don't remove dtask_applic.{o,lo} since this will prevent running
+    # 'make check' in this directory.
+    $verbose && echo "rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o"
+    rm -f dtask_applic.f dtask_wrap.c dtask_wrap.o
 fi
 
 exit 0
