@@ -23,6 +23,7 @@
 *     26 Sep 93 : V1.7-2  Bug fixed in quality handling (DJA)
 *     28 Feb 94 : V1.7-3  Use BIT_ routines to do bit manipulations (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     28 Mar 95 : V1.8-1  Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -31,7 +32,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -39,29 +40,30 @@
 *
 *    Local variables :
 *
-      CHARACTER        ILOC*(DAT__SZLOC)              ! Input dataset
-      CHARACTER        ITYPE*(DAT__SZTYP)             ! Input dataset type
-      CHARACTER        OLOC*(DAT__SZLOC)              ! Output dataset
-      CHARACTER*40     UNITS                          ! Axis units
+      CHARACTER*80		TEXT			! History text
+      CHARACTER*40     		UNITS                   ! Axis units
 
-      REAL             AXCEN                          ! Channel weighted mean
+      REAL             		AXCEN                   ! Channel weighted mean
 
       INTEGER          AXIS                           ! Axis for weighting
       INTEGER          DNDIM                          ! Dummy dimensionality
-      INTEGER          DDIMS(DAT__MXDIM)              ! Dummy dimensions
-      INTEGER          DIMS(DAT__MXDIM)               ! Input dimensions
+      INTEGER          DDIMS(ADI__MXDIM)              ! Dummy dimensions
+      INTEGER          DIMS(ADI__MXDIM)               ! Input dimensions
       INTEGER          IAPTR                          ! Weighting axis data
       INTEGER          IAX, JAX                       ! Loops over axes
       INTEGER          IDPTR                          ! Input data values
+      INTEGER			IFID			! Input dataset id
       INTEGER          IQPTR                          ! Input quality values
       INTEGER          IVPTR                          ! Input variance values
       INTEGER          NAX                            ! Number of axes
       INTEGER          NDIM                           ! Input dimensionality
-      INTEGER          ODIMS(DAT__MXDIM)              ! Output dimensions
+      INTEGER          ODIMS(ADI__MXDIM)              ! Output dimensions
       INTEGER          ODPTR                          ! Output data
+      INTEGER			OFID			! Output dataset id
       INTEGER          ONDIM                          ! Output dimensionality
       INTEGER          OQPTR                          ! Output quality
-      INTEGER          OVPTR                          ! Output variance
+      INTEGER          		OVPTR                   ! Output variance
+      INTEGER			TLEN			! Amount of TEXT used
 
       BYTE             MASK                           ! Input quality mask
       BYTE             OQUAL                          ! Output quality point
@@ -75,7 +77,7 @@
 *
 
       CHARACTER*30     VERSION
-        PARAMETER      (VERSION = 'AXCENTROID Version 1.8-0' )
+        PARAMETER      (VERSION = 'AXCENTROID Version 1.8-1' )
 *-
 
 *    Version id
@@ -85,11 +87,12 @@
       CALL AST_INIT()
 
 *    Get input
-      CALL USI_ASSOCI( 'INP', 'READ', ILOC, PRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+      CALL BDI_PRIM( IFID, PRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check data
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         CALL MSG_PRNT( '! Invalid data' )
@@ -100,8 +103,8 @@
         STATUS = SAI__ERROR
         GOTO 99
       END IF
-      CALL BDA_CHKQUAL( ILOC, QOK, DNDIM, DDIMS, STATUS )
-      CALL BDA_CHKVAR( ILOC, VOK, DNDIM, DDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QOK, DNDIM, DDIMS, STATUS )
+      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
 
 *    Select axis
       IF ( NDIM .EQ. 1 ) THEN
@@ -109,7 +112,7 @@
       ELSE
 
 *      List axes
-        CALL AXIS_LIST( ILOC, NDIM, STATUS )
+        CALL AXIS_TLIST( IFID, NDIM, STATUS )
 
 *      Select axis
         CALL USI_GET0I( 'AXIS', AXIS, STATUS )
@@ -122,13 +125,13 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map input data
-      CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Use axis values or channels
-      CALL BDA_CHKAXES( ILOC, NAX, STATUS )
+      CALL BDI_CHKAXES( IFID, NAX, STATUS )
       IF ( NAX .GT. 0 ) THEN
-        CALL BDA_MAPAXVAL( ILOC, 'READ', AXIS, IAPTR, STATUS )
+        CALL BDI_MAPAXVAL( IFID, 'READ', AXIS, IAPTR, STATUS )
       ELSE
         CALL DYN_MAPR( 1, DIMS(AXIS), IAPTR, STATUS )
         CALL ARR_REG1R( 1.0, 1.0, DIMS(AXIS), %VAL(IAPTR), STATUS )
@@ -136,16 +139,15 @@
 
 *    Map input quality
       IF ( QOK ) THEN
-        CALL BDA_GETMASK( ILOC, MASK, STATUS )
-        CALL BDA_MAPQUAL( ILOC, 'READ', IQPTR, STATUS )
+        CALL BDI_GETMASK( IFID, MASK, STATUS )
+        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
       END IF
 
 *    Create output file?
       IF ( NDIM .GT. 1 ) THEN
 
 *      Associate object
-        CALL DAT_TYPE( ILOC, ITYPE, STATUS )
-        CALL USI_ASSOCO( 'OUT', ITYPE, OLOC, STATUS )
+        CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Construct dimensions
@@ -159,22 +161,22 @@
         ONDIM = NDIM - 1
 
 *      Create output data
-        CALL BDA_CREDATA( OLOC, ONDIM, ODIMS, STATUS )
-        CALL BDA_MAPDATA( OLOC, 'WRITE', ODPTR, STATUS )
+        CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
+        CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
 
 *      Create quality if present in input
         IF ( QOK ) THEN
-          CALL BDA_CREQUAL( OLOC, ONDIM, ODIMS, STATUS )
-          CALL BDA_PUTMASK( OLOC, MASK, STATUS )
-          CALL BDA_MAPQUAL( ILOC, 'READ', IQPTR, STATUS )
-          CALL BDA_MAPQUAL( OLOC, 'WRITE', OQPTR, STATUS )
+          CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
+          CALL BDI_PUTMASK( OFID, MASK, STATUS )
+          CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
+          CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
         END IF
 
 *      Create variance if present in input
 C        IF ( VOK ) THEN
-C          CALL BDA_CREVAR( OLOC, ONDIM, ODIMS, STATUS )
-C          CALL BDA_MAPVAR( ILOC, 'READ', IVPTR, STATUS )
-C          CALL BDA_MAPVAR( OLOC, 'WRITE', OVPTR, STATUS )
+C          CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
+C          CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
+C          CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
 C        END IF
         VOK = .FALSE.
 
@@ -186,16 +188,16 @@ C        END IF
             JAX = 1
             DO IAX = 1, NAX
               IF ( IAX .NE. AXIS ) THEN
-                CALL BDA_COPAXIS( ILOC, OLOC, IAX, JAX, STATUS )
+                CALL BDI_COPAXIS( IFID, OFID, IAX, JAX, STATUS )
                 JAX = JAX + 1
               END IF
             END DO
           END IF
 
 *        Ancillary bits
-          CALL HIST_COPY( ILOC, OLOC, STATUS )
-          CALL BDA_COPMORE( ILOC, OLOC, STATUS )
-          CALL BDA_COPTEXT( ILOC, OLOC, STATUS )
+          CALL HSI_COPY( IFID, OFID, STATUS )
+          CALL BDI_COPMORE( IFID, OFID, STATUS )
+          CALL BDI_COPTEXT( IFID, OFID, STATUS )
 
         END IF
 
@@ -206,10 +208,10 @@ C        END IF
       END IF
 
 *    Pad dimensions to 7D
-      DO IAX = NDIM + 1, DAT__MXDIM
+      DO IAX = NDIM + 1, ADI__MXDIM
         DIMS(IAX) = 1
       END DO
-      DO IAX = ONDIM + 1, DAT__MXDIM
+      DO IAX = ONDIM + 1, ADI__MXDIM
         ODIMS(IAX) = 1
       END DO
 
@@ -231,7 +233,7 @@ C        END IF
      :                     AXCEN, OQUAL, 0, STATUS )
 
         IF ( NAX .GT. 0 ) THEN
-          CALL BDA_GETAXUNITS( ILOC, AXIS, UNITS, STATUS )
+          CALL BDI_GETAXUNITS( IFID, AXIS, UNITS, STATUS )
           CALL MSG_SETC( 'UNIT', UNITS )
         ELSE
           CALL MSG_SETC( 'UNIT', 'pixels' )
@@ -240,6 +242,12 @@ C        END IF
         CALL MSG_SETR( 'CEN', AXCEN )
         CALL MSG_PRNT( 'Centroid wrt axis ^AX is ^CEN ^UNIT.' )
       END IF
+
+*    Write history
+      CALL HSI_ADD( OFID, VERSION, STATUS )
+      CALL MSG_SETI( 'AX', AXIS )
+      CALL MSG_MAKE( 'Centroided axis ^AX', TEXT, TLEN )
+      CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE()
@@ -274,7 +282,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -358,7 +365,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -456,7 +462,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -554,7 +559,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -652,7 +656,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -750,7 +753,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -847,7 +849,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
@@ -945,7 +946,6 @@ C        END IF
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Input :
