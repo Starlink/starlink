@@ -53,9 +53,9 @@
 *        coordinate system.
 *     RESULT = LITERAL (Read)
 *        If the requested coordinate conversion is possible, a FrameSet is 
-*        written to the specified text file. Otherwise, an error is
-*        reported. If created, the FrameSet will contain two Frames. Frame
-*        number 1 (its base Frame) will describe the source coordinate
+*        written to the specified text file. Otherwise, a warning message
+*        is displayed. If created, the FrameSet will contain two Frames.
+*        Frame number 1 (its base Frame) will describe the source coordinate
 *        system, corresponding to the FROM parameter. Frame number 2
 *        (its current Frame) will describe the destination coordinate
 *        system, corresponding to the TO parameter. The Mapping
@@ -129,10 +129,9 @@
 *  Get the required FrameSet.
       RESULT = AST_CONVERT( FROM, TO, DOMLST, STATUS )
 
-*  Report an error if no conversion was possible.
-      IF( RESULT .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN 
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'CONVERT_ERR1', 'No Mapping could be found '//
+*  Issue a warning if no conversion was possible.
+      IF( RESULT .EQ. AST__NULL ) THEN 
+         CALL MSG_OUT( 'CONVERT_MSG1', 'No Mapping could be found '//
      :                 'between the two supplied coordinate systems.', 
      :                 STATUS )
       
@@ -140,7 +139,7 @@
       ELSE
 
          CALL MSG_BLANK( STATUS )
-         CALL MSG_OUT( 'CONVERT_MSG1', 'Conversion was achieved '//
+         CALL MSG_OUT( 'CONVERT_MSG2', 'Conversion was achieved '//
      :                 'by aligning the following Frames:', STATUS )
 
          IF( AST_ISAFRAMESET( FROM, STATUS ) ) THEN 
@@ -157,10 +156,10 @@
                CALL MSG_SETC( 'BFD', ' ' )
             ENDIF
    
-            CALL MSG_OUT( 'CONVERT_MSG2', '   Frame ^BFI ^BFD in the '//
+            CALL MSG_OUT( 'CONVERT_MSG3', '   Frame ^BFI ^BFD in the '//
      :                    '''FROM'' FrameSet.', STATUS )
          ELSE
-            CALL MSG_OUT( 'CONVERT_MSG3', '   The supplied ''FROM'' '//
+            CALL MSG_OUT( 'CONVERT_MSG4', '   The supplied ''FROM'' '//
      :                    'Frame.', STATUS )
          END IF
 
@@ -178,10 +177,10 @@
                CALL MSG_SETC( 'BFD', ' ' )
             ENDIF
    
-            CALL MSG_OUT( 'CONVERT_MSG2', '   Frame ^BFI ^BFD in the '//
+            CALL MSG_OUT( 'CONVERT_MSG5', '   Frame ^BFI ^BFD in the '//
      :                    '''TO'' FrameSet.', STATUS )
          ELSE
-            CALL MSG_OUT( 'CONVERT_MSG3', '   The supplied ''TO'' '//
+            CALL MSG_OUT( 'CONVERT_MSG6', '   The supplied ''TO'' '//
      :                    'Frame.', STATUS )
          END IF
 
