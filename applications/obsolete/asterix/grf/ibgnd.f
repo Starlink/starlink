@@ -1249,7 +1249,7 @@
       ELSE
         DO I = 1, N
           IF ( IDX(I) .GE. 0 ) THEN
-            MODEL(I) = MODEL(I) - DATA(I)
+            MODEL(I) = DATA(I) - MODEL(I)
           END IF
         END DO
       END IF
