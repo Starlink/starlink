@@ -43,9 +43,10 @@
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file.  It
-*        should be in the range 1 to 8191, unless the array is double
-*        precision, when the upper limit is 4095.  The suggested
-*        default is the current value. [The first dimension of the NDF]
+*        should be in the range 1 to n, where n is 32764 divided by
+*        the number of bytes per data value.  The suggested
+*        default is the current value. [The first dimension of the NDF
+*        (or n if this is smaller)]
 *     OUT = FILENAME (Write)
 *        Name of the output sequential unformatted file.  The file will
 *        normally have variable-length records when there is a header,
@@ -145,6 +146,8 @@
 *  History:
 *     1992 September 16 (MJC):
 *        Original version.
+*     1993 August 25 (MJC):
+*        Corrected the calculations of record lengths.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,9 +207,8 @@
       LOGICAL LABFND             ! True if NDF LABEL found
       INTEGER LUN                ! Logical-unit number
       INTEGER NCARD              ! Number of cards in FITS extension
-      INTEGER NDIM               ! Number of dimensions
-      INTEGER NUMMAX             ! Maximum number of longwords per
-                                 ! record
+      INTEGER NDIM               ! Number of dimensions 
+      INTEGER NUMMAX             ! Maximum number of values per record
       INTEGER NDF                ! Identifier for NDF
       INTEGER NUMPRE             ! Number of data values per record
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
@@ -277,35 +279,80 @@
       CALL PAR_GET0L( 'FITS', HEADER, STATUS )
 
 *  Is there a FITS extension to be copied?  If there is, set the minimum
-*  recordlength to 20 longwords for the unformatted FITS headers.
+*  recordlength to 20 longwords for the unformatted FITS headers.  Note
+*  that longwords are used because that's the way FIO works for
+*  unformatted files despite the FIO documentation saying it uses bytes.
       CPFITS = HEADER .AND. THERE
-      IF ( CPFITS ) RECMIN = 20
+      IF ( CPFITS ) THEN
+         RECMIN = 20
+      ELSE
+         RECMIN = 1
+      END IF
 
 *  Find the formatting arrangement for the output file.
 *  ====================================================
 
-*  Derive the maximum number of longwords per record for the data type. 
+*  Derive the maximum number of values per record for the data type.
+*  The maximum is imposed by VMS (8191 maximum number of longwords).
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
          NUMMAX = 32764 / VAL__NBD 
 
       ELSE IF ( TYPE .EQ. '_REAL' ) THEN
          NUMMAX = 32764 / VAL__NBR
 
-      ELSE
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
          NUMMAX = 32764 / VAL__NBI
+
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+         NUMMAX = 32764 / VAL__NBUW
+
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+         NUMMAX = 32764 / VAL__NBW
+
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+         NUMMAX = 32764 / VAL__NBUB
+
+      ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+         NUMMAX = 32764 / VAL__NBB
 
       END IF
 
 *   Obtain the NDF dimensions.
       CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
 
-*  Obtain the number of values per record.
-      CALL PAR_GDR0I( 'NOPEREC', DIMS( 1 ), 1, NUMMAX, .FALSE.,
-     :                NUMPRE, STATUS )
+*  Obtain the number of values per record.  Constrain the dynamic
+*  default so that it is in range.  In normal circumstances it will
+*  be the first dimension of the NDF.
+      CALL PAR_GDR0I( 'NOPEREC', MIN( NUMMAX, DIMS( 1 ) ), 1, NUMMAX,
+     :                .FALSE., NUMPRE, STATUS )
 
-*  Derive the recordlength in bytes, allowing for a space between each 
-*  value.
-      RECL = NUMPRE
+*  Derive the recordlength in longwords (4 bytes).  This may have to
+*  change if FIO is made consistent and use bytes throughout.
+      IF ( TYPE .EQ. '_DOUBLE' ) THEN
+         RECL = ( NUMPRE * VAL__NBD - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
+         RECL = ( NUMPRE * VAL__NBR - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+         RECL = ( NUMPRE * VAL__NBI - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+         RECL = ( NUMPRE * VAL__NBUW - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+         RECL = ( NUMPRE * VAL__NBW - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+         RECL = ( NUMPRE * VAL__NBUB - 1 ) / 4 + 1
+
+      ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
+         RECL = ( NUMPRE * VAL__NBB - 1 ) / 4 + 1
+
+      END IF
+
+*  Ensure that any FITS header is not truncated by the record length.
+      RECL = MAX( RECL, RECMIN )
 
 *  Open the unformatted file.
 *  ==========================
