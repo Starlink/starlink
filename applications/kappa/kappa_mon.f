@@ -167,6 +167,10 @@
          ELSE IF ( NAME .EQ. 'CMULT' ) THEN
             CALL CMULT ( STATUS )
 
+*  Collapse an NDF along one axis.
+         ELSE IF ( NAME .EQ. 'COLLAPSE' ) THEN
+            CALL COLLAPSE ( STATUS )
+
 *  Reduces the size of an NDF by adding values in rectangular boxes.
          ELSE IF ( NAME .EQ. 'COMPADD' ) THEN
             CALL COMPADD ( STATUS )

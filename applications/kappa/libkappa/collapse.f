@@ -112,7 +112,7 @@
 *        pixel in the output NDF is the mean of the corresponding input
 *        pixels with wavelengths between 4500 and 4550 Angstroms.
 *     collapse cube slab 3 4500 4550 
-*        The same as above except the axis to collapse along is specifed
+*        The same as above except the axis to collapse along is specified
 *        by index (3) rather than label (lambda).
 *     collapse cube slab 3 101.0 134.0
 *        This is the same as the above examples, except that the current

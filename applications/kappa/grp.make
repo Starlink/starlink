@@ -202,7 +202,7 @@ kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
-kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f \
+kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_asgdp.f \
 kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
@@ -216,7 +216,7 @@ fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
 lutcol.cl lutcont.cl lutfc.cl lutgrey.cl lutheat.cl lutikon.cl lutneg.cl \
 lutramps.cl lutread.cl lutspec.cl lutzebra.cl picbase.cl picdata.cl \
 picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
-ardmask.par axconv.par axlabel.par axunits.par block.par cadd.par \
+ardmask.par axconv.par axlabel.par axunits.par block.par collapse.par cadd.par \
 calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
 compave.par compick.par contour.par contover.par convolve.par colcomp.par \
 creframe.par crelut.par csub.par cursor.par display.par drawsig.par \
@@ -253,7 +253,7 @@ lutgrey.par lutneg.par lutzebra.par picframe.par kapversion.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
-axlabel.hlp axunits.hlp block.hlp cadd.hlp calc.hlp calpol.hlp cdiv.hlp \
+axlabel.hlp axunits.hlp block.hlp collapse.hlp cadd.hlp calc.hlp calpol.hlp cdiv.hlp \
 centroid.hlp changes_to_kappa.hlp chpix.hlp classified_commands.hlp \
 cmult.hlp co_ordinate_systems.hlp colour_set.hlp compadd.hlp compave.hlp \
 compick.hlp contour.hlp contover.hlp convolve.hlp creframe.hlp crelut.hlp \
@@ -326,7 +326,7 @@ m31_issa_25.sdf.sun4_Solaris m31_issa_60.sdf.sun4_Solaris m57.sdf.sun4_Solaris \
 logo.sdf.sun4_Solaris logo_lut.sdf.sun4_Solaris
 
 # The contents of the kappa_ifls.tar file:
-KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
+KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl collapse.ifl \
 cadd.ifl calc.ifl calpol.ifl cdiv.ifl centroid.ifl chpix.ifl cmult.ifl \
 compadd.ifl compave.ifl compick.ifl convolve.ifl creframe.ifl csub.ifl \
 div.ifl errclip.ifl expon.ifl ffclean.ifl \
@@ -360,7 +360,7 @@ kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
 calpol.f cdiv.f centroid.f chpix.f cmult.f compadd.f compave.f compick.f \
-convolve.f creframe.f csub.f kap_div.f errclip.f expon.f \
+convolve.f creframe.f csub.f kap_div.f errclip.f expon.f collapse.f \
 ffclean.f fillbad.f fitsurface.f flip.f fourier.f gausmooth.f glitch.f \
 globals.f histat.f histeq.f histogram.f kaphelp.f laplace.f \
 kstest.f logar.f look.f lucy.f manic.f makesurface.f maths.f \
@@ -452,7 +452,7 @@ kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
 kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kpg1_orvar.f kps1_glibr.f kps1_glibd.f kps1_glidr.f \
-kps1_gliwr.f kps1_gligt.f kps1_saxlk.f
+kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_clpsr.f kps1_clpsd.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \

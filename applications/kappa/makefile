@@ -566,7 +566,7 @@ KAPGEN_F_ROUTINES = \
 bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalr.f copad.f copar.f copy1d.f copy2d.f \
 copy3d.f cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f \
-elnmbr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f \
+elnmbr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_asgdp.f \
 kpg1_agfnd.f kpg1_agref.f kpg1_ainbd.f kpg1_ainbr.f kpg1_aindd.f \
 kpg1_akerd.f kpg1_akerr.f kpg1_antso.f kpg1_arcog.f kpg1_arcol.f \
 kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f kpg1_asffr.f \
@@ -702,7 +702,7 @@ KAPPA_F3_ROUTINES = kaphelp.f
 KAPPA_F1_ROUTINES = \
 add.f aperadd.f ardgen.f ardmask.f \
 block.f cadd.f calc.f calpol.f cdiv.f \
-centroid.f chpix.f cmult.f compadd.f \
+centroid.f chpix.f cmult.f collapse.f compadd.f \
 compave.f compick.f convolve.f copybad.f \
 creframe.f csub.f errclip.f \
 expon.f ffclean.f \
@@ -816,7 +816,8 @@ kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f \
 kps1_zpdec.f kps1_glibr.f kps1_gligt.f kps1_glidd.f kps1_gliwd.f \
-kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f
+kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
+kps1_clpsd.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2564,6 +2565,7 @@ cnthlt.o:	 SAE_PAR
 cntkey.o:	 SAE_PAR
 cntsbp.o:	 SAE_PAR
 colcomp.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR SUBPAR_PAR CTM_PAR
+collapse.o: 	 SAE_PAR PAR_ERR NDF_PAR DAT_PAR AST_PAR
 compadd.o:	 SAE_PAR PAR_ERR NDF_PAR
 compave.o:	 SAE_PAR PAR_ERR NDF_PAR
 compick.o:	 SAE_PAR PAR_ERR NDF_PAR
@@ -2804,6 +2806,7 @@ kpg1_asfgt.o:	 SAE_PAR AST_PAR NDF_PAR
 kpg1_asfil.o:	 SAE_PAR FIO_ERR GRP_PAR AST_PAR
 kpg1_asfrm.o:	 SAE_PAR AST_PAR PRM_PAR PAR_ERR IRA_PAR
 kpg1_asget.o:	 SAE_PAR NDF_PAR AST_PAR PRM_PAR
+kpg1_asgdp.o:    SAE_PAR NDF_PAR AST_PAR 
 kpg1_asgfr.o:	 SAE_PAR DAT_PAR GRP_PAR GRP_ERR KPG_AST
 kpg1_asgfw.o:	 SAE_PAR DAT_PAR GRP_PAR KPG_AST
 kpg1_asgrd.o:	 SAE_PAR AST_PAR
@@ -3293,6 +3296,8 @@ kps1_cff2d.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cff2r.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_clnsr.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
 kps1_clpal.o:	 SAE_PAR
+kps1_clpsd.o:    SAE_PAR PRM_PAR NDF_PAR
+kps1_clpsr.o:    SAE_PAR PRM_PAR NDF_PAR
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntdr.o:	 SAE_PAR AST_PAR PRM_PAR GRP_PAR
 kps1_cntky.o:	 SAE_PAR AST_PAR

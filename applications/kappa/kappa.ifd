@@ -9091,6 +9091,79 @@ package kappa {
 
       }
 
+      action collapse {
+         helplib {$KAPPA_HELP}
+         parameter axis {
+            position 3
+            type LITERAL
+            prompt {The axis to be collapsed}
+            ppath DYNAMIC
+            helpkey *
+          }
+         parameter estimator {
+            position 6
+            type LITERAL
+            vpath DEFAULT
+            prompt {Method for estimating collapsed pixel values}
+            ppath CURRENT DEFAULT
+            default Mean
+            helpkey *
+          }
+         parameter high {
+            position 5
+            type LITERAL
+            vpath DEFAULT
+            prompt {Axis value at end of collapsed range}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input NDF}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter low {
+            position 4
+            type LITERAL
+            vpath DEFAULT
+            prompt {Axis value at start of collapsed range}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+         parameter title {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Output title}
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+         parameter wlim {
+            type _REAL
+            vpath DEFAULT
+            prompt {Weight limit for good output pixels}
+            ppath CURRENT DEFAULT
+            default 0.3
+            helpkey *
+          }
+      }
+
       action compadd {
          alias {compad(d)}
 
