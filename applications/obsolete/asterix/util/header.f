@@ -82,7 +82,7 @@
 
 *  do editing if required
           IF (EDIT) THEN
-            CALL AST1_LOCHEAD( FID, .TRUE., HLOC, STATUS )
+            CALL ADI1_LOCHEAD( FID, .TRUE., HLOC, STATUS )
             CALL HEADER_EDIT(HLOC,STATUS)
           ENDIF
 
