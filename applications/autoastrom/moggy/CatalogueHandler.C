@@ -76,14 +76,14 @@ int CatalogueHandler::doSearch ()
 	sortcols = new const char*[nmagcols];
 	char **colnames = cat_->colNames();
 	for (int i=0; i<nmagcols; i++)
-	    sortcols[i] = colnames[magcols->at(i)];
+	    sortcols[i] = colnames[(*magcols)[i]];
 
 	if (verbosity_ > normal)
 	{
 	    cerr << "CatalogueHandler::doSearch: sortcols("
 		 << nmagcols << ") =";
 	    for (int i=0; i<nmagcols; i++)
-		cerr << ' ' << magcols->at(i) << '=' << sortcols[i];
+		cerr << ' ' << (*magcols)[i] << '=' << sortcols[i];
 	    cerr << endl;
 	}
     }
@@ -476,7 +476,7 @@ int CatalogueHandler::mag_col()
     if (magcol < -1)		// uninitialised
     {
 	vector<int>* allmagcols = mag_cols();
-	magcol = allmagcols->at(0);
+	magcol = (*allmagcols)[0];
 	delete (allmagcols);
     }
     return magcol;
