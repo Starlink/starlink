@@ -156,6 +156,7 @@
 
       REAL                   	BASE         		! Base of input axis values
       REAL                   	DX           		! Data spacing
+      REAL			SPARR(2)		! Spaced array data
       REAL                   	X1           		! 1st and 2nd  x values
 
       INTEGER			APTR			! Ptr in i/p data
@@ -168,10 +169,8 @@
       INTEGER                	NELM         		! No.of data points
       INTEGER                	NSECT        		! Number of data sections
       INTEGER                	NV           		! Number of freqs in power spec.
-      INTEGER                	NVAL         		! Number of values mapped
       INTEGER			PFID			! Output dataset id
       INTEGER                	TLEN         		! Length of a character string
-      INTEGER                	TPTR         		! Pointer to output times
       INTEGER                	USED         		! Number of history records used
       INTEGER                   WPTR         		! Pointer to work array
       INTEGER                	YPTR         		! Pointer to input data array
