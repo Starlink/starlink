@@ -1,0 +1,494 @@
+#! /usr/bin/perl -w
+
+use Getopt::Std;
+use Net::SMTP;
+
+use strict;
+
+# Config:
+# URL where cvsweb lives 
+my $cvswebhome = 'http://cvsweb.starlink.ac.uk/cvsweb.cgi';
+# Where the results will be reported to be
+my $reporturl = 'http://cvs.starlink.ac.uk/~nxg/summarise-commits.html';
+# Where a report will be mailed to; undef suppresses this
+my $reportmail;
+# ...from
+my $reportfrom = 'ussc@star.rl.ac.uk';
+# ...via mail host
+my $mailhost = $ENV{MAILHOST} || 'rlsaxps.bnsc.rl.ac.uk';
+# The path to a directory which holds a checkout, or undef if we're
+# starting in the correct place
+my $checkoutdir = '.';
+# on rlspc0, use /home/vmwareshare/rhel30linux_i386/build/build-home/MakeWorld/
+
+
+# Prototypes
+sub sendmail(%);
+sub Usage();
+
+# ======================================================================
+# Define classes CVSLog, CVSLogRevision and CVSLogEntry
+#
+#
+{
+    # Class CVSLog represents a sequence of CVS log entries, as read from
+    # the output of 'cvs log'.  The information is read from the
+    # filehandle passed as argument.
+    package CVSLog;
+
+    sub read(*) {
+        my $fh = shift;
+        my @newlog = ();
+        while (<$fh>) {
+            next if (/^\?/);
+            next if (/^ *$/);
+            
+            if (/^RCS file/) {
+                # a commit entry
+                my $r = CVSLogEntry::read(*$fh);
+                push (@newlog, $r);
+                next;
+            }
+            die "Unrecognised text $_ in commit entry";
+        }
+        my $self = {};
+        $self->{array} = \@newlog;
+        return bless $self, 'CVSLog';
+    }
+
+    sub get_entries() {
+        my $self = shift;
+        if (! $self->{sorted}) {
+            my @t = sort sort_log_entry @{$self->{array}};
+            $self->{array} = \@t;
+        }
+        return @{$self->{array}};
+    }
+
+    sub get_nentries() {
+        my $self = shift;
+        my @t = @{$self->{array}};
+        return $#t;
+    }
+
+    sub have_entries() {
+        my $self = shift;
+        return $self->get_nentries() >= 0;
+    }
+
+    sub sort_log_entry {
+        return $a->{file} cmp $b->{file};
+    }
+
+}
+
+{
+    # CVSLogRevision represents a single commit. Reads the information
+    # from the filehandle passed as argument.  Depends on the caller
+    # having the file in the correct place.
+    package CVSLogRevision;
+
+    sub read(*) {
+        my $fh = shift;
+
+        my $entry = {};
+        my $l = <$fh>;              # first line
+        if ($l =~ /^revision *(.*)/) {
+            $entry->{revision} = $1;
+        } else {
+            printf STDERR "Can't parse revision line <%s>\n", $l;
+            return undef;
+        }
+
+        $l = <$fh>;                 # second line
+        if ($l =~ /^date: *([0-9 :+-]*); *author: *([a-zA-Z0-9]*)/) {
+            $entry->{date} = $1;
+            $entry->{author} = $2;
+        } else {
+            printf STDERR "Can't parse log entry <%s>\n", $l;
+            return undef;
+        }
+        my $lastrev = 1;            # default -- return this at end of file
+        while (<$fh>) {
+            if (/^-----/) {
+                $lastrev = 0;
+                last;
+            }
+            if (/^=====/) {
+                $lastrev = 1;
+                last;
+            }
+            $entry->{message} = '' unless defined($entry->{message});
+            $entry->{message} .= $_;
+        }
+        $entry->{lastrev} = $lastrev;
+
+        return bless $entry, 'CVSLogRevision';
+    }
+
+    sub author {
+        my $self = shift;
+        return $self->{author} || '';
+    }
+
+    sub date {
+        my $self = shift;
+        return $self->{date} || '';
+    }
+
+    sub revision {
+        my $self = shift;
+        return $self->{revision} || '';
+    }
+
+    sub message {
+        my $self = shift;
+        return $self->{message} || '';
+    }
+
+    sub last_entry {
+        my $self = shift;
+        return $self->{lastrev};
+    }
+}
+
+{
+    # Class CVSLogEntry is the record of commits to a single
+    # CVS-controlled file.
+    package CVSLogEntry;
+
+    # Read the history of a single file from the filehandle passed as
+    # argument.  Depends on the caller having the file in the correct place.
+    sub read(*) {
+        my $fh = shift;
+        my $entry = {};             # reference to anonymous hash
+        while (<$fh>) {
+            if (/^Working[^:]*: *(.*)/) {
+                $entry->{file} = $1;
+            } elsif (/^head: *(.*)/) {
+                $entry->{head} = $1;
+            } elsif (/^----/) {
+                # Start of the list of revisions
+                my $rev;
+                my @revs = ();
+                do {
+                    $rev = CVSLogRevision::read(*$fh);
+                    push (@revs, $rev);
+                } until ($rev->last_entry);
+                $entry->{revisions} = \@revs;
+                last;
+            } elsif (/^====/) {
+                # shouldn't see this, but stop here anyway
+                last;
+            }
+            # else discard
+        }
+        return bless $entry, 'CVSLogEntry';
+    }
+
+    # The file being controlled
+    sub file {
+        my $self = shift;
+        return $self->{file} || '';
+    }
+
+    # The current head revision
+    sub head {
+        my $self = shift;
+        return $self->{head} || '';
+    }
+
+    # Return an array of CVSLogRevision objects.
+    sub revisions {
+        my $self = shift;
+        return @{$self->{revisions} || []};
+    }
+}
+
+# ======================================================================
+
+my $startdate;
+my $enddate;
+my $interval = 1;          # number of days in the reported interval;
+
+
+my %myopts;
+getopts('c:f:hi:m:o:', \%myopts);
+
+while ($#ARGV >= 0) {
+    if (!defined($startdate)) {
+        $startdate = $ARGV[0];
+        next;
+    }
+    if (!defined($enddate)) {
+        $enddate = $ARGV[0];
+        next;
+    }
+    Usage();
+} continue {
+    shift @ARGV;
+}
+
+$checkoutdir = $myopts{c} if defined $myopts{c};
+$reportfrom = $myopts{f}  if defined $myopts{f};
+$interval = $myopts{i}    if defined $myopts{i};
+$reportmail = $myopts{m}  if defined $myopts{m};
+
+Usage() if $myopts{h};
+
+
+if (defined $myopts{o}) {
+    open(HTML, ">$myopts{o}") 
+        || die "Can't open file <".$myopts{o}."> to write";
+} else {
+    open(HTML, ">-")
+        || die "Can't reopen stdout for output";
+}
+
+
+
+unless (defined($startdate) && defined($enddate)) {
+
+    # We could make the time handling more sophisticated using Date::Manip,
+    # but that's not necessary right now.
+
+    my $timenow = time();
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst);
+
+    unless (defined $enddate) {
+        ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
+            = localtime($timenow);
+        $enddate = sprintf("%04d-%02d-%02dT%02d:%02d",
+                           $year+1900, $mon+1, $mday, $hour, $min);
+    }
+    unless (defined $startdate) {
+        ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)
+            = localtime($timenow-$interval*24*3600);
+        
+        $startdate = sprintf("%04d-%02d-%02dT%02d:%02d",
+                             $year+1900, $mon+1, $mday, $hour, $min);
+    }
+}
+
+
+chdir ($checkoutdir) if defined $checkoutdir;
+unless (-d "CVS") {
+    print STDERR "This script must be run in a checkout directory\n";
+    exit 1;
+}
+
+# Read in the list of commit info
+my $cvslogcmd = sprintf("cvs log -N -S -d '%s<%s'",
+                        $startdate, $enddate);
+open(COMMITS, "$cvslogcmd |") || die "Can't read commit info";
+my $cvslog = CVSLog::read(*COMMITS);
+close(COMMITS);
+
+defined $cvslog || die "Error reading commit log";
+
+
+printf HTML <<'EOD', $startdate, $enddate;
+<DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Recent CVS commits</title>
+<!-- <link type="text/css" rel="stylesheet" href="style.css"/> -->
+<!-- Following inline stylesheet would be a lot better in an external .css
+     file (not least because it confuses Emacs syntax highlighting
+     something rotten). -->
+<style type="text/css">
+
+body {
+  color: #003;
+  background: white;
+  margin-left: 10%;
+  margin-right: 10%;
+  font-family: optima, arial, helvetica, sens-serif;
+}
+
+/* Link colours should be specified, since text colour was in body spec */
+a:link    { color: #009; }
+a:active: { color: #00C; }
+a:visited { color: #600; }
+a[href]:hover { background: #FF9; }     /* CSS2 */
+
+h1 {
+  margin-left: -10%;
+  margin-right: -10%;
+  background: navy;
+  color: white;
+}
+h2 {
+  margin-left: -5%;
+  border-top: thick solid red;
+}
+
+pre {
+  background: silver;
+}
+
+th {
+  text-align: left;
+}
+tr.r0 {
+  background: #DDF;
+}
+tr.r1 {
+  background: #BBF;
+}
+</style>
+</head>
+<body>
+<h1>Commits between %s and %s</h1>
+EOD
+
+    
+my $i = 0;
+my $lastprefix = '';
+if ($cvslog->have_entries) {
+    print HTML "<table>\n<tr><th>File</th><th>author</th><th>revision</th></tr>\n";
+
+    foreach my $e ($cvslog->get_entries) {
+        ($e->file =~ m{(^([^/]*/){0,2})});
+        my $thisprefix = $1;
+        if ($thisprefix ne $lastprefix) {
+            print HTML "<tr style='background: #99F'><td colspan='3' style='line-height: 2.0'>$thisprefix</td></tr>\n";
+            $lastprefix = $thisprefix;
+        }
+        
+        my @revs = $e->revisions;
+        my $l = $revs[0];
+        printf(HTML
+               "<tr class='r%d'><td><a href='#c%d' >%s</td><td>%s</td><td>%s</td></tr>\n",
+               $i % 2, $i++, $e->file, $l->author, $l->revision);
+    }
+    print HTML "</table>\n";
+} else {
+    print HTML "<p>No commits in this period.</p>\n";
+}
+
+$i = 0;
+foreach my $e ($cvslog->get_entries) {
+    printf(HTML
+           "<h2><a name='c%d' href='%s/%s'\n  >%s</a></h2>\n",
+           $i++, $cvswebhome, $e->file, $e->file);
+
+
+    my @revision_list = $e->revisions;
+    if ($#revision_list < 0) {
+        # This shouldn't happen!
+        printf HTML "<p><strong>No revisions!</strong></p>\n";
+    } else {
+#        print HTML "<table border='1'>\n";
+#        printf HTML "<tr><td>Head revision</td><td>%s</td></tr>\n", $e->head;
+#        my $l = $revision_list[0];
+#        printf(HTML "<tr><td>Last commit</td><td>%s by %s at %s</td></tr>\n",
+#               $l->revision, $l->author, $l->date);
+#        print HTML "</table>\n";
+        print HTML "<p>Head revision: " . $e->head . "</p>\n";
+
+        print HTML "<h3>History</h3>\n";
+
+        foreach my $revent ($e->revisions()) {
+            printf(HTML
+                   "<div class='onerevision'>\n<p>%s, %s (%s)</p>\n<pre>\n%s</pre>\n</div>\n",
+                   $revent->revision,
+                   $revent->author,
+                   $revent->date,
+                   $revent->message);
+        }
+    }
+
+}
+
+print HTML "</body>\n</html>\n";
+
+close(HTML);
+
+# Send a notification email if there was a non-zero set of entries
+if (defined $reportmail && $cvslog->have_entries) {
+
+    my @msg = ("",
+               "CVS commits in period $startdate to $enddate.",
+               "",
+               "See <$reporturl> for more details.",
+               "",
+               "Committed files:",
+               "");
+
+    sendmail({ from => $reportfrom,
+               to => $reportmail,
+               subject => "Recent CVS commits",
+               mailhost => $mailhost,
+               message => \@msg });
+}
+
+
+
+exit 0;
+
+
+sub sendmail(%) {
+    my $param = shift;
+
+    unless ($param->{to}
+            && $param->{from}
+            && $param->{subject}
+            && $param->{mailhost}
+            && $param->{message}) {
+        return 0;
+    }
+
+    my $smtp = Net::SMTP->new($param->{mailhost});
+    defined $smtp || do {
+        print STDERR "Can't open SMTP connection to ".$param->{mailhost}."\n";
+        return 0;
+    };
+
+    print "Banner: ", $smtp->banner, "\n";
+    print "Domain: ", $smtp->domain, "\n";
+
+    my $status = 1;
+    
+    $status &= $smtp->mail($param->{from});
+    $status || print "Error mail\n";
+    $status &= $smtp->recipient($param->{to});
+    $status || print "Error recipient\n";
+    $status &= $smtp->data();
+    $status || print "Error data\n";
+    $status &= $smtp->datasend("To: ".$param->{to}."\n");
+    $status &= $smtp->datasend("From: ".$param->{from}."\n");
+    $status &= $smtp->datasend("Subject: ".$param->{subject}."\n");
+    $status &= $smtp->datasend("\n");
+    foreach my $line (@{$param->{message}}) {
+        $status &= $smtp->datasend($line . "\n");
+    }
+    $status &= $smtp->dataend;
+    $status &= $smtp->quit;
+    $status || print "Error quit\n";
+
+    return $status;
+}
+
+sub Usage() {
+    printf STDERR <<"EOD";
+Usage: $0 [options] [startdate [enddate]]
+Arguments:
+    startdate, enddate: start and end of interval, format yyyy-mm-dd
+Options:
+    -c path         path to a current checkout
+                    (default: $checkoutdir)
+    -f sender-addr  sender of report (only if -m is present)
+                    (default: $reportfrom)
+    -h              show this help
+    -i n            if neither argument is present, specify period n days
+                    before present (default: $interval)
+    -m recipient    send report mail message to recipient
+                    (default: $reportmail)
+    -o file         where to place the report file (default: stdout)
+Environment:
+    MAILHOST        SMTP server to use to send report mail message
+                    (default: $mailhost)
+EOD
+exit 1;
+}
