@@ -65,6 +65,9 @@
 *        Increased the maximum buffer size again, but pass an additional
 *        argument to set the maximum buffer for efficiency when
 *        processing short records.
+*     2003 November 25 (MJC):
+*        Search only the used part of the buffer looking for comment
+*        characters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -142,8 +145,8 @@
 
 *  Look for a comment.
          COM = 0
-         SHRIEK = INDEX( BUFFER, '!' )
-         HASH = INDEX( BUFFER, '#' )
+         SHRIEK = INDEX( BUFFER( 1:NC ), '!' )
+         HASH = INDEX( BUFFER( 1:NC ), '#' )
 
 *  We can skip the line if the first character is a comment indicator.
 *  If there is a trailing comment it should be removed before
