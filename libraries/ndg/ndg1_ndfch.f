@@ -141,6 +141,7 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the name to be expanded from the untruncated copy of the input group.
+         NAME = ' '
          CALL GRP_GET( IGRP3, I, 1, NAME, STATUS )
 
 *  Expand the name into separate file names, appending them to the 
