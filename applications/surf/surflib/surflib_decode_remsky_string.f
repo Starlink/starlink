@@ -87,6 +87,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.10  2005/03/18 06:25:56  timj
+*     Add THUMPER recognition
+*
 *     Revision 1.9  2004/09/01 01:06:58  timj
 *     fix uninitialised warnings
 *
@@ -144,7 +147,7 @@
       INTEGER MAX_N_BOLS              ! Storage space for bolometers in list
       PARAMETER ( MAX_N_BOLS = 500 )
       INTEGER N_SUBS                  ! Number of sub_instruments
-      PARAMETER ( N_SUBS = 2 )        ! with different arrays
+      PARAMETER ( N_SUBS = 3 )        ! with different arrays
       INTEGER N_RINGS                 ! Max number of rings of all subs_insts
       PARAMETER ( N_RINGS = 5 )      
       INTEGER N_BPR                   ! Max number of bols per ring
@@ -175,7 +178,7 @@
       INTEGER SUB_INDEX               ! Index to specify sub instrument in RINGS
 
 *  Local Data:
-      DATA ARRAYS / 'LONG','SHORT'/
+      DATA ARRAYS / 'LONG','SHORT', 'THUMP' /
 
       DATA (RINGS(I,0,1),I=1,N_BPR) /19, 29*0/    ! LONG array
       DATA (RINGS(I,1,1),I=1,N_BPR) / 12,13,20,26,25,18, 24*0 /
@@ -200,7 +203,14 @@
      :     /1,2,3,4,5,6,13,21,30,40,51,61,70,78,85,91,90,
      :     89,88,87,86,79,71,62,52,41,31,22,14,7/
 
-      DATA RING_MAX_SUB / 3, 5 /
+      DATA (RINGS(I,0,3),I=1,N_BPR) /4, 29*0/    ! THUMPER array
+      DATA (RINGS(I,1,3),I=1,N_BPR) / 1, 2, 3, 5, 6, 7, 24 *0/
+      DATA (RINGS(I,2,3),I=1,N_BPR) /30*0/
+      DATA (RINGS(I,3,3),I=1,N_BPR) /30*0/
+      DATA (RINGS(I,4,3),I=1,N_BPR) /30*0/
+      DATA (RINGS(I,5,3),I=1,N_BPR) /30*0/
+
+      DATA RING_MAX_SUB / 3, 5, 1 /
 
       DATA BOLS_TEMP / MAX_N_BOLS * 0 /
       DATA BOLS_SOFAR / MAX_N_BOLS * 0 /
