@@ -116,7 +116,7 @@
       IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the full file specification for the packages version file.
-      CALL KPG1_FLPTH( 'POLPACK_DIR', 'version', PATH, NC, STATUS )
+      CALL KPG1_FLPTH( 'POLPACK_DIR', 'version.dat', PATH, NC, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999

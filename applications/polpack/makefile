@@ -1089,6 +1089,9 @@ install:
            chmod 755 $(INSTALL_BIN)/$(TEST_SCRIPT) ;\
         else :; fi
 #
+#  Write the package version to a file in the installation directory.
+	echo $(PKG_VERS) 1>$(INSTALL_BIN)/version.dat
+#
 #  Install the package startup script.  The package version number,
 #  the name of the directory containing the installed binaries and 
 #  interface files, and the name of the directory containing the help
@@ -1392,6 +1395,11 @@ do_deinstall:
            else :; fi ;\
            $(MAKE) $(TEST_SCRIPT);\
         else :; fi
+#
+#  Remove the package version file in the installation directory.
+	- if test -n "version.dat"; then \
+             rm -f $(INSTALL_BIN)/version.dat ;\
+           else :; 
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
