@@ -238,6 +238,11 @@ itcl::class gaia::GaiaContour {
    #  Destructor:
    #  -----------
    destructor  {
+
+      #  Release the rtdimage used to access image files.
+      if { image_rtd_ != {} } {
+	 catch {image delete $image_rtd_}
+      }
    }
 
    #  Methods:
@@ -833,12 +838,25 @@ itcl::class gaia::GaiaContour {
    protected method get_rtdimage_ {} {
       if { $imagefile_ != {} } {
 
-         #  Displayed on disk, create an rtdimage and return this.
-         if {[catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
-            error "Failed to access image: $imagefile_, for contouring"
-            set rtdimage 0
-         }
+	 set rtdimage {}
+	 #  Remove the existing external image, if not using same file.
+	 if { $image_rtd_ != {} } {
+	    if { "[$image_rtd_ cget -file]" == "$imagefile_" } {
+	       set rtdimage $image_rtd_
+	    } else {
+	       catch {image delete $image_rtd_}
+	    }
+	 }
 
+	 if { $rtdimage == {} } {
+	    #  Displayed on disk, create an rtdimage and return this.
+	    if {[catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
+	       error "Failed to access image: $imagefile_, for contouring"
+	       set rtdimage 0
+	    }
+	    #  Record so we can tidy up.
+	    set image_rtd_ $rtdimage
+	 }
       } else {
 
          #  Name of an rtdimage, just check that this isn't the
@@ -873,7 +891,6 @@ itcl::class gaia::GaiaContour {
       }
       return $image
    }
-
 
    #  Remove all contours. Do it one-by-one so we don't interfere with
    #  other contour objects.
@@ -942,13 +959,12 @@ itcl::class gaia::GaiaContour {
       pack $itk_component(ctype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(ctype) \
          {Algorithm to use for contour generation}
-      foreach type {automatic linear magnitude} {
+      foreach type {automatic linear magnitude percentiles} {
          $itk_component(ctype) add \
             -label $type \
             -value $type \
             -command [code $this ctype_changed_]
       }
-      $itk_component(ctype) configure -value automatic
 
       #  Starting value.
       itk_component add start {
@@ -975,6 +991,18 @@ itcl::class gaia::GaiaContour {
       add_short_help $itk_component(incre) \
          {Increment between generated levels}
 
+      #  Percentile list.
+      itk_component add percent {
+         LabelEntry $w.percent \
+            -text "Percentiles:" \
+            -labelwidth 14 \
+            -valuewidth 20 \
+            -command [code $this generate_contours_]
+      }
+      pack $itk_component(percent) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(percent) \
+         {List of percentiles (space separated)}
+
       #  Set initial state.
       $itk_component(ctype) configure -value automatic
       ctype_changed_
@@ -993,24 +1021,36 @@ itcl::class gaia::GaiaContour {
    #  Configure entry fields when the generation type changes.
    protected method ctype_changed_ {} {
       set method [$itk_component(ctype) get]
-      if { $method == "automatic" } { 
+      if { $method == "automatic" || $method == "percentiles" } {
          set state disabled
       } else {
          set state normal
       }
       $itk_component(start) configure -state $state
       $itk_component(incre) configure -state $state
+      if { $method == "percentiles" } { 
+	 $itk_component(percent) configure -state normal
+	 $itk_component(ncont) configure -state disabled
+      } else {
+	 $itk_component(percent) configure -state disabled
+	 $itk_component(ncont) configure -state normal
+      }
    }
 
    #  Generate contours levels.
    protected method generate_contours_ {args} {
+      set method [$itk_component(ctype) get]
       set ncont [$itk_component(ncont) get]
       set ncont [min $itk_option(-maxcnt) $ncont]
-      set method [$itk_component(ctype) get]
       set start [$itk_component(start) get]
       set incre [$itk_component(incre) get]
-      if { $method != "automatic" && ( $start == {} || $incre == {} ) } {
-         info_dialog "Please enter values for all generation fields"
+      set percent [$itk_component(percent) get]
+      if { $method != "automatic" && $method != "percentiles" && 
+           ( $start == {} || $incre == {} ) } {
+         info_dialog "Please enter values for start and increment"
+         return
+      } elseif { $method == "percentiles" && $percent == {} } {
+         info_dialog "Please enter values for percentiles"
          return
       }
       clear_contours 0
@@ -1025,14 +1065,34 @@ itcl::class gaia::GaiaContour {
                [expr $start+($i-1)*$incre]
          }
       } else {
-         set min [$itk_option(-rtdimage) min]
-         set max [$itk_option(-rtdimage) max]
-         set incre [expr double($max-$min)/double($ncont)]
-         set start [expr $min+$incre*0.5]
-         for {set i 1} {$i <= $ncont} {incr i} {
-            $itk_component(value$i) configure -value \
-               [expr $start+($i-1)*$incre]
-         }
+
+	 #  Automatic, or percentiles. Need to use the data of the
+	 #  image to be contoured. 
+	 set rtdimage [get_rtdimage_]
+	 if { $rtdimage == {} || $rtdimage == 0 } {
+	    set rtdimage $itk_option(-rtdimage)
+	 }
+	 if { $method == "automatic" } { 
+	    set min [$rtdimage min]
+	    set max [$rtdimage max]
+	    set incre [expr double($max-$min)/double($ncont)]
+	    set start [expr $min+$incre*0.5]
+	    for {set i 1} {$i <= $ncont} {incr i} {
+	       $itk_component(value$i) configure -value \
+		  [expr $start+($i-1)*$incre]
+	    }
+	 } else {
+
+	    #  Percentiles.
+	    set i 1
+	    foreach level [$rtdimage percentiles $percent] { 
+	       $itk_component(value$i) configure -value $level
+	       incr i
+	       if { $i >= $itk_option(-maxcnt) } { 
+		  break
+	       }
+	    }
+	 }
       }
 
       #  Switch to the levels pane.
@@ -1551,6 +1611,9 @@ itcl::class gaia::GaiaContour {
       "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
       "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
    }
+
+   #  Name of rtdimage used to access external files.
+   protected variable image_rtd_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

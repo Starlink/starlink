@@ -100,7 +100,7 @@
 //        problem should be worked around.
 //     12-JUL-1999 (PWD):
 //        Added changes to sliceCmd to replace blank pixels by the
-//        mean along the slice.
+//        mean along the slice. Added percentiles command.
 //-
 
 #include <string.h>
@@ -174,6 +174,7 @@ public:
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
   { "hdu",           &StarRtdImage::hduCmd,          0,  6},
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
+  { "percentiles",   &StarRtdImage::percentCmd,      1, 1 },
   { "plotgrid",      &StarRtdImage::plotgridCmd,     0, 2 },
   { "slice",         &StarRtdImage::sliceCmd,       11, 11},
   { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
@@ -3715,3 +3716,108 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
   }
   return TCL_OK;
 }
+
+//+
+//   StarRtdImage::percentCmd
+//
+//   Purpose:
+//     Returns image values that correspond to certain percentile
+//     limits.
+//
+//   Notes:
+//     Accepts one parameter. This is a list of percentiles.
+//
+//   Return:
+//     A list of data values corresponding to the given percentiles.
+//
+//-
+int StarRtdImage::percentCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::percentCmd" << endl;
+#endif
+
+  //  No image, no values.
+  if ( ! image_ ) {
+    return error( "no image loaded" );
+  }
+
+  //  Split the list and convert into doubles.
+  char **levelsArgv;
+  int nlevels = 0;
+  if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
+    return error( "sorry: failed to decode the percentile levels (check format)" );
+  }
+  if ( nlevels == 0 ) { 
+    return error( "must give some percentiles" );
+  }
+
+  //  Convert these into doubles.
+  double *levels = new double[nlevels];
+  for ( int index = 0; index < nlevels; index++ ) {
+    if ( Tcl_GetDouble( interp_, levelsArgv[index],
+			&levels[index] ) != TCL_OK ) {
+      Tcl_Free( (char *) levelsArgv );
+      delete [] levels;
+      return error( levelsArgv[index], "is not a valid number");
+    }
+  }
+
+  //  Get the hisogram of data values.
+  int numValues = 2048;
+  double xyvalues[2048*2];
+  image_->getDist( numValues, xyvalues );
+
+  //  Find out how many pixel we actually counted (may be significant
+  //  numbers of blanks)
+  int npixels = 0;
+  int i;
+  for ( i = 0 ; i < numValues; i++ ) {
+    npixels += (int)(xyvalues[i*2+1]);
+  }
+  if ( npixels == 0 ) {
+    delete [] levels;
+    Tcl_Free( (char *) levelsArgv );
+    return error( "image contains no valid pixels" );
+  }
+
+  //  Now get percentiles. Assume ordered randomly.
+  for ( i = 0; i < nlevels; i++ ) { 
+
+    //  Change percentile to pixel count.
+    int cutoff = (int) ( (double) npixels * ( levels[i] / 100.0 ) );
+
+    //  Run over histogram until pixel count exceeded, then
+    //  interpolate to get better estimate.
+    int count = 0;
+    int j;
+    int prev = 0;
+    for ( j = 0; j < numValues; j++ ) {
+      prev = count;
+      count += (int)(xyvalues[j*2+1]);
+      if ( count >= cutoff) {
+	levels[i] = xyvalues[j*2];
+	if ( j != numValues - 1 ) {
+	  double interp = 1.0 - ( double(cutoff) - double(prev) ) /
+	                        ( double(count) - double(prev) );
+	  levels[i] = xyvalues[(j+1)*2] -
+	            ( xyvalues[(j+1)*2] - levels[i] ) * interp;
+	}
+	break;
+      }
+    }
+  }
+
+  //  Construct the result.
+  char buf[TCL_DOUBLE_SPACE];
+  for ( i = 0; i < nlevels; i++ ) { 
+    sprintf( buf, "%f", levels[i] );
+    append_element( buf );
+  }
+
+  //  Free workspace and return.
+  Tcl_Free( (char *) levelsArgv );
+  delete [] levels;
+  return TCL_OK;
+}
+

@@ -162,6 +162,9 @@ public:
   //  Colorramp command, with pseudo WCS.
   int colorrampCmd( int argc, char *argv[] );
 
+  //  List of percentiles.
+  int percentCmd( int argc, char *argv[] );
+
   //  Draw a Skycat-like ellipse and rotbox
   virtual int draw_symbol(const char *shape,
                   double x, double y, const char *xy_units,
