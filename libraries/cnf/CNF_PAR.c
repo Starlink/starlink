@@ -1,12 +1,17 @@
+* Process this file with cpp to produce CNF_PAR
+#include <config.h>
+
 *+
 *  Name:
-*     CNF_PAR
+*     CNF_PAR.c
 
 *  Purpose:
 *     Define public global constants for the CNF_ system.
 
 *  Language:
 *     Starlink Fortran 77
+*     (despite the .c extension -- this is not a C file, but it is only
+*     portable to run cpp on files with a .c extension).
 
 *  Type of Module:
 *     Platform-specific global constants include file.
@@ -19,6 +24,9 @@
 *     It is dynamically generated such that CNF_PVAL returns the declared
 *     size of the return value from CNF_PVAL is large enough to hold
 *     a C pointer.
+*
+*     Process this file with cpp to produce the actual CNF_PAR file,
+*     expanding the SIZEOF_VOIDP token below.
 
 *  Copyright:
 *     Copyright (C) 1999-2004 Central Laboratory of the Research Councils
@@ -42,6 +50,6 @@
 *-
 
 *   The Fortran INTEGER to C pointer conversion function
-      INTEGER@SIZEOF_VOIDP@ CNF_PVAL
+      INTEGER*SIZEOF_VOIDP CNF_PVAL
 
 *.

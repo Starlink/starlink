@@ -16,6 +16,7 @@ dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_CC
+AC_PROG_CPP
 AC_PROG_FC
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
@@ -29,13 +30,8 @@ dnl   Check if BSD bcopy function is available, if not should use memmove.
 AC_CHECK_FUNCS(memmove bcopy)
 
 dnl   Need to know the size of a pointer for CNF_PVAL
+dnl   (see CNF_PAR.c and Makefile.am)
 AC_CHECK_SIZEOF(void*)
-
-dnl   Create a variable containing the pointer size (and the "*")
-dnl   so that we can create CNF_PAR dynamically from configure itself
-dnl   rather than having to write a program to generate CNF_PAR
-SIZEOF_VOIDP="*$ac_cv_sizeof_voidp"
-AC_SUBST(SIZEOF_VOIDP)
 
 dnl   This package has no dependencies
 
@@ -44,6 +40,6 @@ STAR_LATEX_DOCUMENTATION(sun209)
 dnl   Header checks.  
 AM_CONFIG_HEADER(config.h)
 
-AC_CONFIG_FILES(Makefile component.xml CNF_PAR)
+AC_CONFIG_FILES(Makefile component.xml)
 
 AC_OUTPUT
