@@ -1,9 +1,9 @@
-EMS_ERR
-config.h
-ems_err.h
-ems_fioer.c
-fac_104_err
-ssn4.ps
+core.*
+*.ifc
+*.ifl
+starconf.status
+sun223.ps
+sun223.dvi
 *.lo
 *.la
 Makefile
@@ -28,5 +28,3 @@ stamp-h1
 make.log
 .deps
 
-config.h.in
-starconf.status

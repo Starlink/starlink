@@ -1,3 +1,18 @@
+kpg1_bl1d.f
+kpg1_dara.f
+kpg1_frac.f
+kpg1_hsds.f
+kpg1_hsta.f
+kpg1_hstf.f
+kpg1_mani.f
+kpg1_medu.f
+kpg1_mixv.f
+kpg1_pow.f
+kpg1_stat.f
+kpg1_stds.f
+kpg1_stfl.f
+kpg1_thrs.f
+kpg1_trig.f
 *.lo
 *.la
 Makefile
@@ -21,4 +36,4 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
+starconf.status

@@ -1,3 +1,6 @@
+ARD_ERR
+fac_1520_err
+sun183.ps
 *.lo
 *.la
 Makefile
@@ -22,3 +25,4 @@ stamp-h1
 make.log
 .deps
 
+starconf.status

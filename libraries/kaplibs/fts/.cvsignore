@@ -1,3 +1,6 @@
+fts1_gkeyx.f
+fts1_ukeyx.f
+fts1_wkeyx.f
 *.lo
 *.la
 Makefile

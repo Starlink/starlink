@@ -1,3 +1,5 @@
+kaplibs_link_adam
+sun238.ps
 *.lo
 *.la
 Makefile
@@ -22,3 +24,6 @@ stamp-h1
 make.log
 .deps
 
+starconf.status
+*.ifc
+kaplibs_test
