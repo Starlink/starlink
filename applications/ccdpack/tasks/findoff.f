@@ -453,6 +453,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PAR_ERR'          ! PAR error codes
+      INCLUDE 'GRP_PAR'          ! Standard GRP system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -465,6 +466,7 @@
       CHARACTER * ( CCD1__BLEN ) LINE2 ! Line buffer for writing out text
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for CCDPACK extension
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer to store filenames
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of the NDF
       CHARACTER * ( 4 ) METHOD  ! Last method attempted for object matching
       DOUBLE PRECISION BNDX( 4, CCD1__MXLIS ) ! X coords of bounding boxes
       DOUBLE PRECISION BNDY( 4, CCD1__MXLIS ) ! Y coords of bounding boxes
@@ -1326,7 +1328,9 @@
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL CCD1_MSG( ' ',
      :'  Warning - not all position datasets have been successfully'//
-     :' matched. Continuing with those that have.', STATUS) 
+     :' matched.', STATUS )
+               CALL CCD1_MSG( ' ', '  Continuing with those that have.',
+     :                        STATUS ) 
                CALL CCD1_MSG( ' ', ' ', STATUS )
             ELSE
                STATUS = SAI__ERROR
@@ -1339,22 +1343,32 @@
       END IF      
 
 *  If not all the position lists have been matched but we are going to 
-*  continue, we should remove the associated position lists from any
+*  continue, we should remove existing associated position lists from any
 *  NDFs which have not been matched, otherwise casual use of them by 
 *  later applications may give the impression that the original position
 *  lists are matched ones.
       IF ( .NOT. OK .AND. NDFS ) THEN
          DO 13 I = 1, NOPEN
             IF ( .NOT. PAIRED( I ) ) THEN
+               IF ( STATUS .NE. SAI__OK ) GO TO 99
+               CALL ERR_MARK
                CALL NDG_NDFAS( NDFGR, I, 'UPDATE', IDIN, STATUS )
-               CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT, STATUS )
+               CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT,
+     :                         STATUS )
                CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
-               CALL CCD1_MSG( ' ', 
-     :'  Removing associated position list from CCDPACK extension of',
-     :                        STATUS )
-               CALL NDF_MSG( 'NDF', IDIN )
-               CALL CCD1_MSG( ' ', '      unmatched NDF ^NDF.', STATUS )
-               CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  If we succeeded, tell the user that the old list has been removed.
+*  If we failed, it is presumably becuase there was no old list, which
+*  is fine.
+               IF ( STATUS .EQ. SAI__OK ) THEN
+                  CALL GRP_GET( NDFGR, I, 1, NDFNAM, STATUS )
+                  CALL MSG_SETC( 'NDF', NDFNAM )
+                  CALL CCD1_MSG( ' ',
+     :'  Removing associated list for unpaired NDF ^NDF', STATUS )
+               ELSE
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+               CALL ERR_RLSE
             END IF
  13      CONTINUE
       END IF
