@@ -769,16 +769,10 @@
             set pos "-relx 0.5 -rely 0.5 -anchor center"
          }
          set inview($slot) $item
-      #  set cursview [ $itk_component(view$slot) cget -cursor ]
-      #  set cursdescribe [ $itk_component(describe$slot) cget -cursor ]
-      #  $itk_component(view$slot) configure -cursor watch
-      #  $itk_component(describe$slot) configure -cursor watch
          eval place [ ndfplotwindow $item ] \
             -in $itk_component(view$slot) $pos
          pack [ ndfinfowindow $item ] \
             -in $itk_component(describe$slot) -anchor w
-      #  $itk_component(view$slot) configure -cursor $cursview
-      #  $itk_component(describe$slot) configure -cursor $cursdescribe
          if { [ isvalid ] } {
             $itk_component(gotpair) configure -state normal
          }
