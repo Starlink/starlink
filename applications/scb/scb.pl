@@ -133,29 +133,44 @@ sub query_form {
 
 #  CGI output of the program when no arguments have been specified.
 
+#  Read file listing packages and (probably) tasks.
+
+   open TASKS, $taskfile or error "Couldn't open $taskfile";
+   while (<TASKS>) {
+      ($package, @tasks) = split;
+      $package =~ s/:?$//;
+      @{$tasks{$package}} = @tasks;
+   }
+   close TASKS;
+   @packages = sort keys %tasks;
+
    header $self;
-   hprint <<"   END"
+   hprint "
       <h1>$self: Starlink Source Code Browser</h1>
-      <form method=GET action="$self">
+      <form method=GET action='$self'>
           Name of source module:
           <input name=module size=24 value=''>
           <br>
           Name of package (optional):
-          <input name=package size=24 value=''>
+          <font size=-1>
+          <select name=package>
+          <option value='' selected>Any
+   ";
+   for $package (@packages) {
+      print "<option value=$package>$package\n";
+   }
+   print "</select></font>\n";
+   hprint "
           <br>
           <input type=submit value='Retrieve'>
       </form>
       <hr>
-   END
-   ;
-   open TASKS, $taskfile or error "Couldn't open $taskfile";
-   while (<TASKS>) {
-      ($package, @tasks) = split;
-      # next unless @tasks;
-      $package =~ s/:?$//;
+   ";
+
+   foreach $package (@packages) {
       print "<h3>$package</h3>\n";
-      foreach $task (@tasks) {
-         print "<a href='$scb?$task#$task'>$task</a>\n";
+      foreach $task (@{$tasks{$package}}) {
+         print "<a href='$scb?$task&$package#$task'>$task</a>\n";
       }
    }
    print "<hr>\n";
@@ -199,13 +214,15 @@ sub get_module {
    unless (@locations) {
       error "Failed to find module $module",
          "Probably this is a result of a deficiency in the source
-          code indexing program, but it may be because the index 
+          code indexing program, but it may be because the module you
+          requested doesn't exist, or because the index 
           database <code>$indexfile</code> has become out of date.";
    }
 
 #  See if any of the listed locations is in the requested package;
 #  otherwise just pick any of them (in fact, the last).
 
+   my ($head, $tail);
    foreach $location (@locations) {
       $locname = $location;
       $location =~ /^(.+)#(.+)/i;
@@ -213,19 +230,18 @@ sub get_module {
       last if (uc ($head) eq uc ($package));
    }
 
-
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
 
-   my $file;
+   my ($file, $tarfile);
    if (-d "$srcdir/$head") {
       $file = "$srcdir/$head/$tail";
    }
-   elsif (-f ($tarfile = <$srcdir/$head.tar*>)) {
+   elsif ( defined ($tarfile = <$srcdir/$head.tar*>) && -f $tarfile) {
       $file = "$tarfile>$tail";
    }
-   elsif ($head eq "INCLUDE") {
-      $file = $incdir/$tail;
+   elsif ($head =~ /^INCLUDE$/i) {
+      $file = "$incdir/$tail";
    }
    else {
       error "Failed to interpret location $location",
@@ -234,7 +250,7 @@ sub get_module {
 
 #  Extract file from logical path.
 
-   extract_file $file;
+   extract_file $file, $head;
 
 #  Finished with STDOUT; by closing it here the CGI user doesn't have to
 #  wait any longer than necessary (I think).
@@ -259,16 +275,17 @@ sub extract_file {
 #  Arguments.
 
    my $location = shift;
+   my $package = shift;
 
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
    ($file, $tarcontents, $tail) = ($1, $2, $3);
    if ($tarcontents) {
       tarxf $file, $tarcontents;
-      extract_file "$tarcontents$tail";
+      extract_file "$tarcontents$tail", $package;
       unlink $tarcontents;
    }
    else {
-      output $file;
+      output $file, $package;
    }
 }
 
@@ -279,6 +296,7 @@ sub output {
 #  Arguments.
 
    my $file = shift;              #  Filename of file to output.
+   my $package = shift;
 
 #  Get file type.
 
@@ -367,7 +385,7 @@ sub output {
 
                if ($body =~ /\bCALL(\w+)[^=]*$/) {
                   $sub = $1;
-                  s%$sub%<a href='$scb?$sub#$sub'>$sub</a>%;
+                  s%$sub%<a href='$scb?$sub&$package#$sub'>$sub</a>%;
                }
             }
             elsif ($ftype eq 'c') {
@@ -377,7 +395,7 @@ sub output {
                if ($body =~ /F77_CALL\s*\(\s*(\w+)\s*\)/) {
                   $sub = $1;
                   $module = uc $sub;
-                  s%$sub%<a href='$scb?$module#$module'>$sub</a>%;
+                  s%$sub%<a href='$scb?$module&$package#$module'>$sub</a>%;
                }
 
 #              Identify and deal with C includes.
