@@ -114,7 +114,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate the IMAGE hdu
-      CALL ADI2_FNDHDU( ARGS(2), ' ', IMHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., IMHDU, STATUS )
 
 *  Switch on the various items
 *  X axis label
