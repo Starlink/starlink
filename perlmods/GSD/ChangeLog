@@ -1,3 +1,16 @@
+2003-05-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* README: Update for v1.13 
+
+	* GSD.pm: gsdClose now moved back to XS since we no longer need to
+	include the kluge that closes the perl filehandle prematurely.
+
+	* GSD.xs: Now treats FILE* as an opaque pointer to prevent
+	problems with Perl importing the file handle and then closing
+	the file itself.
+
+	* typemap: FILE* is changed to GSDFILE* and is now a T_OPAQUEPTR
+	
 2000-05-17  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* gsdprint: Properly determine where C13DAT is in order to omit it. 

@@ -4,6 +4,7 @@ float	T_NV
 float *	T_FLOATP
 double * T_DOUBLEP
 Logical	T_IV
+GSDFILE *			T_PTROBJ
 item_descriptor *                  T_PTROBJ
 file_descriptor *                  T_PTROBJ
 gsd_data * T_PTROBJ

@@ -63,8 +63,9 @@ to an array:
 Note also that the C<gsdInqSize> subroutine does not require
 a value for MAXDIMS since the perl interface allows for the maximum
 size automatically. The C<gsdGet1x> functions return a vectorised
-array rather than an N-D array.
-
+array rather than an N-D array. Note that the C<fptr> argument
+to C<gsdOpenRead> and C<gsdClose> is an opaque object and not
+a filehandle.
 
 =cut
 
@@ -78,9 +79,9 @@ use DynaLoader;
 
 use vars qw/$VERSION @ISA @EXPORT/;
 
- 
-@ISA = qw(Exporter DynaLoader); 
- 
+
+@ISA = qw(Exporter DynaLoader);
+
 @EXPORT = qw( gsdOpenRead gsdClose gsdFind gsdItem gsdInqSize
               gsdGet0d gsdGet0r gsdGet0i gsdGet0l gsdGet0c gsdGet0b
 	      gsdGet0w
@@ -88,44 +89,9 @@ use vars qw/$VERSION @ISA @EXPORT/;
 	      gsdGet1dp gsdGet1rp gsdGet1ip
 	    );
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 bootstrap GSD  $VERSION;
-
-# On linux, ran into a problem where the program segments
-# on exit during global cleanup. This occurs when it tries to
-# tidy up the GV created when the file is opened. When we run
-# gsdClose the file handle is closed but Perl doesnt know about
-# it. It tries to tidy up but gets all confused. This seems to be
-# fixed by simply closing the file before running gsdClose
-# but is not a wonderful solution.
-
-# We implement gsdClose at the perl level and then call
-# the C version. Note that we could implement this without the
-# actual gsdClose if we simply attached destructors to item_dsc,
-# file_dsc and data_ptr. For completeness though, we use gsdClose itself.
-
-# Input arguments are set to undef on exit
-
-# Return 0 if good status
-# Return -1 if there was a problem
-
-sub gsdClose ($$$$) {
-
-  # Close the file early
-  my $status = close($_[0]);
-
-  # Now shut down GSD
-  my $gsdstat = _gsdClose($_[0], $_[1], $_[2], $_[3]);
-
-  # Combine the status from the close and that from gsdClose
-  if ($status && $gsdstat == 0) {
-    return $gsdstat;
-  } else {
-    return -1;
-  }
-
-}
 
 # OO interface
 
@@ -753,7 +719,8 @@ sub CLEAR {
 
 The C<gsdGet1xp> routines return a packed string rather than an array.
 This is far more convenient for packages such as C<PDL> which need
-to manipulate the array without a perl array overhead.
+to manipulate the array without a perl array overhead. The PDL::IO::GSD
+module hides this from the casual user.
 
 This library is read-only. 
 
@@ -761,7 +728,7 @@ This library is read-only.
 
 This module was written by Tim Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>
 
-Copyright (C) 1995-2000 Tim Jenness and the UK Particle Physics and
+Copyright (C) 1995-2000,2003 Tim Jenness and the UK Particle Physics and
 Astronomy Research Council. All Rights Reserved.
 
 =head1 CVS REVISION

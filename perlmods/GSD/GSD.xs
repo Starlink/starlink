@@ -49,6 +49,7 @@ extern "C" {
    memory and stores a pointer to the struct in this pointer */
 typedef void file_descriptor;
 typedef void item_descriptor;
+typedef FILE GSDFILE;
 
 /* Somewhere to store the data */
 typedef char gsd_data;
@@ -82,7 +83,7 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
   float		version = NO_INIT
   char *	label = NO_INIT
   int		no_items = NO_INIT
-  FILE *	fptr = NO_INIT
+  GSDFILE *	fptr = NO_INIT
   file_descriptor *	file_dsc = NO_INIT
   item_descriptor *	item_dsc = NO_INIT
   gsd_data *	data_ptr = NO_INIT
@@ -107,8 +108,8 @@ gsdOpenRead(filename, version, label, no_items, fptr, file_dsc, item_dsc, data_p
 # perl level before running this
 
 int
-_gsdClose(fptr, file_dsc, item_dsc, data_ptr)
-  FILE *	fptr
+gsdClose(fptr, file_dsc, item_dsc, data_ptr)
+  GSDFILE *	fptr
   file_descriptor *	file_dsc
   item_descriptor *	item_dsc
   gsd_data *	data_ptr 
