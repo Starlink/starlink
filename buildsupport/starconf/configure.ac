@@ -1,7 +1,7 @@
 dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(starconf, 1.1, ussc@star.rl.ac.uk)
+AC_INIT(starconf, 1.1-1, ussc@star.rl.ac.uk)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([starconf.m4.in])
@@ -96,7 +96,10 @@ AC_SUBST(aclocaldir)
 
 
 # Convert the version number in PACKAGE_VERSION into an integer
-PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | $AWK '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
+# Pick a version (I'm getting bored with this project...)
+PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION 0 0 0 | sed 's/[^0-9]/ /g;s/$/ [Saz0<x]sx lxx La 1000*La+1000*La+p/' | dc`]
+#PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION 0 0 0 | sed 's/[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/\3 \2 \1 1000*+1000*+p/' | dc`]
+#PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9]/ /g' | $AWK '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
 
