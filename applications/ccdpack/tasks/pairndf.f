@@ -303,6 +303,10 @@
 *        Removed top-level locator control (foreign data access upgrade).
 *     22-MAY-1997 (PDRAPER):
 *        Now has better control of reserved pens.
+*     22-FEB-1999 (PDRAPER):
+*        Increased centroid control parameters to scale with 
+*        image size. Large images generally have their initial centroids
+*        badly positioned.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -314,144 +318,149 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameterisations
-      INCLUDE 'IDI_ERR'          ! IDI error codes
-      INCLUDE 'IDI_PAR'          ! IDI parameterisations
-      INCLUDE 'MSG_PAR'          ! Message system parameterisations
-      INCLUDE 'NDF_PAR'          ! NDF parameterisations
-      INCLUDE 'PAR_ERR'          ! Parameter system error codes
-      INCLUDE 'PRM_PAR'          ! Primdat constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'CCD1_PAR'        ! CCDPACK parameterisations
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameterisations
+      INCLUDE 'IDI_ERR'         ! IDI error codes
+      INCLUDE 'IDI_PAR'         ! IDI parameterisations
+      INCLUDE 'MSG_PAR'         ! Message system parameterisations
+      INCLUDE 'NDF_PAR'         ! NDF parameterisations
+      INCLUDE 'PAR_ERR'         ! Parameter system error codes
+      INCLUDE 'PRM_PAR'         ! Primdat constants
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  Local Constants:
-      INTEGER MAXPOS             ! Maximum number of positions read from
-                                 ! overlap region
+      INTEGER MAXPOS            ! Maximum number of positions read from
+                                ! overlap region
       PARAMETER ( MAXPOS = 256 ) 
 
 *  Local Variables:
-      CHARACTER * ( 80 ) FNAME   ! Filename
-      CHARACTER * ( 80 ) MESS    ! Error message from IDI
+      CHARACTER * ( 80 ) FNAME  ! Filename
+      CHARACTER * ( 80 ) MESS   ! Error message from IDI
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for writing output lines
       CHARACTER * ( NDF__SZTYP ) ITYPE1 ! Input NDF data types
       CHARACTER * ( NDF__SZTYP ) ITYPE2 ! Input NDF data types
-      DOUBLE PRECISION FFRAC     ! Fraction of scratch area for scaled displayed image.
+      DOUBLE PRECISION CSCALE   ! Centroid scale factor
+      DOUBLE PRECISION FFRAC    ! Fraction of scratch area for scaled displayed image.
       DOUBLE PRECISION LOWER( CCD1__MXNDF ) ! Lower data values for displaying images
-      DOUBLE PRECISION PFRAC     ! Fraction of display used for palette
-      DOUBLE PRECISION PR( 2 )   ! Percentage histogram range for display
-      DOUBLE PRECISION SCALE     ! Maximum factor which scales input dimensions to display sizes 
-      DOUBLE PRECISION SCALES    ! Small images scale factor
+      DOUBLE PRECISION MAXSHF   ! Centroid maximum shift
+      DOUBLE PRECISION PFRAC    ! Fraction of display used for palette
+      DOUBLE PRECISION PR( 2 )  ! Percentage histogram range for display
+      DOUBLE PRECISION SCALE    ! Maximum factor which scales input dimensions to display sizes 
+      DOUBLE PRECISION SCALES   ! Small images scale factor
+      DOUBLE PRECISION TOLER    ! Centroid tolerance
       DOUBLE PRECISION UPPER( CCD1__MXNDF ) ! Upper data values for displaying images
-      DOUBLE PRECISION WASTE     ! Waste area in small image fit (current)
-      DOUBLE PRECISION WASTE1    ! Waste area in small image fit (global)
+      DOUBLE PRECISION WASTE    ! Waste area in small image fit (current)
+      DOUBLE PRECISION WASTE1   ! Waste area in small image fit (global)
       DOUBLE PRECISION X1( MAXPOS ) ! X positions read from overlap region
       DOUBLE PRECISION X2( MAXPOS ) ! X positions read from overlap region
       DOUBLE PRECISION XOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial X offsets
       DOUBLE PRECISION XOFFN( CCD1__MXNDF * CCD1__MXNDF ) ! Absolute X offsets
-      DOUBLE PRECISION XSCALE    ! Factor which scales input dimensions to display sizes 
+      DOUBLE PRECISION XSCALE   ! Factor which scales input dimensions to display sizes 
       DOUBLE PRECISION Y1( MAXPOS ) ! X positions read from overlap region
       DOUBLE PRECISION Y2( MAXPOS ) ! X positions read from overlap region
       DOUBLE PRECISION YOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial Y offsets
       DOUBLE PRECISION YOFFN( CCD1__MXNDF * CCD1__MXNDF ) ! Absolute Y offsets
-      DOUBLE PRECISION YSCALE    ! Factor which scales input dimensions to display sizes 
-      INTEGER COUNT              ! Current intercomparison level
-      INTEGER DEPTH( 2 )         ! Image display data depth
-      INTEGER DSIZE( 2 )         ! Large display surface size
-      INTEGER DSIZES( 2 )        ! Small display surface size
-      INTEGER EL                 ! Number of elements in data array
+      DOUBLE PRECISION YSCALE   ! Factor which scales input dimensions to display sizes 
+      INTEGER COUNT             ! Current intercomparison level
+      INTEGER DEPTH( 2 )        ! Image display data depth
+      INTEGER DSIZE( 2 )        ! Large display surface size
+      INTEGER DSIZES( 2 )       ! Small display surface size
+      INTEGER EL                ! Number of elements in data array
       INTEGER FDO( CCD1__MXNDF ) ! Output FIO descriptors
-      INTEGER I                  ! Loop variable
-      INTEGER ID                 ! Display identifier
-      INTEGER IPBEEN             ! Pointer to workspace
-      INTEGER IPDAT1             ! Pointer to input data array component
-      INTEGER IPDAT2             ! Pointer to input data array component
-      INTEGER IPGRA              ! Pointer to graph
-      INTEGER IPID( CCD1__MXNDF ) ! Pointer to output identifiers
+      INTEGER I                 ! Loop variable
+      INTEGER ID                ! Display identifier
       INTEGER IDIMG( CCD1__MXNDF ) ! Identifiers to workspace containing display images
-      INTEGER IPQUE              ! Pointer to workspace
-      INTEGER IPSIDE             ! Pointer to workspace with small images 
-      INTEGER IPSML              ! Pointer to small images data
-      INTEGER IPSPAN             ! Pointer to graph (spanning)
-      INTEGER IPSUB              ! Pointer to sub-graph (spanning)
-      INTEGER IPWORK             ! Intermediary workspace
+      INTEGER IPBEEN            ! Pointer to workspace
+      INTEGER IPDAT1            ! Pointer to input data array component
+      INTEGER IPDAT2            ! Pointer to input data array component
+      INTEGER IPGRA             ! Pointer to graph
+      INTEGER IPID( CCD1__MXNDF ) ! Pointer to output identifiers
+      INTEGER IPQUE             ! Pointer to workspace
+      INTEGER IPSIDE            ! Pointer to workspace with small images 
+      INTEGER IPSML             ! Pointer to small images data
+      INTEGER IPSPAN            ! Pointer to graph (spanning)
+      INTEGER IPSUB             ! Pointer to sub-graph (spanning)
+      INTEGER IPWORK            ! Intermediary workspace
       INTEGER IPX1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to X position lists
       INTEGER IPX2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to X position lists
       INTEGER IPXO( CCD1__MXNDF ) ! Pointer to output X positions
       INTEGER IPY1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to Y position lists
       INTEGER IPY2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to Y position lists
       INTEGER IPYO( CCD1__MXNDF ) ! Pointer to output Y positions
-      INTEGER ISTAT              ! IDI status
-      INTEGER J                  ! Loop variable
+      INTEGER ISIZE             ! Centroid search box
+      INTEGER ISTAT             ! IDI status
+      INTEGER J                 ! Loop variable
       INTEGER LBND( 2, CCD1__MXNDF ) ! Lower bounds of input images (origins)
-      INTEGER LBND1( 2 )         ! Lower bounds of display image
-      INTEGER LBND2( 2 )         ! Lower bounds of display image
+      INTEGER LBND1( 2 )        ! Lower bounds of display image
+      INTEGER LBND2( 2 )        ! Lower bounds of display image
       INTEGER LBNDS( 2, CCD1__MXNDF ) ! Lower bounds of small image
-      INTEGER LEFT               ! Index of left-hand image
-      INTEGER MEMID              ! Display memory identifier
-      INTEGER MEMITT( 2 )        ! Memory ITT depths
-      INTEGER MESLEN             ! IDI message length
-      INTEGER MIDS( 2 )          ! List of memory identifiers
-      INTEGER MODCON             ! Configuration mode
-      INTEGER MSIZEX( 2 )        ! Memory sizes in X
-      INTEGER MSIZEY( 2 )        ! Memory sizes in Y
-      INTEGER NARR               ! Dummy
-      INTEGER NDFGR              ! Input NDF group identifier
-      INTEGER NDFID1             ! NDF identifier
-      INTEGER NDFID2             ! NDF identifier
-      INTEGER NDISP              ! Number of small images displayed
-      INTEGER NEDGES             ! Number of edges in graph
-      INTEGER NEWED              ! Number of edges in spanning graph
+      INTEGER LEFT              ! Index of left-hand image
+      INTEGER MAXIT             ! Centroid maximum iterations
+      INTEGER MEMID             ! Display memory identifier
+      INTEGER MEMITT( 2 )       ! Memory ITT depths
+      INTEGER MESLEN            ! IDI message length
+      INTEGER MIDS( 2 )         ! List of memory identifiers
+      INTEGER MODCON            ! Configuration mode
+      INTEGER MSIZEX( 2 )       ! Memory sizes in X
+      INTEGER MSIZEY( 2 )       ! Memory sizes in Y
+      INTEGER NARR              ! Dummy
+      INTEGER NDFGR             ! Input NDF group identifier
+      INTEGER NDFID1            ! NDF identifier
+      INTEGER NDFID2            ! NDF identifier
+      INTEGER NDISP             ! Number of small images displayed
+      INTEGER NEDGES            ! Number of edges in graph
+      INTEGER NEWED             ! Number of edges in spanning graph
       INTEGER NMAT( CCD1__MXNDF * CCD1__MXNDF ) ! Number of position selected
-      INTEGER NNDF               ! Number of input NDFs
-      INTEGER NNODE              ! Number of nodes in spanning graph
+      INTEGER NNDF              ! Number of input NDFs
+      INTEGER NNODE             ! Number of nodes in spanning graph
       INTEGER NODES( 2, CCD1__MXNDF * CCD1__MXNDF ) ! Original node numbers
       INTEGER NOUT( CCD1__MXNDF ) ! Numbers of output positions
-      INTEGER NRES               ! Number of reserved pens
-      INTEGER NRET               ! Dummy variable
-      INTEGER NUMMEM             ! Number of device memories
-      INTEGER NVAL               ! Dummy
-      INTEGER NX                 ! Number of smalls images in X
-      INTEGER NY                 ! Number of smalls images in Y
+      INTEGER NRES              ! Number of reserved pens
+      INTEGER NRET              ! Dummy variable
+      INTEGER NUMMEM            ! Number of device memories
+      INTEGER NVAL              ! Dummy
+      INTEGER NX                ! Number of smalls images in X
+      INTEGER NY                ! Number of smalls images in Y
       INTEGER OFFS( CCD1__MXNDF+ 1 ) ! Offsets into extended lists
-      INTEGER OUTGRP             ! Output IRH group identifier
-      INTEGER PENS( 1 )          ! Number of pens in display
-      INTEGER RIGHT              ! Index of right-hand image
-      INTEGER SPAN               ! Length of marking cross span
-      INTEGER THICK              ! Thickness of crosses
-      INTEGER TOTNOD             ! Total number of nodes in graph
-      INTEGER UBND1( 2 )         ! Upper bounds of display image
-      INTEGER UBND2( 2 )         ! Upper bounds of display image
+      INTEGER OUTGRP            ! Output IRH group identifier
+      INTEGER PENS( 1 )         ! Number of pens in display
+      INTEGER RIGHT             ! Index of right-hand image
+      INTEGER SPAN              ! Length of marking cross span
+      INTEGER THICK             ! Thickness of crosses
+      INTEGER TOTNOD            ! Total number of nodes in graph
+      INTEGER UBND1( 2 )        ! Upper bounds of display image
+      INTEGER UBND2( 2 )        ! Upper bounds of display image
       INTEGER UBNDS( 2, CCD1__MXNDF ) ! Upper bounds of small image
-      INTEGER UNIQUE             ! The number of unique node numbers visited by the user when forming the graph
+      INTEGER UNIQUE            ! The number of unique node numbers visited by the user when forming the graph
       INTEGER XDIM( CCD1__MXNDF ) ! X dimensions
       INTEGER XDIMW( CCD1__MXNDF ) ! X dimensions of display image
       INTEGER XDIMWS( CCD1__MXNDF ) ! X dimensions of small images
-      INTEGER XLARGE             ! Largest span in X dimension
-      INTEGER XOFFS              ! Small image offset
-      INTEGER XPOS( 5 )          ! X positions of box
-      INTEGER XSPAN              ! Number of device pixels in small image region
+      INTEGER XLARGE            ! Largest span in X dimension
+      INTEGER XOFFS             ! Small image offset
+      INTEGER XPOS( 5 )         ! X positions of box
+      INTEGER XSPAN             ! Number of device pixels in small image region
       INTEGER YDIM( CCD1__MXNDF ) ! Y dimensions
       INTEGER YDIMW( CCD1__MXNDF ) ! Y dimensions of display image
       INTEGER YDIMWS( CCD1__MXNDF ) ! Y dimensions of small images
-      INTEGER YLARGE             ! Largest span in Y dimension
-      INTEGER YOFFS              ! Small image offset
-      INTEGER YPOS( 5 )          ! Y positions of box
-      INTEGER YSPAN              ! Number of device pixels in small image region
-      LOGICAL BAD                ! Whether BAD pixels are present or not
-      LOGICAL COMPL              ! True if graph is complete
-      LOGICAL CYCLIC             ! True if graph is cyclic
+      INTEGER YLARGE            ! Largest span in Y dimension
+      INTEGER YOFFS             ! Small image offset
+      INTEGER YPOS( 5 )         ! Y positions of box
+      INTEGER YSPAN             ! Number of device pixels in small image region
+      LOGICAL BAD               ! Whether BAD pixels are present or not
+      LOGICAL COMPL             ! True if graph is complete
+      LOGICAL CYCLIC            ! True if graph is cyclic
       LOGICAL DRAW( CCD1__MXNDF ) ! Small image has been aligned draw box aound it
-      LOGICAL MBIG               ! Make displayed images as big as possible
+      LOGICAL MBIG              ! Make displayed images as big as possible
       LOGICAL NEED( CCD1__MXNDF ) ! Flag indicating that NDF needs processing before display.
-      LOGICAL OK                 ! Whether it's ok to do something
-      LOGICAL OVERLP             ! Whether the displayed images overlap 
-      LOGICAL USELUT             ! Keep the present look-up-table
-      REAL COLS( 3, 5 )          ! Look-up-table 
-      REAL GREY( 3, 512 )        ! Look-up-table 
-      REAL MSIZE                 ! Fraction of X dimension for crosses
+      LOGICAL OK                ! Whether it's ok to do something
+      LOGICAL OVERLP            ! Whether the displayed images overlap 
+      LOGICAL USELUT            ! Keep the present look-up-table
+      REAL COLS( 3, 5 )         ! Look-up-table 
+      REAL GREY( 3, 512 )       ! Look-up-table 
+      REAL MSIZE                ! Fraction of X dimension for crosses
                             
 *  Local Data:                 
       DATA COLS / 0.0, 0.0, 0.0, ! Black
@@ -986,13 +995,22 @@
      :                       IPDAT2, EL, STATUS )
                CALL NDF_BAD( NDFID2, 'Data', .FALSE., BAD, STATUS )
                
-*  Centroid the positions for each of the NDFs.
+*  Centroid the positions for each of the NDFs. Set the centroid
+*  parameters so that they scale according to the size of the images
+*  displayed (and more importantly so that large images are given
+*  greater freedom in selecting the initial positions, since the initial
+*  positioning must be less accurate).
+               CSCALE = MAX( 1.0D0, SCALE )
+               ISIZE = NINT( CSCALE * 9 )
+               MAXSHF = CSCALE * 5.5D0
+               TOLER = MIN( 0.5D0, CSCALE * 0.05D0 )
+               MAXIT = 5
                CALL CCD1_CEN2( ITYPE1, IPDAT1, XDIM( LEFT ),
      :                         YDIM( LEFT ), LBND( 1, LEFT ),
      :                         ITYPE2, IPDAT2, XDIM( RIGHT ),
      :                         YDIM( RIGHT ), LBND( 1, RIGHT ),
      :                         X1, Y1, X2, Y2, NMAT( COUNT ),
-     :                         9, .TRUE., 5.5D0, 5, 0.05D0,
+     :                         ISIZE, .TRUE., MAXSHF, MAXIT, TOLER,
      :                         %VAL( IPX1( COUNT ) ), 
      :                         %VAL( IPY1( COUNT ) ),
      :                         %VAL( IPX2( COUNT ) ),
