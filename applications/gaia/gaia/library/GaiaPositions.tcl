@@ -1,0 +1,487 @@
+#+
+#  Name:
+#     GaiaPositions
+
+#  Type of Module:
+#     [incr Tcl] class
+
+#  Purpose:
+#     Get list of positions from an image.
+
+#  Description:
+#     This class creates objects for creating a local catalogue of
+#     positions from objects identified on the image. It also presents 
+#     image quality information determined from the list of positions
+#     (this includes FWHM to estimate the global seeing).
+
+#  Invocations:
+#
+#        GaiaPositions object_name [configuration options]
+#
+#     This creates an instance of a GaiaPositions object. The return is
+#     the name of the object.
+#
+#        object_name configure -configuration_options value
+#
+#     Applies any of the configuration options (after the instance has
+#     been created).
+#
+#        object_name method arguments
+#
+#     Performs the given method on this object.
+
+#  Configuration options:
+#     See itk_option definitions.
+
+#  Methods:
+#     See individual method declarations.
+
+#  Inheritance:
+#     This object inherits GaiaSearch
+
+#  Authors:
+#     PWD: Peter Draper (STARLINK - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-MAR-2000 (PWD):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+#.
+
+itk::usual GaiaPositions {}
+
+itcl::class gaia::GaiaPositions {
+
+   #  Inheritances:
+   #  -------------
+   inherit util::TopLevelWidget
+
+   #  Constructor:
+   #  ------------
+   constructor {args} {
+
+      #  Evaluate any options [incr Tk].
+      eval itk_initialize $args
+
+      #  Set the top-level window title.
+      wm title $w_ "GAIA: Record object positions ($itk_option(-number))"
+
+      #  Create the short help window.
+      make_short_help
+
+      #  Add the menus.
+      add_menus_
+
+      #  Add the table for displaying the choosen positions.  Also
+      #  adds to the edit menu and the markers menu which controls the
+      #  appearance of the graphics markers.
+      itk_component add table {
+         GaiaPosTable $w_.table \
+            -editmenu [get_menu Edit] \
+            -markmenu [get_menu Markers] \
+            -rtdimage $itk_option(-rtdimage) \
+            -canvas $itk_option(-canvas) \
+            -image $itk_option(-image)
+      }
+      add_short_help $itk_component(table) \
+         {Table of coordinates and associated values}
+      pack $itk_component(table) -side top -fill both -expand 1
+
+      #  Add image quality controls.
+      add_image_quality_
+
+      #  Create the actions toolbar.
+      itk_component add actions {frame $w_.actions}
+      pack $itk_component(actions) -fill x -side top -pady 3 -padx 3
+
+      #  Add button to add a new position/object.
+      itk_component add add {
+         button $itk_component(actions).add -text Add \
+            -command [code $this add]
+      }
+      add_short_help $itk_component(add) \
+         {Add new position to table}
+      pack $itk_component(add) -side left -expand 1 -pady 2 -padx 2
+
+      #  Update button for stats on all objects
+      itk_component add update {
+         button $itk_component(actions).update -text {Update all}\
+            -command [code $this update_stats all]
+      }
+      add_short_help $itk_component(update) \
+         {Update image quality statistics for all objects}
+      pack $itk_component(update) -side left -expand 1 -pady 2 -padx 2
+
+      #  Update button for stats on selected objects.
+      itk_component add updatesel {
+         button $itk_component(actions).updatesel -text {Update selected}\
+            -command [code $this update_stats selected]
+      }
+      add_short_help $itk_component(updatesel) \
+         {Update image quality statistics for selected objects}
+      pack $itk_component(updatesel) -side left -expand 1 -pady 2 -padx 2
+
+      #  Add a button to close window
+      itk_component add close {
+         button $itk_component(actions).close -text Close \
+            -command [code $this close]
+      }
+      add_short_help $itk_component(close) \
+         {Close window}
+      pack $itk_component(close) -side left -expand 1 -pady 2 -padx 2
+
+      #  Initialisations after widget creation.
+      auto_centroid_changed_
+   }
+
+   #  Destructor:
+   #  -----------
+   destructor  {
+   }
+
+   #  Methods:
+   #  --------
+
+   #  Create a new instance of this object.
+   protected method clone_me_ {} {
+      if { $itk_option(-clone_cmd) != {} } {
+         eval $itk_option(-clone_cmd)
+      }
+   }
+
+   #  Just close the window, removing associated graphics.
+   public method close {} {
+
+      #  Add binding to restore contents and store them.
+      bind [winfo toplevel $w_] <Map> [code $this reappears_]
+      set oldcontents_ [$itk_component(table) get_contents]
+
+      #  Clear table (to remove the markers)
+      $itk_component(table) clear_table
+      wm withdraw $w_
+   }
+
+   #  Recover table contents if deiconified.
+   protected method reappears_ {} {
+      if { $oldcontents_ != {} } {
+         eval $itk_component(table) set_contents $oldcontents_
+
+         #  Remove binding to restore contents (stop repeated calls).
+         set oldcontents_ {}
+         bind [winfo toplevel $w_] <Map> {}
+      }
+   }
+
+   #  Add menus to menubar.
+   protected method add_menus_ {} {
+
+      #  Add the File menu.
+      add_menubar
+      set File [add_menubutton "File" left]
+      configure_menubutton File -underline 0
+      add_short_help $itk_component(menubar).file {File menu: close window}
+
+      #  Add option to create a new window.
+      $File add command -label {New window} \
+         -command [code $this clone_me_] \
+         -accelerator {Control-n}
+      bind $w_ <Control-n> [code $this clone_me_]
+      $short_help_win_ add_menu_short_help $File \
+         {New window} {Create a new toolbox}
+
+      #  And the options to save positions and re-read from file.
+      $File add command -label {Write positions to file...} \
+         -command [code $this save_positions_] \
+         -accelerator {Control-s}
+      bind $w_ <Control-s> [code $this save_positions_]
+      $short_help_win_ add_menu_short_help $File \
+         {Write positions to file...}\
+         {Write the displayed positions out to an ordinary text file}
+
+      $File add command -label {Read positions from a file...} \
+         -command [code $this read_positions_] \
+         -accelerator {Control-r}
+      bind $w_ <Control-r> [code $this read_positions_]
+      $short_help_win_ add_menu_short_help $File \
+         {Read positions from a file...} \
+      {Read a suitable set of positions from an ordinary text file}
+
+      #  Set the exit menu item
+      $File add command -label {Exit closing window   } \
+         -command [code $this close] \
+         -accelerator {Control-c}
+      bind $w_ <Control-c> [code $this close]
+
+      #  Add window help.
+      global gaia_dir
+      add_help_button $gaia_dir/GaiaPositions.hlp "On Window..."
+      add_short_help $itk_component(menubar).help \
+         {Help menu: get some help about this window}
+
+      #  Edit menu (filled by GaiaPosTable).
+      add_menubutton Edit
+
+      #  Options menu.
+      set Options [add_menubutton Options]
+      add_short_help $itk_component(menubar).options {Set additional options}
+
+      #  Add option to switch off automatic centroiding.
+      set values_($this,autoc) 1
+      $Options add checkbutton \
+         -label {Auto centroid} \
+         -variable [scope values_($this,autoc)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this auto_centroid_changed_]
+
+      #  Add option to define a different centroid maxshift/search box.
+      set values_($this,isize) $itk_option(-isize)
+      $Options add cascade -label {Centroid search box} \
+         -menu [menu $Options.isize]
+      $short_help_win_ add_menu_short_help $Options {Centroid search box} \
+         {Change the search box used when locating centroids (pixels)}
+      foreach i {3 4 5 7 9 11 13 15 17 19 21} {
+         $Options.isize add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope values_($this,isize)] \
+            -command [code $this configure -isize $i]
+      }
+      set values_($this,maxshift) $itk_option(-maxshift)
+      $Options add cascade -label {Centroid max shift} \
+         -menu [menu $Options.maxshift]
+      $short_help_win_ add_menu_short_help $Options {Centroid max shift} \
+         {Change the maximum shift from initial position (pixels)}
+      foreach i {3.5 4.5 5.5 7.5 9.5 11.5 13.5 15.5 17.5 19.5 21.5} {
+         $Options.maxshift add radiobutton \
+            -value $i \
+            -label $i \
+            -variable [scope values_($this,maxshift)] \
+            -command [code $this configure -maxshift $i]
+      }
+
+      #  Markers menu (filled by GaiaPosTable).
+      add_menubutton Markers
+   }
+   
+   #  Add controls for image quality estimates.
+   protected method add_image_quality_ {} {
+      itk_component add rule {
+         LabelRule $w_.rule -text "Image Quality:"
+      }
+      pack $itk_component(rule) -side top -fill x
+
+      #  Size of region used to fit objects.
+      set lwidth 14
+      itk_component add size {
+         util::LabelEntryScale $w_.size \
+            -text {Size of fit region:} \
+            -labelwidth $lwidth \
+            -increment 1 \
+            -resolution 1 \
+            -from 10 \
+            -to 40 \
+            -show_arrows 1 \
+            -orient horizontal \
+            -value $itk_option(-iqesize) \
+            -command [code $this configure -iqesize]
+      }
+      pack $itk_component(size) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(size) \
+         {Size of region used around each object}
+
+      #  Add fields for showing values.
+      itk_component add fwhmx {
+         LabelValue $w_.fwhmx -text {FwhmX:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(fwhmx) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(fwhmx) \
+         {Mean FWHM in X direction (range) pixels/arcsec}
+
+      itk_component add fwhmy {
+         LabelValue $w_.fwhmy -text {FwhmY:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(fwhmy) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(fwhmy) \
+         {Mean FWHM in Y direction (range) pixels/arcsec}
+
+      itk_component add angle {
+         LabelValue $w_.angle -text {Angle:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(angle) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(angle) \
+         {Mean position angle of major axis (degrees)}
+
+      itk_component add peak {
+         LabelValue $w_.peak -text {Peak:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(peak) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(peak) \
+         {Mean peak value of objects}
+
+      itk_component add back {
+         LabelValue $w_.back -text {Background:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(back) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(back) \
+         {Mean background level of all objects}
+
+      itk_component add nused {
+         LabelValue $w_.nused -text {Number used:} \
+            -value 0 \
+            -labelwidth $lwidth
+      }
+      pack $itk_component(nused) -fill x -side top -pady 2 -padx 2
+      add_short_help $itk_component(nused) \
+         {Number of objects used in image quality estimates}
+   }
+
+   #  Add position to table.
+   public method add {} {
+
+      #  Set up interaction to read the next <1> on the image
+      #  and get the coordinates.
+      $itk_component(table) add_new_row
+      $itk_component(table) update_row
+   }
+
+   #  Read and write reference positions to a file.
+   protected method read_positions_ {} {
+      $itk_component(table) read_from_file
+   }
+   protected method save_positions_ {} {
+      $itk_component(table) write_to_file
+   }
+
+   #  Toggle state of auto centroiding.
+   protected method auto_centroid_changed_ {} {
+      $itk_component(table) configure -init_centroid $values_($this,autoc)
+   }
+
+   #  Update image quality statistics
+   public method update_stats {what} {
+      set content {}
+      if { "$what" == "all" } {
+
+         #  Work with all objects.
+         set content [$itk_component(table) get_contents]
+      } else {
+         #  Work with selected objects.
+         set content [$itk_component(table) get_selected]
+      }
+      if { $content != {} } {
+         set coords {}
+         foreach line $content {
+            append coords "[lindex $line 3] [lindex $line 4] "
+         }
+         if { [catch {$itk_option(-rtdimage) globalstats \
+                         $coords $itk_option(-iqesize)} msg] == 0 } {
+            lassign $msg fwhmx rfwhmx fwhmy rfwhmy angle peak back nused
+            
+            #  Get image scale.
+            set ix [lindex $coords 0]
+            set iy [lindex $coords 1]
+            $itk_option(-rtdimage) convert coords $ix $iy image x1 y1 canvas
+            set ix [expr $ix + 1.0]
+            $itk_option(-rtdimage) convert coords $ix $iy image x2 y2 canvas
+            set imgscale [$itk_option(-rtdimage) wcsdist $x1 $y1 $x2 $y2]
+
+            #  Update results controls (use format to keep precision down).
+            set res [format "%.2f/%.2f (%.2f/%.2f)" \
+                        $fwhmx [expr $fwhmx*$imgscale] \
+                        $rfwhmx [expr $rfwhmx*$imgscale]]
+            $itk_component(fwhmx) configure -value $res
+            set res [format "%.2f/%.2f (%.2f/%.2f)" \
+                        $fwhmy [expr $fwhmy*$imgscale] \
+                        $rfwhmy [expr $rfwhmy*$imgscale]]
+            $itk_component(fwhmy) configure -value $res
+            $itk_component(angle) configure -value [format "%.2f" $angle]
+            $itk_component(peak) configure -value [format "%.2f" $peak]
+            $itk_component(back) configure -value [format "%.2f" $back]
+            $itk_component(nused) configure -value $nused
+         } else {
+            #  No measurements so clear boxes.
+            $itk_component(fwhmx) configure -value 0
+            $itk_component(fwhmy) configure -value 0
+            $itk_component(angle) configure -value 0
+            $itk_component(peak) configure -value 0
+            $itk_component(back) configure -value 0
+            $itk_component(nused) configure -value 0
+         }
+      } else {
+         warning_dialog "No positions available"
+      }
+   }
+
+   #  Configuration options: (public variables)
+   #  ----------------------
+
+   #  Name of rtdimage widget.
+   itk_option define -rtdimage rtdimage RtdImage {}
+
+   #  Name of the canvas holding the starrtdimage widget.
+   itk_option define -canvas canvas Canvas {}
+
+   #  Name of the RtdImage widget or derived class.
+   itk_option define -image image Image {}
+
+   #  Identifying number for toolbox (shown in () in window title).
+   itk_option define -number number Number 0
+
+   #  The type of fit to be used when refining the coordinate system.
+   itk_option define -fittype fittype Fittype 5 {
+      set values_($this,fittype) $itk_option(-fittype)
+   }
+
+   #  The centroid search box and maximum shift.
+   itk_option define -isize isize Isize 9 {
+      set values_($this,isize) $itk_option(-isize)
+      if { [info exists itk_component(table) ] } {
+         $itk_component(table) configure -isize $itk_option(-isize)
+      }
+   }
+   itk_option define -maxshift maxshift Maxshift 5.5 {
+      set values_($this,isize) $itk_option(-isize)
+      if { [info exists itk_component(table) ] } {
+         $itk_component(table) configure -maxshift $itk_option(-maxshift)
+      }
+   }
+
+   #  Command to execute to create a new instance of this object.
+   itk_option define -clone_cmd clone_cmd Clone_Cmd {}
+
+   #  If this is a clone, then it should die rather than be withdrawn.
+   itk_option define -really_die really_die Really_Die 0
+
+   #  Size of region about object, used when determining IQE.
+   itk_option define -iqesize iqesize Iqesize 15
+
+   #  Protected variables: (available to instance)
+   #  --------------------
+
+   #  Last content of table when closed.
+   protected variable oldcontents_ {}
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
+
+   #  Variable to share amongst all widgets. This is indexed by the
+   #  object name ($this)
+   common values_
+
+#  End of class definition.
+}
