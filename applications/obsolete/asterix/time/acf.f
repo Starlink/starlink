@@ -313,7 +313,7 @@
       ELSE
         TEXT(2) = '           Input VARIANCE and QUALITY were NOT used.'
       END IF
-      CALL HIST_PTXT (OFID, 2, TEXT, STATUS)
+      CALL HSI_PTXT (OFID, 2, TEXT, STATUS)
 
 *    Exit
   99  CALL AST_CLOSE()
