@@ -66,9 +66,10 @@ test_iostat_wrap.c:
 	echo "int main() { exit (test_iostat_()); }" >test_iostat_wrap.c
 test_iostat: $(test_iostat_OBJECTS)
 	$(LIBTOOL) --mode=link $(FC) -o test_iostat \
-		$(test_iostat_OBJECTS) libems.la libemsf.la \
+		$(test_iostat_OBJECTS) -lemsf -lems \
 		`cnf_link`
 
+#  Because we invoke `ems_link`, the following
 ems_test_SOURCES = ems_test.c
-ems_test_LDADD = `ems_link`
+ems_test_LDADD = `$(srcdir)/ems_link`
 

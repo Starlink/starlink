@@ -20,7 +20,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_C_CONST
 AC_HEADER_STDC
-AC_CHECK_FUNCS([strcmp snprintf])
+AC_CHECK_FUNCS([strcmp vsnprintf vsprintf])
 AC_CHECK_DECLS([strcmp])
 AC_PROG_LIBTOOL
 

@@ -86,6 +86,7 @@
 #include <stdlib.h>                     /* for bsearch */
 #if STDC_HEADERS
 #  include <string.h>
+#  include <stdarg.h>
 #elif !HAVE_DECL_STRCMP
 int strcmp(const char*, const char*);
 #endif
@@ -124,13 +125,13 @@ typedef struct {
 static const MessageInfo *getMessageInfo();
 static const char* alpha_iostat_lookup( const int iostat );
 static int compareIostatMessagePair(const void*, const void*);
+static const char* msg_printf(const char*, ...);
 
-#ifdef HAVE_SNPRINTF
-#define SNPRINTF(buf, buflen, ...) snprintf ( buf, buflen, __VA_ARGS__ )
-#else
-/* fingers crossed */
-#define SNPRINTF(buf, buflen, ...) sprintf ( buf, __VA_ARGS__ )
-#endif
+/* We use snprintf below if we have it, and sprintf otherwise.  If we
+   don't have snprintf, we can only hope that the message isn't too
+   long for the (generously sized) buffer.  It would be nice to define
+   a SNPRINTF macro, but the __VA_ARGS__ mechanism seems to outwit
+   some preprocessors (gcc3.3 can cope, gcc3.1 can't). */
 
 F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
 {
@@ -153,39 +154,34 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
       ems1Stok( ctok, "End-of-file");
       
    } else if ( msgInfo->msgs == 0 ) {
-      char buf[100];
+      const char* tokenvalue;
 
       /* The compiler wasn't recognised, or there is a lookup function */
       if ( msgInfo->lookup == 0 ) {
          /* unrecognised compiler */
-         SNPRINTF( buf, sizeof(buf),
-                   "ems_fioer: unrecognized IOSTAT value %d"
-                   " (can't recognise compiler: %s %s)",
-                   *iostat, AC_vendor, AC_FC );
+         tokenvalue = msg_printf("ems_fioer: unrecognized IOSTAT value %d"
+                                 " (can't recognise compiler: %s %s)",
+                                 *iostat, AC_vendor, AC_FC );
          
       } else {
          const char* msg = (*msgInfo->lookup)( *iostat );
          if ( msg == 0 ) {
             /* message wasn't found */
-            SNPRINTF( buf, sizeof(buf),
-                   "ems_fioer: unrecognized IOSTAT value %d"
-                   " (compiler=%s)",
-                      *iostat, msgInfo->name );
+            tokenvalue = msg_printf("ems_fioer: unrecognized IOSTAT value %d"
+                                    " (compiler=%s)",
+                                    *iostat, msgInfo->name );
          } else {
-            strncpy( buf, msg, sizeof(buf) );
-            buf[sizeof(buf)-1] = '\0';  /* just in case */
+            tokenvalue = msg;
          }
       }
-      ems1Stok( ctok, buf );
+      ems1Stok( ctok, tokenvalue );
       
    } else if ( ( *iostat >= msgInfo->first_iostat )
                && ( *iostat <= msgInfo->last_iostat ) ) {
-      char buf[100];
-      SNPRINTF( buf, sizeof(buf),
-                "%s [%s]",
-                msgInfo->msgs[ *iostat - msgInfo->first_iostat ],
-                msgInfo->name );
-      ems1Stok( ctok, buf );
+      ems1Stok( ctok,
+                msg_printf("%s [%s]",
+                           msgInfo->msgs[ *iostat - msgInfo->first_iostat ],
+                           msgInfo->name ) );
 
    } else {
       /* The iostat value was not recognised.  It does not seem useful
@@ -193,11 +189,10 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
          was done before: if we've failed to recognise the error code,
          it's more likely that we've mixed up our compilers than that
          the system error code will be useful. */
-      char buf[100];
-      SNPRINTF( buf, sizeof(buf),
-                "ems_fioer: unrecognised IOSTAT value %d (compiler=%s)",
-                *iostat, msgInfo->name );
-      ems1Stok( ctok, buf );
+      ems1Stok( ctok,
+                msg_printf( "ems_fioer: unrecognised IOSTAT value %d "
+                            "(compiler=%s)",
+                            *iostat, msgInfo->name ) );
    }
 
    return;
@@ -376,7 +371,8 @@ static const MessageInfo* getMessageInfo(void)
  * /usr/include/foriosdef.f for Alpha platforms) with the error
  * messages in ems_fioer.c_dec_osf, omitting those codes which didn't
  * have a corresponding error message, and the IOS_EOF code, which is
- * negative.
+ * negative.  The list MUST remain in numerical order of the iostat
+ * codes, if bsearch(3) is to work.
  */ 
 static const char* alpha_iostat_lookup( const int iostat )
 {
@@ -517,3 +513,23 @@ static int compareIostatMessagePair(const void* key, const void* element)
    return p1->iostat - p2->iostat;
 }
 
+/*
+ * Like sprintf, but prints to an internal static buffer, which it
+ * returns a pointer to.
+ */
+static const char* msg_printf(const char* format, ...)
+{
+   va_list args;
+   static char buf[100];
+
+   va_start(args, format);
+#ifdef HAVE_VSNPRINTF
+   vsnprintf(buf, sizeof(buf), format, args);
+#elif defined HAVE_VSPRINTF
+   vsprintf(buf, format, args);
+#else
+#  error help! we have neither vsnprintf nor vsprintf
+#endif
+   va_end(args);
+   return (const char*)buf;
+}
