@@ -1,0 +1,33 @@
+<!-- -*- Mode: Text -*- -->
+<!-- 
+  Starlink SGML system, release notes
+  $Id$
+-->
+
+<subsect id=release-0.6 export>Release Notes, version DR-0.6
+
+<p>This is developers' release 0.6.
+
+<subsubsect>New in this release
+
+<p><ul>
+
+<li>The down-conversion is now driven by a script, <code/sgml2docs/,
+as described in <ref id=proc.sgml2docs>.  This required a non-trivial
+amount of internal rearrangement, none of which should be visible to
+authors.
+
+<li>Significantly upgraded the error handling in the case where a
+<code/docxref/ cross-reference target cannot be resolved.  The
+stylesheet does not complain in this case, but instead synthesises a
+reference to the RAL document server, as long as the public identifier
+is in the correct format.  Jade still gives a warning in this case
+(which it's not easy to turn off), but it doesn't invalidate the document.
+
+</ul>
+
+<subsubsect>Outstanding issues
+
+<p>There is now a defects list, available on the web at
+<url>http://www.astro.gla.ac.uk/users/norman/star/sgml/project/Defects</url>.
+
