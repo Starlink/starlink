@@ -1,7 +1,7 @@
       SUBROUTINE POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, PHI, ANLIND, T, 
-     :                       EPS, TVAR, NREJ, IGRP2, TOL, INDFO, INDFC, 
-     :                       MAXIT, NSIGMA, ILEVEL, HW, SETVAR, MNFRAC,
-     :                       DEZERO, ZERO, STATUS )
+     :                       EPS, TVAR, NREJ, IGRP2, TOL, TRIM, INDFO, 
+     :                       INDFC, MAXIT, NSIGMA, ILEVEL, HW, SETVAR, 
+     :                       MNFRAC, DEZERO, ZERO, STATUS )
 *+
 *  Name:
 *     POL1_SNGSV
@@ -85,6 +85,9 @@
 *        presumed to have converged. No more iterations are performed if
 *        convergence has been reached or it the maximum number of
 *        iterations (given by MAXIT) has been reached.
+*     TRIM = LOGICAL (Given)
+*        If .TRUE., the output NDF is trimmed to remove any borders of
+*        bad pixels.
 *     INDFO = INTEGER (Given)
 *        An NDF identifier for the output NDF in which to store the 
 *        I, Q and U values, relative to a reference direction parallel to
@@ -128,7 +131,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -137,6 +140,8 @@
 *  History:
 *     15-JAN-1999 (DSB):
 *        Original version.
+*     15-AUG-2000 (DSB):
+*        Added argument TRIM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -165,6 +170,7 @@
       INTEGER NREJ( NNDF )
       INTEGER IGRP2
       INTEGER TOL
+      LOGICAL TRIM
       INTEGER INDFO
       INTEGER INDFC
       INTEGER MAXIT
@@ -532,6 +538,14 @@
 
       END IF
 
+*  If required, trim the output NDF (and co-variance NDF) to exclude
+*  ant margins of bad pixels.
+      IF( TRIM ) THEN
+         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
+     :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+         CALL NDF_SBND( 3, LBND, UBND, INDFO, STATUS ) 
+         IF( VAR ) CALL NDF_SBND( 2, LBND, UBND, INDFC, STATUS ) 
+      END IF
 
 *  Tidy up
 *  =======
