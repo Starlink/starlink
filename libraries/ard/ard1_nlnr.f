@@ -105,6 +105,7 @@
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_RNDXC = INTEGER (Write)
 *           The RINDEX value passed to the ARD "drawing" routines.
 *        CMN_TYPEC = INTEGER (Write)
@@ -186,7 +187,7 @@
 *  hold exterior values. The pixels outside the interior bounding box
 *  already hold exterior values.
       CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
-     :                 UBINTB, %VAL( IPB ), STATUS )
+     :                 UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
       LBEXTB( 1 ) = VAL__MAXI
       LBINTB( 1 ) = VAL__MINI
 
@@ -332,7 +333,7 @@
 
 *  Reset all pixels so that they hold exterior values. 
             CALL ARD1_BXSET( NDIM, LBND, UBND, MSKSIZ, 0, LBINTB,
-     :                       UBINTB, %VAL( IPB ), STATUS )
+     :                       UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
 
 *  Extend the bounding box by a safety margin of 2 pixels.
             IF( LBINTB( 1 ) .NE. VAL__MINI .AND. 
@@ -412,7 +413,8 @@
             NBAD = AST_RESAMPLEI( GMAP, NDIM, LBIN, UBIN, DP, DP, 
      :                            AST__UINTERP, ARD1_UINTERP, PAR, 0, 
      :                            DPP*0.2, MXPIX, 0, NDIM, LBND, UBND, 
-     :                            LBINTB, UBINTB, %VAL( IPB ), DP, 
+     :                            LBINTB, UBINTB, 
+     :                            %VAL( CNF_PVAL( IPB ) ), DP,
      :                            STATUS )
 
          END IF

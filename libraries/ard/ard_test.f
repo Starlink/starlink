@@ -9,6 +9,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'GRP_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER NDIM
       PARAMETER ( NDIM = 2 )
@@ -45,7 +46,8 @@
 *  Create the mask.
       INDEX = 2
       CALL ARD_WORK( IGRP, NDIM, LBND, UBND, C, .FALSE., INDEX, 
-     :               %VAL( IP ), LBNDI, UBNDI, LBNDE, UBNDE, STATUS )
+     :               %VAL( CNF_PVAL( IP ) ), 
+     :               LBNDI, UBNDI, LBNDE, UBNDE, STATUS )
 
 *  Check the returned index is corect.
       IF( INDEX .NE. 4 ) THEN

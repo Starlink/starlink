@@ -51,6 +51,7 @@
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_MSKSC = INTEGER (Write)
 *           The MSKSIZ value passed to the ARD "drawing" routines.
 *        CMN_RNDXC = INTEGER (Write)
@@ -93,7 +94,8 @@
          PC( 4 ) = Y( I )
 
          CALL ARD1_LINFL( CMN_RNDXC, 2, CMN_LBNDC, CMN_UBNDC, CMN_MSKSC, 
-     :                    4, PC, %VAL( CMN_IPBC ), CMN_LBIBC, CMN_UBIBC, 
+     :                    4, PC, %VAL( CNF_PVAL( CMN_IPBC ) ), 
+     :                    CMN_LBIBC, CMN_UBIBC,
      :                    STATUS )
 
       END DO

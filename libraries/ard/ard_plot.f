@@ -79,6 +79,7 @@
 
 *  Global Constants:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_AWCS = INTEGER (Read and Write)
 *           A pointer to the application FrameSet.
 *        CMN_ADOM = CHARACTER*40 (Read and Write)
@@ -270,8 +271,8 @@
      :                    SZEXPR, SZOPND, INP, STATUS )
 
 *  Attempt to draw the region assuming it consists of a single keyword.
-         CALL ARD1_FPLOT( SZEXPR, %VAL( IPEXPR ), SZOPND, 
-     :                    %VAL( IPOPND ), OK, STATUS )
+         CALL ARD1_FPLOT( SZEXPR, %VAL( CNF_PVAL( IPEXPR ) ), SZOPND,
+     :                    %VAL( CNF_PVAL( IPOPND ) ), OK, STATUS )
 
 *  Clear the flag which prevents any Mapping being considered Linear.
          CMN_LINOK = .TRUE.  
@@ -286,7 +287,8 @@
 *  Fill the work array with integers representing the ARD description.
          RV = 2
          CALL ARD_WORK( IGRP, 2, LBND, UBND, VAL__BADR, .FALSE., 
-     :                  RV, %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :                  RV, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                  LBNDI, UBNDI, LBNDE, UBNDE,
      :                  STATUS )
 
 *  Re-instate the original application FrameSet and Domain.
@@ -309,10 +311,11 @@
             CALL PSX_CALLOC( 2*MAXPTS, '_DOUBLE', IPXY, STATUS )
 
 *  Contour this array at the specified integer value.
-            CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ), %VAL( IPMASK ), 
+            CALL ARD1_CNTDR( JPLOT, DIM( 1 ), DIM( 2 ), 
+     :                       %VAL( CNF_PVAL( IPMASK ) ),
      :                       LBNDI( 1 ), LBNDI( 2 ), XSIZE, YSIZE, 
-     :                       REGVAL, MAXPTS, %VAL( IPXY ), 
-     :                       %VAL( IPDONE ), STATUS )
+     :                       REGVAL, MAXPTS, %VAL( CNF_PVAL( IPXY ) ),
+     :                       %VAL( CNF_PVAL( IPDONE ) ), STATUS )
 
 * Free the work space.
             CALL PSX_FREE( IPXY, STATUS )

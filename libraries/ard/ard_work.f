@@ -102,6 +102,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IGRP
@@ -256,7 +257,8 @@
 *  if there were no INPUT keywords in the supplied ARD description and
 *  if the CONCAT argument is .TRUE.
       CALL ARD1_CHECK( ( (.NOT. INP) .AND. CONCAT ), SZEXPR,
-     :                 %VAL( IPEXPR ), OUTSIZ, %VAL( IPEXP2 ), STATUS )
+     :                 %VAL( CNF_PVAL( IPEXPR ) ), OUTSIZ, 
+     :                 %VAL( CNF_PVAL( IPEXP2 ) ), STATUS )
 
 *  Get work space needed to convert the algebraic expression to reverse
 *  polish form.
@@ -265,8 +267,10 @@
       CALL PSX_CALLOC( OUTSIZ, '_INTEGER', IPOPCO, STATUS )
 
 *  Convert the algebraic expression to reverse polish form.
-      CALL ARD1_ALTRP( OUTSIZ, %VAL( IPEXP2 ), %VAL( IPSTK ),
-     :                 %VAL( IPASTK ), %VAL( IPOPCO ), MXSTK, STATUS )
+      CALL ARD1_ALTRP( OUTSIZ, %VAL( CNF_PVAL( IPEXP2 ) ), 
+     :                 %VAL( CNF_PVAL( IPSTK ) ),
+     :                 %VAL( CNF_PVAL( IPASTK ) ), 
+     :                 %VAL( CNF_PVAL( IPOPCO ) ), MXSTK, STATUS )
 
 *  Abort if an error has occured.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -281,9 +285,13 @@
 
 *  Evaluate the ARD expression.
       CALL ARD1_EVAL( INDEX1, NDIM, LBND, UBND, OUTSIZ, SZOPND, MXSTK,
-     :                MSKSIZ, %VAL( IPOPCO), %VAL( IPOPND ), 
-     :                %VAL( IPMSTK ), %VAL( IPLSTE ), %VAL( IPUSTE ),
-     :                %VAL( IPLSTI ), %VAL( IPUSTI ), MASK, LBNDE,
+     :                MSKSIZ, %VAL( CNF_PVAL( IPOPCO )), 
+     :                %VAL( CNF_PVAL( IPOPND ) ),
+     :                %VAL( CNF_PVAL( IPMSTK ) ), 
+     :                %VAL( CNF_PVAL( IPLSTE ) ), 
+     :                %VAL( CNF_PVAL( IPUSTE ) ),
+     :                %VAL( CNF_PVAL( IPLSTI ) ), 
+     :                %VAL( CNF_PVAL( IPUSTI ) ), MASK, LBNDE,
      :                UBNDE, LBNDI, UBNDI, REGVAL, STATUS )
 
 *  Check for infinite bounding boxes (these are represented internally

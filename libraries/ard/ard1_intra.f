@@ -85,6 +85,7 @@
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_IPPAR = INTEGER (Read)
 *           Pointer to na array holding parameter values.
 *        CMN_FRMC = INTEGER (Read)
@@ -118,6 +119,7 @@
 *  Call a lower level routine which can access the parameter array.
       CALL ARD1_INTRB( THIS, NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
      :                 NCOORD_OUT, OUTDIM, CMN_TYPEC, CMN_NPARC, 
-     :                 %VAL( CMN_IPPAR ), CMN_FRMC, OUT, STATUS )
+     :                 %VAL( CNF_PVAL( CMN_IPPAR ) ), 
+     :                 CMN_FRMC, OUT, STATUS )
 
       END

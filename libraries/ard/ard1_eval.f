@@ -130,6 +130,8 @@
 *        Original version.
 *     18-JUL-2001 (DSB):
 *        Modified for ARD version 2.0.
+*     31-AUG-2004 (TIMJ):
+*        Register the %LOC pointer with CNF prior to use..
 *     {enter_changes_here}
 
 *  Bugs:
@@ -145,6 +147,7 @@
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'CNF_PAR'          ! CNF_PREG
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD_ common blocks
@@ -193,6 +196,7 @@
      :        I,                 ! Loop count
      :        IOP,               ! Index of current value in OPCODE
      :        IOPND,             ! Pointer into OPRNDS array
+     :        IPNTR,             ! Pointer from STACK subsection
      :        LEX0( ARD__MXDIM ),! Supplied mask bounding box low limits
      :        LIN0( ARD__MXDIM ),! Supplied mask bounding box low limits
      :        NEWTOS,            ! TOS after executing the instruction
@@ -202,6 +206,7 @@
      :        UIN0( ARD__MXDIM ) ! Supplied mask bounding box hi. limits
 
       LOGICAL
+     :        ISNEWREG,          ! Was the pointer registered?
      :        LOADED             ! Has the supplied mask been loaded?
 
 
@@ -383,12 +388,29 @@
 *  Load the array described by the corresponding keyword onto the
 *  top-of-stack.
                TOS = TOS + 1
+
+*  First we need a pointer from the STACK variable. This code is 64bit
+*  friendly, need to translate to an INTEGER and register with CNF
+               IPNTR = CNF_PREG( %LOC( STACK( 1, TOS ) ), ISNEWREG )
+               IF (IPNTR .EQ. 0 .OR. CNF_PVAL(IPNTR) .EQ. 0) THEN
+                  IF ( STATUS .EQ. SAI__OK ) THEN
+                     STATUS = SAI__ERROR
+                     CALL ERR_REP( 'ARD1_EVAL_ERR3B',
+     :                    'Unable to register work pointer with CNF',
+     :                    STATUS )
+                     GO TO 999
+                  END IF
+               END IF
+
                CALL ARD1_LKR( INDEX1, NDIM, LBND, UBND, MSKSIZ, MASK,
      :                        OPNSIZ, IOPND, LEX0, UEX0, LIN0, UIN0, 
-     :                        OPRNDS, %LOC( STACK( 1, TOS ) ),
+     :                        OPRNDS, IPNTR,
      :                        LEXSTK( 1, TOS ), UEXSTK( 1, TOS ),
      :                        LINSTK( 1, TOS ), UINSTK( 1, TOS ),
      :                        LOADED, RINDEX, STATUS )
+
+*  Release the %LOC pointer from CNF so that it can be re-used
+               IF (ISNEWREG .AND. IPNTR .NE. 0) CALL CNF_UNREGP( IPNTR )
 
 *  Update the maximum value assigned to a keyword.
                IF( RINDEX .GT. INDEX ) INDEX = RINDEX

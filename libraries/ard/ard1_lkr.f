@@ -146,6 +146,7 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'ARD_CONST'        ! ARD_ private constants
       INCLUDE 'ARD_ERR'          ! ARD_ error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDEX1
@@ -262,7 +263,8 @@
 
 *  WHOLE keywords...
       IF( TYPE .EQ. ARD__WHO ) THEN
-         CALL ARD1_WHO( RINDEX, NDIM, MSKSIZ, %VAL( IPB ), LBEXTB, 
+         CALL ARD1_WHO( RINDEX, NDIM, MSKSIZ, %VAL( CNF_PVAL( IPB ) ), 
+     :                  LBEXTB,
      :                  UBEXTB, LBINTB, UBINTB, STATUS )
 
 *  INPUT keywords...
@@ -271,7 +273,8 @@
 *  Copy the mask values and find the mask bounding boxes if they have
 *  not already been found.
          CALL ARD1_LSM( NDIM, LBND, UBND, MSKSIZ, MASK, LOADED,
-     :                  %VAL( IPB ), LEX0, UEX0, LIN0, UIN0, STATUS )
+     :                  %VAL( CNF_PVAL( IPB ) ), 
+     :                  LEX0, UEX0, LIN0, UIN0, STATUS )
 
 *  Copy the mask bounding boxes.
          DO I = 1, NDIM
@@ -289,7 +292,8 @@
       ELSE IF( LINEAR ) THEN 
          CALL ARD1_LNR( RINDEX, TYPE, NDIM, LBND, UBND, MSKSIZ, NPAR, 
      :                  OPRNDS( IPAR ), OPRNDS( ICOEFF ), IAST( 1 ),
-     :                  %VAL( IPB ), LBEXTB, UBEXTB, LBINTB, UBINTB, 
+     :                  %VAL( CNF_PVAL( IPB ) ), 
+     :                  LBEXTB, UBEXTB, LBINTB, UBINTB,
      :                  STATUS )
 
 *  Now deal with non-linear Mappings. Ensure we have room for at least 

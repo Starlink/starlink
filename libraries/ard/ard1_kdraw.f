@@ -95,6 +95,7 @@
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_MSKSC = INTEGER (Write)
 *           The MSKSIZ value passed to the ARD "drawing" routines.
 *        CMN_RNDXC = INTEGER (Write)
@@ -165,7 +166,8 @@
 *  mark the pixel in which they fall.
       IF( TYPE .EQ. ARD__POI .OR. TYPE .EQ. ARD__PIX ) THEN
          CALL ARD1_POI2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                   IWCS, %VAL( IPB ), LBEXTB, UBEXTB, LBINTB, 
+     :                   IWCS, %VAL( CNF_PVAL( IPB ) ), 
+     :                   LBEXTB, UBEXTB, LBINTB,
      :                   UBINTB, STATUS )
 
 *  Non-2D LINE keywords cannot be handled using AST (see below), so
@@ -175,8 +177,9 @@
       ELSE IF( TYPE .EQ. ARD__LIN .AND. NDIM .NE. 2 ) THEN
          CALL PSX_CALLOC( NDIM*NLP, '_DOUBLE', IPW1, STATUS )
          CALL ARD1_LIN2( RINDEX, NDIM, LBND, UBND, MSKSIZ, NPAR, PAR,
-     :                   NLP, IWCS, %VAL( IPB ), LBEXTB, UBEXTB, LBINTB, 
-     :                   UBINTB, %VAL( IPW1 ), STATUS )
+     :                   NLP, IWCS, %VAL( CNF_PVAL( IPB ) ), 
+     :                   LBEXTB, UBEXTB, LBINTB,
+     :                   UBINTB, %VAL( CNF_PVAL( IPW1 ) ), STATUS )
          CALL PSX_FREE( IPW1, STATUS )
 
 *  All other cases are handled by the graphics facilities of the AST Plot

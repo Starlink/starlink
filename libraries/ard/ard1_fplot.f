@@ -75,6 +75,7 @@
 
 *  Global Constants:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_IPPAR = INTEGER (Write)
 *           Pointer to na array holding parameter values.
 *        CMN_NPARC = INTEGER (Write)
@@ -295,9 +296,11 @@
 *  region parameters, and copy them.
          CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS ) 
          IF( OTYPE .NE. ARD__ROT ) THEN
-            CALL ARD1_COPYD( NPAR, OPND( IPAR ), %VAL( IPPAR ), STATUS )
+            CALL ARD1_COPYD( NPAR, OPND( IPAR ), 
+     :                       %VAL( CNF_PVAL( IPPAR ) ), STATUS )
          ELSE
-            CALL ARD1_COPYD( NPAR, RBPAR, %VAL( IPPAR ), STATUS )
+            CALL ARD1_COPYD( NPAR, RBPAR, %VAL( CNF_PVAL( IPPAR ) ), 
+     :                       STATUS )
          END IF
 
 *  Store information needed by the IntraMap transformation routine

@@ -53,6 +53,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'ARD_CONST'        ! ARD private constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER VALUE
@@ -77,7 +78,8 @@
       END IF         
 
 *  Store the value.
-      CALL ARD1_PUTI( VALUE, SIZE, NEXT, %VAL( PNTR ), STATUS )
+      CALL ARD1_PUTI( VALUE, SIZE, NEXT, %VAL( CNF_PVAL( PNTR ) ), 
+     :                STATUS )
 
 *  Increment the index at which the next value will be stored.
       NEXT = NEXT + 1

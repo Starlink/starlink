@@ -92,6 +92,7 @@
 
 *  Global Variables:
       INCLUDE 'ARD_COM'          ! ARD common blocks
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_IPPAR = INTEGER (Write)
 *           Pointer to na array holding parameter values.
 *        CMN_NPARC = INTEGER (Write)
@@ -167,14 +168,14 @@
 *  hold exterior values. The pixels outside the interior bounding box
 *  already hold exterior values. 
       CALL ARD1_BXSET( 2, LBND, UBND, MSKSIZ, 0, LBINTB,
-     :                 UBINTB, %VAL( IPB ), STATUS )
+     :                 UBINTB, %VAL( CNF_PVAL( IPB ) ), STATUS )
 
 *  We create an AST IntraMap defining the Mapping from distance along a
 *  curve to user coordinates. This IntrMap needs to know how all about
 *  the region being drawn. Allocate memory for a copy of the supplied
 *  region parameters, and copy them.
       CALL PSX_CALLOC( NPAR, '_DOUBLE', IPPAR, STATUS ) 
-      CALL ARD1_COPYD( NPAR, PAR, %VAL( IPPAR ), STATUS )
+      CALL ARD1_COPYD( NPAR, PAR, %VAL( CNF_PVAL( IPPAR ) ), STATUS )
 
 *  Store information needed by the IntraMap transformation routine
 *  in common .
