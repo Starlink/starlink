@@ -115,7 +115,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 65 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 66 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -289,7 +289,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jan 19, 2004 5:35:52 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 20, 2004 5:32:30 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -545,4 +545,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/diva/build.xml:345: Compile failed; see the compiler error output for details.
 
-Total time: 1 minute 59 seconds
+Total time: 2 minutes 20 seconds

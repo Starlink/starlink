@@ -9116,6 +9116,7 @@ U java/source/util/src/main/uk/ac/starlink/util/URLUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/UncompressInputStream.java
 U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/gui
+U java/source/util/src/main/uk/ac/starlink/util/gui/AWTXMLEncodeAndDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFontChooser.java

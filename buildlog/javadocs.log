@@ -3747,6 +3747,11 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the dimension of the time series (i.e. the number of values
   [javadoc]   it contains)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:48: warning - The first sentence is interpreted to be:
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e. the
+  [javadoc]  time series of which this is a fit."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:169: warning - The first sentence is interpreted to be:
   [javadoc] "The TimeSeriesComp object associated with Periodogram, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -3998,6 +4003,11 @@ javadocs:
   [javadoc] "Make name absolute (i.e. start with leading "/")."
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/SinFit.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:14: Tag @see: Malformed: TimeSeries, FoldSeriesDialog
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/SinFit.java:48: warning - The first sentence is interpreted to be:
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The TimeSeriesComp object associated with the fit, i.e. the
+  [javadoc]  time series of which this is a fit."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:56: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:307: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/data/TimeSeries.html...
@@ -4225,7 +4235,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/FrogDebug.java:179: warning - Tag @see: reference not found: RunTime
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/Percentile.java:17: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/stylesheet.css...
-  [javadoc] 292 warnings
+  [javadoc] 294 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 43 seconds
+Total time: 4 minutes 6 seconds

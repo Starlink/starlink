@@ -24,7 +24,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 48 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 49 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -852,4 +852,4 @@ javadoc-sources:
   [javadoc] 190 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 15 seconds
+Total time: 1 minute 30 seconds
