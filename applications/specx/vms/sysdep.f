@@ -1,3 +1,7 @@
+*
+*  18-Mar-2003 (rpt)
+*               Modified UTRNLOG slightly. Added UPUTLOG
+*
 *-----------------------------------------------------------------------
 
       SUBROUTINE UGETVM (NBYTES, IPTR, STATUS)
@@ -56,29 +60,86 @@
 
 *-----------------------------------------------------------------------
 
-      SUBROUTINE UTRNLOG (LOGNAME, FILENAME, STATUS)
+      SUBROUTINE UTRNLOG (LOGNAME, VALUE, STATUS)
 
 *  Uses system services to find a translation for a logical name.
 
       IMPLICIT    NONE
+      INCLUDE 'PSX_ERR'
       INCLUDE 'SAE_PAR'
 
 *     Formal parameters:
 
       CHARACTER   LOGNAME*(*)
-      CHARACTER   FILENAME*(*)
+      CHARACTER   VALUE*(*)
       INTEGER     STATUS
+
+*  External Functions:
+      INTEGER GEN_ILEN
 
 *  Ok, go...
 
       STATUS = SAI__OK
 
-      CALL PSX_GETENV (LOGNAME, FILENAME, STATUS)
-
-      IF (STATUS.NE.SAI__OK) THEN
+      CALL PSX_GETENV (LOGNAME, VALUE, STATUS)
+      
+      IF (STATUS.NE.SAI__OK .AND. STATUS.NE.PSX__NOENV) THEN
         PRINT *, ' -- utrnlog --'
         PRINT *, '    bad status in PSX_GETENV = ', STATUS
       END IF
+
+      RETURN
+      END
+
+*-----------------------------------------------------------------------
+
+      SUBROUTINE UPUTLOG (LOGNAME, VALUE, STATUS)
+
+*  Uses system services to find set a logical name. It checks the result
+*  by reading the variable back.
+
+      IMPLICIT    NONE
+      INCLUDE 'PSX_ERR'
+      INCLUDE 'SAE_PAR'
+
+*     Formal parameters:
+
+      CHARACTER     LOGNAME*(*)
+      CHARACTER     VALUE*(*)
+      INTEGER       STATUS
+
+      CHARACTER*132 VALUE2
+
+*  External Functions:
+      INTEGER GEN_ILEN
+
+*  Ok, go...
+      CALL PSX_PUTENV( LOGNAME, VALUE, STATUS )
+
+*     Now check that it worked  
+      IF (STATUS .EQ. SAI__OK) THEN
+
+*        We stored something
+         CALL UTRNLOG( LOGNAME, VALUE2, STATUS )
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            PRINT *, '   Logical ',
+     &           LOGNAME(:GEN_ILEN(LOGNAME)),
+     &           ' now set to: "',VALUE2(:GEN_ILEN(VALUE2)),'"'
+         ELSE
+            PRINT *, ' -- uputlog --'
+            PRINT *, 
+     &      '    Error reading back environment variable ',
+     &      LOGNAME(:GEN_ILEN(LOGNAME))
+         END IF
+      ELSE
+        PRINT *, ' -- uputlog --'
+        PRINT *, '    Error setting ',
+     &           LOGNAME(:GEN_ILEN(LOGNAME)),
+     &           ' environment variable'
+        PRINT *, '    bad status in PSX_PUTENV = ', STATUS
+
+      ENDIF
 
       RETURN
       END
