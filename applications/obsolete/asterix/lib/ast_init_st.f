@@ -14,7 +14,7 @@
 *-
 
 *    Initialize USI_CMN
-      CALL USI_INIT()
+c      CALL USI_INIT()
 
 *    Initialize DYN_CMN
       CALL DYN_INIT()
