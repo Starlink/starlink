@@ -1,0 +1,84 @@
+#+
+#  Name:
+#     kappa.sty
+
+#  Purpose:
+#     An example of a file containing a description of a coloured
+#     plotting style which can be used for day-to-day work by KAPPA 
+#     graphical application.
+
+#  Description:
+#     KAPPA graphical applications such as CONTOUR, DISPLAY, etc, allow
+#     the appearance of certain parts of the plot (annotated axes,
+#     contours, keys, etc) to be specified using a text file containing 
+#     settings for plotting attributes. The name of such a file can be
+#     supplied for the relevant application parameter. For instance, the
+#     STYLE parameter is usually used to specify the appearance of
+#     annotated axes.
+#
+#     This file is an example of the way in which this facility can be
+#     used. It contains general settings which could be applicable for 
+#     any data plot. Data-specific versions could be produced by editing
+#     copies of this file to include such things as the title to be
+#     displayed at the top of the plot (using the Title attribute), or 
+#     the format for numerical axis labels (using the Format or Digits
+#     attributes).
+#
+#     This file produces a coloued plotting style suitable for day-to-day
+#     work. The file $KAPPA_DE/pub.sty produces a plotting style more 
+#     suited to publications.
+
+#  Example:
+#     display style=$KAPPA_DIR/style.def
+#        This runs the DISPLAY application, creating annotated axes with
+#        the appearance specified in this file. Note, subsequent
+#        invocations of DISPLAY will use the same file until a new value
+#        is assigned to parameter STYLE. Most style parameters within
+#        KAPPA work in this way. If the user has write access to the
+#        specified file, then it could be edited between invocations
+#        of DISPLAY to produce different plotting styles.
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     28-AUG-1998 (DSB):
+#        Original version.
+#-
+
+#  Speed up plotting of borders, grids, etc, by reducing the Tol attribute.
+      tol=0.002
+
+#  Always draw a border around the regions of the plot containing
+#  valid co-ordinates. Make it slightly wider than its default width.
+      border=1
+      width(border)=0.01
+
+#  Always include textual labels describing the axes.
+      textlab=1
+
+#  Set colours for various elements of the plot.
+      colour(border)=blue
+      colour(grid)=green
+      colour(ticks)=green
+      colour(numlab)=cyan
+      colour(axes)=green
+
+#  Set colours for plot elements used by individual applications.
+      colour(contour)=yellow
+
+#  Set the size of the text to use for numerical and textual axis labels.
+#  These are slightly smaller than the default sizes of 1.0.
+      size(numlab)=0.8
+      size(textlab)=0.9
+
+#  Set the gaps between the axes and the associated textual labels. The default
+#  is 0.01.
+      textlabgap(1)=0.03
+      textlabgap(2)=0.03
+
+#  Make the ticks marks (both major and minor) longer. The defaults are
+#  0.015 for major ticks and 0.007 for minor ticks.
+      majticklen=0.025
+      minticklen=0.012

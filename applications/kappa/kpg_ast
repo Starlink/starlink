@@ -1,0 +1,79 @@
+*+
+*  Name:
+*     KPG_AST
+
+*  Purpose:
+*     Define the KPG library AST common block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file contains definitions of AST-related global variables used 
+*     internally by the KPG library for things such as local communication 
+*     between the KPG library and the "source" and "sink" routines used to 
+*     read and write AST_ data from/to HDS objects, GRP groups, etc.
+
+*  Prior Requirements:
+*     The DAT_PAR include file should be included prior to this file, in 
+*     order to define constants which are needed here.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-FEB-1998( DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Variables:
+*  ================
+
+*  GRP group identifier.
+      INTEGER ASTGRP
+
+*  Maximum length of text to be stored in a GRP element.
+      INTEGER ASTTSZ
+
+*  HDS object locator.
+      CHARACTER * ( DAT__SZLOC ) ASTLC
+
+*  Line number of text being read/written.
+      INTEGER ASTLN
+
+*  Pointer to mapped HDS _CHAR array data.
+      INTEGER ASTPT
+
+*  GRP identifier for a group holding psynonyms for AST attributes.
+      INTEGER ASTING
+
+*  GRP identifier for a group holding corresponding AST attribute names.
+      INTEGER ASTOUG
+
+*  Number of defined psynonyms.
+      INTEGER ASTNPS
+
+*  Character to prepend to each line when writing an AST Object to a GRP group.
+      CHARACTER ASTGSP*1
+
+*  Common Blocks:
+*  =============
+
+*  Non-character data.
+      COMMON /KPG_AST1/ ASTLN, ASTPT, ASTGRP, ASTTSZ, ASTING, ASTOUG,
+     :                  ASTNPS
+
+*  Character data.
+      COMMON /KPG_AST2/  ASTLC, ASTGSP
+
+*  Save common block contents.
+      SAVE /KPG_AST1/
+      SAVE /KPG_AST2/
+
+*.
