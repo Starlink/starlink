@@ -3159,10 +3159,9 @@
 *  Local Variables:
       REAL			PFX(-MAXPT:MAXPT)
       REAL			PFXN(-MAXPT:MAXPT)
-      REAL			PFXR(-MAXPT:MAXPT)
       REAL	       		PFY(-MAXPT:MAXPT)
-      REAL			WORKC((MAXDEG*2)+1)
-      REAL			WORKA(MAXDEG+2,MAXDEG+2)
+      REAL			WRKC((MAXDEG*2)+1)
+      REAL			WRKA(MAXDEG+2,MAXDEG+2)
       REAL			SUMSQ, YFIT
       REAL			COEFFS(MAXDEG+2)
 
