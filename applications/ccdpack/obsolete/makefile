@@ -230,6 +230,8 @@
 #        Modified for changes required to use AST/WCS information in NDFs.
 #     15-MAR-1999 (MBT):
 #        Changed order of .SUFFIXES list so failed .gen files don't mess up.
+#     1-APR-1999 (MBT):
+#        Fixed a bug in helptask linking.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -1276,7 +1278,7 @@ $(MONOLITH5): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 #  Rule for creating HELPTASK.
 
 $(HELPTASK) : $(HELPTASK).o lib$(HELPTASK).a
-	$(ALINK) $(ADDLIBS) $(HELPTASK).o lib$(HELPTASK).a
+	$(ALINK) $(HELPTASK).o $(ADDLIBS) lib$(HELPTASK).a
 
 #  Rules for building the help libraries.
 
