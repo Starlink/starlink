@@ -190,7 +190,7 @@
          J = 1
  2       CONTINUE
          IF ( USED( J ) ) THEN 
-            IF ( J .LT. NDF__MXDIM ) THEN
+            IF ( J .LT. NDIMI ) THEN
                J = J + 1
                GO TO 2
             END IF
@@ -319,7 +319,7 @@
          J = 1
  1       CONTINUE
          IF ( AXES( J ) .EQ. 0 ) THEN
-            IF ( J .LT. NDF__MXDIM ) THEN
+            IF ( J .LT. NDIMO ) THEN
                J = J + 1
                GO TO 1
             END IF
