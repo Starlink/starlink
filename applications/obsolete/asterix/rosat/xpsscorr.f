@@ -104,7 +104,6 @@
       INTEGER     EAPTR2             ! Pointer to exposure map axis 2
 
       LOGICAL     ERRORS             ! Flux errors present in input?
-      LOGICAL     INPRIM             ! Is input primitive ?
       LOGICAL     OK                 ! Dataset ok?
       LOGICAL     SYM_ERRORS         ! Symmetric flux errors?
       LOGICAL     LWIRE              ! Correct for wires ?
