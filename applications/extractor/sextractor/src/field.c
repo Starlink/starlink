@@ -9,7 +9,7 @@
 *
 *	Contents:	Handling of field structures.
 *
-*	Last modify:	14/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -44,7 +44,7 @@ picstruct	*newfield(char *filename, int flags, int nok)
    picstruct	*field;
    catstruct	*cat;
    tabstruct	*tab;
-   OFF_T	mefpos;
+   OFF_T	mefpos = 0;		/* To avoid gcc -Wall warnings */
    int		nok2, ntab;
 
 /* Move to nok'th valid FITS image extension */

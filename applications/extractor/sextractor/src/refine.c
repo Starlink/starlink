@@ -9,7 +9,7 @@
 *
 *	Contents:	functions to refine extraction of objects.
 *
-*	Last modify:	02/04/2003
+*	Last modify:	27/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,7 +20,7 @@
 
 #include	<math.h>
 #include	<stdlib.h>
-#include        <string.h>      /* PWD: change here */
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -108,7 +108,7 @@ int	parcelout(objliststruct *objlistin, objliststruct *objlistout)
 
         for (i=0; i<objlist[k-1].nobj; i++)
           {
-          if (out=lutz(objlistin,l,&objlist[k-1].obj[i], &debobjlist)
+          if ((out=lutz(objlistin,l,&objlist[k-1].obj[i], &debobjlist))
 			==RETURN_FATAL_ERROR)
             goto exit_parcelout;
 
@@ -289,6 +289,7 @@ int	gatherup(objliststruct *objlistin, objliststruct *objlistout)
 
   objlistout->plist = pixelout;
   k = objlistout->npix;
+  iclst = 0;				/* To avoid gcc -Wall warnings */
   for (pixt=pixelin+objin->firstpix; pixt>=pixelin;
 	pixt=pixelin+PLIST(pixt,nextpix))
     {

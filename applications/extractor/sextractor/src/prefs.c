@@ -9,7 +9,7 @@
 *
 *	Contents:	Functions to handle the configuration file.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -195,7 +195,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
           case P_BOOL:
             if (!value || value[0]==(char)'#')
               error(EXIT_FAILURE, keyword," keyword has no value!");
-            if (cp = strchr("yYnN", (int)value[0]))
+            if ((cp = strchr("yYnN", (int)value[0])))
               *(int *)(key[nkey].ptr) = (tolower((int)*cp)=='y')?1:0;
             else
               error(EXIT_FAILURE, keyword, " value must be Y or N");
@@ -216,7 +216,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
               {
               if (i>=key[nkey].nlistmax)
                 error(EXIT_FAILURE, keyword, " has too many members");
-              if (cp = strchr("yYnN", (int)value[0]))
+              if ((cp = strchr("yYnN", (int)value[0])))
                 ((int *)(key[nkey].ptr))[i] = (tolower((int)*cp)=='y')?1:0;
               else
                 error(EXIT_FAILURE, keyword, " value must be Y or N");
@@ -354,13 +354,13 @@ int     cistrcmp(char *cs, char *ct, int mode)
   if (mode)
     {
     for (i=0; cs[i]&&ct[i]; i++)
-      if (diff=tolower((int)cs[i])-tolower((int)ct[i]))
+      if ((diff=tolower((int)cs[i])-tolower((int)ct[i])))
         return diff;
     }
   else
     {
     for (i=0; cs[i]||ct[i]; i++)
-      if (diff=tolower((int)cs[i])-tolower((int)ct[i]))
+      if ((diff=tolower((int)cs[i])-tolower((int)ct[i])))
         return diff;
     }
 
@@ -421,6 +421,8 @@ void	useprefs()
     else
       prefs.naper = naper;
     }
+  else
+    naper = 0;			/* To avoid gcc -Wall warnings */
 
 /* Find the largest "minimum margin" necessary for apertures */
   prefs.cleanmargin = 0;
@@ -559,27 +561,27 @@ void	useprefs()
   if (!strcmp(prefs.cat_name, "STDOUT"))
     prefs.pipe_flag = 1;
 
-  if (str=strrchr(prefs.filter_name, '/'))
+  if ((str=strrchr(prefs.filter_name, '/')))
     strcpy(thecat.filter_name, str+1);
   else
     strcpy(thecat.filter_name, prefs.filter_name);
 
-  if (str=strrchr(prefs.prefs_name, '/'))
+  if ((str=strrchr(prefs.prefs_name, '/')))
     strcpy(thecat.prefs_name, str+1);
   else
     strcpy(thecat.prefs_name, prefs.prefs_name);
 
-  if (str=strrchr(prefs.nnw_name, '/'))
+  if ((str=strrchr(prefs.nnw_name, '/')))
     strcpy(thecat.nnw_name, str+1);
   else
     strcpy(thecat.nnw_name, prefs.nnw_name);
 
-  if (str=strrchr(prefs.image_name[prefs.nimage_name-1], '/'))
+  if ((str=strrchr(prefs.image_name[prefs.nimage_name-1], '/')))
     strcpy(thecat.image_name, str+1);
   else
     strcpy(thecat.image_name, prefs.image_name[prefs.nimage_name-1]);
 
-  sprintf(thecat.soft_name, "%s%s", BANNER, VERSION);
+  sprintf(thecat.soft_name, "%s %s", BANNER, VERSION);
 
   return;
   }

@@ -13,6 +13,7 @@
 *	Last modify:	12/11/99
 *                       20/03/00 (PWD): Added userradii function.
 *                       20/02/02 (PWD): Added X_PIXEL and Y_PIXEL calcs.
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -41,6 +42,8 @@
 #include	"photom.h"
 #include	"psf.h"
 #include	"retina.h"
+
+static obj2struct	*obj2 = &outobj2;
 
 /********************************* analyse ***********************************/
 void  analyse(picstruct *field, picstruct *dfield, int objnb,
@@ -103,13 +106,15 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
     dfield = field;
 
 /* Prepare computation of positional error */
-  if (errflag=FLAG(obj.poserr_mx2))
+  esum = emx2 = emy2 = emxy = 0.0;
+  if ((errflag=FLAG(obj.poserr_mx2)))
     {
     dbacknoise2 = dfield->backsig*dfield->backsig;
-    esum = emx2 = emy2 = emxy = 0.0;
     xm = obj->mx;
     ym = obj->my;
     }
+  else
+    xm = ym = dbacknoise2 = 0.0;	/* to avoid gcc -Wall warnings */
 
   pospeakflag = FLAG(obj.peakx);
   profflag = FLAG(obj.flux_prof);
@@ -118,23 +123,29 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
   photoflag = (prefs.detect_type==PHOTO);
   gainflag = PLISTEXIST(var) && prefs.weightgain_flag;
 
+  h = minarea = prefs.ext_minarea;
+
 /* Prepare selection of the heap selection for CLEANing */
-  if (cleanflag = prefs.clean_flag)
+  if ((cleanflag = prefs.clean_flag))
     {
-    if (obj->fdnpix < (minarea = prefs.ext_minarea))
+    if (obj->fdnpix < minarea)
       {
       obj->mthresh = 0.0;
       cleanflag = 0;
+      heapt = heap = NULL;		/* to avoid gcc -Wall warnings */
       }
     else
       {
-      h = minarea = prefs.ext_minarea;
       QMALLOC(heap, float, minarea);
       heapt = heap;
       }
     }
   else
+    {
     obj->mthresh = 0.0;
+    heapt = heap = NULL;		/* to avoid gcc -Wall warnings */
+    }
+
 
 /* Measure essential isophotal parameters in the measurement image... */
   tv = sigtv = profflux = proffluxvar = 0.0;
@@ -317,12 +328,12 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
 
 /* Put objects in "segmentation check-image" */
 
-  if (check = prefs.check[CHECK_SEGMENTATION])
+  if ((check = prefs.check[CHECK_SEGMENTATION]))
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
       ((USHORT *)check->pix)[check->width*PLIST(pixt,y)+PLIST(pixt,x)]
 		= (USHORT)obj->number;
 
-  if (check = prefs.check[CHECK_OBJECTS])
+  if ((check = prefs.check[CHECK_OBJECTS]))
     for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
       ((PIXTYPE *)check->pix)[check->width*PLIST(pixt,y)+PLIST(pixt,x)]
 		= PLIST(pixt,value);
@@ -462,7 +473,7 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 
 /*-- Check-image CHECK_APERTURES option */
 
-    if (check = prefs.check[CHECK_APERTURES])
+    if ((check = prefs.check[CHECK_APERTURES]))
       {
       if (FLAG(obj2.flux_aper))
         for (i=0; i<prefs.naper; i++)
@@ -558,7 +569,7 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 
     newnumber = ++thecat.ntotal;
 /*-- update segmentation map */
-    if (check=prefs.check[CHECK_SEGMENTATION])
+    if ((check=prefs.check[CHECK_SEGMENTATION]))
       {
        USHORT	*pix;
        USHORT	newsnumber = newnumber,

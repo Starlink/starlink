@@ -21,6 +21,7 @@
 *                       08/01/03: Fixed a double free of pointer.
 *	Last modify:	16/12/2002
 *                                 (EB) for 2.3.
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -284,7 +285,6 @@ Initialize the catalog header
 */
 void	initcat(void)
   {
-   tabstruct	*tab, *asctab;
    keystruct	*key;
    int		i, n;
 
@@ -371,7 +371,6 @@ void	reinitcat(picstruct *field)
   {
    tabstruct	*tab, *asctab;
    keystruct	*key;
-   int		i, n;
 
   if (prefs.cat_type == CAT_NONE)
     return;
@@ -476,8 +475,6 @@ Terminate the catalog output.
 void	endcat()
   {
    keystruct	*key;
-   tabstruct	*tab;
-   char		*head;
    int		i;
 
   switch(prefs.cat_type)
@@ -530,7 +527,6 @@ void	reendcat()
    tabstruct	*tab;
    OFF_T	pos;
    char		*head;
-   int		i;
 
   switch(prefs.cat_type)
     {
@@ -541,6 +537,7 @@ void	reendcat()
 
     case FITS_LDAC:
       end_writeobj(fitscat, objtab);
+      key = NULL;
       if (!(tab=fitscat->tab->prevtab)
 	|| !(key=name_to_key(tab, "Field Header Card")))
         error(EXIT_FAILURE,"*Error*: cannot update table ", "ASCFIELD");
@@ -560,9 +557,10 @@ void	reendcat()
       end_writeobj(fitscat, objtab);
       fitswrite(fitscat->tab->headbuf,"SEXNDET ",&thecat.ndetect,H_INT,T_LONG);
       fitswrite(fitscat->tab->headbuf,"SEXNFIN ",&thecat.ntotal, H_INT,T_LONG);
-      QFSEEK(fitscat->file, 0, SEEK_SET, fitscat->filename);
+      QFTELL(fitscat->file, pos, fitscat->filename);
+      QFSEEK(fitscat->file, fitscat->tab->headpos, SEEK_SET,fitscat->filename);
       save_tab(fitscat, fitscat->tab);
-      free_cat(&fitscat,1);
+      QFSEEK(fitscat->file, pos, SEEK_SET, fitscat->filename);
       break;
 
     case CAT_NONE:

@@ -353,7 +353,7 @@ typedef struct
   char		filter_name[MAXCHAR];			/* Filter name */
   char		soft_name[MAXCHAR];			/* Sextractor version*/
 /*----- time */
-  char		ext_date[12],ext_time[12];		/* date and time */
+  char		ext_date[16],ext_time[16];		/* date and time */
   double	ext_elapsed;				/* processing time */
 /*----- MEF */
   int		currext;				/* current extension */

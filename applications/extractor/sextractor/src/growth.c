@@ -9,7 +9,7 @@
 *
 *	Contents:	Make growth curves.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	28/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -21,7 +21,7 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
-#include        <string.h>   /* PWD: change here */
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -32,6 +32,7 @@
 
 static double	*growth;
 static int	ngrowth;
+static obj2struct	*obj2 = &outobj2;
 
 /******************************** initgrowth *********************************/
 /*
@@ -80,6 +81,8 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
 
   if (wfield)
     wthresh = wfield->weight_thresh;
+  else
+    wthresh = 0.0;		/* To avoid gcc -Wall warnings */
 
 /* Clear the growth-curve buffer */
   memset(growth, 0, (size_t)(GROWTH_NSTEP*sizeof(double)));
@@ -123,7 +126,11 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
     ngamma = field->ngamma;
     pdbkg = exp(obj->dbkg/ngamma);
     }
-
+  else
+    {
+    ngamma = 0.0;
+    pdbkg = 0.0;
+    }
   tv = sigtv = area = 0.0;
   scaley = scalex = 1.0/GROWTH_OVERSAMP;
   scale2 = scalex*scaley;
@@ -156,6 +163,7 @@ void	makeavergrowth(picstruct *field, picstruct *wfield, objstruct *obj)
     }
 
   strip = field->strip;
+  wstrip = wstript = NULL;		/* To avoid gcc -Wall warnings */
   if (wfield)
     wstrip = wfield->strip;
   for (y=ymin; y<ymax; y++)

@@ -1,6 +1,3 @@
-May 13, 2003
-
-This is V2.3 of SExtractor.
 SExtractor stands for ``Source Extractor'': a software for making
 catalog of sources from astronomical images.
 Multi-Extension FITS is now supported. Binary output catalogs are also MEFs.
@@ -10,13 +7,6 @@ given source was detected. Check-images will also be written as MEFs if the
 input image is a MEF.
 - The (main) default config file can be dumped by typing "sex -d". Secondary
 configuration files like default.param are still needed, though.
-
-SExtractor is:
-Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001 Emmanuel Bertin
-
-SExtractor is free software, and is distributed under the terms of the
-GNU General Public License.  See the file COPYING in this distribution
-for more information.
 
 In case of problems, questions or suggestions related to the software,
 please don't hesitate to send a mail (preferably in english) to the
