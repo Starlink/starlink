@@ -309,6 +309,9 @@
 #        - Add GZIP compression
 #        - Add SURF_CONDITIONS
 #        - Fix bug in version.dat deinstall
+#      29-OCT-2001 (TIMJ):
+#        - Begin the move to kaplibs
+#        - Up version to 1.6-8
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -492,7 +495,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.6-7
+PKG_VERS = 1.6-8
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -562,8 +565,7 @@ PRIVATE_INCLUDES = $(SURF_INC) $(KAP_INC)
 
 SURF_INC = surf_par
 
-KAP_INC = ctm_com ctm_par hlpcmd kpg_ast kpg_par lpg_com \
-lpg_const grf.h
+KAP_INC = hlpcmd
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -597,21 +599,7 @@ surf_add_dbm.f surf_remip.f surf_request_output_coords.f surf_scuclkerr.f
 SURF_FCPP_ROUTINES = surf_write_map_info.F surf_set_app_name.F
 
 KAP_F_ROUTINES = \
-gethlp.f gthlpi.f pthlpo.f sread.f \
-kpg1_scrsz.f kpg1_plot.f kpg1_agatc.f kpg1_agref.f \
-kpg1_asref.f kpg1_asffr.f kpg1_aspsy.f kpg1_asset.f \
-kpg1_pgcls.f kpg1_plota.f kpg1_asmrg.f kpg1_plotp.f \
-kpg1_plotn.f kpg1_plots.f kpg1_verb.f \
-kpg1_gtgrp.f kpg1_flpth.f kpg1_assts.f \
-kpg1_pgopn.f kpg1_agfnd.f kpg1_gdget.f kpg1_gdold.f \
-kpg1_gdnew.f kpg1_gdput.f kpg1_lasto.f kpg1_assty.f \
-kpg1_pllod.f kpg1_asreg.f kpg1_wread.f kpg1_asplt.f \
-kpg1_asagd.f kpg1_gdwin.f kpg1_wwrt.f kpg1_fit1d.f kpg1_litrd.f \
-kpg1_prnth.f kpg1_short.f kpg1_pgcol.f kpg1_plget.f \
-kpg1_aslog.f kpg1_rdast.f kpg1_wrast.f kpg1_plcip.f \
-kpg1_h2ast.f kpg1_ast2h.f kpg1_nmcol.f kpg1_pgsht.f \
-kpg1_pgsty.f \
-lpg_assoc.f  lpg_state.f lpg1_init.f lpg1_ptpar.f
+gethlp.f gthlpi.f pthlpo.f sread.f
 
 SURFLIB_F_ROUTINES = \
 surflib_calc_gridij.f surflib_diff_despike.f surflib_fill_grid.f \
@@ -692,7 +680,7 @@ sculib_calc_clockerr.f sculib_rad2string.f sculib_mjd_to_dateobs.f
 
 BLOCK_DATA = $(KAPGEN_BLOCK_DATA)
 
-KAPGEN_BLOCK_DATA = ctm_xcols.f
+KAPGEN_BLOCK_DATA =
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -710,7 +698,7 @@ PF_SUB2 =
 
 C_ROUTINES = $(KAP_C_ROUTINES) $(SCULIB_C_ROUTINES)
 
-KAP_C_ROUTINES = kpg1_trmsz.c grf_kappa.c lpg1_rm.c
+KAP_C_ROUTINES = 
 
 SCULIB_C_ROUTINES = 
 
@@ -1955,65 +1943,10 @@ surflib_read_ipfile.o: FIO_ERR SAE_PAR PRM_PAR
 surflib_trim_image.o: SAE_PAR NDF_FUNC
 surflib_remove_dc_via_sect.o: SAE_PAR PRM_PAR MSG_PAR
 
-ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
-kpg1_agatc.o: DAT_PAR SAE_PAR
-kpg1_agfnd.o: DAT_PAR SAE_PAR
-kpg1_agref.o: DAT_ERR DAT_PAR SAE_PAR
-kpg1_asagd.o: SAE_PAR
-kpg1_asffr.o: AST_PAR NDF_PAR SAE_PAR
-kpg1_aslog.o: AST_PAR SAE_PAR
-kpg1_asmrg.o: AST_PAR SAE_PAR
-kpg1_asplt.o: AST_PAR SAE_PAR
-kpg1_aspsy.o: DAT_PAR GRP_PAR KPG_AST SAE_PAR
-kpg1_asref.o: DAT_PAR NDF_PAR PAR_PAR SAE_PAR
-kpg1_asreg.o: AST_PAR SAE_PAR
-kpg1_asset.o: AST_PAR GRP_PAR PAR_ERR PSX_ERR SAE_PAR
-kpg1_assts.o: AST_ERR AST_PAR GRP_PAR SAE_PAR
-kpg1_assty.o: CTM_PAR DAT_PAR GRP_PAR KPG_AST SAE_PAR
-kpg1_ast2h.o: SAE_PAR
-kpg1_fit1d.o: PRM_PAR SAE_PAR
-kpg1_flpth.o: SAE_PAR
-kpg1_gdget.o: AGI_PAR AST_PAR DAT_PAR SAE_PAR
-kpg1_gdnew.o: AST_PAR SAE_PAR
-kpg1_gdold.o: AGI_PAR SAE_PAR
-kpg1_gdput.o: AST_PAR DAT_PAR PRM_PAR SAE_PAR
-kpg1_gdwin.o: SAE_PAR
-kpg1_gtgrp.o: GRP_PAR PAR_ERR SAE_PAR
-kpg1_h2ast.o: SAE_PAR
-kpg1_lasto.o: SAE_PAR
-kpg1_litrd.o: PRM_PAR SAE_PAR
-kpg1_nmcol.o: CTM_COM CTM_PAR SAE_PAR
-kpg1_pgcls.o: SAE_PAR
-kpg1_pgcol.o: SAE_PAR
-kpg1_pgopn.o: SAE_PAR
-kpg1_plcip.o: CTM_PAR SAE_PAR
-kpg1_plget.o: SAE_PAR
-kpg1_pllod.o: CTM_PAR DAT_ERR DAT_PAR SAE_PAR
-kpg1_plota.o: AST_PAR PAR_ERR SAE_PAR
-kpg1_plot.o: AST_PAR SAE_PAR
-kpg1_plotn.o: AST_PAR SAE_PAR
-kpg1_plotp.o: SAE_PAR
-kpg1_plots.o: AST_PAR SAE_PAR
-kpg1_prnth.o: SAE_PAR
-kpg1_rdast.o: AST_PAR DAT_PAR KPG_AST KPG_PAR SAE_PAR
-kpg1_scrsz.o: SAE_PAR
-kpg1_short.o: SAE_PAR
-kpg1_verb.o: PSX_ERR SAE_PAR
-kpg1_wrast.o: AST_PAR DAT_PAR KPG_AST KPG_PAR SAE_PAR
-kpg1_wread.o: AST_PAR DAT_PAR KPG_AST KPG_PAR SAE_PAR
-kpg1_wwrt.o: AST_PAR DAT_PAR KPG_AST KPG_PAR SAE_PAR
-kpg1_pgsht.o: SAE_PAR
-kpg1_pgsty.o: SAE_PAR AST_PAR
-lpg1_init.o: DAT_PAR GRP_PAR LPG_COM LPG_CONST
-lpg1_ptpar.o: DAT_PAR GRP_PAR SAE_PAR
-lpg_assoc.o: DAT_PAR GRP_PAR LPG_COM LPG_CONST NDF_PAR PAR_ERR SAE_PAR SUBPAR_PAR
-lpg_state.o: DAT_PAR LPG_COM LPG_CONST SAE_PAR
 pthlpo.o: HLPCMD SAE_PAR
 sread.o:
-
-grf_kappa.o: grf.h
 
 #-------------------------------------------------------------------------------
 #
