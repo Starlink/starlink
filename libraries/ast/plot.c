@@ -370,6 +370,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *       grfAttrs:Modified to test element attributes explicitly using the
 *       relevant TestUse<attr> functions, instead of relying on the
 *       "GetUse<attr>" function returning the NO<attr> constant if not set.
+*       - Modified Axplot so that SkyFrames positions which are out of
+*       their normal ranges are not rejected by Map1.
 *class--
 */
 
@@ -2890,8 +2892,8 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     description will be included in the descriptive label for that
 *     axis, otherwise it will be omitted.  The default behaviour is to
 *     include a unit description unless the current Frame of the Plot
-*     is a SkyFrame (i.e. a celestial coordinate system), in which
-*     case it is omitted.
+*     is a SkyFrame representing equatorial, ecliptic, galactic or
+*     supergalactic coordinates, in which case it is omitted.
 
 *  Applicability:
 *     Plot
@@ -2913,7 +2915,6 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 /* Are textual labels to include a string describing the axis units? Has a 
 value of -1 when not set yielding a default of 1. */
 MAKE_CLEAR(LabelUnits,labelunits,-1,2)
-MAKE_GET(LabelUnits,int,1,( this->labelunits[axis] == -1 ? 1 : this->labelunits[axis] ),2)
 MAKE_TEST(LabelUnits,( this->labelunits[axis] != -1 ),2)
 MAKE_SET(LabelUnits,int,labelunits,( value ? 1 : 0 ),2)
 
@@ -9874,6 +9875,10 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 *     guard against the supplied array of axis values not entirely covering
 *     the range of axis values in the plotting area.
 *
+*     For SkyFrames, positions which have latitude values outside the
+*     normal ranges are ignored. Longitude ranges are not checked to
+*     avoid problems with CAR projections.
+*
 *     The returned tick mark values are placed into their primary domain
 *     using the Norm1 method, but are NOT normalised using the astNorm
 *     method for the supplied Frame. Duplicate tick marks values are
@@ -9960,6 +9965,22 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       nticks = FindMajTicks2( nfill, gap, centre, ngood, data, &ticks );
       lnfill = nfill;
       nfill = (int) (0.1*(double) nticks );
+   }
+
+/* Check latitude values for SkyFrames. */
+   if( astIsASkyFrame( frame ) ){
+      if( axis == astGetLatAxis( frame ) ) {
+         r = ticks;
+         for( k = 0; k < nticks; k++ ){
+            if( *r != AST__BAD ) {
+               val[ axis ] = *r;
+               val[ 1 - axis ] = refval;
+               astNorm( frame, val );
+               if( !EQUAL( val[ axis ], *r ) ) *r = AST__BAD;
+            }
+            r++;
+         }
+      }
    }
 
 /* Use the Mapping to place each tick mark value in its primary domain.
@@ -10846,6 +10867,91 @@ f        The global status.
 /* Return. */
    return;
 
+}
+
+static int GetLabelUnits( AstPlot *this, int axis ) {
+/*
+*  Name:
+*     GetLabelUnits
+
+*  Purpose:
+*     Return the value of the LabelUnits attribute for a Plot axis.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int GetLabelUnits( AstPlot *this, int axis ) 
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+*     This function returns the value of the LabelUnits attribute for a 
+*     Plot axis, supplying a suitable default if not set.
+
+*  Parameters:
+*     this
+*        The Plot.
+*     axis
+*        The axis index (zero based).
+
+*  Returned Value:
+*     The attribute value.
+
+*/
+
+/* Local Variables: */
+   AstFrame *fr;           /* The current Frame in the Plot */
+   AstFrame *primframe;    /* The primary Frame holding the requested axis */
+   AstSkySystemType system;/* The SkyFrame System attribute */
+   int primaxis;           /* Index of requested axis in the primary frame */
+   int ret;                /* The returned value */
+
+/* Initialise. */
+   ret = 0;
+
+/* Check global status. */
+   if( !astOK ) return ret;
+
+/* If a value has been set, return it. */
+   ret = this->labelunits[ axis ];
+
+/* If no value has been set, find a default. */
+   if( ret == -1 ) {
+
+/* Assume "no" for any SkyAxis axes within the current frame of the Plot, 
+   and "yes" for other axes. Get a pointer to the current Frame of the
+   Plot. */
+      fr = astGetFrame( this, AST__CURRENT );
+
+/* The current Frame may be a CmpFrame. So find the primary Frame containing 
+   the requested axis. The primary Frame is guaranteed not to be a CmpFrame. */
+      astPrimaryFrame( fr, axis, &primframe, &primaxis );
+
+/* If the primary Frame is a SkyFrame representing equatorial, ecliptic,
+   galactic or supergalactic coords, use a default of "no" for LabelUnits.
+   Otherwise use a defaul of "yes". */
+      ret = 1;
+      if( astIsASkyFrame( primframe ) ) {
+        system = astGetSystem( primframe );
+        if( system == AST__FK4 ||
+            system == AST__FK4_NO_E ||
+            system == AST__FK5 ||
+            system == AST__GAPPT ||
+            system == AST__ECLIPTIC ||
+            system == AST__GALACTIC ||
+            system == AST__SUPERGALACTIC ) ret = 0;
+      }
+
+/* Annul the frame pointers. */
+      primframe = astAnnul( primframe );
+      fr = astAnnul( fr );
+   }
+
+/* Return the answer. */
+   return ret;
 }
 
 static void GFlush( AstPlot *this, const char *method, 
@@ -13447,22 +13553,9 @@ f        The global status.
       border = edgeticks;
    }
 
-/* See if the Units string is to be inluded in the label. If no value has
-   been set for LabelUnits, assume no for any SkyAxis axes within the 
-   current frame of the Plot, and yes for other axes. */
-   fr = astGetFrame( this, AST__CURRENT );
-
-   for( axis = 0; axis < 2; axis++ ) {
-      if( astTestLabelUnits( this, axis ) ){
-         dounits[ axis ] = astGetLabelUnits( this, axis );
-      } else {
-         ax = astGetAxis( fr, axis );
-         dounits[ axis ] =  astIsASkyAxis( ax ) ? 0 : 1 ;
-         ax = astAnnul( ax );
-      }
-   }
-
-   fr = astAnnul( fr );
+/* See if the Units string is to be inluded in the label. */
+   dounits[ 0 ] =  astGetLabelUnits( this, 0 );
+   dounits[ 1 ] =  astGetLabelUnits( this, 1 );
 
 /* The rest is not done if no output is required. */
    if( ink ) {
@@ -13715,6 +13808,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 */
 
 /* Local Variables: */
+   AstFrame *fr;          /* Pointer to current Frame */
    TickInfo **info;       /* Returned array of two TickInfo pointers */
    double *lengths;       /* Pointer to lengths of each curve section */
    double *starts;        /* Pointer to start of each curve section */
@@ -13722,6 +13816,7 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    int i;                 /* Tick mark index */
    int j;                 /* Axis index */
    int k;                 /* Section index */
+   int lonax;             /* Index of longitude axis, or -1 */
    int nticks;            /* Number of tick marks */
 
 /* Check the global status. */
@@ -13763,6 +13858,12 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
    next tick mark (23:59:59 in the RA example) and extends upto the next
    missing tick mark, or the last tick mark if none are missing. */
 
+/* If the current Frame is a SkyFrame, note the index of the longitude
+   axis. */
+      fr = astGetFrame( this, AST__CURRENT );
+      lonax = astIsASkyFrame( fr ) ? astGetLonAxis( fr ) : -1;
+      fr = astAnnul( fr );
+
 /* Find the start and length of each section of the curve for each tick
    mark on axis "j". */
       for( j = 0; j < 2 && astOK; j++ ){
@@ -13800,6 +13901,13 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 
 /* Record the length of the section. */
                lengths[ k ] = ticks[ i - 1 ] - starts[ k ];   
+
+/* The section is extended at start and end by one gap in order to "cover
+   up the joins". This is only done for the latitude axes of SkyFrames. */
+               if( j != lonax ) {
+                  starts[ k ] -= gap[ 1 - j];
+                  lengths[ k ] += 2.0*gap[ 1 - j ]; 
+               }
 
 /* The section is extended at start and end by one gap in order to "cover
    up the joins". */
@@ -23442,6 +23550,11 @@ int astCvBrk_( AstPlot *this, int ibrk, double *brk, double *vbrk,
                    double *len ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,Plot,CvBrk))(this,ibrk,brk,vbrk,len);
+}
+
+int astGetLabelUnits_( AstPlot *this, int axis ){
+   if( !astOK ) return 0;
+   return (**astMEMBER(this,Plot,GetLabelUnits))(this,axis);
 }
 
 void astMark_( AstPlot *this, int nmark, int ncoord, int indim,

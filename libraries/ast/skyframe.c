@@ -91,6 +91,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added astBear method.
 *     21-SEP-2001 (DSB):
 *        Removed astBear method.
+*     10-OCT-2002 (DSB):
+*        Moved definitions of macros for SkyFrame system values from
+*        this file into skyframe.h.
 *class--
 */
 
@@ -100,21 +103,6 @@ f     The SkyFrame class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS SkyFrame
-
-/* Values used to represent different System attribute values. */
-#define AST__NOSKYSYSTEM   0
-#define AST__FK4           1
-#define AST__FK4_NO_E      2
-#define AST__FK5           3
-#define AST__GAPPT         4
-#define AST__ECLIPTIC      5
-#define AST__GALACTIC      6
-#define AST__SUPERGALACTIC 7
-#define AST__UNKNOWN       8
-
-/* These are used to validate System attribute values. */
-#define AST__SKYSYSTEM_FIRST AST__FK4
-#define AST__SKYSYSTEM_LAST  AST__UNKNOWN
 
 /* Header files. */
 /* ============= */

@@ -315,6 +315,9 @@
 *     3-APR-2001 (DSB):
 *        Added "Unknown" option for the System attribute. Added read-only
 *        attributes LatAxis and LonAxis.
+*     10-OCT-2002 (DSB):
+*        Moved definitions of macros for SkyFrame system values into
+*        this file from skyframe.c.
 *-
 */
 
@@ -324,6 +327,30 @@
 /* ---------------------- */
 #include "object.h"              /* Base Object class */
 #include "frame.h"               /* Parent Frame class */
+
+/* Macros. */
+/* ======= */
+
+#if defined(astCLASS)            /* Protected */
+
+/* Values used to represent different System attribute values. */
+#define AST__NOSKYSYSTEM   0
+#define AST__FK4           1
+#define AST__FK4_NO_E      2
+#define AST__FK5           3
+#define AST__GAPPT         4
+#define AST__ECLIPTIC      5
+#define AST__GALACTIC      6
+#define AST__SUPERGALACTIC 7
+#define AST__HPC           8
+#define AST__HPR           9
+#define AST__UNKNOWN       10
+
+/* These are used to validate System attribute values. */
+#define AST__SKYSYSTEM_FIRST AST__FK4
+#define AST__SKYSYSTEM_LAST  AST__UNKNOWN
+
+#endif
 
 /* Type Definitions. */
 /* ================= */
