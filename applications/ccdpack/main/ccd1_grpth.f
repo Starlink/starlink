@@ -62,6 +62,10 @@
 *  History:
 *     14-APR-1999 (MBT):
 *        Original version.
+*     20-MAR-2001 (MBT):
+*        Added a check which prevented it taking far too long for large
+*        and highly connected graphs (don't recurse unless current path
+*        is shorter than shortest yet).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -204,9 +208,10 @@
                FAIL = CYCLIC
             END IF
 
-*  If investigation of this edge is not conclusive, recurse further
+*  If investigation of this edge is not conclusive, and the path
+*  is not longer than the best candidate yet, recurse further 
 *  into it.
-            IF ( .NOT. ( SUCCES .OR. FAIL ) ) THEN
+            IF ( .NOT. ( SUCCES .OR. FAIL ) .AND. STEP .LT. NSTEP ) THEN
                NODEC = WORK( 2, STEP )
                WORK2( STEP ) = I
                STEP = STEP + 1
