@@ -3725,7 +3725,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         Y=Y-YC
 
 *  rotate to frame parallel with slice axes
-        THETA=ATAN2(Y,X)
+        THETA=ATAN2(ABS(Y),ABS(X))
         DISP=SQRT(X**2 + Y**2)
         X=DISP*COS(ANGLE-THETA)
         Y=DISP*SIN(ANGLE-THETA)
@@ -4095,7 +4095,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           B=SQRT(BSQ)
           CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
           ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
-          WIDTH=A*SIN(ALPHA)
+          WIDTH=2.0*A*SIN(ALPHA)
 
 *  keyboard mode
         ELSE
