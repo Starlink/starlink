@@ -155,29 +155,10 @@
 *  Initialise ASTERIX
       CALL AST_INIT()
 
-*  Tidy up
-      CALL AST_CLOSE()
-      CALL AST_ERR( STATUS )
-
-      END
-
-
-
-*  Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MEANDAT version 1')
-*-
-
-*    Version id
-      CALL MSG_PRNT( VERSION )
-
-*    ASTERIX initialisation
-      CALL AST_INIT()
-
-*    Initialise variables
-      LVAR=.TRUE.
-      LQUAL=.TRUE.
-      DO LP=1,ADI__MXDIM
+*  Initialise variables
+      LVAR = .TRUE.
+      LQUAL = .TRUE.
+      DO LP = 1, ADI__MXDIM
          DIMS(LP)=1
          TDIMS(LP)=1
       ENDDO
