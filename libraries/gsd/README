@@ -37,6 +37,9 @@ turn being defined in "makefile".
 % mk export
    As export_source, but includes built files as well.
 
+% mk archive
+   Create the gsd_source.tar archive that is required before
+   a Starlink build or export_source
 
 
 Different platforms
