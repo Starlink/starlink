@@ -147,6 +147,12 @@
 *        transformed data (of the first NDF) will appear in the output
 *        NDF.
 *        [Dynamic default]
+*     USEWCS = _LOGICAL (Read)
+*        If TRUE then the transformation which is to be applied to the
+*        NDF is stored in the NDF's WCS extension. If FALSE then the
+*        transformation is either stored as a TRN structure in the
+*        NDF's CCDPACK extension (.MORE.CCDPACK.TRANSFORM), or is
+*        supplied by the user (see the INEXT parameter). [TRUE]
 
 *  Examples:
 *     tranndf '*' '*-trn' reset
@@ -172,7 +178,9 @@
 
 *  Implementation Status:
 *     - Flux conservation can only be applied to constant-determinant
-*       or linear transformations.
+*       or linear transformations. Since we currently can't tell 
+*       whether AST Mappings are linear, flux conservation is turned
+*       off when using WCS.
 *     - The NDF components are processed by this application as
 *       follows:
 *        -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
@@ -180,6 +188,8 @@
 *        -  QUALITY is not derived from the input NDF for a linearly
 *           interpolated NDF. The DATA and VARIANCE arrays are
 *           resampled.
+*        -  If USEWCS is .TRUE. then the NDF WCS extension is updated
+*           and propogated, otherwise it will merely be propogated
 *     -  Bad pixels, including automatic quality masking, are supported.
 *     -  All non-complex numeric data types are supported.
 *     -  There can be an arbitrary number of NDF dimensions.
@@ -212,6 +222,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PDRAPER: Peter Draper (STARLINK)
+*     AALLAN: Alasdair Allan (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -227,6 +238,17 @@
 *        Updated for CCDPACK version 2.0.
 *     25-JUN-1998 (PDRAPER):
 *        Stopped quality bad flag from being set (isn't possible).
+*     11-MAR-1999 (AALLAN):
+*        Added USEWCS parameter (.TRUE. for AST, .FALSE. for TRN).
+*        Converted TRANNDF to use AST FrameSets rather than TRN structures.
+*     14-APR-1999 (AALLAN):
+*        Ongoing tweaks to conversion.
+*     03-MAY-1999 (AALLAN):
+*        Turned off flux conservation (NORM = .FALSE.) for AST FrameSets.
+*        Now deals only in the current frame, warns in AST__CURRENT != CCD_REG.
+*        Other minor changes.
+*     17-MAY-1999 (AALLAN):
+*        Final tweaks for shipping.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -245,6 +267,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'TRN_PAR'          ! TRANSFORM constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
+      INCLUDE 'AST_PAR'          ! AST parameters
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -268,10 +291,11 @@
       CHARACTER * ( DAT__SZLOC ) LOCTR ! Locator to the transformation
       CHARACTER * ( DAT__SZTYP ) DTYPE ! NDF output array type
       CHARACTER * ( DAT__SZTYP ) ITYPE ! NDF array implementation type
+      CHARACTER * ( 50 ) TEXT       ! Temporary string for message output
       DOUBLE PRECISION AEND( NDF__MXDIM ) ! End co-ord of each axis
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start co-ord of each axis
-      DOUBLE PRECISION COIN( 0:NDF__MXDIM, NDF__MXDIM ) ! Input coordinates for determinant finding
-      DOUBLE PRECISION COOUT( 0:NDF__MXDIM, NDF__MXDIM ) ! Output coordinates for determinant finding
+      DOUBLE PRECISION COIN( 0:NDF__MXDIM, NDF__MXDIM ) ! Input coord for determinant finding
+      DOUBLE PRECISION COOUT( 0:NDF__MXDIM, NDF__MXDIM ) ! Output coord for determinant finding
       DOUBLE PRECISION DDLBND( NDF__MXDIM ) ! Data coordinate lower bounds of output NDF
       DOUBLE PRECISION DDUBND( NDF__MXDIM ) ! Data coordinate upper bounds of output NDF
       DOUBLE PRECISION FLUX      ! Flux conservation factor
@@ -286,14 +310,17 @@
       INTEGER BMAX( NDF__MXDIM ) ! Maximum upper bounds of output NDF
       INTEGER CADIMS( NDF__MXDIM ) ! Number of elements in concatenated- axis vector
       INTEGER CAXPTR             ! Pointer to the concatenated axes
+      INTEGER CFRAME            ! Index value of the current AST Frame
       INTEGER DLBND( NDF__MXDIM ) ! Default bounds of the output NDF
       INTEGER DUBND( NDF__MXDIM ) ! Default bounds of the output NDF
       INTEGER EL                 ! Number of elements in higher dims
       INTEGER ELIN               ! Number of elements in input array
       INTEGER ELOUT              ! Number of elements in output array
+      INTEGER FRCUR              ! Pointer to the Current AST Frame
+      INTEGER FRNEW             ! Pointer to the New AST Frame
       INTEGER GIDIN              ! Input NDF group identifier
       INTEGER GIDOUT             ! Output NDF group identifier
-      INTEGER I                  ! Loop counter
+      INTEGER I, J                  ! Loop counter
       INTEGER IAXIS              ! Loop counter through the axes
       INTEGER ICOMP              ! Loop counter through array components
       INTEGER IDIMS( NDF__MXDIM ) ! Dimensions of the input NDF
@@ -305,11 +332,18 @@
       INTEGER INPNTR             ! Pointer to nearest-neighbour list
       INTEGER IPNTR( 2 )         ! Pointers to the input arrays
       INTEGER IUBND( NDF__MXDIM ) ! Upper bounds of the input NDF
+      INTEGER IWCS               ! Pointer to the WCS extension of the input NDF
+      INTEGER JREG              ! Index of the CCD_REG frame in the input NDF
+      INTEGER JGEN              ! Index of the CCD_GEN frame in the input NDF
+      INTEGER JPIX              ! Index of the PIXEL frame in the output NDF
+      INTEGER MPCUR             ! Pointer to current mapping between CURRENT and PIXEL domains
+      INTEGER MPINV             ! Inverse map of MPCUR
       INTEGER NBAD               ! Number of bad elements in output array
       INTEGER NDIMI              ! Number of dimensions in input NDF
       INTEGER NNDF               ! Number of NDFs to process
       INTEGER NVIN               ! Number of input variables in the transformation
       INTEGER NVOUT              ! Number of output variables in the transformation
+      INTEGER OWCS              ! Pointer to the WCS extension of the output NDF
       INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of the output NDF
       INTEGER OLBND( NDF__MXDIM ) ! Lower bounds of the output NDF
       INTEGER OPNTR( 2 )         ! Pointers to the output arrays
@@ -318,6 +352,7 @@
       INTEGER SHADEF( NDF__MXDIM ) ! Suggested default output NDF shape upper bound
       INTEGER TRIDF              ! Identifier to the forward input transformation
       INTEGER TRIDI              ! Identifier to the inverse input transformation
+      INTEGER UMAP               ! Identifier for AST unit map
       INTEGER VARI               ! Dummy input variance
       INTEGER WDIMS( 2 )         ! Workspace dimensions
       INTEGER WKID4              ! Workspace identifier
@@ -330,10 +365,16 @@
       LOGICAL CONSRV             ! If true, the flux will be altered
       LOGICAL INEXT              ! Locate transform structure in NDF extensions
       LOGICAL NORM               ! Conserve flux if true
+      LOGICAL SWCS               ! If true, then a WCS component is present in the NDF
       LOGICAL THERE              ! If true, the array component is present in the NDF
+      LOGICAL USEWCS               ! If true then we use AST FrameSet rather than TRN structure
       LOGICAL VAR                ! Variance array is present in NDF
       REAL VARR                  ! Dummy input variance
 
+      CHARACTER * ( 20 ) TEMP    
+
+*  Delcare Functions
+      
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
 
@@ -362,6 +403,9 @@
 *
 *  Start a new NDF context.
       CALL NDF_BEGIN
+      
+*  Start a new AST context
+      CALL AST_BEGIN( STATUS )
 
 *  Get the IRG group identifier for the NDFs.
       CALL CCD1_NDFGR( 'IN', 'READ', GIDIN, NNDF, STATUS )
@@ -373,17 +417,44 @@
 *  Get control parameters.
 *  =======================
 
+*  Are we using AST FrameSets or TRN structures?
+
+      CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
+      
+*  If using AST FrameSets then we can't tell whether we have linear
+*  or non-linear mappings, turn flux conservation OFF
+
+      IF ( USEWCS .AND. NORM) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS)
+         CALL CCD1_MSG( ' ',
+     : '  WARNING - Flux conservation is turned on but'/
+     :/' we are using AST FrameSets ', STATUS )
+         CALL CCD1_MSG( ' ',
+     : '            to transform the co-ordinates. If the'/
+     :/' transform is non-linear', STATUS )
+         CALL CCD1_MSG( ' ',
+     : '            then the flux levels will be incorrect.',STATUS)    
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+      ENDIF      
+
+      IF( .NOT. USEWCS ) THEN
+        
+*  The user wants to read data with the old TRN structures, shame on them!
+
 *  Does the user want transformation structures to be located in the NDF
 *  extensions or do they want to supply a single structure to transform
 *  all the NDFs.
-      CALL PAR_GET0L( 'INEXT', INEXT, STATUS )
+         CALL PAR_GET0L( 'INEXT', INEXT, STATUS )
 
 *  If we're not using the extension we need a transformation structure.
-      IF ( .NOT. INEXT ) THEN
+         IF ( .NOT. INEXT ) THEN
 
 *  User supplies a single locator to a transformation structure.
-         CALL DAT_ASSOC( 'TRANSFORM', 'READ', LOCTR, STATUS )
-      END IF
+            CALL DAT_ASSOC( 'TRANSFORM', 'READ', LOCTR, STATUS )
+            
+         END IF
+
+      ENDIF
 
 *  See if the user is happy with auto-sizing of the output bounds or
 *  whether they want to specify some (just one chance at this --
@@ -407,20 +478,36 @@
 
 *  If flux levels are conserved.
       IF ( NORM ) THEN
-         CALL CCD1_MSG( ' ', '  Total flux levels conserved', STATUS )
+         IF ( USEWCS ) THEN
+            CALL CCD1_MSG( ' ', '  Attempting to conserve flux levels', 
+     :                     STATUS )
+         ELSE
+            CALL CCD1_MSG( ' ', '  Total flux levels conserved', 
+     :                     STATUS )
+         ENDIF
       ELSE
          CALL CCD1_MSG( ' ', '  Total flux levels not conserved',
      :                  STATUS )
       END IF
 
-*  Are we using a structure from the NDFs or user?
-      IF ( INEXT ) THEN
+*  Are we using AST FrameSets or TRN structures?
+
+      IF( USEWCS ) THEN
          CALL CCD1_MSG( ' ',
-     :'  Using transform structures in NDF CCDPACK extensions', STATUS )
+     :'  Using AST FrameSet in NDF extensions', STATUS )
+     
       ELSE
-         CALL CCD1_MSG( ' ',
+     
+*  Are we using a TRN structure from the NDFs or user?
+         IF ( INEXT ) THEN
+            CALL CCD1_MSG( ' ',
+     :'  Using transform structures in NDF CCDPACK extensions', STATUS )
+         ELSE
+            CALL CCD1_MSG( ' ',
      :'  Using transform structure $STRUCT', STATUS )
-      END IF
+         END IF
+        
+      ENDIF
 
 *  Are we using auto-sizing or will the user get to specify a single
 *  extent for all NDFs?
@@ -455,49 +542,149 @@
      :                  STATUS )
          CALL CCD1_MSG( ' ',  ' ', STATUS )
 
-         IF ( INEXT ) THEN
+*  Decide whether we're using AST or TRN structres
+
+         IF ( USEWCS ) THEN
+                              
 *  Get the transformation associated with this NDF. This should be
-*  stored in the CCDPACK extension item TRANSFORM.
-*  First get a CCDPACK extension.
-            CALL CCD1_CEXT( IDIN, .FALSE., 'READ', LOCEXT, STATUS )
+*  stored in the WCS extention of the NDF.
 
-*  Now Look for a transformation structure.
-            IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
+*  First check that there is an existing WCS FrameSet
 
-*  If have one get a locator to it.
-               IF ( THERE ) THEN
-                  CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR, STATUS )
-               ELSE
-
-*  Failed to find component TRANSFORM.
-                  STATUS = SAI__ERROR
-                  CALL NDF_MSG( 'NDFNAME', IDIN )
-                  CALL ERR_REP( 'TRANNDF_NOEXT', '  NDF ^NDFNAME '//
-     :'does not have a TRANSFORM component in its CCDPACK extension',
-     :                          STATUS )
-                  GO TO 940
-               END IF
-            ELSE
-
-*  No extension structure. Set status and abort.
+            CALL NDF_STATE(IDIN, 'WCS', SWCS, STATUS)
+            IF( .NOT. SWCS ) THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDFNAME', IDIN )
-               CALL ERR_REP( 'TRANNDF_NOEXT',
-     : '  NDF ^NDFNAME does not have a CCDPACK extension', STATUS )
+               CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
+     :'does not have a WCS extension (try setting USEWCS to .FALSE.).',
+     :                       STATUS ) 
                GO TO 940
-            END IF
-         END IF
+            ENDIF  
+            
+*  It appears we have a WCS component, get a pointer to the current FrameSet
+            
+            CALL CCD1_GTWCS(IDIN, IWCS, STATUS)
+            FRCUR = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
+*  Get the index of the current frame for future use 
+
+            CFRAME = AST_GETI(IWCS, 'Current', STATUS)
+                                     
+         ELSE
+
+*  The user is back in the dark ages and insists that they want
+*  to use TRN structures, lets humour them.
+         
+            IF ( INEXT ) THEN
+*  Get the transformation associated with this NDF. This should be
+*  stored in the CCDPACK extension item TRANSFORM.
+
+*  First get a CCDPACK extension.
+               CALL CCD1_CEXT( IDIN, .FALSE., 'READ', LOCEXT, STATUS )
+
+*  Now Look for a transformation structure.
+               IF ( STATUS .EQ. SAI__OK ) THEN
+                 CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
+
+*  If have one get a locator to it.
+                 IF ( THERE ) THEN
+                    CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR, STATUS )
+                 
+                 ELSE
+
+*  Failed to find component TRANSFORM.
+                    STATUS = SAI__ERROR
+                    CALL NDF_MSG( 'NDFNAME', IDIN )
+                    CALL ERR_REP( 'TRANNDF_NOEXT', '  NDF ^NDFNAME '//
+     :'does not have a TRANSFORM component in its CCDPACK extension',
+     :                          STATUS )
+                     GO TO 940
+                 END IF
+               ELSE
+
+*  No extension structure. Set status and abort.
+                   STATUS = SAI__ERROR
+                 CALL NDF_MSG( 'NDFNAME', IDIN )
+                 CALL ERR_REP( 'TRANNDF_NOEXT',
+     : '  NDF ^NDFNAME does not have a CCDPACK extension', STATUS )
+                 GO TO 940
+               END IF
+            END IF
+            
+         END IF
+         
+                  
+*  We need to validate the transformations
+
+         IF( USEWCS ) THEN
+         
+*  We are using AST FrameSets
+*  ==========================
+
+*  Since AST transformations are linear in nature we do not need 
+*  to check whether flux conservation is turned on or off.
+
+*  Validate the transformation
+
+           IF ( IWCS .EQ. AST__NULL ) THEN
+               STATUS = SAI__ERROR
+               CALL NDF_MSG( 'NDFNAME', IDIN )
+               CALL ERR_REP( 'TRANNDF_NOAST', '  NDF ^NDFNAME '//
+     :'does not have a valid WCS extension.',STATUS ) 
+               GO TO 940 
+           ELSE IF (AST_GETC( IWCS,'Class',STATUS) .NE. 'FrameSet') THEN
+               STATUS = SAI__ERROR
+               CALL NDF_MSG( 'NDFNAME', IDIN )
+               CALL ERR_REP( 'TRANNDF_FRAME', '  NDF ^NDFNAME '//
+     :'does not have a WCS extention with class FrameSet.',STATUS)
+               GO TO 940             
+           ELSE 
+                              
+*  Make sure the user has actually run REGISTER, if not warn them
+
+               CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
+               CALL CCD1_FRDM( IWCS, 'CCD_GEN', JGEN, STATUS )
+              
+               IF( JREG .EQ. 0 ) THEN
+               
+*  There is no CCD_REG Frame, warn the user (bad things may happen!)
+
+                    CALL CCD1_MSG( ' ',
+     :'  WARNING - NDF does not have an AST CCD_REG Frame, '//
+     :'attempting alignment',STATUS)
+                    CALL CCD1_MSG( ' ',
+     :'            This image has not been processed by the '//
+     :'CCDPACK REGISTER program',STATUS)
+                    CALL CCD1_MSG( ' ',' ',STATUS)
+               ENDIF
+
+*  Tell the user which co-ordinate domain we'll be transforming too
+
+               CALL MSG_SETC('CURRENT', 
+     :                       AST_GETC(FRCUR, 'Domain', STATUS))
+               CALL CCD1_MSG(' ','  The current AST Frame has '//
+     :'domain ^CURRENT', STATUS )               
+           ENDIF
+
+*  Obtain the number of input and output co-ordinates for a Mapping
+
+           NVIN = AST_GETI(IWCS, 'Nin', STATUS)
+           NVOUT = AST_GETI(IWCS, 'Nout', STATUS)    
+                               
+         ELSE
+         
+*  We are using TRN structres
+*  ==========================
+           
 *  Now validate the transformation.  Need forward and backward
 *  transformations.
-         IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
-            CALL TRN_COMP( LOCTR, .TRUE., TRIDF, STATUS )
-            CALL TRN_COMP( LOCTR, .FALSE., TRIDI, STATUS )
+            IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
+                CALL TRN_COMP( LOCTR, .TRUE., TRIDF, STATUS )
+                CALL TRN_COMP( LOCTR, .FALSE., TRIDI, STATUS )
 
 *  Obtain the number of variables in the transformation.
-            CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GO TO 940
+                CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
+                IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  Inquire the classification of the transformation.
 *  =================================================
@@ -505,20 +692,22 @@
 *  Certain efficiencies gains can be made for certain types of
 *  transformation, mostly notably a linear transformation, where the
 *  flux conservation factor is a constant.
-            CALL TRN_GTCL( LOCTR, .TRUE., CLASS, STATUS )
+                CALL TRN_GTCL( LOCTR, .TRUE., CLASS, STATUS )
 
 *  Test if the transformation can be processed.
-            IF ( .NOT. CLASS( TRN__LIN   ) .AND.
-     :           .NOT. CLASS( TRN__CONDT ) .AND. NORM ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'TRANNDF_ERR',
+                IF ( .NOT. CLASS( TRN__LIN   ) .AND.
+     :               .NOT. CLASS( TRN__CONDT ) .AND. NORM ) THEN
+                    STATUS = SAI__ERROR
+                    CALL ERR_REP( 'TRANNDF_ERR',
      :     'TRANNDF: The transformation is non-linear, '/
      :     /'or does not have a constant determinant, and cannot be '/
      :     /'handled with flux conservation by this routine', STATUS )
-               GO TO 940
+                    GO TO 940
+                END IF
             END IF
-         END IF
-
+            
+          ENDIF   
+         
 *  Get the properties of the NDF.
 *  ==============================
 *  Dimensions.
@@ -526,6 +715,7 @@
 
 *  Bounds.
          CALL NDF_BOUND( IDIN, NDF__MXDIM, ILBND, IUBND, NDIMI, STATUS )
+                     
          IF ( STATUS .NE. SAI__OK ) GO TO 940
 
 *  Validate dimensions and number of input coordinates.
@@ -534,6 +724,7 @@
 *  Check that processing is possible.  The number of dimensions in the
 *  NDF must be at least the number of input variables for the
 *  transformation to be applied.
+        
          IF ( NVIN .GT. NDIMI .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', IDIN )
@@ -578,9 +769,19 @@
 *  an estimate of the extent of the output NDF's coordinates.  This
 *  assumes that the transformation does not move the innards of the
 *  input array to the outside of the output array.
-         CALL KPG1_TRBOD( NVIN, ASTART, AEND, TRIDF, NVOUT, DDLBND,
-     :                    DDUBND, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 940
+
+         IF ( USEWCS ) THEN
+*  We're using AST FrameSets, the KPG1_ASBOx routine does the same job
+*  as the AST_MAPBOX routine, probably should be changed to this at
+*  some point in the future.
+            CALL KPG1_ASBOD( NVIN, ASTART, AEND, IWCS, NVOUT, DDLBND,
+     :                       DDUBND, STATUS )             
+         ELSE
+*  We're using old fashioned TRN structures
+            CALL KPG1_TRBOD( NVIN, ASTART, AEND, TRIDF, NVOUT, DDLBND,
+     :                       DDUBND, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 940
+         ENDIF
 
 *  Set the bounds of the output NDF.
 *  =================================
@@ -591,6 +792,7 @@
 *  present. If same is specified then the output NDFs will have the
 *  same bounds as the input NDFs, otherwise the user will be prompted
 *  once for bounds which will apply to all output NDFs.
+
          IF ( SHAPE .EQ. 'SPECIFY' ) THEN
            IF ( INDEX .EQ. 1 ) THEN
 
@@ -665,7 +867,7 @@
 *  Find the length of the concatenated axes.
          CADIMS( 1 ) = 0
          DO IAXIS = 1, NVIN
-            CADIMS( 1 ) = CADIMS( 1 ) + AEL( IAXIS )
+           CADIMS( 1 ) = CADIMS( 1 ) + AEL( IAXIS )
          END DO
 
 *  Create some workspace for the concatenated array.
@@ -710,6 +912,20 @@
          CALL NDF_MSG( 'OUTNDF', IDOUT )
          CALL CCD1_MSG( ' ', '  Output NDF: ^OUTNDF', STATUS )
 
+*  Report the extent of the input NDF, useful if using shape=auto to compare
+*  with the ouptut NDF shape and see if something stupid is happening. 
+      DO IAXIS = 1, NVIN
+        CALL MSG_SETI( 'LOW', ILBND( IAXIS ) )
+        CALL MSG_SETI( 'HIGH', IUBND( IAXIS ) )
+        IF ( IAXIS .EQ. 1 ) THEN
+          CALL CCD1_MSG( 'INBOUNDS',
+     :'  Input NDF bounds : ^LOW to ^HIGH', STATUS )
+        ELSE 
+          CALL CCD1_MSG( 'INBOUNDS',
+     :'                   : ^LOW to ^HIGH', STATUS )      
+        END IF
+      END DO
+
 *  And report the actual extent of the output NDF (before creating
 *  an NDF of this actual extent - useful if shape=auto and funny
 *  transformation is being used).
@@ -730,13 +946,14 @@
          CALL NDF_SBND( NDIMI, OLBND, OUBND, IDOUT, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 940
 
+
 *  Find the flux-conservation factor.
 *  ==================================
 
 *  Find a constant determinant by transforming unit vectors along each
 *  dimension.
          IF ( NORM .AND. NVIN .EQ. NVOUT .AND.
-     :        ( CLASS( TRN__LIN ) .OR. CLASS( TRN__CONDT ) ) ) THEN
+     :      ( CLASS(TRN__LIN) .OR. CLASS(TRN__CONDT) .OR. USEWCS)) THEN
 
 *  First set the input coordinates to all zero.
             DO IAXIS = 1, NVIN
@@ -752,8 +969,13 @@
             EL = NVIN * NVIN + 1
 
 *  Apply the transformation.
-            CALL TRN_TRND( .FALSE., NDF__MXDIM + 1, NVIN, EL, COIN,
-     :                     TRIDF, NDF__MXDIM + 1, NVOUT, COOUT, STATUS )
+            IF( USEWCS ) THEN
+              CALL AST_TRANN(IWCS, EL, NVIN, NDF__MXDIM + 1, COIN,
+     :               .TRUE., NVOUT, NDF__MXDIM + 1, COOUT, STATUS)
+            ELSE
+              CALL TRN_TRND( .FALSE., NDF__MXDIM + 1, NVIN, EL, COIN,
+     :                  TRIDF, NDF__MXDIM + 1, NVOUT, COOUT, STATUS )
+            ENDIF
 
 *  Assign the Jacobian matrix.
             DO IAXIS = 1, NVIN
@@ -776,11 +998,13 @@
 
 *  No flux conservation.
             FLUX = 1.0D0
+            CALL CCD1_MSG( ' ', '  Flux is not conserved', STATUS )
          END IF
 
 *  See if there is any conservation of flux required.
          CONSRV = ABS( FLUX - 1.0D0 ) .GT. VAL__EPSD
          IF ( STATUS .NE. SAI__OK ) GO TO 940
+         
 
 *  Resample using the nearest-neighbour technique.
 *  ===============================================
@@ -810,11 +1034,17 @@
             CALL CCD1_MPTMP( INDID, 'WRITE', INPNTR, STATUS )
 
 *  Generate the list of vector indices for the resampling.
-            CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI, %VAL( CAXPTR ),
-     :                       WDIMS( 1 ), NVOUT, OLBND, ODIMS,
-     :                       %VAL( WPNTR1 ), %VAL( WPNTR3 ),
-     :                       %VAL( WPNTR2 ), %VAL( INPNTR ), STATUS )
-
+            IF( USEWCS ) THEN
+                CALL KPG1_ASPID( NDIMI, IDIMS, IWCS, %VAL( CAXPTR ),
+     :                        WDIMS( 1 ), NVOUT, OLBND, ODIMS,
+     :                        %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                        %VAL( WPNTR2 ), %VAL( INPNTR ), STATUS )            
+            ELSE
+                CALL KPG1_TRPID( NDIMI, IDIMS, TRIDI, %VAL( CAXPTR ),
+     :                        WDIMS( 1 ), NVOUT, OLBND, ODIMS,
+     :                        %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                        %VAL( WPNTR2 ), %VAL( INPNTR ), STATUS )
+            ENDIF
 *  Free the workspace that is no longer needed.
             CALL CCD1_MFREE( WPNTR1, STATUS )
             CALL CCD1_MFREE( WPNTR2, STATUS )
@@ -967,7 +1197,17 @@
 *  Perform the transformation on the data array for the numeric data
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF( USEWCS ) THEN 
+                    CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( OPNTR( 1 ) ),
+     :                             %VAL( OPNTR( 2 ) ),
+     :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                             %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -975,10 +1215,20 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF( USEWCS ) THEN 
+                    CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( OPNTR( 1 ) ),
+     :                             %VAL( OPNTR( 2 ) ),
+     :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                             %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -986,10 +1236,20 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF ( USEWCS ) THEN
+                    CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( OPNTR( 1 ) ),
+     :                             %VAL( OPNTR( 2 ) ),
+     :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                             %VAL( WPNTR2 ), STATUS )
+                 ELSE
+                    CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -997,10 +1257,20 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-
+                 ENDIF
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( OPNTR( 1 ) ),
+     :                             %VAL( OPNTR( 2 ) ),
+     :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                             %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1008,10 +1278,20 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS ) THEN
+                    CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                              VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                              NDIMI, OLBND, ODIMS,
+     :                              %VAL( OPNTR( 1 ) ),
+     :                              %VAL( OPNTR( 2 ) ),
+     :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                              %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1019,10 +1299,20 @@
      :                              %VAL( OPNTR( 2 ) ),
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                              VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                              NDIMI, OLBND, ODIMS,
+     :                              %VAL( OPNTR( 1 ) ),
+     :                              %VAL( OPNTR( 2 ) ),
+     :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                              %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                              FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
@@ -1030,10 +1320,20 @@
      :                              %VAL( OPNTR( 2 ) ),
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF(USEWCS) THEN
+                    CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, %VAL( IPNTR( 2 ) ), IWCS,
+     :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
+     :                             NDIMI, OLBND, ODIMS,
+     :                             %VAL( OPNTR( 1 ) ),
+     :                             %VAL( OPNTR( 2 ) ),
+     :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                             %VAL( WPNTR2 ), STATUS )
+                  ELSE
+                    CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, %VAL( IPNTR( 2 ) ), TRIDI,
      :                             FLUX, %VAL( CAXPTR ), ODIMS( 1 ),
      :                             NDIMI, OLBND, ODIMS,
@@ -1041,6 +1341,7 @@
      :                             %VAL( OPNTR( 2 ) ),
      :                             %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                             %VAL( WPNTR2 ), STATUS )
+                  ENDIF
                END IF
             ELSE
 
@@ -1057,73 +1358,143 @@
 *  Perform the transformation on the data array for the numeric data
 *  type.  First apply to a byte array.
                IF ( ITYPE .EQ. '_BYTE' ) THEN
-                  CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, VARB, IWCS, FLUX,
+     :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
+     :                             VARBO, %VAL( WPNTR1 ),
+     :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
+     :                             STATUS )    
+                  ELSE           
+                    CALL KPG1_TDLIB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARB, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
+                  ENDIF
 
 *  Transform a double-precision array.
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-                  CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, VARD, IWCS, FLUX,
+     :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
+     :                             VARBO, %VAL( WPNTR1 ),
+     :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
+     :                             STATUS )
+                  ELSE           
+                    CALL KPG1_TDLID( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARD, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
-
+                  ENDIF
+     
 *  Transform an integer array.
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-                  CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, VARI, IWCS, FLUX,
+     :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
+     :                             VARBO, %VAL( WPNTR1 ),
+     :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
+     :                             STATUS )
+                  ELSE           
+                    CALL KPG1_TDLII( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARI, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
+                  ENDIF
 
 *  Transform a single-precision array.
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-                  CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, VARR, IWCS, FLUX,
+     :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
+     :                             VARBO, %VAL( WPNTR1 ),
+     :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
+     :                             STATUS )
+                  ELSE           
+                    CALL KPG1_TDLIR( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARR, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
+                  ENDIF
 
 *  Transform an unsigned-byte array.
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-                  CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                              VAR, VARB, IWCS, FLUX,
+     :                              %VAL( CAXPTR ), ODIMS( 1 ),
+     :                              NDIMI, OLBND, ODIMS,
+     :                              %VAL( OPNTR( 1 ) ), VARBO,
+     :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                              %VAL( WPNTR2 ), STATUS )
+                  ELSE           
+                    CALL KPG1_TDLIUB( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, VARB, TRIDI, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
+                  
 *  Transform an unsigned-word array.
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-                  CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                              VAR, VARW, IWCS, FLUX,
+     :                              %VAL( CAXPTR ), ODIMS( 1 ),
+     :                              NDIMI, OLBND, ODIMS,
+     :                              %VAL( OPNTR( 1 ) ), VARBO,
+     :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
+     :                              %VAL( WPNTR2 ), STATUS )
+                  ELSE           
+                    CALL KPG1_TDLIUW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                              VAR, VARW, TRIDI, FLUX,
      :                              %VAL( CAXPTR ), ODIMS( 1 ),
      :                              NDIMI, OLBND, ODIMS,
      :                              %VAL( OPNTR( 1 ) ), VARBO,
      :                              %VAL( WPNTR1 ), %VAL( WPNTR3 ),
      :                              %VAL( WPNTR2 ), STATUS )
-
+                  ENDIF
+                  
 *  Transform a word array.
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-                  CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+                  IF (USEWCS) THEN
+                    CALL KPG1_ASLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
+     :                             VAR, VARW, IWCS, FLUX,
+     :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
+     :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
+     :                             VARBO, %VAL( WPNTR1 ),
+     :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
+     :                             STATUS )
+                  ELSE           
+                    CALL KPG1_TDLIW( NDIMI, IDIMS, %VAL( IPNTR( 1 ) ),
      :                             VAR, VARW, TRIDI, FLUX,
      :                             %VAL( CAXPTR ), ODIMS( 1 ), NDIMI,
      :                             OLBND, ODIMS, %VAL( OPNTR( 1 ) ),
      :                             VARBO, %VAL( WPNTR1 ),
      :                             %VAL( WPNTR3 ), %VAL( WPNTR2 ),
      :                             STATUS )
+                  ENDIF
                END IF
 
 *  Free the workspace that is no longer needed.
@@ -1136,9 +1507,77 @@
 *  Add a title to the new NDF.
          CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
 
+         IF (USEWCS) THEN
+
+*  A reminder of the various pointers and indices we have to play with
+*       CFRAME  Index of the alignment frame
+*       JREG    Index of CCD_REG frame
+*       JGEN    Index of CCD_GEN frame
+*       JPIX    Index of PIXEL frame
+*       FRCUR   Pointer to alignment frame
+*       IWCS    Pointer to input AST FrameSet
+*       OWCS    Pointer to output AST FrameSet
+
+*  Make a copy of the input NDF's WCS component
+            OWCS = AST_COPY(IWCS, STATUS)
+            CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
+
+*  GRID, PIXEL and AXIS domains updated by writing it to
+*  the output NDF. So get a pointer to the new WCS FrameSet         
+            CALL CCD1_GTWCS(IDOUT, OWCS, STATUS)
+
+*  Make the mapping between CURRENT and PIXEL domains a UnitMap 
+
+            CALL CCD1_FRDM( OWCS, 'PIXEL', JPIX, STATUS )
+                
+            MPCUR = AST_GETMAPPING( OWCS, JPIX, CFRAME, STATUS )
+            MPINV = AST_GETMAPPING( OWCS, JPIX, CFRAME, STATUS )
+            CALL AST_INVERT( MPINV, STATUS )
+            CALL AST_REMAPFRAME( OWCS, CFRAME, MPINV, STATUS )     
+            
+*  The current frame is not CCD_REG. We're assumed we can do a
+*  mapping anyway, we may have done something very dodgy. We'd 
+*  better warn the user...
+
+            IF( JREG .EQ. 0 ) THEN
+               CALL CCD1_MSG(' ',' ', STATUS )     
+               CALL MSG_SETC('CURRENT', 
+     :                       AST_GETC(FRCUR, 'Domain', STATUS))      
+               CALL CCD1_MSG( ' ',
+     :'  WARNING - Mapping between the ^CURRENT and '//
+     :'PIXEL frames is now a unit map',STATUS)
+               CALL CCD1_MSG(' ',' ', STATUS )     
+            ENDIF
+                                                           
+*  Remove CCD_GEN Frame from the FrameSet if it exists (not needed?)
+*
+*  Comment to Mark - The mapping in the FrameSet between the CCD_GEN
+*                    and PIXEL domains is invalid. Surely its tidier 
+*                    to remove the frame at this stage? Your call...
+*
+*            CALL CCD1_FRDM( OWCS, 'CCD_GEN', JGEN, STATUS )
+*            IF( JGEN .NE. 0 ) THEN
+*                CALL AST_REMOVEFRAME(OWCS, JGEN, STATUS )
+*            ENDIF
+
+*  Reset AST__CURRENT to its correct value, the call to CCD1_FRDM()
+*  has left AST__CURRENT pointing to the PIXEL domain.
+
+            CALL AST_SETI( OWCS, 'Current', CFRAME, STATUS )
+
+            CALL NDF_PTWCS( OWCS, IDOUT, STATUS )
+            
+         END IF
+
 *  Release NDFs and close container files. Retain locator to transform
 *  structure if INEXT is false.
-         IF ( INEXT ) THEN
+         IF( USEWCS ) THEN
+            CALL AST_ANNUL( IWCS, STATUS )
+            CALL AST_ANNUL( FRCUR, STATUS )
+            CALL AST_ANNUL( OWCS, STATUS )
+            CALL AST_ANNUL( MPCUR, STATUS )
+            CALL AST_ANNUL( MPINV, STATUS )
+         ELSE IF( INEXT ) THEN
             CALL DAT_ANNUL( LOCEXT, STATUS )
             CALL DAT_ANNUL( LOCTR, STATUS )
             CALL TRN_ANNUL( TRIDF, STATUS )
@@ -1165,27 +1604,36 @@
       CALL CCD1_MFREE( -1, STATUS )
       CALL CCD1_FRTMP( -1, STATUS )
 
-*  Tidy the NDF context.
   960 CONTINUE
+      IF( USEWCS ) THEN 
+*  Tidy up any remaining AST FrameSets
+        CALL AST_END( STATUS )
+      ELSE
+*  Free any remaining transformation resources.
+        CALL TRN_CLOSE( STATUS ) 
+      ENDIF     
+ 
+*  Tidy the NDF context.
       CALL NDF_END( STATUS )
 
 *  Close down IRH/IRG.
       CALL IRH_CLOSE( STATUS )
 
-*  Free any remaining transformation resources.
-      CALL TRN_CLOSE( STATUS )
-
   999 CONTINUE
-
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'TRANNDF_ERR',
-     :     'TRANNDF: Unable to transform the NDF.',
-     :     STATUS )
+         IF( USEWCS ) THEN
+            CALL ERR_REP( 'TRANNDF_ERR',
+     :        'TRANNDF: Unable to transform the NDF '/
+     :       /'using WCS extensions.', STATUS ) 
+         ELSE        
+            CALL ERR_REP( 'TRANNDF_ERR',
+     :        'TRANNDF: Unable to transform the NDF '/
+     :       /'using TRN structures.', STATUS )
+         ENDIF
       END IF
 
 *  Close the log file.
       CALL CCD1_END( STATUS )
-
+      
       END
-* $Id$
