@@ -283,13 +283,14 @@
 
 *      Loop over NDIM-1 dimensions, performing 1 d fits
         CALL POLYFIT_LOOPWT (POLY, NDEG, NDIM, LDIMS(1), BLEN,
-     :        %VAL(AXPTR), %VAL(NBPTR), %VAL(WTPTR), %VAL(DPTR), STATUS)
+     :        %VAL(AXPTR), %VAL(NBPTR), %VAL(WTPTR), %VAL(DPTR),
+     :                                           COEFF,  STATUS)
 
       ELSE
 
 *      Loop over NDIM-1 dimensions, performing 1 d fits
         CALL POLYFIT_LOOPNOWT( POLY, NDEG, NDIM, LDIMS(1), BLEN,
-     :                         %VAL(AXPTR), %VAL(DPTR), STATUS )
+     :                         %VAL(AXPTR), %VAL(DPTR),COEFF,STATUS)
 
       END IF
 

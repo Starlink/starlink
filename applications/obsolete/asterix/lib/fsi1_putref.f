@@ -109,13 +109,13 @@
       OARG = ADI__NULLID
 
 *  Extract locator
-      CALL ADI1_GETLOC( ARGS(1), TLOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
 
 *  Create reference name
-      CALL FRI1_NAME( ARGS(2), 'REF', CNAM, STATUS )
+      CALL FRI1_NAME( ARGS(3), 'REF', CNAM, STATUS )
 
 *  Create reference
-      CALL FRI1_PUT1( TLOC, CNAM, ARGS(3), STATUS )
+      CALL FRI1_PUT1( TLOC, CNAM, ARGS(4), STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI1_PUTREF', STATUS )

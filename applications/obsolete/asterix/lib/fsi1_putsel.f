@@ -105,13 +105,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get top-level locator
-      CALL ADI1_GETLOC( ARGS(1), TLOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
 
 *  Construct the component name
-      CALL FSI1_NAME( ARGS(2), 'SEL', CNAM, STATUS )
+      CALL FSI1_NAME( ARGS(3), 'SEL', CNAM, STATUS )
 
 *  Copy the data
-      CALL ADI1_CCA2HI( ARGS(3), ' ', TLOC, CNAM, STATUS )
+      CALL ADI1_CCA2HI( ARGS(4), ' ', TLOC, CNAM, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FSI1_PUTSEL', STATUS )
