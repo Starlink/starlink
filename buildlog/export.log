@@ -175,130 +175,24 @@ prepare:
 
 check_packages:
 
-get_ast_source:
-    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
-
-assemble_java:
-
 build_classes:
 
-assemble_jni:
-    [javah] ClassArgument.name=uk.ac.starlink.ast.AstException
-    [javah] ClassArgument.name=uk.ac.starlink.ast.AstObject
-    [javah] ClassArgument.name=uk.ac.starlink.ast.Channel
-    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpFrame
-    [javah] ClassArgument.name=uk.ac.starlink.ast.CmpMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.FitsChan
-    [javah] ClassArgument.name=uk.ac.starlink.ast.Frame
-    [javah] ClassArgument.name=uk.ac.starlink.ast.FrameSet
-    [javah] ClassArgument.name=uk.ac.starlink.ast.IntraMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.LutMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.Mapping
-    [javah] ClassArgument.name=uk.ac.starlink.ast.MathMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.MatrixMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.PcdMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.PermMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.Plot
-    [javah] ClassArgument.name=uk.ac.starlink.ast.SkyFrame
-    [javah] ClassArgument.name=uk.ac.starlink.ast.SlaMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecFrame
-    [javah] ClassArgument.name=uk.ac.starlink.ast.SpecMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.SphMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.UnitMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.WcsMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.WinMap
-    [javah] ClassArgument.name=uk.ac.starlink.ast.ZoomMap
-    [javah] [Search path = /apps/j2sdk1.4.1_06/jre/lib/rt.jar:/apps/j2sdk1.4.1_06/jre/lib/i18n.jar:/apps/j2sdk1.4.1_06/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_06/jre/lib/jsse.jar:/apps/j2sdk1.4.1_06/jre/lib/jce.jar:/apps/j2sdk1.4.1_06/jre/lib/charsets.jar:/apps/j2sdk1.4.1_06/jre/classes:/apps/cvsbuild/java/source/jniast/build/classes]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstException.class]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/RuntimeException.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Exception.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Throwable.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Object.class)]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstException.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstObject.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstObject.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Channel.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Channel.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpFrame.class]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Frame.class]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpFrame.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/CmpMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_CmpMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FitsChan.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FitsChan.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/FrameSet.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Frame.h]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_FrameSet.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/IntraMap.class]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Transformer.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_IntraMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/LutMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_LutMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Mapping$Interpolator.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Mapping.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MathMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MathMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/MatrixMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_MatrixMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PcdMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PcdMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PermMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PermMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Plot.class]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/awt/geom/Rectangle2D.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/awt/geom/RectangularShape.class)]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Plot.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SkyFrame.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SkyFrame.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SlaMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SlaMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecFrame.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecFrame.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SpecMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SpecMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SphMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SphMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/UnitMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_UnitMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WcsMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WcsMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/WinMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_WinMap.h]
-    [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/ZoomMap.class]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_ZoomMap.h]
+unpack_jni:
 
-build_jni:
-     [echo] If C compilation fails you may have the wrong AST version - see README
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/i386/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/i386
 
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e shared
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstException.c
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]            for f in `../jniast_libraries` ""; do \
-     [exec]            echo "Processing $f"; \
-     [exec]            if test -n "$f"; then \
-     [exec]               ar x $f; \
-     [exec]            fi;\
-     [exec]         done)
-     [exec] Processing /apps/cvsbuild/star/lib/libast.a
-     [exec] Processing /apps/cvsbuild/star/lib/libast_wcslib.a
-     [exec] Processing /apps/cvsbuild/star/lib/libast_slalib.a
-     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
-     [exec] Processing /apps/cvsbuild/star/lib/libast_pass2.a
-     [exec] Processing 
-     [exec] f() { gcc -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/jniast/lib/i386/libjniast.so 'jniast.o err_jniast.o AstException.o AstObject.o Channel.o CmpFrame.o CmpMap.o FitsChan.o Frame.o FrameSet.o IntraMap.o LutMap.o Mapping.o MathMap.o MatrixMap.o PcdMap.o PermMap.o Plot.o SkyFrame.o SlaMap.o SpecFrame.o SpecMap.o SphMap.o UnitMap.o WcsMap.o WinMap.o ZoomMap.o temp/*.o' '';\
-     [exec] rm -r -f temp
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/sparc/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jniast/src/lib/x86/jniast_libs.jar into /apps/cvsbuild/java/source/jniast/lib/x86
 
 build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/jniast/jniast.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/jniast/jniast_src.zip
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/i386/jniast_libs.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/sparc/jniast_libs.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jniast/lib/x86/jniast_libs.jar
@@ -354,7 +248,7 @@ export:
 prepare:
 
 check_packages:
-[available] Feb 3, 2004 5:40:58 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Feb 4, 2004 5:40:09 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -387,32 +281,25 @@ check_packages:
 
 build_classes:
 
-assemble_jni:
-    [javah] ClassArgument.name=uk.ac.starlink.hds.HDSObject
-    [javah] [Search path = /apps/j2sdk1.4.1_06/jre/lib/rt.jar:/apps/j2sdk1.4.1_06/jre/lib/i18n.jar:/apps/j2sdk1.4.1_06/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_06/jre/lib/jsse.jar:/apps/j2sdk1.4.1_06/jre/lib/jce.jar:/apps/j2sdk1.4.1_06/jre/lib/charsets.jar:/apps/j2sdk1.4.1_06/jre/classes:/apps/cvsbuild/java/source/jnihds/build/classes]
-    [javah] [Loaded /apps/cvsbuild/java/source/jnihds/build/classes/uk/ac/starlink/hds/HDSObject.class]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Object.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/ByteBuffer.class)]
-    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/Buffer.class)]
-    [javah] [No need to update file /apps/cvsbuild/java/source/jnihds/build/jni/uk_ac_starlink_hds_HDSObject.h]
+unpack_jni:
 
-build_jni:
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/i386/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/i386
 
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e shared
-     [exec] make: Nothing to be done for `shared'.
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/sparc/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/sparc
+
+unpack_jni_arch:
+    [unjar] Expanding: /apps/cvsbuild/java/source/jnihds/src/lib/x86/jnihds_libs.jar into /apps/cvsbuild/java/source/jnihds/lib/x86
 
 build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/jnihds/jnihds_src.zip
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/i386/jnihds_libs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/x86/jnihds_libs.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/sparc/jnihds_libs.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/jnihds/lib/x86/jnihds_libs.jar
 
 javadoc_check:
 
@@ -774,6 +661,42 @@ create_archives:
      [gzip] Building: /apps/cvsbuild/export/soapserver-0.1.tar.gz
     [bzip2] Building: /apps/cvsbuild/export/soapserver-0.1.tar.bz2
    [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
+     [echo] Executing JPCS target: export
+
+export:
+
+prepare:
+
+check_packages:
+
+build_classes:
+
+assemble_jni:
+
+build_jni:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e shared
+     [exec] make: Nothing to be done for `shared'.
+
+build:
+
+jars:
+
+javadoc_check:
+
+javadocs:
+
+dist:
+
+create_archives:
+      [zip] Building zip: /apps/cvsbuild/export/jpcs-0.1-Linux.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
+     [gzip] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jpcs-0.1-Linux.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jpcs/jpcs-0.1-Linux.tar
      [echo] Executing SOG target: export
 
 export:
@@ -1051,4 +974,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 18 minutes 46 seconds
+Total time: 18 minutes 5 seconds

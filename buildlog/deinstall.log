@@ -138,6 +138,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
+     [echo] Executing JPCS target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jpcs/.jpcs.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
@@ -188,4 +194,4 @@ real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 BUILD SUCCESSFUL
-Total time: 23 seconds
+Total time: 14 seconds

@@ -53,15 +53,8 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.util.gui...
   [javadoc] Loading source files for package uk.ac.starlink.util.images...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:7: package org.apache.tools.bzip2 does not exist
-  [javadoc] import org.apache.tools.bzip2.CBZip2InputStream;
-  [javadoc]                               ^
   [javadoc] Standard Doclet version 1.4.1
 
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Compression.java:148: cannot resolve symbol
-  [javadoc] symbol: class CBZip2InputStream 
-  [javadoc]             return new CBZip2InputStream( raw );
-  [javadoc]                        ^
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
@@ -103,8 +96,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java:56: warning - Tag @link: reference not found: SourceSource
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java:68: warning - Tag @link: reference not found: getConfigDirectory
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
-  [javadoc] 1 error
-  [javadoc] 19 warnings
+  [javadoc] 18 warnings
      [echo] Executing Task target: javadocs
 
 prepare:
@@ -127,11 +119,6 @@ javadocs:
 prepare:
 
 javadoc_check:
-
-get_ast_source:
-    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
-
-assemble_java:
 
 javadocs:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/docs/jniast/javadocs
@@ -1775,6 +1762,23 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: Tag @see: Malformed: Plot, PlotConfigurator
   [javadoc] Generating /apps/cvsbuild/java/source/soapserver/docs/soapserver/javadocs/stylesheet.css...
   [javadoc] 1 warning
+     [echo] Executing JPCS target: javadocs
+
+prepare:
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jpcs/docs/jpcs/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.jpcs...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
      [echo] Executing SOG target: javadocs
 
 prepare:
@@ -1915,47 +1919,11 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java:5: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarEntry;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:16: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarEntry;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:17: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarInputStream;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:330: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private InputStream getEntryInputStream( TarEntry reqEnt ) 
-  [javadoc]                                              ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:348: cannot resolve symbol
-  [javadoc] symbol  : class TarInputStream 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private TarInputStream getTarInputStream() throws IOException {
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:361: cannot resolve symbol
-  [javadoc] symbol  : class TarInputStream 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private static TarEntry getNextEntry( TarInputStream tstrm ) {
-  [javadoc]                                           ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:361: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private static TarEntry getNextEntry( TarInputStream tstrm ) {
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java:20: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarBranchDataNode
-  [javadoc]     public TarBranchDataNode( TarStreamDataNode tarnode, TarEntry entry ) {
-  [javadoc]                                                          ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -2780,4 +2748,4 @@ javadocs:
   [javadoc] 201 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 35 seconds
+Total time: 3 minutes 51 seconds

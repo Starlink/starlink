@@ -138,6 +138,12 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/bin
    [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/soapserver/docs
+     [echo] Executing JPCS target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/jpcs/docs
      [echo] Executing SOG target: clean
 
 clean:
@@ -198,4 +204,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 34 seconds
+Total time: 23 seconds

@@ -6376,6 +6376,7 @@ cvs checkout: Updating java/source/jniast/src/ast
 U java/source/jniast/src/ast/README
 U java/source/jniast/src/ast/ast_source.tar
 cvs checkout: Updating java/source/jniast/src/jni
+U java/source/jniast/src/jni/AstException.c
 U java/source/jniast/src/jni/AstObject.c
 U java/source/jniast/src/jni/Channel.c
 U java/source/jniast/src/jni/CmpFrame.c
@@ -6421,18 +6422,42 @@ cvs checkout: Updating java/source/jniast/src/main/uk
 cvs checkout: Updating java/source/jniast/src/main/uk/ac
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink/ast
+U java/source/jniast/src/main/uk/ac/starlink/ast/AstException.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/AstObject.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/AstPackage.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Axis.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Channel.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/CmpFrame.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/CmpMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/DssMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/FitsChan.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/Frame.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/FrameSet.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Grf.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/IntraMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/LutMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/Mapping.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/MathMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/MatrixMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/NeedsChannelizing.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/PcdMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/PermMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/Plot.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/SkyAxis.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SkyFrame.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SlaMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SpecFrame.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SpecMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/SphMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer1.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Transformer2.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/UinterpCalculator.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Ukern1Calculator.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/UnitMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/WcsMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/WinMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/ZoomMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/package.html
 cvs checkout: Updating java/source/jniast/src/main/uk/ac/starlink/ast/grf
 U java/source/jniast/src/main/uk/ac/starlink/ast/grf/DefaultGrf.java
@@ -6516,6 +6541,53 @@ cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/jnihds/src/testcases/uk/ac/starlink/hds
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/HDSObjectTest.java
 U java/source/jnihds/src/testcases/uk/ac/starlink/hds/reduced_data1.sdf
+cvs checkout: Updating java/source/jpcs
+U java/source/jpcs/.properties
+U java/source/jpcs/build.xml
+cvs checkout: Updating java/source/jpcs/src
+cvs checkout: Updating java/source/jpcs/src/jni
+U java/source/jpcs/src/jni/jsubpar.c
+U java/source/jpcs/src/jni/makefile
+U java/source/jpcs/src/jni/mk
+U java/source/jpcs/src/jni/subpar.h
+U java/source/jpcs/src/jni/subpar_err.h
+cvs checkout: Updating java/source/jpcs/src/main
+cvs checkout: Updating java/source/jpcs/src/main/uk
+cvs checkout: Updating java/source/jpcs/src/main/uk/ac
+cvs checkout: Updating java/source/jpcs/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/jpcs/src/main/uk/ac/starlink/jpcs
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/AbortParameterValue.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ArrayParameterValue.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ArrayStringTokenizer.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/BooleanParameter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/CommandLineTokenizer.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Dtask.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/FilenameParameter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/IfxHandler.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Msg.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/NullParameterValue.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/NumberParameter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Parameter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterAbortException.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterException.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterList.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterNullException.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterPrompt.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterPromptAdapter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterPrompter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterReply.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterStatusValue.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterUtility.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ParameterValueList.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Ppath.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/StarlinkStatus.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/StringArrayReader.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/StringParameter.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/TaskReply.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/TaskReplyHandler.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/ValuePath.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/Vpath.java
+U java/source/jpcs/src/main/uk/ac/starlink/jpcs/package.html
 cvs checkout: Updating java/source/jsky
 U java/source/jsky/.properties
 U java/source/jsky/build.xml

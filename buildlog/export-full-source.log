@@ -116,6 +116,11 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+     [echo] Executing JPCS target: deinstall
+
+deinstall:
+
+real_deinstall:
      [echo] Executing SOG target: deinstall
 
 deinstall:
@@ -226,6 +231,9 @@ clean:
      [echo] Executing SOAPSERVER target: clean
 
 clean:
+     [echo] Executing JPCS target: clean
+
+clean:
      [echo] Executing SOG target: clean
 
 clean:
@@ -281,17 +289,9 @@ javadoc-sources:
      [copy] Copying 13 files to /apps/cvsbuild/java/source/task/build/java
      [echo] Executing JNIAST target: javadoc-sources
 
-prepare:
-
-get_ast_source:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/ast
-    [untar] Expanding: /apps/cvsbuild/java/source/jniast/src/ast/ast_source.tar into /apps/cvsbuild/java/source/jniast/build/ast
-
-assemble_java:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
-     [copy] Copying 21 files to /apps/cvsbuild/java/source/jniast/build/java
-
 javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/java
+     [copy] Copying 45 files to /apps/cvsbuild/java/source/jniast/build/java
      [echo] Executing DIVA target: javadoc-sources
 
 javadoc-sources:
@@ -375,6 +375,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/java
      [copy] Copying 5 files to /apps/cvsbuild/java/source/soapserver/build/java
+     [echo] Executing JPCS target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jpcs/build/java
+     [copy] Copying 32 files to /apps/cvsbuild/java/source/jpcs/build/java
      [echo] Executing SOG target: javadoc-sources
 
 javadoc-sources:
@@ -415,11 +420,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1747 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1834 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 2 seconds
+Total time: 46 seconds
