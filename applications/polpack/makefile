@@ -350,15 +350,16 @@ PKG_VERS = 1.1
 #  smaller source archives in place of one large one to speed up build
 #  times.
 
-SOURCE_FILES = $(PKG_NAME)_source.tar ndg.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar ndg_source.tar makefile mk $(DOCUMENTATION)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl PolReg.tcl PolReg_procs.tcl \
-CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild 
+PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl Polka.tcl Polka_procs.tcl \
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay ndg_wild polimp.csh \
+polexp.csh
 
 # List of StarTcl files which must reside in the POLPACK binary directory.
 # These should be in the STARTCL_DIR directory.
@@ -409,15 +410,14 @@ NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE) \
              $(GENLRDICSRC) $(GENLRDICSRC:.glrdic=.f) 
 
-F_SUB1 = ndg1_ffind.f ndg1_fspec.f ndg1_subst.f \
-ndg1_lasto.f ndg1_ndfch.f ndg1_slice.f \
-ndg_annul.f ndg_asexp.f ndg_assoc.f ndg_creat.f \
-ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f ndg_ndfpr.f
+F_SUB1 = ndg1_expan.f ndg1_lasto.f ndg1_ndfch.f ndg_annul.f ndg_asexp.f \
+ndg_assoc.f ndg_creat.f ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f \
+ndg_ndfpr.f ndg1_hspec.f ndg1_mspec.f ndg1_match.f ndg1_subst.f 
 
 F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
 kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kps1_flxyr.f kps1_inxyr.f kps1_plcpx.f \
 kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
-polcent.f polhelp.f polmap.f polreg.f pthlpo.f rdndf.f segment.f sread.f \
+polcent.f polhelp.f polmap.f polka.f pthlpo.f rdndf.f segment.f sread.f \
 wrndf.f calpol.f ndfac.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f \
 ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
@@ -461,7 +461,7 @@ ADDLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polmap polreg datapic polcent segment calpol polimp polexp
+TASKS = polhelp polmap polka datapic polcent segment calpol polimp polexp
 
 #  Monolith routine source name.
 
@@ -477,7 +477,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polreg.ifl \
+IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polka.ifl \
 segment.ifl calpol.ifl polimp.ifl polexp.ifl
 
 #  List of help library sources.
@@ -495,9 +495,9 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = polreg.tex polmap.tex
+LATEX_DOCS = polka.tex polmap.tex
 HYPERTEXT_DOCS = 
-#HYPERTEXT_HELP = polreg.htx polmap.htx
+#HYPERTEXT_HELP = polka.htx polmap.htx
 HYPERTEXT_HELP = 
 
 #  List of documentation files.
@@ -577,7 +577,7 @@ $(STARTUP_SCRIPT) $(IFL_FILES) $(MONO_IFL) $(ICL_SCRIPT) $(TEST_SCRIPT):
            else echo $@ is not in the tar file; exit 1; fi
 
 $(F_SUB1) $(I_SUB1) $(C_SUB1):
-	$(TAR_OUT) ndg.tar $@
+	$(TAR_OUT) ndg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -644,7 +644,7 @@ libpolpack.a: $(O_SUB2)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            -L/star-dev/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
+            -L/star-test/lib -L$(KAPPA_SOURCE) $(ADDLIBS) `./$(LINK_SCRIPT)` \
             $(LDFLAGS)
 
 
@@ -943,9 +943,9 @@ install:
 #  libraries must be edited into this, and execute permission given.
 #  Leave the original file in place.
 	if test -n "$(STARTUP_SCRIPT)"; then \
-           sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
-               -e s#INSTALL_HELP#$(INSTALL_HELP)# \
-               -e s#PKG_VERS#$(PKG_VERS)# \
+           sed -e s#INSTALL_BIN#$(INSTALL_BIN)#g \
+               -e s#INSTALL_HELP#$(INSTALL_HELP)#g \
+               -e s#PKG_VERS#$(PKG_VERS)#g \
               $(STARTUP_SCRIPT) >$(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
            chmod 755 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
         else :; fi
@@ -1453,53 +1453,55 @@ kps1_stor.o:	SAE_PAR
 kps1_xyd2w.o:	SAE_PAR     
 kps1_xyd2w.o:	PRM_PAR     
 ndfac.o:	SAE_PAR     
-ndg1_ffind.o:	SAE_PAR     
-ndg1_ffind.o:	GRP_PAR     
-ndg1_ffind.o:	NDG_ERR     
-ndg1_ffind.o:	NDG_CONST   
-ndg1_fspec.o:	SAE_PAR     
-ndg1_fspec.o:	GRP_PAR     
-ndg1_lasto.o:	SAE_PAR     
-ndg1_ndfch.o:	SAE_PAR     
-ndg1_ndfch.o:	DAT_PAR     
-ndg1_ndfch.o:	GRP_PAR     
-ndg1_ndfch.o:	NDG_CONST   
-ndg1_ndfch.o:	NDG_ERR     
-ndg1_ndfch.o:	PSX_ERR     
-ndg1_slice.o:	SAE_PAR     
-ndg1_slice.o:	GRP_PAR     
-ndg_asexp.o:	SAE_PAR     
-ndg_asexp.o:	NDG_CONST   
-ndg_asexp.o:	NDG_ERR     
-ndg_asexp.o:	GRP_PAR     
-ndg_assoc.o:	SAE_PAR     
-ndg_assoc.o:	GRP_PAR     
-ndg_assoc.o:	GRP_ERR     
-ndg_assoc.o:	PAR_ERR     
-ndg_assoc.o:	NDG_ERR     
-ndg_creat.o:	SAE_PAR     
-ndg_creat.o:	GRP_PAR     
-ndg_creat.o:	PAR_ERR     
-ndg_crexp.o:	SAE_PAR     
-ndg_crexp.o:	GRP_PAR     
-ndg_crexp.o:	NDG_ERR     
-ndg_crexp.o:	NDG_CONST   
-ndg_crexp.o:	PSX_ERR     
-ndg_ndfas.o:	SAE_PAR     
-ndg_ndfas.o:	DAT_PAR     
-ndg_ndfas.o:	NDF_PAR     
-ndg_ndfas.o:	GRP_PAR     
-ndg_ndfas.o:	NDG_CONST   
-ndg_ndfcr.o:	SAE_PAR     
-ndg_ndfcr.o:	DAT_PAR     
-ndg_ndfcr.o:	NDF_PAR     
-ndg_ndfcr.o:	GRP_PAR     
-ndg_ndfcr.o:	NDG_CONST   
-ndg_ndfpr.o:	SAE_PAR     
-ndg_ndfpr.o:	DAT_PAR     
-ndg_ndfpr.o:	NDF_PAR     
-ndg_ndfpr.o:	GRP_PAR     
-ndg_ndfpr.o:	NDG_CONST   
+ndg1_expan.o:	SAE_PAR
+ndg1_expan.o:	GRP_PAR
+ndg1_expan.o:	DAT_PAR
+ndg1_expan.o:	NDG_CONST
+ndg1_expan.o:	NDG_ERR
+ndg1_hspec.o:	SAE_PAR
+ndg1_hspec.o:	GRP_PAR
+ndg1_lasto.o:	SAE_PAR
+ndg1_match.o:	SAE_PAR
+ndg1_match.o:	GRP_PAR
+ndg1_match.o:	NDG_CONST
+ndg1_mspec.o:	SAE_PAR
+ndg1_mspec.o:	GRP_PAR
+ndg1_ndfch.o:	SAE_PAR
+ndg1_ndfch.o:	PSX_ERR
+ndg1_ndfch.o:	GRP_PAR
+ndg1_ndfch.o:	NDG_ERR
+ndg1_subst.o:	SAE_PAR
+ndg_asexp.o:	SAE_PAR
+ndg_asexp.o:	NDG_CONST
+ndg_asexp.o:	NDG_ERR
+ndg_asexp.o:	GRP_PAR
+ndg_assoc.o:	SAE_PAR
+ndg_assoc.o:	GRP_PAR
+ndg_assoc.o:	GRP_ERR
+ndg_assoc.o:	PAR_ERR
+ndg_assoc.o:	NDG_ERR
+ndg_creat.o:	SAE_PAR
+ndg_creat.o:	GRP_PAR
+ndg_creat.o:	PAR_ERR
+ndg_crexp.o:	SAE_PAR
+ndg_crexp.o:	GRP_PAR
+ndg_crexp.o:	NDG_CONST
+ndg_crexp.o:	PSX_ERR
+ndg_ndfas.o:	SAE_PAR
+ndg_ndfas.o:	DAT_PAR
+ndg_ndfas.o:	NDF_PAR
+ndg_ndfas.o:	GRP_PAR
+ndg_ndfas.o:	NDG_CONST
+ndg_ndfcr.o:	SAE_PAR
+ndg_ndfcr.o:	DAT_PAR
+ndg_ndfcr.o:	NDF_PAR
+ndg_ndfcr.o:	GRP_PAR
+ndg_ndfcr.o:	NDG_CONST
+ndg_ndfpr.o:	SAE_PAR
+ndg_ndfpr.o:	DAT_PAR
+ndg_ndfpr.o:	NDF_PAR
+ndg_ndfpr.o:	GRP_PAR
+ndg_ndfpr.o:	NDG_CONST
 pol1_chkex.o:	SAE_PAR     
 pol1_chkex.o:	GRP_PAR     
 pol1_chkex.o:	DAT_PAR     
@@ -1536,10 +1538,10 @@ polexp.o:	DAT_PAR
 polexp.o:	GRP_PAR
 polmap.o:	SAE_PAR     
 polmap.o:	PAR_ERR     
-polreg.o:	SAE_PAR     
-polreg.o:	GRP_PAR     
-polreg.o:	PAR_ERR     
-polreg.o:	PRM_PAR     
+polka.o:	SAE_PAR     
+polka.o:	GRP_PAR     
+polka.o:	PAR_ERR     
+polka.o:	PRM_PAR     
 pthlpo.o:	SAE_PAR     
 pthlpo.o:	HLPCMD      
 rdndf.o:	SAE_PAR     
