@@ -196,7 +196,7 @@ KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
 kps1_stpa.gen kps1_thgt.gen kps1_prmx.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
-KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
+KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f curre.f \
 ftsize.f ftsizt.f gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
 inxy.f kps1_agncm.f kps1_agncp.f kps1_agncv.f kps1_agndl.f kps1_agndr.f \
@@ -244,7 +244,7 @@ kps1_rprfr.f kps1_rprfub.f kps1_rprfuw.f kps1_rprfw.f kps1_skyft.f \
 kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_subid.f kps1_subir.f \
 kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f \
 kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f \
-kps1_suskd.f kps1_suskr.f kps1_trdrd.f \
+kps1_suskd.f kps1_suskr.f kps1_trdrd.f kps1_cremg.f kps1_crets.f \
 kps1_trdri.f kps1_trdrr.f kps1_trncl.f kps1_trndd.f kps1_trndi.f \
 kps1_trndr.f kps1_trnvd.f kps1_trnvi.f kps1_trnvr.f kps1_trop1.f \
 kps1_trop2.f kps1_vecky.f kps1_vecpl.f kps1_wieap.f kps1_wiecp.f \

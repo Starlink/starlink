@@ -1,489 +1,492 @@
-*+  CREFRAME - Generates a test 2-d data array from a selection of
-*              several types
+      SUBROUTINE CREFRAME(STATUS)
+*+
+*  Name:
+*     CREFRAME
 
-      SUBROUTINE CREFRAME( STATUS )
-*
-*    Description :
-*
-*     This routine allows you to generate several different types of
-*     2-d data array for test purposes.  The data array is written to an
-*     output IMAGE structure.  The types of array are summarised as
-*     follows:
-*
-*     [Random]   - between 0 and 1, or specified limits
-*     [Constant] - 0 or at a specified value
-*     [Noisy]    - Poissonian or Gaussian noise about a specified mean
-*     [Ramped]   - between specified minimum and maximum values and a
-*                  choice of four directions
-*     [Gaussian] - a random distribution of 2-d Gaussians of defined
-*                  FWHM and range of maximum peak values on a specified
-*                  background, with optional invalid pixels and bad
-*                  column. There is a choice of distributions for the
-*                  Gaussians: fixed, or inverse square radially from the
-*                  array centre. (In essence it is equivalent to a
-*                  simulated star field.) The x-y position and peak
-*                  value of each Gaussian may be stored in a Fortran
-*                  formatted file, or reported to you.  Magic-value
-*                  bad data may be included randomly, and/or in a column
-*                  or line of the array.
-*
-*    Invocation :
-*
+*  Purpose:
+*     Generates a test 2-d NDF with a selection of several forms.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL CREFRAME( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This application creates a 2-dimensional output NDF containing
+*     artificial data of various forms (see parameter MODE). The output 
+*     NDF can, optionally, have a Variance component describing the noise 
+*     in the Data array (see parameter VARIANCE), and additionally a 
+*     randomly generated pattern of bad pixels (see parameter BADPIX). 
+*     Bad columns or rows of pixels can also be generated 
+
+*  Usage:
+*     creframe out mode [lbound] [ubound]
+
+*  ADAM Parameters:
+*     BACKGROUND = _REAL (Read)
+*        Background intensity to be used in the generated data 
+*        array (GS mode).
+*     BADCOL = _INTEGER (Read)
+*        The number of bad columns to include. Only accessed if
+*        parameter BADPIX is TRUE. The bad columns are distributed 
+*        at random using a uniform distribution.
+*     BADPIX  = _LOGICAL (Read)
+*        Whether or not bad pixels are to be included. See also
+*        parameters FRACTION, BADCOL and BADROW. [FALSE]
+*     BADROW = _INTEGER (Read)
+*        The number of bad rows to include. Only accessed if
+*        parameter BADPIX is TRUE. The bad rows are distributed 
+*        at random using a uniform distribution.
+*     DIRN = _INTEGER (Read)
+*        Direction of the ramp. 1 means left to right, 2 is right to
+*        left, 3 is bottom to top, and 4 is top to bottom. (RA mode)
+*     DISTRIB  =  _CHAR (Read)
+*        Radial distribution of the Gaussians to be used (GS mode).
+*        Alternatives weightings are:
 *
-*    Parameters :
+*        - FIX: Fixed distance.
+*        - RSQ: One over radius squared. 
 *
-*     OUTPIC   =  IMAGE( WRITE )
-*         Output IMAGE structure for the generated data array
-*     OTITLE   =  CHAR( READ )
-*         Title for the output IMAGE structure
-*     IDIMS    =  INTEGER( READ )
-*         x and y dimensions of the output data array
-*     TYPED    =  CHAR( READ )
-*         Type of data to be generated. The options are GS - Gaussian;
-*           RR - random 0 -- 1; RP - random Poisson noise about mean;
-*           RL - random with set limits; FL - flat; BL - zeroes;
-*           RA - ramps; and GN - Gaussian noise about mean.
-*     HIGH     =  REAL( READ )
-*         High value used in the generated data array (RA and RL types)
-*     LOW      =  REAL( READ )
-*         Low value used in the generated data array (RA and RL types)
-*     DIRN     =  INTEGER( READ )
-*         Direction of the ramp. 1 means left to right, 2 is right to
-*           left, 3 is bottom to top, and 4 is top to bottom. (RA type)
-*     MEAN     =  REAL( READ )
-*         Mean value used in the generated data array (FL and RP types)
-*     SIGMA    =  REAL( READ )
-*         Standard deviation of noise to be used in the generated data
-*           array (GN type)
-*     MAX      =  REAL( READ )
-*         Peak Gaussian intensity to be used in the generated data array
-*           (GS type)
-*     MIN      =  REAL( READ )
-*         Lowest Gaussian intensity to be used in the generated data
-*           array  (GS type)
-*     BACKGROUND  =  REAL( READ )
-*         Background intensity to be used in the generated data array
-*           (GS type)
-*     NGAUSS   =  INTEGER( READ )
-*         Number of Gaussian star-like images to be generated (GS type)
-*     SEEING   =  REAL( READ )
-*         Seeing (FWHM) in pixels (not the same as the standard
-*           deviation) (GS type)
-*     DISTRIB  =  CHAR( READ )
-*         Radial distribution of the Gaussians to be used; alternatives
-*           weightings are FIX = fixed distance; and RSQ = one over
-*           radius squared. (GS type)
-*     BADPIX   =  LOGICAL( READ )
-*         Whether or not bad pixels are to be included (GS type)
-*     FRACTION =  REAL( READ )
-*         Fraction of bad pixels to be included (GS type)
-*     BADCOL   =  LOGICAL( READ )
-*         Whether or not a bad column is to be included (GS type)
-*     SCREEN   =  LOGICAL( READ )
-*         True if the Gaussian parameters are reported to you (GS type)
-*     FILENAME =  CHAR( READ )
-*         Filename for the output of the Gaussian parameters (GS type)
+*     FRACTION = _REAL (Read)
+*        Fraction of bad pixels to be included. Only accessed if BADPIX
+*        is TRUE.
+*     HIGH = _REAL (Read)
+*        High value used in the generated data array (RA and RL modes).
+*     LBOUND( 2 ) = _INTEGER (Read)
+*        Lower pixel bounds of the output NDF. Only accessed if parameter 
+*        LIKE is set to null (!). [1,1]
+*     LIKE = NDF (Read)
+*        An optional template NDF which, if specified, will be used to
+*        define the bounds and data type for the output NDF. If a null 
+*        value (!) is given the bounds are obtained via parameters LBOUND
+*        and UBOUND, and the data type through parameter TYPE. [!]
+*     LOGFILE = LITERAL (Read)
+*        Name of a log file in which to store details of the Gaussians
+*        added to the output NDF (GS mode). [!]
+*     LOW  = _REAL (Read)
+*        Low value used in the generated data array (RA and RL modes).
+*     MAX = _REAL (Read)
+*        Peak Gaussian intensity to be used in the generated data 
+*        array (GS mode).
+*     MIN = _REAL (Read)
+*        Lowest Gaussian intensity to be used in the generated data
+*        array (GS mode).
+*     MEAN = _REAL (Read)
+*        Mean value used in the generated data array (FL, RP and GN modes).
+*     MODE = LITERAL (Read)
+*        The form of the data to be generated. The options are:
 *
-*    Arguments:
+*        - RR: Uniform noise between 0 and 1.
+*        - RL: Uniform noise between specified limits.
+*        - BL: A constant value of zero.
+*        - FL: A specified constant value.
+*        - RP: Poisson noise about a specified mean
+*        - GN: Gaussian noise about a specified mean
+*        - RA: Ramped between specified minimum and maximum values and a
+*              choice of four directions.
+*        - GS: A random distribution of 2-d Gaussians of defined
+*              FWHM and range of maximum peak values on a specified
+*              background, with optional invalid pixels and bad
+*              column. There is a choice of distributions for the
+*              Gaussians: fixed, or inverse square radially from the
+*              array centre. (In essence it is equivalent to a
+*              simulated star field.) The x-y position and peak
+*              value of each Gaussian may be stored in a log file, 
+*              a positions list catalogue, or reported on the screen. 
+*              Bad pixels may be included randomly, and/or in a column
+*              or line of the array. 
 *
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Get size and type of array to be generated
-*     If there is no error then
-*        Get or set parameters required to generate the specified array
-*        If there is no error then
-*           Create output IMAGE structure
-*           If there is no error then
-*              Map output data array onto a pointer
-*              If there is no error then
-*                 If Gaussian field required then
-*                    Call MANYG routine
-*                 Else
-*                    Call multi-purpose data generating routine
-*                 Endif
-*                 Unmap output data array
-*              Else
-*                 Report error context
-*              Endif
-*              Tidy output data structure
-*           Else
-*              Report error context
-*           Endif
-*        Else
-*           Report error context
-*        Endif
-*     Else
-*        Report error context
-*     Endif
-*     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Mark McCaughrean UoE (REVA::MJM)
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     29-07-1985 : First implementation, explicitly for testing
-*                : of A-tasks. (REVA::MJM)
-*     14-10-1985 : Added simulated starfield option (REVA::MJM)
-*     09-01-1986 : Added blank option (again) (REVA::MJM)
-*     14-01-1986 : Added option to display or store the star
-*                : parameters if GS option chosen (REVA::MJM)
-*     1986 Aug 5 : Renamed algorithm subroutine (CRFRSB), correctly
-*                  ordered arguments in MANYG (2nd to 7th) and in
-*                  CRFRSB (2nd to penultimate). Added list of options
-*                  to the prologue (RL.STAR::CUR).
-*     1986 Aug 28: Completed the prologue and nearly conformed to
-*                  Starlink programming standards (RL.STAR::CUR).
-*     1987 Oct 13: Modified status check of output array mapping
-*                  (RL.STAR::CUR)
-*     1988 Mar 17: Referred to `array' rather than `image'
-*                  (RL.STAR::CUR)
-*     1988 May 23: Added Gaussian noise option (RL.STAR::CUR).
-*     1988 Jun 7 : More error reporting (RL.STAR::CUR).
-*     1988 Jun 30: File name obtained in MANYG (RL.STAR::CUR).
-*     1988 Aug 5 : Removed lingering astronomical references and
-*                  SCALE parameter (RL.STAR::CUR).
-*     1989 Jul 25: Altered MANYG argument list; removed DISPLAY
-*                  parameter and reordered alternatives of DISTRIB
-*                  parameter (RL.STAR::CUR)
-*     1989 Aug  7: Passed array dimensions as separate variables
-*                  to CRFRSB (RL.STAR::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*
-*    Type Definitions :
+*     NGAUSS  = _INTEGER (Read)
+*        Number of Gaussian star-like images to be generated (GS mode).
+*     OUT = NDF (Write)
+*        The output NDF.
+*     OUTCAT = FILENAME (Write)
+*        An output catalogue in which to store the pixel co-ordinates of 
+*        the Gausians in the output NDF (GS mode). If a null value is 
+*        supplied, no output positions list is produced. [!]
+*     SCREEN = _LOGICAL  (Read)
+*         True if the Gaussian parameters are reported to you (GS mode) [FALSE]
+*     SEEING = _REAL (Read)
+*        Seeing (FWHM) in pixels (not the same as the standard deviation) 
+*        (GS mode). 
+*     SIGMA = _REAL (Read)
+*        Standard deviation of noise to be used in the generated data
+*        array (GN mode).
+*     TITLE = LITERAL (Read)
+*        Title for the output NDF ["CREFRAME Test Data"]
+*     TYPE = LITERAL (Read)
+*        Numerical data type for the output NDF. Only accessed if parameter 
+*        LIKE is set to null (!).  It must be one of "_DOUBLE", "_REAL",
+*        "_INTEGER", "_WORD" or "_BYTE". ["_REAL"]
+*     UBOUND( 2 ) = _INTEGER (Read)
+*        Upper pixel bounds of the output NDF. Only accessed if parameter 
+*        LIKE is set to null (!). [64,64]
+*     VARIANCE = _LOGICAL (Read)
+*        Should a variance component be added to the output NDF if
+*        appropriate for the values supplied for paremeter MODE? [TRUE]
 
-      IMPLICIT NONE            ! no implicit typing allowed
+*  Examples:
+*     creframe out=file ubound=[128,128] mode=gs ngauss=5 badpix badcol=2
+*              max=200 min=20 background=20 seeing=1.5
+*        Produces a 128x128 pixel data array with 5 gaussians with peak
+*        values of 200 counts and a background of 20 counts. There will
+*        be two bad columns added to the resulting data.  
 
-*    Global constants :
+*  Implementation Status:
+*     - This routine does not assign values to any of the following 
+*     components in the output NDF: LABEL, UNITS, QUALITY, AXIS, WCS.
 
-      INCLUDE 'SAE_PAR'        ! global SSE definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
+*  Authors:
+*     MJM: Mark McCaughrean 
+*     MJC: Malcolm Currie (Starlink, RAL)
+*     AALLAN: Alasdair Allan (Starlink, University of Exeter)
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-*    Status :
+*  History:
+*     01-SEP-2001 (AALLAN):
+*        Original NDF version, based on earlier version by MJM and MJC.
+*     11-SEP-2001 (DSB):
+*        Removed nested status checks, standardize layout of local variable
+*        declarations, remove unused variables and include files.
+*     {enter_further_changes_here}
 
-      INTEGER STATUS
-
-*    Local Constants :
-
-      INTEGER NDIMS            ! output array dimensionality
-      PARAMETER ( NDIMS = 2 )  ! defaults to 2-d
-
-*    Local variables :
-
-      INTEGER 
-     :  IDIMS( NDIMS ),        ! dimensions of input DATA_ARRAY
-     :  PNTRO,                 ! pointer to output DATA_ARRAY component
-     :  NGAUSS,                ! number of Gaussians (simulated stars)
-                               ! generated
-     :  DIRN                   ! direction of ramping in data
-                               ! directions : 0 = flat, 1 = L-R
-                               ! 2 = R-L, 3 = B-T, 4 = T-B
-
-      REAL
-     :  LOW,                   ! low value in data to be generated
-     :  HIGH,                  ! high value in data to be generated
-     :  MEAN,                  ! mean value in data to be generated
-     :  SIGMA,                 ! standard deviation in data to be
-                               ! generated
-     :  MAX,                   ! peak Gaussian intensity to be used
-     :  MIN,                   ! low     "        "      "  "   "
-     :  BCKGRD,                ! background intensity
-     :  SEEING,                ! seeing in pixels
-     :  FRACTN                 ! fraction of bad pixels to be included
-
-
-      CHARACTER*(DAT__SZLOC)   ! locator for :
-     :  LOCO                   ! output data structure
-
-      CHARACTER*2
-     :  TYPED                  ! type of data to be generated
-
-      CHARACTER*3
-     :  DISTRB                 ! radial distribution of Gaussians
-                               ! FIX = Fixed distance
-                               ! RSQ = one over radius squared 
-
-      LOGICAL                  ! true if:
-     :  BADPIX,                ! bad pixels to be included
-     :  BADCOL,                ! bad column "  "     "
-     :  SCREEN                 ! parameters are reported to the user
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
-*    check status on entry (do not check status after this point -
-*    have adopted method where status is checked on entry to each
-*    subroutine, and if status is bad, there is an immediate
-*    return, and the routine just ripples down to the bottom not
-*    doing anything)
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    get size of array to be generated 
+*  Type definitions:
+      IMPLICIT NONE              ! No implicit typing allowed
 
-      CALL PAR_GDR0I( 'XDIM', 64, 1, 1000000, .FALSE., IDIMS( 1 ), 
-     :                STATUS )
-      CALL PAR_GDR0I( 'YDIM', 64, 1, 1000000, .FALSE., IDIMS( 2 ), 
-     :                STATUS )
+*  Global constants:
+      INCLUDE 'SAE_PAR'           ! SSE global definitions
+      INCLUDE 'DAT_PAR'           ! Data system constants
+      INCLUDE 'PAR_ERR'           ! Parameter system errors
+      INCLUDE 'NDF_PAR'           ! NDF parameters
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Status:
+      INTEGER  STATUS
 
-*       describe options available (insufficient room in interface help)
+*  External references:
+      INTEGER CHR_LEN             ! Length of string ignoring trailing blanks
 
-         CALL MSG_OUT( 'CREFRAME_OPTIONS',  'GS = Gaussians, RR ='/
-     :                 /' Random 0 to 1, RL = Random from Min to Max, ',
-     :                 STATUS )
-         CALL MSG_OUT( 'CREFRAME_OPTIONS', 'RA = Ramp across image, '/
-     :                 /'FL = Flat, BL = Blank,', STATUS )
-         CALL MSG_OUT( 'CREFRAME_OPTIONS', 'GN = Gaussian noise with '/
-     :                 /'standard deviation about the mean,', STATUS )
-         CALL MSG_OUT( 'CREFRAME_OPTIONS', 'RP = '/
-     :                 /'Poissonian noise about the mean.', STATUS )
+*  Local Variables:
+      CHARACTER BUFFER*132        ! Buffer for writing to the logfile
+      CHARACTER DATE*64           ! Date string
+      CHARACTER DISTRB*3          ! Radial distribution of Gaussians
+      CHARACTER TTYPE*( DAT__SZTYP ) ! Data type of NDF
+      CHARACTER TYPED*2           ! Type of data to be generated
+      INTEGER BADCOL              ! bad column to be included?
+      INTEGER BADROW              ! bad row to be included?
+      INTEGER DIRN                ! Direction of ramping in data
+      INTEGER FDL                 ! File description of logfile
+      INTEGER ITEMP               ! Pointer to the input template NDF
+      INTEGER LBND( NDF__MXDIM )  ! Template NDF lower bounds
+      INTEGER NC                  ! Character Column Counters
+      INTEGER NCI                 ! Character Column Counters
+      INTEGER NDIM                ! Number of dimensions in template NDF
+      INTEGER NGAUSS              ! Number of Gaussians (simulated stars)
+      INTEGER NPIX                ! Number of pixels in output NDF
+      INTEGER NTICKS              ! Number of time ticks 
+      INTEGER ODAT                ! Pointer to the output DATA component
+      INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of the output NDF
+      INTEGER ONDF                ! Pointer to the output NDF
+      INTEGER OVAR                ! Pointer to the output VAR component
+      INTEGER UBND( NDF__MXDIM )  ! Template NDF upper bounds
+      LOGICAL BADPIX              ! Bad pixels to be included?           
+      LOGICAL LIKE                ! Shape template supplied?
+      LOGICAL LOGFIL              ! True if a log file is being written
+      LOGICAL SCREEN              ! Parameters are reported to the user?
+      LOGICAL VARS                ! Should variances be generated?
+      REAL BCKGRD                 ! Background intensity
+      REAL FRACTN                 ! Fraction of bad pixels to be included
+      REAL HIGH                   ! High value in data to be generated
+      REAL LOW                    ! Low value in data to be generated
+      REAL MAX                    ! Max Gaussian intensity 
+      REAL MEAN                   ! Mean value in data to be generated
+      REAL MIN                    ! Min Gaussian intensity 
+      REAL SEEING                 ! Seeing in pixels
+      REAL SIGMA                  ! Std dev in data to be generated
+         
+*.
 
-*       get type of data to be generated
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+            
+*  Begin AST and NDF contexts.
+      CALL AST_BEGIN( STATUS )
+      CALL NDF_BEGIN
 
-         CALL PAR_CHOIC( 'TYPED', 'GS', 'GS,RR,RL,RP,RA,FL,BL,GN',
-     :                   .TRUE., TYPED, STATUS )
+*  Open log file
+*  =============
+*  Attempt to obtain and open a log file to list the statistics.  A
+*  null value, meaning no logfile is required, is handled invisibly.
+      CALL ERR_MARK
+      LOGFIL = .FALSE.
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, FDL, STATUS )
 
-*       force input string to upper case
+      IF(  STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      ELSE IF(  STATUS .EQ. SAI__OK ) THEN
+         LOGFIL = .TRUE.
+         CALL MSG_OUT( 'LOG', 'Logging to $LOGFILE', STATUS )
+      END IF
+      
+      CALL ERR_RLSE
 
-         CALL CHR_UCASE( TYPED )
+*  Log the start time
+      IF(  LOGFIL ) THEN
+         NC = 0
+         NCI = 0 
+         BUFFER = ' '
+         CALL PSX_TIME( NTICKS, STATUS )
+         CALL PSX_CTIME( NTICKS, DATE, STATUS )
+         NCI = CHR_LEN( DATE )
+         CALL CHR_PUTC( 'CREFRAME started at ', BUFFER, NC )
+         CALL CHR_PUTC( DATE( :NCI ) , BUFFER, NC )
+         CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
+         CALL FIO_WRITE( FDL, ' ', STATUS )
+      END IF   
+           
+*  Open the shape and data type for the output NDF.
+*  ================================================
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*       now assign variables for subroutine call according to the
-*       choice of data requested.
-*
-*       Gaussian `stars'
+*  Attempt to obtain NDF via the LIKE parameter to act as a template.
+      LIKE = .FALSE.
+      CALL LPG_ASSOC( 'LIKE', 'READ', ITEMP, STATUS )
 
-         IF ( TYPED .EQ. 'GS' .AND. STATUS .EQ. SAI__OK ) THEN
+*  If a null template was given, then simply annul the error.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
 
-*          get number of Gaussians to be generated
+*  Otherwise, obtain the bounds of the template.
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+         LIKE = .TRUE.
+         CALL NDF_BOUND( ITEMP, NDF__MXDIM, LBND, UBND, NDIM,
+     :                   STATUS )
+         CALL NDF_TYPE( ITEMP, 'DATA', TTYPE, STATUS )
+      END IF
 
-            CALL PAR_GDR0I( 'NGAUSS', 10, 1, 1000, .TRUE., NGAUSS,
-     :                      STATUS )
+*  If no template file was found get the the bounds of the NDF to be generated
+*  from the UBOUND and LBOUND parameters
+      IF( .NOT. LIKE ) THEN
+         CALL PAR_GET1I('LBOUND', NDF__MXDIM, LBND, NDIM, STATUS )
+         CALL PAR_GET1I('UBOUND', NDF__MXDIM, UBND, NDIM, STATUS )
+         CALL PAR_CHOIC( 'TYPE', '_REAL', '_DOUBLE,_REAL,'/
+     :                   /'_INTEGER,_WORD,_BYTE,_UBYTE',
+     :                   .TRUE., TTYPE, STATUS )
+       END IF
 
-*          get maximum allowable intensity for Gaussians
+*  Obtain other options.
+*  =====================
 
-            CALL PAR_GDR0R( 'MAX', 100.0, 0.1, 1.0E20, .TRUE., MAX,
-     :                      STATUS )
+*  Describe options available (insufficient room in interface help)
+      CALL MSG_OUT( 'CREFRAME_OPTIONS',  'GS = Gaussians, RR ='//
+     :              ' Random 0 to 1, RL = Random from Min to Max, ',
+     :              STATUS )
+      CALL MSG_OUT( 'CREFRAME_OPTIONS', 'RA = Ramp across image, '//
+     :              'FL = Flat, BL = Blank,', STATUS )
+      CALL MSG_OUT( 'CREFRAME_OPTIONS', 'GN = Gaussian noise with '//
+     :              'standard deviation about the mean,', STATUS )
+      CALL MSG_OUT( 'CREFRAME_OPTIONS', 'RP = '//
+     :              'Poissonian noise about the mean.', STATUS )
 
-*          get minimum allowable intensity for Gaussians
+*  Get type of data to be generated
+      CALL PAR_CHOIC( 'MODE', 'GS', 'GS,RR,RL,RP,RA,FL,BL,GN',
+     :                .TRUE., TYPED, STATUS )
 
-            CALL PAR_GDR0R( 'MIN', 0.0, 0.0, 1.0E20, .TRUE., MIN,
-     :                      STATUS )
+*  Force input string to upper case
+      CALL CHR_UCASE( TYPED )
 
-*          get background intensity
+*  Now get mode-specific parameters...
 
-            CALL PAR_GDR0R( 'BACKGROUND', 10.0, 0.0, 1.0E20, .TRUE.,
-     :                      BCKGRD, STATUS )
+*  Mode GS: Gaussian Stars.
+      IF( TYPED .EQ. 'GS' .AND. STATUS .EQ. SAI__OK ) THEN
 
-*          get seeing in pixels
-
-            CALL PAR_GDR0R( 'SEEING', 1.0, 0.01, 100.0, .TRUE., SEEING,
-     :                      STATUS )
-
-*          get type of distribution of Gaussians - fixed distance or
-*          inverse square
-
-            CALL PAR_CHOIC( 'DISTRIB', 'FIX', 'FIX,RSQ', .TRUE., DISTRB,
-     :                      STATUS )
-
-*          find out whether bad pixels are to be included
-
-            CALL PAR_GTD0L( 'BADPIX', .FALSE., .TRUE., BADPIX, STATUS )
-
-*          if so, then get the fraction to be set bad
-
-            IF ( BADPIX ) THEN
-               CALL PAR_GDR0R( 'FRACTION', 0.01, 0.0, 1.0, .TRUE.,
-     :                         FRACTN, STATUS )
-            END IF
-
-*          find whether a bad column is to be included
-
-            CALL PAR_GTD0L( 'BADCOL', .FALSE., .TRUE., BADCOL, STATUS )
-
-*          find out whether the display is wanted on the screen
-
-            CALL PAR_GTD0L( 'SCREEN', .FALSE., .TRUE., SCREEN, STATUS )
-
-*       random between 0 and 1
-
-         ELSE IF ( TYPED .EQ. 'RR' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            HIGH  =  1.0
-            LOW   =  0.0
-            MEAN  =  0.5
-            SIGMA =  0.0
-            DIRN  =  0
-
-*       random between set limits
-
-         ELSE IF ( TYPED .EQ. 'RL' .AND. STATUS .EQ. SAI__OK ) THEN
- 
-            CALL PAR_GET0R( 'LOW', LOW, STATUS )
-            CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
-
-            MEAN  =  ( HIGH + LOW ) / 2
-            SIGMA =  0.0
-            DIRN  =  0
-
-*       Poissonian noise about mean
-
-         ELSE IF ( TYPED .EQ. 'RP' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
-
-            HIGH  =  0.0
-            LOW   =  0.0
-            DIRN  =  0
-            SIGMA =  0.0
-
-*       Gaussian noise about mean
-
-         ELSE IF ( TYPED .EQ. 'GN' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
-            CALL PAR_GET0R( 'SIGMA', SIGMA, STATUS )
-
-            HIGH  =  0.0
-            LOW   =  0.0
-            DIRN  =  0
-
-*       ramp across array
-
-         ELSE IF ( TYPED .EQ. 'RA' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            CALL PAR_GET0R( 'LOW', LOW, STATUS )
-            CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
-            CALL PAR_GDR0I( 'DIRN', 1, 1, 4, .FALSE., DIRN, STATUS )
-
-            MEAN  =  ( HIGH + LOW ) / 2
-
-*       flat all over array
-
-         ELSE IF ( TYPED .EQ. 'FL' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
-
-            HIGH  =  MEAN
-            LOW   =  MEAN
-            SIGMA =  0.0
-            DIRN  =  0
-
-*       zero all over array
-
-         ELSE IF ( TYPED .EQ. 'BL' .AND. STATUS .EQ. SAI__OK ) THEN
-
-            HIGH  =  0.0
-            LOW   =  0.0
-            SIGMA =  0.0
-            DIRN  =  0
-
-         END IF
-
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*          now create output IMAGE type data structure with DATA_ARRAY 
-*          component; also create and get value for DATA_LABEL component
-
-            CALL CREOUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS, LOCO,
+*  Get number of Gaussians to be generated
+         CALL PAR_GDR0I( 'NGAUSS', 10, 1, 1000, .TRUE., NGAUSS,
      :                   STATUS )
 
-            IF ( STATUS .EQ. SAI__OK ) THEN
+*  Get maximum allowable intensity for Gaussians
+         CALL PAR_GDR0R( 'MAX', 100.0, 0.0, 1.0E20, .TRUE., MAX,
+     :                   STATUS )
 
-*             map output DATA_ARRAY component
+*  Get minimum allowable intensity for Gaussians
+         CALL PAR_GDR0R( 'MIN', 0.0, 0.0, 1.0E20, .TRUE., MIN,
+     :                   STATUS )
 
-               CALL CMP_MAPN( LOCO, 'DATA_ARRAY', '_REAL', 'WRITE',
-     :                        NDIMS, PNTRO, IDIMS, STATUS )
+*  Get background intensity
+         CALL PAR_GET0R( 'BACKGROUND', BCKGRD, STATUS )
 
-               IF ( STATUS .EQ. SAI__OK ) THEN
+*  Get seeing in pixels
+         CALL PAR_GDR0R( 'SEEING', 1.0, 0.01, 100.0, .TRUE., 
+     :                   SEEING, STATUS )
 
-*                call actual subroutines to do the work - use CRFRSB for
-*                the simple data types and MANYG for Gaussians
+*  Get type of distribution of Gaussians - fixed distance or inverse square
+         CALL PAR_CHOIC( 'DISTRIB', 'FIX', 'FIX,RSQ', .TRUE., DISTRB,
+     :                   STATUS )
 
-                  IF ( TYPED .EQ. 'GS' ) THEN
+*  Find out whether bad pixels are to be included
+         CALL PAR_GTD0L( 'BADPIX', .FALSE., .TRUE., BADPIX, STATUS )
 
-                     CALL MANYG( IDIMS( 1 ), IDIMS( 2 ), MAX, MIN,
-     :                           BCKGRD, NGAUSS, SEEING, DISTRB, BADPIX,
-     :                           FRACTN, BADCOL, SCREEN, 'FILENAME',
-     :                           %VAL( PNTRO ), STATUS )
-
-                  ELSE
-
-                     CALL CRFRSB( IDIMS( 1 ), IDIMS( 2 ), TYPED, MEAN,
-     :                            HIGH, LOW, DIRN, SIGMA,
-     :                            %VAL( PNTRO ), STATUS )
-
-                  END IF
-
-*                unmap output data array
-
-                  CALL CMP_UNMAP( LOCO, 'DATA_ARRAY', STATUS )
-
-               ELSE
-                  CALL ERR_REP( 'ERR_CREFRAME_NOMPO',
-     :              'CREFRAME: Error occurred whilst trying to map '/
-     :              /'output frame', STATUS )
-
-*             end of if-no-error-after-mapping-output-data-array check
-
-               END IF
-
-*             tidy up the output data structure
-
-               CALL DAT_ANNUL( LOCO, STATUS )
-
-            ELSE
-
-               IF ( STATUS .NE. PAR__ABORT ) THEN
-                  CALL ERR_REP( 'ERR_CREFRAME_NOFRO',
-     :              'CREFRAME: Error occurred whilst trying to '/
-     :              /'access output frame', STATUS )
-               END IF
-
-*          end of if-no-error-after-creating-output-structure check
-
-            END IF
-
-         ELSE
-
-            IF ( STATUS .NE. PAR__ABORT .AND.
-     :           STATUS .NE. PAR__NULL ) THEN
-
-*             announce the error
-
-               CALL ERR_REP( 'ERR_CREFRAME_PAR',
-     :           'CREFRAME: Error obtaining parameters - aborting',
-     :           STATUS )
-            END IF
-
-*       end of no-error-getting-parameters check
-
-        END IF
-
-      ELSE
-
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_CREFRAME_ARSE',
-     :        'CREFRAME: Error getting size of output array',
-     :        STATUS )
+*  If so, then get the fraction to be set bad
+         IF( BADPIX ) THEN
+            CALL PAR_GDR0R( 'FRACTION', 0.01, 0.0, 1.0, .TRUE.,
+     :                      FRACTN, STATUS )
          END IF
 
-*    end of no-error-getting-output-array-dimensions check
+*  Find whether a bad column is to be included
+         CALL PAR_GET0I( 'BADCOL', BADCOL, STATUS )
+            
+*  Find whether a bad row is to be included
+         CALL PAR_GET0I( 'BADROW', BADROW, STATUS )
+            
+*  Find out whether the display is wanted on the screen
+         CALL PAR_GTD0L( 'SCREEN', .FALSE., .TRUE., SCREEN, STATUS )
+
+*  Mode RR: Random between 0 and 1
+      ELSE IF( TYPED .EQ. 'RR' .AND. STATUS .EQ. SAI__OK ) THEN
+         HIGH  =  1.0
+         LOW   =  0.0
+         MEAN  =  0.5
+         SIGMA =  0.0
+         DIRN  =  0
+
+*  Mode RL: Random between set limits
+      ELSE IF( TYPED .EQ. 'RL' .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_GET0R( 'LOW', LOW, STATUS )
+         CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
+
+         MEAN  =  ( HIGH + LOW ) / 2
+         SIGMA =  0.0
+         DIRN  =  0
+
+*  Mode RP: Poissonian noise about mean
+      ELSE IF( TYPED .EQ. 'RP' .AND. STATUS .EQ. SAI__OK ) THEN
+
+         CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
+
+         HIGH  =  0.0
+         LOW   =  0.0
+         DIRN  =  0
+         SIGMA =  0.0
+
+*  Mode GN: Gaussian noise about mean
+      ELSE IF( TYPED .EQ. 'GN' .AND. STATUS .EQ. SAI__OK ) THEN
+
+         CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
+         CALL PAR_GET0R( 'SIGMA', SIGMA, STATUS )
+
+         HIGH  =  0.0
+         LOW   =  0.0
+         DIRN  =  0
+
+*  Mode RA: Ramp across array
+      ELSE IF( TYPED .EQ. 'RA' .AND. STATUS .EQ. SAI__OK ) THEN
+
+         CALL PAR_GET0R( 'LOW', LOW, STATUS )
+         CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
+         CALL PAR_GDR0I( 'DIRN', 1, 1, 4, .FALSE., DIRN, STATUS )
+ 
+         MEAN  =  ( HIGH + LOW ) / 2
+
+*  Mode FL: Flat all over array
+      ELSE IF( TYPED .EQ. 'FL' .AND. STATUS .EQ. SAI__OK ) THEN
+
+         CALL PAR_GET0R( 'MEAN', MEAN, STATUS )
+
+         HIGH  =  MEAN
+         LOW   =  MEAN
+         SIGMA =  0.0
+         DIRN  =  0
+
+*  Mode BL: Zero all over array
+      ELSE IF( TYPED .EQ. 'BL' .AND. STATUS .EQ. SAI__OK ) THEN
+
+         HIGH  =  0.0
+         LOW   =  0.0
+         SIGMA =  0.0
+         DIRN  =  0
 
       END IF
 
-*    end
+*  Create the output NDF.
+*  ======================
 
-      END
+*  Create a simple NDF via the parameter system.
+      CALL LPG_CREAT( 'OUT', TTYPE, NDIM, LBND, UBND, ONDF, STATUS)
+
+*  Obtain a new title.
+      CALL NDF_CINP( 'TITLE', ONDF, 'Title', STATUS )
+
+*  Find out whether we should generate variances
+      CALL PAR_GTD0L( 'VARIANCE', .TRUE., .TRUE., VARS, STATUS )        
+                              
+*  Map the component array
+      CALL NDF_MAP( ONDF, 'Data', TTYPE, 'WRITE', ODAT, NPIX, STATUS )
+
+*  Map a variance component if required
+      IF( VARS ) CALL NDF_MAP( ONDF, 'Variance', TTYPE, 'WRITE', OVAR,
+     :                         NPIX, STATUS )            
+            
+*  Obtained the dimensions of the output NDF
+      CALL NDF_DIM( ONDF, NDF__MXDIM, ODIMS, NDIM, STATUS )
+
+*  Call actual subroutines to do the work.
+      IF( TYPED .EQ. 'GS' ) THEN
+         CALL KPS1_CREMG( ODIMS( 1 ), ODIMS( 2 ), MAX, MIN, BCKGRD, 
+     :                    NGAUSS, SEEING, DISTRB, BADPIX, FRACTN, 
+     :                    BADCOL, BADROW, SCREEN, 'OUTCAT', 
+     :                    %VAL( ODAT ), %VAL( OVAR ), VARS, STATUS )
+
+      ELSE
+         CALL KPS1_CRETS( ODIMS( 1 ), ODIMS( 2 ), TYPED, MEAN, HIGH, 
+     :                    LOW, DIRN, SIGMA, VARS, %VAL( ODAT ), 
+     :                    %VAL( OVAR ), STATUS )
+
+      END IF
+
+*  Tidy up.
+*  ========
+ 999  CONTINUE
+
+*  Wind up the logfile
+      IF( LOGFIL ) THEN
+         NC = 0
+         NCI = 0 
+         CALL PSX_TIME( NTICKS, STATUS )
+         CALL PSX_CTIME( NTICKS, DATE, STATUS )
+         NCI = CHR_LEN( DATE )
+         CALL CHR_PUTC( 'CREFRAME terminated at ', BUFFER, NC )
+         CALL CHR_PUTC( DATE( :NCI ) , BUFFER, NC )
+         CALL FIO_WRITE( FDL, ' ', STATUS )
+         CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
+         CALL FIO_WRITE( FDL, ' ', STATUS )        
+      END IF
+
+*  Close the logfile.
+      IF( LOGFIL ) CALL FIO_ANNUL( FDL, STATUS ) 
+    
+*  End the NDF and AST contexts.
+      CALL NDF_END( STATUS )
+      CALL AST_END( STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'CREFRAME_ERR', 'CREFRAME: Failed to create a '//
+     :                 'test NDF.', STATUS )
+      END IF
+
+      END 

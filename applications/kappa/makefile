@@ -581,7 +581,7 @@ ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
 ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f
 
 KAPSUB_F_ROUTINES = \
-apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f ftsize.f ftsizt.f \
+apadsb.f cnthlt.f cntkey.f cntsbp.f curre.f ftsize.f ftsizt.f \
 gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f hstlo.f hstrep.f \
 imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f inxy.f kps1_agndr.f \
 kps1_agnls.f kps1_ardmb.f kps1_agncp.f kps1_agnst.f kps1_agncv.f \
@@ -657,7 +657,7 @@ kps1_elmap.f kps1_pswcs.f kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f \
 kps1_zpdec.f kps1_glibr.f kps1_gligt.f kps1_glidd.f kps1_gliwd.f \
 kps1_glibd.f kps1_glidr.f kps1_gliwr.f kps1_saxlk.f kps1_clpsr.f \
 kps1_clpsd.f kps1_prmxb.f kps1_prmxub.f kps1_prmxd.f kps1_prmxuw.f \
-kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f
+kps1_prmxi.f kps1_prmxw.f kps1_prmxr.f kps1_cremg.f kps1_crets.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2283,8 +2283,7 @@ convolve.o:	 SAE_PAR PRM_PAR PAR_ERR
 copybad.o:	 SAE_PAR NDF_PAR
 creframe.o:	 SAE_PAR DAT_PAR PAR_ERR
 crelut.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
-crfrsb.o:	 SAE_PAR
-csub.o:	 SAE_PAR NDF_PAR
+csub.o:	         SAE_PAR NDF_PAR
 curre.o:	 SAE_PAR PAR_ERR
 cursor.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR AST_PAR PRM_PAR PAR_ERR AGI_ERR
 display.o:	 SAE_PAR NDF_PAR PRM_PAR AST_PAR PAR_ERR PAR_PAR CTM_PAR
@@ -2347,6 +2346,7 @@ kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
 kapversion.o:	 SAE_PAR PAR_ERR
 kapview_mon.o:	 SAE_PAR
+
 kps1_agncm.o:	 SAE_PAR GRP_PAR
 kps1_agncp.o:	 SAE_PAR DAT_PAR PAR_PAR
 kps1_agncv.o:	 SAE_PAR
@@ -2401,6 +2401,8 @@ kps1_cpbr.o:	 SAE_PAR PRM_PAR
 kps1_cpbub.o:	 SAE_PAR PRM_PAR
 kps1_cpbuw.o:	 SAE_PAR PRM_PAR
 kps1_cpbw.o:	 SAE_PAR PRM_PAR
+kps1_cremg.o:    SAE_PAR PAR_ERR PRM_PAR
+kps1_crets.o:    SAE_PAR PAR_ERR PRM_PAR
 kps1_curfm.o:	 SAE_PAR AST_PAR
 kps1_cuxyr.o:	 SAE_PAR PRM_PAR
 kps1_discl.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR SUBPAR_PAR NUM_DEC_CVT NUM_DEF_CVT
