@@ -159,7 +159,7 @@
 *    Function declarations :
 *    Local constants :
       INTEGER NLINE
-      PARAMETER (NLINE=8)
+      PARAMETER (NLINE=7)
 *    Local variables :
       CHARACTER*79 TEXT(NLINE)
       INTEGER I
@@ -170,9 +170,7 @@
      :  '    RED      - red table         RAINBOW - rainbow colours',
      :  '    RGB      - 3-colour table    NEG     - invert colours',
      :  '    NORM     - reverse NEG       POS     - same as NORM',
-     :  '    READ     - read table from HDS file/object',
-     :  '    WRITE    - write current table to HDS file/object',
-     :  '     '/
+     :  '    READ     - read from file    WRITE   - write to file'/
 *-
       CALL MSG_BLNK()
       DO I=1,NLINE
@@ -203,79 +201,43 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
-      CHARACTER*(DAT__SZTYP) TYPE
-      CHARACTER TABLE*10,FILE*132
+      CHARACTER*80 REC
+      CHARACTER*16 TABS(6)/'default.act','greyscale.act',green.act',
+     :                     'bluegreen.act','red.act',rainbow.act'/
+      CHARACTER FILE*132
       REAL COLTAB(3,16)
-      INTEGER NVAL,NCHAR
+      INTEGER IFD
       INTEGER I
-      INTEGER TABNO
-      INTEGER DIMS(2)
-      LOGICAL OK,NUMBER
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        DIMS(1)=3
-        DIMS(2)=16
-
-        NUMBER=.FALSE.
-        IF (TAB.EQ.0) THEN
-          CALL USI_DASSOC('TABLE','READ',LOC,STATUS)
-          CALL DAT_TYPE(LOC,TYPE,STATUS)
-          CALL DAT_SIZE(LOC,NVAL,STATUS)
-          OK=.TRUE.
-          IF (TYPE.EQ.'_INTEGER'.AND.NVAL.EQ.1) THEN
-            CALL DAT_GET0I(LOC,TABNO,STATUS)
-            CALL DAT_ANNUL(LOC,STATUS)
-            NUMBER=.TRUE.
-          ENDIF
+        IF (TAB.GE.1.AND.TAB.LE.6) THEN
+          FILE='$AST_ROOT/data/grafix/'//TABS(TAB)
         ELSE
-          TABNO=TAB
-          NUMBER=.TRUE.
-          OK=.TRUE.
+          CALL USI_GET0C('FILE',FILE,STATUS)
         ENDIF
 
-        IF (NUMBER) THEN
-          CALL CHR_ITOC(TABNO,TABLE,NCHAR)
-          TABLE='AST_TAB'//TABLE(:NCHAR)
-          CALL PSX_GETENV(TABLE,FILE,STATUS)
-          CALL HDS_OPEN(FILE,'READ',LOC,STATUS)
-          IF (STATUS.NE.SAI__OK) THEN
-            CALL MSG_PRNT('AST_ERR: unknown table number')
-            OK=.FALSE.
-          ENDIF
+        CALL FIO_OPEN(FILE,'READ','NONE',0,IFD,STATUS)
 
-*  check type of external table
-        ELSEIF (TYPE.NE.'_REAL') THEN
-          CALL MSG_PRNT('AST_ERR: invalid data type in table')
-          OK=.FALSE.
-*  check number of entries
-        ELSE
-          IF (NVAL.NE.48) THEN
-            CALL MSG_PRNT('AST_ERR: incorrect number of entries'
-     :                                          //' in table')
-            OK=.FALSE.
-          ENDIF
-        ENDIF
+        I=1
+        DO WHILE (I.LE.16.AND.STATUS.EQ.SAI__OK)
+          CALL FIO_READF(IFD,REC,STATUS)
+          READ(REC,*) COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
+          I=I+1
+        ENDDO
 
-*  read table
-        IF (OK.AND.STATUS.EQ.SAI__OK) THEN
-
-          CALL DAT_GETR(LOC,2,DIMS,COLTAB,STATUS)
+        CALL FIO_CLOSE(IFD,STATUS)
 
 *  save it
-          CALL GCB_SETL('COLOUR_RGB',.FALSE.,STATUS)
-          CALL GCB_SETI('COLOUR_N',16,STATUS)
-          DO I=1,16
-            CALL GCB_SET1R('COLOUR_RED',I,1,COLTAB(1,I),STATUS)
-            CALL GCB_SET1R('COLOUR_GREEN',I,1,COLTAB(2,I),STATUS)
-            CALL GCB_SET1R('COLOUR_BLUE',I,1,COLTAB(3,I),STATUS)
-          ENDDO
+        CALL GCB_SETL('COLOUR_RGB',.FALSE.,STATUS)
+        CALL GCB_SETI('COLOUR_N',16,STATUS)
+        DO I=1,16
+          CALL GCB_SET1R('COLOUR_RED',I,1,COLTAB(1,I),STATUS)
+          CALL GCB_SET1R('COLOUR_GREEN',I,1,COLTAB(2,I),STATUS)
+          CALL GCB_SET1R('COLOUR_BLUE',I,1,COLTAB(3,I),STATUS)
+        ENDDO
 
-        ENDIF
-
-        CALL DAT_ANNUL(LOC,STATUS)
 
       ENDIF
 
@@ -300,11 +262,11 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
+      CHARACTER*132 FILE
+      CHARACTER*80 REC
       REAL COLTAB(3,16)
-      INTEGER DIMS(2)
-      INTEGER I,N
-      LOGICAL OK
+      INTEGER IFD
+      INTEGER I
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -316,12 +278,15 @@
             CALL GCB_GET1R('COLOUR_GREEN',I,1,OK,COLTAB(2,I),STATUS)
             CALL GCB_GET1R('COLOUR_BLUE',I,1,OK,COLTAB(3,I),STATUS)
           ENDDO
-          DIMS(1)=3
-          DIMS(2)=16
-          CALL USI_DCREAT('TABLE','_REAL',2,DIMS,STATUS)
-          CALL USI_DASSOC('TABLE','WRITE',LOC,STATUS)
-          CALL DAT_PUTR(LOC,2,DIMS,COLTAB,STATUS)
-          CALL DAT_ANNUL(LOC,STATUS)
+
+          CALL USI_GET0C('FILE',FILE,STATUS)
+          CALL FIO_OPEN(FILE,'WRITE','NONE',0,IFD,STATUS)
+          DO I=1,16
+            WRITE(REC,'(3(F4.2,1X))') COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
+            CALL FIO_WRITEF(IFD,REC,STATUS)
+          ENDDO
+          CALL FIO_CLOSE(IFD,STATUS)
+
         ELSE
           CALL MSG_PRNT('AST_ERR: no colour table present')
         ENDIF
