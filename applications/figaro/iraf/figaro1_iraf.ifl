@@ -1,0 +1,7024 @@
+monolith FIGARO1
+# ADAM Interface file for IRAF use
+# Created automatically from figaro1.ifd using ifd2star
+# Tue Oct 30 17:27:36 GMT 2001
+interface ADJOIN
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) First of the two spectra to be adjoined'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPECTRUM1) 2nd of the two spectra to be adjoined'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface BCLEAN
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to be cleaned'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter CRSIG
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CRSig) Cosmic ray sigma cutoff'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CRFACT
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CRFact) Cosmic ray fractional cutoff'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CRMINV
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CRMinv) Cosmic ray minimum excess value'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CRSHARPNESS
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CRSharpness) Cosmic ray minimum sharpness value'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BRFACT
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BRFact) Bad row fractional cutoff'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BRPASS
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BRPass) Number of passes in bad row search'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter DEGFIX
+      position 8
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(DEGfix) Polynomial degree for interpolation'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 9
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of cleaned image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NBROWS
+      position 10
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(NBRows) Number of bad rows to be cleaned'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOROW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUTOrow) Perform automatic search for bad lines?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter FIX
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(FIx) Fix up the bad lines and cosmic rays?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SHARPNESS
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(SHarpness) Perform sharpness test on cosmic rays?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TEXTFILE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(TExtfile) Produce a text file of cosmic ray results?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter DIRECTION
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(DIRECTion) Interp. direction (-1=rows, 1=columns, 0=best)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BROWS
+      position 11
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BRows) Bad rows'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.BROWS
+      helpkey '*'
+   endparameter
+endinterface
+interface CCDLIN
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be corrected'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ALPHA
+      position 3
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(ALpha) Linearity constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CBIAS
+      position 4
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(CBias) Bias value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface CCUR
+   helplib '$FIG_HELP'
+   parameter SCREEN
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(Screen) Use screen formatting for terminal?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.TVFILE
+   endparameter
+endinterface
+interface CFIT
+   helplib '$FIG_HELP'
+   parameter OUTPUT
+      position 1
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Output file for interpolated data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CHANGE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Modify points'
+      helpkey '*'
+   endparameter
+   parameter REDRAW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Redraw original spectrum'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface CLEAN
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be grey-scaled'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <-GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter IDEV
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default '0.'
+      association <-GLOBAL.IDEV
+   endparameter
+   parameter IMARRAY
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.IMARRAY
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IMFILE
+   endparameter
+   parameter QUIT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Terminate cleaning process'
+      helpkey '*'
+   endparameter
+   parameter DEG
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Degree of fit to use for interpolation'
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in X'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in Y'
+      helpkey '*'
+   endparameter
+   parameter HIGH
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Highest displayed data value'
+      helpkey '*'
+   endparameter
+   parameter LOW
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Lowest displayed data value'
+      helpkey '*'
+   endparameter
+endinterface
+interface CLIP
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be clipped'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter LOWCLIP
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOwclip) Low threshold'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HIGHCLIP
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIghclip) High threshold'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface COADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The 2D data to be reduced to a spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter TSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TStart) first t-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.TSTART
+      helpkey '*'
+   endparameter
+   parameter TEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TEnd) last t-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.TEND
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) first y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) last y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter CUTOFF
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CUToff) value to exclude data point'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 7
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of resulting spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter NORM
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NOrm) Normalize Each Cycle?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface COLOUR
+   helplib '$FIG_HELP'
+   parameter TABLE
+      position 1
+      type _CHAR
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(TABLE) Name of the colour lookup table'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter IDEV
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default '0.'
+      association <-GLOBAL.IDEV
+   endparameter
+endinterface
+interface COMBINE
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of first Spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPECTRUM1) Name of second spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface COSREJ
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The file containing the spectra'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to use in calculating means'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to use in calculating means'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter CRSIG
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CRSig) Cosmic ray sigma rejection level'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WMEAN
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WMean) Produce spectrum consisting of mean values?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter MSPECT
+      position 5
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(MSpect) Name of mean value spectrum to be generated'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 6
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) The file containing the corrected spectra'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface CSET
+   helplib '$FIG_HELP'
+   parameter VALUE
+      position 1
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Value) Constant value to set selected regions to'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Output file for modified data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter QUIT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Terminate region selection'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface DVDPLOT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE) Structure whose data is to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter IMAGE2
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE2) Structure against which IMAGE is to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XLOW
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XLow) Lowest value in second image to use (X-value)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XHIGH
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XHigh) Highest value in second image to use (X-value)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Low) Lowest value in image to use (Y-value)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(High) Highest value in image to use (Y-value)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Use all values in second image?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Autoscale so all image points fit?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce a hardcopy plot?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+endinterface
+interface ELSPLOT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSIze) Plot length in metres'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSIze) Height of plot in metres'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale so all of spectrum fits?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIgh) Maximum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOw) Minimum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter BIAS
+      position 8
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIas) Bias value to be added to data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.BIAS
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 9
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+endinterface
+interface ERRCON
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of file with percentage errors'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of file with absolute errors'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ESPLOT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce plot as a hard copy?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale so all of spectrum fits?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIgh) Maximum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOw) Minimum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter BIAS
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIas) Bias value to be added to data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.BIAS
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 7
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ERASE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(ERase) Erase screen before plotting?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter AXES
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(AXes) Plot and label axes?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter COLOUR
+      position 8
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter THICKNESS
+      position 9
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(THickness) Plotted line width'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.THICKNESS
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface EXTLIST
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to extract data from'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter NROWS
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(NRows) How many rows to be added'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter SECTIONS
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(SECtions) List of rows'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter SPECTRUM
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) name of spectrum to be generated'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface EXTRACT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to extract data from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) first y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) last y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) name of spectrum to be generated'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+endinterface
+interface FIGINFO
+   parameter INPUT
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(INput) Name of file to examine'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter CHECK_FLAGS
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(CHeck_flags) Check for flagged values by reading data?'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter CLEAR_FLAG
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(CLEAR_FLAG) Clear "may contain flagged data flag" anyway?'
+      ppath 'CURRENT,DYNAMIC'
+      default FALSE
+   endparameter
+   parameter SET_FLAG
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(SET_FLAG) Set "may contain flagged data flag"?'
+      ppath 'CURRENT,DYNAMIC'
+      default FALSE
+   endparameter
+endinterface
+interface FLAG2QUAL
+   parameter INPUT
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(INput) Name of file to have flagged values removed'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting file'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter FIXED
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(FIxed) Replace flagged values with one fixed value?'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter VALUE
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(VAlue) Fixed value to use to replace flagged values'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface FSCRUNCH
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be scrunched'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter WSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WStart) Wavelength of center of first bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BINS
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIns) Number of bins for scrunched spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter INORDER
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(INOrder) Order of fit for local interpolation'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 6
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of scrunched spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter INCREMENT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(INCrement) Treat WEND value as an increment value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter FINAL
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FInal) Treat WEND as a final wavelength value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LOg) Bin into logarithmic wavelength bins?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter DENSITY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(DENsity) Treat data as flux per unit wavelength?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SCRUNCH_END
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SCRUNCH_END
+   endparameter
+   parameter SCRUNCH_INC
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SCRUNCH_INC
+   endparameter
+endinterface
+interface GROWX
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be "grown" into image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter IMAGE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Image to grow spectrum into'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First cross-section to copy spectrum into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last cross-section to copy spectrum into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter NEW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NEw) Force creation of a new image?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSIze) Y-dimension of new image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface GROWXT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Image to grow into planes of cube'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter CUBE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(Cube) Cube into which image is to be grown'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter NEW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NEw) Force creation of a new cube?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSIze) Y-dimension of new image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface GROWXY
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Image to grow into planes of cube'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter CUBE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(Cube) Cube into which image is to be grown'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TStart) First plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TEnd) Last plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NEW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NEw) Force creation of a new cube?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TSIZE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TSIze) T-dimension of new image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface GROWY
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be "grown" into image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter IMAGE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Image to grow spectrum into'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First cross-section to copy spectrum into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last cross-section to copy spectrum into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter NEW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NEw) Force creation of a new image?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSIze) X-dimension of new image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface GROWYT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Image to grow into planes of cube'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter CUBE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(Cube) Cube into which image is to be grown'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last plane to copy image into'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter NEW
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(NEw) Force creation of a new cube?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSIze) X-dimension of new image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface HARD
+   helplib '$FIG_HELP'
+   parameter HARDDEV
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(HArddev) Device to use for hardcopy plots'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OPTIONS
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(OPtions) List possible device names?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter FORCE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FOrce) Force use of an unrecognised device ?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter DRAW
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(DRaw) Output a test plot to the device?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.HARD
+   endparameter
+endinterface
+interface HCROSS
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter TEMPLATE
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(TEmplate) Name of template spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter VELOCITIES
+#      position 0
+      type _LOGICAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter BASERED
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BASEred) Redshift of template spectrum'
+      ppath 'CURRENT,DYNAMIC'
+      helpkey '*'
+   endparameter
+   parameter BASERR
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BASERR) Redshift error of template spectrum'
+      ppath 'CURRENT,DYNAMIC'
+      helpkey '*'
+   endparameter
+   parameter BASEVEL
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BASEVel) Velocity (km/s) of template spectrum'
+      ppath 'CURRENT,DYNAMIC'
+      helpkey '*'
+   endparameter
+   parameter BASEVERR
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BASEVERR) Velocity error (km/s) of template spectrum'
+      ppath 'CURRENT,DYNAMIC'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter FITCONT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FICONT) Fit continuum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default TRUE
+      helpkey '*'
+   endparameter
+   parameter CBPC
+      position 7
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(CBpc) Percentage of spectrum covered by cosine bell'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter RECORD
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(RECord) Create file to record cross-correlation?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CROSS
+      position 8
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(CRoss) Name of cross-correlation data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SHIFT
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SHIFT
+   endparameter
+   parameter REDSHIFT
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.REDSHIFT
+   endparameter
+   parameter REDERR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.REDERR
+   endparameter
+   parameter VELOCITY
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.VELOCITY
+   endparameter
+   parameter VELERR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.VELERR
+   endparameter
+   parameter CONF
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.CONFIDENCE
+   endparameter
+   parameter WARN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.IWARN
+   endparameter
+endinterface
+interface HIST
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of data to be histogrammed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter MINVAL
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(MInval) Minimum data value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter MAXVAL
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(MAXval) Maximum data value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BINS
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIns) Number of histogram bins'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 5
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of resulting histogram'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+endinterface
+interface HOPT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be equalised'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter MINVAL
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(MINval) Minimum data value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter MAXVAL
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(MAXval) Maximum data value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter EQUALISE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(EQualise) Generate equalised output data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+endinterface
+interface IADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of first image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter IMAGE1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE1) Name of second image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IALOG
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to take antilog of'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be added to'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Additive constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be divided'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICMULT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be multiplied'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Multiplicative constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICONT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be contoured'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Low) Lowest contour level'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(High) Highest contour level'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter CONTOURS
+      position 8
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(COntours) Number of contour levels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 9
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter THICKNESS
+      position 10
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(THickness) Width of plotted lines'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.THICKNESS
+      helpkey '*'
+   endparameter
+   parameter LEVELS
+      position 11
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LEvels) Explicit contour levels to use'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ADJUST
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(ADjust) Adjust scales so as to fill display?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BYVALUE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(BYvalue) Specify contour level array explicitly?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Generate a hardcopy plot?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter PGENVARG
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.PGENVARG
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IMFILE
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVYST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYST
+   endparameter
+   parameter TVYEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+endinterface
+interface ICONV3
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to convolve with filter'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter CENTER
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Center) Central value for 3x3 convolution kernel'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter EDGE
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Edge) Edge value for 3x3 convolution kernel'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) The resulting filtered image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICOR16
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of input image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICSET
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to be modified'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter CONSTANT
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(CONstant) Value of constant to set region to'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 7
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Output file for modified data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICSUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be subtracted from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant to be subtracted from image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ICUR
+   helplib '$FIG_HELP'
+   parameter IDEV
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default '0.'
+      association <-GLOBAL.IDEV
+   endparameter
+   parameter IMARRAY
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.IMARRAY
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.IMFILE
+   endparameter
+   parameter XPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.XPIXELS
+   endparameter
+   parameter YPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.YPIXELS
+   endparameter
+   parameter NPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.NPIXELS
+   endparameter
+endinterface
+interface IDEV
+   helplib '$FIG_HELP'
+   parameter IMAGDEV
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMAGDEV) Device to use for image display'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OPTIONS
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(OPtions) List possible device names?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter FORCE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FOrce) Force use of an unrecognised device ?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter DRAW
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(DRaw) Output a test plot to the device?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter IDEV
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IDEV
+   endparameter
+endinterface
+interface IDIFF
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of input image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of first image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter IMAGE1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE1) Name of second image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IGCONV
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of file to be convolved with an array'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter CONVOL
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(COnvol) Text file that defines the convolution array'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image file'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface IGCUR
+   helplib '$FIG_HELP'
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter PGENVARG
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.PGENVARG
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.IMFILE
+   endparameter
+   parameter XPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.XPIXELS
+   endparameter
+   parameter YPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.YPIXELS
+   endparameter
+   parameter NPIXELS
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.NPIXELS
+   endparameter
+endinterface
+interface IGREY
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be grey-scaled'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Low) Lowest data level used (black level)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(High) Highest data level used (white level)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 8
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ADJUST
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(ADjust) Adjust scales so as to fill display?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Generate a hardcopy plot?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter PGENVARG
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.PGENVARG
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IMFILE
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVYST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYST
+   endparameter
+   parameter TVYEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+endinterface
+interface ILIST
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be listed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value for list'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value for list'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value for list'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value for list'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce a file containing list?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ILOG
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to take log of'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IMAGE
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be grey-scaled'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be displayed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Low) Lowest data level used (black level)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(High) Highest data level used (white level)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter OPTIMIZE
+      position 8
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(OPTimize) Amount of histogram optimisation (0 to 1)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XPLACES
+      position 9
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XPlaces) Number of sub-displays across screen in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YPLACES
+      position 10
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YPlaces) Number of sub-displays across screen in Y'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ATX
+      position 11
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(ATX) Sub-display position in X to use'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ATY
+      position 12
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(ATY) Sub-display position in Y to use'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XORIGIN
+      position 13
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XOrigin) Origin of display in X in display pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YORIGIN
+      position 14
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YOrigin) Origin of display in Y in display pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XPIXELS
+      position 15
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XPIxels) Number of display pixels to use in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YPIXELS
+      position 16
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YPIxels) Number of display pixels to use in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Calculate display limits automatically'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NEGATIVE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(NEgative) Set limits to give a negative image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter ASPECT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(ASpect) Maintain correct aspect ratio for image?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(LOG) Display using logarithmic scaling'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter ERASE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(ERASE) Erase screen before display'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(HARDCOPY) Use "hard" devices rather than imaging device'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter IDEV
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default '0.'
+      association <-GLOBAL.IDEV
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default '0.'
+      association <-GLOBAL.HARD
+   endparameter
+   parameter IMARRAY
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.IMARRAY
+   endparameter
+   parameter IMFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IMFILE
+   endparameter
+endinterface
+interface IMULT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of first image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter IMAGE1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE1) Name of second image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IPLOTS
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of cross-sections?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Xstart) Start of spectrum to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Xend) End of spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Ystart) First spectrum to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Yend) Last spectrum to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale each spectrum individually?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NSPECT
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(NSpect) Number of spectra per page'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 7
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce plot as a hard copy?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter COLOUR
+      position 8
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NEXT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Want next page'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface IPOWER
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to raise to specified power'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter POWER
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(POwer) Power to which image is to be raised'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IREVX
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be reversed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IREVY
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be reversed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IROT90
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be rotated'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ANTI
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(ANTI) Anti-clockwise rotation?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+endinterface
+interface ISEDIT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The 1D or 2D data'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting edited data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YVALUE
+#      position 0
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Y value to plot'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+endinterface
+interface ISHIFT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be shifted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSHIFT
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSHift) Shift in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSHIFT
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSHift) Shift in Y'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSPLIT
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSPlit) Subdivision of X pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSPLIT
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSPlit) Subdivision of Y pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 6
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISMOOTH
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be smoothed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FRACTION
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FRaction) Fraction of pixel data for redistribution'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter REPEAT
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(REpeat) Number of times to repeat basic smoothing'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISPLOT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce plot as a hard copy?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of cross-sections?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale so all of data fits?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter REVERSE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(REVerse) Plot cross-sections is reverse order?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIgh) Maximum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOw) Minimum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter OFFSET
+      position 8
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(OFfset) Offset applied to bias up x-sects'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SLANT
+      position 9
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(SLant) Offset in X to apply to successive x-sects'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 10
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ERASE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(ERase) Erase screen before plotting?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter AXES
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(AXes) Plot and label axes?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter COLOUR
+      position 11
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVYST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYST
+   endparameter
+   parameter TVYEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVYEN
+   endparameter
+   parameter TVDIM
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVDIM
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface ISTAT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to examine'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter PASS2
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(PAss2) Pass twice through data for better sigma value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter MEDIAN
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(MEDian) Calculate median as well as other statistics?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter STAT_TOTAL
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_TOTAL
+   endparameter
+   parameter STAT_MAX
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_MAX
+   endparameter
+   parameter STAT_MIN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_MIN
+   endparameter
+   parameter STAT_MEAN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_MEAN
+   endparameter
+   parameter STAT_SIGMA
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_SIGMA
+   endparameter
+   parameter STAT_SIZE
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_SIZE
+   endparameter
+   parameter STAT_XMAX
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_XMAX
+   endparameter
+   parameter STAT_XMIN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_XMIN
+   endparameter
+   parameter STAT_YMAX
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_YMAX
+   endparameter
+   parameter STAT_YMIN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_YMIN
+   endparameter
+   parameter STAT_XSTART
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_XSTART
+   endparameter
+   parameter STAT_XEND
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_XEND
+   endparameter
+   parameter STAT_YSTART
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_YSTART
+   endparameter
+   parameter STAT_YEND
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_YEND
+   endparameter
+   parameter STAT_MEDIAN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.STAT_MEDIAN
+   endparameter
+endinterface
+interface ISTRETCH
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be stretched'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSTRETCH
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSTretch) Stretch factor in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSTRETCH
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSTretch) Stretch factor in Y'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSHIFT
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSHift) Shift in X'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSHIFT
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSHift) Shift in Y'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSPLIT
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSPlit) Subdivision of X pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSPLIT
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSPlit) Subdivision of Y pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 8
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of first image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter IMAGE1
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMAGE1) Name of second image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISUBSET
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to subset'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) First Y value for subset'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Last Y value for subset'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value for subset'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value for subset'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 6
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISUPER
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to be supersetted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSize) X-dimension of superset image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSize) Y-dimension of superset image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XPIXEL
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XPixel) X-Position in output of input pixel (1,1)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YPIXEL
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YPixel) Y-Position in output of input pixel (1,1)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 6
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting superset image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISXADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISXDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISXMUL
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISXSUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISYADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISYDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISYMUL
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ISYSUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface IXSMOOTH
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of data to be smoothed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SIGMA
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(SIgma) Gaussian half width in pixels'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WIDTH
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WIdth) Pixels over which gaussian is calculated'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface LSPLOT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XSIze) Plot length in metres'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YSIze) Height of plot in metres'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale so all of spectrum fits?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIgh) Maximum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOw) Minimum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter BIAS
+      position 8
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIas) Bias value to be added to data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.BIAS
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 9
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LINES
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(LINes) Use a line plot (not a histogram)?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+endinterface
+interface LXSET
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image whose X values are to be set'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter WSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WStart) Wavelength of center of first bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WEnd) Wavelength of center of last bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of modified image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LOg) Bin into logarithmic wavelength bins?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface LYSET
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image whose Y values are to be set'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter VSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(VStart) Value of center of first bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter VEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(VEnd) Value of center of last bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of modified image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LOg) Set logarithmic Y values?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface MEDFILT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be smoothed'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter BOX
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Box) Size of box for median calculations'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface MEDFILTR
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be smoothed'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter XBOX
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(XBox) X-dimension of box for median calculations'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter YBOX
+      position 3
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(YBox) Y-dimension of box for median calculations'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface MEDSKY
+   helplib '$FIG_HELP'
+   parameter FILES
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(FILE) File containing list of images or spectra'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) The file containing the medians of the inputs'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter IMGLOG
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(IMGlog) Image to contain median origin values?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SCALED
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(SCale) Scale input images relative to the first?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(LOG) Create an image showing origins of median values?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+endinterface
+interface MSPLOT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce plot as a hard copy?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SAMESCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(SAmescale) Use same scale for each spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter NSPECT
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(NSpect) Number of spectra per page'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XRANGE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XRange) Range in X for each spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 6
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter COLOUR
+      position 7
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter THICKNESS
+      position 8
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(THickness) Plotted line width'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.THICKNESS
+      helpkey '*'
+   endparameter
+   parameter NEXT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Ready for next page'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+endinterface
+interface NCSET
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be set'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be set to constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter VALUE
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(Value) Constant value to set region to'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 5
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Output file for modified data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface OPTEXTRACT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The 2D data to be reduced to a spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter PROFILE
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(PROFile) The normalized spatial profile'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of resulting spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter WEIGHT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WEIght) Use errors to weight data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface POLYSKY
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The input 2D data'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YS1
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YS1) Y start for first sky region'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YE1
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YE1) Y end for first sky region'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YS2
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YS2) Y start for second sky region'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YE2
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YE2) Y end for second sky region'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter DEGREE
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(DEGree) Degree of polynomial'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NREJECT
+      position 7
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(NREJect) Number of points to reject from each column'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 8
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting sky subtracted data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WEIGHT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WEIght) Use errors to weight fit?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface PROFILE
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) The input 2D data'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) Y start for window'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Y end for window'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter DEGREE
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(DEGree) Degree of polynomial'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter NREJECT
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(NREJect) Number of points to reject'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter PROFILE
+      position 6
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(PROFile) Name of resulting profile image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter RESIDUAL
+      position 7
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(RESIDual) Name of image containing residuals'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WEIGHT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WEIght) Use errors to weight fit?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface QUAL2FLAG
+   helplib '$FIG_HELP'
+   parameter INPUT
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(INput) Name of file to have the quality array removed'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting file'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface REMBAD
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum containing bad points'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface RESAMPLE
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image to be resampled'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter TRANSFORM
+      position 2
+      type _REAL
+      vpath 'CURRENT,DYNAMIC'
+      prompt '(Transform) The transformation coefficients'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter XMAG
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XMag) X magnification'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter YMAG
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YMag) Y magnification'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter ANGLE
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(ANGle) Rotation angle'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter INVERT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(INvert) Invert the transformation?'
+      ppath 'CURRENT,DYNAMIC'
+      default FALSE
+   endparameter
+   parameter METHOD
+      position 6
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(Method) The interpolation method (1, 2, or 3)'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter XSIZE
+      position 7
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC'
+      prompt '(XSize) X-dimension of output image'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter YSIZE
+      position 8
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC'
+      prompt '(YSize) Y-dimension of output image'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter INVALID
+      position 9
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC'
+      prompt '(INValid) Value of an invalid pixel'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter OUTPUT
+      position 10
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface RESCALE
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be rescaled'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter LOWFACT
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOWfact) lower limit of rescaling'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter HIGHFACT
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIGHfact) upper limit of rescaling'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface RETYPE
+   helplib '$FIG_HELP'
+   parameter INPUT
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(INput) Name of file for which data type is to be changed'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TYPE
+      position 2
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(TYpe) New type for data array'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting data file'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface ROTX
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of data to be rotated in X'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter PIXELS
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(PIXels) Number of pixels to rotate data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of resulting rotated data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface SCNSKY
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to obtain sky from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter SECTION
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(SECtion) Length of each Y-section'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) name of spectrum to be generated'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter LIMIT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(LImit) Ignore pixels below a minimum value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter MINIMUM
+      position 4
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(MINimum) Minimum valid pixel value'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface SCLEAN
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be cleaned'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <-GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 2
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter IDEV
+      position 3
+      type _CHAR
+      access 'READ'
+      vpath 'DYNAMIC,GLOBAL'
+      prompt 'Device for image display'
+      ppath 'DYNAMIC,GLOBAL,DEFAULT'
+      default 'xwindows'
+      association <-GLOBAL.IDEV
+      helpkey '*'
+   endparameter
+   parameter IMARRAY
+      position 4
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.IMARRAY
+   endparameter
+   parameter IMFILE
+      position 5
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.IMFILE
+   endparameter
+   parameter QUIT
+      position 6
+      type _LOGICAL
+      vpath 'NOPROMPT'
+      prompt 'Terminate cleaning process'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter DEG
+      position 7
+      type _INTEGER
+      vpath 'DEFAULT,PROMPT'
+      prompt 'Degree of fit to use for interpolation'
+      default 2
+      range 0,7
+      helpkey '*'
+   endparameter
+   parameter XSIZE
+      position 8
+      type _INTEGER
+      vpath 'DEFAULT,PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in X'
+      default 5
+      range 1,20
+      helpkey '*'
+   endparameter
+   parameter YSIZE
+      position 9
+      type _INTEGER
+      vpath 'DEFAULT,PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in Y'
+      default 5
+      range 1,20
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 10
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Highest displayed data value'
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 11
+      type _REAL
+      vpath 'PROMPT'
+      prompt 'Lowest displayed data value'
+      helpkey '*'
+   endparameter
+   parameter LOGFILE
+      position 12
+      type FILENAME
+      vpath 'DEFAULT'
+      prompt 'Log file'
+      ppath 'DEFAULT'
+      default !
+      helpkey '*'
+   endparameter
+   parameter BATCHFILE
+      position 13
+      type FILENAME
+      vpath 'DEFAULT'
+      prompt 'File containing commands for batch operation (!=interactive)'
+      default !
+      helpkey '*'
+   endparameter
+   parameter BITNUM
+      position 14
+      type _INTEGER
+      vpath 'DYNAMIC,DEFAULT'
+      prompt 'Bit number of quality mask to modify for bad pixels'
+      ppath 'DYNAMIC,DEFAULT'
+      default 4
+      range 0,7
+      helpkey '*'
+   endparameter
+   parameter ZOOM
+      position 15
+      type _INTEGER
+      vpath 'DEFAULT'
+      prompt 'Pixel magnification factor in Expanded and SCUBA modes'
+      default 6
+      range 1,24
+      helpkey '*'
+   endparameter
+endinterface
+interface SCROSS
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter TEMPLATE
+      position 2
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(TEmplate) Name of template spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter FITCONT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FItcont) Fit continuum to data prior to cosine bell?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter CBPC
+      position 5
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(CBpc) Percentage of spectrum covered by cosine bell'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter RECORD
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(RECord) Create file to record cross-correlation?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CROSS
+      position 6
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(CRoss) Name of cross-correlation data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SHIFT
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SHIFT
+   endparameter
+endinterface
+interface SCRUNCH
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be scrunched'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter WSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WStart) Wavelength of center of first bin'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter BINS
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIns) Number of bins for scrunched spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 5
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Name of scrunched spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter INCREMENT
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(INCrement) Treat WEND value as an increment value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter FINAL
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FInal) Treat WEND as a final wavelength value?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter LOG
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LOg) Bin into logarithmic wavelength bins?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LINEAR
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LInear) Use linear interpolation for data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter QUAD
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(Quad) Use quadratic interpolation for data?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter FLUX
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(Flux) Conserve flux (as opposed to mean value)?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter MEAN
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(Mean) Conserve mean value (as opposed to flux)?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SCRUNCH_INC
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SCRUNCH_INC
+   endparameter
+   parameter SCRUNCH_END
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.SCRUNCH_END
+   endparameter
+endinterface
+interface SFIT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Name of spectrum to be fitted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter ORDER
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(ORder) Order of fitted polynomial'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter LOGS
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(LOgs) Fit to logarithms of data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface SLICE
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image from which slice is taken'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) Y value of start of slice'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) Y value of end of slice'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) X value for start of slice'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) X value of end of slice'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter ELEMENTS
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(ELements) Number of pixels in resulting spectrum'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 7
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Resulting spectrum'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+endinterface
+interface SOFT
+   helplib '$FIG_HELP'
+   parameter SOFTDEV
+      position 1
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(SOftdev) Device to use for soft plots'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OPTIONS
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(OPtions) List possible device names?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter FORCE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(FOrce) Force use of an unrecognised device ?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter DRAW
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(DRaw) Output a test plot to the device?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.SOFT
+   endparameter
+endinterface
+interface SPLOT
+   helplib '$FIG_HELP'
+   parameter SPECTRUM
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(SPectrum) Spectrum to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+   parameter HARDCOPY
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(HArdcopy) Produce plot as a hard copy?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter WHOLE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(WHole) Plot all of spectrum?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter AUTOSCALE
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt '(AUtoscale) Scale so all of spectrum fits?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) First X-value to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) Last X-value to be plotted'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter HIGH
+      position 4
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(HIgh) Maximum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.HIGH
+      helpkey '*'
+   endparameter
+   parameter LOW
+      position 5
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(LOw) Minimum data value to be plotted'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.LOW
+      helpkey '*'
+   endparameter
+   parameter BIAS
+      position 6
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(BIas) Bias value to be added to data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.BIAS
+      helpkey '*'
+   endparameter
+   parameter LABEL
+      position 7
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(LABel) Label for plot'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter ERASE
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(ERase) Erase screen before plotting?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter AXES
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(AXes) Plot and label axes?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter LINES
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(LINes) Use a line plot (not a histogram)?'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      default FALSE
+      helpkey '*'
+   endparameter
+   parameter COLOUR
+      position 8
+      type LITERAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter THICKNESS
+      position 9
+      type _REAL
+      vpath 'CURRENT,DYNAMIC,DEFAULT'
+      prompt '(THickness) Plotted line width'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.THICKNESS
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter HARD
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.HARD
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association ->GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface SQRTERR
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to calculate errors for'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Factor where Error=SQRT(Data/FACTOR)'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface SURFIT
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Name of image to be fitted'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter XKNOTS
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XKnots) Number of interior knots in X'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter YKNOTS
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YKnots) Number of interior knots in Y'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter VMODE
+      position 4
+      type LITERAL
+      vpath 'PROMPT'
+      prompt '(VMode) "Median" or "Average" for panel values?'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+   parameter MOSAIC
+#      position 0
+      type _LOGICAL
+      vpath 'DYNAMIC,DEFAULT'
+      prompt '(MOsaic) Generate mosaic instead of fitted data?'
+      ppath 'CURRENT,DYNAMIC'
+      default FALSE
+   endparameter
+   parameter OUTPUT
+      position 5
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC'
+   endparameter
+endinterface
+interface TIPPEX
+   helplib '$FIG_HELP'
+   parameter OUTPUT
+      position 1
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUtput) Output file for fudged data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter CONFIRM
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Go ahead'
+      helpkey '*'
+   endparameter
+   parameter QUIT
+#      position 0
+      type _LOGICAL
+      vpath 'PROMPT'
+      prompt 'Quit TIPPEX'
+      helpkey '*'
+   endparameter
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVHIGH
+   endparameter
+   parameter TVFILE
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.TVFILE
+   endparameter
+   parameter TVCOLOR
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVCOLOR
+   endparameter
+endinterface
+interface XCADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with X data to be added to'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Additive constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface XCDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with X data to be divided'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface XCMULT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with X data to be multiplied'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Multiplicative constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface XCSUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with X data to be subtracted from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant to be subtracted from data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface YCADD
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with Y data to be added to'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Additive constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface YCDIV
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with Y data to be divided'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface YCMULT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with Y data to be multiplied'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Multiplicative constant'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface YCSUB
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) Image with Y data to be subtracted from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter FACTOR
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(FACtor) Constant to be subtracted from data'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OUTPUT
+      position 3
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(OUTput) Name of resulting image'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+endinterface
+interface XCUR
+   helplib '$FIG_HELP'
+   parameter SOFT
+#      position 0
+      type _CHAR
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association <-GLOBAL.SOFT
+   endparameter
+   parameter TVXST
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXST
+   endparameter
+   parameter TVXEN
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVXEN
+   endparameter
+   parameter TVLOW
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVLOW
+   endparameter
+   parameter TVHIGH
+#      position 0
+      type _REAL
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default 0.
+      association <-GLOBAL.TVHIGH
+   endparameter
+   parameter XSTART
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.XSTART
+   endparameter
+   parameter XEND
+#      position 0
+      type _REAL
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association ->GLOBAL.XEND
+   endparameter
+endinterface
+interface XTPLANE
+   helplib '$FIG_HELP'
+   parameter CUBE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(CUbe) Name of data cube to extract image from'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter YSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YStart) first y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YSTART
+      helpkey '*'
+   endparameter
+   parameter YEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(YEnd) last y-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.YEND
+      helpkey '*'
+   endparameter
+   parameter IMAGE
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to be created'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+endinterface
+interface XYPLANE
+   helplib '$FIG_HELP'
+   parameter CUBE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(CUbe) Name of data cube to extract image from'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TStart) first t-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter TEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(TEnd) last t-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter IMAGE
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to be created'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+endinterface
+interface YSTRACT
+   helplib '$FIG_HELP'
+   parameter IMAGE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to extract data from'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) first x-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) last x-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter SPECTRUM
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(SPectrum) name of spectrum to be generated'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.SPECTRUM
+      helpkey '*'
+   endparameter
+endinterface
+interface YTPLANE
+   helplib '$FIG_HELP'
+   parameter CUBE
+      position 1
+      type NDF
+      access 'READ'
+      vpath 'PROMPT'
+      prompt '(CUbe) Name of data cube to extract image from'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter XSTART
+      position 2
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XStart) first x-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XSTART
+      helpkey '*'
+   endparameter
+   parameter XEND
+      position 3
+      type _REAL
+      vpath 'PROMPT'
+      prompt '(XEnd) last x-value to be used'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.XEND
+      helpkey '*'
+   endparameter
+   parameter IMAGE
+      position 4
+      type NDF
+      access 'WRITE'
+      vpath 'PROMPT'
+      prompt '(IMage) name of image to be created'
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association <->GLOBAL.IMAGE
+      helpkey '*'
+   endparameter
+endinterface
+interface COPOBJ
+   helplib '$FIG_HELP'
+   parameter SOURCE
+      position 1
+      type HDSOBJECT
+      prompt 'HDS object to be copied'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OBJECT
+      position 2
+      type HDSOBJECT
+      prompt 'HDS object to be created or modified'
+      helpkey '*'
+   endparameter
+endinterface
+interface CREOBJ
+   helplib '$FIG_HELP'
+   parameter TYPE
+      position 1
+      type _CHAR
+      prompt 'HDS-type of object to be created'
+      default '_REAL'
+      helpkey '*'
+   endparameter
+   parameter DIMS
+      position 2
+      type _INTEGER
+      prompt 'Dimensions of HDS object to be created'
+      default 0
+      helpkey '*'
+   endparameter
+   parameter OBJECT
+      position 3
+      type HDSOBJECT
+      prompt 'HDS object to be created'
+      helpkey '*'
+   endparameter
+endinterface
+interface DELOBJ
+   helplib '$FIG_HELP'
+   parameter OBJECT
+      position 1
+      type HDSOBJECT
+      prompt 'HDS object to be deleted'
+      helpkey '*'
+   endparameter
+endinterface
+interface GOODVAR
+   helplib '$FIG_HELP'
+   parameter IN
+      position 1
+      type NDF
+      access 'READ'
+      prompt 'Input NDF'
+      helpkey '*'
+   endparameter
+   parameter OUT
+      position 2
+      type NDF
+      access 'WRITE'
+      prompt 'Output NDF'
+      helpkey '*'
+   endparameter
+   parameter BAD
+      position 3
+      type _REAL
+      prompt 'Value to replace bad variances'
+      default !
+      helpkey '*'
+   endparameter
+   parameter NEG
+      position 4
+      type _REAL
+      prompt 'Value to replace negative variances'
+      default !
+      helpkey '*'
+   endparameter
+   parameter ZERO
+      position 5
+      type _REAL
+      prompt 'Value to replace zero variances'
+      default !
+      helpkey '*'
+   endparameter
+endinterface
+interface Q2BAD
+   helplib '$FIG_HELP'
+   parameter IN
+      position 1
+      type NDF
+      access 'READ'
+      prompt 'Input NDF data structure'
+      help '*'
+   endparameter
+   parameter OUT
+      position 2
+      type NDF
+      access 'WRITE'
+      prompt 'Output NDF'
+      help '*'
+   endparameter
+endinterface
+interface RENOBJ
+   helplib '$FIG_HELP'
+   parameter SOURCE
+      position 1
+      type HDSOBJECT
+      prompt 'HDS object to be renamed'
+      helpkey '*'
+   endparameter
+   parameter DESTIN
+      position 2
+      type HDSOBJECT
+      prompt 'Destination of renamed HDS object'
+      helpkey '*'
+   endparameter
+endinterface
+interface SETOBJ
+   helplib '$FIG_HELP'
+   parameter VALUE
+      position 1
+      type LITERAL
+      prompt 'New value for HDS scalar'
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   endparameter
+   parameter OBJECT
+      position 2
+      type HDSOBJECT
+      prompt 'HDS object to be assigned a value'
+      helpkey '*'
+   endparameter
+endinterface
+interface TRIMFILE
+   helplib '$FIG_HELP'
+   parameter IN
+      position 1
+      type HDSOBJECT
+      prompt 'Input HDS file'
+      helpkey '*'
+   endparameter
+   parameter OUT
+      position 2
+      type _CHAR
+      prompt 'Name of clean copy of HDS file'
+      helpkey '*'
+   endparameter
+endinterface
+endmonolith
