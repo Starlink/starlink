@@ -38,6 +38,8 @@
 #        Modified CreateMask to look for the same mask in other images,
 #        before looking for the other mask in the specified image. See
 #        TMG mail 2/9/99, 3/99/99 (saved in PINE on 15/9/99).
+#     28-FEB-2000 (DSB):
+#        Modified call to KAPPA:SEGMENT to do away with COSYS parameter.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -11827,6 +11829,8 @@ proc Segment {indata outdata image obj} {
 #
 #  Purpose:
 #     Uses KAPPA:SEGMENT to copy a region of one image into another image.
+#     It assumes that all images have PIXEL as the current co-ordinate
+#     Frame.
 #
 #  Arguments:
 #     indata
@@ -11922,7 +11926,7 @@ proc Segment {indata outdata image obj} {
 
 # Run SEGMENT to extract the mask area into a temporary image.  
    if { $outdata == "" } { set outdata "!" }
-   if { ![Obey kappa segment "cosys=world in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
+   if { ![Obey kappa segment "in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
       set maskarea ""
    }
 
