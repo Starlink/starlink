@@ -14,3 +14,6 @@ surf_scuclip.f surf_extflat.f surf_grid_despike.f surf_scuba2mem.f   \
 surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f	     \
 surf_add_dbm.f surf_remip.f surf_request_output_coords.f	     \
 surf_scuclkerr.f surf_write_map_info.f
+
+PRIVATE_INCLUDES = SURF_PAR
+
