@@ -8645,6 +8645,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ConcatStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/EmptyStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/JoinStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ObjectArrayColumn.java
@@ -8736,6 +8737,7 @@ U java/source/table/src/main/uk/ac/starlink/table/join/TextProgressIndicator.jav
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/storage
 U java/source/table/src/main/uk/ac/starlink/table/storage/Codec.java
 U java/source/table/src/main/uk/ac/starlink/table/storage/ColumnWidth.java
+U java/source/table/src/main/uk/ac/starlink/table/storage/DiscardRowStore.java
 U java/source/table/src/main/uk/ac/starlink/table/storage/DiskRowStore.java
 U java/source/table/src/main/uk/ac/starlink/table/storage/ListRowStore.java
 U java/source/table/src/main/uk/ac/starlink/table/storage/NioDataInput.java
@@ -8763,6 +8765,8 @@ U java/source/table/src/testcases/uk/ac/starlink/table/RowSubsetTest.java
 U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui
 U java/source/table/src/testcases/uk/ac/starlink/table/gui/StarTableNodeChooserTest.java
+cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/storage
+U java/source/table/src/testcases/uk/ac/starlink/table/storage/StorageTest.java
 cvs checkout: Updating java/source/tamfits
 U java/source/tamfits/README
 U java/source/tamfits/build.xml
