@@ -88,14 +88,23 @@ Makefile.dependencies: componentset.xml
 	    :; \
 	fi
 
+# Make a componentset.xml by concatenating all the component.xml files
+# we can find.  Sort the list of files, not because this matters, but
+# to make this deterministic.  The removal of the DOCTYPE lines and
+# PIs is admittedly lame, but good enough for the moment.
 componentset.xml: componentinfo.dtd
 	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
 	echo '<componentset>' >>$@
-#	cat `find . -name component.xml` | sed -e '/^<?/d' -e '/^<!/d' >>$@
-	find . -name component.xml -exec cat '{}' ';' | \
-		sed -e '/^<?/d' -e '/^<!/d' >>$@
+	find . -name component.xml | sort | { \
+	    while read cname; do \
+		sed -e '/^<?/d' -e '/^<!DOCTYPE/d' $$cname >>$@; \
+	    done; }
 	echo '</componentset>' >>$@
 
+# Make a link to an installed componentinfo.dtd file.  This will not
+# work at bootstrap time (so the bootstrap file takes care of this
+# link).  It does no harm to have the rule in, just in case this is
+# used at some other time.
 componentinfo.dtd:
 	$(LN_S) `starconf --show buildsupportdata`/componentinfo.dtd componentinfo.dtd
 
