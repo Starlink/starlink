@@ -7303,6 +7303,7 @@ U java/source/table/src/main/uk/ac/starlink/table/AbstractStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ArrayColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnData.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
+U java/source/table/src/main/uk/ac/starlink/table/ColumnPermutedStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnScratchTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
@@ -7323,6 +7324,8 @@ U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
+U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/WrapperTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
@@ -7334,8 +7337,10 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/SQLReadDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLWriteDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ValueInfoCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/WriterFileFilter.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/package.html
@@ -7354,6 +7359,7 @@ U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/SizingScrollPane.java
+U java/source/table/src/main/uk/ac/starlink/table/view/TableColumnModelAdapter.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
 U java/source/table/src/main/uk/ac/starlink/table/view/WindowTracker.java
 cvs checkout: Updating java/source/table/src/resources
