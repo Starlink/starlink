@@ -94,9 +94,9 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			FID			! File identifier
-      INTEGER			HDUTYP			! HDU type
-      INTEGER			IHDU			! HDU number
+c     INTEGER			FID			! File identifier
+c     INTEGER			HDUTYP			! HDU type
+c     INTEGER			IHDU			! HDU number
 *.
 
 *  Check inherited global status.

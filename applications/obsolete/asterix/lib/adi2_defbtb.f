@@ -116,11 +116,11 @@
 
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU identifier
-      INTEGER			KCID			! Keyword container
+c     INTEGER			KCID			! Keyword container
       INTEGER			LUN			! Logical unit
-      INTEGER			NKEY			! Number of keywords
+c     INTEGER			NKEY			! Number of keywords
 
-      LOGICAL			DIDCRE
+c     LOGICAL			DIDCRE
 *.
 
 *  Check inherited global status.
