@@ -1,0 +1,260 @@
+
+                   Fit astrometric system to image
+                   ===============================
+
+   How to use this window:
+   =======================
+
+This window is designed for fitting an astrometric calibration to your
+image. To use it you need to go through several stages:
+
+    1) Obtain reference positions (e.g.) from a catalogue.
+
+    2) Position these over the corresponding image features.
+
+    3) Perform a fit from sky to image coordinates.
+
+    4) Test the new coordinate system.
+
+    5) Accept it if you're happy.
+
+See below for more about these stages.
+
+
+   Obtaining reference positions
+   =============================
+
+You can get reference position information from many sources
+(consulting your coworkers about how they get such information is
+often a good start), but the most easily available in GAIA is from the
+Guide Star Catalogue (GSC) and US Naval Catalogue (USNO) which you can
+query using the "Catalogues..." item under the "Data-Servers" menu on
+the main window.
+
+
+   --- Copying positions from a catalogue window.
+
+   After you've made a query to a catalogue for some reference
+   positions, you can copy these to this window using the "Grab"
+   button. This creates a dialog window from which you need to select
+   the catalogue you're interested in.
+
+   Note to use this feature you'll need to know the approximate centre
+   and size of your image (in arcminutes). One strategy to make things
+   even easier is to use this information (or perhaps just the name of
+   your object) to retrieve a Digital Sky Survey (DSS) image (see the
+   item "Image Servers..." under the "Data-Servers" menu in main
+   window). This can be used to display the catalogue positions and help
+   you identify which image features they correspond to (note that you
+   can "Grab" catalogues from other windows, and to display a second
+   image you need open the "File" menu in the main window and select
+   the "New Window" item). You can also use such an image to generate
+   your own reference positions (if the GSC or USNO catalogues do not
+   have many positions in your field).
+
+   --- Modifying a reference position.
+
+   All the reference positions are listed in rows the reference
+   table. To modify one of these values you either:
+
+      1) Select the required line in the reference positions table
+         and now press the "Edit" button. This opens a dialog window in
+         which you can edit the positions (take care to press the "Enter"
+         button to update the entry).
+
+      2) Double click mouse button 1 over the corresponding image graphics
+         marker. This will result in the same dialog window being revealed.
+
+
+   --- Adding a reference position.
+
+   To do this just press the "New" button and fill in the dialog
+   window. Remember to give a valid "id" (which can be any unique
+   string or number) and press "Enter" to create the new object. You
+   can enter more than one object at a time by editing new values and
+   pressing "Enter" again.
+
+   --- Deleting a reference position.
+
+   Either select the row in the reference table and press the "Delete"
+   button, or press <Control-Mouse-Button-1> over the marker. Note you
+   can delete many rows at a time by selecting all their entries in the
+   reference table.
+
+
+   Positioning reference points on your image
+   ==========================================
+
+Each reference position is associated with a graphics marker that is
+displayed over the image (the default is a small circle). The position
+of this marker identifies the point on the image that corresponds to
+the correct position on the sky.
+
+   --- Moving a graphics marker.
+
+   You do this by:
+
+      1) Dragging the marker around over the image (to do this
+         press, and holding down, mouse button 1 and then move
+         the mouse, when your cursor is over the marker).
+
+      2) Selecting the required line in the reference positions
+         table and then pressing the "Edit" button. This opens a
+         dialog window in which you can edit the positions (take
+         care to press the "Enter" button to update the entry).
+
+      3) Double clicking mouse button 1 over the marker will also
+         create a dialog window in which you can edit the values.
+
+
+   --- Moving all graphics markers.
+
+   If you want to move all the markers as if they where coupled
+   together (so that for instance they all move by the same amount,
+   or rotate/scale about the same point). Then open the "Options"
+   menu and select the "Move markers individually" item to switch
+   this option off. Now when you move one marker they will all move
+   together. You'll also notice a cross marker appearing on the
+   image, this identifies the rotation/scale centre and can be moved
+   just like any other marker. To rotate or scale all markers, press
+   mouse button 2 over one and drag the marker to its new position.
+
+
+   --- Seeing which markers correspond to which reference positions.
+
+   Just place your cursor over the marker you're interested in and
+   the appropriate row in the reference table will be
+   highlighted. Double clicking the marker also shows the values
+   associated with the object.
+
+
+   --- Accurately centering all the markers on stars.
+
+   If your reference positions are all stars (or non-confused peaked
+   objects), then you can accurately position the markers by
+   centroiding. Just press the "Centroid" button.
+
+
+   Trying out a fit
+   ================
+
+After you've got sufficient reference positions created and you've
+positioned their graphics markers to your satisfaction, you can
+attempt a fit by pressing the "Test" button. The results of
+the fit are displayed in a scrollable window just below the "Test"
+button.
+
+
+   Checking the fit
+   ================
+
+After doing a fit you can assess it visually by checking the new
+marker positions, which are updated. You can also read off positions
+using the main window facilities, check the axes orientations using
+a grid overlay (see "Overlay axes grid..." under "Image-Analysis") and
+replot any catalogues positions from query windows.
+
+
+   Saving the new astrometry
+   =========================
+
+When you've happy with the quality of your calibration press the
+"Accept" button to close the window. This updates the image with the
+new astrometric system, but to retain this information you need to
+save the image to disk (see the "Save as..." item in the "File"
+menu).
+
+
+   Miscellaneous features
+   ======================
+
+   How to:
+   -------
+
+   --- Change the appearance of the object markers.
+
+   Open the "Graphics" menu. Under this are many options for setting the
+   size, shape and colour of the markers.
+
+
+   --- Clear the markers from the image.
+
+   You can do this by closing the window, or by using the "Clear" item
+   under the "Graphics" menu.
+
+
+   --- Redraw the markers.
+
+   Open the "Graphics" menu and select the "Redraw" item.
+
+
+   --- Remove markers which are not on the image.
+
+   Press the "Clip" button.
+
+
+   --- Save the reference positions.
+
+   You can write a plain text file copy of the reference positions using
+   the "Write positions to a file..." item in the "File" menu. These can
+   be read back later using the "Read positions from a file...".
+
+   --- Read reference positions from places other than catalogue windows.
+
+   You can read in reference positions from plain text files using the
+   "Read positions from a file..." item in the "File" menu. The format of
+   these files should be either:
+
+      1)  id ra dec x y
+
+      2)  id ra dec
+
+      3)  ra dec
+
+   Each field should be space separated, and ra's and dec's should be
+   written as either hh/dd:mm:ss.ss strings or dd.dd values. Note
+   that this format is different to that used by "Local Catalogues",
+   which use a tab-separated design that also allows parameters, column
+   naming etc. It is designed to be simple to create using text editors
+   and other programs. You can manipulate and save local catalogues, but
+   you will need to "Grab" the values on each occasion.
+
+
+   What are:
+   ---------
+
+   --- All those fields in the "Table parameters:" section?
+
+   The fields in this section define the type and system of your
+   reference coordinates. Usually these will be "Equatorial" (i.e.
+   right ascension and declination), in the FK5 system and have
+   an equinox of J2000. However, they could potentially also be in
+   the FK4 system, in which case the usual equinox is B1950 with
+   epoch also of 1950. You'll need to check the source of your
+   reference positions to find out this information. Most standard
+   catalogue positions (and certainly those which are used on-line by
+   GAIA) are in FK5/J2000 coordinates.
+
+
+   --- All those fields in the "Astrometric parameters:"
+
+   If you are dealing with images which have been taken on optical
+   telescopes (not Schmidt) then you can probably leave the
+   "Projection type:" field in its default value (radio astronomers
+   and others with unusual configurations will need to worry more about
+   this field).
+
+
+   The "X coordinate type" field is used to say which image axes
+   are most like the corresponding "ra" and "dec" columns (you would
+   select "X coordinate type:" as Dec if your image had Declination
+   running along the X axis). If this occasionally necessary when
+   fitting rotated images and using fit options other than the one that
+   allows shearing terms.
+
+
+   To learn more about projections and the different types of celestial
+   coordinate systems have a look at the various FITS documents
+   available, such as the draft "Representations of celestial coordinate
+   in FITS", by Eric W. Greisen and Mark Calabretta
+   (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).

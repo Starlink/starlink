@@ -1,0 +1,78 @@
+
+                          The blink toolbox
+                          =================
+
+   How to use this window to:
+   --------------------------
+
+   --- Move an image:
+
+You only move one image at a time (the "mobile" image). This is the
+one displayed when the window is first created. You can move it by
+using the arrow button arrangement, or by using your arrow keys.  
+
+If you want to use your arrow keys then you should place your mouse
+cursor within the bounds of the region where the image is
+displayed. The image can be moved in larger steps by pressing the
+Control or Shift key and the arrow keys together.
+
+
+   --- Change which image is moved:
+
+Press the "View next image" button (after halting the blink) until the
+image you want to move is visible. Now press the "Mark image mobile"
+button. Now when you start the blink this image will move when you
+press the keyboard arrows.
+
+
+   --- Add a new image to blink, remove an image:
+
+The images that are blinked are "views" of all the images displayed in
+the main windows. To add a new image close the blink window create a
+new window and display the new image in it. Now when you create a new
+blink window this will also be used. 
+
+To remove an image select the "Images" menu at the top of the window
+and deselect the appropriate one. Note you must have at least one
+image displayed.
+
+
+   --- Change the display range, colours of the blinked images:
+
+The blinked images are just "views" of the main images (like the zoom
+and pan windows) and copy any changes made to the main images
+(including colour changes and zoom, but not pan).
+
+
+   --- Increase the speed of blinking.
+
+Increased blinking speeds correspond to a lower "Speed factor". To
+reduce the speed factor press the down arrowhead to the right of the
+number. Speed factor 1 should correspond to video speeds if any one
+has a machine/graphics card fast enough.
+
+
+   --- Get a more consistent blink rate:
+
+The best way to use the blink window is to run it on a lightly loaded
+machine with an integral X display (i.e. a local machine not a
+server). Running over a network or on a heavily loaded machine will
+give an inconsistent refresh rate, about which you can do little
+except keep the speed factor high. If things are really bad on your
+system then switch blinking off and use the "View next image" button
+to cycle the image stack.
+
+
+   --- Cycle though the images "by hand"
+
+You can cycle through the displayed images one-by-one by using the
+"View next image" button. Alternatively you can get the same effect 
+by pressing the <Return> key when the mouse cursor is in the image 
+display region.
+
+
+   --- Recover parts of my images that are missing!
+
+If you change the size of the blink window some of your images
+(usually in the right extreme) may no longer be shown. To correct this
+press the "Refresh" button. 

@@ -1,0 +1,21 @@
+interface CAT2TAB
+
+   parameter OUT
+      position 1
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of input catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter IN
+      position 2
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of output catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+endinterface

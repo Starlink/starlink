@@ -1,0 +1,74 @@
+
+                           Catalogue access
+                           ================
+
+This window displays information obtained from remote and local
+catalogues.  It allows you to make queries of the catalogues for
+information about a region of sky, select which elements of the
+catalogue are displayed and control the appearance of the associated
+image markers.
+
+It also has facilities for obtaining images (from the DSS) and for
+finding out about any previous observations made by HST, NNT and the
+CFHT.
+
+
+      Remote catalogues
+      -----------------
+
+Remote catalogues are obtained from Web servers over the internet.
+Typically these servers return object coordinates (as Right Ascension
+and Declination) together with other useful information, such as
+magnitudes and possibly links to bibliographic (ADS) and archive (HST,
+NNT and CFHT) details.
+
+The main services used by GAIA and Skycat are provided by ESO, CADC
+and LEDAS.
+
+To see a list of all the catalogues available select the "Browse
+Catalog Directories..." item in the "Data-Servers" menu. This should
+reveal a window containing a directory-like listing of all the
+catalogues. Those marked with type "directory" may be expanded to show
+their full contents by pressing the plus sign against their names.
+
+The catalogues shown outside of the site directory listings are the
+default set and are those shown in the "Catalogs" sub-menus of the
+"Data-Servers" menu.
+
+Queries for images of a region of sky can be made by selecting the
+"Image Servers" item and queries of existing observations of a region
+of sky by the "Archives" items.
+
+
+      Local catalogues
+      ----------------
+
+Local catalogues are contained in files held on your local
+computer. These are opened using the "Open" item in the "File" menu,
+or by the "Local Catalogues" sub-menu in the "Data-Servers" menu (this
+is available in the main window and in the catalogue window). Local
+catalogues can be created by saving remote ones to disk (this is a
+good idea when you have slow or intermittent internet access), or they
+can be created by other programs (such as SExtractor -- SUN/225).
+
+The native format of local catalogues is called "tab-table". This is a
+simple, plain-text, format that is described in the GAIA SUN (214). 
+
+As well as this format (which is the most efficient to use), local
+catalogues can be stored in any format accessible by the CURSA
+(SUN/190) package (this includes FITS-tables), and the "ASCII_HEAD"
+format used by the SExtractor package.
+
+
+      Finding out more
+      ----------------
+
+If you'd like to know more about the "Data-Servers" menu then look in
+the "Help" menu on the main window and select "SkyCat...". This should
+start up netscape and take you to the WWW Skycat page at ESO. There's
+a FAQ and some other information available there. The description of
+how the WCS system works is largely correct, but GAIA uses a different
+back-end (the Starlink AST library) which supports more formats (the
+draft FITS-WCS system for instance) and the NDF WCS component. You
+should also note that GAIA may not be using the latest version of
+SkyCat, so everything described there may not be available.

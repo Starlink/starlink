@@ -53,6 +53,9 @@ ImageColor::ImageColor(Display* display, Visual* visual,
     readOnly_ = 0;
   } else {
     readOnly_ = 1;
+
+    //  Assume all colours are available, and use them.
+    cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_))- 1);
   }
 
   //  If default visual isn't the same then create a local colormap.

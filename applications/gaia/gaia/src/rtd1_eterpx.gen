@@ -1,0 +1,58 @@
+      SUBROUTINE RTD1_ETERP<T>( DX, DY, NX, NY, DATA, INDX, SPEC )
+C-----------------------------------------------------------------------
+C  Subroutine to do Everett interpolation.  INITEI should be called once
+C  with the order of the interpolation desired to set up variables in
+C  common before any subsequent calls to this routine.
+C  INPUTS:
+C    DX      R*4      X position.
+C    DY      R*4      Y position.
+C    NX      I*4      Number of X pts in DATA.
+C    NY      I*4      Number of Y pts in DATA.
+C
+C    DATA    <TYPE>   Image data array.
+C    INDX    I*4      Index of SPEC to place result
+C  OUTPUTS:
+C    SPEC    <TYPE>   Interpolated value.
+C  Note: This routine is based closely on the routine ETERP from the AIPS
+C  program SLICE, but has been simplified for Figaro since it can now
+C  assume that all the data array is available.
+C                                                KS / CIT 22nd March 1984
+C
+C     26th Jul 1994.   Make common blocks SAVE. HME / UoE, Starlink.
+C     25th Nov 1997.   Make generic to deal with different data types
+C                      PWD / Durham, Starlink.
+C     26th Nov 1997    Now skips BAD pixels. PWD / Durham, Starlink.
+C-----------------------------------------------------------------------
+      IMPLICIT NONE
+      INTEGER*4 NX, NY, INDX
+      <TYPE> DATA(NX,NY), SPEC( * )
+      REAL*4 DX, DY, SVX(14), SVY(14), OUTVAL, XSUM, ZIKP
+      INTEGER*2 IXI, IYI, K, MORD, MORD1, MORD12, MORD21
+      INTEGER*2 J, JP, KP
+      INCLUDE 'PRM_PAR'
+      COMMON /RTD1_STCOM/ MORD, MORD1, MORD12, MORD21
+      SAVE /RTD1_STCOM/
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+C-----------------------------------------------------------------------
+      OUTVAL = 0.0
+      CALL RTD1_EVERT( DX, IXI, SVX )
+      CALL RTD1_EVERT( DY, IYI, SVY )
+C                                       Loop on y-interpolation:
+      DO 130 J = 1 , MORD12
+         JP = J + IYI
+         IF ((JP.LT.1).OR.(JP.GT.NY)) GO TO 130
+         XSUM = 0.0
+C                                       Do an x-interpolation:
+         DO 120 K = 1, MORD12
+            KP = K + IXI
+            IF ((KP.LT.1).OR.(KP.GT.NX)) GO TO 120
+            IF ( DATA( KP, JP ) .EQ. VAL__BAD<T> ) GO TO 120
+            ZIKP = REAL( DATA(KP,JP) )
+            XSUM = XSUM + (ZIKP * SVX(K))
+ 120     CONTINUE
+         OUTVAL = OUTVAL + (XSUM * SVY(J))
+ 130  CONTINUE
+      SPEC( INDX ) = NUM_RTO<T>( OUTVAL )
+      RETURN
+      END

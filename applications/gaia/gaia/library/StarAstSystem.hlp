@@ -1,0 +1,16 @@
+
+                Set image celestial coordinate system
+                =====================================
+
+This window is designed to allow you to modify your image's celestial
+coordinate system. The choices available cover: FK5, FK4, FK4 with no
+E terms, Ecliptic, Galactic and SuperGalactic coordinates, just choose
+the system that you are after using the "System:" menu button and
+qualify it with an appropriate equinox and epoch, if necessary.
+
+To apply the new system to the image press the "Test" button. This
+will make the sky coordinate position readouts change, and any grid
+overlay (although you can modify the coordinate that a grid is plotted
+in using methods in the grid plotting window). To make the change
+permanent press the "Accept" button and save the image to disk.
+

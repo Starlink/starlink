@@ -1,0 +1,133 @@
+
+                       Object detection window
+                       =======================
+
+   How to use this window to:
+   --------------------------
+
+   --- Detect the objects on my image:
+
+Just press the "Detect objects" button. This will by default find all
+the objects, create a catalogue of their positions, intensity and
+shape parameters, display the catalogue and finally get the catalogue
+window to draw some detection ellipses.
+
+You can now use the catalogue window to investigate the results (see
+the help there for making selections).
+
+
+   --- Change the detection limits, etc. etc. etc.:
+
+The parameters shown in the various "pages" of the toolbox, control
+the values used in the detection and analysis of the objects on your
+image. These are directly related to the parameters used by the
+SExtractor program, the documentation (SUN/225) and associated
+documentation (MUD/165) of which should be consulted for their exact
+meaning.
+
+Usually the meaning is obvious from the description in the short help
+(displayed at the bottom of the window), so you can proceed, at least
+initially, from just these.
+
+
+   --- Configure the default parameters:
+
+When the toolbox starts up it configures itself by reading files
+called "default.sex" and "default.param". To locate these files it
+searches the following directories:
+
+   1) The current directory.
+   2) The config/ directory of the SExtractor program installation.
+   3) The directory of the SExtractor program.
+
+If they are not found then built-in defaults are used. So you may
+configure the default setup by changing these two files and placing
+them in the current directory. Note, however, that the interface
+itself will update these two files (unless you've changed the names to
+be used) whenever a detection pass is made, so they always reflect the
+current state of the interface.
+
+
+   --- Run SExtractor using the values in the toolbox:
+
+When it runs the toolbox updates the "default.sex" and "default.param"
+files (unless you've changed in names used). These can then be used to
+run SExtractor. You can also use the File menu items to save the
+program and catalogue parameters to other files. So you can use the
+GAIA interface to fine tune the detection parameters for an image and
+then use these to do the detections on other images.
+
+
+   --- Make detections on one image and measurements on another:
+
+The toolbox always makes its measurements on the displayed image. If
+you want to use another image to do the initial detections then just
+enter its name in the "Detection image:" entry field.
+
+
+   --- Stop plotting detection ellipses:
+
+If you want to stop plotting detection ellipses, then look under the
+"Options" menu and de-select the currently highlighted option.
+
+
+   --- Get hardcopy:
+
+To get a hardcopy of your image plus detections use the "Print..."
+item under the "File" menu in the main image window. Remember you only
+get a copy of what is visible, so if you have a large image unzoom it
+until it is all visible.
+
+If you want to draw axes around your image then see the "Overlay axes
+grid..." item under the "Image-Analysis" menu in the main window.
+
+
+   --- Use my own version of SExtractor:
+
+To use your own version of SExtractor you need to define the
+environment variable EXTRACTOR_DIR to point to the directory that
+contains your "sex" program. Note this directory, or a sub-directory
+of it called "config" should contain the SExtractor configurations
+files.
+
+The toolbox was developed using SExtractor version 2.0.15. Later
+versions may not be supported.
+
+
+   --- Use the Starlink version of SExtractor on my FITS image:
+
+By default the toolbox will use the native version of SExtractor on
+FITS files. To stop this just open the "Options" menu and de-select the
+"Use Native SExtractor" item. You may need to do this if you have an
+image with a DSS astrometric solution and you want to measure sky
+coordinates.
+
+
+   --- View my stars/galaxies separated:
+
+To view your catalogue using a cut in the star/galaxy measurement you
+need to use the catalogue window controls. 
+
+One way to do this is to sort by the "CLASS_STAR" column and just drag
+out all the objects you want to see (these will then be highlighted in
+the main window). The other way to do this is to copy the catalogue
+and open it twice in local catalogue windows. You can then use the
+catalogue window methods for selecting a rows with values between
+given ranges (see the help in the catalogue window for how to do
+this).
+
+
+   --- Change the output catalogue file extension:
+
+The file types output by the toolbox are restricted to the following:
+
+  - .FIT, for FITS-tables (SExtractor FITS_1.0)
+
+  - .ASC, for plain ASCII tables (SExtractor ASCII_HEAD)
+
+  - .TAB, for tab-tables, the "native" format.
+
+All these can be restored by reading back as local catalogues.
+
+  - 
+

@@ -1,0 +1,42 @@
+# ------------------------------------------------------------------------
+# 	Makefile for GAIA colormaps directory, just installs with RTD 
+#       versions.
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+GAIA_LIB     = @RTD_DIR@/../gaia
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = bgyrw.lasc
+srcdir	     = @srcdir@
+
+all:
+
+All: 
+	cd ..; $(MAKE)
+
+install-top:
+	@if test -d $(GAIA_LIB)/colormaps ; then \
+	    : ; \
+	else \
+	    mkdir -p $(GAIA_LIB)/colormaps ; \
+	fi
+
+install-files: install-top
+	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	    $(INSTALL_DATA) $$i $(GAIA_LIB)/colormaps ; \
+	done 
+
+install: install-files
+
+clean:
+	$(RM) *\~ "#"* core
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+man:
+

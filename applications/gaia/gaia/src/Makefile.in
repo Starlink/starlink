@@ -1,0 +1,234 @@
+ #*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id$"
+#
+# ------------------------------------------------------------------------
+# 	Makefile for RtdImage library
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CXXDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+FC              = @FC@
+GC              = @STARLINK@/bin/generic
+FFLAGS          = @FFLAGS@
+STAR_INC        = @STARLINK@/include
+LINK            = @LINK@
+# ------------------------------------------------------------------------
+# 	Directories containing Tcl and Tk include files and libraries
+# ------------------------------------------------------------------------
+
+TCL_INCLUDE   	= @TCLINCSW@
+TK_INCLUDE    	= @TKINCSW@
+X_INCLUDE     	= @XINCSW@
+
+# ------------------------------------------------------------------------
+CPPSRCS         =  Gaia.C NDFIO.C StarRtdImage.C bitmaps.C GaiaLocalCatalog.C \
+                   GaiaSkySearch.C StarWCS.C
+
+CSRCS           =  rtdNDF.c rtdRotBoxEllipse.c patch.c rtdDtrn.c \
+	           writeslice.c centroid.c gaiacat.c grf_tkcan.c
+
+FSRCS           =  rtd_rdndf.f rtd_wrndf.f rtd1_wndfh.f rtd1_crfit.f \
+                   rtd_axlid.f rtd_axlir.f rpatch.f pda_sfit.f \
+                   rtd1_dofit.f rtd1_patch.f rtd1_repl.f rtd1_setar.f \
+                   rtd1_prsh2.f rtd1_ardst.f pda_drnor.f rtd1_sndfh.f \
+                   rtd1_gkeyc.f rtd1_ploc.f rtd1_wrcrd.f rtd1_wcard.f \
+                   rtd_cpdat.f rtd1_dtrn.f rtd1_enwcs.f rtd1_aqual.f \
+		   rtd1_gtval.f rtd1_stint.f rtd1_evert.f rtd_slice.f \
+                   rtd1_binom.f rtd_cent.f rtd1_isrt.f rtd1_chead.f \
+		   rtd1_dewcs.f gai_c2tab.f gai1_nxtab.f gai_t2cat.f \
+	           gai1_t2cn.f gai1_t2cg.f gai1_s2ang.f gai_a2tab.f \
+	           gai_t2asc.f
+
+GSRCS           =  rtd_cpx.gen rtd1_mstx.gen rtd1_sufitx.gen \
+                   rtd1_dofilx.gen rtd1_statx.gen rtd1_gbndx.gen \
+	           rtd1_eterpx.gen rtd1_cenx.gen
+
+SGSRCS          =  rtd1_wrftx.gsc rtd1_wkeyx.gsc
+
+NGSRCS          =  rtd1_gkeyx.gsn
+
+OBJS            =  $(CPPSRCS:.C=.o) $(CSRCS:.c=.o) $(GSRCS:.gen=.o) \
+                   $(FSRCS:.f=.o) $(SGSRCS:.gsc=.o) $(NGSRCS:.gsn=.o)
+
+libname  	= ../lib/libgaia.a
+INCLUDES	= -I../include  \
+                  -I../bitmaps \
+                  -I../../skycat/skycat/interp/include \
+                  -I../../skycat/rtd/rtdimg/include \
+                  -I../../skycat/rtd/rtdstar/include \
+                  -I../../skycat/rtd/rtilib/include \
+                  -I../../skycat/rtd/rtdutl/include \
+                  -I../../skycat/tclutil/util/include \
+                  -I../../skycat/tclutil/tclutil/include \
+                  -I../../skycat/astrotcl/imageio/include \
+                  -I../../skycat/astrotcl/wcslib/include \
+                  -I../../skycat/cat/astrocat/include \
+                  -I../../skycat/cat/tclcat/include \
+	          $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
+
+#DEFINES         = @DEFS@
+CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+LINT		= lint
+LINTFLAGS	= -axhbn
+srcdir 		= @srcdir@
+VPATH		= @srcdir@
+
+all: dirs $(libname)
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+All:
+	cd ../..; $(MAKE)
+
+
+install: $(libname) install-dirs
+	$(INSTALL_DATA) $(libname) $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/$(libname)
+
+dirs:
+	@test -d ../lib || mkdir ../lib
+	@test -d ../bin || mkdir ../bin
+
+install-dirs:
+	@for i in $(TOPDIR) $(LIBDIR) ; do \
+	    if test ! -d $$i ; then \
+		mkdir $$i ; \
+	    fi ; \
+        done
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"* $(LINKS)
+
+distclean: clean
+	echo > make.dep
+	rm -f Makefile
+
+tags:
+	etags ../../*/*/*.[Cch]
+
+.SUFFIXES: .o .C .f .gen .gsc .gsn
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+.f.o:
+	$(FC) -c $(FFLAGS) $<
+
+.gen.o:
+	$(GC) -t n $<
+	$(FC) -c $(FFLAGS) $(<:.gen=.f)
+	rm -f $(<:.gen=.f)
+
+.gsc.o:
+	$(LINK) $< $(<:.gsc=.gen)
+	$(GC) -t rlidc $(<:.gsc=.gen)
+	$(FC) -c $(FFLAGS) $(<:.gsc=.f)
+	rm -f $(<:.gsc=.f) $(<:.gsc=.gen)
+
+.gsn.o:
+	$(LINK) $< $(<:.gsn=.gen)
+	$(GC) -t rlid $(<:.gsn=.gen)
+	$(FC) -c $(FFLAGS) $(<:.gsn=.f)
+	rm -f $(<:.gsn=.f) $(<:.gsn=.gen)
+
+man:
+
+# Starlink include file dependencies
+gai1_nxtab.o: SAE_PAR
+gai1_s2ang.o: PRM_PAR SAE_PAR
+gai1_t2cg.o: CAT_PAR FIO_ERR SAE_PAR
+gai1_t2cn.o: CAT_PAR FIO_ERR SAE_PAR
+gai1_wrtab.o: CAT_PAR SAE_PAR
+gai_a2tab.o: FIO_ERR SAE_PAR
+gai_c2tab.o: CAT_PAR SAE_PAR
+gai_t2asc.o: FIO_ERR SAE_PAR
+gai_t2cat.o: SAE_PAR
+pda_sfit.o: SAE_PAR
+rpatch.o: FIO_ERR GRP_PAR SAE_PAR
+rtd1_aqual.o: SAE_PAR
+rtd1_ardst.o: GRP_PAR MSG_PAR PRM_PAR SAE_PAR
+rtd1_cenx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+rtd1_chead.o: SAE_PAR
+rtd1_crfit.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR
+rtd1_dewcs.o: AST_PAR SAE_PAR
+rtd1_dofilx.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+rtd1_dofit.o: PRM_PAR SAE_PAR
+rtd1_dtrn.o: PRM_PAR SAE_PAR
+rtd1_enwcs.o: AST_PAR SAE_PAR
+rtd1_eterpx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR
+rtd1_gbndx.o: PRM_PAR SAE_PAR
+rtd1_gkeyc.o: SAE_PAR
+rtd1_gkeyx.o: SAE_PAR
+rtd1_gtval.o: SAE_PAR
+rtd1_isrt.o: SAE_PAR
+rtd1_mstx.o: PRM_PAR SAE_PAR
+rtd1_patch.o: FIO_ERR GRP_PAR PRM_PAR SAE_PAR
+rtd1_ploc.o: SAE_PAR
+rtd1_prsh2.o: GRP_PAR SAE_PAR
+rtd1_repl.o: PRM_PAR SAE_PAR
+rtd1_setar.o: SAE_PAR
+rtd1_sndfh.o: NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+rtd1_statx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+rtd1_sufitx.o: PRM_PAR SAE_PAR
+rtd1_wcard.o: SAE_PAR
+rtd1_wkeyx.o: SAE_PAR
+rtd1_wndfh.o: NDF_PAR PRM_PAR SAE_PAR
+rtd1_wrcrd.o: SAE_PAR
+rtd1_wrftx.o: DAT_PAR SAE_PAR
+rtd_axlid.o: PRM_PAR SAE_PAR
+rtd_axlir.o: PRM_PAR SAE_PAR
+rtd_cent.o: SAE_PAR
+rtd_cpdat.o: NDF_PAR PRM_PAR SAE_PAR
+rtd_cpx.o: PRM_PAR SAE_PAR
+rtd_rdndf.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR
+rtd_slice.o: DAT_PAR NDF_PAR SAE_PAR
+rtd_wrndf.o: AST_PAR DAT_PAR NDF_PAR SAE_PAR
+slice.o: DAT_PAR NDF_PAR SAE_PAR
+
+LINKS = SAE_PAR PRM_PAR DAT_PAR NDF_PAR GRP_PAR FIO_ERR NUM_DEC_CVT \
+        NUM_DEF_CVT MSG_PAR AST_PAR CAT_PAR
+
+SAE_PAR:	$(STAR_INC)/sae_par
+	  $(LINK) $? $@
+PRM_PAR:	$(STAR_INC)/prm_par
+	  $(LINK) $? $@
+MSG_PAR:	$(STAR_INC)/msg_par
+	  $(LINK) $? $@
+DAT_PAR:	$(STAR_INC)/dat_par
+	  $(LINK) $? $@
+NDF_PAR:	$(STAR_INC)/ndf_par
+	  $(LINK) $? $@
+GRP_PAR:	$(STAR_INC)/grp_par
+	  $(LINK) $? $@
+FIO_ERR:	$(STAR_INC)/fio_err
+	  $(LINK) $? $@
+NUM_DEC_CVT:	$(STAR_INC)/num_dec_cvt
+	  $(LINK) $? $@
+NUM_DEF_CVT:	$(STAR_INC)/num_def_cvt
+	  $(LINK) $? $@
+AST_PAR:	$(STAR_INC)/ast_par
+	  $(LINK) $? $@
+CAT_PAR:	$(STAR_INC)/cat_par
+	  $(LINK) $? $@
+

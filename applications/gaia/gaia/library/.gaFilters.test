@@ -1,0 +1,16 @@
+Filter 1 $env(KAPPA_DIR)/block \
+  "in=$data box=[3,3] out=${data}_smooth accept" \
+   ${data}_smooth "Block smooth 3 by 3 (replace)"
+
+Filter 0 $env(KAPPA_DIR)/block \
+  "in=$data box=[3,3] out=${data}_smooth accept" \
+   ${data}_smooth "Block smooth 3 by 3 (keep)"
+
+Filter 1 $env(KAPPA_DIR)/block \
+  "in=$data box=[5,5] out=${data}_smooth accept" \
+   ${data}_smooth "Block smooth 5 by 5 (replace)"
+
+Filter 0 $env(KAPPA_DIR)/block \
+  "in=$data box=[5,5] out=${data}_smooth accept" \
+   ${data}_smooth "Block smooth 5 by 5 (keep)"
+

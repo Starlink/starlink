@@ -1,0 +1,77 @@
+# ------------------------------------------------------------------------
+# 	Makefile for GAIA Tcl library files
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+GAIA_LIB      = @RTD_DIR@/../gaia
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = \
+ Batch.tcl CanvasPrint.tcl ETable.tcl FileSelect.tcl FrameWidget.tcl \
+ GaiaConvertTable.tcl GaiaForeignExec.tcl GaiaImage.tcl \
+ GaiaImageCtrl.tcl GaiaImageCut.tcl GaiaImagePanel.tcl \
+ GaiaImageSpectrum.tcl GaiaQuery.tcl GaiaQueryResult.tcl GaiaSearch.tcl \
+ GaiaSextractor.tcl GraphPrint.tcl LabelEntry.tcl LabelEntryMenu.tcl \
+ LabelEntryScale.tcl LabelFileChooser.tcl LabelRule.tcl \
+ ManyLabelEntry.tcl NameChooser.tcl \
+ Queue.tcl RtdImage.tcl RtdImageCtrl.tcl RtdImagePick.tcl \
+ RtdImagePixTable.tcl RtdImageTrans.tcl RtdImageZoomView.tcl \
+ ScrollText.tcl Scrollbox.tcl StarApp.tcl StarAppFilter.tcl StarArd.tcl \
+ StarArdAnnBox.tcl StarArdAnnCircle.tcl StarArdAnnColumn.tcl \
+ StarArdAnnEllipse.tcl StarArdAnnList.tcl StarArdAnnPixel.tcl \
+ StarArdAnnPoly.tcl StarArdAnnRect.tcl StarArdAnnRotBox.tcl \
+ StarArdAnnRow.tcl StarArdAnnTool.tcl StarArdBox.tcl StarArdCircle.tcl \
+ StarArdColumn.tcl StarArdEllipse.tcl StarArdLine.tcl StarArdList.tcl \
+ StarArdPixel.tcl StarArdPoly.tcl StarArdPrim.tcl StarArdRect.tcl \
+ StarArdRotBox.tcl StarArdRow.tcl StarArdTool.tcl StarAstCopy.tcl \
+ StarAstDefine.tcl StarAstGrid.tcl StarAstReference.tcl \
+ StarAstRefine.tcl StarAstSystem.tcl StarAstTable.tcl StarBlink.tcl \
+ StarCanvasDraw.tcl StarCanvasObject.tcl StarDemo.tcl \
+ StarEnterObject.tcl StarHelp.tcl StarLabelCheck.tcl StarPatch.tcl \
+ StarPhotom.tcl StarPhotomDetails.tcl StarPhotomExtras.tcl \
+ StarPhotomList.tcl StarPhotomObject.tcl TopLevelWidget.tcl \
+ defaults.tcl gaiaMain.tcl graphics_features.tcl udialog.tcl \
+ Catalogue.hlp Gaia.hlp GaiaSearch.hlp GaiaSextractor.hlp StarArd.hlp \
+ StarAst.hlp StarAstCopy.hlp StarAstDefine.hlp StarAstGrid.hlp \
+ StarAstReference.hlp StarAstRefine.hlp StarAstSystem.hlp \
+ StarBlink.hlp StarPatch.hlp StarPhotom.hlp \
+ skycat.cfg gaiawcs2tab tclIndex Gaia.tcl ScrollArrows.tcl
+
+PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh
+srcdir	     = @srcdir@
+
+all:
+
+All:./built/lib/gaia/gaia
+	cd ..; $(MAKE)
+
+install-top:
+	test -d $(GAIA_LIB) || mkdir -p $(GAIA_LIB)
+	(cd $(GAIA_LIB); rm -rf library; ln -s . library)
+
+install-files: install-top
+	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	    $(INSTALL_DATA) $$i $(GAIA_LIB) ; \
+	done
+	for f in $(srcdir)/$(PROGRAMS); do \
+	    $(INSTALL) $$f $(GAIA_LIB) ;\
+	done
+
+install: install-files
+
+clean:
+	$(RM) *\~ "#"*
+
+index tclIndex: FORCE
+	./mkIndex.tcl
+
+depend:
+
+distclean: clean
+	rm -f Makefile
+
+man:
+
+FORCE:
+

@@ -1,0 +1,66 @@
+interface CAT2TAB
+
+   parameter IN
+      position 1
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of input catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter OUT
+      position 2
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of output catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter IDCOL
+      type   '_INTEGER'
+      access 'READ'
+      prompt 'Column number of identifiers'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default !
+   endparameter
+
+   parameter XCOL
+      type   '_INTEGER'
+      access 'READ'
+      prompt 'Column number of X coordinates'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default !
+   endparameter
+
+   parameter YCOL
+      type   '_INTEGER'
+      access 'READ'
+      prompt 'Column number of Y coordinates'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default !
+   endparameter
+
+   parameter RACOL
+      type   '_INTEGER'
+      access 'READ'
+      prompt 'Column number of RA coordinates'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default !
+   endparameter
+
+   parameter DECCOL
+      type   '_INTEGER'
+      access 'READ'
+      prompt 'Column number of DEC coordinates'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default !
+   endparameter
+
+endinterface

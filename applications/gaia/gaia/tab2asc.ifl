@@ -1,0 +1,21 @@
+interface TAB2ASC
+
+   parameter IN
+      position 1
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of input catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter OUT
+      position 2
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Name of output catalogue'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+endinterface

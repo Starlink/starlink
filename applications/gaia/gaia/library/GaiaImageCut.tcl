@@ -1,0 +1,217 @@
+#+
+#  Name:
+#     GaiaImageCut.tcl
+
+#  Purpose:
+#     Defines a class for controlling the cut levels of an image.
+
+#  Type of Module:
+#     [incr Tk] class
+
+#  Description:
+#     This class extends the RtdImageCut class to add any abilities
+#     required by the GAIA interface. The main change is to extend
+#     way that very small and large ranges are dealt with.
+
+#  Invocation:
+#     GaiaImageCut name [configuration options]
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     {enter_new_authors_here}
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Inherits:
+#     Methods and configuration options of SkyCat (and Rtd).
+
+#  History:
+#     26-SEP-1997 (PDRAPER):
+#        Original version
+#     {enter_changes_here}
+
+#-
+
+itk::usual GaiaImageCut {}
+
+class gaia::GaiaImageCut {
+   inherit rtd::RtdImageCut
+
+   #  Constructor: create a new instance of this class.
+   constructor {args} {
+      eval RtdImageCut::constructor $args
+   } {
+      eval itk_initialize $args
+   }
+
+   #  Add a short help window. Change the text in one part.
+   method make_short_help {} {
+      TopLevelWidget::make_short_help
+      add_short_help $itk_component(graph) \
+         {Graph: shows distribution of pixel values in image \
+             {bitmap b1} ... {bitmap b1} = Zoom in, {bitmap b3} = Zoom out, Cancel zoom}
+      add_short_help $itk_component(percent) \
+         {Auto set: {bitmap b1} = set so that given percent of pixels are within cut levels}
+
+      add_short_help [$itk_component(lowcut) component scale] \
+         {Low cut: {bitmap dragb1} = adjust low cut value}
+
+      add_short_help [$itk_component(lowcut) component entry] \
+         {Low cut: enter low cut value}
+
+      add_short_help [$itk_component(highcut) component scale] \
+         {High cut: {bitmap dragb1} = adjust high cut value}
+
+      add_short_help [$itk_component(highcut) component entry] \
+         {High cut: enter high cut value}
+
+      add_short_help $itk_component(set) \
+         {Set: {bitmap b1} = set cut levels to selected values}
+
+      add_short_help $itk_component(reset) \
+         {Reset: {bitmap b1} = no cut levels used}
+
+      add_short_help $itk_component(median) \
+         {Median Filter: {bitmap b1} = apply median filtering algorithm to set cut levels}
+
+      add_short_help $itk_component(close) \
+         {Close: {bitmap b1} = close this window}
+   }
+
+   #  Override the make the control panel to make changes in the way
+   #  that the slider widget's limits and resolutions are set.
+   method make_controls {} {
+      RtdImageCut::make_controls
+      set from [$image_ min]
+      set to [$image_ max]
+      set increment_ [expr min(50,($to-$from)/1000.0)]
+      set resolution_ [expr min(1.0,$increment_/10.0)]
+      lassign [$image_ cut] low_ high_
+      update_graph
+   }
+
+   #  Override make buttons to change some text.
+   method make_buttons {} {
+      RtdImageCut::make_buttons
+      $itk_component(median) configure -text "Median Filter"
+   }
+
+   #  Override update_graph, not sure why added test for image range.
+   method update_graph {{modimg 1}} {
+      set from [$image_ min]
+      set to [$image_ max]
+      if {$to <= $from} {
+         if {[$image_ isclear]} {
+            # no image is loaded ?
+            wm withdraw $w_
+            return
+         }
+      }
+      lassign [$image_ cut] low high
+
+      if {[expr $low >= $high]} {
+         return
+      }
+      lassign [get_cuts] plow phigh
+      if {$plow != $low || $phigh != $high} {
+         $itk_component(percent) config -value ""
+      }
+
+      # adapt new scale range
+      if {$low < $low_} {
+         setb_lowcut [expr $low <= $low_] $low
+      } else {
+         $itk_component(lowcut) config -value $low \
+            -increment $increment_ -resolution $resolution_
+      }
+      if {$high > $high_} {
+         setb_highcut [expr $high >= $high_] $high
+      } else {
+         $itk_component(highcut) config -value $high \
+            -increment $increment_ -resolution $resolution_
+      }
+      update_xaxis
+
+      # plot the distribution of pixel values
+      $image_ graphdist $graph_ elem $itk_option(-num_points) $graph_.xVector $graph_.yVector
+   }
+
+   #  Set entry values of the lowcut scale widget and update scale
+   #  widgets. Override to increment by resolution.
+   method setb_lowcut {setlow_ value} {
+        lassign [get_cuts] low high
+        if {$value >= $high} {
+            set value [expr $high - $resolution_]
+        }
+        if {$setlow_} {
+            set low_ $value
+        }
+        entry_value lowcut $value
+        update_cut $value $high
+    }
+
+   #  Set entry values of the highcut scale widget and update scale widgets.
+   #  Override to increment by resolution.
+   method setb_highcut {sethigh_ value} {
+      lassign [get_cuts] low high
+      if {$value <= $low} {
+         set value [expr $low + $resolution_]
+      }
+      if {$sethigh_} {
+         set high_ $value
+      }
+      entry_value highcut $value
+      update_cut $low $value
+   }
+
+   #  Update min, max values of the lowcut scale widget.
+   #  Override to increment by resolution.
+   method update_lowcut {low high} {
+      global ::$w_.lowcut
+      set from $low_
+      set to [expr $high + $resolution_]
+      if {$from > $low} {
+         set from $low
+      }
+      if {$to < $low} {
+         set to $low
+      }
+
+      #  Only change, if necessary, otherwise events can feed into
+      #  update_highcut and back again.
+      set oldfrom [$itk_component(lowcut) cget -from]
+      set oldto [$itk_component(lowcut) cget -to]
+      if { $oldfrom != $from && $oldto != $to } {
+         $itk_component(lowcut) config -from $from -to $to
+      }
+      set $w_.lowcut $low
+   }
+
+   #  Update min, max values of the highcut scale widget. Override to
+   #  increment by resolution.
+   method update_highcut {low high} {
+      global ::$w_.highcut
+      set from [expr $low + $resolution_]
+      set to $high_
+      if {$from > $high} {
+         set from $high
+      }
+      if {$to < $high} {
+         set to $high
+      }
+      if {$from == $to} {
+         set from [expr $from - $resolution_]
+      }
+      set oldfrom [$itk_component(lowcut) cget -from]
+      set oldto [$itk_component(lowcut) cget -to]
+      if { $oldfrom != $from && $oldto != $to } {
+         $itk_component(highcut) config -from $from -to $to
+      }
+      set $w_.highcut $high
+   }
+
+   #  Protected variables.
+   protected variable increment_ 1.0
+   protected variable resolution_ 1.0
+}

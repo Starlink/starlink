@@ -1,0 +1,7 @@
+#!/bin/sh
+
+$GAIA_DIR/gaia /star/bin/kappa/ccdframec.sdf -float_panel 1 -with_pan_window 0 -with_zoom_window 0 &
+sleep 10
+$GAIA_DIR/gaiadisp /star/bin/kappa/ccdframec.sdf 1
+sleep 5
+$GAIA_DIR/gaiadisp /star/bin/kappa/ccdframec.sdf 2

@@ -1,0 +1,295 @@
+# $Id$
+#
+# Makefile.in - Makefile for GAIA extensions.
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Peter W. Draper 6-Oct-1997 Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = src colormaps
+
+# root of source tree
+SRC_ROOT     = @SRC_ROOT@
+
+# path to this dir
+SRCDIR       = $(SRC_ROOT)/src
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# Fortran and atask linker command
+FC           = @FC@
+FFLAGS       = @FFLAGS@
+ALINK        = @ALINK@
+LINK         = @LINK@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@ @TCLUTIL_DEFS@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+RTD_DIR      = @RTD_DIR@
+
+# Include directives for Tcl, Tk, and X include files
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+# Tk libs
+TCLTKLIBS = @ITK_LIB_SPEC@ \
+	    @TIX_LIB_SPEC@ \
+            @TK_LIB_SPEC@ \
+            @BLT_LIB_SPEC@ \
+            @TCLX_LIB_SPEC@ \
+            @ITCL_LIB_SPEC@ \
+            @TCL_LIB_SPEC@
+
+# Tclutil library
+TCLUTIL_LIB          = @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC   = @TCLUTIL_LIB_STATIC@
+
+# Astrotcl library
+ASTROTCL_LIB         = @ASTROTCL_LIB@
+ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
+
+# Rtd library
+RTD_LIB              = @RTD_LIB@
+RTD_LIB_STATIC       = @RTD_LIB_STATIC@
+
+# Catalog library
+CAT_LIB              = @CAT_LIB@
+CAT_LIB_STATIC       = @CAT_LIB_STATIC@
+
+# Skycat libraries
+SKYCAT_LIB	     = @SKYCAT_LIB@
+SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
+
+#  Local library.
+LOCAL_LIBRARY = lib/libgaia.a
+# info needed for shared libraries (see configure.in or tclConfig.sh
+# for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# ------------------------------------------------------------------------
+#       Libraries required to link against Fortran source code
+#       using a C++ compiler.
+# ------------------------------------------------------------------------
+F77_LIBS = @F77_LIBS@
+TCLADAM  = @DESTDIR@/lib/tclAdam.o
+STAR_LIB = @STARLINK@/lib
+STAR_INC = @STARLINK@/include
+COMPIFL  = @STARLINK@/bin/compifl
+#  Define sets of ADAM libraries we need to link against. Note that
+#  ast_link and ndf_link must be carefully managed to avoid picking up
+#  default AST libraries for errors and graphics.
+AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
+ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
+
+#  Main wish interpreter for GAIA.
+demo_wish = bin/gaia_wish
+
+# ARDSTAT
+ardstat = bin/ardstat
+
+# AUTOCROP
+autocrop = bin/autocrop
+
+# CAT2TAB
+cat2tab = bin/cat2tab
+
+# TAB2CAT
+tab2cat = bin/tab2cat
+
+# ASC2TAB
+asc2tab = bin/asc2tab
+
+# TAB2ASC
+tab2asc = bin/tab2asc
+
+
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# these objects are only needed to make the gaia_wish binary for the demos
+OBJECTS      = tkAppInit.o
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# ------------------------------------------------------------------------
+all: $(demo_wish) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
+	$(asc2tab) $(tab2asc)
+
+$(demo_wish): normallib tkAppInit.o FORCE
+	@echo "linking \"$(demo_wish)\"..."
+	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish)  \
+	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
+	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
+	       $(TCLUTIL_LIB_STATIC) $(TCLADAM) $(LOCAL_LIBRARY) \
+	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(X_LIB) $(EXTRA_LIBS)
+
+$(ardstat): normallib ardstat.o
+	echo "linking \"$(ardstat)\"..."
+	$(ALINK) ardstat.o $(FFLAGS) -o $(ardstat) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam`
+	$(COMPIFL) ardstat.ifl
+	$(INSTALL_DATA) ardstat.ifc bin/ardstat.ifc
+	$(RM) ardstat.ifc
+
+$(autocrop): normallib autocrop.o
+	echo "linking \"$(autocrop)\"..."
+	$(ALINK) autocrop.o $(FFLAGS) -o $(autocrop) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam`
+	$(COMPIFL) autocrop.ifl
+	$(INSTALL_DATA) autocrop.ifc bin/autocrop.ifc
+	$(RM) autocrop.ifc
+
+$(cat2tab): normallib cat2tab.o
+	echo "linking \"$(cat2tab)\"..."
+	$(ALINK) cat2tab.o $(FFLAGS) -o $(cat2tab) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
+	$(COMPIFL) cat2tab.ifl
+	$(INSTALL_DATA) cat2tab.ifc bin/cat2tab.ifc
+	$(RM) cat2tab.ifc
+
+$(tab2cat): normallib tab2cat.o
+	echo "linking \"$(tab2cat)\"..."
+	$(ALINK) tab2cat.o $(FFLAGS) -o $(tab2cat) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
+	$(COMPIFL) tab2cat.ifl
+	$(INSTALL_DATA) tab2cat.ifc bin/tab2cat.ifc
+	$(RM) tab2cat.ifc
+
+$(asc2tab): normallib asc2tab.o
+	echo "linking \"$(asc2tab)\"..."
+	$(ALINK) asc2tab.o $(FFLAGS) -o $(asc2tab) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
+	$(COMPIFL) asc2tab.ifl
+	$(INSTALL_DATA) asc2tab.ifc bin/asc2tab.ifc
+	$(RM) asc2tab.ifc
+
+$(tab2asc): normallib tab2asc.o
+	echo "linking \"$(tab2asc)\"..."
+	$(ALINK) tab2asc.o $(FFLAGS) -o $(tab2asc) $(LOCAL_LIBRARY) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
+	$(COMPIFL) tab2asc.ifl
+	$(INSTALL_DATA) tab2asc.ifc bin/tab2asc.ifc
+	$(RM) tab2asc.ifc
+
+normallib:
+	cd src; $(MAKE)
+
+install-top:
+	@if test -d $(TOPDIR); then : ; else mkdir $(TOPDIR); fi
+
+install-bin:
+	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
+	chmod 0755 $(demo_wish)
+	$(INSTALL) $(demo_wish) $(BINDIR)
+	$(INSTALL) $(ardstat) $(BINDIR)
+	$(INSTALL_DATA) $(ardstat).ifc $(BINDIR)
+	$(INSTALL) $(autocrop) $(BINDIR)
+	$(INSTALL_DATA) $(autocrop).ifc $(BINDIR)
+	$(INSTALL) $(cat2tab) $(BINDIR)
+	$(INSTALL_DATA) $(cat2tab).ifc $(BINDIR)
+	$(INSTALL) $(tab2cat) $(BINDIR)
+	$(INSTALL_DATA) $(tab2cat).ifc $(BINDIR)
+	$(INSTALL) $(asc2tab) $(BINDIR)
+	$(INSTALL_DATA) $(asc2tab).ifc $(BINDIR)
+	$(INSTALL) $(tab2asc) $(BINDIR)
+	$(INSTALL_DATA) $(tab2asc).ifc $(BINDIR)
+
+
+install-man:
+	@(cd man; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+# install the tcl library files.
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-colormaps:
+	@(cd colormaps; $(MAKE) install)
+
+install: install-top install-library install-bin install-colormaps
+
+clean:
+	$(RM) $(OBJECTS) $(demo_wish) $(ardstat) ardstat.o $(ardstat).ifc \
+	      $(autocrop) autocrop.o $(autocrop).ifc $(cat2tab) \
+	      cat2tab.o $(cat2tab).ifc $(tab2cat) $(tab2cat).ifc \
+	      tab2cat.o $(asc2tab) asc2tab.o $(asc2tab).ifc \
+	      $(tab2asc) tab2asc.o $(tab2asc).ifc *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+	$(RM) $(FINCLUDES)
+
+distclean: clean
+	$(RM) config.status config.cache config.log Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+f.o:
+	$(FC) -c $(FFLAGS) $<
+
+# Starlink include file dependencies
+FINCLUDES = GRP_PAR NDF_PAR SAE_PAR
+ardstat.o: GRP_PAR NDF_PAR SAE_PAR
+autocrop.o: NDF_PAR SAE_PAR
+cat2tab.o: SAE_PAR CAT_PAR PAR_ERR
+asc2tab.o: SAE_PAR PAR_ERR
+tab2cat.o: SAE_PAR CAT_PAR
+tab2asc.o: SAE_PAR
+SAE_PAR: $(STAR_INC)/sae_par
+	 $(LINK) $? $@
+NDF_PAR: $(STAR_INC)/ndf_par
+	 $(LINK) $? $@
+GRP_PAR: $(STAR_INC)/grp_par
+	 $(LINK) $? $@
+CAT_PAR: $(STAR_INC)/cat_par
+	 $(LINK) $? $@
+PAR_ERR: $(STAR_INC)/par_err
+	 $(LINK) $? $@
+
+FORCE:
+

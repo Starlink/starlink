@@ -1,0 +1,420 @@
+//+
+//   Name:
+//      GaiaLocalCatalog
+
+//  Purpose:
+//     Defines a class for controlling access to a non-tab table
+//     (i.e. CAT and plain ASCII) catalogues.
+
+//  Description:
+//     This class defines a series of methods that control the
+//     conversion of a "foreign" catalogue into a tab-table stored in
+//     a temporary file.
+//
+//     The actual conversion is performed by an external [incr Tcl]
+//     class GaiaConvertTable, which is provided so that addition
+//     filters etc. can be added without extending the abilities of
+//     this class.
+
+//  Language:
+//     C++
+
+//  Copyright:
+//     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+//  Inherits:
+//     LocalCatalog
+
+//  Bugs:
+//     Not really a bug in this class, but in the way that it and
+//     LocalCatalog are used. After the initial creation of this
+//     object queries are done in forked processes. So if the
+//     catalogue changes this fact is noted in the forked process and
+//     a conversion is performed, however, no information about this
+//     change is available after the forked process dies. So the
+//     timestamp is not updated and any mapped data are lost.  This is
+//     relatively harmless, but has an efficiency burden as after the
+//     first modification the catalogue is reconverted on occasions
+//     when it isn't really necessary. The simple solution is to avoid
+//     forking processes that use local catalogues (in fact this is
+//     what happens in GAIA).
+
+//  Authors:
+//     Peter W. Draper (PDRAPER):
+//     {enter_new_authors_here}
+
+//  History:
+//     28-JUN-1996 (PDRAPER):
+//        Original version, based on LocalCatalog.
+//     {enter_changes_here}
+
+//-
+
+#include <error.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+#include "GaiaLocalCatalog.h"
+#include "Mem.h"
+#include "tcl.h"
+#include "util.h"
+
+//
+//  Constructor - used internally only, public interface uses
+//  "open(name)" "e" is the catalog config entry object for this
+//  catalog. Note that getInfo() in LocalCatalog constructor will be
+//  resolved at that level, hence we must have our own version... This
+//  should be resolved correctly.
+//
+GaiaLocalCatalog::GaiaLocalCatalog( CatalogInfoEntry *e, Tcl_Interp *interp )
+  : LocalCatalog( e ),
+    realname_( NULL ),
+    modified_( 0 ),
+    interp_( interp )
+{
+  convertTable_[0] = '\0';
+  status_ = getInfo();
+}
+
+//
+//  Constructor for tab-tables that are already converted. In this case
+//  the names of the table and the destination file (of foreign type) are
+//  given.
+//
+GaiaLocalCatalog::GaiaLocalCatalog( CatalogInfoEntry *e,
+				    Tcl_Interp *interp,
+				    const char *in,  
+				    const char *out )
+  : LocalCatalog( e ),
+    interp_( interp )
+{
+  realname_ = strdup ( out );
+  if ( filename_ ) {
+    free( filename_ );
+  }
+  filename_ = strdup( in );
+  convertTable_[0] = '\0';
+  tempstamp_ = modDate( in );
+  timestamp_ = modDate( out );
+  modified_ = 1;
+}
+
+//
+//  Destructor. Convert catalogue back, if it has been modified and
+//  dispose of temporary file.
+//
+GaiaLocalCatalog::~GaiaLocalCatalog()
+{
+  if ( filename_ && realname_ ) {
+    freeCat();
+
+    //  The entry in the list of catalogues for this file will be
+    //  wrong. Change the url to point to the real file again, rather
+    //  than the temporary one.
+    entry_->url( realname_ );
+    free( realname_ );
+  }
+}
+
+//
+//  Static method that checks the validity of the catalogue. Since
+//  this is static and we do not want to convert catalogues if not
+//  really necessary, just check the file extension.
+//
+int GaiaLocalCatalog::check_table( const char* filename )
+{
+  if ( GaiaLocalCatalog::is_foreign( filename ) ) {
+    return TCL_OK;
+  } else {
+    return TCL_ERROR;
+  }
+}
+
+//
+//  If necessary convert the foreign catalogue into a tab-table.
+//
+//  Note the conversion is deemed unnecessary if the variable
+//  realname_ is already defined and the modification time of the
+//  input catalogue is unchanged.
+//
+
+int GaiaLocalCatalog::getInfo()
+{
+  //  If realname_ exists then a conversion has already been
+  //  successful. We will only convert again if the modification time
+  //  of the main catalogue is changed.
+  if ( realname_ ) {
+    time_t curtime = modDate( realname_ );
+    if ( difftime( curtime, timestamp_ ) != 0.0 ) {
+
+      //  Main catalogue modified, so dispose of temporary and
+      //  regenerate.
+      dispose();
+      filename_ = realname_;
+    } else {
+
+      //  Check if temporary file has been modified since it was last
+      //  read, if so we need to re-read it.
+      curtime = modDate( filename_ );
+      if ( difftime( curtime, tempstamp_ ) != 0.0 ) {
+	modified_ = 1;
+	return readTemp();
+      }
+      return 0;
+    }
+  }
+
+  //  No conversion yet, so get on with it.  Note update time of input
+  //  file, so we know if it has been modified...
+  timestamp_ = modDate( filename_ );
+
+  //  Convert the catalogue into a "tab table" and retain the old and
+  //  new names. Note tempnam creates the file in TMPDIR or /tmp.
+  realname_ = filename_;
+  filename_ = tempnam( (char *) NULL, "gaia" );
+  filename_ = strdup( filename_ );
+  entry_->url( filename_ );   //  Set the temporary name as the url.
+                              //  This is the correct place. 
+                              //  Leave longname and shortname alone.
+  if ( ! convertTo( 1 ) ) {
+    return sys_error( "failed to convert catalogue: ", realname_ );
+  }
+
+  //  OK now force the initial read of the temporary file.
+  modified_ = 0;
+  return readTemp();
+}
+
+//
+//  Free the catalogue by converting the temporary file, if needed and 
+//  then deleting it.
+//
+int GaiaLocalCatalog::freeCat() {
+  if ( filename_ && realname_ ) {
+
+    //  If intermediary tab table has been modified and the main
+    //  catalogue has not, then convert it back to the original file,
+    //  otherwise just remove it.
+    time_t newtime = modDate( realname_ );
+    if ( difftime( newtime, timestamp_ ) == 0.0 ) {
+
+      //  Main catalogue not changed, so check the temporary file.
+      if ( modified_ ) {
+
+        //  This is changed, so convert it back.
+        convertFrom( 1 );
+      }
+    }
+
+    //  Now dispose of temporary file.
+    dispose();
+  }
+  return 0;
+}
+
+//
+//  Static member to test if a local catalogue is a known foreign
+//  catalogue type. These are the known CAT types and two plain ascii
+//  formats (asc and lis).
+//
+int GaiaLocalCatalog::is_foreign( const char *name )
+{
+  const char *type = fileSuffix( name );
+  if ( strcasecmp( type, "fit" )  == 0 ||
+       strcasecmp( type, "fits" ) == 0 ||
+       strcasecmp( type, "gsc" )  == 0 ||
+       strcasecmp( type, "asc" )  == 0 ||
+       strcasecmp( type, "lis" )  == 0 ||
+       strcasecmp( type, "txt" )  == 0 ) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+//
+//  Convert the current file "realname_" into a tab table. If now is 1 
+//  then the conversion is done immediately, rather than being
+//  queued.
+//
+int GaiaLocalCatalog::convertTo( int now )
+{
+
+  //  If realname_ is defined then attempt to convert it into a tab
+  //  table.
+  if ( realname_ ) {
+
+    //  Make sure we're ok to attempt a conversion.
+    if ( ! startConvert() ) {
+      return 0;
+    }
+
+    //  Convert to a temporary file.
+    char buf[1024];
+    sprintf( buf, "%s to %s %s %d", convertTable_, realname_,
+             filename_, now );
+    if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
+      return 0;
+    }
+  }
+
+  //  Record the modification time for this file.
+  tempstamp_ = modDate( filename_ );
+  return 1;
+}
+
+//
+//  Convert temporary tab table into previous filename and type.
+//
+//  if now is 1 then the jobs runs in a blocking manner (needed to 
+//  guarantee completion when application is really exiting).
+//
+int GaiaLocalCatalog::convertFrom( int now )
+{
+  //  If filename_ is defined then attempt to convert it back.
+  if ( filename_ ) {
+
+    //  Make sure we're ok to attempt a conversion.
+    if ( ! startConvert() ) {
+      return 0;
+    }
+
+    //  Convert back to permanent file.
+    char buf[1024];
+    sprintf( buf, "%s from %s %s %d", convertTable_, filename_, 
+	     realname_, now );
+    if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
+      return 0;
+    }
+  }
+  modified_ = 0;
+  return 1;
+}
+
+//
+//  Check for and start the conversion [incr Tcl] class that controls
+//  the conversion process.
+//
+int GaiaLocalCatalog::startConvert() {
+
+  //  Use a [incr Tcl] class GaiaConvertTable to control the
+  //  conversion process. This controls the external filters and
+  //  executes the conversion command. If a GaiaConvertTable object
+  //  doesn't exist yet, then create one.
+  char buf[256];
+  if ( convertTable_[0] != '\0' ) {
+    sprintf( buf, "info exists %s", convertTable_ );
+    if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
+      convertTable_[0] = '\0';
+    }
+  }
+  if ( convertTable_[0] == '\0' ) {
+    if ( Tcl_Eval( interp_, "GaiaConvertTable #auto" ) != TCL_OK ) {
+      return 0;
+    } else {
+      (void) strncpy( convertTable_, interp_->result, NAMELEN - 1 );
+    }
+  }
+  return 1;
+}
+
+//
+//  Return the modification date of a file (see stat(2)).
+//
+time_t GaiaLocalCatalog::modDate( const char *filename )
+{
+  struct stat buf;
+  if ( stat( filename, &buf ) != 0 ) {
+    return (time_t) NULL;
+  }
+  return buf.st_mtime;
+}
+
+//
+//  Dispose of the temporary file. No questions asked.
+//
+void GaiaLocalCatalog::dispose()
+{
+  if ( filename_ ) {
+    (void) remove( filename_ );
+  }
+  free( filename_ );
+  filename_ = (char *) NULL;
+}
+
+//
+//  Map in the temporary file and re-read its contents.
+//
+int GaiaLocalCatalog::readTemp()
+{
+  if ( filename_ && access( filename_, F_OK ) == 0 ) {
+    Mem m( filename_ );
+    if ( m.status() != 0 ) {
+      return TCL_ERROR;
+    }
+    if ( info_.init( (char *)m.ptr() ) != 0 ) {
+      return TCL_ERROR;
+    }
+    //  This will extract any catalog config info from the file's header
+    info_.entry( entry_, (char *)m.ptr() );
+
+    //  Record modification date at this read.
+    tempstamp_ = modDate( filename_ );
+    return TCL_OK;
+  } else {
+    return TCL_ERROR;
+  }
+}
+
+//
+//  If we don't have the info for this catalog, get it and return the
+//  status. 
+//
+//  Here we also check if the files have been modified. If the
+//  real file has been modified we need to reconvert it. If the
+//  temporary file has been change we just need to reload it.
+//
+int GaiaLocalCatalog::checkInfo()
+{
+  if ( info_.numCols() > 0 ) {
+
+    //  Check the real file.
+    time_t newtime = modDate( realname_ );
+    if ( difftime( newtime, timestamp_ ) == 0.0 ) {
+
+      //  Not changed, so check the temporary file, since it was last read.
+      newtime = modDate( filename_ );
+      if ( difftime( newtime, tempstamp_ ) == 0.0 ) {
+
+        //  Neither are changed, so do nothing.
+        return 0;
+      }
+    }
+  }
+
+  //  One of the files is changed, so reconvert or reload as necessary.
+  return getInfo();
+}
+
+//
+//  Static member to convert a tab table into a known catalogue type. 
+//
+//  Arguments are:
+//
+//     in = name of tab table.
+//     out = name of new catalogue.
+//
+int GaiaLocalCatalog::save( CatalogInfoEntry *e,
+			    Tcl_Interp *interp,
+			    const char *in,  
+			    const char *out )
+{
+  GaiaLocalCatalog *temp = new GaiaLocalCatalog( e, interp, in, out );
+  if ( temp->convertFrom( 1 ) ) {
+    return TCL_OK;
+  } else {
+    return error( "failed to save file:", out );
+  }
+}
