@@ -46,12 +46,13 @@ C--
       PARAMETER    (HEIGHT = 8500.0)
       PARAMETER    (MARGIN = 375)
 C--
-      CHARACTER*(*) ESC, SP, ESCP, ESCLB, ESCBS
-      PARAMETER    (ESC    = CHAR (27))
-      PARAMETER    (SP     = CHAR (32))
-      PARAMETER    (ESCP   = CHAR (27)//CHAR (80))
-      PARAMETER    (ESCLB  = CHAR (27)//CHAR (91))
-      PARAMETER    (ESCBS  = CHAR (27)//CHAR (92))
+      CHARACTER*(1) ESC, SP
+      CHARACTER*(2) ESCP, ESCLB, ESCBS
+C      PARAMETER    (ESC    = CHAR (27))
+C      PARAMETER    (SP     = CHAR (32))
+C      PARAMETER    (ESCP   = CHAR (27)//CHAR (80))
+C      PARAMETER    (ESCLB  = CHAR (27)//CHAR (91))
+C      PARAMETER    (ESCBS  = CHAR (27)//CHAR (92))
 C
       CHARACTER*80  BUFFER
       CHARACTER*80  INSTR
@@ -75,6 +76,14 @@ C
      :              YRESOL = 1000.00,
      :              PENWID = 5)
       SAVE EXSIZE, EYSIZE
+
+C ---- Linux can not have these in a parameter statement
+      ESC    = CHAR (27)
+      SP     = CHAR (32)
+      ESCP   = CHAR (27)//CHAR (80)
+      ESCLB  = CHAR (27)//CHAR (91)
+      ESCBS  = CHAR (27)//CHAR (92)
+
 C
 C=======================================================================
 C
