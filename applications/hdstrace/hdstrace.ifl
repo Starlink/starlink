@@ -14,6 +14,8 @@
 #  History:
 #     1991 January 31 (MJC):
 #	 Original version.
+#     1992 September 25 (MJC):
+#     	 Removed the default for OBJECT to be portable.
 #     1993 November 4 (MJC):
 #     	 Renamed HDSTRACE from TRACE for use on UNIX systems.
 #     {enter_further_changes_here}
@@ -29,8 +31,7 @@ interface HDSTRACE
       type        'UNIV'
       access      'READ'
       vpath       'PROMPT'
-      ppath       'CURRENT,DEFAULT'
-      default     ADAM_USER:GLOBAL
+      ppath       'CURRENT'
       prompt      'Object to be examined'
       helpkey     *
    endparameter
