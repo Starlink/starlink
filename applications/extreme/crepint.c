@@ -14,7 +14,8 @@
 *     occurrences of the type specifier `int' by the identifier
 *     `INT_BIG'.  This identifier can then be assigned a preprocessor 
 *     value of a suitable integral type (int or long) either using an
-*     include file or with a -DINT_BIG=xxx flag on the C compiler.
+*     include file or with a -DINT_BIG=(type) flag on the C compiler
+*     command line.
 *
 *     It's not quite as simple as replacing every semantically significant
 *     occurrence of the `int' identifier; `short int' and `long int' type 
@@ -27,8 +28,8 @@
 *     Additionally, references to the limit.h macros INT_MAX, INT_MIN 
 *     and UINT_MAX are replaced by INT_BIG_MAX, INT_BIG_MIN and 
 *     UINT_BIG_MAX respectively.  If any of these substitutions are
-*     made, then a line '#include "extreme.h"' is added after the 
-*     '#include <limits.h>' line which is presumably in the file.
+*     made, then a line `#include "extreme.h"' is added after the 
+*     `#include <limits.h>' line which is presumably in the file.
 *     If <limits.h> is not included in the input file, a warning is
 *     written to standard error.
 *
@@ -38,10 +39,27 @@
 *
 *     The program will write a warning on standard error for certain 
 *     constructions in the code which are likely to cause trouble after
-*     the mass redeclaration of int as INT_BIG has occurred.
+*     the mass redeclaration of int as INT_BIG has occurred, since in 
+*     some places the type int, and not INT_BIG, is still required.
 *     These constructions are:
-*        - Declarations of functions with variable argument lists
-*        - Use of format strings in formatted I/O which may need changes
+*        - Inclusion of system header files other than those of the C
+*          standard library, since these may indicate use of functions 
+*          other than those warned about above with arguments of type 
+*          pointer to int.
+*        - Use of functions from the C standard library which may require
+*          changes.
+*
+*     The functions from the C standard library which may require changes
+*     are the following:
+*        - Format strings in formatted I/O which may need changes
+*          because they use variable argument lists or require
+*          arguments of type pointer to int.
+*        - The frexp() math function whose second argument must be
+*          a pointer to int
+*        - The signal() function whose second argument is a function
+*          which must take an int argument
+*        - The bsearch() and qsort() functions which take a comparison
+*          function as argument, and this function must be of type int
 *
 *     In the case of potentially dangerous format strings, for
 *     convenience a comment is inserted in the output code on the line
@@ -49,29 +67,28 @@
 *     character string `crepint: '.  The warning to standard error 
 *     notes that the comment line has been inserted.
 *
-*     The program does not make all changes which are required to effect
-*     this conversion.  The following constructions are likely to cause
-*     trouble, but will not be warned about by the program:
+*     The following constructions are also likely to cause trouble, but 
+*     will not be warned about by the program:
 *        - Use of functions without prototypes.  If header files are 
 *          omitted or old style function declarations are used then the
 *          ANSI C machinery for doing type conversion at function call
-*          time will not work.
-*        - Use of external C libraries apart from the C standard library
-*          which have not been recoded replacing INT_BIG for int.
+*          time will not work.  Gcc's `-Wstrict-prototypes' and 
+*          `-Wimplicit' flags are useful for this.
 *        - Implicit declarations, which are implicitly of type int.
 *          If a name is declared simply by mentioning it without any type
 *          or type qualifiers, it is implicitly of type int, and so 
 *          should become delcared as INT_BIG.  This program does not 
 *          find these.  Such implicit declarations (only?) occur in 
-*          function declarations.  The Tru64 Unix C compiler's "-protois" 
-*          flag is useful for identifying these.
+*          function declarations.  The Tru64 Unix C compiler's `-protois'
+*          flag or gcc's `-Wimplicit' flag are useful for identifying 
+*          these.
 *
 *     The program tries to adjust padding whitespace outside comments 
 *     so that the spacing of the output looks OK.
 *
 *     No changes are made to comment lines so that, for instance, the 
 *     Synopsis stanza of function prologues will not have formal argument 
-*     types changed from 'int' to 'INT_BIG'.
+*     types changed from `int' to `INT_BIG'.
 *       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -99,6 +116,9 @@
 
 /* Macro for working out which column a tab character advances to. */
 #define tabstop(c) ( ( (c) / 8 ) * 8 + 8 )
+
+/* Macro for general purpose smallish buffer length. */
+#define LINELENG 120
 
 /* Local function prototypes. */
    void crepint();
@@ -495,7 +515,7 @@
       char *cbuf;
       char *nl = NULL;
       char *pc;
-      char text[ 120 ];
+      char text[ LINELENG ];
       int done = 0;
       int incomm;
       int tleng;
@@ -596,7 +616,7 @@
       char c1;
       char *cbuf;
       char *interp;
-      char line[ 100 ];
+      char line[ LINELENG ];
       char *stlit;
       char *string;
       char *strmat;
@@ -674,10 +694,51 @@
             limline = i + 6;
          }
 
-/* Check for and warn about variable argument lists. */
-         if ( t == DOTDOTDOT && t1 == ')' ) {
-            fprintf( stderr, "%s: Variable argument list for %s()\n",
-                             name, funcofarg( tbuf + i )->strmat );
+/* System header file.  Depending on what it is, this may need some action. */
+         if ( tokmatch( tbuf + i, CPP_INCLUDE, '<', IDENTIFIER, 0 ) ) {
+
+/* Assemble name of file (may span several tokens since it may contain '/'). */
+            char fname[ LINELENG + 1 ];
+            char *qc = fname;
+            char *pc;
+            for ( j = i + 2; tbuf[ j ].tokval != '>' && j < leng; j++ ) {
+               for ( pc = tbuf[ j ].string; *pc && qc - fname < LINELENG; ) 
+                  *(qc++) = *(pc++);
+            }
+            *qc = '\0';
+
+/* Record position of limits.h header file.  This will be a good place to
+   include extreme.h if it is needed. */
+            if ( ! strcmp( fname, "limits.h" ) ) {
+               limline = i + 6;
+            }
+
+/* Check if it is a standard library header file.  If so, no action needs
+   to be taken. */
+            else if ( ! strcmp( fname, "assert.h" ) || 
+                      ! strcmp( fname, "ctype.h" )  ||
+                      ! strcmp( fname, "errno.h" )  ||
+                      ! strcmp( fname, "float.h" )  ||
+                      ! strcmp( fname, "locale.h" ) ||
+                      ! strcmp( fname, "math.h" )   ||
+                      ! strcmp( fname, "setjmp.h" ) ||
+                      ! strcmp( fname, "signal.h" ) ||
+                      ! strcmp( fname, "stdarg.h" ) ||
+                      ! strcmp( fname, "stddef.h" ) ||
+                      ! strcmp( fname, "stdio.h" )  ||
+                      ! strcmp( fname, "stdlib.h" ) ||
+                      ! strcmp( fname, "string.h" ) ||
+                      ! strcmp( fname, "time.h" ) ) {
+            }
+
+/* Otherwise, it is an unrecognised system header file.  This may indicate
+   that unknown functions are being used, which may have dangerous
+   declarations (arguments of type pointer to int).  Warn the user that
+   further checking is in order. */
+            else {
+               fprintf( stderr, "%s: Non-stdlib system header file <%s>\n",
+                                name, fname );
+            }
          }
 
 /* Set categories of token which will be useful. */
@@ -715,11 +776,34 @@
 
          }
 
-/* Check for, and warn about if necessary, printf (etc) format strings.
+/* Check for, and warn about, certain functions from the standard library
+   which will need attention. */
+
+/* Check for, and warn about, frexp (declared in math.h). */
+         if ( t1 == '(' && idmatch( tbuf + i, "frexp" ) ) {
+            fprintf( stderr, "%s: Second arg of frexp() must be int *\n", 
+                             name );
+         }
+
+/* Check for, and warn about, signal (declared in signal.h). */
+         else if ( t1 == '(' && idmatch( tbuf + i, "signal" ) ) {
+            fprintf( stderr, "%s: Check func passed to signal() is (*)(int)\n",
+                             name );
+         }
+
+/* Check for, and warn about, bsearch and qsort (declared in stdlib.h). */
+         else if ( t1 == '(' && ( idmatch( tbuf + i, "bsearch" ) 
+                               || idmatch( tbuf + i, "qsort" ) ) ) {
+            fprintf( stderr, "%s: Check func passed to %s() is int (*)()\n",
+                             name, tbuf[ i ].strmat );
+         }
+
+/* Check for, and warn about if necessary, format strings used by printf
+   and related functions (declared in stdio.h). 
    This code was written with reference to K&R (2nd Ed.) */
-         if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
-                          || idmatch( tbuf + i, "fprintf" )
-                          || idmatch( tbuf + i, "sprintf" ) ) ) {
+         else if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
+                               || idmatch( tbuf + i, "fprintf" )
+                               || idmatch( tbuf + i, "sprintf" ) ) ) {
             arg = i + 2;
             if ( ! idmatch( tbuf + i, "printf" ) )
                arg = nextarg( tbuf + arg ) - tbuf;
@@ -771,11 +855,12 @@
             if ( *warn ) comment( tbuf + i, warn );
          }
 
-/* Check for, and warn about if necessary, scanf (etc) format strings. 
+/* Check for, and warn about if necessary, format strings used by scanf 
+   and related functions (declared in stdio.h). 
    This code was written with reference to K&R (2nd Ed.) */
-         if ( t1 == '(' && ( idmatch( tbuf + i, "scanf" )
-                          || idmatch( tbuf + i, "fscanf" )
-                          || idmatch( tbuf + i, "sscanf" ) ) ) {
+         else if ( t1 == '(' && ( idmatch( tbuf + i, "scanf" )
+                               || idmatch( tbuf + i, "fscanf" )
+                               || idmatch( tbuf + i, "sscanf" ) ) ) {
             arg = i + 2;
             if ( ! idmatch( tbuf + i, "scanf" ) ) 
                arg = nextarg( tbuf + arg ) - tbuf;
