@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {225.1(Draft)}
 \newcommand{\stardocauthors}   {M. B. Taylor}
-\newcommand{\stardocdate}      {1 December 1998}
+\newcommand{\stardocdate}      {19 January 1999}
 \newcommand{\stardoctitle}     {SCB --- Source Code Browser}
 \newcommand{\stardocversion}   {1.0-1}
 \newcommand{\stardocmanual}    {Use and installation guide}
@@ -289,7 +289,8 @@ must be installed as a CGI script.
 
 \section{\xlabel{sec:introduction}\label{sec:introduction}Introduction}
 
-The USSC consists of a few million lines of source code, mainly in 
+The programs in the Starlink software collection 
+consist of a few million lines of source code, mainly in 
 Fortran 77 and C. 
 Finding the source code of interest given the name of a
 user task, a function, or even a source file can be non-trivial;
@@ -299,7 +300,7 @@ and the position in the file at which the routine is defined
 may all be difficult pieces of information to obtain if one is
 unfamiliar with the package in question.
 
-This package seeks to enable fast navigation around the USSC 
+This package seeks to enable fast navigation around the Starlink 
 source code in two ways.  In the first place it can locate a routine
 or file based on an explicit user query (giving the exact or
 approximate name of the routine or file and optionally the Starlink 
@@ -521,7 +522,8 @@ if it is necessary to unpack tar archives.  The problem is most acute
 when tar files are contained in other tar files (usually only the
 case if the whole source archive for each package is stored as a tar file,
 rather than unpacked as is more usual).  
-If all the tar files within the source archive are unpacked in place,
+You may wish to 
+unpack all the tar files within the source archive in place,
 for instance using a C-shell sequence like 
 \begin{quote}
 \begin{verbatim}
@@ -532,11 +534,11 @@ foreach tarfile (`find $SCB_SOURCES -name \*.tar -print`)
 end
 \end{verbatim}
 \end{quote}
-then no temporary disk space will be used, and much reduced disk
+In this case no temporary disk space will be used, and much reduced disk
 activity will be required by the browser program.
 The disadvantage of doing this is increased use of disk space
 in the SCB\_SOURCES directory 
-(by around 220MB for the full unbuilt USSC). 
+(by around 250MB for the full unbuilt source code collection). 
 \end{description}
 
 
@@ -631,7 +633,7 @@ Use of the {\tt scbcp.pl} utility is explained in
 section \ref{sec:scbcp}.
 
 The index files created in the SCB\_INDEX directory should 
-total around five Mb for the whole USSC.  
+total around 5--10 Mb for the whole Starlink source code set.  
 On some operating systems the index files may be 
 sparse, and {\em appear} much bigger than they are,
 so that {\tt ls~-l} makes them look very large, 
@@ -639,7 +641,7 @@ while {\tt du} or {\tt ls~-s} gives their true size.
 Copying the indexes should be done using the supplied utility
 {\tt scbcp.pl} (see section \ref{sec:scbcp}), 
 not the Unix {\tt cp} command; the latter would
-work, but may result in inefficient use of disk space.
+work, but might result in inefficient use of disk space.
 
 
 \subsection{\xlabel{sec:personalise}\label{sec:personalise}Creating a personalised index}
@@ -679,7 +681,7 @@ then the last line above could be replaced by
 % scbindex.pl ./figaro.tar.Z
 \end{verbatim}
 \end{quote}
-It would be possible to make personal index containing Figaro only,
+It would be possible to make a personal index containing Figaro only,
 in which case the copying step could be avoided, 
 but then hyperlinks to routines in other Starlink packages 
 would not work.
@@ -711,6 +713,8 @@ and to use your personal index you should point it at
 http://host.domain/cgi-bin/star/scb.pl?indexdir=/home/user/star/etc/scb
 \end{verbatim}
 \end{quote}
+Note the index directory must be the path of the index as seen by
+the web server.
 \end{description}
 
 
@@ -853,7 +857,7 @@ the names of routines.
 A third possibility is `{\tt type=regex}', in which case the 
 search term is interpreted as a case-insensitive 
 Perl regular expression, and
-all functions and all files are searched for matches.
+all function names and all file names are checked for matches.
 All the matching terms, along with file locations, are then printed out
 (first files, then routines).
 In this case no source file is extracted.
@@ -940,7 +944,8 @@ It consists of the following parts:
 \begin{description}
 \item[Name of item]
 The name of the file or function/subroutine to locate, 
-or a regular expression matching a file or routine.
+or a regular expression matching a file or routine
+(more detail in section \ref{sec:extract-name}).
 \item[Type of item]
 Describes how to interpret the ``Name of item'' box.  Select one of:
 \begin{description}
@@ -968,6 +973,7 @@ Describes how to interpret the ``Name of item'' box.  Select one of:
    % A case sensitive search can be achieved by prepending `{\tt (?-i)}' to the
    % regular expression; however this requires Perl 5.005.
 \end{description}
+(More detail in section \ref{sec:extract-type}).
 \item[Name of package (optional)]
 If one of the listed packages is selected, it serves
 as a hint about where the file or routine being searched for might be.
@@ -979,6 +985,7 @@ In particular, this means that even when one package is specified here,
 a routine from another package may be presented.\\
 If the Type of item is ``Regular expression'' however, then filling in this
 field will restrict the search to the named package.
+(More detail in section \ref{sec:extract-package}).
 \end{description}
 If the type of item is ``Routine'' or ``File'', then submitting
 the form will take you to the unit requested, or a message
@@ -1025,7 +1032,7 @@ will take you to one of the files in the package.
 \subsubsection{\xlabel{sec:view}\label{sec:view}Viewing a source file}
 
 A file from a package is normally presented as text in the browser.
-If it is C or Fortran source code, then each called function or
+If it is C or Fortran source code, then each call of a function or
 subroutine should be a hyperlink to the appropriate definition.
 Similarly, included files (Fortran {\tt INCLUDE} or C {\tt \#include}) 
 are hyperlinked to the right place.
@@ -1064,7 +1071,9 @@ means that the file is part of the package FIGARO,
 is contained in the tar archive {\tt figaro\_dsa.tar}, and
 within that archive is called {\tt dsa/dsa\_dat\_sz.f}.
 
-At the bottom of each file is a copyright notice.
+At the bottom of each file is a copyright notice, 
+a link to the list of all items in the current file's package,
+and a link to the top level of the browser.
 
 
 \section{\xlabel{sec:internals}\label{sec:internals}Internal workings}
@@ -1083,7 +1092,7 @@ This section is not required reading for users of the package.
 \subsection{\xlabel{sec:internals-indexes}\label{sec:internals-indexes}Index files}
 
 The indexing program {\tt scbindex.pl} builds disk-based indexes, and the 
-extractor program, which is the same as the browser program  {\tt scb.pl}
+extractor program, which is the same as the browser program  {\tt scb.pl},
 interrogates them.  There are three indexes:
 \begin{description}
 \item[Tasks]
@@ -1102,7 +1111,7 @@ packages which have been indexed.
 An index of every file which makes up the indexed source code set,
 indexed by bare filename (i.e.\ the tail of the filename, excluding
 path information). 
-This index also holds a special entry for each package 
+This index also holds one special entry for each package 
 recording where the source code is stored.
 %
 \item[Routines]
@@ -1156,7 +1165,7 @@ The design of these objects was dictated chiefly by the requirements
 of the browser program, as explained in 
 section \ref{sec:internals-extractor}).
 More detailed documentation of the implementation of these indexes
-can be found in the StarIndex.pm module itself.
+can be found in the {\tt StarIndex.pm} module itself.
 
 It is possible to examine the File and Routines indexes 
 directly from the command line by using the supplied {\tt dbmcat.pl}
@@ -1298,7 +1307,7 @@ int code (int argc, char **argv) \{ \\
 \}
 }
 \end{quote}
-it will changed by the tagging routine to read:
+it will be changed by the tagging routine to read:
 \begin{quote}
 {\tt
 \#include "{\bf $<$a href='INCLUDE-header.h'$>$}header.h{\bf $<$/a$>$}" \\
@@ -1332,7 +1341,7 @@ understand the contents of include files, link scripts or makefiles, which
 would make the whole business a great deal more complicated.
 
 Note that the link to the function (although not to the include file)
-includes specification of a target within the document
+includes specification of a fragment within the document
 (the part after the `{\tt \#}' symbol), 
 which is important if the referenced function is just one of many within a
 large source file (frequently true in C source, although less so in Fortran).
@@ -1345,7 +1354,7 @@ the link is not created, but the word which would otherwise have
 been a link is output in bold to indicate that it looks
 like it ought to reference another file but does not.
 Secondly, if the referenced item exists in the same source file,
-a truncated URL giving only the relative position in the same
+a truncated URL giving only the fragment position in the same
 file is written.  This prevents the behaviour (which smart browsers
 may in any case avoid) of having to reload the same file when all
 that is required is to move around in it.
