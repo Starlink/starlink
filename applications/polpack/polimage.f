@@ -30,7 +30,7 @@
 *     If parameter SHAPE is set TRUE, a 2 or 3 dimensional NDF is created
 *     in which the spatial position of each data value is read from the 
 *     catalogue columns specified using parameters COLX, COLY and COLZ. The 
-*     NDF is formed by bining the catalogue values into a grid of equally
+*     NDF is formed by binning the catalogue values into a grid of equally
 *     sized rectangular cells, the dimensions of each cell being given by 
 *     parameter BOX. Each pixel in the output NDF corresponds to one of 
 *     these cells. The  data values for the cell are formed by combining 
@@ -146,7 +146,7 @@
 *     WCS components.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)

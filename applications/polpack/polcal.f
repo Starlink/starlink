@@ -25,7 +25,8 @@
 *     into an output NDF holding a Stokes vector at every pixel in the supplied 
 *     input NDFs. If the input NDFs are 2-dimensional images, the output NDF
 *     will be 3-dimensional. If the input NDFs are 3-dimensional cubes
-*     (spectropolarimetry data for instance), the output NDF will be 4-dimensioanl. 
+*     (spectropolarimetry data for instance), the output NDF will be 
+*     4-dimensional. 
 *
 *     Either dual or single beam data can be processed, with an
 *     appropriate algorithm being used in each case. There is also an
@@ -38,7 +39,7 @@
 *     If the input arrays are 3D, the first two pixels axes must be the 
 *     spatial axes, and all planes within each input cube must be spatially 
 *     aligned. Corresponding 2D planes within 3D input cubes are processed
-*     independantly of each other, using the same algorithm used for 2D
+*     independently of each other, using the same algorithm used for 2D
 *     input images.
 *
 *     The final axis in the output array corresponds to Stokes parameter
@@ -93,9 +94,9 @@
 *        describing such things as warnings and the E and F factors
 *        adopted (in dual-beam mode). A value of 2 produces more verbose 
 *        output including details of each iteration in the iterative
-*        processes used by both dual and single beam modes. A value of
+*        processes used by both dual and single-beam modes. A value of
 *        3 produces additional details about each individual input image in
-*        single beam mode. [1]
+*        single-beam mode. [1]
 *     IN = NDF (Update)
 *        A group specifying the names of the input intensity images or
 *        cubes. This may take the form of a comma separated list, or any of 
@@ -106,7 +107,7 @@
 *        This parameter is accessed by both single and dual-beam 
 *        algorithm, but is used slightly differently in each case. 
 *
-*        In dual beam mode, it specifies the maximum number of iterations 
+*        In dual-beam mode, it specifies the maximum number of iterations 
 *        to be used when inter-comparing pairs of input images to determine 
 *        their relative scale-factor and/or zero-point. If the specified 
 *        number of iterations is exceeded without achieving the accuracy 
@@ -132,7 +133,7 @@
 *        when iteratively rejecting input values (i.e. if MAXIT is
 *        greater than zero). It controls how much good input data is 
 *        required to form a good output pixel. It is given as a fraction 
-*        in the range 0 to 1. The miminum number of good input values 
+*        in the range 0 to 1. The minimum number of good input values 
 *        required to form a good output value at a particular pixel is 
 *        equal to this fraction multiplied by the number of input NDFs 
 *        which have good values for the pixel. The number is rounded to 
@@ -223,7 +224,7 @@
 *        specifies the convergence criterion for the iterative process
 *        which estimates the input variances, and rejects bad input values.
 *        If the number of pixels rejected from any input NDF changes by more 
-*        than TOLR pixels between two succesive iterations, then the process 
+*        than TOLR pixels between two successive iterations, then the process 
 *        is assumed not to have converged and another iteration will be 
 *        performed unless MAXIT iterations have already been performed. [0]
 *     TOLS = _REAL (Read)
@@ -283,7 +284,7 @@
 *        The dual-beam algorithm always uses scheme 1. [1]
  
 *  The Single-beam Algorithm:
-*        In single-bean mode, the I, Q and U values at each output pixel are 
+*        In single-beam mode, the I, Q and U values at each output pixel are 
 *        chosen to minimise the sum of the squared residuals between the 
 *        supplied intensity values and the intensity values implied by the I, 
 *        Q and U values (this is equivalent to fitting sine curves to the 
@@ -291,7 +292,7 @@
 *        according to the scheme chosen using parameter WEIGHTS. The basic 
 *        algorithm is described by Sparks and Axon (submitted to P.A.S.P.). 
 *
-*        Single beam mode can take account of imperfections in the analyser.
+*        Single-beam mode can take account of imperfections in the analyser.
 *        The transmission (i.e. the overall throughput) and efficiency
 *        (i.e. the ability to reject light polarized across the axis) of the 
 *        analyser are read from the POLPACK extension. If not found, values 
@@ -301,10 +302,10 @@
 *        efficiency of zero. The extension items named T and EPS hold the
 *        transmission and efficiency.
 *
-*        Single beam mode can handle data taken by polarimeters containing
+*        Single-beam mode can handle data taken by polarimeters containing
 *        a number of fixed analysers, or a single rotating analyser, in
 *        addition to the normal combination of fixed analyser and rotating
-*        half-wave plate. The POLPACK extension in each input image should 
+*        half-wave plate. The POLPACK extension in each input NDF should 
 *        contain either a WPLATE value (giving the angle between a fixed
 *        analyser and the half-wave plate), or an ANLANG value (giving the
 *        angle between the rotating or fixed analyser and the polarimeter 
@@ -313,29 +314,30 @@
 *        any value (i.e. they are not restricted to the values 0.0, 22.5,
 *        45.0 and 67.5 degrees as in the dual-beam algorithm).
 *
-*        If the input intensity images do not contain usable variances,
+*        If the input intensity NDFs do not contain usable variances,
 *        then estimates of these variances can be made from the spread of
 *        supplied data values. This is an expensive iterative process
 *        (see parameters TOLR and WEIGHTS). Initially, Stokes vectors
-*        are estimated assigning a uniform constant weight to all input
-*        data values. The I, Q and U images are then smoothed by fitting
-*        a quadratic surface to the data within a box centred on each
-*        pixel (the size of the box can be specified using parameter
-*        SMBOX). For each input image, a similar image is then created
-*        holding the squared residual between the input intensity values, 
-*        and the intensity values implied by the smoothed Stokes vectors 
-*        (using the known analyser positions, etc, for the images). These
-*        images containing squared residuals are then stacked together
-*        to obtain a single image holding the mean squared residual at
-*        each pixel. This image is then smoothed using a mean box filter
-*        of size specified by parameter SMBOX. The values in the resulting 
-*        image are used as the variance estimates for the input data (note,
-*        the same variance estimates are used for all the input images).
+*        are estimated by assigning a uniform constant weight to all input
+*        data values. The I, Q and U arrays are then smoothed spatially by 
+*        fitting a quadratic surface to the data within a box centred on each
+*        pixel (the size of the box can be specified using parameter SMBOX 
+*        - no smoothing is applied along any frequency axis). For each input 
+*        NDF, a similar array is then created holding the squared residual 
+*        between the input intensity values, and the intensity values implied 
+*        by the smoothed Stokes vectors (using the known analyser positions, 
+*        etc, for the NDFs). These arrays containing squared residuals are 
+*        then stacked together to obtain a single array holding the mean 
+*        squared residual at each pixel. This array is then smoothed spatially
+*        using a mean box filter of size specified by parameter SMBOX. The 
+*        values in the resulting array are used as the variance estimates for 
+*        the input data (note, the same variance estimates are used for all 
+*        the input NDFs).
 *
-*        If the input arrays have differing zero points, the residuals
-*        for any one image will usually not be centred on zero, but will
+*        If the input NDFs have differing zero points, the residuals
+*        for any one NDF will usually not be centred on zero, but will
 *        have some non-zero mean determined by the zero point for the
-*        array. If uncorrected this would led to an artifically high
+*        NDF. If uncorrected this would led to an artificially high
 *        estimate of the input variance. There is an option (see parameter 
 *        DEZERO) to reduce this effect, by using the mean of the residuals 
 *        as a zero point correction for the input array. Note however, that
@@ -344,7 +346,7 @@
 *        MAXIT.
 *        
 *        In order to provide some safe-guards against aberrant values in 
-*        the input images, input data values which are badly inconsistent 
+*        the input NDFs, input data values which are badly inconsistent 
 *        with the smoothed Stokes vectors are rejected at this point. Pixels
 *        are rejected if the corresponding squared residual is greater than 
 *        NSIGMA times the standard deviation expected for the pixel value.
@@ -364,7 +366,7 @@
 *        There are a couple of restrictions in single-beam mode. Firstly,
 *        there is currently no facility for measuring circular
 *        polarization. Secondly, no attempt is made to correct for
-*        difference in the exposure times of the input images, which
+*        difference in the exposure times of the input NDFs, which
 *        should all have been normalised to the same exposure time.
 
 *  The Dual-beam Algorithm:
@@ -414,7 +416,7 @@
 *        RAY item in the POLPACK extension), and so the dual-beam
 *        algorithm is used.
 *     polcal "*_O,*_E" stokes nodualbeam
-*       As above, but the data is processed as if it were single beam data.
+*       As above, but the data is processed as if it were single-beam data.
 
 *  Notes:
 *     -  An item named STOKES is added to the POLPACK extension. It is a
@@ -434,7 +436,7 @@
 *     input image to the output cube. 
 
 *  Copyright:
-*     Copyright (C) 2000 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
@@ -454,7 +456,7 @@
 *        characters to 30 characters. Modified call to POL_CALE to include
 *        trailing length specifier for IPID strings.
 *     8-FEB-1998 (DSB):
-*        Added single beam mode.
+*        Added single-beam mode.
 *     16-AUG-2000 (DSB):
 *        The TRIMBAD parameter added.
 *     2-FEB-2001 (DSB):
@@ -547,7 +549,7 @@
          CALL MSG_BLANK( STATUS )
       END IF
 
-*  Process the data using dual or single beam mode.
+*  Process the data using dual or single-beam mode.
       IF( DBEAM ) THEN
          CALL POL1_DULBM( IGRP, VAR, ILEVEL, STATUS )
       ELSE

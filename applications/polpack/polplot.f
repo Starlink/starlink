@@ -285,7 +285,7 @@
 *        supplied catalogue (see parameter COLZ). For instance, if the 
 *        current coordinate Frame contains a calibrated wavelength axis,
 *        the value should be given in the units specified in that frame 
-*        (anstroms, nanometres, etc.). If the wavelength axis has not been 
+*        (Angstroms, nanometres, etc.). If the wavelength axis has not been 
 *        calibrated, the value will probably need to be supplied in units
 *        of pixels. Entering a colon (":") for the parameter will result in 
 *        a description of the current coordinate Frame being shown. This may 
@@ -380,7 +380,7 @@
 *     picture has sky coordinate information stored with it).
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -409,6 +409,8 @@
 *     11-AUG-2000 (DSB):
 *        Modified to allow negative KEYPOS values and use of Title
 *        attribute in KEYSTYLE to set the key text.
+*     22-FEB-2001 (DSB):
+*        Modified to support 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
