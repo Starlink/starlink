@@ -1114,7 +1114,7 @@ c      RECORD /POS_REC/ POS
 
 *    Import-Export :
       DOUBLE PRECISION     INTIMES(NEVENT)     ! timelist
-      DOUBLE PRECISI0N     OUTTIMES(NEVENT)    ! timelist
+      DOUBLE PRECISION     OUTTIMES(NEVENT)    ! timelist
       DOUBLE PRECISION     WIDTHS(NEVENT)      ! timelist binwidths
 
 *  Status :
