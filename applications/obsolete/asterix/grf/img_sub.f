@@ -5030,6 +5030,7 @@ c        REAL XX,XP,YP
           IF (FLAG.EQ.3) THEN
             I_FORM=.TRUE.
           ELSE
+            CALL PGPOINT(1,XC,YC,2)
             CALL MSG_PRNT('Select any corner...')
             XCORN=XC
             YCORN=YC
@@ -5132,11 +5133,9 @@ c        REAL XX,XP,YP
       REAL PXOEND,PYOEND
       REAL XWID,YWID
       REAL PXWID,PYWID
-c      REAL HLEN
-c      REAL HWID
       REAL PLENGTH,PHLEN,PWIDTH,PHWID
       REAL ALPHA,BETA
-      REAL D
+      REAL A,ASQ,B,BSQ,CSQ,D
       REAL XTR,YTR,XTL,YTL,XBR,YBR,XBL,YBL
       REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
       INTEGER LS
@@ -5180,10 +5179,30 @@ c      REAL HWID
               IF (FLAG.EQ.1) THEN
                 CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
 
-*  calc length etc
-                CALL IMG_GETSLICE_SUB(XCENT,YCENT,XEND,YEND,
-     :                   XOEND,YOEND,XWID,YWID,ANGLE,LENGTH,WIDTH,
-     :                                                       STATUS)
+*  calc length
+                LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+                PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
+                PHLEN=MAX(1.0,PHLEN)
+                PLENGTH=PHLEN*2.0
+
+*  calc angle
+                ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+
+*  calc width (pixels)
+                D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
+                ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
+                BETA=ALPHA-ANGLE
+                PHWID=ABS(D*SIN(BETA))
+                PHWID=MAX(0.5,PHWID)
+                PWIDTH=PHWID*2.0
+*  calc width (world coords)
+                ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+                A=SQRT(ASQ)
+                BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+                B=SQRT(BSQ)
+                CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+                ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+                WIDTH=2.0*A*SIN(ALPHA)
 
               ELSEIF (FLAG.EQ.3) THEN
                 I_FORM=.TRUE.
@@ -5240,9 +5259,30 @@ c      REAL HWID
 
           CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
 
-*  calc length etc
-          CALL IMG_GETSLICE_SUB(XCENT,YCENT,XEND,YEND,
-     :             XOEND,YOEND,XWID,YWID,ANGLE,LENGTH,WIDTH,STATUS)
+*  calc length
+          LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+          PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
+          PHLEN=MAX(1.0,PHLEN)
+          PLENGTH=PHLEN*2.0
+
+*  calc angle
+          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+
+*  calc width (pixels)
+          D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
+          ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
+          BETA=ALPHA-ANGLE
+          PHWID=ABS(D*SIN(BETA))
+          PHWID=MAX(0.5,PHWID)
+          PWIDTH=PHWID*2.0
+*  calc width (world coords)
+          ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+          A=SQRT(ASQ)
+          BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+          B=SQRT(BSQ)
+          CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+          ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+          WIDTH=2.0*A*SIN(ALPHA)
 
 
 *  keyboard mode
@@ -5298,79 +5338,6 @@ c      REAL HWID
 
       END
 
-
-*+ IMG_GETSLICE_SUB
-      SUBROUTINE IMG_GETSLICE_SUB(
-     :                     XCENT,YCENT,XEND,YEND,XOEND,XWID,YWID,
-     :                                   ANGLE,LENGTH,WIDTH,STATUS)
-*    Description :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-*    Import :
-      REAL XCENT,YCENT,XEND,YEND,XOEND,YOEND,XWID,YWID
-*    Export :
-      REAL ANGLE,LENGTH,WIDTH
-*    Global variables :
-      INCLUDE 'IMG_CMN'
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-      REAL PI,DTOR
-      PARAMETER (PI=3.14159265,DTOR=PI/180.0)
-*    Local variables :
-      REAL PXCENT,PYCENT
-      REAL PXEND,PYEND
-      REAL PXOEND,PYOEND
-      REAL PXWID,PYWID
-      REAL PLENGTH,PHLEN,PWIDTH,PHWID
-      REAL ALPHA,BETA
-      REAL D
-      REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
-      REAL A,ASQ,B,BSQ,CSQ
-*-
-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
-        CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
-        CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
-        CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
-
-*  calc length
-        LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
-        PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
-        PHLEN=MAX(1.0,PHLEN)
-        PLENGTH=PHLEN*2.0
-
-*  calc angle
-        ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
-
-*  calc width (pixels)
-        D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
-        ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
-        BETA=ALPHA-ANGLE
-        PHWID=ABS(D*SIN(BETA))
-        PHWID=MAX(0.5,PHWID)
-        PWIDTH=PHWID*2.0
-*  calc width (world coords)
-        ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
-        A=SQRT(ASQ)
-        BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
-        B=SQRT(BSQ)
-        CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
-        ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
-        WIDTH=2.0*A*SIN(ALPHA)
-
-      ENDIF
-
-      END
 
 *+ IMG_GETELLIPSE - get ellipse
       SUBROUTINE IMG_GETELLIPSE(PAR1,PAR2,PAR3,PAR4,PAR5,XCENT,YCENT,
