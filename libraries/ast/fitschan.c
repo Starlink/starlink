@@ -348,6 +348,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Introduced SplitMap2 in order to guard against producing
 *        celestial FITS headers for a Mapping which includes more than
 *        one WcsMap.
+*     13-AUG-2001 (DSB):
+*        Modified FixNew so that it retains the current card index if possible.
+*        This fixed a bug which could cause headers written out using Native 
+*        encodings to be non-contiguous.
 
 *class--
 */
@@ -7397,19 +7401,27 @@ static void FixNew( AstFitsChan *this, int flag, int remove,
 
 *  Notes:
 *     - This function attempts to execute even if an error has occurred.
-*     - The current Card is "end-of-file" on exit.
+*     - If any cards are removed, the current Card is left at "end-of-file" 
+*       on exit. If no cards are removed, the original current card is
+*       retained.
 
 *-
 */
 
 /* Local Variables: */
    int *flags;             /* Pointer to flags mask for the current card */
+   int icard;              /* Index of current card on entry */
+   int ndeleted;           /* Number of cards deleted by this call */
 
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
    if ( !this || !this->head ) return;
 
-/* Reset the current card to be the first card. */
+/* Save the current card index, and rewind the FitsChan. */
+   icard = astGetCard( this );
    astClearCard( this );
+
+/* Indicate no cards have yet been deleted. */
+   ndeleted = 0;
 
 /* Loop through the list of FitsCards in the FitsChan until the final
    card is reached. */
@@ -7425,6 +7437,7 @@ static void FixNew( AstFitsChan *this, int flag, int remove,
    current card on to the next card. */
          if( remove ){
             DeleteCard( this, method, class );
+            ndeleted++;
 
 /* Otherwise, clear the flag. */
          } else {
@@ -7441,6 +7454,10 @@ static void FixNew( AstFitsChan *this, int flag, int remove,
          MoveCard( this, 1, method, class );
       }
    }
+
+/* If no cards were removed, we can safely re-instate the original
+   current card. Otherwise, the current card is left at "end-of-file". */
+   if( ndeleted == 0 ) astSetCard( this, icard );
 
 /* Return */
    return;
@@ -18591,7 +18608,7 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
    to the FitsCHan by this call. */
    if( !astOK ) ret = 0;
 
-/* Clear the new flagd associated with cards which have been added to the 
+/* Clear the new flag associated with cards which have been added to the 
    FitsChan as a result of this function. If the object was not added 
    succesfully to the FitsChan, remove any cards which were added before 
    the error was discovered. */
@@ -18878,6 +18895,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
 
 /* Decrement the indentation level for comments. */
    current_indent -= INDENT_INC;
+
 }
 
 static void WriteInt( AstChannel *this_channel, const char *name,
