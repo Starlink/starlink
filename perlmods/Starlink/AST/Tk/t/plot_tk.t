@@ -114,9 +114,9 @@ $plot->Grid();
 # Switch to GRAPHICS frame for easy plotting
 
 my $ra1 = $wcsinfo->Unformat( 1, "0:40:00" );
-my $dec1 = $wcsinfo->Unformat( 1, "41:30:00" );
+my $dec1 = $wcsinfo->Unformat( 2, "41:30:00" );
 my $ra2 = $wcsinfo->Unformat( 1, "0:44:00" );
-my $dec2 = $wcsinfo->Unformat( 1, "42:00:00" );
+my $dec2 = $wcsinfo->Unformat( 2, "42:00:00" );
 
 print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
 print "# Plotting at $ra1, $dec1\n";
