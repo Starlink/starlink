@@ -221,7 +221,48 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
   return lst1;                          /* Simply return first argument */
   }
 
+/*
+ * Special list erase where only list cells are deleted
+ */
+void lstx_sperase( ADIobj *list, ADIstatus status )
+  {
+  ADIobj curp = list;
 
+  while ( _valid_q(curp) ) {
+    _CAR(curp) = ADI__nullid;
+    curp = _CDR(curp)
+    }
+
+  adic_erase( list, status );
+  }
+
+void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
+  {
+  ADIobj curp  = *list;
+  ADIobj *ipoint = list;
+  ADIobj	test = -1;
+
+  if ( _ok(status) ) {
+    while ( _valid_q(curp) && (test<0) ) {
+
+/* Compare identifiers */
+      test = _CAR(curp) - obj;
+
+/* Not there yet? If so, store insertion point in case next node is past */
+/* the point where we'd insert "obj". If test > 0 then ipoint points to */
+/* the cell insertion point from the last iteration if any, otherwise the
+/* user's list variable */
+      if ( test < 0 ) {
+        ipoint = _CDR(curp);
+        curp = *ipoint;
+        }
+      }
+
+/* Add cell to list if not already present */
+    if ( test != 0 )
+      *ipoint = lstx_cell( obj, *ipoint, status );
+    }
+  }
 
 
 /*
