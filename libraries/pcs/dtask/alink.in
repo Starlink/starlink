@@ -103,22 +103,25 @@
 #          install-time editing that used to be performed by the
 #          makefile.  This meant that the ALINK_FLAGS1/2 could be
 #          removed.  Also removed the paths from two INCLUDES, and
-#          changed the include file names to uppercase, since the
+#          changed the dtask_applic.f include file names to uppercase, since the
 #          FCFLAGS substitution includes a -I option, and since the
 #          files in question are now installed in uppercase forms.
+#          (3) Force the monolith to be linked statically.  This might
+#          need further work, as the linker flags might be compiler or
+#          loader specific.
 #          
 #-
 
 set -e
 
 # Strip off `our' options from the beginning of the list of arguments
-XDBX=" "
+includedebug=false
 verbose=false
 while [ $# != 0 ]
 do 
         case $1 in
         -xdbx|--xdbx)
-            XDBX="-g"
+            includedebug=true
             ;;
         --verbose)
             verbose=true
@@ -359,34 +362,37 @@ cat >dtask_applic.f <<FOO
       END
 FOO
 
-if [ "$XDBX" = "-g" ]
+# We need to link monoliths statically.  This is partly because if we don't,
+# we need to worry about setting LD_LIBRARY_PATH or similar,
+# but mostly because monoliths appear not to work if linked against
+# shared libraries.  This needs further investigation, but in the mean
+# time, force static linking.  This option may be specific to
+# gcc/gnuld, and so might need configuration in future.
+alinkextraflags='-Wl,--static'
+if $includedebug
 then
-        if $verbose; then echo "Including debugging support"; fi
-        sed -e s#PROGNAME#$PROGNAME# @staretcdir@/dtask_main.txt \
+    $verbose && echo "Including debugging support in dtask_main.f"
+    alinkextraflags="$extraflags -g"
+    sed -e s#PROGNAME#$PROGNAME# @staretcdir@/dtask_main.txt \
            >dtask_main.f
 fi
 
-if $verbose; then
-    echo "@FC@ @FCFLAGS@ -o $EXENAME \
-        $XDBX \
+linkcmd="@FC@ @FCFLAGS@ -o $EXENAME \
+        $alinkextraflags \
         @libdir@/dtask_main.o \
         dtask_applic.f \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
         `dtask_link_adam`"
-fi
 
-@FC@ @FCFLAGS@ -o $EXENAME \
-$XDBX \
-@libdir@/dtask_main.o \
-dtask_applic.f \
-$ARGS \
--lhdspar_adam \
--lpar_adam \
-`dtask_link_adam`
+$verbose && echo $linkcmd
+eval $linkcmd
 
-if [ "$XDBX" != "-g" ]
+if $includedebug
 then
+    : nothing
+else
+    $verbose && echo "rm -f dtask_applic.[fo] dtask_wrap.[co]"
     rm -f dtask_applic.[fo] dtask_wrap.[co]
 fi
