@@ -52,6 +52,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1998/06/19 19:28:26  timj
+*     First released version
+*
 *     Revision 1.1  1998/05/14 20:41:03  timj
 *     Initial revision
 *
@@ -68,6 +71,7 @@
       INCLUDE 'SAE_PAR'       ! Starlink status
       INCLUDE 'DAT_PAR'       ! DAT__ constants
       INCLUDE 'PRM_PAR'       ! For VAL__
+      INCLUDE 'MSG_PAR'       ! For MSG_
 
       INCLUDE 'SCU_SOL'       ! Description of DREAM header file
       INCLUDE 'SURF_PAR'      ! Standard SCUBA include
@@ -91,6 +95,11 @@
       PARAMETER     (HEADER   = 5120)          ! Nr of I4 in Header records
       CHARACTER*(10) TSKNAME                   ! Task name
       PARAMETER (TSKNAME = 'DREAM2SURF')
+
+      DOUBLE PRECISION LAT_OBS           ! Latitude of JCMT (degrees)
+      PARAMETER (LAT_OBS = 19.8258323669)
+      DOUBLE PRECISION LONG_OBS          ! Longitude of JCMT (degrees)
+      PARAMETER (LONG_OBS = 204.520278931)
        
 
 
@@ -123,6 +132,7 @@
                                                  ! bolometer types
       INTEGER BOL_ADC ( SCUBA__NUM_ADC * SCUBA__NUM_CHAN ) ! ADC numbers
       INTEGER BOL_CHAN ( SCUBA__NUM_ADC * SCUBA__NUM_CHAN ) ! Channel numbers
+      CHARACTER *10 CENT_CRD  ! Centre coordinate system
       INTEGER CHAN            ! Channel number
       CHARACTER * 80 CTEMP    ! Scratch string
       DOUBLE PRECISION DEC    ! Declination
@@ -131,6 +141,7 @@
       INTEGER DIM ( 4 )       ! Dimensions of an array
       DOUBLE PRECISION DLST   ! Time per cycle
       INTEGER DREAM_PTR       ! Pointer to DREAM input data
+      DOUBLE PRECISION DTEMP  ! Scratch double
       CHARACTER * (80) FITS (SCUBA__MAX_FITS)  ! FITS extension
       INTEGER LBND ( 2 )      ! Lower bounds of output NDF
       INTEGER LUN             ! Logical unit number of input file
@@ -144,9 +155,11 @@
       INTEGER ITEMP           ! Scratch integer
       REAL    JIGL_X ( SCUBA__MAX_JIGGLE ) ! X jiggle positions
       REAL    JIGL_Y ( SCUBA__MAX_JIGGLE ) ! Y jiggle positions
+      DOUBLE PRECISION LONGITUDE ! Longitude degrees west
       DOUBLE PRECISION LST    ! LST of observation
-      DOUBLE PRECISION LST_STRT ! Start LST of observation
+      DOUBLE PRECISION LST_STRT ! Start LST of observation (decimal hours)
       INTEGER MAXCYC          ! Maximum number of cycles that can be read
+      DOUBLE PRECISION MJD    ! MJD of observation
       INTEGER NBYTES          ! Number of bytes per data record
       INTEGER NDIM            ! Number of dimensions in an array
       INTEGER NERR            ! For VEC_
@@ -169,6 +182,7 @@
       INTEGER RECIN           ! Current input record
       INTEGER RECORD          ! Record number in input file
       INTEGER RECSS           ! Record size in words
+      CHARACTER *20 RUNNO     ! Run number in 0 padded form (eg 0015) 
       CHARACTER * 80 STEMP    ! Scratch string
       INTEGER UBND ( 2 )      ! Upper bounds of output NDF
 
@@ -238,6 +252,38 @@
       CALL NDF_BEGIN
 
 *     Open an NDF file
+*     Default file name constructed from the UT date
+
+*     Year
+      CALL CHR_ITOC(GR_YY, STEMP, ITEMP)
+      IPOSN = CHR_LEN(STEMP)
+
+*     Month (pad with leading zero)
+      IF (GR_MN .LT. 10) CALL CHR_APPND('0', STEMP, IPOSN)
+      CALL CHR_ITOC(GR_MN, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+
+*     Day
+      IF (GR_DD .LT. 10) CALL CHR_APPND('0', STEMP, IPOSN)
+      CALL CHR_ITOC(GR_DD, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP,STEMP,IPOSN)
+
+*     Append DREAM signature
+      CALL CHR_APPND('_drm_', STEMP, IPOSN)
+
+*     Find observation number from filename
+*     Assumes string of form xxx_NNNN
+
+      ITEMP = CHR_LEN ( SOLVE_DATA )
+      RUNNO = SOLVE_DATA(ITEMP-3:)
+
+*     Append run number to out
+      CALL CHR_APPND(RUNNO, STEMP, IPOSN)
+
+*     Set default
+      CALL PAR_DEF0C('OUT', STEMP, STATUS)
+
+*     Bounds of NDF
       LBND(1) = 1
       LBND(2) = 1
       UBND(1) = R_NBOL
@@ -399,16 +445,23 @@
       CALL CMP_MAPV(OUT_SCUCD_LOC, 'LST_STRT', '_DOUBLE',
      :     'WRITE', DEM_PNTR, ITEMP, STATUS)
 
-*     Calculate base LST (SURF needs this in radians)
-      LST_STRT = (LST_HH + LST_MM / 60.0D0 + LST_SS / 3600.0D0)
+*     This is based on STIME
+*     Returns LST in radians and the MJD
+*     Dont know why John chose degrees east of meridian
+*     convert back to degrees west.
+      LONGITUDE =  LONG_OBS - 360.0D0
+
+      CALL LST_FROM_UT(GR_YY, GR_MN, GR_DD, UT_HH, UT_MN, UT_SS,
+     :     LONGITUDE, LST_STRT, MJD, STATUS)
 
 *     increment in LST per cycle
 *     I think this is stored in cycle_t and is in millisec in the header
-      DLST = (CYCLE_T / (1000.0D0 * 3600.0D0))
+*     Convert to radians
+      DLST = (CYCLE_T / (1000.0D0 * 3600.0D0)) * 15.0D0 * PI / 180.0D0
 
 *     Loop over cycles
       DO I = FSCYCLE, NRCYCLE
-         LST = 15.0D0 * PI * (LST_STRT + (DBLE(I-1) * DLST)) / 180.0D0
+         LST = LST_STRT + (DBLE(I-1) * DLST)
          
          CALL VEC_DTOD(.FALSE., 1, LST,
      :        %VAL(DEM_PNTR + (I-FSCYCLE) * VAL__NBD), IERR, NERR,
@@ -516,8 +569,9 @@
      :     'OBJECT', 'DREAM', 'Name of object', STATUS)
 
 *     RUN number
+      CALL CHR_CTOI(RUNNO, ITEMP, STATUS)
       CALL SCULIB_PUT_FITS_I(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'RUN', 1, 'Run number of observation', STATUS)
+     :     'RUN', ITEMP, 'Run number of observation', STATUS)
 
 *     Observation, Sample mode (Always MAP/JIGGLE) and sample coords
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
@@ -532,32 +586,28 @@
      :     STATUS)
 
 *     Coordinates of observation
-*     Currently stored as Apparent Dec and H.A.
-*     Store in header as 'RD', Dec and RA
-*     Also need it in HHH:MM:SS format!!
-      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'CENT_CRD','RD','Centre coordinate system', STATUS)
 
-*     Convert dec to radians
-      DEC = PI * DEC_OBS / 180.0D0
-
+*     Declination
 *     Convert to string D:M:S
-      IF (DEC .GE. 0.0D0) THEN
+      IF (DECSN .GE. 0.0D0) THEN
          STEMP = '+'
       ELSE
          STEMP = '-'
       END IF
       IPOSN = 1
+
+      DEC = DBLE(DECDD) + (DBLE(DECMN)/60.0D0) + (DBLE(DECSS)/3600.0D0)
       CALL CHR_RTOAN(REAL(DEC), 'DEGREES', STEMP, IPOSN)
 
 *     Store in LAT
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LAT', STEMP, 'Object Latitude', STATUS)
 
-*     Determine Right ascension from HA and known LST
-      RA = LST_STRT - HA_START
+*     Store in token
+      CALL MSG_SETC('DEC', STEMP)
 
-*     Convert to string
+*     Determine Right ascension 
+      RA = DBLE(RAHH) + (DBLE(RAMN)/60.0D0) + (DBLE(RASS)/3600.0D0)
       IPOSN = 0
       CALL CHR_RTOAN(REAL(RA), 'HOURS', STEMP, IPOSN)
 
@@ -565,30 +615,73 @@
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'LONG', STEMP, 'Object longitude', STATUS)
 
+*     Store in message token
+      CALL MSG_SETC('RA', STEMP)
+
+*     Write coordinates to display
+      CALL MSG_SETC('TSK',TSKNAME)
+      CALL MSG_OUTIF(MSG__NORM, ' ', '^TSK: Coordinates: '//
+     :     '^RA, ^DEC', STATUS)
+
+
+*     Need to ask for coordinate frame of the tracking centre
+      CALL PAR_CHOIC('COORDS', 'RB', 'AZ,RD,RB,GA,RJ', .TRUE.,
+     :     CENT_CRD, STATUS)
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'CENT_CRD',CENT_CRD,'Centre coordinate system', STATUS)
+
+
 
 *     UT Date.
-*     For simplicity assume that UT data and LST are same!!!!!!!
-
 *     Convert Year
-      CALL CHR_ITOC(LST_YY, STEMP, ITEMP)
+      CALL CHR_ITOC(GR_YY, STEMP, ITEMP)
       IPOSN = CHR_LEN(STEMP)
       CALL CHR_APPND(':',STEMP, IPOSN)
 
 *     Convert month
-      CALL CHR_ITOC(LST_MN, CTEMP, ITEMP)
+      CALL CHR_ITOC(GR_MN, CTEMP, ITEMP)
       CALL CHR_APPND(CTEMP, STEMP, IPOSN)
       CALL CHR_APPND(':',STEMP, IPOSN)
 
 *     Convert day
-      CALL CHR_ITOC(LST_DD, CTEMP, ITEMP)
+      CALL CHR_ITOC(GR_DD, CTEMP, ITEMP)
       CALL CHR_APPND(CTEMP, STEMP, IPOSN)
 
+*     Write the MJD
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'MJD-OBS', MJD, 'Modified Julian Date of obsstart',
+     :     STATUS)
+
 *     Write the date
-      STEMP = '1998:1:1'
+*      STEMP = '1998:1:1'
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'UTDATE', STEMP, 'UT Date of observation', STATUS)     
 
+
+
+*     Write the UT time
+*     Convert hour
+      CALL CHR_ITOC(UT_HH, STEMP, ITEMP)
+      IPOSN = CHR_LEN(STEMP)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert minute
+      CALL CHR_ITOC(UT_MN, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+      CALL CHR_APPND(':',STEMP, IPOSN)
+
+*     Convert second
+      CALL CHR_ITOC(UT_SS, CTEMP, ITEMP)
+      CALL CHR_APPND(CTEMP, STEMP, IPOSN)
+
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'UTSTART', STEMP, 'UT at start of observation', STATUS)
+
 *     Convert LST (Hours minutes seconds) into a time
+*     First convert LST_STRT to hours (should be radians to this point)
+      LST_STRT = LST_STRT * 180.0D0 / (PI * 15.0D0)
+
       IPOSN = 0
       CALL CHR_DTOAN(LST_STRT, 'HOURS', STEMP, IPOSN)
 
@@ -596,21 +689,20 @@
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'STSTART', STEMP, 'ST at start of observation', STATUS)
 
-*     Also assume UTSTART equals STSTART
-*     WRONG!!!!!
-      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'UTSTART', STEMP, 'UT at start of observation', STATUS)
 
 *     Also store STEND
       IPOSN = 0
-      CALL CHR_DTOAN(LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE)),
+
+      DTEMP = LST_STRT + (DLST * DBLE(FSCYCLE + NRCYCLE - 1) 
+     :     * 180.0D0 / (PI * 15.0D0))
+      CALL CHR_DTOAN(DTEMP,
      :     'HOURS',STEMP, IPOSN)
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'STEND', STEMP, 'ST at start of observation', STATUS)
 
 *     exposure time per sample
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'EXP_TIME', DBLE(SAMPLE_T / 1000.0),
+     :     'EXP_TIME', DBLE(CYCLE_T / (1000.0 * REAL(NPIX))),
      :     'Exposure time for each basic measurement (sec)',
      :     STATUS)
 
@@ -657,9 +749,13 @@
      :     'CNTR_DU4', 0.0D0, 'Nasmyth dU4 coord of instrument centre',
      :     STATUS)
 
-*     Latitude of the telescope
+*     Position of the telescope
       CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'LAT-OBS', LATITUDE, 'Latitude of observatory (degrees)',
+     :     'LAT-OBS', LAT_OBS, 'Latitude of observatory (degrees)',
+     :     STATUS)
+      CALL SCULIB_PUT_FITS_D(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'LONG-OBS', LONG_OBS, 
+     :     'East Longitude of observatory (degrees)',
      :     STATUS)
 
 *     Need to supply some chop information (meaningless)
@@ -812,6 +908,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1998/06/19 19:28:26  timj
+*     First released version
+*
 *     Revision 1.1  1998/05/14 20:41:03  timj
 *     Initial revision
 *
@@ -880,3 +979,153 @@
       END
 
 
+      SUBROUTINE LST_FROM_UT(YY, MN, DD, HH, MM, SS,
+     :     LONGITUDE, LST, MJD, STATUS)
+*+
+*  Name:
+*     LST_FROM_UT
+
+*  Purpose:
+*     Calculate LST given UT
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Subroutine
+
+*  Invocation:
+*     CALL DREAM_DATA_TO_SURF_DATA ( YY, MN, DD, HH, MM, SS,
+*    :    LST, LONGITUDE, MJD, STATUS)
+
+*  Arguments:
+*     YY = INTEGER (Given)
+*        Gregorian year (eg 1998)
+*     MN = INTEGER (Given)
+*        Month number (starting at 1)
+*     DD = INTEGER (Given)
+*        Day of month
+*     HH = INTEGER (Given)
+*        Hour of day
+*     MM = INTEGER (Given)
+*        Minute of hour
+*     SS = INTEGER (Given)
+*        Second of minute
+*     LONGITUDE = DOUBLE (Given)
+*        Longitude of telescope in decimal degrees
+*     LST = DOUBLE (Returned)
+*        Local sidereal time in decimal degre
+*     MJD = DOUBLE (Returned)
+*        Modified julian date
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description:
+*     Converts a UT to local sidereal time and Modified Julian date
+
+
+*  Authors:
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+*  History:
+*     $Log$
+*     Revision 1.2  1998/06/19 19:28:26  timj
+*     First released version
+*
+*     Revision 1.1  1998/05/14 20:41:03  timj
+*     Initial revision
+*
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE
+ 
+*  Global constants:
+      INCLUDE 'SAE_PAR'       ! Starlink status
+
+*  COMMON data
+*      COMMON SOLPA            ! DREAM common block
+
+*  Arguments Given:
+      INTEGER YY
+      INTEGER MN
+      INTEGER DD
+      INTEGER HH
+      INTEGER MM
+      INTEGER SS
+      DOUBLE PRECISION LONGITUDE
+
+*  Arguments Returned:
+      DOUBLE PRECISION MJD
+      DOUBLE PRECISION LST
+
+*  Status:
+      INTEGER STATUS
+
+*  Constants:
+      DOUBLE PRECISION DPI            ! PI
+      PARAMETER (DPI = 3.141592653589793238462643383)
+      DOUBLE PRECISION DD2R           ! Decimal degrees to radians
+      PARAMETER (DD2R = 0.0174532925199432957692369076)
+
+*  External references
+      DOUBLE PRECISION SLA_GMSTA
+      DOUBLE PRECISION SLA_EQEQX
+      EXTERNAL SLA_GMSTA
+      EXTERNAL SLA_EQEQX
+
+*  Local Variables:
+      DOUBLE PRECISION DAYFRAC        ! Fraction of day
+      DOUBLE PRECISION DMJD           ! MJD of day
+      DOUBLE PRECISION EQEQX          ! Equation of the equinox
+      DOUBLE PRECISION GMST           ! Greenwich mean sidereal time
+      INTEGER SLA_STATUS              ! Status from SLA routines
+
+*.
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*     Calculate fraction of day
+*     Length of day is 86400 seconds
+      DAYFRAC = ((DBLE(HH) * 3600.0D0) + (DBLE(MM) * 60.0D0) +
+     :     DBLE(SS)) / 86400.0D0
+
+*     Calculate the modified Julian date
+      CALL SLA_CLDJ(YY, MN, DD, DMJD, SLA_STATUS)
+
+      IF (SLA_STATUS .NE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI('C', SLA_STATUS)
+         CALL ERR_REP(' ','LST_FROM_UT: Error calculating MJD:'//
+     :        ' Code ^C from SLA_CLDJ', STATUS)
+
+         CALL MSG_SETI('YY',YY)
+         CALL MSG_SETI('MN',MN)
+         CALL MSG_SETI('DD',DD)
+         CALL ERR_REP(' ','LST_FROM_UT: UT input: ^YY ^MN ^DD',
+     :        STATUS)
+      END IF
+
+*     Calculate Sidereal time of Greenwich
+
+      GMST = SLA_GMSTA( DMJD, DAYFRAC)
+      MJD  = DMJD + DAYFRAC
+
+*     Equation of the equinoxes
+      EQEQX = SLA_EQEQX( MJD )
+      
+*     Local sidereal time = Greenwich mean sidereal time +
+*                           Equation of the equinox +
+*                           Longitude in radians
+
+      LST = GMST + EQEQX + (LONGITUDE * DD2R) 
+
+*     Add 24 h if less than 0
+      IF (LST .LT. 0.0D0) LST = LST + (2.0 * DPI)
+
+
+      END
