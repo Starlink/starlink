@@ -184,7 +184,7 @@
       DO I = 1, 2
 
 *    Associate file
-        CALL USI_IASSOC( 'INP', I, 'BinDS|Array', 'READ', IFID(1),
+        CALL USI_IASSOC( 'INP', I, 'BinDS|Array', 'READ', IFID(I),
      :                   STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
