@@ -5010,6 +5010,83 @@ c      REAL HWID
 
       END
 
+*+  IMG_GUICURS - get cursor position from GUI
+      SUBROUTINE IMG_GUICURS(X,Y,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Import :
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local Constants :
+*    Local variables :
+      INTEGER IXP,IYP,IXPMAX,IYPMAX
+      INTEGER IX,IY
+      INTEGER I,J,II,JJ
+      INTEGER I1,I2,J1,J2
+      INTEGER ISTAT
+      INTEGER XPMID,YPMID,FID,XID,YID
+      INTEGER FLAG
+      INTEGER NB
+      REAL XP1,XP2,YP1,YP2
+      REAL X,Y
+      REAL XW1,XW2,YW1,YW2
+      REAL XSCALE,YSCALE
+*    Global Variables :
+      INCLUDE 'IMG_CMN'
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  locate noticeboard items
+        CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+
+*  get device size
+        CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,NB,STATUS)
+        CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,NB,STATUS)
+
+*  get plot window parameters
+        CALL PGQVP(3,XP1,XP2,YP1,YP2)
+        CALL PGQWIN(XW1,XW2,YW1,YW2)
+
+        XSCALE=(XW2-XW1)/(XP2-XP1)
+        YSCALE=(YW2-YW1)/(YP2-YP1)
+
+*  wait for GUI to send a position
+        FLAG=0
+        DO WHILE (FLAG.EQ.0)
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+        ENDDO
+
+*  get current cursor position in device coords
+        CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
+        CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
+        IYP=IYPMAX-IYP
+
+*  convert to world coords
+        X=XW1+(REAL(IXP)-XP1)*XSCALE
+        Y=YW1+(REAL(IYP)-YP1)*YSCALE
+
+
+      ENDIF
+
+      END
+
 
 
 
