@@ -70,10 +70,10 @@ defhelp  polplot         $POLPACK_HELP
 {  Announce that the POLPACK commands are available.
 {
 print ""
-print "   POLPACK commands are now available -- (Version PKG_VERS)"
+print "   POLPACK commands are now available -- (Version 1.0)"
 print " "
 print "   Type `polhelp' for help on POLPACK commands"
-print '   Type "showme sun???" to browse the hypertext documentation'
+print '   Type "showme sun223" to browse the hypertext documentation'
 print " "
 {
 { end

@@ -105,10 +105,10 @@
 # Tell the user that POLPACK commands are now available.
 #
       echo ""
-      echo "   POLPACK commands are now available -- (Version 1.1)"
+      echo "   POLPACK commands are now available -- (Version 1.0)"
       echo " "
       echo "   Type polhelp for help on POLPACK commands"
-      echo "   Type 'showme sun???' to browse the hypertext documentation"
+      echo "   Type 'showme sun223' to browse the hypertext documentation"
       echo " "
 #
 # end
