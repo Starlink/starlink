@@ -21,16 +21,34 @@
 
 *  Description:
 *     This application performs the arbitrary transformation of a list
-*     of NDFs using transform structures created by routines such as
-*     REGISTER and CCDEDIT. The output NDFs are calculated by resampling
-*     the data of the input NDFs. Output array elements are set to the
+*     of images.  The output images are calculated by resampling
+*     the data of the input images. Output array elements are set to the
 *     bad value if their inverse-transformed coordinates lie outside the
-*     corresponding input NDF's coordinate limits.
+*     corresponding input image's coordinate limits.  Many images can 
+*     be resampled with a single invocation of TRANNDF, but it is
+*     the user's responsibility to ensure that they are resampled 
+*     into the same coordinate system if they are subsequently to be
+*     combined or compared on a pixel-by-pixel basis.
 *
-*     NDFs processed within CCDPACK may be resampled using the
-*     appropriate transformation structures located within the NDF's
-*     extensions. Using these facilities allows many NDFs to be aligned
-*     with one invocation.
+*     Images processed by CCDPACK are resampled in one of two ways,
+*     depending on the value of the USEWCS parameter.
+*
+*     If USEWCS is TRUE then they are resampled from their Pixel 
+*     coordinates into their Current attached coordinate system
+*     (this is the default).  Since the resampling means that a 1 x 1
+*     square in the Current coordinates will represent one pixel, 
+*     the Current coordinate system must be of an appropriate size
+*     (so for instance resampling into SKY coordinates is not suitable
+*     because they have units of radians).  The Current coordinate 
+*     system will typically have been added by the CCDPACK REGISTER or
+*     WCSREG applications, and be labelled 'CCD_REG' or 'CCD_WCSREG'
+*     accordingly - if it has another label (domain) a warning will
+*     be issued but resampling will proceed.
+*
+*     If USEWCS is set to FALSE, then the resampling will take place
+*     according to the TRANSFORM structure stored in the .MORE.CCDPACK
+*     extension of the file.  This option exists chiefly for 
+*     compatibility with older versions of CCDPACK.
 
 *  Usage:
 *     tranndf in out [method]
@@ -179,13 +197,10 @@
 
 *  Implementation Status:
 *     - Flux conservation can only be applied to constant-determinant
-*       or linear transformations. Since we currently can't tell 
-*       whether AST Mappings are linear, flux conservation should be
-*       turned off when using the NDFs WCS component to perform the
-*       mapping. If left on the program will warn the user that it
-*       may not be performing flux conservation correctly (N.B. if
-*       the WCS transform is linear however, flux conservation will
-*       be calculated correctly).
+*       or linear transformations.  It is currently impossible to tell
+*       whether an AST Mapping is linear, but in the expectation that
+*       it is (most of them are, and most of the rest very nearly are),
+*       it is turned on, without a warning, by default.
 *     - The NDF components are processed by this application as
 *       follows:
 *        -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
@@ -198,9 +213,6 @@
 *     -  Bad pixels, including automatic quality masking, are supported.
 *     -  All non-complex numeric data types are supported.
 *     -  There can be an arbitrary number of NDF dimensions.
-
-*  Implementation Deficiencies:
-*     -  AXIS information is not used.
 
 *  Behaviour of parameters:
 *     Most parameters retain their current value as default. The
@@ -259,6 +271,8 @@
 *        Mucked about a bit.
 *     07-SEP-1999 (AALLAN):
 *        Renamed some KPG1_* routines and propogated changes
+*     4-NOV-1999 (MBT):
+*        Modified some of the warnings.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -295,6 +309,7 @@
       BYTE VARB                  ! Dummy input variance
       BYTE VARBO                 ! Dummy output variance
       CHARACTER * ( 8 ) COMP( NACOMP ) ! NDF array component names
+      CHARACTER * ( AST__SZCHR ) DMN ! AST Current domain
       CHARACTER * ( 7 ) METHOD   ! Resampling method
       CHARACTER * ( 7 ) SHAPE    ! How output NDF shape is determined
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locator to NDF extension
@@ -433,21 +448,6 @@
 *  Are we using AST FrameSets or TRN structures?
       CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
       
-*  If using AST FrameSets then we can't tell whether we have linear
-*  or non-linear mappings, turn flux conservation OFF
-      IF ( USEWCS .AND. NORM) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS)
-         CALL CCD1_MSG( ' ',
-     : '  WARNING - Flux conservation is turned on but'/
-     :/' we are using AST FrameSets ', STATUS )
-         CALL CCD1_MSG( ' ',
-     : '            to transform the co-ordinates. If the'/
-     :/' transform is non-linear', STATUS )
-         CALL CCD1_MSG( ' ',
-     : '            then the flux levels will be incorrect.',STATUS)    
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-      ENDIF      
-
       IF( .NOT. USEWCS ) THEN
         
 *  The user wants to read data with the old TRN structures.
@@ -605,12 +605,12 @@
                     CALL ERR_REP( 'TRANNDF_NOEXT', '  NDF ^NDFNAME '//
      :'does not have a TRANSFORM component in its CCDPACK extension',
      :                          STATUS )
-                     GO TO 940
+                    GO TO 940
                  END IF
                ELSE
 
 *  No extension structure. Set status and abort.
-                   STATUS = SAI__ERROR
+                 STATUS = SAI__ERROR
                  CALL NDF_MSG( 'NDFNAME', IDIN )
                  CALL ERR_REP( 'TRANNDF_NOEXT',
      : '  NDF ^NDFNAME does not have a CCDPACK extension', STATUS )
@@ -627,9 +627,12 @@
 *  We are using AST FrameSets
 *  ==========================
 
-*  Most AST transformations are linear, if flux conservation is turned
-*  on the the user will have been warned that we're using WCS transforms
-*  and the code may not be able to conserve flux correctly. 
+*  Note there is a danger here that for nonlinear AST mappings the 
+*  flux tranformation will be incorrect.  AST mappings are (in this
+*  respect) opaque however so there's no way of telling whether it's
+*  linear or not.  We hope that it is, or that the user will have 
+*  specified that flux is not to be conserved (in any case it is 
+*  unlikely that deviations from linearity will be very great).
 
 *  Validate the transformation
            IF ( IWCS .EQ. AST__NULL ) THEN
@@ -646,27 +649,19 @@
                GO TO 940             
            ELSE 
                               
-*  Make sure the user has actually run REGISTER, if not warn them
-               CALL CCD1_FRDM( IWCS, 'CCD_REG', JREG, STATUS )
-              
-               IF( JREG .EQ. 0 ) THEN
-               
-*  There is no CCD_REG Frame, warn the user (bad things may happen!)
-                    CALL CCD1_MSG( ' ',
-     :'  WARNING - NDF does not have an AST CCD_REG Frame, '//
-     :'attempting alignment',STATUS)
-                    CALL CCD1_MSG( ' ',
-     :'            This image has not been processed by the '//
-     :'CCDPACK REGISTER program',STATUS)
-                    CALL CCD1_MSG( ' ',' ',STATUS)
-               ENDIF
+*  Tell the user which co-ordinate frame we'll be resampling into.
+               DMN = AST_GETC( FRCUR, 'Domain', STATUS )
+               CALL MSG_SETC( 'DMN', DMN )
+               CALL CCD1_MSG( ' ', '  Resampling into the ^DMN '
+     :                           //'coordinate system', STATUS )
 
-*  Tell the user which co-ordinate domain we'll be transforming too
-               CALL MSG_SETC('CURRENT', 
-     :                       AST_GETC( FRCUR, 'Domain', STATUS ) )
-               CALL CCD1_MSG(' ','  The current AST Frame has '//
-     :'domain ^CURRENT', STATUS )               
-           ENDIF
+*  If it's neither CCD_REG nor CCD_WCSREG then issue a mild warning.
+               IF ( DMN .NE. 'CCD_REG ' .AND. DMN .NE. 'CCD_WCSREG ' )
+     :         THEN
+                  CALL CCD1_MSG( ' ', '    (Warning: this is not a '//
+     :'default CCDPACK registration coordinate system)', STATUS )
+               END IF
+           END IF
 
 *  Obtain the number of input and output co-ordinates for a Mapping
            NVIN = AST_GETI( MAP, 'Nin', STATUS )
