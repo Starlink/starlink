@@ -1,0 +1,36 @@
+*==================================================================
+*    STRUCTURE DEFINTION FILE FOR EXTATIC OUTPUT FILE FROM LONGSLIT
+*
+*  Current version 27/1/89, T.N.Wilkins Manchester
+*==================================================================
+VARIABLE  ncases
+VARIABLE  nvars
+VARIABLE  nids
+VARIABLE  dimvrnm
+VARIABLE  nsamnam
+
+STRUCTURE EXTATIC EXTATIC
+  .Z             Z_DATA_STRUCT
+  .VMIN[nvars]      FLOAT
+  .VMAX[nvars]      FLOAT
+  .MISS[nvars,ncases]  SHORT
+  .VARNAM[dimvrnm]   CHAR
+  .IDS[nids]     CHAR
+  .SAMNAM[nsamnam]   CHAR
+  .X             X_AXIS_STRUCT
+  .Y             Y_AXIS_STRUCT
+END STRUCTURE
+
+STRUCTURE X_AXIS_STRUCT STRUCT
+  .DATA[nvars]   FLOAT
+  .UNITS[dimvrnm] CHAR
+END STRUCTURE
+
+STRUCTURE Y_AXIS_STRUCT STRUCT
+  .DATA[ncases]   FLOAT
+END STRUCTURE
+
+STRUCTURE Z_DATA_STRUCT STRUCT
+  .DATA[nvars,ncases]  FLOAT
+  .ERRORS[nvars,ncases]  FLOAT
+END STRUCTURE

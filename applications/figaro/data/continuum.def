@@ -1,0 +1,41 @@
+*
+*                     C O N T I N U U M . D E F
+*
+*  To define the structure used by FITCONT and CSUN
+*
+*         T.N.Wilkins Manchester 25/10/88
+*              "      Cambridge 17/8/90 Made the same for CSUB and
+*                                       FITCONT, called CONTINUUM
+*
+* REMOVE specifies if the continuum expressed by the Cheby Polynomial
+* contained in COEFF has been removed. With the following code
+*       SUBRACTED
+*       DIVIDED
+* WEIGHTS contains the weights used in the cheby polynomial fits
+* for each point along the X axis direction. Note that at the moment
+* this is 1d and it is therfore assumed that if the data is 2d all
+* the Y direction data has the saim weighting structure.
+* ORDER gives the order of the polynomial to extract from the COEFFS
+*--------------------------------------------------------------
+
+VARIABLE max_ord  DEFAULT 20
+VARIABLE ni
+VARIABLE nl
+
+STRUCTURE CONTINUUM CONTINUUM
+      .COEFF[max_ord,ni] DOUBLE
+      .REMOVE INT
+      .NI INT
+      .NL INT
+      .WEIGHTS[nl] DOUBLE
+      .ORDER INT
+END STRUCTURE
+
+
+VARIANT DST
+    EQUATE CONTINUUM .CONTINUUM
+END VARIANT
+
+VARIANT NDF
+    EQUATE CONTINUUM .MORE.FIGARO.CONTINUUM
+END VARIANT

@@ -1,0 +1,32 @@
+!+
+!  Name:
+!     LINKMONO
+!
+!  Purpose:
+!     Link the Figaro monolith for ICL Figaro.
+!
+!  Language:
+!     DCL
+!
+!  Type of Module:
+!     Link options file.
+!
+!  Description:
+!     This link options file helps link the Figaro monolith.
+!     The parameter settings here avoid unecessarily large executables.
+!
+!  Authors:
+!     HME: Horst Meyerdierks (UoE, Starlink)
+!
+!  History:
+!     25 Oct 1992 (HME):
+!        Original version for Figaro 3.1.
+!
+!  Bugs:
+!     {note_any_bugs_here}
+!
+!-
+!
+!.
+ISD_MAX=250
+DZRO_MIN=30

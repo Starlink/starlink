@@ -1,0 +1,196 @@
+*
+*          R E S . D E F
+*
+*  To define the results structure used by LONGSLIT etc.
+*
+*         T.N.Wilkins Manchester 22-23/8/88
+*              "      Cambridge  3/1/90 Altered so can handle data for
+*                                FIBDISP as well
+*              "          "      15/2/90 Template NDF added
+*              "          "      4/6/91 NDF variant added
+*              "          "      1/7/91 NDF structure for results
+*              "          "      17/7/91 Groups added
+*
+*     mxpars       : Number of fit etc. parameters
+*     nyp          : Number of lines
+*     dimids       : 10*nyp
+*     nxp          : 1st spatial direction (for variant COMB this is
+*                    nchans instead)
+*     ndec         : 10*mxpars
+*     ntols        : Number of tolerances
+*     nchans       : Wavelength dimension of data
+*     hex          : If "hexagonal" -3d data only
+*     data3d       : If data is 3d
+*     nxx          : 2nd spatial dimension
+*     nmasks       : numbe of allowed spatial masks
+*
+*  Note that the .TEMPLATE is really an NDF.
+*
+*--------------------------------------------------------------
+VARIABLE nmasks  DEFAULT 1
+VARIABLE mxpars  DEFAULT 36
+VARIABLE nyp DEFAULT 10
+VARIABLE dimids DEFAULT 100
+VARIABLE nxp
+VARIABLE ndec DEFAULT 360
+VARIABLE ntols DEFAULT 13
+VARIABLE ngtol DEFAULT 3
+VARIABLE nchans
+VARIABLE hex DEFAULT False
+VARIABLE data3d DEFAULT False
+VARIABLE comb DEFAULT False
+VARIABLE nxx DEFAULT 1
+VARIABLE ncntrl DEFAULT 3
+VARIABLE nselct DEFAULT 7
+
+* RESULTS from the LONGSLIT analysis are stored in this
+* data structure in DATA_ARRAY
+* and the associated VARIANCES on each fit parameter in 
+* VARIANCE
+
+STRUCTURE RESULTS RESULTS
+   .DATA_ARRAY[mxpars,nyp,nxp,nxx] FLOAT
+   .VARIANCE[mxpars,nyp,nxp,nxx] FLOAT
+   .MORE RMORE
+END STRUCTURE
+
+* TEmplate contains a 1D data array which matches the 
+* attributes of the current 2D aray.
+
+STRUCTURE TEMPLATE_STRUCT STRUCT
+   .DATA_ARRAY[nchans] FLOAT
+   .AXIS[1] AXIS
+END STRUCTURE
+
+STRUCTURE AXIS STRUCT
+   .DATA_ARRAY[nchans] FLOAT
+END STRUCTURE
+
+* Contains Definitions of LINES and names of PARAMETERS for RESULTS
+*  PARAMS      gives name of each paramter as refered to in .DAtA_ARRAY
+* REST_WAVE    rest wavelength of each line
+* IDS          Name of each line
+* TRAML,TRAMR  locatons in wavelngth space of each line
+* .TWODPSPEC    contains more parameters
+
+STRUCTURE RMORE STRUCT
+   .PARAMS[ndec]  CHAR
+   .REST_WAVE[nyp] FLOAT
+   .IDS[dimids] CHAR
+   .TRAML[nyp] FLOAT
+   .TRAMR[nyp] FLOAT
+   .TWODSPEC TWOD
+END STRUCTURE
+
+* Structure containing pointers for line groupings. These take one of
+* two forms either SPARSE or COMPACT
+* a SPARSE group is one in which each line boundary is 
+* treated as a seperate fit region with gaps inbetween
+* a COMPACT group is one in which all the data between the left
+* boundary of the left most group memmber and the RIGHT boundary
+* of the RIGHT-MOST group memeber are assumed in the the current
+* data window.
+
+* AJH Start - Not used in code as TNW did not implement
+* And see GROUP_STRUCT LINE below
+
+*STRUCTURE GROUP_STRUCT STRUCT
+*   .ALL GROUP_SUBSTRU
+*   .SKY GROUP_SUBSTRU
+*END STRUCTURE
+
+*STRUCTURE GROUP_SUBSTRU STRUCT
+*   .TYPE[20] CHAR
+*   .NUMBER SHORT
+*   .DATA_ARRAY[nyp] SHORT
+*END STRUCTURE
+   
+* End AJH commented out
+
+
+* Fittimg control for LONGSLIT
+* ITMASK      itteration number at which current line and position
+*             had a succesful fit stored
+*  CONTROL    fitting instructions storage
+* ITERATION    current itteration control
+* FIT_STATUS   the status of each fit
+* SELECT        For each of the Select options an entry is included
+*               informing LONGSLIT which to include
+* TOLS          fit tolarence rejection/aceptence parameters
+* TEMPLATE      containing spectral templates.
+* TOTAL_INTENSITY 
+
+STRUCTURE TWOD STRUCT
+   .ITMASK[nyp,nxp,nxx] SHORT
+   .CONTROL[ncntrl,nyp,nxp,nxx] INT
+   .ITERATION SHORT
+   .FIT_STATUS[ncntrl,nyp,nxp,nxx] INT
+   .SELECT[nselct,nyp] SHORT
+   .TOLS[ntols] FLOAT
+   .GUESS_TOLS[ngtol] FLOAT
+   .OPTSTATE OPT_STRUCT
+   .TEMPLATE TEMPLATE_STRUCT
+   
+* if its a fibre array then
+   IF (hex) THEN
+     .XDISP[nxp] FLOAT
+   END IF
+   
+* If the input data is a CUBE then add the following
+* structure to handle 2d iamges and sparial masking
+
+   IF (data3d) THEN
+     .TOTAL_INTENSITY[nxp,nxx] FLOAT
+     .SPATIAL_MASK[nxp,nxx,nmasks] SHORT
+     .VARIANT[10] CHAR
+   END IF
+   
+* if its a fibre array then
+
+   IF (comb) THEN
+     .VARIANT[4] CHAR
+   END IF
+   
+* add the defintions for GROUPS of lines
+* AJH commented out - see note above
+
+*   .GROUPS GROUP_STRUCT
+
+END STRUCTURE
+
+* Optimization structure. Encoodes the current status of all
+* the parameters in the the cube for the current fit model
+* In the following scheme
+*   parameter_status        contains status of each parameter
+*                             -1
+*                             -2
+*                             0
+*                             >0
+*  free_parameters           list of free parameters
+*  link_index
+*  link_constant
+*  lower_bound
+*  upper_bound
+*  periodic_parameters
+*  periods
+*  period_start
+
+STRUCTURE OPT_STRUCT         STRUCT
+   .PAR_STATUS[mxpars]    INT
+   .FREE_PARAMETERS[mxpars]     INT
+   .LINK_INDEX[mxpars]          INT
+   .LINK_CONSTANT[mxpars]       DOUBLE
+   .LOWER_BOUND[mxpars]         DOUBLE
+   .UPPER_BOUND[mxpars]         DOUBLE
+   .PERIODIC_PARS[mxpars] INT
+   .PERIODS[mxpars]             DOUBLE
+   .PERIOD_START[mxpars]        DOUBLE
+END STRUCTURE
+
+VARIANT DST
+   EQUATE RESULTS .RESULTS
+END VARIANT
+
+VARIANT NDF
+   EQUATE RESULTS .MORE.FIGARO.RESULTS
+END VARIANT
