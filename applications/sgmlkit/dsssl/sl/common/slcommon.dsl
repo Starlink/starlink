@@ -546,34 +546,38 @@ and number, and this goes wrong if they were specified with their
 end-tags omitted, so that the string has returns or the like within
 it.
 
-<p>At one point, I thought to use <code/input-whitespace?/, defined in
-the DSSSL spec, but it turns out that this is defined only during 
-FOT construction.  There seems potential milage in defining whitespace
-properties for characters using <code/(declare-char-property)/ (8.5.8.1),
-but little ultimate point, as Jade does not fully support
-char-property - see notes at
-<url>http://www.jclark.com/jade/#limitations</url>.  That code
-<em/would/ have been
-<code>
-(define (trim-leading-whitespace charlist)
-  (let loop ((cl charlist))
-    (if (not (debug (char-property 'input-whitespace? (debug (car cl)))))
-	(debug cl)
-	(loop (cdr cl)))))</code>
-<p>Instead, brute-force it:
+<p>Given a list of characters, return the list with leading whitespace 
+characters removed
+
+<p>This function requires that <code/input-whitespace?/ work.  This is
+true in OpenJade but not in Jade 1.2.1 (see notes at
+<url>http://www.jclark.com/jade/#limitations</url>).  In that case,
+the char-property whitespace test has to be replaced by the
+brute-force version:
+<code>(not (or (equal? firstchar #\space)
+	       (equal? firstchar #\&#TAB)
+	       (equal? firstchar #\&#RE)))</code>.
+
 <codebody>
-;; Given a list of characters, return the list with leading whitespace 
-;; characters removed
+;; jade-1.2.1 version:
 (define (trim-leading-whitespace charlist)
   (if (null? charlist)
       charlist
       (let loop ((cl charlist))
-	(let ((firstchar (car cl)))
-	  (if (not (or (equal? firstchar #\space)
-		       (equal? firstchar #\&#TAB)
-		       (equal? firstchar #\&#RE)))
+ 	(let ((firstchar (car cl)))
+ 	  (if (not (or (equal? firstchar #\space)
+ 		       (equal? firstchar #\&#TAB)
+ 		       (equal? firstchar #\&#RE)))
 	      cl
-	      (loop (cdr cl)))))))
+ 	      (loop (cdr cl)))))))
+;; openjade version:
+;(define (trim-leading-whitespace charlist)
+;  (if (null? charlist)
+;      charlist
+;      (let loop ((cl charlist))
+;	(if (not (char-property 'input-whitespace? (car cl)))
+;	    cl
+;	    (loop (cdr cl))))))
 
 ;; Trim both ends of a string by converting it to a list, trimming
 ;; leading whitespace, then reversing it and doing it again, then
@@ -1536,7 +1540,7 @@ MLABEL child in the document instance.
 <routinename>nl-to-pairs
 <description>
 Transform a node-list into a list of pairs, where each pair consists of the 
-GI of the node, and the node.  This is useful when combinde with
+GI of the node, and the node.  This is useful when combined with
 <funcname/assoc/.
 <returnvalue type='list of pairs'>List of pairs of GI plus node.
 <argumentlist>
