@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="pgplot">
-  <version>5.2.2-1</version>
+  <version>5.2.2-2</version>
   <path>thirdparty/caltech/pgplot</path>
   <description>Native PGPLOT</description>
   <!-- <abstract><p></p></abstract> -->
