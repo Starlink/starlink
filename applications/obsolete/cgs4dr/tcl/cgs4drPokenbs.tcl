@@ -1,8 +1,23 @@
-proc cgs4drPokenbs {taskname noticeboard} {
+proc cgs4drPokenbs {taskname} {
 #+
 # Puts value into nbs 
 #-
+    global Cred4NoticeBoard
+    global C4UserNb
+    global Cred4Task
+    global P4NoticeBoard
+    global P4UserNb
+    global P4Task
     global cgs4drHtml
+
+# Set default
+    if {[string match $Cred4Task $taskname]} {
+      set noticeboard $C4UserNb
+    } elseif {[string match $P4Task $taskname]} {
+      set noticeboard $P4UserNb
+    } else { 
+      set noticeboard ""
+    }
 
 # Create a dialog box
     if {[winfo exists .cgs4drDialogue]} {destroy .cgs4drDialogue}
@@ -23,12 +38,32 @@ proc cgs4drPokenbs {taskname noticeboard} {
     pack $valu -in $bot -side right
     $valu delete 0 end
 
-    bind $ilab <Button-2> "$item delete 0 end; $item insert 0 $noticeboard; $valu delete 0 end"
-    bind $vlab <Button-2> "$item delete 0 end; $item insert 0 $noticeboard; $valu delete 0 end"
-    bind $valu <Button-2> "$valu delete 0 end"
-    bind $valu <Double-Button-2> "$valu delete 0 end"
-    bind $item <Button-2> "$item delete 0  end; $item insert 0 $noticeboard"
-    bind $item <Double-Button-2> "$item delete 0  end"
+# Set some bindings
+    if {[string match $Cred4Task $taskname]} {
+      bind $ilab <Button-2> "$item delete 0 end; $item insert 0 $Cred4NoticeBoard; $valu delete 0 end"
+      bind $vlab <Button-2> "$item delete 0 end; $item insert 0 $Cred4NoticeBoard; $valu delete 0 end"
+      bind $valu <Button-2> "$valu delete 0 end"
+      bind $valu <Double-Button-2> "$valu delete 0 end"
+      bind $item <Button-2> "$item delete 0  end; $item insert 0 $Cred4NoticeBoard"
+      bind $item <Double-Button-2> "$item delete 0  end"
+      set noticeboard $C4UserNb
+    } elseif {[string match $P4Task $taskname]} {
+      bind $ilab <Button-2> "$item delete 0 end; $item insert 0 $P4NoticeBoard; $valu delete 0 end"
+      bind $vlab <Button-2> "$item delete 0 end; $item insert 0 $P4NoticeBoard; $valu delete 0 end"
+      bind $valu <Button-2> "$valu delete 0 end"
+      bind $valu <Double-Button-2> "$valu delete 0 end"
+      bind $item <Button-2> "$item delete 0  end; $item insert 0 $P4NoticeBoard"
+      bind $item <Double-Button-2> "$item delete 0  end"
+      set noticeboard $P4UserNb
+    } else { 
+      bind $ilab <Button-2> "$item delete 0 end; $valu delete 0 end"
+      bind $vlab <Button-2> "$item delete 0 end; $valu delete 0 end"
+      bind $valu <Button-2> "$valu delete 0 end"
+      bind $valu <Double-Button-2> "$valu delete 0 end"
+      bind $item <Button-2> "$item delete 0  end"
+      bind $item <Double-Button-2> "$item delete 0  end"
+      set noticeboard ""
+    }
     bind $ilab <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PokeNbsBox1.html"
     bind $vlab <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PokeNbsBox1.html"
     bind $valu <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PokeNbsBox1.html"
@@ -44,6 +79,14 @@ proc cgs4drPokenbs {taskname noticeboard} {
         cgs4drClear $taskname
         cgs4drInform $taskname "cgs4drPokenbs error : Noticeboard or value incorrectly specified!"
       } else {
+
+#     Set default
+        if {[string match $Cred4Task $taskname]} {
+          set C4UserNb $nb
+        } elseif {[string match $P4Task $taskname]} {
+          set P4UserNb $nb 
+        }
+
         set status [catch {nbs put $nb $vb}]
         if {$status!=0} {
           cgs4drClear $taskname

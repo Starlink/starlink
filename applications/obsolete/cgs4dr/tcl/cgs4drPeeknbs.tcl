@@ -1,8 +1,23 @@
-proc cgs4drPeeknbs {taskname noticeboard} {
+proc cgs4drPeeknbs {taskname} {
 #+
 # Lists noticeboard.
 #-
+    global Cred4NoticeBoard
+    global C4UserNb
+    global Cred4Task
+    global P4NoticeBoard
+    global P4UserNb
+    global P4Task
     global cgs4drHtml
+
+# Set a default depending upon task
+    if {[string match $Cred4Task $taskname]} {
+      set noticeboard $C4UserNb
+    } elseif {[string match $P4Task $taskname]} {
+      set noticeboard $P4UserNb
+    } else {
+      set noticeboard ""
+    }
 
 # Set the box, cursor etc
     if {[winfo exists .cgs4drDialogue]} {destroy .cgs4drDialogue}
@@ -18,12 +33,26 @@ proc cgs4drPeeknbs {taskname noticeboard} {
     pack $ilab $inbs -in $top -side left
     $inbs insert end $noticeboard
 
-    bind $ilab <Button-2> "$inbs delete 0 end; $inbs insert 0 $noticeboard"
-    bind $inbs <Button-2> "$inbs delete 0 end; $inbs insert 0 $noticeboard"
-    bind $inbs <Double-Button-2> "$inbs delete 0 end"
+# Set some bindings
+    if {[string match $Cred4Task $taskname]} {
+      bind $ilab <Button-2> "$inbs delete 0 end; $inbs insert 0 $Cred4NoticeBoard"
+      bind $inbs <Button-2> "$inbs delete 0 end; $inbs insert 0 $Cred4NoticeBoard"
+      bind $inbs <Double-Button-2> "$inbs delete 0 end"
+      set noticeboard $C4UserNb
+    } elseif {[string match $P4Task $taskname]} {
+      bind $ilab <Button-2> "$inbs delete 0 end; $inbs insert 0 $P4NoticeBoard"
+      bind $inbs <Button-2> "$inbs delete 0 end; $inbs insert 0 $P4NoticeBoard"
+      bind $inbs <Double-Button-2> "$inbs delete 0 end"
+      set noticeboard $P4UserNb
+    } else {
+      bind $ilab <Button-2> "$inbs delete 0 end"
+      bind $inbs <Button-2> "$inbs delete 0 end"
+      bind $inbs <Double-Button-2> "$inbs delete 0 end"
+      set noticeboard ""
+    }
     bind $ilab <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PeekNbsBox1.html"
     bind $inbs <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4PeekNbsBox1.html"
-
+  
 # If user presses OK, send it to the task
     set bv [dialogShow .cgs4drDialogue .cgs4drDialogue]
     if {$bv==0} {
@@ -33,6 +62,13 @@ proc cgs4drPeeknbs {taskname noticeboard} {
         cgs4drClear $taskname
         cgs4drInform $taskname "cgs4drPeeknbs error : Noticeboard or value incorrectly specified!"
       } else {
+
+#     Set a default depending upon task and list nbs
+        if {[string match $Cred4Task $taskname]} {
+          set C4UserNb $item
+        } elseif {[string match $P4Task $taskname]} {
+          set P4UserNb $item
+        }
         cgs4drListnbs $taskname $item
       }
     }
