@@ -285,7 +285,7 @@
           ENDDO
 
           CALL USI_GET0C('FILE',FILE,STATUS)
-          CALL FIO_OPEN(FILE,'WRITE','NONE',0,IFD,STATUS)
+          CALL FIO_OPEN(FILE,'WRITE','LIST',0,IFD,STATUS)
           DO I=1,16
             WRITE(REC,'(3(F4.2,1X))')
      :                       COLTAB(1,I),COLTAB(2,I),COLTAB(3,I)
