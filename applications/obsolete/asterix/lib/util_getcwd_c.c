@@ -1,37 +1,93 @@
-/*+
- *  Name:
- *     util_getcwd_c.c
- *
- *  Purpose:
- *     Returns the name of the current working directory.
- *
- *  Language:
- *
- *     Starlink ANSI C
- *
- *  Description:
- *
- *
- *  Invokation:
- *
- *     CALL UTIL_GETCWD( DIRNAME, STATUS )
- *
- *  Authors:
- *
- *     Richard D. Saxton (LTVAD::RDS)
- *
- *  History:
- *
- *      9-Mar-1993 (RDS):
- *        Original version.
- *     26-Nov-1993 (DJA):
- *        Given correct name UTIL_GETCWD. Error handling corrected.
- *- */
+/*
+*+
+*  Name:
+*     UTIL_GETCWD
 
-/* Include Statements: */
+*  Purpose:
+*     Returns the name of the current working directory.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Invocation:
+*     CALL UTIL_GETCWD( PATHNM, STATUS )
+
+*  Description:
+*     Returns the name of the current working directory.
+
+*  Arguments:
+*     PATHNM = CHARACTER*(*) (returned)
+*        The current working directory
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  {machine}-specific features used:
+*     {routine_machine_specifics}...
+
+*  References:
+*     util Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/util.html
+
+*  Keywords:
+*     package:util, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      9 Mar 1993 (RDS):
+*        Original version.
+*     26 Nov 1993 (DJA):
+*        Given correct name UTIL_GETCWD. Error handling corrected.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+
+/*
+ *  Include files
+ */
 #include "sae_par.h"
-#include "cnf.h"
 #include "f77.h"
+#include "cnf.h"
 #include "ems.h"          /* Error handling */
 
 /* VMS definitions
@@ -47,6 +103,9 @@
 #endif
 
 
+/*
+ *  Body of code
+ */
 F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
   {
   GENPTR_CHARACTER(pathnm)
@@ -59,7 +118,8 @@ F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
    char ptest[MAXPATHLEN];
 #endif
 
-  if ( *status != SAI__OK )		/* Check status on entry */
+/* Check inherited global status on entry */
+  if ( *status != SAI__OK )
     return;
 
 /* Get the current working directory and set status GOOD if the operation
@@ -69,36 +129,36 @@ F77_SUBROUTINE(util_getcwd)( CHARACTER(pathnm), INTEGER(status) TRAIL(pathnm))
 
 #if defined(VAX)
 
-  pthstr = cnf_creat(pathnm_length+1);  /* Make temp space size of Fortran */
-					/* string + space for trailing null */
+/* Make temp space size of Fortran string + space for trailing null */
+  pthstr = cnf_creat(pathnm_length+1);
 
-  *status = getcwd( pthstr, 		/* Set status from getcwd result */
-                    pathnm_length+1 )
-            ? SAI__OK : SAI__ERROR;
+/* Set status from getcwd result */
+  *status = getcwd( pthstr, pathnm_length+1 ) ? SAI__OK : SAI__ERROR;
 
-  cnf_exprt( pthstr, pathnm, 		/* Export C string to Fortran */
-	     pathnm_length );
+/* Export C string to Fortran */
+  cnf_exprt( pthstr, pathnm, pathnm_length );
 
-  if ( pthstr ) cnf_free( pthstr );	/* Free temporary string */
+/* Free temporary string */
+  if ( pthstr ) cnf_free( pthstr );
 #else
 
-  *status = getwd( ptest )		/* Set status from getwd result */
-            ? SAI__OK : SAI__ERROR;
+/* Set status from getwd result */
+  *status = getwd( ptest ) ? SAI__OK : SAI__ERROR;
 
-  if ( strlen(ptest) > pathnm_length ) 	/* Will we have to truncate the text? */
-    {
+/* Will we have to truncate the text? */
+  if ( strlen(ptest) > pathnm_length ) {
     *status = SAI__ERROR;
     ems_rep_c( " ", "Text truncated copying current directory name", status );
     }
-  else
-    {
-    cnf_exprt( ptest, pathnm, 		/* Export C string to Fortran */
-	     pathnm_length );
+  else {
+
+/* Export C string to Fortran */
+    cnf_exprt( ptest, pathnm, pathnm_length );
     }
 #endif
 
-  if (*status != SAI__OK )		/* Report errors */
-    {
+/* Report errors */
+  if (*status != SAI__OK ) {
     ems_rep_c( " ", "Error finding current directory", status );
     ems_rep_c( " ", "...from UTIL_GETCWD", status );
     }
