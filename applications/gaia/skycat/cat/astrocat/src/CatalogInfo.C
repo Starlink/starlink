@@ -125,6 +125,10 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  29 Oct 95  Created
+ * Peter W. Draper 25 Sep 03  Modified to output ra_col and dec_col 
+ *                            even when at default values. Can cause
+ *                            problems when x_col and y_col are also
+ *                            set (after ra_col and dec_col).
  */
 static const char* const rcsId="@(#) $Id: CatalogInfo.C,v 1.33 1999/03/15 12:30:04 abrighto Exp $";
 
@@ -1096,17 +1100,17 @@ ostream& operator<<(ostream& os, const CatalogInfoEntry& e)
     if (e.id_col() > 0)
 	os << "id_col: " << e.id_col() << endl;
 
-    // don't need to output default order of: id, ra, dec
-    if (e.ra_col() >= 0 && e.ra_col() != 1)  
+    // PWD: do need to output default order of: id, ra, dec, x and y.
+    if (e.ra_col() >= 0 )  
 	os << "ra_col: " << e.ra_col() << endl;
     
-    if (e.dec_col() >= 0 && e.dec_col() != 2)
+    if (e.dec_col() >= 0 )
 	os << "dec_col: " << e.dec_col() << endl;
 
-    if (e.x_col() >= 0 && e.x_col() != 1)
+    if (e.x_col() >= 0)
 	os << "x_col: " << e.x_col() << endl;
 
-    if (e.y_col() >= 0 && e.y_col() != 2)
+    if (e.y_col() >= 0)
 	os << "y_col: " << e.y_col() << endl;
 
     if (e.is_tcs())
