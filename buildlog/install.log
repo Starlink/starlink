@@ -449,7 +449,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/table
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 132 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -622,7 +622,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/votable
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/votable
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 51 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 54 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -855,6 +855,8 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
+  [javadoc] Sep 17, 2004 5:16:43 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
@@ -955,7 +957,6 @@ docs:
      [java] [INFO] [84]
      [java] [INFO] [85]
      [java] [INFO] [86]
-     [java] [INFO] [87]
      [java] [INFO] Parsing of document complete, stopping renderer
      [java] Parsing document /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
      [java] Transforming with stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML.xslt
@@ -990,7 +991,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 206 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 207 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 3 empty directories to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 86 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
@@ -1006,60 +1007,140 @@ build_demo:
       [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
 
 build:
-    [javac] Compiling 12 source files to /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:76: cannot resolve symbol
-    [javac] symbol  : method getElement ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]         parentObj = new DOMSource( vocel.getElement().getParentNode(),
-    [javac]                                         ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:138: cannot resolve symbol
-    [javac] symbol  : method getSource ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]             Source xsrc = ((VOElement) it.next()).getSource();
-    [javac]                           ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:170: cannot resolve symbol
-    [javac] symbol  : method getDescendantsByName (java.lang.String)
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]             VOElement[] tableEls = vocel.getDescendantsByName( "TABLE" );
-    [javac]                                         ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:208: cannot resolve symbol
-    [javac] symbol  : method getElement ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]         for ( Node child = voel.getElement().getFirstChild(); child != null;
-    [javac]                                ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:231: cannot resolve symbol
-    [javac] symbol  : constructor ParamElement (org.w3c.dom.Element,java.lang.String,uk.ac.starlink.votable.VOElementFactory)
-    [javac] location: class uk.ac.starlink.votable.ParamElement
-    [javac]                     params.add( new ParamElement( childEl, systemId, vofact ) );
-    [javac]                                 ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:267: cannot resolve symbol
-    [javac] symbol  : method getTextContent ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]             String text = coosys.getTextContent().trim();
-    [javac]                                 ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java:310: cannot resolve symbol
-    [javac] symbol  : method getSource ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]                 return new TextViewer( voel.getSource() );
-    [javac]                                            ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableDataNode.java:68: cannot resolve symbol
-    [javac] symbol  : method getSource ()
-    [javac] location: class uk.ac.starlink.votable.VOElement
-    [javac]                 Source xsrc = ((VOElement) it.next()).getSource();
-    [javac]                               ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java:34: cannot resolve symbol
-    [javac] symbol  : method getRowCount ()
-    [javac] location: class uk.ac.starlink.votable.TableElement
-    [javac]         long nrows = votable.getRowCount();
-    [javac]                             ^
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java:36: cannot resolve symbol
-    [javac] symbol  : method getColumnCount ()
-    [javac] location: class uk.ac.starlink.votable.TableElement
-    [javac]              + votable.getColumnCount() 
-    [javac]                       ^
-    [javac] 10 errors
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
+      [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/showndx.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
 
-Total time: 4 minutes 25 seconds
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/bin
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/etc/treeview
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/treeview/bin
+     [copy] Copying 14 files to /apps/cvsbuild/java/source/treeview/etc/treeview
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/treeview
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/treeview
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/treeview
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
+     [echo] Executing Coco target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/coco
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/coco
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing RV target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/rv
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/rv
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing FROG target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/etc/frog
+     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/bin/frog
+     [copy] Copying 7 files to /apps/cvsbuild/java/source/frog/docs/frog
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/frog/docs/frog
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/starjava/bin/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/frog
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/frog
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
+
+BUILD SUCCESSFUL
+Total time: 4 minutes 26 seconds

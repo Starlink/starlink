@@ -8682,6 +8682,7 @@ U java/source/table/src/main/uk/ac/starlink/table/TableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/TableSink.java
 U java/source/table/src/main/uk/ac/starlink/table/Tables.java
 U java/source/table/src/main/uk/ac/starlink/table/UCD.java
+U java/source/table/src/main/uk/ac/starlink/table/URLValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
@@ -9039,10 +9040,11 @@ cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Arithmetic.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Conversions.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Coords.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Display.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Maths.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Output.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sdss.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Sog.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Splat.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Strings.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/TwoQZ.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/package.html
@@ -9537,11 +9539,14 @@ U java/source/votable/src/main/uk/ac/starlink/votable/DataFormat.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/FieldElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/FieldRefElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/FitsPlusTableBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/FitsPlusTableWriter.java
+U java/source/votable/src/main/uk/ac/starlink/votable/GroupElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/LinkElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/NumericDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/ParamElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/ParamRefElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/RowStepper.java
 U java/source/votable/src/main/uk/ac/starlink/votable/SAXDocumentBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableBodies.java
