@@ -89,7 +89,6 @@
       CHARACTER*(DAT__SZLOC) ELOC                 ! Locator to effective areas
       CHARACTER*80 RFILE                          ! Name of response file
       CHARACTER*80 EFILE                          ! Name of eff. area file
-      CHARACTER*80 PFILE                          ! Name of particle file
       CHARACTER*80 CALDIR                         ! Dir. for XRT cal. files
       REAL AMULT                                  ! Area multiplication
 *
@@ -577,7 +576,7 @@
 *
 * Set a reference to the background spectrum - if it has been created
       IF (LBMOD .AND. SDIM(4) .GT. 1) THEN
-        CALL FRI_PUT( OID, 'BGND', MID, STATUS )
+        CALL FRI_PUTI( OID, 'BGND', MID, STATUS )
         IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_PRNT('Error writing reference to background '/
      &                   /'spectrum')
@@ -1601,7 +1600,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *  Find which axis is which
       DO LP=1,NDIM
 *
-         CALL BDI_AXGETOC( IFID, LP, 'Label', LABEL, STATUS )
+         CALL BDI_AXGET0C( IFID, LP, 'Label', LABEL, STATUS )
          IF (STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error reading axis label')
             GOTO 999
