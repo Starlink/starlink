@@ -273,8 +273,6 @@
       REAL                      INP(MAX_PROFILE)         !
       REAL                      RVAL                     ! Return val
 
-      REAL TEMPA(61,61),TOTAL
-      INTEGER I,J
 *-
 
 *    Check status
@@ -483,8 +481,8 @@
                   ENDDO
                ENDIF
 
-               CALL DYN_UNMAP(PSF_PRO_PTR)
-               CALL DYN_UNMAP(PSF_ARRAY_PTR)
+               CALL DYN_UNMAP(PSF_PRO_PTR,STATUS)
+               CALL DYN_UNMAP(PSF_ARRAY_PTR,STATUS)
 *          Next radius
                IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
             END DO
