@@ -31,7 +31,7 @@
             position 1
             type LITERAL
             access READ
-            vpath CURRENT PROMPT
+            vpath PROMPT
             ppath CURRENT
             prompt {NDF to associate with positions}
             helpkey *
@@ -42,7 +42,7 @@
             position 2
             type LITERAL
             access READ
-            vpath CURRENT PROMPT
+            vpath PROMPT
             ppath CURRENT DEFAULT
             default *.lis
             prompt {Output file for positions}
