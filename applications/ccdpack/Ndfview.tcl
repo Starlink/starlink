@@ -246,7 +246,7 @@
          $canvas delete all
 
 #  Create the GWM viewing item.
-         set shift [ makegwm $xbase $ybase $xdim $ydim ]
+         makegwm $xbase $ybase $xdim $ydim
 
 #  Get percentile values for drawing the display (these are cached 
 #  efficiently by the NDF object, so there is no need to remember them
@@ -267,9 +267,6 @@
                style=\"tickall=1,drawtitle=0,$displaystyle\" \
                reset \
             " "Displaying NDF $ndfname" $canvas
-
-#  Ugly bug workaround.
-         $canvas move gwmitem [ lindex $shift 0 ] [ lindex $shift 1 ]
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
