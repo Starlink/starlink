@@ -31,6 +31,7 @@
 
 /* Package definitions */
 
+#include "idi_err.h"
 #include "f77.h"
 #include "cnf.h"
 #include "device.dep"
@@ -2615,12 +2616,15 @@ F77_SUBROUTINE(ixwqid) ( INTEGER(display), INTEGER(intyp),
 *
 *  Authors :
 *     NE: Nick Eaton (Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *
 *  History :
 *     27-FEB-1991 (NE):
 *        Orignal version
 *     19-SEP-1991 (NE):
 *        Added CNF interface
+*     4-SEP-2004 (TIMJ):
+*        Protect cnf_exprt if we get bad status from IIIQID_C
 *-
 */
 
@@ -2639,7 +2643,13 @@ char lintdscr[256];
 *idierr = IIIQID_C( *display, *intyp, *intid, lintdscr, lendscr );
 
 /* Copy the local C string to a FORTRAN string */
-cnf_exprt( lintdscr, intdscr, *lendscr );
+if (*idierr == IDI__OK) {
+  cnf_exprt( lintdscr, intdscr, *lendscr );
+} else {
+  *lintdscr = '\0';
+  *lendscr = 0;
+  cnf_exprt( lintdscr, intdscr, intdscr_length );
+}
 
 return;
 }
