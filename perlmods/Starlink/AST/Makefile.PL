@@ -28,7 +28,7 @@ if (exists $ENV{STARLINK}) {
 }
 
 # This is the list of libraries required to use ems
-my $astlibs = qx/ast_link -myerr -pgplot/;
+my $astlibs = qx/ast_link -myerr /;
 
 die "No AST libraries were found.\n This may imply that the
 ast_link command is not in your path." if $astlibs !~ /./;
