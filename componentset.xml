@@ -45,6 +45,7 @@
   </developers>
 </component>
 
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="chr">
   <version>2.2-5</version>
@@ -81,6 +82,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cnf">
   <version>4.0-2</version>
@@ -115,6 +117,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ems">
   <version>2.0-7</version>
@@ -174,6 +177,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hds">
   <version>4.3-4</version>
@@ -215,6 +219,31 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hlp">
+  <version>3.3-2</version>
+  <path>libraries/hlp</path>
+  <description>HLP -- interactive help system</description>
+  <abstract><p>The Starlink HLP system allows an application program
+      to retrieve named items from a hierarchically-arranged library
+      of text.  The facility resembles VAX/VMS HELP.  It consists of a
+      library plus utility programs for creating, listing and reading
+      help libraries.</p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>P T Wallace</name>
+      <uname>ptw</uname>
+      <email>ptw@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun124</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="mers">
   <version>1.8</version>
@@ -246,6 +275,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="par">
   <version>2.3</version>
@@ -284,6 +314,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="adam">
   <version>3.0</version>
@@ -309,6 +340,149 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Part of the PCS system.</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="adamnet">
+  <version>1.0</version>
+  <path>libraries/pcs/adamnet</path>
+  <description>Implements the ADAM networking process. It interfaces
+  the ADAM intertask communication software on unix to TCP/IP, thereby
+  allowing ADAM tasks on different machines to communicate with one
+  another. </description>
+  <dependencies >
+    <build>sae</build><build>messys</build><build>adam</build><build>ams</build><build>msp</build><build>sock</build><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B.D.Kelly (REVAD::BDK)</name>
+    </person>
+    <person>
+      <name>Brian K McIlwrath</name>
+      <uname>bkm</uname>
+      <email>b.k.mcilwrath@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ams">
+  <version>1.3</version>
+  <path>libraries/pcs/ams</path>
+  <description>ADAM Message System</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>dtask</build><build>atimer</build><build>messys</build><build>msp</build><build>adam</build>
+  </dependencies>
+  <developers>
+    <person><name>Ian Jenkins (IRJ)</name></person>
+    <person><name>Dennis Kelly (BDK)</name></person>
+    <person><name>Brian McIlwrath (BKM)</name></person>
+    <person><name>Alan Chipperfield (AJC)</name></person>
+    <person><name>David Terrett (DLT)</name></person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="atimer">
+  <version>1.0</version>
+  <path>libraries/pcs/atimer</path>
+  <description>ATIMER -- millisecond interval timers</description>
+  <abstract><p>This library provides a system of millisecond interval
+      timers used by the message system and DTASK.  Each timer has an
+      associated handler which is invoked when the timer expires.  The
+      library is written in C but a Fortran interface, FATIMER, is
+      provided.</p></abstract>
+  <dependencies >
+    <build>sae</build><build>cnf</build><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pcs">
+  <version>4.1-1</version>
+  <path>libraries/pcs</path>
+  <description>The Parameter and Communication Subsystems</description>
+  <abstract><p>Application programs often need to obtain parameter
+      values from a variety of sources and to communicate with other
+      programs. The Parameter and Communication Subsystems (PCS) are a
+      set of closely-related subroutine libraries which provide these
+      facilities for many Starlink applications and the associated
+      user-interfaces.</p>
+    <p>The PCS libraries will not generally be called directly by
+      application programs, but form a basic part of the Starlink
+      Software Environment</p></abstract>
+  <dependencies >
+    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="dtask">
+  <version>3.0</version>
+  <path>libraries/pcs/dtask</path>
+  <description>DTASK linking library</description>
+  <abstract><p>ADD DETAILS!</p></abstract>
+  <dependencies >
+    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hdspar">
+  <version>1.0-1</version>
+  <path>libraries/pcs/hdspar</path>
+  <description>Part of the HDS system.  HDSPAR declares bulk data
+    parameters.</description>
+  <dependencies >
+    <build>sae</build><link>subpar</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>B D Kelly, ROE</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Documented in SUN/224, handled in pcs directory</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="lex">
   <version>1.2-1</version>
@@ -337,6 +511,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Part of the PCS package</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="messys">
   <version>3.0</version>
@@ -358,111 +533,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Part of the PCS system</p></notes>
 </component>
-
-<component id="subpar">
-  <version>2.1</version>
-  <path>libraries/pcs/subpar</path>
-  <description>Parameter subsystem</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>adam</build><build>chr</build><build>hds</build><build>ems</build><build>lex</build><build>messys</build><build>sae</build><link>ams</link><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>lex</link><link>misc</link><link>parsecon</link><link>psx</link><link>string</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-
-<component id="ams">
-  <version>1.3</version>
-  <path>libraries/pcs/ams</path>
-  <description>ADAM Message System</description>
-  <!-- <abstract><p></p></abstract> -->
-  <dependencies >
-    <build>sae</build><build>cnf</build><build>dtask</build><build>atimer</build><build>messys</build><build>msp</build><build>adam</build>
-  </dependencies>
-  <developers>
-    <person><name>Ian Jenkins (IRJ)</name></person>
-    <person><name>Dennis Kelly (BDK)</name></person>
-    <person><name>Brian McIlwrath (BKM)</name></person>
-    <person><name>Alan Chipperfield (AJC)</name></person>
-    <person><name>David Terrett (DLT)</name></person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-
-<component id="dtask">
-  <version>3.0</version>
-  <path>libraries/pcs/dtask</path>
-  <description>DTASK linking library</description>
-  <abstract><p>ADD DETAILS!</p></abstract>
-  <dependencies >
-    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <!-- <documentation></documentation> -->
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-
-<component id="adamnet">
-  <version>1.0</version>
-  <path>libraries/pcs/adamnet</path>
-  <description>Implements the ADAM networking process. It interfaces
-  the ADAM intertask communication software on unix to TCP/IP, thereby
-  allowing ADAM tasks on different machines to communicate with one
-  another. </description>
-  <dependencies >
-    <build>sae</build><build>messys</build><build>adam</build><build>ams</build><build>msp</build><build>sock</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>B.D.Kelly (REVAD::BDK)</name>
-    </person>
-    <person>
-      <name>Brian K McIlwrath</name>
-      <uname>bkm</uname>
-      <email>b.k.mcilwrath@rl.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="hdspar">
-  <version>1.0-1</version>
-  <path>libraries/pcs/hdspar</path>
-  <description>Part of the HDS system.  HDSPAR declares bulk data
-    parameters.</description>
-  <dependencies >
-    <build>sae</build><link>subpar</link>
-  </dependencies>
-  <developers>
-    <person>
-      <name>B D Kelly, ROE</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Documented in SUN/224, handled in pcs directory</p></notes>
-</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="misc">
   <version>1.4</version>
@@ -487,6 +558,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Documented in SUN/144 in PCS</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="msp">
   <version>2.3</version>
@@ -514,6 +586,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Documented in SUN/241 in PCS system</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="parsecon">
   <version>1.3</version>
@@ -539,6 +612,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Documented in passing in SSN/29</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sock">
   <version>1.0</version>
@@ -556,6 +630,51 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Described in SSN/29</p></notes>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="string">
+  <version>1.1-1</version>
+  <path>libraries/pcs/string</path>
+  <description>Fortran string manipulation subroutines</description>
+  <abstract><p>Fortran string manipulation subroutines. These
+      subroutines are also used by software items outside the
+      parameter system, but the library has no published
+      interface</p></abstract>
+  <dependencies >
+    <build>sae</build><build>chr</build><link>chr</link><link>ems</link>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>Described in SSN/29, but has no published interface</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="subpar">
+  <version>2.1</version>
+  <path>libraries/pcs/subpar</path>
+  <description>Parameter subsystem</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>adam</build><build>chr</build><build>hds</build><build>ems</build><build>lex</build><build>messys</build><build>sae</build><link>ams</link><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>lex</link><link>misc</link><link>parsecon</link><link>psx</link><link>string</link><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="task">
   <version>2.0</version>
@@ -585,103 +704,7 @@
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Described in SSN/29, with examples in SUN/134</p></notes>
 </component>
-
-<component id="string">
-  <version>1.1-1</version>
-  <path>libraries/pcs/string</path>
-  <description>Fortran string manipulation subroutines</description>
-  <abstract><p>Fortran string manipulation subroutines. These
-      subroutines are also used by software items outside the
-      parameter system, but the library has no published
-      interface</p></abstract>
-  <dependencies >
-    <build>sae</build><build>chr</build><link>chr</link><link>ems</link>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29, but has no published interface</p></notes>
-</component>
-
-<component id="atimer">
-  <version>1.0</version>
-  <path>libraries/pcs/atimer</path>
-  <description>ATIMER -- millisecond interval timers</description>
-  <abstract><p>This library provides a system of millisecond interval
-      timers used by the message system and DTASK.  Each timer has an
-      associated handler which is invoked when the timer expires.  The
-      library is written in C but a Fortran interface, FATIMER, is
-      provided.</p></abstract>
-  <dependencies >
-    <build>sae</build><build>cnf</build><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <notes><p>Described in SSN/29</p></notes>
-</component>
-
-<component id="pcs">
-  <version>4.1-1</version>
-  <path>libraries/pcs</path>
-  <description>The Parameter and Communication Subsystems</description>
-  <abstract><p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other
-      programs. The Parameter and Communication Subsystems (PCS) are a
-      set of closely-related subroutine libraries which provide these
-      facilities for many Starlink applications and the associated
-      user-interfaces.</p>
-    <p>The PCS libraries will not generally be called directly by
-      application programs, but form a basic part of the Starlink
-      Software Environment</p></abstract>
-  <dependencies >
-    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-
-<component id="sae">
-  <version>1.0</version>
-  <path>libraries/sae</path>
-  <description>Starlink Applications Environment special files</description>
-  <abstract>
-    <p>The SAE package brings together some include files, a facility
-      error file and a shell script needed for development of software
-      in the Starlink environment, and for building the USSC.</p>
-  </abstract>
-  <dependencies >
-    <sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Martin J Bly</name>
-      <uname>bly</uname>
-      <email>NONE</email>
-    </person>
-  </developers>
- <documentation> sun191</documentation> 
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psx">
   <version>0.4</version>
@@ -708,29 +731,32 @@
   <documentation> sun121</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="hlp">
-  <version>3.3-2</version>
-  <path>libraries/hlp</path>
-  <description>HLP -- interactive help system</description>
-  <abstract><p>The Starlink HLP system allows an application program
-      to retrieve named items from a hierarchically-arranged library
-      of text.  The facility resembles VAX/VMS HELP.  It consists of a
-      library plus utility programs for creating, listing and reading
-      help libraries.</p></abstract>
+<component id="sae">
+  <version>1.0</version>
+  <path>libraries/sae</path>
+  <description>Starlink Applications Environment special files</description>
+  <abstract>
+    <p>The SAE package brings together some include files, a facility
+      error file and a shell script needed for development of software
+      in the Starlink environment, and for building the USSC.</p>
+  </abstract>
   <dependencies >
-    
+    <sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
-      <name>P T Wallace</name>
-      <uname>ptw</uname>
-      <email>ptw@star.rl.ac.uk</email>
+      <name>Martin J Bly</name>
+      <uname>bly</uname>
+      <email>NONE</email>
     </person>
   </developers>
-  <documentation> sun124</documentation>
+ <documentation> sun191</documentation> 
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
 </component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="sla">
   <version>2.4-11</version>
