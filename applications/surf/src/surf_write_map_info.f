@@ -98,6 +98,9 @@
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.5  2005/03/18 06:28:50  timj
+* warn if frequency can not be written because wavelength is zero
+*
 * Revision 1.4  2004/11/18 20:37:46  timj
 * Forgot to pass STATUS into PSX_TIME
 *
@@ -149,6 +152,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'SURF_PAR'         ! REDS constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -393,11 +397,16 @@
      :     'WAVELEN', DBLE(WAVELENGTH) * 1.0D-6,
      :     '[m] Wavelength of the observation', STATUS)
 
-      FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
+      IF (WAVELENGTH .GT. 0) THEN
+         FREQ = VLIGHT * 1.0D6 / DBLE(WAVELENGTH)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'FREQ', FREQ, '[Hz] Frequency of observation', STATUS)
+      ELSE
+         CALL MSG_OUTIF( MSG__QUIET, ' ',
+     :        'WARNING: Wavelength not defined. Unable to write '//
+     :        'Frequency header', STATUS)
+      END IF
 
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'FREQ', FREQ, '[Hz] Frequency of observation', STATUS)
-      
 *     Write the FILTER name
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
      :     'FILTER', FILTER, 'SCUBA filter name',
