@@ -134,14 +134,10 @@ itcl::class gaia::StarApp {
    #  ------------
    constructor  {args} {
 
-      #  Initialise the adamtask interface.
+      #  Initialise the adamtask interface. Note "adamtask.init" is
+      #  autoloaded, so must be on auto_path somewhere.
       if { ! $adamtask_initialised_ } {
-         global env
-         if { [info exists env(TCLADAM_DIR)] } {
-            uplevel \#0 source $env(TCLADAM_DIR)/adamtask.tcl
-         } else {
-            uplevel \#0 source /star/lib/tk/adam/adamtask.tcl
-         }
+         adamtask.init
          set adamtask_initialised_ 1
       }
 
