@@ -84,6 +84,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        accurate).
 *     10-DEC-1998 (RFWS):
 *        First useful implementation of astResample<X>.
+*     16-AUG-1999 (RFWS):
+*        Fixed bug in SpecialBounds - wrong number of coordinates being used
+*        when checking for bad output coordinate values.
 *class--
 */
 
@@ -862,7 +865,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
    dimension. This is chosen so that the volume ratio will be 2. */
       oversize = pow( 2.0, 1.0 / (double) ncoord );
 
-/* Initialise the limits iof the active region to unknown. */
+/* Initialise the limits of the active region to unknown. */
       for ( coord = 0; coord < ncoord; coord++ ) {
          active_lo[ coord ] = DBL_MAX;;
          active_hi[ coord ] = -DBL_MAX;
@@ -8783,7 +8786,7 @@ static void SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
    coordinates is bad. */
          for ( point = 0; point < npoint; point++ ) {
             bad = 0;
-            for ( coord = 0; coord < ncoord; coord++ ) {
+            for ( coord = 0; coord < mapdata->nout; coord++ ) {
                if ( ptr_out[ coord ][ point ] == AST__BAD ) {
                   bad = 1;
                   break;
