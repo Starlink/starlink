@@ -36,7 +36,9 @@ alias echo "echo > /dev/null"
 
 # First start up kappa
 
-kappa
+#kappa
+# Kluge to use kappa.csh rather than the alias
+source $KAPPA_DIR/kappa.csh
 
 # Second start up surf
 
@@ -59,11 +61,22 @@ else
    skydip out=$out model_out=${out}_m in=$in
 endif
 
-# Get current value of LINCOL and SYMCOL from LINPLOT so that
-# I can reset them at the end
+# Work out whether we are using the new (STYLE parameter) kappa
+# or the old (pre 0.13 is old)
 
-set old_lincol = `parget lincol linplot`
-set old_symcol = `parget symcol linplot`
+if (-e $KAPPA_DIR/style.def) then
+  set newkappa = 1
+else
+  set newkappa = 0
+endif
+
+# Get current value of LINCOL and SYMCOL from LINPLOT so that
+# I can reset them at the end -only for old KAPPA (pre 0.13)
+
+if ($newkappa == 0) then
+  set old_lincol = `parget lincol linplot`
+  set old_symcol = `parget symcol linplot`
+endif
 
 # Now display the result with linplot
 
@@ -79,15 +92,36 @@ if (-e ${out}.sdf) then
    
 
     # Now we can setup a postscript plot if needed
-    linplot $out cosys=data mode=2 symcol=black device='epsfcol_l;sdip_p1.eps'
+    if ($newkappa == 0) then
+      set kapargs = "cosys=data mode=2 symcol=black"
+    else
+      wcsframe $out axis
+      set kapargs = "mode=mark marker=2 style='Colour(Symbols)=black,colour(numlab)=black,colour(border)=black,Colour(ticks)=black'"
+    endif
+
+    linplot $out $kapargs device='epsfcol_l;sdip_p1.eps'
+
 
     # If we have a fit then plot the model
     if (-e ${out}_m.sdf) then
 
-	linplot ${out}_m cosys=data mode=line lincol=red device='epsfcol_l;sdip_p2.eps' noclear ordlab="''" pltitl="''"
+        if ($newkappa == 0) then
+          set kapargs = 'cosys=data lincol=red pltitl="" ordlab=""'
+        else
+          wcsframe ${out}_m axis
+	  set kapargs = "style='Colour(Lines)=red'"
+        endif
 
-        # And merge them
-	if (-e sdip_p1.eps.1 && -e sdip_p2.eps) psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
+	linplot ${out}_m mode=line noclear $kapargs device='epsfcol_l;sdip_p2.eps'
+
+        # And merge them - for the old kappa we want sdip_p1.eps.1
+	# for the new kappa we can use sdip_p1.eps
+
+	if ($newkappa == 0) then
+          if (-e sdip_p1.eps.1 && -e sdip_p2.eps) psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
+	else
+	  if (-e sdip_p1.eps && -e sdip_p2.eps) psmerge -e sdip_p1.eps sdip_p2.eps >! ${out}.eps
+        endif
 
    else
         # If we don't have a fit then just cp the sky temps to the output
@@ -106,19 +140,34 @@ if (-e ${out}.sdf) then
 
    #  XWINDOWS
 
+   if ($newkappa == 0) then
+     set kapargs = "cosys=data mode=2 symcol=green"
+   else
+     set kapargs = "mode=mark marker=2 style='Colour(Symbols)=green'"
+   endif
+
+
    # Display the data first
-   linplot $out cosys=data mode=2 symcol=green device=xwindows
+   linplot $out $kapargs device=xwindows
 
    # Now overlay the model if necessary
 
    if (-e ${out}_m.sdf) then
-     linplot ${out}_m cosys=data mode=line lincol=red device=xwindows noclear ordlab="''" pltitl="''"
+
+     if ($newkappa == 0) then
+       set kapargs = 'cosys=data lincol=red ordlab="" pltitl="" '
+     else
+       set kapargs = "style='Colour(Lines)=red'"
+     endif
+     linplot ${out}_m mode=line $kapargs device=xwindows noclear
    endif
 
 endif
 
 # Reset linplot parameters
-linplot device=! ndf=! lincol=$old_lincol symcol=$old_symcol > /dev/null
+if ($newkappa == 0) then
+  linplot device=! ndf=! lincol=$old_lincol symcol=$old_symcol > /dev/null
+endif
 
 # Remove the intermediate files
 
@@ -180,6 +229,8 @@ exit
 *    1997 July 8 (TIMJ)
 *       Add code to create a postscript file as well as using xwindows
 *     {enter_further_changes_here}
+*    1998 Dec 8 (TIMJ)
+*       Make compatible with KAPPA V0.13
 *
 *  Bugs:
 *     {note_any_bugs_here}

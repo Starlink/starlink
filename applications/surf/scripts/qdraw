@@ -20,6 +20,12 @@ if (defined $ENV{"KAPPA_DIR"}) {
   die "Can not start - The KAPPA_DIR environment variable is not set\n";
 }
 
+# Check the kappa version number (important since from v0.13)
+# the parameters for linplot changed.
+# Do this by checking for a new file in $KAPPA_DIR that is only
+# there in the new release.
+
+$newkappa = ( -e "$kappa/style.def" ? 1 : 0);
 
 # Global status
 $status = &NDF::SAI__OK;
@@ -35,7 +41,7 @@ $good = &NDF::SAI__OK;
 foreach $arg (@ARGV) {
  
   $arg =~ /=/ && do {
-    ($param, $value) = split(/=/, $arg);
+    ($param, $value) = split(/=/, $arg,2);  # eg STYLE='string=b'
     $param = uc($param);
     $params{$param} = $value;
   } || push(@ndfs, $arg);
@@ -129,8 +135,12 @@ $min = $mean - ($nsig * $sigma);
 
 # Run linplot
 
-@parlist = ('DEVICE','MODE','ERRBAR','PLTTITL','COMP','LINCOL','SYMCOL',
-	   'COSYS','THICK','FONT','ABSLAB','ORDLAB');
+if ($newkappa) {
+  @parlist = ('DEVICE', 'MODE', 'MARKER', 'COMP','STYLE','ERRBAR');
+} else {
+  @parlist = ('DEVICE','MODE','ERRBAR','PLTTITL','COMP','LINCOL','SYMCOL',
+	      'COSYS','THICK','FONT','ABSLAB','ORDLAB');
+}
 
 undef $modpars;
 foreach $par (@parlist) {
@@ -138,9 +148,14 @@ foreach $par (@parlist) {
   if ($params{$par} =~ /./);
 }
 
+if ($newkappa) {
+  $args = "ytop=$max ybot=$min $modpars";
+} else {
+  $args = "axlim=true ordlim='[$min,$max]' abslim=! $modpars";
+}
 
 $exstat =
-  system("$kappa/linplot '$ndf' axlim=true ordlim='[$min,$max]' abslim=! $modpars");
+  system("$kappa/linplot '$ndf' $args");
 die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0);
 
