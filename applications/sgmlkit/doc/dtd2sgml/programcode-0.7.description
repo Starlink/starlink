@@ -38,6 +38,12 @@ arguments.  In this case, there should be no <elemref gi="parameter"/> content.
 <element gi="author" status="beta">
 <p>Describes the author of a function.
 </p>
+<p>The <elemref gi="author" self="self"/> element includes full
+details about an author, and has a required ID attribute.
+This ID is a key which is intended to be unique to a particular author
+(it's not an SGML ID attribute which would be guaranteed unique, but
+which causes other problems in this case). 
+<!--
 <p>The <elemref gi="author" self="self"/> element includes full details about
 an author and has a required ID attribute, the <elemref gi="authorref"/> element simply refers to an <elemref gi="author" self="self"/>
 element elsewhere using an IDREF.  We need the distinction since it
@@ -49,8 +55,9 @@ scattered files to have <elemref gi="authorref"/> elements, and for the
 corresponding <elemref gi="author" self="self"/> element to be in a <elemref gi="codegroup"/> element in a `master' file which collects together
 the source-code files for documentation purposes.
 </p>
+-->
 <attribute name="id">
-<p>A unique ID for the author.  This is used within <elemref gi="authorref"/> and <elemref gi="change"/> elements.
+<p>A unique ID for the author.
 </p>
 </attribute>
 <attribute name="affiliation">
@@ -135,6 +142,50 @@ Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 
 </body>
 </commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Tue, 16 May 2000 17:13:02 +0100 (BST)</date>
+<subject>Re: clumsy cross-referencing</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Tue May 16 17:13:07 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+authorlist@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Tue, 16 May 2000 17:13:07 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12rjxz-0000IE-00; Tue, 16 May 2000 17:13:07 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12rjy1-0008Jv-00; Tue, 16 May 2000 17:13:09 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12rjxw-00049l-00; Tue, 16 May 2000 17:13:04 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id RAA06711; Tue, 16 May 2000 17:13:03 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id RAA18988; Tue, 16 May 2000 17:13:02 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005161659480.18852-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I am in favour of this suggestion (getting rid of &lt;authorref&gt; elements
+altogether), since it simplifies things and makes the information
+available in human-readable form in the prologues themselves, which 
+is historically where it's been.  I'm slightly surprised to see it
+suggested by Norman, since it sort of subverts the meaning of  what
+appears to be an 'id' attribute, and weakens the crossreferencing.
+However, this doesn't count as an objection.
+
+I think conflicting attributes should be treated as something which
+authors ought to avoid, but which is guaranteed to be coped with
+(i.e. document processing will not abort in this case).
+As such the downconverters can decide how to react; a sensible 
+reaction would be to use the first values and if possible emit
+some mild warning if there are inconsistencies.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
 <!--splice:authorlist-->
 </element>
 
@@ -153,8 +204,10 @@ this in the <elemref gi="authornote" self="self"/> element.
 <!--splice:authornote-->
 </element>
 
+<![IGNORE[
 <element gi="authorref" status="beta">
-<p>A reference to an author whose details are in the <elemref gi="author"/> element referred to by the ID attribute.
+<p>A reference to an author whose details are in the <elemref
+gi="author"/> element referred to by the ID attribute. 
 </p>
 <attribute name="id">
 <p>The link to the <elemref gi="author"/> element.
@@ -169,6 +222,7 @@ list the section of the standard where the code was defined.
 </attribute>
 <!--splice:authorref-->
 </element>
+]]>
 
 <element gi="blockquote" status="beta">
 <p>See <elemxref gi="blockquote" dtd="sundtd"/>
@@ -348,16 +402,20 @@ or one of the <elemref gi="codegroup"/> or <elemref gi="codereference"/> blocks.
 </element>
 
 <element gi="example" status="beta">
-<p>The text of an example.  This is followed by a separate description
-element.
-</p>
+<p>The text of an example, which is formatted as verbatim text.
+This must be followed by an <elemref gi="examplenote"/> element, which
+gives an explanation of the example.</p>
 <!--splice:example-->
 </element>
 
 <element gi="examplelist" status="beta">
-<p>A list of examples.
-</p>
+<p>A list of examples.</p>
 <!--splice:examplelist-->
+</element>
+
+<element gi="examplenote" status="beta">
+<p>The explanation of an example.</p>
+<!--splice:examplenote-->
 </element>
 
 <element gi="foreign" status="beta">
