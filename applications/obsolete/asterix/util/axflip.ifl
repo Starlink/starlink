@@ -2,7 +2,7 @@
 
     PARAMETER INP
        POSITION 1
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        PPATH 'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Input object'
@@ -19,7 +19,7 @@
 
     PARAMETER OUT
        POSITION 3
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        ASSOCIATION '->GLOBAL.BINDS'
        PROMPT 'Output for flipped data'
        HELP 'This will be a binned dataset, same shape as input'
