@@ -17,23 +17,6 @@ $#ARGV == 0 || die "Usage: $0 dtd-file\n";
 
 $dtdfilename = $ARGV[0];
 
-$dtdecl = '
-<!element elementlist - - (element+)>
-<!element element - - (parents, content, tree?, attribute*)>
-<!element parents - - (elemref*)>
-<!element content - - (#pcdata | elemref)*>
-<!element tree - - (#pcdata)>
-<!element attribute - - (#pcdata)>
-<!element elemref - o empty>
-<!attlist elementlist sysid cdata #required>
-<!attlist element gi id #required>
-<!attlist attribute 
-  name cdata #required
-  default cdata #required
-  type cdata #implied>
-<!attlist elemref gi idref #required>
-';
-
 use SGML::DTD;
 
 # Now parse the DTD and write the output
@@ -44,37 +27,39 @@ $dtd->read_dtd(\*DTDFILE);
 
 @elements = $dtd->get_elements(0);
 
-print "<!doctype elementlist [$dtdecl]>\n<elementlist sysid='$dtdfilename'>\n";
+@top_element = $dtd->get_top_elements();
+
+print "<!doctype dtdelementlist system 'dtdelementlist.dtd'>\n<dtdelementlist sysid='$dtdfilename' top='$top_element[0]'>\n";
 
 foreach $e (@elements) {
-    print "<element gi='$e'>\n";
+    print "<dtdelement gi='$e'>\n";
 
     @parents = $dtd->get_parents ($e);
-    print "<parents>\n";
+    print "<dtdparents>\n";
     foreach $pe (@parents) {
-	print "<elemref gi='", lc($pe), "'>\n";
+	print "<dtdelemref gi='", lc($pe), "'>\n";
     }
-    print "</parents>\n";
+    print "</dtdparents>\n";
 
     @content = $dtd->get_base_children ($e, 1);
-    print "<content>";
+    print "<dtdcontent>";
     foreach $ce (@content) {
 	$ce = lc($ce);
 	if ($ce =~ /[a-z]+/) {
 	    if (SGML::DTD->is_elem_keyword($ce)) {
 		print "$ce";
 	    } else {
-		print "<elemref gi='$ce'>";
+		print "<dtdelemref gi='$ce'>";
 	    }
 	} else {
 	    print "$ce ";
 	}
     }
-    print "</content>\n";
+    print "</dtdcontent>\n";
 
-    print "<tree>\n";
+    print "<dtdtree>\n";
     $dtd->print_tree($e, 2);
-    print "</tree>\n";
+    print "</dtdtree>\n";
 
     # FIXME -- following doesn't deal with notations properly
     %atts = $dtd->get_elem_attr ($e);
@@ -83,7 +68,7 @@ foreach $e (@elements) {
 	@values = @$ar;
 	$def = lc($values[0]);
 	shift (@values);
-	print "<attribute name='$a' default='$def'";
+	print "<dtdattribute name='$a' default='$def'";
 	if ($def eq '#fixed') {
 	    $type = $values[$#values];
 	    pop(@values);
@@ -94,8 +79,8 @@ foreach $e (@elements) {
 		shift (@values);
 	    }
 	}
-	print ">@values</attribute>\n";
+	print ">@values</dtdattribute>\n";
     }
-    print "</element>\n";
+    print "</dtdelement>\n";
 }
-print "</elementlist>\n";
+print "</dtdelementlist>\n";
