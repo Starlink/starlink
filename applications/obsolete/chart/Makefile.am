@@ -21,7 +21,7 @@ nso2b_SOURCES = nso2b.f
 BUILT_SOURCES = chart.csh chart.icl $(IFL_FILES)
 
 TASKS = astro bsearch display ecreate fcreate listo oset ploto \
-	qcreate rgogs search setone sset typeo cht_disp
+	qcreate rgogs search setone sset typeo disp
 
 IFL_FILES = $(TASKS:=.ifl) chart.ifl
 
