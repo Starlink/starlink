@@ -1623,7 +1623,7 @@ iraf! {
 
    display {
 
-     ATOOLS commands are now available -- (Version PKG_VERS)
+     ATOOLS commands are now available -- (Version @PACKAGE_VERSION@)
 
      Type atlhelp for help on ATOOLS commands.
      Type "showme sun??" to browse the hypertext documentation.
