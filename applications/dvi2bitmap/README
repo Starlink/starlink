@@ -14,6 +14,8 @@ again as long as you have the appropriate library installed.
 The program is written in C++, and incidentally provides a reasonably
 good (I think) object interface for DVI and PK files.
 
+See <http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/>
+
 Configuring and building
 ------------------------
 
@@ -52,14 +54,21 @@ fonts (and more).  If you wish to use this, then give the option
 `--with-kpathsea' to the configure command, and if the library is
 installed on your machine, the program will use it.
 
-The program builds successfully on (at least) egcs-2.91, Sun Workshop
-C++ 5.0, and Alpha Digital C++ 6.2.  It should be written in
+The program builds successfully on (at least) the following
+machine/compiler combinations.  It should be written in
 standards-conforming C++, so if it doesn't build then (1) it's not as
 conformant as I think it is (in which case please tell me), (2) your
 compiler is not as conformant as you think it is (in which case please
 don't tell me), or (3) you need to invoke some magic to get the
 compiler to be conformant (in which case tell me, if there's something
 I can do in the autoconfigure script).
+
+    i686-pc-linux-gnu           egcs-2.91.66
+    powerpc-mac-linux-gnu       gcc 2.8.1?
+    sparc-sun-solaris2.7        egcs-2.91.66
+    sparc-sun-solaris2.7        gcc 2.8.1
+    sparc-sun-solaris2.7        WorkShop Compilers 5.0 98/12/15 C++ 5.0
+    alpha-dec-osf4.0f           Compaq C++ V6.2-024 for Digital UNIX V4.0F
 
 
 Documentation
