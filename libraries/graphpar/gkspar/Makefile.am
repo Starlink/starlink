@@ -18,3 +18,14 @@ BLOCKDATA_ROUTINES = gks1_blk.f
 
 # Testing
 # Need to know how to build adam applications
+
+# magtest is ADAM monolith
+
+TESTS = gks_test
+
+check_PROGRAMS = gks_test
+#check_MONOLITHS = gks_test
+
+gks_test_SOURCES = gks_test.f
+gks_test_LDADD = `gks_link_adam` `par_link_adam`
+gks_test_TASKS =
