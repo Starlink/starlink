@@ -18,9 +18,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.2  1996/07/31 18:53:16  timj
-*     Add skydip option
+*     Revision 1.3  1996/09/16 20:27:18  timj
+*     Change PHOTOM to SCUPHOT
 *
+c Revision 1.2  1996/07/31  18:53:16  timj
+c Add skydip option
+c
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -69,7 +72,7 @@
 
          CALL REDS_MODIFY (STATUS)
 
-      ELSE IF (NAME .EQ. 'PHOTOM') THEN
+      ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
          CALL REDS_PHOTOM (STATUS)
 
