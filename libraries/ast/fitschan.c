@@ -585,6 +585,10 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     19-AUG-2004 (DSB):
 *        Modify SpecTrans to ignore any CDELT values if the header
 *        includes some CDi_j values.
+*     26-AUG-2004 (DSB):
+*        Modify astSplit_ to allow floating point keyword values which
+*        include an exponent to be specified with no decimal point 
+*        (e.g. "2E-4").
 *class--
 */
 
@@ -23092,8 +23096,8 @@ int astSplit_( const char *card, char **name, char **value,
 /* Save the length of the value string excluding trailing blanks. */
                   len = ChrLen( v );
 
-/* If there are no dots (decimal points) in the value... */
-                  if( !strchr( v, '.' ) ){
+/* If there are no dots (decimal points) or exponents (D or E) in the value... */
+                  if( !strpbrk( v, ".EeDd" ) ){
 
 /* First attempt to read two integers from the string (separated by white
    space). */
@@ -28758,6 +28762,14 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
                      "", "", banner );
          astFitsSetCom( this, "COMMENT", banner, 0 );
+
+         if( astIsAFrameSet( object ) ) {
+            MakeBanner( "WCS information in AST format", "", "", banner );
+            astFitsSetCom( this, "COMMENT", banner, 0 );
+            MakeBanner( "See http://www.starlink.ac.uk/ast/", "", "", banner );
+            astFitsSetCom( this, "COMMENT", banner, 0 );
+         }
+
          MakeBanner( HEADER_TEXT, astGetClass( object ), " object", banner );
          astFitsSetCom( this, "COMMENT", banner, 0 );
          MakeBanner(
