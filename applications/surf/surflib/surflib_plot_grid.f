@@ -58,6 +58,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.4  1998/06/03 22:00:56  timj
+*     Protect against all points being bad.
+*
 *     Revision 1.3  1997/11/27 23:11:10  timj
 *     Protect against all points being bad.
 *
@@ -80,6 +83,7 @@
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! Bad values
       INCLUDE 'PAR_ERR'                          ! For PAR_NULL
+      INCLUDE 'MSG_PAR'                          ! For MSG
 
 *  Arguments Given:
       INTEGER UNIT
@@ -107,9 +111,11 @@
       REAL    DMAX            ! Maximum of data
       REAL    DMIN            ! Minimum of data
       LOGICAL FOUND           ! TRUE if there is at least one good point
+      REAL    HIGH            ! Upper end of Xrange for plot
       INTEGER I               ! Loop variable
       INTEGER IERR            ! For VEC_
       INTEGER J               ! J coordinate
+      REAL    LOW             ! Lower end of x for plot
       INTEGER MED_X_PTR       ! Position of medians
       INTEGER MED_X_END       ! End of MED_X_PTR
       INTEGER MED_PTR         ! Medians for each bin
@@ -175,6 +181,7 @@
 
             END IF
 
+
 *     Find the range of the data for plotting
          
             DMIN = VAL__MAXR
@@ -221,14 +228,26 @@
      :              SIG_X_END, STATUS)
         
 
+*     Add a small bit on either end of the plot range
+*     This also allows me to deal with LOW=HIGH plotting problems
+               LOW = REAL(XRANGE(1))
+               HIGH = REAL(XRANGE(2))
+
+               IF (LOW .LE. HIGH) THEN
+                  LOW = LOW - 0.5
+                  HIGH = HIGH + 0.5
+               ELSE
+                  HIGH = HIGH - 0.5
+                  LOW = LOW + 0.5
+               END IF
+
 *     Perform graphics operations on the device
 *     Setup the axes
 
                AXIS = 0
                CALL PGSCI(1)
-            
-               CALL PGENV(REAL(XRANGE(1)), REAL(XRANGE(2)), DMIN, DMAX,
-     :              0, AXIS)
+
+               CALL PGENV(LOW, HIGH, DMIN, DMAX, 0, AXIS)
                
                CALL PGSCI(3)
             
@@ -334,6 +353,12 @@
      :              STATUS)
                CALL SCULIB_FREE('STDEVM', STDEVM_PTR, STDEVM_END, 
      :              STATUS)
+
+
+            ELSE
+
+               CALL MSG_OUTIF(MSG__QUIET,' ','PLOT_GRID: No good '//
+     :              'points in selected range', STATUS)
                
             END IF
             
