@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {211.5}
+\newcommand{\stardocnumber}    {211.6}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th January 2000}
+\newcommand{\stardocdate}      {2nd April 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -26,7 +26,7 @@
 \newcommand{\stardoccopyright} {Copyright (C) 2000 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V1.4}
+\newcommand{\stardocversion}   {V1.5}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(C Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (C Version)}
 \newcommand{\stardocabstract}  {
@@ -5061,7 +5061,7 @@ over-rides the effects of both the Digits and AsTime attributes.
 
 \subsection{\label{ss:unformattingskyaxisvalues}Reading Formatted Celestial Coordinates}
 
-The process of converting formatted celestial coordinates, such a
+The process of converting formatted celestial coordinates, such as
 might be produced by the \htmlref{astFormat}{astFormat} function
 (\secref{ss:formattingskyaxisvalues}), into numerical (double)
 coordinate values is performed by using \htmlref{astUnformat}{astUnformat}
@@ -7631,12 +7631,9 @@ WCS calibration information with FITS data, but it also allows any other
 information that can be expressed in terms of AST Objects to be stored
 as well.  In fact, the native encoding provides us with facilities
 roughly analogous to those of the \htmlref{Channel}{Channel}
-(\secref{ss:channels})---{\em{i.e.}}\ a nearly lossless way of
+(\secref{ss:channels})---{\em{i.e.}}\ a lossless way of
 transferring AST Objects from program to program---but based on FITS
-headers instead of free-format text.\footnote{Unfortunately, the
-process is currently not quite lossless because string truncation can
-still occur due to the finite length (80~characters) of FITS header
-cards.}
+headers instead of free-format text.
 
 \subsection{The FitsChan Model}
 
@@ -7831,6 +7828,23 @@ attribute will point at the card immediately after the last one
 written. Since our FitsChan was initially empty, the Card attribute
 will, in this example, point at the end-of-file
 (\secref{ss:addressingfitscards}).
+
+The FITS standard imposes a limit of 68 characters on the length of
+strings which may be stored in a single header card. Sometimes, a
+description of an AST Object involves the use of strings which exceed
+this limit ({\em{e.g.}}\ a \htmlref{Frame}{Frame} title can be of arbitrary length). If
+this occurs, the long string will be split over two or more header cards.
+Each ``continuation'' card will have the keyword {\tt CONTINUE} in
+columns 1 to 8, and will contain a space in column 9 (instead of the
+usual equals sign). An ampersand (``{\tt \&}'') is appended to the end of
+each of the strings (except the last one) to indicate that the string is
+continued on the next card. 
+
+Note, this splitting of long strings over several cards only occurs when
+writing AST Objects to a FitsChan using the astWrite function and the
+{\em native} encoding. If a long string is stored in a FitsChan using
+(for instance) the \htmlref{astPutFits}{astPutFits} function, it will simply be truncated.
+
 
 \subsection{\label{ss:extractingfitscards}Extracting Individual Cards from a FitsChan}
 
@@ -8029,6 +8043,13 @@ original FitsChan will remain untouched.
 After a read completes, the FitsChan's \htmlref{Card}{Card} attribute identifies the
 card immediately following the last card read, or the end-of-file of
 there are no more cards.
+
+Since the {\em native} encoding is being used, any long strings involved
+in the object description will have been split into two or more adjacent
+contuation cards when the Object was stored in the header using function
+\htmlref{astWrite}{astWrite}. The astRead function reverses this process by concatenating any
+such adjacent continuation cards to re-create the original long string.
+
 
 \subsection{Saving and Restoring Multiple Objects in a FitsChan}
 
@@ -8234,33 +8255,42 @@ likely to be adopted widely for FITS data in future.  However, this
 proposed standard is still evolving, and while this continues we
 intend that the AST implementation should track it.
 
-{\bf{Unfortunately, this means that future versions of AST cannot
-necessarily be guaranteed to read FITS-WCS encoded data written with
-the current version.  At present, therefore, you should write WCS
-information using this encoding only with great caution and should not
-use it for archiving data.}}\footnote{The likelihood of further
-substantial changes to the FITS-WCS proposal came as something of a
-surprise to many onlookers, given that the paper by Greisen \&
-Calabretta had changed very little for several years. At present,
-therefore, the situation is somewhat uncertain, although there are
-hopes that final agreement on a FITS-WCS standard may now be close.
-Meanwhile, a suitable (stable) interim standard can be found in the
-form of the FITS-IRAF encoding.}
+\footnote{After a long and chequered history, the FITS-WCS proposal 
+finally seems to be stabilizing. The version currently implemented within
+AST -- based on the use of {\tt CDi\_j} keywords to describe axis scaling
+and rotation -- seems likely to be adopted as the official standard
+sometime during the year 2000, although obviously the possibility of
+change before then cannot be ruled out.}
 
 \item[FITS-IRAF]\mbox{}\\
 This encoding is based on the conventions described in the document
-"World Coordinate Systems Representations Within the FITS Format" by
-R.J. Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
-fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently
-employed by the IRAF data analysis facility, so its use will
-facilitate data exchange with IRAF.
+``World Coordinate Systems Representations Within the FITS Format'' by R.J.
+Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
+fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently employed
+by the IRAF data analysis facility, so its use will facilitate data
+exchange with IRAF. This encoding is in effect a sub-set of the current
+FITS-WCS encoding.
 
-Given the current lack of final agreement on the FITS-WCS standard
-(above), the FITS-IRAF encoding provides a suitable interim solution,
-because it approximates to a subset of the propsed FITS-WCS standard.
-This means that it is slightly more restrictive, but in practice its
-limitations are often unimportant. Conversion of data from FITS-IRAF
-to the final form of FITS-WCS is likely to be well supported.
+\item[FITS-PC]\mbox{}\\
+This encoding is based on a previous version of the proposed new FITS WCS
+standard which used {\tt PCjjjjiii} and {\tt CDELTj} keywords to describe
+axis rotation and scaling. Versions of AST prior to V1.5 used this scheme
+for the FITS-WCS encoding. As of V1.5, FITS-WCS uses {\tt CDi\_j}
+keywords instead.\footnote{There are many other differences between the
+previous and the current FITS-WCS encodings. The keywords to describe
+axis rotation and scaling is used purely as a label to identify the
+scheme.} The FITS-PC encoding is included in AST V1.5 only to allow
+FITS-WCS data created with previous versions to be read. It should not,
+in general, be used to create new data sets.
+
+\item[FITS-AIPS]\mbox{}\\
+This encoding is based on the conventions described in the document
+``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen (revised 9th
+September, 1994).\footnote{Available by ftp from fits.cv.nrao.edu
+/fits/documents/wcs/aips27.ps.Z} It is currently employed by the AIPS
+data analysis facility, so its use will facilitate data exchange with
+AIPS. This encoding uses {\tt CROTAi} and {\tt CDELTi} keywords to
+describe axis rotation and scaling.
 \end{description}
 \end{quote}
 
@@ -8424,14 +8454,14 @@ encode = astGetC( fitschan, "Encoding" );
 \normalsize
 \end{quote}
 
-The result of this enquiry would be the string ``FITS-WCS''.  Note
+The result of this enquiry would be the string ``FITS-AIPS''.  Note
 that we could also have set the FitsChan's Encoding attribute
 explicitly, such as when creating it:
 
 \begin{quote}
 \small
 \begin{verbatim}
-fitschan = astFitsChan( NULL, NULL, "Encoding=FITS-WCS" );
+fitschan = astFitsChan( NULL, NULL, "Encoding=FITS-AIPS" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -8739,17 +8769,13 @@ if ( !astWrite( fitschan, wcsinfo ) ) {
 That is:
 
 \begin{enumerate}
-\item Start by trying the FITS-IRAF encoding, on the grounds that FITS
+\item Start by trying the FITS-WCS encoding, on the grounds that FITS
 should provide a universal interchange standard in which all WCS
-information should be expressed if possible. (In the fullness of time,
-when the FITS-WCS standard becomes stable, you should change to using
-this instead. For now, however, the FITS-IRAF encoding is a practical
-alternative.)
+information should be expressed if possible. 
 
 \item If that fails, then try the original encoding used for the input
-WCS information (which might even be FITS-WCS), on the grounds that
-you are at least not making the information any harder for others to
-read than it originally was.
+WCS information, on the grounds that you are at least not making the
+information any harder for others to read than it originally was.
 
 \item If that also fails, then you are probably trying to store fairly
 complex information for which you need the native encoding. Only other
@@ -8758,19 +8784,14 @@ probably the only programs that will be able to do anything sensible
 with it anyway.
 \end{enumerate}
 
-An alternative approach might be to encode the WCS information in
-several ways, since this gives the maximum chance that other software
-will be able to read it. This approach is possible because there is
-currently little conflict between the FITS keywords used by the
-different encodings which AST supports,\footnote{There is some risk
-that clashes between the FITS-IRAF and FITS-WCS encodings may occur,
-since they share some keywords, although they use them for the same
-purposes. This makes it possible, in theory, to mix them safely, but
-in practice other software might be confused by the presence of both
-conventions at once.} although the possibility of new conflicts
-arising between encodings introduced in future obviously cannot be
-ruled out.  Adopting this approach would simply require multiple calls
-to astWrite, rewinding the FitsChan and changing its Encoding value
+An alternative approach might be to encode the WCS information in several
+ways, since this gives the maximum chance that other software will be
+able to read it. This approach is only possible if there is no
+significant conflict between the FITS keywords used by the different
+encodings\footnote{In practice, this means you should avoid mixing
+FITS-IRAF, FITS-WCS, FITS-AIPS and FITS-PC encodings since they share
+many keywords.}.  Adopting this approach would simply require multiple
+calls to astWrite, rewinding the FitsChan and changing its Encoding value
 before each one.
 
 Unfortunately, however, there is a drawback to duplicating WCS
@@ -18186,18 +18207,19 @@ Object            - Base class for all AST Objects
       using the \htmlref{WcsType}{WcsType} attribute and the coordinates on which it acts
       may be determined using the \htmlref{WcsAxis(lonlat)}{WcsAxislonlat} attribute.
 
-      Each WcsMap also uses up to 10 {\tt{"}}projection parameters{\tt{"}} which
-      specify the precise form of the projection. These parameter
-      values are accessed using the \htmlref{ProjP(i)}{ProjPi} attribute, where {\tt{"}}i{\tt{"}} is
-      an integer in the range 0 to 9. The number of projection
-      parameters used, and their meanings, are dependent upon the
-      projection type (most projections either do not use any
-      projection parameters, or use parameters 1 and 2). Before
-      creating a WcsMap you should consult the FITS-WCS paper for
-      details of which projection parameters are required, and which
-      have defaults. When creating the WcsMap, you must explicitly set
-      values for all those required projection parameters which do not
-      have defaults defined in this paper.
+      Each WcsMap also allows up to 99 {\tt{"}}projection parameters{\tt{"}} to be
+      associated with each axis. These specify the precise form of the
+      projection, and are accessed using \htmlref{PVj\_m}{PVj_m} attribute, where {\tt{"}}j{\tt{"}} is
+      the integer axis index (starting at 1), and m is an integer
+      {\tt{"}}parameter index{\tt{"}} in the range 0 to 99. The number of projection
+      parameters required by each projection, and their meanings, are
+      dependent upon the projection type (most projections either do not
+      use any projection parameters, or use parameters 1 and 2 associated
+      with the latitude axis). Before creating a WcsMap you should consult
+      the FITS-WCS paper for details of which projection parameters are
+      required, and which have defaults. When creating the WcsMap, you must
+      explicitly set values for all those required projection parameters
+      which do not have defaults defined in this paper.
    }
    \sstsynopsis{
       AstWcsMap $*$astWcsMap( int ncoord, int type, int lonax, int latax,
@@ -18245,7 +18267,7 @@ Object            - Base class for all AST Objects
 
          If the sky projection to be implemented requires projection
          parameter values to be set, then this should normally be done
-         here via the ProjP(i) attribute (see the {\tt{"}}Examples{\tt{"}}
+         here via the PVj\_m attribute (see the {\tt{"}}Examples{\tt{"}}
          section). Setting values for these parameters is mandatory if
          they do not have default values (as defined in the FITS-WCS
          paper).
@@ -18279,17 +18301,17 @@ Object            - Base class for all AST Objects
          projection parameters.
       }
       \sstexamplesubsection{
-         wcsmap = astWcsMap( AST\_\_COE, 3, 2, 3, {\tt{"}}ProjP(1)=40.0{\tt{"}} );
+         wcsmap = astWcsMap( AST\_\_COE, 3, 2, 3, {\tt{"}}PV3\_1=40.0{\tt{"}} );
       }{
          Creates a WcsMap that implements a FITS-WCS conical equal
          area projection. The WcsMap acts on points in a 3-dimensional
          space; coordinates 2 and 3 represent longitude and latitude
          respectively, while the values of coordinate 1 are copied
-         unchanged.  \htmlref{Projection}{Projection} parameter 1 (corresponding to FITS
-         keyword {\tt{"}}PROJP1{\tt{"}}) is required and has no default, so is set
-         explicitly to 40.0 degrees. Projection parameter 2
-         (corresponding to FITS keyword {\tt{"}}PROJP2{\tt{"}}) is required but has
-         a default of zero, so need not be specified.
+         unchanged.  \htmlref{Projection}{Projection} parameter 1 associatyed with the latitude
+         axis (corresponding to FITS keyword {\tt{"}}PV3\_1{\tt{"}}) is required and has
+         no default, so is set explicitly to 40.0 degrees. Projection
+         parameter 2 (corresponding to FITS keyword {\tt{"}}PV3\_2{\tt{"}}) is required
+         but has a default of zero, so need not be specified.
       }
    }
    \sstnotes{
@@ -18309,7 +18331,7 @@ Object            - Base class for all AST Objects
          a WcsMap will yield coordinate values of AST\_\_BAD.
 
          \sstitem
-         The validity of any projection parameters given via the ProjP(i)
+         The validity of any projection parameters given via the PVj\_m
          parameter in the {\tt{"}}options{\tt{"}} string is not checked by this
          function. However, their validity is checked when the resulting
          WcsMap is used to transform coordinates, and an error will
@@ -19244,6 +19266,17 @@ Object            - Base class for all AST Objects
          Encoding{\tt{"}} below.
 
          \sstitem
+         {\tt{"}}FITS-PC{\tt{"}}: Encodes coordinate system information in FITS
+         header cards using the conventions described in an earlier draft
+         of the FITS world coordinate system paper by E.W. Greisen and
+         M. Calabretta. This encoding uses a combination of CDELTi and
+         PCiiijjj keywords to describe the scale and rotation of the pixel
+         axes. This encoding is included to support existing data and
+         software which uses these now superceded conventions. In general,
+         the {\tt{"}}FITS-WCS{\tt{"}} encoding (which uses CDi\_j keywords to describe the
+         scale and rotation) should be used in preference to {\tt{"}}FITS-PC{\tt{"}}.
+
+         \sstitem
          {\tt{"}}FITS-IRAF{\tt{"}}: Encodes coordinate system information in FITS
          header cards using the conventions described in the document
          {\tt{"}}World Coordinate Systems Representations Within the FITS
@@ -19257,6 +19290,13 @@ Object            - Base class for all AST Objects
          stable. Since many datasets currently use the FITS-IRAF
          encoding, conversion of data from FITS-IRAF to the final form of
          FITS-WCS is likely to be well supported.
+
+         \sstitem
+         {\tt{"}}FITS-AIPS{\tt{"}}: Encodes coordinate system information in FITS
+         header cards using the conventions originally introduced by the
+         AIPS data analysis facility. This is base on the use of CDELTi and
+         CROTAi keuwords to desribe the scale and rotation of each axis.
+         These conventions have been superceded but are still widely used.
 
          \sstitem
          {\tt{"}}NATIVE{\tt{"}}: Encodes AST Objects in FITS header cards using a
@@ -19287,17 +19327,44 @@ Object            - Base class for all AST Objects
          string {\tt{"}}BEGAST{\tt{"}}, then NATIVE encoding is used,
 
          \sstitem
+         Otherwise, if the FitsChan contains the {\tt{"}}PLTRAH{\tt{"}} keyword, then
+         DSS encoding is used,
+
+         \sstitem
          Otherwise, if the FitsChan contains a keyword of the form
-         {\tt{"}}CDi\_j{\tt{"}} or {\tt{"}}CDiiijjj{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then
+         {\tt{"}}PCiiijjj{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then
+         FITS-PC encoding is used,
+
+         \sstitem
+         Otherwise, if the FitsChan contains a keyword of the form
+         {\tt{"}}CDiiijjj{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then
          FITS-IRAF encoding is used,
 
          \sstitem
-         Otherwise, if the FitsChan contains the {\tt{"}}CRVAL1{\tt{"}} keyword, then
-         FITS-WCS encoding is used,
+         Otherwise, if the FitsChan contains a keyword of the form
+         {\tt{"}}CDi\_j{\tt{"}}, and at least one of RADECSYS, PROJPi, or CjVALi
+         where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then FITS-IRAF encoding is
+         used.
 
          \sstitem
-         Otherwise, if the FitsChan contains the {\tt{"}}PLTRAH{\tt{"}} keyword, then
-         DSS encoding is used,
+         Otherwise, if the FitsChan contains any keywords of the form
+         PROJPi, CjVALi or RADECSYS, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits,
+         then FITS-PC encoding is used.
+
+         \sstitem
+         Otherwise, if the FitsChan contains a keyword of the form
+         CROTAi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-AIPS encoding is
+         used.
+
+         \sstitem
+         Otherwise, if the FitsChan contains a keyword of the form
+         CDELTi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-PC encoding is
+         used.
+
+         \sstitem
+         Otherwise, if the FitsChan contains a keyword of the form
+         CRVALi, where {\tt{"}}i{\tt{"}} is a single digit, then FITS-WCS encoding is
+         used.
 
          \sstitem
          Otherwise, if none of these conditions is met (as would be the
@@ -19324,8 +19391,9 @@ Object            - Base class for all AST Objects
       declination). This encoding may only be used to store a single
       AST Object in any set of FITS header cards, and that Object must
       be a \htmlref{FrameSet}{FrameSet} which conforms to the STScI/DSS coordinate system
-      model (this means that its base and current Frames must be
-      related by a \htmlref{DssMap}{DssMap}).
+      model (this means the \htmlref{Mapping}{Mapping} which relates its base and current
+      Frames must include either a \htmlref{DssMap}{DssMap} or a \htmlref{WcsMap}{WcsMap} with type
+      AST\_\_TAN).
 
       When reading a DSS encoded Object (using astRead), the FitsChan
       concerned must initially be positioned at the first card (its
@@ -19341,23 +19409,11 @@ Object            - Base class for all AST Objects
 
       When astWrite is used to store a FrameSet using DSS encoding,
       an attempt is first made to simplify the FrameSet to see if it
-      conforms to the DSS model.  Typically, for this simplification
-      process to succeed, the FrameSet must initially have been read
-      from a FitsChan (using astRead) where it was already stored
-      using the DSS encoding scheme.  This is because any intervening
-      modification to the FrameSet (such as re-mapping its Frames -
-      see \htmlref{astRemapFrame}{astRemapFrame}) is likely to cause it to depart from the very
-      simple DSS polynomial model.
-
-      Some very limited modification is possible,
-      however. Specifically, the DssMap (which relates the pixel and
-      celestial coordinate Frames) may be prefixed with a linear
-      \htmlref{Mapping}{Mapping} which produces a shift of pixel origin and/or a change
-      in pixel scale. However, this is only permitted if the DSS pixel
-      origin values remain as integers. Changes to the Frames within
-      the FrameSet are also permitted, but only the \htmlref{Epoch}{Epoch} and \htmlref{Equinox}{Equinox}
-      values will be used when any new DSS encoding of the FrameSet is
-      made.
+      conforms to the DSS model.  Specifically, the current Frame must
+      be a default FK5 \htmlref{SkyFrame}{SkyFrame}; the projection must be a tangent plane
+      (gnomonic) projection with polynomial corrections conforming to
+      DSS requirements, and north must be parallel to the second base
+      Frame axis.
 
       If the simplification process succeeds, a description of the
       FrameSet is written to the FitsChan using appropriate DSS FITS
@@ -19385,7 +19441,7 @@ Object            - Base class for all AST Objects
       terms of a sequence of transformations which convert between
       various intermediate coordinate systems. One of the
       transformations involved is a {\tt{"}}sky projection{\tt{"}} (e.g. as
-      implemented by a \htmlref{WcsMap}{WcsMap}).  The FITS-WCS encoding may only be
+      implemented by a WcsMap).  The FITS-WCS encoding may only be
       used to store a single AST Object in any set of FITS header
       cards, and that Object must be a FrameSet which conforms to the
       FITS-WCS model.
@@ -19449,8 +19505,8 @@ Object            - Base class for all AST Objects
          are equatorial, galactic and ecliptic,
 
          \sstitem
-         The range of sky projections which can be represented is
-         considerably smaller than FITS-WCS,
+         Sky projections can be represented only if any associated
+         projection parameters are set to their default values.
 
          \sstitem
          Secondary axis descriptions are not supported, so when writing
@@ -19473,18 +19529,65 @@ Object            - Base class for all AST Objects
       is also in use, is recognised when reading an Object, but is never
       written.
 
-      In addition, the experimental IRAF {\tt{"}}ZPX{\tt{"}} sky projection will be
-      accepted when reading, but will never be written (the corresponding
-      FITS {\tt{"}}ZPN{\tt{"}} projection being used instead). However, longitude and
-      latitude correction surfaces used by this {\tt{"}}ZPX{\tt{"}} projection (appearing
-      as {\tt{"}}lngcor{\tt{"}} or {\tt{"}}latcor{\tt{"}} terms in the IRAF-specific {\tt{"}}WAT{\tt{"}} keywords) are
-      not supported. If these are encountered while reading from a FitsChan,
-      they are ignored and a warning message is added to the contents of the
-      FitsChan as a set of cards using the keyword {\tt{"}}ASTWARN{\tt{"}}.
+      In addition, the experimental IRAF {\tt{"}}ZPX{\tt{"}} and {\tt{"}}TNX{\tt{"}} sky projections will
+      be accepted when reading, but will never be written (the corresponding
+      FITS {\tt{"}}ZPN{\tt{"}} or {\tt{"}}TAN{\tt{"}} projection being used instead). However, there
+      are restrictions on the use of these experimental projections. For
+      {\tt{"}}ZPX{\tt{"}}, longitude and latitude correction surfaces (appearing as
+      {\tt{"}}lngcor{\tt{"}} or {\tt{"}}latcor{\tt{"}} terms in the IRAF-specific {\tt{"}}WAT{\tt{"}} keywords) are
+      not supported. For {\tt{"}}TNX{\tt{"}} projections, only cubic surfaces encoded as
+      simple polynomials with {\tt{"}}half cross-terms{\tt{"}} are supported. If an
+      un-usable {\tt{"}}TNX{\tt{"}} or {\tt{"}}ZPX{\tt{"}} projection is encountered while reading
+      from a FitsChan, a simpler form of TAN or ZPN projection is used
+      which ignores the unsupported features and may therefore be
+      inaccurate. If this happens, a warning message is added to the
+      contents of the FitsChan as a set of cards using the keyword {\tt{"}}ASTWARN{\tt{"}}.
 
-      You should not normally attempt to mix the FITS-IRAF and
-      FITS-WCS encodings within the same FitsChan, since there is a
-      risk that keyword clashes may occur.
+      You should not normally attempt to mix the FITS-IRAF, FITS-WCS,
+      FITS-AIPS or FITS-PC encodings within the same FitsChan, since there
+      is a risk that keyword clashes may occur.
+   }
+   \sstdiytopic{
+      The FITS-PC Encoding
+   }{
+      The FITS-PC encoding can, for most purposes, be considered as
+      equivalent to the FITS-WCS encoding (above), although it differs
+      in the details of the FITS keywords used. It is used in exactly
+      the same way and has the same restrictions.
+   }
+   \sstdiytopic{
+      The FITS-AIPS Encoding
+   }{
+      The FITS-AIPS encoding can, for most purposes, be considered as
+      equivalent to the FITS-WCS encoding (above), although it differs
+      in the details of the FITS keywords used. It is used in exactly
+      the same way and has the same restrictions, but with the
+      addition of the following:
+
+      \sstitemlist{
+
+         \sstitem
+         The only celestial coordinate systems that may be represented
+         are equatorial, galactic and ecliptic,
+
+         \sstitem
+         Sky projections can be represented only if any associated
+         projection parameters are set to their default values.
+
+         \sstitem
+         The AIT, SFL and MER projections can only be written if the CRVAL
+         keywords are zero for both longitude and latitude axes.
+
+         \sstitem
+         Secondary axis descriptions are not supported, so when writing
+         a FrameSet to a FitsChan, only information from the base and
+         current Frames will be stored.
+
+         \sstitem
+         If there are more than 2 axes in the base and current Frames, any
+         rotation must be restricted to the celestial plane, and must involve
+         no shear.
+      }
    }
    \sstdiytopic{
       The NATIVE Encoding
@@ -20747,7 +20850,7 @@ Object            - Base class for all AST Objects
       radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. In some
       cases, this latitude value may be determined by one or more
       projection parameter values supplied for the WcsMap using its
-      \htmlref{ProjP(i)}{ProjPi} attribute.
+      \htmlref{PVj\_m}{PVj_m} attribute.
    }
    \sstattributetype{
       Floating point, read-only.
@@ -21063,6 +21166,66 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   PVj\_m\sstlabel{PVj_m}
+}{
+   FITS-WCS projection parameters
+}{
+   \sstdescription{
+      This attribute specifies the projection parameter values to be
+      used by a \htmlref{WcsMap}{WcsMap} when implementing a FITS-WCS sky projection.
+      Each PV attribute name should include two integers, j and m,
+      separated by an underscore. The axis index is specified
+      by j, and should be in the range 1 to 99. The parameter number
+      is specified by m, and should be in the range 0 to 99. For
+      example, {\tt{"}}PV2\_1=45.0{\tt{"}} would specify a value for projection
+      parameter 1 of axis 2 in a WcsMap.
+
+      These projection parameters correspond exactly to the values
+      stored using the FITS-WCS keywords {\tt{"}}PV1\_1{\tt{"}}, {\tt{"}}PV1\_2{\tt{"}}, etc. This
+      means that projection parameters which correspond to angles must
+      be given in degrees (despite the fact that the angular
+      coordinates and other attributes used by a WcsMap are in
+      radians).
+
+      The set of projection parameters used by a WcsMap depends on the
+      type of projection, which is determined by its \htmlref{WcsType}{WcsType}
+      parameter.  Most projections either do not require projection
+      parameters, or use parameters 1 and 2 associated with the latitude
+      axis. You should consult the FITS-WCS paper for details.
+
+      Some projection parameters have default values (as defined in
+      the FITS-WCS paper) which apply if no explicit value is given.
+      Currently, these defaults are all zero. You may omit setting a
+      value for these {\tt{"}}optional{\tt{"}} parameters and the default will
+      apply. Some projection parameters, however, have no default and
+      a value must be explicitly supplied.  This is most conveniently
+      done using the {\tt{"}}options{\tt{"}} argument of \htmlref{astWcsMap}{astWcsMap} (q.v.) when a WcsMap
+      is first created. An error will result when a WcsMap is used to
+      transform coordinates if any of its required projection
+      parameters has not been set and lacks a default value.
+   }
+   \sstattributetype{
+      Floating point.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         WcsMap
+      }{
+         All WcsMaps have this attribute.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the projection parameter values given for a WcsMap do not
+         satisfy all the required constraints (as defined in the FITS-WCS
+         paper), then an error will result when the WcsMap is used to
+         transform coordinates.
+      }
+   }
+}
+\sstroutine{
    PcdCen(axis)\sstlabel{PcdCenaxis}
 }{
    Centre coordinates of pincushion/barrel distortion
@@ -21186,36 +21349,16 @@ Object            - Base class for all AST Objects
    FITS-WCS projection parameters
 }{
    \sstdescription{
-      This attribute specifies the projection parameter values to be
-      used by a \htmlref{WcsMap}{WcsMap} when implementing a FITS-WCS sky
-      projection. The ProjP attribute name should be subscripted by an
-      integer in the range 0 to 9 to identify which projection
-      parameter is required. For example, {\tt{"}}ProjP(1)=45.0{\tt{"}} would
-      specify a value for projection parameter 1 of a WcsMap.
+      This attribute provides aliases for the PV attributes, which
+      specifies the projection parameter values to be used by a \htmlref{WcsMap}{WcsMap}
+      when implementing a FITS-WCS sky projection. ProjP is retained for
+      compatibility with previous versions of FITS-WCS and AST. New
+      applications should use the PV attibute instead.
 
-      These projection parameters correspond exactly to the values
-      stored using the FITS-WCS keywords {\tt{"}}PROJP0{\tt{"}} to {\tt{"}}PROJP9{\tt{"}}. This
-      means that projection parameters which correspond to angles must
-      be given in degrees (despite the fact that the angular
-      coordinates and other attributes used by a WcsMap are in
-      radians).
-
-      The set of projection parameters used by a WcsMap depends on the
-      type of projection, which is determined by its \htmlref{WcsType}{WcsType}
-      parameter.  Most projections either do not require projection
-      parameters, or use parameters 1 and 2. You should consult the
-      FITS-WCS paper for details.
-
-      Some projection parameters have default values (as defined in
-      the FITS-WCS paper) which apply if no explicit value is given.
-      Currently, these defaults are all zero. You may omit setting a
-      value for these {\tt{"}}optional{\tt{"}} parameters and the default will
-      apply. Some projection parameters, however, have no default and
-      a value must be explicitly supplied.  This is most conveniently
-      done using the {\tt{"}}options{\tt{"}} argument of \htmlref{astWcsMap}{astWcsMap} (q.v.) when a WcsMap
-      is first created. An error will result when a WcsMap is used to
-      transform coordinates if any of its required projection
-      parameters has not been set and lacks a default value.
+      Attributes ProjP(0) to ProjP(9) correspond to attributes PV$<$axlat$>$\_0
+      to PV$<$axlat$>$\_9, where $<$axlat$>$ is replaced by the index of the
+      latitude axis (given by attribute WcsAxis(2)). See PV for further
+      details.
    }
    \sstattributetype{
       Floating point.
@@ -21225,16 +21368,6 @@ Object            - Base class for all AST Objects
          WcsMap
       }{
          All WcsMaps have this attribute.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         If the projection parameter values given for a WcsMap do not
-         satisfy all the required constraints (as defined in the FITS-WCS
-         paper), then an error will result when the WcsMap is used to
-         transform coordinates.
       }
    }
 }
@@ -23854,18 +23987,19 @@ Object            - Base class for all AST Objects
       using the \htmlref{WcsType}{WcsType} attribute and the coordinates on which it acts
       may be determined using the \htmlref{WcsAxis(lonlat)}{WcsAxislonlat} attribute.
 
-      Each WcsMap also uses up to 10 {\tt{"}}projection parameters{\tt{"}} which
-      specify the precise form of the projection. These parameter
-      values are accessed using the \htmlref{ProjP(i)}{ProjPi} attribute, where {\tt{"}}i{\tt{"}} is
-      an integer in the range 0 to 9. The number of projection
-      parameters used, and their meanings, are dependent upon the
-      projection type (most projections either do not use any
-      projection parameters, or use parameters 1 and 2). Before
-      creating a WcsMap you should consult the FITS-WCS paper for
-      details of which projection parameters are required, and which
-      have defaults. When creating the WcsMap, you must explicitly set
-      values for all those required projection parameters which do not
-      have defaults defined in this paper.
+      Each WcsMap also allows up to 99 {\tt{"}}projection parameters{\tt{"}} to be
+      associated with each axis. These specify the precise form of the
+      projection, and are accessed using \htmlref{PVj\_m}{PVj_m} attribute, where {\tt{"}}j{\tt{"}} is
+      the integer axis index (starting at 1), and m is an integer
+      {\tt{"}}parameter index{\tt{"}} in the range 0 to 99. The number of projection
+      parameters required by each projection, and their meanings, are
+      dependent upon the projection type (most projections either do not
+      use any projection parameters, or use parameters 1 and 2 associated
+      with the latitude axis). Before creating a WcsMap you should consult
+      the FITS-WCS paper for details of which projection parameters are
+      required, and which have defaults. When creating the WcsMap, you must
+      explicitly set values for all those required projection parameters
+      which do not have defaults defined in this paper.
    }
    \sstconstructor{
       \htmlref{astWcsMap}{astWcsMap}
@@ -23887,7 +24021,7 @@ Object            - Base class for all AST Objects
          \htmlref{NatLat}{NatLat}: Native latitude of the reference point of a FITS-WCS projection
 
          \sstitem
-         ProjP(i): FITS-WCS projection parameters
+         PVj\_m: FITS-WCS projection parameters
 
          \sstitem
          WcsAxis(lonlat): FITS-WCS projection axes
@@ -24439,11 +24573,11 @@ indefinite looping or unwanted error messages.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes Introduced in V1.4}
+\subsection{Changes Introduced in V1.4}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.3 and V1.4 (the
-current version):
+The following describes the most significant changes which have occurred
+in the AST library between versions V1.3 and V1.4 (not the most recent
+version):
 
 \begin{enumerate}
 \item A new \htmlref{MathMap}{MathMap} class has been introduced. This is a form of
@@ -24509,7 +24643,107 @@ a CD matrix and a PC matrix are erroneously present in a FITS header.
 \item A small number of documentation errors have been corrected.
 \end{enumerate}
 
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.5}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.4 and V1.5 (the
+current version):
+
+\begin{enumerate}
+
+\item The \htmlref{FitsChan}{FitsChan} class has been modified to support the latest draft
+FITS WCS standard, described in the two papers ``Representation of world
+coordinates in FITS'' (E.W.\,Greisen and M.\,Calabretta, dated 30th
+November, 1999), and ``Representation of celestial coordinates in FITS''
+(M.\,Calabretta and E.W.\,Greisen, dated 24th September, 1999). These are
+available at
+\htmladdnormallink{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
+{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}.
+
+The FITS-WCS encoding now uses these updated conventions. The main
+changes are:
+
+\begin{itemize}
+\item Rotation and scaling of pixel axes is now represented by a matrix
+of {\tt CDj\_i} keywords instead of a combination of {\tt PCjjjiii} and
+{\tt CDELTj} keywords.
+\item \htmlref{Projection}{Projection} parameters are now associated with particular axes and
+are represented by {\tt PVi\_m} keywords instead of the {\tt PROJPm}
+keywords.
+\item The tangent plane projection (``TAN'') can now include optional 
+polynomial correction terms.
+\item An entire set of keywords must be supplied for each set of secondary 
+axis descriptions, and each such keyword must finish with a single
+character indicating which set it belongs to. This means that keywords
+which previously occupied eight characters have been shorten to seven to
+leave room for this extra character. Thus {\tt LONGPOLE} has become {\tt
+LONPOLE} and {\tt RADECSYS} has become {\tt RADESYS}.
+\end{itemize}
+
+\item Two new encodings have been added to the FitsChan class:
+\begin{description}
+
+\item [FITS-PC] This encoding uses the conventions of the now superceded
+FITS WCS paper by E.W.\,Greisen and M.\,Calabretta which used keywords
+{\tt CDELTj} abd {\tt PCjjjiii} to describe axis scaling and rotation.
+These are the conventions which were used by the FITS-WCS encoding prior
+to version 1.5 of AST. This encoding is provided to allow existing data
+which use these conventions to be read. It should not in general be used
+to create new data.
+
+\item [FITS-AIPS] This encoding is based on the conventions described in the 
+document ``Non-linear Coordinate Systems in AIPS'' by Eric W. Greisen
+(revised 9th September, 1994 and available by ftp from fits.cv.nrao.edu
+/fits/documents/wcs/aips27.ps.Z). This encoding uses {\tt CROTAi} and
+{\tt CDELTi} keywords to describe axis rotation and scaling.
+
+\end{description}
+
+\item The FitsChan class now provides some support for the IRAF-specific 
+``TNX'' sky projection, which is converted transparently into the
+equivalent FITS ``TAN'' projection (see the description of the \htmlref{Encoding}{Encoding}
+attribute for details).
+
+\item FrameSets originally read from a DSS encoded FITS header can now be
+written out using the FITS-WCS encoding (a TAN projection with correction
+terms will be used) in addition to the DSS encoding. The reverse is also
+posible: FrameSets originally read from a FITS-WCS encoded FITS header
+and which use a TAN projection can now be written out using the DSS
+encoding.
+
+\item The algorithm used by the FitsChan class to verify that a \htmlref{FrameSet}{FrameSet} 
+conforms to the FITS-WCS model has been improved so that FrameSets
+including more complex mixtures of parallel and serial Mappings
+can be written out using the FITS-WCS encoding.
+
+\item The FitsChan class has been changed so that long strings included in 
+the description of an \htmlref{Object}{Object} can be saved and restored without truncation
+when using the NATIVE encoding. Previously, very long \htmlref{Frame}{Frame} titles,
+mathematical expressions, {\em etc.} were truncated if they exceeded the
+capacity of a single FITS header card. They are now split over several
+header cards so that they can be restored without truncation. Note, this
+facility is only available when using NATIVE encoding.
+
+\item The \htmlref{WcsMap}{WcsMap} class has been changed to support the changes made to the
+FITS-WCS encoding in the FitsChan class:
+\begin{itemize}
+\item Projection parameters are now associated with a particular axis and
+are specified using a new set of attributes called \htmlref{PVj\_m}{PVj_m}. Here, ``j'' is 
+the index of an axis of WcsMap, and ``m'' is the index of the projection 
+parameter.
+\item The old attributes ProjP(0) to ProjP(9) are still available but are
+now depracated in favour of the new PVj\_m attributes. They are interpreted 
+as aliases for PV(axlat)\_0 to PV(axlat)\_9, where ``axlat'' is the index of 
+the latitude axis.
+\item The GLS projection projection has been renamed as SFL, but the 
+AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
+\end{itemize}
+
+\end{enumerate}
+
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
+
 
 \end{document}
