@@ -549,15 +549,19 @@
       CALL BDI_NEW( OCLASS, ONDIM, ODIMS, 'REAL', BID, STATUS )
       CALL USI_CREAT( 'OUT', BID, OFID, STATUS )
 
-*  Map data
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
+*  Find total number of output elements
+      CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
+
+*  Map and initialise data
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODPTR, STATUS )
 
 *  Map quality
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
-     :                QUAL__MASK, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Loop over AXIS structure writing the values.
       DO I = 1, ONDIM
@@ -605,17 +609,6 @@
 *  Copy the ancillaries
       CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*  Find total number of output elements
-      CALL ARR_SUMDIM( ONDIM, ODIMS, ONELM )
-
-*  Initialise output array
-      CALL ARR_INIT1R( 0.0, ONELM, %VAL(ODPTR), STATUS )
-
-*    ...and quality if needed
-      IF ( QUALITY ) THEN
-        CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
-      END IF
 
 *  Pad dimensions with ones to simulate 7D data
       CALL AR7_PAD( ONDIM, ODIMS, STATUS )
