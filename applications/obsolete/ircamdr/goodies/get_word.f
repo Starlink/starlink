@@ -52,7 +52,6 @@
       IMPLICIT NONE
 
 *    Global constants :
-      INCLUDE 'ADAMERRS'
       INCLUDE 'CHR_ERR'
       INCLUDE 'SAE_PAR'
 
@@ -81,7 +80,7 @@
 
 *-
 
-      IF ( STATUS .NE. ADAM__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
       LENGTH = CHR_LEN( LINE )
 
