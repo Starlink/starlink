@@ -5,14 +5,14 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun160.3}
-\newcommand{\stardocnumber}    {160.3}
+\newcommand{\stardocsource}    {sun160.4}
+\newcommand{\stardocnumber}    {160.4}
 \newcommand{\stardocauthors}   {P.W. Draper \\
                                 R.F. Warren-Smith}
-\newcommand{\stardocdate}      {16 December 1996}
+\newcommand{\stardocdate}      {09 June 1998}
 \newcommand{\stardoctitle}     {IMG \\ [1ex]
                                 Simple Image Data Access}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {Subroutine Library}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1906,6 +1906,9 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          \qs{\%} will match any single character.  Note that
          only those parameter names previously used to access images
          via IMG subroutines are considered as potential matches.
+
+         \sstitem Identifiers obtained using
+         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine. 
       }
    }
 }
@@ -1991,6 +1994,9 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          \qs{\%} will match any single character.  Note that
          only those parameter names previously used to access images
          via IMG subroutines are considered as potential matches.
+
+         \sstitem Identifiers obtained using
+         \htmlref{IMG\_INDF}{IMG\_INDF} are not released by this routine. 
       }
    }
 }
@@ -3545,7 +3551,7 @@ will compile the source and link the program.
 
 This version introduces and documents the C interface.
 
-\section{Changes this release (1.2)}
+\section{Changes in release (1.2)}
 
 In this release several bugs in the Linux version of IMG have been
 corrected. These affected the release of headers when using the
@@ -3553,6 +3559,13 @@ corrected. These affected the release of headers when using the
 \htmlref{HDR\_NUMB}{HDR\_NUMB}. A new routine has also been added --
 \htmlref{IMG\_NAME}{IMG\_NAME}. This returns the name of the 
 image data file for use when producing logfile information etc.
+
+\section{Changes this release (1.3)}
+The documentation has been updated to reinforce the fact that NDF
+identifiers obtained using \htmlref{IMG\_INDF}{IMG\_INDF} are not
+released by any IMG calls (you must do this for yourself using
+NDF\_ANNUL). A new routine for copying sources of header 
+information (\htmlref{HDR\_COPY}{HDR\_COPY}) has been added.
 
 \end{document}
 % $Id$

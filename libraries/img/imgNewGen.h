@@ -54,6 +54,9 @@
  *        generic include file. 
  *     10-JUN-1996 (PDRAPER):
  *        Converted to use more C-like names:
+ *     21-APR-1999 (PDRAPER):
+ *        Changed to export pointer array using CNF macros (64 bit
+ *        changes).
  *     {enter_changes_here}
 
  *-
@@ -73,18 +76,18 @@ IMGNEW( IMG_SHORT_C_TYPE ) ( char *param,
                              IMG_FULL_C_TYPE **ip,
                              int *status ) 
 {
-  DECLARE_CHARACTER_DYN(fparam);
+  DECLARE_CHARACTER_DYN( fparam );
+  DECLARE_POINTER_ARRAY_DYN( fip );
   int nparam;
-  int i;
-  F77_POINTER_TYPE *fip;
   
-  F77_CREATE_CHARACTER(fparam,strlen( param ));
-  cnf_exprt( param, fparam, fparam_length );
+  F77_CREATE_CHARACTER( fparam, strlen( param ) );
+  F77_EXPORT_CHARACTER( param, fparam, fparam_length );
   
   /*  Count the number of input parameters and create enough space for
       the corresponding Fortran pointers */
   nparam = img1CountParams( param, status );
-  fip = (F77_POINTER_TYPE *) malloc( nparam * sizeof(F77_POINTER_TYPE) );
+  F77_CREATE_POINTER_ARRAY( fip, nparam );
+  F77_ASSOC_POINTER_ARRAY( fip, ip );
   
   IMGNEW_CALL( IMG_F77_TYPE ) ( CHARACTER_ARG(fparam),
                                 INTEGER_ARG(&nx),
@@ -94,11 +97,10 @@ IMGNEW( IMG_SHORT_C_TYPE ) ( char *param,
                                 TRAIL_ARG(fparam) );
   
   /*  Now copy the addresses back to to C pointers */
-  for( i=0; i < nparam; i++ ) { 
-    ip[i] = (IMG_FULL_C_TYPE *) fip[i];
-  }
-  free( (void *)fip );
-  F77_FREE_CHARACTER(fparam);
+  F77_IMPORT_POINTER_ARRAY( fip, ip, nparam );
+
+  F77_FREE_POINTER( fip );
+  F77_FREE_CHARACTER( fparam );
 
   return;
 }

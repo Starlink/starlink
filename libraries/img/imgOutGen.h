@@ -33,7 +33,7 @@
  *        Parameter name for the input image (case insensitive).
  *     param2 = char * (Given)
  *        Parameter name for the output image (case insensitive).
- *     ip = ? * (Returned)
+ *     ip = ? ** (Returned)
  *        Pointer to the mapped output data.
  *     status = int * (Given and Returned)
  *        The global status.
@@ -52,6 +52,9 @@
  *        generic include file. 
  *     10-JUN-1996 (PDRAPER):
  *        Converted to use more C-like names.
+ *     21-APR-1999 (PDRAPER):
+ *        Changed to export pointer array using CNF macros (64 bit
+ *        changes).
  *     {enter_changes_here}
  *-
  */
@@ -72,21 +75,21 @@ IMGOUT( IMG_SHORT_C_TYPE ) ( char *param1,
                              IMG_FULL_C_TYPE **ip,
                              int *status ) {
   
-   DECLARE_CHARACTER_DYN(fparam1);
-   DECLARE_CHARACTER_DYN(fparam2);
+   DECLARE_CHARACTER_DYN( fparam1 );
+   DECLARE_CHARACTER_DYN( fparam2 );
+   DECLARE_POINTER_ARRAY_DYN( fip );
    int nparam;
-   int i;
-   F77_POINTER_TYPE *fip;
   
    /*  Count the number of output parameters and create enough space for
        the corresponding Fortran pointers */
    nparam = img1CountParams( param2, status );
-   fip = (F77_POINTER_TYPE *) malloc( nparam * sizeof(F77_POINTER_TYPE) );
+   F77_CREATE_POINTER_ARRAY( fip, nparam );
+   F77_ASSOC_POINTER_ARRAY( fip, ip );
 
-   F77_CREATE_CHARACTER(fparam1,strlen( param1 ));
-   cnf_exprt( param1, fparam1, fparam1_length );
-   F77_CREATE_CHARACTER(fparam2,strlen( param2 ));
-   cnf_exprt( param2, fparam2, fparam2_length );
+   F77_CREATE_CHARACTER( fparam1, strlen( param1 ) );
+   F77_EXPORT_CHARACTER( param1, fparam1, fparam1_length );
+   F77_CREATE_CHARACTER( fparam2, strlen( param2 ) );
+   F77_EXPORT_CHARACTER( param2, fparam2, fparam2_length );
 
    IMGOUT_CALL( IMG_F77_TYPE ) ( CHARACTER_ARG(fparam1),
                                  CHARACTER_ARG(fparam2),
@@ -96,10 +99,9 @@ IMGOUT( IMG_SHORT_C_TYPE ) ( char *param1,
                                  TRAIL_ARG(fparam2) );
 
    /*  Now copy the addresses back to to C pointers */
-   for( i=0; i < nparam; i++ ) { 
-      ip[i] = (IMG_FULL_C_TYPE *) fip[i];
-   }
-   free( (void *) fip );
+   F77_IMPORT_POINTER_ARRAY( fip, ip, nparam );
+
+   F77_FREE_POINTER( fip );
    F77_FREE_CHARACTER(fparam1);
    F77_FREE_CHARACTER(fparam2);
 

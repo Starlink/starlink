@@ -52,14 +52,10 @@ F77_SUBROUTINE(img_free)( CHARACTER(param),
 
 void imgFree( char *param,
               int *status ) {
-  
-  DECLARE_CHARACTER_DYN(fparam);
-  int i;
-  int nparam;
-  char pname[MAXFSTRING];
 
-  F77_CREATE_CHARACTER(fparam,strlen( param ));
-  cnf_exprt( param, fparam, fparam_length );
+  DECLARE_CHARACTER_DYN(fparam);
+  F77_CREATE_CHARACTER( fparam, strlen( param ) );
+  F77_EXPORT_CHARACTER( param, fparam, fparam_length );
   
   F77_CALL(img_free)( CHARACTER_ARG(fparam),
                       INTEGER_ARG(status)
