@@ -385,7 +385,8 @@
 *     -  The LABEL, UNITS, and HISTORY components, and all extensions are 
 *     propagated. TITLE is controlled by the TITLE parameter. DATA,
 *     VARIANCE and WCS are propagated after appropriate modification. The
-*     QUALITY and AXIS components are not propagated.
+*     QUALITY component is also propagated if Nearest Neighbour
+*     interpolation is being used. The AXIS components is not propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.
@@ -409,7 +410,8 @@
 *        against AST__BAD values being returned by AST_TRAN.
 *     15-Jan-2001 (DSB):
 *        Modified propagation of WCS to use KPG1_ASFIX. Re-named
-*        from RESAMPLE to REGRID.
+*        from RESAMPLE to REGRID. Propagate QUALITY if Nearest Neighbour
+*        interpolation is being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -461,6 +463,8 @@
       INTEGER INTERP             ! Resampling scheme identifier
       INTEGER IPDATI             ! Pointer to input Data array
       INTEGER IPDATO             ! Pointer to output Data array
+      INTEGER IPQUAI             ! Pointer to input Quality array
+      INTEGER IPQUAO             ! Pointer to output Quality array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
       INTEGER JFRM               ! Index of Frame for joining FrameSets
@@ -488,6 +492,7 @@
       INTEGER WCSO               ! WCS FrameSet of the output NDF
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL CURENT             ! Resample into current Frame?
+      LOGICAL HASQUA             ! Does the input NDF have Quality component?
       LOGICAL HASVAR             ! Does the input NDF have Variance component?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
 *.
@@ -512,7 +517,6 @@
 
 *  See if it has a Variance component.
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
-
 *  Obtain its WCS component.
       CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
@@ -973,6 +977,28 @@
       CALL NDF_SBAD( BAD, NDFO, 'DATA', STATUS )
       IF ( HASVAR ) THEN
          CALL NDF_SBAD( BAD, NDFO, 'VARIANCE', STATUS )
+      END IF
+
+*  If using Nearest Neighbour interpolation, resample any QUALITY array.
+*  =====================================================================
+      CALL NDF_STATE( NDFI, 'QUALITY', HASQUA, STATUS )
+      IF( INTERP .EQ. AST__NEAREST .AND. HASQUA ) THEN
+
+*  Map the QUALITY array of the input and output NDFs. Note, QUALITY
+*  arrays should always be mapped as _UBYTE.
+         CALL NDF_MAP( NDFI, 'DATA', '_UBYTE', 'READ', IPQUAI, ELI, 
+     :                 STATUS )
+         CALL NDF_MAP( NDFO, 'DATA', '_UBYTE', 'WRITE', IPQUAO, ELO,
+     :                 STATUS )
+
+*  Do the resampling.
+         NBAD = AST_RESAMPLEUB( MAPHIO, NDIMI, LBNDI, UBNDI,
+     :                          %VAL( IPQUAI ), %VAL( IPQUAI ), INTERP,
+     :                          AST_NULL, PARAMS, 0, TOL, MAXPIX,
+     :                          VAL__BADUB, NDIMO, LBNDO, UBNDO, LBNDO,
+     :                          UBNDO, %VAL( IPQUAO ), %VAL( IPQUAO ),
+     :                          STATUS )
+
       END IF
 
 *  Tidy up.
