@@ -126,7 +126,7 @@
       REAL			EQNX			! Equinox
       REAL			TOR			! Radian conversion
 
-      INTEGER			DIMS(2)			! Axis dimensions
+      INTEGER			DIMS(ADI__MXDIM)	! Axis dimensions
       INTEGER			FARG			! File argument
       INTEGER			IMJD			! Value of BASE_MJD
       INTEGER			IPSF			! Psf system handle
@@ -173,7 +173,7 @@
 *  Extract axis info
       IF ( HASPIX ) THEN
         CALL PSF_QAXES( IPSF, X_AX, Y_AX, E_AX, T_AX, STATUS )
-        CALL BDI_GETSHP( FARG, 2, DIMS, NDIM, STATUS )
+        CALL BDI_GETSHP( FARG, ADI__MXDIM, DIMS, NDIM, STATUS )
         IF ( (X_AX.LT.1) .AND. (Y_AX.LT.1) ) THEN
           X_AX = 1
           Y_AX = 2
@@ -193,15 +193,16 @@
             HASPIX = .FALSE.
           END IF
         ELSE
-          CALL PSF_QAXIS( IPSF, X_AX, DIMS(1), REG(1), PTR(1), BASE(1),
-     :                    SCALE(1), LABEL, UNITS(1), TOR, STATUS )
+          CALL PSF_QAXIS( IPSF, X_AX, DIMS(X_AX), REG(1), PTR(1),
+     :                    BASE(1), SCALE(1), LABEL(1), UNITS(1), TOR,
+     :                    STATUS )
           BASE(1) = BASE(1) / TOR
           SCALE(1) = SCALE(1) / TOR
 
 *  Something not quite right here - rb
           IF ( NDIM .GT. 1 ) THEN
-            CALL PSF_QAXIS( IPSF, Y_AX, DIMS(2), REG(2), PTR(2),
-     :                      BASE(2), SCALE(2), LABEL, UNITS(2), TOR,
+            CALL PSF_QAXIS( IPSF, Y_AX, DIMS(Y_AX), REG(2), PTR(2),
+     :                      BASE(2), SCALE(2), LABEL(2), UNITS(2), TOR,
      :                      STATUS )
             BASE(2) = BASE(2) / TOR
             SCALE(2) = SCALE(2) / TOR
