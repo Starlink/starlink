@@ -98,16 +98,19 @@
      elements within <dependencies>.
 
 -->
-<!ELEMENT dependencies  (sourceset | build | link | use | test)*>
+<!ELEMENT dependencies  (sourceset | build | link | use | test | configure)*>
 <!ELEMENT sourceset     (#PCDATA)>
 <!ELEMENT build         (#PCDATA)>
 <!ELEMENT link          (#PCDATA)>
 <!ELEMENT use           (#PCDATA)>
 <!ELEMENT test          (#PCDATA)>
+<!ELEMENT configure     (#PCDATA)>
 <!ATTLIST sourceset     option CDATA #IMPLIED>
 <!ATTLIST build         option CDATA #IMPLIED>
 <!ATTLIST link          option CDATA #IMPLIED>
 <!ATTLIST use           option CDATA #IMPLIED>
+<!ATTLIST test          option CDATA #IMPLIED>
+<!ATTLIST configure     option CDATA #IMPLIED>
 
 <!-- A list of developers with an interest in this component.  If the
      uname and email address are unknown, omit the corresponding element.  -->
