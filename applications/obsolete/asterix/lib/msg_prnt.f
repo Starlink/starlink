@@ -6,8 +6,10 @@
 *    Deficiencies :
 *    Authors :
 *     (BHVAD::RJV)
+*     (Birmingham: RB)
 *    History :
 *     24 Nov 88 : Original
+*      7 Apr 98 : Don't use MSG_OUT is its rubbish (RB)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -18,14 +20,17 @@
 *    Import-Export :
 *    Export :
 *    Status :
-*    Functions:
-      INTEGER CHR_LEN
 *    Local variables :
-      INTEGER L
+      CHARACTER*256 BUF
+      INTEGER BLEN
       INTEGER ISTAT
 *-
       ISTAT=SAI__OK
-      L=CHR_LEN(STR)
-      CALL MSG_OUT(' ',STR(1:L),ISTAT)
+
+*    Translate any tokens
+      CALL MSG_LOAD( ' ', STR, BUF, BLEN, ISTAT )
+
+*    Write to the full width screen
+      WRITE( 6, '(A)' ) BUF(:BLEN)
 
       END

@@ -5,7 +5,9 @@
 *    Deficiencies :
 *    Authors :
 *     (BHVAD::RJV)
+*     (Birmingham: RB)
 *    History :
+*      7 Apr 1998 : Don't use the useless MSG_OUT call
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -19,6 +21,6 @@
       INTEGER ISTAT
 *-
       ISTAT=SAI__OK
-      CALL MSG_OUT(' ',' ',ISTAT)
+      WRITE( 6, * )
 
       END
