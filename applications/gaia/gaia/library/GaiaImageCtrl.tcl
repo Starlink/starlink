@@ -839,7 +839,7 @@ itcl::class gaia::GaiaImageCtrl {
             load_fits_
          }
          if { $itk_option(-file_change_cmd) != "" } {
-            #eval $itk_option(-file_change_cmd) $itk_option(-file)
+            eval $itk_option(-file_change_cmd) [list $itk_option(-file)]
          }
       }
       set $itk_option(-temporary) 0
