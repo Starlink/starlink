@@ -473,8 +473,8 @@
 *    Functions :
 *
       INTEGER                 CHR_LEN
-      REAL                    PSF1_GETAXDR, PSF1_GETAXTOR
-      LOGICAL                 STR_ABBREV, PSF1_GETAXOK
+      REAL                    PSF0_GETAXDR, PSF0_GETAXTOR
+      LOGICAL                 STR_ABBREV, PSF0_GETAXOK
       EXTERNAL			PSF_ANAL
       EXTERNAL			PSF_ANAL_HINT, PSF_ANAL_PFL
 *
@@ -527,13 +527,13 @@
       CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
 
 *  Tell the user about the pixel size if we have a dataset.
-      X_OK = PSF1_GETAXOK( PSID, X_AX, STATUS )
-      Y_OK = PSF1_GETAXOK( PSID, Y_AX, STATUS )
-      X_DR = PSF1_GETAXDR( PSID, X_AX, STATUS )
-      Y_DR = PSF1_GETAXDR( PSID, Y_AX, STATUS )
-      X_TOR = PSF1_GETAXTOR( PSID, X_AX, STATUS )
-      Y_TOR = PSF1_GETAXTOR( PSID, Y_AX, STATUS )
-      CALL PSF1_GETAXTXT( PSID, X_AX, LABEL, UNITS, STATUS )
+      X_OK = PSF0_GETAXOK( PSID, X_AX, STATUS )
+      Y_OK = PSF0_GETAXOK( PSID, Y_AX, STATUS )
+      X_DR = PSF0_GETAXDR( PSID, X_AX, STATUS )
+      Y_DR = PSF0_GETAXDR( PSID, Y_AX, STATUS )
+      X_TOR = PSF0_GETAXTOR( PSID, X_AX, STATUS )
+      Y_TOR = PSF0_GETAXTOR( PSID, Y_AX, STATUS )
+      CALL PSF0_GETAXTXT( PSID, X_AX, LABEL, UNITS, STATUS )
 
 *  Are dataset axes ok?
       IF ( X_OK .AND. Y_OK .AND. .NOT.
@@ -1898,8 +1898,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Functions :
 *
-      REAL 			PSF1_GETAXDR
-      REAL 			PSF1_GETAXTOR
+      REAL 			PSF0_GETAXDR
+      REAL 			PSF0_GETAXTOR
       EXTERNAL			PSF_RESPFILE
       EXTERNAL			PSF_RESPFILE_CLOSE
       EXTERNAL			PSF_RESPFILE_HINT
@@ -2037,8 +2037,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           R_SCALE = SPARR(2)
 
 *      Get dataset axis attributes
-          D_SCALE = PSF1_GETAXDR( PSID, X_AX, STATUS )
-          TOR = PSF1_GETAXTOR( PSID, X_AX, STATUS )
+          D_SCALE = PSF0_GETAXDR( PSID, X_AX, STATUS )
+          TOR = PSF0_GETAXTOR( PSID, X_AX, STATUS )
 
 *        Compare bin sizes
           IF ( ABS((ABS(R_SCALE)-ABS(D_SCALE/TOR))/R_SCALE)
