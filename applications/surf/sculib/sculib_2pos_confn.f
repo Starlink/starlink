@@ -35,7 +35,7 @@
 *
 *     The function is normalised such that convolving this function with
 *     an original chop function of 2 delta functions of unit height will 
-*     give a delta function of height 2.
+*     give a delta function of height 1.
 *
 *    Don't understand what happens when UNBAL <> 1, but the code has left
 *    doing the same as NOD2.
@@ -80,6 +80,11 @@
 *      8-MAY-1991 (REVAD::JFL): Convolution function reversed.
 *     12-OCT-1995 (jfl@roe.ac.uk): Name changed to SCULIB_GENASCONFN
 *     31-OCT-1995 (jfl@roe.ac.uk): Name changed to SCULIB_2POS_CONFN
+*      6-JAN-1997 (jfl@roe.ac.uk): Change normalisation to give delta
+*                                  function of unit height when convolved
+*                                  with the chop function, add in more
+*                                  delta functions beyond the ends of
+*                                  the convolution function range.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -144,22 +149,23 @@
 *  In principle the convolution function has infinite length but the
 *  delta functions far away from the centre have such a small effect that
 *  they can be ignored. Therefore, take into account only those delta
-*  functions covered by the length of the convolution function plus 3
+*  functions covered by the length of the convolution function plus 5
 *  on either side.
 
-      NDELTA = (INT (ABS(REAL(NPIX)/PIXBSEP)) + 3) * 2
+      NDELTA = (INT (ABS(REAL(NPIX)/PIXBSEP)) + 5) * 2
 
       IF (AUNBAL .GT. 1.0) AUNBAL = 1.0 / AUNBAL
-      NORM = 2.0 / (1.0 + AUNBAL**(NDELTA/2+1))
+      NORM = 1.0 / (1.0 + AUNBAL**(NDELTA/2+1))
 
 *  cycle through pixels in convolution function
 
       DO I = 1, NCFN
-
-         SUM = 0
-         DX = I - NPIX                       ! position in pixels rel to centre
-         B1 = PIXBSEP/2 - (NDELTA/2)*PIXBSEP ! position of first delta rel to centre
-         ALPHA=1.0
+         SUM = 0.0
+         DX = REAL (I - NPIX)                ! position in pixels rel to centre
+         B1 = PIXBSEP/2 - REAL(NDELTA/2) * PIXBSEP
+                                             ! position of first delta rel to 
+                                             ! centre
+         ALPHA = 1.0
 
 *  for each delta function...
 
@@ -172,11 +178,9 @@
             IF (J .EQ. NPIX/2+1) ALPHA = 1.0
             SUM = SUM + SIGN(ALPHA,UNBAL) * SINC(DX-B1) * SIGN(1.0,B1)
             B1 = B1 + PIXBSEP
-
          END DO
 
          CONF(I) = SUM * NORM
-
       END DO
 
 *  for the case where UNBAL was greater than 1 the convolution array
