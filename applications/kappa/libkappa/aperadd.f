@@ -1,500 +1,609 @@
-*+  APERADD - Derives statistics of pixels within a specified circle of 
-*             a 2-d data array
+      SUBROUTINE APERADD( STATUS )
+*+
+*  Name:
+*     APERADD
 
-      SUBROUTINE APERADD ( STATUS )
-*
-*    Description :
-*
-*     This routine takes an input 2-dimensional data array in an IMAGE
-*     structure and bins up all the pixels that lie within specified
-*     circles to either increase the signal-to-noise over that region,
-*     or to simulate a circular-aperture measurement of the image.
-*
-*     WARNING: This simple task does not divide the light of pixels
-*     spanning the circle.  If the pixel's centre lies within the circle,
-*     its full value is included in the summation; if it lies outside
-*     the circle, the pixel value is excluded from the summation.
-*     Therefore this task is not suitable for accurate aperture
-*     photometry, especially where the aperture diameter is less than
-*     about ten times the pixel size.  Use PHOTOM where accuracy, rather
-*     than speed, is paramount.
+*  Purpose:
+*     Integrates pixel values within an aperture of an NDF.
 
-*     The following are displayed: the standard deviation of the
-*     intensity of the pixels within the aperture before binning, the
-*     integrated value over the aperture, and the calculated mean level
-*     and reduced noise after binning.
-*
-*     The magic-value method is used for processing bad data.
+*  Language:
+*     Starlink Fortran 77
 
-*    Invocation :
-*
+*  Invocation:
 *     CALL APERADD( STATUS )
+
+*  Arguments:   
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This routine displays statistics for pixels that lie within a 
+*     specified aperture of an NDF. The aperture can either be circular 
+*     (specified by parameters CENTRE and DIAM), or arbitrary (specified 
+*     by parameter ARDFILE). If the aperture is specified using parameters
+*     CENTRE and DIAM, then it must be either 1 or 2 dimensional.
 *
-*    Parameters :
+*     The following statistics are displayed:
 *
-*     LOGFILE = FILENAME( READ )
-*         Name of the text file to record the statistics. If null,
-*           there will be no logging.
-*     INPIC = IMAGE( READ )
-*         Input IMAGE structure containing data array to be processed
-*     XCEN = REAL( READ )
-*         x co-ordinate of the circle centre
-*     YCEN = REAL( READ )
-*         y co-ordinate of the circle centre
-*     DIAM = REAL( READ )
-*         Diameter of the circle in pixels
-*     AGAIN = LOGICAL( READ )
-*         If true then another aperture can be chosen
-*     NUMPIX = INTEGER( WRITE )
-*         The number of pixels within the aperture.
-*     TOTAL = REAL( WRITE )
-*         The total of the pixel values within the aperture.
-*     MEAN = REAL( WRITE )
-*         The mean of the pixel values within the aperture.
-*     SIGMA = REAL( WRITE )
-*         The standard deviation of the pixel values within the
-*         aperture.
-*     NOISE = REAL( WRITE )
-*         The standard deviation of the pixel values within the
-*         aperture after binning.
+*     - The total number of pixels within the aperture
+*     - The number of good pixels within the aperture
+*     - The total data sum within the aperture
+*     - The standard deviation on the total data sum (that is, the 
+*       square root of the sum of the individual pixel variances)
+*     - The mean pixel value within the aperture
+*     - The standard deviation on the mean pixel value (that is, the
+*       standard deviation on the total data sum divided by the number of
+*       values)
+*     - The standard deviation of the pixel values within the aperture
 *
-*    Arguments:
+*     If individual pixel variances are not available within the input NDF
+*     (i.e. if it has no VARIANCE component), then each pixel is assumed to 
+*     have a constant variance equal to the variance of the pixel values 
+*     within the aperture. There is an option to weight pixels so that
+*     pixels with larger variances are given less weight (see parameter 
+*     WEIGHT). The statistics are displayed on the screen and written to 
+*     output parameters. They may also be written to a log file.
 *
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
+*     A pixel is included if its centre is within the aperture, and is not 
+*     included otherwise. This simple approach may not be suitable for 
+*     accurate aperture photometry, especially where the aperture diameter 
+*     is less than about ten times the pixel size. A specialist photometry 
+*     package should be used if accuracy, rather than speed, is paramount.
+
+*  Usage:
+*     aperadd ndf centre diam
+
+*  ADAM Parameters:
+*     ARDFILE = FILENAME (Read)
+*        The name of an ARD file containing a description of the aperture.
+*        This allows apertures of almost any shape to be used. If a null 
+*        (!) value is supplied then the aperture is assumed to be circular 
+*        with centre and diameter given by parameters CENTRE and DIAM. ARD 
+*        files can be created euther "by hand" using an editor, or using a
+*        specialist application should as KAPPA:ARDGEN. 
 *
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Open the logfile if required
-*     Get input IMAGE structure from environment
-*     If no error so far then
-*        Map in DATA_ARRAY
-*        If no error so far then
-*           Output array dimensions to user
-*           Record the image name in the log file
-*           For all centres required
-*              Get circle centre x, y co-ordinates somewhere on array
-*              Compute maximum diameter of circle in pixels
-*              Get circle diameter in pixels
-*              Record the input parameters  in the log file
-*              If no error so far then
-*                 Call subroutine APADSB to do work
-*                 If no error occurred within subroutine then
-*                    Write out results on return
-*                    Record the results in the logfile if required
-*                    See whether or not the loop is to continue
-*                 Endif
-*              Else
-*                 Report error and abort loop
-*              Endif
-*              Cancel parameters for next try
-*           Endfor
-*           Record the statistics in output parameters
-*           Unmap input data array
-*        Else
-*           Report error
-*        Endif
-*        Annul input IMAGE structure
-*     Else
-*        Report error
-*     Endif
-*     End
-*
-*    Deficiencies :
-*
-*     The circle centre must lie somewhere on the array, which is
-*     by far the most likely option, but it not totally general.
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Mark McCaughrean UoE ( REVA::MJM )
-*     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
-*     22-10-1985 : First implementation (REVA::MJM)
-*     17-01-1986 : More error checking and tidying (REVA::MJM) 
-*     1986 Aug 3 : Renamed algorithm subroutine (APADSB) (RL.STAR::CUR)
-*     1986 Aug 27: Argument section added and nearly conformed to
-*                  Starlink standards (RL.STAR::CUR)
-*     1987 Oct 13: Extra status check for mapping image (RL.STAR::CUR)
-*     1988 Feb 14: Removed SCALE parameter and references to intensity
-*                  and referred to `array' rather than `image'
-*                  (RL.STAR::CUR)
-*     1988 Apr 30: Correct labelling of output and a loop introduced
-*                  to measure in more than one aperture (RL.STAR::CUR).
-*     1988 May 29: More reporting of error context (RL.STAR::CUR)
-*     1989 Jul 27: Passed array dimensions as separate variables
-*                  to APADSB (RL.STAR::CUR).
-*     1990 Mar 10: Logfile option added (RAL::CUR).
-*     1990 Sep 18: Added results parameters (RAL::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*     1995 Sep 19: Clarified the limitations of APERADD.  Made it use
-*                  the floating-point centre co-ordinates rather than
-*                  pixel indices. (MJC)
-*
-*    Type definitions :
+*        The co-ordinate system in which positions within the ARD file are
+*	 given should be indicated by including suitable COFRAME or WCS
+*	 statements within the file (see SUN/183), but will default to
+*	 pixel co-ordinates in the absence of any such statements. For
+*	 instance, starting the file with a line containing the text
+*	 "COFRAME(SKY,System=FK5)" would indicate that positions are
+*	 specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
+*	 indicates explicitly that positions are specified in pixel
+*	 co-ordinates. [!]
+*     CENTRE = LITERAL (Read)
+*        The co-ordinates of the centre of the circular aperture. Only
+*        used if parameter ARDFILE is set to null. The position must be 
+*        given in the current co-ordinate Frame of the NDF (supplying 
+*        a colon ":" will display details of the current co-ordinate
+*        Frame). The position should be supplied as a list of formatted 
+*        axis values separated by spaces or commas. See also parameter 
+*        USEAXIS. The current co-ordinate Frame can be changed using
+*        KAPPA:WCSFRAME.
+*     DIAM = LITERAL (Read)
+*        The diameter of the circular aperture. Only used if parameter 
+*        ARDFILE is set to null. If the current co-ordinate Frame of the 
+*        NDF is a SKY Frame (e.g. RA and DEC), then the value should be
+*        supplied as an increment of celestial latitude (e.g. DEC). Thus,
+*        "10.2" means 10.2 arc-seconds, "30:0" would mean 30 arc-minutes,
+*        and "1:0:0" would mean 1 degree. If the current co-ordinate
+*        Frame is not a SKY Frame, then the diameter should be specified 
+*        as an increment along axis 1 of the current co-ordinate Frame.
+*        Thus, if the current Frame is PIXEL, the value should be given
+*        simply as a number of pixels.
+*     LOGFILE  =  FILENAME (Read)
+*        Name of the text file to log the results.  If null, there
+*        will be no logging.  Note this is intended for the human reader
+*        and is not intended for passing to other applications. [!]
+*     MEAN = _DOUBLE (Write)
+*        The mean of the pixel values within the aperture.
+*     NDF = NDF (Read)
+*        The input NDF.
+*     NGOOD = _INTEGER (Write)
+*        The number of good pixels within the aperture.
+*     NUMPIX = _INTEGER (Write)
+*        The total number of pixels within the aperture.
+*     QUIET = LOGICAL (Read)
+*        If TRUE then the statistics are not displayed on the screen. 
+*        Output parameters and log files are still created. [FALSE]
+*     SIGMA = _DOUBLE (Write)
+*        The standard deviation of the pixel values within the
+*        aperture.
+*     SIGMEAN = _DOUBLE (Write)
+*        The standard deviation on the mean pixel value. If variances are
+*        available this is the RMS value of the standard deviations
+*        associated with each included pixel value. If variances are not
+*        available, it is the standard deviation of the pixel values
+*        divided by the square root of the number of good pixels in 
+*        the aperture.
+*     SIGTOTAL = _DOUBLE (Write)
+*        The standard deviation on the total data sum. Only created if If variances are
+*        available this is the RMS value of the standard deviations
+*        associated with each included pixel value. If variances are not
+*        available, it is the standard deviation of the pixel values
+*        divided by the square root of the number of good pixels in 
+*        the aperture.
+*     TOTAL = _DOUBLE (Write)
+*        The total of the pixel values within the aperture.
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has too many axes. A group of strings should be supplied 
+*        specifying the axes which are to be used when specifying the 
+*        aperture using parameters ARDFILE, CENTRE and DIAM. Each axis can 
+*        be specified either by its integer index within the current Frame 
+*        (in the range 1 to the number of axes in the current Frame), or by 
+*        its symbol string. A list of acceptable values is displayed if an 
+*        illegal value is supplied. If a null (!) value is supplied, the 
+*        axes with the same indices as the 2 used pixel axes within the 
+*        NDF are used. [!]
+*     WEIGHT = _LOGICAL (Read)
+*        If a TRUE value is supplied, and the input NDF has a VARIANCE
+*        component, then pixels with larger variances will be given
+*        smaller weight in the statistics. The weight associated with
+*        each pixel is proportional to the reciprocal of its variance.
+*        The constant of proportionality is chosen so that the mean weight
+*        is unity. The pixel value and pixel variance are multiplied by
+*        the pixels weight before being used to calculate the statistics.
+*        The calculation of the statistics remains unchanged in all other 
+*        respects. [FALSE]
 
-      IMPLICIT  NONE           ! no implicit typing allowed
+*  Examples:
+*     aperadd neb1 "13.5,201.3" 20
+*        This calculates the statistics of the pixels within a circular
+*        aperture of NDF neb1. Assuming the current co-ordinate Frame of
+*        neb1 is PIXEL, the aperture is centred at pixel co-ordinates
+*        (13.5, 201.3) and has a diameter of 20 pixels. 
+*     aperadd neb1 "15:23:43.2 -22:23:34.2" "10:0"
+*        This also calculates the statistics of the pixels within a circular
+*        aperture of NDF neb1. Assuming the current co-ordinate Frame of
+*        neb1 is a SKY Frame describing RA and DEC, the aperture is centred 
+*        at RA 15:23:43.2 and DEC -22:23:34.2, and has a diameter of 10
+*        arc-minutes.
+*     aperadd ndf=neb1 ardfile=outline.dat quiet logfile=obj1
+*        This calculates the statistics of the pixels within an aperture 
+*        of NDF neb1 described within the file "outline.dat". The file
+*        contains an ARD description of the required aperture. The results
+*        are written to the log file "obj1", but are not displayed on the
+*        screen.
 
-*    Global constants :
+*  ASCII-region-definition Descriptors:
+*     The ARD file may be created by ARDGEN or written manually.  In the
+*     latter case consult SUN/183 for full details of the ARD
+*     descriptors and syntax; however, much may be learnt from looking
+*     at the ARD files created by ARDGEN and the ARDGEN documentation.
+*     There is also a summary with examples in the main body of SUN/95.
 
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! PARameter-system errors
-      INCLUDE 'PRM_PAR'        ! Magic-value bad pixels
+*  Implementation Status:
+*     -  This routine correctly processes the WCS, AXIS, DATA, and VARIANCE 
+*     components of an NDF data structure.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  Bad pixels and automatic quality masking are supported.
+*     -  All non-complex numeric data types can be handled.
 
-*    Status :
+*  Related Applications:
+*     KAPPA: STATS, MSTATS, ARDGEN, ARDMASK, ARDPLOT, WCSFRAME.
 
-      INTEGER  STATUS
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-*    External references :
+*  History:
+*     26-NOV-2001 (DSB):
+*        Original NDF version.
+*     {enter_further_changes_here}
 
-      INTEGER CHR_LEN          ! Length of string ignoring trailing
-                               ! blanks
-
-*    Local Constants :
-
-      INTEGER  NDIMS           ! Dimensionality of input data
-      PARAMETER( NDIMS = 2 )   ! 2d arrays only
-
-*    Local variables :
-
-      LOGICAL                  ! True if:
-     :  AGAIN                  ! Another aperture is to selected
-
-      INTEGER
-     :  DIMS( NDIMS ),         ! Input array dimensions
-     :  FDL,                   ! File description of logfile
-     :  NC,                    ! Character column counter
-     :  NCI,                   ! Character column counter of image name
-     :  NUMPIX,                ! Number of pixels added in circle
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI                  ! Pointer to input array
-
-      REAL
-     :  MAXDIA,                ! Maximum diameter of the circle
-     :  PIXDIA,                ! Circle diameter in pixels
-     :  TOTAL,                 ! Total intensity in added circle
-     :  MEAN,                  ! Mean      "      "   "      "
-     :  OLNOIS,                ! Standard deviation of pixels before add
-     :  NWNOIS,                !     "         "     "    "   after   "
-     :  XCEN,                  ! x co-ord of circle centre
-     :  YCEN                   ! y   "    "    "      "
-
-      CHARACTER
-     :  DATNAM*100,            ! Name of input IMAGE
-     :  BUFFER*132             ! Buffer for writing to the logfile
-
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI                 ! Name of the input data-array component
-
-      CHARACTER*( DAT__SZLOC )
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCI                   ! Locator to input IMAGE structure
-
-      LOGICAL                  ! True if :
-     :  LOGFIL                 ! A log file is being written
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
-*    check status on entry - return if not o.k.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
-*    Attempt to obtain and open a log file to list the statistics.  A
-*    null value, meaning no logfile is required, is handled invisibly.
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'PAR_ERR'          ! PAR error constants 
+               
+*  Status:     
+      INTEGER STATUS             ! Global status
 
-      CALL ERR_MARK
-      LOGFIL = .FALSE.
-      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 132, FDL, STATUS )
+*  Local Variables:      
+      CHARACTER APTXT*80         ! Description of aperture
+      CHARACTER DOM*30           ! Current Frame Domain
+      CHARACTER TEXT*(GRP__SZNAM)! General text bufferName of ARD file
+      CHARACTER TYPE*(NDF__SZTYP)! Numeric type for processing
+      DOUBLE PRECISION BC( 2 )   ! CENTRE base Frame axis value
+      DOUBLE PRECISION CC( 2 )   ! CENTRE current Frame axis value
+      DOUBLE PRECISION DIAM      ! The diameter of circular aperture
+      DOUBLE PRECISION MEAN      ! Mean pixel value
+      DOUBLE PRECISION SGMEAN    ! Std devn on mean pixel value
+      DOUBLE PRECISION SGTOT     ! Std devn on total pixel value
+      DOUBLE PRECISION SIGMA     ! Std devn of pixel values
+      DOUBLE PRECISION TOT       ! Total pixel value
+      INTEGER CURFRM             ! AST pointer to current WCS Frame
+      INTEGER DAX                ! Index of axis for measuring diameter
+      INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
+      INTEGER EL                 ! Total number of pixels in the image
+      INTEGER FDL                ! File descriptor
+      INTEGER IAT                ! Used length of a string
+      INTEGER IGRP               ! Group identifier
+      INTEGER INDF1              ! Identifier for the input NDF  
+      INTEGER INDF2              ! Identifier for NDF section containing aperture
+      INTEGER IPDAT              ! Pointer to the data component of input NDF
+      INTEGER IPIX               ! Index of PIXEL Frame within IWCS
+      INTEGER IPMASK             ! Pointer to the full sized ARD logical mask
+      INTEGER IPMSK2             ! Pointer to the minimal ARD logical mask
+      INTEGER IPVAR              ! Pointer to the variance component of input NDF
+      INTEGER IWCS               ! NDF WCS FrameSet
+      INTEGER LBNDE( NDF__MXDIM )! Lower bounds of a box encompassing all external array elements
+      INTEGER LBNDI( NDF__MXDIM )! Lower bounds of a box encompassing all internal array elements
+      INTEGER NDIM               ! Number of dimensions in the image
+      INTEGER NGOOD              ! Number of good pixels
+      INTEGER NUMPIX             ! Total number of pixels
+      INTEGER NVAL               ! Number of supplied values
+      INTEGER REGVAL             ! Value assignied to the first ARD region
+      INTEGER SDIM( NDF__MXDIM ) ! Indices of significant axes
+      INTEGER SLBND( NDF__MXDIM )! Lower limit for input NDF
+      INTEGER SUBND( NDF__MXDIM )! Upper limit for input NDF
+      INTEGER UBNDE( NDF__MXDIM )! Upper bounds of a box encompassing all external array elements
+      INTEGER UBNDI( NDF__MXDIM )! Upper bounds of a box encompassing all internal array elements
+      LOGICAL ARD                ! Aperture specified by an ARD file?
+      LOGICAL CONT               ! ARD description to continue?
+      LOGICAL LOG                ! Log results?
+      LOGICAL QUIET              ! Supress screen output?
+      LOGICAL VAR                ! Are variances availab le?
+      LOGICAL WEIGHT             ! Weight pixels?
+      REAL TRCOEF( ( NDF__MXDIM + 1 ) * NDF__MXDIM ) ! Data to world co-ordinate conversions
+*.
 
-      IF ( STATUS .EQ. PAR__NULL ) THEN
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
+*  Obtain an identifier for the NDF structure to be examined.       
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF1, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  See if a circular aperture is to be used (in which case the NDF must
+*  be 2-d). Do this by seeing if the user has supplied an ARD file (in
+*  which case store a suitable ARD expression in TEXT which will cause
+*  the file to be read). If not, anull the error. 
+      CALL FIO_ASSOC( 'ARDFILE', 'READ', 'LIST', 0, FDL, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL NDF_DIM( INDF1, NDF__MXDIM, DIM, NDIM, STATUS )
+         ARD = .TRUE.
+         TEXT( 1:1 ) = '^'
+         CALL FIO_FNAME( FDL, TEXT( 2: ), STATUS ) 
+         CALL FIO_ANNUL( FDL, STATUS )
+         APTXT = TEXT( 2: )
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-         LOGFIL = .TRUE.
+         NDIM = 2
+         ARD = .FALSE.
       END IF
-      CALL ERR_RLSE
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-      IF ( LOGFIL ) CALL MSG_OUT( 'LOG', 'Logging to $LOGFILE.',
-     :                             STATUS )
-
-*    start by obtaining the input IMAGE structure locator
-
-      CALL KPG1_GETIM( 'INPIC', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
-
-*    proceed if no error
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*       map its DATA_ARRAY component onto a pointer
-
-         CALL CMP_MAPN( LOCDI, DNAMEI, '_REAL', 'READ', NDIMS,
-     :                  PNTRI, DIMS, STATUS )
-
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*          write out the array dimensions to the user
-
-            CALL MSG_SETI( 'XDIM', DIMS( 1 ) )
-            CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
-            CALL MSG_OUT( 'INPUT_DIMS',
-     :           'Array is ^XDIM by ^YDIM pixels', STATUS )
-
-            IF ( LOGFIL ) THEN
-
-*             Get the names of the data array to store in the log file.
-
-               NC = 0
-               BUFFER = ' '
-               CALL AIF_FLNAM( 'INPIC', DATNAM, STATUS )
-               NCI = CHR_LEN( DATNAM )
-               CALL CHR_PUTC( 'Input IMAGE is ', BUFFER, NC )
-               CALL CHR_PUTC( DATNAM( :NCI ), BUFFER, NC )
-               CALL CHR_PUTC( '.', BUFFER, NC )
-               CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-            END IF
-
-            AGAIN = .TRUE.
-            DO WHILE ( AGAIN .AND. STATUS .EQ. SAI__OK )
-
-*             get the circle centre co-ordinates - the circle centre
-*             cannot be off edge of the array and the maximum diameter
-*             of the circle
-
-               CALL PAR_GDR0R( 'XCEN', REAL( DIMS( 1 )/2.0 ), 0.0,
-     :                         REAL( DIMS( 1 ) ), .FALSE., XCEN,
-     :                         STATUS )
-               CALL PAR_GDR0R( 'YCEN', REAL( DIMS( 2 )/2.0 ), 0.0,
-     :                         REAL( DIMS( 2 ) ), .FALSE., YCEN,
-     :                         STATUS )
-
-               IF ( STATUS .EQ. SAI__OK )
-     :            MAXDIA = SQRT( REAL( DIMS( 1 ) * DIMS( 1 ) ) +
-     :                           REAL( DIMS( 2 ) * DIMS( 2 ) ) )
-
-*             get the diameter of the circle in arbitrary units
-
-               CALL PAR_GDR0R( 'DIAM', 10.0, 1.00001, MAXDIA, .FALSE.,
-     :                         PIXDIA, STATUS )
-
-*             check for error before calling working subroutine
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-
-                  IF ( LOGFIL ) THEN
-
-                     CALL FIO_WRITE( FDL, ' ', STATUS )
-
-*                   Build up the output for the logfile.
-
-                     NC = 0
-                     CALL CHR_PUTC( 'The centre of the circle is at '/
-     :                              /'( ', BUFFER, NC )
-                     CALL CHR_PUTR( XCEN, BUFFER, NC )
-                     CALL CHR_PUTC( ', ', BUFFER, NC )
-                     CALL CHR_PUTR( YCEN, BUFFER, NC )
-                     CALL CHR_PUTC( ' ), and its diameter is ', BUFFER,
-     :                              NC )
-                     CALL CHR_PUTR( PIXDIA, BUFFER, NC )
-                     CALL CHR_PUTC( ' pixels.', BUFFER, NC )
-                     CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                  END IF
-
-*                given valid x,y centre and circle diameter, call the
-*                subroutine that does the actual work
-
-                  CALL APADSB( %VAL( PNTRI ), DIMS( 1 ), DIMS( 2 ),
-     :                         XCEN, YCEN, PIXDIA, NUMPIX, OLNOIS,
-     :                         TOTAL, MEAN, NWNOIS, STATUS )
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   on return, output the relevant figures by building
-*                   output strings
-
-                     CALL MSG_OUT( 'BLANK', ' ', STATUS )
-
-*                   Number of pixels...
-
-                     NC = 0
-                     CALL CHR_PUTC( 'Number of pixels binned together '/
-     :                              /'    = ', BUFFER, NC )
-                     CALL CHR_PUTI( NUMPIX, BUFFER, NC )
-                     IF ( LOGFIL )
-     :                 CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                     CALL MSG_OUT( 'APER_NUMPIX', BUFFER( :NC ),
-     :                             STATUS )
-
-*                   Total...
-
-                     NC = 0
-                     CALL CHR_PUTC( 'Total value in binned pixels     '/
-     :                              /'    = ', BUFFER, NC )
-
-*                   Assign value to token depending on whether or not
-*                   value is valid
-
-                     IF ( TOTAL .NE. VAL__BADR ) THEN
-                        CALL CHR_PUTR( TOTAL, BUFFER, NC )
-                     ELSE
-                        CALL CHR_PUTC( 'INVALID', BUFFER, NC )
-                     END IF
-                     IF ( LOGFIL )
-     :                  CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                     CALL MSG_OUT( 'APER_TOTAL', BUFFER( :NC ),
-     :                             STATUS )
-
-*                   Mean...
-
-                     NC = 0
-                     CALL CHR_PUTC( 'Mean value over circle           '/
-     :                              /'    = ', BUFFER, NC )
-
-*                   Assign value to token depending on whether or not
-*                   value is valid
-
-                     IF ( MEAN .NE. VAL__BADR ) THEN
-                        CALL CHR_PUTR( MEAN, BUFFER, NC )
-                     ELSE
-                        CALL CHR_PUTC( 'INVALID', BUFFER, NC )
-                     END IF
-                     IF ( LOGFIL )
-     :                  CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                     CALL MSG_OUT( 'APER_MEAN', BUFFER( :NC ),
-     :                             STATUS )
-
-*                   Noise before binning...
-
-                     NC = 0
-                     CALL CHR_PUTC( 'Noise for pixels before binning  '/
-     :                              /'    = ', BUFFER, NC )
-
-*                   Assign value to token depending on whether or not
-*                   value is valid
-
-                     IF ( OLNOIS .NE. VAL__BADR ) THEN
-                        CALL CHR_PUTR( OLNOIS, BUFFER, NC )
-                     ELSE
-                        CALL CHR_PUTC( 'INVALID', BUFFER, NC )
-                     END IF
-                     IF ( LOGFIL )
-     :                  CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                     CALL MSG_OUT( 'APER_OLDNOISE', BUFFER( :NC ),
-     :                             STATUS )
-
-*                   Noise after binning...
-
-                     NC = 0
-                     CALL CHR_PUTC( 'Error in the mean value          '/
-     :                              /'    = ', BUFFER, NC )
-
-*                   Assign value to token depending on whether or not
-*                   value is valid
-
-                     IF ( NWNOIS .NE. VAL__BADR ) THEN
-                        CALL CHR_PUTR( NWNOIS, BUFFER, NC )
-                     ELSE
-                        CALL CHR_PUTC( 'INVALID', BUFFER, NC )
-                     END IF
-                     IF ( LOGFIL )
-     :                  CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
-                     CALL MSG_OUT( 'APER_NEWNOISE', BUFFER( :NC ),
-     :                             STATUS )
-                  END IF
-
-*                See whether or not another aperture is required
-
-                  CALL PAR_GET0L( 'AGAIN', AGAIN, STATUS )
-                  CALL PAR_CANCL( 'AGAIN', STATUS )
-               ELSE
-
-                  IF ( STATUS .NE. PAR__ABORT ) THEN
-
-*                   just announce the error
-
-                     CALL ERR_REP( 'ERR_APERADD_PAR',
-     :                 'APERADD : Error obtaining input parameters - '/
-     :                 /'try again', STATUS )
-                     CALL ERR_FLUSH( STATUS )
-                  ELSE
-
-*                   abort loop
-
-                     AGAIN = .FALSE.
-                  END IF
-
-*             end of if-no-error-before-calling-subroutine check
-
-               END IF
-
-*             Store the results of the calculations in the parameter
-*             system for use by other applications.
-
-               CALL PAR_PUT0I( 'NUMPIX', NUMPIX, STATUS )
-               CALL PAR_PUT0R( 'TOTAL', TOTAL, STATUS )
-               CALL PAR_PUT0R( 'MEAN', MEAN, STATUS )
-               CALL PAR_PUT0R( 'SIGMA', OLNOIS, STATUS )
-               CALL PAR_PUT0R( 'NOISE', NWNOIS, STATUS )
-
-*             Cancel the association with input parameters for a further
-*             loop, otherwise retain them so they can be stored in the
-*             parameter file.
-
-               IF ( AGAIN ) THEN
-                  CALL PAR_CANCL( 'XCEN', STATUS )
-                  CALL PAR_CANCL( 'YCEN', STATUS )
-                  CALL PAR_CANCL( 'DIAM', STATUS )
-               END IF
-
-*          end of another-aperture loop
-
-            END DO
-
-*          unmap input data array
-
-            CALL CMP_UNMAP( LOCDI, DNAMEI, STATUS )
-
+*  See if pixels are to be weighted.
+      CALL PAR_GET0L( 'WEIGHT', WEIGHT, STATUS )
+
+*  Get the WCS FrameSet and the bounds of the significant axes.
+      CALL KPG1_ASGET( INDF1, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
+     :                 SLBND, SUBND, IWCS, STATUS )
+
+*  Get a pointer to the current Frame.
+      CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+
+*  If an ARD file was supplied... 
+      IF( ARD ) THEN
+
+*  Create a GRP group holding the ARD description.
+         IGRP = GRP__NOID
+         CALL ARD_GRPEX( TEXT, GRP__NOID, IGRP, CONT, STATUS )
+
+*  Indicate that the ARD file can contain coords in any of the Frames
+*  contained in the NDFs WCS FrameSet. First set the current Frame of 
+*  the FrameSet to PIXEL to indicate that PIXEL is the default coord 
+*  system for positions in the ARD file.
+         CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS )
+         CALL AST_SETI( IWCS, 'CURRENT', IPIX, STATUS )
+         CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
+
+*  If no ARD file was supplied, get the centre and diameter of the circular 
+*  aperture, and construct a group holding an equivalent ARD description.
+      ELSE 
+
+*  Get the CENTRE parameter value.
+         CC( 1 ) = AST__BAD
+         CALL KPG1_GTPOS( 'CENTRE', IWCS, .FALSE., CC, BC, STATUS )
+
+*  Choose the axis to use, and then get the DIAM parameter value.
+         IF( AST_ISASKYFRAME( CURFRM, STATUS ) ) THEN
+            DAX = AST_GETI( CURFRM, 'LATAXIS', STATUS )
          ELSE
-
-            CALL ERR_REP( 'ERR_APERADD_NOMPI',
-     :        'APERADD : Error occurred whilst trying to map input '/
-     :        /'frame', STATUS )
-
-*       end of if-no-error-mapping-input-data check
-
+            DAX = 1
          END IF
+         DIAM= AST__BAD
+         CALL KPG1_GTAXV( 'DIAM', 1, .TRUE., CURFRM, DAX, DIAM, NVAL, 
+     :                    STATUS )
 
-*       now tidy up input data
+*  Create the ARD description.
+         TEXT = 'CIRCLE('
+         IAT = 8
+         CALL CHR_APPND( AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS ), TEXT,
+     :                   IAT )
+         CALL CHR_APPND( ',', TEXT, IAT )
+         IAT = IAT + 1
+         CALL CHR_APPND( AST_FORMAT( CURFRM, 2, CC( 2 ), STATUS ), TEXT,
+     :                   IAT )
+         CALL CHR_APPND( ',', TEXT, IAT )
+         IAT = IAT + 1
+         CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, DIAM, STATUS ), TEXT,
+     :                   IAT )
+         CALL CHR_APPND( ' )', TEXT, IAT )
 
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL( LOCI, STATUS )
+*  Put this text into a GRP group.
+         CALL GRP_NEW( ' ', IGRP, STATUS )
+         CALL GRP_PUT( IGRP, 1, TEXT( : IAT ), 0, STATUS ) 
+         APTXT = TEXT( : IAT )
+          
+*  Store the WCS FrameSet. Since no COFRAME or WCS statements were included 
+*  in the ARD description above, positions will be interpreted as being in 
+*  the current Frame of the WCS FrameSet.
+         CALL ARD_WCS( IWCS, 'PIXEL', STATUS )
+          
+      END IF
+
+*  Allocate the memory needed for the logical mask array.
+      CALL NDF_SIZE( INDF1, EL, STATUS ) 
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMASK, STATUS )
+      
+*  Create the mask.  Value 2 should be used to represent pixels
+*  specified by the first keyword in the ARD description. TRCOEF is
+*  ignored because we have previously called ARD_WCS.
+      REGVAL = 2
+      CALL ARD_WORK( IGRP, NDIM, SLBND, SUBND, TRCOEF, .FALSE., REGVAL,
+     :               %VAL( IPMASK ), LBNDI, UBNDI, LBNDE, UBNDE,
+     :               STATUS )
+       
+*  Create a section from the input NDF which just encloses the aperture.
+      CALL NDF_SECT( INDF1, NDIM, LBNDI, UBNDI, INDF2, STATUS ) 
+
+*  Obtain the numeric type of the array, and map it.
+      CALL NDF_TYPE( INDF2, 'DATA', TYPE, STATUS )
+      CALL NDF_MAP( INDF2, 'DATA', TYPE, 'READ', IPDAT, EL, STATUS )
+
+*  If variances are available, map them.
+      CALL NDF_STATE( INDF2, 'VARIANCE', VAR, STATUS )
+      IF( VAR ) CALL NDF_MAP( INDF2, 'VARIANCE', TYPE, 'READ', IPVAR, 
+     :                        EL, STATUS )
+
+*  Copy the section of the mask array which just encloses the aperture
+*  into a new mask array.
+      CALL PSX_CALLOC( EL, '_INTEGER', IPMSK2, STATUS )
+      CALL KPG1_CPNDI( NDIM, SLBND, SUBND, %VAL( IPMASK ), LBNDI, UBNDI, 
+     :                 %VAL( IPMSK2 ), EL, STATUS )   
+
+*  Calculate the required statistics. Call the appropriate routine for the 
+*  data type.
+      IF( TYPE .EQ. '_REAL' ) THEN
+         CALL KPS1_APADR( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_BYTE' ) THEN
+         CALL KPS1_APADB( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPS1_APADD( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+         CALL KPS1_APADI( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+         CALL KPS1_APADUB( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+         CALL KPS1_APADUW( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      ELSE IF( TYPE .EQ. '_WORD' ) THEN
+         CALL KPS1_APADW( WEIGHT, EL, %VAL( IPMSK2 ), %VAL( IPDAT ), 
+     :                    VAR, %VAL( IPVAR ), NGOOD, MEAN, SGMEAN, TOT, 
+     :                    SGTOT, NUMPIX, SIGMA, STATUS )
+
+      END IF
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to open a log file to store the results.
+      LOG = .FALSE.
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', 80, FDL, STATUS )
+
+*  Annul the error if a null value was given, and indicate that a log
+*  file is not to be created.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         LOG = .TRUE.
+      END IF
+
+*  See if we are to run quietly.
+      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+
+*  Display a blank line.
+      CALL KPG1_REPRT( ' ', QUIET, LOG, FDL, STATUS )
+
+*  Describe the aperture.
+      IF( ARD ) THEN
+         TEXT = '  ARD file: '
+         IAT = 12
+         CALL CHR_APPND( APTXT, TEXT, IAT )
+         CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
 
       ELSE
+         TEXT = '  Aperture: '
+         IAT = 12
+         CALL CHR_APPND( APTXT, TEXT, IAT )
+         CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
 
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_APERADD_NOFRI',
-     :        'APERADD : Error occurred whilst trying to access '/
-     :        /'input frame', STATUS )
+*  If a non-ARD aperture was given, describe the coordinate system.
+         TEXT = '  Co-ords : '
+         IAT = 12
+         DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
+         CALL CHR_APPND( DOM, TEXT, IAT )
+         IF( DOM .EQ. 'SKY' ) THEN 
+            CALL CHR_APPND( ' (', TEXT, IAT )
+            CALL CHR_APPND( AST_GETC( CURFRM, 'SYSTEM', STATUS ),
+     :                     TEXT, IAT )
+
+            IF( AST_GETD( CURFRM, 'EQUINOX', STATUS ) .LT. 1984.0 ) THEN 
+               CALL CHR_APPND( ' B', TEXT, IAT )
+            ELSE
+               CALL CHR_APPND( ' J', TEXT, IAT )
+            END IF
+
+            CALL CHR_APPND( AST_GETC( CURFRM, 'EQUINOX', STATUS ),
+     :                      TEXT, IAT )
+            CALL CHR_APPND( ')', TEXT, IAT )
          END IF
-
-*    end of if-no-error-after-getting-input check
-
+         CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
       END IF
 
-*    Close the logfile and release any identifiers used to access it.
-      IF ( LOGFIL ) CALL FIO_ANNUL( FDL, STATUS )
+*  Display the NDF name.
+      CALL NDF_MSG( 'NDF', INDF1 )
+      CALL MSG_LOAD( ' ', '  NDF     : ^NDF', TEXT, IAT, STATUS )
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
 
+*  Display the NDF's title.
+      CALL NDF_CMSG( 'TITLE', INDF1, 'Title', STATUS )
+      CALL MSG_LOAD( ' ', '  Title   : ^TITLE', TEXT, IAT, STATUS )
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display a blank line.
+      CALL KPG1_REPRT( ' ', QUIET, LOG, FDL, STATUS )
+
+*  Display the total number of pixels within the aperture.
+      TEXT = '  No. of pixels in aperture:'
+      IAT = 29
+      CALL CHR_PUTI( NUMPIX, TEXT, IAT )
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display the number of good pixels included in the statistics.
+      TEXT = '  No. of good pixels       :'
+      IAT = 29
+      CALL CHR_PUTI( NGOOD, TEXT, IAT )
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display a blank line.
+      CALL KPG1_REPRT( ' ', QUIET, LOG, FDL, STATUS )
+
+*  Display the total pixel sum.
+      TEXT = '  Total data sum                      :'
+      IAT = 41      
+      IF( TOT .NE. VAL__BADD ) THEN
+         CALL CHR_PUTD( TOT, TEXT, IAT )
+      ELSE
+         CALL CHR_APPND( '(undefined)', TEXT, IAT )
+      END IF
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display the standard deviation on the total data sum.
+      TEXT = '  Standard deviation on total data sum:'
+      IAT = 41
+      IF( SGTOT .NE. VAL__BADD ) THEN
+         CALL CHR_PUTD( SGTOT, TEXT, IAT )
+      ELSE
+         CALL CHR_APPND( '(undefined)', TEXT, IAT )
+      END IF
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display the mean pixel value.
+      TEXT = '  Mean pixel value                    :'
+      IAT = 41
+      IF( MEAN .NE. VAL__BADD ) THEN
+         CALL CHR_PUTD( MEAN, TEXT, IAT )
+      ELSE
+         CALL CHR_APPND( '(undefined)', TEXT, IAT )
+      END IF
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display the standard deviation on the mean pixel value.
+      TEXT = '  Standard deviation on mean value    :'
+      IAT = 41
+      IF( SGMEAN .NE. VAL__BADD ) THEN
+         CALL CHR_PUTD( SGMEAN, TEXT, IAT )
+      ELSE
+         CALL CHR_APPND( '(undefined)', TEXT, IAT )
+      END IF
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display the standard deviation of the pixel values.
+      TEXT = '  Standard deviation of pixel values  :'
+      IAT = 41
+      IF( SIGMA .NE. VAL__BADD ) THEN
+         CALL CHR_PUTD( SIGMA, TEXT, IAT )
+      ELSE
+         CALL CHR_APPND( '(undefined)', TEXT, IAT )
+      END IF
+      CALL KPG1_REPRT( TEXT( : IAT ), QUIET, LOG, FDL, STATUS )
+
+*  Display a blank line.
+      CALL KPG1_REPRT( ' ', QUIET, LOG, FDL, STATUS )
+
+*  Write the final results to the output parameters.
+      CALL PAR_PUT0D( 'MEAN', MEAN, STATUS )
+      CALL PAR_PUT0I( 'NGOOD', NGOOD, STATUS )
+      CALL PAR_PUT0I( 'NUMPIX', NUMPIX, STATUS )
+      CALL PAR_PUT0D( 'SIGMA', SIGMA, STATUS )
+      CALL PAR_PUT0D( 'SIGMEAN', SGMEAN, STATUS )
+      CALL PAR_PUT0D( 'SIGTOTAL', SGTOT, STATUS )
+      CALL PAR_PUT0D( 'TOTAL', TOT, STATUS )
+
+*  Shutdown procedure.
+*  ===================
  999  CONTINUE
 
-*    end
+*  Close any log file.
+      IF( LOG ) CALL FIO_ANNUL( FDL, STATUS )
+
+*  Free the dynamic array space of the logical mask.
+      CALL PSX_FREE( IPMASK, STATUS )
+      CALL PSX_FREE( IPMSK2, STATUS )
+
+*  Delete the group used to hold the ARD description.
+      CALL GRP_DELET( IGRP, STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )                              
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'APERADD_ERR', 'APERADD: Failed to sum NDF '//
+     :                 'pixels within an aperture.', STATUS )
+      END IF
 
       END
-
