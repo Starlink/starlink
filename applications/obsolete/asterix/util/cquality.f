@@ -34,8 +34,6 @@
 *    Method :
 *    Deficiencies :
 *    Bugs :
-*     DAT_UNMAP will generate bad status if any INPUT quality
-*     values = 255 !!!
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
@@ -57,7 +55,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -75,8 +73,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC                   ! Locator to input file
-      CHARACTER*(DAT__SZLOC) OLOC                   ! Locator to output file
       CHARACTER*8            MODQUAL                ! Quality to modify
       CHARACTER*8            QVAL                   ! Quality value
       CHARACTER*80           TEXT(5)                ! History text
@@ -85,23 +81,25 @@
       REAL                   XC(MX_PTS), YC(MX_PTS) ! Circular centres
       REAL                   RC(MX_PTS)             ! Circular radii
 
-      INTEGER                AORDER(DAT__MXDIM)     !
+      INTEGER                AORDER(ADI__MXDIM)     !
       INTEGER                TCPTR, CPTR            ! Pointer to dynamic
                                                     ! array
-      INTEGER                DIMS(DAT__MXDIM)       ! Length of each dimension
+      INTEGER                DIMS(ADI__MXDIM)       ! Length of each dimension
       INTEGER                FSTAT                  ! i/o status
       INTEGER                I                      ! Loop counters
-      INTEGER                INORDER(DAT__MXDIM)    ! Inverse of AORDER
+      INTEGER			IFID			! Input dataset id
+      INTEGER                INORDER(ADI__MXDIM)    ! Inverse of AORDER
       INTEGER                NCH                    ! Points changed
       INTEGER                NDIM                   ! Number of dimensions
       INTEGER                NELM                   ! Number of data points
       INTEGER                NFROM                  ! # selected points
       INTEGER                NRPTS, NXPTS, NYPTS    ! # values entered
-      INTEGER                QDIMS(DAT__MXDIM)      ! Length of each dimension
+      INTEGER			OFID			! Output dataset id
+      INTEGER                QDIMS(ADI__MXDIM)      ! Length of each dimension
       INTEGER                QNDIM                  ! Number of dimensions
       INTEGER                QPTR                   ! Pointer to mapped
                                                     ! QUALITY
-      INTEGER                TDIMS(DAT__MXDIM)      ! Working dimensions
+      INTEGER                TDIMS(ADI__MXDIM)      ! Working dimensions
       INTEGER                TQPTR                  ! Temp quality array
       INTEGER                XPTR, YPTR             ! Spatial axis data
 
@@ -121,7 +119,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 1.8-2')
+        PARAMETER           (VERSION = 'CQUALITY Version 1.8-3')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -168,8 +166,9 @@
 
 *    Check that a mode has been selected
       IF ( .NOT. MODESET ) THEN
-        CALL MSG_PRNT( '! No CQUALITY operation selected selected' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No CQUALITY operation selected selected',
+     :                STATUS )
         GOTO 99
       END IF
 
@@ -178,15 +177,16 @@
 
 *    Get input
       IF ( OVERWRITE ) THEN
-        CALL USI_ASSOCI( 'INP', 'UPDATE', ILOC, INPRIM, STATUS )
-        OLOC = ILOC
+        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        OFID = IFID
       ELSE
-        CALL USI_ASSOC2( 'INP', 'OUT', 'R', ILOC, OLOC, INPRIM, STATUS )
+        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       END IF
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
 
 *    Create output
       IF ( .NOT. OVERWRITE ) THEN
-        CALL HDX_COPY( ILOC, OLOC, STATUS )
+        CALL ADI_FCOPY( IFID, OFID, STATUS )
       END IF
 
 *    Check status
@@ -194,20 +194,21 @@
 
 *    Validate dataset
       IF ( INPRIM ) THEN
-        CALL MSG_PRNT ('! Input not a dataset')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Input is primitive, must be a dataset',
+     :                STATUS )
       ELSE
-        CALL BDA_CHKDATA( OLOC, OK, NDIM, DIMS, STATUS )
+        CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
         IF ( ( STATUS .EQ. SAI__OK ) .AND. .NOT. OK ) THEN
-          CALL MSG_PRNT( '! Invalid data' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Invalid data', STATUS )
         END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check axes
-      CALL AXIS_GETORD( OLOC, 'X,Y', MOVE_AXES, AORDER,
-     :                            NDIM, TDIMS, STATUS )
+      CALL AXIS_TGETORD( OFID, 'X,Y', MOVE_AXES, AORDER,
+     :                             NDIM, TDIMS, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
@@ -218,7 +219,7 @@
         DO I = 1, NDIM
           TDIMS(I) = DIMS(I)
         END DO
-        DO I = NDIM+1, DAT__MXDIM
+        DO I = NDIM+1, ADI__MXDIM
           TDIMS(I) = 1
         END DO
       END IF
@@ -227,25 +228,25 @@
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Check QUALITY
-      CALL BDA_CHKQUAL( OLOC, OK, QNDIM, QDIMS, STATUS )
+      CALL BDI_CHKQUAL( OFID, OK, QNDIM, QDIMS, STATUS )
 
       IF ( .NOT. OK ) THEN
         IF ( Q_SET .OR. Q_IGNORE ) THEN
-          CALL BDA_CREQUAL( OLOC, NDIM, DIMS, STATUS )
-          CALL BDA_MAPQUAL( OLOC, 'WRITE', QPTR, STATUS )
+          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
+          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDA_PUTMASK( OLOC, QUAL__MASK, STATUS )
+          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
         ELSE
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'No input quality!', STATUS )
         END IF
       ELSE
-        CALL BDA_MAPQUAL( OLOC, 'UPDATE', QPTR, STATUS )
+        CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Adjust size of array to 7 D
-      DO I = NDIM + 1, DAT__MXDIM
+      DO I = NDIM + 1, ADI__MXDIM
         DIMS(I) = 1
       END DO
 
@@ -261,7 +262,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get axis units for message
-      CALL BDA_GETAXUNITS( OLOC, AORDER(1), UNITS, STATUS )
+      CALL BDI_GETAXUNITS( OFID, AORDER(1), UNITS, STATUS )
       IF ( UNITS .GT. ' ' ) THEN
         CALL CHR_UCASE( UNITS )
         CALL MSG_SETC( 'UNIT', UNITS )
@@ -282,9 +283,9 @@
       CALL USI_GET1R( 'CR', MX_PTS, RC, NRPTS, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( ( NRPTS .NE. 1 ) .AND. ( NRPTS .NE. NXPTS ) ) THEN
-          CALL MSG_PRNT( '! Numbers of radii must be 1 or same as'/
-     :                                   /' number of X,Y values' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Numbers of radii must be 1 or same as'/
+     :                             /' number of X,Y values', STATUS )
         ELSE IF ( ( NRPTS .EQ. 1 ) .AND. ( NXPTS .GT. 1 ) ) THEN
           CALL ARR_INIT1R( RC(1), NXPTS, RC, STATUS )
         END IF
@@ -298,8 +299,8 @@
       CALL ARR_INIT1L( .TRUE., NELM, %VAL(CPTR), STATUS )
 
 *    Map two spatial axes
-      CALL BDA_MAPAXVAL( OLOC, 'READ', AORDER(1), XPTR, STATUS )
-      CALL BDA_MAPAXVAL( OLOC, 'READ', AORDER(2), YPTR, STATUS )
+      CALL BDI_MAPAXVAL( OFID, 'READ', AORDER(1), XPTR, STATUS )
+      CALL BDI_MAPAXVAL( OFID, 'READ', AORDER(2), YPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Initialise local selection array
@@ -392,7 +393,7 @@
      :                                   %VAL(QPTR), STATUS )
         CALL DYN_UNMAP( TQPTR, STATUS )
       END IF
-      CALL BDA_UNMAPQUAL( OLOC, STATUS )
+      CALL BDI_UNMAPQUAL( OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Count points selected
@@ -403,18 +404,18 @@
       CALL MSG_PRNT( '^NFROM points had quality modified' )
 
 *    Write history
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       IF ( QSEL ) THEN
         TEXT(2) = ' Only points having QUALITY = '//MODQUAL//' altered'
       END IF
 
- 80   FORMAT( A,<NXPTS>E10.4 )
+ 80   FORMAT( A,<NXPTS>(E10.4) )
       WRITE( TEXT(3), 80, IOSTAT=FSTAT ) 'X-pos : ',(XC(I),I=1,NXPTS)
-      WRITE( TEXT(4), 80, IOSTAT=FSTAT ) 'X-pos : ',(YC(I),I=1,NXPTS)
+      WRITE( TEXT(4), 80, IOSTAT=FSTAT ) 'Y-pos : ',(YC(I),I=1,NXPTS)
       WRITE( TEXT(5), 80, IOSTAT=FSTAT ) 'Radii : ',(RC(I),I=1,NRPTS)
 
 *    Write history
-      CALL HIST_PTXT( OLOC, 5, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, 5, TEXT, STATUS )
 
 *    Exit
  99   CALL AST_CLOSE()
@@ -436,7 +437,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
