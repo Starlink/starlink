@@ -743,6 +743,8 @@ sub ndf_info ($$$$) {
 
     # ASTROM Obs record
     if (defined($obsdata->{obs})) {
+        # Just need to remove any pesky colons.
+	$obsdata->{obs} =~ s/:/ /g;
 	$returnhash{astromobs} = $obsdata->{obs};
 	$returnhash{astromobscomment} = "command-line obs";
     } elsif (defined($fitshash{SLATEL})) {
@@ -2553,7 +2555,7 @@ sub check_obsdata_kwd (\%) {
 		   'angle' => '\s*[+-]?\d+(\.\d+)?\s*',
 		   'source' => '(?i)\s*(AST|FITS|USER)(\s*:\s*(AST|FITS|USER))*\s*',
 		   'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
-		   'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?|\w+\.\w+)\s*',
+		   'obs' => '\s*(\w+|([: ]*[+-]?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?|\w+\.\w+)\s*',
 		   'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
 		   'col' => '\s*\d+\s*'
 		  );
