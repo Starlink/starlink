@@ -319,6 +319,9 @@
 *        Report an error if an even value is supplied for SEARCH.
 *     25-JUN-1999 (DSB):
 *        Many major changes to make use of AST/PGPLOT.
+*     25-AUG-1999 (DSB):
+*        Changed calls to PAR_STATE to NDG_STATE to allow for multiple
+*        invocation of the application to process a list of NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -456,7 +459,7 @@
 *  application, but is no longer documented. It is expected that people
 *  will now use parameter OUTCAT instead of COOUT. Only use the parameter
 *  if it was given on the command line.
-      CALL PAR_STATE( 'COOUT', STATE, STATUS )
+      CALL NDG_STATE( 'COOUT', STATE, STATUS )
       IF( STATE .EQ. SUBPAR__ACTIVE ) THEN
 
 *  Abort if an error occured.

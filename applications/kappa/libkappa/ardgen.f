@@ -248,6 +248,8 @@
 *        the impersonal "the user".
 *     1995 December 16 (MJC):
 *        Devices with a mouse can use it instead of the keyboard.
+*     30-AUG-1999 (DSB):
+*        Do not cancel DEVICE when the graphics system is closed down.
 *     {enter_further_changes_here}
       
 *  Bugs:
@@ -649,7 +651,7 @@
  999  CONTINUE
 
 *   Close down the graphics database before exiting.
-      CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
+      CALL AGS_DEASS( 'DEVICE', .FALSE., STATUS )
 
       END
 
