@@ -84,6 +84,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			ADI0_SETLNK
+
       EXTERNAL			ADI1_OPEN
       EXTERNAL			ADI1_FCLONE
       EXTERNAL			ADI1_FCLOSE
@@ -136,6 +138,10 @@
       CALL ADI_DEFMTH( 'SetLink(_EventDS,_HDSfile)', EDI1_SETLNK,
      :                 DID, STATUS )
       CALL ADI_DEFMTH( 'UnLink(_EventDS,_HDSfile)', EDI1_UNLNK,
+     :                 DID, STATUS )
+
+*  Multi-graph dataset interface
+      CALL ADI_DEFMTH( 'SetLink(_MultiGraph,_HDSfile)', ADI0_SETLNK,
      :                 DID, STATUS )
 
 *  Ancillary copying
