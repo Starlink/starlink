@@ -80,6 +80,7 @@ use SDBM_File;
 use Scb;
 use FortranTag;
 use CTag;
+use Directory;
 
 #  Declarations.
 
@@ -106,6 +107,10 @@ $html = $cgi;
 @args = $cgi ? split ('&', $ENV{'QUERY_STRING'})
              : @ARGV;
 
+#  Add blank elements so we don't get warned about undefined variables later.
+
+push @args, '', '';
+
 #  Extract named arguments (of format arg=value).
 
 if (@args) {
@@ -130,25 +135,22 @@ while ($args[0] =~ /^-/) {
    }
 }
 
-$arg{'module'}  ||= shift @args;
-$arg{'package'} ||= shift @args;
-$arg{'package'} ||= '';
+$arg{'module'}  ||= shift (@args);
+$arg{'package'} ||= shift (@args);
 
 #  Decode hex encoded characters.
 
-$arg{'module'}  =~ s/%(..)/pack("c",hex($1))/ge if $arg{'module'};
-$arg{'package'} =~ s/%(..)/pack("c",hex($1))/ge if $arg{'package'};
+$arg{'module'}  =~ s/%(..)/pack("c",hex($1))/ge;
+$arg{'package'} =~ s/%(..)/pack("c",hex($1))/ge;
 
 #  Substitute for '<' and '>' to match encoding in index.
 
-if ($arg{'module'}) {
-   $arg{'module'} =~ s/</&lt;/g;
-   $arg{'module'} =~ s/>/&gt;/g;
-}
+$arg{'module'} =~ s/</&lt;/g;
+$arg{'module'} =~ s/>/&gt;/g;
 
-#  Open index file, tied to index hash %locate.
+#  Initialise index object containing locations of all modules.
 
-tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
+$index = Directory->new($indexfile, O_RDONLY);
 
 #  Main processing.
 
@@ -159,8 +161,8 @@ if ($arg{'module'}) {
 #  initial try fails (and doesn't have one already).
 
    $arg{'module'} .= "_" 
-      unless ($arg{'module'} =~ /_$/ || $locate{$arg{'module'}});
-   unless ($locate{$arg{'module'}}) {
+      unless ($arg{'module'} =~ /_$/ || $index->get($arg{'module'}));
+   unless ($index->get($arg{'module'})) {
       error "Failed to find module $arg{'module'}",
          "This may be a result of a deficiency in the source
           code indexing program, or because the module you
@@ -280,15 +282,11 @@ sub query_form {
 #     Go through list of modules, picking ones from the selected package
 #     only, and grouping them by prefix.
 
-      my (%modules, $mod, $loc, $tail);
-      while (($mod, $locs) = each %locate) {
-         foreach $loc (split ' ', $locs) {
-            if ($loc =~ /^$package#/io) {
-               $mod =~ /^([^_]*_)./;
-               $prefix = $1 || '';
-               push @{$modules{$prefix}}, $mod;
-            }
-         }
+      my (%modules, $mod, $loc, $prefix);
+      while (($mod, $loc) = $index->each($package)) {
+         $prefix = '';
+         $prefix = $1 if ($mod =~ /^([^_]*_)./);
+         push @{$modules{$prefix}}, $mod;
       }
 
       if (%modules) {
@@ -380,30 +378,22 @@ sub get_module {
 
 #  Get logical path name from database.
 
-   @locations = split ' ', $locate{$module};
+   $location = $index->get($module, packpref => $package);
 
 #  Generate an error if no module of the requested name is indexed.
 #  This ought not to happen, since $module should have been checked 
 #  before calling this routine.
 
-   error "Failed to find module $module" unless (@locations);
-
-#  See if any of the listed locations is in the requested package;
-#  otherwise just pick any of them (in fact, the last).
-
-   my ($head, $tail);
-   foreach $location (@locations) {
-      $locname = $location;
-      $location =~ /^(.+)#(.+)/i;
-      ($head, $tail) = ($1, $2);
-      last if ($head eq $package);
-   }
+   error "Failed to find module $module" unless ($location);
 
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
 
+   $location =~ /^(.+)#(.+)/i;
+   ($head, $tail) = ($1, $2);
+
    my ($file, $tarfile, $dir, $loc);
-   if ($loc = $locate{"$head#"}) {
+   if ($loc = $index->get("$head#")) {
       $file = ($loc =~ m%\.tar[^/>#]*$%) ? "$loc>$tail" : "$loc/$tail";
    }
    elsif (-d "$srcdir/$head") {
@@ -514,7 +504,8 @@ sub output {
             sub {
                %tag = parsetag $1;
                if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                  return '<b>' unless ($loc = $locate{$name});
+                  return '<b>' 
+                     unless ($loc = $index->get($name, packpref => $package));
                   $inhref = 1;
                   if ($name =~ /^INCLUDE-/) {
                      $href = "$scb?$name&$package";

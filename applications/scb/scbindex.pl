@@ -140,6 +140,7 @@ use SDBM_File;
 use Scb;
 use FortranTag;
 use CTag;
+use Directory;
 
 #  Declarations.
 
@@ -163,9 +164,9 @@ $tmpdir = "/local/junk/scb/index";
 rmrf $tmpdir;
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
-#  Read values of index file into %locate.
+#  Initialise index object containing locations of all modules.
 
-tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
+$index = Directory->new($indexfile, O_CREAT | O_RDWR);
 
 #  If task file exists, read values from it into @tasks.
 
@@ -185,7 +186,7 @@ if (@ARGV) {
    }
 }
 else {
-   $locate{'SOURCE#'} = $srcdir;
+   $index->put('SOURCE#', $srcdir);
    foreach $package_file (glob "$srcdir/*") {
       index_pack $package_file;
    }
@@ -210,15 +211,8 @@ foreach $pack (sort keys %tasks) {
    $line = "$pack:";
    foreach $task (uniq sort @{$tasks{$pack}}) {
       $module = $task;
-      $module .= '_' unless ($locate{$module});
-      if ($locate{$module}) {
-         foreach $path (split ' ', $locate{$module}) {
-            if (starpack ($path) eq $pack) {
-               $line .= " $task";
-               next;
-            }
-         }
-      }
+      $module .= '_' unless ($index->get($module, packmust => $pack));
+      $line .= " $task"  if ($index->get($module, packmust => $pack));
    }
    print TASKS "$line\n";
    print       "$line\n" if $verbose;
@@ -242,8 +236,6 @@ if ($verbose) {
 
 #  Terminate processing.
 
-untie %locate;
-untie %tasks;
 rmrf $tmpdir;
 
 exit;
@@ -268,23 +260,13 @@ sub index_pack {
    my ($dir, $tarext);
    ($dir, $package, $tarext) = ($1, $2, $3);
    print "PACKAGE: $package\n";
-   $locate{"$package#"} = $pack_file;
+   $index->put("$package#", $pack_file);
 
 #  If any records for this package already exist in the index, delete them.
 
-   my ($module);
-   foreach $module (keys %locate) {
-      my ($loc, @loc) = undef;
-      next unless ($locate{$module} =~ /\b$package#/);
-      foreach $loc (split ' ', $locate{$module}) {
-         push @loc, $loc unless (starpack ($loc) eq $package);
-      }
-      if (@loc) {
-         $locate{$module} = join ' ', @loc;
-      }
-      else {
-         delete $locate{$module};
-      }
+   my ($key, $value);
+   while (($key, $value) = $index->each($package)) {
+      $index->delete($key, $package);
    }
 
 #  If any tasks exist for this package delete them.
@@ -629,25 +611,9 @@ sub write_entry {
    $location =~ s%([#>/])\./%$1%g;
    $location =~ s%//+%/%g;
 
-#  Write entry to database if there is not already a better entry for 
-#  that module name in the same package.
+#  Write entry to database.
 
-   if ($locate{$name}) {
-      my ($loc, %loc, $oldloc);
-      foreach $loc (split ' ', $locate{$name}) {
-         $loc{starpack $loc} = $loc;
-      }
-      $oldloc = $loc{$package};
-      $loc{$package} = $location 
-         if (!$oldloc ||
-             (($oleng = length $oldloc) > ($leng = length $location)) ||
-             ($oleng == $leng && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/)
-            );
-      $locate{$name} = join ' ', values %loc;
-   }
-   else {
-      $locate{$name} = $location;
-   }
+   $index->put($name, $location);
 
 #  Optionally log entry to stdout.
 
