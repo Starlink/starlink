@@ -129,6 +129,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.14  1998/10/02 00:49:38  timj
+*     Do not try to report the errors if the fit has failed
+*
 *     Revision 1.13  1998/06/06 03:24:02  timj
 *     Add errors (Thanks to Nick Tothill for adding them).
 *     Tidy up -- return errors to calling routine.
@@ -537,8 +540,14 @@
      :        'for filter = ^FILT and sub-instrument ^SUB', STATUS)
             CALL ERR_REP (' ', ' - last fit values were:-', STATUS)
 
-            WRITE (BUFFER, 20) ETA_TEL_FIT, ETA_ERROR, B_FIT, 
-     :           B_ERROR, TAUZ_FIT, TAU_ERROR, REXISQ, ITERATION
+*     Since the fit has failed -- there is no point printing 
+*     errors (they are bad values)
+
+            WRITE (BUFFER, 15) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
+     :           REXISQ, ITERATION
+ 15         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
+     :           '  tau = ', F7.3, '  X= ', F7.1, '  N= ', I4)
+
 
             CALL MSG_SETC ('BUFFER', BUFFER)
             CALL ERR_REP (' ', ' ^BUFFER', STATUS)
