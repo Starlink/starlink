@@ -174,6 +174,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -182,6 +183,8 @@
 *     1995 January 11 (MJC):
 *        Made TITLE propagate from the input NDF.  Used PSX for
 *        workspace.
+*     27-FEB-1998 (DSB):
+*        Type of local variable AXWT corrected from INTEGER to LOGICAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -214,7 +217,6 @@
                                ! is dummy for subroutines)
      :  ADIMS( 2 ),            ! Axis dimension (2nd dimension is dummy
                                ! for subroutines).
-     :  AXWT,                  ! Axis weighted averages
      :  CMPMAX( NDF__MXDIM ),  ! Maximum compression factors
      :  CMPMIN( NDF__MXDIM ),  ! Minimum compression factors
      :  COMPRS( NDF__MXDIM ),  ! Compression factors
@@ -251,6 +253,7 @@
       LOGICAL                  ! True if:
      :  AVAR,                  ! Axis variance is present
      :  AXIS,                  ! Axis structure is present
+     :  AXWT,                  ! Axis weighted averages
      :  NORMAL,                ! Normalise the summations for bad values
      :  PRESTY,                ! Preserve the input array's data type in
                                ! the output arrays
