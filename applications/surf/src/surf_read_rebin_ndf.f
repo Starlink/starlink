@@ -45,7 +45,7 @@
 *     DATA_SPEC( NSPEC ) = CHAR (Given)
 *        SCUBA sections
 *     OUT_COORDS = CHAR (Given)
-*        Output coordinates system. (Passed into SURF_READ_REBIN_NDFS)
+*        Output coordinates system. (Passed into SURF_READ_REBIN_NDF)
 *     N_FILE = INTEGER (Given)
 *        Current file number (less than MAX_FILE and greater than 0).
 *     USE_SECTION = LOGICAL (Given)
@@ -148,6 +148,14 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.17  1999/05/15 01:50:00  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*     Read units from file.
+*     Initialise ANG_INT and ANG_MEAS in this routine.
+*
 *     Revision 1.16  1999/02/27 04:39:00  timj
 *     Read polarimeter extensions.
 *     Return back pointers to measurements as well as integrations.
@@ -188,7 +196,7 @@
       INTEGER          MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       CHARACTER*25     TSKNAME              ! Name of task
-      PARAMETER (TSKNAME = 'READ_REBIN_NDFS')
+      PARAMETER (TSKNAME = 'READ_REBIN_NDF')
 
 *  Arguements Given:
       CHARACTER*(*)    DATA_SPEC(SCUBA__MAX_SECT)
@@ -381,6 +389,7 @@
       LOGICAL          THERE           ! Is a component present
       INTEGER          TNDF(2)         ! Temporary NDF identifiers
       INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
+      CHARACTER*15     UNITS           ! Units from the NDF Char component
       LOGICAL          USE_INTS        ! How to use the specified ints
       INTEGER          WP_PTR          ! Mapped WPLATE NDF (for POL data)
 
@@ -461,6 +470,8 @@
      :     (OBSERVING_MODE .NE. 'FOCUS')    .AND.
      :     (OBSERVING_MODE .NE. 'ALIGN')    .AND.
      :     (OBSERVING_MODE .NE. 'PHOTOM')    .AND.
+     :     (OBSERVING_MODE .NE. 'POLPHOT')    .AND.
+     :     (OBSERVING_MODE .NE. 'POLMAP')    .AND.
      :     (OBSERVING_MODE .NE. 'POINTING')) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
@@ -471,9 +482,11 @@
          END IF
       END IF
 
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUTIF(MSG__QUIET, ' ', '^PKG: WARNING! The PHOTOM '//
+         CALL MSG_SETC('MODE', OBSERVING_MODE)
+         CALL MSG_OUTIF(MSG__QUIET, ' ', '^PKG: WARNING! The ^MODE '//
      :        'data will not provide a fully-sampled image', STATUS)
       END IF
 
@@ -498,15 +511,15 @@
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', 
      :              I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
+               ELSE IF (STEMP(:10) .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
-               ELSE IF (STEMP .EQ. 'FLATFIELD') THEN
+               ELSE IF (STEMP(:9) .EQ. 'FLATFIELD') THEN
                   FLATFIELD = .TRUE.
-               ELSE IF (STEMP .EQ. 'REBIN') THEN
+               ELSE IF (STEMP(:5) .EQ. 'REBIN') THEN
                   REBIN = .TRUE.
-               ELSE IF (STEMP .EQ. 'RESTORE') THEN
+               ELSE IF (STEMP(:7) .EQ. 'RESTORE') THEN
                   RESTORE = .TRUE.
                END IF
             END DO
@@ -723,7 +736,8 @@
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             IF ((NDIM .NE. 3)                  .OR.
      :          (DIM(1) .LT. 1)         .OR.
      :          (DIM(2) .LT. 1)                .OR.
@@ -1161,6 +1175,20 @@
 *     I still think it is somewhat easier to rely on REMIP
 *     being run first and storing the values there
 
+*     Fill ANG_MEAS and ANG_INT with bad values -- this is required
+*     since they will not be initialised at all if there are no
+*     ANGROT or WPLATE extensions.
+
+      DO I = 1, SCUBA__MAX_INT
+         ANG_INT(N_FILE, I, 1) = VAL__BADR
+         ANG_INT(N_FILE, I, 2) = VAL__BADR
+      END DO
+
+      DO I = 1, SCUBA__MAX_MEAS
+         ANG_MEAS(N_FILE, I, 1) = VAL__BADR
+         ANG_MEAS(N_FILE, I, 2) = VAL__BADR
+      END DO
+
 *     Only fill in the arrays if the WPLATE and ANGROT arrays
 *     are present
 
@@ -1220,6 +1248,17 @@
          END IF
 
       END IF
+
+*     Read the Units from the NDF and store them in the FITS airlock
+*     use this to make sure that Units are propogated to the output
+*     NDF (could also be used to check units for consistency).
+*     Would not need to do this if we always propogated the output NDF
+*     from the input rather than simply doing that when there is only
+*     a single input file.
+
+      CALL NDF_CGET(IN_NDF, 'Units', UNITS, STATUS)
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :     'NDFUNITS', UNITS, 'Units as read from the NDF', STATUS) 
 
 
 *     annul locators and array identifiers and close the file
