@@ -1,0 +1,43 @@
+                      1.2 -> 2:   1   2
+                     3. 4 -> 2:   3   4
+                  5.6     -> 2:   5   6
+                     7.   -> 1:   7   0
+                        7 -> 1:   7   0
+                      888 -> 1: 888   0
+                    99    -> 1:  99   0
+                     10   -> 1:  10   0
+    1 2 3 4 5 6 7 8 9 10  -> 1:   1   0
+                   adjust -> a
+                  disable -> d
+                     help -> h
+                     menu -> m
+                     plot -> p
+                     exit -> q
+                     quit -> q
+                    hyper -> Y
+                   ADJUST -> a
+                  diSable -> d
+            disable this  -> d
+                      HeL -> h
+                    meNU  -> m
+                     PLOT -> p
+           hYpErrrrrrr    -> x
+                        a -> a
+                        d -> d
+                        h -> h
+                        m -> m
+                        p -> p
+                        e -> q
+                        q -> q
+                       hy -> Y
+                     disa -> d
+                    men   -> m
+                    yes   -> y
+                        / -> y
+                        + -> y
+                        ! -> x
+                        * -> x
+            this is wrong -> x
+                   also   -> x
+                          -> x
+                          -> x
