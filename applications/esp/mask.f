@@ -126,7 +126,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999
       
 *   Transfer to the ARD driver control routine.
-      CALL ESP_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT2,STATUS)
+      CALL ESP1_ARD_DRIVER(NDIM,ELEMS,LBND,UBND,POINT1,POINT2,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
 
 *   Free the dynamic array space of the logical mask.
