@@ -179,6 +179,7 @@ itcl::class gaia::GaiaForeignExec {
          set forret_($this) {}
          set forerr_($this) {}
          set forout_($this) {}
+         set msg {}
          catch {eval "blt::bgexec \[scope forret_($this)\] \
                          -keepnewline $keepnewlines \
                          -error \[scope forerr_($this)\] \
@@ -186,8 +187,8 @@ itcl::class gaia::GaiaForeignExec {
                          -onoutput \[code $this inform_\] \
                          -onerror \[code $this error_\] \
                          -- $application $args"} msg
-         if { $msg != "" } {
-            info_dialog "$msg"
+         if { $msg != {} } {
+            error_ "$msg"
          }
          command_completed_
       }
@@ -242,7 +243,7 @@ itcl::class gaia::GaiaForeignExec {
 
    #  Method to deal with messages on stderr.
    private method error_ {msg} {
-      if { $msg != "" } { 
+      if { $msg != "" } {
          if { $use_error } {
             #  Ordinary message arrive on standard error, just pass on
             #  as if ordinary text.

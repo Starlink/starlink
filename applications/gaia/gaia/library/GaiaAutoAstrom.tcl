@@ -385,10 +385,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
             #  Remove previous results.
             catch {::file delete -force "autoastrom_tmp"} msg
-            puts "delete msg = $msg"
-
             catch {::file delete -force "$solution_"} msg
-            puts "delete msg = $msg"
+            set error_messages_ {}
 
             #  Construct WCS bootstrap source.
             if { $values_(wcssource) == "Y" } {
@@ -409,7 +407,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
             } else {
                set fitopts "--maxfit=9"; # or maybe 7.
             }
-            
+
             #  Verbosity
             if { $values_(verbose) } {
                set verbosity "--verbose"
@@ -445,15 +443,17 @@ itcl::class gaia::GaiaAutoAstromSimple {
             #--xxxccdcat=ngc1275.autoext
             puts "Running: $args $image"
             catch {eval $autoastrom_ runwith $args \$image} msg
-            if { "$msg" != "" && "$msg" != "0" } { 
-               warning_dialog "$msg"
+            #if { "$msg" != "" && "$msg" != "0" } {
+            #   warning_dialog "$msg"
+            #}
+            if { $error_messages_ != {} } {
+               warning_dialog "$error_messages"
             }
          }
       }
    }
 
    protected method completed_ {} {
-      puts "Completed"
       if { [file exists $solution_] } {
 
          #  Report the best fit parameters.
@@ -469,7 +469,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
          notify_
 
          #  Re-draw the positions used in the solution.
-         puts "calling display_solution_cat_"
          display_solution_cat_
       } else {
          error_dialog "Failed to determine a solution"
@@ -497,10 +496,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
             set t3 "RMS"
             set t4 "Q"
          } else {
-            puts "line = $line"
             lassign "$line" n t1 ra dec t3 t4 fits
-            puts "n=$n, t1=$t1"
-            puts "ra=$ra, dec=$dec t3=$t3, t4=$t4, fits=$fits"
             set t2 "$ra $dec"
 
          }
@@ -511,7 +507,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
          }
          incr nlines
       }
-      
+
       #  Get rest of file as parsed arrays of parameter names and values.
       set nlines 0
       while { [::gets $fid line] > -1 } {
@@ -547,6 +543,11 @@ itcl::class gaia::GaiaAutoAstromSimple {
       regsub -all "\[\033\]" $output {} output
       regsub -all "\[\011\]" $output {      } output
       regsub -all {\[1A|\[1M>} $output {} output
+
+      #  Gather any error messages.
+      if { [string match "--E*" $output] } {
+         append error_messages $output
+      }
       return $output
    }
 
@@ -596,9 +597,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Display the solution positions.
    protected method display_solution_cat_ {} {
-      puts "in display_solution_cat_"
 
-      #  Open the catalogue window. Returns {} is already around.
+      #  Open the catalogue window. Returns {} if already around.
       set astrocat [gaia::GaiaSearch::new_local_catalog \
                        $solution_catalogue_ [code $itk_option(-image)] \
                        ::gaia::GaiaSearch 0 catalog $w_]
@@ -607,23 +607,26 @@ itcl::class gaia::GaiaAutoAstromSimple {
          set astrocatname_ $astrocat
          after idle "$astrocatname_ set_symbol {} {circle red {} {} {} {}} {{4.0} {}}"
       }
+
+      #  Set display area to whole image (doesn't update if image is changed).
+      $astrocatname_ set_from_image
+
+      #  Search and display.
       $astrocatname_ search
    }
 
-   #  Guess the initial WCS parameters from the FITS headers of the 
+   #  Guess the initial WCS parameters from the FITS headers of the
    #  image. This is purely guess work based on a look around any
    #  images that I've come across.
    protected method fits_based_guess_ {} {
 
       if { $itk_option(-rtdimage) != {} } {
-         
+
          #  Reset to defaults first.
          set values_(racentre) "00:00:00"
          set values_(deccentre) "00:00:00"
          set values_(imagescale) "1.0"
          set values_(angle) "0.0"
-
-         puts "reset to defaults"
 
          #  RA.
          set ra_keys_ "RA OBSRA OBJCTRA RABASE RA_TARG CRVAL1"
@@ -632,7 +635,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
             if { $value != {} } {
                regsub -all { } [string trim $value] {:} value
                set values_(racentre) $value
-               puts "RA = $values_(racentre)"
                break
             }
          }
@@ -644,7 +646,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
             if { $value != {} } {
                regsub -all { } [string trim $value] {:} value
                set values_(deccentre) $value
-               puts "Dec = $values_(deccentre)"
                break
             }
          }
@@ -657,7 +658,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
             set value [$itk_option(-rtdimage) fits get $key]
             if { $value != {} } {
                set values_(imagescale) [expr abs($value)]
-               puts "Imagescale = $values_(imagescale)"
                set imagescale_done 1
                break
             }
@@ -670,7 +670,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
                set value [$itk_option(-rtdimage) fits get $key]
                if { $value != {} } {
                   set values_(imagescale) [expr abs($value*3600.0)]
-                  puts "Imagescale = $values_(imagescale)"
                   break
                }
             }
@@ -682,7 +681,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
             set value [$itk_option(-rtdimage) fits get $key]
             if { $value != {} } {
                set values_(angle) $value
-               puts "Angle = $values_(angle)"
                break
             }
          }
@@ -726,6 +724,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
    #  catalogue.
    protected variable astrocatname_ {}
 
+   #  Any error messages issued by AUTOASTROM.
+   protected variable error_messages_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
@@ -744,7 +744,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
 
    #  Names of any parameters that we want to report from AUTOASTROM best
    #  fit log file and their descriptions as pairs (use foreach name desc).
-   common pnames_ { 
+   common pnames_ {
       "nstars"    "no. ref stars"
       "rrms"      "radial rms, arcsec"
       "xrms"      "x-axis rms, arcsec"

@@ -220,6 +220,13 @@ itcl::class gaia::GaiaSearch {
       }
    }
 
+   #  Set the display area from the image that is displayed.
+   public method set_from_image {} {
+      if { [info exists searchopts_] && [winfo exists $searchopts_] } {
+         $searchopts_ set_from_image
+      }
+   }
+
    #  Return the iswcs value of the current catalogue.
    public method iswcs {} {
       return [$w_.cat iswcs]
