@@ -6,16 +6,51 @@
  not repeated here but should be consulted when using these commands.
  The parameters of a given ATOOLS command correspond to those of the 
  same AST routine, so for further information on (say) the ATOOLS
- remapframe command, see the entry for the AST_REMAPFRAME routine in 
+ astremapframe command, see the entry for the AST_REMAPFRAME routine in 
  SUN/210. Any differences in behaviour between the AST routine and the
  corresponding ATOOLS command are noted in the documentation for the
  command.
 
+ Many of these commands require AST Objects to be supplied as input. 
+ These may be supplied in several formats:
+
+ - as a dump of an AST Object stored in a text file (as produced by the
+ AST_SHOW routine).
+
+ - as an NDF, in which case the WCS FrameSet is used (an error is
+ reported if the ATOOLS command required an Object of a different class).
+
+ - as a text file containing a series of FITS headers conforming to one
+ of the supported FITS encoding of WCS information, in which case the
+ corresponding FrameSet will be used (an error is reported if the ATOOLS
+ command required an Object of a different class).
+
+
+ Many of the ATOOLS commands create new AST Objects as output. These may be 
+ stored in the following ways:
+
+ - If the name of an existing NDF is supplied for the parameter, the new
+ AST Object will be stored in the NDF as a WCS FrameSet, replacing any
+ existing WCS FrameSet. An error will be reported if the new AST Object
+ is not suitable for being used as a WCS FrameSet.
+
+ - Otherwise, a new text file is created with the given name containing a
+ dump of the Object.
+
+
+
+
 1 ASTSHOW
 
- This is a tcl script which allows you to browse an AST Object in a
- heirarchical manner. The AST object must be contained in a text file (to
- examine the WCS FrameSet of an NDF, use the wcsshow command in KAPPA).
+ This is a simple tcl script which allows you to browse an AST Object in
+ a heirarchical manner. The AST object must be contained in a text file
+ (to examine the WCS FrameSet of an NDF, use the wcsshow command in
+ KAPPA). Clicking on a component of an Object will open a new window
+ containing a listing of the components of the selected Object.
+ Individual components of the Object can be saved to text files (the
+ names of these text files are fixed, and determined by the name of the
+ Object being saved).
+
  
  Invocation:
 
