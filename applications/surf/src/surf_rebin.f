@@ -246,8 +246,8 @@
       INTEGER          N_FITS          ! number of items in FITS array
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
-      INTEGER          N_INT_BAD                 ! the number of integrations
-                                                 ! with data to beignored
+      INTEGER          N_INT_BAD       ! the number of integrations
+                                       ! with data to be ignored
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
       INTEGER          N_POINT         ! dimension of pointing correction 
                                        ! array in input file
@@ -290,6 +290,7 @@
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
+      CHARACTER*5      RADECSYS        ! Type of coordinate system
       REAL             RA_START        ! RA offset of scan start (arcsec)
       REAL             RA_VEL          ! RA velocity of scan (arcsec/sec)
       LOGICAL          READING         ! .TRUE. while reading input files
@@ -339,9 +340,12 @@
       DOUBLE PRECISION XMIN            ! min of map offsets
       DOUBLE PRECISION YMAX            ! max of map offsets
       DOUBLE PRECISION YMIN            ! min of map offsets
-      INTEGER WEIGHTSIZE               ! Radius of weighting function
+      INTEGER          WEIGHTSIZE      ! Radius of weighting function
       REAL             WTFN(WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
                                        ! Weighting function
+      CHARACTER* 20    XLAB            ! X label for output map
+      CHARACTER* 20    YLAB            ! Y label for output map
+      
 
       REAL T0, T1
       REAL SECNDS
@@ -401,6 +405,7 @@
          CALL PAR_DEF0C ('IN', FILENAME(FILE), STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
+            CALL PAR_GET0C('IN', FILENAME(FILE), STATUS)
             CALL NDF_EXIST ('IN', 'READ', IN_NDF, STATUS)
 
             IF (IN_NDF .EQ. NDF__NOID) THEN
@@ -417,6 +422,7 @@
          END IF
 
          IF (READING) THEN
+
 
 *  get some general descriptive parameters of the observation
 
@@ -677,7 +683,6 @@
                   IN_UT1 = IN_UT1 + 
      :              ((SEC/60.0D0 + DBLE(IMIN)) / 60.0D0 +
      :              DBLE(IHOUR)) / 24.0D0
-
                   IF (STATUS .NE. SAI__OK) THEN
                      CALL MSG_SETI ('SLA', STATUS)
                      STATUS = SAI__ERROR
@@ -1765,6 +1770,14 @@
       PRINT *, 'FINISH at T= ',T1
 *  set up the output axes
 
+      IF (OUT_COORDS .EQ. 'GA') THEN
+         XLAB = 'Longitude offset'
+         YLAB = 'Latitude offset'
+      ELSE
+         XLAB = 'R.A. offset'
+         YLAB = 'Declination offset'
+      END IF
+
       CALL NDF_AMAP (OUT_NDF, 'CENTRE', 1, '_REAL', 'WRITE',
      :  OUT_A_PTR, ITEMP, STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
@@ -1774,7 +1787,7 @@
          CALL SCULIB_MULCAR (NX_OUT, %val(OUT_A_PTR), 
      :     -OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
       END IF
-      CALL NDF_ACPUT ('X', OUT_NDF, 'LABEL', 1, STATUS)
+      CALL NDF_ACPUT (XLAB, OUT_NDF, 'LABEL', 1, STATUS)
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 1, STATUS)
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 1, STATUS)
 
@@ -1787,7 +1800,7 @@
          CALL SCULIB_MULCAR (NY_OUT, %val(OUT_A_PTR),
      :     OUT_PIXEL * REAL(R2AS), %val(OUT_A_PTR))
       END IF
-      CALL NDF_ACPUT ('Y', OUT_NDF, 'LABEL', 2, STATUS)
+      CALL NDF_ACPUT (YLAB, OUT_NDF, 'LABEL', 2, STATUS)
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
 
@@ -1812,12 +1825,15 @@
       IF (OUT_COORDS .EQ. 'RB') THEN
          SCS = 'EQUATORIAL(1950.0)'
          OUT_EPOCH = 1950.0D0
+         RADECSYS  = 'FK4'
       ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
          SCS = 'EQUATORIAL(2000.0)'
          OUT_EPOCH = 2000.0D0
+         RADECSYS  = 'FK5'
       ELSE IF (OUT_COORDS .EQ. 'EQ') THEN
          SCS = 'ECLIPTIC(2000.0)'
          OUT_EPOCH = 2000.D0
+         RADECSYS  = 'GAPPT'
       ELSE IF (OUT_COORDS .EQ. 'GA') THEN
          SCS = 'GALACTIC'
          OUT_EPOCH = 2000.0D0
@@ -1852,12 +1868,21 @@
 
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SYSTEM',
      :  SCS, 'sky coordinate system', STATUS)
+      IF (OUT_COORDS.NE.'GA') THEN
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
+      END IF
+
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'EPOCH',
      :  OUT_EPOCH, 'epoch of map', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'EQUINOX',
+     :  OUT_EPOCH, 'epoch of mean equator and equinox', STATUS)
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
      :  OUT_LONG, 'centre longitude (radians)', STATUS)
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT',
      :  OUT_LAT, 'centre latitude (radians)', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD-OBS',
+     :     MJD_STANDARD, 'MJD of first observation', STATUS)
 
       CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'I_CENTRE',
      :  I_CENTRE, 'I of centre pixel', STATUS)
