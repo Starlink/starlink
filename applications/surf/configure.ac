@@ -30,7 +30,7 @@ dnl    No use dependencies
 
 dnl STAR_LATEX_DOCUMENTATION(sun102)
 
-AC_CONFIG_SUBDIRS([sculib surflib src])
+AC_CONFIG_SUBDIRS([sculib surflib src scripts misc])
 
 AC_CONFIG_FILES(Makefile component.xml surf_set_app_name.f surf.ifd)
 
