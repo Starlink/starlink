@@ -30,8 +30,8 @@
 *     or quality of pixels.  Each outline is therefore basically
 *     rectangular in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.
-*     The origin (minimum X,Y pixel value) of each outline is marked
-*     by a dot, and by a label giving the NDF's name and/or index number
+*     The origin (minimum X,Y pixel value) of each outline can be
+*     marked and/or labelled with the NDF's name and/or index number
 *     (as determined by the LABEL parameter).  This label is written
 *     parallel to the X direction, or anti-parallel if the mapping
 *     between pixel and Current coordinates includes a reflection.
@@ -39,17 +39,18 @@
 *     The results are only likely to be sensible if the Current 
 *     coordinate system of all the NDFs is one in which they are all
 *     registered.  If they do not all have the same current Domain
-*     name, a warning will be issued.
+*     name, a warning will be issued, but plotting will proceed.
 *
-*     OUTLINE is aware of the AGI graphics database; if the CLEAR
-*     parameter is set to false then it will attempt to align the
-*     outline drawings with suitably registered images which are
-*     already on the graphics device.  This allows one, for instance,
-*     to overlay the outlines of a set of NDFs on a mosaic image
-*     which has been constructed using those NDFs.
+*     OUTLINE uses the AGI graphics database in the same way
+*     as KAPPA applications; if the CLEAR parameter is set to 
+*     false then it will attempt to align the outline drawings with
+*     suitably registered graphics which are already on the graphics 
+*     device.  So, for instance, it is easy to overlay the outlines
+*     of a set of NDFs on a mosaic image which has been constructed 
+*     using those NDFs.
 *
-*     This routine is designed for use on two-dimensional NDFs; if any
-*     of the NDFs presented has more than two dimensions, any extra
+*     This routine is designed for use on two-dimensional NDFs;
+*     if the NDFs presented have more than two dimensions, any extra
 *     ones will be ignored.
 
 *  Usage:
@@ -58,35 +59,41 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        True if labelled and annotated axes are to be drawn around the
-*        outlines, showing the common Current coordinate frame of the
+*        outlines, showing the common Current coordinate system of the
 *        NDFs.  The appearance of the axes can be controlled using the
-*        STYLE parameter.
-*        [TRUE]
+*        STYLE parameter.  This parameter has a dynamic default; it
+*        defaults to the same value as the CLEAR parameter.
+*        [dynamic]
 *     CLEAR = _LOGICAL (Read)
-*        If true, the graphics device will be cleared before the plot
-*        is made.  If you want the outlines to be drawn over the top
+*        If CLEAR is set to true, the graphics device will be cleared
+*        before the plot is made.  
+*
+*        If you want the outlines to be drawn over the top
 *        of an existing DATA picture, for instance one displayed with
 *        KAPPA's DISPLAY application, then set CLEAR to false.  If
 *        possible, alignment will occur within the Current coordinate
 *        system of the NDF.  If this is not possible, an attempt is
 *        made in SKY, PIXEL or GRID domains.  If the image cannot be
 *        aligned in any suitable domain, then OUTLINE will terminate
-*        with an error.
+*        with an error.  If CLEAR is set to FALSE, then there must
+*        already be a picture displayed on the graphics device.
 *        [TRUE]
 *     DEVICE = DEVICE (Read)
 *        The name of the device on which to draw the outlines.
 *        [Current display device]
 *     IN = LITERAL (Read)
 *        A list of the NDFs whose outlines are to be drawn.
-*     LABEL = LITERAL (Read)
-*        This is a comma-separated list of keywords indicating what 
-*        sort of label should be written at the origin of the outlines.
-*        Any combination of the following keywords may be used:
+*     LABEL = LITERAL( * ) (Read)
+*        This is an array of keywords indicating what sort of label
+*        should be written at the origin of the outlines.
+*        Any combination of one or more of the following keywords may 
+*        be used:
 *           - NAME   -- The name of the NDF is written
 *           - INDEX  -- The index number of the NDF is written
 *           - DOT    -- The origin of the NDF is marked by a dot
 *
-*        [NAME,DOT]
+*        If you do not want any of the above, use the null (!) value.
+*        ["NAME","DOT"]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -113,24 +120,44 @@
 *        default is "BOTH".
 *        [BOTH]
 *     PENROT = _LOGICAL (Read)
-*        If TRUE, each outline will be drawn with a different pen (colour).
-*        Otherwise, they will all be drawn in the same pen.
+*        If TRUE, each outline will be drawn with a different pen 
+*        (colour).  Otherwise, they will all be drawn in the same pen.
 *        [FALSE]
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style 
 *        to use for the outlines and annotated axes.  This should be
 *        a string consisting of comma-separated `attribute=value'
 *        items, as explained in the `Plotting Styles and Attributes'
-*        section of SUN/95.
-*        []
+*        section of SUN/95, except that colours may only be specified
+*        by index, and not by name.
+*        [""]
 
 *  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-*     [routine_example]...
-
-*  Notes:
-*     {routine_notes}...
+*     outline reg-data* clear
+*        This will clear the current graphics device and plot on it 
+*        labelled outlines of all the `reg-data*' NDFs, as well as
+*        axes showing the common coordinate system in which they
+*        all reside.  The plotting area will be made just large enough
+*        that all the outlines fit in.  Prior to running this, the 
+*        Current attached coordinate system of all the reg-data* NDFs
+*        should be one in which they are all aligned.
+*     outline ccd* noclear
+*        This will attempt to plot outlines of all the `ccd*' NDFs 
+*        aligned with whatever is already plotted on the graphics 
+*        device, for instance the result of a KAPPA DISPLAY command
+*        or of a previous call of OUTLINE.  Parts of the NDF outlines
+*        which fall outside the existing plot area will not be visible.
+*     outline in="one,two,three' axes=yes label=[name,index] penrot=yes
+*             style="size(strings)=2,width(curves)=3"
+*        This will draw outlines of the NDFs `one', `two' and `three' 
+*        in the current directory with labelled axes, in triple-thick 
+*        lines and with double-size text labels which read `1: one',
+*        `2: two' and `3: three' respectively.  The colour of each 
+*        outline and its associated text label will be different from
+*        the others.
+*     outline in=a* noclear nopenrot style="colour=2" label=\!
+*        All the NDFs beginning with `a' will be outlined in colour 2,
+*        with no text labels or indication of the origin.
 
 *  Behaviour of Parameters:
 *     All parameters retain their current value as default. The
@@ -175,6 +202,7 @@
       INCLUDE 'NDF_PAR'          ! Standard NDF constants
       INCLUDE 'PRM_PAR'          ! Standard PRIMDAT constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'PAR_ERR'          ! PAR system error codes
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
 
 *  Local Constants:
@@ -189,6 +217,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER BGCOL              ! Normal text background colour
       INTEGER BL                 ! Buffer length
       INTEGER DIMS( 2, CCD1__MXNDF ) ! Dimensions of NDFs
       INTEGER FRM                ! AST identifier for a frame
@@ -201,6 +230,7 @@
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
       INTEGER JCOM               ! Index of common frame in global FSET
+      INTEGER LBGCOL             ! Label text background colour
       INTEGER LOCOL              ! Lowest colour index available
       INTEGER LW                 ! Normal plotting line width
       INTEGER MAP                ! AST identifier for a mapping
@@ -210,7 +240,6 @@
       INTEGER NLAB               ! Number of labelling options
       INTEGER NNDF               ! Number of input NDFs in group
       INTEGER NPEN               ! Number of distinct pens for rotation
-      INTEGER NSTY               ! Number of style elements in group
       INTEGER PAXES( 2 )         ! Map for picking two axes from many
       INTEGER PENGID             ! GRP identifier for pen style strings
       INTEGER PICID              ! AGI identifier for initial DATA picture
@@ -224,11 +253,9 @@
       LOGICAL LABIND             ! Use labelling INDEX option?
       LOGICAL LABDOT             ! Use labelling DOT option?
       LOGICAL PENROT             ! Rotate pen styles for different outlines?
-      REAL GBOX( 4 )             ! Graph box for AST_PLOT definition
       REAL XCH                   ! Vertical baseline text character height
       REAL YCH                   ! Horizontal baseline text character height
       REAL UP( 2 )               ! Up direction for text
-      DOUBLE PRECISION BBOX( 4 ) ! Base box for AST_PLOT definition
       DOUBLE PRECISION DIMOD     ! Length of the unit diagonal vector
       DOUBLE PRECISION DOT       ! Dot product
       DOUBLE PRECISION GLBND( 2 ) ! Lower GRID-like coordinate bounds
@@ -265,6 +292,8 @@
 
 *  Local data:
       DATA PAXES / 1, 2 /
+      DATA BGCOL / 0 /
+      DATA LBGCOL / -1 /
 
 *.
 
@@ -286,6 +315,12 @@
 *  Determine what the labelling options are required.
       CALL PAR_CHOIV( 'LABEL', MAXLAB, 'NAME,INDEX,DOT', LABOPT, NLAB,
      :                STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         NLAB = 0
+         CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Set the labelling flags accordingly.
       LABNAM = .FALSE.
       LABIND = .FALSE.
       LABDOT = .FALSE.
@@ -317,18 +352,14 @@
       CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
 
 *  Determine whether we will draw axes.
-      IF ( CLEAR ) THEN
-         CALL PAR_GET0L( 'AXES', AXES, STATUS )
-      ELSE
-         AXES = .FALSE.
-      END IF
+      CALL PAR_GTD0L( 'AXES', CLEAR, .TRUE., AXES, STATUS )
 
 *  Initialise the global frameset with the Current frame of the 
 *  reference (first) NDF.  First get the NDF identifier.
       CALL NDG_NDFAS( GID, 1, 'READ', INDF, STATUS )
 
 *  Get the WCS component of the reference NDF.
-      CALL NDF_GTWCS( INDF, IWCS, STATUS )
+      CALL CCD1_GTWCS( INDF, IWCS, STATUS )
       CALL NDF_ANNUL( INDF, STATUS )
 
 *  Get the Current frame of the reference NDF, which we would like to 
@@ -369,11 +400,11 @@
          CALL NDG_NDFAS( GID, I, 'READ', INDF, STATUS )
 
 *  Get the WCS component from the NDF.
-         CALL NDF_GTWCS( INDF, IWCS, STATUS )
+         CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
 *  Check that the Current frame has the right number of dimensions.
          NAXES = AST_GETI( IWCS, 'Naxes', STATUS )
-         IF ( NAXES .NE. 2 ) THEN
+         IF ( NAXES .NE. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
             CALL MSG_SETI( 'NAXES', NAXES )
@@ -392,7 +423,7 @@
 *  then bail out.  If it has too many, then generate a new frame and
 *  mapping which just represents the first two.
          NAXES = AST_GETI( FRM, 'Naxes', STATUS )
-         IF ( NAXES .LT. 2 ) THEN
+         IF ( NAXES .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
             CALL CCD1_ERREP( ' ', 'OUTLINE: NDF ''^NDF'' must have at '
@@ -406,17 +437,6 @@
      :                  // '^NDF', STATUS )
             FRM = AST_PICKAXES( FRM, 2, PAXES, MAP, STATUS )
          END IF
-
-*  Change the Domain of the Base frame; this doesn't make any difference
-*  to this application, but the resulting global frameset will get 
-*  written into the AGI database, where having a lot of frames all 
-*  called GRID is unlikely to be a good thing.
-         CALL AST_SETC( FRM, 'Domain', 'CCD_GRID-' // NDFNAM, STATUS )
-
-*  Add the Base (GRID-domain) frame of the NDF to the global frameset,
-*  using the correct mapping from the common coordinate system.
-*  Note the index of this frame within the frameset will be JCOM + I.
-         CALL AST_ADDFRAME( FSET, JCOM, MAP, FRM, STATUS )
 
 *  Get the NDF extent in its Base (GRID-domain) frame.
          CALL NDF_DIM( INDF, 2, DIMS( 1, I ), NDIM, STATUS )
@@ -432,6 +452,17 @@
          DIFERS = DIFERS .OR. ( DMN .NE. COMDMN )
          BUFFER( 40: ) = DMN
          CALL CCD1_MSG( ' ', BUFFER( 1:CHR_LEN( BUFFER ) ), STATUS )
+
+*  Change the Domain of the Base frame; this doesn't make any difference
+*  to this application (this time round), but the resulting global
+*  frameset will get written into the AGI database, where having a 
+*  lot of frames all called GRID is unlikely to be a good thing.
+         CALL AST_SETC( FRM, 'Domain', 'CCD_GRID-' // NDFNAM, STATUS )
+
+*  Add the Base (GRID-domain) frame of the NDF to the global frameset,
+*  using the correct mapping from the common coordinate system.
+*  Note the index of this frame within the frameset will be JCOM + I.
+         CALL AST_ADDFRAME( FSET, JCOM, MAP, FRM, STATUS )
 
 *  Release the NDF.
          CALL NDF_ANNUL( INDF, STATUS )
@@ -470,7 +501,8 @@
 
 *  It would probably be a good idea to deactivate clipping here, since
 *  it may be useful to see outlines which go outside of the plotted
-*  image.  However, the PGSCLP call is not available in the Starlink
+*  image.  In any case text labels get plotted outside of the clipping
+*  region.  However, the PGSCLP call is not available in the Starlink
 *  version of PGPLOT.
 c        CALL AST_CLIP( PLOT, AST__NOFRAME, GLBND, GUBND, STATUS )
 c        CALL PGSCLP( 0 )
@@ -534,6 +566,9 @@ c        CALL PGSCLP( 0 )
 *  Turn the global frameset into an AST Plot.
          CALL CCD1_APLOT( FSET, PICID, .FALSE., PLOT, STATUS )
       END IF
+
+*  Set default text background colour opaque.
+      CALL PGSTBG( BGCOL )
 
 *  Apply default and user-selected style settings to the plot.
       CALL CCD1_PLSTY( PLOT, 'STYLE', STATUS )
@@ -687,10 +722,13 @@ c        CALL PGSCLP( 0 )
             CALL MSG_SETI( 'INDEX', I )
             CALL MSG_LOAD( ' ', LFMT, BUFFER, BL, STATUS )
 
-*  Write the label in the correct position and orientation.
+*  Write the label in the correct position and orientation.  We set the
+*  text background colour appropriately.
+            CALL PGSTBG( LBGCOL )
             CALL AST_SETI( PLOT, 'Current', AST__BASE, STATUS )
             CALL AST_TEXT( PLOT, BUFFER( :BL ), TPOS, UP, JUST, STATUS )
             CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
+            CALL PGSTBG( BGCOL )
          END IF
 
 *  Plot geodesics in the GRID-like coordinate system along the edges
