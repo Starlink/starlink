@@ -1582,7 +1582,6 @@
 *  Destroy source database?
       IF ( SRC ) THEN
         I_BGM_NSRC = 0
-        IF (
         DO I = 1, I__NSRCATT
           CALL DYN_MAPR( 1, I__MXBGSRC, I_BGM_SRCPTR(I), STATUS )
         END DO
