@@ -13,7 +13,9 @@
 *     CALL ADI1_PUTLOC( LOC, ID, STATUS )
 
 *  Description:
-*     Store an HDS locator in an ADI object
+*     Store an HDS locator in an ADI object. If the null HDS locator is
+*     passed, then the output is the null ADI object, NOT an wrapped up
+*     copy of the null locator.
 
 *  Arguments:
 *     LOC = CHARACTER*(DAT__SZLOC) (given)
@@ -55,20 +57,14 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:private
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -105,8 +101,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create ADI object to handle the locator
-      CALL ADI_NEW0( 'HDSfile', ID, STATUS )
-      CALL ADI_CPUT0C( ID, 'Locator', LOC, STATUS )
+      IF ( LOC .EQ. DAT__NOLOC ) THEN
+        ID = ADI__NULLID
+      ELSE
+        CALL ADI_NEW0( 'HDSfile', ID, STATUS )
+        CALL ADI_CPUT0C( ID, 'Locator', LOC, STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_PUTLOC', STATUS )
