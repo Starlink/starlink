@@ -15712,9 +15712,11 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
    double mjdobs;                 /* MJD-OBS value */
    int *perm;                     /* Permuted axis indices */
    int axis;                      /* Axis index */
+   int axis2;                     /* Another axis index */
    int inon;                      /* Index of next non-celestial axis */
    int naxis;                     /* No. of axes */
    int noncel;                    /* Number of non-celestial axes */
+   int ok;                        /* No identical labels found yet? */
    int radesys;                   /* RADESYS value */
    int skperm[2];                 /* Axis permutation for SkyFrames */
 
@@ -15996,6 +15998,30 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             if( ckeyval ) astSetUnit( ret, axis, ckeyval );
          }            
 
+      }
+
+/* Now check that no two axis labels are identical. If so we clear all the
+   axis labels. */
+      ok = 1;
+      for( axis = 0; axis < naxis-1 && ok; axis++ ){
+         if( axis != axlon && axis != axlat ){
+            ckeyval = (char *) astGetLabel( ret, axis );
+            for( axis2 = axis+1; axis2 < naxis && ok; axis2++ ){
+               if( axis2 != axlon && axis2 != axlat ){
+                  if( !strcmp( astGetLabel( ret, axis2 ), ckeyval ) ) {
+                     ok = 0;
+                  }
+               }
+            }
+         }
+      }
+               
+      if( !ok ){
+         for( axis = 0; axis < naxis; axis++ ){
+            if( axis != axlon && axis != axlat ){
+               astClearLabel( ret, axis );
+            }
+         }
       }
 
 /* If there are no non-celestial axes, the returned Frame is just the
