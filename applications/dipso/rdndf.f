@@ -94,7 +94,7 @@
 *        one significant pixel axis. 
 *        - Obtain spectral calibrartion for X axis from NDF WCS component
 *        if the NDF was not created by DIPSO.
-*     24-AUG-2003 (DSB):
+*     13-DEC-2003 (DSB):
 *        - Check for usable AXIS structures before using FITS WCS headers.
 *        - Check for unit plurals ("Angstroms" instead of "Angstrom")
 *     {enter_changes_here}
@@ -151,8 +151,8 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN
-      LOGICAL UNITOK
+      INTEGER CHR_LEN            ! Used length of a string
+      LOGICAL UNITOK             ! Is the Unit string OK?
 
 *  Local Variables:
       CHARACTER SYS*40           ! System string
@@ -188,6 +188,7 @@
       LOGICAL DIPNDF             ! Is this a DIPSO NDF?
       LOGICAL GOTAX              ! Got an NDF AXIS structure?
       LOGICAL MORE               ! Continue looping?
+      LOGICAL REPORT             ! Report system and units?
       LOGICAL THERE              ! Does the named component exist?
       REAL RF                    ! Rest frequency (GHz)
 *.
@@ -398,12 +399,12 @@
                NEWFRM = AST_PICKAXES( IWCS, 1, I, MAP, STATUS ) 
                MORE = .FALSE.
 
+*  Get the axis unit.
+               UNIT = AST_GETC( NEWFRM, 'UNIT(1)', STATUS )
+
 *  Get the upper case axis label.
                TEXT = AST_GETC( NEWFRM, 'LABEL(1)', STATUS )
                CALL CHR_UCASE( TEXT )            
-
-*  Get the axis unit.
-               UNIT = AST_GETC( NEWFRM, 'UNIT(1)', STATUS )
  10            CONTINUE
 
 *  Create a candidate SpecFrame to describe the current axis.
@@ -459,17 +460,17 @@
 
 *  First try wavelength.
                   CALL AST_SETC( SFRM, 'SYSTEM', 'WAVE', STATUS )
-                  CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
-
+                  CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
+                  
 *  If the unit string is not OK, and try frequency.
                   IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                      CALL AST_SETC( SFRM, 'SYSTEM', 'FREQ', STATUS )
-                     CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
+                     CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
                                
 *  If the unit was not OK, try optical velocity.
                      IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
                         CALL AST_SETC( SFRM, 'SYSTEM', 'VOPT', STATUS )
-                        CALL AST_SETC( SFRM, 'UNIT', TEXT, STATUS )
+                        CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
 
 *  If the Unit was not OK, indicate that we need to try the next axis in the 
 *  current Frame.
@@ -509,7 +510,7 @@
                   END IF
                END IF
 
-             END DO
+            END DO
 
 *  Use the default SpecFrame if no more appropriate one was found.
             IF( SFRM .EQ. AST__NULL ) THEN
@@ -523,66 +524,57 @@
      :                                         STATUS )
             IF( UUNIT .NE. ' ' ) UNIT = UUNIT
 
-*  If we have a Unit string, set it.
+            REPORT = ( USYS .EQ. ' ' .OR. UUNIT .EQ. ' ' )
+
+*  Attempt to set the axis unit. If an error occurs, annul it and clear
+*  the Unit attribute.
             IF( STATUS .EQ. SAI__OK .AND. UNIT .NE. ' ' ) THEN
                CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
-
-*  If the Unit is unsuitable... */
-               IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
-
-*  Removing any trailing "s" may make it usable.
-                  ULEN = CHR_LEN( UNIT )
-                  IF( UNIT( ULEN : ULEN ) .EQ. 'S' .OR.
-     :                UNIT( ULEN : ULEN ) .EQ. 's' ) THEN
-                     UNIT( ULEN : ULEN ) = ' '
-                  END IF
-                  CALL AST_SETC( SFRM, 'UNIT', UNIT, STATUS )
-
-*  If the Unit is still unsuitable, clear the Unit attribute so that the
-*  default Unit is used. */
-                  IF( .NOT. UNITOK( SFRM, STATUS ) ) THEN
-                     CALL AST_CLEAR( SFRM, 'UNIT', STATUS )
-                  END IF
-
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  CALL AST_CLEAR( SFRM, 'UNIT', STATUS )
+                  REPORT = .TRUE.
                END IF
             END IF
 
 *  Tell the user about the above assumptions.
-            SYS = AST_GETC( SFRM, 'SYSTEM', STATUS )
-            IF( SYS .EQ. 'FREQ' ) THEN 
-               SYS = 'frequency'     
-            ELSE IF( SYS .EQ. 'ENER' ) THEN 
-               SYS = 'energy'     
-            ELSE IF( SYS .EQ. 'WAVN' ) THEN 
-               SYS = 'wave-number'     
-            ELSE IF( SYS .EQ. 'WAVE' ) THEN 
-               SYS = 'wavelength'     
-            ELSE IF( SYS .EQ. 'AWAV' ) THEN 
-               SYS = 'wavelength in air'     
-            ELSE IF( SYS .EQ. 'VRAD' ) THEN 
-               SYS = 'radio velocity'     
-            ELSE IF( SYS .EQ. 'VOPT' ) THEN 
-               SYS = 'optical velocity'     
-            ELSE IF( SYS .EQ. 'ZOPT' ) THEN 
-               SYS = 'redshift'     
-            ELSE IF( SYS .EQ. 'BETA' ) THEN 
-               SYS = 'beta factor'     
-            ELSE IF( SYS .EQ. 'VELO' ) THEN 
-               SYS = 'relativistic velocity'     
-            END IF
-            CALL MSG_SETC( 'SYS', SYS )
-
-            UNIT = AST_GETC( SFRM, 'UNIT', STATUS )
-            IF( UNIT .NE. ' ' ) THEN 
-               CALL MSG_SETC( 'UN', AST_GETC( SFRM, 'UNIT', STATUS ) )
-               CALL MSGOUT( COMM, 'Assuming the spectral system '//
-     :                      'in the input NDF is ^SYS in'//
-     :                      ' units of ''^UN''.', .TRUE., STATUS )
-            ELSE
-               CALL MSGOUT( COMM, 'Assuming the spectral system '//
-     :                      'in the input NDF is ^SYS '//
-     :                      '(in dimensionless units).', .TRUE., 
+            IF( REPORT ) THEN
+               SYS = AST_GETC( SFRM, 'SYSTEM', STATUS )
+               IF( SYS .EQ. 'FREQ' ) THEN 
+                  SYS = 'frequency'     
+               ELSE IF( SYS .EQ. 'ENER' ) THEN 
+                  SYS = 'energy'     
+               ELSE IF( SYS .EQ. 'WAVN' ) THEN 
+                  SYS = 'wave-number'     
+               ELSE IF( SYS .EQ. 'WAVE' ) THEN 
+                  SYS = 'wavelength'     
+               ELSE IF( SYS .EQ. 'AWAV' ) THEN 
+                  SYS = 'wavelength in air'     
+               ELSE IF( SYS .EQ. 'VRAD' ) THEN 
+                  SYS = 'radio velocity'     
+               ELSE IF( SYS .EQ. 'VOPT' ) THEN 
+                  SYS = 'optical velocity'     
+               ELSE IF( SYS .EQ. 'ZOPT' ) THEN 
+                  SYS = 'redshift'     
+               ELSE IF( SYS .EQ. 'BETA' ) THEN 
+                  SYS = 'beta factor'     
+               ELSE IF( SYS .EQ. 'VELO' ) THEN 
+                  SYS = 'relativistic velocity'     
+               END IF
+               CALL MSG_SETC( 'SYS', SYS )
+   
+               UNIT = AST_GETC( SFRM, 'UNIT', STATUS )
+               IF( UNIT .NE. ' ' ) THEN 
+                  CALL MSG_SETC( 'UN', AST_GETC( SFRM, 'UNIT', STATUS) )
+                  CALL MSGOUT( COMM, 'Unsure about the spectral '//
+     :                     'system in the input NDF: assuming it is '//
+     :                     '^SYS in units of ''^UN''.', .TRUE., STATUS )
+               ELSE
+                  CALL MSGOUT( COMM, 'Unsure about the spectral '//
+     :                      'system in the input NDF: assuming it is '//
+     :                      '^SYS (in dimensionless units).', .TRUE., 
      :                      STATUS )
+               END IF
             END IF
 
 *  Add this SpecFrame into the FrameSet using a UnitMap to connect it to
@@ -650,7 +642,7 @@
 *  Extract the AXIS->GRID Mapping.    
          AGMAP = AST_GETMAPPING( FS, AST__CURRENT, AST__BASE, STATUS )
 
-*  Concatentate this with the GRID->SPECTRUM Mapping to get the
+*  Concatenate this with the GRID->SPECTRUM Mapping to get the
 *  AXIS->SPECTRUM Mapping.
          ASMAP = AST_CMPMAP( AGMAP, GSMAP, .TRUE., ' ', STATUS )
 
@@ -713,6 +705,9 @@
       IF( STATUS .NE. SAI__OK ) NPOINT = 0
 
       END 
+
+
+
 
 
       LOGICAL FUNCTION UNITOK( SF, STATUS )

@@ -3536,8 +3536,9 @@ This section records the changes introduced with each new version of DIPSO.
 \item The {\tt READ} command has been modified so that it will attempt to
 read spectral axis information from the WCS component of an NDF if the NDF
 was not created by DIPSO. If the NDF has no WCS component, the spectral
-axis information will be read from the FITS header cards in the NDF FITS
-extension (if any). Details of the spectral axis are displayed.
+axis information will be read from the NDF AXIS structures, or the FITS header 
+cards in the NDF FITS extension (if any). Details of the spectral axis are 
+displayed.
 \item The {\tt WRITE} command has been modified so that it will add a WCS
 component to the output NDF describing the spectral axis. This allows it
 to be used by other Starlink applications such as SPLAT, KAPPA, etc.

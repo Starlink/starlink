@@ -1,7 +1,7 @@
 1 DIPSO - friendly spectrum analysis program
 
- V3.6-2 (26-AUG-2003) 
-    DIPSO V3.6-2 has been released. This includes the following changes:
+ V3.6-3 (15-DEC-2003) 
+    DIPSO V3.6-3 has been released. This includes the following changes:
 
 
     o A bug in the READ and SP0RD commands has been fixed which could cause 
