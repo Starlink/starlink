@@ -335,6 +335,224 @@
       END
 
 
+*+ IMG_CACHE - copy current image to cache
+	SUBROUTINE IMG_CACHE(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'QUAL_PAR'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      INTEGER N
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  copy existing data to cache
+        N=I_NX*I_NY
+        CALL ARR_COP1R(N,%VAL(I_DPTR),%VAL(I_DPTR_M),STATUS)
+
+*  axis values
+        CALL ARR_COP1R(I_NX,%VAL(I_XPTR),%VAL(I_XPTR_M),STATUS)
+        CALL ARR_COP1R(I_NY,%VAL(I_YPTR),%VAL(I_YPTR_M),STATUS)
+
+        I_VOK_M=I_VOK
+        IF (I_VOK) THEN
+          CALL ARR_COP1R(N,%VAL(I_VPTR),%VAL(I_VPTR_M),STATUS)
+        ENDIF
+        I_QOK_M=I_QOK
+        IF (I_QOK) THEN
+          CALL ARR_COP1B(N,%VAL(I_QPTR),%VAL(I_QPTR_M),STATUS)
+          I_MASK_M=I_MASK
+          I_BAD_M=I_BAD
+        ENDIF
+
+        I_XBASE_M=I_XBASE
+        I_XSCALE_M=I_XSCALE
+        I_YBASE_M=I_YBASE
+        I_YSCALE_M=I_YSCALE
+        I_XWID_M=I_XWID
+        I_YWID_M=I_YWID
+        I_DMIN_M=I_DMIN
+        I_DMAX_M=I_DMAX
+        I_TITLE_M=I_TITLE
+
+        CALL DYN_SIZE(I_CACHE,N,STATUS)
+        CALL ARR_COP1B(N,%VAL(I_CACHE),%VAL(I_CACHE_M),STATUS)
+
+      ENDIF
+
+      END
+
+
+*+ IMG_UNCACHE - copy cache to current image
+	SUBROUTINE IMG_UNCACHE(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'QUAL_PAR'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      INTEGER N
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  copy existing data to cache
+        N=I_NX*I_NY
+        CALL ARR_COP1R(N,%VAL(I_DPTR_M),%VAL(I_DPTR),STATUS)
+
+*  axis values
+        CALL ARR_COP1R(I_NX,%VAL(I_XPTR_M),%VAL(I_XPTR),STATUS)
+        CALL ARR_COP1R(I_NY,%VAL(I_YPTR_M),%VAL(I_YPTR),STATUS)
+
+        I_VOK=I_VOK_M
+        IF (I_VOK) THEN
+          CALL ARR_COP1R(N,%VAL(I_VPTR_M),%VAL(I_VPTR),STATUS)
+        ENDIF
+        I_QOK=I_QOK_M
+        IF (I_QOK) THEN
+          CALL ARR_COP1B(N,%VAL(I_QPTR_M),%VAL(I_QPTR),STATUS)
+          I_MASK=I_MASK_M
+          I_BAD=I_BAD_M
+        ENDIF
+
+        I_XBASE=I_XBASE_M
+        I_XSCALE=I_XSCALE_M
+        I_YBASE=I_YBASE_M
+        I_YSCALE=I_YSCALE_M
+        I_XWID=I_XWID_M
+        I_YWID=I_YWID_M
+        I_DMIN=I_DMIN_M
+        I_DMAX=I_DMAX_M
+        I_TITLE=I_TITLE_M
+
+        CALL DYN_SIZE(I_CACHE,N,STATUS)
+        CALL ARR_COP1B(N,%VAL(I_CACHE_M),%VAL(I_CACHE),STATUS)
+
+      ENDIF
+
+      END
+
+
+      SUBROUTINE IMG_TOGGLE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+*    Export :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER*80 CDUM
+      INTEGER IDUM
+      REAL RDUM
+      BYTE BDUM
+      LOGICAL LDUM
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        RDUM=I_XBASE
+        I_XBASE=I_XBASE_M
+        I_XBASE_M=RDUM
+
+        RDUM=I_YBASE
+        I_YBASE=I_YBASE_M
+        I_YBASE_M=RDUM
+
+        RDUM=I_XSCALE
+        I_XSCALE=I_XSCALE_M
+        I_XSCALE_M=RDUM
+
+        RDUM=I_YSCALE
+        I_YSCALE=I_YSCALE_M
+        I_YSCALE_M=RDUM
+
+        RDUM=I_XWID
+        I_XWID=I_XWID_M
+        I_XWID_M=RDUM
+
+        RDUM=I_YWID
+        I_YWID=I_YWID_M
+        I_YWID_M=RDUM
+
+        RDUM=I_DMIN
+        I_DMIN=I_DMIN_M
+        I_DMIN_M=RDUM
+
+        RDUM=I_DMAX
+        I_DMAX=I_DMAX_M
+        I_DMAX_M=RDUM
+
+        IDUM=I_DPTR
+        I_DPTR=I_DPTR_M
+        I_DPTR_M=IDUM
+
+        IDUM=I_XPTR
+        I_XPTR=I_XPTR_M
+        I_XPTR_M=IDUM
+
+        IDUM=I_YPTR
+        I_YPTR=I_YPTR_M
+        I_YPTR_M=IDUM
+
+        IDUM=I_VPTR
+        I_VPTR=I_VPTR_M
+        I_VPTR_M=IDUM
+
+        IDUM=I_QPTR
+        I_QPTR=I_QPTR_M
+        I_QPTR_M=IDUM
+
+        BDUM=I_MASK
+        I_MASK=I_MASK_M
+        I_MASK_M=BDUM
+
+        LDUM=I_BAD
+        I_BAD=I_BAD_M
+        I_BAD_M=LDUM
+
+        CDUM=I_TITLE
+        I_TITLE=I_TITLE_M
+        I_TITLE_M=CDUM
+
+        IDUM=I_CACHE
+        I_CACHE=I_CACHE_M
+        I_CACHE_M=IDUM
+
+      ENDIF
+
+      END
+
+
 
 *+ IMG_TMAT - Get coordinate transformation matrices
 	SUBROUTINE IMG_TMAT(STATUS)
@@ -1905,6 +2123,102 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 
 
+*+ IMG_CHECKCACHE - check cache image
+	SUBROUTINE IMG_MCHECK(IFID, STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
+        INCLUDE 'MATH_PAR'
+        INCLUDE 'PRM_PAR'
+*  Import :
+      INTEGER			IFID
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      CHARACTER*80 XUNITS,YUNITS
+      INTEGER NDIM,DIMS(ADI__MXDIM)
+      INTEGER XPTR,YPTR,SID
+      LOGICAL DOK,AXOK,AYOK,AXREG,AYREG
+      LOGICAL XNORM,YNORM
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  check validity of data array
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_CHK( IFID, 'Data', DOK, STATUS )
+        IF (STATUS.EQ.SAI__OK) THEN
+          IF (.NOT.DOK) THEN
+            CALL MSG_PRNT('AST_ERR: invalid data array')
+            STATUS=SAI__ERROR
+          ELSEIF (NDIM.EQ.1) THEN
+            CALL MSG_PRNT('AST_ERR: this is a one dimensional dataset')
+            STATUS=SAI__ERROR
+          ELSEIF (NDIM.EQ.2) THEN
+            I_NX=DIMS(1)
+            I_NY=DIMS(2)
+            I_XAX=1
+            I_YAX=2
+            I_CUBE=.FALSE.
+          ELSEIF (NDIM.EQ.3) THEN
+            CALL IMG_CHECK_CUBE(IFID,STATUS)
+            I_NX=DIMS(I_XAX)
+            I_NY=DIMS(I_YAX)
+            I_NZ=DIMS(I_ZAX)
+            I_CUBE=.TRUE.
+          ELSE
+            CALL MSG_PRNT('AST_ERR: dataset has invalid dimensions')
+            STATUS=SAI__ERROR
+          ENDIF
+        ENDIF
+
+*  X axis present
+        CALL BDI_AXCHK( IFID, I_XAX, 'Data', AXOK, STATUS )
+        IF ( AXOK ) THEN
+          CALL BDI_AXMAPR( IFID, I_XAX, 'Data', 'READ', XPTR, STATUS )
+          CALL ARR_CHKREG(%val(XPTR),I_NX,AXREG,I_XBASE,I_XSCALE,
+     :                                                    STATUS)
+          IF (.NOT.AXREG) THEN
+            CALL MSG_PRNT('AST_ERR: x-axis has non-equal bin sizes')
+            STATUS=SAI__ERROR
+          END IF
+
+        ELSE
+          I_XBASE = 1.0
+          I_XSCALE = 1.0
+          I_NX = DIMS(I_XAX)
+        END IF
+
+*  Y axis present
+        CALL BDI_AXCHK( IFID, I_YAX, 'Data', AYOK, STATUS )
+        IF ( AYOK ) THEN
+          CALL BDI_AXMAPR( IFID, I_YAX, 'Data', 'READ', YPTR, STATUS )
+          CALL ARR_CHKREG(%val(YPTR),I_NY,AYREG,I_YBASE,I_YSCALE,
+     :                                                    STATUS)
+          IF (.NOT.AYREG) THEN
+            CALL MSG_PRNT('AST_ERR: y-axis has non-equal bin sizes')
+            STATUS=SAI__ERROR
+          END IF
+
+        ELSE
+          I_YBASE = 1.0
+          I_YSCALE = 1.0
+          I_NY = DIMS(I_YAX)
+        END IF
+
+      ENDIF
+
+      END
+
+
+
+
 *+ IMG_LOAD - load image into system
 	SUBROUTINE IMG_LOAD(IFID,STATUS)
 
@@ -2146,6 +2460,118 @@ c      LOGICAL VOK,QOK
 
       END
 
+
+*+ IMG_LOADCACHE - load cache image into system
+	SUBROUTINE IMG_LOAD(IFID,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
+*  Import :
+        INTEGER			IFID
+*  Export :
+*  Status :
+        INTEGER STATUS
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Local constants :
+*  Local variables :
+      INTEGER NDIM,DIMS(ADI__MXDIM),NVAL,NWID
+      INTEGER DPTR,IDUM
+      INTEGER VPTR,QPTR
+c      LOGICAL VOK,QOK
+      LOGICAL UNIF,WOK
+*-
+
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  store identifier
+        I_FID = IFID
+
+        NVAL=I_NX*I_NY
+        NDIM=2
+        DIMS(1)=I_NX
+        DIMS(2)=I_NY
+
+*  map data and get axis values
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
+        CALL DYN_MAPR(1,NVAL,I_DPTR,STATUS)
+        CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR),STATUS)
+        CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
+        CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
+
+        CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
+        CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
+        CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
+        CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
+        CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
+        CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
+          I_XWID=ABS(I_XSCALE)
+          I_YWID=ABS(I_YSCALE)
+
+*  get variance and quality if there
+        CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
+        IF (I_VOK) THEN
+          CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
+          CALL DYN_MAPR(1,NVAL,I_VPTR,STATUS)
+          CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR),STATUS)
+          CALL BDI_UNMAP(IFID,'Variance',VPTR,STATUS)
+          CALL DYN_MAPR(1,NVAL,I_VPTR_W,STATUS)
+        ENDIF
+
+        CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
+        IF (I_QOK) THEN
+          CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
+          CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
+          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
+          CALL BDI_GET0UB(IFID,'QualityMask',I_MASK,STATUS)
+          CALL IMG_BAD(%VAL(I_QPTR),STATUS)
+          CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
+          CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
+        ELSE
+          I_BAD=.FALSE.
+        ENDIF
+
+*  get min and max
+        CALL IMG_MINMAX(STATUS)
+
+*  set data slice
+        I_IX1=1
+        I_IX2=I_NX
+        I_IY1=1
+        I_IY2=I_NY
+
+*  set zoom window to whole image
+        I_ZM_IX1=1
+        I_ZM_IX2=I_NX
+        I_ZM_IY1=1
+        I_ZM_IY2=I_NY
+
+*  set current position to centre of image
+        I_X=I_XBASE+(REAL(I_NX)/2.0-1.0)*I_XSCALE
+        I_Y=I_YBASE+(REAL(I_NY)/2.0-1.0)*I_YSCALE
+        I_DX=ABS(I_X-I_XBASE)
+        I_DY=ABS(I_Y-I_YBASE)
+        I_R=0.0
+
+*  get top level text
+        CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
+        CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
+        CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
+
+*  get work area
+        CALL DYN_MAPI(1,NVAL,I_WKPTR,STATUS)
+
+*  get region mask
+        CALL DYN_MAPB(1,NVAL,I_REG_PTR,STATUS)
+
+      ENDIF
+
+      END
 
 
 *+ IMG_CHECK1D - check image
@@ -2699,6 +3125,58 @@ c      LOGICAL VOK,QOK
 
       END
 
+
+
+*+ IMG_GETCACHE - get dynamic arrays for cache image
+	SUBROUTINE IMG_GETMEM(V,Q,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        LOGICAL V,Q
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER N,M
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        N=I_NX*I_NY
+        CALL DYN_SIZE(I_DPTR_M,M,STATUS)
+        IF (M.LT.N) THEN
+          CALL DYN_UNMAP(I_DPTR_M,STATUS)
+          CALL DYN_MAPR(1,N,I_DPTR_M,STATUS)
+          CALL DYN_UNMAP(I_XPTR_M,STATUS)
+          CALL DYN_MAPR(1,I_NX,I_XPTR_M,STATUS)
+          CALL DYN_UNMAP(I_YPTR_M,STATUS)
+          CALL DYN_MAPR(1,I_NY,I_YPTR_M,STATUS)
+        ENDIF
+        IF (V) THEN
+          CALL DYN_SIZE(I_VPTR_M,M,STATUS)
+          IF (M.LT.N) THEN
+            CALL DYN_UNMAP(I_VPTR_M,STATUS)
+            CALL DYN_MAPR(1,N,I_VPTR_M,STATUS)
+          ENDIF
+        ENDIF
+        IF (Q) THEN
+          CALL DYN_SIZE(I_QPTR_M,M,STATUS)
+          IF (M.LT.N) THEN
+            CALL DYN_UNMAP(I_QPTR_M,STATUS)
+            CALL DYN_MAPB(1,N,I_QPTR_M,STATUS)
+          ENDIF
+        ENDIF
+        CALL GCB_CRECACHE(I_CACHE_M,STATUS)
+
+
+      ENDIF
+
+      END
 
 
 *+ IMG_CIRCLE
