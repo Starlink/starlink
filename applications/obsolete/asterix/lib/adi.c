@@ -4607,7 +4607,7 @@ void adix_gthmth( ADIobj gen, int narg, ADIobj args[], int nmform,
 
   while ( _valid_q(cur) ) {
     mth = _CAR(cur);
-	 mdata = _mthd_data(mth);            /* Locate method data */
+    mdata = _mthd_data(mth);            /* Locate method data */
     cur = _CDR(cur);                    /* Advance to next method */
 
     found = ADI__false;                 /* Suitable form? */
@@ -4627,14 +4627,16 @@ void adix_gthmth( ADIobj gen, int narg, ADIobj args[], int nmform,
       ADIclassDefPtr    margc;
       ADIobj            aclsnam;
 
-      uargc = _DTDEF(args[i]);          /* Get class block of user arg */
+/* Allow null arguments for the moment */
+      if ( _valid_q(args[i]) ) {
+        uargc = _DTDEF(args[i]);        /* Get class block of user arg */
 
-		aclsnam = _CAR(acur);
-      margc = adix_loccls( aclsnam, status );
+        aclsnam = _CAR(acur);
+        margc = adix_loccls( aclsnam, status );
 
-      if ( ! adix_chkder(uargc,margc,   /* Method arg class must exist in the */
-			      status) ) /* inheritance list of the user arg */
-	ok = ADI__false;
+/* Method arg class must exist in the inheritance list of the user arg */
+        ok = adix_chkder(uargc,margc,status);
+        }
 
       acur = _CDR(acur);
       }
