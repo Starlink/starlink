@@ -90,7 +90,7 @@
       INCLUDE 'DAT_PAR'
 
 *  Global Variables:
-      INCLUDE 'GMI_CMN'                                 ! GMI common block
+c      INCLUDE 'GMI_CMN'                                 ! GMI common block
 *       GMI_INIT = LOGICAL (given)
 *         GMI class definitions loaded?
 

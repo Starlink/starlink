@@ -8,8 +8,8 @@
         EXTERNAL        ADI1_NATRL
 
         CALL ADI_DEFREP( 'HDS', ID, STATUS )
-        CALL ADI_DEFRCB( ID, 'OPEN_RTN', ADI1_OPEN, STATUS )
-        CALL ADI_DEFRCB( ID, 'CREAT_RTN', ADI1_FCREAT, STATUS )
+        CALL ADI_DEFRCB( ID, 'OpenRtn', ADI1_OPEN, STATUS )
+        CALL ADI_DEFRCB( ID, 'CreatRtn', ADI1_FCREAT, STATUS )
 
 	CALL ADI_DEFCLS( 'HDSlocator', ' ', 'Locator', DID,
      :                   STATUS )
@@ -20,6 +20,6 @@
         CALL ADI_DEFMTH( 'FileTrace(HDSlocator)', ADI1_FTRACE, DID,
      :                   STATUS )
 
-c        CALL ADI_DEFRCB( ID, 'NATRL_RTN', ADI1_NATRL, STATUS )
+c        CALL ADI_DEFRCB( ID, 'NatrlRtn', ADI1_NATRL, STATUS )
 
         END
