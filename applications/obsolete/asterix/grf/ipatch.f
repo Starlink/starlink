@@ -308,7 +308,6 @@
                   CALL MSG_SETI('J',J)
                   CALL MSG_PRNT(
      :             '** insufficient good pixels to patch (^I,^J)')
-                  PATCHED=.FALSE.
                 ENDIF
 
                 CALL GFX_PIXELQ(I_WKPTR,I_NX,I_NY,X1,X2,Y1,Y2,
