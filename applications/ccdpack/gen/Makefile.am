@@ -6,12 +6,6 @@ libccdpack_gen_la_SOURCES = $(GENSRC:.gen=.f) \
                             $(GENLNSRC:.gln=.f) \
                             $(DGENSRC:.dgen=.f)
 
-AM_FCFLAGS = -I../
-
-#  Fortran compilation rule (Automake doesn't seem to add it since
-#  there are no .f files here?)
-FORTRAN_COMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
-
 #  Define the known suffixes in this subsystem.  Automake will infer
 #  this list from the suffix rules without us having to write it
 #  explicitly, but it gets it in the wrong order, which can cause
