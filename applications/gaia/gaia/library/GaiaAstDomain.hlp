@@ -2,8 +2,8 @@
                 Set image coordinate system
                 ===========================
 
-This window is designed to allow you to select which coordinate system
-is shown in the alpha and delta readouts in the main window (the
+This window is designed to allow you to select the built-in coordinate
+system shown in the alpha and delta readouts in the main window (the
 secondary coordinates).
 
 The "System:" drop down menu shows all the systems that are available
@@ -12,12 +12,12 @@ system. To make this change permanent just close the window using the
 "Accept" button. The "Reset" button switches back to the original
 system and "Cancel" closes the window after a reset.
 
-Usually FITS images will have only two possible coordinate systems,
+Usually FITS images will have only two built-in coordinate systems,
 the base (or grid) one shown in the X and Y readouts and a celestial
-one, shown in the alpha and delta readouts, however, future standards
-may provide additional coordinate systems that describe things like
-the coordinates of each chip in a mosaic camera and the coordinates of
-the camera as a whole, as well as some celestial system.
+one, shown in the alpha and delta readouts. However, future standards
+may provide additional systems that describe things like the
+coordinates of each chip in a mosaic camera and the coordinates of the
+camera as a whole, as well as some celestial system.
 
 NDF images have several coordinate systems associated with them:
 

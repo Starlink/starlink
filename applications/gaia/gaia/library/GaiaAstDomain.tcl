@@ -68,7 +68,7 @@ itcl::class gaia::GaiaAstDomain {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      wm title $w_ "GAIA: Secondary image coordinate system ($itk_option(-number))"
+      wm title $w_ "GAIA: image built-in coordinate system ($itk_option(-number))"
 
       #  Create the short help window.
       make_short_help
@@ -104,7 +104,7 @@ itcl::class gaia::GaiaAstDomain {
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.
       itk_component add rule {
-         LabelRule $w_.rule -text {Secondary image coordinate system:}
+         LabelRule $w_.rule -text {Built-in image coordinate system:}
       }
 
       #  System.
@@ -116,7 +116,7 @@ itcl::class gaia::GaiaAstDomain {
                -valuewidth 18
       }
       add_short_help $itk_component(System) \
-         {Select the secondary image coordinate system}
+         {Select the built-in image coordinate system}
 
       #  Set up the system menu. Also defines the default state.
       set_system_menu_

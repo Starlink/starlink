@@ -455,10 +455,6 @@ itcl::class gaia::Gaia {
       add_short_help $itk_component(menubar).image-analysis \
          {Image analysis menu: do astronomy with image}
 
-      add_menuitem $m command "Coordinates system...  " \
-         {Change the secondary coordinate system} \
-	 -command [code $this make_toolbox astdomain]
-
       add_menuitem $m cascade "Aperture photometry" \
          {Perform aperture photometry on image} \
          -menu [menu $m.photom]
@@ -539,11 +535,17 @@ itcl::class gaia::Gaia {
          -accelerator {Control-w}
       bind $w_ <Control-w> [code $this make_toolbox astdefine]
 
-      add_menuitem $m command "New celestial coordinates...  " \
-         {Change the image celestial coordinate system} \
-	 -command [code $this make_toolbox astsystem] \
-	 -accelerator {Control-e}
-      bind $w_ <Control-e> [code $this make_toolbox astsystem]
+      add_menuitem $m cascade "Change coordinates" \
+         {Change the secondary (alpha/delta) coordinate system} \
+         -menu [menu $m.coords]
+
+      add_menuitem $m.coords command "Built-in coordinates..." \
+         {Choose a coordinate system } \
+         -command [code $this make_toolbox astdomain]
+
+      add_menuitem $m.coords command "Celestial coordinates...  " \
+         {Change the celestial coordinate system} \
+	 -command [code $this make_toolbox astsystem]
 
       add_menuitem $m command "Object detection...  " \
          {Automatically detect and parameterize objects} \
