@@ -1295,7 +1295,7 @@ $(CATLIBINSTALLDIR)/stamp:
 # Unpack match.
 $(MATCHPROG)/Makefile:
 	@ if test -f $(MATCHPROG).tar.gz; then \
-	    echo "Found $(MATCHPROG).tar.gz; gunzip $(MATCHPROG).tar; \
+	    echo "Found $(MATCHPROG).tar.gz"; gunzip $(MATCHPROG).tar; \
 	elif test -f $(MATCHPROG).tar; then \
 	    echo "Found $(MATCHPROG).tar"; \
 	else \

@@ -103,13 +103,13 @@
 #           files along with all the built files.
 #
 #  External Dependencies:
-#     The GKS package depends on the following other Starlink
+#     The AUTOASTROM package depends on the following other Starlink
 #     packages which must previously have been installed into the
 #     appropriate sub-directories of the $STARLINK directory (/star is
 #     used if the environment variable STARLINK is not defined).
 #
 #        CCDPACK 4.0.1
-#        ATOOLS 1.1
+#        ATOOLS 1.5
 #
 #  Notes:
 #     This makefile uses the presence/absence of the hidden files
@@ -220,28 +220,21 @@
 #
 #------------------------------------------------------------------------------
 
+
+# This is the default target
+all: build
+
 #  Help target.
 #  ===========
-#
-#  This is the default target, so it appears first.
 
 #  Display information about the mk script and the make targets.
 
 help:
 	@ echo \
-   '   The makefile provided is intended to be used by the make utility when';\
-        echo \
-   '   invoked via the associated mk script.  This script defines environment';\
-        echo \
-   '   variables which are used by make to accommodate differing machine and';\
-        echo \
-   '   operating system characteristics.  Please see the mk script prologue';\
-        echo \
-   '   for full details.';\
-        echo;\
-        echo \
    '   The following targets are provided:';\
         echo;\
+	echo \
+   '      [all]         - Same as make build (default)'; \
         echo \
    '      help          - Display this message';\
         echo \
@@ -346,10 +339,6 @@ RANLIB = ranlib
 #  Commands for adding to and extracting from an archive file (.tar).
 TAR_IN=tar -cvhf
 TAR_OUT=tar -xf
-#  These are not currently configured using the configure script, but
-#  everything reasonable has some usable version of tar.
-#TAR_IN = tar cf
-#TAR_OUT = tar xf
 
 #  Commands for adding, deleting and extracting files to/from an object 
 #  archive (.a).
@@ -366,7 +355,6 @@ TAR_OUT=tar -xf
 RMF = rm -f
 
 #  Environment settings for calls to ./configure
-#CONFENVS = INSTALL= LINK= CFLAGS= CXX=$(CXX) CC=$(CC) F77=$(FC) FFLAGS="$(FFLAGS)"
 CONFENVS = unset INSTALL;
 
 #------------------------------------------------------------------------------
@@ -1227,9 +1215,10 @@ sun242.xml:
 # When building, remove troublesome environment variables
 build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
 		astrom/makefile $(MATCHPROG)/Makefile
-	cd moggy && unset INSTALL; make
+	cd moggy && $(CONFENVS) make
 	cd astrom && ./mk build
-	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make
+	cd $(MATCHPROG) && $(CONFENVS) make
+#	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make
 
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
@@ -1275,8 +1264,6 @@ astrom/makefile: astrom/makefile.in
 $(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
 	cd catlib && $(CONFENVS) make
 	cd catlib && $(CONFENVS) make install
-#	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
-#	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 	ar -d $@ slasubs.o
 	@ echo "NOTE: removed slasubs.o from $@"
 	echo 'char glsfwd(); int main() { glsfwd(); return 0; }' >conftest.c
@@ -1307,7 +1294,9 @@ $(CATLIBINSTALLDIR)/stamp:
 
 # Unpack match.
 $(MATCHPROG)/Makefile:
-	@ if test -f $(MATCHPROG).tar; then \
+	@ if test -f $(MATCHPROG).tar.gz; then \
+	    echo "Found $(MATCHPROG).tar.gz"; gunzip $(MATCHPROG).tar; \
+	elif test -f $(MATCHPROG).tar; then \
 	    echo "Found $(MATCHPROG).tar"; \
 	else \
 	    echo "!!! Can't find $(MATCHPROG).tar -- download it from http://spiff.rit.edu/match/"; \
