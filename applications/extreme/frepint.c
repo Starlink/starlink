@@ -34,10 +34,10 @@
 *        - EQUIVALENCE statements
 *        - Use of INTEGER Specific names for standard intrinsic functions
 *          (IABS, ISIGN, IDIM, MAX0, AMAX0, MIN0, IMIN0)
-*
-*     One construction which can cause trouble which is NOT spotted by
-*     this program is use of integer literals as actual arguments in 
-*     subroutine/function calls.
+*        - Literal integer constants used as actual arguments in function
+*          or subroutine calls.  A function call is identified as such
+*          (rather than an array reference) if its name contains an 
+*          underscore - obviously, this might lead to mistakes.
 *
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -106,6 +106,47 @@
    };
 
 
+   struct tokitem *funcofarg( struct tokitem *ptok ) {
+/*
+*+
+*  Name:
+*     funcofarg
+*
+*  Purpose:
+*     Find the name of the function of which the given token is an argument.
+*
+*  Description:
+*     Given a pointer to a token which represents an argument, or an
+*     unbracketed element of an argument, of a function call or
+*     declaration, this function works back through the token stream
+*     to find the token containing the identifier of the function.
+*     This is the first token at a lower level of bracketing in the
+*     backwards direction from the starting position.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to a token which is an unbracketed token in an actual
+*        or formal argument list of a function call/declaration.
+*
+*  Return value:
+*     funcofarg = struct tokitem *
+*        Pointer to the token giving the function name identifier.
+*-
+*/
+      int lev = 1;
+      while ( (--ptok)->tokval && lev ) {
+         switch( ptok->tokval ) {
+            case '(':
+               lev--;
+               break;
+            case ')':
+               lev++;
+               break;
+         }
+      }
+      return ptok;
+   }
+
 
    void frepint() {
 /*
@@ -140,11 +181,13 @@
       int skipspc;
       int t;
       int t1;
+      int tp;
       int tbufsiz = 0;
       int tok;
       char c;
       char *pc;
       char *qc;
+      struct tokitem *pctok;
       struct tokitem *tbuf = NULL;
 
 /* Get characters from the lex tokeniser.  As well as the token id which
@@ -184,9 +227,13 @@
             }
          }
 
+/* Get values of tokens for convenience. */
+         t = tbuf[ i ].tokval;
+         t1 = tbuf[ i + 1 ].tokval;
+
 /* INTEGER declaration to be changed.  Handle this token and any others 
    up till the next newline character. */
-         if ( tbuf[ i ].tokval == INTEGER && tbuf[ i + 1 ].tokval != '*' ) {
+         if ( t == INTEGER && t1 != '*' ) {
             printf( " * 8" );
             skipspc = 4;
             if ( ! isspace( *(tbuf[ i + 1 ].string) ) ) {
@@ -275,23 +322,42 @@
             i = j - 1;
          }
 
-/* Any other token. */
-         else {
-            t = tbuf[ i ].tokval;
-            t1 = tbuf[ i + 1 ].tokval;
-            if ( t == INTEGER && t1 == '*' ) {
-               fprintf( stderr, "%s: INTEGER*%s declaration not changed\n", 
-                                name, tbuf[ i + 2 ].strmat );
-            }
-            if ( t == EQUIVALENCE ) {
-               fprintf( stderr, "%s: EQUIVALENCE statement found\n", name );
-            }
-            if ( ( t == IABS || t == ISIGN || t == IDIM || t == MAX0 ||
-                   t == AMAX0 || t == MIN0 || t == AMIN0 ) && t1 == '(' ) {
-               fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
-                               name, tbuf[ i ].strmat );
+/* Literal integer constant.  If this occurs as an actual argument of a
+   subroutine or function call, we should at least generate a warning. */
+         else if ( t == INTEGER_CONSTANT ) {
+            tp = tbuf[ i - 1 ].tokval;
+            if ( tp == '+' || tp == '-' )   /* Cope with unary plus or minus */
+               tp = tbuf[ i - 2 ].tokval;
+            if ( ( t1 == ',' || t1 == ')' ) && ( tp == ',' || tp == '(' ) ) {
+               pctok = funcofarg( tbuf + i );
+               if ( pctok[ -1 ].tokval == CALL || 
+                    ( pctok->tokval == IDENTIFIER && 
+                      strchr( pctok->strmat, '_' ) != NULL ) ) {
+                  fprintf( stderr, "%s: Literal integer as arg of %s\n",
+                                   name, pctok->strmat );
+               }
             }
          }
+
+/* INTEGER which already has an explicit length declared - generate a 
+   warning. */
+         else if ( t == INTEGER && t1 == '*' ) {
+            fprintf( stderr, "%s: INTEGER*%s declaration not changed\n", 
+                             name, tbuf[ i + 2 ].strmat );
+         }
+
+/* EQUIVALENCE statement - generate a warning. */
+         else if ( t == EQUIVALENCE ) {
+            fprintf( stderr, "%s: EQUIVALENCE statement found\n", name );
+         }
+
+/* Integer specific intrinsic function call - generate a warning. */
+         else if ( ( t == IABS || t == ISIGN || t == IDIM || t == MAX0 ||
+                t == AMAX0 || t == MIN0 || t == AMIN0 ) && t1 == '(' ) {
+            fprintf( stderr, "%s: INTEGER-specific intrinsic name %s\n",
+                            name, tbuf[ i ].strmat );
+         }
+         
       }
 
    }
