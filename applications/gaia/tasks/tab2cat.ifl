@@ -1,4 +1,4 @@
-interface CAT2TAB
+interface TAB2CAT
 
    parameter OUT
       position 1
