@@ -1,0 +1,272 @@
+o Colour Depth: 8, 16 or 24 Bit Colour Tables:
+
+LutEdit can be used with nearly any type of X windows visual. The only
+real difference in the behaviour of LutEdit is that the updating of the
+image display and histogram happens much faster if the if your window 
+is set to 256 (8 bit) colour.
+
+o Colour Tables, Pens & Entries:
+
+The xwindows device used to display the image in the top left corner can
+display a limited number of colours (usually no more than 256). Each of
+these colours is referred to as a "pen" within LutEdit. Each pen has an
+integer index from 1 to the number of available pens. Pens 1 to 16 are
+reserved for drawing annotation and are not used by the image display.
+
+The full list of pen colours (minus the reserved lower 16 pens) is called
+the "colour table". A colour table can be saved in the form of an NDF for
+future use. Such an NDF has a 2D data array with 3 columns holding red,
+green and blue intensity. Each row in the NDF corresponds to a single
+"entry". If the number of entries in the NDF does not match the number of
+pens available in the image display, then the entries are interpolated to
+find the colour for each pen. Thus an NDF containing only (say) 30
+entries can be expanded to cover a colour table with 240 pens. Each NDF
+"entry" then corresponds to 8 "pens". The entries in an NDF can be 
+interpolated in two different ways to find the value of a given pen:
+
+  -  Nearest neighbour interpolation: each pen is assigned the value of
+the nearest entry in the NDF.
+
+  -  Linear interpolation: the value of each pen is determined by linear
+interpolation between the two nearest entries in the NDF.
+
+In the LutEdit editor panel, the current pen is represented by the
+"cursor" (a vertical white line). The NDF entry which contains this pen
+is indicated by a short horizontal black line, at the point where the
+cursor line crosses the curve being edited. This line is referred to as
+"the marker". The colour curves include the effects of the chosen
+interpolation method. So if nearest neighbour interpolation is selected,
+the curve will have a jagged "staircase" look, but it will be smooth if
+linear interpolation is selected.
+
+o The Component of the LutEdit GUI:
+
+At the top is the MENU BAR, with the usual collection od menu buttons.
+
+Under this is an area containing INFORMATION about the number of pens and
+entries in the colour table, and the data values used to scale the
+displayed image.
+
+Under this, on the left there is a IMAGE DISPLAY which uses the current 
+contents of the colour table editor to render the image specified at
+start-up. The upper and lower scaling limits can be selected within the
+"Options" menu. To the right of the image display is a HISTOGRAM of the 
+pens used to draw the image. Each bin within the histogram is coloured
+using the colour of the pen to which it refers. The horizontal axis of
+this histogram may be annotated either with pen numbers or with data
+value. The vertical axis (pen count) can either be linear or logarithmic
+(useful if a large fraction of the image has a single value). The image
+display and histogram can either be updated automatically whenever a
+change is made to the colour table, or manually by pressing the "update"
+button (a vertical pointing arrow to the right of the editor panel). All
+these options are controlled from the "Options" menu.
+
+Next is the EDITOR PANEL. The horizontal axis of the editor corresponds
+to pen number. The interpretation of the vertical axis depends on which
+colour system is currently in use; for instance, when using the RGB
+colour system, it corresponds to colour "intensity" in the range zero to
+one. The editor will contain one or more coloured curves representing the
+value of each component of the colour system, at each pen (see the
+"Colour System" entry in the "Options" menu for further details). One of
+these curves will be highlighted and is known as the "current" curve. All
+editing functions affect the current curve only. To change the current
+curve, click on one of the buttons below the lower left corner of the
+editor panel.
+
+The WHITE VERTICAL LINE is the "cursor", which may be moved by clicking
+anywhere within the editor panel. The pen number and the value of the
+current curve at the cursor are displayed below the editor panel. The
+cursor can also be moved by typing a pen number into the widget which
+displays the current pen number, or by pressing the left or right arrow
+keys on the keyboard. 
+
+Several of the items in the "Edit" menu, require pens to be selected. To
+SELECT A RANGE OF PENS, click on the cursor and drag it sideways.
+
+Under the cursor, at the point where it crosses the current curve, is a
+SHORT HORIZONTAL BLACK LINE. This line is called the "marker", and it
+identifies the value and extent of the table entry which contains the
+current pen. This marker can be dragged vertically to change the value
+of the corresponding table entry.
+
+The editor panel can be ZOOMED independantly in the horizontal or
+vertical direction. Each direction has a pair of buttons labelled "+" and
+"-" which can be pressed to increase or decrease the zoom factor. There
+is also an "UNZOOM" button at the bottom right corner of the panel, which
+restores both zoom factors to their default values. When zoomed, the
+visible section of the table may be changed using the scroll bars below
+and to the right of the editor panel.
+
+Below the unzoom button are a pair of buttons which are used to create
+and delete "CONTROL POINTS". Pressing the left hand button in the pair
+will add a control point to the current curve at the current position of
+the cursor. Pressing the right hand button in the pair will delete the
+control point which is closest to the cursor. Pressing the shift key
+whilst pressing the right hand button will causes all control points to
+be deleted from the current curve. Control points are represented by
+black circular symbols attached to the current curve. These symbols may
+be moved vertically by clicking and dragging. This will cause the current
+curve to be "bent" to allow value at the current pen to follow the
+control point. The bends in the curve occur at the adjacent control
+points (if there is no adjacent control point, then the remaining part of
+the curve is shifted bodily up or down.
+
+At the very bottom is an area which displays short help about each item
+under the pointer as the pointer is moved over the interface.
+
+o The File Menu:
+
+  - Open: Opens an NDF containing an existing colour table and displays
+  it in the editor panel. The image and histogram will only be updated if
+  the "auto-update" option is selected. If this is not the case, you will
+  need to press the manual update button (to the right of the editor
+  panel) to force the display to be updated. 
+
+  - Read Current: Closes the current colour table and loads the colour
+  table currently being used to display the image at the top left corner
+  of the interface. This will usually be a representation of the colour
+  table which has just been closed, but may not be exactly the same
+  depending on how many colours are avilable and the interpolation method
+  being used. This command allows you to check how faithfully your
+  requested colour table is being honoured by the image display.
+
+  - New: Closes the current colour table and initializes a new greyscale
+  colour table with a specified number of entries.
+
+  - Save: Saves the current colour table. If it has not been saved before,
+  you will be asked to specify the file in which to save it.
+
+  - Save As: Allows you to save the current colour table again, using a
+  specified file name. Any existing file name associated with the colour
+  table is ignored.
+
+  - Exit: Close the current colour table, saving it if any changes have
+  been made, and quit the application.
+
+o The Options Menu:
+
+  - Auto-update: If selected, the image display and histogram will be
+  updated automatically to reflect each change made to the colour table.
+  If not selected, the image and histogram will only be updated when the
+  "update" button is pressed (an upward pointing arrow to the right of
+  the editor panel).
+
+  - Colour system: Determines hwo the colour of each pen is represented.
+  Each curve within the editor represents one of the parameters of the 
+  selected colour system. Each time the system is changed, the curves in
+  the editor will be transformed into the newly selected system, and the
+  labels of the curve-selection buttons under the editor will be changed.
+
+     RGB: Each colour is represented by three parameters; the red, green
+     and blue "intensity", normalized into the range zero to one.
+
+     HSV: Each colour is represented by three parameters; hue, saturation
+     and value, all represented by numbers in the range zero to one. Hue
+     specifies the basic colour (0.0=red, 0.33=green, 0.67=blue, 1.0=red).
+     Saturation specifies how intense the colour is. Zero corresponds to 
+     no colour (i.e. a shade of grey), and one corresponds to full colour.
+     The value represents the overall "brightness" of the colour in the
+     range zero to one.
+
+     Greyscale: Each colour is represented by a single parameter;
+     intensity. Zero corresponds to black and one corresponds to white.
+
+  - Interpolation: Specifies how the entries in the colour table should
+  be interpolated to obtain the value for a specified pen. Nearest-neighbour 
+  preserves sharp edges in the colour table, and linear produces a smoother 
+  colour table. This value is used both to produce the curves in the
+  editor, and to colour the image display and histogram.
+
+  - Image display: Determines how the the image display in the top left 
+  corner should be produced. "Auto-cut" allows the scaling of the image
+  to be selected. For instance, "0.5%" means that the top 0.5% of the 
+  pixel valuess in the image will be coloured with the highest available 
+  pen, and lowest 0.5% will be coloured with the lowest available pen. 
+  This can be changed by selecting "Negative" in which case the top data
+  values are coloured using the bottom pen, and vice-versa.
+
+  - Histogram: Determines how the histogram to the top right corner
+  should be produced. The labels on the X axis can be either pen numbers
+  or the corresponding data values within the displayed image. The SIze
+  of the text can be changed, adn the Y axis can be drawn logarithmically
+  (base 10) or linearly.
+
+  - Save options: This causes all the current options settings to be
+  saved in a file called "luteditrc" in your ADAM directory. This file
+  will be used to re-establish the current options value when LutEdit is
+  next run.
+
+o The Edit Menu:
+
+To select a range of pens, click and drag the pointer over the editor
+window.
+
+  - Undo: Undo the previous change to the colour table. The most recent ten 
+  changes can be undone.
+
+  - Bridge: This replaces part of the current curve using a straight line
+  which passes through the current values at the first and last select
+  pens. 
+
+  - Resample: Changes the number of entries in the colour table to a
+  specified number. The new table is formed by resampling the old table
+  using a specified interpolation scheme (linear or nearest-neighbour).
+
+  - Rotate: This shifts the current curve to the left or right by a given
+  number of pens. Entries which are shifted off the ends of the table are
+  re-introduced into the table at the opposite end, so that pens
+  "rotate".
+
+  - Set Constant: This replaces the values for the currently selected
+  pens with a specified constant value.
+
+  - Smooth: This smooths the values for the selected pens using a
+  "box-filter" of specified size. A box filter replaces each value with
+  the mean of the values within a box of the specified size, centred on
+  the pen being changed.
+
+o How to...:
+
+>>> Change the value of an individual entry in the colour table: 
+
+  Click and drag the short horizontal black line (the "marker") which is
+  displayed at the point the cursor crosses the current curve (use the
+  "+" and "-" buttons to zoom in if it is too small to see). The marker
+  can only be dragged vertically.
+
+
+>>> Change the values of a range of pens:
+
+  1) Select the pens to change (by dragging the cursor) and then use one
+  of the commands in the "Edit" menu
+ 
+  or 
+
+  2) Add control points to the current curve by positioning the cursor
+  and then pressing the "Add Control Point" button (to the bottom right
+  of the editor). Then drag one or more control points vertically to
+  achieve the desired result. The curve will move vertically at the
+  dragged control point, but will remain fixed at the adjacent control
+  points. Intermediate pens will dragged vertically by an amount which
+  depends on how far away the pen is from the control point which is
+  being dragged.
+
+
+>>> Set pens to a shade of grey:
+
+  If you want the whole colour table to be grey, select the "Greyscale"
+  colour system in the "Options" menu. If you only want selected pens to 
+  be grey, choose the "HSV" colour system, then click on the "Saturation"
+  button at the bottom right of the editor, then select the pens to be
+  changed. Press the "Set Constant" entry in the "Edit" menu, and enter a
+  value of zero. If desired, re-select the RGB colour system in the
+  "Options" menu.
+
+
+>>> Increase the number of entries in the colour table:
+
+   Use the "Resample" item in the "Edit" menu.
+
+
+
+  
