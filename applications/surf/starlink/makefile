@@ -576,7 +576,7 @@ surf_remsky.f surf_restore.f surf_scan_rlb.f surf_scucat.f surf_scuclip.f \
 surf_scuhelp.f surf_scuover.f surf_scuphot.f surf_skydip.f surf_write_data.f \
 surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f \
 surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f \
-surf_add_dbm.f surf_remip.f
+surf_add_dbm.f surf_remip.f surf_request_output_coords.f
 
 SURF_FCPP_ROUTINES = surf_write_map_info.F surf_set_app_name.F
 
@@ -1695,6 +1695,7 @@ surf_rebin.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_recurse_read.o: DAT_PAR MSG_PAR NDF_PAR SAE_PAR SURF_PAR
 surf_reduce_switch.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_remsky.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_request_output_coords.o: SAE_PAR
 surf_restore.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_scan_rlb.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR MSG_PAR GRP_PAR
