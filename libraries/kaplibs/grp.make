@@ -28,7 +28,7 @@ UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sunxx.tex sunxx.htx_tar \
-kaplibs.news ira_Source.tar 
+kaplibs.news ira_source.tar 
 
 #  Target for use by the grp command.
 $(action)
