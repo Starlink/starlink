@@ -91,11 +91,12 @@
 *  External References:
       EXTERNAL			BDI1_CHK
       EXTERNAL			BDI1_CREAT
+      EXTERNAL			BDI1_GET
       EXTERNAL			BDI1_MAP
       EXTERNAL			BDI1_MAPERR
       EXTERNAL			BDI1_MAPLQ
+      EXTERNAL			BDI1_PUT
       EXTERNAL			BDI1_UNMAP
-      EXTERNAL			BDI1_GET
 
 *  Local Variables:
       INTEGER			DID			! Dummy identifier
@@ -110,8 +111,9 @@
 *    Requires the data models package
         CALL ADI_REQPKG( 'dsmodels', STATUS )
 
+*    HDS general binned dataset interface
         CALL ADI_DEFFUN(
-     :       'FileItemChk(_BinDS,_HDSfile,_CHAR)',
+     :       'FileItemChk(_,_HDSfile,_CHAR)',
      :                   BDI1_CHK, DID, STATUS )
 
         CALL ADI_DEFFUN(
@@ -119,16 +121,16 @@
      :                   BDI1_CREAT, DID, STATUS )
 
         CALL ADI_DEFFUN(
-     :       'FileItemMap(_BinDS,_HDSfile,_CHAR,_CHAR,_CHAR)',
+     :       'FileItemGet(_,_HDSfile,_CHAR)',
+     :                   BDI1_GET, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_,_HDSfile,_CHAR,_CHAR,_CHAR)',
      :                   BDI1_MAP, DID, STATUS )
 
         CALL ADI_DEFFUN(
-     :       'FileItemUnmap(_BinDS,_HDSfile,_CHAR,_INTEGER)',
+     :       'FileItemUnmap(_,_HDSfile,_CHAR,_INTEGER)',
      :                   BDI1_UNMAP, DID, STATUS )
-
-        CALL ADI_DEFFUN(
-     :       'FileItemGet(_BinDS,_HDSfile,_CHAR)',
-     :                   BDI1_GET, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemMap(_BinDS,_HDSfile,"Error",_CHAR,_CHAR)',
@@ -137,6 +139,10 @@
         CALL ADI_DEFFUN(
      :    'FileItemMap(_BinDS,_HDSfile,"LogicalQuality",_CHAR,_CHAR)',
      :                   BDI1_MAPLQ, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemPut(_,_HDSfile,_CHAR,_)',
+     :                   BDI1_PUT, DID, STATUS )
 
 *    Mark as initialised
         BDI_INIT = .TRUE.
