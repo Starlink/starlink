@@ -51,7 +51,6 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 am__installdirs = $(DESTDIR)$(m4datadir)
 dist_m4dataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_m4data_DATA)
@@ -158,6 +157,7 @@ sanity.m4 \
 strip.m4
 
 EXTRA_DIST = dirlist amversion.in
+STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-am
 
 .SUFFIXES:

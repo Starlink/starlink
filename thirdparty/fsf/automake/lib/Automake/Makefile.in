@@ -51,7 +51,6 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -170,6 +169,7 @@ do_subst = in=`echo $@ | sed 's/\.[^.]*$$//'`; sed \
   -e 's,[@]datadir[@],$(datadir),g'
 
 EXTRA_DIST = Config.in
+STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-recursive
 
 .SUFFIXES:

@@ -51,7 +51,6 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 am__installdirs = $(DESTDIR)$(amdir)
 dist_amDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(dist_am_DATA)
@@ -129,9 +128,11 @@ configure.am data.am dejagnu.am depend.am depend2.am distdir.am \
 footer.am header-vars.am header.am install.am java.am lang-compile.am \
 lex.am library.am libs.am libtool.am lisp.am ltlib.am ltlibrary.am \
 mans-vars.am mans.am monoliths.am multilib.am program.am progs.am python.am \
-remake-hdr.am scripts.am starlink.am starlink_messgen.am subdirs.am tags.am texi-vers.am texibuild.am \
-texinfos.am yacc.am
+remake-hdr.am scripts.am \
+starlink.am starlink_messgen.am starlink_stardocs.am \
+subdirs.am tags.am texi-vers.am texibuild.am texinfos.am yacc.am
 
+STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-am
 
 .SUFFIXES:

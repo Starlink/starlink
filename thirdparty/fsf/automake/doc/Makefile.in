@@ -51,7 +51,6 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/lib/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 INFO_DEPS = $(srcdir)/automake.info
 TEXINFO_TEX = $(top_srcdir)/lib/texinfo.tex
 am__TEXINFO_TEX_DIR = $(top_srcdir)/lib
@@ -144,6 +143,7 @@ ETAGS_ARGS = --lang=none \
  --regex='/^@node[ \t]+\([^,]+\)/\1/' $(srcdir)/automake.texi
 
 TAGS_DEPENDENCIES = automake.texi
+STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-am
 
 .SUFFIXES:

@@ -58,7 +58,6 @@ binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -173,6 +172,7 @@ config.sub \
 symlink-tree \
 texinfo.tex
 
+STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
 all: all-recursive
 
 .SUFFIXES:
