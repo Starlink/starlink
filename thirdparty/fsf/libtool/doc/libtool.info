@@ -1,4 +1,4 @@
-This is libtool.info, produced by makeinfo version 4.5 from
+This is libtool.info, produced by makeinfo version 4.3 from
 libtool.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -27,8 +27,8 @@ Indirect:
 libtool.info-1: 863
 libtool.info-2: 49847
 libtool.info-3: 98981
-libtool.info-4: 148036
-libtool.info-5: 183757
+libtool.info-4: 148035
+libtool.info-5: 183756
 
 Tag Table:
 (Indirect)
@@ -99,23 +99,23 @@ Node: C++ libraries134997
 Node: Troubleshooting136417
 Node: Libtool test suite136949
 Node: Test descriptions137675
-Node: When tests fail144115
-Node: Reporting bugs144999
-Node: Maintaining146610
-Node: New ports147350
-Node: Information sources148036
-Node: Porting inter-library dependencies150493
-Node: Tested platforms153199
-Node: Platform quirks161627
-Node: References162593
-Node: Compilers163439
-Ref: Compilers-Footnote-1165004
-Node: Reloadable objects165320
-Node: Multiple dependencies165668
-Node: Archivers166548
-Node: libtool script contents167103
-Node: Cheap tricks182261
-Node: GNU Free Documentation License183757
-Node: Index202485
+Node: When tests fail144114
+Node: Reporting bugs144998
+Node: Maintaining146609
+Node: New ports147349
+Node: Information sources148035
+Node: Porting inter-library dependencies150492
+Node: Tested platforms153198
+Node: Platform quirks161626
+Node: References162592
+Node: Compilers163438
+Ref: Compilers-Footnote-1165003
+Node: Reloadable objects165319
+Node: Multiple dependencies165667
+Node: Archivers166547
+Node: libtool script contents167102
+Node: Cheap tricks182260
+Node: GNU Free Documentation License183756
+Node: Index202484
 
 End Tag Table

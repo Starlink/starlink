@@ -1,4 +1,4 @@
-This is libtool.info, produced by makeinfo version 4.5 from
+This is libtool.info, produced by makeinfo version 4.3 from
 libtool.texi.
 
 INFO-DIR-SECTION GNU programming tools
@@ -1075,7 +1075,6 @@ they test for:
      than `.c'.  This test validates that libtool can handle suffixes
      for all the file types that it supports, and that it fails when
      the suffix is invalid.
-
 
 
 File: libtool.info,  Node: When tests fail,  Prev: Test descriptions,  Up: Libtool test suite

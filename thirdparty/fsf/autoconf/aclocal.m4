@@ -1,6 +1,6 @@
-# generated automatically by aclocal 1.7a -*- Autoconf -*-
+# generated automatically by aclocal 1.8.2-starlink -*- Autoconf -*-
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 # Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
@@ -13,6 +13,7 @@
 
 #                                                        -*- Autoconf -*-
 # Copyright (C) 2002, 2003  Free Software Foundation, Inc.
+# Generated from amversion.in; do not edit by hand.
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,14 +33,14 @@
 # ----------------------------
 # Automake X.Y traces this macro to ensure aclocal.m4 has been
 # generated from the m4 files accompanying Automake X.Y.
-AC_DEFUN([AM_AUTOMAKE_VERSION],[am__api_version="1.7a"])
+AC_DEFUN([AM_AUTOMAKE_VERSION], [am__api_version="1.8"])
 
 # AM_SET_CURRENT_AUTOMAKE_VERSION
 # -------------------------------
 # Call AM_AUTOMAKE_VERSION so it can be traced.
 # This function is AC_REQUIREd by AC_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-	 [AM_AUTOMAKE_VERSION([1.7a])])
+	 [AM_AUTOMAKE_VERSION([1.8.2-starlink])])
 
 # AM_AUX_DIR_EXPAND
 
@@ -189,6 +190,7 @@ AM_MISSING_PROG(MAKEINFO, makeinfo)
 AM_MISSING_PROG(AMTAR, tar)
 AM_PROG_INSTALL_SH
 AM_PROG_INSTALL_STRIP
+AC_REQUIRE([AM_PROG_MKDIR_P])dnl
 # We need awk for the "check" target.  The system "awk" is bad on
 # some platforms.
 AC_REQUIRE([AC_PROG_AWK])dnl
@@ -288,7 +290,7 @@ rmdir .tst 2>/dev/null
 AC_SUBST([am__leading_dot])])
 
 
-# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+# Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 # Free Software Foundation, Inc.
 
 # This program is free software; you can redistribute it and/or modify
@@ -306,23 +308,23 @@ AC_SUBST([am__leading_dot])])
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-# serial 7
+# serial 8
 
 # AM_PATH_LISPDIR
 # ---------------
 AC_DEFUN([AM_PATH_LISPDIR],
-[AC_CHECK_PROGS([EMACS], [emacs xemacs], [no])
+[ # If set to t, that means we are running in a shell under Emacs.
+ # If you have an Emacs named "t", then use the full path.
+ test x"$EMACS" = xt && EMACS=
+ AC_CHECK_PROGS([EMACS], [emacs xemacs], [no])
  AC_ARG_VAR([EMACS], [the Emacs editor command])
  AC_ARG_VAR([EMACSLOADPATH], [the Emacs library search path])
  AC_ARG_WITH([lispdir],
- [  --with-lispdir          Override the default lisp directory ],
+ [  --with-lispdir          override the default lisp directory],
  [ lispdir="$withval"
    AC_MSG_CHECKING([where .elc files should go])
    AC_MSG_RESULT([$lispdir])],
  [
- # If set to t, that means we are running in a shell under Emacs.
- # If you have an Emacs named "t", then use the full path.
- test x"$EMACS" = xt && EMACS=
  AC_CACHE_CHECK([where .elc files should go], [am_cv_lispdir], [
    if test $EMACS != "no"; then
      if test x${lispdir+set} != xset; then
@@ -334,8 +336,8 @@ AC_DEFUN([AM_PATH_LISPDIR],
   AC_RUN_LOG([$EMACS -batch -q -eval '(while load-path (princ (concat (car load-path) "\n")) (setq load-path (cdr load-path)))' </dev/null >conftest.out])
 	am_cv_lispdir=`sed -n \
        -e 's,/$,,' \
-       -e '/.*\/lib\/x\?emacs\/site-lisp$/{s,.*/lib/\(x\?emacs/site-lisp\)$,${libdir}/\1,;p;q;}' \
-       -e '/.*\/share\/x\?emacs\/site-lisp$/{s,.*/share/\(x\?emacs/site-lisp\),${datadir}/\1,;p;q;}' \
+       -e '/.*\/lib\/x*emacs\/site-lisp$/{s,.*/lib/\(x*emacs/site-lisp\)$,${libdir}/\1,;p;q;}' \
+       -e '/.*\/share\/x*emacs\/site-lisp$/{s,.*/share/\(x*emacs/site-lisp\),${datadir}/\1,;p;q;}' \
        conftest.out`
        rm conftest.out
      fi
@@ -394,6 +396,64 @@ else
   AC_MSG_WARN([`missing' script is too old or missing])
 fi
 ])
+
+# AM_PROG_MKDIR_P
+# ---------------
+# Check whether `mkdir -p' is supported, fallback to mkinstalldirs otherwise.
+
+# Copyright (C) 2003, 2004 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+
+# Automake 1.8 used `mkdir -m 0755 -p --' to ensure that directories
+# created by `make install' are always world readable, even if the
+# installer happens to have an overly restrictive umask (e.g. 077).
+# This was a mistake.  There are at least two reasons why we must not
+# use `-m 0755':
+#   - it causes special bits like SGID to be ignored,
+#   - it may be too restrictive (some setups expect 775 directories).
+#
+# Do not use -m 0755 and let people choose whatever they expect by
+# setting umask.
+AC_DEFUN([AM_PROG_MKDIR_P],
+[if mkdir -p -- . 2>/dev/null; then
+  # Keeping the `.' argument allows $(mkdir_p) to be used without
+  # argument.  Indeed, we sometimes output rules like
+  #   $(mkdir_p) $(somedir)
+  # where $(somedir) is conditionally defined.
+  # (`test -n '$(somedir)' && $(mkdir_p) $(somedir)' is a more
+  # expensive solution, as it forces Make to start a sub-shell.)
+  mkdir_p='mkdir -p -- .'
+else
+  # On NextStep and OpenStep, the `mkdir' command does not
+  # recognize any option.  It will interpret all options as
+  # directories to create, and then abort because `.' already
+  # exists.
+  for d in ./-p ./--;
+  do
+    test -d $d && rmdir $d
+  done
+  # $(mkinstalldirs) is defined by Automake if mkinstalldirs exists.
+  if test -f "$ac_aux_dir/mkinstalldirs"; then
+    mkdir_p='$(mkinstalldirs)'
+  else
+    mkdir_p='$(install_sh) -d'
+  fi
+fi
+AC_SUBST([mkdir_p])])
 
 # Helper functions for option handling.                    -*- Autoconf -*-
 
