@@ -42,7 +42,7 @@ arguments.  In this case, there should be no <elemref gi="parameter"/> content.
 details about an author, and has a required ID attribute.
 This ID is a key which is intended to be unique to a particular author
 (it's not an SGML ID attribute which would be guaranteed unique, but
-which causes other problems in this case). 
+which causes other problems in this case). </p>
 <!--
 <p>The <elemref gi="author" self="self"/> element includes full details about
 an author and has a required ID attribute, the <elemref gi="authorref"/> element simply refers to an <elemref gi="author" self="self"/>
@@ -203,26 +203,6 @@ this in the <elemref gi="authornote" self="self"/> element.
 </p>
 <!--splice:authornote-->
 </element>
-
-<![IGNORE[
-<element gi="authorref" status="beta">
-<p>A reference to an author whose details are in the <elemref
-gi="author"/> element referred to by the ID attribute. 
-</p>
-<attribute name="id">
-<p>The link to the <elemref gi="author"/> element.
-</p>
-</attribute>
-<attribute name="note">
-<p>A note giving further information about the author, in this
-context.  For example, ISO 10179 was listed as an `author' of some of
-the routines in the DSSSL stylesheet, and this attribute was used to
-list the section of the standard where the code was defined.
-</p>
-</attribute>
-<!--splice:authorref-->
-</element>
-]]>
 
 <element gi="blockquote" status="beta">
 <p>See <elemxref gi="blockquote" dtd="sundtd"/>
