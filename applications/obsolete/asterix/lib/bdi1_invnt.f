@@ -355,7 +355,9 @@
         CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
 *    Set the WriteBack function
-        WBPTR = UTIL_PLOC( BDI1_WBGEN )
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_WBGEN )
+        END IF
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
@@ -400,12 +402,14 @@
           CALL ADI_UNMAP( ITID, WPTR, STATUS )
           CALL BDI1_UNMAP_INT( BDID, HFID, PSID, STATUS )
 
-*      Set the WriteBack function
-          WBPTR = UTIL_PLOC( BDI1_WBERR )
-
 *      Release storage
           CALL ADI_ERASE( PSID, STATUS )
 
+        END IF
+
+*    Set the WriteBack function
+        IF ( .NOT. RMODE ) THEN
+          WBPTR = UTIL_PLOC( BDI1_WBERR )
         END IF
 
 *  Axis bounds?
