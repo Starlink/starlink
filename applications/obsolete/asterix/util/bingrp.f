@@ -173,7 +173,6 @@
       INTEGER       		NABIN,NRBIN		! # of azimuthal & radial bins
       INTEGER                   NGELM                   ! # pixels in grped axes
       INTEGER                   NOPAX                   ! # grouped axes
-      INTEGER       		NRAD			! limit on # of radial bins
 
       LOGICAL			ARD			! ARD file mode?
       LOGICAL			AXMODE			! Axis mode?
@@ -381,26 +380,14 @@
 *        Get radial bin width
             CALL USI_GET0R( 'RBIN', RBIN, STATUS )
 
-*      Calculate number of output bins in each dimension
-*      Find closest border distance in axis units
+*        Calculate number of output bins in each dimension
+*        Find closest border distance in axis units
             DIST = MIN( (XHIGH-XCENT), (XCENT-XLOW), (YHIGH-YCENT),
      :                                              (YCENT-YLOW) )
-            NRBIN=INT(DIST/RBIN)
 
-*        Only 1 radial bin
-            IF (NRBIN .LT. 1) THEN
-              NRBIN=1
-              RBIN=DIST/NRBIN
-            ELSE
-*     See if limit on radial extent
-              CALL USI_DEF0I('NRAD',NRBIN,STATUS)
-              CALL USI_GET0I('NRAD',NRAD,STATUS)
-              IF (NRAD.LT.NRBIN) THEN
-                NRBIN=NRAD
-              ELSE
-                RBIN=DIST/NRBIN
-              ENDIF
-            ENDIF
+*        See if limit on radial extent
+            CALL USI_DEF0I('NRAD',MAX(1,INT(DIST/RBIN)),STATUS)
+            CALL USI_GET0I('NRAD',NRBIN,STATUS)
             PRBIN=ABS(RBIN/ASCALE(1))
 
 *      If irregular, get bounds
