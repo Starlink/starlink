@@ -86,9 +86,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
       
-*  Put the parameter into its cancelled state.
-      CALL PAR_CANCL( PARAM, STATUS )
-
 *  Get a list of NDFs from the user.
       NNDF = 0
       CALL CCD1_NDFGL( PARAM, 1, MAXNDF, GID, NNDF, STATUS )
