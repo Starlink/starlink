@@ -158,8 +158,8 @@ astimp astfile=instrum.ast in=! logto=terminal accept
 Notes
 
 AST file format:
-   The AST file is designed to be written by ASTEXP and read by
-   ASTIMP, and the user does not need to understand its format.
+   The AST file is designed to be written by ASTEXP and read by ASTIMP
+   or MAKESET, and the user does not need to understand its format.
    It is however a text file, and if care is taken it may be
    edited by hand.  Removing entire framesets and modifying ID
    values or domain names may be done fairly easily, but care
@@ -216,6 +216,10 @@ AST file format:
             Usually N will take the values 1,2,3,... for the
             framesets in the file.  Typically the N'th image in a
             list will match the one with an ID of "INDEX N".
+
+      -  "SET N"
+            This will match an image if the Set Index attribute
+            in its CCDPACK Set header is equal to the integer N.
 
    Modifiers:
       Modifiers describe additional modifications to be made

@@ -6,7 +6,7 @@ Usage:
 
    ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
             direction=? deferred=? extent=? preserve=? genvar=?
-            ndfnames=?
+            ndfnames=? useset=?
 
 Description:
 
@@ -291,6 +291,32 @@ SAVEFILE = FILENAME (Read)
    when restoring the program parameters. Restoration files are
    described in the notes section.
    [CCDPACK_SETUP.DAT]
+
+USESET
+
+USESET = _LOGICAL (Read)
+   This parameter determines whether CCDPACK Set header information
+   will be used when it is available.  Most of the CCDPACK 
+   reduction and registration programs will look for Set header
+   information in the .MORE.CCDPACK extension of the NDFs they
+   are processing, and if it exists it will be used to modify
+   the way the processing is done: broadly speaking, reduction 
+   programs will group corresponding members of different Sets
+   together before processing, and registration programs will
+   make use of a CCD_SET frame for alignment between members
+   of the same Set.
+
+   This header information will only be present if it has been
+   added (to the NDF itself or to one earlier in the reduction 
+   chain from which it was produced) by running the MAKESET
+   program.  If it is not present, the programs will behave
+   as if USESET was false anyway, so it is normally quite safe
+   for USESET to be TRUE.  However, in some cases (especially
+   if intermediate files are stored in foreign, i.e. non-NDF 
+   data formats) it may be more efficient to set this parameter
+   false.  You should also set it false if you wanted CCDPACK 
+   programs to ignore existing Set information for some reason.
+   [TRUE]
 
 Notes
 

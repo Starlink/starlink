@@ -1,6 +1,6 @@
 .help astexp Starlink ccdpack
 .nf
-Exports coordinate system information from images to an AST file
+Exports coordinate system information from images
 
 Usage:
 
@@ -16,8 +16,8 @@ Description:
    which can be derived from other images to which similar framesets
    ought to apply.  The key should be generated in the same way when
    the AST file is used for importing the mapping information by
-   ASTIMP.  Currently these keys can be generated according to a
-   FITS header card or the order in which the images are presented.
+   ASTIMP or MAKESET.  Currently these keys can be generated according
+   to a FITS header card or the order in which the images are presented.
    Additional information may be written describing what use to
    make of FITS headers in the images.
 
@@ -25,8 +25,8 @@ Description:
    contain information about the positioning of images in a set of
    related images.
 
-   AST files written out by this program can be applied to
-   other images of similar origin using the ASTIMP program, so
+   AST files written out by this program can be applied to other 
+   images of similar origin using the ASTIMP or MAKESET programs, so
    that registration information present in the WCS components of
    one set of images (put there for instance by the REGISTER or
    WCSEDIT programs) can be transferred using ASTIMP and ASTEXP to
@@ -132,6 +132,10 @@ IDTYPE = LITERAL (Read)
                     INDICES parameter.  This normally gives the
                     frameset generated from the N'th image in the
                     IN list an ID with index N.
+
+      -  SET     -- ID is given by an integer taken from the Set
+                    Index attribute of the CCDPACK Set header
+                    of each input file
    [INDEX]
 
 IN
@@ -207,7 +211,7 @@ OUTDOMAIN = LITERAL (Read)
    parameter only gives the name that the frames will have in
    the AST file, and consequently the name by which they will be
    known when the WCS information is imported into other images
-   using ASTIMP.
+   using ASTIMP or MAKESET.
 
    The name is converted to upper case, and whitespace is removed.
    [CCD_EXPORT]
@@ -219,7 +223,7 @@ astexp reg_data* camera.ast idtype=fitsid fitsid=CHIPNUM
    This will save the information about the relative positioning
    of the images 'reg_data*' to the file 'camera.ast', calling the
    alignment domain 'CAMERA'.  The file 'camera.ast' can later be
-   used by the ASTIMP application to add the same coordinate
+   used by the ASTIMP  or MAKESET applications to add the same coordinate
    information to a different set of images from the same instrument.
    Before running this, the images 'reg_data*' should be correctly
    aligned in their Current domain.  CHIPNUM must be the name
@@ -256,8 +260,8 @@ astexp "r10595[2345]" wfc.ast outdomain=wfc
 Notes
 
 AST file format:
-   The AST file is designed to be written by ASTEXP and read by
-   ASTIMP, and the user does not need to understand its format.
+   The AST file is designed to be written by ASTEXP and read by ASTIMP
+   or MAKESET, and the user does not need to understand its format.
    It is however a text file, and if care is taken it may be
    edited by hand.  Removing entire framesets and modifying ID
    values or domain names may be done fairly easily, but care
@@ -314,6 +318,10 @@ AST file format:
             Usually N will take the values 1,2,3,... for the
             framesets in the file.  Typically the N'th image in a
             list will match the one with an ID of "INDEX N".
+
+      -  "SET N"
+            This will match an image if the Set Index attribute
+            in its CCDPACK Set header is equal to the integer N.
 
    Modifiers:
       Modifiers describe additional modifications to be made

@@ -23,9 +23,12 @@ FLAT = LITERAL (Read)
    Name of the image which contains the normalised (mean of one)
    flatfield data. This should have been produced by a program
    such as MAKEFLAT. The data should have a floating point HDS
-   data type (_REAL or _DOUBLE).
-   The name of this file may be specified using indirection
-   through a file.
+   data type (_REAL or _DOUBLE).  If USESET is true, FLAT should
+   be a group expression referring to one flatfield data file
+   matching each of the Set Index attributes represented in the 
+   IN list; again the name of the file produced by MAKEFLAT will 
+   normally be suitable.  The name of this file may be specified
+   using indirection through a file.
    [Global flatfield]
 
 IN
@@ -153,6 +156,23 @@ TITLE = LITERAL (Read)
    Title for the output images.
    [Output from FLATCOR]
 
+USESET
+
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored. 
+   If USESET is true, then the FLAT parameter is taken to 
+   refer to a group of files, and each IN file will be processed
+   using a flatfield dataset with a Set Index attribute which
+   matches its own.  An IN file with no Set header is considered
+   to match a FLAT file with no Set header, so USESET can safely
+   be set true (the default) when the input files contain no 
+   Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
+
 Examples
 
 flatcor frame1 frame1_f flatr
@@ -204,7 +224,7 @@ Behaviour_of_parameters
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, PRESERVE and FLAT) have
+   Certain parameters (LOGTO, LOGFILE, PRESERVE, FLAT and USESET) have
    global values. These global values will always take precedence,
    except when an assignment is made on the command line.  In general
    global values may be set and reset using the CCDSETUP and

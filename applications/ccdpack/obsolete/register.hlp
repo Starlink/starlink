@@ -87,6 +87,8 @@ FITTYPE = _INTEGER (Read)
 
       - 6 -- self defined function
 
+   If more than two position lists are provided, then only the 
+   values 1-5 may be used.
    [5]
 
 FULL
@@ -265,6 +267,34 @@ TOLER = _DOUBLE (Read)
    specified in coordinates with a higher accuracy or smaller
    units.
    [0.001]
+
+USESET
+
+USESET = _LOGICAL (Read)
+   This parameter determines whether Set header information should
+   be used in the registration.  If USESET is true, then 
+   REGISTER will try to group position lists according to
+   the Set Name attribute of the images to which they are attached.
+   All lists coming from images which share the same (non-blank)
+   Set Name attribute, and which have a CCD_SET coordinate 
+   frame in their WCS component, will be grouped together and
+   treated by the program as a single position list.  Images
+   which have no associated position list but are in the same
+   Set as ones which are successfully registered will have
+   a suitable registration frame added too, based on their
+   Set alignment relation to the registered Set member.
+   Thus the assumption is made that the relative alignment of 
+   images within a Set is already known and has been fixed.
+
+   If USESET is false, all Set header information is ignored.
+   If NDFNAMES is false, USESET will be ignored.  If the input
+   images have no Set headers, or if they have no CCD_SET frame 
+   in their WCS components, the setting of USESET will make
+   no difference.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 
 USEWCS
 
@@ -466,6 +496,7 @@ Notes
   the input NDFs.  Taken together these contain the registration
   information and can be inspected using WCSEDIT.
 
+
 Behaviour_of_parameters
 
    All parameters retain their current value as default. The
@@ -480,7 +511,7 @@ Behaviour_of_parameters
    default behaviour of the application may be restored by using the
    RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+   Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line.  Global values may
    be set and reset using the CCDSETUP and CCDCLEAR commands.

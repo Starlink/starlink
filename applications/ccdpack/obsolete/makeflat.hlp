@@ -211,8 +211,12 @@ OUT
 
 OUT = LITERAL (Write)
    Name of an image to contain the output flatfield data. Note this
-   image will have a precision of at least _REAL. This name may be
-   specified using indirection through a file.
+   image will have a precision of at least _REAL.
+   If USESET is true and multiple Sets are represented in the IN
+   list then this name will be used as the name of an HDS 
+   container file containing one NDF structure for each Set Index value.
+   This name may be specified using indirection through a file.
+   [TRUE]
 
 SIGMAS
 
@@ -224,6 +228,25 @@ SIGMAS = _REAL (Read)
    variances exist then one is estimated from the population of
    values.
    [4.0]
+
+USESET
+
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then input files will be considered in
+   groups; a separate flatfield will be constructed for each
+   group of corresponding input frames (i.e. those sharing 
+   the same Set Index attribute).  If this results in multiple
+   output flatfields, they will be written as separate NDF structures 
+   into a single HDS container file.  If no Set header information 
+   is present in the input files, then flatfielding is done 
+   on all the input files together, so USESET can usually be 
+   safely set to TRUE (the default).
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 
 USEVAR
 
@@ -297,7 +320,7 @@ Behaviour_of_parameters
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO and LOGFILE) have global values. These
+   Certain parameters (LOGTO, LOGFILE and USESET) have global values. These
    global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.

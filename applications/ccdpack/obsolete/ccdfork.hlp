@@ -1,7 +1,6 @@
 .help ccdfork Starlink ccdpack
 .nf
-   Creates a script for executing CCDPACK commands in a background
-   process.
+   Creates a script for executing CCDPACK commands in a background process.
 
 Usage:
 

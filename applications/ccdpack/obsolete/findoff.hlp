@@ -1,7 +1,6 @@
 .help findoff Starlink ccdpack
 .nf
-Performs pattern-matching between position lists related by
-simple offsets.
+Performs pattern-matching between position lists related by simple offsets.
 
 Usage:
 
@@ -202,7 +201,7 @@ OUTLIST = FILENAME (Write)
 
 OVERRIDE
 
-OVERRIDE = LOGICAL (Read)
+OVERRIDE = _LOGICAL (Read)
    This parameter controls whether to continue and create an
    incomplete solution. Such solutions will result when only a
    subset of the input position lists have been matched.
@@ -225,7 +224,7 @@ OVERRIDE = LOGICAL (Read)
 
 RESTRICT
 
-RESTRICT = LOGICAL (Read)
+RESTRICT = _LOGICAL (Read)
    This parameter determines whether the Current coordinate system
    is used to restrict the choice of objects to match with each
    other.  If set TRUE, then the only objects which are
@@ -245,7 +244,7 @@ RESTRICT = LOGICAL (Read)
 
 USECOMP
 
-USECOMP = LOGICAL (Read)
+USECOMP = _LOGICAL (Read)
    This parameter specifies whether the completeness value will
    be used to weight the number of matches between a pair, when
    determining the graph connecting all input datasets. Using
@@ -254,9 +253,34 @@ USECOMP = LOGICAL (Read)
    with the highest counts in favour of those with lower counts.
    [TRUE]
 
+USESET
+
+USESET = _LOGICAL (Read)
+   This parameter determines whether Set header information should
+   be used in the object matching.  If USESET is true,
+   FINDOFF will try to group position lists according to
+   the Set Name attribute of the image to which they are attached.
+   All lists coming from images which share the same (non-blank)
+   Set Name attribute, and which have a CCD_SET coordinate frame
+   in their WCS component, will be grouped together and treated
+   by the program as a single position list.  Thus no attempt
+   is made to match objects between members of the same Set;
+   it is assumed that the relative alignment within a Set
+   is already known and has been fixed.
+
+   If USESET is false, all Set header information is ignored.
+   If NDFNAMES is false, USESET will be ignored.  If the input
+   images have no Set headers, or if they have no CCD_SET frame
+   in their WCS components, the setting of USESET will make
+   no difference.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
+
 USEWCS
 
-USEWCS = LOGICAL (Read)
+USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
    position lists should be transformed from Pixel coordinates
    into the Current coordinate system of the associated image
@@ -339,7 +363,6 @@ Notes
   line.  These have no effect on the calculations, but FINDOFF
   will propagate them to the corresponding lines in the output
   list.
-
 
   EXTERNAL format - positions are specified using just an X
   and a Y entry and no other entries.
@@ -444,7 +467,7 @@ Behaviour_of_parameters
    behaviour of the application may be restored by using the RESET
    keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+   Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line.  Global values may
    be set and reset using the CCDSETUP and CCDCLEAR commands.

@@ -188,8 +188,11 @@ OUT
 
 OUT = LITERAL (Read)
    Name of the output image. This has the master bias frame and
-   the estimated variances. This name may be specified using
-   indirection through a file.
+   the estimated variances.  If USESET is true and multiple Sets
+   are represented in the IN list, then this name will be used
+   as the name of an HDS container file containing one NDF for
+   each Set Index value.  
+   This name may be specified using indirection through a file.
 
 PRESERVE
 
@@ -257,6 +260,25 @@ USEEXT = _LOGICAL (Read)
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
 
+USESET
+
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then input files will be considered in
+   groups; a separate master bias frame will be constructed for
+   each group of corresponding input frames (i.e. those sharing
+   the same Set Index attribute).  If this results in multiple
+   output master bias frames, they will be written as separate
+   NDFs into a single HDS container file.  If no Set header
+   information is present in the input files, then all the
+   input files are combined together to form the master bias,
+   so USESET can usually be safely set to TRUE (the default).
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
+
 ZERO
 
 ZERO = _LOGICAL (Read)
@@ -312,7 +334,7 @@ Behaviour_of_parameters
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE)
+   Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE and USESET)
    have global values. These global values will always take
    precedence, except when an assignment is made on the command line.
    Global values may be set and reset using the CCDSETUP and

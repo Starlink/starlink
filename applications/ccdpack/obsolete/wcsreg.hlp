@@ -16,10 +16,10 @@ Description:
    TRANNDF applications can then be used on the resulting images.
 
    This can be of use when different kinds of alignment information
-   are available between different members of a set of images.  By
+   are available between different members of a group of images.  By
    supplying an ordered list of coordinate systems within which to
    align, the best alignment available can be made between
-   different  members of the set, falling back on second or third
+   different  members of the group, falling back on second or third
    choices of alignment types where first choices are not
    available.
 
@@ -45,6 +45,11 @@ Description:
    there is more than one which meets this criterion, one which
    uses domains near the head of the list is preferred.
 
+   If the USESET parameter is true, then WCSREG will take account
+   of alignment information stored in the CCDPACK Set header;
+   this means that the alignment implied when images were 
+   previously grouped into a Set can be guaranteed to be retained.
+
    If the graph is not fully connected, a list of the existing
    subgraphs is output, and the program will normally terminate,
    however it can be made to continue with registration of the
@@ -61,7 +66,24 @@ DOMAINS( * ) = LITERAL (Read)
    of preference for achieving alignment.  Alignment paths
    between images are selected by shortness of path, but in case
    of a tie, those using domains nearest the start of this list
-   are used by preference.
+   are used by preference.  You should not normally include the
+   CCD_SET domain in this list; for details of how this domain
+   is treated specially, see the USESET parameter.
+
+   Note that this parameter is an array of strings, so that either
+   the whole list should be surrounded by square brackets, or
+   each element should be surrounded by double quotes.  The
+   whole thing may need to be protected from the Unix shell
+   by using, e.g., single quotes.
+
+   Supplying the null value (!) is equivalent to specifying the
+   current domain of the reference NDF.  The effect of this
+   is to retain the alignment already given by the Current
+   coordinates of each image, but to ensure that the pixels
+   are aligned with the pixels of the reference image.
+   This will result in the images being aligned in a coordinate
+   system suitable for resampling with TRANNDF.
+   [!]
 
 IN
 
@@ -112,6 +134,15 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 
+NAMELIST
+
+NAMELIST = LITERAL (Read)
+   The name of an output file in which to record all the images
+   to which new coordinate systems were successfully added.
+   This may not be the same as the IN list if OVERRIDE is set
+   true.
+   [wcsreg.lis]
+
 OUTDOMAIN
 
 OUTDOMAIN = LITERAL (Read)
@@ -133,6 +164,10 @@ OVERRIDE = _LOGICAL (Read)
    insert new frames in those images which can be reached from the
    one indicated by REFPOS, making no change to the others, except
    to remove any frames in the domain OUTDOMAIN which already exist.
+
+   The NAMELIST parameter can be used to record which images were
+   successfully registered when OVERRIDE is true (if OVERRIDE is
+   false, then it will be the same as IN unless the program fails).
    [FALSE]
 
 REFPOS
@@ -146,6 +181,23 @@ REFPOS = _INTEGER (Read)
    when they both have frames in the same one of the entries in
    the DOMAINS list.
    [1]
+
+USESET
+
+USESET = _LOGICAL (Read)
+   This parameter governs whether Set-based alignment 
+   information in the images, if it exists, should be used. 
+   If it is set to true, then coordinate frames with the 
+   domain CCD_SET will take precedence over all the ones named 
+   in the DOMAINS parameter.  In this case, if two of the images
+   both have a CCD_SET coordinate frame and also share the
+   same Set Name attribute, the connection will be made in
+   CCD_SET frame.  If no CCD_SET frames are present, this
+   parameter has no effect.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 
 Examples
 
@@ -178,16 +230,19 @@ wcsreg "obs1_*,obs2_*" outdomain=final
    component using the ASTIMP application.  The name FINAL is
    used for the new domain added to the WCS component.
 
-wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
+wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 domains=!
    Here wcsreg is being used with a somewhat different intent.
-   The images named are already fully aligned in  SKY
+   The images named are already fully aligned in their Current
    coordinates, but executing this command has the effect of
    aligning them in a new coordinate system which is a copy of
    the pixel coordinate system of 'skyfr2'.  Since this has
    units which are the size of pixels, the resulting image files
-   are suitable for resampling using TRANNDF.  This would not
-   have been the case for the files initially, since the SKY
-   coordinates have units of radians.
+   are suitable for resampling using TRANNDF.   Supposing that
+   they were originally aligned in SKY coordinates they could
+   not have been resampled by \routine{TRANNDF} in their initial state,
+   since the SKY coordinates have units of radians, which 
+   are much too large compared to pixels.
+
 
 Behaviour_of_parameters
 
@@ -203,7 +258,7 @@ Behaviour_of_parameters
    default behaviour of the application may be restored by using the
    RESET keyword on the command line.
 
-   Certain parameters (LOGTO and LOGFILE) have global values.
+   Certain parameters (LOGTO, LOGFILE and USESET) have global values.
    These global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.

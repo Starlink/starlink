@@ -123,6 +123,19 @@ FITTYPE = _INTEGER (Read)
    transformation (see the CLASS parameter).
    [5]
 
+FIXWCS
+
+FIXWCS = _LOGICAL (Read)
+   If MODE="ERASE" and NAME="SET", then this parameter indicates
+   whether the CCD_SET coordinate frame should be removed from
+   the World Coordinate System etension of the NDF as well.
+   Since CCD_SET coordinates are usually a copy of another
+   coordinate system, and mainly intended for Set-related 
+   registration, it is usually sensible to erase this coordinate
+   frame when the rest of the Set header information has
+   been erased.
+   [TRUE]
+
 IN
 
 IN = image (Read)
@@ -217,8 +230,11 @@ NAME
 
 NAME = LITERAL (Read)
    If MODE = "ERASE" is chosen then the value of this parameter
-   names the CCDPACK extension item of the input NDFs which is to
-   be erased. Typical items are "CURRENT_LIST" and "TRANSFORM".
+   names the CCDPACK extension item of the input images which is to
+   be erased. Typical items are "CURRENT_LIST", "TRANSFORM" and "SET".
+   If "SET" is used, then the FIXWCS parameter will be
+   used to decide whether to remove any CCD_SET-domain frames
+   from the WCS component.
 
 PA-PZ
 
@@ -398,6 +414,11 @@ ccdedit mode=erase in=image_with_bad_transform name=transform
    In this example the TRANSFORM structure in the CCDPACK
    extension of the image image_with_bad_transform is removed.
 
+ccdedit mode=erase fixwcs=yes in='*' 
+   All Set header information, and any CCD_SET coordinate
+   frames which are associated with it, will be removed from
+   the images in the current directory.
+
 ccdedit mode=invert in='*'
    In this example all the images in the current directory have
    their transforms inverted.
@@ -459,6 +480,9 @@ Notes
   XXX.MORE.CCDPACK has been removed.
 
 - Transforms are stored in the item .MORE.CCDPACK.TRANSFORM .
+
+- If MODE=ERASE, NAME=SET and FIXWCS=TRUE, the WCS component
+  of the NDF may also be modified.
 
 Behaviour_of_parameters
 

@@ -69,7 +69,7 @@ NAMES = LITERAL (Read)
 
       ADC, BIAS, BOUNDS, CAL, DEFERRED, DIRECTION, EXTENT, FLAT,
       GENVAR, MASK, NDFNAMES, PRESERVE, RNOISE, SATURATE,
-      SATURATION, SETSAT
+      SATURATION, SETSAT, USESET
 
    These correspond to the parameter names used in CCDSETUP (and
    in the other applications which access these parameters).

@@ -297,6 +297,7 @@ drizzle in=img* out=combined scale=true zero=true ref=! multi=4.0
    times larger than the output pixel and contains 16 output
    pixels.
 
+
 Notes
 
 The file containing scale and zero-point corrections (see the

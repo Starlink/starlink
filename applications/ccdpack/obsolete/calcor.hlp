@@ -1,7 +1,6 @@
 .help calcor Starlink ccdpack
 .nf
-Subtracts a scaled dark or flash calibration image from a series of
-images.
+Subtracts a scaled dark or flash calibration image from a series of images.
 
 Usage:
 
@@ -33,6 +32,11 @@ CAL = LITERAL (Read)
    normalised to one exposure unit. It is expected that the
    calibration image contains dark or flash exposure CCD data
    which have been bias corrected.
+
+   If USESET is true, CAL should be a group expression referring
+   to one calibration frame matching each of the Set Index
+   attributes represented in the IN list; again the name of
+   the file produced by MAKECAL will normally be suitable.
 
    The name of this file may be specified using indirection
    through a file.
@@ -194,6 +198,23 @@ TITLE = LITERAL (Read)
    Title for the output images.
    [Output from CALCOR].
 
+USESET
+
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then the CAL parameter is taken to
+   refer to a group of files, and each IN file will be 
+   processed using a calibration image with a Set Index 
+   attribute which matches its own.  An IN file with no Set
+   header is considered to match a CAL file with no Set header,
+   so USESET can safely be set true (the default) when the 
+   input files contain no Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
+
 Examples
 
 calcor frame1 frame2 calibration 250
@@ -269,7 +290,7 @@ Behaviour_of_parameters
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, PRESERVE and CAL) have
+   Certain parameters (LOGTO, LOGFILE, USESET, PRESERVE and CAL) have
    global values. These global values will always take precedence,
    except when an assignment is made on the command line.  In general
    global values may be set and reset using the CCDSETUP and

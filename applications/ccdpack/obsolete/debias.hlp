@@ -1,7 +1,6 @@
 .help debias Starlink ccdpack
 .nf
-Performs the debiassing and initial preparation of CCD
-data.
+Performs the debiassing and initial preparation of CCD data.
 
 Usage:
 
@@ -82,6 +81,12 @@ BIAS = LITERAL (Read)
    through an ASCII file. The offered default is either the last
    used master bias name or (if one exists) the name of the image
    produced by the last run of MAKEBIAS.
+
+   If USESET is true and you are using bias calibration data
+   from a file, BIAS should be a group expression referring
+   to one master bias frame matching each of the Set Index
+   attributes represented in the IN list; again the name of
+   the file produced by MAKEBIAS will normally be suitable.
    [Global master bias or !]
 
 BOUNDS
@@ -219,9 +224,13 @@ IN
 IN = LITERAL (Read)
    A list of the names of the images which contain the raw CCD
    data. Note that at present the input data must have a common
-   processing mode, i.e. use the same bias frame, have the same
-   ADC factor, readout noise etc. These values are represented
-   by the parameter values of the task.
+   processing mode, i.e. have the same ADC factor, readout noise
+   etc. These values are represented by the parameter values of 
+   the task.  The input data must also use the same master bias
+   frame except if USESET is true and the input and bias images
+   contain suitable CCDPACK Set header information, in which
+   case each input image will be processed using the bias image
+   with the corresponding Set Index attribute.
 
    The image names should be separated by commas and may include
    wildcards.
@@ -476,6 +485,23 @@ USEEXT = _LOGICAL (Read)
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
 
+USESET
+
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then the BIAS parameter is 
+   taken to refer to a group of files, and each IN file will
+   be processed using a master bias image with a Set Index
+   attribute which matches its own.  An IN file with no Set
+   header is considered to match a master bias file with
+   no Set header, so USESET can safely be set true (the default)
+   when the input files contain no Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
+
 WMODE
 
 WMODE = LITERAL (Read)
@@ -617,7 +643,7 @@ Behaviour_of_parameters
 
    Certain parameters (ADC, BIAS, BOUNDS, DEFERRED, DIRECTION,
    EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
-   SATURATION and SETSAT) have global values. These global values
+   SATURATION, SETSAT and USESET) have global values. These global values
    will always take precedence, except when an assignment is made on
    the command line.  In general global values may be set and reset
    using the CCDSETUP and CCDCLEAR commands, however, the BIAS
@@ -666,4 +692,12 @@ Implementation_Status
      NDF are set to ADUs or electrons depending on whether data
      expansion has occurred or not. Processing is supported for all
      HDS (non-complex) numeric types.
+
+   - The MASK parameter, when it refers to an NDF, ought really to
+     be sensitive to Set header information if USESET is true.
+     This is currently not implemented because of difficulties
+     arising from the fact that MASK parameter can be interpreted
+     as an ARD file, an ARD description or an image according to
+     its value.
+
 .endhelp

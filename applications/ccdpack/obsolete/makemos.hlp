@@ -1,7 +1,6 @@
 .help makemos Starlink ccdpack
 .nf
-Make a mosaic by combining and (optionally) normalising a set of
-images.
+Make a mosaic by combining and (optionally) normalising a set of images.
 
 Usage:
 
@@ -92,11 +91,11 @@ CORRECT
 
 CORRECT = LITERAL (Read)
    The name of the file used to output the scale and zero-point
-   corrections (see the SCALE and ZERO parameters). This file can be 
+   corrections (see SCALE and ZERO parameters). This file can be 
    read by the DRIZZLE task.  If the file already exists, it is 
-   overwritten.  If a null (!) value is supplied, or if SCALE and 
+   overwritten.  If a null (!) value is supplied, or if SCALE and
    ZERO are both set to FALSE, no file is written.
-   [!] 
+   [!]
 
 GENVAR
 
@@ -742,8 +741,6 @@ PDRAPER: Peter Draper (STARLINK)
 
 AALLAN: Alasdair Allan (Keele University, STARLINK)
 
-MBT: Mark Taylor (STARLINK)
-
 History
 
  5-AUG-1992 (RFWS):
@@ -795,6 +792,7 @@ History
 
  31-JAN-2000 (MBT):
     Removed WRITESZ.
+
 
 Implementation_Status
 
