@@ -281,5 +281,7 @@ $(TCL_SUPPORT_MSGRLY): Makefile
 
 BUILT_SOURCES = ccdhelp.ifl USER_ERR
 
+EXTRA_DIST = $(SHELL_SCR) $(IFD_FILES)
+
 SUBDIRS = tasks gen help main
 
