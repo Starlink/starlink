@@ -3474,10 +3474,10 @@ File: configure.in      Status: Up-to-date
         <p>In both cases, the final step, after you have committed your
           changes, is to go to the top level of a <em>full checkout</em>
           of the repository, make sure your new component is checked out
-          there, then delete <code>componentset.xml</code> and remake
-          <code>Makefile.dependencies</code>
+          there, then delete <code>Makefile.dependencies</code> and
+          remake it.
           <verbatim>
-% rm componentset.xml
+% rm Makefile.dependencies
 % make Makefile.dependencies
 # ... remakes componentset.xml, and from that Makefile.dependencies
 % cvs -n update
