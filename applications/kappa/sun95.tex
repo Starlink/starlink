@@ -10323,7 +10323,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.  QUALITY is not
          processed since it is a series of flags, not numerical values.
 
@@ -10501,7 +10501,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.  QUALITY is not
          processed since it is a series of flags, not numerical values.
 
@@ -10617,7 +10617,7 @@ default value.
 
          \sstitem
          This routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
-         LABEL, TITLE, UNITS, and HISTORY components of the input NDF
+         LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF
          and propagates all extensions.
 
          \sstitem
@@ -35531,6 +35531,10 @@ modified applications below.
 
 \subsection{Modified applications}
 \begin{itemize}
+  \item \htmlref{COMPADD}{COMPADD} now correctly processes NDFs with more
+than 2 axes.
+  \item \htmlref{COMPAVE}{COMPAVE} now correctly processes NDFs with more
+than 2 axes.
   \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
 previously reported if double precision data is displayed which requires
 compression to fit in the display.
@@ -35562,7 +35566,8 @@ if a null value is given for parameter CLASS.
 The following applications now propagate the WCS component of an NDF
 structure: 
 
-ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT CONVOLVE CSUB DISPLAY
+ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
+CONVOLVE CSUB DISPLAY
 ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ INSPECT DIV LUCY
 MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC NORMALIZE PASTE RIFT
 SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
