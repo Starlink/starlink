@@ -97,6 +97,27 @@ itcl::class gaia::GaiaBlink {
       configure_menubutton File -underline 0
       add_short_help $itk_component(menubar).file {File menu:}
 
+      #  Add option to create a new window.
+      $File add command -label {New window} \
+         -command [code $this clone_me_] \
+         -accelerator {Control-n}
+      bind $w_ <Control-n> [code $this clone_me_]
+      $short_help_win_ add_menu_short_help $File \
+         {New window} {Create a new toolbox}
+
+      #  Add option to list the offsets for all images.
+      add_menuitem $File command "Save offsets" \
+         {Save all offsets to file GaiaOffsets.Log} \
+         -command [code $this save_offsets_]
+
+      #  Set the exit item.
+      $File add command -label {Close window} \
+         -command [code $this close] \
+         -accelerator {Control-c}
+      bind $w_ <Control-c> [code $this close]
+      $short_help_win_ add_menu_short_help $File \
+         {Close window} {Close toolbox}
+
       #  Add option to control some actions that may be removed when
       #  the controls panel is hidden or are not provided there.
       set Actions [add_menubutton "Actions" left]
@@ -171,22 +192,6 @@ itcl::class gaia::GaiaBlink {
 
       #  Add help menu.
       add_help_button blink "On Window..."
-
-      #  Add option to create a new window.
-      $File add command -label {New window} \
-         -command [code $this clone_me_] \
-         -accelerator {Control-n}
-      bind $w_ <Control-n> [code $this clone_me_]
-      $short_help_win_ add_menu_short_help $File \
-         {New window} {Create a new toolbox}
-
-      #  Set the exit item.
-      $File add command -label {Close window} \
-         -command [code $this close] \
-         -accelerator {Control-c}
-      bind $w_ <Control-c> [code $this close]
-      $short_help_win_ add_menu_short_help $File \
-         {Close window} {Close toolbox}
 
       #  Frame for all controls.
       itk_component add ControlsFrame {
@@ -631,15 +636,24 @@ itcl::class gaia::GaiaBlink {
          -value "$names_($top_) ($clone_num_($top_))"
 
       #  Image offsets WRT to mobile image.
-      lassign [get_image_area_ $top_] tx0 ty0 tx1 ty1
-      lassign [get_image_area_ $mobile_] mx0 my0 mx1 my1
-
-      $image_($top_) convert dist \
-         [expr $tx0-$mx0+1] [expr $my1-$ty1+1] canvas x0 y0 image
+      lassign [get_offsets_ $top_] x0 y0
 
       $itk_component(Xlow) configure -value $x0
       $itk_component(Ylow) configure -value $y0
    }
+
+   #  Return the offsets of an image WRT the mobile image. Image
+   #  coordinates.
+   protected method get_offsets_ { n } {
+      lassign [get_image_area_ $n] tx0 ty0 tx1 ty1
+      lassign [get_image_area_ $mobile_] mx0 my0 mx1 my1
+
+      $image_($n) convert dist \
+         [expr $tx0-$mx0+1] [expr $my1-$ty1+1] canvas x0 y0 image
+
+      return "$x0 $y0"
+   }
+
 
    #  Shift the current image to a new position.
    protected method place_image_ {dir new} {
@@ -839,6 +853,19 @@ itcl::class gaia::GaiaBlink {
          pack $itk_component(ControlsFrame) \
             -side bottom -fill x -ipadx 5 -ipady 5
       }
+   }
+
+   #  Save all offsets to a log file.
+   protected method save_offsets_ {} {
+      set fid [open "GaiaOffsets.Log" w]
+      puts $fid "\# GaiaBlink log file"
+      puts $fid "\#"
+      puts $fid "\#  File \t X-offset \t Y-offset (pixels)"
+      for { set i 0 } { $i < $n_ } { incr i } {
+         lassign [get_offsets_ $i] x0 y0
+         puts $fid "$names_($i) \t $x0 \t $y0"
+      }
+      ::close $fid
    }
 
    #  Configuration options: (public variables)

@@ -175,6 +175,8 @@ itcl::class gaia::Gaia {
       #  options.
       itk_option remove rtd::Rtd::scrollbars
       itk_option remove rtd::Rtd::panel_layout
+
+      puts "Gaia args = $args"
       eval itk_initialize $args
 
       #  Override about_skycat message.
@@ -206,6 +208,19 @@ itcl::class gaia::Gaia {
       if { $importer_ != {} && [winfo exists $importer_] } {
          catch {delete object $importer_}
       }
+   }
+   
+   # Restore the position of the top level window from the previous
+   # session, or not depending on mode.
+   protected method load_toplevel_geometry {} {
+      puts "no geometry ($toplevel_geometry_)"
+      return
+      
+      if {[catch {set fd [::open $toplevel_geometry_]}]} {
+         return
+      }
+      catch {wm geometry $w_ [gets $fd]}
+      ::close $fd
    }
 
    #  Quit the application. Really....
@@ -1331,7 +1346,7 @@ itcl::class gaia::Gaia {
          set config_file [utilGetConfigFilename .skycat skycat.cfg]
          if {[file exists $config_file]} {
             set env(CATLIB_CONFIG) "file:$config_file"
-            check_config_file_ $config_file
+            check_config_file $config_file
          } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
             set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
          } else {
@@ -1388,7 +1403,7 @@ itcl::class gaia::Gaia {
    #  from time to time as features are added to the default file.
    #  The match string should be set to something new in the
    #  default file.
-   protected proc check_config_file_ { config_file } {
+   public proc check_config_file { config_file } {
       set newmatch "*2MASS*"
 
       #  Search the file for the string match.
@@ -1614,7 +1629,7 @@ window gives you access to this."
    }
 
    #  Whether toolboxes are transient (iconize with main window).
-   itk_option define -transient_tools transient_tools Transient_Tools 0
+   itk_option define -transient_tools transient_tools Transient_Tools 1
 
    #  The known file types.
    itk_option define -file_types file_types File_Types {{any *}}
@@ -1734,6 +1749,8 @@ proc false_tkwait {args} {
 itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
    {w ""}} {
+      
+   puts "new_catalog w = $w"       
    if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
       return
    }
@@ -1748,6 +1765,10 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    if {[winfo exists $w]} {
       set instname $w.ac[incr n_instances_]
    } else {
+      puts "no parent for catalogue window"
+      for { set i [info level] } { $i > -1 } { incr i -1 } { 
+         puts "$i: [info level $i]"
+      }
       set instname .ac[incr n_instances_]
    }
    set instances_($i) \

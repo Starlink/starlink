@@ -3,5 +3,5 @@
 # mkIndex.tcl - generate a tclIndex file in the current directory
 # "@(#) $Id$"
 
-auto_mkindex . *.tcl
+auto_mkindex . *.tcl *.itk
 exit 0

@@ -69,6 +69,11 @@
 #        ends need to press <return>.
 #     20-FEB-2002 (PWD):
 #        Added X_PIXEL and Y_PIXEL parameters.
+#     18-JUL-2003 (PWD):
+#        Changed values_ and columns_ arrays to protected from common.
+#        Removes chance of crosstalk to other toolboxes (the unset of
+#        columns_ was doing this!) and such variables no longer need
+#        to be common for scope to work in widgets.
 #     {enter_further_changes_here}
 
 #-
@@ -178,56 +183,56 @@ itcl::class gaia::GaiaSextractor {
       #  Add an option to not use the native version of SExtractor if
       #  the Starlink version is available.
       $Options add checkbutton  -label {Use Native SExtractor} \
-         -variable [scope values_($this,use_native)] \
+         -variable [scope values_(use_native)] \
          -onvalue 1 \
          -offvalue 0
       $short_help_win_ add_menu_short_help $Options \
          {Use Native SExtractor} \
          {Use native SExtractor for FITS images}
-      set values_($this,use_native) 1
+      set values_(use_native) 1
 
       #  Add an option to make sure that we can plot kron or isophotal
       #  ellipses.
       $Options add checkbutton  -label {Draw Kron Ellipses} \
-         -variable [scope values_($this,draw_kron_ellipses)] \
+         -variable [scope values_(draw_kron_ellipses)] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this toggle_draw_kron_ellipses_]
       $short_help_win_ add_menu_short_help $Options \
          {Draw Kron Ellipses}\
          {Fix output catalogue parameters for drawing Kron ellipses}
-      set values_($this,draw_kron_ellipses) 0
+      set values_(draw_kron_ellipses) 0
 
       $Options add checkbutton  -label {Draw Isophotal Ellipses} \
-         -variable [scope values_($this,draw_iso_ellipses)] \
+         -variable [scope values_(draw_iso_ellipses)] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this toggle_draw_iso_ellipses_]
       $short_help_win_ add_menu_short_help $Options \
          {Draw Isophotal Ellipses}\
          {Fix output catalogue parameters for drawing Isophotal ellipses}
-      set values_($this,draw_iso_ellipses) 1
+      set values_(draw_iso_ellipses) 1
 
       #  Add option to draw simple circles (not scaled, so no special
       #  parameters).
       $Options add checkbutton  -label {Draw Circles} \
-         -variable [scope values_($this,draw_circles)] \
+         -variable [scope values_(draw_circles)] \
          -onvalue 1 \
          -offvalue 0
       $short_help_win_ add_menu_short_help $Options \
          {Draw Circles}\
          {Draw detections as simple circles}
-      set values_($this,draw_circles) 0
+      set values_(draw_circles) 0
 
       #  Add option to draw isophotal radii, if determined.
       $Options add checkbutton  -label {Draw Radii} \
-         -variable [scope values_($this,draw_radii)] \
+         -variable [scope values_(draw_radii)] \
          -onvalue 1 \
          -offvalue 0
       $short_help_win_ add_menu_short_help $Options \
          {Draw Radii}\
          {Draw any isophotal radii as circles}
-      set values_($this,draw_radii) 0
+      set values_(draw_radii) 0
 
       #  Allow selection of the detection image.
       set lwidth 18
@@ -235,20 +240,20 @@ itcl::class gaia::GaiaSextractor {
          LabelFileChooser $w_.detname \
             -labelwidth $lwidth \
             -text "Detection image:" \
-            -textvariable [scope values_($this,detname)] \
+            -textvariable [scope values_(detname)] \
             -filter_types $itk_option(-filter_types)
       }
       pack $itk_component(detname) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(detname) \
          {Name of detection image, blank or NONE for displayed image}
-      set values_($this,detname) "NONE"
+      set values_(detname) "NONE"
 
       #  Add fields for setting the catalogue name and type(!).
       itk_component add catname {
          LabelEntry $w_.catname \
             -labelwidth $lwidth \
             -text "Catalogue name:" \
-            -textvariable [scope values_($this,catname)] \
+            -textvariable [scope values_(catname)] \
             -command [code $this set_catname_ to]
       }
       pack $itk_component(catname) -side top -fill x -ipadx 1m -ipady 1m
@@ -259,7 +264,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $w_.cattype \
             -labelwidth $lwidth \
             -text "Catalogue type:" \
-            -variable [scope values_($this,cattype)]
+            -variable [scope values_(cattype)]
       }
       pack $itk_component(cattype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(cattype) \
@@ -278,7 +283,7 @@ itcl::class gaia::GaiaSextractor {
          LabelEntry $w_.conpar \
             -labelwidth $lwidth \
             -text "Config parameters:" \
-            -textvariable [scope values_($this,conpar)]
+            -textvariable [scope values_(conpar)]
       }
       pack $itk_component(conpar) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(conpar) \
@@ -288,7 +293,7 @@ itcl::class gaia::GaiaSextractor {
          LabelEntry $w_.catpar \
             -labelwidth $lwidth \
             -text "Catalogue parameters:" \
-            -textvariable [scope values_($this,catpar)]
+            -textvariable [scope values_(catpar)]
       }
       pack $itk_component(catpar) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(catpar) \
@@ -537,13 +542,13 @@ itcl::class gaia::GaiaSextractor {
             # And add all the known values.
             foreach name $valuenames_ {
                if { $to_($name) != "special" } {
-                  if { [llength $values_($this,$name)] == 1 } {
-                     puts $fid "[format "%-16s" $to_($name)] $values_($this,$name)"
+                  if { [llength $values_($name)] == 1 } {
+                     puts $fid "[format "%-16s" $to_($name)] $values_($name)"
                   } else {
-                     puts $fid "[format "%-16s" $to_($name)] [lindex $values_($this,$name) 0],[lindex $values_($this,$name) 1]"
+                     puts $fid "[format "%-16s" $to_($name)] [lindex $values_($name) 0],[lindex $values_($name) 1]"
                   }
                } else {
-                  set line [eval $special_($name) $values_($this,$name)]
+                  set line [eval $special_($name) $values_($name)]
                   if { $line != "" } {
                      puts $fid $line
                   }
@@ -584,9 +589,9 @@ itcl::class gaia::GaiaSextractor {
                            set value2 [ctoken tmpline {, }]
                            if { $from_($keyword) != "special" } {
                               if { [string match {\#*} $value2] || $value2 == {} } {
-                                 set values_($this,$from_($keyword)) $value1
+                                 set values_($from_($keyword)) $value1
                               } else {
-                                 set values_($this,$from_($keyword)) [list $value1 $value2]
+                                 set values_($from_($keyword)) [list $value1 $value2]
                               }
                            } else {
                               set params [ctoken line {\#}]
@@ -630,7 +635,7 @@ itcl::class gaia::GaiaSextractor {
                if { $llen > 0 } {
                   if { ! [string match {\#*} $line] } {
                      set keyword [ctoken line {, }]
-                     set columns_($this,$keyword) 1
+                     set columns_($keyword) 1
                   }
                } elseif { $llen < 0 } {
 
@@ -654,8 +659,8 @@ itcl::class gaia::GaiaSextractor {
             # And add all the known columns. Ones which are not set
             # are "commented" out.
             foreach {name desc} $columnnames_ {
-               if { [info exists columns_($this,$name)] &&
-                    $columns_($this,$name) } {
+               if { [info exists columns_($name)] &&
+                    $columns_($name) } {
                   puts $fid "$name"
                } else {
                   puts $fid "\#$name"
@@ -670,9 +675,9 @@ itcl::class gaia::GaiaSextractor {
    #  Control if catalogue parameters (columns) necessary for drawing
    #  ellipses are present.
    protected method toggle_draw_kron_ellipses_ {} {
-      if { $values_($this,draw_kron_ellipses) } {
+      if { $values_(draw_kron_ellipses) } {
          foreach param "$commoncols_ $kroncols_" {
-            set columns_($this,$param) 1
+            set columns_($param) 1
             if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state disabled
             }
@@ -680,11 +685,11 @@ itcl::class gaia::GaiaSextractor {
 
       } else {
          set names $kroncols_
-         if { !$values_($this,draw_iso_ellipses) } {
+         if { !$values_(draw_iso_ellipses) } {
             append names $commoncols_
          }
          foreach param $names {
-            set columns_($this,$param) 0
+            set columns_($param) 0
             if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state normal
             }
@@ -692,9 +697,9 @@ itcl::class gaia::GaiaSextractor {
       }
    }
    protected method toggle_draw_iso_ellipses_ {} {
-      if { $values_($this,draw_iso_ellipses) } {
+      if { $values_(draw_iso_ellipses) } {
          foreach param "$commoncols_ $isocols_" {
-            set columns_($this,$param) 1
+            set columns_($param) 1
             if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state disabled
             }
@@ -702,11 +707,11 @@ itcl::class gaia::GaiaSextractor {
 
       } else {
          set names $isocols_
-         if { !$values_($this,draw_kron_ellipses) } {
+         if { !$values_(draw_kron_ellipses) } {
             append names $commoncols_
          }
          foreach param $names {
-            set columns_($this,$param) 0
+            set columns_($param) 0
             if { $revealed_(7) } {
                $colparent_.[string tolower $param] configure -state normal
             }
@@ -717,7 +722,7 @@ itcl::class gaia::GaiaSextractor {
    #  Disable "safe" columns.
    protected method fix_safe_columns_ {} {
       foreach param "$safecols_" {
-         set columns_($this,$param) 1
+         set columns_($param) 1
          if { $revealed_(7) } {
             $colparent_.[string tolower $param] configure -state disabled
          }
@@ -743,8 +748,8 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -show_scale 0 \
             -validate integer \
-            -value $values_($this,minsize) \
-            -textvariable [scope values_($this,minsize)] \
+            -value $values_(minsize) \
+            -textvariable [scope values_(minsize)] \
             -command [code $this set_values_ minsize]
       }
       pack $itk_component(minsize) -side top -fill x -ipadx 1m -ipady 1m
@@ -758,7 +763,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.threshtype \
             -text "Threshold type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,threshtype)]
+            -variable [scope values_(threshtype)]
       }
       pack $itk_component(threshtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(threshtype) \
@@ -770,7 +775,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this toggle_threshtype_ $shortname]
       }
-      set values_($this,threshtype) $values_($this,threshtype)
+      set values_(threshtype) $values_(threshtype)
 
       #  The detection threshold. Either a number of standard
       #  deviations, or a surface brightness and zero point.
@@ -782,8 +787,8 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -validate real \
             -orient horizontal \
-            -value $values_($this,detthresh) \
-            -textvariable [scope values_($this,detthresh)] \
+            -value $values_(detthresh) \
+            -textvariable [scope values_(detthresh)] \
             -command [code $this set_values_ detthresh]
       }
       pack $itk_component(detthresh) -side top -fill x -ipadx 1m -ipady 1m
@@ -796,13 +801,13 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -anchor w \
             -validate real \
-            -value $values_($this,analthresh) \
+            -value $values_(analthresh) \
             -orient horizontal \
-            -textvariable [scope values_($this,analthresh)] \
+            -textvariable [scope values_(analthresh)] \
             -command [code $this set_values_ analthresh]
       }
       pack $itk_component(analthresh) -side top -fill x -ipadx 1m -ipady 1m
-      toggle_threshtype_ $values_($this,threshtype)
+      toggle_threshtype_ $values_(threshtype)
 
       #  Detection filter. Either NONE or some known filename. Note
       #  the use of full path names.
@@ -810,7 +815,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.detfilter \
             -text "Detection filter:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,detfilter)]
+            -variable [scope values_(detfilter)]
       }
       pack $itk_component(detfilter) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(detfilter) \
@@ -823,7 +828,7 @@ itcl::class gaia::GaiaSextractor {
             -value $fullname \
             -command [code $this set_values_ detfilter $fullname]
       }
-      set values_($this,detfilter) $values_($this,detfilter)
+      set values_(detfilter) $values_(detfilter)
 
       #  Number of thresholds used in deblending.
       itk_component add debthresh {
@@ -840,8 +845,8 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -validate integer \
             -fix_range 1 \
-            -value $values_($this,debthresh) \
-            -textvariable [scope values_($this,debthresh)] \
+            -value $values_(debthresh) \
+            -textvariable [scope values_(debthresh)] \
             -command [code $this set_values_ debthresh]
       }
       pack $itk_component(debthresh) -side top -fill x -ipadx 1m -ipady 1m
@@ -859,10 +864,10 @@ itcl::class gaia::GaiaSextractor {
             -show_arrows 1 \
             -validate real \
             -anchor w \
-            -value $values_($this,debcontrast) \
-            -textvariable [scope values_($this,debcontrast)] \
+            -value $values_(debcontrast) \
+            -textvariable [scope values_(debcontrast)] \
             -from 0.0 \
-            -to [max 0.1 [min 1.0 $values_($this,debcontrast)]] \
+            -to [max 0.1 [min 1.0 $values_(debcontrast)]] \
             -command [code $this set_values_ debcontrast]
       }
       pack $itk_component(debcontrast) -side top -fill x -ipadx 1m -ipady 1m
@@ -877,7 +882,7 @@ itcl::class gaia::GaiaSextractor {
             -offvalue N \
             -labelwidth $lwidth \
             -anchor w \
-            -variable [scope values_($this,detclean)] \
+            -variable [scope values_(detclean)] \
             -command [code $this toggle_clean_]
       }
       pack $itk_component(detclean) -side top -fill x -ipadx 1m -ipady 1m
@@ -895,8 +900,8 @@ itcl::class gaia::GaiaSextractor {
             -fix_range 1 \
             -validate real \
             -anchor w \
-            -value $values_($this,deteffic) \
-            -textvariable [scope values_($this,deteffic)] \
+            -value $values_(deteffic) \
+            -textvariable [scope values_(deteffic)] \
             -from 0.1 \
             -to 10.0 \
             -command [code $this set_values_ deteffic]
@@ -909,7 +914,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Method to toggle state of cleaning parameter.
    private method toggle_clean_ {args} {
-      if { $values_($this,detclean) == "Y" } {
+      if { $values_(detclean) == "Y" } {
          $itk_component(deteffic) configure -state normal
       } else {
          $itk_component(deteffic) configure -state disabled
@@ -918,7 +923,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Method to toggle the short help for the threshold field.
    private method toggle_threshtype_ {value} {
-      set values_($this,threshtype) $value
+      set values_(threshtype) $value
       if { $value == "RELATIVE" } {
          set help \
             {Standard deviations above background, or surface brightness, zero point}
@@ -945,9 +950,9 @@ itcl::class gaia::GaiaSextractor {
             if { $filterflag_ == "Y" } {
                set name [lindex $args 0]
                if { "[string index $name 0]" != "/"} {
-                  set values_($this,detfilter) "${config_dir_}/$name"
+                  set values_(detfilter) "${config_dir_}/$name"
                } else {
-                  set values_($this,detfilter) "$name"
+                  set values_(detfilter) "$name"
                }
                set filterflag_ "N"
             }
@@ -955,10 +960,10 @@ itcl::class gaia::GaiaSextractor {
          to {
 
             #  Convert local setup into a SExtractor description.
-            if { $values_($this,detfilter) == "NONE" } {
+            if { $values_(detfilter) == "NONE" } {
                return "FILTER           N\nFILTER_NAME      default.conv"
             } else {
-               return "FILTER           Y\nFILTER_NAME      $values_($this,detfilter)"
+               return "FILTER           Y\nFILTER_NAME      $values_(detfilter)"
             }
          }
       }
@@ -970,7 +975,7 @@ itcl::class gaia::GaiaSextractor {
       if { $value == "" } {
          #  Change by interface, check for extension and remove if
          #  present.
-         set $values_($this,catname) [file rootname $values_($this,catname)]
+         set $values_(catname) [file rootname $values_(catname)]
          return
       }
 
@@ -984,7 +989,7 @@ itcl::class gaia::GaiaSextractor {
 
          #  Convert SEXtractor name to local one, just remove the file
          #  extension. The rest is controlled by the file type.
-         set values_($this,catname) [file rootname $value]
+         set values_(catname) [file rootname $value]
       }
    }
 
@@ -997,9 +1002,9 @@ itcl::class gaia::GaiaSextractor {
       if { $flag == "to" } {
 
          #  Name to SExtractor conversion. Get the full filename.
-         return "PARAMETERS_NAME     $values_($this,catpar)"
+         return "PARAMETERS_NAME     $values_(catpar)"
       } else {
-         set values_($this,catpar) $defaults_(catpar)
+         set values_(catpar) $defaults_(catpar)
       }
    }
 
@@ -1008,7 +1013,7 @@ itcl::class gaia::GaiaSextractor {
    #  ".TAB"
    private method get_catname_ {} {
       set type ".TAB"
-      switch -glob $values_($this,cattype) {
+      switch -glob $values_(cattype) {
          ASCII_SKYCAT {
             set type ".TAB"
          }
@@ -1019,7 +1024,7 @@ itcl::class gaia::GaiaSextractor {
             set type ".ASC"
          }
       }
-      set name [file rootname $values_($this,catname)]
+      set name [file rootname $values_(catname)]
       return "${name}${type}"
    }
 
@@ -1028,7 +1033,7 @@ itcl::class gaia::GaiaSextractor {
       if { $flag == "to" } {
 
          #  Return SExtractor file type.
-         return "CATALOG_TYPE     $values_($this,cattype)"
+         return "CATALOG_TYPE     $values_(cattype)"
       } else {
 
          #  Accept SExtractor file type and make sure that it is
@@ -1042,7 +1047,7 @@ itcl::class gaia::GaiaSextractor {
                set type "ASCII_HEAD"
             }
          }
-         set values_($this,cattype) $type
+         set values_(cattype) $type
       }
    }
 
@@ -1054,7 +1059,7 @@ itcl::class gaia::GaiaSextractor {
       $itk_component(detfilter) configure -value $defaults_(detfilter)
       $itk_component(debthresh) configure -value $defaults_(debthresh)
       $itk_component(debcontrast) configure -value $defaults_(debcontrast)
-      set values_($this,detclean) $defaults_(detclean)
+      set values_(detclean) $defaults_(detclean)
       toggle_clean_
       $itk_component(deteffic) configure -value $defaults_(deteffic)
    }
@@ -1079,8 +1084,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,photzero) \
-            -textvariable [scope values_($this,photzero)] \
+            -value $values_(photzero) \
+            -textvariable [scope values_(photzero)] \
             -command [code $this set_values_ photzero]
       }
       pack $itk_component(photzero) -side top -fill x -ipadx 1m -ipady 1m
@@ -1103,7 +1108,7 @@ itcl::class gaia::GaiaSextractor {
             -to 32 \
             -fix_range 1 \
             -validate integer \
-            -value $values_($this,photnum) \
+            -value $values_(photnum) \
             -command [code $this set_photnum_]
       }
       #  pack $itk_component(photnum) -side top -fill x -ipadx 1m -ipady 1m
@@ -1114,14 +1119,14 @@ itcl::class gaia::GaiaSextractor {
          ManyLabelEntry $childsite.photapp \
             -text "Aperture size:" \
             -labelwidth $lwidth \
-            -nentry $values_($this,photnum) \
+            -nentry $values_(photnum) \
             -anchor w \
             -orient vertical \
-            -textvariable [scope values_($this,photapps)] \
+            -textvariable [scope values_(photapps)] \
             -command [code $this set_values_ photapps]
       }
       update idletasks ;#  Needed to stop problem with -borderwidth values.
-      eval $itk_component(photapps) setvals $values_($this,photapps)
+      eval $itk_component(photapps) setvals $values_(photapps)
       pack $itk_component(photapps) -side top -fill x -ipadx 1m -ipady 1m
       #add_short_help $itk_component(photapps) \
       #   {Aperture sizes (in pixels, up to 32 values)}
@@ -1144,8 +1149,8 @@ itcl::class gaia::GaiaSextractor {
             -to 5.0 \
             -fix_range 1 \
             -validate real \
-            -value $values_($this,kronfact) \
-            -textvariable [scope values_($this,kronfact)] \
+            -value $values_(kronfact) \
+            -textvariable [scope values_(kronfact)] \
             -command [code $this set_values_ kronfact]
       }
       pack $itk_component(kronfact) -side top -fill x -ipadx 1m -ipady 1m
@@ -1165,8 +1170,8 @@ itcl::class gaia::GaiaSextractor {
             -from 1.0 \
             -to 20.0 \
             -validate real \
-            -value $values_($this,kronmin) \
-            -textvariable [scope values_($this,kronmin)] \
+            -value $values_(kronmin) \
+            -textvariable [scope values_(kronmin)] \
             -command [code $this set_values_ kronmin]
       }
       pack $itk_component(kronmin) -side top -fill x -ipadx 1m -ipady 1m
@@ -1178,7 +1183,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $childsite.detmask \
             -text "Neighbour mask:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,photmask)]
+            -variable [scope values_(photmask)]
       }
       pack $itk_component(photmask) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(photmask) \
@@ -1190,7 +1195,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this set_values_ photmask $shortname]
       }
-      set values_($this,photmask) $values_($this,photmask)
+      set values_(photmask) $values_(photmask)
    }
 
    #  Set the number of entry fields for apertures.
@@ -1210,15 +1215,15 @@ itcl::class gaia::GaiaSextractor {
             if { [info exists itk_component(photapps)] } {
                set_photnum_ $nargs
             } else {
-               set values_($this,photnum) $nargs
+               set values_(photnum) $nargs
             }
-            set values_($this,photapps) $largs
+            set values_(photapps) $largs
          }
          to {
             set result ""
             set first 1
-            for {set i 0} {$i < $values_($this,photnum)} {incr i} {
-               set value [lindex $values_($this,photapps) $i]
+            for {set i 0} {$i < $values_(photnum)} {incr i} {
+               set value [lindex $values_(photapps) $i]
                if { $value != "" } {
                   if { $first } {
                      append result "$value"
@@ -1243,14 +1248,14 @@ itcl::class gaia::GaiaSextractor {
             set value1 [ctoken args {, }]
             set value2 [ctoken args {, }]
             if { $value1 != {} } {
-               set values_($this,kronfact) $value1
+               set values_(kronfact) $value1
             }
             if { $value2 != {} } {
-               set values_($this,kronmin) $value2
+               set values_(kronmin) $value2
             }
          }
          to {
-            return "PHOT_AUTOPARAMS      $values_($this,kronfact),$values_($this,kronmin)"
+            return "PHOT_AUTOPARAMS      $values_(kronfact),$values_(kronmin)"
          }
       }
    }
@@ -1277,7 +1282,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.dettype \
             -text "Detector type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,dettype)]
+            -variable [scope values_(dettype)]
       }
       pack $itk_component(dettype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(dettype) \
@@ -1288,7 +1293,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this toggle_detector_ $shortname]
       }
-      set values_($this,dettype) $values_($this,dettype)
+      set values_(dettype) $values_(dettype)
 
       #  Size of a pixel in arcseconds.
       itk_component add imagescale {
@@ -1297,8 +1302,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,imagescale) \
-            -textvariable [scope values_($this,imagescale)] \
+            -value $values_(imagescale) \
+            -textvariable [scope values_(imagescale)] \
             -command [code $this set_values_ imagescale]
       }
       pack $itk_component(imagescale) -side top -fill x -ipadx 1m -ipady 1m
@@ -1312,8 +1317,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,photsat) \
-            -textvariable [scope values_($this,photsat)] \
+            -value $values_(photsat) \
+            -textvariable [scope values_(photsat)] \
             -command [code $this set_values_ photsat]
       }
       pack $itk_component(photsat) -side top -fill x -ipadx 1m -ipady 1m
@@ -1334,8 +1339,8 @@ itcl::class gaia::GaiaSextractor {
             -from 0.01 \
             -to 5.0 \
             -validate real \
-            -value $values_($this,photgain) \
-            -textvariable [scope values_($this,photgain)] \
+            -value $values_(photgain) \
+            -textvariable [scope values_(photgain)] \
             -command [code $this set_values_ photgain]
       }
       pack $itk_component(photgain) -side top -fill x -ipadx 1m -ipady 1m
@@ -1349,8 +1354,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,photgamma) \
-            -textvariable [scope values_($this,photgamma)] \
+            -value $values_(photgamma) \
+            -textvariable [scope values_(photgamma)] \
             -command [code $this set_values_ photgamma]
       }
       pack $itk_component(photgamma) -side top -fill x -ipadx 1m -ipady 1m
@@ -1358,12 +1363,12 @@ itcl::class gaia::GaiaSextractor {
          {Gamma of photographic emulsion (if required)}
 
       #  Initialise widget states.
-      toggle_detector_ $values_($this,dettype)
+      toggle_detector_ $values_(dettype)
    }
 
    #  Set the detector type and configure related fields.
    protected method toggle_detector_ {value} {
-      set values_($this,dettype) $value
+      set values_(dettype) $value
       if { $value == "CCD" } {
          $itk_component(photgain) configure -state normal
          $itk_component(photgamma) configure -state disabled
@@ -1395,8 +1400,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,fwhm) \
-            -textvariable [scope values_($this,fwhm)] \
+            -value $values_(fwhm) \
+            -textvariable [scope values_(fwhm)] \
             -command [code $this set_values_ fwhm]
       }
       pack $itk_component(fwhm) -side top -fill x -ipadx 1m -ipady 1m
@@ -1408,7 +1413,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.nettable \
             -text "Neural network table:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,nettable)]
+            -variable [scope values_(nettable)]
       }
       pack $itk_component(nettable) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(nettable) \
@@ -1421,7 +1426,7 @@ itcl::class gaia::GaiaSextractor {
             -value $longname \
             -command [code $this set_values_ nettable $longname]
       }
-      set values_($this,nettable) $values_($this,nettable)
+      set values_(nettable) $values_(nettable)
    }
 
    #  Reset classification parameters to the builtin defaults.
@@ -1440,7 +1445,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.radtype \
             -labelwidth $lwidth \
             -text "Type of values:" \
-            -variable [scope values_($this,radtype)]
+            -variable [scope values_(radtype)]
       }
       pack $itk_component(radtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(radtype) \
@@ -1462,14 +1467,14 @@ itcl::class gaia::GaiaSextractor {
             -anchor w \
             -validate real \
             -orient vertical \
-            -value $values_($this,radthresh) \
-            -textvariable [scope values_($this,radthresh)] \
+            -value $values_(radthresh) \
+            -textvariable [scope values_(radthresh)] \
             -command [code $this set_values_ radthresh]
       }
       pack $itk_component(radthresh) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(radthresh) \
          {Step, [start] and [zeropoint] (SB only) of thresholds}
-      toggle_radtype_ $values_($this,radtype)
+      toggle_radtype_ $values_(radtype)
    }
 
    #  Reset radii parameters to the builtin defaults.
@@ -1485,7 +1490,7 @@ itcl::class gaia::GaiaSextractor {
       } else {
          $itk_component(radthresh) configure -state normal
       }
-      set values_($this,radtype) $intype
+      set values_(radtype) $intype
    }
 
    #  Set the value of RAD_TYPE. This is special as NONE means
@@ -1494,7 +1499,7 @@ itcl::class gaia::GaiaSextractor {
       switch -exact $flag {
          from {
             #  Read in value, must be OK.
-            set values_($this,radtype) $args
+            set values_(radtype) $args
          }
          to {
             #  Return blank if "NONE".
@@ -1515,11 +1520,11 @@ itcl::class gaia::GaiaSextractor {
             #  Read in value(s), must be OK. Only catch is that these
             #  may be comma separated.
             regsub -all  {,} $args { } largs
-            set values_($this,radthresh) $largs
+            set values_(radthresh) $largs
          }
          to {
             #  Return blank if radtype "NONE".
-            if { "$values_($this,radtype)" == "NONE" } {
+            if { "$values_(radtype)" == "NONE" } {
                return ""
             } else {
 
@@ -1538,13 +1543,13 @@ itcl::class gaia::GaiaSextractor {
             #  otherwise assume a name in $config_dir_ is being used.
             set name [lindex $args 0]
             if { "[string index $name 0]" != "/"} {
-               set values_($this,nettable) ${config_dir_}/$name
+               set values_(nettable) ${config_dir_}/$name
             } else {
-               set values_($this,nettable) $name
+               set values_(nettable) $name
             }
          }
          to {
-            return "STARNNW_NAME     $values_($this,nettable)"
+            return "STARNNW_NAME     $values_(nettable)"
          }
       }
    }
@@ -1559,7 +1564,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.backtype \
             -text "Background type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,backtype)]
+            -variable [scope values_(backtype)]
       }
       pack $itk_component(backtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backtype) \
@@ -1571,7 +1576,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this toggle_backvalue_ $shortname]
       }
-      set values_($this,backtype) $values_($this,backtype)
+      set values_(backtype) $values_(backtype)
 
       #  Value of background (if backtype is MANUAL).
       itk_component add backvalue {
@@ -1580,8 +1585,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -validate real \
-            -value $values_($this,backvalue) \
-            -textvariable [scope values_($this,backvalue)] \
+            -value $values_(backvalue) \
+            -textvariable [scope values_(backvalue)] \
             -command [code $this set_values_ backvalue]
       }
       pack $itk_component(backvalue) -side top -fill x -ipadx 1m -ipady 1m
@@ -1596,8 +1601,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -anchor w \
             -validate integer \
-            -value $values_($this,backmesh) \
-            -textvariable [scope values_($this,backmesh)] \
+            -value $values_(backmesh) \
+            -textvariable [scope values_(backmesh)] \
             -orient horizontal \
             -command [code $this set_values_ backmesh]
       }
@@ -1613,8 +1618,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -anchor w \
             -validate integer \
-            -value $values_($this,backfilter) \
-            -textvariable [scope values_($this,backfilter)] \
+            -value $values_(backfilter) \
+            -textvariable [scope values_(backfilter)] \
             -orient horizontal \
             -command [code $this set_values_ backfilter]
       }
@@ -1627,7 +1632,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.backphot \
             -text "Photometry type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,backphot)]
+            -variable [scope values_(backphot)]
       }
       pack $itk_component(backphot) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backphot) \
@@ -1639,7 +1644,7 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this toggle_annulus_ $shortname]
       }
-      set values_($this,backphot) $values_($this,backphot)
+      set values_(backphot) $values_(backphot)
 
       #  Thickness of background annulus.
       itk_component add backthick {
@@ -1656,20 +1661,20 @@ itcl::class gaia::GaiaSextractor {
             -to 256 \
             -fix_range 1 \
             -validate integer \
-            -value $values_($this,backthick) \
-            -textvariable [scope values_($this,backthick)] \
+            -value $values_(backthick) \
+            -textvariable [scope values_(backthick)] \
             -command [code $this set_values_ backthick]
       }
       pack $itk_component(backthick) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backthick) \
          {Thickness (in pixels) of the background annulus}
-      toggle_annulus_ $values_($this,backphot)
-      toggle_backvalue_ $values_($this,backtype)
+      toggle_annulus_ $values_(backphot)
+      toggle_backvalue_ $values_(backtype)
    }
 
    #  Method to toggle state of annulus parameter.
    private method toggle_annulus_ {value} {
-      set values_($this,backphot) $value
+      set values_(backphot) $value
       if { "$value" == "LOCAL" } {
          $itk_component(backthick) configure -state normal
       } else {
@@ -1679,7 +1684,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Method to toggle state of back ground value parameter.
    private method toggle_backvalue_ {value} {
-      set values_($this,backtype) $value
+      set values_(backtype) $value
       if { "$value" == "MANUAL" } {
          $itk_component(backvalue) configure -state normal
          $itk_component(backmesh) configure -state disabled
@@ -1713,7 +1718,7 @@ itcl::class gaia::GaiaSextractor {
          LabelMenu $parent.checktype \
             -text "Checkimage type:" \
             -labelwidth $lwidth \
-            -variable [scope values_($this,checktype)]
+            -variable [scope values_(checktype)]
       }
       pack $itk_component(checktype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(checktype) \
@@ -1724,15 +1729,15 @@ itcl::class gaia::GaiaSextractor {
             -value $shortname \
             -command [code $this set_values_ checktype $shortname]
       }
-      set values_($this,checktype) $values_($this,checktype)
+      set values_(checktype) $values_(checktype)
 
       #  Name of check image.
       itk_component add checkimage {
          LabelEntry $parent.checkimage \
             -labelwidth $lwidth \
             -text "Check image name:" \
-            -value $values_($this,checkimage) \
-            -textvariable [scope values_($this,checkimage)]
+            -value $values_(checkimage) \
+            -textvariable [scope values_(checkimage)]
       }
       pack $itk_component(checkimage) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(checkimage) \
@@ -1762,7 +1767,7 @@ itcl::class gaia::GaiaSextractor {
                       -text "$param" \
                       -onvalue 1 \
                       -offvalue 0 \
-                      -variable [scope columns_($this,$param)] \
+                      -variable [scope columns_($param)] \
                       -width  20 \
                       -anchor w \
                       -font $itk_option(-labelfont)]
@@ -1785,7 +1790,7 @@ itcl::class gaia::GaiaSextractor {
    protected method reset_catalogue_ {} {
       unset columns_
       foreach param "$safecols_ $defcolumns_" {
-         set columns_($this,$param) 1
+         set columns_($param) 1
       }
       toggle_draw_kron_ellipses_
       toggle_draw_iso_ellipses_
@@ -1793,7 +1798,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Set an element of the values_ array.
    protected method set_values_ {elem value} {
-      set values_($this,$elem) $value
+      set values_($elem) $value
    }
 
    #  Establish the mappings between local names and SExtractor
@@ -1987,53 +1992,53 @@ itcl::class gaia::GaiaSextractor {
    protected method set_defaults_ {} {
 
       # Set the local defaults.
-      set values_($this,conpar) "default.sex"
-      set values_($this,catname) "GaiaCatalog.tab"
-      set values_($this,catpar) "default.param"
-      set values_($this,cattype) "ASCII_SKYCAT"
-      set values_($this,minsize) 5
-      set values_($this,threshtype) "RELATIVE"
-      set values_($this,detthresh) {{1.5} {}}
-      set values_($this,analthresh) {{1.5} {}}
-      set values_($this,detfilter) "${config_dir_}/default.conv"
-      set values_($this,debthresh) 32
-      set values_($this,debcontrast) 0.005
-      set values_($this,detclean) "Y"
-      set values_($this,deteffic) 1.0
-      set values_($this,photzero) 50.0
-      set values_($this,photnum) 1
-      set values_($this,photapps) 5.0
-      set values_($this,kronfact) 2.5
-      set values_($this,kronmin) 3.5
-      set values_($this,photmask) "NONE"
-      set values_($this,dettype) "CCD"
-      set values_($this,imagescale) 1.0
-      set values_($this,photsat) 50000
-      set values_($this,photgain) 1.0
-      set values_($this,photgamma) 4.0
-      set values_($this,fwhm) 1.2
-      set values_($this,nettable) "${config_dir_}/default.nnw"
-      set values_($this,backmesh) {{64} {}}
-      set values_($this,backfilter) {{3} {}}
-      set values_($this,backtype) "AUTO"
-      set values_($this,backvalue) 0.0
-      set values_($this,backphot) "GLOBAL"
-      set values_($this,backthick) 24
-      set values_($this,checktype) "NONE"
-      set values_($this,checkimage) "check.fits"
+      set values_(conpar) "default.sex"
+      set values_(catname) "GaiaCatalog[incr catnames_]"
+      set values_(catpar) "default.param"
+      set values_(cattype) "ASCII_SKYCAT"
+      set values_(minsize) 5
+      set values_(threshtype) "RELATIVE"
+      set values_(detthresh) {{1.5} {}}
+      set values_(analthresh) {{1.5} {}}
+      set values_(detfilter) "${config_dir_}/default.conv"
+      set values_(debthresh) 32
+      set values_(debcontrast) 0.005
+      set values_(detclean) "Y"
+      set values_(deteffic) 1.0
+      set values_(photzero) 50.0
+      set values_(photnum) 1
+      set values_(photapps) 5.0
+      set values_(kronfact) 2.5
+      set values_(kronmin) 3.5
+      set values_(photmask) "NONE"
+      set values_(dettype) "CCD"
+      set values_(imagescale) 1.0
+      set values_(photsat) 50000
+      set values_(photgain) 1.0
+      set values_(photgamma) 4.0
+      set values_(fwhm) 1.2
+      set values_(nettable) "${config_dir_}/default.nnw"
+      set values_(backmesh) {{64} {}}
+      set values_(backfilter) {{3} {}}
+      set values_(backtype) "AUTO"
+      set values_(backvalue) 0.0
+      set values_(backphot) "GLOBAL"
+      set values_(backthick) 24
+      set values_(checktype) "NONE"
+      set values_(checkimage) "check.fits"
 
-      set values_($this,radtype)  "NONE"
-      set values_($this,radthresh) ""
+      set values_(radtype)  "NONE"
+      set values_(radthresh) ""
 
       #  Memory parameters. These are not optional and may be changed
       #  using the local default.sex file.
-      set values_($this,memory_objstack) 2000
-      set values_($this,memory_pixstack) 100000
-      set values_($this,memory_bufsize) 1024
+      set values_(memory_objstack) 2000
+      set values_(memory_pixstack) 100000
+      set values_(memory_bufsize) 1024
 
       #  Verbosity. Not used, but may be modified using local
       #  default.sex file.
-      set values_($this,verbose_type) "NORMAL"
+      set values_(verbose_type) "NORMAL"
 
       #  Set list of parameter names (this is so we can order them in
       #  a specific format -- useful for human readable output).
@@ -2049,13 +2054,15 @@ itcl::class gaia::GaiaSextractor {
 
       #  Record defaults so they can be restored.
       foreach name $valuenames_ {
-         set defaults_($name) $values_($this,$name)
+         set defaults_($name) $values_($name)
       }
 
       #  Open SExtractor config parameter file and read in
       #  defaults. This can be local, or from the main installation.
+      set localfile 0
       if { [file isfile "default.sex"] } {
          set deffile "default.sex"
+         set localfile 1
       } elseif { [file isfile "${config_dir_}/default.sex"] } {
          set deffile "${config_dir_}/default.sex"
       } elseif { [file isfile "$itk_option(-sex_dir)/default.sex"] } {
@@ -2064,7 +2071,13 @@ itcl::class gaia::GaiaSextractor {
          set deffile ""
       }
       if { $deffile != "" } {
+         #  Read file, but if not a local configuration file use our
+         #  unique name. 
+         set localname $values_(catname)
          read_conpars $deffile
+         if { ! $localfile } {
+            set values_(catname) $localname
+         }
       }
 
       #  Now look for catalogue parameters file and read it in.
@@ -2097,7 +2110,7 @@ itcl::class gaia::GaiaSextractor {
             set starlink 1
          }
          if { [file isfile $itk_option(-sex_dir)/sex] } {
-            if { $values_($this,use_native) } {
+            if { $values_(use_native) } {
                set native 1
             }
          }
@@ -2107,8 +2120,8 @@ itcl::class gaia::GaiaSextractor {
          }
 
          #  OK now save all config parameters and catalogue params.
-         save_conpars $values_($this,conpar)
-         save_catpars $values_($this,catpar)
+         save_conpars $values_(conpar)
+         save_catpars $values_(catpar)
 
          #  Get name of the image we need to use for measuring. We
          #  also need the detection image, which is the displayed
@@ -2119,7 +2132,7 @@ itcl::class gaia::GaiaSextractor {
 	    set image [$namer_ ndfname]
             set diskimage [$namer_ diskfile]
 
-            set detect $values_($this,detname)
+            set detect $values_(detname)
             if { $detect != "" && $detect != "NONE" } {
 	       $namer_ configure -imagename $detect
 	       set detect [$namer_ ndfname]
@@ -2159,10 +2172,10 @@ itcl::class gaia::GaiaSextractor {
                   #  Run program, monitoring output...
                   if { $detect == "" } {
                      catch {$foreign_sex_ runwith \
-                               -c $values_($this,conpar) $diskimage } msg
+                               -c $values_(conpar) $diskimage } msg
                   } else {
                      catch {$foreign_sex_ runwith \
-                               -c $values_($this,conpar) \
+                               -c $values_(conpar) \
                                $diskdetect,$diskimage } msg
                   }
 
@@ -2191,11 +2204,11 @@ itcl::class gaia::GaiaSextractor {
                #  Run program, monitoring output...
                if { $detect == "" } {
                   $star_sex_ runwiths \
-                     "config=$values_($this,conpar) image=$image \
+                     "config=$values_(conpar) image=$image \
                       reset accept"
                } else {
                   $star_sex_ runwiths \
-                     "config=$values_($this,conpar) \
+                     "config=$values_(conpar) \
                      image=\"$detect,$image\" reset accept"
                }
 
@@ -2261,60 +2274,60 @@ itcl::class gaia::GaiaSextractor {
 
          #  Reset all known columns
          foreach {param desc} $columnnames_ {
-            set columns_($this,$param) 0
+            set columns_($param) 0
          }
 
          #  Now get the actual columns in this catalogue and switch them on.
          foreach param [$astrocat headings] {
-            set columns_($this,$param) 1
+            set columns_($param) 1
          }
          $astrocat delete
 
          #  Check that we can display the required symbols.
-         if { $values_($this,draw_kron_ellipses) } {
+         if { $values_(draw_kron_ellipses) } {
             set n 0
             set i 0
             foreach param "$safecols_ $commoncols_ $kroncols_" {
-               if { [info exists columns_($this,$param)] && 
-                    $columns_($this,$param) } {
+               if { [info exists columns_($param)] && 
+                    $columns_($param) } {
                   incr i
                }
                incr n
             }
             if { $i != $n } {
-               set values_($this,draw_kron_ellipses) 0
+               set values_(draw_kron_ellipses) 0
                toggle_draw_kron_ellipses_
                warning_dialog "Cannot draw kron ellipses (wrong columns available)"
             }
          }
-         if { $values_($this,draw_iso_ellipses) } {
+         if { $values_(draw_iso_ellipses) } {
             set n 0
             set i 0
             foreach param "$safecols_ $commoncols_ $isocols_" {
-               if { [info exists columns_($this,$param)] &&
-                    $columns_($this,$param) } {
+               if { [info exists columns_($param)] &&
+                    $columns_($param) } {
                   incr i
                }
                incr n
             }
             if { $i != $n } {
-               set values_($this,draw_iso_ellipses) 0
+               set values_(draw_iso_ellipses) 0
                toggle_draw_iso_ellipses_
                warning_dialog "Cannot draw isophotal ellipses (wrong columns available)"
             }
          }
-         if { $values_($this,draw_circles) } {
+         if { $values_(draw_circles) } {
             set n 0
             set i 0
             foreach param "$safecols_" {
-               if { [info exists columns_($this,$param)] &&
-                    $columns_($this,$param) } {
+               if { [info exists columns_($param)] &&
+                    $columns_($param) } {
                   incr i
                }
                incr n
             }
             if { $i != $n } {
-               set values_($this,draw_iso_ellipses) 0
+               set values_(draw_iso_ellipses) 0
                toggle_draw_circles_
                warning_dialog "Cannot draw detection circles (wrong columns available)"
             }
@@ -2348,18 +2361,18 @@ itcl::class gaia::GaiaSextractor {
          if { [info exists astrocatnames_($catalogue)] &&
               [winfo exists $astrocatnames_($catalogue)] } {
             set catwin $astrocatnames_($catalogue)
-            if { [info exists columns_($this,X_IMAGE)] &&
-                 $columns_($this,X_IMAGE) &&
-                 [info exists columns_($this,Y_IMAGE)] &&
-                 $columns_($this,Y_IMAGE) } {
+            if { [info exists columns_(X_IMAGE)] &&
+                 $columns_(X_IMAGE) &&
+                 [info exists columns_(Y_IMAGE)] &&
+                 $columns_(Y_IMAGE) } {
                set havpix 1
             } else {
                set havpix 0
             }
-            if { [info exists columns_($this,X_WORLD)] &&
-                 $columns_($this,X_WORLD) &&
-                 [info exists columns_($this,Y_WORLD)] &&
-                 $columns_($this,Y_WORLD) } {
+            if { [info exists columns_(X_WORLD)] &&
+                 $columns_(X_WORLD) &&
+                 [info exists columns_(Y_WORLD)] &&
+                 $columns_(Y_WORLD) } {
                set havwcs 1
             } else {
                set havwcs 0
@@ -2405,15 +2418,15 @@ itcl::class gaia::GaiaSextractor {
       }
 
       #  Set the columns in which the various coordinates are found.
-      if { [info exists columns_($this,NUMBER)] &&
-           $columns_($this,NUMBER) } {
+      if { [info exists columns_(NUMBER)] &&
+           $columns_(NUMBER) } {
          set ncol 0
       } else {
          set ncol -1
       }
       foreach "id name" "X_WORLD ra Y_WORLD dec X_IMAGE x Y_IMAGE y" {
          catch {
-            if { [info exists columns_($this,$id)] && $columns_($this,$id) } {
+            if { [info exists columns_($id)] && $columns_($id) } {
                incr ncol
                $astrocat entry update [list "${name}_col $ncol"] $catalogue
             } else {
@@ -2428,9 +2441,9 @@ itcl::class gaia::GaiaSextractor {
       $astrocat delete
 
       #  Now open the catalogue window.
-      set astrocat [gaia::GaiaSearch::new_local_catalog \
-                       $catalogue [code $itk_option(-image)] \
-                       $itk_option(-astrocat)]
+      set astrocat [gaia::GaiaSearch::new_local_catalog $catalogue \
+                       [code $itk_option(-image)] $itk_option(-astrocat) \
+                       0 catalog $w_]
 
       #  Now display the catalogue.
       if { $astrocat == {} } {
@@ -2524,14 +2537,14 @@ itcl::class gaia::GaiaSextractor {
    #  or, if the first time a simple circle.
    protected method set_plot_symbols_ {astrocat} {
       set symbol {}
-      if { $values_($this,draw_kron_ellipses) } {
+      if { $values_(draw_kron_ellipses) } {
          lappend symbol \
             [list KRON_RADIUS B_IMAGE THETA_IMAGE ELONGATION] \
             [list ellipse blue \$ELONGATION \$THETA_IMAGE {} {}] \
             [list \$KRON_RADIUS*\$B_IMAGE {}]
       }
-      if { $values_($this,draw_iso_ellipses) } {
-         if {$values_($this,draw_kron_ellipses) } {
+      if { $values_(draw_iso_ellipses) } {
+         if {$values_(draw_kron_ellipses) } {
             lappend symbol {:}
          }
          lappend symbol \
@@ -2541,9 +2554,9 @@ itcl::class gaia::GaiaSextractor {
       }
 
       # Use a simple plot symbol.
-      if { $values_($this,draw_circles) } {
-         if {$values_($this,draw_kron_ellipses) ||
-             $values_($this,draw_iso_ellipses) } {
+      if { $values_(draw_circles) } {
+         if {$values_(draw_kron_ellipses) ||
+             $values_(draw_iso_ellipses) } {
             lappend symbol {:}
          }
          lappend symbol \
@@ -2553,16 +2566,16 @@ itcl::class gaia::GaiaSextractor {
       }
 
       #  Isophotal radii, if available.
-      if { $values_($this,draw_radii) } {
-         if { "[array get columns_ $this,RAD*]" != "" } {
-            if {$values_($this,draw_kron_ellipses) ||
-                $values_($this,draw_iso_ellipses) ||
-                $values_($this,draw_circles) } {
+      if { $values_(draw_radii) } {
+         if { "[array get columns_ RAD*]" != "" } {
+            if {$values_(draw_kron_ellipses) ||
+                $values_(draw_iso_ellipses) ||
+                $values_(draw_circles) } {
                lappend symbol {:}
             }
             for {set i 0} {$i < 16} {incr i} {
-               if { [info exists columns_($this,RAD$i)] &&
-                    $columns_($this,RAD$i) } {
+               if { [info exists columns_(RAD$i)] &&
+                    $columns_(RAD$i) } {
                   lappend symbol \
                      RAD$i \
                      [list circle yellow {} {} {} \$RAD$i>0] \
@@ -2935,14 +2948,17 @@ itcl::class gaia::GaiaSextractor {
    #  Name of object to deal with image names.
    protected variable namer_ {}
 
+   #  Array for catalogue columns. Indexed by (param).
+   protected variable columns_
+
+   #  Array for local values index by a name.
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Array for passing around at global level. Indexed by ($this,param).
-   common values_
-
-   #  Array for catalogue columns. Indexed by ($this,param).
-   common columns_
+   #  A counter for generating unique catalogue names.
+   common catnames_ -1
 
 #  End of class definition.
 }
