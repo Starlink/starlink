@@ -1,56 +1,30 @@
 GSD read-only library for Unix.
 ===============================
 
-Make
-----
+This library provides read-only access to files created using the GSD
+format as used on the James Clerk Maxwell Telescope (JCMT) for
+heterodyne data. It is currently used by SPECX and JCMTDR.
 
-The library is maintained using the "mk" script that is part of it.
-Maintenance is controlled mainly by the "makefile" file. The "mk"
-command is usually given a target for the make command, the target in
-turn being defined in "makefile".
 
-% mk build
-   This will build the library from source. Each library source file
-   will afterwards be accompanied by an object file and a date-stamp
-   file .now. The library itself will be in libgsd.a.
+Installation
+------------
 
-   There is another built file, an executable programme gsd_print. This
-   is compiled and linked from gsd_print.c and the final object library.
+This library uses the standard Gnu tools for building so it should be 
+simply a case of
 
-% mk clean
-   This will remove transient files, namely the object files and any
-   symbolic links needed during build. In the sequence of targets
-   build-clean-build the second build will not need to re-compile any
-   code, since the date-stamp files still exist an are newer than the
-   source files. (The second build will, however, re-create symbolic
-   links.)
-
-% mk unbuild
-   This will remove transient and built files.
-
-% mk export_source
-   This will compile a list of source files in the file
-   $EXPORT/filelist. It appends to such a file if it exists. And it
-   prepends "gsd/" to each file name. So it is not terribly useful
-   outwith an application package.
-
-% mk export
-   As export_source, but includes built files as well.
-
-% mk archive
-   Create the gsd_source.tar archive that is required before
-   a Starlink build or export_source
+   % ./configure
+   % make
+   % make install
 
 
 Different platforms
 -------------------
 
-Before any mk command, the environment variable SYSTEM must be set. Use
-"alpha_OSF1", "sun4_Solaris", or "sun4" (SunOS 4.x).
+This library has only been tested on ix86 Linux, Solaris, and Digital
+Unix (Alpha).
 
-All platform-dependencies are in gsd2.h, or rather gsd2_$(SYSTEM).h.
-There exist versions for Alpha/OSF1, Sun4/Solaris and Sun4/SunOS(4.x).
-They are also prepared for use under VAX/VMS.
+All platform dependenceies are in gsd2.h, hopefully the configure
+script will set up the correct settings for your architecture.
 
 gsd2.h initialises unions, which is possible only in ANSI C. This is
 a problem on the VAX.
@@ -59,8 +33,6 @@ a problem on the VAX.
 
 Source files
 ------------
-
-mk and makefile are for maintenance.
 
 C_ROUTINES are the C source code of the library. This excludes
    gsd_print.c, which does not enter the library but becomes an
@@ -144,7 +116,7 @@ The recommended binding is the C binding.
 The Fortran binding is incomplete and existing code calling GSD may need
 modifications. See gsd_print.f.
 
-   Only a rudimentary include file GSDPARS is provided. It also requires
+   Only a rudimentary include file GSD_PAR is provided. It also requires
    prior inclusion of PRM_PAR.
 
    Error status values have changed. Zero is good status, non-zero is
@@ -152,3 +124,13 @@ modifications. See gsd_print.f.
 
    gsd_inquire_array is not implemented. Instead gsd_inq_size must be
    used, although it was previously labelled "obsolete".
+
+Other language bindings
+-----------------------
+
+  A perl binding to this library is available. It is currently
+  shipped as part of the Starlink STARPERL package.
+
+  A native java implementation of a GSD reader is also available.
+  Please contact Tim Jenness (t.jenness@jach.hawaii.edu) if you are
+  interested.
