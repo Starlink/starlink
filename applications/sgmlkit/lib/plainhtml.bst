@@ -104,7 +104,11 @@ FUNCTION {output.nonnull}
     { output.state after.block =
 	{ add.period$ write$
 	  newline$
-	  "  " write$
+% It's important that we do _not_ have leading whitespace at the
+% beginning of blocks, since lib/postprocess-bbl.sed looks for such
+% whitespace as an indicator that BibTeX has wrapped a block, which it 
+% then carefully unwraps.
+%	  "  " write$
 	}
 	{ output.state before.all =
 	    'write$
