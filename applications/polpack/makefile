@@ -524,7 +524,12 @@ FIGURES = sun223_figures
 #  List of documentation files.
 
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(FIGURES) \
-                $(HYPERTEXT_HELP:.htx=.htx_tar) $(PKG_NAME).news
+                $(HYPERTEXT_HELP:.htx=.htx_tar) $(PKG_NAME).news $(LICENCE)
+
+#  Conditions of use file.
+
+LICENCE = $(PACK_NAME)_CONDITIONS
+
 ################################################################################
 #-------------------------------------------------------------------------------
 
@@ -1028,6 +1033,11 @@ install:
 	export HTX_PATH;\
 	$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP)
 #
+#  Install the conditions of use file and make it read-only to prevent its
+#  date being changed.
+	cp -p $(LICENCE) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(LICENCE)
+#
 #  Install the date stamp file and make it read-only to prevent its
 #  date being changed.
 	cp -p $(DATE_STAMP) $(INSTALL_DATES)
@@ -1196,6 +1206,13 @@ do_deinstall:
 	HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
         export HTX_PATH;\
         $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP)
+#
+#  Deinstall the conditions of use file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+           chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+           rm -f $(INSTALL_DATES)/$(LICENCE);\
+        else :; fi
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
