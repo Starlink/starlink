@@ -170,7 +170,9 @@
 *
 *        -  HISTORY cards in a special format created by NDF2FITS are
 *        converted back into NDF HISTORY records.  This will only work
-*        provided the HISTORY headers have not been tampered.
+*        provided the HISTORY headers have not been tampered.  Such
+*        headers are not transferred to the FITS airlock, when
+*        PROFIT = .TRUE..
 *
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
@@ -210,7 +212,9 @@
 *  History:
 *     1994 May 31 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 16 (MJC):
+*        Filter out NDF-style HISTORY.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -288,6 +292,7 @@
       INTEGER NDFE               ! Identifier of effective NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER NHDU               ! Count of header and data unit
+      INTEGER NHEAD              ! Number of FITS header cards
       LOGICAL NONSDA             ! True if the current HDU contains a
                                  ! non-standard data array
       INTEGER NPOS               ! Character position in extension name
@@ -296,6 +301,7 @@
       CHARACTER * ( DAT__SZLOC ) PLOC ! Locator to NDF top-level
       INTEGER PNTR( 1 )          ! Pointer to NDF array
       INTEGER RECLEN             ! Record length of logfile
+      INTEGER REPNTR             ! Pointer to header-propagation flags
       LOGICAL SIMPLE             ! True if the FITS file is simple
       CHARACTER * ( 6 ) SPENAM   ! Name of special type of FITS file
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
@@ -466,11 +472,15 @@
 *  Data scaling.
 *  =============
 
+*  Check that if the current HDU is the primary, or that it is an
+*  IMAGE, and thus can be processed by the following routines.  
+            IF ( FIRST. OR. XTENS .EQ. 'IMAGE' ) THEN
+
 *  The FMTCNV flag decides whether or not the data scaling is required.
 *  The FITSIO routines that obtain the data array(s) will apply the
 *  block floating-point scaling as prescribed by the BSCALE and BZERO
 *  keywords.
-            IF ( FMTCNV ) THEN
+               IF ( FMTCNV ) THEN
 
 *  Scaling is to be applied.  Find the data type required for the
 *  output array based upon the number of significant digits in the
@@ -479,37 +489,34 @@
 *  then the data type can be set to the null string.  This instructs
 *  later routines like COF_STYPC to use the data type specified by the
 *  FITSIO data-type code (based on BITPIX).
-               CALL COF_DSTYP( FUNIT, 'BSCALE', 'BZERO', TYPE, STATUS )
+                  CALL COF_DSTYP( FUNIT, 'BSCALE', 'BZERO', TYPE,
+     :                            STATUS )
 
 *  To prevent scaling, the scale and offset must be set to
 *  one and zero respectively.  Note that this does not affect the
 *  keywords in the header of the input FITS file.  Note that the values
 *  are double precision.
-            ELSE
-               CALL FTPSCL( FUNIT, 1.0D0, 0.0D0, FSTAT )
+               ELSE
+                  CALL FTPSCL( FUNIT, 1.0D0, 0.0D0, FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-               IF ( FSTAT .GT. FITSOK ) THEN
-                  BUFFER = 'Error defaulting the scale and offset for '/
-     :                     /'FITS file '//FILNAM( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_F2NDF_SCOF', 'FTPSCL',
-     :                            BUFFER, STATUS )
-                  GOTO 999
-               END IF
+                  IF ( FSTAT .GT. FITSOK ) THEN
+                     BUFFER = 'Error defaulting the scale and offset '/
+     :                        /'for FITS file '//FILNAM( :NCF )//'.'
+                     CALL COF_FIOER( FSTAT, 'COF_F2NDF_SCOF', 'FTPSCL',
+     :                               BUFFER, STATUS )
+                     GOTO 999
+                  END IF
 
 *  Set the recommended data type to a null string.  This instructs later
 *  routines like COF_STYPC to use the data type specified by the FITSIO
 *  data-type code (based on BITPIX).
-               TYPE = ' '
-            END IF
+                  TYPE = ' '
+               END IF
 
 *  Determine the main properties of the FITS object.
 *  =================================================
-
-*  Check that if the current HDU is the primary, or that it is an
-*  IMAGE, and thus can be processed by the following routine.  
-            IF ( FIRST. OR. XTENS .EQ. 'IMAGE' ) THEN
 
 *  Get the mandatory headers of the primary HDU or an IMAGE extension.
                CALL COF_MANDH( FUNIT, FIRST, NDF__MXDIM, SIMPLE, BITPIX,
@@ -706,20 +713,61 @@
 *  ====================================================================
 *
 *  This is slightly less efficient than combining the two operations,
-*  but re-using subroutines does make the code easier to follow.
+*  but re-using subroutines does make the code easier to follow.  There
+*  is another factor.  This stage incorporates the recreation of NDF
+*  HISTORY records, which should not be propagated to the FITS airlock
+*  too.  This intertwined steps requires a set of flags, but the logging
+*  does not.
 
-*  Decide whether or not to save the headers in an extension.
-*  Exclude the zeroth group of a random-groups dataset.
+*  Decide whether or not to save the headers in an extension.  Exclude
+*  the zeroth group of a random-groups dataset.
                   WRTEXT = ( ( FIRST .AND. .NOT. MULTIP ) .OR.
      :                       ( XTENS .EQ. 'IMAGE' .AND. .NOT. EXNDF )
      :                        .OR. ( IGROUP .GT .0 ) ) .AND. PROFIT
 
+*  Decide when to access the headers.
+                  IF ( WRTEXT .OR.
+     :                 ( EXNDF .AND. COMP .EQ. 'Data' ) ) THEN
+
+*  Instruct that the FITS airlock is not to use all the headers
+*  regardless whether or not they are NDF-style HISTORY records.  This
+*  uses a logical work array to flag whether or not to propagate the
+*  header to the airlock.
+
+*  Find the number of FITS headers.  Check that nothing has gone wrong
+*  before using the the number to create workspace.
+                     CALL COF_NHEAD( FUNIT, FILNAM, NHEAD, STATUS )
+                     IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Create the mask and assign .TRUE. to all of its elements.
+                     CALL PSX_CALLOC( NHEAD, '_LOGICAL', REPNTR,
+     :                                STATUS )
+                     CALL CON_CONSL( .TRUE., NHEAD, %VAL( REPNTR ),
+     :                               STATUS )
+                  END IF
+
+*  Deal with the NDF-style history records in the headers, assuming the
+*  history records have not been tampered.  Search for such records,
+*  transfer their information back into NDF HISTORY records, and flag
+*  that these headers should not to be propagated to the FITS airlock.
+*  This is to avoid growing duplication of potentially bulky text, if
+*  using FITS files with Starlink tasks.
+                  IF ( EXNDF .AND. COMP .EQ. 'Data' ) THEN
+                     CALL COF_CHISR( FUNIT, NDFE, NHEAD, %VAL( REPNTR ),
+     :                               STATUS )
+                  END IF
+
 *  Read the main header into the FITS extension of the NDF.  The FITS
 *  headers for the random groups will appear in each group NDF.
                   IF ( WRTEXT ) THEN
-                     CALL COF_WFEXT( FUNIT, NDFE, IGROUP, PCOUNT,
-     :                               FILNAM, STATUS )
+                     CALL COF_WFEXF( FUNIT, NDFE, IGROUP, PCOUNT,
+     :                               FILNAM, NHEAD, %VAL( REPNTR ),
+     :                               STATUS )
                   END IF
+
+*  Free the work space.
+                  IF ( WRTEXT .OR. ( EXNDF .AND. COMP .EQ. 'Data' ) )
+     :              CALL PSX_FREE( REPNTR, STATUS )
 
 *  Write out the headers to a logfile, if desired.
                   IF ( LOGHDR )
@@ -778,10 +826,10 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                      IF ( FSTAT .GT. FITSOK ) THEN
+                        NC = CHR_LEN( COMP )
                         BUFFER = 'Error reading the '//COMP( :NC )/
      :                           /' array in FITS file '/
      :                           /FILNAM( :NCF )//'.'
-                        NC = CHR_LEN( COMP )
                         CALL COF_FIOER( FSTAT, 'COF_F2NDF_READ',
      :                    'FTGPVx', BUFFER, STATUS )
                         CALL NDF_UNMAP( NDFE, COMP, STATUS )
@@ -817,9 +865,6 @@
 
 *  Create the NDF AXIS structure from the FITS headers.
                      CALL COF_NDFAX( FUNIT, NDFE, STATUS )
-
-*  Transfer HISTORY records, assuming they have not been tampered.
-                     IF ( EXNDF ) CALL COF_CHISR( FUNIT, NDFE, STATUS )
 
 *  Annul the temporary NDF, and tidy the locator to the extension.
                      IF ( NONSDA .AND. IGROUP .GT. 0 ) THEN
