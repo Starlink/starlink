@@ -1,4 +1,3 @@
-#define BOUNDS 1
 /*
 *class++
 *  Name:
@@ -142,6 +141,7 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
+static double AvoidWt( int, const double [], const double [], const double [], int, const double [], const double [] );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
@@ -179,53 +179,146 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 
 /* Member functions. */
 /* ================= */
+static void CornerBounds( MapData *mapdata, double *lbnd, double *ubnd,
+                          double xl[], double xu[] ) {
 
-#if BOUNDS
-
-
-#if 1
-static double PdfWeight( int ndim, const double x[],
-                         const double lbnd[], const double ubnd[],
-                         int npoint, const double x1[], const double x2[] ) {
-   double wt;
+   AstPointSet *pset_in;
+   AstPointSet *pset_out;
+   double **ptr_in;
+   double **ptr_out;
+   double f;
+   int *limit;
+   int bad;
+   int coord;
+   int done;
+   int ncoord;
+   int npoint;
    int point;
-   int dim;
-   double wt1;
-   double wt2;
-   double dxu;
-   double dxl;
-   double dx;
-   double delta;
-  
-   wt = 1.0;
-   for ( point = 0; point < npoint; point++ ) {
-      wt1 = wt2 = 0.0;
-      for ( dim = 0; dim < ndim; dim++ ) {
-         dxl = fabs( x1[ point * ndim + dim ] - lbnd[ dim ] );
-         dxu = fabs( ubnd[ dim ] - x1[ point * ndim + dim ] );
-         dx = ( dxu > dxl ) ? dxu : dxl;
-         delta = fabs( x[ dim ] - x1[ point * ndim + dim ] ) / dx;
-         wt1 = ( wt1 > delta ) ? wt1 : delta;
+   int i;
+   
+/* Obtain the number of coordinate axes and calculate the number of
+   points required in order to place one at every corner of the
+   constrained region of the coordinate space. */
+   ncoord = mapdata->nin;
+   for ( npoint = 1, coord = 0; coord < ncoord; coord++ ) npoint *= 2;
+   npoint += 2 * ncoord + 1;
+   
+/* Create a PointSet to hold the corner coordinates and obtain a
+   pointer to its coordinate values. Also allocate workspace for
+   calculating the corner coordinates. */
+   pset_in = astPointSet( npoint, ncoord, "" );
+   ptr_in = astGetPoints( pset_in );
+   limit = astMalloc( ncoord * sizeof( int ) );
+   if ( astOK ) {
+   
+/* Initialise the workspace. */
+      for ( coord = 0; coord < ncoord; coord++ ) limit[ coord ] = 0;
 
-         dxl = fabs( x2[ point * ndim + dim ] - lbnd[ dim ] );
-         dxu = fabs( ubnd[ dim ] - x2[ point * ndim + dim ] );
-         dx = ( dxu > dxl ) ? dxu : dxl;
-         delta = fabs( x[ dim ] - x2[ point * ndim + dim ] ) / dx;
-         wt2 = ( wt2 > delta ) ? wt2 : delta;
+/* Loop to visit every corner. */
+      done = 0;
+      point = 0;
+      while ( !done ) {
+
+/* At each corner, translate the contents of the "limit" array
+   (containing zeros and ones) into the lower or upper bound on the
+   corresponding axis. This gives the coordinates of the corner, which
+   we store in the input PointSet. */
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            ptr_in[ coord ][ point ] = limit[ coord ] ?
+                                       mapdata->ubnd[ coord ] :
+                                       mapdata->lbnd[ coord ];
+         }
+
+/* Increment the count of points (i.e. corners). */
+         point++;
+      
+/* Now update the limit array to identify the next corner. */
+         coord = 0;
+         while ( !done ) {
+
+/* Flip the first zero found to become a one. This gives a new
+   corner. */
+            if ( !limit[ coord ] ) {
+               limit[ coord ] = 1;
+               break;
+
+/* However, first flip any previous ones to become zeros and then
+   examine the next element. We have processed all corners once the
+   array is entirely filled with ones. */
+            } else {
+               limit[ coord ] = 0;
+               done = ( ++coord == ncoord );
+            }
+         }
       }
-      wt *= wt1 * wt2;
+
+      for ( coord = 0; coord < ncoord; coord++ ) {
+         for ( i = 0; i < ncoord; i++ ) {
+            ptr_in[ i ][ point ] = ptr_in[ i ][ point + 1 ] = 0.0;
+         }
+         ptr_in[ coord ][ point ] = mapdata->lbnd[ coord ];
+         ptr_in[ coord ][ point + 1 ] = mapdata->ubnd[ coord ];
+         point += 2;
+      }
+      for ( coord = 0; coord < ncoord; coord++ ) {
+         ptr_in[ coord ][ point ] = 0.5 * ( mapdata->lbnd[ coord ] +
+                                            mapdata->ubnd[ coord ] );
+      }
+
+/* Once all the corner coordinates have been calculated, transform the
+   resulting set of points and obtain a pointer to the resulting
+   coordinate values. */
+      pset_out = astTransform( mapdata->mapping, pset_in, mapdata->forward,
+                               NULL );
+      ptr_out = astGetPoints( pset_out );
+      if ( astOK ) {
+
+/* Loop through each point and test if any of its transformed
+   coordinates is bad. */
+         for ( point = 0; point < npoint; point++ ) {
+            bad = 0;
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               if ( ptr_out[ coord ][ point ] == AST__BAD ) {
+                  bad = 1;
+                  break;
+               }
+            }
+
+/* If so, we ignore the point. Otherwise, extract the required
+   coordinate. */
+            if ( !bad ) {
+               f = ptr_out[ mapdata->coord ][ point ];
+
+/* Use this to update the lower and upper bounds we are seeking. If
+   either bound is updated, also store the coordinates of the
+   corresponding input point (i.e. corner). */
+               if ( ( *lbnd == AST__BAD ) || ( f < *lbnd ) ) {
+                  *lbnd = f;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xl[ coord ] = ptr_in[ coord ][ point ];
+                  }
+               }
+               if ( ( *ubnd == AST__BAD ) || ( f > *ubnd ) ) {
+                  *ubnd = f;
+                  for ( coord = 0; coord < ncoord; coord++ ) {
+                     xu[ coord ] = ptr_in[ coord ][ point ];
+                  }
+               }
+            }
+         }
+      }
    }
-   return wt;
+
+/* Annul the temporary PointSets and free the workspace. */
+   pset_in = astAnnul( pset_in );
+   pset_out = astAnnul( pset_out );
+   limit = astFree( limit );
 }
 
-void astBoxBound( AstMapping *this,
-                  const double lbnd_in[], const double ubnd_in[],
-                  int coord_out, double lbnd_out[], double ubnd_out[] ) {
+static void GlobalBounds( MapData *mapdata, double *lbnd, double *x_l,
+                          double *ubnd, double *x_u ) {
 
-   MapData mapdata;
-   int nin;
-   int nout;
-   long int irand = 77665544;
+   long int seed = 77665544;
    double random;
    double *x_in_l;
    double *x_out_l;
@@ -250,46 +343,31 @@ void astBoxBound( AstMapping *this,
    int done_l;
    int done_u;
    
-   nin = astGetNin( this );
-   nout = astGetNout( this );
-
-   mapdata.mapping = this;
-   mapdata.nin = nin;
-   mapdata.nout = nout;
-   mapdata.coord = coord_out;
-   mapdata.forward = 1;
-   mapdata.lbnd = lbnd_in;
-   mapdata.ubnd = ubnd_in;
-   mapdata.pset_in = astPointSet( 1, nin, "" );
-   mapdata.pset_out = astPointSet( 1, nout, "" );
-   mapdata.ptr_in = astGetPoints( mapdata.pset_in );
-   mapdata.ptr_out = astGetPoints( mapdata.pset_out );
  
-   *lbnd_out = *ubnd_out = AST__BAD;
    x_in_l = x_in_u = NULL;
    x_out_l = x_out_u = NULL;
    nsame_l = nsame_u = 0;
    done_l = done_u = 0;
    for ( iter = 0; iter < maxiter; iter++ ) {
       if ( !done_l ) {
-         x_in_l = astGrow( x_in_l, nin * ( iter + 1 ), sizeof( double ) );
-         x_out_l = astGrow( x_out_l, nin * ( iter + 1 ), sizeof( double ) );
+         x_in_l = astGrow( x_in_l, mapdata->nin * ( iter + 1 ), sizeof( double ) );
+         x_out_l = astGrow( x_out_l, mapdata->nin * ( iter + 1 ), sizeof( double ) );
       }
       if ( !done_u ) {
-         x_in_u = astGrow( x_in_u, nin * ( iter + 1 ), sizeof( double ) );
-         x_out_u = astGrow( x_out_u, nin * ( iter + 1 ), sizeof( double ) );
+         x_in_u = astGrow( x_in_u, mapdata->nin * ( iter + 1 ), sizeof( double ) );
+         x_out_u = astGrow( x_out_u, mapdata->nin * ( iter + 1 ), sizeof( double ) );
       }
          
       if ( !done_l ) {
          wtsum = wtmax_l = 0.0;
          for ( i = 0; i < nsamp; i++ ) {
-            for ( coord = 0; coord < nin; coord++ ) {
-               random = Random( &irand );
-               x_in_l[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                              lbnd_in[ coord ] * ( 1.0 - random );
+            for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               random = Random( &seed );
+               x_in_l[ iter * mapdata->nin + coord ] = mapdata->ubnd[ coord ] * random +
+                                              mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
-            wt = PdfWeight( nin, &x_in_l[ iter * nin ], lbnd_in, ubnd_in,
-                            iter, x_in_l, x_out_l );
+            wt = AvoidWt( mapdata->nin, &x_in_l[ iter * mapdata->nin ], mapdata->lbnd, mapdata->ubnd, iter,
+                          x_in_l, x_out_l );
             wtsum += wt;
             wtmax_l = ( wt > wtmax_l ) ? wt : wtmax_l;
          }
@@ -298,13 +376,13 @@ void astBoxBound( AstMapping *this,
       if ( !done_u ) {
          wtsum = wtmax_u = 0.0;
          for ( i = 0; i < nsamp; i++ ) {
-            for ( coord = 0; coord < nin; coord++ ) {
-               random = Random( &irand );
-               x_in_u[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                              lbnd_in[ coord ] * ( 1.0 - random );
+            for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               random = Random( &seed );
+               x_in_u[ iter * mapdata->nin + coord ] = mapdata->ubnd[ coord ] * random +
+                                              mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
-            wt = PdfWeight( nin, &x_in_u[ iter * nin ], lbnd_in, ubnd_in,
-                            iter, x_in_u, x_out_u );
+            wt = AvoidWt( mapdata->nin, &x_in_u[ iter * mapdata->nin ], mapdata->lbnd, mapdata->ubnd, iter,
+                          x_in_u, x_out_u );
             wtsum += wt;
             wtmax_u = ( wt > wtmax_u ) ? wt : wtmax_u;
          }
@@ -314,44 +392,44 @@ void astBoxBound( AstMapping *this,
       if ( !done_l ) {
          reject = 1;
          while ( reject ) {
-            for ( coord = 0; coord < nin; coord++ ) {
-               random = Random( &irand );
-               x_out_l[ iter * nin + coord ] =
-                 x_in_l[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                            lbnd_in[ coord ] * ( 1.0 - random );
+            for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               random = Random( &seed );
+               x_out_l[ iter * mapdata->nin + coord ] =
+                 x_in_l[ iter * mapdata->nin + coord ] = mapdata->ubnd[ coord ] * random +
+                                            mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
             wt = 1.0;
             if ( wtmax_l > 0.0 ) {
-              wt = PdfWeight( nin, &x_in_l[ iter * nin ], lbnd_in, ubnd_in,
-                              iter, x_in_l, x_out_l ) / wtmax_l;
+              wt = AvoidWt( mapdata->nin, &x_in_l[ iter * mapdata->nin ], mapdata->lbnd, mapdata->ubnd, iter,
+                            x_in_l, x_out_l ) / wtmax_l;
             }
-            reject = ( Random( &irand ) > wt );
+            reject = ( Random( &seed ) > wt );
          }
       }
       if ( !done_u ) {
          reject = 1;
          while ( reject ) {
-            for ( coord = 0; coord < nin; coord++ ) {
-               random = Random( &irand );
-               x_out_u[ iter * nin + coord ] =
-                 x_in_u[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                            lbnd_in[ coord ] * ( 1.0 - random );
+            for ( coord = 0; coord < mapdata->nin; coord++ ) {
+               random = Random( &seed );
+               x_out_u[ iter * mapdata->nin + coord ] =
+                 x_in_u[ iter * mapdata->nin + coord ] = mapdata->ubnd[ coord ] * random +
+                                            mapdata->lbnd[ coord ] * ( 1.0 - random );
             }
             wt = 1.0;
             if ( wtmax_u > 0.0 ) {
-              wt = PdfWeight( nin, &x_in_u[ iter * nin ], lbnd_in, ubnd_in,
-                              iter, x_in_u, x_out_u ) / wtmax_u;
+              wt = AvoidWt( mapdata->nin, &x_in_u[ iter * mapdata->nin ], mapdata->lbnd, mapdata->ubnd, iter,
+                            x_in_u, x_out_u ) / wtmax_u;
             }
-            reject = ( Random( &irand ) > wt );
+            reject = ( Random( &seed ) > wt );
          }
       }
 
-      if ( ( *lbnd_out != AST__BAD ) && ( *ubnd_out != AST__BAD ) ) {
-         acc = fabs( *ubnd_out - *lbnd_out );
-      } else if ( *lbnd_out != AST__BAD ) {
-         acc = fabs( *lbnd_out );
-      } else if ( *ubnd_out != AST__BAD ) {
-         acc = fabs( *ubnd_out );
+      if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
+         acc = fabs( *ubnd - *lbnd );
+      } else if ( *lbnd != AST__BAD ) {
+         acc = fabs( *lbnd );
+      } else if ( *ubnd != AST__BAD ) {
+         acc = fabs( *ubnd );
       } else {
          acc = 1.0;
       }
@@ -359,52 +437,52 @@ void astBoxBound( AstMapping *this,
 printf( "acc = %g\n", acc );
       if ( !done_l ) {
          printf( "X minimising (iter=%d) starting at:\n", iter );
-         for ( coord = 0; coord < nin; coord ++ ) {
-            printf( "%g ", x_in_l[ iter * nin + coord ] );
+         for ( coord = 0; coord < mapdata->nin; coord ++ ) {
+            printf( "%g ", x_in_l[ iter * mapdata->nin + coord ] );
          }
          printf( "\n" );
-         mapdata.negate = 1;
-         new_min = -LocalMaximum( &mapdata, acc, 0.1, &x_out_l[ iter * nin ] );
+         mapdata->negate = 1;
+         new_min = -LocalMaximum( mapdata, acc, 0.1, &x_out_l[ iter * mapdata->nin ] );
          printf( "minimum found at " );
-         for ( coord = 0; coord < nin; coord++ ) {
-            printf( "%.20g ", x_out_l[ iter * nin + coord ] );
+         for ( coord = 0; coord < mapdata->nin; coord++ ) {
+            printf( "%.20g ", x_out_l[ iter * mapdata->nin + coord ] );
          }
          printf( "\n\n" );
       }
       if ( !done_u ) {
          printf( "X maximising (iter=%d) starting at:\n", iter );
-         for ( coord = 0; coord < nin; coord ++ ) {
-            printf( "%g ", x_in_u[ iter * nin + coord ] );
+         for ( coord = 0; coord < mapdata->nin; coord ++ ) {
+            printf( "%g ", x_in_u[ iter * mapdata->nin + coord ] );
          }
          printf( "\n" );
-         mapdata.negate = 0;
-         new_max = LocalMaximum( &mapdata, acc, 0.1, &x_out_u[ iter * nin ] );
+         mapdata->negate = 0;
+         new_max = LocalMaximum( mapdata, acc, 0.1, &x_out_u[ iter * mapdata->nin ] );
          printf( "maximum found at " );
-         for ( coord = 0; coord < nin; coord++ ) {
-            printf( "%.20g ", x_out_u[ iter * nin + coord ] );
+         for ( coord = 0; coord < mapdata->nin; coord++ ) {
+            printf( "%.20g ", x_out_u[ iter * mapdata->nin + coord ] );
          }
          printf( "\n\n" );
       }
 
       if ( !done_l ) {
-         if ( *lbnd_out == AST__BAD ) {
+         if ( *lbnd == AST__BAD ) {
             nsame_l = 0;
-            *lbnd_out = new_min;
-         } else if ( new_min < *lbnd_out ) {
-            nsame_l = ( ( *lbnd_out - new_min ) > acc ) ? 0 : nsame_l + 1;
-            *lbnd_out = new_min;
+            *lbnd = new_min;
+         } else if ( new_min < *lbnd ) {
+            nsame_l = ( ( *lbnd - new_min ) > acc ) ? 0 : nsame_l + 1;
+            *lbnd = new_min;
          } else {
             nsame_l++;
          }
 printf( "nsame_l = %d\n", nsame_l );
       }
       if ( !done_u ) {
-         if ( *ubnd_out == AST__BAD ) {
+         if ( *ubnd == AST__BAD ) {
             nsame_u = 0;
-            *ubnd_out = new_max;
-         } else if ( new_max > *ubnd_out ) {
-            nsame_u = ( ( new_max - *ubnd_out ) > acc ) ? 0 : nsame_u + 1;
-            *ubnd_out = new_max;
+            *ubnd = new_max;
+         } else if ( new_max > *ubnd ) {
+            nsame_u = ( ( new_max - *ubnd ) > acc ) ? 0 : nsame_u + 1;
+            *ubnd = new_max;
          } else {
             nsame_u++;
          }
@@ -417,230 +495,208 @@ printf( "nsame_u = %d\n", nsame_u );
           ( nsame_u >= miniter ) &&
           ( nsame_u >= ( 0.3 * ( iter + 1 ) + 0.5 ) ) ) done_u = 1;
       if ( done_l && done_u ) break;
-
-
    }
-   printf( "best limit(l) = %g\n", *lbnd_out );
-   printf( "best limit(u) = %g\n", *ubnd_out );
+   printf( "best limit(l) = %g\n", *lbnd );
+   printf( "best limit(u) = %g\n", *ubnd );
    x_in_l = astFree( x_in_l );
    x_out_u = astFree( x_out_u );
    x_in_l = astFree( x_in_l );
    x_out_u = astFree( x_out_u );
 }
-
-#else
 void astBoxBound( AstMapping *this,
                   const double lbnd_in[], const double ubnd_in[],
-                  double lbnd_out[], double ubnd_out[] ) {
+                  int coord_out, double lbnd_out[], double ubnd_out[] ) {
 
-#define NFIT 10
-#define NMULT 10
-   const double decrement = 2.0;
-   const int maxiter = 1;
-   
-   double fitness[ NFIT ];
-   double v[ NFIT * NMULT ];
-   double **fit_ptr;
-   double noise;
-   int nin;
-   int nout;
-   int point;
-   int coord;
-   AstPointSet *fitset;
-   AstPointSet *pset1_in;
-   AstPointSet *pset1_out;
-   double **ptr1_in;
-   double **ptr1_out;
-   AstPointSet *pset2_in;
-   AstPointSet *pset2_out;
-   double **ptr2_in;
-   double **ptr2_out;
-   AstPointSet *pset3_in;
-   AstPointSet *pset3_out;
-   double **ptr3_in;
-   double **ptr3_out;
-   int mult;
-   double x;
-   int bad;
-   double fit1;
-   double fit2;
-   double fit;
-   int icoord;
-   int p;
-   int pp;
-   int iter;
-   int limit;
-   float seed = 0.776543289;
-   long int irand = 77665544;
-   double random;
    MapData mapdata;
-   
+   double x_l[ 10 ];
+   double x_u[ 10 ];
 
-   nin = astGetNin( this );
-   nout = astGetNout( this );
-   for ( coord = 0; coord < nout; coord++ ) {
-      lbnd_out[ coord ] = AST__BAD;
-      ubnd_out[ coord ] = AST__BAD;
-   }
-
-
-   pset1_in = astPointSet( 1, nin, "" );
-   ptr1_in = astGetPoints( pset1_in );
-   if ( astOK ) {
-      for ( coord = 0; coord < nin; coord ++ ) {
-         ptr1_in[ coord ][ 0 ] = 0.5 * ( lbnd_in[ coord ] + ubnd_in[ coord ] );
-      }
-   }
-   pset1_out = astTransform( this, pset1_in, 1, NULL );
-   ptr1_out = astGetPoints( pset1_out );
-   bad = 0;
-   if ( astOK ) {
-      for ( coord = 0; coord < nout; coord++ ) {
-         if ( bad = ( ptr1_out[ coord ][ 0 ] == AST__BAD ) ) break;
-      }
-      if ( !bad ) {
-         for ( coord = 0; coord < nout; coord++ ) {
-            lbnd_out[ coord ] = ubnd_out[ coord ] = ptr1_out[ coord ][ 0 ];
-         }
-      }
-   }
-
-   pset2_in = astPointSet( NFIT, nin, "" );
-   ptr2_in = astGetPoints( pset2_in );
-   pset2_out = astPointSet( NFIT, nout, "" );
-   ptr2_out = astGetPoints( pset2_out );
-
-   pset3_in = astPointSet( NFIT * NMULT, nin, "" );
-   ptr3_in = astGetPoints( pset3_in );
-   pset3_out = astPointSet( NFIT * NMULT, nout, "" );
-   ptr3_out = astGetPoints( pset3_out );
-   
    mapdata.mapping = this;
-   mapdata.nin = nin;
-   mapdata.nout = nout;
+   mapdata.nin = astGetNin( this );
+   mapdata.nout = astGetNout( this );
+   mapdata.coord = coord_out;
    mapdata.forward = 1;
    mapdata.lbnd = lbnd_in;
    mapdata.ubnd = ubnd_in;
-   mapdata.pset_in = astPointSet( 1, nin, "" );
-   mapdata.pset_out = astPointSet( 1, nout, "" );
+   mapdata.pset_in = astPointSet( 1, mapdata.nin, "" );
+   mapdata.pset_out = astPointSet( 1, mapdata.nout, "" );
    mapdata.ptr_in = astGetPoints( mapdata.pset_in );
    mapdata.ptr_out = astGetPoints( mapdata.pset_out );
-   
-   for ( limit = 0; limit < 2 * nout; limit++ ) {
-      icoord = limit / 2;
-      mapdata.negate = !( limit % 2 );
-      mapdata.coord = icoord;
 
-      if ( astOK ) {
-         for ( coord = 0; coord < nin; coord++ ) {
-            for ( point = 0; point < NFIT; point++ ) {
-               ptr2_in[ coord ][ point ] = ptr1_in[ coord ][ 0 ];
-            }
-         }
-         for ( coord = 0; coord < nout; coord++ ) {
-            for ( point = 0; point < NFIT; point++ ) {
-               ptr2_out[ coord ][ point ] = ptr1_out[ coord ][ 0 ];
-               if ( limit % 2 ) ptr2_out[ coord ][ point ] *= -1.0;
-            }
-         }
-      }
-      
-      noise = 1.0;
-      for ( iter = 0; iter < maxiter; iter++ ) {
-         for ( coord = 0; coord < nin; coord++ ) {
-            for ( point = 0; point < NFIT; point++ ) {
-               for ( mult = 0; mult < NMULT; mult++ ) {
-                  do {
-#if 0
-                     random = ( 1.0 - noise ) * Gauss( &irand ) * noise +
-                              noise * 2.0 * ( Random( &irand ) - 0.5 ) * noise;
-#elif 0
-                     random = ( 1.0 - noise ) * slaGresid( noise ) +
-                              noise * 2.0 * ( slaRandom( seed ) - 0.5 ) * noise;
-#else
-                     random = Gauss( &irand ) * noise;
-#endif                     
-                     x = ptr2_in[ coord ][ point ] + 0.5 * random *
-                         ( ubnd_in[ coord ] - lbnd_in[ coord ] );
-                  } while ( x < lbnd_in[ coord ] || x > ubnd_in[ coord ] );
-                  ptr3_in[ coord ][ point * NMULT + mult ] = x;
-               }
-            }
-         }
-         astTransform( this, pset3_in, 1, pset3_out );
-         
-         for ( point = 0; point < NMULT * NFIT; point++ ) {
-            x = ptr3_out[ icoord ][ point ];
-            if ( limit % 2 ) x = -x;
-            if ( x >= ptr2_out[ icoord ][ 0 ] ) {
-               for ( p = 1; p < NFIT + 1; p++ ) {
-                  if ( p == NFIT || x < ptr2_out[ icoord ][ p ] ||
-                      ( x == ptr2_out[ icoord ][ p ] &&
-                       slaGresid( 1.0 ) >= 0.0 ) ) {
-                     for ( coord = 0; coord < nin; coord++ ) {
-                        for ( pp = 1; pp < p; pp++ ) {
-                           ptr2_in[ coord ][ pp - 1 ] = ptr2_in[ coord ][ pp ];
-                        }
-                        ptr2_in[ coord ][ p - 1 ] = ptr3_in[ coord ][ point ];
-                     }
-                     for ( pp = 1; pp < p; pp++ ) {
-                        ptr2_out[ icoord ][ pp - 1 ] = ptr2_out[ icoord ][ pp ];
-                     }
-                     ptr2_out[ icoord ][ p - 1 ] = ptr3_out[ icoord ][ point ];
-                     if ( limit % 2 ) ptr2_out[ icoord ][ p - 1 ] *= -1.0;
-                     break;
-                  }
-               }
-            }
-         }
-         noise /= decrement;
-      }
-
+   *lbnd_out = *ubnd_out = AST__BAD;
+   CornerBounds( &mapdata, lbnd_out, ubnd_out, x_l, x_u );
 #if 1
-         for ( point = 0; point < NFIT; point++ ) {
-            for ( coord = 0; coord < nin; coord++ ) {
-               printf( "%g ", ptr2_in[ coord ][ point ] );
-            }
-            printf( "--> " );
-            for ( coord = 0; coord < nout; coord++ ) {
-               printf( "%g ", ptr2_out[ coord ][ point ] );
-            }
-            printf( "\n" );
-         }
-         printf( "\n" );
+   GlobalBounds( &mapdata, lbnd_out, x_l, ubnd_out, x_u );
 #endif
-      {
-         double p[ 100 ];
-         int ncall;
-         double answer;
-         for ( coord = 0; coord < nin; coord++ ) {
-            p[ coord ] = ptr2_in[ coord ][ NFIT - 1 ];
-         }
-         answer = LocalMaximum( &mapdata, p, noise, DBL_EPSILON, &ncall );
-         printf( "ymin = %g\n", answer );
-         printf( "ncall = %d\n", ncall );
-
-         if ( limit % 2 ) {
-            lbnd_out[ icoord ] = answer;
-         } else {
-            ubnd_out[ icoord ] = -answer;
-         }
-      }
-   }
-   mapdata.pset_in = astAnnul( mapdata.pset_in );
-   mapdata.pset_out = astAnnul( mapdata.pset_out );
-
-   pset1_in = astAnnul( pset1_in );
-   pset1_out = astAnnul( pset1_out );
-   pset2_in = astAnnul( pset2_in );
-   pset2_out = astAnnul( pset2_out );
-   pset3_in = astAnnul( pset3_in );
-   pset3_out = astAnnul( pset3_out );
 }
-#endif
-#endif
+
 
 /*************************************/
+static double AvoidWt( int ncoord, const double x[],
+                       const double lbnd[], const double ubnd[], int npoint,
+                       const double xstart[], const double xend[] ) {
+/*
+*  Name:
+*     AvoidWt
+
+*  Purpose:
+*     Generate a weighting function that avoids previously-used points.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double AvoidWt( int ncoord, const double x[],
+*                     const double lbnd[], const double ubnd[], int npoint,
+*                     const double xstart[], const double xend[] );
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function accepts the coordinates of a test point in an
+*     n-dimensional space and returns a corresponding weight factor
+*     between zero and one. The function also accepts two lists (of
+*     equal length) containing the coordinates of two sets of points
+*     which are to be avoided. The weight factor is set to zero if the
+*     test point corresponds with any point in these lists and
+*     increases towards one as the distance between the test point and
+*     the nearest point in either of these lists increases.
+*
+*     The purpose of this is to provide a weighting function which may
+*     be used as the basis for a probability distribution
+*     function. Pseudo-random points may be generated using this in
+*     such a way that they tend to avoid occurring near points which
+*     appear in either of the two lists.
+*
+*     The intended application is to global opimisation. Here, one of
+*     the sets of points to be avoided will contain the starting
+*     positions used for previous local opimisation searches. The
+*     other set will contain the positions of the end-points of these
+*     searches (the location of each local optimum found). In choosing
+*     a point at which to start a new search (the test point), it is
+*     advantageous to avoid the regions around any of these
+*     previously-visited points, so as to improve the likelihood of
+*     visiting a new basin of convergence and hence a new optimum. The
+*     weight factor returned by this function serves as a basis for
+*     generating new pseudo-random starting positions in this way.
+
+*  Parameters:
+*     ncoord
+*        The dimensionality of the coordinate space.
+*     x
+*        Pointer to an array of double containing the coordinates of
+*        the test point.
+*     lbnd
+*        Pointer to an array of double containing the lower bounds of
+*        the region of coordinate space to be used in each dimension.
+*     ubnd
+*        Pointer to an array of double containing the upper bounds of
+*        the region of coordinate space to be used in each
+*        dimension. These values should not be less than the
+*        corresponding lower bounds (but may equal them).
+*     npoint
+*        The number of points in each of the lists given below.
+*     xstart
+*        Pointer to an array of double containing a list of the
+*        starting positions of previous searches for local optima.
+*        The coordinates of the first point should be given first in
+*        this array, then the second point, etc. These positions
+*        should not lie outside the bounds given above.
+*     xend
+*        Pointer to an array of double containing a list of the ending
+*        positions of previous searches for local optima (i.e. the
+*        locations of the local optima found). The coordinates should
+*        be stored in the same order as for "xstart" and should
+*        similarly not lie outside the bounds given above.
+
+*  Returned Value:
+*     The weight factor.
+
+*  Notes:
+*     - The weight factor returned is not normalised to serve directly
+*     as a probability distribution function. Neither will its maximum
+*     value, in general, be equal to unity. Hence, further external
+*     normalisation must be applied before using it to generate
+*     pseudo-random samples.
+*     - A weight factor of unity will be returned if this function is
+*     invoked with the global error status set, or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   double dx;                    /* Distance from more distant bound */
+   double dxl;                   /* Distance from lower bound */
+   double dxu;                   /* Distance from upper bound */
+   double weight;                /* Weight factor to return */
+   double wt;                    /* Local weight factor */
+   double wtend;                 /* Weight factor for start position */
+   double wtstart;               /* Weight factor for end position (optimum) */
+   int coord;                    /* Loop counter for coordinates */
+   int point;                    /* Loop counter for points */
+  
+/* Initialise. */
+   weight = 1.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return weight;
+
+/* Loop through the list of points to be avoided, initialising a
+   weight factor for each set of points (start position and end
+   position). */
+   for ( point = 0; point < npoint; point++ ) {
+      wtstart = wtend = 0.0;
+
+/* Use each coordinate in turn. */
+      for ( coord = 0; coord < ncoord; coord++ ) {
+
+/* Considering the start position first, calculate its absolute
+   distance from each coordinate bound. */
+         dxl = fabs( xstart[ point * ncoord + coord ] - lbnd[ coord ] );
+         dxu = fabs( ubnd[ coord ] - xstart[ point * ncoord + coord ] );
+
+/* Select the larger of these distances. */
+         dx = ( dxl > dxu ) ? dxl : dxu;
+
+/* Calculate a weight factor which is zero if the coordinate of the
+   test point is coincident with the point to be avoided and increases
+   linearly towards unity at the more distant coordinate bound. This
+   ensures it does not exceed unity within the bounded region. Protect
+   against division by zero. */
+         wt = 1.0;
+         if ( dx != 0.0 ) wt = fabs( x[ coord ] -
+                                     xstart[ point * ncoord + coord ] ) / dx;
+
+/* Form the maximum weight over all coordinate axes. This results in a
+   weighting function whose "contours" (at least, in 2-dimensions) are
+   rectangular. This is better than a weighting factor based on
+   Cartesian distances (circular contours) because it avoids excess
+   weight being given to the corners if the number of dimensions is
+   large. */
+         wtstart = ( wt > wtstart ) ? wt : wtstart;
+
+/* Repeat this process to generate a second weight factor which causes
+   the end position (of the local optimum) to be avoided in the same
+   way. */
+         dxl = fabs( xend[ point * ncoord + coord ] - lbnd[ coord ] );
+         dxu = fabs( ubnd[ coord ] - xend[ point * ncoord + coord ] );
+         dx = ( dxl > dxu ) ? dxl : dxu;
+         wt = 1.0;
+         if ( dx != 0.0 ) wt = fabs( x[ coord ] -
+                                     xend[ point * ncoord + coord ] ) / dx;
+         wtend = ( wt > wtend ) ? wt : wtend;
+      }
+
+/* Multiply all the weighting factors together to generate an overall
+   weight which causes all the required points to be avoided. */
+      weight *= wtstart * wtend;
+   }
+
+/* Return the result. */
+   return weight;
+}
+
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -2001,7 +2057,7 @@ static double Random( long int *seed ) {
 /* Local Variables: */
    long int i;                   /* Temporary storage */
 
-/* This a basic random number generator using constants given in
+/* This a basic random number generator using the constants given in
    Numerical Recipes (Press et al.). */
    i = *seed / 127773;
    *seed = ( *seed - i * 127773 ) * 16807 - i * 2836;
