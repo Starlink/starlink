@@ -339,6 +339,9 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *       which could be over-written after many calls to astGet.
 *       - If a user specifies an axis format, use it whether or not it
 *       results in any identical adjacent labels.
+*     26-FEB-2002 (DSB):
+*       Remove unneccesary astNorm calls to avoid problems with CAR
+*       projections.
 *class--
 */
 
@@ -1423,11 +1426,11 @@ static CurveData **DrawGrid( AstPlot *, TickInfo **, int, const char *, const ch
 static TickInfo **CleanGrid( TickInfo ** );
 static TickInfo **GridLines( AstPlot *, double *, double *, int *, const char *, const char * );
 static TickInfo *TickMarks( AstPlot *, int, double *, double *, int *, const char *, const char * );
-static char **CheckLabels2( AstFrame *, int, double *, int, char ** );
+static char **CheckLabels2( AstFrame *, int, double, double *, int, char ** );
 static char *FindWord( char *, const char *, const char ** );
 static char *GrfItem( int, const char * );
-static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
-static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, const char *, const char * );
+static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, const char *, const char * );
+static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, double *, const char *, const char * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
 static double UseSize( AstPlot *, int );
 static double UseWidth( AstPlot *, int );
@@ -1441,7 +1444,7 @@ static int CGLineWrapper( AstPlot *, int, const float *, const float * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
 static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
-static int CheckLabels( AstFrame *, int, double *, int, int, char ** );
+static int CheckLabels( AstFrame *, int, double, double *, int, int, char ** );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
 static int Compared( const void *, const void * );
@@ -1467,7 +1470,7 @@ static int Ustrncmp( const char *, const char *, size_t );
 static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static void AddCdt( CurveData *, CurveData *, const char *, const char * );
 static void Apoly( AstPlot *, float, float, const char *, const char * );
-static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, int, const char *, const char * );
+static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, const char *, const char * );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
@@ -3293,8 +3296,7 @@ static void PurgeCdata( CurveData *cdata ){
 }
 
 static void AxPlot( AstPlot *this, int axis, const double *start, double length,
-                    int ink, CurveData *cdata, int normal, const char *method, 
-                    const char *class ){
+                    int ink, CurveData *cdata, const char *method, const char *class ){
 /*
 *
 *  Name:
@@ -3309,8 +3311,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *  Synopsis:
 *     #include "plot.h"
 *     void AxPlot( AstPlot *this, int axis, const double *start, double length,
-*                  int ink, CurveData *cdata, int normal, const char *method, 
-*                  const char *class )
+*                  int ink, CurveData *cdata, const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -3342,9 +3343,6 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 *     cdata
 *        A pointer to a structure in which to return information about the
 *        breaks in the curve.
-*     normal
-*        If non-zero, then only draw points which are within the normal
-*        ranges of the physical axes. Otherwise, draw all points.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -3421,9 +3419,8 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
 /* The index of the axis which the curve follows. */
       Map1_axis = axis;
 
-/* Copy the flag which says whether to omit points not in their normal
-   ranges. */
-      Map1_norm = normal;
+/* Do not omit points not in their normal ranges. */
+      Map1_norm = 0; 
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -3634,7 +3631,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 
 /* Create the grid. */
    ptr2 = MakeGrid( this, NULL, map, dim, this->xlo, this->xhi, this->ylo, 
-                    this->yhi, 2, &pset1, &pset2, 0, method, class );
+                    this->yhi, 2, &pset1, &pset2, method, class );
 
 /* Store the number of cells along each edge of the grid. */
    ncell = dim - 1;
@@ -4725,8 +4722,8 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
                                                          upy, xb, yb );
 }
 
-static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-                        int force, char **list ){
+static int CheckLabels( AstFrame *frame, int axis, double refval, 
+                        double *ticks, int nticks, int force, char **list ){
 /*
 *  Name:
 *     CheckLabels
@@ -4739,8 +4736,8 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 
 *  Synopsis:
 *     #include "plot.h"
-*     int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-*                      int force, char **list )
+*     int CheckLabels( AstFrame *frame, int axis, double refval, 
+*                      double *ticks, int nticks, int force, char **list )
 
 *  Class Membership:
 *     Plot member function.
@@ -4758,6 +4755,8 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 *        Pointer to the Frame.
 *     axis
 *        The zero-based index of the axis to which the tick marks refer.
+*     refval
+*        A value to use for the other axis when normalizing the tick value.
 *     ticks
 *        Pointer to an array holding the tick mark values.
 *     nticks
@@ -4787,6 +4786,7 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 
 /* Local Variables: */
    const char *label;        /* Pointer to formatted tick value */
+   double val[ 2 ];          /* Normalization work array */
    int i;                    /* Tick index */
    int len;                  /* Number of characters in curent label */
    int ok;                   /* The returned flag */
@@ -4801,8 +4801,11 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
    different. */
    ok = 1;
 
-/* Format the first tick mark value. */
-   label = astFormat( frame, axis, ticks[ 0 ] );
+/* Normalize and format the first tick mark value. */
+   val[ axis ] = ticks[ 0 ];
+   val[ 1-axis ] = refval;
+   astNorm( frame, val );
+   label = astFormat( frame, axis, val[ axis ] );
 
 /* Allocate memory holding a copy of the formatted value, and store a
    pointer to this copy in the list of labels. */
@@ -4813,9 +4816,12 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
       ok = 0;
    }
 
-/* Format each of the tick mark values in this batch. */
+/* Normalize and format each of the tick mark values in this batch. */
    for( i = 1; i < nticks && astOK && ok; i++ ){
-      label = astFormat( frame, axis, ticks[ i ] );
+      val[ axis ] = ticks[ i ];
+      val[ 1-axis ] = refval;
+      astNorm( frame, val );
+      label = astFormat( frame, axis, val[ axis ] );
       if( label ){
 
 /* Unless checks have been supressed, compare this label with the previous 
@@ -4851,8 +4857,8 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 
 }
 
-static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks, 
-                            char **old_list ){
+static char **CheckLabels2( AstFrame *frame, int axis, double refval, 
+                            double *ticks, int nticks, char **old_list ){
 /*
 *  Name:
 *     CheckLabels2
@@ -4865,8 +4871,8 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
 
 *  Synopsis:
 *     #include "plot.h"
-*     char **CheckLabels2( AstFrame *frame, int axis, double *ticks, 
-*                          int nticks, char **old_list )
+*     char **CheckLabels2( AstFrame *frame, int axis, double refval, 
+*                          double *ticks, int nticks, char **old_list )
 
 *  Class Membership:
 *     Plot member function.
@@ -4885,6 +4891,8 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
 *        Pointer to the Frame.
 *     axis
 *        The zero-based index of the axis to which the tick marks refer.
+*     refval
+*        A value to use for the other axis when normalizing the tick value.
 *     ticks
 *        Pointer to an array holding the tick mark values.
 *     nticks
@@ -4914,6 +4922,7 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
 /* Local Variables: */
    char **list;              /* The returned pointer */
    const char *label;        /* Pointer to formatted tick value */
+   double val[ 2 ];          /* Normalization work array */
    int i;                    /* Tick index */
    int llen;                 /* Number of characters in curent label */
    int ok;                   /* Are the old labels OK to be used? */
@@ -4932,9 +4941,12 @@ static char **CheckLabels2( AstFrame *frame, int axis, double *ticks, int nticks
    shorter than the old labels. */
       ok = 0;
 
-/* Format each of the tick mark values in this batch. */
+/* Normalize and format each of the tick mark values in this batch. */
       for( i = 0; i < nticks && astOK; i++ ){
-         label = astFormat( frame, axis, ticks[ i ] );
+         val[ axis ] = ticks[ i ];
+         val[ 1-axis ] = refval;
+         astNorm( frame, val );
+         label = astFormat( frame, axis, val[ axis ] );
          if( label ){
 
 /* Get the length of the new label. */
@@ -7470,7 +7482,7 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    of the curve which are outside the normal ranges of the physical axes. */
                start[ axis ] = *(value++);
                start[ 1 - axis ] = labelat[ axis ];
-               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, 1, method, 
+               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, method, 
                        class );
             }
          }
@@ -7605,7 +7617,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
    structure. We use invisible ink if short tick marks are required instead 
    of a grid of curves. */
                AxPlot( this, 1 - i, start, (info->length)[ 0 ],
-                       drawgrid, cdt, 1, method, class );
+                       drawgrid, cdt, method, class );
 
 /* Now draw any other sections in the curve. */
                for( k = 1; k < info->nsect; k++ ){
@@ -7617,7 +7629,7 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Draw the curve, the information describing the breaks goes into
    temporary storage in the local structure "tcdt". */
                   AxPlot( this, 1 - i, start, (info->length)[ k ],
-                          drawgrid, &tcdt, 1, method, class );
+                          drawgrid, &tcdt, method, class );
 
 /* Concatenate the break information for this section with the break
    information describing the previous sections. */
@@ -9671,16 +9683,8 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
       nfill = (int) (0.1*(double) nticks );
    }
 
-/* If all has gone OK, normalise the tick values using the supplied value 
-   for the other axis. */
+/* If all has gone OK... */
    if( astOK ){
-      val[ 1 - axis ] = refval;
-      r = ticks;
-      for( k = 0; k < nticks; k++ ){
-         val[ axis ] = *r;
-         astNorm( frame, val );
-         *(r++) = val[ axis ];
-      }
 
 /* Ensure that all ticks marks are offset from the "centre" value by an 
    integer multiple of the gap size. This is done by changing each tick
@@ -11557,7 +11561,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 static double GetTicks( AstPlot *this, int axis, double *cen, double gap, 
                       double **ticks, int *nmajor, int *nminor, int format_set,
-                      int *inval, const char *method, const char *class ){
+                      int *inval, double *refval, const char *method, 
+                      const char *class ){
 /*
 *  Name:
 *     GetTicks
@@ -11573,8 +11578,8 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 *     #include "plot.h"
 *     double GetTicks( AstPlot *this, int axis, double *cen, double gap, 
 *                      double **ticks, int *nmajor, int *nminor, 
-*                      int format_set, int *inval, const char *method, 
-*                      const char *class )
+*                      int format_set, int *inval, double *refval, 
+*                      const char *method, const char *class )
 
 *  Class Membership:
 *     Plot member function.
@@ -11626,6 +11631,9 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 *     inval
 *        A pointer to a location at which to return a flag indicating if
 *        any invalid physical coordinates were encountered.
+*     refval
+*        A pointer to a location at which to return the mean value on the 
+*        other axis.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -11734,6 +11742,10 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    were found. */
    *inval = bad;
 
+/* Return the mean value on the other axis (used for normalizing axis
+   values ). */
+   *refval = mean[ 1 - axis ];
+
 /* Store the supplied valeu of cen. */
    cen0 = ( cen ) ? *cen : AST__BAD;
 
@@ -11760,7 +11772,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
    data first. */
          if( *ticks ) *ticks = astFree( *ticks );
          if( cen ) *cen = cen0;
-         *nmajor = FindMajTicks( map, frame, axis, mean[ 1 - axis ], used_gap, cen, 
+         *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
                                  ngood[ axis ], ptr[ axis ], ticks );
 
 /* If the number of ticks is unacceptable, try a different gap size. If the
@@ -11800,7 +11812,7 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 
 /* Find where the major ticks should be put. */
       if( cen ) *cen = cen0;
-      *nmajor = FindMajTicks( map, frame, axis, mean[ 1 - axis ], used_gap, cen, 
+      *nmajor = FindMajTicks( map, frame, axis, *refval, used_gap, cen, 
                               ngood[ axis ], ptr[ axis ], ticks );
 
    }
@@ -11945,7 +11957,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
    covers the entire plotting area with the current grid dimension. A
    pointer to the physical axis values is returned. */
       ptr2 = MakeGrid( this, frm, map, *dim, this->xlo, this->xhi, this->ylo, 
-                       this->yhi, 2, pset1, pset2, 1, method, class );
+                       this->yhi, 2, pset1, pset2, method, class );
 
 /* Get a pointer to the graphics axis values. */
       ptr1 = astGetPoints( *pset1 );
@@ -12018,7 +12030,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Create the new grid covering the region containing good physical
    coordinates. */
          (void) MakeGrid( this, frm, map, *dim, xmin, xmax, ymin, ymax, 2,
-                          pset1, pset2, 1, method, class );
+                          pset1, pset2, method, class );
       }
    }
 
@@ -13274,7 +13286,7 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
    about the most recently drawn curve. */
-   AxPlot( this, axis - 1, start, length, 1, &Curve_data, 1, method, class );
+   AxPlot( this, axis - 1, start, length, 1, &Curve_data, method, class );
 
 /* Return. */
    return;
@@ -15628,7 +15640,7 @@ static void LinePlot( AstPlot *this, double xa, double ya, double xb,
 static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
                           int dim, double xlo, double xhi, double ylo, 
                           double yhi, int nphy, AstPointSet **pset1, 
-                          AstPointSet **pset2, int norm, const char *method, 
+                          AstPointSet **pset2, const char *method, 
                           const char *class ){
 /*
 *  Name:
@@ -15646,7 +15658,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *     double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map, 
 *                        int dim, double xlo, double xhi, double ylo, 
 *                        double yhi, int nphy, AstPointSet **pset1, 
-*                        AstPointSet **pset2, int norm, const char *method, 
+*                        AstPointSet **pset2, const char *method, 
 *                        const char *class ){
 
 *  Class Membership:
@@ -15693,9 +15705,6 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
 *     pset2
 *        A pointer to a location at which to store a pointer to the
 *        PointSet holding the physical coordinates.
-*     norm
-*        If non-zero the physical cooridnates are normalised using the
-*        Plot's astNorm method.
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -15739,7 +15748,7 @@ static double **MakeGrid( AstPlot *this, AstFrame *frm, AstMapping *map,
    GraphGrid( dim, xlo, xhi, ylo, yhi, ptr1 );
 
 /* Transform these graphics positions to physical coordinates. */
-   Trans( this, frm, map, *pset1, 1, *pset2, norm, method, class ); 
+   Trans( this, frm, map, *pset1, 1, *pset2, 0, method, class ); 
 
 /* If an error has occurred, annul the two pointsets. */
    if( !astOK ){
@@ -17474,9 +17483,10 @@ static int RejectOOB( AstMapping *map, double refval, AstFrame *frame,
 *     This function searches the supplied array of candidate major tick
 *     values. It removes any ticks which are out-of-bounds (i.e. not in their 
 *     primary domain). The check is performed as follows: All ticks are 
-*     transformed into the Base Frame, and then back into the Current Frame 
-*     and normalized. If this process changes any tick mark significantly, 
-*     then the tick mark is removed from the array.
+*     normalized and then transformed into the Base Frame, and then back 
+*     into the Current Frame and normalized again. If this process changes 
+*     any tick mark significantly, then the tick mark is removed from the 
+*     array.
 
 *  Parameters:
 *     map 
@@ -17490,9 +17500,8 @@ static int RejectOOB( AstMapping *map, double refval, AstFrame *frame,
 *        Zero-based index of the axis being used.
 *     ticks 
 *        A pointer to an array holding the candidate major tick values.
-*        These should have been normalized using the astNorm method of the 
-*        supplied Frame. On exit, any out-of-bounds values are replaced by
-*        AST__BAD and shuffled to the end of the array.
+*        On exit, any out-of-bounds values are replaced by AST__BAD and 
+*        shuffled to the end of the array.
 *     nticks
 *        The number of values in the array pointed to by "ticks".
 
@@ -17503,12 +17512,15 @@ static int RejectOOB( AstMapping *map, double refval, AstFrame *frame,
 */
 
 /* Local Variables: */
-   AstPointSet *pset1;/* AstPointset holding current Frame positions */
+   AstPointSet *pset1;/* AstPointset holding normalized supplied positions */
    AstPointSet *pset2;/* AstPointset holding base Frame positions */
+   AstPointSet *pset3;/* AstPointset holding final current Frame positions */
    double **ptr1;     /* Pointer to pset1 data */
+   double **ptr3;     /* Pointer to pset3 data */
    double *a;         /* Pointer to next value */
    double *b;         /* Pointer to next value */
    double *c;         /* Pointer to next value */
+   double *d;         /* Pointer to next value */
    double dst;        /* Distance between two points */
    double lim;        /* Max. distance between 2 points for them to be 
                          considered co-incident */
@@ -17523,64 +17535,70 @@ static int RejectOOB( AstMapping *map, double refval, AstFrame *frame,
 /* Check the global error status. */
    if ( !astOK ) return nticks;
 
-/* Create a pointset holding the supplied positions. */
+/* Create a pointset holding the normalized supplied positions. */
    pset1 = astPointSet( nticks, 2, "" );
    ptr1 = astGetPoints( pset1 );
    a = ptr1[ axis ];
    b = ptr1[ 1 - axis ];
    for( i = 0; i < nticks; i++){
-      *(a++) = ticks[ i ];
-      *(b++) = refval;
+      val[ axis ] = ticks[ i ];
+      val[ 1-axis ] = refval;
+      astNorm( frame, val );
+      *(a++) = val[ axis ];
+      *(b++) = val[ 1-axis ];
    }
 
-/* Transform the supplied positions into the Base Frame. */
+/* Transform the normalized supplied positions into the Base Frame. */
    pset2 = astTransform( map, pset1, 0, NULL );
 
 /* Transform the Base Frame positions back into the Current Frame. */
-   astTransform( map, pset2, 1, pset1 );
+   pset3 = astTransform( map, pset2, 1, NULL );
+   ptr3 = astGetPoints( pset3 );
+   if( astOK ) {
 
 /* Check each position. */
-   a = ptr1[ axis ];
-   b = ptr1[ 1-axis ];
-   c = ticks;
-   i = 0;
-   while( i < nticks ){
+      a = ptr3[ axis ];
+      b = ptr3[ 1-axis ];
+      c = ptr1[ axis ];
+      d = ptr1[ 1-axis ];
+      i = 0;
+      while( i < nticks ){
 
 /* Normalize the transformed position. */
-      val[ axis ] = *a;
-      val[ 1-axis ] = *b;
-      astNorm( frame, val );
+         val[ axis ] = *a;
+         val[ 1-axis ] = *b;
+         astNorm( frame, val );
 
 /* See which axes have changed significantly. */
-      cha = !EQUAL( val[ axis ], *c );
-      chb = !EQUAL( val[ 1-axis ], refval );
+         cha = !EQUAL( val[ axis ], *c );
+         chb = !EQUAL( val[ 1-axis ], *d );
 
 /* Reject the tick if *both* axes have changed. */
-      if( cha && chb ) {
-         reject = 1;
+         if( cha && chb ) {
+            reject = 1;
 
 /* Reject the tick if *either* axis is bad. */
-      } else if( val[ axis ] == AST__BAD || val[ 1-axis ] == AST__BAD ) {
-         reject = 1;
+         } else if( val[ axis ] == AST__BAD || val[ 1-axis ] == AST__BAD ) {
+            reject = 1;
 
 /* Do not reject the tick if *neither* axis has changed. */
-      } else if( !cha && !chb ) {
-         reject = 0;
+         } else if( !cha && !chb ) {
+            reject = 0;
 
 /* If just one axis has changed, this may be because we are at a
    singularity (like the poles in a celestial coord system) at which
    an axis value is undefined (e.g. RA is undefined at the equatorial 
    poles). */
-      } else {
+         } else {
 
 /* Modify the value on the axis which has changed. The size of the 
    modification is unimportant. We choose to modify the axis to the
    mean of the original and changed values. */
-         if( cha ) {
-            val[ axis ] = 0.5*( val[ axis ] + *c );
-         } else {
-            val[ 1-axis ] = 0.5*( val[ 1-axis ] + refval );
-         }
+            if( cha ) {
+               val[ axis ] = 0.5*( val[ axis ] + *c );
+            } else {
+               val[ 1-axis ] = 0.5*( val[ 1-axis ] + *d );
+            }
 
 /* Find the geodesic distance from the modified position to the original
    position. */
@@ -17589,33 +17607,36 @@ static int RejectOOB( AstMapping *map, double refval, AstFrame *frame,
    we are at a singularity. Do not reject the tick value in this case. As
    our "significant distance" we take a small fraction of the larger of
    the two axis values. */
-         val2[ axis ] = *c;
-         val2[ 1-axis ] = refval;
-         dst = astDistance( frame, val2, val );
-         lim = 1.0E5*DBL_EPSILON*MAX( fabs( *c ), fabs( refval ) );
-         reject = ( dst > lim );
-      }
+            val2[ axis ] = *c;
+            val2[ 1-axis ] = *d;
+            dst = astDistance( frame, val2, val );
+            lim = 1.0E5*DBL_EPSILON*MAX( fabs( *c ), fabs( *d ) );
+            reject = ( dst > lim );
+         }
 
 /* If the tick is to be rejected, decrement the number of ticks
    remaining, shuffle the remaining unchecked positions down one place, 
    and fill the last position with a bad value. */
-      if( reject ) {
-         nticks--;
-         for( j = i; j < nticks; j++ ) ticks[ j ] = ticks[ j + 1 ];
-         ticks[ nticks ] = AST__BAD;
+         if( reject ) {
+            nticks--;
+            for( j = i; j < nticks; j++ ) ticks[ j ] = ticks[ j + 1 ];
+            ticks[ nticks ] = AST__BAD;
 
 /* Otherwise move on to check the next value. */
-      } else {
-	i++;
-        c++;
+         } else {
+            i++;
+            c++;
+            d++;
+         }
+         a++;
+         b++;
       }
-      a++;
-      b++;
    }
 
 /* Annul the PointSets. */
    pset1 = astAnnul( pset1 );
    pset2 = astAnnul( pset2 );
+   pset3 = astAnnul( pset3 );
 
 /* Return the number of remaining ticks. */
    return nticks;
@@ -19359,6 +19380,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    const char *old_format; /* Original Format string */
    double *ticks;      /* Pointer to major tick mark values */
    double cen0;        /* Supplied value of cen */
+   double refval;      /* Mean value on other axis */
    double used_gap;    /* The gap size actually used */
    int axdigset;       /* Was the Axis Digits attribute set originally? */
    int frdigset;       /* Was the Frame Digits attribute set originally? */
@@ -19377,7 +19399,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    allocated within GetTicks, and return. */
    if( !this ){
       (void) GetTicks( NULL, 0, NULL, 0.0, &ticks, &nmajor, &nminor, 
-                       0, inval, method, class );
+                       0, inval, &refval, method, class );
       return NULL;
    }      
 
@@ -19416,7 +19438,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 
 /* Get a set of tick mark values. */
       used_gap = GetTicks( this, axis, cen, *gap, &ticks, &nmajor, &nminor, 1, 
-                           inval, method, class );
+                           inval, &refval, method, class );
 
 /* Reserve memory to hold pointers to the formatted labels. */
       labels = (char **) astMalloc( sizeof(char *)*(size_t)nmajor );
@@ -19424,7 +19446,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* See if there are any adjacent labels which are identical. If there are
    not, the labels are formatted and returned in "labels". */
       fmt = astGetFormat( frame, axis );
-      ok = CheckLabels( frame, axis, ticks, nmajor, 1, labels );
+      ok = CheckLabels( frame, axis, refval, ticks, nmajor, 1, labels );
 
    }
 
@@ -19471,7 +19493,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Get a set of tick mark values. */
          if( cen ) *cen = cen0;
          used_gap = GetTicks( this, axis, cen, *gap, &ticks, &nmajor, &nminor,
-                              0, inval, method, class );
+                              0, inval, &refval, method, class );
 
 /* Expand the memory holding the pointers to the formatted labels. */
          labels = (char **) astGrow( labels, nmajor, sizeof(char *) );
@@ -19479,7 +19501,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Break out of the loop if a Digits value has been found which results
    in all adjacent labels being different. */
          fmt = astGetFormat( frame, axis );
-         if( CheckLabels( frame, axis, ticks, nmajor, 0, labels ) ) {
+         if( CheckLabels( frame, axis, refval, ticks, nmajor, 0, labels ) ) {
             ok = 1;
             top_digits = digits;
             break;
@@ -19506,7 +19528,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    are longer than the corresponding old labels, then a null pointer is
    returned. Otherwise, a pointer is returned to the new set of labels. */
             fmt = astGetFormat( frame, axis );
-            new = CheckLabels2( frame, axis, ticks, nmajor, labels );
+            new = CheckLabels2( frame, axis, refval, ticks, nmajor, labels );
 
 /* Free the old labels. */
             for( i = 0; i < nmajor; i++ ){
@@ -19552,7 +19574,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
             for( digits = bot_digits; digits < 1000; digits++ ){
                astSetAxisDigits( ax, digits );
                fmt = astGetFormat( frame, axis );
-               if( CheckLabels( frame, axis, ticks, nmajor, 0, labels ) ) {
+               if( CheckLabels( frame, axis, refval, ticks, nmajor, 0, labels ) ) {
                   ok = 1;
                   break;
                }
