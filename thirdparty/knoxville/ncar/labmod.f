@@ -1,0 +1,73 @@
+C
+C
+C
+      SUBROUTINE LABMOD(FMTX,FMTY,NUMX,NUMY,ISIZX,ISIZY,IXDEC,IYDEC,
+     1                  IXOR)
+C
+C  RESETS PARAMETERS FOR TEXT GRAPHICS FROM DEFAULT VALUES
+C
+        EXTERNAL GRIDT
+        COMMON /LAB/ SIZX,SIZY,XDEC,YDEC,IXORI
+        COMMON /CLAB/ XFMT, YFMT
+        CHARACTER*8 XFMT,YFMT,FMTX,FMTY
+C
+C  THE FOLLOWING IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+        CALL Q8QST4('GRAPHX','GRIDAL','LABMOD','VERSION 01')
+C
+C
+        XFMT = '        '
+        YFMT = '        '
+        XFMT = FMTX
+        YFMT = FMTY
+C
+      CALL GETUSV('XF',IVAL)
+        XRANGE = 2. ** IVAL
+        CALL GETUSV('YF', IVAL)
+        YRANGE = 2. ** IVAL
+C
+C  SIZX AND SIZY ARE COMPUTED TO BE PERCENTAGES OF TOTAL SCREEN
+C  WIDTH
+C
+        IF (ISIZX .GT. 3) THEN
+            SIZX = FLOAT(ISIZX)/XRANGE
+        ELSEIF (ISIZX .EQ. 3) THEN
+            SIZX = 24./1024.
+        ELSEIF (ISIZX .EQ. 2) THEN
+            SIZX = 16./1024.
+        ELSEIF (ISIZX .EQ. 1) THEN
+            SIZX = 12./1024.
+        ELSE
+            SIZX = 8./1024.
+        ENDIF
+C
+        IF (ISIZY .GT. 3) THEN
+            SIZY = FLOAT(ISIZY)/XRANGE
+      ELSEIF (ISIZY .EQ. 3) THEN
+            SIZY = 24./1024.
+        ELSEIF (ISIZY .EQ. 2) THEN
+            SIZY = 16./1024.
+        ELSEIF (ISIZY .EQ. 1) THEN
+            SIZY = 12./1024.
+        ELSE
+            SIZY = 8./1024.
+        ENDIF
+C
+C  CALCULATE XDEC AND YDEC AS PERCENTAGES OF TOTAL SCREEN WIDTH
+C  IN PLOTTER ADDRESS UNITS
+C
+        IF (IXDEC .EQ. 0 .OR. IXDEC .EQ. 1) THEN
+            XDEC = FLOAT(IXDEC)
+        ELSE
+            XDEC = FLOAT(IXDEC)/YRANGE
+        ENDIF
+        IF (IYDEC .EQ. 0 .OR. IYDEC .EQ. 1) THEN
+            YDEC = FLOAT(IYDEC)
+        ELSE
+            YDEC = FLOAT(IYDEC)/XRANGE
+        ENDIF
+C
+        IXORI = IXOR
+C
+        RETURN
+        END

@@ -1,0 +1,7 @@
+      INTEGER FUNCTION NERRO(NERR)
+C
+      NERRO=I8SAV(1,0,.FALSE.)
+      NERR=NERRO
+      RETURN
+C
+      END

@@ -1,0 +1,27 @@
+C
+C
+C
+        SUBROUTINE HSTSTR(LABEL,FIRST,LAST)
+C
+C  THIS CALCULATES THE POSITION OF THE FIRST NON-BLANK CHARACTER
+C  AND THE POSITION OF THE LAST NON-BLANK CHARACTER IN LABEL
+C
+      INTEGER   FIRST, LAST
+        CHARACTER*(*) LABEL
+C
+        LAST = LEN(LABEL)
+        DO 100 I = 1,LAST
+            IF (LABEL(I:I) .NE. ' ') GOTO 200
+ 100  CONTINUE
+ 200  FIRST = I
+        IF (FIRST .NE. LAST) THEN
+            DO 300 J = LAST,FIRST,-1
+                  IF (LABEL(J:J) .NE. ' ') THEN
+                  LAST = J
+                  GOTO 999
+                  ENDIF
+ 300      CONTINUE
+ 999  CONTINUE
+        ENDIF
+      RETURN
+        END

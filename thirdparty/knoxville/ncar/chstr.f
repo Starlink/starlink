@@ -1,0 +1,27 @@
+C
+C
+C
+        SUBROUTINE CHSTR(LABEL,FIRST,LAST)
+C
+C  THIS CALCULATES THE POSITION OF THE FIRST NON-BLANK CHARACTER
+C  AND THE POSITION OF THE LAST NON-BLANK CHARACTER IN LABEL
+C
+      INTEGER   FIRST, LAST
+        CHARACTER*15 LABEL
+C
+        DO 100 I = 1,15
+            IF (LABEL(I:I) .NE. ' ') GOTO 200
+ 100  CONTINUE
+ 200  FIRST = I
+        LAST = 15
+        IF (FIRST .NE. 15) THEN
+            DO 300 J = FIRST+1,15
+                  IF (LABEL(J:J) .EQ. ' ') THEN
+                  LAST = J-1
+                  GOTO 999
+                  ENDIF
+ 300      CONTINUE
+ 999  CONTINUE
+        ENDIF
+      RETURN
+        END

@@ -1,0 +1,727 @@
+      SUBROUTINE CONREC (Z,L,M,N,FLO,HI,FINC,NSET,NHI,NDOT)
+      EXTERNAL        CONBD
+C
+      SAVE
+      CHARACTER       ENCSCR*22  ,IWORK*126
+      DIMENSION       LNGTHS(5)  ,HOLD(5)
+      DIMENSION       Z(L,N)     ,CL(40)
+      DIMENSION       WNDW(4)    ,VWPRT(4)
+C
+      COMMON /CONRE1/ IOFFP      ,SPVAL
+      COMMON /CONRE4/ ISIZEM     ,ISIZEP     ,NLA        ,NLM        ,
+     1                XLT        ,YBT        ,SIDE       ,ISOLID     ,
+     2                EXT        ,IOFFD      ,IOFFM
+      COMMON /CONRE5/ SCLY
+C
+C
+C
+      DATA  LNGTHS(1),LNGTHS(2),LNGTHS(3),LNGTHS(4),LNGTHS(5)
+     1      /  12,       3,        20,       9,        17       /
+C
+C
+C THE FOLLOWING CALL IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+      CALL Q8QST4 ('GRAPHX','CONRECQCK','CONREC','VERSION 01')
+C
+C                       * * * * * * * * * *
+C                            * * * * * * * * * *
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+      GL = FLO
+      HA = HI
+      GP = FINC
+      MX = L
+      NX = M
+      NY = N
+      IDASH = NDOT
+C
+      IF (IDASH.EQ.0 .OR. IDASH.EQ.1) IDASH = ISOLID
+C
+C SET CONTOUR LEVELS.
+C
+      CALL CLGEN (Z,MX,NX,NY,GL,HA,GP,NLA,NLM,CL,NCL,ICNST)
+C
+C
+C                       * * * * * * * * * *
+C                            * * * * * * * * * *
+C
+C
+C SAVE CURRENT NORMALIZATION TRANS NUMBER NTORIG
+C
+      CALL GQCNTN ( IERR , NTORIG )
+      CALL GETUSV('LS',IOLLS)
+C
+C SET UP SCALING  LABELS
+C
+      CALL GETUSV ( 'YF' , IYVAL )
+      SCLY = 2.0 ** (IYVAL - 15)
+C
+C SET UP SCALING
+C
+      IF (NSET) 101,102,106
+  101 CALL GQNT ( NTORIG,IERR,VWPRT,WNDW )
+      X1 = VWPRT(1)
+      X2 = VWPRT(2)
+      Y1 = VWPRT(3)
+      Y2 = VWPRT(4)
+C
+C SAVE NORMALIZAITION TRANSFORMATION 1
+C
+      CALL GQNT ( 1,IERR,WNDW,VWPRT )
+C
+C DEFINE NORMALIZATION 1 AND LOG SCALING
+C
+      CALL SET(X1,X2,Y1,Y2,1.0,FLOAT(NX),1.0,FLOAT(NY),1)
+      GO TO 106
+  102 X1 = XLT
+      X2 = XLT+SIDE
+      Y1 = YBT
+      Y2 = YBT+SIDE
+      X3 = NX
+      Y3 = NY
+      IF (AMIN1(X3,Y3)/AMAX1(X3,Y3) .LT. EXT) GO TO 105
+      IF (NX-NY) 103,105,104
+  103 X2 = SIDE*X3/Y3+XLT
+      GO TO 105
+  104 Y2 = SIDE*Y3/X3+YBT
+  105 CALL GQNT ( 1,IERR,WNDW,VWPRT )
+      CALL SET(X1,X2,Y1,Y2,1.0,X3,1.0,Y3,1)
+      CALL PERIM (NX-1,1,NY-1,1)
+  106 IF (ICNST .NE. 0) GO TO 111
+C
+C SET UP LABEL SCALING
+C
+      IOFFDT = IOFFD
+      IF (GL.NE.0.0 .AND. (ABS(GL).LT.0.1 .OR. ABS(GL).GE.1.E5))
+     1    IOFFDT = 1
+      IF (HA.NE.0.0 .AND. (ABS(HA).LT.0.1 .OR. ABS(HA).GE.1.E5))
+     1    IOFFDT = 1
+      ASH = 10.**(3-IFIX(ALOG10(AMAX1(ABS(GL),ABS(HA),ABS(GP)))-5000.)-
+     1                                                             5000)
+      IF (IOFFDT .EQ. 0) ASH = 1.
+      IF (IOFFM .NE. 0) GO TO 110
+         IWORK = 'CONTOUR FROM              TO              CONTOUR INTE
+     1RVAL OF              PT(3,3)=              LABELS SCALED BY'
+  107 CONTINUE
+      HOLD(1) = GL
+      HOLD(2) = HA
+      HOLD(3) = GP
+      HOLD(4) = Z(3,3)
+      HOLD(5) = ASH
+      NCHAR = 0
+      DO 109 I=1,5
+         WRITE (ENCSCR,'(G13.5)') HOLD(I)
+         NCHAR = NCHAR+LNGTHS(I)
+         DO 108 J=1,13
+            NCHAR = NCHAR+1
+            IWORK(NCHAR:NCHAR) = ENCSCR(J:J)
+  108    CONTINUE
+  109 CONTINUE
+      IF (ASH .EQ. 1.) NCHAR = NCHAR-13-LNGTHS(5)
+C
+C WRITE PLOT TITLE USING NORMALIZATION NUMBER 0
+C
+      CALL GSELNT ( 0 )
+      CALL WTSTR ( 0.5, 0.015625, IWORK(1:NCHAR), 0, 0, 0  )
+      CALL GSELNT ( 1 )
+C
+C PROCESS ENTIRE GRID
+C
+C
+C CHANGE 10 BIT PATTERN TO 16 BIT PATTERN FOR USE WITH DASHD
+C
+  110 IDASH = IOR ( ISHIFT(IDASH,6) , ISHIFT(IDASH,-4) )
+      CALL DASHDB ( IDASH )
+      CALL QUICK (Z,L,M,N,NCL,CL)
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C
+C FIND RELATIVE MINIMUMS AND MAXIMUMS IF WANTED, AND MARK VALUES IF
+C WANTED.
+C
+      IF (NHI .EQ. 0) CALL MAXMIN (Z,MX,NX,NY,ISIZEM,ASH,IOFFDT)
+      IF (NHI .GT. 0) CALL MAXMIN (Z,MX,NX,NY,ISIZEP,-ASH,IOFFDT)
+C
+      GO TO 114
+  111 CONTINUE
+         IWORK = 'CONSTANT FIELD'
+  112 CONTINUE
+      WRITE (ENCSCR,'(G22.14)') GL
+      DO 113 I=1,22
+      IWORK(I+14:I+14) = ENCSCR(I:I)
+  113 CONTINUE
+C
+C WRITE TITLE USING NORMALIZATION TRNS 0
+      CALL GSELNT ( 0 )
+      CALL WTSTR ( 0.09765, 0.48828, IWORK(1:36), 3, 0, -1 )
+  114 CONTINUE
+C
+C RESTORE NORMALIZATION TRANSFORMATION 1
+C
+      IF (NSET.LE.0) THEN
+          CALL SET(VWPRT(1),VWPRT(2),VWPRT(3),VWPRT(4),
+     -             WNDW(1),WNDW(2),WNDW(3),WNDW(4),IOLLS)
+      END IF
+C
+C RESTORE ORIGINAL NORMALIZATION TRANSFORMATION NUMBER
+C
+      CALL GSELNT (NTORIG)
+C
+      RETURN
+C
+C
+      END
+      SUBROUTINE CLGEN (Z,MX,NX,NNY,CCLO,CHI,CINC,NLA,NLM,CL,NCL,ICNST)
+      SAVE
+      DIMENSION       CL(NLM)    ,Z(MX,NNY)
+      COMMON /CONRE1/ IOFFP      ,SPVAL
+C
+C CLGEN PUTS THE VALUES OF THE CONTOUR LEVELS IN CL.
+C VARIABLE NAMES MATCH THOSE IN CONREC, WITH THE FOLLOWING ADDITIONS.
+C         NCL     -NUMBER OF CONTOUR LEVELS PUT IN CL.
+C         ICNST   -FLAG TO TELL CONREC IF A CONSTANT FIELD WAS DETECTED.
+C                 .ICNST=0 MEANS NON-CONSTANT FIELD.
+C                 .ICNST NON-ZERO MEANS CONSTANT FIELD.
+C
+C TO PRODUCE NON-UNIFORM CONTOUR LEVEL SPACING, REPLACE THE CODE IN THIS
+C SUBROUTINE WITH CODE TO PRODUCE WHATEVER SPACING IS DESIRED.
+C
+      ICNST = 0
+      NY = NNY
+      CLO = CCLO
+      GLO = CLO
+      HA = CHI
+      FANC = CINC
+      CRAT = NLA
+      IF (HA-GLO) 101,102,111
+  101 GLO = HA
+      HA = CLO
+      GO TO 111
+  102 IF (GLO .NE. 0.) GO TO 120
+      GLO = Z(1,1)
+      HA = Z(1,1)
+      IF (IOFFP .EQ. 0) GO TO 107
+      DO 106 J=1,NY
+         DO 105 I=1,NX
+            IF (Z(I,J) .EQ. SPVAL) GO TO 105
+            GLO = Z(I,J)
+            HA = Z(I,J)
+            DO 104 JJ=J,NY
+               DO 103 II=1,NX
+                  IF (Z(II,JJ) .EQ. SPVAL) GO TO 103
+                  GLO = AMIN1(Z(II,JJ),GLO)
+                  HA = AMAX1(Z(II,JJ),HA)
+  103          CONTINUE
+  104       CONTINUE
+            GO TO 110
+  105    CONTINUE
+  106 CONTINUE
+      GO TO 110
+  107 DO 109 J=1,NY
+         DO 108 I=1,NX
+            GLO = AMIN1(Z(I,J),GLO)
+            HA = AMAX1(Z(I,J),HA)
+  108    CONTINUE
+  109 CONTINUE
+  110 IF (GLO .GE. HA) GO TO 119
+  111 IF (FANC) 112,113,114
+  112 CRAT = AMAX1(1.,-FANC)
+  113 FANC = (HA-GLO)/CRAT
+      P = 10.**(IFIX(ALOG10(FANC)+5000.)-5000)
+      FANC = AINT(FANC/P)*P
+  114 IF (CHI-CLO) 116,115,116
+  115 GLO = AINT(GLO/FANC)*FANC
+      HA = AINT(HA/FANC)*FANC*(1.+SIGN(1.E-6,HA))
+  116 DO 117 K=1,NLM
+         CC = GLO+FLOAT(K-1)*FANC
+         IF (CC .GT. HA) GO TO 118
+         KK = K
+         CL(K) = CC
+  117 CONTINUE
+  118 NCL = KK
+      CCLO = CL(1)
+      CHI = CL(NCL)
+      CINC = FANC
+      RETURN
+  119 ICNST = 1
+      NCL = 1
+      CCLO = GLO
+      RETURN
+  120 CL(1) = GLO
+      NCL = 1
+      RETURN
+      END
+      SUBROUTINE QUICK (Z,L,M,N,NL,CL)
+      SAVE
+C
+C QUICK CONTOURS Z
+C
+      DIMENSION       Z(L,N)     ,CL(NL)
+C
+      COMMON /CONRE1/ IOFFP      ,SPVAL
+C
+      FX(X,Y) = X
+      FY(X,Y) = Y
+C
+      C(P1,P2,B) = B+(P1-CV)/(P1-P2)
+C
+      IDUB = 0
+      ASSIGN 102 TO JUMP
+      IF (IOFFP .NE. 0) ASSIGN 101 TO JUMP
+      DO 128 JP1=2,N
+         J = JP1-1
+         Y1 = J
+         Y2 = JP1
+         DO 127 IP1=2,M
+            I = IP1-1
+            X1 = I
+            X2 = IP1
+            H1 = Z(I,J)
+            H2 = Z(I,JP1)
+            H3 = Z(IP1,JP1)
+            H4 = Z(IP1,J)
+            GO TO JUMP,(101,102)
+  101       IF (H1.EQ.SPVAL .OR. H2.EQ.SPVAL .OR. H3.EQ.SPVAL .OR.
+     1          H4.EQ.SPVAL) GO TO 127
+  102       DO 126 K=1,NL
+               CV = CL(K)
+C
+C FIND WHAT SITUATION FOR THIS CV IN THIS CELL
+C
+               IF (H1-CV) 103,110,110
+  103          IF (H2-CV) 104,106,106
+  104          IF (H3-CV) 105,107,107
+  105          IF (H4-CV) 127,127,117
+  106          IF (H3-CV) 108,109,109
+  107          IF (H4-CV) 118,119,119
+  108          IF (H4-CV) 120,121,121
+  109          IF (H4-CV) 122,123,123
+  110          IF (H2-CV) 111,113,113
+  111          IF (H3-CV) 112,114,114
+  112          IF (H4-CV) 123,122,122
+  113          IF (H3-CV) 115,116,116
+  114          IF (H4-CV) 124,120,120
+  115          IF (H4-CV) 119,118,118
+  116          IF (H4-CV) 117,126,126
+C
+C INTERPOLATE LINE SEGMENT ENDPOINTS
+C
+  117          XA = C(H1,H4,X1)
+               YB = C(H4,H3,Y1)
+               XB = X2
+               YA = Y1
+               GO TO 125
+  118          XA = C(H2,H3,X1)
+               YB = C(H4,H3,Y1)
+               XB = X2
+               YA = Y2
+               GO TO 125
+  119          XA = C(H1,H4,X1)
+               XB = C(H2,H3,X1)
+               YA = Y1
+               YB = Y2
+               GO TO 125
+  120          XB = C(H2,H3,X1)
+               YA = C(H1,H2,Y1)
+               XA = X1
+               YB = Y2
+               IDUB = 0
+               GO TO 125
+  121          IDUB = 1
+               GO TO 117
+  122          YA = C(H1,H2,Y1)
+               YB = C(H4,H3,Y1)
+               XA = X1
+               XB = X2
+               GO TO 125
+  123          XB = C(H1,H4,X1)
+               YA = C(H1,H2,Y1)
+               XA = X1
+               YB = Y1
+               IDUB = 0
+               GO TO 125
+  124          IDUB = -1
+               GO TO 118
+  125          XX1 = FX(XA,YA)
+               YY1 = FY(XA,YA)
+               XX2 = FX(XB,YB)
+               YY2 = FY(XB,YB)
+C
+C DRAW LINE SEGMENT
+C
+               CALL LINED ( XX1, YY1, XX2, YY2 )
+               IF (IDUB) 123,126,120
+  126       CONTINUE
+  127    CONTINUE
+  128 CONTINUE
+C
+C
+      RETURN
+      END
+      SUBROUTINE MAXMIN (Z,L,MM,NN,JSIZEM,AASH,JOFFDT)
+      SAVE
+C
+C THIS ROUTINE FINDS RELATIVE MINIMUMS AND MAXIMUMS.  A RELATIVE MINIMUM
+C (OR MAXIMUM) IS DEFINED TO BE THE LOWEST (OR HIGHEST) POINT WITHIN
+C A CERTAIN NEIGHBORHOOD OF THE POINT.  THE NEIGHBORHOOD USED HERE
+C IS + OR - MN IN THE X DIRECTION AND + OR - NM IN THE Y DIRECTION.
+C
+C
+      CHARACTER*6     IA
+      DIMENSION       IW(4)
+      DIMENSION       Z(L,NN)
+C
+C
+      COMMON /CONRE1/ IOFFP      ,SPVAL
+      COMMON /CONRE5/ SCLY
+      DATA IW(1),IW(2),IW(3),IW(4)/4,6,8,12/
+C
+      FX(X,Y) = X
+      FY(X,Y) = Y
+C
+      M = MM
+      N = NN
+      ISIZEM = JSIZEM
+      ASH = ABS(AASH)
+      IOFFDT = JOFFDT
+C
+      IF (AASH .LT. 0.0) GO TO 128
+C
+      MN = MIN0(15,MAX0(2,IFIX(FLOAT(M)/8.)))
+      NM = MIN0(15,MAX0(2,IFIX(FLOAT(N)/8.)))
+      NM1 = N-1
+      MM1 = M-1
+      IH1 = 4*IW(ISIZEM+1)
+C
+C SCALE IH1 TO COMPENSATE FOR USER CHANGE IN RESOLUTION
+C
+      IH1 = 32*SCLY*IH1
+C
+C LINE LOOP FOLLOWS - THE COMPLETE TWO-DIMENSIONAL TEST FOR A MINIMUM OR
+C MAXIMUM OF THE FIELD IS ONLY PERFORMED FOR POINTS WHICH ARE MINIMA OR
+C MAXIMA ALONG SOME LINE - FINDING THESE CANDIDATES IS MADE EFFICIENT BY
+C USING A COUNT OF CONSECUTIVE INCREASES OR DECREASES OF THE FUNCTION
+C ALONG THE LINE
+C
+      DO 127 JP=2,NM1
+C
+         IM = MN-1
+         IP = -1
+         GO TO 126
+C
+C CONTROL RETURNS TO STATEMENT 10 AS LONG AS THE FUNCTION IS INCREASING
+C ALONG THE LINE - WE SEEK A POSSIBLE MAXIMUM
+C
+  101    IP = IP+1
+         AA = AN
+         IF (IP .EQ. MM1) GO TO 104
+         AN = Z(IP+1,JP)
+         IF (IOFFP.NE.0 .AND. AN.EQ.SPVAL) GO TO 125
+         IF (AA-AN) 102,103,104
+  102    IM = IM+1
+         GO TO 101
+  103    IM = 0
+         GO TO 101
+C
+C FUNCTION DECREASED - TEST FOR MAXIMUM ON LINE
+C
+  104    IF (IM .GE. MN) GO TO 106
+         IS = MAX0(1,IP-MN)
+         IT = IP-IM-1
+         IF (IS .GT. IT) GO TO 106
+         DO 105 II=IS,IT
+            IF (AA .LE. Z(II,JP)) GO TO 112
+  105    CONTINUE
+  106    IS = IP+2
+         IT = MIN0(M,IP+MN)
+         IF (IS .GT. IT) GO TO 109
+         DO 108 II=IS,IT
+            IF (IOFFP.EQ.0 .OR. Z(II,JP).NE.SPVAL) GO TO 107
+            IP = II-1
+            GO TO 125
+  107       IF (AA .LE. Z(II,JP)) GO TO 112
+  108    CONTINUE
+C
+C WE HAVE MAXIMUM ON LINE - DO TWO-DIMENSIONAL TEST FOR MAXIMUM OF FIELD
+C
+  109    JS = MAX0(1,JP-NM)
+         JT = MIN0(N,JP+NM)
+         IS = MAX0(1,IP-MN)
+         IT = MIN0(M,IP+MN)
+         DO 111 JK=JS,JT
+            IF (JK .EQ. JP) GO TO 111
+            DO 110 IK=IS,IT
+               IF (Z(IK,JK).GE.AA .OR.
+     1             (IOFFP.NE.0 .AND. Z(IK,JK).EQ.SPVAL)) GO TO 112
+  110       CONTINUE
+  111    CONTINUE
+C
+         X = FLOAT(IP)
+         Y = FLOAT(JP)
+         CALL WTSTR ( FX(X,Y),FY(X,Y),'H',ISIZEM,0,0 )
+         CALL FL2INT ( FX(X,Y),FY(X,Y),IFX,IFY )
+         IFY = IFY*SCLY
+         CALL ENCD (AA,ASH,IA,NC,IOFFDT)
+         MY = IFY - IH1
+         TMY = CPUY ( MY )
+         CALL WTSTR ( FX(X,Y),TMY,IA(1:NC),ISIZEM,0,0 )
+  112    IM = 1
+         IF (IP-MM1) 113,127,127
+C
+C CONTROL RETURNS TO STATEMENT 20 AS LONG AS THE FUNCTION IS DECREASING
+C ALONG THE LINE - WE SEEK A POSSIBLE MINIMUM
+C
+  113    IP = IP+1
+         AA = AN
+         IF (IP .EQ. MM1) GO TO 116
+         AN = Z(IP+1,JP)
+         IF (IOFFP.NE.0 .AND. AN.EQ.SPVAL) GO TO 125
+         IF (AA-AN) 116,115,114
+  114    IM = IM+1
+         GO TO 113
+  115    IM = 0
+         GO TO 113
+C
+C FUNCTION INCREASED - TEST FOR MINIMUM ON LINE
+C
+  116    IF (IM .GE. MN) GO TO 118
+         IS = MAX0(1,IP-MN)
+         IT = IP-IM-1
+         IF (IS .GT. IT) GO TO 118
+         DO 117 II=IS,IT
+            IF (AA .GE. Z(II,JP)) GO TO 124
+  117    CONTINUE
+  118    IS = IP+2
+         IT = MIN0(M,IP+MN)
+         IF (IS .GT. IT) GO TO 121
+         DO 120 II=IS,IT
+            IF (IOFFP.EQ.0 .OR. Z(II,JP).NE.SPVAL) GO TO 119
+            IP = II-1
+            GO TO 125
+  119       IF (AA .GE. Z(II,JP)) GO TO 124
+  120    CONTINUE
+C
+C WE HAVE MINIMUM ON LINE - DO TWO-DIMENSIONAL TEST FOR MINIMUM OF FIELD
+C
+  121    JS = MAX0(1,JP-NM)
+         JT = MIN0(N,JP+NM)
+         IS = MAX0(1,IP-MN)
+         IT = MIN0(M,IP+MN)
+         DO 123 JK=JS,JT
+            IF (JK .EQ. JP) GO TO 123
+            DO 122 IK=IS,IT
+               IF (Z(IK,JK).LE.AA .OR.
+     1             (IOFFP.NE.0 .AND. Z(IK,JK).EQ.SPVAL)) GO TO 124
+  122       CONTINUE
+  123    CONTINUE
+C
+         X = FLOAT(IP)
+         Y = FLOAT(JP)
+         CALL WTSTR (FX(X,Y),FY(X,Y),'L',ISIZEM,0,0 )
+         CALL FL2INT (FX(X,Y),FY(X,Y),IFX,IFY)
+         IFY = IFY*SCLY
+         CALL ENCD (AA,ASH,IA,NC,IOFFDT)
+         MY = IFY-IH1
+         TMY = CPUY ( MY )
+         CALL WTSTR ( FX(X,Y),TMY,IA(1:NC),ISIZEM,0,0 )
+  124    IM = 1
+         IF (IP-MM1) 101,127,127
+C
+C SKIP SPECIAL VALUES ON LINE
+C
+  125    IM = 0
+  126    IP = IP+1
+         IF (IP .GE. MM1) GO TO 127
+         IF (IOFFP.NE.0 .AND. Z(IP+1,JP).EQ.SPVAL) GO TO 125
+         IM = IM+1
+         IF (IM .LE. MN) GO TO 126
+         IM = 1
+         AN = Z(IP+1,JP)
+         IF (Z(IP,JP)-AN) 101,103,113
+C
+  127 CONTINUE
+C
+      RETURN
+C
+C ****************************** ENTRY PNTVAL **************************
+C     ENTRY PNTVAL (Z,L,MM,NN,JSIZEM,AASH,JOFFDT)
+C
+  128 CONTINUE
+      II = (M-1+24)/24
+      JJ = (N-1+48)/48
+      NIQ = 1
+      NJQ = 1
+      DO 130 J=NJQ,N,JJ
+         Y = J
+         DO 129 I=NIQ,M,II
+            X = I
+            ZZ = Z(I,J)
+            IF (IOFFP.NE.0 .AND. ZZ.EQ.SPVAL) GO TO 129
+            CALL ENCD (ZZ,ASH,IA,NC,IOFFDT)
+            CALL WTSTR ( FX(X,Y),FY(X,Y),IA(1:NC),ISIZEM,0,0 )
+  129    CONTINUE
+  130 CONTINUE
+      RETURN
+      END
+      SUBROUTINE CALCNT (Z,M,N,A1,A2,A3,I1,I2,I3)
+      SAVE
+      DIMENSION       Z(M,N)
+C
+C***CRAYLIB HAS THIS BLANK COMMENT
+C THIS ENTRY POINT IS FOR USERS WHO ARE TOO LAZY TO SWITCH OLD DECKS
+C TO THE NEW CALLING SEQUENCE.
+C THE FOLLOWING CALL IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+      CALL Q8QST4 ('GRAPHX','CONRECQCK','CALCNT','VERSION 01')
+C
+C***CRAYLIB HAS THIS BLANK COMMENT
+C
+      CALL CONREC (Z,M,M,N,A1,A2,A3,I1,I2,I3)
+      RETURN
+      END
+      SUBROUTINE EZCNTR (Z,M,N)
+      SAVE
+      DIMENSION       Z(M,N)
+C
+C CONTOURING VIA SHORTEST POSSIBLE ARGUMENT LIST
+C ASSUMPTIONS --
+C     ALL OF THE ARRAY IS TO BE CONTOURED,
+C     CONTOUR LEVELS ARE PICKED INTERNALLY,
+C     CONTOURING ROUTINE PICKS SCALE FACTORS,
+C     HIGHS AND LOWS ARE MARKED,
+C     ALL LINES ARE DRAWN WITH A SOLID DASH-LINE PATTERN.
+C     EZCNTR CALLS FRAME AFTER DRAWING THE CONTOUR MAP.
+C IF THESE ASSUMPTIONS ARE NOT MET, USE CONREC.
+C
+C ARGUMENTS
+C     Z   ARRAY TO BE CONTOURED
+C     M   FIRST DIMENSION OF Z
+C     N   SECOND DIMENSION OF Z
+C***CRAYLIB HAS THIS BLANK COMMENT
+C
+      DATA NSET,NHI,NDASH/0,0,0/
+C
+C***CRAYLIB HAS THIS BLANK COMMENT
+C THE FOLLOWING CALL IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+      CALL Q8QST4 ('GRAPHX','CONRECQCK','EZCNTR','VERSION 01')
+C
+C***CRAYLIB HAS THIS BLANK COMMENT
+C
+      CALL CONREC (Z,M,M,N,0.,0.,0.,NSET,NHI,NDASH)
+      CALL FRAME
+      RETURN
+      END
+      BLOCKDATA CONBD
+      COMMON /CONRE1/ IOFFP      ,SPVAL
+      COMMON /CONRE4/ ISIZEM     ,ISIZEP     ,NLA        ,NLM        ,
+     1                XLT        ,YBT        ,SIDE       ,ISOLID     ,
+     2                EXT        ,IOFFD      ,IOFFM
+      DATA IOFFP,SPVAL/0,0.0/
+      DATA ISIZEM,ISIZEP,NLA,NLM,XLT,YBT,SIDE,ISOLID/
+     1        2,     1,   16, 40,.05,.05,   .9, 1023/
+      DATA EXT,IOFFD,IOFFM/.25,0,0/
+C
+C REVISION HISTORY---
+C
+C JANUARY 1978     DELETED REFERENCES TO THE  *COSY  CARDS AND
+C                  ADDED REVISION HISTORY
+C FEBURARY 1979    MADE CODE CONFORM TO FORTRAN 66 STANDARDS
+C JANUARY 1980     CHANGED LIBRARY NAME FROM NSSL TO
+C                  PORTLIB FOR MOVE TO PORTLIB
+C MAY 1980         CONRECQCK ON PORTLIB WAS DISCOVERED TO BE ESSENTIALLY
+C                  THE WRONG VERSION.  EXTENSIVE MODIFICATIONS TO CLGEN,
+C                  MAXMIN, CONREC TO MAKE IT PORTABLE (INVOLVED REMOVAL
+C                  OF PWRT CALLS, ENCODE STATEMENTS, INAPPROPRIATE CON-
+C                  STANTS, ETC.).
+C JUNE 1984        UPDATED TO FORTRAN 77 AND TO GKS
+C-----------------------------------------------------------------------
+C
+      END
