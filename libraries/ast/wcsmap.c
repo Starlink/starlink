@@ -120,6 +120,9 @@ f     The WcsMap class does not define any new routines beyond those
 *        MapMerge no longer simplifies a CAR projection. Previously they
 *        were replaced by a UnitMap, but this removed the cylic nature of
 *        the mapping (i.e. 2.PI == 0 ).
+*     6-OCT-2000 (DSB):
+*        Ignore leading and trailing spaces in astWCsPrjType (some
+*        CTYPE FITS keywords have appeared with trailing white space).
 *class--
 */
 
@@ -3028,8 +3031,25 @@ int PrjType_( const char *ctype ){
 */
 
    PrjData *data;
+   char buffer[21];
+   const char *a;
+   char *b;
+
+/* Remove leading and trailing blanks from the supplied string. */
+   a = ctype;
+   b = buffer;
+   while( *a && (b - buffer) < 20 ){
+      if( !isspace( (int) *a ) ) {
+         *(b++) = *a;
+      }
+      a++;
+   }
+   *b = 0;
+
+/* Search for the projection in the list of available projectons. */
    data = PrjInfo;
    while( data->prj != AST__WCSBAD && strcmp( data->ctype, ctype ) ) data ++;
+
    return data->prj;
 }
 

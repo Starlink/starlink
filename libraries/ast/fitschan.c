@@ -318,6 +318,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     19-MAY-2000 (DSB):
 *        Added attribute Warnings. Lowered DSS in the priority list
 *        of encodings implemented by GetEncoding.
+*     6-OCT-2000 (DSB):
+*        Increased size of buffers used to store CTYPE values to take
+*        account of the possiblity of lots of trailing spaces.
 *class--
 */
 
@@ -421,6 +424,7 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 #define NONAX              0
 #define LATAX              1
 #define NDESC              9
+#define MXCTYPELEN        81
 
 /* Each card in the fitschan has a set of flags associated with it,
    stored in different bits of the "flags" item within each FitsCard
@@ -1085,8 +1089,8 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
    char combuf[80];    /* Buffer for FITS card comment */
-   char lattype[10];   /* Latitude axis CTYPE */
-   char lontype[10];   /* Longitude axis CTYPE */
+   char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
+   char lontype[MXCTYPELEN];/* Longitude axis CTYPE */
    char s;             /* Co-ordinate version character */
    char sign[2];       /* Fraction's sign character */
    double *cdelt;      /* Pointer to CDELT array */
@@ -8991,8 +8995,8 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
    char *comm;         /* Pointer to comment string */
    char *cval;         /* Pointer to string keyword value */
    char combuf[80];    /* Buffer for FITS card comment */
-   char lattype[10];   /* Latitude axis CTYPE */
-   char lontype[10];   /* Longitude axis CTYPE */
+   char lattype[MXCTYPELEN];/* Latitude axis CTYPE */
+   char lontype[MXCTYPELEN];/* Longitude axis CTYPE */
    char s;             /* Co-ordinate version character */
    char sign[2];       /* Fraction's sign character */
    double fd;          /* Fraction of a day */
@@ -10716,7 +10720,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    char combuf[80];    /* Buffer for FITS card comment */
    char keyname[10];   /* Buffer for keyword name string */
    char primsys[20];   /* Buffer for primnary RADECSYS value */
-   char type[10];      /* Buffer for CTYPE value */
+   char type[MXCTYPELEN];/* Buffer for CTYPE value */
    char s;             /* Co-ordinate version character */
    char sign[2];       /* Fraction's sign character */
    char sup;           /* Upper limit on s */
@@ -12442,8 +12446,8 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
 */
 
 /* Local Variables: */
-   char lattype[10];        /* Latitude axis CTYPE value */
-   char lontype[10];        /* Longitude axis CTYPE value */
+   char lattype[MXCTYPELEN];/* Latitude axis CTYPE value */
+   char lontype[MXCTYPELEN];/* Longitude axis CTYPE value */
    const char *prj_name;    /* Pointer to projection name string */
    const char *sys;         /* Celestal coordinate system */
    double ep;               /* Epoch of observation (MJD) */
@@ -12768,8 +12772,8 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    char bj;                       /* Besselian/Julian indicator */
    char format[ 50 ];             /* scanf format string */
    char keyname[ FITSNAMLEN + 1 ];/* General Keyword name */
-   char lattype[11];              /* CTYPE value for latitude axis */
-   char lontype[11];              /* CTYPE value for longitude axis */
+   char lattype[MXCTYPELEN];      /* CTYPE value for latitude axis */
+   char lontype[MXCTYPELEN];      /* CTYPE value for longitude axis */
    char prj[6];                   /* Projection string */
    char s;                        /* Co-ordinate version character */
    double cdelti;                 /* CDELT for longitude axis */
@@ -15107,10 +15111,10 @@ static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys,
    AstWcsMap *new;                 /* The created WcsMap */
    char *ctype;                    /* Pointer to CTYPE string */
    char *keyname;                  /* Pointer to keyword name string */
-   char latctype[10];              /* Latitude CTYPE keyword value */
+   char latctype[MXCTYPELEN];      /* Latitude CTYPE keyword value */
    char latkey[10];                /* Latitude CTYPE keyword name */
    char lattype[4];                /* Buffer for celestial system */
-   char lonctype[10];              /* Longitude CTYPE keyword value */
+   char lonctype[MXCTYPELEN];      /* Longitude CTYPE keyword value */
    char lonkey[10];                /* Longitude CTYPE keyword name */
    char lontype[4];                /* Buffer for celestial system */
    double pv;                      /* Projection parameter value */
