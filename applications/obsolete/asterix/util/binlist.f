@@ -23,6 +23,7 @@
 *      3 Mar 94 : V1.7-0 Use sensible format for real numbers (DJA)
 *      4 May 94 : V1.7-1 Use AIO to do i/o (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Jan 95 : V1.8-1 Updated data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -31,41 +32,42 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
       INTEGER STATUS
 *
+*    Functions :
+*
+      INTEGER CHR_LEN
+*
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) 	LOC	 		! Locator to top level
-
-      CHARACTER*75           	NAME
+      CHARACTER*132		FILE, PATH
       CHARACTER*20           	SLICE       		! Data slice specification
 
       INTEGER                	AEPTR(2)    		! Asymmetric data errors
       INTEGER                	AWPTR(2)    		! Asymmetric axis errors
 
-      INTEGER L
+      INTEGER			FID			! File identifier
+      INTEGER 			NLEV
       INTEGER			OCH			! Output channel
       INTEGER 			DEFWIDTH                ! Width of output
       INTEGER 			NDIM            	! Dimensionality of object
-      INTEGER DIMS(DAT__MXDIM)           ! Dimensions of object
-      INTEGER NDUM,DUMS(DAT__MXDIM)
-      INTEGER RANGES(2,DAT__MXDIM)       ! Ranges of data to be output
-      INTEGER ID
+      INTEGER DIMS(ADI__MXDIM)           ! Dimensions of object
+      INTEGER NDUM,DUMS(ADI__MXDIM)
+      INTEGER RANGES(2,ADI__MXDIM)       ! Ranges of data to be output
       INTEGER DPTR,VPTR,QPTR,APTR,WPTR
 
-      LOGICAL                PRIM        ! Whether object primitive
-      LOGICAL                DOK
+      LOGICAL                	DOK
       LOGICAL VOK,AOK,WOK,QOK,AWOK,AEOK
       LOGICAL DUM
 *
 *    Version id :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='BINLIST Version 1.8-0')
+        PARAMETER (VERSION='BINLIST Version 1.8-1')
 *-
 
 *    Version id
@@ -76,57 +78,56 @@
       DOK=.FALSE.
 
 *    Input dataset
-      CALL USI_ASSOCI( 'INP', 'READ', LOC, PRIM, STATUS )
-      CALL BDA_FIND( LOC, ID, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', FID, STATUS )
 
 *    Set up output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEFWIDTH, STATUS )
 
-      CALL BDA_CHKDATA_INT(ID,DOK,NDIM,DIMS,STATUS)
+      CALL BDI_CHKDATA(FID,DOK,NDIM,DIMS,STATUS)
 
       IF ( DOK.AND. (NDIM.EQ.1) ) THEN
 
 *      Write dataset name
-        CALL STR_OBNAME(LOC,NAME,L,STATUS)
+        CALL ADI_FTRACE( FID, NLEV, PATH, FILE, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
         CALL AIO_WRITE( OCH, 'Dataset:-', STATUS )
         CALL AIO_BLNK( OCH, STATUS )
-        CALL AIO_IWRITE( OCH, 2, NAME(:L), STATUS )
+        CALL AIO_IWRITE( OCH, 2, FILE(:CHR_LEN(FILE)), STATUS )
         CALL AIO_BLNK( OCH, STATUS )
 
 *      Axis data?
-        CALL BDA_CHKAXVAL_INT(ID,1,AOK,DUM,NDUM,STATUS)
-        CALL BDA_MAPAXVAL_INT(ID,'R',1,APTR,STATUS)
+        CALL BDI_CHKAXVAL( FID,1,AOK,DUM,NDUM,STATUS)
+        CALL BDI_MAPAXVAL( FID, 'READ', 1, APTR, STATUS )
 
 *      Asymmetric axis errors?
-        CALL BDA_CHKXERR_INT(ID,AWOK,DUM,STATUS)
+        CALL BDI_CHKXERR( FID, AWOK, DUM, STATUS )
         IF ( AWOK ) THEN
           WOK = .FALSE.
-          CALL BDA_MAPXERR_INT(ID,'R',AWPTR(1),AWPTR(2),STATUS)
+          CALL BDI_MAPXERR( FID,'READ',AWPTR(1),AWPTR(2),STATUS)
         ELSE
-          CALL BDA_CHKAXWID_INT(ID,1,WOK,DUM,NDUM,STATUS)
-          CALL BDA_MAPAXWID_INT(ID,'R',1,WPTR,STATUS)
+          CALL BDI_CHKAXWID(FID,1,WOK,DUM,NDUM,STATUS)
+          CALL BDI_MAPAXWID(FID,'READ',1,WPTR,STATUS)
         END IF
 
 *      The data
-        CALL BDA_MAPDATA_INT(ID,'R',DPTR,STATUS)
+        CALL BDI_MAPDATA(FID,'READ',DPTR,STATUS)
 
 *      Asymmetric data errors?
-        CALL BDA_CHKYERR_INT(ID,AEOK,DUM,STATUS)
+        CALL BDI_CHKYERR(FID,AEOK,DUM,STATUS)
         IF ( AEOK ) THEN
           VOK = .FALSE.
-          CALL BDA_MAPYERR_INT(ID,'R',AEPTR(1),AEPTR(2),STATUS)
+          CALL BDI_MAPYERR(FID,'READ',AEPTR(1),AEPTR(2),STATUS)
 
 *      Otherwise look for variance
         ELSE
-          CALL BDA_CHKVAR_INT(ID,VOK,NDUM,DUMS,STATUS)
-          CALL BDA_MAPVAR_INT(ID,'R',VPTR,STATUS)
+          CALL BDI_CHKVAR(FID,VOK,NDUM,DUMS,STATUS)
+          CALL BDI_MAPVAR(FID,'READ',VPTR,STATUS)
 
         END IF
 
 *      Quality
-        CALL BDA_CHKQUAL_INT(ID,QOK,NDUM,DUMS,STATUS)
-        CALL BDA_MAPQUAL_INT(ID,'R',QPTR,STATUS)
+        CALL BDI_CHKQUAL(FID,QOK,NDUM,DUMS,STATUS)
+        CALL BDI_MAPQUAL(FID,'READ',QPTR,STATUS)
 
 *      Get slice of dataset
         CALL USI_GET0C( 'SLICE', SLICE, STATUS )
@@ -154,7 +155,6 @@
       CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Close down ASTERIX
-      CALL USI_ANNUL(LOC,STATUS)
       CALL AST_CLOSE()
       CALL AST_ERR(STATUS)
 
@@ -174,8 +174,9 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+*
 *    Import :
+*
       REAL D(*),V(*), AEL(*), AEU(*)
       BYTE Q(*)
       REAL A(*),W(*),AWL(*),AWU(*)
