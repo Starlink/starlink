@@ -396,8 +396,8 @@ PKG_VERS = @PACKAGE_VERSION@
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in mk VERSION $(DOCUMENTATION) \
-	$(MATCHPROG).tar
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in configure config mk \
+	VERSION $(DOCUMENTATION) $(MATCHPROG).tar
 
 #  Source directory for catlib is ./catlib; the directory it's
 #  installed into is CATLIBINSTALLDIR.  May be relative to current
@@ -1215,9 +1215,11 @@ sun242.xml:
 # The file build-subdirs must not exist at any time.
 #
 # When building, remove troublesome environment variables
+# Also, set RUN_LOCAL_AUTOTOOLS to false to stop `missing' attempting
+# to run programs (a bit of a hack, because we have generated files in CVS).
 build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
 		astrom/makefile $(MATCHPROG)/Makefile
-	cd moggy && $(CONFENVS) make
+	cd moggy && $(CONFENVS) RUN_LOCAL_AUTOTOOLS=false make
 	cd astrom && ./mk build
 	cd $(MATCHPROG) && $(CONFENVS) make
 #	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make

@@ -396,8 +396,8 @@ PKG_VERS = 0.5-10
 #  script and any documentation files).
 
 #  List of the source files bundled into the export_source distribution
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in mk VERSION $(DOCUMENTATION) \
-	$(MATCHPROG).tar
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in configure config mk \
+	VERSION $(DOCUMENTATION) $(MATCHPROG).tar
 
 #  Source directory for catlib is ./catlib; the directory it's
 #  installed into is CATLIBINSTALLDIR.  May be relative to current
