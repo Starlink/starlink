@@ -8,8 +8,8 @@
   coordinates stored in text files (of various formats) and the
   transformation of these positions from various celestial coordinate
   systems to that of a displayed image (for instance this allows you
-  to read positions in FK4 and precess to FK5). Each position can also
-  be labelled for visual identification in plots and mean image
+  to read positions in FK4 and transform to FK5). Each position can
+  also be labelled for visual identification in plots and mean image
   properties (such as seeing) can be calculated.
 
   Another major change in this release is support for multiple
