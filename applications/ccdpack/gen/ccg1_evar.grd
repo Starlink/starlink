@@ -1,0 +1,97 @@
+      SUBROUTINE CCG1_EVAR<T>( STACK, NLINES, NEL, VAR, STATUS )
+*+
+*  Name:
+*     CCG1_EVAR
+
+*  Purpose:
+*     To estimate the variances of a stack of image lines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_EVAR<T>( STACK, NLINES, NEL, VAR, STATUS )
+
+*  Description:
+*     This routine accepts an array of data lines (which are probably
+*     a series of vectorised images) and estimates the population
+*     variance of the data at each point in the lines. The variances
+*     produced are returned in the single line VAR. Using the
+*     population to estimate the variances should only be used when
+*     the number of images is large.
+
+*  Arguments:
+*     STACK( NLINES, EL ) = <COMM> (Given)
+*        The input array of data lines.
+*     NLINES = INTEGER (Given)
+*        The number of data lines (i.e. vectorised images) in the
+*        input array. Should be greater 2 and probably much larger.
+*     NEL = INTEGER (Given)
+*        The number of values per data-line in the input array.
+*     VAR( NEL ) =<COMM> (Given and Returned)
+*        The estimate variance array.
+*        The global status.
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-JAN-1999 (PDRAPER):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! BAD value constants
+
+*  Arguments Given:
+      INTEGER NLINES
+      INTEGER EL
+      <TYPE> STACK( NLINES, NEL )
+
+*  Arguments Returned:
+      <TYPE> VAR( NEL )
+
+*  Status:
+      INTEGER STATUS            ! Global status
+
+*  Local Variables:
+      DOUBLE PRECISION SUM      ! Sum of data values
+      DOUBLE PRECISION SUMSQ    ! Sum of data values squared
+      DOUBLE PRECISION VAL      ! Data value as DBLE
+      INTEGER NGOOD             ! Number of non-BAD data values.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over lines estimating the variance for each set of elements.
+      DO 1 I = 1, NLINES
+         SUM = 0.0D0
+         SUMSQ = 0.0D0
+         NGOOD = 0
+         DO 2 J = 1, NLINES
+            IF ( STACK( I, J ) .NE. VAL__BAD<T> ) THEN 
+               NGOOD = NGOOD + 1
+               VAL = DBLE( STACK( I, J ) )
+               SUM = SUM + VAL
+               SUMSQ = SUMSQ + VAL * VAL
+            END IF
+ 2       CONTINUE
+         IF ( NGOOD .GT. 1 ) THEN
+            VAR( I ) = ( SUMSQ/DBLE(NGOOD) ) - ( SUM/DBLE(NGOOD) )**2
+         ELSE 
+            VAR( I ) = VAL__BAD<T>
+         END IF
+ 1    CONTINUE
+      END
+* $Id$
