@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="tclsys">
+<component id="tcl">
   <version>8.2.3</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
