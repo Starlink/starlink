@@ -232,8 +232,8 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/classes
-    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/astrogrid/build/classes
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/astrogrid/build/classes
+    [javac] Compiling 8 source files to /apps/cvsbuild/java/source/astrogrid/build/classes
+     [copy] Copying 8 files to /apps/cvsbuild/java/source/astrogrid/build/classes
      [echo] Executing JSky target: build
 
 prepare:
@@ -432,7 +432,7 @@ build:
     [javac] Compiling 114 source files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 5 empty directories to 2 empty directories under /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 67 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 68 files to /apps/cvsbuild/java/source/treeview/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
      [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
      [echo] Executing Coco target: build
@@ -491,4 +491,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 19 seconds
+Total time: 1 minute 16 seconds

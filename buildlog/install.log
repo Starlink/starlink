@@ -587,7 +587,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/astrogrid
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/astrogrid
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JSky target: install
 
 prepare:
@@ -938,7 +938,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Dec 7, 2004 5:19:40 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Dec 8, 2004 5:19:16 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1136,4 +1136,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 40 seconds
+Total time: 5 minutes 39 seconds

@@ -218,4 +218,4 @@ real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/.frog.install
 
 BUILD SUCCESSFUL
-Total time: 21 seconds
+Total time: 20 seconds

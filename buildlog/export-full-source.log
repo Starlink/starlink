@@ -398,7 +398,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astrogrid/build/java
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/astrogrid/build/java
+     [copy] Copying 8 files to /apps/cvsbuild/java/source/astrogrid/build/java
      [echo] Executing JSky target: javadoc-sources
 
 javadoc-sources:
@@ -478,4 +478,4 @@ javadoc-sources:
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:550: No supported regular expression matcher found
 
-Total time: 45 seconds
+Total time: 44 seconds

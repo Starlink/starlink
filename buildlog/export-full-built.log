@@ -510,7 +510,7 @@ dist:
 
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JSky target: install
 
 prepare:
@@ -945,4 +945,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 12 seconds
+Total time: 5 minutes 46 seconds

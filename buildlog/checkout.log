@@ -3195,11 +3195,21 @@ cvs checkout: Updating java/source/astrogrid/src/main/uk
 cvs checkout: Updating java/source/astrogrid/src/main/uk/ac
 cvs checkout: Updating java/source/astrogrid/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/astrogrid/src/main/uk/ac/starlink/astrogrid
-U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/LoginDialog.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/AGConnector.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/AGConnectorFactory.java
 U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceDataSource.java
 U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceSelector.java
 U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceTableLoadDialog.java
 U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/MyspaceTreeNode.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/SwingAGConnector.java
+U java/source/astrogrid/src/main/uk/ac/starlink/astrogrid/UserAGConnector.java
+cvs checkout: Updating java/source/astrogrid/src/testcases
+cvs checkout: Updating java/source/astrogrid/src/testcases/uk
+cvs checkout: Updating java/source/astrogrid/src/testcases/uk/ac
+cvs checkout: Updating java/source/astrogrid/src/testcases/uk/ac/starlink
+cvs checkout: Updating java/source/astrogrid/src/testcases/uk/ac/starlink/astrogrid
+U java/source/astrogrid/src/testcases/uk/ac/starlink/astrogrid/MyspaceTest.java
+U java/source/astrogrid/src/testcases/uk/ac/starlink/astrogrid/ToadConnector.java
 cvs checkout: Updating java/source/axis
 U java/source/axis/.properties
 U java/source/axis/README
@@ -10750,6 +10760,7 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/invocation.htm
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/popup.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/popup.html
 cvs checkout: Updating java/source/treeview/src/resources/uk/ac/starlink/treeview/images
+U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/AGlogo.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Down.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Frame.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Help2.gif
