@@ -1130,7 +1130,9 @@ instant templates and recipes for performing the most
 commonly-required operations using AST, but without going into
 detail. The examples given (sort of) follow on from each other, so you
 should be able to construct a variety of programs by piecing them
-together.
+together.  Note that some of them appear longer than they actually
+are, because we have included plenty of comments and a few options
+that you probably won't need.
 
 If any of this material has you completely baffled, then you may want
 to read the introduction to AST programming concepts in
@@ -1282,7 +1284,7 @@ f-
 \subsection{\label{ss:howtoreadwcs}\ldots Read a WCS Calibration from a Dataset}
 
 c+
-Precisely how you extract World Coordinate System (WCS) information
+Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
 is. Usually, however, you should be able to obtain a set of FITS
 header cards which contain the WCS information (and probably much more
@@ -1291,7 +1293,7 @@ containing a complete set of FITS header cards and ``ncard'' is the
 number of cards. Then proceed as follows:
 c-
 f+
-Precisely how you extract World Coordinate System (WCS) information
+Precisely how you extract world coordinate system (WCS) information
 from a dataset obviously depends on what type of dataset it
 is. Usually, however, you should be able to obtain a set of FITS
 header cards which contain the WCS information (and probably much more
@@ -1343,14 +1345,6 @@ f+
 \normalsize
 f-
 
-f+
-(Some datasets which do not easily yield FITS headers may require a
-different approach. In the case of the Starlink NDF data format, for
-example, the above recipe should be replaced by a single call to the
-routine \xref{NDF\_GTWCS}{sun33}{NDF_GTWCS}---see
-\xref{SUN/33}{sun33}{}).
-f-
-
 c+
 The result should be a pointer, ``wcsinfo'', to a Frameset which
 contains the WCS information. This pointer can now be used to perform
@@ -1361,6 +1355,27 @@ f+
 The result should be a pointer, WCSINFO, to a Frameset which contains
 the WCS information. This pointer can now be used to perform many
 useful tasks, some of which are illustrated in the following recipes.
+f-
+
+c+
+Some datasets which do not easily yield FITS header cards may require
+a different approach, possibly involving use of a Channel
+(\secref{ss:channels}) rather than a FitsChan. In the case of the
+Starlink NDF data format, for example, all the above may be replaced
+by a single call to the (Fortran) routine
+\xref{NDF\_GTWCS}{sun33}{NDF_GTWCS}---see \xref{SUN/33}{sun33}{}.  The
+whole process can probably be encapsulated in a similar way in C for
+most data systems, whether they use FITS header cards or not.
+c-
+f+
+Some datasets which do not easily yield FITS header cards may require
+a different approach, possibly involving use of a Channel
+(\secref{ss:channels}) rather than a FitsChan. In the case of the
+Starlink NDF data format, for example, all the above may be replaced
+by a single call to the routine
+\xref{NDF\_GTWCS}{sun33}{NDF_GTWCS}---see \xref{SUN/33}{sun33}{}.  The
+whole process can probably be encapsulated in a similar way for most
+other data systems, whether they use FITS header cards or not.
 f-
 
 For more details about reading WCS information from datasets, see
@@ -1542,25 +1557,90 @@ For more information about transforming coordinates, see
 details of how to handle missing coordinates, see
 \secref{ss:badcoordinates}.
 
+\subsection{\label{ss:howtotestforcelestial}\ldots Test if a WCS is a Celestial Coordinate System}
+
+The world coordinate system (WCS) currently associated with an image
+may often be a celestial coordinate system, but this need not
+necessarily be the case. For instance, instead of right ascension and
+declination, an image might have a WCS with axes representing
+wavelength and slit position, or maybe just plain old pixels.
+
+c+
+If you have obtained a WCS calibration for an image, as in
+\secref{ss:howtoreadwcs}, in the form of a pointer ``wcsinfo'' to a
+FrameSet, then you may determine if the current coordinate system is a
+celestial one or not, as follows:
+c-
+f+
+If you have obtained a WCS calibration for an image, as in
+\secref{ss:howtoreadwcs}, in the form of a pointer WCSINFO to a
+FrameSet, then you may determine if the current coordinate system is a
+celestial one or not, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFrame *frame;
+int issky;
+
+...
+
+/* Obtain a pointer to the current Frame and determine if it is a
+   SkyFrame. */
+frame = astGetFrame( wcsinfo, AST__CURRENT );
+issky = astIsASkyFrame( frame );
+frame = astAnnul( frame );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER FRAME
+      LOGICAL ISSKY
+
+      ...
+
+*  Obtain a pointer to the current Frame and determine if it is a
+*  SkyFrame.
+      FRAME = AST_GETFRAME( WCSINFO, AST__CURRENT, STATUS )
+      ISSKY = AST_ISASKYFRAME( FRAME, STATUS )
+      CALL AST_ANNUL( FRAME, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+This will set ``issky'' to 1 if the WCS is a celestial coordinate
+system, and to zero otherwise.
+c-
+f+
+This will set ISSKY to .TRUE.\ if the WCS is a celestial coordinate
+system, and to .FALSE.\ otherwise.
+f-
+
 \subsection{\label{ss:howtoformatcoordinates}\ldots Format Coordinates for Display}
 
 c+
-Once you have converted pixel coordinates into world coordinates, you
-may want to format them as text before displaying them. Typically,
-this would convert from (say) radians into something more
-comprehensible. Using the FrameSet pointer ``wcsinfo'' obtained in
-\secref{ss:howtoreadwcs} and a pair of world coordinates ``xw'' and
-``yw'' ({\em{e.g.}}\ see \secref{ss:howtotransform}), you could
-proceed as follows:
+Once you have converted pixel coordinates into world coordinates
+(\secref{ss:howtotransform}), you may want to format them as text
+before displaying them. Typically, this would convert from (say)
+radians into something more comprehensible. Using the FrameSet pointer
+``wcsinfo'' obtained in \secref{ss:howtoreadwcs} and a pair of world
+coordinates ``xw'' and ``yw'' ({\em{e.g.}}\ see
+\secref{ss:howtotransform}), you could proceed as follows:
 c-
 f+
-Once you have converted pixel coordinates into world coordinates, you
-may want to format them as text before displaying them. Typically,
-this would convert from (say) radians into something more
-comprehensible. Using the FrameSet pointer WCSINFO obtained in
-\secref{ss:howtoreadwcs} and a pair of world coordinates XW and YW
-({\em{e.g.}}\ see \secref{ss:howtotransform}), you could proceed as
-follows:
+Once you have converted pixel coordinates into world coordinates
+(\secref{ss:howtotransform}), you may want to format them as text
+before displaying them. Typically, this would convert from (say)
+radians into something more comprehensible. Using the FrameSet pointer
+WCSINFO obtained in \secref{ss:howtoreadwcs} and a pair of world
+coordinates XW and YW ({\em{e.g.}}\ see \secref{ss:howtotransform}),
+you could proceed as follows:
 f-
 
 c+
@@ -1852,7 +1932,7 @@ that may be used for for celestial coordinates, see
 \secref{ss:unformattingskyaxisvalues}.
 f-
 
-\subsection{\ldots Modify a WCS Calibration}
+\subsection{\label{ss:howtomodifywcs}\ldots Modify a WCS Calibration}
 
 The usual reason for wishing to modify the WCS calibration associated
 with a dataset is that the data have been geometrically transformed in
@@ -2067,9 +2147,269 @@ so that they are correctly registered with your new image instead.
 f-
 
 For more information about re-mapping the Frames within a FrameSet,
-see \secref{ss:remapframe} and \secref{ss:wcsprocessingexample}.
+see \secref{ss:remapframe}. Also see \secref{ss:wcsprocessingexample}
+for a similar example to the above, applicable to the case of reducing
+the size of an image by binning.
 
-\subsection{\ldots Display a Graphical Coordinate Grid}
+\subsection{\ldots Write a Modified WCS Calibration to a DataSet}
+
+If you have modified the WCS calibration associated with a dataset,
+such as in the example above (\secref{ss:howtomodifywcs}), then you
+will need to write the modified version out along with any new data.
+
+In the same way as when reading a WCS calibration
+(\secref{ss:howtoreadwcs}), how you do this will depend on your data
+system, but we will assume that you wish to generate a set of FITS
+header cards that can be stored with the data. You should usually make
+preparations for doing this when you first read the WCS calibration
+from your input dataset by modifying the example given in
+\secref{ss:howtoreadwcs} as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFitsChan *fitschan1;
+AstFrameSet *wcsinfo1;
+const char *encode;
+
+...
+
+/* Create an input FitsChan and fill it with FITS header cards. */
+fitschan1 = astFitsChan( NULL, NULL, "" );
+for ( icard = 0; icard < ncard; icard++ ) astPutFits( fitschan1, cards[ icard ], 0 );
+
+/* Note which encoding has been used for the WCS information. */
+encode = astGetC( fitschan1, "Encoding" );
+
+/* Rewind the input FitsChan and read the WCS information from it. */
+astClear( fitschan1, "Card" );
+wcsinfo1 = astRead( fitschan1 );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER FITSCHAN1, WCSINFO1
+      CHARACTER * ( 20 ) ENCODE
+
+      ...
+
+*  Create an input FitsChan and fill it with FITS header cards.
+      FITSCHAN1 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+      DO 1 ICARD = 1, NCARD
+         CALL AST_PUTFITS( FITSCHAN1, CARDS( ICARD ), .FALSE., STATUS )
+ 1    CONTINUE
+
+*  Note which encoding has been used for the WCS information.
+      ENCODE = AST_GETC( FITSCHAN1, 'Encoding', STATUS );
+
+*  Rewind the input FitsChan and read the WCS information from it.
+      CALL AST_CLEAR( FITSCHAN1, 'Card', STATUS )
+      WCSINFO1 = AST_READ( FITSCHAN1, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Note how we have added an enquiry to determine how the WCS information
+is encoded in the input FITS cards, storing a pointer to the resulting
+string in the ``encode'' variable. This must be done {\bf{before}}
+actually reading the WCS calibration.
+c-
+f+
+Note how we have added an enquiry to determine how the WCS information
+is encoded in the input FITS cards, storing the resulting string in
+the ENCODE variable. This must be done {\bf{before}} actually reading
+the WCS calibration.
+f-
+
+c+
+{\em{({\bf{N.B.}}\ If you will be making extensive use of astGetC in
+your program, then you should allocate a buffer and make a copy of
+this string, because the pointer returned by astGetC will only remain
+valid for 50 invocations of the function, and you will need to use the
+Encoding value again later on.)}}
+c-
+
+c+
+Once you have produced a modified WCS calibration for the output
+dataset ({\em{e.g.}}\ \secref{ss:howtomodifywcs}), in the form of a
+FrameSet identified by the pointer ``wcsinfo2'', you can produce a new
+FitsChan containing the output FITS header cards as follows:
+c-
+f+
+Once you have produced a modified WCS calibration for the output
+dataset ({\em{e.g.}}\ \secref{ss:howtomodifywcs}), in the form of a
+FrameSet identified by the pointer WCSINFO2, you can produce a new
+FitsChan containing the output FITS header cards as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFitsChan *fitschan2;
+AstFrameSet *wcsinfo2;
+
+...
+
+/* Make a copy of the input FitsChan, AFTER the WCS information has
+   been read from it. This will propagate all the input FITS header
+   cards, apart from those describing the input WCS calibration. */
+fitschan2 = astCopy( fitschan1 );
+
+/* If necessary, make modifications to the cards in "fitschan2"
+   (e.g. you might need to change NAXIS1, NAXIS2, etc., to account for
+   a change in image size). You probably only need to do this if your
+   data system does not provide these facilities itself. */
+<details not shown - see below>
+
+/* Alternatively, if your data system handles the propagation of FITS
+   header cards to the output dataset for you, then simply create an
+   empty FitsChan to contain the output WCS information alone.
+fitschan2 = astFitsChan( NULL, NULL, "" );
+*/
+
+/* Rewind the new FitsChan (if necessary) and attempt to write the
+   output WCS information to it using the same encoding method as the
+   input dataset. */
+astSet( fitschan2, "Card=1, Encoding=%s", encode );
+if ( !astWrite( fitschan2, wcsinfo2 ) ) {
+
+/* If this didn't work (the WCS FrameSet has become too complex), then
+   use the native AST encoding instead. */
+   astSet( fitschan2, "Encoding=NATIVE" );
+   (void) astWrite( fitschan2, wcsinfo2 );
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER FITSCHAN2, JUNK, WCSINFO2
+
+      ...
+
+*  Make a copy of the input FitsChan, AFTER the WCS information has
+*  been read from it. This will propagate all the input FITS header
+*  cards, apart from those describing the WCS calibration.
+      FITSCHAN2 = AST_COPY( FITSCHAN1, STATUS )
+
+*  If necessary, make modifications to the cards in FITSCHAN2
+*  (e.g. you might need to change NAXIS1, NAXIS2, etc., to account for
+*  a change in image size). You probably only need to do this if your
+*  data system does not provide these facilities itself.
+      <details not shown - see below>
+
+*  Alternatively, if your data system handles the propagation of FITS
+*  header cards to the output dataset for you, then simply create an
+*  empty FitsChan to contain the output WCS information alone.
+*     FITSCHAN2 = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+
+*  Rewind the new FitsChan (if necessary) and attempt to write the
+*  output WCS information to it using the same encoding method as the
+*  input dataset.
+      CALL AST_SET( FITSCHAN2, 'Card=1, Encoding=' // ENCODE, STATUS )
+      IF ( AST_WRITE( FITSCHAN2, WCSINFO2, STATUS ) .EQ. 0 ) {
+
+*  If this didn't work (the WCS FrameSet has become too complex), then
+*  use the native AST encoding instead.
+         CALL AST_SETC( FITSCHAN2, 'Encoding', 'NATIVE', STATUS );
+         JUNK = AST_WRITE( FITSCHAN2, WCSINFO2, STATUS );
+      END IF
+\end{verbatim}
+\normalsize
+f-
+
+For details of how to modify the contents of the output FitsChan in
+other ways, such as by adding, over-writing or deleting header cards,
+see \secref{ss:addressingfitscards}, \secref{ss:addingfitscards} and
+\secref{ss:findingandchangingfits}.
+
+Once you have assembled the output FITS cards, you may retrieve them
+from the FitsChan that contains them as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include <stdio.h>
+char card[ 81 ];
+
+...
+
+astClear( fitschan2, "Card" );
+while ( astFindFits( fitschan2, "%f", card, 1 ) ) (void) printf( "%s\n", card );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CHARACTER * ( 80 ) CARD
+
+      ...
+
+      CALL AST_CLEAR( FITSCHAN2, 'Card', STATUS )
+ 5    CONTINUE
+      IF ( AST_FINDFITS( FITSCHAN2, '%f', CARD, .TRUE., STATUS ) ) THEN
+         WRITE ( *, '(A)' ) CARD
+         GO TO 5
+      END IF
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, we have simply written each card to the standard output stream,
+but you would obviously replace this with a function invocation to
+store the cards in your output dataset.
+c-
+f+
+Here, we have simply written each card to the standard output unit,
+but you would obviously replace this with a subroutine call to store
+the cards in your output dataset.
+f-
+
+c+
+For data systems that do not use FITS header cards, a different
+approach may be needed, possibly involving use of a Channel
+(\secref{ss:channels}) rather than a FitsChan.  In the case of the
+Starlink NDF data format, for example, all of the above may be
+replaced by a single call to the (Fortran) routine
+\xref{NDF\_PTWCS}{sun33}{NDF_PTWCS}---see \xref{SUN/33}{sun33}{}. The
+whole process can probably be encapsulated in a similar way in C for
+most data systems, whether they use FITS header cards or not.
+c-
+f+
+For data systems that do not use FITS header cards, a different
+approach may be needed, possibly involving use of a Channel
+(\secref{ss:channels}) rather than a FitsChan.  In the case of the
+Starlink NDF data format, for example, all of the above may be
+replaced by a single call to the routine
+\xref{NDF\_PTWCS}{sun33}{NDF_PTWCS}---see \xref{SUN/33}{sun33}{}. The
+whole process can probably be encapsulated in a similar way for most
+other data systems, whether they use FITS header cards or not.
+f-
+
+For an overview of how to propagate WCS information through data
+processing steps, see \secref{ss:propagatingwcsinformation}.  For more
+information about writing WCS information to FitsChans, see
+\secref{ss:writingnativefits} and \secref{ss:writingforeignfits}.  For
+information about the options for encoding WCS information in FITS
+header cards, see \secref{ss:nativeencoding},
+\secref{ss:foreignencodings}, and the description of the Encoding
+attribute in \appref{ss:attributedescriptions}.  For a complete
+understanding of FitsChans and their use with FITS header cards, you
+should read \secref{ss:nativefits} and \secref{ss:foreignfits}.
+
+\subsection{\label{ss:howtoplotgrid}\ldots Display a Graphical Coordinate Grid}
 
 c+
 A common requirement when displaying image data is to plot an
@@ -2200,7 +2540,7 @@ if( cpgbeg( 0, " ", 1, 1 ) == 1 ) {
 /* Optionally, we can now set other Plot attributes to control the
    appearance of the grid. The values assigned here use the
    colour/font indices defined by the underlying graphics system. */
-   astSet( plot, "Colour(grid)=2,Font(textlab)=3" );
+   astSet( plot, "Colour(grid)=2, Font(textlab)=3" );
 
 /* Use the Plot to draw the coordinate grid. */
    astGrid( plot );
@@ -2296,7 +2636,7 @@ f+
 *  Optionally, we can now set other Plot attributes to control the
 *  appearance of the grid. The values assigned here use the
 *  colour/font indices defined by the underlying graphics system.
-         CALL AST_SET( PLOT, 'Colour(grid)=2,Font(textlab)=3', STATUS )
+         CALL AST_SET( PLOT, 'Colour(grid)=2, Font(textlab)=3', STATUS )
 
 *  Use the Plot to draw the coordinate grid.
          CALL AST_GRID( PLOT, STATUS )
@@ -2329,6 +2669,191 @@ the Plot class in \appref{ss:classdescriptions}.
 For details of how to build a graphics program which uses PGPLOT, see
 \secref{ss:howtobuild} and the description of the ast\_link command in
 \appref{ss:commanddescriptions}.
+
+\subsection{\label{ss:howtoswitchgrid}\ldots Switch to Plot a Different Celestial Coordinate Grid}
+
+c+
+Once you have set up a Plot to draw a coordinate grid
+(\secref{ss:howtoplotgrid}), it is a simple matter to change things so
+that the grid represents a different celestial coordinate system. For
+example, after creating the Plot with astPlot, you could use:
+c-
+f+
+Once you have set up a Plot to draw a coordinate grid
+(\secref{ss:howtoplotgrid}), it is a simple matter to change things so
+that the grid represents a different celestial coordinate system. For
+example, after creating the Plot with AST\_PLOT, you could use:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astSet( plot, "System=Galactic" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SET( PLOT, 'System=Galactic', STATUS )
+\end{verbatim}
+\normalsize
+f-
+or:
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astSet( plot, "System=FK5, Equinox=J2010" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SET( PLOT, 'System=FK5, Equinox=J2010', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+and any axes and/or grid drawn subsequently would represent the new
+celestial coordinate system you specified.  Note, however, that this
+will only work if the original grid represented celestial coordinates
+of some kind (see \secref{ss:howtotestforcelestial} for how to
+determine if this is the case\footnote{Note that the methods applied
+to a FrameSet may be used equally well with a Plot.}). If it did not,
+you will get an error message.
+
+For more information about the celestial coordinate systems available,
+see the descriptions of the System, Equinox and Epoch attributes in
+\appref{ss:attributedescriptions}.
+
+\subsection{\ldots Give a User Control Over the Appearance of a Plot}
+
+The idea of using a Plot's attributes to control the appearance of the
+graphical output it produces (\secref{ss:howtoplotgrid} and
+\secref{ss:howtoswitchgrid}) can easily be extended to allow the user
+of a program complete control over such matters.
+
+For instance, if the file ``plot.config'' contains a series of
+plotting options in the form of Plot attribute assignments (see below
+for an example), then we could create a Plot and implement these
+assignments before producing the graphical output as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include <stdio.h>
+#define MAXCHARS 120
+FILE *stream;
+char line[ MAXCHARS + 2 ];
+int base;
+
+...
+
+/* Create a Plot and define the default appearance of the graphical
+   output it will produce. */
+plot = astPlot( wcsinfo, gbox, pbox,
+                "Grid=1, Colour(grid)=2, Font(textlab)=3" );
+
+/* Obtain the value of any Plot attributes we want to preserve. */
+base = astGetI( plot, "Base" );
+
+/* Open the plot configuration file, if it exists. Read each line of
+   text and use it to set new Plot attribute values. Close the file
+   when done. */
+if ( stream = fopen( "plot.config", "r" ) ) {
+   while ( fgets( line, MAXCHARS + 2, stream ) ) astSet( plot, "%s", line );
+   close( stream );
+}
+
+/* Restore any attribute values we are preserving. */
+astSetI( plot, "Base", base );
+
+/* Produce the graphical output (e.g.). */
+astGrid( plot );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CHARACTER LINE( 120 )
+      INTEGER BASE
+
+      ...
+
+*  Create a Plot and define the default appearance of the graphical
+*  output it will produce.
+      PLOT = AST_PLOT( WCSINFO, GBOX, PBOX,
+     :                 'Grid=1, Colour(grid)=2, Font(textlab)=3',
+     :                 STATUS )
+
+*  Obtain the value of any Plot attributes we want to preserve.
+      BASE = AST_GETI( PLOT, 'Base', STATUS )
+
+*  Open the plot configuration file, if it exists.
+      OPEN ( 1, FILE = 'plot.config', STATUS = 'OLD', ERR = 8 )
+
+*  Read each line of text and use it to set new Plot attribute
+*  values. Close the file when done.
+ 6    CONTINUE
+         READ ( 1, '(A)', END = 7 ) LINE
+         CALL AST_SET( PLOT, LINE, STATUS )
+      GO TO 6
+ 7    CLOSE ( 1 )
+ 8    CONTINUE
+
+*  Restore any attribute values we are preserving.
+      CALL AST_SETI( PLOT, 'Base', BASE, STATUS )
+
+*  Produce the graphical output (e.g.).
+      CALL AST_GRID( PLOT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Notice that we take care that the Plot's Base attribute is preserved
+so that the user cannot change it. This is because graphical output
+will not be produced successfully if the base Frame does not describe
+the plotting surface to which we attached the Plot when we created it.
+
+The arrangement shown above allows the contents of the ``plot.config''
+file to control most aspects of the graphical output produced
+(including the coordinate system used; the colour, line style,
+thickness and font used for each component; the positioning of axes
+and tick marks; the precision, format and positioning of labels;
+{\em{etc.}}) {\em{via}} assignments of the form:
+
+\begin{quote}
+\small
+\begin{verbatim}
+System=Galactic, Equinox = 2001
+Border = 1, Colour( border ) = 1
+Colour( grid ) = 2
+DrawAxes = 1
+Colour( axes ) = 3
+Digits = 8
+Labelling = Interior
+\end{verbatim}
+\normalsize
+\end{quote}
+
+For a yet more sophisticated interface, you could obviously perform
+pre-processing on this input---for example, to translate words like
+``red'', ``green'' and ``blue'' into colour indices, to permit
+comments and blank lines, {\em{etc.}}
+
+For a full list of the attributes that may be used to control the
+appearance of graphical output, see the description of the Plot class
+in \appref{ss:classdescriptions}. For a complete description of each
+individual attribute ({\em{e.g.}}\ those above), see the attribute's
+entry in \appref{ss:arreibutedescriptions}.
 
 \cleardoublepage
 %\include{primer}
@@ -2864,7 +3389,7 @@ c+
 \begin{quote}
 \small
 \begin{verbatim}
-astSet( zoommap, "Zoom = 99.6, Report = 1" );
+astSet( zoommap, "Zoom=99.6, Report=1" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -2872,7 +3397,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      CALL AST_SET( ZOOMMAP, 'Zoom = 99.6, Report = 1', STATUS )
+      CALL AST_SET( ZOOMMAP, 'Zoom=99.6, Report=1', STATUS )
 \end{verbatim}
 \normalsize
 f-
@@ -2906,7 +3431,7 @@ int report = 1;
 
 ...
 
-astSet( zoommap, "Zoom = %g, Report = %d", zoom, report );
+astSet( zoommap, "Zoom=%g, Report=%d", zoom, report );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -2932,7 +3457,7 @@ $<$float.h$>$) when necessary. For example:
 
 ...
 
-astSet( zoommap, "Zoom = %.*g", DBL_DIG, double_value );
+astSet( zoommap, "Zoom=%.*g", DBL_DIG, double_value );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -2945,7 +3470,7 @@ interpreted as an assignment separator, for example:
 \begin{quote}
 \small
 \begin{verbatim}
-astSet( object, "Attribute = %s", "A string, containing a comma" );
+astSet( object, "Attribute=%s", "A string, containing a comma" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -3117,7 +3642,7 @@ c+
 \begin{quote}
 \small
 \begin{verbatim}
-astSet( zoommap, "Report = 1" );
+astSet( zoommap, "Report=1" );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -3125,7 +3650,7 @@ c-
 f+
 \small
 \begin{verbatim}
-      CALL AST_SET( ZOOMMAP, 'Report = 1', STATUS )
+      CALL AST_SET( ZOOMMAP, 'Report=1', STATUS )
 \end{verbatim}
 \normalsize
 f-
@@ -11812,7 +12337,7 @@ char card[ 81 ];
 ...
 
 astClear( fitschan, "Card" );
-while ( astFindFits( fitschan, "%f", card, 1 ) ) printf( "%s\n", card );
+while ( astFindFits( fitschan, "%f", card, 1 ) ) (void) printf( "%s\n", card );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -12957,7 +13482,7 @@ char card[ 81 ];
 ...
 
 astClear( fitschan, "Card" );
-while ( astFindFits( fitschan, "%f", card, 1 ) ) printf( "%s\n", card );
+while ( astFindFits( fitschan, "%f", card, 1 ) ) (void) printf( "%s\n", card );
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -13058,7 +13583,7 @@ not be over-written by a new output value, so would remain erroneously
 present.} The destructive read mechanism ensures that this doesn't
 happen.
 
-\subsection{Propagating WCS Information through Data Processing Steps}
+\subsection{\label{ss:propagatingwcsinformation}Propagating WCS Information through Data Processing Steps}
 
 One of the purposes of AST is to make it feasible to propagate WCS
 information through successive stages of data processing, so that it
