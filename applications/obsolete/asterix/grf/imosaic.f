@@ -1040,7 +1040,6 @@ c                              ! axis units
       INTEGER NOUT(2)                            !Axis dimensions
       REAL			SCALE(2)			! Bin sizes
       LOGICAL OK                                 !Is object present
-      LOGICAL REG                                !Are axes regular ?
       INTEGER			NACT			! Values read from obj
 *-
 
@@ -1048,20 +1047,6 @@ c                              ! axis units
 
 *    Locate astrometry
       CALL WCI_GETIDS( FID, PIXID, PRJID, SYSID, STATUS )
-
-*    Map axis values.
-      CALL BDI_CHKAXVAL( FID, 1, OK, REG, NOUT(1), STATUS )
-      CALL BDI_CHKAXVAL( FID, 2, OK, REG, NOUT(2), STATUS )
-
-*    Check if number of axis elements are consistent with data array
-      IF ( (NOUT(1) .NE. IDIMS(1) .OR. NOUT(2) .NE. IDIMS(2)) .AND.
-     :                                     STATUS .EQ. SAI__OK ) THEN
-
-        STATUS = SAI__ERROR
-        CALL ERR_REP(' ', 'Dimensions of data array don''t '/
-     :                     /'match axis dimensions', STATUS )
-
-      END IF
 
 *  Test if any objects were missing
       IF (STATUS .NE. SAI__OK) THEN
