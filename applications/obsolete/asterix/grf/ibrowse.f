@@ -17,6 +17,7 @@
 *    17 Feb 94 : V1.2-6 New features (RJV)
 *    23 May 94 : V1.2-7 Errors and Significance added (RJV)
 *     1 Sep 94 : V1.2-8 Positioning error fixed (RJV)
+*    25 aug 95 : V1.8-0 GUI interface (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -46,7 +47,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IBROWSE Version 1.2-7')
+      PARAMETER (VERSION='IBROWSE Version 1.8-0')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -62,172 +63,181 @@
 *  make sure transformations are correct
         CALL GTR_RESTORE(STATUS)
 
-*  find out if data, variance, errors, significance or quality wanted
-        VAR=.FALSE.
-        QUAL=.FALSE.
-        ERR=.FALSE.
-        SIGNIF=.FALSE.
-        CALL USI_GET0L('VAR',VAR,STATUS)
-        IF (VAR) THEN
-          IF (.NOT.I_VOK) THEN
-            CALL MSG_PRNT(
-     :            'AST_ERR: no variance present - defaulting to data')
-            VAR=.FALSE.
-          ENDIF
+        IF (I_GUI) THEN
+
+          CALL IBROWSE_GUI(STATUS)
+
+
         ELSE
-          CALL USI_GET0L('ERR',ERR,STATUS)
-          IF (ERR) THEN
+
+*  find out if data, variance, errors, significance or quality wanted
+          VAR=.FALSE.
+          QUAL=.FALSE.
+          ERR=.FALSE.
+          SIGNIF=.FALSE.
+          CALL USI_GET0L('VAR',VAR,STATUS)
+          IF (VAR) THEN
             IF (.NOT.I_VOK) THEN
               CALL MSG_PRNT(
      :            'AST_ERR: no variance present - defaulting to data')
-              ERR=.FALSE.
+              VAR=.FALSE.
             ENDIF
           ELSE
-            CALL USI_GET0L('SIGNIF',SIGNIF,STATUS)
-            IF (SIGNIF) THEN
+            CALL USI_GET0L('ERR',ERR,STATUS)
+            IF (ERR) THEN
               IF (.NOT.I_VOK) THEN
                 CALL MSG_PRNT(
      :            'AST_ERR: no variance present - defaulting to data')
-                SIGNIF=.FALSE.
+                ERR=.FALSE.
               ENDIF
             ELSE
-              CALL USI_GET0L('QUAL',QUAL,STATUS)
-              IF (QUAL.AND..NOT.I_QOK) THEN
-                CALL MSG_PRNT(
+              CALL USI_GET0L('SIGNIF',SIGNIF,STATUS)
+              IF (SIGNIF) THEN
+                IF (.NOT.I_VOK) THEN
+                  CALL MSG_PRNT(
+     :            'AST_ERR: no variance present - defaulting to data')
+                  SIGNIF=.FALSE.
+                ENDIF
+              ELSE
+                CALL USI_GET0L('QUAL',QUAL,STATUS)
+                IF (QUAL.AND..NOT.I_QOK) THEN
+                  CALL MSG_PRNT(
      :            'AST_ERR: no quality present - defaulting to data')
-                QUAL=.FALSE.
+                  QUAL=.FALSE.
+                ENDIF
               ENDIF
             ENDIF
           ENDIF
-        ENDIF
 
 *  see if data to be scaled
-        CALL USI_GET0I('SCALE',ISCALE,STATUS)
+          CALL USI_GET0I('SCALE',ISCALE,STATUS)
 
 *  keyboard mode
-        IF (I_MODE.NE.1) THEN
-          CALL USI_DEF0R('XPOS',I_X,STATUS)
-          CALL USI_DEF0R('YPOS',I_Y,STATUS)
-          CALL USI_GET0R('XPOS',XW,STATUS)
-          CALL USI_GET0R('YPOS',YW,STATUS)
-          KEYB=.TRUE.
-          FIRST=.TRUE.
-          NX=9
-          NY=9
-          CALL IBROWSE_DISP(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,SIGNIF,
-     :                                  QUAL,ISCALE,XW,YW,VAL,Q,STATUS)
+          IF (I_MODE.NE.1) THEN
+            CALL USI_DEF0R('XPOS',I_X,STATUS)
+            CALL USI_DEF0R('YPOS',I_Y,STATUS)
+            CALL USI_GET0R('XPOS',XW,STATUS)
+            CALL USI_GET0R('YPOS',YW,STATUS)
+            KEYB=.TRUE.
+            FIRST=.TRUE.
+            NX=9
+            NY=9
+            CALL IBROWSE_DISP(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,
+     :                          SIGNIF,QUAL,ISCALE,XW,YW,VAL,Q,STATUS)
 
-        ELSE
+          ELSE
 
-          CALL MSG_PRNT(' ')
-          CALL MSG_PRNT('Select points (press X to exit)...')
+            CALL MSG_PRNT(' ')
+            CALL MSG_PRNT('Select points (press X to exit)...')
 
-          FIRST=.TRUE.
-          KEYB=.FALSE.
-          XW=I_X
-          YW=I_Y
-          XXW=XW
-          YYW=YW
+            FIRST=.TRUE.
+            KEYB=.FALSE.
+            XW=I_X
+            YW=I_Y
+            XXW=XW
+            YYW=YW
 
 
-          CH=' '
-          DO WHILE (CH.NE.'X'.AND.STATUS.EQ.SAI__OK)
+            CH=' '
+            DO WHILE (CH.NE.'X'.AND.STATUS.EQ.SAI__OK)
 
-            CALL GFX_CURS(XW,YW,LEFT,RIGHT,CH,STATUS)
+              CALL GFX_CURS(XW,YW,LEFT,RIGHT,CH,STATUS)
 
-            IF (CH.EQ.'X') THEN
-              XW=XXW
-              YW=YYW
-            ELSE
+              IF (CH.EQ.'X') THEN
+                XW=XXW
+                YW=YYW
+              ELSE
 
-              IF (FIRST) THEN
+                IF (FIRST) THEN
 *  Initialise screen management and get display size
-                CALL TSM_INIT( ' ', STATUS )
-                CALL TSM_GETDIMS( 0, NCOLS, NROWS, STATUS )
-                IF ( (NCOLS .LT. 80) .OR. (NROWS.LT.10) ) THEN
-                  CALL MSG_PRNT(
+                  CALL TSM_INIT( ' ', STATUS )
+                  CALL TSM_GETDIMS( 0, NCOLS, NROWS, STATUS )
+                  IF ( (NCOLS .LT. 80) .OR. (NROWS.LT.10) ) THEN
+                    CALL MSG_PRNT(
      :             '** Terminal is too small for IBROWSE'/
      :                                 /' - resize it **' )
-                  GOTO 99
-                END IF
+                    GOTO 99
+                  END IF
 
 *  Number of data columns
-                NX = 9
+                  NX = 9
 
 *  Number of data rows that can be displayed. Ensure that it is odd.
 *  The number of rows is given by the number of rows on the screen,
 *  minus 4 rows for the positions window and 2 for the data border.
-                NY = (NROWS-6)/2
-                IF (MOD(NY,2).EQ.0 ) NY = NY - 1
+                  NY = (NROWS-6)/2
+                  IF (MOD(NY,2).EQ.0 ) NY = NY - 1
 
-                CALL TSM_CREWIN( 80, NROWS, 1, 1, DWIN, STATUS )
+                  CALL TSM_CREWIN( 80, NROWS, 1, 1, DWIN, STATUS )
 
-              ENDIF
+                ENDIF
 
-              IF (CH.EQ.'D') THEN
-                XW=XXW
-                YW=YYW
-                VAR=.FALSE.
-                QUAL=.FALSE.
-                ERR=.FALSE.
-                SIGNIF=.FALSE.
-              ELSEIF (CH.EQ.'V'.AND.I_VOK) THEN
-                XW=XXW
-                YW=YYW
-                VAR=.TRUE.
-                QUAL=.FALSE.
-                ERR=.FALSE.
-                SIGNIF=.FALSE.
-              ELSEIF (CH.EQ.'E'.AND.I_VOK) THEN
-                XW=XXW
-                YW=YYW
-                VAR=.FALSE.
-                QUAL=.FALSE.
-                ERR=.TRUE.
-                SIGNIF=.FALSE.
-              ELSEIF (CH.EQ.'S'.AND.I_VOK) THEN
-                XW=XXW
-                YW=YYW
-                VAR=.FALSE.
-                QUAL=.FALSE.
-                ERR=.FALSE.
-                SIGNIF=.TRUE.
-              ELSEIF (CH.EQ.'Q'.AND.I_QOK) THEN
-                XW=XXW
-                YW=YYW
-                VAR=.FALSE.
-                QUAL=.TRUE.
-                ERR=.FALSE.
-                SIGNIF=.FALSE.
-              ELSEIF (CH.EQ.'<') THEN
-                XW=XXW
-                YW=YYW
-                ISCALE=ISCALE-1
-              ELSEIF (CH.EQ.'>') THEN
-                XW=XXW
-                YW=YYW
-                ISCALE=ISCALE+1
-              ENDIF
+                IF (CH.EQ.'D') THEN
+                  XW=XXW
+                  YW=YYW
+                  VAR=.FALSE.
+                  QUAL=.FALSE.
+                  ERR=.FALSE.
+                  SIGNIF=.FALSE.
+                ELSEIF (CH.EQ.'V'.AND.I_VOK) THEN
+                  XW=XXW
+                  YW=YYW
+                  VAR=.TRUE.
+                  QUAL=.FALSE.
+                  ERR=.FALSE.
+                  SIGNIF=.FALSE.
+                ELSEIF (CH.EQ.'E'.AND.I_VOK) THEN
+                  XW=XXW
+                  YW=YYW
+                  VAR=.FALSE.
+                  QUAL=.FALSE.
+                  ERR=.TRUE.
+                  SIGNIF=.FALSE.
+                ELSEIF (CH.EQ.'S'.AND.I_VOK) THEN
+                  XW=XXW
+                  YW=YYW
+                  VAR=.FALSE.
+                  QUAL=.FALSE.
+                  ERR=.FALSE.
+                  SIGNIF=.TRUE.
+                ELSEIF (CH.EQ.'Q'.AND.I_QOK) THEN
+                  XW=XXW
+                  YW=YYW
+                  VAR=.FALSE.
+                  QUAL=.TRUE.
+                  ERR=.FALSE.
+                  SIGNIF=.FALSE.
+                ELSEIF (CH.EQ.'<') THEN
+                  XW=XXW
+                  YW=YYW
+                  ISCALE=ISCALE-1
+                ELSEIF (CH.EQ.'>') THEN
+                  XW=XXW
+                  YW=YYW
+                  ISCALE=ISCALE+1
+                ENDIF
 
-              CALL IBROWSE_DISP(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,
+                CALL IBROWSE_DISP(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,
      :                           SIGNIF,QUAL,ISCALE,XW,YW,VAL,Q,STATUS)
-              XXW=XW
-              YYW=YW
-              FIRST=.FALSE.
+                XXW=XW
+                YYW=YW
+                FIRST=.FALSE.
 
-            ENDIF
-          ENDDO
+              ENDIF
+            ENDDO
 
-          CALL TSM_CLOSE( STATUS )
+            CALL TSM_CLOSE( STATUS )
 
-        ENDIF
+          ENDIF
 
 *  write final value to parameter and reset current position
-        CALL IMG_SETPOS(XW,YW,STATUS)
-        IF (QUAL) THEN
-          CALL USI_PUT0I('VAL',Q,STATUS)
-        ELSE
-          CALL USI_PUT0R('VAL',VAL,STATUS)
+          CALL IMG_SETPOS(XW,YW,STATUS)
+          IF (QUAL) THEN
+            CALL USI_PUT0I('VAL',Q,STATUS)
+          ELSE
+            CALL USI_PUT0R('VAL',VAL,STATUS)
+          ENDIF
+
         ENDIF
 
       ENDIF
@@ -516,8 +526,7 @@
 
 
 *+  IBROWSE_GUI
-      SUBROUTINE IBROWSE_GUI(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,
-     :                          SIGNIF,QUAL,ISCALE,XW,YW,VAL,Q,STATUS)
+      SUBROUTINE IBROWSE_GUI(STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -531,18 +540,8 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
-      LOGICAL KEYB
-      LOGICAL FIRST
-      INTEGER DWIN
-      INTEGER NROWS
-      INTEGER NX,NY
-      INTEGER ISCALE
-      LOGICAL VAR,QUAL,ERR,SIGNIF
-      REAL XW,YW
 *    Import-Export :
 *    Export :
-      REAL VAL
-      BYTE Q
 *    Status :
       INTEGER STATUS
 *    Functions :
@@ -556,23 +555,28 @@
       INTEGER IXP,IYP,IXPMAX,IYPMAX
       INTEGER IX,IY,I,J
       INTEGER I1,I2,J1,J2
-      INTEGER IC1,IC2
-      INTEGER ROW,CPOS
-      INTEGER IPIX(2)
       INTEGER ISTAT
       INTEGER XPID,YPID,XPMID,YPMID,DID(9,9),FID,OID
       INTEGER FLAG
+      INTEGER ISCALE
       REAL XP1,XP2,YP1,YP2
+      REAL XW,YW
       REAL XW1,XW2,YW1,YW2
       REAL SCVAL,VAL2
       REAL XC,YC,DX,DY
       DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
+      LOGICAL VAR,ERR,SIGNIF,QUAL
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
+        VAR=.FALSE.
+        ERR=.FALSE.
+        SIGNIF=.FALSE.
+        QUAL=.FALSE.
+        ISCALE=0
 
 *  locate noticeboard items
         CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
@@ -598,12 +602,19 @@
         CALL PGQVP(3,XP1,XP2,YP1,YP2)
         CALL PGQWIN(XW1,XW2,YW1,YW2)
 
+        XSCALE=(XW2-XW1)/(XP2-XP1)
+        YSCALE=(YW2-YW1)/(YP2-YP1)
+
         FLAG=0
         DO WHILE (FLAG.EQ.0)
 
 *  get current cursor position in device coords
           CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,STATUS)
           CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,STATUS)
+
+*  convert to world coords
+          XW=XW1+(REAL(IXP)-XP1)*XSCALE
+          YW=YW1+(REAL(IYP)-YP1)*YSCALE
 
 *  convert to other frames
           CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
@@ -677,6 +688,10 @@
             ENDDO
 
           ENDDO
+
+          CALL NBS_PUT_VALUE(XID,0,VAL__NBR,XW,STATUS)
+          CALL NBS_PUT_VALUE(YID,0,VAL__NBR,YW,STATUS)
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,STATUS)
 
         ENDDO
 
