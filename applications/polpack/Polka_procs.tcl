@@ -1,3 +1,21 @@
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Name:
+#     Polka_procs.tcl
+#
+#  Purpose:
+#     Defines Tcl procedures needed by POLKA.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#
+#  History:
+#     4-JUN-1998 (DSB):
+#        Original version
+#     22-JUN-1998 (DSB):
+#        Modified Save to avoid long integer image identifiers (i.e. IMGID
+#        values) producing "integer value too large to represent" message.
+#---------------------------------------------------------------------------
+
 proc Accept {} {
 #+
 #  Name:
@@ -10614,7 +10632,7 @@ proc Save {} {
                      break
                   }
 
-                  if { $old_plate == "" } {
+                  if { ![string length $old_plate] } {
                      set plate [file tail $image]
                      if { ![Extension $outndf IMGID _CHAR $plate ""] } { 
                         set ok 0 
