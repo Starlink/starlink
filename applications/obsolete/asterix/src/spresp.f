@@ -92,22 +92,25 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     21-Apr-93 (DJA):
+*     21 Apr 1993 (DJA):
 *        V1.7-0  Original version.
-*     20-Jan-94 (DJA):
+*     20 Jan 1994 (DJA):
 *        V1.7-1  Fixed locator annulling bug.
-*     21-Jan-94 (DJA):
+*     21 Jan 1994 (DJA):
 *        V1.7-2  Fixed bug in compression algorithm.
-*      3-Mar-94 (DJA):
+*      3 Mar 1994 (DJA):
 *        V1.7-3  Write first 2 axis attributes.
-*     17-Aug-94 (DJA):
+*     17 Aug 1994 (DJA):
 *        V1.7-4  Reduces expanded dimensions to minimum required
-*     25-Nov-94 (DJA):
+*     25 Nov 1994 (DJA):
 *        V1.8-0  User interface now uses only USI.
-*     25-Apr-95 (DJA):
+*     25 Apr 1995 (DJA):
 *        V1.8-1  New data interfaces.
-*     31-Jul-95 (DJA):
+*     31 Jul 1995 (DJA):
 *        V2.0-0  Allow user to control energy resolution using NEBIN
+*      1 Aug 1995 (DJA):
+*        V2.0-1  Fixed bug in rectangular mode where output units were
+*                not written in radians
 *     {enter_changes_here}
 
 *  Bugs:
@@ -141,6 +144,7 @@
       CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
       CHARACTER*40           UNITS              ! Axis units
 
+      REAL			BASE, SCALE		!
       REAL                   	CUTOFF			! Cutoff amplitude
       REAL 		     	DX, DY		! Psf data bin widths in radians
       REAL                   	E, R, X, Y         	!
@@ -190,7 +194,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 2.0-0' )
+        PARAMETER        ( VERSION = 'SPRESP Version 2.0-1' )
 
 *  Local Data:
       DATA EVDS/.FALSE./
@@ -391,8 +395,16 @@
         CALL BDI_PUTAXVAL( SID, 3, SRES*TOR/2.0, SRES*TOR,
      :                     DIMS(3), STATUS )
       ELSE
-        CALL BDI_COPAXIS( IFID, SID, X_AX, 3, STATUS )
-        CALL BDI_COPAXIS( IFID, SID, Y_AX, 4, STATUS )
+        CALL BDI_PUTAXTEXT( SID, 3, 'X_CORR', 'radian', STATUS )
+        CALL BDI_GETAXVAL( IFID, X_AX, BASE, SCALE, DIMS(3), STATUS )
+        CALL BDI_CREAXVAL( SID, 3, .TRUE., DIMS(3), STATUS )
+        CALL BDI_PUTAXVAL( SID, 3, BASE*TOR, SCALE*TOR, DIMS(3),
+     :                      STATUS )
+        CALL BDI_PUTAXTEXT( SID, 4, 'Y_CORR', 'radian', STATUS )
+        CALL BDI_GETAXVAL( IFID, Y_AX, BASE, SCALE, DIMS(4), STATUS )
+        CALL BDI_CREAXVAL( SID, 4, .TRUE., DIMS(4), STATUS )
+        CALL BDI_PUTAXVAL( SID, 4, BASE*TOR, SCALE*TOR, DIMS(4),
+     :                      STATUS )
       END IF
       IF ( E_AX .GT. 0 ) THEN
         IF ( ONEBIN .EQ. IDIMS(E_AX) ) THEN
