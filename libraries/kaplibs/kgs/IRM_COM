@@ -1,0 +1,65 @@
+*  Purpose:
+*     Declares common block used to communicate the IRM package global
+*     variables.
+
+*  Authors:
+*     WG: Wei Gong (IPMAF)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 August (WG):
+*        Original version.
+*     1992 March 16 (MJC):
+*        Added the prologue and removed the DATA statement (now in
+*        BLOCK DATA routine IRM_BLDAT).
+*     1993 February 12 (MJC):
+*        Made the maximum number of curves 100.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*
+* 1. Global variables for setting NCAR pen number:
+*
+
+*  Upper limit of the number of curves.
+      INTEGER MCM__MXCUR
+      PARAMETER( MCM__MXCUR = 100 )
+
+*  The original GKS polyline idex and text colour index.
+      INTEGER MCM_OLDPX
+      INTEGER MCM_OLDTX
+      COMMON / IRM_NPEN / MCM_OLDPX, MCM_OLDTX
+
+*  The flag to show whether the curves are drawn in solid lines.
+      LOGICAL MCM_SOCUR
+      COMMON / IRM_NPEN / MCM_SOCUR
+
+*  The number of curves which have been set pen number, 
+*  and pen number of each curve.
+      INTEGER MCM_NCURV       
+      INTEGER MCM_CRPN( MCM__MXCUR )
+      COMMON / IRM_NPEN / MCM_NCURV, MCM_CRPN
+
+*  Colour indices of the in-line labels.
+      INTEGER MCM_INCL( MCM__MXCUR )
+      COMMON / IRM_NPEN / MCM_INCL
+
+*  Pen number of axis lines and tick marks, and colour index
+*  of numeric labels.
+      INTEGER MCM_AXPN 
+      INTEGER MCM_TKPN
+      INTEGER MCM_NLBCL
+      COMMON / IRM_NPEN /MCM_AXPN, MCM_TKPN, MCM_NLBCL
+
+*  Colour indices of title and axes labels.
+      INTEGER MCM_TITCL
+      INTEGER MCM_ALBCL
+      COMMON / IRM_NPEN /MCM_TITCL, MCM_ALBCL
+
+*  Data setting flag
+      LOGICAL MCM_STDAT        ! True means that the variables have
+                               ! already been set, otherwise not yet.
+      COMMON / IRM_NPEN / MCM_STDAT

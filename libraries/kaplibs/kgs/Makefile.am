@@ -3,15 +3,27 @@
 lib_LTLIBRARIES = libkgs.la
 
 libkgs_la_SOURCES = \
+        $(PRIVATE_INCLUDES) \
 	$(F_ROUTINES) 
 
-F_ROUTINES = bttn3.f kpg1_frpic.f kpg1_gkeyuw.f \
-kpg1_prcur.f kpg1_zopic.f kpg1_gkeyb.f kpg1_gkeyw.f \
-kpg1_qcol.f curpts.f kpg1_gkeyd.f kpg1_iwcg.f kpg1_qidat.f \
-ncrbck.f drebar.f kpg1_gkeyi.f kpg1_keyzo.f kpg1_qncol.f \
-ncropn.f kpg1_cross.f kpg1_gkeyr.f kpg1_palci.f \
-kpg1_qvid.f kpg1_erbar.f kpg1_gkeyub.f kpg1_pgsht.f \
-kpg1_zones.f
+PRIVATE_INCLUDES = IRM_COM
+
+F_ROUTINES = agchcu.f bttn3.f curpts.f drebar.f dynclr.f \
+kpg1_antso.f kpg1_cross.f kpg1_erbar.f kpg1_frpic.f kpg1_gkeyuw.f \
+kpg1_gkeyw.f kpg1_gkeyub.f kpg1_gkeyb.f kpg1_gkeyr.f kpg1_gkeyd.f \
+kpg1_gkeyi.f kpg1_gtcol.f kpg1_iderr.f kpg1_ivci.f kpg1_iwcg.f \
+kpg1_keyzo.f kpg1_macol.f kpg1_ncaxs.f kpg1_pacol.f \
+kpg1_palci.f kpg1_pgcol.f kpg1_pgsht.f kpg1_plcip.f kpg1_prcur.f \
+kpg1_qcol.f kpg1_qidat.f kpg1_qncol.f kpg1_qvid.f kpg1_sdtrn.f \
+kpg1_solin.f kpg1_zones.f kpg1_zopic.f ncraxs.f ncrbck.f ncropn.f
+
+
+
+
+
+
+
+
 
 
 
