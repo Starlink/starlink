@@ -592,6 +592,12 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			if (fn->length() != 0)
 			    BitmapImage::setInfo (BitmapImage::INPUTFILENAME,
 						  fn);
+			if (b.ofile_type.length() == 0)
+			{
+			    b.ofile_type = BitmapImage::defaultBitmapImageFormat;
+			    cerr << "Warning: unspecified image format.  Selecting default ("
+				 << b.ofile_type << ")\n";
+			}
 			if (b.ofile_name.length() == 0)
 			{
 			    char fn[100];
@@ -791,6 +797,18 @@ bool process_special (string specialString, Bitmap* bitmap, bitmap_info& b)
 			    Bitmap::cropDefault (side, dimen, absolute);
 			bitmap->crop (side, dimen, absolute);
 		    }
+	    }
+	    else if (*s == "imageformat")
+	    {
+		s++;
+		if (s == l.end())
+		    stringOK = false;
+		else
+		{
+		    b.ofile_type = *s;
+		    if (!setDefault)
+			cerr << "Warning: imageformat special should be prefixed with `default'\n";
+		}
 	    }
 	    else
 		stringOK = false;
