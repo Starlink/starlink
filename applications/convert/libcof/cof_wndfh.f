@@ -71,6 +71,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +89,8 @@
 *        Modified to suppress output of AXIS information if the NDF 
 *        has a WCS component or if the FITS extension has usable WCS
 *        information. Added argument PROPEX.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,6 +184,7 @@
 *  Declare and define the NUM_ type conversion functions.
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
+      INCLUDE 'CNF_PAR'
 *.
 
 *  Check the inherited global status.
@@ -258,7 +262,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART,
+                  CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            DSTART,
      :                            DEND, LINEAR, STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -276,7 +281,8 @@
 *  start value.
                ELSE
                   DINCRE = 1.0D0
-                  CALL CON_AXBND( NELM, %VAL( APNTR( I ) ), DSTART,
+                  CALL CON_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            DSTART,
      :                            DEND, STATUS )
                END IF
 
@@ -286,7 +292,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START,
+                  CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            START,
      :                            END, LINEAR, STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -304,7 +311,8 @@
 *  start value.
                ELSE
                   INCREM = 1.0
-                  CALL CON_AXBNR( NELM, %VAL( APNTR( I ) ), START, END,
+                  CALL CON_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            START, END,
      :                            STATUS )
                END IF
             END IF

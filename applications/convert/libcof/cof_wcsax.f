@@ -32,6 +32,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +41,8 @@
 *     14-JUL-1998 (DSB):
 *        Corrected single precision constants passed to AST_PERMMAP to
 *        double precision. 
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -54,6 +57,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'AST_PAR'          ! AST_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER INDF
@@ -157,8 +161,9 @@
                IF( STATUS .EQ. SAI__OK ) THEN                  
 
 *  Map these pixel coordinates into AXIS coordinates.
-                  CALL AST_TRAN1( MAP5, EL, %VAL( IP ), .TRUE., 
-     :                               %VAL( IP ), STATUS )
+                  CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), 
+     :                            .TRUE.,
+     :                               %VAL( CNF_PVAL( IP ) ), STATUS )
                END IF
 
 *  Unmap the Axis Centre array.

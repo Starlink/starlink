@@ -156,6 +156,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     JAB: Jeremy Bailey (AAO)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -202,6 +203,8 @@
 *     21-MAR-2003 (DSB):
 *        Annull error caused by all input pixels being BAD, in order to 
 *        create a FITS file containing all blank pixels.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -310,6 +313,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *.
 
@@ -680,19 +684,23 @@
 *  need a shift of BZERO.  The scaling itself is done by FITSIO (FTPSCL
 *  sets the scale and offset).
             IF ( TYPE .EQ. '_WORD' ) THEN
-               CALL COF_ESCOW( BAD, EL, %VAL( IPNTR ), MINV, MAXV,
+               CALL COF_ESCOW( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         MINV, MAXV,
      :                          BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-               CALL COF_ESCOI( BAD, EL, %VAL( IPNTR ), MINV, MAXV,
+               CALL COF_ESCOI( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         MINV, MAXV,
      :                          BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-               CALL COF_ESCOR( BAD, EL, %VAL( IPNTR ), MINV, MAXV,
+               CALL COF_ESCOR( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         MINV, MAXV,
      :                          BSCALE, BZERO, STATUS )
 
             ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL COF_ESCOD( BAD, EL, %VAL( IPNTR ), MINV, MAXV,
+               CALL COF_ESCOD( BAD, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                         MINV, MAXV,
      :                          BSCALE, BZERO, STATUS )
 
             END IF
@@ -792,23 +800,28 @@
 *  determine whether or not scaling was required).  The arrays may have
 *  bad pixels.
             IF ( BPIN .EQ. 8 ) THEN
-               CALL FTPPNB( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL8,
+               CALL FTPPNB( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      NULL8,
      :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 16 ) THEN
-               CALL FTPPNI( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL16,
+               CALL FTPPNI( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      NULL16,
      :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 32 ) THEN
-               CALL FTPPNJ( FUNIT, 0, 1, EL, %VAL( IPNTR ), NULL32,
+               CALL FTPPNJ( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      NULL32,
      :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -32 ) THEN
-               CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_32,
+               CALL FTPPNE( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      NUL_32,
      :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -64 ) THEN
-               CALL FTPPND( FUNIT, 0, 1, EL, %VAL( IPNTR ), NUL_64,
+               CALL FTPPND( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      NUL_64,
      :                      FSTAT )
             END IF
 
@@ -833,19 +846,24 @@
 *  BITPIX (the non-standard values were needed to determine whether or
 *  not scaling was required).
             IF ( BPIN .EQ. 8 ) THEN
-               CALL FTPPRB( FUNIT, 0, 1, EL, %VAL( IPNTR ), FSTAT )
+               CALL FTPPRB( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 16 ) THEN
-               CALL FTPPRI( FUNIT, 0, 1, EL, %VAL( IPNTR ), FSTAT )
+               CALL FTPPRI( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. 32 ) THEN
-               CALL FTPPRJ( FUNIT, 0, 1, EL, %VAL( IPNTR ), FSTAT )
+               CALL FTPPRJ( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -32 ) THEN
-               CALL FTPPRE( FUNIT, 0, 1, EL, %VAL( IPNTR ), FSTAT )
+               CALL FTPPRE( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      FSTAT )
 
             ELSE IF ( BPIN .EQ. -64 ) THEN
-               CALL FTPPRD( FUNIT, 0, 1, EL, %VAL( IPNTR ), FSTAT )
+               CALL FTPPRD( FUNIT, 0, 1, EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                      FSTAT )
 
             END IF
 

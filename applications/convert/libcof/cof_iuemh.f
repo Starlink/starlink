@@ -86,6 +86,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +95,8 @@
 *     18-FEB-1998 (DSB):
 *        Corrected constant "0" used as nullval argument to FTGCVx so that
 *        it has the required type (eg "0", "0.0" or "0.0D0" ).
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,6 +112,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -357,15 +361,15 @@
 *  for the chosen type.  This should be _REAL.
          IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADI,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADR,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IORDER, LBND, EL, VAL__BADD,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE
             STATUS = SAI__ERROR
@@ -416,7 +420,7 @@
 *  values.
          WVALUE = 0
          CALL FTGCVI( FUNIT, COLNUM, IORDER, LBND, EL, WVALUE,
-     :                %VAL( WPNTR ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
 
 *  Map the input array component with the desired data type.  Any type
 *  conversion will be performed by the FITSIO array-reading routine.
@@ -425,7 +429,8 @@
 
 *  Transfer the most-significant IUE quality flags across to the NDF's
 *  QUALITY component.  
-         CALL COF_IUEQ( EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ), STATUS )
+         CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Tidy up the workspace and quality.
          CALL PSX_FREE( WPNTR, STATUS )
@@ -539,10 +544,11 @@
 *  Created the spaced array using the appropriate data type.
          IF ( ATYPE .EQ. '_REAL' ) THEN
             CALL CON_SSAZR( EL, DBLE( STEPW ), DBLE( STARTW ),
-     :                      %VAL( PNTR( 1 ) ), STATUS )
+     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL CON_SSAZD( EL, DSTEPW, DSTARW, %VAL( PNTR( 1 ) ),
+            CALL CON_SSAZD( EL, DSTEPW, DSTARW, 
+     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                      STATUS )
 
          END IF
@@ -631,27 +637,32 @@
 *  let's be defensive in case there are revisions.
                      IF ( CTYPE .EQ. '_UBYTE' ) THEN
                         CALL FTGCVB( FUNIT, COLNUM, IORDER, LBND, EL,
-     :                               VAL__BADUB, %VAL( PNTR( 1 ) ), BAD,
+     :                               VAL__BADUB, 
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
                      ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                         CALL FTGCVI( FUNIT, COLNUM, IORDER, LBND, EL,
-     :                               VAL__BADW, %VAL( PNTR( 1 ) ), BAD,
+     :                               VAL__BADW, 
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGCVJ( FUNIT, COLNUM, IORDER, LBND, EL,
-     :                               VAL__BADI, %VAL( PNTR( 1 ) ), BAD,
+     :                               VAL__BADI, 
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                         CALL FTGCVE( FUNIT, COLNUM, IORDER, LBND, EL,
-     :                               VAL__BADR, %VAL( PNTR( 1 ) ), BAD,
+     :                               VAL__BADR, 
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
       
                      ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                         CALL FTGCVD( FUNIT, COLNUM, IORDER, LBND, EL,
-     :                               VAL__BADD, %VAL( PNTR( 1 ) ), BAD,
+     :                               VAL__BADD, 
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
      :                               FSTAT )
 
                      END IF
@@ -688,11 +699,13 @@
                         IF ( ATYPE .EQ. '_REAL' ) THEN
                            CALL CON_SSAZR( EL, DBLE( STEPW ),
      :                                     DBLE( STARTW ),
-     :                                     %VAL( PNTR( 1 ) ), STATUS )
+     :                                     
+     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
                         ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
                            CALL CON_SSAZD( EL, DSTEPW, DSTARW,
-     :                                     %VAL( PNTR( 1 ) ), STATUS )
+     :                                     
+     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
                         END IF
 

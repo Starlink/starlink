@@ -110,6 +110,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -119,6 +120,8 @@
 *        More information about the format has come to light.  Combine
 *        each set of three rows (data, error, exposure) into a single
 *        NDF.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,6 +137,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -249,7 +253,8 @@
          CALL AIF_GETVM( '_CHAR*80', 1, TNHEAD, HPNTR, WKLOC, STATUS )
 
 *  Transfer the headers from the primary HDU to the workspace.
-         CALL COF_RHEAD( FUNIT, FILE, NHEAD, TNHEAD, %VAL( HPNTR ),
+         CALL COF_RHEAD( FUNIT, FILE, NHEAD, TNHEAD, 
+     :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   STATUS, %VAL( 80 ) )
 
       END IF
@@ -567,23 +572,23 @@
 *  for the chosen type.
          IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL FTGCVB( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADUB,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL FTGCVI( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADW,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
          ELSE
             STATUS = SAI__ERROR
@@ -669,7 +674,8 @@
 *  appearance of being one of a series of simple FITS files.  The
 *  merged headers are written to the FITS extension if one is desired.
                CALL COF_WGBFE( FUNIT, FILE, NDFE, PROFIT, IOBS, NFIELD,
-     :                         USED, NHEAD, TNHEAD, %VAL( HPNTR ),
+     :                         USED, NHEAD, TNHEAD, 
+     :                         %VAL( CNF_PVAL( HPNTR ) ),
      :                         STATUS, %VAL( 80 ) )
          END IF
 
@@ -677,7 +683,8 @@
 *  name and HDU number (1) for the heading, and the length of the FITS
 *  header card as the array is mapped.
             IF ( LOGHDR )
-     :        CALL COF_HALOG( FDL, TNHEAD, %VAL( HPNTR ), FILE, 1,
+     :        CALL COF_HALOG( FDL, TNHEAD, %VAL( CNF_PVAL( HPNTR ) ), 
+     :                        FILE, 1,
      :                        STATUS, %VAL( 80 ) )
 
 *  Tidy the NDF and locators need to make the extension.

@@ -68,11 +68,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 23 (MJC):
 *        Original version.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -219,23 +223,23 @@
 *  for the chosen type.
       IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, VAL__BADUB,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE
          STATUS = SAI__ERROR
@@ -295,36 +299,41 @@
       IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBUB, WPNTR, STATUS )
          CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, VAL__BADUB,
-     :                %VAL( WPNTR ), BAD, FSTAT )
-         CALL VEC_ABSUB( .FALSE., EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
+         CALL VEC_ABSUB( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                   IERR, NERR, STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBW, WPNTR, STATUS )
          CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
-     :                %VAL( WPNTR ), BAD, FSTAT )
-         CALL VEC_ABSW( .FALSE., EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
+         CALL VEC_ABSW( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
       
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBI, WPNTR, STATUS )
          CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
-     :                %VAL( WPNTR ), BAD, FSTAT )
-         CALL VEC_ABSI( .FALSE., EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
+         CALL VEC_ABSI( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
       
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBR, WPNTR, STATUS )
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
-     :                %VAL( WPNTR ), BAD, FSTAT )
-         CALL VEC_ABSR( .FALSE., EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
+         CALL VEC_ABSR( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
       
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL PSX_MALLOC( EL * VAL__NBD, WPNTR, STATUS )
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
-     :                %VAL( WPNTR ), BAD, FSTAT )
-         CALL VEC_ABSD( .FALSE., EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ),
+     :                %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
+         CALL VEC_ABSD( .FALSE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                  %VAL( CNF_PVAL( PNTR( 1 ) ) ),
      :                  IERR, NERR, STATUS )
       
       ELSE
@@ -376,7 +385,7 @@
 *  values.
       BVALUE = 0
       CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, BVALUE,
-     :             %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :             %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
 *  Unmap the error array.
       CALL NDF_UNMAP( NDF, 'Quality', STATUS )
@@ -414,11 +423,11 @@
 *  for the chosen type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
-     :                %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
       
       ELSE
          STATUS = SAI__ERROR
@@ -512,23 +521,28 @@
 *  for the chosen type.
                IF ( CTYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGCVB( FUNIT, COLNUM, 1, 1, EL, VAL__BADUB,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                   CALL FTGCVI( FUNIT, COLNUM, 1, 1, EL, VAL__BADW,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGCVJ( FUNIT, COLNUM, 1, 1, EL, VAL__BADI,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                   CALL FTGCVE( FUNIT, COLNUM, 1, 1, EL, VAL__BADR,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
       
                ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGCVD( FUNIT, COLNUM, 1, 1, EL, VAL__BADD,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
       
                END IF
 

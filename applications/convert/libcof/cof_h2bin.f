@@ -55,6 +55,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,8 @@
 *     12-MAR-2002 (AJC):
 *        Correct CRDNM for TDIMn card error message.
 *        Add string length to dimensions in TDIMn cards for _CHAR arrays
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,6 +176,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
+      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 
 *.
 
@@ -537,7 +541,8 @@
                  ELSE
 
 *  Copy the mapped value to the binary table.
-                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                    CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
+     :                           %VAL( CNF_PVAL( OPNTR ) ),
      :                           FSTAT, %VAL( STRLEN ) )
                  END IF
 
@@ -658,7 +663,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ), 
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_BTOW( VAL__BADB ), FSTAT )
                   ROUTIN = 'FTPCNI'
                END IF
@@ -672,7 +678,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNB( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCNB( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_UBTOI( VAL__BADUB ), FSTAT )
                   ROUTIN = 'FTPCNB'
                END IF
@@ -686,7 +693,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCNI( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADW, FSTAT )
                   ROUTIN = 'FTPCNI'
                END IF
@@ -701,7 +709,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         NUM_UWTOI( VAL__BADUW ), FSTAT )
                   ROUTIN = 'FTPCNJ'
                END IF
@@ -715,7 +724,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCNJ( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADI, FSTAT )
                   ROUTIN = 'FTPCNJ'
                END IF
@@ -736,7 +746,8 @@
      :                            CVALUE( :STRLEN ), FSTAT )
                   END DO
                ELSE
-                  CALL FTPCLS( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         FSTAT, %VAL( STRLEN ) )
                END IF
                ROUTIN = 'FTPCLS'
@@ -750,7 +761,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCNE( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCNE( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADR, FSTAT )
                   ROUTIN = 'FTPCNE'
                END IF
@@ -764,7 +776,8 @@
                   CALL FTPCLU( FUNIT, 1, 1, 1, EL, FSTAT )
                   ROUTIN = 'FTPCLU'
                ELSE
-                  CALL FTPCND( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCND( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         VAL__BADD, FSTAT )
                   ROUTIN = 'FTPCND'
                END IF
@@ -783,7 +796,8 @@
                      CALL FTPCLL( FUNIT, 1, 1, LEL, 1, .TRUE., FSTAT )
                   END DO
                ELSE
-                  CALL FTPCLL( FUNIT, 1, 1, 1, EL, %VAL( OPNTR ),
+                  CALL FTPCLL( FUNIT, 1, 1, 1, EL, 
+     :                         %VAL( CNF_PVAL( OPNTR ) ),
      :                         FSTAT )
                   ROUTIN = 'FTPCLL'
                END IF
@@ -1324,7 +1338,7 @@
 
 *  Copy the mapped value to the binary table.
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        FSTAT, %VAL( STRLEN ) )
                               END IF
 
@@ -1471,7 +1485,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNI( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        NUM_BTOW( VAL__BADB ),
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNI'
@@ -1489,7 +1503,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNB( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ),
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        NUM_UBTOI( VAL__BADUB ),
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNB'
@@ -1507,7 +1521,8 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNI( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), VAL__BADW,
+     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        VAL__BADW,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNI'
                               END IF
@@ -1524,7 +1539,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNJ( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ),
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        NUM_UWTOI( VAL__BADUW ),
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNJ'
@@ -1542,7 +1557,8 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNJ( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), VAL__BADI,
+     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        VAL__BADI,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNJ'
                               END IF
@@ -1566,7 +1582,7 @@
                                  END DO
                               ELSE
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        FSTAT, %VAL( STRLEN ) )
                               END IF
                               ROUTIN = 'FTPCLS'
@@ -1583,7 +1599,8 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNE( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), VAL__BADR,
+     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        VAL__BADR,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNE'
                               END IF
@@ -1600,7 +1617,8 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCND( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), VAL__BADD,
+     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        VAL__BADD,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCND'
                               END IF
@@ -1622,7 +1640,8 @@
                                  END DO
                               ELSE
                                  CALL FTPCLL( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( OPNTR ), FSTAT )
+     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        FSTAT )
                                  ROUTIN = 'FTPCLL'
                               END IF
 

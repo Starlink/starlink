@@ -77,6 +77,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -84,6 +85,8 @@
 *        Original version.
 *     1997 April-May  (MJC):
 *        Various fixes as learnt more about MWCS.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF                ! NDF identifier
@@ -243,7 +247,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART( I ),
+                  CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            DSTART( I ),
      :                            DEND( I ), LINEAR( I ), STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -261,7 +266,8 @@
 *  start value.
                ELSE
                   DINCRE( I ) = 1.0D0
-                  CALL CON_AXBND( NELM, %VAL( APNTR( I ) ), DSTART( I ),
+                  CALL CON_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            DSTART( I ),
      :                            DEND( I ), STATUS )
                END IF
 
@@ -271,7 +277,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START( I ),
+                  CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            START( I ),
      :                            END( I ), LINEAR( I ), STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
@@ -289,7 +296,8 @@
 *  start value.
                ELSE
                   INCREM( I ) = 1.0
-                  CALL CON_AXBNR( NELM, %VAL( APNTR( I ) ), START( I ),
+                  CALL CON_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                            START( I ),
      :                            END( I ), STATUS )
                END IF
             END IF
@@ -758,7 +766,8 @@
 *  Append the specN attributes to the WAT1_nnn headers.
                      CALL COI_WMS5D( IMDESC, 1, 1, 2, DSTART, DINCRE,
      :                               0.0, VAL__BADR, VAL__BADR,
-     :                               1.0, 0.0, NELM, %VAL( APNTR( 1 ) ),
+     :                               1.0, 0.0, NELM, 
+     :                               %VAL( CNF_PVAL( APNTR( 1 ) ) ),
      :                               HEADNO, STATUS )
 
                   ELSE
@@ -766,7 +775,8 @@
 *  Append the specN attributes to the WAT1_nnn headers.
                      CALL COI_WMS5R( IMDESC, 1, 1, 2, START, INCREM,
      :                               0.0, VAL__BADR, VAL__BADR,
-     :                               1.0, 0.0, NELM, %VAL( APNTR( 1 ) ),
+     :                               1.0, 0.0, NELM, 
+     :                               %VAL( CNF_PVAL( APNTR( 1 ) ) ),
      :                               HEADNO, STATUS )
                   END IF
 

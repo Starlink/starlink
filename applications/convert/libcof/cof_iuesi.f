@@ -97,6 +97,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +105,8 @@
 *        Original version.
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV to argument list for COF_STYPE call.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -119,6 +122,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -298,23 +302,23 @@
 *  bad pixels.
          IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL FTGPVB( FUNIT, 0, 1, EL, VAL__BADUB,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL FTGPVI( FUNIT, 0, 1, EL, VAL__BADW,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL FTGPVJ( FUNIT, 0, 1, EL, VAL__BADI,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGPVE( FUNIT, 0, 1, EL, VAL__BADR,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGPVD( FUNIT, 0, 1, EL, VAL__BADD,
-     :                   %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD, FSTAT )
 
          END IF
 
@@ -409,7 +413,8 @@
 *  Read the IMAGE extension array into the workspace.  By definition
 *  there can be no bad values (hence fifth argument is zero).
       WVALUE = 0
-      CALL FTGPVI( FUNIT, 0, 1, EL, WVALUE, %VAL( WPNTR ), BAD, FSTAT )
+      CALL FTGPVI( FUNIT, 0, 1, EL, WVALUE, %VAL( CNF_PVAL( WPNTR ) ), 
+     :             BAD, FSTAT )
 
 *  Map the input array component with the desired data type.  Any type
 *  conversion will be performed by the FITSIO array-reading routine.
@@ -418,7 +423,8 @@
 
 *  Transfer the most-significant IUE quality flags across to the NDF's
 *  QUALITY component.  
-      CALL COF_IUEQ( EL, %VAL( WPNTR ), %VAL( PNTR( 1 ) ), STATUS )
+      CALL COF_IUEQ( EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :               %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Tidy up the workspace and quality.
       CALL DAT_ANNUL( WLOC, STATUS )

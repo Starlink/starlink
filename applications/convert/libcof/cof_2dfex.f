@@ -57,6 +57,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,6 +74,8 @@
 *     1998 August 13 (MJC):
 *        No longer writes TNULLn keywords for non-integer columns,
 *        so as not to violate the FITS standard.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +90,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       CHARACTER * ( * ) SNAME
@@ -548,7 +552,8 @@
 *     :                          %VAL( STRLEN ) )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLS( FUNIT, I, 1, 1, EL, %VAL( OPNTR ),
+                CALL FTPCLS( FUNIT, I, 1, 1, EL, 
+     :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       FSTAT, %VAL( STRLEN ) )
 
 *  Unmap the component.
@@ -579,7 +584,8 @@
 
 *  Transfer the values to the binary-table column.  Replace Starlink bad
 *  values with NaNs.
-                CALL FTPCND( FUNIT, I, 1, 1, EL, %VAL( OPNTR ),
+                CALL FTPCND( FUNIT, I, 1, 1, EL, 
+     :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       VAL__BADD, FSTAT )
 
 *  Unmap the component.
@@ -589,11 +595,13 @@
 *  bad values.  
              ELSE
                 CALL PSX_CALLOC( EL, '_DOUBLE', OPNTR, STATUS )
-                CALL CON_CONSD( VAL__BADD, EL, %VAL( OPNTR ), STATUS )
+                CALL CON_CONSD( VAL__BADD, EL, 
+     :                          %VAL( CNF_PVAL( OPNTR ) ), STATUS )
 
 *  Transfer the bad values to the binary-table column.  Replace
 *  Starlink bad values with NaNs.
-                CALL FTPCND( FUNIT, I, 1, 1, EL, %VAL( OPNTR ),
+                CALL FTPCND( FUNIT, I, 1, 1, EL, 
+     :                       %VAL( CNF_PVAL( OPNTR ) ),
      :                       VAL__BADD, FSTAT )
 
 *  Release the workspace.
@@ -612,7 +620,8 @@
      :                         STATUS )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLJ( FUNIT, I, 1, 1, EL, %VAL( OPNTR ), FSTAT )
+                CALL FTPCLJ( FUNIT, I, 1, 1, EL, 
+     :                       %VAL( CNF_PVAL( OPNTR ) ), FSTAT )
 
 *  Unmap the component.
                 CALL DAT_UNMAP( CLOC, STATUS )
@@ -638,7 +647,8 @@
      :                         STATUS )
 
 *  Transfer the values to the binary-table column.
-                CALL FTPCLI( FUNIT, I, 1, 1, EL, %VAL( OPNTR ), FSTAT )
+                CALL FTPCLI( FUNIT, I, 1, 1, EL, 
+     :                       %VAL( CNF_PVAL( OPNTR ) ), FSTAT )
 
 *  Unmap the component.
                 CALL DAT_UNMAP( CLOC, STATUS )

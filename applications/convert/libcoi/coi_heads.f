@@ -56,6 +56,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,8 @@
 *     1997 November 23 (MJC):
 *        Propagate blank lines from the IRAF history records.  Wrap
 *        comments at 72.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +89,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER IMDESC
@@ -234,7 +238,8 @@
 *  be passed for this to work under UNIX.  It has no effect under VMS.
       IF ( ADFITS ) THEN
          CALL CON_WFMAN( XLINES, MDIM, DIMS, BITPIX,
-     :                   %VAL( FIPNTR( 1 ) ), STATUS, %VAL( FITSLN ) )
+     :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS, 
+     :                   %VAL( FITSLN ) )
 
          IF ( STATUS .NE. SAI__OK) GOTO 999
       
@@ -281,7 +286,7 @@
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
                CALL CON_PCARD( CARD, NFITSA, XLINES,
-     :                         %VAL( FIPNTR( 1 ) ), STATUS,
+     :                         %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                         %VAL( FITSLN ) )
 
 *  Keep a tally of the entries used in the FITS airlock.
@@ -321,7 +326,8 @@
 
 *  Put it into the FITS extension.  Note again that the length of the
 *  mapped character array is passed by value for UNIX.
-         CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ),
+         CALL CON_PCARD( CARD, LINENO, XLINES, 
+     :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ),
      :                   STATUS, %VAL( FITSLN ) )
          LINENO = LINENO + 1
       END DO
@@ -338,7 +344,8 @@
      :        /' from the IRAF image'
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, 
+     :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
@@ -365,7 +372,8 @@
       END IF
       
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, 
+     :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( FITSLN ) )
 
 *  Report the HISTORY line in verbose-message mode.
@@ -381,7 +389,8 @@
       CARD = 'END'
 
 *  Add the line to the image.
-      CALL CON_PCARD( CARD, LINENO, XLINES, %VAL( FIPNTR( 1 ) ), STATUS,
+      CALL CON_PCARD( CARD, LINENO, XLINES, 
+     :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
      :                %VAL( FITSLN ) )
 
 *  Report the line in verbose-message mode.

@@ -39,6 +39,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Original version.
 *     2002 March 13 (AJC):
 *        Adjust dimensions for multi-dimensional CHARACTER arrays
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -61,6 +64,7 @@
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -257,27 +261,27 @@
 *  verbatim.
             IF ( CTYPE .EQ. '_UBYTE' ) THEN
                CALL FTGCVB( FUNIT, COLNUM, 1, 1, NV, VAL__BADUB,
-     :                      %VAL( PNTR ), BAD, FSTAT )
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
 
             ELSE IF ( CTYPE .EQ. '_WORD' ) THEN
                CALL FTGCVI( FUNIT, COLNUM, 1, 1, NV, VAL__BADW,
-     :                      %VAL( PNTR ), BAD, FSTAT )
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
       
             ELSE IF ( CTYPE .EQ. '_INTEGER' ) THEN
                CALL FTGCVJ( FUNIT, COLNUM, 1, 1, NV, VAL__BADI,
-     :                      %VAL( PNTR ), BAD, FSTAT )
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
       
             ELSE IF ( CTYPE .EQ. '_REAL' ) THEN
                CALL FTGCVE( FUNIT, COLNUM, 1, 1, NV, VAL__BADR,
-     :                      %VAL( PNTR ), BAD, FSTAT )
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
       
             ELSE IF ( CTYPE .EQ. '_DOUBLE' ) THEN
                CALL FTGCVD( FUNIT, COLNUM, 1, 1, NV, VAL__BADD,
-     :                      %VAL( PNTR ), BAD, FSTAT )
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT )
       
             ELSE IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
                CALL FTGCVS( FUNIT, COLNUM, 1, 1, NV, ' ',
-     :                      %VAL( PNTR ), BAD, FSTAT,
+     :                      %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT,
      :                      %VAL( 1 ), %VAL( WIDTH ) )
       
             END IF

@@ -109,6 +109,7 @@
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -130,6 +131,8 @@
 *     30-AUG-2000 (AJC):
 *        Correct description FITS_EXT_n not NDF_EXT_n
 *        Add separate FITS unit numbers in call to COF_WRTAB.
+*     2004 September 9 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -146,6 +149,7 @@
       INCLUDE 'NDF_PAR'          ! NDF__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER FUNIT
@@ -500,7 +504,8 @@
 
 *  Create the mask and assign .TRUE. to all of its elements.
                CALL PSX_CALLOC( NHEAD, '_LOGICAL', REPNTR, STATUS )
-               CALL CON_CONSL( .TRUE., NHEAD, %VAL( REPNTR ), STATUS )
+               CALL CON_CONSL( .TRUE., NHEAD, 
+     :                         %VAL( CNF_PVAL( REPNTR ) ), STATUS )
             END IF
 
 *  Deal with the NDF-style history records in the headers, assuming the
@@ -510,7 +515,8 @@
 *  This is to avoid growing duplication of potentially bulky text, if
 *  using FITS files with Starlink tasks.
             IF ( EXNDF .AND. COMP .EQ. 'Data' ) THEN
-               CALL COF_CHISR( FUNIT, NDFE, NHEAD, %VAL( REPNTR ),
+               CALL COF_CHISR( FUNIT, NDFE, NHEAD, 
+     :                         %VAL( CNF_PVAL( REPNTR ) ),
      :                         STATUS )
             END IF
 
@@ -518,7 +524,7 @@
 *  headers for the random groups will appear in each group NDF.
             IF ( WRTEXT ) THEN
                CALL COF_WFEXF( FUNIT, NDFE, 0, 0, FILE, NHEAD,
-     :                         %VAL( REPNTR ), STATUS )
+     :                         %VAL( CNF_PVAL( REPNTR ) ), STATUS )
             END IF
 
 *  Free the work space.
@@ -558,23 +564,28 @@
 *  have bad pixels.
                IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL FTGPVB( FUNIT, 0, 1, EL, VAL__BADUB,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL FTGPVI( FUNIT, 0, 1, EL, VAL__BADW,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL FTGPVJ( FUNIT, 0, 1, EL, VAL__BADI,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL FTGPVE( FUNIT, 0, 1, EL, VAL__BADR,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                   CALL FTGPVD( FUNIT, 0, 1, EL, VAL__BADD,
-     :                         %VAL( PNTR( 1 ) ), BAD, FSTAT )
+     :                         %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                         BAD, FSTAT )
 
                END IF
 
