@@ -117,9 +117,25 @@
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
+*  Trap the Axis_<n> item
+      IF ( (ITEM(1:5) .EQ. 'Axis_') .AND. (ITEM(7:).LE.' ') ) THEN
+
+*    Locate object to be got
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC, STATUS )
+
+*    Copy components
+        CALL ADI1_CCA2HC( ARGS(4), 'Label', CLOC, 'LABEL', STATUS )
+        CALL ADI1_CCA2HC( ARGS(4), 'Units', CLOC, 'UNITS', STATUS )
+        CALL ADI1_CCA2HL( ARGS(4), 'Normalised', CLOC,
+     :                    'NORMALISED', STATUS )
+        CALL ADI1_CCA2HT( ARGS(4), 'Data', CLOC, 'DATA_ARRAY', STATUS )
+        CALL ADI1_CCA2HT( ARGS(4), 'Width', CLOC, 'WIDTH', STATUS )
+        CALL ADI1_CCA2HT( ARGS(4), 'LoWidth', CLOC, 'LOWIDTH', STATUS )
+        CALL ADI1_CCA2HT( ARGS(4), 'HiWidth', CLOC, 'HIWIDTH', STATUS )
+
 *  Trap the Axis_<n>_SpacedData item
-      IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
-     :     (ITEM(8:17).EQ.'SpacedData') ) THEN
+      ELSE IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
+     :          (ITEM(8:17).EQ.'SpacedData') ) THEN
 
 *    Locate object to be got
         CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Data', .TRUE.,
