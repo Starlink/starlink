@@ -128,7 +128,7 @@
       LOGICAL CHR_ISNAM          ! CHR routine to test whether the
                                  ! string is a valid filename
       EXTERNAL CHR_LEN
-      LOGICAL CHR_LEN            ! CHR routine to find the length of
+      INTEGER CHR_LEN            ! CHR routine to find the length of
                                  ! a string 
 
 *  Local Variables:
