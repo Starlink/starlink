@@ -1,0 +1,2524 @@
+<?xml version="1.0"?>
+<!DOCTYPE ssn PUBLIC
+              "-//Starlink//DTD Starlink SSN 0.7 (XML)//EN"
+              "ssn-xml-0.7.dtd" [
+  <!ENTITY autoconfman 
+           "http://www.gnu.org/software/autoconf/manual/autoconf-2.57">
+  <!ENTITY autoconfhtml "&autoconfman;/html_node">
+  <!ENTITY automakeman "http://www.gnu.org/software/automake/manual">
+  <!ENTITY automakehtml "&automakeman;/html_node">
+]>
+
+<ssn>
+  <docinfo>
+    <title>The Starlink Build System</title>
+    <authorlist>
+      <author id="nxg">Norman Gray</author>
+    </authorlist>
+    <docnumber>78</docnumber>
+    <history>
+      <version number="0" date="26-Feb-2004" author="nxg">
+        <px>Initial draft release: $Revision$</px>
+      </version>
+    </history>
+  </docinfo>
+
+  <docbody>
+    <abstract>
+      <px>An introduction to the Starlink build system.  At present, this
+        document covers only the configuration and build aspects of
+        the system, but it should expand to cover tagging, branching,
+        and other source maintenance patterns as well.</px>
+
+      <px><strong>This is a draft document: $Id$</strong></px>
+    </abstract>
+
+    <sect id="intro" export="export">
+      <subhead>
+        <title>Introduction</title>
+      </subhead>
+
+      <p><strong>This is a draft document</strong></p>
+
+      <p>The Starlink build system consists of
+        <ul>
+          <li>
+            <p>build tools, consisting of modified versions of the GNU
+              autotools <code>autoconf</code> <code>automake</code>
+              and <code>libtool</code>;</p>
+          </li>
+          <li>
+            <p>configuration and bootstrap code, consisting of the
+              <code>starconf</code> system and the scripts at the top
+              level of the Starlink source tree; and</p>
+          </li>
+          <li>
+            <p>the conventions for branching and tagging which are at
+              present only documented in the wiki, on the pages
+              <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/BranchingPolicy</url> and <url>http://wiki.starlink.ac.uk/twiki/bin/view/Starlink/CvsTagging</url>.</p>
+          </li>
+        </ul>
+      </p>
+
+      <p>The build system is intended to cover two main cases.
+        Firstly, it covers the problem of building code directly from
+        the CVS repository, both when building the entire software set
+        from scratch (as during the nightly test build for example),
+        and when working on a development version of a particular
+        component, within the context of an otherwise built software
+        set.  This includes the problem of abiding by long-standing
+        Starlink conventions on documentation, auxiliary tools and
+        installation locations.  The build system at present is
+        concerned primarily with the `classic' applications: the
+        large volume of legacy Starlink code which, though it is no
+        longer being developed, must still be maintained and be
+        buildable by the community.  It has no contact with the large
+        volume of Java code, apart from having the same tagging and
+        branching conventions, since the building of the Java
+        applications is currently completely handled by the
+        <code>ant</code> system.</p>
+
+      <p>Each component in the CVS repository is intended to be built
+        separately, as opposed to being built only by a make running
+        at the top of the tree.  Many components require other
+        components to be installed, and the role of the top-level
+        makefile is to manage these dependencies, when it is necessary
+        to build the entire tree from scratch.  After a fresh CVS
+        checkout, and presuming that any dependencies are in place,
+        each component in the tree should be built with the sequence
+        of commands
+        <verbatim>
+% ./bootstrap
+% ./configure
+% make
+% make install
+        </verbatim>There is an alternative <code>make
+          install-manifest</code> available in the generated
+        makefiles.  This does the same as <code>make install</code>,
+        but additionally creates a manifest file which is then installed in
+        the <code>manifests/</code> subdirectory under the Starlink
+        installation directory.</p>
+
+      <p>Secondly, it handles the construction of portable source-code
+        sets, so that individual components can be built by users,
+        from source, as straightforwardly as possible.  Since we are
+        using the GNU autotools, much of this functionality comes for
+        free, and we simply have to do the relatively small amount of
+        configuration work required to ensure that the source set is
+        complete (rather than requiring non-distributed build tools)
+        and has clearly expressed dependencies between packages.  It
+        is an absolute requirement that the build process for users
+        must consist of no more than
+        <verbatim>
+% ./configure
+% make
+% make install
+        </verbatim>
+        with the usual options available for <code>./configure</code>
+        and the usual relocations available for GNU-style makefiles.</p>
+
+      <p>The system does not cover the precise mechanism by which these
+        tarballs are distributed to users, nor the means by which they
+        are informed of, or helped to satisfy, the dependencies
+        between components; but in generating manifests and assembling
+        the component dependency graph, it provides the information
+        which such a distribution portal would need.</p>
+    </sect>
+
+    <sect id="tools" export="export">
+      <subhead>
+        <title>Tools</title>
+      </subhead>
+
+      <p>This section is concerned with the tools which make up the 
+        Starlink build system.  There are generally very few
+        adjustments you need to make to the program source code
+        (though the autotools can help you manage such things as
+        installation directories and platform dependencies), and the
+        changes you will make are to the auxiliary files which manage
+        the build, most prominently the <code>configure.ac</code> file
+        which organises the configuration, and the
+        <code>Makefile.am</code> file which controls generating the
+        makefile which does the work.</p>
+
+      <p>The build system is based on the GNU `autotools', autoconf,
+        automake and libtool.  We use (at the time of writing) an
+        unmodified libtool, a moderately extended autoconf, and an
+        extended and customised automake.  The description below
+        explains the use of these tools as modified; see <ref
+          id="gnutools"/> for details of the differences from the
+        stock autotools.</p>
+
+      <p>Though the autoconf program is installed without any Starlink
+        extensions, there are Starlink extensions available, through the
+        standard autoconf extension mechanism.  You don't need to worry
+        about the rather intricate details of how this works, but if
+        you're curious, or there does appear to be a problem, the gories
+        are as follows.  The macros are in a file
+        <code>starconf.m4</code>, which the <code>starconf</code>
+        program (see <ref id="starconf"/>) adds to the current
+        directory, and copies to <code>acinclude.m4</code>.  From there,
+        the macros are scooped into <code>aclocal.m4</code> by the
+        <code>aclocal</code> program, and that is what makes them
+        available to autoconf when it is run.  See <ref
+          id="autoreconf"/> for the details of how <code>aclocal</code>
+        runs.</p>
+
+      <subsect id="starconf" export="export">
+        <subhead>
+          <title>Starconf, and the Starlink autoconf macros</title>
+        </subhead>
+
+        <p>The build system consists of a number of components:
+          <dl>
+
+            <dt>The Starlink autotools</dt>
+            <dd>
+              <p>These consist of versions of the GNU autotools, which
+                are part of the Starlink CVS repository, and which are
+                built and installed as part of the top-level bootstrap.
+                They should be installed in <code
+                  type="fspath">/star/buildsupport/bin</code>, or its
+                equivalent if you have installed a set of tools in a
+                different location.  Since they have been extended and
+                customised, they are essential; you cannot build the
+                Starlink collection without them.  These tools are
+                described in some detail in <ref id="tooloverview"/></p>
+            </dd>
+
+            <dt>The Starlink autoconf macros</dt>
+            <dd>
+              <p>The autoconf program which is used is not itself
+                customised for Starlink use.  Instead, autoconf is
+                extended on the fly using the standard autoconf
+                extension mechanism, which consists of placing
+                additional macros in a file <code>acinclude.m4</code>
+                in the build directory, and letting them be
+                incorporated by the application <em>aclocal</em>.</p>
+
+              <p>You don't have to do anything to use these, since the
+                macros are installed in your directory by the
+                <em>starconf</em> application (described below),
+                and the aclocal application is generally executed on
+                your behalf by the <em>starconf</em> application, via
+                the <em>autoreconf</em> application (<ref
+                  id="autoreconf"/>).</p>
+
+              <p>The macros are described in detail in <ref
+                  id="starconfmacros"/>.</p>
+            </dd>
+
+            <dt>starconf</dt>
+            <dd>
+              <p>This is the program which handles installing required
+                macros, and configuring your directory ready to use
+                the build system.  Associated with <em>starconf</em>
+                is the <em>starconf-validate</em> program which checks
+                that your directory is configured correctly, and the
+                program <em>./starconf.status</em>, which unpacks
+                required files, and allows you to make the link back
+                to the configuration used to build the software.  All
+                these are described in detail in <ref
+                  id="starconfdetails"/>.</p>
+            </dd>
+
+          </dl>
+        </p>
+
+        <subsubsect id='starconfdetails'>
+          <subhead>
+            <title>Starconf overview</title>
+          </subhead>
+
+          <p>The starconf application does some of the work of
+            ensuring that your build directory is correctly
+            organised.  It does the following:
+            <ul>
+              <li>
+                <p>ensures that you have a <code>./bootstrap</code>
+                  script;</p>
+              </li>
+              <li>
+                <p>ensures that your directory has a copy of the
+                  starconf autoconf macros in the file
+                  <code>starconf.m4</code>, which it unpacks and
+                  immediately copies to the file
+                  <code>acinclude.m4</code>;</p>
+              </li>
+              <li>
+                <p>checks that your <code>configure.ac</code> and
+                  <code>Makefile.am</code> files look at least
+                  plausible by checking, amongst other things, for the
+                  presence of a <code>STAR_DEFAULTS</code> invocation
+                  in the former;</p>
+              </li>
+              <li>
+                <p>creates the script <code>./starconf.status</code>
+                  (which is what does the actual work of unpacking
+                  <code>starconf.m4</code>) and configures it so that
+                  it links back to the starconf installation.</p>
+              </li>
+            </ul>
+          </p>
+
+          <p>The <code>./bootstrap</code> script is `owned' by
+            starconf, and you should not change it, since it will be
+            overritten by starconf if a newer release of starconf
+            includes an updated bootstrap script.  If you <em>do</em>
+            have some pressing reason to change it, then remove the word
+            `original' from the second line of the bootstrap file, which
+            signals to starconf that it should leave the file untouched.</p>
+
+          <p>You need to explicitly run starconf only once, when you
+            first prepare a directory for configuration.  The
+            <code>./bootstrap</code> file which this creates itself
+            runs starconf, so that each time you run the bootstrap
+            script, you run starconf also.  This has no effect unless
+            either the bootstrap script or the macro set has been
+            updated in the starconf installation, in which case starconf
+            will propagate the updates to your directory.
+            The <code>./starconf.status</code> script should be
+            checked into the repository, but its products other than
+            <code>./bootstrap</code> should not be.  The file
+            <code>starconf.m4</code> is the only other product at
+            present, but others may appear in future (see <ref
+              id="developments"/>.</p>
+
+          <p>You might on other occasions run the
+            <code>./starconf.status</code> script.  You will do this
+            firstly to query important locations, such as the location
+            of the starconf templates:
+            <verbatim>
+% ./starconf.status --show buildsupportdata
+/export3/sun/buildsupport/share
+</verbatim>
+            See <kbd>./starconf.status --show --all</kbd> or
+            <kbd>./starconf.status --help</kbd> for the list
+            of all the things which you can show in this way (though
+            be warned that this list is not yet completely stable, and
+            may yet change).</p>
+
+          <p>Some of these variables are `fixed', meaning that they
+            are fixed for a particular installation of starconf (you
+            can in principle have more than one installation of
+            starconf, and choose which one to invoke, but there is
+            unlikely any need for that).  Others are `sticky', meaning
+            that they can be changed, but the value retains its value
+            unless and until it is changed again in future.</p>
+
+          <p>The two `sticky' variables are
+            <code>STARCONF_DEFAULT_PREFIX</code> and
+            <code>STARCONF_DEFAULT_STARLINK</code>.  The first is the
+            default installation prefix of the software you are
+            building; the second is the location of a currently built Starlink
+            tree, which will be used for applications and include
+            files if they are not found under
+            <code>STARCONF_DEFAULT_PREFIX</code>.  The default for
+            each of these was set when starconf was
+            itself installed (see <kbd>./configure --help</kbd> within
+            <code>buildsupport/starconf</code>: having different
+            values for this is one 
+            possible reason why you might have more than one starconf
+            installation), but their value is typically something like
+            <code>/star</code>.   You can change either value by using
+            <code>./starconf.status</code>:
+            <verbatim>
+% ./starconf-status STARCONF_DEFAULT_PREFIX=/my/local/star
+</verbatim>
+            When you configure a particular package, you can set the
+            installation prefix with the <code>--prefix</code> option
+            to <code>./configure</code>, and you can set the location
+            of the `backup' Starlink directory by setting the
+            <code>STARLINK</code> environment variable.  In general,
+            however, we recommend that you do not adjust
+            <code>--prefix</code>, and that you leave the
+            <code>STARLINK</code> variable unset.</p>
+
+          <p>A companion to the starconf application is the
+            <em>starconf-validate</em> application.  When run, this
+            examines the current directory, checking that all required
+            files are present, and checking that you have the correct
+            files checked in to the repository.  The command
+            <kbd>starconf-validate --help</kbd> shows which files are
+            in which category.  Note that this applies only to
+            directories which are fully Starlink applications -- those
+            in the <code>libraries</code> and
+            <code>applications</code> directories; components
+            in the <code>thirdparty</code> tree, on the other hand,
+            have some starconf features such as a
+            <code>component.xml</code> file, but are not valid
+            according to <em>starconf-validate</em>; also `bundle'
+            directories such as <code>libraries/pcs</code>, which have
+            no actual code in them, are not valid in this sense.</p>
+
+          <p>There are templates available for the most important
+            starconf files.  See <ref id="templates"/>.</p>
+
+          <p>The final component of the starconf system is the file
+            <code>component.xml</code>.  This is an XML file
+            containing information about the particular component in
+            the directory.  The information in this file is redundant
+            with some of the information you specify in
+            <code>configure.ac</code>, and so the best way to ensure
+            the two are consistent is to configure
+            <code>component.xml</code> from
+            <code>configure.ac</code>.  To this end, there is a
+            template component.xml.in file in the starconf
+            `buildsupportdata' directory.  When you are preparing a
+            directory to be build with the Starlink tools, copy this
+            <code>template-component.xml.in</code> into the current
+            directory under the name <code>component.xml.in</code>,
+            and fill in those field which are not configured.  See
+            <ref id="componentxml"/> for details.  The files
+            <code>component.xml</code> and
+            <code>component.xml.in</code> should both be
+            checked in.</p>
+
+        </subsubsect>
+
+        <subsubsect id='templates'>
+          <subhead>
+            <title>File templates</title>
+          </subhead>
+
+          <p>There are three templates available as part of the
+            starconf system.  They are located in the starconf
+            `buildsupportdir': given that the starconf application
+            is in your path, you can find this location with
+            <kbd>starconf --show buildsupportdata</kbd>, and if you
+            have a <code>starconf.status</code> script in your local
+            directory, you can find this directory with
+            <kbd>./starconf.status --show buildsupportdata</kbd>.</p>
+
+          <p>The three templates present are
+            <code>template-Makefile.am</code>,
+            <code>template-configure.ac</code> and
+            <code>template-configure.xml.in</code>.</p>
+
+        </subsubsect>
+
+        <subsubsect id='componentxml'>
+          <subhead>
+            <title>The format of the component.xml file</title>
+          </subhead>
+
+          <p>The meaning of the elements in the component.xml DTD is
+            as follows.  The term `component' is used here rather
+            than `package': no great distinction is being drawn
+            here, except that the components within the CVS tree
+            might not be reflected in ultimately distributed packages.
+            <dl>
+              <dt>component/id</dt>
+              <dd>
+                <p>The ID for this component.  This must match the
+                  package name in <code>configure.ac</code>, and is
+                  the name under which the manifest file is
+                  installed.  Let this remain under the control
+                  of <code>configure.ac</code></p>
+              </dd>
+
+              <dt>version</dt>
+              <dd>
+                <p>The version number of this component.  This
+                  must match the version number in
+                  <code>configure.ac</code>.</p>
+              </dd>
+
+              <dt>path</dt>
+              <dd>
+                <p>This is the path to this package within the CVS
+                  repository, without any leading slash. Make sure
+                  this is correct, or else the top-level build will
+                  probably fail.</p>
+              </dd>
+
+              <dt>description</dt>
+              <dd>
+                <p>A brief description of the component.</p>
+              </dd>
+
+              <dt>abstract</dt>
+              <dd>
+                <p>A fuller description of the component.</p>
+              </dd>
+
+              <dt>dependencies</dt>
+              <dd>
+                <p>This is the set of component IDs which this
+                  component depends on.  This is managed by the
+                  <code>STAR_DECLARE_DEPENDENCIES</code> macros, and
+                  should not be adjusted by hand.</p>
+              </dd>
+
+              <dt>developers</dt>
+              <dd>
+                <p>This is a non-exhaustive list of those who have
+                  worked on this package.  Little use is made of
+                  this at present, but its use is likely to extend,
+                  for example to be the source of recipients for CVS
+                  commit messages.  The fields within it are
+                  <code>&lt;name&gt;</code>, which is the real name
+                  of the individual; <code>&lt;uname&gt;</code>,
+                  which is the username of the developer on the CVS
+                  system; and <code>&lt;email&gt;</code>, which is
+                  the person's email address.  The last two elements
+                  are not required.</p>
+              </dd>
+
+              <dt>documentation</dt>
+              <dd>
+                <p>A list of SUNs and the like.  At this stage the
+                  format of this element is 
+                  not completely finalised, and it is best to leave
+                  its maintenance to the
+                  <code>STAR_LATEX_DOCUMENTATION</code> macro.</p>
+              </dd>
+
+              <dt>bugreports</dt>
+              <dd>
+                <p>The email address for bug reports.</p>
+              </dd>
+
+              <dt>notes</dt>
+              <dd>
+                <p>Any other notes that might be of interest or utility.</p>
+              </dd>
+
+            </dl></p>
+
+        </subsubsect>
+
+
+      </subsect>
+
+      <subsect id="tooloverview" export="export">
+        <subhead>
+          <title>Overview of the Autotools</title>
+        </subhead>
+
+        <p>The details of the autotools are to be found in their
+          respective manuals, which are available online at
+          <ul>
+            <li>
+              <p><url>&autoconfman;/autoconf.html</url></p>
+            </li>
+            <li>
+              <p><url>&automakeman;/</url></p>
+            </li>
+            <li>
+              <p><url>http://www.gnu.org/software/libtool/manual.html</url></p>
+            </li>
+          </ul>
+          The autoconf manual is relatively clear, once you have a
+          basic idea of what it's trying to do, but it's more
+          effective as a reference manual than as a tutorial.  The
+          automake manual should be regarded as a reference manual
+          only: you might not guess from the manual, that 
+          automake will make your life simpler, rather than full of
+          anguish, suffering and confusion.  It doesn't really matter
+          how good or bad the libtool manual is, since if you discover you
+          have to look at it, you already know your future holds pain,
+          and the manual isn't going to make things better or worse.
+        </p>
+
+        <p>The aim of the notes below is to give you an overview of
+          autoconf and automake functionality, enough to make it
+          possible for you to roughly understand the existing
+          configuration files, and to make it easier to approach the full
+          autoconf and automake documentation.</p>
+
+        <subsubsect id="autoconfoverview">
+          <subhead>
+            <title>Autoconf</title>
+          </subhead>
+
+          <p>We use an extended version of autoconf 2.59.</p>
+
+          <p>The goal of autoconf is to help you make your program
+            portable, by allowing you, at build time, to adapt the
+            program to the facilities available on the machine on
+            which the program is being built.</p>
+
+          <p>You control this through a script called
+            <code>configure.ac</code> (which was called
+            <code>configure.in</code> in older versions of autoconf).
+            The autoconf program produces from this a very portable
+            <code>/bin/sh</code> script called <code>configure</code>,
+            which is distributed as part of your package, and which
+            the person building the package runs as the first part of
+            the <kbd>./configure; make; make install</kbd>
+            incantation.</p>
+
+          <p>The <code>./configure</code> script probes the system it
+            is running on, finding compilers, testing the behaviour of
+            the local unix system, testing whether specific include files
+            exist or not, testing whether required functions are
+            available and working as expected, and managing some
+            configuration by the user, such as allowing them to
+            specify where the package is to be installed.  The script
+            communicates this information to your source code in two
+            ways.  Firstly, you can create template files which are
+            edited by the <code>./configure</code> script.  For
+            example, you might have a version header file
+            <code>version.h.in</code>, containing the line
+            <verbatim>
+const char version[] = "@PACKAGE_VERSION@";
+</verbatim>
+            The configure variable <code>PACKAGE_VERSION</code> is one of those
+            substituted by default, and if this file were listed as
+            one of those to be substituted, by mentioning it in the
+            autoconf macro <code>AC_CONFIG_FILES(version.h)</code>,
+            then a file <code>version.h</code> would be created
+            containing the contents of the <code>version.h.in</code>
+            file with the <code>@PACKAGE_VERSION@</code> substituted by the
+            version number declared within the
+            <code>configure</code> file.</p>
+
+          <p>There are two ways that this information is most
+            typically used, modifying a makefile through a
+            <code>Makefile.in</code> and allowing code to configure
+            itself using <code>config.h</code>.</p>
+
+          <p>A <code>Makefile.in</code> is a skeleton makefile which
+            you might write yourself (though see the discussion of
+            automake in <ref id='automakeoverview'/>).  There is an
+            example of this at the top level of the Starlink build
+            tree.  A typical <code>Makefile.in</code> might include
+            lines like
+            <verbatim>
+SPECIALINSTALLDIR=@prefix@/goodies
+@SET_MAKE@
+LN_S=@LN_S@
+.java.class:
+	@JAVAC@ $<
+src/libcomplicated.a:
+        cd src; $(MAKE) libcomplicated.a
+</verbatim>
+            That, combined with autoconf macros
+            <code>AC_PROG_MAKE_SET</code>,
+            <code>AC_PATH_PROGS(javac)</code> and
+            <code>AC_PROG_LN_S</code>, would allow you to produce a
+            file <code>Makefile</code> which was customised to the
+            local environment, and which had the makefile variable
+            <code>SPECIALINSTALLDIR</code> set to the
+            installation location.</p>
+
+          <p>As well as configuring the makefile, you may also want to
+            configure the source code, so that you can take different
+            actions in your code depending on whether certain
+            functions or headers are available.  We don't use this
+            functionality much at present, but it is part of the point
+            of autoconf.</p>
+
+          <p>This is most
+            often done via a particular configured file,
+            conventionally named <code>config.h</code>.  This second
+            way of communicating with your source code has the
+            <code>config.h</code> file substituted with a number of C
+            preprocessor <code>#define</code> statements, such as 
+            <verbatim>
+#define HAVE_SYS_WAIT_H 1
+#define HAVE_STRCHR 1
+</verbatim>
+            if the build system does have a
+            <code>&lt;sys/wait.h&gt;</code> header file available, and
+            has the function <code>strchr()</code> available.  The
+            tests for these features are triggered by autoconf macros
+            such as <code>AC_CHECK_HEADERS([sys/wait.h])</code>.  After
+            including this file into your source code with 
+            <verbatim>
+#include &lt;config.h&gt;
+</verbatim>
+            you can adjust the compiled code with suitable
+            <code>#ifdef</code> preprocessor conditionals.</p>  
+
+          <p>It is possible to maintain the <code>config.h.in</code>
+            file by hand, but generally better to generated it by using
+            the <em>autoheader</em> application which is part of
+            autoconf.  This scans your <code>configure.ac</code> and
+            extracts into <code>config.h.in</code> mentions of all those
+            preprocessor defines it finds.  Autoheader knows about
+            macros such as <code>AC_CHECK_HEADERS</code> above; if you
+            wish to add further switches to the <code>config.h.in</code>
+            file, you should do so by calling the autoconf macro
+            <code>AC_DEFINE</code>.  See the section <webref
+              url="&autoconfhtml;/autoconf_82.html" >7.1 Defining C
+              Preprocessor Symbols</webref> in the autoconf manual for
+            further details.  Autoheader is one of those applications
+            run on your behalf by autoreconf (see <ref id="autoreconf"/>).</p>
+
+          <p>Note the angle brackets round <code>config.h</code>: this
+            is preferred to double quotes, as it gives the makefile the
+            option of controlling where the source code is; in the
+            simplest case this is handed by simply adding
+            <code>-I.</code> to the compile line.  We don't take take
+            advantage of this particular flexibility, but it is a good
+            habit to get into.</p>
+
+          <p>An illustrative <code>configure.ac</code> might look like
+            this (with line numbers inserted):
+            <verbatim>
+1   AC_INIT(mypack, 1.2, ussc@star.rl.ac.uk)
+2   AC_CONFIG_SRCDIR(src.c)
+3   STAR_DEFAULTS
+4   AC_PROG_CC
+5   AC_PATH_PROG(PERL, perl)
+6   AC_CHECK_HEADERS([sys/time.h])
+7   STAR_MESSGEN(mypack_err.msg)
+8   AC_CONFIG_HEADERS(config.h)
+9   AC_CONFIG_FILES(Makefile)
+10  AC_CONFIG_FILES(myscript.pl, [chmod +x myscript.pl])
+11  AC_OUTPUT
+</verbatim></p>
+
+          <!-- The media selectors below are currently at 'all': might be
+               useful to switch these back to 'screen' and add other
+               branches for other media. -->
+
+          <p>Line 1: This line is required.  It declares the package
+            name, version number, and bug-report address.  Each of
+            these is available for substitution via the substitution
+            variables <code>PACKAGE_NAME</code>,
+            <code>PACKAGE_VERSION</code> and
+            <code>PACKAGE_BUGREPORT</code>.  <span media='all'>See
+              autoconf
+            <webref url='&autoconfhtml;/autoconf_16.html' >4.1 Initializing configure</webref></span></p>
+
+          <p>Line 2: This is largely a sanity check, and produces an
+            error if the named file (in this case <code>src.c</code>)
+            is not in the source directory.  The source directory is
+            typically the current directory, but you can specify a
+            different one using the <code>--srcdir</code> option to
+            <code>./configure</code>, if you have a good reason for
+            doing that.  <span media="all">See autoconf
+              <webref url='&autoconfhtml;/autoconf_18.html' >4.3 Finding configure Input</webref></span></p>
+
+          <p>Line 3: This macro is one of the Starlink extensions, and
+            the only required Starlink macro.  It
+            sets up the defaults required for building Starlink
+            applications, and assures the <code>starconf</code>
+            program that it's being run in the correct directory.  See
+            <ref id='starconf'/> for a description of the starconf
+            application, and <ref id="starconfmacros"/> for details of
+            the associated macros.</p>
+
+          <p>Line 4: This finds a working C compiler, and prepares to
+            substitute it in the substitution variable
+            <code>CC</code>.  Presumably the Makefile.in has a line
+            <code>CC=@CC@</code>.
+            <span media="all">See autoconf 
+              <webref url='&autoconfhtml;/autoconf_64.html' >5.10.3 C Compiler Characteristics</webref></span></p>
+
+          <p>Line 5: Find a binary called <code>perl</code> in the
+            current <code>PATH</code> and assign the substitution
+            variable <code>PERL</code> the full path to it.  The most
+            common way of using this would be for the file
+            <code>myscript.pl.in</code> to start off with the line
+            <verbatim>
+#! @PERL@ -w
+</verbatim>
+            so that the script ends up with the correct full path.
+            See line 10<span media="all"> and autoconf
+              <webref url='&autoconfhtml;/autoconf_41.html' >5.2.2 Generic Program and File Checks</webref></span>.</p>
+
+          <p>Line 6: check that the system has an include file
+            <code>sys/time.h</code> in the include path, and if it
+            has, make sure that the <code>cpp</code> variable
+            <code>HAVE_SYS_TIME_H</code> is defined.  If this were a
+            real configure file, you would likely have several other
+            header tests here (in a space-separated list, surrounded
+            by square brackets), and cpp branching inside your source
+            code to handle the various cases.  See line 8<span
+              media="all"> and autoconf
+              <webref url='&autoconfhtml;/autoconf_51.html' >5.6.3 Generic Header Checks</webref></span>.</p>
+
+          <p>Line 7: Another Starlink extension.  It
+            declares that this package has a set of ERR messages in
+            the given file, and that autoconf and automake should
+            prepare to handle them.</p>
+
+          <p>Line 8: This is the macro that makes cpp configuration
+            information available, by editing the header file
+            <code>config.h.in</code> (this file name is conventional, but
+            not required).  <span media="all">See autoconf
+              <webref url="&autoconfhtml;/autoconf_27.html">4.8
+                Configuration Header Files</webref>.</span></p>
+
+          <p>Line 9: This does the work of substituting the results of
+            the various tests into the files being configured.  For each
+            of the files named in the (space-separated list) argument,
+            which most typically includes <code>Makefile</code>,
+            autoconf expects to find a file of the same name but with
+            <code>.in</code> appended, and this is the file which has
+            the substitutions edited in.</p>
+
+          <p>Line 10: This is a variant of line 9.  The
+            <code>AC_CONFIG_FILES</code> macro takes a second argument
+            consisting of one or more lines of shell script to
+            post-process the file in question, in this case making
+            sure that the generated file is executable.</p>
+
+          <p>Line 11: This is the line which <em>really</em> does the
+            work.  <span media='all'>See <webref
+                url="&autoconfhtml;/autoconf_19.html" >4.4 Outputting
+                Files</webref>.</span></p>
+
+          <p>Of this script, it is lines 1, 2 and 11 which are
+            absolutely required, along with something like line 9 to
+            make the configure script do something useful.</p>
+
+          <p>It is useful to think of the <code>configure.ac</code>
+            file as being the template for the final
+            <code>./configure</code> script, with the autoconf macros
+            simply expanding to (large chunks of) shell script during
+            translation by the autoconf program.  This isn't the whole
+            truth, but it suffices for almost all purposes.  About the
+            only place where this view might deceive you is if you
+            wished to modify a file after it was generated by
+            <code>AC_CONFIG_FILES</code> for example; if you did that
+            immediately after the <code>AC_CONFIG_FILES</code> line it
+            would fail -- that is why <code>AC_CONFIG_FILES</code> has
+            its second argument.  With this view it is natural that
+            you can add any other shell scripting to your
+            configure.ac, adding any tests and switches you fancy.
+            You communicate the results of your scripting to the
+            output files by making shell variables into substitution
+            variables, and the way you do that is by calling
+            <code>AC_SUBST</code> on them.  Thus, after
+            <verbatim>
+wibble=''
+... # lots of clever scripting
+AC_SUBST(wibble)
+</verbatim>
+            any occurrences of the string <code>@wibble@</code> in the
+            substituted files will be replaced by the value of
+            <code>wibble</code> at the end of the
+            <code>./configure</code> script.</p>
+
+          <subsubsubsect>
+            <subhead>
+              <title>M4 syntax and traps</title>
+            </subhead>
+
+            <p>Autoconf does its work by running the
+              <code>configure.ac</code> file through the text processor
+              GNU <code>m4</code>, and this can cause occasional
+              surprises.</p>
+
+            <p>M4 is a macro language, intended for very much the sort
+              of rewriting that autoconf does.  When m4 processes a
+              file, anything at all that looks like an m4 macro is
+              substituted, so that there is no macro invocation
+              character like the backslash in &tex;.  Macros can take
+              arguments, delimited by round brackets and separated by
+              commas, as illustrated above.</p>
+
+            <p>The first oddity is to do with comment characters.  The
+              default m4 comment character is <code>#</code>, but
+              since this is also the shell script and makefile comment
+              character, autoconf makes it an ordinary character.
+              Thus to add comments to a <code>configure.ac</code> file
+              which won't make it into the <code>./configure</code>
+              file, you should prefix them with the m4 <em>macro</em>
+              <code>dnl</code>, as in
+              <verbatim>
+dnl   This is a comment
+AC_INIT(...)
+</verbatim>
+              There's no harm in including <code>#</code>-style
+              comments in your <code>configure.ac</code> file and
+              allowing these to be passed through to the output file,
+              since `got-here' type comments can sometimes help you
+              debug the <code>./configure</code> script.</p>
+
+            <p>The default m4 quote characters are the left and right
+              single quotes, but autoconf changes these to left and
+              right square brackets.  You need to use these in two
+              circumstances, firstly when you have a multi-word
+              argument to a macro, and particularly when that argument
+              contains a comma, and secondly if a piece of text looks
+              like a current m4 macro.  In general, if you need to
+              care about m4 quoting, you're in trouble, but see
+              section <webref url="&autoconfhtml;/autoconf_90.html"
+                >8.1 M4 Quotation</webref> in the autoconf manual, for
+              some advice.</p>
+
+          </subsubsubsect>
+        </subsubsect>
+
+        <subsubsect id='automakeoverview'>
+          <subhead>
+            <title>Automake</title>
+          </subhead>
+
+          <p>The most typical use of autoconf is to configure a file
+            <code>Makefile.in</code>.  You can write this yourself, as
+            described in <ref id='autoconfoverview' >the discussion of
+              autoconf</ref>, but since so much of a typical makefile
+            is boilerplate, automake exists to write this boilerplate
+            for you.  This has the additional advantage that we can
+            support and enforce Starlink-specific conventions with a
+            customised installation of automake.  We (currently) use
+            an adapted version of automake 1.8.2 -- see <ref
+              id="gnutools"/> for a summary of the differences.</p>
+
+          <p>The file which controls automake is
+            <code>Makefile.am</code>.  Automake reads both this file and
+            <code>configure.ac</code>, and based on these emits a
+            <code>Makefile.in</code>.  It is this latter file which
+            you distribute, and which is substituted at build time by the 
+            <code>./configure</code> script which autoconf generates
+            in turn.</p>
+
+          <p>The resulting <code>Makefile</code> has rules to do all
+            the required building and installation in a very portable
+            fashion, as well as targets to make distributions
+            (<kbd>make dist</kbd>), clean up (<kbd>make clean</kbd>,
+            <kbd>make distclean</kbd> and <kbd>make
+              maintainer-clear</kbd>) and, in the case of Starlink
+            automake, make an installation manifest (<kbd>make
+              install-manifest</kbd>).</p>
+
+          <p>The <code>Makefile.am</code> script consists, in its
+            simplest form, of a sequence of declarations of the
+            relationships between the source files in your
+            distribution and the programs and libraries they are
+            intended to produce.  For example, here is the
+            <code>Makefile.am</code> for the PAR library, slightly edited:
+            <verbatim>
+## Process this file with automake to produce Makefile.in
+
+lib_LTLIBRARIES = libpar_adam.la
+libpar_adam_la_SOURCES = $(F_ROUTINES)
+
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+F_ROUTINES = \
+         par1_menu.f \
+         par_cancl.f \
+         [blah...]
+
+PUBLIC_INCLUDES = \
+	PAR_ERR \
+	PAR_PAR \
+	par.h \
+	parwrap.h \
+	par_err.h \
+	par_par.h
+
+BUILT_SOURCES = PAR_ERR par_err.h
+</verbatim></p>
+
+          <p>Overall, you can see that this automake source file is
+            syntactically a makefile -- the statements in this example
+            look like makefile variable settings, and it is possible
+            to put makefile rules in the <code>Makefile.am</code>
+            file, though that is not illustrated here.  This is
+            slightly deceptive, however, and while it was useful to
+            think, above, of the <code>configure.ac</code> file as
+            being the template of the eventual
+            <code>./configure</code> script, for automake you should
+            think of the match between the input syntax and the
+            makefile as a happy coincidence.  You provide information
+            to automake through the <code>Makefile.am</code> file,
+            and based on that it then emits the <code>Makefile.in</code> it
+            thinks you want (or need, at least).</p>
+
+          <p>The first line is a conventional comment.  It starts with
+            a doubled hash mark <code>##</code>, which causes automake
+            to discard the text after it; lines beginning with a
+            single comment character are copied verbatim into the
+            generated <code>Makefile.in</code>.</p>
+
+          <p>The next stanza declares that there is to be a library
+            <code>libpar_adam.la</code>, and that the sources for this
+            file are in the `makefile variable'
+            <code>F_ROUTINES</code>.</p>
+
+          <p>Though the variables <code>F_ROUTINES</code> and
+            <code>PUBLIC_INCLUDES</code> are specific to this
+            makefile, and arbitrary, the other variable names have both
+            structure and meaning for automake.</p>
+
+          <p>The variable <code>lib_LTLIBRARIES</code> consists of the
+            `prefix' <code>lib</code> and the `primary'
+            <code>LTLIBRARIES</code>.  The primary tells automake that
+            you wish to build the libtool library
+            <code>libpar_adam.la</code>, and the prefix indicates that
+            this is to be installed with the other libraries (the
+            variable <code>pkglib_LTLIBRARIES</code>, for example, would tell
+            automake that you wanted to install the result in a
+            package-specific library).  For each of the libraries
+            listed in this variable, separated by spaces, there must
+            be a corresponding <code>_SOURCES</code> variable, which
+            has the `primary' <code>SOURCES</code> and a prefix
+            formed from the canonicalised library name, which lists
+            the set of source files for that library.  As well, this
+            indicates to automake that these source files are to be
+            distributed as part of the final tarball, and that it must
+            emit makefile rules to install the library in the correct
+            place, with the correct installation commands.  See
+            section <webref
+              url="&automakehtml;/Program-and-Library-Variables.html"
+              >Program and Library Variables</webref> of the automake
+            documentation.</p>
+
+          <p>If we only wanted to build static libraries, we would
+            replace this line with <code>lib_LIBRARIES =
+              libpar_adam.a</code>, and the given library would be
+            built in the usual way, without involving libtool.</p>
+
+          <p>The <code>include_HEADERS</code> line is similar: it
+            indicates that the listed files are to be distributed, and
+            are to be installed in the correct place for include
+            files.</p>
+
+          <p>The final line which is significant to automake is the
+            <code>BUILT_SOURCES</code> line.  This says that, even
+            though <code>PAR_ERR</code> and <code>par_err.h</code> are
+            to be installed and distributed, they are not actually
+            genuine source files, but must be built; adding the
+            <code>BUILT_SOURCES</code> line forces automake to add a
+            dependency for these files at an artificially early stage.
+            It is not always
+            necessary to include a line like this.  If one of the
+            source files were in this category, then it would
+            naturally be built when it was required, without any
+            need to add it to <code>BUILT_SOURCES</code>.  As it happens,
+            there is no rule in this file for building these targets;
+            that is added automatically by automake when it spots that
+            the <code>STAR_MESSGEN</code> macro has been used in the
+            <code>configure.ac</code> file which partners this
+            <code>Makefile.am</code>.  In a more general case,
+            however, you would add a make-style rule to the
+            <code>Makefile.am</code> file to build these files from
+            their (presumably undistributed) sources.  See also <webref
+              url="&automakehtml;/Sources.html" >Built sources</webref> in
+            the automake manual.</p>
+
+          <p>For a second example, we can look at the
+            <code>Makefile.am</code> for the <code>sst</code>
+            application (this is a non-distributed application for
+            building documentation).
+            <verbatim>
+## Process this file with automake to produce Makefile.in
+
+bin_SCRIPTS = start
+
+bin_MONOLITHS = sst_mon
+sst_mon_SOURCES = \
+	sst_mon.f \
+	$(sst_mon_TASKS:=.f) \
+	$(SUBSRC) \
+	$(SUBCSRC) \
+	$(PRIVATE_INCLUDES)
+sst_mon_TASKS = forstats procvt prohlp prolat propak prohtml
+sst_mon_LDADD = $(LDADD) `fio_link`
+
+
+SUBSRC = sst_clean.f sst_fwild.f sst_latex.f sst_puts.f  sst_trcvt.f \
+         sst_cntac.f sst_get.f sst_latp.f sst_rdad1.f sst_trhlp.f \
+         [blah...]
+
+SUBCSRC = find_file.c
+
+PRIVATE_INCLUDES = SST_PAR SST_SCB
+
+sstsupportdir = $(bindir)
+sstsupport_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
+
+# The `start' script needs to have installation locations edited into it
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@VERSION\@,$(VERSION),g'
+start: start.in
+	rm -f start.tmp start
+	$(edit) \
+	    -e 's,@edited_input\@,start: produced from start.in by Makefile.am,' \
+	    $(srcdir)/start.in >start.tmp
+	mv start.tmp start
+
+EXTRA_DIST = start.in $(sstsupport_DATA)
+</verbatim></p>
+
+          <p>This makefile configures and installs a script, builds
+            and installs a monolith, and adds some supporting data
+            files in a non-standard place.</p>
+
+          <p>The <code>SCRIPTS</code> primary indicates to automake
+            where and how to install the <code>start</code> script.
+            The <code>start</code> script must be generated, since it
+            is to include the version number and installation
+            location.  Since it includes the installation location, it
+            should <em>not</em> be generated at configure time or
+            install time, but instead at make time, so that the user
+            may specify an installation prefix at make time (through
+            <kbd>make prefix=xxx</kbd>) and specify a
+            <em>different</em> one -- presumably a staging location or
+            something similar -- at installation time (through
+            <kbd>make prefix=yyy install</kbd>).  This is discussed in
+            section
+            <webref url="&autoconfhtml;/autoconf_24.html">4.7.2
+              Installation Directory Variables</webref> of the autoconf
+            manual.  This is why we have to include a makefile-style
+            rule for deriving the file <code>start</code> from its
+            template <code>start.in</code>.  This substitutes in the
+            values of the makefile variables <code>bindir</code> and
+            <code>VERSION</code>; these get their values, in the
+            resulting <code>Makefile</code>, by having those values
+            substituted in to the generated <code>Makefile.in</code>
+            by the generated <code>./configure</code> script; the
+            careful escaping of the @-signs in the sed command is to
+            match the <code>@...@</code> in <code>start.in</code>
+            while <em>not</em> matching this in
+            <code>Makefile.am</code> or the resulting
+            <code>Makefile.in</code> (yes, this can get a little
+            confusing).</p>
+
+          <p>This <code>Makefile.am</code> also declares a single
+            monolith (this and the <code>TASKS</code> primary below
+            are obviously part of the Starlink
+            extensions to automake) and its associated
+            <code>SOURCES</code>.  However it also declares a set of
+            <code>TASKS</code>.  This primary indicates to automake
+            that there will be <code>.ifl</code> files in the
+            directory corresponding to the six tasks, that these
+            <code>.ifl</code> files should be distributed, and that
+            the appropriate extra links should be made, in the binary
+            directory, when the monolith is installed.  The tasks
+            variable is also used in the <code>sst_mon_SOURCES</code>
+            variable to declare the dependence of the monolith on the
+            Fortran files corresponding to the tasks (it would be
+            possible to automake to have inferred this last step, but
+            it seems clearer overall to have this dependency at least
+            made explicit).  This incidentally illustrates that
+            automake allows variable reuse and rewriting very similar
+            to that supported by make.</p>
+
+          <p>When we are linking this monolith, we need to add a
+            couple of link options, and we do this with a
+            <code>LDADD</code> primary associated with the
+            <code>sst_mon</code> prefix.  The extra link options we
+            declare here are added to the eventual link command,
+            replacing the default set of option
+            options <code>$(LDADD)</code>, so we include that variable
+            in our version.  We also add <code>`fio_link`</code>,
+            because this monolith needs to be linked against the FIO
+            library (automake constrains what can appear in the
+            <code>LDADD</code> variable, and the
+            <code>`fio_link`</code> is permissable only in Starlink
+            automake).</p>
+
+          <p>The variables <code>SUBSRC</code>, <code>SUBCSRC</code>
+            and <code>PRIVATE_INCLUDES</code> are purely user
+            variables, with no special meaning to automake.</p>
+
+          <p>The next bit of magic in this file is
+            <code>sstsupport_DATA</code>.  In this particular case, we
+            want to install data files in the same location as the
+            binaries (why, and whether this is a good thing, is not
+            for us to worry about here).  The obvious thing (trust
+            me!) would be to say <code>bin_DATA = sun.tex ...</code>,
+            but automake forbids that particular combination of prefix
+            and primary, precisely because it wouldn't generally make
+            sense (see <webref url="&automakehtml;/Data.html"
+              >Architecture-independent data files</webref> in the
+            automake manual).  Instead, we can take advantage of an
+            escape-hatch that automake provides: a given prefix, such
+            as <code>sstsupport</code>, is valid if you also define a
+            variable of the same name, but with <code>dir</code>
+            appended.  Thus we define <code>sstsupport_DATA</code> and
+            <code>sstsupportdir</code>, and define the latter to have
+            the same value as the <code>$(bindir)</code> makefile
+            variable, as eventually substituted (see section <webref
+              url="&automakehtml;/Uniform.html" >The Uniform Naming
+              Scheme</webref> in the automake manual).</p>
+
+          <p>The remaining magic in this file is the
+            <code>EXTRA_DIST</code> variable.  For all its cleverness,
+            automake cannot work out that the <code>start.in</code>
+            source, nor any of the <code>sstsupport_DATA</code> files
+            are to be distributed, and you need to declare that
+            explicitly by setting the <code>EXTRA_DIST</code>
+            variable.  Though it is of course deterministic (see
+            section <webref url="&automakehtml;/Dist.html" >What Goes
+              in a Distribution</webref> of the manual), I find the
+            most straightforward way to work out whether anything
+            needs to go here is to build a distribution and spot what
+            was missed out.</p>
+          
+        </subsubsect>
+
+        <subsubsect>
+          <subhead>
+            <title>Libtool</title>
+          </subhead>
+
+          <p>We are using unmodified Libtool 1.5.</p>
+
+          <p>Libtool contains the darkest magic of the autotools, so
+            it is fortunate that we need barely concern ourselves with
+            it.  This is because all of the technicalities of calling
+            libtool are handled for us by the makefile generated by
+            automake.</p>
+
+          <p>The function of libtool is to build libraries.  While
+            this is generally straightforward for static libraries,
+            usually involving little more than working out whether
+            <code>ranlib</code> is necessary, doing the same thing for
+            dynamic libraries is extremely platform dependent.</p>
+
+          <p>Libtool consists of a large body of platform-dependent
+            code which implements a single platform-independent
+            interface.  Libtool has been ported to a broad range of
+            operating systems.</p>
+
+          <p>For more details, see the libtool manual at
+            <url>http://www.gnu.org/software/libtool/manual.html</url>.</p>
+
+        </subsubsect>
+
+        <subsubsect id="autoreconf">
+          <subhead>
+            <title>Autoreconf: why you don't need to know about aclocal</title>
+          </subhead>
+
+          <p>You don't have to know anything very much about
+            <code>autoreconf</code>, other than that, if you change one
+            of the autotools files <code>Makefile.am</code> or
+            <code>configure.ac.</code>, you should probably run
+            <code>autoreconf</code> to bring everything up to date.  In
+            fact, you probably don't even need that, since the generated
+            makefiles have these dependencies explicit.  The problem
+            that <code>autoreconf</code> addresses is that when one of
+            these files is updated, there are
+            several commands which might need to be re-run, including
+            <code>aclocal</code>, <code>autoheader</code>,
+            <code>libtoolize</code> and others, and it's a headache
+            trying to remember which ones are which.</p>
+
+        </subsubsect>
+      </subsect>
+    </sect>
+
+    <sect id="building" export="export">
+      <subhead>
+        <title>Building applications and libraries</title>
+      </subhead>
+
+      <p>This section applies <em>only</em> to building code which has
+        been checked out of the CVS repository.  It does <em>not</em>
+        apply to building a distribution tarball: that process is
+        nothing more than the usual:
+        <verbatim>
+% ./configure
+% make
+% make install
+</verbatim>
+        with the usual options for the <code>./configure</code>
+        script, of which the most important is <code>--prefix</code>
+        to control the installation location of the code.  The default
+        location is typically <code>/star</code>, though a particular
+        distribution might have a different value (see
+        <kbd>./configure --help</kbd> for more details).</p>
+
+      <p>In fact, you will often want to replace the last line with
+        <kbd>make install-manifest</kbd>, which has the same function as
+        <kbd>make install</kbd> except that it installs a manifest file,
+        listing the files actually installed, in the directory
+        <code>/star/manifests</code> (depending on
+        <code>--prefix</code>).</p>
+
+      <p>Most users of this document will likely be concerned only
+        with the details of building a particular component, and thus
+        concerned primarily with <ref id="buildingcomponents"/>.</p>
+
+      <p>Only rather few users are concerned with building the entire
+        tree, for example for the nightly build: this is dealt with in
+        <ref id="bootstrapping"/>.</p>
+
+      <subsect id="bootstrapping" export="export">
+        <subhead>
+          <title>Bootstrapping and building the entire tree</title>
+        </subhead>
+
+        <p>If you wish to build the entire tree after a fresh
+          checkout, you do so at the top level, using the
+          <code>./bootstrap</code> script and <code>Makefile.in</code>
+          located there.  Neither of these is a `standard' one.</p>
+
+        <p>The procedure is as shown
+          below, for an installation into the notional directory
+          <code>/local/star</code>; explanations follow.
+          <verbatim>
+1% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout .
+2% unset STARLINK
+3% export STARCONF_DEFAULT_STARLINK=/local/star
+4% export STARCONF_DEFAULT_PREFIX=/local/star
+5% rm -Rf /local/star
+6% PATH=/local/star/bin:/local/star/buildsupport/bin:$PATH
+7% ./bootstrap
+... a few harmless warnings, and miscellaneous other chatter
+... takes quite a while
+8% ./configure -C
+... mucho blah-blah-blah
+9% make
+... etc
+10% ls /local/star/manifests
+adam      automake  ems     hlp      messgen  par       sae   star2html  task
+ams       chr       fio     lex      messys   parsecon  sla   starconf
+atimer    cnf       hds     libtool  misc     pcs       sock  string
+autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
+</verbatim></p>
+
+        <p>Line 1: check out the entire collection from the
+          repository.  A combination of commands like
+          <verbatim>
+% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout -l .
+% cvs -d :ext:username@cvs.starlink.ac.uk:/cvs checkout buildsupport
+</verbatim>
+          would allow you to be more distriminating in what you
+          retrieve, and this may be desirable, since not everything in
+          the repository is controlled by this bootstrapping build,
+          most notably the contents of the <code>java</code> directory.</p>
+
+        <p>Lines 2-4: unset the <code>STARLINK</code> variable, and
+          set the two starconf variables as shown.  For a whole-tree
+          build, these two should have the same value, to ensure that
+          the build uses only tools and libraries which have been
+          built at an earlier point in the build.  For fuller details
+          of these variables, and more information about controlling
+          the bootstrapping process, see <ref id="bootstrappingonly"/>.</p>
+
+        <p>Line 5: the directory where the components are to be
+          installed can be empty, and need not exist at the
+          start.  It doesn't matter if this is not empty in fact,
+          since most of the installation tree is not examined by the
+          build.  The only exception is
+          <code>/local/star/manifests</code>, since the files in this
+          directory control what is actually built -- see the notes
+          for line 9.</p>
+
+        <p>Line 6: put <code>/local/star/bin</code> and
+          <code>/local/star/buildsupport/bin</code> in the path, and
+          make sure that there are <em>no</em> Starlink binary
+          directories elsewhere in the path.</p>
+
+        <p>Line 7: run the <code>./bootstrap</code> script.  This
+          configures, builds and installs the `buildsupport' tools --
+          the autotools plus the starconf application -- then
+          recursively runs the bootstrap code in a selection of the
+          directories beneath this one.  The directories the bootstrap
+          recurses into, in this directory and its children, are those
+          listed in a <code>AC_CONFIG_SUBDIRS</code> macro in
+          <code>configure.ac</code>.  After this, you should be able
+          to do
+<verbatim>
+% which autoconf
+/local/star/buildsupport/bin/autoconf
+% autoconf --version
+autoconf (GNU Autoconf) 2.59
+...
+%
+          </verbatim>
+          to verify that the correct tools have indeed been installed
+          in the correct place.</p>
+
+        <p>Line 8: configure the entire tree (the <code>-C</code>
+          option indicates that configure should cache its results,
+          speeding up the process).  This configures this
+          directory and recurses into the children named in
+          <code>AC_CONFIG_SUBDIRS</code> in this
+          <code>configure.ac</code> and those below it.</p>
+
+        <p>Line 9: build the entire tree.  The make builds all the
+          components in an order which ensures that each component is
+          build after the components it depends on, as declared in
+          <ref id="macro-declare-dependencies"
+            ><code>STAR_DECLARE_DEPENDENCIES</code></ref> invocations in
+          those components' <code>configure.ac</code> files.  The set
+          of dependencies can be examined (if you're interested) in
+          the file <code>componentset.xml</code>, which is built up
+          from the various directories' <code>component.xml</code>
+          files, as reprocessed into
+          <code>Makefile.dependencies</code>.</p>
+
+        <p>Note that the
+          dependencies are expressed as dependencies of components'
+          <em>manifest</em> files on each other, and the top-level
+          makefile is written so that each component is built with the
+          pair of commands <code>make; make install-manifest</code>,
+          which builds the component then installs both it and its manifest.
+          Thus, if you need to ask
+          for a particular component, foo, to be built, you can do so from
+          the top-level directory with <kbd>make
+            /local/star/manifests/foo</kbd>.</p>
+
+        <p>Line 10: after the make, a manifest is installed for each
+          of the built components.</p>
+
+      </subsect>
+
+      <subsect id="buildingcomponents" export="export">
+        <subhead>
+          <title>Building a single component</title>
+        </subhead>
+
+        <p>In <ref id='bootstrapping' /> we saw
+          how you would bootstrap and build the entire tree, building
+          each component's dependencies before building the component
+          itself.</p>
+
+        <p>If, on the other hand, you wish to build only one
+          component, because you wish to install the latest and
+          greatest version of some application, or because you want to
+          work on the CVS version, then you do not want to build the
+          entire code collection, but only the component you are
+          interested in.</p>
+
+        <p>In this case, you <em>may</em> want to control two things,
+          namely where
+          your newly-built component is to be installed, and where it
+          is to find any other Starlink applications and libraries it
+          requires.</p>
+
+        <p>Generally, however, you don't have to worry about
+          intricate configuration matters.  You simply give the
+          commands
+          <verbatim>
+% ./bootstrap
+% ./configure
+% make
+% make install
+</verbatim>
+          (or <kbd>make install-manifest</kbd>) to build the single
+          component from a CVS checkout.</p>
+
+        <p>In fact, you may not even need to do that.  The main
+          function of the bootstrap script is to update the directory
+          and regenerate the configuration scripts by rerunning starconf
+          and autoreconf.  However, the <code>./configure</code> and
+          <code>Makefile.in</code> files, though formally generated,
+          are checked in to the repository, so the bootstrap may be
+          redundant (this behaviour might change: see <ref
+            id="developments"/>).  You should still run the bootstrap
+          script when building such a checkout for the first time.</p>
+
+        <p>If you don't have starconf installed, that's fine -- the
+          bootstrap script can cope with that.  If you need to change
+          any of the autotools source files (that is,
+          <code>configure.ac</code> or <code>Makefile.am</code>) then
+          you will need to install starconf and the Starlink-specific
+          autotools, instructions for which are in <ref
+            id="bootstrappingonly">the next section</ref>.</p>
+
+        <p>If you do want to adjust things, here's how.</p>
+
+        <p>You control where the component is to be installed with the
+          <code>--prefix</code> option to the <code>./configure</code>
+          script.  The default value for this prefix is stored within
+          the <code>starconf.m4</code> file which holds all the
+          Starlink autoconf macros, and this is set by the starconf
+          application to be the location it was configured with in turn,
+          which is typically the top of the tree the starconf
+          application is installed in.  You can see this with the
+          command <kbd>starconf --show STARCONF_DEFAULT_PREFIX</kbd>.
+          If you need to change this default -- and you won't need to
+          do that often -- you can do so by re-running
+          <code>./starconf.status</code>:
+          <verbatim>
+% ./starconf.status STARCONF_DEFAULT_PREFIX=/my/new/default/prefix
+</verbatim>
+          and you can see the result with
+          <verbatim>
+% ./starconf.status --show STARCONF_DEFAULT_PREFIX
+</verbatim>
+        </p>
+
+        <p>You can control where the configuration process finds other
+          Starlink applications in a broadly similar way.  The default
+          location which is examined is specified by the
+          <code>STARCONF_DEFAULT_STARLINK</code> variable, which is
+          examined and changed just as the
+          <code>STARCONF_DEFAULT_PREFIX</code> variable was above.
+          That can be overridden by setting the environment variable
+          <code>STARLINK</code>, and that can be overridden in turn by
+          the <code>--with-starlink</code> option to the
+          <code>./configure</code> script.  We recommend that you
+          generally leave the <code>STARLINK</code> variable unset,
+          and use either the first or the last of these methods
+          instead.</p>
+
+        <p>Note that part of the function of the
+          <code>./configure</code> script is to find the location of
+          important files and freeze them in to the Makefile.  Thus
+          you cannot, in general, change the STARLINK variable or
+          change your path, and have new binaries picked up.</p>
+
+      </subsect>
+
+      <subsect id="bootstrappingonly" export="export">
+        <subhead>
+          <title>Bootstrapping without building, and configuring starconf</title>
+        </subhead>
+
+        <p>If you intend to work only on a single component, then you
+          can configure and build it as described in <ref
+            id="buildingcomponents" >the previous section</ref>.  If
+          you don't need to change any of the autotool source files --
+          namely <code>configure.ac</code> and
+          <code>Makefile.am</code> -- then this is all you need to do,
+          and you don't need to read this section.</p>
+
+        <p>If you need to rebuild the autotool source files, then you
+          <em>must</em> install the autotools which are part of the
+          CVS repository, since these have been extended and
+          customised specially for the Starlink build tree (for the
+          details of the differences, see <ref id="gnutools"/>).  The
+          standard autotools will not work.</p>
+
+        <p>The most straightforward way of doing this is to make sure
+          you have the required components checked out (<kbd>cvs -d xxx
+          checkout -l .</kbd> plus similar checkouts of
+          <code>buildsupport</code> and <code>thirdparty/fsf</code>
+          should be sufficient), then go to the
+          top of the tree and give the command
+          <verbatim>
+% ./bootstrap --buildsupport-only
+</verbatim>
+          This builds and installs the `buildsupport' tools -- namely
+          the autotools plus starconf -- but does not go on to
+          bootstrap the rest of the tree.  The functions of the
+          `sticky variables' <code>STARCONF_DEFAULT_PREFIX</code> and
+          <code>STARCONF_DEFAULT_STARLINK</code> were described in the
+          previous section: in order to configure starconf at this
+          stage, you must define these two variables <em>as environment
+            variables</em> before running the <code>./bootstrap</code>
+          script.  This will cause the tools to be installed in the
+          directory <code type="fspath"
+            >$STARCONF_DEFAULT_PREFIX/buildsupport/bin</code>, and the
+          configured starconf to configure components, when it is
+          itself invoked, so that the default value of
+          <code>STARCONF_DEFAULT_PREFIX</code> is the value given
+          here, as described in the previous section.</p>
+
+        <p>After that, you should put the
+          <code>.../buildsupport/bin</code> directory in your path,
+          and start work.</p>
+
+      </subsect>
+
+    </sect>
+
+    <sect id="autoconfing" export="export">
+      <subhead>
+        <title>Adapting a package to the Starlink build system</title>
+      </subhead>
+
+      <p>The process of adding a package to the build system, and
+        autoconfing it, is reasonably mechanical.  The main
+        differences from the traditional build system are as follows.</p>
+
+      <p>There is now no <code>./mk</code> file, and so no platform
+        configuration using the <code>$SYSTEM</code> environment
+        variable.  Instead, all platform dependencies should be
+        discovered by the configuration process.  It is only in
+        rather extreme cases that you will need to resort to
+        platform-specific code, and that should be handled by
+        the starconf macro <ref
+          id="macro-platform-sources"><code>STAR_PLATFORM_SOURCES</code></ref>. </p>
+
+      <p>You should try to avoid mentioning or referring to any
+        specific platform when configuring.  Test for <em>features</em>,
+        working with those you find, and working around those you don't;
+        don't test for platforms and believe you can reliably then
+        deduce what features are available.</p>
+
+      <p>Traditional Starlink makefiles had two phases, `build' and
+        `install' (plus the various export targets).  These makefiles
+        often did on-the-fly editing of scripts as they were being
+        installed, to edit in version numbers, or the correct path to
+        Perl, for example.  There was also implicit configuration done
+        in the <code>./mk</code> script, which specified
+        platform-specific compiler flags, or versions of `tar'.</p>
+
+      <p>GNU-style projects, on the other hand, have three phases,
+        `configure', `build' and `install', and source file editing
+        happens only in the first two -- installation consists only of
+        the installation of static files.  Most configuration editing
+        happens at configure time, when <code>.in</code> files are
+        substituted with static information, such as the absolute paths
+        to programs, determined as part of configuration.  In the case
+        where the substitution involves installation directory
+        variables, GNU (and thus general) conventions demand that this
+        be done at build time, since these directories involve the
+        <code>$(prefix)</code> makefile variable, and it is deemed
+        legitimate for the user to specify a different value at build
+        time (<kbd>make prefix=xxx</kbd>) from that specified or implied
+        at configuration time.  The user may then specify a different
+        prefix again at install time (<kbd>make prefix=yyy
+          install</kbd>) for the purposes of relocating or staging the
+        install, but this must not invalidate the value of
+        <code>$(prefix)</code> which may have been compiled into
+        applications.  This is discussed in some detail in section
+        <webref url="&autoconfhtml;/autoconf_24.html">4.7.2 Installation
+          Directory Variables</webref> of the autoconf manual, but you
+        generally do not have to worry about it, since it is rather rare
+        in practice that you have to compile installation directories
+        into the applications and libraries that you build.</p>
+
+      <p>In general, whereas traditional Starlink makefiles quite
+        often performed spectacular gymnastics at install time,
+        GNU-style makefiles generally do nothing at install time,
+        other than occasionally adding extra material to the install
+        via one of the installation hooks supplied by automake (see section
+        <webref url="&automakeman;/Install.html" >What gets
+          installed</webref> of the automake manual).</p>
+
+      <p>In the traditional build system, the master source was
+        regarded as rather private to the developer who `owned' the
+        code, who was free to use whatever occult means they desired
+        to produce the sources which were put into the three
+        distribution objects, `export_source' (just the source),
+        `export_run' (just the executable) and `export' (both).  Now,
+        everything should be put into the CVS repository, including
+        any code-generation tools either as separate packages or as
+        local scripts, and it is this source set which is
+        used for nightly builds and the like.  If you need tools to
+        generate some of the distributed sources, they should be
+        checked in, and your component should declare a `sourceset' on
+        the required tool (see <ref
+          id="macro-declare-dependencies"/>).</p>
+
+      <p>With these remarks out of the way, the following is a
+        description of the steps involved in bringing an application
+        into the new fold.</p>
+
+      <subsect id="autoconfingexample" export="export">
+        <subhead>
+          <title>Autoconfing a library</title>
+        </subhead>
+
+        <p>The example here shows the autoconfing of the adam library,
+          chosen simply because it's relatively simple.</p>
+
+        <p>Make a directory to hold the package, and add it to the
+          repository
+<verbatim>
+% pwd
+&lt;cvs-checkout&gt;/libraries/pcs
+% mkdir adam
+% cvs add adam
+Directory /cvs/libraries/pcs/adam added to the repository
+% cd adam
+          </verbatim></p>
+
+        <p>Get the complete set of source files, and check them in to
+          the repository.  This means unpacking all the files in
+          <code>adam_source.tar</code>, which you can find in
+          <code>/star/sources/pcs/adam</code> (as it happens).  Note,
+          however, that we <em>don't</em> add the <code>mk</code> script
+          or the old <code>makefile</code>, since we're about to make
+          both of these redundant.  The <code>adam_source.tar</code>
+          file includes a Fortran include file containing error codes,
+          <code>adam_err</code>; there are two problems with this.</p>
+
+        <p>Firstly, the filename should be uppercase: the file is
+          generally specified within the program in uppercase, and it
+          should appear thus on the filesystem.  The traditional
+          makefile works around this by creating a link from
+          <code>adam_err</code> to <code>ADAM_ERR</code>, but this won't
+          work (and indeed will fail messily) on a case-insensitive
+          filesystem like HFS+, used on OS X.</p>
+
+        <p>The second problem is that this is a generated file, though
+          the source is not distributed, is probably misplaced, and in any
+          case the generation was probably done on a VAX a decade ago.
+          All is not lost, however.  The functionality of the VAX
+          `message' utility is duplicated in the application
+          <em>messgen</em>, in a component of the same name, along with
+          an application <em>cremsg</em> which constructs a source file
+          from this message file.  Thus it is neither
+          <code>adam_err</code> nor <code>ADAM_ERR</code> which we
+          should check in, but the source file <code>adam_err.msg</code>
+          which we reconstruct using <em>cremsg</em>.  The file
+          <code>adam_defns</code> is similar, but this is genuinely a
+          source file, so we need do nothing more elaborate than rename
+          it to <code>ADAM_DEFNS</code> before checking it in.  Also,
+          CVS preserves access modes when it stores files, so we should
+          make sure that the script <code>adam_link_adam</code> is
+          executable before checking it in, and we need not bother to
+          make it executable as part of the build process.
+
+<verbatim>
+% tar xf /star/sources/pcs/adam/adam_source.tar
+% mv adam_defns ADAM_DEFNS
+% chmod +x adam_link_adam
+% cremsg adam_err
+% cvs add *.f adam_link_adam adam_defns.h ADAM_DEFNS adam_err.msg
+...
+cvs server: scheduling file `ADAM_DEFNS' for addition
+cvs server: scheduling file `adam_err.msg' for addition
+cvs server: use 'cvs commit' to add these files permanently
+          </verbatim>
+        </p>
+
+        <p>Create files <code>configure.ac</code>,
+          <code>Makefile.am</code> and <code>component.xml.in</code> by
+          copying the templates in the starconf buildsupport directory
+          (<kbd>starconf --show buildsupportdata</kbd>); the fields in
+          the <code>component.xml.in</code> file are discussed in <ref
+            id="componentxml"/>.  If you have an editor that can use it,
+          you might also want to create a link to the DTD used for the
+          <code>component.xml</code> file, which is in the same
+          directory.  Edit these files as appropriate, using information
+          in the original Starlink makefile for guidance.  Then check
+          them in.</p>
+
+        <p>What edits should you make?  The adam
+          <code>Makefile.am</code> file looks as follows:
+          <verbatim>
+bin_SCRIPTS = adam_link_adam
+lib_LTLIBRARIES = libadam_adam.la
+libadam_adam_la_SOURCES = $(PUBLIC_INCLUDES) $(F_ROUTINES)
+include_HEADERS = $(PUBLIC_INCLUDES)
+PUBLIC_INCLUDES = ADAM_ERR ADAM_DEFNS adam_defns.h
+F_ROUTINES = \
+	adm_acknow.f adm_getreply.f adm_getreplyt.f adm_path.f \
+        adm_prcnam.f adm_receive.f adm_reply.f adm_send.f \
+        adm_sendonly.f adm_sendt.f adm_trigger.f
+</verbatim>
+          Four out of six of these variable declarations are variables
+          meaningful to automake (see <ref id="automakeoverview"/>),
+          and the other two are simply copied from the original
+          <code>makefile</code>.</p>
+
+        <p>The adam <code>configure.ac</code> looks like this:
+          <verbatim>
+AC_INIT(adam, 3.0, ussc@star.rl.ac.uk)
+AC_PREREQ(2.50)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+AC_CONFIG_SRCDIR([ADAM_DEFNS])
+STAR_DEFAULTS
+
+AC_PROG_FC
+AC_PROG_LIBTOOL
+STAR_CNF_COMPATIBLE_SYMBOLS
+
+STAR_DECLARE_DEPENDENCIES(build, [sae messys])
+STAR_DECLARE_DEPENDENCIES(link,  [chr psx ems messys])
+
+dnl    There is no .msg file in this directory.  The ADAM_ERR file 
+dnl    contains only a single definition, of the parameter ADAM__OK.
+
+AC_CONFIG_FILES(Makefile component.xml)
+AC_OUTPUT
+</verbatim>
+          The first five lines are straightforward boilerplate (see
+          <ref id="autoconfoverview"/>).  The next three find a
+          Fortran compiler, declare that we want to use libtool to
+          build our libraries, and finally that we wish the symbols in
+          that library to be of the sort that the CNF package is able
+          to handle (see <ref id="macro-cnf-compatible-symbols"/>).
+          The `FC' autoconf macros will search for a Fortran compiler
+          by looking for a f95 compiler before looking for a f77
+          compiler; if you know or discover this is inappropriate,
+          then you can constrain the Fortran dialect that
+          <code>AC_PROG_FC</code> will look for by giving a value for
+          its optional dialect argument.  Macro
+          <code>AC_PROG_FC</code> is not yet documented in the
+          autoconf manual, but see <ref id="gnutools"/>.</p>
+
+        <p>After that, we declare the dependencies.  The dependencies
+          you work out by any and all means you can.  For a library, the set
+          of `build' dependencies is determined by the set of
+          components which supply files which the code here includes.
+          Grepping for all the Fortran <code>INCLUDE</code> statements
+          and all the C <code>#include</code> directives is a good
+          start.  For link dependencies, grepping for
+          <code>CALL</code> lines is useful for Fortran, and grepping
+          for <code>= *\([A-Za-z][A-Za-z]*__*[A-Za-z][A-Za-z]*\)
+            *(.*</code> will probably be handy.  In fact, the script
+          <verbatim>
+#! /bin/sh -
+sed -n \
+        -e 's/^ *\(INCLUDE\|include\) *'\(.*\)'.*/_ \2/p' \
+        -e 's/^ *\(CALL\|call\) *\([A-Za-z]*_[A-Za-z]*\).*/\2/p' \
+        -e 's/.*= *\([A-Za-z][A-Za-z]*__*[A-Za-z][A-Za-z]*\) *(.*/\1/p' \
+        ${1+"$@"} | \
+    sort | \
+    uniq
+</verbatim>
+          should give you the raw material for most of the
+          dependencies you need.  It doesn't really matter too much
+          if you get this wrong -- you might cause something to be
+          built slightly later than it might be in the top-level
+          bootstrap, might cause some eventual user to have to
+          download one package more than they have to, or might create
+          a circular dependency and break the nightly build, in which
+          case you'll find out soon enough.</p>
+
+        <p>The next couple of lines tells you that we lied
+          outrageously, above, when we were talking about
+          <code>.msg</code> files.  Though the remarks there are true
+          enough in general, the <code>ADAM_ERR</code> file is special,
+          and doesn't come from any <code>.msg</code> file.  This is
+          surprising enough that it's worth making a remark to this
+          effect in the <code>configure.ac</code> file.</p>
+
+        <p>Finally, we list the files that should be configured.
+          Essentially all starconf-style configure files should have
+          at least these two files mentioned here.</p>
+
+        <p>Now run starconf.  As described in <ref
+            id="starconfdetails"/>, this adds some required files, and
+          checks that the directory looks right.  It will look
+          something like this:
+<verbatim>
+% starconf
+starconf-validate: the following files are required but do not exist:
+        bootstrap
+starconf-validate: the following files should be checked in, but aren't
+        Makefile.am configure.ac bootstrap component.xml.in component.xml configure starconf.status
+Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
+Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
+Creating starconf.m4
+Creating bootstrap
+Creating acinclude.m4 from starconf.m4
+          </verbatim>
+        </p>
+
+        <p>That complained that the file bootstrap wasn't present, and
+          then went on to install one for you; it listed a number of
+          files which should be checked in; and it added a couple of
+          files, namely the bootstrap script, then the
+          <code>starconf.m4</code> file that contains the starconf
+          macros for autoconf, then it copies that file to the fixed
+          file <code>acinclude.m4</code> which aclocal examines if
+          present.  The starconf application actually does the
+          checking by running the <em>starconf-validate</em> script,
+          which you can run yourself independently if you wish.</p>
+
+        <p>Now you have a bootstrap file, so run it:
+<verbatim>
+% ./bootstrap 
+starconf-validate: the following files should be checked in, but aren't
+        Makefile.am configure.ac bootstrap component.xml.in component.xml configure starconf.status
+Configuring with STARCONF_DEFAULT_STARLINK=/export3/sun
+Configuring with STARCONF_DEFAULT_PREFIX=/export3/sun
+Creating starconf.m4
+File bootstrap already exists, not overwriting
+Creating acinclude.m4 from starconf.m4
+autoreconf --install --symlink
+configure.ac: installing `./install-sh'
+configure.ac: installing `./missing'
+          </verbatim>
+          The bootstrap script always re-runs starconf if it can, so
+          this reminds you that you still haven't checked those files
+          in.  It also runs autoreconf (<ref id="autoreconf"/>) for
+          you, installing the helper files that requires, and
+          constructing <code>configure</code> from
+          <code>configure.ac</code> and <code>Makefile.in</code> from
+          <code>configure.ac</code> and <code>Makefile.am</code>.</p>
+
+        <p>Now, finally, you can try <code>./configure</code> and
+          <code>make</code>.  That might just work.</p>
+
+        <p>Iterate until success.</p>
+      </subsect>
+
+    </sect>
+
+    <appendices>
+      <sect id='starconfmacros' export='export'>
+        <subhead>
+          <title>The Starconf macros</title>
+        </subhead>
+
+        <p>The following macros may be used within the
+          <code>configure.ac</code> file.  Of these, only the
+          <code>STAR_DEFAULTS</code> macro is required to be in the
+          file.</p>
+
+        <p>In the descriptions below, optional arguments are shown in
+          square brackets, along with their default value.  If the
+          sole argument is optional (for example in the case of
+          <code>STAR_DEFAULTS</code>), you do not need to supply the
+          brackets.</p>
+
+        <subsect id='macro-check-progs' export='export'>
+          <subhead>
+            <title>STAR_CHECK_PROGS(progs-to-check-for)</title>
+          </subhead>
+
+          <p><strong><code>STAR_CHECK_PROGS(progs-to-check-for)</code></strong></p>
+
+          <p><strong>Note: The functionality of this macro is very likely to change.</strong></p>
+
+          <p>For each of the programs in
+            <code>PROGS-TO-CHECK-FOR</code>, define a variable whose
+            name is the upcased version of the program name, and whose
+            value is the full path to that program, or the expected
+            installation location of that program if no absolute path
+            can be found.  Because of this default behaviour, this
+            macro should _only_ be used for locating Starlink programs
+            such as messgen or alink, and not as a general replacement
+            for <code>AC_CHECK_PROG</code>.  Any characters in the
+            program outside of the set of alphanumerics and
+            underscores are normalised to underscores.</p>
+
+          <p>For example: <code>STAR_CHECK_PROGS(messgen)</code>
+            would define the variable <code>MESSGEN</code> to have the
+            full path to the messgen application.</p>
+
+          <p>Calls AC_SUBST and AC_ARG_VAR on the generated variable
+            name.</p>
+
+          <p>This is the analogue of <code>AC_CHECK_PROG</code>,
+            except that: (1) the variable name defaults to the program
+            name, (2) the variable value if the program is not found
+            is the path to the anticipated installation location of
+            the program, so that the macro does not fail in this case.
+            This is useful for locating Starlink programs, as it means
+            we can use this macro to produce absolute paths to
+            programs, even before they have been installed (in this
+            case we are presumably doing a top-level configure of the
+            Starlink tree, and the Makefile will ensure that the
+            required files are installed before the current package
+            actually uses it.</p>
+
+          <p>The current value of the <code>PATH</code> variable is
+            augmented by the location of the binary installation
+            directory, using the current default value of the prefix
+            (not ideal, since this may in principle change when the
+            component being configured is installed, but it's the best
+            we can do at configure time); and by the
+            <code>$STARLINK/bin</code> directory.</p>
+
+          <p>The default, if the program isn't in the augmented
+            path, is bare program-name otherwise.  Is this the best
+            default?  Would the `starconf-finder' program be better?
+            The program may not be in the augmented path for two
+            reasons: (1) we are doing the global configuration done
+            during bootstrapping, and noting has been installed yet;
+            or (2) the program is one of those installed in a
+            subdirectory of the `bindir'.  In case (2), there's not a
+            lot we can do, short of grubbing round manifest files at
+            some point, but the starconf-finder, which is the eventual
+            default, knows about this case, and could take care of
+            it.</p>
+
+        </subsect>
+
+        <subsect id='macro-cnf-compatible-symbols' export='export'>
+          <subhead>
+            <title>STAR_CNF_COMPATIBLE_SYMBOLS</title>
+          </subhead>
+
+          <p><strong><code>STAR_CNF_COMPATIBLE_SYMBOLS</code></strong></p>
+
+          <p>Work out what is required to have the Fortran compiler
+            produce library symbols which are compatible with those
+            expected by the CNF package.  If you are building a
+            library which includes Fortran code, then you should call
+            this macro, which possibly adjusts the
+            <code>FCFLAGS</code> variable.</p>
+
+          <p>At present, all this macro has to do is simply work out
+            whether it needs to stop g77 adding a second underscore to
+            generated symbol names (it adds a single underscore to
+            most Fortran symbols, but by default adds two when the
+            symbol name already contains an underscore); the other
+            Fortran compilers we use don't need any extra options, as
+            it happens.  However this could potentially be much more
+            complicated.  The autoconf <code>AC_F77_WRAPPERS</code>
+            macro detects more possibilities, but probably not a
+            completely exhaustive set.  In future it might be
+            necessary to extend the CNF macros, by somehow merging the
+            results of <code>AC_F77_WRAPPERS</code> into it, and at
+            that point it might be necessary to extend this macro.</p>
+
+          <p>This macro is designed to work with CNF, however it
+            does <em>not</em> require the <code>cnf.h</code> headers
+            to be installed, because it should remain callable at
+            configuration time before <em>anything</em> has been
+            installed.  Instead we fake the functionality of the
+            definition <code>F77_EXTERNAL_NAME</code> in
+            <code>cnf.h</code>, which appends an underscore (just one)
+            to the end of C symbols.</p>
+
+        </subsect>
+
+        <subsect id='macro-declare-dependencies' export='export'>
+          <subhead>
+            <title>STAR_DECLARE_DEPENDENCIES(type, deplist, [option='']</title>
+          </subhead>
+
+          <p><strong><code>STAR_DECLARE_DEPENDENCIES(type, deplist, [option=''])</code></strong></p>
+
+          <p>Declare dependencies of this component.  The
+            <code>TYPE</code> is one of `sourceset', `build', `link'
+            or `use', and the <code>DEPLIST</code> is a space
+            separated list of component names, which this component
+            depends on in the given way.
+            <ul>
+              <li><p>Sourceset dependencies are those components
+                  which must be installed in order to build the complete
+                  set of sources, either for building or for
+                  distribution.  This includes documentation, so it
+                  would include star2html as well as messgen.</p>
+              </li>
+
+              <li>
+                <p>Build dependencies are those which are required
+                  in order to build this component.  This typically
+                  means include files, but if part of the component is
+                  an executable file (such as <code>compifl</code>
+                  within the <code>parsecon</code> component), then
+                  that's a build dependence also (but see the
+                  discussion of `option', below).  You may not have
+                  two components which have a build dependency on each
+                  other, since that would mean that each would have to
+                  be built before the other, which is impossible.</p>
+              </li>
+
+              <li>
+                <p>Link dependencies are those required to link
+                  against the libraries in a component.  That means
+                  all the libraries that this component's libraries
+                  use.  These are not necessarily build dependencies,
+                  since if you are building a library, any called
+                  libraries don't have to be present in order to build
+                  this library; you can have two components which have
+                  mutual link dependencies.  If you are building an
+                  application, however, then all its link dependencies
+                  will actually be build dependencies and should be
+                  declared as such.  In other words, the distinction
+                  between build and link dependencies is important
+                  only for library components.</p>
+              </li>
+
+              <li>
+                <p>Use dependencies are those which are required in
+                  order for the component to be used by something
+                  else, after it has been built and installed.  For
+                  example a library which called another application
+                  as part of its functionality would have only a use
+                  dependency on the component which contained that
+                  application.</p>
+              </li>
+            </ul></p>
+
+          <p>The point of this is that different dependencies are
+            required at different times.  The set of dependencies in
+            the master makefile is composed of all the `sourceset' and
+            `build' dependencies, but not `link' or `use'
+            dependencies, and since the core Starlink libraries are
+            closely interdependent, the set of `build' dependencies
+            needs to be kept as small as possible in order to avoid
+            circularities (that is, A depending on B, which depends,
+            possibly indirectly, on A).</p>
+
+          <p>All these relationships are transitive: if A has a
+            build dependency on B, and B has one on C, then A has a
+            build dependency on C.  You can augment this by using the
+            final `option' argument: if, in component A's declaration
+            element you say <code>STAR_DECLARE_DEPENDENCIES(build, B,
+              link)</code>, then you declare that A has a build-time
+            dependency on B, but that (presumably because you are
+            building an application within a component which is mostly
+            libraries) you need to link against B, so component A has
+            a dependency on all of B's <em>link</em> dependencies, not just
+            its build dependencies.  This is (I believe) the only case
+            where this `option' attribute is useful, though it is
+            legal for each of the dependency types.</p>
+
+          <p>You need only declare direct dependencies.  If package
+            A depends on package B, which depends in turn on package
+            C, then package A need not declare a dependency on C.</p>
+
+          <p>The macro may be called more than once.  The results of
+            this macro are expressed in the file
+            <code>component.xml</code> in the component directory.</p>
+        </subsect>
+
+
+        <subsect id='macro-defaults' export='export'>
+          <subhead>
+            <title>STAR_DEFAULTS([options=''])</title>
+          </subhead>
+
+          <p><strong><code>STAR_DEFAULTS([options=''])</code></strong></p>
+
+          <p>Sets up the defaults for Starlink
+            <code>configure.ac</code> files.  The optional
+            <code>OPTIONS</code> argument holds a space-separated list
+            of option keywords, of which the only one defined at
+            present is `per-package-dirs', which causes applications
+            and help to be installed in a package-specific
+            directory (see <ref id="developments"/>).
+          </p>
+
+        </subsect>
+
+        <subsect id='macro-doc-files' export='export'>
+          <subhead>
+            <title>STAR_DOC_FILES(docfiles)</title>
+          </subhead>
+
+          <p><strong><code>STAR_DOC_FILES(docfiles)</code></strong></p>
+
+          <p>Declare a list of files to be installed into the
+            Starlink documentation directory.  This can be used both
+            internally and in user <code>configure.ac</code>
+            files.</p>
+
+          <p>You can achieve the same effect by giving the list of
+            files as the value of <code>stardocs_DATA</code> in
+            Makefile.am, if that is more appropriate.</p>
+        </subsect>
+
+        <subsect id='macro-etc-files' export='export'>
+          <subhead>
+            <title>STAR_ETC_FILES(etcfiles)</title>
+          </subhead>
+
+          <p><strong><code>STAR_ETC_FILES(etcfiles)</code></strong></p>
+
+          <p>Declare a list of files to be installed into the
+            Starlink <code>etc</code> directory.  This can be used
+            both internally and in user <code>configure.ac</code>
+            files.</p>
+
+          <p>You can achieve the same effect by giving the list of
+            files as the value of <code>staretc_DATA</code> in
+            Makefile.am, if that is more appropriate.</p>
+        </subsect>
+
+        <subsect id='macro-have-fc-open-readonly' export='export'>
+          <subhead>
+            <title>STAR_HAVE_FC_OPEN_READONLY</title>
+          </subhead>
+
+          <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
+
+          <p>Tests if the Fortran compiler supports the READONLY
+            option on the OPEN command.</p>
+
+        </subsect>
+
+        <subsect id='macro-help-files' export='export'>
+          <subhead>
+            <title>STAR_HELP_FILES(helpfiles)</title>
+          </subhead>
+
+          <p><strong><code>STAR_HELP_FILES(helpfiles)</code></strong></p>
+
+          <p>Declare a list of files to be installed into the
+            Starlink <code>help</code> directory.  This can be used
+            both internally and in user <code>configure.ac</code>
+            files.</p>
+
+          <p>You can achieve the same effect by giving the list of
+            files as the value of <code>starhelp_DATA</code> in
+            Makefile.am, if that is more appropriate.</p>
+        </subsect>
+
+        <subsect id='macro-latex-documentation' export='export'>
+          <subhead>
+            <title>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</title>
+          </subhead>
+
+          <p><strong><code>STAR_LATEX_DOCUMENTATION(documentcode, [targets=''])</code></strong></p>
+
+          <p>Generate the standard makefile targets to handle
+            &latex; documentation source.  The parameter documentcode
+            should be something like `sun123' -- it should not include
+            any .tex extension.</p>
+
+          <p>The second, optional, argument gives an explicit list
+            of the targets which are build.  If this is <em>not</em>
+            specified, then a standard list is used
+            (<code>.tex</code>, <code>.ps</code> and
+            <code>.tar_htx</code>) and corresponding rules added to
+            the generated makefile.  If it is specified, it must be
+            non-null, and its value is a list of files which are to be
+            added to the distribution, and no extra Makefile rules are
+            added.  Thus if users need anything complicated done, they
+            should use this second argument and provide rules for
+            satisfying the given targets.</p>
+
+          <p>In the latter case, the <code>.tex -> htx_tar</code>
+            rule is still emitted, so you can use it, but it requires
+            the substitution variable @STAR2HTML@, and so if you _do_
+            use it, you will have to make that available, either
+            through <code>STAR_CHECK_PROGS(star2html)</code> or
+            otherwise (see <ref id="macro-check-progs"/>).</p>
+
+        </subsect>
+
+        <subsect id='macro-messgen' export='export'>
+          <subhead>
+            <title>STAR_MESSGEN(msgfile-list)</title>
+          </subhead>
+
+          <p><strong><code>STAR_MESSGEN(msgfile-list)</code></strong></p>
+
+          <p>Handle generating message, error, and facility files.</p>
+
+          <p>The argument is a space-separated list of files, each
+            of which has a set of message declarations in it, in the
+            format prescribed by the messgen utility.  There is no
+            default, though the usual name for this file is
+            <code>${PACKAGE}_err.msg</code>.  The macro may be called
+            more than once if you have more than one <code>.msg</code>
+            file in the directory.</p>
+
+          <p>This causes automake to add makefile rules to create
+            the appropriate <code>_err</code>, <code>_ERR</code>,
+            <code>_err.h</code> and <code>fac_nnn_err</code> files,
+            and handles installing the latter file to the help
+            directory, and including it in the distribution.</p>
+
+          <p>The files which this generates should be declared as
+            sources in the Makefile.am if they are to be used in code,
+            or are to be installed.  If they are used in building the
+            package, you will probably need to declare them
+            additionally as <code>BUILT_SOURCES</code>.  The package
+            also implicitly declares a `sourceset' dependency on the
+            messgen package (see <ref
+              id="macro-declare-dependencies"/>).</p>
+
+          <p>This macro leaves the discovered facility name and code
+            in the shell variables <code>star_facilityname</code> and
+            <code>star_facilitycode</code> respectively (these
+            correspond to the last message file, if there is more than
+            one), from where they may be scavenged by the calling
+            configure script.</p>
+        </subsect>
+
+        <subsect id='macro-monoliths' export='export'>
+          <subhead>
+            <title>STAR_MONOLITHS</title>
+          </subhead>
+          <p><strong><code>STAR_MONOLITHS</code></strong></p>
+
+          <p>Declare that we will be creating monoliths.  This does
+            whatever configuration is necessary to handle these.</p>
+
+          <p>Note that the declarations done in the
+            <code>Makefile.am</code>, declaring the name of the
+            monolith and the names and source files of the tasks, are
+            slightly redundant inasmuch as some of that information
+            could be implied.  However, this is required to be
+            explicit for clarity and consistency, and so accomodate
+            the (currently unexploited) possibility that the tasks and
+            <code>.ifl</code> files longer have the one-task-per-file
+            relationship they have now.</p>
+
+        </subsect>
+
+        <subsect id='macro-platform-sources' export='export'>
+          <subhead>
+            <title>STAR_PLATFORM_SOURCES(target-file-list, platform-list)</title>
+          </subhead>
+
+          <p><strong><code>STAR_PLATFORM_SOURCES(target-file-list, platform-list)</code></strong></p>
+
+          <p>Generate the given target-file for each of the files in
+            the list <code>TARGET-FILE-LIST</code>, by selecting the
+            appropriate element of the <code>PLATFORM-LIST</code>
+            based on the value of <code>AC_CANONICAL_BUILD</code>.
+            Both lists are space-separated lists.</p>
+
+          <p>For each of the platforms, <code>&lt;p&gt;</code>, in
+            platform-list, there should be a file
+            <code>&lt;target-file&gt;&lt;p&gt;</code>.  There should
+            always be a file <code>&lt;target-file&gt;default</code>,
+            and if none of the platform-list strings matches, this is
+            the file which is used.  If the `default' file is listed
+            in the `platform-list', then it is matched in the normal
+            run of things; if it is not listed, it still matches, but
+            a warning is issued.</p>
+
+          <p>If you wish no match <em>not</em> to be an error --
+            perhaps because there is a platform-dependent file which
+            is redundant on unlisted platforms -- then end the
+            platform-list with <code>NONE</code>.  In this case, if no
+            file matches, then no link is made, with no error or
+            warning.</p>
+
+          <p>This macro uses the results of ./config.guess to
+            determine the current platform.  That returns a triple
+            consisting of cpu-vendor-os, such as
+            `<code>i686-pc-linux-gnu</code>' (OS=linux-gnu),
+            `<code>sparc-sun-solaris2.9</code>', or
+            `<code>alphaev6-dec-osf5.1</code>'.</p>
+
+          <p>The extensions <code>&lt;p&gt;</code> in platform-list
+            should all have the form `<code>cpu_vendor[_os]</code>',
+            where each of the components `cpu', `vendor' and `os' may
+            be blank.  If not blank, they are matched as a prefix of
+            the corresponding part of the config.guess value.  Thus
+            `<code>_sun_solaris</code>' would match
+            `<code>sparc-sun-solaris2.9</code>' but not
+            `<code>sparc-sun-sunos</code>', and `<code>_sun</code>'
+            would match both.  For a <code>&lt;target-file&gt;</code>
+            file foo.c, this would result in `code:ln -s foo.c_sun
+            <code>foo.c</code>'.</p>
+
+          <p>Calls <code>AC_LIBSOURCE</code> for each of the implied
+            platform-specific files. </p>
+        </subsect>
+      </sect>
+
+      <sect id="gnutools" export="export">
+        <subhead>
+          <title>The relationship with the GNU autotools</title>
+        </subhead>
+
+        <p>The build system is based heavily on the GNU autotools,
+          autoconf, automake and
+          libtool.  Each of these is checked in to the CVS
+          repository, and built and installed during the top-level
+          <code>./bootstrap</code> process.</p>
+
+        <p>The checked-in
+          libtool is an unmodified libtool 1.5
+          distribution.</p>
+
+        <p>The Starlink autoconf is based on
+          version 2.59, with additions to support preprocessable
+          Fortran; these modifications have been submitted to the
+          autoconf maintainers, so it is hoped that these
+          will become part of the autoconf distribution, at
+          which point the Starlink autoconf will revert to
+          being an unmodified one.</p>
+
+        <p>The additions are as follows:
+          <dl>
+            <dt><code>AC_PROG_FC([COMPILERS...], [DIALECT])</code></dt>
+            <dd>
+              <p><code>[COMPILERS...]</code> is a list of specific
+                compilers you want it to try, so you could give it
+                <code>[f77 g77]</code> as an argument.  That's useful if you
+                have rather specific demands or need to more-or-less
+                customize this.  More useful is the DIALECT, which can
+                be 77, 90, 95 or 2000.  Thus if you give this as
+                <code>AC_PROG_FC([], 77)</code> or
+                <code>AC_PROG_FC([], 1977)</code> then this will
+                search only its internal list of Fortran 77 compilers
+                (which happens to be [g77 f77 xlf frt pgf77 fort77
+                fl32 af77] currently).</p>
+            </dd>
+
+            <dt><code>AC_PROG_FPP(required-features,
+                [FPP-SRC-EXT=.fpp])</code></dt>
+            <dd>
+              <p><code>required-features</code> is a space-separated
+                list of features that the Fortran preprocessor must
+                have for the code to compile.  It is up to the package
+                maintainer to properly set these requirements. </p>
+              <p><code>FPP-SRC-EXT</code> is an optional specification
+                of the file extension for preprocessable Fortran
+                source files (without a leading dot).  It defaults to
+                <code>.fpp</code>, which is better than
+                <code>.F</code> in general, since <code>.F</code> and
+                <code>.f</code> are indistinguishable on
+                case-insensitive filesystems (such as HFS+ on MacOS
+                X).</p>
+              <p>Supported features are:
+                <dl>
+                  <dt>include</dt>
+                  <dd><p>the preprocessor must correctly process
+                      <code>#include</code> directives and
+                      <code>-I</code> options</p></dd>
+
+                  <dt>define</dt>
+                  <dd><p>correctly process <code>-D</code> options</p></dd>
+
+                  <dt>substitute</dt>
+                  <dd><p>substitute macros in Fortran code 
+                      (some preprocessors touch only lines starting with #)</p>
+                  </dd>
+
+                  <dt>wrap</dt>
+                  <dd><p>wrap lines that become too long through macro
+                      substitution.  <code>fpp</code> is probably the
+                      only preprocessor that does this.</p></dd>
+
+                  <dt>cstyle</dt>
+                  <dd><p>Do not suppress C style comments (the
+                      <code>-C</code> option in cpp)</p>
+                  </dd>
+
+                  <dt>CSTYLE</dt>
+                  <dd><p><em>Do</em> suppress C style comments
+                      (e.g. code contains C-style comments, and
+                      compiler may not know how to handle them)</p>
+                  </dd>
+                </dl></p>
+
+              <p>Features can be abbreviated: i, in, inc etc. are
+                equivalent to include. Features can be deselected
+                (feature not needed) by prepending "no",  e.g. nodef
+                (=nodefine), now (=nowrap).</p>
+              <p>Default for the feature list is 
+                [include define substitute nowrap nocstyle noCSTYLE]</p>
+          <p>Feature requirements corresponding to the defaults may be
+                omitted</p> 
+<p>Note that "wrap" implies "substitute", and CSTYLE and cstyle cannot
+                be requested at the same time. The macro adjusts this
+                automatically. </p>
+            </dd>
+          </dl>
+          There are some features of this macro support which are
+          arguably bad autoconf style, and it is <em>very</em> likely that this
+          macro will change.  The above documentation is only for
+          completeness, and you are advised not to pay any attention
+          to it.  See <ref id="developments"/>.
+          </p>
+
+        <p>The Starlink automake is a more heavily modified
+          version of automake version 1.8.2.  There are a few
+          generic changes to support the added Fortran
+          autoconf macros, but the majority of the changes
+          are in the service of Starlink's specific requirements.  They
+          are summarised here.</p>
+
+        <p>Addition of the <code>MONOLITHS</code> and <code>TASKS</code>
+          primaries: These function rather like the <code>PROGRAMS</code>
+          primary, in that the the <code>MONOLITHS</code> primary
+          specifies one or more monoliths to install, and the
+          <code>TASKS</code> one or more IFL tasks to associate with it.
+          Like the <code>PROGRAMS</code> primary, each
+          <code>MONOLITHS</code> variable should have a
+          <code>xxx_SOURCES</code> variable associated with it.  Starlink
+          <code>automake</code> also emits the makefile rules to compile
+          <code>.ifl</code> files to <code>.ifc</code> files.</p>
+
+        <p>Addition of the
+          <code>stardocs</code>,
+          <code>staretc</code>
+          and
+          <code>starhelp</code>
+          prefixes to
+          the <code>DATA</code> primary.  Setting these variables has
+          the same effect as giving an argument to the
+          <ref id='macro-doc-files' ><code>STAR_DOC_FILES</code></ref>,
+          <ref id='macro-etc-files' ><code>STAR_ETC_FILES</code></ref>
+          and
+          <ref id='macro-help-files' ><code>STAR_HELP_FILES</code></ref>
+          starconf macros</p>
+
+        <p>Extra <code>LDADD</code> options: In standard
+          <code>automake</code>, the content of the <code>LDADD</code>
+          variables must be a list of extra objects to add to a program,
+          or extra libraries, specified through <code>-l</code> and
+          <code>-L</code> flags.  In Starlink <code>automake</code>, you
+          can also specify extra libraries using the standard Starlink
+          <code>*_link</code> and <code>*_link_adam</code> commands.
+          You can add tokens matching <code>`*_link`</code> or
+          <code>`*_link_adam`</code> to the <code>LDADD</code> variable, or
+          either of these preceded by exactly <code>$(srcdir)/</code>,
+          which you may need to do only in the case of test code.</p>
+
+        <p>Starlink <code>automake</code> spots use of the
+          <code>STAR_MESSGEN</code> and
+          <code>STAR_LATEX_DOCUMENTATION</code> macros in the associated
+          <code>configure.ac</code>, and produces
+          appropriate extra build rules in the generated
+          <code>Makefile.in</code>.  If the
+          <code>STAR_MANIFEST_DIR</code> is to be substituted by
+          autoconf, then Starlink automake
+          will add the <code>install-manifest</code> target to the
+          generated makefile.</p>
+
+        <p>Default strictness: Starlink automake adds the
+          <code>--startree</code> strictness level to the default
+          <code>--foreign</code>, <code>--gnu</code> and
+          <code>--gnits</code>.  At present, it
+          is almost indistinguishable from <code>--foreign</code>, and
+          is the default (the default for GNU automake is
+          <code>--gnu</code> strictness -- see also <ref
+            id="developments"/>).</p>
+
+        <p>All of the installation rules have been modified to recognise
+          the presence of the <code>MANIFEST_FILE</code> environment
+          variable, and if it is present, to append the path to the
+          installed file to the file named in the variable.  The new
+          <code>install-manifest</code> target manages this variable.</p>
+
+        <p>The <code>missing</code> script which is installed as part of
+          Starlink automake respects the
+          <code>MISSING_SUPPRESS_RUN</code> environment variable.</p>
+
+        <p>The package version is reported as
+          <code>1.8.2-starlink</code> rather than plain 1.8.2.</p>
+      </sect>
+
+      <sect id="developments" export="export">
+        <subhead>
+          <title>Possible future changes</title>
+        </subhead>
+
+        <p>The starconf system is still quite new, and there are
+          certain features of it which might change in the light of
+          experience.  These are summarised here, as a warning of
+          what is not finalised, as reassurance if some of the
+          documentation here seems out of date (in which case tell the
+          document maintainer), and as a note of what aspects might
+          need further discussion.
+          <ul>
+            <li>
+              <p>The files generated by autoconf and automake are
+                currently checked in to the repository.  Though this
+                is good practice in general, since we use extended or
+                customised versions of autoconf and automake, we can
+                always control what versions of those applications are
+                being used, which possibly makes the disadvantages of
+                this policy outweigh the advantages.  This affects the
+                discussion in <ref id="buildingcomponents"/>.</p>
+            </li>
+
+            <li>
+              <p>The starconf application currently only generates two
+                files -- you should not assume this will always be so.</p>
+            </li>
+
+            <li>
+              <p>There is only one option to
+                <code>STAR_DEFAULTS</code> -- the set will likely expand.</p>
+            </li>
+
+            <li>
+              <p>The description of the tree-wide bootstrapping
+                process in <ref id="bootstrapping"/> is likely to
+                change as more of the Starlink legacy and new code is
+                brought under this build system umbrella.</p>
+            </li>
+
+            <li>
+              <p>The default automake strictness is
+                <code>--starlink</code>, which is currently almost
+                identical to the standard automake
+                <code>--foreign</code> strictness.  We may change
+                this, and add other files.</p>
+            </li>
+
+            <li>
+              <p>The <code>AC_PROG_FPP</code> macro described in <ref
+                  id="gnutools"/> will <em>very</em> likely change its
+              interface.</p>
+            </li>
+          </ul></p>
+
+      </sect>
+    </appendices>
+
+  </docbody>
+</ssn>
+
+<!-- Local Variables: -->
+<!-- outline-regexp: " *<\\(sub\\)*sect" -->
+<!-- End: -->
