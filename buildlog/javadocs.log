@@ -2386,11 +2386,11 @@ javadocs:
   [javadoc] "Get references to gram Y data (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get references to gram Y data (i.e. the data values)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:370: warning - The first sentence is interpreted to be:
   [javadoc] "Get references to gram Y data errors (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:370: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1354: warning - The first sentence is interpreted to be:
   [javadoc] "Get references to gram Y data errors (i.e. the data errors)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1354: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. time stamp and data value) that
@@ -2654,4 +2654,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 47 seconds
+Total time: 4 minutes 45 seconds

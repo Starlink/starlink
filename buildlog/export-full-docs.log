@@ -192,42 +192,42 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e. those with element name "strings"). "
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: missing #: "java.lang.Double.compareTo()"
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -425,4 +425,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 1 minute 57 seconds
+Total time: 1 minute 31 seconds
