@@ -394,7 +394,6 @@ identifier
 /* Add preval to the unprocessed text. */
       if ( prealloc > 0 ) {
          uadd( preval );
-         free( preval );
          preleng = 0;
          prealloc = 0;
       }
@@ -404,7 +403,10 @@ identifier
 
 /* Do something appropriate with it. */
       if ( strict ) {
-         fprintf( stderr, "\nError in this line:\n\n   %s\n", text );
+         fflush( stdout );
+         fprintf( stderr, 
+                  "\n\nError in the following:\n%s\n\nTerminated with error\n",
+                  text );
          exit( 1 );
       }
       else {
