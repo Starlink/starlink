@@ -410,7 +410,7 @@ sub index_source {
    if ($ftype eq 'f' || $ftype eq 'gen') {
       $tagged = FortranTag::tag join '', <SOURCE>;
    }
-   elsif ($ftype eq 'c') {
+   elsif ($ftype eq 'c' || $ftype eq 'h') {
       $tagged = CTag::tag join '', <SOURCE>;
    }
    close SOURCE;
@@ -557,6 +557,10 @@ sub index_h {
 #  Write to index.
 
    write_entry $include, $path;
+
+#  Index source (e.g. for #defines).
+
+   index_source $path, $file, 'h';
 }
 
 
