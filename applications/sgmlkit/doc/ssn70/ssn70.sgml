@@ -158,6 +158,9 @@ versionid='v0-7-11'>
 <px>Small documentation changes.</px>
 </distribution>
 
+<change date="24-Aug-2001" author="ng" versionid="v0-7-13-edit1">
+<px>Minor edits, which I noticed the need for after using the documentation.</px>
+</change>
 
 </history>
 
@@ -1389,7 +1392,14 @@ general documentation and a specific file marked up using the
 <p>These elements are available only if the document type has the
 `Routinelist' feature enabled.  See <ref id=str.structure/>.
 
-<subsect id=str.history export>History
+<subsect id=str.history export>
+<subhead>
+<title>History</title>
+<update versionid="v0-7-13-edit1">
+<px>Added a statement of the syntax for dates, even though this is
+briefly repeated in element documentation.</px>
+</update>
+</subhead>
 
 <p>Includes
 <ref id='el.sun.change' >change</ref>,
@@ -1419,6 +1429,13 @@ indicates which edit of the document this is -- a significant update
 to the document should be marked by incrementing the document version
 number.  The release information marks a more minor update to a
 document.
+
+<p>All dates within these elements have the format <code/dd-mmm-yyyy>, 
+where <code/dd> indicates a <em/two-digit> day number, <code/mmm> a
+three-letter month name (such as <code/jan>, <code/feb> and so on, in
+any mixture of case), and <code/yyyy> a four-digit year number.  Let's 
+keep things Gregorian -- no Julian, French-revolutionary or Mayan
+dates, if you would be so kind.
 
 <p>Each of the three elements has paragraph content, to record brief notes
 about the change or distribution.
