@@ -1615,7 +1615,7 @@ static void InitVtab( AstMappingVtab *vtab ) {
 */
 /* Define macros to implement the function for a specific data
    type. */
-#define MAKE_INTERPOLATE_PIXEL_LINEAR(X,Xtype,Xsigned,Xfloating,Xfloattype) \
+#define MAKE_INTERPOLATE_PIXEL_LINEAR(X,Xtype,Xfloating,Xfloattype) \
 static int InterpolatePixelLinear##X( int ndim_in, \
                                       const int *lbnd_in, const int *ubnd_in, \
                                       const Xtype *in, const Xtype *in_var, \
@@ -1629,7 +1629,6 @@ static int InterpolatePixelLinear##X( int ndim_in, \
    Xfloattype val;               /* Value to be asigned to output pixel */ \
    Xfloattype wtsum;             /* Sum of weight values */ \
    Xtype var;                    /* Variance value */ \
-   const Xtype zero = (Xtype) 0; /* Zero, in appropriate data type */ \
    double *frac_hi;              /* Pointer to array of weights */ \
    double *frac_lo;              /* Pointer to array of weights */ \
    double *wt;                   /* Pointer to array of weights */ \
@@ -1750,12 +1749,12 @@ static int InterpolatePixelLinear##X( int ndim_in, \
                if ( lo_x >= lbnd_in[ 0 ] ) { \
                   FORM_LINEAR_INTERPOLATION_SUM( off_lo, \
                                                  frac_lo_x, \
-                                                 Xsigned, Xfloattype ) \
+                                                 Xtype, Xfloattype ) \
                } \
                if ( hi_x <= ubnd_in[ 0 ] ) { \
                   FORM_LINEAR_INTERPOLATION_SUM( off_lo + 1, \
                                                  frac_hi_x, \
-                                                 Xsigned, Xfloattype ) \
+                                                 Xtype, Xfloattype ) \
                } \
             } \
          } \
@@ -1898,24 +1897,24 @@ static int InterpolatePixelLinear##X( int ndim_in, \
                      if ( lo_x >= lbnd_in[ 0 ] ) { \
                         FORM_LINEAR_INTERPOLATION_SUM( off_lo, \
                                                        frac_lo_x * frac_lo_y, \
-                                                       Xsigned, Xfloattype ) \
+                                                       Xtype, Xfloattype ) \
                      } \
                      if ( hi_x <= ubnd_in[ 0 ] ) { \
                         FORM_LINEAR_INTERPOLATION_SUM( off_lo + 1, \
                                                        frac_hi_x * frac_lo_y, \
-                                                       Xsigned, Xfloattype ) \
+                                                       Xtype, Xfloattype ) \
                      } \
                   } \
                   if ( hi_y <= ubnd_in[ 1 ] ) { \
                      if ( lo_x >= lbnd_in[ 0 ] ) { \
                         FORM_LINEAR_INTERPOLATION_SUM( off_lo + ystride, \
                                                        frac_lo_x * frac_hi_y, \
-                                                       Xsigned, Xfloattype ) \
+                                                       Xtype, Xfloattype ) \
                      } \
                      if ( hi_x <= ubnd_in[ 0 ] ) { \
                         FORM_LINEAR_INTERPOLATION_SUM( off_lo + ystride + 1, \
                                                        frac_hi_x * frac_hi_y, \
-                                                       Xsigned, Xfloattype ) \
+                                                       Xtype, Xfloattype ) \
                      } \
                   } \
                } \
@@ -2108,7 +2107,7 @@ static int InterpolatePixelLinear##X( int ndim_in, \
 /* If necessary, test if this value is bad (if the data type is \
    signed, also check that it is not negative). */ \
                         bad_var = ( var == badval ) && usebad; \
-                        if ( Xsigned ) bad_var = bad_var || ( var < zero ); \
+                        CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
 \
 /* If any bad input variance value is obtained, we cannot generate a \
    valid output variance estimate. Otherwise, form the sum needed to \
@@ -2216,7 +2215,7 @@ static int InterpolatePixelLinear##X( int ndim_in, \
 /* This subsidiary macro adds the contribution from a specified input
    pixel to the accumulated sums for forming the linearly interpolated
    value in the macro above. */
-#define FORM_LINEAR_INTERPOLATION_SUM(off,wt,Xsigned,Xfloattype) \
+#define FORM_LINEAR_INTERPOLATION_SUM(off,wt,Xtype,Xfloattype) \
 \
 /* Obtain the offset of the input pixel to use. */ \
    off_in = (off); \
@@ -2238,7 +2237,7 @@ static int InterpolatePixelLinear##X( int ndim_in, \
 /* If necessary, test if the variance value is bad (if the data type \
    is signed, also check that it is not negative). */ \
          bad_var = ( var == badval ) && usebad; \
-         if ( Xsigned ) bad_var = bad_var || ( var < zero ); \
+         CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
 \
 /* If OK, increment the weighted sum of variance values. */ \
          if ( !bad_var ) { \
@@ -2248,26 +2247,44 @@ static int InterpolatePixelLinear##X( int ndim_in, \
       } \
    }
 
-/* Expand the above macros to generate a function for each required
-   data type. */
+/* This second subsidiary macro tests for negative variance values in
+   the macros above. This check is required only for signed data
+   types. */
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+        bad_var = bad_var || ( var < ( (Xtype) 0 ) );
+
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-MAKE_INTERPOLATE_PIXEL_LINEAR(LD,long double,1,1,long double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,1,0,long double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,0,long double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(LD,long double,1,long double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,0,long double)
 #else
-MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,1,0,double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,0,double)
 #endif     
-MAKE_INTERPOLATE_PIXEL_LINEAR(D,double,1,1,double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(F,float,1,1,float)
-MAKE_INTERPOLATE_PIXEL_LINEAR(I,int,1,0,double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(UI,unsigned int,0,0,double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(S,short int,1,0,float)
-MAKE_INTERPOLATE_PIXEL_LINEAR(US,unsigned short int,0,0,float)
-MAKE_INTERPOLATE_PIXEL_LINEAR(B,signed char,1,0,float)
-MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(D,double,1,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(F,float,1,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(I,int,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(S,short int,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(B,signed char,0,float)
+
+/* Re-define the macro for testing for negative variances to do
+   nothing. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype)
+
+/* Expand the main macro above to generate a function for each
+   required unsigned data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,long double)
+#else
+MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,double)
+#endif     
+MAKE_INTERPOLATE_PIXEL_LINEAR(UI,unsigned int,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(US,unsigned short int,0,float)
+MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,float)
 
 /* Undefine the macros. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
 #undef FORM_LINEAR_INTERPOLATION_SUM
 #undef MAKE_INTERPOLATE_PIXEL_LINEAR
 
@@ -2431,7 +2448,7 @@ MAKE_INTERPOLATE_PIXEL_LINEAR(UB,unsigned char,0,0,float)
 */
 /* Define a macro to implement the function for a specific data
    type. */
-#define MAKE_INTERPOLATE_PIXEL_NEAREST(X,Xtype,Xsigned) \
+#define MAKE_INTERPOLATE_PIXEL_NEAREST(X,Xtype) \
 static int InterpolatePixelNearest##X( int ndim_in, \
                                        const int *lbnd_in, \
                                        const int *ubnd_in, \
@@ -2444,7 +2461,6 @@ static int InterpolatePixelNearest##X( int ndim_in, \
 \
 /* Local Variables: */ \
    Xtype var;                    /* Variance value */ \
-   const Xtype zero = (Xtype) 0; /* Zero, in appropriate data type */ \
    double *xn_max;               /* Pointer to upper limits array (n-d) */ \
    double *xn_min;               /* Pointer to lower limits array (n-d) */ \
    double x;                     /* x coordinate value */ \
@@ -2514,7 +2530,7 @@ static int InterpolatePixelNearest##X( int ndim_in, \
             if ( usevar ) { \
                var = in_var[ off_in ]; \
                bad = ( var == badval ) && usebad; \
-               if ( Xsigned ) bad = bad || ( var < zero ); \
+               CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
 \
 /* If the variance value is not bad, store it in the output \
    array. Otherwise, store a bad value and count it. */ \
@@ -2587,7 +2603,7 @@ static int InterpolatePixelNearest##X( int ndim_in, \
             if ( usevar ) { \
                var = in_var[ off_in ]; \
                bad = ( var == badval ) && usebad; \
-               if ( Xsigned ) bad = bad || ( var < zero ); \
+               CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
 \
 /* If the variance value is not bad, store it in the output \
    array. Otherwise, store a bad value and count it. */ \
@@ -2669,7 +2685,7 @@ static int InterpolatePixelNearest##X( int ndim_in, \
                if ( usevar ) { \
                   var = in_var[ off_in ]; \
                   bad = ( var == badval ) && usebad; \
-                  if ( Xsigned ) bad = bad || ( var < zero ); \
+                  CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
 \
 /* If the variance value is not bad, store it in the output \
    array. Otherwise, store a bad value and count it. */ \
@@ -2704,23 +2720,37 @@ static int InterpolatePixelNearest##X( int ndim_in, \
    return result; \
 }
 
-/* Expand the above macro to generate a function for each required
-   data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double,1)
-#endif
-MAKE_INTERPOLATE_PIXEL_NEAREST(D,double,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(F,float,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UL,unsigned long int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(I,int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UI,unsigned int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(S,short int,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(US,unsigned short int,0)
-MAKE_INTERPOLATE_PIXEL_NEAREST(B,signed char,1)
-MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char,0)
+/* This subsidiary macro tests for negative variance values in the
+   macro above. This check is required only for signed data types. */
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype) \
+        bad = bad || ( var < ( (Xtype) 0 ) );
 
-/* Undefine the macro. */
+/* Expand the main macro above to generate a function for each
+   required signed data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double)
+#endif
+MAKE_INTERPOLATE_PIXEL_NEAREST(D,double)
+MAKE_INTERPOLATE_PIXEL_NEAREST(F,float)
+MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(I,int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(S,short int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(B,signed char)
+
+/* Re-define the macro for testing for negative variances to do
+   nothing. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
+#define CHECK_FOR_NEGATIVE_VARIANCE(Xtype)
+
+/* Expand the main macro above to generate a function for each
+   required unsigned data type. */
+MAKE_INTERPOLATE_PIXEL_NEAREST(UL,unsigned long int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UI,unsigned int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(US,unsigned short int)
+MAKE_INTERPOLATE_PIXEL_NEAREST(UB,unsigned char)
+
+/* Undefine the macros. */
+#undef CHECK_FOR_NEGATIVE_VARIANCE
 #undef MAKE_INTERPOLATE_PIXEL_NEAREST
 
 static void Invert( AstMapping *this ) {
