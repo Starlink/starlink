@@ -155,24 +155,6 @@
 -->
 <!entity % req.abstract "abstract?,"	-- optional abstract -->
 
-<!--
-  Express a link policy on certain elements.  Those elements which
-  have %export.id.required have both the ID element and the EXPORT as
-  required attributes.  ID is, of course, a unique ID for this
-  section, figure, or whatever.  If EXPORT is present, then the
-  document commits itself to maintaining this ID in future: that is,
-  it can safely be linked to from outside.
-
-  If an element has %export.id.optional in its attribute list, then it
-  may specify an ID, and it may export it, but neither is required.
--->
-<!entity % export.id.required "
-	id id #required
-	export (export) #required">
-<!entity % export.id.optional "
-	id id #implied
-	export (export) #implied">
-
 <!--=========== Feature Switches ==========-->
 <!--
   Use %Only.paper and %Only.web in source documents to distinguish
@@ -227,6 +209,15 @@
   Default: absent
 -->
 <!entity % Feature.Routinelist 'ignore'>
+
+<!--
+  The entity %Feature.EnforceLinkpolicy controls whether the link
+  policy described below is enforced by the DTD.  Set this to IGNORE
+  to relax the policy.
+
+  Default: enforced
+-->
+<!entity % Feature.EnforceLinkpolicy 'include'>
 
 
 <!--========== Entities for special symbols ==========
@@ -547,6 +538,33 @@
 ]]>
 <!entity % appendix.content "sect+">
 <!entity % backmatter	"bibliography? & indexcontents? & notecontents?">
+
+<!--
+  Express a link policy on certain elements.  Those elements which
+  have %export.id.required have both the ID element and the EXPORT as
+  required attributes.  ID is, of course, a unique ID for this
+  section, figure, or whatever.  If EXPORT is present, then the
+  document commits itself to maintaining this ID in future: that is,
+  it can safely be linked to from outside.
+
+  If an element has %export.id.optional in its attribute list, then it
+  may specify an ID, and it may export it, but neither is required.
+-->
+<![ %Feature.EnforceLinkpolicy [
+  <!entity % export.id.required "
+	id id #required
+	export (export) #required">
+]]>
+<!-- 
+  If %Feature.EnforceLinkpolicy is IGNORE, then make all the
+  attributes implied
+ -->
+<!entity % export.id.required "
+	id id #implied
+	export (export) #implied">
+<!entity % export.id.optional "
+	id id #implied
+	export (export) #implied">
 
 <!-- 
   Content model for element DOCBODY.  Presence or absence of abstract

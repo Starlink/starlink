@@ -19,6 +19,8 @@
 <!entity % Feature.Routinelist 'ignore'
 		-- MUDs should not, by default support routine
 		   descriptions -->
+<!entity % Feature.EnforceLinkpolicy 'ignore'
+		-- Don't enforce the link policy: let sections omit ID -->
 
 <!entity % Starlink.general
 	public "-//Starlink//DTD Starlink General 0.2//EN">
