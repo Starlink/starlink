@@ -56,9 +56,9 @@ f     In addition to those routines applicable to all Mappings, the
 f     following routines may also be applied to all Frames:
 *
 c     - astAngle: Calculate the angle subtended by two points at a third point
+c     - astAxAngle: Find the angle from an axis, to a line through two points.
 c     - astAxDistance: Calculate the distance between two axis values
 c     - astAxOffset: Calculate an offset along an axis
-c     - astBear: Calculate the bearing of one point seen from another point.
 c     - astConvert: Determine how to convert between two coordinate systems
 c     - astDistance: Calculate the distance between two points in a Frame
 c     - astFindFrame: Find a coordinate system with specified characteristics
@@ -70,10 +70,10 @@ c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astResolve: Resolve a vector into two orthogonal components
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
-f     - AST_ANGLE: Calculate the angle subtended by two points at a third point
+f     - AST_ANGLE: Find the angle subtended by two points at a third point
+f     - AST_AXANGLE: Find the angle from an axis, to a line through two points.
 f     - AST_AXDISTANCE: Calculate the distance between two axis values
 f     - AST_AXOFFSET: Calculate an offset along an axis
-f     - AST_BEAR: Calculate the bearing of one point seen from another point.
 f     - AST_CONVERT: Determine how to convert between two coordinate systems
 f     - AST_DISTANCE: Calculate the distance between two points in a Frame
 f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
@@ -135,6 +135,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added method astResolve.
 *     9-SEP-2001 (DSB):
 *        Added method astBear.
+*     21-SEP-2001 (DSB):
+*        Replaced astBear with astAxAngle.
 *class--
 */
 
@@ -588,7 +590,7 @@ static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double AxDistance( AstFrame *, int, double, double );
 static double AxOffset( AstFrame *, int, double, double );
-static double Bear( AstFrame *, const double[], const double[] );
+static double AxAngle( AstFrame *, const double[], const double[], int );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double Offset2( AstFrame *, const double[2], double, double, double[2] );
@@ -825,11 +827,10 @@ f     RESULT = AST_ANGLE( THIS, A, B, C, STATUS )
 *  Description:
 c     This function 
 f     This routine 
-*     finds the angle at point B between the line
-*     joining points A and B, and the line joining points C 
-*     and B. These lines will in fact be geodesic curves appropriate to 
-*     the Frame in use. For instance, in SkyFrame, they will be great
-*     circles.
+*     finds the angle at point B between the line joining points A and B, 
+*     and the line joining points C and B. These lines will in fact be 
+*     geodesic curves appropriate to the Frame in use. For instance, in 
+*     SkyFrame, they will be great circles.
 
 *  Parameters:
 c     this
@@ -857,17 +858,13 @@ f        The global status.
 c     astAngle
 f     AST_ANGLE = DOUBLE PRECISION
 *        The angle in radians, from the line AB to the line CB. If the
-*        Frame is 2-dimensional, it will be in the range $\pm \pi$.
-*        If the Frame has 3 axes, a positive value will
-*        always be returned in the range zero to $\pi$. A value of
-*        AST_BAD will be returned if the Frame is not 2 or 3 dimensional.
+*        Frame is 2-dimensional, it will be in the range $\pm \pi$,
+*        and positive rotation is in the same sense as rotation from 
+*        the positive direction of axis 2 to the positive direction of 
+*        axis 1. If the Frame has more than 2 axes, a positive value will
+*        always be returned in the range zero to $\pi$.
 
 *  Notes:
-*     -  For a simple Frame positive rotation is in the same sense as 
-*     rotation from the positive direction of axis 2 to the positive 
-*     direction of axis 1.
-*     -  For a SkyFrame positive rotation is in the same sense as 
-*     rotation from the north to east.
 *     - A value of AST_BAD will also be returned if points A and B are
 *     co-incident, or if points B and C are co-incident.
 *     - A value of AST_BAD will also be returned if this function is
@@ -878,15 +875,15 @@ f     invoked with STATUS set to an error value, or if it should fail for
 */
 
 /* Local Variables: */
-   double ab[3];                 /* Vector AB */
+   double *ab;                   /* Pointer to vector AB */
+   double *cb;                   /* Pointer to vector CB */
+   double cos;                   /* cosine of required angle */
    double anga;                  /* Angle from +ve Y to the line BA */
    double angc;                  /* Angle from +ve Y to the line BC */
-   double cb[3];                 /* Vector CB */
-   double cosa;                  /* Co-sine of required angle */
-   double dp[3];                 /* AB cross CB */
-   double r;                     /* Vector length */
    double result;                /* Result value to return */
-   double sina;                  /* Sine of required angle */
+   double sla;                   /* Squared length of vector AB */
+   double slc;                   /* Squared length of vector CB */
+   double sp;                    /* Scalar product of AB and CB */
    int axis;                     /* Axis index */
    int naxes;                    /* Number of Frame axes */
    int ok;                       /* Supplied points OK? */
@@ -897,91 +894,221 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Assume everyting is ok */
+/* Assume everything is ok */
    ok = 1;
 
 /* Obtain the number of Frame axes. */
    naxes = astGetNaxes( this );
 
-/* Check that the Frame is 2 or 3 dimensional. */
-   if( naxes != 2 && naxes != 3 ) ok = 0;
+/* Obtain workspace. */
+   ab = (double *) astMalloc( sizeof(double)*naxes );
+   cb = (double *) astMalloc( sizeof(double)*naxes );
 
-/* Check all positions are good. */
-   if( ok ) {
+/* Check all positions are good, and form the vectors from b to a, and
+   from b to c. Also find the squared length of each vector. */
+   if( astOK ) {
+      sla = 0.0;
+      slc = 0.0;
       for( axis = 0; axis < naxes; axis++ ) {
-         if( a[axis] == AST__BAD || b[axis] == AST__BAD ||
-             c[axis] == AST__BAD ) { 
+         if( a[ axis ] == AST__BAD || b[ axis ] == AST__BAD ||
+             c[ axis ] == AST__BAD ) { 
             ok = 0;
             break;
+         } else {
+            ab[ axis ] = a[ axis ] - b[ axis ];
+            cb[ axis ] = c[ axis ] - b[ axis ];
+            sla += ( ab[ axis ] )*( ab[ axis ] );
+            slc += ( cb[ axis ] )*( cb[ axis ] );
+         }
+      }
+
+/* Check that neither of the vectors have zero length. */
+      if( sla == 0 || slc == 0 ) ok = 0;
+
+/* Only proceed if these checks were passed. */
+      if ( ok ) {
+
+/* Deal first with 2-dimensional Frames. */
+         if( naxes == 2 ) {
+
+/* Find the angle from +ve Y to the line BA. */
+            anga = atan2( ab[ 0 ], ab[ 1 ] );
+
+/* Find the angle from +ve Y to the line BC. */
+            angc = atan2( cb[ 0 ], cb[ 1 ] );
+
+/* Find the difference, folded into the range +/- PI. */
+            result = slaDrange( angc - anga );
+
+/* Now deal with Frames with more than 2 axes. */
+         } else {
+
+/* Form the scalar product of the two vectors. */
+            sp = 0.0;
+            for( axis = 0; axis < naxes; axis++ ) {
+               sp += ab[ axis ]*cb[ axis ];
+            }
+
+/* Derive the required angle from the normalized scalar product. */
+            cos = sp/sqrt( sla*slc );
+            if( cos > 1.0 ) {
+               cos = 1.0;
+            } else if( cos < -1.0 ) {
+               cos = -1.0;
+            }
+            result =acos( cos );
          }
       }
    }
 
-/* Check that A and B are not co-incident, and form the vector AB. */
-   if( ok ) {
-      ok = 0;
-      for( axis = 0; axis < naxes; axis++ ) {
-         ab[ axis ] = a[ axis ] - b[ axis ];
-         if( ab[ axis ] != 0.0 ) ok = 1;
-      }
-   }
-
-/* Check that C and B are not co-incident, and form the vector CB. */
-   if( ok ) {
-      ok = 0;
-      for( axis = 0; axis < naxes; axis++ ) {
-         cb[ axis ] = c[ axis ] - b[ axis ];
-         if( cb[ axis ] != 0.0 ) ok = 1;
-      }
-   }
-
-/* Only proceed if these checks were passed. */
-   if ( astOK && ok ) {
-
-/* Deal first with 2-dimensional Frames. */
-      if( naxes == 2 ) {
-
-/* Find the angle from +ve Y to the line BA. */
-         anga = atan2( ab[ 0 ], ab[ 1 ] );
-
-/* Find the angle from +ve Y to the line BC. */
-         angc = atan2( cb[ 0 ], cb[ 1 ] );
-
-/* Find the difference, folded into the range +/- PI. */
-         result = slaDrange( angc - anga );
-
-/* Now deal with Frames with 3 axes. */
-      } else {
-
-/* Normalize the vectors to unit vectors. */
-         r = sqrt( ab[ 0 ]*ab[ 0 ] + ab[ 1 ]*ab[ 1 ] + ab[ 2 ]*ab[ 2 ] );
-         ab[ 0 ] /= r;
-         ab[ 1 ] /= r;
-         ab[ 2 ] /= r;
-
-         r = sqrt( cb[ 0 ]*cb[ 0 ] + cb[ 1 ]*cb[ 1 ] + cb[ 2 ]*cb[ 2 ] );
-         cb[ 0 ] /= r;
-         cb[ 1 ] /= r;
-         cb[ 2 ] /= r;
-
-/* Find the cross product between the two unit vectors. */
-         slaDvxv( ab, cb, dp );
-
-/* The magnitude of the cross product is the sin of the angle (0 to 1). */
-         sina = sqrt( dp[ 0 ]*dp[ 0 ] + dp[ 1 ]*dp[ 1 ] + dp[ 2 ]*dp[ 2 ] );
-
-/* The scalar product of the two unit vectors is the cos of the angle (-1
-   to +1). */
-         cosa = ab[ 0 ]*cb[ 0 ] + ab[ 1 ]*cb[ 1 ] + ab[ 2 ]*cb[ 2 ];
-
-/* Form the require angle. */
-         result = atan2( sina, cosa );
-
-      }
-   }
+/* Free the work space. */
+   ab = (double *) astFree( (void *) ab );
+   cb = (double *) astFree( (void *) cb );
 
 /* Return the result. */
    return result;
+}
+
+static double AxAngle( AstFrame *this, const double a[], const double b[], int axis ) {
+/*
+*++
+*  Name:
+c     astAxAngle
+f     AST_AXANGLE
+
+*  Purpose:
+*     Returns the angle from an axis, to a line through two points.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     double astAxAngle( AstFrame *this, const double a[], const double b[], int axis )
+f     RESULT = AST_AXANGLE( THIS, A, B, AXIS, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     finds the angle, as seen from point A, between the positive
+*     direction of a specified axis, and the geodesic curve joining point 
+*     A to point B. 
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     a
+f     A( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the first point.
+c     b
+f     B( * ) = DOUBLE PRECISION (Given)
+c        An array of double, with one element for each Frame axis
+f        An array with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the second point.
+c     axis
+f     AXIS = INTEGER (Given)
+*        The number of the Frame axis from which the angle is to be
+*        measured (axis numbering starts at 1 for the first axis).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astAxAngle
+f     AST_AXANGLE = DOUBLE PRECISION
+*        The angle in radians, from the positive direction of the
+*        specified axis, to the line AB. If the Frame is 2-dimensional, 
+*        it will be in the range $\pm \pi$, and positive rotation is in 
+*        the same sense as rotation from the positive direction of axis 2 
+*        to the positive direction of axis 1. If the Frame has more than 2 
+*        axes, a positive value will always be returned in the range zero 
+*        to $\pi$. 
+
+*  Notes:
+c     - The geodesic curve used by this function is the path of
+f     - The geodesic curve used by this routine is the path of
+*     shortest distance between two points, as defined by the
+c     astDistance function.
+f     AST_DISTANCE function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the require
+*     position angle is undefined.
+*--
+*/
+
+/* Local Variables: */
+   double *aa;                   /* Pointer to third point */
+   double ab;                    /* Absolute value of component */
+   double mxab;                  /* Largest absolute value of component */
+   double result;                /* The returned value */
+   int iaxis;                    /* Axis index */
+   int naxes;                    /* Number of Frame axes */
+   int ok;                       /* Are values ok to use? */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis - 1, "astAxAngle" );
+
+/* Obtain the number of Frame axes. */
+   naxes = astGetNaxes( this );
+
+/* Obtain workspace. */
+   aa = (double *) astMalloc( sizeof(double)*naxes );
+
+/* Create a position which is offset slightly from point A in the
+   positive direction of the specified axis. Also get the largest absolute 
+   value of any component of the vector AB. */
+   if( astOK ) {
+      ok = 1;
+      mxab = 0.0;
+
+      for( iaxis = 0; iaxis < naxes; iaxis++ ) {
+         if( a[ iaxis ] != AST__BAD && b[ iaxis ] != AST__BAD ) {
+            aa[ iaxis ] = a[ iaxis ];
+            ab = fabs( a[ iaxis ] - b[ iaxis ] );
+            if( ab > mxab ) mxab = ab;
+         } else {
+            ok = 0;
+            break;
+         }
+      }
+
+      if( ok ) {
+
+         if( a[ axis - 1 ] != 0.0 ) {
+            aa[ axis - 1 ] += 10000.0*DBL_EPSILON*fabs( a[ axis - 1 ] );
+
+         } else if( b[ axis - 1 ] != 0.0 ) {
+            aa[ axis - 1 ] = 10000.0*DBL_EPSILON*fabs( b[ iaxis - 1 ] );
+
+         } else if( mxab != 0.0 ) {
+            aa[ axis - 1 ] = 10000.0*DBL_EPSILON*mxab;
+
+         } else {
+            aa[ axis - 1 ] = 1.0;
+         }
+
+/* Use astAngle to get the required angle. */
+         result = astAngle( this, a, aa, b );
+      }
+   }
+
+/* Free the workspace. */
+   aa = (double *) astFree( (void *) aa );
+
+/* Return the result. */
+   return result;
+
 }
 
 static double AxDistance( AstFrame *this, int axis, double v1, double v2 ) {
@@ -1144,109 +1271,6 @@ f     invoked with STATUS set to an error value, or if it should fail for
 
 /* Annul the Axis pointer. */
    ax = astAnnul( ax );
-
-/* Return the result. */
-   return result;
-
-}
-
-static double Bear( AstFrame *this, const double a[], const double b[] ) {
-/*
-*++
-*  Name:
-c     astBear
-f     AST_BEAR
-
-*  Purpose:
-*     Returns the bearing (position angle) of one point as seen from another.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "frame.h"
-c     double astBear( AstFrame *this, const double a[], const double b[] )
-f     RESULT = AST_BEAR( THIS, A, B, STATUS )
-
-*  Class Membership:
-*     Frame method.
-
-*  Description:
-c     This function 
-f     This routine 
-*     finds the bearing (position angle) of point B as seen from point A.
-*     It can only be used with 2-dimensional Frames.
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Frame.
-c     a
-f     A( * ) = DOUBLE PRECISION (Given)
-c        An array of double, with one element for each Frame axis
-f        An array with one element for each Frame axis
-*        (Naxes attribute) containing the coordinates of the first point.
-c     b
-f     B( * ) = DOUBLE PRECISION (Given)
-c        An array of double, with one element for each Frame axis
-f        An array with one element for each Frame axis
-*        (Naxes attribute) containing the coordinates of the second point.
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-
-*  Returned Value:
-c     astBear
-f     AST_BEAR = DOUBLE PRECISION
-*        The position angle in radians, of the point B as seen from the
-*        point A. The value will be in the range zero to 2.PI.
-
-*  Notes:
-*     - For a simple Frame, the returned position angle is the angle from the 
-*     positive direction of the second axis, to the line joining the supplied
-*     positions. Positive rotation is in the sense of rotation from the
-*     positive direction of the second axis, to the positive direction of the
-*     first axis.
-*     - For a SkyFrame, the returned position angle is the angle from north 
-*     to the great circle joining the supplied positions. Positive rotation is 
-*     in the sense of rotation from north to east. 
-*     - An error will be reported if the Frame is not 2-dimensional.
-*     - This function will return "bad" coordinate values (AST__BAD)
-*     if any of the input coordinates has this value, or if the require
-*     position angle is undefined.
-*--
-*/
-
-/* Local Variables: */
-   double d0;                    /* Axis 0 increment */
-   double d1;                    /* Axis 1 increment */
-   double result;                /* The returned value */
-   int naxes;                    /* Number of Frame axes */
-
-/* Check the global error status. */
-   result = AST__BAD;
-   if ( !astOK ) return result;
-
-/* Determine the number of Frame axes. */
-   naxes = astGetNaxes( this );
-
-/* Report an error if the Frame is not 2 dimensional. */
-   if( naxes != 2 && astOK ) {
-      astError( AST__NAXIN, "astBear(%s): Invalid number of Frame axes (%d)."
-                " astBear can only be used with 2 dimensonal Frames.",
-                astGetClass( this ), naxes );
-   }
-
-/* Check the supplied values. */
-   if ( astOK && a[ 0 ] != AST__BAD && a[ 1 ] != AST__BAD && 
-                 b[ 0 ] != AST__BAD && b[ 1 ] != AST__BAD ) {
-
-/* If the points are not co-incident, store the required value. */
-      d0 = a[ 0 ] - b[ 0 ];
-      d1 = a[ 1 ] - b[ 1 ];
-      if( d0 != 0.0 || d1 != 0.0 ) {
-         result = slaDranrm( atan2( d0, d1 ) );
-      }
-   }
 
 /* Return the result. */
    return result;
@@ -3750,7 +3774,7 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->Norm = Norm;
    vtab->AxDistance = AxDistance;
    vtab->AxOffset = AxOffset;
-   vtab->Bear = Bear;
+   vtab->AxAngle = AxAngle;
    vtab->Offset = Offset;
    vtab->Offset2 = Offset2;
    vtab->Resolve = Resolve;
@@ -4201,7 +4225,7 @@ f     RESULT = AST_OFFSET2( THIS, POINT1, ANGLE, OFFSET, POINT2, STATUS )
 c     This function finds the Frame coordinate values of a point which
 f     This routine finds the Frame coordinate values of a point which
 *     is offset a specified distance along the geodesic curve at a
-*     given bearing from a specified staring point. It can only be
+*     given angle from a specified starting point. It can only be
 *     used with 2-dimensional Frames.
 *
 *     For example, in a basic Frame, this offset will be along the
@@ -4222,7 +4246,9 @@ c     angle
 f     ANGLE = DOUBLE PRECISION (Given)
 *        The angle (in radians) from the positive direction of the second
 *        axis, to the direction of the required position, as seen from
-*        the starting position. 
+*        the starting position. Positive rotation is in the sense of 
+*        rotation from the positive direction of axis 2 to the positive 
+*        direction of axis 1.
 c     offset
 f     OFFSET = DOUBLE PRECISION
 *        The required offset from the first point along the geodesic
@@ -4240,17 +4266,14 @@ f        The global status.
 *  Returned Value:
 c     astOffset2
 f     AST_OFFSET2 = DOUBLE PRECISION
-*        The position angle which the geodesic curve has at the end point.
-*        That is, the angle between the positive direction of the second
+*        The direction of the geodesic curve at the end point. That is, the 
+*        angle (in radians) between the positive direction of the second
 *        axis and the continuation of the geodesic curve at the requested
-*        end point. 
+*        end point. Positive rotation is in the sense of rotation from
+*        the positive direction of axis 2 to the positive direction of axis 
+*        1.
 
 *  Notes:
-*     - For a simple Frame, positive rotation is in the sense of 
-*     rotation from the positive direction of the second axis to the 
-*     positive direction of the first axis.
-*     - For a SkyFrame, positive rotation is in the sense of 
-*     rotation from north to east.
 c     - The geodesic curve used by this function is the path of
 f     - The geodesic curve used by this routine is the path of
 *     shortest distance between two points, as defined by the
@@ -8164,9 +8187,10 @@ void astOffset_( AstFrame *this, const double point1[], const double point2[],
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Offset))( this, point1, point2, offset, point3 );
 }
-double astBear_( AstFrame *this, const double a[2], const double b[2] ) {
+double astAxAngle_( AstFrame *this, const double a[2], const double b[2],
+                    int axis ) {
    if ( !astOK ) return AST__BAD;
-   return (**astMEMBER(this,Frame,Bear))( this, a, b );
+   return (**astMEMBER(this,Frame,AxAngle))( this, a, b, axis );
 }
 double astOffset2_( AstFrame *this, const double point1[2], double angle,
                  double offset, double point2[2] ) {

@@ -89,6 +89,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added NegLon attribute, and astResolve method.
 *     9-SEP-2001 (DSB):
 *        Added astBear method.
+*     21-SEP-2001 (DSB):
+*        Removed astBear method.
 *class--
 */
 
@@ -194,7 +196,6 @@ static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *SystemString( AstSkySystemType );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
-static double Bear( AstFrame *, const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstSkyFrame * );
@@ -290,7 +291,7 @@ static double Angle( AstFrame *this_frame, const double a[],
 *  Returned Value:
 *     The angle in radians, from the line AB to the line CB, in
 *     the range $\pm \pi$ with positive rotation is in the same sense 
-*     as rotation from north to east.
+*     as rotation from axis 2 to axis 1.
 
 *  Notes:
 *     - This function will return a "bad" result value (AST__BAD) if
@@ -310,12 +311,22 @@ static double Angle( AstFrame *this_frame, const double a[],
    double bb[ 2 ];               /* Permuted b coordinates */
    double cc[ 2 ];               /* Permuted c coordinates */
    double result;                /* Value to return */
+   int stat;                     /* Status return from SLALIB */
+   static double piby2;          /* Value of pi/2 */
+   static int init = 0;          /* Value of pi/2 initialised? */
 
 /* Initialise. */
    result = AST__BAD;
 
 /* Check the global error status. */
-   if ( !astOK ) return result;
+   if ( !astOK ) return;
+
+/* If not already done, obtain a value for pi/2 from SLALIB by
+   converting 90 degrees into radians. */
+   if ( !init ) {   
+      slaDaf2r( 90, 0, 0.0, &piby2, &stat );
+      init = 1;
+   }
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -350,100 +361,17 @@ static double Angle( AstFrame *this_frame, const double a[],
 /* Find the angle from north to the line BC. */
                angc = slaDbear( bb[ 0 ], bb[ 1 ], cc[ 0 ], cc[ 1 ] );
 
-/* Find the difference, folded into the range +/- PI. */
-               result = slaDrange( angc - anga );
+/* Find the difference. */
+               result = angc - anga;
+
+/* This value is the angle from north, but we want the angle from axis 2.
+   If the axes have been swapped so that axis 2 is actually the longitude
+   axis, then we need to correct this result. */
+               if( perm[ 0 ] != 0 ) result = piby2 - result;
+
+/* Fold the result into the range +/- PI. */
+               result = slaDrange( result );
             }
-         }
-      }
-   }
-
-/* Return the result. */
-   return result;
-}
-
-static double Bear( AstFrame *this_frame, const double a[], const double b[] ) {
-/*
-*  Name:
-*     Bear
-
-*  Purpose:
-*     Calculate the bearing (position angle) of one point seen from another.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "skyframe.h"
-*     double Bear( AstFrame *this_frame, const double a[], const double b[] )
-
-*  Class Membership:
-*     SkyFrame member function (over-rides the astBear method inherited from 
-*     the Frame class).
-
-*  Description:
-*     This function finds the position angle of point B seen from point A.
-
-*  Parameters:
-*     this
-*        Pointer to the SkyFrame.
-*     a 
-*        An array of double, with one element for each SkyFrame axis,
-*        containing the coordinates of the first point.
-*     b 
-*        An array of double, with one element for each SkyFrame axis,
-*        containing the coordinates of the second point.
-
-*  Returned Value:
-*     The position angle in radians, in the range zero to 2.PI. This is
-*     the angle from north to the line joining the two points, measured
-*     positive through east.
-
-*  Notes:
-*     - This function will return a "bad" result value (AST__BAD) if
-*     any of the input coordinates has this value.
-*     - A "bad" value will also be returned if points A and B are
-*     co-incident.
-*     - A "bad" value will also be returned if this function is
-*     invoked with the AST error status set, or if it should fail for
-*     any reason.
-*/
-
-   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
-   const int *perm;              /* Axis permutation array */
-   double aa[ 2 ];               /* Permuted a coordinates */
-   double bb[ 2 ];               /* Permuted b coordinates */
-   double result;                /* Value to return */
-
-/* Initialise. */
-   result = AST__BAD;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Obtain a pointer to the SkyFrame structure. */
-   this = (AstSkyFrame *) this_frame;
-
-/* Obtain a pointer to the SkyFrame's axis permutation array. */
-   perm = astGetPerm( this );
-   if ( astOK ) {
-
-/* Check that all supplied coordinates are OK. */
-      if ( ( a[ 0 ] != AST__BAD ) && ( a[ 1 ] != AST__BAD ) &&
-           ( b[ 0 ] != AST__BAD ) && ( b[ 1 ] != AST__BAD ) ) {
-
-/* Apply the axis permutation array to obtain the coordinates of the
-   three points in the required (longitude,latitude) order. */
-         aa[ perm[ 0 ] ] = a[ 0 ];
-         aa[ perm[ 1 ] ] = a[ 1 ];
-         bb[ perm[ 0 ] ] = b[ 0 ];
-         bb[ perm[ 1 ] ] = b[ 1 ];
-
-/* Check that A and B are not co-incident. */
-         if( aa[ 0 ] != bb[ 0 ] || aa[ 1 ] != bb[ 1 ] ) {
-
-/* Find the angle, folded into the range 0 to 2.PI */
-            result = slaDranrm( slaDbear( aa[ 0 ], aa[ 1 ], bb[ 0 ], bb[
-1 ] ) );
          }
       }
    }
@@ -2354,7 +2282,6 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
    frame->Angle = Angle;
-   frame->Bear = Bear;
    frame->Distance = Distance;
    frame->Norm = Norm;
    frame->Resolve = Resolve;
@@ -3274,7 +3201,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *  Description:
 *     This function finds the SkyFrame coordinate values of a point
 *     which is offset a specified distance along the geodesic curve
-*     (i.e. great circle) at a given bearing from a given starting point.
+*     (i.e. great circle) at a given angle from a given starting point.
 
 *  Parameters:
 *     this
@@ -3284,13 +3211,15 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *        This should contain the coordinates of the point marking the
 *        start of the geodesic curve.
 *     angle
-*        The angle (in radians) from north, to the direction of the required 
-*        position, as seen from the starting position. Positive rotation is 
-*        in the sense of rotation from north to east.
+*        The angle (in radians) from the positive direction of the second
+*        axis, to the direction of the required position, as seen from
+*        the starting position. Positive rotation is in the sense of 
+*        rotation from the positive direction of axis 2 to the positive 
+*        direction of axis 1.
 *     offset
 *        The required offset from the first point along the geodesic
 *        curve, in radians. If this is positive, it will be towards
-*        the given bearing. If it is negative, it will be in the
+*        the given angle. If it is negative, it will be in the
 *        opposite direction. 
 *     point2
 *        An array of double, with one element for each SkyFrame axis
@@ -3298,10 +3227,12 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 *        returned.
 
 *  Returned Value:
-*     The position angle which the geodesic curve has at the end point.
-*     That is, the angle between the positive direction of the second
+*     The direction of the geodesic curve at the end point. That is, the 
+*     angle (in radians) between the positive direction of the second
 *     axis and the continuation of the geodesic curve at the requested
-*     end point. 
+*     end point. Positive rotation is in the sense of rotation from
+*     the positive direction of axis 2 to the positive direction of axis 
+*     1.
 
 *  Notes:
 *     - The geodesic curve used by this function is the path of
@@ -3320,6 +3251,7 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
    double cosoff;              /* Cosine of offset */
    double cosa1;               /* Cosine of longitude at start */
    double cosb1;               /* Cosine of latitude at start */
+   double pa;                  /* A position angle measured from north */
    double q1[ 3 ];             /* Vector PI/2 away from R4 in meridian of R4 */
    double q2[ 3 ];             /* Vector PI/2 away from R4 on equator */
    double q3[ 3 ];             /* Vector PI/2 away from R4 on great circle */
@@ -3328,10 +3260,22 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
    double sinoff;              /* Sine of offset */
    double sina1;               /* Sine of longitude at start */
    double sinb1;               /* Sine of latitude at start */
+   int stat;                   /* Status return from SLALIB */
+   static double piby2;        /* Value of pi/2 */
+   static int init = 0;        /* Value of pi/2 initialised? */
+
+/* Initialise. */
+   result = AST__BAD;
 
 /* Check the global error status. */
-   result = AST__BAD;
-   if ( !astOK ) return result;
+   if ( !astOK ) return;
+
+/* If not already done, obtain a value for pi/2 from SLALIB by
+   converting 90 degrees into radians. */
+   if ( !init ) {   
+      slaDaf2r( 90, 0, 0.0, &piby2, &stat );
+      init = 1;
+   }
 
 /* Obtain a pointer to the SkyFrame structure. */
    this = (AstSkyFrame *) this_frame;
@@ -3354,13 +3298,17 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
          p1[ perm[ 0 ] ] = point1[ 0 ];
          p1[ perm[ 1 ] ] = point1[ 1 ];
 
+/* If the axes are permuted, convert the supplie dangle into a position
+   angle. */
+         pa = ( perm[ 0 ] == 0 )? angle: piby2 - angle;
+
 /* Use Shcal to calculate the required vectors R0 (representing
    the reference point) and R3 (representing the point which is 90
    degrees away from the reference point, along the required great
    circle). The XY plane defines zero latitude, Z is in the direction
    of increasing latitude, X is towards zero longitude, and Y is
    towards longitude 90 degrees. */
-         Shcal( p1[ 0 ], p1[ 1 ], angle, r0, r3 );
+         Shcal( p1[ 0 ], p1[ 1 ], pa, r0, r3 );
 
 /* Use Shapp to use R0 and R3 to calculate the new position. */
          Shapp( offset, r0, r3,  p1[ 0 ], p2 );
@@ -3398,9 +3346,12 @@ static double Offset2( AstFrame *this_frame, const double point1[2],
 
 /* Calculate the position angle of the great circle at the required
    point. */
-         result = atan2( slaDvdv( q3, q2 ), slaDvdv( q3, q1 ) );
+         pa = atan2( slaDvdv( q3, q2 ), slaDvdv( q3, q1 ) );
 
-/* Ensure that the end position angle is in the range 0 to 2*pi. */
+/* Convert this from a pa into the required angle. */
+         result = ( perm[ 0 ] == 0 )? pa: piby2 - pa;
+
+/* Ensure that the end angle is in the range 0 to 2*pi. */
          result = slaDranrm( result );
 
 /* Permute the result coordinates to undo the effect of the SkyFrame
