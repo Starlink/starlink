@@ -44,27 +44,31 @@ in mode make-manifest-mode in sl.dsl
   (or (hasnotes?) (hasbibliography?) (hashistory?) (hasidindex?)))
 
 ;; Do NOT call this within the context of the document-element.  It
-;; messes up big-time if (current-node) is the document-element.
+;; messes up big-time if (current-node) is the document-element,
+;; because (I think -- I'm adding this note a little while after this
+;; injunction) that results in a recursive call to this routine.
 (define (process-backmatter)
-  (if (hasbackmatter?)
-      (let ((body (make sequence
-		    (make element gi: "ul"
-			  (make-contents-backmatter))
-		    (make-notecontents)
-		    (make-bibliography)
-		    (make-updatelist)
-		    (make-idindex))))
-	(if (chunking?)
-	    (html-document (literal "Backmatter")
-			   body
-			   system-id: (backmatter-sys-id)
-			   force-chunk?: #t
-			   navbars?: #f)
+  (if (node-list=? (current-node) (document-element))
+      (error "(process-backmatter) called within document-element")
+    (if (hasbackmatter?)
+	(let ((body (make sequence
+			  (make element gi: "ul"
+				(make-contents-backmatter))
+			  (make-notecontents)
+			  (make-bibliography)
+			  (make-updatelist)
+			  (make-idindex))))
+	  (if (chunking?)
+	      (html-document (literal "Backmatter")
+			     body
+			     system-id: (backmatter-sys-id)
+			     force-chunk?: #t
+			     navbars?: #f)
 	    (make sequence
-	      (make element gi: "h1"
-		    (literal "Backmatter"))
-	      body)))
-      (empty-sosofo)))
+		  (make element gi: "h1"
+			(literal "Backmatter"))
+		  body)))
+      (empty-sosofo))))
 
 (define (make-manifest-backmatter)
   (make sequence
@@ -427,7 +431,10 @@ update elements which refer to them.
 <routine>
 <description>
 Linking support.  Create a page listing all the exported IDs in the document,
-so that document authors can find them in once place.
+so that document authors can find them in one place.
+Note that we use <funcname>idindex-element-list</funcname> rather than 
+<funcname>target-element-list</funcname>, since the former has had
+removed from it elements which are expensive to work with.
 <codebody>
 (define (hasidindex?)
   (not suppress-idindex))
@@ -436,13 +443,24 @@ so that document authors can find them in once place.
       (html-file uniq: "idindex")
       (html-file target_nd: (document-element))))
 (define (idindex-frag-id) "xref__IDINDEX")
+;; This function (make-idindex) seems to be taking an atrociously long
+;; time to run (294s runtime with `--jadeflags -Vsuppress-idindex' and
+;; 759s without), which I just don't understand -- what can be
+;; happening in there?  I thought it might be due to taking a long
+;; time to find <routine> elements cross-document, so had
+;; idindex-element-list consist of everything in target-element-list
+;; except "routine", but that didn't make any difference, so now the
+;; two are identical.  Tracing the output (by putting (debug)
+;; statements in the handlers in make-idindex-mode) suggests that
+;; every element in the idindex is taking a couple of seconds or so to
+;; process.  Bizarre!
 (define (make-idindex)
   (if suppress-idindex
       (empty-sosofo)
       (let ((body (let ((all-els (node-list-filter-by-gi
 				  (select-by-class (descendants (getdocbody))
 						   'element)
-				  (target-element-list))))
+				  (idindex-element-list))))
 		    (make sequence
 		      (make element gi: "h2"
 			    (make element gi: "a"
@@ -461,6 +479,7 @@ so that document authors can find them in once place.
 			   force-chunk?: #t
 			   navbars?: #f)
 	    body))))
+
 (mode make-idindex-mode
   (default
     (let ((id (attribute-string (normalize "id") (current-node))))
@@ -479,7 +498,8 @@ so that document authors can find them in once place.
 				(literal id)))
 		    (literal ">")
 		    (with-mode section-reference
-		      (process-node-list target)))))
+			       (process-node-list target))
+		    )))
 	  (empty-sosofo))))
   (element sect
     (let ((id (attribute-string (normalize "id") (current-node))))
@@ -502,7 +522,8 @@ so that document authors can find them in once place.
 				  (literal id)))
 		      (literal ">")
 		      (with-mode section-reference
-			(process-node-list target))))))
+				 (process-node-list target))
+		      ))))
 	  (empty-sosofo)))))
 ; nothing yet
 
