@@ -7162,7 +7162,7 @@ Reports the co-ordinates of positions selected using the cursor.
 
 Usage:
 
-   cursor [mode] [name] [outlist] [device]
+   cursor [mode] [name] [outcat] [device]
 
 Description:
 
@@ -7170,13 +7170,11 @@ Description:
    using a cursor and displays them on your terminal. The selected
    positions may be marked in various ways on the device (see parameter
    PLOT), and can be written to an output positions list so that subsequent
-   applications can make use of them (see parameter OUTLIST). The format
+   applications can make use of them (see parameter OUTCAT). The format
    of the displayed positions may be controlled using parameter STYLE.
 
    Positions may be reported in several different co-ordinate Frames
-   (see parameter FRAME). Optionally, the corresponding pixel
-   co-ordinates at each position may also be reported (see parameter
-   SHOWPIXEL).
+   (see parameter FRAME).
 
    The picture or pictures within which positions are required can be
    selected in several ways (see parameters MODE and NAME).
@@ -7187,24 +7185,24 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CLOSE
-CLOSE = _LOGICAL (Read)
+CLOSE = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
-   "Chain" or "Poly". If TRUE, polygons will be closed by joining
-   the first position to the last position. [current value]
+   "Chain" or "Poly". If TRUE, polgons will be closed by joining
+   the first position to the last position. [Current value]
 3 DESCRIBE
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    subsequent positions will be reported is produced each time a
-   position is reported within a new picture. [current value]
+   position is reported within a new picture. [Current value]
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics workstation.  This device must support cursor
-   interaction. [current graphics device]
+   interaction. [The current graphics device]
 3 EPOCH
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an
-   epoch value is needed to qualify it. This is the epoch at
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter FRAME) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
    which the supplied sky positions were determined. It should be
    given as a decimal years value, with or without decimal places
    ("1996.8" for example). Such values are interpreted as a Besselian
@@ -7219,7 +7217,7 @@ FRAME = LITERAL (Read)
    any of the co-ordinate Frames stored with each picture. The
    string supplied for FRAME can be one of the following:
 
-   - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
+   - A Domain name such as SKY, AXIS, PIXEL, etc. The special Domains
    AGI_WORLD and AGI_DATA are used to refer to the world and data
    co-ordinate system stored in the AGI graphics database. They can
    be useful if no WCS information was store with the picture when
@@ -7227,24 +7225,24 @@ FRAME = LITERAL (Read)
 
    - An integer value giving the index of the required Frame.
 
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
-   section "Sky Co-ordinate Systems" in SUN/95).
+   - An IRAS90 Sky Co-ordinate System (SCS) values such as
+   EQUAT(J2000) (see SUN/163).
 
    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the picture was created.
    [!]
 3 GEODESIC
-GEODESIC = _LOGICAL (Read)
+GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Poly". It specifies whether the curves drawn between
-   positions should be straight lines, or should be geodesic curves.
+   positions should be stright lines, or should be geodesic curves.
    In many co-ordinate Frames geodesic curves will be simple straight
    lines. However, in others (such as the majority of celestial
    co-ordinates Frames) geodesic curves will be more complex curves
    tracing the shortest path between two positions in a non-linear
    projection. [FALSE]
 3 INFO
-INFO = _LOGICAL (Read)
+INFO = LOGICAL (Read)
    If TRUE then messages are displayed describing the use of the
    mouse prior to obtaining the first position. Note, these
    informational messages are not suppressed by setting parameter
@@ -7263,10 +7261,10 @@ LOGFILE = FILENAME (Write)
    The name of the text file in which the formatted co-ordinates of
    positions selected with the cursor may be stored. This is intended
    primarily for recording the screen output, and not for communicating
-   positions to subsequent applications (use parameter OUTLIST for this
+   positions to subsequent applications (use parameter OUTCAT for this
    purpose). A null string (!) means that no file is created.  [!]
 3 MARKER
-MARKER = _INTEGER (Read)
+MARKER = INTEGER (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Mark". It specifies the symbol with which each
    position should be marked, and should be given as an integer
@@ -7274,12 +7272,12 @@ MARKER = _INTEGER (Read)
    2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The
    value must be larger than or equal to -31. [current value]
 3 MAXPOS
-MAXPOS = _INTEGER (Read)
+MAXPOS = INTEGER (Read)
    The maximum number of positions which may be supplied before the
-   application terminates. The number must be in the range 1 to 200.
-   [200]
+   application terminates. The number must be in the range 1 to 500.
+   [500]
 3 MINPOS
-MINPOS = _INTEGER (Read)
+MINPOS = INTEGER (Read)
    The minimum number of positions which may be supplied. The user
    is asked to supply more if necessary. The number must be in the
    range 0 to the value of parameter MAXPOS. [0]
@@ -7313,16 +7311,18 @@ NAME = LITERAL (Read)
 NUMBER = _INTEGER (Write)
    The number of positions selected with the cursor (excluding
    invalid positions).
-3 OUTLIST
-OUTLIST = FILENAME (Write)
-   An output positions list in which to store the valid selected
-   positions (only positions in the first selected picture are
-   recorded). This is the name of a text file which can be used to
-   communicate positions to subsequent applications. It includes
-   information describing the available co-ordinate Frames as well as
-   the positions themselves. If you want a simple record of the
-   positions displayed on the screen, use parameter LOGFILE instead.
-   If a null value is supplied, no output positions list is produced. [!]
+3 OUTCAT
+OUTCAT = FILENAME (Write)
+   An output catalogue in which to store the valid selected positions.
+   The catalogue has the form of a positions list such as created by
+   application LISTMAKE. Only positions in the first selected picture
+   are recorded. This application uses the conventions of the CURSA
+   package (SUN/190) for determining the format of the catalogue. If a
+   file type of .fits is given, then the catalogue is stored as a FITS
+   binary table. If a file type of .txt is given, then the catalogue
+   is stored in a text file in "Small Text List" (STL) format. If no
+   file type is given, then ".fit" is assumed. If a null value is
+   supplied, no output positions list is produced. [!]
 3 PLOT
 PLOT = LITERAL (Read)
    The type of graphics to be used to mark the selected positions
@@ -7346,52 +7346,28 @@ PLOT = LITERAL (Read)
    position. Parameters MARKER, GEODESIC and CLOSE are used to
    specify the symbols and lines to use.
 
-   [current value]
+   [Current value]
 3 QUIET
-QUIET = _LOGICAL (Read)
+QUIET = LOGICAL (Read)
    If TRUE then positions are not reported on the screen. Output
    parameters and files are still created. The display of informational
    messages describing the use of the cursor is controlled by the
    parameter INFO. [FALSE]
-3 SHOWPIXEL
-SHOWPIXEL = _LOGICAL (Read)
-   If TRUE, the pixel co-ordinates of each selected position are
-   shown on a separate line, following the co-ordinates requested
-   using parameter FRAME. If pixel co-ordinates are being displayed
-   anyway (see parameter FRAME) then a value of FALSE is used for.
-   SHOWPIXEL. [current value]
 3 STYLE
 STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the graphics specified by parameter PLOT. The format
-   of the positions reported on the screen may also be controlled.
+   The name of a text file containing a description of the plotting
+   style to use when drawing the graphics specified by parameter PLOT.
+   By specifying suitable values for Frame attributes (eg Digits(1),
+   Digits(2), Symbol(1), Symbol(2), etc), it can also be used to
+   control the format for the displayed axis values.
 
-   A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported). [current value]
-
-   In addition to the attributes which control the appearance of
-   the graphics (Colour, Font, etc), the following attributes may
-   be set in order to control the appearance of the formatted axis
-   values reported on the screen: Format, Digits, Symbol, Unit. These
-   may be suffixed with an axis number (eg "Digits(2)") to refer to
-   the values displayed for a specific axis. [current value]
+   Each line in the file should contain a string of the form
+   <name>=<value>, in which <name> is the name of an attribute,
+   and <value> is the value to assign to the attribute. The file may
+   contain blank lines and comment lines starting with a hash (#) sign.
+   Default values will be used for any unspecified attributes. All
+   attributes will be defaulted if a null value (!) is supplied,
+   or if the specified file cannot be accessed. [Current value]
 2 Examples
 cursor frame=pixel
    This obtains co-ordinates within any visible picture for the
@@ -7413,12 +7389,12 @@ cursor describe plot=mark marker=3 style="colour=red,size=2"
    marked with PGPLOT marker 3 (an asterisk). The markers are
    red and are twice the default size.
 
-cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
+cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
    Exactly two positions are obtained within the current picture,
    and are joined with a straight line. The positions are written to
-   a text file called slice but are not displayed on the screen. The
-   text file may be used to communicate the positions to later
-   applications.
+   a FITS binary catalogue called slice.fit but are not displayed on
+   the screen. The catalogue may be used to communicate the positions
+   to later applications (LISTSHOW, PROFILE, etc).
 
 cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
    This obtains co-ordinates within any visible DATA picture on
@@ -7436,11 +7412,6 @@ celestial co-ordinate values are stored in radians.
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
-
--  Pixel co-ordinates are formatted with 1 decimal place unless a
-format has already been specified by setting the Format attributes
-for the axes of the PIXEL co-ordinate Frame (eg using application
-WCSATTRIB).
 
 -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the
@@ -16835,21 +16806,21 @@ DSB: David S. Berry (STARLINK)
    before the plot is drawn.
 
 1 LISTMAKE
-Creates a text file holding a positions list.
+Creates a catalogue holding a positions list.
 
 Usage:
 
-   listmake outlist [ndf] [mode] [file]
+   listmake outcat [ndf] [mode] [file]
 
 Description:
 
-   This application creates a text file containing a list of positions
-   supplied by the user. Positions list are primarily intended for
-   communicating positions between applications. In addition to the
-   positions themselves, they contain information describing the
-   co-ordinate Frames in which the positions are defined. They also
-   contain integer position identifiers which allow positions to be
-   distinguished.
+   This application creates a catalogue containing a list of positions
+   supplied by the user, together with information describing the
+   co-ordinate Frames in which the positions are defined. Integer
+   position identifiers which allow positions to be distinguished are
+   also stored in the catalogue. The catalogue may be manipulated
+   using the CURSA package (SUN/190), and is stored in either FITS
+   binary format or the "Small Text List" (STL) format defined by CURSA.
 
    If an NDF is specified using parameter NDF, then the positions should
    be given in the current co-ordinate Frame of the NDF. Information
@@ -16859,63 +16830,62 @@ Description:
    data sets.
 
    If no NDF is specified, then the user must indicate the co-ordinate
-   Frame in which the positions will be supplied using parameter FRAME.
+   Frame in which the positions will be supplied using parameter DOMAIN.
    A description of this Frame will be written to the output positions
    list for use by subsequent applications.
 
-   The positions themselves may be supplied within another text file,
+   The positions themselves may be supplied within a text file,
    or may be given in response to repeated prompts for a parameter.
    Alternatively, the pixel centres in the NDF supplied for parameter
    NDF can be used (see parameter MODE).
 
    The output can be initialised by copying positions from an existing
    positions list. Any positions supplied directly by the user are then
-   appended to the end of this initial list (see parameter INLIST).
+   appended to the end of this initial list (see parameter INCAT).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 DESCRIBE
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    positions are required will be displayed before the positions
-   are obtained using either parameter POSITION or FILE. [current value]
+   are obtained using either parameter POSITION or FILE. [Current value]
 3 DIM
 DIM = _INTEGER (Read)
-   The number of axes in the co-ordinate Frame in which the positions
-   will be supplied. Only accessed if a null value is supplied for
-   parameter NDF.
+   The number of axes for each position. Only accessed if a null
+   value is supplied for parameter NDF.
+3 DOMAIN
+DOMAIN = LITERAL (Read)
+   Specifies the Domain of the positions supplied using parameter
+   POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string
+   such as EQUAT(J2000) is supplied (see SUN/163), then the positions
+   are assumed to be 2-dimensional celestial co-ordinates in the
+   specified system. Otherwise, the given Domain name is used without
+   any interpretation. Any string may be supplied, but normally one
+   of the standard Domain names such as GRID, PIXEL, GRAPHICS, etc,
+   should be given. Parameter DIM is used to determine the number
+   of axes in the Frame. This parameter is only accessed if the
+   parameter NDF is given a null value.
 3 EPOCH
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an epoch
-   value is needed to qualify it. This is the epoch at which the
-   supplied sky positions were determined. It should be given as a
-   decimal years value, with or without decimal places  ("1996.8" for
-   example). Such values are interpreted as a Besselian epoch if less
-   than 1984.0 and as a Julian epoch otherwise.
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter DOMAIN) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
 3 FILE
 FILE = FILENAME (Read)
    A text file containing the positions to be stored in the output
    positions list. Each line should contain the formatted axis values
    for a single position, separated by white space. Only accessed if
    parameter MODE is given the value "File".
-3 FRAME
-FRAME = LITERAL (Read)
-   Specifies the domain of the positions supplied using parameter
-   POSITION or FILE. If a "Sky Co-ordinate System" (SCS) string
-   such as EQUAT(J2000) is supplied (see section "Sky Co-ordinate
-   Systems" in SUN/95), then the positions are assumed to be
-   2-dimensional celestial co-ordinates in the specified system.
-   Otherwise, the given domain name is used without any interpretation.
-   Any string may be supplied, but normally one of the standard domain
-   names such as GRID, PIXEL, GRAPHICS, etc, should be given. Parameter
-   DIM is used to determine the number of axes in the Frame. This
-   parameter is only accessed if the parameter NDF is given a null value.
-3 INLIST
-INLIST = FILENAME (Read)
-   A text file containing an existing positions list which is to be
+3 INCAT
+INCAT = FILENAME (Read)
+   A catalogue containing an existing positions list which is to be
    included at the start of the output positions list. These positions
    are mapped into the current co-ordinate Frame of the supplied
-   NDF, or into the Frame specified by parameter FRAME if no NDF was
+   NDF, or into the Frame specified by parameter DOMAIN if no NDF was
    supplied. A message is displayed indicating the Frame in which
    alignment occurred. They are then stored in the output list before
    any further positions are added. A null value may be supplied
@@ -16936,27 +16906,27 @@ MODE = LITERAL (Read)
 
    [Interface]
 3 NDF
-NDF = NDF (Read)
+NDF = NDF (READ)
    The NDF which defines the available co-ordinate Frames in the
    output positions list. If an NDF is supplied, the positions
    obtained using parameter POSITION or FILE are assumed to be in
    the current co-ordinate Frame of the NDF, and the WCS component
    of the NDF is copied to the output positions list. If a null
    value is supplied, the single co-ordinate Frame defined by parameter
-   FRAME is stored in the output positions list, and supplied
+   DOMAIN is stored in the output positions list, and supplied
    positions are assumed to be in the same Frame. [!]
-3 OUTLIST
-OUTLIST = FILENAME (Write)
-   The output positions list.
+3 OUTCAT
+OUTCAT = FILENAME (Write)
+   The catalogue holding the output positions list.
 3 POSITION
 POSITION = LITERAL (Read)
    The co-ordinates of a single position to be stored in the output
-   positions list. Supplying a colon ":" will display details of the
-   co-ordinate Frame in which the position is required. The position
-   should be given as a list of formatted axis values separated by
-   commas or spaces. You are prompted for new values for this parameter
-   until a null value (!) is entered. This parameter is only accessed
-   if parameter MODE is given the value "Interface".
+   positions list. Supplying ":" will display details of the co-ordinate
+   Frame in which the position is required. The position should be
+   given as a list of formatted axis values separated by white space.
+   You are prompted for new values for this parameter until a null
+   value is entered. Only accessed if parameter MODE is given the
+   value "Interface".
 3 TITLE
 TITLE = LITERAL (Read)
    A title for the output positions list. The dynamic default
@@ -16965,88 +16935,76 @@ TITLE = LITERAL (Read)
    is supplied. Otherwise, the dynamic default is "Output from
    LISTMAKE". []
 2 Examples
-listmake newlist frame=pixel dim=2
-   This creates a text file called newlist containing a list of
-   positions, together with a description of a single 2-dimensional
-   pixel co-ordinate Frame. The positions are supplied as a set of
-   space-separated pixel co-ordinates in response to repeated prompts
-   for the parameter POSITION.
+listmake newlist domain=pixel dim=2
+   This creates a FITS binary catalogue called newlist.fit containing a
+   list of positions, together with a description of a single
+   2-dimensional pixel co-ordinate Frame. The positions are supplied as
+   a set of space-separated pixel co-ordinates in response to repeated
+   prompts for the parameter POSITION.
 
-listmake stars.dat frame=equat(B1950) epoch=1962.3
-   This creates a text file called stars.dat containing a list of
+listmake stars.txt domain=equat(B1950) epoch=1962.3
+   This creates a catalogue called stars.txt containing a list of
    positions, together with a description of a single FK4 equatorial
    RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
-   positions were determined at epoch B1962.3. The epoch of
-   observation is required since the underlying model on which the
-   FK4 system is based is non-inertial and rotates slowly with time,
-   introducing fictitious proper motions. The positions are supplied
-   as hours and degrees values in response to repeated prompts for
-   parameter POSITIONS.
+   catalogue is stored in a text file using the CAT "Small Text List"
+   format ("STL" - see SUN/190). The positions were determined at epoch
+   B1962.3. The epoch of observation is required since the underlying
+   model on which the FK4 system is based is non-inertial and rotates
+   slowly with time, introducing fictitious proper motions. The
+   positions are supplied hours and degrees values in reponse to
+   repeated prompts for parameter POSITIONS.
 
 listmake outlist ndf=allsky mode=file file=stars
-   This creates a text file called outlist containing a list of
-   positions, together with descriptions of all the co-ordinate
+   This creates a FITS binary catalogue called outlist.fit containing a
+   list of positions, together with descriptions of all the co-ordinate
    Frames contained in the NDF allsky. The positions are supplied
-   within the current co-ordinate Frame of the NDF. Application
-   WCSFRAME can be used to find out what this Frame is.
-   The positions are supplied in a text file called stars. It may
-   seem pointless to copy positions out of one text file into
-   another. The input and output text files are, however, different in
-   two important respects: the output file contains Frame descriptions
-   which enable subsequent applications to align the positions with
-   other data, and it also contains integer position identifiers which
-   allow the positions to be distinguished.
+   as co-ordinates within the current co-ordinate Frame of the NDF.
+   Application WCSFRAME can be used to find out what this Frame is.
+   The positions are supplied in a text file called stars.
 
-listmake out inlist=old.dat frame=gal
-   This creates a text file called out containing a list of
-   positions, together with a description of a single galactic
-   co-ordinate Frame. The positions contained in the existing
-   positions list old.dat are mapped into galactic co-ordinates (if
-   possible) and stored in the output positions list. Further
-   galactic co-ordinate positions are then obtained by repeated
+listmake out.txt incat=old.fit domain=gal
+   This creates an STL format catalogue stored in a text file called
+   out.txt containing a list of positions, together with a description
+   of a single galactic co-ordinate Frame. The positions contained in
+   the existing binary FITS catalogue old.fit are mapped into galactic
+   co-ordinates (if possible) and stored in the output positions list.
+   Further galactic co-ordinate positions are then obtained by repeated
    prompting for the parameter POSITION. These positions are
-   appended to the positions obtained from file old.dat.
+   appended to the positions obtained from file old.fit.
 
-listmake out inlist=old.dat ndf=cobe
+listmake out.txt incat=old.fit ndf=cobe
    As above but the output positions list contains copies of all the
-   Frames in the NDF cobe. The positions in old.dat are mapped into
+   Frames in the NDF cobe. The positions in old.fit are mapped into
    the current co-ordinate Frame of the NDF (if possible) before
-   being stored in the output positions list. The new positions must
+   being stored in the output positions list. The new positons must
    also be supplied in the same Frame (using parameter POSITION).
 
 listmake profpos ndf=prof1 mode=pixel
-   This creates a positions list called profpos containing the
+   This creates a positions list called profpos.fit containing the
    positions of all the pixel centres in the 1-dimensional NDF
    called prof. This could for instance be used as input to
    application PROFILE in order to produce another profile in which
    the samples are at the same positions as those in NDF prof.
 2 Notes
+-  This application uses the conventions of the CURSA package
+for determining the formats of input and output catalogues. If a file
+type of .fits is given, then the catalogue is assumed to be a FITS
+binary table. If a file type of .txt is given, then the catalogue is
+assumed to be stored in a text file in STL format. If no file type is
+given, then ".fit" is assumed.
+
 -  There is a limit of 200 on the number of positions which can be
 given using parameter POSITION. There is no limit on the number of
 positions which can be given using parameter FILE.
 
--  Position identifiers are assigned to the supplied positions in
+-  Position identifiers are asigned to the supplied positions in
 the order in which they are supplied. If no input positions list is
-given using parameter INLIST, then the first supplied position will
+given using parameter INCAT, then the first supplied position will
 be assigned the identifier "1". If an input positions list is
 given, then the first supplied position is assigned an identifier
 one greater than the largest identifier in the input positions list.
-
--  Each line in the created file will either be a comment line
-commencing with a "#" character, or will contain a single integer
-position identifier, followed by a set of space separated double
-precision floating point axis values. A block of comments will be
-included at the end of the file containing a description of the
-co-ordinates Frames in which the positions are defined (an AST
-"FrameSet" - see SUN/210). The structure of such FrameSets is
-complicated and will usually be created by applications, not directly
-by the user. The positions stored in file are in the Base Frame of
-the FrameSet. If no FrameSet is included (for instance if a user
-creates a positions list using a text editor and does not include
-a FrameSet), then subsequent applications will assume that the
-positions are pixel co-ordinates.
 2 Related_Applications
-   KAPPA: CURSOR, LISTSHOW
+   KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT
 2 Authors
 DSB: David S. Berry (STARLINK)
 2 History
@@ -17058,21 +17016,22 @@ Reports the positions stored in a positions list.
 
 Usage:
 
-   listshow inlist [frame] [first] [last] [plot] [device]
+   listshow incat [frame] [first] [last] [plot] [device]
 
 Description:
 
-   This application reports positions contained in a text file. The
-   text file should have the form of a positions list as produced (for
-   instance) by application LISTMAKE. By default all positions in the
-   file are reported, but a subset may be reported by specifying a range
-   of "position identifiers" (see parameters FIRST and LAST).
+   This application reports positions contained in a catalogue. The
+   catalogue should have the form of a positions list as produced (for
+   instance) by applications LISTMAKE and CURSOR. By default all positions
+   in the catalogue are reported, but a subset may be reported by
+   specifying a range of "position identifiers" (see parameters FIRST
+   and LAST).
 
-   Positions may be reported in a range of co-ordinate Frames dependent
+   Positions may be reported in a range of co-ordinate Frames dependant
    on the information stored in the supplied positions list (see parameter
    FRAME). The selected positions are written to an output parameter
    (parameter POSNS), and may also be written to an output positions
-   list (see parameter OUTLIST). The formatted screen output can be saved
+   list (see parameter OUTCAT). The formatted screen output can be saved
    in a logfile (see parameter LOGFILE). The formats used to report the
    axis values can be controlled using parameter STYLE.
 
@@ -17087,34 +17046,34 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CLOSE
-CLOSE = _LOGICAL (Read)
+CLOSE = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
-   "Chain" or "Poly". If TRUE, polygons will be closed by joining
-   the first position to the last position. [current value]
+   "Chain" or "Poly". If TRUE, polgons will be closed by joining
+   the first position to the last position. [Current value]
 3 DESCRIBE
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    the positions will be reported is displayed before the
-   positions. [current value]
+   positions. [Current value]
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics workstation.  Only accessed if parameter PLOT
-   indicates that graphics are required. [current graphics device]
+   indicates that graphics are required. [The current graphics device]
 3 DIM
 DIM = _INTEGER (Write)
-   The number of co-ordinate values for each position written to output
-   parameter POSNS.
+   The number of axes for each position written to output parameter
+   POSNS.
 3 EPOCH
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an epoch
-   value is needed to qualify it. This is the epoch at which the
-   supplied sky positions were determined. It should be given as a
-   decimal years value, with or without decimal places  ("1996.8" for
-   example). Such values are interpreted as a Besselian epoch if less
-   than 1984.0 and as a Julian epoch otherwise.
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter FRAME) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
 3 FIRST
-FIRST = _INTEGER (Read)
+FIRST = INTEGER (Read)
    The identifier for the first position to be displayed. Positions
    are only displayed which have identifiers in the range given by
    parameters FIRST and LAST. The dynamic default is the lowest
@@ -17130,29 +17089,29 @@ FRAME = LITERAL (Read)
 
    - An integer value giving the index of the required Frame.
 
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
-   section "Sky Co-ordinate Systems" in SUN/95).
+   - An IRAS90 Sky Co-ordinate System (SCS) values such as
+   EQUAT(J2000) (see SUN/163).
 
    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the positions list was
    created. The user is re-prompted if the specified Frame is not
    available within the positions list. [!]
 3 GEODESIC
-GEODESIC = _LOGICAL (Read)
+GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Poly". It specifies whether the curves drawn between
-   positions should be straight lines, or should be geodesic curves.
+   positions should be stright lines, or should be geodesic curves.
    In many co-ordinate Frames geodesic curves will be simple straight
    lines. However, in others (such as the majority of celestial
    co-ordinates Frames) geodesic curves will be more complex curves
    tracing the shortest path between two positions in a non-linear
    projection. [FALSE]
-3 INLIST
-INLIST = FILENAME (Read)
-   A text file containing a positions list such as produced by
-   applications LISTMAKE, or CURSOR.
+3 INCAT
+INCAT = FILENAME (Read)
+   A catalogue containing a positions list such as produced by
+   applications LISTMAKE, CURSOR, etc.
 3 LABEL
-LABEL = _LOGICAL (Read)
+LABEL = LOGICAL (Read)
    If TRUE the positions are labelled with the corresponding integer
    identifiers on the graphics device specified by parameter DEVICE.
    The offset from each position to the centre of the corresponding
@@ -17161,11 +17120,11 @@ LABEL = _LOGICAL (Read)
    controlled using attributes "Colour(NumLab)", "Size(NumLab)", etc.
    These attributes may be specified using parameter STYLE. [FALSE]
 3 LAST
-LAST = _INTEGER (Read)
+LAST = INTEGER (Read)
    The identifier for the last position to be displayed. Positions
    are only displayed which have identifiers in the range given by
-   parameters FIRST and LAST. The dynamic default is the highest
-   identifier value in the positions list. []
+   parameters FIRST and LAST. parameters FIRST and LAST. The dynamic
+   default is the highest identifier value in the positions list. []
 3 LOGFILE
 LOGFILE = FILENAME (Write)
    The name of the text file in which the formatted co-ordinates of
@@ -17174,7 +17133,7 @@ LOGFILE = FILENAME (Write)
    positions to subsequent applications. A null string (!) means that
    no file is created.  [!]
 3 MARKER
-MARKER = _INTEGER (Read)
+MARKER = INTEGER (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Mark". It specifies the symbol with which each
    position should be marked, and should be given as an integer
@@ -17183,12 +17142,11 @@ MARKER = _INTEGER (Read)
    value must be larger than or equal to -31. [current value]
 3 NUMBER
 NUMBER = _INTEGER (Write)
-   On exit, this holds the number of positions selected.
-3 OUTLIST
-OUTLIST = FILENAME (Write)
-   The output positions list in which to store the selected
-   positions. If a null value is supplied, no output positions list
-   is produced. [!]
+   The number of positions selected.
+3 OUTCAT
+OUTCAT = FILENAME (Write)
+   The output catalogue in which to store the selected positions. If a
+   null value is supplied, no output catalogue is produced. [!]
 3 PLOT
 PLOT = LITERAL (Read)
    The type of graphics to be used to mark the positions on the
@@ -17216,18 +17174,18 @@ PLOT = LITERAL (Read)
    by giving a TRUE value for parameter LABEL. [None]
 3 POSNS
 POSNS() = _DOUBLE (Write)
-   On exit, this holds the unformatted co-ordinates of the positions
-   selected by parameters FIRST and LAST, in the co-ordinate Frame
-   selected by FRAME. The axis values are stored as a 1-dimensional
-   vector. All the axis 1 values for the selected positions are stored
-   first, followed by the axis 2 values, etc. The number of positions in
+   The unformatted co-ordinates of the positions selected by
+   parameters FIRST and LAST, in the co-ordinate Frame selected by
+   FRAME. The axis values are stored as a 1-dimensional vector. All
+   the axis 1 values for the selected positions are stored first,
+   followed by the axis 2 values, etc. The number of positions in
    the vector is written to the output parameter NUMBER, and the
    number of axes per position is written to the output parameter
    DIM. The axis values may not be in the same units as the
    formatted values shown on the screen. For instance, unformatted
    celestial co-ordinate values are stored in units of radians.
 3 QUIET
-QUIET = _LOGICAL (Read)
+QUIET = LOGICAL (Read)
    If TRUE then nothing is displayed on the screen while the
    application is running (other than error messages). Output
    parameters and files are still created. The dynamic default is
@@ -17235,63 +17193,52 @@ QUIET = _LOGICAL (Read)
    parameters PLOT and LABEL). []
 3 STYLE
 STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the graphics specified by parameter PLOT. The format
-   of the positions reported on the screen may also be controlled.
+   The name of a text file containing a description of a plotting
+   style. It is used only to control the labels and format for the
+   displayed axis values, by specifying suitable values for Frame
+   attributes (eg  Digits(1), Digits(2), Symbol(1), Symbol(2), etc).
 
-   A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported). [current value]
-
-   In addition to the attributes which control the appearance of
-   the graphics (Colour, Font, etc), the following attributes may
-   be set in order to control the appearance of the formatted axis
-   values reported on the screen: Format, Digits, Symbol, Unit. These
-   may be suffixed with an axis number (eg "Digits(2)") to refer to
-   the values displayed for a specific axis. [current value]
+   Each line in the file should contain a string of the form
+   <name>=<value>, in which <name> is the name of an attribute,
+   and <value> is the value to assign to the attribute. The file may
+   contain blank lines and comment lines starting with a hash (#) sign.
+   Default values will be used for any unspecified attributes. All
+   attributes will be defaulted if a null value (!) is supplied.
+   [Current value]
 2 Examples
-listshow stars.dat pixel
+listshow stars pixel
    This displays the pixel co-ordinates of all the positions
-   stored in the text file stars.dat. They are all written to
-   the output parameter POSNS as well as to the screen.
+   stored in the FITS binary catalogue stars.fit. They are all written
+   to the output parameter POSNS as well as to the screen.
 
-listshow stars.dat equat(J2010) first=3 last=3 quiet
-   This extracts position 3 from the text file stars.dat transforming
+listshow stars.fit equat(J2010) first=3 last=3 quiet
+   This extracts position 3 from the catalogue stars.fit transforming
    it into FK5 equatorial RA/DEC co-ordinates (referenced to the
    J2010 equinox) if possible. The RA/DEC values (in radians) are
    written to the output parameter POSNS, but not to the screen.
 
-listshow stars.dat style="digits(1)=5,digits(2)=7"
-   This lists the positions in stars.dat in their original
-   co-ordinate Frame. By default, 5 digits are used to format axis
-   1 values, and 7 to format axis 2 values. These defaults are
-   over-ridden if the attributes Format(1) and/or Format(2) are
-   assigned values in the description of the current Frame stored in
-   the positions list.
+listshow stars_2.txt style="digits(1)=5,digits(2)=7"
+   This lists the positions in the STL format catalogue contained
+   in text file stars_2.txt in their original co-ordinate Frame. By
+   default, 5 digits are used to format axis 1 values, and 7 to format
+   axis 2 values. These defaults are over-ridden if the attributes
+   Format(1) and/or Format(2) are assigned values in the description
+   of the current Frame stored in the positions list.
 
-listshow stars.dat plot=3 style="colour=red,size=2"
-   This lists the positions in stars.dat on the screen in their original
-   co-ordinate Frame, and also marks them on the currently selected
-   graphics device using PGPLOT marker 3 (an asterisk). The markers are
-   red and are twice the default size.
+listshow stars_2.txt plot=3 style="colour=red,size=2"
+   This lists the positions in stars_2.txt on the screen in their
+   original co-ordinate Frame, and also marks them on the currently
+   selected graphics device using PGPLOT marker 3 (an asterisk). The
+   markers are red and are twice the default size.
+2 Notes
+-  This application uses the conventions of the CURSA package (SUN/190)
+for determining the formats of input and output catalogues. If a file
+type of .fits is given, then the catalogue is assumed to be a FITS
+binary table. If a file type of .txt is given, then the catalogue is
+assumed to be stored in a text file in "Small Text List" (STL) format.
+If no file type is given, then ".fit" is assumed.
 2 Related_Applications
-   KAPPA: CURSOR, LISTMAKE
+   KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT
 2 Authors
 DSB: David S. Berry (STARLINK)
 2 History
@@ -26755,7 +26702,7 @@ Creates a 1-dimensional profile through an N-dimensional NDF.
 
 Usage:
 
-   profile in out start finish [nsamp]
+   profile in out start finish nsamp
 
 Description:
 
@@ -26766,48 +26713,47 @@ Description:
    The samples can be placed at specified positions within the input NDF,
    or can be spaced evenly along a poly-line joining a set of vertices
    (see parameter MODE). The positions of the samples may be saved in an
-   output positions list (see parameter OUTLIST).
+   output positions list (see parameter OUTCAT).
 2 Parameters
 For information on individual parameters, select from the list below:
 3 FINISH
 FINISH = LITERAL (Read)
    The co-ordinates of the last sample in the profile, in the current
-   co-ordinate Frame of the NDF (supplying a colon ":" will display
-   details of the required co-ordinate Frame). The position should be
-   supplied as a list of formatted axis values separated by commas or
-   spaces. This parameter is only accessed if parameter MODE is set to
-   "Curve" and a null (!) value is given for INLIST. If the last (top
-   right) pixel in the NDF has valid co-ordinates in the current
-   co-ordinate Frame, then these co-ordinates will be used as the
-   suggested default. Otherwise there will be no suggested default.
+   co-ordinate Frame of the NDF (supplying ":" will display details of
+   the required co-ordinate Frame). The position should be supplied as
+   a list of formatted axis values separated by spaces. This parameter
+   is only accessed if parameter MODE is set to "Curve" and a null
+   (!) value is given for INCAT. If the last (top right) pixel in the
+   NDF has valid co-ordinates in the current co-ordinate Frame of the
+   NDF, then these co-ordinates will be used as the suggested default.
+   Otherwise there will be no suggested default.
 3 GEODESIC
-GEODESIC = _LOGICAL (Read)
+GEODESIC = LOGICAL (Read)
    If TRUE then the line segments which form the profile will be
    geodesic curves within the current co-ordinate Frame of the NDF.
-   Otherwise, the line segments are simple straight lines within the
-   current co-ordinate Frame. This parameter is only accessed if
-   parameter MODE is set to "Curve".
+   Otherwise, the line segments are simple straight lines. This
+   parameter is only accessed if parameter MODE is set to "Curve".
 
-   As an example, consider a profile through an all-sky image consisting
-   of a single line segment which starts at RA=0h DEC=80d and finishes
-   at RA=12h DEC=80d. If GEODESIC is FALSE, the line segment will be a
-   line of constant declination, i.e. the "straight" line from the
-   position (0,80) to the position (12,80), passing through (1,80),
-   (2,80), etc. If GEODESIC is TRUE, then the line segment will be the
-   curve of shortest distance on the celestial sphere between the start
-   and end. In this particular case, this will be a great circle
-   passing through the north celestial pole. [FALSE]
+   As an example, consider a profile consisting of a single line segment
+   which starts at RA=0h DEC=+80d and finishes at RA=12h DEC=+80d. If
+   GEODESIC is FALSE, the line segment will be a line of constant
+   declination, i.e. the "straight" line from the position (0,80) to the
+   position (12,80), passing through (1,80), (2,80), etc. If GEODESIC
+   is TRUE, then the line segment will be the curve of shortest
+   distance on the celestial sphere between the start and end. In this
+   particaular case, this will be a great circle passing through the
+   north celestial pole. [FALSE]
 3 IN
 IN = NDF (Read)
-   The input NDF structure containing the data to be profiled.
-3 INLIST
-INLIST = FILENAME (Read)
-   A text file containing a set of vertices or sample positions defining
+   Input NDF structure containing the data to be profiled.
+3 INCAT
+INCAT = FILENAME (Read)
+   A catalogue containing a set of vertices or sample positions defining
    the required profile. The file should be in the format of a "positions
    list" such as produced by applications CURSOR and LISTMAKE. If a
    null value (!) is given then parameters START and FINISH will be
    used to obtain the vertex positions. If parameter MODE is given the
-   value "Curve", then the parameter INLIST is only accessed if a value
+   value "Curve", then the parameter INCAT is only accessed if a value
    is given for it on the command line (otherwise a null value is
    assumed).
 3 MODE
@@ -26819,17 +26765,17 @@ MODE = LITERAL (Read)
    by a set of vertices obtained from the user. The line segments
    joining these vertices may be linear or geodesic (see parameter
    GEODESIC). Multiple vertices may be supplied using a text file
-   (see parameter INLIST). Alternatively, a single line segment can
+   (see parameter INCAT). Alternatively, a single line segment can
    be specified using parameters START and FINISH. The number of
-   samples to place along the curve is specified by parameter NSAMP.
+   samples to take along the curve is specified by parameter NSAMP.
 
    - "Points" -- The positions at which samples should be taken are
    given explicitly by the user in a text file (see parameter
-   INLIST). No other sample positions are used.
+   INCAT). No other sample positions are used.
 
    [Curve]
 3 NSAMP
-NSAMP = _INTEGER (Read)
+NSAMP = INTEGER (Read)
    The number of samples required along the length of the profile.
    The first sample is at the first supplied vertex, and the last
    sample is at the last supplied vertex. The sample positions are
@@ -26839,44 +26785,39 @@ NSAMP = _INTEGER (Read)
    parameter MODE is given the value "Curve". [!]
 3 OUT
 OUT = NDF (Write)
-   The output NDF. The pixel array will be 1-dimensional with length
-   specified by parameter NSAMP, but the corresponding N-dimensional
-   positions in the original NDF will be retained in the WCS
-   component. In particular, the current co-ordinate Frame from the
-   input NDF is retained, and the original N-dimensional pixel
-   co-ordinate Frame will be retained with domain PIXEL_ND (so long
-   as no Frame already exists with this domain).
-3 OUTLIST
-OUTLIST = FILENAME (Write)
-   An output positions list in which to store the sample positions
-   This is the name of a text file which can be used to communicate
+   The output NDF. This will be 1-dimensional with length specified
+   by parameter NSAMP.
+3 OUTCAT
+OUTCAT = FILENAME (Write)
+   An output positions list in which to store the sample positions.
+   This is the name of a catalogue which can be used to communicate
    positions to subsequent applications. It includes information
-   describing the available co-ordinate Frames as well as the positions
-   themselves. If a null value is supplied, no output positions list
-   is produced. [!]
+   describing the available WCS co-ordinate Frames as well as the
+   positions themselves. If a null value is supplied, no output
+   positions list is produced. [!]
 3 START
 START = LITERAL (Read)
    The co-ordinates of the first sample in the profile, in the current
-   co-ordinate Frame of the NDF (supplying a colon ":" will display
-   details of the required co-ordinate Frame). The position should be
-   supplied as a list of formatted axis values separated by commas or
-   spaces. This parameter is only accessed if parameter MODE is set to
-   "Curve" and a null (!) value is given for INLIST. If the first
-   (bottom left) pixel in the NDF has valid co-ordinates in the current
-   co-ordinate Frame, then these co-ordinates will be used as the
-   suggested default. Otherwise there will be no suggested default.
+   co-ordinate Frame of the NDF (supplying ":" will display details of
+   the required co-ordinate Frame). The position should be supplied as
+   a list of formatted axis values separated by spaces. This parameter
+   is only accessed if parameter MODE is set to "Curve" and a null
+   (!) value is given for INCAT. If the first (bottom left) pixel in
+   the NDF has valid co-ordinates in the current co-ordinate Frame of
+   the NDF, then these co-ordinates will be used as the suggested
+   default. Otherwise there will be no suggested default.
 2 Examples
-profile my_data prof "0 0" "100 100" 40 outlist=samps
+profile my_data prof "0 0" "100 100" 40 outcat=samps
    Create a 1-dimensional NDF called prof, holding a profile of the
    data values in the input NDF my_data along a profile starting at
-   pixel co-ordinates [0.0,0.0] and ending at pixel co-ordinates
+   pixel co-ordinates [0.0,0.0] and ending at pixle co-ordinates
    [100.0,100.0]. The profile consists of 40 samples spread evenly
    (in the pixel co-ordinate Frame) between these two positions.
    This example assumes that the current co-ordinate Frame in the NDF
    my_data represents pixel co-ordinates. This can be ensured by
    issuing the command "wcsframe my_data pixel" before running
-   profile. An output text file is created called samps containing
-   the positions of all samples in the profile, together with
+   profile. A FITS binary catalogue is created called samps.fit
+   containing the positions of all samples in the profile, together with
    information describing all the co-ordinate Frames in which the
    positions of the samples are known. This file may be examined
    using application LISTSHOW.
@@ -26886,24 +26827,33 @@ profile my_data prof "15:32:47 23:40:08" "15:32:47 23:42"
    assumed that the current co-ordinate Frame in the input NDF my_data
    is an equatorial (RA/DEC) system. It creates a 1-dimensional
    profile starting at RA=15:32:47 DEC=23:40:08, and ending at the same
-   RA, and DEC=23:42:00. The number of points in the profile is
+   RA and DEC=23:42:00. The number of points in the profile is
    determined by the resolution of the data.
 
-profile allsky prof inlist=prof_path npoint=200 geodesic outlist=aa
+profile allsky prof incat=prof_path npoint=200 geodesic outcat=aa
    This examples creates a profile of the NDF allsky through a set of
-   points given in a text file called prof_path. Such files can be
-   created (for example) using application CURSOR. Each line segment
-   is a geodesic curve. The profile is sampled at 200 points. The
-   samples positions are written to the output positions list aa.
+   points given in a FITS binary catalogue called prof_path.fit. Such
+   catalogues can be created (for example) using application CURSOR.
+   Each line segment is a geodesic curve. The profile is sampled at 200
+   points. The samples positions are written to the output positions
+   list aa.fit.
 
-profile allsky2 prof2 mode=point inlist=aa
+profile allsky2 prof2 mode=point incat=aa
    This examples creates a profile of the NDF allsky2 containing
-   samples at the positions given in the positions list aa. Thus,
+   samples at the positions given in the positions list aa.fit. Thus,
    the profiles created by this example and the previous example
    will sample the two images allsky and allsky2 at the same
    positions and so can be compared directly.
+2 Notes
+-  This application uses the conventions of the CURSA package (SUN/190)
+for determining the formats of input and output positions list
+catalogues. If a file type of .fits is given, then the catalogue is
+assumed to be a FITS binary table. If a file type of .txt is given,
+then the catalogue is assumed to be stored in a text file in "Small
+Text List" (STL) format. If no file type is given, then ".fit" is
+assumed.
 2 Related_Applications
-   KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW;
+   KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW
 2 Authors
 DSB: David S. Berry (STARLINK)
 2 History
