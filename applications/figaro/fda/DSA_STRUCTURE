@@ -1,0 +1,130 @@
+*+
+*  Name:
+*     DSA_STRUCTURE
+
+*  Purpose:
+*     Common block and parameters for DSA structure definitions.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'DSA_STRUCTURE'
+
+*  Description:
+*     Common block and parameters for DSA structure definitions.
+
+*  Arguments:
+*
+*     MAX_SYMBOLS = INTEGER (PARAMETER)
+*        Maximum number of symbols.
+*     MAX_STRUCTS = INTEGER (PARAMETER)
+*        Max number of structures.
+*     MAX_STRUCT_LINES = INTEGER (PARAMETER)
+*        Max no. of definition lines.
+*     UNDEFINED_VAR = INTEGER (PARAMETER)
+*        Flags symbol as undefined.
+*     DEFINED_VAR = INTEGER (PARAMETER)
+*        Flags symbol as defined VARIABLE.
+*     EQUATE = INTEGER (PARAMETER)
+*        Flags symbol as an EQUATE.
+*     ANY_TYPE = INTEGER (PARAMETER)
+*        Flags not limited to any variant.
+*     DST_TYPE = INTEGER (PARAMETER)
+*        Indicates limited to DST variants.
+*     NDF_TYPE = INTEGER (PARAMETER)
+*        Indicates limited to NDF variants.
+*
+*     STRUCTS_DEFINED = INTEGER (/DSA_STRUCT/)
+*        Number of defined structures.
+*     SYMBOLS_DEFINED = INTEGER (/DSA_STRUCT/)
+*        Number of defined symbols.
+*     STRUCT_TYPE_FLAG( MAX_STRUCTS ) = INTEGER (/DSA_STRUCT/)
+*        Flags structure defined for given type.
+*     STRUCT_START( MAX_STRUCTS ) = INTEGER (/DSA_STRUCT/)
+*        First element of structure.
+*     STRUCT_END( MAX_STRUCTS ) = INTEGER (/DSA_STRUCT/)
+*        Last element of structure.
+*     SYMBOL_STATE( MAX_SYMBOLS ) = INTEGER (/DSA_STRUCT/)
+*        States of symbols.
+*     SYMBOL_TYPE_FLAG( MAX_SYMBOLS ) = INTEGER (/DSA_STRUCT/)
+*        Flags symbol defined for given type.
+*
+*     FULL_NAME = CHARACTER * ( 80 ) (/DSA_STRUCT_C/)
+*        Full name of definition file.
+*     ELEMENT_COND( MAX_STRUCT_LINES ) = CHARACTER * ( 32 ) (/DSA_STRUCT_C/)
+*        Condition for including element.
+*     ELEMENT_NAME( MAX_STRUCT_LINES ) = CHARACTER * ( 64 ) (/DSA_STRUCT_C/)
+*        Names of structure elements.
+*     ELEMENT_TYPE( MAX_STRUCT_LINES ) = CHARACTER * ( 32 ) (/DSA_STRUCT_C/)
+*        Types of structure elements.
+*     STRUCT_NAMES( MAX_STRUCTS ) = CHARACTER * ( 32 ) (/DSA_STRUCT_C/)
+*        Names of defined structures.
+*     STRUCT_TYPE( MAX_STRUCTS ) = CHARACTER * ( 32 ) (/DSA_STRUCT_C/)
+*        Types of defined structures.
+*     SYMBOL_NAMES( MAX_SYMBOLS ) = CHARACTER * ( 32 ) (/DSA_STRUCT_C/)
+*        Names of defined symbols.
+*     SYMBOL_VALUES( MAX_SYMBOLS ) = CHARACTER * ( 64 ) (/DSA_STRUCT_C/)
+*        Values of defined symbols.
+
+*  Authors:
+*     ks: Keith Shortridge (AAO)
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     29 Aug 1992 (ks):
+*        Name of common blocks DSA_STRUCTC changed to avoid conflict
+*        with routine of the same name.
+*     26 Jul 1994 (hme):
+*        Make common blocks SAVE.
+*     01 Mar 1996 (hme):
+*        FDA library.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+      INTEGER MAX_SYMBOLS
+      INTEGER MAX_STRUCTS
+      INTEGER MAX_STRUCT_LINES
+      PARAMETER ( MAX_SYMBOLS = 48, MAX_STRUCTS = 10 )
+      PARAMETER ( MAX_STRUCT_LINES = 100 )
+      INTEGER UNDEFINED_VAR
+      INTEGER DEFINED_VAR
+      INTEGER EQUATE
+      PARAMETER ( UNDEFINED_VAR = 1, DEFINED_VAR = 2, EQUATE = 3 )
+      INTEGER ANY_TYPE
+      INTEGER DST_TYPE
+      INTEGER NDF_TYPE
+      PARAMETER ( ANY_TYPE = 0, DST_TYPE = 1, NDF_TYPE = 2 )
+
+*  Global Variables:
+      INTEGER STRUCTS_DEFINED
+      INTEGER SYMBOLS_DEFINED
+      INTEGER STRUCT_TYPE_FLAG( MAX_STRUCTS )
+      INTEGER STRUCT_START( MAX_STRUCTS )
+      INTEGER STRUCT_END( MAX_STRUCTS )
+      INTEGER SYMBOL_STATE( MAX_SYMBOLS )
+      INTEGER SYMBOL_TYPE_FLAG( MAX_SYMBOLS )
+      CHARACTER * ( 80 ) FULL_NAME
+      CHARACTER * ( 64 ) ELEMENT_NAME( MAX_STRUCT_LINES )
+      CHARACTER * ( 32 ) ELEMENT_TYPE( MAX_STRUCT_LINES )
+      CHARACTER * ( 32 ) ELEMENT_COND( MAX_STRUCT_LINES )
+      CHARACTER * ( 32 ) STRUCT_NAMES( MAX_STRUCTS )
+      CHARACTER * ( 32 ) STRUCT_TYPE( MAX_STRUCTS )
+      CHARACTER * ( 32 ) SYMBOL_NAMES( MAX_SYMBOLS )
+      CHARACTER * ( 64 ) SYMBOL_VALUES( MAX_SYMBOLS )
+      COMMON / DSA_STRUCT /
+     :   SYMBOLS_DEFINED, SYMBOL_STATE, STRUCTS_DEFINED,
+     :   STRUCT_START, STRUCT_END, STRUCT_TYPE_FLAG, SYMBOL_TYPE_FLAG
+      COMMON / DSA_STRUCT_C /
+     :   SYMBOL_NAMES, SYMBOL_VALUES, STRUCT_NAMES, STRUCT_TYPE,
+     :   ELEMENT_NAME, ELEMENT_TYPE, FULL_NAME, ELEMENT_COND
+      SAVE / DSA_STRUCT /
+      SAVE / DSA_STRUCT_C /
+
+*.

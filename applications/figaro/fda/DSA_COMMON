@@ -1,0 +1,311 @@
+*+
+*  Name:
+*     DSA_COMMON
+
+*  Purpose:
+*     Common block for DSA system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'DSA_COMMON'
+
+*  Description:
+*     Common block for DSA system.
+
+*  Arguments:
+*
+*     DSA__MAXREF = INTEGER (PARAMETER)
+*        The maximum number of DSA reference names that can be used
+*        simultaneously.
+*     DSA__MAXMAP = INTEGER (PARAMETER)
+*        The maximum number of map slots that can be used
+*        simultaneously.
+*     DSA__MAXLU = INTEGER (PARAMETER)
+*        The maximum number of Fortran logical units that can be used
+*        simultaneously.
+*
+*     DSA__BADQUA = LOGICAL (/DSA_COMM/)
+*        Whether it is permissible to declare use of both bad values
+*        and quality. If either of DSA__REFBAD or DSA__REFQUA is
+*        already set and an attempt is made to set the other, this
+*        should succeed only if DSA__BADQUA is set as well. This is a
+*        means to prevent applications from setting both flags, when
+*        they can in fact handle only either kind of information.
+*        An application that really can handle both, can also set this
+*        flag.
+*
+*     DSA__REFUSD( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Whether a reference slot is used or free.
+*     DSA__REFBAD( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Whether an NDF's data component may contain bad values or not.
+*     DSA__REFQUA( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Whether an NDF's quality component is going to be mapped. If
+*        not this has implications for the way data are accessed.
+*     DSA__REFRSD( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true when the NDF is reshaped, i.e. when DSA_RESHAPE_DATA
+*        or DSA_COERCE_DATA_ARRAY notice that the shape actually
+*        changes.
+*     DSA__REFMDD( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true when the data are accessed for write or update. This
+*        is done by DSA_MAP_DATA.
+*     DSA__REFMDQ( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true ewhen the quality is accessed for write or update.
+*        This is set by DSA1_MDAT and DSA_MAP_QUALITY.
+*     DSA__REFMDV( DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true ewhen the variance is accessed for write or update.
+*        This is set by DSA_MAP_ERRORS and DSA_MAP_VARIANCE.
+*     DSA__REFRSA( NDF__MXDIM, DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true when the axis is reshaped, i.e. when DSA_RESHAPE_AXIS
+*        or DSA_COERCE_AXIS_DATA notice that the shape actually
+*        changes. Note that reshaping the NDF as a whole does not set
+*        these flags, although the 1-D arrays are reshaped implicitly by
+*        those routines.
+*     DSA__REFMDC( NDF__MXDIM, DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true when the centre array is accessed for write or
+*        update. This is done by DSA_MAP_AXIS_DATA.
+*     DSA__REFMDW( NDF__MXDIM, DSA__MAXREF ) = LOGICAL (/DSA_COMM/)
+*        Set true when the width array is accessed for write or
+*        update or when a scalar width is written. This is done by
+*        DSA_MAP_WIDTH and DSA_SET_WIDTH.
+*     DSA__REFID1( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        The NDF identifier for the real NDF to be referred to by the
+*        reference name. Data/quality access may not be directly to
+*        this NDF but to a temporary NDF instead. This NDF identifier
+*        may be NDF__NOID even when the slot is used, namely if the
+*        slot is for an output NDF that is not a copy of an old NDF.
+*        In that case there is a placeholder instead of an identifier.
+*        As soon as the new NDF is given a shape, will its placeholder
+*        become an identfier stored here.
+*     DSA__REFID2( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This NDF identifier may be used to hold temporary copies of
+*        data and quality. This would be used if access to the real
+*        NDF is read-only, but the data/quality in the file need to be
+*        buffered for the benefit of the application. This is not
+*        NDF__NOID only while it is used to access data/quality.
+*     DSA__REFID3( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This NDF identifier may be used to hold a temporary copy
+*        the variance or errors. This is not NDF__NOID only while it is
+*        used to access variance or errors.
+*     DSA__REFPLC( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This may be an NDF placeholder while there is no NDF identifier
+*        yet. This would be the case between a call to DSA_OUTPUT
+*        without a model copy, and a subsequent call to a reshaping
+*        routine or to DSA_SIMPLE_OUTPUT.
+*     DSA__REFDPT( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This holds the memory address of the data array, which needs
+*        to be buffered between calls to DSA_MAP_QUALITY and
+*        DSA_MAP_DATA, because both arrays are mapped during the
+*        first call, but only one pointer is returned. This is also used
+*        to check that quality/bad-value use is not declared after
+*        data have been accessed.
+*     DSA__REFQPT( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This may hold the memory address of the quality array, which
+*        needs to be buffered between calls to DSA_MAP_QUALITY and
+*        DSA_MAP_DATA, because both arrays are mapped during the
+*        first call, but only one pointer is returned. This is also used
+*        to check that quality/bad-value use is not declared after
+*        data have been accessed.
+*     DSA__REFFPT( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        This may hold the memory address of the array of FITS items.
+*     DSA__REFFNE( DSA__MAXREF ) = INTEGER (/DSA_COMM/)
+*        The number of FITS items in the currently mapped array. This
+*        have the special value of zero while a new FITS extension has
+*        been created with one element, but has not yet received any
+*        FITS item.
+*     DSA__REFNDF( DSA__MAXREF ) = CHARACTER * ( 256 ) (/DSA_COMMC/)
+*        The name to be used by NDF_OPEN. Suppose DSA_NAMED_OUTPUT is
+*        asked to open this NDF and finds it already is open. In that
+*        case it might open a temporary NDF instead. Opening the named
+*        NDF would be deferred to the point when the reference slot is
+*        to be closed. So the common block must keep the intended NDF
+*        name in mind in the meantime. (It is not guaranteed that this
+*        variable is blank when not in use. The decision whether an
+*        NDF is deferred output it to be made by checking whether
+*        DSA__REFID1 is a temporary NDF or not.)
+*     DSA__REFNAM( DSA__MAXREF ) = CHARACTER * ( 16 ) (/DSA_COMMC/)
+*        The DSA reference name used by routines calling DSA. This is
+*        stored as an upper-case string and must be checked in a case-
+*        insensitive way. I.e. fold your test string to upper case or
+*        use CHR_SIMLR.
+*     DSA__REFFLO( DSA__MAXREF ) = CHARACTER * ( DAT__SZLOC ) (/DSA_COMMC/)
+*        While the FITS extension is mapped this is its locator. This
+*        indicates whether it is mapped or not (valid or DAT__NOLOC). 
+*     DSA__REFLOC( DSA__MAXREF ) = CHARACTER * ( DAT__SZLOC ) (/DSA_COMMC/)
+*        Usually (after DSA_INPUT or after DSA_OUTPUT with model copy),
+*        the reference is the ID1 NDF identifier. It may be (between
+*        DSA_OUTPUT without model copy and a data-shaping routine)
+*        that temporarily it is an NDF placeholder instead. A third case
+*        is during DSA_CREATE_STRUCTURE: The structure (aka NDF) is
+*        created with DTA calls (aka HDS calls). During
+*        DSA_CREATE_STRUCTURE the NDF is known only by its placeholder,
+*        but a temporary HDS structure is also known, so that the
+*        structure tree can be created. DSA__REFLOC is used to hold the
+*        locator of this temporary HDS structure while it lasts.
+*
+*     DSA__MAPUSD( DSA__MAXMAP ) = LOGICAL (/DSA_COMM/)
+*        Whether a map slot is used or free.
+*     DSA__MAPID1( DSA__MAXMAP ) = INTEGER (/DSA_COMM/)
+*        The NDF identifier needed to unmap the slot. The NDF may be
+*        identified in the reference table as well, or not if it is
+*        a temporary NDF for a work space.
+*     DSA__MAPAXI( DSA__MAXMAP ) = INTEGER (/DSA_COMM/)
+*        The axis number for which the map slot is used. Usually this is
+*        zero. If it is not zero, then unmapping is to be done not with
+*        NDF_UNMAP on the NDF, but with NDF_AUNMP on the specified axis
+*        of the NDF.
+*     DSA__MAPREF( DSA__MAXMAP ) = INTEGER (/DSA_COMM/)
+*        The reference slot - if any - for which this map slot has
+*        mapped an NDF component. (Data and quality count as one
+*        component and are separate from variance.) Whether this is zero
+*        indicates whether there is a work space or a real NDF component
+*        behind the map slot.
+*     DSA__MAPPT1( DSA__MAXMAP ) = INTEGER (/DSA_COMM/)
+*        The array pointer for an HDS component mapped on the locator
+*        DSA__MAPLO1.
+*     DSA__MAPPT2( DSA__MAXMAP ) = INTEGER (/DSA_COMM/)
+*        The array pointer for an HDS component mapped on the locator
+*        DSA__MAPLO2.
+*     DSA__MAPNAM( DSA__MAXMAP ) = CHARACTER * ( 16 ) (/DSA_COMMC/)
+*        NDF component name needed to unmap the slot.
+*     DSA__MAPLO1( DSA__MAXMAP ) = CHARACTER * ( DAT__SZLOC ) (/DSA_COMMC/)
+*        One or two HDS locators may be used to map an N-dimensional
+*        axis array. The first locator is for the stored array, and the
+*        second locator is for the accessed array in case the access
+*        data type differs from the stored data type. Mapping of an axis
+*        centre or width is done such that DSA__MAPAXI is non zero, so
+*        that DSA_UNMAP can distinguish between NDF components other
+*        than axis component and axis components. Mapping of an axis
+*        centre or with is also done such that the component name is
+*        'NCENTRE' or 'NWIDTH' if the axis is N-dimensional. This
+*        enables DSA_UNMAP to decide whether to unmap an axis array via
+*        NDF or via HDS. If mapping was done by HDS then one or two
+*        locators are valid. DSA_UNMAP has to unmap and annull whichever
+*        of the two is valid. If both are valid, it has to do a data
+*        type back conversion from the accessed data type to the stored
+*        data type. For that purpose the array pointers are kept as
+*        well.
+*     DSA__MAPLO2( DSA__MAXMAP ) = CHARACTER * ( DAT__SZLOC ) (/DSA_COMMC/)
+*        See DSA__MAPLO1.
+*
+*     DSA__LUUSD( DSA__MAXLU ) = LOGICAL (/DSA_COMM/)
+*        Whether a unit slot is used or free.
+*     DSA__LUNUM( DSA__MAXLU ) = INTEGER (/DSA_COMM/)
+*        The logical unit allocated on the slot.
+
+*  Prior Requirements:
+*     DAT_PAR and NDF_PAR must be included before this file.
+
+*  Notes:
+*     When the contents of the common blocks are changed some routines
+*     need revision, because they initialise slots or display all common
+*     block contents. These are:
+*     DSA_BLOCK, DSA_CLOSE, DSA_CLOSE_STRUCTURE, DSA_DUMP_COMMON,
+*     DSA_FREE_WORKSPACE, DSA_UNMAP.
+*     In addition, all routines that use discontinued variables or that
+*     should use new variables must be reviewed.
+
+*  Authors:
+*     ks: Keith Shortridge (AAO)
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     29 Aug 1992 (ks):
+*        Changed FITS_OPEN from INTEGER to the LOGICAL that it
+*        always should have been.
+*     17 Dec 1992 (ks):
+*        Added section K), the temporary file name variables. 
+*        WORK_VM_LIMIT no longer used and removed.
+*     26 Jul 1994 (hme):
+*        Make common blocks SAVE.
+*     25 Oct 1994 (ks):
+*        Added MAP_START to support array subset mapping.
+*     17 Feb 1995 (ks):
+*        Added QF_HANDLING and associated parameters.
+*     19 Jul 1995 (hme):
+*        Make common blocks SAVE.
+*     24 Jul 1994 (hme):
+*        Make common blocks SAVE.
+*     26 Nov 1995 (hme):
+*        FDA library.
+*     19 Jan 1996 (hme):
+*        Axis center buffer NDF and axis number in map slot.
+*     09 Feb 1996 (hme):
+*        Add flags to signal shape changes and content modifications.
+*     22 Feb 1996 (hme):
+*        Add space for NDF name to allow deferred opening of output.
+*     23 Feb 1996 (hme):
+*        Add locator, pointer, size of FITS extension.
+*     05 Mar 1996 (hme):
+*        Add locator for temporary HDS structure, for the benefit of
+*        creation of structures from definition files.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
+      INTEGER DSA__MAXREF
+      INTEGER DSA__MAXMAP
+      INTEGER DSA__MAXLU
+      PARAMETER ( DSA__MAXREF = 8, DSA__MAXMAP = 64, DSA__MAXLU = 5 )
+
+*  Global Variables:
+      LOGICAL DSA__BADQUA
+      LOGICAL DSA__REFUSD( DSA__MAXREF )
+      LOGICAL DSA__REFBAD( DSA__MAXREF )
+      LOGICAL DSA__REFQUA( DSA__MAXREF )
+      LOGICAL DSA__REFRSD( DSA__MAXREF )
+      LOGICAL DSA__REFMDD( DSA__MAXREF )
+      LOGICAL DSA__REFMDQ( DSA__MAXREF )
+      LOGICAL DSA__REFMDV( DSA__MAXREF )
+      LOGICAL DSA__REFRSA( NDF__MXDIM, DSA__MAXREF )
+      LOGICAL DSA__REFMDC( NDF__MXDIM, DSA__MAXREF )
+      LOGICAL DSA__REFMDW( NDF__MXDIM, DSA__MAXREF )
+      INTEGER DSA__REFID1( DSA__MAXREF )
+      INTEGER DSA__REFID2( DSA__MAXREF )
+      INTEGER DSA__REFID3( DSA__MAXREF )
+      INTEGER DSA__REFPLC( DSA__MAXREF )
+      INTEGER DSA__REFDPT( DSA__MAXREF )
+      INTEGER DSA__REFQPT( DSA__MAXREF )
+      INTEGER DSA__REFFPT( DSA__MAXREF )
+      INTEGER DSA__REFFNE( DSA__MAXREF )
+      LOGICAL DSA__MAPUSD( DSA__MAXMAP )
+      INTEGER DSA__MAPID1( DSA__MAXMAP )
+      INTEGER DSA__MAPAXI( DSA__MAXMAP )
+      INTEGER DSA__MAPREF( DSA__MAXMAP )
+      INTEGER DSA__MAPPT1( DSA__MAXMAP )
+      INTEGER DSA__MAPPT2( DSA__MAXMAP )
+      LOGICAL DSA__LUUSD(  DSA__MAXLU  )
+      INTEGER DSA__LUNUM(  DSA__MAXLU  )
+      CHARACTER * ( 256        ) DSA__REFNDF( DSA__MAXREF )
+      CHARACTER * (  16        ) DSA__REFNAM( DSA__MAXREF )
+      CHARACTER * ( DAT__SZLOC ) DSA__REFFLO( DSA__MAXREF )
+      CHARACTER * ( DAT__SZLOC ) DSA__REFLOC( DSA__MAXREF )
+      CHARACTER * (  16        ) DSA__MAPNAM( DSA__MAXMAP )
+      CHARACTER * ( DAT__SZLOC ) DSA__MAPLO1( DSA__MAXMAP )
+      CHARACTER * ( DAT__SZLOC ) DSA__MAPLO2( DSA__MAXMAP )
+      COMMON / DSA_COMM / DSA__BADQUA,
+     :                    DSA__REFUSD, DSA__REFBAD, DSA__REFQUA,
+     :                    DSA__REFRSD, DSA__REFMDD, DSA__REFMDQ,
+     :                    DSA__REFMDV,
+     :                    DSA__REFRSA, DSA__REFMDC, DSA__REFMDW,
+     :                    DSA__REFID1, DSA__REFID2, DSA__REFID3,
+     :                    DSA__REFPLC, DSA__REFDPT, DSA__REFQPT,
+     :                    DSA__REFFPT, DSA__REFFNE,
+     :                    DSA__MAPUSD,
+     :                    DSA__MAPID1, DSA__MAPAXI, DSA__MAPREF,
+     :                    DSA__MAPPT1, DSA__MAPPT2,
+     :                    DSA__LUUSD,
+     :                    DSA__LUNUM
+      COMMON / DSA_COMMC / DSA__REFNDF, DSA__REFNAM, DSA__MAPNAM,
+     :                     DSA__REFFLO, DSA__REFLOC,
+     :                     DSA__MAPLO1, DSA__MAPLO2
+      SAVE   / DSA_COMM  /
+      SAVE   / DSA_COMMC /
+
+*.

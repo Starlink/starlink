@@ -1,0 +1,84 @@
+*+
+*  Name:
+*     DSA_TYPES
+
+*  Purpose:
+*     Type definitions for data types supported by the DSA_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'DSA_TYPES'
+
+*  Description:
+*     Type definitions for data types supported by the DSA_ system.
+
+*  Arguments:
+*     MAX_TYPES = INTEGER (PARAMETER)
+*        Number of supported types.
+*     BYTE_TYPE = INTEGER (PARAMETER)
+*        'BYTE' data.
+*     INT_TYPE = INTEGER (PARAMETER)
+*        'INT' data.
+*     DOUBLE_TYPE = INTEGER (PARAMETER)
+*        'DOUBLE' data.
+*     CHAR_TYPE = INTEGER (PARAMETER)
+*        'CHAR' data.
+*     SHORT_TYPE = INTEGER (PARAMETER)
+*        'SHORT' data.
+*     FLOAT_TYPE = INTEGER (PARAMETER)
+*        Code for 'FLOAT' data.
+*     USHORT_TYPE = INTEGER (PARAMETER)
+*        Code for 'USHORT' data.
+*     TYPE_NAMES( MAX_TYPES ) = CHARACTER * ( 6 ) (DATA)
+*        Names corresponding to type codes.
+*     TYPE_SIZE( MAX_TYPES ) = INTEGER (DATA)
+*        Size in bytes for each type.
+*     FMTCON_CODE( MAX_TYPES ) = INTEGER (DATA)
+*        Types codes used by DSA_FMTCON. Note that the type codes are
+*        quite arbitrary, and are just index values into the other
+*        arrays.  The DSA_FMTCON codes are determined by that routine.
+
+*  Authors:
+*     ks: Keith Shortridge (AAO)
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     24 Nov 1995 (hme):
+*        Review for FDA.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Local Constants:
+      INTEGER MAX_TYPES
+      INTEGER FLOAT_TYPE
+      INTEGER INT_TYPE
+      INTEGER DOUBLE_TYPE
+      INTEGER SHORT_TYPE
+      INTEGER CHAR_TYPE
+      INTEGER BYTE_TYPE
+      INTEGER USHORT_TYPE
+      PARAMETER
+     :   ( MAX_TYPES   = 7, FLOAT_TYPE = 1, INT_TYPE  = 2,
+     :     DOUBLE_TYPE = 3, SHORT_TYPE = 4, CHAR_TYPE = 5,
+     :     BYTE_TYPE = 6,  USHORT_TYPE = 7 )
+
+*  Local Variables:
+      INTEGER TYPE_SIZE( MAX_TYPES )
+      INTEGER FMTCON_CODE( MAX_TYPES )
+      CHARACTER * ( 6 ) TYPE_NAMES( MAX_TYPES )
+
+*  Local Data:
+      DATA TYPE_NAMES
+     :   / 'FLOAT', 'INT', 'DOUBLE', 'SHORT',
+     :     'CHAR',  'BYTE', 'USHORT' /
+      DATA TYPE_SIZE   / 4, 4, 8, 2, 1, 1, 2 /
+      DATA FMTCON_CODE / 4, 3, 5, 2, 1, 1, 7 /
+
+*.
