@@ -25,7 +25,11 @@ const string *BitmapImage::softwareversion = 0;
 const string *BitmapImage::inputfilename = 0;
 const string *BitmapImage::furtherinfo = 0;
 
-BitmapImage::BitmapImage(const int w, const int h, const bpp)
+const string BitmapImage::defaultBitmapImageFormat = "xbm";
+
+verbosities BitmapImage::verbosity_ = normal;
+
+BitmapImage::BitmapImage(const int w, const int h, const int bpp)
     : w_(w), h_(h), bpp_(bpp),
       bitmap_(0), allocBitmap_(0), myBitmap_(false), bitmapRows_(0),
       isTransparent_(false)
@@ -49,9 +53,28 @@ BitmapImage *BitmapImage::newBitmapImage
     if (format == "xbm")
 	return new XBMBitmap (w, h);
     else
-	return new XBMBitmap (w, h);
+	return 0;
 }
 
+// Return true if newBitmapImage would succeed -- ie, if the format is
+// a valid one.
+bool BitmapImage::supportedBitmapImage (const string format)
+{
+#if ENABLE_PNG
+    if (format == "png")
+	return true;
+#endif
+
+#if ENABLE_GIF
+    if (format == "gif")
+	return true;
+#endif
+
+    if (format == "xbm")
+	return true;
+
+    return false;
+}
 
 BitmapImage::~BitmapImage ()
 {
