@@ -428,8 +428,8 @@ numerical types. The \emph{actual} routines names will not include the trailing
     <SCRIPT LANGUAGE=JavaScript>
        function popup() {
           self.name="MAIN";
-          var w = open( "", "SEARCH", "status,width=700,height=500" );
-          if( w.document.URL == "" ) w.location = "./search.html";
+          var w = open( "./search.html", "SEARCH", "status,width=700,height=500" );
+          if( w.document.URL != "./search.html" ) w.location = "./search.html";
           w.focus();
        }
        popup();
