@@ -158,7 +158,10 @@
 <!--========== Notations ==========-->
 <!-- Read in the set of defined data notations.
 
-     These are kept in a separate file, because one of the notations (at
+     These are kept in a separate file so that they can be used in
+     common with the programcode DTD.
+
+     A further reason is that one of the notations (at
      present) defines data attributes (see 8879, Sect. 11.4).  If we want
      to define, in the DTD subset, entities which use any of these
      attributes, the notation declaration must come first (see
@@ -183,6 +186,13 @@
 	"notations.text"
 	>
 %notations-subset;
+
+<!-- %text.figure.notations: Figure notations which use only SGML
+     characters (terminology? see 8879, 9.2), which can therefore be
+     included directly within figurecontent element
+     -->
+<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'>
+
 
 ]]>
 
@@ -383,6 +393,7 @@
      -->
 <!SHORTREF textabbrevsmap	"--"	endash
 				"_"	underscore
+				'"'	quot
 				"~"	nbsp>
 <!-- Enable this map in the following elements.  This means it's
      enabled in all of %body.content, plus miscellaneous other places
@@ -503,13 +514,16 @@
      -->
 <!ELEMENT coderef %MXX (#PCDATA)>
 <!ATTLIST coderef
-	collection	IDREF	#REQUIRED
+	collection	IDREF	#IMPLIED
 	id		CDATA	#REQUIRED
 	>
 	<!-- attributes:
 		collection	An ID which points to a codecollection
 				element, which in turn refers to an
-				instance of the programcode DTD.
+				instance of the programcode DTD.  If
+				this is omitted, then the coderef
+				refers to the first codecollection
+				element in the document.
 		id		An ID which exists within the document
 				referred to by the collection
 				attribute.
@@ -768,6 +782,15 @@
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist; [
+  <!-- Allow body.content to contain _either_ ordinary text _or_ a
+       routinelist element.  In the latter case, you can preface the
+       enclosed codecollections with some text, by putting a sequence
+       of paragraphs before the codecollection elements.  There's no
+       deep reason for this, but it turns out that, since the
+       processing of programcode documents is so different from that
+       of `ordinary' text, that it makes their processing
+       substantially easier if we impose this dichotomy.
+       -->
   <!ENTITY % body.content '(routinelist | (p | table | figure | mdefs)*)'>
 ]]>
 <!ENTITY % body.content '(p | table | figure | mdefs)*'>
