@@ -90,6 +90,17 @@ $file_indexfile = cwd . "/file";
 $taskfile  = cwd . "/tasks";
 
 #  Language-specific tagging routines.
+#     By defining the hash of references to functions %tagger, file tagging 
+#     can be done without explicit reference to any of the tagging routines.
+#     All that is required is a sequence like:
+#
+#        use Scb.pm;
+#        $tagged = &{$tagger{$ftype}} ($source, $ftype);
+#
+#     where $ftype is the file type (usually the filename extension), as
+#     given in the keys to %tagger below.  The $ftype argument to the 
+#     tagging routine is in general optional, but the routine may wish 
+#     to know what kind of file it has been given.
 
 use CTag;
 use FortranTag;
@@ -97,6 +108,9 @@ use FortranTag;
 %tagger = ( 
             c   => \&CTag::tag,
             h   => \&CTag::tag,
+            C   => \&CTag::tag,
+            cpp => \&CTag::tag,
+            cxx => \&CTag::tag,
 
             f   => \&FortranTag::tag,
             gen => \&FortranTag::tag,
