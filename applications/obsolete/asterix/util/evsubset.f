@@ -116,6 +116,7 @@
       INTEGER                 IBLOCK               ! Loop over blocks
       INTEGER                 ICOPY                ! Pointer to copy array
       INTEGER                 IDPTR(LIST__MXNL)    ! List data pointers
+      INTEGER			IFID			! Input dataset id
       INTEGER                 IQPTR(LIST__MXNL)    ! Pointer to input quantum
       INTEGER                 LDIMS(DAT__MXDIM)    ! Length of each dimension
       INTEGER                 LEN                  ! Length of various things
@@ -128,8 +129,10 @@
       INTEGER                 ODPTR                ! Pointers to output
                                                    ! DATA_ARRAY
       INTEGER		      OFFSET		   ! Output data offset
+      INTEGER			OFID			! Output dataset id
       INTEGER                 OQPTR                ! Pointers to output
                                                    ! vector QUANTUM
+      INTEGER			TIMID			! Timing info
 
       BYTE		      BVAL                 ! Array initialisation value
 
@@ -145,7 +148,7 @@
 *    Version :
 *
       CHARACTER*80            VERSION
-        PARAMETER            ( VERSION = 'EVSUBSET Version 1.8-0' )
+        PARAMETER            ( VERSION = 'EVSUBSET Version 1.8-1' )
 *-
 
 *    Display version
@@ -159,14 +162,10 @@
       END DO
 
 *    Associate input & output datasets
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', INPL, OUTL, INPRIM, STATUS)
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', INPL, OUTL, STATUS )
+      CALL ADI1_GETLOC( IFID, INPL, STATUS )
+      CALL ADI1_GETLOC( OFID, OUTL, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
-
-      IF ( INPRIM ) THEN
-        CALL MSG_PRNT ('FATAL ERROR: Input must be an EVENT dataset')
-        STATUS = SAI__ERROR
-        GOTO 99
-      END IF
 
 *    Index mode?
       CALL USI_GET0L( 'INDEX', INDEXMODE, STATUS )
@@ -541,32 +540,27 @@
             OBS_LENGTH = OBS_LENGTH + (RANGES(K+1,I) - RANGES(K,I))
           END DO
 
-          CALL BDA_CHKHEAD( INPL, OK, STATUS )
-          IF ( OK ) THEN
-            CALL BDA_LOCHEAD( INPL, HEADER, STATUS )
-            CALL HDX_OK( HEADER, 'OBS_LENGTH', OK, STATUS)
-
-            IF ( OK .AND. .NOT. KEEP(I) ) THEN
-              CALL CMP_GET0R( HEADER, 'OBS_LENGTH', OLD_OBS_LENGTH,
-     :                                                     STATUS )
-              OBS_LENGTH = OLD_OBS_LENGTH - OBS_LENGTH
-            ELSE IF (.NOT. OK .AND. .NOT. KEEP(I) ) THEN
-              OBS_LENGTH = VAL__BADR
-            END IF
-            CALL BDA_LOCHEAD( OUTL, HEADER, STATUS )
-            CALL CMP_PUT0R( HEADER, 'OBS_LENGTH', OBS_LENGTH, STATUS )
-          ELSE
-            CALL ERR_ANNUL( STATUS )
+          CALL TCI_GETID( IFID, TIMID, STATUS )
+          CALL ADI_THERE( TIMID, 'ObsLength', OK, STATUS )
+          IF ( OK .AND. .NOT. KEEP(I) ) THEN
+            CALL ADI_CGET0R( TIMID, 'ObsLength', OLD_OBS_LENGTH,
+     :                       STATUS )
+            OBS_LENGTH = OLD_OBS_LENGTH - OBS_LENGTH
+          ELSE IF ( .NOT. OK .AND. .NOT. KEEP(I) ) THEN
+            OBS_LENGTH = VAL__BADR
           END IF
+
+          CALL ADI_CPUT0D( TIMID, 'ObsLength', OBS_LENGTH, STATUS )
+          CALL TCI_PUTID( OFID, TIMID, STATUS )
 
         END IF
       END DO
 
 *    History
-      CALL HIST_ADD( OUTL, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *    Exit
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
