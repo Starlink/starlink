@@ -1332,7 +1332,37 @@ astSimplify( this )
  OUTPUT:
   RETVAL
 
-# astTran1  XXXX
+# astTran1
+#   Returns one array
+# Even though we return one array, we use PPCODE so that it is closer to
+# the code used for astTran2
+
+void
+astTran( this, xin, forward )
+  AstMapping * this
+  AV* xin
+  bool forward
+ PREINIT:
+  int len1;
+  double * cxin;
+  AV* xout;
+  double * cxout;
+  SV** elem;
+ PPCODE:
+  len1 = av_len( xin ) + 1;
+  cxin = pack1D( newRV_noinc((SV*)xin), 'd');
+  cxout = get_mortalspace( len1, 'd' );
+
+  ASTCALL(
+    astTran1( this, len1, cxin, forward, cxout );
+  )
+
+  xout = newAV();
+  unpack1D( newRV_noinc((SV*) xout), cxout, 'd', len1);
+
+  XPUSHs( newRV_noinc((SV*) xout ));
+
+
 
 # astTran2
 #   Returns 2 arrays
@@ -1365,7 +1395,6 @@ astTran2( this, xin, yin, forward )
   cyout = get_mortalspace( len2, 'd' );
 
   ASTCALL(
-    astShow( this );
     astTran2( this, len1, cxin, cyin, forward, cxout, cyout );
   )
 
