@@ -33,6 +33,8 @@
 *   A.J.Holloway, Manchester
 *   T.D.C.Ash, RAL, Starlink
 *   A.C. Davenhall, Starlink, Edinburgh.
+*   Malcolm J Currie, RAL, Starlink
+*
 * History:
 *   TNW: 4-OCT-1990 Original version
 *   TNW: 26-JAN-2-FEB-1994 Add bits for FITS keywords etc.
@@ -49,6 +51,7 @@
 *        variable outside its loop, which caused array bounds to be
 *        exceeded.
 *   ACD: 28/9/00 Remove local unused variables.
+*   MJC: 2004 July 23 Initialised READVARS array.
 *-
       implicit none
       integer ival
@@ -144,10 +147,10 @@ C      integer find_file
       do i = 1, NFITSTAB
          do j = 1, NFITSVAR
             call chr_fill(' ',fits_unames(j,i))
+            call chr_fill(' ',READVAR(j))
          enddo
          call dta_szvar('defaults.more.figaro.'//fits_twodnames(i),
      :        2,ndim,dims,status)
-
 
          if(status.eq.SAI__OK) then
             dims(2) = min(dims(2),NFITSVAR)
@@ -162,11 +165,8 @@ C      integer find_file
 *     call dta_rdvarc(name,8,fits_unames(j,i),status)
 *     enddo
             
-            
-
             call dta_loc('defaults.more.figaro.'//
      :           fits_twodnames(i),nloc,status)
-
 
 
             
@@ -207,8 +207,4 @@ C      integer find_file
       enddo
       call dsa_close_structure('defaults',status)
       end
-
-
-
-
 
