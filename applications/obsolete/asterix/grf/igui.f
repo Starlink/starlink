@@ -146,6 +146,17 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'FLAG','_INTEGER',0,VAL__NBI,
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'OPTIONS','_CHAR',0,12,SID,STATUS)
+
+*  current region and position
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGION','_CHAR',0,12,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMIN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMAX','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'X','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,VAL__NBR,SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'RA','_CHAR',0,12,SID,STATUS)
@@ -158,11 +169,22 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'DEC1950','_DOUBLE',0,VAL__NBD,
      :                                                    SID,STATUS)
-*  data min/max
+*  data min/max/mean
         CALL NBS_DEFINE_PRIMITIVE(ID,'MIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'MAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'MEAN','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'MERR','_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+
+*  data quality
+        CALL NBS_DEFINE_PRIMITIVE(ID,'NGOOD','_INTEGER',0,VAL__NBI,SID,
+     :                                                          STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'NBAD','_INTEGER',0,VAL__NBI,SID,
+     :                                                         STATUS)
+
 *  axes min/max
         CALL NBS_DEFINE_PRIMITIVE(ID,'XMIN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
@@ -185,15 +207,6 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'WTODEG','_REAL',0,VAL__NBR,SID,
      :                                                         STATUS)
 
-*  limits of current region
-        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMIN','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'REGXMAX','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMIN','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'REGYMAX','_REAL',0,VAL__NBR,SID,
-     :                                                       STATUS)
 
 *  background modeller
         CALL NBS_DEFINE_PRIMITIVE(ID,'BG_RMS','_REAL',0,VAL__NBR,SID,
@@ -276,6 +289,10 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',ITEMID,STATUS)
         CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'REGION',ITEMID,STATUS)
+        CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PIXEL',ITEMID,STATUS)
+        CALL NBS_PUT_CVALUE(ITEMID,0,' ',STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'X',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'Y',ITEMID,STATUS)
@@ -296,6 +313,14 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'MAX',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'MEAN',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'MERR',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'NGOOD',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'NBAD',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'COLOUR',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
         CNAME='DATA'

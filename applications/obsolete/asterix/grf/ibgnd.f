@@ -169,6 +169,9 @@
 *      Start modelling
           ELSE IF ( CMD .EQ. 'START' ) THEN
 
+*        Don't know what image is displayed
+            I_BGM_DISIM = 0
+
 *        If already modelling then update to take account of changes since
 *        last restart (eg. in regions)
             IF ( I_BGM_ON ) THEN
@@ -204,8 +207,23 @@
 *        Add to list
             CALL IBGND_ADDSRC( XPOS, YPOS, R, STATUS )
 
-*        Mark the new soruce
-            CALL IBGND_MARK( I_BGM_NSRC, STATUS )
+*        Bgnd derived image is displayed?
+            IF ( I_BGM_DISIM .NE. 0 ) THEN
+
+*          Update it
+              CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
+
+*          Mark sources
+              DO ISRC = 1, I_BGM_NSRC
+                CALL IBGND_MARK( ISRC, STATUS )
+              END DO
+
+            ELSE
+
+*          Mark the new soruce
+              CALL IBGND_MARK( I_BGM_NSRC, STATUS )
+
+            END IF
 
 *      Mark sources
           ELSE IF ( CMD .EQ. 'MARKSRC' ) THEN
@@ -238,13 +256,26 @@
             CALL USI_GET0I( 'ISRC', ISRC, STATUS )
             CALL IBGND_DELSRC( ISRC, STATUS )
 
+*        Bgnd derived image is displayed?
+            IF ( I_BGM_DISIM .NE. 0 ) THEN
+
+*          Update it
+              CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
+
+*          Mark sources
+              DO ISRC = 1, I_BGM_NSRC
+                CALL IBGND_MARK( ISRC, STATUS )
+              END DO
+
+            END IF
+
 *      Display model
           ELSE IF ( CMD .EQ. 'DISP' ) THEN
-            CALL IBGND_DISP_SURF( .FALSE., STATUS )
+            CALL IBGND_DISP_SURF( 1, STATUS )
 
 *      Display model residuals
           ELSE IF ( CMD .EQ. 'RDISP' ) THEN
-            CALL IBGND_DISP_SURF( .TRUE., STATUS )
+            CALL IBGND_DISP_SURF( -1, STATUS )
 
 *      Save model to file
           ELSE IF ( CMD .EQ. 'SAVE' ) THEN
@@ -955,7 +986,7 @@
 
 
 
-      SUBROUTINE IBGND_DISP_SURF( RESID, STATUS )
+      SUBROUTINE IBGND_DISP_SURF( PCODE, STATUS )
 *+
 *  Name:
 *     IBGND_DISP_SURF
@@ -970,14 +1001,14 @@
 *     Task subroutine
 
 *  Invocation:
-*     CALL IBGND_DISP_SURF( RESID, STATUS )
+*     CALL IBGND_DISP_SURF( PCODE, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
-*     RESID = LOGICAL (given)
-*        Display residuals?
+*     PCODE = INTEGER (given)
+*        Which image? Model = 1, residuals = -1
 *     STATUS = INTEGER (given)
 *        The global status.
 
@@ -1092,10 +1123,12 @@
         CALL GFX_SETCOLS(STATUS)
 
 *    Convert to residuals?
-        IF ( RESID ) THEN
+        IF ( PCODE .EQ. -1 ) THEN
+
           CALL IBGND_SURF_RESID( I_NX*I_NY, %VAL(I_BGM_SAMIDX),
      :                           %VAL(I_DPTR), %VAL(I_BGM_DPTR),
      :                           .TRUE., STATUS )
+
         END IF
 
 *    Plot bounds
@@ -1107,7 +1140,7 @@
         END IF
 
 *    Plot the pixels
-        IF ( RESID .AND. I_QOK .AND. I_BAD ) THEN
+        IF ( (PCODE.EQ.-1) .AND. I_QOK .AND. I_BAD ) THEN
           CALL GFX_PIXEL(I_WKPTR,I_NX,I_NY,I_IX1,I_IX2,I_IY1,I_IY2,
      :                .TRUE.,%VAL(I_XPTR),%VAL(I_YPTR),0,0,
      :                     %VAL(I_BGM_DPTR), PMIN,PMAX,%VAL(I_QPTR),
@@ -1119,7 +1152,7 @@
         END IF
 
 *    Convert back from residuals?
-        IF ( RESID ) THEN
+        IF ( PCODE .EQ. -1 ) THEN
           CALL IBGND_SURF_RESID( I_NX*I_NY, %VAL(I_BGM_SAMIDX),
      :                           %VAL(I_DPTR), %VAL(I_BGM_DPTR),
      :                           .FALSE., STATUS )
@@ -1133,6 +1166,7 @@
 *  Flag current plotting status
       I_DISP = .TRUE.
       I_DISP_1D = .FALSE.
+      I_BGM_DISIM = PCODE
 
       END
 
