@@ -156,7 +156,7 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 /* ================= */
 #if 1
 #include "f77.h"
-static double Random( long int *irand ) {
+static volatile double Random( long int *irand ) {
    long int i;
    double result;
 
@@ -468,6 +468,119 @@ printf( "minimum %d = %.20g, fract = %g, ncall = %d\n", iter, minimum, fract, *n
 }
 
 
+#if 1
+void astBoxBound( AstMapping *this,
+                  const double lbnd_in[], const double ubnd_in[],
+                  int coord_out, double lbnd_out[], double ubnd_out[] ) {
+
+   MapData mapdata;
+   int nin;
+   int nout;
+   long int irand = 77665544;
+   double random;
+   int ncall;
+   double *x;
+   int iter;
+   int coord;
+   double lbnd;
+   double ubnd;
+   int limit;
+   double minimum;
+   double new_minimum;
+   const int maxiter = 5;
+   double *x_opt;
+   int reject;
+   double delta;
+   double wt;
+   double distance;
+   int i;
+   double dx1;
+   double dx2;
+   double dx;
+   
+   nin = astGetNin( this );
+   nout = astGetNout( this );
+
+   mapdata.mapping = this;
+   mapdata.nin = nin;
+   mapdata.nout = nout;
+   mapdata.coord = coord_out;
+   mapdata.forward = 1;
+   mapdata.lbnd = lbnd_in;
+   mapdata.ubnd = ubnd_in;
+   mapdata.pset_in = astPointSet( 1, nin, "" );
+   mapdata.pset_out = astPointSet( 1, nout, "" );
+   mapdata.ptr_in = astGetPoints( mapdata.pset_in );
+   mapdata.ptr_out = astGetPoints( mapdata.pset_out );
+ 
+   x_opt = astMalloc( sizeof( double ) * (size_t) nin );
+
+   for ( limit = 0; limit < 2; limit++ ) {
+      mapdata.negate = limit;
+      minimum = DBL_MAX;
+
+      x = NULL;
+      for ( iter = 0; iter < 5; iter++ ) {
+         x = astGrow( x, nin * ( iter + 1 ), sizeof( double ) );
+         reject = 1;
+         while ( reject ) {
+            for ( coord = 0; coord < nin; coord++ ) {
+               random = Random( &irand );
+               x[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                         lbnd_in[ coord ] * ( 1.0 - random );
+            }
+            wt = 1.0;
+            for ( i = 0; i < iter; i++ ) {
+               distance = 0.0;
+               for ( coord = 0; coord < nin; coord++ ) {
+                  dx1 = fabs( x[ i * nin + coord ] - lbnd_in[ coord ] );
+                  dx2 = fabs( ubnd_in[ coord ] - x[ i * nin + coord ] );
+                  dx = dx1 > dx2 ? dx1 : dx2;
+                  delta = fabs( ( x[ i * nin + coord ] -
+                                  x[ iter * nin + coord ] ) / dx );
+                  distance = ( distance > delta ) ? distance : delta;
+               }
+               wt *= distance;
+            }
+            random = Random( &irand );
+            reject = ( random > wt );
+            printf( "wt, reject = %g %d\n", wt, reject );
+         }
+
+         for ( coord = 0; coord < nin; coord ++ ) {
+printf( "%g ", x[ iter * nin + coord ] );
+         }
+printf( "\n" );
+         new_minimum = SimplexMinimum( &mapdata, &x[ iter * nin ],
+                                       0.1, 0.001, &ncall );
+         printf( "minimum found at " );
+         for ( coord = 0; coord < nin; coord++ ) {
+            printf( "%g ", x[ iter * nin + coord ] );
+         }
+         printf( "\n\n" );
+         if ( new_minimum < minimum ) {
+            minimum = new_minimum;
+            for ( coord = 0; coord < nin; coord ++ ) {
+               x_opt[ coord ] = x[ iter * nin + coord ];
+            }
+         }
+      }
+      if ( !limit ) {
+         *lbnd_out = minimum;
+      } else {
+         *ubnd_out = - minimum;
+      }
+      printf( "best limit = %g at ", minimum );
+      for ( coord = 0; coord < nin; coord++ ) {
+         printf( "%g ", x_opt[ coord ] );
+      }
+      printf( "\n\n" );
+      x = astFree( x );
+   }
+   x_opt = astFree( x_opt );
+}
+
+#else
 void astBoxBound( AstMapping *this,
                   const double lbnd_in[], const double ubnd_in[],
                   double lbnd_out[], double ubnd_out[] ) {
@@ -676,6 +789,7 @@ void astBoxBound( AstMapping *this,
    pset3_in = astAnnul( pset3_in );
    pset3_out = astAnnul( pset3_out );
 }
+#endif
 #endif
 
 /*************************************/
