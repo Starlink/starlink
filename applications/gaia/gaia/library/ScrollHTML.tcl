@@ -257,7 +257,6 @@ itcl::class gaia::ScrollHTML {
 
    #  Load a file into the HTML widget. Update history if needed.
    public method loadfile {url {update 1} } {
-      puts "loading: $url"
       set html [readfile_ $url]
       if { $html == "" } return
       clear
@@ -282,9 +281,7 @@ itcl::class gaia::ScrollHTML {
    #  Append a file to the history record. Do not append if this is
    #  the same as the current file.
    protected method happend_ {name} {
-      puts "happend: $name, $nhist_"
       set history_($nhist_) $name
-      puts "history_ = [array get history_]"
       incr nhist_
    }
 
@@ -298,11 +295,9 @@ itcl::class gaia::ScrollHTML {
    #  Display the "previous" file.
    public method previous {} {
       incr nhist_ -2
-      puts "looking for: $nhist_"
       if { [info exists history_($nhist_)] } {
          loadfile $history_($nhist_) 0
       } else {
-         puts "missed: $nhist_ ([expr $nhist_ +2])"
          incr nhist_ 2
       } 
    }

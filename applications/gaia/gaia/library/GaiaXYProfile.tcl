@@ -81,7 +81,7 @@ itcl::class gaia::GaiaXYProfile {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      add_help_button xyprofile "On Window..."
+      add_help_button xyprofileusage "On Window..."
 
       #  Add short help window.
       make_short_help

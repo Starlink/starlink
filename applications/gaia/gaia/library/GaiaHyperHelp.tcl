@@ -181,14 +181,12 @@ itcl::class gaia::GaiaHyperHelp {
    #  Render text of help topic <topic>. The text is expected to be
    #  found in <helpdir>/<topic>.html
    public method showtopic {topic} {
-      puts "showing topic: $topic"
       if { $topic != ""} {
          if ![regexp {(.*)\#(.*)} $topic dummy topicname anchorpart] {
             set topicname $topic
             set anchorpart {}
          }
          set url $itk_option(-helpdir)/${topic}.html${anchorpart}
-         puts "reading:$url"
          readtopic_ $url
       }
    }
@@ -206,7 +204,6 @@ itcl::class gaia::GaiaHyperHelp {
    #
    # Show a menu topic, clearing history.
    public method hometopic { topic } {
-      puts "hometopic"
       $itk_component(html) clear_history
       showtopic $topic
    }
