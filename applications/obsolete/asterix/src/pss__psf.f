@@ -371,6 +371,7 @@
               ILEV = 4
             ELSE
               STATUS = SAI__ERROR
+              CALL MSG_SETC( 'P', PDATA )
               CALL ERR_REP( ' ', 'Cannot translate ^P to radii, try '/
      :                      /'one of 50%, 68%, 90% or 95%', STATUS )
               GOTO 99
@@ -384,7 +385,6 @@
             CALL PRS_GETLIST_INT( PDATA(:PLEN), 99, PSF_PPS, NUR,
      :                            STATUS )
           END IF
-	PRINT *,PSF_PPS
 
 *        Right number?
           IF ( NUR .NE. NIPOS ) THEN
