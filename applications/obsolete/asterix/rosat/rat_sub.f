@@ -760,7 +760,7 @@
       DATA VALUES(99) /'   :PSPC:EVRATE :A1_AL    ee_a1ll' /
       DATA VALUES(100)/'US :HRI :EVRATE :PS_VALID ps_valid' /
       DATA VALUES(101)/'   :    :       :TIME     time' /
-      DATA VALUES(102)/'RDF:HRI :EVRATE :SECONDARYsecondary' /
+      DATA VALUES(102)/'RDF:HRI :EVRATE :PS_VALID secondary' /
       DATA VALUES(103)/'   :    :       :TIME     time' /
 *-
 *
