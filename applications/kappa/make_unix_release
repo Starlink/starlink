@@ -112,6 +112,7 @@
       ifd2iraf kappa
 
 #  Create the on-line help file.
+      mv lutedit.help lutedit.gui-help
       foreach file (`grp kappa_ifls`)
          set ffile = `basename $file .ifl`.f
          set hfile = `basename $file .ifl`.help
@@ -121,6 +122,7 @@
       cat kappa.star-hlp *.help > new.hlp
       mv new.hlp kappa.hlp kappa.star-hlp
       rm *.help
+      mv lutedit.gui-help lutedit.help 
 
 #  Generate the IRAF documentation.
       ifd_irafhlpgen kappa

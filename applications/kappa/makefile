@@ -1094,8 +1094,7 @@ $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o \
 
 $(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(KAPPA_MONO_SOURCE:.f=.o) -o $(KAPPA_MON) $(OBJECT_LIBRARIES) \
-	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
+	         $(ADDLIBS) `./$(LINK_SCRIPT) -nogks` 
 
 $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
@@ -1104,7 +1103,7 @@ $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
 	         lsfun1.o $(OBJECT_LIBRARIES) \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
+	         $(ADDLIBS) `./$(LINK_SCRIPT) -nogks` $(TCLLIBS) $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
 
