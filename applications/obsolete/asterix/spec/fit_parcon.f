@@ -92,6 +92,7 @@
 *     13 Jan 93 : NEPAR and EPAR arrays allows error calculation to be
 *                 restricted to specific parameters (DJA)
 *     19 May 94 : Updated to handle constrained fitting (DJA)
+*     12 Jan 95 : Fixed deleted line causing FFROZEN to be uninitialised (DJA)
 *
 *    Type definitions :
 *
@@ -181,6 +182,7 @@
       DO J = 1, NPAR
 	FPEGGED(J) = PEGGED(J)
 	FROZEN(J) = LFROZEN(J)
+	FFROZEN(J) = FROZEN(J)
 	IF ( .NOT. LFROZEN(J) ) NUNFROZEN = NUNFROZEN + 1
 	FPAR(J) = PARAM(J)
       END DO
