@@ -1,4 +1,3 @@
-cvs checkout: /cvs/CVSROOT/config: unrecognized keyword 'UseNewInfoFormatStrings'
 cvs checkout: Updating java
 cvs checkout: Updating java/pal
 cvs checkout: Updating java/pal/src
