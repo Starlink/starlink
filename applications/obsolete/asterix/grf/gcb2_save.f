@@ -129,7 +129,7 @@
 
 *  Write keywords to define contents of HDU
       CALL ADI2_PKEY0C( ARGS(1), 'GCB', 'CONTENT', 'GRAFIX CONTROL',
-     :                  'Version of GCB description', STATUS )
+     :                  'Contents of extension', STATUS )
       CALL ADI2_PKEY0R( ARGS(1), 'GCB', 'GCBVERSN', G_VERSION,
      :                  'Version of GCB description', STATUS )
 
