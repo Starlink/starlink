@@ -1,0 +1,79 @@
+
+##testing decompose_transform
+
+test -n "$AUTOASTROM_DIR" || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(decompose_transform);
+
+
+
+my @cpts = (
+	    [  0.0,  0.0,  1.0,  1.0,    0,   60 ],
+	    [  0.0,  0.0,  1.0,  1.0,    0,  120 ],
+	    [  0.0,  0.0,  1.0,  1.0,    0, -120 ],
+	    [  0.0,  0.0, -1.0,  1.0,    0, -120 ],
+	    [  0.0,  0.0, -1.0,  1.0,    0, +120 ],
+	    [  0.0,  0.0, -1.0,  1.0,   60,  -90 ],
+	    [  0.0,  0.0, -1.0,  1.0,  -60,  -90 ],
+	    [  0.0,  0.0,  1.0,  1.0,   60,  -90 ],
+	    [  0.0,  0.0,  1.0,  1.0,   60,   90 ],
+	    [  0.0,  0.0, -1.0, -1.0,    0,    0 ],
+	    [  0.0,  0.0,  1.0,  1.0, -360,  180 ],
+	    [  0.0,  0.0, +2.0, +2.0,    0,    0 ],
+	    [ 10.0,  5.0, +1.0, +2.0,    0,   45 ],
+	    [ -5.0, -2.0, +1.0, +1.0,   45,    0 ],
+	    [  0.0,  0.0, +1.0, +1.0,   10,    0 ],
+	    [  0.0,  0.0, +1.0, +1.0,  -10,    0 ],
+	    [  0.0,  0.0, +1.0, -1.0,  +10,    0 ],
+	    [  0.0,  0.0, +1.0, -1.0,  -10,    0 ],
+	    [  0.0,  0.0, -1.0, -1.0,  +10,    0 ],
+	    [  0.0,  0.0, -1.0, -1.0,  -10,    0 ],
+	   );
+
+
+printf (" %5s %5s %6s %6s %4s %4s      %5s %5s %5s %5s %5s %5s      %5s %5s %6s %6s %4s %4s \n",
+	"xz", "yz", "xs", "ys", "perp", "ori",
+	"a", "b", "c", "d", "e", "f",
+	"xz", "yz", "xs", "ys", "perp", "ori");
+
+foreach my $a (@cpts) {
+    #my $r2d = 57.295779513082320876; # radians to degrees (quite accurately)
+    printf STDOUT ("(%5.2f,%5.2f,%6.2f,%6.2f,%4.0f,%4.0f) -> ",
+		   $a->[0], $a->[1], $a->[2], $a->[3], $a->[4], $a->[5]);
+    my $b = make_cpts (@$a);
+    my ($x0, $y0, $sx,$sy,$sigma,$theta)
+      = decompose_transform ($b->[0], $b->[1], $b->[2],
+			     $b->[3], $b->[4], $b->[5]);
+    printf STDOUT ("(%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f) -> (%5.2f,%5.2f,%6.2f,%6.2f,%4.0f,%4.0f)\n",
+		   $b->[0], $b->[1], $b->[2], $b->[3], $b->[4], $b->[5],
+		   $x0, $y0, $sx, $sy, $sigma, $theta);
+}
+
+sub make_cpts {
+    my ($xz, $yz, $sx, $sy, $sigma, $theta) = @_;
+    my $r2d = 57.295779513082320876; # radians to degrees (quite accurately)
+    my $c1 = cos ($theta/$r2d);
+    my $s1 = sin ($theta/$r2d);
+    my $c2 = cos ($sigma/2.0/$r2d);
+    my $s2 = sin ($sigma/2.0/$r2d);
+    my $rk11 = +$c1*$c2+$s1*$s2;
+    my $rk12 = +$c1*$s2+$s1*$c2;
+    my $rk21 = -$s1*$c2+$c1*$s2;
+    my $rk22 = -$s1*$s2+$c1*$c2;
+
+    my @t = ($rk11*$sx*$xz + $rk12*$sy*$yz,
+	     $rk11*$sx,
+	     $rk12*$sy,
+	     $rk21*$sx*$xz + $rk22*$sy*$yz,
+	     $rk21*$sx,
+	     $rk22*$sy);
+    return \@t;
+}
+
+exit 0;
+EOD;
