@@ -9,6 +9,7 @@
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
 #     ACC: A.C.Charles (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #
 #  History:
 #     22-MAR-1995 (BLY):
@@ -23,20 +24,22 @@
 #        Set default graphics device to /XWIN if not already set.
 #     09-OCT-1998 (BLY):
 #        Adapted for use with Starlink installation of Native PGPLOT.
+#     06-AUG-2004 (TIMJ):
+#        Autoconfed
 #-
 
 echo ""
-echo "    Echwind version PKG_VERS"
+echo "    Echwind version @PACKAGE_VERSION@"
 echo ""
 
 onintr goto exit
 
 #  Define location of Echwind files.
-setenv ECHWIND_HOME INSTALL_BIN/
+setenv ECHWIND_HOME @bindir@/
 
 #  Define location of Pgplot files if not already defined.
 if ( ! ${?PGPLOT_DIR} ) then
-   setenv PGPLOT_DIR STAR_BIN/
+   setenv PGPLOT_DIR @pgplotdir@/
    set set_dir = "yes"
 else
    set set_dir = "no"
