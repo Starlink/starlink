@@ -48,10 +48,6 @@
 //     17-OCT-1997 (PWD):
 //        Started changes to support the modification of Astrometry
 //        information in the WCS.
-//     09-MAR-1998 (PWD):
-//        Added clone member. This executes a Tcl command to create
-//        a clone in the main Tcl-level interface. It is added to
-//        allow remote control without using the send mechanism.
 //     16-Mar-1998 (ALLAN):
 //        Make use of new Skycat/Rtd features supporting subclassing,
 //        New constructor args to support subclassing,
@@ -128,14 +124,6 @@
 #include "tcl_err.h"
 #include "rtdDtrn.h"
 
-extern "C" {
-int gaiaContour( const float *image, int nx, int ny,
-                 const double *cont, int ncont,
-                 AstPlot *plot, const char *props[], int nprops,
-                 int xll, int yll, int xsize, int ysize,
-                 int fast );
-}
-
 // Include any foreign commands. These are processed by the "foreign"
 // member function when requested.
 #include "StarRtdForeignCmds.h"
@@ -177,7 +165,6 @@ public:
   { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
-  { "clone",         &StarRtdImage::cloneCmd,        1, 2 },
   { "contour",       &StarRtdImage::contourCmd,      1, 6 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
@@ -2588,52 +2575,6 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     }
   }
   return TCL_OK;
-}
-
-
-//+
-//   StarRtdImage::cloneCmd
-//
-//   Purpose:
-//       Creates a clone of the main Tcl-level widget controlling this
-//       widget and optionally displays an image in it.
-//
-//    Notes:
-//       Assumes that the name of the controlling widget is ".rtd"
-//       (followed by some number). The first instance of this that
-//       is found is invoked with the command "clone number". No
-//       other action is taken (this makes command secure to any
-//       misuse).
-//-
-int StarRtdImage::cloneCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-  cout << "Called StarRtdImage::cloneCmd (" << argv[0] << ")" << endl;
-#endif
-
-  // Find the GAIA clone.
-  int clone = -1;
-  char cmdName[10];
-  Tcl_CmdInfo infoPtr;
-  for ( int i = 0; i< 1000; i++ ) {
-    sprintf( cmdName, ".rtd%d", i );
-    if ( Tcl_GetCommandInfo( interp_, cmdName, &infoPtr ) ) {
-      clone = i;
-      break;
-    }
-  }
-  if ( clone != -1 ) {
-    //  Use this clone to create a new clone.
-    char cmd[eval_buf_size_];
-    if ( argc != 2 ) {
-      sprintf( cmd, ".rtd%d clone %s", clone, argv[0] );
-    } else {
-      sprintf( cmd, ".rtd%d clone %s %s", clone, argv[0], argv[1] );
-    }
-    return Tcl_Eval( interp_, cmd );
-  } else {
-    return error("cannot clone new window, failed to locate GAIA");
-  }
 }
 
 //
