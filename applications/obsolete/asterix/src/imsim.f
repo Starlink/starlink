@@ -115,6 +115,7 @@
 
       INTEGER           	ACTSRC                 	! Actual # sources
       INTEGER           	ACTWID                 	! Actual number of widths given
+      INTEGER			BID			! Output data object
       INTEGER           	DIMS(ADI__MXDIM)       	! Bgnd dimensions
       INTEGER           	FFILE                  	! Index of first file
       INTEGER			FOFID			! 1st output dataset id
@@ -482,7 +483,8 @@
         END IF
 
 *      Open file
-        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', ADI__NULLID,
+        CALL BDI_NEW( 'XYimage', NDIM, DIMS, 'REAL', BID, STATUS )
+        CALL ADI_FCREAT( ONAME(:CHR_LEN(ONAME))//'%hds', BID,
      :                   OFID, STATUS )
 
 *      Get fluxes in Log NS mode
