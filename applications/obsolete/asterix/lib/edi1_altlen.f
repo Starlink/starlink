@@ -121,7 +121,6 @@
       CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
 
 *  Get existing list length, and number of lists
-	call adi_print(args(1),status)
       CALL EDI_GETNS( ARGS(1), NEVENT, NLIST, STATUS )
 
 *  Get new list length
@@ -134,7 +133,6 @@
         CALL EDI_IDX( ARGS(1), I, LID, STATUS )
 
 *    Get its name
-	call adi_print(lid,status)
         CALL ADI_CGET0C( LID, 'Name', NAME, STATUS )
 
 *    Is it mapped?
