@@ -499,6 +499,9 @@
 			   dd-MMM-yyyy --
 		cdata
 		#required
+	author		-- Who approved the release of this version? --
+		idref
+		#required
 	>
 <!attlist distribution
 	string		-- Identifies the distribution.  This will
@@ -664,13 +667,13 @@
 <!--
   It might be worth including a modification-type attribute, such
   as `added', `deleted' or `changed'.  Or is that becoming unduly
-  cumbersome?   Do we need `date' when `version' is already required?
+  cumbersome?
 -->
 <!attlist update
-	version
+	versionid
 		idref	#required
 		-- version/release when the alteration was made --
-		-- id matches one DISTRIBUTION element --
+		-- id matches one DISTRIBUTION or CHANGE element --
 	author
 		idref	#required
 		-- author of modification.  id matches author element --
@@ -750,7 +753,7 @@
 <!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
 <!element QUOTE - - (attribution?, (%phrase)+)	
 					-- simple quotation  -->
-<!element ATTRIBUTION - - (%phrase)	-- source of quotation -->
+<!element ATTRIBUTION - - ((%phrase)+)	-- source of quotation -->
 
 <!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
 
@@ -1099,7 +1102,7 @@
   TITLE element with a required CAPTION, and add an ID attribute to
   the TABLE.
 -->
-<!entity % titles 'caption'>
+<!entity % titles '%update caption'>
 <!entity % tbl.entry.mdl '(%phrase)*'>
 <!entity % tbl.table.att 
 	'pgwide number	#implied
