@@ -38,6 +38,7 @@
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -57,6 +58,9 @@
 *        Prefix messages with 'SUBPAR:'
 *     26-FEB-1993 (AJC):
 *        Add INCLUDE DAT_PAR
+*     25-MAR-2005 (TIMJ):
+*        Increase the maximum filename size from 80 to 256.
+*        There should be a single include file for this definition.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,7 +104,7 @@
 
       INTEGER NUMLEVS               ! number of levels in structure-name
 
-      CHARACTER*80 FILENAME         ! name of container-file
+      CHARACTER*256 FILENAME        ! name of container-file
 
       CHARACTER*(DAT__SZLOC) TOPLOC ! temporary locator
 
