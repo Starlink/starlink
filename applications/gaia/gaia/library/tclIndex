@@ -105,6 +105,7 @@ set auto_index(::gaia::StarArdTool) [list source [file join $dir StarArdTool.tcl
 set auto_index(::gaia::GaiaAstDefine) [list source [file join $dir GaiaAstDefine.tcl]]
 set auto_index(::gaia::GaiaAstRefine) [list source [file join $dir GaiaAstRefine.tcl]]
 set auto_index(::gaia::GaiaAstSystem) [list source [file join $dir GaiaAstSystem.tcl]]
+set auto_index(::gaia::GaiaAstDomain) [list source [file join $dir GaiaAstDomain.tcl]]
 set auto_index(::gaia::OptionDialog) [list source [file join $dir OptionDialog.tcl]]
 set auto_index(::gaia::GaiaAstTable) [list source [file join $dir GaiaAstTable.tcl]]
 set auto_index(::gaia::StarBlink) [list source [file join $dir StarBlink.tcl]]

@@ -455,6 +455,10 @@ itcl::class gaia::Gaia {
       add_short_help $itk_component(menubar).image-analysis \
          {Image analysis menu: do astronomy with image}
 
+      add_menuitem $m command "Coordinates system...  " \
+         {Change the secondary coordinate system} \
+	 -command [code $this make_toolbox astdomain]
+
       add_menuitem $m cascade "Aperture photometry" \
          {Perform aperture photometry on image} \
          -menu [menu $m.photom]
@@ -535,7 +539,7 @@ itcl::class gaia::Gaia {
          -accelerator {Control-w}
       bind $w_ <Control-w> [code $this make_toolbox astdefine]
 
-      add_menuitem $m command "Celestial coordinates...  " \
+      add_menuitem $m command "New celestial coordinates...  " \
          {Change the image celestial coordinate system} \
 	 -command [code $this make_toolbox astsystem] \
 	 -accelerator {Control-e}
@@ -756,6 +760,18 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Make an AST set secondary coordinates system toolbox.
+   public method make_astdomain_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaAstDomain $w_.\#auto \
+            -rtdimage [$image_ get_image] \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -notify_cmd [code $this redraw_specials_ 1] \
+            -clone_cmd [code $this make_toolbox astdomain 1] \
+            -really_die $cloned
+      }
+   }
 
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
@@ -927,6 +943,11 @@ itcl::class gaia::Gaia {
       if { [info exists itk_component(astsystem) ] } {
          if { [winfo exists $itk_component(astsystem) ] } {
             $itk_component(astsystem) image_changed
+         }
+      }
+      if { [info exists itk_component(astdomain) ] } {
+         if { [winfo exists $itk_component(astdomain) ] } {
+            $itk_component(astdomain) image_changed
          }
       }
       if { [info exists itk_component(contour) ] } {

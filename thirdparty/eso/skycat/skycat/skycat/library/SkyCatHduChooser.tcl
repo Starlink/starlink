@@ -8,6 +8,7 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  09/11/98   Created
+# Peter W. Draper 08/12/00   Slight corrections for missing CRPIX values.
 
 itk::usual SkyCatHduChooser {}
 
@@ -191,19 +192,24 @@ itcl::class skycat::SkyCatHduChooser {
 	    # put images in correct order based on crpix values 
 	    # (reverse of crpix order)
 	    for {set i 0} {$i < $num_images_} {incr i} {
-		set crpix1 $ext_($i,CRPIX1)
-		set crpix2 $ext_($i,CRPIX2)
-		set naxis1 $ext_($i,NAXIS1)
-		set naxis2 $ext_($i,NAXIS2)
-		set row [expr round(($max_crpix2 - $crpix2)/$naxis2)]
-		set col [expr round(($max_crpix1 - $crpix1)/$naxis1)]
-		if {$row<0 || $col<0 || [info exists check($row,$col)]} {
-		    # use plan B...
-		    set use_crpix 0
-		    break
-		}
-		set check($row,$col) 1
-		set ext_($i,idx) $row,$col
+               set crpix1 $ext_($i,CRPIX1)
+               set crpix2 $ext_($i,CRPIX2)
+               set naxis1 $ext_($i,NAXIS1)
+               set naxis2 $ext_($i,NAXIS2)
+               set row -1
+               set col -1
+               catch {
+                  set row [expr round(($max_crpix2 - $crpix2)/$naxis2)]
+                  set col [expr round(($max_crpix1 -
+                                       $crpix1)/$naxis1)]
+               }
+               if {$row<0 || $col<0 || [info exists check($row,$col)]} {
+                  # use plan B...
+                  set use_crpix 0
+                  break
+               }
+               set check($row,$col) 1
+               set ext_($i,idx) $row,$col
 	    }
 	} 
 

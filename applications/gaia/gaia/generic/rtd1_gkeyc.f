@@ -67,11 +67,11 @@
 *        Global status value.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,17 +94,20 @@
 *     1992 June 24 (MJC):
 *        Made to handle a value without a trailing blank.  Takes the
 *        remainder of the card image as the value.
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Incorporated into IMG_ (was called FTS1_GKEYC in KAPPA).
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Rewrite to remove need for quoted strings so HISTORY and
 *        COMMENT strings are allowed (these do not necessarily have the
 *        form "keyword = ' value  '/ comment", "keyword 'value'" is more
 *        likely).
-*     21-JUL-1994 (PDRAPER):
+*     21-JUL-1994 (PWD):
 *        Re-created flexible formatting after SCCS crisis.
-*     12-SEP-1994 (PDRAPER):
+*     12-SEP-1994 (PWD):
 *        Added ability to read occurence for multiple FITS keywords.
+*     08-DEC-2000 (PWD):
+*        Changed to test for 'END ' rather than 'END'. A standard
+*        END keyword should be blank up to the eighth column.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -209,7 +212,7 @@
  1       CONTINUE                ! Start of 'DO WHILE' loop
          IF ( ( .NOT. THERE ) .AND.
      :        ( CARD .LE. NCARD ) .AND.
-     :        ( BUFFER( MIN( NCARD, CARD ) )( :3 ) .NE. 'END' ) ) THEN
+     :        ( BUFFER( MIN( NCARD, CARD ) )( :4 ) .NE. 'END ' ) ) THEN
 
 *  Extract the keyword from this card image.
             CRDKEY = BUFFER( CARD )( :8 )
@@ -324,7 +327,7 @@
  2       CONTINUE                ! Start of 'DO WHILE' loop
          IF ( ( .NOT. THERE ) .AND.
      :        ( CARD .LE. NCARD ) .AND.
-     :        ( BUFFER( MIN( NCARD, CARD ) )( :3 ) .NE. 'END' ) ) THEN
+     :        ( BUFFER( MIN( NCARD, CARD ) )( :4 ) .NE. 'END ' ) ) THEN
 
 *  Does the current card have a value, i.e. an equals sign.  This is
 *  neccessary to be able to descriminate the value from a hierarchical

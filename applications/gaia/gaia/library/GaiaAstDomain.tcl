@@ -68,7 +68,7 @@ itcl::class gaia::GaiaAstDomain {
       eval itk_initialize $args
 
       #  Set the top-level window title.
-      wm title $w_ "GAIA: Image coordinate system ($itk_option(-number))"
+      wm title $w_ "GAIA: Secondary image coordinate system ($itk_option(-number))"
 
       #  Create the short help window.
       make_short_help
@@ -104,7 +104,7 @@ itcl::class gaia::GaiaAstDomain {
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.
       itk_component add rule {
-         LabelRule $w_.rule -text {Image coordinate system:}
+         LabelRule $w_.rule -text {Secondary image coordinate system:}
       }
 
       #  System.
@@ -202,17 +202,28 @@ itcl::class gaia::GaiaAstDomain {
    #  that is to be selected.
    public method set_domain {iframe} {
       if { $itk_option(-rtdimage) != {} } {
-         $itk_option(-rtdimage) astset current $iframe
+         catch {
+            $itk_option(-rtdimage) astset current $iframe
+            notify_
+         }
       }
    }
 
    #  Reset the domain back to the default.
    protected method reset_ {} {
       if { $itk_option(-rtdimage) != {} } {
-         $itk_option(-rtdimage) astset current $original_
+         set_domain $original_
+         set_menu_default_
       }
    }
-   
+
+   #  Set/reset system menu to the default value.
+   protected method set_menu_default_ {} {
+      if { $itk_option(-rtdimage) != {} } {
+         $itk_component(System) configure -value $original_
+      }
+   }
+
    #  Find out the available image domains and add these to the system
    #  choice menu (overrides any existing choices).
    protected method set_system_menu_ {} {
@@ -237,7 +248,7 @@ itcl::class gaia::GaiaAstDomain {
             if { ! [info exists added($system)] } {
                set label $system
                if { $index == $original_ } {
-                 append label " (default)"
+                  append label " (default)"
                }
                $itk_component(System) add \
                   -command [code $this set_domain $index] \
@@ -246,6 +257,7 @@ itcl::class gaia::GaiaAstDomain {
                set added($system) 1
             }
          }
+         set_menu_default_
       }
    }
 

@@ -955,7 +955,7 @@ WorldCoords StarWCS::center() const
 //
 const char *StarWCS::astGetAttrib( char *attrib )
 {
-    if ( !isWcs() ) {
+    if ( ! wcs_ ) {
         return (char *)NULL;
     }
     const char *result = astGetC( wcs_, attrib );
@@ -966,6 +966,23 @@ const char *StarWCS::astGetAttrib( char *attrib )
     return result;
 }
 
+//
+//  Set an AST attribute. Name and value supplied as characters.
+//  
+//  Success (1) or failure (0) returned as result.
+//
+int StarWCS::astSetAttrib( const char *what, const char *value ) 
+{
+    if ( ! wcs_ ) {
+        return 0;
+    }
+    astSetC( wcs_, what, value );
+    if ( !astOK ) {
+        astClearStatus;
+        return 0;
+    }
+    return 1;
+}
 
 //+
 //  Name:
@@ -1273,8 +1290,12 @@ char *StarWCS::getDomains()
     int nframe = astGetI( wcs_, "nframe" );
     for ( int i = 1; i <= nframe; i++ ) {
         astSetI( wcs_, "Current", i );
-        const char *domain = astGetC( wcs_, "Domain" );
+        char *domain = (char *) astGetC( wcs_, "Domain" );
         int newlength = strlen( domain );
+        if ( newlength == 0 ) { // No domain name, so make one up.
+            domain = (char *) malloc( (size_t) chunk );
+            sprintf( domain, "Domain%d", i );
+        }
         if ( insert + newlength > length ) {
             length += chunk;
             namelist = (char *) realloc( namelist, length );
@@ -1289,24 +1310,6 @@ char *StarWCS::getDomains()
         astClearStatus;
     }
     return namelist;
-}
-
-//
-//  Set an AST attribute. Name and value supplied as characters.
-//  
-//  Success (1) or failure (0) returned as result.
-//
-int StarWCS::astSetAttrib( const char *what, const char *value ) 
-{
-    if ( ! wcs_ ) {
-        return 0;
-    }
-    astSetC( wcs_, what, value );
-    if ( !astOK ) {
-        astClearStatus;
-        return 0;
-    }
-    return 1;
 }
 
 //

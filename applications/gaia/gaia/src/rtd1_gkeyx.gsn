@@ -72,9 +72,12 @@
 *     real and double precision: replace "x" in the routine name by
 *     L, I, R or D as appropriate.
 
+*  Copyright:
+*     Copyright (C) 2000 Central Laboratory of the Research Councils
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,12 +95,15 @@
 *        Modified to handle hierarchical keywords.
 *     1991 August 31 (MJC):
 *        Fixed bug in comparing card keyword with the selected keyword.
-*     20-JUL-1994 (PDRAPER):
+*     20-JUL-1994 (PWD):
 *        Incorporated into IMG_ (was called FTS1_GKEYX in KAPPA). Beefed
 *        up the error reports and changed returned status to IMG codes.
-*     12-SEP-1994 (PDRAPER):
+*     12-SEP-1994 (PWD):
 *        Added ability to deal with keywords with more than one
 *        occurrence.
+*     08-DEC-2000 (PWD):
+*        Changed to test for 'END ' rather than 'END'. A standard
+*        END keyword should be blank up to the eighth column.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,7 +202,7 @@
  1       CONTINUE                ! Start of 'DO WHILE' loop
          IF ( ( .NOT. THERE ) .AND.
      :        ( CARD .LE. NCARD ) .AND.
-     :        ( BUFFER( MIN( NCARD, CARD ) )( :3 ) .NE. 'END' ) ) THEN
+     :        ( BUFFER( MIN( NCARD, CARD ) )( :4 ) .NE. 'END ' ) ) THEN
 
 *  Does the current card contain the required keyword?
             IF ( BUFFER( CARD )( :8 ) .EQ. KEYWRD( :NC ) ) THEN
@@ -260,7 +266,7 @@
  2       CONTINUE                ! Start of 'DO WHILE' loop
          IF ( ( .NOT. THERE ) .AND.
      :        ( CARD .LE. NCARD ) .AND.
-     :        ( BUFFER( MIN( NCARD, CARD ) )( :3 ) .NE. 'END' ) ) THEN
+     :        ( BUFFER( MIN( NCARD, CARD ) )( :4 ) .NE. 'END ' ) ) THEN
 
 *  Does the current card have a value, i.e. an equals sign. This is
 *  not foolproof because of the ING format et al. uses blank fields,

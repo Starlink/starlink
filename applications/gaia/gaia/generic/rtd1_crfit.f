@@ -19,7 +19,7 @@
 
 *     There are two stages:
 *     a) Inquire of the NDF its shape, type, character components,
-*     and axis components; and write these to the header.
+*     and write these to the header.
 *     b) Look for a FITS extension if requested to do so.  If one is
 *     present append the headers contained therein to the FITS header
 *     section, but not replacing any of the headers created in stage
@@ -47,16 +47,6 @@
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array;
-*        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
-*          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF FITS extension
-*          are copied.  If any are non-linear, all FITS axis
-*          information is lost.  When any non-zero CROTAn card is
-*          present in the FITS extension, the extension axis
-*          information is propagated, and not that of the NDF axis
-*          structure.  [This rule is to enable rotated axis (not
-*          supported in the NDF) to be retained in the cycle from FITS
-*          to NDF and back to FITS.]
 *        OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *          and UNITS respectively are used if present, otherwise any
 *          s found in the FITS extension are used.
@@ -74,7 +64,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     PDRAPER: Peter W. Draper (STARLINK, Durham University)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,15 +77,20 @@
 *        Added checks not to propagate the FITSIO banner and Starlink
 *        ORIGIN card in the NDF's FITS extension to the output FITS
 *        file.
-*     1996 November 22 (PDRAPER):
+*     1996 November 22 (PWD):
 *        Converted to provide GAIA/RTD NDF import.
-*     1998 May 15 (PDRAPER):
+*     1998 May 15 (PWD):
 *        Added NDF WCS support (moved here to make sure NDF WCS is seen
 *        before any that are present in the FITS headers).
-*     2000 Nov 23 (PDRAPER):
+*     2000 Nov 23 (PWD):
 *        Changed to only add the Starlink ORIGIN header, if an existing
 *        FITS header block doesn't have an ORIGIN card. Previously
 *        always overwrote with Starlink header.
+*     2000 Dec 08 (PWD):
+*        Now adds default NDF WCS if no actual NDF WCS component
+*        exists. The FITS headers still override this by precedence in the
+*        header list. Removed axis encoding, this is passed with the NDF
+*        WCS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -104,17 +99,18 @@
 *-
       
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! Data system constants
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'DAT_PAR'         ! Data system constants
+      INCLUDE 'NDF_PAR'         ! NDF_ public constants
+      INCLUDE 'PRM_PAR'         ! PRIMDAT public constants
+      INCLUDE 'AST_PAR'         ! AST parameters
 
 *  Arguments Given:
-      INTEGER   NDF              ! NDF identifier
-      INTEGER   BITPIX           ! Bits per pixel
+      INTEGER NDF               ! NDF identifier
+      INTEGER BITPIX            ! Bits per pixel
 
 *  Arguments Returned:
       INTEGER IPHEAD
@@ -122,28 +118,28 @@
       INTEGER AVAIL
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  Local Constants:
-      INTEGER   FITSOK           ! Good status for FITSIO library
+      INTEGER   FITSOK          ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
 
-      INTEGER   NFLAGS           ! Number of flags to indicate
-                                 ! presence special NDF components
-      PARAMETER( NFLAGS = 6 )
-
-      INTEGER   SZKEY            ! Length of keyword names
-      PARAMETER( SZKEY = 8 )     ! Columns 1 to 8
-
-      INTEGER   SZFITS           ! Length of FITS string
+      INTEGER   NFLAGS          ! Number of flags to indicate
+                                ! presence special NDF components
+      PARAMETER( NFLAGS = 3 )
+      
+      INTEGER   SZKEY           ! Length of keyword names
+      PARAMETER( SZKEY = 8 )    ! Columns 1 to 8
+      
+      INTEGER   SZFITS          ! Length of FITS string
       PARAMETER( SZFITS = 80 )
-
-      INTEGER   SZNVAL           ! Character length of numeric values
-      PARAMETER( SZNVAL = 20 )   ! Columns 11 to 30
-
-      INTEGER   SZVAL            ! Length of keyword string values
-      PARAMETER( SZVAL = 70 )    ! Columns 11 to 80
-
+      
+      INTEGER   SZNVAL          ! Character length of numeric values
+      PARAMETER( SZNVAL = 20 )  ! Columns 11 to 30
+      
+      INTEGER   SZVAL           ! Length of keyword string values
+      PARAMETER( SZVAL = 70 )   ! Columns 11 to 80
+      
 *  Local Variables:
       CHARACTER * ( 1 ) C       ! Accommodates character string
       CHARACTER * ( SZKEY ) CDELT ! Keyword name of CDELTn
@@ -154,7 +150,6 @@
       CHARACTER * ( DAT__SZLOC ) FTLOCI ! Locator to element of NDF FITS extension
       CHARACTER * ( SZKEY ) KEYWRD ! Accommodates keyword name
       CHARACTER * ( SZVAL ) VALUE ! Accommodates keyword value
-      INTEGER ADIM              ! Axis loop counter
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER I                 ! Loop variable
       INTEGER IWCS              ! NDF WCS identifier
@@ -162,9 +157,6 @@
       INTEGER NCHAR             ! Length of a character string
       INTEGER NCOMP             ! No. of components
       INTEGER NDIM              ! Number of dimensions
-      LOGICAL AXIFND            ! True if NDF contains a linear axis comps.
-      LOGICAL AXLFND            ! True if NDF contains axis label
-      LOGICAL AXUFND            ! True if NDF contains axis units
       LOGICAL BANNER            ! Part of the FITSIO banner header?
       LOGICAL CMPFND( NFLAGS )  ! True if certain special NDF components are present
       LOGICAL EXISTS            ! NDF component exists
@@ -172,10 +164,8 @@
       LOGICAL LABFND            ! True if NDF LABEL found
       LOGICAL MANDAT            ! Not a mandatory header?
       LOGICAL ORIGIN            ! Starlink origin header present?
-      LOGICAL ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the FITS extension
       LOGICAL TITFND            ! True if NDF TITLE found
       LOGICAL UNTFND            ! True if NDF UNITS found
-      REAL AXROT                ! Rotation angle of an axis
 
 *.
 
@@ -198,11 +188,6 @@
 *    SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default values.
 *    BITPIX, NAXIS, NAXISn --- are derived directly from the NDF data
 *      array;
-*    CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from the
-*      NDF axis structures if possible.  If no linear NDF axis
-*      structures are present, the values in the NDF FITS extension are
-*      copied.  If any are non-linear, all FITS axis information is
-*      lost.
 *    OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *      and UNITS respectively are used if present, otherwise any values
 *      found in the FITS extension are used.
@@ -260,20 +245,12 @@
 
 *  Use more obvious flags to indicate the certain items have been
 *  written to the keywords already.
-         AXIFND = CMPFND( 1 )
-         AXLFND = CMPFND( 2 )
-         AXUFND = CMPFND( 3 )
-         TITFND = CMPFND( 4 )
-         LABFND = CMPFND( 5 )
-         UNTFND = CMPFND( 6 )
+         TITFND = CMPFND( 1 )
+         LABFND = CMPFND( 2 )
+         UNTFND = CMPFND( 3 )
 
 *  Obtain the number of dimensions of the NDF.
          CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
-
-*  Initialise the flags that indicate a rotated axis.
-         DO I = 1, NDIM
-            ROTAX( I ) = .FALSE.
-         END DO
 
 *  Deal with the items in the NDF FITS extension one by one.
          CALL NDF_XLOC( NDF, 'FITS', 'READ', FTLOC, STATUS )
@@ -294,14 +271,12 @@
             VALUE = FITSTR( 11:SZFITS )
 
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn, and possibly CDELTn, CRVALn, CRPIXn, CRTYPEn, CTYPEn,
-*  CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and END as
-*  described above.  Note CROTAn are also excluded.  To avoid duplicate
-*  FITSIO banners these are also omitted, as they are written when
-*  FITSIO creates the primary headers.
-*
-*  Use an intermediate variable to reduce the number of continuation
-*  lines in the test.  This combines tests for the mandatory headers.
+*  NAXISn and possibly, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and
+*  END as described above. To avoid duplicate FITSIO banners these are
+*  also omitted, as they are written when FITSIO creates the primary
+*  headers.  * Use an intermediate variable to reduce the number of
+*  continuation lines in the test.  This combines tests for the
+*  mandatory headers.
             MANDAT = ( KEYWRD .NE. 'SIMPLE' ) .AND.
      :               ( KEYWRD .NE. 'BITPIX' ) .AND.
      :               ( KEYWRD .NE. 'EXTEND' ) .AND.
@@ -334,83 +309,33 @@
      :        ( KEYWRD .NE. 'BZERO' ) .AND.
      :        ( KEYWRD .NE. 'EXTNAME' ) .AND.
      :        ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CDELT' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CRVAL' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CRPIX' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:6 ) .NE. 'CRTYPE' .OR. .NOT. AXLFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CTYPE' .OR. .NOT. AXLFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CUNIT' .OR. .NOT. AXUFND ) .AND.
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
      :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
      :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) 
      :      THEN
 
-*  Look for a rotated axis in the FITS extension (CROTAn is present and
-*  non-zero).  If there is one, the NDF AXIS structure will contain
-*  pixel co-ordinates, which are probably not the original co-ordinates
-*  for the axis.  If there are rotated axes, the keywords defining the
-*  axis will be re-written later using the values of CRVALn and CDELTn
-*  in the FITS extension.  When there is no AXIS component in the NDF,
-*  then the axis keywords can be written immediately to the output
-*  FITS header.
-               IF ( INDEX( KEYWRD, 'CROTA' ) .NE. 0 .AND.
-     :              AXIFND ) THEN
-                  CALL CHR_CTOI( KEYWRD( 6: ), ADIM, STATUS )
-                  CALL CHR_CTOR( VALUE( :SZNVAL ), AXROT, STATUS )
-                  ROTAX( ADIM ) = ABS( AXROT ) .GT. VAL__EPSR
-               ELSE
-
 *  Write the header card, replacing any non-printing characters
 *  with blanks (yes people do this).
-                  CALL CHR_CLEAN( FITSTR )
-                  CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
-     :                             STATUS )
-               END IF
+               CALL CHR_CLEAN( FITSTR )
+               CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
+     :                          STATUS )
             END IF
             CALL DAT_ANNUL( FTLOCI, STATUS )
          END DO
-
-*  Deal with rotated axes.
-*  =======================
-
-*  For each dimension check if there are any rotated axes when the
-*  the NDF contains an AXIS component.
-         DO J = 1, NDIM
-            IF ( ROTAX( J ) ) THEN
-
-*  Search through the FITS headers to find the values of CRVALn,
-*  CDELTn, and CRPIXn.
-               DO I = 1, NCOMP
-
-*  Get locator to successive elements in the FITS extension.
-                  CALL DAT_CELL( FTLOC, 1, I, FTLOCI, STATUS )
-
-*  Read the FITS string, and extract the keyword.
-                  CALL DAT_GET0C( FTLOCI, FITSTR, STATUS )
-                  KEYWRD = FITSTR( 1:SZKEY )
-
-*  Create the keywords being searched.
-                  CALL CHR_ITOC( J, C, NCHAR )
-                  CDELT = 'CDELT'//C(:1)
-                  CRPIX = 'CRPIX'//C(:1)
-                  CRVAL = 'CRVAL'//C(:1)
-
-*  Test the current keyword.
-                  IF ( ( INDEX( KEYWRD, CDELT ) .NE. 0 ) .OR.
-     :                 ( INDEX( KEYWRD, CRPIX ) .NE. 0 ) .OR.
-     :                 ( INDEX( KEYWRD, CRVAL ) .NE. 0 ) ) THEN
-
-*  Write the header card.
-                     CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
-     :                                STATUS )
-                  END IF
-                  CALL DAT_ANNUL( FTLOCI, STATUS )
-               END DO
-            END IF
-         END DO      
          CALL DAT_ANNUL( FTLOC, STATUS )
       END IF
 
+*  Add the default NDF WCS (GRID, PIXEL and AXIS) if no WCS component
+*  exists in the NDF or FITS headers.
+      IF ( .NOT. EXISTS ) THEN 
+         CALL RTD1_DEWCS( %VAL( IPHEAD ), NHEAD, IWCS, STATUS, 
+     :                    %VAL(80) )
+         IF ( IWCS .EQ. AST__NULL ) THEN 
+            CALL NDF_GTWCS( NDF, IWCS, STATUS )
+            CALL RTD1_ENWCS( IWCS, IPHEAD, NHEAD, AVAIL, STATUS )
+         END IF
+         CALL AST_ANNUL( IWCS, STATUS )
+      END IF
 
 *  If no FITS headers or no existing ORIGIN card then add the Starlink
 *  ORIGIN card. 

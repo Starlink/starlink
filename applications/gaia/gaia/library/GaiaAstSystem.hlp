@@ -10,7 +10,12 @@ qualify it with an appropriate equinox and epoch, if necessary.
 
 To apply the new system to the image press the "Test" button. This
 will make the sky coordinate position readouts change, and any grid
-overlay (although you can modify the coordinate that a grid is plotted
-in using methods in the grid plotting window). To make the change
-permanent press the "Accept" button and save the image to disk.
+overlay (although you can modify the coordinates that a grid is
+plotted in using methods in the grid plotting window). To make the
+change permanent press the "Accept" button and save the image to disk.
 
+Note this window's effects are not related to those of "Coordinates
+system..." window. That selects from the systems already associated
+with your image, this window adds a new coordinate system. A necessary
+prerequisite to using this window is an existing celestial coordinate
+system.
