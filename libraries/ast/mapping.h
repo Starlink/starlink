@@ -170,6 +170,8 @@
 *           Use nearest pixel centre.
 *        AST__SINC
 *           Use sinc(x) interpolation.
+*        AST__SINCCOS
+*           Use sinc(x) * cos(kx) interpolation.
 *        AST__SINCSINC
 *           Use sinc(x) * sinc(x/2) interpolation.
 *        AST__UINTERP
@@ -267,6 +269,8 @@
 #define AST__LINEAR (5)          /* Simple linear interpolation */
 #define AST__SINC (6)            /* sinc(x) interpolation */
 #define AST__SINCSINC (7)        /* sinc(x) * sinc(x/2) interpolation */
+#define AST__SINCCOS (8)         /* sinc(x) * cos(kx) interpolation */
+#define AST__SINCGAUSS (9)       /* sinc(x) * exp(-kx*x) interpolation */
 
 /* Type Definitions. */
 /* ================= */

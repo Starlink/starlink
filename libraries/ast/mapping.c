@@ -186,6 +186,7 @@ static const char *GetAttrib( AstObject *, const char * );
 static double *LinearApprox( AstMapping *, int, int, const int *, const int *, double );
 static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
+static double MaxD( double, double );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
 static double Random( long int * );
 static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
@@ -260,6 +261,8 @@ static void SetAttrib( AstObject *, const char * );
 static void SetInvert( AstMapping *, int );
 static void SetReport( AstMapping *, int );
 static void Sinc( double, const double [], int, double * );
+static void SincCos( double, const double [], int, double * );
+static void SincGauss( double, const double [], int, double * );
 static void SincSinc( double, const double [], int, double * );
 static void SpecialBounds( const MapData *, double *, double *, double [], double [] );
 static void Tran1( AstMapping *, int, const double [], int, double [] );
@@ -5030,6 +5033,41 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return -1;
 }
 
+static double MaxD( double a, double b ) {
+/*
+*  Name:
+*     MaxD
+
+*  Purpose:
+*     Return the maximum of two double values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double MaxD( double a, double b )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function returns the maximum of two double values.
+
+*  Parameters:
+*     a
+*        The first value.
+*     b
+*        The second value.
+
+*  Returned Value:
+*     The maximum.
+*/
+
+/* Return the larger value. */
+   return ( a > b ) ? a : b;
+}
+
 static int MaxI( int a, int b ) {
 /*
 *  Name:
@@ -6929,6 +6967,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    double **ptr_in;              /* Pointer to input PointSet coordinates */
    double **ptr_out;             /* Pointer to output PointSet coordinates */
    double *accum;                /* Pointer to array of accumulated sums */
+   double fwhm;                  /* Full width half max. of gaussian */
+   double lpar[ 1 ];             /* Local parameter array */
    double x1;                    /* Interim x coordinate value */
    double y1;                    /* Interim y coordinate value */
    int *dim;                     /* Pointer to array of output pixel indices */
@@ -7361,6 +7401,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Interpolation using a 1-d kernel. */
 /* --------------------------------- */
          case AST__SINC:
+         case AST__SINCCOS:
+         case AST__SINCGAUSS:
          case AST__SINCSINC:
          case AST__UKERN1:       /* User-supplied 1-d kernel function */
 
@@ -7370,26 +7412,94 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             par = NULL;
             switch ( interp ) {
 
-/* sinc(x) interpolation: calculate the number of neighbouring pixels
-   to use. */
+/* sinc(x) interpolation. */
+/* ---------------------- */
+/* Assign the kernel function. */
                case AST__SINC:
                   kernel = Sinc;
+
+/* Calculate the number of neighbouring pixels to use. */
                   neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
                   break;
 
-/* Sinc(x) * sinc(x/c2) interpolation: fix the number of neighbouring
-   pixels at 2. */
-               case AST__SINCSINC:
-                  kernel = SincSinc;
-                  neighb = 2;
+/* sinc(x) * cos(pi*k*x) interpolation. */
+/* ------------------------------------ */
+/* Assign the kernel function. */
+               case AST__SINCCOS:
+                  kernel = SincCos;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
                   break;
 
-/* User-supplied kernel: calculate the number of neighbouring pixels
-   to use and pass a pointer to the "params" array. */
+/* sinc(x) * exp(-k*x*x) interpolation. */
+/* ------------------------------------ */
+/* Assign the kernel function. */
+               case AST__SINCGAUSS:
+                  kernel = SincGauss;
+
+/* Constrain the full width half maximum of the gaussian factor. */
+                  fwhm = MaxD( 0.1, params[ 1 ] );
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 4.0 * log( 2.0 ) / ( fwhm * fwhm );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, use the number of neighbouring pixels required by the width
+   of the kernel (out to where the gaussian term falls to 1% of its
+   peak value). */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = (int) ceil( sqrt( -log( 0.01 ) /
+                                                                lpar[ 0 ] ) );
+                  break;
+
+/* sinc(x) * sinc(k*x) interpolation. */
+/* ---------------------------------- */
+/* Assign the kernel function. */
+               case AST__SINCSINC:
+                  kernel = SincSinc;
+
+/* Store the required value of "k" in a local parameter array and pass
+   this array to the kernel function. */
+                  lpar[ 0 ] = 0.5 / MaxD( 1.0, params[ 1 ] );
+                  par = lpar;
+
+/* Obtain the number of neighbouring pixels to use. If this is zero or
+   less, the number will be calculated automatically below. */
+                  neighb = (int) floor( params[ 0 ] + 0.5 );
+                  if ( neighb <= 0 ) neighb = INT_MAX;
+
+/* Calculate the maximum number of neighbouring pixels required by the
+   width of the kernel, and use this value if preferable. */
+                  neighb = MinI( neighb,
+                                 (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
+                  break;
+
+/* User-supplied kernel. */
+/* --------------------- */
+/* Assign the kernel function. */
                case AST__UKERN1:
                   kernel = (void (*)( double, const double [],
                                       int, double * )) finterp;
+
+/* Calculate the number of neighbouring pixels to use. */
                   neighb = MaxI( 1, (int) floor( params[ 0 ] + 0.5 ) );
+
+/* Pass a pointer to the "params" array. */
                   par = params;
                   break;
             }
@@ -8052,11 +8162,147 @@ static void Sinc( double offset, const double params[], int flags,
       init = 1;
    }
 
-/* Scale the offset, so that sinc( 1.0 ) == 0.0. */
+/* Scale the offset. */
    offset *= pi;
 
 /* Evaluate the function. */
    *value = ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0;
+}
+
+static void SincCos( double offset, const double params[], int flags,
+                     double *value ) {
+/*
+*  Name:
+*     SincCos
+
+*  Purpose:
+*     1-dimensional sinc(x) * cos(pi*k*x) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SincCos( double offset, const double params[], int flags,
+*                   double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is sinc(x) * cos(pi*k*x)
+*     out to the point where cos(pi*k*x) = 0, and zero beyond.
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        The first element of this array should give a value for "k"
+*        in the cos(pi*k*x) term.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   double offset_k;              /* Scaled offset */
+   static double halfpi;         /* Value of pi/2 */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise local values for pi and
+   pi/2. Do this only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      halfpi = 0.5 * pi;
+      init = 1;
+   }
+
+/* Multiply the offset by pi and remove its sign. */
+   offset = pi * fabs( offset );
+
+/* Find the offset scaled by the "k" factor. */
+   offset_k = offset * params[ 0 ];
+
+/* If the cos(pi*k*x) term has not reached zero, calculate the
+   result. */
+   if ( offset_k < halfpi ) {
+      *value = ( ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0 ) *
+               cos( offset_k );
+
+/* Otherwise, the result is zero. */
+   } else {
+      *value = 0.0;
+   }
+}
+
+static void SincGauss( double offset, const double params[], int flags,
+                       double *value ) {
+/*
+*  Name:
+*     SincGauss
+
+*  Purpose:
+*     1-dimensional sinc(x) * exp(-k*x*x) interpolation kernel.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void SincGauss( double offset, const double params[], int flags,
+*                     double *value )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function calculates the value of a 1-dimensional sub-pixel
+*     interpolation kernel. The function used is sinc(x) *
+*     exp(-k*x*x).
+
+*  Parameters:
+*     offset
+*        The offset of a pixel from the interpolation point, measured
+*        in pixels.
+*     params
+*        The first element of this array should give a value for "k"
+*        in the exp(-k*x*x) term.
+*     flags
+*        Not used.
+*     value
+*        Pointer to a double to receive the calculated kernel value.
+
+*  Notes:
+*     - This function does not perform error checking and does not
+*     generate errors.
+*/
+
+/* Local Variables: */
+   double offset_pi;             /* Offset multiplied by pi */
+   static double pi;             /* Value of pi */
+   static int init = 0;          /* Initialisation flag */
+
+/* On the first invocation, initialise a local value for pi. Do this
+   only once. */
+   if ( !init ) {
+      pi = acos( -1.0 );
+      init = 1;
+   }
+
+/* Find the offset scaled by pi. */
+   offset_pi = pi * offset;
+
+/* Calculate the result. */
+   *value = ( ( offset_pi != 0.0 ) ? ( sin( offset_pi ) / offset_pi ) : 1.0 ) *
+            exp( -params[ 0 ] * offset * offset );
 }
 
 static void SincSinc( double offset, const double params[], int flags,
@@ -8066,7 +8312,7 @@ static void SincSinc( double offset, const double params[], int flags,
 *     SincSinc
 
 *  Purpose:
-*     1-dimensional sinc(x) * sinc(x/2) interpolation kernel.
+*     1-dimensional sinc(x) * sinc(k*x) interpolation kernel.
 
 *  Type:
 *     Private function.
@@ -8081,14 +8327,16 @@ static void SincSinc( double offset, const double params[], int flags,
 
 *  Description:
 *     This function calculates the value of a 1-dimensional sub-pixel
-*     interpolation kernel. The function used is sinc(x) * sinc(x/2).
+*     interpolation kernel. The function used is sinc(x) * sinc(k*x)
+*     out to the point where sinc(k*x) = 0, and zero beyond.
 
 *  Parameters:
 *     offset
 *        The offset of a pixel from the interpolation point, measured
 *        in pixels.
 *     params
-*        Not used.
+*        The first element of this array should give a value for "k"
+*        in the sinc(k*x) term.
 *     flags
 *        Not used.
 *     value
@@ -8100,24 +8348,35 @@ static void SincSinc( double offset, const double params[], int flags,
 */
 
 /* Local Variables: */
-   double offset_sq;             /* Square of offset value */
+   double offset_k;              /* Scaled offset */
+   static double halfpi;         /* Value of pi/2 */
    static double pi;             /* Value of pi */
    static int init = 0;          /* Initialisation flag */
 
-/* On the first invocation, initialise a local value for pi. Do this
-   only once. */
+/* On the first invocation, initialise local values for pi and
+   pi/2. Do this only once. */
    if ( !init ) {
       pi = acos( -1.0 );
+      halfpi = 0.5 * pi;
       init = 1;
    }
 
-/* Scale the offset, so that sinc( 1.0 ) == 0.0. */
-   offset *= pi;
+/* Multiply the offset by pi and remove its sign. */
+   offset = pi * fabs( offset );
 
-/* Evaluate the function. */
-   offset_sq = offset * offset;
-   *value = ( offset_sq != 0.0 ) ?
-            ( 2.0 * sin( offset ) * sin( 0.5 * offset ) / offset_sq ) : 1.0;
+/* Find the offset scaled by the "k" factor. */
+   offset_k = offset * params[ 0 ];
+   
+/* If the sinc(k*x) term has not reached zero, calculate the
+   result. */
+   if ( offset_k < halfpi ) {
+      *value = ( ( offset != 0.0 ) ? ( sin( offset ) / offset ) : 1.0 ) *
+               ( ( offset_k != 0.0 ) ? ( sin( offset_k ) / offset_k ) : 1.0 );
+
+/* Otherwise, the result is zero. */
+   } else {
+      *value = 0.0;
+   }
 }
 
 static AstMapping *Simplify( AstMapping *this ) {
