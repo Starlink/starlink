@@ -28,6 +28,11 @@ STAR_CHECK_PROGS([atclsh])
 AC_CHECK_FUNCS([inet_ntop inet_pton])
 AC_CHECK_FUNCS([memset bzero])
 
+dnl    Extra libraries needed to link against sockets on this system.
+dnl    These tests are definitely needed for Solaris.
+AC_CHECK_LIB(nsl, gethostbyname)
+AC_CHECK_LIB(socket, connect)  
+
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp])
 
