@@ -1173,11 +1173,11 @@ $(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR)/stamp catlib/Makefile
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
 	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 	ar -d $@ slasubs.o
-	echo "NOTE: removed slasubs.o from $@"
+	@ echo "NOTE: removed slasubs.o from $@"
 	echo 'char glsfwd(); int main() { glsfwd(); return 0; }' >conftest.c
 	if cc -o conftest conftest.c -L$(STAR_LIB) -last_wcslib -lm >conftest.log 2>&1; then \
-		echo "NOTE: removed proj.o from $@"; \
 		ar -d $@ proj.o; \
+		@ echo "NOTE: removed proj.o from $@"; \
 	fi
 	$(RMF) conftest*
 	$(RANLIB) $@
@@ -1202,7 +1202,7 @@ $(CATLIBINSTALLDIR)/stamp:
 #  (always/sometimes?) wants to execute this twice.  Things get
 #  circular if this depends explicitly on the source tarball
 moggy/Makefile.in astrom/astrom.f:
-	if test ! -f $(PKG_NAME)_source.tar; then \
+	@ if test ! -f $(PKG_NAME)_source.tar; then \
 		echo "Eh!? Don't have source, and don't have source tarball"; \
 		exit 1; \
 	fi
