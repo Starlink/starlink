@@ -1889,7 +1889,9 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    AstStdOfRestType result_sor;  /* Standard of rest in result */
    AstStdOfRestType sor;         /* Standard of rest to use */
    AstStdOfRestType target_sor;  /* Standard of rest in target */
+   AstSystemType serr;           /* Erroneous system */
    AstSystemType system;         /* Code to identify coordinate system */
+   const char *uerr;             /* Erroneous units */
    const char *ures;             /* Results units */
    const char *utarg;            /* Target units */
    double args[ MAX_ARGS ];      /* Conversion argument array */
@@ -2371,8 +2373,16 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
       if( !astIsAUnitMap( map2 ) || strcmp( ures, utarg ) ) {
          match = 0;
          if( astOK && report ) {         
-            astError( AST__BADUN, "astMatch(SpecFrame): Cannot convert between "
-                      "spectral axis units '%s' and '%s'.", utarg, ures );
+            if( !umap1 ) {
+               uerr = utarg;
+               serr = astGetSystem( target );
+            } else {
+               uerr = ures;
+               serr = astGetSystem( result );
+            }
+
+            astError( AST__BADUN, "astMatch(SpecFrame): Inappropriate units (%s) "
+                      "specified for a %s axis.", uerr, SystemLabel( serr ) );
          }
       }
    }
@@ -4213,7 +4223,7 @@ static const char *SystemLabel( AstSystemType system ) {
       break;
 
    case AST__VOPTICAL:
-      result = "optical veclocity";
+      result = "optical velocity";
       break;
 
    case AST__REDSHIFT:
@@ -5383,7 +5393,10 @@ AstSpecFrame *astSpecFrame_( const char *options, ... ) {
 */
 
 /* Local Variables: */
+   AstMapping *um;               /* Mapping from default to actual units */
    AstSpecFrame *new;            /* Pointer to new SpecFrame */
+   AstSystemType s;              /* System */
+   const char *u;                /* Units string */
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
@@ -5403,6 +5416,18 @@ AstSpecFrame *astSpecFrame_( const char *options, ... ) {
       va_start( args, options );
       astVSet( new, options, args );
       va_end( args );
+
+/* Check the Units are appropriate for the System. */
+      u = astGetUnit( new, 0 );
+      s = astGetSystem( new );
+      um = astUnitMapper( DefUnit( s, "astSpecFrame", "SpecFrame" ), 
+                          u, NULL, NULL );
+      if( um ) {
+         um = astAnnul( um );
+      } else {
+         astError( AST__BADUN, "astSpecFrame: Inappropriate units (%s) "
+                   "specified for a %s axis.", u, SystemLabel( s ) );
+      }      
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -5905,7 +5930,10 @@ f     function is invoked with STATUS set to an error value, or if it
 */
 
 /* Local Variables: */
+   AstMapping *um;               /* Mapping from default to actual units */
    AstSpecFrame *new;            /* Pointer to new SpecFrame */
+   AstSystemType s;              /* System */
+   const char *u;                /* Units string */
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
@@ -5925,6 +5953,18 @@ f     function is invoked with STATUS set to an error value, or if it
       va_start( args, options );
       astVSet( new, options, args );
       va_end( args );
+
+/* Check the Units are appropriate for the System. */
+      u = astGetUnit( new, 0 );
+      s = astGetSystem( new );
+      um = astUnitMapper( DefUnit( s, "astSpecFrame", "SpecFrame" ), 
+                          u, NULL, NULL );
+      if( um ) {
+         um = astAnnul( um );
+      } else {
+         astError( AST__BADUN, "astSpecFrame: Inappropriate units (%s) "
+                   "specified for a %s axis.", u, SystemLabel( s ) );
+      }      
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );

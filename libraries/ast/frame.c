@@ -6077,16 +6077,14 @@ f     This routine
 *     sets the current value of the ActiveUnit flag for a Frame, which 
 *     controls how the Frame
 c     behaves when it is used (by astFindFrame) as a template to match
-c     another (target) Frame, or is used as the "to" Frame by astConvert.
 f     behaves when it is used (by AST_FINDFRAME) as a template to match
-f     another (target) Frame, or is used as the TO Frame by AST_CONVERT.
-*     It determines if the Mapping between the template and target Frames 
-*     should take differences in axis units into account. The default value 
-*     for simple Frames is zero, which preserves the behaviour of versions 
-*     of AST prior to version 2.0.
+*     another (target) Frame. It determines if the Mapping between the 
+*     template and target Frames should take differences in axis units
+c     into account. The default value is zero, which preserves the
+f     into account. The default value is .FALSE., which preserves the
+*     behaviour of older versions of AST.
 *
-c     If the ActiveUnit flag of the template Frame is zero, then the
-f     If the ActiveUnit flag of the template Frame is .FALSE., then the
+*     If the ActiveUnit flag of the template Frame is zero, then the
 *     Mapping will ignore any difference in the Unit attributes of
 *     corresponding template and target axes. In this mode, the Unit 
 *     attributes are purely descriptive commentary for the benefit of
@@ -6094,8 +6092,7 @@ f     If the ActiveUnit flag of the template Frame is .FALSE., then the
 *     This is the behaviour which all Frames had in older version of AST,
 *     prior to the introduction of this attribute.
 *
-c     If the ActiveUnit flag of the template Frame is non-zero, then the
-f     If the ActiveUnit flag of the template Frame is .TRUE., then the
+*     If the ActiveUnit flag of the template Frame is non-zero, then the
 *     Mapping from template to target will take account of any difference 
 *     in the axis Unit attributes, where-ever possible. For instance, if
 *     corresponding target and template axes have Unit strings of "km" and 
@@ -9618,12 +9615,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* ActiveUnit. */
 /* ----------- */
-      if( astTestActiveUnit( this ) ) {
-         ival = astGetActiveUnit( this );
-         astWriteInt( channel, "ActUnt", 1, 0, ival,
-                      ival ? "Unit strings affects alignment" :
-                             "Unit strings do not affect alignment" );
-      }
+      set = TestActiveUnit( this );
+      ival = astGetActiveUnit( this );
+      astWriteInt( channel, "ActUnt", set, 0, ival,
+                   ival ? "Unit strings affects alignment" :
+                          "Unit strings do not affect alignment" );
 
 /* Axis permutation array. */
 /* ----------------------- */
@@ -9893,6 +9889,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
          new->title = NULL;
          new->system = AST__BADSYSTEM;
          new->alignsystem = AST__BADSYSTEM;
+         new->active_unit = -INT_MAX;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */

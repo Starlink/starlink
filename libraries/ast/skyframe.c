@@ -5821,6 +5821,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Decide whether the Equinox value is relevant to ths current
    coordinate system. */
+   system = astGetSystem( this );
    helpful = ( ( system == AST__FK4 ) ||
                ( system == AST__FK4_NO_E ) ||
                ( system == AST__FK5 ) ||
