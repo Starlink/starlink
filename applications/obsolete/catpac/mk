@@ -208,6 +208,7 @@
 #     RFWS: R.F.Warren-Smith (Starlink, RAL)
 #     PMA: P.M.Allan (Starlink, RAL)
 #     PTW: P.T.Wallace (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -221,6 +222,8 @@
 #        Added comments about PLAdefinitions of CC and CFLAGS for all machines.
 #     15-NOV-1993 (PTW):
 #        Cosmetics.
+#     12-OCT-2004 (TIMJ):
+#        Add Linux
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -324,6 +327,25 @@
                TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
+
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+               CC='gcc'
+               CFLAGS='-I$(STAR_INC) -O'
+               FC='g77'
+               FFLAGS='-fno-second-underscore -O'
+               LINK='ln -s'
+               RANLIB='ranlib'
+               SOURCE_VARIANT='Solaris'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
 
 #  Issue a warning if SYSTEM is not recognised.
             *)
