@@ -18,40 +18,51 @@ SGMLDECL starlink.decl
 
 	-- Starlink General is to be used _only_ by reference --
 	-- from within one of the other DTDs --
-PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink General//EN"		starlink-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink General 0.3//EN"	starlink-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.2//EN"	starlink-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink General 0.1//EN"	starlink-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG//EN"		sug-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SUG 0.3//EN"		sug-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SUG 0.2//EN"		sug-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN//EN"		sun-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SUN 0.3//EN"		sun-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.2//EN"		sun-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SUN 0.1//EN"		sun-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN//EN"		ssn-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SSN 0.3//EN"		ssn-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.2//EN"		ssn-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink SSN 0.1//EN"		ssn-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP//EN"		sgp-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SGP 0.3//EN"		sgp-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SGP 0.2//EN"		sgp-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SC//EN"		sc-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SC 0.3//EN"		sc-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SC 0.2//EN"		sc-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink SG//EN"		sg-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink SG 0.3//EN"		sg-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink SG 0.2//EN"		sg-0.2.dtd
 
-PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.2.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD//EN"		mud-0.3.dtd
+PUBLIC "-//Starlink//DTD Starlink MUD 0.3//EN"		mud-0.3.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.2//EN"		mud-0.2.dtd
 PUBLIC "-//Starlink//DTD Starlink MUD 0.1//EN"		mud-0.1.dtd
 
 PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
 
-PUBLIC "-//Starlink//DTD Program Source Code 0.1//EN"	programcode-0.1.dtd
+--PUBLIC "-//Starlink//DTD Program Source Code 0.3//EN"	programcode-0.3.dtd--
 PUBLIC "-//Starlink//DTD Program Source Code 0.2//EN"	programcode-0.2.dtd
-PUBLIC "-//Starlink//DTD Fortran Source Code 0.1//EN"	fortrancode-0.1.dtd
+PUBLIC "-//Starlink//DTD Program Source Code 0.1//EN"	programcode-0.1.dtd
+--PUBLIC "-//Starlink//DTD Fortran Source Code 0.3//EN"	fortrancode-0.3.dtd--
 PUBLIC "-//Starlink//DTD Fortran Source Code 0.2//EN"	fortrancode-0.2.dtd
+PUBLIC "-//Starlink//DTD Fortran Source Code 0.1//EN"	fortrancode-0.1.dtd
+--PUBLIC "-//Starlink//DTD DSSSL Source Code 0.3//EN"	dssslcode-0.3.dtd--
 PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN"	dssslcode-0.2.dtd
 
 --
