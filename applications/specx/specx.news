@@ -2,7 +2,7 @@
 
  - Fix problem with DAS-MERGE command not accepting different
    answers to the quadrant adjustment and wideband mode (present
-   since v6.7-7)
+   since v6.7-8)
  - Trap cases where the velocity frame was not recognized by SPECX.
    (in many cases HEL was not a match for HELI - now only match first
    3 characters of string).
