@@ -154,8 +154,8 @@ do
         eval echo "\"Environment variable $d=\\\"\$$d\\\" has a space in it\""
         echo "This causes unavoidable problems with the autoconf system,"
         echo "so, unfortunately, we can't proceed."
-        # Exit below
-        dryrun=:
+        # exit immediately
+        exit 1
     fi
 done
 
@@ -225,7 +225,10 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
         echo "        clean-buildsupport"
         make -f $tempmakefile \
             MANIFEST=$STAR_MANIFEST_DIR \
-            clean-buildsupport
+            clean-buildsupport || {
+                echo "Can't clean buildsupport">&2
+                exit 1
+            }
     fi
 
     if $need_gnu_m4; then
@@ -247,7 +250,7 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
         MANIFEST=$STAR_MANIFEST_DIR \
         buildsupport
 
-) || { echo "Failed to make buildsupport"; exit 1; }
+) || { echo "Failed to make buildsupport">&2; exit 1; }
 rm -f $tempmakefile
 
 
@@ -286,8 +289,12 @@ echorun autoreconf --install --symlink
 # them), the autoreconf above did not run autoreconf in buildsupport.
 # Do that now (partly because we want buildsupport/install-sh from
 # there, but mostly for symmetry).  The --force appears to be necessary,
-# though I don't have a convincing explanation of why.
-(cd buildsupport && autoreconf --install --symlink --force)
+# though I don't have a convincing explanation of why, since there
+# shouldn't be anything there already.
+(cd buildsupport && autoreconf --install --symlink --force) || {
+    echo "Failed to autoreconf buildsupport">&2
+    exit 1
+}
 
 # autoreconf does _not_ add an install-sh link, because there's no
 # Makefile.am in this directory, so it thinks we don't need one.  We
@@ -331,7 +338,10 @@ fi
 # Run configure WITHOUT RECURSION to create a basic Makefile which
 # will allow us to invoke 'make configure-deps'.  NOTE: This option isn't
 # advertised in the help, so it may not be public.
-./configure --no-recursion
+./configure --no-recursion || {
+    echo "Failed to configure top-level directory">&2
+    exit 1
+}
 
 # If there is a non-empty list of configure-deps in Makefile.dependencies,
 # then remind the user to make them.
