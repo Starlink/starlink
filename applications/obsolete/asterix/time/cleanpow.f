@@ -117,7 +117,7 @@
 *  Get input data from file
       CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
      :                                        VPNTR, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Set data format flag depending on the presence of variance
       IF (LVAR) THEN
@@ -160,7 +160,7 @@ C        READ *, LGXFL,LGYFL
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error obtaining dynamic memory')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
 * Fill the weights array
@@ -243,7 +243,7 @@ C        READ *, LGXFL,LGYFL
 * Ask if any changes required
       CALL USI_GET0L('CHANGE', LCHANGE, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Set defaults and get new values if changes wanted
       IF (LCHANGE) THEN
@@ -271,7 +271,7 @@ C        READ *, LGXFL,LGYFL
      &                /' to CLNLIM/MAXITE and HPBW')
       ENDIF
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Set some more values
       KNUM   = MIN0( INT(((AMAXFR-AMINFR)/HPBWR)*NPHPBW)+1, 6*NGOOD )
@@ -328,7 +328,7 @@ C        READ *, LGXFL,LGYFL
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error mapping dynamic memory')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
 * Call the routine that does the business
@@ -588,7 +588,7 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
         IF (MINFR.EQ.MAXFRE) THEN
             CALL MSG_PRNT(' WARNING, Minimum frequency equal to '/
      +              /'maximum frequency.')
-            GO TO 999
+            GO TO 99
         ENDIF
 
 *
@@ -1131,7 +1131,7 @@ C           ENDIF
               ENDIF
 
  110       CONTINUE
- 999    RETURN
+ 99     RETURN
         END
 *
 ********************************************************************
