@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.3}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th November 1998}
+\newcommand{\stardocdate}      {10th December 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -241,11 +241,9 @@ environment-independent.
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required for the hypertext version.
-   \begin{center}
    \includegraphics[scale=0.3,angle=-90]{sun210_figures/fronta.eps}\hfill
    \includegraphics[scale=0.3,angle=-90]{sun210_figures/frontb.eps}\hfill
    \includegraphics[scale=0.3,angle=-90]{sun210_figures/frontc.eps}
-   \end{center}
 % ? End of picture
 
    \begin{rawhtml} <H1> \end{rawhtml}
@@ -9773,7 +9771,7 @@ the ``ast\_link\_adam'' command description in
    }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1:}]
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
@@ -20877,6 +20875,9 @@ Object            - Base class for all AST Objects
 
          \sstitem
          \htmlref{AST\_MAPBOX}{AST_MAPBOX}: Find a bounding box for a Mapping
+
+         \sstitem
+         \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX}: Resample a region of a data grid
 
          \sstitem
          \htmlref{AST\_SIMPLIFY}{AST_SIMPLIFY}: Simplify a Mapping

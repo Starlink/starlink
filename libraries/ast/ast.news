@@ -18,6 +18,11 @@ Main Changes in this Version
 o  A new astPolyCurve function has been added for drawing multiple
    geodesic curves end-to-end.
  
+o  A new set of functions (astResample<X>) has been introduced for
+   resampling gridded data such as images (i.e. re-gridding) under
+   the control of a geometrical transformation specified by a
+   Mapping.
+
 o  The "ast_link" command has changed so that the options "-pgp" and
    "-pgplot" now link against the Starlink and "Native" versions of
    PGPLOT respectively. Previously these options were synonymous and
@@ -51,4 +56,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-13/11/98
+10/12/98
