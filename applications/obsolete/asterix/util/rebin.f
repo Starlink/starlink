@@ -128,8 +128,8 @@
 *     24 Nov 1994 : V1.8-0 Now use USI for user interface (DJA)
 *     12 Dec 1994 : V1.8-1 Uses axis bounds rather than widths (RJV)
 *     30 Jul 1995 : V1.8-2 Get locators from ADI (DJA)
-*     11 Nov 1995 V2.0-0 (DJA):
-*        Full ADI port
+*     11 Nov 1995 V2.0-0 (DJA) Full ADI port
+*     26 Mar 1996 V2.0-1 Fix boundary leakage (RJV)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -158,7 +158,7 @@
          PARAMETER (MXBIN=500)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'REBIN Version V2.0-0' )
+        PARAMETER		( VERSION = 'REBIN Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*80           AXLABEL(7) ! AXIS labels
@@ -199,6 +199,7 @@
       INTEGER VPTRO	              ! data VARIANCE
       INTEGER AXVPO(ADI__MXDIM)       ! axes
       INTEGER AXWPO(ADI__MXDIM)       ! axes widths
+      INTEGER AXBPO(ADI__MXDIM)	      ! axes bounds
       INTEGER AXES(ADI__MXDIM)
       INTEGER ISEL,NSEL
 
@@ -299,6 +300,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         AXWP(I) = UTIL_PLOC(DUMAXWID(I))
         AXWPO(I) = UTIL_PLOC(DUMAXWID(I))
         AXBP(I) = UTIL_PLOC(DUMAXBND(1,I))
+        AXBPO(I) = UTIL_PLOC(DUMAXBND(1,I))
         DUMAXVAL(I) = 0.5
         DUMAXWID(I) = 1.0
         DUMAXBND(1,I) = 0.0
@@ -456,6 +458,9 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
         END IF
 
+* output axis bounds
+        CALL BDI_AXMAPR( OFID, I, 'Bounds', 'READ', AXBPO(I), STATUS )
+
       END DO
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -475,9 +480,12 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         CALL REBIN_DOIT_BYBOUNDS(NDIM,DIMS,
      :    %VAL(DPTR),VOK,%VAL(VPTR),QOK,MASK,%VAL(QPTR),
      :    %VAL(AXBP(1)),%VAL(AXBP(2)),%VAL(AXBP(3)),%VAL(AXBP(4)),
-     :    %VAL(AXBP(5)),%VAL(AXBP(6)),%VAL(AXBP(7)),DIR,NORM,
-     :    ODIM,BNDS,REGO,SEL,%VAL(DPTRO),%VAL(VPTRO),%VAL(QPTRO),
-     :                                                     STATUS)
+     :    %VAL(AXBP(5)),%VAL(AXBP(6)),%VAL(AXBP(7)),
+     :    %VAL(AXBPO(1)),%VAL(AXBPO(2)),%VAL(AXBPO(3)),%VAL(AXBPO(4)),
+     :    %VAL(AXBPO(5)),%VAL(AXBPO(6)),%VAL(AXBPO(7)),
+     :    DIR,NORM,ODIM,BNDS,REGO,SEL,
+     :    %VAL(DPTRO),%VAL(VPTRO),%VAL(QPTRO),
+     :                                  STATUS)
 
       ENDIF
       IF (STATUS.EQ.SAI__OK) THEN
@@ -848,6 +856,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
       SUBROUTINE REBIN_DOIT_BYBOUNDS(NDIM,DIMS,FRVAL,VOK,FRVAR,QOK,
      :   MASK,FRQAL,FRBND1,FRBND2,FRBND3,FRBND4,FRBND5,FRBND6,FRBND7,
+     :          TOBND1,TOBND2,TOBND3,TOBND4,TOBND5,TOBND6,TOBND7,
      :          DIR,NORM,NBIN,BNDS,REGO,SEL,TOVAL,TOVAR,TOQAL,STATUS)
 
 *    Description :
@@ -875,13 +884,20 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         LOGICAL QOK			! whether input QUALITY present
         BYTE MASK			! QUALITY mask
 	BYTE FRQAL(*)			! values of donor qualities
-        REAL FRBND1(2,*) 		! donor bin widths
-        REAL FRBND2(2,*) 		! donor bin widths
-        REAL FRBND3(2,*) 		! donor bin widths
-        REAL FRBND4(2,*) 		! donor bin widths
-        REAL FRBND5(2,*) 		! donor bin widths
-        REAL FRBND6(2,*) 		! donor bin widths
-        REAL FRBND7(2,*)		! donor bin widths
+        REAL FRBND1(2,*) 		! donor bin bounds
+        REAL FRBND2(2,*) 		! donor bin bounds
+        REAL FRBND3(2,*) 		! donor bin bounds
+        REAL FRBND4(2,*) 		! donor bin bounds
+        REAL FRBND5(2,*) 		! donor bin bounds
+        REAL FRBND6(2,*) 		! donor bin bounds
+        REAL FRBND7(2,*)		! donor bin bounds
+        REAL TOBND1(2,*) 		! receptor bin bounds
+        REAL TOBND2(2,*) 		! receptor bin bounds
+        REAL TOBND3(2,*) 		! receptor bin bounds
+        REAL TOBND4(2,*) 		! receptor bin bounds
+        REAL TOBND5(2,*) 		! receptor bin bounds
+        REAL TOBND6(2,*) 		! receptor bin bounds
+        REAL TOBND7(2,*)		! receptor bin bounds
         REAL DIR(7)			! axis direction indicator
 	LOGICAL NORM(7)	        	! whether axes normalised
 	INTEGER NBIN(7)	        	! number of receptor bins
@@ -947,11 +963,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
       ENDIF
       CALL AR7_INITB(QUAL__GOOD,NBIN,%VAL(FPTR),STATUS)
 
-*  get BASE, SCALE for regular output axes
-      DO IAX=1,NDIM
-        BASEO(IAX)=BNDS(1,1,IAX)
-        SCALEO(IAX)=BNDS(2,1,IAX)-BASEO(IAX)
-      ENDDO
 
 *   Loop through donor bins
       DO I7=1,DIMS(7)
@@ -1016,30 +1027,36 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                         RIL(IAX)=I(IAX)
                         RIH(IAX)=I(IAX)
 
-                      ELSEIF(REGO(IAX)) THEN		! regular bins
 
-                        RIL(IAX)=INT((DBOT(IAX)-BASEO(IAX))
-     :                                              /SCALEO(IAX))+1
-                        RIH(IAX)=INT((DTOP(IAX)-BASEO(IAX))
-     :                                              /SCALEO(IAX))+1
-*  case where upper boundaries coincide
-                        IF (MOD((DTOP(IAX)-BASEO(IAX)),SCALEO(IAX))
-     :                                                   .EQ.0.0) THEN
-                          RIH(IAX)=RIH(IAX)-1
-                        ENDIF
-
-*  check donor falls completely within output range
-                        INCLUDE=(RIL(IAX).GT.0.AND.RIL(IAX).LE.NBIN(IAX)
-     :                     .AND.RIH(IAX).GT.0.AND.RIH(IAX).LE.NBIN(IAX))
-
-                      ELSE			! irregular bins
+                      ELSE
 
                         LOFOUND=.FALSE.
                         IBIN=1
 *  lower receptor bin
                         DO WHILE (IBIN.LE.NBIN(IAX).AND..NOT.LOFOUND)
-                          RBOT(IAX)=BNDS(1,IBIN,IAX)
-                          RTOP(IAX)=BNDS(2,IBIN,IAX)
+                          IF (IAX.EQ.1) THEN
+                            RBOT(IAX)=TOBND1(1,IBIN)
+                            RTOP(IAX)=TOBND1(2,IBIN)
+                          ELSEIF (IAX.EQ.2) THEN
+                            RBOT(IAX)=TOBND2(1,IBIN)
+                            RTOP(IAX)=TOBND2(2,IBIN)
+                          ELSEIF (IAX.EQ.3) THEN
+                            RBOT(IAX)=TOBND3(1,IBIN)
+                            RTOP(IAX)=TOBND3(2,IBIN)
+                          ELSEIF (IAX.EQ.4) THEN
+                            RBOT(IAX)=TOBND4(1,IBIN)
+                            RTOP(IAX)=TOBND4(2,IBIN)
+                          ELSEIF (IAX.EQ.5) THEN
+                            RBOT(IAX)=TOBND5(1,IBIN)
+                            RTOP(IAX)=TOBND5(2,IBIN)
+                          ELSEIF (IAX.EQ.6) THEN
+                            RBOT(IAX)=TOBND6(1,IBIN)
+                            RTOP(IAX)=TOBND6(2,IBIN)
+                          ELSEIF (IAX.EQ.7) THEN
+                            RBOT(IAX)=TOBND7(1,IBIN)
+                            RTOP(IAX)=TOBND7(2,IBIN)
+                          ENDIF
+
                           IF((DBOT(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
      :                                                           .AND.
      :                       (RTOP(IAX)-DBOT(IAX))*DIR(IAX).GT.0.0)
@@ -1054,8 +1071,29 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 *  upper receptor bin
                         DO WHILE (IBIN.LE.NBIN(IAX).AND..NOT.HIFOUND
      :                                                  .AND.LOFOUND)
-                          RBOT(IAX)=BNDS(1,IBIN,IAX)
-                          RTOP(IAX)=BNDS(2,IBIN,IAX)
+                          IF (IAX.EQ.1) THEN
+                            RBOT(IAX)=TOBND1(1,IBIN)
+                            RTOP(IAX)=TOBND1(2,IBIN)
+                          ELSEIF (IAX.EQ.2) THEN
+                            RBOT(IAX)=TOBND2(1,IBIN)
+                            RTOP(IAX)=TOBND2(2,IBIN)
+                          ELSEIF (IAX.EQ.3) THEN
+                            RBOT(IAX)=TOBND3(1,IBIN)
+                            RTOP(IAX)=TOBND3(2,IBIN)
+                          ELSEIF (IAX.EQ.4) THEN
+                            RBOT(IAX)=TOBND4(1,IBIN)
+                            RTOP(IAX)=TOBND4(2,IBIN)
+                          ELSEIF (IAX.EQ.5) THEN
+                            RBOT(IAX)=TOBND5(1,IBIN)
+                            RTOP(IAX)=TOBND5(2,IBIN)
+                          ELSEIF (IAX.EQ.6) THEN
+                            RBOT(IAX)=TOBND6(1,IBIN)
+                            RTOP(IAX)=TOBND6(2,IBIN)
+                          ELSEIF (IAX.EQ.7) THEN
+                            RBOT(IAX)=TOBND7(1,IBIN)
+                            RTOP(IAX)=TOBND7(2,IBIN)
+                          ENDIF
+
                           IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
      :                                                            .AND.
      :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GT.0.0)
@@ -1107,15 +1145,31 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                                     DO IAX=1,NDIM
 *  set receptor bin boundaries
                                       IF (SEL(IAX)) THEN
-                                        IF(REGO(IAX)) THEN
-                                          RBOT(IAX)=BASEO(IAX)
-     :                                   +SCALEO(IAX)*REAL(II(IAX)-1)
-		                          RTOP(IAX)=RBOT(IAX)+
-     :                                              SCALEO(IAX)
-                                        ELSE
                                           RBOT(IAX)=BNDS(1,II(IAX),IAX)
                                           RTOP(IAX)=BNDS(2,II(IAX),IAX)
+                                        IF (IAX.EQ.1) THEN
+                                          RBOT(IAX)=TOBND1(1,II(IAX))
+                                          RTOP(IAX)=TOBND1(2,II(IAX))
+                                        ELSEIF (IAX.EQ.2) THEN
+                                          RBOT(IAX)=TOBND2(1,II(IAX))
+                                          RTOP(IAX)=TOBND2(2,II(IAX))
+                                        ELSEIF (IAX.EQ.3) THEN
+                                          RBOT(IAX)=TOBND3(1,II(IAX))
+                                          RTOP(IAX)=TOBND3(2,II(IAX))
+                                        ELSEIF (IAX.EQ.4) THEN
+                                          RBOT(IAX)=TOBND4(1,II(IAX))
+                                          RTOP(IAX)=TOBND4(2,II(IAX))
+                                        ELSEIF (IAX.EQ.5) THEN
+                                          RBOT(IAX)=TOBND5(1,II(IAX))
+                                          RTOP(IAX)=TOBND5(2,II(IAX))
+                                        ELSEIF (IAX.EQ.6) THEN
+                                          RBOT(IAX)=TOBND6(1,II(IAX))
+                                          RTOP(IAX)=TOBND6(2,II(IAX))
+                                        ELSEIF (IAX.EQ.7) THEN
+                                          RBOT(IAX)=TOBND7(1,II(IAX))
+                                          RTOP(IAX)=TOBND7(2,II(IAX))
                                         ENDIF
+
 
 *  calculate various overlaps between donor and receptor
                                         OV1=(RTOP(IAX)-DTOP(IAX))

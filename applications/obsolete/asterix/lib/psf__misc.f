@@ -106,7 +106,7 @@
       MID = P_MODID(SLOT)
       IF ( L_MOD_PFL(MID,LID) .NE. 0 ) THEN
         CALL PSF_ENERGY_PFL_SPEC( %VAL(L_MOD_PFL(MID,LID)),
-     :               PS_PSID(SLOT), NFRAC, FRAC, RADII, STATUS )
+     :               P_PSID(SLOT), NFRAC, FRAC, RADII, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           GOTO 99
         ELSE
