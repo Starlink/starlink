@@ -78,36 +78,19 @@
 ;;      Return to caller if error
         ON_ERROR, 2
 
-;; 	Different platforms have different filename extensions and entry
-;;	point formats. Determine what type of machine we are on and set the 
-;;	correct names.
+;;      Make sure we're not running under 64 bit Solaris.
 
-	CASE !VERSION.ARCH OF 
-	   'sparc': BEGIN		;Sun or Solaris
-            IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
-               MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
-            ENDIF
-		LIB_EXT		= 'so'
-		ENTRY_PREFIX	= ''
-         END
-         'alpha': BEGIN		;Dec OSF1
-            LIB_EXT = 'so'
-            ENTRY_PREFIX    = ''
-         END
-         'x86': BEGIN		;PC running Linux
-            LIB_EXT = 'so'
-		ENTRY_PREFIX    = ''
-         END    
-         ELSE: BEGIN
-		MESSAGE,"ERROR: Unsupported platform."
-         END
-	ENDCASE
+	IF ( !VERSION.ARCH EQ 'sparc' ) THEN BEGIN 
+          IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
+            MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
+          ENDIF
+	ENDIF
 
 ;;	Determine the entry point and library name to use in the 
-;;	CALL_EXTERNAL function.
+;;	CALL_EXTERNAL function. These are edited in when during make.
 
-;;	Get the library name and check that it is there
-        LIB_NAME   = 'INSTALL_BIN/convert_idl.' + LIB_EXT
+        ENTRY_PREFIX = '@ENTRY_PREFIX@'
+        LIB_NAME = '@bindir@/@DLNAME@'
 
 ;;	Ensure that the library file exists
 	DUM = findfile(LIB_NAME, COUNT=CNT)

@@ -1,0 +1,56 @@
+## Process this file with automake to produce Makefile.in
+
+## List the scripts which are to be installed in the `bin' directory.
+bin_SCRIPTS = read_ndf.pro write_ndf.pro idl2hds.pro addnames.pro \
+ convert_idl.dlm
+
+## List libraries which are to be built, these are not installed by this 
+## package, convert does that.
+lib_LTLIBRARIES = convert_idl.la
+
+## Declare the sources for the library.
+convert_idl_la_SOURCES = \
+ $(PRIVATE_INCLUDES) \
+ $(C_ROUTINES)
+
+convert_idl_la_LIBADD = $(LIBADD) `ndf_link`
+
+## We want to dlopen this library (can we not depend on other shareables?).
+convert_idl_la_LDFLAGS = -module
+
+PRIVATE_INCLUDES = badvals.h export.h hds.h
+
+C_ROUTINES = read_ndf.c write_ndf.c probe_ndf.c crehds.c hds2idl.c \
+ idlstructdef.c idlstructarrdef.c idlstructfill.c idlprimfill.c \
+ hdsstructwrite.c hdsprimwrite.c gethdstype.c getidltype.c \
+ getidlstringsize.c getobjectdetails.c getstringarray.c tagstrip.c \
+ getcomp.c checkarr.c IDL_Load.c hds.c dat.c
+
+## In order to get the correct name for the dlopened library we need to let
+## libtool do it's work and then query the convert_idl.la file for the dlname
+## variable. Once we have this name we can subsitute it into some of the 
+## scripts. Do this at install-time. ENTRY_PREFIX is some prefix used to access
+## the function, see the IDL documentation if needs to be set.
+
+ENTRY_PREFIX=
+
+getdlname = grep 'dlname=' convert_idl.la | sed -e 's:dlname=::' -e s:\'::g
+
+edit = sed \
+        -e 's,@bindir\@,$(bindir),g' \
+        -e "s,@DLNAME\@,$$DLNAME,g" \
+	-e 's,@ENTRY_PREFIX\@,$(ENTRY_PREFIX),g'
+
+read_ndf.pro: convert_idl.la read_ndf.pro.in
+	DLNAME="`$(getdlname)`";\
+	rm -f read_ndf.pro.tmp readndf.pro;\
+	$(edit) \
+	   $(srcdir)/read_ndf.pro.in >read_ndf.pro.tmp;\
+	mv read_ndf.pro.tmp read_ndf.pro
+
+write_ndf.pro: convert_idl.la write_ndf.pro.in
+	DLNAME="`$(getdlname)`";\
+	rm -f write_ndf.pro.tmp write_ndf.pro;\
+	$(edit) \
+	   $(srcdir)/write_ndf.pro.in >write_ndf.pro.tmp;\
+	mv write_ndf.pro.tmp write_ndf.pro
