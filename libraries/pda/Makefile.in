@@ -15,7 +15,6 @@
 @SET_MAKE@
 
 
-
 SOURCES = $(libpda_la_SOURCES) $(Covartest_SOURCES) $(Lintest_SOURCES) $(Nonlin2test_SOURCES) $(Normtest_SOURCES) $(Randtest_SOURCES) $(Sf2dtest_SOURCES) $(Simann_SOURCES) $(Sorttest_SOURCES) $(Subplex_SOURCES) $(pda_test_SOURCES)
 
 srcdir = @srcdir@
@@ -50,15 +49,14 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/../config.guess \
 	$(srcdir)/component.xml.in $(top_srcdir)/configure
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libpda_la_LIBADD =
@@ -184,11 +182,8 @@ DIST_SOURCES = $(libpda_la_SOURCES) $(Covartest_SOURCES) \
 	$(Lintest_SOURCES) $(Nonlin2test_SOURCES) $(Normtest_SOURCES) \
 	$(Randtest_SOURCES) $(Sf2dtest_SOURCES) $(Simann_SOURCES) \
 	$(Sorttest_SOURCES) $(Subplex_SOURCES) $(pda_test_SOURCES)
-stardocsDATA_INSTALL = $(INSTALL_DATA)
-DATA = $(stardocs_DATA)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -250,22 +245,10 @@ PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
-PACKAGE_VERSION_INTEGER = @PACKAGE_VERSION_INTEGER@
-PACKAGE_VERSION_MAJOR = @PACKAGE_VERSION_MAJOR@
-PACKAGE_VERSION_MINOR = @PACKAGE_VERSION_MINOR@
-PACKAGE_VERSION_RELEASE = @PACKAGE_VERSION_RELEASE@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-STAR2HTML = @STAR2HTML@
-STARLINK = @STARLINK@
-STAR_DEPENDENCIES_ATTRIBUTES = @STAR_DEPENDENCIES_ATTRIBUTES@
-STAR_DEPENDENCIES_CHILDREN = @STAR_DEPENDENCIES_CHILDREN@
-STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
-STAR_EXTRA_DIST = @STAR_EXTRA_DIST@
-STAR_MANIFEST_DIR = @STAR_MANIFEST_DIR@
-STAR_MESSGEN_SOURCES = @STAR_MESSGEN_SOURCES@
 STRIP = @STRIP@
 VERSION = @VERSION@
 ac_ct_AR = @ac_ct_AR@
@@ -308,10 +291,6 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
-stardocs_DATA = @stardocs_DATA@
-stardocsdir = @stardocsdir@
-staretcdir = @staretcdir@
-starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 bin_SCRIPTS = pda_link pda_link_adam
@@ -417,7 +396,7 @@ Subplex_LDADD = `$(srcdir)/pda_link`
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .f .lo .o .obj
+.SUFFIXES: .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -581,26 +560,6 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
-install-stardocsDATA: $(stardocs_DATA)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(stardocsdir)
-	@list='$(stardocs_DATA)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " $(stardocsDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f"; \
-	  $(stardocsDATA_INSTALL) $$d$$p $(DESTDIR)$(stardocsdir)/$$f; \
-	  if test -n "$$MANIFEST_FILE"; then \
-	  	echo "$(DESTDIR)$(stardocsdir)/$$f" >>$$MANIFEST_FILE; \
-	  else :; fi; \
-	done
-
-uninstall-stardocsDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(stardocs_DATA)'; for p in $$list; do \
-	  f="`echo $$p | sed -e 's|^.*/||'`"; \
-	  echo " rm -f $(DESTDIR)$(stardocsdir)/$$f"; \
-	  rm -f $(DESTDIR)$(stardocsdir)/$$f; \
-	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -742,19 +701,6 @@ install-manifest: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-# Requires that the STAR2HTML substitution was made in
-# configure.ac, probably implicitly by the STAR_LATEX_DOCUMENTATION macro.
-.tex.htx_tar:
-	- @STAR2HTML@ $<
-	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -887,9 +833,9 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(DATA)
+all-am: Makefile $(LTLIBRARIES) $(SCRIPTS)
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -935,7 +881,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-stardocsDATA
+install-data-am:
 
 install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
 
@@ -965,7 +911,7 @@ ps: ps-am
 ps-am:
 
 uninstall-am: uninstall-binSCRIPTS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-stardocsDATA
+	uninstall-libLTLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
 	clean clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
@@ -976,13 +922,12 @@ uninstall-am: uninstall-binSCRIPTS uninstall-info-am \
 	dvi-am html html-am info info-am install install-am \
 	install-binSCRIPTS install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am \
-	install-libLTLIBRARIES install-man install-stardocsDATA \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-stardocsDATA
+	install-libLTLIBRARIES install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binSCRIPTS \
+	uninstall-info-am uninstall-libLTLIBRARIES
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
