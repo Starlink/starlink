@@ -1,7 +1,7 @@
 AST Library
 -----------
-   The first release (V<VERSION_NUMBER>) of the Starlink AST (astrometry) library
-is now available.
+   A new release (V<VERSION_NUMBER>) of the Starlink AST (astrometry) library is
+now available.
 
    AST may be used for attaching world coordinate systems (such as
 RA/Dec) to astronomical data, for retrieving and interpreting that
@@ -12,10 +12,53 @@ software which needs to manipulate coordinate system data, especially
 celestial coordinate systems. AST is portable and
 environment-independent.
 
-Further Details
----------------
-   For further details, see Starlink User Note SUN/210 (Fortran
-version) or SUN/211 (C version). These are available on the WWW at:
+Changes in this Version
+-----------------------
+o  A new "How To..." section has been added to the documentation (SUN/210
+   and SUN/211). It contains simple recipies for performing
+   commonly-required operations using AST.
+
+o  A new routine has been provided to perform free-format input of
+   coordinate values, including celestial coordinate.
+
+o  Celestial coordinates may now be formatted in (arc)minutes and/or
+   (arc)seconds, without a leading degrees or hours field.
+
+o  A new routine has been provided to find the extent of a "bounding
+   box".  A typical use might be to calculate the size of an image after
+   geometrical transformation.
+
+o  A new class of Object, the IntraMap, has been introduced to
+   encapsulate privately-defined coordinate transformation routines
+   written in Fortran or C.  This allows you to create private Mappings
+   that perform any conceivable coordinate transformation.
+
+o  The internal integrity of a FrameSet is now automatically preserved
+   whenever changes are made to any attributes which affect the current
+   Frame.
+
+o  The internal structure of a FrameSet is now automatically tidied
+   whenever any of its Frames is removed or re-mapped. This prevents the
+   accumulation of unnecessary structure in FrameSets which are
+   repeatedly modified.
+
+o  Some improvements have been made to the algorithms for simplifying
+   compound Mappings.
+
+o  The textual representation used for some Objects has changed slightly,
+   but remains compatible with earlier versions of AST.
+
+o  Interfaces to the internal routines and macros used by AST for
+   handling memory and error conditions are now provided via the C
+   interface.  This is for the benefit of those writing (e.g.) new
+   graphics interfaces for AST.
+
+o  A number of minor bugs have been fixed.
+
+
+   For further details of these changes, see the final appendix of
+Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
+These are available on the WWW at:
 
       http://star-www.rl.ac.uk/cgi-bin/htxserver/sun210.htx/
    and
@@ -23,8 +66,8 @@ version) or SUN/211 (C version). These are available on the WWW at:
 
 Alternatively, on Starlink systems, type:
 
-      showme sun210
+      showme sun210 changes
    or
-      showme sun211
+      showme sun211 changes
 
-12/1/98
+9/6/98
