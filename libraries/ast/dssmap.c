@@ -1298,7 +1298,8 @@ AstDssMap *astDssMap_( void *fits_void, const char *options, ... ) {
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
-   if ( !astOK ) return NULL;
+   new = NULL;
+   if ( !astOK ) return new;
 
 /* Obtain and validate a pointer to the FitsChan structure provided. */
    fits = astCheckFitsChan( fits_void );
