@@ -1,0 +1,156 @@
+1 ASCII2NDF
+Converts an ASCII file to an NDF.
+
+Usage:
+
+   ASCII2NDF IN OUT [COMP] [SKIP] SHAPE [TYPE]
+
+Description:
+
+   This application converts an ASCII file to an NDF.  Only one of
+   the array components may be created from the input file.
+   Preceding the input data there may be an optional header.  This
+   header may be skipped, or may consist of a simple FITS header.
+   In the former case the shape of the NDF has be to be supplied.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COMP
+COMP = LITERAL (Read)
+   The NDF component to be copied.  It may be "Data", "Quality"
+   or "Variance".  To create a variance or quality array the NDF
+   must already exist. ["Data"]
+3 FITS
+FITS = _LOGICAL (Read)
+   If true, the initial records of the formatted file are
+   interpreted as a FITS header (with one card image per record)
+   from which the shape, data type, and axis centres are derived.
+   The last record of the FITS-like header must be terminated by
+   an END keyword; subsequent records in the input file are
+   treated as an array component given by COMP.  [FALSE]
+3 IN
+IN = FILENAME (Read)
+   Name of the input ASCII Fortran file.  The file will normally
+   have variable-length records when there is a header, but
+   always fixed-length records when there is no header.  It has a
+   default file extension of ".DAT".
+3 OUT
+OUT = NDF (Read and Write)
+   Output NDF data structure.  When COMP is not "Data" the NDF
+   is modified rather than a new NDF created.
+3 SHAPE
+SHAPE = _INTEGER (Read)
+   The shape of the NDF to be created.  For example, [40,30,20]
+   would create 40 columns by 30 lines by 10 bands.  It is only
+   accessed when FITS is FALSE.
+3 SKIP
+SKIP = INTEGER (Read)
+   The number of header records to be skipped at the start of the
+   input file before finding the data array or FITS-like header.
+   [0]
+3 TYPE
+TYPE = LITERAL (Read)
+   The data type of the output NDF.  It must be one of the
+   following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
+   "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
+   signed word, real, integer, double precision, unsigned byte,
+   and unsigned word.  See SUN/92 for further details.  An
+   unambiguous abbreviation may be given.  TYPE is ignored when
+   COMP = "Quality" since the QUALITY component must comprise
+   unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
+   NDF. The suggested default is the current value.  ["_REAL"]
+2 Examples
+ASCII2NDF NGC253.DAT NGC253 SHAPE=[100,60]
+   This copies a data array from the ASCII file NGC253.DAT to the
+   NDF called NGC253.  NGC253.DAT does not contain a header
+   section.  The NDF is two-dimensional: 100 elements in x by 60
+   in y.  Its data array has type _REAL.
+
+ASCII2NDF NGC253Q.DAT NGC253 Q SHAPE=[100,60]
+   This copies a quality array from the ASCII file NGC253Q.DAT to
+   an existing NDF called NGC253 (such as created in the first
+   example).  NGC253Q.DAT does not contain a header section.  The
+   NDF is two-dimensional: 100 elements in x by 60 in y.  Its
+   data array has type _UBYTE.
+
+ASCII2NDF NGC253.DAT NGC253 FITS
+   This copies a data array from the ASCII file NGC253.DAT
+   to the NDF called NGC253.  NGC253.DAT contains a FITS-like
+   header section, which is copied to the FITS extension of the
+   NDF.  The shape of the NDF is controlled by the mandatory FITS
+   keywords NAXIS, AXIS1, ..., AXISn, and the data type by
+   keywords BITPIX and UNSIGNED.
+
+ASCII2NDF TYPE='_UWORD' IN=NGC253.DAT OUT=NGC253 \
+   This copies a data array from the ASCII file NGC253.DAT to the
+   NDF called NGC253.  NGC253.DAT does not contain a header
+   section.  The NDF has the current shape and data type is
+   unsigned word.
+
+ASCII2NDF SPECTRUM ZZ SKIP=2 SHAPE=200
+   This copies a data array from the ASCII file SPECTRUM.DAT to
+   the NDF called ZZ.  SPECTRUM.DAT contains two header records
+   that are ignored.  The NDF is one-dimensional comprising 200
+   elements of type _REAL.
+
+ASCII2NDF SPECTRUM.LIS ZZ SKIP=1 FITS
+   This copies a data array from the ASCII file SPECTRUM.LIS to
+   the NDF called ZZ.  SPECTRUM.LIS contains one header record,
+   that is ignored, followed by a FITS-like header section, which
+   is copied to the FITS extension of the NDF.  The shape of the
+   NDF is controlled by the mandatory FITS keywords NAXIS, AXIS1,
+   ..., AXISn, and the data type by keywords BITPIX and UNSIGNED.
+2 Notes
+The details of the conversion are as follows:
+
+   -  the ASCII-file array is written to the NDF array as
+   selected by COMP.  When the NDF is being modified, the shape
+   of the new component must match that of the NDF.
+
+   -  If the input file contains a FITS-like header, and a new
+   NDF is created, i.e. COMP = "Data", the header records are
+   placed within the NDF's FITS extension.  This enables more
+   than one array (input file) to be used to form an NDF.  Note
+   that the data array must be created first to make a valid NDF,
+   and its the FITS structure associated with that array that is
+   wanted.  Indeed the application prevents you from doing
+   otherwise.
+
+   -  The FITS-like header defines the properties of the NDF as
+   follows:
+      o  BITPIX defines the data type: 8 gives _BYTE, 16 produces
+      _WORD, 32 makes _INTEGER, -32 gives _REAL, and -64 generates
+      _DOUBLE.  For the first two, if there is an extra header
+      record with the keyword UNSIGNED and logical value T, these
+      types become _UBYTE and _UWORD respectively.  UNSIGNED is
+      non-standard, since unsigned integers would not follow in a
+      proper FITS file.  However, here it is useful to enable
+      unsigned types to be input into an NDF.  UNSIGNED may be
+      created by this application's sister, NDF2ASCII.  BITPIX is
+      ignored for QUALITY data; type _UBYTE is used.
+      o  NAXIS, and NAXISn define the shape of the NDF.
+      o  The TITLE, LABEL, and BUNITS are copied to the NDF
+      TITLE, LABEL, and UNITS NDF components respectively.
+      o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn keywords make
+      linear axis structures within the NDF.  CTYPEn define the
+      axis units, and the axis labels are assigned to CRTYPEn If
+      some are missing, pixel co-ordinates are used for those
+      axes.
+      o  BSCALE and BZERO in a FITS extension are ignored.
+      o  BLANK is not used to indicate which input array values
+      should be assigned to a standard bad value.
+      o  END indicates the last header record unless it
+      terminates a dummy header, and the actual data is in an
+      extension.
+
+   -  Other data item such as HISTORY, data ORIGIN, and axis
+   widths are not supported, because the ASCII file has a simple
+   structure to enable a diverse set of input files to be
+   converted to NDFs, and to limitations of the standard FITS
+   header.
+2 Related_Applications
+   CONVERT: NDF2ASCII; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+2 Authors
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 1992 September 18 (MJC):
+    Original version.
