@@ -4050,7 +4050,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             if( i == axspec ) {
                val *= specfactor;
-               val -= rf;
+               if( !strncmp( spectype, "FREQ", 4 ) ) val -= rf;
             }
             sprintf( combuf, "Value at ref. pixel on axis %d", i + 1 );
             SetValue( this, FormatKey( "CRVAL", i + 1, -1, s ), &val, 
@@ -4130,7 +4130,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* The image frequency corresponding to the rest frequency (only used for
    double sideband data). */
       val = GetItem( &(store->imagfreq), 0, 0, s, NULL, method, class );
-      if( val == AST__BAD ) {
+      if( val != AST__BAD ) {
          SetValue( this, "IMAGFREQ", &val, AST__FLOAT, "[Hz] Image frequency" );
       }      
 
@@ -7517,12 +7517,14 @@ static int FindLonLatSpecAxes( FitsStore *store, char s, int *axlon, int *axlat,
 */
 
 /* Local Variables: */
+   char *assys;                   
+   char *astype;                  
    char algcode[5];
    char stype[5];
    const char *ctype;
    double dval;
    int i;
-   int wcsaxes;
+   int wcsaxes;     
 
 /* Initialise */
    *axlon = -1;
@@ -7549,8 +7551,9 @@ static int FindLonLatSpecAxes( FitsStore *store, char s, int *axlon, int *axlat,
 /* Check a value was found. */
       if( ctype ) {
 
-/* First check for spectral axes. */
-         if( IsSpectral( ctype, stype, algcode ) ) {
+/* First check for spectral axes, either FITS-WCS or AIPS-like. */
+         if( IsSpectral( ctype, stype, algcode ) ||
+             IsAIPSSpectral( ctype, &astype, &assys ) ) {
             *axspec = i;
 
 /* Otherwise look for celestial axes. Celestial axes must have a "-" as the 
@@ -14475,7 +14478,7 @@ static int IsAIPSSpectral( const char *ctype, char **wctype, char **wspecsys ){
 *     The given CTYPE value is checked to see if it conforms to the
 *     requirements of a spectral axis CTYPE value as specified by
 *     FITS-AIPS encoding. If so, the equivalent FITS-WCS CTYPE and
-*     SPECSYS values are returned.
+*     SPECSYS values are returned. 
 
 *  Parameters:
 *     ctype
@@ -14969,14 +14972,9 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 *     FitsChan member function.
 
 *  Description:
-*     Returns non-zero if the supplied FitssChan probably uses FITS-CLASS
-*     encoding. This is the case if:
-*
-*     1)  CTYPE1 is "FREQ" 
-*     2)  CTYPE2 is "RA" or "GLON" 
-*     3)  CTYPE3 is "DEC" or "GLAT"
-* 
-*     None of these CTYPE values have algorithm codes.
+*     Returns non-zero if the supplied FitsChan probably uses FITS-CLASS
+*     encoding. This is the case if it contains an ORIGIN keyword with
+*     the value 'CLASS-Grenoble'
 
 *  Parameters:
 *     this
@@ -14994,37 +14992,37 @@ static int LooksLikeClass( AstFitsChan *this, const char *method,
 */
 
 /* Local Variables... */
-   const char *cval;   /* Pointer to text string */
+   int found;          /* Was an ORIGIN ard found in the FitsChan? */
    int ret;            /* Returned value */
+   size_t size;        /* length of string value */
+
+/* Initialise */
+   ret = 0;
 
 /* Check the global status. */
-   if( !astOK ) return 0;
+   if( !astOK ) return ret;
 
-/*  Initialise */
-   ret = 1;
+/* Clear the Card attribute so that the following search will start with the 
+   first card. */
+   astClearCard( this );
 
-/* Check CTYPE1 */
-   if( GetValue( this, "CTYPE1", AST__STRING, (void *) &cval, 0, 0, method, 
-                 class ) ) {
-      if( strcmp( cval, "RA" ) && strcmp( cval, "GLON" ) ) ret = 0;
-   } else {
-      ret = 0;
-   }
+/* Find the first occurrence of an ORIGIN card. */
+   found = FindKeyCard( this, "ORIGIN", method, class );
 
-/* Check CTYPE2 */
-   if( ret && GetValue( this, "CTYPE2", AST__STRING, (void *) &cval, 0, 0, 
-                        method, class ) ) {
-      if( strcmp( cval, "DEC" ) && strcmp( cval, "GLAT" ) ) ret = 0;
-   } else {
-      ret = 0;
-   }
+/* If an ORIGIN card was found, see if it has the value "CLASS-Grenoble". */
+   while( found ) {
+      if( !strncmp( "CLASS-Grenoble", (const char *) CardData( this, &size ), 
+                    14 ) ) {
+         ret = 1;  
+         break;
 
-/* Check CTYPE3 */
-   if( ret && GetValue( this, "CTYPE3", AST__STRING, (void *) &cval, 0, 0, 
-                        method, class ) ) {
-      if( strcmp( cval, "FREQ" ) ) ret = 0;
-   } else {
-      ret = 0;
+/* If this ORIGIN card is not "CLASS-Grenoble", Increment the current
+   card pointer and see if there is another ORIGIN card in the FitsChan.
+   Loop to check its value.*/
+      } else {
+         MoveCard( this, 1, method, class );
+         found = FindKeyCard( this, "ORIGIN", method, class );
+      }
    }
 
 /* Return  the result. */
@@ -19482,7 +19480,7 @@ static void RoundFString( char *text, int width ){
          } else {
             nzero = last - start;
          }            
-         for( i = 0; i < dot-start; i++ ) *(c++) = '0';
+         for( i = 0; i < nzero; i++ ) *(c++) = '0';
 
 /* If the original string containsed a decimal point, make sure the
    returned string also contains one. */
@@ -22651,9 +22649,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
          }
       }
 
-/* Do translations spcifi to the FITS-CLASS encoding. */
+/* Things specific to the CLASS encoding
+   ------------------------------------- */
       if( encoding == FITSCLASS_ENCODING ) ClassTrans( this, ret, axlat,
-                                                     axlon, method, class );
+                                                       axlon, method, class );
 
 /* AIPS "NCP" projections 
    --------------------- */
@@ -30342,10 +30341,8 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *
 *     - If the FitsChan contains any keywords beginning with the
 *     string "BEGAST", then NATIVE encoding is used,
-*     - Otherwise, FITS-CLASS is used if the FitsChan contains CTYPE
-*     values as follows: CTYPE1 equal to "FREQ", CTYPE2 equal to "RA" or 
-*     "GLON", and CTYPE3 equal to "DEC" or "GLAT". Note that no algorithm
-*     code is included in any of these CTYPE values.
+*     - Otherwise, FITS-CLASS is used if the FitsChan contains an ORIGIN
+*     keyword with the value 'CLASS-Grenoble'.
 *     - Otherwise, if the FitsChan contains a CTYPE keyword which
 *     represents a spectral axis using the conventions of the AIPS and
 *     AIPS++ projects (e.g. "FELO-LSR", etc), then one of FITS-AIPS or 
@@ -30619,9 +30616,7 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *     - Axis 1 must be a linear frequency axis.
 *     - Axis 2 must be a RA or GLON axis
 *     - Axis 3 must be a DEC or GLAT axis
-*     - No algorithm code is used to specify the celestial projection,
-*     which must be SFL (Sanson-Flamsteed, equivalent to the old
-*     AIPS GLS projection).
+*     - A limited range of projection codes similar to AIPS may be used.
 *     - No rotation of the celestial axes is allowed.
 *     - The FITS-WCS CRVAL1 value is obtained by adding the values of the
 *     CRVAL1 and RESTFREQ keywords.
