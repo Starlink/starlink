@@ -68,6 +68,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       EXTERNAL VAL_DTO<T>
       <TYPE> VAL_DTO<T>          ! Converts double precision to
                                  ! `real' data type.

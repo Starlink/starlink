@@ -61,6 +61,9 @@
       <TYPE> ARRAY( NPIX )
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       <TYPE> VAL_DTO<T>
       EXTERNAL VAL_DTO<T>        ! Converts double precision to ARRAY type.
 

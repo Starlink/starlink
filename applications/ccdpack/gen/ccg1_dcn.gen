@@ -129,6 +129,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       EXTERNAL VAL_DTO<T>
       <TYPE> VAL_DTO<T>          ! Function to convert DBLE to local
                                  ! type

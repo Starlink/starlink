@@ -75,6 +75,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       <TYPE> VAL_DTO<T>          ! Numeric conversion with protection
 
 *  Local Variables:

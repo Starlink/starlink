@@ -189,7 +189,7 @@
       INTEGER STATUS             ! Global status
 
 *  Global variables:
-      INCLUDE 'NUM_CMN'          ! Numeric error handlear common block
+
                                  ! defines NUM_ERROR
 
 *  Local Constants:
@@ -200,6 +200,8 @@
 *  External References:
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numeric error trap
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
 
 *  Local Variables:
       DOUBLE PRECISION CHANGE, TARGET ! change on last iteration and target
@@ -396,8 +398,8 @@
      :            ( .NOT. ALDONE ) )
 
 *  Check for any numeric errors (overflows have occurred occasionally)
-         IF ( NUM_ERROR .NE. SAI__OK ) THEN
-            STATUS = NUM_ERROR
+         IF ( .NOT. NUM_WASOK() ) THEN
+            CALL NUM_GETERR()
             CALL ERR_REP( 'CCD1_FITLM_NERR',
      :      'CCD1_FITLM: Numeric error during fit.', STATUS )
             STOP = .TRUE. 

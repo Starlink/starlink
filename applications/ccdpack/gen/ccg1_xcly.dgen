@@ -81,7 +81,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
+
 
 *  Arguments Given:
       LOGICAL BAD
@@ -103,6 +103,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
@@ -130,7 +133,7 @@
 *  Establish a numerical error handler and initialise the numerical
 *  error status and error count.
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
 
 *  No bad values present:
@@ -145,10 +148,10 @@
                DUM1 = NUM_<T2>TOD( DARRI( I ) )
                DUM2 = NUM_<T1>TOD( DCALI( I ) )
                DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   DARRO( I ) = VAL__BAD<T2>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 1           CONTINUE
 
@@ -168,10 +171,10 @@
                   DUM1 = NUM_<T2>TOD( DARRI( I ) )
                   DUM2 = NUM_<T1>TOD( DCALI( I ) )
                   DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      DARRO( I ) = VAL__BAD<T2>
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
                END IF
 2           CONTINUE
@@ -187,7 +190,7 @@
 *  Establish a numerical error handler and initialise the numerical
 *  error status and error count.
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
 
 *  No bad values present:
@@ -200,10 +203,10 @@
                DUM1 = NUM_<T2>TOD( DARRI( I ) )
                DUM2 = NUM_<T1>TOD( DCALI( I ) )
                DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   DARRO( I ) = VAL__BAD<T2>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 
 *  This is the noiseless case the variance is unmodified.
@@ -227,10 +230,10 @@
                   DUM1 = NUM_<T2>TOD( DARRI( I ) )
                   DUM2 = NUM_<T1>TOD( DCALI( I ) )
                   DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      DARRO( I ) = VAL__BAD<T2>
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
                END IF
 
@@ -252,7 +255,7 @@
 *  Establish a numerical error handler and initialise the numerical
 *  error status and error count.
          CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
+         CALL NUM_CLEARERR()
          NERR = 0
 
 *  No bad values present:
@@ -265,10 +268,10 @@
                DUM1 = NUM_<T2>TOD( DARRI( I ) )
                DUM2 = NUM_<T1>TOD( DCALI( I ) )
                DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   DARRO( I ) = VAL__BAD<T2>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 
 *  Derive the variance value for the same values, again checking for
@@ -276,10 +279,10 @@
                DUM1 = NUM_<T2>TOD( VARRI( I ) )
                DUM2 = NUM_<T1>TOD( VCALI( I ) )
                VARRO( I ) = NUM_DTO<T2>( DUM1 + EXPSQ * DUM2 )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   VARRO( I ) = VAL__BAD<T2>
                   NERR = NERR + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 5           CONTINUE
 
@@ -300,10 +303,10 @@
                   DUM1 = NUM_<T2>TOD( DARRI( I ) )
                   DUM2 = NUM_<T1>TOD( DCALI( I ) )
                   DARRO( I ) = NUM_DTO<T2>( DUM1 - EXPOSE * DUM2 )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      DARRO( I ) = VAL__BAD<T2>
                      NERR = NERR + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
 
 *  See if either input variance value is bad. If so, then set a bad
@@ -318,10 +321,10 @@
                      DUM1 = NUM_<T2>TOD( VARRI( I ) )
                      DUM2 = NUM_<T1>TOD( VCALI( I ) )
                      VARRO( I ) = NUM_DTO<T2>( DUM1 + EXPSQ * DUM2 )
-                     IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                     IF ( .NOT. NUM_WASOK() ) THEN
                         VARRO( I ) = VAL__BAD<T2>
                         NERR = NERR + 1
-                        NUM_ERROR = SAI__OK
+                        CALL NUM_CLEARERR()
                      END IF
                   END IF
                END IF

@@ -82,7 +82,7 @@
       INCLUDE 'PRM_PAR'          ! Bad values
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numeric error flag
+
 
 *  Arguments Given:
       INTEGER NCOLA
@@ -101,6 +101,9 @@
       LOGICAL BADOUT
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       INTEGER NUM_TRAP
       EXTERNAL NUM_TRAP          ! Numeric error trap
 

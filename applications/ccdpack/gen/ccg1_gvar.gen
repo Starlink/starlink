@@ -84,7 +84,7 @@
       INCLUDE 'PRM_PAR'          ! BAD value constants
 
 *  Global variables:
-      INCLUDE 'NUM_CMN'          ! NUM common block definition defines
+
                                  ! NUM_ERROR
 
 *  Arguments Given:
@@ -103,6 +103,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       INTEGER NUM_TRAP
       EXTERNAL NUM_TRAP          ! Condition handler
 
@@ -127,7 +130,7 @@
       CALL NUM_HANDL( NUM_TRAP )
 
 *  Initialise the error flag.
-      NUM_ERROR = SAI__OK
+      CALL NUM_CLEARERR()
 
 *  Set number of numeric errors
       NERR = 0
@@ -162,9 +165,9 @@
             END IF
 
 *  Check for numeric error and that variance is greater than zero.
-            IF ( NUM_ERROR .NE. SAI__OK ) THEN
+            IF ( .NOT. NUM_WASOK() ) THEN
                NERR = NERR + 1
-               NUM_ERROR = SAI__OK
+               CALL NUM_CLEARERR()
 
 *  Set output value BAD.
                VAR( I ) = VAL__BAD<T>

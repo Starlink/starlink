@@ -134,7 +134,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Numeric errors common block
+
                                  ! defines NUM_ERROR
       INCLUDE 'CCD1_FITCM'       ! Common block for passing fit
                                  ! information to LSFUN1 subroutine
@@ -187,6 +187,8 @@
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP          ! Condition handler
       EXTERNAL CCD1_LSFUN1      ! Sum of squares function
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOCTR ! Locator for compiled transform
@@ -206,7 +208,7 @@
       CALL NUM_HANDL( NUM_TRAP )
 
 *  Initialise the error counter.
-      NUM_ERROR = SAI__OK
+      CALL NUM_CLEARERR()
 
 *  Match the identifiers of the lists and remove unmatched positions.
       CALL CCD1_MTCHL( %VAL( CNF_PVAL( IPID1 ) ), 
@@ -294,8 +296,8 @@
      :                    %VAL( CNF_PVAL( IPWRK2 ) ), NWORK )
 
 *  Trap numeric errors.
-         IF ( NUM_ERROR .NE. SAI__OK ) THEN
-            STATUS = NUM_ERROR
+         IF ( .NOT. NUM_WASOK() ) THEN
+            CALL NUM_GETERR()
             CALL ERR_REP( ' ',
      :'  A numeric error occurred when performing fit', STATUS )
             GO TO 99

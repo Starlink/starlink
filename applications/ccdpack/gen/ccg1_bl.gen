@@ -94,7 +94,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT primitive data constants
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR status flag
+
 
 *  Arguments Given:
       LOGICAL BAD
@@ -117,6 +117,9 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      EXTERNAL NUM_WASOK
+      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
@@ -161,7 +164,7 @@
 *  Establish a numerical error handler and initialise the numerical
 *  error status and error count.
       CALL NUM_HANDL( NUM_TRAP )
-      NUM_ERROR = SAI__OK
+      CALL NUM_CLEARERR()
       NBAD = 0
 
 *  Loop to initialise elements of the two workspace arrays so that they
@@ -302,10 +305,10 @@
             IF ( .NOT. BAD ) THEN
                DENOM = ASUM0 / DENOM
                B( IX, IY ) = NUM_DTO<T>( DENOM )
-               IF ( NUM_ERROR .NE. SAI__OK ) THEN
+               IF ( .NOT. NUM_WASOK() ) THEN
                   B( IX, IY ) = VAL__BAD<T>
                   NBAD = NBAD + 1
-                  NUM_ERROR = SAI__OK
+                  CALL NUM_CLEARERR()
                END IF
 
 *  It is also valid if SAMBAD is .TRUE. and the corresponding input
@@ -314,10 +317,10 @@
                IF ( A( IX, IY ) .NE. VAL__BAD<T> ) THEN
                   DENOM = ASUM0 / DENOM
                   B( IX, IY ) = NUM_DTO<T>( DENOM )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      B( IX, IY ) = VAL__BAD<T>
                      NBAD = NBAD + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
 
 *  It is bad if SAMBAD is .TRUE. and the corresponding input pixel is
@@ -333,10 +336,10 @@
                IF ( NSUM0 .GE. NLIM ) THEN
                   DENOM = ASUM0 / DENOM
                   B( IX, IY ) = NUM_DTO<T>( DENOM )
-                  IF ( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF ( .NOT. NUM_WASOK() ) THEN
                      B( IX, IY ) = VAL__BAD<T>
                      NBAD = NBAD + 1
-                     NUM_ERROR = SAI__OK
+                     CALL NUM_CLEARERR()
                   END IF
 
 *  It is bad if the NLIM criterion is not met. Note that bad pixels are
