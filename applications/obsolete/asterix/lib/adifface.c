@@ -1208,7 +1208,7 @@ F77_SUBROUTINE(adifn(unmap))( INTEGER(id), POINTER(vptr), INTEGER(status) )
 
   _ERR_IN("ADI_UNMAP");
 
-  adix_unmap_n( (ADIobj) *id, NULL, 0, (void *) vptr, status );
+  adix_unmap_n( (ADIobj) *id, NULL, 0, (void *) *vptr, status );
 
   _ERR_OUT;
   }

@@ -3456,10 +3456,10 @@ void adix_print( ADIobj stream, ADIobj id, int level, ADIlogical value_only,
     ADIobj      hid = _han_id(id);
 
     if ( ! value_only )
-      ADIstrmPrintf( stream, "< {%d:%d->%d:%d}, nref=%d, ", status,
+      ADIstrmPrintf( stream, "< {%d:%d->%d:%d}, nref=%d, set=%d, ", status,
 	    _ID_IBLK(id), _ID_SLOT(id),
 	    _ID_IBLK(hid), _ID_SLOT(hid),
-	    _han_ref(id) );
+	    _han_ref(id), _han_set(id) );
 
     if ( _krnl_q(hid) )
       adix_print( stream, hid, level+1, ADI__false, status );
