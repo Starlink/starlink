@@ -157,8 +157,8 @@
 
             ASP = REAL( PBOX(4) - PBOX(2) )/REAL( PBOX(3) - PBOX(1) )
             IF( ASP .GT. 1.0 ) THEN
-               DELTA = 0.5*( ( GBOX(4) - GBOX(2) )/ASP - 
-     :                       ( GBOX(3) - GBOX(1) ) )
+               DELTA = 0.5*( ( GBOX(3) - GBOX(1) ) -
+     :                       ( GBOX(4) - GBOX(2) )/ASP )
                GBOX(3) = GBOX(3) - DELTA
                GBOX(1) = GBOX(1) + DELTA
             ELSE
