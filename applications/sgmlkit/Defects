@@ -3,6 +3,9 @@
 # If it's not in here, I don't plan to do anything about it (which
 # probably means I've forgotten about it, and you should remind
 # me). 
+#
+# These are in no particular order, and some have a higher priority
+# than others.
 
 ### General DTD
 
@@ -37,6 +40,9 @@ allow `&' in codeprologue (prog meeting)
 programcode content modifications (Mark, and prog meeting)
 	Use SST elements.
 
+func opener, notelist (Mark, 3/5 Aug and Norman, 4 Aug)
+	Embedding comments in the body of a routine
+
 shortrefs in programcode DTD (Mark)
 	Shortrefs to make lists in prologues tidier.  Nice, but I'm
 	always nervous of having too much cleverness in this area,
@@ -48,7 +54,7 @@ AUTHORREF element (Mark, 14 Sept)
 	`The AUTHORLIST element is a nasty example of SGML forcing one
 	to write something which one otherwise wouldn't want to'.
 
-DL/DD/DT/BLOCKQUOTE in prologues (Mark, 14 Sept)
+DL/DD/DT/BLOCKQUOTE/VERBATIM/M in prologues (Mark, 14 Sept)
 	Easy, I think.
 
 
@@ -77,6 +83,15 @@ LaTeX pages are smaller than standard, and different positioning (Mark)
 
 KBD in VERBATIM doesn't work (Mark)
 
+
+### General
+
+Does the Makefile work on all platforms? (Mark, 16 Aug)
+	I havn't checked this (and the Tru64 make is so crappy that
+	the answer is almost certainly `no'), but the point is moot at
+	the moment, as Jade builds only on the Linux boxes.  By the
+	time this becomes live, we might be running Linux on the
+	alphas, too!
 
 
 $Revision$ $Date$
