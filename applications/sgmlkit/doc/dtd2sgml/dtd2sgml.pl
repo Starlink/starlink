@@ -3,6 +3,8 @@
 # Parse a DTD, and produce a
 # representation of the DTD as an SGML document.
 #
+# $Id$
+#
 # The DTD parsing is done by Earl Hood's perlSGML package
 # (http://www.oac.uci.edu/indiv/ehood/perlSGML.html).
 #    
