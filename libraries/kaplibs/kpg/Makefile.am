@@ -418,34 +418,34 @@ KPG_ADAM_N_GEN = kpg1_dara.gn
 
 .gn.f:
 	cp $< $(<:.gn=.gen)
-	$(GENERIC)  -t n $(<:.gn=.gen)
+	$(FGENERIC)  -t n $(<:.gn=.gen)
 	rm $(<:.gn=.gen)
 
 
 .gdr.f:
 	cp $< $(<:.gdr=.gen)
-	$(GENERIC)  -t dr $(<:.gdr=.gen)
+	$(FGENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
 
 .gxl.f:
 	cp $< $(<:.gxl=.gen)
-	$(GENERIC)  -t bcdirwWB $(<:.gxl=.gen)
+	$(FGENERIC)  -t bcdirwWB $(<:.gxl=.gen)
 	rm $(<:.gxl=.gen)
 
 .gnxd.f:
 	cp $< $(<:.gnxd=.gen)
-	$(GENERIC)  -t bBirwW $(<:.gnxd=.gen)
+	$(FGENERIC)  -t bBirwW $(<:.gnxd=.gen)
 	rm $(<:.gnxd=.gen)
 
 .gnxb.f:
 	cp $< $(<:.gnxb=.gen)
-	$(GENERIC)  -t dirwW $(<:.gnxb=.gen)
+	$(FGENERIC)  -t dirwW $(<:.gnxb=.gen)
 	rm $(<:.gnxb=.gen)
 
 .gdir.f:
-	$(GENERIC) $(<)
+	$(FGENERIC) $(<)
 
 .gbdirw.f:
-	$(GENERIC) $(<)
+	$(FGENERIC) $(<)
 
 AM_FCFLAGS = -I../ira 

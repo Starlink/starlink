@@ -42,4 +42,4 @@ fts1_sdscf.f
 #  Run generic to get dp, integer, logical and real types.
 GFLAGS = dilr
 .gen.f:
-	$(GENERIC)  -t $(GFLAGS) $<
+	$(FGENERIC)  -t $(GFLAGS) $<
