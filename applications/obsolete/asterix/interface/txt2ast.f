@@ -79,6 +79,7 @@
 *     21 Feb 94 : V1.7-1  Fixed bug uncovered by last change in handling
 *                         non-scalar widths (DJA)
 *     31 Jul 94 : V1.7-2  Added LOLIM/UPLIM option for DATA values (ISH)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -204,7 +205,7 @@
 *    Version :
 *
       CHARACTER*30        VERSION
-         PARAMETER        ( VERSION = 'IMPORT Version 1.7-2' )
+         PARAMETER        ( VERSION = 'IMPORT Version 1.8-0' )
 *-
 
 *    Check status
@@ -1553,7 +1554,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get SORT keyword from user
-      CALL PAR_GET0L( 'SORT', SORT, STATUS )
+      CALL USI_GET0L( 'SORT', SORT, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF ( NAXES .EQ. 0 ) THEN
@@ -1704,8 +1705,8 @@
 *    Create components with dimensions calculated
       IF ( USE_DATA ) THEN
         IF ( PRIM ) THEN
-          CALL DAT_CREAT( 'OUT', TYPE, NDIM, DIMS, STATUS )
-          CALL DAT_ASSOC( 'OUT', 'WRITE', OLOC, STATUS )
+          CALL USI_DCREAT( 'OUT', TYPE, NDIM, DIMS, STATUS )
+          CALL USI_DASSOC( 'OUT', 'WRITE', OLOC, STATUS )
           CALL DAT_MAPR( OLOC, 'WRITE', NDIM, DIMS, PTR_DATA, STATUS )
           CALL USI_STORE( OLOC, 'O', STATUS )
         ELSE
