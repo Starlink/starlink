@@ -377,6 +377,61 @@ sub astdomain {
     return $self->{ASTDOMAIN};
 }
 
+#+ <routinename>astconvert
+#
+# <description>Converts a coordinate pair to or from the SKY domain.
+# Must follow an astinformation() method call.
+#
+# <argumentlist>
+#   <parameter>
+#     <name>arg1
+#     <type>double
+#     <description>If the third parameter is false, then this must be a 
+#       right-ascention in decimal degrees.  If the third parameter is false,
+#       then it is the first parameter in the domain specified by the
+#       AST information.
+#   <parameter>
+#     <name>arg2
+#     <type>double
+#     <description>If the third parameter is false, then this must be a 
+#       declination in decimal degrees.  If the third parameter is false,
+#       then it is the second parameter in the domain specified by the
+#       AST information.
+#   <parameter>
+#     <name>tosky
+#     <type>boolean
+#     <description>If true, then the coordinates are in the domain specified
+#       by the AST information and we are to convert the coordinates
+#       into the SKY domain.  If false, it's the other way around.
+#
+# <returnvalue type=arrayref>Reference to a 2-element array containing
+# the converted coordinates.  Return undef on error.
+#-
+sub astconvert {
+    my $self = shift;
+    my ($arg1, $arg2, $tosky) = @_;
+
+    defined($tosky) || return undef; # wrong number of arguments
+    $self->send_command_to_slave_ ("ast convert", $arg1, $arg2,
+				   ($tosky ? "tosky" : "fromsky"));
+
+    $self->status_ok() || return undef;
+
+    # The response from this is a single further line containing two
+    # doubles.  Construct an array containing these two doubles, and
+    # return a reference to it.
+    my $RDR = $self->{SLAVEREADER};
+    my $line = <$RDR>;
+    my @vals = split (' ', $line);
+    # Check that there are precisely two values in the line.
+    defined($vals[1]) || return undef;
+    if ($#vals > 1) {
+	# silently truncate
+	$#vals = 1;
+    }
+    return \@vals;
+}
+
 #+
 # <routinename>query
 # <description>Perform the query which has been set up by calls to other

@@ -34,6 +34,20 @@ AST NONE
      501 Syntax error -- unrecognised keyword
      504 Unrecognised domain
 
+AST CONVERT <double> <double> TOSKY|FROMSKY
+	  [ Convert coordinates to or from Sky coordinates.
+	    This must have been preceded by a `AST FRAMESET' command.
+	    Sky coordinates are in decimal degrees, and device
+	    coordinates are in whichever domain was specified in the
+	    preceding `AST FRAMESET' command.  This has nothing much to do
+	    with catalogue searching, but it's the sort of thing one
+	    needs to do when manipulating catalogues, and it's easy to 
+	    implement here. ]
+  s: 210 Result follows.
+         Next line contains two doubles containing the result.
+  e: 501 Wrong number or type of parameters
+     503 No preceding AST FRAMESET command
+
 CATCONFIG string
 	 [ Set the URL of a catalogue configuration file ]
   s: 250 Parameter set successfully

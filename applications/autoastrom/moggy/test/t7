@@ -193,6 +193,9 @@ ast frameset pixel
     End WinMap
     End FrameSet
 .
+ast convert 1274.51 2129.66 tosky
+ast convert 261.713 74.4153 fromsky
+ast convert 261.712 74.4152 fromsky
 coord1 1 1
 coord2 2048 4097
 catconfig file://$PWD/local.config

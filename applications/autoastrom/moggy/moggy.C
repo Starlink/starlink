@@ -64,6 +64,8 @@ verbosities verbosity = normal;
 
 void dumpCatalogue (ostream& o);
 string processCommand (CommandParse *t, istream& cin, bool& keepGoing);
+string processAstCommand (vector<string>& arglist, istream&, AstHandler*& ast)
+    throw (MoggyException);
 void Usage ();
 
 int main (int argc, char **argv)
@@ -186,7 +188,7 @@ int main (int argc, char **argv)
 // which generate multi-line responses (just CONF and SEARCH) do their
 // own responses to cout, and return an empty string.
 //
-// When it is time to exit, set parameter keepGoing to true.  This is
+// When it is time to exit, set parameter keepGoing to false.  This is
 // taken as a successful exit -- any errors should raise exceptions.
 // Since this is the routine where all this program's processing
 // happens, we won't give an exception-specification, but assume it
@@ -207,78 +209,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	break;
 
       case CommandParse::AST:
-	if (arglist.size() == 2)
-	{
-	    string upar = arglist[1];
-	    Util::uppercaseString(upar);
-	    if (upar == "NONE")
-	    {
-		// OK
-		if (ast != 0)
-		{
-		    delete ast;
-		    ast = 0;
-		}
-		response = "250 Frameset deleted";
-	    }
-	    else
-		response = "501 Wrong number or type of parameters";
-	}
-	else if (arglist.size() == 3)
-	{
-	    string upar = arglist[1];
-	    Util::uppercaseString(upar);
-	    if (upar == "FRAMESET")
-	    {
-		// OK.  First delete any old AST information
-		if (ast != 0)
-		    delete ast;
-
-		// Send back the reply requesting the frameset
-		cout << "350 Command accepted -- send frameset"
-		     << crlf << flush;
-
-		if (verbosity > normal)
-		    cerr << "Moggy:dialogue:Response:"
-			 << "350 Command accepted -- send frameset" << endl;
-
-		// ... and read the frameset
-
-		vector<string> frameset;
-		string astlinein;
-		while (getline (instream, astlinein))
-		{
-		    // top and tail whitespace from the string
-		    string::size_type startpos
-			= astlinein.find_first_not_of (" \t\r\n");
-		    string::size_type endpos
-			= astlinein.find_last_not_of (" \t\n\r");
-
-		    if (verbosity > normal)
-			cerr << "Moggy:dialogue:Input   :"
-			     << astlinein << endl;
-
-		    if (startpos < astlinein.npos)
-		    {
-			// The string is not solely whitespace
-			string astline = astlinein.substr (startpos,
-							   endpos-startpos+1);
-
-			if (astline == ".")
-			    break;
-
-			frameset.push_back(astline);
-		    }
-		}
-
-		ast = new AstHandler (frameset, arglist[2]);
-		response = "250 Frameset created successfully";
-	    }
-	    else
-		response = "501 Syntax error -- unrecognised keyword";
-	}
-	else
-	    response = "501 Syntax error -- wrong number of parameters";
+	response = processAstCommand (arglist, instream, ast);
 	break;
 
       case CommandParse::CATCONFIG:
@@ -845,6 +776,140 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
     return response;
 }
 
+
+string processAstCommand (vector<string>& arglist,
+			  istream& instream,
+			  AstHandler*& ast)
+    throw (MoggyException)
+{
+    string response;
+    enum
+    {
+	cmd_none, cmd_frameset, cmd_convert, cmd_null
+    } subcmd = cmd_null;
+    string upar = arglist[1];
+    Util::uppercaseString(upar);
+    unsigned int reqargs = 0; // number of elements required in arglist
+    if (upar == "NONE")
+    {
+	subcmd = cmd_none;
+	reqargs = 2;
+    }
+    else if (upar == "FRAMESET")
+    {
+	subcmd = cmd_frameset;
+	reqargs = 3;
+    }
+    else if (upar == "CONVERT")
+    {
+	subcmd = cmd_convert;
+	reqargs = 5;
+    }
+
+    if (subcmd == cmd_null || arglist.size() != reqargs)
+	response = "501 Wrong number or type of parameters";
+    else
+	switch (subcmd)
+	{
+	  case cmd_none:
+	    if (ast != 0)
+	    {
+		delete ast;
+		ast = 0;
+	    }
+	    response = "250 Frameset deleted";
+	    break;
+
+	  case cmd_frameset:
+	      {
+		  if (ast != 0)
+		      delete ast;
+
+		  // Send back the reply requesting the frameset
+		  cout << "350 Command accepted -- send frameset"
+		       << crlf << flush;
+
+		  if (verbosity > normal)
+		      cerr << "Moggy:dialogue:Response:"
+			   << "350 Command accepted -- send frameset"
+			   << endl;
+
+		  // ... and read the frameset
+
+		  vector<string> frameset;
+		  string astlinein;
+		  while (getline (instream, astlinein))
+		  {
+		      // top and tail whitespace from the string
+		      string::size_type startpos
+			  = astlinein.find_first_not_of (" \t\r\n");
+		      string::size_type endpos
+			  = astlinein.find_last_not_of (" \t\n\r");
+
+		      if (verbosity > normal)
+			  cerr << "Moggy:dialogue:Input   :"
+			       << astlinein << endl;
+
+		      if (startpos < astlinein.npos)
+		      {
+			  // The string is not solely whitespace
+			  string astline = astlinein.substr
+			      (startpos, endpos-startpos+1);
+
+			  if (astline == ".")
+			      break;
+
+			  frameset.push_back(astline);
+		      }
+		  }
+
+		  ast = new AstHandler (frameset, arglist[2]);
+		  response = "250 Frameset created successfully";
+	      }
+	      break;
+
+	  case cmd_convert:
+	    if (ast)
+	    {
+		double arg1, arg2;
+		bool convok = 
+		    Util::stringToDouble (arglist[2], arg1)
+		    && Util::stringToDouble (arglist[3], arg2);
+		string direction = arglist[4];
+		bool toSky = true;
+		Util::uppercaseString (direction);
+		if (direction == "TOSKY")
+		    toSky = true;
+		else if (direction == "FROMSKY")
+		    toSky = false;
+		else
+		    convok = false;
+
+		if (convok)
+		{
+		    double res1, res2;
+		    if (toSky)
+			ast->transToSky (arg1, arg2, res1, res2);
+		    else
+			ast->transFromSky (arg1, arg2, res1, res2);
+		    cout << "210 Conversion follows" << crlf << flush;
+		    cout << res1 << ' ' << res2 << crlf << flush;
+		    response = "";
+		}
+		else
+		    response = "501 Wrong number or type of parameters";
+	    }
+	    else
+		response = "503 No preceding AST FRAMESET command";
+
+	    break;
+
+	  default:
+	    throw MoggyException ("Impossible command in AST");
+	}
+
+    return response;
+}
 
 
 void dumpCatalogue (ostream& o)

@@ -350,6 +350,17 @@ print REPORT "  Searchtype : ", $felix->searchtype(), "\n";
 print REPORT "  MaxRows    : ", $felix->maxrow(), "\n";
 print REPORT "  Status     : ", ($felix->status_ok() ? "OK" : "BAD"), "\n";
 
+print REPORT "  Conversions:\n";
+$convref = $felix->astconvert(1274.51, 2129.66, 1);
+printf REPORT "    (%s, %s) --> (%f, %f)sky\n",
+	1274.51, 2129.66, $convref->[0], $convref->[1];
+$convref = $felix->astconvert(261.713, 74.4153, 0);
+printf REPORT "    (%s, %s)sky --> (%f, %f)\n",
+	261.713, 74.4153, $convref->[0], $convref->[1];
+$convref = $felix->astconvert(261.712, 74.4152, 0);
+printf REPORT "    (%s, %s)sky --> (%f, %f)\n",
+	261.712, 74.4152, $convref->[0], $convref->[1];
+
 $felix->query() || die "Query to dummy\@home failed";
 
 $colref = $felix->resultcolumns();
