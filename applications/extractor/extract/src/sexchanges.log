@@ -5,11 +5,11 @@
 *
 *       Part of:        SExtractor
 *
-*       Author:         E. BERTIN, IAP, Leiden observatory & ESO
+*       Author:         E. BERTIN (IAP)
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    11/08/98
+*       Last modify:    13/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -230,3 +230,25 @@ EB      11/08/98        photom.c        Purify warning fixed in
                         scan.c          Purify warning fixed in scanimage().
                                         BLANKing procedure of CLEANed pixels
                                         fixed. Memory leaks fixed.
+
+EB      18/11/98        -               New BACK_TYPE, BACK_VALUE, and
+                                        THRESH_TYPE config parameters.
+                        flag.c          Fixed initialization bug in FLAG_TYPE
+                                        MAX mode (thanks to T.Erben).
+
+EB      20/11/98        back.c          New BACK_FILTTHRESH parameter.
+
+EB      23/11/98        prefs.c
+                        weight.c        Quick fix of MAP_RMS measurement mode.
+
+EB      26/11/98        -               New key->alloc flag to distinguish between
+                                        constant and dynamic pointers.
+
+EB      28/11/98        -               lint warnings fixed.
+
+EB      29/11/98        assoc.c         New ASSOC_TYPE NEAREST option.
+
+EB      28/12/98        catout.c        Added dependency between flux_auto and flux_radius
+
+EB      13/01/99        endobject()     Fixed numbering problem in SEGMENTATION maps when
+                                        CLEAN is N.

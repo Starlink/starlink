@@ -9,7 +9,7 @@
 *
 *	Contents:	Implementation of Kohonen's Self Organizing Map (V3.0).
 *
-*	Last modify:	28/05/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -32,8 +32,8 @@ best-fitting prototype.
 void	som_phot(somstruct *som, float back, float backnoise, float gain,
 		float dx0, float dy0, float *vector, float clip)
   {
-   float	err, errmin, *xnt, *xn0, scale;
-   int		i,j,n,nd,jmin,jmin0, *nx, *mul, pos;
+   float	err, errmin, *xnt;
+   int		i,j,nd,jmin, *nx, *mul;
 
   nd = som->neurdim;
 /* First we compute the error map */
@@ -156,7 +156,7 @@ float	som_err(somstruct *som, float dist, int flags)
   {
    static float	dx[SOM_MAXDIM];
    double	s,sx,sxx,sy,syy,sxy,b,err,ds;
-   float	*psf, *psft, *dxt, *wt,*xt,*yt,xi,yi,wi,wxi,wyi, diff,dd;	
+   float	*psft, *dxt, *wt,*xt,*yt,xi,yi,wi,wxi,wyi, diff,dd;	
    int		i,j,k,n, nd, *nx, *mult, ix, pos,post, nima;
 
 /* Is the requested position lying on a node? */

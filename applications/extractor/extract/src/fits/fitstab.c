@@ -9,7 +9,7 @@
 *
 *	Contents:	general functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	25/04/97
+*	Last modify:	30/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -283,6 +283,7 @@ void	free_tab(tabstruct *tab)
   free(tab->headbuf);
   free(tab->bodybuf);
   remove_keys(tab);
+
   free(tab);
 
   return;
@@ -349,7 +350,7 @@ INPUT	Pointer to the catalog,
 OUTPUT	RETURN_OK if everything went as expected, and RETURN_ERROR otherwise.
 NOTES	If tabname = "", the last table from the list is removed.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	15/01/97
+VERSION	30/11/98
  ***/
 int	remove_tab(catstruct *cat, char *tabname, int seg)
 
@@ -402,11 +403,13 @@ int	remove_tab(catstruct *cat, char *tabname, int seg)
 
   if (seg)
 /*--update status for each table segment*/
-  for (tab=prevtab;!tab->nseg; tab = tab->prevtab);
-  for (nexttab=tab->nexttab,i=2;!nexttab->nseg; nexttab=nexttab->nexttab,i++);
-    nexttab->seg = i;
-  tab->nseg = i;
-  tab->seg = 1;
+    {
+    for (tab=prevtab;!tab->nseg; tab = tab->prevtab);
+    for (nexttab=tab->nexttab,i=2;!nexttab->nseg;nexttab=nexttab->nexttab,i++);
+      nexttab->seg = i;
+    tab->nseg = i;
+    tab->seg = 1;
+    }
 
   return RETURN_OK;  
   }

@@ -9,7 +9,7 @@
 *
 *	Contents:	header structure and templates for catalog data.
 *
-*	Last modify:	22/08/96
+*	Last modify:	18/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -33,7 +33,6 @@ paramstruct	extpar[] = {
 */
 	{"SEXCONFF", 0, sex.prefs_name, "%-18s", H_STRING},
 	{"SEXDETT ", 0, &prefs.detect_type, "%-18s", H_KEY},
-	{"SEXTHLDT", 0, &prefs.threshold_type, "-18s", H_KEY},
 	{"SEXTHLD ", T_DOUBLE, &prefs.threshold, "%-13G", H_EXPO},
 	{"XMINAREA", T_LONG, &prefs.ext_minarea, "%5d", H_INT},
 	{"SEXCONV ", T_LONG, &prefs.filter_flag, "%1s", H_BOOL},

@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden Sterrewacht.
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	functions dealing with retinal analysis of the data.
 *
-*	Last modify:	08/12/96
+*	Last modify:	28/08/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -22,6 +22,7 @@
 #include	"globals.h"
 #include	"fitscat.h"
 #include	"bpro.h"
+#include	"image.h"
 #include	"retina.h"
 
 
@@ -68,7 +69,6 @@ retistruct	*getretina(char *filename)
    retistruct	*retina;
    catstruct	*fcat;
    tabstruct	*ftab;
-   char		str[MAXCHAR];
    int		ival;
 
   QMALLOC(retina, retistruct, 1);

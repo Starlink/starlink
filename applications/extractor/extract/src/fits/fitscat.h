@@ -9,7 +9,7 @@
 *
 *	Contents:	Simplified versin of the LDACTools: main include file
 *
-*	Last modify:	16/01/98
+*	Last modify:	26/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -84,6 +84,7 @@ typedef struct structkey
   struct structkey	*prevkey;	/* previous key within the chain */
   struct structkey	*nextkey;	/* next key within the chain */
   struct structtab	*tab;		/* (original) parent tab */
+  int		allocflag;		/* true if ptr dynamically allocated */
   }		keystruct;
 
 /*------------------------------- catalog  ---------------------------------*/

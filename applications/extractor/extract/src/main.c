@@ -87,6 +87,7 @@ int	main(int argc, char *argv[])
     }
 
   readprefs(prefs.prefs_name, argkey, argval, narg);
+
   free(argkey);
   free(argval);
 

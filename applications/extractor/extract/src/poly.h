@@ -9,7 +9,7 @@
 *
 *	Contents:	Include for poly.c
 *
-*	Last modify:	16/07/98
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -36,10 +36,10 @@ typedef struct poly
 
 extern polystruct	*poly_init(int *dim, int ndim);
 
-extern double		poly_fit(polystruct *poly, double *x, double *y,
-				double *w, int ndata, double *extbasis),
-			poly_func(polystruct *poly, double *pos);
+extern double		poly_func(polystruct *poly, double *pos);
 
 extern void		cholsolve(double *a, double *b, int n),
-			poly_end(polystruct *poly);
+			poly_end(polystruct *poly),
+			poly_fit(polystruct *poly, double *x, double *y,
+				double *w, int ndata, double *extbasis);
 

@@ -9,7 +9,7 @@
 *
 *	Contents:	Handling of weight maps.
 *
-*	Last modify:	21/07/98
+*	Last modify:	23/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -137,7 +137,8 @@ void	rms_to_var(picstruct *wfield, PIXTYPE *data, int npix)
 
   datap = data;
   for (i=npix; i--; datap++)
-    *datap *= *datap;
+    if (*datap<BIG)
+      *datap *= *datap;
 
   return;
   }

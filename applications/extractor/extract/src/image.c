@@ -9,7 +9,7 @@
 *
 *	Contents:	Function related to image manipulations.
 *
-*	Last modify:	09/06/98
+*	Last modify:	06/01/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,13 +20,7 @@
 
 #include	"define.h"
 #include	"globals.h"
-
-
-#define	INTERPW		6	/* Interpolation function range (x) */
-#define	INTERPH		6	/* Interpolation function range (y) */
-
-#define	INTERPF(x)	(x==0.0?1.0:sin(PI*x)*sin(PI*x/3.0)/(PI*PI/3.0*x*x))
-				/* Lanczos approximation */
+#include	"image.h"
 
 static float	interpm[INTERPW*INTERPH];
 
@@ -247,7 +241,7 @@ void	addimage_center(picstruct *field, float *psf, int w,int h,
 			float x,float y, float amplitude)
   {
    PIXTYPE	*s,*s0, *dt,*dt0,*dt2;
-   float	*m, *psf2,
+   float	*m,
 		dx,dy, ddx0,ddx,ddy,sum, fy, mval;
    int		i,ix,iy, idmx,idmy, mx,my, xmin,ymin,xmin2,x0,y0,y2, w2,h2,
 		sw,sh, idx,idy;
@@ -455,4 +449,189 @@ void	pasteimage(picstruct *field, PIXTYPE *mask, int w,int h,
 
   return;
   }
+
+
+/****************************** vignet_resample ******************************/
+/*
+Scale and shift a small image through sinc interpolation.
+Image parts which lie outside boundaries are set to 0.
+*/
+int	vignet_resample(double *pix1, int w1, int h1,
+			double *pix2, int w2, int h2,
+			double dx, double dy, double step2)
+  {
+   double	*mask,*maskt, xc1,xc2,yc1,yc2, xs1,ys1, x1,y1, x,y, dxm,dym,
+		val,
+		*pix12, *pixin,*pixin0, *pixout,*pixout0;
+   int		i,j,k,n,t, *start,*startt, *nmask,*nmaskt,
+		ixs2,iys2, ix2,iy2, dix2,diy2, nx2,ny2, iys1a, ny1, hmw,hmh,
+		ix,iy, ix1,iy1;
+
+
+/* Initialize destination buffer to zero */
+  memset(pix2, 0, w2*h2*sizeof(double));
+
+  xc1 = (double)(w1/2);	/* Im1 center x-coord*/
+  xc2 = (double)(w2/2);	/* Im2 center x-coord*/
+  xs1 = xc1 + dx - xc2*step2;	/* Im1 start x-coord */
+  if ((int)xs1 >= w1)
+    return RETURN_ERROR;
+  ixs2 = 0;			/* Int part of Im2 start x-coord */
+  if (xs1<0.0)
+    {
+    dix2 = (int)(1-xs1/step2);
+/*-- Simply leave here if the images do not overlap in x */
+    if (dix2 >= w2)
+      return RETURN_ERROR;
+    ixs2 += dix2;
+    xs1 += dix2*step2;
+    }
+  nx2 = (int)((w1-1-xs1)/step2+1);/* nb of interpolated Im2 pixels along x */
+  if (nx2>(ix2=w2-ixs2))
+    nx2 = ix2;
+  if (!nx2)
+    return RETURN_ERROR;
+  yc1 = (double)(h1/2);	/* Im1 center y-coord */
+  yc2 = (double)(h2/2);	/* Im2 center y-coord */
+  ys1 = yc1 + dy - yc2*step2;	/* Im1 start y-coord */
+  if ((int)ys1 >= h1)
+    return RETURN_ERROR;
+  iys2 = 0;			/* Int part of Im2 start y-coord */
+  if (ys1<0.0)
+    {
+    diy2 = (int)(1-ys1/step2);
+/*-- Simply leave here if the images do not overlap in y */
+    if (diy2 >= h2)
+      return RETURN_ERROR;
+    iys2 += diy2;
+    ys1 += diy2*step2;
+    }
+  ny2 = (int)((h1-1-ys1)/step2+1);/* nb of interpolated Im2 pixels along y */
+  if (ny2>(iy2=h2-iys2))
+    ny2 = iy2;
+  if (!ny2)
+    return RETURN_ERROR;
+
+/* Set the yrange for the x-resampling with some margin for interpolation */
+  iys1a = (int)ys1;		/* Int part of Im1 start y-coord with margin */
+  hmh = INTERPH/2 - 1;		/* Interpolant start */
+  if (iys1a<0 || ((iys1a -= hmh)< 0))
+    iys1a = 0;
+  ny1 = (int)(ys1+ny2*step2)+INTERPW-hmh;	/* Interpolated Im1 y size */
+  if (ny1>h1)					/* with margin */
+    ny1 = h1;
+/* Express everything relative to the effective Im1 start (with margin) */
+  ny1 -= iys1a;
+  ys1 -= (double)iys1a;
+
+/* Allocate interpolant stuff for the x direction */
+  QMALLOC(mask, double, nx2*INTERPW);	/* Interpolation masks */
+  QMALLOC(nmask, int, nx2);		/* Interpolation mask sizes */
+  QMALLOC(start, int, nx2);		/* Int part of Im1 conv starts */
+/* Compute the local interpolant and data starting points in x */
+  hmw = INTERPW/2 - 1;
+  x1 = xs1;
+  maskt = mask;
+  nmaskt = nmask;
+  startt = start;
+  for (j=nx2; j--; x1+=step2)
+    {
+    ix = (ix1=(int)x1) - hmw;
+    dxm = ix1 - x1 - hmw;	/* starting point in the interpolation func */
+    if (ix < 0)
+      {
+      n = INTERPW+ix;
+      dxm -= (double)ix;
+      ix = 0;
+      }
+    else
+      n = INTERPW;
+    if (n>(t=w1-ix))
+      n=t;
+    *(startt++) = ix;
+    *(nmaskt++) = n;
+    for (x=dxm, i=n; i--; x+=1.0)
+      *(maskt++) = INTERPF(x);
+    }
+
+  QCALLOC(pix12, double, nx2*ny1);	/* Intermediary frame-buffer */
+
+/* Make the interpolation in x (this includes transposition) */
+  pixin0 = pix1+iys1a*w1;
+  pixout0 = pix12;
+  for (k=ny1; k--; pixin0+=w1, pixout0++)
+    {
+    maskt = mask;
+    nmaskt = nmask;
+    startt = start;
+    pixout = pixout0;
+    for (j=nx2; j--; pixout+=ny1)
+      {
+      pixin = pixin0+*(startt++);
+      val = 0.0; 
+      for (i=*(nmaskt++); i--;)
+        val += *(maskt++)**(pixin++);
+      *pixout = val;
+      }
+    }
+
+/* Reallocate interpolant stuff for the y direction */
+  QREALLOC(mask, double, ny2*INTERPH);	/* Interpolation masks */
+  QREALLOC(nmask, int, ny2);		/* Interpolation mask sizes */
+  QREALLOC(start, int, ny2);		/* Int part of Im1 conv starts */
+
+/* Compute the local interpolant and data starting points in y */
+  hmh = INTERPH/2 - 1;
+  y1 = ys1;
+  maskt = mask;
+  nmaskt = nmask;
+  startt = start;
+  for (j=ny2; j--; y1+=step2)
+    {
+    iy = (iy1=(int)y1) - hmh;
+    dym = iy1 - y1 - hmh;	/* starting point in the interpolation func */
+    if (iy < 0)
+      {
+      n = INTERPH+iy;
+      dym -= (double)iy;
+      iy = 0;
+      }
+    else
+      n = INTERPH;
+    if (n>(t=ny1-iy))
+      n=t;
+    *(startt++) = iy;
+    *(nmaskt++) = n;
+    for (y=dym, i=n; i--; y+=1.0)
+      *(maskt++) = INTERPF(y);
+    }
+
+/* Make the interpolation in y  and transpose once again */
+  pixin0 = pix12;
+  pixout0 = pix2+ixs2+iys2*w2;
+  for (k=nx2; k--; pixin0+=ny1, pixout0++)
+    {
+    maskt = mask;
+    nmaskt = nmask;
+    startt = start;
+    pixout = pixout0;
+    for (j=ny2; j--; pixout+=w2)
+      {
+      pixin = pixin0+*(startt++);
+      val = 0.0; 
+      for (i=*(nmaskt++); i--;)
+        val += *(maskt++)**(pixin++);
+      *pixout = val;
+      }
+    }
+
+/* Free memory */
+  free(pix12);
+  free(mask);
+  free(nmask);
+  free(start);
+
+  return RETURN_OK;
+  }
+
 
