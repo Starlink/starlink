@@ -1869,6 +1869,8 @@ c      LOGICAL VOK,QOK
         DIMS(2)=I_NY
 
 *  map data and get axis values
+	print *,'map data'
+        call flush(6)
         CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
         CALL DYN_MAPR(1,NVAL,I_DPTR,STATUS)
         CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR),STATUS)
@@ -1877,9 +1879,13 @@ c      LOGICAL VOK,QOK
 
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
+	print *,'create x-axis'
+        call flush(6)
         CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
+	print *,'create y-axis'
+        call flush(6)
         CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
 C        CALL BDI_AXCHK( IFID, 1, 'Width', WOK, STATUS )
 C        IF (WOK) THEN
@@ -1899,6 +1905,8 @@ C        ENDIF
 *  get variance and quality if there
         CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
         IF (I_VOK) THEN
+	print *,'map variance'
+        call flush(6)
           CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR,STATUS)
           CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR),STATUS)
@@ -1908,6 +1916,8 @@ C        ENDIF
 
         CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
+	print *,'map quality'
+        call flush(6)
           CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
@@ -1921,6 +1931,8 @@ C        ENDIF
         ENDIF
 
 *  get min and max
+	print *,'get min/max'
+        call flush(6)
         CALL IMG_MINMAX(STATUS)
 
 *  get top level text

@@ -124,10 +124,14 @@
         ENDIF
         CALL USI_GET0L('DISP',DISP,STATUS)
 
+	print *,'attaching image context'
+	call flush(6)
         CALL GCB_ATTACH('IMAGE',STATUS)
 
 *  if new session create caches and group for ARD text
         IF (NEW) THEN
+	print *,'create gcb cache and ard group'
+	call flush(6)
           CALL GCB_CRECACHE(I_CACHE,STATUS)
           I_CACHE_1D=0
           CALL ARX_OPEN('WRITE',I_ARD_ID,STATUS)
@@ -138,6 +142,8 @@
         IF (GCB) THEN
           CALL GCB_FLOAD(IFID,STATUS)
         ELSE
+	print *,'clear gcb'
+	call flush(6)
           CALL GCB_CLEAR(STATUS)
           CALL GCB_SETL('PIX_FLAG',.TRUE.,STATUS)
         ENDIF
