@@ -99,8 +99,9 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
-
       CHARACTER*20		ITEM
+
+      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model object dims
 
       LOGICAL			PRIM			! Object is primitive?
       LOGICAL			OK			! Object exists/ok?
@@ -113,7 +114,8 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Ensure objects satisfy mapping requirement
-      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC, STATUS )
+      CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC,
+     :                 BDIM, DIMS, STATUS )
 
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN

@@ -172,7 +172,7 @@
 
 *      The best chance the primary data array
           CALL BDI1_CFIND( MDID, ARGS(2), 'Data', .FALSE.,
-     :                     ALOC, STATUS )
+     :                     ALOC, NDIM, DIMS, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_REP( 'BDI1_SETLNK', 'Unable to find primary '/
      :                             /'data array in input', STATUS )

@@ -1,4 +1,5 @@
-      SUBROUTINE BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC, STATUS )
+      SUBROUTINE BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC,
+     :                       CNDIM, CDIMS, STATUS )
 *+
 *  Name:
 *     BDI1_CFIND
@@ -10,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC, STATUS )
+*     CALL BDI1_CFIND( MID, HID, ITEM, CREATE, CLOC, CNDIM, CDIMS, STATUS )
 
 *  Description:
 *     Locate HDS component for a given item, creating if required. If the
@@ -29,6 +30,14 @@
 *     CLOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locator to object matching item. If the item does not exist
 *        the CLOC is set to the symbolic value DAT__NOLOC
+*     CNDIM = INTEGER (returned)
+*        The dimensionality of the object according to the data model. Note
+*        that this not necessarily the dimensionality of the actual HDS
+*        component
+*     CDIMS[] = INTEGER (returned)
+*        The dimensions of the object according to the data model. Note
+*        that these are not necessarily the dimensions of the actual HDS
+*        component
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -101,6 +110,7 @@
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC)	CLOC
+      INTEGER			CNDIM, CDIMS(*)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -151,11 +161,14 @@
 *  Top-level data array
       IF ( ITEM .EQ. 'Data' ) THEN
 
+*    Define dimensions
+        CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
+
 *    Should create structure array object depending on presence
 *    of magic flag
         IF ( ISBIND ) THEN
-          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, '_'//TYPE, NDIM,
-     :                      DIMS, THERE, CLOC, STATUS )
+          CALL BDI1_CFIND1( LOC, 'DATA_ARRAY', CREATE, '_'//TYPE, CNDIM,
+     :                      CDIMS, THERE, CLOC, STATUS )
         ELSE
           CALL DAT_CLONE( LOC, CLOC, STATUS )
         END IF
@@ -175,11 +188,17 @@
 *  Top-level variance
       ELSE IF ( ITEM .EQ. 'Variance' ) THEN
 
-        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, NDIM,
-     :                    DIMS, THERE, CLOC, STATUS )
+*    Define dimensions
+        CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
+
+        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, CNDIM,
+     :                    CDIMS, THERE, CLOC, STATUS )
 
 *  Axis container
       ELSE IF ( ITEM .EQ. 'Axes' ) THEN
+
+*    Define dimensions
+        CALL BDI1_CFIND0( 1, NDIM, CNDIM, CDIMS )
 
         CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, 'AXIS', 1,
      :                    NDIM, THERE, CLOC, STATUS )
@@ -187,6 +206,9 @@
 *  Top-level text components whose names are the same as their HDS counterparts
       ELSE IF ( (ITEM.EQ.'Units') .OR. (ITEM.EQ.'Label') .OR.
      :          (ITEM.EQ.'Title') ) THEN
+
+*    Define dimensions
+        CALL BDI1_CFIND0( 0, 0, CNDIM, CDIMS )
 
 *    Does it exist? If not, and we can create it, do so
         CALL DAT_THERE( LOC, ITEM, THERE, STATUS )
@@ -206,6 +228,9 @@
 
 *  Asymmetric data errors
       ELSE IF ( (ITEM .EQ. 'LoError') .OR. (ITEM .EQ. 'HiError') ) THEN
+
+*    Define dimensions
+        CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
 *    Look for container
         CALL BDI1_CFIND1( LOC, 'ERROR', CREATE, 'ERROR', 0, 0,
@@ -243,6 +268,9 @@
 *      Free the axis structure array
           CALL DAT_ANNUL( CLOC, STATUS )
 
+*      Define default dimensions for scalars
+          CALL BDI1_CFIND0( 0, 0, CNDIM, CDIMS )
+
 *      Switch depending on the axis item required
           IF ( ITEM(8:) .EQ. 'Units' ) THEN
 
@@ -261,20 +289,32 @@
 
           ELSE IF ( ITEM(8:) .EQ. 'Data' ) THEN
 
+*        Define dimensions
+            CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
+
             CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, '_'//TYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
+
+*        Define dimensions
+            CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
             CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, '_'//TYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'LoWidth' ) THEN
 
+*        Define dimensions
+            CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
+
             CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, '_'//TYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'HiWidth' ) THEN
+
+*        Define dimensions
+            CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
             CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, '_'//TYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
@@ -301,12 +341,18 @@
 *      The quality mask
           IF ( ITEM .EQ. 'QualityMask' ) THEN
 
+*        Define dimensions
+            CALL BDI1_CFIND0( 0, 0, CNDIM, CDIMS )
+
 *        Does bad bits mask exist?
             CALL BDI1_CFIND1( QLOC, 'BADBITS', CREATE, '_UBYTE', 0, 0,
      :                        THERE, CLOC, STATUS )
 
 *      The quality array
           ELSE IF ( ITEM .EQ. 'Quality' ) THEN
+
+*        Define dimensions
+            CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
 *        Does quality array exist?
             CALL BDI1_CFIND1( QLOC, 'QUALITY', CREATE, '_UBYTE', NDIM,
@@ -338,8 +384,83 @@
       END
 
 
+      SUBROUTINE BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
+*+
+*  Name:
+*     BDI1_CFIND0
+
+*  Purpose:
+*     Copy dimensions array and dimensionality
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL BDI1_CFIND0(  NDIM, DIMS, CNDIM, CDIMS )
+
+*  Description:
+*     Locate HDS component for a given item, creating if required. If the
+*     object does not exist and creation is not allowed then CLOC is set
+*     to a flag value.
+
+*  Arguments:
+*     NDIM = INTEGER (given)
+*        The dimensionality
+*     DIMS[] = INTEGER (given)
+*        The dimensions
+*     CNDIM = INTEGER (returned)
+*        Exported copy of NDIM
+*     CDIMS[] = INTEGER (returned)
+*        Exported copy of DIMS
+
+*  References:
+*     BDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/bdi.html
+
+*  Keywords:
+*     package:bdi, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     10 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Arguments Given:
+      INTEGER			NDIM, DIMS(*)
+
+*  Arguments Returned:
+      INTEGER			CNDIM, CDIMS(*)
+
+*  Local Variables:
+      INTEGER			I			! Loop over dimensions
+*.
+
+*  Export dimensions
+      CNDIM = NDIM
+      DO I = 1, NDIM
+        CDIMS(I) = DIMS(I)
+      END DO
+
+      END
+
+
+
       SUBROUTINE BDI1_CFIND1( LOC, NAME, CREATE, TYPE, NDIM, DIMS,
-     :                           THERE, CLOC, STATUS )
+     :                        THERE, CLOC, STATUS )
 *+
 *  Name:
 *     BDI1_CFIND

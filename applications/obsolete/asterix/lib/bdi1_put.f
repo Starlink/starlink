@@ -106,6 +106,7 @@
       DOUBLE PRECISION		SCWID			! Scalar width
       DOUBLE PRECISION		SPARR(2)		! Spaced array data
 
+      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model dimensions
       INTEGER			NELM			! # data elements
       INTEGER			PTR			! Mapped axis values
 
@@ -125,7 +126,8 @@
       IF ( (ITEM(1:5) .EQ. 'Axis_') .AND. (ITEM(7:).LE.' ') ) THEN
 
 *    Locate object to be got
-        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC, STATUS )
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC,
+     :                   NDIM, DIMS, STATUS )
 
 *    Copy components
         CALL ADI1_CCA2HC( ARGS(4), 'Label', CLOC, 'LABEL', STATUS )
@@ -143,7 +145,7 @@
 
 *    Locate object to be got
         CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Data', .TRUE.,
-     :                   CLOC, STATUS )
+     :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Extract spaced parameters
         CALL ADI_GET1D( ARGS(4), 2, SPARR, NELM, STATUS )
@@ -163,7 +165,7 @@
 
 *    Locate object to be got
         CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM(:7)//'Width', .TRUE.,
-     :                   CLOC, STATUS )
+     :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Extract spaced parameters
         CALL ADI_GET0D( ARGS(4), SCWID, STATUS )
@@ -182,7 +184,7 @@
 
 *    Locate primary data array
         CALL BDI1_CFIND( ARGS(1), ARGS(2), 'Data', .TRUE.,
-     :                   CLOC, STATUS )
+     :                   CLOC, NDIM, DIMS, STATUS )
 
 *    Is the array a structure? If not, rename it, create a structure and
 *    move the data into that new structure
@@ -212,7 +214,7 @@
 
 *    Locate object to be got
         CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .TRUE., CLOC,
-     :                   STATUS )
+     :                   NDIM, DIMS, STATUS )
 
 *    Everything ok?
         IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
