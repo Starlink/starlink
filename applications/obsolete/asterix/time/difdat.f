@@ -50,11 +50,12 @@
 *
 *    Local variables :
 *
-	INTEGER DIMS(ADI__MXDIM)
-	INTEGER NDIM
+      INTEGER			IFID			! Input dataset id
+      INTEGER 			NDIM, DIMS(ADI__MXDIM)	! Input dimensions
+      INTEGER			OFID			! Output dataset id
+
 	INTEGER DPTR
 	INTEGER ODPTR
-	INTEGER NVAL
 	INTEGER NOP
 	INTEGER AXPTR
 	INTEGER QPTR
@@ -62,18 +63,11 @@
 	INTEGER OAXPTR
 	INTEGER VPTR
 	INTEGER OVPTR
-	INTEGER ONDAT
 	INTEGER NDAT
 
 	LOGICAL INPRIM
-	LOGICAL REG
-	LOGICAL VFLAG
-	LOGICAL QFLAG
 	LOGICAL VOK
 	LOGICAL OK
-	LOGICAL BAD
-
-        INTEGER			IFID,OFID
 
 *    Version :
 	CHARACTER*30 VERSION
@@ -112,9 +106,6 @@
         CALL BDI_LINK( 'BinDS', 1, NDAT - 1, 'REAL', OFID, STATUS )
 
 *    Set flags
-        REG = .TRUE.
-	VFLAG = .FALSE.
-        QFLAG = .FALSE.
 	CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
         SPARR(1) = 0.0
         SPARR(1) = 1.0
@@ -165,19 +156,13 @@
           CALL MATH_POISSVAR( %VAL(DPTR), NDAT, 1, %VAL(VPTR), STATUS )
 	END IF
 
-*    Set flags
-	   REG=.FALSE.
-	   VFLAG=.TRUE.
-	   QFLAG=.FALSE.
-	   DIMS(1)=NOP
-
 *    Map output arrays
         CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
         CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
         CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', OAXPTR, STATUS )
 
 *    Copy stuff
-        CALL BDI_AXCOPY( IFID, 1, 'Label,Units', OFID, I, STATUS )
+        CALL BDI_AXCOPY( IFID, 1, 'Label,Units', OFID, 1, STATUS )
         CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
         CALL UDI_COPANC( IFID, ' ', OFID, STATUS )
 
