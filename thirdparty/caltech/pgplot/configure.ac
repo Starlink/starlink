@@ -34,7 +34,7 @@ dnl STAR_DECLARE_DEPENDENCIES(link,  [gwm ems])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
-STAR_LATEX_DOCUMENTATION(sun83)
+dnl    STAR_LATEX_DOCUMENTATION(sun83)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
