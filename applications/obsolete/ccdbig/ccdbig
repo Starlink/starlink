@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh -f
 #+
 #  Name:
 #     CCDBIG
@@ -37,7 +37,6 @@
 #     {enter_further_changes_here}
 #-
 #
-      onintr EXIT
 ###################################################################
 # Set up the parameters of the reduction sequences.
 # These can be changed to test behaviour of the programs under
@@ -64,6 +63,10 @@
 
 # End of parameter setup.
 ###################################################################
+
+      onintr EXIT
+      set null = "\!"
+      set abort = "\!\!"
 
 #  Validation
       if ("$variance" != "TRUE" && "$variance" != "FALSE") then
@@ -109,10 +112,10 @@
 #  Does the user want to see image display activity?
       echo -n "DISPLAY - Display device (! for none) > "
       set device = $<
-      if ( "$device" == "\!\!" || "$device" == "" ) then
+      if ( "$device" == "$abort" || "$device" == "" ) then
          goto EXIT
       else
-         if ( "$device" == "\!" ) then
+         if ( "$device" == "$null" ) then
             set device = "NONE"
          endif
       endif
