@@ -420,7 +420,6 @@
           IF ( DIDCRE ) THEN
             CREOBJ = 'AUNIT'
             CRECOM = 'Axis '//CAX//' units'
-c           CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
           END IF
 
 *    Axis label
@@ -435,7 +434,6 @@ c           CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
           IF ( DIDCRE ) THEN
             CREOBJ = 'ALABEL'
             CRECOM = 'Axis '//CAX//' label'
-c           CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
           END IF
 
 * added for BDI_AXCHK in GDRAW (start rb)
@@ -443,7 +441,7 @@ c           CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
         ELSE IF ( ITEM(8:) .EQ. 'Data' ) THEN
 
 *      Access keyword
-          CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
+          CALL ADI2_CFIND( FITID, ' ', '.CRPIX'//CAX, ' ', CREATE,
      :                     DELETE, 'REAL', 0, 0, DIDCRE, CACHEID,
      :                     STATUS )
           IF ( CACHEID .EQ. ADI__NULLID ) THEN
@@ -485,7 +483,6 @@ c           CALL ADI_CPUT0C( CACHEID, 'Value', ' ', STATUS )
 
 *      Add extra info if we created the keyword
           IF ( DIDCRE ) THEN
-c           CALL ADI_CPUT0I( CACHEID, 'Value', 1, STATUS )
             CALL ADI_CPUT0C( CACHEID, 'Comment',
      :                       'Axis '//CAX//' spacing', STATUS )
           END IF
@@ -502,7 +499,6 @@ c           CALL ADI_CPUT0I( CACHEID, 'Value', 1, STATUS )
           IF ( DIDCRE ) THEN
             CREOBJ = 'ANORM'
             CRECOM = 'Axis '//CAX//' normalised?'
-c           CALL ADI_CPUT0L( CACHEID, 'Value', .FALSE., STATUS )
           END IF
 
         ELSE

@@ -30,6 +30,8 @@
 *        Updated to ADI
 *     24 Feb 1997 (RB):
 *        Fudge axis id's if labels are blank for 2-d images
+*     30 Jun 1997 (RB):
+*        Invent some values for an event dataset
 *
 *    Type definitions :
 *
@@ -127,6 +129,9 @@
             END IF
 
 *        Write axis data
+*        Do we need to fill in some blanks? (RB)
+            BASE = 1.0
+            SCALE = 1.0
             CALL PSF0_PUTAX( PSID, IAX, .TRUE., -1, .TRUE., 0, BASE,
      :                       SCALE, TOR, LABEL, UNITS, STATUS )
 
@@ -154,7 +159,7 @@
 
 *    We'll have to fudge images as labels are blank (RB)
         IF ( AXID(1) .EQ. 0 .AND. AXID(2) .EQ. 0 .AND.
-     :       AXID(2) .EQ. 0 .AND. AXID(3) .EQ. 0 ) THEN
+     :       AXID(3) .EQ. 0 .AND. AXID(4) .EQ. 0 ) THEN
           IF ( NDIM .EQ. 2 .AND.
      :         DIMS(1) .GT. 1 .AND. DIMS(2) .GT. 1) THEN
             AXID(1) = 1
