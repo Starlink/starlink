@@ -578,13 +578,14 @@
         ELSE
 
 *      Centres and widths if irregular
-          CALL BDI_AXMAPR( OFID, I, 'Data', AXPTR, STATUS )
-          CALL BDI_AXMAPR( OFID, I, 'Width', WPTR, STATUS )
+          CALL BDI_AXMAPR( OFID, I, 'Data', 'WRITE', AXPTR, STATUS )
+          CALL BDI_AXMAPR( OFID, I, 'Width', 'WRITE', WPTR, STATUS )
 
-          CALL AXIS_RNG2VALW( ODIMS(I), RANGES, %VAL(AXPTR),
-     :                                  %VAL(WPTR), STATUS )
+          CALL ARR_BND2CWR( ODIMS(I), RANGES, %VAL(AXPTR),
+     :                                %VAL(WPTR), STATUS )
 
-          CALL BDI_AXUNMAP( OFID, I, 'Data,Width', STATUS )
+          CALL BDI_AXUNMAP( OFID, I, 'Data', AXPTR, STATUS )
+          CALL BDI_AXUNMAP( OFID, I, 'Width', WPTR, STATUS )
 
         END IF
 

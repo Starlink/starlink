@@ -402,8 +402,8 @@
 *    Otherwise find bin centres and write to output object
         CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', APTR, STATUS )
         CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', AWPTR, STATUS )
-        CALL AXIS_RNG2VALW( NBIN, BOUNDS, %VAL(APTR), %VAL(AWPTR),
-     :                                                    STATUS )
+        CALL ARR_BND2CWR( NBIN, BOUNDS, %VAL(APTR), %VAL(AWPTR),
+     :                                                  STATUS )
 
       END IF
       CALL BDI_AXPUT0C( OFID, 1, 'Label,Units', AXTXT, STATUS )

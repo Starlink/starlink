@@ -379,8 +379,8 @@ C        END IF
       ELSE
         CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', OAPTR, STATUS )
         CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', OWPTR, STATUS )
-        CALL AXIS_RNG2VALW( NRAD, RANGE, %VAL(OAPTR), %VAL(OWPTR),
-     :                                                    STATUS )
+        CALL ARR_BND2CWR( NRAD, RANGE, %VAL(OAPTR), %VAL(OWPTR),
+     :                                                  STATUS )
       END IF
       CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Radius', STATUS )
       IF ( ORUNIT .GT. ' ' ) THEN
