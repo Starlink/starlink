@@ -94,6 +94,7 @@ URITF           <unregistered IntraMap transformation function>
 GBDIN           <grid bounds invalid>
 NGDIN           <number of grid dimensions invalid>
 PATIN           <positional accuracy tolerance invalid>
+SIFER           <error in sub-pixel interpolation function>
 SISIN           <sub-pixel interpolation scheme invalid>
 SSPIN           <scale size in pixels invalid>
 
