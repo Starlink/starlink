@@ -18,7 +18,7 @@ foreach $v (('0', '360', '-360', # all three should turn into 0
 	     '400',		# non-normalised number
 	     '12:34:56',	# malformed
 	    )) {
-    my $rval = deg2sex($v,1);
+    my $rval = deg2sex($v,0);
     printf ("ra= %10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
 }
 
@@ -30,7 +30,7 @@ foreach $v (('0',
 	     '-90.0001',	# out of range
 	     '12:34:56',	# malformed
 	    )) {
-    my $rval = deg2sex($v,0);
+    my $rval = deg2sex($v,1);
     printf ("dec=%10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
 }
 
@@ -41,7 +41,7 @@ foreach $v (('0',
 	     '0.001',		# leading zero on arcsec
 	     '261.636', '-12.345',
 	    )) {
-    my $rval = deg2sex($v,1,':');
+    my $rval = deg2sex($v,0,':');
     printf ("ra= %10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
 }
 
@@ -49,7 +49,7 @@ foreach $v (('0', '0.001',
 	     '10.05',		# leading zero on minutes?
 	     '12.345', '-12.345', # positive and negative
 	    )) {
-    my $rval = deg2sex($v,0,':');
+    my $rval = deg2sex($v,1,':');
     printf ("dec=%10f  -->  %s\n", $v, (defined($rval) ? $rval : 'ERROR'));
 }
 
@@ -75,7 +75,7 @@ foreach $v (('0:0:0',
 	     '12:34:',
 	     '12:34:56:78',
 	    )) {
-    my $rval = sex2deg($v,1);
+    my $rval = sex2deg($v,0);
     print sprintf("ra= %20s  -->  ", '<'.$v.'>'),
 	    (defined($rval) ? $rval : "ERROR"), "\n";
 }
@@ -98,7 +98,7 @@ foreach $v (('0:0:0',
 	     '12:34',
 	     '12:ping:00.0',
 	    )) {
-    my $rval = sex2deg($v,0);
+    my $rval = sex2deg($v,1);
     print sprintf("dec=%20s  -->  ", '<'.$v.'>'),
 	    (defined($rval) ? $rval : "ERROR"), "\n";
 }
