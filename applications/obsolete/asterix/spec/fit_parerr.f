@@ -113,9 +113,8 @@
       INTEGER             JP1,JP2		! Parameter indices
       INTEGER             NPFREE		! No of free (unfrozen+unpegged params
       INTEGER             LSSCALE		! SSCALE proofed against zero value
-      INTEGER             IPIV(NPAMAX)		! Workspace for LU factorising
 
-      LOGICAL			LFROZEN(NPAMAX)		! Local frozen array
+      LOGICAL		  LFROZEN(NPAMAX)	! Local frozen array
 *-
 
 *    Status check
@@ -204,7 +203,7 @@
 *    Invert alpha matrix to get parameter errors
       IFAIL=1
       IF ( NPFREE .GT. 0 ) THEN
-        DO M = 1, NPRFREE
+        DO M = 1, NPFREE
           DO L = 1, NPFREE
             ALPHAINV(L,M) = ALPHA(L,M)
           END DO
