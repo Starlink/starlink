@@ -55,6 +55,9 @@ protected:
   //  Equinox string: "J2000", "B1950", ...
   char equinoxStr_[32];
 
+  //  Set up object for celestial coordinates.
+  void initCelestial();
+
   //  Set equinox value and string.
   void setEquinox();
 

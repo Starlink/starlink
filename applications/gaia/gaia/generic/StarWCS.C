@@ -242,30 +242,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
                     wcs_ = (AstFrameSet *) astAnnul( wcs_ );
                     print_error( "Failed to read a 2D World Coordinate System from FITS headers");
                 } else {
-
-                    // See if WCS is a celestial system.
-                    setCelestial();
-                    if ( issky_ ) {
-
-                        // Set the equinox value and string. Note this may
-                        // be reset later if any warnings about the equinox
-                        // are given.
-                        setEquinox();
-
-                        // Finally work out which axes are longitude
-                        // and which are latitude (might be a better
-                        // way to do this, note we leave at defaults
-                        // if neither is a time axis).
-                        int astime2 = astGetI( wcs_, "astime(2)" );
-                        if ( astime2 ) {
-                            raIndex_  = 2;
-                            decIndex_ = 1;
-                        }
-
-                        // Note the number of arcsecs per pixel for
-                        // later access.
-                        setSecPix();
-                    }
+                    initCelestial();
                 }
             }
 
@@ -294,6 +271,33 @@ StarWCS::~StarWCS()
 }
 
 //
+// Local initialisations when coordinate system is celestial (equinox,
+// RA-Dec axes, pixel scale).
+//
+void StarWCS::initCelestial()
+{
+    //  Initialisations for all coordinate systems.
+    raIndex_ = 1;
+    decIndex_ = 2;
+    equinoxStr_[0] = '\0';
+    xSecPix_ = 0.0;
+    ySecPix_ = 0.0;
+    
+    //  If celestial need additional information about equinox, which
+    //  axes are RA and Dec and the image scales.
+    setCelestial();
+    if ( issky_ ) {
+        setEquinox();
+        int astime2 = astGetI( wcs_, "astime(2)" );
+        if ( astime2 ) {
+            raIndex_  = 2;
+            decIndex_ = 1;
+        }
+        setSecPix();
+    }
+}
+
+//
 // Replace the current WCS FrameSet with one given (this is so that
 // the current WCS can be copied and modified without destroying this
 // version, it can then be used to replace this one if the
@@ -315,27 +319,11 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             error( "Failed to read a 2D World Coordinate System from FITS headers");
             return 0;
         } else {
-            // Set the equinox value and string.
-            setEquinox();
+
+            initCelestial();
 
             // Release the old WCS.
             astcopy = (AstFrameSet *) astAnnul( astcopy );
-
-            // Finally work out which axes are longitude and which are
-            // latitude (might be a better way to do this, note we leave
-            // at defaults if neither is a time axis).
-            int astime2 = astGetI( wcs_, "astime(2)" );
-            if ( astime2 ) {
-                raIndex_  = 2;
-                decIndex_ = 1;
-            } else {
-                raIndex_  = 1;
-                decIndex_ = 2;
-            }
-
-            // note the number of arcsecs per pixel for later access
-            setSecPix();
-
         }
     } else {
 
@@ -1053,8 +1041,7 @@ int StarWCS::set( double ra, double dec,
         return error("Cannot locate a valid world coordinate system");
     }
     fitschan = (AstFitsChan *) astAnnul( fitschan );
-    setEquinox();
-    setSecPix();
+    initCelestial();
     if ( ! astOK ) astClearStatus;
     return 0;
 }
@@ -1096,7 +1083,17 @@ int StarWCS::astSetAttrib( const char *what, const char *value )
     if ( ! wcs_ ) {
         return 0;
     }
+    
+    //  Check for a change in coordinates, we need to update when that
+    //  occurs.
+    int oldcurrent = astGetI( wcs_, "Current" );
+
     astSetC( wcs_, what, value );
+
+    int newcurrent = astGetI( wcs_, "Current" );
+    if ( oldcurrent != newcurrent ) {
+        initCelestial();
+    }
     if ( !astOK ) {
         astClearStatus;
         return 0;
