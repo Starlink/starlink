@@ -11,7 +11,7 @@
       The package also includes the interface file compiler,
       COMPIFL.</p></abstract>
   <dependencies >
-    <build>chr</build><build>hds</build><build>ems</build><build>sae</build><build>subpar</build><build option='link'>string</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
+    <build>hds</build><build>sae</build><build option='link'>chr</build><build option='link'>ems</build><build option='link'>string</build><build option='link'>subpar</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
