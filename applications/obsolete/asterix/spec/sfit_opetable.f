@@ -1,6 +1,6 @@
 *+  SFIT_OPETABLE - Write an error table to a specified o/p unit
-      SUBROUTINE SFIT_OPETABLE( NPAR, PARAM, LE, UE, PEGCODE, MODEL,
-     :                                                 OCI, STATUS )
+      SUBROUTINE SFIT_OPETABLE( NPAR, PARAM, NEPAR, PARS, LE, UE,
+     :                          PEGCODE, MODEL, OCI, STATUS )
 *
 *    Description :
 *
@@ -19,6 +19,7 @@
 *
 *      8 Dec 92 : Original (DJA)
 *     25 Jul 94 : Converted to use AIO system (DJA)
+*     22 Jan 96 : Added NEPAR and PARS (DJA)
 *
 *    Type definitions :
 *
@@ -42,6 +43,8 @@
 *
       INTEGER               NPAR          ! Number of parameters
       REAL                  PARAM(NPAR)   ! Parameter values
+      INTEGER               NEPAR         ! Number of parameters with new errors
+      INTEGER			PARS(*)	  ! Pars with new errors
       REAL                  LE(NPAR)      ! Parameter lower bounds
       REAL                  UE(NPAR)      ! Parameter upper bounds
       INTEGER               PEGCODE(NPAR) ! Pegging codes
@@ -57,6 +60,7 @@
 *    Local variables :
 *
       CHARACTER*79          OTXT          ! Output text buffer
+      CHARACTER*25		PNAM		! Parameter name
 
       REAL                  HW		  ! Half-width of conf.region
       REAL                  LCON	  ! Lower confidence limit
@@ -66,6 +70,7 @@
       INTEGER               NC		  ! Model component number
 
       LOGICAL               FIRST         ! First pegged parameter met?
+      LOGICAL			ISNEW			!
 *-
 
 *    Check status
@@ -84,6 +89,18 @@
 *    Loop over parameters
       NC=1
       DO J = 1, NPAR
+
+*      This parameter new in this iteration?
+        IF ( NEPAR .EQ. 0 ) THEN
+          ISNEW = .TRUE.
+        ELSE
+          ISNEW = .FALSE.
+          DO K = 1, NEPAR
+            IF ( PARS(K) .EQ. J ) THEN
+              ISNEW = .TRUE.
+            END IF
+          END DO
+        END IF
 
 *      Check lower and upper bounds
         IF ( UE(J) .GT. 0.0) THEN
@@ -105,15 +122,22 @@
           HW = 2*HW
         END IF
 
+*      Make model parameter upper case if this is one of the parameters
+*      whose errors have been found on this iteration
+        PNAM = MODEL.PARNAME(J)
+        IF ( ISNEW ) THEN
+          CALL CHR_UCASE( PNAM )
+        END IF
+
 *      Format the parameter information. Only write model component name
 *      for the first component in each model.
         IF ( J .EQ. MODEL.ISTART(NC) ) THEN
-          WRITE(OTXT,115) MODEL.KEY(NC), MODEL.PARNAME(J), PARAM(J),
+          WRITE(OTXT,115) MODEL.KEY(NC), PNAM, PARAM(J),
      :                    LCON, UCON, HW
  115      FORMAT( A4, 1X, A23, 1PG12.4, 3(1X,1PG12.4) )
           NC = NC + 1
         ELSE
-          WRITE(OTXT,120) MODEL.PARNAME(J), PARAM(J), LCON, UCON, HW
+          WRITE(OTXT,120) PNAM, PARAM(J), LCON, UCON, HW
  120      FORMAT( 5X, A23, 1PG12.4, 3(1X,1PG12.4) )
         END IF
 
