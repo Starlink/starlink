@@ -94,6 +94,12 @@ f     The SkyFrame class does not define any new routines beyond those
 *     10-OCT-2002 (DSB):
 *        Moved definitions of macros for SkyFrame system values from
 *        this file into skyframe.h.
+*     24-OCT-2002 (DSB):
+*        Modified MakeSkyMapping so that any two SkyFrames with system=unknown
+*        are assumed to be related by a UnitMap. previously, they were
+*        considered to be unrelated, resulting in no ability to convert from 
+*        one to the other. This could result for instance in astConvert
+*        being unable to find a maping from a SkyFrame to itself.
 *class--
 */
 
@@ -2608,6 +2614,15 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* Initialise the returned values. */
    match = 1;
    *map = NULL;
+
+/* If both systems are unknown, assume they are the same. Return a UnitMap.
+   We need to do this, otherwise a simple change of Title (for instance)
+   will result in a FrameSet loosing its integrity. */
+   if( astGetSystem( target ) == AST__UNKNOWN && 
+       astGetSystem( result ) == AST__UNKNOWN ) {
+      *map = (AstMapping *) astUnitMap( 2, "" );
+      return 1;
+   }
 
 /* Create an initial (null) SlaMap. */
    slamap = astSlaMap( 0, "" );
