@@ -7,11 +7,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     23-JUL-1992 (PDRAPER):
 #     	 Original version.
+#     1-APR-1999 (MBT):
+#        Added FRAMEIN, EPOCHIN, FRAMEOUT, EPOCHOUT and WCSFILE parameters.
 #     {enter_changes_here}
 
 #-
@@ -126,6 +129,48 @@ interface TRANLIST
       ppath    'CURRENT,DEFAULT'
       default  'true'
       prompt   'Use forward transformation'
+      helpkey  '*'
+   endparameter
+
+   parameter WCSFILE
+      type     NDF
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT'
+      prompt   'NDF containing WCS component'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAMEIN
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
+      default  'PIXEL'
+      prompt   'Source coordinate frame'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAMEOUT
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      ppath    'CURRENT'
+      prompt   'Destination coordinate frame'
+      helpkey  '*'
+   endparameter
+
+   parameter EPOCHIN
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,CURRENT'
+      prompt   'Source frame epoch of observation'
+      helpkey  '*'
+   endparameter
+
+   parameter EPOCHOUT
+      type     '_DOUBLE'
+      ppath    'DYNAMIC,CURRENT'
+      prompt   'Destination frame epoch of observation'
       helpkey  '*'
    endparameter
 
