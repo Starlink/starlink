@@ -248,7 +248,7 @@ install:
 prepare:
 
 check_packages:
-[available] Oct 30, 2003 4:22:11 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Nov 2, 2003 4:20:45 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -759,7 +759,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 51 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 52 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -890,4 +890,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 1 minute 57 seconds
+Total time: 1 minute 43 seconds

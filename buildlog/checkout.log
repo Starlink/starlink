@@ -7945,6 +7945,7 @@ cvs checkout: Updating java/source/splat/src/main/uk
 cvs checkout: Updating java/source/splat/src/main/uk/ac
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat
+U java/source/splat/src/main/uk/ac/starlink/splat/SplatMain.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/ast
 U java/source/splat/src/main/uk/ac/starlink/splat/ast/ASTChannel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/ast/ASTFITSChan.java
@@ -8032,6 +8033,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecXCoordTypeFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplashWindow.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowserMain.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatLookAndFeelManager.java
@@ -8100,6 +8102,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/special.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splash.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat2.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/starlink_logo_small.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/stop.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/table.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/unarymaths.gif
@@ -8553,6 +8556,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/LoadQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumn.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumnModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumnTableModel.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/MethodWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MirageHandler.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/OptionsListModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ParameterWindow.java
@@ -8602,6 +8606,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-formats.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-jdbc.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-node.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/load-text.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/methods.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/mirage.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
@@ -8649,8 +8654,10 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/fx2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
