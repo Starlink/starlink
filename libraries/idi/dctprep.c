@@ -32,10 +32,7 @@ char    *sarg[ARGSIZE];
 int     i, j, k , nit , dcterr=0;
 int     arg[ARGSIZE];
 int     ival;
-char    *malloc ();
 FILE    *f;
-FILE    *fopen ();
-FILE    *fopen ();
 
 getdctfile (fildct);
 
