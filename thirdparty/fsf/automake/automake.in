@@ -6744,7 +6744,7 @@ sub append_exeext ($)
   my ($macro) = @_;
 
   prog_error "append_exeext ($macro)"
-    unless $macro =~ /_PROGRAMS$/;
+    unless $macro =~ /_(PROGRAMS|MONOLITHS)$/;
 
   transform_variable_recursively
     ($macro, $macro, 'am__EXEEXT', 0, INTERNAL,
@@ -6958,8 +6958,9 @@ sub am_install_var
 	}
       # A blatant hack: we rewrite each _PROGRAMS primary to include
       # EXEEXT.
+      # Starlink: ...or MONOLITHS
       append_exeext ($one_name)
-	if $primary eq 'PROGRAMS';
+        if $primary eq 'PROGRAMS' or $primary eq 'MONOLITHS';
       # "EXTRA" shouldn't be used when generating clean targets,
       # all, or install targets.  We used to warn if EXTRA_FOO was
       # defined uselessly, but this was annoying.
