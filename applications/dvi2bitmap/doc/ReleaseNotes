@@ -1,29 +1,54 @@
-<subsect id="rn-0.12-2" export="export">Release 0.12-2
+<subsect id="rn-0.13b2" export="export">
+  <subhead>
+    <title>Release 0.13b2</title>
+  </subhead>
+
+  <p>There are no significant changes from 0.12-2.  However the build system
+    changed significantly when the repository was relocated, and
+    this warrants a new minor version, since the required changes,
+    though they should be leaving the functionality unchanged, are
+    more than just bugfixes.</p>
+
+</subsect>
+
+<subsect id="rn-0.12-2" export="export">
+  <subhead>
+    <title>Release 0.12-2</title>
+  </subhead>
 
   <p>Bugfix release.
     <ul>
-      <li>The mmap configure code was wrong in that, while it wouldn't
+      <li>
+        <p>The mmap configure code was wrong in that, while it wouldn't
           attempt to call mmap() on systems without a working mmap
           (`working' according to the AC_FUNC_MMAP test), it would try
-          to compile it, which is incorrect.</li>
+          to compile it, which is incorrect.</p></li>
 
-      <li>The problem was reported by a user who was building it under
+      <li><p>The problem was reported by a user who was building it under
           cygwin.  The ./configure output which he forwarded suggested
           that the system did have mman.h, but didn't have a `working'
           mmap -- so <em>it</em> thinks it's got mmap, but autoconf
           disagrees (I've no idea what autoconf takes as `working').
           The actual report was an `invalid cast' error which I've
-          fixed.</li>
+          fixed.</p></li>
     </ul>
   </p>
+</subsect>
 
-<subsect id="rn-0.12-1" export="export">Release 0.12-1
+<subsect id="rn-0.12-1" export="export">
+  <subhead>
+    <title>Release 0.12-1</title>
+  </subhead>
 
-<p>Bugfix release.
-<ul>
-<li>Add configure code to cope with systems which declare mmap but
-fail to declare MAP_FAILED (required by Single Unix and POSIX).
-</ul>
+  <p>Bugfix release.
+    <ul>
+      <li><p>Add configure code to cope with systems which declare mmap but
+          fail to declare MAP_FAILED (required by Single Unix and
+          POSIX).</p>
+      </li>
+    </ul>
+  </p>
+</subsect>
 
 <subsect id="rn-0.12" export="export">
   <subhead>
