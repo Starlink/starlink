@@ -15,11 +15,18 @@ proc p4Cursor {taskname} {
 
 # Issue a message saying what to do
   cgs4drCursor pirate orange black
-  set oldval $P4Widgets(CROSSHAIR)
+  set old_xhair $P4Widgets(CROSSHAIR)
   set P4Widgets(CROSSHAIR) 1
   crossHair
 
-# Do the cursoring
+# Have to disable reset auto-plot for this an re-display image
+  set old_reset $P4Widgets(RESETPLOT)
+  if {$P4Widgets(RESETPLOT) != 0} {
+    set P4Widgets(RESETPLOT) 0
+    p4Plot $taskname
+  }
+  
+# Do the cursoring on the given data set
   set done 0
   $taskname obey cursorval "port=$P4Widgets(PORT_NO)" -inform "cgs4drInform $taskname %V" -endmsg {set done 1}
   tkwait variable done
@@ -51,8 +58,9 @@ proc p4Cursor {taskname} {
   cgs4drInform $taskname $message 
 
 # Change the cursor and exit
-  set P4Widgets(CROSSHAIR) $oldval
+  set P4Widgets(CROSSHAIR) $old_xhair
   crossHair
+  set P4Widgets(RESETPLOT) $old_reset
   cgs4drCursor arrow green black
 }
 
