@@ -71,7 +71,7 @@ in some cases, surely a mismatch is inevitable.  After all, a star and
 a database record surely have nothing in common except a tendency to
 generate entropy.  This is why we need a data model.
 
-A data model is the set of primitive concepts that we hope the user
+A data model is the set of primitive concepts that we hope our user
 thinks with, the language expresses, and the underlying system
 implements; it is the rendezvous which helps the system as a whole
 hang together.  If the model is made explicit during the development
@@ -86,17 +86,17 @@ explicit.  There are several obvious answers to this, of which the
 most currently fashionable will be XSchema, UML, and `a Java
 class library'.  The problem with each of these is that they each come with
 far too much baggage.  This is another aspect of the Sapir-Whorf
-hypothesis: we have a tendency to see the world in terms of the
+hypothesis: we tend to see the world in terms of the
 structure of the language we use to describe it.  That means that if
 we use XSchemas to model the world, we will discover that the world is
-made of things enclosing other things, and if we use an O-O language,
+made of things enclosing other things, with attributes, and if we use an O-O language,
 the world turns out to have methods.  That is, our choice of modelling
-language biases our model to have certain features, irrespective of
+language biases our model to have certain features, \emph{irrespective} of
 whether these features are present in the system being modelled.
 
 A separate problem is to start thinking about syntactical or
-presentational details too early.  If we retrofit a data model too
-late, it will end up being a poor model of the world, but an excellent
+presentational details too early.  If we retrofit a data model, it
+will end up being a poor model of the world, but an excellent
 model of our syntax.
 % During the UCD modelling effort, we found ourselves asking questions
 % which purported to be about astronomy, but which were really about
