@@ -71,6 +71,7 @@
             I_MEM=.FALSE.
             IF (I_GUI) THEN
               CALL IMG_NBPUT0I('CACHE',0,STATUS)
+            ENDIF
           ELSE
             CALL MSG_PRNT('AST_ERR: no image currently in cache')
           ENDIF
