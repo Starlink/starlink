@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.9}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {14th June 2001}
+\newcommand{\stardocdate}      {20th June 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -15587,6 +15587,42 @@ the curve and LENGTH specifies the distance to draw along the axis in
 physical coordinate space.
 f-
 
+\subsection{\label{ss:plottinggeneralizedcurves}Plotting Generalized Curves}
+We have seen how geodesic curves and grid lines can be drawn, and the Plot
+class includes another method,
+c+
+astGenCurve,
+c- 
+f+
+AST_GENCURVE,
+f-
+which allows curves of {\em any} form to be drawn. The caller supplies a
+Mapping which maps distance along the curve\footnote{normalized so that
+the start of the curve is at ``distance'' of 0.0 and the end of the curve
+is at ``distance'' 1.0.}. into the corresponding
+position in the current Frame of the Plot. 
+c+
+astGenCurve,
+c- 
+f+
+AST_GENCURVE,
+f-
+then takes care of Mapping these positions into graphics coordinates. The
+choice of exactly which positions along the curve are to be used to
+define the curve is also made by
+c+
+astGenCurve,
+c- 
+f+
+AST_GENCURVE,
+f-
+using an adaptive algorithm which concentrates points around areas where
+the curve is bending sharply or is discontinuous in graphics coordinates.
+
+The IntraMap class may be of particular use in this context since it allows 
+you to code your own Mappings to do any transformation you choose.
+
+
 \subsection{\label{ss:clipping}Clipping}
 
 Like many graphics systems, a Plot allows you to {\em{clip}} the graphics
@@ -17290,6 +17326,19 @@ occurred in the AST library between versions V1.6 and V1.7 (the
 current version):
 
 \begin{enumerate}
+
+\item The Plot class has a new method called 
+f+
+AST\_GENCURVE
+f-
+c+
+astGenCurve
+c-
+which allows generalised user-defined curves to be drawn. The curve is
+defined by a user-supplied Mapping which maps distance along the curve
+into the corresponding position in the current Frame of the Plot. The new
+method then maps these current Frame position into graphics coordinates,
+taking care of any non-linearities or discontinuities in the mapping.
 
 \item The Plot class has a new method called 
 f+

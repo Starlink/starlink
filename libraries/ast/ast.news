@@ -33,6 +33,13 @@ Main Changes in this Version
   temporary changes to be made to the set of registered graphics
   routines.
 
+  o A new method has been added to the Plot class to allow generalised
+  user-defined curves to be drawn. The curve is defined by a
+  user-supplied Mapping which maps distance along the curve into the
+  corresponding position in the current Frame of the Plot. The new method
+  then maps these current Frame position into graphics coordinates,
+  taking care of any non-linearities or discontinuities in the mapping.
+
   o The DrawAxes attribute of the Plot class can now be specified
   independantly for each axis, by appending the axis index to the
   end of the attribute name.
