@@ -186,7 +186,7 @@
           ELSE IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'ITEM', LITEM(:LITL) )
             LSTAT = SAI__OK
-            CALL BDI_DESCID( ID, 'F', STATUS )
+            CALL BDI0_DESCID( ID, 'F', STATUS )
             CALL ERR_REP( 'BDI_MAP_1', 'Unable to map item '/
      :                    /'^ITEM in file ^F', STATUS )
           ELSE
