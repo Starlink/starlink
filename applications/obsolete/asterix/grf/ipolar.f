@@ -144,6 +144,8 @@
 *        Updated data interfaces
 *      9 Nov 1995 V2.0-0 (DJA):
 *        Original version.
+*     10 Jan 1996 V2.0-1 (DJA):
+*        Use USI_NAMES for file info
 *     {enter_changes_here}
 
 *  Bugs:
@@ -169,12 +171,12 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IPOLAR Version V2.0-0' )
+        PARAMETER		( VERSION = 'IPOLAR Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*40 		AUNITS(2)            	! Units of axes
       CHARACTER*60 		DUNITS               	! Units of the data
-      CHARACTER*80		PATH(8) 		! History input axis2-units
+      CHARACTER*80		HTXT(3)			! History text
       CHARACTER*80 		TITLE 			! Title of files
 
       DOUBLE PRECISION 		UFACT         		! Conversion factor between pixels
@@ -202,6 +204,7 @@
       INTEGER       		DIMS(3)    		! Input dimensions
       INTEGER       		IDPTR               	! Input data
       INTEGER			IFID			! Input dataset id
+      INTEGER			IFILES			! Input file info
       INTEGER       		IVPTR               	! input variance
       INTEGER       		IQPTR               	! Input quality
       INTEGER       		INELM               	! Input # elements
@@ -209,7 +212,7 @@
       INTEGER       		K                   	! Length of strings
       INTEGER       		NABIN,NRBIN		! # of azimuthal & radial bins
       INTEGER       		NRAD			! limit on # of radial bins
-      INTEGER       		NLINES              	! # lines of history
+      INTEGER       		NTXT			! # lines of history
       INTEGER       		ODIM(3)             	! Output dimensions (1=radial,2=az)
       INTEGER			OFID			! Output dataset id
       INTEGER       		ONDIM               	! Output dimensionality
@@ -601,27 +604,30 @@
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Create text strings for history
-      CALL USI_NAMEI( NLINES, PATH, STATUS )
-
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
       CALL MSG_SETR( 'X', XCENT )
       CALL MSG_SETR( 'Y', YCENT )
       CALL MSG_MAKE( 'Polar centred on the point X=^X  Y=^Y',
-     :               PATH(NLINES+1), TLEN )
+     :               HTXT(1), TLEN )
+      NTXT = 1
 
 *  Write azimuthal start position if required.
-      IF ( NABIN .NE. 1) THEN
+      IF ( NABIN .NE. 1 ) THEN
         CALL MSG_SETR( 'AZANG', AZANG )
         CALL MSG_MAKE( 'Initial azimuthal angle ^AZANG degrees',
-     :                 PATH(NLINES+2), TLEN )
+     :                 HTXT(2), TLEN )
+        NTXT = 2
       END IF
       PSIZE = ABS( ASCALE(1) * ASCALE(2) )
       CALL MSG_SETR( 'PS', PSIZE )
       CALL MSG_SETC( 'UN', AUNITS(1) )
+      NTXT = NTXT + 1
       CALL MSG_MAKE( 'Original pixel size ^PS square ^UN',
-     :               PATH(NLINES+3), TLEN )
+     :               HTXT(NTXT), TLEN )
 
 *  Write strings to history structure
-      CALL HSI_PTXT( OFID, NLINES+3, PATH, STATUS )
+      CALL HSI_PTXT( OFID, NTXT, HTXT, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
