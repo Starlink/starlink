@@ -107,7 +107,7 @@
       CALL ADI1_GETLOC( ID, LOC, STATUS )
 
 *  Locate field
-      CALL SSO_LOCFLD( ID, FLD, FLOC, STATUS )
+      CALL SSO_LOCFLD( LOC, FLD, FLOC, STATUS )
 
 *  Get dimensions of error
       CALL CMP_SHAPE( FLOC, 'ERROR', MXDIM, DIMS, NDIM, STATUS )
