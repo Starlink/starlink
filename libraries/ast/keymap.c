@@ -1597,7 +1597,7 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 /* Now store the new values. */ \
       keylen = strlen( key ); \
       mapentry->key = astStore( NULL, key, keylen + 1 ); \
-      mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
+      if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
       mapentry->type = Itype; \
       mapentry->nel = 0; \
       entry->value = ValExp; \
@@ -1761,7 +1761,7 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 /* Now store the new values. */ \
       keylen = strlen( key ); \
       mapentry->key = astStore( NULL, key, keylen + 1 ); \
-      mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
+      if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 ); \
       mapentry->type = Itype; \
       mapentry->nel = size; \
       entry->value = astMalloc( sizeof( Xtype )*(size_t)size ); \
@@ -1866,7 +1866,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *valu
 /* Now store the new values. */
       keylen = strlen( key );
       mapentry->key = astStore( NULL, key, keylen + 1 );
-      mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
+      if( comment ) mapentry->comment = astStore( NULL, comment, strlen( comment ) + 1 );
       mapentry->type = AST__OBJECTTYPE;
       mapentry->nel = size;
       entry->value = astMalloc( sizeof( AstObject * )*(size_t)size );
