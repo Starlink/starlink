@@ -1328,14 +1328,27 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             variable is indeed set as you wish, and rerun
             <code>./configure</code>.</p>
 
-          <p>You can pass options to the compiler using the
-            <code>CFLAGS</code> variable, for example in the form
-            <code>CFLAGS=-g</code>.  The variables <code>CFLAGS</code>
-            and <code>LDFLAGS</code> are examples of variables you
-            might usefully set and export in the environment, for
-            example to point <code>./configure</code> to software
-            installed in non-standard places, such as
-            <code>/opt</code> or <code>/sw</code>.</p>
+          <p>You can pass options to the compiler using environment
+            variables, but you will <em>not</em> need to do this in
+            general, other than perhaps to set <code>CFLAGS=-g</code>
+            to turn on debugging in the code you are building.  The
+            variables <code>CFLAGS</code> and <code>LDFLAGS</code> are
+            variables you might potentially set and export in the
+            environment, for example to point <code>./configure</code>
+            to software installed in non-standard places (perhaps you
+            are on a Mac and have installed Fink in <code>/sw</code>
+            or OpenDarwin in <code>/opt/local</code>, or are on a Sun
+            and have extra software in <code>/opt</code>).  In this
+            case you might set
+            <code>CFLAGS=-I/opt/local/include</code> and
+            <code>LDFLAGS=-L/opt/local/lib</code> in the environment
+            to help configure and the compiler find libraries.  Note
+            that this is rather a blunt instrument, and because you
+            cannot really control where the respective flags appear in
+            generated compiler commands, you can end up picking up
+            inconsistent versions of software.  That is, this is a mechanism
+            for getting yourself out of a fix, not a recommended way
+            of building the software.</p>
 
           <p>The important point of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
@@ -2177,12 +2190,11 @@ autoconf (GNU Autoconf) 2.59
           <code>configure.ac</code> and those below it.</p>
 
         <p>If you will need to give <code>./configure</code> some help
-          to find include files and libraries (for example, you are on a
-          Mac and have installed Fink in <code>/sw</code> or OpenDarwin
-          in <code>/opt/local</code>, or are on a Sun and have extra
-          software in <code>/opt</code>), then do so by setting (for
-          example) <code>CFLAGS=-I/opt/local/include</code> and
-          <code>LDFLAGS=-L/opt/local/lib</code> in the environment.</p>
+          to find include files and libraries, you <em>might</em> try
+          setting the <code>CFLAGS</code> or <code>LDFLAGS</code>
+          variables in the environment, in the manner described in
+          <ref id="configure-script"/>.  Note, however, that this is
+          not a recommended practice.</p>
 
         <p>Line 9: build the entire tree, using the <kbd>make
             world</kbd> target described in <ref
