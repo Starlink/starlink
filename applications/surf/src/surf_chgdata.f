@@ -395,7 +395,7 @@
 
 *     Now propogate the output file from the input and open it.
 
-      CALL NDF_PROP (IN_NDF, 'Data,Variance,Quality,Axis', 'OUT', 
+      CALL NDF_PROP (IN_NDF, 'Data,Variance,Quality,Axis,Units', 'OUT', 
      :     OUT_NDF, STATUS)
 
 *     close input file and tidy up
