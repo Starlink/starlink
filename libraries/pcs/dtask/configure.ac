@@ -29,6 +29,8 @@ AC_PATH_PROGS(M4, m4, m4)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+AC_FC_CHECK_INTRINSICS([GETCWD CHDIR PUTENV])
+
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [adam cnf messys psx sae subpar])
 STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers ams atimer hds psx subpar])
