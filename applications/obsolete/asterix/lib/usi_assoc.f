@@ -75,6 +75,8 @@
 *  History:
 *     12 Jan 1995 (DJA):
 *        Original version.
+*      9 Oct 1995 (DJA):
+*        Added support for scalar strings and numerics
 *     {enter_changes_here}
 
 *  Bugs:
@@ -87,6 +89,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       CHARACTER*(*)		PAR			! Parameter name
@@ -100,13 +103,28 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
 
 *  Local Variables:
       CHARACTER*200		FNAME			! Input object
+      CHARACTER*3		SSTR			! SCL in characters
+      CHARACTER*(DAT__SZLOC)	TLOC			! Temp HDS object
+
+      DOUBLE PRECISION		DVAL			! Scalar value
 
       INTEGER			EP, PPOS		! Character pointers
+      INTEGER			FLEN			! Length of FNAME
+      INTEGER			FSTAT			! Fortran i/o status
+      INTEGER			HREPID			! HDS representation id
+      INTEGER			NDIG			! Chars used in SSTR
+      INTEGER			SCL			! Length of scalar data
+      INTEGER			TFID			! Temp ADI object
+
+      LOGICAL			LVAL			! Scalar logical value
+      LOGICAL			SCALAR			! Read a scalar?
 *.
 
 *  Check inherited global status.
@@ -126,12 +144,67 @@
 *  Open the file
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*    Get length of FNAME
+        FLEN = CHR_LEN(FNAME)
+
+*    Has user supplied a string delimited by quotes
+        SCALAR = .FALSE.
+        IF ( (FNAME(1:1).EQ.FNAME(FLEN:FLEN)) .AND.
+     :       ((FNAME(1:1) .EQ. '''') .OR. (FNAME(1:1) .EQ. '"')) ) THEN
+          SCL = FLEN - 2
+          CALL CHR_ITOC( SCL, SSTR, NDIG )
+          CALL DAT_TEMP( '_CHAR'//SSTR(:NDIG), 0, 0, TLOC, STATUS )
+          CALL DAT_PUT0C( TLOC, FNAME(2:SCL), STATUS )
+          SCALAR = (STATUS.EQ.SAI__OK)
+
+*    One of YES, NO, TRUE or FALSE
+        ELSE IF ( INDEX( 'yYnNTtFf', FNAME(1:1)) .GT. 0 ) THEN
+          IF ( CHR_INSET( 'TRUE,YES', FNAME(:FLEN)) ) THEN
+            SCALAR = .TRUE.
+            LVAL = .TRUE.
+          ELSE IF ( CHR_INSET( 'FALSE,NO', FNAME(:FLEN)) ) THEN
+            SCALAR = .TRUE.
+            LVAL = .FALSE.
+          END IF
+          IF ( SCALAR ) THEN
+            CALL DAT_TEMP( '_LOGICAL', 0, 0, TLOC, STATUS )
+            CALL DAT_PUT0L( TLOC, LVAL, STATUS )
+          END IF
+
+*    Last try is a numeric value
+        ELSE
+
+*      Try reading as a number
+          READ( FNAME, *, IOSTAT=FSTAT ) DVAL
+          IF ( FSTAT .EQ. 0 ) THEN
+            CALL DAT_TEMP( '_DOUBLE', 0, 0, TLOC, STATUS )
+            CALL DAT_PUT0D( TLOC, DVAL, STATUS )
+            SCALAR = (STATUS.EQ.SAI__OK)
+          END IF
+
+        END IF
+
+*    Scalar object?
+        IF ( SCALAR ) THEN
+
+*      Create HDSfile object]
+          CALL ADI_NEW0( 'HDSfile', TFID, STATUS )
+          CALL ADI_CPUT0C( TFID, 'MODE', ACCESS, STATUS )
+          CALL ADI_LOCREP( 'HDS', HREPID, STATUS )
+          CALL ADI_CPUT0I( TFID, 'REP', HREPID, STATUS )
+          CALL ADI_CPUT0C( TFID, 'Locator', TLOC, STATUS )
+
+*      Link to requested data class object
+          CALL ADI_FLINK( TFID, CLASS, ID, STATUS )
+
+*    No representation supplied
+        ELSE IF ( PPOS .EQ. 0 ) THEN
+          CALL ADI_FOPEN( FNAME, CLASS, ACCESS, ID, STATUS )
+
 *    If caller specified a representation on the parameter, glue it
 *    on to the file name
-        IF ( PPOS .EQ. 0 ) THEN
-          CALL ADI_FOPEN( FNAME, CLASS, ACCESS, ID, STATUS )
         ELSE
-          CALL ADI_FOPEN( FNAME(:MAX(1,CHR_LEN(FNAME)))//PAR(PPOS:),
+          CALL ADI_FOPEN( FNAME(:MAX(1,FLEN))//PAR(PPOS:),
      :                                   CLASS, ACCESS, ID, STATUS )
         END IF
       END IF
