@@ -6337,12 +6337,14 @@ c        REAL XX,XP,YP
       INTEGER STATUS
 *  Local constants :
 *  Local variables :
+      CHARACTER*132 BUFF
       INTEGER ID,NB
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+        BUFF=CVAL
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
-        CALL NBS_PUT_CVALUE(ID,0,CVAL,STATUS)
+        CALL NBS_PUT_CVALUE(ID,0,BUFF,STATUS)
 
 
       ENDIF

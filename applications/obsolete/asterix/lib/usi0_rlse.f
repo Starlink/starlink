@@ -38,6 +38,8 @@
       INTEGER			ID			! File identifier
       INTEGER			PSID			! Parameter store
       INTEGER			NPAR			! # parameters
+
+      LOGICAL			THERE			! Object exists?
 *-
 
 *  Check existing count
@@ -53,10 +55,13 @@
         CALL ADI_INDCMP( CTX_PST(USI_ICTX), I, PSID, STATUS )
 
 *    Get its 3 bits of info
-        CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
+        CALL ADI_THERE( PSID, 'ID', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0I( PSID, 'ID', ID, STATUS )
 
-*    Close the file
-        CALL ADI_FCLOSE( ID, STATUS )
+*      Close the file
+          CALL ADI_FCLOSE( ID, STATUS )
+        END IF
 
 *    Release parameter
         CALL ADI_ERASE( PSID, STATUS )
