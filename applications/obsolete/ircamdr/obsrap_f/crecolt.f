@@ -74,7 +74,7 @@
 	  CALL PAR_CANCL( 'INT2', STATUS)
 	  CALL PAR_CANCL( 'INT3', STATUS)
 	  if( status .ne. sai__ok) then
-	    type *,'after par_get0r intensities ...'
+	    print *,'after par_get0r intensities ...'
 	    return
 	  end if
 
@@ -84,7 +84,7 @@
 
 	  CALL PAR_GET0C( 'FIRST_PEN', FIRST_COL, STATUS)
 	  if( status .ne. sai__ok) then
-	    type *,'after par_get0c first pen ...'
+	    print *,'after par_get0c first pen ...'
 	    return
 	  end if
 
@@ -117,7 +117,7 @@
 	  CALL PAR_CANCL( 'INT2', STATUS)
 	  CALL PAR_CANCL( 'INT3', STATUS)
 	  if( status .ne. sai__ok) then
-	    type *,'after par_get0r intensities ...'
+	    print *,'after par_get0r intensities ...'
 	    return
 	  end if
 
@@ -127,7 +127,7 @@
 
 	  CALL PAR_GET0C( 'LAST_PEN', LAST_COL, STATUS)
 	  if( status .ne. sai__ok) then
-	    type *,'after par_get0c last pen ...'
+	    print *,'after par_get0c last pen ...'
 	    return
 	  end if
 
@@ -159,7 +159,7 @@
 
 	  CALL PAR_CANCL( 'PEN', STATUS)
 	  if( status .ne. sai__ok) then
-	    type *,'after par_get0i pen position ...'
+	    print *,'after par_get0i pen position ...'
 	    return
 	  end if
 
@@ -197,7 +197,7 @@
 	      CALL PAR_CANCL( 'INT2', STATUS)
 	      CALL PAR_CANCL( 'INT3', STATUS)
 	      if( status .ne. sai__ok) then
-	        type *,'after par_get0r intensities ...'
+	        print *,'after par_get0r intensities ...'
 	        return
 	      end if
 
@@ -211,7 +211,7 @@
 
 	      CALL PAR_CANCL( 'COLOUR', STATUS)
 	      if( status .ne. sai__ok) then
-	        type *,'after par_get0c colour ...'
+	        print *,'after par_get0c colour ...'
 	        return
 	      end if
 
