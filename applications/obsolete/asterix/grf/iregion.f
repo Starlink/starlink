@@ -100,7 +100,7 @@
           IF (MODE.EQ.'CIR') THEN
             CALL IREGION_CIRCLE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'BOX') THEN
-            CALL IREGION_BOX(EXCLUDE,STATUS)
+            CALL IREGION_BOX(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'POL') THEN
             CALL IREGION_POLYGON(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ANN') THEN
@@ -454,7 +454,7 @@
 
 
 *+
-      SUBROUTINE IREGION_BOX(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_BOX(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -469,14 +469,18 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*80 TEXT
       REAL XC,YC,DX,DY
+      INTEGER L
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -484,6 +488,35 @@
         CALL IMG_GETBOX('XC','YC','XWID','YWID',XC,YC,DX,DY,STATUS)
         CALL IMG_BOX(XC,YC,DX,DY,STATUS)
         CALL IMG_SETBOX(XC,YC,DX,DY,EXCLUDE,STATUS)
+
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (BOX( '
+        ELSE
+          TEXT(L:)=' BOX( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('XW',2.0*DX)
+        CALL MSG_SETR('YW',2.0*DY)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^XW , ^YW ',TEXT,L)
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
