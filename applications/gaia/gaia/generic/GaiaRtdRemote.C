@@ -20,7 +20,10 @@
 //-
 
 //  Include files.
+#include <unistd.h>
 #include "GaiaRtdRemote.h"
+#include "define.h"
+#include "tcl.h"
 
 //  Initialise static members.
 int GaiaRtdRemote::zeroports_ = 1;

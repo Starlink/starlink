@@ -812,7 +812,7 @@ itcl::class gaia::StarCanvasDraw {
    method create_arc {x y} {
       return [$canvas_ create arc $x $y $x $y \
                  -start 90 \
-                 -extent 20 \
+                 -extent 90 \
                  -style pieslice \
                  -width $itk_option(-linewidth) \
                  -fill $itk_option(-fillcolor) \
