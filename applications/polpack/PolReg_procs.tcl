@@ -9352,7 +9352,6 @@ proc Save {} {
                   }
 
 # Copy the temporary output NDF to the requiested output image.
-                  exec cp ${outndf}.sdf /home/mips/dsb/ndf.sdf
                   if { ![Obey ndfpack ndfcopy "in=$outndf out=$outim"] } {
                      set ok 0
                      break
