@@ -37,6 +37,8 @@
 #        Add T_HOT
 #     1998 Jun 5  (TimJ)
 #        Add ERRORS
+#     2000 Apr 17 (TimJ)
+#        Add RESIDUAL
 #-
 
    INTERFACE SKYDIP
@@ -138,6 +140,15 @@
         DEFAULT  'NORM'
         VPATH    'DEFAULT'
         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER RESIDUAL
+        PROMPT 'Residual of fit'
+        TYPE '_DOUBLE'
+        DEFAULT -1.0
+        HELPKEY '*'
+        VPATH  'DEFAULT'
+        ACCESS WRITE
       ENDPARAMETER
 
       PARAMETER SIGMA
