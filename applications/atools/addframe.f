@@ -26,7 +26,7 @@
 *     the FrameSet's current Frame.
 
 *  Usage:
-*     getmapping this iframe map frame result
+*     addframe this iframe map frame result
 
 *  ADAM Parameters:
 *     FRAME = LITERAL (Read) 
