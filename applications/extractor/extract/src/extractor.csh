@@ -22,6 +22,7 @@
 #  Authors:
 #     BLY: M.J. Bly (Starlink, RAL)
 #     AJC: A.J. Chipperfield (Starlink, RAL)
+#     PWD: Peter W. Draper (Starlink, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -31,6 +32,8 @@
 #       Cosmetic mods.
 #     23-NOV-1998 (AJC):
 #       Modify for extractor
+#     24-APR-2001 (PWD):
+#       Added "extractor" alias.
 #     {enter_changes_here}
 
 #-
@@ -72,6 +75,7 @@ setenv EXTRACTOR_CONFIG $EXTRACTOR_DIR/config
 
 # eg:  alias command ${EXTRACTOR_BIN}/command
 alias extract '$EXTRACTOR_DIR/extractor'
+alias extractor '$EXTRACTOR_DIR/extractor'
 
 #
 #  Now do the same with alternative names.
@@ -85,9 +89,8 @@ alias extract '$EXTRACTOR_DIR/extractor'
 
 echo ""
 echo "   EXTRACTOR commands are now available -- (Version PKG_VERS)"
-echo " "
-#echo "   Type extractorhelp for help on EXTRACTOR commands"
-#echo " "
+echo ""
+echo "   Type 'showme sun226 running_extractor' for initial help"
+echo ""
 
-#
 # end

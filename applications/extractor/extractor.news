@@ -3,21 +3,30 @@
  A minor update to the EXTRACTOR package with several significant
  changes:
 
-    o SExtractor has been updated to version 2.1.6. 
+    o SExtractor has been updated to version 2.2.1.
 
     o New parameters to control the measurement of "mean" object radii
       at configurable intensity levels have been added to the Starlink
-      version of EXTRACTOR and SExtractor.
+      versions of EXTRACTOR and SExtractor.
 
- The update to SExtractor 2.1.6 introduces the following changes (from 
+ The update to SExtractor 2.2.1 introduces the following changes (from
  the SExtractor change log).
+
+     o Version 2.2.1
+       - Memory allocation bug for large images on Alphas while
+         preparing the background-map fixed.
+       - CLEANing bug with hollow objects on weighted images fixed.
+
+     o Version 2.2.0
+       - MAP_RMS weight-map bug fixed.
+       - Huge MAP_WEIGHT calibration bugs fixed.
 
      o Version 2.1.6
        - Crowding-flag bug introduced in V2.1.5 fixed.
 
      o Version 2.1.5
         - Small inaccuracy in crowding-flag positioning fixed.
-        - Fixed division by zero in local background in MASK_TYPE 
+        - Fixed division by zero in local background in MASK_TYPE
           CORRECT mode.
         - Risk of segmentation fault with huge weight maps fixed.
 
@@ -67,5 +76,5 @@
 
     % showme sun226
 
- Peter W. Draper 13th July 2000 (extractor@star.rl.ac.uk).
+ Peter W. Draper 24th April 2001 (extractor@star.rl.ac.uk).
 

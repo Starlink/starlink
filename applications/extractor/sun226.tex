@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {226.4}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {13 July 2000}
+\newcommand{\stardocdate}      {24 April 2001}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.2}
@@ -29,7 +29,7 @@ popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 
-\newcommand{\sexversion}{2.1.6}
+\newcommand{\sexversion}{2.2.1}
 
 % -----------------------------------------------------------------------------
 
@@ -555,9 +555,9 @@ data, but also performs well on other astronomical images.
 
 \EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\
 (Source-Extractor) program\footnote{BERTIN E. and ARNOUTS S., 1996,
-A\&AS 117,393} re-packaged for use in the \xref{Starlink Software
-Environment}{sg4}{}\latex{ (see SG/4)}.  This means that it uses the
-Starlink parameter system, accepts images in
+A\&AS 117,393} re-packaged for use in the 
+\xref{Starlink Software Environment}{sg4}{} \latex{(see SG/4)}.  
+This means that it uses the Starlink parameter system, accepts images in
 \xref{NDF}{sun33}{abstract} format \latex{(see SUN/33)} and uses the
 \xref{AST}{sun210}{} library \latex{(SUN/210)} for astrometry.
 
@@ -570,13 +570,15 @@ by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
 SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 \htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
-An unmodified version of \SExtractor\ \sexversion\ is also included in the
-distribution of \EXTRACTOR.  You can find details of \SExtractor's
-operation, and how to configure it, in the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
-as a Starlink Miscellaneous User Document, MUD/165\footnote{Note this
+An slightly modified version of \SExtractor\ \sexversion\ is also
+included in the distribution of \EXTRACTOR.  
+You can find details of \SExtractor's operation, and how to configure
+it, in the \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
+as a Starlink Miscellaneous User Document, MUD 165\footnote{Note this
 document is still in draft, consequently you should read this in
-conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
+conjunction with the \htmladdnormallink{A\&AS paper}{sexpaper.ps} 
+and the \htmladdnormallink{earlier SExtractor user document}{sex1_doc.ps}.}) 
+\dash\ you configure \EXTRACTOR\
 in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
 \latex{(see Section~\ref{implementation_notes})}.
@@ -589,20 +591,21 @@ from the Starlink distribution.
 
 Like any Starlink program \EXTRACTOR\ may be run from the
 Unix shell or from a user-interface such as
-\xref{ICL}{sg5}{abstract}\latex{ (see SG/5)}.
+\xref{ICL}{sg5}{abstract} \latex{(see SG/5)}.
 A useful summary of the rich variety of methods of specifying parameter values
-is given in \xref{SUN/95}{sun95}{se_param}.
+is given in \xref{SUN/95}{sun95}{se_param}. C-shell users should also
+consult \xref{SC/4}{sc4}{}, the C-Shell CookBook.
 
 The examples below assume you are running from the Unix shell but the commands
 and parameters are exactly the same from ICL.
 
 After normal Starlink startup, at the shell prompt, type:
 \begin{quote} \begin{verbatim}
-% extractor
+% extractorsetup
 \end{verbatim} \end{quote}
 to initialise the package and then:
 \begin{quote} \begin{verbatim}
-% extract
+% extractor
 \end{verbatim} \end{quote}
 to run the program.  You will now be prompted for the values of parameters
 CONFIG and IMAGE in turn:
@@ -633,11 +636,11 @@ point to the directory containing the \EXTRACTOR\ program and the
 You can also provide parameter values on the command line.
 Either positionally,
 \begin{quote} \begin{verbatim}
-% extract image $EXTRACTOR_DIR/config/default.sex
+% extractor image $EXTRACTOR_DIR/config/default.sex
 \end{verbatim} \end{quote}
 or by keyword,
 \begin{quote} \begin{verbatim}
-% extract config=$EXTRACTOR_DIR/config/default.sex
+% extractor config=$EXTRACTOR_DIR/config/default.sex
 \end{verbatim} \end{quote}
 (In this case, you would be prompted for IMAGE but not for CONFIG.)
 
@@ -645,7 +648,7 @@ The additional parameters KEYWORDS, NAME and VALUE allow
 configuration parameters specified in the preferences file to be overridden
 without editing the file. For example:
 \begin{quote} \begin{verbatim}
-% extract keywords=true
+% extractor keywords=true
 NAME - Parameter name /!/ > catalog_name
 VALUE - Parameter value /!/ > sky.cat
 NAME - Parameter name /!/ > catalog_type
@@ -677,10 +680,10 @@ different strategy to normal programs. Here's one example script:
 #!/bin/csh
 
 #  Initialize EXTRACTOR
-extractor
+extractorsetup
 
 #  Extract all objects above 1 sigma
-extract keywords=true image=image config=default.sex <<EOF
+extractor keywords=true image=image config=default.sex <<EOF
 catalog_name
 thresh1.cat
 detect_thresh
@@ -689,7 +692,7 @@ detect_thresh
 EOF
 
 # Extract all objects above 2 sigma
-extract keywords image=image config=default.sex <<EOF
+extractor keywords image=image config=default.sex <<EOF
 catalog_name
 thresh2.cat
 detect_thresh
@@ -735,7 +738,8 @@ FLAGS
 
 For a full description of the meaning of the configuration parameters, see
 the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} \latex{(MUD/165)}
+and \htmladdnormallink{related documents}{sex1_doc.ps}.
 
 \section{\xlabel{using_images_in_nonndf_formats}Using images in non-NDF formats}
 If you want to read an image in one of the
@@ -754,7 +758,7 @@ an appropriate extension. For example:
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
 
-% extract
+% extractor
 CONFIG - Configuration file /'$EXTRACTOR_DIR/config/default.sex'/ >
 IMAGE - Input image /'image'/ > image.fit
 \end{verbatim} \end{quote}
@@ -921,18 +925,30 @@ the peak intensity.
 
 \section{Changes}
 \subsection{Version 1.2-0}
+
  This is a minor update to the \EXTRACTOR\ package with several
  significant changes:
  \begin{itemize}
-   \item \SExtractor\ has been updated to version 2.1.6. 
+   \item \SExtractor\ has been updated to version 2.2.1. 
 
    \item New parameters to control the measurement of \texttt{mean}
          object radii at configurable intensity levels have been
          added to the Starlink version of \EXTRACTOR\ and \SExtractor.
  \end{itemize}
- The update to \SExtractor\ 2.1.6 introduces the following changes (from 
+ The update to \SExtractor\ 2.2.1 introduces the following changes (from 
  the \SExtractor\ change log).
  \begin{itemize}
+   \item Version 2.2.1
+      \begin{itemize}
+         \item  Memory allocation bug for large images on Alphas while
+                preparing the background-map fixed.
+         \item CLEANing bug with hollow objects on weighted images fixed.
+      \end{itemize}
+   \item Version 2.2.0
+      \begin{itemize}
+        \item \texttt{MAP\_RMS} weight-map bug fixed.
+        \item Huge \texttt{MAP\_WEIGHT} calibration bugs fixed.
+      \end{itemize}
    \item Version 2.1.6
      \begin{itemize}
         \item Crowding-flag bug introduced in V2.1.5 fixed.
