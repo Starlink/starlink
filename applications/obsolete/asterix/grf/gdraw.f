@@ -1228,7 +1228,6 @@
       INTEGER STATUS
 *    Local Constants :
 *    Local variables :
-      INTEGER ID
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
