@@ -32,6 +32,7 @@
 *    Local variables :
 *     <declarations for local variables>
 *-
+      CHARACTER*2 GREEK,UP,DOWN
       REAL NG(50),GMEAN(50),BIN(50)
       REAL AV                     !Average data value
       REAL TREF                   !Average time or reference epoch
@@ -171,7 +172,11 @@
 * Size and plot THAOV(P)=AOV(N).
       CALL PGBEGIN(0,'?',1,1,1)
       CALL PGENV(XPER(1),XPER(NFREQ),AMIN,AMAX,0,0)
-      CALL PGLABEL('Period','\gH\dAOV\u','AOV Periodogram')
+      GREEK=CHAR(92)//'g'
+      UP=CHAR(92)//'u'
+      DOWN=CHAR(92)//'d'
+      CALL PGLABEL(
+     :   'Period',GREEK//'H'//DOWN//'AOV'//UP,'AOV Periodogram')
       CALL PGLINE(NFREQ,XPER,AOV)
       CALL PGEND
 *
