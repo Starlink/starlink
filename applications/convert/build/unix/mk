@@ -312,6 +312,7 @@
                CC='cc'
                CFLAGS='-O -I/star/include'
                FC='f77'
+               FFLAGS = '-O'
                LINK='ln -s'
                MACHINE_TYPE=$SYSTEM
                RANLIB='ranlib'
@@ -328,6 +329,7 @@
                CC='cc'
                CFLAGS='-O -I/star/include'
                FC='f77'
+               FFLAGS = '-O'
                LINK='ln -s'
                MACHINE_TYPE=$SYSTEM
                RANLIB='ranlib'
