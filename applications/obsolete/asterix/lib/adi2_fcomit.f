@@ -93,10 +93,13 @@
 *  Local Variables:
       CHARACTER*20		HNAME			! HDU name
 
+      INTEGER			FHDU, LHDU		! First/last HDU's to
+							! commit to disk
       INTEGER			HDUID			! HDU identifier
       INTEGER			HIID			! HDU index
       INTEGER			IHDU			! HDU loop variable
       INTEGER			NHDU			! HDU count
+      INTEGER			UIHDU			! Specific HDU number
 
       LOGICAL			CHANGED			! HDU is updated?
 *.
@@ -104,13 +107,26 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get number of HDU's
-      CALL ADI_FIND( FID, 'HduIndex', HIID, STATUS )
-      CALL ADI_NCMP( HIID, NHDU, STATUS )
-      CALL ADI_ERASE( HIID, STATUS )
+*  User HDU supplied?
+      CALL ADI_CGET0I( FID, 'UserHDU', UIHDU, STATUS )
+      IF ( UIHDU .GT. 0 ) THEN
+        FHDU = UIHDU
+        LHDU = UIHDU
+
+*  Whole file access
+      ELSE
+
+*    Get number of HDU's
+        CALL ADI_FIND( FID, 'HduIndex', HIID, STATUS )
+        CALL ADI_NCMP( HIID, NHDU, STATUS )
+        CALL ADI_ERASE( HIID, STATUS )
+        FHDU = 1
+        LHDU = NHDU
+
+      END IF
 
 *  Loop over them
-      DO IHDU = 1, NHDU
+      DO IHDU = FHDU, LHDU
 
 *    Get value of HDU index
         CALL ADI2_GETHDI( FID, IHDU, HNAME, STATUS )
@@ -234,6 +250,12 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  Local Constants:
+      INTEGER			NDEC1                   ! Decimals to write
+        PARAMETER		( NDEC1 = 7 )		! single precision
+      INTEGER			NDEC2                   ! Decimals to write
+        PARAMETER		( NDEC2 = 13 )		! double precision
+
 *  Local Variables:
       CHARACTER*1		CFORM			! Card form, K,C or H
       CHARACTER*70		CMT			! Keyword comment
@@ -252,10 +274,13 @@
       INTEGER			IVALUE			! Keyword value
       INTEGER			LUN			! Logical unit number
       INTEGER			NCARD			! # cards in HDU
+      INTEGER			NDEC			! # decimals
       INTEGER			OBJID			! Card data
 
       LOGICAL			CHANGED			! Card data updated?
+      LOGICAL			ISNEW			! Object is new?
       LOGICAL			LVALUE			! Logical keyword value
+      LOGICAL			SFMT			! Scientific notation?
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -286,6 +311,9 @@
           CALL ADI_CGET0L( OBJID, '.Changed', CHANGED, STATUS )
           IF ( CHANGED ) THEN
 
+*        New object or updated value
+            CALL ADI_THERE( OBJID, '.New', ISNEW, STATUS )
+
 *        Keyword?
             IF ( CFORM .EQ. 'K' ) THEN
 
@@ -299,24 +327,57 @@
               ELSE
                 CALL ADI2_STDCMT( KEYWRD, CMT, STATUS )
               END IF
+              IF ( (CMT .LE. ' ') .AND. .NOT. ISNEW ) CMT = '&'
 
 *          Write keyword data
               CALL ADI_TYPE( OBJID, CLASS, STATUS )
               IF ( CLASS(1:1) .EQ. 'D' ) THEN
                 CALL ADI_GET0D( OBJID, DVALUE, STATUS )
-                CALL FTPKYG( LUN, KEYWRD, DVALUE, 8, CMT, FSTAT )
+                IF ( ISNEW ) THEN
+                  CALL FTPKYG( LUN, KEYWRD, DVALUE, NDEC2, CMT, FSTAT )
+                ELSE
+                  CALL ADI_CGET0L( OBJID, '.Scientific', SFMT, STATUS )
+                  CALL ADI_CGET0I( OBJID, '.Ndecimal', NDEC, STATUS )
+                  IF ( SFMT ) THEN
+                    CALL FTMKYD( LUN, KEYWRD, DVALUE, NDEC, CMT, FSTAT )
+                  ELSE
+                    CALL FTMKYG( LUN, KEYWRD, DVALUE, NDEC, CMT, FSTAT )
+                  END IF
+                END IF
               ELSE IF ( CLASS(1:1) .EQ. 'R' ) THEN
                 CALL ADI_GET0R( OBJID, RVALUE, STATUS )
-                CALL FTPKYE( LUN, KEYWRD, RVALUE, 8, CMT, FSTAT )
+                IF ( ISNEW ) THEN
+                  CALL FTPKYE( LUN, KEYWRD, RVALUE, NDEC1, CMT, FSTAT )
+                ELSE
+                  CALL ADI_CGET0L( OBJID, '.Scientific', SFMT, STATUS )
+                  CALL ADI_CGET0I( OBJID, '.Ndecimal', NDEC, STATUS )
+                  IF ( SFMT ) THEN
+                    CALL FTMKYF( LUN, KEYWRD, RVALUE, NDEC, CMT, FSTAT )
+                  ELSE
+                    CALL FTMKYE( LUN, KEYWRD, RVALUE, NDEC, CMT, FSTAT )
+                  END IF
+                END IF
               ELSE IF ( CLASS(1:1) .EQ. 'I' ) THEN
                 CALL ADI_GET0I( OBJID, IVALUE, STATUS )
-                CALL FTPKYJ( LUN, KEYWRD, IVALUE, CMT, FSTAT )
+                IF ( ISNEW ) THEN
+                  CALL FTPKYJ( LUN, KEYWRD, IVALUE, CMT, FSTAT )
+                ELSE
+                  CALL FTMKYJ( LUN, KEYWRD, IVALUE, CMT, FSTAT )
+                END IF
               ELSE IF ( CLASS(1:1) .EQ. 'L' ) THEN
                 CALL ADI_GET0L( OBJID, LVALUE, STATUS )
-                CALL FTPKYL( LUN, KEYWRD, LVALUE, CMT, FSTAT )
+                IF ( ISNEW ) THEN
+                  CALL FTPKYL( LUN, KEYWRD, LVALUE, CMT, FSTAT )
+                ELSE
+                  CALL FTMKYL( LUN, KEYWRD, LVALUE, CMT, FSTAT )
+                END IF
               ELSE
                 CALL ADI_GET0C( OBJID, CVALUE, STATUS )
-                CALL FTPKYS( LUN, KEYWRD, CVALUE, CMT, FSTAT )
+                IF ( ISNEW ) THEN
+                  CALL FTPKYS( LUN, KEYWRD, CVALUE, CMT, FSTAT )
+                ELSE
+                  CALL FTMKYS( LUN, KEYWRD, CVALUE, CMT, FSTAT )
+                END IF
               END IF
 
 *        Comment?

@@ -106,9 +106,11 @@
       INTEGER			IKEY			! Loop over keywords
       INTEGER			IVAL			! Integer key value
       INTEGER			LUN			! Logical unit number
+      INTEGER			NDECIM			! # decimals used
       INTEGER			VID			! Value identifier
 
       LOGICAL			MORE			! More keywords?
+      LOGICAL			SCINOT			! Scientific notation?
       LOGICAL			UPDATE			! Update mode on HDU?
 *.
 
@@ -167,6 +169,21 @@
             IF ( INDEX( VALUE, '.' ) .GT. 0 ) THEN
               CALL CHR_CTOD( VALUE, DVAL, STATUS )
               CALL ADI_NEWV0D( DVAL, VID, STATUS )
+
+*          Scientific notation?
+              SCINOT = (INDEX( VALUE, 'E' ).GT.0)
+
+*          Store format
+              CALL ADI_CPUT0L( VID, '.Scientific', SCINOT, STATUS )
+
+*          Determine number of stored decimal places
+              IF ( SCINOT ) THEN
+                NDECIM = INDEX(VALUE,'E') - INDEX(VALUE,'.') - 1
+              ELSE
+                NDECIM = CHR_LEN(VALUE) - INDEX(VALUE,'.') - 1
+              END IF
+              CALL ADI_CPUT0I( VID, '.Ndecimal', MAX(1,NDECIM), STATUS )
+
             ELSE
               IF ( (VALUE(1:1) .EQ. 'T') .OR. (VALUE(1:1).EQ.'F') ) THEN
                 CALL ADI_NEWV0L( (VALUE(1:1) .EQ. 'T'), VID, STATUS )

@@ -92,6 +92,7 @@
       EXTERNAL        		ADI2_NEWLNK_ARR
 
       EXTERNAL        		BDI2_SETLNK
+      EXTERNAL        		BDI2_UNLNK
 
       EXTERNAL        		EDI2_SETLNK
 
@@ -132,7 +133,14 @@
 
       CALL ADI_DEFMTH( 'SetLink(_Scalar,_FITSfile)', BDI2_SETLNK,
      :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_BinDS,_FITSfile)', BDI2_UNLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_Array,_FITSfile)', BDI2_UNLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'UnLink(_Scalar,_FITSfile)', BDI2_UNLNK,
+     :                 DID, STATUS )
 
+*  Define EDI interface
       CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
      :                 DID, STATUS )
 

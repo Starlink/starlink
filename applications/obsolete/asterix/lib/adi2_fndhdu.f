@@ -130,7 +130,8 @@
 *  Make local copy of HDU name. Convert if user HDU number supplied
       LHDU = HDU
       IF ( HDU .EQ. ' ' ) LHDU = 'PRIMARY'
-      IF ( (UIHDU .GT. 0) .AND. (HDU.GT.' ') ) THEN
+      IF ( (UIHDU .GT. 0) .AND. (HDU.GT.' ') .AND.
+     :     (HDU.NE.'PRIMARY') ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Attempted illegal index to named HDU '/
      :              /'when file opened with specific HDU', STATUS )

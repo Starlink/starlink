@@ -96,11 +96,10 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*5		CNAME			! Comment struc name
+      CHARACTER*4		CNAME			! Comment struc name
 
       INTEGER			CCID			! Comments list
       INTEGER			CID			! Comment object
-      INTEGER			MCARD			! 1st changed card
       INTEGER			NCARD			! HDU card number
 *.
 
@@ -113,20 +112,12 @@
 *  Create comment object
       CALL ADI_NEWV0C( CMNT, CID, STATUS )
 
-*  Mark comment and HDU as changed
-      CALL ADI_CPUT0L( CID, '.Changed', UPDATE, STATUS )
-      IF ( UPDATE ) THEN
-        CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
-      END IF
-
 *  Get keyword number and update
       IF ( UPDATE ) THEN
 
-*  Update first changed card number
-        CALL ADI_CGET0I( HDUID, 'MinDiffCard', MCARD, STATUS )
-        IF ( MCARD .EQ. 0 ) MCARD = NCARD
-        CALL ADI_CPUT0I( HDUID, 'MinDiffCard', MIN(MCARD,NCARD),
-     :                   STATUS )
+*    Mark as updated
+        CALL ADI2_MRKCHG( HDUID, CID, STATUS )
+        CALL ADI_CPUT0L( KID, '.New', .TRUE., STATUS )
 
       ELSE
 
@@ -136,7 +127,7 @@
       END IF
 
 *  Create structure name from card number
-      WRITE( CNAME, '(A1,I4.4)' ) 'C', NCARD
+      WRITE( CNAME, '(A1,I3.3)' ) 'C', NCARD
 
 *  Write component to container
       CALL ADI_CPUTID( CCID, CNAME, CID, STATUS )

@@ -99,7 +99,6 @@
 
 *  Local Variables:
       INTEGER			KCID			! Keywords list
-      INTEGER			MCARD			! First changed card
       INTEGER			NCARD			! HDU card number
       INTEGER			OKID			! Existing keyword data
 
@@ -130,28 +129,24 @@
         END IF
       END IF
 
-*  Mark keyword and HDU as changed
-      CALL ADI_CPUT0L( KID, '.Changed', UPDATE, STATUS )
-      IF ( UPDATE ) THEN
-        CALL ADI_CPUT0L( HDUID, 'Changed', .TRUE., STATUS )
-      END IF
-
 *  Get keyword number and update
       IF ( UPDATE ) THEN
+
         IF ( THERE ) THEN
           CALL ADI_CPUT0I( KID, '.Icard', NCARD, STATUS )
         ELSE
           CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
+          CALL ADI_CPUT0L( KID, '.New', .TRUE., STATUS )
+
         END IF
 
-*  Update first changed card number
-        CALL ADI_CGET0I( HDUID, 'MinDiffCard', MCARD, STATUS )
-        IF ( MCARD .EQ. 0 ) MCARD = NCARD
-        CALL ADI_CPUT0I( HDUID, 'MinDiffCard', MIN(MCARD,NCARD),
-     :                   STATUS )
+*    Mark keyword as changed
+        CALL ADI2_MRKCHG( HDUID, KID, STATUS )
 
       ELSE
+
         CALL ADI2_ADDCRC( HDUID, 'K'//KEY, KID, NCARD, STATUS )
+
       END IF
 
 *  Write component to container

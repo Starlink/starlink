@@ -107,7 +107,6 @@
       INTEGER			LUN			! Logical i/o unit
       INTEGER			NELM			! # data elements
       INTEGER			PTR			! Mapped address
-      INTEGER			SVID			! Scalar value id
 *.
 
 *  Check inherited global status.
@@ -176,13 +175,6 @@
 
 *    Map the ADI value of the object
         CALL ADI_UNMAP( KID, PTR, STATUS )
-
-*    Update the data model value
-        IF ( MODE .NE. 'READ' ) THEN
-          CALL ADI_CERASE( FID, 'Value', STATUS )
-          CALL ADI_COPY( KID, SVID, STATUS )
-          CALL ADI_CPUTID( FID, 'Value', SVID, STATUS )
-        END IF
 
 *  Miscellaneous mapped data
       ELSE IF ( FORM .EQ. 'X' ) THEN

@@ -116,6 +116,9 @@
       NCARD = NCARD + 1
       CALL ADI_CPUT0I( HDUID, 'Ncard', NCARD, STATUS )
 
+*  Mark as unchanged
+      CALL ADI_CPUT0L( OBJ, '.Changed', .FALSE., STATUS )
+
 *  Write property to card object
       CALL ADI_CPUT0I( OBJ, '.Icard', NCARD, STATUS )
 
