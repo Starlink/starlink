@@ -1455,6 +1455,7 @@ D        WRITE(*,*) RLP
 *    Local variables :
       CHARACTER*(DAT__SZLOC) HLOC     ! Locator to header block
       REAL TOT_CORR                   ! Total correction factor for this bin
+      REAL EFF_EXPOS		      ! Effective exposure
       INTEGER PLP,TLP,XLP,YLP,RLP
 
 *-
@@ -1462,11 +1463,13 @@ D        WRITE(*,*) RLP
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+
+      EFF_EXPOS=0.0
+
 * Apply corrections to each bin
       DO RLP=1,NR
         DO PLP=1,NP
            DO TLP=1,NT
-D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
              DO YLP=1,NY
                 DO XLP=1,NX
 *
@@ -1478,6 +1481,8 @@ D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
 *
                      TOT_CORR = DCORR(TLP) * TCORR(1) * PCORR *
      &                           VCORR(RLP) * WCORR(1) / EXPOS(TLP)
+
+                     EFF_EXPOS = EFF_EXPOS + EXPOS(TLP)/DCORR(TLP)
 *
                      DATA(XLP,YLP,TLP,PLP,RLP) =
      &                     DATA(XLP,YLP,TLP,PLP,RLP) * TOT_CORR
@@ -1505,13 +1510,9 @@ D                  WRITE(2,*)DCORR(TLP),EXPOS(TLP)
         ENDDO
       ENDDO
 *
-* Write in an effective exposure value into the header, unless the file
-* was a time series
-      IF (NT .EQ. 1) THEN
-         CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
-         CALL HDX_PUTR(HLOC, 'EFF_EXPOSURE', 1,
-     &                           EXPOS(1)/DCORR(1), STATUS)
-      ENDIF
+* Write in an effective exposure value into the header
+       CALL BDA_LOCHEAD(LOC, HLOC, STATUS)
+       CALL HDX_PUTR(HLOC, 'EFF_EXPOSURE', 1, EFF_EXPOS, STATUS)
 
  999  IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP(' ','from XRTCORR_DOIT',STATUS)
