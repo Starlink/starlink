@@ -43,7 +43,8 @@
 {        Added DA2NDF, FITS2NDF, and NDF2DA tasks and help.  Added
 {        automatic conversions for STREAM and GZIP.  Added FITS synonym
 {        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
-{        write one format per line for clarity.
+{        write one format per line for clarity.  Due to limited length 
+{        of SETENV token, there are no aliases for FITS in NDF_FORMATS_IN.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -171,25 +172,10 @@ UNF0(.dat),~
 ASCII(.asc),~
 TEXT(.txt),~
 GIF(.gif),~
-TIFF(.tif)\,
+TIFF(.tif),~
 GASP(.hdr),~
 COMPRESSED(.sdf.Z),~
-GZIP(.sdf.gz),~
-FITS(.fits),~
-FITS(.fts),~
-FITS(.FTS),~
-FITS(.FITS),~
-FITS(.FIT),~
-FITS(.lilo),~
-FITS(.lihi),~
-FITS(.silo),~
-FITS(.sihi),~
-FITS(.mxlo),~
-FITS(.rilo),~
-FITS(.rihi),~
-FITS(.vdlo),~
-FITS(.vdhi),~
-STREAM(.str)'
+GZIP(.sdf.gz)'
 
 {  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT ~
@@ -202,25 +188,10 @@ UNF0(.dat),~
 ASCII(.asc),~
 TEXT(.txt),~
 GIF(.gif),~
-TIFF(.tif)\,
+TIFF(.tif),~
 GASP(.hdr),~
 COMPRESSED(.sdf.Z),~
-GZIP(.sdf.gz),~
-FITS(.fits),~
-FITS(.fts),~
-FITS(.FTS),~
-FITS(.FITS),~
-FITS(.FIT),~
-FITS(.lilo),~
-FITS(.lihi),~
-FITS(.silo),~
-FITS(.sihi),~
-FITS(.mxlo),~
-FITS(.rilo),~
-FITS(.rihi),~
-FITS(.vdlo),~
-FITS(.vdhi),~
-STREAM(.str)'
+GZIP(.sdf.gz)'
 
 {  Define format-conversion commands.
 {  ==================================
@@ -415,4 +386,5 @@ print  " "
 print  " Defaults for automatic NDF conversion are set."
 print  ""
 print  " Type CONHELP or HELP CONVERT for CONVERT help."
+print  ' Type "showme sun55" to browse the hypertext documentation.'
 print  " "
