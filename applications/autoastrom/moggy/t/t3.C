@@ -1,6 +1,18 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstdio>
 #include <vector>
 #include <string>
+
+#if HAVE_STD_NAMESPACE
+using std::string;
+using std::vector;
+using std::cout;
+using std::cerr;
+using std::endl;
+#endif
 
 #include "../util.h"
 
