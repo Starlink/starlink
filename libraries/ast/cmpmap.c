@@ -1216,6 +1216,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          }
 
 /* If the Mappings can be swapped.. */
+         new_pm = NULL;
+         new_cm = NULL;
+         qa = NULL;
+         qb = NULL;
          if( canswap ) {
 
 /* Temporarily set the Invert attributes of the component Mappings to the 
@@ -2516,6 +2520,10 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
          nin = astGetNin( map1 ) + astGetNin( map2 );
          nout = astGetNout( map1 ) + astGetNout( map2 );
       }
+
+   } else {
+      nin = 0;
+      nout = 0;
    }
 
 /* Initialise a Mapping structure (the parent class) as the first component
@@ -2779,14 +2787,14 @@ static int PatternCheck( int val, int check, int **list, int *list_len ){
 */
 
 /* Local Variables: */
-   int *wave1;               /* Start of most recent wave */
-   int *wave2;               /* Start of 2nd wave */
-   int *wave3;               /* Start of 3rd wave */
+   int *wave[ 30 ];          /* Pointers to start of waves */
    int iat;                  /* Index of elements added by this invocation */
    int jat;                  /* Index of element condiered next */
    int jlo;                  /* Earliest "mlist" entry to consider */
    int k;                    /* Index of element within pattern */
    int mxwave;               /* Max pattern length to consider */
+   int iwave;                /* Index of current wave */
+   int nwave;                /* Number of waves required to mark a pattern */
    int result;               /* Returned flag */
    int wavelen;              /* Current pattern length */
 
@@ -2826,21 +2834,40 @@ static int PatternCheck( int val, int check, int **list, int *list_len ){
 /* When an earlier occurrence of "val" is found, see if the values
    which preceed it are the same as the values which preceed the new
    element if "list" added by this invocation. We use 3 complete
-   patterns as evidence of looping. Ignore wavelenths of 1 since these
-   can occur legitamately. */
+   patterns as evidence of looping, unless the wavelength is 1 in which
+   case we use 30 patterns (this is because wavelengths of 1 can occur
+   in short sequences legitamately). */
                wavelen = iat - jat;
-               if( wavelen > 1 && 3*wavelen <= *list_len ) {
-                  result = 1;
-                  wave1 = *list + *list_len - wavelen;
-                  wave2 = wave1 - wavelen;
-                  wave3 = wave2 - wavelen;
-                  for( k = 0; k < wavelen; k++, wave1++, wave2++, wave3++ ) {
-                     if( *wave2 != *wave1 || *wave3 != *wave1 ) {
-                        result= 0;
-                        break;
+
+               if( wavelen == 1 ) {
+                  nwave = 30;
+                  if( nwave > iat ) nwave = iat;
+               } else {
+                  nwave = 3;
+               }
+
+               if( nwave*wavelen <= *list_len ) {
+                  result = wavelen;
+                  wave[ 0 ] = *list + *list_len - wavelen;
+                  for( iwave = 1; iwave < nwave; iwave++ ) {
+                     wave[ iwave ] = wave[ iwave - 1 ] - wavelen;
+                  }
+
+                  for( k = 0; k < wavelen; k++ ) {
+                     for( iwave = 1; iwave < nwave; iwave++ ) {
+                        if( *wave[ iwave ] != *wave[ 0 ] ) {
+                           result = 0;
+                           break;
+                        }
+                        wave[ iwave ]++;
                      }
+                     wave[ 0 ]++;
                   }   
                }
+
+/* Break if we have found a repeating pattern. */
+               if( result ) break;
+
             }
             jat--;
          }
