@@ -328,11 +328,507 @@ prepare:
 check_packages:
 
 build_sources:
-     [copy] Copying 15 files to /apps/cvsbuild/java/source/hdx/build/java
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/hdx/lib/hdx/hdx.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing NDArray target: install
+
+prepare:
+
+check_packages:
+
+assemble_java:
+
+do_assemble_java:
+
+build_classes:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/array/lib/array/array.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/array/lib/array/array.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 58 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing NDX target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/ndx/lib/ndx/ndx.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 27 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing Table target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/table/lib/table/table.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/table/lib/table/htmIndex.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/table/lib/table/table.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing NDTools target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/ndtools/lib/ndtools/ndtools.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 15 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing HDS target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/hds/lib/hds/hds.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 20 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing FITS target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/fits/lib/fits/fits.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing AstroGrid target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/astrogrid/lib/astrogrid/astrogrid.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/astrogrid/bin. It is empty.
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 23 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing JSky target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/dom4j.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/hcompress.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jcommon.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jel.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jfreechart.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jsky/lib/jsky/jsky.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 434 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing Pal target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing VOTable target: install
+
+prepare:
+
+check_packages:
+
+build_sources:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 54 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing VO target: install
+
+prepare:
+
+check_packages:
+
+ws_sources_check:
+
+ws_sources:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+      [jar] Building jar: /apps/cvsbuild/java/source/vo/lib/vo/sesame.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/nvo-registry.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/sesame.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/vo/lib/vo/vo.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 35 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing JAIUtil target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing SOAPSERVER target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 25 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing SOG target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 48 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing SPLAT target: install
+
+prepare:
+
+check_packages:
+
+build:
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/build/classes
+
+execute_mk_script:
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] make: Nothing to be done for `build'.
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jargs.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/splat/lib/splat/toolbar.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
+
+install:
+[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 12 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 254 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 264 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
+     [echo] Executing Mirage target: install
+
+prepare:
+
+check_packages:
+
+build:
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+  [signjar] Signing JAR: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
+
+javadoc_check:
+
+javadocs:
+
+webstart:
+
+dist:
+
+install:
+[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
+[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
+     [echo] Executing TOPCAT target: install
+
+prepare:
+
+check_packages:
+
+build_demo:
+   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
+      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
+
+build:
+
+docs_check:
+
+docs:
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Jan 21, 2005 5:26:16 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] INFO: java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
+  [javadoc] java.lang.UnsatisfiedLinkError: couldn't load library jniast: /apps/cvsbuild/starjava/lib/i386/libjniast.so: libg2c.so.0: cannot open shared object file: No such file or directory
+  [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:146)
+  [javadoc] 	at uk.ac.starlink.ast.AstObject.<clinit>(AstObject.java:43)
+  [javadoc] 	at uk.ac.starlink.ast.AstPackage.isAvailable(AstPackage.java:36)
+  [javadoc] 	at uk.ac.starlink.topcat.TopcatUtils.canSplat(TopcatUtils.java:248)
+  [javadoc] 	at uk.ac.starlink.topcat.JELUtils.getActivationStaticClasses(JELUtils.java:169)
+  [javadoc] 	at uk.ac.starlink.topcat.doc.XmlDoclet.<init>(XmlDoclet.java:84)
+  [javadoc] 	at uk.ac.starlink.topcat.doc.XmlDoclet.start(XmlDoclet.java:48)
+  [javadoc] 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+  [javadoc] 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+  [javadoc] 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+  [javadoc] 	at java.lang.reflect.Method.invoke(Method.java:324)
+  [javadoc] 	at com.sun.tools.javadoc.DocletInvoker.invoke(DocletInvoker.java:193)
+  [javadoc] 	at com.sun.tools.javadoc.DocletInvoker.start(DocletInvoker.java:92)
+  [javadoc] 	at com.sun.tools.javadoc.Start.parseAndExecute(Start.java:301)
+  [javadoc] 	at com.sun.tools.javadoc.Start.begin(Start.java:120)
+  [javadoc] 	at com.sun.tools.javadoc.Main.execute(Main.java:41)
+  [javadoc] 	at com.sun.tools.javadoc.Main.main(Main.java:31)
+  [javadoc] Caused by: java.lang.UnsatisfiedLinkError: no jniast in java.library.path
+  [javadoc] 	at java.lang.ClassLoader.loadLibrary(ClassLoader.java:1403)
+  [javadoc] 	at java.lang.Runtime.loadLibrary0(Runtime.java:788)
+  [javadoc] 	at java.lang.System.loadLibrary(System.java:832)
+  [javadoc] 	at uk.ac.starlink.util.Loader.loadLibrary(Loader.java:111)
+  [javadoc] 	... 16 more
+  [javadoc] Jan 21, 2005 5:26:16 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] WARNING: JNIAST load failed - no WCS processing
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
+  [javadoc] Constructing Javadoc information...
+     [xslt] Processing /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml to /apps/cvsbuild/java/source/topcat/build/docs/sun253/sun253.html
+     [xslt] Loading stylesheet /apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt
+     [xslt] apps/cvsbuild/java/source/topcat/src/docs/toHTML1.xslt:580: Error! java.lang.reflect.InvocationTargetException Cause: java.lang.reflect.InvocationTargetException
+     [xslt] : Fatal Error! java.lang.NullPointerException Cause: java.lang.NullPointerException
+     [xslt] Failed to process /apps/cvsbuild/java/source/topcat/build/docs/sun253.xml
 
 BUILD FAILED
 /apps/cvsbuild/java/source/build.xml:289: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/build.xml:156: The following error occurred while executing this line:
-/apps/cvsbuild/java/source/hdx/build.xml:931: No supported regular expression matcher found
+/apps/cvsbuild/java/source/build.xml:216: The following error occurred while executing this line:
+/apps/cvsbuild/java/source/topcat/build.xml:1146: Fatal error during transformation
 
-Total time: 1 minute 36 seconds
+Total time: 3 minutes 22 seconds
