@@ -1218,3 +1218,85 @@ itcl::body ::cat::AstroCat::new_catalog {name {id ""}
 	  -transient 0 \
 	  -center 0]
 }
+
+#  XXX redefine the body of SkySearch add_history proc. This doesn't
+#  deal with images without a WCS system well (i.e. it reports an
+#  error about converting "" to an RA and gives up).
+itcl::body ::skycat::SkySearch::add_history {skycat filename} {
+   set catalog $history_catalog_
+   set image [$skycat get_image]
+	
+   # make sure at least an empty catalog exists
+   if {! [file exists $catalog] || [file size $catalog] == 0} {
+      # If it doesn't exist yet, create an empty catalog file
+      if {[catch {set fd [::open $catalog w]} msg]} {
+	 error_dialog "can't create image history catalog: %msg"
+	 return
+      }
+      puts $fd "Skycat History Catalog v1.0"
+      puts $fd ""
+      puts $fd "ra_col: -1"
+      puts $fd "dec_col: -1"
+      puts $fd "x_col: -1"
+      puts $fd "y_col: -1"
+      puts $fd "show_cols: file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3"
+      puts $fd "sort_cols: timestamp"
+      puts $fd "sort_order: decreasing"
+      puts $fd ""
+      puts $fd [join $history_cols_ "\t"]
+      puts $fd "----"
+      ::close $fd
+      # get the catalog into the list of known catalogs
+      $astrocat_ open $catalog
+   }
+   
+   if {"$filename" == "" || [string first /tmp $filename] == 0 \
+	  || ! [file exists $filename]} {
+      # ignore temporary and non-existant files
+      return
+   }
+   
+   # add an entry for the given image and filename
+   set id [file tail $filename]
+   lassign [$image wcscenter] ra dec equinox
+   if { $ra == "" } { 
+      set ra "00:00:00"
+      set dec "00:00:00"
+   }
+   set object [$image fits get OBJECT] 
+   set naxis [$image fits get NAXIS]
+   set naxis1 [$image fits get NAXIS1]
+   set naxis2 [$image fits get NAXIS2]
+   set naxis3 [$image fits get NAXIS3]
+   lassign [$image cut] lowcut highcut
+   set colormap [$image cmap file]
+   set itt [$image itt file]
+   set colorscale [$image colorscale]
+   set zoom [lindex [$image scale] 0]
+   if {"$zoom" == ""} {
+      set zoom 1
+   }
+   set timestamp [clock seconds]
+   
+   # get full path name of file for preview URL
+   if {"[string index $filename 0]" == "/"} {
+      set fullpath $filename
+   } else {
+      set fullpath [pwd]/$filename
+   }
+   set preview file:$fullpath
+   
+   set data [list [list $id $ra $dec $object $naxis $naxis1 $naxis2 $naxis3\
+		      $lowcut $highcut $colormap $itt $colorscale $zoom \
+		      $timestamp $preview]]
+   
+   $astrocat_ open $catalog
+   $astrocat_ save $catalog 1 $data $equinox
+   
+   # update history catalog window, if it is showing
+   set w [cat::AstroCat::get_instance [file tail $catalog]]
+   if {"$w" != "" && [winfo viewable $w]} {
+      $w search
+   }
+}
+

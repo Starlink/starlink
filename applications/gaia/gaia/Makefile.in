@@ -152,21 +152,22 @@ all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
 	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
-	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
+	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) \
+	       $(ADDLIBS) $(AST_LIBS) \
 	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
-	       $(TCLUTIL_LIB_STATIC) $(LOCAL_LIBRARY) \
+	       $(TCLUTIL_LIB_STATIC) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
 
 $(demo_tcl): normallib tclAppInit.o FORCE
 	@echo "linking \"$(demo_tcl)\"..."
 	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(demo_tcl) \
-	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADAM_LIBS) \
+	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(ADDLIBS) $(gADAM_LIBS) \
 	       $(TCLTKLIBS) $(EXTRA_LIBS)
 
 $(ardstat): normallib ardstat.o
 	echo "linking \"$(ardstat)\"..."
-	$(ALINK) ardstat.o $(FFLAGS) -o $(ardstat) $(LOCAL_LIBRARY) \
+	$(ALINK) ardstat.o $(FFLAGS) -o $(ardstat) $(LOCAL_LIBRARY) $(ADDLIBS)\
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam`
 	$(COMPIFL) ardstat.ifl
 	$(INSTALL_DATA) ardstat.ifc bin/ardstat.ifc
@@ -174,7 +175,7 @@ $(ardstat): normallib ardstat.o
 
 $(autocrop): normallib autocrop.o
 	echo "linking \"$(autocrop)\"..."
-	$(ALINK) autocrop.o $(FFLAGS) -o $(autocrop) $(LOCAL_LIBRARY) \
+	$(ALINK) autocrop.o $(FFLAGS) -o $(autocrop) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam`
 	$(COMPIFL) autocrop.ifl
 	$(INSTALL_DATA) autocrop.ifc bin/autocrop.ifc
@@ -182,7 +183,7 @@ $(autocrop): normallib autocrop.o
 
 $(cat2tab): normallib cat2tab.o
 	echo "linking \"$(cat2tab)\"..."
-	$(ALINK) cat2tab.o $(FFLAGS) -o $(cat2tab) $(LOCAL_LIBRARY) \
+	$(ALINK) cat2tab.o $(FFLAGS) -o $(cat2tab) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
 	$(COMPIFL) cat2tab.ifl
 	$(INSTALL_DATA) cat2tab.ifc bin/cat2tab.ifc
@@ -190,7 +191,7 @@ $(cat2tab): normallib cat2tab.o
 
 $(tab2cat): normallib tab2cat.o
 	echo "linking \"$(tab2cat)\"..."
-	$(ALINK) tab2cat.o $(FFLAGS) -o $(tab2cat) $(LOCAL_LIBRARY) \
+	$(ALINK) tab2cat.o $(FFLAGS) -o $(tab2cat) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
 	$(COMPIFL) tab2cat.ifl
 	$(INSTALL_DATA) tab2cat.ifc bin/tab2cat.ifc
@@ -198,7 +199,7 @@ $(tab2cat): normallib tab2cat.o
 
 $(asc2tab): normallib asc2tab.o
 	echo "linking \"$(asc2tab)\"..."
-	$(ALINK) asc2tab.o $(FFLAGS) -o $(asc2tab) $(LOCAL_LIBRARY) \
+	$(ALINK) asc2tab.o $(FFLAGS) -o $(asc2tab) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
 	$(COMPIFL) asc2tab.ifl
 	$(INSTALL_DATA) asc2tab.ifc bin/asc2tab.ifc
@@ -206,7 +207,7 @@ $(asc2tab): normallib asc2tab.o
 
 $(tab2asc): normallib tab2asc.o
 	echo "linking \"$(tab2asc)\"..."
-	$(ALINK) tab2asc.o $(FFLAGS) -o $(tab2asc) $(LOCAL_LIBRARY) \
+	$(ALINK) tab2asc.o $(FFLAGS) -o $(tab2asc) $(LOCAL_LIBRARY) $(ADDLIBS) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `fio_link` `cat_link_adam`
 	$(COMPIFL) tab2asc.ifl
 	$(INSTALL_DATA) tab2asc.ifc bin/tab2asc.ifc

@@ -11,7 +11,7 @@
 *     attempts to convert it into a CAT catalogue, under the assumption
 *     that the attached file contains a "tab table".
 *
-*     Since tab-table do not, in general, have any type information this
+*     Since tab-tables do not, in general, have any type information this
 *     must be derived for each of the columns of the table. Parameters
 *     are always stored as character strings.
 *
@@ -83,10 +83,10 @@
 *  Local Variables:
       CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
       CHARACTER * ( CAT__SZEXF ) EXTFMT( 10 ) ! Default external formats
-      CHARACTER * ( CAT__SZVAL ) VALUE ! Value of a component
+      CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
       CHARACTER * ( MAXLEN ) COLS ! Line buffer for column names
       CHARACTER * ( MAXLEN ) LINE ! Line buffer for output
-      CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
+      CHARACTER * ( MAXLEN ) VALUE ! Value of a component
       DOUBLE PRECISION DVAL     ! Dummy value
       INTEGER COL( CAT__MXCOL ) ! Column identifiers
       INTEGER CSIZE( CAT__MXCOL ) ! Characters in fields
@@ -98,12 +98,14 @@
       INTEGER IEND              ! End character of word
       INTEGER IVAL              ! Dummy value
       INTEGER NDONE             ! Number of lines read from file.
+      INTEGER NLINE             ! Data line counter
       INTEGER QI                ! Parameter identifier
       INTEGER RACOL             ! Position of RA column
       INTEGER TYPES( CAT__MXCOL ) ! Data types of the columns
+      INTEGER VALLEN            ! VALUE length
       LOGICAL FLAG              ! Conversion success flag
-      LOGICAL OK                ! Loop control flag
       LOGICAL ISWCS             ! True when table has RA and DEC columns
+      LOGICAL OK                ! Loop control flag
 
 *.
 
@@ -139,19 +141,35 @@
                   NAME = LINE( : IAT - 1 )
                   VALUE = LINE( IAT + 1 : )
 
+
+*  The 'symbol' parameter may be quite long so split this over several
+*     records.
+                  IF ( NAME( : 6 ) .EQ. 'symbol' ) THEN 
+                     VALLEN = CHR_LEN( VALUE ) 
+                     I = 1
+                     DO 10 IAT = 1, VALLEN, 68
+                        WRITE( NAME( 7:7 ), '(I1)' ) I
+                        CALL CAT_PPTSC( CI, NAME, VALUE( IAT:IAT+68 ), 
+     :                                  ' ',QI, STATUS )
+                        CALL CAT_TATTI( QI, 'CSIZE', 68, STATUS )
+                        I = I + 1
+ 10                  CONTINUE
+                  ELSE
+
 *  Create the parameter. This will just have character format.
-                  CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI, STATUS )
-                  CALL CAT_TATTI( QI, 'CSIZE', CHR_LEN( VALUE ),
-     :                            STATUS )
+                     CALL CAT_PPTSC( CI, NAME, VALUE, ' ', QI, STATUS )
+                     CALL CAT_TATTI( QI, 'CSIZE', CHR_LEN( VALUE ),
+     :                               STATUS )
 
 *  Check for special parameters. These indicate which, if any, columns
 *  contain sky coordinates.
-                  IF ( NAME .EQ. 'ra_col' .OR.
-     :                 NAME .EQ. 'RA_COL' ) THEN
-                     RACOL = I
-                  ELSE IF ( NAME .EQ. 'dec_col' .OR.
-     :                      NAME .EQ. 'DEC_COL' ) THEN
-                     DECCOL = I
+                     IF ( NAME .EQ. 'ra_col' .OR.
+     :                    NAME .EQ. 'RA_COL' ) THEN
+                        RACOL = I
+                     ELSE IF ( NAME .EQ. 'dec_col' .OR.
+     :                         NAME .EQ. 'DEC_COL' ) THEN
+                        DECCOL = I
+                     END IF
                   END IF
                ELSE
 
@@ -339,6 +357,7 @@
 
 *  Now read the data for real and enter it into the catalogue.
       OK = .TRUE.
+      NLINE = 1
  8    CONTINUE
       IF ( OK .AND. STATUS .EQ. SAI__OK ) THEN
          CALL FIO_READF( FI, LINE, STATUS )
@@ -363,21 +382,27 @@
                   IAT = IEND + 1
                ELSE
 
-*  Missing field?
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETI( 'LINE', I )
-                     CALL ERR_REP( ' ',
-     :            'Data line no. ^LINE, contains too few fields',
-     :                          STATUS )
+*  Missing field or [EOD]?
+                  IF ( LINE( 1:5 ) .NE. '[EOD]' ) THEN 
+                     IF ( STATUS .EQ. SAI__OK ) THEN
+                        STATUS = SAI__ERROR
+                        CALL MSG_SETI( 'LINE', NLINE )
+                        CALL ERR_REP( ' ',
+     :                  'Data line no. ^LINE, contains too few fields',
+     :                              STATUS )
+                     END IF
+                     GO TO 99
+                  ELSE 
+                     OK = .FALSE.
+                     GO TO 8
                   END IF
-                  GO TO 99
                END IF
                IF ( STATUS .NE. SAI__OK ) GO TO 8
  9          CONTINUE
 
 *  Append this row to catalogue.
             CALL CAT_RAPND( CI, STATUS )
+            NLINE = NLINE + 1
          END IF
          GO TO 8
       END IF

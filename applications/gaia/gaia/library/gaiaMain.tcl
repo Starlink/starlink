@@ -95,36 +95,4 @@ set env(NATIVE_GAIA) 1
 
 #  Start up the main window.
 gaia::Gaia::startGaia
-
-#----------------------------------------------
-#  Debugging code.
-# set debug 1
-#  if { $debug } {
-#     proc profile_on {args} {
-#        eval profile $args on
-#        .l configure -text "profiling on ($args)"
-#     }
-#     proc profile_off {args} {
-#        global tmp
-#        if { [.l cget -text] != "profiling off" } {
-#           profile off tmp
-#        }
-#        if { [info exists tmp] } {
-#           eval profrep tmp $args
-#        }
-#        .l configure -text "profiling off"
-#     }
-
-#     button .a -command {blt::bltdebug 100} -text {Debug on}
-#     button .b -command {profile_on} -text {profile on}
-#     button .c -command {profile_on -commands} -text {profile on (commands)}
-#     button .d -command {profile_on -eval} -text {profile on (eval)}
-#     button .e -command {profile_on -commands -eval} -text {profile on (eval & commands)}
-#     button .f -command {profile_off cpu} -text {profile off (cpu)}
-#     button .g -command {profile_off real} -text {profile off (real)}
-#     button .h -command {profile_off calls} -text {profile off (calls)}
-
-#     label .l -text "profiling off" -relief raised
-#     pack .a .b .c .d .e .f .g .h .l -fill x
-#     after idle [wm deiconify .]
-#  }
+exit

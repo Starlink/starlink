@@ -39,7 +39,9 @@
 *     FI = INTEGER (Given)
 *        Fortran unit number of output file.
 *     IDCOL = INTEGER (Given)
-*        The position, within the catalogue, of the ID column.
+*        The position, within the catalogue, of the ID column. If this
+*        doesn't exist and the first column is a positional one
+*        (i.e. RA, DEC, X or Y)then a pseudo index will be generated.
 *     XCOL = INTEGER (Given and Returned)
 *        The position, within the catalogue, of the X column. This will
 *        be guessed, if the value is set to -1.
@@ -67,7 +69,7 @@
 *        Original version.
 *     04-JUN-1999 (PDRAPER):
 *        Added check if RA and DEC columns have these names. {HOURS}
-*        isn't a strong enough check, these can also be qualified by 
+*        isn't a strong enough check, these can also be qualified by
 *        {+IHMS.3} type strings. In which case we cannot "guess" which
 *        column is RA. To do this add a check if the name is RA.
 *     {enter_changes_here}
@@ -103,7 +105,7 @@
 *  Local Parameters:
       INTEGER MAXLEN
       PARAMETER ( MAXLEN = 1024 )
-      DOUBLE PRECISION PI 
+      DOUBLE PRECISION PI
       PARAMETER ( PI = 3.141592653589793238462643 )
 
 *  Local Variables:
@@ -111,8 +113,9 @@
       CHARACTER * ( 1 ) EXCEPT  ! Exception value (not used)
       CHARACTER * ( 1 ) EXPR    ! Virtual column expression (not used).
       CHARACTER * ( 1 ) TAB     ! Tab character
-      CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
+      CHARACTER * ( 80 ) SYMBOL( 10 ) ! Incoming symbol parameter (may span more than one-line)
       CHARACTER * ( CAT__SZCMP ) LNAME ! Name of a component
+      CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
       CHARACTER * ( CAT__SZEXP ) EXTFMT ! Column external format
       CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
       CHARACTER * ( CAT__SZVAL ) VALUE ! Value of a component
@@ -126,27 +129,31 @@
       INTEGER DTYPE             ! Column data type
       INTEGER GENUS             ! Genus of column
       INTEGER I                 ! Loop variable
+      INTEGER IAT               ! String position counter
       INTEGER ICUR              ! Current insertion position in line
+      INTEGER IOSTAT            ! Internal read status
       INTEGER J                 ! Loop variable
+      INTEGER N                 ! Counter
       INTEGER NCHAR             ! Number of characters used to encode value
       INTEGER NULL              ! NULL strategy
       INTEGER NUMCOL            ! Number of columns
       INTEGER NUMIND            ! Number of indices
       INTEGER NUMPAR            ! Number of parameters
       INTEGER NUMROW            ! Number of rows
+      INTEGER NUMSYM            ! Number of symbol descriptions found
       INTEGER ORDER             ! Sorting order
       INTEGER QI                ! Parameter identifier
       INTEGER SIZEA( 1 )        ! Size of dimension (must be 0)
       INTEGER ULEN              ! Used length of string
       LOGICAL AREDEG            ! TRUE if world coordinates are already in degrees.
-      LOGICAL HAVSYM            ! TRUE if a symbol description is found
       LOGICAL NULFLG            ! Value is NULL
       LOGICAL PRFDSP            ! Preferential display flag
+      LOGICAL ADDIND            ! Whether to add a pseudo index
 
 *.
 
 *  Check the global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN 
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First get the details of the catalogue.
       CALL CAT_TDETL( CI, CAT__GPHYS, NUMROW, NUMCOL, NUMIND, NUMPAR,
@@ -163,8 +170,8 @@
 *  World coordinates are in degrees by default.
       AREDEG = .TRUE.
 
-*  No symbol if found yet.
-      HAVSYM = .FALSE.
+*  No symbols if found yet.
+      NUMSYM = 0
 
 *  Title:
 *  ======
@@ -188,30 +195,55 @@
      :                  UNITS, EXTFMT, PRFDSP, COMM, VALUE, DATE,
      :                  STATUS )
          CALL CAT_EGT0C( QI, VALUE, NULFLG, STATUS )
-         WRITE( FI, 101 ) NAME, DTYPE, CSIZE, UNITS, EXTFMT, PRFDSP
  101     FORMAT( '#P', A17, I3, I5, A22, A22, L2 )
 
-*  Check for known parameters, which can be case folded and truncated by 
+*  Symbol may span more than one line (and are suffixed by an integer
+*  from 1 to 9). No suffix is the same as 1.
+         IF ( NAME( :6 ) .EQ. 'SYMBOL' ) THEN
+            IF ( NUMSYM .EQ. 0 ) THEN
+               WRITE( FI, 101 ) 'SYMBOL', DTYPE, CSIZE, UNITS, EXTFMT,
+     :                          PRFDSP
+            END IF
+
+            NUMSYM = NUMSYM + 1
+            IF ( NAME( 7: 7 ) .NE. ' ' ) THEN
+               READ( NAME( 7: 7 ), '(I1)', IOSTAT = IOSTAT ) N
+               IF ( IOSTAT .NE. 0 ) N = 1
+            ELSE
+               N = 1
+            END IF
+            SYMBOL( N ) = VALUE
+         ELSE
+
+*  Write the parameter.
+            WRITE( FI, 101 ) NAME, DTYPE, CSIZE, UNITS, EXTFMT, PRFDSP
+
+*  Check for known parameters, which can be case folded and truncated by
 *  conversion into CAT (esp CAT/FITS).
-         IF ( NAME .EQ. 'SYMBOL' ) THEN 
-            NAME = 'symbol'
-            HAVSYM = .TRUE.
-         ELSE IF ( NAME .EQ. 'SHORT_NA' ) THEN 
-            NAME = 'short_name'
-         ELSE IF ( NAME .EQ. 'SERV_TYP' ) THEN 
-            NAME = 'serv_type'
-         ELSE IF ( NAME .EQ. 'LONG_NAM' ) THEN 
-            NAME = 'long_name'
-         ELSE IF ( NAME .EQ. 'URL' ) THEN 
-            NAME = 'url'
-         ELSE IF ( NAME .EQ. 'SEARCH_C' ) THEN 
-            NAME = 'search_cols'
-         END IF
+            IF ( NAME .EQ. 'SHORT_NA' ) THEN
+               NAME = 'short_name'
+            ELSE IF ( NAME .EQ. 'SERV_TYP' ) THEN
+               NAME = 'serv_type'
+            ELSE IF ( NAME .EQ. 'LONG_NAM' ) THEN
+               NAME = 'long_name'
+            ELSE IF ( NAME .EQ. 'URL' ) THEN
+               NAME = 'url'
+            ELSE IF ( NAME .EQ. 'SEARCH_C' ) THEN
+               NAME = 'search_cols'
+            ELSE IF ( NAME .EQ. 'SORT_COL' ) THEN
+               NAME = 'sort_cols'
+            ELSE IF ( NAME .EQ. 'SORT_ORD' ) THEN
+               NAME = 'sort_order'
+            ELSE IF ( NAME .EQ. 'SHOW_COL' ) THEN
+               NAME = 'show_cols'
+            ELSE IF ( NAME .EQ. 'COPYRIGH' ) THEN
+               NAME = 'copyright'
+            END IF
 
 *  Add the "parameter : value" line.
-         WRITE( FI, '(A)') NAME( :CHR_LEN( NAME ) )//': '//
-     :                     VALUE( :CHR_LEN( VALUE ) )
-
+            WRITE( FI, '(A)') NAME( :CHR_LEN( NAME ) )//': '//
+     :                        VALUE( :CHR_LEN( VALUE ) )
+         END IF
  2    CONTINUE
 
 *  Column names:
@@ -227,15 +259,8 @@
      :                  ORDER, UNITS, EXTFMT, PRFDSP, COMM, DATE,
      :                  STATUS )
 
-*  Add these to the output file. Used a fixed format on a single line so
-*  that we can recover this easily. Note we abandon the character values
-*  that are not useful, in order to keep the line length under control.
-         WRITE( FI, 102 ) NAME, DTYPE, CSIZE, NULL, SCALE, ZERO,
-     :                    ORDER, UNITS, EXTFMT, PRFDSP
- 102     FORMAT( '#C', A17, I3, I5, I2, G15.7, G15.7, I2,
-     :               A22, A22, L2 )
-
-*  Check units for special significance.
+*  Check units for special significance, radians or degrees are assumed
+*  to be possible sky coordinates.
          IF ( UNITS( :7 ) .EQ. 'RADIANS' ) THEN
 
 *  Not degrees.
@@ -250,12 +275,12 @@
             ELSE
                LNAME = NAME
                CALL CHR_LCASE( LNAME )
-               CALL CHR_LDBLK( LNAME ) 
-               IF ( LNAME( :2 ) .EQ. 'ra' .OR. 
+               CALL CHR_LDBLK( LNAME )
+               IF ( LNAME( :2 ) .EQ. 'ra' .OR.
      :              LNAME( :5 ) .EQ. 'right' .OR.
      :              LNAME( :4 ) .EQ. 'r.a.' ) THEN
                   IF ( RACOL .EQ. -1 ) RACOL = I - 1
-               ELSE 
+               ELSE
                   IF ( DECCOL .EQ. -1 ) DECCOL = I - 1
                END IF
             END IF
@@ -270,16 +295,54 @@
             IF ( XCOL .EQ. -1 ) XCOL = I - 1
          ELSE IF ( NAME .EQ. 'Y_IMAGE' ) THEN
             IF ( YCOL .EQ. -1 ) YCOL = I - 1
+
+*  Look for incoming IDCOL.
+         ELSE IF ( NAME .EQ. 'ID_COL' ) THEN 
+            IF ( IDCOL .EQ. -1 ) IDCOL = I - 1
          END IF
 
-*  Add the details of the column as one line so we can restore this if
-*  needed.
-
+*  Add these to the output file. Used a fixed format on a single line so
+*  that we can recover this easily. Note we abandon the character values
+*  that are not useful, in order to keep the line length under control.
+         WRITE( FI, 102 ) NAME, DTYPE, CSIZE, NULL, SCALE, ZERO,
+     :                    ORDER, UNITS, EXTFMT, PRFDSP
+ 102     FORMAT( '#C', A17, I3, I5, I2, G15.7, G15.7, I2,
+     :               A22, A22, L2 )
  3    CONTINUE
+
+*  If no IDCOL has been identified and the first column is a positional
+*  one, then set up to add a simple index column.
+      IF ( IDCOL .EQ. -1 .AND. ( RACOL .EQ. 0 .OR. DECCOL .EQ. 0 .OR.
+     :                           XCOL .EQ. 0 .OR. YCOL .EQ. 0 ) ) THEN
+         ADDIND = .TRUE.
+
+*  Move the positional columns up one place.
+         IF ( RACOL .NE. -1 ) RACOL = RACOL + 1
+         IF ( DECCOL .NE. -1 ) DECCOL = DECCOL + 1
+         IF ( XCOL .NE. -1 ) XCOL = XCOL + 1
+         IF ( YCOL .NE. -1 ) YCOL = YCOL + 1
+         IDCOL = 0
+
+*  Add a fake column description.
+         NAME = 'ID_COL'
+         DTYPE = CAT__TYPEI
+         CSIZE = 0
+         NULL = CAT__NULLD
+         SCALE = 1.0
+         ZERO = 0.0
+         ORDER = CAT__ASCND
+         UNITS = ' '
+         EXTFMT = 'I9'
+         PRFDSP = .FALSE.
+         WRITE( FI, 102 ) NAME, DTYPE, CSIZE, NULL, SCALE, ZERO,
+     :                    ORDER, UNITS, EXTFMT, PRFDSP
+      ELSE
+         ADDIND = .FALSE.
+      END IF
 
 *  OK, if we have located special columns then add these to the header
 *  section. Note that if world coordinates are not located then this is
-*  recorded (as -1). This is necessary as information about the presence 
+*  recorded (as -1). This is necessary as information about the presence
 *  of these coordinates may persist in GAIA.
       IF ( IDCOL .NE. -1 ) THEN
          CALL CHR_ITOC( IDCOL, VALUE, ICUR )
@@ -289,8 +352,6 @@
       WRITE( FI, '(A)' ) 'ra_col: '// VALUE( :ICUR )
       CALL CHR_ITOC( DECCOL, VALUE, ICUR )
       WRITE( FI, '(A)' ) 'dec_col: '// VALUE( :ICUR )
-      RACOL = RACOL + 1
-      DECCOL = DECCOL + 1
       IF ( XCOL .NE. -1 .AND. YCOL .NE. -1 ) THEN
          CALL CHR_ITOC( XCOL, VALUE, ICUR )
          WRITE( FI, '(A)' ) 'x_col: '// VALUE( :ICUR )
@@ -298,19 +359,42 @@
          WRITE( FI, '(A)' ) 'y_col: '// VALUE( :ICUR )
       END IF
 
-*  If no symbol has been found and we have some positional columns 
-*  then add a very simple symbol (a circle of size 4 pixels).
-      IF ( .NOT. HAVSYM .AND. 
-     :     ( ( XCOL .NE. -1 .AND. YCOL .NE. -1 ) .OR. 
-     :       ( RACOL .NE. -1 .AND. DECCOL .NE. -1 ) ) 
+*  Move positional columns back to relative in input catalogue.
+      IF ( ADDIND ) THEN
+         IF ( RACOL .NE. -1 ) RACOL = RACOL - 1
+         IF ( DECCOL .NE. -1 ) DECCOL = DECCOL - 1
+         IF ( XCOL .NE. -1 ) XCOL = XCOL - 1
+         IF ( YCOL .NE. -1 ) YCOL = YCOL - 1
+      END IF
+
+*  If no symbol has been found and we have some positional columns
+*  then add a very simple symbol (a circle of size 4 pixels), otherwise
+*  construct the line.
+      IF ( NUMSYM .EQ. 0 .AND.
+     :     ( ( XCOL .NE. -1 .AND. YCOL .NE. -1 ) .OR.
+     :       ( RACOL .NE. -1 .AND. DECCOL .NE. -1 ) )
      :   ) THEN
-         WRITE( FI, '(A)' ) 
+         WRITE( FI, '(A)' )
      :      'symbol: {} {circle {} {} {} {} {}} {4.0 {}}'
+      ELSE IF ( NUMSYM .GT. 0 ) THEN
+         LINE = 'symbol: '
+         IAT = 8
+         DO 7 I = 1, NUMSYM
+            LINE( IAT: ) = SYMBOL( I )
+            IAT = IAT + CHR_LEN( SYMBOL( I ) )
+ 7       CONTINUE
+         WRITE( FI, '(A)' ) LINE( :IAT )
       END IF
 
 *  Now add the column names.
-      ICUR = 1
-      LINE = ' '
+      IF ( ADDIND ) THEN
+         NAME = 'ID_COL'
+         LINE = NAME // TAB
+         ICUR = CAT__SZCMP + 2
+      ELSE
+         LINE = ' '
+         ICUR = 1
+      END IF
       DO 4 I = 1, NUMCOL
          CALL CAT_TIQAC( COL( I ), 'NAME', NAME, STATUS )
          IF ( I .NE. NUMCOL ) THEN
@@ -332,22 +416,29 @@
       DO 5 I = 1, NUMROW
          ICUR = 1
          CALL CAT_RGET( CI, I, STATUS )
+
+*  In needed add the pseudo index.
+         IF ( ADDIND ) THEN
+            CALL CHR_ITOC( I, VALUE, ULEN )
+            LINE( ICUR: ) = VALUE( :ULEN ) // TAB
+            ICUR = ICUR + ULEN + 1
+         END IF
          DO 6 J = 1, NUMCOL
-            IF ( J .EQ. RACOL .OR. J .EQ. DECCOL ) THEN
+            IF ( J .EQ. ( RACOL + 1 ) .OR. J .EQ. ( DECCOL + 1 ) ) THEN
 
 *  Need to get double precision value and may need to convert to degrees
 *  from radians.
                CALL CAT_EGT0D( COL( J ), SCALE, NULFLG, STATUS )
-               IF ( .NOT. AREDEG ) THEN 
+               IF ( .NOT. AREDEG ) THEN
                   SCALE = SCALE * 180.0D0 / PI
                END IF
                CALL CHR_DTOC( SCALE, VALUE, NCHAR )
-               IF ( STATUS .NE. SAI__OK ) THEN 
-                  CALL ERR_REP( ' ', 
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_REP( ' ',
      :            'Failed to extract angle column data', STATUS )
                   GO TO 99
                END IF
-            ELSE 
+            ELSE
                CALL CAT_EGT0C( COL( J ), VALUE, NULFLG, STATUS )
             END IF
             IF ( J .NE. NUMCOL ) THEN

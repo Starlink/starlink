@@ -181,6 +181,7 @@
 *  Create an initial character array.
       AVAIL = 128
       NHEAD = 0
+      NCOMP = 0
       CALL PSX_MALLOC( AVAIL * SZFITS, IPHEAD, STATUS )
       CALL RTD1_WRFTC( 'END', ' ', ' ', IPHEAD, NHEAD, AVAIL, 
      :     STATUS )
