@@ -122,6 +122,8 @@
 
 #-
 
+$| = 1;
+
 #  Flags.
 
 $verbose = 1;
@@ -446,37 +448,6 @@ sub index_source {
 
 
 ########################################################################
-# sub index_fortran_file {
-# 
-# #  Examine and index a fortran source file.
-# 
-# #  Arguments.
-# 
-#    my $path = shift;          #  Logical pathname of file to be indexed.
-#    my $file = shift;          #  File in current directory to be indexed.
-#    my $ftype = shift || 'f';  #  Type of file ('f' or 'gen' - default 'f').
-# 
-# #  Cycle through source file writing index lines where appropriate.
-# 
-#    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
-#    $tagged = FortranTag::tag join '', <F>;
-#    close F;
-# 
-#    while ($tagged =~ /(<[^>]+>)/g) {
-#       %tag = parsetag $1;
-#       if (($tag{'Start'} eq 'a') && ($name = $tag{'name'})) {
-#          write_entry $tag{'name'}, $path;
-#       }
-#       elsif (($tag{'Start'} eq 'a') && ($tag{'href'} =~ /^INCLUDE-(.*)/)) {
-#          $include = uc $1;
-#       }
-#    }
-# 
-#    $nlines{$ftype} += ($tagged =~ tr/\n/\n/);
-# }
-
-
-########################################################################
 sub index_c {
 
 #  Examine and index a C source file.
@@ -605,26 +576,6 @@ sub index_h {
 
    write_entry $include, $path;
 }
-
-
-########################################################################
-# sub index_c {
-# 
-# #  Examine and index a C source file.
-# 
-# #  Arguments.
-# 
-#    my $path = shift;      #  Logical pathname of .c file.
-#    my $file = shift;      #  .c file in current directory to be indexed.
-# 
-#    open C, $file or die "Couldn't open $file in directory ".cwd."\n";
-#    while (<C>) {
-#       write_entry $name, $path if ($name = module_name 'c', $_);
-#       $nlines{'c'}++;
-#    }
-#    close C;
-# }
-
 
 
 ########################################################################

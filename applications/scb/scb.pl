@@ -503,7 +503,6 @@ sub output {
       }
       elsif ($ftype eq 'c' || $ftype eq 'h') {
          $tagged = CTag::tag (join '', <FILE>);
-         # print <FILE>; return;
       }     
 
 
@@ -552,111 +551,6 @@ sub output {
          print;
       }
    }
-
-#    while (<FILE>) {
-#       if ($html) {
-# 
-# #        Identify active part of line.
-# 
-#          if ($ftype eq 'f' || $ftype eq 'gen') {
-# 
-#             $body = /^[cC*]/ ? '' : $_;   #  Ignore comments.
-#             if ($body) {
-#                $body =~ s/^......//;      #  Discard first six characters.
-#                $body =~ s/!.*//;          #  Discard inline comments.
-#                $body =~ s/\s//g;          #  Discard spaces.
-#                $body =~ tr/a-z/A-Z/;      #  Fold to upper case.
-#             }
-#          }
-# 
-#          elsif ($ftype eq 'c' || $ftype eq 'h') {
-# 
-#             $body = $_;
-#             $body =~ s%^#.*%%;            #  Discard preprocessor directives.
-#             $body =~ s%/\*.*\*/%%g;       #  Discard comments fully inline.
-#             $body =~ s%/\*.*%%;           #  Discard started comments.
-#          }
-# 
-# #        Substitute for HTML meta-characters.
-# 
-#          s%&%##AMPERSAND##%g;
-#          s%>%&gt;%g;
-#          s%<%&lt;%g;
-#          s%"%&quot;%g;
-#          s%##AMPERSAND##%&amp;%g;
-# 
-#          if ($body) {
-# 
-# #           Identify and deal with lines beginning modules.
-# 
-#             if ($name = module_name $ftype, $_) {
-#                
-# #              Embolden module name.
-# 
-#                my $lname = $name;
-#                $lname =~ s%_$%%;
-#                s%($lname)%<b>$1</b>%i;
-# 
-# #              Add anchors (multiple ones if generic function).
-# 
-#                if ($ftype eq 'gen' && $name =~ /^(.*)&lt;T&gt;(.*)/i) {
-#                   ($g1, $g2) = ($1, $2);
-#                   @names = map "$g1$_$g2", qw/&lt;t&gt; i r d l c b ub w uw/; 
-#                }
-#                else {
-#                   @names = ($name);
-#                }
-#                foreach $name (@names) {
-#                   s/^/<a name='$name'>/;
-#                }
-#             }
-# 
-#             if ($ftype eq 'f' || $ftype eq 'gen') {
-# 
-# #              Identify and deal with fortran includes.
-# 
-#                if ($body =~ /\bINCLUDE['"]([^'"]+)['"]/) {
-#                   $include = $1;
-#                   s%$include%<a href='$scb?$include'>$include</a>%
-#                      if ($locate{$include});
-#                }
-# 
-# #              Identify and deal with fortran subroutine calls.
-# 
-#                if ($body =~ /\bCALL(\w+)[^=]*$/) {
-#                   $lsub = $1;
-#                   $sub = lc ($lsub) . '_';
-#                   s%$lsub%<a href='$scb?$sub&$package#$sub'>$lsub</a>%
-#                      if ($locate{$sub});
-#                }
-#             }
-#             elsif ($ftype eq 'c' || $ftype eq 'h') {
-# 
-# #              Identify and deal with C calls to fortran routines.
-# 
-#                if ($body =~ /F77_CALL\s*\(\s*(\w+)\s*\)/) {
-#                   $sub = $1;
-#                   $module = $sub . "_";
-#                   s%$sub%<a href='$scb?$module&$package#$module'>$sub</a>%
-#                      if ($locate{$module});
-#                }
-# 
-# #              Identify and deal with C includes.
-# 
-#                if ($body =~ /#include\s*"\s*(\S+)\s*"/) {
-#                   $include = $1;
-#                   s%$include%<a href='$scb?$include'>$include</a>%
-#                      if ($locate{$include});
-#                }
-#             }
-#          }
-#       }
-# 
-# #     Output (modified or unmodified) line of source.
-# 
-#       $copyright ||= /copyright/i;
-#       print;
-#    }
 
    close FILE;
 
