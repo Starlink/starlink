@@ -207,6 +207,16 @@
   (make element gi: "code"
     (process-children)))
 
+;; webref and url: just copy to output
+(element webref
+  (let ((url (attribute-string (normalize "url"))))
+    (make element gi: "webref"
+	  attributes: `(("url" ,url))
+	  (process-children))))
+(element url
+  (make element gi: "url"
+	(process-children)))
+
 ;; Utility functions
 
 ;; Get document element
