@@ -1,51 +1,125 @@
-*+  AXSHOW - Display axes of a dataset
       SUBROUTINE AXSHOW( STATUS )
-*    Description :
-*    Environment parameters :
-*
-*     INP = UNIV(R)
-*           Input object
-*     DEV = CHAR(R)
-*           Output device
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*      8 May 91 : V1.4-0  Original (DJA)
-*      4 May 94 : V1.7-0  Use AIO_ for output (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     28 Mar 95 : V1.8-1  Use new data interface (DJA)
-*
-*    Type definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
+*+
+*  Name:
+*     AXSHOW
+
+*  Purpose:
+*     Display axes of a dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL AXSHOW( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     {routine_description}
+
+*  Usage:
+*     axshow {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input object
+*     DEV = CHAR (read)
+*        Output device
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     axshow, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      8 May 1991 V1.4-0 (DJA):
+*        Original version.
+*      4 May 1994 V1.7-0 (DJA):
+*        Use AIO_ for output
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      7 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'AXSHOW Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*80              LABEL, UNITS      	! Axis attributes
       CHARACTER*132		OBUF			! Output buffer
       CHARACTER*30              RSTR              	! Axis range description
       CHARACTER*20              WSTR              	! Axis width description
 
       REAL                      LO, HI            	! Axis range
-      REAL                      BASE, SCALE       	! Regular axis parameters
       REAL                      WIDTH             	! Axis width
 
       INTEGER                   DEVWID            	! Device width
+      INTEGER			DIMS(ADI__MXDIM)	! Dataset dimensions
       INTEGER                   FSTAT             	! i/o status code
       INTEGER                   I                 	! Loop over dimensions
       INTEGER			IFID			! Input dataset id
@@ -56,107 +130,83 @@
       INTEGER                   PTR               	! Ptr to mapped component
       INTEGER                   TLEN              	! Text length
 
-      LOGICAL                   INPRIM            	! Input primitive?
       LOGICAL                   OK, WOK           	! Input objects ok?
-      LOGICAL                   REG               	! Regular axis values?
-      LOGICAL                   UNIF              	! Uniform axis widths?
-*
-*    Local data :
-*
-      CHARACTER*1               TRUTH(-1:1)
-      DATA                      TRUTH/'Y','N','Y'/
-*
-*    Version :
-*
-      CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'AXSHOW Version 1.8-1' )
-*-
+*.
 
-*    Check status
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
-      CALL AST_INIT
-
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Get input object
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      IF ( INPRIM ) THEN
-        CALL MSG_PRNT( 'Primitive input object - no axes present' )
+*  Initialise ASTERIX
+      CALL AST_INIT()
+
+*  Get input object
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Any axes present?
+      CALL BDI_CHK( IFID, 'Axes', OK, STATUS )
+      IF ( .NOT. OK ) THEN
+        CALL MSG_PRNT( 'No axes present in input' )
         STATUS = SAI__OK
       ELSE
 
-*      Set up output channel
+*    Set up output channel
         CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
-*      Get number of axes
-        CALL BDI_CHKAXES( IFID, NAX, STATUS )
-
-*      Heading
+*    Heading
         WRITE( OBUF, '(1X,A,T67,A)' ) 'Axis Label                '/
-     :            /'   Size  Range', 'Reg Widths'
+     :            /'   Size  Range', 'Widths'
         CALL AIO_WRITE( OCH, OBUF, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
 
-*      Loop over axes and print out data
+*    Get dimensions
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NAX, STATUS )
+
+*    Loop over axes and print out data
         DO I = 1, NAX
 
-*        Get label and units
-          CALL BDI_GETAXLABEL( IFID, I, LABEL, STATUS )
-          CALL BDI_GETAXUNITS( IFID, I, UNITS, STATUS )
+*      Get label and units
+          CALL BDI_AXGET0C( IFID, I, 'Label', LABEL, STATUS )
+          CALL BDI_AXGET0C( IFID, I, 'Units', UNITS, STATUS )
 
-*        Get dimension
+*      Get dimension
           CALL BDI_CHKAXVAL( IFID, I, OK, REG, NVAL, STATUS )
 
-*        Construct range string
-          IF ( REG ) THEN
-            CALL BDI_GETAXVAL( IFID, I, BASE, SCALE, NVAL, STATUS )
-            LO = BASE
-            HI = BASE + FLOAT(NVAL-1)*SCALE
-          ELSE
-            CALL BDI_MAPAXVAL( IFID, 'READ', I, PTR, STATUS )
-            CALL ARR_ELEM1R( PTR, NVAL, 1, LO, STATUS )
-            CALL ARR_ELEM1R( PTR, NVAL, NVAL, HI, STATUS )
-            CALL BDI_UNMAPAXVAL( IFID, I, STATUS )
-          END IF
+*      Construct range string
+          CALL BDI_AXMAPR( IFID, I, 'Data', 'READ', PTR, STATUS )
+          CALL ARR_ELEM1R( PTR, NVAL, 1, LO, STATUS )
+          CALL ARR_ELEM1R( PTR, NVAL, NVAL, HI, STATUS )
+          CALL BDI_AXUNMAP( IFID, I, 'Data', PTR, STATUS )
           CALL MSG_SETR( 'LO', LO )
           CALL MSG_SETR( 'HI', HI )
           CALL MSG_SETC( 'UNITS', UNITS )
           CALL MSG_MAKE( '^LO to ^HI ^UNITS', RSTR, TLEN )
 
-*        Widths present
-          CALL BDI_CHKAXWID( IFID, I, WOK, UNIF, NWID, STATUS )
+*      Widths present?
+          CALL BDI_AXCHK( IFID, I, 'Width', WOK, STATUS )
           IF ( WOK ) THEN
-            IF ( UNIF ) THEN
-              CALL BDI_GETAXWID( IFID, I, WIDTH, STATUS )
-              CALL MSG_SETR( 'WID', WIDTH )
-            ELSE
-              CALL MSG_SETC( 'WID', 'Non-uniform' )
-            END IF
+            CALL MSG_SETC( 'WID', 'Ok' )
           ELSE
             CALL MSG_SETC( 'WID', 'Absent' )
           END IF
           CALL MSG_MAKE( '^WID', WSTR, TLEN )
 
-*        Write to output
-          WRITE( OBUF, '(1X,I3,2X,A22,I6,2X,A,T67,1X,A1,2X,A)',
-     :        IOSTAT=FSTAT ) I, LABEL, NVAL, RSTR, TRUTH(REG), WSTR
+*      Write to output
+          WRITE( OBUF, '(1X,I3,2X,A22,I6,2X,A,T67,A)',
+     :        IOSTAT=FSTAT ) I, LABEL, NVAL, RSTR, WSTR
           CALL AIO_WRITE( OCH, OBUF, STATUS )
 
         END DO
 
-*      Free device
+*    Free device
         CALL AIO_CANCL( 'DEV', STATUS )
 
       END IF
 
-*    Release dataset
-      CALL BDI_RELEASE( IFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
