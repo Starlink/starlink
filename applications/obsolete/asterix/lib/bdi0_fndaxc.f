@@ -74,6 +74,8 @@
 *  History:
 *     10 Aug 1995 (DJA):
 *        Original version.
+*     15 Jan 1996 (DJA):
+*        Find [R]adius axis too
 *     {enter_changes_here}
 
 *  Bugs:
@@ -122,7 +124,7 @@
       FOUND = .FALSE.
 
 *  Check known code
-      IF ( INDEX( 'ETPXY', QCODE ) .GT. 0 ) THEN
+      IF ( INDEX( 'ETPXYR', QCODE ) .GT. 0 ) THEN
 
 *    Look for axis order string in data model
         CALL ADI_THERE( ID, 'AxisOrder', THERE, STATUS )
@@ -176,7 +178,11 @@
                ELSE IF ( QCODE .EQ. 'P' ) THEN
                  FOUND = (INDEX( LABEL, 'PHASE' ) .GT. 0)
 
+               ELSE IF ( QCODE .EQ. 'R' ) THEN
+                 FOUND = (INDEX( LABEL, 'RADIUS' ) .GT. 0)
+
                END IF
+
             END IF
 
 *        Next axis if not found
