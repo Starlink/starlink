@@ -87,6 +87,10 @@ dvi2bitmap.tar: dvi2bitmap_source.tar dvi2bitmap_doc.tar
 	mv distrib/$@ .
 	rm -Rf distrib
 
+# Build defects list.  This requires non-distributed scripts,
+# so is not buildable after distribution.
+defects.html: defects.xml
+	java com.jclark.xsl.sax.Driver defects.xml /home/norman/sgml/defect/defects.xslt defects.html
 
 # Housekeeping targets
 tidy:

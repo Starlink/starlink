@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE defectslist
+	PUBLIC "+//IDN astro.gla.ac.uk::norman//DTD Defects List//EN"
+	"defects.dtd">
+
+<defectslist>
+
+<title>dvi2bitmap defects/issues list</title>
+
+<version>$Revision$</version>
+<date>$Date$</date>
+
+<p>This list contains the current defects/issues list for the
+dvi2bitmap application.  As well as specific deficiencies, these
+`defects' include items which are merely suggestions or TODOs</p>
+
+<p>These are in no particular order, and some have a higher priority
+than others.</p>
+
+<!-- DO NOT CHANGE THE ORDER OF ELEMENTS IN THIS FILE.
+     They're numbered when they're formatted, and it'd be nice to keep
+     those numbers correct.
+     -->
+
+<defect status="open" originator="Eitan Gurari, gurari@cis.ohio-state.edu">
+<title>dvi2bitmap crashes/hangs when given non-existent input file</title>
+<p>Most mysterious.  The problem seems to be confined to versions of
+the program build with gcc.  It builds OK using Sun's and Compaq's C++
+compilers, and with egcs-2.91.66.  Eitan was using gcc 2.8.1 on a
+Sparc and it dumped core; I tried building with apparently the same
+compiler on a Sparc (hermes), and it didn't dump core, but it did seem
+to hang.  Poking around with gdb suggests it's hanging somewhere in a
+library destructor, but this is still a little obscure.</p>
+</defect>
+
+</defectslist>
