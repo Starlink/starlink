@@ -64,13 +64,15 @@ sub header;
 
 #  Determine operating environment.
 
-$cgi = 1;
+$cgi = defined $ENV{'SERVER_PROTOCOL'};
 $html = $cgi;
 
 #  Name of source module to locate.
 
 $module = $ARGV[0];
 $module =~ s/^module=//;
+
+error "Source code browser" unless ($module);
 
 #  Open index file, tied to index hash %locate.
 
@@ -181,9 +183,9 @@ sub output {
 #              Add anchors (multiple ones if generic function).
 
                @names = ($name);
-               if ($name =~ /^(.*)&gt;T&lt;(.*)/) {
+               if ($name =~ /^(.*)&LT;T&GT;(.*)/) {
                   ($g1, $g2) = ($1, $2);
-                  @names = map { "$g1$_$g2" } qw/I R D L C B UB W UW/; 
+                  @names = map "$g1$_$g2", qw/I R D L C B UB W UW/; 
                }
                foreach $name (@names) {
                   s/^/<a name='$name'>/;
@@ -232,6 +234,7 @@ sub error {
       print "<h1>Error</h1>\n";
       print "$message\n";
       print "</body>\n</html>\n";
+      exit 1;
    }
    else {
       die "$message\n";
@@ -246,7 +249,7 @@ sub header {
    my $title = shift;
 
    if ($cgi) {
-      print "Content-type: text/html\n\n";
+      print "Content-Type: text/html\n\n";
    }
    if ($html) {
       print "<html>\n";
