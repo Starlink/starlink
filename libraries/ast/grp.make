@@ -49,6 +49,7 @@ intramap.c \
 loader.c \
 lutmap.c \
 mapping.c \
+mathmap.c \
 matrixmap.c \
 memory.c \
 object.c \
@@ -97,6 +98,7 @@ intramap.h \
 loader.h \
 lutmap.h \
 mapping.h \
+mathmap.h \
 matrixmap.h \
 memory.h \
 object.h \
