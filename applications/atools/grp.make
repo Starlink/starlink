@@ -24,7 +24,7 @@ atl1_rdgrp.f atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f \
 astlutmap.ifl astpcdmap.f astpcdmap.ifl astwinmap.f astwinmap.ifl \
 astfindframe.f astfindframe.ifl astpermaxes.f astpermaxes.ifl \
 astpickaxes.f astpickaxes.ifl astsimplify.f astsimplify.ifl asttrann.ifl \
-asttrann.f
+asttrann.f atl1_cpcol.f
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc astcopy.par astaddframe.par astclear.par astget.par astset.par \
