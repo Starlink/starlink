@@ -3112,7 +3112,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       REAL BCPHI,BSPHI                       ! Cos and Sine of bck angle
 *
       LOGICAL LHRI                           ! Is it an HRI file ?
-      LOGICAL TOK                            ! Is this event within time ranges?
+      LOGICAL SOK,BOK
       LOGICAL OK
       LOGICAL IMAGE			     ! Output contains image(s)
       INTEGER IX,YMAX                        ! Counter
@@ -3141,294 +3141,264 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 ***   Calculate the squares of the elliptical axis - if any
       IF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
      &                              SRT.SHAPE .EQ. 'E') THEN
-         SAMIN2 = SRT.ELAMIN **2
-         SAMAX2 = SRT.ELAMAX **2
-         SBMIN2 = SRT.ELBMIN **2
-         SBMAX2 = SRT.ELBMAX **2
-         BAMIN2 = BSRT.ELAMIN **2
-         BAMAX2 = BSRT.ELAMAX **2
-         BBMIN2 = BSRT.ELBMIN **2
-         BBMAX2 = BSRT.ELBMAX **2
+        SAMIN2 = SRT.ELAMIN **2
+        SAMAX2 = SRT.ELAMAX **2
+        SBMIN2 = SRT.ELBMIN **2
+        SBMAX2 = SRT.ELBMAX **2
+        BAMIN2 = BSRT.ELAMIN **2
+        BAMAX2 = BSRT.ELAMAX **2
+        BBMIN2 = BSRT.ELBMIN **2
+        BBMAX2 = BSRT.ELBMAX **2
 
 ***      Calculate the product of the squares of the two elliptical axes
-         SA2B2I = SAMIN2 * SBMIN2
-         SA2B2O = SAMAX2 * SBMAX2
-         BA2B2I = BAMIN2 * BBMIN2
-         BA2B2O = BAMAX2 * BBMAX2
+        SA2B2I = SAMIN2 * SBMIN2
+        SA2B2O = SAMAX2 * SBMAX2
+        BA2B2I = BAMIN2 * BBMIN2
+        BA2B2O = BAMAX2 * BBMAX2
 
 ***      Set a local cos and sin of the orientation angle for speed
-         SCPHI = SRT.COSPHI
-         SSPHI = SRT.SINPHI
-         BCPHI = BSRT.COSPHI
-         BSPHI = BSRT.SINPHI
+        SCPHI = SRT.COSPHI
+        SSPHI = SRT.SINPHI
+        BCPHI = BSRT.COSPHI
+        BSPHI = BSRT.SINPHI
       ENDIF
 
 ***   Loop over each element in arrays
       DO IX = 1,NELEMS
 ***      Copy event to simpler variables
-         TEV = TIME(IX) - BSCTIM
-         XEV = XPIX(IX)
-         YEV = YPIX(IX)
-         XDEV = XDET(IX)
-         YDEV = YDET(IX)
-         AEV = AMPL(IX)
-         CEV = CAMPL(IX)
+        TEV = TIME(IX) - BSCTIM
+        XEV = XPIX(IX)
+        YEV = YPIX(IX)
+        XDEV = XDET(IX)
+        YDEV = YDET(IX)
+        AEV = AMPL(IX)
+        CEV = CAMPL(IX)
 ***      Fix for HRI no corrected events. set to value '1'
-         IF (LHRI) CEV = 1
+        IF (LHRI) CEV = 1
 
-***      Check if this event is from an HRI hotspot or deadspot
-         IF (.NOT. LHRI .OR. XRT_HSPOT(HEAD, XEV, YEV)) THEN
+*  Check if this event is from an HRI hotspot or deadspot
+        IF (LHRI .AND..NOT. XRT_HSPOT(HEAD, XEV, YEV)) THEN
 
-***         If the source box is circular, annular or elliptical, calculate
+          BADEV = BADEV + 1
+
+        ELSE
+
+*  If the source box is circular, annular or elliptical, calculate
 ***         various numbers.
-            IF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
+          IF (SRT.SHAPE .EQ. 'C' .OR. SRT.SHAPE .EQ. 'A' .OR.
      &                              SRT.SHAPE .EQ. 'E') THEN
 
 ***             calculate the offset in X and Y celestial pixels from the
 ***             source box centre
-                SDIFFX = XEV - SCEN_X
-                SDIFFY = YEV - SCEN_Y
+            SDIFFX = XEV - SCEN_X
+            SDIFFY = YEV - SCEN_Y
 
 ***             calculate the position in elliptical coordinates - source box
 ***             NB: This also handles circles
-                SELPX = SDIFFX * SCPHI + SDIFFY * SSPHI
-                SELPY = - SDIFFX * SSPHI + SDIFFY * SCPHI
-                SELPX2 = SELPX * SELPX
-                SELPY2 = SELPY * SELPY
+            SELPX = SDIFFX * SCPHI + SDIFFY * SSPHI
+            SELPY = - SDIFFX * SSPHI + SDIFFY * SCPHI
+            SELPX2 = SELPX * SELPX
+            SELPY2 = SELPY * SELPY
 
 ***             calculate the position in elliptical coordinates - backgnd box
-                IF (SRT.BCKGND) THEN
-
+            IF (SRT.BCKGND) THEN
 
 ***                calculate the offset in X and Y celestial pixels from the
 ***                background box centre
-                   BDIFFX = XEV - BCEN_X
-                   BDIFFY = YEV - BCEN_Y
+              BDIFFX = XEV - BCEN_X
+              BDIFFY = YEV - BCEN_Y
 
-                   BELPX = BDIFFX * BCPHI + BDIFFY * BSPHI
-                   BELPY = - BDIFFX * BSPHI + BDIFFY * BCPHI
-                   BELPX2 = BELPX * BELPX
-                   BELPY2 = BELPY * BELPY
+              BELPX = BDIFFX * BCPHI + BDIFFY * BSPHI
+              BELPY = - BDIFFX * BSPHI + BDIFFY * BCPHI
+              BELPX2 = BELPX * BELPX
+              BELPY2 = BELPY * BELPY
 
-                ENDIF
-             ENDIF
+            ENDIF
+          ENDIF
 
-***          Check if each event is within the ranges selected
-***          Time range:
-             TOK = .FALSE.
-             DO TLP=1,SRT.NTIME
-                IF (SRT.MIN_T(TLP) .LE. TEV .AND. SRT.MAX_T(TLP)
-     &                      .GE. TEV) THEN
-                   TOK = .TRUE.
-                   GOTO 100
-                ENDIF
-             ENDDO
-*
-100          CONTINUE
-*
-             IF (TOK) THEN
-*
-             IF (SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) THEN
-*
-             IF (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) THEN
-*
-             IF (SRT.MIN_XD .LE. XDEV .AND.SRT.MAX_XD .GE. XDEV) THEN
-*
-             IF (SRT.MIN_YD .LE. YDEV .AND.SRT.MAX_YD .GE. YDEV) THEN
-*
-*     If quality limits have been made more strict then check quality
-               OK = .TRUE.
-*
-               IF (QCHECK) THEN
-*
-*         See if this time is within one of the bad times
-                  DO BLP=1,NBAD
-                     IF (TEV .GE. STBAD(BLP) .AND.
-     &                                      TEV .LE. ENBAD(BLP)) THEN
-*           Set flag false and exit loop
-                        OK=.FALSE.
-                        GOTO 10
-                     ENDIF
-                  ENDDO
-*
-10                CONTINUE
-*
-               ENDIF
-*
-               IF (OK) THEN
-*
-*             Check if event is within the source box. Circles are tested
-*             as a special case of the elliptical box
-                 IF ( SRT.SHAPE .EQ. 'R') THEN
-                   OK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
-     &                                  .AND.
-     &                 (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
-                 ELSEIF (INDEX('CAE',SRT.SHAPE).NE.0) THEN
-                   OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
-     &                                  .AND.
-     &                 (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
-                 ELSEIF (SRT.SHAPE.EQ.'I') THEN
-*              Find position within spatial mask
-                   IF (IMAGE) THEN
-                     MEL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
-                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                       MEL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
-                     ELSE
-                       MEL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
-                     ENDIF
-                   ELSE
-                     MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                       MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                     ELSE
-                       MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                     ENDIF
-                   ENDIF
-                   OK=(SMASK(MEL1,MEL2).NE.0)
+*  Check if each event is within the selected time range
+          OK = .FALSE.
+          TLP=1
+          DO WHILE (.NOT.OK.AND.TLP.LE.SRT.NTIME)
+            OK= (SRT.MIN_T(TLP) .LE. TEV .AND. SRT.MAX_T(TLP)
+     &                                                .GE. TEV)
+            TLP=TLP+1
+          ENDDO
 
-                 ENDIF
+*  If quality limits have been made more strict then check quality
+          IF (QCHECK) THEN
 
-                 IF (OK) THEN
+*  See if this time is within one of the bad times
+            BLP=1
+            DO WHILE (OK.AND.BLP.LE.NBAD)
+              IF (TEV.GE.STBAD(BLP).AND.TEV.LE.ENBAD(BLP)) THEN
+                OK=.FALSE.
+              ENDIF
+            ENDDO
 
-*
-*             Calculate position of data in array
-*               The first two dimensions of the array can be either
-*               X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
-*               the user selection.
-                   IF (IMAGE) THEN
-*
-*                 X,Y bins:
-                     EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
-*
-*                 Calculate Y element according to orientation of raw pixels
-                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                       EL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
-                     ELSE
-                       EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
-                     ENDIF
-*
-                   ELSE
+          ENDIF
 
-*                   No spatial axes
-                     IF (SDIM1.EQ.1.AND.SDIM2.EQ.1) THEN
-
-                       EL1=1
-                       EL2=1
-
-*                   Radial distribution
-                     ELSE
-
-*                 Calculate the radial (and azimuthal) bin by checking
-*                 each bin individually (how else ??)
-                       DO EL1=1,NRBIN
+*  if timing Ok then check event falls within various other limits
+          IF (OK) THEN
 *
-                         IF (( SELPX2 / ELIPA2(EL1) +
-     &                         SELPY2 / ELIPB2(EL1) ) .LE. 1.0) GOTO 110
-                       ENDDO
+            OK= (SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) .AND.
+     :           (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) .AND.
+     :           (SRT.MIN_XD .LE.XDEV .AND.SRT.MAX_XD .GE.XDEV) .AND.
+     :           (SRT.MIN_YD .LE.YDEV .AND.SRT.MAX_YD .GE.YDEV)
 *
-*                 This error message should never be activated
-                       CALL MSG_PRNT('Error calculating elliptical - '/
-     &                             /'bin refer to author')
-*
-110                    CONTINUE
-*
-*                 Set azimuthal bin to zero for now
-                       EL2=1
-*
-                     ENDIF
+          ENDIF
 
+*  if event has survived this far check spatial selection
+          IF (OK) THEN
 
+*  rectangle
+            IF ( SRT.SHAPE .EQ. 'R') THEN
 
-                   ENDIF
-*
-*               Calculate the other elements
-                   EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
-                   EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
-                   EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
-                   EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
-                   EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
-*
-
-                   SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
-     &                      SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
-*
-                 ENDIF
-
-*             Check if event is within the background box
-                 IF ( SRT.BCKGND) THEN
-                   IF (BSRT.SHAPE .EQ. 'R') THEN
-                     OK=((BSRT.MIN_X .LE.XEV.AND.BSRT.MAX_X.GE.XEV)
+              SOK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
+     &                               .AND.
+     &             (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+              IF (SRT.BCKGND) THEN
+                BOK=((BSRT.MIN_X .LE.XEV.AND.BSRT.MAX_X.GE.XEV)
      &                            .AND.
-     &                   (BSRT.MIN_Y.LE.YEV.AND.BSRT.MAX_Y.GE.YEV))
-                   ELSEIF (INDEX('CAE',BSRT.SHAPE).NE.0) THEN
-                     OK=((BELPX2*BBMIN2 + BELPY2*BAMIN2) .GE. BA2B2I
+     &                 (BSRT.MIN_Y.LE.YEV.AND.BSRT.MAX_Y.GE.YEV))
+              ENDIF
+
+*  circle, annulus or ellipse (all treated as ellipse)
+            ELSEIF (INDEX('CAE',SRT.SHAPE).NE.0) THEN
+
+              SOK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
+     &                               .AND.
+     &             (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
+              IF (SRT.BCKGND) THEN
+                BOK=((BELPX2*BBMIN2 + BELPY2*BAMIN2) .GE. BA2B2I
      &                              .AND.
-     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2) .LE. BA2B2O)
-                   ELSEIF (BSRT.SHAPE.EQ.'I') THEN
-                  Find position within spatial mask
-                     IF (IMAGE) THEN
-                       MEL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
-                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                         MEL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
-                       ELSE
-                         MEL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
-                       ENDIF
-                     ELSE
-                       MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                         MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                       ELSE
-                         MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                       ENDIF
-                     ENDIF
-                     OK=(BMASK(MEL1,MEL2).NE.0)
+     &                (BELPX2*BBMAX2 + BELPY2*BAMAX2) .LE. BA2B2O)
+              ENDIF
 
-                   ENDIF
+*  ARD description
+            ELSEIF (SRT.SHAPE.EQ.'I') THEN
 
-                   IF (OK) THEN
-
-*                Calculate position of data in array
-*                NB: no polar bins in background
-                     IF (BDIM1.GT.1.AND.BDIM2.GT.1) THEN
-                       EL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
-
-*                 Calculate Y element depending on orientation of raw pixels
-                       IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                         EL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
-                       ELSE
-                         EL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
-                       ENDIF
-*
-
-                     ELSE
-
-                       EL1=1
-                       EL2=1
-
-
-                     ENDIF
-
-                     EL3=INT((XDEV-BSRT.MIN_XD)/XDWID) + 1
-                     EL4=INT((YDEV-BSRT.MIN_YD)/YDWID) + 1
-                     EL5=INT((TEV-BSRT.MIN_T(1))/TWIDTH) + 1
-                     EL6=INT((AEV-BSRT.MIN_PH)/PWIDTH) + 1
-                     EL7=INT((CEV-BSRT.MIN_EN)/EWIDTH) + 1
-*
-
-                     BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
-     &                   BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
-
-                   ENDIF
+*  find position within spatial mask
+              IF (IMAGE) THEN
+                MEL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
+                IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                  MEL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
+                ELSE
+                  MEL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
+                ENDIF
+              ELSE
+                MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+                IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                  MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+                ELSE
+                  MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
                 ENDIF
               ENDIF
+              SOK=(SMASK(MEL1,MEL2).NE.0)
+              IF (SRT.BCKGND) THEN
+                BOK=(BMASK(MEL1,MEL2).NE.0)
+              ENDIF
             ENDIF
-           ENDIF
-           ENDIF
-           ENDIF
-          ELSE
-            BADEV = BADEV + 1
-          ENDIF      ! Hotspot ?
-      ENDDO       ! Loop over all records in map
+
+          ENDIF
+
+          IF (SOK) THEN
+
+*
+*  Calculate position of data in array
+*  The first two dimensions of the array can be either
+*  X and Y pixel or RADIAL and AZIMUTHAL bin, depending on
+*  the user selection.
+            IF (IMAGE) THEN
+*
+*  X,Y bins:
+              EL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
+*  Calculate Y element according to orientation of raw pixels
+              IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                EL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
+              ELSE
+                EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
+              ENDIF
+*
+            ELSE
+
+*  No spatial axes
+              IF (SDIM1.EQ.1.AND.SDIM2.EQ.1) THEN
+
+                EL1=1
+                EL2=1
+
+*  Radial distribution
+              ELSE
+
+*  Calculate the radial (and azimuthal) bin by checking
+*  each bin individually (how else ??)
+                DO EL1=1,NRBIN
+*
+                  IF (( SELPX2 / ELIPA2(EL1) +
+     &                 SELPY2 / ELIPB2(EL1) ) .LE. 1.0) GOTO 110
+                ENDDO
+*
+*  This error message should never be activated
+                CALL MSG_PRNT('Error calculating elliptical - '/
+     &                             /'bin refer to author')
+*
+110             CONTINUE
+*
+*                 Set azimuthal bin to zero for now
+                EL2=1
+*
+              ENDIF
+            ENDIF
+*
+*  Calculate the other elements
+            EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
+            EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
+            EL5=MIN((INT((TEV-SRT.MIN_T(1))/TWIDTH) + 1), SDIM5)
+            EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
+            EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
+*
+
+            SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+     &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
+*
+          ENDIF
+
+          IF ( SRT.BCKGND.AND.BOK) THEN
+
+*  Calculate position of data in array
+*  NB: no polar bins in background
+            IF (BDIM1.GT.1.AND.BDIM2.GT.1) THEN
+              EL1=INT((XEV-BSRT.MIN_X)/BXWIDTH) + 1
+*  Calculate Y element depending on orientation of raw pixels
+              IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                EL2=BDIM2 - INT((YEV-BSRT.MIN_Y)/BYWIDTH)
+              ELSE
+                EL2=INT((YEV-BSRT.MIN_Y)/BYWIDTH) + 1
+              ENDIF
+*
+            ELSE
+
+              EL1=1
+              EL2=1
+
+            ENDIF
+
+            EL3=INT((XDEV-BSRT.MIN_XD)/XDWID) + 1
+            EL4=INT((YDEV-BSRT.MIN_YD)/YDWID) + 1
+            EL5=INT((TEV-BSRT.MIN_T(1))/TWIDTH) + 1
+            EL6=INT((AEV-BSRT.MIN_PH)/PWIDTH) + 1
+            EL7=INT((CEV-BSRT.MIN_EN)/EWIDTH) + 1
+*
+
+            BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
+     &           BDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
+
+          ENDIF
+
+        ENDIF
+
+      ENDDO
 *
 999   CONTINUE
 *
@@ -3699,6 +3669,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       LOGICAL TOK                            ! Is this event within time ranges?
       LOGICAL OK
       INTEGER IX
+      INTEGER MEL1,MEL2
 *-
       IF (INDEX(HEAD.DETECTOR, 'HRI') .NE. 0) THEN
          LHRI = .TRUE.
@@ -3828,7 +3799,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                   ELSEIF ((INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
                     OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
      &                                  .AND.
-     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O))
+     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
                   ELSEIF (SRT.SHAPE .EQ. 'I') THEN
                     MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
                     IF (HEAD.ORIGIN.EQ.'MPE') THEN
@@ -3861,7 +3832,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                     ELSEIF (INDEX( 'CAE', BSRT.SHAPE ) .NE. 0) THEN
                       OK=((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I
      &                                  .AND.
-     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O))
+     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O)
                     ELSEIF (BSRT.SHAPE.EQ.'I') THEN
                       OK=(BMASK(MEL1,MEL2).NE.0)
                     ENDIF
