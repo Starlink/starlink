@@ -81,7 +81,7 @@
       CHARACTER * ( 4 ) FMT      ! Format string
       CHARACTER * ( 3 ) FMTL     ! A-format length for update mode
       INTEGER HLEN               ! Number of characters in history
-      CHARACTER * ( 70 ) HISTRY  ! FITS header card
+      CHARACTER * ( 80 ) HISTRY  ! FITS header card
       CHARACTER * ( NDF__SZHST ) HOST ! Host machine
       INTEGER IREC               ! Loop counter for history records
       INTEGER ISTAT              ! IMFORT status
