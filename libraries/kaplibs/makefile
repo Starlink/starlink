@@ -424,7 +424,8 @@ LIB_VERS = 1.1
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-ira_source.tar aif_source.tar fts_source.tar ctg_source.tar lpg_source.tar
+ira_source.tar aif_source.tar fts_source.tar ctg_source.tar kpg_source.tar \
+lpg_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -457,8 +458,10 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
+KPG_PRIVATE_INCLUDES = kpg_ast kpg_par
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
-                   $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) 
+                   $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
+                   $(KPG_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -504,6 +507,120 @@ ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
 
+KPG_F_ROUTINES = \
+bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
+bad2duw.f bad2dw.f bttn3.f chvalr.f copad.f copar.f copy1d.f copy2d.f \
+copy3d.f cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f \
+elnmbr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_asgdp.f \
+kpg1_agfnd.f kpg1_agref.f kpg1_ainbd.f kpg1_ainbr.f kpg1_aindd.f \
+kpg1_akerd.f kpg1_akerr.f kpg1_antso.f kpg1_arcog.f kpg1_arcol.f \
+kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f kpg1_asffr.f \
+kpg1_asfgt.f kpg1_asfil.f kpg1_asfrm.f kpg1_asget.f kpg1_asgfr.f \
+kpg1_asgfw.f kpg1_asgrd.f kpg1_asgrp.f kpg1_asira.f kpg1_aslog.f \
+kpg1_asmrg.f kpg1_asoff.f kpg1_asplt.f kpg1_asprp.f kpg1_aspsy.f \
+kpg1_asptp.f kpg1_asref.f kpg1_asreg.f kpg1_asset.f kpg1_assim.f \
+kpg1_assir.f kpg1_assmp.f kpg1_asspl.f kpg1_assts.f kpg1_assty.f \
+kpg1_ast2h.f kpg1_avlut.f kpg1_axano.f kpg1_axbnd.f kpg1_axbnr.f \
+kpg1_axgvd.f kpg1_axlid.f kpg1_axlir.f kpg1_axlvd.f kpg1_axrng.f \
+kpg1_axtyp.f kpg1_axvld.f kpg1_bilnr.f kpg1_blocd.f kpg1_blocr.f \
+kpg1_bmedd.f kpg1_bmedr.f kpg1_caddb.f kpg1_caddd.f kpg1_caddi.f \
+kpg1_caddr.f kpg1_caddub.f kpg1_cadduw.f kpg1_caddw.f kpg1_ccpro.f \
+kpg1_ceil.f kpg1_chaxd.f kpg1_chaxr.f kpg1_che2d.f kpg1_chevd.f \
+kpg1_chvab.f kpg1_chvad.f kpg1_chvai.f kpg1_chvar.f kpg1_chvaub.f \
+kpg1_chvauw.f kpg1_chvaw.f kpg1_cmadd.f kpg1_cmadr.f kpg1_cmavd.f \
+kpg1_cmavr.f kpg1_cmpkb.f kpg1_cmpkd.f kpg1_cmpki.f kpg1_cmpkr.f \
+kpg1_cmpkub.f kpg1_cmpkuw.f kpg1_cmpkw.f kpg1_cmulb.f kpg1_cmuld.f \
+kpg1_cmuli.f kpg1_cmulr.f kpg1_cmulub.f kpg1_cmuluw.f kpg1_cmulw.f \
+kpg1_cmvdd.f kpg1_cmvdr.f kpg1_cmvvd.f kpg1_cmvvr.f kpg1_cnlim.f \
+kpg1_colnm.f kpg1_cpnti.f kpg1_cpntr.f kpg1_cross.f kpg1_crout.f \
+kpg1_csubb.f kpg1_csubd.f kpg1_csubi.f kpg1_csubr.f kpg1_csubub.f \
+kpg1_csubuw.f kpg1_csubw.f kpg1_d2w2r.f kpg1_danot.f kpg1_dauni.f \
+kpg1_dclid.f kpg1_dclir.f kpg1_divd.f kpg1_divr.f kpg1_dsfrm.f \
+kpg1_dwsod.f kpg1_dwsor.f kpg1_elnmb.f kpg1_elnmd.f kpg1_elnmr.f \
+kpg1_ffrd.f kpg1_ffrr.f kpg1_fftbd.f kpg1_fftbr.f kpg1_fftfd.f \
+kpg1_fftfr.f kpg1_fhdat.f kpg1_fillb.f kpg1_filld.f kpg1_filli.f \
+kpg1_fillr.f kpg1_fillub.f kpg1_filluw.f kpg1_fillw.f kpg1_flasb.f \
+kpg1_flasd.f kpg1_flasi.f kpg1_flasr.f kpg1_flasw.f kpg1_flcor.f \
+kpg1_flipb.f kpg1_flipd.f kpg1_flipi.f kpg1_flipr.f kpg1_flipub.f \
+kpg1_flipuw.f kpg1_flipw.f kpg1_floor.f kpg1_flpth.f kpg1_frpic.f \
+kpg1_gaufr.f kpg1_gausd.f kpg1_gausr.f kpg1_gaxlb.f kpg1_gca.f \
+kpg1_gdare.f kpg1_gdbnd.f kpg1_gdget.f kpg1_gdnew.f kpg1_gdold.f \
+kpg1_gdput.f kpg1_gdqpc.f kpg1_gdwin.f kpg1_getim.f kpg1_getyp.f \
+kpg1_ghstb.f kpg1_ghstd.f kpg1_ghsti.f kpg1_ghstr.f kpg1_ghstub.f \
+kpg1_ghstuw.f kpg1_ghstw.f kpg1_gilst.f kpg1_gkeyb.f kpg1_gkeyd.f \
+kpg1_gkeyi.f kpg1_gkeyr.f kpg1_gkeyw.f kpg1_gnlbu.f kpg1_gntit.f \
+kpg1_gpcol.f kpg1_gtaxi.f kpg1_gtaxv.f kpg1_gtchv.f kpg1_gtgrp.f \
+kpg1_gtndf.f kpg1_gtpos.f kpg1_gtwcs.f kpg1_h2ast.f kpg1_hconr.f \
+kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
+kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f \
+kpg1_hstfd.f kpg1_hstfr.f kpg1_hstlo.f kpg1_hstqb.f \
+kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
+kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incor.f kpg1_isclb.f \
+kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f kpg1_isscs.f \
+kpg1_ivci.f kpg1_iwcg.f kpg1_keyzo.f kpg1_kgodr.f kpg1_lasto.f \
+kpg1_lgtrn.f kpg1_lintd.f kpg1_listc.f kpg1_litnd.f kpg1_litnr.f \
+kpg1_litrd.f kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f \
+kpg1_loctd.f kpg1_locti.f kpg1_loctr.f kpg1_loctub.f kpg1_loctuw.f \
+kpg1_loctw.f kpg1_ludcd.f kpg1_lutin.f kpg1_macol.f kpg1_map.f \
+kpg1_mdetd.f kpg1_meand.f kpg1_meanr.f kpg1_medur.f kpg1_modeb.f \
+kpg1_moded.f kpg1_modei.f kpg1_moder.f kpg1_modeub.f kpg1_modeuw.f \
+kpg1_modew.f kpg1_monod.f kpg1_monor.f kpg1_mthed.f kpg1_mther.f \
+kpg1_muld.f kpg1_muli.f kpg1_mulr.f kpg1_mxmnb.f kpg1_mxmnd.f \
+kpg1_mxmni.f kpg1_mxmnr.f kpg1_mxmnub.f kpg1_mxmnuw.f kpg1_mxmnw.f \
+kpg1_nacvt.f kpg1_nagtc.f kpg1_naptc.f kpg1_nmcol.f kpg1_noisb.f \
+kpg1_noisd.f kpg1_noisi.f kpg1_noisr.f kpg1_noisub.f kpg1_noisuw.f \
+kpg1_noisw.f kpg1_nthmr.f kpg1_numbb.f kpg1_numbd.f kpg1_numbi.f \
+kpg1_numbr.f kpg1_numbub.f kpg1_numbuw.f kpg1_numbw.f kpg1_numfl.f \
+kpg1_pacol.f kpg1_palci.f kpg1_pastb.f kpg1_pastd.f kpg1_pasti.f \
+kpg1_pastr.f kpg1_pastub.f kpg1_pastuw.f kpg1_pastw.f kpg1_pgcol.f \
+kpg1_pgcur.f kpg1_pgcut.f kpg1_pgesc.f kpg1_pgpix.f kpg1_pgsht.f \
+kpg1_pgsty.f kpg1_pgtxt.f kpg1_pl2ge.f kpg1_pl2pu.f kpg1_plcip.f \
+kpg1_plot.f kpg1_plota.f kpg1_plotn.f kpg1_plotp.f kpg1_plots.f \
+kpg1_pltln.f kpg1_poisr.f kpg1_pqvid.f kpg1_prcur.f kpg1_prcvt.f \
+kpg1_prnth.f kpg1_prowd.f kpg1_prowr.f kpg1_prsad.f kpg1_prsai.f \
+kpg1_prsar.f kpg1_psfsd.f kpg1_psfsr.f kpg1_px2ax.f kpg1_pxdpb.f \
+kpg1_pxdpd.f kpg1_pxdpi.f kpg1_pxdpr.f kpg1_pxdpub.f kpg1_pxdpuw.f \
+kpg1_pxdpw.f kpg1_qcol.f kpg1_qidat.f kpg1_qncol.f kpg1_qntld.f \
+kpg1_qntlr.f kpg1_qsrtc.f kpg1_qsrti.f kpg1_qsrtr.f kpg1_qvid.f \
+kpg1_rdast.f kpg1_rdlst.f kpg1_retrr.f kpg1_rfcod.f kpg1_nbadd.f \
+kpg1_rfcor.f kpg1_rgndf.f kpg1_rmapb.f kpg1_rmapd.f kpg1_rmapi.f \
+kpg1_rmapr.f kpg1_rmapub.f kpg1_rmapuw.f kpg1_rmapw.f kpg1_satkc.f \
+kpg1_satkd.f kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_sdtrn.f \
+kpg1_secsh.f kpg1_seed.f kpg1_sgdig.f kpg1_sgdim.f kpg1_short.f \
+kpg1_slice.f kpg1_solin.f kpg1_sqsud.f kpg1_ssazd.f kpg1_ssazr.f \
+kpg1_sscof.f kpg1_statb.f kpg1_statd.f kpg1_stati.f kpg1_statr.f \
+kpg1_statub.f kpg1_statuw.f kpg1_statw.f kpg1_stdsd.f kpg1_stdsr.f \
+kpg1_stfld.f kpg1_stflr.f kpg1_stord.f kpg1_storr.f kpg1_tdlib.f \
+kpg1_tdlid.f kpg1_tdlii.f kpg1_tdlir.f kpg1_tdliub.f kpg1_tdliuw.f \
+kpg1_tdliw.f kpg1_thrsb.f kpg1_thrsd.f kpg1_thrsi.f kpg1_thrsr.f \
+kpg1_thrsub.f kpg1_thrsuw.f kpg1_thrsw.f kpg1_trald.f kpg1_trbod.f \
+kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f kpg1_trlir.f kpg1_trliub.f \
+kpg1_trliuw.f kpg1_trliw.f kpg1_trpid.f kpg1_trpir.f kpg1_unz2r.f \
+kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
+kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_verb.f \
+kpg1_wgndf.f kpg1_wmodr.f kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f \
+kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
+kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
+normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
+kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
+kpg1_wcatw.f kpg1_srcta.f kpg1_fit1d.f kpg1_pgclr.f \
+kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
+kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
+kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
+kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f kpg1_grlm1.f \
+kpg1_cpbdd.f kpg1_cpbdr.f kpg1_pgopn.f kpg1_pgcls.f \
+kpg1_expob.f kpg1_expoi.f kpg1_expoub.f kpg1_expow.f kpg1_expod.f \
+kpg1_expor.f kpg1_expouw.f kpg1_logab.f kpg1_logai.f kpg1_logaub.f \
+kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f kpg1_asshr.f \
+kpg1_lutky.f kpg1_pvers.f kpg1_orvar.f kpg1_is3d.f kpg1_wtm3d.f \
+kpg1_is3r.f kpg1_wtm3r.f kpg1_darar.f kpg1_darad.f kpg1_darai.f \
+kpg1_daraw.f kpg1_darab.f kpg1_daraub.f kpg1_darauw.f kpg1_fracr.f \
+kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
+kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
+kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
+kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
+kpg1_hstaub.f kpg1_hstauw.f 
+
 CTG_F_ROUTINES = ctg1_appen.f ctg1_expan.f ctg1_match.f ctg_catcr.f \
 ctg_ptsup.f ctg1_asexp.f ctg1_fpars.f ctg_setsz.f ctg1_catch.f \
 ctg1_gtyps.f ctg1_crexp.f ctg1_lasto.f ctg_catas.f ctg_gtsup.f ctg1_subst.f \
@@ -514,7 +631,7 @@ lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
 lpg_state.f
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
-             $(LPG_F_ROUTINES) $(FTS_F_ROUTINES)
+             $(LPG_F_ROUTINES) $(FTS_F_ROUTINES) $(KPG_F_ROUTINES) 
 
 #  List of Fortran BLOCK DATA routines.
 
@@ -536,8 +653,9 @@ IRA_C_ROUTINES =
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
+KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c 
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
-             $(FTS_C_ROUTINES) 
+             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) 
 
 #  The facility error file.
 
@@ -588,8 +706,9 @@ IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM
 CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
 LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
 FTS_INCLUDE_LINKS = FTS_PAR
+KPG_INCLUDE_LINKS = KPG_PAR KPG_AST
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
-                $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) 
+                $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) $(KPG_INCLUDE_LINKS) 
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -601,6 +720,8 @@ CTG_ERR:     ctg_err;             $(LINK) $? $@
 LPG_CONST:   lpg_const;           $(LINK) $? $@
 LPG_COM:     lpg_com;             $(LINK) $? $@
 FTS_PAR:     fts_par;             $(LINK) $? $@
+KPG_PAR:     kpg_par;             $(LINK) $? $@
+KPG_AST:     kpg_ast;             $(LINK) $? $@
 
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
 CAT_PAR:   $(STAR_INC)/cat_par;   $(LINK) $? $@
@@ -631,6 +752,11 @@ $(CTG_F_ROUTINES) $(CTG_C_ROUTINES):
 	$(TAR_OUT) ctg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in ctg_source.tar; exit 1; fi
+
+$(KPG_PRIVATE_INCLUDES) $(KPG_F_ROUTINES) $(KPG_C_ROUTINES):
+	$(TAR_OUT) kpg_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in kpg_source.tar; exit 1; fi
 
 $(FTS_PRIVATE_INCLUDES) $(FTS_F_ROUTINES) $(FTS_C_ROUTINES):
 	$(TAR_OUT) fts_source.tar $@
@@ -679,11 +805,14 @@ FTS_OBJECT_FILES = $(FTS_F_ROUTINES:.f=.o) \
 CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
                   $(CTG_PLATFORM_F:.f=.o) $(CTG_C_ROUTINES:.c=.o)
 
+KPG_OBJECT_FILES = $(KPG_F_ROUTINES:.f=.o) \
+                  $(KPG_PLATFORM_F:.f=.o) $(KPG_C_ROUTINES:.c=.o)
+
 LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
-               $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) 
+               $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) $(KPG_OBJECT_FILES) 
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -693,7 +822,7 @@ OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a
+OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a libkpg.a
 
 libaif.a: $(AIF_OBJECT_FILES)
 	$(AR_IN) $@ $?
@@ -704,6 +833,10 @@ libira.a: $(IRA_OBJECT_FILES)
 	$(RANLIB) $@
 
 libctg.a: $(CTG_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+libkpg.a: $(KPG_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -1510,6 +1643,483 @@ ira_read.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
 ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+kpg1_abset.o:	 SAE_PAR PAR_ERR
+kpg1_agatc.o:	 SAE_PAR DAT_PAR
+kpg1_agfnd.o:	 SAE_PAR DAT_PAR
+kpg1_agref.o:	 SAE_PAR DAT_PAR DAT_ERR
+kpg1_ainbd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ainbr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_aindd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_akerd.o:	 SAE_PAR PRM_PAR
+kpg1_akerr.o:	 SAE_PAR PRM_PAR
+kpg1_antso.o:	 SAE_PAR
+kpg1_arcog.o:	 SAE_PAR
+kpg1_arcol.o:	 SAE_PAR CHR_ERR
+kpg1_asagd.o:	 SAE_PAR
+kpg1_ascrv.o:	 SAE_PAR AST_PAR
+kpg1_asdis.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_asdsv.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_asffr.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_asfgt.o:	 SAE_PAR AST_PAR NDF_PAR
+kpg1_asfil.o:	 SAE_PAR FIO_ERR GRP_PAR AST_PAR
+kpg1_asfrm.o:	 SAE_PAR AST_PAR PRM_PAR PAR_ERR IRA_PAR
+kpg1_asget.o:	 SAE_PAR NDF_PAR AST_PAR PRM_PAR
+kpg1_asgdp.o:    SAE_PAR NDF_PAR AST_PAR 
+kpg1_asgfr.o:	 SAE_PAR DAT_PAR GRP_PAR GRP_ERR KPG_AST
+kpg1_asgfw.o:	 SAE_PAR DAT_PAR GRP_PAR KPG_AST
+kpg1_asgrd.o:	 SAE_PAR AST_PAR
+kpg1_asgrp.o:	 SAE_PAR GRP_PAR NDF_PAR AST_PAR
+kpg1_asira.o:	 SAE_PAR AST_PAR PRM_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
+kpg1_aslog.o:	 SAE_PAR AST_PAR
+kpg1_asmrg.o:	 SAE_PAR AST_PAR
+kpg1_asoff.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_asplt.o:	 SAE_PAR AST_PAR
+kpg1_asprp.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_aspsy.o:	 SAE_PAR DAT_PAR GRP_PAR KPG_AST
+kpg1_asptp.o:	 SAE_PAR AST_PAR
+kpg1_asref.o:	 SAE_PAR DAT_PAR NDF_PAR PAR_PAR
+kpg1_asreg.o:	 SAE_PAR AST_PAR
+kpg1_asset.o:	 SAE_PAR GRP_PAR AST_PAR PAR_ERR PSX_ERR
+kpg1_assim.o:	 SAE_PAR AST_PAR
+kpg1_assir.o:	 SAE_PAR AST_PAR PRM_PAR IRA_PAR
+kpg1_assmp.o:	 SAE_PAR AST_PAR NDF_PAR
+kpg1_asspl.o:	 SAE_PAR NDF_PAR AST_PAR
+kpg1_assts.o:	 SAE_PAR GRP_PAR AST_PAR AST_ERR
+kpg1_assty.o:	 SAE_PAR GRP_PAR DAT_PAR CTM_PAR KPG_AST
+kpg1_ast2h.o:	 SAE_PAR
+kpg1_avlut.o:	 SAE_PAR
+kpg1_axano.o:	 SAE_PAR
+kpg1_axbnd.o:	 SAE_PAR
+kpg1_axbnr.o:	 SAE_PAR
+kpg1_axgvd.o:	 SAE_PAR
+kpg1_axlid.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_axlir.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_axlvd.o:	 SAE_PAR
+kpg1_axrng.o:	 SAE_PAR
+kpg1_axtyp.o:	 SAE_PAR NDF_PAR
+kpg1_axvld.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_bilnr.o:	 SAE_PAR PRM_PAR
+kpg1_blocd.o:	 SAE_PAR PRM_PAR
+kpg1_blocr.o:	 SAE_PAR PRM_PAR
+kpg1_bmedd.o:	 SAE_PAR PRM_PAR
+kpg1_bmedr.o:	 SAE_PAR PRM_PAR
+kpg1_caddb.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_caddd.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_caddi.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_caddr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_caddub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
+kpg1_cadduw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
+kpg1_caddw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_ccpro.o:	 SAE_PAR
+kpg1_ceil.o:	 SAE_PAR
+kpg1_chaxd.o:	 SAE_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chaxr.o:	 SAE_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_che2d.o:	 SAE_PAR PRM_PAR
+kpg1_chevd.o:	 SAE_PAR PRM_PAR
+kpg1_chvab.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvad.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvar.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvaub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvauw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_chvaw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmadd.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmadr.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmavd.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmavr.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmpkb.o:	 SAE_PAR NDF_PAR
+kpg1_cmpkd.o:	 SAE_PAR NDF_PAR
+kpg1_cmpki.o:	 SAE_PAR NDF_PAR
+kpg1_cmpkr.o:	 SAE_PAR NDF_PAR
+kpg1_cmpkub.o:	 SAE_PAR NDF_PAR
+kpg1_cmpkuw.o:	 SAE_PAR NDF_PAR
+kpg1_cmpkw.o:	 SAE_PAR NDF_PAR
+kpg1_cmulb.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmuld.o:	 SAE_PAR PRM_PAR NUM_CMN
+kpg1_cmuli.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmulr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmulub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmuluw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmulw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmvdd.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmvdr.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmvvd.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cmvvr.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_cnlim.o:	 SAE_PAR PRM_PAR
+kpg1_colnm.o:	 SAE_PAR CTM_PAR CTM_COM
+kpg1_cpndb.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpndd.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpndi.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpndr.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpndub.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpnduw.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpndw.o:	 SAE_PAR NDF_PAR PRM_PAR
+kpg1_cpnti.o:	 SAE_PAR PAR_ERR
+kpg1_cpntr.o:	 SAE_PAR PAR_ERR
+kpg1_cross.o:	 SAE_PAR
+kpg1_crout.o:	 SAE_PAR DAT_PAR PAR_ERR
+kpg1_csubb.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_csubd.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_csubi.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_csubr.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_csubub.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
+kpg1_csubuw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
+kpg1_csubw.o:	 SAE_PAR PRM_PAR NUM_CMN NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_ctcpd.o:    SAE_PAR PRM_PAR CAT_PAR
+kpg1_ctcpi.o:    SAE_PAR PRM_PAR CAT_PAR
+kpg1_d2w2r.o:	 SAE_PAR PRM_PAR
+kpg1_danot.o:	 SAE_PAR
+kpg1_dauni.o:	 SAE_PAR
+kpg1_dclid.o:	 SAE_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_dclir.o:	 SAE_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_divd.o:	 SAE_PAR PRM_PAR
+kpg1_divr.o:	 SAE_PAR PRM_PAR
+kpg1_dsfrm.o:	 SAE_PAR AST_PAR NDF_PAR
+kpg1_dwsod.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_dwsor.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_elnmb.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_elnmd.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_elnmr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_envdf.o:	 SAE_PAR PSX_ERR
+kpg1_ffrd.o:	 SAE_PAR
+kpg1_ffrr.o:	 SAE_PAR
+kpg1_fftbd.o:	 SAE_PAR
+kpg1_fftbr.o:	 SAE_PAR
+kpg1_fftfd.o:	 SAE_PAR
+kpg1_fftfr.o:	 SAE_PAR
+kpg1_fhdat.o:	 SAE_PAR NDF_PAR
+kpg1_fillb.o:	 SAE_PAR
+kpg1_filld.o:	 SAE_PAR
+kpg1_filli.o:	 SAE_PAR
+kpg1_fillr.o:	 SAE_PAR
+kpg1_fillub.o:	 SAE_PAR
+kpg1_filluw.o:	 SAE_PAR
+kpg1_fillw.o:	 SAE_PAR
+kpg1_fit1d.o:	 SAE_PAR PRM_PAR
+kpg1_flasb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_flasd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_flasi.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_flasr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_flasw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_flcor.o:	 SAE_PAR PRM_PAR MSG_PAR PAR_ERR FIO_ERR
+kpg1_flipb.o:	 SAE_PAR
+kpg1_flipd.o:	 SAE_PAR
+kpg1_flipi.o:	 SAE_PAR
+kpg1_flipr.o:	 SAE_PAR
+kpg1_flipub.o:	 SAE_PAR
+kpg1_flipuw.o:	 SAE_PAR
+kpg1_flipw.o:	 SAE_PAR
+kpg1_floor.o:	 SAE_PAR
+kpg1_flpth.o:	 SAE_PAR
+kpg1_frpic.o:	 SAE_PAR PRM_PAR
+kpg1_fspec.o:	 SAE_PAR GRP_PAR IRG_ERR
+kpg1_gaufr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_gausd.o:	 SAE_PAR PRM_PAR
+kpg1_gausr.o:	 SAE_PAR PRM_PAR
+kpg1_gaxlb.o:	 SAE_PAR PAR_ERR
+kpg1_gca.o:	 SAE_PAR
+kpg1_gdare.o:	 SAE_PAR
+kpg1_gdbnd.o:	 SAE_PAR PAR_ERR
+kpg1_gdget.o:	 SAE_PAR AST_PAR DAT_PAR AGI_PAR
+kpg1_gdnew.o:	 SAE_PAR AST_PAR
+kpg1_gdold.o:	 SAE_PAR AGI_PAR
+kpg1_gdput.o:	 SAE_PAR AST_PAR DAT_PAR
+kpg1_gdqpc.o:	 SAE_PAR
+kpg1_gdwin.o:	 SAE_PAR
+kpg1_getim.o:	 SAE_PAR DAT_PAR DAT_ERR
+kpg1_getyp.o:	 SAE_PAR DAT_PAR
+kpg1_ghstb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghstd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghsti.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghstr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghstub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghstuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ghstw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_gilst.o:	 SAE_PAR
+kpg1_gkeyb.o:	 SAE_PAR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_gkeyd.o:	 SAE_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_gkeyi.o:	 SAE_PAR NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_gkeyr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_gkeyw.o:	 SAE_PAR NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_gnlbu.o:	 SAE_PAR PAR_ERR
+kpg1_gntit.o:	 SAE_PAR PAR_ERR
+kpg1_gpcol.o:	 SAE_PAR CTM_PAR
+kpg1_graph.o:    SAE_PAR
+kpg1_grphw.o:    SAE_PAR PRM_PAR PAR_ERR AST_PAR
+kpg1_gtaxi.o:	 SAE_PAR NDF_PAR AST_PAR PRM_PAR
+kpg1_gtaxv.o:	 SAE_PAR AST_PAR AST_ERR PAR_ERR
+kpg1_gtchv.o:	 SAE_PAR GRP_PAR PAR_ERR
+kpg1_gtgrp.o:	 SAE_PAR GRP_PAR PAR_ERR
+kpg1_gtndf.o:	 SAE_PAR NDF_PAR
+kpg1_gtpos.o:	 SAE_PAR AST_PAR AST_ERR PAR_ERR NDF_PAR
+kpg1_gtwcs.o:	 SAE_PAR AST_PAR DAT_PAR GRP_PAR PSX_ERR
+kpg1_h2ast.o:	 SAE_PAR
+kpg1_hconr.o:	 SAE_PAR
+kpg1_hmltd.o:	 SAE_PAR
+kpg1_hmltr.o:	 SAE_PAR
+kpg1_hmsg.o:	 SAE_PAR
+kpg1_hrcpr.o:	 SAE_PAR
+kpg1_hsdsd.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hsdsr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hsfld.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hsflr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hsstp.o:	 SAE_PAR PRM_PAR
+kpg1_hstab.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstad.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstai.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstar.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstaub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstauw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstaw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstfd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstfr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_hstlo.o:	 SAE_PAR
+kpg1_hstqb.o:	 SAE_PAR
+kpg1_hstqd.o:	 SAE_PAR
+kpg1_hstqi.o:	 SAE_PAR
+kpg1_hstqr.o:	 SAE_PAR
+kpg1_hstqub.o:	 SAE_PAR
+kpg1_hstquw.o:	 SAE_PAR
+kpg1_hstqw.o:	 SAE_PAR
+kpg1_iderr.o:	 SAE_PAR IDI_ERR
+kpg1_imprg.o:	 SAE_PAR DAT_PAR DAT_ERR
+kpg1_incor.o:	 SAE_PAR DAT_PAR PRM_PAR PAR_ERR
+kpg1_isclb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_iscld.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_iscli.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_isclr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_isclw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_isscs.o:	 SAE_PAR IRA_PAR
+kpg1_ivci.o:	 SAE_PAR CTM_PAR GNS_PAR
+kpg1_iwcg.o:	 SAE_PAR
+kpg1_keyzo.o:	 SAE_PAR PRM_PAR
+kpg1_kgodr.o:	 SAE_PAR PRM_PAR
+kpg1_lasto.o:	 SAE_PAR
+kpg1_lgtrn.o:	 SAE_PAR
+kpg1_lintd.o:	 SAE_PAR AST_PAR PRM_PAR
+kpg1_listc.o:	 SAE_PAR
+kpg1_litnd.o:	 SAE_PAR
+kpg1_litnr.o:	 SAE_PAR
+kpg1_litrd.o:	 SAE_PAR PRM_PAR
+kpg1_litrr.o:	 SAE_PAR PRM_PAR
+kpg1_lltrd.o:	 SAE_PAR PRM_PAR
+kpg1_lltrr.o:	 SAE_PAR PRM_PAR
+kpg1_loctb.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_loctd.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_locti.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_loctr.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_loctub.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_loctuw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_loctw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ludcd.o:	 SAE_PAR PRM_PAR
+kpg1_lutin.o:	 SAE_PAR
+kpg1_macol.o:	 SAE_PAR
+kpg1_map.o:	 SAE_PAR
+kpg1_mdetd.o:	 SAE_PAR PRM_PAR
+kpg1_meand.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_meanr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_medur.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_modeb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_moded.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_modei.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_moder.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_modeub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_modeuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_modew.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_monod.o:	 SAE_PAR PRM_PAR
+kpg1_monor.o:	 SAE_PAR PRM_PAR
+kpg1_mthed.o:	 SAE_PAR PRM_PAR
+kpg1_mther.o:	 SAE_PAR PRM_PAR
+kpg1_muld.o:	 SAE_PAR PRM_PAR NUM_CMN
+kpg1_muli.o:	 SAE_PAR PRM_PAR NUM_CMN
+kpg1_mulr.o:	 SAE_PAR PRM_PAR NUM_CMN
+kpg1_mxmnb.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmnd.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmni.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmnr.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmnub.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmnuw.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_mxmnw.o:	 SAE_PAR PRM_PAR NUM_DEC NUM_DEF
+kpg1_nacvt.o:	 SAE_PAR DAT_PAR
+kpg1_nagtc.o:	 SAE_PAR
+kpg1_naptc.o:	 SAE_PAR DAT_PAR
+kpg1_nbadd.o:    SAE_PAR PRM_PAR
+kpg1_ndfch.o:	 SAE_PAR DAT_PAR GRP_PAR IRG_ERR MSG_PAR
+kpg1_ndfnm.o:    SAE_PAR
+kpg1_nmcol.o:	 SAE_PAR CTM_PAR CTM_COM
+kpg1_noisb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisi.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_noisw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_nthmr.o:	 SAE_PAR PRM_PAR
+kpg1_numbb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_numbd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_numbi.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_numbr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_numbub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
+kpg1_numbuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
+kpg1_numbw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_numfl.o:	 SAE_PAR FIO_ERR
+kpg1_nwild.o:	 SAE_PAR DAT_PAR DAT_ERR NDF_PAR GRP_PAR
+kpg1_pacol.o:	 SAE_PAR
+kpg1_palci.o:	 SAE_PAR CTM_PAR
+kpg1_pastb.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pastd.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pasti.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pastr.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pastub.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pastuw.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pastw.o:	 SAE_PAR PRM_PAR NDF_PAR
+kpg1_pgcol.o:	 SAE_PAR
+kpg1_pgcur.o:	 SAE_PAR PRM_PAR
+kpg1_pgcut.o:	 SAE_PAR
+kpg1_pgesc.o:	 SAE_PAR
+kpg1_pgpix.o:	 SAE_PAR AST_PAR
+kpg1_pgsht.o:	 SAE_PAR
+kpg1_pgsty.o:	 SAE_PAR AST_PAR
+kpg1_pgtxt.o:	 SAE_PAR
+kpg1_pl2ge.o:	 SAE_PAR DAT_PAR PRM_PAR
+kpg1_pl2pu.o:	 SAE_PAR DAT_PAR PRM_PAR
+kpg1_plcip.o:	 SAE_PAR CTM_PAR
+kpg1_plget.o:	 SAE_PAR
+kpg1_pllod.o:	 SAE_PAR CTM_PAR DAT_PAR DAT_ERR
+kpg1_plot.o:	 SAE_PAR AST_PAR
+kpg1_plota.o:	 SAE_PAR PAR_ERR AST_PAR
+kpg1_plotn.o:	 SAE_PAR AST_PAR
+kpg1_plotp.o:	 SAE_PAR
+kpg1_plots.o:	 SAE_PAR AST_PAR
+kpg1_plput.o:	 SAE_PAR CTM_PAR
+kpg1_plsav.o:	 SAE_PAR CTM_PAR DAT_PAR DAT_ERR
+kpg1_pltln.o:	 SAE_PAR AST_PAR
+kpg1_poisr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_pqvid.o:	 SAE_PAR CTM_PAR GNS_PAR
+kpg1_prcur.o:	 SAE_PAR GNS_PAR
+kpg1_prcvt.o:	 SAE_PAR DAT_PAR
+kpg1_prnth.o:	 SAE_PAR
+kpg1_prowd.o:	 SAE_PAR
+kpg1_prowr.o:	 SAE_PAR
+kpg1_prsad.o:	 SAE_PAR CHR_ERR
+kpg1_prsai.o:	 SAE_PAR CHR_ERR
+kpg1_prsar.o:	 SAE_PAR CHR_ERR
+kpg1_pseed.o:	 SAE_PAR PRM_PAR
+kpg1_psfsd.o:	 SAE_PAR PRM_PAR
+kpg1_psfsr.o:	 SAE_PAR PRM_PAR
+kpg1_px2ax.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpb.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpd.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpi.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpr.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpub.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpuw.o:	 SAE_PAR NDF_PAR
+kpg1_pxdpw.o:	 SAE_PAR NDF_PAR
+kpg1_qcol.o:	 SAE_PAR GKS_PAR
+kpg1_qidat.o:	 SAE_PAR GKS_PAR
+kpg1_qncol.o:	 SAE_PAR GKS_PAR
+kpg1_qntld.o:	 SAE_PAR
+kpg1_qntlr.o:	 SAE_PAR
+kpg1_qsrtc.o:	 SAE_PAR
+kpg1_qsrti.o:	 SAE_PAR
+kpg1_qsrtr.o:	 SAE_PAR
+kpg1_qvid.o:	 SAE_PAR GKS_PAR CTM_PAR GNS_PAR
+kpg1_rcatw.o:    SAE_PAR DAT_PAR AST_PAR CAT_PAR GRP_PAR KPG_AST
+kpg1_rdast.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
+kpg1_rdlst.o:    SAE_PAR CAT_PAR CAT_ERR NDF_PAR AST_PAR
+kpg1_retrr.o:	 SAE_PAR
+kpg1_rfcod.o:	 SAE_PAR DAT_PAR FIO_ERR
+kpg1_rfcor.o:	 SAE_PAR DAT_PAR FIO_ERR
+kpg1_rglmt.o:	 SAE_PAR
+kpg1_rgndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
+kpg1_rmapb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B
+kpg1_rmapd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_D NUM_DEF_CVT NUM_DEF_D
+kpg1_rmapi.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_I NUM_DEF_CVT NUM_DEF_I
+kpg1_rmapr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
+kpg1_rmapub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_UB NUM_DEF_CVT NUM_DEF_UB
+kpg1_rmapuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_UW NUM_DEF_CVT NUM_DEF_UW
+kpg1_rmapw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEC_W NUM_DEF_CVT NUM_DEF_W
+kpg1_satkc.o:	 SAE_PAR
+kpg1_satkd.o:	 SAE_PAR
+kpg1_sclof.o:	 SAE_PAR PRM_PAR NUM_CMN
+kpg1_scrsz.o:	 SAE_PAR
+kpg1_sdimp.o:	 SAE_PAR NDF_PAR
+kpg1_sdtrn.o:	 SAE_PAR DAT_PAR
+kpg1_secsh.o:	 SAE_PAR NDF_PAR
+kpg1_seed.o:	 SAE_PAR
+kpg1_sgdig.o:	 SAE_PAR
+kpg1_sgdim.o:	 SAE_PAR NDF_PAR
+kpg1_short.o:	 SAE_PAR
+kpg1_slice.o:	 SAE_PAR
+kpg1_snkta.o:    SAE_PAR DAT_PAR GRP_PAR KPG_PAR KPG_AST
+kpg1_solin.o:	 SAE_PAR
+kpg1_sqsud.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_srcta.o:    SAE_PAR DAT_PAR GRP_PAR KPG_PAR AST_PAR KPG_AST
+kpg1_ssazd.o:	 SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_ssazr.o:	 SAE_PAR NUM_CMN NUM_DEC_CVT NUM_DEF_CVT
+kpg1_sscof.o:	 SAE_PAR NUM_CMN
+kpg1_statb.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_statd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stati.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_statr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_statub.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_statuw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_statw.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stdsd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stdsr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stfld.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stflr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_stord.o:	 SAE_PAR
+kpg1_storr.o:	 SAE_PAR
+kpg1_tdlib.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdlid.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdlii.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdlir.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdliub.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdliuw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_tdliw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_thrsb.o:	 SAE_PAR PRM_PAR
+kpg1_thrsd.o:	 SAE_PAR PRM_PAR
+kpg1_thrsi.o:	 SAE_PAR PRM_PAR
+kpg1_thrsr.o:	 SAE_PAR PRM_PAR
+kpg1_thrsub.o:	 SAE_PAR PRM_PAR
+kpg1_thrsuw.o:	 SAE_PAR PRM_PAR
+kpg1_thrsw.o:	 SAE_PAR PRM_PAR
+kpg1_trald.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trbod.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trlib.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trlid.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trlii.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trlir.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trliub.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trliuw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trliw.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trpid.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_trpir.o:	 SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_unz2r.o:	 SAE_PAR
+kpg1_vasvb.o:	 SAE_PAR PRM_PAR
+kpg1_vasvd.o:	 SAE_PAR PRM_PAR
+kpg1_vasvi.o:	 SAE_PAR PRM_PAR
+kpg1_vasvr.o:	 SAE_PAR PRM_PAR
+kpg1_vasvub.o:	 SAE_PAR PRM_PAR
+kpg1_vasvuw.o:	 SAE_PAR PRM_PAR
+kpg1_vasvw.o:	 SAE_PAR PRM_PAR
+kpg1_vec2n.o:	 SAE_PAR NDF_PAR
+kpg1_vect.o:	 SAE_PAR
+kpg1_verb.o:	 SAE_PAR PSX_ERR
+kpg1_wcatw.o:    SAE_PAR DAT_PAR CAT_PAR GRP_PAR AST_PAR KPG_AST
+kpg1_wgndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
+kpg1_wmodr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_wrast.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
+kpg1_wread.o:	 SAE_PAR DAT_PAR KPG_PAR AST_PAR KPG_AST
+kpg1_wrls2.o:    SAE_PAR CAT_PAR NDF_PAR AST_PAR
+kpg1_wrlst.o:    SAE_PAR AST_PAR PAR_ERR
+kpg1_wwrt.o:	 SAE_PAR DAT_PAR AST_PAR KPG_PAR KPG_AST
+kpg1_xyd2w.o:	 SAE_PAR PRM_PAR
+kpg1_xyzwd.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_xyzwr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
+kpg1_zones.o:	 SAE_PAR
+kpg1_zopic.o:	 SAE_PAR
 lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
 lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR
 lpg1_tidy.o:	 SAE_PAR DAT_PAR GRP_PAR SUBPAR_PAR LPG_CONST LPG_COM

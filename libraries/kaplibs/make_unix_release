@@ -41,20 +41,20 @@
       ${LPG_SYS}/dev/bin/make_source.csh
 
 #  Expand any generic source files.
-#      foreach file (`grp generic_sources`)
-#         echo "Expanding generic source file $file"
-#         generic -t n -s ${file}
-#      end
+      foreach file (`grp generic_sources`)
+         echo "Expanding generic source file $file"
+         generic -t n -s ${file}
+      end
 
 #  Rename unsigned data type files.
-#      foreach n (*W.f)
-#         echo "Renaming expanded file file $n"
-#         mv $n `basename $n W.f`uw.f
-#      end
-#      foreach n (*B.f)
-#         echo "Renaming expanded file file $n"
-#         mv $n `basename $n B.f`ub.f
-#      end
+      foreach n (*W.f)
+         echo "Renaming expanded file file $n"
+         mv $n `basename $n W.f`uw.f
+      end
+      foreach n (*B.f)
+         echo "Renaming expanded file file $n"
+         mv $n `basename $n B.f`ub.f
+      end
 
 #  Check for direct calls to NDF parameter routines. These should usually
 #  be replaced by equivalent LPG routines (to allow multiple invocations to 
