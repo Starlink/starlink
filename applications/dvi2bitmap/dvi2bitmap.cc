@@ -219,6 +219,7 @@ main (int argc, char **argv)
 			    break;
 			  case 'b': // debug bitmap
 			    Bitmap::verbosity(debuglevel);
+			    BitmapImage::verbosity(debuglevel);
 			    break;
 			  case 'm': // debug main program
 			    verbosity = debuglevel;
@@ -294,6 +295,7 @@ main (int argc, char **argv)
 		PkRasterdata::verbosity(quiet);
 		InputByteStream::verbosity(quiet);
 		Bitmap::verbosity(quiet);
+		BitmapImage::verbosity(quiet);
 		verbosity = quiet;
 		break;
 	      case 'Q':		// run silently - no warnings or errors
@@ -302,6 +304,7 @@ main (int argc, char **argv)
 		PkRasterdata::verbosity(silent);
 		InputByteStream::verbosity(silent);
 		Bitmap::verbosity(silent);
+		BitmapImage::verbosity(silent);
 		verbosity = silent;
 		break;
 	      case 'r':		// set resolution
@@ -322,6 +325,16 @@ main (int argc, char **argv)
 		if (argc <= 0)
 		    Usage();
 		bm.ofile_type = *argv;
+		if (! BitmapImage::supportedBitmapImage (bm.ofile_type))
+		{
+		    bm.ofile_type
+			= BitmapImage::defaultBitmapImageFormat.c_str();
+		    cerr << "Unsupported image type "
+			 << *argv
+			 << ": using "
+			 << bm.ofile_type
+			 << " instead\n";
+		}
 		break;
 	      case 'V':		// display version
 		cout << version_string << "\nOptions:\n";
@@ -881,6 +894,9 @@ void Usage (void)
 	[-p num] [-l num] [-pp ranges] [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
+#endif
+#if ENABLE_PNG
+	 << "|png"
 #endif
 	 << "]\n\
 	dvifile" << '\n';
