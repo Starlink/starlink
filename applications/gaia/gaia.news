@@ -71,3 +71,8 @@
   Peter W. Draper (P.W.Draper@durham.ac.uk)
 
   16th October 2000.
+
+
+  2.5-3, SKYCAT_CONFIG from CURSA now ignored. Stops lock up when 
+         behind web proxy.
+
