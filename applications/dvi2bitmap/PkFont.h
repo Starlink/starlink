@@ -156,12 +156,8 @@ class PkFont {
     static void setMakeFonts(bool doit) { makeMissingFonts_ = doit; }
     string name() const { return name_; }
     string fontFilename() const { return path_; }
-    string fontgenCommand();
+    string fontgenCommand() const;
     double magnification() const;
-    /* redundant?
-    int dpi() const { return static_cast<int>(resolution_
-					      * (double)dvimag_ / 1000.0); }
-    */
     static int dpiBase() { return resolution_; }
     int dpiScaled() const {
 	return static_cast<int>(resolution_

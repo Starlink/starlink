@@ -1070,6 +1070,7 @@ string_list break_path (string path)
 // font file.  Return an empty string on errors, or if such a command
 // is not supported on a particular platform.
 string PkFont::fontgenCommand (void)
+    const
 {
     string rval;
 
