@@ -20,7 +20,7 @@ AC_SUBST(DATE2, "$date2")
 AC_SUBST(DATE3, "$date3")
 
 # Include macros
-sinclude(acx_prog_cc_optim.m4)
+#sinclude(acx_prog_cc_optim.m4)
 
 # Display pakage and version number
 AC_MSG_RESULT([*********** Configuring:  $PACKAGE $VERSION ($date) **********])
