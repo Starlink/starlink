@@ -108,5 +108,16 @@ interface CCDBGEN
       helpkey     '*'
    endparameter
 
+   parameter      DTYPE
+      type        _CHAR
+      access      READ
+      vpath       'PROMPT,CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Data type for NDFs'
+      in          '_WORD', '_INTEGER', '_REAL', '_DOUBLE'
+      default     '_REAL'
+      helpkey     '*'
+   endparameter
+
 endinterface
-# $Id: ccdbgen.ifl,v 1.4 1998/06/17 14:14:17 mbt Exp $
+# $Id: ccdbgen.ifl,v 1.5 1998/06/17 15:43:04 mbt Exp $
