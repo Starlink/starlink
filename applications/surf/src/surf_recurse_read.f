@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_RECURSE_READ( RLEV, NAME, MAX_FILE,
+      SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
      :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
      :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
      :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
@@ -10,13 +10,13 @@
      :     STATUS)
 *+
 *  Name:
-*     REDS_RECURSE_READ
+*     SURF_RECURSE_READ
 
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*      SUBROUTINE REDS_RECURSE_READ( RLEV, NAME, MAX_FILE,
+*      SUBROUTINE SURF_RECURSE_READ( RLEV, NAME, MAX_FILE,
 *     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
 *     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
 *     :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
@@ -44,7 +44,7 @@
 *     MAX_FILE = INTEGER (Given)
 *        Maximum number of NDFs that can be read by the system.
 *     OUT_COORDS = CHAR (Given)
-*        Output coordinates system. (Passed into REDS_READ_REBIN_NDFS)
+*        Output coordinates system. (Passed into SURF_READ_REBIN_NDFS)
 *     N_FILE = INTEGER (Given & Returned)
 *        Current file number (less than MAX_FILE and greater than 0).
 *        This counter is incremented when an NDF has been read successfully.
@@ -147,14 +147,14 @@
  
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'REDS_SYS'         ! REDS
+      INCLUDE 'SURF_PAR'         ! SURF
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'NDF_PAR'          ! NDF__ constants
 
 *  Local Constants:
       CHARACTER*25     TSKNAME   ! Name of task
-      PARAMETER (TSKNAME = 'REDS_RECURSE_READ')
+      PARAMETER (TSKNAME = 'SURF_RECURSE_READ')
 
 *  Arguements Given:
       INTEGER          MAX_FILE
@@ -185,7 +185,7 @@
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
-      REAL             PAR4
+      LOGICAL          PAR4
       CHARACTER*(*)    OBJECT(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
@@ -224,7 +224,7 @@
 
 *     Check status on entry
       IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_SETC('LEV',RLEV)
+         CALL MSG_SETI('LEV',RLEV)
          CALL ERR_REP(' ','Error entering RECURSE, Lev = ^LEV', STATUS)
          RETURN
       END IF
@@ -300,8 +300,8 @@
             END IF
 
 *     Read in the NDF
-            CALL REDS_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC,
-     :           DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, PAR4,
+            CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
+     :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, PAR4,
      :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
      :           IN_UT1(N_FILE), IN_RA_CEN(N_FILE), IN_DEC_CEN(N_FILE), 
      :           WAVELENGTH, SUB_INSTRUMENT, 
@@ -345,7 +345,11 @@
 
                FILENAME(N_FILE) = FNAME
 
-               N_FILE = N_FILE + 1
+*     Dont increment file if status was bad through this
+*     eg someone has returned PAR__NULL for a parameter
+               IF (STATUS .EQ. SAI__OK) THEN
+                  N_FILE = N_FILE + 1
+               END IF
 
                CALL NDF_ANNUL(IN_NDF, STATUS)
 
@@ -410,8 +414,8 @@
 
                      RLEV = RLEV + 1
 
-                     CALL REDS_RECURSE_READ( RLEV, SNAME, MAX_FILE,
-     :                    OUT_COORDS, N_FILE, N_BOL, N_POS, 
+                     CALL SURF_PSEUDO_RECURSE( RLEV, SNAME, 
+     :                    MAX_FILE, OUT_COORDS, N_FILE, N_BOL, N_POS, 
      :                    N_INTS, IN_UT1, IN_RA_CEN, 
      :                    IN_DEC_CEN, WAVELENGTH, 
      :                    SUB_INSTRUMENT, OBJECT, UTDATE, 
@@ -447,3 +451,105 @@
       END IF
 
       END
+
+
+      SUBROUTINE SURF_PSEUDO_RECURSE( RLEV, SNAME, MAX_FILE,
+     :     OUT_COORDS, N_FILE, N_BOL, N_POS, N_INTS,
+     :     IN_UT1, IN_RA_CEN, IN_DEC_CEN, WAVELENGTH, 
+     :     SUB_INSTRUMENT, OBJECT, UTDATE, UTSTART, FILENAME,
+     :     BOL_ADC, BOL_CHAN,
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
+     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
+     :     NPARS, PARS, PAR4,
+     :     STATUS)
+*+
+*  Name:
+*     SURF_PSEUDO_RECURSE
+
+*  Purpose:
+*     Fool the alpha compiler into thinking that I am not recursing
+
+*  Language:
+*     Starlink Fortran 77 (+ recursion)
+
+*  Description:
+*     This routine is called from SURF_RECURSE_READ and immeidiately
+*     calls SURF_RECURESE_READ. Recursion via an intermediary.
+
+*  Author:
+*     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+
+*  History:
+*     May 1997 (TimJ)
+*        Original Version
+
+*-
+      IMPLICIT NONE
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'SURF_PAR'
+
+
+*  Arguements Given:
+      INTEGER          MAX_FILE
+      CHARACTER*(*)    SNAME
+      CHARACTER*(*)    OUT_COORDS
+
+*  Arguments Given & Returned:
+      INTEGER          N_FILE
+      CHARACTER*(*)    SUB_INSTRUMENT
+      REAL             WAVELENGTH
+
+*  Arguments Returned:
+      INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+      INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
+      INTEGER          BOL_DEC_END(MAX_FILE)
+      INTEGER          BOL_DEC_PTR(MAX_FILE)
+      INTEGER          BOL_RA_END(MAX_FILE)
+      INTEGER          BOL_RA_PTR(MAX_FILE)
+      INTEGER          DATA_END(MAX_FILE)
+      INTEGER          DATA_PTR(MAX_FILE)
+      CHARACTER*(*)    FILENAME(MAX_FILE)
+      INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
+      DOUBLE PRECISION IN_DEC_CEN(MAX_FILE)
+      DOUBLE PRECISION IN_RA_CEN(MAX_FILE)
+      DOUBLE PRECISION IN_UT1(MAX_FILE)
+      INTEGER          N_BOL(MAX_FILE)
+      INTEGER          N_INTS(MAX_FILE)
+      INTEGER          N_POS(MAX_FILE)
+      INTEGER          NPARS
+      REAL             PARS(3) ! I know there are 3 parameters
+      LOGICAL          PAR4
+      CHARACTER*(*)    OBJECT(MAX_FILE)
+      INTEGER          RLEV    ! Recursion level
+      REAL             SHIFT_DX(MAX_FILE)
+      REAL             SHIFT_DY(MAX_FILE)
+      CHARACTER*(*)    UTDATE(MAX_FILE)
+      CHARACTER*(*)    UTSTART(MAX_FILE)
+      INTEGER          VARIANCE_END(MAX_FILE)
+      INTEGER          VARIANCE_PTR(MAX_FILE)
+      REAL             WEIGHT(MAX_FILE)
+
+*     Status
+      INTEGER STATUS
+*.
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      CALL SURF_RECURSE_READ( RLEV, SNAME, MAX_FILE,
+     :     OUT_COORDS, N_FILE, N_BOL, N_POS, 
+     :     N_INTS, IN_UT1, IN_RA_CEN, 
+     :     IN_DEC_CEN, WAVELENGTH, 
+     :     SUB_INSTRUMENT, OBJECT, UTDATE, 
+     :     UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
+     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
+     :     BOL_DEC_END, DATA_PTR, DATA_END, 
+     :     VARIANCE_PTR, VARIANCE_END,
+     :     INT_LIST, WEIGHT, SHIFT_DX, 
+     :     SHIFT_DY,  NPARS, PARS, PAR4, 
+     :     STATUS)
+
+      END
+
+
