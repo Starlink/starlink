@@ -3469,7 +3469,7 @@ The ESP routine descriptions are contained in the following pages.
       used for all input required by the application.
    }
    \sstusage{
-      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+      ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT (OUTCAT)
 \LineBreak
              AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE)
 \LineBreak
@@ -3614,6 +3614,15 @@ The ESP routine descriptions are contained in the following pages.
          data.
       }
       \sstsubsection{
+         OUTCAT=\_CHAR (Read)
+      }{
+         File name for an output file which is written using the CAT
+         library.  See SUN/181.  The type of catalogue which is written
+         depends on the file extension to the filename presented here.
+         A file ending .txt will be written as a STL (Small Text List)
+         file, and one ending .fits will be written as a FITS file.
+      }
+      \sstsubsection{
          PSIZE=\_REAL (Read)
       }{
          The size of each pixel in arc seconds.  If the image contains
@@ -3649,13 +3658,13 @@ The ESP routine descriptions are contained in the following pages.
    \sstexamples{
       \sstexamplesubsection{
          ellfou mode=true back=6200. sigma=390. psize=1.
-\LineBreak
+      }{
              zerop=27.5 ardfil=$\wedge$ardfile.dat device=xwindow
 \LineBreak
              out=elf autol=true frzori=true cursor=true
 \LineBreak
              same=true
-      }{
+
          Profiles are obtained for the image co-ordinates determined
          using the cursor/mouse on the DATA image currently displayed
          on device XWINDOW. The background count value of that image is
@@ -3667,13 +3676,12 @@ The ESP routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          ellfou mode=true back=1267. sigma=45. psize=2.
-\LineBreak
+      }{
              zerop=26.2 ardfil=$\wedge$ardfile.dat device=xwindow
 \LineBreak
              out=elf2 autol=true frzori=true cursor=true
 \LineBreak
              same=false imgdev=x2windows
-      }{
 
          Profiles are obtained for the current data image on device
          XWINDOW. The results are output onto device X2WINDOWS. An
@@ -3685,17 +3693,16 @@ The ESP routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          ellfou mode=true back=6200 sigma=390. zerop=27.5
-\LineBreak
+      }{
              ardfil=$\wedge$ardfile.dat out=elf autol=true frzori=true
 \LineBreak
-             cursor=false in=p2 origin="12:36:53.42 62:12:21.8"
+             cursor=false in=p2 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
 \LineBreak
              rlim=10. imgdev=x2windows
-      }{
 
          Profiles for the object at the co-ordinates indicated on image
          P2 are obtained out to a radius of 10 pixels. The Current
-         co-ordinate frame of P2 is in the 'SKY' domain.  Pixel size in
+         co-ordinate frame of P2 is in the {\tt '}SKY{\tt '} domain.  Pixel size in
          arcseconds is determined automatically from the SKY co-ordinates.
          The results are output to device X2WINDOWS and to a file text
          file ELF. The background count is 6200 with an associated
@@ -3703,11 +3710,10 @@ The ESP routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          ellfou mode=false infile=coords ardfil=$\wedge$ardfile.dat in=jet
-\LineBreak
+      }{
              frzori=false back=3713 sigma=23 rlim=20 psize=0.5
 \LineBreak
              zerop=26.2 autol=false
-      }{
 
          The program is operated in file mode where co-ordinates
          of the galaxies to be profiled are read from file
@@ -3754,7 +3760,7 @@ The ESP routine descriptions are contained in the following pages.
       its co-ordinates.
    }
    \sstusage{
-      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT
+      ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT (OUTCAT)
 \LineBreak
              AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST)
 \LineBreak
@@ -3789,14 +3795,19 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          AUTOL=\_LOGICAL (Read)
       }{
-         Is a better estimate of the galaxy centre position to be
-         obtained? If AUTOL=True the program attempts to find a better
-         candidate for the galaxy centre.
+         If true, then the application attempts to find a better initial
+         estimate of the galaxy centre.  See also the AUTOLT parameter
+         for further control of this, and contrast the FRZORI parameter.
       }
       \sstsubsection{
          AUTOLT=\_LOGICAL (Read)
       }{
-         The type of centroiding method used. N=centroid, Y=weighted mean
+         Controls the method used when improving the estimate of the
+         galaxy centre (see parameter AUTOL).  If autolt=true, the
+         application refines the initial galaxy centre by taking the
+         centroid of the points in a small region around the given
+         location.  If autolt=false, it uses an alternative
+         weighted-mean method.
       }
       \sstsubsection{
          BACK=\_REAL (Read)
@@ -3851,8 +3862,11 @@ The ESP routine descriptions are contained in the following pages.
       \sstsubsection{
          FRZORI=\_LOGICAL (Read)
       }{
-         Allows the origin given (or the values determined via AUTOL)
-         to remain unchanged throughout if FRZORI=TRUE.
+         If FRZORI is true, then the initial galaxy position, after any
+         initial refinement if the AUTOL parameter is true, will be
+         frozen for the rest of the calculation.  If FRZORI is false,
+         then the initial estimate will be allowed to drift if that
+         improves an ellipse fit.
       }
       \sstsubsection{
          IMGDEV=\_DEVICE (Read)
@@ -3905,14 +3919,14 @@ The ESP routine descriptions are contained in the following pages.
 
          The type of residual to be calculated is specified as 0, 1 or
          2.  This also controls which type of statistic is returned in
-         the final column of the ELLPRO output file.  It's not
+         the final column of the ELLPRO output file.  It{\tt '}s not
          completely clear what is the best type of residual to use.  The
          original one -- a weighted standard error, selected by giving
          this parameter the option$\sim$0 -- is rational, but not obviously
-         ideal.  I've added here the range and the squared-differences
+         ideal.  I{\tt '}ve added here the range and the squared-differences
          as alternatives, selectable by options$\sim$1 and$\sim$2 respectively.
 
-         I don't really recommend you play with this unless you wish to
+         I don{\tt '}t really recommend you play with this unless you wish to
          experiment.  If this parameter makes much of a difference, the
          ESP maintainer would be interested to hear about it.
       }
@@ -3934,6 +3948,15 @@ The ESP routine descriptions are contained in the following pages.
       }{
          File name for the output text file containing the profile
          data.
+      }
+      \sstsubsection{
+         OUTCAT=\_CHAR (Read)
+      }{
+         File name for an output file which is written using the CAT
+         library.  See SUN/181.  The type of catalogue which is written
+         depends on the file extension to the filename presented here.
+         A file ending .txt will be written as a STL (Small Text List)
+         file, and one ending .fits will be written as a FITS file.
       }
       \sstsubsection{
          PSIZE=\_REAL (Read)
@@ -3971,13 +3994,12 @@ The ESP routine descriptions are contained in the following pages.
    \sstexamples{
       \sstexamplesubsection{
          ellpro mode=true back=6200 sigma=390
-\LineBreak
+      }{
              zerop=27.5 ardfil=$\wedge$ardfile.dat device=xwindows
 \LineBreak
              out=elp1.dat autol=true frzori=false cursor=false
 \LineBreak
-             in=p2 rlim=10 origin="12:36:53.42 62:12:21.8"
-      }{
+             in=p2 rlim=10 origin={\tt "}12:36:53.42 62:12:21.8{\tt "}
 
          Performs profiling on an object positioned at the co-ordinates
          indicated on image P2; the Current co-ordinate system of P2 is
@@ -3991,11 +4013,10 @@ The ESP routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          ellpro mode=true back=6200 sigma=390 psize=1. zerop=27.5
-\LineBreak
+      }{
               ardfil=$\wedge$ardfile.dat device=xwindows out=elp1.dat
 \LineBreak
               autol=false frzori=true cursor=true
-      }{
 
          Performs profiling on a galaxy identified using a cursor/mouse
          and the most recently displayed image. The ARD area definition
@@ -4007,11 +4028,10 @@ The ESP routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          ellpro mode=false back=760 sigma=12 psize=0.44 zerop=27.5
-\LineBreak
+      }{
               ardfil=$\wedge$arddef.dat in=p2 infile=p2log.dat
 \LineBreak
               out=output.dat autol=true frzori=false
-      }{
 
          The appliication reads the object locations in file P2LOG.DAT
          (in the Current co-ordinates of P2) and performs profiling on
@@ -4094,7 +4114,7 @@ The ESP routine descriptions are contained in the following pages.
    \sstdescription{
       Uses a minimisation routine to determine the 2-D Gaussian profiles
       of multiple sources on an NDF format image. This will be especially
-      useful for those using JCMT data (see also $\backslash$xref\{JCMTDR\}\{sun132\}\{\}).
+      useful for those using JCMT data (see also \xref{JCMTDR}{sun132}{}).
 
       Source locations can be specified using a cursor or by
       text file. The user is allowed to restrain the extent to which
