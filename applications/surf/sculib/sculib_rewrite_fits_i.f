@@ -1,11 +1,25 @@
-*+  SCULIB_REWRITE_FITS_I - rewrite the value of specified FITS integer keyword
       SUBROUTINE SCULIB_REWRITE_FITS_I (MAX_FITS, N_FITS, FITS, NAME,
      :  VALUE, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_REWRITE_FITS_I
+
+*  Purpose:
+*     rewrite the value of specified FITS integer keyword
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SCULIB_REWRITE_FITS_R (MAX_FITS, N_FITS, FITS, NAME,
+*    :  VALUE, STATUS)
+
+
+*  Description:
 *     This routine will overwrite the value of a specified FITS integer 
-*     keyword held in the FITS extension of an NDF file. The FITS extension must
-*     have been read into the input array FITS before this routine is called
-*     and be written out again afterwards for the change to take effect.
+*     keyword held in the FITS extension of an NDF file. The FITS extension
+*     must have been read into the input array FITS before this routine is 
+*     called and be written out again afterwards for the change to take effect.
 *        The routine assumes that each line in the FITS array will contain
 *     a string with format:-
 *      KEYWORD=VALUE           / this is a comment
@@ -14,10 +28,8 @@
 *     be reported and bad status returned. If the keyword is found but the
 *     line does not conform to the above format an error will be reported
 *     and bad status returned.
-*    Invocation :
-*     CALL SCULIB_REWRITE_FITS_I (MAX_FITS, N_FITS, FITS, NAME, VALUE,
-*    :  STATUS)
-*    Parameters :
+
+*  Parameters:
 *     MAX_FITS             = INTEGER (Given)
 *           the maximum number of items in the FITS array
 *     N_FITS               = INTEGER (Given)
@@ -30,34 +42,48 @@
 *           the value that the FITS keyword is to have
 *     STATUS               = INTEGER (Given and returned)
 *           global status 
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Authors :
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+*     T. Jenness (timj@jach.hawaii.edu)
+
+*  History :
 *     $Id$
-*     26-JUL-1995: original version.
-*    endhistory
-*    Type Definitions :
+*     $Log$
+*     Revision 1.2  1997/11/19 02:30:11  timj
+*     Modernise header
+*
+*     26-JUL-1995 (JFL): 
+*        original version.
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER MAX_FITS
       INTEGER N_FITS
       CHARACTER*(*) NAME
       INTEGER VALUE
-*    Import-Export :
+
+*  Arguments Given & Returned:
       CHARACTER*(*) FITS (MAX_FITS)
-*    Export :
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER      CHR_LEN             ! CHR used-string length function
-*    Global variables :
-*    Local Constants :
-*    Local variables :
+
+*  Global variables:
+
+*  Local Constants:
+
+*  Local variables:
       LOGICAL      FOUND               ! .TRUE. if keywrod found
       INTEGER      I                   ! DO loop index
       INTEGER      IPOS                ! position of = in string
@@ -67,8 +93,10 @@
       LOGICAL      LOOPING             ! .TRUE. while looping
       CHARACTER*80 STEMP               ! scratch string
       CHARACTER*80 UNAME               ! upper case version of NAME
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+*  Local data:
+
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
