@@ -19,7 +19,7 @@
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
-*     requested) variances for each pixel.
+*     requested) variances for each pixel. 
 
 *  Arguments:
 *     TR( 4 ) = _REAL (Given)
@@ -83,6 +83,12 @@
 *        An array holding the variance of AIP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
+*  Notes:
+*     -  The polarization angles stored in the catalogue are theta values 
+*     (i.e. clockwise angle from the reference direction to the polarisation 
+*     vector). The ANG column should already have had scale and zero 
+*     attributes set for it which convert these theta values into ANG values.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -440,15 +446,8 @@
      :                            STATUS )
                   CALL CAT_PUT0R( PCAT,   P, ( P .EQ. VAL__BADR ), 
      :                            STATUS )
-
-                  IF( T .NE. VAL__BADR ) THEN
-                     CALL CAT_PUT0R( ANCAT,  ANGROT - T, .FALSE., 
-     :                               STATUS )
-                  ELSE
-                     CALL CAT_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
-     :                               STATUS )
-                  END IF
-
+                  CALL CAT_PUT0R( ANCAT,   T, ( T .EQ. VAL__BADR ), 
+     :                            STATUS )
                   CALL CAT_PUT0R( PICAT, IP, ( IP .EQ. VAL__BADR ),
      :                            STATUS )
 

@@ -147,7 +147,7 @@
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
-      INTEGER GTHETA             ! CAT identifiers for THETA column
+      INTEGER GANG               ! CAT identifiers for ANG column
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -218,11 +218,33 @@
       REAL SYLO                  ! Lower bound of used region of Y axis 
       REAL Q                     ! Stored Q in input catalogue
       REAL U                     ! Stored U in input catalogue
-      REAL THETA                 ! Stored angle in input catalogue
+      REAL ANG                 ! Stored angle in input catalogue
       REAL TR( 4 )               ! Coeff.s of (X,Y) -> cell indices mapping
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
       REAL X0                    ! X at bottom left of bottom left cell
       REAL Y0                    ! Y at bottom left of bottom left cell
+
+*  CAT column attributes...
+      CHARACTER COMM*80
+      CHARACTER EXCEPT*1
+      CHARACTER EXPR*1
+      CHARACTER EXTFMT*20
+      CHARACTER FNAME*10
+      CHARACTER UNITS*20
+      DOUBLE PRECISION DATE 
+      DOUBLE PRECISION SCALEF
+      DOUBLE PRECISION ZEROP
+      INTEGER CI
+      INTEGER CSIZE
+      INTEGER DIMS
+      INTEGER DTYPE
+      INTEGER GENUS
+      INTEGER NULL
+      INTEGER ORDER
+      INTEGER SIZEA
+      INTEGER SZDIM
+      LOGICAL PRFDSP
+
 *.
 
 *  Check the inherited global status.
@@ -348,43 +370,16 @@
          END IF          
       END IF
 
-*  Derive the position angle of the analyser by comparing values of
-*  theta stored in the supplied catalogues with the value of theta
-*  implied by the corresponding Q and U values. This only needs to be
-*  done for linear polarisation. The theta value stored in the catalogue
-*  is the anti-clockwise angle from the X pixel axis to the plane of
-*  polarisation (in degrees). ANGROT is the anti-clockwise angle from the 
-*  X pixel axis to the analyser axis (in degrees). The angle implied by Q 
-*  and U ( 0.5*ATAN( U, Q ) ) is the clockwise angle from the analyser axis
-*  to the plane of polarisation.
+*  If we are dealing with linear polarisation, get the ACW angle from the
+*  X axis to the reference direction (ANGROT). This is the zero point value
+*  for the ANG column in the supplied catalogue (see POLVEC).
       IF( .NOT. CIRC ) THEN
-         RTOD = 180.0 / ACOS( -1.0 )
-
-*  Get the CAT identifier for the THETA column in the input catalogue.
-         CALL CAT_TIDNT( CIIN, 'THETA', GTHETA, STATUS )       
-
-*  Go through the catalogue until a row is found which has good values
-*  for Q, U and THETA. Use ANGROT = 0.0 if no such row is found.
-         ANGROT = 0.0
-         DO IROW = 1, NCIN
-
-*  Get the Q, U and THETA values from the input catalogue for the current
-*  row.
-            CALL CAT_FGT0R( CIIN, IROW, GTHETA, THETA, NULL1, STATUS )
-            CALL CAT_FGT0R( CIIN, IROW, GI( Q_ID ), Q, NULL2, STATUS )
-            CALL CAT_FGT0R( CIIN, IROW, GI( U_ID ), U, NULL3, STATUS )
-
-*  If they are all good, work out the implied value of ANGROT, and leave
-*  the loop.
-            IF( .NOT. NULL1 .AND. .NOT. NULL2 .AND. .NOT. NULL3 ) THEN
-               ANGROT = THETA + RTOD*0.5*ATAN2( U, Q )
-               GO TO 10            
-            END IF
-
-         END DO
-
- 10      CONTINUE
-
+         CALL CAT_TIDNT( CIIN, 'ANG', GANG, STATUS )       
+         CALL CAT_CINQ( GANG, SZDIM, CI, FNAME, GENUS, EXPR, DTYPE, 
+     :                  CSIZE, DIMS, SIZEA, NULL, EXCEPT, SCALEF, 
+     :                  ZEROP, ORDER, UNITS, EXTFMT, PRFDSP, COMM, 
+     :                  DATE, STATUS)
+         ANGROT = REAL( ZEROP )
       END IF
 
 *  Decide whether or not a bias correction is needed and possible.
@@ -713,7 +708,8 @@
       CALL CAT_TIQAC( GI( I_ID ), 'UNITS', UNITS, STATUS) 
 
 *  Create the output catalogue.
-      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, CIOUT, STATUS )
+      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGROT, CIOUT, 
+     :                 STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999

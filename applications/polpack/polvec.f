@@ -533,7 +533,7 @@
  
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
-     :                 UNITS, VAR, CI, STATUS )
+     :                 UNITS, VAR, ANGROT, CI, STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
