@@ -91,7 +91,7 @@
           CALL BDI_MAPR(I_FID,'Variance','READ',VPTR,STATUS)
         ENDIF
         IF (I_QOK) THEN
-          CALL BDI_MAP(I_FID,'Quality','UBYTE','READ',QPTR,STATUS)
+          CALL BDI_MAPUB(I_FID,'Quality','READ',QPTR,STATUS)
         ENDIF
 
 *  do it
