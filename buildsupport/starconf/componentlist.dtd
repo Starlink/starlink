@@ -1,16 +1,35 @@
+<!-- A list of components -->
 <!ELEMENT componentlist (component+)>
+
+<!-- One component.  The ID attribute is a unique identifier for this
+     component, used in, for example, <dependencies> elements of other
+     components. -->
 <!ELEMENT component     (description, path, dependencies, developers?, notes?)>
+<!ATTLIST component
+        id      ID      #REQUIRED
+        >
+
+<!-- Brief description of this component -->
 <!ELEMENT description   (#PCDATA)>
+
+<!-- Path to this component in CVS tree -->
 <!ELEMENT path          (#PCDATA)>
-<!ELEMENT dependencies  (#PCDATA)>
+
+<!-- List components this component depends on, both those
+     required in order to build the component, and those required
+     after installation in order to use it.  Both are space-separated
+     lists of the IDs given in <component> start-tags. -->
+<!ELEMENT dependencies  (build?, use?)>
+<!ELEMENT build         (#PCDATA)>
+<!ELEMENT use           (#PCDATA)>
+
+<!-- A list of developers with an interest in this component -->
 <!ELEMENT developers    (person+)>
 <!ELEMENT person        (name, email, role?)>
 <!ELEMENT name          (#PCDATA)>
 <!ELEMENT email         (#PCDATA)>
 <!ELEMENT role          (#PCDATA)>
+
+<!-- Any other notes -->
 <!ELEMENT notes         (p+)>
 <!ELEMENT p             (#PCDATA)>
-
-<!ATTLIST component
-        id      ID      #REQUIRED
-        >
