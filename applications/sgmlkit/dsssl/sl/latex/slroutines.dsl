@@ -24,7 +24,7 @@ $Id$
   (element codecollection
     (make-section-reference
      ;set-prefix: (literal (number->string (child-number)) " ")
-     set-prefix: (literal "")
+     set-prefix: (literal "Code collection: ")
      title: (with-mode routine-ref-get-reference
 	      (process-codecollection (attribute-string (normalize "doc")))))))
 
@@ -73,22 +73,6 @@ $Id$
   (let ((docelem (document-element-from-entity docent)))
       (process-node-list docelem)))
 
-; (define (process-authorlist nl)
-;   (let* ((first-author (attribute-string (normalize "id")
-; 					 (node-list-first nl)))
-; 	 (alist (node-list-filter
-; 		 (lambda (snl)
-; 		   (string=? first-author
-; 			     (attribute-string (normalize "id")
-; 					       snl)))
-; 		 nl))
-; 	 (remainder (node-list-difference nl alist)))
-;     (make sequence
-;       (process-node-list (node-list-first alist))
-;       (if (node-list-empty? remainder)
-; 	  (empty-sosofo)
-; 	  (process-authorlist remainder)))))
-
 ;; Process a list consisting of all the "author" elements in the
 ;; programcode document.  Split the author list into those with the
 ;; same ID as the first author, and those with a different ID: call
@@ -109,7 +93,8 @@ $Id$
 				(attribute-string (normalize "id")
 						  (node-list-first anl)))
 			       (loop (node-list-rest anl)
-				     (node-list thisaut (node-list-first anl))
+				     (node-list thisaut
+						(node-list-first anl))
 				     otherauts)
 			       (loop (node-list-rest anl)
 				     thisaut
@@ -158,41 +143,52 @@ $Id$
 	  (literal (string-append " (" (cadr autprops) ")"))
 	  (empty-sosofo))
       (if (caddr autprops)
-	  (literal (string-append " Email: " (caddr autprops) "."))
+	  (make sequence
+	    (literal " Email:")
+	    (make command name: "Code"
+		  (literal (caddr autprops)))
+	    (literal ". "))
 	  (empty-sosofo))
       (if (cadddr autprops)
 	  (make sequence
-	    (literal " URL: ")
+	    (literal " URL:")
 	    (make command name: "Code"
-		  (literal (string-append "<" (cadddr autprops) ">"))))
+		  (literal (string-append "<" (cadddr autprops) ">. "))))
 	  (empty-sosofo)))))
 
 (mode routine-ref-sst
   (element docblock
-    (let ((allauthors (select-elements
-		       (descendants (parent (current-node)))
-		       (normalize "author"))))
-      ;; docblock always has a title element, but this is suppressed in
-      ;; this mode.  If there's _more_ than one element, then other
-      ;; docblock elements are present, so should be put into a
-      ;; description list.
-      (make sequence
-	(if (or (> (node-list-length (children (current-node))) 1)
-		(not (node-list-empty? allauthors)))
-	    (make environment name: "description"
-		  (make sequence
-		    (with-mode docblock
-		      (process-children))
-		    ;; process authors
-		    (if (node-list-empty? allauthors)
-			(empty-sosofo)
-			(make sequence
-			  (make empty-command name: "item"
-				parameters: '("?Authors"))
-			  (make fi data: "\\hbox{}\\hfil\\\\")
-			  (make environment name: "description"
-				(process-authorlist allauthors))))))
-	    (empty-sosofo)))))
+    ;; Only prepare an authorlist for the top-level docblock, and not
+    ;; for docblock elements in codegroups, for example.  There are
+    ;; separate, simpler, author lists for each routine.
+    (if (string=? (gi (parent (current-node)))
+		  (normalize "programcode"))
+	(let ((allauthors (select-elements
+			   (descendants (parent (current-node)))
+			   (normalize "author"))))
+	  ;; docblock always has a title element, but this is suppressed in
+	  ;; this mode.  If there's _more_ than one element, then other
+	  ;; docblock elements are present, so should be put into a
+	  ;; description list.
+	  (make sequence
+	    (if (or (> (node-list-length (children (current-node))) 1)
+		    (not (node-list-empty? allauthors)))
+		(make environment name: "description"
+		      (make sequence
+			(with-mode docblock
+			  (process-children))
+			;; process authors
+			(if (node-list-empty? allauthors)
+			    (empty-sosofo)
+			    (make sequence
+			      (make empty-command name: "item"
+				    parameters: '("?Authors"))
+			      (make fi data: "\\hbox{}\\hfil\\\\")
+			      (make environment name: "raggedright"
+				    (make environment name: "description"
+					  (process-authorlist allauthors)))))))
+		(empty-sosofo))))
+	(empty-sosofo)))
   (element routineprologue
     (let ((kids (nl-to-pairs (children (current-node)))))
       (make sequence
@@ -226,7 +222,7 @@ $Id$
 			      "returnvalue"
 			      "argumentlist"
 			      "parameterlist"
-			      ;;"authorlist"
+			      "authorlist"
 			      ;;"history"
 			      "usage"
 			      "invocation"
@@ -240,7 +236,8 @@ $Id$
 					    (normalize "diytopic"))
 				  (process-node-list (cdr gi-and-nd))
 				  (empty-sosofo)))
-			    kids)))))))
+			    kids))))
+	(make empty-command name: "clearpage"))))
   (element routinename
     (process-children))
   (element name
@@ -320,8 +317,23 @@ $Id$
 			  (else		;default is given
 			   "given"))
 			 ")")))
-	(make environment brackets: '("{" "}")
+	(with-mode plain-elements
 	      (process-node-list desc)))))
+  (element authorlist
+    (make environment name: "sstdiytopic"
+	  parameters: '("Authors")
+	  (make environment name: "itemize"
+		(process-children))))
+  (element author
+    (make sequence
+      (make empty-command name: "item")
+      (process-children)))
+  (element otherauthors
+    (make sequence
+      (make empty-command name: "item")
+      (literal "Other authors")
+      (make environment name: "itemize"
+	    (process-children))))
   (element examplelist
     (make environment name: "sstexamples"
 	  (process-children)))
@@ -358,6 +370,13 @@ $Id$
 	      parameters: (list (data (node-list-first kids)))
 	      (process-node-list (node-list-rest kids))))))
   )
+
+;; Since some of the element names are overloaded (for example,
+;; description is part of both routinelist and parameter), we
+;; occasionally need simpler variants of elements.
+(mode plain-elements
+  (element description
+    (process-children)))
 
 (mode docblock
   (element title			; ignore in this mode -- title
