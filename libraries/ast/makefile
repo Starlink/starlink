@@ -1349,7 +1349,7 @@ fpcdmap.o: fpcdmap.c f77.h c2f77.h error.h memory.h pcdmap.h mapping.h \
 fpermmap.o: fpermmap.c f77.h c2f77.h error.h memory.h permmap.h \
  mapping.h object.h channel.h pointset.h
 fplot.o: fplot.c f77.h c2f77.h error.h memory.h plot.h frameset.h \
- frame.h object.h channel.h axis.h mapping.h pointset.h
+ frame.h object.h channel.h axis.h mapping.h pointset.h grf.h
 frame.o: frame.c error.h memory.h object.h channel.h mapping.h \
  pointset.h unitmap.h permmap.h cmpmap.h axis.h frame.h frameset.h \
  ast_err.h
