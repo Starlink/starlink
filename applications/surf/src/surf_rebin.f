@@ -1394,7 +1394,7 @@
 *  be ignored then set the data quality bad
 
                            IF (INT_QUALITY(INTEGRATION) .NE. 0) THEN
-                              CALL SCULIB_CFILLB (N_BOL(FILE), 1
+                              CALL SCULIB_CFILLB (N_BOL(FILE), 1,
      :                          %val(IN_QUALITY_PTR(FILE) +
      :                          DATA_OFFSET * VAL__NBUB))
                            END IF
