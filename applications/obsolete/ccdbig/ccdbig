@@ -136,6 +136,9 @@
          goto EXIT
       endif
 
+#  Check CCDBIG_DIR is in path
+      set path = ( $path $CCDBIG_DIR )
+
 #  Copy required files from source directory.
       if ( -e $CCDBIG_DIR/ccdbig_obj.dat )  cp $CCDBIG_DIR/ccdbig_obj.dat .
       if ( -e $CCDBIG_DIR/ccdtest.ard )     cp $CCDBIG_DIR/ccdtest.ard .
@@ -286,11 +289,9 @@
                ubnds="[$x1hi,$y1hi,$x2hi,$y2hi]" \
                lbnds="[$x1lo,$y1lo,$x2lo,$y2lo]" \
      	       file=ccdtest_obj.dat \
+               bias=$biasframe \
      	       accept
 #           end ccdbgen
-
-#  Delete bias frames if we don't need them.
-            if ($biasframe == "FALSE") rm bias?.sdf
 
 #  Change the data type if required.
 #    Find out the current data type.
