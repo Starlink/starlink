@@ -1,4 +1,6 @@
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
 
@@ -12,6 +14,7 @@
 /* Include files for version using mmap:				    */
 /* ====================================					    */
 #if defined( _mmap) || defined( HAVE_MMAP ) 
+#include <sys/types.h>           /* OS X requires this */
 #include <sys/mman.h>		 /* Definitions for memory management	    */
 #endif
 
