@@ -46,6 +46,7 @@
 *
 *	adic_defcac	- define class allocation cluster size
 *       adic_defcls	- define a new class
+*	adic_deffun	- define a function
 * 	adic_defgdp	- define generic dispatch procedure
 *	adic_defgen	- define a generic function
 *	adic_defmcf	- define a method combination form (no Fortran
@@ -356,6 +357,18 @@ void adic_defdes( ADIobj clsid, ADIcMethodCB rtn, ADIstatus status )
   _ERR_REP("adic_defdes",Estr__DefClsDes);
   }
 
+void adic_deffun( char *spec, ADIcMethodCB rtn,
+		  ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;                 		/* Standard entry checks */
+
+  adix_deffun( spec, _CSM,
+	       ADIkrnlNewEproc( ADI__true, (ADICB) rtn, status ),
+	       id, status );
+
+  _ERR_REP("adic_deffun",Estr__DefFun);
+  }
+
 void adic_defgdp( ADIobj genid, ADIcGenericDispatchCB rtn, ADIstatus status )
   {
   _chk_stat;                 		/* Standard entry checks */
@@ -655,6 +668,24 @@ void adic_newv0c( char *value, ADIobj *id, ADIstatus status )
 	&_TM_alloc(c), _CSM, id, status );
 
   _ERR_REP("adic_newv0c",Estr__CreObjDat);
+  }
+
+void adic_new0c_n( int len, ADIobj *id, ADIstatus status )
+  {
+  _chk_stat;                 		/* Standard checks */
+
+/* Use user supplied length */
+  adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, NULL,
+	      &_TM_alloc(c), 0, id, status );
+
+  if ( _ok(status) && (len>0) ) {
+    ADIstring	*sdat = _str_data(*id);
+    sdat->len = len;
+    sdat->data = strx_alloc( len, status );
+    _han_set(*id) = ADI__true;
+    }
+
+  _ERR_REP("adic_new0c_n",Estr__CreObjDat);
   }
 
 void adic_newv0c_n( char *value, int len, ADIobj *id, ADIstatus status )

@@ -50,13 +50,14 @@ ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
   _chk_stat_ret(ADI__nullid);
 
   if ( _valid_q(curp) ) {
-    ADIobj	cdr = _CDR(curp);
+    ADIobj	car,cdr;
+
+    _GET_CARCDR(car,cdr,curp);
 
     ADIstrmPrintf( stream, "{", status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
-	ADIobj	car = _CAR(curp);
-	curp = _CDR(curp);
+	_GET_CARCDR(car,curp,curp);
 
 	ADIstrmPrintf( stream, "%O%s", status, car,
 		_valid_q(curp) ? ", " : "" );
@@ -66,7 +67,7 @@ ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
 
 /* It's a dotted pair */
     else
-      ADIstrmPrintf( stream, "%O.%O", status, _CAR(curp), _CDR(curp) );
+      ADIstrmPrintf( stream, "%O.%O", status, car, cdr );
 
     ADIstrmPrintf( stream, "}", status );
     }
@@ -79,7 +80,7 @@ void lstx_init( ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "_List", "", "first,rest", &UT_ALLOC_list, status );
+  adic_defcls( "List", "", "first,rest", &UT_ALLOC_list, status );
 
   adic_defprt( UT_ALLOC_list, (ADIcMethodCB) lstx_print, status );
   }
@@ -129,8 +130,7 @@ ADIobj lstx_revrsi( ADIobj list, ADIstatus status )
 
   if ( _ok(status) )
     {
-    while ( _valid_q(curp) )
-      {
+    while ( _valid_q(curp) ) {
       ADIobj next = _CDR(curp);
       _CDR(curp) = last;
 
@@ -228,10 +228,13 @@ ADIobj lstx_append( ADIobj lst1, ADIobj lst2, ADIstatus status )
 void lstx_sperase( ADIobj *list, ADIstatus status )
   {
   ADIobj curp = *list;
+  ADIobj	*car,*cdr;
 
   while ( _valid_q(curp) ) {
-    _CAR(curp) = ADI__nullid;
-    curp = _CDR(curp);
+    _GET_CARCDR_A(car,cdr,curp);
+
+    *car = ADI__nullid;
+    curp = *cdr;
     }
 
   adic_erase( list, status );
@@ -246,17 +249,21 @@ void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
   if ( _ok(status) ) {
     while ( _valid_q(curp) && (test<0) ) {
 
+      ADIobj	*car,*cdr;
+
+      _GET_CARCDR_A(car,cdr,curp);
+
 /* Compare identifiers */
-      test = _CAR(curp) - obj;
+      test = *car - obj;
 
 /* Not there yet? If so, store insertion point in case next node is past */
 /* the point where we'd insert "obj". If test > 0 then ipoint points to */
 /* the cell insertion point from the last iteration if any, otherwise the
 /* user's list variable */
       if ( test < 0 ) {
-        ipoint = &_CDR(curp);
-        curp = *ipoint;
-        }
+	ipoint = cdr;
+	curp = *ipoint;
+	}
       }
 
 /* Add cell to list if not already present */
@@ -279,15 +286,15 @@ ADIobj adix_mapcar1( ADIobj (*proc)(ADIobj,ADIstatus),
 		     ADIobj lst, ADIstatus status )
   {
   ADIobj        curp = lst;
+  ADIobj	elem;
   ADIobj        rval = ADI__nullid;
 
   _chk_stat_ret(ADI__nullid);
 
   while ( _valid_q(curp) ) {
-    rval = (*join)( rval, (*proc)( _CAR(curp), status ),
-		    status );
+    _GET_CARCDR(elem,curp,curp);
 
-    curp = _CDR(curp);
+    rval = (*join)( rval, (*proc)( elem, status ), status );
     }
 
   return rval;
@@ -299,10 +306,11 @@ ADIlogical adix_eql_p( ADIobj x, ADIobj y )
   }
 
 ADIlogical adix_member( ADIobj element, ADIobj list,
-			               ADIlogical (*test)(ADIobj,ADIobj),
-			               ADIstatus status )
+				       ADIlogical (*test)(ADIobj,ADIobj),
+				       ADIstatus status )
   {
   ADIobj        curp = list;
+  ADIobj	elem;
   ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
   ADIlogical    rval = ADI__false;
 
@@ -311,12 +319,12 @@ ADIlogical adix_member( ADIobj element, ADIobj list,
   if ( ! ltest )
     ltest = adix_eql_p;
 
-  while ( _valid_q(curp) && _ok(status) && ! rval )
-    {
-    if ( (*ltest)(element,_CAR(curp)) )
+  while ( _valid_q(curp) && _ok(status) && ! rval ) {
+
+    _GET_CARCDR(elem,curp,curp);
+
+    if ( (*ltest)(element,elem) )
       rval = ADI__true;
-    else
-      curp = _CDR(curp);                /* Next test class */
     }
 
   return rval;
@@ -330,14 +338,14 @@ ADIobj adix_assoc( ADIobj idx, ADIobj lst, ADIstatus status )
   if ( _ok(status) ) {
     while ( _valid_q(curp) ) {
 
-      ADIobj	car = _CAR(curp);
+      ADIobj	car;
+
+      _GET_CARCDR(car,curp,curp);
 
       if ( idx == _CAR(car) ) {
 	rval = car;
 	break;
 	}
-      else
-	curp = _CDR(curp);
       }
     }
 
@@ -348,6 +356,7 @@ ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
 		      ADIobj args, ADIobj lst,
 		      ADIstatus status )
   {
+  ADIobj	car;
   ADIobj        curp = lst;
   ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
   ADIobj        newlist = ADI__nullid;
@@ -358,17 +367,15 @@ ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
   if ( ! ltest )
     ltest = adix_eql_p;
 
-  while ( _valid_q(curp) && _ok(status) )
-    {
-    if ( ! (*ltest)(_CAR(curp),args) )
-      {
-      *ipoint = lstx_cell( adix_copy(_CAR(curp),status),
+  while ( _valid_q(curp) && _ok(status) ) {
+    _GET_CARCDR(car,curp,curp);
+
+    if ( ! (*ltest)(car,args) ) {
+      *ipoint = lstx_cell( adix_copy(car,status),
 			   ADI__nullid, status );
 
       ipoint = &_CDR(*ipoint);
       }
-
-    curp = _CDR(curp);                /* Next test class */
     }
 
   return newlist;

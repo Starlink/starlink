@@ -136,43 +136,84 @@ ADIobj prsx_symname( ADIobj stream, ADIstatus status )
  */
 ADIobj prsx_cvalue( ADIobj stream, ADIstatus status )
   {
-  ADIstream	*str = _strm_data(stream);
+  int		base;
   ADItokenType  ctok;
+  ADItoken	idata;
+  ADIinteger    ival;                    /* Integer constant */
+  ADIlogical	lval;
+  ADIlogical	next = ADI__true;
   ADIobj    	rval = ADI__nullid;
+  ADIstream	*str = _strm_data(stream);
 
   _chk_stat_ret(ADI__nullid);
 
   ctok = str->ctok.t;
 
+/* Switch on current token */
   switch( ctok ) {
-    case TOK__CONST:
-      adix_new_n( ADI__true, ADI__nullid, NULL,	/* Create object of correct type */
-		  0, 0, NULL, NULL, &str->ctok.dt,
-		  0, &rval, status );
 
-      adic_put0c( rval, str->ctok.dat, status );
+/* A manifest constant */
+    case TOK__CONST:
+
+/*  Integer data? */
+      if ( str->ctok.dt == UT_ALLOC_i ) {
+	base = 10;
+	idata = str->ctok;
+	ADInextToken( stream, status );
+	if ( str->ctok.t == TOK__CARAT2 ) {
+	  ADInextToken( stream, status );
+	  if ( (str->ctok.t != TOK__CONST) ||
+	       (str->ctok.dt != UT_ALLOC_i ) )
+	    adic_setecs( ADI__SYNTAX, "Numeric base expected", status );
+	  else {
+	    base = (int) ADIparseScanInt( str->ctok.dat, 10, status );
+	    if ( (base<2) || (base>36) || ! _ok(status) ) {
+	      adic_setecs( ADI__SYNTAX, "Invalid base specifier /%d/ - must lie between 2 and 36", status, base );
+	      }
+	    }
+	  }
+	else
+	  next = ADI__false;
+
+	ival = ADIparseScanInt( idata.dat, base, status );
+	adic_newv0i( ival, &rval, status );
+	}
+
+      else if ( str->ctok.dt == UT_ALLOC_d ) {
+	adic_new0d( &rval, status );
+	adic_put0c( rval, str->ctok.dat, status );
+	break;
+	}
+
+      else if ( str->ctok.dt == UT_ALLOC_r ) {
+	adic_new0r( &rval, status );
+	adic_put0c( rval, str->ctok.dat, status );
+	break;
+	}
+
+      else if ( str->ctok.dt == UT_ALLOC_c ) {
+	adic_newv0c( str->ctok.dat, &rval, status );
+	}
+      else
+	adic_newv0c( str->ctok.dat, &rval, status );
       break;
 
     case TOK__SYM:
-      if ( ADIisTokenCstring( stream, "True", status ) )
-	adic_newv0l( ADI__true, &rval, status );
-      else if ( ADIisTokenCstring( stream, "Yes", status ) )
-	adic_newv0l( ADI__true, &rval, status );
-      else if ( ADIisTokenCstring( stream, "False", status ) )
-	adic_newv0l( ADI__false, &rval, status );
-      else if ( ADIisTokenCstring( stream, "No", status ) )
-	adic_newv0l( ADI__false, &rval, status );
-      else {
-	}
+      if ( ADIparseScanLog( stream, &lval, status ) )
+	adic_newv0l( lval, &rval, status );
+      else
+	next = ADI__false;
       break;
 
     default:
       rval = ADI__nullid;
+      next = ADI__false;
       adic_setecs( SAI__ERROR, "Invalid constant", status );
     }
 
 /* Next token if no error */
-  ADInextToken( stream, status );
+  if ( next )
+    ADInextToken( stream, status );
 
   return rval;
   }
@@ -289,7 +330,7 @@ ADIobj ADIstrmNew( char *mode, ADIstatus status )
   ADIobj	str = ADI__nullid;
 
   if ( _ok(status) ) {
-    adic_new0( "Stream", &str, status );
+    str = adix_cls_alloc( _cdef_data(UT_ALLOC_strm), status );
     ADIclearStream( str, status );
     if ( (*mode == 'r') || (*mode == 'R') )
       modemask = ADI_STREAM__IN;
@@ -1066,7 +1107,12 @@ reswitch:	switch (ch) {
 				*va_arg(ap, int *) = ret;
 			continue;	/* no output */
 		case 'I':
-			_ulong = va_arg(ap, ADIinteger);
+			flags |= LONGINT;
+			_ulong = SARG();
+			if ((long)_ulong < 0) {
+			  _ulong = -_ulong;
+			  sign = '-';
+			  }
 			base = DEC;
 			goto number;
 		case 'O':
@@ -1589,8 +1635,8 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
   else
     etok = TOK__END;
 
-  while ( _ok(status) && (tok==TOK__NOTATOK) )
-    {
+  while ( _ok(status) && (tok==TOK__NOTATOK) ) {
+
     str->ctok.nc = 0;
     str->ctok.dt = 0;
     ch = ADIreadCharFromStream( stream, status );
@@ -1604,10 +1650,10 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
     else if ( ch == '\n' ) {
       tok = etok;
       }
-    else if ( isalpha(ch) || (ch=='%') || (ch=='_') )
+    else if ( isalpha(ch) || (ch=='%') )
       {
       str->ctok.ptr0 = str->dev->ptr - 1;
-      while( isalpha(ch) || (ch=='%') || isdigit(ch) || (ch=='_')) {
+      while( isalpha(ch) || (ch=='%') || isdigit(ch) ) {
 	ch = ADIreadCharFromStream( stream, status );
 	}
       ADIreturnCharToStream( stream, ch, status );
@@ -1616,14 +1662,13 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
       str->ctok.dt = UT_ALLOC_c;
       }
 
-    else if ( isdigit(ch) )
-      {
+    else if ( isdigit(ch) ) {
       str->ctok.ptr0 = str->dev->ptr - 1;
       while( isalnum(ch) )
 	ch = ADIreadCharFromStream( stream, status );
 
-      if ( ch == '.' )                	/* Decimal point found */
-	{
+/* Decimal point found */
+      if ( ch == '.' ) {
 	int	ndig = 0;
 
 	ch = ADIreadCharFromStream( stream, status );
@@ -1640,6 +1685,15 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
       else
 	str->ctok.dt = UT_ALLOC_i;
 
+      if ( ch == 'e' || ch == 'E' || ch == 'd' || ch == 'D' ) {
+	str->ctok.dt = ((ch=='e') || (ch=='E')) ? UT_ALLOC_r : UT_ALLOC_d;
+	ch = ADIreadCharFromStream( stream, status );
+	if ( ch == '+' || ch == '-' )
+	  ch = ADIreadCharFromStream( stream, status );
+	while ( isdigit(ch) && _ok(status) )
+	  ch = ADIreadCharFromStream( stream, status );
+	}
+
       ADIreturnCharToStream( stream, ch, status );
       str->ctok.dat[str->ctok.nc] = '\0';
       tok = TOK__CONST;
@@ -1655,15 +1709,12 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
     else if ( ch == '"' )
       {
       str->ctok.nc = 0;
-      while( inquotes )
-	{
+      while( inquotes ) {
 	ch = ADIreadCharFromStream( stream, status );
-	switch( ch )
-	  {
+	switch( ch ) {
 	  case '\\':
 	    ch = ADIreadCharFromStream( stream, status );
-	    switch (ch)
-	      {
+	    switch (ch) {
 	      case '\\':
 		str->ctok.dat[--str->ctok.nc] = '\\';
 		break;
@@ -1692,8 +1743,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
       str->ctok.dt = UT_ALLOC_c;
       }
     else
-      switch (ch)
-	{
+      switch (ch) {
 	case ',':
 	  tok = TOK__COMMA;
 	  break;
@@ -1729,8 +1779,7 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	  break;
 	case '_':
 	  ch = ADIreadCharFromStream( stream, status );
-	  if ( ch == '_' )
-	    {
+	  if ( ch == '_' ) {
 	    ch = ADIreadCharFromStream( stream, status );
 	    if ( ch == '_' )
 	      tok = TOK__UND3;
@@ -1761,6 +1810,8 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
 	    tok = TOK__DECR;
 	  else if ( ch == '=' )
 	    tok = TOK__MINUSEQ;
+	  else if ( ch == '>' )
+	    tok = TOK__RARROW;
 	  else {
 	    ADIreturnCharToStream( stream, ch, status );
 	    tok = TOK__MINUS;
@@ -1972,6 +2023,7 @@ ADIlogical ADIifMatchToken( ADIobj str, ADItokenType t, ADIstatus status )
 ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
 			   ADIstatus status )
   {
+  ADIobj	*caradr;		/* Address of _CAR cell */
   ADIobj	robj = ADI__nullid;	/* Returned object */
   ADIobj     	*lastlinkadr = &robj;   /* Address of last list link cell */
   ADIlogical    more = ADI__true;	/* More items in list */
@@ -1989,14 +2041,16 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
       more = ADI__false;
       }
     else {
-      thisarg = lstx_cell( ADI__nullid,	/* Create list cell */
-		ADI__nullid, status );
 
+/* Create list cell and append to list */
+      thisarg = lstx_cell( ADI__nullid, ADI__nullid, status );
       *lastlinkadr = thisarg;
-      lastlinkadr = &_CDR(thisarg);
 
-      _CAR(thisarg) = ADIparseExpInt(	/* Parse list element */
-	       pstream, 10, status );
+/* Locate new cell's slots */
+      _GET_CARCDR_A( caradr, lastlinkadr, thisarg );
+
+/* Parse list element into the _CAR cell */
+      *caradr = ADIparseExpInt( pstream, 10, status );
 
       if ( ! ADIifMatchToken( pstream, TOK__COMMA, status ) ) {
 	more = ADI__false;
@@ -2023,7 +2077,7 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
 ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
   {
   ADIobj                arg;            /* Argument to blank function */
-  ADIobj                carg;           /* _CAR(arg) */
+  ADIobj                car,cdr;        /* _CAR(arg) and _CDR(arg) */
   int                   nbi;            /* Number of blanks minus one */
   ADIobj                nstr;           /* Name string for _,__,___ */
   ADIstream		*str = _strm_data(stream);
@@ -2046,17 +2100,18 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
   else
     arg = adix_clone( ADIcvNulCons, status );
 
-  carg = _CAR(arg);
+/* Get list elements */
+  _GET_CARCDR(car,cdr,arg);
 
 /* Single _x type node? */
-  if ( _valid_q(carg) && _null_q(_CDR(arg)) )
+  if ( _valid_q(car) && _null_q(cdr) )
 
 /* Check <x> is an expression node */
-    if ( _etn_q(carg) ) {
+    if ( _etn_q(car) ) {
       ADIobj			cid;	/* Class definition */
 
 /* Locate class definition of named class, if any */
-      cid = ADIkrnlFindClsI( _etn_head(carg), status );
+      cid = ADIkrnlFindClsI( _etn_head(car), status );
       if ( _valid_q(cid) ) {
 
 /* Locate address of the slot for nbi'th underscore expression */
@@ -2065,7 +2120,7 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
 	subexp = *saddr;
 
 /* Sub-expression already exists? */
-	if ( *saddr )
+	if ( _valid_q(*saddr) )
 	  adic_erase( &arg, status );
 	else
 	  *saddr = ADIetnNew( adix_clone(nstr, status), arg, status );
@@ -2082,6 +2137,27 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
     return ADIetnNew( adix_clone(nstr, status), arg, status );
   }
 
+
+ADIlogical ADIparseScanLog( ADIobj stream, ADIlogical *lval,
+			    ADIstatus status )
+  {
+  ADIlogical	rval = ADI__true;
+
+  if ( ADIisTokenCstring( stream, "True", status ) )
+    *lval = ADI__true;
+  else if ( ADIisTokenCstring( stream, "Yes", status ) )
+    *lval = ADI__true;
+  else if ( ADIisTokenCstring( stream, "False", status ) )
+    *lval = ADI__false;
+  else if ( ADIisTokenCstring( stream, "No", status ) )
+    *lval = ADI__false;
+  else
+    rval = ADI__false;
+
+  return rval;
+  }
+
+
 ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
   {
   char		*cp = data;
@@ -2097,17 +2173,19 @@ ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
 	dig = (_toupper(*cp)-'A')+10;
       else {
 	adic_setecs( ADI__SYNTAX,
-	  "Character /%c/ is not valid digit in any base", status, cp );
+	  "Character /%c/ is not valid digit in any base", status, *cp );
 	}
       }
     else
-      dig = *cp++ - '0';
+      dig = *cp - '0';
     if ( dig >= base ) {
       adic_setecs( ADI__SYNTAX, "Digit /%c/ is not a valid base %d digit",
-	status, cp, base );
+	status, *cp, base );
       }
     else
       result = (result*base + dig);
+
+    cp++;
     }
 
   return result;
@@ -2117,59 +2195,55 @@ ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
 ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
   {
   DEFINE_OP_TABLE(PreUnary)
-    DEFINE_OP_TABLE_ENTRY(TOK__LCHEV,  950,  None,  K_Get ),
-    DEFINE_OP_TABLE_ENTRY(TOK__DECR,   900,  None,  K_PreDec),
-    DEFINE_OP_TABLE_ENTRY(TOK__INCR,   900,  None,  K_PreInc),
-    DEFINE_OP_TABLE_ENTRY(TOK__MINUS,  810,  None,  K_Negate),
-    DEFINE_OP_TABLE_ENTRY(TOK__PLUS,   800,  None,  K_Plus),
-    DEFINE_OP_TABLE_ENTRY(TOK__NOT,    560,  None,  K_Not),
+    DEFINE_OP_TENTRY(TOK__LCHEV,  950,  None,  K_Get ),
+    DEFINE_OP_TENTRY(TOK__DECR,   900,  None,  K_PreDec),
+    DEFINE_OP_TENTRY(TOK__INCR,   900,  None,  K_PreInc),
+    DEFINE_OP_TENTRY(TOK__MINUS,  810,  None,  K_Negate),
+    DEFINE_OP_TENTRY(TOK__PLUS,   800,  None,  K_Plus),
+    DEFINE_OP_TENTRY(TOK__NOT,    560,  None,  K_Not),
   END_OP_TABLE;
 
   DEFINE_OP_TABLE(Binary)
-    DEFINE_OP_TABLE_ENTRY(TOK__QUERY,  930,  None,  K_PatternTest),
-    DEFINE_OP_TABLE_ENTRY(TOK__SLASHAT,890,  RtoL,  K_Map),
-    DEFINE_OP_TABLE_ENTRY(TOK__ATAT,   890,  RtoL,  K_Apply),
-    DEFINE_OP_TABLE_ENTRY(TOK__PERIOD, 860,  None,  K_Dot),
-    DEFINE_OP_TABLE_ENTRY(TOK__CARAT,  850,  RtoL,  K_Power),
-    DEFINE_OP_TABLE_ENTRY(TOK__DIV,    770,  LtoR,  K_Divide),
-    DEFINE_OP_TABLE_ENTRY(TOK__MUL,    750,  LtoR,  K_Multiply),
-    DEFINE_OP_TABLE_ENTRY(TOK__PLUS,   700,  LtoR,  K_Plus),
-    DEFINE_OP_TABLE_ENTRY(TOK__MINUS,  690,  LtoR,  K_Subtract),
-    DEFINE_OP_TABLE_ENTRY(TOK__EQ,     600,  None,  K_Equal),
-    DEFINE_OP_TABLE_ENTRY(TOK__NE,     600,  None,  K_NotEqual),
-    DEFINE_OP_TABLE_ENTRY(TOK__LE,     600,  None,  K_LE),
-    DEFINE_OP_TABLE_ENTRY(TOK__LT,     600,  None,  K_LT),
-    DEFINE_OP_TABLE_ENTRY(TOK__GE,     600,  None,  K_GE),
-    DEFINE_OP_TABLE_ENTRY(TOK__GT,     600,  None,  K_GT),
-    DEFINE_OP_TABLE_ENTRY(TOK__AND,    450,  None,  K_And),
-    DEFINE_OP_TABLE_ENTRY(TOK__OR,     440,  None,  K_Or),
-    DEFINE_OP_TABLE_ENTRY(TOK__BAR,    430,  None,  K_Alternatives),
-    DEFINE_OP_TABLE_ENTRY(TOK__COND,   420,  None,  K_Condition),
-    DEFINE_OP_TABLE_ENTRY(TOK__PLUSEQ, 230,  None,  K_AddTo),
-    DEFINE_OP_TABLE_ENTRY(TOK__DIVEQ,  230,  None,  K_DivideBy),
-    DEFINE_OP_TABLE_ENTRY(TOK__MINUSEQ,220,  None,  K_SubtractFrom),
-    DEFINE_OP_TABLE_ENTRY(TOK__MULEQ,  210,  None,  K_MultiplyBy),
-    DEFINE_OP_TABLE_ENTRY(TOK__ASSIGN, 100,  RtoL,  K_Set),
-    DEFINE_OP_TABLE_ENTRY(TOK__COLONEQ,95,   None,  K_SetDelayed),
-    DEFINE_OP_TABLE_ENTRY(TOK__RCHEV,  50,   None,  K_Put),
-    DEFINE_OP_TABLE_ENTRY(TOK__CONC,   25,   RtoL,  K_Concat),
+    DEFINE_OP_TENTRY(TOK__QUERY,  930,  None,  K_PatternTest),
+    DEFINE_OP_TENTRY(TOK__SLASHAT,890,  RtoL,  K_Map),
+    DEFINE_OP_TENTRY(TOK__ATAT,   890,  RtoL,  K_Apply),
+    DEFINE_OP_TENTRY(TOK__PERIOD, 860,  None,  K_Dot),
+    DEFINE_OP_TENTRY(TOK__CARAT,  850,  RtoL,  K_Power),
+    DEFINE_OP_TENTRY(TOK__DIV,    770,  LtoR,  K_Divide),
+    DEFINE_OP_TENTRY(TOK__MUL,    750,  LtoR,  K_Multiply),
+    DEFINE_OP_TENTRY(TOK__PLUS,   700,  LtoR,  K_Plus),
+    DEFINE_OP_TENTRY(TOK__MINUS,  690,  LtoR,  K_Subtract),
+    DEFINE_OP_TENTRY(TOK__EQ,     600,  None,  K_Equal),
+    DEFINE_OP_TENTRY(TOK__NE,     600,  None,  K_NotEqual),
+    DEFINE_OP_TENTRY(TOK__LE,     600,  None,  K_LE),
+    DEFINE_OP_TENTRY(TOK__LT,     600,  None,  K_LT),
+    DEFINE_OP_TENTRY(TOK__GE,     600,  None,  K_GE),
+    DEFINE_OP_TENTRY(TOK__GT,     600,  None,  K_GT),
+    DEFINE_OP_TENTRY(TOK__AND,    450,  None,  K_And),
+    DEFINE_OP_TENTRY(TOK__OR,     440,  None,  K_Or),
+    DEFINE_OP_TENTRY(TOK__BAR,    430,  None,  K_Alternatives),
+    DEFINE_OP_TENTRY(TOK__COND,   420,  None,  K_Condition),
+    DEFINE_OP_TENTRY(TOK__PLUSEQ, 230,  None,  K_AddTo),
+    DEFINE_OP_TENTRY(TOK__DIVEQ,  230,  None,  K_DivideBy),
+    DEFINE_OP_TENTRY(TOK__MINUSEQ,220,  None,  K_SubtractFrom),
+    DEFINE_OP_TENTRY(TOK__MULEQ,  210,  None,  K_MultiplyBy),
+    DEFINE_OP_TENTRY(TOK__ASSIGN, 100,  RtoL,  K_Set),
+    DEFINE_OP_TENTRY(TOK__COLONEQ,95,   None,  K_SetDelayed),
+    DEFINE_OP_TENTRY(TOK__RCHEV,  50,   None,  K_Put),
+    DEFINE_OP_TENTRY(TOK__CONC,   25,   RtoL,  K_Concat),
   END_OP_TABLE;
 
   DEFINE_OP_TABLE(PostUnary)
-    DEFINE_OP_TABLE_ENTRY(TOK__DECR,   910,  None,  K_PostDec),
-    DEFINE_OP_TABLE_ENTRY(TOK__INCR,   910,  None,  K_PostInc),
-    DEFINE_OP_TABLE_ENTRY(TOK__NOT,    880,  None,  K_Factorial),
+    DEFINE_OP_TENTRY(TOK__DECR,   910,  None,  K_PostDec),
+    DEFINE_OP_TENTRY(TOK__INCR,   910,  None,  K_PostInc),
+    DEFINE_OP_TENTRY(TOK__NOT,    880,  None,  K_Factorial),
   END_OP_TABLE;
 
-  int          base;                    /* Base for reading integers */
-  ADIdouble    dval;                    /* Double precision constant */
   ADIobj       expr = ADI__nullid;      /* Expression to be returned */
   ADIlogical   finished = ADI__false;
   ADIobj       first;
-  ADItoken     idata;
-  ADIinteger   ival;                    /* Integer constant */
   int          ltp;
-  ADIlogical 	next;
+  ADIlogical	lval;
   ADIstream    *str = _strm_data(stream);
   ADIobj       symbol;
   int          tp;
@@ -2186,11 +2260,15 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
     case TOK__SYM:
     case TOK__SCOPE:
-      if ( str->dev->dstatic )
+      if ( ADIparseScanLog( stream, &lval, status ) )
+	adic_newv0l( lval, &expr, status );
+
+      else if ( str->dev->dstatic )
 	expr = ADIetnNew(
 		adix_cmn_i( str->ctok.ptr0, str->ctok.nc,
 			    ADI__true, status ),
 		ADI__nullid, status );
+
       else
 	expr = ADIetnNew(
 		adix_cmn( str->ctok.dat, str->ctok.nc, status ),
@@ -2226,12 +2304,16 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	}
       break;
 
+/* Expression starting '['. Parsed as an array construction from a list */
     case TOK__LBRAK:
       ADInextToken( stream, status );
+
+/* Parse the array elements and construct list constructor expression */
       expr = ADIetnNew( adix_clone( K_List, status ),
-	       ADIparseComDelList( stream,   /* Parse list elements */
-		 TOK__RBRAK, status ),
+	       ADIparseComDelList( stream, TOK__RBRAK, status ),
 	       status );
+
+/* Return an array constructor expression using the list */
       expr = ADIetnNew( adix_clone( K_Array, status ),
 		     lstx_cell( expr, ADI__nullid, status ),
 		     status );
@@ -2256,43 +2338,9 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
       break;
 
     case TOK__CONST:
-      next = ADI__true;
-      if ( str->ctok.dt == UT_ALLOC_i ) {
-	  base = 10;
-	  idata = str->ctok;
-	  ADInextToken( stream, status );
-	  if ( str->ctok.t == TOK__CARAT2 ) {
-	    ADInextToken( stream, status );
-	    if ( (str->ctok.t != TOK__CONST) ||
-		 (str->ctok.dt != UT_ALLOC_i ) )
-	      adic_setecs( ADI__SYNTAX, "Numeric base expected", status );
-	    else {
-	      base = (int) ADIparseScanInt( str->ctok.dat, 10, status );
-	      if ( _ok(status) && (base<2) && (base>36) ) {
-		adic_setecs( ADI__SYNTAX, "Invalid base specifier /%d/ - must lie between 2 and 36", status, base );
-		}
-	      }
-	    }
-	  else
-	    next = ADI__false;
-	  ival = ADIparseScanInt( idata.dat, base, status );
-	  adic_newv0i( ival, &expr, status );
-	}
-      else if ( str->ctok.dt == UT_ALLOC_d ) {
-	  if ( ! sscanf(str->ctok.dat,"%lf",&dval) )
-	    *status = SAI__ERROR;
-	  else
-	    adic_newv0d( dval, &expr, status );
-	  break;
-	}
-      else if ( str->ctok.dt == UT_ALLOC_c ) {
-	  adic_newv0c( str->ctok.dat, &expr, status );
-	}
-      else
-	adic_newv0c( str->ctok.dat, &expr, status );
-      if ( next )
-	ADInextToken( stream, status );
+      expr = prsx_cvalue( stream, status );
       break;
+
     default:
       tp = ADIparseTokenInOpSet( stream, PreUnary, status);
       if ( tp ) {
@@ -2369,95 +2417,95 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 void prsx_init( ADIstatus status )
   {
   DEFINE_CSTR_TABLE(stringtable)
-    CSTR_TABLE_ENTRY(EXC_ArrayBound,"ArrayBound"),
-    CSTR_TABLE_ENTRY(EXC_BoolExp,"BooleanExpected"),
-    CSTR_TABLE_ENTRY(EXC_ControlC,"ControlC"),
-    CSTR_TABLE_ENTRY(EXC_Error,"Error"),
-    CSTR_TABLE_ENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
-    CSTR_TABLE_ENTRY(EXC_InvalidArg,"InvalidArg"),
-    CSTR_TABLE_ENTRY(EXC_NoSuchField,"NoSuchField"),
-    CSTR_TABLE_ENTRY(EXC_ScopeBreak,"ScopeBreak"),
-    CSTR_TABLE_ENTRY(EXC_SyntaxError, "SyntaxError"),
+    CSTR_TENTRY(EXC_ArrayBound,"ArrayBound"),
+    CSTR_TENTRY(EXC_BoolExp,"BooleanExpected"),
+    CSTR_TENTRY(EXC_ControlC,"ControlC"),
+    CSTR_TENTRY(EXC_Error,"Error"),
+    CSTR_TENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
+    CSTR_TENTRY(EXC_InvalidArg,"InvalidArg"),
+    CSTR_TENTRY(EXC_NoSuchField,"NoSuchField"),
+    CSTR_TENTRY(EXC_ScopeBreak,"ScopeBreak"),
+    CSTR_TENTRY(EXC_SyntaxError, "SyntaxError"),
 
-    CSTR_TABLE_ENTRY(K_AddTo,"AddTo"),
-    CSTR_TABLE_ENTRY(K_Alternatives,"Alternatives"),
-    CSTR_TABLE_ENTRY(K_And,"And"),
-    CSTR_TABLE_ENTRY(K_Apply,"Apply"),
-    CSTR_TABLE_ENTRY(K_Array,"Array"),
-    CSTR_TABLE_ENTRY(K_ArrayRef,"ArrayRef"),
+    CSTR_TENTRY(K_AddTo,"AddTo"),
+    CSTR_TENTRY(K_Alternatives,"Alternatives"),
+    CSTR_TENTRY(K_And,"And"),
+    CSTR_TENTRY(K_Apply,"Apply"),
+    CSTR_TENTRY(K_Array,"Array"),
+    CSTR_TENTRY(K_ArrayRef,"ArrayRef"),
 
-    CSTR_TABLE_ENTRY(K_Blank,"Blank"),
-    CSTR_TABLE_ENTRY(K_BlankSeq,"BlankSeq"),
-    CSTR_TABLE_ENTRY(K_BlankNullSeq,"BlankNullSeq"),
-    CSTR_TABLE_ENTRY(K_Break,"Break"),
+    CSTR_TENTRY(K_Blank,"Blank"),
+    CSTR_TENTRY(K_BlankSeq,"BlankSeq"),
+    CSTR_TENTRY(K_BlankNullSeq,"BlankNullSeq"),
+    CSTR_TENTRY(K_Break,"Break"),
 
-    CSTR_TABLE_ENTRY(K_Catch,"Catch"),
-    CSTR_TABLE_ENTRY(K_Concat,"Concat"),
-    CSTR_TABLE_ENTRY(K_Condition,"Condition"),
+    CSTR_TENTRY(K_Catch,"Catch"),
+    CSTR_TENTRY(K_Concat,"Concat"),
+    CSTR_TENTRY(K_Condition,"Condition"),
 
-    CSTR_TABLE_ENTRY(K_DefEnum,"DefEnum"),
-    CSTR_TABLE_ENTRY(K_Divide,"Divide"),
-    CSTR_TABLE_ENTRY(K_DivideBy,"DivideBy"),
-    CSTR_TABLE_ENTRY(K_Dot,"Dot"),
-    CSTR_TABLE_ENTRY(K_DoWhile,"DoWhile"),
+    CSTR_TENTRY(K_DefEnum,"DefEnum"),
+    CSTR_TENTRY(K_Divide,"Divide"),
+    CSTR_TENTRY(K_DivideBy,"DivideBy"),
+    CSTR_TENTRY(K_Dot,"Dot"),
+    CSTR_TENTRY(K_DoWhile,"DoWhile"),
 
-    CSTR_TABLE_ENTRY(K_Echo,"Echo"),
-    CSTR_TABLE_ENTRY(K_Equal,"Equal"),
-    CSTR_TABLE_ENTRY(K_Factorial,"Factorial"),
-    CSTR_TABLE_ENTRY(K_Finally,"Finally"),
-    CSTR_TABLE_ENTRY(K_Foreach,"Foreach"),
+    CSTR_TENTRY(K_Echo,"Echo"),
+    CSTR_TENTRY(K_Equal,"Equal"),
+    CSTR_TENTRY(K_Factorial,"Factorial"),
+    CSTR_TENTRY(K_Finally,"Finally"),
+    CSTR_TENTRY(K_Foreach,"Foreach"),
 
-    CSTR_TABLE_ENTRY(K_Get,"Get"),
-    CSTR_TABLE_ENTRY(K_GE,"GreaterThanOrEqual"),
-    CSTR_TABLE_ENTRY(K_GT,"GreaterThan"),
+    CSTR_TENTRY(K_Get,"Get"),
+    CSTR_TENTRY(K_GE,"GreaterThanOrEqual"),
+    CSTR_TENTRY(K_GT,"GreaterThan"),
 
-    CSTR_TABLE_ENTRY(K_HoldAll,"HoldAll"),
-    CSTR_TABLE_ENTRY(K_HoldFirst,"HoldFirst"),
-    CSTR_TABLE_ENTRY(K_HoldRest,"HoldRest"),
+    CSTR_TENTRY(K_HoldAll,"HoldAll"),
+    CSTR_TENTRY(K_HoldFirst,"HoldFirst"),
+    CSTR_TENTRY(K_HoldRest,"HoldRest"),
 
-    CSTR_TABLE_ENTRY(K_If,"If"),
+    CSTR_TENTRY(K_If,"If"),
 
-    CSTR_TABLE_ENTRY(K_List,"List"),
-    CSTR_TABLE_ENTRY(K_Listable,"Listable"),
-    CSTR_TABLE_ENTRY(K_LE,"LessThanOrEqual"),
-    CSTR_TABLE_ENTRY(K_LT,"LessThan"),
+    CSTR_TENTRY(K_List,"List"),
+    CSTR_TENTRY(K_Listable,"Listable"),
+    CSTR_TENTRY(K_LE,"LessThanOrEqual"),
+    CSTR_TENTRY(K_LT,"LessThan"),
 
-    CSTR_TABLE_ENTRY(K_Map,"Map"),
-    CSTR_TABLE_ENTRY(K_Multiply,"Multiply"),
-    CSTR_TABLE_ENTRY(K_MultiplyBy,"MultiplyBy"),
+    CSTR_TENTRY(K_Map,"Map"),
+    CSTR_TENTRY(K_Multiply,"Multiply"),
+    CSTR_TENTRY(K_MultiplyBy,"MultiplyBy"),
 
-    CSTR_TABLE_ENTRY(K_Negate,"Negate"),
-    CSTR_TABLE_ENTRY(K_Not,"Not"),
-    CSTR_TABLE_ENTRY(K_NotEqual,"NotEqual"),
+    CSTR_TENTRY(K_Negate,"Negate"),
+    CSTR_TENTRY(K_Not,"Not"),
+    CSTR_TENTRY(K_NotEqual,"NotEqual"),
 
-    CSTR_TABLE_ENTRY(K_Or,"Or"),
+    CSTR_TENTRY(K_Or,"Or"),
 
-    CSTR_TABLE_ENTRY(K_Pattern,"Pattern"),
-    CSTR_TABLE_ENTRY(K_PatternTest,"PatternTest"),
-    CSTR_TABLE_ENTRY(K_Plus,"Plus"),
-    CSTR_TABLE_ENTRY(K_PostDec,"PostDecrement"),
-    CSTR_TABLE_ENTRY(K_PostInc,"PostIncrement"),
-    CSTR_TABLE_ENTRY(K_Power,"Power"),
-    CSTR_TABLE_ENTRY(K_PreDec,"PreDecrement"),
-    CSTR_TABLE_ENTRY(K_PreInc,"PreIncrement"),
-    CSTR_TABLE_ENTRY(K_Put,"Put"),
+    CSTR_TENTRY(K_Pattern,"Pattern"),
+    CSTR_TENTRY(K_PatternTest,"PatternTest"),
+    CSTR_TENTRY(K_Plus,"Plus"),
+    CSTR_TENTRY(K_PostDec,"PostDecrement"),
+    CSTR_TENTRY(K_PostInc,"PostIncrement"),
+    CSTR_TENTRY(K_Power,"Power"),
+    CSTR_TENTRY(K_PreDec,"PreDecrement"),
+    CSTR_TENTRY(K_PreInc,"PreIncrement"),
+    CSTR_TENTRY(K_Put,"Put"),
 
-    CSTR_TABLE_ENTRY(K_Query,"Query"),
+    CSTR_TENTRY(K_Query,"Query"),
 
-    CSTR_TABLE_ENTRY(K_Raise,"Raise"),
-    CSTR_TABLE_ENTRY(K_Range,"Range"),
-    CSTR_TABLE_ENTRY(K_ReRaise,"ReRaise"),
+    CSTR_TENTRY(K_Raise,"Raise"),
+    CSTR_TENTRY(K_Range,"Range"),
+    CSTR_TENTRY(K_ReRaise,"ReRaise"),
 
-    CSTR_TABLE_ENTRY(K_Set,"Set"),
-    CSTR_TABLE_ENTRY(K_SetDelayed,"SetDelayed"),
-    CSTR_TABLE_ENTRY(K_Subtract,"Subtract"),
-    CSTR_TABLE_ENTRY(K_SubtractFrom,"SubtractFrom"),
-    CSTR_TABLE_ENTRY(K_Switch,"Switch"),
+    CSTR_TENTRY(K_Set,"Set"),
+    CSTR_TENTRY(K_SetDelayed,"SetDelayed"),
+    CSTR_TENTRY(K_Subtract,"Subtract"),
+    CSTR_TENTRY(K_SubtractFrom,"SubtractFrom"),
+    CSTR_TENTRY(K_Switch,"Switch"),
 
-    CSTR_TABLE_ENTRY(K_Try,"Try"),
+    CSTR_TENTRY(K_Try,"Try"),
 
-    CSTR_TABLE_ENTRY(K_While,"While"),
-    CSTR_TABLE_ENTRY(K_WildCard,"WildCard"),
+    CSTR_TENTRY(K_While,"While"),
+    CSTR_TENTRY(K_WildCard,"WildCard"),
   END_CSTR_TABLE;
 
   ADIkrnlAddCommonStrings( stringtable, status );

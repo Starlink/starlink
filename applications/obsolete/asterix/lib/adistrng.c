@@ -9,7 +9,6 @@
  *   strx_expc          - export characters to C string
  *   strx_expf          - export characters to Fortran string
  *   strx_hash          - hash a string
- *   strx_newmat        - fill in string data from MTA
  *   strx_tok           - string value to message system token
  */
 #include <string.h>                     /* String stuff from RTL */
@@ -208,9 +207,8 @@ int strx_cmp2c( char *str1, int len1, char *str2, int len2 )
 
   minlen = _MIN(len1,len2);		/* Length for compare */
 
-  for( cp=1;
-       (cp<=minlen) && !test; cp++ )
-       test = (*sc1++) - (*sc2++);
+  for( cp=1; (cp<=minlen) && !test; cp++ )
+    test = (*sc1++) - (*sc2++);
 
   if ( test || (len1==len2) )
     return test;
@@ -221,18 +219,23 @@ int strx_cmp2c( char *str1, int len1, char *str2, int len2 )
 
 int strx_cmpc( char *str1, int len1, ADIobj str2 )
   {
-  return strx_cmp2c( str1, len1,	/* Access 2nd string data */
-	      _str_dat(str2),
-	      _str_len(str2) );
+  ADIstring	*s2 = _str_data(str2);
+
+  return strx_cmp2c( str1, len1, s2->data, s2->len );
   }
 
 
 int strx_cmp( ADIobj str1, ADIobj str2 )
   {
-  return strx_cmp2c( _str_dat(str1),	/* Access 2nd string data */
-	      _str_len(str1),
-	      _str_dat(str2),
-	      _str_len(str2) );
+  if ( str1 == str2 )
+    return 0;
+  else {
+    ADIstring	*s1 = _str_data(str1);
+    ADIstring	*s2 = _str_data(str2);
+
+/* Compare strings' data */
+    return strx_cmp2c( s1->data, s1->len, s2->data, s2->len );
+    }
   }
 
 int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
@@ -248,9 +251,7 @@ int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
 
   minlen = _MIN(len1,len2);		/* Minimum of input lengths */
 
-  for( cp=1,sc1 = str1,sc2 = str2;
-       (cp<=minlen) && !test; cp++ )
-    {
+  for( cp=1,sc1 = str1,sc2 = str2; (cp<=minlen) && !test; cp++ ) {
     c1 = *sc1++; c2 = *sc2++;
     if ( islower(c1) )
       c1 = _toupper(c1);
@@ -268,15 +269,22 @@ int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
 
 int strx_cmpi( ADIobj str1, ADIobj str2 )
   {
-  return strx_cmpi2c( _str_dat(str1),
-		      _str_len(str1),
-		      _str_dat(str2),
-		      _str_len(str2) );
+  if ( str1 == str2 )
+    return 0;
+  else {
+    ADIstring	*s1 = _str_data(str1);
+    ADIstring	*s2 = _str_data(str2);
+
+/* Compare strings' data */
+    return strx_cmpi2c( s1->data, s1->len, s2->data, s2->len );
+    }
   }
 
 int strx_cmpic( char *str1, int len1, ADIobj str2 )
   {
-  return strx_cmpi2c( str1, len1, _str_dat(str2), _str_len(str2) );
+  ADIstring	*s2 = _str_data(str2);
+
+  return strx_cmpi2c( str1, len1, s2->data, s2->len );
   }
 
 

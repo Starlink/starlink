@@ -482,6 +482,19 @@ void ADIcnvLL( ADImta *idd, int n, char *in, ADImta *odd,
 	else \
 	  *optr = (_TM_ctype(_ot)) *iptr;} \
 
+#define _do_case_chk_rbth(_it,_ot) \
+      _TM_ctype(_it) *iptr = (_TM_ctype(_it) *) in; \
+      _TM_ctype(_it) r_val;\
+      _TM_ctype(_ot) *optr = (_TM_ctype(_ot) *) out; \
+      int	ival = n; \
+      _chk_stat; \
+      for( ; ival--; iptr++, optr++ ) {\
+	r_val = floor(*iptr); if ( (*iptr - r_val) >= 0.5 ) r_val += 1.0; \
+	if ( *iptr < ((_TM_ctype(_it)) _TM_min(_ot)) || *iptr > ((_TM_ctype(_it)) _TM_max(_ot)) )\
+	  {*optr = _TM_bad(_ot); (*nerr)++;}\
+	else \
+	  *optr = (_TM_ctype(_ot)) r_val;} \
+
 /*
  * Caste to _UBYTE
  */
@@ -494,9 +507,9 @@ void ADIcnvUWUB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr
 void ADIcnvIUB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
   {_do_case_chk_bth(i,ub);}
 void ADIcnvRUB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(r,ub);}
+  {_do_case_chk_rbth(r,ub);}
 void ADIcnvDUB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(d,ub);}
+  {_do_case_chk_rbth(d,ub);}
 
 
 /*
@@ -511,9 +524,9 @@ void ADIcnvUWB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr,
 void ADIcnvIB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
   {_do_case_chk_bth(i,b);}
 void ADIcnvRB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(r,b);}
+  {_do_case_chk_rbth(r,b);}
 void ADIcnvDB( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(d,b);}
+  {_do_case_chk_rbth(d,b);}
 
 
 /*
@@ -528,9 +541,9 @@ void ADIcnvUWW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr,
 void ADIcnvIW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
   {_do_case_chk_bth(i,w);}
 void ADIcnvRW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(r,w);}
+  {_do_case_chk_rbth(r,w);}
 void ADIcnvDW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(d,w);}
+  {_do_case_chk_rbth(d,w);}
 
 
 /*
@@ -545,9 +558,9 @@ void ADIcnvWUW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr,
 void ADIcnvIUW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
   {_do_case_chk_bth(i,uw);}
 void ADIcnvRUW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(r,uw);}
+  {_do_case_chk_rbth(r,uw);}
 void ADIcnvDUW( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(d,uw);}
+  {_do_case_chk_rbth(d,uw);}
 
 /*
  * Caste to _INTEGER
@@ -561,9 +574,9 @@ void ADIcnvUWI( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr,
 void ADIcnvWI( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
   {_do_case_chk(w,i);}
 void ADIcnvRI( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(r,i);}
+  {_do_case_chk_rbth(r,i);}
 void ADIcnvDI( ADImta *idd, int n, char *in, ADImta *odd, char *out, int *nerr, ADIstatus status )
-  {_do_case_chk_bth(d,i);}
+  {_do_case_chk_rbth(d,i);}
 
 /*
  * Caste to REAL

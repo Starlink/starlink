@@ -47,6 +47,7 @@
 *       adi_defcac	 - Define class cluster size
 *       adi_defcls	 - Define a new class
 *	adi_defdes	 - Define a class destructor
+*	adi_deffun	 - Define a function
 *       adi_defgdp	 - Define generic dispatch procedure
 *	adi_defgen	 - Define a generic function
 *	adi_defmth	 - Define a method
@@ -185,14 +186,12 @@
  */
 #define _ASSFLOG(_x,_y) if (_y) (_x) = F77_TRUE; else (_x) = F77_FALSE;
 
-
 /*
- * Macro to assign Fortran POINTER type given some real pointer sptr
+ * Macro to assign pointer to Fortran integer
  */
-#define _EXPORT_POINTER(sptr,dptr_addr) \
-{F77_POINTER_TYPE _pnt = (F77_POINTER_TYPE) sptr; \
-*((F77_POINTER_TYPE *) dptr_addr) = _pnt;}
-
+#define _EXPORT_POINTER(_ptr,_addr) \
+  {F77_POINTER_TYPE tmp= (F77_POINTER_TYPE) _ptr; \
+   *((F77_POINTER_TYPE *) _addr) = tmp; }
 
 
 /* -------------------------------------------------------------------------
@@ -444,6 +443,18 @@ F77_SUBROUTINE(adifn(defdes))( INTEGER(clsid), ADIfMethodCB rtn,
 		   status );
 
   _ERR_REP( "ADI_DEFDES", Estr__DefClsDes );
+  }
+
+F77_SUBROUTINE(adifn(deffun))( CHARACTER(spec), ADIfMethodCB rtn,
+			    INTEGER(id), INTEGER(status) TRAIL(spec) )
+  {
+  _chk_stat;                 		/* Standard entry checks */
+
+  adix_deffun( spec, spec_length,     	/* Invoke kernel routine */
+	       ADIkrnlNewEproc( ADI__false, (ADICB) rtn, status ),
+	       (ADIobj *) id, status );
+
+  _ERR_REP( "ADI_DEFFUN", Estr__DefFun );
   }
 
 F77_SUBROUTINE(adifn(defgdp))( INTEGER(genid), ADICB rtn, INTEGER(status) )
@@ -988,7 +999,7 @@ F77_SUBROUTINE(adifn(map))( INTEGER(id), CHARACTER(type), CHARACTER(mode),
   GENPTR_POINTER(vptr)
   GENPTR_INTEGER(status)
 
-  void	*mptr;
+  void		*mptr;
 
   _chk_stat;
 
@@ -1467,7 +1478,7 @@ F77_SUBROUTINE(adifn(cmap))( INTEGER(id), CHARACTER(name), CHARACTER(type),
   GENPTR_POINTER(vptr)
   GENPTR_INTEGER(status)
 
-  void	*mptr;
+  void		*mptr;
 
   _chk_stat;
 
@@ -1489,12 +1500,12 @@ F77_SUBROUTINE(_TM_fname(cmap,_t))( INTEGER(id), CHARACTER(name), \
   GENPTR_CHARACTER(mode) \
   GENPTR_POINTER(vptr) \
   GENPTR_INTEGER(status) \
-  void		*mptr; \
+  void	*mptr; \
   _chk_stat; \
   adix_map_n( 0, (ADIobj) *id, name, name_length, mode, mode_length, \
 	      &_TM_alloc(_t), sizeof(_TM_ftype(_t)), \
 	      &mptr, status );\
-  _EXPORT_POINTER(mptr,vptr);\
+  _EXPORT_POINTER(mptr,vptr); \
   _ERR_REP( _TM_fnames(cmap,_t), Estr__MapObjDat );}
 
 _genproc(b)	_genproc(w)

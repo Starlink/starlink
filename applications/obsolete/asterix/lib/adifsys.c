@@ -201,9 +201,9 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
   adic_cget0c( fid, "MODE", 7, cmode, status );
   if ( (cmode[0] != 'r') && (cmode[0] != 'R') ) {
 
-    adic_there( repid, "COMIT_RTN", &there, status );
+    adic_there( repid, "ComitRtn", &there, status );
     if ( there ) {
-      adix_locrcb( repid, "COMIT_RTN", _CSM, &ortn, status );
+      adix_locrcb( repid, "ComitRtn", _CSM, &ortn, status );
 
 /* Try to close the file */
       ADIkrnlExecO( ortn, fid, status );
@@ -211,10 +211,10 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
     }
 
 /* Representation has supplied a closure routine? */
-  adic_there( repid, "CLOSE_RTN", &there, status );
+  adic_there( repid, "CloseRtn", &there, status );
 
   if ( there ) {
-    adix_locrcb( repid, "CLOSE_RTN",	/* Locate the opening routine */
+    adix_locrcb( repid, "CloseRtn",	/* Locate the opening routine */
               _CSM, &ortn, status );
 
 /* Try to close the file */
@@ -270,7 +270,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
     else {
 
 /* Locate the file creation routine */
-      adix_locrcb( rid, "CREAT_RTN", _CSM, &ortn, status );
+      adix_locrcb( rid, "CreatRtn", _CSM, &ortn, status );
 
 /* Try to create the file */
       adix_fcreat_int( ortn, fid, id, fileid, status );
@@ -283,27 +283,28 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
     while ( _valid_q(curp) && ! found )	/* Loop over representations */
       {
+      ADIobj		cdr;
       ADIlogical	there=ADI__false;
 
-      rid = _CAR(curp);
+      _GET_CARCDR(rid,cdr,curp);
 
-      adic_there( rid, "CREAT_RTN", &there, status );
+      adic_there( rid, "CreatRtn", &there, status );
 
       if ( there ) {
-        adix_locrcb( rid, "CREAT_RTN",	/* Locate the opening routine */
-                     _CSM, &ortn, status );
+	adix_locrcb( rid, "CreatRtn",	/* Locate the opening routine */
+		     _CSM, &ortn, status );
 
 /* Try to create the file */
-        adix_fcreat_int( ortn, fid, id, fileid, status );
+	adix_fcreat_int( ortn, fid, id, fileid, status );
 
-        if ( _ok(status) )		/* Did it work? */
+	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
-        else
-          adix_errcnl( status );
-        }
+	else
+	  adix_errcnl( status );
+	}
 
       if ( ! found )			/* Next one */
-        curp = _CDR(curp);
+	curp = cdr;
       }
 
     }
@@ -378,7 +379,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
       adic_setecs( ADI__INVARG, "File representation /^REP/ not known",
                    status );
     else {
-      adix_locrcb( rid, "OPEN_RTN",	/* Locate the open routine */
+      adix_locrcb( rid, "OpenRtn",	/* Locate the open routine */
 		   _CSM, &ortn, status );
 
 /* Try to open file */
@@ -392,27 +393,28 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
     while ( _valid_q(curp) && ! found )	/* Loop over representations */
       {
+      ADIobj		cdr;
       ADIlogical	there=ADI__false;
 
-      rid = _CAR(curp);
+      _GET_CARCDR(rid,cdr,curp);
 
-      adic_there( rid, "OPEN_RTN", &there, status );
+      adic_there( rid, "OpenRtn", &there, status );
 
       if ( there ) {
-        adix_locrcb( rid, "OPEN_RTN",	/* Locate the opening routine */
-                     _CSM, &ortn, status );
+	adix_locrcb( rid, "OpenRtn",	/* Locate the opening routine */
+		     _CSM, &ortn, status );
 
-        adix_fopen_int( ortn, fid, mid,	/* Try to open file */
-                        id, status );
+	adix_fopen_int( ortn, fid, mid,	/* Try to open file */
+			id, status );
 
-        if ( _ok(status) )		/* Did it work? */
+	if ( _ok(status) )		/* Did it work? */
 	  found = ADI__true;
-        else
-          adix_errcnl( status );
-        }
+	else
+	  adix_errcnl( status );
+	}
 
       if ( ! found )			/* Next one */
-        curp = _CDR(curp);
+	curp = cdr;
       }
 
     }
@@ -476,8 +478,8 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 /* Loop until found or finished */
   while ( (curp!=ADI__nullid) && _ok(status) && ! found ) {
 
-/* Locate class definition object */
-    cid = _CAR(curp);
+/* Locate class definition object and advance cursor */
+    _GET_CARCDR( cid, curp, curp );
 
 /* Find NAME member insertion */
     adic_find( cid, "NAME", &nid, status );
@@ -487,8 +489,6 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
       found = ADI__true;
       *id = cid;
       }
-    else
-      curp = _CDR(curp);
 
 /*  Release NAME member */
     adic_erase( &nid, status );
@@ -554,25 +554,25 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
 void ADIfsysInit( ADIstatus status )
   {
   DEFINE_CSTR_TABLE(stringtable)
-    CSTR_TABLE_ENTRY(DnameAround, "Around"),
-    CSTR_TABLE_ENTRY(DnameAfter,  "After"),
-    CSTR_TABLE_ENTRY(DnameBefore, "Before"),
-    CSTR_TABLE_ENTRY(DnamePrimary,"Primary"),
-    CSTR_TABLE_ENTRY(DnameNewLink,"NewLink"),
-    CSTR_TABLE_ENTRY(DnameSetLink,"SetLink"),
-    CSTR_TABLE_ENTRY(DnameUnLink, "UnLink"),
+    CSTR_TENTRY(DnameAround, "Around"),
+    CSTR_TENTRY(DnameAfter,  "After"),
+    CSTR_TENTRY(DnameBefore, "Before"),
+    CSTR_TENTRY(DnamePrimary,"Primary"),
+    CSTR_TENTRY(DnameNewLink,"NewLink"),
+    CSTR_TENTRY(DnameSetLink,"SetLink"),
+    CSTR_TENTRY(DnameUnLink, "UnLink"),
   END_CSTR_TABLE;
 
   DEFINE_GNRC_TABLE(gnrctable)
-    GNRC_TABLE_ENTRY("NewLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
-    GNRC_TABLE_ENTRY("SetLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
-    GNRC_TABLE_ENTRY("UnLink(lhs,rhs)",  adix_cdsp_vo,	adix_fdsp_vo),
+    GNRC_TENTRY("NewLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
+    GNRC_TENTRY("SetLink(lhs,rhs)", adix_cdsp_voo,	adix_fdsp_voo),
+    GNRC_TENTRY("UnLink(lhs,rhs)",  adix_cdsp_vo,	adix_fdsp_vo),
   END_GNRC_TABLE;
 
   DEFINE_MTHD_TABLE(mthdtable)
-    MTHD_TABLE_ENTRY( "NewLink(ADIbase,ADIbase)", adix_base_NewLink ),
-    MTHD_TABLE_ENTRY( "SetLink(ADIbase,ADIbase)", adix_base_SetLink ),
-    MTHD_TABLE_ENTRY( "UnLink(ADIbase,ADIbase)", adix_base_UnLink ),
+    MTHD_TENTRY( "NewLink(ADIbase,ADIbase)", adix_base_NewLink ),
+    MTHD_TENTRY( "SetLink(ADIbase,ADIbase)", adix_base_SetLink ),
+    MTHD_TENTRY( "UnLink(ADIbase,ADIbase)",  adix_base_UnLink ),
   END_MTHD_TABLE;
 
   _chk_stat;
@@ -581,7 +581,7 @@ void ADIfsysInit( ADIstatus status )
   ADIkrnlAddCommonStrings( stringtable, status );
 
   adic_defcls( "FileRepresentation", "",
-	   "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN",
+	   "NAME,OpenRtn,CreatRtn,NatrlRtn,CloseRtn,ComitRtn",
 	       &DsysFileRep, status );
   adic_defcac( DsysFileRep, 8, status );
 

@@ -43,9 +43,9 @@ void tblx_init( ADIstatus status )
 
 
 
-ADIobj ECItableIterate( ADIobj	table,
-			ADIobj 	(*iterator)(ADIobj,ADIobj,ADIstatus),
-			ADIobj	iarg, ADIstatus status )
+ADIobj tblx_iterate( ADIobj table,
+		     ADIobj (*iterator)(ADIobj,ADIobj,ADIstatus),
+		     ADIobj iarg, ADIstatus status )
   {
   ADIinteger	i;		/* Loop over hash heads */
   ADIobj        *chead;         /* Head of has list */
@@ -58,10 +58,14 @@ ADIobj ECItableIterate( ADIobj	table,
       {
       cptr = *chead;
       while ( cptr ) {
-	rval = (*iterator)( _CAR(cptr), iarg, status );
+	ADIobj	car,cdr;
+
+	_GET_CARCDR(car,cdr,cptr);
+
+	rval = (*iterator)( car, iarg, status );
 	if ( rval )
 	  robj = lstx_cell( rval, robj, status );
-	cptr = _CDR(cptr);
+	cptr = cdr;
 	}
       }
     }
@@ -83,6 +87,7 @@ ADIobj ECItableIterate( ADIobj	table,
 ADIlogical tblx_scan( ADIobj *head, char *str, int slen, ADIobj **sptr,
 		      ADIstatus status )
   {
+  ADIobj	*car,*cdr;		/* Sides of list cell */
   ADIobj        cstr;                   /* Current dataobj name */
   ADIlogical	found = ADI__false;	/* Return value */
   int           test = 1;               /* String comparison */
@@ -97,8 +102,11 @@ ADIlogical tblx_scan( ADIobj *head, char *str, int slen, ADIobj **sptr,
 /* and not past name in alphabet */
   while ( _valid_q(**sptr) && ! found && (test>=0) ) {
 
+/* Extract links from this list cell */
+    _GET_CARCDR_A(car,cdr,**sptr);
+
 /* Current name */
-    cstr = _CAAR(**sptr);
+    cstr = _CAR(*car);
 
 /* Compare the two names */
     test = strx_cmpc( str, slen, cstr );
@@ -109,7 +117,7 @@ ADIlogical tblx_scan( ADIobj *head, char *str, int slen, ADIobj **sptr,
 
 /* Next list element if query name precedes current one alphabetically */
     else if ( test > 0 )
-      *sptr = &_CDR(**sptr);
+      *sptr = cdr;
     }
 
   return found;
@@ -119,6 +127,7 @@ ADIlogical tblx_scan( ADIobj *head, char *str, int slen, ADIobj **sptr,
 ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 		       ADIstatus status )
   {
+  ADIobj	*car,*cdr;		/* Sides of list cell */
   ADIobj        cstr;                   /* Current dataobj name */
   ADIlogical	found = ADI__false;	/* Return value */
   ADIstring	*sdat = _str_data(str);	/* String data block */
@@ -134,8 +143,11 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 /* and not past name in alphabet */
   while ( _valid_q(**sptr) && ! found && (test>=0) ) {
 
+/* Extract links from this list cell */
+    _GET_CARCDR_A(car,cdr,**sptr);
+
 /* Current name */
-    cstr = _CAAR(**sptr);
+    cstr = _CAR(*car);
 
 /* Compare the two names - fast check for equality */
     if ( cstr == str )
@@ -151,11 +163,32 @@ ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
 
 /* Next list element if query name precedes current one alphabetically */
       else if ( test > 0 )
-	*sptr = &_CDR(**sptr);
+	*sptr = cdr;
       }
     }
 
   return found;
+  }
+
+
+ADIobj *tblx_lochead( ADIobj *table, char *str, int slen, ADIstatus status )
+  {
+  int           hcode;                  /* Table hashing code */
+  ADIobj	*head = table;
+  int           hval;                   /* String hash value */
+  ADIinteger    lhcode = 0;
+
+  if ( _tbl_q(*table) )	{		/* Table or a-list? */
+    adic_get0i( _tbl_htsize(*table), &lhcode, status );
+    hcode = (int) lhcode;
+
+/* Find string's hash value */
+    strx_hash( str, slen, hcode, &hval, status );
+
+    head = _tbl_hash(*table) + hval;
+    }
+
+  return head;
   }
 
 
@@ -178,6 +211,28 @@ ADIobj tblx_new( int size, ADIstatus status )
   }
 
 
+/*
+ * Add a cell to a hash table/association list
+ */
+ADIobj tblx_cell( ADIobj *lentry, ADIobj nstr, ADIobj dataobj,
+		  ADIstatus status )
+  {
+  ADIobj	hnode;
+  ADIobj	rval;
+
+/* Create dotted pair */
+  rval = lstx_cell( nstr, dataobj, status ),
+
+/* The new hash node */
+  hnode = lstx_cell( rval, *lentry, status );
+
+/* Patch node into list */
+  *lentry = hnode;
+
+/* Return the dotted pair object */
+  return rval;
+  }
+
 
 /*  tblx_sadd - Add entry to table if not already present
  */
@@ -186,27 +241,14 @@ ADIobj tblx_sadd( ADIobj *table, char *str, int slen,
   {
   ADIobj        *lentry;                /* List insertion point */
   ADIobj	rval;			/* The associated data object */
-  int           hcode;                  /* Table hashing code */
   ADIobj	*head;			/* Head of dataobj list */
-  ADIobj        hnode;                  /* New element for table hash list */
-  int           hval;                   /* String hash value */
-  ADIinteger    lhcode = 0;
   ADIobj        nstr;                   /* Newly created ADI string */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
 
-  if ( _tbl_q(*table) )	{		/* Table or a-list? */
-    adic_get0i( _tbl_htsize(*table), &lhcode, status );
-    hcode = (int) lhcode;
-
-/* Find string's hash value */
-    strx_hash( str, slen, hcode, &hval, status );
-
-    head = _tbl_hash(*table) + hval;
-    }
-  else
-    head = table;
+/* Locate list head */
+  head = tblx_lochead( table, str, slen, status );
 
 /* Look along list for string */
   if ( tblx_scan( head, str, slen, &lentry, status ) )
@@ -216,13 +258,37 @@ ADIobj tblx_sadd( ADIobj *table, char *str, int slen,
 /* Create new string */
     adic_newv0c_n( str, slen, &nstr, status );
 
-    hnode = lstx_cell(                  /* The new hash node */
-		lstx_cell( nstr, dataobj, status ),
-		*lentry, status );
+/* Create new entry and return dotted pair */
+    rval = tblx_cell( lentry, nstr, dataobj, status );
+    }
 
-    *lentry = hnode;                    /* Patch node into list */
+  return rval;
+  }
 
-    rval = _CAR(hnode);                 /* Return the dotted pair object */
+
+/*  tblx_saddi - Add entry to table if not already present
+ */
+ADIobj tblx_saddi( ADIobj *table, ADIobj str,
+		   ADIobj dataobj, ADIstatus status )
+  {
+  ADIobj        *lentry;                /* List insertion point */
+  ADIobj	rval;			/* The associated data object */
+  ADIobj	*head;			/* Head of dataobj list */
+  ADIstring	*sdat = _str_data(str);
+
+  if ( !_ok(status) )                   /* Check status */
+    return ADI__nullid;
+
+/* Locate list head */
+  head = tblx_lochead( table, sdat->data, sdat->len, status );
+
+/* Look along list for string */
+  if ( tblx_scani( head, str, &lentry, status ) )
+    rval = _CAR(*lentry);
+  else {
+
+/* Create new entry and return dotted pair */
+    rval = tblx_cell( lentry, adix_clone( str, status ), dataobj, status );
     }
 
   return rval;
@@ -238,28 +304,13 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
   ADIobj	rstr = ADI__nullid;	/* The string in the table */
 
   ADIobj	*head;			/* Head of dataobj list */
-  int           hcode;
-  ADIobj        hnode;                  /* New element for table hash list */
-  int           hval;                   /* String hash value */
   ADIobj        nstr;
-  ADIinteger    lhcode;                  /* Table hashing code */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
 
-/* Table or a-list? */
-  if ( _tbl_q(*table) )	{
-    adic_get0i( _tbl_htsize(*table), &lhcode, status );
-
-    hcode = (int) lhcode;
-
-/* Find string's hash value */
-    strx_hash( str, slen, hcode, &hval, status );
-
-    head = _tbl_hash(*table) + hval;
-    }
-  else
-    head = table;
+/* Locate list head */
+  head = tblx_lochead( table, str, slen, status );
 
 /* Look along list for string */
   if ( tblx_scan( head, str, slen, &lentry, status ) )
@@ -268,14 +319,8 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
   else {
     adic_newv0c_n( str, slen, &nstr, status );
 
-/* The new hash node */
-    hnode = lstx_cell(
-		lstx_cell( nstr, dataobj, status ),
-		*lentry, status );
-
-    *lentry = hnode;                    /* Patch node into list */
-
-    rstr = _CAR(hnode);                 /* Return the dotted pair address */
+/* Create new entry and return dotted pair */
+    rstr = tblx_cell( lentry, nstr, dataobj, status );
     }
 
   return rstr;
@@ -284,30 +329,18 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
 
 ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
   {
-  int           hcode;
   ADIobj	*head;			/* Head of list */
-  int           hval;                   /* String hash value */
   ADIobj        *lentry;                /* List insertion point */
-  ADIinteger    lhcode;                  /* Table hashing code */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
 
-  if ( _tbl_q(*table) )	{		/* Table or a-list? */
-    adic_get0i( _tbl_htsize(*table), &lhcode, status );
-    hcode = (int) lhcode;
-
-/* Find string's hash value */
-    strx_hash( str, slen, hcode, &hval, status );
-
-    head = _tbl_hash(*table) + hval;
-    }
-  else
-    head = table;
+/* Locate list head */
+  head = tblx_lochead( table, str, slen, status );
 
 /* Look along list for string */
   if ( tblx_scan( head, str, slen, &lentry, status ) )
-    return *lentry;
+    return _CAR(*lentry);
   else
     return ADI__nullid;
   }
@@ -315,31 +348,19 @@ ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
 
 ADIobj tblx_findi( ADIobj *table, ADIobj str, ADIstatus status )
   {
-  int           hcode;
   ADIobj	*head;			/* Head of list */
-  int           hval;                   /* String hash value */
   ADIobj        *lentry;                /* List insertion point */
-  ADIinteger    lhcode;                  /* Table hashing code */
   ADIstring	*sdat = _str_data(str);
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
 
-  if ( _tbl_q(*table) )	{		/* Table or a-list? */
-    adic_get0i( _tbl_htsize(*table), &lhcode, status );
-    hcode = (int) lhcode;
-
-/* Find string's hash value */
-    strx_hash( sdat->data, sdat->len, hcode, &hval, status );
-
-    head = _tbl_hash(*table) + hval;
-    }
-  else
-    head = table;
+/* Locate list head */
+  head = tblx_lochead( table, sdat->data, sdat->len, status );
 
 /* Look along list for string */
   if ( tblx_scani( head, str, &lentry, status ) )
-    return *lentry;
+    return _CAR(*lentry);
   else
     return ADI__nullid;
   }

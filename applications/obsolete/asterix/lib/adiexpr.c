@@ -39,8 +39,6 @@
 ADIobj	UT_ALLOC_etn = ADI__nullid;
 
 
-ADIobj	ADI_G_syms = ADI__nullid;
-
 _DEF_STATIC_CDEF("_SymbolBinding",sbind,128,ADIsymBinding);
 
 /*
@@ -64,19 +62,6 @@ ADIobj		ADI_G_vs[VSSIZE];
 ADIobj		*vs_limit;		/* Value stack limit */
 ADIobj		*vs_base;		/* Value stack base */
 ADIobj		*vs_top;		/* Value stakc top */
-#define _ARGLOOP_1ST_TO_NTH(x) \
-    for ( (x) = vs_base; ((x) < vs_top); (x)++ )
-#define _ARGLOOP_1ST_TO_NTH_AND(x,cond) \
-    for ( (x) = vs_base; ((x) < vs_top) && (cond); (x)++ )
-#define _ARGLOOP_2ND_TO_NTH(x) \
-    for ( (x) = vs_base+1; ((x) < vs_top); (x)++ )
-#define _ARGLOOP_2ND_TO_NTH_AND(x,cond) \
-    for ( (x) = vs_base+1; ((x) < vs_top) && (cond); (x)++ )
-#define _ARGLOOP_NTH_TO_1ST(x) \
-    for ( (x) = vs_top-1; ((x) >= vs_base); (x)-- )
-#define _ARGLOOP_NTH_TO_1ST_AND(x,cond) \
-    for ( (x) = vs_top-1; ((x) >= vs_base) && (cond); (x)-- )
-#define _NARG ((int)(vs_top-vs_base))
 
 int		ss_top;			/* Top of the slot stack */
 
@@ -88,13 +73,214 @@ ADIstackFrame	ADI_G_fs[FSSIZE];		/* The frame stack */
 
 ADIstackFrame	*fs_top;		/* Frame stack top */
 
-#define		fs_push(afunc)	 (++fs_top)->func = (afunc);  \
-				 {ss_top += fs_top->nslot; \
-				 fs_top->top = vs_top;}
 
-#define         fs_pop 		 {ss_top -= fs_top->nslot;\
-				 (fs_top--);fs_top->exec=fs_top[1].exec;}
+void ADIexprPopFS( ADIstatus status )
+  {
+  ss_top -= fs_top->nslot;
+  fs_top--;
+  fs_top->exec = fs_top[1].exec;
+  }
 
+void ADIexprPushFS( int tslot, ADIobj func, ADIstatus status )
+  {
+  if ( (fs_top - ADI_G_fs + 1) < FSSIZE ) {
+
+/* Go to next stack frame */
+    fs_top++;
+
+/* Is this the base frame? */
+    if ( fs_top == ADI_G_fs ) {
+      fs_top->nslot = 0;
+
+/* Initialise object stack */
+      vs_top = vs_base = ADI_G_vs;
+
+/* Initialise slot stack */
+      ss_top = 0;
+      }
+
+/* Otherwise increment the slot stack pointer */
+    else
+      ss_top += fs_top->nslot;
+
+/* Define the symbol table if one is required */
+    if ( tslot )
+      fs_top->syms = tblx_new( tslot, status );
+    else
+      fs_top->syms = ADI__nullid;
+
+/* Store the invoking function */
+    fs_top->func = func;
+
+/* Set the new current value stack position */
+    fs_top->top = vs_top;
+
+/* Clear the exception field */
+    fs_top->exec = ADI__nullid;
+    }
+  else
+    adic_setecs( ADI__OUTMEM, "ADI has overflowed its frame stack", status );
+  }
+
+
+/*
+ *  Test a method/function definition against values on the stack. Method
+ *  arguments positions define slots - each slot may map on to zero or more
+ *  values on the stack. If the binding matches the arguments on the stack
+ *  the location of the first stack value, and the number of subsequent
+ *  values is stored for each slot. If arguments have names then entries in
+ *  the local symbol table are made.
+ */
+ADIlogical ADIexprTestBind( ADIobj sbind, ADIstatus status )
+  {
+  ADIobj	arg;			/* Current defined args */
+  ADIobj	carg;			/* Cursor over defined args */
+  ADIobj	*cur_sp;
+  ADIclassDef	*cur_sp_t;
+  ADIobj	earg;
+  ADIobj	head;
+  int		iarg;
+  ADIlogical	match = ADI__true;
+  ADIclassDef   *margc;
+  ADIobj	mclass;
+  ADIlogical	mmode;			/* Method (or function) mode */
+  ADImethod	*mthd;
+  int		nleft;			/* Number of values to process */
+  int		nslot = 0;
+  int		nmin, nmax;		/* Allowed slot value count */
+  ADIlogical	ok;
+  int		sacnt;			/* Count of stacked values in slot */
+
+  _chk_stat_ret(ADI__false);
+
+/* Locate the method data */
+  mthd = _mthd_data(sbind);
+
+/* Cursor over defined arguments */
+  carg = mthd->args;
+
+/* Method mode? In function mode argument matching is exact - derived */
+/* class instances are not valid arguments to functions with specified */
+/* argument classes */
+  mmode = _valid_q( mthd->form );
+
+/* Current stack position */
+  cur_sp = vs_base;
+  cur_sp_t = _DTDEF(*cur_sp);
+  nleft = _NARG;
+
+/* For each defined slot, find matching stacked arguments */
+  for( iarg=0; _valid_q(carg) && match && nleft; iarg++ ) {
+
+/* Get current arg definition and advance cursor */
+    _GET_CARCDR( arg, carg, carg );
+
+/* Initialise for this slot */
+    sacnt = 0;
+    margc = NULL;
+
+/* Argument spec is an expression node? */
+    if ( _etn_q(arg) ) {
+
+/* Test for the various Blank* options */
+      _GET_HEDARG( head, earg, arg );
+      if ( head == K_Blank ) {
+	nmin = nmax = 1;
+	}
+      else if ( head == K_BlankSeq ) {
+	nmin = 1;
+	nmax = 999;
+	}
+      else if ( head == K_BlankNullSeq ) {
+	nmin = 0;
+	nmax = 999;
+	}
+      else
+	adic_setecs( ADI__INVARG, "Invalid arg spec %O", status, arg );
+
+      if ( _ok(status) ) {
+
+/* Locate match class */
+	mclass = _CAR(earg);
+	if ( _null_q(mclass) )
+	  mclass = K_WildCard;
+	else if ( _etn_q(mclass) )
+	  mclass = _etn_head(mclass);
+	else
+	  ADIstrmPrintf( ADIcvStdOut, "Comp %O and %O\n",status,mclass,cur_sp_t->aname);
+
+/* Count matching stack values up to a limit of nmax */
+	ok = ADI__true;
+	while ( (sacnt < nmax) && ok && nleft ) {
+
+	  if ( mclass == K_WildCard )
+	    ;
+
+	  else if ( mclass == cur_sp_t->aname )
+	    ;
+
+	  else if ( mmode ) {
+
+	    if ( ! margc )
+	      margc = adix_loccls( mclass, status );
+
+/* Method arg class must exist in the inheritance list of the user arg */
+	    ok = adix_chkder(cur_sp_t,margc,status);
+	    }
+
+/* Otherwise there is no argument match */
+	  else
+	    ok = ADI__false;
+
+	  if ( ok ) {
+	    sacnt++;
+	    cur_sp++;
+	    nleft--;
+	    if ( nleft ) cur_sp_t = _DTDEF(*cur_sp);
+	    }
+	  }
+
+/* Number of values matches requirement? */
+	match = ((sacnt>=nmin) && (sacnt<=nmax));
+
+/* If good match store the slot details */
+	if ( match ) {
+	  slots[ss_top+iarg] = sacnt;
+	  }
+	}
+      }
+    else
+      adic_setecs( ADI__INVARG, "Invalid arg spec %O", status, arg );
+
+    nslot++;
+    }
+
+/* Check for unused arguments */
+  if ( nleft || _valid_q(carg) )
+    match = ADI__false;
+  else if ( _ok(status) )
+    fs_top->nslot = nslot;
+
+  return _ok(status) ? match : ADI__false;
+  }
+
+ADIobj ADIexprOwnArg( ADIobj *arg, ADIstatus status )
+  {
+  ADIobj	marg;
+
+  _chk_stat_ret(ADI__nullid);
+
+  if ( _valid_q(*arg) ) {
+    if ( _han_ref(*arg) > 1 )
+      marg = adix_copy( *arg, status );
+    else {
+      marg = *arg;
+      *arg = ADI__nullid;
+      }
+    }
+
+  return marg;
+  }
 
 
 ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
@@ -104,7 +290,7 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
   int		ilist;			/* Loop over lists */
   ADIobj	*cursor = vs_top;
   ADIinteger	llen;			/* List length */
-  ADIobj	*newargl = vs_top+nlist;/* Argument lists for new heads */
+  ADIobj	*newargl = vs_top + nlist;/* Argument lists for new heads */
   ADIobj 	robj = ADI__nullid;	        /* Returned object */
 
   if ( _ok(status) ) {
@@ -125,12 +311,12 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
 
 /* Extract next list elements*/
       for( ilist=0; ilist<nlist; ilist++) {
+	ADIobj	car_c;
 
-	newargl[ihead] = lstx_cell(
-		adix_copy( _CAR(cursor[ilist]), status ),
+	_GET_CARCDR(car_c,cursor[ilist],cursor[ilist]);
+
+	newargl[ihead] = lstx_cell( adix_copy( car_c, status ),
 		newargl[ihead], status );
-
-	cursor[ilist] = _CDR(cursor[ilist]);
 	}
 
 /* Reverse list elements in situ */
@@ -155,37 +341,107 @@ ADIobj ADIexprMapFun( ADIobj head, ADIobj *first,
   }
 
 
-ADIobj ADIsymFind( ADIobj name, ADIstatus status )
+/*
+ * Locate symbol binding(s) with specified name. If the 2nd argument is
+ * true the first binding in the symbol search tree is taken, otherwise
+ * a list is returned of all the collected bindings. This list should be
+ * be destroyed using lstx_sperase
+ */
+ADIobj ADIsymFind( ADIobj name, ADIlogical takefirst, int forms,
+		   ADIstatus status )
   {
+  ADIobj	cbind;
+  ADIstackFrame	*curfs = fs_top;
+  ADIlogical	found = ADI__false;
   ADIobj	nvpair;
+  ADIobj	rval = ADI__nullid;
+  ADIobj	*ipoint = &rval;
 
-  nvpair = tblx_findi( &ADI_G_syms, name, status );
+  while ( (curfs >= ADI_G_fs) && ! found ) {
 
-  return _valid_q(nvpair) ? _CDR(nvpair) : ADI__nullid;
+    nvpair = tblx_findi( &curfs->syms, name, status );
+    if ( _valid_q(nvpair) ) {
+      cbind = _CDR(nvpair);
+      while ( _valid_q(cbind) && ! found ) {
+	if ( _sbind_form(cbind) & forms ) {
+	  if ( takefirst ) {
+	    rval = cbind;
+	    found = ADI__true;
+	    }
+	  else {
+	    *ipoint = lstx_cell( cbind, ADI__nullid, status );
+            ipoint = &_CDR(*ipoint);
+	    }
+	  }
+
+	cbind = _sbind_next(cbind);
+	}
+      }
+
+    curfs--;
+    }
+
+  return rval;
   }
 
-ADIobj ADIsymBinds( ADIobj symbol, int forms, ADIstatus status )
+
+ADIobj ADIsymAddBind( ADIobj name, ADIlogical global, ADIobj bind,
+		      ADIstatus status )
   {
-  ADIobj	curp = symbol;
-  ADIobj	slist;
-  ADIobj	*ipoint = &slist;
+  ADIstackFrame		*fs;
+  ADIinteger		exclusive_forms = ADI__class_sb|ADI__mcf_sb;
+  ADIobj	nvpair;
+
+  fs = (global ? ADI_G_fs : fs_top);
+
+  nvpair = tblx_saddi( &fs->syms, name, ADI__nullid, status );
+
+  if ( _ok(status) && _valid_q(nvpair) ) {
+    ADIobj		*ipoint = &_CDR(nvpair);
+    ADIsbindForm	iform = _sbind_form(bind);
+    ADIlogical		ok = ADI__true;
+    ADIobj		cbind = *ipoint;
+
+/* Check if binding form demands that only one binding should exist */
+    if ( _valid_q(cbind) && (iform & exclusive_forms) ) {
+      while ( _valid_q(cbind) && ok ) {
+	if ( iform == _sbind_form(cbind) ) {
+	  adic_setecs( ADI__SYMDEF,
+		"Symbol already has a binding of requested form", status );
+	  }
+	else
+	  cbind = _sbind_next(cbind);
+	}
+      }
+
+/* Add binding to head of symbol binding list */
+    if ( ok ) {
+      _sbind_next(bind) = *ipoint;
+      *ipoint = bind;
+      }
+    }
+
+  return nvpair;
+  }
+
+
+ADIobj ADIsbindNew( ADIsbindForm form, ADIobj data, ADIstatus status )
+  {
+  ADIobj	newid;
 
   _chk_stat_ret(ADI__nullid);
 
-  while ( curp && _ok(status) ) {
-    ADIobj	bind = _CAR(curp);
-    ADIsymBinding	*bdata = _sbind_data(bind);
+/* Allocate the new binding object */
+  newid = adix_cls_alloc( &KT_DEFN_sbind, status );
 
-    if ( bdata->form & forms ) {
-      ADIobj ncell = lstx_cell( bind,ADI__nullid, status );
-      *ipoint = ncell;
-      ipoint = &_CDR(ncell);
-      }
-
-    curp = _CDR(curp);
+/* Set fields if allocation went ok */
+  if ( _ok(status) ) {
+    _sbind_form(newid) = form;
+    _sbind_defn(newid) = data;
     }
 
-  return slist;
+/* Return binding to caller */
+  return newid;
   }
 
 
@@ -211,31 +467,25 @@ ADIobj ADIetnNew( ADIobj head, ADIobj args, ADIstatus status )
 void ADIetnPrint( int narg, ADIobj args[], ADIstatus status )
   {
   ADIobj          arglink;
+  ADIobj	car;
+  ADIobj	head;
 
   if ( _valid_q(args[1]) ) {
-    adix_print( args[0], _etn_head(args[1]), 1, ADI__true, status );
+    _GET_HEDARG( head, arglink, args[1] );
 
-    arglink = _etn_args(args[1]);
+    adix_print( args[0], head, 1, ADI__true, status );
+
     if ( arglink ) {
       ADIstrmPrintf( args[0], "(", status );
       while ( _valid_q(arglink) && _ok(status) ) {
-	adix_print( args[0], _CAR(arglink), 1, ADI__true, status );
-	arglink = _CDR(arglink);
+	_GET_CARCDR( car, arglink, arglink );
+	adix_print( args[0], car, 1, ADI__true, status );
 	if ( _valid_q(arglink) )
 	  ADIstrmPrintf( args[0], ", ", status );
 	}
       ADIstrmPrintf( args[0], ")", status );
       }
     }
-  }
-
-
-/*
- * Test args on stack against binding
- */
-ADIlogical ADIsymTestBind( ADIobj bind, ADIstatus status )
-  {
-  return _ok(status) ? _valid_q(bind) : ADI__false;
   }
 
 
@@ -251,22 +501,21 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 			ADIstatus status )
   {
   ADIobj                a_bind;         /* Loop over binding list */
-  ADIobj                alist;          /* Argument list */
   ADIlogical               all_list;
   ADIlogical               anyargeval;     /* Any arguments changed? */
   ADIlogical               argchanged;
   ADIlogical               onstack = ADI__false;/* Arguments already on stack? */
   ADIobj                carg;           /* Loop over arguments */
+  ADIobj		earg;
   ADIlogical               defer_error=ADI__false;
   ADIlogical               finished = ADI__false;
+  ADIobj		head;
   int                   iter = 0;       /* Iterations through eval loop */
-  ADIobj                last_head = ADI__nullid;
   ADIinteger              llen;           /* Length of list argument */
   ADIlogical               match;          /* Binding match found? */
   ADIobj                newval;         /* New argument value */
   ADIobj                robj;           /* Result object */
   ADIobj                s_bind;
-  ADIobj                symbol;
   ADIobj                *old_vs_base,*old_vs_top;
   ADIobj                *vs_first, *vs_last;
   ADIobj                *vs_ptr;        /* Loop over virtual stack */
@@ -286,31 +535,32 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Default is no change */
     *changed = ADI__false;
 
-/* Structured expression? */
-    if ( _etn_q(expr) && _valid_q(_etn_args(expr)) ) {
+/* Extract expression head and args if that kind of object */
+    if ( _etn_q(expr) )
+      _GET_HEDARG( head, earg, expr );
 
-/* Expression head has changed? If so, look up symbol bindings */
-      if ( last_head != _etn_head(expr) ) {
-	symbol = ADIsymFind( _etn_head(expr), status );
-	last_head = _etn_head(expr);
-	}
+/* Structured expression? */
+    if ( _etn_q(expr) && _valid_q(earg) ) {
 
       wereonstack = onstack;
-      if ( onstack )                    /* Stack already initialised? */
-	{
+
+/* Stack already initialised? */
+      if ( onstack )
 	onstack = ADI__false;
-	}
-      else
-	{
-	old_vs_base = vs_base;          /* Set up stack */
+
+/* Set up stack */
+      else {
+	old_vs_base = vs_base;
 	old_vs_top = vs_top;
 	vs_base = vs_top;
 
-	carg = _etn_args(expr);          /* Stack the unevaluated arguments */
-	while ( _valid_q(carg) && _ok(status) )
-	  {
-	  vs_push( _CAR(carg) );
-	  carg = _CDR(carg);
+/* Stack the unevaluated arguments */
+	carg = earg;
+	while ( _valid_q(carg) && _ok(status) ) {
+	  ADIobj	car;
+
+	  _GET_CARCDR( car, carg, carg );
+	  vs_push( adix_clone( car, status ) );
 	  }
 	}
 
@@ -322,25 +572,25 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
       anyargeval = ADI__false;
 
 /* Was a symbol found inthe symbol table? */
-      if ( _valid_q(symbol) ) {
+      if ( head ) {
 
-/* Gather the list of bindings of type Transform or Definition */
-	s_bind = ADIsymBinds( symbol, SBIND__trnsfm|SBIND__defn, status );
+/* Gather the list of bindings of type Function */
+	s_bind = ADIsymFind( head, ADI__false, ADI__fun_sb, status );
 
 	if ( _valid_q(s_bind) ) {
 
 /* HoldAll arguments? */
-	  if ( _valid_q(adix_pl_geti(symbol, K_HoldAll, status )) )
+	  if ( _valid_q(adix_pl_geti(head, K_HoldAll, status )) )
 	    vs_first = vs_last + 1;
 
 	  else {
 
 /* HoldFirst argument? */
-	    if ( _valid_q(adix_pl_geti( symbol, K_HoldFirst, status )) )
+	    if ( _valid_q(adix_pl_geti( head, K_HoldFirst, status )) )
 	      vs_first++;
 
 /* HoldRest arguments? */
-	    if ( _valid_q(adix_pl_geti( symbol, K_HoldRest, status )) )
+	    if ( _valid_q(adix_pl_geti( head, K_HoldRest, status )) )
 	      vs_last = vs_first;
 	    }
 	  }
@@ -354,21 +604,23 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Evaluate stacked item */
 	  newval = ADIexprEvalInt( *vs_ptr, level+1, &argchanged, status );
 
-	  if ( argchanged )             /* Did the value change? */
-	    {
+/* Did the value change? */
+	  if ( argchanged ) {
+
+/* Replace stacked object with result of expression evaluation */
 	    adix_erase( vs_ptr, 1, status );
+	    *vs_ptr = adix_clone( newval, status );
 
-	    *vs_ptr = newval;           /* Replace stacked object */
-
-	    anyargeval = ADI__true;          /* Mark arg list as changed */
+/* Mark arg list as changed */
+	    anyargeval = ADI__true;
 	    }
 	  }
 	}
 
-      if ( _valid_q(symbol) )                     /* Listable form? */
-	{
-	if ( _valid_q(_etn_args(expr)) )
-	  {
+/* Listable form? */
+      if ( _valid_q(head) ) {
+
+	if ( _valid_q(earg) ) {
 	  all_list = ADI__true;              /* Are all the arguments lists? */
 	  _ARGLOOP_1ST_TO_NTH_AND(vs_ptr,all_list)
 	  if ( *vs_ptr )
@@ -386,7 +638,7 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	if ( all_list ) {
 
 /* Listable function? */
-	  if ( _valid_q(adix_pl_geti(symbol, K_Listable, status )) ) {
+	  if ( _valid_q(adix_pl_geti(head, K_Listable, status )) ) {
 
 /* Get length of first list */
 	    llen = lstx_len( *vs_base, status );
@@ -404,35 +656,39 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 /* Map over lists? */
       if ( all_list ) {
 
-	robj = ADIexprMapFun( _etn_head(expr),
-		vs_base, vs_top-vs_base, status );
+	robj = ADIexprMapFun( head, vs_base, vs_top-vs_base, status );
 
 	*changed = ADI__true;
 	}
 
       else {
+	ADIobj	car_ab,cdr_ab;
+
 	match = ADI__false;                  /* Find a matching symbol definition? */
-	if ( _valid_q(symbol) ) {
+	if ( _valid_q(head) ) {
 	  a_bind = s_bind;
 	  while ( _valid_q(a_bind) && ! match ) {
-	    match = ADIsymTestBind( _sbind_defn(_CAR(a_bind)), status );
+
+	    _GET_CARCDR( car_ab, cdr_ab, a_bind );
+
+	    match = ADIexprTestBind( _sbind_defn(car_ab), status );
 	    if ( ! match )
-	      a_bind = _CDR(a_bind);
+	      a_bind = cdr_ab;
 	    }
 	  }
 
-	if ( match )                    /* Invoke function if match */
-	  {
-	  a_bind = _CAR(a_bind);
-	  if ( _sbind_form(a_bind) == SBIND__trnsfm )
-	    robj = adix_copy( _sbind_value(a_bind), status );
+	if ( match ) {                   /* Invoke function if match */
+	  a_bind = car_ab;
+	  if ( _sbind_form(a_bind) == ADI__trnsfm_sb )
+	    robj = adix_copy( _sbind_defn(a_bind), status );
 	  else
 	    {
-            robj = adix_exemth( ADI__nullid, _sbind_value(a_bind), _NARG,
-                                vs_first, status );
+	    ADIobj	mthd = _sbind_defn(a_bind);
 
-	    if ( !_ok(status) )         /* Bad status from procedure? */
-	      {
+	    robj = adix_exemth( ADI__nullid, _mthd_exec(mthd), _NARG,
+				vs_first, status );
+
+	    if ( !_ok(status) ) {       /* Bad status from procedure? */
 	      defer_error = ADI__true;
 	      finished = ADI__true;
 	      ems_begin_c( status );
@@ -441,29 +697,24 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
 	  *changed = ADI__true;              /* Result is always a change */
 	  }
-	else if ( ! anyargeval )        /* No args evaluated & no match */
-	  {                             /* means we're finished here */
+
+/* No args evaluated & no match means we're finished here */
+	else if ( ! anyargeval ) {
+
 	  finished = ADI__true;
 
-	  if ( wereonstack )            /* Args were on stack on loop entry */
-	    {                           /* means o/p object needs creating */
-	    alist = ADI__nullid;
-	    _ARGLOOP_NTH_TO_1ST(vs_ptr) /* Construct argument list */
-	      {
-/*	      if ( _MARK(*vs_ptr) & O_MARKED )
-		{
-		_MARK(*vs_ptr) &= O_MARKED_M;
-		alist = lstx_cell( *vs_ptr, alist, status );
-		}
-	      else */
-		alist = lstx_cell(
-		    adix_copy( *vs_ptr, status ),
-		    alist, status );
-	      }
+/* Args were on stack on loop entry means o/p object needs creating */
+	  if ( wereonstack ) {
+	    ADIobj	alist = ADI__nullid;
+
+/* Ensure we own all the values on the stack. Construct argument list */
+/* for the output expression */
+	    _ARGLOOP_NTH_TO_1ST(vs_ptr)
+	      alist = lstx_cell( ADIexprOwnArg( vs_ptr, status ),
+				 alist, status );
 
 /* Copy of head node */
-	    robj = ADIetnNew(
-		lstx_cell( _etn_head(expr), ADI__nullid, status ),
+	    robj = ADIetnNew( adix_clone( head, status ),
 		  alist, status );
 
 	    *changed = ADI__true;
@@ -481,67 +732,54 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 	}
 
       if ( anyargeval )                 /* Free dynamic arguments */
-	{
-	_ARGLOOP_1ST_TO_NTH(vs_ptr)             /* Free argument list */
-	    adix_erase( vs_ptr, 1, status );
-	}
+	_ARGLOOP_1ST_TO_NTH(vs_ptr)
+	  adix_erase( vs_ptr, 1, status );
 
-      if ( symbol )
+      if ( head )
 	lstx_sperase( &s_bind, status );      /* Remove binding list */
 
-      if ( finished || ! onstack )
-	{
+      if ( finished || ! onstack ) {
 	vs_base = old_vs_base;          /* Restore stack */
 	vs_top = old_vs_top;
 	}
       }
 
-    else if ( _etn_q(expr) )            /* Non-functional expression tree */
-      {
+/* Non-functional expression tree */
+    else if ( _etn_q(expr) ) {
 
-/* Locate symbol if present */
-      symbol = ADIsymFind( _etn_head(expr), status );
+      s_bind = ADIsymFind( head, ADI__false,
+		      ADI__defn_sb|ADI__trnsfm_sb, status );
 
-      if ( symbol ) {
-	s_bind = ADIsymBinds( _etn_head(expr),
-		      SBIND__defn|SBIND__trnsfm, status );
-
-	if ( ! _valid_q(s_bind) )
-	  s_bind = ADIsymBinds( _etn_head(expr), SBIND__enum, status );
+      if ( ! _valid_q(s_bind) )
+	s_bind = ADIsymFind( head, ADI__false, ADI__enum_sb, status );
 
 /* Did we match the symbol? */
-	if ( _valid_q(s_bind) ) {
+      if ( _valid_q(s_bind) ) {
 
 /* Access the symbol binding value */
-	  robj = adix_clone( _sbind_value(_CAR(s_bind)), status );
+	robj = adix_clone( _sbind_defn(_CAR(s_bind)), status );
 
 /* Remove symbol bindings */
-	  adix_erase( &s_bind, 1, status );
-	  *changed = ADI__true;
-	  finished = ADI__true;
-	  }
-	else {
-	  robj = expr;
-	  finished = ADI__true;
-	  }
+	lstx_sperase( &s_bind, status );
+	*changed = ADI__true;
+	finished = ADI__true;
 	}
-      else                                      /* Internal data forms */
-	{
-	robj = expr;                    /* Return unmatched identifier */
+      else {
+	robj = expr;
 	finished = ADI__true;
 	}
       }
 
-    else                                /* Internal data forms */
-      {
-      robj = expr;                      /* Just return the object */
-      finished = ADI__true;                  /* Always finish here */
+/* Internal data forms. Simply return the object and finish */
+    else {
+      robj = expr;
+      finished = ADI__true;
       }
 
     iter++;                             /* Bump up iteration counter */
 
-    if ( (iter>1) && *changed )         /* Free expression? */
-      adix_erase( &expr, 1, status );
+/*    if ( (iter>1) && *changed )          Free expression?
+      adix_erase( &expr, 1, status );                         */
 
     if ( ! finished )                   /* Another round of evaluation? */
       expr = robj;
@@ -549,9 +787,8 @@ ADIobj ADIexprEvalInt( ADIobj expr, int level, ADIlogical *changed,
 
   *changed |= (iter>1);                 /* Always changed after looping */
 
-  if ( _ok(status) && robj &&           /* Object must be dynamic on */
-       (level == 0) )                   /* return to base level */
-    {
+/* Object must be dynamic on return to base level */
+  if ( _ok(status) && _valid_q(robj) && (level == 0) ) {
     if ( _han_ref(robj) > 1 )           /* Is object dynamic? */
       robj = adix_copy( robj, status );  /* Make dynamic copy */
     }
@@ -571,19 +808,8 @@ void ADIetnInit( ADIstatus status )
 /* Define the printer */
   adic_defprt( UT_ALLOC_etn, (ADIcMethodCB) ADIetnPrint, status );
 
-/* Define the symbol table */
-  ADI_G_syms = tblx_new( 201, status );
-
-/* Initialise object stack */
-  vs_base = ADI_G_vs;
-  vs_top = vs_base;
-
 /* Initialise frame stack */
-  fs_top = ADI_G_fs;
-  fs_top->top = vs_top;
-  fs_top->func = NULL;
-
-/* Initialise slot stack */
-  ss_top = 0;
+  fs_top = ADI_G_fs - 1;
   }
+
 
