@@ -284,7 +284,7 @@
 
 *          Resample psf to exact source position
             CALL PSF_RESAMPLE( PSF_UDIMS(1), PSF_UDIMS(2),
-     :                %VAL(PSF_STORE), FC(1), FC(2),
+     :                %VAL(PSF_STORE), -FC(1), -FC(2),
      :                 %VAL(PSF_RESWPTR), %VAL(PSF_DATA), STATUS )
 
 *          Define position of psf on data grid
