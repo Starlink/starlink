@@ -189,7 +189,7 @@
 /*
  * Macro to assign Fortran POINTER type given some real pointer sptr
  */
-#define EXPORT_POINTER(sptr,dptr_addr) \
+#define _EXPORT_POINTER(sptr,dptr_addr) \
 {F77_POINTER_TYPE _pnt = (F77_POINTER_TYPE) sptr; \
 *((F77_POINTER_TYPE *) dptr_addr) = _pnt;}
 
