@@ -109,7 +109,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract the link data
-      CALL FRI0_GET( ID, NAME, FILE, STATUS )
+      CALL FRI_GET( ID, NAME, FILE, STATUS )
 
 *  Open the file
       CALL ADI_FOPEN( FILE, CLASS, MODE, LID, STATUS )

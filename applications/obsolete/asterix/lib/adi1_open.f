@@ -125,7 +125,8 @@
       IF ( EP .NE. 0 ) FLEN = EP - 1
 
 *    Check if slice or subcomponent delimiters present. Look for period
-*    after the last slash in the file name
+*    after the last slash in the file name if one is present, otherwise
+*    simply the first period
       EP = FLEN
       DO WHILE ( (EP.GT.0) .AND. (FSPEC(EP:EP).NE.'/') )
         EP = EP - 1
@@ -140,7 +141,7 @@
           END IF
         END IF
       ELSE
-        DP = 0
+        DP = INDEX( FSPEC, '.' )
       END IF
 
 *    Simple HDS file name?
@@ -157,7 +158,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Locate sub-component
-          CALL ADI1_FIND( TLOC, FSPEC(EP+1:FLEN), FLOC, STATUS )
+          CALL ADI1_FIND( TLOC, FSPEC(DP+1:FLEN), FLOC, STATUS )
 
 *        If successful promote the derived locator to that the file will be
 *        closed when FLOC is annulled
