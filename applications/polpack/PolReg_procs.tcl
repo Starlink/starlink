@@ -2309,6 +2309,10 @@ proc DrawGwm {} {
 # If a new image is being displayed...
    if { $IMSEC_REQ != $IMSEC_DISP } {
 
+# Set the text to display in the status area describing the sky subtraction
+# method.
+      SkyOff      
+
 # Extract the image name and section string from the requested image
 # section string. Save the old displayed image first.
       set old_image $IMAGE_DISP
@@ -6879,6 +6883,7 @@ proc LoadOptions {} {
    global ATASK_SELCOL
    global ATASK_SI
    global ATASK_VIEW
+   global ATASK_SKYOFF
    global ATASK_XHAIR
    global ATASK_XHRCOL
    global BADCOL      
@@ -6919,6 +6924,13 @@ proc LoadOptions {} {
    }
 
 # Do the same for the other options.
+   if { [info exists ATASK_SKYOFF] } {
+      set SKYOFF $ATASK_SKYOFF
+      set ATASK 1
+   } {
+      set SKYOFF 1
+   }
+
    if { [info exists ATASK_XHAIR] } {
       set XHAIR $ATASK_XHAIR
       set ATASK 1
@@ -8818,6 +8830,9 @@ proc Save {} {
 #        the last time the output images were saved. Set to a non-zero
 #        value if the output images are out-of-date with respect to the 
 #        mappings and/or masks.
+#     SKYOFF (Read)
+#        Should sky subtraction be performed? If not, then the input image
+#        name is returned unchanged.
 #     SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
@@ -8853,6 +8868,7 @@ proc Save {} {
    global RESAVE
    global SAFE
    global S_FONT
+   global SKYOFF
    global SKY_AREA
    global SKY_METHOD
    global STOP_BLINK
@@ -8894,7 +8910,7 @@ proc Save {} {
 
 # If the sky to be subtracted is defined within the object frames, 
 # ensure that sky areas have been defined.
-      } elseif { $SKY_METHOD == $SKY_AREA && ![CreateMask $im0 $O_RAY_SKY] } {
+      } elseif { $SKYOFF && $SKY_METHOD == $SKY_AREA && ![CreateMask $im0 $O_RAY_SKY] } {
          Message "The areas containing sky have not yet been supplied."
 
 # Otherwise, process each image section in turn...
@@ -8955,24 +8971,33 @@ proc Save {} {
                  -side top -fill both -expand 1
          }
 
-         set selab [label $fr2.r0b -text "Sky estimation:" -background $back]
-         set setick(O) [label $fr3.r0b -foreground $back \
-                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
-         set setick(E) [label $fr4.r0b -foreground $back \
-                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
-         pack $selab     -side top -anchor w -fill y -expand 1
-         pack $setick(O) -side top -anchor w -fill y -expand 1
-         pack $setick(E) -side top -anchor w -fill y -expand 1
-
-         set sslab [label $fr2.r1 -text "Sky subtraction:" -background $back]
-         set sstick(O) [label $fr3.r1 -foreground $back \
-                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
-         set sstick(E) [label $fr4.r1 -foreground $back \
-                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
-         pack $sslab     -side top -anchor w -fill y -expand 1
-         pack $sstick(O) -side top -anchor w -fill y -expand 1
-         pack $sstick(E) -side top -anchor w -fill y -expand 1
-
+         if { $SKYOFF } {
+            set selab [label $fr2.r0b -text "Sky estimation:" -background $back]
+            set setick(O) [label $fr3.r0b -foreground $back \
+                            -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            set setick(E) [label $fr4.r0b -foreground $back \
+                            -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            pack $selab     -side top -anchor w -fill y -expand 1
+            pack $setick(O) -side top -anchor w -fill y -expand 1
+            pack $setick(E) -side top -anchor w -fill y -expand 1
+   
+            set sslab [label $fr2.r1 -text "Sky subtraction:" -background $back]
+            set sstick(O) [label $fr3.r1 -foreground $back \
+                            -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            set sstick(E) [label $fr4.r1 -foreground $back \
+                            -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            pack $sslab     -side top -anchor w -fill y -expand 1
+            pack $sstick(O) -side top -anchor w -fill y -expand 1
+            pack $sstick(E) -side top -anchor w -fill y -expand 1
+         } {
+            set selab "no.such.widget"
+            set setick(O) "no.such.widget"
+            set setick(E) "no.such.widget"
+            set sslab "no.such.widget"
+            set sstick(O) "no.such.widget"
+            set sstick(E) "no.such.widget"
+         }
+         
          set melab [label $fr2.r2 -text "Mask extraction:" -background $back]
          set metick(O) [label $fr3.r2 -foreground $back \
                          -background $back -bitmap @$POLPACK_DIR/tick.bit]
@@ -9378,6 +9403,7 @@ proc SaveOptions {} {
    global ATASK_SELCOL
    global ATASK_SI
    global ATASK_VIEW
+   global ATASK_SKYOFF
    global ATASK_XHAIR
    global ATASK_XHRCOL          
    global BADCOL
@@ -9414,6 +9440,7 @@ proc SaveOptions {} {
      set ATASK_BADCOL $BADCOL
      set ATASK_XHRCOL $XHRCOL
      set ATASK_XHAIR $XHAIR
+     set ATASK_SKYOFF $SKYOFF
      set ATASK_PLO $PLO_REQ
      set ATASK_PHI $PHI_REQ
      set ATASK_INTERP $INTERP
@@ -10646,6 +10673,115 @@ proc SingleBind {x y} {
    }
 }
 
+proc SkyOff {} {
+#+
+#  Name:
+#    SkyOff
+#
+#  Purpose:
+#    Set the states of the sky area radio-buttons and the text displayed
+#    in the status area to reflect a change in the "Remove Sky" option.
+#
+#  Arguments:
+#    None
+#
+#  Globals:
+#    CUROBJ_REQ (Read)
+#       The current type of the current objects.
+#    IMAGE_DISP (Read)
+#       The currently displayed image.
+#    RB_CUR (Read)
+#       An array holding the names of the radiobuttons which are used to
+#       select the current object type.
+#    RB_REF (Read)
+#       An array holding the names of the radiobuttons which are used to
+#       select the reference object type.
+#    REFOBJ_REQ (Read)
+#       The current type of the reference objects.
+#    E_RAY_SKY (Read)
+#        An integer representing the "E-ray sky" object type.
+#    NONE (Read)
+#       The integer index corresponding to no reference objects.
+#    O_RAY_FEATURES (Read)
+#        An integer representing the "O-ray features" object type.
+#    O_RAY_SKY (Read)
+#        An integer representing the "O-ray sky" object type.
+#    SKYIMS (Read)
+#        A list of images containing sky data to be subtracted from the 
+#        supplied object frames. 
+#    SKYOFF (Read)
+#        Should a sky background be subtracted?
+#    SKYTEXT (Write)
+#        The text to appear in the status area describing the current sky
+#        subtraction method.
+#    SKY_AREA (Read)
+#        One of the integer values which may be assigned to SKY_METHOD:
+#        indicates that sky background is to be performed by fitting
+#        surfaces to areas within the supplied object frames (i.e. the 
+#        O and E sky areas).
+#    SKY_FRAME (Read)
+#        One of the integer values which may be assigned to SKY_METHOD:
+#        indicates that sky background is to be performed by subtracting
+#        the sky frame specified in SKYIMS.
+#    SKY_METHOD (Read)
+#        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. 
+#-
+   global CUROBJ_REQ
+   global E_RAY_SKY
+   global IMAGE_DISP
+   global NONE
+   global O_RAY_FEATURES
+   global O_RAY_SKY
+   global RB_CUR
+   global RB_REF
+   global REFOBJ_REQ
+   global SKYIMS    
+   global SKYOFF   
+   global SKYTEXT
+   global SKY_AREA
+   global SKY_FRAME
+   global SKY_METHOD
+
+# If sky subtraction has just been switched on...
+   if { $SKYOFF } {
+
+# Set the text for the status item describing the sky subtraction.
+      if { $SKY_METHOD == $SKY_FRAME } {
+         set SKYTEXT $SKYIMS($IMAGE_DISP)
+      } {
+         set SKYTEXT "displayed image"
+      }
+
+# Enable all the sky buttons.
+      foreach obj "$O_RAY_SKY $E_RAY_SKY" {
+         $RB_CUR($obj) configure -state normal
+         $RB_REF($obj) configure -state normal
+      }
+
+# If sky subtraction has just been switched off...
+   } {
+
+# Set the text for the status item describing the sky subtraction.
+      set SKYTEXT "(disabled)"
+
+# If the current object is a sky area, change it to "O Ray features".
+      if { $CUROBJ_REQ == $E_RAY_SKY || $CUROBJ_REQ == $O_RAY_SKY } {
+         $RB_CUR($O_RAY_FEATURES) invoke         
+      }
+
+# If the reference object is a sky area, change it to "None".
+      if { $REFOBJ_REQ == $E_RAY_SKY || $REFOBJ_REQ == $O_RAY_SKY } {
+         $RB_REF($NONE) invoke         
+      }
+
+# Disable all the sky buttons.
+      foreach obj "$O_RAY_SKY $E_RAY_SKY" {
+         $RB_CUR($obj) configure -state disabled
+         $RB_REF($obj) configure -state disabled
+      }
+   }
+}
+
 proc SkySub {data image args} {
 #+
 #  Name:
@@ -10684,6 +10820,9 @@ proc SkySub {data image args} {
 #        A list of images containing sky data to be subtracted from the 
 #        supplied object frames. This variable is ignored unless $SKY_METHOD
 #        is $SKY_FRAME.
+#     SKYOFF (Read)
+#        Should sky subtraction be performed? If not, then the input image
+#        name is returned unchanged.
 #     SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
@@ -10705,6 +10844,7 @@ proc SkySub {data image args} {
    global O_RAY_SKY
    global PSF_SIZE
    global SKYIMS
+   global SKYOFF
    global SKY_AREA
    global SKY_FRAME
    global SKY_METHOD
@@ -10732,7 +10872,7 @@ proc SkySub {data image args} {
 
 # If the sky background has been supplied in a separate image, subtract
 # it from the object frame.
-   if { $SKY_METHOD == $SKY_FRAME } {
+   if { $SKY_METHOD == $SKY_FRAME && $SKYOFF } {
 
 # Indicate that the sky areas have been extracted, and highlight the 
 # "sky subraction" label to indicate that the sky is being subtracted.
@@ -10740,7 +10880,7 @@ proc SkySub {data image args} {
       if { $DBEAM } { Wop $setick(E) configure -foreground black }
       Wop $sslab configure -foreground red 
 
-# Do the subtraction.
+# Do the subtraction
       set ssimage [UniqueFile]
       if { ![Obey kappa sub "in1=$data in2=$SKYIMS($image) out=$ssimage"] } {
          set ssimage ""
@@ -10753,7 +10893,7 @@ proc SkySub {data image args} {
 
 # If the sky background is defined by an area in the supplied object
 # frame...
-   } elseif { $SKY_METHOD == $SKY_AREA } {
+   } elseif { $SKY_METHOD == $SKY_AREA && $SKYOFF } {
 
 # In single-beam mode we just use the O-ray area, and we can manage
 # without an O-ray mask.
@@ -10880,10 +11020,6 @@ proc SkySub {data image args} {
 # Do no sky subtraction for any other type. 
    } {
       set ssimage $image
-      Wop $setick(O) configure -foreground grey
-      Wop $setick(E) configure -foreground grey
-      Wop $sstick(O) configure -foreground grey
-      Wop $sstick(E) configure -foreground grey
    }
 
 # Delete all the temporary files created in this procedure, except for the 
