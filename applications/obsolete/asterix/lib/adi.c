@@ -4559,7 +4559,7 @@ ADIobj adix_fdsp_voo( ADICB *rtn, int *narg, ADIobj args[], ADIstatus status )
 
 ADIobj adix_fdsp_vo( ADICB *rtn, int *narg, ADIobj args[], ADIstatus status )
   {
-  (*((ADIfoCB) *rtn))( args+1, status );
+  (*((ADIfoCB) *rtn))( args+0, status );
 
   return ADI__nullid;
   }
@@ -4667,6 +4667,9 @@ void adix_putid( ADIobj id, char *name, int nlen, ADIobj value,
 	_han_pid(value) = parid;
 	_han_name(value) = namid;
 	}
+
+      if ( _valid_q(parid) )
+	_han_set(parid) = ADI__true;
       }
     else {
 

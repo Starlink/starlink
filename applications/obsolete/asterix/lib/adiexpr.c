@@ -412,6 +412,14 @@ ADIlogical ADIexprTestBind( ADIobj sbind, int narg, ADIobj args[],
 	if ( mode == m_compare )
 	  ok = adix_equal( arg, *cur_sp, status );
 
+/* Only way null arguments can make it through */
+	else if ( mclass == K_WildCard )
+	  ;
+
+/* Trap null argument otherwise */
+        else if ( ! argcls[iarg] )
+          ok = ADI__false;
+
 /* Need to check dimensions here too */
 	else if ( mclass == argcls[iarg]->aname ) {
 	  ok = ( (matcharray  ? 1 : 0) == argary[iarg]);
@@ -423,9 +431,6 @@ ADIlogical ADIexprTestBind( ADIobj sbind, int narg, ADIobj args[],
 	    ok = _null_q(_etn_args(*cur_sp));
 	    }
 	  }
-
-	else if ( mclass == K_WildCard )
-	  ;
 
 	else if ( mmode ) {
 
