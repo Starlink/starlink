@@ -101,7 +101,7 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Temporary !
 
-      INTEGER			LID
+      INTEGER			FID
 
       LOGICAL			ISHDS			! HDS object?
 *.
@@ -111,16 +111,16 @@
 
 *  Derived from HDSfile?
       VALUE = .FALSE.
-      CALL ADI_GETLINK( ID, LID, STATUS )
+      CALL ADI_GETFILE( ID, FID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-      ELSE IF ( LID .NE. ADI__NULLID ) THEN
+      ELSE IF ( FID .NE. ADI__NULLID ) THEN
 
-        CALL ADI_DERVD( LID, 'HDSfile', ISHDS, STATUS )
+        CALL ADI_DERVD( FID, 'HDSfile', ISHDS, STATUS )
         IF ( ISHDS ) THEN
 
 *      Get locator and invoke HDS version
-          CALL ADI1_GETLOC( ID, LOC, STATUS )
+          CALL ADI1_GETLOC( FID, LOC, STATUS )
           CALL PRF1_GET( LOC, FLAG, VALUE, STATUS )
         END IF
       END IF
