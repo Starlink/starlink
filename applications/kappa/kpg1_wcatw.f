@@ -49,6 +49,10 @@
 *  History:
 *     26-JAN-1998 (DSB):
 *        Original version.
+*     26-MAY-1999 (DSB):
+*        Safety margin of 2 characters removed from ASTTSZ to avoid CAT 
+*        splitting lines itself, resulting in lines which do not start
+*        with "!!".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,9 +127,9 @@
 *  COMMENT in the catalogue. Store this value in common.
       CALL CAT_SZTXT( CI, 'WRITE', ASTTSZ, STATUS )
 
-*  Reduce it by 2 to leave room for the "!!" string used to mark the 
-*  start of the AST information.
-      ASTTSZ = ASTTSZ - 2 
+*  Reduce it by 4 to leave room for the "!!" string used to mark the 
+*  start of the AST information, plus an extra safety margin
+      ASTTSZ = ASTTSZ - 4
 
 *  Initialise the index of the first element in the group to be
 *  used by the sink function.
