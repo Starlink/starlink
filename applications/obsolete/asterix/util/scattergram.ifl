@@ -17,7 +17,6 @@
     PARAMETER SUBSET
        POSITION 3
        TYPE '_INTEGER'
-       KEYWORD 'SUBSET'
        PROMPT 'Subset and spacing of items to be used'
        HELP '2 or 3 numbers, e.g. 1,500 or 1,100000,100'
     ENDPARAMETER
