@@ -1,8 +1,8 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.6-7 of SURF. It will be 
-  distributed on the Autumn 2001 Starlink CD-ROM.
+  This is the release V1.6-8 of SURF. It will be 
+  distributed on the Spring 2002 Starlink CD-ROM.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -12,8 +12,8 @@
 
     o JIGGLE/MAP (including map version of POINTING, FOCUS and ALIGN)
     o PHOTOM
-    o SKYDIP
-    o SCAN/MAP
+    o SKYDIP   [Raster and discrete]
+    o SCAN/MAP [EmersonII and EKH]
     o NOISE
 
   ***
@@ -23,6 +23,9 @@
   ***  STARPERL distribution.
   ***
 
+  You may also want to install the associated ORAC-DR data reduction
+  pipeline. See SUN/230.
+
   More information can be found in document SUN/216 (use `findme surf'
   or `showme sun216' on a Starlink system), or on the JCMT software WWW
   pages (http://www.jach.hawaii.edu/JACdocs/JCMT/software/scuba).
@@ -31,6 +34,15 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_6_8
+
+  - New version of the Mapping Cookbok (SC/11) now includes
+    scan mapping
+
+  - Update remdbm to support KAPPA 0.18
+
+  - Use kappa libraries rather than private copies
 
 2 New_in_version_1_6_7
 
