@@ -167,6 +167,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIT_PAR'
+      INCLUDE 'ADI_PAR'
 
 *  Structure Definitions:
       INCLUDE 'FIT_STRUC'
@@ -269,8 +270,9 @@
 
 *    Get observed data and response
         CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
-        CALL FIT_GETDAT( IFID, 'SPEC', 1, .FALSE., .FALSE., NDS, OBDAT,
-     :                          NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
+        CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', 1, .FALSE.,
+     :                   .FALSE., NDS, OBDAT,
+     :                   NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
         NDMAX = OBDAT(1).NDAT
         NFMAX = PREDDAT(1).NMDAT
 
