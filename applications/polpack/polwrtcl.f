@@ -5,7 +5,7 @@
 
 *  Purpose:
 *     Creates a text file holding the contents of a specified catalogue in 
-*     the form of a Tcl code frament which can be used in a Tcl applications
+*     the form of a Tcl code fragment which can be used in a Tcl applications
 *     such as GAIA.
 
 *  Language:
@@ -39,11 +39,11 @@
 *                 if the quantity in the column is not known).
 *      xlo_     : The minimum X pixel index value in the data
 *      ylo_     : The minimum Y pixel index value in the data
-*      zlo_     : The minimum Z pixel index value in the data (only set
+*      zlo_     : The minimum Z column value in the data (only set
 *                 if the catalogue has a Z column).
 *      xhi_     : The maximum X pixel index value in the data
 *      yhi_     : The maximum Y pixel index value in the data
-*      zhi_     : The maximum Z pixel index value in the data (only set
+*      zhi_     : The maximum Z column value in the data (only set
 *                 if the catalogue has a Z column).
 *      ncol_    : The number of columns in the catalogue
 *      nrow_    : The number of rows in the catalogue
@@ -65,6 +65,11 @@
 *                 Column values are formatted with this format.
 *      hfmts_   : A list of Tcl formats specifications, one for each column.
 *                 Column headings are formatted with this format.
+*      zaxunit_ : The units associated with the Z axis in the current
+*                 Frame of the catalogues WCS FrameSet. Not written if
+*                 the catalogue does not have a Z axis.
+*      zcolunit_: The units associated with the Z column in the catalogue.
+*                 Not written if the catalogue does not have a Z column.
 
 *  Usage:
 *     polwrtcl in out 
@@ -77,7 +82,7 @@
 *        The name of the output text file.
 
 *  Copyright:
-*     Copyright (C) 2000 Central Laboratory of the Research Councils
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
  
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -88,6 +93,8 @@
 *        Original version.
 *     13-FEB-2001 (DSB):
 *        Modified to support 3D data.
+*     2-MAR-2001 (DSB):
+*        Added zcolunit_ and zaxunit_,
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -157,14 +164,16 @@
       CHARACTER TEXT*512         ! O/p text buffer
       CHARACTER XCNM*20          ! Name of the X column
       CHARACTER YCNM*20          ! Name of the Y column
+      CHARACTER ZAXUN*20         ! Units for Z axis
       CHARACTER ZCNM*20          ! Name of the Z column
+      CHARACTER ZCOLUN*20        ! Units for Z column
       DOUBLE PRECISION DEQN      ! Input equinox
       INTEGER BFRM               ! Base Frame from input WCS FrameSet
       INTEGER CI                 ! CAT identifier for input catalogue
       INTEGER DECCOL             ! Index of DEC column within output catalogue 
       INTEGER FD                 ! FIO identifier for output file
       INTEGER FS                 ! An AST FrameSet pointer
-      INTEGER GA( 2 )            ! CAT id.s for i/p cols giving o/p RA/DEC
+      INTEGER GA( 3 )            ! CAT id.s for i/p cols giving o/p RA/DEC
       INTEGER GCOL( MXCOL + 2 )  ! CAT id.s for o/p columns within i/p catalogue
       INTEGER GI                 ! A CAT component identifier
       INTEGER I                  ! Loop count
@@ -180,6 +189,7 @@
       INTEGER MAP                ! AST Mapping used to create new RA/DEC values
       INTEGER NCIN               ! No. of columns in input catalogue
       INTEGER NCOL               ! No. of columns in output catalogue
+      INTEGER NDIM               ! No. of dimensions in WCS Base Frame
       INTEGER NROW               ! No. of rows in output catalogue
       INTEGER RACOL              ! Index of RA column within output catalogue 
       INTEGER SKYFRM             ! An AST SkyFrame pointer
@@ -328,6 +338,27 @@
       IF( IDCOL .LT. YCOL ) IDCOL = IDCOL + 1
       YCOL = 2
 
+*  Get a WCS FrameSet from the catalogue with either 2 or 3 base Frame
+*  axes (depending on whether a Z column is present in the catalogue or not).
+      GA( 1 ) = GCOL( XCOL )
+      GA( 2 ) = GCOL( YCOL )
+      IF( ZCOL .GT. 0 ) THEN
+         GA( 3 ) = GCOL( ZCOL )
+         NDIM = 3
+      ELSE
+         NDIM = 2
+      END IF
+      CALL POL1_GTCTA( CI, NDIM, GA, IWCS, STATUS )
+
+*  If a Z column is present, get the units strings from the 3rd axis in
+*  both base and current Frames.
+      IF( ZCOL .GT. 0 ) THEN
+         ZAXUN = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
+     :                      'UNIT(3)', STATUS )
+         ZCOLUN = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
+     :                      'UNIT(3)', STATUS )
+      END IF
+
 *  Assume for the moment that the output catalogue will contain RA/DEC
 *  columns.
       GOTRD = .TRUE.
@@ -414,6 +445,7 @@
 *  the new RA and DEC columns will be derived.
                      GA( 1 ) = GCOL( RACOL )
                      GA( 2 ) = GCOL( DECCOL )
+                     NDIM = 2
 
 *  Create a default AST SkyFrame.
                      SKYFRM = AST_SKYFRAME( ' ', STATUS )
@@ -458,39 +490,16 @@
 *  RA/DEC columns.
          GOTRD = .FALSE.
 
-*  See if the catalogue has a WCS FrameSet 
-         CALL POL1_GTCTW( CI, IWCS, STATUS )
-
-*  If so, check the Base Frame is two dimensional and has axis symbols 
-*  of "X" and "Y". If not, annul the FrameSet since it cannot be used.
-         IF( IWCS .NE. AST__NULL ) THEN
-            BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
-
-            IF( AST_GETI( BFRM, 'NAXES', STATUS ) .NE. 2 ) THEN
-               CALL AST_ANNUL( IWCS, STATUS )
-
-            ELSE IF( AST_GETC( BFRM, 'SYMBOL(1)', STATUS ) .NE. 'X' .OR.
-     :             AST_GETC( BFRM, 'SYMBOL(2)', STATUS ) .NE. 'Y' ) THEN
-               CALL AST_ANNUL( IWCS, STATUS )
-
-*  See if the FrameSet contains a SKY Frame. If the input has more than 2
-*  axes (there will often be a third axis 'stokes'), this call will
-*  look for a SkyFrame within the CmpFrame and append a copy of it to the
-*  end of the FrameSet so that the following call to AST_CONVERT will be
-*  able to use it.
-            ELSE
-               CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
-               IF( IFRM .EQ. AST__NOFRAME ) THEN
-                  CALL AST_ANNUL( IWCS, STATUS )
-               END IF
-            END IF
-         END IF
-
+*  See if the WCS FrameSet contains a SKY Frame. If the input has more than 2
+*  axes this call will look for a SkyFrame within the CmpFrame and append a 
+*  copy of it to the end of the FrameSet so that the following call to 
+*  AST_CONVERT will be able to use it.
+         CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
 
 *  If the FrameSet passed the above tests...
-         IF( IWCS .NE. AST__NULL ) THEN
+         IF( IFRM .NE. AST__NOFRAME ) THEN
 
-*  Attempt to get a FrameSet connecting X/Y to RA/DEC.
+*  Attempt to get a FrameSet connecting X/Y(Z) to RA/DEC.
             CALL AST_SETI( IWCS, 'CURRENT', 
      :                     AST_GETI( IWCS, 'BASE', STATUS ),
      :                     STATUS )
@@ -504,19 +513,14 @@
 *  Get the epoch of the SkyFrame.
                EPOCH = AST_GETC( FS, 'EPOCH', STATUS )
 
-*  Get the Mapping from X/Y to RA/DEC.
+*  Get the Mapping from X/Y(/Z) to RA/DEC.
                MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, 
      :                               STATUS )
 
 *  Set the flags to indicate that new RA/DEC columns should be created on 
-*  the basis of existing X/Y columns. 
+*  the basis of existing X/Y(/Z) columns. 
                MAKERD = .TRUE.
                GOTRD = .TRUE.
-
-*  Save identifiers for the columns within the input catalogue from which
-*  the new RA and DEC columns will be derived.
-               GA( 1 ) = GCOL( XCOL )
-               GA( 2 ) = GCOL( YCOL )
 
 *  Append RA DEC columns to the column headings arrays.
                HEAD( NCOL + 1 ) = RACNM
@@ -647,7 +651,7 @@
       CALL FIO_WRITE( FD, '}', STATUS )
 
 *  Write out the number of rows and columns. Add one on for the ID column
-*  added by thgis program.
+*  added by this program.
       TEXT = 'set nrow_ '
       IAT = 10
       CALL CHR_PUTI( NROW, TEXT, IAT )
@@ -678,7 +682,7 @@
       SZBAT = MIN( NROW, MXBAT )
 
 *  Allocate work space.
-      CALL PSX_CALLOC( SZBAT*2, '_DOUBLE', IPW1, STATUS )
+      CALL PSX_CALLOC( SZBAT*NDIM, '_DOUBLE', IPW1, STATUS )
       CALL PSX_CALLOC( SZBAT*2, '_DOUBLE', IPW2, STATUS )
       IF( GOTRD ) THEN
          CALL PSX_CALLOC( SZBAT*( NCOL - 4 ), '_REAL', IPW3, STATUS )
@@ -687,9 +691,10 @@
       END IF
 
 *  Write values to the output file.
-      CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                 IDCOL, ZCOL, FD, SZBAT, LBND, UBND, %VAL( IPW1 ), 
-     :                 %VAL( IPW2 ), %VAL( IPW3 ), STATUS )
+      CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, 
+     :                 NROW, IDCOL, ZCOL, FD, SZBAT, LBND, UBND, 
+     :                 %VAL( IPW1 ), %VAL( IPW2 ), %VAL( IPW3 ), 
+     :                 STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )
@@ -720,13 +725,26 @@
       IF( ZCOL .GT. 0 ) THEN 
          TEXT = 'set zlo_ '
          IAT = 9
-         CALL CHR_PUTI( NINT( 0.5 + LBND( 3 ) ), TEXT, IAT )
+         CALL CHR_PUTR( LBND( 3 ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
    
          TEXT = 'set zhi_ '
          IAT = 9
-         CALL CHR_PUTI( NINT( 0.5 + UBND( 3 ) ), TEXT, IAT )
+         CALL CHR_PUTR( UBND( 3 ), TEXT, IAT )
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+         TEXT = 'set zaxunit_ "'
+         IAT = 14
+         CALL CHR_APPND( ZAXUN, TEXT, IAT )
+         CALL CHR_APPND( '"', TEXT, IAT )
+         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
+         TEXT = 'set zcolunit_ "'
+         IAT = 15
+         CALL CHR_APPND( ZCOLUN, TEXT, IAT )
+         CALL CHR_APPND( '"', TEXT, IAT )
+         CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
+
       END IF
 
 *  Arrive here if an error occurs.

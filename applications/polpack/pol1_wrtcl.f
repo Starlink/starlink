@@ -1,6 +1,6 @@
-      SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, 
-     :                       IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, 
-     :                       WORK2, WORK3, STATUS )
+      SUBROUTINE POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, 
+     :                       GCOL, NROW, IDCOL, ZCOL, FD, SZBAT, LBND, 
+     :                       UBND, WORK1, WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     POL1_WRTCL
@@ -12,9 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, MAP, NCOL, GCOL, NROW, IDCOL, 
-*                      ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, WORK3, 
-*                      STATUS )
+*     CALL POL1_WRTCL( CI, GOTRD, MAKERD, NDIM, GA, MAP, NCOL, GCOL, NROW, 
+*                      IDCOL, ZCOL, FD, SZBAT, LBND, UBND, WORK1, WORK2, 
+*                      WORK3, STATUS )
 
 *  Description:
 *     This routine writes out a Tcl list holding the column data in a 
@@ -28,9 +28,14 @@
 *     MAKERD = LOGICAL (Given)
 *        Should RA and DEC values be created on the basis of the supplied
 *        Mapping?
+*     NDIM = INTEGER (Given)
+*        Number of values supplied in GA. Should always be at least 2.
+*     GA( NDIM ) = INTEGER (Given)
+*        CAT identifiers for the column on which MAP should operate to
+*        create new RA/DEC values. Only accessed if MAKERD is .TRUE.
 *     MAP = INTEGER (Given)
-*        A pointer to an AST Mapping from X/Y to RA/DEC. Only accessed if
-*        MAKERD is .TRUE.
+*        A pointer to an AST Mapping from the columns given by GA to RA/DEC. 
+*        Only accessed if MAKERD is .TRUE.
 *     NCOL = INTEGER (Given)
 *        No. of columns to write. Should be at least 4.
 *     GCOL( NCOL ) = INTEGER (Given)
@@ -52,7 +57,7 @@
 *        The lower bounds of columns 1 (X) and 2 (Y), and the Z column.
 *     UBND( 3 ) = REAL (Retuned)
 *        The upper bounds of columns 1 (X) and 2 (Y), and the Z column.
-*     WORK1( SZBAT, 2 ) = DOUBLE PRECISION (Returned)
+*     WORK1( SZBAT, NDIM ) = DOUBLE PRECISION (Returned)
 *        Work array.
 *     WORK2( SZBAT, 2 ) = DOUBLE PRECISION (Returned)
 *        Work array.
@@ -72,6 +77,8 @@
 *  History:
 *     8-SEP-2000 (DSB):
 *        Original version.
+*     2-MAR-2001 (DSB):
+*        Add arguments NDIM and GA.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -91,6 +98,8 @@
       INTEGER CI
       LOGICAL GOTRD
       LOGICAL MAKERD
+      INTEGER NDIM
+      INTEGER GA( NDIM )
       INTEGER MAP
       INTEGER NCOL
       INTEGER GCOL( NCOL )
@@ -103,7 +112,7 @@
 *  Arguments Returned:
       REAL LBND( 3 )
       REAL UBND( 3 )
-      DOUBLE PRECISION WORK1( SZBAT, 2 ) 
+      DOUBLE PRECISION WORK1( SZBAT, NDIM ) 
       DOUBLE PRECISION WORK2( SZBAT, 2 ) 
       REAL WORK3( SZBAT, * ) 
 
@@ -142,6 +151,7 @@
       INTEGER I                  ! Loop index
       INTEGER IAT                ! Length of formatted value
       INTEGER IC                 ! Index of saved row nearest to field centre
+      INTEGER IGA                ! Index into GA
       INTEGER IRAN               ! Index of next random row number
       INTEGER IROW               ! Index of first row in bacth
       INTEGER JROW               ! Index of next row to be read
@@ -154,6 +164,8 @@
       INTEGER SAVRAN             ! No. of random rows saved so far
       INTEGER UNIT               ! Fortran IO unit for output text file
       LOGICAL MAKEID             ! Create ID values?
+      LOGICAL READX              ! Do we still need to read the X column?
+      LOGICAL READY              ! Do we still need to read the Y column?
       LOGICAL SAVE               ! Is this row to be saved?
       REAL RAN( NRAN )           ! Random values between 0 and 1
       REAL RANX( NRAN )          ! X value for random rows
@@ -232,19 +244,26 @@
 *  Find the size of this batch
          BATSZ = MIN( ( NROW - IROW ) + 1, SZBAT )
 
-*  Read in the next batch of X and Y values.
-         CALL POL1_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, WORK1( 1, 1 ),
-     :                    STATUS )     
-         CALL POL1_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, WORK1( 1, 2 ),
-     :                    STATUS )     
-
 *  If the output file is to contain RA/DEC values in columns 3 and 4...
          IF( GOTRD ) THEN 
 
 *  If required, create RA/DEC values by transforming the X/Y values.
             IF( MAKERD ) THEN 
-               CALL AST_TRANN( MAP, BATSZ, 2, SZBAT, WORK1, .TRUE., 2, 
-     :                         SZBAT, WORK2, STATUS ) 
+
+*  Read in the next batch of values to use as the basis of the RA and DEC
+*  values.
+               DO IGA = 1, NDIM
+                  CALL POL1_GCOLD( CI, GA( IGA ), IROW, BATSZ, 
+     :                             WORK1( 1, IGA ), STATUS )     
+               END DO
+
+*  Map these values into RA/DEC values.
+               CALL AST_TRANN( MAP, BATSZ, NDIM, SZBAT, WORK1, .TRUE.,
+     :                         2, SZBAT, WORK2, STATUS ) 
+
+*  Indicate if we stll need to read X and Y columns.
+               READX = ( GA( 1 ) .NE. GCOL( 1 ) )
+               READY = ( GA( 2 ) .NE. GCOL( 2 ) )
 
 *  Otherwise, read the RA and DEC values in from the input catalogue.
             ELSE
@@ -252,7 +271,19 @@
      :                          WORK2( 1, 1 ), STATUS )     
                CALL POL1_GCOLD( CI, GCOL( 4 ), IROW, BATSZ, 
      :                          WORK2( 1, 2 ), STATUS )     
+
+*  Indicate that we stll need to read X and Y columns.
+               READX = .TRUE.
+               READY = .TRUE.
+
             END IF
+
+*  Read in the next batch of X and Y values, if we do not already have
+*  them.
+            IF( READX ) CALL POL1_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, 
+     :                                   WORK1( 1, 1 ), STATUS )     
+            IF( READY ) CALL POL1_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, 
+     :                                   WORK1( 1, 2 ), STATUS )     
 
 *  Read the remaining columns.
             DO I = 5, NCOL
@@ -337,6 +368,12 @@
 *  Now deal with cases where no RA/DEC columns are to be included in the
 *  output catalogue.
          ELSE
+
+*  Read in the next batch of X and Y values.
+            CALL POL1_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, WORK1( 1, 1 ),
+     :                       STATUS )     
+            CALL POL1_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, WORK1( 1, 2 ),
+     :                       STATUS )     
 
 *  Read the remaining columns.
             DO I = 3, NCOL
