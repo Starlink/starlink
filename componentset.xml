@@ -2274,7 +2274,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndf">
-  <version>1.5-9</version>
+  <version>1.5-10</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
