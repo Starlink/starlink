@@ -54,16 +54,24 @@
 #     new graphics system yourself and wish to provide your own arguments for
 #     linking with it.
 #
-#     - ``-pgplot'' (or ``-pgp''): Requests that the program be linked so that
-#     graphical output from the AST library is displayed via the PGPLOT
-#     graphics package. By default, no graphics package is linked and this
-#     will result in an error at run time if AST routines are invoked that
+#     - ``-pgp'': Requests that the program be linked so that
+#     graphical output from the AST library is displayed via the
+#     Starlink version of the PGPLOT graphics package (which uses GKS
+#     for its output). By default, no graphics package is linked and
+#     this will result in an error at run time if AST routines are
+#     invoked that attempt to generate graphical output.
+#
+#     - ``-pgplot'': Requests that the program be linked so that
+#     graphical output from the AST library is displayed via the
+#     standard (or ``native'') version of the PGPLOT graphics
+#     package. By default, no graphics package is linked and this will
+#     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
 #  Examples:
 #c     cc display.c -L/star/lib `ast_link -pgplot` -o display
 #c        Compiles and links a C program called ``display'' which uses
-#c        PGPLOT for graphical output.
+#c        the standard version of PGPLOT for graphical output.
 #c     cc import.c -L/star/lib `ast_link -csla` -o import
 #c        Compiles and links a C program called ``import'' which does
 #c        not produce any graphical output. The ``-csla'' flag indicates that
@@ -76,7 +84,7 @@
 #c        interface is supplied by means of the ``-lgrf_my'' library reference.
 #f     f77 display.f -L/star/lib `ast_link -pgplot` -o display
 #f        Compiles and links a Fortran program called ``display'' which uses
-#f        PGPLOT for graphical output.
+#f        the standard version of PGPLOT for graphical output.
 #f     f77 import.f -L/star/lib `ast_link -csla` -o import
 #f        Compiles and links a Fortran program called ``import'' which does
 #f        not produce any graphical output. The ``-csla'' flag indicates that
@@ -153,9 +161,14 @@
             grf='my'
             shift;;
 
-#  -pgp[lot] - Requests graphical output through PGPLOT.
-         -pgp|-pgplot)
+#  -pgp - Requests graphical output through Starlink PGPLOT.
+         -pgp)
             grf='pgp'
+            shift;;
+
+#  -pgplot - Requests graphical output through native PGPLOT.
+         -pgplot)
+            grf='pgplot'
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -192,10 +205,15 @@
 #  ---------------------------------------------------
       case "${grf}" in
 
-#  If using PGPLOT, link with the AST PGPLOT interface and the Fortran library
-#  via the PGPLOT link script (if found).
-      pgp) args="${args} -last_pgplot `\`find pgplot_link\``"
+#  If using Starlink PGPLOT, link with the AST PGPLOT interface and
+#  the Fortran library via the PGP link script (if found).
+      pgp) args="${args} -last_pgplot `\`find pgp_link\``"
            f77='y';;
+
+#  If using native PGPLOT, link with the AST PGPLOT interface and the
+#  Fortran library via the PGPLOT link script (if found).
+      pgplot) args="${args} -last_pgplot `\`find pgplot_link\``"
+              f77='y';;
 
 #  If using own graphics, do not produce any arguments.
       my) :;;

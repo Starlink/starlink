@@ -1,3 +1,4 @@
+#define REBIN 0
 /*
 *class++
 *  Name:
@@ -180,10 +181,160 @@ static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
 static void TranN( AstMapping *, int, int, int, const double (*)[], int, int, int, double (*)[] );
 static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
-static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
+static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
 /* Member functions. */
 /* ================= */
+#if REBIN
+static void InterpolateImage( int ndim, const int *indim, const double *in;
+                              int npoint, const int *offset, double *coord,
+                              double badflag, int usebad, double *out ) {
+   int point;
+   int bad;
+   int s;
+   int *stride;
+   int dim;
+   int pixel;
+   double x;
+   double dx;
+   int *lo;
+   int *hi;
+   int ix;
+   int *idim;
+   int off;
+
+   if ( !astOK ) return;
+
+/* Allocate workspace. */
+   hi = astMalloc( sizeof( int ) * (size_t) ndim );
+   idim = astMalloc( sizeof( int ) * (size_t) ndim );
+   lo = astMalloc( sizeof( int ) * (size_t) ndim );
+   stride = astMalloc( sizeof( int ) * (size_t) ndim );
+
+/* Calculate the input pixel stride for each dimension. */
+   if ( astOK ) {
+      s = 1;
+      for ( dim = 0; dim < ndim; dim++ ) {
+         stride[ dim ] = s;
+         s *= indim[ dim ];
+      }
+
+/* Loop through the output points (i.e. pixel centres). */
+      for ( point = 0; point < npoint; point++ ) {
+
+/* Initialise the offset into the input image. Then examine each
+   coordinate from the corresponding input point in turn. */
+         pixel = 0;
+         off = 0;
+         for ( dim = 0; dim < ndim; dim++ ) {
+            x = coord[ ndim * point + dim ];
+
+/* Test if the coordinate lies outside the input image, or is bad. If
+   either is true, the corresponding output pixel value will be bad,
+   so quit. */
+            bad = ( x < 0.5 ) ||
+                  ( x > ( 0.5 + (double) indim[ dim ] ) ) ||
+                  ( x == AST__BAD );
+            if ( bad ) break;
+
+/* Obtain the 1-based index along the current input image dimension of
+   the pixel which contains the input point. */
+            ix = ( int ) floor( x + 0.5 );
+
+/* Accumulate this pixel's offset (in pixels) from the start of the
+   input image. */
+            pixel += ( ix - 1 ) * stride[ dim ];
+
+/* Calculate the offset of the input position from the pixel's centre. */
+            dx = x - (double) ix;
+
+/* Test if the position lies below (or on) the pixel's centre. */
+            if ( x <= 0.5 ) {
+
+/* If so, obtain the offsets from the start of the image (due to
+   displacement along the current dimension) of the two pixels which
+   will contribute to the output value. If necessary, restrict the
+   pixel with the lower index to ensure it does not lie outside the
+   input image. */
+               if ( ix == 0 ) {
+                  lo[ dim ] = ( lo[ dim ] - 1 ) * stride[ dim ];
+               } else {
+                  lo[ dim ] = ( lo[ dim ] - 2 ) * stride[ dim ];
+               }
+               hi[ dim ] = ( hi[ dim ] - 1 ) * stride[ dim ];
+
+/* Calculate the fractional contribution which each pixel will make to
+   the interpolated result. */
+               frac_lo[ dim ] = -dx;
+               frac_hi[ dim ] = 1.0 + dx;
+
+/* If the input position lies above the pixel's centre, repeat the
+   above process, this time restricting the pixel with the larger
+   index if necessary. */
+            } else {
+               lo[ dim ] = ( lo[ dim ] - 1 ) * stride[ dim ];
+               if ( ix < indim[ dim ] - 1 ) {
+                  hi[ dim ] = hi[ dim ] * stride[ dim ];
+               } else {
+                  hi[ dim ] = ( hi[ dim ] - 1 ) * stride[ dim ];
+               }
+               frac_lo[ dim ] = 1.0 - dx;
+               frac_hi[ dim ] = dx;
+            }
+
+/* Store the lower index involved in interpolation along each
+   dimension and accumulate the offset from the start of the image of
+   the pixel which has these indices. */
+            idim[ dim ] = lo[ dim ];
+            off += lo[ dim ];
+
+/* Also store the fractional weight associated with the lower pixel
+   along each dimension. */
+            wt[ dim ] = frac_lo[ dim ];
+         }
+
+         bad = bad || ( ( in[ pixel ] == badflag ) && usebad );
+       
+         if ( bad ) {
+            out[ offset[ point ] ] = badflag;
+
+         } else {
+            done = 0;
+            sum = 0.0;
+            wtsum = 0.0;
+            while ( !done ) {
+               if ( ( in[ off ] != badflag ) || !usebad ) {
+                  for ( wt = 0.0, dim = 0; dim < ndim; dim++ ) wt *= wt[ dim ];
+                  sum += in[ off ] * wt;
+                  wtsum += wt;
+               }
+           
+               dim = 0;
+               while ( !done ) {
+                  if ( idim[ dim ] != hi[ dim ] ) {
+                     idim[ dim ] = hi[ dim ];
+                     off += stride[ dim ];
+                     wt[ dim ] = frac_hi[ dim ];
+                     break;
+                  } else {
+                     idim[ dim ] = lo[ dim ];
+                     off -= stride[ dim ];
+                     wt[ dim ] = frac_lo[ dim ];
+                     done = ( ++dim == ndim );
+                  }
+               }
+            }
+            out[ offset[ point ] ] = sum / wtsum;
+         }
+      }
+   }
+   hi = astFree( hi );
+   idim = astFree( idim );
+   lo = astFree( lo );
+   stride = astFree( stride );
+}
+#endif
+
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:

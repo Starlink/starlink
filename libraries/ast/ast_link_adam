@@ -53,18 +53,25 @@
 #     should use this option only if you have implemented an interface to a
 #     new graphics system yourself and wish to provide your own arguments for
 #     linking with it.
-#     - ``-pgplot'' (or ``-pgp''): Requests that the program be linked so that
-#     graphical output from the AST library is displayed via the PGPLOT
-#     graphics package. By default, no graphics package is linked and this
-#     will result in an error at run time if AST routines are invoked that
+#
+#     - ``-pgp'': Requests that the program be linked so that
+#     graphical output from the AST library is displayed via the
+#     Starlink version of the PGPLOT graphics package (which uses GKS
+#     for its output). By default, no graphics package is linked and
+#     this will result in an error at run time if AST routines are
+#     invoked that attempt to generate graphical output.
+#
+#     - ``-pgplot'': Requests that the program be linked so that
+#     graphical output from the AST library is displayed via the
+#     standard (or ``native'') version of the PGPLOT graphics
+#     package. By default, no graphics package is linked and this will
+#     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
 #  Examples:
 #c     alink display.o -L/star/lib `ast_link_adam -pgplot`
-#c        Links an ADAM program ``display'' which uses PGPLOT for graphical
-#c        output. (If the program is written in C, it should, following ADAM
-#c        conventions, be a Fortran-callable routine and be pre-compiled
-#c        before using ``alink'' to link it.)
+#c        Links an ADAM program ``display'' which uses the standard
+#c        version of PGPLOT for graphical output.
 #c     alink import.o -L/star/lib `ast_link_adam -csla`
 #c        Links an ADAM program ``import'', written in C, which does not
 #c        produce any graphical output. The ``-csla'' flag indicates that the C
@@ -77,7 +84,7 @@
 #c        interface is supplied by means of the ``-lgrf_my'' library reference.
 #f     alink display.f -L/star/lib `ast_link_adam -pgplot`
 #f        Compiles and links an ADAM Fortran program called ``display'' which
-#f        uses PGPLOT for graphical output.
+#f        uses the standard version of PGPLOT for graphical output.
 #f     alink import.f -L/star/lib `ast_link_adam -csla`
 #f        Compiles and links an ADAM Fortran program called ``import'' which
 #f        does not produce any graphical output. The ``-csla'' flag indicates
@@ -133,9 +140,14 @@
             grf='my'
             shift;;
 
-#  -pgp[lot] - Requests graphical output through PGPLOT.
-         -pgp|-pgplot)
+#  -pgp - Requests graphical output through Starlink PGPLOT.
+         -pgp)
             grf='pgp'
+            shift;;
+
+#  -pgplot - Requests graphical output through native PGPLOT.
+         -pgplot)
+            grf='pgplot'
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -171,9 +183,13 @@
 #  ---------------------------------------------------
       case "${grf}" in
 
-#  If using PGPLOT, link with the AST PGPLOT interface and the Fortran library
-#  via the PGPLOT link script.
+#  If using Starlink PGPLOT, link with the AST PGPLOT interface and
+#  the Fortran library via the PGP link script.
       pgp) args="${args} -last_pgplot `pgp_link_adam`";;
+
+#  If using native PGPLOT, link with the AST PGPLOT interface and
+#  the Fortran library via the PGPLOT link script.
+      pgplot) args="${args} -last_pgplot `pgplot_link_adam`";;
 
 #  If using own graphics, do not produce any arguments.
       my) :;;
