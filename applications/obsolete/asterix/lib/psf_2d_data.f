@@ -95,7 +95,7 @@
       CALL PSF0_FNDRTN( P_PSID(SLOT), 'Data', THERE, RTNPTR, STATUS )
       IF ( .NOT. THERE ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Psf has not data routine!', STATUS )
+        CALL ERR_REP( ' ', 'Psf has no data routine!', STATUS )
         GOTO 99
       END IF
 

@@ -80,6 +80,9 @@
         CALL ADI_NEW0( 'PsfDescription', P_PSID(SLOT), STATUS )
         CALL ADI_CPUT0I( P_PSID(SLOT), 'Slot', SLOT, STATUS )
 
+*    Store file id
+        CALL ADI_CPUT0I( P_PSID(SLOT), 'FileID', FID, STATUS )
+
 *      Mark slot in use
         P_USED(SLOT) = .TRUE.
 
