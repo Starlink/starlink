@@ -91,9 +91,11 @@
 
 
       IF (HRI) THEN
-        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
+c        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
+        CALDIR='$AST_ETC/hri_drm'
       ELSE
-        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
+c        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
+        CALDIR='$AST_ETC/drmpspc'
       ENDIF
       CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)
 *
