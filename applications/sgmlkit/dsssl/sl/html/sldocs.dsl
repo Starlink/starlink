@@ -81,15 +81,23 @@ These are the document element types.
    (process-children))
 
 (mode make-html-author-links
-  (element author
-    (let ((email (attribute-string "email")))
-      (if email
-	  (make empty-element
-	    gi: "link"
-	    attributes: (list (list "rev" "made")
-			      (list "href" email)
-			      (list "title" (data (current-node)))))
-	  (empty-sosofo)))))
+      (element author
+	       (let ((link (cond ((attribute-string (normalize "webpage")
+						    (current-node)))
+				 ((attribute-string (normalize "email")
+						    (current-node))
+				  (string-append
+				   "mailto:"
+				   (attribute-string (normalize "email")
+						     (current-node))))
+				 (else #f))))
+		 (if link
+		     (make empty-element
+			   gi: "link"
+			   attributes: `(("rev" "made")
+					 ("href" ,link)
+					 ("title" ,(trim-data (current-node)))))
+		   (empty-sosofo)))))
 
 ;; In the default mode, make author a link to the author details,
 ;; if either of the webpage or email attributes is present
