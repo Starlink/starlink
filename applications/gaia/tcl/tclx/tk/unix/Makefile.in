@@ -85,7 +85,7 @@ TEST_SAOBJS = tkTest.o tkSquare.o tkXunixTestSA.o
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: RUNTIME 
+all: wishx RUNTIME 
 
 static: wishx.static tktest.static
 
