@@ -337,11 +337,11 @@
 *  label for the cross axis.
          LBND( 2 ) = 0.0
          IF( LOGPOP ) THEN 
-            UBND( 2 ) = 1.05*LOG10( REAL( MAXPOP ) )
+            UBND( 2 ) = 1.1*LOG10( REAL( MAXPOP ) )
             CLABEL = 'Log10( count )'
             CSYM = 'LOG(COUNT)'
          ELSE
-            UBND( 2 ) = 1.05*REAL( MAXPOP )
+            UBND( 2 ) = 1.1*REAL( MAXPOP )
             CLABEL = 'Count'
             CSYM = 'COUNT'
          END IF
