@@ -67,6 +67,7 @@
       INTEGER INL
       INTEGER INR
       INTEGER SEED
+      CHARACTER * ( * ) DTYPE
 
 *  Arguments Given and Returned:
       INTEGER IMAGE( 1 )
@@ -96,8 +97,8 @@
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DTYPE', DTYPE )
          CALL ERR_REP( 'CCDBGEN_TYPE', 
-        :              'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
+     :                 'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
       END IF
 
       END
-* $Id: ccdb1_abia.f,v 1.5 1998/06/17 16:53:26 mbt Exp $
+* $Id: big1_abiat.f,v 1.2 1998/07/03 14:08:39 mbt Exp $

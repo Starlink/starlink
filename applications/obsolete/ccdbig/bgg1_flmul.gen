@@ -58,7 +58,7 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      INCLUDE 'DCV_EXT'          ! Generic type conversion functions
+      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
 
 *  Local Variables:
       REAL INTER
@@ -78,4 +78,4 @@
       END DO
 
       END
-* $Id: big1_flmul.f,v 1.4 1998/06/17 15:43:04 mbt Exp $
+* $Id: bgg1_flmul.gen,v 1.1 1998/07/03 13:16:44 mbt Exp $

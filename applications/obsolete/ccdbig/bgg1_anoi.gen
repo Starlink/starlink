@@ -46,7 +46,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! Bad values VAL__BADR
 
 *  Arguments Given:
       INTEGER NPIX
@@ -92,4 +91,4 @@
  2    CONTINUE
 
       END
-* $Id: ccd1_anoi.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: bgg1_anoi.gen,v 1.1 1998/07/03 13:44:06 mbt Exp $

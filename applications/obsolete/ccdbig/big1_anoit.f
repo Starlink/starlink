@@ -83,8 +83,8 @@
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'DTYPE', DTYPE )
          CALL ERR_REP( 'CCDBGEN_TYPE',
-        :              'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
+     :                 'CCDBGEN: Invalid data type (^DTYPE)', STATUS )
       END IF
 
       END
-* $Id: ccd1_anoi.f,v 1.1 1997/06/27 09:01:41 pwd Exp $
+* $Id: big1_anoit.f,v 1.1 1998/07/03 13:44:06 mbt Exp $
