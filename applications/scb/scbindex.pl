@@ -128,22 +128,12 @@ $| = 1;
 
 $verbose = 1;
 
-#  Shell commands required.
-
-$generic = "generic";
-
 #  Required libraries.
 
 use Fcntl;
 use Cwd;
 use Scb;
-use FortranTag;
-use CTag;
 use Directory;
-
-#  Debugging
-
-$srcdir = "/local/star/src/from-ussc";
 
 #  Declarations.
 
@@ -152,20 +142,25 @@ sub index_pack;
 sub index_dir;
 sub index_tar;
 sub index_hlp;
-sub index_f;
-sub index_c;
-sub index_h;
-sub index_gen;
+sub index_source;
 sub index_files;
 sub indexinc_dir;
 sub write_entry;
 sub uniq;
+sub tidyup;
 
 #  Set up scratch directory.
 
 $tmpdir = "/local/junk/scb/index";
 rmrf $tmpdir;
-system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
+system "mkdir -p $tmpdir" and error "Couldn't create $tmpdir: $?\n";
+
+#  Set up signal handler.  Note this is not entirely safe since tidyup
+#  does non-trivial work and so (probably) calls some non-reentrant 
+#  routines.  If the handler is called at an unlucky time this may 
+#  result in an inelegant exit (core dump).
+
+$SIG{'INT'} = sub {tidyup; exit;};
 
 #  Initialise index object containing locations of all modules.
 
@@ -180,6 +175,7 @@ if (open TASKS, "$taskfile") {
       ($pack, $tasks) = /^ *(\S+) *: *(.*)$/;
       ${tasks{$pack}} = [ split ' ', $tasks ];
    }
+   close TASKS;
 }
 
 #  Index packages named on command line.
@@ -191,6 +187,7 @@ if (@ARGV) {
 }
 
 #  Or index all packages under $srcdir, and include files under $incdir.
+
 else {
    indexinc_dir "INCLUDE#", $incdir;
    foreach $package_file (glob "$srcdir/*") {
@@ -198,18 +195,13 @@ else {
    }
 }
 
-#  Index files from include directory.
-
-
-$verbose = 0;
-
 #  Write checked task names out to text file.
 #  Currently, a task is identified as the text of any entry in a .hlp file
 #  for which a module of the same name (possibly with appended underscore)
 #  exists in the same package.
 
 my ($line, $module);
-open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
+open TASKS, ">$taskfile" or error "Couldn't open $taskfile\n";
 foreach $pack (sort keys %tasks) {
    $npackages++;
    $line = "$pack:";
@@ -245,7 +237,7 @@ if ($verbose) {
 
 #  Terminate processing.
 
-rmrf $tmpdir;
+tidyup;
 
 exit;
 
@@ -275,12 +267,8 @@ sub index_pack {
 #  or file index, delete them.
 
    my ($key, $value);
-   while (($key, $value) = $func_index->each($package)) {
-      $func_index->delete($key, $package);
-   }
-   while (($key, $value) = $file_index->each($package)) {
-      $file_index->delete($key, $package);
-   }
+   $func_index->delpack($package);
+   $file_index->delpack($package);
 
 #  If any tasks exist for this package delete them.
 
@@ -295,7 +283,7 @@ sub index_pack {
       index_tar "$package#", "$dir$package$tarext";
    }
    else {
-      die "Arguments must be package tar files or directories\n";
+      error "Arguments must be package tar files or directories\n";
    }
 
 #  Look for task candidates in the $bindir/$package directory.
@@ -326,32 +314,22 @@ sub index_list {
    my $path = shift;      #  Logical pathname of current directory.
    my @files = @_;        #  Files in current directory to be indexed.
 
-   my $file;
+   my ($file, $ext);
    foreach $file (@files) {
-      if (-d $file) {                 #  directory.
+      $file =~ /\.([^.]+)$/;
+      $ext = $1 || '';
+      if (-d $file) {                    #  directory.
          index_dir "$path$file/", $file; 
       }
-      elsif ($file =~ /\.tar\b/) {    #  tar archive (possibly compressed).
+      elsif ($file =~ /\.tar\b/) {       #  tar archive (possibly compressed)
          index_tar "$path$file>", $file;
       }
-      elsif ($file =~ /\.f$/) {       #  fortran source file.
-         $nfiles{'f'}++;
-         index_f "$path$file", $file;
-      }
-      elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
-         $nfiles{'gen'}++;
-         index_gen "$path$file", $file;
-      }
-      elsif ($file =~ /\.c$/) {       #  C source file.
-         $nfiles{'c'}++;
-         index_c "$path$file", $file;
-      }
-      elsif ($file =~ /\.h$/) {       #  C header file.
-         $nfiles{'h'}++;
-         index_h "$path$file", $file;
-      }
-      elsif ($file =~ /\.hlp$/) {     #  starlink help file
+      elsif ($ext eq 'hlp') {            #  starlink help file
          index_hlp "$path$file", $file;
+      }
+      elsif (defined $tagger{$ext}) {    #  source file in taggable language
+         $nfiles{$ext}++;
+         index_source "$path$file", $file;
       }
    }
 }
@@ -440,18 +418,24 @@ sub index_source {
 
    my $path = shift;          #  Logical pathname of file to be indexed.
    my $file = shift;          #  File in current directory to be indexed.
-   my $ftype = shift;         #  Type of file ('f' or 'c').
+
+#  Get file extension.
+
+   $file =~ /\.([^.]+)$/;
+   my $ext = $1;
+
+#  Get language-specific tagging routine.
+
+   (ref ($rtagger = $tagger{$ext}) eq 'CODE') 
+      or error "Language-specific tagging routine doesn't seem to exist\n";
 
 #  Tag source file using language-specific tagging routine.
 
-   open SOURCE, $file or die "Failed to open $file in directory " . cwd . "\n";
-   if ($ftype eq 'f' || $ftype eq 'gen') {
-      $tagged = FortranTag::tag join '', <SOURCE>;
-   }
-   elsif ($ftype eq 'c' || $ftype eq 'h') {
-      $tagged = CTag::tag join '', <SOURCE>;
-   }
+   open SOURCE, $file or error "Failed to open $file in directory ".cwd."\n";
+   $tagged = &$rtagger (join '', <SOURCE>);
    close SOURCE;
+
+#  Write index entries for all the "<a name=''>" type tags.
 
    while ($tagged =~ /(<[^>]+>)/g) {
       %tag = parsetag $1;
@@ -460,77 +444,9 @@ sub index_source {
       }
    }
 
-   $nlines{$ftype} += ($tagged =~ tr/\n/\n/);
+   $nlines{$ext} += ($tagged =~ tr/\n/\n/);
 }
 
-
-########################################################################
-sub index_c {
-
-#  Examine and index a C source file.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of .c file.
-   my $file = shift;      #  .c file in current directory to be indexed.
-
-   index_source $path, $file, 'c';
-}
-
-
-########################################################################
-sub index_f {
-
-#  Examine and index a fortran source file.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of .f file.
-   my $file = shift;      #  .f file in current directory to be indexed.
-
-   index_source $path, $file, 'f';
-}
-
-
-########################################################################
-sub index_gen {
-
-#  Examine and index a .gen (fortran Generic) source file.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of .gen file.
-   my $file = shift;      #  .gen file in current directory to be indexed.
-
-#  Index unprocessed source code.
-
-   index_source $path, $file, 'gen';
-
-#  Move file to scratch space.
-
-   my $gtmpdir = "$tmpdir/generic_tmpdir";
-   my $tail = $file;
-   $tail =~ s%.*/%%;
-   system "mkdir -p $gtmpdir" and die "Failed to mkdir $gtmpdir\n";
-   system "cp $file $gtmpdir/$tail" and die "Failed to copy $file\n";
-   pushd $gtmpdir;
-
-#  Process file to produce normal fortran source code.
-
-   system "$generic $tail" and die "Command '$generic $tail' failed: $?\n";
-
-#  Hand file over to routine which handles normal fortran source code.
-
-   my $ffile = "$gtmpdir/$tail";
-   $ffile =~ s/\.gen$/.f/;
-   index_source $path, $ffile, 'f';
-
-#  Tidy up.
-
-   popd;
-   unlink "$gtmpdir/$tail", $ffile;
-   rmdir $gtmpdir or die "Failed to rmdir $gtmpdir\n";
-}
 
 ########################################################################
 sub index_hlp {
@@ -551,7 +467,7 @@ sub index_hlp {
    my $path = shift;      #  Logical pathname of .hlp file.
    my $file = shift;      #  .hlp file in current directory to be indexed.
 
-   open HLP, $file or die "Couldn't open $file in directory ".cwd."\n";
+   open HLP, $file or error "Couldn't open $file in directory ".cwd."\n";
    my ($level, $baselevel);
    while (<HLP>) {
 
@@ -571,27 +487,6 @@ sub index_hlp {
       }
    }
    close HLP;
-}
-
-
-########################################################################
-sub index_h {
-
-#  Examine and index a C header file in the source tree (not include dir).
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of .h file.
-   my $file = shift;      #  .h file in current directory to be indexed.
-
-#  Strip head part of path.
-
-   my $include = $file;
-   $include =~ s%^.*/%%;
-
-#  Index source (e.g. for #defines).
-
-   index_source $path, $file, 'h';
 }
 
 
@@ -653,7 +548,16 @@ sub uniq {
 
 
 ########################################################################
+sub tidyup {
+   $func_index->finish();
+   $file_index->finish();
+   rmrf $tmpdir;
+}
+
+########################################################################
 sub error {
+
+   tidyup;
    $_ = shift;
    chomp;
    die "$_\n";
