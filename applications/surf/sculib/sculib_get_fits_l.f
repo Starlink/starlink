@@ -58,6 +58,7 @@
 *    Global variables :
 *    Local Constants :
 *    Local variables :
+      LOGICAL      FOUND               ! Set if we find a value
       INTEGER      I                   ! DO loop index
       INTEGER      IPOS                ! position of = in string
       INTEGER      JPOS                ! position of / in string
@@ -73,7 +74,10 @@
 
       UNAME = NAME
       CALL CHR_UCASE (UNAME)
-      VALUE = VAL__BADI
+
+      FOUND = .FALSE.
+*      VALUE = VAL__BADI ! This is type unsafe since we do not know that
+                         ! Logicals are integers
 
 *  loop through the FITS array
 
@@ -111,6 +115,7 @@
                         STEMP = FITS(I) (IPOS+1:JPOS-1)
                         CALL CHR_LDBLK (STEMP)
                         CALL CHR_CTOL (STEMP, VALUE, STATUS)
+                        FOUND = .TRUE.
                      END IF
                   END IF
                END IF
@@ -119,8 +124,7 @@
 *  break out of loop if we've found a value, reached the end of the FITS
 *  array, or if an error has occured
    
-            IF ((VALUE .NE. VAL__BADI).OR. 
-     :          (STATUS .NE. SAI__OK) .OR.
+            IF ((STATUS .NE. SAI__OK) .OR.
      :          (I .EQ. N_FITS))      THEN
                LOOPING = .FALSE.
             END IF
@@ -137,7 +141,7 @@
  
 *  check that a value for the parameter was found
 
-      IF (VALUE .EQ. VAL__BADI) THEN
+      IF (.NOT.FOUND) THEN
          VALUE = .FALSE.
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
