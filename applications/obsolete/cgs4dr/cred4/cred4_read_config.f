@@ -33,8 +33,9 @@
       INTEGER
      :  LUN,                     ! Fortran logical unit number
      :  RECLEN,                  ! Length of a record
-     :  EOF,                     ! The end-of-file marker
      :  ERR_STAT                 !  Error status
+      LOGICAL
+     :  EOF                      ! The end-of-file marker
 *    Local data :
 *-
 

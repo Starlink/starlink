@@ -159,7 +159,8 @@
          CALL CHR_PUTC( OUTPUT1(1:CLEN), INVAL, CPOS )
          CALL CHR_PUTC( '" ISPECT="', INVAL, CPOS )
          CLEN = LEN( OUTPUT2 )
-         CALL CHR_PUTC( OUTPUT2(1:CLEN)//'"', INVAL, CPOS )
+         CALL CHR_PUTC( OUTPUT2(1:CLEN), INVAL, CPOS )
+         CALL CHR_PUTC( '"', INVAL, CPOS )
 
 *      Tell the RED4 task to fit a polynomial to the group
          CALL TASK_OBEY( RED4_ALIAS, 'NODEXTRACT4', INVAL(1:CPOS),

@@ -2,13 +2,15 @@
       SUBROUTINE RED4_CALC_SLIT_ANGLE( STATUS )
 *    Description :
 *     This routine uses the information extracted from EMLT
-*     to calculate the CGS4 slit angle.
+*     to calculate the CGS4 slit angle. It uses a value of
+*     pi from Abramowicz.
 *    Invocation :
 *     CALL RED4_CALC_SLIT_ANGLE( STATUS )
 *    Authors :
 *     P N Daly   (JACH.HAWAII.EDU::PND)
 *    History :
 *     19-Jan-1995: Original Unix version.                          (PND)
+*     03-Sep-1996: Port to linux by using standard ATAN            (PND)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -23,6 +25,9 @@
      :  XDIFF,       ! X centroid difference
      :  YDIFF,       ! Y centroid difference
      :  DANGLE       ! Double precision slit angle
+*    Local constants :
+      DOUBLE PRECISION RAD2DEG
+      PARAMETER ( RAD2DEG = 180.00000000000000 / 3.14159265358979 )
 *-
 
 *    Check for error on entry
@@ -48,7 +53,7 @@
       IF ( ABS( YDIFF ) .GT. 1.0D-20 ) THEN
 
 *       Determine the slit angle in degrees
-         DANGLE = ATAN2D( XDIFF, YDIFF )
+         DANGLE = ATAN(XDIFF/YDIFF) * RAD2DEG
 
 *         Ensure this is in the range -180.0 to +180.0
 *         (This step ensures that the angle calculated
