@@ -55,9 +55,6 @@ t8.test: t8.pl
 
 # Test 5 depends on its DVI file; test 7 uses it, too
 t5.test$(EXEEXT) t7.test$(EXEEXT): t5.dvi
-# Test 6 generates its own test data
-t6.data: t6.test$(EXEEXT)
-	./t6.test -g 500 >$@
 
 pathtest: hello.dvi
 	sh ./test-font-gen.sh $(DVI2BITMAP) hello.dvi temp-hello-output

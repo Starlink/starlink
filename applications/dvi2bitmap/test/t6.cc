@@ -285,6 +285,33 @@ int do_stream_tests()
     
     try {
 	{
+	    struct stat S;
+	    if (stat(fn.c_str(), &S) != 0) {
+		// File does not exist
+		int pid = fork();
+		if (pid < 0) {
+		    cerr << "Can't fork!" << strerror(errno) << endl;
+		    exit(1);	// give up immediately
+		} else if (pid == 0) {
+		    // child
+		    execl("./t6.test",
+			  "./t6.test",
+			  "-o", fn.c_str(),
+			  "-g", "500",
+			  0);
+		    cerr << "Oh-oh: couldn't exec in child of "
+			 << getppid() << ": " << strerror(errno) << endl;
+		    exit(1);
+		} else {
+		    // parent
+		    int status;
+		    waitpid(pid, &status, 0);
+		    cerr << "Generated data file " << fn << endl;
+		}
+	    }
+	}
+	
+	{
             int tfails = 0;
 	    // Test 1 -- reading without preloading
             IFV cerr << "===== Stream test 1" << endl;
