@@ -6,7 +6,7 @@ SUBDIRS = @subdirs@
 # go into bin/
 
 noinst_LTLIBRARIES = libpgplot_drivers.la
-libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $C(ROUTINES)
+libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 bin_PROGRAMS = pgxwin_server
 pgxwin_server = pgxwin_server.c

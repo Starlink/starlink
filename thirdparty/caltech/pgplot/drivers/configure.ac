@@ -28,13 +28,12 @@ AC_PROG_LIBTOOL
 AC_C_BIGENDIAN
 AC_HEADER_STDC
 AC_PATH_XTRA
-AC_CHECK_LIB(tk, Tk_DisplayName)
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-AC_CONFIG_SUBDIRS([xathena])
+AC_CONFIG_SUBDIRS([xathena xtk xmotif])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
