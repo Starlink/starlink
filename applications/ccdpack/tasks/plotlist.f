@@ -222,6 +222,8 @@
 *     9-JAN-2001 (MBT):
 *        Modified to use AST and AGI properly.  This allows it to interact
 *        with the AGI graphics database much more intelligently.
+*     22-MAY-2001 (MBT):
+*        Changed to cope with empty position list files.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -301,7 +303,8 @@
 *  Now access a group of position list names.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS,
-     :                 NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+     :                 .FALSE., NOPEN, FIOGR, NDFGR, NNOLIS, NLGR,
+     :                 STATUS )
       CALL CCD1_GRDEL( NLGR, STATUS )
 
 *  If not all supplied NDFs have position lists, warn the user of
@@ -456,36 +459,40 @@
 *  Find out how many entries it has.
          CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
 
+*  Only attempt to plot points if there are any.
+         IF ( NVAL .GT. 0 ) THEN
+
 *  Map in the data.
-         IF ( NVAL .EQ. 2 ) THEN 
+            IF ( NVAL .EQ. 2 ) THEN 
 
 *  X and Y positions only.
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC, NVAL,
-     :                       STATUS )
-            XYONLY = .TRUE.
-         ELSE
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPID, IPDAT, NREC,
-     :                      NVAL, STATUS )
-            XYONLY = .FALSE.
-         END IF
+               CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC,
+     :                          NVAL, STATUS )
+               XYONLY = .TRUE.
+            ELSE
+               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPID, IPDAT, 
+     :                         NREC, NVAL, STATUS )
+               XYONLY = .FALSE.
+            END IF
 
 *  If MTYPE is less then zero then use any identifiers as the marker.
 *  Otherwise we will not use identifiers
-         IF ( XYONLY ) THEN
-            MTYPE = MAX( 0, MIN( 31, ABS( MTYPE ) ) )
-         ELSE
-            IF ( MTYPE .GE. 0 ) THEN
-               MTYPE = MIN( 31, MTYPE )
+            IF ( XYONLY ) THEN
+               MTYPE = MAX( 0, MIN( 31, ABS( MTYPE ) ) )
+            ELSE
+               IF ( MTYPE .GE. 0 ) THEN
+                  MTYPE = MIN( 31, MTYPE )
+               END IF
             END IF
-         END IF
 
 *  Draw the points.
-         CALL CCD1_DRAWA( PLOT, %VAL( IPID ), %VAL( IPDAT ), NREC, NVAL,
-     :                    MTYPE, STATUS )
+            CALL CCD1_DRAWA( PLOT, %VAL( IPID ), %VAL( IPDAT ), NREC,
+     :                       NVAL, MTYPE, STATUS )
 
 *  Free memory used on this pass.
-         CALL CCD1_MFREE( IPID, STATUS )
-         CALL CCD1_MFREE( IPDAT, STATUS )
+            CALL CCD1_MFREE( IPID, STATUS )
+            CALL CCD1_MFREE( IPDAT, STATUS )
+         END IF
 
 *  Close the position list.
  98      CALL FIO_CLOSE( FDIN, STATUS )

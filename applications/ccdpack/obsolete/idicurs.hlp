@@ -245,11 +245,6 @@ WRITELIST = _LOGICAL (Read)
    positions will be written to the file using the standard
    CCDPACK format as described in the Notes section.
 
-   If this parameter is true and no points are marked on the
-   image when the program finishes, then the image file will be
-   left with no associated position list file - any pre-existing
-   one will be de-associated with it.
-
    If WRITELIST is false, then no position lists are written and
    no changes are made to the image associated position lists.
    [FALSE]

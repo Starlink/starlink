@@ -83,3 +83,6 @@
       - There is improved crossreferencing in SUN/139 from "See also"
         sections in the task descriptions Appendix back to the main text.
 
+      - Programs which deal with attached position lists will now normally
+        use a position list file with no entries rather than not using
+        an attached position list at all.

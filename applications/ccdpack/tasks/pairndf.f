@@ -208,7 +208,7 @@
 *        which means call the position lists the same as the input NDFs
 *        but put "_objs.dat" after the names. Replacement of a specified
 *        string with another in the output file names can also be used,
-*           outlist > *|_debias|_images.dat|
+*           OUTLIST > *|_debias|_images.dat|
 *        this replaces the string "_debias" with "_images.dat" in any
 *        of the output names.
 *
@@ -384,6 +384,9 @@
 *        Changed call parameters for modified CCD1_GMMP.
 *     7-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     22-MAY-2001 (MBT):
+*        Changed so that empty position lists are written rather than no
+*        lists at all.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -705,32 +708,21 @@
      :                       %VAL( IPYQ ), NCOUT, STATUS )
          END IF
 
-*  Check whether there are any points to write to this position list.
-         IF ( NCOUT .GT. 0 ) THEN
-
 *  Open the position list file.
-            CALL GRP_GET( OUTGRP, I, 1, FNAME, STATUS )
-            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO, STATUS )
-            CALL CCD1_FIOHD( FDO, 'Output from PAIRNDF', STATUS )
+         CALL GRP_GET( OUTGRP, I, 1, FNAME, STATUS )
+         CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO, STATUS )
+         CALL CCD1_FIOHD( FDO, 'Output from PAIRNDF', STATUS )
 
 *  Write the data.
-            CALL CCD1_WRIXY( FDO, %VAL( IPIQ ), %VAL( IPXQ ),
-     :                       %VAL( IPYQ ), NCOUT, LINE, CCD1__BLEN,
-     :                       STATUS )
+         CALL CCD1_WRIXY( FDO, %VAL( IPIQ ), %VAL( IPXQ ),
+     :                    %VAL( IPYQ ), NCOUT, LINE, CCD1__BLEN,
+     :                    STATUS )
 
 *  Close the file.
-            CALL FIO_CLOSE( FDO, STATUS )
+         CALL FIO_CLOSE( FDO, STATUS )
 
 *  Store the names of the position lists in the NDF extensions
-            CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST', FNAME, STATUS )
-
-*  If there are no points to write, then remove any existing list name
-*  from the NDF extension, otherwise casual use of them by later 
-*  applications may give the impression that the original position
-*  lists are matched ones.
-         ELSE
-            CALL CCD1_RMIT( INDF( I ), 'CURRENT_LIST', .TRUE., STATUS )
-         END IF
+         CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST', FNAME, STATUS )
 
 *  Release some resources.
          IF ( NOUT( IS ) .GT. 0 ) THEN

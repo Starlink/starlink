@@ -22,6 +22,9 @@
 *     in this range STATUS is set and an error is reported. If either of
 *     the bounds is given as 0 then it does not apply. The file is
 *     rewound to the beginning before the routine returns.
+*
+*     If the file contains no data (contains no lines apart from
+*     comments) then the number of fields is returned as zero.
 
 *  Arguments:
 *     FD = INTEGER (Given)
@@ -37,17 +40,21 @@
 *        The maximum number of words which is acceptable. If this
 *        value is given as zero no bound applies.
 *     NVAL = INTEGER (Returned)
-*        The number of words located in line.
+*        The number of words located in line.  If there are no data lines
+*        in the file this is returned as zero.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-SEP-1992 (PDRAPER):
 *        Original version.
+*     22-MAY-2001 (MBT):
+*        Changed to return NVAL = 0 without error if the file is empty.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -131,6 +138,10 @@
      :      '  Error reading file ^FILENAME', STATUS )
             GO TO 99
          END IF
+
+*  If no data line was retrieved, just set the return value to zero.
+      ELSE IF ( STATUS .EQ. SAI__OK .AND. EOF ) THEN
+         NVAL = 0
       END IF
 
 *  Rewind the file and exit.

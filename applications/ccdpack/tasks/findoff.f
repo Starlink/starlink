@@ -477,6 +477,9 @@
 *     18-MAY-2001 (MBT):
 *        Fixed the propagation of extra columns - it was failing to do
 *        more than one of them properly.
+*     22-MAY-2001 (MBT):
+*        Changed to write an empty list file rather than no list file
+*        at all.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -624,7 +627,6 @@
       INTEGER OUTGRP            ! Output group identifier
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER UBND( 2 )         ! Upper pixel-index bounds of NDF
-      INTEGER WRTGRP            ! GRP identifier for list files actually written
       LOGICAL ALLOK             ! Trur no input positions removed in preselection phase
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
@@ -659,7 +661,6 @@
       FIOGR = GRP__NOID
       OUTGRP = GRP__NOID
       NDFGR = GRP__NOID
-      WRTGRP = GRP__NOID
 
 *  Find out what is to be used for the source of the position list
 *  names. Are they stored in NDF extensions or will just straight list
@@ -669,7 +670,8 @@
 
 *  Get the lists of of positions.
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS, 
-     :                 NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+     :                 .FALSE., NOPEN, FIOGR, NDFGR, NNOLIS, NLGR,
+     :                 STATUS )
       CALL CCD1_GRDEL( NLGR, STATUS )
 
 *  If not all supplied NDFs have position lists, warn the user of
@@ -898,67 +900,74 @@
          CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
          CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
-         IF ( NVAL .EQ. 2 ) THEN 
+         IF ( NVAL .GT. 0 ) THEN
+            IF ( NVAL .EQ. 2 ) THEN 
 
 *  Map in X and Y positions only (non-standard file)
-            NXVAL( I ) = 0
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC( I ),
-     :                       NVAL, STATUS )
-         ELSE
+               NXVAL( I ) = 0
+               CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT,
+     :                          NREC( I ), NVAL, STATUS )
+            ELSE
 
 *  Standard file format map these in.
-            NXVAL( I ) = NVAL - 3
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
-     :                      NREC( I ), NVAL, STATUS )
-            CALL CCD1_MFREE( IPIND, STATUS )            
-         END IF
+               NXVAL( I ) = NVAL - 3
+               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
+     :                         NREC( I ), NVAL, STATUS )
+               CALL CCD1_MFREE( IPIND, STATUS )            
+            END IF
 
 *  Accumulate the number of records in this superlist.
-         NRECS( ISUP( I ) ) = NRECS( ISUP( I ) ) + NREC( I ) 
+            NRECS( ISUP( I ) ) = NRECS( ISUP( I ) ) + NREC( I ) 
 
 *  Get workspace for storing the point identifiers and X and Y pixel 
 *  coordinate values.
-         CALL CCD1_MALL( NREC( I ), '_INTEGER', IPSEQ( I ), STATUS )
-         CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXP, STATUS )
-         CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYP, STATUS )
+            CALL CCD1_MALL( NREC( I ), '_INTEGER', IPSEQ( I ), STATUS )
+            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXP, STATUS )
+            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYP, STATUS )
 
 *  Prepare a list of unique indices identifying each point.  This will
 *  enable us later on to keep track of the file in which each point 
 *  originated.
-         CALL CCD1_GISEQ( IPOS, 1, NREC( I ), %VAL( IPSEQ( I ) ),
-     :                    STATUS )
-         IPOS = IPOS + NREC( I )
+            CALL CCD1_GISEQ( IPOS, 1, NREC( I ), %VAL( IPSEQ( I ) ),
+     :                       STATUS )
+            IPOS = IPOS + NREC( I )
 
 *  Extract the X and Y values from the mapped data array.
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 1,
-     :                   %VAL( IPXP ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2,
-     :                   %VAL( IPYP ), STATUS )
+            CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 1,
+     :                      %VAL( IPXP ), STATUS )
+            CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2,
+     :                      %VAL( IPYP ), STATUS )
 
 *  Transform the X and Y values into the correct coordinate system.
-         IF ( USEWCS ) THEN
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXQ( I ), STATUS )
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYQ( I ), STATUS )
-            CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPXP ),
-     :                      %VAL( IPYP ), .TRUE., %VAL( IPXQ( I ) ),
-     :                      %VAL( IPYQ( I ) ), STATUS )
-            CALL CCD1_MFREE( IPXP, STATUS )
-            CALL CCD1_MFREE( IPYP, STATUS )
-         ELSE
-            IPXQ( I ) = IPXP
-            IPYQ( I ) = IPYP
-         END IF
+            IF ( USEWCS ) THEN
+               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPXQ( I ), STATUS )
+               CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPYQ( I ), STATUS )
+               CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPXP ),
+     :                         %VAL( IPYP ), .TRUE., %VAL( IPXQ( I ) ),
+     :                         %VAL( IPYQ( I ) ), STATUS )
+               CALL CCD1_MFREE( IPXP, STATUS )
+               CALL CCD1_MFREE( IPYP, STATUS )
+            ELSE
+               IPXQ( I ) = IPXP
+               IPYQ( I ) = IPYP
+            END IF
 
 *  Extract additional values from the mapped data array if present.
-         IF ( NXVAL( I ) .GT. 0 ) THEN
-            CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
-     :                      IPXDAT( I ), STATUS )
-            CALL CCD1_XDAT( %VAL( IPDAT ), NREC( I ), NVAL, 
-     :                      %VAL( IPXDAT( I ) ), STATUS )
-         END IF
+            IF ( NXVAL( I ) .GT. 0 ) THEN
+               CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
+     :                         IPXDAT( I ), STATUS )
+               CALL CCD1_XDAT( %VAL( IPDAT ), NREC( I ), NVAL, 
+     :                         %VAL( IPXDAT( I ) ), STATUS )
+            END IF
 
 *  Release workspace.
-         CALL CCD1_MFREE( IPDAT, STATUS )
+            CALL CCD1_MFREE( IPDAT, STATUS )
+
+*  No lines in the position list file.
+         ELSE
+            NREC( I ) = 0
+            NXVAL( I ) = 0
+         END IF
 
 *  And close the file.
          CALL FIO_CLOSE( FDIN, STATUS )
@@ -970,54 +979,60 @@
 *  contain the union of all the points in all the read lists with 
 *  the same Set Name attribute.
       DO I = 1, NSUP
-         IF ( USESET ) THEN
-            CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRDN, STATUS )
-            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPXN, STATUS )
-            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPYN, STATUS )
-            IOFF = 1
-            DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
-               L = ILIS( J )
-               CALL CCG1_COPSI( 1, %VAL( IPSEQ( L ) ), NREC( L ), IOFF,
-     :                          %VAL( IPRDN ), STATUS )
-               CALL CCG1_COPSD( 1, %VAL( IPXQ( L ) ), NREC( L ), IOFF,
-     :                          %VAL( IPXN ), STATUS )
-               CALL CCG1_COPSD( 1, %VAL( IPYQ( L ) ), NREC( L ), IOFF,
-     :                          %VAL( IPYN ), STATUS )
-               IOFF = IOFF + NREC( L )
-               CALL CCD1_MFREE( IPSEQ( L ), STATUS )
-               CALL CCD1_MFREE( IPXQ( L ), STATUS )
-               CALL CCD1_MFREE( IPYQ( L ), STATUS )
-            END DO
-         ELSE
-            IPRDN = IPSEQ( I )
-            IPXN = IPXQ( I )
-            IPYN = IPYQ( I )
-         END IF
+         IF ( NRECS( I ) .GE. MINMAT ) THEN
+            IF ( USESET ) THEN
+               CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRDN, STATUS )
+               CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPXN, STATUS )
+               CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPYN, STATUS )
+               IOFF = 1
+               DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
+                  L = ILIS( J )
+                  IF ( NREC( L ) .GT. 0 ) THEN
+                     CALL CCG1_COPSI( 1, %VAL( IPSEQ( L ) ), NREC( L ),
+     :                                IOFF, %VAL( IPRDN ), STATUS )
+                     CALL CCG1_COPSD( 1, %VAL( IPXQ( L ) ), NREC( L ),
+     :                                IOFF, %VAL( IPXN ), STATUS )
+                     CALL CCG1_COPSD( 1, %VAL( IPYQ( L ) ), NREC( L ),
+     :                                IOFF, %VAL( IPYN ), STATUS )
+                     IOFF = IOFF + NREC( L )
+                     CALL CCD1_MFREE( IPSEQ( L ), STATUS )
+                     CALL CCD1_MFREE( IPXQ( L ), STATUS )
+                     CALL CCD1_MFREE( IPYQ( L ), STATUS )
+                  END IF
+               END DO
+            ELSE
+               IPRDN = IPSEQ( I )
+               IPXN = IPXQ( I )
+               IPYN = IPYQ( I )
+            END IF
 
 *  Ok. Now select which of these point will be considered for matching.
 *  Remove points which are too close.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRAN( I ), STATUS )
-         CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPX( I ), STATUS )
-         CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPY( I ), STATUS )
-         CALL CCD1_PRMIN( %VAL( IPXN ), %VAL( IPYN ), %VAL( IPRDN ),
-     :                    NRECS( I ), 
-     :                    MINSEP * PSIZE( ILIS( ILISOF( I ) ) ),
-     :                    %VAL( IPX( I ) ), %VAL( IPY( I ) ),
-     :                    %VAL( IPRAN( I ) ), NRECN( I ), STATUS )
-         CALL CCD1_MFREE( IPRDN, STATUS )
-         CALL CCD1_MFREE( IPXN, STATUS )
-         CALL CCD1_MFREE( IPYN, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPRAN( I ), STATUS )
+            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPX( I ), STATUS )
+            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPY( I ), STATUS )
+            CALL CCD1_PRMIN( %VAL( IPXN ), %VAL( IPYN ), %VAL( IPRDN ),
+     :                       NRECS( I ), 
+     :                       MINSEP * PSIZE( ILIS( ILISOF( I ) ) ),
+     :                       %VAL( IPX( I ) ), %VAL( IPY( I ) ),
+     :                       %VAL( IPRAN( I ) ), NRECN( I ), STATUS )
+            CALL CCD1_MFREE( IPRDN, STATUS )
+            CALL CCD1_MFREE( IPXN, STATUS )
+            CALL CCD1_MFREE( IPYN, STATUS )
 
 *  If any points have been rejected, report this and set ALLOK false
 *  to indicate that at least some input positions have been rejected.
-         IF ( NRECN( I ) .NE. NRECS( I ) ) THEN
-            ALLOK = .FALSE.
-            CALL MSG_SETI( 'NREJ', NRECS( I ) - NRECN( I ) )
-            CALL MSG_SETI( 'N', I )
-            CALL CCD1_MSG( ' ',
+            IF ( NRECN( I ) .NE. NRECS( I ) ) THEN
+               ALLOK = .FALSE.
+               CALL MSG_SETI( 'NREJ', NRECS( I ) - NRECN( I ) )
+               CALL MSG_SETI( 'N', I )
+               CALL CCD1_MSG( ' ',
      :'  ^NREJ positions too close in list ^N); positions removed',
-     : STATUS )
+     :    STATUS )
+            END IF
+         ELSE
+            NRECN( I ) = NRECS( I )
          END IF
 
 *  Check list has at least MINMAT values, otherwise it isn't possible
@@ -1542,9 +1557,6 @@
       CALL CCD1_MSG( ' ', '    Output position lists:', STATUS )
       CALL CCD1_MSG( ' ', '    ----------------------', STATUS )
 
-*  Create a group to hold the names of the lists actually written.
-      CALL GRP_NEW( 'CCD:LISTS', WRTGRP, STATUS )
-
 *  Initialise the value of the next position in the global list to 
 *  be encountered.
       IPOS = 1
@@ -1554,6 +1566,13 @@
       DO L = 1, NOPEN
          IS = ISUP( L )
          NLOUT = 0
+
+*  Open the output file and write a header.
+         CALL GRP_GET( OUTGRP, L, 1, FNAME, STATUS )
+         CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, STATUS )
+         CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
+
+*  If there are any points, get them in a suitable form for output.
          IF ( NOUT( IS ) .GT. 0 ) THEN 
 
 *  Get arrays representing the points of the list L, which may need
@@ -1583,11 +1602,6 @@
 
 *  Only proceed if we have any positions to write to this list.
             IF ( NLOUT .GT. 0 ) THEN
-               CALL GRP_GET( OUTGRP, L, 1, FNAME, STATUS )
-               CALL GRP_PUT( WRTGRP, L, FNAME, 0, STATUS )
-               CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT,
-     :                          STATUS )
-               CALL CCD1_FIOHD( FDOUT, 'Output from FINDOFF', STATUS )
 
 *  If we have previously transformed from Pixel to Current coordinates,
 *  transform the output list back again now.
@@ -1642,15 +1656,15 @@
                   CALL CCD1_MFREE( IPLX, STATUS )
                   CALL CCD1_MFREE( IPLY, STATUS )
                END IF
-
-*  Close the output file.
-               CALL FIO_CLOSE( FDOUT, STATUS )
-
-*  Output name.
-               CALL MSG_SETC( 'FNAME', FNAME )
-               CALL CCD1_MSG( ' ', '  ^FNAME', STATUS )
             END IF
          END IF
+
+*  Close the output file.
+         CALL FIO_CLOSE( FDOUT, STATUS )
+
+*  Output name.
+         CALL MSG_SETC( 'FNAME', FNAME )
+         CALL CCD1_MSG( ' ', '  ^FNAME', STATUS )
 
 *  If the names of the positions lists were accessed using NDF extension
 *  information then update the extension.
@@ -1659,17 +1673,8 @@
 *  Get the NDF identifier.
             CALL NDG_NDFAS( NDFGR, L, 'UPDATE', IDIN, STATUS )
 
-*  Store a new position list if there were matches.
-            IF ( NLOUT .GT. 0 ) THEN 
-               CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
-
-*  Just erase the old position list if there were no matches.
-            ELSE
-               CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT,
-     :                         STATUS )
-               CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
-               CALL DAT_ANNUL( LOCEXT, STATUS )
-            END IF
+*  Store a new position list.
+            CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Release the NDF.
             CALL NDF_ANNUL( IDIN, STATUS )
@@ -1686,7 +1691,7 @@
 *  Write the names of the output files to a file which may be used for
 *  indirection into other applications.
          CALL CCD1_LNAM( 'NAMELIST', 1, NOPEN,
-     :   '# FINDOFF - output position lists', WRTGRP, .TRUE., STATUS )
+     :   '# FINDOFF - output position lists', OUTGRP, .TRUE., STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL CCD1_MSG( ' ', '  No namelist written ', STATUS )
@@ -1711,7 +1716,6 @@
       CALL CCD1_GRDEL( FIOGR, STATUS )
       CALL CCD1_GRDEL( OUTGRP, STATUS )
       CALL CCD1_GRDEL( NDFGR, STATUS )
-      CALL CCD1_GRDEL( WRTGRP, STATUS )
 
 *  Close AST.
       CALL AST_END( STATUS )

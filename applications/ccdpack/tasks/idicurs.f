@@ -201,11 +201,6 @@
 *        positions will be written to the file using the standard
 *        CCDPACK format as described in the Notes section.
 *
-*        If this parameter is true and no points are marked on the
-*        image when the program finishes, then the image file will be
-*        left with no associated position list file - any pre-existing
-*        one will be de-associated with it.
-*
 *        If WRITELIST is false, then no position lists are written and
 *        no changes are made to the image associated position lists.
 *        [FALSE]
@@ -332,6 +327,9 @@
 *        is a rewrite from scratch).
 *     9-APR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     22-MAY-2001 (MBT):
+*        Changed so that an empty position list file is written when 
+*        there are no points rather than no file at all.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -574,6 +572,9 @@
                   CALL CCD1_LTEST( FD, LINE, CCD1__BLEN, 2, 0, NFIELD,
      :                             STATUS )
 
+*  If there are any data in the file, read it.
+                  IF ( NFIELD .GT. 0 ) THEN
+
 *  Map in X and Y positions only (non-standard file).
 *  Note: this could screw up (give duplicate ID values) in the event that
 *  a Set contains some files with explicit ID values and some with
@@ -582,19 +583,25 @@
 *  ID values themselves.  Under normal circumstances (if you have been
 *  doing previous processing in a Set-aware way) neither case is likely.
 *  If it happens, too bad (probably some positions will get lost).
-                  IF ( NFIELD .EQ. 2 ) THEN
-                     CALL CCD1_NLMAP( FD, LINE, CCD1__BLEN, IPDAT( I ),
-     :                                NP( I ), NF( I ), STATUS )
-                     CALL CCD1_MALL( NP( I ), '_INTEGER', IPIND( I ),
-     :                               STATUS )
-                     CALL CCD1_GISEQ( NPOSI + 1, 1, NP( I ),
-     :                                %VAL( IPIND( I ) ), STATUS )
+                     IF ( NFIELD .EQ. 2 ) THEN
+                        CALL CCD1_NLMAP( FD, LINE, CCD1__BLEN,
+     :                                   IPDAT( I ), NP( I ), NF( I ),
+     :                                   STATUS )
+                        CALL CCD1_MALL( NP( I ), '_INTEGER', IPIND( I ),
+     :                                  STATUS )
+                        CALL CCD1_GISEQ( NPOSI + 1, 1, NP( I ),
+     :                                   %VAL( IPIND( I ) ), STATUS )
 
 *  Standard file format map these in.
+                     ELSE
+                        CALL CCD1_LMAP( FD, LINE, CCD1__BLEN,
+     :                                  IPIND( I ), IPDAT( I ), NP( I ),
+     :                                  NF( I ), STATUS )
+                     END IF
+
+*  No data - set number of points to zero.
                   ELSE
-                     CALL CCD1_LMAP( FD, LINE, CCD1__BLEN, IPIND( I ),
-     :                               IPDAT( I ), NP( I ), NF( I ),
-     :                               STATUS )
+                     NP( I ) = 0
                   END IF
 
 *  Close the input file.
@@ -684,57 +691,60 @@
 *  position list file.
          IF ( WRLIST ) THEN
             IF ( NMEM .EQ. 1 ) THEN
-               IF ( NPOSO .GT. 0 ) THEN
 
 *  Open the output position list file.
-                  CALL GRP_GET( OLSTGR, IMEM( IMEMOF( IS ) ), 1, FNAME,
-     :                          STATUS )
-                  CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD,
-     :                             STATUS )
+               CALL GRP_GET( OLSTGR, IMEM( IMEMOF( IS ) ), 1, FNAME,
+     :                       STATUS )
+               CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
 
 *  Write a header to the file.
-                  CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
+               CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
 
 *  Write the positions to the output file.
-                  CALL CCD1_WRIXY( FD, %VAL( IPIO ), %VAL( IPXO ),
-     :                             %VAL( IPYO ), NPOSO, LINE,
-     :                             CCD1__BLEN, STATUS )
+               CALL CCD1_WRIXY( FD, %VAL( IPIO ), %VAL( IPXO ),
+     :                          %VAL( IPYO ), NPOSO, LINE,
+     :                          CCD1__BLEN, STATUS )
+
+*  Close the output file.
+               CALL FIO_CLOSE( FD, STATUS )
 
 *  Report file used and number of entries.
-                  CALL CCD1_MSG( ' ', ' ', STATUS )
-                  CALL MSG_SETC( 'FNAME', FNAME )
-                  CALL MSG_SETI( 'NPOS', NPOSO )
-                  CALL CCD1_MSG( ' ', 
-     :            '    Wrote ^NPOS positions to file ^FNAME', STATUS )
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL MSG_SETC( 'FNAME', FNAME )
+               CALL MSG_SETI( 'NPOS', NPOSO )
+               CALL CCD1_MSG( ' ', 
+     :         '    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
 *  Modify the CURRENT_LIST item of the CCDPACK extension accordingly.
-                  CALL CCG1_STO0C( INDF( 1 ), 'CURRENT_LIST', FNAME,
-     :                             STATUS )
-
-*  If there were no points, ensure that the output position list is
-*  not written into the extension.
-               ELSE
-                  CALL CCD1_RMIT( INDF( 1 ), 'CURRENT_LIST', .TRUE., 
-     :                            STATUS )
-               END IF
+               CALL CCG1_STO0C( INDF( 1 ), 'CURRENT_LIST', FNAME,
+     :                          STATUS )
 
 *  Multiple members of this Set.  In this case we have to transform
 *  back from CCD_SET coordinates, and only write the appropriate 
 *  points into each position list.
             ELSE
 
+*  Loop over each NDF in this Set.
+               DO I = 1, NMEM
+                  INDEX = IMEM( IMEMOF( IS ) + I - 1 )
+
+*  Open the position list file.
+                  CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
+                  CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD,
+     :                             STATUS )
+
+*  Write a header to the file.
+                  CALL CCD1_FIOHD( FD, 'Output from IDICURS', STATUS )
+
 *  Allocate enough space to hold transformed coordinates, and a 
 *  subset of this Set's position list.
-               IF ( NPOSO .GT. 0 ) THEN
-                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX1, STATUS )
-                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY1, STATUS )
-                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX2, STATUS )
-                  CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY2, STATUS )
-                  CALL CCD1_MALL( NPOSO, '_INTEGER', IPI2, STATUS )
-
-*  Loop over each NDF in this Set.
-                  DO I = 1, NMEM
-                     INDEX = IMEM( IMEMOF( IS ) + I - 1 )
+                  NPO = 0
+                  IF ( NPOSO .GT. 0 ) THEN
+                     CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX1, STATUS )
+                     CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY1, STATUS )
+                     CALL CCD1_MALL( NPOSO, '_DOUBLE', IPX2, STATUS )
+                     CALL CCD1_MALL( NPOSO, '_DOUBLE', IPY2, STATUS )
+                     CALL CCD1_MALL( NPOSO, '_INTEGER', IPI2, STATUS )
 
 *  Transform the positions into pixel coordinates.
                      CALL AST_TRAN2( MAP( I ), NPOSO, %VAL( IPXO ),
@@ -758,56 +768,32 @@
      :                                %VAL( IPI2 ), %VAL( IPX2 ), 
      :                                %VAL( IPY2 ), NPO, STATUS )
 
-*  If the subset contains some points, write a list and associate it
-*  with this NDF.
-                     IF ( NPO .GT. 0 ) THEN
-
-*  Open the position list file.
-                        CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
-                        CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD,
-     :                                   STATUS )
-
-*  Write a header to the file.
-                        CALL CCD1_FIOHD( FD, 'Output from IDICURS',
-     :                                   STATUS )
-
 *  Write the positions out.
-                        CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
-     :                                   %VAL( IPY2 ), NPO, LINE,
-     :                                   CCD1__BLEN, STATUS )
+                     CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
+     :                                %VAL( IPY2 ), NPO, LINE,
+     :                                CCD1__BLEN, STATUS )
+
+*  Free memory.
+                     CALL CCD1_MFREE( IPX1, STATUS )
+                     CALL CCD1_MFREE( IPY1, STATUS )
+                     CALL CCD1_MFREE( IPX2, STATUS )
+                     CALL CCD1_MFREE( IPY2, STATUS )
+                     CALL CCD1_MFREE( IPI2, STATUS )
+                  END IF
+
+*  Close the output file.
+                  CALL FIO_CLOSE( FD, STATUS )
 
 *  Report file used and number of entries.
-                        CALL MSG_SETC( 'FNAME', FNAME )
-                        CALL MSG_SETI( 'NPOS', NPO )
-                        CALL CCD1_MSG( ' ',
+                  CALL MSG_SETC( 'FNAME', FNAME )
+                  CALL MSG_SETI( 'NPOS', NPO )
+                  CALL CCD1_MSG( ' ',
      :'    Wrote ^NPOS positions to file ^FNAME', STATUS )
 
 *  Modify the CURRENT_LIST item of the CCDPACK extension accordingly.
-                        CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST',
-     :                                   FNAME, STATUS )
-
-*  If there were no points, ensure that the output position list is
-*  not written into the extension.
-                     ELSE
-                        CALL CCD1_RMIT( INDF( I ), 'CURRENT_LIST',
-     :                                  .TRUE., STATUS )
-                     END IF
-                  END DO
-
-*  Free memory.
-                  CALL CCD1_MFREE( IPX1, STATUS )
-                  CALL CCD1_MFREE( IPY1, STATUS )
-                  CALL CCD1_MFREE( IPX2, STATUS )
-                  CALL CCD1_MFREE( IPY2, STATUS )
-                  CALL CCD1_MFREE( IPI2, STATUS )
-
-*  No points marked at all; just erase the CURRENT_LIST items.
-               ELSE
-                  DO I = 1, NMEM
-                     CALL CCD1_RMIT( INDF( I ), 'CURRENT_LIST', .TRUE.,
-     :                               STATUS )
-                  END DO
-               END IF
+                  CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST',
+     :                             FNAME, STATUS )
+               END DO
             END IF
          END IF
 

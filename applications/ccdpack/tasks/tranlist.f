@@ -427,6 +427,8 @@
 *        Added new TRTYPE of WCS.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     22-MAY-2001 (MBT):
+*        Changed to cope with position lists which contain no data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -531,7 +533,8 @@
 *  Now get the list names. If NDFS is true then we require a group of
 *  NDFs are well as the group of list names.
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 1, CCD1__MXLIS,
-     :                 NOPEN, FIOGRP, NDFGRP, NNOLIS, NLGRP, STATUS )
+     :                 .FALSE., NOPEN, FIOGRP, NDFGRP, NNOLIS, NLGRP,
+     :                 STATUS )
       CALL CCD1_GRDEL( NLGRP, STATUS )
 
 *  If not all supplied NDFs have position lists, warn the user of
@@ -745,160 +748,171 @@
      :                  STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Test the input file to see how many values the first line has.
-         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
-
-*  If only two values are given then interpret these as the X and Y
-*  positions. Otherwise assume that the file is a standard file and map
-*  in the first column as identifiers then the data area.
-         IF ( NVAL .EQ. 2 ) THEN
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC, NVAL,
-     :                       STATUS )
-
-*  Generate some dummy identfiers for the output file.
-            CALL CCD1_MALL( NREC, '_INTEGER', IPIND, STATUS )
-            CALL CCD1_GISEQ( 1, 1, NREC, %VAL( IPIND ), STATUS )
-         ELSE
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT, NREC,
-     :                      NVAL, STATUS )
-         END IF
-
 *  If inputs are associated with NDFs then access the NDFs.
          IF ( NDFS ) THEN
             CALL NDG_NDFAS( NDFGRP, INDEX, 'UPDATE', IDIN, STATUS )
          END IF
 
+*  Test the input file to see how many values the first line has.
+         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL, STATUS )
+
+*  Skip most processing if there were no data lines in the list file.
+         IF ( NVAL .GT. 0 ) THEN
+
+*  If only two values are given then interpret these as the X and Y
+*  positions. Otherwise assume that the file is a standard file and map
+*  in the first column as identifiers then the data area.
+            IF ( NVAL .EQ. 2 ) THEN
+               CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT, NREC,
+     :                          NVAL, STATUS )
+
+*  Generate some dummy identfiers for the output file.
+               CALL CCD1_MALL( NREC, '_INTEGER', IPIND, STATUS )
+               CALL CCD1_GISEQ( 1, 1, NREC, %VAL( IPIND ), STATUS )
+            ELSE
+               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND, IPDAT,
+     :                         NREC, NVAL, STATUS )
+            END IF
+
 *  Transformation section...............................................
 *  Get workspace for storing the transformed data.
-         CALL CCD1_MALL( NREC * NVAL, '_DOUBLE', IPWORK, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 98
+            CALL CCD1_MALL( NREC * NVAL, '_DOUBLE', IPWORK, STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Transform the data.
-         IF ( TRTYPE .EQ. 'COEFF' ) THEN
+            IF ( TRTYPE .EQ. 'COEFF' ) THEN
 
 *  Linear transformation from supplied coefficients.
-            CALL CCD1_LXYT( %VAL( IPDAT ), NREC, NREC, NVAL, TR,
-     :                      %VAL( IPWORK ), STATUS )
-         ELSE IF ( TRTYPE .EQ. 'EXPRES' .OR. TRTYPE .EQ. 'STRUCT' )
-     :   THEN
+               CALL CCD1_LXYT( %VAL( IPDAT ), NREC, NREC, NVAL, TR,
+     :                         %VAL( IPWORK ), STATUS )
+            ELSE IF ( TRTYPE .EQ. 'EXPRES' .OR. TRTYPE .EQ. 'STRUCT' )
+     :      THEN
 
 *  Using a tranformation structure. If these are stored in the NDF
 *  extensions then we may still need to access them.
-            IF ( INEXT .AND. STATUS .EQ. SAI__OK ) THEN
+               IF ( INEXT .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Get a CCDPACK extension.
-               CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT, STATUS )
+                  CALL CCD1_CEXT( IDIN, .FALSE., 'UPDATE', LOCEXT, 
+     :                            STATUS )
 
 *  Now Look for a transformation structure.
-               IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE, STATUS )
+                  IF ( STATUS .EQ. SAI__OK ) THEN
+                     CALL DAT_THERE( LOCEXT, 'TRANSFORM', THERE,
+     :                               STATUS )
 
 *  If have one get a locator to it.
-                  IF ( THERE ) THEN
-                     CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR, STATUS )
+                     IF ( THERE ) THEN
+                        CALL DAT_FIND( LOCEXT, 'TRANSFORM', LOCTR,
+     :                                 STATUS )
 
 *  And compile it.
-                     CALL TRN_COMP( LOCTR, FORWRD, IDTR, STATUS )
-                     CALL DAT_ANNUL( LOCEXT, STATUS )
-                  ELSE
+                        CALL TRN_COMP( LOCTR, FORWRD, IDTR, STATUS )
+                        CALL DAT_ANNUL( LOCEXT, STATUS )
+                     ELSE
 
 *  Failed to find component TRANSFORM.
-                     CALL DAT_ANNUL( LOCEXT, STATUS )
-                     STATUS = SAI__ERROR
-                     CALL NDF_MSG( 'NDFNAME', IDIN )
-                     CALL ERR_REP( 'TRANLIST_NOEXT', '  NDF ^NDFNAME '//
+                        CALL DAT_ANNUL( LOCEXT, STATUS )
+                        STATUS = SAI__ERROR
+                        CALL NDF_MSG( 'NDF', IDIN )
+                        CALL ERR_REP( 'TRANLIST_NOEXT', '  NDF ^NDF '//
      : 'does not have a TRANSFORM component in its CCDPACK extension',
-     :                             STATUS )
-                     GO TO 99
-                  END IF
-               ELSE
+     :                                STATUS )
+                        GO TO 99
+                     END IF
+                  ELSE
 
 *  No extension. Set status and abort.
-                   STATUS = SAI__ERROR
-                   CALL NDF_MSG( 'NDFNAME', IDIN )
-                   CALL ERR_REP( 'CCDTRAN_NOEXT',
+                      STATUS = SAI__ERROR
+                      CALL NDF_MSG( 'NDFNAME', IDIN )
+                      CALL ERR_REP( 'CCDTRAN_NOEXT',
      :'  NDF ^NDFNAME does not have a CCDPACK extension', STATUS )
-                   GO TO 99
+                      GO TO 99
+                  END IF
                END IF
-            END IF
 
 *  Find out how many transformation variables there are. We need 2 for
 *  our purposes.
-            CALL TRN_GTNV( LOCTR, NINV, NFOR, STATUS )
-            IF (         FORWRD .AND. NINV .NE. 2  .OR.
-     :           ( .NOT. FORWRD .AND. NFOR .NE. 2 ) ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'TRANLIST_BADDIR',
+               CALL TRN_GTNV( LOCTR, NINV, NFOR, STATUS )
+               IF (         FORWRD .AND. NINV .NE. 2  .OR.
+     :              ( .NOT. FORWRD .AND. NFOR .NE. 2 ) ) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP( 'TRANLIST_BADDIR',
      :         '  Transformation does not have the required number '//
      :         'variables (2)', STATUS )
-               GO TO 99
-            END IF
+                  GO TO 99
+               END IF
 
 *  Finally transform the data.
-            CALL TRN_TRND( .FALSE., NREC, 2, NREC, %VAL( IPDAT ), IDTR,
-     :                     NREC, 2, %VAL( IPWORK ), STATUS )
+               CALL TRN_TRND( .FALSE., NREC, 2, NREC, %VAL( IPDAT ),
+     :                        IDTR, NREC, 2, %VAL( IPWORK ), STATUS )
 
 *  Copy any further data into the result array.
-            IF ( NVAL .GT. 2 ) THEN
-               DO 2 I = 3, NVAL
-                  CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
-     :                           %VAL( IPWORK ), STATUS )
- 2             CONTINUE
-            END IF
-            IF ( INEXT ) CALL DAT_ANNUL( LOCTR, STATUS )
-         ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
+               IF ( NVAL .GT. 2 ) THEN
+                  DO 2 I = 3, NVAL
+                     CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
+     :                              %VAL( IPWORK ), STATUS )
+ 2                CONTINUE
+               END IF
+               IF ( INEXT ) CALL DAT_ANNUL( LOCTR, STATUS )
+            ELSE IF ( TRTYPE .EQ. 'WCS' ) THEN
 
 *  Using WCS component of one or all NDFs for the mapping.  
 *  Generate the mapping from the NDF identifier.  If INEXT is set we 
 *  need to do this every time, otherwise just first time round the loop.
-            IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
+               IF ( INEXT .OR. INDEX .EQ. 1 ) THEN
 
 *  Get the WCS component.
-               IF ( INEXT ) THEN
-                  CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
-               ELSE
-                  CALL CCD1_GTWCS( IWCSF, IWCS, STATUS )
-               END IF
+                  IF ( INEXT ) THEN
+                     CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
+                  ELSE
+                     CALL CCD1_GTWCS( IWCSF, IWCS, STATUS )
+                  END IF
 
 *  Save the index of the original Current frame.
-               JCUR = AST_GETI( IWCS, 'Current', STATUS )
+                  JCUR = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Get the index of the source frame.
-               CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, ' ', ' ',
-     :                          .FALSE., STATUS )
-               JFROM = AST_GETI( IWCS, 'Current', STATUS )
+                  CALL KPG1_ASFRM( 'FRAMEIN', 'EPOCHIN', IWCS, ' ', ' ',
+     :                             .FALSE., STATUS )
+                  JFROM = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Set the WCS frameset Current frame to the destination frame (if
 *  parameter is null then it has the right value already).
-               IF ( STATUS .NE. SAI__OK ) GO TO 99
-               CALL PAR_GET0C( 'FRAMEOUT', LINE, STATUS )
-               IF ( STATUS .EQ. PAR__NULL ) THEN
-                  CALL ERR_ANNUL( STATUS )
-                  CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
-               ELSE
-                  CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, ' ', 
-     :                             ' ', .FALSE., STATUS )
-               END IF
+                  IF ( STATUS .NE. SAI__OK ) GO TO 99
+                  CALL PAR_GET0C( 'FRAMEOUT', LINE, STATUS )
+                  IF ( STATUS .EQ. PAR__NULL ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
+                  ELSE
+                     CALL KPG1_ASFRM( 'FRAMEOUT', 'EPOCHOUT', IWCS, ' ', 
+     :                                ' ', .FALSE., STATUS )
+                  END IF
 
 *  Generate the mapping to use.
-               MAPAST = AST_GETMAPPING( IWCS, JFROM, AST__CURRENT, 
-     :                                  STATUS )
-            END IF
+                  MAPAST = AST_GETMAPPING( IWCS, JFROM, AST__CURRENT,
+     :                                     STATUS )
+               END IF
 
 *  Transform the coordinates with the given mapping.
-            CALL AST_TRANN( MAPAST, NREC, 2, NREC, %VAL( IPDAT ), 
-     :                      .TRUE., 2, NREC, %VAL( IPWORK ), STATUS )
+               CALL AST_TRANN( MAPAST, NREC, 2, NREC, %VAL( IPDAT ), 
+     :                         .TRUE., 2, NREC, %VAL( IPWORK ), STATUS )
 
 *  Dispose of one-use mappings.
-            IF ( INEXT ) CALL AST_ANNUL( MAPAST, STATUS )
+               IF ( INEXT ) CALL AST_ANNUL( MAPAST, STATUS )
 
 *  Copy any further data into the result array.
-            IF ( NVAL .GT. 2 ) THEN
-               DO 4 I = 3, NVAL
-                  CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
-     :                           %VAL( IPWORK ), STATUS )
- 4             CONTINUE
+               IF ( NVAL .GT. 2 ) THEN
+                  DO 4 I = 3, NVAL
+                     CALL CCD1_LCC( %VAL( IPDAT ), NREC, NVAL, I, I,
+     :                              %VAL( IPWORK ), STATUS )
+ 4                CONTINUE
+               END IF
             END IF
+
+*  No data in file, so no transformed points.
+         ELSE
+            NREC = 0
          END IF
 
 *  Open a results file.

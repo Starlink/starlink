@@ -246,6 +246,10 @@
       - There is improved crossreferencing in SUN/139 from "See also"
         sections in the task descriptions Appendix back to the main text.
 
+      - Programs which deal with attached position lists will now normally
+        use a position list file with no entries rather than not using
+        an attached position list at all.
+
 1 ASTEXP
 Exports coordinate system information from images
 
@@ -5668,11 +5672,6 @@ WRITELIST = _LOGICAL (Read)
    positions will be written to the file using the standard
    CCDPACK format as described in the Notes section.
 
-   If this parameter is true and no points are marked on the
-   image when the program finishes, then the image file will be
-   left with no associated position list file - any pre-existing
-   one will be de-associated with it.
-
    If WRITELIST is false, then no position lists are written and
    no changes are made to the image associated position lists.
    [FALSE]
@@ -8327,7 +8326,7 @@ OUTLIST = LITERAL (Read)
    which means call the position lists the same as the input images
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
-      outlist > *|_debias|_images.dat|
+      OUTLIST > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 

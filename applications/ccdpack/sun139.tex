@@ -12081,11 +12081,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          positions will be written to the file using the standard
          CCDPACK format as described in the Notes section.
 
-         If this parameter is true and no points are marked on the
-         image when the program finishes, then the image file will be
-         left with no associated position list file - any pre-existing
-         one will be de-associated with it.
-
          If WRITELIST is false, then no position lists are written and
          no changes are made to the image associated position lists.
          [FALSE]
@@ -15181,7 +15176,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          which means call the position lists the same as the input images
          but put {\tt "}\_objs.dat{\tt "} after the names. Replacement of a specified
          string with another in the output file names can also be used,
-            outlist $>$ $*$$|$\_debias$|$\_images.dat$|$
+            OUTLIST $>$ $*$$|$\_debias$|$\_images.dat$|$
          this replaces the string {\tt "}\_debias{\tt "} with {\tt "}\_images.dat{\tt "} in any
          of the output names.
 
@@ -19946,6 +19941,11 @@ This is a major update to CCDPACK.
         from ``See also'' sections in the
         \htmlref{task descriptions Appendix}{descriptions} 
         back to the main text.
+
+     \item
+        Programs which deal with attached position lists will now normally
+        use a position list file with no entries rather than not using
+        an attached position list at all.
 
      \end{itemize}
 

@@ -312,6 +312,9 @@
 *        and MORE are used rather than overloading the IN parameter for
 *        everything which limits the potential use of wildcards.
 *        Also upgraded for Sets.
+*     22-MAY-2001 (MBT):
+*        Changed so that an empty position list file is written instead
+*        of no list file at all.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -818,37 +821,26 @@
      :                          XLO, XHI, YLO, YHI, %VAL( IPI2 ), 
      :                          %VAL( IPX2 ), %VAL( IPY2 ), N2, STATUS )
 
-*  If the subset contains some points, write a list and associate it
-*  with this NDF.
-               IF ( N2 .GT. 0 ) THEN
-
-*  Construct a name for the list file.
-                  CALL MSG_SETI( 'IX', J )
-                  CALL MSG_LOAD( ' ', 'ccdalign_' // 
-     :                           LISTID( :CHR_LEN( LISTID ) ) //
-     :                           '_^IX.fea', FNAME, LENG, STATUS )
+*  Now write a list and associate it with this NDF.  First construct
+*  a name for the list file.
+               CALL MSG_SETI( 'IX', J )
+               CALL MSG_LOAD( ' ', 'ccdalign_' // 
+     :                        LISTID( :CHR_LEN( LISTID ) ) //
+     :                        '_^IX.fea', FNAME, LENG, STATUS )
 
 *  Open the list file and write a header.
-                  CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD,
-     :                             STATUS )
-                  CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
+               CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
+               CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
 
 *  Write the chosen points into it.
-                  CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
-     :                             %VAL( IPY2 ), N2, LINE, 1024,
-     :                             STATUS )
+               CALL CCD1_WRIXY( FD, %VAL( IPI2 ), %VAL( IPX2 ),
+     :                          %VAL( IPY2 ), N2, LINE, 1024, STATUS )
 
 *  Close the list file.
-                  CALL FIO_CLOSE( FD, STATUS )
+               CALL FIO_CLOSE( FD, STATUS )
 
 *  Associate it with the NDF.
-                  CALL CCG1_STO0C( INDF, 'CURRENT_LIST', FNAME, STATUS )
-
-*  If the list is empty, then ensure that the NDF does not have an
-*  associated list (since that could cause confusion by later tasks).
-               ELSE
-                  CALL CCD1_RMIT( INDF, 'CURRENT_LIST', .TRUE., STATUS )
-               END IF
+               CALL CCG1_STO0C( INDF, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Release the NDF.
                CALL NDF_ANNUL( INDF, STATUS )

@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, NOPEN,
-     :                       FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+      SUBROUTINE CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, SKIPMT,
+     :                       NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
 *+
 *  Name:
 *     CCD1_GTLIG
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, NOPEN,
-*                      FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+*     CALL CCD1_GTLIG( NDFS, ITEM, PARNAM, MINOPN, MAXOPN, SKIPMT,
+*                      NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
 
 *  Description:
 *     This routine creates a GRP group of filenames. The files are
@@ -32,12 +32,6 @@
 *     through the ADAM parameters PARNAM using GRP are just the exact
 *     names of the files.  All files are then opened using FIO_OPEN to
 *     test for their existence. 
-*
-*     If an extension does not exist or the file cannot be opened then 
-*     an error is reported and status is set.  If NDFs is true and the
-*     CCDPACK extension exists, but no ITEM is in it, then a message is
-*     printed and status is not set.  In this case the list in question
-*     is not added to the GRP group.
 
 *  Arguments:
 *     NDFS = LOGICAL (Given)
@@ -54,6 +48,12 @@
 *        The minimum number of files which need to be opened.
 *     MAXOPN = INTEGER (Given)
 *        The maximum number of files which can be opened.
+*     SKIPMT = LOGICAL (Given)
+*        If true, then position list files which exist but contain no
+*        positions will be treated in the same way as non-existent
+*        position list files (added to the NLGR group).  If false, 
+*        they will be treated the same as position list files which
+*        do contain positions.
 *     NOPEN = INTEGER (Returned)
 *        The number of files which were opened (size of FIOGR and NDFGR).
 *     FIOGR = INTEGER (Returned)
@@ -63,11 +63,11 @@
 *        An NDG group identifier for the names of the NDFs from which
 *        the filenames were obtained.
 *     NNOLIS = INTEGER (Returned)
-*        The number of NDFs which were specified by the user but have
-*        no associated position list (size of NLGR).
+*        The size of NLGR. 
 *     NLGR = INTEGER (Returned)
-*        An NDG group identifier for the names of NDFs which were 
-*        specified by the user, but have no associated position list.
+*        An NDG group identifier for the names of lists/NDFs which were 
+*        specified by the user, but have no position list file or,
+*        if SKIPMT is true, have empty lists.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -99,6 +99,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     16-MAR-2001 (MBT):
 *        Added NNOLIS and NLGR arguments.
+*     22-MAY-2001 (MBT):
+*        Added SKIPMT argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +115,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
+      INCLUDE 'CCD1_PAR'         ! CCDPACK private constants
 
 *  Arguments Given:
       LOGICAL NDFS
@@ -120,6 +123,7 @@
       CHARACTER * ( * ) PARNAM
       INTEGER MINOPN
       INTEGER MAXOPN
+      LOGICAL SKIPMT
 
 *  Arguments Returned:
       INTEGER NOPEN
@@ -133,14 +137,19 @@
 
 *  Local Variables:
       CHARACTER * ( GRP__SZNAM ) FNAME ! Filename
+      CHARACTER * ( CCD1__BLEN ) LINE ! Line buffer
       CHARACTER * ( GRP__SZNAM ) NNAME ! NDF name
       INTEGER FD                 ! FIO file descriptor
       INTEGER I                  ! Loop variable
+      INTEGER FIO1GR             ! GRP identifier for group fo all PARNAM FIOs
       INTEGER INGRP              ! Dummy GRP identifier
+      INTEGER NC                 ! Number of characters in line (dummy)
       INTEGER NDF1GR             ! GRP identifier for group of all PARNAM NDFs
       INTEGER NDFID              ! NDF identfier
+      INTEGER NL                 ! Number of line in file (dummy)
       INTEGER NRET               ! Number of names in group
       LOGICAL OK                 ! Flag showing extension ok
+      LOGICAL SKIP               ! Do we skip this list?
 
 *.
 
@@ -158,7 +167,7 @@
 
 *  Not a list of NDFs, just get a group of names.
          INGRP = GRP__NOID
-         CALL CCD1_STRGR( PARNAM, INGRP, MINOPN, MAXOPN, FIOGR, NRET,
+         CALL CCD1_STRGR( PARNAM, INGRP, MINOPN, MAXOPN, FIO1GR, NRET,
      :                    STATUS )
          CALL MSG_SETI( 'NOPEN', NRET )
          CALL MSG_SETC( 'PARNAM', PARNAM )
@@ -172,18 +181,20 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  Initialise number of names successfully entered in the group.
+      NOPEN = 0
+      NNOLIS = 0
+
+*  Create GRP groups to contain the name strings.
+      CALL GRP_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
+      CALL GRP_NEW( 'CCDPACK:NOLIST', NLGR, STATUS )
+
 *  If all's well then proceed to either open the files, if NDFS is
 *  false or start looking for the names in the NDF extensions.
       IF ( NDFS ) THEN
 
-*  Initialise number of names successfully entered in the group.
-         NOPEN = 0
-         NNOLIS = 0
-
-*  Create GRP groups to contain the name strings.
-         CALL GRP_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
+*  Create a new group to hold the NDF names.
          CALL GRP_NEW( 'CCDPACK:NDFLIST', NDFGR, STATUS )
-         CALL GRP_NEW( 'CCDPACK:NOLIST', NLGR, STATUS )
 
 *  Open each NDF in turn and locate the required name.
          DO 2 I = 1, NRET
@@ -199,18 +210,52 @@
                CALL GRP_PUT( NLGR, 1, NNAME, 0, STATUS )
                NNOLIS = NNOLIS + 1
 
-*  Report that this NDF will be ignored and add it to the group of 
-*  NDFs with no associated list.
+*  Report that this NDF will be ignored.
                CALL MSG_SETC( 'NDF', NNAME )
                CALL CCD1_MSG( ' ',
-     :'  There is no associated list for NDF ^NDF.', STATUS )
-            ELSE
+     :'  There is no associated list for NDF ^NDF', STATUS )
+            ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Enter the file name and the NDF name into the new groups, appending 
-*  to the end (0).
-               CALL GRP_PUT( FIOGR, 1, FNAME, 0, STATUS )
-               CALL GRP_PUT( NDFGR, 1, NNAME, 0, STATUS )
-               NOPEN = NOPEN + 1
+*  We have a file name.  See if the named file exists.
+               CALL FIO_OPEN( FNAME, 'READ', 'LIST', 0, FD, STATUS )
+               IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Failed to open the file. Stop and issue error.
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'FNAME', FNAME )
+                  CALL ERR_REP( 'CCD1_GTLIS_FERR',
+     :                          '  Failed to open file ^FNAME', STATUS )
+                  GO TO 99
+               END IF
+
+*  The file exists.  If asked to, check it for being empty.
+               SKIP = .FALSE.
+               IF ( SKIPMT ) THEN
+                  NL = 0
+                  CALL CCD1_RDLIN( FD, CCD1__BLEN, LINE, NC, NL, SKIP,
+     :                             STATUS )
+               END IF
+
+*  Close the file.
+               CALL FIO_CLOSE( FD, STATUS )
+
+*  If we are to discard it, store it in the no-list group.
+               IF ( SKIP ) THEN
+                  CALL GRP_PUT( NLGR, 1, NNAME, 0, STATUS )
+                  NNOLIS = NNOLIS + 1
+
+*  Report that this NDF will be ignored.
+                  CALL MSG_SETC( 'NDF', NNAME )
+                  CALL CCD1_MSG( ' ',
+     :'  The associated list for NDF ^NDF is empty', STATUS )
+               ELSE
+
+*  Everything is all right, we have a usable list.  Enter the file name
+*  and the NDF name into the new groups, appending to the end (0).
+                  CALL GRP_PUT( FIOGR, 1, FNAME, 0, STATUS )
+                  CALL GRP_PUT( NDFGR, 1, NNAME, 0, STATUS )
+                  NOPEN = NOPEN + 1
+               END IF
             END IF
 
 *  Release the NDF.
@@ -222,35 +267,58 @@
          CALL CCD1_GRDEL( NDF1GR, STATUS )
       ELSE
 
-*  If position lists are given directly, the number to consider must be 
-*  the number in PARNAM.
-         NOPEN = NRET
-         NNOLIS = 0
-         NDFGR = GRP__NOID
-         NLGR = GRP__NOID
+*  Position lists are given directly.  We just need to check that the
+*  named files exist and possibly that they are non-empty.
+         DO I = 1, NRET
+
+*  Get the name of the file.
+            CALL GRP_GET( FIO1GR, I, 1, FNAME, STATUS )
+
+*  Try to open it.
+            CALL FIO_OPEN( FNAME, 'READ', 'LIST', 0, FD, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Failed to open the file.  Stop and issue error.
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'FNAME', FNAME )
+               CALL ERR_REP( 'CCD1_GTLIG_FERR',
+     :         'CCD1_GTLIG: Failed to open file ^FNAME', STATUS )
+            ELSE
+
+*  The file exists.  If asked to, check for it being empty.
+               SKIP = .FALSE.
+               IF ( SKIPMT ) THEN
+                  NL = 0
+                  CALL CCD1_RDLIN( FD, CCD1__BLEN, LINE, NC, NL, SKIP,
+     :                             STATUS )
+               END IF
+
+*  Close the file.
+               CALL FIO_CLOSE( FD, STATUS )
+
+*  If we are to discard it, store it in the no-list group.
+               IF ( SKIP ) THEN
+                  CALL GRP_PUT( NLGR, 1, FNAME, 0, STATUS )
+                  NNOLIS = NNOLIS + 1
+
+*  Report that this list will be ignored.
+                  CALL MSG_SETC( 'LIST', FNAME )
+                  CALL CCD1_MSG( ' ', '  The list ^LIST is empty',
+     :                           STATUS )
+               ELSE
+
+*  Everything is all right, we have a usable list.  Enter the file name
+*  into the new group, appending to the end (0).
+                  CALL GRP_PUT( FIOGR, 1, FNAME, 0, STATUS )
+                  NOPEN = NOPEN + 1
+               END IF
+            END IF
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+         END DO
+
+*  Relase the input group.
+         CALL CCD1_GRDEL( FIO1GR, STATUS )
       END IF
-
-*  Now at stage were we have a group of names which may belong to a
-*  list of formatted files. Try to open them one by one, stop if one
-*  does not exist.
-      DO 3 I = 1, NOPEN
-         CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
-
-*  Try to open the file.
-         CALL FIO_OPEN( FNAME, 'READ', 'LIST', 0, FD, STATUS )
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Everything ok - file exists. Now close it.
-            CALL FIO_CLOSE( FD, STATUS )
-         ELSE
-
-*  Failed to open the file. Stop and issue error.
-            STATUS = SAI__ERROR
-            CALL MSG_SETC( 'FNAME', FNAME )
-            CALL ERR_REP( 'CCD1_GTLIS_FERR',
-     :         '  Failed to open file ^FNAME', STATUS )
-         END IF
- 3    CONTINUE
 
 *  Ensure that we have an acceptable number of lists.  We may have 
 *  arrived here without that if an acceptable number of NDFs were

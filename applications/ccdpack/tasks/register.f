@@ -485,6 +485,9 @@
 *        the right way to do it! (so that the CCD_REG frame is guaranteed
 *        suitable for resampling), don't be tempted to change it back
 *        to a copy of the Current frame again.
+*     22-MAY-2001 (MBT):
+*        Changed to use empty position list files instead of no file at
+*        all when there are no positions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -657,7 +660,8 @@
 *  Get the names of all the input lists.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 2, CCD1__MXLIS,
-     :                 NOPEN, FIOGR, NDFGR, NNOLIS, NLGR, STATUS )
+     :                 .TRUE., NOPEN, FIOGR, NDFGR, NNOLIS, NLGR,
+     :                 STATUS )
 
 *  Get coordinate and Set information about lists.
       CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, NLGR, NNOLIS, NDFS, USEWCS,
@@ -772,19 +776,28 @@
      :                         STATUS )
             END IF
 
+*  Now close the file.
+            CALL FIO_CLOSE( FDIN, STATUS )
+
 *  Increment number of items in this superlist.
             NRECS( I ) = NRECS( I ) + NREC( L )
          END DO
 
-*  Now close the file.
-         CALL FIO_CLOSE( FDIN, STATUS )
+*  Check that the superlist is not empty.
+         IF ( NRECS( I ) .LE. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'LIST', I )
+            CALL ERR_REP( 'REGISTER_EMPTY', 
+     :                    'REGISTER: List ^LIST contains no points',
+     :                    STATUS )
+            GO TO 99
+         END IF
       END DO
-
-      IF ( IFIT .NE. 6 .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Does the user want the extended reference set of position written
 *  out? If parameter state is null then no reference set will be
 *  written.
+      IF ( IFIT .NE. 6 .AND. STATUS .EQ. SAI__OK ) THEN
          CALL CCD1_ASFIO( 'OUTREF', 'WRITE', 'LIST', 0, FDREFO, OUTREF,
      :                    STATUS )
          IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
