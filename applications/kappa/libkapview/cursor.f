@@ -405,6 +405,8 @@
 *        Added parameter JUST.
 *     25-AUG-1999 (DSB):
 *        Add TOKEN arg in call to KPG1_ASFRM.
+*     15-FEB-2000 (DSB):
+*        KPG1_PGCUR argument list changed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -788,7 +790,7 @@
 *  view surface.
          CALL KPG1_PGCUR( INFO, PURP, NACT, AMES, KEYS( : NACT ), 0.0, 
      :                    0.0, 0.0, 0.0, NACT - 1, XC, YC, 1, RBMODE, 0,
-     :                    0, -32, XC, YC, ACT, NPNT, STATUS )
+     :                    0, -32, AST__NULL, XC, YC, ACT, NPNT, STATUS )
 
 *  Indicate that instructions on the use of the mouse should not be 
 *  displayed again.

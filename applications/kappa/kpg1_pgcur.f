@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_PGCUR( INFO, MESS, NACT, ACTDES, KEYS, X1, X2, Y1,
      :                       Y2, EXACT, X0, Y0, MAXPNT, RBMODE, LINE, 
-     :                       BOX, MARK, X, Y, ACT, NPNT, STATUS )
+     :                       BOX, MARK, IPLOT, X, Y, ACT, NPNT, STATUS )
 *+
 *  Name:
 *     KPG1_PGCUR
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL KPG1_PGCUR( INFO, MESS, NACT, ACTDES, KEYS, X1, X2, Y1, Y2, 
 *                      EXACT, X0, Y0, MAXPNT, RBMODE, LINE, BOX, MARK, 
-*                      X, Y, ACT, NPNT, STATUS )
+*                      IPLOT, X, Y, ACT, NPNT, STATUS )
 
 *  Description:
 *     This routine uses the PGPLOT cursor to get a set of positions in the 
@@ -98,17 +98,29 @@
 *           1 - use a straight-line rubber band.
 *           2 - use a horizontal box rubber band.
 *     LINE = INTEGER (Given)
-*        If non-zero then a line is drawn (using the current PGPLOT
-*        attributes) between each position. If the value is positive, then
-*        the polygon is closed by joining the last position to the first 
-*        position.
+*        Specifies lines to be drawn as follows:
+*           -1: Join adjacent points and do not close the polygon.
+*            0: Do not draw any lines.
+*            1: Join adjacent points and close the polygon.
+*            2: Draw a vertical line between y1 and y2 (or the height of
+*               the window if y1=y2).
+*            3: Draw a horizontal line between x1 and x2 (or the width of
+*               the window if x1=x2).
+*        The plotting attributes are specified by the CURVES(...) attributes
+*        of the supplied Plot (see IPLOT).
 *     BOX = INTEGER (Given)
-*        If non-zero then a horizontal box is drawn (using the current PGPLOT
-*        attributes) between each position. 
+*        If non-zero then a horizontal box is drawn between each position. 
+*        The plotting attributes are specified by the BORDER(...) attributes
+*        of the supplied Plot (see IPLOT).
 *     MARK = INTEGER (Given)
 *        If -31 or larger, then a marker is drawn at each position. The
-*        type of marker is given by the specific value (see GPLOT routine
-*        PGPT). The current PGPLOT drawing attributes are used.
+*        type of marker is given by the specific value (see PGPLOT routine
+*        PGPT). The plotting attributes are specified by the MARKERS(...) 
+*        attributes of the supplied Plot (see IPLOT).
+*     IPLOT = INTEGER (Given)
+*        Defines the plotting styles for any graphics (see LINE, BOX and
+*        MARK). If AST__NULL is supplied, ther current PGPLOT attributes
+*        are used for all graphics.
 *     X( MAXPNT ) = REAL (Returned)
 *        Elements 1 to NPNT hold the selected X positions.
 *     Y( MAXPNT ) = REAL (Returned)
@@ -131,6 +143,10 @@
 *  History:
 *     21-AUG-1998 (DSB):
 *        Original version.
+*     10-JAN-2000 (DSB):
+*        Added argument IPLOT.
+*     19-JAN-2000 (DSB):
+*        Allow horizontal and vertical lines to be drawn.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -144,6 +160,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'AST_PAR'          ! AST__ constants
 
 *  Arguments Given:
       LOGICAL INFO
@@ -163,6 +180,7 @@
       INTEGER LINE
       INTEGER BOX
       INTEGER MARK
+      INTEGER IPLOT
 
 *  Arguments Returned:
       REAL X( MAXPNT )
@@ -183,21 +201,27 @@
       CHARACTER LKEYS*50         ! Lower case version of KEYS
       CHARACTER TEXT*128         ! Action desription
       CHARACTER VAL*1            ! PGPLOT information string
+      DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       INTEGER I                  ! Loop counter
       INTEGER IACT               ! Index of terminator key in KEYS
       INTEGER IAT                ! No. of characters in string
+      INTEGER NPL                ! Number of graphical elements requested
       INTEGER OK                 ! Zero if no position was obtained
       INTEGER POSN               ! Zero if no acnhor position is available
       INTEGER VLEN               ! Length of PGPLOT information string
       LOGICAL LOOP               ! Get another position?
       LOGICAL RESTR              ! Restrict position to X1:X2,Y1:Y2 ?
+      LOGICAL RESATT             ! Reset plotting attributes each time?
+      REAL LX1                   ! X at left end of line to be drawn
+      REAL LX2                   ! X at right end of line to be drawn
+      REAL LY1                   ! Y at upper end of line to be drawn
+      REAL LY2                   ! Y at lower end of line to be drawn
       REAL XG                    ! X at given position      
       REAL XMAX                  ! Maximum acceptable X at given position      
       REAL XMIN                  ! Minimum acceptable X at given position      
       REAL YG                    ! Y at given position      
       REAL YMAX                  ! Maximum acceptable Y at given position      
       REAL YMIN                  ! Minimum acceptable Y at given position      
-
 *.
 
 *  Check the inherited status. 
@@ -311,6 +335,63 @@
          RESTR = .FALSE.
       END IF
       
+*  If a Plot was supplied we need to establish the require PGPLOT plotting 
+*  attributes. 
+      IF( IPLOT .NE. AST__NULL ) THEN
+
+*  First count the number  of plotting elements being used.
+         NPL = 0
+         IF( LINE .NE. 0 ) NPL = NPL + 1
+         IF( BOX .NE. 0 ) NPL = NPL + 1
+         IF( MARK .GT. -32 ) NPL = NPL + 1
+
+*  If only a single plotting element is being used, we can establish the
+*  plotting attributes now, and then leave them alone.
+         IF( NPL .EQ. 1 ) THEN
+            RESATT = .FALSE.
+
+            IF( LINE .NE. 0  ) THEN
+               CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
+            ELSE IF( BOX .NE. 0 ) THEN
+               CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTR, STATUS )
+            ELSE 
+               CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
+            END IF
+
+*  If there are two or more graphical elements to be drawn, we need to
+*  reset the plotting attributes before drawing each one.
+         ELSE IF( NPL .GT. 1 ) THEN
+            RESATT = .TRUE.
+
+*  If there are no graphical elements to be drawn, we do not need to
+*  reset the plotting attributes.
+         ELSE
+            RESATT = .FALSE.
+         END IF
+
+*  If no Plot was supplied, we do not reset the plotting attributes
+*  before drawing each graphical element.
+      ELSE
+         RESATT = .FALSE.
+      END IF
+
+*  Get the length of any required lines.
+      IF( LINE .EQ. 2 ) THEN      
+         IF( Y1 .EQ. Y2 ) THEN
+            CALL PGQWIN( LX2, LX2, LY1, LY2 ) 
+         ELSE
+            LY1 = Y1
+            LY2 = Y2
+         END IF
+      ELSE IF( LINE .EQ. 3 ) THEN      
+         IF( X1 .EQ. X2 ) THEN
+            CALL PGQWIN( LX2, LX2, LY1, LY2 ) 
+         ELSE
+            LX1 = X1
+            LX2 = X2
+         END IF
+      END IF
+
 *  Initialise the number of positions stored so far.
       NPNT = 0
 
@@ -412,27 +493,80 @@
                   LOOP = .FALSE.
                END IF
 
-*  Draw a line from this position to the previous position if required.
+*  Draw a line through this position if required. Set up the plotting 
+*  attributes first if required.
                IF( LINE .NE. 0 ) THEN
-                  IF( NPNT .GT. 1 ) THEN
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, 
+     :                                STATUS )
+                  END IF
+
+*  If required, draw a line joining this point to the previous point, but
+*  only if this is not the first point.
+                  IF( ( LINE .EQ. -1 .OR. LINE .EQ. 1 ) .AND. 
+     :                NPNT .GT. 1 ) THEN
                      CALL PGMOVE( X( NPNT - 1 ), Y( NPNT - 1 ) )
                      CALL PGDRAW( XG, YG )
+
+*  Otherwise, draw a vertical line if required.
+                  ELSE IF( LINE .EQ. 2 ) THEN
+                     CALL PGMOVE( XG, LY1 )
+                     CALL PGDRAW( XG, LY2 )
+
+*  Otherwise, draw a horizontal line if required.
+                  ELSE IF( LINE .EQ. 3 ) THEN
+                     CALL PGMOVE( LX1, YG )
+                     CALL PGDRAW( LX2, YG )
+
+                  END IF
+
+*  R-instate the original drawing attributes if something else is to be
+*  drawn.
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., 
+     :                                ATTR, STATUS )
                   END IF
 
                END IF
 
 *  Draw a box from this position to the previous position if required.
+*  Establish the plotting attributes first if required.
                IF( BOX .NE. 0 .AND. NPNT .GT. 1 ) THEN
+
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .TRUE., ATTR, 
+     :                                STATUS )
+                  END IF
+
                   CALL PGMOVE( XG, YG )
                   CALL PGDRAW( X( NPNT - 1 ), YG )
                   CALL PGDRAW( X( NPNT - 1 ), Y( NPNT - 1 ) )
                   CALL PGDRAW( XG, Y( NPNT - 1 ) )
                   CALL PGDRAW( XG, YG )
+
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'BORDER', .FALSE., ATTR, 
+     :                                STATUS )
+                  END IF
+
                END IF
 
-*  Draw a mrker if required.
+*  Draw a mrker if required, establishing the plotting charactersistics
+*  first if required.
                IF( MARK .GT. -32 ) THEN
+
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, 
+     :                                STATUS )
+                  END IF
+
                   CALL PGPT( 1, XG, YG, MARK )
+
+                  IF( RESATT ) THEN
+                     CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTR, 
+     :                                STATUS )
+                  END IF
+
                END IF
 
             END IF
@@ -442,12 +576,35 @@
 *  If we have finished, close the polygon if required.
          IF( .NOT. LOOP .AND. LINE .GT. 0 ) THEN
             IF( NPNT .GT. 2 ) THEN
+               IF( RESATT ) THEN
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, 
+     :                             STATUS )
+               END IF
+
                CALL PGMOVE( X( 1 ), Y( 1 ) )
                CALL PGDRAW( X( NPNT ), Y( NPNT ) )
+
+               IF( RESATT ) THEN
+                  CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, 
+     :                             STATUS )
+               END IF
+
             END IF
          END IF
 
       END DO
+
+*  If a Plot was supplied we may need to re-establish the original PGPLOT 
+*  plotting attributes. 
+      IF( IPLOT .NE. AST__NULL .AND. .NOT. RESATT ) THEN
+         IF( LINE .NE. 0 ) THEN
+            CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )
+         ELSE IF( BOX .NE. 0 ) THEN
+            CALL KPG1_PGSTY( IPLOT, 'BORDER', .FALSE., ATTR, STATUS )
+         ELSE IF( MARK .GT. -32 ) THEN
+            CALL KPG1_PGSTY( IPLOT, 'MARKERS', .FALSE., ATTR, STATUS )
+         END IF
+      END IF
 
  999  CONTINUE
 

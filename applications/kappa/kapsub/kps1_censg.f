@@ -135,6 +135,8 @@
 *        Original version.
 *     3-SEP-1999 (DSB):
 *        Added NULL argument to KPG1_GTPOS call.
+*     15-FEB-2000 (DSB):
+*        KPG1_PGCUR argument list changed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -374,7 +376,8 @@
 *  may be selected are restricted to the current picture.
             CALL KPG1_PGCUR( INFO, 'select an image feature', 2, AMES, 
      :                       ' .', X1, X2, Y1, Y2, 0, XIN, YIN, 1, 0, 
-     :                       0, 0, IMARK, XIN, YIN, ACT, NP, STATUS )
+     :                       0, 0, IMARK, AST__NULL, XIN, YIN, ACT, NP, 
+     :                       STATUS )
 
 *  Look out for the abort, i.e. the number of points is zero.
             IF( NP .EQ. 0 ) THEN

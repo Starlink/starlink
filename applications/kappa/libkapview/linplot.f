@@ -453,6 +453,8 @@
 *     26-OCT-1999 (DSB):
 *        Change MARGIN to be a fraction of the current picture, not of the
 *        DATA picture.
+*     15-FEB-2000 (DSB):
+*        Modified for new KPG1_GTAXV argument list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -548,6 +550,7 @@
       INTEGER NCU              ! Number of characters in the units
       INTEGER NFRM             ! Frame index increment between IWCS and IPLOT
       INTEGER NMARG            ! No. of margin values given
+      INTEGER NVAL             ! No. of axis values supplied
       INTEGER PMAP             ! PermMap pointer
       INTEGER PERM( NDF__MXDIM ) ! Dummy axis permutation array
       INTEGER SDIM( NDIM )     ! The significant NDF axes
@@ -1209,8 +1212,10 @@
 
 *  We now have the limits of the data on the X axis of the "what we want" 
 *  Frame. Allow the user to over-ride these limits. 
-         CALL KPG1_GTAXV( 'XLEFT', FSET, 1, BL( 1 ), STATUS )
-         CALL KPG1_GTAXV( 'XRIGHT', FSET, 1, TR( 1 ), STATUS )
+         CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., FSET, 1, BL( 1 ), NVAL, 
+     :                    STATUS )
+         CALL KPG1_GTAXV( 'XRIGHT', 1, .TRUE., FSET, 1, TR( 1 ), NVAL,
+     :                    STATUS )
 
 *  Find the corresponding range of GRID indices. Use an arbitrary value
 *  of 0.0 for the Y axis when doing this Mapping (any Y value will do since
@@ -1259,8 +1264,10 @@
 
 *  We now have the limits of the data on the Y axis of the "what we want" 
 *  Frame. Allow the user to over-ride these limits. 
-         CALL KPG1_GTAXV( 'YBOT', FSET, 2, BL( 2 ), STATUS )
-         CALL KPG1_GTAXV( 'YTOP', FSET, 2, TR( 2 ), STATUS )
+         CALL KPG1_GTAXV( 'YBOT', 1, .TRUE., FSET, 2, BL( 2 ), NVAL, 
+     :                    STATUS )
+         CALL KPG1_GTAXV( 'YTOP', 1, .TRUE., FSET, 2, TR( 2 ), NVAL,
+     :                    STATUS )
 
 *  Map these positions into the Base (uniform) Frame.
          CALL AST_TRANN( FSET, 1, 2, 1, BL, .FALSE., 2, 1, BLG, STATUS ) 

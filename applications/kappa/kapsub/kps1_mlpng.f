@@ -89,6 +89,8 @@
 *  History:
 *     6-AUG-1998 (DSB):
 *        Original version.
+*     15-FEB-2000 (DSB):
+*        Modified to take account of new KPG1_GTAXV argument list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,6 +156,7 @@
       INTEGER NAX                ! No. of axes in Current WCS Frame
       INTEGER NREPHI             ! No. of values above high threshold
       INTEGER NREPLO             ! No. of values below low threshold
+      INTEGER NVAL               ! No. of axis values supplied
       INTEGER ORDAXS             ! Index of ordinate pixel axis
       INTEGER OUTPRM( 2 )        ! O/p axes permutation array
       INTEGER PMAP               ! Pointer to a PermMap
@@ -242,8 +245,10 @@
 
 *  Get the annotated axis values for the left and right hand ends of the
 *  horizontal axis, using the above values as dynamic defaults.
-      CALL KPG1_GTAXV( 'XLEFT', CFRM, IAXIS, XL, STATUS )
-      CALL KPG1_GTAXV( 'XRIGHT', CFRM, IAXIS, XR, STATUS )
+      CALL KPG1_GTAXV( 'XLEFT', 1, .TRUE., CFRM, IAXIS, XL, NVAL, 
+     :                 STATUS )
+      CALL KPG1_GTAXV( 'XRIGHT', 1, .TRUE., CFRM, IAXIS, XR, NVAL, 
+     :                 STATUS )
 
 *  Find a 1D Mapping from "nominal GRID" value to the annotated axis values. 
 *  The nominal GRID axis is mapped linearly onto the horizontal axis of the 
