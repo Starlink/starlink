@@ -32,10 +32,10 @@
  * float, but it would allow you to work it out.
  */
 #if WORDS_BIGENDIAN
-#  if sizeof(int) != 4*sizeof(char)
+#  if SIZEOF_INT != 4*SIZEOF_CHAR
 #    error "num1_cvt.c is specific to 4-byte integers"
 #  endif
-#  if sizeof(short int) != 2*sizeof(char)
+#  if SIZEOF_SHORT_INT != 2*SIZEOF_CHAR
 #    error "num1_cvt.c is specific to 2-byte short integers"
 #  endif
 #endif
@@ -74,7 +74,7 @@ int num1_ubtoi_( unsigned char *num_argub )
 #if WORDS_BIGENDIAN
     union {
         int ret_val;
-        unsigned char[4] ubyte;
+        unsigned char ubyte[4];
     } un;
 
     un.ret_val = 0;
@@ -127,7 +127,7 @@ unsigned short int num1_ubtouw_( unsigned char *num_argub )
 #if WORDS_BIGENDIAN
     union {
         unsigned short ret_val;
-        unsigned char[2] ubyte;
+        unsigned char ubyte[2];
     } un;
 
     un.ret_val = 0;
@@ -184,7 +184,7 @@ short int num1_ubtow_( unsigned char *num_argub )
 
     union {
         short ret_val;
-        unsigned char[2] ubyte;
+        unsigned char ubyte[2];
     } un;
 
     un.ret_val = 0;
@@ -240,11 +240,11 @@ int num1_uwtoi_( unsigned short int *num_arguw )
 
     union {
         int ret_val;
-        unsigned short[2] uword;
+        unsigned short uword[2];
     } un;
 
     un.ret_val = 0;
-    uword[1] = *num_arguw;
+    un.uword[1] = *num_arguw;
 
 #else
 
@@ -295,12 +295,12 @@ unsigned char num1_wtoub_( short int *num_argw )
 #if WORDS_BIGENDIAN
 
     union {
-        unsigned char[2] ret_val;
+        unsigned char ret_val[2];
         short word;
     } un;
 
     un.word = *num_argw;
-    return ret_val[1];
+    return un.ret_val[1];
 
 #else
 
@@ -349,7 +349,7 @@ unsigned short int num1_itouw_( int *num_argi )
 #if WORDS_BIGENDIAN
 
     union {
-        unsigned short[2] ret_val;
+        unsigned short ret_val[2];
         int i;
     } un;
 
