@@ -133,9 +133,9 @@
 *  to the input and output of MAP1, which selects only the required axis.
 *  Create two PermMaps to extract axis IAX from an n-D Frame; MAP2 goes
 *  from 1-D to n-D, MAP3 goes from n-D to 1-D.
-               MAP2 = AST_PERMMAP( 1, IAX, NDIM, OUTPRM, 0.0, ' ',
+               MAP2 = AST_PERMMAP( 1, IAX, NDIM, OUTPRM, 0.0D0, ' ',
      :                                STATUS )
-               MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, IAX, 0.0, ' ', 
+               MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, IAX, 0.0D0, ' ', 
      :                                STATUS )
 
 *  Concatenate the Mappings together, to get a mapping between axis

@@ -303,7 +303,7 @@
             END DO
    
 *  Create the PermMap.
-            PMAP = AST_PERMMAP( NDIMF, INPRM, NDIM, OUTPRM, 1.0, ' ',
+            PMAP = AST_PERMMAP( NDIMF, INPRM, NDIM, OUTPRM, 1.0D0, ' ',
      :                          STATUS )
 
 *  Create a new Base Frame by picking the required axes from the existing 

@@ -221,11 +221,9 @@ if ( $gotext == 1 ) then
    fitslist $ndf logfile=zzfitsedit.tmp
 else
    echo "fitsedit: '$ndf' has no FITS extension. A new FITS extension will be created."
+
    sleep 5
-   echo "COMMENT   This FITS header was created by KAPPA:FITSEDIT" > zzfitsedit.tmp
-   echo "COMMENT   (delete these comments if required.)" >> zzfitsedit.tmp
-   echo "COMMENT " >> zzfitsedit.tmp
-   echo "SIMPLE  =                    T / File conforms to FITS standard" >> zzfitsedit.tmp
+   echo "SIMPLE  =                    T / File conforms to FITS standard" > zzfitsedit.tmp
 endif
 #
 #   Call the selected editor to modify the listing.

@@ -522,6 +522,8 @@
 *     23-JUN-1998 (DSB):
 *        Used KPG1_MAP instead of NDF_MAP, so that NaN and Inf values
 *        are converted to Starlink BAD values before being used.
+*     14-JUL-1998 (DSB):
+*        Use '_DOUBLE' instead of 'DOUBLE' in call to NDF_MTYPE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1990,7 +1992,7 @@
 *       Find the implementation type to be used.
 
          CALL ERR_MARK
-         CALL NDF_MTYPE( '_REAL,DOUBLE', NDFS, NDFS, COMP, ITYPE,
+         CALL NDF_MTYPE( '_REAL,_DOUBLE', NDFS, NDFS, COMP, ITYPE,
      :                   DTYPE, STATUS )
          IF ( STATUS .EQ. NDF__TYPNI ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
