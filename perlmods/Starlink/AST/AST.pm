@@ -44,13 +44,31 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 
 =cut
 
+# Exception handling
+
+package Starlink::AST::Status;
+
+# This is called via the ASTCALL C macro
+# Arguments are : status value and a reference to an array
+# containing the message stack
+
+sub ThrowError {
+  my $status = shift;
+  my $err = shift;
+  my $str = join("\n",map { "- $_" } @$err) . "\n";
+  # This should throw an appropriate exception
+  # for now just croak
+  Carp::croak( $str );
+}
+
 # All the inheritance stuff
 
 package AstObjectPtr;
 
 
 # Provide the sprintf functionality in the Perl side since it
-# is easier than doing it in C
+# is easier than doing it in C [but causes a problem if the
+# string includes a comma]
 
 sub Set {
   my $self = shift;

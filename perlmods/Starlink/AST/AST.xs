@@ -64,24 +64,129 @@ char ** pack1Dchar( AV * avref ) {
   return outarr;
 }
 
+/* Exception handler callback */
+
+void astThrowException ( int status, AV* errorstack ) {
+  dSP;
+  
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(sp);
+
+  /* Push the status and array onto the arg stack */
+  XPUSHs(sv_2mortal(newSViv(status))); 
+  XPUSHs(newRV_noinc((SV*) errorstack));
+
+  PUTBACK;
+
+  /* Now call the perl code to throw the exception */
+  call_pv("Starlink::AST::Status::ThrowError", G_DISCARD );
+
+  FREETMPS;
+  LEAVE;
+
+}
+
+/* Need to allocate a mutex to prevent threads accessing
+   the AST simultaneously. May need to protect this from
+   non-threaded perl */
+
+static perl_mutex AST_mutex;
+
+/* An array to store the messages coming from the error system */
+AV* ErrBuff;
+
+/* We need to make sure that ast routines are called in a thread-safe
+   manner since the underlying AST library is not thread-safe because
+   of the error system. Use Mark's JNIAST technique */
+
+#define ASTCALL(code) \
+  STMT_START { \
+    int my_xsstatus_val = 0; \
+    int *my_xsstatus = &my_xsstatus_val; \
+    int *old_ast_status; \
+    AV* local_err; \
+    MUTEX_LOCK(&AST_mutex); \
+    My_astClearErrMsg(); \
+    old_ast_status = astWatch( my_xsstatus ); \
+    code \
+    astWatch( old_ast_status ); \
+    /* Need to remove the MUTEX before we croak [but must copy the error buffer] */ \
+    My_astCopyErrMsg( &local_err ); \
+    MUTEX_UNLOCK(&AST_mutex); \
+    if ( *my_xsstatus != 0 ) { \
+      astThrowException( *my_xsstatus, local_err ); \
+    } \
+  } STMT_END;
+
+
+/* This is the error handler.
+ Store error messages in an array. Need to worry about thread-local storage
+ very soon.
+ */
+
+void astPutErr_ ( int status, const char * message ) {
+  /* the av_clear decrements the refcnt of the SV entries */
+  av_push(ErrBuff, newSVpv(message, 0) );
+}
+
+void My_astClearErrMsg () {
+  av_clear( ErrBuff );
+}
+
+/* routine to copy the error messages from the global array to a private
+   array so that we can release the Mutex before the exception is thrown.
+   Creates a new mortal AV and populates it.
+
+   This is required because astPutErr can only use the static version
+   of the array.
+ */
+
+void My_astCopyErrMsg ( AV ** newbuff ) {
+  int i;
+  SV ** elem;
+
+  *newbuff = newAV();
+  for (i = 0; i <= av_len( ErrBuff ) ; i++ ) {
+    elem = av_fetch( ErrBuff, i, 0);
+    if (elem != NULL ) {
+      av_push( *newbuff, sv_mortalcopy( *elem )); 
+    }
+  }
+
+}
+
+MODULE = Starlink::AST     PACKAGE = Starlink::AST
+
+BOOT:
+          MUTEX_INIT(&AST_mutex);
+          ErrBuff = newAV();
+
 MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
 
 void
 astBegin()
  CODE:
-   astBegin;
+  ASTCALL(
+    astBegin;
+  )
 
 
 void
 astEnd()
  CODE:
-   astEnd;
+  ASTCALL(
+    astEnd;
+  )
 
 int
 astVersion()
  CODE:
-  RETVAL = astVersion;
+  ASTCALL(
+   RETVAL = astVersion;
+  )
  OUTPUT:
   RETVAL
 
@@ -93,12 +198,16 @@ astIntraReg()
 void
 astClearStatus()
  CODE:
-  astClearStatus;
+  ASTCALL(
+   astClearStatus;
+  )
 
 bool
 astOK()
  CODE:
-  RETVAL = astOK;
+  ASTCALL(
+   RETVAL = astOK;
+  )
  OUTPUT:
   RETVAL
 
@@ -106,12 +215,16 @@ void
 astSetStatus( status )
   StatusType status
  CODE:
-  astSetStatus( status );
+  ASTCALL(
+   astSetStatus( status );
+  )
 
 StatusType
 astStatus()
  CODE:
-  RETVAL = astStatus;
+  ASTCALL(
+   RETVAL = astStatus;
+  )
  OUTPUT:
   RETVAL
 
@@ -134,7 +247,9 @@ new( class, naxes, options )
   int naxes
   char * options
  CODE:
-  RETVAL = astFrame( naxes, options );
+  ASTCALL(
+   RETVAL = astFrame( naxes, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -146,7 +261,9 @@ new( class, frame, options )
   AstFrame * frame
   char * options
  CODE:
-  RETVAL = astFrameSet( frame, options );
+  ASTCALL(
+   RETVAL = astFrameSet( frame, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -159,7 +276,9 @@ new( class, frame1, frame2, options )
   AstFrame * frame2
   char * options
  CODE:
-  RETVAL = astCmpFrame( frame1, frame2, options );
+  ASTCALL(
+   RETVAL = astCmpFrame( frame1, frame2, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -173,7 +292,9 @@ new( class, map1, map2, series, options )
   int series
   char * options
  CODE:
-  RETVAL = astCmpMap( map1, map2, series, options );
+  ASTCALL(
+   RETVAL = astCmpMap( map1, map2, series, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -186,7 +307,9 @@ MODULE = Starlink::AST  PACKAGE = Starlink::AST::FitsChan
 AstFitsChan *
 new( ... )
  CODE:
-  RETVAL = astFitsChan( NULL, NULL, "");
+  ASTCALL(
+   RETVAL = astFitsChan( NULL, NULL, "");
+  )
  OUTPUT:
   RETVAL
 
@@ -197,7 +320,9 @@ MODULE = Starlink::AST  PACKAGE = Starlink::AST::XmlChan
 AstXmlChan *
 new( ... )
  CODE:
-  RETVAL = astXmlChan( NULL, NULL, "");
+  ASTCALL(
+   RETVAL = astXmlChan( NULL, NULL, "");
+  )
  OUTPUT:
   RETVAL
 
@@ -208,7 +333,9 @@ new( class, options )
   char * class
   char * options
  CODE:
-  RETVAL = astGrismMap( options );
+  ASTCALL(
+   RETVAL = astGrismMap( options );
+  )
  OUTPUT:
   RETVAL
 
@@ -222,7 +349,9 @@ new( class, name, nin, nout, options )
   int nout
   char * options
  CODE:
-  RETVAL = astIntraMap( name, nin, nout, options );
+  ASTCALL(
+   RETVAL = astIntraMap( name, nin, nout, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -241,7 +370,9 @@ new( class, lut, start, inc, options )
  CODE:
   nlut = av_len( lut );
   clut = pack1D( (SV*)lut, 'd' );
-  RETVAL = astLutMap( nlut, clut, start, inc, options );
+  ASTCALL(
+   RETVAL = astLutMap( nlut, clut, start, inc, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -300,7 +431,9 @@ new( class, nin, nout, matrix, options )
     Perl_croak(aTHX_ "MatrixMap: matrix len not consistent with nout/nin");
   }
   cmatrix = pack1D((SV*)matrix, 'd');
-  RETVAL = astMatrixMap( nin, nout, form, cmatrix, options );
+  ASTCALL(
+   RETVAL = astMatrixMap( nin, nout, form, cmatrix, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -321,7 +454,9 @@ new( class, disco, pcdcen, options )
     Perl_croak(aTHX_ "Must supply two values to PcdCen");
   }
   cpcdcen = pack1D((SV*)pcdcen, 'd');
-  RETVAL = astPcdMap( disco, cpcdcen, options );
+  ASTCALL(
+   RETVAL = astPcdMap( disco, cpcdcen, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -363,7 +498,9 @@ new( class, inperm, outperm, constant, options )
   } else {
     cconstant = pack1D((SV*)constant, 'd' );
   }
-  RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, options );
+  ASTCALL(
+   RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -387,7 +524,9 @@ new( class, shift, options )
  CODE:
   ncoord = av_len( shift );
   cshift = pack1D((SV*)shift, 'd');
-  RETVAL = astShiftMap( ncoord, cshift, options);
+  ASTCALL(
+   RETVAL = astShiftMap( ncoord, cshift, options);
+  )
  OUTPUT:
   RETVAL
 
@@ -398,7 +537,9 @@ new( class, options )
   char * class
   char * options
  CODE:
-  RETVAL = astSkyFrame( options );
+  ASTCALL(
+   RETVAL = astSkyFrame( options );
+  )
  OUTPUT:
   RETVAL
 
@@ -409,7 +550,9 @@ new( class, options )
   char * class
   char * options
  CODE:
-  RETVAL = astSpecFrame( options );
+  ASTCALL(
+   RETVAL = astSpecFrame( options );
+  )
  OUTPUT:
   RETVAL
 
@@ -422,7 +565,9 @@ new( class, flags, options )
   int flags
   char * options
  CODE:
-  RETVAL = astSlaMap( flags, options );
+  ASTCALL(
+   RETVAL = astSlaMap( flags, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -435,7 +580,9 @@ new( class, nin, flags, options )
   int flags
   char * options
  CODE:
-  RETVAL = astSpecMap( nin, flags, options );
+  ASTCALL(
+   RETVAL = astSpecMap( nin, flags, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -447,7 +594,9 @@ new( class, ncoord, options )
   int ncoord
   char * options
  CODE:
-  RETVAL = astUnitMap( ncoord, options );
+  ASTCALL(
+   RETVAL = astUnitMap( ncoord, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -462,7 +611,9 @@ new( class, ncoord, type, lonax, latax, options )
   int latax
   char * options
  CODE:
-  RETVAL = astWcsMap( ncoord, type, lonax, latax,options );
+  ASTCALL(
+   RETVAL = astWcsMap( ncoord, type, lonax, latax,options );
+  )
  OUTPUT:
   RETVAL
 
@@ -494,7 +645,9 @@ new( class, ncoord, zoom, options )
   double zoom
   char * options
  CODE:
-  RETVAL = astZoomMap( ncoord, zoom, options );
+  ASTCALL(
+   RETVAL = astZoomMap( ncoord, zoom, options );
+  )
  OUTPUT:
   RETVAL
 
@@ -506,19 +659,25 @@ astClear( this, attrib )
   AstObject * this
   char * attrib
  CODE:
-   astClear( this, attrib );
+  ASTCALL(
+    astClear( this, attrib );
+  )
 
 void
 astAnnul( this )
   AstObject * this
  CODE:
-  astAnnul( this );
+  ASTCALL(
+   astAnnul( this );
+  )
 
 AstObject *
 ast_Clone( this )
   AstObject * this
  CODE:
-  RETVAL = astClone( this );
+  ASTCALL(
+   RETVAL = astClone( this );
+  )
  OUTPUT:
   RETVAL
 
@@ -526,7 +685,9 @@ AstObject *
 ast_Copy( this )
   AstObject * this
  CODE:
-  RETVAL = astCopy( this );
+  ASTCALL(
+   RETVAL = astCopy( this );
+  )
  OUTPUT:
   RETVAL
 
@@ -534,26 +695,34 @@ void
 astDelete( this )
   AstObject * this
  CODE:
-  astDelete( this );
+  ASTCALL(
+   astDelete( this );
+  )
 
 void
 astExempt( this )
   AstObject * this
  CODE:
-  astExempt( this );
+  ASTCALL(
+   astExempt( this );
+  )
 
 void
 astExport( this )
   AstObject * this
  CODE:
-  astExport( this );
+  ASTCALL(
+   astExport( this );
+  )
 
 const char *
 astGetC( this, attrib )
   AstObject * this
   char * attrib
  CODE:
-  RETVAL = astGetC( this, attrib );
+  ASTCALL(
+   RETVAL = astGetC( this, attrib );
+  )
  OUTPUT:
   RETVAL
 
@@ -566,7 +735,9 @@ astGetD( this, attrib )
  ALIAS:
   astGetF = 1 
  CODE:
-  RETVAL = astGetD( this, attrib );
+  ASTCALL(
+   RETVAL = astGetD( this, attrib );
+  )
  OUTPUT:
   RETVAL
 
@@ -577,7 +748,9 @@ astGetI( this, attrib )
  ALIAS:
   astGetL = 1
  CODE:
-  RETVAL = astGetI( this, attrib );
+  ASTCALL(
+   RETVAL = astGetI( this, attrib );
+  )
  OUTPUT:
   RETVAL
 
@@ -593,7 +766,9 @@ ast_Set(this, settings )
   AstObject * this
   char * settings
  CODE:
-  astSet(this, settings );
+  ASTCALL(
+   astSet(this, settings );
+  )
 
 void
 astSetC( this, attrib, value )
@@ -601,7 +776,9 @@ astSetC( this, attrib, value )
   char * attrib
   char * value
  CODE:
-  astSetC( this, attrib, value );
+  ASTCALL(
+   astSetC( this, attrib, value );
+  )
 
 # Float is just an alias for double
 
@@ -613,7 +790,9 @@ astSetD( this, attrib, value )
  ALIAS:
   astSetF = 1 
  CODE:
-  astSetD( this, attrib, value );
+  ASTCALL(
+   astSetD( this, attrib, value );
+  )
 
 
 void
@@ -624,20 +803,26 @@ astSetI( this, attrib, value )
  ALIAS:
   astSetL = 1
  CODE:
-  astSetI( this, attrib, value );
+  ASTCALL(
+   astSetI( this, attrib, value );
+  )
 
 void
 astShow( this )
   AstObject * this
  CODE:
-  astShow( this );
+  ASTCALL(
+   astShow( this );
+  )
 
 bool
 astTest( this, attrib )
   AstObject * this
   char * attrib
  CODE:
-  RETVAL = astTest( this, attrib );
+  ASTCALL(
+   RETVAL = astTest( this, attrib );
+  )
  OUTPUT:
   RETVAL
 
@@ -648,18 +833,52 @@ int
 astVersion(class)
   AstObject * class
  CODE:
-  RETVAL = astVersion;
+  ASTCALL(
+   RETVAL = astVersion;
+  )
  OUTPUT:
   RETVAL
 
 # Use annul as automatic destructor
+# For automatic destructor we do not want to throw an exception
+# on error. So do not use ASTCALL. Do a manual printf to stderr and continue.
 
 void
 astDESTROY( this )
   AstObject * this
+ PREINIT:
+  int my_xsstatus_val = 0;
+  int *my_xsstatus = &my_xsstatus_val;
+  int *old_ast_status;
+  int i;
+  SV ** elem;
+  char one[3] = "! ";
+  char two[3] = "!!";
+  char * pling;
+  AV* local_err;
+  char * s = CopFILE( PL_curcop );
  CODE:
-  printf("In destructor\n");
+  MUTEX_LOCK(&AST_mutex);
+  My_astClearErrMsg();
+  old_ast_status = astWatch( my_xsstatus );
   astAnnul( this );
+  astWatch( old_ast_status );
+  My_astCopyErrMsg( &local_err );
+  MUTEX_UNLOCK(&AST_mutex);
+  if (*my_xsstatus != 0 ) {
+    for (i=0; i <= av_len( local_err ); i++ ) {
+      pling = ( i == 0 ? two : one );
+      elem = av_fetch( local_err, i, 0 );
+      if (elem != NULL ) {
+        PerlIO_printf( PerlIO_stderr(),  "%s %s\n", pling,
+		       SvPV( *elem, PL_na ));
+      }
+    }
+    if (!s) s = "(none)";
+    PerlIO_printf( PerlIO_stderr(),  "!  (in cleanup from file %s:%" IVdf ")\n",
+                s, (IV) CopLINE(PL_curcop));
+  }
+
 
 MODULE = Starlink::AST   PACKAGE = AstFramePtr PREFIX = ast
 
@@ -695,7 +914,9 @@ astAngle( this, a, b, c )
   cc = pack1D( (SV*)c, 'd');
 
   /* Call the ast function */
-  RETVAL = astAngle( this, aa, bb, cc);
+  ASTCALL(
+   RETVAL = astAngle( this, aa, bb, cc);
+  )
  OUTPUT:
   RETVAL
 
@@ -723,7 +944,9 @@ astAxAngle( this, a, b, axis )
 
   aa = pack1D( (SV*)a, 'd');
   bb = pack1D( (SV*)b, 'd');
-  RETVAL = astAxAngle( this, aa, bb, axis);
+  ASTCALL(
+   RETVAL = astAxAngle( this, aa, bb, axis);
+  )
  OUTPUT:
   RETVAL
 
@@ -734,7 +957,9 @@ astAxDistance( this, axis, v1, v2)
   double v1
   double v2
  CODE:
-  RETVAL = astAxDistance( this, axis, v1, v2);
+  ASTCALL(
+   RETVAL = astAxDistance( this, axis, v1, v2);
+  )
  OUTPUT:
   RETVAL
 
@@ -745,7 +970,9 @@ astAxOffset( this, axis, v1, dist)
   double v1
   double dist
  CODE:
-  RETVAL = astAxOffset( this, axis, v1, dist);
+  ASTCALL(
+   RETVAL = astAxOffset( this, axis, v1, dist);
+  )
  OUTPUT:
   RETVAL
 
@@ -755,7 +982,9 @@ astConvert( from, to, domainlist )
   AstFrame * to
   char * domainlist
  CODE:
-  RETVAL = astConvert( from, to, domainlist );
+  ASTCALL(
+   RETVAL = astConvert( from, to, domainlist );
+  )
  OUTPUT:
   RETVAL
 
@@ -782,7 +1011,9 @@ astDistance( this, point1, point2 )
 
   aa = pack1D( (SV*)point1, 'd');
   bb = pack1D( (SV*)point2, 'd');
-  RETVAL = astDistance( this, aa, bb);
+  ASTCALL(
+   RETVAL = astDistance( this, aa, bb);
+  )
  OUTPUT:
   RETVAL
 
@@ -792,7 +1023,9 @@ astFindFrame( this, template, domainlist )
   AstFrame * template
   char * domainlist
  CODE:
-  RETVAL = astFindFrame( this, template, domainlist );
+  ASTCALL(
+   RETVAL = astFindFrame( this, template, domainlist );
+  )
  OUTPUT:
   RETVAL
 
@@ -802,7 +1035,9 @@ astFormat( this, axis, value )
   int axis
   double value
  CODE:
-  RETVAL = astFormat( this, axis, value );
+  ASTCALL(
+   RETVAL = astFormat( this, axis, value );
+  )
  OUTPUT:
   RETVAL
 
@@ -810,7 +1045,9 @@ int
 astGetActiveUnit( this )
   AstFrame * this
  CODE:
-  RETVAL = astGetActiveUnit( this );
+  ASTCALL(
+   RETVAL = astGetActiveUnit( this );
+  )
  OUTPUT:
   RETVAL
 
@@ -830,7 +1067,9 @@ astNorm( this, value )
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
                 naxes);
   aa = pack1D( (SV*)value, 'd');
-  astNorm( this, aa );
+  ASTCALL(
+   astNorm( this, aa );
+  )
 
 # Return list
 
@@ -863,7 +1102,9 @@ astOffset( this, point1, point2, offset )
   /* Somewhere to put the return values */
   point3 = get_mortalspace( naxes, 'd' );
 
-  astOffset( this, aa, bb, offset, point3 );
+  ASTCALL(
+   astOffset( this, aa, bb, offset, point3 );
+  )
 
   /* now need to push the resulting values onto the return stack */
   for (i =0; i < naxes; i++ ) {
@@ -898,7 +1139,9 @@ astOffset2( this, point1, angle, offset )
   /* Somewhere to put the return values */
   point2 = get_mortalspace( naxes, 'd' );
 
-  RETVAL = astOffset2( this, aa, angle, offset, point2 );
+  ASTCALL(
+   RETVAL = astOffset2( this, aa, angle, offset, point2 );
+  )
 
   /* Push the angle on to the stack */
   XPUSHs(sv_2mortal(newSVnv(RETVAL)));
@@ -922,7 +1165,9 @@ astPermAxes( this, perm )
      Perl_croak(aTHX_ "Number of elements in perm array must be %d",
                 naxes);
   aa = pack1D( (SV*)perm, 'i');
-  astPermAxes( this, aa );
+  ASTCALL(
+   astPermAxes( this, aa );
+  )
 
 # Returns a new frame and an optional mapping
 # Use a boolean to control whether a mapping is returned
@@ -944,7 +1189,9 @@ astPickAxes( this, axes )
   if ( naxes > maxaxes )
     Perl_croak(aTHX_ "Number of axes selected must be less than number of axes in frame");
   aa = pack1D( (SV*)axes, 'i');
-  RETVAL = astPickAxes( this, naxes, aa, NULL);
+  ASTCALL(
+   RETVAL = astPickAxes( this, naxes, aa, NULL);
+  )
  OUTPUT:
   RETVAL
 
@@ -955,7 +1202,9 @@ astSetActiveUnit( this, value )
   AstFrame * this
   int value
  CODE:
-  astSetActiveUnit( this, value );
+  ASTCALL(
+   astSetActiveUnit( this, value );
+  )
 
 # astUnformat currently returns the value not the number of
 # characters read. Returns undef if no character read
@@ -984,7 +1233,9 @@ astAddFrame( this, iframe, map, frame)
   AstMapping * map
   AstFrame * frame
  CODE:
-  astAddFrame( this, iframe, map, frame );
+  ASTCALL(
+   astAddFrame( this, iframe, map, frame );
+  )
 
 
 AstFrame *
@@ -992,7 +1243,9 @@ astGetFrame( this, iframe )
   AstFrameSet * this
   int iframe
  CODE:
-  RETVAL = astGetFrame( this, iframe );
+  ASTCALL(
+   RETVAL = astGetFrame( this, iframe );
+  )
  OUTPUT:
   RETVAL
 
@@ -1002,7 +1255,9 @@ astGetMapping( this, iframe1, iframe2 )
   int iframe1
   int iframe2
  CODE:
-  RETVAL = astGetMapping( this, iframe1, iframe2 );
+  ASTCALL(
+   RETVAL = astGetMapping( this, iframe1, iframe2 );
+  )
  OUTPUT:
   RETVAL
 
@@ -1012,14 +1267,18 @@ astRemapFrame( this, iframe, map )
   int iframe
   AstMapping * map
  CODE:
-  astRemapFrame( this, iframe, map );
+  ASTCALL(
+   astRemapFrame( this, iframe, map );
+  )
 
 void
 astRemoveFrame( this, iframe )
   AstFrameSet * this
   int iframe
  CODE:
-  astRemoveFrame( this, iframe );
+  ASTCALL(
+   astRemoveFrame( this, iframe );
+  )
 
 MODULE = Starlink::AST   PACKAGE = AstMappingPtr PREFIX = ast
 
@@ -1040,13 +1299,17 @@ astDecompose( this )
   int invert2;
  PPCODE:
   Perl_croak(aTHX_ "astDecompose not yet implemented\n");
-  astDecompose(this, &map1, &map2, &series, &invert1, &invert2);
+  ASTCALL(
+   astDecompose(this, &map1, &map2, &series, &invert1, &invert2);
+  )
 
 void
 astInvert( this )
   AstMapping * this
  CODE:
-  astInvert( this );
+  ASTCALL(
+   astInvert( this );
+  )
 
 # astMapBox  XXXX
 
@@ -1061,7 +1324,9 @@ AstMapping *
 astSimplify( this )
   AstMapping * this
  CODE:
-  RETVAL = astSimplify( this );
+  ASTCALL(
+   RETVAL = astSimplify( this );
+  )
  OUTPUT:
   RETVAL
 
@@ -1081,7 +1346,9 @@ AstObject *
 ast_Read( channel )
   AstChannel * channel
  CODE:
-  RETVAL = astRead( channel );
+  ASTCALL(
+   RETVAL = astRead( channel );
+  )
  OUTPUT:
   RETVAL
 
@@ -1090,7 +1357,9 @@ astWrite( channel, object )
   AstChannel * channel
   AstObject * object
  CODE:
-  RETVAL = astWrite( channel, object );
+  ASTCALL(
+   RETVAL = astWrite( channel, object );
+  )
  OUTPUT:
   RETVAL
 
@@ -1102,13 +1371,17 @@ astPutFits( this, card, overwrite )
   char * card
   int overwrite
  CODE:
-  astPutFits(this, card, overwrite);
+  ASTCALL(
+   astPutFits(this, card, overwrite);
+  )
 
 void
 astDelFits( this )
   AstFitsChan * this
  CODE:
-  astDelFits( this );
+  ASTCALL(
+   astDelFits( this );
+  )
 
 # Need to handle a NULL card  - XXXXX
 
@@ -1122,7 +1395,9 @@ astFindFits( this, name, card, inc )
   char buff[81];
  CODE:
   card = buff;
-  RETVAL = astFindFits( this, name, card, inc );
+  ASTCALL(
+   RETVAL = astFindFits( this, name, card, inc );
+  )
  OUTPUT:
   RETVAL 
   card
@@ -1136,7 +1411,9 @@ astSetRefPos( this, frm, lon, lat)
   double lon
   double lat
  CODE:
-  astSetRefPos( this, frm, lon, lat );
+  ASTCALL(
+   astSetRefPos( this, frm, lon, lat );
+  )
 
 # XXX frm is allowed to be null here
 
@@ -1148,7 +1425,9 @@ astGetRefPos( this, frm )
   double lon;
   double lat;
  PPCODE:
-  astGetRefPos( this, frm, &lon, &lat );
+  ASTCALL(
+   astGetRefPos( this, frm, &lon, &lat );
+  )
   XPUSHs(sv_2mortal(newSVnv(lon)));
   XPUSHs(sv_2mortal(newSVnv(lat)));
  
@@ -1164,7 +1443,9 @@ astSlaAdd( this, cvt, args )
   double * cargs;
  CODE:
   cargs = pack1D((SV*)args, 'd');
-  astSlaAdd( this, cvt, cargs );
+  ASTCALL(
+   astSlaAdd( this, cvt, cargs );
+  )
 
 MODULE = Starlink::AST   PACKAGE = AstSpecMapPtr PREFIX = astSpec
 
@@ -1177,7 +1458,9 @@ astSpecAdd( this, cvt, args )
   double * cargs;
  CODE:
   cargs = pack1D((SV*)args, 'd');
-  astSpecAdd( this, cvt, cargs );
+  ASTCALL(
+   astSpecAdd( this, cvt, cargs );
+  )
 
 # Constants
 
