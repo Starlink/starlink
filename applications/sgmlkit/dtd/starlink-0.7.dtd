@@ -215,6 +215,7 @@
 
 <!--========== Parameter entities for configuration ==========-->
 <!ENTITY % DocClass "SUN">
+<!ENTITY % DocClassString "'%DocClass'">
 
 <!--=========== Feature Switches ==========-->
 
@@ -652,7 +653,7 @@
 			<!-- document number in series -->
     <!ATTLIST docnumber
 	unassigned	(unassigned)	#IMPLIED
-	documenttype	CDATA		#FIXED "%DocClass;"
+	documenttype	CDATA		#FIXED %DocClassString;
 	>
 	<!-- attributes:
 		unassigned	indicates that no number has (yet?)
