@@ -139,7 +139,7 @@ C
       CHARACTER OBSTIT*20                     ! Observatory title
       CHARACTER NAMEMP*80                     ! For contour mapping
       CHARACTER CDUMMY2*8                     ! 
-      CHARACTER GSDNAME*32                    !GSD observation file name prefix
+      CHARACTER GSDNAME*128                   !GSD observation file name prefix
       CHARACTER SIDEBAND*1                    ! Current sideband (U/L)
       CHARACTER XAXIS_UNITS*6                 ! X-axis units
       CHARACTER XAXIS_NAME*10                 ! X-axis name
@@ -151,7 +151,7 @@ C
       CHARACTER TTNN*16                       ! Terminal line for graphics
       CHARACTER VEL_DEF*3                     ! Velocity definition (RAD/OPT/REL)
       CHARACTER VEL_REF*4                     ! Velocity frame for display.
-      CHARACTER CHFLGD*100                    ! To give 512 chars total.
+      CHARACTER CHFLGD*4                      ! To give 512 chars total.
 
       COMMON /CHFLAGS/
      &          ITTLP,   CDUMMY, NAMEFD,  FILNAM,
