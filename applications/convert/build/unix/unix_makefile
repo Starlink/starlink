@@ -282,7 +282,7 @@ BLD_SHR = echo >/dev/null
 #  merit documentation changes.
 
 PKG_NAME = convert
-PKG_VERS = 0.6
+PKG_VERS = 0.5
 
 #  Library version number.
 #
@@ -308,7 +308,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 #  installed in the $(INSTALL_DIR) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = 
+PUBLIC_SCRIPTS = $(PKG_NAME)
 
 #  List of public include files. These are include files which form
 #  part of the package and may be required by users of it. They will be
@@ -320,7 +320,7 @@ PUBLIC_INCLUDES =
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = HLPCMD
+PRIVATE_INCLUDES = hlpcmd.f
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -338,13 +338,14 @@ EXTERNAL_INCLUDES = SAE_PAR CHR_ERR CMP_ERR DAT_PAR DAT_ERR FIO_PAR \
 #  they have no documententation.
 
 F_ROUTINES = \
-aif_temp.f aif_antmp.f con_afhir.f \
+aif_antmp.f aif_ptfnm.f aif_temp.f \
+con_afhir.f \
 con_axlid.f con_axlii.f con_axlir.f con_axliuw.f con_axliw.f \
 con_bitpx.f con_btypc.f \
 con_cd2ir.f con_cd2iw.f \
-con_chvar.f con_chvaw.f \
+con_chvai.f con_chvar.f con_chvaw.f \
 con_ci2dr.f con_ci2dw.f \
-con_diprd.f con_dipwr.f con_dst2n.f \
+con_cnlim.f con_dst2n.f \
 con_ffrmt.f con_fill.f con_fitax.f con_ftype.f \
 con_ghelp.f con_ghlpi.f \
 con_gkeyc.f con_gkeyd.f con_gkeyi.f con_gkeyl.f con_gkeyr.f \
@@ -357,25 +358,27 @@ con_ofufb.f con_ofufd.f con_ofufi.f con_ofufr.f con_ofufub.f \
             con_ofufuw.f con_ofufw.f \
 con_pcard.f con_pfith.f \
 con_prsad.f con_prsai.f con_prsar.f \
-con_phlpo.f con_rescm.f con_rgasp.f con_sphea.f con_sread.f \
-con_ssazd.f con_ssadr.f \
+con_phlpo.f con_rgasp.f con_sclof.f \
+con_scrsz.f con_sphea.f con_sread.f \
+con_ssazd.f con_ssazr.f \
 con_trndd.f con_trndi.f con_trndr.f \
 con_typsz.f con_wfman.f con_wgasp.f
 
 SPP_F_ROUTINES = \
 adline.f gethis.f getlin.f nhist.f nlines.f
 
+MACHINE_SPECIFIC_F_ROUTINES =
+
 #  The A-task Fortran routines.
 
 ATASK_F_ROUTINES = \
 ascii2ndf.f \
 conhelp.f \
-dipso2ndf.f \
 dst2ndf.f \
 gasp2ndf.f \
 iraf2ndf.f \
+ircam2ndf.f \
 ndf2ascii.f \
-ndf2dipso.f \
 ndf2dst.f \
 ndf2gasp.f \
 ndf2iraf.f \
@@ -391,7 +394,7 @@ INTERFACE_FILES = $(ATASK_F_ROUTINES:.f=.ifl)
 
 #  Define the source help file.
 
-HELP_SOURCE = $(PKG_NAME).hlp
+HELP_SOURCE = convert.hlp
 
 #  Block data routines.
 
@@ -400,12 +403,11 @@ BLOCK_DATA =
 #  C routines required for building the library.  This is just a
 #  list of all the C source files.
 
-C_ROUTINES = 
+C_ROUTINES = con_trmsz.c
 
 #  List of documentation files.
 
-#DOCUMENTATION = sun55.tex convert.news
-DOCUMENTATION = 
+DOCUMENTATION = sun55.tex convert.news
 
 #  Files needed to test the installation.
 
@@ -423,13 +425,13 @@ TEST_FILES = $(PKG_NAME)_test.dst
 
 .SUFFIXES:
 .SUFFIXES: .o .c .f
-
+#
 #  Define new suffixes for compiling and interface file.
-
+#
 .SUFFIXES: .ifc .ifl
-
+#
 #  Define new suffixes for building a help library from source.
-
+#
 .SUFFIXES: .hlp .shl
 
 #  List of files which must be built from the source files before the
@@ -438,7 +440,7 @@ TEST_FILES = $(PKG_NAME)_test.dst
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
-$(SHAREABLE_LIBRARIES) $(ATASKS) $(COMPILED_INTERFACE_FILES) (HELP_LIBRARIES)
+$(SHAREABLE_LIBRARIES) $(ATASKS) $(COMPILED_INTERFACE_FILES) $(HELP_LIBRARIES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -446,9 +448,9 @@ $(SHAREABLE_LIBRARIES) $(ATASKS) $(COMPILED_INTERFACE_FILES) (HELP_LIBRARIES)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
-
+#
 #  Rules to set up links to locate each of the above include files.
-
+#
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CMP_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 DAT_ERR:     $(STAR_INC)/dat_err;     $(LINK) $? $@
@@ -456,7 +458,7 @@ DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
 DTACODES:    $(FIG_INC)/dtacodes.inc; $(LINK) $? $@
 DYNAMIC_MEMORY:  $(FIG_INC)/dynamic_memory.inc; $(LINK) $? $@
 FIO_PAR:     $(STAR_INC)/fio_par;     $(LINK) $? $@
-HLPCMD:      ./hlpcmd;                $(LINK) $? $@
+HLPCMD:      ./hlpcmd.f;              $(LINK) $? $@
 MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
 NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
 NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
@@ -468,29 +470,29 @@ PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
 PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
 PSX_ERR:     $(STAR_INC)/psx_err;     $(LINK) $? $@
 SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
-
+#
 #  Rules for extracting source files from the source archive.
-
+#
 $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
-$(F_ROUTINES_ADAM) $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-$(INTERFACE_FILES) $(HELP_SOURCE):
+$(SPP_F_ROUTINES) $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
+$(INTERFACE_FILES) $(HELP_SOURCE) $(DOCUMENTATION) $(TEST_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-
+#
 #  Rules for extracting machine specific source files from the source
 #  archive.
-
-$(MACHINE_SPECIFIC_F_ROUTINES):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@-$(MACHINE_TYPE)
-	mv $@-$(MACHINE_TYPE) $@
+#
+#$(MACHINE_SPECIFIC_F_ROUTINES):
+#	$(TAR_OUT) $(PKG_NAME)_source.tar $@-$(MACHINE_TYPE)
+#	mv $@-$(MACHINE_TYPE) $@
 
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
 OBJECT_FILES = $(F_ROUTINES:.f=.o) $(MACHINE_SPECIFIC_F_ROUTINES:.f=.o) \
    $(BLOCK_DATA:.f=.o) $(C_ROUTINES:.c=.o)
-OBJECT_FILES_ADAM = $(F_ROUTINES_ADAM:.f=.o)
+SPP_OBJECT_FILES = $(SPP_F_ROUTINES:.f=.o)
 ATASK_OBJECT_FILES = $(ATASK_F_ROUTINES:.f=.o)
-
+#
 .c.o:
 	$(CC) $(CFLAGS) -c $<
 .f.o:
@@ -499,9 +501,17 @@ ATASK_OBJECT_FILES = $(ATASK_F_ROUTINES:.f=.o)
 #  List of the object-library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = lib$(PKG_NAME).a
-
-lib$(PKG_NAME).a: $(OBJECT_FILES)
+OBJECT_LIBRARIES = lib$(PKG_NAME).a libcon.a libconspp.a
+#
+lib$(PKG_NAME).a: $(ATASK_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libcon.a: $(OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libconspp.a: $(SPP_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -510,38 +520,93 @@ lib$(PKG_NAME).a: $(OBJECT_FILES)
 
 SHAREABLE_LIBRARIES = 
 
-#  List of the A-tasks to be built, their dependencies and rule for
+#  List of the A-tasks to be built, their dependencies and rules for
 #  building them.
 
-$(ATASKS)= $(ATASK_OBJECT_FILES:.o=)
-	alink ascii2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
-        alink conhelp.o libconlib.a `help_link`
-	alink dipso2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
-	alink dst2ndf.o libconlib.a `ndf_link_adam` `prm_link_adam` \
-                        $(STARLINK)/figaro/lib/libdta.a \
-                        $(STARLINK)/figaro/lib/libdyn.a \
-                        $(STARLINK)/figaro/lib/libcnv.a ; \
-	alink gasp2ndf.o libconlib.a `ndf_link_adam` ; \
-	alink iraf2ndf.o libconlib.a libconspp.a `ndf_link_adam` \
-                         libimfort.a libsys.a libvops.a libos.a
-	alink ndf2ascii.o libconlib.a `ndf_link_adam` `fio_link_adam` ; \
-	alink ndf2dipso.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
-	alink ndf2dst.o libconlib.a `ndf_link_adam` `prm_link_adam` ; \
-	alink ndf2gasp.o libconlib.a `ndf_link_adam` ; \
-	alink ndf2iraf.o libconlib.a libconspp.a `ndf_link_adam` \
-                         libimfort.a libsys.a libvops.a libos.a
-	alink ndf2unf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
-	alink unf2ndf.o libconlib.a libaif.a `ndf_link_adam` `fio_link_adam` ; \
-	
+ATASKS = \
+ascii2ndf \
+conhelp \
+dst2ndf \
+gasp2ndf \
+iraf2ndf \
+ircam2ndf \
+ndf2ascii \
+ndf2dst \
+ndf2gasp \
+ndf2iraf \
+ndf2unf \
+unf2ndf
+
+#
+ascii2ndf: ascii2ndf.o $(OBJECT_LIBRARIES)
+	alink ascii2ndf.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
+conhelp: conhelp.o $(OBJECT_LIBRARIES)
+	alink conhelp.o libcon.a -L/star/lib `hlp_link`
+
+dst2ndf: dst2ndf.o $(OBJECT_LIBRARIES)
+	alink dst2ndf.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `prm_link_adam` \
+	                $(STARLINK)/figaro/lib/libdta.a \
+	                $(STARLINK)/figaro/lib/libich.a 
+
+gasp2ndf: gasp2ndf.o $(OBJECT_LIBRARIES)
+	alink gasp2ndf.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
+iraf2ndf: iraf2ndf.o $(OBJECT_LIBRARIES)
+	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
+	   alink iraf2ndf.o libcon.a libconspp.a \
+	                libimfort.a libsys.a libvops.a libos.a \
+	                -L/star/lib `ndf_link_adam` ; \
+	else \
+	   touch iraf2ndf ;\
+	fi
+
+ircam2ndf: ircam2ndf.o $(OBJECT_LIBRARIES)
+	alink ircam2ndf.o libcon.a \
+	                -L/star/lib `par_link_adam` `ndf_link_adam`
+
+ndf2ascii: ndf2ascii.o $(OBJECT_LIBRARIES)
+	alink ndf2ascii.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
+ndf2dst: ndf2dst.o $(OBJECT_LIBRARIES)
+	alink ndf2dst.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `prm_link_adam` 
+
+ndf2gasp: ndf2gasp.o $(OBJECT_LIBRARIES)
+	alink ndf2gasp.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
+ndf2iraf: ndf2iraf.o $(OBJECT_LIBRARIES)
+	if test "$(SYSTEM)" = "sun4" -o "$(SYSTEM)" = "mips" ; then \
+	   alink ndf2iraf.o libcon.a libconspp.a \
+	                libimfort.a libsys.a libvops.a libos.a \
+	                -L/star/lib `par_link_adam` `ndf_link_adam` \
+	                `prm_link_adam` ;\
+	else \
+	   touch ndf2iraf ;\
+	fi
+
+ndf2unf: ndf2unf.o $(OBJECT_LIBRARIES)
+	alink ndf2unf.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
+unf2ndf: unf2ndf.o $(OBJECT_LIBRARIES)
+	alink unf2ndf.o libcon.a -L/star/lib `par_link_adam` \
+	                `ndf_link_adam` `fio_link_adam`
+
 #  List of the interface files to be built and rules for compiling them.
 
-COMPILED_INTERFACE_FILES = $(INTERFACE_FILES:.ifl=.ifc)
-
+COMPILED_INTERFACE_FILES = $(ATASK_F_ROUTINES:.f=.ifc)
+#
 .ifl.ifc:
-	$(COMPIFL.ifl) $(OUTPUT_OPTIONS) $< 
+	$(COMPIFL.ifl) $< 
 
 #  Define the compifl macro definitions.
-
+#
 COMPIFL.ifl = $(IFC) $(IFFLAGS)
 IFC = compifl
 IFFLAGS =
@@ -549,13 +614,13 @@ IFFLAGS =
 #  List of the help libraries and rules for building them.
 
 HELP_LIBRARIES = $(HELP_SOURCE:.hlp=.shl)
-
+#
 .hlp.shl:
-	$(COMPIFL.hlp) $(HELP_OPTIONS) $< 
+	$(COMPHLP.hlp) $< 
 
 #  Define the help macro definitions.
 
-COMPIFL.hlp = $(HELP_BUILD) $(HFLAGS)
+COMPHLP.hlp = $(HELP_BUILD) $(HFLAGS)
 HELP_BUILD = hlib
 HFLAGS =
 
@@ -569,17 +634,17 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 #  Pathnames of directories into which files may be placed when the
 #  package is installed.
 
-INSTALL_BIN = $(INSTALL)/bin
+INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_ETC = $(INSTALL)/etc
-INSTALL_HELP = $(INSTALL)/help
+INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
 INSTALL_INC = $(INSTALL)/include
 INSTALL_LIB = $(INSTALL)/lib
 
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_INC) $(INSTALL_LIB)
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_HELP) $(INSTALL_LIB)
 
 $(INSTALL_DIRS): 
 	mkdir $@
@@ -653,11 +718,11 @@ build:
 #  The .BUILT target records the time of the most recent build which
 #  modified any of the built files. It depends on all the built files
 #  being up to date (which causes them to be built).
-
-.BUILT: $(BUILT_FILES)
+#
 #
 #  Enter information about the current machine and build environment
 #  into the date stamp file.
+.BUILT: $(BUILT_FILES)
 	@ echo 'Package : $(PKG_NAME)'         >$(DATE_STAMP)
 	@ echo 'Version : V$(PKG_VERS)'       >>$(DATE_STAMP)
 	@ echo 'Library : V$(LIB_VERS)'       >>$(DATE_STAMP)
@@ -724,13 +789,13 @@ install:
 #  original file by a link to the installed copy.
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS)
-	
+#
 #  Touch .INSTALLED_$(SYSTEM) to record that the package is installed
 #  (at least in part).
 	@ touch .INSTALLED_$(SYSTEM)
 
 #  Install the public scripts, giving them world execute permission.
-	for f in $(PUBLIC_SCRIPTS); do \
+	- for f in $(PUBLIC_SCRIPTS); do \
            cp -p $$f $(INSTALL_BIN);\
            chmod 755 $(INSTALL_BIN)/$$f;\
            rm $$f;\
@@ -739,7 +804,7 @@ install:
 
 #  Install the A-tasks and compiled interface files, giving them world
 #  execute permission.
-	for f in $(ATASKS) $(COMPILED_INTERFACE_FILES) ; do \
+	- for f in $(ATASKS) $(COMPILED_INTERFACE_FILES) ; do \
            cp -p $$f $(INSTALL_BIN);\
            chmod 755 $(INSTALL_BIN)/$$f;\
            rm $$f;\
@@ -747,39 +812,19 @@ install:
         done
 
 #  Install the help libraries, giving them world read permission.
-	for f in $(HELP_LIBRARIES); do \
-           cp -p $$f $(INSTALL_INC);\
-           chmod 644 $(INSTALL_INC)/$$f;\
+	- for f in $(HELP_LIBRARIES); do \
+           cp -p $$f $(INSTALL_HELP);\
+           chmod 644 $(INSTALL_HELP)/$$f;\
            rm $$f;\
-           $(LINK) $(INSTALL_INC)/$$f $$f;\
-        done
-
-#  Install the public include files, giving them world read permission.
-	for f in $(PUBLIC_INCLUDES); do \
-           cp -p $$f $(INSTALL_INC);\
-           chmod 644 $(INSTALL_INC)/$$f;\
-           rm $$f;\
-           $(LINK) $(INSTALL_INC)/$$f $$f;\
+           $(LINK) $(INSTALL_HELP)/$$f $$f;\
         done
 
 #  Install the object libraries, giving them world read permission.
-	for f in $(OBJECT_LIBRARIES); do \
+	- for f in $(OBJECT_LIBRARIES); do \
            cp -p $$f $(INSTALL_LIB);\
            chmod 644 $(INSTALL_LIB)/$$f;\
            rm $$f;\
            $(LINK) $(INSTALL_LIB)/$$f $$f;\
-        done
-
-#  Install shareable libraries, giving them read permission (unless
-#  they are dummy, zero size, files in which case they are left in
-#  place).
-	for f in $(SHAREABLE_LIBRARIES); do \
-           if test -s $$f; then \
-              cp -p $$f $(INSTALL_LIB);\
-              chmod 644 $(INSTALL_LIB)/$$f;\
-              rm $$f;\
-              $(LINK) $(INSTALL_LIB)/$$f $$f;\
-           else :; fi \
         done
 
 #  Install the date stamp file and make it read-only to prevent its
@@ -820,13 +865,11 @@ deinstall:
 #  source directory before copying.
 
 do_deinstall:
-	
+#
 #  Note the package will need to be tested again.
-	
 	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
 
 #  Deinstall the public script files, if installed versions exist.
-	
 	- for f in $(PUBLIC_SCRIPTS); do \
            if test -f $(INSTALL_BIN)/$$f; then \
               rm $$f;\
@@ -837,7 +880,6 @@ do_deinstall:
 
 #  Deinstall the A-tasks and compiled interface files, if installed
 #  versions exist.
-	
 	- for f in $(ATASKS) $(COMPILED_INTERFACE_FILES); do \
            if test -f $(INSTALL_BIN)/$$f; then \
               rm $$f;\
@@ -846,29 +888,17 @@ do_deinstall:
            else :; fi \
         done
 
-#  Deinstall the public include files, if installed versions exist.
-	
-	- for f in $(PUBLIC_INCLUDES); do \
-           if test -f $(INSTALL_INC)/$$f; then \
-              rm $$f;\
-              cp -p $(INSTALL_INC)/$$f ./;\
-              rm $(INSTALL_INC)/$$f;\
-           else :; fi \
-        done
-
 #  Deinstall the help libraries, if installed versions exist.
-	
 	- for f in $(HELP_LIBRARIES); do \
-           if test -f $(INSTALL_INC)/$$f; then \
+           if test -f $(INSTALL_HELP)/$$f; then \
               rm $$f;\
-              cp -p $(INSTALL_INC)/$$f ./;\
-              rm $(INSTALL_INC)/$$f;\
+              cp -p $(INSTALL_HELP)/$$f ./;\
+              rm $(INSTALL_HELP)/$$f;\
            else :; fi \
         done
 
-#  Deinstall the object and shareable libraries, if installed versions exist.
-	
-	- for f in $(OBJECT_LIBRARIES) $(SHAREABLE_LIBRARIES); do \
+#  Deinstall the object libraries, if installed versions exist.
+	- for f in $(OBJECT_LIBRARIES) ; do \
            if test -f $(INSTALL_LIB)/$$f; then \
               rm $$f;\
               cp -p $(INSTALL_LIB)/$$f ./;\
@@ -878,7 +908,6 @@ do_deinstall:
 
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
-	
 	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
            chmod 644 $(DATE_STAMP); rm $(DATE_STAMP);\
            chmod 644 $(INSTALL_DATES)/$(DATE_STAMP);\
@@ -888,7 +917,6 @@ do_deinstall:
 
 #  Note the system is no longer installed. Touch .BUILT, since we have
 #  returned the built files to the source directory.
-	
 	@- rm .INSTALLED_$(SYSTEM) 1>/dev/null 2>/dev/null
 	@ touch .BUILT
 
@@ -925,12 +953,11 @@ do_test: $(EXTERNAL_INCLUDES)
 	
 #  Extract the test data file from the archive.
 	
-	$(TAR_OUT) $(PKG_NAME)_source.tar $(PKG_NAME)_test.sdf \
-             $(PKG_NAME)_test.ifl
+	$(TAR_OUT) $(PKG_NAME)_source.tar $(TEST_FILES)
 
 #  Execute the test.  Remove the test data when done. 
-	./trace $(PKG_NAME)_test
-	rm $(PKG_NAME)_test.sdf
+	./dst2ndf $(TEST_FILES:.dst=) $(TEST_FILES:.dst=)
+	rm $(TEST_FILES) $(TEST_FILES:.dst=.sdf)
 	
 #  Note the test has been run.
 	
@@ -1014,10 +1041,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 
 clean:
 	@- rm $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(F_ROUTINES) \
-              $(MACHINE_SPECIFIC_F_ROUTINES) $(F_ROUTINES_ADAM) \
+              $(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) \
               $(ATASK_F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
               $(INTERFACE_FILES) $(HELP_SOURCE) \
-              $(OBJECT_FILES) $(OBJECT_FILES_ADAM) \
+              $(OBJECT_FILES) $(SPP_OBJECT_FILES) \
               $(ATASK_OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
@@ -1044,11 +1071,11 @@ unbuild: clean
 
 $(PKG_NAME)_source.tar: 
 	$(TAR_IN) $(PKG_NAME)_source.tar $(F_ROUTINES) \
-                $(MACHINE_SPECIFIC_F_ROUTINES) $(F_ROUTINES_ADAM) \
+                $(MACHINE_SPECIFIC_F_ROUTINES) $(SPP_F_ROUTINES) \
                 $(ATASK_F_ROUTINES) $(C_ROUTINES) \
                 $(PUBLIC_INCLUDES) $(BLOCK_DATA) $(PRIVATE_INCLUDES) \
                 $(PUBLIC_SCRIPTS) $(TEST_FILES) \
-                $(INTERFACE_FILES) $(HELP_SOURCE) \
+                $(INTERFACE_FILES) $(HELP_SOURCE) $(DOCUMENTATION) \
 
 #----------------------------------------------------------------------------
 
@@ -1059,7 +1086,13 @@ $(PKG_NAME)_source.tar:
 #  files). These are normally generated automatically from the source
 #  files.
 
+aif_antmp.o:       SAE_PAR
+aif_antmp.o:       DAT_PAR
+aif_ptfnm.o:       SAE_PAR
+aif_temp.o:        SAE_PAR
+aif_temp.o:        DAT_PAR
 ascii2ndf.o:       SAE_PAR
+ascii2ndf.o:       DAT_PAR
 ascii2ndf.o:       NDF_PAR
 ascii2ndf.o:       PRM_PAR
 con_afhir.o:       SAE_PAR
@@ -1084,9 +1117,14 @@ con_axliw.o:       PRM_PAR
 con_axliw.o:       NUM_DEC_CVT
 con_axliw.o:       NUM_DEF_CVT
 con_bitpx.o:       SAE_PAR
+con_bitpx.o:       DAT_PAR
 con_btypc.o:       SAE_PAR
 con_cd2ir.o:       SAE_PAR
 con_cd2iw.o:       SAE_PAR
+con_chvai.o:       SAE_PAR
+con_chvai.o:       PRM_PAR
+con_chvai.o:       NUM_DEC_CVT
+con_chvai.o:       NUM_DEF_CVT
 con_chvar.o:       SAE_PAR
 con_chvar.o:       PRM_PAR
 con_chvar.o:       NUM_DEC_CVT
@@ -1097,16 +1135,17 @@ con_chvaw.o:       NUM_DEC_CVT
 con_chvaw.o:       NUM_DEF_CVT
 con_ci2dr.o:       SAE_PAR
 con_ci2dw.o:       SAE_PAR
-con_diprd.o:       SAE_PAR
-con_diprd.o:       PRM_PAR
-con_dipwr.o:       SAE_PAR
-con_dipwr.o:       PRM_PAR
+con_cnlim.o:       SAE_PAR
+con_cnlim.o:       PRM_PAR
 con_dst2n.o:       SAE_PAR
 con_dst2n.o:       DTACODES
 con_dst2n.o:       DYNAMIC_MEMORY
+con_dst2n.o:       NUM_DEC_CVT
+con_dst2n.o:       NUM_DEF_CVT
 con_ffrmt.o:       SAE_PAR
 con_fill.o:        SAE_PAR
 con_fitax.o:       SAE_PAR
+con_fitax.o:       DAT_PAR
 con_fitax.o:       PRM_PAR
 con_ftype.o:       SAE_PAR
 con_ghelp.o:       SAE_PAR
@@ -1161,9 +1200,11 @@ con_ifufw.o:       NUM_DEF_CVT
 con_lnear.o:       SAE_PAR
 con_lnear.o:       PRM_PAR
 con_mandh.o:       SAE_PAR
+con_mandh.o:       DAT_PAR
 con_mandh.o:       PRM_PAR
 con_move.o:        SAE_PAR
 con_ndfcm.o:       SAE_PAR
+con_ndfcm.o:       DAT_PAR
 con_oaffd.o:       SAE_PAR
 con_oaffd.o:       PRM_PAR
 con_oaffd.o:       NUM_DEC_CVT
@@ -1202,6 +1243,7 @@ con_ofufuw.o:      NUM_DEC_CVT
 con_ofufuw.o:      NUM_DEF_CVT
 con_pcard.o:       SAE_PAR
 con_pfith.o:       SAE_PAR
+con_pfith.o:       DAT_PAR
 con_phlpo.o:       SAE_PAR
 con_phlpo.o:       HLPCMD
 con_prsad.o:       SAE_PAR
@@ -1211,6 +1253,9 @@ con_prsai.o:       CHR_ERR
 con_prsar.o:       SAE_PAR
 con_prsar.o:       CHR_ERR
 con_rgasp.o:       SAE_PAR
+con_sclof.o:       SAE_PAR
+con_sclof.o:       PRM_PAR
+con_scrsz.o:       SAE_PAR
 con_sphea.o:       SAE_PAR
 con_sphea.o:       NDF_PAR
 con_ssazr.o:       SAE_PAR
@@ -1235,10 +1280,8 @@ con_wfman.o:       MSG_PAR
 con_wgasp.o:       SAE_PAR
 conhelp.o:         SAE_PAR
 conhelp.o:         PAR_ERR
-dipso2ndf.o:       SAE_PAR
-dipso2ndf.o:       NDF_PAR
-dipso2ndf.o:       PRM_PAR
 dst2ndf.o:         SAE_PAR
+dst2ndf.o:         DAT_PAR
 gasp2ndf.o:        SAE_PAR
 gasp2ndf.o:        MSG_PAR
 gasp2ndf.o:        PAR_PAR
@@ -1249,11 +1292,15 @@ iraf2ndf.o:        NDF_PAR
 iraf2ndf.o:        PSX_ERR
 iraf2ndf.o:        CMP_ERR
 iraf2ndf.o:        MSG_PAR
+iraf2ndf.o:        PRM_PAR
+ircam2ndf.o:       SAE_PAR
+ircam2ndf.o:       DAT_PAR
+ircam2ndf.o:       NDF_PAR
+ircam2ndf.o:       PRM_PAR
 ndf2ascii.o:       SAE_PAR
 ndf2ascii.o:       NDF_PAR
+ndf2ascii.o:       DAT_PAR
 ndf2ascii.o:       PRM_PAR
-ndf2dipso.o:       SAE_PAR
-ndf2dipso.o:       NDF_PAR
 ndf2dst.o:         SAE_PAR
 ndf2dst.o:         FIO_PAR
 ndf2dst.o:         NDF_PAR
@@ -1273,9 +1320,11 @@ ndf2iraf.o:        PRM_PAR
 ndf2iraf.o:        NUM_DEC_CVT
 ndf2iraf.o:        NUM_DEF_CVT
 ndf2unf.o:         SAE_PAR
+ndf2unf.o:         DAT_PAR
 ndf2unf.o:         NDF_PAR
 ndf2unf.o:         PRM_PAR
 unf2ndf.o:         SAE_PAR
+unf2ndf.o:         DAT_PAR
 unf2ndf.o:         NDF_PAR
 unf2ndf.o:         PRM_PAR
 
