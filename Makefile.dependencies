@@ -507,7 +507,8 @@ $(MANIFEST)/echwind: \
 		$(MANIFEST)/pgplot \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/star2html
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx
 	cd applications/echwind \
 	  && $(MAKE_CPT)
 
