@@ -676,16 +676,16 @@ void GIFBitmap::cl_block ()             /* table clear for block compress */
         output( (code_int)ClearCode );
 }
 
-void GIFBitmap::cl_hash(count_int hsize)          /* reset code table */
+void GIFBitmap::cl_hash(count_int p_hsize)          /* reset code table */
      /*register count_int hsize;*/
 {
 
-        register count_int *htab_p = htab+hsize;
+        register count_int *htab_p = htab+p_hsize;
 
         register long i;
         register long m1 = -1;
 
-        i = hsize - 16;
+        i = p_hsize - 16;
         do {                            /* might use Sys V memset(3) here */
                 *(htab_p-16) = m1;
                 *(htab_p-15) = m1;

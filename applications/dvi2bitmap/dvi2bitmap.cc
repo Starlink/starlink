@@ -61,6 +61,7 @@ main (int argc, char **argv)
     bitmap_info bm;
     bool do_process_file = true; // if true, then process DVI file
     bool all_fonts_present = true;
+    bool one_font_present = false;
 
     //DviFile::verbosity(2);
     //PkFont::verbosity(2);
@@ -218,7 +219,7 @@ main (int argc, char **argv)
 	}
 
 	all_fonts_present = true;
-	bool one_font_present = false;
+	one_font_present = false;
 	const PkFont *fallback_font = 0;
 
 	for (PkFont *f = dvif->firstFont();

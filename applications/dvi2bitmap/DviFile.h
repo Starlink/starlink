@@ -81,7 +81,7 @@ private:
 	unsigned int i, num, den, mag;
 	string comment;
     } preamble_;
-    inline magnify_(int i) const
+    inline int magnify_(int i) const
 	{ return (magfactor_==1.0
 		  ? i
 		  : static_cast<int>(magfactor_*(double)i)); }
@@ -151,7 +151,7 @@ class DviFileSetChar : public DviFileEvent {
  public:
     DviFileSetChar(int charno, DviFile *dptr)
 	: DviFileEvent(setchar,dptr), charno(charno) { }
-    DviFileSetChar::~DviFileSetChar () { };
+    ~DviFileSetChar () { };
     void debug() const;
     const int charno;
 };
@@ -160,13 +160,13 @@ class DviFileSetRule: public DviFileEvent {
     const int h, w;
     DviFileSetRule(DviFile *dptr, int h, int w)
 	: DviFileEvent(setrule,dptr), h(h), w(w) { }
-    DviFileSetRule::~DviFileSetRule () { };
+    ~DviFileSetRule () { };
     void debug() const;
 };
 class DviFileFontChange : public DviFileEvent {
  public:
     DviFileFontChange(PkFont *f) : DviFileEvent(fontchange), font(f) { }
-    DviFileFontChange::~DviFileFontChange () { };
+    ~DviFileFontChange () { };
     void debug() const;
     const PkFont *font;
 };
@@ -174,14 +174,14 @@ class DviFileSpecial : public DviFileEvent {
  public:
     DviFileSpecial(string str)
 	: DviFileEvent(special), specialString(str) { }
-    DviFileSpecial::~DviFileSpecial () { };
+    ~DviFileSpecial () { };
     const string specialString;
     void debug() const;
 };
 class DviFilePage : public DviFileEvent {
  public:
     DviFilePage(bool isStart) : DviFileEvent(page), isStart(isStart) { }
-    DviFilePage::~DviFilePage () { };
+    ~DviFilePage () { };
     void debug() const;
     const bool isStart;		// true/false if this is a bop/eop
     signed int count[10];
@@ -190,7 +190,7 @@ class DviFilePage : public DviFileEvent {
 class DviFilePreamble : public DviFileEvent {
  public:
     DviFilePreamble() : DviFileEvent(preamble) { }
-    DviFilePreamble::~DviFilePreamble () { };
+    ~DviFilePreamble () { };
     void debug() const;
     unsigned int dviType, num, den, mag;
     string comment;
@@ -198,7 +198,7 @@ class DviFilePreamble : public DviFileEvent {
 class DviFilePostamble : public DviFileEvent {
  public:
     DviFilePostamble() : DviFileEvent(postamble) { }
-    DviFilePostamble::~DviFilePostamble () { };
+    ~DviFilePostamble () { };
 };
 
 #endif //#ifndef DVI_FILE_HEADER_READ

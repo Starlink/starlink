@@ -68,8 +68,12 @@ class GIFBitmap : public BitmapImage {
     int Pass;
     int Interlace;
 
+#if 0
     const int BITS = 12;
     const int HSIZE = 5003;	/* 80% occupancy */
+#endif
+#define BITS 12
+#define HSIZE 5003
  
     int n_bits;			/* number of bits/code */
     int maxbits;                /* user settable max # bits/code */
