@@ -1,5 +1,5 @@
 package NDF;
-require 5.002;
+require 5.004;
 
 use strict;
 use Carp;
@@ -14,7 +14,7 @@ require AutoLoader;
  
 @ISA = qw(Exporter DynaLoader); 
 
-# Version 1.2
+# Version 1.3
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = "$1");
 
 # Add the following to the 'ndf'=> associative array if you want to
@@ -261,18 +261,29 @@ sub mem2array ($$$) {
 #    is returned.
 #
 
+#  Usage:
+#    @values = par_get($par, $file, \$status)
+
 #  Arguments:
-#    PAR (Given)
+#    PAR = scalar (Given)
 #      The required parameter
-#    FILE (Given)
+#    FILE = scalar (Given)
 #      The requested application
+#    STATUS = scalar reference (Given & Returned)
+#      Reference to the global status.
+#    VALUES = array
+#      The values associated with the specified parameter returned
+#      in an array context.
 
 #  Example:
-#     pget  nsigma drawsig
+#     @values = par_get("nsigma", "drawsig", \$status);
 #        Returns the value of the NSIGMA parameter (an array)
 
 #  Prior requirements:
-#    - The NDF perl module must exist
+#    - The NDF perl module must exist (but since this is in the NDF module
+#      statement is not very helpful).
+#    - Either the ADAM_USER or HOME environment variables must be set
+#      so that the location of the parameter files can be determined.
 #-
 
 sub par_get ($$$) {
@@ -304,11 +315,14 @@ sub par_get ($$$) {
     $path = $ENV{'HOME'};
     if ($path !~ /./) {
       $$status = &NDF::SAI__ERROR;
+      err_rep('PARGET_NOPARS','Could not find the location of the ADAM parameter files. Neither ADAM_USER nor HOME were set.',$$status);
       return;
     }
+    # The HOME directory does not include adam explicitly
+    $path .= '/adam';
   }
 
-  $filename = "$path/adam/$pkg";
+  $filename = "$path/$pkg";
 
   # Open the file
   hds_open($filename, 'READ', $loc, $$status);
@@ -321,7 +335,7 @@ sub par_get ($$$) {
     $$status = &NDF::SAI__ERROR;
     msg_setc('PAR', $parname);
     msg_setc('PATH', $filename);
-    err_rep("PARGET_NOOBJ", "There is no parameter ^PAR in file ^PATH", $$status);
+    err_rep("PARGET_NOOBJ", "There is no parameter \"^PAR\" in file ^PATH", $$status);
     return;
   }
 
@@ -875,7 +889,10 @@ For example
 
 returns the current data set (stored in GLOBAL.sdf). Note that the 
 data is returned in an array context. The routine returns without
-action if $status is not set to SAI__OK on entry.
+action if $status is not set to SAI__OK on entry. 
+
+Either the  $ADAM_USER or $HOME environment variable must be set so that
+the location of the parameter files can be determined.
 
 For direct access to ADAM monoliths and parameters see L<Starlink::ADAMTASK (3)>.
 
