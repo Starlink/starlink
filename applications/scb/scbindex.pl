@@ -611,7 +611,10 @@ sub index_source {
 
 #  Tag source file using language-specific tagging routine.
 
-   open SOURCE, $file or error "Failed to open $file in directory ".cwd."\n";
+   unless (open SOURCE, $file) {
+      print "Failed to open $file in directory ".cwd."\n";
+      return;
+   }
    $tagged = &$rtagger (join ('', <SOURCE>), $ext);
    close SOURCE;
 
@@ -684,7 +687,10 @@ sub index_hlp {
 
    my ($path, $file) = @_;
 
-   open HLP, $file or error "Couldn't open $file in directory ".cwd."\n";
+   unless (open HLP, $file) {
+      print "Couldn't open $file in directory ".cwd."\n";
+      return;
+   }
    my ($level, $baselevel);
    while (<HLP>) {
 
