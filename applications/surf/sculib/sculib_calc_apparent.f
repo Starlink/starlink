@@ -1,9 +1,23 @@
-*+  SCULIB_CALC_APPARENT - calculate apparent RA, Dec of plate centre and angle
-*                          of input coord system N relative to apparent N.
       SUBROUTINE SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X,
      :  MAP_Y, COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP,
      :  ROTATION, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_CALC_APPARENT
+
+*  Purpose:
+*     calculate apparent RA, Dec of plate centre and angle
+*     of input coord system N relative to apparent N.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y,
+*    :  COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, STATUS)
+
+
+*  Description:
 *     This routine takes the input coordinates and coordinate system of the
 *     map centre and converts them to the apparent coords at the time of the
 *     observation. In addition, the angle between the north direction in
@@ -102,10 +116,8 @@
 *           LONG, LAT, MJD1 and LONG2, LAT2, MJD2 according to MJD. 
 *           Rotation = 0.
 *
-*    Invocation :
-*     CALL SCULIB_CALC_APPARENT (LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y,
-*    :  COORD_TYPE, LST, MJD, MJD1, MJD2, RA_APP, DEC_APP, ROTATION, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LONG                   = DOUBLE PRECISION (Given)
 *           longitude of centre in input coord system (radians)
 *     LAT                    = DOUBLE PRECISION (Given)
@@ -137,39 +149,73 @@
 *           (radians, measured clockwise from input north)
 *     STATUS                 = INTEGER (Given and returned)
 *           Global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
+
+*  Method:
+
+*  Deficiencies:
+*     Does not handle LOCAL_COORDS for MAP_X and MAP_Y
+*     Does not deal with MAP_X or MAP_Y at all!
+
+*  Bugs:
+
 *    Authors :
-*     J.Lightfoot (REVAD::JFL)
+*     J.Lightfoot (jfl@roe.ac.uk)
+*     T.Jenness (timj@jach.hawaii.edu)
+
+
 *    History :
 *     $Id$
 *     22-DEC-1992: Original
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
+*     $Log$
+*     Revision 1.5  1997/10/30 20:49:29  timj
+*     Modernise header.
+*
 *    endhistory
-*    Type Definitions :
+
+*-
+
+
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
-*    Import :
-      DOUBLE PRECISION LONG, LAT, LONG2, LAT2, MAP_X, MAP_Y
+
+*  Arguments Given:
+      DOUBLE PRECISION LONG
+      DOUBLE PRECISION LAT 
+      DOUBLE PRECISION LONG2 
+      DOUBLE PRECISION LAT2 
+      DOUBLE PRECISION MAP_X 
+      DOUBLE PRECISION MAP_Y
       CHARACTER*(*) COORD_TYPE
       DOUBLE PRECISION MJD, MJD1, MJD2
-*    Import-Export :
-*    Export :
-      DOUBLE PRECISION RA_APP, DEC_APP, ROTATION
-*    Status :
+
+*  Arguments Given and Returned:
+
+*  Arguments Returned:
+      DOUBLE PRECISION RA_APP
+      DOUBLE PRECISION DEC_APP 
+      DOUBLE PRECISION ROTATION
+
+*  Status :
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references :
+
+*  Global variables :
+
+*  Local Constants:
       DOUBLE PRECISION DPI
       PARAMETER       (DPI = 3.14159265359D0)
       DOUBLE PRECISION DPI2
       PARAMETER       (DPI2 = DPI / 2.0D0)
       DOUBLE PRECISION LAT_OBS_RAD
       PARAMETER       (LAT_OBS_RAD = 3.46026051751D-1)
+
 *    Local variables :
       DOUBLE PRECISION COS_HA                 ! cos of hour angle
       DOUBLE PRECISION HA                     ! Hour angle
@@ -184,9 +230,11 @@
       DOUBLE PRECISION SIN_HA                 ! Sine of hour angle
       DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION, 
 *                                             !   multiplied by cos (lat)
-*    Internal References :
-*    Local data :
-*-
+*  Internal References:
+
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
