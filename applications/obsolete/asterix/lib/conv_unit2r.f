@@ -99,11 +99,6 @@
 *  External References:
       LOGICAL			STR_ABBREV
         EXTERNAL		STR_ABBREV
-
-*  Local Variables:
-      {data_type} {name}[dimensions] ! [local_variable_description]
-
-
 *.
 
 *  Check inherited global status.
