@@ -1,9 +1,9 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V4.0-10.
+#  Package CCDPACK version V4.0-14.
 #  
-makefile: 1.82
-mk: 1.4
-sun139.tex: 1.102
+makefile: 1.85
+mk: 1.5
+sun139.tex: 1.109
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -12,7 +12,7 @@ sun139driz.eps: 1.1
 sun139outsky.eps: 1.2
 sun139outclear.eps: 1.3
 sun139outim.eps: 1.2
-ccdpack.news: 1.48
+ccdpack.news: 1.52
 ccdhelp.f: 1.1
 gethlp.f: 1.1
 gthlpi.f: 1.1
@@ -43,7 +43,7 @@ ccdpack_red.f: 1.2
 ccdpack_reg.f: 1.9
 ccdpack_res.f: 1.3
 ccdpack_scr.f: 1.3
-ccdpack.hlp: 1.79
+ccdpack.hlp: 1.84
 ccdwish.c: 1.15
 grf_ccdpack.c: 1.1
 ccdpack.ifd: 1.15
@@ -345,8 +345,8 @@ ccd1_gefp.f: 1.2
 ccd1_ggmap.f: 1.1
 ccd1_giseq.f: 1.1
 ccd1_gmdcp.f: 1.3
-ccd1_gmid.f: 1.2
-ccd1_gmmp.f: 1.3
+ccd1_gmid.f: 1.3
+ccd1_gmmp.f: 1.4
 ccd1_gparf.f: 1.1
 ccd1_gpnam.f: 1.1
 ccd1_gprmt.f: 1.1
@@ -691,7 +691,7 @@ kpg1_ainb.gen: 1.1
 kpg1_iscl.gen: 1.1
 kpg1_past.gen: 1.1
 kpg1_vasv.gen: 1.1
-kpg1_tdli.gen: 1.1
+kpg1_tdli.gen: 1.2
 ccg1_qsrt.gen: 1.1
 ccg1_smd1.gen: 1.4
 ccg1_wtm4.gen: 1.2
@@ -707,9 +707,9 @@ ccg1_fmd1.gen: 1.1
 ccg1_fmd2.gen: 1.1
 ccg1_fmd3.gen: 1.2
 ccg1_kthx.gen: 1.4
-ccg1_asli.gen: 1.2
+ccg1_asli.gen: 1.3
 ccg1_dodiz.gen: 1.7
-ccg1_frac.gen: 1.10
+ccg1_frac.gen: 1.11
 ccg1_ghst.gen: 1.1
 ccg1_iblk.gen: 1.2
 ccg1_ord.gen: 1.2
@@ -748,14 +748,14 @@ flatcor.f: 1.12
 findcent.f: 1.12
 idicurs.f: 1.26
 findobj.f: 1.13
-register.f: 1.35
+register.f: 1.36
 tranlist.f: 1.12
 plotlist.f: 1.14
-findoff.f: 1.36
-pairndf.f: 1.32
+findoff.f: 1.38
+pairndf.f: 1.33
 ccdedit.f: 1.6
 makemos.f: 1.17
-tranndf.f: 1.15
+tranndf.f: 1.16
 drizzle.f: 1.24
 astimp.f: 1.21
 astexp.f: 1.21
@@ -829,8 +829,8 @@ schedule.hlp: 1.3
 findcent.hlp: 1.4
 tranlist.hlp: 1.5
 findobj.hlp: 1.5
-tranndf.hlp: 1.5
-findoff.hlp: 1.11
+tranndf.hlp: 1.6
+findoff.hlp: 1.12
 typical_initial_reduction.hlp: 1.2
 flatcor.hlp: 1.5
 use_globals.hlp: 1.1
