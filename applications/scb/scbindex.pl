@@ -12,48 +12,92 @@
 
 #  Description:
 #     This program attempts to find all the source code files which form
-#     part of the USSC.  Given a starting point in the directory tree, 
-#     typically /star/sources, it looks underneath it for anything which
+#     part of the USSC.  Given a base directory $srcdir, typically
+#     /star/sources, it looks underneath it for anything which
 #     looks like a source file, specifically files with the following 
-#     extensions: .f .gen
+#     extensions: 
+#        .f .gen .c .h
 #     These files may be sitting 'naked' in one of the subordinate 
 #     directories, or may be in a (compressed or uncompressed) tar file,
-#     or may be in a tar file within such a tar file.  If more than one
-#     instance of a given file is found, the 'most accessible' one is
-#     used, i.e. first naked, then in a tar file, then in a tar file 
-#     in a tar file.
+#     or may be in a tar file within such a tar file (nested to an 
+#     arbitrary level, although not usually deeper than 2).
 #
 #     When such a file is found, it is searched for program modules
 #     which could be referred to by other programs (e.g. functions and
 #     subroutines).  For each instance of such a module, the name of 
 #     the module and information about its location is written to a 
-#     DBM file.
+#     DBM file ($indexfile).
 #
-#     It also indexes all include files from a second specified 
-#     directory, by filename (capitalised if it looks like a fortran
-#     include) rather than module name.  This will typically be
-#     /star/include.
+#     The resulting DBM file $indexfile can then be read by a separate 
+#     program to locate the source code for a module, using no 
+#     information other than its name, and perhaps what package it is
+#     part of.
 #
-#     The location of files is stored in the dbm file as a 'logical
-#     pathname'; this resembles an ordinary pathname except that
-#     it starts with one of the literals 'SOURCE' or 'INCLUDE',
-#     and may contain the special character '>' which indicates
+#     Additionally a list of packages, and tasks within each package,
+#     is written out to a second file.
+#
+#  Index DBM file format.
+#     The index file named $indexfile and stored as a Perl SDBM file.  
+#     This resembles a Unix dbm(3) file and is therefore an unordered 
+#     set of (key, value) pairs.
+#
+#     For each record, the key is just the name of the module 
+#     (usually, just the name of the subroutine, or the include file).
+#
+#     The value is a 'location', that is, a string containing one or
+#     more space-separated 'logical pathnames'.
+#     A logical pathname resembles an ordinary pathname except that
+#     it starts with the sequence "package#", where "package" is the
+#     name of a Starlink package.  Furthermore, a logical path 
+#     may contain the special character '>' which indicates
 #     inclusion in a (possibly compressed) tar file.  Thus some
 #     example logical pathnames would be:
 #
-#         SOURCE#ast.tar.Z>ast_source.tar>frame.f
-#         SOURCE#figaro/figaro_applic.tar>applic/bclean.f
-#         INCLUDE#par_err
+#         AST#ast_source.tar>frame.f
+#         FIGARO#figaro_applic.tar.Z>applic/bclean.f
 #
-#     Additionally, some further information is stored in the dbm file:
-#         SOURCE#    - name of the source directory
-#         INCLUDE#   - name of the include directory 
-#     These are for information to whatever program is reading the file
-#     and may be ignored or used as desired.
+#     A 'package' is identified as a directory
+#     immediately below the base directory ($srcdir) or a (possibly 
+#     compressed) tar file in the base directory.  Thus the tar file
+#     AST#ast_source.tar may be stored either in the directory 
+#     $srcdir/ast, or in the tar file $srcdir/ast.tar.Z.
+#     No distinction between the two is made; so that an index will
+#     remain valid if a package is compressed or extracted according
+#     to this scheme.
 #
-#     The resulting DBM file can then be read by a separate program to
-#     locate the source code for a module, using no information other
-#     than its name.
+#     A 'location' can contain more than one logical pathname because
+#     there may be modules in different packages which share the 
+#     same name.  There ought not to be more than one pathname per
+#     package in a given location.
+#
+#     If there are any other files in $srcdir apart from directories 
+#     and tar files (there shouldn't be) then they will be indexed 
+#     with the pseudo-package name 'SOURCE'.
+#
+#     As well as scanning all files under $srcdir, the program also
+#     indexes all modules (presumed to be include files) from a second 
+#     specified directory (typically /star/include), by filename 
+#     (capitalised if it looks like a fortran include) rather than 
+#     module name.  These packages are indexed with the pseudo-
+#     package name 'INCLUDE'.
+#
+#  Task file format.
+#     An file name $taskfile is also written containing names of
+#     all packages, and the tasks within each package.  Althought the
+#     file is plain text, some of the lines may be quite long.
+#
+#     Each line is of the form
+#
+#        package: task1 task2 task3 ...
+#
+#     where 'package' is a package name as defined above (every task
+#     containing at least one module indexed in $indexfile is included
+#     exactly once) and the tasks are supposed to be modules of 
+#     particular importance.  Their meaning is not defined other than 
+#     that, but they should typically be commands which can be invoked
+#     from the command line.  Identifying them is a haphazard business,
+#     and the method for this is explained elsewhere in this source
+#     file.
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -105,7 +149,7 @@ sub write_entry;
 #  Set up scratch directory.
 
 $tmpdir = "/local/junk/scb/index";
-print "rm -rf $tmpdir\n";
+print "rm -rf $tmpdir\n" if $verbose;
 system "rm -rf $tmpdir" and die "Couldn't clean out $tmpdir: $?\n";
 system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
@@ -118,18 +162,19 @@ tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
 
 chdir $srcdir or die "Couldn't enter $srcdir\n";
 index_dir "SOURCE#", ".";
-write_entry "SOURCE#", $srcdir;
 
-#  Index include files.
+#  Index files from include directory.
 
 chdir $incdir or die "Couldn't enter $incdir\n";
 index_incdir "INCLUDE#", ".";
-write_entry "INCLUDE#", $incdir;
 
 #  Write checked task names out to text file.
+#  Currently, a task is identified as the text of any entry in a .hlp file
+#  for which a module of the same name exists in the same package.
 
 open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
 foreach $package (sort keys %tasks) {
+   $npackages++;
    print TASKS "$package:";
    print "$package:" if $verbose;
    foreach $task (sort @{$tasks{$package}}) {
@@ -147,6 +192,21 @@ foreach $package (sort keys %tasks) {
    print       "\n" if $verbose;
 }
 close TASKS;
+
+#  Print statistics
+
+if ($verbose) {
+   printf "\nSTATISTICS ($npackages packages):\n";
+   printf "%20s %10s %10s\n\n", "File type", "Files", "Lines";
+   foreach $ftype (keys %nfiles) {
+      $nfiles += $nfiles{$ftype};
+      $nlines{$ftype} ||= 0;
+      $nlines += $nlines{$ftype};
+      printf "%20s %10d %10d\n", $ftype, $nfiles{$ftype}, $nlines{$ftype};
+   }
+   printf "%20s %10s %10s\n", ' ', '--------', '--------';
+   printf "%20s %10d %10d\n", ' ', $nfiles, $nlines;
+}
 
 #  Terminate processing.
 
@@ -172,9 +232,9 @@ sub index_list {
    my $path = shift;      #  Logical pathname of current directory.
    my @files = @_;        #  Files in current directory to be indexed.
 
-#  Rephrase logical path as a package reference if it looks it needs doing,
-#  i.e. if it starts off with the literal 'SOURCE#' followed by a tarfile
-#  or a directory.
+#  Rephrase logical path as a package reference if it looks like it needs 
+#  doing i.e. if it starts off with the literal 'SOURCE#' followed by a 
+#  tarfile or a directory.
 
    local $package;
    $path =~ s%([/#>])./%$1%g;    #  Tidy it up.
@@ -193,15 +253,19 @@ sub index_list {
          index_tar $path, $file;
       }
       elsif ($file =~ /\.f$/) {       #  fortran source file.
+         $nfiles{'f'}++;
          index_f $path, $file;
       }
       elsif ($file =~ /\.gen$/) {     #  generic fortran source file.
+         $nfiles{'gen'}++;
          index_gen $path, $file;
       }
       elsif ($file =~ /\.c$/) {       #  C source file.
+         $nfiles{'c'}++;
          index_c $path, $file;
       }
       elsif ($file =~ /\.h$/) {       #  C header file.
+         $nfiles{'h'}++;
          index_h $path, $file;
       }
       elsif ($file =~ /\.hlp$/) {     #  starlink help file
@@ -265,14 +329,16 @@ sub index_fortran_file {
 
 #  Arguments.
 
-   my $path = shift;      #  Logical pathname of FILE to be indexed.
-   my $file = shift;      #  File in current directory to be indexed.
+   my $path = shift;          #  Logical pathname of FILE to be indexed.
+   my $file = shift;          #  File in current directory to be indexed.
+   my $ftype = shift || 'f';  #  Type of file ('f' or 'gen' - default 'f').
 
 #  Cycle through source file writing index lines where appropriate.
 
    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
    while (<F>) {
-      write_entry $name, $path if ($name = module_name 'f', $_);
+      write_entry $name, $path if ($name = module_name $ftype, $_);
+      $nlines{$ftype}++;
    }
    close F;
 }
@@ -287,7 +353,7 @@ sub index_f {
    my $path = shift;      #  Logical pathname of current directory.
    my $file = shift;      #  .f file in current directory to be indexed.
 
-   index_fortran_file "$path$file", $file;
+   index_fortran_file "$path$file", $file, 'f';
 }
 
 ########################################################################
@@ -300,6 +366,10 @@ sub index_gen {
    my $path = shift;      #  Logical pathname of current directory.
    my $file = shift;      #  .gen file in current directory to be indexed.
 
+#  Index unprocessed source code.
+
+   index_fortran_file "$path$file", $file, 'gen';
+
 #  Process file to produce normal fortran source code.
 
    system "$generic $file" and die "Command '$generic $file' failed: $?\n";
@@ -308,7 +378,7 @@ sub index_gen {
 
    my $ffile = $file;
    $ffile =~ s/\.gen$/.f/;
-   index_fortran_file "$path$file", $ffile;
+   index_fortran_file "$path$file", $ffile, 'f';
 
 #  Tidy up.
 
@@ -397,6 +467,7 @@ sub index_c {
    open C, $file or die "Couldn't open $file in directory ".cwd."\n";
    while (<C>) {
       write_entry $name, "$path$file" if ($name = module_name 'c', $_);
+      $nlines{'c'}++;
    }
    close C;
 }
