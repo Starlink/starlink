@@ -1,4 +1,4 @@
 
 echo `err_link` `kaplibs_link_adam` `snx_link_adam` `pda_link` \
                 `hdspar_link_adam` `dtask_link_adam` `ast_link` \
-      | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+      | @AWK@ '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

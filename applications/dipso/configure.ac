@@ -31,9 +31,12 @@ AC_FC_LIBRARY_LDFLAGS
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION(sun50)
 
+dnl    Pick the best awk command, the _link script is quite demanding
+AC_PROG_AWK
+
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml my_dipso])
+AC_CONFIG_FILES([Makefile component.xml my_dipso dipso_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
