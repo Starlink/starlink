@@ -159,7 +159,7 @@
 
 1 Changes_this_release
 
-  Release v3.2-0 is a minor update of CCDPACK, but provides greatly
+  Release v3.2-1 is a minor update of CCDPACK, but provides greatly
   improved facilities for interactive registration:
 
    - The following programs have been completely rewritten:
@@ -175,8 +175,18 @@
      incarnations. 
 
 
+  The following new program has been added for viewing positioning of
+  registered images:
+
+      - OUTLINE -- Draws aligned outlines of images on a graphics display
+
+
   The following minor changes have also been made since v3.1-1:
      
+   - PLOTLIST has been modified to interact with the AGI database
+     in a more KAPPA-compatible way, so that alignment with KAPPA
+     graphical output should be improved.
+
    - There have been some improvements and bug fixes to the percentile
      location routine used by FINDOBJ.
 
