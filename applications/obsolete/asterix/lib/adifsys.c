@@ -178,6 +178,7 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
 
 void ADIfsysFileClose( ADIobj id, ADIstatus status )
   {
+  char		cmode[7];		/* The file access mode */
   ADIobj	fid;			/* File object at end of chain */
   ADIobj	ortn;			/* Close routine */
   ADIobj        repid;
@@ -190,6 +191,19 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
 
 /* Extract representation id from file object */
   adic_cget0i( fid, "REP", &repid, status );
+
+/* If the mode was WRITE or UPDATE, and an FCOMIT method exists, call it */
+  adic_cget0c( fid, "MODE", 7, cmode, status );
+  if ( (cmode[0] != 'r') && (cmode[0] != 'R') ) {
+
+    adic_there( repid, "COMIT_RTN", &there, status );
+    if ( there ) {
+      adix_locrcb( repid, "COMIT_RTN", _CSM, &ortn, status );
+
+/* Try to close the file */
+      ADIkrnlExecO( ortn, fid, status );
+      }
+    }
 
 /* Representation has supplied a closure routine? */
   adic_there( repid, "CLOSE_RTN", &there, status );
