@@ -407,7 +407,7 @@ proc red4DoSomething {taskname dowhat inputs} {
        if {$dowhat=="action"} {
          red4Iarith $taskname IMULT4
        } elseif {$dowhat=="help"} {
-         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox5.html
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox4.html
        }
       }
     normalise_observation
@@ -439,7 +439,7 @@ proc red4DoSomething {taskname dowhat inputs} {
        if {$dowhat=="action"} {
          red4Iarith $taskname IOR4
        } elseif {$dowhat=="help"} {
-         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox6.html
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox5.html
        }
       }
     polysky_reduced_observation_or_group
@@ -527,7 +527,7 @@ proc red4DoSomething {taskname dowhat inputs} {
        if {$dowhat=="action"} {
          red4Iarith $taskname ISUB4
        } elseif {$dowhat=="help"} {
-         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox7.html
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox6.html
        }
       }
     two_column_line_fit
