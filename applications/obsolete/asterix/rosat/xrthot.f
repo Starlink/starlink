@@ -36,7 +36,7 @@
       CHARACTER*80 FNAME,HNAME,RTNAME  ! file names
       CHARACTER*(DAT__SZLOC) HLOC      ! Locator to header file
       DOUBLE PRECISION SPOTS(MAXSPOT*3)
-      INTEGER LP,NSPOT,LUNIT,ISTATUS,BLKSIZE
+      INTEGER LP,NSPOT,LUNIT,ISTATUS,BLKSIZE,HID
 *    Local data :
 *     <any DATA initialisations for local variables>
 *    Version :
@@ -93,28 +93,24 @@
 *
 *     Open the header file for update
       HNAME = RTNAME(1:CHR_LEN(RTNAME))//'_hdr'
-      CALL HDS_OPEN(HNAME, 'UPDATE', HLOC, STATUS)
+      CALL ADI_FOPEN(HNAME, '*', 'UPDATE', HID, STATUS)
+      CALL ADI1_GETLOC( HID, HLOC, STATUS )
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Cannot open header file for update')
          GOTO 999
       ENDIF
-*
-*     Write the header structure into the header file
+
+*    Write the header structure into the header file
       CALL RAT_PUTHEAD(HLOC,'HEAD',HEAD,STATUS)
-*
-*     update the history information
-      CALL HIST_ADD(HLOC,VERSION,STATUS)
-*
-*     close header file
-      CALL HDS_CLOSE(HLOC,STATUS)
-*
-999   CONTINUE
-*
-      IF (STATUS.NE.SAI__OK) THEN
-         CALL ERR_REP(' ',VERSION,STATUS)
-      ENDIF
-*
-      CALL AST_CLOSE(STATUS)
-*
+
+*    Update the history information
+      CALL HSI_ADD(HID,VERSION,STATUS )
+
+*    Close header file
+      CALL ADI_FCLOSE( HID, STATUS )
+
+ 999  CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
