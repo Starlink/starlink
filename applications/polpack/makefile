@@ -455,7 +455,8 @@ pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f polexpx.f \
 pol1_sngsm.f pol1_blocr.f pol1_sngvn.f pol1_sngva.f pol1_sngct.f\
 polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
-polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f 
+polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \ 
+pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -494,7 +495,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 #  List of applications/tasks in monolith.
 
 TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
-polexpx polexp polvec polplot polbin polsim polimage
+polexpx polexp polvec polplot polbin polsim polimage polstack
 
 #  Monolith routine source name.
 
@@ -512,7 +513,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
-polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl
+polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl
 
 #  List of help library sources.
 
@@ -540,7 +541,7 @@ IRAF_PKG_PAR = $(PKG_NAME).par
 #  IRAF tasks
 
 IRAF_PAR_FILES = polcal.par polexp.par polimp.par polka.par polvec.par \
-polplot.par polbin.par polext.par polsim.par polimage.par
+polplot.par polbin.par polext.par polsim.par polimage.par polstack.par
 
 #  Name the ADAM executables to be run under IRAF
 #  This assumes there are no IRAF-specific versions of the executables
@@ -1814,6 +1815,8 @@ pol1_sngmn.o:	 SAE_PAR
 pol1_sngsm.o:	 SAE_PAR PRM_PAR
 pol1_sngsv.o:	 SAE_PAR GRP_PAR
 pol1_squar.o:	 SAE_PAR PRM_PAR
+pol1_srtim.o:	 SAE_PAR DAT_PAR PRM_PAR
+pol1_stkim.o:    SAE_PAR DAT_PAR PRM_PAR GRP_PAR NDF_PAR
 pol1_stbin.o:	 SAE_PAR
 pol1_stk.o:	 SAE_PAR
 pol1_stk2.o:	 SAE_PAR PRM_PAR
@@ -1837,6 +1840,7 @@ polimpx.o:	 SAE_PAR DAT_PAR GRP_PAR
 polka.o:	 SAE_PAR GRP_PAR PAR_ERR PRM_PAR NDF_PAR
 polpack_mon.o:	 SAE_PAR PAR_PAR
 polplot.o:	 SAE_PAR PRM_PAR AST_PAR CAT_PAR PAR_ERR
+polstack.o:	 SAE_PAR GRP_PAR PAR_ERR 
 polvec.o:	 SAE_PAR PAR_ERR PRM_PAR NDF_PAR AST_PAR
 pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
