@@ -112,9 +112,6 @@
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
-
-*  Local Variables:
-      INTEGER			FILID			! Base file object
 *.
 
 *  Check inherited global status.
