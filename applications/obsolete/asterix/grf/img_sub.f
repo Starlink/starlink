@@ -6338,12 +6338,31 @@ c        REAL XX,XP,YP
 *  Local constants :
 *  Local variables :
       INTEGER ID,NB
+      INTEGER I,L
+      LOGICAL NULL
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
         CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
         CALL NBS_GET_CVALUE(ID,0,CVAL,NB,STATUS)
 
+        L=LEN(CVAL)
+        I=1
+        NULL=.FALSE.
+        DO WHILE (I.LE.L.AND..NOT.NULL)
+          IF (CVAL(I:I).EQ.CHAR(0)) THEN
+            NULL=.TRUE.
+          ELSE
+            I=I+1
+          ENDIF
+        ENDDO
+        IF (NULL) THEN
+          IF (I.EQ.1) THEN
+            CVAL=' '
+          ELSE
+            CVAL=CVAL(:I-1)
+          ENDIF
+        ENDIF
 
       ENDIF
 
