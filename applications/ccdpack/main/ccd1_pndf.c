@@ -5,12 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "ccdtcl.h"
+#include "ccdaux.h"
 #include "grp_par.h"
 
    void *ccdMall( char *type, int size, int *status );
 
-   F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nndf),
-                              INTEGER_ARRAY(iset), INTEGER(nset), 
+   F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nset),
+                              INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof), 
                               INTEGER(namgid), DOUBLE_ARRAY(percnt), 
                               DOUBLE(zoom), INTEGER(maxcnv), 
                               INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
@@ -33,7 +34,7 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, NNDF, ISET, NSET, NAMGID, PERCNT, ZOOM,
+*     CALL CCD1_PNDF( NDFGID, NSET, IMEM, IMEMOF, NAMGID, PERCNT, ZOOM,
 *                     MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
 *                     NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
 
@@ -47,18 +48,16 @@
 *     NDFGID = INTEGER (Given)
 *        GRP identifier of the group of NDFs which is to be presented 
 *        to the user.
-*     NNDF = INTEGER (Given)
-*        The number of entries in the NDFGID group.
-*     ISET( NNDF ) = INTEGER (Given)
-*        The number of the Set to which each NDF in the NDFGID group 
-*        belongs.  Members of the same Set (NDFs with the same value
-*        of ISET( * )) will be grouped together, and each pairing
-*        returned by this routine will be between a pair of Sets.
 *     NSET = INTEGER (Given)
-*        The number of Sets represented in ISET.
+*        The number of Sets referred to by IMEM.
+*     IMEM( NSET ) = INTEGER (Given)
+*        The group indices of the NDFs in Set order.
+*     IMEMOF( NSET + 1 ) = INTEGER (Given)
+*        Pointers into the IMEM array indicating where each Set's NDFs
+*        begin.  The final entry is a sentinel.
 *     NAMGID = INTEGER (Given)
 *        The GRP identifier for a group holding the Set names 
-*        corresponding to the Sets in ISET.  It should have NSET members.
+*        corresponding to the NSET Sets.  It should have NSET members.
 *        Members with a value of ' ', meaning no alignment Set 
 *        information is available, are permitted.
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
@@ -151,9 +150,9 @@
 
 /* Arguments Given. */
       GENPTR_INTEGER(ndfgid)
-      GENPTR_INTEGER(nndf)
-      GENPTR_INTEGER_ARRAY(iset)
       GENPTR_INTEGER(nset)
+      GENPTR_INTEGER_ARRAY(imem)
+      GENPTR_INTEGER_ARRAY(imemof)
       GENPTR_INTEGER(namgid)
       GENPTR_DOUBLE_ARRAY(percnt)
 
@@ -181,7 +180,6 @@
 /* Local variables. */
       int i;
       int j;
-      int first;
       const int one = 1;
       ccdTcl_Interp *cinterp;
       DECLARE_CHARACTER( fndfname, GRP__SZNAM );
@@ -200,27 +198,25 @@
 /* Construct a list of NDF names available to the Tcl interpreter as 
    the value of the NDFSETS variable. */
       for ( i = 1; i <= *nset; i++ ) {
-         ccdTclDo( cinterp, "set tmplist {}; unset tmplist", status );
          F77_CALL(grp_get)( INTEGER_ARG(namgid), INTEGER_ARG(&i),
                             INTEGER_ARG(&one), CHARACTER_ARG(fsetname),
                             INTEGER_ARG(status)
                             TRAIL_ARG(fsetname) );
          cnfImprt( fsetname, GRP__SZNAM, setname );
-         first = 1;
-         for ( j = 1; j <= *nndf; j++ ) {
-            if ( iset[ j - 1 ] == i ) {
-               F77_CALL(grp_get)( INTEGER_ARG(ndfgid), INTEGER_ARG(&j), 
-                                  INTEGER_ARG(&one), CHARACTER_ARG(fndfname),
-                                  INTEGER_ARG(status)
-                                  TRAIL_ARG(fndfname) );
-               cnfImprt( fndfname, GRP__SZNAM, ndfname );
-               if ( first ) {
-                  if ( *setname == '\0' ) strcpy( setname, ndfname );
-                  ccdTclAppC( cinterp, "tmplist", setname, status );
-                  first = 0;
-               }
-               ccdTclAppC( cinterp, "tmplist", ndfname, status );
-            }
+         if ( *setname == '\0' || imemof[ i ] - imemof[ i - 1 ] == 1 ) {
+            strcpy( buffer, "{}" );
+         }
+         else {
+            sprintf( buffer, "{set:%s}", setname );
+         }
+         ccdTclSetC( cinterp, "tmplist", buffer, status );
+         for ( j = imemof[ i - 1 ]; j <= imemof[ i ] - 1; j++ ) {
+            F77_CALL(grp_get)( INTEGER_ARG(ndfgid), INTEGER_ARG(&imem[ j - 1 ]),
+                               INTEGER_ARG(&one), CHARACTER_ARG(fndfname),
+                               INTEGER_ARG(status)
+                               TRAIL_ARG(fndfname) );
+            cnfImprt( fndfname, GRP__SZNAM, ndfname );
+            ccdTclAppC( cinterp, "tmplist", ndfname, status );
          }
          ccdTclDo( cinterp, "lappend NDFSETS $tmplist", status );
       }
@@ -301,49 +297,5 @@
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );
    }
-
-
-
-#include "dat_par.h"
-
-   void *ccdMall( char *type, int size, int *status ) {
-/*
-*+
-*  Name:
-*     ccdMall
-*
-*  Purpose:
-*     C wrapper for fortran CCD1_MALL routine.
-*
-*  Arguments:
-*     type = char *
-*        HDS type of memory to allocate, as a null-terminated string.
-*     size = int
-*        Number of elements of type type to allocate.
-*     status = int
-*        The global status.
-*
-*  Return Value:
-*     A pointer to a block of memory which will hold size elements of
-*     type type.  This pointer has been registered with the CCDPACK
-*     memory allocation machinery (and a fortiori the CNF memory 
-*     allocation machinery) and so must be deallocated using CCD1_MFREE.
-*     The pointer returned is a C pointer, and thus suitable for direct
-*     use by C code.  If it is to be used by Fortran code it must
-*     be processed with the function cnfFptr.
-*-
-*/
-      DECLARE_CHARACTER( ftype, DAT__SZTYP );
-      F77_POINTER_TYPE ptr;
-
-      if ( *status != SAI__OK ) return (void *) NULL;
-
-      cnfExprt( type, ftype, DAT__SZTYP );
-      F77_CALL(ccd1_mall)( INTEGER_ARG(&size), CHARACTER_ARG(ftype),
-                           POINTER_ARG(&ptr), INTEGER_ARG(status)
-                           TRAIL_ARG(ftype) );
-      return cnfCptr( ptr );
-   }
-                           
 
 /* $Id$ */
