@@ -132,6 +132,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.30  1999/08/19 03:32:55  timj
+*     use SCUBA__N_TEMPS
+*
 *     Revision 1.29  1999/08/03 20:01:38  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -580,7 +583,8 @@ c
       IF (STATUS .EQ. SAI__OK) THEN
 
          IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
-            EXPECTED_DIM1 = 3     ! This is the number of skydip temperatures
+*     This is the number of skydip temperatures
+            EXPECTED_DIM1 =   SCUBA__N_TEMPS  
          ELSE IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
             EXPECTED_DIM1 = 5
          ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN

@@ -1,3 +1,8 @@
+1999-08-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_reduce_switch.f (SURF_REDUCE_SWITCH): Use
+	SCUBA__N_TEMPS to size the data array for SKYDIPS.
+
 1999-08-05  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* sculib/sculib_sinc.f (SINC): Rename as SCULIB_SINC
@@ -13,7 +18,7 @@
 
 1999-08-04  Tim Jenness  <timj@jach.hawaii.edu>
 
-	* scripts/remdbm.pl: Correct coordinate centre of filter.
+	* scripts/remdbm.pl: Correct coordinate centre of filtering.
 
 1999-07-29  Tim Jenness  <timj@jach.hawaii.edu>
 
