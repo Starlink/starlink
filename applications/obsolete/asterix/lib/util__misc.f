@@ -14,6 +14,7 @@
 * Type Definitions :
       IMPLICIT NONE
 * Global constants
+      INCLUDE 'SAE_PAR'
       INCLUDE 'QUAL_PAR'              !Definitions of quality values
 * Import :
       INTEGER LP2,LP3,LP4             !These define the slice of the 4-d array.
