@@ -1,3 +1,10 @@
+core.*
+*.shl
+iras90_pm
+specresp100.sdf
+specresp12.sdf
+specresp25.sdf
+specresp60.sdf
 ffield
 iras90.csh
 iras90.icl
