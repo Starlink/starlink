@@ -547,8 +547,12 @@ C------------------------------------------------------------------------
       implicit none
       integer nval,i,excl,istat,chr_len
       real vals(nval),long,lat,radius
-      character prompt*(*),buffer*80
+C   prompt buffer is declared in size here to keep g77 happy
+C   when concatenating a string of unknown length
+      character prompt*(80),buffer*80
       logical menu,cart
+      real pi
+      parameter ( pi = 3.141592654 )
       common /cart/ cart
 
       if( istat .ne. 0 ) return
@@ -577,12 +581,12 @@ C------------------------------------------------------------------------
 *  Convert to Cartesian coordinates if spherical coordinates were
 *  entered.
       if( nval .eq. 3 .and. .not. cart ) then
-         long = vals(1)
-         lat = vals(2)
+         long = vals(1) * pi / 180.0
+         lat = vals(2) * pi / 180.0
          radius = vals(3)
-         vals(1) = radius*cosd( lat )*cosd( long )
-         vals(2) = radius*cosd( lat )*sind( long )
-         vals(3) = radius*sind( lat )
+         vals(1) = radius*cos( lat )*cos( long )
+         vals(2) = radius*cos( lat )*sin( long )
+         vals(3) = radius*sin( lat )
          write(6,*) 'Equivalent Cartesian coordinates: ',vals(1),
      :               vals(2),vals(3)
       end if
@@ -592,7 +596,9 @@ C------------------------------------------------------------------------
       subroutine charin(prompt,menu,text,len,istat)
       implicit none
       integer excl,istat,len,chr_len
-      character text*(*),prompt*(*)
+C   prompt buffer is declared in size here to keep g77 happy
+C   when concatenating a string of unknown length
+      character text*(*),prompt*(80)
       logical menu
 
       if( istat .ne. 0 ) return
