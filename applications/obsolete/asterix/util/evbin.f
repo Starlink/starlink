@@ -162,6 +162,8 @@
 *        New data interface for output
 *     19 Sep 1995 V2.0-0 (DJA):
 *        Full ADI port. Removed Fortran structures
+*      7 Nov 1995 V2.0-1 (DJA):
+*        Allow field extrema to be absent, but warn if so.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -385,7 +387,8 @@
 
 *      Get field range
         CALL EVBIN_GETRANGE( O_LID(I), O_NAME(I), O_DECR(I), O_QOK(I),
-     :                       O_QUANT(I), O_LHS(I), O_RHS(I), STATUS )
+     :                       O_QUANT(I), NEVENT, %VAL(O_PTR(I)),
+     :                       O_LHS(I), O_RHS(I), STATUS )
 
 *      Tell user the data range
         CALL MSG_SETR( 'LHS', O_LHS(I) )
@@ -684,7 +687,7 @@
 
 
 *+  EVBIN_GETRANGE - Obtains min, max & range of data
-      SUBROUTINE EVBIN_GETRANGE( LID, NAME, DECR, QOK, QUANT, LHS,
+      SUBROUTINE EVBIN_GETRANGE( LID, NAME, DECR, QOK, QUANT, LDAT, LHS,
      :                           RHS, STATUS )
 *    Description :
 *     Obtains FIELD_MIN/MAX & range for the list pointed to by AXN.
@@ -714,6 +717,8 @@
       INTEGER			LID			! List identifier
       CHARACTER*(*)		NAME			! List name
       LOGICAL			DECR
+      INTEGER			LLEN
+      REAL			LDAT(*)
 *
 *    Export :
 *
@@ -742,10 +747,11 @@
       CALL ADI_CGET0R( LID, 'Min', FMIN, STATUS )
       CALL ADI_CGET0R( LID, 'Max', FMAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_FLUSH( STATUS )
         CALL MSG_SETC( 'NAME', NAME )
-        CALL ERR_REP( ' ', 'Error reading field min/max for list ^NAME',
-     :                STATUS )
-        GOTO 99
+        CALL MSG_PRNT( 'WARNING : Error reading field min/max for '/
+     :             /'list ^NAME, data range will be used instead' )
+        CALL ARR_RANG1R( LLEN, LDAT, FMIN, FMAX, STATUS )
       END IF
 
 *  Does quantum exist?
