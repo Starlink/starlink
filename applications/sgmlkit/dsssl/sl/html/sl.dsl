@@ -12,9 +12,10 @@
 <!entity maths.dsl		system "slmaths.dsl" subdoc>
 <!entity tables.dsl		system "sltables.dsl" subdoc>
 <!entity sllinks.dsl		system "sllinks.dsl" subdoc>
+<!entity slback.dsl		system "slback.dsl" subdoc>
 ]>
 
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
 <docblock>
 <title>Starlink to HTML stylesheet
@@ -71,13 +72,17 @@ Miscellaneous parameters, which control detailed behaviour of the stylesheet.
 <description>
 Simple support for tables.
 
-<codereference doc="sllinks.dsl" id=code.links
+<codereference doc="sllinks.dsl" id=code.links>
 <title>Inter- and Intra-document linking
 <description>Handles <code/ref/, <code/docxref/, <code/webref/ and <code/url/.
 Imposes the link policy.
 
+<codereference doc="slback.dsl" id=code.back>
+<title>Back-matter
+<description>Handles notes, bibliography and indexing
+
 <codegroup 
-  use="code.lib code.common code.maths code.html code.navig code.params code.tables code.links" 
+  use="code.lib code.common code.maths code.html code.navig code.params code.tables code.links code.back" 
   id=html>
 <title>HTML-specific stylesheet code
 <description>
