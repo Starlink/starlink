@@ -39,3 +39,11 @@ PRIVATE_INCLUDES = SST_PAR SST_SCB
 sstsupportdir = $(bindir)
 sstsupport_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
+# The `start' script needs to have installation locations edited into it
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@VERSION\@,$(VERSION),g'
+start: start.in
+	rm -f start.tmp start
+	$(edit) $(srcdir)/start.in >start.tmp
+	mv start.tmp start

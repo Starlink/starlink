@@ -17,6 +17,7 @@
 #
 #  Authors:
 #     P.W. Draper (STARLINK)
+#     Norman Gray (Starlink)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -26,25 +27,27 @@
 #       Added PISA2ARD application.
 #     5-DEC-1994 (PDRAPER):
 #       Convert to SST.
+#     17-Feb-2004 (NG)
+#       Add autoconf substitutions
 #     {enter_changes_here}
 #
 #-
 #
 #  Define aliases for each application.
-alias forstats      INSTALL/bin/sst/forstats
-alias procvt        INSTALL/bin/sst/procvt
-alias prolat        INSTALL/bin/sst/prolat
-alias prohlp        INSTALL/bin/sst/prohlp
-alias propak        INSTALL/bin/sst/propak
-alias prohtml       INSTALL/bin/sst/prohtml
+alias forstats      @bindir@/forstats
+alias procvt        @bindir@/procvt
+alias prolat        @bindir@/prolat
+alias prohlp        @bindir@/prohlp
+alias propak        @bindir@/propak
+alias prohtml       @bindir@/prohtml
 #
 # set environment variables for SST system
 #
-setenv SST_DIR INSTALL/bin/sst
+setenv SST_DIR @bindir@
 #
 #  Show that the SST commands are now available.
 echo " "
-echo "   SST commands are now available - (Version 1.1-0)"
+echo "   SST commands are now available - (Version @VERSION@)"
 echo " "
 #
 # end
