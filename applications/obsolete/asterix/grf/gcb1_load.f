@@ -105,6 +105,7 @@
       CHARACTER*(DAT__SZLOC)	GLOC			! GRAFIX box
 
       INTEGER			GCBPTR			! Ptr to mapped GCB
+      INTEGER			NBYTE			! Size of GCB
 
       LOGICAL			OK			! Read from file?
 *.
@@ -112,12 +113,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator from 1st argument
-      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
-
 *  Initialise
       OK = .FALSE.
-      AOK = .FALSE.
 
 *  GRAFIX box exists?
       CALL ADI1_LOCGRAF( ARGS(1), .FALSE., GLOC, STATUS )
