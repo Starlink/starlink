@@ -56,7 +56,7 @@
 
 *     This needs a configure test
 *     Ranges from 26 to extremely large
-      PARAMETER (KMXIO=40)
+      PARAMETER (KMXIO=96)
 
 *     Use configure to detect the RECL unit
 
