@@ -79,6 +79,8 @@ package ccdpack {
 #     7-MAY-1999 (MBT):
 #        Original version.  Includes pieces of code from the previously
 #        existing files ccdpack.csh, ccdpack.icl, ccdpack.cl.
+#     21-SEP-1999 (MBT):
+#        Added inclusion of drizzle.ifd
 #     {enter_changes_here}
 #-
 
@@ -106,6 +108,7 @@ package ccdpack {
       source ccdedit.ifd
       source makemos.ifd
       source tranndf.ifd
+      source drizzle.ifd
       source astimp.ifd
       source astexp.ifd
       source wcsedit.ifd
