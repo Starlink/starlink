@@ -55,7 +55,7 @@ done
 echorun() { echo $*; eval $* || exit 1; }
 
 # Starconf uses the value of STARCONF_DEFAULT_{PREFIX,STARLINK}
-# during its configuration.  We setthese here, unless they're set
+# during its configuration.  We set these here, unless they're set
 # in the environment.  Starconf's configure.ac sets these anyway, and
 # defaults them in a way which is similar or identical to what we do
 # here, however it makes sense to make this explicit.
@@ -121,10 +121,6 @@ fi
 PATH=$BUILDSUPPORT_PREFIX/bin:$PATH
 
 # Configure and build the bootstrap utilities.
-# We make a temporary makefile from Makefile.in, which can be used,
-# unconfigured, below.
-tempmakefile=Makefile.tmp
-rm -f $tempmakefile
 
 # Make sure that componentinfo.dtd exists.
 # Link to the uninstalled version of the file.
@@ -139,8 +135,15 @@ test -f componentinfo.dtd ||
 test -d $STARCONF_DEFAULT_PREFIX/bin || \
     echorun mkdir -p $STARCONF_DEFAULT_PREFIX/bin
 
-
+# We make a temporary makefile from Makefile.in.  This can be used,
+# unconfigured, below.
+tempmakefile=Makefile.tmp
+rm -f $tempmakefile
 sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
+
+# Now invoke 'make buildsupport', using this temporary makefile, and
+# setting environment variables appropriately.  These variables have
+# to be exported, so contain them in a subshell.
 (
 
     MISSING_SUPPRESS_RUN=true
@@ -210,6 +213,7 @@ done
 # NOW do the autoreconf in all the children
 
 # (Re)configure, installing missing files
+echo "GENERATING configure SCRIPTS..."
 echorun autoreconf --install --symlink
 
 # Because buildsupport is not mentioned in AC_CONFIG_SUBDIRS in
