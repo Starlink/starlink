@@ -24,15 +24,19 @@
 *    Local Constants :
 *    Local variables :
       CHARACTER*132 BUFF
+      LOGICAL ISAFILE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+*  try alternative location first
         CALL PSX_GETENV(ALT,BUFF,STATUS)
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_ANNUL(STATUS)
+*  if not defined then try default location
           CALL PSX_GETENV(DEF,BUFF,STATUS)
           IF (STATUS.NE.SAI__OK) THEN
             CALL ERR_ANNUL(STATUS)
+*  still not found then try AST_ETC as catch-all
             CALL PSX_GETENV('AST_ETC',BUFF,STATUS)
             IF (STATUS.NE.SAI__OK) THEN
               CALL MSG_PRNT('! Unable to resolve data path')
@@ -43,17 +47,35 @@
         IF (STATUS.EQ.SAI__OK) THEN
 
           L=CHR_LEN(BUFF)
+*  if relative path defined then append it
           IF (CHR_LEN(REL).GT.0) THEN
-            IF (BUFF(L:L).NE.'/'.AND.REL(1:1).NE.'/') THEN
-              BUFF=BUFF(1:L)//'/'
-              L=L+1
+*  but first see if what we have already points to a file
+            INQUIRE(FILE=BUFF,EXIST=ISAFILE)
+*  could be case that default expects filename to be added
+            IF (ISAFILE) THEN
+*  but alternate doesn't
+              PATH=BUFF
+
+            ELSE
+*  if we are appending then sort out slashes
+              IF (BUFF(L:L).NE.'/'.AND.REL(1:1).NE.'/') THEN
+                BUFF=BUFF(1:L)//'/'
+                L=L+1
+              ENDIF
+              PATH=BUFF(1:L)//REL
+
             ENDIF
-            PATH=BUFF(1:L)//REL
+
           ENDIF
+
+*  return length of final string
           L=CHR_LEN(PATH)
 
         ENDIF
 
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from AST_PATH',STATUS)
+        ENDIF
 
       ENDIF
 
