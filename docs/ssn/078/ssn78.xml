@@ -4940,6 +4940,10 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <title>Forcing automake's choice of linking language</title>
         </subhead>
 
+        <p><strong>XXX</strong> no: there's an better mechanism,
+          as yet undocumented.  Watch this space, but don't use this
+          technique.</p>
+
         <p>When building a library or application, automake needs to
           make a decision about which language to use to do the final
           link.  For example, it must use the Fortran linker to make a
@@ -4978,6 +4982,96 @@ C A dummy Fortran routine.  See comments in Makefile.am
           As the comment indicates, it is wise to include an
           explanation of this ... let's not call it a hack ... in the
           <code>Makefile.am</code>.</p>
+
+        <p>This is currently used in the `pcs', `gks', `astrom' and `pgplot'
+          components.</p>
+      </subsect>
+
+      <subsect id="tip-conditional-build" export="export">
+        <subhead>
+          <title>Conditionally building components</title>
+        </subhead>
+
+        <p>It is occasionally useful to build code conditionally,
+          depending on features of the environment.  About the only
+          place where this is necessary, however, is when building a
+          target of a configure dependency<index>dependencies!configure</index>
+          (see <ref id="macro-declare-dependencies"/>), where a library (for
+          example) must be built only if it is not available on the
+          platform already.</p>
+
+        <p>There is no way to decide not to build a component, so
+          instead we arrange the configuration of the component in
+          such a way that if the component's code is not required,
+          then the component trivially builds and installs nothing, or
+          nothing more than a stamp file.</p>
+
+        <p>This is true for the <code>jpeg</code> component, which is
+          a configure dependency of <code>startcl</code>, and located in
+          the repository in <code>thirdparty/ijg/jpeg</code>.  The
+          important parts of <code>jpeg</code>'s
+          <code>configure.ac</code> are as follows:
+<verbatim>
+AC_CHECK_HEADER([jpeglib.h],
+  [MAIN_TARGET=jpeglib-stamp],
+  [
+  (
+    cd src
+    echo ./configure --prefix=$prefix --cache-file=config.cache
+    ./configure --prefix=$prefix --cache-file=config.cache
+  )
+  MAIN_TARGET=jpeglib
+])
+AC_SUBST(MAIN_TARGET)
+
+STAR_SPECIAL_INSTALL_COMMAND([
+    if test $(MAIN_TARGET) = jpeglib; then
+      cd src;
+      for d in bin lib include man/man1;
+        do $(mkdir_p) $$DESTDIR$(prefix)/$$d;
+      done;
+      $(MAKE) DESTDIR=$$DESTDIR install install-lib;
+    fi])
+</verbatim>
+          The first part wraps the actual jpeglib configuration code (see
+          <ref id="config-tclsys"/> for the rationale for that code)
+          inside an autoconf test for the <code>jpeglib.h</code>
+          include file.  If it finds it, there is nothing to do; if it
+          doesn't then it does actually configure the package.  The
+          decision it makes is recorded in the substituted variable
+          <code>@MAIN_TARGET@</code> and its corresponding Makefile
+          variable <code>$(MAIN_TARGET)</code>.</p>
+
+        <p>Note that the <code>STAR_SPECIAL_INSTALL_COMMAND</code> is
+          expanded at a different time from the header test, with the
+          effect that it is effective in both conditions, when the
+          header file is there and when it isn't.  Thus the command
+          inside it must be written with this in mind, and explicitly
+          test the value of <code>$(MAIN_TARGET)</code>.</p>
+
+        <p>The <code>Makefile.am</code> has corresponding support, the
+          important parts of which are as follows.
+<verbatim>
+all-local: $(MAIN_TARGET)
+
+jpeglib:
+        cd src; $(MAKE) all
+
+jpeglib-stamp:
+        rm -f $@
+        { date; \
+          echo "jpeglib.h found in system -- no need to build our own"; } >$@
+</verbatim>
+          We can't override the `all' target, but instead use
+          automake's `all-local' hook which, if it is present, is
+          built at the same time as `all'.  Thus depending on the
+          value of the variable <code>$(MAIN_TARGET)</code>, as
+          determined and substituted by <code>configure.ac</code>, we
+          build either the jpeglib software, or a stamp file.  The
+          install command in the <code>configure.ac</code> file above
+          then avoids installing anything if
+          <code>$(MAIN_TARGET)</code> is not the string
+          <code>jpeglib</code>.</p>
       </subsect>
     </sect>
 
