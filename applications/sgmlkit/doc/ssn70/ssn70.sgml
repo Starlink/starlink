@@ -1,0 +1,699 @@
+<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.2//EN" [
+  <!entity sgp28
+	public "-//Starlink//DOCUMENT Summary SGP/28//EN" subdoc>
+  <!entity sun199 
+	public "-//Starlink//DOCUMENT Summary SUN/199//EN" subdoc>
+  <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
+  <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif87a>
+  <!entity % Feature.Routinelist 'include'>
+  <!entity rsqbrack ']'>
+]>
+<![ ignore [ $Id$ ]]>
+
+<title>The Starlink SGML system
+<author email='norman@astro.gla.ac.uk'
+	webpage='http://www.astro.gla.ac.uk/users/norman'
+	affiliation='University of Glasgow'
+	id=ng
+	>Norman Gray
+
+<docnumber>70
+
+<history>
+<version number=0 date='21-APR-1999'>Initial version
+</history>
+
+<copyright>
+Copyright 1999, Particle Physics and Astronomy Research Council
+</copyright>
+
+<abstract>
+This document describes the Starlink SGML system.  Blah
+
+<px>Audience: 
+This document is addressed both at those who need to generate Starlink
+documentation of any kind, and at anyone maintaining the SGML system.
+</abstract>
+
+<sect id=intro export>Introduction
+
+<p>The Starlink SGML system supports people writing Starlink documents,
+such as SUNs, SSNs, MUDs and the like.  It consists of a definition of
+a markup language suitable for such documents, plus software to
+convert these source documents to reader-friendly form.  At present,
+these `output formats' include HTML and &latex (and hence include
+postscript and PDF formats).
+
+<p>The SGML system scores over previous solutions to Starlink's
+documentation needs, such as <code/runoff/ or &latex, because it is a
+well-defined system, so that there is excellent support for it in
+tools, and it is designed to be converted into whichever presentation
+format is most convenient (see also the Frequently Asked Questions
+<ref id=faq.html> and <ref id=faq.latex>).
+
+<p>Although this system can help with many of the tasks involved in
+document creation, it cannot write the document for you (shame!).  For
+advice on that, documents such as <docxref doc=sgp28> are still vital.
+
+<p>This document is organised as follows.  In <ref id=sgml>, I
+discuss SGML in general terms, describing its general structure and
+aims, describing how to read a Document Type Definition (DTD), and
+pointing to sources of information.  In <ref id=markup>, I describe
+how you would go about actually writing a document, describing the
+structure of Starlink documents which is crystallised in the
+specification of this system.  In <ref id=future>, I describe
+some possible further improvements in the system (suggestions and
+comments are most welcome).  Finally, in <ref id=faq>, I
+answer (I hope) some frequently asked questions about SGML in general
+and this system in particular.
+
+<sect id=sgml export>SGML
+
+<subsect id=why.sgml export>Why SGML?
+
+<p>The problem SGML tries to solve is that humans are good at
+intuiting structure from layout, but computers are exceedingly bad at
+it.  This means that if we want computers to help us with documents --
+displaying them, transforming them, storing them, searching them -- we
+have to give the computer some help.  
+
+<p>A common way of providing this
+help is through markup systems such as <code/runoff/ (or its
+variants), or &tex, or &latex;.  The last of these three has served
+Starlink very well, and even survived the conversion of Starlink's
+document set to hypertext, through the tool <code/Star2HTML/ (see <docxref
+doc=sun199>), but the problems of the &latex system illustrate the
+advantages of the SGML approach quite well.
+<dl>
+<dt>&latex templates are ill-defined
+<dd>What is a Starlink document?  Although Starlink distributes
+templates for the principal document types (for example in
+<code>/star/docs/sun.tex</code>), and distributes style guides such as
+<docxref doc=sgp28>, there is no way either of mandating that certain
+elements, such as a document number, actually appear, nor of ensuring
+that other features, such as raw &tex, do not.  This means that
+document authors can never quite be sure that they have produced a
+`correct' document, and that tools which search or process such
+documents have to have contingency strategies available, when the
+elements they hope to use are missing.
+
+<dt>The conversion is a hack!
+<dd>Because the input documents are not well-defined, the tools which
+process them cannot be designed against any standard, but instead have
+to rely on heuristics and uncheckable conventions.  &latex documents
+are defined to work with one particular tool -- the &tex tokeniser and
+parser -- so that using
+them with any other tool (which is necessary if you want to produce
+anything other than DVI files<note>In fact, there is a version of &tex
+which produces PDF files directly, and a &tex;-to-HTML converter
+called <webref url="http://www.tug.org/applications/tex4ht/mn.html"
+>TeX4ht</webref> which writes special DVI files which work with a
+postprocessor, and so uses the &tex parser to produce HTML
+indirectly.  This really just pushes the hack elsewhere.</note>) is
+asking for trouble.
+
+<dt>Users have to know too much.
+<dd>When you are writing a <code/Star2HTML/ document, you are
+riding two horses at once; you must write in that subset of &latex
+which <code/Star2HTML/ knows about.  Users must frequently be
+sensitive to the treatment of their document by two separate systems.
+
+<dt>Not future-proof
+<dd>&latex is not precisely defined; on the contrary, it is
+continually being developed, and a completely new version, <webref
+url="http://www.oasis-open.org/cover/latex3-9804.html" >&latex;3</webref> is
+eagerly anticipated (which will, incidentally, be heavily influenced
+by SGML).  Similarly, the <code/LaTeX2HTML/ package is continually
+being upgraded, causing a <code/Star2HTML/ (based on
+<code/LaTeX2HTML/) maintenance headache.
+</dl>
+
+<p>None of these problems is fatal -- all of them have manifestly been
+overcome by the authors and maintainers of the current document set --
+but taken together they make the maintenance of the document set more
+expensive in time than there is time to spare.
+
+<p>SGML addresses these problems effectively.
+<dl>
+<dt>SGML documents are well-defined
+<dd>The structure of an SGML document is formally specified in the
+Document Type Definition (DTD) associated with it.  This specifies
+what features must, which may, and which may not, be present in a
+document.  This means that systems processing the document need work
+only within a much smaller universe of possibilities.
+
+<dt>Future-proof
+<dd>SGML has had only two backward-compatible amendments since 1986;
+it's not dependent on any particular tool; SGML is designed to be used
+decades hence; a sufficient number of
+hangarfuls of technical documentation have been produced using SGML
+that if and when a replacement comes along, it will have good support.
+
+</dl>
+
+<subsect id=what.sgml export>What is SGML?
+
+<p>SGML is a metalanguage: that is, a language for writing languages
+in.
+
+<p>This is not actually as arcane as it sounds.  It simply means that
+you use SGML to define the abstract structure of a document type (the
+Document Type Definition, or DTD), so
+that any documents which claim to be of that type must have a certain
+syntactic structure.
+
+<p>HTML is a well known example of an SGML DTD, whose rules are well
+known.  An HTML document consists of precisely one <code/head/ and one
+<code/body/ element.  The <code/head/ must have precisely one
+<code/title/ element, and may have zero or more <code/link/ elements.
+The <code/title/ element has simple characters as content.  The
+<code/link/ element has no content, but has four optional
+attributes&ellip, and so on.
+
+<p>Given a document marked up in some specific DTD it will be parsed
+by some tool which reads first the DTD then the document, and then
+creates some abstract representation of the document which it passes
+to a formatter, which in turn produces output in some form which may,
+of course, be further processed to a final document.  The SGML parser
+and whichever editor you use are both quite generic, but the formatter
+is tied to a particular DTD.  There is a diagram of this system in
+<ref id=fig.sgml>.
+<figure id=fig.sgml float>
+<caption>An SGML system
+<figurecontent
+	image="sgmlsystem.eps sgmlsystem.gif"
+	alt="An SGML system">
+</figure>
+
+<p>For further information on SGML, see the well-known
+<cite>Gentle Introduction to SGML</cite><citation/gentle/.
+For more detailed information,
+see the useful but compressed <citation/bradley/; and for an
+authoritative account see 
+<citation/goldfarb/, which is an exegesis of the standard,
+<citation/iso8879/. 
+
+<subsect id=sgml.dtd export>Reading DTDs
+
+<p>The discussion in <ref id=markup> should be enough to let
+you produce your own documents but, now or in the future, you may find
+it useful to be able to read the DTD directly.  Once you are familiar
+with the underlying ideas, the expression of them in the DTD turns out
+to be agreeably compact and reasonably readable.
+
+<p>My account of the DTD syntax will be rather compressed -- see
+<citation/gentle/, or the other references in <ref
+id=what.sgml> for alternatives.
+
+<p>A simple HTML-like DTD could be declared as follows:
+<verbatim><![ cdata [
+<!element html      o o (head, body, copyright?)>
+<!element head      o o (title & link*)>
+<!element title     - - (#pcdata)>
+<!element link      - o empty>
+<!element body      o o (p | dl)+>
+<!element p         - o (#pcdata)>
+<!element dl        - - (dt, dd)+>
+<!element (dt|dd)   - o (#pcdata)>
+<!element copyright - - (#pcdata)>
+
+<!entity % URL "cdata"
+        -- The term URL means a CDATA attribute
+           whose value is a Uniform Resource Locator,
+           See RFC1808 (June 95) and RFC1738 (Dec 94).
+        -->
+<!attlist link
+    href  %URL          #required  -- URL for linked resource --
+    rel   (next | prev) #implied   -- reverse link types --
+    >
+<!entity amp "&">
+]]></verbatim>
+And here is a simple document which uses this DTD:
+<verbatim><![ cdata [
+<link href="http://www.astro.gla.ac.uk/users/norman/" rel=next>
+<title>This is a title</title>
+
+<p>And here is a paragraph
+<dl>
+<dt>With a delimited list
+<dd>Correctly formed &amp; OK
+</dl>
+]]></verbatim>
+This displays most of the important syntactical features in an SGML
+DTD, so if we explain it line-by-line, it should illustrate the
+features you need to make some sense of most DTDs.
+
+<p><verbatim><![ cdata [
+<!element html    o o (head, body, copyright?)>
+]]></verbatim>
+This `element declaration'
+declares the <code/html/ element.  The element type name is followed
+by a statement of whether the start and end tags may be omitted if the
+parser can infer their presence.  The minimisation specifications may
+be either `-' (minus), indicating that the corresponding tag is
+required, or `o' (letter O), indicating that it may be omitted.
+Following this is the `content model' which, in this case, states that
+the <code/html/ element must consist of one <code/head/, one
+<code/body/, and an optional <code/copyright/, in that order -- the
+comma connecting the element 
+names specifies that they must be in order, and the question mark
+following the copyright element indicates that it may occur zero or
+one times. 
+The omission of the start element is possible in this case, since the
+first element in the <code/html/ element must be a <code/head/
+element, so whenever the parser finds a <code/head/ element, it can
+know that the <code/html/ element has begun.
+
+<p>So what is in the <code/head/ element?
+<verbatim><![ cdata [
+<!element head    o o (title & link*)>
+]]></verbatim>
+The <code/head/ element consists of precisely one title, and zero or
+more <code/link/ elements, in either order.  The <code/head/ tags
+can be inferred from the presence of
+the <code/title/ and <code/link/ elements, and so it is feasible for
+us to declare that they may be omitted.  The star following the
+<code/link/ token in the content model indicates that this element may
+appear zero or more times, and the ampersand declares that the
+elements on either side of it must both appear, but can do so in
+either order.  Note that this content model allows `<code/title/',
+`<code/title link link.../' and `<code/link link...title/', but not
+`<code/link/' or `<code/link title link/'.
+
+<p>Finally we have some text:
+<verbatim><![ cdata [
+<!element title   - - (#pcdata)>
+]]></verbatim>
+The title element is very simple: neither the start not the end tag
+may be omitted, and it may contain only characters (<code/#pcdata/
+stands for `parseable character data') and entity references such as
+<code/&amp;amp;/.
+
+<p><verbatim><![ cdata [
+<!element link    - o empty>
+]]></verbatim>
+The <code/link/ element has no actual content, so it is given a
+content model consisting of the reserved word <code/empty/.  The tag
+omission for empty elements is always `<code/- o/'.  The point of the
+<code/link/ element is to hold its attributes, which we will come to
+shortly.
+
+<p><verbatim><![ cdata [
+<!element body    o o (p | dl)+>
+]]></verbatim>
+The document body consists of paragraph elements, or `delimited
+lists'.  The `or' connector, `<code/|/', indicates that either of the
+<code/p/ or <code/dl/ elements may appear, and the `plus' occurrence
+indicator asserts that the group <code/(p|dl)/ must appear one or more times.
+
+<p>Finally, we start to specify the `interesting' content of the document.
+<verbatim><![ cdata [
+<!element dl      - - (dt, dd)+>
+]]></verbatim>
+Like the <code/body/ itself, the <code/dl/ element consists of a
+sequence of one or more structures.  Unlike the <code/body/ element,
+however, the structure is not a list of alternatives, but a sequence.
+Where the <code/body/ element would allow `<code/p p dl p/' for example, the
+<code/dl/ element requires that the <code/dt/ and <code/dd/ elements
+alternate -- the repeatable element is the <em/ordered pair/ of
+elements `<code/dt, dd/'.
+
+<p><verbatim><![ cdata [
+<!element (dt|dd) - o (#pcdata)>
+<!element p       - o (#pcdata)>
+<!element copyright - - (#pcdata)>
+]]></verbatim>
+The paragraph, list and copyright elements have simple content
+models.  Note that we can specify the structure of more than one
+element in the same declaration.
+
+<p>Prior to specifying the attributes for the <code/link/ element, we
+may declare an abbreviation.
+<verbatim><![ cdata [
+<!entity % URL "cdata"
+        -- The term URL means a CDATA attribute
+           whose value is a Uniform Resource Locator,
+           See RFC1808 (June 95) and RFC1738 (Dec 94).
+        -->
+]]></verbatim>
+This declares <code/URL/ to be a `parameter entity', usable only
+within this DTD.  The entity reference `<code/%URL/' will be
+substituted by the string `<code/cdata/' (unparsed character data)
+when it is encountered.  A DTD may declare an entity more than once,
+but any declarations after the first are silently ignored.
+
+<p>Note the structure of the comment in this last declaration: in SGML,
+comments may appear only within markup declarations (that is within
+`<code/&lt;! ... >/'), they start and end with the string
+`<code/&#45;&#45;/', and there may be more than one in a row.  Thus you
+may legally find `<code/&lt;!>/' within an SGML file -- this is a
+completely empty markup declaration.  Such a declaration may have a
+single comment within it, as in `<code><![ cdata [<!-- this is a comment
+-->]]></code>', or it may have several, as in
+<code><![ cdata [<!-- here -- -- is a comment ------>]]></code>, which
+has <em/three/ comments within it. 
+
+<p>Now we declare the attributes for the <code/link/ element.
+<verbatim><![ cdata [
+<!attlist link
+    href  %URL          #required  -- URL for linked resource --
+]]></verbatim>
+This declares an <code/href/ attribute.  After expansion of the
+<code/%URL/ entity reference, this attribute is seen to have a
+`declared value' of <code/cdata/ (unparsed character data), and this
+attribute is required to be present, so that the SGML parser will
+object if it finds a <code/link/ element in a document without an
+<code/href/ attribute.
+
+<p>The <code/rel/ attribute can take only two values:
+<verbatim><![ cdata [
+    rel   (next | prev) #implied   -- reverse link types --
+    >
+]]></verbatim>
+The <code/link/ element may have the attribute `<code/rel=next/' or
+`<code/rel=prev/', but no other strings.  Since this attribute is
+`<code/#implied/', it is also permitted to omit it entirely.  A
+document may even specify this as simply `<code/&lt;link
+href=&quot;here.html&quot; next>/' and the parser will infer that the value
+`<code/next/' is associated with the attribute name `<code/rel/'.
+
+<p><verbatim><![ cdata [
+<!entity amp "&">
+]]></verbatim>
+Entity references (other than parameter entities, which are internal
+to a DTD) are made using a
+construction such as `<code/&amp;entname;/.  This presents a problem
+if you want to include the ampersand in your text, but this
+declaration sets up an entity called `amp', which can be used to
+include an ampersand in text by typing `<code/&amp;amp;/'.  You can
+use this in your own documents to create shorthand forms for bits of
+text you don't want to retype.
+
+<p>The remaining feature you will commonly find in DTDs is the `marked
+section'.  This is a construction such as
+<verbatim>
+Here is some text &lt![ ignore [ and here is some ignored text &rsqbrack;]>
+</verbatim>
+Along with <code/ignore/ there is <code/include/.
+Why on earth would you want to do this?  Because the ignore/include
+keyword can be the expansion of an entity.  We could have defined our
+HTML-like as follows:
+<!-- can't use marked section when I'm illustrating one! -->
+<verbatim>
+&lt;!entity % allow.copyright &quot;ignore&quot;>
+&lt;![ %allow.copyright [
+  &lt;!entity % html.model &quot;head, body, copyright?&quot;>
+  &lt;!element copyright - - (#pcdata)>
+&rsqbrack;]>
+&lt;!entity % html.model &quot;head, body&quot;>
+&lt;!element html    o o (%html.model)>
+</verbatim>
+This looks very strange, but it is a common construction in DTDs.  The
+parameter entity <code/%allow.copyright/ is defined to be
+<code/ignore/.  That means that when the parser finds the first marked
+section it ignores it, so that the first definition it finds of the parameter
+entity <code/%html.model/ is the one which sets it to be
+`<code/head,body/', so that is what is used as the content model
+in the declaration of the <code/html/ element.  If the
+<code/%allow.copyright/ entity had <em/earlier/ been set to
+<code/include/, then the redefinition of it here would have been
+ignored, the marked section would have been included, the
+<code/%html.model/ entity would have been defined as
+`<code/head,body,copyright?/' with the (now) second one ignored, and
+the <code/html/ element would have been defined to allow all three
+elements.  That is, marked sections used internally in this way can be
+a useful way of parameterising DTDs.
+
+<p>You can define entities, including parameter entities, in the
+document's `declaration subset' (see <ref id=markup.dtdsubset>), since these
+conceptually come before, and hence have priority over, definitions in
+the DTD.  However, resist resist resist the temptation to do clever
+things here, since it is easy to make your document unreadable and,
+a much more heinous crime, invalid.
+
+<sect id=markup export>Marking up your document
+
+<subsect id=markup.intro export>Sample document, and overview
+
+<p>A sample SUN is illustrated in <ref id=fig.simplesun>.
+<figure id=fig.simplesun export float>
+<caption>A simple sample SUN
+<figurecontent alt="Simple SUN document">
+<verbatim><![ cdata [
+<!doctype sun public "-//Starlink//DTD Starlink SUN//EN">
+<title>The Starlink SGML system
+<author email='norman@astro.gla.ac.uk'
+	webpage='http://www.astro.gla.ac.uk/users/norman'
+	affiliation='University of Glasgow'
+	id=ng
+	>Norman Gray
+<docnumber>1234
+<history>
+  <version number=0 date='21-APR-1999'>Initial version
+<abstract>
+  This is a sample SUN
+</abstract>
+
+<sect id=intro export>Introduction
+<p>Starlink SUNs are easy to write.
+]]></verbatim>
+</figurecontent>
+</figure>
+<p>Features to note:
+<ul>
+<li>The document starts off with a `document type declaration',
+<code>&lt;!doctype sun public &quot;-//Starlink//DTD Starlink
+SUN//EN&quot;></code>, which states which DTD this document claims to be
+conformant to, in this case the Starlink SUN document type.
+
+<li>The document is structured in terms of `elements' such as
+<code/author/ or <code/sect/, and these in turn contain further data,
+such as a sequence of characters (`Norman Gray') in the case of the
+<code/author/ element, or further elements (the title and paragraphs)
+in the case of the <code/sect/ element.  Elements are delimited by
+`opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
+like <code>&lt;/abstract&gt;</code>.
+
+<li>Elements have both <em/content/ and <em/attributes/.  For example,
+the <code/author/ element has the characters `Norman Gray' as its
+content and a list of strings such as an email address as its
+attributes.
+
+<li>Some of the elements (only the <code/abstract/ element in fact)
+are closed (ie, have closing tags to match their opening tags), but
+the majority are not.  This is because the DTD tells 
+the parser that a <code/title/ element cannot contain an <code/author/
+element, so the appearance of the latter implicitly finishes the
+former.
+
+<li>Some elements and attributes are required, others optional.  This
+document is close to being a minimal SUN.  It is not quite minimal
+because the <code/copyright/ element is optional, and it turns out
+that the only <em/required/ content of a document 
+body is the abstract!  Also, the only required attribute of the
+<code/author/ element is the <code/id/ attribute.
+
+<li>There are actually more elements present here than are apparent to
+the eye.  As well as allowing some closing tags to be omitted, a DTD
+can be allow certain <em/opening/ tags to be omitted, too.  In fact,
+the full structure of this document is as seen in <ref
+id=fig.simplesun2>.
+</ul>
+<figure float id="fig.simplesun2" export>
+<caption>A SUN document with all tags in place, the normalised version
+of the document in <ref id=fig.simplesun>.
+<figurecontent alt="Normalised SUN document">
+<verbatim><![ cdata [
+<SUN>
+<DOCINFO>
+<TITLE>The Starlink SGML system</TITLE>
+<AUTHORLIST>
+<AUTHOR EMAIL="norman@astro.gla.ac.uk" 
+WEBPAGE="http://www.astro.gla.ac.uk/users/norman" 
+AFFILIATION="University of Glasgow" 
+ID="NG">Norman Gray</AUTHOR>
+</AUTHORLIST>
+<DOCNUMBER>1234</DOCNUMBER>
+<HISTORY>
+<VERSION NUMBER="0" DATE="21-APR-1999">
+<PX>Initial version</PX>
+</VERSION>
+</HISTORY>
+<COPYRIGHT>
+<P>Copyright 1999, Particle Physics and Astronomy Research Council</P>
+</COPYRIGHT>
+</DOCINFO>
+<DOCBODY>
+<ABSTRACT>
+<PX>This is a sample SUN</PX>
+</ABSTRACT>
+<SECT ID="INTRO" EXPORT>
+<SUBHEAD>
+<TITLE>Introduction</TITLE>
+</SUBHEAD>
+<P>Starlink SUNs are easy to write.</P>
+</SECT>
+</DOCBODY>
+</SUN>
+]]></verbatim>
+</figurecontent>
+</figure>
+
+<p>In <ref id=fig.simplesun2>, note that the actual content of
+the <code/abstract/ element is one or more <code/px/ elements (a
+slightly restricted variant of the standard <code/p/ paragraph
+element), and that the <code/sect/ element contains a <code/subhead/
+element, and <em/contains/ the paragraphs which constitute it (note
+that this is a significant difference from HTML, where the heading
+elements <code/hn/ contain only a section title).  You will rarely
+have to be aware of these `hidden' tags when you are creating a
+document, but it will occasionally be
+useful to know that these tags are there somewhere, and that you're
+glad you don't have to type all of them.
+In fact, when I explain the document structure below, I will do it in terms
+of the elements which are `really' there.
+
+<p>`Markup minimisation', which is SGML's name for this, was
+introduced to SGML to make typing less onerous.  Personally, I like
+this, since it seems to make the document look less cluttered, and so
+I have designed the DTD to support this quite extensively.  The
+minimisation is completely optional, however, and you may insert all
+the tags if you prefer.  SGML-aware editors (see <ref id=editors>)
+typically insert all tags.
+
+<p>You can see from <ref id=fig.simplesun2> that the `top-level'
+element of this document is <code/sun/.  The top-level element of SSN
+documents is <code/ssn/, and similarly for the other Starlink document
+types.  These different document types are broadly the same, but the
+SSN document type does not include elements for documenting
+programming code, and the MUD document type has a <code/docdate/
+element instead of a <code/docnumber/ and a <code/history/.  The SUN
+document type is the most general.  The top-level <code/sun/ element
+has only two `children', <code/docinfo/, which contains the document
+information such as its author, number, and so on, and <code/docbody/,
+which contains the actual content of the document.
+
+<subsect id=markup.dtdsubset export>Declaration subset.
+
+<!-- FIXME -->
+<p>Explain doc declaration subset, once I've finalised how to refer to
+documentsummary documents -- in a master catalogue, or locally?
+
+<p>Can be used to include subfiles, create abbreviations, necessarily
+declare subdocs or, in extremis, modify the DTD.  Use for HTML-only
+sections, etc.  Recapitulate the warnings about careless use making
+the document invalid.  Perhaps put this into a separate section on
+marked sections, and mention the CDATA marked section.
+
+<subsect id=markup.try export>Try it yourself
+
+<p>Type the document given in <ref id=fig.simplesun> into a file, and
+check it with the distributed SGML parser, as follows.  If the
+document is in a file <code/sun1234.sgml/, then give the command
+<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls/
+parser, and, with the <code/-s/ option, suppresses all output except
+warnings and error messages.  This means that for a valid document,
+you should see precisely no output from this command.  If you want to
+see output, leave off the <code/-s/ option and the parser will produce
+a version of your document in a form which is easy for a downstream
+application to parse.  There are, for example, Perl libraries (for
+example <code/SGMLSpm/, which should be on CPAN) which
+will parse this output format and allow you to process SGML documents
+using Perl.  The crucial thing in this case is the final line in
+the file, which should be a single `C' command, indicating that the
+document conforms to its DTD.
+
+<p>If you want to try normalising your document, give the command
+<kbd>sgmlnorm sun1234.sgml</kbd>.  This transforms your document into
+an equivalent one with all omitted elements reinserted.
+
+<p>Finally, try converting your document to HTML.  This uses the
+program Jade, which is an implementation of the DSSSL formatting
+language.  Give the command 
+<kbd>jade -t sgml -d
+$STARLINK_SGML_DIR/dsssl/sl/html/sl.dsl#html sun1234.sgml</kbd>.  This
+will parse your document, and convert it to a collection of HTML
+files, with the master file named <code/SUN-1234.html/ (this name is based
+on the information in the document, and is independent of what your
+source file is actually called).  The command actually spits out a
+line of text to the standard output; this is because the system is
+designed to be used from within a Makefile (see <ref id=setup>) rather
+than directly from the command line.
+
+<p>You can also convert your document to &latex;, with the command 
+<kbd>jade -t latex -d $STARLINK_SGML_DIR/dsssl/sl/latex/sl.dsl#latex
+sun1234.sgml</kbd>.
+
+<p>Try making parts of your document invalid, and comparing the error
+with the error message <code/nsgmls/ produces.
+
+<!-- FIXME : check that this is consistent with whatever I do to set up
+     the paths and environment variables -->
+
+
+<subsect id=markup.structure export>The structure of the document
+<p>Discuss separately structure, tables, figures, cross-references,
+maths, program code.  
+
+<p>Discuss markup minimisation: recap tag omission, mention NET and SHORTREFs.
+
+<sect id=processing export>Processing your document
+
+<subsect id=setup export>Setting up
+<p>Makefiles
+
+<p>Packaging document for distribution.  BOS?  Manifest?  Figures?  Makefile?
+
+<subsect id=editors export>Editors
+
+<p>Is this the best place for this?
+
+<sect id=future export>Further developments
+
+<p>What next?  Weaknesses with the current implementation.
+
+<p>HyTime?  XML?  Searching?
+
+<sect id=faq export>Frequently Asked Questions
+
+<subsect id=faq.html export>What's wrong with HTML?
+
+<p>Well?
+
+<subsect id=faq.latex export>What's wrong with &latex?
+
+<p>Well?
+
+<subsect id=faq.xml export>What about XML?
+
+<p>Well?
+
+<appendices>
+
+<sect id=appx.general.dtd export>The Starlink General DTD
+
+<p>Everything, including the HTML version of the DTD in the HTML
+version of the manual
+
+<sect id=appx.programcode.dtd export>The Programcode DTD
+
+<p>The programcode DTD.
+
+<sect id=appx.system export>The Starlink SGML system for maintainers
+
+<p>This section is a reference for maintainers of the Starlink SGML
+system
+
+<p>Supporting software: in .../sgml/lib (inc BibTeX style)
+
+<subsect id=appx.dssslcode export>The DSSSL source code
+
+<p>Hoover everything in to here.
+
+<subsect id=install export>Installation
+
+<p>How to install everything, including building Jade.
+
+<backmatter>
+<notecontents>
+<bibliography bib=ssn70>
