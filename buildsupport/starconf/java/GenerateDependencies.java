@@ -112,7 +112,7 @@ public class GenerateDependencies {
             System.out.println();
             System.out.println("\tcd " + c.componentPath() + " \\");
             if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
-                System.out.println("\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $t >configure-output.log; echo $t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\");
+                System.out.println("\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\");
                 if (c.getBuildsupport() == Component.BUILDSUPPORT_AUTO)
                     allbuildsupport.add(c);
             }
