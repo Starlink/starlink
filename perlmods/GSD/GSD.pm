@@ -88,7 +88,7 @@ use vars qw/$VERSION @ISA @EXPORT/;
 	      gsdGet1dp gsdGet1rp gsdGet1ip
 	    );
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 bootstrap GSD  $VERSION;
 
@@ -327,15 +327,22 @@ sub Get0w ($$) {
 All the C<gsdGet0x> commands are available as methods of the following
 form:
 
-  $data = $gsd->Get1x($itemno, \@dimvals, \@start, \@end);
+  @data = $gsd->Get1x($itemno, \@dimvals, \@start, \@end);
 
 Note that this routine does not require that the number of dimensions
 for dimvals is given (this is known to perl) or the number of
 values returned to the user (you can simply find the size of the array).
+C<@dimvals> is an array reflecting the required shape of the array
+which is to be sliced by C<@start> and C<@end>. This does not necessarily
+have to match the actual shape of the array item, allowing you to
+extract arbritrary slices by modifying the dimensionality. It is assumed
+that the product of C<@dimvals> is not greater than the size
+of the GSD item (although this is not checked!).
+
 In addition, if only a single start and end position are required
 they can be supplied as scalars
 
-  $data = $gsd->Get1x($itemno, 1, 1, $size);
+  @data = $gsd->Get1x($itemno, $size, 1, $size);
 
 Returns undef if an error occurred.
 
@@ -490,6 +497,10 @@ Works for array and scalar types. The data are returned in their
 native precision (float, double etc).  Trailing spaces are removed
 when character values are returned.
 
+In a scalar context, array items are returned as references to
+arrays (unless they happen to be PDL objects (see L<GSD::PDL>
+in which case the PDL is returned).
+
 Returns undef on error.
 
 =cut
@@ -518,6 +529,10 @@ Returns the contents of a GSD item from position.
 Works for array and scalar types. The data are returned in their
 native precision (float, double etc).  Trailing spaces are removed
 when character values are returned.
+
+In a scalar context, array items are returned as references to
+arrays (unless they happen to be PDL objects (see L<GSD::PDL>
+in which case the PDL is returned).
 
 Returns undef on error.
 
@@ -553,11 +568,28 @@ sub _getTypedData {
     if ($array) {
       my ($dimnm, $dimunt, $dimvals, $size) = $self->InqSize($itemno);      
       if (defined $size) {
-	my @data = $self->$method($itemno, 1, 1, $size);
+	# We need to specify the correct dimensions here so that 
+	# the PDL subclass will get the shape correct
+	my (@start, @end);
+	foreach (@$dimvals) {
+	  push(@start, 1);
+	  push(@end, $_);
+	}
+	my @data = $self->$method($itemno, $dimvals, \@start, \@end);
 	if ($type eq 'C') { # Strip trailing spaces
 	  foreach (@data) { s/\s+$//; }
 	}
-	return @data;
+	# Check context for return arguments
+	if (wantarray) {
+	  return @data;
+	} else {
+	  # Check to see if we have a PDL as the first entry
+	  if (UNIVERSAL::isa($data[0], 'PDL')) {
+	    return $data[0];
+	  } else {
+	    return \@data;
+	  }
+	}
       }
     } else {
       my $data = $self->$method($itemno);
