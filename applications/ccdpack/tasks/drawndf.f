@@ -667,7 +667,7 @@ c        CALL PGSCLP( 0 )
       CALL PGSTBG( BGCOL )
 
 *  Apply default and user-selected style settings to the plot.
-      CALL CCD1_PLSTY( PLOT, 'STYLE', STATUS )
+      CALL CCD1_PLSTY( PLOT, 'Tol=0.001', 'STYLE', STATUS )
 
 *  Save the PGPLOT viewport as a new picture in the AGI database.
       CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE', PICOD, STATUS )

@@ -380,7 +380,7 @@
          FRM = AST_FRAME( 2, 'Domain=PIXEL', STATUS )
          FSET = AST_FRAMESET( FRM, ' ', STATUS )
          CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
-         CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+         CALL CCD1_PLSTY( PLOT, ' ', ' ', STATUS )
          CALL AST_SET( PLOT, STYELS( 1:STYELL ), STATUS )
       END IF
 
@@ -437,7 +437,7 @@
             CALL AST_SETI( PLOT, 'Current', JCURP, STATUS )
 
 *  Apply default and user-selected style settings to the plot.
-            CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+            CALL CCD1_PLSTY( PLOT, ' ', ' ', STATUS )
             CALL AST_SET( PLOT, STYELS( 1:STYELL ), STATUS )
          END IF
 

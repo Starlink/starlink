@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_PLSTY( PLOT, PARAM, STATUS )
+      SUBROUTINE CCD1_PLSTY( PLOT, SETING, PARAM, STATUS )
 *+
 *  Name:
 *     CCD1_PLSTY
@@ -10,21 +10,21 @@
 *     Starlink Fortran 77.
 
 *  Invocation:
-*     CALL CCD1_PLSTY( PLOT, PARAM, STATUS )
+*     CALL CCD1_PLSTY( PLOT, SETING, PARAM, STATUS )
 
 *  Description:
-*     This routine applies default (CCDPACK-style) and, optionally, 
-*     environment-specified style settings to an AST Plot object.
+*     This routine applies in order default (CCDPACK-style), caller-
+*     specified (in the argument SETING), and environment-specified
+*     (from the parameter PARAM) style settings to an AST Plot object.
 *     It picks up the default settings from a file in the 
-*     CCDPACK_DIR directory, and gets the environment-specified ones
-*     from an ADAM parameter given by the PARAM argument.  If PARAM
-*     is an empty string, then only the CCDPACK default style settings
-*     are applied.
+*     CCDPACK_DIR directory.
 
 *  Arguments:
 *     PLOT = INTEGER (Given)
 *        The AST identifier for a Plot object whose style settings are to
 *        be modified.
+*     SETING = CHARACTER * ( * ) (Given)
+*        A string passed to AST_SET to apply settings.
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of an ADAM parameter from which additional style 
 *        settings are to be taken.  This will be treated as a GRP 
@@ -66,6 +66,7 @@
       
 *  Arguments Given:
       INTEGER PLOT
+      CHARACTER * ( * ) SETING
       CHARACTER * ( * ) PARAM
       
 *  Status:
@@ -75,7 +76,7 @@
       INTEGER CHR_LEN            ! Significant length of a string
 
 *  Local Variables:
-      INTEGER GID( 2 )           ! GRP group identifiers
+      INTEGER GID( 3 )           ! GRP group identifiers
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER NADD               ! Number of elements added to group (dummy)
@@ -121,6 +122,14 @@
       END IF
       CALL ERR_RLSE
 
+*  If required, read elements from the SETING variable into a group.
+      IF ( SETING .NE. ' ' ) THEN
+         NGRP = NGRP + 1
+         CALL GRP_NEW( 'CCDPACK:STYLE', GID( NGRP ), STATUS )
+         CALL GRP_GRPEX( SETING, GRP__NOID, GID( NGRP ), NEL,
+     :                   NADD, FLAG, STATUS )
+      END IF
+
 *  If required, read elements from the ADAM parameter into a group.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( PARAM .NE. ' ' ) THEN
@@ -155,6 +164,7 @@
 *  Release group resources.
       CALL CCD1_GRDEL( GID( 1 ), STATUS )
       CALL CCD1_GRDEL( GID( 2 ), STATUS )
+      CALL CCD1_GRDEL( GID( 3 ), STATUS )
 
       END
 * $Id$
