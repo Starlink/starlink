@@ -292,6 +292,7 @@
 
 *     open the data NDF
          ITEMP = 0
+
          IN_NDF = NDF__NOID
 
          CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
@@ -454,7 +455,7 @@
                END DO
 
 *     Annul file descriptor and status
-               CALL FIO_ANNUL(FD(RLEV), FIOSTATUS(RLEV))
+               CALL FIO_CLOSE(FD(RLEV), FIOSTATUS(RLEV))
                IF (FIOSTATUS(RLEV) .NE. SAI__OK)
      :              CALL ERR_ANNUL(FIOSTATUS(RLEV))
 
