@@ -117,8 +117,9 @@
                AXIS(1) structure exists in the input NDF the value of the
                first data point is stored with the keyword CRVAL1,
                and the incremental value between successive axis data is
-               stored in keyword CDELT1. If there is an axis label it is
-               written to keyword CRTYPE1, and axis unit is written to CTYPE1.
+               stored in keyword CDELT1.  By definition the reference pixel is
+               1.0 and is stored in keyword CRPIX1.  If there is an axis label
+               it is written to keyword CTYPE1, and axis unit is written to CUNIT1.
                (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
                a standard method of storing axis widths and variances, so these
                NDF components will not be propagated to the header.
@@ -143,7 +144,8 @@
                \item The TITLE, LABEL, and BUNITS descriptors are only copied
                if no TITLE, LABEL, and UNITS NDF components respectively
                have already been copied into these headers.
-               \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}}, and CRTYPE{\em{n}} descriptors
+               \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}},
+               CUNIT{\em{n}}, and CRTYPE{\em{n}} descriptors
                in the FITS extension are only copied if the input NDF
                contained no linear axis structures.
                \item The standard order of the FITS keywords is preserved,

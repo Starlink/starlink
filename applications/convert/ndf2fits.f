@@ -178,7 +178,7 @@
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array;
-*        CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn --- are derived from
+*        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
 *          structures are present, the values in the NDF FITS extension
 *          are copied (when parameter PROFITS is true).  If any axes
@@ -227,7 +227,11 @@
 *  History:
 *     1994 June 3 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.  Also writes CRPIXn FITS keyword when the NDF
+*        has linear axis centres.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}

@@ -38,7 +38,7 @@ COMP = GROUP (Read)
    FITS file.  The acceptable values are "D" for the main data
    array "V" for variance, "Q" for quality, or any permutation
    thereof.  The special value "A" means all components, i.e.
-   COMP="DVQ".  Thus COMP="VD" requests that both the data array
+   COMP="DVQ". Thus COMP="VD" requests that both the data array
    and variance are to be converted if present.  During
    processing at least one, if not all, of the requested
    components must be present, otherwise an error is reported and
@@ -63,7 +63,7 @@ COMP = GROUP (Read)
 IN = GROUP (Read)
    The names of the NDFs to be converted into FITS format.  It
    may be a list of NDF names or direction specifications
-   separated by commas and enclosed in double quotes.  NDF names
+   separated by commas and enclosed in double quotes. NDF names
    may include the regular expressions ("*", "?", "[a-z]" etc.)
    on UNIX systems.  Indirection may occur through text files
    (nested up to seven deep).  The indirection character is "^".
@@ -175,7 +175,7 @@ NDF into the FITS header, listed by FITS keyword.
      values.
    BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
      data array;
-   CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn --- are derived from
+   CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
      the NDF axis structures if possible.  If no linear NDF axis
      structures are present, the values in the NDF FITS extension
      are copied (when parameter PROFITS is true).  If any axes
@@ -212,5 +212,10 @@ MJC: Malcolm J. Currie (STARLINK)
 2 History
  1994 June 3 (MJC):
     Original version.
+
+ 1996 September 16 (MJC):
+    Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+    for axis units.  Also writes CRPIXn FITS keyword when the NDF
+    has linear axis centres.
 2 Implementation_Status
    - All NDF data types are supported.

@@ -111,11 +111,12 @@
 *        AXIS(1) structure exists in the input NDF the value of the 
 *        first data point is stored with the keyword CRVAL1,
 *        and the incremental value between successive axis data is 
-*        stored in keyword CDELT1. If there is an axis label it is
-*        written to keyword CRTYPE1, and axis unit is written to CTYPE1.
-*        (Similarly for AXIS(2) structures etc.) FITS does not have a
-*        standard method of storing axis widths and variances, so these
-*        NDF components will not be propagated to the header.
+*        stored in keyword CDELT1.  By definition the reference pixel is
+*        1.0 and is stored in keyword CRPIX1.  If there is an axis label
+*        it is written to keyword CTYPE1, and axis unit is written to
+*        CUNIT1.  (Similarly for AXIS(2) structures etc.) FITS does not
+*        have a standard method of storing axis widths and variances,
+*        so these NDF components will not be propagated to the header.
 *        Non-linear axis data arrays cannot be represented by CRVALn
 *        and CDELTn, and must be ignored.
 *        -  If the input NDF contains TITLE, LABEL or UNITS components
@@ -132,9 +133,9 @@
 *           o  The TITLE, LABEL, and BUNITS descriptors are only copied
 *           if no TITLE, LABEL, and UNITS NDF components respectively
 *           have already been copied into these headers.
-*           o  The CDELTn, CRVALn, CTYPEn, and CRTYPEn descriptors in
-*           the FITS extension are only copied if the input NDF
-*           contained no linear axis structures.
+*           o  The CDELTn, CRVALn, CTYPEn, CUNITn, and CRTYPEn
+*           descriptors in the FITS extension are only copied if the
+*           input NDF contained no linear axis structures.
 *           o  The standard order of the FITS keywords is preserved,
 *           thus BITPIX, NAXIS and NAXISn appear immediately after the
 *           first card image, which should be SIMPLE.
@@ -165,6 +166,10 @@
 *        Original version.
 *     1992 September 15 (MJC):
 *        Added more control of the formatting of the output file.
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.  Also writes CRPIXn FITS keyword when the NDF
+*        has linear axis centres.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -373,11 +378,11 @@
 *      Each item is copied to a header record except:
 *         NAXIS, NAXISn - these are derived directly from the NDF data
 *           array;
-*         CRVALn, CDELTn, CRTYPEn, CTYPEn - derived from the NDF axis
-*           structures if possible. If no linear NDF axis structures
-*           are present, the values in the NDF FITS extension are
-*           copied.  If any are non-linear all FITS axis information is
-*           lost.
+*         CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn, CRTYPEn - derived from
+*           the NDF axis structures if possible.  If no linear NDF axis
+*           structures are present, the values in the NDF FITS
+*           extension are copied.  If any are non-linear all FITS axis
+*           information is lost.
 *         TITLE, LABEL, BUNITS - the values held in NDF TITLE, LABEL,
 *           and UNITS are used if present, otherwise any values found in
 *           the FITS extension are used.
@@ -422,8 +427,8 @@
             END = I .EQ. NCARD .AND. DESCR( 1:3 ) .NE. 'END'
 
 *  Leave out BITPIX, NAXIS, NAXISn, and possibly CDELTn, CRVALn,
-*  CRTYPEn, CTYPEn, TITLE, LABEL, and BUNITS as described above.  Note
-*  CROTAn are also excluded.
+*  CRPIXn, CRTYPEn, CTYPEn, CUNITn, TITLE, LABEL, and BUNITS as
+*  described above.  Note CROTAn are also excluded.
             IF ( ( INDEX( DESCR, 'NAXIS' ) .EQ. 0 ) .AND.
      :        ( INDEX( DESCR, 'BITPIX' ) .EQ. 0 ) .AND.
      :        ( INDEX( DESCR, 'BSCALE') .EQ. 0 .OR. IDATA ) .AND.
@@ -432,7 +437,8 @@
      :        ( INDEX( DESCR, 'CRVAL' ) .EQ. 0 .OR. .NOT. AXIFND ) .AND.
      :        ( INDEX( DESCR, 'CROTA' ) .EQ. 0 .OR. .NOT. AXIFND ) .AND.
      :        ( INDEX( DESCR, 'CRTYPE') .EQ. 0 .OR. .NOT. AXLFND ) .AND.
-     :        ( INDEX( DESCR, 'CTYPE' ) .EQ. 0 .OR. .NOT. AXUFND ) .AND.
+     :        ( INDEX( DESCR, 'CTYPE' ) .EQ. 0 .OR. .NOT. AXLFND ) .AND.
+     :        ( INDEX( DESCR, 'CUNIT' ) .EQ. 0 .OR. .NOT. AXUFND ) .AND.
      :        ( INDEX( DESCR, 'LABEL' ) .EQ. 0 .OR. .NOT. LABFND ) .AND.
      :        ( INDEX( DESCR, 'BUNITS') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
      :        ( INDEX( DESCR, 'TITLE') .EQ. 0 .OR. .NOT. TITFND ) ) THEN
