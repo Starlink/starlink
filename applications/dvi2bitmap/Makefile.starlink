@@ -822,7 +822,7 @@ dvi2bitmap_source.tar:
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	rm *.o
+	rm -f *.o config.*
 	@ echo
 	@ echo '*** There are no intermediate files to remove'
 	@ echo
