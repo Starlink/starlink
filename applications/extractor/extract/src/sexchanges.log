@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    08/02/2001
+*       Last modify:    24/09/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -341,3 +341,12 @@ EB      04/02/2001      backhisto()
 
 EB      08/02/2001      makeback()      Fixed a small bug in large-image mode.
                         clean()         Fixed CLEANing bug for hollow objects.
+
+EB      23/09/2001      neurfilter()    Fixed a bug that would make the result of
+                                        neural filtering compiler-dependent.
+                        makeback()      Correct typos in text displayed on screen.
+
+EB      24/09/2001      endobject()     Add 1 to xmin,xmax,ymin and ymax object
+                                        parameters to be compatible with the FITS
+                                        convention for pixel coordinates.
+

@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	07/02/2001
+*	Last modify:	23/09/2001
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -297,10 +297,10 @@ void	makeback(picstruct *field, picstruct *wfield)
     }
 
 /* Compute 2nd derivatives along the y-direction */
-  NFPRINTF(OUTPUT, "Computing backgound d-map");
+  NFPRINTF(OUTPUT, "Computing background d-map");
   free(field->dback);
   field->dback = makebackspline(field, field->back);
-  NFPRINTF(OUTPUT, "Computing backgound-noise d-map");
+  NFPRINTF(OUTPUT, "Computing background-noise d-map");
   free(field->dsigma);
   field->dsigma = makebackspline(field, field->sigma);
 /* If asked for, force the backmean parameter to the supplied value */

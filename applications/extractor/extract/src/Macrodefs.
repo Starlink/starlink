@@ -1,7 +1,7 @@
 #
 # macro default definitions
 #
-# E.BERTIN 1999
+# E.BERTIN 2001
 #
 SEXMACHINE=
 CD    = cd
@@ -16,7 +16,8 @@ default:
 	@echo "                         alpha   (for DEC-ALPHAs with Digital UNIX)"
 	@echo "                         hpux    (for HP/UX systems)"
 	@echo "                         linuxpc (for PCs running LINUX, using gcc)"
-	@echo "                         linuxp2 (for Pentium2 PCs running LINUX, using egcs)"
+	@echo "                         linuxp2 (for Pentium2/3/4 PCs running LINUX)"
+	@echo "                         linuxk7 (for Athlon PCs running LINUX)"
 	@echo "                         sgi     (for SGI platforms)"
 	@echo "                         solaris (for SUN-Solaris machines)"
 	@echo "                         sunos   (for SUN-OS platforms)"
