@@ -27,6 +27,7 @@ $(MANIFEST)/adamnet: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sock \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/adamnet \
 		&& make>make.log && make install-manifest>>make.log
@@ -52,7 +53,8 @@ $(MANIFEST)/ams: \
 $(MANIFEST)/atimer: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/atimer \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -70,11 +72,13 @@ $(MANIFEST)/automake: \
 
 $(MANIFEST)/chr: \
 		$(MANIFEST)/cnf \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/chr \
 		&& make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/cnf:
+$(MANIFEST)/cnf: \
+		$(MANIFEST)/star2html
 	cd libraries/cnf \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -89,6 +93,7 @@ $(MANIFEST)/dtask: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/dtask \
 		&& make>make.log && make install-manifest>>make.log
@@ -96,7 +101,8 @@ $(MANIFEST)/dtask: \
 $(MANIFEST)/ems: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/ems \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -112,6 +118,7 @@ $(MANIFEST)/fio: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/par \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/fio \
 		&& make>make.log && make install-manifest>>make.log
@@ -120,7 +127,8 @@ $(MANIFEST)/hds: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/hds \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -129,13 +137,15 @@ $(MANIFEST)/hdspar: \
 	cd libraries/pcs/hdspar \
 		&& make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/hlp:
+$(MANIFEST)/hlp: \
+		$(MANIFEST)/star2html
 	cd libraries/hlp \
 		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/lex: \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/lex \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -148,17 +158,20 @@ $(MANIFEST)/mers: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/mers \
 		&& make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/messgen:
+$(MANIFEST)/messgen: \
+		$(MANIFEST)/star2html
 	cd applications/messgen \
 		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/messys: \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/messys \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -170,7 +183,8 @@ $(MANIFEST)/misc: \
 $(MANIFEST)/msp: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sock
+		$(MANIFEST)/sock \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/msp \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -185,6 +199,7 @@ $(MANIFEST)/par: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/par \
 		&& make>make.log && make install-manifest>>make.log
@@ -199,6 +214,7 @@ $(MANIFEST)/parsecon: \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/parsecon \
@@ -222,6 +238,7 @@ $(MANIFEST)/pcs: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sock \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/task
@@ -230,22 +247,26 @@ $(MANIFEST)/pcs: \
 
 $(MANIFEST)/psx: \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/psx \
 		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sae: \
-		$(MANIFEST)/messgen
+		$(MANIFEST)/messgen \
+		$(MANIFEST)/star2html
 	cd libraries/sae \
 		&& make>make.log && make install-manifest>>make.log
 
-$(MANIFEST)/sla:
+$(MANIFEST)/sla: \
+		$(MANIFEST)/star2html
 	cd libraries/sla \
 		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sock: \
 		$(MANIFEST)/messgen \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/sock \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -264,10 +285,15 @@ $(MANIFEST)/sst: \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar \
 		$(MANIFEST)/task
 	cd applications/sst \
+		&& make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/star2html:
+	cd applications/star2html \
 		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/starconf: \
@@ -294,7 +320,8 @@ $(MANIFEST)/subpar: \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
-		$(MANIFEST)/sae
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html
 	cd libraries/pcs/subpar \
 		&& make>make.log && make install-manifest>>make.log
 
@@ -310,6 +337,7 @@ $(MANIFEST)/task: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/task \
 		&& make>make.log && make install-manifest>>make.log
@@ -322,6 +350,7 @@ buildsupport: \
 componentset.xml: \
 		./applications/messgen/component.xml \
 		./applications/sst/component.xml \
+		./applications/star2html/component.xml \
 		./buildsupport/starconf/component.xml \
 		./libraries/chr/component.xml \
 		./libraries/cnf/component.xml \
