@@ -8,7 +8,8 @@ lib_LTLIBRARIES = libdta.la
 libdta_la_SOURCES = \
         $(PRIVATE_INCLUDES) \
         $(BLOCK_DATA_FILES) \
-        $(F_ROUTINES)
+        $(F_ROUTINES) \
+	$(FPP_ROUTINES)
 
 PRIVATE_INCLUDES = \
 DTACACHE DTACODES DTAMAP DTAPROBE DTASDEF DTATCON DTATYPES HDSCODES
@@ -30,4 +31,6 @@ dta_rdvarb.f dta_rdvarc.f dta_rdvard.f dta_rdvarf.f dta_rdvari.f \
 dta_rdvars.f dta_rdvaru.f dta_rnvar.f dta_splitn.f dta_struc.f \
 dta_szvar.f dta_trname.f dta_tytidy.f dta_tyvar.f dta_versname.f \
 dta_wrvar.f dta_wrvarb.f dta_wrvarc.f dta_wrvard.f dta_wrvarf.f \
-dta_wrvari.f dta_wrvars.f dta_wrvaru.f
+dta_wrvari.f dta_wrvars.f dta_wrvaru.f 
+
+FPP_ROUTINES = dta_chrptr.fpp

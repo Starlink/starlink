@@ -1,0 +1,29 @@
+C+
+      SUBROUTINE DTA_CHRPTR (STRING,POINTER)
+C
+C     D T A _ C H R P T R
+C
+C     Given a string, returns a pointer to the start of the
+C     actual characters in the string.
+C
+C     Parameters -  (">" input, "<" output)
+C
+C     (>) STRING    (Character) The string in question.
+C     (<) POINTER   (Integer) The address of the first character.
+C
+C     Common variables used - None
+C
+C     Functions / subroutines used - None
+C
+C                                       28th March 1986  KS / AAO
+C+
+      IMPLICIT NONE
+C
+C     Parameters
+C
+      INTEGER POINTER
+      CHARACTER*(*) STRING
+C
+      POINTER=%LOC(STRING)
+C
+      END
