@@ -107,7 +107,7 @@
 
 *    Associate the input object file
       CALL USI_ASSOC( 'INP', '*', 'READ', IID, STATUS )
-      ADI1_GETLOC( IID, ILOC, STATUS )
+      CALL ADI1_GETLOC( IID, ILOC, STATUS )
 
 *    Get specification of output object
       CALL USI_GET0C( 'OUT', OUT, STATUS )

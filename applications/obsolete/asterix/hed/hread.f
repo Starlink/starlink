@@ -52,7 +52,7 @@
 
 * Obtain object name
       CALL USI_ASSOC('OUT','*','UPDATE',ID,STATUS)
-      CALL ADI1_GETLOC(ID,OBJ,STATUS)
+      CALL ADI1_GETLOC(ID,LOC,STATUS)
 
 * Open file
       CALL FIO_GUNIT(LUN,STATUS)
