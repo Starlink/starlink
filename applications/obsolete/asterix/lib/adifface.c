@@ -187,6 +187,7 @@
 
 #include "asterix.h"
 #include "aditypes.h"
+#include "adicface.h"
 
 /* Toggle this entire file on the value of the ADI_F77 macro
  */
@@ -238,7 +239,7 @@ F77_SUBROUTINE(adifn(setecs))( INTEGER(code), CHARACTER(ctx), INTEGER(status) TR
   GENPTR_CHARACTER(ctx)
   GENPTR_INTEGER(status)
 
-  adix_setecs( *code, ctx, ctx_length, (va_list) 0, status );
+  adic_setecs( *code, "%*s", status, ctx_length, ctx );
   }
 
 F77_SUBROUTINE(adifn(setes))( CHARACTER(ctx), INTEGER(status) TRAIL(ctx) )
