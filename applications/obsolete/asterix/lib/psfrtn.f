@@ -2348,13 +2348,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*80            TNAME             ! Table file name
       CHARACTER*40            UNITS             ! Axis units
 
-      REAL                    BASE, SCALE       ! Axis attributes
       REAL                    TOR               ! Conversion to radians
 
       INTEGER                 APTR              ! Ptr to axis data
       INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
-      INTEGER                 NDIM              ! Dimensionality
+      INTEGER                 NVAL,NDIM              ! Dimensionality
       INTEGER			TFID			! Tabular dataset
       INTEGER                 WPTR              ! Ptr to axis width data
 
@@ -2362,89 +2361,63 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       LOGICAL                 VALID             ! Have we a valid dataset?
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Get user's choice of table
+*  Get user's choice of table
       CALL USI_PROMT( 'MASK', 'Dataset containing radial profile',
      :                                                    STATUS )
       CALL USI_GET0C( 'MASK', TNAME, STATUS )
       CALL USI_CANCL( 'MASK', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Try to open file
-      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), '*', 'READ', TFID,
+*  Try to open file
+      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), 'BinDS', 'READ', TFID,
      :                STATUS )
 
-*    Check the data
-      CALL BDI_CHKDATA( TFID, VALID, NDIM, DIMS, STATUS )
+*  Check the data
+      CALL BDI_CHK( TFID, 'Data', VALID, STATUS )
+      CALL BDI_GETSHP( TFID, 1, DIMS, NDIM, STATUS )
       IF ( VALID ) THEN
 
-        IF ( NDIM .NE. 1 ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'This isn''t a 1-dimensional dataset!',
-     :                                                      STATUS )
-        END IF
+*    Map if ok
+        CALL BDI_MAPR( TFID, 'Data', 'READ', DPTR, STATUS )
 
-*      Map if ok
-        CALL BDI_MAPDATA( TFID, 'READ', DPTR, STATUS )
-
-*      If ok then make a copy of this data and store
+*    If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
           RD_DIM(SLOT) = DIMS(1)
           CALL DYN_MAPR( 1, DIMS(1), RD_DPTR(SLOT), STATUS )
           CALL ARR_COP1R( DIMS(1), %VAL(DPTR),
      :                    %VAL(RD_DPTR(SLOT)), STATUS )
 
-*        Get axis info
-          CALL BDI_CHKAXVAL( TFID, 1, OK, RD_REG(SLOT),
-     :                           DIMS(1), STATUS )
+*      Get axis info
+          CALL BDI_AXCHK( TFID, 1, 'Data', OK, STATUS )
 
-*        Profile bin positions and heights
+*      Profile bin positions and widths
           CALL DYN_MAPR( 1, DIMS(1), RD_APTR(SLOT), STATUS )
           CALL DYN_MAPR( 1, DIMS(1), RD_WPTR(SLOT), STATUS )
 
-*        Regular axis?
-          IF ( RD_REG(SLOT) ) THEN
-            CALL BDI_GETAXVAL( TFID, 1, BASE, SCALE, DIMS(1), STATUS )
+*      Read data
+          RD_REG(SLOT) = .FALSE.
+          CALL BDI_AXGET1R( TFID, 1, 'Data', DIMS(1),
+     :                      %VAL(RD_APTR(SLOT)), NVAL, STATUS )
+          CALL BDI_AXGET1R( TFID, 1, 'Width', DIMS(1),
+     :                      %VAL(RD_WPTR(SLOT)), NVAL, STATUS )
 
-*          Fill axis values array
-            CALL ARR_REG1R( BASE, SCALE, DIMS(1),
-     :                      %VAL(RD_APTR(SLOT)), STATUS )
+*      Get axis units
+          CALL BDI_AXGET0C( TFID, 1, 'Units', UNITS, STATUS )
 
-*          Fill widths array
-            CALL ARR_INIT1R( SCALE, DIMS(1),
-     :                       %VAL(RD_WPTR(SLOT)), STATUS )
-
-*        Irregular axis
-          ELSE
-
-*          Map axis data
-            CALL BDI_MAPAXVAL( TFID, 1, APTR, STATUS )
-            CALL ARR_COP1R( DIMS(1), %VAL(APTR), %VAL(RD_APTR(SLOT)),
-     :                      STATUS )
-
-*          And the widths
-            CALL BDI_MAPAXWID( TFID, 1, WPTR, STATUS )
-            CALL ARR_COP1R( DIMS(1), %VAL(WPTR),
-     :                      %VAL(RD_WPTR(SLOT)), STATUS )
-
-          END IF
-
-*        Get axis units
-          CALL BDI_GETAXUNITS( TFID, 1, UNITS, STATUS )
-
-*        Convert axis units
+*      Convert axis units
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
-*        Normalise the profile
+*      Normalise the profile
           CALL PSF_RADIAL_NORM( DIMS(1), %VAL(RD_DPTR(SLOT)),
      :              %VAL(RD_APTR(SLOT)), %VAL(RD_WPTR(SLOT)),
      :              TOR, STATUS )
 
         END IF
 
-*      Inform user
+*    Inform user
         IF ( STATUS .EQ. SAI__OK ) THEN
           CALL MSG_SETC( 'FILE', TNAME )
           CALL MSG_PRNT( 'PSF read in from file ^FILE' )
@@ -2452,15 +2425,15 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END IF
 
-*    Energy radii not present
+*  Energy radii not present
       RD_NLEV(SLOT) = 0
 
-*    Release from BDA
+*  Release from BDI
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
-*    Tidy up
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_RADIAL_INIT', STATUS )
       END IF
@@ -5100,10 +5073,11 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       CHARACTER*(DAT__SZLOC)	CBLOC			! Cube locator
 
+      REAL			SPARR(2)
       CHARACTER*132           FNAME             ! File name of cube
       CHARACTER*20            MASK              ! Mask name
 
-      INTEGER                 CDIMS(3)          ! XRT pf cube dimensions
+      INTEGER                 IDUM,CDIMS(3)          ! XRT pf cube dimensions
 
       LOGICAL                 OK, UNIF          !
 *-
@@ -5149,7 +5123,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
 *        Open the file
-          CALL ADI_FOPEN( FNAME, '*', 'READ', RX_CB_ID, STATUS )
+          CALL ADI_FOPEN( FNAME, 'BinDS', 'READ', RX_CB_ID, STATUS )
           CALL ADI1_GETLOC( RX_CB_ID, CBLOC, STATUS )
 
 *        Abort if failed
@@ -5167,16 +5141,19 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           CALL CMP_MAPN( CBLOC, 'RBINSIZE', '_REAL', 'READ',
      :                   2, RX_CB_RPTR, CDIMS, STATUS )
 
-*        Get off-axis angle axis attributes
-          CALL BDI_GETAXVAL( RX_CB_ID, 2, RX_CB_OBASE,
-     :                       RX_CB_OSCALE, CDIMS(2), STATUS )
+*      Get off-axis angle axis attributes
+          CALL BDI_AXGET1R( RX_CB_ID, 2, 'SpacedData', 2, SPARR,
+     :                      IDUM, STATUS )
+          RX_CB_OBASE = SPARR(1)
+          RX_CB_OSCALE = SPARR(2)
 
-*        Map energy axis data and widths if present
-          CALL BDI_MAPAXVAL( RX_CB_ID, 'READ', 3, RX_CB_EAPTR,STATUS )
-          CALL BDI_CHKAXWID( RX_CB_ID, 3, OK, UNIF, CDIMS(3), STATUS )
+*      Map energy axis data and widths if present
+          CALL BDI_AXMAPR( RX_CB_ID, 3, 'Data', 'READ', RX_CB_EAPTR,
+     :                     STATUS )
+          CALL BDI_AXCHK( RX_CB_ID, 3, 'Width', OK, STATUS )
           IF ( OK ) THEN
-            CALL BDI_MAPAXWID( RX_CB_ID, 'READ', 3,
-     :                         RX_CB_EWPTR, STATUS )
+            CALL BDI_AXMAPR( RX_CB_ID, 3, 'Width', 'READ', RX_CB_EWPTR,
+     :                     STATUS )
           ELSE
             RX_CB_EWPTR = 0
           END IF
