@@ -1345,9 +1345,9 @@ static GWMdev *new_GWMdev(char *gwm_name, int mode)
  */
    if(display==NULL)
    {
-      display = XOpenDisplay("");
+      display = XOpenDisplay(NULL);
       if(display==NULL) {
-         sprintf(errbuff, "%s: cannot connect to X server\n", GWM_IDENT);
+         sprintf(errbuff, "%s: GWM cannot connect to X server\n", GWM_IDENT);
          gwm_errmess(errbuff);
          return del_GWMdev(gwm,0);
       }
