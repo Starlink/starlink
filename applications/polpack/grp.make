@@ -7,7 +7,8 @@
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
-USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f polmap.f polvec.f
+USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f polmap.f \
+polvec.f polplot.f
 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl PolMap.tcl PolMap_procs.tcl Polka.tcl Polka_procs.tcl \
@@ -32,7 +33,19 @@ pol1_setft.f polimp.tab irg_wild polimp.csh polexp.csh polvec.f polvec.ifl \
 pol1_plvec.f pol1_prwcs.f ccd1_orvar.f pol1_stats.f ccg1_clipr.f \
 ccg1_mer1r.f ccg1_mer3r.f ccg1_scr1r.f ccg1_scr3r.f pol1_clcat.f \
 pol1_cm1rr.f pol1_cm3rr.f pol1_gtwcs.f pol1_mkcat.f pol1_stbin.f \
-pol1_stk.f
+pol1_stk.f ctm_par grf.h grf_kappa.c kpg1_aschp.f kpg1_asffr.f \
+kpg1_asget.f kpg1_aspsy.f kpg1_ast2h.f kpg1_asunt.f kpg1_chscn.f \
+kpg1_chscs.f kpg1_cpctd.f kpg1_cpctr.f kpg1_cshft.f kpg1_dsfrm.f \
+kpg1_frmmk.f kpg1_gdact.f kpg1_gddat.f kpg1_gddfp.f kpg1_gdfnd.f \
+kpg1_gdfrm.f kpg1_gdplt.f kpg1_gdqpc.f kpg1_gdsav.f kpg1_grpsz.f \
+kpg1_gtcol.f kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f \
+kpg1_gtsty.f kpg1_h2ast.f kpg1_isscs.f kpg1_odadd.f kpg1_odasp.f \
+kpg1_odast.f kpg1_oddel.f kpg1_odfil.f kpg1_odfld.f kpg1_odget.f \
+kpg1_odloc.f kpg1_odprs.f kpg1_odset.f kpg1_odthr.f kpg1_odtrn.f \
+kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f kpg1_plot.f kpg1_prnth.f \
+kpg1_rcatw.f kpg1_rdast.f kpg1_seteq.f kpg1_short.f kpg1_vect.f \
+kpg1_wcatw.f kpg1_wrast.f kpg1_wread.f kpg1_wwrt.f kpg_ast kpg_par \
+kps1_vecky.f 
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
