@@ -136,7 +136,6 @@
       INTEGER LPATH
       INTEGER NGOOD
       INTEGER NREJL
-      INTEGER SEC
       REAL EXPECT
       REAL K1
       REAL K2
@@ -224,10 +223,6 @@
             IAT = 1
          END IF
              
-*  Truncate the patg before any opening parenthesis (NDF section).
-         SEC = INDEX( PATH( : LPATH ), '(' )
-         IF( SEC .GT. 0 ) LPATH = SEC - 1
-
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( ILEVEL .GT. 2 ) THEN

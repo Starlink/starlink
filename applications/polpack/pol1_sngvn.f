@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGVN( NNDF, INDF, ILEVEL, T, PHI, EPS, EL, HW,
+      SUBROUTINE POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW,
      :                       DEZERO, DIMST, STOKES, NDIMI, LBNDI, UBNDI, 
      :                       WORK, TVAR, VEST, WORK2, ZERO, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVN( NNDF, INDF, ILEVEL, T, PHI, EPS, EL, HW, DEZERO,
+*     CALL POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW, DEZERO,
 *                      DIMST, STOKES, NDIMI, LBNDI, UBNDI, WORK, TVAR, 
 *                      VEST, WORK2, ZERO, STATUS )
 
@@ -31,8 +31,8 @@
 *  Arguments:
 *     NNDF = INTEGER (Given)
 *        The number of input NDFs in the supplied group.
-*     INDF( NNDF ) = INTEGER (Given)
-*        An array of identifiers for the input NDF sections.
+*     IGRP = INTEGER (Given)
+*        A GRP identifier for the group containing the input NDF names. 
 *     ILEVEL = INTEGER (Given)
 *        The information level. 
 *     T( NNDF ) = REAL (Given)
@@ -88,9 +88,6 @@
 *  History:
 *     12-APR-1999 (DSB):
 *        Original version.
-*     21-FEB-2001 (DSB):
-*        Supply input NDFs as an array of NDF identifiers instead of a
-*        GRP group of paths.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +104,7 @@
 
 *  Arguments Given:
       INTEGER NNDF
-      INTEGER INDF( NNDF )
+      INTEGER IGRP
       INTEGER ILEVEL
       REAL T( NNDF )
       REAL PHI( NNDF )
@@ -135,6 +132,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Index of current input NDF
+      INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER INDFS              ! NDF identifier for the input section
       INTEGER IPDIN              ! Pointer to input DATA array
       INTEGER IPW1               ! Pointer to work array     
@@ -154,8 +152,14 @@
 *  Loop round each NDF.
       DO I = 1, NNDF
 
+*  Begin an NDF context.
+         CALL NDF_BEGIN
+
 *  Get the current input NDF identifier.
-         CALL NDF_CLONE( INDF( I ), INDFS, STATUS )
+         CALL NDG_NDFAS( IGRP, I, 'READ', INDF, STATUS )
+
+*  Get a section from it which matches the output NDF.
+         CALL NDF_SECT( INDF, NDIMI, LBNDI, UBNDI, INDFS, STATUS ) 
 
 *  Map the data array.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', IPDIN, NEL, 
@@ -168,8 +172,8 @@
      :                    DIMST, STOKES, WORK, VEST, TVAR( I ), WORK2, 
      :                    DEZERO, ZERO( I ), STATUS )
 
-*  Annul the NDF identifier
-         CALL NDF_ANNUL( INDFS, STATUS )
+*  End the NDF context.
+         CALL NDF_END( STATUS )
 
       END DO
 

@@ -146,17 +146,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constants:
-      INTEGER MXNDF              ! Max. no. of inpurt NDFs
-      PARAMETER ( MXNDF = 500 )  
-
 *  Local Variables:
       CHARACTER NDFNM*255        ! NDF section specifier
       CHARACTER XLOC*(DAT__SZLOC)! POLPACK extension locator
       INTEGER I                  ! Index of current input NDF
       INTEGER IGRP2              ! GRP group containing analyser identifiers
+      INTEGER IGRP3              ! GRP group containing NDF sections
       INTEGER INDF               ! NDF identifier for current input NDF
-      INTEGER INDFIN( MXNDF )    ! NDF identifiers for input NDF sections
       INTEGER INDF1              ! NDF identifier for first input NDF
       INTEGER INDFC              ! Identifier for co-variance NDF
       INTEGER INDFCS             ! NDF identifier for covariance NDF section
@@ -171,7 +167,7 @@
       INTEGER IPTVAR             ! Pointer to input mean variance estimates
       INTEGER IPZERO             ! Pointer to input NDF zero points
       INTEGER IWCS               ! Pointer to output WCS FramSet
-      INTEGER LBND( 4 )          ! Lower bounds of input NDF
+      INTEGER LBND( 3 )          ! Lower bounds of input NDF
       INTEGER LBNDO( 4 )         ! Lower bounds of output NDF
       INTEGER MAXIT              ! Max. no. of rejection iterations to perform
       INTEGER NC                 ! No. of characters in string
@@ -181,7 +177,7 @@
       INTEGER PLACE              ! Place holder for co-variances NDF
       INTEGER SMBOX              ! Full size of smoothign box in pixels
       INTEGER TOL                ! Convergence criterion
-      INTEGER UBND( 4 )          ! Upper bounds of input NDF
+      INTEGER UBND( 3 )          ! Upper bounds of input NDF
       INTEGER UBNDO( 4 )         ! Upper bounds of output NDF
       INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
@@ -441,75 +437,61 @@
 *  See if we should trim any bad margins from the output NDF.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
 
-
-
-
-
-
-
 *  If the input NDFs are 2D (i.e. number of output axes is 3), calculate 
 *  the I,Q,U values.        
       IF( NDIMO .EQ. 3 ) THEN
-
-         DO I = 1, NNDF
-            CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-            CALL NDF_SECT( INDF, 2, LBNDO, UBNDO, INDFIN( I ), STATUS ) 
-            CALL NDF_ANNUL( INDF, STATUS )
-         END DO
-
-         CALL POL1_SNGSV( NNDF, INDFIN, WSCH, OUTVAR, %VAL( IPPHI ), 
+         CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
      :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
      :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
      :                 STATUS )
 
-         DO I = 1, NNDF
-            CALL NDF_ANNUL( INDFIN( I ), STATUS )
-         END DO
-
 *  If the input NDFs are 3, process each plane separately.
       ELSE
 
-         LBND( 1 ) = LBNDO( 1 )
-         LBND( 2 ) = LBNDO( 2 )
-         LBND( 3 ) = LBNDO( 3 )
-         LBND( 4 ) = LBNDO( 4 )
-         UBND( 1 ) = UBNDO( 1 )
-         UBND( 2 ) = UBNDO( 2 )
-         UBND( 3 ) = UBNDO( 3 )
-         UBND( 4 ) = UBNDO( 4 )
+*  Create a group to hold 2D NDF section strings.
+         CALL GRP_NEW( '2D NDF sections', IGRP3, STATUS ) 
 
 *  Loop round each frequency channel.
          DO Z = LBNDO( 3 ), UBNDO( 3 )
 
-            IF( ILEVEL .GT. 1 ) THEN
-               CALL MSG_SETI( 'Z', Z )
-               CALL MSG_OUT( ' ', ' Doing Z plane ^Z...', STATUS )
-            END IF
-
-            LBND( 3 ) = Z
-            UBND( 3 ) = Z
+*  First create a group holding strings describing sections of the input
+*  NDFs for the current plane. For each NDF, an NDF identifiers is
+*  obtained, and then a section is obtained for the required plane, and
+*  the full specification of this slice is then found and appeneded to
+*  the end of the group.
+            CALL GRP_SETSZ( IGRP3, 0, STATUS ) 
             DO I = 1, NNDF
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
-               CALL NDF_SECT( INDF, 3, LBND, UBND, INDFIN( I ), STATUS ) 
+               CALL NDF_BOUND( INDF, 3, LBND, UBND, NDIM, STATUS )
+               LBND( 3 ) = Z
+               UBND( 3 ) = Z
+               CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
+               CALL NDF_MSG( 'NDF', INDFS )
+               CALL MSG_LOAD( ' ', '^NDF', NDFNM, NC, STATUS )
+               CALL GRP_PUT( IGRP3, 1, NDFNM( : NC ), 0, STATUS ) 
                CALL NDF_ANNUL( INDF, STATUS )
+               CALL NDF_ANNUL( INDFS, STATUS )
             END DO
 
 *  Obtain a section of the output NDF to receive the results of
 *  processing this Z plane.
-            CALL NDF_SECT( INDFO, 4, LBND, UBND, INDFOS, STATUS ) 
+            LBNDO( 3 ) = Z
+            UBNDO( 3 ) = Z
+            CALL NDF_SECT( INDFO, NDIMO, LBNDO, UBNDO, INDFOS, STATUS ) 
 
 *  Obtain a section of the output covariance NDF to receive the results of
 *  processing this Z plane.
             IF( INDFC .NE. NDF__NOID ) THEN 
-               CALL NDF_SECT( INDFC, 3, LBND, UBND, INDFCS, STATUS ) 
+               CALL NDF_SECT( INDFC, NDIMO - 1, LBNDO, UBNDO, INDFCS, 
+     :                        STATUS ) 
             ELSE
                INDFCS = NDF__NOID
             END IF
 
 *  Calculate the I,Q,U values.        
-            CALL POL1_SNGSV( NNDF, INDFIN, WSCH, OUTVAR, %VAL( IPPHI ), 
+            CALL POL1_SNGSV( IGRP3, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
      :                 TRIM, INDFOS, INDFCS, MAXIT, NSIGMA, ILEVEL, 
@@ -520,11 +502,10 @@
             CALL NDF_ANNUL( INDFOS, STATUS )
             IF( INDFCS .NE. NDF__NOID ) CALL NDF_ANNUL( INDFCS, STATUS )
 
-            DO I = 1, NNDF
-               CALL NDF_ANNUL( INDFIN( I ), STATUS )
-            END DO
-
          END DO
+
+*  Delete the group.
+         CALL GRP_DELET( IGRP3, STATUS )
 
       END IF
 

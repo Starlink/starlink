@@ -6155,10 +6155,10 @@ the expected intensity $I'_{k}$ and observed intensity $I_{k}$, where the sum is
 the variances associated with the observed intensity values:
 
 \begin{myquote}
-\begin{eqnarray*}
+\begin{eqnarray}
   \label{EQN:CHI}
   \chi^2 & = & \frac{1}{2}\sum_{k} \frac{(I_{k}-I'_{k})^2}{\sigma^2_{k}}
-\end{eqnarray*}
+\end{eqnarray}
 \end{myquote}
 
 A minimum of three images are required, taken at different analyser
@@ -6288,7 +6288,7 @@ badly under-sampled, it is also reasonable in the absence of noise to
 expect each image to be spatially smooth over some small scale. So we
 could also estimate the noise by spatially smoothing each image and
 looking at the residuals between the smoothed and original data. The two
-methods can be combined by smoothing the Stokes vectors before find the
+methods can be combined by smoothing the Stokes vectors before finding the
 estimated intensity values.
 
 In some cases this smoothing is essential. For instance, consider the
