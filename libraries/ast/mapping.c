@@ -1,4 +1,3 @@
-#define REBIN 1
 /*
 *class++
 *  Name:
@@ -197,8 +196,9 @@ static int InterpolatePixelNearestUL( int, const int *, const int *, const unsig
 static int InterpolatePixelNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, double *, int, unsigned short int, unsigned short int *, unsigned short int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MinI( int, int );
-static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
-static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, int, const int *, const int *, const int *, const int *, void *, void * );
+static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), double, double, int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
+static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
+static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int TestAttrib( AstObject *, const char * );
 static int TestInvert( AstMapping * );
 static int TestReport( AstMapping * );
@@ -226,546 +226,68 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
 /* Member functions. */
 /* ================= */
-#if REBIN
-static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
-                             const int *lbnd, const int *ubnd, double tol ) {
-/*
-*  Name:
-*     LinearApprox
-
-*  Purpose:
-*     Obtain a linear approximation to a Mapping, if appropriate.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "mapping.h"
-*     double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
-*                           const int *lbnd, const int *ubnd, double tol )
-
-*  Class Membership:
-*     Mapping member function.
-
-*  Description:
-*     This function tests the inverse coordinate transformation
-*     implemented by a Mapping over a range of output coordinates
-*     spanning a grid into which resampled values are to be placed. If
-*     the transformation is found to be linear to a specified level of
-*     accuracy, then an array of fit coefficients is returned. These
-*     may be used to implement a linear approximation to the Mapping's
-*     inverse transformation within the specified range of output
-*     coordinates. If the transformation is not sufficiently linear,
-*     no coefficients are returned.
-
-*  Parameters:
-*     this
-*        Pointer to the Mapping, whose inverse transformation must be
-*        available.
-*     ndim_in
-*        The number of input dimensions for the Mapping. This should
-*        equal the Mapping's Nin attribute and should be at least 1.
-*     ndim_out
-*        The number of output dimensions for the Mapping. This should
-*        equal the Mapping's Nout attribute and should be at least 1.
-*     lbnd
-*        Pointer to an array of integers with "ndim_out"
-*        elements. These should specify the lower bounds of the output
-*        grid and hence the lower bounds of the region of output
-*        coordinate space over which linearity is required.
-*     ubnd
-*        Pointer to an array of integers with "ndim_out"
-*        elements. These should specify the upper bounds of the output
-*        grid and hence the upper bounds of the region of output
-*        coordinate space over which linearity is required.
-*     tol
-*        The maximum permitted deviation from linearity, expressed as
-*        a positive Cartesian displacement in the input coordinate
-*        space. If a linear fit to the Mapping's inverse
-*        transformation deviates from the true transformation by more
-*        than this amount at any point which is tested, then no fit
-*        coefficients will be returned.
-
-*  Returned Value:
-*     If the inverse transformation is sufficiently linear, the
-*     function returns a pointer to a dynamically allocated double
-*     array of fit coefficients. This should be freed by the caller
-*     (e.g. using astFree) when no longer required.
-*
-*     If the transformation is not sufficiently linear, then a NULL
-*     pointer is returned.
-
-*  Notes:
-*     - A NULL pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*/
-
-/* Local Variables: */
-   AstPointSet *pset_ina;        /* PointSet for input fitting points */
-   AstPointSet *pset_inb;        /* PointSet for input test points */
-   AstPointSet *pset_outa;       /* PointSet for output fitting points */
-   AstPointSet *pset_outb;       /* PointSet for output test points */
-   double **ptr_ina;             /* Input coordinate array pointers */
-   double **ptr_inb;             /* Input coordinate array pointers */
-   double **ptr_outa;            /* Output coordinate array pointers */
-   double **ptr_outb;            /* Output coordinate array pointers */
-   double *fit;                  /* Pointer to array of fit coefficients */
-   double *grad;                 /* Pointer to matrix of gradients */
-   double *zero;                 /* Pointer to array of zero point values */
-   double diff;                  /* Difference in coordinate values */
-   double err;                   /* Sum of squared error */
-   double in1;                   /* Input coordinate value */
-   double in2;                   /* Input coordinate value */
-   double out1;                  /* Output coordinate value */
-   double out2;                  /* Output coordinate value */
-   double outdiff;               /* Difference in output coordinate values */
-   double x0;                    /* Coordinate of grid centre */
-   double y;                     /* Input coordinate (transformed) */
-   double yfit;                  /* Coordinate resulting from fit */
-   double z;                     /* Sum for calculating zero points */
-   int *limit;                   /* Pointer to flag array for vertices */
-   int coord_in;                 /* Loop counter for input coordinates. */
-   int coord_out;                /* Loop counter for output coordinates */
-   int done;                     /* All vertices visited? */
-   int face1;                    /* Index of first face coordinates */
-   int face2;                    /* Index of second face coordinates */
-   int face;                     /* Loop counter for faces */
-   int ii;                       /* Index into gradient matrix */
-   int linear;                   /* Mapping is linear? */
-   int npoint;                   /* Number of test points required */
-   int point;                    /* Counter for points */
-
-/* Initialise. */
-   fit = NULL;
-   
-/* Check the global error status. */
-   if ( !astOK ) return fit;
-
-/* Further initialisation. */
-   linear = 1;
-   ptr_ina = NULL;
-
-/* Allocate space for the fit coefficients. */
-   fit = astMalloc( sizeof( double ) *
-                    (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
-      
-/* Allocate workspace. */
-   limit = astMalloc( sizeof( int ) * (size_t) ndim_out );
-
-/* Create a PointSet to hold output coordinates and obtain a pointer
-   to its coordinate arrays. */
-   pset_outa = astPointSet( 2 * ndim_out, ndim_out, "" );
-   ptr_outa = astGetPoints( pset_outa );
-   if ( astOK ) {
-
-/* Set up and transform an initial set of points. */
-/* ---------------------------------------------- */
-/* Loop to set up output coordinates at the centre of each face of the
-   output grid, storing them in the PointSet created above. */
-      point = 0;
-      for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-            ptr_outa[ coord_out ][ point ] =
-               0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-         }
-         ptr_outa[ face / 2 ][ point ] = ( face % 2 ) ?
-                                         ubnd[ face / 2 ] : lbnd[ face / 2 ];
-         point++;
-      }
-   }
-
-/* Transform these coordinates into the input grid's coordinate system
-   and obtain a pointer to the resulting arrays of input
-   coordinates. */
-   pset_ina = astTransform( this, pset_outa, 0, NULL );
-   ptr_ina = astGetPoints( pset_ina );
-   if ( astOK ) {
-
-/* Fit a linear approximation to the points. */
-/* ----------------------------------------- */
-/* Obtain pointers to the locations in the fit coefficients array
-   where the gradients and zero points should be stored. */
-      grad = fit + ndim_out;
-      zero = fit;
-
-/* On the assumption that the transformation applied above is
-   approximately linear, loop to determine the matrix of gradients and
-   the zero points which describe it. */
-      ii = 0;
-      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-         z = 0.0;
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-
-/* Find the indices of opposite faces in each output dimension. */
-            face1 = 2 * coord_out;
-            face2 = face1 + 1;
-
-/* Obtain the input and output coordinates at these face centres. */
-            out1 = ptr_outa[ coord_out ][ face1 ];
-            out2 = ptr_outa[ coord_out ][ face2 ];
-            in1 = ptr_ina[ coord_in ][ face1 ];
-            in2 = ptr_ina[ coord_in ][ face2 ];
-
-/* Check whether any transformed coordinates are bad. If so, the
-   transformation cannot be linear, so give up trying to fit it. */
-            if ( ( in1 == AST__BAD ) || ( in2 == AST__BAD ) ) {
-               linear = 0;
-               break;
-            }
-
-/* If possible, determine the gradient along this dimension, storing
-   it in the appropriate element of the gradient matrix. */
-            outdiff = out2 - out1;
-            if ( outdiff != 0.0 ) {
-               grad[ ii++ ] = ( in2 - in1 ) / outdiff;
-            } else {
-               grad[ ii++ ] = 0.0;
-            }
-
-/* Accumulate the sum used to determine the zero point. */
-            z += ( in1 + in2 );
-         }
-
-/* Also quit the outer loop if a linear fit cannot be obtained. */
-         if ( !linear ) break;
-
-/* Determine the average zero point from all dimensions. */
-         zero[ coord_in ] = z / (double) ( 2 * ndim_out );
-      }
-
-/* If a linear fit was obtained, its zero points will be appropriate
-   to an output coordinate system with an origin at the centre of the
-   output grid (we assume this to simplify the calculations above). To
-   correct for this, we transform the actual output coordinates of the
-   grid's centre through the matrix of gradients and subtract the
-   resulting coordinates from the zero point values. The zero points
-   are then correct for the actual input and output coordinate systems
-   we are using. */
-      if ( linear ) {
-         ii = 0;
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-               zero[ coord_in ] -= grad[ ii++ ] * x0;
-            }
-         }
-      }
-   }
-
-/* Set up test points in the output coordinate system. */
-/* --------------------------------------------------- */   
-/* If we have obtained a linear fit above, it will (by construction)
-   be exact at the centre of each face of the output grid. However, it
-   may not fit anywhere else. We therefore set up some test points to
-   determine if it is an adequate approximation elsewhere. */
-   if ( astOK && linear ) {
-
-/* Calculate the number of test points required to place one at each
-   vertex of the output grid. */
-      for ( npoint = 1, coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-         npoint *= 2;
-
-/* Initialise flags for identifying the vertices. */
-         limit[ coord_out ] = 0;
-      }
-
-/* Now calculate the total number of test points required, also
-   allowing one at half the distance to each vertex, one at half the
-   distance to each face, and one at the centre. */
-      npoint = 2 * ( npoint + ndim_out ) + 1;
-
-/* Create a PointSet to hold these coordinates and obtain a pointer to
-   its coordinate arrays. */
-      pset_outb = astPointSet( npoint, ndim_out, "" );
-      ptr_outb = astGetPoints( pset_outb );
-      if ( astOK ) {
-
-/* Generate one point at the grid centre, storing the coordinates in
-   the PointSet created above. */
-         point = 0;
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-            ptr_outb[ coord_out ][ point ] =
-               0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-         }
-         point++;
-
-/* Similarly generate a point half way between the grid centre and the
-   centre of each face. */
-         for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               ptr_outb[ coord_out ][ point ] =
-                  0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
-            }
-            ptr_outb[ face / 2 ][ point ] =
-               0.5 * ( ( (double) ( ( face % 2 ) ? ubnd[ face / 2 ] :
-                                                   lbnd[ face / 2 ] ) ) +
-                       ptr_outb[ face / 2 ][ 0 ] );
-            point++;
-         }
-
-/* Now loop to visit each output grid vertex. */
-         done = 0;
-         while ( !done ) {
-
-/* Generate a test point at each vertex. */
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               ptr_outb[ coord_out ][ point ] =
-                  limit[ coord_out ] ? ubnd[ coord_out ] : lbnd[ coord_out ];
-
-/* Also place one half way between the grid centre and each vertex. */
-               ptr_outb[ coord_out ][ point + 1 ] =
-                  0.5 * ( ptr_outb[ coord_out ][ point ] +
-                          ptr_outb[ coord_out ][ 0 ] );
-            }
-            point += 2;
-
-/* Now update the array of vertex flags to identify the next vertex. */
-            coord_out = 0;
-            do {
-
-/* The least significant dimension which does not have its upper bound
-   as one of the vertex coordinates is changed to use its upper bound
-   in the next vertex. */
-               if ( !limit[ coord_out ] ) {
-                  limit[ coord_out ] = 1;
-                  break;
-
-/* Any less significant dimensions whose upper bounds are already
-   being used are changed to use their lower bounds in the next
-   vertex. */
-               } else {
-                  limit[ coord_out ] = 0;
-
-/* All vertices have been visited when the most significant dimension
-   is changed back to using its lower bound. */
-                  done = ( ++coord_out == ndim_out );
-               }
-            } while ( !done );
-         }
-      }
-
-/* Transform the test points. */
-/* -------------------------- */
-/* Use the Mapping to transform the test points into the input
-   coordinate space, obtaining a pointer to the resulting arrays of
-   input coordinates. */
-      pset_inb = astTransform( this, pset_outb, 0, NULL );
-      ptr_inb = astGetPoints( pset_inb );
-   }
-
-/* Test the linear fit for accuracy. */
-/* --------------------------------- */
-/* If OK so far, and a linear fit has been obtained, then loop to use
-   this fit to transform each test point and compare the result with
-   the result of applying the Mapping. */
-   if ( astOK && linear ) {
-      for ( point = 0; point < npoint; point++ ) {
-
-/* Initialise the fitting error for the current point. */
-         err = 0.0;
-
-/* Obtain each input coordinate (produced by using the Mapping) in
-   turn and check that it is not bad. If it is, then the
-   transformation is not linear, so give up testing the fit. */
-         ii = 0;
-         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
-            y = ptr_inb[ coord_in ][ point ];
-            if ( y == AST__BAD ) {
-               linear = 0;
-               break;
-            }
-
-/* Apply the fitted transformation to the output coordinates to obtain
-   the approximate input coordinate value. */
-            yfit = zero[ coord_in ];
-            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-               yfit += grad[ ii++ ] * ptr_outb[ coord_out ][ point ];
-            }
-
-/* Form the sum of squared differences between the Mapping's
-   transformation and the fit. */
-            diff = ( y - yfit );
-            err += diff * diff;
-         }
-
-/* Quit the outer loop if the Mapping is found to be non-linear. */
-         if ( !linear ) break;
-
-/* Test if the Cartesian distance between the true input coordinate
-   and the approximate one exceeds the accuracy tolerance. If this
-   happens for any test point, we declare the Mapping non-linear and
-   give up. */
-         if ( sqrt( err ) > tol ) {
-            linear = 0;
-            break;
-         }
-      }
-   }
-
-/* Annul the pointers to the PointSets used above. */
-   pset_ina = astAnnul( pset_ina );
-   pset_outa = astAnnul( pset_outa );
-
-/* Free the workspace. */
-   limit = astFree( limit );
-
-/* If an error occurred, or the Mapping was found to be non-linear,
-   then free the space allocated for the fit coefficients and clear
-   the returned pointer value. */
-   if ( !astOK || !linear ) fit = astFree( fit );
-
-/* Return the result. */
-   return fit;
-}
-                         
-
-/*
-*+
-*  Name:
-c     astResample<X>
-f     AST_RESAMPLE<X>
-
-*  Purpose:
-*     Resample a rectangular grid of data in one or more dimensions.
-
-*  Type:
-*     Public virtual function.
-
-*  Synopsis:
-c     #include "mapping.h"
-c     int astResample<X>( AstMapping *this, int ndim_in,
-c                         const int lbnd_in[], const int ubnd_in[],
-c                         const <Xtype> in[], const <Xtype> in_var[],
-c                         AstInterpolate<X> method, double tol, int gridsize,
-c                         int flags, <Xtype> badval, int ndim_out,
-c                         const int lbnd_out[], const int ubnd_out[],
-c                         const int lbnd[], const int ubnd[],
-c                         <Xtype> *out, <Xtype> *out_var )
-f     CALL AST_RESAMPLEX( THIS, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
-f                         METHOD, TOLtolRIDSIZE, FLAGS, BADVAL,
-f                         NDIM_OUT, LBND_OUT, UBND_OUT, LBND, UBND,
-f                         OUT, OUT_VAR, STATUS )
-
-*  Class Membership:
-*     Mapping method.
-
-*  Description:
-
-*  Parameters:
-c     this
-f     THIS = INTEGER (Given)
-*        Pointer to the Mapping.
-c     ndim_in
-f     NDIM_IN = INTEGER
-*        The number of dimensions of the input data grid.
-c     lbnd_in
-f     LBND_IN( NDIM_IN ) = INTEGER (Given)
-*        
-c     ubnd_in
-f     UBND_IN( NDIM_IN ) = INTEGER (Given)
-
-c     in
-f     IN( * ) = <XTYPE> (Given)
-
-c     in_var
-f     IN_VAR( * ) = <XTYPE> (Given)
-
-f     STATUS = INTEGER (Given and Returned)
-f        The global status.
-*-
-*/
+/* Define macros to implement the function for a specific data
+   type. */
 #define MAKE_RESAMPLE(X,Xtype) \
 static int Resample##X( AstMapping *this, int ndim_in, \
-                             const int *lbnd_in, const int *ubnd_in, \
-                             const Xtype *in, const Xtype *in_var, \
-                             AstInterpolate##X method, double tol, \
-                             int gridsize, int flags, Xtype badval, \
-                             int ndim_out, const int *lbnd_out, \
-                             const int *ubnd_out, const int *lbnd, \
-                             const int *ubnd, Xtype *out, Xtype *out_var ) { \
-   double *linear_fit; \
-   int result; \
-   int npix; \
-   int mxdim; \
+                        const int lbnd_in[], const int ubnd_in[], \
+                        const Xtype in[], const Xtype in_var[], \
+                        AstInterpolate##X interp, double tol, \
+                        double linscale, int flags, Xtype badval, \
+                        const double params[], \
+                        int ndim_out, const int lbnd_out[], \
+                        const int ubnd_out[], const int lbnd[], \
+                        const int ubnd[], Xtype out[], Xtype out_var[] ) { \
+\
+/* Local Variables: */ \
+   AstMapping *simple; \
    int coord_out; \
-   int dim; \
-   int divide; \
-   int toobig; \
-   int toosmall; \
-   int dimx; \
- \
+   int npix; \
+   int result; \
+\
+/* Initialise. */ \
    result = 0; \
+\
+/* Check the gklobal error status. */ \
    if ( !astOK ) return result; \
- \
+\
+/* Loop to determine how many pixels require resampled values. */ \
    npix = 1; \
-   mxdim = 0; \
-   dimx = 1; \
    for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
-      dim = ubnd[ coord_out ] - lbnd[ coord_out ] + 1; \
-printf( "%d ", dim ); \
-      npix *= dim; \
-      if ( dim > mxdim ) { \
-         mxdim = dim; \
-         dimx = coord_out; \
-      } \
+      npix *= ubnd[ coord_out ] - lbnd[ coord_out ] + 1; \
    } \
-    \
-   toosmall = npix <= 100; \
-   toobig = mxdim > gridsize; \
- \
-   linear_fit = NULL; \
-   if ( toosmall ) { \
-printf( " toosmall\n" ); \
-      divide = 0; \
-   } else if ( toobig ) { \
-printf( " toobig\n" ); \
-      divide = 1; \
+\
+/* If there are sufficient pixels to make it worthwhile, simplify the \
+   Mapping supplied to improve performance. Otherwise, just clone the \
+   Mapping pointer. */ \
+   if ( npix > 100 ) { \
+      simple = astSimplify( this ); \
    } else { \
-     linear_fit = LinearApprox( this, ndim_in, ndim_out, lbnd, ubnd, tol ); \
-printf( " %s\n", ( linear_fit ? "linear" : "non-linear" ) ); \
-     divide = !linear_fit; \
+      simple = astClone( this ); \
    } \
-   if ( astOK ) { \
-      if ( !divide ) { \
-         result += ResampleWithBlocking( this, linear_fit, \
-                                  ndim_in, lbnd_in, ubnd_in, \
-                                  (void *) in, (void *) in_var, TYPE_##X, \
-                                  (int (*)()) method, \
-                                  flags, (void *) &badval, \
-                                  ndim_out, lbnd_out, ubnd_out, \
-                                  lbnd, ubnd, \
-                                  (void *) out, (void *) out_var ); \
-      } else { \
-         int lo[ 100 ]; \
-         int hi[ 100 ]; \
-         int tmp; \
-         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
-            lo[ coord_out ] = lbnd[ coord_out ]; \
-            hi[ coord_out ] = ubnd[ coord_out ]; \
-         } \
-         tmp = hi[ dimx ]; \
-         hi[ dimx ] = ( ubnd[ dimx ] + lbnd[ dimx ] ) / 2; \
-         result += Resample##X( this, ndim_in, lbnd_in, ubnd_in, \
-                                     in, in_var, \
-                             method, tol, gridsize, \
-                             flags, badval, \
-                             ndim_out, lbnd_out, ubnd_out, \
-                             lo, hi, out, out_var ); \
-         lo[ dimx ] = hi[ dimx ] + 1; \
-         hi[ dimx ] = tmp; \
-         result += Resample##X( this, ndim_in, lbnd_in, ubnd_in, \
-                                     in, in_var, \
-                             method, tol, gridsize, \
-                             flags, badval, \
-                             ndim_out, lbnd_out, ubnd_out, \
-                             lo, hi, out, out_var ); \
-      } \
-   } \
-   if ( linear_fit ) linear_fit = astFree( linear_fit ); \
+\
+/* Perform the resampling, passing the grid data via void pointers, \
+   but supplying an argument to identify their data type. */ \
+   result = ResampleAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
+                                (const void *) in, (const void *) in_var, \
+                                TYPE_##X, (int (*)()) interp, tol, linscale, \
+                                flags, (const void *) &badval, params, \
+                                ndim_out, lbnd_out, ubnd_out, \
+                                lbnd, ubnd, \
+                                (void *) out, (void *) out_var ); \
+\
+/* Annul the pointer to the simplified Mapping. */ \
+   simple = astAnnul( simple ); \
+\
+/* If an error occurred, clear the returned result. */ \
    if ( !astOK ) result = 0; \
+\
+/* Return the result. */ \
    return result; \
 }
+
+/* Expand the above macros to generate a function for each required
+   data type. */
 MAKE_RESAMPLE(LD,long double)
 MAKE_RESAMPLE(D,double)
 MAKE_RESAMPLE(F,float)
@@ -777,8 +299,9 @@ MAKE_RESAMPLE(S,short int)
 MAKE_RESAMPLE(US,unsigned short int)
 MAKE_RESAMPLE(B,signed char)
 MAKE_RESAMPLE(UB,unsigned char)
+
+/* Undefine the macro. */
 #undef MAKE_RESAMPLE
-#endif
 
 static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /*
@@ -3237,6 +2760,423 @@ f        The global status.
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
 }
 
+static double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
+                             const int *lbnd, const int *ubnd, double tol ) {
+/*
+*  Name:
+*     LinearApprox
+
+*  Purpose:
+*     Obtain a linear approximation to a Mapping, if appropriate.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double *LinearApprox( AstMapping *this, int ndim_in, int ndim_out,
+*                           const int *lbnd, const int *ubnd, double tol )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function tests the inverse coordinate transformation
+*     implemented by a Mapping over a range of output coordinates
+*     spanning a grid into which resampled values are to be placed. If
+*     the transformation is found to be linear to a specified level of
+*     accuracy, then an array of fit coefficients is returned. These
+*     may be used to implement a linear approximation to the Mapping's
+*     inverse transformation within the specified range of output
+*     coordinates. If the transformation is not sufficiently linear,
+*     no coefficients are returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping, whose inverse transformation must be
+*        available.
+*     ndim_in
+*        The number of input dimensions for the Mapping. This should
+*        equal the Mapping's Nin attribute and should be at least 1.
+*     ndim_out
+*        The number of output dimensions for the Mapping. This should
+*        equal the Mapping's Nout attribute and should be at least 1.
+*     lbnd
+*        Pointer to an array of integers with "ndim_out"
+*        elements. These should specify the lower bounds of the output
+*        grid and hence the lower bounds of the region of output
+*        coordinate space over which linearity is required.
+*     ubnd
+*        Pointer to an array of integers with "ndim_out"
+*        elements. These should specify the upper bounds of the output
+*        grid and hence the upper bounds of the region of output
+*        coordinate space over which linearity is required.
+*     tol
+*        The maximum permitted deviation from linearity, expressed as
+*        a positive Cartesian displacement in the input coordinate
+*        space. If a linear fit to the Mapping's inverse
+*        transformation deviates from the true transformation by more
+*        than this amount at any point which is tested, then no fit
+*        coefficients will be returned.
+
+*  Returned Value:
+*     If the inverse transformation is sufficiently linear, the
+*     function returns a pointer to a dynamically allocated double
+*     array of fit coefficients. This should be freed by the caller
+*     (e.g. using astFree) when no longer required.
+*
+*     If the transformation is not sufficiently linear, then a NULL
+*     pointer is returned.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *pset_in_f;       /* PointSet for input fitting points */
+   AstPointSet *pset_in_t;       /* PointSet for input test points */
+   AstPointSet *pset_out_f;      /* PointSet for output fitting points */
+   AstPointSet *pset_out_t;      /* PointSet for output test points */
+   double **ptr_in_f;            /* Input coordinate array pointers */
+   double **ptr_in_t;            /* Input coordinate array pointers */
+   double **ptr_out_f;           /* Output coordinate array pointers */
+   double **ptr_out_t;           /* Output coordinate array pointers */
+   double *fit;                  /* Pointer to array of fit coefficients */
+   double *grad;                 /* Pointer to matrix of gradients */
+   double *zero;                 /* Pointer to array of zero point values */
+   double diff;                  /* Difference in coordinate values */
+   double err;                   /* Sum of squared error */
+   double frac;                  /* Fraction of output coordinate range */
+   double in1;                   /* Input coordinate value */
+   double in2;                   /* Input coordinate value */
+   double out1;                  /* Output coordinate value */
+   double out2;                  /* Output coordinate value */
+   double outdiff;               /* Difference in output coordinate values */
+   double x0;                    /* Coordinate of grid centre */
+   double y;                     /* Input coordinate (transformed) */
+   double yfit;                  /* Coordinate resulting from fit */
+   double z;                     /* Sum for calculating zero points */
+   int *vertex;                  /* Pointer to flag array for vertices */
+   int coord_in;                 /* Loop counter for input coordinates. */
+   int coord_out;                /* Loop counter for output coordinates */
+   int done;                     /* All vertices visited? */
+   int face1;                    /* Index of first face coordinates */
+   int face2;                    /* Index of second face coordinates */
+   int face;                     /* Loop counter for faces */
+   int ii;                       /* Index into gradient matrix */
+   int linear;                   /* Mapping is linear? */
+   int npoint;                   /* Number of test points required */
+   int point;                    /* Counter for points */
+
+/* Initialise. */
+   fit = NULL;
+   
+/* Check the global error status. */
+   if ( !astOK ) return fit;
+
+/* Further initialisation. */
+   linear = 1;
+
+/* Allocate space for the fit coefficients. */
+   fit = astMalloc( sizeof( double ) *
+                    (size_t) ( ( ndim_in + 1 ) * ndim_out ) );
+      
+/* Create a PointSet to hold output coordinates and obtain a pointer
+   to its coordinate arrays. */
+   pset_out_f = astPointSet( 2 * ndim_out, ndim_out, "" );
+   ptr_out_f = astGetPoints( pset_out_f );
+   if ( astOK ) {
+
+/* Set up and transform an initial set of points. */
+/* ---------------------------------------------- */
+/* Loop to set up output coordinates at the centre of each face of the
+   output grid, storing them in the PointSet created above. */
+      point = 0;
+      for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+            ptr_out_f[ coord_out ][ point ] =
+               0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+         }
+         ptr_out_f[ face / 2 ][ point ] = ( face % 2 ) ?
+                                          ubnd[ face / 2 ] : lbnd[ face / 2 ];
+         point++;
+      }
+   }
+
+/* Transform these coordinates into the input grid's coordinate system
+   and obtain an array of pointers to the resulting coordinate
+   data. */
+   pset_in_f = astTransform( this, pset_out_f, 0, NULL );
+   ptr_in_f = astGetPoints( pset_in_f );
+   if ( astOK ) {
+
+/* Fit a linear approximation to the points. */
+/* ----------------------------------------- */
+/* Obtain pointers to the locations in the fit coefficients array
+   where the gradients and zero points should be stored. */
+      grad = fit + ndim_out;
+      zero = fit;
+
+/* On the assumption that the transformation applied above is
+   approximately linear, loop to determine the matrix of gradients and
+   the zero points which describe it. */
+      ii = 0;
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         z = 0.0;
+         for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+
+/* Find the indices of opposite faces in each output dimension. */
+            face1 = 2 * coord_out;
+            face2 = face1 + 1;
+
+/* Obtain the input and output coordinates at these face centres. */
+            out1 = ptr_out_f[ coord_out ][ face1 ];
+            out2 = ptr_out_f[ coord_out ][ face2 ];
+            in1 = ptr_in_f[ coord_in ][ face1 ];
+            in2 = ptr_in_f[ coord_in ][ face2 ];
+
+/* Check whether any transformed coordinates are bad. If so, the
+   transformation cannot be linear, so give up trying to fit it. */
+            if ( ( in1 == AST__BAD ) || ( in2 == AST__BAD ) ) {
+               linear = 0;
+               break;
+            }
+
+/* If possible, determine the gradient along this dimension, storing
+   it in the appropriate element of the gradient matrix. */
+            outdiff = out2 - out1;
+            if ( outdiff != 0.0 ) {
+               grad[ ii++ ] = ( in2 - in1 ) / outdiff;
+            } else {
+               grad[ ii++ ] = 0.0;
+            }
+
+/* Accumulate the sum used to determine the zero point. */
+            z += ( in1 + in2 );
+         }
+
+/* Also quit the outer loop if a linear fit cannot be obtained. */
+         if ( !linear ) break;
+
+/* Determine the average zero point from all dimensions. */
+         zero[ coord_in ] = z / (double) ( 2 * ndim_out );
+      }
+
+/* If a linear fit was obtained, its zero points will be appropriate
+   to an output coordinate system with an origin at the centre of the
+   output grid (we assume this to simplify the calculations above). To
+   correct for this, we transform the actual output coordinates of the
+   grid's centre through the matrix of gradients and subtract the
+   resulting coordinates from the zero point values. The zero points
+   are then correct for the actual input and output coordinate systems
+   we are using. */
+      if ( linear ) {
+         ii = 0;
+         for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+               x0 = 0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+               zero[ coord_in ] -= grad[ ii++ ] * x0;
+            }
+         }
+      }
+   }
+
+/* Annul the pointers to the PointSets used above. */
+   pset_in_f = astAnnul( pset_in_f );
+   pset_out_f = astAnnul( pset_out_f );
+
+/* Calculate the number of test points required. */
+/* --------------------------------------------- */
+/* If we have obtained a linear fit above, it will (by construction)
+   be exact at the centre of each face of the output grid. However, it
+   may not fit anywhere else. We therefore set up some test points to
+   determine if it is an adequate approximation elsewhere. */
+   if ( astOK && linear ) {
+
+/* Calculate the number of test points required to place one at each
+   vertex of the grid. */
+      npoint = 1;
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         npoint *= 2;
+      }
+
+/* Now calculate the total number of test points required, also
+   allowing one at the centre, one at half the distance to each face,
+   and one at half the distance to each vertex. */
+      npoint = 1 + 2 * ( ndim_out + npoint );
+
+/* Set up test points in the output coordinate system. */
+/* --------------------------------------------------- */   
+/* Create a PointSet to hold the test coordinates and obtain an array
+   of pointers to its coordinate data. */
+      pset_out_t = astPointSet( npoint, ndim_out, "" );
+      ptr_out_t = astGetPoints( pset_out_t );
+      if ( astOK ) {
+
+/* If the output array is 1-dimensional, the face and vertex positions
+   calculated below will co-incide. Therefore, we simply distribute
+   the required number of test points uniformly throughout the output
+   coordinate range (avoiding the end-points, where the fit has been
+   obtained). The coordinates are stored in the PointSet created
+   above. */
+         if ( ndim_out == 1 ) {
+            for ( point = 0; point < npoint; point++ ) {
+               frac = ( (double) ( point + 1 ) ) / ( (double) ( npoint + 1 ) );
+               ptr_out_t[ 0 ][ point ] = ( 1.0 - frac ) * (double) lbnd[ 0 ] +
+                                         frac * (double) ubnd[ 0 ];
+            }
+
+/* Otherwise, generate one point at the grid centre. */
+         } else {
+            point = 0;
+            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+               ptr_out_t[ coord_out ][ point ] =
+                  0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+            }
+            point++;
+
+/* Similarly generate a point half way between the grid centre and the
+   centre of each face. */
+            for ( face = 0; face < ( 2 * ndim_out ); face++ ) {
+               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                  ptr_out_t[ coord_out ][ point ] =
+                     0.5 * (double) ( lbnd[ coord_out ] + ubnd[ coord_out ] );
+               }
+               ptr_out_t[ face / 2 ][ point ] =
+                  0.5 * ( ( (double) ( ( face % 2 ) ? ubnd[ face / 2 ] :
+                                                      lbnd[ face / 2 ] ) ) +
+                          ptr_out_t[ face / 2 ][ 0 ] );
+               point++;
+            }
+
+/* Allocate workspace and initialise flags for identifying the
+   vertices. */
+            vertex = astMalloc( sizeof( int ) * (size_t) ndim_out );
+            if ( astOK ) {
+               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                  vertex[ coord_out ] = 0;
+               }
+
+/* Now loop to visit each output grid vertex. */
+               done = 0;
+               while ( !done ) {
+
+/* Generate a test point at each vertex. */
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     ptr_out_t[ coord_out ][ point ] = vertex[ coord_out ] ?
+                                                       ubnd[ coord_out ] :
+                                                       lbnd[ coord_out ];
+
+/* Also place one half way between the grid centre and each vertex. */
+                     ptr_out_t[ coord_out ][ point + 1 ] =
+                        0.5 * ( ptr_out_t[ coord_out ][ point ] +
+                                ptr_out_t[ coord_out ][ 0 ] );
+                  }
+                  point += 2;
+
+/* Now update the array of vertex flags to identify the next vertex. */
+                  coord_out = 0;
+                  do {
+
+/* The least significant dimension which does not have its upper bound
+   as one of the vertex coordinates is changed to use its upper bound
+   in the next vertex. */
+                     if ( !vertex[ coord_out ] ) {
+                        vertex[ coord_out ] = 1;
+                        break;
+
+/* Any less significant dimensions whose upper bounds are already
+   being used are changed to use their lower bounds in the next
+   vertex. */
+                     } else {
+                        vertex[ coord_out ] = 0;
+
+/* All vertices have been visited when the most significant dimension
+   is changed back to using its lower bound. */
+                        done = ( ++coord_out == ndim_out );
+                     }
+                  } while ( !done );
+               }
+            }
+
+/* Free the workspace used for vertex flags. */
+            vertex = astFree( vertex );
+         }
+
+/* Transform the test points. */
+/* -------------------------- */
+/* Use the Mapping to transform the test points into the input grid's
+   coordinate system, obtaining a pointer to the resulting arrays of
+   input coordinates. */
+         pset_in_t = astTransform( this, pset_out_t, 0, NULL );
+         ptr_in_t = astGetPoints( pset_in_t );
+
+/* Test the linear fit for accuracy. */
+/* --------------------------------- */
+/* If OK so far, then loop to use this fit to transform each test
+   point and compare the result with the result of applying the
+   Mapping. */
+         if ( astOK ) {
+            for ( point = 0; point < npoint; point++ ) {
+
+/* Initialise the fitting error for the current point. */
+               err = 0.0;
+
+/* Obtain each input coordinate (produced by using the Mapping) in
+   turn and check that it is not bad. If it is, then the
+   transformation is not linear, so give up testing the fit. */
+               ii = 0;
+               for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                  y = ptr_in_t[ coord_in ][ point ];
+                  if ( y == AST__BAD ) {
+                     linear = 0;
+                     break;
+                  }
+
+/* Apply the fitted transformation to the output coordinates to obtain
+   the approximate input coordinate value. */
+                  yfit = zero[ coord_in ];
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     yfit += grad[ ii++ ] * ptr_out_t[ coord_out ][ point ];
+                  }
+
+/* Form the sum of squared differences between the Mapping's
+   transformation and the fit. */
+                  diff = ( y - yfit );
+                  err += diff * diff;
+               }
+
+/* Quit the outer loop if the Mapping is found to be non-linear. */
+               if ( !linear ) break;
+
+/* Test if the Cartesian distance between the true input coordinate
+   and the approximate one exceeds the accuracy tolerance. If this
+   happens for any test point, we declare the Mapping non-linear and
+   give up. */
+               if ( sqrt( err ) > tol ) {
+                  linear = 0;
+                  break;
+               }
+            }
+         }
+
+/* Annul the pointers to the PointSets used above. */
+         pset_in_t = astAnnul( pset_in_t );
+      }
+      pset_out_t = astAnnul( pset_out_t );
+   }
+
+/* If an error occurred, or the Mapping was found to be non-linear,
+   then free the space allocated for the fit coefficients, clearing
+   the returned pointer value. */
+   if ( !astOK || !linear ) fit = astFree( fit );
+
+/* Return the result. */
+   return fit;
+}
+
 static double LocalMaximum( const MapData *mapdata, double acc, double fract,
                             double x[] ) {
 /*
@@ -4362,37 +4302,36 @@ static void ReportPoints( AstMapping *this, int forward,
    }
 }
 
-static int ResampleSection( AstMapping *this, const double *linear_fit,
-                            int ndim_in,
-                            const int *lbnd_in, const int *ubnd_in,
-                            const void *in, const void *in_var,
-                            DataType type, int (* method)(),
-                            int flags, const void *badval_ptr,
-                            int ndim_out,
-                            const int *lbnd_out, const int *ubnd_out,
-                            const int *lbnd, const int *ubnd,
-                            void *out, void *out_var ) {
+static int ResampleAdaptively( AstMapping *this, int ndim_in,
+                               const int *lbnd_in, const int *ubnd_in,
+                               const void *in, const void *in_var,
+                               DataType type, int (* interp)(),
+                               double tol, double linscale, int flags,
+                               const void *badval_ptr, const double *params,
+                               int ndim_out, const int *lbnd_out,
+                               const int *ubnd_out, const int *lbnd,
+                               const int *ubnd, void *out, void *out_var ) {
 /*
 *  Name:
-*     ResampleSection
+*     ResampleAdaptively
 
 *  Purpose:
-*     Resample a section of a data grid.
+*     Resample a section of a data grid efficiently.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "mapping.h"
-*     int ResampleSection( AstMapping *this, const double *linear_fit,
-*                          int ndim_in, const int *lbnd_in, const int *ubnd_in,
-*                          const void *in, const void *in_var,
-*                          DataType type, int (* method)(),
-*                          int flags, const void *badval_ptr,
-*                          int ndim_out,
-*                          const int *lbnd_out, const int *ubnd_out,
-*                          const int *lbnd, const int *ubnd,
-*                          void *out, void *out_var )
+*     int ResampleAdaptively( AstMapping *this, int ndim_in,
+*                             const int *lbnd_in, const int *ubnd_in,
+*                             const void *in, const void *in_var,
+*                             DataType type, int (* interp)(),
+*                             double tol, double linscale, int flags,
+*                             const void *badval_ptr,
+*                             int ndim_out, const int *lbnd_out,
+*                             const int *ubnd_out, const int *lbnd,
+*                             const int *ubnd, void *out, void *out_var )
 
 *  Class Membership:
 *     Mapping member function.
@@ -4401,12 +4340,20 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *     This function resamples a rectangular grid of data (with any
 *     number of dimensions) into a specified section of another
 *     rectangular grid (with a possibly different number of
-*     dimensions). The coordinate transformation used is given by the
-*     inverse transformation of the Mapping which is supplied or,
-*     alternatively, by a linear approximation fitted to a Mapping's
-*     inverse transformation. Any pixel interpolation scheme may be
-*     specified for interpolating between the pixels of the input
-*     grid.
+*     dimensions). The coordinate transformation used to convert
+*     output pixel coordinates into positions in the input grid is
+*     given by the inverse transformation of the Mapping which is
+*     supplied.  Any pixel interpolation scheme may be specified for
+*     interpolating between the pixels of the input grid.
+*
+*     This function is very similar to ResampleWithBlocking and
+*     ResampleSection which lie below it in the calling
+*     hierarchy. However, this function also attempts to adapt to the
+*     Mapping supplied and to sub-divide the section being resampled
+*     into smaller sections within which a linear approximation to the
+*     Mapping may be used.  This reduces the number of Mapping
+*     evaluations, thereby improving efficiency, particularly when
+*     complicated Mappings are involved.
 
 *  Parameters:
 *     this
@@ -4418,21 +4365,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *
 *        The number of input coordintes for the Mapping (Nin
 *        attribute) should match the value of "ndim_in" (below), and
-*        the number of output cooprdinates (Nout attribute) should
+*        the number of output coordinates (Nout attribute) should
 *        match the value of "ndim_out".
-*     linear_fit
-*        Pointer to an optional array of double which contains the
-*        coefficients of a linear fit which approximates the above
-*        Mapping's inverse coordinate transformation. If this is
-*        supplied, it will be used in preference to the above Mapping
-*        when transforming coordinates. This may be used to enhance
-*        performance in cases where evaluation of the Mapping's
-*        inverse transformation is expensive. If no linear fit is
-*        available, a NULL pointer should be supplied.
-*
-*        The way in which the fit coefficients are stored in this
-*        array and the number of array elements are as defined by the
-*        LinearApprox function (q.v.).
 *     ndim_in
 *        The number of dimensions in the input grid. This should be at
 *        least one.
@@ -4452,7 +4386,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        each pixel being of unit extent along each dimension with
 *        integral coordinate values at its centre.
 *     in
-*        Pointer to the input array of data to be resampled (with an
+*        Pointer to the input array of data to be resampled (with one
 *        element for each pixel in the input grid). The numerical type
 *        of these data should match the "type" value (below). The
 *        storage order should be such that the coordinate of the first
@@ -4473,13 +4407,50 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        A value taken from the "DataType" enum, which specifies the
 *        data type of the input and output arrays containing the
 *        gridded data (and variance) values.
-*     method
+*     interp
 *        This parameter may take one of the constant values
 *        AST__NEAREST or AST__LINEAR (or, equivalently, NULL),
 *        specifying the sub-pixel interpolation method to be used when
 *        obtaining values from the input grid.  Alternatively, it may
 *        be a pointer to a user-supplied function which will perform
 *        this sub-pixel interpolation itself.
+*     tol
+*        The maximum permitted positional error in transforming output
+*        pixel positions into the input grid in order to resample
+*        it. This should be expressed as a displacement in pixels in
+*        the input grid's coordinate system. If the Mapping's inverse
+*        transformation can be approximated by piecewise linear
+*        functions to this accuracy, then such functions may be used
+*        instead of the Mapping in order to improve
+*        performance. Otherwise, every output pixel position will be
+*        transformed explicitly by the Mapping.
+*
+*        If linear approximation is not required, a "tol" value of
+*        zero may be given. This will ensure that the Mapping is used
+*        explicitly without any approximation.
+*     linscale
+*        A value which specifies the approximate scale size on which
+*        to search for non-linearities in the Mapping supplied. This
+*        value should be expressed in terms of pixels in the output
+*        grid.
+*
+*        If the value given is very large (the normal recommendation),
+*        the function will initially search for non-linearity on a
+*        scale determined by the size of the output grid (or the
+*        section of it to which resampled values are being written, if
+*        this is smaller). This arrangement is almost always
+*        satisfactory. Very occasionally, however, a Mapping may
+*        appear linear on this scale but nevertheless have smaller
+*        irregularities (e.g. "holes") in it.  In such cases,
+*        "linscale" may be set to a suitably smaller value so as to
+*        ensure this non-linearity is not overlooked. Typically, a
+*        value of 50 to 100 pixels might be suitable and would have
+*        little effect on performance.
+*
+*        If too small a value is given, it will have the effect of
+*        preventing linear approximation occurring at all (equivalent
+*        to setting "tol" to zero).  Although this might degrade
+*        performance, accurate results will still be obtained.
 *     flags
 *        The bitwise OR of a set of flag values which control the
 *        operation of the function. Currently, only the flag
@@ -4498,6 +4469,10 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        value whether or not the AST__USEBAD flag is set (the
 *        function return value indicates whether any such values have
 *        been produced).
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the interpolation function, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
 *     ndim_out
 *        The number of dimensions in the output grid. This should be
 *        at least one.
@@ -4528,9 +4503,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        Note that "lbnd" and "ubnd" define the shape and position of
 *        the section of the output grid for which resampled values are
 *        required. This section should lie wholly within the extent of
-*        the output grid (as defined by "lbnd_out" and
-*        "ubnd_out"). Regions of the output grid lying ouside this
-*        section will not be modified.
+*        the output grid (as defined by the "lbnd_out" and "ubnd_out"
+*        arrays). Regions of the output grid lying ouside this section
+*        will not be modified.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned.  The
@@ -4552,6 +4527,373 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *     because no valid output value could be obtained.
 
 *  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+                      
+/* Local Variables: */
+   double *linear_fit;           /* Pointer to array of fit coefficients */
+   int *hi;                      /* Pointer to array of section upper bounds */
+   int *lo;                      /* Pointer to array of section lower bounds */
+   int coord_out;                /* Loop counter for output coordinates */
+   int dim;                      /* Output section dimension size */
+   int dimx;                     /* Dimension with maximum section extent */
+   int divide;                   /* Sub-divide the output section? */
+   int mxdim;                    /* Largest output section dimension size */
+   int npix;                     /* Number of pixels in output section */
+   int npoint;                   /* Number of points for obtaining a fit */
+   int nvertex;                  /* Number of vertices of output section */
+   int result;                   /* Result value to return */
+   int toobig;                   /* Section too big (must sub-divide)? */
+   int toosmall;                 /* Section too small to sub-divide? */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Loop through the output grid dimensions. */
+   npix = 1;
+   mxdim = 0;
+   dimx = 1;
+   nvertex = 1;
+   for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+
+/* Obtain the extent in each dimension of the output section which is
+   to receive resampled values, and calculate the total number of
+   pixels it contains. */
+      dim = ubnd[ coord_out ] - lbnd[ coord_out ] + 1;
+      npix *= dim;
+
+/* Find the maximum dimension size of this output section and note
+   which dimension has this size. */
+      if ( dim > mxdim ) {
+         mxdim = dim;
+         dimx = coord_out;
+      }
+
+/* Calculate how many vertices the output section has. */
+      nvertex *= 2;
+   }
+   
+/* Calculate how many sample points will be needed (by the
+   LinearApprox function) to obtain a linear fit to the Mapping's
+   inverse transformation. */
+   npoint = 1 + 4 * ndim_out + 2 * nvertex;
+
+/* If the number of pixels in the output section is not at least 4
+   times this number, we will probably not save significant time by
+   attempting to obtain a linear fit, so note that the output section
+   is too small. */
+   toosmall = ( npix < ( 4 * npoint ) );
+
+/* Note if the maximum dimension of the output section exceeds the
+   user-supplied maximum section size. */
+   toobig = ( ( (double) mxdim ) > linscale );
+
+/* Assume the Mapping is significantly non-linear before deciding
+   whether to sub-divide the output section. */
+   linear_fit = NULL;
+
+/* If the output section is too small to be worth obtaining a linear
+   fit, or if the accuracy tolerance is zero, we will not
+   sub-divide. This means that the Mapping will be used to transform
+   each pixel's coordinates and no linear approximation will be
+   used. */
+   if ( toosmall || ( tol == 0.0 ) ) {
+      divide = 0;
+
+/* Otherwise, if the largest output section dimension exceeds the
+   maximum permitted section size, we will sub-divide. This offers the
+   possibility of obtaining a linear approximation to the Mapping over
+   a reduced range of output coordinates (which will be handled by a
+   recursive invocation of this function). */
+   } else if ( toobig ) {
+      divide = 1;
+
+/* If neither of the above apply, then attempt to fit a linear
+   approximation to the Mapping's inverse transformation over the
+   range of coordinates covered by the output section. */
+   } else {
+     linear_fit = LinearApprox( this, ndim_in, ndim_out, lbnd, ubnd, tol );
+
+/* If a linear fit was obtained, we will use it and therefore do not
+   wish to sub-divide further. Otherwise, we sub-divide in the hope
+   that this may result in a linear fit next time. */
+     divide = !linear_fit;
+   }
+
+/* If no sub-division is required, perform resampling (in a
+   memory-efficient manner, since the section we are resampling might
+   still be very large). This will use the linear fit, if obtained
+   above. */
+   if ( astOK ) {
+      if ( !divide ) {
+         result = ResampleWithBlocking( this, linear_fit,
+                                        ndim_in, lbnd_in, ubnd_in,
+                                        in, (void *) in_var, type, interp,
+                                        flags, badval_ptr, params,
+                                        ndim_out, lbnd_out, ubnd_out,
+                                        lbnd, ubnd, out, out_var );
+
+/* Otherwise, allocate workspace to perform the sub-division. */
+      } else {
+         lo = astMalloc( sizeof( int ) * (size_t) ndim_out );
+         hi = astMalloc( sizeof( int ) * (size_t) ndim_out );
+         if ( astOK ) {
+
+/* Initialise the bounds of a new output section to match the original
+   output section. */
+            for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+               lo[ coord_out ] = lbnd[ coord_out ];
+               hi[ coord_out ] = ubnd[ coord_out ];
+            }
+
+/* Replace the upper bound of the section's largest dimension with the
+   mid-point of the section along this dimension, rounded
+   downwards. */
+            hi[ dimx ] =
+               (int) floor( 0.5 * (double) ( lbnd[ dimx ] + ubnd[ dimx ] ) );
+
+/* Resample the resulting smaller section using a recursive invocation
+   of this function. */
+            result = ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
+                                         in, in_var, type, interp, tol,
+                                         linscale, flags, badval_ptr, params,
+                                         ndim_out, lbnd_out, ubnd_out,
+                                         lo, hi, out, out_var );
+
+/* Now set up a second section which covers the remaining half of the
+   original output section. */
+            lo[ dimx ] = hi[ dimx ] + 1;
+            hi[ dimx ] = ubnd[ dimx ];
+
+/* Resample this section in the same way, summing the returned
+   values. */
+            result += ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
+                                          in, in_var, type, interp, tol,
+                                          linscale, flags, badval_ptr, params,
+                                          ndim_out, lbnd_out, ubnd_out,
+                                          lo, hi, out, out_var );
+         }
+
+/* Free the workspace. */
+         lo = astFree( lo );
+         hi = astFree( hi );
+      }
+   }
+
+/* If coefficients for a linear fit were obtained, then free the space
+   they occupy. */
+   if ( linear_fit ) linear_fit = astFree( linear_fit );
+
+/* If an error occurred, clear the returned result. */
+   if ( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
+static int ResampleSection( AstMapping *this, const double *linear_fit,
+                            int ndim_in,
+                            const int *lbnd_in, const int *ubnd_in,
+                            const void *in, const void *in_var,
+                            DataType type, int (* interp)(),
+                            int flags, const void *badval_ptr,
+                            const double *params, int ndim_out,
+                            const int *lbnd_out, const int *ubnd_out,
+                            const int *lbnd, const int *ubnd,
+                            void *out, void *out_var ) {
+/*
+*  Name:
+*     ResampleSection
+
+*  Purpose:
+*     Resample a section of a data grid.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int ResampleSection( AstMapping *this, const double *linear_fit,
+*                          int ndim_in, const int *lbnd_in, const int *ubnd_in,
+*                          const void *in, const void *in_var,
+*                          DataType type, int (* interp)(),
+*                          int flags, const void *badval_ptr,
+*                          const double *params, int ndim_out,
+*                          const int *lbnd_out, const int *ubnd_out,
+*                          const int *lbnd, const int *ubnd,
+*                          void *out, void *out_var )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function resamples a rectangular grid of data (with any
+*     number of dimensions) into a specified section of another
+*     rectangular grid (with a possibly different number of
+*     dimensions). The coordinate transformation used is given by the
+*     inverse transformation of the Mapping which is supplied or,
+*     alternatively, by a linear approximation fitted to a Mapping's
+*     inverse transformation. Any pixel interpolation scheme may be
+*     specified for interpolating between the pixels of the input
+*     grid.
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose inverse transformation may be
+*        used to transform the coordinates of pixels in the output
+*        grid into associated positions in the input grid, from which
+*        the output pixel values should be derived (by interpolation
+*        if necessary).
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     linear_fit
+*        Pointer to an optional array of double which contains the
+*        coefficients of a linear fit which approximates the above
+*        Mapping's inverse coordinate transformation. If this is
+*        supplied, it will be used in preference to the above Mapping
+*        when transforming coordinates. This may be used to enhance
+*        performance in cases where evaluation of the Mapping's
+*        inverse transformation is expensive. If no linear fit is
+*        available, a NULL pointer should be supplied.
+*
+*        The way in which the fit coefficients are stored in this
+*        array and the number of array elements are as defined by the
+*        LinearApprox function.
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     in
+*        Pointer to the input array of data to be resampled (with one
+*        element for each pixel in the input grid). The numerical type
+*        of these data should match the "type" value (below). The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     in_var
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the resampled data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+*     type
+*        A value taken from the "DataType" enum, which specifies the
+*        data type of the input and output arrays containing the
+*        gridded data (and variance) values.
+*     interp
+*        This parameter may take one of the constant values
+*        AST__NEAREST or AST__LINEAR (or, equivalently, NULL),
+*        specifying the sub-pixel interpolation method to be used when
+*        obtaining values from the input grid. Alternatively, it may
+*        be a pointer to a user-supplied function which will perform
+*        this sub-pixel interpolation itself.
+*     flags
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised and propagated to the output array(s).  If this
+*        flag is not set, all input values are treated literally.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the interpolation function, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output data grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output data grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output data grid in the same way as "lbnd_in"
+*        and "ubnd_in" define the shape and size of the input grid
+*        (see above).
+*     lbnd
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the output data grid for which a value is
+*        required.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the output data grid for which a value is
+*        required.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the output grid for which resampled values are
+*        required. This section should lie wholly within the extent of
+*        the output grid (as defined by the "lbnd_out" and "ubnd_out"
+*        arrays). Regions of the output grid lying ouside this section
+*        will not be modified.
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the resampled data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the resampled values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+
+*  Returned Value:
+*     The number of output grid points to which a data value (or a
+*     variance value if relevant) equal to "badval" has been assigned
+*     because no valid output value could be obtained.
+
+*  Notes:
+*     - This function does not take steps to limit memory usage if the
+*     grids supplied are large. To resample large grids in a more
+*     memory-efficient way, the ResampleWithBlocking function should
+*     be used.
 *     - A value of zero will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
@@ -4591,6 +4933,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Further initialisation. */
+   pset_in = NULL;
+
 /* Calculate the number of output points, as given by the product of
    the output grid dimensions. */
    for ( npoint = 1, coord_out = 0; coord_out < ndim_out; coord_out++ ) {
@@ -4599,7 +4944,6 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Allocate workspace. */
    offset = astMalloc( sizeof( int ) * (size_t) npoint );
-   dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
    stride = astMalloc( sizeof( int ) * (size_t) ndim_out );
    if ( astOK ) {
 
@@ -4609,13 +4953,6 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
          stride[ coord_out ] = s;
          s *= ubnd_out[ coord_out ] - lbnd_out[ coord_out ] + 1;
-
-/* Initialise an array of pixel indices for the output grid which
-   refer to the first pixel for which we require a value. Also
-   calculate the offset of this pixel within the output array. */
-         dim[ coord_out ] = lbnd[ coord_out ];
-         off += ( dim[ coord_out ] - lbnd_out[ coord_out ] ) *
-                stride[ coord_out ];
       }
 
 /* A linear fit to the Mapping is available. */
@@ -4623,10 +4960,10 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       if ( linear_fit ) {
 
 /* If a linear fit to the Mapping has been provided, then obtain
-   pointers to the array of zero-points and gradients comprising the
+   pointers to the array of gradients and zero-points comprising the
    fit. */
-         zero = linear_fit;
          grad = linear_fit + ndim_out;
+         zero = linear_fit;
 
 /* Create a PointSet to hold the input grid coordinates and obtain an
    array of pointers to its coordinate data. */
@@ -4642,8 +4979,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
             if ( ( ndim_in == 1 ) && ( ndim_out == 1 ) ) {
 
 /* Loop through the pixels of the output grid and transform their x
-   coordinates into the input grid using the linear fit
-   supplied. Store the results in the PointSet created above. */
+   coordinates into the input grid's coordinate system using the
+   linear fit supplied. Store the results in the PointSet created
+   above. */
                for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
                   ptr_in[ 0 ][ point ] = zero[ 0 ] + grad[ 0 ] * (double) ix;
 
@@ -4663,17 +5001,17 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   x1 = zero[ 0 ] + grad[ 1 ] * (double) iy;
                   y1 = zero[ 1 ] + grad[ 3 ] * (double) iy;
 
-/* Also calculate an interim pixel offset within the output array. */
-                  off1 = ( iy - lbnd_out[ 1 ] ) * stride[ 1 ] - lbnd_out[ 0 ];
+/* Also calculate an interim pixel offset into the output array. */
+                  off1 = stride[ 1 ] * ( iy - lbnd_out[ 1 ] ) - lbnd_out[ 0 ];
 
-/* Now loop through the range of x coordinates and calculate the final
-   values of the input coordinates, storing the results in the
-   PointSet created above. */
+/* Now loop through the range of output x coordinates and calculate
+   the final values of the input coordinates, storing the results in
+   the PointSet created above. */
                   for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
                      ptr_in[ 0 ][ point ] = x1 + grad[ 0 ] * (double) ix;
                      ptr_in[ 1 ][ point ] = y1 + grad[ 2 ] * (double) ix;
 
-/* Also calculate final pixel offsets within the output array. */
+/* Also calculate final pixel offsets into the output array. */
                      offset[ point ] = off1 + ix;
                      point++;
                   }
@@ -4686,7 +5024,18 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 /* Allocate workspace. */
                accum = astMalloc( sizeof( double ) *
                                  (size_t) ( ndim_in * ndim_out ) );
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
                if ( astOK ) {
+
+/* Initialise an array of pixel indices for the output grid which
+   refer to the first pixel for which we require a value. Also
+   calculate the offset of this pixel within the output array. */
+                  off = 0;
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     dim[ coord_out ] = lbnd[ coord_out ];
+                     off += stride[ coord_out ] *
+                            ( dim[ coord_out ] - lbnd_out[ coord_out ] );
+                  }
 
 /* To calculate each input grid coordinate we must perform a matrix
    multiply on the output grid coordinates (using the gradient matrix)
@@ -4701,20 +5050,21 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                      accum[ ( coord_in + 1 ) * ndim_out - 1 ] =
                                                               zero[ coord_in ];
                   }
+                  coord_out = ndim_out - 1;
 
 /* Now loop to process each output pixel. */
-                  coord_out = ndim_out - 1;
                   for ( done = 0; !done; point++ ) {
 
 /* To generate the input coordinate that corresponds to the current
    output pixel, we work down from the most significant dimension
-   whose index has changed since the previous pixel we considered. For
-   each affected dimension, we accumulate in "accum" the matrix sum
-   (including the zero point) for that dimension and all higher output
-   dimensions. We must accumulate a separate set of sums for each
-   input coordinate we wish to produce. (Note that for the first pixel
-   we process, all dimensions are considered "changed", so we start by
-   initialising the whole "accum" array.) */
+   whose index has changed since the previous pixel we considered
+   (given by "coord_out"). For each affected dimension, we accumulate
+   in "accum" the matrix sum (including the zero point) for that
+   dimension and all higher output dimensions. We must accumulate a
+   separate set of sums for each input coordinate we wish to
+   produce. (Note that for the first pixel we process, all dimensions
+   are considered "changed", so we start by initialising the whole
+   "accum" array.) */
                      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
                         i1 = coord_in * ndim_out;
                         for ( idim = coord_out; idim >= 1; idim-- ) {
@@ -4742,7 +5092,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* The least significant index which currently has less than its
    maximum value is incremented by one. The offset into the output
-   array is then updated accordingly. */
+   array is updated accordingly. */
                         if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
                            dim[ coord_out ]++;
                            off += stride[ coord_out ];
@@ -4750,14 +5100,14 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Any less significant indices which have reached their maximum value
    are returned to their minimum value and the output pixel offset is
-   updated appropriately. */
+   decremented appropriately. */
                         } else {
                            dim[ coord_out ] = lbnd[ coord_out ];
-                           off -= ( ubnd[ coord_out ] - lbnd[ coord_out ] ) *
-                                  stride[ coord_out ];
+                           off -= stride[ coord_out ] *
+                                  ( ubnd[ coord_out ] - lbnd[ coord_out ] );
 
-/* All the output pixels have been processed once the final (most
-   significant) index has been returned to its minimum value. */
+/* All the output pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
                            done = ( ++coord_out == ndim_out );
                         }
                      } while ( !done );
@@ -4766,6 +5116,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Free the workspace. */
                accum = astFree( accum );
+               dim = astFree( dim );
             }
          }
 
@@ -4777,109 +5128,133 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    obtain a pointer to its coordinate data. */
          pset_out = astPointSet( npoint, ndim_out, "" );
          ptr_out = astGetPoints( pset_out );
+         if ( astOK ) {
+
+/* Initialise the count of output points. */
+            point = 0;
 
 /* Handle the 1-dimensional case optimally. */
 /* ---------------------------------------- */
-         if ( ndim_out == 1 ) {
+            if ( ndim_out == 1 ) {
 
 /* Loop through the required range of output x coordinates, assigning
    the coordinate values to the PointSet created above. Also store a
    pixel offset into the output array. */
-            point = 0;
-            for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
-               ptr_out[ 0 ][ point ] = (double) ix;
-               offset[ point ] = ix - lbnd_out[ 0 ];
-
-/* Increment the count of output pixels. */
-               point++;
-            }
-
-/* Handle the 2-dimensional case optimally. */
-/* ---------------------------------------- */
-         } else if ( ndim_out == 2 ) {
-
-/* Loop through the required range of output y coordinates,
-   calculating an interim pixel offset into the output array. */
-            point = 0;
-            for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
-               off1 = stride[ 1 ] * ( iy - lbnd_out[ 1 ] ) - lbnd_out[ 0 ];
-
-/* Loop through the required range of output x coordinates, assigning
-   the coordinate values to the PointSet created above. Also store a
-   final pixel offset into the output array. */
                for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
                   ptr_out[ 0 ][ point ] = (double) ix;
-                  ptr_out[ 1 ][ point ] = (double) iy;
-                  offset[ point ] = off1 + ix;
+                  offset[ point ] = ix - lbnd_out[ 0 ];
 
 /* Increment the count of output pixels. */
                   point++;
                }
-            }
+
+/* Handle the 2-dimensional case optimally. */
+/* ---------------------------------------- */
+            } else if ( ndim_out == 2 ) {
+
+/* Loop through the required range of output y coordinates,
+   calculating an interim pixel offset into the output array. */
+               for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+                  off1 = stride[ 1 ] * ( iy - lbnd_out[ 1 ] ) - lbnd_out[ 0 ];
+
+/* Loop through the required range of output x coordinates, assigning
+   the coordinate values to the PointSet created above. Also store a
+   final pixel offset into the output array. */
+                  for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                     ptr_out[ 0 ][ point ] = (double) ix;
+                     ptr_out[ 1 ][ point ] = (double) iy;
+                     offset[ point ] = off1 + ix;
+
+/* Increment the count of output pixels. */
+                     point++;
+                  }
+               }
 
 /* Handle other numbers of dimensions. */
 /* ----------------------------------- */
-         } else {
+            } else {
+
+/* Allocate workspace. */
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_out );
+               if ( astOK ) {
+
+/* Initialise an array of pixel indices for the output grid which
+   refer to the first pixel for which we require a value. Also
+   calculate the offset of this pixel within the output array. */
+                  off = 0;
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     dim[ coord_out ] = lbnd[ coord_out ];
+                     off += stride[ coord_out ] *
+                            ( dim[ coord_out ] - lbnd_out[ coord_out ] );
+                  }
 
 /* Loop to generate the coordinates of each output pixel. */
-            for ( done = 0, point = 0; !done; point++ ) {
+                  for ( done = 0; !done; point++ ) {
 
 /* Copy each pixel's coordinates into the PointSet created above. */
-               for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
-                  ptr_out[ coord_out ][ point ] = (double) dim[ coord_out ];
-               }
+                     for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                        ptr_out[ coord_out ][ point ] =
+                                                     (double) dim[ coord_out ];
+                     }
 
 /* Store the offset of the pixel in the output array. */
-               offset[ point ] = off;
+                     offset[ point ] = off;
 
 /* Now update the array of pixel indices to refer to the next output
    pixel. */
-               coord_out = 0;
-               while ( !done ) {
+                     coord_out = 0;
+                     do {
 
 /* The least significant index which currently has less than its
    maximum value is incremented by one. The offset into the output
-   array is then updated accordingly. */
-                  if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
-                     dim[ coord_out ]++;
-                     off += stride[ coord_out ];
-                     break;
+   array is updated accordingly. */
+                        if ( dim[ coord_out ] < ubnd[ coord_out ] ) {
+                           dim[ coord_out ]++;
+                           off += stride[ coord_out ];
+                           break;
 
 /* Any less significant indices which have reached their maximum value
    are returned to their minimum value and the output pixel offset is
-   updated appropriately. */
-                  } else {
-                     dim[ coord_out ] = lbnd[ coord_out ];
-                     off -= stride[ coord_out ] *
-                            ( ubnd[ coord_out ] - lbnd[ coord_out ] );
+   decremented appropriately. */
+                        } else {
+                           dim[ coord_out ] = lbnd[ coord_out ];
+                           off -= stride[ coord_out ] *
+                                  ( ubnd[ coord_out ] - lbnd[ coord_out ] );
 
-/* All the output pixels have been processed once the final (most
-   significant) index has been returned to its minimum value. */
-                     done = ( ++coord_out == ndim_out );
+/* All the output pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
+                           done = ( ++coord_out == ndim_out );
+                        }
+                     } while ( !done );
                   }
                }
+
+/* Free the workspace. */
+               dim = astFree( dim );
             }
-         }
 
 /* When all the output pixel coordinates have been generated, use the
    Mapping's inverse transformation to generate the input coordinates
-   from them. */
-         pset_in = astTransform( this, pset_out, 0, NULL );
-         ptr_in = astGetPoints( pset_in );
+   from them. Obtain an array of pointers to the resulting coordinate
+   data. */
+            pset_in = astTransform( this, pset_out, 0, NULL );
+            ptr_in = astGetPoints( pset_in );
+         }
 
 /* Annul the PointSet containing the output coordinates. */
          pset_out = astAnnul( pset_out );
       }
    }
 
-/* If the input coordinates have been produced successfully, test for
-   each method of interpolating to obtain the data (and variance)
-   values at the required positions in the input grid. */
+/* Resample the input grid. */
+/* ------------------------ */
+/* If the input coordinates have been produced successfully, identify
+   the input grid resampling method to be used. */
    if ( astOK ) {
 
 /* Use the nearest pixel. */
 /* ---------------------- */
-      if ( method == AST__NEAREST ) {
+      if ( interp == AST__NEAREST ) {
 
 /* Define a macro to use a "case" statement to invoke the
    nearest-pixel interpolation function appropriate to a given data
@@ -4916,8 +5291,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                
 /* Linear interpolation. */
 /* --------------------- */
-/* Note this is also the default if "method" is NULL. */
-      } else if ( ( method == AST__LINEAR ) || ( method == NULL ) ) {
+/* Note this is also the default if "interp" is NULL. */
+      } else if ( ( interp == AST__LINEAR ) || ( interp == NULL ) ) {
 
 /* Define a macro to use a "case" statement to invoke the linear
    interpolation function appropriate to a given data type. */
@@ -4960,11 +5335,11 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    type. */
 #define USER_CASE(X,Xtype) \
             case ( TYPE_##X ): \
-               result = ( *( (AstInterpolate##X) method ) ) \
+               result = ( *( (AstInterpolate##X) interp ) ) \
                            ( ndim_in, lbnd_in, ubnd_in, \
                              (Xtype *) in, (Xtype *) in_var, npoint, \
                              offset, ptr_in[ 0 ], \
-                             flags, *( (Xtype *) badval_ptr ), \
+                             flags, *( (Xtype *) badval_ptr ), params, \
                              (Xtype *) out, (Xtype *) out_var ); \
                break;
 
@@ -4988,10 +5363,11 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
       }
    }
 
-/* Free the workspace. */
-   dim = astFree( dim );
-   offset = astFree( offset );
+/* Annul the PointSet used to hold input coordinates. */
    pset_in = astAnnul( pset_in );
+
+/* Free the workspace. */
+   offset = astFree( offset );
    stride = astFree( stride );
 
 /* If an error occurred, clear the returned value. */
@@ -5005,9 +5381,9 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
                                  int ndim_in,
                                  const int *lbnd_in, const int *ubnd_in,
                                  const void *in, const void *in_var,
-                                 DataType type, int (* method)(),
+                                 DataType type, int (* interp)(),
                                  int flags, const void *badval_ptr,
-                                 int ndim_out,
+                                 const double *params, int ndim_out,
                                  const int *lbnd_out, const int *ubnd_out,
                                  const int *lbnd, const int *ubnd,
                                  void *out, void *out_var ) {
@@ -5027,9 +5403,9 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *                               int ndim_in,
 *                               const int *lbnd_in, const int *ubnd_in,
 *                               const void *in, const void *in_var,
-*                               DataType type, int (* method)(),
+*                               DataType type, int (* interp)(),
 *                               int flags, const void *badval_ptr,
-*                               int ndim_out,
+*                               const double *params, int ndim_out,
 *                               const int *lbnd_out, const int *ubnd_out,
 *                               const int *lbnd, const int *ubnd,
 *                               void *out, void *out_var )
@@ -5065,7 +5441,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *
 *        The number of input coordintes for the Mapping (Nin
 *        attribute) should match the value of "ndim_in" (below), and
-*        the number of output cooprdinates (Nout attribute) should
+*        the number of output coordinates (Nout attribute) should
 *        match the value of "ndim_out".
 *     linear_fit
 *        Pointer to an optional array of double which contains the
@@ -5079,7 +5455,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *
 *        The way in which the fit coefficients are stored in this
 *        array and the number of array elements are as defined by the
-*        LinearApprox function (q.v.).
+*        LinearApprox function.
 *     ndim_in
 *        The number of dimensions in the input grid. This should be at
 *        least one.
@@ -5099,7 +5475,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        each pixel being of unit extent along each dimension with
 *        integral coordinate values at its centre.
 *     in
-*        Pointer to the input array of data to be resampled (with an
+*        Pointer to the input array of data to be resampled (with one
 *        element for each pixel in the input grid). The numerical type
 *        of these data should match the "type" value (below). The
 *        storage order should be such that the coordinate of the first
@@ -5120,7 +5496,7 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        A value taken from the "DataType" enum, which specifies the
 *        data type of the input and output arrays containing the
 *        gridded data (and variance) values.
-*     method
+*     interp
 *        This parameter may take one of the constant values
 *        AST__NEAREST or AST__LINEAR (or, equivalently, NULL),
 *        specifying the sub-pixel interpolation method to be used when
@@ -5145,6 +5521,10 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        value whether or not the AST__USEBAD flag is set (the
 *        function return value indicates whether any such values have
 *        been produced).
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the interpolation function, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
 *     ndim_out
 *        The number of dimensions in the output grid. This should be
 *        at least one.
@@ -5175,9 +5555,9 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        Note that "lbnd" and "ubnd" define the shape and position of
 *        the section of the output grid for which resampled values are
 *        required. This section should lie wholly within the extent of
-*        the output grid (as defined by "lbnd_out" and
-*        "ubnd_out"). Regions of the output grid lying ouside this
-*        section will not be modified.
+*        the output grid (as defined by the "lbnd_out" and "ubnd_out"
+*        arrays). Regions of the output grid lying ouside this section
+*        will not be modified.
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned.  The
@@ -5305,14 +5685,14 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 /* Loop to generate the extent of each block of output pixels and to
    resample them. */
       done = 0;
-      while ( !done ) {
+      while ( !done && astOK ) {
 
 /* Resample the current block, accumulating the sum of bad pixels
    produced. */
          result += ResampleSection( this, linear_fit,
                                     ndim_in, lbnd_in, ubnd_in,
-                                    in, in_var, type, method,
-                                    flags, badval_ptr,
+                                    in, in_var, type, interp,
+                                    flags, badval_ptr, params,
                                     ndim_out, lbnd_out, ubnd_out,
                                     lbnd_block, ubnd_block, out, out_var );
 
@@ -7947,25 +8327,23 @@ void astReportPoints_( AstMapping *this, int forward,
    (**astMEMBER(this,Mapping,ReportPoints))( this, forward,
                                              in_points, out_points );
 }
-#define MAKE_RESAMPLE_(abbrev,type) \
-int astResample##abbrev##_( AstMapping *this, int ndim_in, \
-                            const int *lbnd_in, const int *ubnd_in, \
-                            const type *in, const type *in_var, \
-                            AstInterpolate##abbrev method, \
-                            double acc, int gridsize, int flags, \
-                            type badval, int ndim_out, const int *lbnd_out, \
-                            const int *ubnd_out, const int *lbnd, \
-                            const int *ubnd, type *out, type *out_var ) { \
+#define MAKE_RESAMPLE_(X,Xtype) \
+int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
+                       const int *ubnd_in, const Xtype *in, \
+                       const Xtype *in_var, AstInterpolate##X interp, \
+                       double tol, double linscale, int flags, Xtype badval, \
+                       const double *params, int ndim_out, \
+                       const int *lbnd_out, const int *ubnd_out, \
+                       const int *lbnd, const int *ubnd, Xtype *out, \
+                       Xtype *out_var ) { \
    if ( !astOK ) return 0; \
-   return (**astMEMBER(this,Mapping,Resample##abbrev))( this, ndim_in, \
-                                                        lbnd_in, ubnd_in, \
-                                                        in, in_var, \
-                                                        method, acc, \
-                                                        gridsize, flags, \
-                                                        badval, ndim_out, \
-                                                        lbnd_out, ubnd_out, \
-                                                        lbnd, ubnd, \
-                                                        out, out_var ); \
+   return (**astMEMBER(this,Mapping,Resample##X))( this, ndim_in, lbnd_in, \
+                                                   ubnd_in, in, in_var, \
+                                                   interp, tol, linscale, \
+                                                   flags, badval, params, \
+                                                   ndim_out, lbnd_out, \
+                                                   ubnd_out, lbnd, ubnd, out, \
+                                                   out_var ); \
 }
 MAKE_RESAMPLE_(LD,long double)
 MAKE_RESAMPLE_(D,double)

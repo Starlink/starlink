@@ -62,6 +62,7 @@ static int ast_resample_method##cabbrev( int ndim, \
                                          const ctype *in_var, int npoint, \
                                          const int *offset, double *coord, \
                                          int flags, ctype badval, \
+                                         const double *params, \
                                          ctype *out, ctype *out_var ) { \
    DECLARE_INTEGER(STATUS); \
 \
@@ -146,7 +147,7 @@ printf("variance\n" );\
          RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
                                         LBND_IN, UBND_IN, IN, IN_VAR, \
                                         method, *ACC, *GRIDSIZE, \
-                                        *FLAGS, *BADVAL, \
+                                        *FLAGS, *BADVAL, NULL, \
                                         *NDIM_OUT, LBND_OUT, UBND_OUT, \
                                         LBND, UBND, OUT, OUT_VAR ); \
       } else { \
@@ -154,7 +155,7 @@ printf("no variance\n" );\
          RESULT = astResample##cabbrev( astI2P( *THIS ), *NDIM_IN, \
                                         LBND_IN, UBND_IN, IN, NULL, \
                                         method, *ACC, *GRIDSIZE, \
-                                        *FLAGS, *BADVAL, \
+                                        *FLAGS, *BADVAL, NULL, \
                                         *NDIM_OUT, LBND_OUT, UBND_OUT, \
                                         LBND, UBND, OUT, NULL ); \
       } \
