@@ -3708,6 +3708,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    Import-Export :
 *    Export :
 *    Status :
+      INTEGER STATUS
 *    Function declarations :
 *    Local variables :
       REAL X,Y
@@ -3716,6 +3717,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *-
 
 *  get world coord of pixel centre
+        STATUS=SAI__OK
         CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
 
 *  transform to frame centred on slice
