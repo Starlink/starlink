@@ -32,6 +32,10 @@ if %?HAVEDOCS%
 	  latex2dvi $<
 .dvi.ps:
 	dvips -o $@ $<
+.tex.ps:
+	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
+	  latex2dvi $<
+	dvips -o $@ $(<:.tex=.dvi)
 .tex.pdf:
 	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
 	  latex2dvi $<
