@@ -37,6 +37,15 @@ INTERFACE SPRESP
     HELP        'Alternative is to have centre on the vertex of 4 pixels'
   ENDPARAMETER
 
+
+  PARAMETER NEBIN
+    TYPE        '_INTEGER'
+    VPATH       'DYNAMIC,PROMPT'
+    PPATH       'DYNAMIC'
+    PROMPT      'Number of samples along energy dimension'
+    HELP        'Default is number of energy bins in data'
+  ENDPARAMETER
+
   PARAMETER SRES
     TYPE        '_REAL'
     VPATH       'PROMPT'
