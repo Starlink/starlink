@@ -100,7 +100,6 @@ f     The XmlChan class does not define any new routines beyond those
 /* A string used to indicate atrue attribute value */
 #define TRUE "true"
 
-
 /* Include files. */
 /* ============== */
 /* Interface definitions. */
@@ -166,6 +165,7 @@ static AstObject *Read( AstChannel * );
 static AstObject *ReadObject( AstChannel *, const char *, AstObject * );
 static AstXmlElement *FindAttribute( AstXmlChan *, const char * );
 static AstXmlElement *FindObject( AstXmlChan *, const char * );
+static AstXmlElement *FindElement( AstXmlElement *, const char *, int );
 static AstXmlElement *ReadXmlText( AstXmlChan * );
 static AstXmlElement *Remove( AstXmlChan *, AstXmlElement * );
 static char *ReadString( AstChannel *, const char *, const char * );
@@ -177,7 +177,7 @@ static const char *FindNextIsA( AstXmlElement *, int );
 static double ReadDouble( AstChannel *, const char *, double );
 static int GetComment( AstChannel * );
 static int GetFull( AstChannel * );
-static int IsAnAstElement( AstXmlElement * );
+static int IsUsable( AstXmlElement * );
 static int ReadInt( AstChannel *, const char *, int );
 static int TestAttrib( AstObject *, const char * );
 static int Use( AstXmlChan *, int, int );
@@ -454,9 +454,10 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name ) {
          item = astXmlGetItem( this->container, i );
 
 /* Ignore this item if it is not an element. */
-         if( astXmlGetType( item ) == AST__XMLELEM ) {
+         if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
 /* Ignore this element if its name is not _ATTRIBUTE. */
+            if( !astOK ) break;
             if( !strcmp( astXmlGetName( item ), _ATTRIBUTE ) ){
 
 /* Ignore this element if it represents a default value. */
@@ -485,6 +486,88 @@ static AstXmlElement *FindAttribute( AstXmlChan *this, const char *name ) {
    }
 
 /* Return the pointer. */
+   return result;
+}
+
+static AstXmlElement *FindElement( AstXmlElement *elem, const char *name,
+                                   int report ){
+/*
+*  Name:
+*     FindElement
+
+*  Purpose:
+*     Find the first element with a given name within a supplied element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "xmlchan.h"
+*     AstXmlElement *FindElement( AstXmlElement *elem, const char *name,
+*                                 int report )
+
+*  Class Membership:
+*     XmlChan member function 
+
+*  Description:
+*     This function searches the content of the supplied element and
+*     returns a pointer to the first element with the given name. A NULL
+*     pointer is returned if no such element is found. Whether or not an
+*     error is reported in this case depends on the value supplied for 
+*     reporting.
+
+*  Parameters:
+*     elem 
+*        Pointer to the XmlElement to be searched.
+*     name
+*        Pointer to a null terminated string specifying the name of the
+*        element to be searched for.
+*     report
+*        Specifies whether an error should be reporte if the requested
+*        element is not found. If a non-zero value is supplied, then an
+*        error will be reported, otherwise no error is reported.
+
+*  Returned Value:
+*     A pointer to the found element, or NULL if no element was found.
+
+*  Notes:
+*     - A NULL pointer is returned if an error has already occurred, or
+*     if this function should fail for any reason.
+
+*/
+
+/* Local Variables: */
+   AstXmlContentItem *item;      /* Pointer to current content item */
+   AstXmlElement *result;        /* Pointer to the returned element */
+   int i;                        /* Index of current content item */
+   int nitem;                    /* No. of content items in supplied element */
+
+/* Initialise */
+   result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Search all items of content within the supplied element, looking for
+   an element with the supplied name. */
+   nitem = astXmlGetNitem( elem );
+   for( i = 0; i < nitem; i++ ) {
+      item = astXmlGetItem( elem, i );      
+      if( astXmlCheckType( item, AST__XMLELEM ) && astOK &&
+          !strcmp( astXmlGetName( item ), name ) ){
+         result = (AstXmlElement *) item;
+         break;
+      }
+   }
+
+/* If no element was found, report an error if required. */
+   if( !result && report ) {
+      astError( AST__BADIN, "astRead(XmlChan): No \"<%s>\" element found "
+                "within the enclosing \"<%s>\" element.", name,
+                astXmlGetName( elem ) );
+   }
+
+/* Return the result */
    return result;
 }
 
@@ -543,8 +626,8 @@ static const char *FindNextIsA( AstXmlElement *elem, int start ) {
       item = astXmlGetItem( elem, i );
 
 /* Check this item is an XmlElement with name ISA. */
-      if( astXmlGetType( item ) == AST__XMLELEM ) {
-         if( !strcmp( astXmlGetName( item ), ISA ) ) {
+      if( astXmlCheckType( item, AST__XMLELEM ) ) {
+         if( astOK && !strcmp( astXmlGetName( item ), ISA ) ) {
 
 /* The returned string is th evlaue of the "class" attribute of this
    element. */
@@ -639,10 +722,10 @@ static AstXmlElement *FindObject( AstXmlChan *this, const char *name ) {
          item = astXmlGetItem( this->container, i );
 
 /* Ignore this item if it is not an element. */
-         if( astXmlGetType( item ) == AST__XMLELEM ) {
+         if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
 /* Ignore this element if its name is _ATTRIBUTE. */
-            if( strcmp( astXmlGetName( item ), _ATTRIBUTE ) ){
+            if( astOK && strcmp( astXmlGetName( item ), _ATTRIBUTE ) ){
 
 /* Ignore this element if it represents a default value. */
                def = astXmlGetAttributeValue( item, DEFAULT );
@@ -945,7 +1028,7 @@ static const char *GetTag( AstXmlObject *this, int opening ){
 *     const char *GetTag( AstXmlObject *this, int opening )
 
 *  Description:
-*     This function returns a pointer to a dynamically allocated string
+*     This function returns a pointer to static string
 *     containing an XML tag describing the given XmlObject. It is a
 *     wrapper for the astXmlGetTag function defined in xml.h, but it
 *     additionally removes any "definedby" attribute before formating the
@@ -963,9 +1046,7 @@ static const char *GetTag( AstXmlObject *this, int opening ){
 *        then NULL is returned but no error is reported.
 
 *  Returned Value:
-*     Pointer to a null terminated string holding the tag. This string should 
-*     be freed when no longer needed using astFree. NULL is returned if
-*     the supplied XmlObject does not have the requested tag.
+*     Pointer to a null terminated static string holding the tag. 
 
 *  Notes:
 *     - Empty elements are represented as an start tag of the form <.../>, 
@@ -985,7 +1066,7 @@ static const char *GetTag( AstXmlObject *this, int opening ){
    result = NULL;
 
 /* If the object is an element, check for the "definedby" attribute. */
-   if( astXmlGetType( this ) == AST__XMLELEM ) {
+   if( astXmlCheckType( this, AST__XMLELEM ) ) {
       elem = (AstXmlElement *) this;
 
 /* See if the element contains a "definedby" attribute. */
@@ -1013,35 +1094,36 @@ static const char *GetTag( AstXmlObject *this, int opening ){
    return result;
 }
 
-static int IsAnAstElement( AstXmlElement *elem ){
+static int IsUsable( AstXmlElement *elem ){
 /*
 *  Name:
-*     IsAnAstElement
+*     IsUsable
 
 *  Purpose:
-*     See if an XmlElement describes an AST object.
+*     See if an XmlElement could describe an AST object.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "channel.h"
-*     int IsAnAstElement( AstXmlElement *elem )
+*     int IsUsable( AstXmlElement *elem )
 
 *  Class Membership:
 *     XmlChan member function.
 
 *  Description:
-*     This function returns a non-zero value if the supplied XmlElement 
-*     describes an instance of an AST class. Otherwise zero is returned.
+*     This function checks if an instance of an AST class could be
+*     created from the supplied XmlElement.
 
 *  Parameters:
 *     elem
 *        A pointer to the XmlElement, or NULL.
 
 *  Returned Value:
-*     One if the element describes an AST Object, otherwise zero. Zero is
-*     returned if the supplied pointer is NULL.
+*     If an AST Object could be created from the supplied element, +1 is 
+*     returned. Otherwise, -1 is returned. Zero is returned if the supplied 
+*     pointer is NULL.
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
@@ -1055,13 +1137,13 @@ static int IsAnAstElement( AstXmlElement *elem ){
    int oldrep;                   /* Original value of the Reporting flag */
    int result;                   /* Result value to be returned */
 
-/* Initialise */
-   result = 0;
-
 /* Check the global error status, and the supplied pointer. */
-   if ( !astOK || !elem ) return result;
+   if ( !astOK || !elem ) return 0;
 
-/* Get the namespace URI for the element. This */
+/* Initialise */
+   result = -1;
+
+/* Get the namespace URI for the element. */
    uri = astXmlGetURI( elem );
 
 /* Only proceed if the URI is not defined, or if it the AST URI. */
@@ -1087,13 +1169,18 @@ static int IsAnAstElement( AstXmlElement *elem ){
          }
          astReporting( oldrep );
       }
+  
+/* If the element is in no namespace, use the AST URI as the default
+   namespace for it and its children. */
+      if( !uri ) astXmlAddURI( elem, NULL, AST__XMLNS );
+
    }
 
 /* Return the result. */
    return result;
 }
 
-static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
+static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *elem ) {
 /*
 *  Name:
 *     MakeAstFromXml
@@ -1106,7 +1193,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
 
 *  Synopsis:
 *     #include "xmlchan.h"
-*     AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root )
+*     AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *elem )
 
 *  Class Membership:
 *     XmlChan member function.
@@ -1117,7 +1204,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
 *  Parameters:
 *     this
 *        Pointer to the XmlChan.
-*     root
+*     elem
 *        Pointer to the XML element containing a description of the AST
 *        object.
 
@@ -1128,7 +1215,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
 /* Local Variables: */
    AstLoaderType *loader;        /* Pointer to loader for Object */
    AstObject *new;               /* Pointer to returned Object */
-   AstXmlElement *old_container; /* Element from which items are being read */
+   AstXmlParent *old_container;  /* Element from which items are being read */
    const char *class;            /* Pointer to Object class name string */
 
 /* Initialise. */
@@ -1138,7 +1225,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
    if ( !astOK ) return new;
 
 /* Get the AST class name. This is the name of the XML element. */
-   class = astXmlGetName( root );
+   class = astXmlGetName( elem );
 
 /* Use the associated class name to locate the loader for that
    class. This function will then be used to build the Object. */
@@ -1150,7 +1237,7 @@ static AstObject *MakeAstFromXml( AstXmlChan *this, AstXmlElement *root ) {
    read. */
    if( astOK ) {
       old_container = this->container;
-      this->container = root;
+      this->container = (AstXmlParent *) elem;
 
 /* The "isa_class" item in the XmlChan structure contains a pointer to
    the name of the class whose loader is currently being invoked. It is set 
@@ -1213,9 +1300,14 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen ) {
 */
 
 /* Local Variables: */
-   int nc;                       /* Length of remaining string */
+   char *breakat;                /* Pointer to terminating character */
    char *c;                      /* Pointer to start of next chunk */
+   char *lastend;                /* Pointer to last closing quote */
+   char *lastspace;              /* Pointer to last whitespace character */
+   char *linestart;              /* Pointer to start of current line */
+   char quote;                   /* Opening quote character */
    char tt;                      /* Character temporarily replaced by 0 */
+   int len;                      /* Length of current line */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1224,36 +1316,82 @@ static void OutputText( AstXmlChan *this, const char *text, int mxlen ) {
    if( mxlen < 1 ) {
       astPutNextText( this, text );
 
-/* Otherwise, get the length of the supplied string. */
+/* Otherwise, output the string split up into lines */
    } else {
-      nc = strlen( text );
-      c = (char *) text;
+      c = (char *) text - 1;
+      quote = 0;
+      lastend = NULL;
+      lastspace = NULL;
+      len = 0;
+      linestart = (char *) text;   
 
-/* Loop round writing out chunks of the text (each of "mxlen" characters) 
-   until we are left with a chunk which is less than "mxlen" characters
-   long. */
-      while( nc > mxlen ) {
+/* Loop round each character in the text */
+      while( *(++c ) ){
 
-/* Terminate the string after "mxlen" characters, first saving the
-   character which is replaced by the terminating zero so that it can be
-   re-instated later. */
-         tt = c[ mxlen ];
-         c[ mxlen ] = 0;
+/* Note if we are currently inside a quoted string. Remember the quote
+   character (" or ') so that we can look out for the corresponding
+   closing quote. Note the position of the previous quote end. */
+         if( !quote ) {
+            if( *c == '\"' || *c == '\'' ) quote = *c;
+         } else {
+            if( *c == quote ) {
+               quote = 0;
+               lastend = c;
+            }
+         }             
+
+/* Note the position of hte previous space. */
+         if( isspace( *c ) ) lastspace = c;
+
+/* If we have exceeded the maximum allowed line length, split it. If we
+   are inside a quote, we split it at the last quote end (if any). If we
+   are not in a quote, we split it at the last space, or the last quote
+   end (which ever is closest). To cover the case where the end quote is
+   first character beyoind the limit, reduce the limit a bit. */
+         len++;
+         if( len >= mxlen - 2 ) {
+            if( !quote || !lastend ) {
+               if( lastend && lastspace ){
+                  breakat = ( lastend > lastspace ) ? lastend + 1: lastspace;
+               } else if( lastend ){
+                  breakat = lastend + 1;
+               } else if( lastspace ){
+                  breakat = lastspace;
+               } else {
+                  breakat = c;
+               }
+            } else {
+               breakat = lastend + 1;
+            }
+         } else {
+            breakat = NULL;
+         }
+
+/* If we have a line break, output the current line. */
+         if( breakat ) {
+
+/* Terminate the string, first saving the character which is replaced by the 
+   terminating zero so that it can be re-instated later. */
+            tt = *breakat;
+            *breakat = 0;
 
 /* Write out the newly terminated chunk. */
-         astPutNextText( this, c );
+            astPutNextText( this, linestart );
 
 /* Move on to ths start of the next chunk, decrement the number of characters 
    remaining, and re-instate the character previously over-written by
    zero. */
-         c += mxlen;
-         nc -= mxlen;
-         *c = tt;                  
+            c = breakat;
+            linestart = c;
+            *c = tt;                  
+            len = 0;
+            quote = 0;
+         }
       }
 
 /* Write out any remaining text (this will be less than "mxlen"
    characters long)*/
-      if( *c ) astPutNextText( this, c );
+      if( linestart && *linestart ) astPutNextText( this, linestart );
    }
 }
 
@@ -1290,7 +1428,7 @@ static AstObject *Read( AstChannel *this_channel ) {
 /* Local Variables: */
    AstObject *new;               /* Pointer to returned Object */
    AstXmlChan *this;             /* Pointer to the XmlChan structure */
-   AstXmlElement *root;          /* Root XML element holding AST Object */
+   AstXmlElement *elem;          /* XML element holding AST Object */
 
 /* Initialise. */
    new = NULL;
@@ -1302,27 +1440,40 @@ static AstObject *Read( AstChannel *this_channel ) {
    this = (AstXmlChan *) this_channel;
 
 /* First we construct an in-memory XML representation of the data source,
-   by reading text up to the end of the first AST object encountered. If
-   the Skip attribute is zero, then an error is reported if there is any
-   text prior to the start of the first AST Object. If Skip is non-zero any 
-   initial text prior to the start of the first AST object is ignored. */
-   root = ReadXmlText( this );
+   by reading text up to the end of the first element encountered from
+   which an AST Object could be created. If the Skip attribute is zero, then 
+   an error is reported if there is any text prior to the start of the first 
+   usable element. If Skip is non-zero any initial text prior to the start 
+   of the first usable element is ignored. */
+   elem = ReadXmlText( this );
 
-/* Check an AST Object description was found. */
-   if( root ) {
+/* Check a usable element was found. */
+   if( elem ) {
 
 /* The "current container element" is the XML element from which items
-   are currently being read. Indicat that we are currently not reading
+   are currently being read. Indicate that we are currently not reading
    any element. */
       this->container = NULL;
 
-/* Next we create a new AST Object from this this in-memory XML representation
+/* Next we create a new AST Object from this in-memory XML representation
    of the source. */
-      new = MakeAstFromXml( this, root );
+      new = MakeAstFromXml( this, elem );
 
-/* Remove the root element. This will cause an error to be reported if
-   the root element contains any items which have not been used. */
-      root = Remove( this, root );
+/* Remove the element. This will cause an error to be reported if
+   the element contains any items which have not been used. */
+      elem = Remove( this, elem );
+
+   }
+
+/* If an error has occurred, annul the document. */
+   if( !astOK ) this->readcontext = astXmlAnnul( this->readcontext );
+
+/* Report an error if any XmlObjects remain in existence once the last
+   object has been read from the Xml source. */
+   if( !new && astXmlTrace(1) && astOK ) {
+      astError( AST__INTER, "astRead(XmlChan): %d XmlObjects remain in "
+                "existence after reading the entire source (internal "
+                "AST programming error).", astXmlTrace(3) );
    }
 
 /* If an error occurred, clean up by deleting the new Object and
@@ -1404,20 +1555,20 @@ static void ReadClassData( AstChannel *this_channel, const char *class ) {
 
 /* Find the first "isa" element and get the value of its "class" attribute. 
    If none is found the name of the class being loaded is used. */
-      definedby = FindNextIsA( this->container, 0 );
+      definedby = FindNextIsA( (AstXmlElement *) this->container, 0 );
 
 /* Loop round all elements within the container. */
       nitem = astXmlGetNitem( this->container );
       for( i = 0; astOK && i < nitem; i++ ) {   
          item = astXmlGetItem( this->container, i );
-         if( astXmlGetType( item ) == AST__XMLELEM ) {
+         if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
 /* If this is an "ISA" element, then we have ended the scope of the
    current "isa" class. All subsequent items will be defined by the class
    mentioned in the next following "ISA" element. Find the next ISA
    element and get its class. */
-            if( !strcmp( astXmlGetName( item ), ISA ) ) {
-               definedby = FindNextIsA( this->container, i + 1 );
+            if( astOK && !strcmp( astXmlGetName( item ), ISA ) ) {
+               definedby = FindNextIsA( (AstXmlElement *) this->container, i + 1 );
 
 /* For other element types, add a "definedby" attribute holding the name
    of the class defined by the current ISA element. */
@@ -1874,11 +2025,11 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this ){
 
 *  Description:
 *     This function constructs an in-memory XML representation of the data 
-*     source by reading text up to the end of the first AST object 
-*     encountered. If the Skip attribute is zero, then an error is reported 
-*     if there is any text prior to the start of the first AST Object. If 
-*     Skip is non-zero any initial text prior to the start of the first 
-*     AST object is ignored. 
+*     source by reading text up to the end of the first element encountered
+*     from which an AST Object could be constructed. If the Skip attribute is 
+*     zero, then an error is reported if there is any text prior to the start 
+*     of the first AST Object. If Skip is non-zero any initial text prior to 
+*     the start of the first usable element is ignored. 
 
 *  Parameters:
 *     this
@@ -1887,7 +2038,8 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this ){
 *  Returned Value:
 *     A pointer to the returned XmlElement. This should be annuled using
 *     astXmlAnnul when no longer needed. NULL is returned if the end of
-*     the source text is reached without finding a complete AST Object.
+*     the source text is reached without finding a en element from which 
+*     an AST Object could be read.
 
 *  Notes:
 *     - A NULL pointer is returned if an error has already occurred, of
@@ -1895,15 +2047,9 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this ){
 
 */
 
-/* Local Constants: */
-#define BUFF_LEN 50         /* Size of local text buffer */
-
 /* Local Variables: */
    AstXmlElement *result;   /* Returned pointer */
-   const char *text;        /* Pointer to formatted tag */
-   char buff[ BUFF_LEN + 1 ]; /* Local text buffer */
-   int isAst;               /* Does result describe an AST Object? */
-   int skip;                /* Skip over initial non-AST markup? */
+   int skip;                /* Skip over initial irrelevant markup? */
 
 /* Initialise */
    result = NULL;
@@ -1912,71 +2058,26 @@ static AstXmlElement *ReadXmlText( AstXmlChan *this ){
    if ( !astOK ) return result;
 
 /* Get the value of the Skip attribute. This indicates if we should skip
-   over any non-AST markup prior to the first AST object. */
+   over any irrelevant markup prior to the first element from which an
+   AST object could be created. */
    skip = astGetSkip( this );
 
-/* Loop until we have obtained an XmlElement describing a complete AST Object, 
-   or an error has occurred. */
-   while( !result && astOK ){
+/* Read characters from the XML source and return an XmlElement structure
+   containing the first usable element encountered. */
+   result = astXmlReadDocument( &(this->readcontext), IsUsable, skip, 
+                               GetNextChar, this );
 
-/* Read characters from the source until we find the next XML element
-   start tag. Continue to read the characters contained within this tag, 
-   up to the ">" character marking the end of the start tag, and then create 
-   an empty XmlElement describing the tag. The read stops when the start tag 
-   is complete - it does not go on to read the contents of the element. 
-   All other classes of tag are skipped over. If any characters were 
-   encountered before the returned element start tag, a null terminated copy 
-   of them (or as many of them as will fit) is returned in the supplied 
-   buffer. */
-      result = astXmlReadNextElement( GetNextChar, this, buff, BUFF_LEN );
-
-/* See if this element marks the start of an AST Object. A value of zero is 
-   returned if "result" is NULL. */
-      isAst = IsAnAstElement( result );
-
-/* If skip is zero, the description of the AST object must be the first
-   text read from the source. Therefore, if skip is zero, report an error if: 
-   1) any text preceeded the element or 2) the element does not represent
-   an AST Object. */
-      if( !skip ){
-         if( !buff[ 0 ] && !isAst && result ) {
-            text = GetTag( (AstXmlObject *) result, 1 );
-            strncpy( buff, text, BUFF_LEN );
-            text = astFree( (void *) text );
-         }
-         if( buff[ 0 ] ) {
-            astError( AST__BADIN, "astRead(XmlChan): Cannot interpret the input "
-                      "data: \"%s\".", buff );
-            result = astXmlAnnul( result );
-            break;
-         }
-      }
-
-/* If no tag was read, we must have reached the end of the source. Therefore 
-   leave the loop. */
-      if( !result ) {
-         break;
-
-/* If an XmlElement was created above and describes an AST Object, add content 
-   to it by reading more text from the source. */
-      } else if( isAst ) {
-         astXmlReadContent( result, GetNextChar, this );
-
-/* If a non-AST tag was read, annul the XmlObject and pass through the
-   loop again to find the next start tag. */
-      } else {
-         result = astXmlAnnul( result );
-      }
+/* If no usable element was found, annul the document. */
+   if( !result ) {
+      this->readcontext = astXmlAnnul( this->readcontext );
    }
 
 /* Delete the returned element if an error has occurred. */
-   if( !astOK ) result = astXmlAnnul( result );
+   if( !astOK ) result = astXmlAnnulTree( result );
 
 /* Return the result. */
    return result;
 
-/* Undefine macros local to this function. */
-#undef BUFF_LEN
 }
 
 static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
@@ -2017,11 +2118,9 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
 
 /* Local Variables: */
    AstXmlContentItem *item; /* Item */
-   const char *c;           /* Pointer to next character */
-   const char *text;        /* Pointer to character data */
-   int blank;               /* Is character data blank? */
+   const char *def;         /* Pointer to default attribute value */
    int i;                   /* Index of current item */
-   int nitem;               /* Number of items still i nthe element */
+   int nitem;               /* Number of items still in the element */
 
 /* Check the global error status, and the supplied element. */
    if ( !astOK || !element ) return NULL;
@@ -2030,7 +2129,7 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
    check that the container is the elements parent. If so, remove the
    element from its parent container. */
    if( this->container ) {
-      if( this->container != astXmlGetParent( element ) ){
+      if( (AstXmlParent *) this->container != astXmlGetParent( element ) ){
          astError( AST__INTER, "Remove(XmlChan): Supplied element is not "
                    "contained within the current container element (internal "
                    "AST programming error)." );
@@ -2039,16 +2138,19 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
       }
    }
 
-/* Check that the element being removed is empty (apart from comments and
-   "isa" elements). */
+/* Check that the element being removed is empty (apart from comments,
+   defaulted values and "isa" elements). */
    nitem = astXmlGetNitem( element );
    for( i = 0; i < nitem; i++ ) {
       item = astXmlGetItem( element, i );
+      if( astXmlCheckType( item, AST__XMLELEM ) ) {
 
-      if( astXmlGetType( item ) == AST__XMLELEM ) {
+/* See if this element represents a default value */
+         def = astXmlGetAttributeValue( item, DEFAULT );
 
-/* "isa" elements are OK. */
-         if( strcmp( astXmlGetName( item ), ISA ) ) {
+/* Default values and "isa" elements are OK. */
+         if( ( !def || strcmp( def, TRUE ) ) && astOK &&
+             strcmp( astXmlGetName( item ), ISA ) ) {
 
 /* Remove any "definedby" attribute (added by ReadClassData) so that it
    does not appear in the error message. */
@@ -2062,33 +2164,20 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
             break;
          }
                
-      } else if( astXmlGetType( item ) == AST__XMLCHAR ) {
-
 /* Character data is OK so long as it contains only white space */
-         blank = 1;
-         text = astXmlGetValue( item );
-         c = text - 1;
-         while( *(++c) ) {
-            if( !isspace( *c ) ) {
-               blank = 0;
-               break;
-            }
-         }
-
-         if( !blank ) {
-            astError( AST__BADIN, "astRead(XmlChan): The following character "
-                      "data was not recognised as valid input within a %s: %s",
-                      astXmlGetName( element ), astXmlGetValue( item ) );
-            break;
-         }
-
-      } else if( astXmlGetType( item ) == AST__XMLCDATA ) {
-         astError( AST__BADIN, "astRead(XmlChan): The following CDATA section "
+      } else if( astXmlCheckType( item, AST__XMLBLACK ) ) {
+         astError( AST__BADIN, "astRead(XmlChan): The following character "
                    "data was not recognised as valid input within a %s: %s",
-                   astXmlGetName( element ), astXmlGetValue( item ) );
+                   astXmlGetName( element ), astXmlGetValue( item, 0 ) );
          break;
 
-      } else if( astXmlGetType( item ) == AST__XMLPI ) {
+      } else if( astXmlCheckType( item, AST__XMLCDATA ) ) {
+         astError( AST__BADIN, "astRead(XmlChan): The following CDATA section "
+                   "data was not recognised as valid input within a %s: %s",
+                   astXmlGetName( element ), astXmlGetValue( item, 0 ) );
+         break;
+
+      } else if( astXmlCheckType( item, AST__XMLPI ) ) {
          astError( AST__BADIN, "astRead(XmlChan): The following processing "
                    "instruction was not recognised as valid input within "
                    "a %s: %s", astXmlGetName( element ), GetTag( (AstXmlObject *) item, 1 ) );
@@ -2096,7 +2185,8 @@ static AstXmlElement *Remove( AstXmlChan *this, AstXmlElement *element ) {
       }
    }
 
-/* Annul the element. */
+/* Renmove the element from its parent and the annul it. */
+   astXmlRemoveItem( element );
    astXmlAnnul( element );   
 
 /* Return a NULL pointer. */
@@ -2602,26 +2692,26 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
    DEFAULT attribute. */
    if( !this->objectset ) astXmlAddAttr( elem, DEFAULT, TRUE, NULL );
 
+/* Add commments if required. */
+   if( astGetComment( this_channel ) ) {
+
 /* If we are adding comments, and if a comment was supplied as a
    parameter to this function, then store the commment as an attribute of
    the element. This comment describes the class function as a whole, not
    the specific usage of this instance of the class (this is given by the
    comment in this->objectcomment). */
-   if( comment && *comment && astGetComment( this_channel ) ) {
-      astXmlAddAttr( elem, DESC, comment, NULL );
-   }
+      if( comment && *comment ) astXmlAddComment( elem, 0, comment );
 
 /* If the object has a usage comment, add it to the content of the
    element if required. */
-   if( astGetComment( this_channel ) && this->objectcomment ) {
-      astXmlAddComment( elem, this->objectcomment );
+      if( this->objectcomment ) astXmlAddAttr( elem, DESC, this->objectcomment, NULL );
    }
 
 /* Make the new element the current container. */
-   this->container = elem;
+   this->container = (AstXmlParent *) elem;
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 }
 
@@ -2769,7 +2859,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
    }
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
@@ -2810,14 +2900,18 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
 
 /* Local Variables: */
    AstXmlChan *this;             /* Pointer to the XmlChan structure */
-   AstXmlElement *parent;        /* Pointer to parent element */
+   AstXmlParent *parent;         /* Pointer to parent element */
    char *d;                      /* Pointer to end of next sub-string */
    char *c;                      /* Pointer to start of next sub-string */
    char *text;                   /* Pointer to complete string */
    int mxlen;                    /* Max allowed length of text */
+   int nobj;                     /* No. of XmlObjects in existence */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Save the number of XmlObjects currenyl in existenece. */
+   nobj = astXmlTrace(3);
 
 /* Obtain a pointer to the XmlChan structure. */
    this = (AstXmlChan *) this_channel;
@@ -2867,16 +2961,30 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
 /* Free the memory holding the text and in-memory representations of the AST 
    Object. */
             text = astFree( (void *) text );
-            astXmlAnnul( this->container );
+            astXmlRemoveItem( this->container );
+            this->container = astXmlAnnul( this->container );
+
+/* Report an error if there is a memory leak. */
+            if( astXmlTrace(3) > nobj && astOK ) {
+               astError( AST__INTER, "astWriteEnd(XmlChan): %d XmlObjects "
+                         "remain in existence - should be %d (internal AST "
+                         "programming error).", astXmlTrace(3), nobj );
+            }
          }
       }
 
 /* Reset the current container element to be the parent found above. */
-      this->container = parent;
+      if( !parent || astXmlCheckType( parent, AST__XMLELEM ) ) {
+         this->container = parent;
+      } else if( astOK ) {
+         astError( AST__INTER, "astWriteEnd(XmlChan): Cannot update "
+                   "container: parent is not an XmlElement (internal "
+                   "AST programming error)." );
+      }
    }
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 }
 
@@ -3018,7 +3126,7 @@ static void WriteInt( AstChannel *this_channel, const char *name, int set, int h
    }
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
@@ -3112,7 +3220,7 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
    this->write_isa = 0;
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 }
 
 static void WriteObject( AstChannel *this_channel, const char *name,
@@ -3247,7 +3355,7 @@ static void WriteObject( AstChannel *this_channel, const char *name,
    }
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 }
 
@@ -3388,7 +3496,7 @@ static void WriteString( AstChannel *this_channel, const char *name, int set,
    }
 
 /* If an error has occurred, annul the container element in the XmlChan. */
-   if( !astOK ) this->container = astXmlAnnul( this->container );
+   if( !astOK ) this->container = astXmlAnnulTree( this->container );
 
 }
 
@@ -3517,6 +3625,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->objectname = NULL;   /* Name of object being written */
    out->objectset = 1;       /* Is object being written set?*/
    out->objectcomment = NULL;/* Comment for object class being written */
+   out->readcontext = NULL;  /* XmlElement giving context for current read */ 
    out->container = NULL;    /* XmlElement to which content will be added */ 
    out->write_isa = 0;       /* Write out the next "IsA" item? */
    out->reset_source = 1;    /* A new line should be read from the source */
@@ -4179,6 +4288,7 @@ AstXmlChan *astInitXmlChan_( void *mem, size_t size, int init,
       new->objectset = 1;       /* Is object being written set?*/
       new->objectcomment = NULL;/* Comment for object class being written */
       new->container = NULL;    /* XmlElement to which content will be added */ 
+      new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indentat output? */
       new->xmllength = -INT_MAX;/* Buffer length */
@@ -4316,6 +4426,7 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
       new->objectset = 1;       /* Is object being written set?*/
       new->objectcomment = NULL;/* Comment for object class being written */
       new->container = NULL;    /* XmlElement to which content will be added */ 
+      new->readcontext = NULL;  /* XmlElement giving context for current read */ 
       new->write_isa = 0;       /* Write out the next "IsA" item? */
       new->xmlindent = -1;      /* Indent output? */
       new->xmllength = -INT_MAX;/* Buffer length */
@@ -4351,7 +4462,6 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
    Note that the member function may not be the one defined here, as it may
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
-
 
 
 

@@ -94,7 +94,7 @@
 *        provided for external calls to the AST library.
 
 *  Copyright:
-*     Copyright (C) 2003 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)

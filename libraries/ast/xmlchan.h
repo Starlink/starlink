@@ -74,7 +74,8 @@ typedef struct AstXmlChan {
    const char *objectname;     /* Name of Object currently being written. */
    const char *objectcomment;  /* Comment for Object currently being written. */
    int objectset;              /* Is the Object currently being written set? */
-   AstXmlElement *container;   /* XmlElement to which content will be added */
+   AstXmlParent *container;    /* XmlParent to which content will be added */
+   AstXmlDocument *readcontext;/* XmlDocument giving context for current read */
    int write_isa;              /* Is the next "isA" really needed? */
    int xmlindent;              /* Indentat output? */
    int xmllength;              /* Buffer length */

@@ -16,24 +16,24 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {210.11}
+\newcommand{\stardocnumber}    {210.13}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {18th August 2003}
+\newcommand{\stardocdate}      {13th November 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2003 Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 2004 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
-\newcommand{\stardocversion}   {V3.0}
+\newcommand{\stardocversion}   {V3.1}
 \newcommand{\stardocmanual}    {Programmer's Guide\\(Fortran Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (Fortran Version)}
 \newcommand{\stardocabstract}  {
 The AST library provides a comprehensive range of facilities for
 attaching world coordinate systems to astronomical data, for
-retrieving and interpreting that information and for generating
-graphical output based on it.
+retrieving and interpreting that information in a variety of formats,
+including FITS-WCS, and for generating graphical output based on it.
 
 This programmer's manual should be of interest to anyone writing
 astronomical applications which need to manipulate coordinate system
@@ -186,7 +186,8 @@ environment-independent.
    \renewcommand{\secref}[1]{\ref{#1}}
 \end{htmlonly}
 
-\newcommand{\fitsurl}[0]{http://www.gsfc.nasa.gov/fits_home.html}
+\newcommand{\fitsurl}[0]{http://fits.gsfc.nasa.gov/}
+\newcommand{\fitskey}[3]{{#1}&{#2}&{#3}\\}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -344,7 +345,9 @@ and need to use celestial coordinates ({\em{e.g.}}\ RA and Dec), spectral
 coordinates ({\em{e.g.}}\ wavelength, frequency, {\em{etc.}}), or
 other coordinate system information, then this library should be of
 interest. It provides solutions for most of the problems you will meet
-and allows you to write robust and flexible software.
+and allows you to write robust and flexible software. It is able to read
+and write WCS information in a variety of formats, including 
+\htmladdnormallink{FITS-WCS}{http://fits.gsfc.nasa.gov/fits_wcs.html}. 
 
 %\subsection{TBW---What is a World Coordinate \htmlref{System}{System}?}
 
@@ -479,6 +482,11 @@ extern "C" {
 \normalsize
 \end{quote}
 
+A JNI interface (known as ``JNIAST'' - see 
+\htmladdnormallink{http://www.starlink.ac.uk/jniast/}
+{http://www.starlink.ac.uk/jniast/}) has also been developed by Starlink 
+which allows AST to be used from Java.
+
 \item {\bf{\htmlref{Object}{Object} Oriented Design.}}
 AST uses ``object oriented'' techniques internally in order to provide
 a flexible and easily-extended programming model.  A fairly
@@ -578,7 +586,7 @@ following and, where appropriate, their inverses:
 \htmlref{SlaMap}{SlaMap}).
 
 \item Conversions between various spectral coordinate systems (the
-\htmlref{SpecMap}{SpecMap} and GrismMap).
+\htmlref{SpecMap}{SpecMap} and \htmlref{GrismMap}{GrismMap}).
 
 \item Conversion between 2-dimensional spherical celestial coordinates
 (longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
@@ -590,7 +598,9 @@ coordinate spaces---{\em{i.e.}}\ map projections (the \htmlref{DssMap}{DssMap} a
 \htmlref{PermMap}{PermMap}).
 
 \item Various linear coordinate transformations (the \htmlref{MatrixMap}{MatrixMap}, \htmlref{WinMap}{WinMap},
-ShiftMap and \htmlref{ZoomMap}{ZoomMap}).
+\htmlref{ShiftMap}{ShiftMap} and \htmlref{ZoomMap}{ZoomMap}).
+
+\item General N-dimensional polynomial transformations (the \htmlref{PolyMap}{PolyMap}).
 
 \item Lookup tables (the \htmlref{LutMap}{LutMap}).
 
@@ -901,6 +911,17 @@ possible to intercept the text being processed by a Channel so that it
 may be redirected to/from any chosen external data store, such as a
 text file, an astronomical dataset, or a network connection.
 
+The text format used by the basic Channel class is peculiar to the AST
+library - no other software will understand it. However, more specialised 
+forms of Channel are provided which use text formats more widely
+understood.
+
+An \htmlref{XmlChan}{XmlChan} is a type of Channel which stores the text in the form of 
+XML markup. Currently, the only form of markup provided by the XmlChan
+class is closely related to the text format produced by the basic Channel 
+class (currently, no schema or DTD is available describing this format). 
+It is hoped to add more widely understood formats later. 
+
 To further facilitate the storage of coordinate system information in
 astronomical datasets, a more specialised form of Channel called a
 \htmlref{FitsChan}{FitsChan} is provided. Instead of using free-format text, a FitsChan
@@ -1101,7 +1122,7 @@ the WCS information. This pointer can now be used to perform many
 useful tasks, some of which are illustrated in the following recipes.
 
 Some datasets which do not easily yield FITS header cards may require
-a different approach, possibly involving use of a \htmlref{Channel}{Channel}
+a different approach, possibly involving use of a \htmlref{Channel}{Channel} or \htmlref{XmlChan}{XmlChan}
 (\secref{ss:channels}) rather than a \htmlref{FitsChan}{FitsChan}. In the case of the
 Starlink NDF data format, for example, all the above may be replaced
 by a single call to the routine
@@ -1459,7 +1480,7 @@ In AST, it can be represented by concatenating two Mappings. The first
 is a \htmlref{MatrixMap}{MatrixMap}, which implements the matrix multiplication. The second
 is a \htmlref{WinMap}{WinMap}, which linearly transforms one coordinate window on to
 another, but will be used here simply to implement the shift of
-origin (alternatively, a ShiftMap could have been used in place of a
+origin (alternatively, a \htmlref{ShiftMap}{ShiftMap} could have been used in place of a
 WinMap). These Mappings may be constructed and concatenated as follows:
 
 \small
@@ -1641,7 +1662,7 @@ but you would obviously replace this with a subroutine call to store
 the cards in your output dataset.
 
 For data systems that do not use FITS header cards, a different
-approach may be needed, possibly involving use of a \htmlref{Channel}{Channel}
+approach may be needed, possibly involving use of a \htmlref{Channel}{Channel} or \htmlref{XmlChan}{XmlChan}
 (\secref{ss:channels}) rather than a FitsChan.  In the case of the
 Starlink NDF data format, for example, all of the above may be
 replaced by a single call to the routine
@@ -2061,6 +2082,7 @@ Object
       ZoomMap
    Channel
       FitsChan
+      XmlChan
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -2732,6 +2754,7 @@ as a whole and some of the sub-classes it contains:
       MathMap
       MatrixMap
       PermMap
+      PolyMap
       SlaMap
       SpecMap
       UnitMap
@@ -4600,6 +4623,7 @@ may be included in a units string, the standard prefixes for multiples
 and sub-multiples, and the strings which may be used to represent
 mathematical operators and functions.
 
+\begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|l|l|l|}
 \hline
@@ -4618,7 +4642,9 @@ luminous intensity  & cd  & candela \\
 \hline
 \end{tabular}
 \end{center}
+\end{table}
 
+\begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|l|l|l|l|}
 \hline
@@ -4675,7 +4701,9 @@ time  & min & minute & 60 s \\
 \hline
 \end{tabular}
 \end{center}
+\end{table}
 
+\begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|lll|lll|}
 \hline
@@ -4698,7 +4726,9 @@ $10^{-24}$ & yocto & y & $10^{24}$ & yotta & Y \\
 \hline
 \end{tabular}
 \end{center}
+\end{table}
 
+\begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|l|l|}
 \hline
@@ -4718,6 +4748,7 @@ sqrt(sym1)          & square root \\
 \hline
 \end{tabular}
 \end{center}
+\end{table}
 
 \subsubsection{Side-effects of Changing the Unit attribute}
 If an \htmlref{Axis}{Axis} has an active Unit attribute, changing its value (either by 
@@ -7344,11 +7375,12 @@ different external representations in order to be compatible with
 (say) the astronomical data storage system in which they will reside.
 
 In this section, we discuss the basic I/O facilities which support
-external representations based on text. These are implemented using a
-new kind of Object---a \htmlref{Channel}{Channel}. We will examine later how
-to use other representations, based on FITS headers, for storing
-Objects. These are implemented using a more specialised form of
-Channel called a \htmlref{FitsChan}{FitsChan} (\secref{ss:nativefits}).
+external representations based on a textual format referred to as the AST
+``native format''. These are implemented using a new kind of Object---a
+\htmlref{Channel}{Channel}. We will examine later how to use other representations, based on
+an XML format or on the use of FITS headers, for storing Objects. These
+are implemented using more specialised forms of Channel called \htmlref{XmlChan}{XmlChan} 
+(\secref{ss:xmlchan}) and \htmlref{FitsChan}{FitsChan} (\secref{ss:nativefits}).
 
 \subsection{The Channel Model}
 
@@ -8072,13 +8104,138 @@ also be implemented {\em{via}} source and sink functions in basically
 the same way.
 
 \cleardoublepage
+\section{\label{ss:xmlchan}Storing AST Objects as XML (XmlChan)}
+
+\begin{latexonly}
+XML\footnote{http://www.w3.org/XML/}
+\end{latexonly}
+\begin{htmlonly}
+\htmladdnormallink{XML}{http://www.w3.org/XML/}
+\end{htmlonly}
+is fast becoming the standard format for passing structured data around
+the internet, and much general purpose software has been written for
+tasks such as the parsing, editing, display and transformation of XML
+data. The \htmlref{XmlChan}{XmlChan} class (a specialised form of \htmlref{Channel}{Channel}) provides
+facilities for storing AST objects externally in the form of XML documents, 
+thus allowing such software to be used.
+
+Currently, there is no DTD or schema defining the structure of data produced 
+by an XmlChan. At the moment, such data is limited to be a fairly close
+transliteration of the AST native format produced by the basic Channel
+class. The following is a native AST representation of a simple 1-D \htmlref{Frame}{Frame}
+(including comments and with the \htmlref{Full}{Full} attribute set to zero so that some
+default attribute values are included as extra comments):
+
+\begin{quote}
+\small
+\begin{verbatim}
+ Begin Frame    # Coordinate system description
+#   Title = "1-d coordinate system"     # Title of coordinate system
+    Naxes = 1   # Number of coordinate axes
+    Domain = "SCREEN"   # Coordinate system domain
+#   Lbl1 = "Axis 1"     # Label for axis 1
+#   Uni1 = "cm"         # Units for axis 1
+    Ax1 =       # Axis number 1
+       Begin Axis       # Coordinate axis
+          Unit = "cm"   # Axis units
+       End Axis
+ End Frame
+\end{verbatim}
+\normalsize
+\end{quote}
+
+The corresponding XmlChan output would look like:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/" 
+        desc="Coordinate system description">
+    <_attribute name="Title" quoted="true" value="1-d coordinate system"
+                desc="Title of coordinate system" default="true"/>
+    <_attribute name="Naxes" value="1" desc="Number of coordinate axes"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"
+                desc="Coordinate system domain"/>
+    <_attribute name="Lbl1" quoted="true" value="Axis 1" 
+                desc="Label for axis 1" default="true"/>
+    <_attribute name="Uni1" quoted="true" value="cm" 
+                desc="Units for axis 1" default="true"/>
+    <Axis label="Ax1" desc="Coordinate axis">
+       <!--Axis number 1-->
+       <_attribute name="Unit" quoted="true" value="cm" desc="Axis units"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+Notes:
+
+\begin{enumerate}
+\item The AST class name is used as the name for an XML element which contain 
+a description of an AST object.
+
+\item AST attributes are described by XML elements with the name
+``\_attribute''. Unfortunately, the word ``attribute'' is also used by XML
+to refer to a ``name=value'' pair within an element start tag. So for
+instance, the ``\htmlref{Title}{Title}'' attribute of the AST Frame object is described
+within an XML element with name ``\_attribute'' in which the XML attribute
+``name'' has the value ``Title'', and the XML attribute ``value'' has the 
+value ``1-d coordinate system''. The moral is always to be clear clear 
+about the context (AST or XML) in which the word \emph{attribute} is being 
+used!
+
+\item The XML includes comments both as XML attributes with the name ``desc'', 
+and as separate comment tags.
+
+\item Elements which describe default values are identified by the fact
+that they have an XML attribute called ``default'' set to the value
+``true''. These elements are ignored when being read back into an XmlChan.
+
+\item The outer-most XML element of an AST object will set the default
+namespace to \verb+http://www.starlink.ac.uk/ast/xml/+ which will be
+inherited by all nested elements.
+
+\end{enumerate}
+
+
+The XmlChan class changes the default value for the \htmlref{Comment}{Comment} and Full
+attributes (inherited from the base Channel class) to zero and -1,
+resulting in terse output by default. With the default values for these
+attributes, the above XML is reduced to the following:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ <Frame xmlns="http://www.starlink.ac.uk/ast/xml/">
+    <_attribute name="Naxes" value="1"/>
+    <_attribute name="Domain" quoted="true" value="SCREEN"/>
+    <Axis label="Ax1">
+       <_attribute name="Unit" quoted="true" value="cm"/>
+    </Axis>
+ </Frame>
+\end{verbatim}
+\normalsize
+\end{quote}
+
+
+The XmlChan class uses the \htmlref{Skip}{Skip} attributes very similarly to the Channel
+class. If Skip is zero (the default) then an error will be reported if the text
+supplied by the source function does not begin with an AST \htmlref{Object}{Object}. If
+Skip is non-zero, then initial text is skipped over without error until
+the start of an AST object is found. this allows an AST object to be
+located within a larger XML document.
+
+
+\cleardoublepage
 \section{\label{ss:nativefits}Storing AST Objects in FITS Headers (FitsChans)}
 
 \begin{latexonly}
 A FITS header is a sequence of 80-character strings, formatted
 according to particular rules defined by the Flexible Image Transport
 \htmlref{System}{System}
-(FITS). FITS\footnote{http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}
+(FITS). FITS\footnote{http://fits.gsfc.nasa.gov/}
 is a widely-used standard for data interchange in astronomy and has
 also been adopted as a data processing format in some astronomical
 data reduction systems.  The individual 80-character strings in a FITS
@@ -8089,7 +8246,7 @@ entirely anachronistic reasons).
 A FITS header is a sequence of 80-character strings, formatted
 according to particular rules defined by the Flexible Image Transport
 System (FITS).
-\htmladdnormallink{FITS}{http://www.gsfc.nasa.gov/astro/fits/fits_home.html}
+\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}
 is a widely-used standard for data interchange in astronomy and has
 also been adopted as a data processing format in some astronomical
 data reduction systems.  The individual 80-character strings in a FITS
@@ -8747,7 +8904,7 @@ FITS headers, which we call {\em{encodings.}} Here, we are concerned
 with those encodings defined by software systems other than AST, which
 we term {\em{foreign encodings.}}
 
-Currently, AST supports three foreign encodings, which may be selected
+Currently, AST supports five foreign encodings, which may be selected
 by setting the \htmlref{Encoding}{Encoding} attribute of a \htmlref{FitsChan}{FitsChan} to one of the
 following (character string) values:
 
@@ -8769,26 +8926,26 @@ information using this encoding and then to write it back out again,
 so long as only minor changes have been made.
 
 \item[FITS-WCS]\mbox{}\\
-This encoding is potentially very important because it is based on a
-proposed new FITS standard which should, for the first time, address
-the problem of celestial coordinate systems in a proper manner, by
-considerably extending the original FITS standard.
+This encoding is very important because it is based on a new FITS standard 
+which should, for the first time, address the problem of celestial coordinate 
+systems in a proper manner, by considerably extending the original FITS 
+standard.
 
-The convention used is described in the paper ``Representation
-of celestial coordinates in FITS'' \htmladdnormallinkfoot{(the
-FITS-WCS paper)}{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}
-by E.W.\,Greisen and M.\,Calabretta (Astronomy \& Astrophysics). Now that
-this FITS standard has been agreed, this encoding
-should be understood by any FITS-WCS compliant software and it is
-likely to be adopted widely for FITS data in future.  Currently, AST does
-not supports the FITS conventions described in papers III (spectral coordinate
-systems) and IV (distrortions) which are still in draft form.
+The conventions used are described in a series of papers by
+E.W.\,Greisen, M.\,Calabretta, \emph{et. al.}, often referred to as the
+``FITS-WCS papers''. They are described at
+\htmladdnormallink{http://fits.gsfc.nasa.gov/fits\_wcs.html}
+{http://fits.gsfc.nasa.gov/fits_wcs.html}. Now that the first two papers
+in this series have been agreed, this encoding should be understood by any 
+FITS-WCS compliant software and it is likely to be adopted widely for FITS 
+data in future.  For details of the coverage of these conventions provided
+by the FitsChan class, see \appref{ss:fitswcscoverage}.
 
 \item[FITS-IRAF]\mbox{}\\
 This encoding is based on the conventions described in the document
 ``World Coordinate Systems Representations Within the FITS Format'' by R.J.
 Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
-fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently employed
+fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is employed
 by the IRAF data analysis facility, so its use will facilitate data
 exchange with IRAF. This encoding is in effect a sub-set of the current
 FITS-WCS encoding.
@@ -8885,7 +9042,7 @@ from a set of FITS header cards which have been written by some other
 software system. We will pretend that our program does not know which
 encoding has been used for the WCS information and must discover this
 for itself. In order to have a concrete example, however, we will use
-the following set of cards. These use the FITS-WCS encoding and
+the following set of cards. These use the FITS-AIPS encoding and
 contain a typical mix of other FITS cards which are irrelevant to the
 WCS information in which we are interested:
 
@@ -9082,10 +9239,6 @@ written out as FITS headers to describe the modified image
 If the FrameSet contains other Frames (apart from the base and current
 Frames), then you would also have access to information about other
 coordinate systems associated with the image.
-
-Note, currently the FitsChan class does not recognise spectral axes. They
-are treated as an ``unknown'' axis type, and are represented by simple
-1-dimensional Frames (not SpecFrames).
 
 \subsection{\label{ss:destructiveread}Removing WCS Information from FITS Headers---the Destructive Read}
 
@@ -10860,6 +11013,7 @@ Object             - Base class for all AST Objects
       SkyAxis      - Store celestial axis information
    Channel         - Basic (textual) I/O channel
       FitsChan     - I/O Channel using FITS header cards
+      XmlChan      - I/O Channel using XML
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
       DssMap       - Map points using Digitised Sky Survey plate solution
@@ -10876,6 +11030,7 @@ Object             - Base class for all AST Objects
       MatrixMap    - Map positions by multiplying them by a matrix
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
+      PolyMap      - General N-dimensional polynomial Mapping
       ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
@@ -14710,6 +14865,67 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_GRISMMAP\sstlabel{AST_GRISMMAP}
+}{
+   Create a GrismMap
+}{
+   \sstdescription{
+      This function creates a new \htmlref{GrismMap}{GrismMap} and optionally initialises
+      its attributes.
+
+      A GrismMap is a specialised form of \htmlref{Mapping}{Mapping} which transforms
+      1-dimensional coordinates using the spectral dispersion equation
+      described in FITS-WCS paper III {\tt{"}}Representation of spectral
+      coordinates in FITS{\tt{"}}. This describes the dispersion produced by
+      gratings, prisms and grisms.
+
+      When initially created, the forward transformation of a GrismMap
+      transforms input {\tt{"}}grism parameter{\tt{"}} values into output wavelength
+      values. The {\tt{"}}grism parameter{\tt{"}} is a dimensionless value which is
+      linearly related to position on the detector. It is defined in FITS-WCS
+      paper III as {\tt{"}}the offset on the detector from the point of intersection
+      of the camera axis, measured in units of the effective local length{\tt{"}}.
+      The units in which wavelength values are expected or returned is
+      determined by the values supplied for the \htmlref{GrismWaveR}{GrismWaveR}, \htmlref{GrismNRP}{GrismNRP} and
+      \htmlref{GrismG}{GrismG} attribute: whatever units are used for these attributes will
+      also be used for the wavelength values.
+   }
+   \sstinvocation{
+      RESULT = AST\_GRISMMAP( OPTIONS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         OPTIONS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string containing an optional comma-separated
+         list of attribute assignments to be used for initialising the
+         new GrismMap. The syntax used is identical to that for the
+         \htmlref{AST\_SET}{AST_SET} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_GRISMMAP = INTEGER
+      }{
+         A pointer to the new GrismMap.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
+         function is invoked with STATUS set to an error value, or if it
+         should fail for any reason.
+      }
+   }
+}
+\sstroutine{
    AST\_INTRAMAP\sstlabel{AST_INTRAMAP}
 }{
    Create an IntraMap
@@ -17050,6 +17266,119 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_POLYMAP\sstlabel{AST_POLYMAP}
+}{
+   Create a PolyMap
+}{
+   \sstdescription{
+      This function creates a new \htmlref{PolyMap}{PolyMap} and optionally initialises
+      its attributes.
+
+      A PolyMap is a form of \htmlref{Mapping}{Mapping} which performs a general polynomial
+      transformation.  Each output coordinate is a polynomial function of
+      all the input coordinates. The coefficients are specified separately
+      for each output coordinate. The forward and inverse transformations
+      are defined independantly by separate sets of coefficients.
+   }
+   \sstinvocation{
+      RESULT = AST\_POLYMAP( NIN, NOUT, NCOEFF\_F, COEFF\_F, NCOEFF\_I, COEFF\_I,
+                            OPTIONS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NIN = INTEGER (Given)
+      }{
+         The number of input coordinates.
+      }
+      \sstsubsection{
+         NOUT = INTEGER (Given)
+      }{
+         The number of output coordinates.
+      }
+      \sstsubsection{
+         NCOEFF\_F = INTEGER (Given)
+      }{
+         The number of non-zero coefficients necessary to define the
+         forward transformation of the PolyMap. If zero is supplied, the
+         forward transformation will be undefined.
+      }
+      \sstsubsection{
+         COEFF\_F( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array containing
+         {\tt{"}}NCOEFF\_F$*$( 2 $+$ NIN ){\tt{"}} elements. Each group of {\tt{"}}2 $+$ NIN{\tt{"}}
+         adjacent elements describe a single coefficient of the forward
+         transformation. Within each such group, the first element is the
+         coefficient value; the next element is the integer index of the
+         PolyMap output which uses the coefficient within its defining
+         polynomial (the first output has index 1); the remaining elements
+         of the group give the integer powers to use with each input
+         coordinate value (powers must not be negative, and floating
+         point values are rounded to the nearest integer).
+
+         For instance, if the PolyMap has 3 inputs and 2 outputs, each group
+         consisting of 5 elements, A groups such as {\tt{"}}(1.2, 2.0, 1.0, 3.0, 0.0){\tt{"}}
+         describes a coefficient with value 1.2 which is used within the
+         definition of output 2. The output value is incremented by the
+         product of the coefficient value, the value of input coordinate
+         1 raised to the power 1, and the value of input coordinate 2 raised
+         to the power 3. Input coordinate 3 is not used since its power is
+         specified as zero. As another example, the group {\tt{"}}(-1.0, 1.0,
+         0.0, 0.0, 0.0 ){\tt{"}} describes adds a constant value -1.0 onto
+         output 1 (it is a constant value since the power for every input
+         axis is given as zero).
+
+         Each final output coordinate value is the sum of the {\tt{"}}NCOEFF\_F{\tt{"}} terms
+         described by the {\tt{"}}NCOEFF\_F{\tt{"}} groups within the supplied array.
+      }
+      \sstsubsection{
+         NCOEFF\_I = INTEGER (Given)
+      }{
+         The number of non-zero coefficients necessary to define the
+         inverse transformation of the PolyMap. If zero is supplied, the
+         inverse transformation will be undefined.
+      }
+      \sstsubsection{
+         COEFF\_I( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array containing
+         {\tt{"}}NCOEFF\_I$*$( 2 $+$ NOUT ){\tt{"}} elements. Each group of {\tt{"}}2 $+$ NOUT{\tt{"}}
+         adjacent elements describe a single coefficient of the inverse
+         transformation, using the same schame as {\tt{"}}COEFF\_F{\tt{"}},
+         except that {\tt{"}}inputs{\tt{"}} and {\tt{"}}outputs{\tt{"}} are transposed.
+      }
+      \sstsubsection{
+         OPTIONS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string containing an optional comma-separated
+         list of attribute assignments to be used for initialising the
+         new PolyMap. The syntax used is identical to that for the
+         \htmlref{AST\_SET}{AST_SET} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_POLYMAP = INTEGER
+      }{
+         A pointer to the new PolyMap.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
+         function is invoked with STATUS set to an error value, or if it
+         should fail for any reason.
+      }
+   }
+}
+\sstroutine{
    AST\_PUTFITS\sstlabel{AST_PUTFITS}
 }{
    Store a FITS header card in a FitsChan
@@ -18563,6 +18892,68 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_SHIFTMAP\sstlabel{AST_SHIFTMAP}
+}{
+   Create a ShiftMap
+}{
+   \sstdescription{
+      This function creates a new \htmlref{ShiftMap}{ShiftMap} and optionally initialises its
+      attributes.
+
+      A ShiftMap is a linear \htmlref{Mapping}{Mapping} which shifts each axis by a
+      specified constant value.
+   }
+   \sstinvocation{
+      RESULT = AST\_SHIFTMAP( NCOORD, SHIFT, OPTIONS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NCOORD = INTEGER (Given)
+      }{
+         The number of coordinate values for each point to be
+         transformed (i.e. the number of dimensions of the space in
+         which the points will reside). The same number is applicable
+         to both input and output points.
+      }
+      \sstsubsection{
+         SHIFT( NCOORD ) = DOUBLE PRECISION (Given)
+      }{
+         An array containing the values to be added on to the input
+         coordinates in order to create the output coordinates. A separate
+         value should be supplied for each coordinate.
+      }
+      \sstsubsection{
+         OPTIONS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string containing an optional comma-separated
+         list of attribute assignments to be used for initialising the
+         new ShiftMap. The syntax used is identical to that for the
+         \htmlref{AST\_SET}{AST_SET} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_SHIFTMAP = INTEGER
+      }{
+         A pointer to the new ShiftMap.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
+         function is invoked with STATUS set to an error value, or if it
+         should fail for any reason.
+      }
+   }
+}
+\sstroutine{
    AST\_SHOW\sstlabel{AST_SHOW}
 }{
    Display a textual representation of an Object on standard output
@@ -18961,6 +19352,12 @@ Object             - Base class for all AST Objects
 
          \sstitem
          {\tt{"}}EQHPR{\tt{"}} (DATE,OBSX,OBSY,OBSZ): Convert J2000.0 equatorial coordinates to Helioprojective-Radial.
+
+         \sstitem
+         {\tt{"}}HEEQ{\tt{"}} (DATE): Convert helio-ecliptic coordinates to J2000.0 equatorial.
+
+         \sstitem
+         {\tt{"}}EQHE{\tt{"}} (DATE): Convert J2000.0 equatorial coordinates to helio-ecliptic.
       }
    }
 }
@@ -19372,7 +19769,7 @@ Object             - Base class for all AST Objects
       \sstexamplesubsection{
          FRAME = AST\_SPECFRAME( 'System=VELO, RestFreq=1.0E15, \htmlref{StdOfRest}{StdOfRest}=LSRK', STATUS )
       }{
-         Creates a SpecFrame describing a relativistic velocity ({\tt{"}}VELO{\tt{"}}) axis
+         Creates a SpecFrame describing a apparent radial velocity ({\tt{"}}VELO{\tt{"}}) axis
          with rest frequency 1.0E15 Hz (about 3000 Angstroms), measured
          in the kinematic Local Standard of Rest ({\tt{"}}LSRK{\tt{"}}). Since the
          source position has not been specified (using attributes \htmlref{RefRA}{RefRA} and
@@ -20888,6 +21285,111 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   AST\_XMLCHAN\sstlabel{AST_XMLCHAN}
+}{
+   Create an XmlChan
+}{
+   \sstdescription{
+      This function creates a new \htmlref{XmlChan}{XmlChan} and optionally initialises
+      its attributes.
+
+      A XmlChan is a specialised form of \htmlref{Channel}{Channel} which supports XML I/O
+      operations. Writing an \htmlref{Object}{Object} to an XmlChan (using
+      \htmlref{AST\_WRITE}{AST_WRITE}) will, if the Object is suitable, generate an
+      XML description of that Object, and reading from an XmlChan will
+      create a new Object from its XML description.
+
+      Normally, when you use an XmlChan, you should provide {\tt{"}}source{\tt{"}}
+      and {\tt{"}}sink{\tt{"}} routines which connect it to an external data store
+      by reading and writing the resulting XML text. By default, however,
+      a Channel will read from standard input and write to standard
+      output.
+   }
+   \sstinvocation{
+      RESULT = AST\_XMLCHAN( SOURCE, SINK, OPTIONS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SOURCE = SUBROUTINE (Given)
+      }{
+         A source routine, which is a subroutine which takes a single
+         integer error status argument.  This routine will be used by
+         the XmlChan to obtain lines of input text. On each
+         invocation, it should read the next input line from some
+         external XML data store, and then return the resulting text to
+         the AST library by calling \htmlref{AST\_PUTLINE}{AST_PUTLINE}. It should supply a
+         negative line length when there are no more lines to read.
+         If an error occurs, it should set its own error status
+         argument to an error value before returning.
+
+         If the null routine AST\_NULL is suppied as the SOURCE value,
+         the Channel will read from standard input instead.
+      }
+      \sstsubsection{
+         SINK = SUBROUTINE (Given)
+      }{
+         A sink routine, which is a subroutine which takes a single
+         integer error status argument.  This routine will be used by
+         the XmlChan to deliver lines of output text. On each
+         invocation, it should obtain the next output line from the
+         AST library by calling \htmlref{AST\_GETLINE}{AST_GETLINE}, and then deliver the
+         resulting text to some external XML data store.  If an error
+         occurs, it should set its own error status argument to an
+         error value before returning.
+
+         If the null routine AST\_NULL is suppied as the SINK value,
+         the Channel will write to standard output instead.
+      }
+      \sstsubsection{
+         OPTIONS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string containing an optional comma-separated
+         list of attribute assignments to be used for initialising the
+         new XmlChan. The syntax used is identical to that for the
+         \htmlref{AST\_SET}{AST_SET} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_XMLCHAN = INTEGER
+      }{
+         A pointer to the new XmlChan.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The names of the routines supplied for the SOURCE and SINK
+         arguments should appear in EXTERNAL statements in the Fortran
+         routine which invokes AST\_XMLCHAN. However, this is not generally
+         necessary for the null routine AST\_NULL (so long as the AST\_PAR
+         include file has been used).
+
+         \sstitem
+         If the external data source or sink uses a character encoding
+         other than ASCII, the supplied source and sink functions should
+         translate between the external character encoding and the internal
+         ASCII encoding used by AST.
+
+         \sstitem
+         A null Object pointer (AST\_\_NULL) will be returned if this
+         function is invoked with the AST error status set, or if it
+         should fail for any reason.
+
+         \sstitem
+         Note that the null routine AST\_NULL (one underscore) is
+         different to AST\_\_NULL (two underscores), which is the null Object
+         pointer.
+      }
+   }
+}
+\sstroutine{
    AST\_ZOOMMAP\sstlabel{AST_ZOOMMAP}
 }{
    Create a ZoomMap
@@ -20981,7 +21483,7 @@ Object             - Base class for all AST Objects
 
          \sstitem
          Map values from the system used by the target (wavelength,
-         relativistic velocity, etc) to the system specified by the
+         apparent radial velocity, etc) to the system specified by the
          \htmlref{AlignSystem}{AlignSystem} attribute, using the target's rest frequency if necessary.
 
          \sstitem
@@ -21122,6 +21624,20 @@ Object             - Base class for all AST Objects
          {\tt{"}}Representation of World Coordinates in FITS{\tt{"}} by Greisen \& Calabretta
          requires that this matrix be invertable. Many operations (such as
          grid plotting) will not be possible if the matrix cannot be inverted.
+
+         \sstitem
+         {\tt{"}}BadVal{\tt{"}}: This condition arises when reading a FrameSet from a
+         non-Native encoded FitsChan if it is not possible to convert the
+         value of a FITS keywords to the expected type. For instance, this
+         can occur if the FITS header contains a string value for a keyword
+         which should have a floating point value, or if the keyword has no
+         value at all (i.e. is a comment card).
+
+         \sstitem
+         {\tt{"}}Distortion{\tt{"}}: This condition arises when reading a FrameSet from a
+         non-Native encoded FitsChan if any of the CTYPE keywords specify an
+         unsupported distortion code using the {\tt{"}}4-3-3{\tt{"}} format specified in
+         FITS-WCS paper IV. Such distortion codes are ignored.
 
          \sstitem
          {\tt{"}}NoCTYPE{\tt{"}}: This condition arises if a default CTYPE value is used
@@ -21589,8 +22105,8 @@ Object             - Base class for all AST Objects
       \htmlref{Channel}{Channel}. If included, they will describe what each item of
       output represents.
 
-      If Comment is non-zero (the default), then comments will be
-      included. If it is zero, comments will be omitted.
+      If Comment is non-zero, then comments will be included. If
+      it is zero, comments will be omitted.
    }
    \sstattributetype{
       Integer (boolean).
@@ -21599,7 +22115,17 @@ Object             - Base class for all AST Objects
       \sstsubsection{
          Channel
       }{
-         All Channels have this attribute.
+         The default value is non-zero for a normal Channel.
+      }
+      \sstsubsection{
+         \htmlref{FitsChan}{FitsChan}
+      }{
+         The default value is non-zero for a FitsChan.
+      }
+      \sstsubsection{
+         \htmlref{XmlChan}{XmlChan}
+      }{
+         The default value is zero for an XmlChan.
       }
    }
 }
@@ -21643,10 +22169,12 @@ Object             - Base class for all AST Objects
       This attribute is a boolean value which specifies a default equinox
       and reference frame to use when reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}
       with a foreign (i.e. non-native) encoding. It is only used if the FITS
-      header contains no information about the reference frame or equinox. If
-      this is the case, then values of FK4 and B1950 are assumed if the
-      DefB1950 attribute has a non-zero value (the default), and FK5 J2000
-      is assumed if DefB1950 is zero.
+      header contains RA and DEC axes but contains no information about the
+      reference frame or equinox. If this is the case, then values of FK4 and
+      B1950 are assumed if the DefB1950 attribute has a non-zero value and
+      ICRS is assumed if DefB1950 is zero. The default value for DefB1950
+      depends on the value of the \htmlref{Encoding}{Encoding} attribute: for FITS-WCS encoding
+      the default is zero, and for all other encodings it is one.
    }
    \sstattributetype{
       Integer (boolean).
@@ -22078,8 +22606,9 @@ Object             - Base class for all AST Objects
          PCiiijjj keywords to describe the scale and rotation of the pixel
          axes. This encoding is included to support existing data and
          software which uses these now superceded conventions. In general,
-         the {\tt{"}}FITS-WCS{\tt{"}} encoding (which uses CDi\_j keywords to describe the
-         scale and rotation) should be used in preference to {\tt{"}}FITS-PC{\tt{"}}.
+         the {\tt{"}}FITS-WCS{\tt{"}} encoding (which uses CDi\_j or PCi\_j keywords to
+         describe the scale and rotation) should be used in preference to
+         {\tt{"}}FITS-PC{\tt{"}}.
 
          \sstitem
          {\tt{"}}FITS-IRAF{\tt{"}}: Encodes coordinate system information in FITS
@@ -22210,7 +22739,7 @@ Object             - Base class for all AST Objects
       When AST\_WRITE is used to store a FrameSet using DSS encoding,
       an attempt is first made to simplify the FrameSet to see if it
       conforms to the DSS model.  Specifically, the current Frame must
-      be a default FK5 \htmlref{SkyFrame}{SkyFrame}; the projection must be a tangent plane
+      be a FK5 \htmlref{SkyFrame}{SkyFrame}; the projection must be a tangent plane
       (gnomonic) projection with polynomial corrections conforming to
       DSS requirements, and north must be parallel to the second base
       Frame axis.
@@ -22237,18 +22766,40 @@ Object             - Base class for all AST Objects
       The FITS-WCS convention uses FITS header cards to describe the
       relationship between pixels in an image (not necessarily
       2-dimensional) and one or more related {\tt{"}}world coordinate systems{\tt{"}}.
-      Often, although not necessarily, one of these systems will be a
-      celestial coordinate system, in which case the sequence of
-      transformations which convert between the various intermediate
-      coordinate systems will include a {\tt{"}}sky projection{\tt{"}} (e.g. as
-      implemented by a WcsMap).  The FITS-WCS encoding may only be
-      used to store a single AST Object in any set of FITS header
-      cards, and that Object must be a FrameSet which conforms to the
-      FITS-WCS model (the FrameSet may, however, contain multiple Frames).
-      The projections supported include all those in the fits-wcs standard.
-      In addition, it supports the {\tt{"}}TAN with polynomial correction terms{\tt{"}}
-      projection which was included in a draft of the FITS-WCS paper, but
-      was not present in the final version.
+      The FITS-WCS encoding may only be used to store a single AST Object
+      in any set of FITS header cards, and that Object must be a FrameSet
+      which conforms to the FITS-WCS model (the FrameSet may, however,
+      contain multiple Frames which will be result in multiple FITS
+      {\tt{"}}alternate axis descriptions{\tt{"}}). Details of the use made by this
+      Encoding of the conventions described in the FITS-WCS papers are
+      given in the appendix {\tt{"}}FITS-WCS Coverage{\tt{"}} of this document. A few
+      main points are  described below.
+
+      The rotation and scaling of the intermediate world coordinate system
+      can be specified using either {\tt{"}}CDi\_j{\tt{"}} keywords, or {\tt{"}}PCi\_j{\tt{"}} together
+      with {\tt{"}}CDELTi{\tt{"}} keywords. When writing a FrameSet to a FitsChan, the
+      the value of the \htmlref{CDMatrix}{CDMatrix} attribute of the FitsChan determines
+      which system is used.
+
+      In addition, this encoding supports the {\tt{"}}TAN with polynomial correction
+      terms{\tt{"}} projection which was included in a draft of the FITS-WCS paper,
+      but was not present in the final version. A {\tt{"}}TAN with polynomial
+      correction terms{\tt{"}} projection is represented using a WcsMap with type
+      AST\_\_TPN (rather than AST\_\_TAN which is used to represent simple
+      TAN projections). When reading a FITS header, a CTYPE keyword value
+      including a {\tt{"}}-TAN{\tt{"}} code results in an AST\_\_TPN projection if there are
+      any projection parameters (given by the \htmlref{PVi\_m}{PVi_m} keywords) associated with
+      the latitude axis, or if there are projection parameters associated
+      with the longitude axis for m greater than 4. When writing a
+      FrameSet to a FITS header, an AST\_\_TPN projection gives rise to a
+      CTYPE value including the normal {\tt{"}}-TAN{\tt{"}} code, but the projection
+      parameters are stored in keywords with names {\tt{"}}QVi\_m{\tt{"}}, instead of the
+      usual {\tt{"}}PVi\_m{\tt{"}}. Since these QV parameters are not part of the
+      FITS-WCS standard they will be ignored by other non-AST software,
+      resulting in the WCS being interpreted as a simple TAN projection
+      without any corrections. This should be seen as an interim solution
+      until such time as an agreed method for describing projection
+      distortions within FITS-WCS has been published.
 
       When reading a FITS-WCS encoded Object (using AST\_READ), the FitsChan
       concerned must initially be positioned at the first card (its
@@ -22863,7 +23414,7 @@ Object             - Base class for all AST Objects
       or $+$1.  It controls the amount of information included in the
       output generated by a \htmlref{Channel}{Channel}.
 
-      If Full is zero (the default), then a modest amount of
+      If Full is zero, then a modest amount of
       non-essential but useful information will be included in the
       output. If Full is negative, all non-essential information will
       be suppressed to minimise the amount of output, while if it is
@@ -22877,7 +23428,17 @@ Object             - Base class for all AST Objects
       \sstsubsection{
          Channel
       }{
-         All Channels have this attribute.
+         The default value is zero for a normal Channel.
+      }
+      \sstsubsection{
+         \htmlref{FitsChan}{FitsChan}
+      }{
+         The default value is zero for a FitsChan.
+      }
+      \sstsubsection{
+         \htmlref{XmlChan}{XmlChan}
+      }{
+         The default value is -1 for an XmlChan.
       }
    }
    \sstnotes{
@@ -23071,6 +23632,179 @@ Object             - Base class for all AST Objects
          \sstitem
          The spacing between major axis values, which determines the
          spacing of grid lines, may be set using the \htmlref{Gap(axis)}{Gapaxis} attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismAlpha\sstlabel{GrismAlpha}
+}{
+   The angle of incidence of the incoming light on the grating surface
+}{
+   \sstdescription{
+      This attribute holds the angle between the incoming light and the
+      normal to the grating surface, in radians. The default value is 0.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismEps\sstlabel{GrismEps}
+}{
+   The angle between the normal and the dispersion plane
+}{
+   \sstdescription{
+      This attribute holds the angle (in radians) between the normal to
+      the grating or exit prism face, and the dispersion plane. The
+      dispersion plane is the plane spanned by the incoming and outgoing
+      ray. The default value is 0.0.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismG\sstlabel{GrismG}
+}{
+   The grating ruling density
+}{
+   \sstdescription{
+      This attribute holds the number of grating rulings per unit length.
+      The unit of length used should be consistent with the units used
+      for attributes \htmlref{GrismWaveR}{GrismWaveR} and \htmlref{GrismNRP}{GrismNRP}. The default value is 0.0.
+      (the appropriate value for a pure prism disperser with no grating).
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismM\sstlabel{GrismM}
+}{
+   The interference order
+}{
+   \sstdescription{
+      This attribute holds the interference order being considered.
+      The default value is 0.
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismNR\sstlabel{GrismNR}
+}{
+   The refractive index at the reference wavelength
+}{
+   \sstdescription{
+      This attribute holds refractive index of the grism material at the
+      reference wavelength (given by attribute \htmlref{GrismWaveR}{GrismWaveR}). The default
+      value is 1.0.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismNRP\sstlabel{GrismNRP}
+}{
+   The rate of change of refractive index with wavelength
+}{
+   \sstdescription{
+      This attribute holds the rate of change of the refractive index of the
+      grism material with respect to wavelength at the reference wavelength
+      (given by attribute \htmlref{GrismWaveR}{GrismWaveR}). The default value is 0.0 (the
+      appropriate value for a pure grating disperser with no prism). The
+      units of this attribute should be consistent with those of attributes
+      GrismWaveR and \htmlref{GrismG}{GrismG}.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismTheta\sstlabel{GrismTheta}
+}{
+   Angle between normal to detector plane and reference ray
+}{
+   \sstdescription{
+      This attribute gives the angle of incidence of light of the
+      reference wavelength (given by attribute \htmlref{GrismWaveR}{GrismWaveR}) onto the
+      detector. Specifically, it holds the angle (in radians) between
+      the normal to the detector plane and an incident ray at the reference
+      wavelength. The default value is 0.0.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
+      }
+   }
+}
+\sstroutine{
+   GrismWaveR\sstlabel{GrismWaveR}
+}{
+   The reference wavelength
+}{
+   \sstdescription{
+      This attribute holds reference wavelength. The default value is
+      5000 (Angstrom). The units of this attribute should be consistent with
+      those of attributes \htmlref{GrismNRP}{GrismNRP} and \htmlref{GrismG}{GrismG}.
+   }
+   \sstattributetype{
+      Double precision.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{GrismMap}{GrismMap}
+      }{
+         All GrismMaps have this attribute.
       }
    }
 }
@@ -23851,24 +24585,30 @@ Object             - Base class for all AST Objects
 \sstroutine{
    NatLat\sstlabel{NatLat}
 }{
-   Native latitude of the fiducial point of a FITS-WCS projection
+   Native latitude of the reference point of a FITS-WCS projection
 }{
    \sstdescription{
-      This attribute gives the latitude of the fiducial point of the
+      This attribute gives the latitude of the reference point of the
       FITS-WCS projection implemented by a \htmlref{WcsMap}{WcsMap}. The value is in
-      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. The FITS-WCS
-      paper reserves parameter 2 associated with the longitude axis to
-      store this value. The value of the NatLat attribute equals this
-      projection parameter value converted to radians. A default value
-      is used if no value has been set for the projection parameter.
-      The default value is fixed for most projection types and is specified
-      in the FITS-WCS paper. The exception is that the default for the conic
-      projections is variable and is specified by the value of projection
-      parameter one associated with the latitude axis.
+      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. This value is
+      fixed for most projections, for instance it is PI/2 (90 degrees)
+      for all zenithal projections. For some projections (e.g. the conics)
+      the value is not fixed, but is specified by parameter one on the
+      latitude axis.
 
-      The NatLat attribute is read-only. The returned value can however
-      be changed by assigning a new value to the PVi\_2 attribute (where
-      {\tt{"}}i{\tt{"}} is the index of the longitude axis).
+      FITS-WCS paper II introduces the concept of a {\tt{"}}fiducial point{\tt{"}}
+      which is logical distinct from the projection reference point.
+      It is easy to confuse the use of these two points. The fiducial
+      point is the point which has celestial coordinates given by the
+      CRVAL FITS keywords. The native spherical coordinates for this point
+      default to the values of the NatLat and \htmlref{NatLon}{NatLon}, but these defaults
+      mey be over-ridden by values stored in the PVi\_j keywords. Put
+      another way, the CRVAL keywords will by default give the celestial
+      coordinates of the projection reference point, but may refer to
+      some other point if alternative native longitude and latitude values
+      are provided through the PVi\_j keywords.
+
+      The NatLat attribute is read-only.
    }
    \sstattributetype{
       Floating point, read-only.
@@ -23884,38 +24624,23 @@ Object             - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         The AST-specific TPN projection uses all projection parameters on
-         both axes to represent correction terms. The value of the NatLat
-         attribute is therefore fixed at 0.5$*$PI rather than being specified
-         by a projection parameter.
-
-         \sstitem
-         A value of AST\_\_BAD is returned if no latitude value is
-         available.
-
-         \sstitem
-         For a definition of the fiducial point for a projection, see
-         the FITS-WCS paper.
+         A default value of AST\_\_BAD is used if no latitude value is available.
       }
    }
 }
 \sstroutine{
    NatLon\sstlabel{NatLon}
 }{
-   Native longitude of the fiducial point of a FITS-WCS projection
+   Native longitude of the reference point of a FITS-WCS projection
 }{
    \sstdescription{
-      This attribute gives the longitude of the fiducial point of the
+      This attribute gives the longitude of the reference point of the
       FITS-WCS projection implemented by a \htmlref{WcsMap}{WcsMap}. The value is in
-      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system. The FITS-WCS
-      paper reserves parameter 1 associated with the longitude axis to
-      store this value. The value of the NatLon attribute equals this
-      projection parameter value converted to radians. A default value
-      of zero is used if no value has been set for the projection parameter.
+      radians in the {\tt{"}}native spherical{\tt{"}} coordinate system, and will
+      usually be zero. See the description of attribute \htmlref{NatLat}{NatLat} for further
+      information.
 
-      The NatLon attribute is read-only. The returned value can however
-      be changed by assigning a new value to the PVi\_1 attribute (where
-      {\tt{"}}i{\tt{"}} is the index of the longitude axis).
+      The NatLon attribute is read-only.
    }
    \sstattributetype{
       Floating point, read-only.
@@ -23925,20 +24650,6 @@ Object             - Base class for all AST Objects
          WcsMap
       }{
          All WcsMaps have this attribute.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The AST-specific TPN projection uses all projection parameters on
-         both axes to represent correction terms. The value of the NatLon
-         attribute is therefore fixed at zero rather than being specified
-         by a projection parameter.
-
-         \sstitem
-         For a definition of the fiducial point for a projection, see
-         the FITS-WCS paper.
       }
    }
 }
@@ -25291,6 +26002,14 @@ Object             - Base class for all AST Objects
             value.
 
             \sstitem
+            {\tt{"}}HELIOECLIPTIC{\tt{"}}: Ecliptic coordinates (IAU 1980), referred to the
+            ecliptic and mean equinox of J2000.0, in which an offset is added to
+            the longitude value which results in the centre of the sun being at
+            zero longitude at the date given by the Epoch attribute. Attempts to
+            set a value for the Equinox attribute will be ignored, since this
+            system is always referred to J2000.0.
+
+            \sstitem
             {\tt{"}}GALACTIC{\tt{"}}: Galactic coordinates (IAU 1958).
 
             \sstitem
@@ -25315,7 +26034,7 @@ Object             - Base class for all AST Objects
       }{
          The SpecFrame class supports the following System values and
          associated spectral coordinate systems (the default is {\tt{"}}WAVE{\tt{"}} -
-         wavelength):
+         wavelength). They are all defined in FITS-WCS paper III:
 
          \sstitemlist{
 
@@ -25347,7 +26066,7 @@ Object             - Base class for all AST Objects
             {\tt{"}}BETA{\tt{"}}: Beta factor (dimensionless)
 
             \sstitem
-            {\tt{"}}VELO{\tt{"}} or {\tt{"}}VREL{\tt{"}}: Relativistic velocity (km/s)
+            {\tt{"}}VELO{\tt{"}} or {\tt{"}}VREL{\tt{"}}: Apparent radial ({\tt{"}}relativistic{\tt{"}}) velocity (km/s)
 
          }
          The default value for the Unit attribute for each system is shown
@@ -25955,6 +26674,63 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   XmlIndent\sstlabel{XmlIndent}
+}{
+   Controls output of indentation and line feeds
+}{
+   \sstdescription{
+      This attribute controls the appearance of the XML produced when an
+      AST object is written to an \htmlref{XmlChan}{XmlChan}. If it is non-zero, then extra
+      linefeed characters will be inserted as necessary to ensure that each
+      XML tag starts on a new line, and each tag will be indented to show
+      its depth in the containment hierarchy. If XmlIndent is zero (the
+      default), then no linefeeds or indentation strings will be added to
+      output text.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         XmlChan
+      }{
+         All XmlChans have this attribute.
+      }
+   }
+}
+\sstroutine{
+   XmlLength\sstlabel{XmlLength}
+}{
+   Controls output buffer length
+}{
+   \sstdescription{
+      This attribute specifies the maximum length to use when writing out
+      text through the sink function supplied when the \htmlref{XmlChan}{XmlChan} was created.
+
+      The number of characters in each string written out through the sink
+      function will not be greater than the value of this attribute (but
+      may be less). A value of zero (the default) means there is no limit -
+      each string can be of any length.
+
+      Note, the default value of zero is unlikely to be appropriate when
+      an XmlChan is used within Fortran code. In this case, XmlLength
+      should usually be set to the size of the CHARACTER variable used to
+      receive the text returned by \htmlref{AST\_GETLINE}{AST_GETLINE} within the sink function.
+      This avoids the possibility of long lines being truncated invisibly
+      within AST\_GETLINE.
+   }
+   \sstattributetype{
+      Integer.
+   }
+   \sstapplicability{
+      \sstsubsection{
+         XmlChan
+      }{
+         All XmlChans have this attribute.
+      }
+   }
+}
+\sstroutine{
    Zoom\sstlabel{Zoom}
 }{
    ZoomMap scale factor
@@ -26281,10 +27057,6 @@ Object             - Base class for all AST Objects
       encoding. Otherwise (e.g. the NATIVE encoding), multiple Object
       descriptions are written sequentially and may later be read
       back in the same sequence.
-
-      Note, currently the FitsChan class does not recognise spectral axes.
-      They are treated as an ``unknown'' axis type, and are represented by
-      simple a 1-dimensional \htmlref{Frame}{Frame} (not a \htmlref{SpecFrame}{SpecFrame}).
    }
    \sstconstructor{
       \htmlref{AST\_FITSCHAN}{AST_FITSCHAN}
@@ -26626,6 +27398,77 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   GrismMap\sstlabel{GrismMap}
+}{
+   Transform 1-dimensional coordinates using a grism dispersion equation
+}{
+   \sstdescription{
+      A GrismMap is a specialised form of \htmlref{Mapping}{Mapping} which transforms
+      1-dimensional coordinates using the spectral dispersion equation
+      described in FITS-WCS paper III {\tt{"}}Representation of spectral
+      coordinates in FITS{\tt{"}}. This describes the dispersion produced by
+      gratings, prisms and grisms.
+
+      When initially created, the forward transformation of a GrismMap
+      transforms input {\tt{"}}grism parameter{\tt{"}} values into output wavelength
+      values. The {\tt{"}}grism parameter{\tt{"}} is a dimensionless value which is
+      linearly related to position on the detector. It is defined in FITS-WCS
+      paper III as {\tt{"}}the offset on the detector from the point of intersection
+      of the camera axis, measured in units of the effective local length{\tt{"}}.
+      The units in which wavelength values are expected or returned is
+      determined by the values supplied for the \htmlref{GrismWaveR}{GrismWaveR}, \htmlref{GrismNRP}{GrismNRP} and
+      \htmlref{GrismG}{GrismG} attribute: whatever units are used for these attributes will
+      also be used for the wavelength values.
+   }
+   \sstconstructor{
+      \htmlref{AST\_GRISMMAP}{AST_GRISMMAP}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The GrismMap class inherits from the Mapping class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      In addition to those attributes common to all Mappings, every
+      GrismMap also has the following attributes:
+
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{GrismNR}{GrismNR}: The refractive index at the reference wavelength
+
+         \sstitem
+         GrismNRP: Rate of change of refractive index with wavelength
+
+         \sstitem
+         GrismWaveR: The reference wavelength
+
+         \sstitem
+         \htmlref{GrismAlpha}{GrismAlpha}: The angle of incidence of the incoming light
+
+         \sstitem
+         GrismG: The grating ruling density
+
+         \sstitem
+         \htmlref{GrismM}{GrismM}: The interference order
+
+         \sstitem
+         \htmlref{GrismEps}{GrismEps}: The angle between the normal and the dispersion plane
+
+         \sstitem
+         \htmlref{GrismTheta}{GrismTheta}: Angle between normal to detector plane and reference ray
+      }
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The GrismMap class does not define any new routines beyond those
+      which are applicable to all Mappings.
+   }
+}
+\sstroutine{
    IntraMap\sstlabel{IntraMap}
 }{
    Map points using a private transformation routine
@@ -26696,10 +27539,13 @@ Object             - Base class for all AST Objects
       linearly between the appropriate entries in the table. If the
       index lies outside the range of the table, linear extrapolation
       is used based on the two nearest entries (i.e. the two entries
-      at the start or end of the table, as appropriate).
+      at the start or end of the table, as appropriate). If either of the
+      entries used for the interplation has a value of AST\_\_BAD, then the
+      interpolated value is returned as AST\_\_BAD.
 
-      If the lookup table entries increase or decrease monotonically,
-      then the inverse transformation may also be performed.
+      If the lookup table entries increase or decrease monotonically (and
+      if the table contains no AST\_\_BAD values), then the inverse
+      transformation may also be performed.
    }
    \sstconstructor{
       \htmlref{AST\_LUTMAP}{AST_LUTMAP}
@@ -26926,6 +27772,9 @@ Object             - Base class for all AST Objects
 
          \sstitem
          \htmlref{ID}{ID}: Object identification string
+
+         \sstitem
+         \htmlref{Ident}{Ident}: Permanent Object identification string.
 
          \sstitem
          \htmlref{Nobject}{Nobject}: Number of Objects in class
@@ -27365,6 +28214,69 @@ Object             - Base class for all AST Objects
    }
 }
 \sstroutine{
+   PolyMap\sstlabel{PolyMap}
+}{
+   Map coordinates using polynomial functions
+}{
+   \sstdescription{
+      A PolyMap is a form of \htmlref{Mapping}{Mapping} which performs a general polynomial
+      transformation.  Each output coordinate is a polynomial function of
+      all the input coordinates. The coefficients are specified separately
+      for each output coordinate. The forward and inverse transformations
+      are defined independantly by separate sets of coefficients.
+   }
+   \sstconstructor{
+      \htmlref{AST\_POLYMAP}{AST_POLYMAP}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The PolyMap class inherits from the Mapping class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      The PolyMap class does not define any new attributes beyond
+      those which are applicable to all Mappings.
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The PolyMap class does not define any new routines beyond those
+      which are applicable to all Mappings.
+   }
+}
+\sstroutine{
+   ShiftMap\sstlabel{ShiftMap}
+}{
+   Add a constant value to each coordinate
+}{
+   \sstdescription{
+      A ShiftMap is a linear \htmlref{Mapping}{Mapping} which shifts each axis by a
+      specified constant value.
+   }
+   \sstconstructor{
+      \htmlref{AST\_SHIFTMAP}{AST_SHIFTMAP}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The ShiftMap class inherits from the Mapping class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      The ShiftMap class does not define any new attributes beyond those
+      which are applicable to all Mappings.
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The ShiftMap class does not define any new routines beyond those
+      which are applicable to all Mappings.
+   }
+}
+\sstroutine{
    SkyAxis\sstlabel{SkyAxis}
 }{
    Store celestial axis information
@@ -27732,10 +28644,10 @@ Object             - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
-         \htmlref{NatLat}{NatLat}: Native latitude of the fiducial point of a FITS-WCS projection
+         \htmlref{NatLat}{NatLat}: Native latitude of the reference point of a FITS-WCS projection
 
          \sstitem
-         \htmlref{NatLon}{NatLon}: Native longitude of the fiducial point of a FITS-WCS projection
+         \htmlref{NatLon}{NatLon}: Native longitude of the reference point of a FITS-WCS projection
 
          \sstitem
          PVi\_m: FITS-WCS projection parameters
@@ -27788,6 +28700,56 @@ Object             - Base class for all AST Objects
    }{
       The WinMap class does not define any new routines beyond those
       which are applicable to all Mappings.
+   }
+}
+\sstroutine{
+   XmlChan\sstlabel{XmlChan}
+}{
+   I/O Channel using XML to represent Objects
+}{
+   \sstdescription{
+      A XmlChan is a specialised form of \htmlref{Channel}{Channel} which supports XML I/O
+      operations. Writing an \htmlref{Object}{Object} to an XmlChan (using
+      \htmlref{AST\_WRITE}{AST_WRITE}) will, if the Object is suitable, generate an
+      XML description of that Object, and reading from an XmlChan will
+      create a new Object from its XML description.
+
+      Normally, when you use an XmlChan, you should provide {\tt{"}}source{\tt{"}}
+      and {\tt{"}}sink{\tt{"}} routines which connect it to an external data store
+      by reading and writing the resulting XML text. These routines
+      should perform any conversions needed between external character
+      encodings and the internal ASCII encoding. If no such routines
+      are supplied, a Channel will read from standard input and write
+      to standard output.
+   }
+   \sstconstructor{
+      \htmlref{AST\_XMLCHAN}{AST_XMLCHAN}
+   }
+   \sstdiytopic{
+      Inheritance
+   }{
+      The XmlChan class inherits from the Channel class.
+   }
+   \sstdiytopic{
+      Attributes
+   }{
+      In addition to those attributes common to all Channels, every
+      XmlChan also has the following attributes:
+
+      \sstitemlist{
+
+         \sstitem
+         \htmlref{XmlIndent}{XmlIndent}: Controls output of indentation and line feeds
+
+         \sstitem
+         \htmlref{XmlLength}{XmlLength}: Controls output buffer length
+      }
+   }
+   \sstdiytopic{
+      Functions
+   }{
+      The XmlChan class does not define any new routines beyond those
+      which are applicable to all Channels.
    }
 }
 \sstroutine{
@@ -28073,6 +29035,533 @@ in a non-standard location.} is on your PATH.
    }
 }
 \normalsize
+
+\newpage
+\section{\label{ss:fitswcscoverage}FITS-WCS Coverage}
+
+This appendix gives details of the \htmlref{FitsChan}{FitsChan} class
+implementation of the conventions described in the FITS-WCS papers
+available at
+\htmladdnormallink{http://fits.gsfc.nasa.gov/fits\_wcs.html}
+{http://fits.gsfc.nasa.gov/fits_wcs.html}. These conventions are
+used only if the \htmlref{Encoding}{Encoding} attribute of the FitsChan
+has the value ``FITS-WCS'' (whether set explicitly or defaulted). It
+should always be possible for a \htmlref{FrameSet}{FrameSet} to be read
+(using the 
+\htmlref{AST\_READ}{AST_READ}
+function) from a FitsChan containing a header which conforms to these 
+conventions. However, only those FrameSets which are compatible with the
+FITS-WCS model can be \emph{written} to a FitsChan using the
+\htmlref{AST\_WRITE}{AST_WRITE}
+function. For instance, if the current \htmlref{Frame}{Frame} of a
+FrameSet is re-mapped using, say, an arbitrary \htmlref{MathMap}{MathMap}
+then the FrameSet will no longer be compatible with the FITS-WCS model,
+and so will not be written out successfully to a FitsChan.
+
+The following sub-sections describe the details of the implementation of
+each of the first four FITS-WCS papers. Here, the term ``pixel axes'' is
+used to refer to the FITS pixel coordinates (i.e. the centre of the 
+first image pixel has a value 1.0 on each pixel axis); the term ``IWC 
+axes'' is used to refer to the axes of the Intermediate World Coordinate 
+system; and the term ``WCS axes'' is used to refer to the axes of the final 
+physical coordinate system described by the CTYPE\emph{i} keywords.
+
+\subsection{Paper I - General Linear Coordinates}
+When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}, these conventions are used if the CTYPE\emph{i} keyword
+values within the FitsChan do not conform to the conventions described in
+later papers, in which case the axes are assumed to be linear. When
+writing a FrameSet to a FitsChan, these conventions are used for axes
+which are described by a simple \htmlref{Frame}{Frame} (\emph{i.e.} not a 
+\htmlref{SkyFrame}{SkyFrame}, \htmlref{SpecFrame}{SpecFrame}, \emph{etc.}).
+
+Table \ref{tab:fitspaper1} describes the use made by AST of each keyword
+defined by FITS-WCS paper I.
+
+\begin{table}[htbp]
+\begin{tabular}{|l|p{2.5in}|p{2.5in}|}
+\hline
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+& \multicolumn{1}{c|}{{\bf Write}} \\ \hline
+
+\fitskey{WCSAXES\emph{a}}{Ignored.}{Set to the number of axes in the WCS
+Frame - only written if different to NAXIS.}
+
+\fitskey{CRVAL\emph{ia}}{Used to create the pixel to WCS
+\htmlref{Mapping}{Mapping}.}{Always written (see ``Choice of Reference
+Point'' below).}
+
+\fitskey{CRPIX\emph{ja}}{Used to create the pixel to WCS Mapping.}{Always
+written (see ``Choice of Reference Point'' below).}
+
+\fitskey{CDELT\emph{ia}}{Used to create the pixel to WCS Mapping.}{Only
+written if the \htmlref{CDMatrix}{CDMatrix} attribute of the FitsChan is 
+set to zero.}
+
+\fitskey{CROTA\emph{i}}{Used to create the pixel to WCS Mapping.}{Only
+written in FITS-AIPS encoding.}
+
+\fitskey{CTYPE\emph{ia}}{Used to choose the class and attributes of the
+WCS Frame, and to create the pixel to WCS Mapping (note, ``STOKES'' and
+``COMPLEX'' axes are treated as unknown linear axes).}{Always written
+(see ``Use and Choice of CTYPE keywords'' below).}
+
+\fitskey{CUNIT\emph{ia}}{Used to set the Units attributes
+of the WCS Frame.}{Only written if the Units attribute of the WCS Frame
+has been set explicitly. If so, the Units value for each axis is used as
+the CUNIT value.}
+
+\fitskey{PC\emph{i\_j}\emph{a}}{Used to create the pixel to WCS
+Mapping.}{Only written if the CDMatrix attribute of the FitsChan is set to
+zero.}
+
+\fitskey{CD\emph{i\_j}\emph{a}}{Used to create the pixel to WCS
+Mapping.}{Only written if the CDMatrix attribute of the FitsChan is set to
+a non-zero value.}
+
+\fitskey{PV\emph{i\_ma}}{Ignored for linear axes.}{Not written if the axes
+are linear.}
+
+\fitskey{PS\emph{i\_ma}}{Ignored.}{Not used.}
+
+\fitskey{WCSNAME\emph{a}}{Used to set the \htmlref{Domain}{Domain} attribute
+of the WCS Frame.}{Only written if the Domain attribute of the WCS Frame
+has been set explicitly. If so, the Domain value is used as the WCSNAME
+value.}
+
+\fitskey{CRDER\emph{ia}}{Ignored.}{Not used.}
+
+\fitskey{CSYER\emph{ia}}{Ignored.}{Not used.}
+
+\hline
+\end{tabular}
+\vspace{3.mm}
+\caption{Use of FITS-WCS Paper I keywords}
+\label{tab:fitspaper1}
+\end{table}
+
+\subsubsection{Requirements for a Successful Write Operation}
+When writing a \htmlref{FrameSet}{FrameSet} in which the WCS
+\htmlref{Frame}{Frame} is a simple Frame to a \htmlref{FitsChan}{FitsChan},
+success depends on the \htmlref{Mapping}{Mapping} from pixel coordinates
+(the base Frame in the FrameSet) to the WCS Frame being linear. The write
+operation will fail if this is not the case.
+
+\subsubsection{Use and Choice of CTYPE\emph{i} keywords}
+When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan} the CTYPE\emph{i} values in the FitsChan are used to set the
+Symbol attributes of the corresponding WCS \htmlref{Frame}{Frame}. The Label attributes of the WCS Frame are set from 
+the CNAME\emph{i} keywords, if present in the header. Otherwise they are set
+from the CTYPE\emph{i} comments strings in the header, so long as each
+axis has a unique non-blank comment. Otherwise, the Label attributes are
+set to the CTYPE\emph{i} values. The above procedure is over-ridden if
+the axis types conform to the conventions described in paper II or III,
+as described below.
+
+When writing a FrameSet to a FitsChan, each CTYPE\emph{i} value is set to
+the value of the Symbol attribute of the corresponding axis in the Frame
+being written. If a value has been set explicitly for the axis Label
+attribute, it is used as the axis comment (except that any existing
+comments in the FitsChan take precedence if the keyword value has not
+changed). The above procedure is over-ridden if the Frame is a
+\htmlref{SkyFrame}{SkyFrame} or a \htmlref{SpecFrame}{SpecFrame}, in which
+case the CTYPE\emph{i} value is derived from the \htmlref{System}{System}
+attribute of the Frame and the nature of the pixel to WCS \htmlref{Mapping}{Mapping}
+according to the conventions of papers II and III, as described below.
+
+\subsubsection{Choice of Reference Point}
+When writing a \htmlref{FrameSet}{FrameSet} to a
+\htmlref{FitsChan}{FitsChan}, the pixel coordinates of the 
+reference point for linear axes (i.e. the CRPIX\emph{j} values) are 
+chosen as follows:
+
+\begin{itemize}
+\item If the FrameSet is being written to a FitsChan which previously
+contained a set of axis descriptions with the same identifying letter, 
+then the previous CRVAL\emph{j}values are converted into the coordinate system 
+of the \htmlref{Frame}{Frame} being written (if possible). These values are then
+transformed into the pixel Frame, and the closest integer pixel values
+are used as the CRPIX keywords.
+\item If the above step could not be performed for any reason, the
+central pixel is used as the reference point. This requires the image 
+dimensions to be present in the FitsChan in the form of a set of
+NAXIS\emph{j} keyword values.
+\item If both the above two steps failed for any axis, then the pixel
+reference position is set to a value of 1.0 on the pixel axis.
+\end{itemize}
+
+The pixel to WCS \htmlref{Mapping}{Mapping} is then used to find the corresponding
+CRVAL\emph{j}values.
+
+Again, the above procedure is over-ridden if the Frame is a
+\htmlref{SkyFrame}{SkyFrame} or a \htmlref{SpecFrame}{SpecFrame}, in which 
+case the conventions of papers II and III are used as described below.
+
+
+\subsubsection{Choice of Axis Ordering}
+When reading a \htmlref{FrameSet}{FrameSet} from a
+\htmlref{FitsChan}{FitsChan}, WCS axis $i$ in the current
+\htmlref{Frame}{Frame} of the
+resulting FrameSet corresponds to axis $i$ in the FITS header.
+
+When writing a FrameSet to a FitsChan, the axis ordering for the FITS
+header is chosen to make the CD\emph{i\_j} or PC\emph{i\_j} matrix
+predominately diagonal. This means that the axis numbering in the FITS
+header will not necessarily be the same as that in the AST Frame.
+
+\subsubsection{Alternate Axis Descriptions}
+When reading a \htmlref{FrameSet}{FrameSet} from a
+\htmlref{FitsChan}{FitsChan} which contains alternate axis descriptions,
+each complete set of axis descriptions results in a single \htmlref{Frame}{Frame} being added 
+to the final FrameSet, connected via an appropriate 
+\htmlref{Mapping}{Mapping} to the base pixel Frame. The \htmlref{Ident}{Ident} attribute of the Frame is set to hold the single alphabetical 
+character which is used to identify the set of axis descriptions within 
+the FITS header (a single space is used for the primary axis descriptions).
+
+When writing a FrameSet to a FitsChan, it is assumed that the base Frame
+represents pixel coordinates, and the current Frame represents the
+primary axis descriptions. If there are any other Frames present in the
+FrameSet, an attempt is made to create a complete set of ``alternate''
+set of keywords describing each additional Frame. The first character in
+the Ident attribute of the Frame is used as the single character
+descriptor to be appended to the keyword, with the proviso that a given
+character can only be used once. If a second Frame is found with an Ident
+attribute which has already been used, its Ident attribute is ignored and
+the next free character is used instead. Note, failure to write a set of
+alternate axis descriptions does not result in failure of the entire
+write operation: the primary axis descriptions are still written,
+together with any other alternate axis descriptions which can be produced
+successfully.
+
+\subsection{Paper II - Celestial Coordinates}
+These conventions are used when reading a \htmlref{FrameSet}{FrameSet}
+from a \htmlref{FitsChan}{FitsChan} containing appropriate CTYPE\emph{i} 
+values, and when writing a FrameSet in which the WCS \htmlref{Frame}{Frame}
+is a \htmlref{SkyFrame}{SkyFrame}.
+
+Table \ref{tab:fitspaper2} describes the use made by AST of each keyword
+whose meaning is defined or extended by FITS-WCS paper II. 
+
+\begin{table}[htbp]
+\begin{tabular}{|l|p{2.5in}|p{2.5in}|}
+\hline
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+& \multicolumn{1}{c|}{{\bf Write}} \\ \hline
+
+\fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
+listed in paper II are supported (note, ``CUBEFACE'' axes are treated as
+unknown linear axes).}{Determined by the \htmlref{System}{System} attribute 
+of the SkyFrame and the \htmlref{WcsType}{WcsType} attribute of the
+\htmlref{WcsMap}{WcsMap} within the FrameSet.}
+
+\fitskey{CUNIT\emph{ia}}{Ignored (assumed to be 'degrees').}{Not written.}
+
+\fitskey{PV\emph{i\_ma}}{Used to create the pixel to WCS \htmlref{Mapping}{Mapping} (values
+are stored as attributes of a WcsMap within this Mapping).}{Values are
+obtained from the WcsMap in the pixel to WCS Mapping.}
+
+\fitskey{LONPOLE\emph{a}}{Used to create the pixel to WCS Mapping. Also
+stored as a \htmlref{PVi\_m}{PVi_m} attribute for the longitude axis of the WcsMap.}{Only
+written if not equal to the default value defined in paper II (see
+``Choice of LONPOLE/LATPOLE'' below).}
+
+\fitskey{LATPOLE\emph{a}}{Used to create the pixel to WCS Mapping. Also
+stored as a PV attribute for the longitude axis of the WcsMap.}{Only
+written if not equal to the default value defined in paper II (see
+``Choice of LONPOLE/LATPOLE'' below).}
+
+\fitskey{RADESYS\emph{a}}{Used to set the attributes of the SkyFrame. All
+values supported except that ecliptic coordinates are currently always
+assumed to be FK5.}{Always written. Determined by the System attribute of
+the SkyFrame.}
+
+\fitskey{EQUINOX\emph{a}}{Used to set the \htmlref{Equinox}{Equinox} attribute 
+of the SkyFrame.}{Written if relevant. Determined by the Equinox attribute of
+the SkyFrame.}
+
+\fitskey{EPOCH}{Used to set the Equinox attribute of the SkyFrame.}{Only
+written if using FITS-AIPS encoding. Determined by the Equinox attribute
+of the SkyFrame.}
+
+\fitskey{MJD-OBS}{Used to set the \htmlref{Epoch}{Epoch} attribute of the 
+SkyFrame. DATE-OBS is used if MJD-OBS is not present. A default value based on
+RADESYS and EQUINOX is used if used if DATE-OBS is not present
+either.}{Determined by the Epoch attribute of the SkyFrame. Only written
+if this attribute has been set to an explicit value (in which case
+DATE-OBS is also written).}
+
+\hline
+\end{tabular}
+\vspace{3.mm}
+\caption{Use of FITS-WCS Paper II keywords}
+\label{tab:fitspaper2}
+\end{table}
+
+\subsubsection{Requirements for a Successful Write Operation}
+When writing a \htmlref{FrameSet}{FrameSet} in which the WCS
+\htmlref{Frame}{Frame} is a \htmlref{SkyFrame}{SkyFrame} to a
+\htmlref{FitsChan}{FitsChan}, success depends on the following conditions 
+being met:
+
+\begin{enumerate}
+\item The \htmlref{Mapping}{Mapping} from pixel coordinates (the base Frame 
+in the FrameSet) to the WCS SkyFrame includes a \htmlref{WcsMap}{WcsMap}.
+\item The Mapping prior to the WcsMap (\emph{i.e.} from pixel to IWC) is linear. 
+\item The Mapping after the WcsMap (\emph{i.e.} from native spherical to
+celestial coordinates) is a spherical rotation for the
+celestial axes, and linear for any other axes.
+\end{enumerate}
+
+If any of the above conditions do not hold, the write operation will be
+unsuccessful.
+
+\subsubsection{Choice of LONPOLE/LATPOLE}
+When writing a \htmlref{FrameSet}{FrameSet} to a \htmlref{FitsChan}{FitsChan}, 
+the choice of LONPOLE and LATPOLE values is determined as follows:
+
+\begin{enumerate}
+
+\item If the projection represented by the \htmlref{WcsMap}{WcsMap} is 
+azimuthal, then any values set for attributes ``PV\emph{i}\_3'' 
+and ``PV\emph{i}\_4'' (where ``\emph{i}'' is the index of the longitude axis) 
+within the WcsMap are used as the LONPOLE and LATPOLE values. Reading a 
+FrameSet from a FITS-WCS header
+results in the original LONPOLE and LATPOLE values being stored within a
+WcsMap within the FrameSet. Consequently, if a FrameSet is read from a
+FITS-WCS header and it is subsequently written out to a new FITS-WCS
+header, the original LONPOLE and LATPOLE values will usually be used in
+the new header (the exception being if the WcsMap has been explicitly
+modified before being written out again). Any extra rotation of the sky
+is absorbed into the CD\emph{i\_j} or PC\emph{i\_j} matrix (this is
+possible only if the projection is azimuthal).
+
+\item If the projection represented by the WcsMap is azimuthal but no
+values have been set for the ``PV\emph{i}\_3'' and ``PV\emph{i}\_4''
+attributes within the WcsMap, then the default LONPOLE and LATPOLE values
+are used. This results in no LONPOLE or lATPOLE keywords being stored in
+the header since default values are never stored. Any extra rotation of
+the sky is absorbed into the CD\emph{i\_j} or PC\emph{i\_j} matrix (this
+is possible only if the projection is azimuthal).
+
+\item If the projection represented by the WcsMap is not azimuthal,
+then the values of LONPOLE and LATPOLE are found by transforming the
+coordinates of the celestial north pole (\emph{i.e} longitude zero,
+latitude $+\pi/2$) into native spherical coordinates using the inverse of
+the \htmlref{Mapping}{Mapping} which follows the WcsMap.
+
+\end{enumerate}
+
+\subsubsection{User Defined Fiducial Points}
+When reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}, projection parameters
+PV\emph{i}\_0, PV\emph{i}\_1 and PV\emph{i}\_2 (for longitude axis
+``\emph{i}'') are used to indicate a user-defined fiducial point as
+described in section 2.5 of paper II. This results in a shift of IWC
+origin being applied \emph{before} the \htmlref{WcsMap}{WcsMap} which converts 
+IWC into
+native spherical coordinates. The values of these projection parameters,
+if supplied, are stored as the corresponding \htmlref{PVi\_m}{PVi_m} attributes 
+of the WcsMap.
+
+When writing a FrameSet to a FitsChan, the PV attributes of the WcsMap
+determine the native coordinates of the fiducial point (the fixed
+defaults for each projection described in paper II are used if the PV
+attributes of the WcsMap have not been assigned a value). The
+corresponding celestial coordinates are used as the CRVAL\emph{i}
+keywords and the corresponding pixel coordinates as the CRPIX\emph{j}
+keywords.
+
+\subsubsection{Common Non-Standard Features}
+A collection of common non-standard features are supported when reading a
+\htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}, in addition 
+to those embodied within the
+available encodings of the FitsChan class. These are translated into the
+equivalent standard features before being used to create a FrameSet.
+Note, the reverse operation is never performed: it is not possible to
+produce non-standard features when writing a FrameSet to a FitsChan
+(other than those embodied in the available encodings of the FitsChan
+class). The supported non-standard features include:
+
+\begin{itemize}
+\item EQUINOX keywords with string values equal to a date preceded
+by the letter B or J (\emph{e.g.} ``B1995.0''). 
+
+\item EQUINOX or EPOCH keywords with value zero  (these are converted to 
+B1950). 
+
+\item The IRAF ``ZPX'' projection is represented by a
+\htmlref{WcsMap}{WcsMap} with type of
+AST\_\_ZPN. \htmlref{Projection}{Projection} parameter values are read from any WAT\emph{i\_nnn}
+keywords, and corresponding \htmlref{PVi\_m}{PVi_m} attributes are set in the 
+WcsMap. The WAT\emph{i\_nnn} keywords may specify corrections to the basic 
+ZPN projection by including ``lngcor'' or ``latcor'' terms. There is no 
+direct equivalent in FITS-WCS to these terms and so they are ignored. If 
+these correction terms are found, ASTWARN keywords are added to the FitsChan 
+containing a warning message (but only if the \htmlref{Warnings}{Warnings}
+attribute of the FitsChan is set appropriately). 
+
+\item The IRAF ``TNX'' projection is represented by a WcsMap with type of
+AST\_\_TPN (a distorted TAN projection retained within the WcsMap class
+from an early draft of the FITS-WCS paper II). Projection parameter values
+are read from any WAT\emph{i\_nnn} keywords, and corresponding PV
+attributes are set in the WcsMap. If the TNX projection cannot be
+converted exactly into an AST\_\_TPN projection, ASTWARN keywords are
+added to the FitsChan containing a warning message (but only if the
+Warnings attribute of the FitsChan is set appropriately).
+
+\item ``QV'' parameters for TAN projections (as produced by 
+\htmladdnormallink{AUTOASTROM}{http://www.astro.gla.ac.uk/users/norman/star/autoastrom/} 
+are renamed to the equivalent ``PV'' parameters.
+
+\end{itemize}
+
+\subsection{Paper III - Spectral Coordinates}
+These conventions are used when reading a \htmlref{FrameSet}{FrameSet} 
+from a \htmlref{FitsChan}{FitsChan} which includes appropriate 
+CTYPE\emph{i} values, and when writing a FrameSet in which
+the WCS \htmlref{Frame}{Frame} is a \htmlref{SpecFrame}{SpecFrame}.
+
+Table \ref{tab:fitspaper3} describes the use made by AST of each keyword
+whose meaning is defined or extended by FITS-WCS paper III. 
+
+\begin{table}[htbp]
+\begin{tabular}{|l|p{2.5in}|p{2.5in}|}
+\hline
+\multicolumn{1}{|c|}{{\bf Keyword}} & \multicolumn{1}{c|}{{\bf Read}} 
+& \multicolumn{1}{c|}{{\bf Write}} \\ \hline
+
+\fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
+listed in paper III are supported, except for the ``-TAB''
+algorithm (the ``-LOG'' algorithm may also be applied to non-spectral linear 
+axes).}{Determined by the \htmlref{System}{System} attribute of the 
+SpecFrame and the nature of the pixel to SpecFrame
+\htmlref{Mapping}{Mapping}.}
+
+\fitskey{CUNIT\emph{ia}}{Used to set the Units attribute of 
+the SpecFrame (note, SpecFrames always have an ``active'' Units attribute
+(see astSetActiveUnit).}{Always written.}
+
+\fitskey{PV\emph{i\_ma}}{Used to create the pixel to WCS Mapping (values
+are stored as attributes of a \htmlref{GrismMap}{GrismMap}).}
+{Set from the attributes of the GrismMap, if present, and if set explicitly.}
+
+\fitskey{SPECSYS\emph{a}}{Used to set the \htmlref{StdOfRest}{StdOfRest}
+attribute of the SpecFrame (all systems are supported except CMBDIPOL).}
+{Set from the StdOfRest attribute of the SpecFrame, but only if it has been 
+set explicitly.}
+
+\fitskey{SSYSOBS\emph{a}}{Ignored.}{Never written.}
+
+\fitskey{OBSGEO-X/Y/Z}{Used to set the \htmlref{GeoLon}{GeoLon} and
+\htmlref{GeoLat}{GeoLat} attributes of the SpecFrame (the observers
+height above sea level is ignored).}{Set from the GeoLon and GeoLat 
+attributes of the SpecFrame, if they have been set explicitly (it is
+assumed that the observer is at sea level).}
+
+\fitskey{MJD-AVG}{Used to set the \htmlref{Epoch}{Epoch} attributes of
+the SpecFrame.}{Set from the Epoch attribute of the SpecFrame, if it has
+been set explicitly.}
+
+\fitskey{VSOURCE\emph{a}}{Used to set the \htmlref{SourceVel}{SourceVel}
+attribute of the SpecFrame (the \htmlref{SourceVRF}{SourceVRF} attribute
+is first set to ``Topocentric'').}{Set from the SourceVel attribute of
+the SpecFrame, if it has been set explicitly (the SourceVRF
+attribute is set to ``Topocentric'' before getting the value of
+SourceVel).}
+
+\fitskey{ZSOURCE\emph{a}}{Used to set the SourceVel
+attribute of the SpecFrame (the SourceVRF attribute
+is first set to ``Topocentric'' and the ZSOURCE value is converted to a
+topocentric apparent radial velocity).}{Never written (VSOURCE is written
+instead).}
+
+\fitskey{VELOSYS\emph{a}}{Ignored.}{Never written.}
+
+\fitskey{RESTFRQ\emph{a}}{Used to set the \htmlref{RestFreq}{RestFreq}
+attribute of the SpecFrame.}{Set from the RestFreq attribute of the
+SpecFrame, but only if the System attribute is not set to 
+``WAVE'', ``VOPT'', ``ZOPT'' or ``AWAV'', and only if RestFreq has been set 
+explicitly.}
+
+\fitskey{RESTWAV\emph{a}}{Used to set the RestFreq
+attribute of the SpecFrame (after conversion from wavelength to frequency).}
+{Set from the RestFreq attribute of the SpecFrame (after conversion), but only if the 
+System attribute is set to ``WAVE'', ``VOPT'', ``ZOPT'' or 
+``AWAV'', and only if RestFreq has been set explicitly.}
+
+\fitskey{CNAME\emph{ia}}{Used to set the Label attributes of 
+the WCS Frame keywords.}{Set from the Label attributes of the WCS Frame,
+if they have been set explicitly.}
+\hline
+\end{tabular}
+\vspace{3.mm}
+\caption{Use of FITS-WCS Paper III keywords}
+\label{tab:fitspaper3}
+\end{table}
+
+\subsubsection{Requirements for a Successful Write Operation}
+When writing a \htmlref{FrameSet}{FrameSet} in which the WCS \htmlref{Frame}{Frame} is a \htmlref{SpecFrame}{SpecFrame} to a 
+\htmlref{FitsChan}{FitsChan}, the write operation is successful only if
+the \htmlref{Mapping}{Mapping} from pixel coordinates (the base Frame 
+in the FrameSet) to the SpecFrame satisfies one of the following conditions:
+
+\begin{enumerate}
+\item It is linear.
+\item It is logarithmic.
+\item It is linear if the SpecFrame were to be re-mapped into one of the
+other spectral systems supported by FITS-WCS paper III.
+\item It contains a \htmlref{GrismMap}{GrismMap}, and the Mapping before the GrismMap (from
+pixel coordinates to grism parameter) is linear, and the Mapping after the 
+GrismMap is either null or represents a change of spectral system from wavelength (air or
+vacuum) to one of the supported spectral systems.
+\end{enumerate}
+
+If none of the above conditions hold, the write operation will be
+unsuccessful.
+
+\subsection{Paper IV - Coordinate Distortions}
+
+This paper proposes that an additional 4 character code be appended to
+the end of the CTYPE\emph{i} keyword to specify the nature of any
+distortion away from the basic algorithm described by the first 8
+characters of the CTYPE\emph{i} value. Currently AST ignores all such
+codes when reading a \htmlref{FrameSet}{FrameSet} from a
+\htmlref{FitsChan}{FitsChan} (except for the ``-SIP'' code
+defined by the SIRTF project - see below). This means that a FrameSet can
+still be read from such headers, but the \htmlref{Mapping}{Mapping} which 
+gives the WCS
+position associated with a given pixel position will reflect only the
+basic algorithm and will not include the effects of the distortion.
+
+If such a FrameSet is then written out to a FitsChan, the resulting 
+CTYPE\emph{i} keywords will include no distortion code.
+
+\subsubsection{The ``-SIP'' distortion code}
+
+The SIRTF project
+(\htmladdnormallink{http://sirtf.caltech.edu/SSC/}{http://sirtf.caltech.edu/SSC/})
+has developed its own system for encoding 2-dimensional image distortion
+within a FITS header, based on the proposals of paper IV. A description
+of this system is available in \htmladdnormallink
+{http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}
+{http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}. In this
+system, the presence of distortion is indicated by appending the
+distortion code ``-SIP'' to the CTYPE\emph{i} keyword values for the
+celestial axes. The distortion takes the form of a polynomial function
+which is applied to the pixel coordinates, after subtraction of the
+CRPIX\emph{j} values.
+
+This system is a strictly 2 dimensional system. When reading a
+\htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan} which 
+includes the ``-SIP'' distortion code, AST assumes that it
+is only applied to the first 2 WCS axes in a FITS header (i.e.
+CTYPE1 and CTYPE2). If the ``-SIP'' distortion code is attached to other
+axes, it will be ignored. The distortion itself is represented by a
+\htmlref{PolyMap}{PolyMap} within the resulting FrameSet.
+
+If a FrameSet is read from a FitsChan which includes ``-SIP''
+distortion, and an attempt is then made to write this FrameSet out to a
+FitsChan, the write operation will fail unless the distortion is
+insignificant (\emph{i.e.} is so small that the tests for linearity built
+into AST are passed). In this case, no distortion code will be appended to 
+the resulting CTYPE\emph{i} keyword values.
 
 \newpage
 \section{\xlabel{changes_and_new_features}\label{ss:changes}Changes and New Features}
@@ -28800,8 +30289,8 @@ axis labels if all non-celestial axes have unique non-blank comments
 trailing ``Z'' character to the end of DATE-OBS keyword values.
 
 \item The FitsChan class has been modified to use latest list of FITS-WCS 
-projections, as described in the FITS-WCS paper II, "Representations of
-celestial coordinates in FITS" (Calabretta \& Greisen, draft dated 23
+projections, as described in the FITS-WCS paper II, ``Representations of
+celestial coordinates in FITS'' (Calabretta \& Greisen, draft dated 23
 April 2002). Support has been retained for the polynomial correction
 terms which previous drafts have allowed to be associated with TAN
 projections. 
@@ -28812,7 +30301,7 @@ projection type now represents a simple TAN projection and has no
 associated projection parameters. In addition, the usage of projection 
 parameters has been brought into line with the the FITS-WCS paper II. 
 
-\item The WcsMap class has been modified so that a "get" operation on a
+\item The WcsMap class has been modified so that a ``get'' operation on a
 projection parameter attribute will return the default value defined in the
 FITS-WCS paper II if no value has been set for the attribute. Previously, a
 value of AST\_\_BAD was returned in such a situation.
@@ -28918,12 +30407,12 @@ component Frame can be accessed without needing to extract the Frame first.
 To do this, append an axis index to the end of the attribute name. For
 instance, if a CmpFrame contains a SpecFrame and a SkyFrame (in that order), 
 then the \htmlref{StdOfRest}{StdOfRest} attribute of the SpecFrame can be referred to as the
-"StdOfRest(1)" attribute of the CmpFrame. Likewise, the \htmlref{Equinox}{Equinox} attribute
-of the SkyFrame can be accessed as the "Equinox(2)" (or equivalently
-"Equinox(3)") attribute of the CmpFrame. The "System(1)" attribute of the
+``StdOfRest(1)'' attribute of the CmpFrame. Likewise, the \htmlref{Equinox}{Equinox} attribute
+of the SkyFrame can be accessed as the ``Equinox(2)'' (or equivalently
+``Equinox(3)'') attribute of the CmpFrame. The ``System(1)'' attribute of the
 CmpFrame will refer to the System attribute of the SpecFrame, whereas the 
-"System(2)" and "System(3)" attributes of the CmpFrame will refer to the
-System attribute of the SkyFrame (the "System" attribute without an axis
+``System(2)'' and ``System(3)'' attributes of the CmpFrame will refer to the
+System attribute of the SkyFrame (the ``System'' attribute without an axis
 specifier will refer to the System attribute of the CmpFrame as a whole,
 since System is an attribute of all Frames, and a CmpFrame is a Frame and
 so has its own System value which is independant of the System attributes
@@ -28954,41 +30443,175 @@ Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.0}
+\subsection{Changes Introduced in V3.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V2.0 and V3.0 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V2.0 and V3.0:
 
 \begin{enumerate}
 
-\item The \htmlref{SkyFrame}{SkyFrame} class now represents ICRS coordinates by default
-instead of FK5 (that is, the default for the \htmlref{System}{System} attribute for SkyFrames 
-has been changed to ``ICRS'').
+\item Many changes have been made in the \htmlref{FitsChan}{FitsChan} class in order to bring
+the FITS-WCS encoding into line with the current versions of the FITS-WCS
+papers (see \htmladdnormallink{http://www.atnf.csiro.au/people/mcalabre/WCS/}
+{http://www.atnf.csiro.au/people/mcalabre/WCS/}):
+
+\begin{itemize}
+
+\item The rotation and scaling of the pixel axes may now be specified using
+either CD\emph{i\_j} keywords, or PC\emph{i\_j} and CDELTj keywords. A new attribute
+called \htmlref{CDMatrix}{CDMatrix} has been added to the FitsChan class to indicate which
+set of keywords should be used when writing a \htmlref{FrameSet}{FrameSet} to a FITS-WCS
+header.
+
+\item The FITS-WCS encoding now supports most of the conventions
+described in FITS-WCS paper III for the description of spectral
+coordinates. The exceptions are that the SSYSOBS keyword is not
+supported, and WCS stored in tabular form (as indicated by the ``-TAB'' 
+algorithm code) is not supported.
+
+
+\item User-specified fiducial points for WCS projections are now
+supported by FitsChans which use FITS-WCS encoding. This use keywords
+PVi\_0, PVi\_1 and PVi\_2 for the longitude axis.
+
+\item  When reading a FITS-WCS header, a FitsChan will now use keywords PVi\_3 
+and PVi\_4 for the longitude axis (if present) in preference to any LONPOLE 
+and LATPOLE keywords which may be present. When writing a FITS-WCS header, 
+both forms are written out.
+
+\item The number of WCS axes is stored in the WCSAXES keyword if its value
+would be different to that of the NAXIS keyword.
+
+\item Helio-ecliptic coordinates are now supported by FitsChans which use 
+FITS-WCS encoding. This uses CTYPE codes ``HLON'' and ``HLAT''. The
+resulting \htmlref{SkyFrame}{SkyFrame} will have a \htmlref{System}{System} value of ``HELIOECLIPTIC'', and all
+the usual facilities, such as conversion to other celestial systems, are
+available.
+
+\item The FITS-WCS encoding now supports most of the conventions
+described in FITS-WCS paper III for the description of spectral
+coordinates. The exceptions are that the SSYSOBS keyword is not
+supported, and WCS stored in tabular form (as indicated by the ``-TAB'' 
+algorithm code) is not supported.
+
+\item When reading a FITS-WCS header, a FitsChan will now ignore any
+distortion codes which are present in CTYPE keywords. Here, a ``distortion 
+code'' is the final group of four characters in a CTYPE value of the
+form ``xxxx-yyy-zzz'', as described in FITS-WCS paper IV. The exception
+to this is that the ``-SIP'' distortion code (as used by the SIRTF
+project - see 
+\htmladdnormallink{
+http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}{
+http://sirtf.caltech.edu/SSC/documents/WCSkeywords\_v1.3.pdf}) is
+interpreted correctly and results in a \htmlref{PolyMap}{PolyMap} being used to represent
+the distortion in the resulting FrameSet. Note, ``-SIP'' distortion codes
+can only be read, not written. A FrameSet which uses a PolyMap will not
+in general be able to be written out to a FitsChan using any foreign
+encoding (although NATIVE encoding can of course be used).
+
+\item The \htmlref{Warnings}{Warnings} attribute of the FitsChan class now accepts values 
+``BadVal'' (which gives warnings about conversion errors when reading 
+FITS keyword values), ``Distortion'' (which gives warnings about
+unsupported distortion codes within CTYPE values), and ``BadMat'' (which
+gives a warning if the rotation/scaling matrix cannot be inverted).
+
+\item When writing a FrameSet to a FitsChan which uses a non-Native
+encoding, the comment associated with any card already in the FitsChan
+will be retained if the keyword value being written is the same as the
+keyword value already in the FitsChan.
+
+\item A FrameSet which uses the non-FITS projection type AST\_\_TPN (a TAN 
+projection with polynomial distortion terms) can now be written to a 
+FitsChan if the \htmlref{Encoding}{Encoding} attribute is set to FITS-WCS. The standard
+``-TAN'' code is used within the CTYPE values, and the distortion
+coefficients are encoded in keywords of the form `` QVi\_ma'', which are 
+directly analogous to the standard ``PVi\_ma'' projection parameter keywords.
+Thus a FITS reader which does not recognise the QV keywords will still
+be able to read the header, but the distortion will be ignored.
+
+\item The default value for \htmlref{DefB1950}{DefB1950} attribute now depends on the value
+of the Encoding attribute. 
+
+\item A new appendix has been added to SUN/210 and SUN/211 giving details
+of the implementation provided by the FitsChan class of the
+conventions contained in the first four FITS-WCS papers.
+\end{itemize}
+
+\item The SkyFrame class now supports two new coordinate systems ``ICRS''
+and ``HELIOECLIPTIC''. The default for the System attribute for SkyFrames 
+has been changed from ``FK5'' to ``ICRS''.
 
 \item The 
 \htmlref{AST\_RATE}{AST_RATE}
 function has been added which allows an estimate to be made of the rate of 
 change of a \htmlref{Mapping}{Mapping} output with respect to one of the Mapping inputs. 
 
-\item A new subclass of Mapping, the GrismMap, has been added which
+\item All attribute names for Frames of any class may now include an optional
+axis specifier. This includes those attributes which describe a property
+of the whole \htmlref{Frame}{Frame}. For instance, the \htmlref{Domain}{Domain} attribute may now be
+specified as ``Domain(1)'' in addition to the simpler ``Domain''. In cases
+such as this, where the attribute describes a property of the whole
+Frame, axis specifiers will usually be ignored. The exception is that a
+\htmlref{CmpFrame}{CmpFrame} will use the presence of an axis specifier to indicate that the
+attribute name relates to the primary Frame containing the specified
+axis, rather than to the CmpFrame as a whole.
+
+\item A new subclass of Mapping, the PolyMap, has been added which
+performs a general N-dimensional polynomial mapping.
+
+\item A new subclass of Mapping, the \htmlref{GrismMap}{GrismMap}, has been added which
 models the spectral dispersion produced by a grating, prism or grism.
 
-\item A new subclass of Mapping, the ShiftMap, has been added which adds
+\item A new subclass of Mapping, the \htmlref{ShiftMap}{ShiftMap}, has been added which adds
 constant values onto all coordinates (this is equivalent to a \htmlref{WinMap}{WinMap}
 with unit scaling on all axes).
 
 \item Minor bugs have been fixed within the \htmlref{Plot}{Plot} class to do with the choice 
 and placement of numerical axis labels.
 
-\item The SphMap class has a new attribute caller PolarLong which gives the 
+\item The SphMap class has a new attribute called PolarLong which gives the 
 longitude value to be returned when a Cartesian position corresponding to 
 either the north or south pole is transformed into spherical coordinates.
 
 \item The \htmlref{WcsMap}{WcsMap} class now assigns a longitude of zero to output
 celestial coordinates which have a latitude of plus or minus 90 degrees.
 
+\item The \htmlref{NatLat}{NatLat} and \htmlref{NatLon}{NatLon} attributes of the WcsMap class have been
+changed so that they now return the fixed native coordinates of the
+projection reference point, rather than the native coordinates of the
+user-defined fiducial point. 
+
+\item Changes have been made to several Mapping classes in order to allow
+the 
+\htmlref{AST\_SIMPLIFY}{AST_SIMPLIFY}
+function to make simplifications in a \htmlref{CmpMap}{CmpMap} which previously were not
+possible.
+
+\item The \htmlref{SlaMap}{SlaMap} class has been extended by the addition of conversions
+between FK5 and ICRS coordinates, and between FK5 and helio-ecliptic coordinates.
+
+\item The \htmlref{SpecMap}{SpecMap} class has been changed to use the equation for the
+refractive index of air as given in the current version of FITS-WCS paper
+III. Also, the forward and inverse transformations between frequency and
+air-wavelength have been made more compatible by using an iterative
+procedure to calculate the inverse.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.0 and V3.1 (the
+current version):
+
+\begin{enumerate}
+\item Addition of a new class called \htmlref{XmlChan}{XmlChan} - a \htmlref{Channel}{Channel} which 
+reads and writes AST objects in the form of XML.
+\item A bug has been fixed in the \htmlref{Plot}{Plot} class which could cause incorrect
+graphical attributes to be used for various parts of the plot if either
+axis has no tick marks (i.e. if both major and minor tick marks have zero
+length).
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in

@@ -4,7 +4,7 @@
 #  a version to use (just store the new value in the file).
 version="${AST_VERSION}"
 if test ! -n "${version}"; then
-   old_version="`cat ${AST_REF}/version.number`"
+   old_version="`cat ./version.number`"
    echo;
    echo "Always include a release number !!! (e.g. \"2.0-1\")"
    echo -n "New version number /${old_version}/ > "
@@ -12,7 +12,4 @@ if test ! -n "${version}"; then
    echo;
    if test ! -n "${version}"; then version="${old_version}"; fi
 fi
-cd ${AST_DEV}
-res version.number 1>/dev/null
 echo "${version}" >version.number
-repl version.number 1>/dev/null 2>/dev/null

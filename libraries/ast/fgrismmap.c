@@ -18,7 +18,7 @@
 *     AST_GRISMMAP
 
 *  Copyright:
-*     Copyright (C) 2003 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David S. Berry (Starlink)
