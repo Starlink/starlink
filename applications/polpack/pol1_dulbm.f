@@ -510,7 +510,8 @@
                   CALL NDF_MSG( 'NDF2', NDFVAL( PVAL ) )
                   CALL ERR_REP( 'POLCAL_DUPL', 'Images ''^NDF1'' and '//
      :                          '''^NDF2'' seem to contain the same '//
-     :                          'data.', STATUS )
+     :                          'data (i.e. have the same IMGID, '//
+     :                          'WPLATE and RAY values).', STATUS )
                   GO TO 99
                ELSE
                   IPAIR( IVAL ) = PVAL
@@ -533,10 +534,12 @@
       NPAIR = NPAIR / 2
       
 *  If there are no valid pairs then quit.
-      IF ( NPAIR .EQ. 0 ) THEN
+      IF ( NPAIR .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_NOPAIRS', 'POLCAL: There are no ' //
-     :                 'usable images. Cannot continue.', STATUS )
+     :                 'usable pairs of images (i.e. two images '//
+     :                 'with the same IMGID and WPLATE values but '//
+     :                 'different RAY values).', STATUS )
          GO TO 99
       ENDIF
          
