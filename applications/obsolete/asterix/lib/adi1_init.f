@@ -13,7 +13,7 @@
 	CALL ADI_DEFCLS( 'HDSlocator', ' ', 'Locator', DID,
      :                   STATUS )
 
-	CALL ADI_DEFCLS( 'HDSfile', 'FileObject,HDSlocator', ' ', DID,
+	CALL ADI_DEFCLS( 'HDSfile', 'FileObject,HDSlocator', 'x', DID,
      :                   STATUS )
 
 c        CALL ADI_DEFRCB( ID, 'NATRL_RTN', ADI1_NATRL, STATUS )

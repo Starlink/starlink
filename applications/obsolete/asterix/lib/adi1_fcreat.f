@@ -100,6 +100,7 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	FLOC			! File locator
+      CHARACTER*(DAT__SZNAM)    HNAME			! HDS object name
       CHARACTER*(DAT__SZTYP)    HTYPE			! HDS type
       CHARACTER*(DAT__SZLOC)	LOC			! New object locator
       CHARACTER*(DAT__SZLOC)	SLOC			! File object locator
@@ -110,6 +111,8 @@
       INTEGER			FSUBC, LSUBC		! Sub-struc char pos's
       INTEGER			LFILEC			! Last filename char
       INTEGER			NDIM			! Dimensionality
+
+      LOGICAL			DERVD			! Derived from a class?
 *.
 
 *  Check inherited global status.
@@ -123,13 +126,30 @@
 
 *  Choose the object type. If we have no input object defined create an
 *  anonymous structure
+      HNAME = ' '
       IF ( ID .EQ. ADI__NULLID ) THEN
         HTYPE = 'UNKNOWN'
         NDIM = 0
       ELSE
 
+*      Is the object derived from an energy response?
+        CALL ADI_DERVD( ID, 'RedistributionMatrix', DERVD, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          DERVD = .FALSE.
+          CALL ERR_ANNUL( STATUS )
+
+        ELSE IF ( DERVD ) THEN
+
+          HNAME = 'ENERGY_RESP'
+          HTYPE = 'EXTENSION'
+
+        END IF
+
 *      Get object class
-        CALL ADI_CLASS( ID, HTYPE, STATUS )
+        IF ( .NOT. DERVD ) THEN
+          CALL ADI_CLASS( ID, HTYPE, STATUS )
+
+        END IF
 
         NDIM = 0
 
@@ -189,7 +209,10 @@
         FNCH = FNCH + 1
 
 *    Create the new file
-        CALL HDS_NEW( FNAME(:LFILEC), FNAME(FNCH:LFILEC), HTYPE,
+        IF ( HNAME(1:1) .EQ. ' ' ) THEN
+          HNAME = FNAME(FNCH:LFILEC)
+        END IF
+        CALL HDS_NEW( FNAME(:LFILEC), HNAME, HTYPE,
      :                NDIM, DIMS, LOC, STATUS )
 
       END IF

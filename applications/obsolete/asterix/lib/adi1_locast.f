@@ -100,8 +100,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*12		APROPN			! Name of property
-        PARAMETER		( APROPN = '.ASTERIX_LOC' )
+      CHARACTER*15		APROPN			! Name of property
+        PARAMETER		( APROPN = '.ASTERIXlocator' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	MLOC			! MORE box locator

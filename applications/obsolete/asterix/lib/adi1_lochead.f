@@ -99,8 +99,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*11		HPROPN			! Name of property
-        PARAMETER		( HPROPN = '.HEADER_LOC' )
+      CHARACTER*14		HPROPN			! Name of property
+        PARAMETER		( HPROPN = '.HEADERlocator' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ALOC			! Object locator
