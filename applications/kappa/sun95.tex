@@ -40605,25 +40605,21 @@ plot (7k).
       optionally use the Mapping to add a new co-ordinate Frame into
       the WCS component of an NDF (see parameter NDF). An output text file
       may also be created holding a textual representation of the
-      Mapping for future use by other applications such as RESAMPLE (see
+      Mapping for future use by other applications such as REGRID (see
       parameter MAPOUT). A number of different types of Mapping can be
       used (see parameter MAPTYPE).
 
       When adding a new Frame to a WCS component, the Mapping is used to
-      connect the new Frame to an existing one (called the {\tt "}basis{\tt "} Frame
-      \sstitemlist{
+      connect the new Frame to an existing one (called the {\tt "}basis{\tt "} Frame:
+      see parameter FRAME). The specific type of Frame to add is specified
+      using parameter FRMTYPE (the default is to simply copy the basis Frame).
+      Attributes which have been assigned an explicit value in the basis Frame
+      are transfered to the new Frame (but only if they are relevant to the
+      type of the new Frame). The value of the Domain attribute for the new
+      Frame can be specified using parameter DOMAIN. Other attribute values
+      for the new Frame may be specified using parameters ATTRS. The new
+      Frame becomes the current co-ordinate Frame in the NDF.
 
-         \sstitem
-         see parameter FRAME). The specific type of Frame to add is specified
-         using parameter FRMTYPE (the default is to simply copy the basis Frame).
-         Attributes which have been assigned an explicit value in the basis Frame
-         are transfered to the new Frame (but only if they are relevant to the
-         type of the new Frame). The value of the Domain attribute for the new
-         Frame can be specified using parameter DOMAIN. Other attribute values
-         for the new Frame may be specified using parameters ATTRS. The new
-         Frame becomes the current co-ordinate Frame in the NDF.
-
-      }
       WCSADD will only generate Mappings with the same number of
       input and output axes; this number is determined by the number
       of axes in the basis Frame if an NDF is supplied, or by the
@@ -40720,7 +40716,7 @@ plot (7k).
          may be more if intermediate expressions are to be used. The
          expressions may be given directly in response to the prompt, or
          read from a text file, in which case the name of the file should
-         be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
+         be given, preceded by a {\tt "}$\wedge${\tt "} character. Individual expression
          should be separated by commas or, if they are supplied in a file,
          new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
          which is within the section {\tt "}Parameters{\tt "}). The syntax for each
@@ -40798,7 +40794,7 @@ plot (7k).
          MAPOUT = FILENAME (Write)
       }{
          The name of a text file in which to store a textual representation
-         of the Mapping. This can be used, for instance, by the RESAMPLE
+         of the Mapping. This can be used, for instance, by the REGRID
          application. If a null (!) value is supplied, no file is
          created. {\tt [!]}
       }
@@ -41019,7 +41015,7 @@ plot (7k).
          This constructs a pincushion-type distortion Mapping centred
          on the origin with a distortion coefficient of 5.3e-10,
          and writes out the Mapping as a text file called pcd.ast.
-         This file could then be used by RESAMPLE to resample
+         This file could then be used by REGRID to resample
          the pixels of an NDF according to this transformation.
          No NDF is accessed.
       }
@@ -41038,455 +41034,7 @@ plot (7k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB.
-      CCDPACK: WCSEDIT.
-   }
-}
-\sstroutine{
-   WCSADD
-}{
-   Creates a Mapping and optionally adds a new co-ordinate Frame into the
-   WCS component of an NDF
-}{
-   \sstdescription{
-      This application can be used to create a new AST Mapping and
-      optionally use the Mapping to add a new co-ordinate Frame into
-      the WCS component of an NDF (see parameter NDF). An output text file
-      may also be created holding a textual representation of the
-      Mapping for future use by other applications such as RESAMPLE (see
-      parameter MAPOUT). A number of different types of Mapping can be
-      used (see parameter MAPTYPE).
-
-      When adding a new Frame to a WCS component, the Mapping is used to
-      connect the new Frame to an existing one (called the {\tt "}basis{\tt "} Frame
-      \sstitemlist{
-
-         \sstitem
-         see parameter FRAME). The specific type of Frame to add is specified
-         using parameter FRMTYPE (the default is to simply copy the basis Frame).
-         Attributes which have been assigned an explicit value in the basis Frame
-         are transfered to the new Frame (but only if they are relevant to the
-         type of the new Frame). The value of the Domain attribute for the new
-         Frame can be specified using parameter DOMAIN. Other attribute values
-         for the new Frame may be specified using parameters ATTRS. The new
-         Frame becomes the current co-ordinate Frame in the NDF.
-
-      }
-      WCSADD will only generate Mappings with the same number of
-      input and output axes; this number is determined by the number
-      of axes in the basis Frame if an NDF is supplied, or by the
-      NAXES parameter otherwise.
-   }
-   \sstusage{
-      wcsadd ndf frame domain maptype
-   }
-   \sstparameters{
-      \sstsubsection{
-         ATTRS = GROUP (Read)
-      }{
-         A group of attribute settings to be applied to the new Frame
-         before adding it into the NDF.
-
-         A comma-separated list of strings should be given in which each
-         string is either an attribute setting, or the name of a text file
-         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
-         contain further comma-separated lists which will be read and
-         interpreted in the same manner. Attribute settings are applied in
-         the order in which they occur within the list, with later settings
-         over-riding any earlier settings given for the same attribute.
-
-         Each individual attribute setting should be of the form:
-
-            $<$name$>$=$<$value$>$
-
-         where $<$name$>$ is the name of an attribute appropriate to the type
-         of Frame specified by parameter FRMTYPE (see SUN/210 for a complete
-         description of all attributes), and $<$value$>$ is the value to assign
-         to the attribute. Default values will be used for any unspecified
-         attributes - these defaults are inherited from the basis Frame.
-         Any unrecognised attributes are ignored (no error is reported).
-      }
-      \sstsubsection{
-         CENTRE( 2 ) = \_DOUBLE (Read)
-      }{
-         The co-ordinates of the centre of a pincushion distortion.
-         Only used when MAPTYPE=PINCUSHION. See also DISCO.
-         {\tt [0,0]}
-      }
-      \sstsubsection{
-         DIAG( ) = \_DOUBLE (Read)
-      }{
-         The elements along the diagonal of the linear transformation
-         matrix. There will be as many of these as there are axes in the
-         basis Frame. Each effectively gives the factor by which
-         co-ordinates on the corresponding axis should be multiplied.
-         This parameter is only used when MAPTYPE=DIAG.
-      }
-      \sstsubsection{
-         DISCO = \_DOUBLE (Read)
-      }{
-         The distortion coefficient of a pincushion distortion. Used
-         in conjunction with the CENTRE parameter, this defines the
-         forward transformation to be used as follows:
-
-                 XX = X $+$ D $*$ (X - C1) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
-
-                 YY = Y $+$ D $*$ (Y - C2) $*$ ( (X - C1)$*$$*$2 $+$ (Y - C2)$*$$*$2 )
-
-         where (X,Y) are the input co-ordinates, (XX,YY) the output
-         co-ordinates, D is DISCO, and C1 and C2 are the two elements of
-         CENTRE. Only used when MAPTYPE=PINCUSHION.
-      }
-      \sstsubsection{
-         DOMAIN = LITERAL (Read)
-      }{
-         The value for the Domain attribute for the new Frame. Care should be
-         taken to ensure that domain names are used consistently. This
-         will usually mean avoiding any domain names which are already in
-         use within the WCS component, particularly the standard domain names
-         such as GRID, PIXEL, AXIS and GRAPHICS. The supplied value is
-         stripped of spaces, and converted to upper case before being used.
-      }
-      \sstsubsection{
-         EPOCH = \_DOUBLE (Read)
-      }{
-         If the basis Frame is specified using a {\tt "}Sky Co-ordinate System{\tt "}
-         specification for a celestial co-ordinate system (see parameter
-         FRAME), then an epoch value is needed to qualify it. This is the
-         epoch at which the supplied sky positions were determined. It should
-         be given as a decimal years value, with or without decimal places
-         ({\tt "}1996.8{\tt "} for example). Such values are interpreted as a Besselian
-         epoch if less than 1984.0 and as a Julian epoch otherwise. The
-         suggested default is the value stored in the basis Frame.
-      }
-      \sstsubsection{
-         FOREXP = LITERAL (Read)
-      }{
-         A group of expressions to be used for the forward co-ordinate
-         transformations in a MathMap. There must be at least as many
-         expressions as the number of axes of the Mapping, but there
-         may be more if intermediate expressions are to be used. The
-         expressions may be given directly in response to the prompt, or
-         read from a text file, in which case the name of the file should
-         be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
-         should be separated by commas or, if they are supplied in a file,
-         new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
-         which is within the section {\tt "}Parameters{\tt "}). The syntax for each
-         expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
-         the Appendix entitled {\tt "}Using MathMaps{\tt "} in SUN/95 for details. Only
-         used when MAPTYPE=MATH.
-      }
-      \sstsubsection{
-         FRAME = LITERAL (Read)
-      }{
-         A string specifying the basis Frame. If a null value is supplied
-         the current co-ordinate Frame in the NDF is used. The string can
-         be one of the following:
-
-         \sstitemlist{
-
-            \sstitem
-            A domain name such as SKY, AXIS, PIXEL, \emph{etc}. The two
-            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
-            translated into PIXEL and AXIS respectively, so long as the WCS
-            component of the NDF does not contain Frames with these domains.
-
-            \sstitem
-            An integer value giving the index of the required Frame within
-            the WCS component.
-
-            \sstitem
-            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000)
-            (see section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
-         }
-      }
-      \sstsubsection{
-         FRMTYPE = LITERAL (Read)
-      }{
-         The type of Frame to add to the NDF. If a null (!) value is
-         supplied, a copy of the basis Frame is used (as modified by
-         parameters ATTRS and DOMAIN). The allows values are:
-
-         \sstitemlist{
-
-            \sstitem
-            FRAME      -- A simple Cartesian Frame (the number of axes is
-                            equal to the number of outputs from the Mapping)
-
-            \sstitem
-            SKYFRAME   -- A 2-dimensional Frame representing positions on
-                            the celestial sphere.
-
-            \sstitem
-            SPECFRAME  -- A 1-dimensional Frame representing positions
-                            within an electromagnetic spectrum
-
-         }
-         {\tt [!]}
-      }
-      \sstsubsection{
-         INVEXP = LITERAL (Read)
-      }{
-         The expressions to be used for the inverse co-ordinate
-         transformations in a MathMap. See FOREXP. Only used when
-         MAPTYPE=MATH.
-      }
-      \sstsubsection{
-         MAPIN = FILENAME (Read)
-      }{
-         The  name of a file containing an AST Mapping with which to
-         connect the basis Frame to the new one. The file may be a text
-         file which contains the textual representation of an AST Mapping,
-         or a FITS file which contains the Mapping as an AST object
-         encoded in its headers, or an NDF. If it is an NDF, the
-         Mapping from its base (GRID-domain) to current Frame will be
-         used. Only used when MAPTYPE=FILE.
-      }
-      \sstsubsection{
-         MAPOUT = FILENAME (Write)
-      }{
-         The name of a text file in which to store a textual representation
-         of the Mapping. This can be used, for instance, by the RESAMPLE
-         application. If a null (!) value is supplied, no file is
-         created. {\tt [!]}
-      }
-      \sstsubsection{
-         MAPTYPE = LITERAL (Read)
-      }{
-         The type of Mapping to be used to connect the new Frame to the
-         basis Frame. It must be one of the following strings, each
-         of which require some additional parameters as indicated:
-
-         \sstitemlist{
-
-            \sstitem
-            DIAGONAL   -- A linear mapping with no translation
-                            of off-diagonal coefficients (see parameter DIAG)
-
-            \sstitem
-            FILE       -- A mapping defined by an AST Mapping supplied
-                            in a separate file (see parameter MAPIN)
-
-            \sstitem
-            LINEAR     -- A general linear mapping (see parameter TR)
-
-            \sstitem
-            MATH       -- A general algebraically defined mapping
-                            (see parameters FOREXP, INVEXP, SIMPFI, SIMPIF)
-
-            \sstitem
-            PINCUSHION -- A pincushion/barrel distortion (see parameters DISCO,
-                            CENTRE)
-
-            \sstitem
-            SHIFT      -- A translation (see parameter SHIFT)
-
-            \sstitem
-            UNIT       -- A unit mapping
-
-            \sstitem
-            ZOOM       -- A uniform expansion/contraction (see parameter ZOOM)
-
-         }
-         {\tt ["LINEAR"]}
-      }
-      \sstsubsection{
-         NAXES = \_INTEGER (Read)
-      }{
-         The number of input and output axes which the Mapping will have.
-         Only used if a null value is supplied for parameter NDF.
-      }
-      \sstsubsection{
-         NDF = NDF (Read and Write)
-      }{
-         The NDF in which to store a new co-ordinate Frame. Supply a null (!)
-         value if you do not wish to add a Frame to an NDF (you can still
-         use the MAPOUT parameter to write the Mapping to a text file).
-      }
-      \sstsubsection{
-         SHIFT( ) = \_DOUBLE (Read)
-      }{
-         A vector giving the displacement represented by the translation.
-         There must be one element for each axis. Only used when
-         MAPTYPE=SHIFT.
-      }
-      \sstsubsection{
-         SIMPFI = \_LOGICAL (Read)
-      }{
-         The value of the Mapping{\tt '}s SimpFI attribute (whether it is
-         legitimate to simplify the forward followed by the inverse
-         transformation to a unit transformation). Only used when
-         MAPTYPE=MATH.  {\tt [TRUE]}
-      }
-      \sstsubsection{
-         SIMPIF = \_LOGICAL (Read)
-      }{
-         The value of the Mapping{\tt '}s SimpIF attribute (whether it is
-         legitimate to simplify the inverse followed by the forward
-         transformation to a unit transformation). Only used when
-         MAPTYPE=MATH.  {\tt [TRUE]}
-      }
-      \sstsubsection{
-         TR( ) = \_DOUBLE (Read)
-      }{
-         The values of this parameter are the coefficients of a linear
-         transformation from the basis Frame specified by parameter FRAME
-         to the new Frame. This parameter is only used when MAPTYPE=LINEAR.
-         For instance, if a feature has co-ordinates (X,Y,Z,...) in
-         the basis Frame, and co-ordinates (U,V,W,...) in the new Frame,
-         then the following transformations would be used, depending on
-         how many axes the two Frames have:
-
-         \sstitemlist{
-
-            \sstitem
-            1-dimensional:
-
-         }
-               U = TR(1) $+$ TR(2)$*$X
-
-         \sstitemlist{
-
-            \sstitem
-            2-dimensional:
-
-         }
-               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y
-
-               V = TR(4) $+$ TR(5)$*$X $+$ TR(6)$*$Y
-
-         \sstitemlist{
-
-            \sstitem
-            3-dimensional:
-
-         }
-               U = TR(1) $+$ TR(2)$*$X $+$ TR(3)$*$Y $+$ TR(4)$*$Z
-
-               V = TR(5) $+$ TR(6)$*$X $+$ TR(7)$*$Y $+$ TR(8)$*$Z
-
-               W = TR(9) $+$ TR(10)$*$X $+$ TR(11)$*$Y $+$ TR(12)$*$Z
-
-         The correct number of values must be supplied (that is, N$*$(N$+$1)
-         where N is the number of axes in the new and old Frames). If a
-         null value (!) is given it is assumed that the new Frame and the
-         basis Frame are connected using a unit mapping (\emph{i.e.} corresponding
-         axis values are identical in the two Frames). Only used when
-         MAPTYPE=LINEAR. {\tt [!]}
-      }
-      \sstsubsection{
-         ZOOM = \_DOUBLE (Read)
-      }{
-         The scaling factor for a ZoomMap; every coordinate will be
-         multiplied by this factor in the forward transformation.
-         Only used when MAPTYPE=ZOOM.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         wcsadd speca axis frmtype=specframe maptype=unit $\backslash$
-      }{
-             attrs={\tt "}{\tt '}system=wave,unit=Angstrom{\tt '}{\tt "}
-         This example assumes the NDF {\tt "}speca{\tt "} has an Axis structure
-         describing wavelength in Angstroms. It adds a corresponding
-         SpecFrame into the WCS component of the NDF. The SpecFrame
-         is connected to the Frame describing the NDF Axis structure
-         using a unit Mapping. Subsequently, WCSATTRIB  can be used to
-         modify the SpecFrame so that it describes the spectral axis
-         value in some other system (frequency, velocities of various
-         forms, energy, wave number, \emph{etc}).
-      }
-      \sstexamplesubsection{
-         wcsadd ngc5128 pixel old\_pixel unit
-      }{
-         This adds a new co-ordinate Frame into the WCS component of the
-         NDF called ngc5128. The new Frame is given the domain OLD\_PIXEL
-         and is a copy of the existing PIXEL Frame. This OLD\_PIXEL Frame
-         will be retained through further processing and can be used as a
-         record of the original pixel co-ordinate Frame.
-      }
-      \sstexamplesubsection{
-         wcsadd my\_data dist-lum dist(au)-lum linear tr=[0,2.0628E5,0,0,0,1]
-      }{
-         This adds a new co-ordinate Frame into the WCS component of the
-         NDF called my\_data. The new Frame is given the domain DIST(AU)-LUM
-         and is a copy of an existing Frame with domain DIST-LUM. The first
-         axis in the new Frame is derived from the first axis in the basis
-         Frame but is in different units (AU instead of parsecs). This
-         change of units is achieved by multiplying the old Frame axis 1
-         values by 2.0628E5. The values on the second axis are copied
-         without change. You could then use application WCSATTRIB to set
-         the {\tt "}Unit{\tt "} attribute for axis 1 of the new Frame to {\tt "}AU{\tt "}.
-      }
-      \sstexamplesubsection{
-         wcsadd my\_data dist-lum dist(au)-lum diag diag=[2.0628E5,1]
-      }{
-         This does exactly the same as the previous example.
-      }
-      \sstexamplesubsection{
-         wcsadd ax322 ! shrunk zoom zoom=0.25 mapout=zoom.ast
-      }{
-         This adds a new Frame to the WCS component of ax322 which is a
-         one-quarter-scale copy of its current co-ordinate Frame. The
-         Mapping is also stored in the text file {\tt "}zoom.ast{\tt "}.
-      }
-      \sstexamplesubsection{
-         wcsadd cube grid slid shift shift=[0,0,1024]
-      }{
-         This adds a new Frame to the WCS component of the NDF cube
-         which matches the GRID-domain co-ordinates in the first two
-         axes, but is translated by 1024 pixels on the third axis.
-      }
-      \sstexamplesubsection{
-         wcsadd plane pixel polar math simpif simpfi
-      }{
-            forexp={\tt "}{\tt '}r=sqrt(x$*$x$+$y$*$y),theta=atan2(y,x){\tt '}{\tt "}
-            invexp={\tt "}{\tt '}x=r$*$cos(theta),y=r$*$sin(theta){\tt '}{\tt "}
-         A new Frame is added which gives pixel positions in polar
-         co-ordinates. Fortran-like expressions are supplied which define
-         both the forward and inverse transformations of the Mapping. The
-         symbols {\tt "}x{\tt "} and {\tt "}y{\tt "} are used to represent the two input Cartesian
-         pixel co-ordinate axes, and the symbols {\tt "}r{\tt "} and {\tt "}theta{\tt "} are used to
-         represent the output polar co-ordinates. Note, the single quotes
-         are needed when running from the Unix shell in order to prevent
-         the shell interpreting the parentheses and commas within the
-         expressions.
-      }
-      \sstexamplesubsection{
-         wcsadd plane pixel polar math simpif simpfi forexp=$\wedge$ft invexp=$\wedge$it
-      }{
-         As above, but the expressions defining the transformations are
-         supplied in two text files called {\tt "}ft{\tt "} and {\tt "}it{\tt "}, instead of being
-         supplied directly. Each file could contain the two expression on
-         two separate lines.
-      }
-      \sstexamplesubsection{
-         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion
-      }{
-            disco=5.3e-10
-         This constructs a pincushion-type distortion Mapping centred
-         on the origin with a distortion coefficient of 5.3e-10,
-         and writes out the Mapping as a text file called pcd.ast.
-         This file could then be used by RESAMPLE to resample
-         the pixels of an NDF according to this transformation.
-         No NDF is accessed.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The new Frame has the same number of axes as the basis Frame.
-
-         \sstitem
-         An error is reported if the transformation supplied using parameter
-         TR is singular.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: RESAMPLE, NDFTRACE, WCSFRAME, WCSREMOVE, WCSATTRIB;
+      KAPPA: NDFTRACE, REGRID, WCSFRAME, WCSREMOVE, WCSATTRIB;
       CCDPACK: WCSEDIT.
    }
 }

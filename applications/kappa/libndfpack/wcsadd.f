@@ -116,7 +116,7 @@
 *        may be more if intermediate expressions are to be used. The 
 *        expressions may be given directly in response to the prompt, or 
 *        read from a text file, in which case the name of the file should
-*        be given, preceeded by a "^" character. Individual expression
+*        be given, preceded by a "^" character. Individual expression
 *        should be separated by commas or, if they are supplied in a file,
 *        new-lines (see SUN/95 section "Specifying Groups of Objects"
 *        which is within the section "Parameters"). The syntax for each 
