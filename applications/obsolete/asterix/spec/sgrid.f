@@ -215,7 +215,7 @@
       INTEGER                	GPARS(MXGRID)      	! Things to be gridded
       INTEGER                	GPS(ADI__MXDIM)    	! Grid parameters
       INTEGER                	GQPTR              	! Grid quality pointer
-      INTEGER                	I, J, N            	! Loop variables
+      INTEGER                	I, J            	! Loop variables
       INTEGER			IFID			! Input dataset id
       INTEGER			MFID			! Model spec dataset id
       INTEGER                NDOF		! d.o.f. - no of data values
@@ -227,30 +227,29 @@
       INTEGER                	NHBUF              	! # lines used in HBUF
       INTEGER                NITMAX		! Return when NIT reaches NITMAX
       INTEGER                NRANGE             ! # range values entered
-      INTEGER                NPAR		! No of parameters
-      INTEGER                PCOMP(NPAMAX)	! Model par nos.
-      INTEGER                PPAR(NPAMAX)	! Model comp nos.
-      INTEGER                OPTION             ! Grid definition options
-      INTEGER                OQPTR              ! O/p quality pointer
-      INTEGER                SSCALE		! Factor for scaling fitstat
-      INTEGER                TLEN               ! Used length of TEXT
+      INTEGER                	NPAR			! No of parameters
+      INTEGER                	PCOMP(NPAMAX)		! Model par nos.
+      INTEGER                	PPAR(NPAMAX)		! Model comp nos.
+      INTEGER                	OPTION             	! Grid definition options
+      INTEGER                	SSCALE			! Factor for scaling fitstat
+      INTEGER                	TLEN               	! Used length of TEXT
 
-      BYTE                   GQMASK             ! Grid quality mask
+      BYTE                   	GQMASK             	! Grid quality mask
 
-      LOGICAL                ANYBAD             ! Any bad grid points?
-      LOGICAL                ANYBADISH          ! Any bad(ish) grid points?
-      LOGICAL                AUTO               ! Automatic o/p file naming?
-      LOGICAL                CHISTAT		! Fitstat is chi-squared?
-      LOGICAL                ERR                ! Take AXISn defaults from
-                                                ! parameter errors?
-      LOGICAL                FROZEN(NPAMAX)	! Frozen parameter flag
-      LOGICAL                LIKSTAT		! Fitstat is Cash likelihood statistic?
-      LOGICAL                LOGARITHMIC        ! Logarithmic grid axis?
-      LOGICAL                OPTIMISING         ! Using FIT_MIN in FIT_GRID?
-      LOGICAL                PFLAG(NPAMAX)	! Parameter in use flags
-      LOGICAL                SUBSTAT            ! Subtract minimum statistic?
-      LOGICAL                UP                 ! Update model after grid
-      LOGICAL                WORKSPACE		! Set up workspace for STAT gradients?
+      LOGICAL                	ANYBAD             	! Any bad grid points?
+      LOGICAL                	ANYBADISH          	! Any bad(ish) grid points?
+      LOGICAL                	AUTO               	! Automatic o/p file naming?
+      LOGICAL                	CHISTAT			! Fitstat is chi-squared?
+      LOGICAL                	ERR                	! Take AXISn defaults from
+							! parameter errors?
+      LOGICAL                	FROZEN(NPAMAX)		! Frozen parameter flag
+      LOGICAL                	LIKSTAT			! Fitstat is Cash likelihood statistic?
+      LOGICAL                	LOGARITHMIC        	! Logarithmic grid axis?
+      LOGICAL                	OPTIMISING         	! Using FIT_MIN in FIT_GRID?
+      LOGICAL                	PFLAG(NPAMAX)		! Parameter in use flags
+      LOGICAL                	SUBSTAT            	! Subtract minimum statistic?
+      LOGICAL                	UP                 	! Update model after grid
+      LOGICAL                	WORKSPACE		! Set up workspace for STAT gradients?
 *.
 
 *  Check inherited global status.
@@ -689,16 +688,12 @@
 *  If bad quality points, write a copy of quality to each output file
       IF ( ANYBAD .OR. ANYBADISH ) THEN
 
-*    Create quality for first grid
-        CALL BDI_PUT( GFID(1), 'Quality', 'UBYTE', NGRIDAX, GDIMS,
+*    Write quality to each grid
+        DO I = 1, NGRID
+          CALL BDI_PUT( GFID(I), 'Quality', 'UBYTE', NGRIDAX, GDIMS,
      :                %VAL(GQPTR), STATUS )
-        CALL BDI_PUT( GFID(1), 'QualityMask', 'UBYTE', 0, 0, GQMASK,
+          CALL BDI_PUT( GFID(I), 'QualityMask', 'UBYTE', 0, 0, GQMASK,
      :                STATUS )
-
-*    Copy quality for subsequent grids
-        DO I = 2, NGRID
-          CALL BDI_COPY( GFID(1), 'Quality,QualityMask', GFID(I),
-     :                   ' ', STATUS )
         END DO
 
       END IF
