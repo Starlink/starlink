@@ -2465,7 +2465,7 @@ F77_SUBROUTINE(adifn(flink))( INTEGER(fid), CHARACTER(cls),
   _chk_stat;				/* Check initialised and ok */
 
 /* Invoke kernel routine */
-  *id = adix_link_efile( fid, cls, cls_length, status );
+  *id = adix_link_efile( *fid, cls, cls_length, status );
 
   _ERR_REP( "ADI_FOPEN", Estr__LnkFilObj );
   }

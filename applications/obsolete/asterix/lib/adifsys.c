@@ -473,6 +473,9 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Check inherited global status. Return input argument if bad */
   _chk_stat_ret(id);
 
+/* Import strings resolving lengths */
+  _GET_NAME(cls,clen);
+
 /* If the user has specified wildcard type then we're done */
   if ( *cls != '*' ) {
 
