@@ -1265,6 +1265,21 @@ static int Overlap( AstRegion *this, AstRegion *that ){
                   lb_that = ptr_that[ ic ][ 0 ];
                   ub_that = ptr_that[ ic ][ 1 ];
 
+/* If the regions are not closed, reduce the limits by the smallest
+   amount possible. */
+                  if( !astGetClosed( that ) ) {
+                     if( lb_that != AST__BAD && lb_that < DBL_MAX ) 
+                         lb_that += DBL_EPSILON*fabs(lb_that);
+                     if( ub_that != AST__BAD && ub_that > -DBL_MAX ) 
+                         ub_that -= DBL_EPSILON*fabs(ub_that);
+                  }
+                  if( !astGetClosed( this ) ) {
+                     if( lb_this != AST__BAD && lb_this < DBL_MAX ) 
+                         lb_this += DBL_EPSILON*fabs(lb_this);
+                     if( ub_this != AST__BAD && ub_this > -DBL_MAX ) 
+                         ub_this -= DBL_EPSILON*fabs(ub_this);
+                  }
+
 /* Replace any missing limits with suitable extreme values */
                   if( lb_this == AST__BAD ) lb_this = -DBL_MAX;
                   if( ub_this == AST__BAD ) ub_this = DBL_MAX;
@@ -1288,20 +1303,24 @@ static int Overlap( AstRegion *this, AstRegion *that ){
                      ub_that = tmp;
                   } 
 
+
 /* Are the lower limits from the two Intervals effectively equal? Take care 
    about DBL_MAX values causing overflow. */
-                  lb_equal = ( lb_this == lb_that );
+                  lb_equal = EQUAL( lb_this, lb_that );
+
                   if( !lb_equal && fabs(lb_this) != DBL_MAX &&
                                    fabs(lb_that) != DBL_MAX ) {
                      lb_equal = ( fabs( lb_this - lb_that) <= err );
                   }
                                        
 /* Are the upper limits from the two Intervals effectively equal? */
-                  ub_equal = ( ub_this == ub_that );
+                  ub_equal = EQUAL( ub_this, ub_that );
                   if( !ub_equal && fabs(ub_this) != DBL_MAX &&
                                    fabs(ub_that) != DBL_MAX ) {
                      ub_equal = ( fabs( ub_this - ub_that) <= err );
                   }
+
+
 
 /* If both the limits on this axis are effectively equal for the two Intervals,
    set "ov" to 5 if both Interval ranges are inclusive or both are exclusive,

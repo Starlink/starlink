@@ -109,6 +109,7 @@ static void (* parent_setmeshsize)( AstRegion *, int );
 static void (* parent_clearclosed)( AstRegion * );
 static void (* parent_clearmeshsize)( AstRegion * );
 static double (*parent_getfillfactor)( AstRegion * );
+static int (* parent_overlap)( AstRegion *, AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -139,6 +140,7 @@ static void SetClosed( AstRegion *, int );
 static void SetMeshSize( AstRegion *, int );
 static void ClearClosed( AstRegion * );
 static void ClearMeshSize( AstRegion * );
+static int Overlap( AstRegion *, AstRegion * );
 
 
 /* Member functions. */
@@ -845,6 +847,9 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    parent_getfillfactor = region->GetFillFactor;
    region->GetFillFactor = GetFillFactor;
 
+   parent_overlap = region->Overlap;
+   region->Overlap = Overlap;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    region->RegBaseBox = RegBaseBox;
@@ -856,6 +861,264 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    astSetCopy( vtab, Copy );
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "Prism", "Region extrusion into higher dimensions" );
+}
+
+static int Overlap( AstRegion *this, AstRegion *that ){
+/*
+*  Name:
+*     Overlap
+
+*  Purpose:
+*     Test if two regions overlap each other.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     int Overlap( AstRegion *this, AstRegion *that ) 
+
+*  Class Membership:
+*     Prism member function (over-rides the astOverlap method inherited 
+*     from the Region class).
+
+*  Description:
+*     This function returns an integer value indicating if the two
+*     supplied Regions overlap. The two Regions are converted to a commnon
+*     coordinate system before performing the check. If this conversion is 
+*     not possible (for instance because the two Regions represent areas in
+*     different domains), then the check cannot be performed and a zero value 
+*     is returned to indicate this.
+
+*  Parameters:
+*     this
+*        Pointer to the first Region.
+*     that
+*        Pointer to the second Region.
+
+*  Returned Value:
+*     astOverlap()
+*        A value indicating if there is any overlap between the two Regions.
+*        Possible values are:
+*
+*        0 - The check could not be performed because the second Region
+*            could not be mapped into the coordinate system of the first 
+*            Region.
+*
+*        1 - There is no overlap between the two Regions.
+*
+*        2 - The first Region is completely inside the second Region.
+*
+*        3 - The second Region is completely inside the first Region.
+*
+*        4 - There is partial overlap between the two Regions.
+*
+*        5 - The Regions are identical.
+*
+*        6 - The second Region is the negation of the first Region.
+
+*  Notes:
+*     - The returned values 5 and 6 do not check the value of the Closed 
+*     attribute in the two Regions. 
+*     - A value of zero will be returned if this function is invoked with the 
+*     AST error status set, or if it should fail for any reason.
+
+*/
+
+/* Local Variables: */
+   AstFrameSet *fs;
+   AstMapping *emap;
+   AstMapping *map1;
+   AstMapping *map2;
+   AstMapping *map3;
+   AstMapping *map;
+   AstMapping *smap;
+   AstMapping *tmap;
+   AstRegion *that_reg1;
+   AstRegion *that_reg2;
+   AstRegion *this_reg1;
+   AstRegion *this_reg2;
+   int *inax;
+   int *outax;
+   int i;
+   int nbase;
+   int next;
+   int ok;
+   int rbase;
+   int result;     
+   int rext;            
+   int that_neg;
+   int this_neg;
+
+/* A table indicating how to combine together the overlap state of the 
+   extrusion Regions with the overlap state of the other (base) Region.
+   The first index represents the value returned by the astOverlap method
+   when used to determine the overlap of the base Regions in the two
+   supplied Prisms. The second index represents the value returned by the 
+   astOverlap method when used to determine the overlap of the extrusion 
+   Regions in the two supplied Prisms. The integer values stored in the 
+   array represent the astOverlap value describing the overlap of the two
+   Prisms. */
+   static int rtable[ 7 ][ 7 ] = { { 0, 0, 0, 0, 0, 0, 0 },
+                                   { 0, 1, 1, 1, 1, 1, 1 },
+                                   { 0, 1, 2, 4, 4, 2, 1 },
+                                   { 0, 1, 4, 3, 4, 3, 1 },
+                                   { 0, 1, 4, 4, 4, 4, 1 },
+                                   { 0, 1, 2, 3, 4, 5, 1 },
+                                   { 0, 1, 1, 1, 1, 1, 6 } };
+
+/* Initialise */
+   result = 0;
+
+/* Check the inherited status. */
+   if ( !astOK ) return result;
+
+/* If both Regions are Prisms, we provide a specialised implementation.
+   The implementation in the parent Region class assumes that at least one of 
+   the two Regions can be represented using a finite mesh of points on the 
+   boundary which is not the case with some Prisms. The implementation in this 
+   class sees if the Mapping between the base Frames of the Prisms allows 
+   the axis limits to be transferred from one Frame ot the other. */
+   if( astIsAPrism( this ) && astIsAPrism( that ) ) {
+
+/* Get the component Regions, and the Negated value for the two Prisms. The 
+   returned Regions represent a region within the base Frame of the FrameSet 
+   encapsulated by the parent Region structure. */
+      GetRegions( (AstPrism *) this, &this_reg1, &this_reg2, &this_neg );
+      GetRegions( (AstPrism *) that, &that_reg1, &that_reg2, &that_neg );
+
+/* Check that the component Regions have the same number of axes in both 
+   Prisms. */
+      nbase = astGetNaxes( this_reg1 );
+      next = astGetNaxes( this_reg2 );
+      if( astGetNaxes( that_reg1 ) == nbase &&
+          astGetNaxes( that_reg2 ) == next ) {
+
+/* Get a FrameSet which connects the Frame represented by the second Prism
+   to the Frame represented by the first Prism. Check that the conection is 
+   defined. */
+         fs = astConvert( that, this, "" );
+         if( fs ) {
+
+/* Get a pointer to the Mapping from base to current Frame in the second 
+   Prism */
+            map1 = astGetMapping( that->frameset, AST__BASE, AST__CURRENT );
+
+/* Get the Mapping from the current Frame of the second Prism to the
+   current Frame of the first Prism. */
+            map2 = astGetMapping( fs, AST__BASE, AST__CURRENT );
+
+/* Get a pointer to the Mapping from current to base Frame in the first
+   Prism. */
+            map3 = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+
+/* Combine these Mappings to get the Mapping from the base Frame of the
+   second Prism to the base Frame of the first Prism. */
+            tmap = (AstMapping *) astCmpMap( map1, map2, 1, "" );
+            map = (AstMapping *) astCmpMap( tmap, map3, 1, "" );
+
+/* Simplify this Mapping. */
+            smap = astSimplify( map );
+
+/* See if the mapping between the extrusion axes of the Prisms is
+   independent of the other axes. We can only test the overlap using this
+   algorithm is this is the case. The extrusion axes are the trailing
+   "next" axes. */
+            inax = astMalloc( sizeof(int)*(size_t)next );
+            for( i = 0; i < next; i++ ) inax[ i ] = nbase + i;
+            outax = astMapSplit( smap, next, inax, &emap );
+            if( outax ) {
+
+/* The inputs of the Mapping returned by astMapSplit correspond to the
+   extrusion axes of the second Prism. Check that the outputs of this
+   Mapping correspond to the extrusion axes of the first Prism. */
+               ok = 1;
+               for( i = 0; i < next; i++ ) {
+                  if( outax[ i ] < nbase ) {
+                     ok = 0;
+                     break;
+                  }
+               }
+
+               if( ok ) {
+
+/* We now know that the extrusion axes correspond in the base Frames of the 
+   two Prisms. So we can test separately for overlap of the two extrusion 
+   Regions, and for overlap of the two extruded Regions,and then combine
+   the returned flags to represent overlap of the whole Prism. */
+                  rbase = astOverlap( this_reg1, that_reg1 );
+                  rext = astOverlap( this_reg2, that_reg2 );
+                  result = rtable[ rbase ][ rext ];
+
+/* The values in the rtable array assume that neither of the supplied
+   Prisms have been negated. Modify the value obtained from rtable to
+   take account of negation of either or both of the supplied Prisms. */
+                  if( this_neg ) {
+                     if( that_neg ) {
+                        if( result == 1 ) {
+                           result = 4;
+                        } else if( result == 2 ) {
+                           result = 3;
+                        } else if( result == 3 ) {
+                           result = 2;
+                        }
+                     } else {
+                        if( result == 1 ) {
+                           result = 3;
+                        } else if( result == 2 ) {
+                           result = 4;
+                        } else if( result == 3 ) {
+                           result = 1;
+                        } else if( result == 5 ) {
+                           result = 6;
+                        } else if( result == 6 ) {
+                           result = 5;
+                        }
+                     }
+                  } else if( that_neg ){
+                     if( result == 1 ) {
+                        result = 2;
+                     } else if( result == 2 ) {
+                        result = 1;
+                     } else if( result == 3 ) {
+                        result = 4;
+                     } else if( result == 5 ) {
+                        result = 6;
+                     } else if( result == 6 ) {
+                        result = 5;
+                     }
+                  }
+               }
+
+/* Free resources. */
+               outax = astFree( outax );
+               emap = astAnnul( emap );
+            }
+            inax = astFree( inax );
+            smap = astAnnul( smap );
+            map = astAnnul( map );
+            tmap = astAnnul( tmap );
+            map3 = astAnnul( map3 );
+            map2 = astAnnul( map2 );
+            map1 = astAnnul( map1 );
+            fs = astAnnul( fs );
+         }
+      }
+      this_reg1 = astAnnul( this_reg1 );
+      that_reg1 = astAnnul( that_reg1 );
+      this_reg2 = astAnnul( this_reg2 );
+      that_reg2 = astAnnul( that_reg2 );
+   }
+
+/* If overlap could not be determined using the above implementation, try 
+   using the implementation inherited from the parent Region class. */
+   if( !result ) result = (*parent_overlap)( this, that );
+
+/* If not OK, return zero. */
+   if( !astOK ) result = 0;
+
+/* Return the result. */
+   return result;
 }
 
 static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
@@ -1062,16 +1325,16 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
          msz2 = ( astGetNaxes( reg2 ) == 1 ) ? 2 : sqrt( 0.5*mszp );
          gsz1 = 0.5*mszp/msz2;
 
-/* First, get a boundary mesh for the Interval (second region ) defining the 
-   prism extrusion. For instance, if the Interval is 1-dimensional, this mesh 
-   will consist of the two values on the Interval axis: the lower and upper 
-   bounds of the Interval. */
+/* First, get a boundary mesh for the Prism (second region ) defining the 
+   prism extrusion. For instance, if the Prism is 1-dimensional, this mesh 
+   will consist of the two values on the Prism axis: the lower and upper 
+   bounds of the Prism. */
          msz = astTestMeshSize( reg2 ) ? astGetMeshSize( reg2 ) : -1;
          astSetMeshSize( reg2, msz2 );
          mesh2 = astRegMesh( reg2 );
 
 /* Also get a grid of points spread throughout the extent (i.e. not
-   merely on the boundary) of the Interval. */
+   merely on the boundary) of the Prism. */
          astSetMeshSize( reg2, gsz2 );
          grid2 = astRegGrid( reg2 );
 
@@ -2434,10 +2697,11 @@ AstPrism *astInitPrism_( void *mem, size_t size, int init,
 
 /* Initialise. */
    new = NULL;
+   reg2 = NULL;
 
 /* Take a copy of the first supplied Region. */
    reg1 = astCopy( region1 );
-
+   
 /* If the second Region is Box, create a corresponding Interval from it. */
    if( astIsABox( region2 ) ) {
       reg2 = astBoxInterval( region2 );
