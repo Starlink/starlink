@@ -17,9 +17,12 @@
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.3  1996/09/18 19:14:18  timj
-*     Change from CONCAT to SCUCAT
+*     Revision 1.4  1996/10/17 18:13:49  timj
+*     Open OUT after reporting information on first input file
 *
+c Revision 1.3  1996/09/18  19:14:18  timj
+c Change from CONCAT to SCUCAT
+c
 c Revision 1.2  1996/09/18  02:16:51  timj
 c Add bad bit mask
 c
@@ -224,17 +227,6 @@ c
  
          IF (READING.AND. STATUS .EQ. SAI__OK) THEN
 
-*  Open the output file
-
-            IF (FILE .EQ. 1) THEN
-               LBND(1) = 1
-               UBND(1) = 2
-               CALL NDF_CREAT('OUT', '_REAL', 1, LBND, UBND, OUT_NDF, 
-     :              STATUS)
-               UBND(1) = 0
-            END IF
-
-
 * Map the input file
 
             CALL NDF_MAP(IN_NDF, 'QUALITY', '_UBYTE', 'READ',
@@ -257,12 +249,23 @@ c
      :           '^TITLE. There are ^NINT integrations', STATUS)
 
 
+*  Open the output file
+
+            IF (FILE .EQ. 1) THEN
+               LBND(1) = 1
+               UBND(1) = 2
+               CALL NDF_CREAT('OUT', '_REAL', 1, LBND, UBND, OUT_NDF, 
+     :              STATUS)
+               UBND(1) = 0
+            END IF
+
 * Change the bounds
 
             NDATA = UBND(1) - LBND(1) + 1
             UBND(1) = UBND(1) + EL
 
             CALL NDF_SBND(1, LBND, UBND, OUT_NDF, STATUS)
+
 
 * Map the output data arrays
 
