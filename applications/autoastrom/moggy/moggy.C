@@ -133,7 +133,7 @@ int main (int argc, char **argv)
                 argc--, argv++;
                 if (argc == 0)
                     Usage();
-                Util::logstream(*argv);
+                Util::openLogstream(*argv);
                 break;
 #if 0
 	      case 'l':		// log file
@@ -535,6 +535,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	    CommandParse::verbosity     ( flags & 2 ? debug : normal );
 	    AstHandler::verbosity       ( flags & 4 ? debug : normal );
 	    CatalogueHandler::verbosity ( flags & 8 ? debug : normal );
+
 	    msg << "250 Debugging:";
 	    if (flags & 1) msg << " moggy";
 	    if (flags & 2) msg << " CommandParse";
@@ -542,8 +543,11 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 	    if (flags & 8) msg << " CatalogueHandler";
 
             if (arglist.size() == 3) {
-                Util::logstream(arglist[2].c_str());
-                msg << " (to file " << arglist[2] << ")";
+                if (Util::openLogstream(arglist[2].c_str()))
+                    msg << " (to file " << arglist[2] << ")";
+                else
+                    msg << " (can't open " << arglist[2]
+                        << ": no logging)";
             }
 
 	    response = SS_STRING(msg);

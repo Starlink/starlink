@@ -31,16 +31,15 @@
 #ifndef UTIL_HEADER_READ
 #define UTIL_HEADER_READ 1
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 #if HAVE_STD_NAMESPACE
-using std::vector;
 using std::string;
+using std::vector;
 #define STD std
 #else
 #define STD
@@ -52,8 +51,11 @@ namespace Util {
        conversion is completely successful.  */
     bool stringToInteger (string str, int& i);
     bool stringToDouble (string str, double& f);
-    vector<string> tokeniseString (const string s, const char *seps = " \r\n\t");
-    ostream& logstream(const char* fn = 0);
+    vector<string> tokeniseString (const string s,
+                                   const char *seps = " \r\n\t");
+    ostream& logstream();
+    bool openLogstream(const char* fn);
+    static ofstream* log_stream_ = 0;
 }
 
 

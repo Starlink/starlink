@@ -146,16 +146,22 @@ vector<string> Util::tokeniseString (const string str, const char *seps)
     return tokens;
 }
 
-ostream& Util::logstream(const char* fn)
+//ofstream* Util::log_stream_ = 0;
+
+bool Util::openLogstream(const char* fn)
 {
-    static ofstream log_;
-    
-    if (fn != 0) {
-        // open a new one
-        log_.open(fn);
+    if (log_stream_ != 0) {
+        log_stream_->close();
+        delete log_stream_;
     }
-    if (log_.is_open())
-        return log_;
-    else
+    log_stream_ = new ofstream(fn);
+    return log_stream_->is_open();
+}
+
+ostream& Util::logstream()
+{
+    if (log_stream_ == 0)
         return cerr;
+    else
+        return *log_stream_;
 }

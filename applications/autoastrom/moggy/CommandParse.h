@@ -46,7 +46,9 @@
 #if HAVE_STD_NAMESPACE
 using std::string;
 using std::vector;
-using std::map;
+#define STD std
+#else
+#define STD
 #endif
 
 class CommandParse {
@@ -75,7 +77,7 @@ class CommandParse {
     vector<string> args_;
     static verbosities verbosity_;
 #if HAVE_MAP
-    typedef map<string,token_value> CmdMap;
+    typedef STD::map<string,token_value> CmdMap;
     static CmdMap command_table_;
     static bool command_table_init_;
 #endif
