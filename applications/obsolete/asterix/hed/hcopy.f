@@ -144,7 +144,7 @@
 
           CALL DAT_TYPE( ILOC, TYPE, STATUS )
           CALL DAT_NAME( ILOC, NAME, STATUS )
-          CALL DAT_SHAPE( ILOC, DAT__MXDIM, NDIM, DIMS, STATUS )
+          CALL DAT_SHAPE( ILOC, DAT__MXDIM, DIMS, NDIM, STATUS )
           CALL HDS_NEW( OUT, NAME, TYPE, NDIM, DIMS, OLOC, STATUS )
 
 *        Copy all sub-components
@@ -179,14 +179,14 @@
             CALL HDX_FIND( OLOC, OUT(IDOT+1:L), CLOC, STATUS )
 
 *          Get input shape. Adjust scalars to be 1-D arrays of length 1
-            CALL DAT_SHAPE( ILOC, DAT__MXDIM, NDIM, DIMS, STATUS )
+            CALL DAT_SHAPE( ILOC, DAT__MXDIM, DIMS, NDIM, STATUS )
             IF ( NDIM .EQ. 0 ) THEN
               NDIM = 1
               DIMS(1) = 1
             END IF
 
 *          Get output shape
-            CALL DAT_SHAPE( CLOC, DAT__MXDIM, ONDIM, ODIMS, STATUS )
+            CALL DAT_SHAPE( CLOC, DAT__MXDIM, ODIMS, ONDIM, STATUS )
 
 *          Check they're the same. Arrays are the same if dimensions are
 *          same until MIN(NDIM,ONDIM), and subsequent dimensions are unity
