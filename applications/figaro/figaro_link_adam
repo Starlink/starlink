@@ -1,0 +1,59 @@
+
+# N.B. the previous line should be blank.
+#+
+#  Name:
+#     figaro_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking the Figaro monoliths.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked when building the Figaro monoliths
+#     in order to generate the correct arguments
+#     for the compiler (or ld) command. The arguments generated are written
+#     to the standard output.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#        alink program.o -L/star/lib `./figaro_link_adam`
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     acc: Anne Charles (RAL)
+#     acd: Clive Davenhall (UoE, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     18 Oct 1995 (hme):
+#        Original Version.
+#     11 Dec 1995 (hme):
+#        Use _adam variations for AGI and FIO as well as NDF.
+#     14 Mar 1995 (hme):
+#        Figaro libraries are mentioned here, not in the makefile.
+#        The makefile doesn't know that DSA/DTA contain the same routines
+#        as FDA and that one has to make a choice.
+#     19 Nov 1997 (acc):
+#        Add libraries for SPECDRE, which is being merged with FIGARO.
+#     11 Nov 1998 (acd):
+#        Added FLA library.
+#     {enter_changes_here}
+#-
+#.
+
+      echo libapplic.a libappstl.a libappsub.a \
+         libappca.a libappcb.a libspext.a libfitres.a \
+         libwork.a libutil.a libsploop.a libfla.a \
+         libfig.a libfda.a libjty.a libfit.a libtio.a \
+         libgen.a libgkd.a libpar.a libich.a \
+         -lpda `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
+         `fio_link_adam`
+#      echo libapplic.a libappstl.a libappsub.a \
+#         libfig.a libdsa.a libjty.a libdta.a libfit.a libtio.a \
+#         libgen.a libgkd.a libpar.a libich.a \
+#         -lpda `agi_link_adam` `ndf_link_adam` `fio_link_adam`
+
+#  End of script.

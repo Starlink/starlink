@@ -1,0 +1,587 @@
+#+
+#  Name:
+#     figaro.csh
+#
+#  Purpose:
+#     Start the Figaro package from the C shell.
+#
+#  Type of Module:
+#     C shell command list
+#
+#  Invocation:
+#     source $FIG_DIR/figaro.csh
+#
+#  Description:
+#     This procedure starts the Figaro package for use from the C shell by 
+#     defining the aliases needed to execute each application.
+#
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     acc: Anne Charles (RAL)
+#     acd: Clive Davenhall (UoE, Starlink)
+#     mbt: Mark Taylor (IoA, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     bly: Martin Bly, RAL, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     18 Aug 1992 (hme):
+#        Original Version
+#     25 Oct 1992 (hme):
+#        Scrap disk FITS read/write.
+#     16 Nov 1992 (hme):
+#        FIGHELP added. Discontinued applications added. IGCUR added.
+#     06 Apr 1993 (hme):
+#        Five imaging routines added.
+#        creobj rather than crobj.
+#        Split let into copobj and setobj.
+#     10 Jan 1995 (hme):
+#        Add figxhelp.
+#     20 Jul 1995 (hme):
+#        Add yc* applications.
+#     11 Oct 1995 (hme):
+#        No longer define aliases for un-ported applications.
+#     18 Nov 1997 (acc):
+#        Merge with specdre.csh.
+#     22 Dec 1997 (acd)
+#        Modified date to correspond to version 5.3-0.
+#     14 Aug 1998 (mbt):
+#        Added sclean.
+#     09 Nov 1998 (acd):
+#        Added flaircomp, flairext and skyliner.
+#     21 Jun 1999 (tdca):
+#        Added twodspec applications.
+#     11 Feb 2000 (bly):
+#        Added PKG_DATE macro.
+#     30 Oct 2001 (acd):
+#        Added impos.
+#     {enter_changes_here}
+#
+#-
+#.
+#  Announce name now, version etc. below.
+#
+echo " "
+echo " ----------- Initialising for  Figaro ------------"
+#
+#  Define aliases for each application.
+#
+
+alias     abconv $FIG_DIR/abconv
+alias fig_abconv $FIG_DIR/abconv
+alias     abline $FIG_DIR/abline
+alias fig_abline $FIG_DIR/abline
+alias     adjoin $FIG_DIR/adjoin
+alias fig_adjoin $FIG_DIR/adjoin
+alias     alasin $FIG_DIR/alasin
+alias fig_alasin $FIG_DIR/alasin
+alias     alasout $FIG_DIR/alasout
+alias fig_alasout $FIG_DIR/alasout
+alias     aperture $FIG_DIR/aperture
+alias fig_aperture $FIG_DIR/aperture
+alias     arc $FIG_DIR/arc
+alias fig_arc $FIG_DIR/arc
+alias     arc2d $FIG_DIR/arc2d
+alias two_arc2d $FIG_DIR/arc2d
+alias     arcdisp  $FIG_DIR/arcdisp
+alias spe_arcdisp  $FIG_DIR/arcdisp
+alias     arcgendb $FIG_DIR/arcgendb
+alias spe_arcgendb $FIG_DIR/arcgendb
+alias     arcident $FIG_DIR/arcident
+alias spe_arcident $FIG_DIR/arcident
+alias     arclocat $FIG_DIR/arclocat
+alias spe_arclocat $FIG_DIR/arclocat
+alias     arcsdi   $FIG_DIR/arcsdi
+alias two_arcsdi   $FIG_DIR/arcsdi
+alias     ascin    $FIG_DIR/ascin
+alias spe_ascin    $FIG_DIR/ascin
+alias     ascout   $FIG_DIR/ascout
+alias spe_ascout   $FIG_DIR/ascout
+alias     bbody    $FIG_DIR/bbody
+alias spe_bbody    $FIG_DIR/bbody
+alias     bclean $FIG_DIR/bclean
+alias fig_bclean $FIG_DIR/bclean
+alias     bfft $FIG_DIR/bfft
+alias fig_bfft $FIG_DIR/bfft
+alias     bsmult $FIG_DIR/bsmult
+alias fig_bsmult $FIG_DIR/bsmult
+alias     cadd   $FIG_DIR/cadd
+alias two_cadd   $FIG_DIR/cadd
+alias     caldiv $FIG_DIR/caldiv
+alias fig_caldiv $FIG_DIR/caldiv
+alias     ccdlin $FIG_DIR/ccdlin
+alias fig_ccdlin $FIG_DIR/ccdlin
+alias     ccur $FIG_DIR/ccur
+alias fig_ccur $FIG_DIR/ccur
+alias     cdist $FIG_DIR/cdist
+alias fig_cdist $FIG_DIR/cdist
+alias     centers $FIG_DIR/centers
+alias fig_centers $FIG_DIR/centers
+alias     cfit $FIG_DIR/cfit
+alias fig_cfit $FIG_DIR/cfit
+alias     changed $FIG_DIR/changed
+alias two_changed $FIG_DIR/changed
+alias     clean $FIG_DIR/clean
+alias fig_clean $FIG_DIR/clean
+alias     clip $FIG_DIR/clip
+alias fig_clip $FIG_DIR/clip
+alias     cmplx2i $FIG_DIR/cmplx2i
+alias fig_cmplx2i $FIG_DIR/cmplx2i
+alias     cmplx2m $FIG_DIR/cmplx2m
+alias fig_cmplx2m $FIG_DIR/cmplx2m
+alias     cmplx2r $FIG_DIR/cmplx2r
+alias fig_cmplx2r $FIG_DIR/cmplx2r
+alias     cmplxadd $FIG_DIR/cmplxadd
+alias fig_cmplxadd $FIG_DIR/cmplxadd
+alias     cmplxconj $FIG_DIR/cmplxconj
+alias fig_cmplxconj $FIG_DIR/cmplxconj
+alias     cmplxdiv $FIG_DIR/cmplxdiv
+alias fig_cmplxdiv $FIG_DIR/cmplxdiv
+alias     cmplxfilt $FIG_DIR/cmplxfilt
+alias fig_cmplxfilt $FIG_DIR/cmplxfilt
+alias     cmplxmult $FIG_DIR/cmplxmult
+alias fig_cmplxmult $FIG_DIR/cmplxmult
+alias     cmplxsub $FIG_DIR/cmplxsub
+alias fig_cmplxsub $FIG_DIR/cmplxsub
+alias     coadd $FIG_DIR/coadd
+alias fig_coadd $FIG_DIR/coadd
+alias     colour $FIG_DIR/colour
+alias fig_colour $FIG_DIR/colour
+alias     comb $FIG_DIR/comb
+alias two_comb $FIG_DIR/comb
+alias     combine $FIG_DIR/combine
+alias fig_combine $FIG_DIR/combine
+alias     copobj $FIG_DIR/copobj
+alias fig_copobj $FIG_DIR/copobj
+alias     correl   $FIG_DIR/correl
+alias spe_correl   $FIG_DIR/correl
+alias     cosbell $FIG_DIR/cosbell
+alias fig_cosbell $FIG_DIR/cosbell
+alias     cosrej $FIG_DIR/cosrej
+alias fig_cosrej $FIG_DIR/cosrej
+alias     creobj $FIG_DIR/creobj
+alias fig_creobj $FIG_DIR/creobj
+alias     criguass $FIG_DIR/criguass
+alias two_criguass $FIG_DIR/crigauss
+alias     cset $FIG_DIR/cset
+alias fig_cset $FIG_DIR/cset
+alias     cspike $FIG_DIR/cspike
+alias fig_cspike $FIG_DIR/cspike
+alias     cscan $FIG_DIR/cscan
+alias two_cscan $FIG_DIR/cscan
+alias     csub $FIG_DIR/csub
+alias two_csub $FIG_DIR/csub
+alias     cube2long $FIG_DIR/cube2long
+alias two_cube2long $FIG_DIR/cube2long
+alias     delobj $FIG_DIR/delobj
+alias fig_delobj $FIG_DIR/delobj
+alias     dvdplot $FIG_DIR/dvdplot
+alias fig_dvdplot $FIG_DIR/dvdplot
+alias     echarc $FIG_DIR/echarc
+alias fig_echarc $FIG_DIR/echarc
+alias     echfind $FIG_DIR/echfind
+alias fig_echfind $FIG_DIR/echfind
+alias     echmask $FIG_DIR/echmask
+alias fig_echmask $FIG_DIR/echmask
+alias     echmerge $FIG_DIR/echmerge
+alias fig_echmerge $FIG_DIR/echmerge
+alias     echselect $FIG_DIR/echselect
+alias fig_echselect $FIG_DIR/echselect
+alias     editext  $FIG_DIR/editext
+alias spe_editext  $FIG_DIR/editext
+alias     elsplot $FIG_DIR/elsplot
+alias fig_elsplot $FIG_DIR/elsplot
+alias     emlt $FIG_DIR/emlt
+alias fig_emlt $FIG_DIR/emlt
+alias     errcon $FIG_DIR/errcon
+alias fig_errcon $FIG_DIR/errcon
+alias     esplot $FIG_DIR/esplot
+alias fig_esplot $FIG_DIR/esplot
+alias     evalfit  $FIG_DIR/evalfit
+alias spe_evalfit  $FIG_DIR/evalfit
+alias     extin $FIG_DIR/extin
+alias fig_extin $FIG_DIR/extin
+alias     extlist $FIG_DIR/extlist
+alias fig_extlist $FIG_DIR/extlist
+alias     extract $FIG_DIR/extract
+alias fig_extract $FIG_DIR/extract
+alias     fet321 $FIG_DIR/fet321
+alias fig_fet321 $FIG_DIR/fet321
+alias     ff $FIG_DIR/ff
+alias fig_ff $FIG_DIR/ff
+alias     ffcross $FIG_DIR/ffcross
+alias fig_ffcross $FIG_DIR/ffcross
+alias     fft $FIG_DIR/fft
+alias fig_fft $FIG_DIR/fft
+alias     fib2cube $FIG_DIR/fib2cube
+alias two_fib2cube $FIG_DIR/fib2cube
+alias     fibdisp $FIG_DIR/fibdisp
+alias two_fibdisp $FIG_DIR/fibdisp
+alias     fibsep $FIG_DIR/fibsep
+alias two_fibsep $FIG_DIR/fibsep
+alias     figinfo $FIG_DIR/figinfo
+alias fig_figinfo $FIG_DIR/figinfo
+alias     figs321 $FIG_DIR/figs321
+alias fig_figs321 $FIG_DIR/figs321
+alias     figs322 $FIG_DIR/figs322
+alias fig_figs322 $FIG_DIR/figs322
+alias     figs422 $FIG_DIR/figs422
+alias fig_figs422 $FIG_DIR/figs422
+alias     figs423 $FIG_DIR/figs423
+alias fig_figs423 $FIG_DIR/figs423
+alias     figs424 $FIG_DIR/figs424
+alias fig_figs424 $FIG_DIR/figs424
+alias     figsee $FIG_DIR/figsee
+alias fig_figsee $FIG_DIR/figsee
+alias     figsflux $FIG_DIR/figsflux
+alias fig_figsflux $FIG_DIR/figsflux
+alias     fillcube $FIG_DIR/fillcube
+alias spe_fillcube $FIG_DIR/fillcube
+alias     findsp $FIG_DIR/findsp
+alias fig_findsp $FIG_DIR/findsp
+alias     fitbb    $FIG_DIR/fitbb
+alias spe_fitbb    $FIG_DIR/fitbb
+alias     fitcont $FIG_DIR/fitcont
+alias two_fitcont $FIG_DIR/fitcont
+alias     fitgauss $FIG_DIR/fitgauss
+alias spe_fitgauss $FIG_DIR/fitgauss
+alias     fitpoly  $FIG_DIR/fitpoly
+alias spe_fitpoly  $FIG_DIR/fitpoly
+alias     fitset $FIG_DIR/fitset
+alias fig_fitset $FIG_DIR/fitset
+alias     fitskeys $FIG_DIR/fitskeys
+alias fig_fitskeys $FIG_DIR/fitskeys
+alias     fittri   $FIG_DIR/fittri
+alias spe_fittri   $FIG_DIR/fittri
+alias     flaircomp $FIG_DIR/flaircomp
+alias fig_flaircomp $FIG_DIR/flaircomp
+alias     flairext  $FIG_DIR/flairext
+alias fig_flairext  $FIG_DIR/flairext
+alias     flag2qual $FIG_DIR/flag2qual
+alias fig_flag2qual $FIG_DIR/flag2qual
+alias     flconv $FIG_DIR/flconv
+alias fig_flconv $FIG_DIR/flconv
+alias     foto $FIG_DIR/foto
+alias fig_foto $FIG_DIR/foto
+alias     fscrunch $FIG_DIR/fscrunch
+alias fig_fscrunch $FIG_DIR/fscrunch
+alias     fwconv $FIG_DIR/fwconv
+alias fig_fwconv $FIG_DIR/fwconv
+alias     gauss $FIG_DIR/gauss
+alias fig_gauss $FIG_DIR/gauss
+alias     goodvar $FIG_DIR/goodvar
+alias fig_goodvar $FIG_DIR/goodvar
+alias     grow     $FIG_DIR/grow
+alias spe_grow     $FIG_DIR/grow
+alias     growx $FIG_DIR/growx
+alias fig_growx $FIG_DIR/growx
+alias     growxt $FIG_DIR/growxt
+alias fig_growxt $FIG_DIR/growxt
+alias     growxy $FIG_DIR/growxy
+alias fig_growxy $FIG_DIR/growxy
+alias     growy $FIG_DIR/growy
+alias fig_growy $FIG_DIR/growy
+alias     growyt $FIG_DIR/growyt
+alias fig_growyt $FIG_DIR/growyt
+alias     gspike $FIG_DIR/gspike
+alias fig_gspike $FIG_DIR/gspike
+alias     hard $FIG_DIR/hard
+alias fig_hard $FIG_DIR/hard
+alias     hcross $FIG_DIR/hcross
+alias fig_hcross $FIG_DIR/hcross
+alias     himage $FIG_DIR/himage
+alias two_himage $FIG_DIR/himage
+alias     hist $FIG_DIR/hist
+alias fig_hist $FIG_DIR/hist
+alias     hopt $FIG_DIR/hopt
+alias fig_hopt $FIG_DIR/hopt
+alias     i2cmplx $FIG_DIR/i2cmplx
+alias fig_i2cmplx $FIG_DIR/i2cmplx
+alias     iadd $FIG_DIR/iadd
+alias fig_iadd $FIG_DIR/iadd
+alias     iarc $FIG_DIR/iarc
+alias fig_iarc $FIG_DIR/iarc
+alias     icadd $FIG_DIR/icadd
+alias fig_icadd $FIG_DIR/icadd
+alias     icdiv $FIG_DIR/icdiv
+alias fig_icdiv $FIG_DIR/icdiv
+alias     icmult $FIG_DIR/icmult
+alias fig_icmult $FIG_DIR/icmult
+alias     icont $FIG_DIR/icont
+alias fig_icont $FIG_DIR/icont
+alias     iconv3 $FIG_DIR/iconv3
+alias fig_iconv3 $FIG_DIR/iconv3
+alias     icor16 $FIG_DIR/icor16
+alias fig_icor16 $FIG_DIR/icor16
+alias     icset $FIG_DIR/icset
+alias fig_icset $FIG_DIR/icset
+alias     icsub $FIG_DIR/icsub
+alias fig_icsub $FIG_DIR/icsub
+alias     icur $FIG_DIR/icur
+alias fig_icur $FIG_DIR/icur
+alias     idev $FIG_DIR/idev
+alias fig_idev $FIG_DIR/idev
+alias     idiff $FIG_DIR/idiff
+alias fig_idiff $FIG_DIR/idiff
+alias     idiv $FIG_DIR/idiv
+alias fig_idiv $FIG_DIR/idiv
+alias     igconv $FIG_DIR/igconv
+alias fig_igconv $FIG_DIR/igconv
+alias     igcur $FIG_DIR/igcur
+alias fig_igcur $FIG_DIR/igcur
+alias     igrey $FIG_DIR/igrey
+alias fig_igrey $FIG_DIR/igrey
+alias     ilist $FIG_DIR/ilist
+alias fig_ilist $FIG_DIR/ilist
+alias     ilog $FIG_DIR/ilog
+alias fig_ilog $FIG_DIR/ilog
+alias     image $FIG_DIR/image
+alias fig_image $FIG_DIR/image
+alias     impos $FIG_DIR/impos
+alias fig_impos $FIG_DIR/impos
+alias     imult $FIG_DIR/imult
+alias fig_imult $FIG_DIR/imult
+alias     interp $FIG_DIR/interp
+alias fig_interp $FIG_DIR/interp
+alias     iplots $FIG_DIR/iplots
+alias fig_iplots $FIG_DIR/iplots
+alias     ipower $FIG_DIR/ipower
+alias fig_ipower $FIG_DIR/ipower
+alias     irconv $FIG_DIR/irconv
+alias fig_irconv $FIG_DIR/irconv
+alias     irevx $FIG_DIR/irevx
+alias fig_irevx $FIG_DIR/irevx
+alias     irevy $FIG_DIR/irevy
+alias fig_irevy $FIG_DIR/irevy
+alias     irflat $FIG_DIR/irflat
+alias fig_irflat $FIG_DIR/irflat
+alias     irflux $FIG_DIR/irflux
+alias fig_irflux $FIG_DIR/irflux
+alias     irot90 $FIG_DIR/irot90
+alias fig_irot90 $FIG_DIR/irot90
+alias     iscan $FIG_DIR/iscan
+alias two_iscan $FIG_DIR/iscan
+alias     iscrunch $FIG_DIR/iscrunch
+alias fig_iscrunch $FIG_DIR/iscrunch
+alias     iscruni $FIG_DIR/iscruni
+alias fig_iscruni $FIG_DIR/iscruni
+alias     isedit $FIG_DIR/isedit
+alias fig_isedit $FIG_DIR/isedit
+alias     ishift $FIG_DIR/ishift
+alias fig_ishift $FIG_DIR/ishift
+alias     ismooth $FIG_DIR/ismooth
+alias fig_ismooth $FIG_DIR/ismooth
+alias     isplot $FIG_DIR/isplot
+alias fig_isplot $FIG_DIR/isplot
+alias     istat $FIG_DIR/istat
+alias fig_istat $FIG_DIR/istat
+alias     istretch $FIG_DIR/istretch
+alias fig_istretch $FIG_DIR/istretch
+alias     isub $FIG_DIR/isub
+alias fig_isub $FIG_DIR/isub
+alias     isubset $FIG_DIR/isubset
+alias fig_isubset $FIG_DIR/isubset
+alias     isuper $FIG_DIR/isuper
+alias fig_isuper $FIG_DIR/isuper
+alias     isxadd $FIG_DIR/isxadd
+alias fig_isxadd $FIG_DIR/isxadd
+alias     isxdiv $FIG_DIR/isxdiv
+alias fig_isxdiv $FIG_DIR/isxdiv
+alias     isxmul $FIG_DIR/isxmul
+alias fig_isxmul $FIG_DIR/isxmul
+alias     isxsub $FIG_DIR/isxsub
+alias fig_isxsub $FIG_DIR/isxsub
+alias     isyadd $FIG_DIR/isyadd
+alias fig_isyadd $FIG_DIR/isyadd
+alias     isydiv $FIG_DIR/isydiv
+alias fig_isydiv $FIG_DIR/isydiv
+alias     isymul $FIG_DIR/isymul
+alias fig_isymul $FIG_DIR/isymul
+alias     isysub $FIG_DIR/isysub
+alias fig_isysub $FIG_DIR/isysub
+alias     ixsmooth $FIG_DIR/ixsmooth
+alias fig_ixsmooth $FIG_DIR/ixsmooth
+alias     linterp $FIG_DIR/linterp
+alias fig_linterp $FIG_DIR/linterp
+alias     longslit $FIG_DIR/longslit
+alias two_longslit $FIG_DIR/longslit
+alias     lsplot $FIG_DIR/lsplot
+alias fig_lsplot $FIG_DIR/lsplot
+alias     lxset $FIG_DIR/lxset
+alias fig_lxset $FIG_DIR/lxset
+alias     lyset $FIG_DIR/lyset
+alias fig_lyset $FIG_DIR/lyset
+alias     mask $FIG_DIR/mask
+alias fig_mask $FIG_DIR/mask
+alias     maskext $FIG_DIR/maskext
+alias fig_maskext $FIG_DIR/maskext
+alias     mcfit $FIG_DIR/mcfit
+alias fig_mcfit $FIG_DIR/mcfit
+alias     medfilt $FIG_DIR/medfilt
+alias fig_medfilt $FIG_DIR/medfilt
+alias     medfiltr $FIG_DIR/medfiltr
+alias fig_medfiltr $FIG_DIR/medfiltr
+alias     medsky $FIG_DIR/medsky
+alias fig_medsky $FIG_DIR/medsky
+alias     moments  $FIG_DIR/moments
+alias spe_moments  $FIG_DIR/moments
+alias     movie    $FIG_DIR/movie
+alias spe_movie    $FIG_DIR/movie
+alias     msplot $FIG_DIR/msplot
+alias fig_msplot $FIG_DIR/msplot
+alias     ncset $FIG_DIR/ncset
+alias fig_ncset $FIG_DIR/ncset
+alias     offdist $FIG_DIR/offdist
+alias fig_offdist $FIG_DIR/offdist
+alias     optextract $FIG_DIR/optextract
+alias fig_optextract $FIG_DIR/optextract
+alias     overpf $FIG_DIR/overpf
+alias fig_overpf $FIG_DIR/overpf
+alias     peak $FIG_DIR/peak
+alias fig_peak $FIG_DIR/peak
+alias     polext $FIG_DIR/polext
+alias fig_polext $FIG_DIR/polext
+alias     polysky $FIG_DIR/polysky
+alias fig_polysky $FIG_DIR/polysky
+alias     profile $FIG_DIR/profile
+alias fig_profile $FIG_DIR/profile
+alias     q2bad $FIG_DIR/q2bad
+alias fig_q2bad $FIG_DIR/q2bad
+alias     qual2flag $FIG_DIR/qual2flag
+alias fig_qual2flag $FIG_DIR/qual2flag
+alias     r2cmplx $FIG_DIR/r2cmplx
+alias fig_r2cmplx $FIG_DIR/r2cmplx
+alias     rcgs2 $FIG_DIR/rcgs2
+alias fig_rcgs2 $FIG_DIR/rcgs2
+alias     rdfits $FIG_DIR/rdfits
+alias fig_rdfits $FIG_DIR/rdfits
+alias     rdipso $FIG_DIR/rdipso
+alias fig_rdipso $FIG_DIR/rdipso
+alias     rembad $FIG_DIR/rembad
+alias fig_rembad $FIG_DIR/rembad
+alias     renobj $FIG_DIR/renobj
+alias fig_renobj $FIG_DIR/renobj
+alias     resamp   $FIG_DIR/resamp
+alias spe_resample $FIG_DIR/resamp
+alias     resample $FIG_DIR/resample
+alias fig_resample $FIG_DIR/resample
+alias     rescale $FIG_DIR/rescale
+alias fig_rescale $FIG_DIR/rescale
+alias     retype $FIG_DIR/retype
+alias fig_retype $FIG_DIR/retype
+alias     rotx $FIG_DIR/rotx
+alias fig_rotx $FIG_DIR/rotx
+alias     sclean $FIG_DIR/sclean
+alias fig_sclean $FIG_DIR/sclean
+alias     scnsky $FIG_DIR/scnsky
+alias fig_scnsky $FIG_DIR/scnsky
+alias     scross $FIG_DIR/scross
+alias fig_scross $FIG_DIR/scross
+alias     scrunch $FIG_DIR/scrunch
+alias fig_scrunch $FIG_DIR/scrunch
+alias     sdist $FIG_DIR/sdist
+alias fig_sdist $FIG_DIR/sdist
+alias     setobj $FIG_DIR/setobj
+alias fig_setobj $FIG_DIR/setobj
+alias     sfit $FIG_DIR/sfit
+alias fig_sfit $FIG_DIR/sfit
+alias     skyliner $FIG_DIR/skyliner
+alias fig_skyliner $FIG_DIR/skyliner
+alias     slice $FIG_DIR/slice
+alias fig_slice $FIG_DIR/slice
+alias     soft $FIG_DIR/soft
+alias fig_soft $FIG_DIR/soft
+alias     speccont $FIG_DIR/speccont
+alias spe_speccont $FIG_DIR/speccont
+alias     specgrid $FIG_DIR/specgrid
+alias spe_specgrid $FIG_DIR/specgrid
+alias     specplot $FIG_DIR/specplot
+alias spe_specplot $FIG_DIR/specplot
+alias     spflux $FIG_DIR/spflux
+alias fig_spflux $FIG_DIR/spflux
+alias     spied $FIG_DIR/spied
+alias fig_spied $FIG_DIR/spied
+alias     spifit $FIG_DIR/spifit
+alias fig_spifit $FIG_DIR/spifit
+alias     splot $FIG_DIR/splot
+alias fig_splot $FIG_DIR/splot
+alias     sqrterr $FIG_DIR/sqrterr
+alias fig_sqrterr $FIG_DIR/sqrterr
+alias     subset   $FIG_DIR/subset
+alias spe_subset   $FIG_DIR/subset
+alias     table $FIG_DIR/table
+alias fig_table $FIG_DIR/table
+alias     tippex $FIG_DIR/tippex
+alias fig_tippex $FIG_DIR/tippex
+alias     trimfile $FIG_DIR/trimfile
+alias fig_trimfile $FIG_DIR/trimfile
+alias     vachel $FIG_DIR/vachel
+alias fig_vachel $FIG_DIR/vachel
+alias     vig $FIG_DIR/vig
+alias two_vig $FIG_DIR/vig
+alias     wdfits $FIG_DIR/wdfits
+alias fig_wdfits $FIG_DIR/wdfits
+alias     wdipso $FIG_DIR/wdipso
+alias fig_wdipso $FIG_DIR/wdipso
+alias     xcadd $FIG_DIR/xcadd
+alias fig_xcadd $FIG_DIR/xcadd
+alias     xcdiv $FIG_DIR/xcdiv
+alias fig_xcdiv $FIG_DIR/xcdiv
+alias     xcmult $FIG_DIR/xcmult
+alias fig_xcmult $FIG_DIR/xcmult
+alias     xcsub $FIG_DIR/xcsub
+alias fig_xcsub $FIG_DIR/xcsub
+alias     xtract   $FIG_DIR/xtract
+alias spe_xtract   $FIG_DIR/xtract
+alias     ycadd $FIG_DIR/ycadd
+alias fig_ycadd $FIG_DIR/ycadd
+alias     ycdiv $FIG_DIR/ycdiv
+alias fig_ycdiv $FIG_DIR/ycdiv
+alias     ycmult $FIG_DIR/ycmult
+alias fig_ycmult $FIG_DIR/ycmult
+alias     ycsub $FIG_DIR/ycsub
+alias fig_ycsub $FIG_DIR/ycsub
+alias     xcopi $FIG_DIR/xcopi
+alias fig_xcopi $FIG_DIR/xcopi
+alias     xcopy $FIG_DIR/xcopy
+alias fig_xcopy $FIG_DIR/xcopy
+alias     xcur $FIG_DIR/xcur
+alias fig_xcur $FIG_DIR/xcur
+alias     xtplane $FIG_DIR/xtplane
+alias fig_xtplane $FIG_DIR/xtplane
+alias     xyplane $FIG_DIR/xyplane
+alias fig_xyplane $FIG_DIR/xyplane
+alias     ystract $FIG_DIR/ystract
+alias fig_ystract $FIG_DIR/ystract
+alias     ytplane $FIG_DIR/ytplane
+alias fig_ytplane $FIG_DIR/ytplane
+alias     fighelp $FIG_DIR/fighelp
+alias fig_fighelp $FIG_DIR/fighelp
+alias spe_help    $FIG_DIR/fighelp
+#
+alias fig_exam echo \
+     "The EXAM command has been removed.  Please use HDSTRACE instead."
+alias     exam echo \
+     "The EXAM command has been removed.  Please use HDSTRACE instead."
+#
+#  Turn parameter name abbreviation on
+#
+alias abbrev "setenv ADAM_ABBRV"
+alias noabbrev "unsetenv ADAM_ABBRV"
+#
+# Show that the Figaro commands are now available.
+#
+echo "              General data reduction"
+echo "            Version PKG_VERS PKG_DATE"
+echo " "
+echo "          Type" \"fighelp figaro\" for help
+echo "      or" \"fighelp news\" for news on changes
+echo " "
+echo " Type" \"showme sun86\" to browse HTML documentation
+echo " "
+echo " Use" \"abbrev\" and \"noabbrev\" to turn parameter name
+echo " abbreviation on and off."
+echo " "
+#
+# end
+#

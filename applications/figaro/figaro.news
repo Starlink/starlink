@@ -1,0 +1,28 @@
+1 Figaro - Spectroscopy Data Reduction Package
+                                                      Expires: ????.??.??
+
+ Version 5.6-2 of Figaro has recently been released.  Figaro is a
+ powerful and comprehensive general-purpose package for the reduction
+ of astronomical images and spectra.  It contains particularly extensive
+ facilities for spectroscopy.  The only changes in Version 5.6-2 are a
+ couple of bug fixes.
+
+ Figaro is documented in SUN/86.  To view a hypertext version of this
+ document type:
+
+    showme sun86
+
+ or
+
+    findme figaro
+
+ Further information about Figaro is available via the World Wide Web
+ at the following URL:
+
+     http://www.starlink.rl.ac.uk/figaro/
+
+ Please report any problems with Figaro by sending an e-mail message to
+ address figaro@star.rl.ac.uk.
+
+
+ A C Davenhall, 2 May 2003.
