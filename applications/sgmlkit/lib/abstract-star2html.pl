@@ -10,12 +10,14 @@
 # extensions, plus an HTX index file, and produces a summary of the
 # document marked up using the DocumentSummary DTD.  That includes the
 # sub*section structure, the cross-references, and most of the header.
+# It emits a suitable CATALOG line on STDOUT.
 #
 # <p>Usage:
 # <verbatim>
-#    abstract-star2html.pl --prefix=sun180.htx/ \
+#    abstract-star2html.pl \
+#          --prefix=sun180.htx/ --output=sun180.summary \
 #          /star/docs/sun180.tex /star/docs/sun180.htx/htx.index \
-#          > sun180.summary
+#          >>CATALOG 2>abstract-warnings
 # </verbatim>
 #
 # <p>The parsing can cope with <code>\xlabel</code> commands either outside 
@@ -23,6 +25,9 @@
 # <code>\xlabel</code> commands within a heading by emitting <LABEL>
 # elements after the heading.  It logs a message to stderr when it
 # discovers this. 
+#
+# <p>If the parser discovers LaTeX markup in the section headings (which is
+# true at some point for almost every file), then it logs a message to STDERR.
 #
 # <p>The parsing respects <code>\begin{htmlonly}...\end{htmlonly}</code>
 #
@@ -51,6 +56,11 @@
 #
 # <p>The parsing doesn't attempt to deal with markup in section titles, but it
 # does attempt to detect and warn about it, logging a message to stderr.
+#
+# <p>There's not a lot of point in working hard to make this code do much 
+# better than this, since that would essentially require the sophistication
+# of a full document conversion.
+#
 #<returnvalue none>
 #<parameter>input-file-name<type>Star2HTML file
 #  <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
@@ -62,6 +72,8 @@
 # root of the document server, which is set in the DSSSL variable 
 # <code>%starlink-document-server%<code>, and might have the value
 # <code>`file:///star/docs/'</code>
+#<parameter>--output=outfile<type>option
+#  <description>The name of the file to receive the generated output.
 #<author id=ng webpage='http://www.astro.gla.ac.uk/users/norman/'
 #  affiliation='Glasgow'>Norman Gray
 
@@ -73,6 +85,8 @@ while ($#ARGV >= 0)
 {
     if ($ARGV[0] =~ /^--prefix=(\S*)/) {
 	$urlprefix = $1;
+    } elsif ($ARGV[0] =~ /^--output=(\S*)/) {
+	$outputfile = $1;
     } elsif (!defined ($inputfilename)) {
 	$inputfilename = $ARGV[0];
     } elsif (!defined ($indexfilename)) {
@@ -82,8 +96,6 @@ while ($#ARGV >= 0)
     }
     shift;
 }
-#$inputfilename = ':sun188.tex';
-#$indexfilename = ':sun188.htx:htx.index';
 
 defined ($indexfilename) || Usage ();
 
@@ -94,6 +106,20 @@ open (TF, $inputfilename)
 
 open (IDX, $indexfilename)
     || die "Can't open index file $indexfilename to read";
+
+if (defined $outputfile) {
+    open (OUTFILE, ">$outputfile")
+	|| die "Can't open output file $outputfile to write";
+} else {
+    open (OUTFILE, ">&STDOUT");
+}
+
+# Write an identifying line on STDERR
+# This should be redirected by the caller.
+# This script produces so many warnings that a bit of excess chatter 
+# won't matter.
+print STDERR "### Processing $inputfile...\n";
+
 while (defined($idxline = <IDX>))
 {
     #next if $idxline =~ /^>/;
@@ -150,12 +176,12 @@ while (defined($line = <TF>))
 	    $line =~ /(\\(sub)*section{([^{]*{[^{}]*})*[^{}]*})/;
 	    my $ptitle = parse_section ($1);
 	    check_markup ('section title', $ptitle);
-	    print $ptitle;
+	    print OUTFILE $ptitle;
 	    next;
 	};
     $line =~ /\\xlabel{(.*)}/ && do {
 	    if (defined($labels{$1})) {
-		print "<label id=\"$1\" export urlpath=\"$urlprefix$labels{$1}\">\n";
+		print OUTFILE "<label id=\"$1\" export urlpath=\"$urlprefix$labels{$1}\">\n";
 	    } else {
 	    # This xlabel wasn't in the htx.index.  
 	    # Log a remark to STDERR, and print nothing
@@ -207,33 +233,38 @@ while (defined($line = <TF>))
 
     $line =~ /\\begin\{document\}/ &&
 	do {
-	    print "<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
+	    print OUTFILE "<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
 <documentsummary urlpath='$urlprefix$labels{TOP}' urllinkpolicy='explicit'>
 <docinfo>
 ";
-	    print "<title>$documenttitle</title>\n<authorlist>\n";
+	    print OUTFILE "<title>$documenttitle</title>\n<authorlist>\n";
 	    foreach $a (@documentauthlist)
 	    {
-#		print '<author email="???"
+#		print OUTFILE '<author email="???"
 #  webpage="???"
 #  affiliation="???"
 #  id="???">';
-		print "<author>$a</author>\n";
-		print "<!-- Insert email, webpage, affiliation attributes -->\n";
+		print OUTFILE "<author>$a</author>\n";
+		print OUTFILE "<!-- Insert email, webpage, affiliation attributes -->\n";
 	    }
-	    print "</authorlist>
+	    print OUTFILE "</authorlist>
 <docnumber documenttype=\"$documenttype\">$documentnumber</docnumber>
 </docinfo>
 <docbody>
 ";
-	    print "<abstract>$documentabstract</abstract>\n"
+	    # Strip any document version number
+	    $documentnumber =~ s/^(\d*).*$/$1/;
+	    $catalogueline = "PUBLIC \"-//Starlink//DOCUMENT Summary $documenttype/$documentnumber//EN\" $outputfile\n";
+
+	    print OUTFILE "<abstract>$documentabstract</abstract>\n"
 		if (defined($documentabstract));
-	    next; };
+	    next;
+	};
    print STDERR "Unmatched line: $line";
 }
 
-print "</docbody>\n</documentsummary>\n";
-
+print OUTFILE "</docbody>\n</documentsummary>\n";
+print $catalogueline;
 exit 0;
 
 # Argument is of form 
@@ -305,5 +336,5 @@ sub check_markup {
 
 
 sub Usage {
-    die "$ident_string\nUsage: $programname [--prefix=url-prefix] input-file-name index-file-name\n";
+    die "$ident_string\nUsage: $programname [--prefix=url-prefix] [--output=outfile] input-file-name index-file-name\n";
 }
