@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_SCUPHOT (STATUS)
+      SUBROUTINE SURF_SCUPHOT (STATUS)
 *+
 *  Name:
 *     SCUPHOT
 
 *  Purpose:
-*     routine to reduce SCUBA PHOTOM data
+*     Reduce SCUBA PHOTOM data
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_SCUPHOT( STATUS )
+*     CALL SURF_SCUPHOT( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -24,19 +24,20 @@
 *     PHOTOM observation. For each bolometer used to look at the source the
 *     data will be analysed as follows:-
 *
-*       An ndf called <bolname>_map (e.g. h7_map) will be created in the OUT 
+*      -An ndf called <bolname>_map (e.g. h7_map) will be created in the OUT 
 *       file to hold the coadded data from all the integrations. If the
 *       jiggle pattern points fit a 2-d rectangular pattern then these data
 *       will be arranged as a 2-d map suitable for plotting as an image. A
 *       2-d parabola will be fitted to the coadded image and the results 
-*       written in ASCII form to FILE.
-*
-*       Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created in
+*       written in ASCII form to FILE. If an irregular jiggle pattern is
+*       used the map will take the form of a 1-D strip.
+*      -Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created in
 *       the OUT file to hold the fit results to the data for each 
 *       integration. The results stored are the fit peak, its variance and
 *       quality and they are held as a 1-d array suitable for plotting as
 *       a graph. The fit results are also written in ASCII form to FILE, as
 *       is the coadd of all the individual fits to the data.
+*
 
 *  Usage:
 *     scuphot analysis in out file
@@ -49,22 +50,27 @@
 *        for examining sky noise. Note that for 2 and 3 bolometer photometry
 *        ALLBOLS must be false to avoid weighting problems for the 
 *        bolometers that were observed in the left or right beams.
-*     ANALYSIS = _CHAR (Read)
+*     ANALYSIS = CHAR (Read)
 *        The method used to detemine peak. Either average or parabola.
-*     FILE = NDF (Write)
+*        Parabola is not recommended at this time.
+*     FILE = FILENAME (Write)
 *        The name of the ASCII output file.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated (extinction
 *        corrected) SCUBA data.
-*     OUT = _CHAR (Write)
+*     MSG_FILTER = CHAR (Read)
+*        Message output level. Default is NORM.
+*     OUT = CHAR (Write)
 *        The name of the HDS output file to contain the NDFs described above.
 *        This file will have the extension .sdf but this should not be
 *        specified in the name.
 
-
 *  Notes:
 *     ALLBOLS must be false for 2 and 3 bolometer photometry unless you
 *     know what you are doing.
+
+*  Related Applications:
+*     SURF: SCUCAT
 
 *  Algorithm:
 *        In more detail the routine works as follows. If status is good on
@@ -116,7 +122,7 @@
 *     SCULIB_FIT_2D_PARABOLA is called to fit a parabola to the coadded map
 *     and SCULIB_UNPACK_JIGGLE_SEPARATES to store the map to the output ndf.
 *     After the integration fit results have been copied to their ndf the
-*     analysis is complete and REDS_WRITE_PHOTOM is called to write the ASCII
+*     analysis is complete and SURF_WRITE_PHOTOM is called to write the ASCII
 *     version of the results to the file whose name is given in parameter
 *     FILE.
 *        Lastly, the IN and OUT files are closed.
@@ -130,6 +136,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.16  1997/06/13 00:17:24  timj
+*     Check if we have performed a parabolic fit or not.
+*     Update doc.
+*     Change name to SURF
+*
 *     Revision 1.15  1997/05/28 19:17:38  timj
 *     Fix declaration of MEAS_*_Q (was INTEGER, now BYTE)
 *
@@ -165,7 +176,7 @@ c Revision 1.6  1996/11/02  01:43:25  timj
 c Fix bug in history header
 c
 c Revision 1.5  1996/11/02  01:25:10  timj
-c Change Naem: to SCUPHOT from REDS_SCUPHOT in header.
+c Change Naem: to SCUPHOT from SURF_SCUPHOT in header.
 c
 c Revision 1.4  1996/11/01  21:46:04  timj
 c Change name to SCUPHOT
@@ -192,7 +203,7 @@ c
       INCLUDE 'MSG_PAR'                ! Add MSG__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
-      INCLUDE 'REDS_SYS'               ! REDS constants
+      INCLUDE 'SURF_PAR'               ! REDS constants
       INCLUDE 'PAR_ERR'                ! PAR__ constants
 
 *    Status :
@@ -383,6 +394,7 @@ c
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! pointer to REDS extension in output
                                        ! NDFs
+      LOGICAL          PARABOLA        ! Can I fit a parabola
       REAL             PEAK_D (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
                                        ! fitted peaks
       BYTE             PEAK_Q (SCUBA__MAX_INT, SCUBA__MAX_BEAM)
@@ -442,6 +454,7 @@ c
       IF (STATUS .NE. SAI__OK) RETURN
 
       USEFILE = .TRUE.
+      PARABOLA = .TRUE.   ! Assume I can fit a parabola
 
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
@@ -454,36 +467,6 @@ c
 
 *     Get bad bit mask
       CALL NDF_BB(IN_NDF, BADBIT, STATUS)
-
-*     get some general descriptive parameters of the observation
-
-      CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
-      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
-      CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', IN_SCUCDX_LOC, STATUS)
-      CALL NDF_XLOC (IN_NDF, 'REDS', 'READ', IN_REDSX_LOC, STATUS)
-
-      CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
-      IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
-         IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL ERR_REP (' ', '^TASK: input file '//
-     :           'contains too many FITS items', STATUS)
-         END IF
-      END IF
-      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
-     :     STATUS)
-      CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
-
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBSDEF',
-     :     ODF_NAME, STATUS)
-      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
-     :     RUN_NUMBER, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
-     :     OBJECT, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
-     :     OBSERVING_MODE, STATUS)
-      CALL CHR_UCASE (OBSERVING_MODE)
 
 *     get the number of history records present in the file
 
@@ -517,16 +500,6 @@ c
                END IF
             END DO
          END IF
-
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETC('TASK', TSKNAME)
-               CALL ERR_REP (' ', '^TASK: the file '//
-     :              'does not contain data from a PHOTOM observation',
-     :              STATUS)
-            END IF
-         END IF
          
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
@@ -554,6 +527,48 @@ c
             END IF
          END IF
       END IF
+
+*     get some general descriptive parameters of the observation
+
+      CALL NDF_XLOC (IN_NDF, 'FITS', 'READ', IN_FITSX_LOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'SCUBA', 'READ', IN_SCUBAX_LOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', IN_SCUCDX_LOC, STATUS)
+      CALL NDF_XLOC (IN_NDF, 'REDS', 'READ', IN_REDSX_LOC, STATUS)
+
+      CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
+      IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
+     :           'contains too many FITS items', STATUS)
+         END IF
+      END IF
+      CALL DAT_GET1C (IN_FITSX_LOC, SCUBA__MAX_FITS, FITS, N_FITS, 
+     :     STATUS)
+      CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
+
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBSDEF',
+     :     ODF_NAME, STATUS)
+      CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'RUN',
+     :     RUN_NUMBER, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'OBJECT',
+     :     OBJECT, STATUS)
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'MODE',
+     :     OBSERVING_MODE, STATUS)
+      CALL CHR_UCASE (OBSERVING_MODE)
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: the file '//
+     :           'does not contain data from a PHOTOM observation',
+     :           STATUS)
+         END IF
+      END IF
+
+
 
 *     report the run number and object of the observation
 
@@ -725,8 +740,9 @@ c
      :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE, 
      :        UBND(2), IPOS, JPOS, STATUS)
 
-         IF (YSPACE .LT. 0.001) THEN
+         IF (YSPACE .LT. 1.0E-5) THEN
 *     Zero jiggle
+*     Lots of this is now done in SCULIB_CALC_GRID
             IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL (STATUS)
 
             N_OBSDIM = 1
@@ -743,6 +759,7 @@ c
      :           '^PKG: No jiggle pattern was used. '//
      :           'No images will be stored', STATUS)
             WRITEMAP = .FALSE.
+            PARABOLA = .FALSE.
 
          ELSE IF (STATUS .NE. SAI__OK .OR.
      :           (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
@@ -755,7 +772,7 @@ c
             DO I = 1, JIGGLE_COUNT
                IPOS(I) = I
                JPOS(I) = 1
-            END DO
+            END  DO
             
             CALL MSG_SETC('PKG', PACKAGE)
             CALL MSG_OUTIF (MSG__NORM, ' ', 
@@ -779,21 +796,33 @@ c
       END IF
 
 *     Ask for the reduction method
+*     Do not ask this question if we are not allowed to fit
+*     parabolas (ie a zero offset jiggle is being used)
 
-      CALL PAR_CHOIC('ANALYSIS', 'AVERAGE','Average,Parabola', .TRUE.,
-     :     ANALYSIS, STATUS)
+      IF (PARABOLA) THEN
+         CALL PAR_CHOIC('ANALYSIS', 'AVERAGE','Average,Parabola',
+     :        .TRUE., ANALYSIS, STATUS)
+      ELSE
+         ANALYSIS = 'AVERAGE'
+      END IF
 
 
 *     create the output file that will contain the reduced data in NDFs
 
       CALL PAR_GET0C ('OUT', OUT, STATUS)
-      CALL HDS_NEW (OUT, OUT, 'REDS_SCUPHOT', 0, 0, OUT_LOC, STATUS)
+      CALL HDS_NEW (OUT, OUT, 'SURF_SCUPHOT', 0, 0, OUT_LOC, STATUS)
 
 *     Get some work space
          DO BEAM = 1, SCUBA__MAX_BEAM
             IF (PHOT_BB(BEAM) .NE. 0) THEN
 
 *     get some scratch memory to hold the data for the target bolometers
+               INT_D_PTR(BEAM) = 0
+               INT_D_END(BEAM) = 0
+               INT_V_PTR(BEAM) = 0
+               INT_V_END(BEAM) = 0
+               INT_Q_PTR(BEAM) = 0
+               INT_Q_END(BEAM) = 0
 
                CALL SCULIB_MALLOC (N_POS * VAL__NBR, INT_D_PTR(BEAM), 
      :              INT_D_END(BEAM), STATUS)
@@ -816,7 +845,7 @@ c
       IF (SELECT_BOLS) THEN
          PHOT_BB(1) = 0
          PHOT_BB(3) = 0
-
+         
          START_BOL = 1
          END_BOL   = N_BOLS
 
@@ -956,7 +985,7 @@ c
      :                       OUT_REDSX_LOC, STATUS)
                         IF (STATUS .NE. SAI__OK) THEN
                            CALL ERR_ANNUL (STATUS)
-                           CALL NDF_XNEW (IBEAM,'REDS','REDS_EXTENSION',
+                           CALL NDF_XNEW (IBEAM,'REDS','SURF_EXTENSION',
      :                          0, 0, OUT_REDSX_LOC, STATUS)
                         END IF
                         CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
@@ -1019,7 +1048,7 @@ c
      :                    OUT_REDSX_LOC, STATUS)
                      IF (STATUS .NE. SAI__OK) THEN
                         CALL ERR_ANNUL (STATUS)
-                        CALL NDF_XNEW (IPEAK, 'REDS', 'REDS_EXTENSION',
+                        CALL NDF_XNEW (IPEAK, 'REDS', 'SURF_EXTENSION',
      :                       0, 0, OUT_REDSX_LOC, STATUS)
                      END IF
                      CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL',
@@ -1097,13 +1126,16 @@ c
 
 *     derive the measured signal from the coadded measurement
 
-                  CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
-     :                 1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
-     :                 MEAS_D(1,BEAM), MEAS_V(1,BEAM), MEAS_Q(1,BEAM),
-     :                 MEAS_1_D(BEAM), MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
-     :                 MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
-     :                 MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
-     :                 BADBIT, STATUS)
+                  IF (PARABOLA) THEN
+                     CALL SCULIB_ANALYSE_PHOTOM_JIGGLE ('PARABOLA',
+     :                    1, 1, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
+     :                    MEAS_D(1,BEAM), MEAS_V(1,BEAM), 
+     :                    MEAS_Q(1,BEAM), MEAS_1_D(BEAM), 
+     :                    MEAS_1_V(BEAM), MEAS_1_Q(BEAM),
+     :                    MEAS_1_A0(BEAM), MEAS_1_A1(BEAM),
+     :                    MEAS_1_X(BEAM), MEAS_1_Y(BEAM),
+     :                    BADBIT, STATUS)
+                  END IF
 
 
 *     Only if I am writing the jiggle map               
@@ -1154,8 +1186,12 @@ c
                   CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 *     close the ndfs opened in this ndf context
+                  CALL NDF_UNMAP(IPEAK, '*', STATUS)
                   CALL NDF_ANNUL(IPEAK, STATUS)
-                  IF (WRITEMAP) CALL NDF_ANNUL(IBEAM, STATUS)
+                  IF (WRITEMAP) THEN 
+                     CALL NDF_UNMAP(IBEAM, '*', STATUS)
+                     CALL NDF_ANNUL(IBEAM, STATUS)
+                  END IF
 
                   CALL NDF_END (STATUS)
 
@@ -1167,7 +1203,7 @@ c
 
          IF (USEFILE .AND. COUNT .EQ. 1) THEN
 
-            CALL REDS_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
+            CALL SURF_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
      :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
      :           CENTRE_COORDS, LAT, LONG, LAT2, LONG2, MJD1, MJD2, 
      :           OFFSET_COORDS, MAP_X, MAP_Y, SAMPLE_COORDS, SAMPLE_PA, 
@@ -1178,6 +1214,8 @@ c
             IF (STATUS .EQ. PAR__NULL) THEN
                CALL ERR_ANNUL(STATUS)
                USEFILE = .FALSE.
+            ELSE IF (STATUS .NE. SAI__OK) THEN
+               USEFILE = .FALSE.
             END IF
 
          END IF
@@ -1185,7 +1223,7 @@ c
 *     write the results out to an ASCII file
 
          IF (USEFILE) THEN
-            CALL REDS_WRITE_PHOTOM (FD, SCUBA__MAX_BEAM,   
+            CALL SURF_WRITE_PHOTOM (FD, PARABOLA, SCUBA__MAX_BEAM,
      :           N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, SCUBA__MAX_INT,
      :           N_INTEGRATIONS,
      :           PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
