@@ -97,11 +97,9 @@
 *
 *    Local variables :
 *
-      CHARACTER*80             SSDS                    ! Output filename
-      CHARACTER*24             PT                      ! PSX time string
-      CHARACTER*20             STIME                   ! Formatted time string
+      CHARACTER*80              SSDS                    ! Output filename
+      CHARACTER*20              STIME                   ! Formatted time string
 
-      INTEGER                  NTICKS                  ! System time
       INTEGER			SSID
 *-
 
@@ -125,30 +123,22 @@
 
       END IF
 
-*    Create output
+*  Create output
       CALL ADI_NEW0( 'SSDS', SSID, STATUS )
       CALL ADI_FCREAT( SSDS, SSID, SID, STATUS )
 
-*    Book-keeping structure
-      CALL SSI_CREBOOK( SID, 1, STATUS )
-
-*    Version number
+*  Version number
       CALL SSI_PUTPAR0C( SID, 1, 'CREATOR', 30, PSS__VERSION, STATUS )
 
-*   Write parameters varying on IFILE
-
-*    Creation date
-      CALL PSX_TIME( NTICKS, STATUS )
-      CALL PSX_CTIME( NTICKS, PT, STATUS )
- 10   FORMAT( A2, '-', A3, '-', A2, ' ', A8 )
-      WRITE( STIME, 10 ) PT(9:10), PT(5:7), PT(23:24), PT(12:19)
+*  Creation date
+      CALL HSI0_TIME( STIME, STATUS )
       CALL SSI_PUTPAR0C( SID, 1, 'CREATED', 20, STIME, STATUS )
 
-*    File searched
+*  File searched
       CALL SSI_PUTPAR0C( SID, 1, 'SEARCHED', 132, IM_FILE(:
      :                           CHR_LEN(IM_FILE)), STATUS )
 
-*    History entry
+*  History entry
       CALL HSI_ADD( SID, PSS__VERSION, STATUS )
 
       END
