@@ -969,10 +969,14 @@ void adix_defmth( char *spec, int slen,
       ctok = ADInextToken( pstream, status );
 
 /* While more arguments */
-      while ( (ctok==TOK__SYM) && _ok(status) ) {
+      while ( ((ctok==TOK__SYM) || (ctok==TOK__MUL)) && _ok(status) ) {
 
 /* Get common string identifier */
-	aname = prsx_symname( pstream, status );
+        if ( ctok == TOK__MUL )
+          aname = adix_clone( K_WildCard, status );
+        else
+	  aname = prsx_symname( pstream, status );
+
 	narg++;
 
 	_LST_APPEND(ainsert,aname);     /* Insert into argument list */
@@ -4107,10 +4111,16 @@ void adix_gthmth( ADIobj gen, int narg, ADIobj args[], int nmform,
         uargc = _DTDEF(args[i]);        /* Get class block of user arg */
 
         aclsnam = _CAR(acur);
-        margc = adix_loccls( aclsnam, status );
+
+        if ( aclsnam == K_WildCard )
+          ok = ADI__true;
+
+        else {
+          margc = adix_loccls( aclsnam, status );
 
 /* Method arg class must exist in the inheritance list of the user arg */
-        ok = adix_chkder(uargc,margc,status);
+          ok = adix_chkder(uargc,margc,status);
+          }
         }
 
       acur = _CDR(acur);
