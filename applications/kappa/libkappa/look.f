@@ -27,7 +27,7 @@
 *     displayed data value can be controlled using parameter STYLE.
 
 *  Usage:
-*     look ndf centre [size] [lbound] [ubound] [logfile] [format] [comp] 
+*     look ndf centre [size] [logfile] [format] [comp] [mode]
 
 *  ADAM Parameters:
 *     AGAIN = _LOGICAL (Read)

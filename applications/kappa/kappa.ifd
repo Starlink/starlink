@@ -10207,6 +10207,31 @@ iraf! {
 
       action look {
 
+         parameter again {
+            type _LOGICAL
+            prompt {List another region?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter arddesc {
+            type LITERAL
+            ppath CURRENT
+            prompt {ARD description for region to be listed}
+            helpkey *
+          }
+
+         parameter ardfile {
+            type FILENAME
+            access READ
+            ppath GLOBAL CURRENT
+            prompt {ARD file for region to be listed}
+            association <->GLOBAL.ARDFILE
+            helpkey *
+          }
+
          parameter centre {
             position 2
             type LITERAL
@@ -10216,7 +10241,7 @@ iraf! {
           }
 
          parameter comp {
-            position 8
+            position 6
             type LITERAL
             vpath DEFAULT
             prompt {Component to list}
@@ -10226,7 +10251,7 @@ iraf! {
           }
 
          parameter format {
-            position 7
+            position 5
             type LITERAL
             vpath DEFAULT
             prompt {Format for listing}
@@ -10236,7 +10261,6 @@ iraf! {
           }
 
          parameter lbound {
-            position 4
             type LITERAL
             prompt {Position at the bottom left corner of the listing}
             ppath CURRENT DEFAULT
@@ -10245,7 +10269,7 @@ iraf! {
           }
 
          parameter logfile {
-            position 6
+            position 4
             type FILENAME
             access READ
             vpath DEFAULT
@@ -10262,6 +10286,16 @@ iraf! {
             prompt {The line length for the listing}
             ppath CURRENT DEFAULT
             default 80
+            helpkey *
+          }
+
+         parameter mode {
+            position 7
+            type LITERAL
+            vpath DEFAULT
+            prompt {Method for specifying the region}
+            ppath CURRENT DEFAULT
+            default Centre
             helpkey *
           }
 
@@ -10306,7 +10340,6 @@ iraf! {
           }
 
          parameter ubound {
-            position 5
             type LITERAL
             prompt {Position at the top right corner of the listing}
             ppath CURRENT DEFAULT

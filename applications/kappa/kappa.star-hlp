@@ -15354,168 +15354,237 @@ MJC: Malcolm J. Currie (STARLINK)
    -  All non-complex numeric data types can be handled.
 
 1 LOOK
-    Outputs the values of a sub-array of a 2-d data array to the
-    screen or a text file.
- 
-   This routine reports to user or writes to a text file the values
-   in a specified sub-array of the 2-d data array in the input IMAGE
-   structure.  Three options are allowed --- Peep gives a fixed 7x7
-   box on the screen, centred on a given pixel; Examine gives an NxM
-   box on the screen, with lower left pixel as specified; List
-   outputs the specified sub-array to a text text file (maximum
-   width 132 characters) of a defined name.  Beware that the List
-   option can produce very large files if it is not used sensibly.
- 
-   The magic-value method is used for processing bad data. Bad pixels
-   are denoted in the display or file by INVALID rather than a
-   numerical value.
-2 AUTHORS
-   Mark McCaughrean UoE ( REVA::MJM )
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   11-06-1986 : First implementation (REVA::MJM)
-   15-06-1986 : Modified to include Examine option (REVA::MJM)
-   1986 Aug 7 : Renamed algorithmic routines to PEEPSB and LISTSB
-                (RAL::CUR).
-   1986 Aug 29: Added argument section to prologue, and nearly
-                conformed to Starlink standards (RAL::CUR).
-   1987 Oct 15: Reordered tidying and extra status check
-                (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 Jun 4 : More reporting of error context (RAL::CUR)
-   1988 Jun 30: File name obtained in LISTSB (RAL::CUR).
-   1988 Dec  6: Improved Examine XSIZE default (RAL::CUR).
-   1989 Jul 27: Passed array dimensions to PEEPSB and LISTSB as
-                separate variables (RAL::CUR).
-   1990 Feb 22: Modified the calling sequence for the new
-                more-modular version of LISTSB (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       IMAGE structure containing the 2-d data array to be inspected.
-   CHOICE = LITERAL( READ )
-       The means by which the data array is examined.  The options
-         are 'Peep' --- reports the values in a 7x7 pixel region;
-         'Examine' --- reports the values of a region whose size is
-         defined by the user; and 'List' is similar to 'Examine',
-         but it generates a listing to a text file.
-   XCEN  =  INTEGER( READ )
-       x centre of box to be examined on the screen.
-   YCEN  =  INTEGER( READ )
-       y centre of box to be examined on the screen.
-   XLOW  =  INTEGER( READ )
-       x pixel index of the lower left of the sub-array to be output.
-   YLOW  =  INTEGER( READ )
-       y pixel index of the lower left of the sub-array to be output.
-   XSIZE  =  INTEGER( READ )
-       x size of the sub-array to be output.
-   YSIZE  =  INTEGER( READ )
-       y size of the sub-array to be output.
-   FILENAME  =  FILENAME( READ )
-       Name of the file to be used for the output of the sub-array
-         listing.
-   ANOTHER = LOGICAL( READ )
-       If true, another look at the data is required.
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<->GLOBAL.DATA_ARRAY'
-  prompt      'Image to be inspected'
-  help        'Give name of the IMAGE structure holding the 2-d data 
-              array to be inspected.'
-3 CHOICE
-  position    2
-  keyword     'CHOICE'
-  type        'LITERAL'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC,DEFAULT'
-  default     'Peep'
-  prompt      'Peep, Examine or List'
-  help        'Peep lists a 7x7 neighbourhood to screen, Examine
-              reports an NxM box to screen, List gives a listing to
-              a file.'
- #in          'Peep', 'Examine', 'List'
-3 XCEN
-  keyword     'XCEN'
-  type        '_INTEGER'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'x centre pixel index of 7x7 box'
-  help        'Give the x centre pixel index of the sub-array to be 
-              peeped.'
-3 YCEN
-  keyword     'YCEN'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  access      'READ'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'y centre pixel index of 7x7 box'
-  help        'Give the y centre pixel index of the sub-array to be 
-              peeped.'
-3 XLOW
-  keyword     'XLOW'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  access      'READ'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'x start pixel index of sub-array'
-  help        'Give the x start pixel index of the sub-array to be 
-              inspected.'
-3 YLOW
-  keyword     'YLOW'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  access      'READ'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'y start pixel index of sub-array'
-  help        'Give the y start pixel index of the sub-array to be 
-              inspected.'
-3 XSIZE
-  keyword     'XSIZE'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  access      'READ'
-  ppath       'DYNAMIC'
-  prompt      'x size of sub-array'
-  help        'Give the x size of the sub-array to be inspected.'
-3 YSIZE
-  keyword     'YSIZE'
-  type        '_INTEGER'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'y size of sub-array'
-  help        'Give the y size of the sub-array to be inspected.'
-3 FILENAME
-  keyword     'FILENAME'
-  type        'FILENAME'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'DEFAULT'
-  default     LOOKOUT.LIS
-  prompt      'Name of listing file'
-  help        'Give name of the ASCII file to contain the sub-array 
-              listing.'
-3 ANOTHER
-  keyword     'ANOTHER'
-  type        '_LOGICAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'DEFAULT'
-  default     Y
-  prompt      'Another inspection ?'
-  help        'Answer YES if another sub-array is to be peeped or 
-              listed.'
+List pixel values in an NDF.
+
+Usage:
+
+   look ndf centre [size] [logfile] [format] [comp] [mode]
+
+Description:
+
+   This application lists pixel values within a rectangular region of
+   a 2D NDF. The listing may be displayed on the screen and logged in
+   a text file (see parameters QUIET and LOGFILE). The rectangular region
+   to be listed can be specified either by giving its centre and size
+   (see parameters CENTRE and SIZE), or its corners (see parameters LBOUND
+   and UBOUND). The top-right pixel value is also written to an output
+   parameter (VALUE). The listing may be produced in several different
+   formats (see parameter FORMAT), and the format of each individual
+   displayed data value can be controlled using parameter STYLE.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AGAIN
+AGAIN = _LOGICAL (Read)
+   If TRUE, the user is prompted for further regions to list until
+   a FALSE value is obtained. [FALSE]
+3 ARDDESC
+ARDDESC = LITERAL (Read)
+   An ARD description for the parts of the image to be listed.
+   Multiple lines can be supplied by ending each line with a minus
+   sign, in which case further prompts for ARDDESC are made until
+   a value is supplied which does not end with a minus sign. All
+   the supplied values are then concatenated together (after removal
+   of the trailing minus signs).
+3 ARDFILE
+ARDFILE = FILENAME (Read)
+   The name of an existing text file containing an ARD description
+   for the parts of the image to be listed.
+3 CENTRE
+CENTRE = LITERAL (Read)
+   The co-ordinates of the data pixel at the centre of the area to
+   be displayed, in the current co-ordinate Frame of the NDF (supplying
+   a colon ":" will display details of the current co-ordinate Frame).
+   The position should be supplied as a list of formatted axis values
+   separated by spaces or commas. See also parameter USEAXIS.  A
+   null (!) value causes the displayed area to be determined using
+   parameters LBOUND and UBOUND.
+3 COMP
+COMP = LITERAL (Read)
+   The NDF array component to be displayed.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is an
+   alternative to "Variance" and causes the square root of the
+   variance values to be displayed).  If "Quality" is specified,
+   then the quality values are treated as numerical values (in
+   the range 0 to 255). ["Data"]
+3 FORMAT
+FORMAT = LITERAL (Read)
+   Specifies the format for the listing:
+
+   - "strips" -- The area being displayed is divided up into
+   vertical strips of limited width. Each strip is displayed in
+   turn, with Y pixel index at the left of each row, and
+   X pixel index at the top of each column. The highest row is
+   listed first in each strip. This format is intended for human
+   readers - the others are primarily intended for being read by
+   other software.
+
+   - "clist" -- Each row of textual output consists of an X pixel
+   index, followed by a Y pixel index, followed by the pixel data
+   value. No headers or blank lines are included. The pixels are
+   listed in "fortran order" - the lower left pixel first, and the
+   upper right pixel last.
+
+   - "vlist" -- Each row of textual output consists of just the
+   pixel data value. No headers or blank lines are included. The
+   pixels are listed in "fortran order" - the lower left pixel first,
+   and the upper right pixel last.
+
+   - "region" -- The pixel data values are listed as a 2 dimensional
+   region. Each row of textual output contains a whole row of data
+   values. The textual output may be truncated if it is too wide. The
+   lowest row is listed first.
+
+   In all cases, adjacent values are separated by spaces, and bad
+   pixel values are represented by the string "BAD". ["strips"]
+3 LBOUND
+LBOUND = LITERAL (Read)
+   The co-ordinates of the data pixel at the bottom-left of the
+   area to be displayed, in the current co-ordinate Frame of the NDF
+   (supplying a colon ":" will display details of the current
+   co-ordinate Frame). The position should be supplied as a list of
+   formatted axis values separated by spaces or commas. See also
+   parameter USEAXIS.  A null (!) value causes the bottom-left corner
+   of the supplied NDF to be used. The value is ignored unless a null
+   value is supplied for parameter CENTRE or SIZE.
+3 LOGFILE
+LOGFILE = FILENAME (Write)
+   The name of the text file in which the textual output may be stored.
+   See MAXLEN. A null string (!) means that no file is created.  [!]
+3 MAXLEN
+MAXLEN = _INTEGER (Read)
+   The maximum number of characters in a line of textual output. The
+   line is truncated after the last complete value if it would extend
+   beyond this value. [80]
+3 MODE
+MODE = LITERAL (Read)
+   Indicates how the region to be listed will be specified:
+
+   - "Centre" -- The centre and size of the region are specified
+   using parameters CENTRE and SIZE.
+
+   - "Bounds" -- The bounds of the region are specified using
+   parameters LBOUND and UBOUND.
+
+   - "ARDFile" -- The region is given by an ARD description
+   supplied within a text file specified using parameter ARDFILE.
+   Pixels outside the ARD region are represented by the string "OUT".
+
+   - "ARD" -- The region is given using an ARD description
+   supplied directly using parameter ARDDESC. Pixels outside the
+   ARD region are represented by the string "OUT".
+
+   ["Centre"]
+3 NDF
+NDF = NDF (Read)
+   The input NDF structure containing the data to be displayed.
+3 QUIET
+QUIET = LOGICAL (Read)
+   If TRUE then output is not displayed on the screen. The log file
+   and output parameter values are still created. [FALSE]
+3 SIZE
+SIZE( 2 ) = _INTEGER (Read)
+   The dimensions of the rectangular area to be displayed, in pixels.
+   If a single value is given, it is used for both axes. The area
+   is centred on the position specified by parameter CENTRE. A null
+   (!) value for SIZE causes the displayed area to be determined using
+   parameters LBOUND and UBOUND. [7]
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the format to use
+   for individual data values.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a Frame attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   Data values are formatted using attributes Format(1) and Digits(1).
+   [current value]
+3 UBOUND
+UBOUND = LITERAL (Read)
+   The co-ordinates of the data pixel at the top-right corner of the
+   area to be displayed, in the current co-ordinate Frame of the NDF
+   (supplying a colon ":" will display details of the current
+   co-ordinate Frame). The position should be supplied as a list of
+   formatted axis values separated by spaces or commas. See also
+   parameter USEAXIS.  A null (!) value causes the top right corner
+   of the supplied NDF to be used. The value is ignored unless a null
+   value is supplied for parameter CENTRE or SIZE.
+3 USEAXIS
+USEAXIS = GROUP (Read)
+   USEAXIS is only accessed if the current co-ordinate Frame of the
+   NDF has more than 2 axes. A group of two strings should be
+   supplied specifying the 2 axes which are to be used when supplying
+   positions for parameters CENTRE, LBOUND and UBOUND. Each axis can
+   be specified either by its integer index within the current Frame
+   (in the range 1 to the number of axes in the current Frame), or by
+   its symbol string. A list of acceptable values is displayed if an
+   illegal value is supplied. If a null (!) value is supplied, the axes
+   with the same indices as the 2 used pixel axes within the NDF
+   are used. [!]
+3 VALUE
+VALUE = _DOUBLE (Write)
+   An output parameter to which is written the data value at the
+   top-right pixel in the displayed region.
+2 Examples
+look ngc6872 "1:27:23 -22:41:12" quiet logfile=log
+   Lists a 7x7 block of pixel values centred on RA/DEC 1:27:23,
+
+   -22:41:12 (this assumes that the current co-ordinate Frame in
+   the NDF is an RA/DEC Frame). The listing is written to the text
+   file "log" but is not displayed on the screen.
+
+look ngc6872 centre=\! lbound="189 207" ubound="203 241" values.dat
+   Lists the pixel values in an NDF called ngc6872, within a
+   rectangular region from pixel (189,207) to (203,241) (this
+   assumes that the current co-ordinate Frame in the NDF is pixel
+   co-ordinates). The listing is displayed on the screen and written
+   to the text file "values.dat".
+
+look ngc6872 centre="10 11" size=1 quiet
+   Stores the value of pixel (10,11) in output parameter VALUE, but
+   does not display it on the screen or store it in a log file. This
+   assumes that the current co-ordinate Frame in the NDF is pixel
+   co-ordinates.
+2 Notes
+-  The co-ordinate system in which positions are given within ARD
+   descriptions should be indicated by including suitable
+   COFRAME or WCS statements within the description (see SUN/183).
+   For instance, starting the description with the text
+   "COFRAME(PIXEL)" will indicate that positions are specified in
+   pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
+   indicate that positions are specified in RA/DEC (FK5,J2000). If
+   no such statements are included, then it is assumed that
+   positions are given within the current co-ordinate system of the
+   input NDF.
+2 Related_Applications
+   KAPPA: TRANDAT.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 19-OCT-2001 (DSB):
+    Original NDF/AST version.
+2 Implementation_Status
+   -  This routine correctly processes the DATA, QUALITY and
+   VARIANCE components of the input NDF.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
 
 1 LUCY
 Performs a Richardson-Lucy deconvolution of a 1- or 2-dimensional
