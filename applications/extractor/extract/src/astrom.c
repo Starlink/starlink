@@ -32,13 +32,13 @@
 #include	"astrom.h"
 
 #ifndef PI 
-# define PI = 3.14159265358979323846;
+#define PI 3.14159265358979323846
 #endif
 #ifndef R2D
-#define R2D = (PI/180.0);
+#define R2D (PI/180.0)
 #endif
 #ifndef D2R
-#define D2R = (180.0/PI);
+#define D2R (180.0/PI)
 #endif
 
 /****************************** initastrom **********************************/
