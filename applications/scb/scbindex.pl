@@ -355,7 +355,7 @@ sub index_pack {
    if (-d $pack_file) {
       my ($file, @files);
       pushd $pack_file;
-      foreach $file (glob "*CONDITIONS *.news *.tex *.ps *.eps") {
+      foreach $file (glob "makefile mk *CONDITIONS *.news *.tex *.ps *.eps") {
          push @files, $file if (-f $file);
       }
       index_files "$package#", @files;
@@ -928,14 +928,18 @@ sub write_entry {
    $location =~ s%([#/])\./%$1%g;
    $location =~ s%//+%/%g;
 
-#  Write entry to StarIndex object.
+#  Write entry to StarIndex object, and output message for success or
+#  failure.  Failure may occur if the total record length exceeds the
+#  DBM block size - in practice this is only likely to happen for the
+#  makefile entry in the 'file' index.
 
-   $index{$iname}->put($name, $location);
+   if ($index{$iname}->put($name, $location)) {
+      printf "%-20s =>  %s\n", $name, $location if ($verbose);
+   }
+   else {
+      printf "  !!! Failed to write $name => $location (block size limit?)\n";
+   }
 
-#  Optionally log entry to stdout.
-
-   printf "%-20s =>  %s\n", $name, $location if ($verbose);
-   
 }
 
 
