@@ -3610,6 +3610,10 @@ proc DumpImage {file} {
 # Loop round all images...
       set image $IMAGE_DISP
 
+# Write out a description of the file contents.
+      puts $fd "Polka image dump"
+      puts $fd "Image: $image"
+
 # Loop round each object type...
       foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
                            $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
@@ -10576,6 +10580,16 @@ proc RestoreImage {file} {
 # Only proceed if a file was opened.
    if { $ok } {
 
+# Check the file contents.
+      if { [gets $fd line] == -1 || $line != "Polka image dump" } {
+         Message "The supplied dump file \"$file\" does not contain a dump created by the \"Dump/Displayed Image\" command in the File menu."
+         close $fd
+         return
+      }
+
+# Skip the next line which indicates the orignal image file.
+      gets $fd line
+
 # Tell the user what is happening.
       set told [SetInfo $info 0]
 
@@ -11008,12 +11022,12 @@ proc Save {} {
       set rays "O"
    }
 
+# Save the name of the first (reference) image.
+   set im0 [lindex $IMAGES 0]
+
 # Ensure that all the required mappings are available. Return without
 # action if any are missing.
    if { [AllMappings] } {
-
-# Save the name of the first (reference) image.
-      set im0 [lindex $IMAGES 0]
 
 # If we are in dual-beam mode,  ensure that the reference image has an O-ray 
 # mask. Since we already know that all mappings are available, all other 

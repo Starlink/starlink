@@ -735,18 +735,18 @@
 # Add menu items to the Dump and Restore sub-menus.
    $dumpmenu add command -label "Everything " -command {Dump ""} -accelerator "Ctrl-d"
    $dumpmenu add command -label "Masks Only  " -command {DumpMask ""} 
-   $dumpmenu add command -label "Displayed image" -command {DumpImage ""} 
+   $dumpmenu add command -label "Displayed Image" -command {DumpImage ""} 
    MenuHelp $dumpmenu "Everything " ".  Dump feature positions, mappings and masks for all images, plus all option settings, to a text file."
    MenuHelp $dumpmenu "Masks Only  " ".  Dump the O and E ray masks for the reference image to a text file."
-   MenuHelp $dumpmenu "Displayed image" ".  Dump feature positions and masks for the displayed image to a text file."
+   MenuHelp $dumpmenu "Displayed Image" ".  Dump feature positions and masks for the displayed image to a text file."
    bind . <Control-d> {Dump ""}
 
    $restmenu add command -label "Everything " -command {Restore ""} -accelerator "Ctrl-r"
    $restmenu add command -label "Masks Only  " -command {RestoreMask ""} 
-   $restmenu add command -label "Displayed image" -command {RestoreImage ""} 
+   $restmenu add command -label "Displayed Image" -command {RestoreImage ""} 
    MenuHelp $restmenu "Everything " ".  Restore feature positions, mappings and masks for all images, plus all option settings, from a text file."
    MenuHelp $restmenu "Masks Only  " ".  Restore the O and E ray masks for the reference image from a text file."
-   MenuHelp $restmenu "Displayed image" ".  Restore feature positions and masks for the displayed image from a text file."
+   MenuHelp $restmenu "Displayed Image" ".  Restore feature positions and masks for the displayed image from a text file."
    bind . <Control-r> {Restore ""}
 
 # Add menu items to the Effects menu.
@@ -937,6 +937,15 @@
 
    SetHelp $oemapmenu ".  The type of mapping to use when aligning the O and E rays. "
 
+# Set a flag indicating if the next input image is to be used purely as a
+# reference image to define the co-ordinate system. If so it will not be
+# included in the list of input files processed to produce the output files. 
+   if { $REFONLY } {
+      set ref 1
+   } {
+      set ref 0 
+   }
+
 # Go through every supplied image section.
    set maximwid 0
    set maxrimwid 0
@@ -962,8 +971,15 @@
 # Arrange for the first image in the supplied list to be displayed first.
       if { ![info exists IMSEC_REQ] } { set IMSEC_REQ $stdsec }
 
-# Add it to the Images menu.
-      $imagesmenu add radiobutton -label $imsec -variable IMSEC_REQ \
+# Add it to the Images menu. Use label "<ref image>" if it is used purely
+# as a reference image.
+      if { $ref } {
+         set imlab "$imsec <ref. only>"
+      } {
+         set imlab $imsec
+      }
+
+      $imagesmenu add radiobutton -label $imlab -variable IMSEC_REQ \
                                   -value $stdsec  -command UpdateDisplay \
                                   -selectcolor $RB_COL 
 
@@ -971,22 +987,31 @@
 # If these will be the output images, then use the names supplied by the
 # A-task. If they will be temporary files needed only as input to the
 # Stokes parameter calculation, then store temporary names.
-      if { $i < $NOOUT } {
-         set OUTIMS($image,O) [lindex $o_list $i] 
-      } {
-         set OUTIMS($image,O) [UniqueFile]
-      }
+      if { $ref } {
+         set OUTIMS($image,O) "<null>"
+         if { $DBEAM } {
+            set OUTIMS($image,E) "<null>"
+         }
 
-      if { $DBEAM } {
-         if { $i < $NEOUT } {
-            set OUTIMS($image,E) [lindex $e_list $i] 
+      } {
+
+         if { $i < $NOOUT } {
+            set OUTIMS($image,O) [lindex $o_list $i] 
          } {
-            set OUTIMS($image,E) [UniqueFile]
+            set OUTIMS($image,O) [UniqueFile]
+         }
+
+         if { $DBEAM } {
+            if { $i < $NEOUT } {
+               set OUTIMS($image,E) [lindex $e_list $i] 
+            } {
+               set OUTIMS($image,E) [UniqueFile]
+            }
          }
       }
 
 # Update the length of the longest image section and image name.
-      set imwid [string length $imsec]
+      set imwid [string length $imlab]
       if { $imwid > $maximwid } { set maximwid $imwid }
 
       set rimwid [string length $image]
@@ -996,7 +1021,7 @@
 # If there are insufficient sky frames, use the last one for all
 # remaining input object frames. Also, update the maximum length of a sky
 # frame name.
-      if { $nsky > 0 } {
+      if { $nsky > 0 && !$ref } {
          if { $i < $nsky } { 
             set SKYIMS($image) [lindex $sky_list $i]
          } {
@@ -1036,7 +1061,7 @@
       Obey ndfpack ndfcopy "in=$imsec out=$copy" 1
 
 # Check it has a POLPACK extension containing either WPLATE or ANLANG.
-      CheckNDF $copy $image 
+      if { !$ref } { CheckNDF $copy $image }
 
 # Save the current WCS Frame in the NDF so that it can be re-instated
 # when the output images are saved.
@@ -1054,6 +1079,8 @@
       set EFFECTS_MAPPINGS($image) ""
       set EFFECTS_STACK($image) ""
 
+# The next image is not the reference image.
+      set ref 0
       incr i   
    }
 
