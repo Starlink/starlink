@@ -1,163 +1,213 @@
-*+  EVLIST - Displays data values in an event dataset
       SUBROUTINE EVLIST( STATUS )
-*    Description :
-*     List entry values are printed on a printing device specified by the user.
-*    Parameters :
-*     INP=UNIV(R)
-*           Input dataset
-*     SUBSET(2)=INTEGER(R)
-*           Subset of items to be printed
-*     DEV = CHAR(R)
-*           Output ascii device
-*
-*    Method :
-*
-*     All lists in the current object are mapped into virtual memory arrays
-*     and these are printed item by item on the output device.
-*
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Jim Peden (BHVAD::JCMP)
-*
-*    History :
-*
-*     21 Sep 83 : Original (BHVAD::JCMP)
-*     10 Aug 84 : Accumulation of non-scalar items, and tidied up (BHVAD::JCMP)
-*     18 Jan 85 : Version announcement. New output format (BHVAD::JCMP)
-*      4 Feb 85 : Revisions to output format (BHVAD::JCMP)
-*     17 Dec 85 : Mods to SUBSET parameter (BHVAD::JCMP)
-*     27 Jan 86 : V0.4-1 ADAM version (BHVAD::JCMP)
-*     12 Feb 86 : V0.4-2 bug fix - fail if string truncation (BHVAD::JCMP)
-*     28 Sep 88 : V1.0-1 ASTERIX88 (BHVAD::ADM)
-*     30 Nov 88 : V1.5-0 More ASTERIX88 conversion, old LIST_s removed,
-*                        USI_ added correct use of HIST_, 1D LIST's only,
-*                        much tidying... (PLA)
-*      9 Nov 93 : V1.5-1 Increased length of UNITS (DJA)
-*      5 May 94 : V1.7-0 Use AIO for i/o (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'LIST_PAR'
-*
-*    Status :
-*
-      INTEGER 			STATUS
-*
-*    Local constants :
-*
-      CHARACTER*(30)         	VERSION            	! version id
-        PARAMETER           	( VERSION = 'EVLIST Version 1.8-0' )
-*
-*    Local variables :
-*
-      CHARACTER*14           	C(LIST__MXNL)      	! List values
-      CHARACTER*(DAT__SZLOC) 	CELL               	! Locator to list element
-      CHARACTER*(DAT__SZLOC) 	DLOC(LIST__MXNL)   	! Locator for all list DATA_ARRAY's
-      CHARACTER*(DAT__SZLOC) 	ILOC               	! Object locator
-      CHARACTER*(DAT__SZLOC) 	LLOC(LIST__MXNL)   	! Locator for all lists
-      CHARACTER*(DAT__SZNAM) 	LNAMES(LIST__MXNL) 	! Names of lists
-      CHARACTER*132		OBUF			! Output text buffer
-      CHARACTER*(DAT__SZTYP) 	TYPE(LIST__MXNL)   	! Types of lists
-      CHARACTER*80           	LUNIT(LIST__MXNL)  	! Data units
+*+
+*  Name:
+*     EVLIST
 
+*  Purpose:
+*     Displays data values in an event dataset
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL EVLIST( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Displays the values of all the lists in an event dataset to the
+*     ascii device of the users choice. The user may select the events
+*     to display.
+
+*  Usage:
+*     evlist {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset
+*     SUBSET = CHAR (read)
+*        Subset of items to be printed
+*     DEV = CHAR (read)
+*        Output ascii device
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     evlist, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     JCMP: Jim Peden (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     21 Sep 1983 (JCMP):
+*        Original version.
+*     10 Aug 1984 (JCMP):
+*        Accumulation of non-scalar items, and tidied up
+*     18 Jan 1985 (JCMP):
+*        Version announcement. New output format
+*      4 Feb 1985 (JCMP):
+*        Revisions to output format
+*     17 Dec 1985 (JCMP):
+*        Mods to SUBSET parameter
+*     27 Jan 1986 V0.4-1 (JCMP):
+*        ADAM version
+*     12 Feb 1986 V0.4-2 (JCMP):
+*        Bug fix - fail if string truncation
+*     28 Sep 1988 V1.0-1 (ADM):
+*        ASTERIX88 version
+*     30 Nov 1988 V1.5-0 (PLA):
+*        More ASTERIX88 conversion
+*      9 Nov 1993 V1.5-1 (DJA):
+*        Increased length of UNITS
+*      5 May 1994 V1.7-0 (DJA):
+*        Use AIO for i/o
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     15 Aug 1995 V2.0-0 (DJA):
+*        Full ADI port.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER			MAXCOLS			! Max # lists to
+        PARAMETER		( MAXCOLS = 7 )		! display on page
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'EVLIST Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*14		C(MAXCOLS)      	! Formatted list values
+      CHARACTER*20 		LNAMES(MAXCOLS) 	! Names of lists
+      CHARACTER*20 	        MTYPE(MAXCOLS)   	! Mapping types of lists
+      CHARACTER*132		OBUF			! Output text buffer
+      CHARACTER*20 	        TYPE(MAXCOLS)   	! Types of lists
+      CHARACTER*80           	LUNIT(MAXCOLS)  	! Data units
+
+      DOUBLE PRECISION		DVAL			! List value
+
+      INTEGER			FSTAT			! Fortran i/o status
       INTEGER                	I, J, K      	      	! Loop counters
+      INTEGER			IDXPTR			! Display index
+      INTEGER			IFID			! Input file identifier
+      INTEGER			IP			! Photon number
+      INTEGER			IVAL		      	! List value
       INTEGER                	INC          	      	! Number of lists to display at once
-      INTEGER                	LLENGTH      	      	! list length
+      INTEGER			LID			! List identifier
+      INTEGER                	LLEN      	      	! List length
       INTEGER                	OCH          	      	! Output channel
       INTEGER                	NDISP        	      	! Number of lists to be displayed
+      INTEGER                	NEDISP        	      	! # events to display
+      INTEGER                	NLDISP        	      	! # lists to display
       INTEGER                	NLIST        	      	! actual number of lists
-      INTEGER                	OUTWIDTH     	      	! Width of output device
+      INTEGER                	OUTWID     	      	! Width of output device
+      INTEGER			PTRS(MAXCOLS)		! Mapped list data
       INTEGER                	START        	      	! List to display first
-      INTEGER                	SUBSET(2)    	      	! item range
 
       LOGICAL                	CONTINUE     	      	! Used to control loops
       LOGICAL                	DUOK         	      	! data units present
-      LOGICAL                	INPRIM       	      	! Is input ptimative?
-*-
+      LOGICAL			LVAL		      	! List value
+*.
 
-*    Version anouncement
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize
+*  Initialize
       CALL AST_INIT()
 
-*    Obtain data object
-      CALL USI_ASSOCI ('INP', 'READ',ILOC, INPRIM, STATUS)
+*  Obtain data object
+      CALL USI_ASSOC( 'INP', 'EventDS', 'READ', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-      IF ( INPRIM ) THEN
-        CALL MSG_PRNT( 'FATAL ERROR: Input is NOT an event dataset' )
-        STATUS = SAI__ERROR
-      END IF
+*  Find all lists in the object
+      CALL EDI_GETNS( IFID, LLEN, NLIST, STATUS )
 
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*    Find all lists in the object
-      CALL LIST_FINDALLOK (ILOC, .FALSE., LLOC, LNAMES, NLIST, LLENGTH,
-     :                                                           STATUS)
-
-*    Tell user if there aren't any
+*  Tell user if there aren't any
       IF ( NLIST .EQ. 0 ) THEN
-        CALL MSG_PRNT( 'FATAL ERROR: There are no lists to print' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: There are no lists to print',
+     :                STATUS )
       END IF
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Set up output channel
-      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
+*  Set up output channel
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWID, STATUS )
 
-*    Tell the user how many items there are
-      CALL MSG_SETI ('LEN', LLENGTH)
+*  Tell the user how many items there are
+      CALL MSG_SETI( 'LEN', LLEN )
       CALL MSG_PRNT( 'There are ^LEN events per list' )
 
-*    Find out if a subset is required
-      SUBSET(1) = 1
-      SUBSET(2) = LLENGTH
-      CONTINUE  = .TRUE.
+*  Map workspace to hold indices
+      CALL DYN_MAPI( 1, LLEN, IDXPTR, STATUS )
 
-      DO WHILE (CONTINUE)
-        CALL USI_DEF1I( 'SUBSET', 2, SUBSET, STATUS )
-        CALL USI_GET1I( 'SUBSET', 2, SUBSET, I, STATUS )
-        CALL USI_CANCL( 'SUBSET', STATUS )
+*  Get the record numbers to display
+      CALL PRS_GETLIST( 'SUBSET', LLEN, %VAL(IDXPTR), NEDISP,
+     :                  STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
-        IF (STATUS .EQ. SAI__OK) THEN
-          IF (I .NE. 2) THEN
-            CALL MSG_PRNT( 'ERROR: Only 1 range allowed' )
-
-          ELSE IF(SUBSET(2) .LT. SUBSET(1)) THEN
-            CALL MSG_PRNT( 'ERROR: Range must be LOW, HIGH' )
-
-          ELSE
-            CONTINUE = .FALSE.
-            IF (SUBSET(1) .LT. 1) SUBSET(1) = 1
-            IF (SUBSET(2) .GT. LLENGTH) SUBSET(2) = LLENGTH
-
-          END IF
-        ELSE IF (STATUS .EQ. PAR__NULL .OR. STATUS .EQ. PAR__ABORT) THEN
-          CONTINUE = .FALSE.
-
-        ELSE
-          CALL ERR_ANNUL (STATUS)
-          CALL MSG_PRNT( 'ERROR: Invalid input - try again' )
-
-        END IF
-      END DO
-
-*    Print version and introductory information
-      IF (OUTWIDTH .EQ. 132) THEN
+*  Print version and introductory information
+      IF ( OUTWID .EQ. 132 ) THEN
         CALL AIO_BLNK( OCH, STATUS )
         CALL AIO_WRITE( OCH, VERSION, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
@@ -166,70 +216,140 @@
         INC = 4
       END IF
 
-*    Get the list types and the item lengths in bytes, and the format control
-      DO I = 1, NLIST
-        CALL CMP_TYPE (LLOC(I), 'DATA_ARRAY', TYPE(I), STATUS)
-        CALL hdx_ok (LLOC(I), 'UNITS', DUOK, STATUS)
-        IF (DUOK) THEN
-          CALL CMP_GET0C (LLOC(I), 'UNITS', LUNIT(I), STATUS)
-        ELSE
-          LUNIT (I) = 'Units undefined'
-        END IF
-        CALL DAT_FIND (LLOC(I), 'DATA_ARRAY', DLOC(I), STATUS)
-      END DO
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
+*  Set up for display loop
       START = 1 - INC
       NDISP = 0
       CONTINUE = .TRUE.
 
-      DO WHILE (CONTINUE)
+*  While more lists to display
+      DO WHILE ( CONTINUE )
+
+*    Advance window over lists
         START = START + INC
         NDISP = NDISP + INC
-
-        IF (NDISP .GE. NLIST) THEN
+        IF ( NDISP .GE. NLIST ) THEN
           NDISP    = NLIST
           CONTINUE = .FALSE.
         END IF
+        NLDISP = NDISP - START + 1
 
+*    Map the lists on this page
+        J = 1
+        DO I = START, NDISP
+
+*      Index the list
+          CALL EDI_IDX( IFID, I, LID, STATUS )
+
+*      Get the list name & type
+          CALL ADI_NAME( LID, LNAMES(J), STATUS )
+          CALL ADI_CGET0C( LID, 'TYPE', TYPE(J), STATUS )
+
+*      Units ok?
+          CALL ADI_THERE( LID, 'Units', DUOK, STATUS )
+          IF ( DUOK ) THEN
+            CALL ADI_CGET0C( LID, 'Units', LUNIT(J), STATUS )
+          ELSE
+            LUNIT(J) = 'Units undefined'
+          END IF
+          IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*      Map data
+          CALL EDI_MTYPE( LID, MTYPE(J), STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL EDI_MAP( IFID, LNAMES(J), MTYPE(J), 'READ', 0, 0,
+     :    		  PTRS(J), STATUS )
+          ELSE
+            CALL ERR_ANNUL( STATUS )
+            PTRS(J) = 0
+          END IF
+
+*      Free the list
+          CALL ADI_ERASE( LID, STATUS )
+
+*      Increment list counter
+          J = J + 1
+
+*    Next list to map
+        END DO
+
+*    Page header
         CALL AIO_BLNK( OCH, STATUS )
-        WRITE( OBUF, '(10(''-''),<NDISP-START+1>(17(''-'')))')
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
+        WRITE( OBUF, '(10(''-''),<NLDISP>(17(''-'')))')
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
         WRITE( OBUF, '(A1,2X,A7,7A17)') '|', 'Item  |',
-     :                     (' '//LNAMES(I)(1:15)//'|', I = START, NDISP)
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
+     :                     (' '//LNAMES(I)(1:15)//'|', I = 1, NLDISP)
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
         WRITE( OBUF, '(A1,8X,A1,7A17)') '|', '|',
-     :                       (' '//TYPE(I)(1:15)//'|', I = START, NDISP)
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
+     :                       (' '//TYPE(I)(1:15)//'|', I = 1, NLDISP)
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
         WRITE( OBUF, '(A1,8X,A1,7A17)') '|', '|',
-     :                      (' '//LUNIT(I)(1:15)//'|', I = START, NDISP)
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
- 12     FORMAT( '|--------|', <NDISP-START+1>(' ',15('-'),'|'))
+     :                      (' '//LUNIT(I)(1:15)//'|', I = 1, NLDISP)
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
+ 12     FORMAT( '|--------|', <NLDISP>(' ',15('-'),'|'))
         WRITE( OBUF, 12 )
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
 
-*      Print the list values
-        DO I = SUBSET (1), SUBSET (2)
-          DO J = 1, NLIST
-            CALL DAT_CELL( DLOC(J), 1, I, CELL, STATUS )
-            CALL DAT_GET0C( CELL, C(J), STATUS )
-            CALL DAT_ANNUL( CELL, STATUS )
+*    Print the list values
+        DO I = 1, NEDISP
+
+*      Extract the record number to display
+          CALL ARR_ELEM1I( IDXPTR, NEDISP, I, IP, STATUS )
+
+*      Extract and format data
+          DO J = 1, NLDISP
+
+*        Floating point list
+            IF ( MTYPE(J) .EQ. 'DOUBLE' ) THEN
+              CALL ARR_ELEM1D( PTRS(J), LLEN, IP, DVAL, STATUS )
+              WRITE( C(J), '(1PG14.7)', IOSTAT=FSTAT ) DVAL
+
+*        Integer list
+            ELSE IF ( MTYPE(J) .EQ. 'INTEGER' ) THEN
+              CALL ARR_ELEM1I( PTRS(J), LLEN, IP, IVAL, STATUS )
+              WRITE( C(J), '(1X,I12)', IOSTAT=FSTAT ) IVAL
+
+*        Logical list
+            ELSE IF ( MTYPE(J) .EQ. 'LOGICAL' ) THEN
+              CALL ARR_ELEM1L( PTRS(J), LLEN, IP, LVAL, STATUS )
+              IF ( LVAL ) THEN
+                 C(J) = '    True'
+              ELSE
+                 C(J) = '    False'
+              END IF
+            END IF
+
           END DO
 
-          WRITE( OBUF, '(A1,I7,1X,A1,7A17)') '|', I, '|',
-     :                                (' '//C(K)//'|', K = START, NDISP)
-          CALL AIO_WRITE( OCH, OBUF, STATUS )
+*      Write data to buffer
+ 80       FORMAT( '|', I7, 1X, '|', 7(' ', A15,'|') )
+          WRITE( OBUF, 80 ) IP, (C(K), K = 1, NLDISP )
 
+*      Write buffer to device
+          CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
+
+*    Next event
         END DO
-        WRITE( OBUF, '(10(''-''),<NDISP-START+1>(17(''-'')))')
-        CALL AIO_WRITE( OCH, OBUF, STATUS )
+
+*    Page footer
+        WRITE( OBUF, '(10(''-''),<NLDISP>(17(''-'')))')
+        CALL AIO_WRITE( OCH, OBUF(:OUTWID-1), STATUS )
+
+*    Unmap the lists on this page
+        DO I = 1, NLDISP
+          IF ( PTRS(I) .NE. 0 ) THEN
+            CALL EDI_UNMAP( IFID, LNAMES(I), STATUS )
+          END IF
+        END DO
 
       END DO
 
-*    Close output channel
+*  Free index workspace
+      CALL DYN_UNMAP( IDXPTR, STATUS )
+
+*  Close output channel
       CALL AIO_CANCL( 'DEV', STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 

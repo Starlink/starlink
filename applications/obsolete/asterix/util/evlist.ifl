@@ -1,25 +1,29 @@
-Interface EVLIST
-   Parameter INP
-      position    1
-      type        'UNIV'
-      ppath       'GLOBAL'
-      association '<->GLOBAL.EVDS'
-      prompt      'Enter name of event dataset to be listed'
-   EndParameter
+INTERFACE EVLIST
 
-   Parameter SUBSET
-      position    2
-      type        '_INTEGER'
-      prompt      'List range to be displayed'
-      help        'A single pair of numbers is required'
-   EndParameter
+  PARAMETER INP
+    POSITION    1
+    TYPE        'LITERAL'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<->GLOBAL.EVDS'
+    PROMPT      'Enter name of event dataset to be listed'
+  ENDPARAMETER
 
-   Parameter DEV
-      TYPE        'LITERAL'
-      VPATH       'DEFAULT'
-      DEFAULT     'TERMINAL'
-      PROMPT      'Enter code for output device'
-      HELP        '(T)erminal, (P)rinter, (O)ldfile, (N)ewfile ; anything else = filename'
-   EndParameter
+  PARAMETER SUBSET
+    POSITION    2
+    TYPE        '_CHAR'
+    DEFAULT     '*:*'
+    PROMPT      'Events to display'
+    PPATH       'DEFAULT'
+    HELP        'Use standard list notation, eg. 1:10 or 1:6,8,9,100:*'
+  ENDPARAMETER
 
-EndInterface
+  PARAMETER DEV
+    TYPE        'LITERAL'
+    POSITION    3
+    VPATH       'DEFAULT'
+    DEFAULT     'TERMINAL'
+    PROMPT      'Enter code for output device'
+    HELP        '(T)erminal, (P)rinter, (O)ldfile, (N)ewfile ; anything else = filename'
+  ENDPARAMETER
+
+ENDINTERFACE
