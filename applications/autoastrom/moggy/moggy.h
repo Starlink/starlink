@@ -4,8 +4,8 @@
 //
 // $Id$
 
-#ifndef MOGGY_HEADER_READ
-#define MOGGY_HEADER_READ 1
+#ifndef MOGGY_H_LOADED
+#define MOGGY_H_LOADED 1
 
 #include <string>
 
@@ -15,4 +15,4 @@ struct MoggyException {
     MoggyException (string s) { msg = s; }
 };
 
-#endif /* MOGGY_HEADER_READ */
+#endif /* MOGGY_H_LOADED */

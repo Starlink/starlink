@@ -4,10 +4,13 @@
  * $Id$
  */
 
+#ifndef CONFIG_H_LOADED
+#define CONFIG_H_LOADED 1
+
 /* Do we have the <cstd...> include files? */
 /* Define as 1 if you DO have the (standard) <cstdio> headers.  If
    not, we use <stdio.h> instead. */
-#define HAVE_CSTD_INCLUDE 1
+#define HAVE_CSTD_INCLUDE 0
 
 /* The alpha cxx compiler currently (v6.0) needs to be invoked with 
    __USE_STD_IOSTREAM defined, so that it uses a standards-conforming 
@@ -16,3 +19,9 @@
    `-std strict_ansi', but that's a little harder to arrange in
    here. */
 #undef __USE_STD_IOSTREAM
+
+/* Define as 1 if you have <sstream> (as opposed to older
+   <strstream>).  Define as 0 otherwise. */
+#define HAVE_SSTREAM 0
+
+#endif /* CONFIG_H_LOADED */

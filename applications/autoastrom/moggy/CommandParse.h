@@ -1,12 +1,15 @@
-// Part of moggy
-// Copyright 2001 Council for the Central Laboratory of the Research Councils.
-// See file LICENCE for conditions.
-//
-// $Id$
+/* Part of moggy
+ * Copyright 2001 Council for the Central Laboratory of the Research Councils.
+ * See file LICENCE for conditions.
+ *
+ * $Id$
+ */
 
 
-#ifndef COMMANDPARSE_HEADER_READ
-#define COMMANDPARSE_HEADER_READ 1
+#ifndef COMMANDPARSE_H_LOADED
+#define COMMANDPARSE_H_LOADED 1
+
+#include "config.h"
 
 #include <vector>
 #include <string>
@@ -20,11 +23,13 @@ class CommandParse {
     ~CommandParse ();
 
     enum token_value {
-	INVALID, CONF, SRCH, NROW, SRAD, SBOX, QUIT
+	INVALID,
+	CONF, SEARCH, NAME, NROW, COORD1, COORD2, RADIUS, VERSION,
+	STATUS, TYPE, CATCONFIG, COLUMNS, QUIT
     };
 
     token_value type () const { return cmdcode_; }
-    bool argumentsOK () const { return cmdcode_ != INVALID; }
+    bool commandOK () const { return cmdcode_ != INVALID; }
     const vector<string>& arguments () const { return args_; }
 
     struct BadCommandParse : MoggyException {
@@ -36,7 +41,6 @@ class CommandParse {
     vector<string> args_;
     verbosities verbosity_;
 
-    void tokenise_string_ (string s) throw (BadCommandParse);
 };
 
-#endif /* COMMANDPARSE_HEADER_READ */
+#endif /* COMMANDPARSE_H_LOADED */

@@ -38,26 +38,51 @@ LIBS=-lm @LIBS@
 
 
 EXEC=moggy
-OBJS=moggy.o CommandParse.o
+OBJS=moggy.o CommandParse.o CatalogueHandler.o util.o
 
 $(EXEC): $(OBJS)
 	$(CXX) $(OBJS) $(LIBS) -o $@
-
-#CATDIR=/data/goedel/norman/s/src/gaia/build/built
-#moggy: $(OBJS)
-#	$(CXX) -o $@ $(OBJS) -L$(CATDIR)/lib -lcat
-
-# for i in *.C;do echo `echo $i|sed 's/\.C/.o/'`: $i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
-moggy.o: moggy.C moggy.h config.h CommandParse.h
-#	$(CXX) $(CXXFLAGS) -c -o $@ -I$(CATDIR)/include/cat moggy.C
-
-CommandParse.o: CommandParse.C CommandParse.h config.h
-
-# for i in *.h;do echo "$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $i`;done
-CommandParse.h: moggy.h verbosity.h
 
 
 # Distribution
 configure: config/configure.in
 	autoconf config/configure.in >configure
 	chmod 755 configure
+
+tags:
+	etags --c++ *.C *.h
+
+clean:
+	rm -f $(EXEC)
+	rm -f *~ *.o core
+
+distclean: clean
+	rm -f config.cache config.log config.status config.h
+
+# Dependencies
+depend:
+	echo '# DO NOT DELETE THIS LINE (it is used by make depend)' >depend.tmp
+	for i in *.C; do \
+		echo `echo $$i|sed 's/\.C/.o/'`: $$i `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp; \
+	done
+	for i in *.h; do \
+		echo "$$i:" `sed -n '/^#include/s/^[^\"]*\"\(.*\)\".*/\1/p' $$i` >>depend.tmp;\
+	done
+	sed -e '/^# DO NOT DELETE/,$$d' -e '$$r depend.tmp' Makefile >Makefile.tmp
+	mv Makefile.tmp Makefile
+	rm -f depend.tmp
+
+
+# DO NOT DELETE THIS LINE (it is used by make depend)
+CatalogueHandler.o: CatalogueHandler.C config.h stringstream.h \
+	CatalogueHandler.h util.h
+CommandParse.o: CommandParse.C config.h CommandParse.h util.h
+moggy.o: moggy.C config.h moggy.h CommandParse.h CatalogueHandler.h util.h
+util.o: util.C util.h
+CatalogueHandler.h: moggy.h
+CommandParse.h: config.h moggy.h verbosity.h
+config.h:
+moggy.h:
+stringstream.h:
+util.h:
+verbosity.h:
