@@ -1,4 +1,15 @@
-# makefile for SURF package
+# makefile for DREAM2SURF package
+#
+#  Requires that a DREAM initialisation should have been performed
+#  before the build will succeed. This is so that the $DREAM and
+#  $SCUBA_CLIB env variables can be defined so that the dream IO
+#  libraries can be linked in.
+# 
+#  Currently this is achieved by sourcing the .scuba file in
+#  Hans' home directory.
+#    source ~greve/.scuba
+
+
 
 .SUFFIXES : .ifl .ifc
 
@@ -8,7 +19,7 @@
 
 # -L/star/kappa -lkapsub -lkapgen
 
-LIBS= -L/jcmt_sw/sun4_Solaris/lib -lsculib \
+LIBS= -L../sculib -lsculib \
 	$(SCUBA_CLIB)/disk_io.o `dream2surf_link_adam`
 
 
@@ -45,6 +56,7 @@ IFL=	dream2surf.ifl
 OBJS = ${FSRC:.f=.o}
 IFC  = ${IFL:.ifl=.ifc}
 
+EXTERNAL_INCLUDES = DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR SCU_SOL 
 
 .F.o:
 	${FC} ${FFLAGS} -c $<
@@ -70,8 +82,14 @@ install: all
 	${INSTALL} ${INSTOPTS} reds ${INSTDIR}
 	${INSTALL} ${IFC} ${INSTDIR}
 
+
+# Clean up the intermediate files
 clean:
-	/bin/rm -f core *.o
+	/bin/rm -f core $(OBJS) $(EXTERNAL_INCLUDES)
+
+# Do a full clean up of all built files
+distclean: clean
+	/bin/rm -f $(IFC) dream2surf
 
 
 DAT_PAR:
@@ -90,13 +108,13 @@ PRM_PAR:
 	ln -s ${STARINC}/prm_par $@
 
 SCU_SOL:
-	ln -s $(SCUBA)/scu_sol.i $@
+	ln -s $(DREAM)/scu_sol.i $@
 
 MSG_PAR:
 	ln -s ${STARINC}/msg_par $@
 
 SURF_PAR:
-	ln -s /jcmt_sw/scuba/redsdir/surf_par $@
+	ln -s ../src/surf_par $@
 
 dream2surf.f:	SAE_PAR DAT_PAR SCU_SOL SURF_PAR PRM_PAR MSG_PAR
 

@@ -3,32 +3,34 @@
 .SUFFIXES : .ifl .ifc
 
 # Location of libsculib.a
-SCULIB = /jcmt_sw/sun4_Solaris/lib
-SURF_SUB = ../surflib
+SCULIB   = ../sculib
+SURFLIB  = ../surflib
+SURF_KAP = ../surf_kap
+PKG = surf
 
 # Libraries
 
-LIBS = -L$(SURF_SUB) -lsurf_sub -L$(SCULIB) -lsculib 
-IRAS = -L/star/iras90 -lira -L/jcmt_sw/scuba/surf_kap -lsurf_kap
-# -L/star/kappa -lkapsub -lkapgen
-IRAS = -L/jcmt_sw/scuba/surf_kap -lsurf_kap
-STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam` `pda_link_adam`
+LIBS = -L. -lsurf -L$(SURFLIB) -lsurflib -L$(SCULIB) -lsculib -L$(SURF_KAP) -lsurf_kap
+SLIB = libsurflib.a libsculib.a libsurf.a libsurf_kap.a
+IRAS = -L/star/iras90 -lira
 ADAMLIBS = $(IRAS) `./surf_link_adam`
 
 # Includes
 
-STARINC = /star/include
+STAR_INC = /star/include
 
 
 # Linker
-LINK  = alink -xdbx
+ALINK  = alink -xdbx
 LDFLAGS =  -C -g
 
 # Compiler flags
 
-FFLAGS = -C -g -DHAS_IRAS90
+FFLAGS = -C -g
+FCPPFLAGS = -DHAS_IRAS90
 FC    = f77
 COMPIFL = compifl
+LINK   = ln -s
 
 # install
 
@@ -37,10 +39,12 @@ INSTDIR = /jcmt_sw/sun4_Solaris/bin
 INSTOPTS = -s -g jcmtsw
 
 # Source code
-# Remove these lines:
-# reds_get_demod.f reds_get_flat.f kpg1_ivci.f reds_crosstalk.f
-# reds_write_demod.f reds_write_flat.f
-FSOURCES= surf_mon.f surf_extinction.f surf_flatfield.f \
+
+# Separate the A-task root since that always has to be the first
+# object file to include in an alink
+PKG_SRC = ${PKG}_mon.f
+
+FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_scuphot.f surf_rebin.f surf_reduce_switch.f surf_restore.f \
 	surf_write_photom.f surf_write_data.f surf_read_rebin_ndf.f\
 	surf_skydip.f surf_scucat.f \
@@ -51,23 +55,34 @@ FSOURCES= surf_mon.f surf_extinction.f surf_flatfield.f \
 	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
 	surf_grid_calcsky.f surf_reduce_noise.f
 
-FCPP=	surf_write_map_info.F
+FCPPSOURCES=	surf_write_map_info.F
 
-IFL=    surf_mon.ifl extinction.ifl reduce_switch.ifl flatfield.ifl \
-	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl drawsig.ifl \
+PKG_IFL = surf_mon.ifl
+
+IFL=    extinction.ifl reduce_switch.ifl flatfield.ifl \
+	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl \
 	change_pointing.ifl change_flat.ifl change_quality.ifl\
 	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
 	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl\
 	despike.ifl scuclip.ifl extract_flat.ifl scuba2mem.ifl \
-	calcsky.ifl reduce_noise.ifl
+	calcsky.ifl reduce_noise.ifl scumakewt.ifl despike2.ifl
 
-OBJS = ${FSOURCES:.f=.o}
-FCPPOBJ = ${FCPP:.F=.o}
-IFC  = ${IFL:.ifl=.ifc}
+# Dont include $PKG_SRC since that should not be included
+# in tar file
+SOURCE   = ${FSOURCES} ${FCPPSOURCES} ${CSOURCES}
 
+
+OBJS = ${FSOURCES:.f=.o} ${FCPPSOURCES:.F=.o}
+PKG_OBJ = ${PKG_SRC:.f=.o}
+IFC  = ${IFL:.ifl=.ifc} ${PKG_IFL:.ifl=.ifc}
+
+EXTERNAL_INCLUDES = SAE_PAR MSG_PAR PRM_PAR NDF_FUNC DAT_PAR NDF_PAR \
+	PAR_ERR NUM_DEC_CVT AST_PAR PAR_PAR GRP_PAR GKS_PAR NUM_DEF_CVT
+
+LOCAL_INCLUDES = SURF_PAR
 
 .F.o:
-	${FC} ${FFLAGS} -c $<
+	${FC} ${FFLAGS} ${FCPPFLAGS} -c $<
 
 .f.o:
 	${FC} ${FFLAGS} -c $<
@@ -77,12 +92,18 @@ IFC  = ${IFL:.ifl=.ifc}
 
 # Some targets
 
-all:	surf ifc
+all:	${PKG}_mon ifc
 
-objects: ${OBJS} ${FCPPOBJ}
 
-surf:	${OBJS} ${FCPPOBJ} ${SCULIB}/libsculib.a ${SURF_SUB}/libsurf_sub.a
-	${LINK} ${OBJS} NoHand.o ${FCPPOBJ} ${LDFLAGS} ${LIBS} ${ADAMLIBS}
+libsculib.a: $(SCULIB)/libsculib.a
+libsurflib.a: $(SURFLIB)/libsurflib.a
+libsurf_kap.a: $(SURF_KAP)/libsurf_kap.a
+
+libsurf.a: ${OBJS}
+	ar r $@ $?
+
+surf_mon: surf_mon.o $(SLIB)
+	${ALINK} ${@}.o ${LDFLAGS} ${LIBS} ${ADAMLIBS}
 
 ifc:	${IFC}
 
@@ -91,85 +112,72 @@ install: all
 	${INSTALL} ${IFC} ${INSTDIR}
 
 clean:
-	/bin/rm -f core *.o
+	/bin/rm -f core $(PKG_OBJ) $(OBJS) $(LOCAL_INCLUDES) \
+$(EXTERNAL_INCLUDES) libsurf.a
+
+distclean: clean
+	/bin/rm surf_mon $(IFC)
+
+export: ${PKG}_sub.tar ${PKG}_ifls.tar
+
+surf_sub.tar: $(SOURCE)
+	rm -f $@ 1>/dev/null 2>/dev/null; \
+	tar cf $@ $(SOURCE) 
+
+surf_ifls.tar: $(IFL)
+	rm -f $@ 1>/dev/null 2>/dev/null; \
+	tar cf $@ $(IFL) 
 
 
-DAT_PAR:
-	ln -s ${STARINC}/dat_par $@
+# Dependencies
 
-SAE_PAR:
-	ln -s ${STARINC}/sae_par $@
+SURF_PAR:    surf_par;                $(LINK) $? $@
+SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
+MSG_PAR:     $(STAR_INC)/msg_par;     $(LINK) $? $@
+PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
+NDF_FUNC:    $(STAR_INC)/ndf_func;    $(LINK) $? $@
+DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
+NDF_PAR:     $(STAR_INC)/ndf_par;     $(LINK) $? $@
+PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
+NUM_DEC_CVT: $(STAR_INC)/num_dec_cvt; $(LINK) $? $@
+NUM_DEF_CVT: $(STAR_INC)/num_def_cvt; $(LINK) $? $@
+AST_PAR:     $(STAR_INC)/ast_par;     $(LINK) $? $@
+PAR_PAR:     $(STAR_INC)/par_par;     $(LINK) $? $@
+GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
+GKS_PAR:     $(STAR_INC)/gks_par;     $(LINK) $? $@
 
-NDF_PAR:
-	ln -s ${STARINC}/ndf_par $@
+surf_write_map_info.o: AST_PAR DAT_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_chgdata.o: DAT_PAR MSG_PAR NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR SURF_PAR
+surf_chgflat.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_chgpnt.o: DAT_PAR MSG_PAR PAR_ERR SAE_PAR SURF_PAR
+surf_chgqual.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_despike.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_extflat.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_extinction.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_flatfield.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_grid_calcsky.o: DAT_PAR MSG_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_grid_despike.o: MSG_PAR PAR_ERR PRM_PAR SAE_PAR
+surf_make_weight.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_mon.o: PAR_PAR SAE_PAR
+surf_read_rebin_ndf.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_rebin.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_recurse_read.o: DAT_PAR MSG_PAR NDF_PAR SAE_PAR SURF_PAR
+surf_reduce_noise.o: DAT_PAR MSG_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_reduce_switch.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_remsky.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_restore.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_scan_rlb.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
+surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scucat.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_scuclip.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuhelp.o: PAR_ERR SAE_PAR
+surf_scuover.o: DAT_PAR GKS_PAR MSG_PAR NDF_PAR PAR_ERR PAR_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuphot.o: DAT_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_skydip.o: DAT_PAR MSG_PAR NDF_FUNC PAR_ERR PRM_PAR SAE_PAR SURF_PAR
+surf_write_data.o: PRM_PAR SAE_PAR
+surf_write_photom.o: PRM_PAR SAE_PAR
+surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
 
-PAR_PAR:
-	ln -s ${STARINC}/ndf_par $@
-
-PRM_PAR:
-	ln -s ${STARINC}/prm_par $@
-
-REDS_SYS:
-	ln -s surf_par $@
-
-reds_chgflat.f:      REDS_SYS    
-reds_chgpnt.f:       REDS_SYS
-reds_extinction.f:   REDS_SYS
-reds_flatfield.f:    REDS_SYS
-reds_modify.f:       REDS_SYS
-reds_reduce_switch.f:     REDS_SYS
-reds_restore.f:      REDS_SYS
-reds_scuover.f:      REDS_SYS
-reds_scuphot.f:      REDS_SYS
-reds_skydip.f:       REDS_SYS
-reds_wtfn_rebin.f:   REDS_SYS
-
-kstest.f:  SAE_PAR 
-kstest.f:  PRM_PAR 
-kstest.f:  SAE_PAR 
-kstest.f:  PRM_PAR 
-reds.f:  SAE_PAR 
-reds.f:  PAR_PAR 
-reds_extinction.f:  SAE_PAR 
-reds_extinction.f:  DAT_PAR 
-reds_extinction.f:  PRM_PAR 
-reds_extinction.f:  REDS_SYS 
-reds_flatfield.f:  SAE_PAR 
-reds_flatfield.f:  DAT_PAR 
-reds_flatfield.f:  REDS_SYS 
-reds_modify.f:  SAE_PAR 
-reds_modify.f:  DAT_PAR 
-reds_modify.f:  REDS_SYS 
-reds_photom.f:  SAE_PAR 
-reds_photom.f:  DAT_PAR 
-reds_photom.f:  NDF_PAR 
-reds_photom.f:  PRM_PAR 
-reds_photom.f:  REDS_SYS 
-reds_rebin.f:  SAE_PAR 
-reds_reduce_switch.f:  SAE_PAR 
-reds_reduce_switch.f:  DAT_PAR 
-reds_reduce_switch.f:  PRM_PAR 
-reds_reduce_switch.f:  NDF_PAR 
-reds_reduce_switch.f:  REDS_SYS 
-reds_scucat.f:  SAE_PAR 
-reds_scucat.f:  NDF_PAR 
-reds_scucat.f:  PRM_PAR 
-reds_scucat.f:  DAT_PAR 
-reds_scucat.f:  PAR_ERR 
-reds_skydip.f:  SAE_PAR 
-reds_skydip.f:  DAT_PAR 
-reds_skydip.f:  PRM_PAR 
-reds_skydip.f:  REDS_SYS 
-reds_skydip.f:  SAE_PAR 
-reds_write_photom.f:  SAE_PAR 
-reds_write_photom.f:  PRM_PAR 
-reds_wtfn_rebin.f:  SAE_PAR 
-reds_wtfn_rebin.f:  DAT_PAR 
-reds_wtfn_rebin.f:  NDF_PAR 
-reds_wtfn_rebin.f:  PRM_PAR 
-reds_wtfn_rebin.f:  REDS_SYS 
-skydip_fit.f:  SAE_PAR 
-skydip_fit.f:  PRM_PAR 
 
 
 
