@@ -900,8 +900,12 @@ BUILT_SOURCES = PAR_ERR par_err.h
             listed in this variable, separated by spaces, there must
             be a corresponding <code>_SOURCES</code> variable, which
             has the `primary' <code>SOURCES</code> and a prefix
-            formed from the canonicalised library name, which lists
-            the set of source files for that library.  As well, this
+            formed from the library name, which lists
+            the set of source files for that library.
+            The prefix must be canonicalised by replacing
+            with underscores everything other than letters and numbers.
+            As well as declaring the files which are to be compiled
+            into the library, this
             indicates to automake that these source files are to be
             distributed as part of the final tarball, and that it must
             emit makefile rules to install the library in the correct
@@ -3037,7 +3041,7 @@ M Makefile.dependencies
         <title>FAQs</title>
       </subhead>
 
-      <subsect id="general-faqs" export="export">
+     <subsect id="general-faqs" export="export">
         <subhead>
           <title>General FAQs</title>
         </subhead>
@@ -3067,6 +3071,82 @@ M Makefile.dependencies
                 using <code>noinst_</code> tools, the Fortran
                 preprocessor, and <code>./configure</code> variables
                 in a reasonably tidy way.</p>
+            </dd>
+
+            <dt>I want to do odd things at install time.  How?</dt>
+            <dd>
+              <p>Automake provides a couple of escape hatches for
+                installing extra material.  These are the
+                <code>install-exec-local</code> and
+                <code>install-data-local</code> targets for installing
+                platform-dependent and -independent files.  The
+                associated rules are run at install time, and can do
+                anything, the similar <code>install-exec-hook</code>
+                and <code>install-data-hook</code> targets are run
+                after all other install targets, and can do
+                post-installation cleanup and the like.  See section
+                <webref url="&automakehtml;/Install.html" >What Gets
+                  Installed</webref> in the automake manual for
+                details.</p>
+
+              <p>For example, the <code>dtask</code> component
+                installs a special object file in the library
+                directory.  This isn't a program, or script, or
+                library, and so isn't naturally handled by any other
+                automake mechanism.  The <code>Makefile.am</code>
+                there includes the following:
+<verbatim>
+dtask_main.o: dtask_main.f
+install-exec-local: dtask_main.o
+	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
+	if test -n "$$MANIFEST_FILE"; then \
+	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >>$$MANIFEST_FILE; \
+	fi
+</verbatim>
+                This uses the <code>$(INSTALL_PROGRAM)</code> command to
+                install the object file in the library directory (you'd
+                use <code>$(INSTALL_DATA)</code> command for a data
+                target).  The installation location is
+                <code>$(libdir)</code>, which is a location which
+                includes the <code>$(prefix)</code> variable, so that
+                this install rule behaves as other such rules do.
+                Also, it prefixes the installation location with
+                <code>$(DESTDIR)</code>: this is usually the empty
+                string, but it can be set to something else to perform
+                a staged installation.  Finally, the location of the
+                installed file is appended to the file in the
+                environment variable <code>$MANIFEST_FILE</code>,
+                <em>if</em> that variable is non-empty.  This is a
+                Starlink extension, and is how the manifest file is
+                built up.  Each of these features is important if this
+                hand-made install rule is to behave the same way as
+                the automatically-generated rules.</p>
+
+              <p>You often need to create links in this situation.  To
+                do that portably (symbolic links are not required by
+                POSIX), put the <code>AC_PROG_LN_S</code> macro in
+                your <code>configure.ac</code>, and use the
+                <code>$(LN_S)</code> macro in your
+                <code>Makefile.am</code>.  Note that the autoconf
+                manual <webref url="&autoconfhtml;/autoconf_40.html"
+                  >notes</webref> that this macro does not in
+                principle support a path in the second argument; thus
+                do not write
+                <code>$(LN_S) /path/to/target/TARGET
+                  /path/to/link/LINK</code>, but instead
+<verbatim>
+cd /path/to/link; $(LN_S) /path/to/target/TARGET LINK
+</verbatim></p>
+            </dd>
+
+            <dt>I want to do odd things at clean/distribution time.  How?</dt>
+            <dd>
+              <p>Automake also has support for extending what is cleaned
+                and what is included in the distribution, though this
+                does not have to be as elaborate as the support for
+                extended installation above.  See the
+                documentation on <code>CLEANFILES</code> and
+                <code>EXTRA_DIST</code> in the Automake manual.</p>
             </dd>
 
           </dl>
