@@ -83,8 +83,13 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'N', GNAME )
             CALL ERR_REP( 'POL1_GTCOL_ERR1', 'A column name for '//
-     :                    '^N values is required but has not been '//
-     :                    'specified.', STATUS )
+     :                    '^N values is required but is not '//
+     :                    'specified in your polpack setup file '//
+     :                    '($HOME/.polpackrc or $POLPACKRC).', STATUS )
+            CALL ERR_REP( 'POL1_GTCOL_ERR1B', 'You could try deleting'//
+     :                    ' or moving your polpack setup file and '//
+     :                    'then re-running this application.', STATUS )
+
          END IF     
 
 *  Otherwise...

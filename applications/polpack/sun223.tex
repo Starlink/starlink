@@ -13,12 +13,12 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {223.6}
+\newcommand{\stardocnumber}    {223.7}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {4th December 2001}
+\newcommand{\stardocdate}      {26th February 2003}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
-\newcommand{\stardocversion}   {Version 3.1}
+\newcommand{\stardocversion}   {Version 3.1-2}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {POLPACK is a package of applications for 
 reducing imaging polarimetry or spectropolarimetry data. They cover 
@@ -6720,6 +6720,16 @@ The allowed items within the POLPACK extension.}
 \section{\label{APP:HISTORY}History}
 This section describes the major changes introduced at each release of
 POLPACK.
+
+\subsection{V3.1-3}
+
+\begin{itemize}
+ \item Error messages indicating that a required column is not available
+ have been expanded to suggest that deleting your \$HOME/.polpackrc
+ file may solve the problem. This file can be left in a corrupt condition
+ if a command fails whilst using the GAIA polarimetry toolbox. 
+
+\end{itemize}
 
 \subsection{V3.1}
 
