@@ -102,9 +102,24 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External functions:
+      EXTERNAL			CHR_LEN
+        INTEGER			  CHR_LEN
+
 *  Local Variables:
       CHARACTER*20	     	ITEM			! Item name
       CHARACTER*20	     	TYPE			! Item data type
+      CHARACTER*10		AXITEM(7)
+      CHARACTER*7		AXKYWD(7), AXTYPE(7)
+      CHARACTER*40		AXCMNT(7)
+      CHARACTER*8		KEYWRD
+      CHARACTER*1		CAX, AXIS
+      CHARACTER*40		CVAL
+
+      DOUBLE PRECISION		DVAL
+
+      REAL			AXINFO(2), BASE, DELTA, TANG
+      REAL			RVAL
 
       INTEGER			BPI			! Bytes per item
       INTEGER			CNDIM,CDIMS(ADI__MXDIM)	! Object dimensions
@@ -114,17 +129,21 @@
       INTEGER			PSID			! Item private store
       INTEGER			PTR			! Item data
       INTEGER			WBPTR			! Write back proc
-
-      CHARACTER*1		CAX, AXIS
-      LOGICAL			DIDCRE
-      REAL			AXINFO(2), BASE, DELTA, TANG
       INTEGER			IDUM, I
 
-      CHARACTER*11		AXITEM(7)
+      LOGICAL			DIDCRE, LVAL, THERE
 
 *  Local data:
-      DATA AXITEM		/'_Label', '_Units', '_Normalised', '_Data',
-     :                           '_Width', '_LoWidth', '_HiWidth'/
+      DATA AXITEM		/'Label', 'Units', 'Normalised', 'Data',
+     :                           'Width', 'LoWidth', 'HiWidth'/
+      DATA AXKYWD		/'ALABEL', 'AUNIT', 'ANORM', 'CRPIX',
+     :                           'CDELT', 'LOWIDTH', 'HIWIDTH'/
+      DATA AXTYPE		/'CHAR', 'CHAR', 'LOGICAL', 'REAL',
+     :                           'REAL', 'REAL', 'REAL'/
+      DATA AXCMNT		/'Axis lable', 'Axis units',
+     :                           'Is the axis normalised',
+     :                           'Pixel of tangent point',
+     :                           'Axis unit per pixel', '?', '?'/
 
 *.
 
@@ -152,24 +171,32 @@
         ELSE
           AXIS = ' '
         END IF
-        CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
-     :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
-        CALL ADI_CNEWV0R( ITID, 'Value', TANG, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', AXIS//
-     :                    ' pixel of tangent point', STATUS )
-        CALL ADI2_CFIND( ARGS(2), ' ', '.CDELT'//CAX, ' ', .TRUE.,
-     :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
-        CALL ADI_CNEWV0R( ITID, 'Value', DELTA, STATUS )
-        CALL ADI_CNEWV0C( ITID, 'Comment', AXIS//' degrees per pixel',
-     :                    STATUS )
+        CALL ADI2_PKEY0D( ARGS(2), ' ', 'CRPIX'//CAX, DBLE(TANG),
+     :                    AXIS//' pixel of tangent point', STATUS )
+        CALL ADI2_PKEY0D( ARGS(2), ' ', 'CDELT'//CAX, DBLE(DELTA),
+     :                    AXIS//' degrees per pixel', STATUS )
 
 *  Special case for Axis_<n> item, only copy, don't invent (RB)
       ELSE IF (ITEM(1:5) .EQ. 'Axis_' .AND. ITEM(7:).LE.' ' ) THEN
         DO I = 1, 7
-          CALL BDI2_CFIND( ARGS(1), ARGS(2), ITEM(1:6)//AXITEM(I),
-     :                     .TRUE., .FALSE., ITID, CNDIM, CDIMS,
-     :                     STATUS )
-          CALL ERR_ANNUL( STATUS )
+          CALL ADI_THERE( ARGS(4), AXITEM(I), THERE, STATUS )
+          IF ( THERE ) THEN
+            KEYWRD = AXKYWD(I)
+            KEYWRD = KEYWRD(:CHR_LEN(KEYWRD)) // ITEM(6:6)
+            IF ( AXTYPE(I) .EQ. 'CHAR' ) THEN
+              CALL ADI_CGET0C( ARGS(4), AXITEM(I), CVAL, STATUS )
+              CALL ADI2_PKEY0C( ARGS(2), ' ', KEYWRD,
+     :                          CVAL, AXCMNT(I), STATUS )
+            ELSE IF ( AXTYPE(I) .EQ. 'REAL' ) THEN
+              CALL ADI_CGET0R( ARGS(4), AXITEM(I), RVAL, STATUS )
+              CALL ADI2_PKEY0R( ARGS(2), ' ', KEYWRD,
+     :                          RVAL, AXCMNT(I), STATUS )
+            ELSE IF ( AXTYPE(I) .EQ. 'LOGICAL' ) THEN
+              CALL ADI_CGET0L( ARGS(4), AXITEM(I), LVAL, STATUS )
+              CALL ADI2_PKEY0L( ARGS(2), ' ', KEYWRD,
+     :                          LVAL, AXCMNT(I), STATUS )
+            END IF
+          END IF
         END DO
 
 *  All the other items as standard...
