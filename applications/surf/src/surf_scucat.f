@@ -59,6 +59,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.14  1997/04/30 03:01:46  timj
+*     Add MSG_OUTIF.
+*
 *     Revision 1.13  1997/03/31 21:18:29  timj
 *     Use PACKAGE and TSKNAME.
 *
@@ -116,6 +119,7 @@ c
 *     Global constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error codes
       INCLUDE 'DAT_PAR'          ! Data-system constants
@@ -187,6 +191,9 @@ c
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 *     start up the NDF system and read in the input photometry data
       
@@ -283,7 +290,8 @@ c
 
                CALL MSG_SETC('BOL',BOL_LIST)
                CALL MSG_SETC('PKG', PACKAGE)
-               CALL MSG_OUT(' ','^PKG: Found data for the following '//
+               CALL MSG_OUTIF(MSG__NORM, ' ',
+     :              '^PKG: Found data for the following '//
      :              'bolometers: ^BOL', STATUS)
 
 *     Find out if we already used this one
@@ -362,7 +370,8 @@ c
                   CALL MSG_SETC('TITLE', TITLE)
                   CALL MSG_SETC('PKG', PACKAGE)
                   
-                  CALL MSG_OUT(' ','^PKG: This is a PHOTOM '//
+                  CALL MSG_OUTIF(MSG__NORM, ' ',
+     :                 '^PKG: This is a PHOTOM '//
      :                 'observation of ^TITLE. There are ^NINT '//
      :                 'integrations', STATUS)
                END IF
