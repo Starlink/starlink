@@ -31,7 +31,8 @@
 The public ID of the HTML this output is claimed to be conformant with
 <returnvalue type=string>Public ID
 <codebody>
-(define %html-pubid% "-//W3C//DTD HTML 3.2 Final//EN")
+;(define %html-pubid% "-//W3C//DTD HTML 3.2 Final//EN")
+(define %html-pubid% "-//Starlink//DTD Starlink HTML 3//EN")
 
 
 <routine>
@@ -40,9 +41,12 @@ The public ID of the HTML this output is claimed to be conformant with
 The attributes added to the HTML body, controlling text colour, and the like.
 <returnvalue type=list>List of lists of strings
 <codebody>
-(define %body-attr%
-  '(("bgcolor" "#FFFFFF")
-    ("text"    "#000000")))
+;(define %body-attr%
+;  '(("bgcolor" "#FFFFFF")
+;    ("text"    "#000000")))
+;; None.  Firstly because bgcolor is non-conformant, and secondly because
+;; we've taken the decision not to impose layout in the HTML
+(define %body-attr% '())
 
 
 <routine>
@@ -109,8 +113,8 @@ The attributes added to the navigation header table
 <returnvalue type='list of lists of strings'>List of attributes
 <codebody>
 (define %nav-header-table-attr%
-  '(("BGCOLOR" "#FFFF99")
-    ("WIDTH" "100%")
+  '(;("BGCOLOR" "#FFFF99")
+    ;("WIDTH" "100%")
     ("BORDER" "0")))
 
 <routine>
@@ -120,8 +124,8 @@ The attributes added to the navigation footer table
 <returnvalue type='list of lists of strings'>List of attributes
 <codebody>
 (define %nav-footer-table-attr%
-  '(("BGCOLOR" "#FFFF99")
-    ("WIDTH" "100%")
+  '(;("BGCOLOR" "#FFFF99")
+    ;("WIDTH" "100%")
     ("BORDER" "0")))
  
 <routine>
