@@ -6,7 +6,7 @@
 *  Purpose:
 *     Finds the mean of the good data values in an array.
  
-*  Desciption:
+*  Description:
 *     Finds the mean of the good data values in a 1-D array.
 
 *  Language:
