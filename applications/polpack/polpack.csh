@@ -76,6 +76,7 @@
       alias polstack  INSTALL_BIN/polstack
       alias polvec    INSTALL_BIN/polvec
       alias polversion INSTALL_BIN/polversion 
+      alias polzconv  INSTALL_BIN/polzconv
       alias makecube  INSTALL_BIN/makecube.csh
 #
 #  Now do the same with alternative names.
@@ -93,6 +94,7 @@
       alias pol_polstack  INSTALL_BIN/polstack
       alias pol_polvec    INSTALL_BIN/polvec
       alias pol_polversion   INSTALL_BIN/polversion
+      alias pol_polzconv  INSTALL_BIN/polzconv
       alias pol_makecube  INSTALL_BIN/makecube.csh
 #
 #

@@ -1,8 +1,14 @@
 1 POLPACK
 
- Version 2.1-7 of POLPACK (an applications package for processing imaging 
+ Version 3.0 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
  The main changes since V2.1-5 are:
+
+   o  Multi-waveband data (i.e. Spectropolarimetry data) can now be
+   processed and displayed.
+
+   o  A bug has been fixed which could cause inappropriate text to be
+   used as the default title for the key produced by POLPLOT.
 
    o  A new logical-valued parameter called INTEGRATE has been added to
    POLBIN. If set to a true value, the output catalogue contains only a
@@ -10,7 +16,10 @@
    catalogue. Otherwise, the output catalogue contains vectors for a grid
    of bins determined by the BOX parameter, as before.
 
-   o  Two new hidden commands POLWRTCL and POLRDTCL have been added to
-   transfer catalogue data to and from the polarimetry toolbox within
-   GAIA. commands are not designed for interactive use.
+   o  Three new hidden commands POLWRTCL, POLRDTCL and POLZCONV have been
+   added. The first two transfer catalogue data to and from the polarimetry 
+   toolbox within GAIA. The third transforms between calibrated values
+   and pixel values along any spectral channel axis present in a vector
+   catalogue. These commands are not intended for interactive use, and
+   are not documented in SUN/223.
 
