@@ -74,7 +74,7 @@
       CALL SEDIT_LISTPAR( FLOC, PARTOT, COMP, PAR, OCH, STATUS )
 
 *    Free channel
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Exit
       CALL AST_ERR( STATUS )

@@ -20,11 +20,11 @@
 *
 *    Parameters :
 *
-*     INPUT       = UNIV(R)
+*     INP         = UNIV(R)
 *                   Input data object
-*     USEERRORS   = _LOGICAL(R)
+*     WEIGHT      = _LOGICAL(R)
 *                   Asks if data errors are to be used
-*     USEQUALITY  = _LOGICAL(R)
+*     QUALITY     = _LOGICAL(R)
 *                   Asks if data quality is to be used
 *     LOOP        = _LOGICAL(R)
 *                   Loop over rejecting high sigma points
@@ -32,7 +32,6 @@
 *                   Don't calculate kurtosis and skewness
 *
 *    Method :
-*     Calls NAg routine G01AAF.
 *    Deficiencies :
 *    Bugs :
 *    Authors :
@@ -137,7 +136,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Determine output device.
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
       IF ( OUTWIDTH .EQ. 132 ) THEN
         CALL AIO_WRITE( OCH, 'Statistics of '//INPUTFILE, STATUS )
         CALL AIO_BLNK( OCH, STATUS )
@@ -156,13 +155,13 @@
 *      Look for quality - ask user if present
         CALL BDI_CHKQUAL( IFID, QUALOK, TNDIM, TDIMS, STATUS )
         IF ( QUALOK ) THEN
-          CALL USI_GET0L( 'USEQUALITY', QUALOK, STATUS )
+          CALL USI_GET0L( 'QUALITY', QUALOK, STATUS )
         END IF
 
 *      Look for variance - ask user if present
         CALL BDI_CHKVAR( IFID, VAROK, TNDIM, TDIMS, STATUS )
         IF ( VAROK ) THEN
-          CALL USI_GET0L( 'USEERRORS', VAROK, STATUS)
+          CALL USI_GET0L( 'WEIGHT', VAROK, STATUS)
         END IF
 
 *      Check axis values
@@ -229,7 +228,7 @@
       END IF
 
 *    Close output channel
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Release dataset
       CALL BDI_RELEASE( IFID, STATUS )

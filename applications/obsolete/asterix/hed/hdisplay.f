@@ -11,11 +11,11 @@
 *
 *     INP = HDS data object
 *            object to be output
-*     DEVICE = CHAR
+*     DEV = CHAR
 *            output device  { C)ONSOLE,P)RINTER,O)LDFILE,N)EWFILE }
 *     SLICE = CHAR
 *            description of range of object to be output eg. '(1:10,1:5)'
-*     FORMAT = CHAR
+*     FMT = CHAR
 *            optional output format
 *
 *    Method :
@@ -86,7 +86,7 @@
       IF ( OBJOK .AND. (STATUS.EQ.SAI__OK) ) THEN
 
 *      Set up output channel
-        CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, DEFWIDTH, STATUS )
+        CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEFWIDTH, STATUS )
 
 *      Override device width?
         CALL USI_GET0I( 'WIDTH', WIDTH, STATUS )
@@ -114,7 +114,7 @@
         END DO
 
 *      See if format specified
-        CALL USI_GET0C( 'FORMAT', FMT, STATUS )
+        CALL USI_GET0C( 'FMT', FMT, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           FMT = ' '
           CALL ERR_ANNUL( STATUS )
@@ -125,7 +125,7 @@
      :                                           WIDTH, STATUS )
 
 *      Close down output channel
-        CALL AIO_CANCL( 'DEVICE', STATUS )
+        CALL AIO_CANCL( 'DEV', STATUS )
 
       END IF
 

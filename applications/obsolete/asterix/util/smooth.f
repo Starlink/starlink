@@ -8,9 +8,9 @@
 *
 *    Environment parameters :
 *
-*     INPUT = UNIV(R)
+*     INP = UNIV(R)
 *       Input dataset
-*     OUTPUT = UNIV(R)
+*     OUT = UNIV(R)
 *       Output dataset name
 *     OVER = LOGICAL(R)
 *       Overwrite input or create new output?
@@ -161,14 +161,14 @@
 *
         IF (OVER) THEN
 *
-           CALL USI_ASSOCI('INPUT','UPDATE',ILOC,INPRIM,STATUS)
+           CALL USI_ASSOCI('INP','UPDATE',ILOC,INPRIM,STATUS)
 *
 *   Clone an output locator
            CALL DAT_CLONE(ILOC,OLOC,STATUS)
 *
         ELSE
 *
-           CALL USI_ASSOC2('INPUT','OUTPUT','READ',ILOC,OLOC,
+           CALL USI_ASSOC2('INP','OUT','READ',ILOC,OLOC,
      &                                               INPRIM,STATUS)
 *
            IF (INPRIM) THEN

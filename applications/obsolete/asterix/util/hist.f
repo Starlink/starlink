@@ -10,9 +10,9 @@
 *
 *     INP = UNIV(R)
 *           The datatset whose processing history is to be displayed
-*     DEVICE = CHARACTER(R)
+*     DEV = CHARACTER(R)
 *           Output device
-*     LINES_OF_TEXT = INTEGER(R)
+*     LINES _OF_TEXT = INTEGER(R)
 *           Maximum number of text lines to be displayed
 *
 *    Method :
@@ -118,11 +118,11 @@
       END IF
 
 *    Output destination
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
 
 *    How much text information ?
-      CALL USI_DEF0I( 'LINES_OF_TEXT', MXTEXT, STATUS )
-      CALL USI_GET0I( 'LINES_OF_TEXT', MAXLIN, STATUS )
+      CALL USI_DEF0I( 'LINES', MXTEXT, STATUS )
+      CALL USI_GET0I( 'LINES', MAXLIN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 90
       MAXLIN = MIN( MXTEXT, MAXLIN )
       MAXLIN = MAX( 0, MAXLIN )
@@ -210,7 +210,7 @@
      :   '----------------------------------------', STATUS )
 
 *    Clean up
- 90   CALL AIO_CANCL( 'DEVICE', STATUS )
+ 90   CALL AIO_CANCL( 'DEV', STATUS )
 
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )

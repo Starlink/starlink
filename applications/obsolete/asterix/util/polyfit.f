@@ -118,7 +118,7 @@
       CALL ARR_INIT1I( 1, DAT__MXDIM, LDIMS, STATUS )
 
 *    Ask if detrending or polynomial fitting required:
-      CALL USI_GET0L( 'POLYFIT', POLY, STATUS )
+      CALL USI_GET0L( 'FIT', POLY, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( POLY ) THEN
         CALL USI_GET0L( 'DTREND', POLY, STATUS )
@@ -226,7 +226,7 @@
       END IF
 
 *    User input.
-      CALL USI_GET0I( 'POLY_DEGREE', NDEG, STATUS )
+      CALL USI_GET0I( 'DEGREE', NDEG, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    NDEG must lie between 0 and 10

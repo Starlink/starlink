@@ -65,13 +65,13 @@
       CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
 
 *    Connect output device
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
 
 *    Write out information on data object
       CALL HDIR_OUT( OCH, OUTWIDTH, OBJLOC, STATUS )
 
 *    Close output device
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Tidy up
       CALL AST_CLOSE()

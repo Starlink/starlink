@@ -7,7 +7,7 @@
 *           Input dataset
 *     SUBSET(2)=INTEGER(R)
 *           Subset of items to be printed
-*     DEVICE = CHAR(R)
+*     DEV = CHAR(R)
 *           Output ascii device
 *
 *    Method :
@@ -117,7 +117,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Set up output channel
-      CALL AIO_ASSOCO( 'DEVICE', 'LIST', OCH, OUTWIDTH, STATUS )
+      CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
 
 *    Tell the user how many items there are
       CALL MSG_SETI ('LEN', LLENGTH)
@@ -227,7 +227,7 @@
       END DO
 
 *    Close output channel
-      CALL AIO_CANCL( 'DEVICE', STATUS )
+      CALL AIO_CANCL( 'DEV', STATUS )
 
 *    Exit
  99   CALL AST_CLOSE()
