@@ -77,3 +77,16 @@ Oct-Nov 1999
 
 
 
+15 November 1999
+
+	Building the distribution from a CVS-exported copy of the
+	sources:
+
+	  * Export the appropriate version of the source set.
+	  * Build the HTML version of the documentation, using
+	    `star2html sun180', and bundle that into a tar file using
+	    `tar cf sun180.htx_tar sun180.htx'.
+	  * Make a new source bundle with `./mk new_esp_source.tar'
+	    then `./mk export_source' (the precise reason for the
+	    extra step is lost in the mists of time, but something
+	    goes wrong if you don't do it).
