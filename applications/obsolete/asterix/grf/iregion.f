@@ -1467,24 +1467,22 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			FID
       INTEGER PTR
-      LOGICAL PRIM
       LOGICAL MATCH
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
-        CALL IMG_MATCH(LOC,MATCH,STATUS)
-        CALL BDA_MAPTDATA(LOC,'_BYTE','R',PTR,STATUS)
+        CALL USI_ASSOC('INP','BinDS|Array', 'READ', FID,STATUS)
+        CALL IMG_MATCH(FID,MATCH,STATUS)
+        CALL BDI_MAPB( FID, 'Data', 'READ', PTR, STATUS )
         CALL ARR_COP1B(I_NX*I_NY,%val(PTR),%val(I_REG_PTR),STATUS)
         I_REG_TYPE='COMPLEX'
-        CALL BDA_RELEASE(LOC,STATUS)
-        CALL USI_ANNUL('INP',STATUS)
+        CALL USI_CANCL('INP',STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IREGION_IMPORT',STATUS)
+          CALL AST_REXIT('IREGION_IMPORT',STATUS)
         ENDIF
 
       ENDIF

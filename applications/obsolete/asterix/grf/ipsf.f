@@ -9,7 +9,8 @@
 *
 *     16 Aug 90 : V1.2-1 Outputs fit statistics (DJA)
 *      3 Oct 91 : V1.5-0 PMAX parameter overrides fitting (DJA)
-*     21 Feb 92 : V1.6-0 USes IRADIAL_DOIT to profile 2D psf array (DJA)
+*     21 Feb 92 : V1.6-0 Uses IRADIAL_DOIT to profile 2D psf array (DJA)
+*      8 Oct 95 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -42,7 +43,7 @@
       LOGICAL NEW
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPSF Version 1.6-0')
+      PARAMETER (VERSION = 'IPSF Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -56,13 +57,13 @@
 
 *  get PSF if none yet loaded
         IF (I_PSF.EQ.0) THEN
-          CALL PSF_ASSOCI(I_LOC,I_PSF,STATUS)
+          CALL PSF_TASSOCI(I_FID,I_PSF,STATUS)
         ELSE
 *  or see if different PSF to be loaded
           CALL USI_GET0L('NEW',NEW,STATUS)
           IF (NEW) THEN
             CALL PSF_RELEASE(I_PSF,STATUS)
-            CALL PSF_ASSOCI(I_LOC,I_PSF,STATUS)
+            CALL PSF_ASSOCI(I_FID,I_PSF,STATUS)
           ENDIF
         ENDIF
 
@@ -80,7 +81,6 @@
         CALL PSF_2D_DATA(I_PSF,I_X*I_WTORAD,I_Y*I_WTORAD,
      :           0.0, 0.0, ADX, ADY,
      :           .TRUE., PDIMS(1), PDIMS(2), %VAL(PSF_PTR), STATUS )
-
 
 *  get profiling workspace
         CALL DYN_MAPR( 1, I_N_AUX, WPNTR, STATUS )

@@ -8,12 +8,13 @@
 *    History :
 *       22 Jan 93: V1.7-0 original
 *       13 Sep 94: V1.7-1 updates data min/max (RJV)
+*       19 Oct 95: V2.0-0 ADI port (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -21,17 +22,16 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*10 OPER,CMD
       REAL VAL
-      INTEGER NDIM,DIMS(2)
+      INTEGER NDIM,DIMS(2),FID
       INTEGER DPTR,VPTR,QPTR
       LOGICAL MATCH
-      LOGICAL PRIM,SCALAR
+      LOGICAL DATASET,SCALAR
       LOGICAL VOK,QOK
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = ' Version 1.7-1')
+      PARAMETER (VERSION = ' Version 2.0-0')
 *-
 
       CALL USI_INIT()
@@ -56,13 +56,16 @@
       ELSE
 
 *  get image or whatever to add/sub etc
-        CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
-        SCALAR=.FALSE.
-        IF (PRIM) THEN
-          CALL DAT_SHAPE(LOC,2,DIMS,NDIM,STATUS)
+        CALL USI_ASSOC( 'INP', 'BinDS|Array|Scalar', 'READ',
+     :                  FID, STATUS )
+        SCALAR = .FALSE.
+        CALL BDI_GETSHP( FID, 2, DIMS, NDIM, STATUS )
+        CALL ADI_DERVD( FID, 'BinDS', DATASET, STATUS )
+
+        IF ( .NOT. DATASET ) THEN
 *  scalar input
           IF (NDIM.EQ.0) THEN
-            CALL DAT_GET0R(LOC,VAL,STATUS)
+            CALL BDI_GET0R(FID,'Data',VAL,STATUS)
             SCALAR=.TRUE.
             MATCH=.TRUE.
             QOK=.FALSE.
@@ -78,11 +81,10 @@
           ENDIF
         ELSE
 *  dataset - do fuller check
-          CALL IMG_MATCH(LOC,MATCH,STATUS)
+          CALL IMG_MATCH( FID, MATCH, STATUS )
         ENDIF
 
         IF (MATCH) THEN
-
 
           IF (SCALAR) THEN
 
@@ -102,16 +104,17 @@
 
           ELSE
 
-            CALL BDA_MAPDATA(LOC,'R',DPTR,STATUS)
+            CALL BDI_MAPR( FID, 'Data', 'READ', DPTR, STATUS )
             IF (I_VOK) THEN
-              CALL BDA_MAPVAR(LOC,'R',VPTR,STATUS)
+              CALL BDI_MAPR( FID, 'Variance', 'READ', VPTR, STATUS )
             ENDIF
-            CALL BDA_CHKQUAL(LOC,QOK,NDIM,DIMS,STATUS)
+            CALL BDI_CHK( FID, 'Quality', QOK, STATUS )
             IF (I_QOK.OR.OPER.EQ.'DIV') THEN
               QOK=.TRUE.
             ENDIF
             IF (QOK) THEN
-              CALL BDA_MAPQUAL(LOC,'R',QPTR,STATUS)
+              CALL BDI_MAP( FID, 'Variance', 'UBYTE', 'READ', QPTR,
+     :                      STATUS )
             ENDIF
 
 *  copy existing data to work area, creating quality if necessary
@@ -149,8 +152,7 @@
 
         ENDIF
 
-        CALL BDA_RELEASE(LOC,STATUS)
-        CALL USI_ANNUL('INP',STATUS)
+        CALL USI_CANCL('INP',STATUS)
 
       ENDIF
 

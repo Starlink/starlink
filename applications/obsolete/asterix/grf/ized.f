@@ -26,11 +26,12 @@
       REAL XC,YC
       REAL XR,YR,RAD
       REAL BASE,SCALE
-      INTEGER DIM
+      INTEGER ZPTR
       INTEGER DPTR,VPTR,QPTR
+      LOGICAL	REG
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IZED Version 1.7-2')
+      PARAMETER (VERSION = 'IZED Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -78,7 +79,6 @@
 
         ENDIF
 
-
 *  plot  circle
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
 
@@ -87,12 +87,12 @@
         CALL IMG_GET1D(I_N_1D,STATUS)
 
 *  remap cube
-        CALL BDA_MAPDATA(I_LOC,'R',DPTR,STATUS)
+        CALL BDI_MAPR(I_FID,'Data','READ',DPTR,STATUS)
         IF (I_VOK) THEN
-          CALL BDA_MAPVAR(I_LOC,'R',VPTR,STATUS)
+          CALL BDI_MAPR(I_FID,'Variance','READ',VPTR,STATUS)
         ENDIF
         IF (I_QOK) THEN
-          CALL BDA_MAPQUAL(I_LOC,'R',QPTR,STATUS)
+          CALL BDI_MAP(I_FID,'Quality','UBYTE','READ',QPTR,STATUS)
         ENDIF
 
 *  do it
@@ -102,21 +102,37 @@
 
 
 *  axis and labels
-        CALL BDA_GETAXVAL(I_LOC,I_ZAX,BASE,SCALE,DIM,STATUS)
-        I_XBASE_1D=BASE+REAL(I_IZ1-1)*SCALE
-        I_XSCALE_1D=SCALE
-        I_XWID_1D=ABS(SCALE)
-        CALL BDA_GETAXLABEL(I_LOC,I_ZAX,I_XLABEL_1D,STATUS)
-        CALL BDA_GETAXUNITS(I_LOC,I_ZAX,I_XUNITS_1D,STATUS)
-        I_LABEL_1D=I_LABEL
-        I_UNITS_1D=I_UNITS
-        I_TITLE_1D=' '
+        CALL BDI_AXMAPR( I_FID, I_ZAX, 'Data', 'READ', ZPTR, STATUS )
+        CALL ARR_CHKREG( %VAL(ZPTR), I_N_1D, REG, BASE, SCALE,
+     :                   STATUS )
+        CALL BDI_AXGET0C(I_FID,I_ZAX,'Label',I_XLABEL_1D,STATUS)
+        IF ( REG ) THEN
+          I_XBASE_1D=BASE+REAL(I_IZ1-1)*SCALE
+          I_XSCALE_1D=SCALE
+          I_XWID_1D=ABS(SCALE)
+          CALL BDI_AXGET0C(I_FID,I_ZAX,'Units',I_XUNITS_1D,STATUS)
+        ELSE
+          CALL MSG_PRNT( 'WARNING : Input cube has non-regular axis' )
+          I_XBASE_1D = REAL(I_IZ1)
+          I_XSCALE_1D = 1.0
+          I_XWID_1D = 1.0
+          I_XUNITS_1D = 'bin number'
+        END IF
+        I_LABEL_1D = I_LABEL
+        I_UNITS_1D = I_UNITS
+        I_TITLE_1D = ' '
         CALL ARR_REG1R(I_XBASE_1D,I_XSCALE_1D,I_N_1D,%VAL(I_APTR_1D),
      :                                                          STATUS)
         CALL ARR_INIT1R(ABS(I_XSCALE_1D),I_N_1D,%VAL(I_WPTR_1D),STATUS)
 
 *  unmap cube
-        CALL BDA_UNMAP(I_LOC,STATUS)
+        CALL BDI_UNMAP( I_FID, 'Data', DPTR, STATUS )
+        IF ( I_VOK ) THEN
+          CALL BDI_UNMAP( I_FID, 'Variance', VPTR, STATUS )
+        END IF
+        IF ( I_QOK ) THEN
+          CALL BDI_UNMAP( I_FID, 'Quality', QPTR, STATUS )
+        END IF
 
 *  set default axis ranges
         I_X1_1D=I_XBASE_1D-I_XSCALE
@@ -141,9 +157,7 @@
         I_DISP=.FALSE.
         I_CLEAR=.FALSE.
 
-
         CALL IMG_SETPOS(XC,YC,STATUS)
-
 
       ENDIF
 

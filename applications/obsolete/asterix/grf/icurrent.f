@@ -11,6 +11,7 @@
 *      5 Jun 91: V1.2-3 screen suppression option added (RJV)
 *      4 Dec 91: V1.2-4 more output parameters (RJV)
 *     20 Sep 94: V1.7-0 reports on current region (RJV)
+*      5 Oct 95: V2.0-0 Use ADI_FOBNAM rather than STR_OBNAME (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -36,7 +37,7 @@
       LOGICAL SUPPRESS
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICURRENT Version 1.2-4')
+      PARAMETER (VERSION = 'ICURRENT Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -61,7 +62,7 @@
         ENDIF
 
 *  Name of image file
-        CALL STR_OBNAME(I_LOC,NAME,NC,STATUS)
+        CALL ADI_FOBNAM(I_FID,NAME,NC,STATUS)
         CALL USI_PUT0C( 'NAME', NAME(:NC), STATUS )
         IF (.NOT.SUPPRESS) THEN
           CALL MSG_BLNK()
@@ -124,7 +125,6 @@
           CALL MSG_BLNK()
         ENDIF
 
-
 *  Current region
         XPIX1=REAL(I_IX1)-0.5
         XPIX2=REAL(I_IX2)+0.5
@@ -160,5 +160,3 @@
       CALL USI_CLOSE()
 
       END
-
-

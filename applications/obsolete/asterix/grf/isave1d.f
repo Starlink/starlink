@@ -19,10 +19,10 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) OLOC
+      INTEGER			OFID,BID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISAVE1D Version 1.7-0')
+      PARAMETER (VERSION = 'ISAVE1D Version 2.0-0')
 *-
       CALL USI_INIT()
 
@@ -30,12 +30,18 @@
 
       IF (.NOT.I_OPEN) THEN
         CALL MSG_PRNT('AST_ERR: image processing system not active')
+
       ELSEIF (I_N_1D.LE.0) THEN
         CALL MSG_PRNT('AST_ERR: no current 1D data')
 
       ELSE
 
-        CALL USI_ASSOCO('OUT','DATA',OLOC,STATUS)
+        IF ( I_N_AUX .EQ. 0 ) THEN
+          CALL BDI_NEW( 'BinDS', 1, I_N_1D, 'REAL', BID, STATUS )
+        ELSE
+          CALL ADI_NEW0( 'MultiGraph', BID, STATUS )
+        END IF
+        CALL USI_CREAT( 'OUT', BID, OFID, STATUS )
 
         IF (STATUS.EQ.SAI__OK) THEN
           CALL GCB_ATTACH('IMAGE',STATUS)
@@ -43,16 +49,13 @@
 
           CALL MSG_PRNT(' ')
           CALL MSG_PRNT('Saving 1D data...')
-          CALL IMG_SAVE1D(OLOC,STATUS)
+          CALL IMG_SAVE1D(OFID,STATUS)
         ENDIF
 
-        CALL BDA_RELEASE(OLOC,STATUS)
-        CALL USI_ANNUL('OUT',STATUS)
+        CALL USI_CANCL( 'OUT', STATUS )
 
       ENDIF
 
       CALL USI_CLOSE()
 
       END
-
-

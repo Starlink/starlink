@@ -355,6 +355,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -363,61 +364,29 @@
 *    Export :
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-	DOUBLE PRECISION PI, TWOPI, DTOR
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             DTOR = PI/180.0D0)
 *    Local variables :
-        DOUBLE PRECISION RA,DEC,ROLL
-        DOUBLE PRECISION ETOC(3,3)
-        DOUBLE PRECISION GTOC(3,3)
-	DOUBLE PRECISION VPOL(3), VEQU(3),  DECPOL, CDUM, RAPOL
-*    Local data :
-	DATA ETOC /
-     &   1.00000000000000D0, 0.00000000000000D0, 0.00000000000000D0,
-     &   0.00000000000000D0, 9.17482062069182D-1, -3.97777155931914D-1,
-     &   0.00000000000000D0, +3.97777155931914D-01, 9.17482062069182D-1/
-	DATA GTOC /
-     &   -0.054875539726d0, +0.494109453312d0, -0.867666135858d0,
-     &   -0.873437108010d0, -0.444829589425d0, -0.198076386122d0,
-     &   -0.483834985808d0, +0.746982251810d0, +0.455983795705d0/
-*
+      DOUBLE PRECISION		EPOCH			! Epoch of obs'n
+
+      REAL			EQNX			! Equinox of input sys
+*-
+
+*  Status ok
       IF (STATUS .EQ. SAI__OK) THEN
-*
-*
 
-* Convert angles into radians
-	  RA  = I_RA  * DTOR
-	  DEC = I_DEC * DTOR
-	  ROLL = I_ROLL * DTOR
+*    Extract equinox and epoch from input WCS
+        IF ( I_SYSID .NE. ADI__NULLID ) THEN
+          CALL ADI_CGET0R( I_SYSID, 'EQUINOX', EQNX, STATUS )
+          CALL ADI_CGET0D( I_SYSID, 'EPOCH', EPOCH, STATUS )
+        ELSE
+          EQNX = 2000.0
+          EPOCH = 2000.0
+        END IF
 
-* Force ROLL to range -PI to PI
-          ROLL = MOD(ROLL+TWOPI+PI,TWOPI) - PI
+*    Create descriptions of eclipic and galactic coordinates
+        CALL WCI_NEWSYS( 'ECL', EQNX, EPOCH, I_ECLSYS, STATUS )
+        CALL WCI_NEWSYS( 'GAL', EQNX, EPOCH, I_GALSYS, STATUS )
 
-* Find Celestial position of local north pole (Z-axis)
-	  DECPOL = ASIN(COS(ROLL) * COS(DEC))
-	  CDUM   = ACOS(MIN(MAX(-1.0D0,-TAN(DECPOL) * TAN(DEC)),1.0D0))
-	  IF(ROLL .GT. 0.0D0) THEN
-	    RAPOL = RA + CDUM
-	  ELSE
-	    RAPOL = RA - CDUM
-	  ENDIF
-*
-* Convert pole and origin to cartesian 3-vectors
-	  CALL CONV_DONA2V(RAPOL, DECPOL, VPOL)
-	  CALL CONV_DONA2V(RA,   DEC,    VEQU)
-*
-* Generate transform matrix Cel==>World
-	  CALL CONV_DONGEN(VPOL, VEQU, I_CELTOWORLD)
-* Multiply by Cel==>Ecl to generate Ecl==>World
-	  CALL MATH_MATMULT(ETOC,I_CELTOWORLD,I_ECLTOWORLD)
-* Multiply by Cel==>Gal to generate Gal==>World
-	  CALL MATH_MATMULT(GTOC,I_CELTOWORLD,I_GALTOWORLD)
-
-
-
-      ENDIF
+      END IF
 
       END
 
@@ -431,6 +400,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
 	REAL Y				!input	Y value
@@ -441,49 +411,19 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, RTOD
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             RTOD = 180.0D0/PI)
 *  Local variables :
-        DOUBLE PRECISION XR,YR
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINX,COSX,COSY
-        INTEGER J
+        DOUBLE PRECISION LCEL(2)
+        REAL	LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (I_XSCALE.LT.0.0) THEN
-          XR=DBLE(X*I_WTORAD)
-        ELSE
-          XR=DBLE(-X*I_WTORAD)
-        ENDIF
-        YR=DBLE(Y*I_WTORAD)
+        LWORLD(1) = X
+        LWORLD(2) = Y
 
-        SINX=SIN(XR)
-        COSX=COS(XR)
-        COSY=COS(YR)
+        CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, LCEL, STATUS )
 
-        V3=SIN(YR)
-	V1 = COSX * COSY
-	V2 = SINX * COSY
-
-        DO J = 1,3
-	  V(J)=V1*I_CELTOWORLD(J,1)
-     :            +V2*I_CELTOWORLD(J,2)
-     :            +V3*I_CELTOWORLD(J,3)
-        ENDDO
-
-	RA = ATAN2(V(2), V(1))
-
-	IF (RA .LT. 0.0D0) THEN
-          RA = RA + TWOPI
-        ENDIF
-
-	DEC = ASIN(V(3))
-
-        RA=RA*RTOD
-        DEC=DEC*RTOD
+        RA = LCEL(1) * MATH__DRTOD
+        DEC = LCEL(2) * MATH__DRTOD
 
       ENDIF
 
@@ -498,6 +438,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION RA	!input	RA (degrees)
 	DOUBLE PRECISION DEC	!input	DEC (degrees)
@@ -508,42 +449,19 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, DTOR
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             DTOR = PI/180.0D0)
 *  Local variables :
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINAZ,COSAZ,COSEL
-        INTEGER J
+        DOUBLE PRECISION LCEL(2)
+        REAL	LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+        LCEL(1) = RA * MATH__DDTOR
+        LCEL(2) = DEC * MATH__DDTOR
 
+        CALL WCI_CNS2A( LCEL, I_PIXID, I_PRJID, LWORLD, STATUS )
 
-        SINAZ=SIN(RA*DTOR)
-        COSAZ=COS(RA*DTOR)
-        COSEL=COS(DEC*DTOR)
-
-        V3=SIN(DEC*DTOR)
-	V1 = COSAZ * COSEL
-	V2 = SINAZ * COSEL
-
-        DO J = 1,3
-	  V(J)=V1*I_CELTOWORLD(1,J)
-     :            +V2*I_CELTOWORLD(2,J)
-     :            +V3*I_CELTOWORLD(3,J)
-        ENDDO
-
-	X = REAL(ATAN2(V(2), V(1)))
-	Y = REAL(ASIN(V(3)))
-
-        IF (I_XSCALE.LT.0.0) THEN
-          X=X/I_WTORAD
-        ELSE
-          X=-X/I_WTORAD
-        ENDIF
-        Y=Y/I_WTORAD
+        X = LWORLD(1)
+        Y = LWORLD(2)
 
       ENDIF
 
@@ -559,6 +477,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
 	REAL Y				!input	Y value
@@ -569,49 +488,26 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, RTOD
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             RTOD = 180.0D0/PI)
 *  Local variables :
-        DOUBLE PRECISION XR,YR
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINX,COSX,COSY
-        INTEGER J
+      DOUBLE PRECISION		FILESYS(2),LECL(2)
+
+      REAL			LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (I_XSCALE.LT.0.0) THEN
-          XR=DBLE(X*I_WTORAD)
-        ELSE
-          XR=DBLE(-X*I_WTORAD)
-        ENDIF
-        YR=DBLE(Y*I_WTORAD)
+*    Local copy of world coords
+        LWORLD(1) = X
+        LWORLD(2) = Y
 
-        SINX=SIN(XR)
-        COSX=COS(XR)
-        COSY=COS(YR)
+*    Perform conversion to file system
+        CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, FILESYS, STATUS )
 
-        V3=SIN(YR)
-	V1 = COSX * COSY
-	V2 = SINX * COSY
+*    Convert to ecliptic
+        CALL WCI_CNS2S( FILESYS, I_SYSID, I_ECLSYS, LECL, STATUS )
 
-        DO J = 1,3
-	  V(J)=V1*I_ECLTOWORLD(J,1)
-     :            +V2*I_ECLTOWORLD(J,2)
-     :            +V3*I_ECLTOWORLD(J,3)
-        ENDDO
-
-	LON = ATAN2(V(2), V(1))
-
-	IF (LON .LT. 0.0D0) THEN
-          LON = LON + TWOPI
-        ENDIF
-
-	LAT = ASIN(V(3))
-
-        LON=LON*RTOD
-        LAT=LAT*RTOD
+*    Export in degrees
+        LON = LECL(1) * MATH__DRTOD
+        LAT = LECL(2) * MATH__DRTOD
 
       ENDIF
 
@@ -626,6 +522,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION LON	!input longitude (degrees)
 	DOUBLE PRECISION LAT	!input latitude (degrees)
@@ -636,42 +533,25 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, DTOR
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             DTOR = PI/180.0D0)
 *  Local variables :
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINAZ,COSAZ,COSEL
-        INTEGER J
+        DOUBLE PRECISION FILESYS(2),LECL(2)
+      REAL LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+*    Export in degrees
+        LECL(1) = LON * MATH__DDTOR
+        LECL(2) = LAT * MATH__DDTOR
 
+*    Convert to file system
+        CALL WCI_CNS2S( LECL, I_SYSID, I_ECLSYS, FILESYS, STATUS )
 
-        SINAZ=SIN(LON*DTOR)
-        COSAZ=COS(LON*DTOR)
-        COSEL=COS(LAT*DTOR)
+*    Perform conversion to world
+        CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
 
-        V3=SIN(LAT*DTOR)
-	V1 = COSAZ * COSEL
-	V2 = SINAZ * COSEL
-
-        DO J = 1,3
-	  V(J)=V1*I_ECLTOWORLD(1,J)
-     :            +V2*I_ECLTOWORLD(2,J)
-     :            +V3*I_ECLTOWORLD(3,J)
-        ENDDO
-
-	X = REAL(ATAN2(V(2), V(1)))
-	Y = REAL(ASIN(V(3)))
-
-        IF (I_XSCALE.LT.0.0) THEN
-          X=X/I_WTORAD
-        ELSE
-          X=-X/I_WTORAD
-        ENDIF
-        Y=Y/I_WTORAD
+*    Local copy of world coords
+        X = LWORLD(1)
+        Y = LWORLD(2)
 
       ENDIF
 
@@ -688,6 +568,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	REAL X				!input	X value
 	REAL Y				!input	Y value
@@ -698,51 +579,28 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, RTOD
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             RTOD = 180.0D0/PI)
+
 *  Local variables :
-        DOUBLE PRECISION XR,YR
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINX,COSX,COSY
-        INTEGER J
+      DOUBLE PRECISION 		FILESYS(2), LCEL(2)
+      REAL			LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (I_XSCALE.LT.0.0) THEN
-          XR=DBLE(X*I_WTORAD)
-        ELSE
-          XR=DBLE(-X*I_WTORAD)
-        ENDIF
-        YR=DBLE(Y*I_WTORAD)
+*    Local copy of world coords
+        LWORLD(1) = X
+        LWORLD(2) = Y
 
-        SINX=SIN(XR)
-        COSX=COS(XR)
-        COSY=COS(YR)
+*    Perform conversion to file system
+        CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, FILESYS, STATUS )
 
-        V3=SIN(YR)
-	V1 = COSX * COSY
-	V2 = SINX * COSY
+*    Convert to ecliptic
+        CALL WCI_CNS2S( FILESYS, I_SYSID, I_GALSYS, LCEL, STATUS )
 
-        DO J = 1,3
-	  V(J)=V1*I_GALTOWORLD(J,1)
-     :            +V2*I_GALTOWORLD(J,2)
-     :            +V3*I_GALTOWORLD(J,3)
-        ENDDO
+*    Export in degrees
+        L = LCEL(1) * MATH__DRTOD
+        B = LCEL(2) * MATH__DRTOD
 
-	L = ATAN2(V(2), V(1))
-
-	IF (L .LT. 0.0D0) THEN
-          L = L + TWOPI
-        ENDIF
-
-	B = ASIN(V(3))
-
-        L=L*RTOD
-        B=B*RTOD
-
-      ENDIF
+      END IF
 
       END
 
@@ -755,6 +613,7 @@
 *  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'MATH_PAR'
 *  Import :
 	DOUBLE PRECISION L	!input	longitude (degrees)
 	DOUBLE PRECISION B	!input	latitude (degrees)
@@ -765,44 +624,27 @@
         INTEGER STATUS
 *    Global variables :
       INCLUDE 'IMG_CMN'
-*  Local constants :
-	DOUBLE PRECISION PI, TWOPI, DTOR
-	PARAMETER (PI = 3.14159265358979D0, TWOPI=2.0D0*PI,
-     :             DTOR = PI/180.0D0)
 *  Local variables :
-	DOUBLE PRECISION V1, V2, V3, V(3)
-        DOUBLE PRECISION SINAZ,COSAZ,COSEL
-        INTEGER J
+        DOUBLE PRECISION FILESYS(2),LECL(2)
+      REAL LWORLD(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
+*    Export in degrees
+        LECL(1) = L * MATH__DDTOR
+        LECL(2) = B * MATH__DDTOR
 
+*    Convert to file system
+        CALL WCI_CNS2S( LECL, I_SYSID, I_GALSYS, FILESYS, STATUS )
 
-        SINAZ=SIN(L*DTOR)
-        COSAZ=COS(L*DTOR)
-        COSEL=COS(B*DTOR)
+*    Perform conversion to world
+        CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
 
-        V3=SIN(B*DTOR)
-	V1 = COSAZ * COSEL
-	V2 = SINAZ * COSEL
+*    Local copy of world coords
+        X = LWORLD(1)
+        Y = LWORLD(2)
 
-        DO J = 1,3
-	  V(J)=V1*I_GALTOWORLD(1,J)
-     :            +V2*I_GALTOWORLD(2,J)
-     :            +V3*I_GALTOWORLD(3,J)
-        ENDDO
-
-	X = REAL(ATAN2(V(2), V(1)))
-	Y = REAL(ASIN(V(3)))
-
-        IF (I_XSCALE.LT.0.0) THEN
-          X=X/I_WTORAD
-        ELSE
-          X=-X/I_WTORAD
-        ENDIF
-        Y=Y/I_WTORAD
-
-      ENDIF
+      END IF
 
       END
 
@@ -1136,7 +978,6 @@
 
       INTEGER STATUS
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       STATUS=SAI__OK
 
       IF (NFRAME.EQ.1) THEN
@@ -1161,7 +1002,6 @@
 
       INTEGER STATUS
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       STATUS=SAI__OK
 
       IF (NFRAME.EQ.1) THEN
@@ -1597,7 +1437,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 
 *+ IMG_SAVE - save current image to file
-	SUBROUTINE IMG_SAVE(LOC,STATUS)
+	SUBROUTINE IMG_SAVE(ID,STATUS)
 
         IMPLICIT NONE
 
@@ -1605,7 +1445,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         INCLUDE 'SAE_PAR'
         INCLUDE 'DAT_PAR'
 *  Import :
-        CHARACTER*(DAT__SZLOC) LOC
+      INTEGER			ID
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -1613,87 +1453,88 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
       INCLUDE 'IMG_CMN'
 *  Local constants :
 *  Local variables :
-      INTEGER ID
+      REAL			SPARR(2)
+
       INTEGER DPTR,VPTR,QPTR
-      INTEGER DIMS(2)
-      REAL XBASE,YBASE
+      INTEGER DIMS(2),LBND(2),UBND(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  swap locator for BDA identifier
-        CALL BDA_FIND(LOC,ID,STATUS)
-
 *  top level text
-        CALL BDA_PUTTITLE_INT(ID,I_TITLE,STATUS)
-        CALL BDA_PUTLABEL_INT(ID,I_LABEL,STATUS)
-        CALL BDA_PUTUNITS_INT(ID,I_UNITS,STATUS)
+        CALL BDI_PUT0C( ID, 'Title', I_TITLE, STATUS )
+        CALL BDI_PUT0C( ID, 'Label', I_LABEL, STATUS )
+        CALL BDI_PUT0C( ID, 'Units', I_UNITS, STATUS )
 
-        DIMS(1)=I_IX2-I_IX1+1
-        DIMS(2)=I_IY2-I_IY1+1
+*    Set up slice bounds
+        LBND(1) = I_IX1
+        LBND(2) = I_IY1
+        UBND(1) = I_IX2
+        UBND(2) = I_IY2
+        DIMS(1) = I_NX
+        DIMS(2) = I_NY
 
 *  copy data
-        CALL BDA_CREDATA_INT(ID,2,DIMS,STATUS)
-        CALL BDA_MAPDATA_INT(ID,'W',DPTR,STATUS)
-        CALL IMG_ZOOMCOPY(%VAL(I_DPTR),DIMS(1),DIMS(2),%VAL(DPTR),
-     :                                                     STATUS)
-        CALL BDA_UNMAPDATA_INT(ID,STATUS)
+        CALL BDI_MAPR( ID, 'Data', 'WRITE', DPTR, STATUS )
+        CALL ARR_SLCOPR( 2, DIMS, %VAL(I_DPTR), LBND, UBND, %VAL(DPTR),
+     :                   STATUS )
+        CALL BDI_UNMAP(ID,'Data',DPTR,STATUS)
 
 *  variance
         IF (I_VOK) THEN
-          CALL BDA_CREVAR_INT(ID,2,DIMS,STATUS)
-          CALL BDA_MAPVAR_INT(ID,'W',VPTR,STATUS)
-          CALL IMG_ZOOMCOPY(%VAL(I_VPTR),DIMS(1),DIMS(2),%VAL(VPTR),
-     :                                                       STATUS)
-          CALL BDA_UNMAPVAR_INT(ID,STATUS)
+          CALL BDI_MAPR( ID, 'Variance', 'WRITE', VPTR, STATUS )
+          CALL ARR_SLCOPR( 2, DIMS, %VAL(I_VPTR), LBND, UBND,
+     :                     %VAL(VPTR), STATUS )
+          CALL BDI_UNMAP(ID,'Variance',VPTR,STATUS)
         ENDIF
 
 *  quality
         IF (I_QOK) THEN
-          CALL BDA_CREQUAL_INT(ID,2,DIMS,STATUS)
-          CALL BDA_MAPQUAL_INT(ID,'W',QPTR,STATUS)
-          CALL IMG_ZOOMCOPYQ(%VAL(I_QPTR),DIMS(1),DIMS(2),%VAL(QPTR),
-     :                                                        STATUS)
-          CALL BDA_UNMAPQUAL_INT(ID,STATUS)
-          CALL BDA_PUTMASK_INT(ID,I_MASK,STATUS)
+          CALL BDI_MAP( ID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
+          CALL ARR_SLCOPB( 2, DIMS, %VAL(I_QPTR), LBND, UBND,
+     :                     %VAL(QPTR), STATUS )
+          CALL BDI_UNMAP(ID,'Quality',QPTR,STATUS)
+          CALL BDI_PUT0B( ID, 'QualityMask', I_MASK, STATUS )
         ENDIF
 
 *  axis values
-        XBASE=I_XBASE+REAL(I_IX1-1)*I_XSCALE
-        YBASE=I_YBASE+REAL(I_IY1-1)*I_YSCALE
-        CALL BDA_PUTAXVAL_INT(ID,1,XBASE,I_XSCALE,DIMS(1),STATUS)
-        CALL BDA_PUTAXVAL_INT(ID,2,YBASE,I_YSCALE,DIMS(2),STATUS)
-        CALL BDA_PUTAXWID_INT(ID,1,I_XWID,STATUS)
-        CALL BDA_PUTAXWID_INT(ID,2,I_YWID,STATUS)
-        CALL BDA_PUTAXNORM_INT(ID,1,I_NORM,STATUS)
-        CALL BDA_PUTAXNORM_INT(ID,2,I_NORM,STATUS)
-        CALL BDA_PUTAXLABEL_INT(ID,1,I_XLABEL,STATUS)
-        CALL BDA_PUTAXLABEL_INT(ID,2,I_YLABEL,STATUS)
-        CALL BDA_PUTAXUNITS_INT(ID,1,I_XYUNITS,STATUS)
-        CALL BDA_PUTAXUNITS_INT(ID,2,I_XYUNITS,STATUS)
+        SPARR(1) = I_XBASE + REAL(I_IX1-1)*I_XSCALE
+        SPARR(2) = I_XSCALE
+        CALL BDI_AXPUT1R( ID, 1, 'SpacedData', 2, SPARR, STATUS )
+        SPARR(1) = I_YBASE + REAL(I_IY1-1)*I_YSCALE
+        SPARR(2) = I_YSCALE
+        CALL BDI_AXPUT1R( ID, 2, 'SpacedData', 2, SPARR, STATUS )
 
-*  copy ancilliary stuff from input
-        CALL BDA_COPMORE(I_LOC,LOC,STATUS)
+        CALL BDI_AXPUT0R( ID, 1, 'ScalarWidth', I_XWID, STATUS )
+        CALL BDI_AXPUT0R( ID, 2, 'ScalarWidth', I_YWID, STATUS )
+
+        CALL BDI_AXPUT0L( ID, 1, 'Normalised', I_NORM, STATUS )
+        CALL BDI_AXPUT0L( ID, 2, 'Normalised', I_NORM, STATUS )
+        CALL BDI_AXPUT0C( ID, 1, 'Label', I_XLABEL, STATUS )
+        CALL BDI_AXPUT0C( ID, 2, 'Label', I_YLABEL, STATUS )
+        CALL BDI_AXPUT0C( ID, 1, 'Units', I_XYUNITS, STATUS )
+        CALL BDI_AXPUT0C( ID, 2, 'Units', I_XYUNITS, STATUS )
+
+*  Copy ancilliary stuff from input
+        CALL UDI_COPANC( I_FID, ' ', ID, STATUS )
 
 *  GRAFIX control
-        IF (I_DISP_1D) THEN
-          CALL GCB_CSAVE(I_CACHE,LOC,STATUS)
+        IF ( I_DISP_1D ) THEN
+          CALL GCB_CSAVE( I_CACHE, ID, STATUS )
         ELSE
-          CALL GCB_SAVE(LOC,STATUS)
+          CALL GCB_FSAVE( ID, STATUS )
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_SAVE',STATUS)
+          CALL AST_REXIT('IMG_SAVE',STATUS)
         ENDIF
 
       ENDIF
-
-
 
       END
 
 
 *+ IMG_SAVE1D - save current 1D data to file
-	SUBROUTINE IMG_SAVE1D(LOC,STATUS)
+	SUBROUTINE IMG_SAVE1D(FID,STATUS)
 
         IMPLICIT NONE
 
@@ -1701,7 +1542,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         INCLUDE 'SAE_PAR'
         INCLUDE 'DAT_PAR'
 *  Import :
-        CHARACTER*(DAT__SZLOC) LOC
+        INTEGER FID
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -1709,10 +1550,9 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
       INCLUDE 'IMG_CMN'
 *  Local constants :
 *  Local variables :
-      CHARACTER*(DAT__SZLOC) GLOC
+      REAL	SPARR(2)
       INTEGER ID
-      INTEGER DPTR,VPTR,QPTR
-      INTEGER NVAL
+      INTEGER NVAL,BID
       LOGICAL AUX
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1720,92 +1560,91 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  if auxilliary data then create multiple dataset
         AUX=(I_N_AUX.NE.0)
         IF (AUX) THEN
-          CALL GMD_CREMULT(LOC,2,STATUS)
-          CALL GMD_LOCNDF(LOC,1,GLOC,STATUS)
-          CALL BDA_FIND(GLOC,ID,STATUS)
+          CALL GMI_CREMULT(FID,2,STATUS)
+          CALL BDI_NEW( 'BinDS', 1, I_N_AUX, 'REAL', BID, STATUS )
+          CALL GMI_LOCNDF(FID,1,'*',ID,STATUS)
+          CALL ADI_SETLNK( BID, ID, STATUS )
+          ID = BID
         ELSE
-          CALL BDA_FIND(LOC,ID,STATUS)
+          CALL ADI_CLONE(FID,ID,STATUS)
         ENDIF
 
 *  text
-        CALL BDA_PUTTITLE_INT(ID,I_TITLE_1D,STATUS)
-        CALL BDA_PUTLABEL_INT(ID,I_LABEL_1D,STATUS)
-        CALL BDA_PUTUNITS_INT(ID,I_UNITS_1D,STATUS)
+        CALL BDI_PUT0C( ID, 'Title', I_TITLE_1D, STATUS )
+        CALL BDI_PUT0C( ID, 'Label', I_LABEL_1D, STATUS )
+        CALL BDI_PUT0C( ID, 'Units', I_UNITS_1D, STATUS )
 
         NVAL=I_N_1D
 
 *  copy data
-        CALL BDA_CREDATA_INT(ID,1,NVAL,STATUS)
-        CALL BDA_MAPDATA_INT(ID,'W',DPTR,STATUS)
-        CALL ARR_COP1R(NVAL,%VAL(I_DPTR_1D),%VAL(DPTR),STATUS)
-        CALL BDA_UNMAPDATA_INT(ID,STATUS)
+        CALL BDI_PUT1R( ID, 'Data', NVAL, %VAL(I_DPTR_1D), STATUS)
 
 *  variance
-        CALL BDA_CREVAR_INT(ID,1,NVAL,STATUS)
-        CALL BDA_MAPVAR_INT(ID,'W',VPTR,STATUS)
-        CALL ARR_COP1R(NVAL,%VAL(I_VPTR_1D),%VAL(VPTR),STATUS)
-        CALL BDA_UNMAPVAR_INT(ID,STATUS)
+        CALL BDI_PUT1R( ID, 'Variance', NVAL, %VAL(I_VPTR_1D), STATUS)
 
 *  quality
-        CALL BDA_CREQUAL_INT(ID,1,NVAL,STATUS)
-        CALL BDA_MAPQUAL_INT(ID,'W',QPTR,STATUS)
-        CALL ARR_COP1B(NVAL,%VAL(I_QPTR_1D),%VAL(QPTR),STATUS)
-        CALL BDA_UNMAPQUAL_INT(ID,STATUS)
-        CALL BDA_PUTMASK_INT(ID,I_MASK,STATUS)
+        CALL BDI_PUT( ID, 'Quality', 'UBYTE', 1, NVAL,
+     :                         %VAL(I_QPTR_1D), STATUS)
+        CALL BDI_PUT0B( ID, 'QualityMask', I_MASK, STATUS )
 
 *  axis values
-        CALL BDA_PUTAXVAL_INT(ID,1,I_XBASE_1D,I_XSCALE_1D,NVAL,STATUS)
-        CALL BDA_PUTAXNORM_INT(ID,1,.TRUE.,STATUS)
-        CALL BDA_PUTAXLABEL_INT(ID,1,I_XLABEL_1D,STATUS)
-        CALL BDA_PUTAXUNITS_INT(ID,1,I_XUNITS_1D,STATUS)
+        SPARR(1) = I_XBASE_1D
+        SPARR(2) = I_XSCALE_1D
+        CALL BDI_AXPUT1R( ID, 1, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C(ID,1,'Normalised', .TRUE.,STATUS)
+        CALL BDI_AXPUT0C(ID,1,'Label', I_XLABEL_1D,STATUS)
+        CALL BDI_AXPUT0C(ID,1,'Units', I_XUNITS_1D,STATUS)
 
 *  copy ancilliary stuff from input
-        CALL BDA_COPMORE(I_LOC,LOC,STATUS)
+        CALL UDI_COPANC( I_FID, ' ', ID, STATUS )
 
 *  GRAFIX control
         IF (I_DISP) THEN
-          CALL GCB_CSAVE(I_CACHE_1D,LOC,STATUS)
+          CALL GCB_CSAVE(I_CACHE_1D,ID,STATUS)
         ELSE
-          CALL GCB_SAVE(LOC,STATUS)
+          CALL GCB_FSAVE( ID, STATUS )
         ENDIF
+
+*    Release primary output object
+        CALL ADI_ERASE( ID, STATUS )
 
 *  copy ancilliary data if present
         IF (AUX) THEN
-          CALL BDA_RELEASE(GLOC,STATUS)
-          CALL DAT_ANNUL(GLOC,STATUS)
-          CALL GMD_LOCNDF(LOC,2,GLOC,STATUS)
-          CALL BDA_PUTAXVAL(GLOC,1,I_XBASE_1D,I_XSCALE_1D,NVAL,
-     :                                                     STATUS)
-          CALL BDA_CREDATA(GLOC,1,NVAL,STATUS)
-          CALL BDA_MAPDATA(GLOC,'W',DPTR,STATUS)
-          CALL ARR_COP1R(NVAL,%VAL(I_DPTR_AUX),%VAL(DPTR),STATUS)
-          CALL BDA_UNMAPDATA(GLOC,STATUS)
-          CALL BDA_RELEASE(GLOC,STATUS)
-          CALL DAT_ANNUL(GLOC,STATUS)
-          CALL GMD_SETPLOT(LOC,1,1,'2',STATUS)
+
+          CALL BDI_NEW( 'BinDS', 1, NVAL, 'REAL', BID, STATUS )
+          CALL GMI_LOCNDF(FID,2,'*',ID,STATUS)
+          CALL ADI_SETLNK( BID, ID, STATUS )
+          ID = BID
+
+          CALL BDI_AXPUT1R( ID, 1, 'SpacedData', 2, SPARR, STATUS )
+          CALL BDI_PUT1R( ID, 'Data', NVAL, %VAL(I_DPTR_AUX) ,STATUS)
+          CALL GMI_SETPLOT( FID,1,1,'2',STATUS)
+
+*      Release secondary output object
+          CALL ADI_ERASE( ID, STATUS )
+
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_SAVE1D',STATUS)
+          CALL AST_REXIT('IMG_SAVE1D',STATUS)
         ENDIF
 
       ENDIF
-
-
 
       END
 
 
 *+ IMG_CHECK - check image
-	SUBROUTINE IMG_CHECK(ILOC, STATUS)
+	SUBROUTINE IMG_CHECK(IFID, STATUS)
 
         IMPLICIT NONE
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
         INCLUDE 'DAT_PAR'
 *  Import :
-      CHARACTER*(DAT__SZLOC) ILOC
+      INTEGER			IFID
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -1813,19 +1652,17 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
       INCLUDE 'IMG_CMN'
 *  Local constants :
 *  Local variables :
-      CHARACTER*(DAT__SZLOC) HLOC
       CHARACTER*80 XUNITS,YUNITS
-      INTEGER NDIM,DIMS(DAT__MXDIM)
-      INTEGER AXNVAL,AYNVAL
+      INTEGER NDIM,DIMS(ADI__MXDIM)
       INTEGER XPTR,YPTR
       LOGICAL DOK,AXOK,AYOK,AXREG,AYREG
-      LOGICAL HOK,RAOK,DECOK,PAOK
       LOGICAL XNORM,YNORM
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  check validity of data array
-        CALL BDA_CHKDATA(ILOC,DOK,NDIM,DIMS,STATUS)
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_CHK( IFID, 'Data', DOK, STATUS )
         IF (STATUS.EQ.SAI__OK) THEN
           IF (.NOT.DOK) THEN
             CALL MSG_PRNT('AST_ERR: invalid data array')
@@ -1840,7 +1677,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
             I_YAX=2
             I_CUBE=.FALSE.
           ELSEIF (NDIM.EQ.3) THEN
-            CALL IMG_CHECK_CUBE(ILOC,STATUS)
+            CALL IMG_CHECK_CUBE(IFID,STATUS)
             I_NX=DIMS(I_XAX)
             I_NY=DIMS(I_YAX)
             I_NZ=DIMS(I_ZAX)
@@ -1851,51 +1688,45 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
           ENDIF
         ENDIF
 
-*  check axes are regular
-        CALL BDA_CHKAXVAL(ILOC,I_XAX,AXOK,AXREG,AXNVAL,STATUS)
-        CALL BDA_CHKAXVAL(ILOC,I_YAX,AYOK,AYREG,AYNVAL,STATUS)
-        IF (STATUS.EQ.SAI__OK) THEN
-          IF (AXREG) THEN
-            CALL BDA_GETAXVAL(ILOC,I_XAX,I_XBASE,I_XSCALE,I_NX,STATUS)
-          ELSE
-            CALL BDA_MAPAXVAL(ILOC,'R',I_XAX,XPTR,STATUS)
-            CALL ARR_CHKREG(%val(XPTR),I_NX,AXREG,I_XBASE,I_XSCALE,
-     :                                                      STATUS)
-            CALL BDA_UNMAPAXVAL(ILOC,I_XAX,STATUS)
-            IF (.NOT.AXREG) THEN
-              CALL MSG_PRNT('AST_ERR: x-axis has non-equal bin sizes')
-              STATUS=SAI__ERROR
-            ENDIF
-          ENDIF
-          IF (AYREG) THEN
-            CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
-          ELSE
-            CALL BDA_MAPAXVAL(ILOC,'R',I_YAX,YPTR,STATUS)
-            CALL ARR_CHKREG(%val(YPTR),I_NY,AYREG,I_YBASE,I_YSCALE,
-     :                                                      STATUS)
-            CALL BDA_UNMAPAXVAL(ILOC,I_YAX,STATUS)
-            IF (.NOT.AYREG) THEN
-              CALL MSG_PRNT('AST_ERR: y-axis has non-equal bin sizes')
-              STATUS=SAI__ERROR
-            ENDIF
-          ENDIF
-          IF (AXNVAL.GT.0.AND.AXNVAL.NE.DIMS(I_XAX)) THEN
-            CALL MSG_PRNT(
-     :                   'AST_ERR: x-axis size differs from data array')
+*  X axis present
+        CALL BDI_AXCHK( IFID, I_XAX, 'Data', AXOK, STATUS )
+        IF ( AXOK ) THEN
+          CALL BDI_AXMAPR( IFID, I_XAX, 'Data', 'READ', XPTR, STATUS )
+          CALL ARR_CHKREG(%val(XPTR),I_NX,AXREG,I_XBASE,I_XSCALE,
+     :                                                    STATUS)
+          IF (.NOT.AXREG) THEN
+            CALL MSG_PRNT('AST_ERR: x-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
-          ENDIF
-          IF (AYNVAL.GT.0.AND.AYNVAL.NE.DIMS(I_YAX)) THEN
-            CALL MSG_PRNT(
-     :                   'AST_ERR: y-axis size differs from data array')
+          END IF
+
+        ELSE
+          I_XBASE = 1.0
+          I_XSCALE = 1.0
+          I_NX = DIMS(I_XAX)
+        END IF
+
+*  Y axis present
+        CALL BDI_AXCHK( IFID, I_YAX, 'Data', AYOK, STATUS )
+        IF ( AYOK ) THEN
+          CALL BDI_AXMAPR( IFID, I_YAX, 'Data', 'READ', YPTR, STATUS )
+          CALL ARR_CHKREG(%val(YPTR),I_NY,AYREG,I_YBASE,I_YSCALE,
+     :                                                    STATUS)
+          IF (.NOT.AYREG) THEN
+            CALL MSG_PRNT('AST_ERR: y-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
-          ENDIF
-        ENDIF
+          END IF
+
+        ELSE
+          I_YBASE = 1.0
+          I_YSCALE = 1.0
+          I_NY = DIMS(I_YAX)
+        END IF
 
 *  check axis units
         IF (STATUS.EQ.SAI__OK) THEN
 
-          CALL BDA_GETAXUNITS(ILOC,I_XAX,XUNITS,STATUS)
-          CALL BDA_GETAXUNITS(ILOC,I_YAX,YUNITS,STATUS)
+          CALL BDI_AXGET0C( IFID, I_XAX, 'Units', XUNITS, STATUS )
+          CALL BDI_AXGET0C( IFID, I_YAX, 'Units', YUNITS, STATUS )
           IF (XUNITS.NE.YUNITS) THEN
             CALL MSG_PRNT('** different x & y axis units - '
      :                        //'assuming image non-spatial')
@@ -1913,16 +1744,16 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
             I_SPATIALIMAGE=.TRUE.
           ENDIF
 
-          CALL BDA_GETAXLABEL(ILOC,I_XAX,I_XLABEL,STATUS)
-          CALL BDA_GETAXLABEL(ILOC,I_YAX,I_YLABEL,STATUS)
+          CALL BDI_AXGET0C( IFID, I_XAX, 'Label', I_XLABEL, STATUS )
+          CALL BDI_AXGET0C( IFID, I_YAX, 'Label', I_YLABEL, STATUS )
 
         ENDIF
 
 *  check axis normalisations
         IF (STATUS.EQ.SAI__OK) THEN
 
-          CALL BDA_GETAXNORM(ILOC,I_XAX,XNORM,STATUS)
-          CALL BDA_GETAXNORM(ILOC,I_YAX,YNORM,STATUS)
+          CALL BDI_AXGET0L( IFID, I_XAX, 'Normalised', XNORM, STATUS )
+          CALL BDI_AXGET0L( IFID, I_YAX, 'Normalised', YNORM, STATUS )
           IF (.NOT.((XNORM.AND.YNORM).OR..NOT.(XNORM.OR.YNORM))) THEN
             CALL MSG_PRNT('AST_ERR: axis normalisations are different')
             STATUS=SAI__ERROR
@@ -1932,33 +1763,30 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
         ENDIF
 
-
 *  check attitude information present
         IF (STATUS.EQ.SAI__OK) THEN
 
           IF (.NOT.I_SPATIALIMAGE) THEN
+            I_PIXID = ADI__NULLID
+            I_PRJID = ADI__NULLID
+            I_SYSID = ADI__NULLID
             I_RA=0.0D0
             I_DEC=0.0D0
             I_ROLL=0.0D0
           ELSE
 
-            CALL BDA_CHKHEAD(ILOC,HOK,STATUS)
-            IF (HOK) THEN
-              CALL BDA_LOCHEAD(ILOC,HLOC,STATUS)
-              CALL HDX_OK(HLOC,'AXIS_RA',RAOK,STATUS)
-              CALL HDX_OK(HLOC,'AXIS_DEC',DECOK,STATUS)
-              CALL HDX_OK(HLOC,'POSITION_ANGLE',PAOK,STATUS)
-            ENDIF
-            IF (.NOT.(HOK.AND.RAOK.AND.DECOK.AND.PAOK)) THEN
+            CALL WCI_GETIDS( IFID, I_PIXID, I_PRJID, I_SYSID, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              I_PIXID = ADI__NULLID
+              I_PRJID = ADI__NULLID
+              I_SYSID = ADI__NULLID
+              CALL ERR_ANNUL( STATUS )
               CALL MSG_PRNT('** insufficient attitude information')
               CALL MSG_PRNT('** using 0.0 for RA, DEC and ROLL')
+
               I_RA=0.0D0
               I_DEC=0.0D0
               I_ROLL=0.0D0
-            ELSE
-              CALL CMP_GET0D(HLOC,'AXIS_RA',I_RA,STATUS)
-              CALL CMP_GET0D(HLOC,'AXIS_DEC',I_DEC,STATUS)
-              CALL CMP_GET0D(HLOC,'POSITION_ANGLE',I_ROLL,STATUS)
             ENDIF
 
           ENDIF
@@ -1972,9 +1800,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
       END
 
 
-
-
-      SUBROUTINE IMG_CHECK_CUBE(ILOC,STATUS)
+      SUBROUTINE IMG_CHECK_CUBE(IFID,STATUS)
 
       IMPLICIT NONE
 
@@ -1984,7 +1810,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *  Import :
-      CHARACTER*(DAT__SZLOC) ILOC
+      INTEGER			IFID
 *  Export :
 *  Status :
       INTEGER STATUS
@@ -2003,7 +1829,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         IY=0
         IZ=0
         DO I=1,3
-          CALL BDA_GETAXLABEL(ILOC,I,LBL,STATUS)
+          CALL BDI_AXGET0C(IFID,I,'Label',LBL,STATUS)
           IF (STR_ABBREV('X',LBL).OR.STR_SUB('X_',LBL)) THEN
             IX=I
           ELSEIF (STR_ABBREV('Y',LBL).OR.STR_SUB('Y_',LBL)) THEN
@@ -2031,7 +1857,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_CHECK_CUBE',STATUS)
+          CALL AST_REXIT('IMG_CHECK_CUBE',STATUS)
         ENDIF
 
       ENDIF
@@ -2041,15 +1867,16 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 
 
 *+ IMG_LOAD - load image into system
-	SUBROUTINE IMG_LOAD(ILOC,STATUS)
+	SUBROUTINE IMG_LOAD(IFID,STATUS)
 
         IMPLICIT NONE
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
         INCLUDE 'DAT_PAR'
 *  Import :
-        CHARACTER*(DAT__SZLOC) ILOC
+        INTEGER			IFID
 *  Export :
 *  Status :
         INTEGER STATUS
@@ -2057,11 +1884,9 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
       INCLUDE 'IMG_CMN'
 *  Local constants :
 *  Local variables :
-      CHARACTER*(DAT__SZLOC) VLOC,QLOC
-c      CHARACTER*(DAT__SZLOC) DLOC
-      INTEGER NDIM,DIMS(DAT__MXDIM),NVAL,NWID
+      INTEGER NDIM,DIMS(ADI__MXDIM),NVAL,NWID
       INTEGER DPTR
-c      INTEGER VPTR,QPTR
+      INTEGER VPTR,QPTR
 c      LOGICAL VOK,QOK
       LOGICAL UNIF,WOK
 *-
@@ -2070,67 +1895,61 @@ c      LOGICAL VOK,QOK
       IF (STATUS.EQ.SAI__OK) THEN
 
 
-*  store locator
-        I_LOC=ILOC
+*  store identifier
+        I_FID = IFID
 
         NVAL=I_NX*I_NY
         NDIM=2
         DIMS(1)=I_NX
         DIMS(2)=I_NY
 
-
 *  map data and get axis values
-        CALL BDA_MAPDATA(ILOC,'R',DPTR,STATUS)
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
         CALL DYN_MAPR(1,NVAL,I_DPTR,STATUS)
-        CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
         CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR),STATUS)
-C        CALL BDA_LOCDATA(ILOC,DLOC,STATUS)
-C        CALL DAT_GETR(DLOC,2,DIMS,%VAL(I_DPTR),STATUS)
-        CALL BDA_UNMAPDATA(ILOC,STATUS)
-C        CALL BDA_GETAXVAL(ILOC,1,I_XBASE,I_XSCALE,I_NX,STATUS)
+        CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
+        CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
+
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
         CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
-C        CALL BDA_GETAXVAL(ILOC,2,I_YBASE,I_YSCALE,I_NY,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
         CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
-        CALL BDA_CHKAXWID(ILOC,1,WOK,UNIF,NWID,STATUS)
-        IF (WOK.AND.UNIF) THEN
-          CALL BDA_GETAXWID(ILOC,1,I_XWID,STATUS)
-        ELSE
+C        CALL BDI_AXCHK( IFID, 1, 'Width', WOK, STATUS )
+C        IF (WOK) THEN
+C          CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', WPTR, STATUS )
+C          CALL ARR_CHKREG( DIMS(1), %VAL(WPTR), UNIF,
+C          CALL BDA_GETAXWID(ILOC,1,I_XWID,STATUS)
+C        ELSE
           I_XWID=ABS(I_XSCALE)
-        ENDIF
-        CALL BDA_CHKAXWID(ILOC,2,WOK,UNIF,NWID,STATUS)
-        IF (WOK.AND.UNIF) THEN
-          CALL BDA_GETAXWID(ILOC,2,I_YWID,STATUS)
-        ELSE
+C        ENDIF
+C        CALL BDA_CHKAXWID(ILOC,2,WOK,UNIF,NWID,STATUS)
+C        IF (WOK.AND.UNIF) THEN
+C          CALL BDA_GETAXWID(ILOC,2,I_YWID,STATUS)
+C        ELSE
           I_YWID=ABS(I_YSCALE)
-        ENDIF
+C        ENDIF
 
 *  get variance and quality if there
-        CALL BDA_CHKVAR(ILOC,I_VOK,NDIM,DIMS,STATUS)
+        CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
         IF (I_VOK) THEN
-c          CALL BDA_MAPVAR(ILOC,'R',VPTR,STATUS)
+          CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR,STATUS)
+          CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR),STATUS)
+          CALL BDI_UNMAP(IFID,'Variance',VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR_W,STATUS)
-c          CALL ARR_COP1R(NVAL,%VAL(VPTR),%VAL(I_VPTR),STATUS)
-          CALL BDA_LOCVAR(ILOC,VLOC,STATUS)
-          CALL DAT_GETR(VLOC,NDIM,DIMS,%VAL(I_VPTR),STATUS)
-          CALL BDA_UNMAPVAR(ILOC,STATUS)
         ENDIF
 
-        CALL BDA_CHKQUAL(ILOC,I_QOK,NDIM,DIMS,STATUS)
+        CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
-c          CALL BDA_MAPQUAL(ILOC,'R',QPTR,STATUS)
+          CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
-          CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
-c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
-          CALL BDA_GETMASK(ILOC,I_MASK,STATUS)
-          CALL BDA_LOCQUAL(ILOC,QLOC,STATUS)
-          CALL DAT_GET(QLOC,'_UBYTE',NDIM,DIMS,%VAL(I_QPTR),STATUS)
+          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
+          CALL BDI_GET(IFID,'QualityMask','UBYTE',I_MASK,STATUS)
           CALL IMG_BAD(%VAL(I_QPTR),STATUS)
-          CALL BDA_UNMAPQUAL(ILOC,STATUS)
+          CALL BDI_UNMAP(IFID,'Quality',QPTR,STATUS)
+          CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
         ELSE
           I_BAD=.FALSE.
         ENDIF
@@ -2139,9 +1958,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         CALL IMG_MINMAX(STATUS)
 
 *  get top level text
-        CALL BDA_GETTITLE(ILOC,I_TITLE,STATUS)
-        CALL BDA_GETLABEL(ILOC,I_LABEL,STATUS)
-        CALL BDA_GETUNITS(ILOC,I_UNITS,STATUS)
+        CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
+        CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
+        CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
 
 *  get work area
         CALL DYN_MAPI(1,NVAL,I_WKPTR,STATUS)
@@ -2151,19 +1970,19 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       ENDIF
 
-
       END
 
 *+ IMG_LOADCUBE - load image from cube
-	SUBROUTINE IMG_LOADCUBE(ILOC,PAR,STATUS)
+	SUBROUTINE IMG_LOADCUBE(IFID,PAR,STATUS)
 
         IMPLICIT NONE
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
         INCLUDE 'DAT_PAR'
 *  Import :
-        CHARACTER*(DAT__SZLOC) ILOC
+        INTEGER		IFID
         CHARACTER*(*) PAR
 *  Export :
 *  Status :
@@ -2175,9 +1994,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       CHARACTER*20 C1,C2
       REAL ZMIN,ZMAX,RANGE(2)
       INTEGER NR
-      INTEGER NDIM,DIMS(DAT__MXDIM),NVAL,NWID
+      INTEGER NDIM,DIMS(ADI__MXDIM),NVAL,NWID
       INTEGER DPTR,VPTR,QPTR,ZPTR
-      INTEGER NC1,NC2
+      INTEGER NC1,NC2,IDUM
 c      LOGICAL VOK,QOK
       LOGICAL UNIF,WOK
 *-
@@ -2186,13 +2005,13 @@ c      LOGICAL VOK,QOK
       IF (STATUS.EQ.SAI__OK) THEN
 
 
-*  store locator
-        I_LOC=ILOC
+*  store identifier
+        I_FID = IFID
 
         NVAL=I_NX*I_NY
 
 *  map z-axis
-        CALL BDA_MAPAXVAL(ILOC,'R',I_ZAX,ZPTR,STATUS)
+        CALL BDI_AXMAPR( IFID, I_ZAX, 'Data', 'READ', ZPTR, STATUS )
         CALL ARR_RANG1R(I_NZ,%VAL(ZPTR),ZMIN,ZMAX,STATUS)
         CALL CHR_RTOC(ZMIN,C1,NC1)
         CALL CHR_RTOC(ZMAX,C2,NC2)
@@ -2203,63 +2022,68 @@ c      LOGICAL VOK,QOK
 
 *  convert to range (inclusive) of indices
         CALL IMG_ZRANGE(RANGE(1),RANGE(2),%VAL(ZPTR),STATUS)
+	call msg_prnt( 'got zrange')
 
 *  map data and get axis values
-
-        CALL BDA_MAPDATA(ILOC,'R',DPTR,STATUS)
+        CALL BDI_MAPR(IFID,'Data','READ',DPTR,STATUS)
         CALL DYN_MAPR(1,NVAL,I_DPTR,STATUS)
         CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
+	call msg_prnt( 'mapped data')
 
 *  get variance and quality if there
-        CALL BDA_CHKVAR(ILOC,I_VOK,NDIM,DIMS,STATUS)
+        CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
         IF (I_VOK) THEN
-          CALL BDA_MAPVAR(ILOC,'R',VPTR,STATUS)
+          CALL BDI_MAPR(IFID,'Variance','READ',VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR_W,STATUS)
         ENDIF
+	call msg_prnt( 'got variance')
 
-        CALL BDA_CHKQUAL(ILOC,I_QOK,NDIM,DIMS,STATUS)
+        CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
-          CALL BDA_MAPQUAL(ILOC,'R',QPTR,STATUS)
+          CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
+	call msg_prnt( 'got quality')
           CALL DYN_MAPB(1,NVAL,I_QPTR,STATUS)
           CALL DYN_MAPB(1,NVAL,I_QPTR_W,STATUS)
-          CALL BDA_GETMASK(ILOC,I_MASK,STATUS)
+          CALL BDI_GET(IFID,'QualityMask','UBYTE',0,0,I_MASK,IDUM,
+     :          STATUS)
+	call msg_prnt( 'got quality mask')
         ENDIF
-
 
         CALL IMG_BINCUBE(%VAL(DPTR),%VAL(VPTR),%VAL(QPTR),STATUS)
 
-        CALL BDA_UNMAPDATA(ILOC,STATUS)
+	call msg_prnt( 'binned it')
+        CALL BDI_UNMAP( IFID, 'Data', DPTR, STATUS )
         IF (I_QOK) THEN
           CALL IMG_BAD(%VAL(I_QPTR),STATUS)
-          CALL BDA_UNMAPQUAL(ILOC,STATUS)
+          CALL BDI_UNMAP( IFID, 'Quality', QPTR, STATUS )
         ENDIF
         IF (I_VOK) THEN
-          CALL BDA_UNMAPVAR(ILOC,STATUS)
+          CALL BDI_UNMAP( IFID, 'Variance', VPTR, STATUS )
         ENDIF
+	call msg_prnt( 'unmapped')
 
-C        CALL BDA_GETAXVAL(ILOC,I_XAX,I_XBASE,I_XSCALE,I_NX,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
         CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
-C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
         CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
 
-        CALL BDA_CHKAXWID(ILOC,I_XAX,WOK,UNIF,NWID,STATUS)
-        IF (WOK.AND.UNIF) THEN
-          CALL BDA_GETAXWID(ILOC,I_XAX,I_XWID,STATUS)
-        ELSE
+c        CALL BDA_CHKAXWID(ILOC,I_XAX,WOK,UNIF,NWID,STATUS)
+c        IF (WOK.AND.UNIF) THEN
+c          CALL BDA_GETAXWID(ILOC,I_XAX,I_XWID,STATUS)
+c        ELSE
           I_XWID=ABS(I_XSCALE)
-        ENDIF
-        CALL BDA_CHKAXWID(ILOC,I_YAX,WOK,UNIF,NWID,STATUS)
-        IF (WOK.AND.UNIF) THEN
-          CALL BDA_GETAXWID(ILOC,I_YAX,I_YWID,STATUS)
-        ELSE
+c        ENDIF
+c        CALL BDA_CHKAXWID(ILOC,I_YAX,WOK,UNIF,NWID,STATUS)
+c        IF (WOK.AND.UNIF) THEN
+c          CALL BDA_GETAXWID(ILOC,I_YAX,I_YWID,STATUS)
+c        ELSE
           I_YWID=ABS(I_YSCALE)
-        ENDIF
+c        ENDIF
 
+	call msg_prnt( 'got axes')
 *  get min and max
         CALL IMG_MINMAX(STATUS)
 
@@ -2276,11 +2100,10 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
         I_DY=ABS(I_Y-I_YBASE)
         I_R=0.0
 
-
 *  get top level text
-        CALL BDA_GETTITLE(ILOC,I_TITLE,STATUS)
-        CALL BDA_GETLABEL(ILOC,I_LABEL,STATUS)
-        CALL BDA_GETUNITS(ILOC,I_UNITS,STATUS)
+        CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
+        CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
+        CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
 
 *  get work area
         CALL DYN_MAPI(1,NVAL,I_WKPTR,STATUS)
@@ -2290,22 +2113,22 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 
       ENDIF
 
-
       END
 
 
 
 *+ IMG_MATCH - match image to one loaded
-	SUBROUTINE IMG_MATCH(ILOC,MATCH,STATUS)
+	SUBROUTINE IMG_MATCH(IFID,MATCH,STATUS)
 
         IMPLICIT NONE
 
 *  Global constants :
         INCLUDE 'SAE_PAR'
+        INCLUDE 'ADI_PAR'
         INCLUDE 'DAT_PAR'
         INCLUDE 'PRM_PAR'
 *  Import :
-      CHARACTER*(DAT__SZLOC) ILOC
+      INTEGER           IFID
 *  Export :
       LOGICAL MATCH
 *  Status :
@@ -2316,20 +2139,19 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
       REAL SLOP
       PARAMETER (SLOP=3.0*VAL__SMLR)
 *  Local variables :
-      CHARACTER*(DAT__SZLOC) HLOC
-      DOUBLE PRECISION RA,DEC,ROLL
       REAL BASE,SCALE
-      INTEGER NDIM,DIMS(DAT__MXDIM)
-      INTEGER AXNVAL,AYNVAL
+      INTEGER NDIM,DIMS(ADI__MXDIM)
+      INTEGER PIXID, PRJID, SYSID, AXPTR
       LOGICAL DOK,AXOK,AYOK,AXREG,AYREG
-      LOGICAL HOK,RAOK,DECOK,PAOK
+      LOGICAL HOK,SAME
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
         MATCH=.TRUE.
 
 *  check validity of data array
-        CALL BDA_CHKDATA(ILOC,DOK,NDIM,DIMS,STATUS)
+        CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL BDI_CHK( IFID, 'Data', DOK, STATUS )
         IF (STATUS.EQ.SAI__OK) THEN
           IF (.NOT.DOK) THEN
             CALL MSG_PRNT('AST_ERR: invalid data array')
@@ -2348,26 +2170,25 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 
 *  check axes are regular
         IF (MATCH) THEN
-          CALL BDA_CHKAXVAL(ILOC,1,AXOK,AXREG,AXNVAL,STATUS)
-          IF (AXREG) THEN
-            CALL BDA_GETAXVAL(ILOC,1,BASE,SCALE,AXNVAL,STATUS)
-          ENDIF
+          CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
+          CALL ARR_CHKREG( %VAL(AXPTR), DIMS(1), AXREG, BASE, SCALE,
+     :                     STATUS )
+          CALL BDI_AXUNMAP( IFID, 1, 'Data', AXPTR, STATUS )
           IF (.NOT.AXREG.OR.
      :        .NOT.(ABS(BASE-I_XBASE).LE.SLOP.AND.
-     :              ABS(SCALE-I_XSCALE).LE.SLOP.AND.
-     :                                AXNVAL.EQ.I_NX)) THEN
+     :              ABS(SCALE-I_XSCALE).LE.SLOP)) THEN
             CALL MSG_PRNT(
      :             'AST_ERR: x-axis values do not match loaded image')
             MATCH=.FALSE.
           ENDIF
-          CALL BDA_CHKAXVAL(ILOC,2,AYOK,AYREG,AYNVAL,STATUS)
-          IF (AYREG) THEN
-            CALL BDA_GETAXVAL(ILOC,2,BASE,SCALE,AYNVAL,STATUS)
-          ENDIF
+
+          CALL BDI_AXMAPR( IFID, 2, 'Data', 'READ', AXPTR, STATUS )
+          CALL ARR_CHKREG( %VAL(AXPTR), DIMS(2), AYREG, BASE, SCALE,
+     :                     STATUS )
+          CALL BDI_AXUNMAP( IFID, 2, 'Data', AXPTR, STATUS )
           IF (.NOT.AYREG.OR.
      :        .NOT.(ABS(BASE-I_YBASE).LE.SLOP.AND.
-     :              ABS(SCALE-I_YSCALE).LE.SLOP.AND.
-     :                                AXNVAL.EQ.I_NY)) THEN
+     :              ABS(SCALE-I_YSCALE).LE.SLOP)) THEN
             CALL MSG_PRNT(
      :             'AST_ERR: y-axis values do not match loaded image')
             MATCH=.FALSE.
@@ -2378,24 +2199,11 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  match attitude information (for spatial images)
         IF (MATCH.AND.I_SPATIALIMAGE) THEN
 
-          CALL BDA_CHKHEAD(ILOC,HOK,STATUS)
-          IF (HOK) THEN
-            CALL BDA_LOCHEAD(ILOC,HLOC,STATUS)
-            CALL HDX_OK(HLOC,'AXIS_RA',RAOK,STATUS)
-            CALL HDX_OK(HLOC,'AXIS_DEC',DECOK,STATUS)
-            CALL HDX_OK(HLOC,'POSITION_ANGLE',PAOK,STATUS)
-          ENDIF
-          IF (.NOT.(HOK.AND.RAOK.AND.DECOK.AND.PAOK)) THEN
-            RA=0.0D0
-            DEC=0.0D0
-            ROLL=0.0D0
-          ELSE
-            CALL CMP_GET0D(HLOC,'AXIS_RA',RA,STATUS)
-            CALL CMP_GET0D(HLOC,'AXIS_DEC',DEC,STATUS)
-            CALL CMP_GET0D(HLOC,'POSITION_ANGLE',ROLL,STATUS)
-          ENDIF
-          IF (.NOT.(RA.EQ.I_RA.AND.DEC.EQ.I_DEC.AND.ROLL.EQ.I_ROLL))
-     :                                                           THEN
+          CALL WCI_GETIDS( IFID, PIXID, PRJID, SYSID, STATUS )
+          CALL WCI_SAME( PIXID, PRJID, SYSID,
+     :                   I_PIXID, I_PRJID, I_SYSID, SAME, STATUS )
+
+          IF ( .NOT. SAME ) THEN
             CALL MSG_PRNT(
      :              'AST_ERR: pointing doesn''t match loaded image')
             MATCH=.FALSE.
@@ -2910,82 +2718,6 @@ c        INTEGER STATUS
       END
 
 
-*+ IMG_ZOOMCOPY
-	SUBROUTINE IMG_ZOOMCOPY(D,NX,NY,ZD,STATUS)
-
-        IMPLICIT NONE
-
-*  Global constants :
-        INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
-*    Global variables :
-        INCLUDE 'IMG_CMN'
-*  Import :
-        REAL D(I_NX,I_NY)
-        INTEGER NX,NY
-*  Export :
-        REAL ZD(NX,NY)
-*  Status :
-        INTEGER STATUS
-*  Local constants :
-*  Local variables :
-        INTEGER I,J,IZ,JZ
-*-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        JZ=0
-        DO J=I_IY1,I_IY2
-          JZ=JZ+1
-          IZ=0
-          DO I=I_IX1,I_IX2
-            IZ=IZ+1
-            ZD(IZ,JZ)=D(I,J)
-          ENDDO
-        ENDDO
-
-
-      ENDIF
-
-      END
-
-
-*+ IMG_ZOOMCOPYQ
-	SUBROUTINE IMG_ZOOMCOPYQ(Q,NX,NY,ZQ,STATUS)
-
-        IMPLICIT NONE
-
-*  Global constants :
-        INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
-*    Global variables :
-        INCLUDE 'IMG_CMN'
-*  Import :
-        BYTE Q(I_NX,I_NY)
-        INTEGER NX,NY
-*  Export :
-        BYTE ZQ(NX,NY)
-*  Status :
-        INTEGER STATUS
-*  Local constants :
-*  Local variables :
-        INTEGER I,J,IZ,JZ
-*-
-      IF (STATUS.EQ.SAI__OK) THEN
-
-        JZ=0
-        DO J=I_IY1,I_IY2
-          JZ=JZ+1
-          IZ=0
-          DO I=I_IX1,I_IX2
-            IZ=IZ+1
-            ZQ(IZ,JZ)=Q(I,J)
-          ENDDO
-        ENDDO
-
-
-      ENDIF
-
-      END
 
 *+ IMG_SETPOS
 	SUBROUTINE IMG_SETPOS(X,Y,STATUS)
@@ -4526,7 +4258,7 @@ c        REAL XX,XP,YP
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_GETBOX',STATUS)
+          CALL AST_REXIT('IMG_GETBOX',STATUS)
         ENDIF
 
       ENDIF
@@ -4876,7 +4608,7 @@ c      REAL HWID
         CALL ARX_CLOSE(GRPID,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_GETARD',STATUS)
+          CALL AST_REXIT( 'IMG_GETARD',STATUS)
         ENDIF
 
       ENDIF
@@ -4956,7 +4688,7 @@ c      REAL HWID
         CALL IMG_CIRCLE(XC,YC,RAD,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_GETCIRC',STATUS)
+          CALL AST_REXIT('IMG_GETCIRC',STATUS)
         ENDIF
 
       ENDIF
@@ -5053,7 +4785,7 @@ c      REAL HWID
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_GETANNULUS',STATUS)
+          CALL AST_REXIT('IMG_GETANNULUS',STATUS)
         ENDIF
 
       ENDIF
@@ -5180,7 +4912,7 @@ c      REAL HWID
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from IMG_GETPOLY',STATUS)
+          CALL AST_REXIT('IMG_GETPOLY',STATUS)
         ENDIF
 
       ENDIF

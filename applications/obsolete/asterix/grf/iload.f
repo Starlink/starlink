@@ -14,6 +14,7 @@
 *     20 Sep 94 : V1.7-5 region mask incorporated (RJV)
 *      6 Jan 95 : V1.8-0 ARD for regions (RJV)
 *     27 Apr 95 : V1.8-1 SPLIT option added (RJV)
+*     21 Sep 95 : V2.0-0 ADI port (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -27,9 +28,10 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC
+      CHARACTER*132		IFILE			! Input file name
       CHARACTER*20 DEV
       INTEGER NX,NY
+      INTEGER IFID
       INTEGER MODE
       LOGICAL DISP
       LOGICAL ACTIVE
@@ -38,7 +40,7 @@
       LOGICAL FRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ILOAD Version 1.8-1')
+      PARAMETER (VERSION = 'ILOAD Version 2.0-0')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
@@ -50,7 +52,8 @@
       CALL MSG_PRNT(VERSION)
 
 *  get input image
-      CALL BDA_ASSOCI('INP','R',ILOC,STATUS)
+      CALL USI_GET0C( 'INP', IFILE, STATUS )
+      CALL ADI_FOPEN( IFILE, 'BinDS', 'READ', IFID, STATUS )
 
 *  see if GCB wanted
       CALL USI_GET0L('GCB',GCB,STATUS)
@@ -63,7 +66,7 @@
           CALL PSF_RELEASE(I_PSF,STATUS)
           I_PSF=0
 
-          CALL BDA_ANNUL(I_LOC,STATUS)
+          CALL ADI_FCLOSE( I_FID, STATUS )
 
           CALL DYN_UNMAP(I_DPTR,STATUS)
           CALL DYN_UNMAP(I_DPTR_W,STATUS)
@@ -87,14 +90,14 @@
 
         CALL MSG_PRNT(' ')
         CALL MSG_PRNT('Checking image...')
-        CALL IMG_CHECK(ILOC,STATUS)
+        CALL IMG_CHECK(IFID,STATUS)
 
         IF (I_CUBE) THEN
           CALL MSG_PRNT('Loading image from cube....')
-          CALL IMG_LOADCUBE(ILOC,'SLICE',STATUS)
+          CALL IMG_LOADCUBE(IFID,'SLICE',STATUS)
         ELSE
           CALL MSG_PRNT('Loading image....')
-          CALL IMG_LOAD(ILOC,STATUS)
+          CALL IMG_LOAD(IFID,STATUS)
           CALL IMG_SETWHOLE(STATUS)
           CALL IMG_SETPOS(0.0,0.0,STATUS)
         ENDIF
@@ -133,13 +136,11 @@
         ENDIF
 
         IF (GCB) THEN
-          CALL GCB_LOAD(ILOC,STATUS)
+          CALL GCB_FLOAD(IFID,STATUS)
         ELSE
           CALL GCB_CLEAR(STATUS)
           CALL GCB_SETL('PIX_FLAG',.TRUE.,STATUS)
         ENDIF
-
-
 
 *  zero transformations
         CALL GTR_ZERO(STATUS)
@@ -174,7 +175,6 @@
             CALL IMG_DISP(STATUS)
             CALL IMG_AXES(STATUS)
 
-
 *  flag current plotting status
             I_DISP=.TRUE.
             I_CLEAR=.FALSE.
@@ -184,8 +184,8 @@
         ELSE
           CALL MSG_PRNT('AST_ERR: no image loaded')
           I_OPEN=.FALSE.
+          CALL ADI_FCLOSE( IFID, STATUS )
           CALL AST_CLOSE()
-          CALL BDA_ANNUL(ILOC,STATUS)
           CALL GCB_DETACH(STATUS)
         ENDIF
 
@@ -194,5 +194,3 @@
       CALL USI_CLOSE()
 
       END
-
-
