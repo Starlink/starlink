@@ -1,4 +1,4 @@
-#!/bin/csh -fx
+#!/bin/csh -f
 
 # Set up variables
 set logfile = test.log
@@ -8,9 +8,9 @@ set tmpfile = ./tmpfile
 set interval = 10
 
 # Print out header
-set  format = "%28s %10d %10d %10d %10d  %s\n"
-set hformat = "%28s %10s %10s %10s %10s\n"
-printf "$hformat" "#" "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
+set  format = "%29s %10d %10d %10d %10d  %s\n"
+set hformat = "%29s %10s %10s %10s %10s\n"
+printf "$hformat" " " "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
 
 # Classify operating system 
 # (currently works for Red Hat Linux, Solaris, Digital Unix) 
@@ -36,6 +36,7 @@ alias tosec awk -F: "'\\
 set size_max = 0
 set rss_max = 0
 set label = ""
+rm -f $labelfile
 onintr SIGNAL
 
 # Work out parent's PID
@@ -46,8 +47,9 @@ else
 endif
 set ppid = `$pscmd | getfield field=PPID`
 if ("$ppid" == "") then
-   echo "${0:r}:  No parent process - aborting"
-   exit 1
+   set name = $0
+   echo "${name:t}:  No parent process - aborting"
+   goto EXIT
 endif
 if ("$pstype" == "BSD") then
    set parent_pscmd = "ps $ppid"
@@ -65,7 +67,7 @@ while (`$parent_pscmd | getfield field=PID`)
    # Write summary to log and reset values.
       printf >> $logfile "$format" \
         "$label_last" \
-        "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" "$command_major"
+        "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" 
       set rss_max = 0
       set size_max = 0
    endif
@@ -99,7 +101,7 @@ while (`$parent_pscmd | getfield field=PID`)
          set elapsed = `echo $cpu $percent | awk '{print ($2>0) ? int(100.*$1/$2):0}'`
       endif
    else
-      ps -p $pid -otime=TIME -oetime=ETIME -ovsz='     VSZ' -orss='     RSS' -ocomm > $tmpfile 
+      ( ps -p $pid -otime=TIME -oetime=ETIME -ovsz='     VSZ' -orss='     RSS' -ocomm > $tmpfile ) >& /dev/null
       @ ps_worked = (`cat $tmpfile | wc -l` == 2)
       if ($ps_worked) then
          tail -1 $tmpfile >> $logfile
@@ -134,13 +136,19 @@ while (`$parent_pscmd | getfield field=PID`)
 end
 
 echo
-echo "${0:r}: Logging terminated"
+set name = $0
+echo >> $logfile
+echo "${name:t}: Parent died.  Logging terminated" >> $logfile
 
-exit
+goto EXIT
 
 SIGNAL:
-   echo
-   echo "${0:t}: Caught a signal.  Logging terminated"
+   set name = $0
+   echo >> $logfile
+   echo "${name:t}: Caught a signal.  Logging terminated" >> $logfile
+
+EXIT:
+   rm -f $tmpfile
    exit
    
 
