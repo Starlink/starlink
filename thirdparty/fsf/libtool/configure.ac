@@ -24,7 +24,7 @@ AC_PREREQ(2.50)
 ## ------------------------ ##
 ## Autoconf initialisation. ##
 ## ------------------------ ##
-AC_INIT([libtool], [1.5], [bug-libtool@gnu.org])
+AC_INIT([libtool], [1.5.6], [bug-libtool@gnu.org])
 AC_CONFIG_SRCDIR([ltmain.in])
 
 
@@ -79,7 +79,7 @@ AC_CONFIG_SUBDIRS([libltdl])
 
 # all subdirectories that are configured on demand, but that must be
 # included in the distribution
-CONF_SUBDIRS="cdemo pdemo demo depdemo mdemo tagdemo f77demo"
+CONF_SUBDIRS="cdemo pdemo demo depdemo mdemo mdemo2 tagdemo f77demo"
 AC_SUBST([CONF_SUBDIRS])
 
 ACINCLUDE_M4_LIST="${srcdir}/acinclude.m4"

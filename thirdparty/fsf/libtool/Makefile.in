@@ -34,11 +34,12 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(top_srcdir)/configure AUTHORS COPYING \
 	ChangeLog INSTALL NEWS THANKS TODO config.guess config.sub \
-	install-sh ltmain.sh missing mkinstalldirs
+	install-sh ltmain.sh missing
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
@@ -47,15 +48,13 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES =
-am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(aclocaldir) $(DESTDIR)$(pkgdatadir)
+am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(aclocaldir) $(DESTDIR)$(pkgdatadir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-pkgdataSCRIPT_INSTALL = $(INSTALL_SCRIPT)
-SCRIPTS = $(bin_SCRIPTS) $(pkgdata_SCRIPTS)
+SCRIPTS = $(bin_SCRIPTS)
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-exec-recursive install-info-recursive \
@@ -67,8 +66,8 @@ pkgdataDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(aclocal_DATA) $(pkgdata_DATA)
 ETAGS = etags
 CTAGS = ctags
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
+	$(EXTRA_DIST) 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
 am__remove_distdir = \
@@ -217,20 +216,37 @@ EXTRA_DIST = $(aclocal_macros) bootstrap libtoolize.in ltmain.in \
 
 CLEANFILES = libtool libtoolize ltmain.shT
 
-# These are required by libtoolize.
-pkgdata_SCRIPTS = config.guess config.sub
-pkgdata_DATA = ltmain.sh
+# These are required by libtoolize and must be executable when installed.
+# Since _SCRIPTS gets the program transform applied we make them
+# executable by hand
+pkgdata_DATA = config.guess config.sub ltmain.sh
 
 # This macro file should be visible to Automake's aclocal.
 aclocal_DATA = $(aclocal_macros)
 
 # The standalone libtool script, and the libtool distributor.
 bin_SCRIPTS = libtool libtoolize
+TEXI2HTML = texi2html
 
 # TSDEPS will be defined to TSDEPS_DIST at `make dist' time
 TSDEPS = 
 TSDEPS_DIST = ChangeLog libtool.m4
 CVS = cvs # set it to `:' to avoid CVS operations
+WGET = wget
+WGETSGO = $(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~
+FETCHFILES = \
+./INSTALL \
+./config.guess \
+libltdl/config.guess \
+./config.sub \
+libltdl/config.sub \
+doc/texinfo.tex
+
+GPG = gpg # set it to `:' to avoid gpg operations
+DIFF = diff
+DIFF_OPTIONS = -ruNp
+XDELTA = xdelta
+XDELTA_OPTIONS = --pristine -9
 all: all-recursive
 
 .SUFFIXES:
@@ -288,28 +304,6 @@ uninstall-binSCRIPTS:
 	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
 	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
 	  rm -f $(DESTDIR)$(bindir)/$$f; \
-	done
-install-pkgdataSCRIPTS: $(pkgdata_SCRIPTS)
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(pkgdatadir)
-	@list='$(pkgdata_SCRIPTS)'; for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  if test -f $$d$$p; then \
-	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	    echo " $(pkgdataSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f"; \
-	    $(pkgdataSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(pkgdatadir)/$$f; \
-	    if test -n "$$MANIFEST_FD"; then \
-		echo "$(DESTDIR)$(pkgdatadir)/$$f" >&$${MANIFEST_FD-0}; \
-	    else :; fi; \
-	  else :; fi; \
-	done
-
-uninstall-pkgdataSCRIPTS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(pkgdata_SCRIPTS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
-	  echo " rm -f $(DESTDIR)$(pkgdatadir)/$$f"; \
-	  rm -f $(DESTDIR)$(pkgdatadir)/$$f; \
 	done
 
 mostlyclean-libtool:
@@ -622,38 +616,12 @@ check: check-recursive
 all-am: Makefile $(SCRIPTS) $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(pkgdatadir) $(DESTDIR)$(aclocaldir) $(DESTDIR)$(pkgdatadir)
+	$(mkdir_p) $(DESTDIR)$(bindir) $(DESTDIR)$(aclocaldir) $(DESTDIR)$(pkgdatadir)
 install-exec: install-exec-recursive
 install-data: install-data-recursive
 uninstall: uninstall-recursive
 
-# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
-# invoke the install-manifest target, otherwise, do the real install
-# rule.  This means that if this is being invoked from within an
-# install-manifest rule further up the process tree, we don't create
-# another manifest.
-install:  all-am
-	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
-	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
-	else \
-	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
-	fi
-
-install-manifest:
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
-	  echo "<?xml version='1.0'?>" >&5 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
-	  echo "<files>" >&5 ; \
-	  MANIFEST_FD=5; export MANIFEST_FD; \
-	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
-	  echo "</files>"                                       >&5; \
-	  echo "</manifest>"                                    >&5; \
-	  exec 5>&-; \
-	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
-	  rm -f $$MF
+install: $(REAL_INSTALL)
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -695,8 +663,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-aclocalDATA install-pkgdataDATA \
-	install-pkgdataSCRIPTS
+install-data-am: install-aclocalDATA install-pkgdataDATA
 	@$(NORMAL_INSTALL)
 	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
@@ -727,8 +694,7 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-aclocalDATA uninstall-binSCRIPTS \
-	uninstall-info-am uninstall-local uninstall-pkgdataDATA \
-	uninstall-pkgdataSCRIPTS
+	uninstall-info-am uninstall-local uninstall-pkgdataDATA
 
 uninstall-info: uninstall-info-recursive
 
@@ -741,15 +707,14 @@ uninstall-info: uninstall-info-recursive
 	dvi-am html html-am info info-am install install-aclocalDATA \
 	install-am install-binSCRIPTS install-data install-data-am \
 	install-exec install-exec-am install-info install-info-am \
-	install-man install-manifest install-pkgdataDATA \
-	install-pkgdataSCRIPTS install-strip installcheck \
+	install-man install-pkgdataDATA install-strip installcheck \
 	installcheck-am installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic maintainer-clean-recursive \
 	mostlyclean mostlyclean-generic mostlyclean-libtool \
 	mostlyclean-recursive pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-aclocalDATA uninstall-am \
 	uninstall-binSCRIPTS uninstall-info-am uninstall-local \
-	uninstall-pkgdataDATA uninstall-pkgdataSCRIPTS
+	uninstall-pkgdataDATA
 
 
 libtool: $(srcdir)/ltmain.sh $(top_builddir)/configure.ac
@@ -768,13 +733,6 @@ $(srcdir)/ltmain.sh: $(srcdir)/ltmain.in $(TSDEPS)
 	mv -f ltmain.shT $@ || \
 	(rm -f $@ && cp ltmain.shT $@ && rm -f ltmain.shT)
 	cp $@ $(srcdir)/libltdl/
-
-.PHONY: timestamps update-timestamps
-timestamps distdir: update-timestamps
-update-timestamps:
-	@if (cd $(srcdir) && test -d CVS && \
-	    $(CVS) -n update $(TSDEPS_DIST) | grep '^M'); then \
-		echo "Cannot make dist before commit"; exit 1; else :; fi
 
 # All our rules should depend on these demo files.
 all-recursive: $(srcdir)/libltdl/acinclude.m4 $(ACINCLUDE_M4_LIST)
@@ -800,33 +758,151 @@ configure-subdirs distdir: $(DIST_MAKEFILE_LIST)
 # Create and install libltdl
 install-data-hook:
 	cd libltdl && $(MAKE) local-install-files
+	chmod +x $(DESTDIR)$(pkgdatadir)/config.guess
+	chmod +x $(DESTDIR)$(pkgdatadir)/config.sub
 
 # Uninstall libltdl
 uninstall-local:
 	-rm -rf $(DESTDIR)$(pkgdatadir)/libltdl
 
-################################################################
+.PHONY: cvs-release
+cvs-release: version-check prev-tarball cvs-news fetch cvs-commit cvs-dist deltas web-manual
+	@tarname="$(PACKAGE)-$(VERSION).tar.gz"; \
+	diffname="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).diff.gz"; \
+	xdeltaname="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).xdelta"; \
+	echo " *** Upload $$tarname, $$tarname.sig,";\
+	echo " *** $$tarname.directive.asc, $$diffname,"; \
+	echo " *** $$diffname.sig, $$diffname.directive.asc,"; \
+	echo " *** $$xdeltaname, $$xdeltaname.sig and";\
+	echo " *** $$xdeltaname.directive.asc to either"
+	echo " *** /incoming/alpha or /incoming/ftp on ftp-upload.gnu.org."
+	echo " *** You might need to upload manual.html to webcvs/libtool."
 
-# Tag before making distribution.  Also, don't make a distribution if
-# checks fail.  Also, make sure the NEWS file is up-to-date.
-cvs-dist: distcheck
-	@if sed '1,2d;3q' $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
+.PHONY: version-check
+version-check:
+	@case $(VERSION) in \
+	*[acegikmoqsuwy]) \
+	  echo "Version \`$(VERSION)' is not a releasable version, please read:"; \
+	  echo "    http://www.gnu.org/software/libtool/contribute.html"; \
+	  exit 1; \
+	  ;; \
+	esac
+
+.PHONY: prev-tarball
+prev-tarball:
+	@if test -z "$(LASTRELEASE)"; \
+		then echo "LASTRELEASE is not set"; exit 1; fi
+	@ofile="$(PACKAGE)-$(LASTRELEASE).tar.gz"; \
+	if test -f $$ofile; then :; \
+	else echo "Cannot make deltas without $$ofile"; exit 1; fi
+
+.PHONY: timestamps update-timestamps
+timestamps: update-timestamps
+update-timestamps:
+	@if (cd $(srcdir) && test -d CVS && \
+	    $(CVS) -n update $(TSDEPS_DIST) | grep '^M'); then \
+		echo "Cannot make cvs-dist before commit"; exit 1; else :; fi
+
+.PHONY: cvs-news
+cvs-news:
+	@if sed '1,2d;3q' $(srcdir)/NEWS | grep -e "$(VERSION)" >/dev/null; \
+	then :; \
+	else \
 	  echo "NEWS not updated; not releasing" 1>&2; \
-	  exit 1;				\
+	  exit 1; \
 	fi
-	cd $(srcdir) && \
-	 $(CVS) -q tag `echo "release-$(VERSION)" | sed 's/\./-/g'`
-	$(MAKE) dist
 
-cvs-diff:
-	thisver=`echo "release-$(VERSION)" | sed 's/\./-/g'`; \
-	if test -z "$$OLDVERSION"; then \
-	  prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
-	else prevno="$$OLDVERSION"; fi; \
-	prevver=release-`echo $$prevno | sed 's/\./-/g'`; \
-	$(CVS) -f rdiff -c -r $$prevver -r $$thisver $(PACKAGE) \
-	    | GZIP=$(GZIP_ENV) gzip -c \
-	    > $(PACKAGE)-$$prevno-$(VERSION).diff.gz
+.PHONY: fetch
+fetch:
+	rm -rf Fetchdir > /dev/null 2>&1
+	mkdir Fetchdir
+	(cd Fetchdir && \
+	$(WGETSGO)/autoconf/autoconf/INSTALL; \
+	$(WGETSGO)/config/config/config.guess; \
+	$(WGETSGO)/config/config/config.sub; \
+	$(WGETSGO)/texinfo/texinfo/doc/texinfo.tex )
+	@stat=0; for file in $(FETCHFILES); do \
+	  fetchedfile=Fetchdir/`echo $$file | sed 's,.*/,,g'`; \
+	  if diff -u $(srcdir)/$$file $$fetchedfile \
+	    >>Fetchdir/update.patch 2>/dev/null; then :; \
+	  else \
+	    stat=1; \
+	    echo "Updating $(srcdir)/$$file..."; \
+	    cp $$fetchedfile $(srcdir)/$$file; \
+	  fi; \
+	done; \
+	test $$stat = 1 && \
+	  echo "See Fetchdir/update.patch for a log of the changes."; \
+	exit $$stat
+
+.PHONY: cvs-commit
+cvs-commit: cvs-news
+	cd $(srcdir) && $(SHELL) ./commit
+
+.PHONY: cvs-dist
+cvs-dist: cvs-news timestamps
+	$(MAKE) distcheck
+	cd $(srcdir) \
+	  && $(CVS) -q tag -c `echo "release-$(VERSION)" | sed 's/\./-/g'`
+	ofile="$(PACKAGE)-$(VERSION).tar.gz"; \
+	$(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+
+.PHONY: new-tarball
+new-tarball:
+	@ofile="$(PACKAGE)-$(VERSION).tar.gz"; \
+	if test -f $$ofile; then :; \
+	else echo "Cannot make deltas without $$ofile"; exit 1; fi
+
+.PHONY: got-xdelta
+got-xdelta:
+	@if ($(XDELTA) --version 2>&1 | grep version)>/dev/null 2>/dev/null; \
+	then :;\
+	else \
+	  echo "Get xdelta from http://sourceforge.net/projects/xdelta."; \
+	  exit 1; \
+	fi
+
+.PHONY: deltas
+deltas: delta-diff delta-xdelta
+
+.PHONY: delta-diff
+delta-diff: prev-tarball new-tarball
+	rm -rf delta-diff
+	mkdir delta-diff
+	ofile="../$(PACKAGE)-$(LASTRELEASE)-$(VERSION).diff.gz"; \
+	cd delta-diff \
+	&& tar xzf "../$(PACKAGE)-$(LASTRELEASE).tar.gz" \
+	&& tar xzf "../$(PACKAGE)-$(VERSION).tar.gz" \
+	&& $(DIFF) $(DIFF_OPTIONS) \
+		$(PACKAGE)-$(LASTRELEASE) $(PACKAGE)-$(VERSION) \
+		| GZIP=$(GZIP_ENV) gzip -c > $$ofile \
+	&& $(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+	rm -rf delta-diff
+
+.PHONY: delta-xdelta
+delta-xdelta: prev-tarball new-tarball got-xdelta
+	ofile="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).xdelta"; \
+	( test -z `$(XDELTA) delta $(XDELTA_OPTIONS) \
+	    $(PACKAGE)-$(LASTRELEASE).tar.gz $(PACKAGE)-$(VERSION).tar.gz \
+	    $$ofile 2>&1` \
+	  && : ) \
+	&& $(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+
+.PHONY: web-manual
+web-manual:
+	@$(LN_S) $(top_srcdir)/doc/libtool.texi doc/manual.texi
+	$(TEXI2HTML) -I doc -monolithic -number -verbose doc/manual.texi
+	@mv doc/manual.html manual.html
+	@rm -f doc/manual.texi
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -32,6 +32,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
+build_triplet = @build@
 host_triplet = @host@
 subdir = tests
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
@@ -40,13 +41,12 @@ am__aclocal_m4_deps = $(top_srcdir)/acinclude.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(mkdir_p)
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
-STAR_EXTRA_DIST =
-DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
-	$(STAR_EXTRA_DIST)
+DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) \
+	$(EXTRA_DIST) 
 REAL_INSTALL = install-am
 pkgdatadir = @pkgdatadir@
 ACINCLUDE_M4_LIST = @ACINCLUDE_M4_LIST@
@@ -215,7 +215,9 @@ COMMON_TESTS = \
 	mdemo-inst.test mdemo-unst.test \
 	assign.test link.test link-2.test nomode.test \
 	quote.test sh.test suffix.test pdemo-conf.test \
-	pdemo-make.test pdemo-exec.test pdemo-inst.test
+	pdemo-make.test pdemo-exec.test pdemo-inst.test \
+	mdemo-conf.test mdemo-make.test mdemo2-conf.test \
+	mdemo2-make.test mdemo2-exec.test
 
 @HAVE_CXX_FALSE@@HAVE_F77_FALSE@TESTS = $(COMMON_TESTS)
 @HAVE_CXX_FALSE@@HAVE_F77_TRUE@TESTS = $(COMMON_TESTS) $(F77_TESTS)
@@ -387,33 +389,7 @@ install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
-# If STAR_MANIFEST_DIR is defined and MANIFEST_FD is _not_, then
-# invoke the install-manifest target, otherwise, do the real install
-# rule.  This means that if this is being invoked from within an
-# install-manifest rule further up the process tree, we don't create
-# another manifest.
-install:  all-am
-	if test -n "$(STAR_MANIFEST_DIR)" -a -z "$$MANIFEST_FD"; then \
-	    $(MAKE) $(AM_MAKEFLAGS) install-manifest; \
-	else \
-	    $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL); \
-	fi
-
-install-manifest:
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	MF=$${TMPDIR-/tmp}/manifest-$$$$; rm -f $$MF && exec 5>$$MF && \
-	  echo "<?xml version='1.0'?>" >&5 ; \
-	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >&5 ; \
-	  echo "<manifest component='$(PACKAGE)'>" >&5 ; \
-	  echo "<version>$(PACKAGE_VERSION)</version>" >&5 ; \
-	  echo "<files>" >&5 ; \
-	  MANIFEST_FD=5; export MANIFEST_FD; \
-	  $(MAKE) $(AM_MAKEFLAGS) $(REAL_INSTALL) ; \
-	  echo "</files>"                                       >&5; \
-	  echo "</manifest>"                                    >&5; \
-	  exec 5>&-; \
-	  $(INSTALL_DATA) $$MF $(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE); \
-	  rm -f $$MF
+install: $(REAL_INSTALL)
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
@@ -485,10 +461,10 @@ uninstall-am: uninstall-info-am
 	distclean-libtool distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-exec \
 	install-exec-am install-info install-info-am install-man \
-	install-manifest install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am uninstall uninstall-am uninstall-info-am
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	uninstall uninstall-am uninstall-info-am
 
 
 demo-conf.test: $(top_builddir)/libtool
