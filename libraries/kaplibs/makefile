@@ -1229,7 +1229,7 @@ do_test: $(EXTERNAL_INCLUDES)
 #  Build the test program, ensuring that the installed version of the library
 #  and link files are used.
 	$(FC) $(FFLAGS) $(PKG_NAME)_test.f -L$(INSTALL_LIB) -L$(STAR_LIB) \
-              `$(INSTALL_BIN)/$(PKG_NAME)_link` -o $(PKG_NAME)_test
+              `$(INSTALL_BIN)/$(PKG_NAME)_link_adam` -o $(PKG_NAME)_test
 #
 #  Remove the test program source and the include file links used to
 #  build it.
