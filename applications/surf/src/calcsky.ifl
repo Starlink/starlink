@@ -56,6 +56,8 @@
 #        Convert to CALCSKY
 #     1998 Jun 9 (TIMJ)
 #        Add BOXSZ. REF now at POSITION 1
+#     1999 Jul 15 (TIMJ)
+#        Add ADDCHOP, PA and THROW
 #     {enter_further_changes_here}
 
 #-
@@ -64,6 +66,15 @@
 
       HELPLIB 'SURF_HELP:'
 
+      PARAMETER ADDCHOP
+        TYPE '_LOGICAL'
+        VPATH 'PROMPT,DEFAULT'
+        PPATH 'DEFAULT'
+        PROMPT 'Add dual beam chop to source model'
+        DEFAULT false
+        HELPKEY '*'
+      ENDPARAMETER
+
       PARAMETER BOXSZ     # Size of smoothing box
 	TYPE '_REAL'
         PPATH 'DYNAMIC'
@@ -71,6 +82,23 @@
 	PROMPT 'Size of smoothing box (seconds)'
         HELPKEY '*'
       ENDPARAMETER
+
+      PARAMETER CHOP
+         TYPE    '_REAL'
+        POSITION 2
+        VPATH 'prompt,dynamic' 
+        PPATH 'dynamic'
+        PROMPT  'Chop throw in arcsec'
+      ENDPARAMETER
+
+      PARAMETER PA
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH 'prompt,dynamic'
+         PPATH 'dynamic' 
+         PROMPT  'Chop position angle (degrees)'
+      ENDPARAMETER
+
 
       PARAMETER REF        # First reference date file
          POSITION 1
