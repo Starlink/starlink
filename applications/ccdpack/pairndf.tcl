@@ -101,6 +101,9 @@
       set maxleng 0
       foreach ns $NDFSETS {
          incr nndfset
+         if { [ llength $ns ] > 2 || [ lindex $ns 0 ] != [ lindex $ns 1 ] } {
+            set ns [ lreplace $ns 0 0 "set:[ lindex $ns 0 ]" ]
+         }
          set ndfset [ eval ndfset $ns ]
          set ndfsets($nndfset) $ndfset
          lappend ndfsetlist $ndfset
