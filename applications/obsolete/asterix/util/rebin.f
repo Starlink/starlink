@@ -206,8 +206,6 @@
 
       BYTE MASK                      	! QUALITY mask
 
-      INTEGER INLINES                	! # lines input name
-      INTEGER ONLINES                	! # line output name
       INTEGER NAX
       REAL WID				! scalar bin width
       REAL WIDLOW,WIDUPP		! upper and lower bin widths
