@@ -226,6 +226,7 @@
                END IF
 
                FLAG = .TRUE.
+               CALL PAR_CANCL( PARAM, STATUS )
 
             END IF
 
