@@ -6,8 +6,8 @@
 #
 # $Id$
 
-LXDIR=/home/norman/sgml/lx
-DEFECTSDIR=/home/norman/sgml/defect
+LXDIR=/home/norman/sgml/w/sgml/lx
+DEFECTSDIR=/home/norman/sgml/w/sgml/defect
 
 defects.html: defects.xml
 	java com.jclark.xsl.sax.Driver defects.xml $(DEFECTSDIR)/defects.xslt defects.html
