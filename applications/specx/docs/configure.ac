@@ -22,7 +22,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_MAKE_SET
 
 dnl    Need to traverse sub directories
-AC_CONFIG_SUBDIRS([help sun17 sc8 ])
+AC_CONFIG_SUBDIRS([hlp sun17 sc8 ])
 
 AC_CONFIG_FILES([Makefile])
 
