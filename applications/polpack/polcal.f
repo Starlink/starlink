@@ -91,6 +91,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'PAR_ERR'          ! PAR error constants
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -172,6 +173,7 @@
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator for output POLPACK extension
       
       LOGICAL DESCOK             ! Image descriptors OK?
+      LOGICAL GOTVAR             ! Was value supplied for parameter VARIANCE?
       LOGICAL VAR                ! Variance information present and
                                  ! required in output?
       LOGICAL USED( MAXIN )      ! flag for images that have been
@@ -688,12 +690,12 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
       LBND( 3 ) = 1
       IF ( MODE .EQ. 'LINEAR' ) THEN
          UBND( 3 ) = 3
-         TITLE = 'Output from POLPACK: Linear polarimetry',
+         TITLE = 'Output from POLPACK: Linear polarimetry'
          LABEL = 'Stokes parameters (I, Q, U)'
          PLANES = 'IQU'
       ELSE
          UBND( 3 ) = 2
-         TITLE = 'Output from POLPACK: Circular polarimetry',
+         TITLE = 'Output from POLPACK: Circular polarimetry'
          LABEL = 'Stokes parameters (I, V)'
          PLANES = 'IV'
       ENDIF
@@ -708,8 +710,8 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  Create a POLPACK extension containing a character array identifying the
 *  quantities stored in each plane of the DATA array.
       CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
-      CALL NDF_XPT0C( PLANES( : CHR_LEN( PLANES ) ), NDFOUT, 'POLPACK',
-     :                'STOKES', STATUS ) 
+      CALL NDF_XPT0C( PLANES( : UBND( 3 ) - LBND( 3 ) + 1 ), NDFOUT, 
+     :                'POLPACK', 'STOKES', STATUS ) 
       CALL DAT__ANNUL( XLOC, STATUS )         
 
 * Map the output DATA array and if necessary, the VARIANCE array.
