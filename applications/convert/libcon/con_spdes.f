@@ -62,6 +62,9 @@
 *        Made to handle double-precision axis centres, and used an
 *        improved algorithm to determine whether or not the axis centres
 *        are linear, and the increment between adjacent axis centres.
+*     1992 November 17 (MJC):
+*        Fixed bug that could create erroneous CRTYPEn and CTYPEn BDF
+*        descriptors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -285,7 +288,7 @@
 *            See whether an axis label is present or not.
                AXLFND = .FALSE.
                CALL NDF_ASTAT( NDF, 'Label', I, AXLFND, STATUS )
-               IF ( THERE ) THEN
+               IF ( AXLFND ) THEN
 
 *               Obtain the label's value and length.
                   CALL NDF_ACGET( NDF, 'Label', I, VALUE, STATUS )
@@ -315,7 +318,7 @@
 *            See whether an axis units is present or not.
                AXUFND = .FALSE.
                CALL NDF_ASTAT( NDF, 'Units', I, AXUFND, STATUS )
-               IF ( THERE ) THEN
+               IF ( AXUFND ) THEN
 
 *               Obtain the units' value and length.
                   CALL NDF_ACGET( NDF, 'Units', I, VALUE, STATUS )
