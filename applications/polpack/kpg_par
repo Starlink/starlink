@@ -1,0 +1,62 @@
+*+
+*  Name:
+*     KPG_PAR
+
+*  Purpose:
+*     Define private (internal) constants for the KPG library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants used
+*     internally by routines in the KAPPA KPG library.
+
+*  Prior Requirements:
+*     The SAE_PAR include file should be included prior to this file, in
+*     order to define constants which are needed here.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     16-FEB-1998 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  World Coordinate Systems.
+*  ========================
+
+*  Length of _CHAR array elements used to store AST data in HDS.
+      INTEGER KPG__SZAST
+      PARAMETER ( KPG__SZAST = 32 )
+
+*  Number of _CHAR array elements initially created when storing AST
+*  data in HDS (i.e. an initial guess at the number of lines of data to
+*  be stored). The array is expanded if this proves insufficient. It is
+*  always truncated after the data have been written.
+      INTEGER KPG__INAST
+      PARAMETER ( KPG__INAST = 64 )
+
+*  Minimum length of _CHAR array elements accepted as valid when
+*  reading AST data that has been stored in HDS.
+      INTEGER KPG__MLAST
+      PARAMETER ( KPG__MLAST = 16 )
+
+*  Maximum number of continuation lines (i.e. array elements of size
+*  KPG__SZAST) to be used when storing a single line of AST data in
+*  HDS.  Continuation lines are indicated by a '+' as the first
+*  character (normally this is a space). AST data lines which are still
+*  too long to be accommodated will cause an error.
+      INTEGER KPG__MXACL
+      PARAMETER ( KPG__MXACL = 64 )
+
+*.
