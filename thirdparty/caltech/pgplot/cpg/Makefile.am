@@ -11,11 +11,9 @@ PGBIND_ROUTINES = pgbind.c
 C_WRAPPERS = cpgplot.c
 PUBLIC_INCLUDES = cpgplot.h
 
-cpgplot.c: pgbind
+cpgplot.c cpgplot.h: pgbind
 	grep -h '^C%' ../src/pg*.f > ./pgbind_prototypes
 	./pgbind bsd -h -w pgbind_prototypes
-
-cpgplot.h: cpgplot.c
 
 # Build the actual library
 
