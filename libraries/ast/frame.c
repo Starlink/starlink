@@ -4286,7 +4286,6 @@ f     AST_DISTANCE function.
 */
 
 /* Local Variables: */
-   int axis;                     /* Loop counter for axes */
    int naxes;                    /* Number of Frame axes */
    double result;                /* Returned value */
 

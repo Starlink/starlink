@@ -12536,9 +12536,6 @@ f        will be returned holding AST__NULL.
 *     function.
 */
 
-/* Local Variables: */
-   int invert;                   /* New Invert attribute value */
-
 /* Check the global error status. */
    if ( !astOK ) return;
 

@@ -313,7 +313,6 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
 */
 
 /* Local Variables: */
-   AstSkyAxis *this;             /* Pointer to the SkyAxis structure */
    double result;                /* Returned gap size */
 
 /* Initialise. */
@@ -325,9 +324,6 @@ static double AxisDistance( AstAxis *this_axis, double v1, double v2 ) {
 /* Check both axis values are OK, and form the returned increment,
    normalizing it into the range +PI to -PI. */
    if( v1 != AST__BAD && v2 != AST__BAD ) result = slaDrange( v2 - v1 );
-
-/* Return the result. */
-   return result;
 
 /* Return the result. */
    return result;

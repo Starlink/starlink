@@ -4724,8 +4724,8 @@ static int FitLinear( AstMapping *map, int ndim, double *dim, double *c,
    step = (double *) astMalloc( ndim*sizeof( double ) );
    p = (double *) astMalloc( ndim*sizeof( double ) );
    ip = (int *) astMalloc( ndim*sizeof( int ) );
+   np = 1;
    if( astOK ) {
-      np = 1;
       for( i = 0; i < ndim; i++ ){
          if( dim[ i ] != AST__BAD ) {
             step[ i ] = dim[ i ]/NPFIT;
@@ -8843,7 +8843,6 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
                freedata = 1;
             }
          }
-
 /* Obtain the keyword length and test the card to identify the type of
    AST data item (if any) that it represents. */
          len = (int) strlen( keyword );
@@ -10499,7 +10498,8 @@ static int MatchChar( char test, char type, const char *method,
    int ret;            /* Returned flag */
 
 /* Check global status. */
-   if( !astOK ) return 0;
+   ret = 0;
+   if( !astOK ) return ret;
 
 /* Check for "d" specifiers (digits). */
    if( type == 'd' ){
@@ -11224,6 +11224,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
    naxis = GetMaxIM( &(store->crpix) ) + 1;
 
 /* Loop round all co-ordinate versions (0-9) */
+   primpc = NULL;
    for( s = ' '; s < sup && astOK; s++ ){      
       is = s - 'A' + 1;
 
@@ -11411,13 +11412,13 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
       for( j = 0; j < naxis; j++ ){
          cval = GetItemC( &(store->cunit), j, s, NULL, method, class );
          if( cval ) {
-            sprintf( comm, "Units for axis %d", j + 1 );
+            sprintf( combuf, "Units for axis %d", j + 1 );
             if( s == ' ' ) {
                sprintf( keyname, "CUNIT%d", j + 1 );
             } else {
                sprintf( keyname, "C%dNIT%d", is, j + 1 );
             }
-            SetValue( this, keyname, &cval, AST__STRING, comm );
+            SetValue( this, keyname, &cval, AST__STRING, combuf );
          }
       }
 
@@ -11989,6 +11990,7 @@ static AstObject *Read( AstChannel *this_channel ) {
    any of the other supported encodings, the header may only contain a 
    single FrameSet. */
    } else {
+      remove = 0;
 
 /* Only proceed if the FitsChan is at start-of-file. */
       if( !astTestCard( this ) && astOK ){ 
@@ -15495,7 +15497,6 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 
 /* Local Variables: */
    char buff[ FITSCARDLEN + 1 ]; /* Buffer for new card text */
-   char card[ FITSCARDLEN + 1 ]; /* Buffer for existing card text */
    const char *a;        /* Pointer to 1st character in next card */
    const char *b;        /* Pointer to terminating null character */
    const char *c;        /* Pointer to last character in next card */
@@ -16118,7 +16119,7 @@ static void WCSFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
 /* Loop round all the cards in the FitsChan obtaining the keyword name for 
    each card. Note, the single "=" is correct in the following "while"
    statement. */
-   while( keynam = CardName( fc ) ){
+   while( (keynam = CardName( fc )) ){
       item = NULL;
 
 /* Is this a primary CRVAL keyword? */

@@ -2918,7 +2918,6 @@ static void Norm( AstFrame *this_frame, double value[] ) {
    double sky_lat;               /* Sky latitude value */
    double sky_long;              /* Sky longitude value */
    double v[ 2 ];                /* Permuted value coordinates */
-   int neglon;                   /* Normalize longitude values into [-pi,pi]? */
    int stat;                     /* Status return from SLALIB */
    static double pi;             /* Value of pi */
    static int init = 0;          /* Value of pi initialised? */
