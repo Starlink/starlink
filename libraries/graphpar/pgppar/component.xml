@@ -4,7 +4,7 @@
 
 <component id="pgppar">
   <version>1.1-5</version>
-  <path>libraries/graphpar/gkspar</path>
+  <path>libraries/graphpar/pgppar</path>
   <description>ADAM Graphics Programming with PGPLOT</description>
   <abstract><p>
   Libraries for incorporating GKS PGPLOT graphics into ADAM applications. The
