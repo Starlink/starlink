@@ -24,7 +24,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -37,54 +36,58 @@
 *
 *    Local variables :
 *
-      CHARACTER*80             TEXT               ! Output buffer
+      CHARACTER*15		NAME			! A psf name
+      CHARACTER*80             	TEXT               	! Output buffer
 
-      INTEGER                  ILIB               ! Loop over libraries
-      INTEGER                  IMOD               ! Loop over modules
-      INTEGER                  IPSF               ! Psf column
+      INTEGER                  	ICMP			! Loop over list
+      INTEGER                  	IPSF               	! Psf column
+      INTEGER                  	NPSF               	! # psfs
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialised?
-      IF ( .NOT. PSFLIBINIT ) CALL PSF_LINIT( STATUS )
+*  Initialised?
+      IF ( .NOT. PSFINIT ) CALL PSF_INIT( STATUS )
 
-*    Display header for table
+*  Display header for table
       CALL MSG_PRNT( 'PSF system options : ' )
       CALL MSG_PRNT( ' ' )
 
-*    List the psfs available
+*  Find number of psfs
+      CALL ADI_NCMP( P_PLIST, NPSF, STATUS )
+
+*  List them
       IPSF = 1
-      DO ILIB = 1, L_NLIB
+      DO ICMP = 1, NPSF
 
-*      Loop over psfs in library
-        DO IMOD = 1, L_NMOD(ILIB)
+*    Index it
+        CALL ADI_IDXCMP( P_PLIST, PID, STATUS )
+        CALL ADI_NAME( PID, NAME, STATUS )
+        CALL ADI_ERASE( PID, STATUS )
 
-*        Clear buffer if first column
-          IF ( IPSF .EQ. 1 ) CALL CHR_FILL( ' ', TEXT )
+*    Clear buffer if first column
+        IF ( IPSF .EQ. 1 ) CALL CHR_FILL( ' ', TEXT )
 
-*        Write psf to buffer
-          TEXT(3+(IPSF-1)*15:) = L_MODN(IMOD,ILIB)(1:15)
+*    Write psf to buffer
+        TEXT(3+(IPSF-1)*15:) = NAME
 
-*        Next column
-          IF ( IPSF .EQ. 5 ) THEN
-            IPSF = 1
-            CALL MSG_PRNT( TEXT(1:79) )
-          ELSE
-            IPSF = IPSF + 1
-          END IF
-
-        END DO
+*    Next column
+        IF ( IPSF .EQ. 5 ) THEN
+          IPSF = 1
+          CALL MSG_PRNT( TEXT(1:79) )
+        ELSE
+          IPSF = IPSF + 1
+        END IF
 
       END DO
 
-*    Flush buffer
+*  Flush buffer
       IF ( IPSF .NE. 1 ) THEN
         CALL MSG_PRNT( TEXT(1:79) )
       END IF
 
-*    Plus line for models
+*  Plus line for models
       CALL MSG_PRNT( ' ' )
       CALL MSG_PRNT( '  CSPEC(psf/model,spec[,nbin])' )
       CALL MSG_PRNT( '  POLAR(psf,rbin[,abin])        RECT(psf'/

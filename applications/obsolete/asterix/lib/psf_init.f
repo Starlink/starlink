@@ -66,6 +66,9 @@
 *  Load the ADI package
       CALL ADI_REQPKG( 'psf', STATUS )
 
+*  Create the psf store
+      CALL ADI_NEW0( 'STRUC', P_PLIST, STATUS )
+
 *  Load the system psfs
       CALL PSF0_DEFPSF( 'ANALYTIC', PSF_ANAL_INIT, STATUS )
       CALL PSF0_DEFPSF( 'ASCA', PSF_ASCA_INIT, STATUS )
