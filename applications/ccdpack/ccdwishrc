@@ -1,0 +1,20 @@
+#+
+#  Name:
+#     ccdwishrc
+
+#  Purpose:
+#     Startup script for ccdwish.
+
+#  Description:
+#     This file is designed to be sourced when ccdwish starts up.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     10-NOV-2000 (MBT):
+#        Original version.
+#-
+
+#  Work round a bug in some window managers.
+      source $env(CCDPACK_DIR)/raisehack.tcl
