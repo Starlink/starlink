@@ -28,7 +28,7 @@
 *           cards are written. (These are not part of the standard.)
 *        o  The OBJECT, LABEL, and BUNITS keywords are derived from
 *           the TITLE, LABEL, and UNITS NDF components.
-*        o  The CDELTn, CRVALn, CRTYPEn and CTYPEn keywords are
+*        o  The CDELTn, CRVALn, CUNITn and CTYPEn keywords are
 *           derived from a set of linear NDF AXIS structures.
 *        o  DATE and ORIGIN cards are written.
 *        o  For integer DATA types a BLANK card is written using the
@@ -53,9 +53,9 @@
 *        The BITPIX value for the output FITS file.
 *     CMPTHE( NFLAGS ) = LOGICAL (Returned)
 *        The flags when set to true indicate that certain optional NDF
-*        components have been used to write descriptors to the BDF.
-*        In order they are 1) CRVARn and CDELTn, 2) CRTYPEn, 3) CTYPEn,
-*        4) TITLE, 5) LABEL, and 6) UNITS.
+*        components have been used to write descriptors to the NDF.
+*        In order they are 1) CRVARn, CDELTn, and CRPIXn 2) CUNITn,
+*        3) CTYPEn, 4) TITLE, 5) LABEL, and 6) UNITS.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -67,7 +67,10 @@
 *  History:
 *     1994 May 31 (MJC):
 *        Original version.
-*     {enter_any_changes_here}
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.  Write CRPIXn. 
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -191,9 +194,10 @@
 *  -------------------------
 *      
 *  For any axis structure present, the routine checks to see if each
-*  axis data array is linear. If it is, the start value and incremental
-*  value are written to the appropriate CRVALn and CDELTn keywords, as
-*  are the label and units, if present, to CRTYPEn and CTYPEn
+*  axis data array is linear.  If it is, the start value and incremental
+*  value are written to the appropriate CRVALn and CDELTn keywords
+*  defined at a reference pixel 1.0 written to the CRPIXn keyword,
+*  as are the label and units, if present, to CTYPEn and CUNITn
 *  respectively.  This is rather crude, as it deals with the axis
 *  system as a whole, and that the flags to indicate presence of
 *  components are for any of the axes.
@@ -279,8 +283,27 @@
      :                         FSTAT )
                END IF
 
-*  Write the label value to keyword CRTYPEn.
-*  =========================================
+*  Write the reference pixel to keyword CRPIXn.
+*  ============================================
+
+*  Form the keyword name.
+               KEYWRD = 'CRPIX'//C
+
+*  Write the CRPIXn card to the FITS header.  Allow space in the value
+*  for the maximum number of decimal places required for the
+*  appropriate data type.
+               IF ( ATYPE .EQ. '_DOUBLE' ) THEN
+                  CALL FTPKYD( FUNIT, KEYWRD, 1.0D0, VAL__SZD - 7,
+     :                         'Reference pixel along axis '//C,
+     :                         FSTAT )
+               ELSE
+                  CALL FTPKYE( FUNIT, KEYWRD, 1.0, VAL__SZR - 7,
+     :                         'Reference pixel along axis '//C,
+     :                         FSTAT )
+               END IF
+
+*  Write the label value to keyword CTYPEn.
+*  ========================================
 
 *  See whether an axis label is present or not.
                AXLFND = .FALSE.
@@ -288,7 +311,7 @@
                IF ( AXLFND ) THEN
 
 *  Form the keyword name.
-                  KEYWRD = 'CRTYPE'//C
+                  KEYWRD = 'CTYPE'//C
 
 *  Obtain the label's value and length.
                   CALL NDF_ACGET( NDF, 'Label', I, VALUE, STATUS )
@@ -303,7 +326,7 @@
      :                         'Label for axis '//C, FSTAT )
                END IF
 
-*  Write the units value to keyword CTYPEn.
+*  Write the units value to keyword CUNITn.
 *  ========================================
 
 *  See whether an axis units is present or not.
@@ -312,7 +335,7 @@
                IF ( AXUFND ) THEN
 
 *  Form the keyword name.
-                  KEYWRD = 'CTYPE'//C
+                  KEYWRD = 'CUNIT'//C
 
 *  Obtain the units' value and length.
                   CALL NDF_ACGET( NDF, 'Units', I, VALUE, STATUS )
@@ -364,7 +387,7 @@
 
 *  Write the actual card.
             CALL FTPKYJ( FUNIT, KEYWRD, LBND( I ), 
-     :                         'Pixel origin along axis '//C, FSTAT )
+     :                   'Pixel origin along axis '//C, FSTAT )
          END DO
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
