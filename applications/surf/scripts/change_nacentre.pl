@@ -148,9 +148,9 @@ __END__
 *    Should be run after EXTINCTION.
 
 *  Usage:
-     change_nacentre [-h | -v ] infile dx dy
+*    change_nacentre [-h | -v ] infile dx dy
 
-*  ADAM Parameter:
+*  ADAM Parameters:
 *    -h
 *      Return a help message only.
 *    -v
