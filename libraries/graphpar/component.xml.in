@@ -18,7 +18,6 @@
   <developers>
     <person>
       <name>P M Allan</name>
-      <uname>pma</uname>
     </person>
     <person>
       <name>Alan J Chipperfield</name>
@@ -27,15 +26,12 @@
     </person>
     <person>
       <name>Dave Terrett</name>
-      <uname>dlt</uname>
     </person>
     <person>
       <name>Sid Wright</name>
-      <uname>slw</uname>
     </person>
     <person>
       <name>Dennis Kelly</name>
-      <uname>bdk</uname>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
