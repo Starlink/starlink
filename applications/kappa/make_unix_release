@@ -45,6 +45,21 @@
 #         mv ./sun95.htx_tar ${KAPPA_DEV}/..
 #      endif
 
+#  Check for direct calls to NDF parameter routines. These should usually
+#  be replaced by equivalent NDG routines (to allow multiple invocations to 
+#  process groups of NDFs).
+      set n = `grep -il "PAR_STATE\|NDF_ASSOC\|NDF_PROP\|NDF_CREAT\|NDF_CREP" *.f`
+      if( "$a" != "" ) then
+         echo "The following files contain references to NDF parameter routines or"
+         echo "to PAR_STATE. Shouldn't these be replaced by equivalent NDG routines??
+         echo $n
+         echo -n "Continue? (Y/N): "
+         set ans = $<
+         if( "$ans" == "n" || "$ans" == "N" ) then
+            exit
+         endif
+      endif
+
 #  Copy the hypertext docs to the release directory.
       cp ${KAPPA_DEV}/../sun95.htx_tar ${REL_DIR}
       cp ${KAPPA_DEV}/../sun221.htx_tar ${REL_DIR}
