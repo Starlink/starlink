@@ -470,9 +470,9 @@
      These need to be after the declaration of the %update entity
      -->
 
-<!ENTITY % additional.special "| index | note | draftnote">
+<!ENTITY % additional.special "| note | draftnote">
 <!ENTITY % additional.structuring "| tabular">
-<!ENTITY % additional.references  "| citation | coderef">
+<!ENTITY % additional.references  "| index | citation | coderef">
 
 <![ %Full.SGML.Only; [
 <!ENTITY % paragraph.elements 
