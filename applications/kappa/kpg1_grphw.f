@@ -227,6 +227,7 @@
       INTEGER NMARG           ! No. of supplied margin widths
       LOGICAL AXES            ! Draw axes?
       LOGICAL LVAL            ! Unused logical argument
+      REAL DEFMAR             ! Default margin
       REAL DELTA              ! Axis range
       REAL HI                 ! Y at high end of error bar
       REAL LO                 ! Y at low end of error bar
@@ -398,7 +399,7 @@
 
 *  If markers are to be drawn, get the marker type to use.
       IF( MODE .EQ. 3 .OR. MODE .EQ. 5 ) THEN
-         CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .FALSE., IMARK, 
+         CALL PAR_GDR0I( 'MARKER', 2, -31, 10000, .TRUE., IMARK, 
      :                   STATUS )
       ELSE
          IMARK = 0
@@ -407,17 +408,28 @@
 *  See if annotated axes are required. 
       CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get the margin values, using a dynamic default of zero if no axes are 
 *  being created (to avoid the unnecessary creation of FRAME pictures by 
 *  KPG1_PLOT).
       IF( .NOT. AXES ) THEN
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
+         DEFMAR = 0.0
       ELSE
-         CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+         DEFMAR = 0.18
       END IF
 
+      CALL PAR_DEF1R( 'MARGIN', 1, DEFMAR, STATUS )
       CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
-      NMARG = MIN( 4, NMARG )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MARGIN( 1 ) = DEFMAR
+         NMARG = 1
+      ELSE
+         NMARG = MIN( 4, NMARG )
+      END IF
 
 *  Use the first MARGIN value for any unspecified edges.
       IF( STATUS .EQ. SAI__OK ) THEN 
@@ -425,7 +437,6 @@
             MARGIN( I ) = MARGIN( 1 )
          END DO
       END IF
-
 
 *  Create a FrameSet containing a single Frame in which the default values 
 *  for labels, symbols, title, etc can be set.
@@ -508,6 +519,9 @@
 *  routine wants to add anything else to the plot. This means the pointer
 *  will not be annulled by the following call to AST_END.
       CALL AST_EXPORT( IPLOT, STATUS )
+
+*  Tidy up
+ 999  CONTINUE
 
 *  End AST context.
       CALL AST_END( STATUS )
