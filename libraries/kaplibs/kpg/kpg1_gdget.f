@@ -45,10 +45,8 @@
 *     present, it will be the Current Frame in the Plot on exit. See
 *     "Usage" below for warnings about using this option.
 *
-*     Finally, two other Frames are added to the Plot representing normalised
-*     co-ordinates in the BASE and current picture. The two Frames have
-*     Domain BASEPIC and CURPIC, and the axis scales are equal in both 
-*     this Frames:
+*     Finally, some other Frames are added to the Plot representing 
+*     various normalised co-ordinates:
 *
 *     BASEPIC: The co-ordinates of the bottom left corner of the BASE
 *     picture are (0,0). The shorter dimension of the BASE picture has 
@@ -58,8 +56,11 @@
 *     picture are (0,0). The shorter dimension of the current picture has 
 *     length 1.0, and the other axis has a length greater than 1.0. 
 *
-*     If the Plot read from the database already contains either of these
-*     Frames then it is retained and no new Frame is added.
+*     NDC: Normalized device coordinates. The bottom left corner of the
+*     screen is (0,0) and the top-right corner is (1,1).
+*
+*     If the Plot read from the database already contains any of these
+*     Frames then they are retained and no new Frame is added.
 
 *  Usage:
 *     -  To create a new AGI picture, an AST-based application should 
@@ -157,6 +158,8 @@
 *     14-FEB-2000 (DSB):
 *        Set BASEPIC and CURPIC Format to %.3f to avoid loads of
 *        unnecessary digits being displayed by programs such as GDSTATE.
+*     4-DEC-2001 (DSB):
+*        Added NDC Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -198,8 +201,10 @@
       INTEGER WMAP                 ! GRAPHICS->BASEPIC/CURPIC WinMap
       INTEGER BPIC                 ! BASEPIC Frame
       INTEGER CPIC                 ! CURPIC Frame
+      INTEGER NPIC                 ! NDC Frame
       INTEGER IBPIC                ! Index of BASEPIC Frame
       INTEGER ICPIC                ! Index of CURPIC Frame
+      INTEGER INPIC                ! Index of NDC Frame
       INTEGER ICURR                ! Index of original current Frame
       INTEGER IPICL                ! AGI identifier for picture to use
       INTEGER IWOCO                ! Index of AGI world co-ordinates Frame
@@ -396,6 +401,55 @@
          IF( NAME .EQ. 'DATA' ) THEN
             CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
          END IF
+
+      END IF
+
+*  Add a Frame representing normalized device co-ordinates. This picture 
+*  has (in general) un-equals scales on each axis. The bottom left corner
+*  is (0,0) and the top right is (1,1). This Frame is given the Domain NDC.
+*  ====================================================================
+
+*  See if the Plot already contains an NDC Frame.
+      CALL KPG1_ASFFR( IPLOT, 'NDC', INPIC, STATUS )
+
+*  If not, add one into the Plot now.
+      IF( INPIC .EQ. AST__NOFRAME ) THEN
+
+*  Get the bounds of the entire view surface in millimetres.
+         CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+
+*  Store these as the GRAPHICS co-ordinates.
+         INA( 1 ) = DBLE( BX( 1 ) )
+         INA( 2 ) = DBLE( BX( 2 ) )
+         INB( 1 ) = DBLE( BX( 3 ) )
+         INB( 2 ) = DBLE( BX( 4 ) )
+
+*  Store the bounds of the view surface in NDC co-ordinates.
+         OUTA( 1 ) = 0.0D0
+         OUTA( 2 ) = 0.0D0
+         OUTB( 1 ) = 1.0D0
+         OUTB( 2 ) = 1.0D0
+
+*  Create a WinMap which scales millimetres into NDC co-ordinates.
+         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+
+*  Create the NDC Frame.
+         NPIC = AST_FRAME( 2, 'DOMAIN=NDC,TITLE=Normalised device '//
+     :                     'co-ordinates.,'//
+     :                     'Symbol(1)=X,Symbol(2)=Y,'//
+     :                     'Label(1)=Horizontal offset,'//
+     :                     'Label(2)=Vertical offset,'//
+     :                     'Format(1)=%.3f,Format(2)=%.3f',
+     :                     STATUS )
+
+*  Save the original current Frame index.
+         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+
+*  Add the NDC Frame into the Plot.      
+         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, NPIC, STATUS )
+
+*  Re-instate the original current Frame index. 
+         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
       END IF
 

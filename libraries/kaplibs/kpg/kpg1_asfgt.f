@@ -50,6 +50,8 @@
 *        Added BASEPIC as a special case Domain.
 *     15-OCT-1999 (DSB):
 *        Added CURPIC as a special case Domain.
+*     4-DEC-2001 (DSB):
+*        Added NDC as a special case Domain.
 *     {enter_further_changes_here}
 
 *-
@@ -113,7 +115,7 @@
 
 *  Get the number of axes for the Frame.
          IF( DOM .EQ. 'GRAPHICS' .OR. DOM .EQ. 'BASEPIC' .OR.
-     :       DOM .EQ. 'CURPIC' ) THEN
+     :       DOM .EQ. 'CURPIC' .OR. DOM .EQ. 'NDC' ) THEN
             NAX = 2
          ELSE
             CALL PAR_GDR0I( PDIM, 2, 1, NDF__MXDIM, .FALSE., NAX, 
@@ -196,6 +198,11 @@
             CALL AST_SETC( FRM, 'Title', 'Normalised world '//
      :                     'co-ordinates in the AGI BASE picture.', 
      :                     STATUS )
+
+*  PGPLOT normalized device coords
+         ELSE IF( DOM .EQ. 'NDC' ) THEN
+            CALL AST_SETC( FRM, 'Title', 'Normalised device '//
+     :                     'co-ordinates.', STATUS )
 
 *  AGI picture normalized co-ordinates.
          ELSE IF( DOM .EQ. 'CURPIC' ) THEN
