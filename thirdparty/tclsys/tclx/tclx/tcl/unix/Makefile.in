@@ -124,7 +124,7 @@ TEST_SAOBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o tclXunixTestSA.o
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: tcl checkup RUNTIME tclXtest
+all: checkup RUNTIME tclXtest
 
 static:	tcl.static tclXtest.static
 
@@ -310,8 +310,6 @@ install-runtime:
 	    ${INSTALL_ROOT}${TCLX_INST_RUNTIME}
 
 install-exec:
-	${INSTCOPY} tcl ${INSTALL_ROOT}${TCLX_INST_BIN}
-	${STRIP} ${INSTALL_ROOT}${TCLX_INST_BIN}/tcl
 	if test "X@TCLX_STLIB_BUILD_REF@" != "X"; then \
 	    ${INSTCOPY} ${TCLX_STLIB_NAME} ${INSTALL_ROOT}${TCLX_INST_LIB}; \
 	    ${RANLIB} ${INSTALL_ROOT}${TCLX_INST_LIB}/${TCLX_STLIB_NAME}; \

@@ -85,7 +85,7 @@ TEST_SAOBJS = tkTest.o tkSquare.o tkXunixTestSA.o
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: wishx RUNTIME tktest
+all: RUNTIME 
 
 static: wishx.static tktest.static
 
@@ -217,8 +217,6 @@ install-runtime:
 	${INSTCOPY} tkx.tcl ${INSTALL_ROOT}${TKX_INST_RUNTIME}
 
 install-exec:
-	${INSTCOPY} wishx ${INSTALL_ROOT}${TKX_INST_BIN}
-	${STRIP} ${INSTALL_ROOT}${TKX_INST_BIN}/wishx
 	if test "X@TKX_STLIB_BUILD_REF@" != "X"; then \
 	    ${INSTCOPY} ${TKX_STLIB_NAME} ${INSTALL_ROOT}${TKX_INST_LIB}; \
 	    ${RANLIB} ${INSTALL_ROOT}${TKX_INST_LIB}/${TKX_STLIB_NAME}; \
