@@ -1,0 +1,32 @@
+dnl    Process this file with autoconf to produce a configure script
+AC_REVISION($Revision$)
+
+AC_INIT(esp, 0.11, ussc@star.rl.ac.uk)
+
+AC_PREREQ(2.50)
+AM_INIT_AUTOMAKE(1.8.2-starlink)
+
+AC_CONFIG_SRCDIR([ELP_PAR])
+
+STAR_DEFAULTS(per-package-dirs)
+
+dnl    Find required versions of the programs we need for configuration
+AC_PROG_FC
+AC_PROG_FPP
+dnl AC_PROG_LIBTOOL
+STAR_MONOLITHS
+
+AC_C_BIGENDIAN
+
+dnl    Other options here, such as
+dnl STAR_HAVE_FC_OPEN_READONLY
+STAR_CNF_COMPATIBLE_SYMBOLS
+
+dnl    Declare the build and use dependencies for this package
+STAR_DECLARE_DEPENDENCIES(build, [agi ast cat chr fio grp hds ndf par mers pda prm psx sae sgs subpar])
+
+STAR_LATEX_DOCUMENTATION(sun180)
+
+AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_FILES([Makefile component.xml esp1_vers.f])
+AC_OUTPUT

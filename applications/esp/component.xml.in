@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/esp</path>
+  <description>Extended Surface Photometry</description>
+  <abstract><p>ESP (Extended Surface Photometry) is a package of
+      application programs developed to allow you to determine the
+      photometric properties of galaxies and other extended objects.</p>
+    <p>It has applications that: detect flatfielding faults, remove
+  cosmic rays, median filter images, determine image statistics,
+  determine local background values, perform galaxy profiling, fit 2-D
+  Gaussian profiles to galaxies,  generate  pie slice cross-sections
+  of galaxies and display profiling results.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Grant Privett</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
