@@ -38810,7 +38810,7 @@ plot (7k).
       used (see parameter MAPTYPE).
 
       When adding a new Frame to a WCS component, the Mapping is used to
-      connect the new Frame to an existing one (called the {\tt "}basis{\tt "}
+      connect the the new Frame to an existing one (called the {\tt "}basis{\tt "}
       Frame). The newly added Frame is a copy of the basis Frame, with
       the new Domain attribute specified by parameter DOMAIN, and becomes
       the current co-ordinate Frame in the NDF. If necessary, other
@@ -38848,7 +38848,7 @@ plot (7k).
          The distortion coefficient of a pincushion distortion. Used
          in conjunction with the CENTRE parameter, this defines the
          forward transformation to be used as follows:
-         \begin{eqnarray*}
+      \begin{eqnarray*}
             XX &=& X + D * (X - C1) * ( (X - C1)^2 + (Y - C2)^2 ) \\
             YY &=& Y + D * (Y - C2) * ( (X - C1)^2 + (Y - C2)^2 ) 
          \end{eqnarray*}
@@ -38879,15 +38879,21 @@ plot (7k).
          suggested default is the value stored in the basis Frame.
       }
       \sstsubsection{
-         FOREXP( ) = LITERAL (Read)
+         FOREXP = LITERAL (Read)
       }{
-         The expressions to be used for the forward co-ordinate
+         A group of expressions to be used for the forward co-ordinate
          transformations in a MathMap. There must be at least as many
          expressions as the number of axes of the Mapping, but there
-         may be more if intermediate expressions are to be used.
-         Expression syntax is fortran-like; see the AST\_MATHMAP
-         documentation in SUN/210 for details. Only used when
-         MAPTYPE=MATH.
+         may be more if intermediate expressions are to be used. The
+         expressions may be given directly in response to the prompt, or
+         read from a text file, in which case the name of the file should
+         be given, preceeded by a {\tt "}$\wedge${\tt "} character. Individual expression
+         should be separated by commas or, if they are supplied in a file,
+         new-lines (see SUN/95 section {\tt "}Specifying Groups of Objects{\tt "}
+         which is within the section {\tt "}Parameters{\tt "}). The suntax for each
+         expression is fortran-like; see the {\tt "}Examples{\tt "} section below, and
+         the AST\_MATHMAP documentation in SUN/210 for details. Only used
+         when MAPTYPE=MATH.
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -38914,14 +38920,10 @@ plot (7k).
          }
       }
       \sstsubsection{
-         INVEXP( ) = LITERAL (Read)
+         INVEXP = LITERAL (Read)
       }{
          The expressions to be used for the inverse co-ordinate
-         transformations in a MathMap. There must be at least as many
-         expressions as the number of axes of the Mapping, but there
-         may be more if intermediate expressions are to be used.
-         Expression syntax is fortran-like; see the AST\_MATHMAP
-         documentation in SUN/210 for details. Only used when
+         transformations in a MathMap. See FOREXP. Only used when
          MAPTYPE=MATH.
       }
       \sstsubsection{
@@ -38981,7 +38983,7 @@ plot (7k).
             ZOOM       -- A uniform expansion/contraction (see parameter ZOOM)
 
          }
-         {\tt [LINEAR]}
+         {\tt ["LINEAR"]}
       }
       \sstsubsection{
          NAXES = \_INTEGER (Read)
@@ -39029,8 +39031,6 @@ plot (7k).
          the basis Frame, and co-ordinates (U,V,W,...) in the new Frame,
          then the following transformations would be used, depending on
          how many axes the two Frames have:
-
-
          \begin{itemize}
 
             \item 1-dimensional:
@@ -39052,7 +39052,6 @@ plot (7k).
             \end{eqnarray*}
 
          \end{itemize}
-
          The correct number of values must be supplied (that is, N$*$(N$+$1)
          where N is the number of axes in the new and old Frames). If a
          null value (!) is given it is assumed that the new Frame and the
@@ -39112,15 +39111,29 @@ plot (7k).
       }
       \sstexamplesubsection{
          wcsadd plane pixel polar math simpif simpfi \\
-         forexp=[{\tt "}r=sqrt(x$*$x$+$y$*$y){\tt "},{\tt "}theta=atan2(y,x){\tt "}] \\
-         invexp=[{\tt "}x=r$*$cos(theta){\tt "},{\tt "}y=r$*$sin(theta){\tt "}]
+            forexp={\tt "}{\tt '}r=sqrt(x$*$x$+$y$*$y),theta=atan2(y,x){\tt '}{\tt "} \\
+            invexp={\tt "}{\tt '}x=r$*$cos(theta),y=r$*$sin(theta){\tt '}{\tt "}
       }{
-         A new Frame is added giving a polar view of the pixel
-         co-ordinates
+         A new Frame is added which gives pixel positions in polar
+         co-ordinates. Fortran-like expressions are supplied which define
+         both the forward and inverse transformations of the Mapping. The
+         symbols {\tt "}x{\tt "} and {\tt "}y{\tt "} are used to represent the two input Cartesian
+         pixel co-ordinate axes, and the symbols {\tt "}r{\tt "} and {\tt "}theta{\tt "} are used to
+         represent the output polar co-ordinates. Note, the single quotes
+         are needed when running from the Unix shell in order to prevent
+         the shell interpreting the parentheses and commas within the
+         expressions.
       }
       \sstexamplesubsection{
-         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion \\
-         disco=5.3e-10
+         wcsadd plane pixel polar math simpif simpfi forexp=$\wedge$ft invexp=$\wedge$it
+      }{
+         As above, but the expressions defining the transformations are
+         supplied in two text files called {\tt "}ft{\tt "} and {\tt "}it{\tt "}, instead of being
+         supplied directly. Each file could contain the two expression on
+         two separate lines.
+      }
+      \sstexamplesubsection{
+         wcsadd ndf=$\backslash$! naxes=2 mapout=pcd.ast maptype=pincushion disco=5.3e-10
       }{
          This constructs a pincushion-type distortion Mapping centred
          on the origin with a distortion coefficient of 5.3e-10,

@@ -30,7 +30,7 @@
 *     used (see parameter MAPTYPE).
 *     
 *     When adding a new Frame to a WCS component, the Mapping is used to 
-*     connect the new Frame to an existing one (called the "basis" 
+*     connect the the new Frame to an existing one (called the "basis" 
 *     Frame). The newly added Frame is a copy of the basis Frame, with 
 *     the new Domain attribute specified by parameter DOMAIN, and becomes 
 *     the current co-ordinate Frame in the NDF. If necessary, other 
@@ -84,14 +84,20 @@
 *        ("1996.8" for example). Such values are interpreted as a Besselian 
 *        epoch if less than 1984.0 and as a Julian epoch otherwise. The 
 *        suggested default is the value stored in the basis Frame.
-*     FOREXP( ) = LITERAL (Read)
-*        The expressions to be used for the forward co-ordinate 
+*     FOREXP = LITERAL (Read)
+*        A group of expressions to be used for the forward co-ordinate 
 *        transformations in a MathMap. There must be at least as many
 *        expressions as the number of axes of the Mapping, but there
-*        may be more if intermediate expressions are to be used.
-*        Expression syntax is fortran-like; see the AST_MATHMAP
-*        documentation in SUN/210 for details. Only used when
-*        MAPTYPE=MATH.
+*        may be more if intermediate expressions are to be used. The 
+*        expressions may be given directly in response to the prompt, or 
+*        read from a text file, in which case the name of the file should
+*        be given, preceeded by a "^" character. Individual expression
+*        should be separated by commas or, if they are supplied in a file,
+*        new-lines (see SUN/95 section "Specifying Groups of Objects"
+*        which is within the section "Parameters"). The suntax for each 
+*        expression is fortran-like; see the "Examples" section below, and 
+*        the AST_MATHMAP documentation in SUN/210 for details. Only used 
+*        when MAPTYPE=MATH.
 *     FRAME = LITERAL (Read)
 *        A string specifying the basis Frame. If a null value is supplied
 *        the current co-ordinate Frame in the NDF is used. The string can 
@@ -108,13 +114,9 @@
 *        - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) 
 *        (see section "Sky Co-ordinate Systems" in SUN/95).
 *
-*     INVEXP( ) = LITERAL (Read)
+*     INVEXP = LITERAL (Read)
 *        The expressions to be used for the inverse co-ordinate 
-*        transformations in a MathMap. There must be at least as many
-*        expressions as the number of axes of the Mapping, but there
-*        may be more if intermediate expressions are to be used.
-*        Expression syntax is fortran-like; see the AST_MATHMAP
-*        documentation in SUN/210 for details. Only used when
+*        transformations in a MathMap. See FOREXP. Only used when
 *        MAPTYPE=MATH.
 *     MAPIN = FILENAME (Read)
 *        The  name of a file containing an AST Mapping with which to
@@ -242,12 +244,24 @@
 *        which matches the GRID-domain co-ordinates in the first two
 *        axes, but is translated by 1024 pixels on the third axis.
 *     wcsadd plane pixel polar math simpif simpfi 
-*     forexp=["r=sqrt(x*x+y*y)","theta=atan2(y,x)"]
-*     invexp=["x=r*cos(theta)","y=r*sin(theta)"]
-*        A new Frame is added giving a polar view of the pixel 
-*        co-ordinates
+*           forexp="'r=sqrt(x*x+y*y),theta=atan2(y,x)'"
+*           invexp="'x=r*cos(theta),y=r*sin(theta)'"
+*        A new Frame is added which gives pixel positions in polar
+*        co-ordinates. Fortran-like expressions are supplied which define 
+*        both the forward and inverse transformations of the Mapping. The
+*        symbols "x" and "y" are used to represent the two input Cartesian
+*        pixel co-ordinate axes, and the symbols "r" and "theta" are used to
+*        represent the output polar co-ordinates. Note, the single quotes 
+*        are needed when running from the Unix shell in order to prevent
+*        the shell interpreting the parentheses and commas within the 
+*        expressions.
+*     wcsadd plane pixel polar math simpif simpfi forexp=^ft invexp=^it
+*        As above, but the expressions defining the transformations are
+*        supplied in two text files called "ft" and "it", instead of being
+*        supplied directly. Each file could contain the two expression on 
+*        two separate lines.
 *     wcsadd ndf=\! naxes=2 mapout=pcd.ast maptype=pincushion
-*     disco=5.3e-10
+*           disco=5.3e-10
 *        This constructs a pincushion-type distortion Mapping centred
 *        on the origin with a distortion coefficient of 5.3e-10,
 *        and writes out the Mapping as a text file called pcd.ast.
@@ -278,7 +292,8 @@
 *        Added MAPTYPE, MAPOUT and other parameters and several new 
 *        Mapping types.
 *     8-JAN-2002 (DSB):
-*        Minor prologue changes.
+*        Minor prologue changes. Change some parameter logic. Use GRP to
+*        get the MATHMAP expressions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -294,6 +309,7 @@
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
       INCLUDE 'PAR_ERR'          ! PAR error constants 
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Status:
       INTEGER STATUS
@@ -305,14 +321,12 @@
 *  Local Constants:
       INTEGER MAXEXP             ! Maximum number of expressions for MathMap
       PARAMETER( MAXEXP = 12 )
-      INTEGER MAXELN             ! Maximum length of expressions for MathMap
-      PARAMETER( MAXELN = 512 )
 
 *  Local Variables:
       CHARACTER DOM*40           ! Domain for new Frame
       CHARACTER MAPTYP*16        ! Type of transformation to add
-      CHARACTER FOREXP( MAXEXP ) * ( MAXELN ) ! Forward expressions for MathMap
-      CHARACTER INVEXP( MAXEXP ) * ( MAXELN ) ! Inverse expressions for MathMap
+      CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions for MathMap
+      CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions for MathMap
       DOUBLE PRECISION CENTRE( 2 ) ! Pincushion distortion centre
       DOUBLE PRECISION DET       ! Matrix determinant
       DOUBLE PRECISION DIAG( NDF__MXDIM ) ! Diagonal matrix elements
@@ -334,6 +348,7 @@
       INTEGER FRMN               ! Pointer to new Frame
       INTEGER I                  ! General loop count
       INTEGER IBASIS             ! Index of basis Frame
+      INTEGER IGRP               ! GRP group for MATHMAP expresssions
       INTEGER INDF               ! NDF identifier for NDF being modified
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Column index
@@ -525,33 +540,56 @@
 *  Create a MathMap from algebraic expressions supplied by the user.
       ELSE IF ( MAPTYP .EQ. 'MATH' ) THEN
          
-*  Get the algebraic expressions for the forward transformation.
-         NFEXP = 0
- 5       CONTINUE
-         CALL PAR_GET1C( 'FOREXP', MAXEXP, FOREXP( NFEXP + 1 ), NEXP,
-     :                   STATUS )
-         NFEXP = NFEXP + NEXP
-         IF ( NFEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) THEN
+*  Get a GRP group holding the algebraic expressions for the forward 
+*  transformation.
+         IGRP = GRP__NOID
+         CALL KPG1_GTGRP( 'FOREXP', IGRP, NFEXP, STATUS )
+         DO WHILE( NFEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) 
             CALL MSG_SETI( 'N', NAXB )
-            CALL MSG_OUT( 'WCSADD_MSG2', 'At least ^N expressions '//
-     :                    'required - please enter more', STATUS )
+            CALL MSG_OUT( 'WCSADD_MSG2', 'At least ^N forward '//
+     :                    'expressions are required - please enter '//
+     :                    'them again.', STATUS )
             CALL PAR_CANCL( 'FOREXP', STATUS )
-            GO TO 5
+            CALL KPG1_GTGRP( 'FOREXP', IGRP, NFEXP, STATUS )
+         END DO
+
+*  Report an error if too many expressions were given.
+         IF( NFEXP .GT. MAXEXP .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'MX', MAXEXP )
+            CALL MSG_SETI( 'N', NFEXP )
+            CALL MSG_OUT( 'WCSADD_MSG3', 'Too many (^N) forward '//
+     :                    'expressions given. No more than ^MX '//
+     :                    'should be supplied.', STATUS )
          END IF
 
-*  Get the algebraic expressions for the inverse transformation.
-         NIEXP = 0
- 6       CONTINUE
-         CALL PAR_GET1C( 'INVEXP', MAXEXP, INVEXP( NIEXP + 1 ), NEXP,
-     :                   STATUS )
-         NIEXP = NIEXP + NEXP
-         IF ( NIEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) THEN
+*  Copy the expressions into a local array.
+         CALL GRP_GET( IGRP, 1, NFEXP, FOREXP, STATUS ) 
+
+*  Similarly, get the algebraic expressions for the inverse transformation.
+         CALL KPG1_GTGRP( 'INVEXP', IGRP, NIEXP, STATUS )
+         DO WHILE( NIEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) 
             CALL MSG_SETI( 'N', NAXB )
-            CALL MSG_OUT( 'WCSADD_MSG3', 'At least ^N expressions '//
-     :                    ' required - please enter more', STATUS )
+            CALL MSG_OUT( 'WCSADD_MSG4', 'At least ^N inverse '//
+     :                    'expressions are required - please enter '//
+     :                    'them again.', STATUS )
             CALL PAR_CANCL( 'INVEXP', STATUS )
-            GO TO 6
+            CALL KPG1_GTGRP( 'INVEXP', IGRP, NIEXP, STATUS )
+         END DO
+
+         IF( NIEXP .GT. MAXEXP .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'MX', MAXEXP )
+            CALL MSG_SETI( 'N', NIEXP )
+            CALL MSG_OUT( 'WCSADD_MSG3', 'Too many (^N) inverse '//
+     :                    'expressions given. No more than ^MX '//
+     :                    'should be supplied.', STATUS )
          END IF
+
+         CALL GRP_GET( IGRP, 1, NIEXP, INVEXP, STATUS ) 
+
+*  Delete the group.
+         CALL GRP_DELET( IGRP, STATUS )
 
 *  See whether it looks as if non-dummy expressions have been supplied
 *  for both forward and inverse transformations.  This is not foolproof,
@@ -621,14 +659,28 @@
          MAP = AST_ZOOMMAP( NAXB, ZOOM, ' ', STATUS )
       END IF
 
+*  Simplify the Mapping
+      MAP = AST_SIMPLIFY( MAP, STATUS )
+
 *  Use the constructed Mapping.
 *  ============================
 
-*  Write the Mapping out to a text file. If no text file was required (i.e.
-*  if a null parameter value was supplied), annull the error.
+*  Write the Mapping out to a text file. 
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
-      IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+
+*  If a null value was supplied, annull the error
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      
+*  If we do not have an NDF, cancel the parameter and try once more to 
+*  create an output file. We do this because the default value for
+*  MAPOUT in the ifl file is a null.
+         IF( INDF .EQ. NDF__NOID ) THEN
+            CALL PAR_CANCL( 'MAPOUT', STATUS )
+            CALL ATL1_CREAT( 'MAPOUT', MAP, STATUS )
+         END IF
+      END IF      
          
 *  If we have an NDF, add the new Frame into the FrameSet, and store
 *  the modified FrameSet in the NDF.
