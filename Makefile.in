@@ -18,34 +18,56 @@ MANIFEST=$(prefix)/manifests
 #         dependency order.
 ALL_TARGETS = \
 	$(MANIFEST)/adam \
+	$(MANIFEST)/agi \
 	$(MANIFEST)/ams \
 	$(MANIFEST)/ard \
+	$(MANIFEST)/ast \
 	$(MANIFEST)/atimer \
+	$(MANIFEST)/cat \
 	$(MANIFEST)/chr \
 	$(MANIFEST)/cnf \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
+	$(MANIFEST)/gks \
+	$(MANIFEST)/gns \
+	$(MANIFEST)/graphpar \
+	$(MANIFEST)/grp \
+	$(MANIFEST)/gsd \
+	$(MANIFEST)/gwm \
 	$(MANIFEST)/hds \
 	$(MANIFEST)/hdspar \
 	$(MANIFEST)/hlp \
+	$(MANIFEST)/idi \
+	$(MANIFEST)/img \
 	$(MANIFEST)/lex \
+	$(MANIFEST)/mag \
 	$(MANIFEST)/mers \
 	$(MANIFEST)/messgen \
 	$(MANIFEST)/messys \
 	$(MANIFEST)/misc \
 	$(MANIFEST)/msp \
+	$(MANIFEST)/nbs \
+	$(MANIFEST)/ndf \
 	$(MANIFEST)/ndg \
+	$(MANIFEST)/one \
 	$(MANIFEST)/par \
 	$(MANIFEST)/parsecon \
+	$(MANIFEST)/pda \
+	$(MANIFEST)/pgp \
+	$(MANIFEST)/prm \
 	$(MANIFEST)/psx \
+	$(MANIFEST)/ref \
 	$(MANIFEST)/sae \
+	$(MANIFEST)/sgs \
 	$(MANIFEST)/sla \
 	$(MANIFEST)/sock \
 	$(MANIFEST)/sst \
 	$(MANIFEST)/string \
 	$(MANIFEST)/subpar \
-	$(MANIFEST)/task
+	$(MANIFEST)/task \
+	$(MANIFEST)/trn
+
 
 # Targets present in tree, but excluded from list
 #   adamnet -- obsolete
