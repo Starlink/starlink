@@ -27,6 +27,7 @@
 *        -  Add a new frame
 *        -  Remove a frame
 *        -  Set an attribute for a frame
+*        -  Show the frames which currently exist
 *
 *     The routine does not fail if some of the requested edits cannot
 *     be performed, but an output parameter MODIFIED records which 
@@ -78,6 +79,7 @@
 *                                will be changed), and will be mapped 
 *                                from it using the mapping given.
 *           -  MODE = SET     -- The frame whose attributes are to be set
+*           -  MODE = SHOW    -- This parameter is ignored
 *
 *        The value of this parameter can be one of the following:
 *           -  A domain name such as SKY, AXIS, PIXEL, etc.
@@ -138,6 +140,7 @@
 *                          unless the Current one is removed)
 *           -  SET      -- Set frame attributes (Current frame is not
 *                          changed)
+*           -  SHOW     -- Display a list of the frames which exist
 *        [CURRENT]
 *     MODIFIED = LITERAL (Write)
 *        On exit, this parameter gives a comma-separated list of all the
@@ -173,6 +176,10 @@
 *        This changes the value of the Domain attribute of the current 
 *        frame in the WCS component of NDF1 to the name "NEW" and 
 *        sets the Title attribute of the frame to "New frame".
+*
+*     wcsedit image1 show
+*        This displays all the frames in image1 with their domains and
+*        titles, and indicates which one is Current.
 
 *  Notes:
 *     This routine provides similar functionality to that provided by
@@ -189,6 +196,8 @@
 *  History:
 *     18-MAY-1999 (MBT):
 *        Original version.
+*     2-NOV-1999 (MBT):
+*        Added SHOW mode.
 *     {enter_changes_here}
 
 *-
@@ -214,6 +223,7 @@
       PARAMETER( MXMDLN = 2048 ) ! Should be long enough
 
 *  Local Variables:
+      CHARACTER * ( 80 ) BUFFER  ! Buffer for line output
       CHARACTER * ( 16 ) MAPTYP  ! Type of mapping to use
       CHARACTER * ( 16 ) MODE    ! Action to perform
       CHARACTER * ( IRH__SZNAM ) NAME ! Name of NDF
@@ -224,9 +234,12 @@
       CHARACTER * ( AST__SZCHR ) SET ! String pass to AST_SET
       CHARACTER * ( MXMDLN ) MODIF ! List of modified NDFs
       DOUBLE PRECISION COEFFS( 6 ) ! Coefficients of mapping
+      INTEGER BL                 ! Buffer length
       INTEGER FRTARG             ! AST pointer to target frame
+      INTEGER FRM                ! AST pointer to frame
       INTEGER FRNEW              ! AST pointer to new frame
       INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
       INTEGER INDF               ! NDF identifier
       INTEGER INGRP              ! IRG identifier for NDF group
       INTEGER IWCS               ! AST pointer to WCS component
@@ -257,15 +270,39 @@
       CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
 
 *  Get mode.
-      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET', 
+      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET,SHOW', 
      :                .FALSE., MODE, STATUS )
 
 *  Get frame specification.
-      CALL PAR_GET0C( 'FRAME', FRAME, STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
+      IF ( MODE .EQ. 'SHOW' ) THEN
          FRAME = ' '
+      ELSE
+         CALL PAR_GET0C( 'FRAME', FRAME, STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            FRAME = ' '
+         END IF
       END IF
+
+*  Print out any requisite header information.
+      CALL CCD1_MSG( ' ', ' ', STATUS )
+      IF ( MODE .EQ. 'SHOW' ) THEN
+         BUFFER = ' '
+         BUFFER( 1: ) = 'Index'
+         BUFFER( 7: ) = 'Cur'
+         BUFFER( 12: ) = 'Domain'
+         BUFFER( 30: ) = 'Title'
+         CALL MSG_SETC( 'BUFFER', BUFFER )
+         CALL CCD1_MSG( ' ', '    ^BUFFER', STATUS )
+         BUFFER = ' '
+         BUFFER( 1: ) = '-----'
+         BUFFER( 7: ) = '---'
+         BUFFER( 12: ) = '------'
+         BUFFER( 30: ) = '-----'
+         CALL MSG_SETC( 'BUFFER', BUFFER )
+         CALL CCD1_MSG( ' ', '    ^BUFFER', STATUS )
+      END IF
+         
 
 *  Get ready to loop over NDFs.
       MODIF = ' '
@@ -279,8 +316,8 @@
          CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
 *  Log to user.
-         CALL IRH_GET( INGRP, I, 1, NAME, STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL IRH_GET( INGRP, I, 1, NAME, STATUS )
          CALL MSG_SETC( 'NDF', NAME )
          CALL CCD1_MSG( ' ', '^NDF:', STATUS )
 
@@ -329,6 +366,29 @@
                CALL CCD1_MSG( ' ',  '      Setting "^SET"' //
      :                        ' applied to domain ^DOM', STATUS )
                SUCCES = .TRUE.
+
+*  Show state of WCS component.
+            ELSE IF ( MODE .EQ. 'SHOW' ) THEN
+
+*  Loop through each frame in frameset.
+               DO 2 J = 1, AST_GETI( IWCS, 'Nframe', STATUS )
+
+*  Construct a string with Current indicator, domain and title.
+                  FRM = AST_GETFRAME( IWCS, J, STATUS )
+                  BUFFER = ' '
+                  CALL MSG_FMTI( 'IND', 'I3', J )
+                  CALL MSG_LOAD( ' ', '^IND', BUFFER( 1: ), BL, STATUS )
+                  IF ( J .EQ. JCUR ) BUFFER( 8:8 ) = '*'
+                  BUFFER( 12: ) = AST_GETC( FRM, 'Domain', STATUS )
+                  IF ( CHR_LEN( BUFFER ) .GT. 28 ) BUFFER( 26: ) = '...'
+                  BUFFER( 30: ) = AST_GETC( FRM, 'Title', STATUS )
+                  IF ( CHR_LEN( BUFFER ) .GT. 72 ) BUFFER( 70: ) = '...'
+
+*  Output buffer.
+                  CALL MSG_SETC( 'BUFFER', BUFFER )
+                  CALL CCD1_MSG( ' ', '    ^BUFFER', STATUS )
+ 2             CONTINUE
+               SUCCES = .TRUE.
                
 *  Remove a frame.
             ELSE IF ( MODE .EQ. 'REMOVE' ) THEN
@@ -338,14 +398,14 @@
 *  just remove the single frame specified.
 *  First try to remove it as a domain name.  This leaves the Current 
 *  frame intact where possible.
-               CALL PAR_GET0C( 'FRAME', DMRMV, STATUS )
-               CALL CCD1_DMPRG( IWCS, DMRMV, .TRUE., 0, STATUS )
+               IF ( FRAME .NE. ' ' ) THEN
+                  CALL CCD1_DMPRG( IWCS, FRAME, .TRUE., 0, STATUS )
 
 *  If this has reduced the number of frames then it has succeeded.
-               IF ( AST_GETI( IWCS, 'Nframe', STATUS ) .LT. NFRAME ) 
-     :         THEN
-                  SUCCES = .TRUE.
-               ELSE
+                  SUCCES = AST_GETI( IWCS, 'Nframe', STATUS ) 
+     :                     .LT. NFRAME 
+               END IF
+               IF ( .NOT. SUCCES ) THEN
 
 *  Otherwise we can just remove the target frame.
                   CALL AST_REMOVEFRAME( IWCS, JTARG, STATUS )
@@ -412,7 +472,7 @@
 
             END IF
 
-            IF ( SUCCES ) THEN
+            IF ( SUCCES .AND. .NOT. MODE .EQ. 'SHOW' ) THEN
 
 *  Write out the modified WCS component.
                CALL NDF_PTWCS( IWCS, INDF, STATUS )

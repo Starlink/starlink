@@ -38,7 +38,7 @@
              access READ
              vpath PROMPT
              ppath CURRENT DEFAULT
-             prompt {Action to perform (CURRENT,ADD,REMOVE,SET)}
+             prompt {Action to perform (CURRENT,ADD,REMOVE,SET,SHOW)}
              default CURRENT
              helpkey *
           }
