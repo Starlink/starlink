@@ -70,11 +70,6 @@
       INTEGER			P_FID(PSF_NMAX)		! Dataset identifiers
       INTEGER			P_PSID(PSF_NMAX)	! Psf description
 
-*  Time and energy bands
-      LOGICAL                   TE_INIT           	! Initialised yet?
-      INTEGER                   TE_ELO, TE_EHI    	! Energy bands
-      DOUBLE   PRECISION        TE_TLO, TE_THI    	! Time bands
-
 *  Non-character common block
       COMMON /PSF_CMN/
      :          SM_SIZEDEF, SM_NX, SM_NY,  		! Spatial model
@@ -83,8 +78,6 @@
      :            SM_P_NA, SM_P_NR, SM_P_REG,
      :            SM_P_DR, SM_P_RUP, SM_R_NX,
      :            SM_R_NY, SM_R_DX, SM_R_DY,
-     :          TE_TLO, TE_THI, TE_ELO, TE_EHI,		! Time/energy bands
-     :            TE_INIT,
      :          P_USED, P_EOK, 				! Psf instances
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :            P_FID, P_PSID, P_PLIST,
