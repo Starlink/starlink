@@ -6,8 +6,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
-     :     NPARS, PARS, PAR4,
-     :     STATUS)
+     :     NPARS, PARS, STATUS)
 *+
 *  Name:
 *     SURF_RECURSE_READ
@@ -24,8 +23,7 @@
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *     :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
-*     :     NPARS, PARS, PAR4,
-*     :     STATUS)
+*     :     NPARS, PARS, STATUS)
  
 *  Description:
 *     This routine takes an input name and reads in all NDFs resulting
@@ -104,8 +102,6 @@
 *        Number of parameters in PARS array.
 *     PARS( NPARS ) = REAL (Given)
 *        Values of input parameters. 1: WEIGHT, 2: SHIFT_DX, 3: SHIFT_DY
-*     PAR4 = LOGICAL (Given)
-*        Fourth parameter (USE_SECTION)
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -185,7 +181,6 @@
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
-      LOGICAL          PAR4
       CHARACTER*(*)    OBJECT(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
@@ -213,12 +208,11 @@
       CHARACTER * (132)LINE            ! Line read from file
       INTEGER          NSPEC           ! Number of sections in specifier
       INTEGER          N_FOUND         ! Number of parameters in line
-      LOGICAL          SECPAR          ! Am I passing USE_SECTION?
       CHARACTER * (132)SNAME           ! File name read from file
       REAL             T_SHIFT_DX      ! X Shift read from file
       REAL             T_SHIFT_DY      ! Y Shift read from file
-      LOGICAL          T_USE_SECT      ! USE_SECTION read from file
       REAL             T_WEIGHT        ! Weight read from file
+      LOGICAL          USE_SECTION     ! Are we using the section or invers
 
 *.
 
@@ -264,9 +258,10 @@
 *     First task is to split the name up into a filename
 *     and a SCUBA section
 
+      USE_SECTION = .TRUE.
 
       CALL SCULIB_SPLIT_FILE_SPEC(NAME, SCUBA__MAX_SECT, FNAME, NSPEC,
-     :     DATA_SPEC, STATUS)
+     :     DATA_SPEC, USE_SECTION, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -274,8 +269,7 @@
          ITEMP = 0
          IN_NDF = NDF__NOID
 
-         CALL NDF_OPEN (DAT__ROOT, FNAME, 'READ', 'OLD', 
-     :        IN_NDF, ITEMP, STATUS)
+         CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
  
 *     If the status from this action is good then proceed to read
 *     the file. If it is bad then clear status and assume that we 
@@ -293,15 +287,9 @@
      :              '^NAME', STATUS)
             END IF
 
-*     See if the USE_SECTION parameter has been specified in the text file
-            SECPAR = .FALSE.
-            IF (NPARS .GT. 3) THEN
-               SECPAR = .TRUE.
-            END IF
-
 *     Read in the NDF
             CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, 
-     :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, PAR4,
+     :           NSPEC, DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
      :           N_BOL(N_FILE), N_POS(N_FILE), N_INTS(N_FILE),
      :           IN_UT1(N_FILE), IN_RA_CEN(N_FILE), IN_DEC_CEN(N_FILE), 
      :           WAVELENGTH, SUB_INSTRUMENT, 
@@ -351,8 +339,6 @@
                   N_FILE = N_FILE + 1
                END IF
 
-               CALL NDF_ANNUL(IN_NDF, STATUS)
-
             ELSE
 
                CALL MSG_SETC('FILE', FNAME)
@@ -360,6 +346,13 @@
      :              ' the NDF ^FILE', STATUS)
 
             END IF
+
+*     At this point we have finished with the input NDF. We need to 
+*     annul the identifier regardless of STATUS otherwise it will never
+*     get freed and the filename will not even be usable for output
+*     later on.
+
+            CALL NDF_ANNUL(IN_NDF, STATUS)
 
          ELSE
 *     Annul global status
@@ -394,7 +387,7 @@
                   N_FOUND = 0
                   CALL SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND,
      :                 SNAME, T_WEIGHT, T_SHIFT_DX, 
-     :                 T_SHIFT_DY, T_USE_SECT, STATUS)
+     :                 T_SHIFT_DY, STATUS)
 
 *     Only read an NDF if at least one parameter was found on the line
 *     (And assume the first is a filename)
@@ -405,8 +398,6 @@
                      IF (N_FOUND .GT. 1) PARS(1) = T_WEIGHT
                      IF (N_FOUND .GT. 2) PARS(2) = T_SHIFT_DX
                      IF (N_FOUND .GT. 3) PARS(3) = T_SHIFT_DY
-
-                     IF (N_FOUND .GT. 4) PAR4  = T_USE_SECT 
 
                      NPARS = N_FOUND - 1
 
@@ -424,7 +415,7 @@
      :                    BOL_DEC_END, DATA_PTR, DATA_END, 
      :                    VARIANCE_PTR, VARIANCE_END,
      :                    INT_LIST, WEIGHT, SHIFT_DX, 
-     :                    SHIFT_DY,  NPARS, PARS, PAR4, 
+     :                    SHIFT_DY,  NPARS, PARS, 
      :                    STATUS)
 
                      RLEV = RLEV - 1
@@ -461,7 +452,7 @@
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, SHIFT_DY,
-     :     NPARS, PARS, PAR4,
+     :     NPARS, PARS,
      :     STATUS)
 *+
 *  Name:
@@ -520,7 +511,6 @@
       INTEGER          N_POS(MAX_FILE)
       INTEGER          NPARS
       REAL             PARS(3) ! I know there are 3 parameters
-      LOGICAL          PAR4
       CHARACTER*(*)    OBJECT(MAX_FILE)
       INTEGER          RLEV    ! Recursion level
       REAL             SHIFT_DX(MAX_FILE)
@@ -547,7 +537,7 @@
      :     BOL_DEC_END, DATA_PTR, DATA_END, 
      :     VARIANCE_PTR, VARIANCE_END,
      :     INT_LIST, WEIGHT, SHIFT_DX, 
-     :     SHIFT_DY,  NPARS, PARS, PAR4, 
+     :     SHIFT_DY,  NPARS, PARS, 
      :     STATUS)
 
       END
