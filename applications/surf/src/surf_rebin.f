@@ -62,7 +62,9 @@
 *     OUT = NDF (Write)
 *        The name of the NDF that will contain the rebinned map.
 *     OUT_COORDS = _CHAR (Read)
-*        The coordinate system of the output map. []
+*        The coordinate system of the output map. Available coordinate
+*        systems are AZimuth/El offsets, NAsmyth, RB (B1950), 
+*        RJ (J2000), RD (Current epoch) and GAlactic [RJ]
 *     OUT_OBJECT = _CHAR (Read)
 *        The name of the object (ie the NDF title). []
 *     PIXSIZE_OUT = _REAL (Read)
@@ -103,9 +105,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.17  1996/11/07 00:20:17  timj
-*     Change MAX_FILE to 100
+*     Revision 1.18  1996/11/14 02:52:54  timj
+*     Add support for AZ and NA regrids.
 *
+c Revision 1.17  1996/11/07  00:20:17  timj
+c Change MAX_FILE to 100
+c
 c Revision 1.16  1996/11/05  02:08:04  timj
 c Set BAD_PIXEL flag for DATA and VARIANCE
 c
@@ -504,6 +509,47 @@ c
      :        STATUS)
       END IF
 
+*  get the output coordinate system and set the default centre of the
+*  output map
+* This needs to be done in advance of reading files as sme systems
+* do not need to convert coordinate systems to apparent RA,Dec (eg NA)
+
+      CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD',.TRUE.,
+     :     OUT_COORDS, STATUS)
+
+      HOURS = .TRUE.
+      IF (OUT_COORDS .EQ. 'RB') THEN
+         CALL MSG_OUT (' ', 'REDS: output coordinates are FK4 '//
+     :     'B1950.0', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
+         CALL MSG_OUT (' ', 'REDS: output coordinates are FK5 '//
+     :     'J2000.0', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'GA') THEN
+         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
+     :     'galactic', STATUS)
+         HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+         CALL MSG_SETC ('UTDATE', SUTDATE)
+         CALL MSG_SETC ('UTSTART', SUTSTART)
+         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
+     :     'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
+      ELSE IF (OUT_COORDS .EQ. 'NA') THEN
+         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
+     :     'nasmyth', STATUS)
+         HOURS = .FALSE.
+      ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
+         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
+     :     'Az/El offsets', STATUS)
+         HOURS = .FALSE.
+      ELSE
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP (' ', 'REDS_REBIN_BESSEL: invalid output '//
+     :        'coordinate system', STATUS)
+         END IF
+      END IF
+
+
 *  start up the NDF system and read in the input demodulated files
 
       CALL NDF_BEGIN
@@ -888,6 +934,7 @@ c
                   CALL DAT_GET1R (IN_LOC, SCUBA__MAX_POINT, POINT_DEL,
      :              ITEMP, STATUS)
                   CALL DAT_ANNUL (IN_LOC, STATUS)
+
                END IF
             END IF
 
@@ -1485,30 +1532,30 @@ c
             END IF
 
 
-*  calculate position of each bolometer at each measurement
+*     calculate position of each bolometer at each measurement
 
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBD,
-     :        BOL_RA_PTR(FILE), BOL_RA_END(FILE), STATUS)
+     :           BOL_RA_PTR(FILE), BOL_RA_END(FILE), STATUS)
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBD,
-     :        BOL_DEC_PTR(FILE), BOL_DEC_END(FILE), STATUS)
+     :           BOL_DEC_PTR(FILE), BOL_DEC_END(FILE), STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
 
-*  now go through the various exposures of the observation calculating the
-*  observed positions
+*     now go through the various exposures of the observation calculating the
+*     observed positions
 
                DO MEASUREMENT = 1, N_MEASUREMENTS
                   DO INTEGRATION = 1, N_INTEGRATIONS
                      DO EXPOSURE = 1, N_EXPOSURES
 
-*  calculate mean LST for the switch sequence making up the exposure
+*     calculate mean LST for the switch sequence making up the exposure
 
                         EXP_LST = 0.0D0
                         DO I = 1, N_SWITCHES
                            DATA_OFFSET = (((MEASUREMENT-1) *
-     :                       N_INTEGRATIONS + INTEGRATION - 1) *
-     :                       N_EXPOSURES + EXPOSURE - 1) *
-     :                       N_SWITCHES + I - 1
+     :                          N_INTEGRATIONS + INTEGRATION - 1) *
+     :                          N_EXPOSURES + EXPOSURE - 1) *
+     :                          N_SWITCHES + I - 1
                            CALL VEC_DTOD(.FALSE., 1,
      :                          %val(IN_LST_STRT_PTR + DATA_OFFSET *
      :                          VAL__NBD), DTEMP, IERR, NERR, STATUS)
@@ -1516,7 +1563,7 @@ c
                         END DO
                         EXP_LST = EXP_LST / DBLE (N_SWITCHES)
 
-*  get the scan parameters for a raster map
+*     get the scan parameters for a raster map
 
                         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
                            CALL VEC_RTOR(.FALSE., 1,
@@ -1533,89 +1580,113 @@ c
      :                          VAL__NBR), DEC_VEL, IERR, NERR, STATUS)
                         END IF
 
-*  find where the exposure starts and finishes in the data array
+*     find where the exposure starts and finishes in the data array
 
                         CALL SCULIB_FIND_SWITCH (
-     :                    %val(IN_DEM_PNTR_PTR), 1, N_EXPOSURES,
-     :                    N_INTEGRATIONS, N_MEASUREMENTS, N_POS(FILE),
-     :                    1, EXPOSURE, INTEGRATION, MEASUREMENT,
-     :                    EXP_START, EXP_END, STATUS)
+     :                       %val(IN_DEM_PNTR_PTR), 1, N_EXPOSURES,
+     :                       N_INTEGRATIONS, N_MEASUREMENTS,N_POS(FILE),
+     :                       1, EXPOSURE, INTEGRATION, MEASUREMENT,
+     :                       EXP_START, EXP_END, STATUS)
 
-*  cycle through the measurements in the exposure
+*     cycle through the measurements in the exposure
 
                         DO I = EXP_START, EXP_END
 
-*  calculate the LST at which the measurement was made (hardly worth the
-*  bother because it's averaged over the switches anyway)
+*     calculate the LST at which the measurement was made (hardly worth the
+*     bother because it's averaged over the switches anyway)
 
                            LST = EXP_LST + DBLE(I - EXP_START) *
-     :                       DBLE(EXP_TIME) * 1.0027379D0 * 
-     :                       2.0D0 * PI / (3600.0D0 * 24.0D0)
+     :                          DBLE(EXP_TIME) * 1.0027379D0 * 
+     :                          2.0D0 * PI / (3600.0D0 * 24.0D0)
 
-*  work out the pointing offset at which the measurement was made,
-*  remembering that for the `raster' mode the RA offset increases towards
-*  decreasing RA
+*     work out the pointing offset at which the measurement was made,
+*     remembering that for the `raster' mode the RA offset increases towards
+*     decreasing RA
 
                            IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
                               IF (JIGGLE_REPEAT .EQ. 1) THEN
                                  JIGGLE = (EXPOSURE-1) *
-     :                             JIGGLE_P_SWITCH +
-     :                             I - EXP_START + 1
+     :                                JIGGLE_P_SWITCH +
+     :                                I - EXP_START + 1
                               ELSE
                                  JIGGLE = MOD (I - EXP_START,
-     :                             JIGGLE_COUNT) + 1
+     :                                JIGGLE_COUNT) + 1
                               END IF
- 
+                              
                               OFFSET_X = JIGGLE_X (JIGGLE)
                               OFFSET_Y = JIGGLE_Y (JIGGLE)
                               OFFSET_COORDS = SAMPLE_COORDS
                            ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
                               OFFSET_X = - RA_START - RA_VEL *
-     :                          (REAL(I - EXP_START) + 0.5) *
-     :                          EXP_TIME
+     :                             (REAL(I - EXP_START) + 0.5) *
+     :                             EXP_TIME
                               OFFSET_Y = DEC_START + DEC_VEL *
-     :                          (REAL(I - EXP_START) + 0.5) *
-     :                          EXP_TIME
+     :                             (REAL(I - EXP_START) + 0.5) *
+     :                             EXP_TIME
                               OFFSET_COORDS = 'RD'
                            END IF
 
-*  now call a routine to work out the apparent RA,Dec of the measured
-*  bolometers at this position
+*     now call a routine to work out the apparent RA,Dec of the measured
+*     bolometers at this position
 
                            DATA_OFFSET = (I - 1) * N_BOL(FILE)
-                           CALL SCULIB_CALC_BOL_COORDS (IN_RA_CEN,
-     :                       IN_DEC_CEN, LST, LAT_OBS,
-     :                       OFFSET_COORDS, OFFSET_X, OFFSET_Y,
-     :                       IN_ROTATION, N_POINT, SCUBA__MAX_POINT,
-     :                       POINT_LST, POINT_DAZ, POINT_DEL, 
-     :                       SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :                       N_BOL(FILE), BOL_CHAN,
-     :                       BOL_ADC, BOL_DU3, BOL_DU4,
-     :                       CENTRE_DU3, CENTRE_DU4,
-     :                       %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
-     :                       VAL__NBD),
-     :                       %val(BOL_DEC_PTR(FILE) + DATA_OFFSET *
-     :                       VAL__NBD),
-     :                       STATUS)
 
-*  convert the coordinates to apparent RA,Dec on MJD_STANDARD
+                           IF (OUT_COORDS.EQ.'NA'.OR.
+     :                          OUT_COORDS.EQ.'AZ') THEN
 
-                           IF (FILE .NE. 1) THEN
-                              CALL SCULIB_STANDARD_APPARENT (
-     :                          N_BOL(FILE),
-     :                          %val(BOL_RA_PTR(FILE) + 
-     :                          DATA_OFFSET * VAL__NBD),
-     :                          %val(BOL_DEC_PTR(FILE) +
-     :                          DATA_OFFSET * VAL__NBD),
-     :                          IN_UT1, MJD_STANDARD, STATUS)
+                              CALL SCULIB_CALC_AZNA_OFFSET(OUT_COORDS,
+     :                             IN_RA_CEN,IN_DEC_CEN, LST, LAT_OBS,
+     :                             OFFSET_X, OFFSET_Y,
+     :                             N_POINT, SCUBA__MAX_POINT,
+     :                             POINT_LST, POINT_DAZ, POINT_DEL, 
+     :                             SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :                             N_BOL(FILE), BOL_CHAN,
+     :                             BOL_ADC, BOL_DU3, BOL_DU4,
+     :                             CENTRE_DU3, CENTRE_DU4,
+     :                             %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
+     :                             VAL__NBD),
+     :                             %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
+     :                             VAL__NBD),
+     :                             STATUS)
+
+                           ELSE
+
+
+                              CALL SCULIB_CALC_BOL_COORDS (IN_RA_CEN,
+     :                             IN_DEC_CEN, LST, LAT_OBS,
+     :                             OFFSET_COORDS, OFFSET_X, OFFSET_Y,
+     :                             IN_ROTATION, N_POINT,
+     :                             SCUBA__MAX_POINT,
+     :                             POINT_LST, POINT_DAZ, POINT_DEL, 
+     :                             SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :                             N_BOL(FILE), BOL_CHAN,
+     :                             BOL_ADC, BOL_DU3, BOL_DU4,
+     :                             CENTRE_DU3, CENTRE_DU4,
+     :                             %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
+     :                             VAL__NBD),
+     :                             %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
+     :                             VAL__NBD),
+     :                             STATUS)
+
+*     convert the coordinates to apparent RA,Dec on MJD_STANDARD
+
+                              IF (FILE .NE. 1) THEN
+                                 CALL SCULIB_STANDARD_APPARENT (
+     :                                N_BOL(FILE),
+     :                                %val(BOL_RA_PTR(FILE) + 
+     :                                DATA_OFFSET * VAL__NBD),
+     :                                %val(BOL_DEC_PTR(FILE) +
+     :                                DATA_OFFSET * VAL__NBD),
+     :                                IN_UT1, MJD_STANDARD, STATUS)
+                              END IF
+                              
                            END IF
-
                         END DO
                      END DO
                   END DO
                END DO
-
             END IF
+
 
 *  get the weight to be assigned to this dataset and any shift that is to
 *  be applied to it in the output map
@@ -1657,131 +1728,128 @@ c
       END DO
 
 
-*  OK, all the data required should have been read in by now, check that
-*  there is some input data
+*     OK, all the data required should have been read in by now, check that
+*     there is some input data
 
       IF (FILE .LE. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: there is no '//
-     :        'input data', STATUS)
+     :           'input data', STATUS)
          END IF
       END IF
 
-*  get a title for the output map
+*     get a title for the output map
 
       CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
       CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
 
-*  get the output coordinate system and set the default centre of the
-*  output map
+*     Nasmyth rebin doesn't need a coordinate frame
 
-      CALL PAR_GET0C ('OUT_COORDS', OUT_COORDS, STATUS)
-      CALL CHR_UCASE (OUT_COORDS)
-      
-      HOURS = .TRUE.
-      IF (OUT_COORDS .EQ. 'RB') THEN
-         CALL MSG_OUT (' ', 'REDS: output coordinates are FK4 '//
-     :     'B1950.0', STATUS)
-      ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
-         CALL MSG_OUT (' ', 'REDS: output coordinates are FK5 '//
-     :     'J2000.0', STATUS)
-      ELSE IF (OUT_COORDS .EQ. 'GA') THEN
-         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
-     :     'galactic', STATUS)
-         HOURS = .FALSE.
-      ELSE IF (OUT_COORDS .EQ. 'RD') THEN
-         CALL MSG_SETC ('UTDATE', SUTDATE)
-         CALL MSG_SETC ('UTSTART', SUTSTART)
-         CALL MSG_OUT (' ', 'REDS: output coordinates are '//
-     :     'apparent RA,Dec at ^UTSTART on ^UTDATE', STATUS)
-      ELSE
+      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+
+         CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
+     :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
+
          IF (STATUS .EQ. SAI__OK) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_REBIN_BESSEL: invalid output '//
-     :        'coordinate system', STATUS)
+            IF (HOURS) then
+               CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
+               
+               STEMP = SIGN
+               WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
+               STEMP (4:4) = ' '
+               WRITE (STEMP(5:6),'(I2.2)') HMSF(2)
+               STEMP (7:7) = ' '
+               WRITE (STEMP(8:9),'(I2.2)') HMSF(3)
+               STEMP (10:10) = '.'
+               WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
+            ELSE
+               CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
+
+               STEMP = SIGN
+               WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
+               STEMP (5:5) = ' '
+               WRITE (STEMP(6:7), '(I2.2)') HMSF(2)
+               STEMP (8:8) = ' '
+               WRITE (STEMP(9:10), '(I2.2)') HMSF(3)
+               STEMP (11:11) = '.'
+               WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
+            END IF
          END IF
-      END IF
 
-      CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
-     :  MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
+         CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
+         CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (HOURS) then
-            CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
-            
+         IF (STATUS .EQ. SAI__OK) THEN
+            ITEMP = 1
+            CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
+            IF (STATUS .NE. 0) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
+     :              'output centre longitude - it must be in '//
+     :              '5 10 34.6 format', STATUS)
+            ELSE
+               IF (HOURS) THEN
+                  OUT_LONG = OUT_LONG * 15.0D0
+               END IF
+            END IF
+         END IF
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
+
             STEMP = SIGN
-            WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
-            STEMP (4:4) = ' '
-            WRITE (STEMP(5:6),'(I2.2)') HMSF(2)
-            STEMP (7:7) = ' '
-            WRITE (STEMP(8:9),'(I2.2)') HMSF(3)
-            STEMP (10:10) = '.'
-            WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
-         ELSE
-            CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
-
-            STEMP = SIGN
-            WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
+            WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
             STEMP (5:5) = ' '
-            WRITE (STEMP(6:7), '(I2.2)') HMSF(2)
+            WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
             STEMP (8:8) = ' '
-            WRITE (STEMP(9:10), '(I2.2)') HMSF(3)
+            WRITE (STEMP(9:10),'(I2.2)') HMSF(3)
             STEMP (11:11) = '.'
             WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
          END IF
-      END IF
 
-      CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
-      CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
+         CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
+         CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         ITEMP = 1
-         CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
-         IF (STATUS .NE. 0) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
-     :        'output centre longitude - it must be in 5 10 34.6 '//
-     :        'format', STATUS)
-         ELSE
-            IF (HOURS) THEN
-               OUT_LONG = OUT_LONG * 15.0D0
+         IF (STATUS .EQ. SAI__OK) THEN
+            ITEMP = 1
+            CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
+            IF (STATUS .NE. 0) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
+     :              'output centre latitude -  it must be in '//
+     :              '-30 13 56.4 format', STATUS)
             END IF
          END IF
-      END IF
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
+*     calculate the apparent RA,Dec of the selected output centre
 
-         STEMP = SIGN
-         WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
-         STEMP (5:5) = ' '
-         WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
-         STEMP (8:8) = ' '
-         WRITE (STEMP(9:10),'(I2.2)') HMSF(3)
-         STEMP (11:11) = '.'
-         WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
-      END IF
+         CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
+     :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
+     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
-      CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
-      CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         ITEMP = 1
-         CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
-         IF (STATUS .NE. 0) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
-     :        'output centre latitude -  it must be in -30 13 56.4 '//
-     :        'format', STATUS)
+*     convert the RA,Decs of the observed points to tangent plane offsets
+*     from the chosen output centre
+
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO I = 1, FILE
+               CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I), 
+     :              %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
+     :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :              DBLE(SHIFT_DX(I)), DBLE(SHIFT_DY(I)), STATUS)
+            END DO
          END IF
+
+
+*     Deal with NA coords
+      ELSE
+
+         OUT_RA_CEN = 0.0
+         OUT_DEC_CEN = 0.0
+
       END IF
 
-*  calculate the apparent RA,Dec of the selected output centre
-
-      CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
-     :     0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
-     :     OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
 *  get the pixel spacing of the output map
 
@@ -1789,18 +1857,6 @@ c
       CALL PAR_DEF0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
-
-*  convert the RA,Decs of the observed points to tangent plane offsets
-*  from the chosen output centre
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         DO I = 1, FILE
-            CALL SCULIB_APPARENT_2_TP (N_BOL(I) * N_POS(I), 
-     :        %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
-     :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
-     :        DBLE(SHIFT_DX(I)), DBLE(SHIFT_DY(I)), STATUS)
-         END DO
-      END IF
 
 *  find the extent of the input data
 
@@ -1945,6 +2001,12 @@ c
       IF (OUT_COORDS .EQ. 'GA') THEN
          XLAB = 'Longitude offset'
          YLAB = 'Latitude offset'
+      ELSE IF (OUT_COORDS .EQ. 'NA') THEN
+         XLAB = 'X Nasmyth offset'
+         YLAB = 'Y Nasmyth offset'
+      ELSE IF (OUT_COORDS .EQ. 'AZ') THEN
+         XLAB = 'Azimuth offset'
+         YLAB = 'Elevation offset'
       ELSE
          XLAB = 'R.A. offset'
          YLAB = 'Declination offset'
@@ -1978,61 +2040,67 @@ c
 
 * and a title
  
-         CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
-         CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
+      CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
+      CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
 
 *  create the IRAS astrometry structure
 
-      CALL IRA_INIT (STATUS)
+      IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
 
-      P (1) = OUT_LONG
-      P (2) = OUT_LAT
-      P (3) = DBLE (I_CENTRE) - 0.5D0
-      P (4) = DBLE (J_CENTRE) - 0.5D0
-      P (5) = DBLE (OUT_PIXEL)
-      P (6) = DBLE (OUT_PIXEL)
-      P (7) = 0.0D0
-      P (8) = 0.0D0
+         CALL IRA_INIT (STATUS)
 
-      IF (OUT_COORDS .EQ. 'RB') THEN
-         SCS = 'EQUATORIAL(1950.0)'
-         OUT_EPOCH = 1950.0D0
-         RADECSYS  = 'FK4'
-         CTYPE1 = 'RA---TAN'
-         CTYPE2 = 'DEC--TAN'
-      ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
-         SCS = 'EQUATORIAL(2000.0)'
-         OUT_EPOCH = 2000.0D0
-         RADECSYS  = 'FK5'
-         CTYPE1 = 'RA---TAN'
-         CTYPE2 = 'DEC--TAN'
-      ELSE IF (OUT_COORDS .EQ. 'RD') THEN
-         SCS = 'EQUATORIAL(J'
-         CALL CHR_RTOC(RDEPOCH, STEMP, ITEMP)
-         CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
-         CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
-         OUT_EPOCH = RDEPOCH
-         RADECSYS  = 'FK5'
-         CTYPE1 = 'RA---TAN'
-         CTYPE2 = 'DEC--TAN'
-      ELSE IF (OUT_COORDS .EQ. 'EQ') THEN   ! We dont use EQ...
-         SCS = 'ECLIPTIC(2000.0)'
-         OUT_EPOCH = 2000.D0
-         RADECSYS  = 'GAPPT'
-         CTYPE1 = 'RA---TAN'
-         CTYPE2 = 'DEC--TAN'
-      ELSE IF (OUT_COORDS .EQ. 'GA') THEN
-         SCS = 'GALACTIC'
-         OUT_EPOCH = 2000.0D0
-         CTYPE1 = 'GLON-TAN'
-         CTYPE2 = 'GLAT-TAN'
+         P (1) = OUT_LONG
+         P (2) = OUT_LAT
+         P (3) = DBLE (I_CENTRE) - 0.5D0
+         P (4) = DBLE (J_CENTRE) - 0.5D0
+         P (5) = DBLE (OUT_PIXEL)
+         P (6) = DBLE (OUT_PIXEL)
+         P (7) = 0.0D0
+         P (8) = 0.0D0
+
+         IF (OUT_COORDS .EQ. 'RB') THEN
+            SCS = 'EQUATORIAL(1950.0)'
+            OUT_EPOCH = 1950.0D0
+            RADECSYS  = 'FK4'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
+            SCS = 'EQUATORIAL(2000.0)'
+            OUT_EPOCH = 2000.0D0
+            RADECSYS  = 'FK5'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+            SCS = 'EQUATORIAL(J'
+            CALL CHR_RTOC(RDEPOCH, STEMP, ITEMP)
+            CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
+            CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
+            OUT_EPOCH = RDEPOCH
+            RADECSYS  = 'FK5'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'EQ') THEN ! We dont use EQ...
+            SCS = 'ECLIPTIC(2000.0)'
+            OUT_EPOCH = 2000.D0
+            RADECSYS  = 'GAPPT'
+            CTYPE1 = 'RA---TAN'
+            CTYPE2 = 'DEC--TAN'
+         ELSE IF (OUT_COORDS .EQ. 'GA') THEN
+            SCS = 'GALACTIC'
+            OUT_EPOCH = 2000.0D0
+            CTYPE1 = 'GLON-TAN'
+            CTYPE2 = 'GLAT-TAN'
+         END IF
+
+         CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0, 0,OUT_LOC,
+     :        STATUS)
+         NP = 8
+         CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, OUT_NDF,
+     :        ITEMP, STATUS)
+
+         CALL IRA_CLOSE (STATUS)
+
       END IF
-
-      CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0, 0, OUT_LOC,
-     :  STATUS)
-      NP = 8
-      CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, OUT_NDF,
-     :  ITEMP, STATUS)
 
 * Get telescope and instrument from FITS
 
@@ -2055,21 +2123,26 @@ c
      :     FILENAME(I), 'name of input datafile', STATUS)
       END DO
 
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'SYSTEM',
-     :  SCS, 'sky coordinate system', STATUS)
-      IF (OUT_COORDS.NE.'GA') THEN
+      IF (OUT_COORDS.NE.'GA' .AND. OUT_COORDS.NE.'NA'
+     :     .AND.OUT_COORDS.NE.'AZ') THEN
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'RADECSYS', RADECSYS, 'Frame of reference', STATUS)
       END IF
 
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'EPOCH',
-     :  OUT_EPOCH, 'epoch of map', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'EQUINOX',
-     :  OUT_EPOCH, 'epoch of mean equator and equinox', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
-     :  OUT_LONG, 'centre longitude (radians)', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT',
-     :  OUT_LAT, 'centre latitude (radians)', STATUS)
+      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'SYSTEM',
+     :        SCS, 'sky coordinate system', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LONG',
+     :        OUT_LONG, 'centre longitude (radians)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'LAT',
+     :        OUT_LAT, 'centre latitude (radians)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'EPOCH',
+     :        OUT_EPOCH, 'epoch of map', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS,FITS,'EQUINOX',
+     :        OUT_EPOCH, 'epoch of mean equator and equinox', STATUS)
+
+      END IF
+
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD-OBS',
      :     MJD_STANDARD, 'MJD of first observation', STATUS)
 
@@ -2093,41 +2166,49 @@ c
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :        'DATE-OBS', DATEOBS, 'Date of first observation', STATUS)
 
+
 * Now need to calculate the FITS Axis info
+* If this is NA then NDF2FITS will do this for us
 
-      OBSRA = OUT_LONG * 180.0D0 / PI
-      OBSDEC= OUT_LAT  * 180.0D0 / PI
-      OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+      IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
 
-      IF (OUT_COORDS.NE.'GA') THEN
-         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'OBSRA',
-     :        OBSRA, 'RA of map centre (degrees; deprecated)', STATUS)
-         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 'OBSDEC',
-     :        OBSDEC, 'Dec. of map centre (degrees; deprecated)',STATUS)
+         OBSRA = OUT_LONG * 180.0D0 / PI
+         OBSDEC= OUT_LAT  * 180.0D0 / PI
+         OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+
+         IF (OUT_COORDS.NE.'GA') THEN
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :           'OBSRA',OBSRA,'RA of map centre (degrees; deprecated)', 
+     :           STATUS)
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 
+     :           'OBSDEC', OBSDEC, 
+     :           'Dec. of map centre (degrees; deprecated)',STATUS)
+         END IF
+
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CTYPE1',
+     :        CTYPE1,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,'CRPIX1',
+     :        I_CENTRE, 'I of centre (ref) pixel', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CRVAL1',
+     :        OBSRA, 'Map centre (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CDELT1',
+     :        DBLE(-OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CUNIT1',
+     :        'deg','physical units of axis 1', STATUS)
+
+
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CTYPE2',
+     :        CTYPE2,'TAN projection used', STATUS)
+         CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,'CRPIX2',
+     :        J_CENTRE, 'J of centre (ref) pixel', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CRVAL2',
+     :        OBSDEC, 'Map centre (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CDELT2',
+     :        DBLE(OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CUNIT2',
+     :        'deg','physical units of axis 2', STATUS)
+
       END IF
-
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CTYPE1',
-     :  CTYPE1,'TAN projection used', STATUS)
-      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'CRPIX1',
-     :  I_CENTRE, 'I of centre (ref) pixel', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CRVAL1',
-     :  OBSRA, 'Map centre (degrees)', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CDELT1',
-     :  DBLE(-OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CUNIT1',
-     :  'deg','physical units of axis 1', STATUS)
-
-
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CTYPE2',
-     :  CTYPE2,'TAN projection used', STATUS)
-      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'CRPIX2',
-     :  J_CENTRE, 'J of centre (ref) pixel', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CRVAL2',
-     :  OBSDEC, 'Map centre (degrees)', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CDELT2',
-     :  DBLE(OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
-      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CUNIT2',
-     :  'deg','physical units of axis 2', STATUS)
 
 *  write out the FITS extension
 
@@ -2162,7 +2243,7 @@ c
       CALL SCULIB_FREE ('CONV_WEIGHT', CONV_WEIGHT_PTR,
      :  CONV_WEIGHT_END, STATUS)
 
-      CALL IRA_CLOSE (STATUS)
+
       CALL NDF_END (STATUS)
       CALL ERR_END(STATUS)
  
