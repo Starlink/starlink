@@ -354,6 +354,8 @@
 *        Changed the estimation of the "typical" magnitude to be the 90%
 *        percentile value. This is used as the default for the VSCALE
 *        parameter.
+*     22-MAR-1999 (DSB):
+*        Get AXES *before* MARGIN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -750,6 +752,9 @@
 *  graphical element name CURVES.
       CALL KPG1_ASPSY( '(VEC*TORS)', '(CURVES)', STATUS )
 
+*  See if axes are required
+      CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
 *  Set the dynamic defaults for MARGIN.
       IF( AXES ) THEN
          CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
@@ -830,9 +835,6 @@
          END IF
 
       END IF
-
-*  See if axes are required
-      CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
 *  Obtain the vector-plot characteristics.
 *  =======================================
