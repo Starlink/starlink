@@ -62,6 +62,11 @@
 *        the range 0 to 255).  In cases other than "Data", which is 
 *        always present, a missing component will be treated as having 
 *        all pixels set to the `bad' value.  ["Data"]
+*     ILEVEL = _INTEGER (Read)
+*        The interactive level of the routine (only used if SINGLE=TRUE). If 
+*        it is 1, nothing is reported on the screen. If is is 2 or 3, the 
+*        statistics are reported. If is is 3, the individual pixel values 
+*        are also reported. It should lie between 1 and 3. [2]
 *     IN = NDF (Read)
 *        A group of input NDFs.  They may have different shapes, but 
 *        must all have the same number of dimensions.  This should 
@@ -82,11 +87,6 @@
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
 *        images given in this way are concatenated into a single group.
-*     ILEVEL = _INTEGER (Read)
-*        The interactive level of the routine (only used if SINGLE=TRUE). If 
-*        it is 1, nothing is reported on the screen. If is is 2 or 3, the 
-*        statistics are reported. If is is 3, the individual pixel values 
-*        are also reported. It should lie between 1 and 3. [2]
 *     MEAN = _DOUBLE (Write)
 *        An output parameter to which is written the mean pixel value, if
 *        SINGLE=TRUE.
