@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE xsl:stylesheet PUBLIC "-//W3C//DTD XSLT 1.0//EN"
-"/home/norman/s/src/sgml/w/sgml/dtd/xslt.dtd">
+<!DOCTYPE xsl:stylesheet PUBLIC "-//W3C//DTD XSLT 1.0//EN" "/home/norman/s/src/sgml/w/sgml/dtd/xslt.dtd">
 
 <!-- $Id$ -->
 
@@ -23,7 +22,12 @@
       <h1>DTD summary for DTD <xsl:value-of select="@top"/></h1>
       <p>Generated from DTD <code><xsl:value-of	select="@sysid"/></code></p>
       <p>This list includes all of the elements currently present in
-	the DTD, plus a few which have not even made it to the DTD.  Not
+	the DTD, plus a few for which documentation exists, but which
+	are not present in the DTD, either because they have not been
+	added, or because they have been removed.  The complete list
+	of elements in the DTD is
+	<a><xsl:attribute name="href"
+			  >#ALL.ELEMENT.LIST</xsl:attribute>below</a>  Not  
 	all the elements in the DTD have been implemented in
 	down-converters.</p>
       <p>Each element has one of five statuses (asterisks indicate
@@ -36,7 +40,7 @@
 	<tr><td>experimental</td><td>Proposed element, under
 	    discussion.  May or may not be included in the DTD.
 	    <p><xsl:apply-templates
-	      select="../element[@status='experimental']" mode="elementtoc"/>
+		select="../element[@status='experimental']" mode="elementtoc"/>
 	    </p></td></tr>
 	<tr><td>alpha</td><td>Proposed element.  This will at least
 	    be in the DTD, but it may not be implemented in the
@@ -58,17 +62,86 @@
 	    <p><xsl:apply-templates
 	      select="../element[@status='stable']" mode="elementtoc"/>
 	    </p></td></tr>
-	<tr><td>deprecated</td><td>Do not use.  This is still
+	<tr><td>deprecated</td><td>Do not use this element.  This is still
 	    supported in the DTD, but it will probably disappear
 	    come the next major revision.
 	    <p><xsl:apply-templates
 	      select="../element[@status='deprecated']" mode="elementtoc"/>
 	    </p></td></tr>
+	<tr><td><em>No status</em></td><td>Elements which have no
+	    status assigned. 
+	    <p><xsl:apply-templates
+			select="dtdelement[id(@gi) and count(id(@gi)/@status)=0]"
+				   mode="elementtoc"/></p>
+	    </td></tr>
+<!--
+	<tr><td><em>Not in DTD</em></td><td>Elements which are
+	    documented but which are not present in the DTD.
+
+      <xsl:apply-templates 
+           select="../element[../dtdsummary/dtdelement/@gi = @gi]" 
+			   mode="elementtoc"/>
+	  </td></tr>
+-->
+
       </table>
-      <p>All elements in DTD:
+      <h2>Element sets</h2>
+
+      <h3><xsl:element name="a">
+	  <xsl:attribute name="name"
+			 >ALL.ELEMENT.LIST</xsl:attribute>
+	  All elements in DTD
+	</xsl:element></h3>
+      <p>
 	<xsl:apply-templates select="dtdelement" mode="elementtoc"/>.
       </p>
+
+      <h3>Elements in DTD but not fully documented</h3>
+      <p>
+	Elements which are present in
+	the DTD but for which no further explanation is available.
+      </p>
+      <p>
+	<xsl:choose>
+	  <xsl:when test="dtdelement[count(id(@gi))=0]">
+	    <xsl:apply-templates select="dtdelement[count(id(@gi))=0]"
+				 mode="elementtoc"/>
+	  </xsl:when>
+	  <xsl:otherwise><b>None</b></xsl:otherwise>
+	</xsl:choose>
+      </p>
+
+      <h3>Elements not in DTD</h3>
+      <p>
+	Elements which are documented but which are not present in the
+	DTD.
+      </p>
+      <p>
+	<xsl:variable name="gotone">0</xsl:variable>
+	<xsl:for-each select="../element">
+	  <xsl:variable name="thisgi" select="@gi"/>
+	  <xsl:if test="count(../dtdsummary/dtdelement[@gi=$thisgi])=0">
+	    <xsl:apply-templates select="." mode="elementtoc" />
+	    <xsl:variable name="gotone">1</xsl:variable>
+	  </xsl:if>
+	</xsl:for-each>
+	<xsl:if test="$gotone=0"><b>None</b></xsl:if>
+      </p>
+
+      <xsl:if test="../commentary">
+        <hr /><h2>General commentary</h2>
+        <xsl:apply-templates select="../commentary"/>
+      </xsl:if>
+
       <xsl:apply-templates select="dtdelement"/>
+
+      <xsl:for-each select="../element">
+	<xsl:variable name="thisgi" select="@gi"/>
+	<xsl:if test="count(../dtdsummary/dtdelement[@gi=$thisgi])=0">
+	  <xsl:apply-templates select="." mode="completeelement" />
+	</xsl:if>
+      </xsl:for-each>
+
     </body>
   </xsl:template>
 
@@ -98,18 +171,13 @@
     </a>
     <xsl:if test="id(@gi)/commentary">
       <a><xsl:attribute name="href">#comm.<xsl:value-of select="@gi"/></xsl:attribute>*</a></xsl:if>
-    <xsl:if test="position()!=last()">,      
-    </xsl:if>
+    <xsl:variable name="thisgi" select="@gi"/>
+    <xsl:if test="position()!=last()">, </xsl:if>
   </xsl:template>
 
-  <xsl:template match="element" mode="elementtoc">
-    <a><xsl:attribute name="href">#<xsl:value-of select="@gi"/></xsl:attribute>
-      <xsl:value-of select="@gi"/>
-    </a>
-    <xsl:if test="commentary">
-      <a><xsl:attribute name="href">#comm.<xsl:value-of select="@gi"/></xsl:attribute>*</a></xsl:if>
-    <xsl:if test="position()!=last()">,      
-    </xsl:if>
+  <xsl:template match="dtdelement" mode="undocelems">
+    <xsl:value-of select="@gi"/>
+    <xsl:if test="position()!=last()">, </xsl:if>
   </xsl:template>
 
   <xsl:template match="dtdparents">
@@ -154,6 +222,28 @@
     <xsl:apply-templates select="attribute"/>
   </xsl:template>
 
+  <xsl:template match="element" mode="elementtoc">
+    <a><xsl:attribute name="href">#<xsl:value-of select="@gi"/></xsl:attribute>
+      <xsl:value-of select="@gi"/>
+    </a>
+    <xsl:if test="commentary">
+      <a><xsl:attribute name="href">#comm.<xsl:value-of select="@gi"/></xsl:attribute>*</a></xsl:if>
+    <xsl:if test="position()!=last()">,      
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="element" mode="completeelement">
+    <!-- Broadly same format as dtdelement -->
+    <hr />
+    <h2><a><xsl:attribute name="name">
+	  <xsl:value-of select="@gi"/>
+	</xsl:attribute>Element &lt;<xsl:value-of select="@gi"/>&gt;</a></h2>
+    <xsl:apply-templates select="."/>
+    <xsl:if test="commentary">
+      <xsl:apply-templates select="commentary"/>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="p">
     <xsl:copy>
       <xsl:apply-templates select="node()"/>
@@ -168,7 +258,11 @@
   <xsl:template match="commentary">
     <!-- Test if this is the first commentary sibling -->
     <xsl:if test="count(preceding-sibling::commentary)=0">
-      <h3><a><xsl:attribute name="name">comm.<xsl:value-of select="../@gi"/></xsl:attribute>Commentary on <xsl:value-of select="../@gi"/></a></h3>
+      <!-- Test is this is within an `element' element (as opposed to
+      being the general commentary within the `dtddescription' element -->
+      <xsl:if test="parent::element">
+	<h3><a><xsl:attribute name="name">comm.<xsl:value-of select="../@gi"/></xsl:attribute>Commentary on <xsl:value-of select="../@gi"/></a></h3>
+      </xsl:if>
     </xsl:if>
     <table>
       <tr><td align="right"><strong>From:</strong></td>
@@ -234,3 +328,10 @@
   </xsl:template>
 
 </xsl:stylesheet>
+
+<!--
+Local Variables:
+mode: xml-mode
+sgml-indent-step: 2
+sgml-indent-data: t
+-->
