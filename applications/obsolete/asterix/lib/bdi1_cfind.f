@@ -89,6 +89,9 @@
 *  History:
 *     10 Aug 1995 (DJA):
 *        Original version.
+*     18 Jan 1996 (DJA):
+*        Make sure axis values/widths and error quantities are expressed
+*        in max( REAL, dataset preferred type )
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,6 +123,8 @@
       CHARACTER*(DAT__SZLOC)	ELOC			! ERROR container
       CHARACTER*(DAT__SZLOC)	LOC			! Top level locator
       CHARACTER*(DAT__SZLOC)	QLOC			! QUALITY container
+      CHARACTER*(DAT__SZTYP)	RTYPE			! Data type for axes
+							! and errors
       CHARACTER*(DAT__SZTYP)	TYPE			! Data type
 
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
@@ -156,6 +161,16 @@
           CALL ERR_ANNUL( STATUS )
           TYPE = '*unknown*'
         END IF
+
+*    Derive the type for axes and errors. This must be floating point.
+*    Use single precision normalling, but double if that's the maain
+*    dataset type
+        IF ( TYPE .EQ. 'DOUBLE' ) THEN
+          RTYPE = TYPE
+        ELSE
+          TYPE = 'REAL'
+        END IF
+
       END IF
 
 *  Object is derived from BinDS?
@@ -194,7 +209,7 @@
 *    Define dimensions
         CALL BDI1_CFIND0( NDIM, DIMS, CNDIM, CDIMS )
 
-        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, NDIM,
+        CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//RTYPE, NDIM,
      :                    DIMS, THERE, CLOC, STATUS )
 
 *  Axis container
@@ -242,10 +257,10 @@
 *    If present, look for lower or upper component
         IF ( THERE ) THEN
           IF ( ITEM .EQ. 'LoError' ) THEN
-            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, '_'//TYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'LOWER', CREATE, '_'//RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           ELSE
-            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, '_'//TYPE, NDIM,
+            CALL BDI1_CFIND1( ELOC, 'UPPER', CREATE, '_'//RTYPE, NDIM,
      :                        DIMS, THERE, CLOC, STATUS )
           END IF
           CALL DAT_ANNUL( ELOC, STATUS )
@@ -295,7 +310,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, '_'//TYPE,
+            CALL BDI1_CFIND1( ALOC, 'DATA_ARRAY', CREATE, '_'//RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'Width' ) THEN
@@ -303,7 +318,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, '_'//TYPE,
+            CALL BDI1_CFIND1( ALOC, 'WIDTH', CREATE, '_'//RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'LoWidth' ) THEN
@@ -311,7 +326,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, '_'//TYPE,
+            CALL BDI1_CFIND1( ALOC, 'LWIDTH', CREATE, '_'//RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .EQ. 'HiWidth' ) THEN
@@ -319,7 +334,7 @@
 *        Define dimensions
             CALL BDI1_CFIND0( 1, DIMS(IAX), CNDIM, CDIMS )
 
-            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, '_'//TYPE,
+            CALL BDI1_CFIND1( ALOC, 'HWIDTH', CREATE, '_'//RTYPE,
      :                        1, DIMS(IAX), THERE, CLOC, STATUS )
 
           ELSE IF ( ITEM(8:) .LE. ' ' ) THEN
