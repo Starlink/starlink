@@ -3,6 +3,5 @@
 
 int main( int argc, char ** argv )
 {
-   (void)  shl_standalone("SPECX", argc, argv );
-   return EXIT_SUCCESS;
+   return shl_standalone("SPECX", 1, argc, argv );
 }
