@@ -316,7 +316,7 @@ CP = cp -p
 #  fixes, etc.) which no not merit documentation changes.
 
 PKG_NAME = jcmtdr
-PKG_VERS = 1.2
+PKG_VERS = 1.2-2
 
 #  The names of the package tasks. While some handling is delegated to
 #  subsidiary make files, the list of tasks exists only once, namely here. The
