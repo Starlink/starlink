@@ -46,154 +46,11 @@ if { $argc >= 1 } {
    exit
 }
 
-#  Define class for dealing with image names (included so will work
-#  with single binaries).
-itcl::class GaiaImageName {
-   constructor {args} {
-      eval configure $args
-   }
-   destructor  {
-   }
-   public method fullname {} {
-      return $fullname_
-   }
-   public method diskfile {} {
-      return $diskfile_
-   }
-   public method slice {} {
-      return $slice_
-   }
-   public method path {} {
-      return $path_
-   }
-   public method type {} {
-      return $type_
-   }
-   public method exists {} {
-      if { [file readable $diskfile_] && [file isfile $diskfile_] } {
-	 return 1
-      } else {
-	 return 0
-      }
-   }
-   public method absolute {} {
-      if { ! [string match {/*} $imagename] } {
-	 if { ! [catch {set here [pwd]}] } {
-            if { [string range $here 0 7] == "/tmp_mnt" } {
-               set here [string range $here 8 end]
-            }
-	    set imagename "$here/$imagename"
-	    parse_name_
-	 }
-      }
-   }
-   protected method parse_name_ {} {
-      reset_
-      get_slice_
-      get_type_
-      if { ! [check_type_] } {
-	 get_path_
-      }
-      get_diskfile_
-      get_fullname_
-   }
-   protected method get_slice_ {} {
-      set i1 [string last {(} $imagename]
-      set i2  [string last {)} $imagename]
-      if { $i1 > -1 && $i2 > -1 } {
-	 set slice_ [string range $imagename $i1 $i2]
-      } else {
-	 set slice_ ""
-      }
-   }
-   protected method get_type_ {} {
-      set tail [file tail $imagename]
-      set i1 [string first {.} $tail]
-      if { $i1 > -1 } {
-	 set type_ [string range $tail $i1 end]
-      } else {
-	 set type_ ".sdf"
-      }
-   }
-   protected method check_type_ {} {
-      if { [string match ".fit*" $type_] ||
-	   [string match ".FIT*" $type_] ||
-	   [string match ".sdf" $type_] } {
-	 return 1
-      }
-      global env
-      if { [info exists env(NDF_FORMATS_IN)] } {
-	 if { [string first $type_ $env(NDF_FORMATS_IN)] > -1 } {
-	    return 1
-	 }
-      }
-      return 0
-   }
-   protected method get_diskfile_ {} {
-      set i1 [string first $type_ $imagename]
-      if { $i1 > -1 } {
-	 incr i1 -1
-	 set diskfile_ "[string range $imagename 0 $i1]$type_"
-      } else {
-	 set i1 [string first $path_ $imagename]
-	 if { $i1 > -1 } {
-	    incr i1 -1
-	    set diskfile_ "[string range $imagename 0 $i1]$type_"
-	 } else {
-	    if { $slice_ != {} } {
-	       set i2 [expr [string first $slice_ $imagename]-1]
-	    } else {
-	       set i2 end
-	    }
-	    set diskfile_ "[string range $imagename 0 $i2]$type_"
-	 }
-      }
-   }
-   protected method get_fullname_ {} {
-      set fullname_ "$diskfile_$path_$slice_"
-   }
-   protected method get_path_ {} {
-      set i1 [string first {.sdf} $type_]
-      if { $i1 > -1 } {
-	 set i1 [expr $i1+4]
-	 if { $slice_ != {} } {
-	    set i2 [expr [string first $slice_ $type_]-1]
-	 } else {
-	    set i2 end
-	 }
-	 set path_ [string range $type_ $i1 $i2]
-	 
-      } else {
-	 if { $slice_ != {} } {
-	    set i2 [expr [string first $slice_ $type_]-1]
-	 } else {
-	    set i2 end
-	 }
-	 set path_ [string range $type_ 0 $i2]
-      }
-      set type_ ".sdf"
-   }
-   protected method reset_ {} {
-      set fullname_ {}
-      set diskfile_ {}
-      set slice_ {}
-      set path_ {}
-      set type_ {.sdf}
-   }
-   public variable imagename {} {
-      if { $imagename != {} } {
-	 parse_name_
-      }
-   }
-   protected variable fullname_ {}
-   protected variable diskfile_ {}
-   protected variable slice_ {}
-   protected variable path_ {}
-   protected variable type_ {.sdf}
-}
+#  Add GAIA_DIR to autopath for some GAIA classes.
+lappend auto_path $env(GAIA_DIR)
 
 #  Now parse name.
-set namer [GaiaImageName .namer -imagename $image]
+set namer [::gaia::GaiaImageName .namer -imagename $image]
 if { ! [$namer exists] } { 
    puts stderr "Cannot read image: $image"
    exit 1
@@ -201,6 +58,9 @@ if { ! [$namer exists] } {
 
 #  Make it absolute (also stripping off tmp_mnt, if present).
 $namer absolute
+
+#  If it has a FITS extension then we need to protect the [].
+$namer protect
 
 #  Open a socket to a GAIA application and return the file descriptor
 #  for remote commands. If a GAIA isn't found then start one up.
@@ -254,17 +114,17 @@ proc connect_to_gaia {} {
 
 #  Send the command to GAIA and return the results or generate an error.
 proc send_to_gaia {args} {
-    global gaia_fd
-    puts $gaia_fd "$args"
-    lassign [gets $gaia_fd] status length
-    set result {}
-    if {$length > 0} {
-	set result [read $gaia_fd $length]
-    }
-    if {$status != 0} {
-	error $result
-    }
-    return $result
+   global gaia_fd
+   puts $gaia_fd "$args"
+   lassign [gets $gaia_fd] status length
+   set result {}
+   if {$length > 0} {
+      set result [read $gaia_fd $length]
+   }
+   if {$status != 0} {
+      error "$result"
+   }
+   return "$result"
 }
 
 #  Open up connection to GAIA.
