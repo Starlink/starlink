@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.71  1999/07/26 20:35:40  timj
+*     Check for planet coordinate frame for model.
+*
 *     Revision 1.70  1999/07/17 02:56:39  timj
 *     Further refinement of the sky removal using model.
 *
@@ -836,10 +839,19 @@ c
                CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_M_FITS,
      :              MODEL_FITS, 'SCUPROJ', OUT_COORDS, STATUS)
                print *, 'cproj ', out_coords
-               CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
-     :              MODEL_FITS, 'LONG', MODEL_RA_CEN, STATUS)
-               CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
-     :              MODEL_FITS, 'LAT', MODEL_DEC_CEN, STATUS)
+
+*     For PLanet we do not need a LONG/LAT
+               IF (OUT_COORDS .NE. 'PL' .AND. OUT_COORDS .NE. 'AZ'
+     :              .AND. OUT_COORDS .NE. 'NA') THEN
+                  CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :                 MODEL_FITS, 'LONG', MODEL_RA_CEN, STATUS)
+                  CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_M_FITS,
+     :                 MODEL_FITS, 'LAT', MODEL_DEC_CEN, STATUS)
+               ELSE
+                  MODEL_RA_CEN = 0.0
+                  MODEL_DEC_CEN = 0.0
+               END IF
+
                print *, model_ra_cen, model_dec_cen 
 
 *     NOTE: The model file is kept open until after the despiking.
