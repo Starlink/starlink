@@ -98,6 +98,7 @@
         PARAMETER		( UMODE = 'NORMAL' )
 
 *  Local Variables:
+      CHARACTER*72		CMNT			! Keyword comment
       CHARACTER*40		CREATOR			! Creator of file
       CHARACTER*80		HTXT			! History text line
 
@@ -118,7 +119,7 @@
       OARG = ADI__NULLID
 
 *  Locate our primary HDU
-      CALL ADI2_FNDHDU( ARGS(1), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(1), ' ', .TRUE., PHDU, STATUS )
 
 *  Get verbosity
       IVERB = HSI__QUIET
@@ -148,11 +149,11 @@ C      CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
         CALL MSG_MAKE( 'ASTHIS: ^CMD on ^HOST at ^TIME', HTXT, TLEN )
 
 *    Write hew history record
-        CALL ADI2_ADDHIS( PHDU, HTXT(:TLEN), .TRUE., STATUS )
+        CALL ADI2_HPHIS( PHDU, HTXT(:TLEN), STATUS )
 
 *    Get the value of the CREATOR keyword. Only write this keyword if its
 *    value is not currently defined
-        CALL ADI2_HGKYC( PHDU, 'CREATOR', CREATOR, STATUS )
+        CALL ADI2_HGKYC( PHDU, 'CREATOR', CREATOR, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           CALL ADI2_HPKYC( PHDU, 'CREATOR', NAME,
