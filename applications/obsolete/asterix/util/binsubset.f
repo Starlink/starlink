@@ -68,7 +68,6 @@
 *    Local variables :
 *
       CHARACTER*80           TEXTI(4)           ! Input file spec
-      CHARACTER*80           TEXTO(4)           ! Output file spec
       CHARACTER*132          HTEXT(MX__HTEXT)   ! History text
       CHARACTER*80           AXUNT(ADI__MXDIM)  ! Units for each axis
       CHARACTER*6            PARNAM
@@ -86,6 +85,7 @@
       INTEGER                DIMS(ADI__MXDIM)   ! Input DATA_ARRAY dimensions
       INTEGER                HU                 ! History lines used
       INTEGER                IDPTR              ! Pointer to input data
+      INTEGER			IFID			! Input dataset id
       INTEGER                IVPTR              ! Pointer to input VARIANCE
       INTEGER                IWPTR(ADI__MXDIM)  ! Pointer to input axis widths
       INTEGER                NDIM               ! Number of input dimensions
@@ -101,6 +101,7 @@
       INTEGER                I, J, K            ! Loop counters
       INTEGER                NELM               ! Total length of input data
       INTEGER                IQPTR              ! Pointer to input QUALITY
+      INTEGER			OFID			! Output dataset id
       INTEGER                OQPTR              ! Pointer to output QUALITY
       INTEGER                INLINES            ! Number of TEXTI lines
       INTEGER                AXRANGE(2,DTA__MXRANG,ADI__MXDIM)
@@ -602,7 +603,7 @@
           ELSE
             CALL BDI_MAPAXVAL( FID, 'READ', I, AXPTR, STATUS )
             CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
-            CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AHI(I), STATUS )
+            CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
           END IF
 
 *    set direction indicator for axis
@@ -812,7 +813,7 @@ c        END IF
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      INTEGER                A,B,C,D,E,F,G,H,I,J,K,L,M,N,O !Loop counters
+      INTEGER                A,B,C,D,E,F,G,H,I,J,K,L,M,N !Loop counters
 
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -883,9 +884,7 @@ c        END IF
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      INTEGER                I, J, K            ! Counters
-
-      LOGICAL                LOOP
+      INTEGER                I, J            	! Counters
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
