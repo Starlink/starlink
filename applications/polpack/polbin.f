@@ -79,6 +79,8 @@
 *     the reference direction will be the second pixel axis. The POLANAL
 *     Frame in the WCS information of the output catalogue is updated to
 *     describe the new reference direction.
+*     -  The bottom left corner of each bin is chosen so that the origin
+*     of the (X,Y) Frame would correspond to a bin corner. 
 
 *  Examples:
 *     polbin intab outtab 4
@@ -105,6 +107,9 @@
 *        Rename KPG1_GTCTW as POL1_GTCTW.
 *     6-APR-1999 (DSB):
 *        Changed reference direction scheme.
+*     14-MAR-2000 (DSB):
+*        Change the choice of bottom left corner of each bin so that the 
+*        origin of the (X,Y) Frame would correspond to a bin corner. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,6 +129,10 @@
 
 *  Status:
       INTEGER STATUS
+
+*  External References:
+      INTEGER KPG1_CEIL          ! Returns smallest integer >= X
+      INTEGER KPG1_FLOOR         ! Returns largest integer <= X
 
 *  Local Constants:
       INTEGER X_ID               
@@ -207,6 +216,10 @@
       INTEGER IPY                ! Pointer to i/p Y values
       INTEGER IROW               ! Row index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
+      INTEGER IXHI               ! Upper pixel index on X axis
+      INTEGER IXLO               ! Lower pixel index on X axis
+      INTEGER IYHI               ! Upper pixel index on Y axis
+      INTEGER IYLO               ! Lower pixel index on Y axis
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
       INTEGER MINVAL             ! Min. no. of good i/p positions per cell
@@ -226,20 +239,20 @@
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
       LOGICAL VAR                ! Producing variances?
+      REAL ANG                   ! Stored angle in input catalogue
       REAL ANGROT                ! ACW angle from X axis to i/p ref dirn (degs)
       REAL ANGRT                 ! ACW angle from X axis to o/p ref dirn (degs)
       REAL BOX( 2 )              ! Bin size
       REAL NSIGMA                ! No. of sigmas to clip at
+      REAL Q                     ! Stored Q in input catalogue
       REAL RTOD                  ! Conversion factor; radians to degrees
       REAL SXHI                  ! Upper bound of used region of X axis 
       REAL SXLO                  ! Lower bound of used region of X axis 
       REAL SYHI                  ! Upper bound of used region of Y axis 
       REAL SYLO                  ! Lower bound of used region of Y axis 
-      REAL Q                     ! Stored Q in input catalogue
-      REAL U                     ! Stored U in input catalogue
-      REAL ANG                   ! Stored angle in input catalogue
       REAL TR( 4 )               ! Coeff.s of (X,Y) -> cell indices mapping
       REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
+      REAL U                     ! Stored U in input catalogue
       REAL X0                    ! X at bottom left of bottom left cell
       REAL Y0                    ! Y at bottom left of bottom left cell
 *.
@@ -430,17 +443,25 @@
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
      :                  SYLO, MAXPOS, MINPOS, STATUS )
 
+*  Find the indices of the first and last bins on each axis. This
+*  assumes that the origin on each axis is at a bin edge.
+      IXLO = KPG1_FLOOR( SXLO / BOX( 1 ) )
+      IXHI = KPG1_CEIL( SXHI / BOX( 1 ) )
+      IYLO = KPG1_FLOOR( SYLO / BOX( 2 ) )
+      IYHI = KPG1_CEIL( SYHI / BOX( 2 ) )
+
 *  Find the number of bins along each axis.
-      NXBIN = INT( ( SXHI - SXLO ) / BOX( 1 ) ) + 1
-      NYBIN = INT( ( SYHI - SYLO ) / BOX( 2 ) ) + 1
+      NXBIN = IXHI - IXLO + 1
+      NYBIN = IYHI - IYLO + 1
 
 *  Find the total number of bins.
       NBIN = NXBIN*NYBIN
 
 *  Find the X and Y values corresponding to the bottom left corner of the 
-*  bottom left bin.
-      X0 = SXLO - 0.5*( NXBIN*BOX( 1 ) - SXHI + SXLO ) 
-      Y0 = SYLO - 0.5*( NYBIN*BOX( 2 ) - SYHI + SYLO ) 
+*  bottom left bin. AGain, this assumes that the origin on each axis is at
+*  a bin edge.
+      X0 = IXLO*BOX( 1 )
+      Y0 = IYLO*BOX( 2 )
 
 *  Find the coefficients of the transformation. The X cell index for a
 *  position (X,Y) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
