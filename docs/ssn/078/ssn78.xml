@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ssn PUBLIC
               "-//Starlink//DTD Starlink SSN 0.7 (XML)//EN"
-              "ssn-xml-0.7.dtd" [
+              "dtd/ssn-xml-0.7.dtd" [
   <!ENTITY autoconfman 
            "http://www.gnu.org/software/autoconf/manual/autoconf-2.57">
   <!ENTITY autoconfhtml "&autoconfman;/html_node">
@@ -28,11 +28,6 @@
   <!ENTITY fig-versinfo-gif   SYSTEM "ssn78-5.gif" NDATA gif89a>
   <!ENTITY fig-versinfo-eps   SYSTEM "ssn78-5.eps" NDATA eps>
   <!ENTITY fig-versinfo-pdf   SYSTEM "ssn78-5.pdf" NDATA pdf>
-
-  <!-- References to other Starlink documents -->
-  <!ENTITY sgp28  PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN" NDATA XML>
-  <!ENTITY ssn70  PUBLIC "-//Starlink//DOCUMENT Summary SSN/70//EN" NDATA XML>
-  <!ENTITY sun199 PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN" NDATA XML>
 ]>
 <!-- $Revision$ -->
 
@@ -3637,8 +3632,8 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
             their default prefix.  Say you want the distribution to
             install by default 
             in <code>/star</code>, but have these special buildsupport
-            tools installed in <code>/local-star/makedist</code>.  Do
-            that as follows:
+            tools installed in <code>/local-star/makedist</code> (for
+            example) .  Do that as follows:
 <verbatim>
 % STARCONF_DEFAULT_PREFIX=/star ./bootstrap --buildsupport=/local-star/makedist
 </verbatim>
@@ -3664,12 +3659,30 @@ m4_define([OVERRIDE_PREFIX],[/star])
 </verbatim>
             When you run <code>./bootstrap</code> after that, the
             given prefix will be used instead of the prefix baked into
-            the installed buildsupport tools.  This method is slightly
+            the installed buildsupport tools.  This method is in principle
             fragile, and uses a partly-deprecated autoconf interface,
             and so is not guaranteed to work for all time.  Unless you
             plan to delete this directory as soon as you have rolled
             your distribution, it would probably be wise to delete
-            this file and re-bootstrap the directory, to avoid confusion.</p>
+            this file and re-bootstrap the directory, to avoid
+            confusion.</p>
+
+          <p>That is, to create a distribution of component
+            <code>foo</code>, located in <code>libraries/foo</code> in
+            the repository, you should <em>tag</em> the source set
+            with a suitable release tag, such as
+            <code>foo-1-2-3</code>, and then, in a temporary
+            directory, do the following:
+<verbatim>
+% cvs -d <em>???</em> export -r foo-1-2-3 libraries/foo
+% cd libraries/foo
+% echo 'm4_define([OVERRIDE_PREFIX],[/star])' >acinclude.m4
+% ./bootstrap
+% ./configure
+% make dist
+</verbatim>
+            This will leave a tarball such as
+            <code>foo-1.2-3.tar.gz</code> in the current directory.</p>
 
         </subsubsect>
 
@@ -4324,12 +4337,12 @@ $(RECURSIVE_TARGETS):
         <p>There is fairly complete support for documentation within
           the build system.  Most Starlink documentation is in the
           form of &latex; files respecting certain conventions (see
-          <docxref doc="sgp28" >SGP/28: Writing Starlink
-            documents</docxref> and <docxref doc="sun199" >SUN/199:
+          <docxref doc="SGP/28">SGP/28: Writing Starlink
+            documents</docxref> and <docxref doc="SUN/199" >SUN/199:
           Star2HTML</docxref> for some further details), but a small
           amount is in a custom XML DTD, converted using the kit contained in
           the <code>sgmlkit</code> component, documented in <docxref
-            doc="ssn70" >SSN/70</docxref>.</p>
+            doc="SSN/70" />.</p>
 
         <p>The simplest case is where you have one or more
           <code>.tex</code> files in the component directory (that is,
