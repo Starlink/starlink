@@ -116,7 +116,7 @@
 *  warnings.  
          IF ( FSTAT .GT. FITSOK ) THEN
             CALL MSG_SETI( 'I', ICOL )
-            CALL CAT_FIOER( FSTAT, 'CAT_GCOLC_ERR1', 'FTGCVS',
+            CALL CAT1_FIOER( FSTAT, 'CAT_GCOLC_ERR1', 'FTGCVS',
      :                       'Error writing the values for column ^I.',
      :                       STATUS )
          END IF

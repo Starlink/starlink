@@ -1,7 +1,7 @@
-      SUBROUTINE POL1_GCOLR( CI, GI, FROW, NROW, VALS, STATUS )
+      SUBROUTINE CAT1_GCOLR( CI, GI, FROW, NROW, VALS, STATUS )
 *+
 *  Name:
-*     POL1_GCOLR
+*     CAT1_GCOLR
 
 *  Purpose:
 *     Read multiple values for a single column from a catalogue.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_GCOLR( CI, GI, FROW, NROW, VALS, STATUS )
+*     CALL CAT1_GCOLR( CI, GI, FROW, NROW, VALS, STATUS )
 
 *  Description:
 *     This routine reads multiple values for a single column from a 
@@ -122,7 +122,7 @@
 *  warnings.  
          IF ( FSTAT .GT. FITSOK ) THEN
             CALL MSG_SETI( 'I', ICOL )
-            CALL POL1_FIOER( FSTAT, 'POL1_GCOLR_ERR1', 'FTGCVE',
+            CALL CAT1_FIOER( FSTAT, 'CAT1_GCOLR_ERR1', 'FTGCVE',
      :                       'Error writing the values for column ^I.',
      :                       STATUS )
          END IF
