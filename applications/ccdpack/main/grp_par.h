@@ -32,6 +32,9 @@
 *-
 */
 
+#ifndef GRP_DEFINED
+#define GRP_DEFINED
+
 /***********/
 /* General */
 /***********/
@@ -66,3 +69,6 @@
  */
 #define GRP__SZFNM 256
 
+#endif  /* GRP_DEFINED */
+
+/* $Id$ */
