@@ -108,6 +108,7 @@
       INTEGER			NEVENT			! Number of records
       INTEGER			NLIST			! Number of lists
 
+      LOGICAL			QVEC			! Vector quantum?
       LOGICAL			THERE			! Object is mapped?
 *.
 
@@ -144,11 +145,35 @@
      :                       /'list ^L because it is mapped', STATUS )
         END IF
 
-*    Locate the list data component
+*    Locate the list container
         CALL DAT_FIND( LOC, NAME, LLOC, STATUS )
+
+*    Locate the list data component
         CALL DAT_FIND( LLOC, 'DATA_ARRAY', DLOC, STATUS )
         CALL DAT_ALTER( DLOC, 1, NEVENT, STATUS )
         CALL DAT_ANNUL( DLOC, STATUS )
+
+*    Vector quantum?
+        CALL ADI_CGET0L( LID, 'VectorQuantum', QVEC, STATUS )
+        IF ( QVEC ) THEN
+
+*      Check not mapped
+          CALL ADI_THERE( LID, '.MappedComponentQ', THERE, STATUS )
+          IF ( THERE ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'L', NAME )
+            CALL ERR_REP( 'EDI1_ALTLEN_2', 'Unable to alter length'/
+     :         /' of list ^L quantum because it is mapped', STATUS )
+          END IF
+
+*      Alter length of array
+          CALL DAT_FIND( LLOC, 'QUANTUM', DLOC, STATUS )
+          CALL DAT_ALTER( DLOC, 1, NEVENT, STATUS )
+          CALL DAT_ANNUL( DLOC, STATUS )
+
+        END IF
+
+*    Release the list structure
         CALL DAT_ANNUL( LLOC, STATUS )
 
 *    Free the list identifier
