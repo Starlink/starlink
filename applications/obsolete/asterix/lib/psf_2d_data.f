@@ -79,7 +79,7 @@
       INTEGER                   IA, IR, IX, IY          ! Model bin indices
       INTEGER			MDATA, MFLAG		! Model data
       INTEGER                   MODI                    ! Model index
-      INTEGER			GNA, GNR, GNY		! Grid dimensions
+      INTEGER			GNA, GNR, GNX, GNY      ! Grid dimensions
       INTEGER			NELM			! Model # elements
       INTEGER			NTOT			! Model # elements
       INTEGER                   PDATA                   ! Model psf data ptr
@@ -187,15 +187,15 @@
               IR = IR + 1
             END DO
           END IF
-          CALL ADI_CGET0I( PSID, 'ModelNaz', NA, STATUS )
+          CALL ADI_CGET0I( PSID, 'ModelNaz', GNA, STATUS )
 
 *      Find azimuthal bin. Only handle one azimuthal bin for central
 *      radial bin.
-          IF ( (IR.EQ.1) .OR. (NA.EQ.1) ) THEN
+          IF ( (IR.EQ.1) .OR. (GNA.EQ.1) ) THEN
             IA = 1
           ELSE
             MA = ATAN2(Y0,X0)*MATH__RTOD+180.0
-            IA = INT( MA*NA/360.0) + 1
+            IA = INT( MA*GNA/360.0) + 1
           END IF
 
 *      Compute model index from azimuthal radial bins
@@ -207,6 +207,7 @@
 *      Compute model index from azimuthal and altitudinal bins
           CALL ADI_CGET0R( PSID, 'ModelDx', GDX, STATUS )
           CALL ADI_CGET0R( PSID, 'ModelDy', GDY, STATUS )
+          CALL ADI_CGET0I( PSID, 'ModelNx', GNX, STATUS )
           CALL ADI_CGET0I( PSID, 'ModelNy', GNY, STATUS )
           IX = INT(ABS(X0/GDX)) + 1
           IY = INT(ABS(Y0/GDY)) + 1
@@ -232,11 +233,11 @@
               IF ( IA .EQ. 1 ) THEN
                 MA = 0.0
               ELSE
-                MA = (REAL(IA-1)+0.5)*360.0/REAL(NA)
+                MA = (REAL(IA-1)+0.5)*360.0/REAL(GNA)
               END IF
 
               IF ( SMREG ) THEN
-                MR = (REAL(IR-1)+0.5)*DR
+                MR = (REAL(IR-1)+0.5)*GDR
               ELSE
 
 *            Trap case of infinite irregular radius, and peg to last
