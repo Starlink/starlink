@@ -1,3 +1,10 @@
+2000-10-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/makefile (ADAMLIBS): Add -L/star/lib
+
+	* src/surf_link_adam: Remove explicit -L/star/lib to prevent clash
+	with /stardev
+
 2000-10-16  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* scripts/sculog: Fix problem when accessing files of name o??.sdf

@@ -7,7 +7,7 @@
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.6-2JACtest'"
+PKG_VERS = "'1.6-3JACtest'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
@@ -15,16 +15,20 @@ SURFLIB  = ../surflib
 SURF_KAP = ../surf_kap
 PKG = surf
 
+# Starlink
+STARLINK = /star
+STAR_INC = $(STARLINK)/include
+STAR_LIB = $(STARLINK)/lib
+
+
 # Libraries
 
 LIBS = -L. -lsurf -L$(SURFLIB) -lsurflib -L$(SCULIB) -lsculib -L$(SURF_KAP) -lsurf_kap
 SLIB = libsurflib.a libsculib.a libsurf.a libsurf_kap.a
 # IRAS = -L/star/iras90 -lira : This is all in surf_link_adam
-ADAMLIBS = `./surf_link_adam`
+ADAMLIBS = -L$(STAR_LIB) `./surf_link_adam`
 
-# Includes
 
-STAR_INC = /star/include
 
 
 # Linker

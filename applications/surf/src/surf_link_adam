@@ -63,6 +63,9 @@
 #	 Remove SGS dependency.
 #     2000 August 21 (TJ)
 #        Add NDG
+#     2000 October 27 (TJ)
+#        Remove /star/lib since that makes it impossible to build
+#        on stardev system.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -71,7 +74,7 @@
 #-
 
 # Now find the necessary libraries
-      echo -L/star/lib `ndf_link_adam` `fio_link_adam` \
+      echo `ndf_link_adam` `fio_link_adam` \
            `sla_link_adam` `hlp_link_adam` `pda_link_adam` \
            `prm_link_adam` `agi_link_adam` \
            `pgp_link_adam` `grp_link_adam` `ndg_link_adam` \
