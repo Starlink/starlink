@@ -27,7 +27,7 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-AC_CHECK_HEADERS([fenv.h limits.h float.h stdint.h time.h assert.h])
+AC_CHECK_HEADERS([fenv.h limits.h float.h time.h assert.h inttypes.h stdint.h])
 AC_CHECK_FUNCS([nextafter nextafterf])
 AC_CHECK_TYPES([int32_t, int64_t])
 AC_CHECK_SIZEOF(char)
