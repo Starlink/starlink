@@ -1,0 +1,261 @@
+
+                       Polarimetry window
+                       ==================
+
+   How to use this window to:
+   --------------------------
+
+
+   --- Display a vector map:
+
+Select a catalogue using the "Open" item in the "File" menu (or click
+on one of the recently accessed file names in the "File" menu). The
+catalogue must be either a FITS binary table, or any of the other
+formats readable by the POLPACK package. The catalogue must contain
+columns containing Cartesian X and Y coordinates for each vector. If
+the names of these column are not "X" and "Y", then the names should
+be specified in a text file called $HOME/.polpackrc as in the
+following example (where the names of the two columns are "PIXEL_X"
+and "PIXEL_Y"):
+
+% cat $HOME/.polpackrc
+Column X PIXEL_X
+Column Y PIXEL_Y
+
+This file can also contain the names of other columns; in particular
+the names of columns containing RA and DEC values can be supplied if
+these are not just "RA" and "DEC" (the defaults). RA and DEC values
+are qualified by EPOCH and EQUINOX parameters supplied with the
+catalogue, but these both default to J2000 if not supplied.
+
+If an image is displayed in the main image window, an attempt will be
+made to align the vectors with the image. If both image and catalogue
+contain RA and DEC values, then alignment will be in RA and DEC.
+Otherwise alignment will be in pixel coordinates (based on the X and Y
+columns in the catalogue).
+
+If no image is displayed in the main window, a blank image will be
+created covering the area of the catalogue. The colour of this image
+can be controlled as usual using the colour maps and intensity scaling
+controls in the main image control panel.
+
+The columns to use for the length and orientation of each vector are
+specified on the "Rendering" tab, and default to "P" and "ANG". This tab
+also contains controls for setting the appearance of vectors. The
+appearance of selected vectors and unselected vectors can be
+controlled separately. Note, entering a blank value in the "Vector
+scale" box will cause a default vector scale to be calculated and used.
+If a blank value is entered in the "Thickness" box for selected
+vectors, then selected vectors are rendered with the same thickness as
+unselected vectors. 
+
+
+   --- Bin vectors:
+
+Click on the "Binning" tab, select the required binning parameters and
+press the "Bin now" button. This will replace the displayed vector map
+with a map formed by binning all the previously displayed vectors
+(both selected and unselected). If you do not like the results, press
+the "Un-do" item in the "Edit" menu to re-instate the original map!
+
+
+
+   --- Remove vectors:
+
+Select the vectors to be removed using any of the techniques in the 
+"How to select vectors" section of this help, and then press the "Cut"
+item in the "Edit" menu. The selected vectors will be removed from the
+map. To re-instate the original map, press the "Un-do" button in the
+"Edit" menu.
+
+
+
+   --- Save the currently displayed vectors:
+
+Click the "Save as" item in the "File" menu.
+
+
+   --- Select vectors:
+
+Various operations within the toolbox require some vectors to be
+selected in order for the operation to complete. Vectors can be
+selected in several ways:
+
+1) By clicking and dragging with the left mouse button over the
+displayed vector map. The shape of the region dragged out by the
+pointer can be either a rectangle or a circle, and is set on the
+"Selecting" tab. If the control and shift keys are pressed when the
+button is clicked, any selected vectors are added to the previous
+selection.
+
+2) By pointing at an individual vector and clicking with the left
+button. This will select the single vector under the pointer. Again,
+if the control and shift buttons are pressed, the selected vector is
+added to the current selection.
+
+3) By clicking and dragging in the table of vectors in the Polarimetry
+toolbox window. Again, if the control and shift buttons are pressed,
+the selected vectors are added to the current selection.
+
+4) By entering an algebraic expression into the "Expression:" box on
+the "Selecting" tab, and pressing <Return>. The variables within this
+expression should be the names of catalogue columns, preceded by a
+dollar sign ($). The expression should be a legal Tcl expression. The
+expression is evaluated for each row in the catalogue, and if the
+result is non-zero the row is selected. For example, "$P > 50" selects
+vectors which have a value larger than 50 in the P column; "$P >
+2*$DP" selects vectors with a signal to noise ratio better than 2. If
+the control and shift buttons are pressed when the <Return> button is
+pressed, the selected vectors are added to the current selection.
+
+5) Pressing the "Select all" button in the "Selecting" tab, will
+select all vectors.
+
+
+
+   --- De-select vectors:
+
+The "Selecting" tab contains a menu labelled "Operation:", which is
+set to "Select" by default. In this mode, the vectors chosen using the
+techniques described in the previous section are *selected*, and all
+other vectors are de-selected (unless control and shift are pressed,
+in which case the states of other vectors are left unchanged). If the
+"Operation:" value is set to "De-select", then this is reversed, i.e.
+the chosen vectors are *de-selected*, and all other vectors are
+*selected* (unless control and shift are pressed, in which case the
+states of other vectors are left unchanged).
+
+If "Operation" is set to "Select", then clicking over a blank part of
+the vector map will de-select all vectors (if "Operation" is set to
+"De-select", then clicking over a blank part of the vector map will
+select all vectors).
+
+To remove some vectors from the current selection (i.e. to de-select
+them), set "Operation" to "De-select" and then use one of the
+techniques described in the previous section to choose the vectors to
+be de-selected. Be careful to press control and shift while choosing
+them, otherwise the sates of all other vectors will be reset to
+"selected".
+
+
+
+   --- Perform aperture polarimetry:
+
+The "Integrate" tab displays a single row of values formed by binning
+all the currently selected vectors into a single vector. This is done
+by combining the Stokes parameters using the selected method, and
+recalculating the other columns on the basis of the combined Stokes
+parameters. The table is updated automatically when new vectors are
+selected. So to perform simple aperture polarimetry, select all
+vectors within the aperture, and then read off the integrated values
+from the table in the "Integrate" tab. No facilities currently exist
+for removing any "background" Stokes parameters (caused by
+inter-stellar polarization for instance). Sky subtraction should
+normally be performed prior to forming the catalogue of Stokes
+vectors.
+
+Note, if the catalogue contains error information in the form of
+columns of standard deviations for the Stokes parameters, then there
+is a limit of 100 on the number of vectors which can be integrated
+into a single measurement. This limit does not apply though if the
+Stokes parameters are combined using a simple mean (selected using the
+"Method" menu on the "Integrate" tab).
+
+
+
+   --- Specify columns containing Stokes parameters.
+
+In order to use the "Bin" or "Integrate" tabs, assumptions must be
+made about which catalogue columns contain Stokes parameters. By
+default, it is assumed that the Stokes parameters are contained in
+columns names "I", "Q", "U" and "V", with standard deviations in
+columns "DI", "DQ", "DU" and "DV". To select other columns to use for
+these quantities, either use the "Column Names" tab, or create a file
+called $HOME/.polpackrc containing column names prior to using the
+polarimetry toolbox. This file defines columns as in the following
+example:
+
+% cat $HOME/.polpackrc
+Column I STOKES_I
+Column DI STOKES_DI
+
+etc
+
+The second word in each line is the standard column name, and the
+third word is the column name you wish to use. The standard column
+names are I, Q, U, V, DI, DQ, DU, DV, P, DP , ANG, DANG, PI, DPI, X,
+Y, RA and DEC. So the above example uses column "STOKES_I" in place of
+"I", and "STOKES_DI" in place of "DI". If no entry is included for a 
+given column, then the standard column name is used. If a catalogue
+does not contain a given parameter, then a blank column name can be
+given in the .polpackrc file. Thus, the line 
+
+Column V
+
+implies that the catalogue does not contain any V values.
+
+
+
+   --- Display vector statistics:
+
+The "Statistics" tab displays a table of statistics for the currently
+selected vectors. The table is updated automatically when new vectors
+are selected. These statistics are simple statistics of the values in
+each column, and do not make any assumptions about the content of each
+column. For instance, if column "P" contains polarization values, the
+"mean P" displayed in the table is literally the mean of the P values.
+It is *not* the P value implied by the mean of the Stokes vectors. Use
+the "Integrate" tab for such "Stokes-aware" statistics.
+
+
+
+   --- Control the key:
+
+A key to the vector scale can be produced, and is controlled using the
+controls on the "Key" tab. The position of the key can be changed by
+clicking and dragging over the key.
+
+
+
+  --- Display a plane from a spectropolarimetry cube:
+
+A catalogue containing spectropolarimetry data is assumed to have an
+extra column containing some indication of the spectral channel for each
+vector (this may be velocity, wavelength, frequency, integer channel
+number, etc). By default, it is assumed that this column is named "Z",
+but an alternative column name may be specified by including a line in a
+text file called $HOME/.polpackrc as in the following example, which
+indicates that the column named "VEL" should be used as the spectral 
+channel column:
+
+% cat $HOME/.polpackrc
+Column Z VEL
+
+Only a single spectral channel may be displayed at any one time. The
+spectral channel to use is selected using the "SpecPol" tab. The channel
+may be specified in two ways:
+
+   1) as a Z column value - only rows which have the specified value in the
+   Z column are displayed.
+
+   2) as an Z axis value - this is only available if your catalogue has 
+   suitable WCS information which can be used to transform the column
+   values into some other physically meaningful system of units such as 
+   Angstroms, Hertz, etc. 
+
+If available, the units required by each box will be displayed to the
+right of the box. Entering a value into either box will result in the
+corresponding value being displayed in the other box (if possible). If no
+vectors have the specified Z value, the nearest value for which some
+vectors exist will be used instead of the specified value. If the
+catalogue contains no Z column, or if the Z column value is the same for
+all rows, the entry boxes will be disabled so that nothing can be typed
+in them.
+
+All subsequent operations act only on the displayed vectors (i.e. vectors
+for other spectral channels are ignored). Thus, for instance, dragging a
+box over the map will only select vectors in the specified channel, not
+in any other channel. If you save or bin the displayed map, the resulting
+map will contain only vectors for the specified spectral channel.
+
+

@@ -37,6 +37,12 @@ FILES        = \
  StarArdTool.tcl StarBlink.tcl StarCanvasDraw.tcl StarCanvasObject.tcl \
  StarEnterObject.tcl StarKeywordFile.tcl StarLabelCheck.tcl \
  StarLabelCheckLabel.tcl StarLabelWidgetChild.tcl StarSTLFile.tcl \
+ LabelButton.tcl GaiaPolUStyle.tcl GaiaPolUStats.tcl GaiaPolUSpec.tcl \
+ GaiaPolUKey.tcl GaiaPolUInteg.tcl GaiaPolUHigh.tcl GaiaPolUCols.tcl \
+ GaiaPolUBin.tcl GaiaPolTable.tcl GaiaPolStyle.tcl \
+ GaiaPolOptionsDialog.tcl GaiaPolList.tcl GaiaPolAction.tcl \
+ GaiaPolUSelOpt.tcl GaiaPolCat.tcl GaiaPolDisp.tcl \
+ GaiaPolObject.tcl GaiaPolData.tcl GaiaPolarimetry.tcl \
  adamtask.tcl gaiaMain.tcl gaia_defaults.tcl gaia_util.tcl \
  gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaApPhotom.hlp GaiaArd.hlp GaiaAst.hlp \
@@ -45,6 +51,7 @@ FILES        = \
  GaiaAstTransform.hlp GaiaContour.hlp GaiaEsp.hlp GaiaOptPhotom.hlp \
  GaiaPatch.hlp GaiaPositions.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  GaiaTextImport.hlp GaiaXYProfile.hlp StarBlink.hlp \
+ GaiaPolarimetry.hlp \
  skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
  adamtask.tcl
 
