@@ -51,9 +51,11 @@ following steps are required:
    versions shipped with the OS will not work.  These applications
    will be installed into $STARCONF_DEFAULT_PREFIX/buildsupport, so
    you should add $STARCONF_DEFAULT_PREFIX/buildsupport/bin to your
-   path at this point, BEFORE you run the ./bootstrap script.
+   path at this point, BEFORE you run the ./bootstrap script.  In
+   order for the `make' below to work, you also need to add the
+   default bin directory to your path, so you should do that now.
 
-      % setenv PATH $STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
+      % setenv PATH $STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
       % ./bootstrap
 
  - Now configure and build the system.  The dependencies within the
