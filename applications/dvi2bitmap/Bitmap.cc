@@ -24,8 +24,8 @@
 #include "BitmapImage.h"
 
 verbosities Bitmap::verbosity_ = normal;
-int  Bitmap::cropMargin[4] = { 0, 0, 0, 0 };
-bool Bitmap::cropMarginAbs[4] = {false, false, false, false };
+int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
+bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 
 
 // Indecision: Within scaleDown, it seems sensible to average the
@@ -49,12 +49,16 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropR = W;
     cropT = 0;
     cropB = H;
-#if 0
-    cropMargin[Left] = cropMargin[Right] =
-	cropMargin[Top] = cropMargin[Bottom] = 0;
-    cropMarginAbs[Left] = cropMarginAbs[Right] =
-	cropMarginAbs[Top] = cropMarginAbs[Bottom] = false;
-#endif
+
+    cropMargin[Left]      = cropMarginDefault[Left];
+    cropMargin[Right]     = cropMarginDefault[Right];
+    cropMargin[Top]       = cropMarginDefault[Top];
+    cropMargin[Bottom]    = cropMarginDefault[Bottom];
+    cropMarginAbs[Left]   = cropMarginAbsDefault[Left];
+    cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
+    cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
+    cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
+
     cropped_ = false;
     max_colour_ = (1<<bpp_) - 1;
 
@@ -198,14 +202,6 @@ void Bitmap::crop ()
 					: bbT - cropMargin[Top]);
     cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
 					: bbB + cropMargin[Bottom]);
-
-#if 0
-    cropL = bbL;
-    cropR = bbR;
-    cropT = bbT;
-    cropB = bbB;
-#endif
-
     cropped_ = true;
 }
 
@@ -213,6 +209,12 @@ void Bitmap::crop (Margin spec, int pixels, bool absolute)
 {
     cropMargin[spec] = pixels;
     cropMarginAbs[spec] = absolute;
+}	
+	
+void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
+{
+    cropMarginDefault[spec] = pixels;
+    cropMarginAbsDefault[spec] = absolute;
 }	
 	
 
@@ -346,7 +348,14 @@ void Bitmap::scaleDown (const int factor)
     bbT = newbbT;
     bbB = newbbB;
     if (cropped_)
+    {
+	// scale the crop margins as well
+	cropMargin[Left]   = cropMargin[Left]   / factor;
+	cropMargin[Right]  = cropMargin[Right]  / factor;
+	cropMargin[Top]    = cropMargin[Top]    / factor;
+	cropMargin[Bottom] = cropMargin[Bottom] / factor;
 	crop();			// re-crop
+    }
     bpp_ = newbpp;
     max_colour_ = new_max_colour;
 

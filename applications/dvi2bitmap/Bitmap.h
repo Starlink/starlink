@@ -28,7 +28,8 @@ class Bitmap {
     void write (const string filename, const string format);
     void freeze ();
     void crop ();
-    static void crop (Margin spec, int pixels, bool absolute=false);
+    static void cropDefault (Margin spec, int pixels, bool absolute=false);
+    void crop (Margin spec, int pixels, bool absolute=false);
     void blur ();
     void setTransparent(const bool sw) { transparent_ = sw; }
     void scaleDown (const int factor);
@@ -68,8 +69,10 @@ class Bitmap {
     int cropL, cropR, cropT, cropB;
     bool cropped_;
     // When cropping, set margins:
-    static int  cropMargin[4];
-    static bool cropMarginAbs[4];
+    static int  cropMarginDefault[4];
+    int  cropMargin[4];
+    static bool cropMarginAbsDefault[4];
+    bool cropMarginAbs[4];
     bool transparent_;		// make bg transparent if poss.
     int bpp_;			// bits-per-pixel
     int max_colour_;		// ==> max colour index
