@@ -124,6 +124,8 @@
 *        Removed use of VAL_<T>TOI calls on MAXV and MINV.
 *     2002 July 25 (MJC)
 *        Allow for integer-spaced data.
+*     2002 August 12 (MJC)
+*        Corrections and improvements to the previous enhancement.
 *     {enter_further_changes_here}
 
 *-
@@ -204,8 +206,9 @@
       DOUBLE PRECISION MEAN    ! Bin index of mean
       INTEGER MINPOS           ! Position of the minimum (not used)
       <LTYPE> MINV             ! Maximum value in the array
-      INTEGER NINVAL           ! Number of bad values in the input array
       INTEGER NBIN             ! Maximum number of histogram bins used
+      INTEGER NEXT             ! Index of next non-bad element
+      INTEGER NINVAL           ! Number of bad values in the input array
       INTEGER NUMBER           ! Number of non-zero histogram bins
       INTEGER NUMOUT           ! Number of outliers computed separately?
       INTEGER NUMVAL           ! Number of good values in input array
@@ -256,13 +259,11 @@
             INTVAL = .FALSE.
          ELSE
 
-*  Test the pixel values until any is not an integer or is not an
-*  integer increment from its neighbour (to identify integer data with
-*  a real constant added).  The test in fact has a wide margin of
-*  tolerance.  We are just trying to ensure that the histogram is not
-*  artificially sparse.  Therefore the limiting sparseness fraction is
-*  adequate.  This does break down for real values greater than about
-*  +/-8dex6 to the integer-value limits.
+*  Test the pixel values until any is not an integer.  The test in fact
+*  has a wide margin of tolerance.  We are just trying to ensure that
+*  the histogram is not artificially sparse.  Therefore the limiting
+*  sparseness fraction is adequate.  This does break down for real
+*  values greater than about +/-8dex6 to the integer-value limits.
             INTVAL = .TRUE.
             I = 0
             IF ( BAD ) THEN
@@ -270,15 +271,34 @@
                   I = I + 1
                   IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
                      INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
-                     INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                      ARRAY( MIN( I + 1, EL ) ) ) )
-                     INTVAL = INTVAL .OR.
-     :                        ( INT( INCR - INT( INCR ) ) .LT. FILLIM )
+     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM
+
+*  Hunt for the next non-bad value to compare the increments.
+                     NEXT = I + 1
+                     DO WHILE ( NEXT .LE. EL .AND. ARRAY( MIN( NEXT,
+     :                          EL ) ) .EQ. VAL__BAD<T> )
+                         NEXT = NEXT + 1
+                     END DO
+
+*  Test the pixel values until any is not an integer increment from
+*  its non-bad neighbour (to identify integer data with a real constant
+*  added).  As in the first test, this has a wide margin of tolerance.
+                     IF ( NEXT .LE. EL ) THEN
+                        INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
+     :                         ARRAY( NEXT ) ) )
+                        INTVAL = INTVAL .OR. ( ABS( INCR -
+     :                           NINT( INCR ) ) .LT. FILLIM )
+
+* When all previous tests have succeeded, do not fail because the
+* last pixel is bad.
+                     ELSE
+                        INTVAL = .TRUE.
+                     END IF
                   END IF
                END DO
 
-*  Make more efficient if there are no bad pixels present.
+*  Make the test for integer data or increments more efficient if there
+*  are no bad pixels present.
             ELSE
                DO WHILE ( INTVAL .AND. I .LT. EL )
                   I = I + 1
@@ -287,7 +307,7 @@
                   INCR = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
      :                   ARRAY( MIN( I + 1, EL ) ) ) )
                   INTVAL = INTVAL .OR.
-     :                     ( INT( INCR - INT( INCR ) ) .LT. FILLIM )
+     :                     ( ABS( INCR - NINT( INCR ) ) .LT. FILLIM )
                END DO
             END IF
          END IF
