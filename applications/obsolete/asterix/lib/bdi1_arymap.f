@@ -185,9 +185,7 @@
         END IF
 
 *    Fill mapped array with copies of scalar data
-        IF ( (ENELM .GT. NELM) .OR. (NDIM.EQ.0) ) THEN
-          CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
-        END IF
+        CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
 
 *    Clone a copy of the locator for mapping
         CALL DAT_CLONE( LOC, SLOC, STATUS )
