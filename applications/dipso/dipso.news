@@ -14,8 +14,3 @@
     component to the output NDF describing the spectral axis. This allows
     it to be used by other Starlink applications such as SPLAT, KAPPA,
     etc.
-
-    o  The ELFRESTC command has been changed so that it no longer converts
-    the supplied file name to upper case before being used to access the
-    file. The previous behaviour resulted in open failure for file names
-    containing lower case letters. 
