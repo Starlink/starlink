@@ -180,9 +180,6 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ILOC			! HDS locator
 
-      INTEGER			I			! Loop over datasets
-
-
 	CHARACTER*(DAT__SZLOC) LOC	! Component locator
 	CHARACTER*(DAT__SZLOC) DCLOC(NDSMAX)	! Data container file locators
 	CHARACTER*(DAT__SZLOC) CLOC	! Temporary component locator
