@@ -190,7 +190,7 @@ or an empty-sosofo if none is to be produced.  See also (suppress-banner).
 		(literal " Astronomy Research Council")))
     (make element gi: "h2"
 	  (make element gi: "a"
-		attributes: '(("href" "http://star-www.rl.ac.uk/"))
+		attributes: '(("href" "http://www.starlink.ac.uk/"))
 		(literal "Starlink Project")))))
 
 <routine>
