@@ -174,7 +174,7 @@
         CALL ADI_THERE( ARGS(1), 'Fpath', THERE, STATUS )
         IF ( THERE ) THEN
           CALL ADI_CGET0C( ARGS(1), 'Fpath', FPATH, STATUS )
-          CALL ADI_CPUT0C( ARGS(1), 'Fpath', FPATH(:CHR_LEN(FPATH)),
+          CALL ADI_CPUT0C( OARG, 'Fpath', FPATH(:CHR_LEN(FPATH)),
      :                     STATUS )
         END IF
 
@@ -185,9 +185,8 @@
         CALL ADI_CPUT0I( OARG, 'Lun', OLUN, STATUS )
         CALL ADI_CPUT0I( OARG, 'BlockSize', BSIZE, STATUS )
 
-      ELSE
-
 *    Return unit to system
+      ELSE
         CALL FIO_PUNIT( OLUN, STATUS )
 
 *    Report an error
