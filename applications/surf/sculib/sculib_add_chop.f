@@ -1,8 +1,7 @@
-      SUBROUTINE SCULIB_ADD_CHOP(BEAM, RA_CENTRE,
-     :     DEC_CENTRE, CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW,
-     :     LST, MJD, LAT_OBS, RA_START, RA_END, DEC_START, 
-     :     DEC_END, OUT_RA_CEN, OUT_DEC_CEN,
-     :     STATUS)
+      SUBROUTINE SCULIB_ADD_CHOP(BEAM, RA_REF_CENTRE, DEC_REF_CENTRE,
+     :     RA_CENTRE, DEC_CENTRE, CHOP_CRD, CHOP_PA, CHOP_FUN, 
+     :     CHOP_THROW, LST, MJD, LAT_OBS, RA_START, RA_END, DEC_START, 
+     :     DEC_END, OUT_RA_CEN, OUT_DEC_CEN, STATUS)
 *+
 *  Name:
 *     SCULIB_ADD_CHOP
@@ -17,7 +16,7 @@
 *     SCULIB subroutine
  
 *  Invocation:
-*     CALL SCULIB_ADD_CHOP(BEAM, RA_CENTRE,
+*     CALL SCULIB_ADD_CHOP(BEAM, RA_REF_CENTRE, DEC_REF_CENTRE, RA_CENTRE,
 *    :     DEC_CENTRE, CHOP_CRD, CHOP_PA, CHOP_FUN, CHOP_THROW,
 *    :     LST, MJD, LAT_OBS, RA_START, RA_END, DEC_START, 
 *    :     DEC_END, OUT_RA_CEN, OUT_DEC_CEN,
@@ -26,10 +25,16 @@
 *  Arguments:
 *     BEAM        = CHARACTER * (*) (Given)
 *          Beam name ('M','L' or 'R')
+*     RA_REF_CENTRE = DOUBLE PRECISION (Given)
+*          Apparent RA of the map centre. This is the centre that
+*          scan map tangent plane offsets are calculated from.
+*     DEC_REF_CENTRE = DOUBLE PRECISION (Given)
+*          Apparent dec of the map centre. This is the centre that
+*          scan map tangent plane offsets are calculated from.
 *     RA_CENTRE              = DOUBLE PRECISION (Given)
-*        the apparent RA of the `centre' (radians)
+*        the apparent RA of the `centre' of the array (radians)
 *     DEC_CENTRE             = DOUBLE PRECISION (Given)
-*        the apparent dec of the `centre' (radians)
+*        the apparent dec of the `centre' of the array (radians)
 *     CHOP_CRD               = CHARACTER *(*) (Given)
 *        Coordinate system of CHOP throw (SC,AZ,RB,RJ,GA)
 *     CHOP_PA                = REAL (Given)
@@ -64,7 +69,9 @@
 *     supplied apparent RA/Dec centre position returning a new
 *     apparent RA/Dec. Works with scan map and jiggle map
 *     but does not actually know the difference itself (unless
-*     using SC chop). 
+*     using SC chop). For EKH (SC) chopping we have to convert
+*     the scan ends to tangent plane offsets from the reference
+*     centre before calculating the angle.
 
 *  Notes:
 *     It is assumed that the chop throw is divided by two
@@ -77,8 +84,9 @@
 *     - AZ, LO and SC chopping are supported
 *     - The negative beam is always the 'left' beam, the +ve beam is the
 *       'right'.
-*     - This routine does not 'yet' correct for the droopy beam problem
-*       in early jiggle data that used RA/Dec chopping
+*     - The chop tracking 'droopy' beam problem should be dealt with
+*       in an earlier subroutine such that the chop is converted from
+*       LO to AZ before calling this routine
 *     
 
 *  Authors :
@@ -86,6 +94,11 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.3  1999/07/13 20:57:10  timj
+*     Correctly calculate SC chop beams by converting scan ends to tangent
+*     plane offsets before calculating angle.
+*     Convert everything to DOUBLE precision.
+*
 *     Revision 1.2  1999/07/13 06:30:40  timj
 *     Major overhaul - should actually work now!
 *
@@ -101,11 +114,10 @@
 *    Type Definitions :
       IMPLICIT NONE                            ! No implicit typing
 
-*    Global constants :
+*    Global constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PRM_PAR'
 
-*    Import :
+*    Import:
       CHARACTER *(*)   BEAM
       CHARACTER *(*)   CHOP_CRD
       CHARACTER *(*)   CHOP_FUN
@@ -113,37 +125,44 @@
       REAL             CHOP_THROW
       DOUBLE PRECISION DEC_CENTRE
       REAL             DEC_END
+      DOUBLE PRECISION DEC_REF_CENTRE
       REAL             DEC_START
       DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION LST
       DOUBLE PRECISION MJD
       DOUBLE PRECISION RA_CENTRE
       REAL             RA_END
+      DOUBLE PRECISION RA_REF_CENTRE
       REAL             RA_START
 
-*    Import-Export :
-*    Export :
+*    Import-Export:
+*    Export:
       DOUBLE PRECISION OUT_DEC_CEN
       DOUBLE PRECISION OUT_RA_CEN
 
-*    Status :
+*    Status:
       INTEGER          STATUS
-*    External references :
-*      REAL SLA_BEAR
 
-*    Global variables :
+*    External references:
 
-*    Local Constants :
+*    Global variables:
 
-*    Local variables :
-      REAL   ANG                          ! scan angle (-PI to PI)
+*    Local Constants:
+
+*    Local variables:
+      DOUBLE PRECISION ANG                ! scan angle (-PI to PI)
       DOUBLE PRECISION DTEMP              ! Scratch double
-      REAL   DX                           ! X scan length
-      REAL   DY                           ! Y scan length
+      DOUBLE PRECISION DX                 ! X scan length
+      DOUBLE PRECISION DY                 ! Y scan length
       DOUBLE PRECISION MAP_X              ! Cartesian offset of chop
       DOUBLE PRECISION MAP_Y              ! Cartesian offset of chop
       DOUBLE PRECISION MYLAT              ! Intermediate Y coord
       DOUBLE PRECISION MYLONG             ! Intermediate X coord
+      INTEGER          SLA_STATUS         ! Slalib status
+      DOUBLE PRECISION XEND               ! Tangent plane offset of scan end
+      DOUBLE PRECISION XSTART             ! tangent plane offset of scan start
+      DOUBLE PRECISION YEND               ! Tangent plane offset of scan end
+      DOUBLE PRECISION YSTART             ! tangent plane offset of scan start
       
 *.
 
@@ -165,38 +184,64 @@
 
          IF (CHOP_CRD .EQ. 'SC') THEN
 
+*     Need to convert the start and end apparent RA/Decs to tangent
+*     plane offsets relative to the map centre that was used for
+*     the centre of the mapped area
+
+*     Scan start
+            SLA_STATUS = 0
+            CALL SLA_DS2TP( DBLE(RA_START), DBLE(DEC_START), 
+     :           RA_REF_CENTRE, DEC_REF_CENTRE, XSTART, YSTART, 
+     :           SLA_STATUS)
+
+            IF (SLA_STATUS .NE. 0 .AND. STATUS .EQ. SAI__OK) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ', 'SCULIB_ADD_CHOP: Error calculating'//
+     :              ' tangent plane offset of scan start',
+     :              STATUS)
+            END IF
+
+*     Scan end
+            SLA_STATUS = 0
+            CALL SLA_DS2TP( DBLE(RA_END), DBLE(DEC_END), RA_REF_CENTRE,
+     :           DEC_REF_CENTRE, XEND, YEND, SLA_STATUS)
+
+            IF (SLA_STATUS .NE. 0 .AND. STATUS .EQ. SAI__OK) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP(' ', 'SCULIB_ADD_CHOP: Error calculating'//
+     :              ' tangent plane offset of scan end',
+     :              STATUS)
+            END IF
+
 *     Angles are from the end of the scan to the start so that
 *     so that the sense of the positive scan direction can be calculated
 
-            DY = DEC_END - DEC_START
-            DX = RA_END - RA_START
+            DX = XEND - XSTART
+            DY = YEND - YSTART
 
 *     Angles are relative to the X-axis and go anti-clockwise
 *     We are not using the standard 'position angle' definition
 *     since there is no real point in doing that
 
             IF ( ABS(DY) .LT. 1E-10 .AND. ABS(DX) .LT. 1E-10) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP(' ','SCULIB_ADD_CHOP: Start and '//
-     :              'end positions of scan were the same so can '//
-     :              'not define scan angle', STATUS)
+               IF (STATUS .EQ. SAI__OK) THEN
+                  STATUS = SAI__ERROR
+                  CALL ERR_REP(' ','SCULIB_ADD_CHOP: Start and '//
+     :                 'end positions of scan were the same so can '//
+     :                 'not define scan angle', STATUS)
+               END IF
 
             ELSE
                
 *     Calculate the angle using ATAN2 since we want to know
 *     which quadrant the angle is in when we come to add it on
-*     This assumes cartesian geometry.
-*     Use SLA_BEAR to get the bearing along the great circle
-*     -- not sure whether this is correct though, need to find 
-*     out what the telescope actually does!
-               ANG = ATAN2(DY, DX)
 
-*     Calculate the arcsec offset in X and Y
-*     This also assumes cartesian geometry but note that
-*     SCULIB_PROCESS_BOLS calculates the current RA/Dec centre
-*     by assuming cartesian geometry so we will stick with this...
-               MAP_X = DBLE( CHOP_THROW * COS(ANG) )
-               MAP_Y = DBLE( CHOP_THROW * SIN(ANG) )
+               ANG = DATAN2(DY, DX)
+
+*     Calculate the arcsec offset in X and Y (these are tangent plane
+*     offsets)
+               MAP_X = DBLE( CHOP_THROW ) * DCOS( ANG )
+               MAP_Y = DBLE( CHOP_THROW ) * DSIN( ANG )
                
 *     The left beam is always behind the right so have to invert the offset
                IF (BEAM .EQ. 'L') THEN
@@ -228,8 +273,8 @@
 *     Also note that the CHOP_PA is a position angle (from north)
 *     and not a standard angle from X.
             
-            MAP_X = DBLE(CHOP_THROW * SIN(CHOP_PA))
-            MAP_Y = DBLE(CHOP_THROW * COS(CHOP_PA))
+            MAP_X = DBLE(CHOP_THROW) * DSIN(DBLE(CHOP_PA))
+            MAP_Y = DBLE(CHOP_THROW) * DCOS(DBLE(CHOP_PA))
             
 *     Invert the offset if we are in the right beam
             IF (BEAM .EQ. 'R') THEN
