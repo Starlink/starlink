@@ -333,7 +333,7 @@ itcl::class gaia::GaiaSearch {
    #  Set whether to correct the any NDF origin information when
    #  plotting. This allows X and Y coordinates which are displayed in
    #  NDF pixel coordinates to be plotted correctly.
-   itk_option define -use_origin use_origin Use_Origin 1
+   itk_option define -use_origin use_origin Use_Origin 0
 
    #  Common variables (shared between all instances):
    #  ================================================
