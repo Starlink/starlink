@@ -15,7 +15,7 @@ t/pdl.t
 gsdprint
 typemap
 PDL/Makefile.PL
-PDL/GSD.pm
+PDL/PDL.pm
 PDL/IO/GSD.pm
 PDL/IO/Makefile.PL
 PDL/IO/README
