@@ -291,6 +291,7 @@
       INTEGER SIZE( 2 )        ! Region dimensions
       INTEGER SLBND( 2 )       ! Significant lower bounds of the image
       INTEGER SUBND( 2 )       ! Significant upper bounds of the image
+      INTEGER TEMP             ! Temporary storage
       LOGICAL AGAIN            ! List another region?
       LOGICAL CONT             ! ARD description to continue?
       LOGICAL LOG              ! Write to log file?
@@ -460,6 +461,19 @@
             ELSE
                RUBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) )
                RUBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) 
+            END IF
+
+*  Ensure bounds are in the correct order.
+            IF( RLBND( 1 ) .GT. RUBND( 1 ) ) THEN
+               TEMP = RLBND( 1 ) 
+               RLBND( 1 ) = RUBND( 1 )
+               RUBND( 1 ) = TEMP
+            END IF
+
+            IF( RLBND( 2 ) .GT. RUBND( 2 ) ) THEN
+               TEMP = RLBND( 2 ) 
+               RLBND( 2 ) = RUBND( 2 )
+               RUBND( 2 ) = TEMP
             END IF
 
 *  Get an NDF identifier for the relevant section.

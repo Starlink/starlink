@@ -10263,7 +10263,7 @@ iraf! {
          parameter lbound {
             type LITERAL
             prompt {Position at the bottom left corner of the listing}
-            ppath CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
             default !
             helpkey *
           }
@@ -10342,7 +10342,7 @@ iraf! {
          parameter ubound {
             type LITERAL
             prompt {Position at the top right corner of the listing}
-            ppath CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
             default !
             helpkey *
           }
