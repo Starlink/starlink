@@ -11740,6 +11740,176 @@ static void GraphGrid( int dim, double xlo, double xhi, double ylo,
 
 }
 
+static void GrfPop( AstPlot *this ) {
+/*
+*++
+*  Name:
+c     astGrfPop
+f     AST_GRFPOP
+
+*  Purpose:
+*     Restore previously saved graphics functions used by a Plot.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astGrfPop( AstPlot *this )
+f     CALL AST_GRFPOP( THIS STATUS )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+c     This function restores a snapshot of the graphics functions
+c     stored previously by calling astGrfPush. The restored graphics
+c     functions become the current graphics functions used by the Plot.
+*
+c     The astGrfPush and astGrfPop functions are intended for situations
+c     where it is necessary to make temporary changes to the graphics
+c     functions used by the Plot. The current functions should first be
+c     saved by calling astGrfPush. New functions should then be registered
+c     using astGrfSet. The required graphics should then be produced.
+c     Finally, astGrfPop should be called to restore the original graphics
+c     functions.
+f     The AST_GRFPUSH and AST_GRFPOP functions are intended for situations
+f     where it is necessary to make temporary changes to the graphics
+f     functions used by the Plot. The current functions should first be
+f     saved by calling AST_GRFPUSH. New functions should then be registered
+f     using AST_GRFSET. The required graphics should then be produced.
+f     Finally, AST_GRFPOP should be called to restore the original graphics
+f     functions.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+f     - This routine returns without action if there are no snapshots to
+c     - This function returns without action if there are no snapshots to
+*     restore. No error is reported in this case.
+
+*--
+*/
+
+/* Local Variables: */
+   AstGrfPtrs *newframe;         /* Pointer to the stack frame to restore */
+   int i;                        /* Loop count */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check the stack is not already empty. */
+   if( this->grfnstack > 0 ) {
+      this->grfnstack--;
+   
+      if( astOK ) {
+         newframe = this->grfstack + this->grfnstack;
+   
+         for( i = 0; i < AST__NGRFFUN; i++ ) {
+            this->grffun[i] = (newframe->grffun)[i];
+         }
+         this->GAttr = newframe->GAttr;
+         this->GFlush = newframe->GFlush;
+         this->GLine = newframe->GLine;
+         this->GMark = newframe->GMark;
+         this->GText = newframe->GText;
+         this->GTxExt = newframe->GTxExt;
+      }
+   }
+}
+
+static void GrfPush( AstPlot *this ) {
+/*
+*++
+*  Name:
+c     astGrfPush
+f     AST_GRFPUSH
+
+*  Purpose:
+*     Save the current graphics functions used by a Plot.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astGrfPush( AstPlot *this )
+f     CALL AST_GRFPUSH( THIS STATUS )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+c     This function takes a snapshot of the graphics functions which are
+f     This routine takes a snapshot of the graphics functions which are
+*     currently registered with the supplied Plot, and saves the snapshot
+*     on a first-in-last-out stack within the Plot. The snapshot can be
+*     restored later using function 
+c     astGrfPop.
+f     AST_GRFPOP.
+*
+c     The astGrfPush and astGrfPop functions are intended for situations
+c     where it is necessary to make temporary changes to the graphics
+c     functions used by the Plot. The current functions should first be
+c     saved by calling astGrfPush. New functions should then be registered
+c     using astGrfSet. The required graphics should then be produced.
+c     Finally, astGrfPop should be called to restore the original graphics
+c     functions.
+f     The AST_GRFPUSH and AST_GRFPOP functions are intended for situations
+f     where it is necessary to make temporary changes to the graphics
+f     functions used by the Plot. The current functions should first be
+f     saved by calling AST_GRFPUSH. New functions should then be registered
+f     using AST_GRFSET. The required graphics should then be produced.
+f     Finally, AST_GRFPOP should be called to restore the original graphics
+f     functions.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   AstGrfPtrs *newframe;         /* Pointer to the new stack frame */
+   int i;                        /* Loop count */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Increment the number of frames on the stack. */
+   this->grfnstack++;
+
+/* Ensure the stack is large enough to hold this many frames. */
+   this->grfstack = (AstGrfPtrs *) astGrow( (void *) this->grfstack, 
+                     this->grfnstack, sizeof( AstGrfPtrs ) );
+   if( astOK ) {
+
+/* Get a pointer to the new stack frame. */
+      newframe = this->grfstack + this->grfnstack - 1;
+
+/* Copy the graphics function pointers from the main Plot attributes
+   to the new stack frame. */
+      for( i = 0; i < AST__NGRFFUN; i++ ) {
+         (newframe->grffun)[i] = this->grffun[i];
+      }
+      newframe->GAttr = this->GAttr;
+      newframe->GFlush = this->GFlush;
+      newframe->GLine = this->GLine;
+      newframe->GMark = this->GMark;
+      newframe->GText = this->GText;
+      newframe->GTxExt = this->GTxExt;
+   }
+}
+
 static void GrfSet( AstPlot *this, const char *name, AstGrfFun fun ){
 /*
 *++
@@ -21584,49 +21754,3 @@ f     function is invoked with STATUS set to an error value, or if it
 
 }
 
-
-
-static void GrfPop( AstPlot *this ) {
-   AstGrfPtrs *newframe;
-   int i;                        /* Loop count */
-
-   if( this->grfnstack > 0 ) {
-      this->grfnstack--;
-   
-      if( astOK ) {
-         newframe = this->grfstack + this->grfnstack;
-   
-         for( i = 0; i < AST__NGRFFUN; i++ ) {
-            this->grffun[i] = (newframe->grffun)[i];
-         }
-         this->GAttr = newframe->GAttr;
-         this->GFlush = newframe->GFlush;
-         this->GLine = newframe->GLine;
-         this->GMark = newframe->GMark;
-         this->GText = newframe->GText;
-         this->GTxExt = newframe->GTxExt;
-      }
-   }
-}
-
-static void GrfPush( AstPlot *this ) {
-   AstGrfPtrs *newframe;
-   int i;                        /* Loop count */
-
-   this->grfnstack++;
-   this->grfstack = (AstGrfPtrs *) astGrow( (void *) this->grfstack, 
-                     this->grfnstack, sizeof( AstGrfPtrs ) );
-   if( astOK ) {
-      newframe = this->grfstack + this->grfnstack - 1;
-
-      for( i = 0; i < AST__NGRFFUN; i++ ) {
-         (newframe->grffun)[i] = this->grffun[i];
-      }
-      newframe->GAttr = this->GAttr;
-      newframe->GFlush = this->GFlush;
-      newframe->GLine = this->GLine;
-      newframe->GMark = this->GMark;
-      newframe->GText = this->GText;
-      newframe->GTxExt = this->GTxExt;
-   }
-}
