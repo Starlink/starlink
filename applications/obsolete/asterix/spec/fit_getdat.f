@@ -1,4 +1,4 @@
-      SUBROUTINE FIT_GETDAT( ID, GENUS, FSTAT, WORKSPACE, WEIGHTS,
+      SUBROUTINE FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE, WEIGHTS,
      :                       NDS, OBDAT, NGOOD, SSCALE, PREDDAT,
      :                       INSTR, STATUS )
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL FIT_GETDAT( ID, GENUS, FSTAT, WORKSPACE, WEIGHTS, NDS, OBDAT,
+*     CALL FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE, WEIGHTS, NDS, OBDAT,
 *                      NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
 
 *  Description:
@@ -30,6 +30,8 @@
 *     present then the model and data spaces are assumed to be identical.
 
 *  Arguments:
+*     MPCID = INTEGER (given)
+*        Multi-processing control object
 *     ID = INTEGER (given)
 *        Top level fit dataset, either a FileSet or a fit source file
 *     GENUS = CHARACTER*(*) (given)
@@ -189,10 +191,9 @@
       INCLUDE 'FIT_STRUC'
 
 *  Arguments Given:
-      INTEGER			ID			! Input data (or ref)
-      CHARACTER*(*)             GENUS           	! Model GENUS
-      INTEGER                   FSTAT           	! Fit statistic flag
-      LOGICAL                   WORKSPACE               ! Set up workspace?
+      INTEGER			MPCID, ID, FSTAT
+      CHARACTER*(*)             GENUS
+      LOGICAL                   WORKSPACE
 
 *  Arguments Given and Returned:
       LOGICAL 			WEIGHTS                 ! Set up data weights?
@@ -211,6 +212,8 @@
 *  External References:
       EXTERNAL			CHR_LEN
         INTEGER 		CHR_LEN
+      EXTERNAL			MPC_QSLAVE
+        LOGICAL			MPC_QSLAVE
 
 *  Local Variables:
       CHARACTER*100 		FILE			! File name for HDS_TRACE
@@ -256,12 +259,16 @@
       LOGICAL 			OK			! Data present and defined?
       LOGICAL 			QUAL			! Data quality info available?
       LOGICAL 			REF			! Input from ref file?
+      LOGICAL			SLAVE			! Slave process?
       LOGICAL 			SPECSET(NDSCMAX)	! I/p is spectral set?
       LOGICAL			VIG			! Vignetting present?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Slave process?
+      SLAVE = MPC_QSLAVE( MPCID, STATUS )
 
 *  Is the input a file set?
       CALL ADI_DERVD( ID, 'FileSet', REF, STATUS )
@@ -339,13 +346,15 @@
 
 *    Get dataset container file name and display
         CALL ADI_FOBNAM( DCFID(N), FILE, I, STATUS )
-	IF ( NDSC .EQ. 1 ) THEN
-          CALL MSG_PRNT( 'Dataset :-' )
-          CALL MSG_PRNT( '   File : '//FILE(:I) )
-	ELSE
-          CALL MSG_SETI( 'N', N )
-          CALL MSG_PRNT( 'Dataset ^N :-' )
-          CALL MSG_PRNT( '      File : '//FILE(:I) )
+        IF ( .NOT. SLAVE ) THEN
+	  IF ( NDSC .EQ. 1 ) THEN
+            CALL MSG_PRNT( 'Dataset :-' )
+            CALL MSG_PRNT( '   File : '//FILE(:I) )
+	  ELSE
+            CALL MSG_SETI( 'N', N )
+            CALL MSG_PRNT( 'Dataset ^N :-' )
+            CALL MSG_PRNT( '      File : '//FILE(:I) )
+          END IF
         END IF
 	IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
 
@@ -360,7 +369,7 @@
 
 *    Check that spectrum is exposure corrected (i.e in ct/s)
         CALL PRF_GET( DCFID(N), 'CORRECTED.EXPOSURE', LOG, STATUS )
-        IF ( .NOT. LOG ) THEN
+        IF ( .NOT. SLAVE .AND. .NOT. LOG ) THEN
 	  CALL MSG_PRNT(' ')
 	  CALL MSG_PRNT('!! Warning - data must be corrected to ct/s')
           CALL MSG_PRNT(' ')
@@ -433,11 +442,13 @@
 
 *      Have data been b/g subtracted?
           CALL PRF_GET( DCFID(N), 'BGND_SUBTRACTED', BGSUB, STATUS )
-	  IF ( BGSUB ) THEN
-	    CALL MSG_PRNT('    Background-subtracted data')
-	  ELSE
-	    CALL MSG_PRNT('    Not background-subtracted')
-	  END IF
+          IF ( .NOT. SLAVE ) THEN
+	    IF ( BGSUB ) THEN
+	      CALL MSG_PRNT('    Background-subtracted data')
+	    ELSE
+	      CALL MSG_PRNT('    Not background-subtracted')
+	    END IF
+          END IF
 
 *      Check existance of b/g data
           CALL FRI_CHK( DCFID(N), 'BGND', BG, STATUS )
@@ -495,7 +506,7 @@
 
 	    END IF
 
-	    IF (.NOT.BG) THEN
+	    IF (.NOT.BG.AND..NOT.SLAVE) THEN
 	      CALL MSG_PRNT('    No background data found -'//
      :        ' assumed negligible')
 	    END IF
@@ -684,8 +695,11 @@
 *          Count number of groups
               CALL UTIL_CNTGRP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).GPTR),
      :                          OBDAT(NDS).NGDAT, STATUS )
-              CALL MSG_SETI( 'NG', OBDAT(NDS).NGDAT )
-	      CALL MSG_PRNT('    Loaded grouping array with ^NG groups')
+              IF ( .NOT. SLAVE ) THEN
+                CALL MSG_SETI( 'NG', OBDAT(NDS).NGDAT )
+	        CALL MSG_PRNT('    Loaded grouping array with '/
+     :                         /'^NG groups')
+              END IF
 
 *          Create workspace for grouped data
               CALL DYN_MAPR( 1, OBDAT(NDS).NGDAT, OBDAT(NDS).GDPTR,
