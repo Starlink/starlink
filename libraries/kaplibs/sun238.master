@@ -446,7 +446,7 @@ numerical types. The \emph{actual} routines names will not include the trailing
    descriptions. Use the check buttons to the right of the ``Within
    the:'' label to make your choice.
 
-   When a search is succesfull, the matching routines are routines will
+   When a search is succesfull, the matching routines will
    appear at the right hand side of the pop-up window. These are the
    ``selected'' routines. You can click on a routine name to see the full
    documentation in the main browser window. Each routine has a
