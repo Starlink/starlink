@@ -212,6 +212,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
   ADIobj	fid;			/* ADI version of fspec */
   ADIboolean	found = ADI__false;	/* Located the representation? */
   ADIobj	ortn;			/* Create routine */
+  ADIobj	repid;
   char		*ppos;
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
@@ -252,7 +253,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       {
       ADIboolean	there=ADI__false;
 
-      ADIobj	repid = _CAR(curp);
+      repid = _CAR(curp);
 
       adic_there( repid, "CREAT_RTN", &there, status );
 
@@ -320,6 +321,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
   ADIobj	mid;			/* ADI version of mode */
   ADIobj	ortn;			/* Open routine */
   char		*ppos;
+  ADIobj	repid;
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
 
@@ -363,7 +365,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
       {
       ADIboolean	there=ADI__false;
 
-      ADIobj	repid = _CAR(curp);
+      repid = _CAR(curp);
 
       adic_there( repid, "OPEN_RTN", &there, status );
 
@@ -402,8 +404,8 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
 /* Opened ok? If so, write in details of representation and access mode */
   if ( _ok(status) ) {
-    adic_cput0i( *fileid, "REP", repid, status );
-    adic_cputid( *fileid, "MODE", mid, status );
+    adic_cput0i( *id, "REP", repid, status );
+    adic_cputid( *id, "MODE", mid, status );
     }
 
   if ( _ok(status) && (*cls!='*') ) {	/* We've opened the file ok? */
