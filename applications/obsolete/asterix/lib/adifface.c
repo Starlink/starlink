@@ -89,9 +89,12 @@
 *       adi_get<t>      - Get n-D primitive values
 *       adi_get0<t>     - Get scalar primitive value
 *       adi_get1<t>     - Get 1-D primitive values
+*	adi_map		- Map with user specified type
+*	adi_map<t>	- Map with a specific type
 *       adi_put<t>      - Put n-D primitive values
 *       adi_put0<t>     - Put scalar primitive value
 *       adi_put1<t>     - Put 1-D primitive values
+*	adi_unmap	- Unmap object
 *
 *      Component data creation :
 *
@@ -110,6 +113,8 @@
 *       adi_cget<t>     - Get n-D primitive values
 *       adi_cget0<t>    - Get scalar primitive value
 *       adi_cget1<t>    - Get 1-D primitive values
+*	adi_cmap	- Map component with user specified type
+*	adi_cmap<t>	- Map component with a specific type
 *       adi_cput<t>     - Put n-D primitive values
 *       adi_cput0<t>    - Put scalar primitive value
 *       adi_cput1<t>    - Put 1-D primitive values
@@ -119,6 +124,7 @@
 *       adi_cset1<t>    - Set 1-D primitive values
 *	adi_find	- Locate component data
 *	adi_there	- Does a component exist?
+*	adi_cunmap	- Unmap object component
 *
 *      Enquiry routines :
 *
@@ -141,6 +147,10 @@
 *
 *	adi_erase	- Destroy an object
 *	adi_cerase	- Destroy member of property of object
+*
+*      Symbol packages :
+*
+*	adi_reqpkg	- Load a package from the search path
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
@@ -175,7 +185,7 @@
 #include "adierror.h"
 #include "adikrnl.h"
 #include "adimem.h"
-
+#include "adipkg.h"
 #include "adifface.h"                   /* Prototypes for this module */
 
 
@@ -418,8 +428,9 @@ F77_SUBROUTINE(adifn(defcls))( CHARACTER(name), CHARACTER(parents),
 
   _ERR_IN("ADI_DEFCLS");		/* Mark routine for error reporting */
 
-  adix_defcls( name, name_length, parents, parents_length,
-	       members, members_length, (ADIobj *) tid, status );
+  ADIdefClass_e( name, name_length, parents, parents_length,
+		 members, members_length, (ADIobj *) tid, status );
+
   _ERR_OUT;
   }
 
@@ -641,7 +652,7 @@ F77_SUBROUTINE(adifn(new0))( CHARACTER(cls), INTEGER(id),
   _ERR_IN("ADI_NEW0");
 
   adix_newn( ADI__nullid, NULL, 0, cls, cls_length, 0,
-             NULL, (ADIobj *) id, status );
+	     NULL, (ADIobj *) id, status );
 
   _ERR_OUT;
   }
@@ -948,6 +959,44 @@ F77_SUBROUTINE(adifn(get1c))( INTEGER(id), INTEGER(mxval),
   _ERR_OUT;
   }
 
+F77_SUBROUTINE(adifn(map))( INTEGER(id), CHARACTER(type), CHARACTER(mode),
+			    POINTER(vptr), INTEGER(status) TRAIL(type)
+			    TRAIL(mode) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(type)
+  GENPTR_CHARACTER(mode)
+  GENPTR_POINTER(vptr)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_MAP");
+
+  adix_map_t( 0, (ADIobj) *id, NULL, 0, type, type_length, mode,
+	      mode_length, (void **) vptr, status );
+
+  _ERR_OUT;
+  }
+
+#define _genproc(_t) \
+F77_SUBROUTINE(_TM_fname(map,_t))( INTEGER(id), CHARACTER(mode), \
+		POINTER(vptr), INTEGER(status) TRAIL(mode) ) { \
+  GENPTR_INTEGER(id) \
+  GENPTR_CHARACTER(mode) \
+  GENPTR_POINTER(vptr) \
+  GENPTR_INTEGER(status) \
+  _chk_init_err; _chk_stat; \
+  _ERR_IN(_TM_fnames(map,_t)); \
+  adix_map_n( 0, (ADIobj) *id, NULL, 0, mode, mode_length, \
+	      _TM_code(_t), sizeof(_TM_ftype(_t)), \
+	      (void **) vptr, status );\
+  _ERR_OUT;}
+
+_genproc(b)	_genproc(w)
+_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
+#undef _genproc
+
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(put,_t))( INTEGER(id), INTEGER(ndim), \
 		INTEGER_ARRAY(dims), _TM_ftype(_t) *value, INTEGER(status) ) \
@@ -1062,6 +1111,20 @@ F77_SUBROUTINE(adifn(put1c))( INTEGER(id), INTEGER(nval),
   _ERR_OUT;
   }
 
+F77_SUBROUTINE(adifn(unmap))( INTEGER(id), POINTER(vptr), INTEGER(status) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_POINTER(vptr)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_UNMAP");
+
+  adix_unmap_n( (ADIobj) *id, NULL, 0, (void *) vptr, status );
+
+  _ERR_OUT;
+  }
 
 /* -------------------------------------------------------------------------
  * Component data creation
@@ -1085,7 +1148,7 @@ F77_SUBROUTINE(adifn(cnew))( INTEGER(pid), CHARACTER(name),
   _ERR_IN("ADI_CNEW");
 
   adix_newn( (ADIobj) *pid, name, name_length, cls, cls_length, *ndim,
-             dims, NULL, status );
+	     dims, NULL, status );
 
   _ERR_OUT;
   }
@@ -1323,7 +1386,7 @@ F77_SUBROUTINE(_TM_fname(cget,_t))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
   GENPTR_INTEGER_ARRAY(dims) \
   GENPTR_INTEGER(status) \
   _chk_init_err; _chk_stat; \
-  _ERR_IN(_TM_fnames(cget1,_t)); \
+  _ERR_IN(_TM_fnames(cget,_t)); \
   adix_get_n( 0, (ADIobj) *id, name, name_length, *ndim, dims, \
 	      _TM_code(_t), \
 	      sizeof(_TM_ftype(_t)), \
@@ -1434,6 +1497,48 @@ F77_SUBROUTINE(adifn(cget1c))( INTEGER(id), CHARACTER(name), INTEGER(mxval),
 
   _ERR_OUT;
   }
+
+F77_SUBROUTINE(adifn(cmap))( INTEGER(id), CHARACTER(name), CHARACTER(type),
+			     CHARACTER(mode), POINTER(vptr), INTEGER(status)
+			     TRAIL(name) TRAIL(type) TRAIL(mode) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_CHARACTER(type)
+  GENPTR_CHARACTER(mode)
+  GENPTR_POINTER(vptr)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_CMAP");
+
+  adix_map_t( 0, (ADIobj) *id, name, name_length, type, type_length, mode,
+	      mode_length, (void **) vptr, status );
+
+  _ERR_OUT;
+  }
+
+#define _genproc(_t) \
+F77_SUBROUTINE(_TM_fname(cmap,_t))( INTEGER(id), CHARACTER(name), \
+		CHARACTER(mode), POINTER(vptr), INTEGER(status) \
+		TRAIL(name) TRAIL(mode) ) \
+  { \
+  GENPTR_INTEGER(id) \
+  GENPTR_CHARACTER(name) \
+  GENPTR_CHARACTER(mode) \
+  GENPTR_POINTER(vptr) \
+  GENPTR_INTEGER(status) \
+  _chk_init_err; _chk_stat; \
+  _ERR_IN(_TM_fnames(cmap,_t)); \
+  adix_map_n( 0, (ADIobj) *id, name, name_length, mode, mode_length, \
+	      _TM_code(_t), sizeof(_TM_ftype(_t)), \
+	      (void **) vptr, status );\
+  _ERR_OUT;}
+
+_genproc(b)	_genproc(w)
+_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
+#undef _genproc
 
 #define _genproc(_t) \
 F77_SUBROUTINE(_TM_fname(cput,_t))( INTEGER(id), CHARACTER(name), \
@@ -1656,6 +1761,23 @@ F77_SUBROUTINE(adifn(cputid))( INTEGER(id), CHARACTER(name),
 
   adix_cputid( (ADIobj) *id, name,
 	       name_length, (ADIobj) *vid, status );
+
+  _ERR_OUT;
+  }
+
+F77_SUBROUTINE(adifn(cunmap))( INTEGER(id), CHARACTER(name), POINTER(vptr),
+			       INTEGER(status) TRAIL(name) )
+  {
+  GENPTR_INTEGER(id)
+  GENPTR_CHARACTER(name)
+  GENPTR_POINTER(vptr)
+  GENPTR_INTEGER(status)
+
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("ADI_CUNMAP");
+
+  adix_unmap_n( (ADIobj) *id, name, name_length, (void *) vptr, status );
 
   _ERR_OUT;
   }
@@ -1909,8 +2031,8 @@ F77_SUBROUTINE(adifn(slice))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(diml),
   _ERR_IN("ADI_SLICE");			/* Mark routine for error reporting */
 
   adix_slice( (ADIobj) *id, NULL, 0,    /* Invoke kernel routine */
-              *ndim, diml, dimu,
-              (ADIobj *) sid, status );
+	      *ndim, diml, dimu,
+	      (ADIobj *) sid, status );
 
   _ERR_OUT;
   }
@@ -1951,6 +2073,24 @@ F77_SUBROUTINE(adifn(cerase))( INTEGER(id), CHARACTER(name),
   _ERR_OUT;
   }
 
+/* -------------------------------------------------------------------------
+ * Symbol packages
+ * -------------------------------------------------------------------------
+ */
+
+F77_SUBROUTINE(adifn(reqpkg))( CHARACTER(pkg), INTEGER(status) TRAIL(pkg) )
+  {
+  GENPTR_CHARACTER(pkg)
+  GENPTR_INTEGER(status)
+
+  _chk_init; _chk_stat;
+
+  _ERR_IN("ADI_REQPKG");
+
+  ADIpkgRequire( pkg, pkg_length, status );
+
+  _ERR_OUT;
+  }
 
 
 /* ----------------- unincorporated routines --------------- */
@@ -2059,7 +2199,7 @@ F77_SUBROUTINE(adifn(fopen))( CHARACTER(fspec), CHARACTER(cls),
   _ERR_IN("ADI_FOPEN");			/* Mark routine for error reporting */
 
   adix_fopen( fspec, fspec_length,	/* Invoke kernel routine */
-              cls, cls_length,
+	      cls, cls_length,
               mode, mode_length,
               (ADIobj *) id, status );
 

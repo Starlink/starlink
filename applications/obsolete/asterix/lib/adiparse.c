@@ -133,7 +133,33 @@ void ADIclearStream( ADIstreamPtr str, ADIstatus status )
     str->nc_pb = 0;
     str->nt_pb = 0;
     str->dev = NULL;
+    str->flags = ADI_STREAM__DEFAULT;
     }
+  }
+
+
+int ADIgetStreamAttrs( ADIstreamPtr str, ADIstatus status )
+  {
+  return _ok(status) ? str->flags : 0;
+  }
+
+
+void ADIputStreamAttrs( ADIstreamPtr str, int flags, ADIstatus status )
+  {
+  if ( _ok(status) )
+    str->flags = flags;
+  }
+
+int ADIsetStreamAttr( ADIstreamPtr str, int flag, ADIstatus status )
+  {
+  int		oflags = 0;
+
+  if ( _ok(status) ) {
+    oflags = str->flags;
+    str->flags |= flag;
+    }
+
+  return oflags;
   }
 
 
@@ -237,11 +263,10 @@ char ADIreadCharFromStream( ADIstreamPtr str, ADIstatus status )
 
   while ( _ok(status) && !gotit )
     {
-    if ( str->nc_pb )
-      {
+    if ( str->nc_pb ) {
       ch = str->c_pb[--str->nc_pb]; gotit = ADI__true;
       }
-    else
+    else if ( str->dev )
       {
       switch( str->dev->type )
 	{
@@ -279,7 +304,10 @@ char ADIreadCharFromStream( ADIstreamPtr str, ADIstatus status )
 	  break;
 	}
       }
+    else
+      *status = SAI__ERROR;
     }
+
   str->ctok.dat[str->ctok.nc++] = ch;
   return ch;
   }
@@ -363,14 +391,25 @@ ADItokenType ADIisTokenInSet( ADIstreamPtr str,
   }
 
 
+
+#define EOS -1
+
 ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
   {
-  ADItokenType tok = TOK__NOTATOK;
-  char           ch;
-  ADIboolean        inquotes = ADI__true;
+  ADItokenType		etok;
+  ADItokenType		tok = TOK__NOTATOK;
+  char           	ch;
+  ADIboolean        	inquotes = ADI__true;
 
   if ( !_ok(status) )
     return tok;
+
+/* The token to return if a logical end of line is met. If end-of-lines are */
+/* ignored then the flag token is chosen, which forces more parsing */
+  if ( str->flags & ADI_STREAM__EOLISP )
+    etok = TOK__NOTATOK;
+  else
+    etok = TOK__END;
 
   while ( _ok(status) && (tok==TOK__NOTATOK) )
     {
@@ -380,13 +419,17 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
 
     if ( (ch==' ') || ch==9 )
       {;}
-    else if ( ch == '\n' )
-      tok = TOK__END;
+    else if ( ! _ok(status) ) {
+      *status = EOS;
+      continue;
+      }
+    else if ( ch == '\n' ) {
+      tok = etok;
+      }
     else if ( isalpha(ch) || (ch=='%') || (ch=='_') )
       {
       str->ctok.ptr0 = str->dev->ptr - 1;
-      while( isalpha(ch) || (ch=='%') || isdigit(ch) || (ch=='_'))
-	{
+      while( isalpha(ch) || (ch=='%') || isdigit(ch) || (ch=='_')) {
 	ch = ADIreadCharFromStream( str, status );
 	}
       ADIreturnCharToStream( str, ch, status );
@@ -429,7 +472,7 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
       do
 	ch = ADIreadCharFromStream( str, status );
       while ( (ch != '\n') && _ok(status) );
-      tok = TOK__END;
+      tok = etok;
       }
     else if ( ch == '"' )
       {
@@ -592,7 +635,17 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
 	    }
 	  break;
 	case ';':
-	  tok = TOK__SEMICOLON;
+	  ch = ADIreadCharFromStream( str, status );
+          if ( ch == ';' ) {
+            do
+	      ch = ADIreadCharFromStream( str, status );
+            while ( (ch != '\n') && _ok(status) );
+            tok = etok;
+            }
+	  else {
+	    ADIreturnCharToStream( str, ch, status );
+	    tok = TOK__SEMICOLON;
+	    }
 	  break;
 	case '@':
 	  ch = ADIreadCharFromStream( str, status );
@@ -703,17 +756,20 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
 	  break;
 	case '\n':
 	case '\0':
-	  tok = TOK__END;
+          tok = etok;
 	  break;
 	}
     }
+
+  if ( *status == EOS )
+    *status = SAI__OK;
 
   str->ctok.t = tok;
   return tok;
   }
 
 ADIboolean ADImatchTokenFromStream( ADIstreamPtr str,
-                                    ADItokenType t, ADIstatus status )
+				    ADItokenType t, ADIstatus status )
   {
   if ( str->ctok.t == t )
     {

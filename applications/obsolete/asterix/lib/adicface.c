@@ -91,9 +91,12 @@
 *       adic_get<t>	- Get n-D primitive values
 *       adic_get0<t>	- Get scalar primitive value
 *       adic_get1<t>	- Get 1-D primitive values
+*	adic_map	- Map component with user specified type
+*	adic_map<t>	- Map component with a specific type
 *       adic_put<t>	- Put n-D primitive values
 *       adic_put0<t>	- Put scalar primitive value
 *       adic_put1<t>	- Put 1-D primitive values
+*	adic_unmap	- Unmap object
 *
 *      Component data creation :
 *
@@ -112,6 +115,8 @@
 *       adic_cget<t>	- Get n-D primitive values
 *       adic_cget0<t>	- Get scalar primitive value
 *       adic_cget1<t>	- Get 1-D primitive values
+*	adic_cmap	- Map component with user specified type
+*	adic_cmap<t>	- Map component with a specific type
 *       adic_cput<t>	- Put n-D primitive values
 *       adic_cput0<t>	- Put scalar primitive value
 *       adic_cput1<t>	- Put 1-D primitive values
@@ -119,6 +124,7 @@
 *       adic_cset0<t>	- Set scalar primitive value
 *       adic_cset1<t>	- Set 1-D primitive values
 *	adic_cputid	- Put ADI object into object
+*	adic_cunmap	- Unmap object component
 *	adic_find	- Locate component data
 *	adic_there	- Does a component exist?
 *
@@ -143,6 +149,10 @@
 *
 *	adic_erase	- Destroy an object
 *	adic_cerase	- Destroy member of property of object
+*
+*      Symbol packages :
+*
+*	adic_reqpkg	- Load a package from the search path
 
 *  Authors:
 *     DJA: David J. Allan (JET-X, University of Birmingham)
@@ -171,6 +181,7 @@
 #include "adierror.h"
 #include "adilist.h"
 #include "adistrng.h"
+#include "adipkg.h"
 #include "aditable.h"
 
 #include "adicface.h"                   /* Prototypes for this module */
@@ -195,12 +206,12 @@ void adic_setec( ADIstatype code, ADIstatus status )
 
 void adic_setecs( ADIstatype code, char *ctx, ADIstatus status )
   {
-  adix_setecs( code, ctx, _CSTRING_MARK, status );
+  adix_setecs( code, ctx, _CSM, status );
   }
 
 void adic_setes( char *ctx, ADIstatus status )
   {
-  adix_setes( ctx, _CSTRING_MARK, status );
+  adix_setes( ctx, _CSM, status );
   }
 
 void adic_setetc( char *tok, char *val, int vlen )
@@ -230,7 +241,7 @@ void adic_delprp( ADIobj id, char *pname, ADIstatus status )
   _chk_init_err; _chk_stat;
   _ERR_IN("adic_delprp");
 
-  adix_delprp( id, pname, _CSTRING_MARK, status );
+  adix_delprp( id, pname, _CSM, status );
 
   _ERR_OUT;
   }
@@ -240,7 +251,7 @@ void adic_locprp( ADIobj id, char *pname, ADIobj *pid, ADIstatus status )
   _chk_init_err; _chk_stat;
   _ERR_IN("adic_locprp");
 
-  adix_locprp( id, pname, _CSTRING_MARK, pid, status );
+  adix_locprp( id, pname, _CSM, pid, status );
 
   _ERR_OUT;
   }
@@ -274,7 +285,7 @@ void adic_delcmp( ADIobj id, char *cname, ADIstatus status )
   _chk_init_err; _chk_stat;
   _ERR_IN("adic_delcmp");
 
-  adix_delcmp( id, cname, _CSTRING_MARK, status );
+  adix_delcmp( id, cname, _CSM, status );
 
   _ERR_OUT;
   }
@@ -284,7 +295,7 @@ void adic_loccmp( ADIobj id, char *cname, ADIobj *cid, ADIstatus status )
   _chk_init_err; _chk_stat;
   _ERR_IN("adic_loccmp");
 
-  adix_loccmp( id, cname, _CSTRING_MARK, cid, status );
+  adix_loccmp( id, cname, _CSM, cid, status );
 
   _ERR_OUT;
   }
@@ -381,10 +392,8 @@ void adic_defcls( char *name, char *parents,
 
   _ERR_IN("adic_defcls");		/* Mark routine for error reporting */
 
-  adix_defcls( name, _CSTRING_MARK,
-	       parents, _CSTRING_MARK,
-	       members, _CSTRING_MARK,
-	       tid, status );
+  ADIdefClass_e( name, _CSM, parents, _CSM,
+	       members, _CSM, tid, status );
 
   _ERR_OUT;
   }
@@ -409,8 +418,8 @@ void adic_defgen( char *spec, char *options, ADIcGenericDispatchCB rtn,
 
   _ERR_IN("adic_defgen");		/* Mark routine for error reporting */
 
-  adix_defgen( spec, _CSTRING_MARK,     /* Invoke kernel routine */
-	       options, _CSTRING_MARK,
+  adix_defgen( spec, _CSM, options,     /* Invoke kernel routine */
+	       _CSM,
 	       adix_neweprc( ADI__true, (ADICB) rtn, status ),
 	       id, status );
 
@@ -424,7 +433,7 @@ void adic_defmcf( char *name, ADIcMethodCombinationCB rtn,
 
   _ERR_IN("adic_defmcf");		/* Mark routine for error reporting */
 
-  adix_defmcf( name, _CSTRING_MARK,     /* Invoke kernel routine */
+  adix_defmcf( name, _CSM,     /* Invoke kernel routine */
 	       adix_neweprc( ADI__true, (ADICB) rtn, status ),
 	       id, status );
 
@@ -438,7 +447,7 @@ void adic_defmth( char *spec, ADIcMethodCB rtn,
 
   _ERR_IN("adic_defmth");		/* Mark routine for error reporting */
 
-  adix_defmth( spec, _CSTRING_MARK,     /* Invoke kernel routine */
+  adix_defmth( spec, _CSM,     /* Invoke kernel routine */
 	       adix_neweprc( ADI__true, (ADICB) rtn, status ),
 	       id, status );
 
@@ -451,8 +460,7 @@ void adic_defrep( char *name, ADIobj *id, ADIstatus status )
 
   _ERR_IN("adic_defrep");		/* Mark routine for error reporting */
 
-  adix_defrep( name, _CSTRING_MARK, 	/* Invoke kernel routine */
-	       id, status );
+  adix_defrep( name, _CSM, id, status );/* Invoke kernel routine */
 
   _ERR_OUT;
   }
@@ -476,7 +484,7 @@ void adic_exec( char *func, int narg, ADIobj args[], ADIobj *res, ADIstatus stat
 
   _ERR_IN("adic_exec");		/* Mark routine for error reporting */
 
-  *res = adix_exec( func, _CSTRING_MARK, narg, args, status );
+  *res = adix_exec( func, _CSM, narg, args, status );
 
   _ERR_OUT;
   }
@@ -547,7 +555,7 @@ void adic_new( char *cls, int ndim, int dims[], ADIobj *id, ADIstatus status )
 
   _ERR_IN("adic_new");
 
-  adix_newn( ADI__nullid, NULL, 0, cls, _CSTRING_MARK,
+  adix_newn( ADI__nullid, NULL, 0, cls, _CSM,
 	     ndim, dims, id, status );
 
   _ERR_OUT;
@@ -559,7 +567,7 @@ void adic_new0( char *cls, ADIobj *id, ADIstatus status )
 
   _ERR_IN("adic_new0");
 
-  adix_newn( ADI__nullid, NULL, 0, cls, _CSTRING_MARK,
+  adix_newn( ADI__nullid, NULL, 0, cls, _CSM,
 	     0, NULL, id, status );
 
   _ERR_OUT;
@@ -571,7 +579,7 @@ void adic_new1( char *cls, int nval, ADIobj *id, ADIstatus status )
 
   _ERR_IN("adic_new1");
 
-  adix_newn( ADI__nullid, NULL, 0, cls, _CSTRING_MARK,
+  adix_newn( ADI__nullid, NULL, 0, cls, _CSM,
 	     1, &nval, id, status );
 
   _ERR_OUT;
@@ -641,7 +649,7 @@ void adic_newvc( int ndim, int dims[], charptr value[], ADIobj *id, ADIstatus st
   _ERR_IN("adic_newvc");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, ADI__nullid, NULL, 0, ndim, dims, value, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK, id, status );
+	      _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -669,8 +677,7 @@ void adic_newv0c( char *value, ADIobj *id, ADIstatus status )
 
   adix_new_n( ADI__true, ADI__nullid, NULL, 0, 0, NULL, &value,
 	_cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK,
-	      id, status );
+	      _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -710,7 +717,7 @@ void adic_newv1c( int nval, charptr value[], ADIobj *id, ADIstatus status )
   _ERR_IN("adic_newv1c");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__true, ADI__nullid, NULL, 0, 1, &nval, value, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK, id, status );
+	      _CSM, id, status );
 
   _ERR_OUT;
   }
@@ -808,6 +815,33 @@ void adic_get1c( ADIobj id, int mxval, int len,
   _ERR_OUT;
   }
 
+void adic_map( ADIobj id, char *type, char *mode, void **vptr,
+	       ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;
+  _ERR_IN("adic_map");
+
+  adix_map_t( 1, id, NULL, 0, type, _CSM,
+	      mode, _CSM, vptr, status );
+
+  _ERR_OUT;
+  }
+
+#define _genproc(_t) \
+void _TM_name(adic_map,_t)( ADIobj id, char *mode, \
+		_TM_ctype(_t) **vptr, ADIstatus status ) \
+  { \
+  _chk_init_err; _chk_stat; \
+  _ERR_IN(_TM_names(adic_map,_t)); \
+  adix_map_n( 1, id, NULL, 0, mode, _CSM, \
+	      _TM_code(_t), sizeof(_TM_ctype(_t)), \
+	      (void **) vptr, status ); \
+  _ERR_OUT;}
+
+_genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
+_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
+#undef _genproc
+
 #define _genproc(_t) \
 void _TM_name(adic_put0,_t)( ADIobj id, _TM_ctype(_t) value, ADIstatus status ) \
   { \
@@ -830,8 +864,7 @@ void _TM_name(adic_put0,c)( ADIobj id, char *value, ADIstatus status )
   _ERR_IN("adic_put0c");		/* Mark routine for error reporting */
 
   adix_put_n( 1, id, NULL, 0, 0, NULL, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK,
-	      &value, status );
+	      _CSM, &value, status );
 
   _ERR_OUT;
   }
@@ -860,8 +893,7 @@ void adic_putc( ADIobj id, int ndim, int dims[],
   _ERR_IN("adic_putc");		/* Mark routine for error reporting */
 
   adix_put_n( 1, id, NULL, 0, ndim, dims, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK,
-	      value, status );
+	      _CSM, value, status );
 
   _ERR_OUT;
   }
@@ -890,8 +922,18 @@ void adic_put1c( ADIobj id, int nval,
   _ERR_IN("adic_put1c");		/* Mark routine for error reporting */
 
   adix_put_n( 1, id, NULL, 0, 1, &nval, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK,
-	      value, status );
+	      _CSM, value, status );
+
+  _ERR_OUT;
+  }
+
+void adic_unmap( ADIobj id, void *vptr, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("adic_unmap");
+
+  adix_unmap_n( id, NULL, 0, vptr, status );
 
   _ERR_OUT;
   }
@@ -907,7 +949,7 @@ void adic_cnew( ADIobj id, char *name, char *cls, int ndim, int dims[], ADIstatu
 
   _ERR_IN("adic_cnew");
 
-  adix_newn( id, name, _CSTRING_MARK, cls, _CSTRING_MARK,
+  adix_newn( id, name, _CSM, cls, _CSM,
 	     ndim, dims, NULL, status );
 
   _ERR_OUT;
@@ -919,7 +961,7 @@ void adic_cnew0( ADIobj id, char *name, char *cls, ADIstatus status )
 
   _ERR_IN("adic_cnew0");
 
-  adix_newn( id, name, _CSTRING_MARK, cls, _CSTRING_MARK,
+  adix_newn( id, name, _CSM, cls, _CSM,
 	     0, NULL, NULL, status );
 
   _ERR_OUT;
@@ -931,7 +973,7 @@ void adic_cnew1( ADIobj id, char *name, char *cls, int nval, ADIstatus status )
 
   _ERR_IN("adic_cnew1");
 
-  adix_newn( id, name, _CSTRING_MARK, cls, _CSTRING_MARK,
+  adix_newn( id, name, _CSM, cls, _CSM,
 	     1, &nval, NULL, status );
 
   _ERR_OUT;
@@ -942,7 +984,7 @@ void _TM_name(adic_cnew,_t)( ADIobj id, char *name, int ndim, int dims[], ADIsta
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, ndim, dims, NULL, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, NULL, _cdef_ctrl(_TM_alloc(_t)), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -956,7 +998,7 @@ void _TM_name(adic_cnew0,_t)( ADIobj id, char *name, ADIstatus status ) \
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew0,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 0, NULL, NULL, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, NULL, _cdef_ctrl(_TM_alloc(_t)), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -970,7 +1012,7 @@ void _TM_name(adic_cnew1,_t)( ADIobj id, char *name, int nval, ADIstatus status 
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnew1,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 1, &nval, NULL, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, NULL, _cdef_ctrl(_TM_alloc(_t)), \
 	      0, NULL, status ); \
   _ERR_OUT;}
 
@@ -984,7 +1026,7 @@ void _TM_name(adic_cnewv,_t)( ADIobj id, char *name, int ndim, int dims[], _TM_c
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, ndim, dims, value, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1000,8 +1042,8 @@ void adic_cnewvc( ADIobj id, char *name, int ndim, int dims[], charptr value[], 
 
   _ERR_IN("adic_cnewvc");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, ndim, dims, value, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK, NULL, status );
+  adix_new_n( ADI__true, id, name, _CSM, ndim, dims, value, _cdef_ctrl(_TM_alloc(c)),
+	      _CSM, NULL, status );
 
   _ERR_OUT;
   }
@@ -1011,7 +1053,7 @@ void _TM_name(adic_cnewv0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIst
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv0,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 0, NULL, &value, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(value), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1027,10 +1069,9 @@ void adic_cnewv0c( ADIobj id, char *name, char *value, ADIstatus status )
 
   _ERR_IN("adic_cnewv0c");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 0, NULL, &value,
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value,
 	_cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK,
-	      NULL, status );
+	      _CSM, NULL, status );
 
   _ERR_OUT;
   }
@@ -1042,7 +1083,7 @@ void adic_cnewv0c_n( ADIobj id, char *name, _TM_ctype(c) value, int len,
 
   _ERR_IN("adic_cnewv0c_n");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 0, NULL, &value,/* Use user supplied length */
+  adix_new_n( ADI__true, id, name, _CSM, 0, NULL, &value,/* Use user supplied length */
 	      _cdef_ctrl(_TM_alloc(c)),
 	      len, NULL, status );
   _ERR_OUT;
@@ -1053,7 +1094,7 @@ void _TM_name(adic_cnewv1,_t)( ADIobj id, char *name, int nval, _TM_ctype(_t) va
   { \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_names(adic_cnewv1,_t)); \
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 1, &nval, value, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     NULL, status ); \
   _ERR_OUT;}
@@ -1069,8 +1110,8 @@ void adic_cnewv1c( ADIobj id, char *name, int nval, charptr value[], ADIstatus s
 
   _ERR_IN("adic_cnewv1c");		/* Mark routine for error reporting */
 
-  adix_new_n( ADI__true, id, name, _CSTRING_MARK, 1, &nval, value, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK, NULL, status );
+  adix_new_n( ADI__true, id, name, _CSM, 1, &nval, value, _cdef_ctrl(_TM_alloc(c)),
+	      _CSM, NULL, status );
 
   _ERR_OUT;
   }
@@ -1086,7 +1127,7 @@ void _TM_name(adic_cget,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget,_t)); \
-  adix_get_n( 1, id, name, _CSTRING_MARK, ndim, dims, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_code(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, NULL, status ); \
   _ERR_OUT;}
@@ -1103,7 +1144,7 @@ void adic_cgetc( ADIobj id, char *name, int ndim, int dims[], int len,
 
   _ERR_IN("adic_cgetc");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSTRING_MARK, ndim, dims, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, ndim, dims, _TM_code(c),
 	      len, value, NULL, status );
   _ERR_OUT;
   }
@@ -1113,7 +1154,7 @@ void _TM_name(adic_cget0,_t)( ADIobj id, char *name, _TM_ctype(_t) *value, ADIst
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget0,_t)); \
-  adix_get_n( 1, id, name, _CSTRING_MARK, 0, NULL, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_code(_t), \
 	     sizeof(_TM_ctype(_t)), value, NULL, status ); \
   _ERR_OUT;}
 
@@ -1128,7 +1169,7 @@ void adic_cget0c( ADIobj id, char *name, int len, char *value, ADIstatus status 
 
   _ERR_IN("adic_cget0c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSTRING_MARK, 0, NULL, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, 0, NULL, _TM_code(c),
 	      len, value, NULL, status );
 
   _ERR_OUT;
@@ -1140,7 +1181,7 @@ void _TM_name(adic_cget1,_t)( ADIobj id, char *name, int mxval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cget1,_t)); \
-  adix_get_n( 1, id, name, _CSTRING_MARK, 1, &mxval, _TM_code(_t), \
+  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_code(_t), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, nactval, status ); \
   _ERR_OUT;}
@@ -1157,10 +1198,37 @@ void adic_cget1c( ADIobj id, char *name, int mxval, int len,
 
   _ERR_IN("adic_cget1c");		/* Mark routine for error reporting */
 
-  adix_get_n( 1, id, name, _CSTRING_MARK, 1, &mxval, _TM_code(c),
+  adix_get_n( 1, id, name, _CSM, 1, &mxval, _TM_code(c),
 	      len, value, nactval, status );
   _ERR_OUT;
   }
+
+void adic_cmap( ADIobj id, char *name, char *type, char *mode,
+		void **vptr, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;
+  _ERR_IN("adic_cmap");
+
+  adix_map_t( 1, id, name, _CSM, type, _CSM,
+	      mode, _CSM, vptr, status );
+
+  _ERR_OUT;
+  }
+
+#define _genproc(_t) \
+void _TM_name(adic_cmap,_t)( ADIobj id, char *name, char *mode, \
+		_TM_ctype(_t) **vptr, ADIstatus status ) \
+  { \
+  _chk_init_err; _chk_stat; \
+  _ERR_IN(_TM_names(adic_cmap,_t)); \
+  adix_map_n( 1, id, name, _CSM, mode, _CSM, \
+	      _TM_code(_t), sizeof(_TM_ctype(_t)), \
+	      (void **) vptr, status ); \
+  _ERR_OUT;}
+
+_genproc(b)	_genproc(ub)	_genproc(w)	_genproc(uw)
+_genproc(i)	_genproc(r)	_genproc(d)	_genproc(l)
+#undef _genproc
 
 #define _genproc(_t) \
 void _TM_name(adic_cput,_t)( ADIobj id, char *name, int ndim, int dims[], \
@@ -1168,7 +1236,7 @@ void _TM_name(adic_cput,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput,_t)); \
-  adix_put_n( 1, id, name, _CSTRING_MARK, ndim, dims, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, ndim, dims, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1185,8 +1253,8 @@ void adic_cputc( ADIobj id, char *name, int ndim, int dims[],
 
   _ERR_IN("adic_cputc");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSTRING_MARK, ndim, dims,
-	      _cdef_ctrl(_TM_alloc(c)), _CSTRING_MARK,
+  adix_put_n( 1, id, name, _CSM, ndim, dims,
+	      _cdef_ctrl(_TM_alloc(c)), _CSM,
 	      value, status );
 
   _ERR_OUT;
@@ -1197,7 +1265,7 @@ void _TM_name(adic_cput0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIsta
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput0,_t)); \
-  adix_put_n( 1, id, name, _CSTRING_MARK, 0, NULL, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, 0, NULL, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(value), \
 	     &value, status ); \
   _ERR_OUT;}
@@ -1213,9 +1281,9 @@ void adic_cput0c( ADIobj id, char *name, char *value, ADIstatus status )
 
   _ERR_IN("adic_cput0c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSTRING_MARK,
+  adix_put_n( 1, id, name, _CSM,
 	      0, NULL, _cdef_ctrl(_TM_alloc(c)),
-	      _CSTRING_MARK, &value, status );
+	      _CSM, &value, status );
 
   _ERR_OUT;
   }
@@ -1226,7 +1294,7 @@ void _TM_name(adic_cput1,_t)( ADIobj id, char *name, int nval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cput1,_t)); \
-  adix_put_n( 1, id, name, _CSTRING_MARK, 1, &nval, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_put_n( 1, id, name, _CSM, 1, &nval, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1243,8 +1311,8 @@ void adic_cput1c( ADIobj id, char *name, int nval,
 
   _ERR_IN("adic_cput1c");		/* Mark routine for error reporting */
 
-  adix_put_n( 1, id, name, _CSTRING_MARK, 1, &nval,
-	      _cdef_ctrl(_TM_alloc(c)), _CSTRING_MARK,
+  adix_put_n( 1, id, name, _CSM, 1, &nval,
+	      _cdef_ctrl(_TM_alloc(c)), _CSM,
 	      value, status );
 
   _ERR_OUT;
@@ -1256,8 +1324,19 @@ void adic_cputid( ADIobj id, char *name, ADIobj vid, ADIstatus status )
 
   _ERR_IN("adic_cputid");		/* Mark routine for error reporting */
 
-  adix_cputid( id, name, _CSTRING_MARK, /* Invoke kernel routine */
+  adix_cputid( id, name, _CSM, /* Invoke kernel routine */
 	       vid, status );
+
+  _ERR_OUT;
+  }
+
+void adic_cunmap( ADIobj id, char *name, void *vptr, ADIstatus status )
+  {
+  _chk_init_err; _chk_stat;
+
+  _ERR_IN("adic_cunmap");
+
+  adix_unmap_n( id, name, _CSM, vptr, status );
 
   _ERR_OUT;
   }
@@ -1269,7 +1348,7 @@ void adic_find( ADIobj id, char *name, ADIobj *cid, ADIstatus status )
   _ERR_IN("adic_find");			/* Mark routine for error reporting */
 
   *cid = adix_find( id, name,		/* Invoke kernel routine */
-	 _CSTRING_MARK, status );
+	 _CSM, status );
 
   _ERR_OUT;
   }
@@ -1280,7 +1359,7 @@ void _TM_name(adic_cset,_t)( ADIobj id, char *name, int ndim, int dims[], \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset,_t)); \
-  adix_set_n( 1, id, name, _CSTRING_MARK, ndim, dims, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, ndim, dims, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1297,8 +1376,8 @@ void adic_csetc( ADIobj id, char *name, int ndim, int dims[],
 
   _ERR_IN("adic_csetc");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSTRING_MARK, ndim, dims,
-	      _cdef_ctrl(_TM_alloc(c)), _CSTRING_MARK,
+  adix_set_n( 1, id, name, _CSM, ndim, dims,
+	      _cdef_ctrl(_TM_alloc(c)), _CSM,
 	      value, status );
   _ERR_OUT;
   }
@@ -1308,7 +1387,7 @@ void _TM_name(adic_cset0,_t)( ADIobj id, char *name, _TM_ctype(_t) value, ADIsta
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset0,_t)); \
-  adix_set_n( 1, id, name, _CSTRING_MARK, 0, NULL, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, 0, NULL, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(value), \
 	     &value, status ); \
   _ERR_OUT;}
@@ -1324,8 +1403,8 @@ void adic_cset0c( ADIobj id, char *name, char *value, ADIstatus status )
 
   _ERR_IN("adic_cset0c");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSTRING_MARK, 0, NULL,
-	      _cdef_ctrl(_TM_alloc(c)), _CSTRING_MARK,
+  adix_set_n( 1, id, name, _CSM, 0, NULL,
+	      _cdef_ctrl(_TM_alloc(c)), _CSM,
 	       &value, status );
 
   _ERR_OUT;
@@ -1337,7 +1416,7 @@ void _TM_name(adic_cset1,_t)( ADIobj id, char *name, int nval, \
   { \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_names(adic_cset1,_t)); \
-  adix_set_n( 1, id, name, _CSTRING_MARK, 1, &nval, _cdef_ctrl(_TM_alloc(_t)), \
+  adix_set_n( 1, id, name, _CSM, 1, &nval, _cdef_ctrl(_TM_alloc(_t)), \
 	     sizeof(_TM_ctype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1354,8 +1433,8 @@ void adic_cset1c( ADIobj id, char *name, int nval,
 
   _ERR_IN("adic_cset1c");		/* Mark routine for error reporting */
 
-  adix_set_n( 1, id, name, _CSTRING_MARK, 1, &nval,
-	      _cdef_ctrl(_TM_alloc(c)), _CSTRING_MARK,
+  adix_set_n( 1, id, name, _CSM, 1, &nval,
+	      _cdef_ctrl(_TM_alloc(c)), _CSM,
 	      value, status );
   _ERR_OUT;
   }
@@ -1367,7 +1446,7 @@ void adic_there( ADIobj id, char *name, ADIboolean *there, ADIstatus status )
   _ERR_IN("adic_there");		/* Mark routine for error reporting */
 
   *there = adix_there( id, name,	/* Invoke kernel routine */
-	 _CSTRING_MARK, status );
+	 _CSM, status );
 
   _ERR_OUT;
   }
@@ -1398,9 +1477,8 @@ void adic_cshape( ADIobj id, char *name, int mxndim, int dims[], int *ndim, ADIs
 
   _ERR_IN("adic_cshape");		/* Mark routine for error reporting */
 
-  adix_shape( id, name, _CSTRING_MARK,	/* Invoke kernel routine */
-              mxndim, dims,
-	      ndim, status );
+  adix_shape( id, name, _CSM, mxndim,	/* Invoke kernel routine */
+	      dims, ndim, status );
 
   _ERR_OUT;
   }
@@ -1455,8 +1533,8 @@ void adic_calter( ADIobj id, char *name, int ndim, int dims[], ADIstatus status 
 
   _ERR_IN("adic_calter");		/* Mark routine for error reporting */
 
-  adix_alter( id, name, _CSTRING_MARK,  /* Invoke kernel routine */
-              ndim, dims, status );
+  adix_alter( id, name, _CSM,  /* Invoke kernel routine */
+	      ndim, dims, status );
 
   _ERR_OUT;
   }
@@ -1468,9 +1546,8 @@ void adic_ccell( ADIobj id, char *name, int ndim, int index[],
 
   _ERR_IN("adic_ccell");		/* Mark routine for error reporting */
 
-  adix_cell( id, name, _CSTRING_MARK, 	/* Invoke kernel routine */
-             ndim, index, cid,
-             status );
+  adix_cell( id, name, _CSM, ndim,	/* Invoke kernel routine */
+	     index, cid, status );
 
   _ERR_OUT;
   }
@@ -1496,9 +1573,8 @@ void adic_cslice( ADIobj id, char *name, int ndim, int diml[], int dimu[],
 
   _ERR_IN("adic_cslice");		/* Mark routine for error reporting */
 
-  adix_slice( id, name, _CSTRING_MARK, 	/* Invoke kernel routine */
-              ndim, diml, dimu, sid,
-              status );
+  adix_slice( id, name, _CSM, ndim,	/* Invoke kernel routine */
+	      diml, dimu, sid, status );
 
   _ERR_OUT;
   }
@@ -1539,8 +1615,23 @@ void adic_cerase( ADIobj id, char *name, ADIstatus status )
 
   _ERR_IN("adic_cerase");		/* Mark routine for error reporting */
 
-  adix_cerase( id, name, _CSTRING_MARK, /* Invoke kernel routine */
-	       status );
+  adix_cerase( id, name, _CSM, status );/* Invoke kernel routine */
+
+  _ERR_OUT;
+  }
+
+/* -------------------------------------------------------------------------
+ * Symbol packages
+ * -------------------------------------------------------------------------
+ */
+
+void adic_reqpkg( char *pkg, ADIstatus status )
+  {
+  _chk_init; _chk_stat;
+
+  _ERR_IN("adic_reqpkg");
+
+  ADIpkgRequire( pkg, _CSM, status );
 
   _ERR_OUT;
   }
@@ -1552,7 +1643,7 @@ void adic_defrcb( ADIobj rid, char *name, ADICB rtn, ADIstatus status )
   {
   _chk_init; _chk_stat;                 /* Standard entry checks */
 
-  adix_defrcb( rid, name, _CSTRING_MARK, /* Invoke kernel routine */
+  adix_defrcb( rid, name, _CSM, /* Invoke kernel routine */
 	       adix_neweprc( ADI__true,
                  (ADICB) rtn, status ),
                status );
@@ -1585,7 +1676,7 @@ void adic_locrcb( ADIobj rid, char *name, ADIobj *rtn, ADIstatus status )
   {
   _chk_init; _chk_stat;                 /* Standard entry checks */
 
-  adix_locrcb( rid, name, _CSTRING_MARK, /* Invoke kernel routine */
+  adix_locrcb( rid, name, _CSM, /* Invoke kernel routine */
 	       rtn, status );
   }
 
@@ -1593,8 +1684,7 @@ void adic_locrep( char *name, ADIobj *id, ADIstatus status )
   {
   _chk_init; _chk_stat;                 /* Standard entry checks */
 
-  adix_locrep( name, _CSTRING_MARK, 	/* Invoke kernel routine */
-	       id, status );
+  adix_locrep( name, _CSM, id, status );/* Invoke kernel routine */
   }
 
 void adic_cmnstr( char *string, ADIobj *id, ADIstatus status )
@@ -1612,10 +1702,8 @@ void adic_fopen( char *fspec, char *cls, char *mode, ADIobj *id,
 
   _ERR_IN("adic_fopen");		/* Mark routine for error reporting */
 
-  adix_fopen( fspec, _CSTRING_MARK,	/* Invoke kernel routine */
-              cls, _CSTRING_MARK,
-              mode, _CSTRING_MARK,
-              id, status );
+  adix_fopen( fspec, _CSM, cls, _CSM,	/* Invoke kernel routine */
+	      mode, _CSM, id, status );
 
   _ERR_OUT;
   }

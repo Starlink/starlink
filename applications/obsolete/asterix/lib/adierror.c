@@ -234,6 +234,8 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
       {ADI__NOCOMP,	"No such structure component"},
       {ADI__EXCEED,	"Storage space in buffer exceeded"},
       {ADI__NONAME,	"Object is not a named object"},
+      {ADI__MAPPED,	"Object is already mapped"},
+      {ADI__NOTMAP,	"Object is not mapped at this address"},
       {SAI__ERROR,	"Error"},
       {SAI__OK,		""}
       };

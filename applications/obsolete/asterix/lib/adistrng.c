@@ -363,7 +363,7 @@ void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
     {
     if ( _null_q(mta->id) )
       {
-      if ( mta->size == _CSTRING_MARK )
+      if ( mta->size == _CSM )
 	sptr->len = strlen( *((charptr *) mta->data) );
       else
 	sptr->len = mta->size;
