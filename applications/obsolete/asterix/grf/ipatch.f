@@ -47,7 +47,7 @@
         IF (STATUS.EQ.SAI__OK.AND..NOT.(MODE.EQ.'INTERP'.OR.
      :                                  MODE.EQ.'PASTE')) THEN
           CALL MSG_PRNT('AST_ERR: invalid mode')
-          STATUS=SAI__ERRROR
+          STATUS=SAI__ERROR
         ENDIF
 
 *  ensure transformations are correct
@@ -411,8 +411,8 @@
 
         CH=' '
         RIGHT=.FALSE.
-        DO WHILE (.NOT.RIGHT.AND.CH.NE.'X'.AND.CH.NE.'x'.
-     :                                  STATUS.EQ.SAI__OK)
+        DO WHILE (.NOT.RIGHT.AND.CH.NE.'X'.AND.CH.NE.'x'.AND.
+     :                                     STATUS.EQ.SAI__OK)
 
           X=XC
           Y=YC
