@@ -348,15 +348,21 @@
       END
 
 *  Return the extent of a text string.
-*  ------------------------------------
+*
+*  For some reason, the arguments to this function seem particularly
+*  prone to random rounding errors, resulting in the regression test
+*  always failing when run twice in succession, even if not changes
+*  have been made to the code in plot.c. For this reason this function
+*  does not write out its argument to standard output.
+*  --------------------------------------------------------------------
       INTEGER FUNCTION REG_TXEXT( TEXT, X, Y, JUST, UPX, UPY, XB, YB )
       IMPLICIT NONE
 
       CHARACTER TEXT*(*), JUST*(*)
       REAL X, Y, UPX, UPY, XB, YB
 
-      WRITE(*,*) 'REG_TXEXT: ''', TEXT,''''
-      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
+c      WRITE(*,*) 'REG_TXEXT: ''', TEXT,''''
+c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
 
       XB = LEN( TEXT )*0.5
       YB = 0.5
