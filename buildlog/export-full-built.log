@@ -845,9 +845,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -880,4 +880,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 16 seconds
+Total time: 6 minutes 40 seconds

@@ -972,11 +972,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/LassoSelectionAction.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:35: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/MultiStateInterpreter.html...
-  [javadoc] "The timeout for single/double/triple/.."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The timeout for single/double/triple/.. clicks,
-  [javadoc]  in milliseconds."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/PenStroke.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchController.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchEvent.java:20: warning - @rating is an unknown tag.
@@ -984,13 +979,20 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchModel.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/SketchPane.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/StrokeSymbol.java:23: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/MultiStateInterpreter.html...
+  [javadoc] "The timeout for single/double/triple/.."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The timeout for single/double/triple/.. clicks,
+  [javadoc]  in milliseconds."
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/TrainableClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/BayesClassifier.html...
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
@@ -999,8 +1001,6 @@ javadoc-sources:
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f. calculation."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/CrossValidation.java:17: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/classification/RubineClassifier.html...
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1289,17 +1289,21 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/SiteDecorator.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/TransformContext.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/BackgroundedCompositeFigure.java:31: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:191: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/toolbox/LabelFigure.html...
   [javadoc] "Get the point at which this figure is "anchored." This
   [javadoc]  will be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/PointConstraint.html...
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." A snap means that the output value of the point
@@ -1307,16 +1311,12 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/SelectionModel.html...
   [javadoc] "Add an array of objects to the selection."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Add an array of objects to the selection. the model should
   [javadoc]  highlight the selected objects."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:191: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionDragger.java:54: warning - @history is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
@@ -1529,4 +1529,4 @@ javadoc-sources:
   [javadoc] 575 warnings
 
 BUILD SUCCESSFUL
-Total time: 2 minutes 13 seconds
+Total time: 1 minute 48 seconds
