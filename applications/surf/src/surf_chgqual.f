@@ -469,7 +469,6 @@
 *     do we want to set quality bad or good
 
       CALL PAR_GET0L ('BAD_QUALITY', BAD_QUALITY, STATUS)
-      CALL PAR_CANCL ('BAD_QUALITY', STATUS)
 
 *     set the badbit mask to include bit 3 - the one set by this routine, then
 *     modify the quality array
