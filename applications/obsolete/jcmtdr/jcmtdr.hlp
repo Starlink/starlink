@@ -2,7 +2,12 @@
  This is the JCMTDR on-line help system.
 
  JCMTDR is a collection of applications for use in reducing JCMT 
- mapping data. It is intended as a replacement for NOD2.
+ mapping data taken using the IFD in conjunction with UKT14 or the
+ single-pixel heterodyne frontends. It is intended as a replacement
+ for NOD2. This programme is intended for reduction of archive data
+ and of heterodyne beam maps.
+
+ For processing of SCUBA data use SURF (see SUN/216)
 
 1 JCMTDR
 
@@ -209,6 +214,8 @@ The declination must be input in (sign)dd mm ss.s format.
 
 2 AE2RD2
 
+   Disabled in non-NAG version of JCMTDR.
+
    This application will transform JCMT map data into a tangent 
 plane image centred on a specified RA, Dec. The rebinning
 is performed using a NAG algorithm originally due to Renka & Cline
@@ -365,6 +372,8 @@ measurements associated with it.
 
 2 GSD_PRINT
 
+Now distributed separately in the GSD package. See SUN/229.
+
 This utility is provided to allow examination of the raw GSD data
 files. It is available as a shell alias and should be prefaced
 appropriately when run from ICL.
@@ -447,3 +456,22 @@ re-directed to a file or piped into another Unix command.
 
  Starlink User Note 132 is available on-line as Web pages. The browser
  for these pages can be started with "jcmt_xhelp" from the Unix shell.
+
+1 News_1.2-2
+
+  Version 1.2-2 of JCMTDR is the port to Linux.
+
+  o  This involved the replacement of all NAG routines with
+     routines from the PDA library (see SUN/194). AE2RD2 has been removed
+     as no replacement PDA routine is available.
+
+  o  Include SC/1 and SUN/132 in the distribution. Update SUN/132 to current
+     standard although references to VMS and old Figaro support are still 
+     present and should be removed.
+
+  o  GSD inspection routines have been removed. They are now distributed as
+     part of the separate GSD package (see SUN/229).
+
+  o  The jcmt_xhelp command has been replaced with the standard Starlink
+     HTML access system ('findme sun132').
+
