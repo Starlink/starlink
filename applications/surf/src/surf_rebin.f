@@ -249,6 +249,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.78  2005/03/18 06:27:53  timj
+*     + initialise some variables
+*     + add some status check protection
+*
 *     Revision 1.77  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -796,7 +800,9 @@ c
       CALCSKY  = .FALSE.
       QMF = .TRUE.
       DOREBIN  = .TRUE.
-
+      HAVE_MODEL = .FALSE.
+      SOBJECT = ' '
+      OUT_REDSX_LOC = DAT__NOLOC
 
 * Setup taskname (can never have BOLREBIN and INTREBIN)
 
@@ -912,6 +918,7 @@ c
 *     It does not need to be done if we've already read the coords from
 *     a source model in CALCSKY.
 
+      OUT_COORDS = ' '
       IF (.NOT. CALCSKY .OR. .NOT. HAVE_MODEL) THEN 
          CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',
      :     .TRUE., OUT_COORDS, STATUS)
@@ -1115,6 +1122,7 @@ c
       CHOP_PA  = VAL__BADR
       CHOP_CRD = ' '
       OKAY = .FALSE.
+      SAMPLE_MODE = ' '
 
 *     Nothing to check if we only have one input file
       IF (FILE .GT. 1) THEN
@@ -1253,7 +1261,7 @@ c
 *     Read the latitude of the observatory
       CALL SCULIB_GET_FITS_D (N_FITS, N_FITS(1), FITS(1,1),
      :     'LAT-OBS', LAT_OBS, STATUS)
-      LAT_OBS = LAT_OBS * PI / 180.0D0
+      IF (STATUS .EQ. SAI__OK) LAT_OBS = LAT_OBS * PI / 180.0D0
 
 *     If we are just despiking or calcsky-ing we don't need to ask about
 *     the coordinates
@@ -1399,8 +1407,12 @@ c
 
          BITNUM = 4
 
-*     Bin and despike the data
+*     Initialise the arrays
+         DO I = 1, MAX_FILE
+            NSPIKES(I) = 0
+         END DO
 
+*     Bin and despike the data
          CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
      :        WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
      :        IN_DATA_PTR, IN_QUALITY_PTR, 
@@ -1411,17 +1423,19 @@ c
 *     Report the number to the user. Do it here as I want to get the
 *     list before I start asking for output files
 
-         DO I = 1, FILE
-            IF (NSPIKES(I) .GT. 0) THEN
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO I = 1, FILE
+               IF (NSPIKES(I) .GT. 0) THEN
                
-               CALL MSG_SETC('FILE', FILENAME(I))
-               CALL MSG_SETI('NS', NSPIKES(I))
-               CALL MSG_SETC('PKG', PACKAGE)
-               CALL MSG_OUTIF(MSG__NORM, ' ', 
-     :              '^PKG: ^NS spikes detected in file ^FILE',
-     :              STATUS)
-            END IF
-         END DO
+                  CALL MSG_SETC('FILE', FILENAME(I))
+                  CALL MSG_SETI('NS', NSPIKES(I))
+                  CALL MSG_SETC('PKG', PACKAGE)
+                  CALL MSG_OUTIF(MSG__NORM, ' ', 
+     :                 '^PKG: ^NS spikes detected in file ^FILE',
+     :                 STATUS)
+               END IF
+            END DO
+         END IF
 
 *     Now we need to write the new quality data to an output file
 *     Do this by propogating everything from each input file
@@ -1611,7 +1625,7 @@ c
 
 *     Create a 'SKY' extension (unless one already exists)
             STEMP = 'SKY'
-
+            THERE = .FALSE.
             CALL DAT_THERE(OUT_REDSX_LOC, STEMP, THERE, STATUS)
 
 *     Delete if it is there
@@ -1628,8 +1642,11 @@ c
      :           QPTR, ITEMP, STATUS)
 
 *     Copy the sky data in
-            CALL VEC_RTOR(.FALSE., N_POS(I), %VAL(CNF_PVAL(SKY_PTR(I))),
-     :           %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL VEC_RTOR(.FALSE., N_POS(I),
+     :              %VAL(CNF_PVAL(SKY_PTR(I))),
+     :              %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
+            END IF
 
 *     Unmap DATA
             CALL NDF_UNMAP(SKYNDF, 'DATA', STATUS)
@@ -1642,9 +1659,11 @@ c
      :           QPTR, ITEMP, STATUS)
 
 *     Copy in error
-            CALL VEC_RTOR(.FALSE., N_POS(I), 
-     :                    %VAL(CNF_PVAL(SKY_VPTR(I))),
-     :           %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
+            IF (STATUS .EQ. SAI__OK) THEN
+               CALL VEC_RTOR(.FALSE., N_POS(I), 
+     :              %VAL(CNF_PVAL(SKY_VPTR(I))),
+     :              %VAL(CNF_PVAL(QPTR)), IERR, NERR, STATUS)
+            END IF
 
 *     Unmap variance
             CALL NDF_UNMAP(SKYNDF, '*', STATUS)
@@ -1688,19 +1707,22 @@ c
       IF (METHOD .EQ. 'BESSEL' .OR. METHOD.EQ.'LINEAR' .OR.
      :     METHOD .EQ. 'GAUSSIAN') THEN
 
+         IF (STATUS .EQ. SAI__OK) THEN
 *     Calculate my default scale length - Lambda/4D
 *     Also maybe should include factor for the width of the filter
 *     Need to convert to arcsec before changing back again
-         DTEMP = R2AS * DBLE(WAVELENGTH) * 1.0E-6 / 
-     :        (2.0 * DBLE(DIAMETER))
+            DTEMP = R2AS * DBLE(WAVELENGTH) * 1.0E-6 / 
+     :           (2.0 * DBLE(DIAMETER))
 
 *     Make it a bit smaller if we have a Gaussian regrid
 *     Claire Chandler tells me that she had best results
 *     with HWHM = 2.5 (850), 1.3 (450)
 *     This is almost approximated by LAMBDA/(4D)
-         IF (METHOD .EQ. 'GAUSSIAN') DTEMP = DTEMP / 2.5
+            IF (METHOD .EQ. 'GAUSSIAN') DTEMP = DTEMP / 2.5
 
-         CALL PAR_DEF0R('SCALE', REAL(DTEMP), STATUS)
+            CALL PAR_DEF0R('SCALE', REAL(DTEMP), STATUS)
+
+         END IF
 
 *     Change the prompt depending on the relationship
          STEMP = ' '
@@ -1718,7 +1740,7 @@ c
          CALL PAR_GET0R('SCALE', SCALE, STATUS)
 
 *     Convert back to radians
-         SCALE = SCALE / REAL(R2AS)
+         IF (STATUS .EQ. SAI__OK) SCALE = SCALE / REAL(R2AS)
 
 *     Now need to ask for the number of scale lengths
          WEIGHTSIZE = 1
