@@ -76,11 +76,9 @@ fobject.c. */
 F77_SUBROUTINE(ast_null)( void );
 
 static int FGAttrWrapper( AstPlot *, int, double, double *, int );
-static int FGAxScaleWrapper( AstPlot *, float *, float * );
 static int FGFlushWrapper( AstPlot * );
 static int FGLineWrapper( AstPlot *, int, const float *, const float * );
 static int FGMarkWrapper( AstPlot *, int, const float *, const float *, int );
-static int FGQchWrapper( AstPlot *, float *, float *);
 static int FGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int FGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 
@@ -292,16 +290,12 @@ F77_SUBROUTINE(ast_setgrffun)( INTEGER(THIS), CHARACTER(NAME),
 
       if( ifun == AST__GATTR ) {
          wrapper = (AstGrfWrap) FGAttrWrapper;
-      } else if( ifun == AST__GAXSCALE ) {
-         wrapper = (AstGrfWrap) FGAxScaleWrapper;
       } else if( ifun == AST__GFLUSH ) {
          wrapper = (AstGrfWrap) FGFlushWrapper;
       } else if( ifun == AST__GLINE ) {
          wrapper = (AstGrfWrap) FGLineWrapper;
       } else if( ifun == AST__GMARK ) {
          wrapper = (AstGrfWrap) FGMarkWrapper;
-      } else if( ifun == AST__GQCH ) {
-         wrapper = (AstGrfWrap) FGQchWrapper;
       } else if( ifun == AST__GTEXT ) {
          wrapper = (AstGrfWrap) FGTextWrapper;
       } else if( ifun == AST__GTXEXT ) {
@@ -324,13 +318,6 @@ static int FGAttrWrapper( AstPlot *this, int attr, double value,
                                                 DOUBLE_ARG(&value), 
                                                 DOUBLE_ARG(old_value),  
                                                 INTEGER_ARG(&prim) );
-}
-
-static int FGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
-   if ( !astOK ) return 0;
-   return ( *(int (*)( REAL(alpha), REAL(beta) ))
-                  this->grffun[ AST__GAXSCALE ])( REAL_ARG(alpha),
-                                                  REAL_ARG(beta) );
 }
 
 static int FGFlushWrapper( AstPlot *this ) {
@@ -356,13 +343,6 @@ static int FGMarkWrapper( AstPlot *this, int n, const float *x,
                                                 REAL_ARRAY_ARG(x), 
                                                 REAL_ARRAY_ARG(y),
                                                 INTEGER_ARG(&type) );
-}
-
-static int FGQchWrapper( AstPlot *this, float *chv, float *chh ) {
-   if ( !astOK ) return 0;
-   return ( *(int (*)( REAL(chv), REAL(chh) ))
-                  this->grffun[ AST__GQCH ])( REAL_ARG(chv),
-                                              REAL_ARG(chh) );
 }
 
 static int FGTextWrapper( AstPlot *this, const char *text, float x, float y,

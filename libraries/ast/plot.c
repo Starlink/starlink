@@ -1349,11 +1349,9 @@ static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
 static int BoxText( AstPlot *, int, const char *, float, float, const char *, float, float, float *, float *, const char *, const char * );
 static int CGAttrWrapper( AstPlot *, int, double, double *, int );
-static int CGAxScaleWrapper( AstPlot *, float *, float * );
 static int CGFlushWrapper( AstPlot * );
 static int CGLineWrapper( AstPlot *, int, const float *, const float * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
-static int CGQchWrapper( AstPlot *, float *, float *);
 static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 static int CheckLabels( AstFrame *, int, double *, int, char ** );
@@ -1391,11 +1389,9 @@ static void DrawAxis( AstPlot *, TickInfo **, double *, double *, const char *, 
 static void DrawTicks( AstPlot *, TickInfo **, int, double *, double *, const char *, const char * );
 static void Dump( AstObject *, AstChannel * );
 static void GAttr( AstPlot *, int, double, double *, int, const char *, const char * );
-static void GAxScale( AstPlot *, float *, float *, const char *, const char * );
 static void GFlush( AstPlot *, const char *, const char * );
 static void GLine( AstPlot *, int, const float *, const float *, const char *, const char * );
 static void GMark( AstPlot *, int, const float *, const float *, int, const char *, const char * );
-static void GQch( AstPlot *, float *, float *, const char *, const char * );
 static void GText( AstPlot *, const char *, float, float, const char *, float, float, const char *, const char * );
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GraphGrid( int, double, double, double, double, double ** );
@@ -4372,44 +4368,6 @@ static int CGAttrWrapper( AstPlot *this, int attr, double value,
                                                         prim );
 }
 
-static int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta ) {
-/*
-*
-*  Name:
-*     CGAxScaleWrapper
-
-*  Purpose:
-*     Call a C implementation of the GAxScale Grf function.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     int CGAxScaleWrapper( AstPlot *this, float *alpha, float *beta )
-
-*  Class Membership:
-*     Plot private function.
-
-*  Description:
-*     This function is a wrapper for a C implementation of the 
-*     GAxScale grf function to get the axis scales.
-
-*  Parameters:
-*     this
-*        The Plot.
-*     alpha
-*        A pointer to the location at which to return the scale for the
-*        X axis (i.e. Xnorm = alpha*Xworld).
-*     beta
-*        A pointer to the location at which to return the scale for the
-*        Y axis (i.e. Ynorm = beta*Yworld).
-
-*/
-   if ( !astOK ) return 0;
-   return ( (AstGAxScaleFun) this->grffun[ AST__GAXSCALE ])( alpha, beta );
-}
-
 static int CGFlushWrapper( AstPlot *this ) {
 /*
 *
@@ -4524,46 +4482,6 @@ static int CGMarkWrapper( AstPlot *this, int n, const float *x,
    if ( !astOK ) return 0;
    return ( (AstGMarkFun) this->grffun[ AST__GMARK ])( n, x, y, type );
 
-}
-
-static int CGQchWrapper( AstPlot *this, float *chv, float *chh ) {
-/*
-*
-*  Name:
-*     CGQchWrapper
-
-*  Purpose:
-*     Call a C implementation of the GQch Grf function.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     int CGQchWrapper( AstPlot *this, float *chv, float *chh )
-
-*  Class Membership:
-*     Plot private function.
-
-*  Description:
-*     This function is a wrapper for a C implementation of the CGQch grf 
-*     function to get character heights.
-
-*  Parameters:
-*     this
-*        The Plot.
-*     chv
-*        A pointer to the double which is to receive the height of
-*        characters drawn with a vertical baseline . This will be an 
-*        increment in the X axis.
-*     chh
-*        A pointer to the double which is to receive the height of
-*        characters drawn with a horizontal baseline. This will be an 
-*        increment in the Y axis.
-
-*/
-   if ( !astOK ) return 0;
-   return ( (AstGQchFun) this->grffun[ AST__GQCH ])( chv, chh );
 }
 
 static int CGTextWrapper( AstPlot *this, const char *text, float x, float y,
@@ -10261,79 +10179,6 @@ static void GAttr( AstPlot *this, int attr, double value, double *old_value,
 
 }
 
-static void GAxScale( AstPlot *this, float *alpha, float *beta, 
-                      const char *method, const char *class ) {
-/*
-*
-*  Name:
-*     GAxScale
-
-*  Purpose:
-*     Call the GAxScale Grf function.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     void GAxScale( AstPlot *this, float *alpha, float *beta,
-*                    const char *method, const char *class )
-
-*  Class Membership:
-*     Plot private function.
-
-*  Description:
-*     This function calls the GAxScale grf function to get the axis scales,
-*     either calling the version registered using astSetGrfFun, or the version 
-*     in the linked grf module. The linked version is used if the Grf 
-*     attribute is zero, or if no function has been registered for GAxScale 
-*     using astSetGrfFun.
-
-*  Parameters:
-*     this
-*        The Plot.
-*     alpha
-*        A pointer to the location at which to return the scale for the
-*        X axis (i.e. Xnorm = alpha*Xworld).
-*     beta
-*        A pointer to the location at which to return the scale for the
-*        Y axis (i.e. Ynorm = beta*Yworld).
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class 
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-
-*/
-
-/* Local Variables: */
-   int status;          /* Status retruned from Grf function */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astSetGrfFun (so long as a function has been supplied).
-   This called via a wrapper which adapts the interface to suit the
-   language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GAXSCALE ] ) {
-      status = ( *( this->GAxScale ) )( this, alpha, beta );
-
-/* Otherwise, use the function in the external Grf module, selected at
-   link-time using ast_link options.*/
-   } else {
-      status = astGAxScale( alpha, beta );
-   }
-
-/* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGAxScale. ", method, 
-                class );
-   }
-
-}
-
 static void GFlush( AstPlot *this, const char *method, 
                    const char *class ) {
 /*
@@ -10549,81 +10394,6 @@ static void GMark( AstPlot *this, int n, const float *x,
 /* Report an error if anything went wrong. */
    if( !status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", method, 
-                class );
-   }
-
-}
-
-static void GQch( AstPlot *this, float *chv, float *chh,
-                  const char *method, const char *class ) {
-/*
-*
-*  Name:
-*     GQch
-
-*  Purpose:
-*     Call the GQch Grf function.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "plot.h"
-*     void GQch( AstPlot *this, float *chv, float *chh,
-*                const char *method, const char *class )
-
-*  Class Membership:
-*     Plot private function.
-
-*  Description:
-*     This function calls the GQch grf function to get character heights, 
-*     either calling the version registered using astSetGrfFun, or the version
-*     in the linked grf module. The linked version is used if the Grf 
-*     attribute is zero, or if no function has been registered for GQch 
-*     using astSetGrfFun.
-
-*  Parameters:
-*     this
-*        The Plot.
-*     chv
-*        A pointer to the double which is to receive the height of
-*        characters drawn with a vertical baseline . This will be an 
-*        increment in the X axis.
-*     chh
-*        A pointer to the double which is to receive the height of
-*        characters drawn with a horizontal baseline. This will be an 
-*        increment in the Y axis.
-*     method
-*        Pointer to a string holding the name of the calling method.
-*        This is only for use in constructing error messages.
-*     class 
-*        Pointer to a string holding the name of the supplied object class.
-*        This is only for use in constructing error messages.
-
-*/
-
-/* Local Variables: */
-   int status;          /* Status retruned from Grf function */
-
-/* Check the global error status. */
-   if ( !astOK ) return;
-
-/* If the Grf attribute is set to a non-zero value, use the Grf function
-   registered using astSetGrfFun (so long as a function has been supplied).
-   This is called via a wrapper which adapts the interface to suit the
-   language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GQCH ] ) {
-      status = ( *( this->GQch ) )( this, chv, chh );
-
-/* Otherwise, use the function in the external Grf module, selected at
-   link-time using ast_link options.*/
-   } else {
-      status = astGQch( chv, chh );
-   }
-
-/* Report an error if anything went wrong. */
-   if( !status ) {
-      astError( AST__GRFER, "%s(%s): Graphics error in astGQch. ", method, 
                 class );
    }
 
@@ -12015,28 +11785,26 @@ f     THIS = INTEGER (Given)
 c     name 
 f     NAME = CHARACTER * ( * ) (Given)
 c        A name indicating the graphics function to be replaced.
-c        Eight graphics functions are used in total by the
+c        Six graphics functions are used in total by the
 c        Plot class, and any combination of them may be supplied by calling
 c        this function once for each function to be replaced. If any of the 
-c        eight graphics functions are not replaced in this way, the 
+c        six graphics functions are not replaced in this way, the 
 c        corresponding functions in the graphics interface selected at 
 c        link-time (using the ast_link command) are used. The allowed
 c        names are: 
 f        A name indicating the graphics routine to be replaced.
-f        Eight graphics routines are used in total by the
+f        Six graphics routines are used in total by the
 f        Plot class, and any combination of them may be supplied by calling
 f        this routine once for each routine to be replaced. If any of the 
-f        eight graphics routines are not replaced in this way, the 
+f        six graphics routines are not replaced in this way, the 
 f        corresponding routines in the graphics interface selected at 
 f        link-time (using the ast_link command) are used. The allowed
 f        names are: 
 *
 *        - Attr -  Enquire or set a graphics attribute value
-*        - AxScale - Get the axis scales
 *        - Flush - Flush all pending graphics to the output device
 *        - Line - Draw a polyline (i.e. a set of connected lines)
 *        - Mark -  Draw a set of markers
-*        - Qch - Get the character height in world coordinates
 *        - Text - Draw a character string
 *        - TxExt -  Get the extent of a character string
 *        
@@ -12106,24 +11874,6 @@ f       Identified by the following values defined in GRF_PAR:
 *       GRF__LINE,
 *       GRF__MARK,
 *       GRF__TEXT.
-*
-*  AxScale:
-*     The "AxScale" function returns two values (one for each axis) which 
-*     scale increments on the corresponding axis into a "normal" coordinate
-*     system in which; 1) the axes have equal scale in terms of (for instance) 
-*     millimetres per unit distance, 2) X values increase from left to
-*     right, and 3) Y values increase from bottom to top. It requires the 
-*     following interface:
-*
-c     int AxScale( float *alpha, float *beta )
-f     INTEGER FUNCTION AXSCALE( ALPHA, BETA )
-*
-c     - alpha - A pointer to the location at which to return the scale for the
-f     - ALPHA = REAL (Returned) - Returned holding the scale for the
-*        X axis (i.e. Xnorm = alpha*Xworld).
-c     - beta - A pointer to the location at which to return the scale for the
-f     - BETA = REAL (Returned) - Returned holding the scale for the
-*        Y axis (i.e. Ynorm = beta*Yworld).
 
 *  Flush:
 *     The "Flush" function ensures that the display device is up-to-date,
@@ -12164,22 +11914,6 @@ c     - type - An integer which can be used to indicate the type of marker
 c       symbol required.
 f     - TYPE = INTEGER (Given) - An integer which can be used to indicate 
 f       the type of marker symbol required.
-
-*  Qch:
-*     The "Qch" function returns the heights of characters drawn vertically 
-*     and horizontally. It requires the following interface:
-*
-c     int Qch( float *chv, float *chh )
-f     INTEGER FUNCTION QCH( CHV, CHH )
-*
-c     - chv- A pointer to the double which is to receive the height of
-f     - CHV = REAL (Returned) - Returned holding the height of
-*        characters drawn with a vertical baseline. This will be an 
-*        increment along the X axis, in X axis units.
-c     - chh - A pointer to the double which is to receive the height of
-f     - CHH = REAL (Returned) - Returned holding the height of
-*        characters drawn with a horizontal baseline. This will be an 
-*        increment along the Y axis, in Y axis units.
 
 *  Text:
 *     The "Text" function displays a character string at a given
@@ -12292,9 +12026,6 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
       if( ifun == AST__GATTR ) {
          wrapper = (AstGrfWrap) CGAttrWrapper;
 
-      } else if( ifun == AST__GAXSCALE ) {
-         wrapper = (AstGrfWrap) CGAxScaleWrapper;
-
       } else if( ifun == AST__GFLUSH ) {
          wrapper = (AstGrfWrap) CGFlushWrapper;
 
@@ -12303,9 +12034,6 @@ f     - YB( 4 ) = REAL (Returned) - Returned holding the y coordinate of
 
       } else if( ifun == AST__GMARK ) {
          wrapper = (AstGrfWrap) CGMarkWrapper;
-
-      } else if( ifun == AST__GQCH ) {
-         wrapper = (AstGrfWrap) CGQchWrapper;
 
       } else if( ifun == AST__GTEXT ) {
          wrapper = (AstGrfWrap) CGTextWrapper;
@@ -12351,7 +12079,7 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
 *     name 
 *        The grf function name. Any unambiguous abbreviation will do.
 *        Case is ignored. The full list of grf function names is:
-*        "Attr AxScale Flush Line Mark Qch Text TxExt". See grf_pgplot.c
+*        "Attr Flush Line Mark Text TxExt". See grf_pgplot.c
 *        for details of these functions.
 *     method
 *        Pointer to a string holding the name of the calling method.
@@ -12361,7 +12089,7 @@ int astGrfFunID_( const char *name, const char *method, const char *class ) {
 *        This is only for use in constructing error messages.
 
 */
-   return FullForm( "Attr AxScale Flush Line Mark Qch Text TxExt", name, 
+   return FullForm( "Attr Flush Line Mark Text TxExt", name, 
                     "Grf function name (programming error)", method, class );
 }
 
@@ -12529,9 +12257,6 @@ static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
    if( ifun == AST__GATTR ) {
       this->GAttr = (AstGAttrWrap) wrapper;
 
-   } else if( ifun == AST__GAXSCALE ) {
-      this->GAxScale = (AstGAxScaleWrap) wrapper;
-
    } else if( ifun == AST__GFLUSH ) {
       this->GFlush = (AstGFlushWrap) wrapper; 
 
@@ -12540,9 +12265,6 @@ static void GrfWrapper( AstPlot *this, const char *name, AstGrfWrap wrapper ) {
 
    } else if( ifun == AST__GMARK ) {
       this->GMark = (AstGMarkWrap) wrapper;
-
-   } else if( ifun == AST__GQCH ) {
-      this->GQch = (AstGQchWrap) wrapper;
 
    } else if( ifun == AST__GTEXT ) {
       this->GText = (AstGTextWrap) wrapper;
@@ -13565,7 +13287,9 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
 
 /* Find the height in "standard" coordinates of "normal" text draw with the 
    requested up-vector. */
+/*
       GQch( this, &chv, &chh, method, class );
+*/
       a = beta*chh*ux;
       b = alpha*chv*uy;
       nl = sqrt( a*a + b*b );
@@ -20919,15 +20643,13 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    wrappers are defined in fplot.c for use with GRF routines written in 
    F77. */
       new->GAttr = CGAttrWrapper;
-      new->GAxScale = CGAxScaleWrapper;
       new->GFlush = CGFlushWrapper;
       new->GLine = CGLineWrapper;
       new->GMark = CGMarkWrapper;
-      new->GQch = CGQchWrapper;
       new->GText = CGTextWrapper;
       new->GTxExt = CGTxExtWrapper;
 
-      for( i = 0; i < 8; i++ ) new->grffun[i] = NULL;
+      for( i = 0; i < 6; i++ ) new->grffun[i] = NULL;
 
 /* Is a title to be added to an annotated grid? Store a value of -1 to 
    indicate that no value has yet been set. This will cause a default value 

@@ -539,13 +539,11 @@ f     - Strings: Text strings drawn using AST_TEXT
 
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
-#define AST__GAXSCALE	1
-#define AST__GFLUSH	2
-#define AST__GLINE	3
-#define AST__GMARK	4
-#define AST__GQCH	5
-#define AST__GTEXT	6
-#define AST__GTXEXT	7
+#define AST__GFLUSH	1
+#define AST__GLINE	2
+#define AST__GMARK	3
+#define AST__GTEXT	4
+#define AST__GTXEXT	5
 
 #if defined(astCLASS)          /* Protected */
 #define AST__MXBRK         100 /* Max. no. of breaks in a drawn curve */
@@ -567,11 +565,9 @@ typedef void (* AstGrfFun)();
 /* Interfaces for specific Grf funstions implemented in C (other languages
    may have different interfaces). */
 typedef int (* AstGAttrFun)( int, double, double *, int );
-typedef int (* AstGAxScaleFun)( float *, float * );
 typedef int (* AstGFlushFun)();
 typedef int (* AstGLineFun)( int, const float *, const float * );
 typedef int (* AstGMarkFun)( int, const float *, const float *, int );
-typedef int (* AstGQchFun)( float *, float *);
 typedef int (* AstGTextFun)( const char *, float, float, const char *, float, float );
 typedef int (* AstGTxExtFun)( const char *, float, float, const char *, float, float, float *, float * );
 
@@ -581,11 +577,9 @@ typedef void (* AstGrfWrap)();
 
 /* Interfaces for the wrapper functions which wrap specific Grf funstions. */
 typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int );
-typedef int (* AstGAxScaleWrap)( struct AstPlot *, float *, float * );
 typedef int (* AstGFlushWrap)( struct AstPlot * );
 typedef int (* AstGLineWrap)( struct AstPlot *, int, const float *, const float * );
 typedef int (* AstGMarkWrap)( struct AstPlot *, int, const float *, const float *, int );
-typedef int (* AstGQchWrap)( struct AstPlot *, float *, float *);
 typedef int (* AstGTextWrap)( struct AstPlot *, const char *, float, float, const char *, float, float );
 typedef int (* AstGTxExtWrap)( struct AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
 
@@ -650,13 +644,11 @@ typedef struct AstPlot {
    int xrev;
    int yrev;      
    int ink;
-   AstGrfFun grffun[8];
+   AstGrfFun grffun[6];
    AstGAttrWrap GAttr;
-   AstGAxScaleWrap GAxScale;
    AstGFlushWrap GFlush;
    AstGLineWrap GLine;
    AstGMarkWrap GMark;
-   AstGQchWrap GQch;
    AstGTextWrap GText;
    AstGTxExtWrap GTxExt;
 
