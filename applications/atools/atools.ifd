@@ -517,6 +517,76 @@ iraf! {
           }
 
       }
+      action remapframe {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter iframe {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the Frame to be re-mapped}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter map {
+            position 3
+            type NDF
+            prompt {The Mapping from the original to the new Frame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {The modified FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+      action removeframe {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter iframe {
+            position 2
+            type LITERAL
+            prompt {The index or Domain of the Frame to be removed}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {The modified FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
       action unitmap {
          helplib {$ATOOLS_HELP}
 

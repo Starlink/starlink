@@ -108,6 +108,12 @@
       ELSE IF ( NAME .EQ. 'UNITMAP' ) THEN
          CALL UNITMAP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'REMOVEFRAME' ) THEN
+         CALL REMOVEFRAME( STATUS )
+
+      ELSE IF ( NAME .EQ. 'REMAPFRAME' ) THEN
+         CALL REMAPFRAME( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
