@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.24  1997/10/28 01:24:17  timj
+*     Add EXTRACT_FLAT.
+*
 *     Revision 1.23  1997/10/22 02:41:18  timj
 *     Add SCUCLIP and new DESPIKE. Move old despike to despike2.
 *
@@ -161,6 +164,10 @@ c
       ELSE IF (NAME .EQ. 'EXTRACT_DATA') THEN
 
          CALL SURF_REBIN (NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'EXTRACT_FLAT') THEN
+
+         CALL SURF_EXTFLAT(STATUS)
 
       ELSE IF (NAME .EQ. 'FLATFIELD') THEN
 
