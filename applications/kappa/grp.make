@@ -21,7 +21,7 @@ unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
 c1_com me_com ctm_com ctm_par fts_par hlpcmd grecom.inc grerr \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
 ira_err kpg_ast kpg_par grf.h kappa_style.def tkast.tcl \
-kappa_lutview_style.def kappa_keystyle.def \
+kappa_lutview_style.def kappa_keystyle.def kappa_display_keystyle.def \
 kappa_linplot_keystyle.def kappa_vecplot_keystyle.def
 
 # The contents of the aif_sub.tar file:
