@@ -17594,13 +17594,10 @@ library.
 
 \end{enumerate}
 
+\subsection{Changes Introduced in V1.8-4}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-4}
-
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-3 and V1.8-4 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V1.8-3 and V1.8-4:
 
 \begin{enumerate}
 
@@ -17616,6 +17613,24 @@ FrameSet, when when using FITS-AIPS encoding.
 \item A bug has been fixed in the FitsChan class which could cause
 astRead to mis-interpret the FITS CROTA keyword when using FITS-AIPS 
 encoding.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-5}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-4 and V1.8-5 (the
+current version):
+
+\begin{enumerate}
+
+\item The Plot class defines new graphical elements Axis1, Axis2, 
+NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and Ticks2. These allow
+graphical attributes (colour, width, etc) to be set for each axis
+individually. Previously, graphical attributes could only be set for both
+axes together, using graphical elements Axes, NumLabs, TextLabs and
+Ticks.
 
 \end{enumerate}
 
