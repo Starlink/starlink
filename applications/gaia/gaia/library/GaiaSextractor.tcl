@@ -198,7 +198,10 @@ itcl::class gaia::GaiaSextractor {
       set values_(use_native) 1
 
       #  Add an option to make sure that we can plot kron or isophotal
-      #  ellipses.
+      # ellipses. Note that the kron ellipses are the same as those SExtractor
+      # produces using CHECK_APERTURES, these isophotal ellipses have no
+      # equivalent in SExtractor (and are just ellipses with the correct
+      # ELONGATION that have the isophotal area).
       $Options add checkbutton  -label {Draw Kron Ellipses} \
          -variable [scope values_(draw_kron_ellipses)] \
          -onvalue 1 \
