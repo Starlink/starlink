@@ -20,7 +20,7 @@ echmono_SOURCES = echmono.f
 echmono_LDADD = libechomop.la \
 	 `pda_link_adam` `pgp_link` `sla_link_adam` `one_link_adam` \
 	 `hlp_link` `fio_link_adam` `ndf_link_adam` \
-	 `kaplibs_link_adam`
+	 `kaplibs_link_adam` `ast_link`
 
 bin_PROGRAMS = echhelp
 
@@ -29,13 +29,13 @@ ech_ftrdb_SOURCES = ech_ftrdb.f
 ech_ftrdb_LDADD = libechomop.la \
 	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
 	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
-	  `kaplibs_link_adam`
+	  `kaplibs_link_adam` `ast_link`
 
 ech_scrn2d_SOURCES = ech_scrn2d.f
 ech_scrn2d_LDADD = libechomop.la \
 	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
 	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
-	  `kaplibs_link_adam`
+	  `kaplibs_link_adam` `ast_link`
 
 echhelp_SOURCES = helpm.c
 echhelp_LDADD = `shl_link` @FCLIBS@
