@@ -85,14 +85,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -102,11 +100,16 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*200		FILE, PATH		! HDS trace info
+      CHARACTER*200		FILE			! HDS trace info
 
       INTEGER			FSTAT			! I/o status code
+      INTEGER			FPID			! Fpath value id
       INTEGER			IHDU			! HDU number
       INTEGER			LUN			! Logical unit number
+      INTEGER			NLEV			! # levels
+      INTEGER			PID			! Copy of Fpath
+
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -130,15 +133,18 @@
         CALL ADI_NEW0( 'STRUC', OARG, STATUS )
         CALL ADI_CPUT0C( OARG, 'File', FILE(:CHR_LEN(FILE)), STATUS )
 
-*    The path is formatted from the HDU number
-        CALL ADI_CGET0I( ARGS(1), 'UserHDU', IHDU, STATUS )
-        IF ( IHDU .GT. 0 ) THEN
-          WRITE( PATH, '(A1,I1,A1)', IOSTAT=FSTAT ) '[',IHDU,']'
-          CALL ADI_CPUT0C( OARG, 'Path', PATH(:3), STATUS )
+*    The path stored in the Fpath member
+        CALL ADI_THERE( ARGS(1), 'Fpath', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_FIND( ARGS(1), 'Fpath', FPID, STATUS )
+          CALL ADI_COPY( FPID, PID, STATUS )
+          CALL ADI_CPUTID( OARG, 'Path', PID, STATUS )
+          CALL ADI_ERASE( FPID, STATUS )
         ELSE
           CALL ADI_CPUT0C( OARG, 'Path', ' ', STATUS )
+          NLEV = 1
         END IF
-        CALL ADI_CPUT0I( OARG, 'Nlev', 1, STATUS )
+        CALL ADI_CPUT0I( OARG, 'Nlev', NLEV, STATUS )
 
       END IF
 
