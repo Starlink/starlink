@@ -88,6 +88,8 @@
 *     16-JUN-1995 (DSB):
 *        Modified to avoid re-calculating output median values when the
 *        the input filter box has not changed position or size.
+*     2-SEP-1998 (DSB):
+*        INVAL variable changed from REAL to DOUBLE PRECISION.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -123,16 +125,16 @@
       INTEGER STATUS             ! Global status
  
 *  Local Variables:
-      DOUBLE PRECISION DUMMY              ! Un-used dummy argument
+      DOUBLE PRECISION DUMMY     ! Un-used dummy argument
+      DOUBLE PRECISION INVAL     ! Input data value
+      DOUBLE PRECISION MIDPER    ! Central percentile, i.e. median
       INTEGER I, J               ! Output pixel indices
       INTEGER II, JJ             ! Input pixel indices
-      REAL INVAL                 ! Input data value
       INTEGER ILO, IHI           ! Filter box x bounds
       INTEGER ILOL, IHIL         ! X bounds for previous output column
       INTEGER JLO, JHI           ! Filter box y bounds
       INTEGER JLOL, JHIL         ! Y bounds for previous output line
       INTEGER N                  ! No. of elements in filter box
-      DOUBLE PRECISION MIDPER             ! Central percentile, i.e. median
  
 *.
  
