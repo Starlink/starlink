@@ -522,3 +522,44 @@ c    :             LAMBDA, MU, C, OUT, WRK, LWRK, IWRK, LIWRK, IFAIL )
  99   CONTINUE
 
       END
+
+
+
+*+
+      SUBROUTINE NAG_MISSING( STR, STATUS )
+
+*  Description:
+*    Explain that utility will not work because of missing
+*    NAG -> PDA routines. Set the error flag.
+
+*  Authors:
+*    RB: Richard Beard (University of Birmingham)
+
+*  History:
+*    10 Jun 1997 : (RB)
+*      Original version.
+*.
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+
+*  Arguments given:
+      CHARACTER*(*)		STR
+
+* Global status:
+      INTEGER			STATUS
+*-
+
+      CALL MSG_PRNT( '*** This utility does not work at the ' //
+     :               'present,' )
+      CALL MSG_PRNT( '*** due to the unavailability of PDA ' //
+     :               'routines to replace NAG.' )
+      CALL MSG_PRNT( '*** This will be rectified when STARLINK ' //
+     :               'update PDA. Sorry for the delay.' )
+      CALL MSG_PRNT( '*** Contact asterix@star.sr.bham.ac.uk ' //
+     :               'if you require a patch to restore NAG.' )
+      CALL MSG_SETC( 'MISSING', STR )
+      CALL MSG_PRNT( '*** Missing: ^MISSING' )
+      STATUS = SAI__ERROR
+
+      END
