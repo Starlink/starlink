@@ -98,11 +98,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*2		STR			! NHDU in chars
-
-      INTEGER			NDIG			! Chars used in STR
-      INTEGER			NHDU			! HDU number
-
       LOGICAL			CREATED			! Did we create object?
 *.
 
@@ -284,7 +279,7 @@
           CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
           CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
 
-*      Write the try extension name
+*      Write the true extension name
           CALL ADI_CPUT0C( ID, '.EXTNAME', HDU, STATUS )
 
         END IF
