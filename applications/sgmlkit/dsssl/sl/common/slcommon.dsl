@@ -838,6 +838,9 @@ hierarchy; if it is <code>"explicit"</>, the <code>urlpath</> must be
 present; if it is <code>"none"</>, then the policy is satisfied, but no URL
 should be returned.
 
+<p>Irrespective of the link policy settings, we take it that it is
+always permissable to link to the document element.
+
 <p>Note that this function is designed to emit URLs as part of its response.
 That is, it is partly specific to the stylesheet which generates HTML.  
 The link policy, however, is <em>not</> specific to HTML, and the link with
@@ -871,22 +874,28 @@ then a link should be made, using the URL in <code>cdr</>.
 
 (define (get-link-policy-target nd #!key (no-urls #f))
   (let* (;; onlyexported is true if only exported IDs may be linked to
-	 (onlyexported (string=? (attribute-string (normalize
-						    "exportedlinkpolicy")
-						   (document-element nd))
-				 (normalize "onlyexported")))
+	 (linkpol (attribute-string (normalize "exportedlinkpolicy")
+				    (document-element nd)))
+	 (onlyexported (and linkpol
+			    (string=? linkpol
+				      (normalize "onlyexported"))))
 	 ;; If veto-export is false, then we can link to this; if it's
 	 ;; true, that's because this element's ID isn't exported, and
 	 ;; this violates policy.
 	 (ex (attribute-string (normalize "export") nd))
-	 (veto-export (and onlyexported
-			   (not (and ex
-				     (string=? ex
-					       (normalize "export"))))))
+	 ;; If nd is the document-element, then permit the link
+	 ;; always, by setting veto-export to #f.
+	 (veto-export (if (node-list=? nd (document-element nd))
+			  #f		;never veto link to document element
+			  (and onlyexported
+			       (not (and ex
+					 (string=? ex
+						   (normalize "export")))))))
 	 (urlpolicy (attribute-string (normalize "urllinkpolicy")
 				      (document-element nd)))
 	 (urlpath (attribute-string (normalize "urlpath") nd))
-	 (id (attribute-string (normalize "id") nd)))
+	 (id (or (attribute-string (normalize "id") nd)
+		 "")))
     (if veto-export
 	(cons (string-append "The element with id " id
 			     " has not been exported, so may not be linked to")
@@ -900,7 +909,8 @@ then a link should be made, using the URL in <code>cdr</>.
 			    (string-append %starlink-document-server%
 					   urlpath
 					   ;; include xref for hlink
-					   "#xref_" id)))
+					   "#xref_"
+					   (or id ""))))
 	       (cons (string-append "element with id " id
 				    " has no URLPATH attribute")
 		     #f)))
