@@ -22,25 +22,60 @@ mode make-manifest-mode in sl.dsl.
 <codebody>
 (element figure
   (let* ((kids (children (current-node)))
-	 (content (get-best-figurecontent
-		   (node-list (select-elements kids
-					       (normalize "figurecontent"))
-			      (select-elements kids (normalize "px")))
-		   '("eps" "latexgraphics")))
-	 (float (attribute-string (normalize "float"))))
+         (content (figurecontent-to-notation-map
+                   (node-list (select-elements kids
+                                               (normalize "figurecontent"))
+                              (select-elements kids (normalize "px")))))
+	 (float (attribute-string (normalize "float")))
+         (figurecontent-sosofo (*make-figurecontent-sosofo* content)))
   (if (and float
 	   (string=? float "float"))
       (make environment name: "figure"
 	    parameters: `(,%latex-float-spec%)
 	    (if content
-		(process-node-list content)
+		figurecontent-sosofo
 		(literal "No processable content"))
 	    (process-matching-children 'caption))
       (make environment brackets: '("{" "}")
 	    (make empty-command name: "SetCapType"
 		  parameters: '("figure"))
-	    (process-node-list content)
+	    figurecontent-sosofo
 	    (process-matching-children 'caption)))))
+
+;; Choose which of the content elements to put into the output.  CONTENT
+;; is a list of (notation . node-list) pairs.  Returns a sosofo.
+(define (*make-figurecontent-sosofo* content)
+  (let ((eps-content (assoc "eps" content))
+        (pdf-content (assoc "pdf" content))
+        (latexgraphics-content (assoc "latexgraphics" content))
+        (text-content (assoc "XML" content)))
+    (cond
+     ;; Following are in preference order -- first EPS/PDF, then latexgraphics
+     ;; finally text
+     ((or eps-content pdf-content)
+      (make sequence
+        (make empty-command name: "ifpdf")
+        (if pdf-content
+            (process-node-list (cdr pdf-content))
+            (empty-sosofo))
+        (if eps-content
+            (make sequence
+              (make empty-command name: "else")
+              (process-node-list (cdr eps-content)))
+            (empty-sosofo))
+        (make empty-command name: "fi")))
+     (latexgraphics-content
+      (process-node-list (cdr latexgraphics-content)))
+     (text-content
+      ;; CONTENT may have more than one node with notation "XML" (ie,
+      ;; more than one paragraph).  Form a list of _all_ the nodes
+      ;; with this notation, apply node-list to it, and process it.
+      (process-node-list
+       (apply node-list (map (lambda (p)
+                               (if (string=? (car p) "XML")
+                                   (cdr p)
+                                   (empty-node-list)))
+                             content)))))))
 
 (element caption
   (let ((caption-details (get-caption-details (parent (current-node))))
@@ -81,6 +116,10 @@ mode make-manifest-mode in sl.dsl.
 	   (make empty-command name: "includegraphics"
 		 escape-tex?: #f
 		 parameters: (list ent-sysid)))
+	  (("pdf")
+	   (make empty-command name: "includegraphics"
+		 escape-tex?: #f
+		 parameters: (list ent-sysid)))
 	  (("latexgraphics")
 	   (let ((package (entity-attribute-string ent
 						   (normalize "package")
@@ -103,15 +142,24 @@ mode make-manifest-mode in sl.dsl.
 
 (element coverimage
   (let* ((kids (children (current-node)))
-	 (content (get-best-figurecontent
-		   (node-list (select-elements kids
-					       (normalize "figurecontent"))
-			      (select-elements kids
-					       (normalize "px")))
-		  '("eps" "latexgraphics"))))
+         (content (figurecontent-to-notation-map
+                   (node-list (select-elements kids
+                                               (normalize "figurecontent"))
+                              (select-elements kids (normalize "px"))))))
     (if content
-	(process-node-list content)
-	(error "Can't process coverimage"))))
+        (*make-figurecontent-sosofo* content)
+        (error "Can't process coverimage"))))
+;(element coverimage
+;  (let* ((kids (children (current-node)))
+;	 (content (get-best-figurecontent
+;		   (node-list (select-elements kids
+;					       (normalize "figurecontent"))
+;			      (select-elements kids
+;					       (normalize "px")))
+;		  '("eps" "latexgraphics"))))
+;    (if content
+;	(process-node-list content)
+;	(error "Can't process coverimage"))))
 
 <routine>
 <description>
