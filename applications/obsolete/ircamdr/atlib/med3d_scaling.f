@@ -139,7 +139,7 @@
 
 	  END IF
 
-	  CALL MSG_SETR( 'SCA', SCALVAL( I))
+	  CALL MSG_SETD( 'SCA', SCALVAL( I))
 	  CALL MSG_SETI( 'NUM', I)
 	  CALL MSG_OUT( 'MESSAGE',
      :	    'Image number ^NUM, SCALING factor = ^SCA',
