@@ -113,7 +113,7 @@
 *  Extract top-level locator, call HDS version and give locator to ADI
       CALL ADI1_GETLOC( FID, FLOC, STATUS )
       CALL GMD_LOCNDF( FLOC, N, GLOC, STATUS )
-      CALL ADI1_PUTLOC( GLOC, CID, STATUS )
+      CALL ADI1_MKFILE( GLOC, 'READ', CID, STATUS )
 
 *  Perform linkage
       CALL ADI_FLINK( CID, CLASS, GID, STATUS )

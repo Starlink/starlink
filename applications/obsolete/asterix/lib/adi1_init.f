@@ -99,6 +99,9 @@
       EXTERNAL			EDI1_SETLNK
       EXTERNAL			EDI1_UNLNK
 
+      EXTERNAL			GMI1_NEWLNK
+      EXTERNAL			GMI1_SETLNK
+
       EXTERNAL			UDI1_COPANC
 
 *  Local Variables:
@@ -144,7 +147,9 @@
      :                 DID, STATUS )
 
 *  Multi-graph dataset interface
-      CALL ADI_DEFMTH( 'SetLink(_MultiGraph,_HDSfile)', ADI0_SETLNK,
+      CALL ADI_DEFMTH( 'NewLink(_MultiGraph,_HDSfile)', GMI1_NEWLNK,
+     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_MultiGraph,_HDSfile)', GMI1_SETLNK,
      :                 DID, STATUS )
 
 *  Ancillary copying

@@ -118,7 +118,6 @@
       INTEGER			EP, PPOS		! Character pointers
       INTEGER			FLEN			! Length of FNAME
       INTEGER			FSTAT			! Fortran i/o status
-      INTEGER			HREPID			! HDS representation id
       INTEGER			NDIG			! Chars used in SSTR
       INTEGER			SCL			! Length of scalar data
       INTEGER			TFID			! Temp ADI object
@@ -188,11 +187,7 @@
         IF ( SCALAR ) THEN
 
 *      Create HDSfile object]
-          CALL ADI_NEW0( 'HDSfile', TFID, STATUS )
-          CALL ADI_CPUT0C( TFID, 'MODE', ACCESS, STATUS )
-          CALL ADI_LOCREP( 'HDS', HREPID, STATUS )
-          CALL ADI_CPUT0I( TFID, 'REP', HREPID, STATUS )
-          CALL ADI_CPUT0C( TFID, 'Locator', TLOC, STATUS )
+          CALL ADI1_MKFILE( TLOC, 'READ', TFID, STATUS )
 
 *      Link to requested data class object
           CALL ADI_FLINK( TFID, CLASS, ID, STATUS )

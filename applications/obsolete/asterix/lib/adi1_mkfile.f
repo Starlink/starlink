@@ -114,7 +114,7 @@
 *  If first time through, locate the HDS representation
       IF ( FIRST ) THEN
         FIRST = .FALSE.
-        CALL ADI_LOCREP( HDS', HREPID, STATUS )
+        CALL ADI_LOCREP( 'HDS', HREPID, STATUS )
       END IF
 
 *  Create HDSfile object

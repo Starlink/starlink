@@ -4517,7 +4517,7 @@
             ENDIF
             CALL MSG_SETI('NDF',NDFS(ISEL))
             CALL MSG_PRNT(' processing NDF ^NDF...')
-            CALL GMI_LOCNDF(G_MFID,NDFS(ISEL),GFID,STATUS)
+            CALL GMI_LOCNDF(G_MFID,NDFS(ISEL),'*',GFID,STATUS)
             CALL GCB_FLOAD(GFID,STATUS)
 
           ELSE
