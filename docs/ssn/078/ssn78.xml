@@ -1754,7 +1754,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             are rather a special case, these are built within the
             top-level bootstrap script, and the best way to run that `by
             hand' is via the command <kbd>./bootstrap
-              --buildsupport-only</kbd>, noting that the remarks about
+              --buildsupport</kbd>, noting that the remarks about
             dependencies above apply to this process also.  Thus, if you
             update a component -- including one of the buildsupport
             components -- and wish the top-level `make world' build to
@@ -2404,7 +2404,7 @@ foo_TASKS =
             id="tool-cvs-recursion"/>), then go to the
           top of the tree and give the command
           <verbatim>
-% ./bootstrap --buildsupport-only
+% ./bootstrap --buildsupport
 </verbatim>
           This builds and installs the `buildsupport' tools -- namely
           the autotools plus starconf -- but does not go on to
@@ -3853,19 +3853,13 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                   id="bootstrapping"/>, and in the top level of the
                 checkout, do
 <verbatim>
-% ./bootstrap --force-starconf
+% ./bootstrap --buildsupport
 % rm config.cache
 </verbatim>
-                The <code>--force-starconf</code> option forces the
-                bootstrap to remake and reinstall the starconf
-                component, taking the current values of the
-                <code>STARCONF_...</code> variables into account.  In
-                fact, the same effect would be obtained with the
-                simple <kbd>./bootstrap</kbd> command, if you'd done
-                <kbd>rm &lt;my-star&gt;/manifests/starconf</kbd>
-                first.  The starconf component holds the rather little
-                state associated with the <code>STARCONF_...</code>
-                variables.</p>
+                The <code>--buildsupport</code> option forces the
+                bootstrap to remake and reinstall the buildsupport
+                components, taking the current values of the
+                <code>STARCONF_...</code> variables into account.</p>
 
               <p>You should also remove any
                 <code>config.cache</code> files, both in the
@@ -3916,7 +3910,7 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
               <p>Alternatively, and much as described above, you could
                 update your checkout of the component in question,
                 then delete its manifest file and run
-                <kbd>./bootstrap --buildsupport-only</kbd> in the
+                <kbd>./bootstrap --buildsupport</kbd> in the
                 top level of the checkout.</p>
             </dd>
 
