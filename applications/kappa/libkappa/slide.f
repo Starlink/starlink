@@ -1,499 +1,465 @@
-*+  SLIDE - Realigns a 2-d data array via an x,y shift
-
       SUBROUTINE SLIDE( STATUS )
-*
-*    Description :
-*
-*     The data array in the input IMAGE structure is shifted, in either
-*     or both of the x and y axes, to produce the new array, in the
-*     output image structure. The shifts in x and y are either input as
-*     absolute x and y shifts by the user, or alternatively, are
-*     calculated from the co-ordinates of two points provided by the
-*     user. These are a fiducial point, with co-ordinates %FIDX, %FIDY,
-*     and a standard object, with co-ordinates %OBJX, %OBJY. The shift
-*     in x is then given by %FIDX - %OBJX and the shift in y is given by
-*     %FIDY - %OBJY. The output data array is padded with zeros in the
-*     regions not occupied by the shifted input array.  Fractional
-*     shifts are computed by bilinear interpolation.
-*
-*     The magic-value method is used for processing bad data.
-*
-*    Invocation :
-*
+*+
+*  Name:
+*     SLIDE
+
+*  Purpose:
+*     Realigns an NDF using a translation.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL SLIDE( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     The pixels of an NDF are shifted in its current co-ordinate
+*     Frame, so that the pixel co-ordinates of a given feature will
+*     change but its co-ordinates in user-added Frames in the WCS
+*     component will not.  The translation is specified by either an 
+*     absolute vector given by the ABS parameter or by the difference
+*     between a fiducial point and a standard object given by the FID
+*     and OBJ parameters respectively.  In each case the co-ordinates
+*     are specified in the NDF's current co-ordinate Frame.
 *
-*    Parameters :
+*     The shift is done by resampling the NDF pixels onto a new grid.
+*     By default this is done using linear interpolation, but
+*     nearest-neighbour or other schemes may be selected using the
+*     METHOD parameter.
+
+*  Usage:
+*     slide in out abs method
+
+*  ADAM Parameters:
+*     ABS = LITERAL (Read)
+*        Absolute shift in the current co-ordinate Frame (supplying a 
+*        colon ":" will display details of the current Frame).  The
+*        position should be supplied as a list of formatted axis
+*        values separated by spaces or commas.  Only used if 
+*        STYPE="Absolute".
+*     FID = LITERAL (Read)
+*        Position of the fiducial point in the current co-ordinate Frame
+*        (supplying a colon ":" will display details of the current Frame).
+*        The position should be supplied as a list of formatted axis
+*        values separated by spaces or commas.  Only used if 
+*        STYPE="Relative".
+*     IN = NDF (Read)
+*        The NDF to be translated.
+*     METHOD = LITERAL (Read)
+*        The interpolation method used to perform the translation. 
+*        The following values are permitted:
 *
-*     INPIC  = IMAGE( READ )
-*         IMAGE structure containing the 2-d data array to be shifted.
-*     STYPE  = CHAR( READ )
-*         The sort of shift is to be used. The choice is 'Relative',
-*           or 'Absolute'.
-*     ABSX   = REAL( READ )
-*         Absolute x shift in pixels (Absolute shift)
-*     ABSY   = REAL( READ )
-*         Absolute y shift in pixels (Absolute shift)
-*     FIDX   = REAL( READ )
-*         X-co-ordinate of the fiducial point. (Relative shift)
-*     FIDY   = REAL( READ )
-*         Y-co-ordinate of the fiducial point. (Relative shift)
-*     OBJX   = REAL( READ )
-*         X-co-ordinate of the standard object. (Relative shift)
-*     OBJY   = REAL( READ )
-*         Y-co-ordinate of the standard object. (Relative shift)
-*     OUTPIC = IMAGE( WRITE )
-*         IMAGE structure to contain the 2-d data array after being
-*           shifted.
-*     OTITLE = CHAR( READ )
-*         Will be used as the TITLE component for the output IMAGE
-*           structure.
+*        -  "Nearest"   -- Nearest neighbour sampling.
 *
-*    Arguments:
+*        -  "Linear"    -- Linear interpolation.
 *
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
+*        -  "Sinc"      -- Sum of surrounding pixels weighted using
+*                          a 1-d sinc(pi*x) kernel.
 *
-*    Method :
+*        -  "SincSinc"  -- Sum of surrounding pixels weighted using
+*                          a 1-d sinc(pi*x)*sinc(k*pi*x) kernel.
 *
-*     Check for error on entry - return if not o.k.
-*     Get input IMAGE-type data structure
-*     If no error then
-*        Map data-array component
-*        If no error then
-*           Input which type of shift is to be used - Relative or
-*             Absolute
-*           If Absolute then
-*              Input absolute x and y shifts
-*           Else
-*              Input x and y co-ordinates of the fiducial point.
-*              Input x and y co-ordinates of the "standard object"
-*           Endif
-*           If no error calculate the shifts in the x and y directions
-*           If no error then
-*              Write out the values of the shifts to the user.
-*              Call SHIFTS for each x axis to set up the parameters for
-*                performing the x shift.
-*              If status is bad on return then
-*                 Report context
-*              Else
-*                 Call SHIFTS for each y axis to set up the parameters
-*                   for performing the y shift.
-*                 If status is bad on return then
-*                       Report context
-*                 Else
-*                    Create output IMAGE type data structure with
-*                      DATA_ARRAY component of the same dimensions as
-*                      input DATA_ARRAY component and get a TITLE
-*                      component for it.
-*                    Propagate NDF MORE from the input data file
-*                    If no error then
-*                       Map output data array
-*                       If no error then
-*                          Create workspace of same dimensions as input/
-*                            output arrays.
-*                          If no error then
-*                             Call SHIFTX to move the input array,
-*                               shifted in the x direction, into the
-*                               workspace.
-*                             Call SHIFTY to move the workspace,
-*                               shifted in the y direction, into the
-*                               output array.
-*                             Tidy workspace
-*                          Else
-*                             Report error
-*                          Endif
-*                          Unmap output data array
-*                       Else
-*                          Report error
-*                       Endif
-*                       Annul output structure
-*                    Else
-*                       Report error
-*                    Endif
-*                 Endif
-*              Endif
-*           Else
-*              Report error
-*           Endif
-*           Unmap input data array
-*        Else
-*           Report error
-*        Endif
-*        Annul input structure
-*     Else
-*        Report error
-*     Endif
-*     End
+*        -  "SincCos"   -- Sum of surrounding pixels weighted using
+*                          a 1-d sinc(pi*x)*cos(k*pi*x) kernel.
 *
-*    Bugs :
+*        -  "SincGauss" -- Sum of surrounding pixels weighted using
+*                          a 1-d sinc(pi*x)*exp(-k*x*x) kernel.
 *
-*     None known.
+*        -  "BlockAve"  -- Block averaging over all pixels in the
+*                          surrounding N-dimensional cube.
 *
-*    Authors :
-*
-*     Dave Baines (ROE::ASOC5)
-*     Mark McCaughrean (REVA::MJM)
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*     18/08/1983 : Original version                   (ROE::ASOC5)
-*     19/02/1984 : Modified to use new SHIFTS routine (ROE::ASOC5)
-*     03/06/1985 : Modified to allow Relative or Absolute
-*                : shifting                           (REVA::MJM)
-*     1986 Aug 8 : Standardised prologue formatting. Added status check
-*                  on entry (RL.STAR::CUR).
-*     1986 Sep 1 : Added arguments section to the prologue and tidied
-*                  (RL.STAR::CUR).
-*     1987 Oct 16: Reordered tidying and extra status checks
-*                  (RL.STAR::CUR)
-*     1988 Mar 16: Substituted AIF_ANTMP to annul workspace
-*                  (RL.STAR::CUR).
-*     1988 Mar 17: Referred to `array' rather than `image'
-*                  (RL.STAR::CUR)
-*     1988 May 31: More reporting of error context (RL.STAR::CUR)
-*     1989 Jun 13: Allow for processing primitive NDFs (RL.STAR::CUR)
-*     1989 Aug  7: Passed array dimensions as separate variables
-*                  to SHIFTX and SHIFTY (RL.STAR::CUR).
-*     1989 Dec 21: Workspace managed by AIF_TEMP (RL.STAR::CUR).
-*     1991 Oct 25: Propagates UNITS, LABEL, and HISTORY (RAL::CUR).
-*     1992 Feb 25: Limited processing of simple NDFs (RL.STAR::CUR)
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*     1995 Oct 29: Renamed from SHIFT to avoid name clash with the
-*                  C-shell shift built-in function (mjc@star.rl.ac.uk).
-*
-*    Type Definitions :
+*        In the above, sinc(z)=sin(z)/z.  Some of these schemes will
+*        require additional parameters to be supplied via the PARAMS
+*        parameter.  A more detailed discussion of these schemes is
+*        given in the "Sub-Pixel Interpolation Schemes" section below.
+*        ["Linear"]
+*     OBJ = LITERAL (Read)
+*        Position of the standard object in the current co-ordinate Frame
+*        (supplying a colon ":" will display details of the current Frame).
+*        The position should be supplied as a list of formatted axis
+*        values separated by spaces or commas.  Only used if 
+*        STYPE="Relative".
+*     OUT = NDF (Write)
+*        The translated NDF.
+*     PARAMS( ) = _DOUBLE (Read)
+*        Parameters required to control the resampling scheme.  One or
+*        more values may be required to specify the exact resampling
+*        behaviour, according to the value of the METHOD parameter.
+*        See the section on "Sub-Pixel Interpolation Schemes".
+*     STYPE = LITERAL (Read)
+*        The sort of shift to be used.  The choice is "Relative" or
+*        "Absolute". ["Absolute"]
+*     TITLE = LITERAL (Read)
+*        Title for the output NDF. A null (!) value will cause the input
+*        title to be used. [!]
 
-      IMPLICIT NONE            ! no default typing allowed
+*  Examples:
+*     slide m31 m31_acc "0:0:0 0:0:15.8"
+*        The pixels in the NDF m31, whose current co-ordinate Frame 
+*        is in the SKY domain, are shifted by 15.8 seconds in 
+*        declination and the result is written to the NDF m31_acc.
+*        Linear interpolation is used to produce the output data 
+*        (and, if present, variance) array.
+*     slide m31 m31_acc "0:0:0 0:0:15.8" nearest
+*        The same as the previous example except that nearest neighbour
+*        resampling is used.  This will be somewhat faster, but may
+*        result in features shifted by up to half a pixel. 
+*     slide speca specb stype=rel fid=3968.9 obj=3960.1
+*        The pixels in the NDF speca are shifted by 3968.9-3960.1 
+*        units in the current co-ordinate Frame, and the output NDF is 
+*        written as specb.
+*     slide speca specb stype=abs abs=8.8
+*        This does just the same as the previous example.
 
-*    Global constants :
+*  Sub-Pixel Interpolation Schemes:
+*     When performing the translation the pixels are resampled from
+*     the input grid to the output grid by default using linear
+*     interpolation.  For many purposes this default scheme will
+*     be adequate, but for greater control over the resampling 
+*     process the METHOD and PARAMS parameters can be used.  Detailed
+*     discussion of the use of these parameters can be found in the
+*     "Sub-pixel Interpolation Schemes" section of the REGRID task
+*     documentation.
 
-      INCLUDE 'SAE_PAR'        ! global SSE definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
+*  Related Applications:
+*     KAPPA: REGRID, SQORST, WCSADD
 
-*    Status :
+*  Authors:
+*     MBT: Mark Taylor (Starlink)
 
-      INTEGER STATUS
+*  History:
+*     7-JAN-2002 (MBT):
+*        Original version.
 
-*    Local constants :
-
-      INTEGER NDIM
-      PARAMETER ( NDIM = 2 )   ! dimensionality of input/output arrays
-
-*    Local variables :
-
-      CHARACTER*(DAT__SZLOC)   ! locators for :
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCDO,                 ! structure containing the output data
-                               ! array
-     :  LOCI,                  ! input data structure
-     :  LOCO,                  ! output data structure
-     :  WLOC                   ! workspace array
-
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI,                ! Name of the input data-array component
-     :  DNAMEO                 ! Name of the output data-array component
-
-      INTEGER
-     :  DIMS( NDIM ),          ! dimensions of the input/output
-                               ! DATA_ARRAYs
-     :  I,                     ! loop counter
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI,                 ! pointer to : input DATA_ARRAY
-     :  PNTRO,                 !            : output DATA_ARRAY
-     :  WPNTR,                 !            : workspace array
-     :  INTXS,                 ! integer number of pixels for shift 
-                               ! in X direction
-     :  INTYS                  ! integer number of pixels for shift 
-                               ! in Y direction
-
-      REAL
-     :  ABSX,                  ! absolute X shift
-     :  ABSY,                  !     "    Y   "
-     :  FIDX,                  ! fiducial point X co-ordinate
-     :  FIDY,                  !     "      "   Y      "
-     :  OBJX,                  ! standard object X co-ordinate
-     :  OBJY,                  !     "      "    Y     "
-     :  XSHIFT,                ! value of shift in X direction
-     :  YSHIFT,                !   "   "    "    " Y     "
-     :  FRACX,                 ! fractional part of shift in X direction
-     :  FRACY                  !      "       "   "   "    " Y     "
-
-      LOGICAL                  ! true if:
-     :  ABSOLU,                ! if shift is absolute
-     :  XWHOLE,                ! shift in X is whole number of pixels
-     :  YWHOLE,                !   "    " Y  "   "      "    "    "
-     :  XNEG,                  !   "    " X  " negative
-     :  YNEG                   !   "    " Y  "     "
-
-      CHARACTER*8
-     :  STYPE                  ! type of shifting to be used: Relative
-                               ! or Absolute
 *-
-*    check status on entry - return if not o.k.
 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST definitions and declarations
+      INCLUDE 'NDF_PAR'          ! NDF system constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given real
+      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given real
+
+*  Local Variables:
+      CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
+      CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
+      CHARACTER METHOD * ( 16 )  ! Name of resampling scheme
+      CHARACTER STYPE * ( 16 )   ! Type of shift to be supplied
+      DOUBLE PRECISION BC( NDF__MXDIM ) ! Base Frame co-ordinates (dummy)
+      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
+      DOUBLE PRECISION DLBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
+      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
+      DOUBLE PRECISION DUBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      DOUBLE PRECISION FID( NDF__MXDIM ) ! Co-ordinates of fiducial point
+      DOUBLE PRECISION OBJ( NDF__MXDIM ) ! Co-ordinates of standard object
+      DOUBLE PRECISION PARAMS( 8 ) ! Auxiliary parameters for resampling
+      DOUBLE PRECISION PIA( NDF__MXDIM ) ! First input point
+      DOUBLE PRECISION PIB( NDF__MXDIM ) ! Second input point
+      DOUBLE PRECISION POA( NDF__MXDIM ) ! First output point
+      DOUBLE PRECISION POB( NDF__MXDIM ) ! Second output point
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation vector
+      DOUBLE PRECISION TOL       ! Linear approximation tolerance
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lower outliers (dummy)
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of upper outliers (dummy)
+      INTEGER ELI                ! Number of elements in input NDF
+      INTEGER ELO                ! Number of elements in output NDF
+      INTEGER FLAGS              ! Flags for resampling routine
+      INTEGER I                  ! Loop variable
+      INTEGER INTERP             ! Resampling scheme
+      INTEGER IPDATI             ! Pointer to input data array
+      INTEGER IPDATO             ! Pointer to output data array
+      INTEGER IPVARI             ! Pointer to input variance array
+      INTEGER IPVARO             ! Pointer to output variance array
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
+      INTEGER MAP                ! AST Mapping for resampling
+      INTEGER MAPBC              ! AST Mapping from base to current Frame
+      INTEGER MAPCB              ! AST Mapping from current to base Frame
+      INTEGER MAPSHF             ! AST Mapping representing simple translation
+      INTEGER MAXPIX             ! Maximum extent of linear approximation
+      INTEGER NAXC               ! Number of axes in current Frame
+      INTEGER NBAD               ! Number of bad pixels written
+      INTEGER NDFI               ! Input NDF identifier
+      INTEGER NDFO               ! Output NDF identifier
+      INTEGER NDIM               ! Number of dimensions of NDF
+      INTEGER NPARAM             ! Number of auxiliary resampling parameters
+      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER WCSI               ! WCS FrameSet of input NDF
+      INTEGER WCSO               ! WCS FrameSet of output NDF
+      LOGICAL BAD                ! May there be bad pixels?
+      LOGICAL HASVAR             ! Do we have a variance component?
+
+*.
+
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    get locator to input IMAGE type data structure
+*  Start a new AST context.
+      CALL AST_BEGIN( STATUS )
 
-      CALL KPG1_GETIM( 'INPIC', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
+*  Start a new NDF context.
+      CALL NDF_BEGIN
 
-*    check for error
+*  Open and enquire attributes of the input NDF.
+*  =============================================
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+*  Open the input NDF.
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*       map input DATA_ARRAY component
+*  Find out if we have a variance component
+      CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
 
-         CALL CMP_MAPN( LOCDI, DNAMEI, '_REAL', 'READ', NDIM,
-     :                  PNTRI, DIMS, STATUS )
+*  Determine a data type which can be used for operations on its Data
+*  and possibly Variance components.
+      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,' //
+     :                '_DOUBLE', 1, NDFI, 'DATA,VARIANCE', ITYPE,
+     :                DTYPE, STATUS )
 
-*       check for error
+*  Get its shape.
+      CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
 
-         IF ( STATUS .EQ. SAI__OK ) THEN
+*  See if it has bad pixels in the Data or Variance component.
+      CALL NDF_BAD( NDFI, 'DATA', .FALSE., BAD, STATUS )
+      IF ( HASVAR .AND. .NOT. BAD ) THEN
+         CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
+      END IF
 
-*          get type of shift - Relative or Absolute
+*  Get its WCS component.
+      CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
-            CALL PAR_CHOIC( 'STYPE', 'Absolute', 'Absolute,Relative',
-     :                      .TRUE., STYPE, STATUS )
+*  Get the number of axes in the current Frame.
+      NAXC = AST_GETI( WCSI, 'Naxes', STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*          now set logical accordingly
+*  Determine the Mapping to be used for the resample operation.
+*  ============================================================
 
-            IF ( STYPE( 1:1 ) .EQ. 'R' ) THEN  
-               ABSOLU = .FALSE.
-            ELSE
-               ABSOLU = .TRUE.
-            ENDIF
+*  See if we want a relative or absolute shift.
+      CALL PAR_CHOIC( 'STYPE', 'ABSOLUTE', 'ABSOLUTE,RELATIVE', .TRUE.,
+     :                STYPE, STATUS )
 
-*          now get shift amounts, depending on type of shift
+*  Get the absolute shift directly as the value of the ABS parameter.
+      IF ( STYPE .EQ. 'ABSOLUTE' ) THEN
+         CALL KPG1_GTPOS( 'ABS', WCSI, .FALSE., SHIFT, BC, STATUS )
 
-            IF ( ABSOLU ) THEN
-
-*             get x and y shifts
-
-               CALL PAR_GET0R( 'ABSX', ABSX, STATUS )
-               CALL PAR_GET0R( 'ABSY', ABSY, STATUS )
-
-*             set x and y shifts accordingly
-
-               XSHIFT = ABSX
-               YSHIFT = ABSY
-
-            ELSE
-
-*             get position of fiducial point
-
-               CALL PAR_GET0R( 'FIDX', FIDX, STATUS )
-               CALL PAR_GET0R( 'FIDY', FIDY, STATUS )
-
-*             get position of standard object
-
-               CALL PAR_GET0R( 'OBJX', OBJX, STATUS )
-               CALL PAR_GET0R( 'OBJY', OBJY, STATUS )
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                calculate X and Y shifts
-
-                  XSHIFT = FIDX - OBJX
-                  YSHIFT = FIDY - OBJY
-               END IF
-
-            END IF
-
-            IF ( STATUS .EQ. SAI__OK ) THEN
-
-*             tell user what the X and Y shifts are
-
-               CALL MSG_SETR( 'XSHIFT', XSHIFT )
-               CALL MSG_SETR( 'YSHIFT', YSHIFT )
-               CALL MSG_OUT( 'SHIFT_XY', 'Shift in X = ^XSHIFT, Shift '/
-     :                       /'in Y = ^YSHIFT', STATUS )
-
-*             call SHIFTS to set up information for SHIFTX and SHIFTY
-
-               CALL SHIFTS( DIMS( 1 ), XSHIFT, 'X', INTXS, XWHOLE, XNEG,
-     :                      FRACX, STATUS )
-
-*             if return with bad status, warn user and continue as
-*             far as possible
-
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_REP( 'ERR_SLIDE_SUB1',
-     :              'SLIDE: Error occurred in SHIFTS for x shift. ',
-     :              STATUS )
-               ELSE
-
-*                evaluate the parameter for shifting to see if an
-*                integer y shift has been requested
-
-                  CALL SHIFTS( DIMS( 2 ), YSHIFT, 'Y', INTYS, YWHOLE,
-     :                         YNEG, FRACY, STATUS )
-
-*                if return with bad status, warn user and continue as
-*                far as possible
-
-                  IF ( STATUS .NE. SAI__OK ) THEN
-                     CALL ERR_REP( 'ERR_SLIDE_SUB2',
-     :                 'SLIDE: Error occurred in SHIFTS for y shift.',
-     :                 STATUS )
-                  ELSE
-
-*                   reset the origin since it has become undefined
-
-                     DO I = 1, NDIM
-                        ORIGIN( I ) = 1
-                     END DO
-
-*                   create the output IMAGE structure and get a title
-*                   for it
-
-                     CALL KPG1_CROUT( 'OUTPIC', 'OTITLE', NDIM, DIMS,
-     :                                ORIGIN, LOCO, LOCDO, DNAMEO,
-     :                                STATUS )
-
-*                   propagate UNITS, LABEL, HISTORY and extensions from
-*                   the input data file
-
-                     CALL KPG1_IMPRG( LOCI, 'UNITS', LOCO, STATUS )
-
-*                   check for error
-
-                     IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                      map output DATA_ARRAY component
-
-                        CALL CMP_MAPN( LOCDO, DNAMEO, '_REAL', 'WRITE',
-     :                                 NDIM, PNTRO, DIMS, STATUS )
-
-*                      check for error
-
-                        IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                         create and map the workspace array
-
-                           CALL AIF_GETVM( '_REAL', NDIM, DIMS, WPNTR,
-     :                                     WLOC, STATUS )
-
-                           IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                            shift input array into workspace in X
-*                            direction
-
-                              CALL SHIFTX( XNEG, XWHOLE, INTXS, FRACX,
-     :                                     DIMS( 1 ), DIMS( 2 ),
-     :                                     %VAL( PNTRI ), %VAL( WPNTR ),
-     :                                     STATUS )
-
-*                            shift workspace into output array in Y
-*                            direction
-
-                              CALL SHIFTY( YNEG, YWHOLE, INTYS, FRACY,
-     :                                     DIMS( 1 ), DIMS( 2 ),
-     :                                     %VAL( WPNTR ), %VAL( PNTRO ),
-     :                                     STATUS )
-
-*                            tidy up workspace
-
-                              CALL AIF_ANTMP( WLOC, STATUS )
-
-                           ELSE
-
-                              CALL ERR_REP( 'ERR_SLIDE_WSP',
-     :                          'SLIDE: Unable to get workspace for '/
-     :                          /'shifting', STATUS )
-
-*                         end of getting-and-mapping-workspace check
-
-                           END IF
-
-*                         unmap output array
-
-                           CALL CMP_UNMAP( LOCDO, DNAMEO, STATUS )
-
-                        ELSE
-
-                           CALL ERR_REP( 'ERR_SLIDE_NOMPO',
-     :                       'SLIDE: Error occurred whilst trying to '/
-     :                       /'map output frame', STATUS )
-
-*                      end of if-no-error-mapping-output-data-array
-*                      check
-
-                        END IF
-
-*                      tidy up output structures
-
-                        CALL DAT_ANNUL( LOCDO, STATUS )
-                        CALL DAT_ANNUL( LOCO, STATUS )
-
-                     ELSE
-
-                        IF ( STATUS .NE. PAR__ABORT ) THEN
-                           CALL ERR_REP( 'ERR_SLIDE_NOFRO',
-     :                       'SLIDE: Error occurred whilst trying to '/
-     :                       /'access output frame', STATUS )
-                        END IF
-
-*                   end of if-no-error-after-creating-output-structure
-*                   check
-
-                     END IF
-
-*                end of bad-status-return-from-y-SHIFTS check
-
-                  END IF
-
-*             end of bad-status-return-from-x-SHIFTS check
-
-               END IF
-
-            ELSE
-
-               IF ( STATUS .NE. PAR__ABORT .AND.
-     :              STATUS .NE. PAR__NULL ) THEN
-
-*                announce the error
-
-                  CALL ERR_REP( 'ERR_SLIDE_PAR',
-     :              'SLIDE: Error obtaining pixel shifts - aborting',
-     :              STATUS )
-               END IF
-
-*          end of no-error-getting-parameters check
-
-            END IF
-
-*          unmap input data array
-
-            CALL CMP_UNMAP( LOCDI, DNAMEI, STATUS )
-
-         ELSE
-
-            CALL ERR_REP( 'ERR_SLIDE_NOMPI',
-     :        'SLIDE: Error occurred whilst trying to map the input '/
-     :        /'frame', STATUS )
-
-*       end of if-no-error-after-mapping-input-data-array check
-
-         END IF
-
-*       tidy up the input structures
-
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL( LOCI, STATUS )
-
+*  Or get it as the difference between the FID and OBJ parameters.
       ELSE
 
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_SLIDE_NOFRI',
-     :        'SLIDE: Error occurred whilst trying to access input '/
-     :        /'frame', STATUS )
-         END IF
+*  Get the co-ordinates of the fiducial point.
+         CALL KPG1_GTPOS( 'FID', WCSI, .FALSE., FID, BC, STATUS )
 
-*    end of if-no-error-after-getting-input-structure check
+*  Get the co-ordinates of the standard object.
+         CALL KPG1_GTPOS( 'OBJ', WCSI, .FALSE., OBJ, BC, STATUS )
 
+*  Set the shift as the difference between the two.
+         DO I = 1, NAXC
+            SHIFT( I ) = FID( I ) - OBJ( I )
+         END DO
+      END IF
+
+*  Construct a Mapping corresponding to this shift.
+      DO I = 1, NDIM
+         PIA( I ) = 0D0
+         PIB( I ) = 1D0
+         POA( I ) = PIA( I ) + SHIFT( I )
+         POB( I ) = PIB( I ) + SHIFT( I )
+      END DO
+      MAPSHF = AST_WINMAP( NAXC, PIA, PIB, POA, POB, ' ', STATUS )
+
+*  Construct the Mapping to be used for the resampling by sandwiching
+*  the translation in the current Frame by a Mapping from base
+*  (GRID domain) to current and a Mapping from current back to base.
+*  This will constitute the Mapping either from GRID to GRID Frames
+*  or from PIXEL to PIXEL Frames.
+      MAPBC = AST_GETMAPPING( WCSI, AST__BASE, AST__CURRENT, STATUS )
+      MAPCB = AST_GETMAPPING( WCSI, AST__CURRENT, AST__BASE, STATUS )
+      MAP = AST_CMPMAP( MAPBC, MAPSHF, .TRUE., ' ', STATUS )
+      MAP = AST_CMPMAP( MAP, MAPCB, .TRUE., ' ', STATUS )
+      MAP = AST_SIMPLIFY( MAP, STATUS )
+
+*  Create and configure the output NDF.
+*  ====================================
+
+*  Propagate the input to the output NDF.
+      CALL LPG_PROP( NDFI, 'UNIT', 'OUT', NDFO, STATUS )
+
+*  Get a title for the new NDF from the parameter system.
+      CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
+
+*  Set the Data and possibly Variance component data types.
+      CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
+      IF ( HASVAR ) THEN
+         CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
+      END IF
+
+*  Work out the bounds of an array which would contain the resampled
+*  copy of the whole input array.
+      DO I = 1, NDIM
+         DLBNDI( I ) = DBLE( LBNDI( I ) - 1 )
+         DUBNDI( I ) = DBLE( UBNDI( I ) )
+      END DO
+      DO I = 1, NDIM
+         CALL AST_MAPBOX( MAP, DLBNDI, DUBNDI, .TRUE., I, DLBNDO( I ),
+     :                    DUBNDO( I ), XL, XU, STATUS )
+      END DO
+
+*  Work out the corresponding shape of the output NDF.
+      DO I = 1, NDIM
+         LBNDO( I ) = KPG1_FLOOR( REAL( DLBNDO( I ) ) ) + 1
+         UBNDO( I ) = KPG1_CEIL( REAL( DUBNDO( I ) ) )
+      END DO
+
+*  Set the shape of the output NDF.
+      CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
+
+*  Fix it up according to the changes we will make.
+      CALL KPG1_ASFIX( MAP, NDFI, NDFO, STATUS )
+
+
+*  Resample data from the input to output NDF.
+*  ===========================================
+
+*  Map the input and output data arrays.
+      CALL NDF_MAP( NDFI, 'DATA', ITYPE, 'READ', IPDATI, ELI, STATUS )
+      CALL NDF_MAP( NDFO, 'DATA', ITYPE, 'WRITE', IPDATO, ELO, STATUS )
+
+*  If necessary map the input and output variance arrays.
+      IF ( HASVAR ) THEN
+         CALL NDF_MAP( NDFI, 'VARIANCE', ITYPE, 'READ', IPVARI, ELI,
+     :                 STATUS )
+         CALL NDF_MAP( NDFO, 'VARIANCE', ITYPE, 'WRITE', IPVARO, ELO,
+     :                 STATUS )
+      END IF
+
+*  Set flags for the resampling routine.
+      FLAGS = 0
+      IF ( HASVAR ) FLAGS = FLAGS + AST__USEVAR
+      IF ( BAD ) FLAGS = FLAGS + AST__USEBAD
+      TOL = 0.1D0
+      MAXPIX = 500
+
+*  Determine the resampling scheme to use.
+      CALL PAR_CHOIC( 'METHOD', 'LINEAR', 'LINEAR,NEAREST,SINC,' //
+     :                'SINCSINC,SINCCOS,SINCGAUSS,BLOCKAVE', .TRUE.,
+     :                METHOD, STATUS )
+      IF ( METHOD .EQ. 'NEAREST' ) THEN
+         INTERP = AST__NEAREST
+         NPARAM = 0
+      ELSE IF ( METHOD .EQ. 'LINEAR' ) THEN
+         INTERP = AST__LINEAR
+         NPARAM = 0
+      ELSE IF ( METHOD .EQ. 'SINC' ) THEN
+         INTERP = AST__SINC
+         NPARAM = 1
+      ELSE IF ( METHOD .EQ. 'SINCSINC' ) THEN
+         INTERP = AST__SINCSINC
+         NPARAM = 2
+      ELSE IF ( METHOD .EQ. 'SINCCOS' ) THEN
+         INTERP = AST__SINCCOS
+         NPARAM = 2
+      ELSE IF ( METHOD .EQ. 'SINCGAUSS' ) THEN
+         INTERP = AST__SINCGAUSS
+         NPARAM = 2
+      ELSE IF ( METHOD .EQ. 'BLOCKAVE' ) THEN
+         INTERP = AST__BLOCKAVE
+         NPARAM = 1
+      END IF
+
+*  Get an additional parameter vector if required.
+      IF ( NPARAM .GT. 0 ) THEN
+         CALL PAR_EXACD( 'PARAMS', NPARAM, PARAMS, STATUS )
+      END IF
+
+*  Perform the resampling.
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         NBAD = AST_RESAMPLEB( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADB,
+     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         NBAD = AST_RESAMPLEUB( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                          %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADUB,
+     :                          NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                          %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         NBAD = AST_RESAMPLEW( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADW,
+     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         NBAD = AST_RESAMPLEUW( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                          %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                          PARAMS, FLAGS, TOL, MAXPIX, VAL__BADUW,
+     :                          NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                          %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         NBAD = AST_RESAMPLEI( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADI,
+     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         NBAD = AST_RESAMPLER( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADR,
+     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         NBAD = AST_RESAMPLED( MAP, NDIM, LBNDI, UBNDI, %VAL( IPDATI ),
+     :                         %VAL( IPVARI ), INTERP, AST_NULL, 
+     :                         PARAMS, FLAGS, TOL, MAXPIX, VAL__BADD,
+     :                         NDIM, LBNDO, UBNDO, LBNDO, UBNDO, 
+     :                         %VAL( IPDATO ), %VAL( IPVARO ), STATUS )
+      END IF
+
+*  We can set the bad pixels flag according to the bad pixel count 
+*  returned from AST_RESAMPLE<X>.
+      BAD = NBAD .GT. 0
+      CALL NDF_SBAD( BAD, NDFO, 'DATA', STATUS )
+      IF ( HASVAR ) THEN
+         CALL NDF_SBAD( BAD, NDFO, 'VARIANCE', STATUS )
+      END IF
+
+*  Tidy up.
+*  ========
+
+*  Annul (and unmap) the input and output NDFs.
+      CALL NDF_ANNUL( NDFI, STATUS )
+      CALL NDF_ANNUL( NDFO, STATUS )
+
+*  Error exit label.
+  999 CONTINUE
+
+*  Exit the NDF context.
+      CALL NDF_END( STATUS )
+
+*  Exit the AST context.
+      CALL AST_END( STATUS )
+
+*  If an error occurred, then report a contextual message.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'SLIDE_ERR1', 'SLIDE: Unable to translate NDF',
+     :                 STATUS )
       END IF
 
       END
