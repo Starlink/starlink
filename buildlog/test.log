@@ -1,58 +1,6 @@
+shell-init: could not get current directory: getcwd: cannot access parent directories: No such file or directory
 /apps/jdk
-Buildfile: build.xml
-
-prepare:
-
-test:
-
-call_package_ant:
-     [echo] Executing JUnit target: test
-
-test:
-     [echo] Executing tamfits target: test
-
-test:
-     [echo] Executing axis target: test
-
-test:
-     [echo] Executing Jetty target: test
-
-test:
-     [echo] Executing UTIL target: test
-
-prepare:
-
-check_packages:
-
-build:
-
-compile-tests:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/testcases
-    [javac] Compiling 13 source files to /apps/cvsbuild/java/source/util/build/testcases
-
-run-tests:
-    [junit] Testsuite: uk.ac.starlink.util.DOMUtilsTest
-    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.548 sec
-
-    [junit] Testcase: testGetChildElementByName took 0.154 sec
-    [junit] Testcase: testGetTextContent took 0.053 sec
-    [junit] Testcase: testNewDocument took 0.03 sec
-    [junit] Testcase: testRelativizeDOM took 0.306 sec
-    [junit] Testsuite: uk.ac.starlink.util.DataSourceTest
-    [junit] Tests run: 6, Failures: 0, Errors: 1, Time elapsed: 3.739 sec
-
-    [junit] Testcase: testData took 0.843 sec
-    [junit] Testcase: testIntro took 0.984 sec
-    [junit] Testcase: testStream took 0.871 sec
-    [junit] Testcase: testHybridStream took 0.541 sec
-    [junit] Testcase: testCombo1 took 0.277 sec
-    [junit] 	Caused an ERROR
-    [junit] null
-    [junit] java.lang.OutOfMemoryError
-
-    [junit] Testcase: testCombo1Testcase: testResourceStream took 0.213 sec
-
-BUILD FAILED
-file:/apps/cvsbuild/java/source/util/build.xml:913: Test uk.ac.starlink.util.DataSourceTest failed
-
-Total time: 12 seconds
+pwd: could not get current directory: getcwd: cannot access parent directories: No such file or directory
+chdir: could not get current directory: getcwd: cannot access parent directories: No such file or directory
+Buildfile: build.xml does not exist!
+Build failed
