@@ -158,6 +158,7 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
