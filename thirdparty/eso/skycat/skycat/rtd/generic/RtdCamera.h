@@ -76,7 +76,7 @@ public:
     int paused() {return (camera_ != NULL && !attached_);}
     int attached() {return (camera_ != NULL && attached_);}
     int stopped() {return (camera_ == NULL);}
-    char *camera() {return camera_ ? camera_ : "";}
+    const char *camera() {return camera_ ? camera_ : "";}
     RtdPerformanceTool *perftool() {return perftool_ ? perftool_ : 
         (RtdPerformanceTool *)NULL;}
     double imageTime() {return imageUTC;}
