@@ -1356,8 +1356,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         ENDIF
         SCALE(1)=-HEAD.PIXEL*MRES/3600.0
         SCALE(2)=HEAD.PIXEL*MRES/3600.0
-        BASE(1)=MDIM(1)*SCALE(1)+SCALE(1)/2.0
-        BASE(2)=-MDIM(2)*SCALE(2)+SCALE(2)/2.0
+        BASE(1)=-MDIM(1)/2*SCALE(1)+SCALE(1)/2.0
+        BASE(2)=-MDIM(2)/2*SCALE(2)+SCALE(2)/2.0
       ENDIF
       UNITS(1)='degrees'
       UNITS(2)='degrees'
