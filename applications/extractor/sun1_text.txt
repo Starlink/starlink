@@ -1,0 +1,11 @@
+EXTRACTOR is a program for automatically detecting objects on an
+astronomical image and building a catalogue of their properties. It is
+particularly suited for the reduction of large scale galaxy-survey
+data, but also performs well on other astronomical images.
+
+EXTRACTOR is a development of Emmanuel Bertin's SExtractor
+(Source-Extractor) program repackaged for use in the Starlink Software
+Environment.  This means that it uses the Starlink parameter system,
+accepts images in NDF format and uses the AST library for astrometry.
+
+EXTRACTOR is described in SUN/226.
