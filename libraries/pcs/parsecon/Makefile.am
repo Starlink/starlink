@@ -14,13 +14,17 @@ compifl_SOURCES = \
 	compifl.f
 
 # This must be compifl_LDFLAGS or AM_LDFLAGS, but _not_ plain LDFLAGS,
-# since that would override a configure variable.
-compifl_LDFLAGS = `$(bindir)/chr_link_adam` \
-	`$(bindir)/ems_link_adam` \
-	`$(bindir)/subpar_link_adam` \
-	`./parsecon_link_adam`
-# Declare the dependency on the library, since this can't be picked up from
-# the ./parsecon_link_adam output (obviously).
+# since that would override a configure variable.  This includes the
+# contents of ./parsecon_link_adam, but expanded so that we definitely
+# use the local libparsecon_adam.la rather than any installed one
+# (must be first, since subpar_link_adam also refers to the installed
+# libparsecon).
+compifl_LDFLAGS = \
+	libparsecon_adam.la \
+	`ems_link_adam` `string_link_adam` `chr_link_adam` \
+	`subpar_link_adam`
+# Declare the dependency on the library, since this isn't picked up from
+# the presence of the file in the above compifl_LDFLAGS line.
 compifl_DEPENDENCIES = libparsecon_adam.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
