@@ -1,5 +1,5 @@
-      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, FPTR, PTR,
-     :                        ISDYN, NELM, STATUS )
+      SUBROUTINE BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR,
+     :                        NELM, STATUS )
 *+
 *  Name:
 *     BDI1_ARYMAP
@@ -11,8 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, FPTR, PTR, ISDYN,
-*                       NELM, STATUS )
+*     CALL BDI1_ARYMAP( LOC, TYPE, MODE, MAPDYN, PSID, PTR, NELM, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -26,12 +25,10 @@
 *        The access mode, READ, UPDATE or WRITE
 *     MAPDYN = LOGICAL (given)
 *        Force data to mapped copied to dynamic memory
-*     FPTR = INTEGER (returned)
-*        The mapped file data
+*     PSID = INTEGER (given)
+*        ADI identifier of private storage area
 *     PTR = INTEGER (returned)
 *        The mapped data address
-*     ISDYN = LOGICAL (returned)
-*        Mapped memory is owned by DYN?
 *     NELM = INTEGER (returned)
 *        Number of mapped data elements
 *     STATUS = INTEGER (given and returned)
@@ -104,11 +101,11 @@
 *  Arguments Given:
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE
+      INTEGER			PSID
       LOGICAL			MAPDYN
 
 *  Arguments Returned:
-      INTEGER			FPTR, PTR, NELM
-      LOGICAL			ISDYN
+      INTEGER			PTR, NELM
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -117,22 +114,26 @@
       CHARACTER*(DAT__SZLOC)	ACLOC			! ARRAY component
       CHARACTER*(DAT__SZTYP)	ATYPE			! Actual array type
       CHARACTER*(DAT__SZTYP)	HTYPE			! HDS style type name
+      CHARACTER*(DAT__SZLOC)	SLOC			! Locator to save
       CHARACTER*10		VARNT			! Array variant name
 
       DOUBLE PRECISION		BASE, SCALE		! Spaced array descrip
 
       INTEGER			DIMS(DAT__MXDIM)	! Array dimensions
+      INTEGER			FPTR			! Mapped file object
       INTEGER			NDIM			! Array dimensionality
 
+      LOGICAL			ISDYN			! Mapping is dynamic?
       LOGICAL			PRIM			! Object is primitive?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Default return value
+*  Defaults
       ISDYN = MAPDYN
       FPTR = 0
+      SLOC = DAT__NOLOC
 
 *  Construct HDS type
       HTYPE = '_'//TYPE
@@ -156,7 +157,12 @@
 
 *    Otherwise simply map
         ELSE
-          CALL DAT_MAPV( LOC, HTYPE, MODE, FPTR, NELM, STATUS )
+
+*      Clone a copy of the locator for mapping
+          CALL DAT_CLONE( LOC, SLOC, STATUS )
+
+*      Map the object
+          CALL DAT_MAPV( SLOC, HTYPE, MODE, FPTR, NELM, STATUS )
           PTR = FPTR
 
         END IF
@@ -183,8 +189,11 @@
 
           ELSE
 
-*        Simply map the DATA item
-            CALL CMP_MAPV( LOC, 'DATA', HTYPE, MODE, PTR, NELM, STATUS )
+*        Locate the DATA item
+            CALL DAT_FIND( LOC, 'DATA', SLOC, STATUS )
+
+*        And map it
+            CALL DAT_MAPV( SLOC, HTYPE, MODE, PTR, NELM, STATUS )
 
           END IF
 
@@ -235,6 +244,10 @@
         END IF
 
       END IF
+
+*  Store details in private store
+      CALL BDI1_STOMAP( PSID, ISDYN, SLOC, FPTR, PTR, TYPE,
+     :                  MODE, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_ARYMAP', STATUS )

@@ -163,13 +163,26 @@
 *  If not structured objects all subsequent requests will fail
       ELSE IF ( .NOT. ISBIND ) THEN
 
-*    Do nothing
+*    Do nothing unless we have been told to create something which
+*    we aren't allowed to do
+        IF ( CREATE ) THEN
+          STATUS = SAI__ERROR
+          CALL MSG_SETC( 'IT', ITEM )
+          CALL ERR_REP( ' ', 'Cannot create item ^IT in non-'/
+     :                          /'structured output', STATUS )
+        END IF
 
 *  Top-level variance
       ELSE IF ( ITEM .EQ. 'Variance' ) THEN
 
         CALL BDI1_CFIND1( LOC, 'VARIANCE', CREATE, '_'//TYPE, NDIM,
      :                    DIMS, THERE, CLOC, STATUS )
+
+*  Axis container
+      ELSE IF ( ITEM .EQ. 'Axes' ) THEN
+
+        CALL BDI1_CFIND1( LOC, 'AXIS', CREATE, 'AXIS', 1,
+     :                    NDIM, THERE, CLOC, STATUS )
 
 *  Top-level text components whose names are the same as their HDS counterparts
       ELSE IF ( (ITEM.EQ.'Units') .OR. (ITEM.EQ.'Label') .OR.
