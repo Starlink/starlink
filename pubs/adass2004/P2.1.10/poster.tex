@@ -6,19 +6,16 @@
 \pagestyle{empty}
 \setcounter{secnumdepth}{0}
 
-% The textpos package is necessary to position textblocks at arbitary 
-% places on the page.
 \usepackage[absolute,overlay]{textpos}
 
 \usepackage{graphicx,times,url}
 
-% These colours are tried and tested for titles and headers. Don't
-% over use color!
 \usepackage{color}
 \definecolor{DarkBlue}{rgb}{0.1,0.1,0.5}
 \definecolor{Red}{rgb}{0.9,0.0,0.1}
 
-% see documentation for a0poster class for the size options here
+% See documentation for a0poster class for the size options here.
+% Use larger fonts (\iftrue switches back to the smaller ones)
 \iffalse
   \let\Textsize\normalsize
   \def\RHead#1{\noindent\hbox to \hsize{\hfil{\LARGE\color{DarkBlue} #1\par}}\bigskip}
@@ -34,6 +31,16 @@
   \def\Subhead#1{\noindent{\Large\color{DarkBlue} #1\par}\bigskip}
   \def\Title#1{\noindent{\VeryHuge\color{Red} #1\par}}
 \fi
+% ditto
+\iffalse
+  \newcommand{\autoconf}{{\ttfamily\small autoconf}}
+  \newcommand{\automake}{{\ttfamily\small automake}}
+  \newcommand{\libtool}{{\ttfamily\small libtool}}
+\else
+  \newcommand{\autoconf}{{\ttfamily\normalsize autoconf}}
+  \newcommand{\automake}{{\ttfamily\normalsize automake}}
+  \newcommand{\libtool}{{\ttfamily\normalsize libtool}}
+\fi
 
 
 \TPGrid[40mm,40mm]{23}{12}      % 3 cols of width 7, plus 2 gaps width 1
@@ -45,6 +52,8 @@
 
 \Textsize
 
+% We have to put the background graphic here, outside any textblock,
+% or else it overprints the text.
 \hbox{}
 \vskip 2\TPVertModule
 \vbox to 0pt{
@@ -109,11 +118,12 @@
 \includegraphics{starlink_logo}
 \end{textblock}
 
-% Graphics
-% In both cases, place the centre of the graphic at the centre of the
-% lower region, extending from (0,2)..(23,12).
+
+
+% Place the centre of the graphic at the centre of the
+% lower region, extending from (0,2)..(23,12).  The script-big graphic
+% is included separately above.
 \begin{textblock}{7}[0.5,0.5](11.5,7)
-%\vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics[angle=90]{script-big}\hss}\vss}%
 \vbox to 0pt{\vss\hbox to 0pt{\hss\includegraphics{script-little}\hss}\vss}%
 \end{textblock}
 
@@ -121,20 +131,18 @@
 
 \begin{textblock}{7}(0,2)
 
-%\hrule\medskip
-%\Head{Summary}
-
 \slshape
 
 The Classic Starlink Software Collection (aka `USSC', see below)
 currently runs on three different Unix platforms and contains
 approximately 130 separate software items, totalling millions of lines
-of code, in a mix of Fortran, C, C++, Tcl, Perl and others.  We get requests
+of code, in a mix of Fortran, C, C++, Tcl, Perl and other languages.
+We get requests
 to port to an increasing range of platforms, while suffering a
 decrease in the funding support for the classic collection.  We have
 therefore changed the build system from a hand-maintained collection
 of makefiles with hard-wired OS configurations to a scheme involving
-feature-discovery via GNU Autoconf.
+feature-discovery via GNU \autoconf.
 
 As a result of this work, we have already ported the USSC to Mac OSX
 and Cygwin.  This had some unexpected benefits and costs, and
@@ -177,13 +185,12 @@ valuable lessons.
 %  of all our code weren't kept in the one place.  Simply
 %  \emph{finding} all our code was slightly harder than we expected.
 
-\item Did I mention funding problems?
+\item Did we mention funding problems?
 
 \end{itemize}
 \end{textblock}
 
 
-%\begin{textblock}{7}(0,8.5)
 \begin{textblock}{7}(8,8)
 
 \Head{History}
@@ -197,7 +204,7 @@ work smoothly.
 We switched the hardware to Unix in the early nineties -- ending up
 supporting specifically SunOS and Ultrix.  We then shifted to Solaris
 and Digital Unix (our first 64-bit OS), and ended up, last year,
-working with Solaris, Alpha and RedHat, at which point we had managed
+working with Solaris, Tru64 and RedHat, at which point we had managed
 to drop dependence on NAG.  We also ported the software
 collection then, renamed to the USSC, the `Unix Starlink Software
 Collection'.  That meant that some software was dropped, and the rest
@@ -210,7 +217,7 @@ large legacy codebase.
 
 Now we're concentrating on new software, we need to make the classic
 software as accessible and maintainable as possible, since we expect
-the community will have to take a larger role in its curation.
+the community will have to take a larger r\^ole in its curation.
 
 \end{textblock}
 
@@ -233,8 +240,8 @@ the community will have to take a larger role in its curation.
 
 \item Unexpected but valuable preening, refactoring, bugfixing.
 
-\item We extended the autoconf support for Fortran, and this will be
-  offered back to the autoconf mainline.
+\item We extended the \autoconf{} support for Fortran, and this will be
+  offered back to the \autoconf{} mainline.
 
 \item GPLed wherever possible.
 
@@ -251,23 +258,23 @@ the community will have to take a larger role in its curation.
 
 We have a number of project-specific code and installation
 conventions, which we wanted to preserve, and a few build tools which
-need special makefile rules.  This is what \texttt{automake} is for.
+need special makefile rules.  This is what \automake{} is for.
 
-We tried doing everything with autoconf macros, but that quickly
+We tried doing everything with \autoconf{} macros, but that quickly
 became far too precarious -- this route isn't suitable for more than
 light customisation.
 
-Since, for safety, we had to have \texttt{autoconf}, \texttt{automake}
-and \texttt{libtool} snapshots in our repository in any case, it was a
+Since, for safety, we had to have \autoconf, \automake{}
+and \libtool{} snapshots in our repository in any case, it was a
 natural (though nerve-wracking) move to start using patched versions
 of those tools.
 
 We needed more Fortran support (checking for open specifiers,
 intrinsics, record lengths and the like) than was 
-available in standard \texttt{autoconf}.  This group of modifications
-are due to be contributed back to the \texttt{autoconf} maintainers.
+available in standard \autoconf.  This group of modifications
+are due to be contributed back to the \autoconf{} maintainers.
 
-The \texttt{automake} source code isn't an easy read, but it's pretty
+The \automake{} source code isn't an easy read, but it's pretty
 well written, and reasonably easy to patch.  The result is robust and
 portable distributed Makefiles.
   
@@ -279,7 +286,7 @@ portable distributed Makefiles.
 \Head{Lessons and Warnings}
 
 \begin{itemize}
-\item The Fortran support in autoconf is rather slim.
+\item The Fortran support in \autoconf{} is rather slim.
 
 \item The port to OSX was easier, in some ways, than we expected,
   partly because the OSX system compiler is a modified GCC.  We needed
