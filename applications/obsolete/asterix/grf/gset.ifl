@@ -45,6 +45,11 @@ interface GSET
      vpath 'DEFAULT'
      prompt 'List existing values'
    endparameter
+   parameter SUPPRESS
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default N
+   endparameter
    parameter TEXT
      type '_CHAR'
      default !
