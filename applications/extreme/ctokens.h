@@ -37,11 +37,6 @@
 #define VOLATILE 286
 #define WHILE 287
 
-#define F77_SUBROUTINE 288
-#define F77_FUNCTION 289
-#define F77_EXTERNAL 290
-#define F77_CALL 291
-
 #define IDENTIFIER 292
 #define CONSTANT 293
 #define STRING_LITERAL 294
@@ -59,13 +54,6 @@
 #define CPP_PRAGMA 306
 #define CPP_START 307
 
-#define INT_MIN 401
-#define INT_MAX 402
-#define PRINTF 403
-#define SPRINTF 404
-#define FPRINTF 405
-#define SCANF 406
-#define FSCANF 407
-#define SSCANF 408
+#define DOTDOTDOT 350
 
 /* $Id$ */

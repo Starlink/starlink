@@ -40,7 +40,7 @@
 */
 
 void count();
-void comment();
+void ccomm();
 void cpluspluscomm();
 void munch();
 
@@ -83,7 +83,7 @@ CPP			^[ \t]*#[ \t]*
 {CPP}"pragma"			{ count(); return(CPP_PRAGMA); }
 {CPP}				{ count(); return(CPP_START); }
 
-"/*"				{ comment(); }
+"/*"				{ ccomm(); }
 "//"				{ cpluspluscomm(); }
 
 "auto"				{ count(); return(AUTO); }
@@ -119,22 +119,9 @@ CPP			^[ \t]*#[ \t]*
 "volatile"			{ count(); return(VOLATILE); }
 "while"				{ count(); return(WHILE); }
 
-F77_SUBROUTINE			{ count(); return(F77_SUBROUTINE); }
-F77_[A-Z]+_FUNCTION		{ count(); return(F77_FUNCTION); }
-F77_EXTERNAL_NAME		{ count(); return(F77_EXTERNAL); }
-F77_CALL			{ count(); return(F77_CALL); }
-
-INT_MAX				{ count(); return(INT_MAX); }
-INT_MIN				{ count(); return(INT_MIN); }
-printf				{ count(); return(PRINTF); }
-fprintf				{ count(); return(FPRINTF); }
-sprintf				{ count(); return(SPRINTF); }
-scanf				{ count(); return(SCANF); }
-fscanf				{ count(); return(FSCANF); }
-sscanf				{ count(); return(SSCANF); }
-
-
 {IDENT}				{ count(); return(IDENTIFIER); }
+
+"..."				{ count(); return(DOTDOTDOT); }
 
 0[xX]{H}+{IS}?			{ count(); return(CONSTANT); }
 0{D}+{IS}?			{ count(); return(CONSTANT); }
@@ -265,11 +252,11 @@ sscanf				{ count(); return(SSCANF); }
 
 
 
-   void comment() {
+   void ccomm() {
 /*
 *+
 *  Name:
-*     comment
+*     ccom
 *
 *  Purpose:
 *     Store C comment text in preval.
@@ -308,7 +295,6 @@ sscanf				{ count(); return(SSCANF); }
       sappend( yytext );
    }
          
-
 
 
 /* $Id$ */
