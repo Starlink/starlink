@@ -143,11 +143,11 @@
         CALL ADI2_LOCHDU( FID, HDU(:max(1,CHR_LEN(HDU))), OHID, STATUS )
 
 *    Is the definition incomplete?
-        CALL ADI_CGET0L( OHID, '.DEF_END', DEFEND, STATUS )
+        CALL ADI_CGET0L( OHID, 'DefEnd', DEFEND, STATUS )
         IF ( .NOT. DEFEND ) THEN
 
 *      The definition may be unfinished, or it may not even be started
-          CALL ADI_CGET0L( OHID, '.DEF_START', DEFBEG, STATUS )
+          CALL ADI_CGET0L( OHID, 'DefStart', DEFBEG, STATUS )
           IF ( DEFBEG ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'HDU', IHDU )
@@ -157,7 +157,7 @@
           ELSE
 
 *        Has the HDU even been created?
-            CALL ADI_CGET0L( OHID, '.CREATED', CREATED, STATUS )
+            CALL ADI_CGET0L( OHID, 'Created', CREATED, STATUS )
 
 *        Create it if it doesn't exist
             IF ( .NOT. CREATED ) THEN
@@ -173,7 +173,7 @@
               END IF
 
               MOVED = .TRUE.
-              CALL ADI_CPUT0L( OHID, '.CREATED', .TRUE., STATUS )
+              CALL ADI_CPUT0L( OHID, 'Created', .TRUE., STATUS )
 
 *          Reserve some keyword space too
               CALL ADI_NCMP( OHID, NKEY, STATUS )
@@ -196,7 +196,7 @@
             END IF
 
 *        Mark as defined
-            CALL ADI_CPUT0L( OHID, '.DEF_END', .TRUE., STATUS )
+            CALL ADI_CPUT0L( OHID, 'DefEnd', .TRUE., STATUS )
 
           END IF
 

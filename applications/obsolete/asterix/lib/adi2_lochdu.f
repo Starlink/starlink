@@ -221,13 +221,10 @@
 
 *  Local Variables:
       CHARACTER*40		LHDU			! Local copy of HDU
-      CHARACTER*2		STR			! NHDU in chars
 
-      INTEGER			EID			! EXTENSIONS identifier
+      INTEGER			HCID			! HDU container
       INTEGER			HLEN			! Length of LHDU
       INTEGER			I			! Loop over LHDU
-      INTEGER			NDIG			! Chars used in STR
-      INTEGER			NHDU			! HDU number
 
       LOGICAL			THERE			! Object exists
 *.
@@ -242,6 +239,8 @@
 *  primary HDU
       IF ( HDU(1:1) .EQ. ' ' ) THEN
         CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
+        LHDU = 'PRIMARY'
+        HLEN = 7
 
 *  Otherwise named HDU in the EXTENSIONS structure
       ELSE
@@ -254,39 +253,33 @@
             IF ( LHDU(I:I) .EQ. ' ' ) LHDU(I:I) = '_'
           END DO
         END IF
-        CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
-        CALL ADI_THERE( EID, LHDU(:HLEN), THERE, STATUS )
-        IF ( CANCRE .AND. .NOT. THERE ) THEN
-          CALL ADI_CNEW0( EID, LHDU(:HLEN), 'STRUC', STATUS )
-          CREATED = .TRUE.
-        END IF
-        CALL ADI_FIND( EID, LHDU(:HLEN), ID, STATUS )
-
-*    Did we create the structure?
-        IF ( CREATED ) THEN
-
-*      Set the HDU number
-          CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
-
-          NHDU = NHDU + 1
-          CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
-          CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
-          CALL CHR_ITOC( NHDU, STR, NDIG )
-          CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), HDU, STATUS )
-
-*      Mark HDU data area as undefined
-          CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
-          CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
-          CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
-
-*      Write the true extension name
-          CALL ADI_CPUT0C( ID, '.EXTNAME', HDU, STATUS )
-
-        END IF
-
-*  Remove temporary
-        CALL ADI_ERASE( EID, STATUS )
 
       END IF
+
+*  Locate HDU container
+      CALL ADI_FIND( FID, 'Hdus', HCID, STATUS )
+
+*  Has HDU been created yet?
+      CALL ADI_THERE( HCID, LHDU(:HLEN), THERE, STATUS )
+      IF ( CANCRE .AND. .NOT. THERE ) THEN
+        CALL ADI2_NEWHDU( FID, LHDU(:HLEN), STATUS )
+        CREATED = .TRUE.
+      END IF
+      CALL ADI_FIND( HCID, LHDU(:HLEN), ID, STATUS )
+
+*  Did we create the structure?
+      IF ( CREATED ) THEN
+
+*    Write the true extension name
+        IF ( HDU .EQ. ' ' ) THEN
+          CALL ADI_CPUT0C( ID, 'Name', 'PRIMARY', STATUS )
+        ELSE
+          CALL ADI_CPUT0C( ID, 'Name', HDU, STATUS )
+        END IF
+
+      END IF
+
+*  Release HDU container
+      CALL ADI_ERASE( HCID, STATUS )
 
       END

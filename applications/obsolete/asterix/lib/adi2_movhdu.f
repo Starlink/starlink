@@ -114,7 +114,7 @@
       CALL ADI2_LOCHDU( FID, HDU, ID, STATUS )
 
 *  Get the HDU number
-      CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+      CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
 
 *  Ensure previous HDU's data areas are defined
       IF ( NHDU .GT. 1 ) THEN
@@ -124,13 +124,13 @@
 *  Move the specified unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
       FSTAT = 0
-      CALL ADI_CGET0L( ID, '.CREATED', CREATED, STATUS )
+      CALL ADI_CGET0L( ID, 'Created', CREATED, STATUS )
       IF ( .NOT. CREATED ) THEN
         CALL FTCRHD( LUN, FSTAT )
         IF ( FSTAT .NE. 0 ) THEN
           CALL ADI2_FITERP( FSTAT, STATUS )
         END IF
-        CALL ADI_CPUT0L( ID, '.CREATED', .TRUE., STATUS )
+        CALL ADI_CPUT0L( ID, 'Created', .TRUE., STATUS )
       END IF
       CALL FTMAHD( LUN, NHDU, HDUTYPE, FSTAT )
       IF ( (FSTAT.NE.0) .AND. (FSTAT.NE.107) ) THEN

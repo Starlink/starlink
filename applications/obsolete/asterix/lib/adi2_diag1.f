@@ -53,12 +53,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
@@ -87,32 +81,18 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
+c      INCLUDE '{global_constants_file}' ! [global_constants_description]
 
 *  Global Variables:
-      INCLUDE '{global_variables_file}' ! [global_variables_description]
+c      INCLUDE '{global_variables_file}' ! [global_variables_description]
 *        {global_name}[dimensions] = {data_type} ({global_access_mode})
 *           [global_variable_purpose]
 
 *  Arguments Given:
-      {data_type} {name}[dimensions]
-
-*  Arguments Given and Returned:
-      {data_type} {name}[dimensions]
-
-*  Arguments Returned:
-      {data_type} {name}[dimensions]
+      INTEGER			ID			!
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
-*  Local Constants:
-      {data_type} {constant_name} ! [constant_description]
-      PARAMETER ( {constant_name} = {cons} )
 
 *  Local Variables:
       CHARACTER*20		HNAME			! HDU name
