@@ -16,18 +16,38 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-o  The FITS-WCS encoding used by the FitsChan class now includes the
-   WCSNAME keyword. When creating a FrameSet from FITS headers, the
-   values of the WCSNAME keywords are now used as the Domain names for
-   the corresponding Frames in the returned FrameSet. When writing a
-   FrameSet to a FITS header the Domain names of each Frame are stored in
-   WCSNAME keywords in the header. The Domain name is used to create a
-   default Title for the Frame.
+  o The C interface to several methods have been changed to make them
+  easier to call from C++.
 
-o  A new resampling scheme (identified by the symbolic constant
-   AST__BLOCKAVE) has been added to AST_RESAMPLE. This scheme sets each 
-   output pixel value equal to the mean of all input pixel values within 
-   a box of specified size centred on the output pixel.
+  o Several bugs has been fixed in the Plot class which could cause axes
+  and tick marks to be drawn incorrectly.
+
+  o The FITS-WCS encoding used by the FitsChan class now includes support
+  for the WCSNAME keyword, and retains the identification letter associated 
+  with multiple axis descriptions correctly. Improvements have been made
+  to way that unrecognized celestial coordinate systems and axis types 
+  are handled. Also improved is the way that Frame Title and axis Labels 
+  are selected when reading a FITS header.
+
+  o A new interpolation scheme has been added to the astResample(X) set
+  of functions. The new scheme calculates each output pixel value by
+  finding the mean of the input pixels in a box centred on the output
+  pixel.
+
+  o The SkyFrame class can now be used to represent an arbitrary spherical
+  coordinate system by setting its System attribute to "Unknown".
+
+  o The indices of the latitude and longitude axes of a SkyFrame can
+  now be found using new read-only attributes LatAxis and LonAxis. The
+  effects of any axis permutation is taken into account.
+
+  o A new attribute called Ident has been added to the Object class.
+  This serves the same purpose as the existing ID attribute, but (unlike ID)
+  its value is transferred to the new Object when a copy is made.
+
+  o A bug has been fixed which could prevent complex CmpFrames
+  behaving correctly (for instance, resulting in the failure of attempts 
+  to find a Mapping between a CmpFrame and itself).
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
@@ -45,4 +65,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-29/11/2000
+4/4/2001
