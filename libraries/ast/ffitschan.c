@@ -36,6 +36,9 @@
 *        Functions for accessing named keywords removed. Others renamed.
 *     28-APR-1997 (DSB):
 *        FindFits and GetFits merged.
+*     10-SEP-2004 (TIMJ):
+*        Only copy the fits header to fortran string if it was found
+*        by astFindFits.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -333,7 +336,7 @@ F77_LOGICAL_FUNCTION(ast_findfits)( INTEGER(THIS),
       RESULT = astFindFits( astI2P( *THIS ), name, card, inc ) ?
                F77_TRUE : F77_FALSE;
       i = 0;
-      if ( astOK ) {
+      if ( astOK && RESULT == F77_TRUE ) {
          len = (int) strlen( card );
          for( i = 0; i < CARD_length && i < len; i++ ) CARD[i] = card[i];
       }
