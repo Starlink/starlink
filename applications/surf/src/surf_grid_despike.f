@@ -118,6 +118,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.3  1998/06/03 23:34:18  timj
+*     Free IJPOS_PTR. Add (commented out) GRID code.
+*
 *     Revision 1.2  1998/05/12 20:56:48  timj
 *     Free the memory allocated for STATS
 *
@@ -194,6 +197,15 @@
       INTEGER TOT_PTS                       ! Total number of points to despike
       CHARACTER * (10) UMODE                ! Pixel unwrapping mode
       INTEGER UNIT                          ! Unit id for display device
+
+* Variables required if GRID writing is turned back on:
+*      INTEGER GRNDF                         ! NDF identifier
+*      INTEGER GRPNTR                        ! Pointer to mapped data
+*      INTEGER IERR                          ! For VEC_
+*      INTEGER ITEMP                         ! Temp integer
+*      INTEGER LBND ( 2 )                    ! Lower bounds of NDF
+*      INTEGER NERR                          ! For VEC_
+*      INTEGER UBND ( 2 )                    ! Upper bounds of NDF
 
 *  Local data
 *.
@@ -354,6 +366,7 @@
 *     current position in the array.
 
       CALL SCULIB_FREE ('GRID_PTR', GRID_PTR, GRID_END, STATUS)
+      CALL SCULIB_FREE ('IJPOS_PTR', IJPOS_PTR, IJPOS_END, STATUS)
 
 *     Some scratch space for storing the numbers (size nmax)
 *     in each bin
@@ -462,6 +475,27 @@
      :     %VAL(JPOS_PTR), %VAL(BIN_PTR), %VAL(PNT_PTR),
      :     %VAL(STATS_PTR), STATUS)
 
+*     Write the median image to disk - now use MEDIAN regridding option
+*      LBND ( 1 ) = 1
+*      LBND ( 2 ) = 1
+*      UBND ( 1 ) = NX
+*      UBND ( 2 ) = NY
+*      IF (STATUS .EQ. SAI__OK) THEN
+*         CALL NDF_CREAT('GRID','_REAL', 2, LBND, UBND, GRNDF, STATUS)
+*
+*         IF (STATUS .NE. PAR__NULL) THEN
+*
+*            CALL NDF_MAP(GRNDF, 'DATA', '_REAL', 'WRITE', GRPNTR, 
+*     :           ITEMP, STATUS)
+*            CALL VEC_RTOR(.FALSE., NX * NY, %VAL(STATS_PTR), 
+*     :           %VAL(GRPNTR), IERR, NERR, STATUS)
+*            
+*            CALL NDF_UNMAP(GRNDF, '*', STATUS)
+*            CALL NDF_ANNUL(GRNDF, STATUS)
+*         ELSE
+*            CALL ERR_ANNUL(STATUS)
+*         END IF
+*      END IF
 
 *     Do this because:
 *       1. More efficient to calculate stats once rather than for each plot
