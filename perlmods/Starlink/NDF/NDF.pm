@@ -3,16 +3,16 @@ require 5.004;
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA @EXPORT $AUTOLOAD %EXPORT_TAGS);
+use vars qw($VERSION @ISA $AUTOLOAD %EXPORT_TAGS);
 
 
 #grep "dat_.*(" NDF.xs | grep -v ';' | awk -F'(' '{print $1}' | grep -v '_r$' | sort | fmt -50
- 
+
 require Exporter;
 require DynaLoader;
 require AutoLoader;
  
-@ISA = qw(Exporter DynaLoader); 
+@ISA = qw(Exporter DynaLoader);
 
 # Version derived from CVS repository:  '$Revision$ '
 
@@ -24,7 +24,7 @@ $VERSION = '1.42';
 # ndf_assoc ndf_cinp ndf_creat ndf_crep ndf_exist ndf_prop
 # You will also need to link against ndf_link_adam
 
-%EXPORT_TAGS = ( 
+%EXPORT_TAGS = (
 		'ndf'=>[qw/
 			ndf_acget ndf_aclen ndf_acmsg ndf_acput ndf_acre
 			ndf_aform ndf_amap ndf_annul ndf_anorm ndf_arest
@@ -56,11 +56,13 @@ $VERSION = '1.42';
 		'msg'=>[qw/msg_bell msg_blank msg_fmtc msg_fmtd msg_fmti
 			msg_fmtl msg_fmtr msg_iflev msg_ifset msg_load
 			msg_out msg_outif msg_renew msg_setc msg_setd
-			msg_seti msg_setl msg_setr/],
+			msg_seti msg_setl msg_setr msg_tune/],
 
 		'err'=>[qw/err_annul err_begin err_end err_facer err_fioer
 			err_flbel err_flush err_level err_load err_mark
-			err_rep err_rlse err_stat err_syser/],
+			err_rep err_rlse err_stat err_syser err_tune
+			/],
+			#ADAM only: err_clear err_start err_stop
 
 		'hds'=>[qw/hds_copy hds_erase hds_ewild hds_flush hds_free
 			hds_group hds_gtune hds_link hds_lock hds_new
@@ -113,7 +115,7 @@ sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
     # XS function.  If a constant is not found then control is passed
     # to the AUTOLOAD in AutoLoader.
- 
+
     my $constname;
     ($constname = $AUTOLOAD) =~ s/.*:://;
     # Note that the default autoloader expects integer argument
@@ -1011,12 +1013,13 @@ fits_construct_string par_get
 
 =head1 AUTHOR
 
-Module created by T. Jenness, timj@jach.hawaii.edu
-(with help from F. Economou, frossie@jach.hawaii.edu)
+Module created by T. Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>
+(with help from F. Economou, E<lt>frossie@jach.hawaii.eduE<gt>)
 
 =head1 COPYRIGHT
 
-Copyright (C) Tim Jenness, Frossie Economou 1997-2000.
+Copyright (C) 1996-2000 Tim Jenness, Frossie Economou and the
+UK Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
 =head1 STARLINK
