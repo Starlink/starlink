@@ -509,7 +509,7 @@ void InputByteStream::skip (unsigned int increment)
 void InputByteStream::bufferSeek(unsigned int offset)
     throw (InputByteStreamError)
 {
-    if (offset < 0 || offset >= (buflen_))
+    if (offset >= (buflen_))	// unsigned offset can't be negative
 	throw InputByteStreamError
 		("Call to protected bufferSeek too large for buffer");
     p_ = buf_ + offset;
