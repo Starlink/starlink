@@ -49,6 +49,8 @@ foreach name ( \
    fts_par \
    ira_err \
    ira_par \
+   irq_err \
+   irq_par \
    kpg_par \
    kpg_ast \
    hlpcmd \
