@@ -24,6 +24,6 @@ include_HEADERS = $(PUBLIC_INCLUDES)
 #  List of public include files.  These are include files which form
 #  part of the package and may be required by users of it
 
-PUBLIC_INCLUDES = GKS_ERR
+PUBLIC_INCLUDES = GKS_ERR GKS_PAR GKSE_PAR
 
 BUILT_SOURCES = GKS_ERR
