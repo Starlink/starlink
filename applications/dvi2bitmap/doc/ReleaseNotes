@@ -1,5 +1,8 @@
 <subsect id=rn-0.7 export>Release 0.7
 
+<p>Added support for PNG graphics, using the libpng library, if it's
+installed.
+
 <p>A few small changes, including changes to the option list.
 <ul>
 <li>The Metafont mode used for building fonts is now configurable at

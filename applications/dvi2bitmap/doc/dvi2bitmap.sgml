@@ -99,7 +99,7 @@ make things a little clearer.</update>
 <verbatim>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
-    [-s scalefactor] [-t gif|xbm] [-o output] [-b(h|w) size]
+    [-s scalefactor] [-t pbm|gif|xbm] [-o output] [-b(h|w) size]
     [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqQV] [-L[L]]
     [-p num] [-l num] [-pp ranges]
     dvi-file
@@ -250,7 +250,8 @@ option.  The program will respect only the last <code/-p/ and
 may be no spaces in the <code/pagelist/.  The page numbers may be
 negative.
 
-<p>Examples:
+<p><update versionid="upd7">
+Mentioned PNG option</update>Examples:
 <verbatim>
 dvi2bitmap -pp 3,6-10 ... # process only the specified pages
 dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
@@ -284,13 +285,13 @@ when deciding which PK files to use.  The default is 110, but see
 <code/scalefactor/ (default 1).
 
 <dt><code/-t type/
-<dd>Choose the output format, which can be <code/xbm/ or <code/gif/.
-The program generates XBM bitmaps by 
-default.  The GIF option may not be available if it wasn't selected
-when the program was configured.
+<dd>Choose the output format, which can be <code/png/, <code/xbm/ or
+<code/gif/. The program generates XBM bitmaps by default.  The GIF and
+PNG options may not be available if they weren't selected when the
+program was configured.
 
 <dt><code/-V/
-<dd>Display the version number, and exit.
+<dd>Display the version number and compilation options, and exit.
 
 </dl>
 
@@ -461,7 +462,8 @@ it successfully generated them.
 <p>I would argue fairly strongly that having the <code/VARTEXFONTS/
 directory depend on the location of the dvi-ware <em/executables/ is
 a very silly thing to do, but unfortunately it's true in at least one
-common &tex; distribution.  If you've fallen foul of this, then you
+widespread &tex; distribution (namely RedHat 6.0, though this was
+fixed pretty rapidly).  If you've fallen foul of this, then you
 can either
 <ul>
 <li>change your <code/texmf.cnf/ file to something more like the
@@ -753,12 +755,12 @@ about the missing main <code/texmf/ tree.
 
 <p>Things I'd like to do sometime:
 <ul>
-<li>I'd like to support PNG and PBM graphics.
+<li>I'd like to support PBM graphics.
 <li>Ermmm, any suggestions?
 
 </ul>
 
-<p>Bright ideas and (especially) implementations, cheerfully received.
+<p>Bright ideas, fixes and (especially) implementations, cheerfully received.
 
 <sect id=refs export>References
 
