@@ -1,0 +1,91 @@
+#! /bin/sh
+
+#+
+#  Name:
+#     sgml2hlp
+#
+#  Purpose:
+#     Generate Starlink HLP file from SGML source.
+#
+#  Description:
+#     This program uses an appropriate downconverter to generate a 
+#     Starlink HLP file from an SGML source document which conforms to
+#     the PROGRAMCODE DTD.  The resulting HLP file can be fed to the 
+#     HLIB program to generate a .shl help library as per SUN/124.
+#
+#  Usage:
+#     sgml2hlp routines.sgml >package.hlp
+#
+#  Environment:
+#     Requires that the environment variable STARLINK_SGML_DIR is 
+#     properly set, pointing to the root of the Starlink SGML kit.
+#
+#     The following binaries must be in the path:
+#        jade nroff tbl sed
+#
+#  Authors:
+#     MBT: Mark Taylor
+#
+#  History:
+#     5-APR-2000 (MBT):
+#        Initial version.
+#-
+
+#  Set some file locations.
+     DECL=$STARLINK_SGML_DIR/dtd/starlink.decl
+     STYLESHEET=$STARLINK_SGML_DIR/dsssl/sl/hlp/slprogcode.dsl
+
+#  Set binary locations.
+     JADE=jade
+     ROFF='nroff -Tascii -me'
+     TBL=tbl
+     SED=sed
+
+#  Check we've got everything.
+     if [ -f "$DECL" ]
+     then
+        :
+     else
+        echo "Cannot find SGML declaration $DECL"
+        exit
+     fi
+     if [ -f "$STYLESHEET" ]
+     then
+        :
+     else
+        echo "Cannot find stylesheet $STYLESHEET"
+        exit
+     fi
+
+#  Treat any flag as a request for help.
+     if `echo $* | grep '^-' > /dev/null`
+     then
+        echo "Usage:  sgml2hlp routines.sgml > out.hlp"
+        exit
+     else
+        :
+     fi
+
+#  Substitute standard input symbol for filename if we have no arguments,
+#  so we can act as a filter if necessary.
+     if [ "$#" = "0" ]
+     then
+        files='-'
+     else
+        files="$*"
+     fi
+
+#  Do the processing:
+#     Jade  generates text which approximates to Tbl/nroff source
+#     sed   removes troublesome whitespace which Jade has left behind
+#     Tbl   does table processing to produce pure nroff source
+#     nroff processes instructions to produce a long single page
+#     sed   finally clips the long page burst and removes duplicate blank lines
+        $JADE -t sgml -d $STYLESHEET $DECL $files \
+      | $SED 's/^  *//;s/  *$//;/^$/d' \
+      | $TBL \
+      | $ROFF \
+      | $SED -n '/@@@@ END OF TEXT @@@@/q;N;/^\n$/!P;D'
+ 
+
+# $Id$
