@@ -740,9 +740,22 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  read (which removed an object).
             astClear( chan, "Card" );
             AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
-            if ( !astOK ) astClearStatus;
+            if ( !astOK ) {
+                cout << "INITIAL READ FAILED" << endl;
+                astClearStatus;
+            }
             if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
+                astShow( tmpset );
                 tmpset = (AstFrameSet *) astAnnul( tmpset );
+            }
+
+            //  If the card position is at the beginning (why?) then
+            //  we should move it past the standard headers.
+            cout << "card position after read = " << 
+                astGetI( chan, "card" ) << endl;
+            if ( astGetI( chan, "Card" ) == 1 ) {
+                //  Move to end of channel?
+                astSetI( chan, "Card", astGetI( chan, "Ncard" ) );
             }
 
             //  Now we can try to add the WCS encoding. The encoding
@@ -796,6 +809,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             if ( argc == 2 ) {
                 astSet( chan, "Encoding=%s", argv[1] );
                 nextra = astWrite( chan, newwcs );
+
                 if ( astOK && nextra != 0 ) {
                     saved = 1;
                 }
