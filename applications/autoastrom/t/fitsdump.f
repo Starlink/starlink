@@ -4,6 +4,7 @@
       integer ftstat,ftunit,blocksize,i
       character*(80) s
       logical keepreading
+      logical printline
       
       integer iargc
       
@@ -26,8 +27,26 @@
       i = 1
       do while (keepreading .and. ftstat.eq.0)
          call ftgrec (ftunit, i, s, ftstat)
-*      Omit date record (to make diffing reasonable)
-         if (s(1:4).ne.'DATE') write (*, '(a)'), s
+*      Suppress printing of lines with certain keywords, to make diffing
+*      the dumped files reasonable.  The file creation DATE will
+*      obviously change from file to file; HISTORY and COMMENT lines are
+*      suppressed, too (a) because different versions of the (c)fitsio
+*      library seem to have different ideas about how many blanks to
+*      include after these comments, and (b) the post-2001 version of
+*      the library is going to change the `this is FITS' comment cards
+*      (see thread
+*      <http://groups.google.com/groups?threadm=3BC7232C.C4E3A9C1%40tetra.gsfc.nasa.gov>)
+         if (s(1:4).eq.'DATE') then
+            printline = .false.
+         else if (s(1:7).eq.'HISTORY') then
+            printline = .false.
+         else if (s(1:7).eq.'COMMENT') then
+            printline = .false.
+         else
+*         It's OK -- print this line
+            printline = .true.
+         endif
+         if (printline) write (*, '(a)'), s
          i = i+1
          if (s(1:3).eq.'END') keepreading = .false.
       enddo
