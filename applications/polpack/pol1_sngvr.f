@@ -111,7 +111,7 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Smooth the squared residuals to get the vaeriance estimates.
+*  Smooth the squared residuals to get the variance estimates.
       CALL POL1_BLKWR( DIM1, DIM2, SQRES, WGT, 3, 3, 0.0, 
      :                 VAR, WORK1, WORK2, STATUS )
 
@@ -129,7 +129,8 @@
          END IF
       END DO
 
-*  return the standard deviation in this bin.
+*  Return the standard deviation in this bin as an estimate of the
+*  background noise.
       NOISE = SQRT( MAX( 0.0, YBIN( J ) ) )
 
       END

@@ -252,7 +252,7 @@
 *  Apply light spatial smoothing to the I,Q,U values calculated on the
 *  previous iteration. Each smoothed value is estimated by fitting a least
 *  squares quadratic surface to the data within a 5x5 fitting box.
-      IF( ITER .GT. 0 ) CALL POL1_SNGSM( DIM1, DIM2, DIM3, 
+      IF( ITER .GT. 0 ) CALL POL1_SNGSM( ILEVEL, DIM1, DIM2, DIM3, 
      :                                   %VAL( IPVOUT ), %VAL( IPDOUT ), 
      :                                   %VAL( IPCOUT ), %VAL( IPCM1 ),
      :                                   STATUS )

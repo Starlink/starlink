@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_SNGSM( NPIX, NROW, NP, VAR, DATA, WORK, WGT,
-     :                       STATUS )
+      SUBROUTINE POL1_SNGSM( ILEVEL, NPIX, NROW, NP, VAR, DATA, WORK, 
+     :                       WGT, STATUS )
 *+
 *  Name:
 *     POL1_SNGSM
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGSM( NPIX, NROW, NP, VAR, DATA, WORK, WGT, STATUS )
+*     CALL POL1_SNGSM( ILEVEL, NPIX, NROW, NP, VAR, DATA, WORK, WGT, 
+*                      STATUS )
 
 *  Description:
 *     This routine smoothes each plane of the supplied cube. A quadratic
@@ -20,6 +21,10 @@
 *     fitted surface at the central pixel. 
 
 *  Arguments:
+*     ILEVEL = INTEGER (Given)
+*        The level of information to display on the screen. Values above 1
+*        result in a message being displayed indicating which images
+*        (I,Q, or U) are being smoothed.
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in each plane.
 *     NROW = INTEGER (Given)
@@ -62,6 +67,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
+      INTEGER ILEVEL
       INTEGER NPIX
       INTEGER NROW
       INTEGER NP
@@ -157,6 +163,23 @@
 
 *  Loop round each plane.
       DO IZ = 1, NP
+
+*  Tell the user what is happening since this routine can take a long
+*  time to run.
+         IF( ILEVEL .GT. 1 ) THEN
+
+            IF( IZ .EQ. 1 ) THEN
+               CALL MSG_SETC( 'S', 'I' ) 
+            ELSE IF( IZ .EQ. 2 ) THEN
+               CALL MSG_SETC( 'S', 'Q' ) 
+            ELSE IF( IZ .EQ. 3 ) THEN
+               CALL MSG_SETC( 'S', 'U' ) 
+            END IF            
+
+            CALL MSG_OUT( 'POL1_SNGSM_MSG1', '   Reducing noise in '//
+     :                    'the ^S image.', STATUS )
+
+         END IF
 
 *  Create the weights image for this plane.
          DO IY = 1, NROW     
@@ -384,5 +407,7 @@
          END DO
 
       END DO
+
+      IF( ILEVEL .GT. 1 ) CALL MSG_BLANK( STATUS )
 
       END
