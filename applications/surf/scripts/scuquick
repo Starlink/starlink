@@ -114,12 +114,25 @@ if ($#ndfs > -1) {
     ($ndf, $junk) = split('\.',$ndf) if $ndf =~ /\.sdf$/;
 
     if ($ndf =~ /./) {
-      (-e "$ndf.sdf" || -e $ENV{'DATADIR'}."/$ndf.sdf") &&
+      (-e "$ndf.sdf" | -e $ENV{'DATADIR'}."/$ndf.sdf") &&
 	do {      
 	  push(@NDFs, $ndf);
-	};
+	} ||
+	  do {
+	# It might have been given as just a number and expect to use
+	# SCUBA_PREFIX
+	    if ($ndf + 0 > 0) {  # Check that we have just a number
+	      $scanno = sprintf("%04d", $ndf);  # add the leading zeroes
+	      $ndftemp = $ENV{'SCUBA_PREFIX'}.'_dem_'.$scanno;
+	      push (@NDFs, $ndftemp) 
+		if (-e "$ndftemp.sdf" | -e $ENV{'DATADIR'}."/$ndftemp.sdf");
+	    }
+
+	  };
+
+      }
     }
-  }
+
 
   undef $ndf;
   if ($#NDFs == -1) {
