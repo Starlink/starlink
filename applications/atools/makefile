@@ -464,7 +464,8 @@ astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
 astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
 astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f atl1_notif.f \
-astformat.f asttran2.f astmathmap.f atl1_prnt2.f
+astformat.f asttran2.f astmathmap.f atl1_prnt2.f astsetactiveunit.f \
+astgetactiveunit.f
 
 F_SUB2 = 
 
@@ -503,7 +504,7 @@ astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
 astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert \
 astlutmap astpcdmap astwinmap astshiftmap astfindframe astpermaxes astpickaxes \
 astsimplify asttrann astmapbox astinvert astspecframe astsetrefpos \
-astgetrefpos astformat asttran2 astmathmap
+astgetrefpos astformat asttran2 astmathmap astsetactiveunit astgetactiveunit.f
 
 
 #  Monolith routine source name.
@@ -587,7 +588,7 @@ DAT_ERR:   $(STAR_INC)/dat_err;   $(LINK) $? $@
 PAR_ERR:   $(STAR_INC)/par_err;   $(LINK) $? $@
 FIO_ERR:   $(STAR_INC)/fio_err;   $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
-AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
+AST_PAR:   $(INSTALL)/include/ast_par;   $(LINK) $? $@
 PAR_PAR:   $(STAR_INC)/par_par;   $(LINK) $? $@
 CNF_PAR:   $(STAR_INC)/cnf_par;   $(LINK) $? $@
 
@@ -1382,6 +1383,8 @@ astpickaxes.o  : SAE_PAR AST_PAR NDF_PAR PAR_ERR
 astremapframe.o: SAE_PAR AST_PAR
 astremoveframe.o: SAE_PAR AST_PAR
 astset.o       : SAE_PAR AST_PAR
+astgetactiveunit.o: SAE_PAR AST_PAR     
+astsetactiveunit.o: SAE_PAR AST_PAR     
 astsetrefpos.o : SAE_PAR AST_PAR PAR_ERR
 astshiftmap.o  : SAE_PAR AST_PAR NDF_PAR
 astsimplify.o  : SAE_PAR AST_PAR 

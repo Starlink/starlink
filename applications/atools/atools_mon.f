@@ -174,6 +174,12 @@
       ELSE IF ( NAME .EQ. 'ASTMATHMAP' ) THEN
          CALL ASTMATHMAP( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTSETACTIVEUNIT' ) THEN
+         CALL ASTSETACTIVEUNIT( STATUS )
+ 
+      ELSE IF ( NAME .EQ. 'ASTGETACTIVEUNIT' ) THEN
+         CALL ASTGETACTIVEUNIT( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

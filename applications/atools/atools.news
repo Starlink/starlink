@@ -22,6 +22,12 @@
   - New command astformat. Formats one or more axis values using the
   attributes of a supplied Frame.
 
+  - New command astsetactiveunit. Sets the value of the ActiveUnit flag
+  for a Frame, which determines how the Unit attribute of the Frame is used.
+
+  - New command astgetactiveunit. Returns the value of the ActiveUnit flag
+  for a Frame.
+
   - The informational messages which say where the output data has been
   written to are now only produced if the environment variable
   ATOOLS_VERBOSE is defined.

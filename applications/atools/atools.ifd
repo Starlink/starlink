@@ -1459,6 +1459,62 @@ iraf! {
           }
       }
 
+      action astsetactiveunit {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {Name of file or NDF in which to store the modified Frame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            position 2
+            type _LOGICAL
+            prompt {The new ActiveUnit value}
+            ppath CURRENT
+            helpkey *
+          }
+
+      }
+      action astgetactiveunit {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter value {
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+      }
+
+
+
 
    }
 
