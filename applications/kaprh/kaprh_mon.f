@@ -106,7 +106,10 @@
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
-         IF ( NAME .EQ. 'GREYPLOT' ) THEN
+         IF ( NAME .EQ. 'CONTOVER' ) THEN
+            CALL CONTOVER ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
             CALL GREYPLOT ( STATUS )
 
          ELSE IF ( NAME .EQ. 'KRHHELP' ) THEN

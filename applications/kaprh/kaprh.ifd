@@ -4,6 +4,151 @@ package kaprh {
 
    executable kaprh_mon {
 
+      action contover {
+         alias {contov(er)}
+
+         helplib {$KAPRH_HELP}
+
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter comp {
+            position 2
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Component to contour}
+            helpkey *
+            default Data
+          }
+
+         parameter concol {
+            type LITERAL
+            prompt {Colour of contours}
+            vpath CURRENT DEFAULT
+            ppath CURRENT
+            helpkey *
+            default 1
+          }
+
+         parameter dashed {
+            type _REAL
+            prompt {Height below which contours are dashed}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter device {
+            ptype DEVICE
+            position 6
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter firstcnt {
+            type _REAL
+            prompt {Give the height of the first contour}
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            helpkey *
+          }
+
+         parameter heights {
+            size *
+            type _REAL
+            prompt {Give the heights of the contours}
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            helpkey *
+          }
+
+         parameter mode {
+            position 4
+            type LITERAL
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            prompt {Method for selecting contour heights}
+            helpkey *
+          }
+
+         parameter ncont {
+            position 5
+            type _INTEGER
+            prompt {Give the number of contour heights}
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default 6
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to be contoured}
+            helpkey *
+          }
+
+         parameter offset {
+            position 3
+            type _INTEGER
+            vpath PROMPT
+            access READ
+            ppath DYNAMIC
+            prompt {x-y displacement in pixels}
+            helpkey *
+            default 0 0
+            size *
+          }
+
+         parameter penrot {
+            type _LOGICAL
+            prompt {Is the graphics pen to be cycled through 3 colours?}
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter percentiles {
+            size *
+            type _REAL
+            prompt {Give the heights of the contours as percentiles}
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            helpkey *
+          }
+
+         parameter stepcnt {
+            type _REAL
+            prompt {Give the interval between contour heights}
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            helpkey *
+          }
+
+         parameter thick {
+            type _REAL
+            prompt {Give the relative thickness of contours}
+            vpath DEFAULT
+            default 1.0
+            helpkey *
+          }
+
+      }
+
       action greyplot {
          alias {grey(plot)}
 

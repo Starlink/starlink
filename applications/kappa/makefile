@@ -512,7 +512,7 @@ F_ROUTINES = $(CCDPACK_F_ROUTINES) \
              $(KAPPA_MONO_SOURCE) $(NDFPACK_MONO_SOURCE)
 
 KAPVIEW_F_ROUTINES = \
-colcomp.f contour.f contover.f \
+colcomp.f contour.f \
 crelut.f cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
 idclear.f \
@@ -2280,7 +2280,6 @@ compadd.o:	 SAE_PAR PAR_ERR NDF_PAR PRM_PAR
 compave.o:	 SAE_PAR PAR_ERR NDF_PAR PRM_PAR
 compick.o:	 SAE_PAR PAR_ERR NDF_PAR PRM_PAR
 contour.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR AST_PAR GRP_PAR
-contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR
 convolve.o:	 SAE_PAR PRM_PAR PAR_ERR
 copybad.o:	 SAE_PAR NDF_PAR
 creframe.o:	 SAE_PAR DAT_PAR PAR_ERR

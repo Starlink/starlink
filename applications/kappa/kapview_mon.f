@@ -127,10 +127,6 @@
          ELSE IF ( NAME .EQ. 'CONTOUR' ) THEN
             CALL CONTOUR ( STATUS )
 
-*  Contours a 2-d NDF overlaid on an image displayed previously.
-         ELSE IF ( NAME .EQ. 'CONTOVER' ) THEN
-            CALL CONTOVER ( STATUS )
-
 *  Creates or manipulates an image-display lookup table using a palette.
          ELSE IF ( NAME .EQ. 'CRELUT' ) THEN
             CALL CRELUT ( STATUS )

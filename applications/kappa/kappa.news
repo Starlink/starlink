@@ -6,7 +6,7 @@
    - The following obsolete commands have been removed from KAPPA -
    alternatives are indicate in SUN/95:
 
-   GREYPLOT.
+   CONTOVER, GREYPLOT.
 
    Many of these commands have been archived in a new package called
    KAPRH in order to satisfy any occasional need that may occur for them
