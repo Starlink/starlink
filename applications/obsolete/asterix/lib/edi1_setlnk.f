@@ -95,6 +95,8 @@
 *  External References:
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
+      EXTERNAL			CHR_INSET
+        LOGICAL			CHR_INSET
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! LOC component
@@ -133,8 +135,8 @@
 *  Get object type
       CALL DAT_TYPE( LOC, TYP, STATUS )
 
-*  Type must be EVENT_DATASET or EVDS. Issue warning and continue
-      IF ( (TYP.NE.'EVENT_DATASET') .AND. (TYP.NE.'EVDS') ) THEN
+*  Type should be EVENT_DATASET, EVENTDS or EVDS. Issue warning and continue
+      IF ( .NOT. CHR_INSET( 'EVENTDS,EVDS,EVENT_DATASET', TYPE ) ) THEN
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'T', TYP )
         CALL ERR_REP( 'EDI1_SETLNK_2', 'Object is of type ^T, '/
