@@ -15,17 +15,17 @@ vig
 
 figaro5_LDADD = \
 ../main/libmain.la \
-../par/libfigpar.la \
-../fda/libfda.la \
-../dta/libdta.la \
-../ich/libich.la \
-../gen/libgen.la \
 ../opt/libopt.la \
 ../twoutil/libtwoutil.la \
 ../graph/libgraph.la \
-../fig/libfig.la \
+../par/libfigpar.la \
 ../fibre/libfibre.la \
+../fda/libfda.la \
+../dta/libdta.la \
+../fig/libfig.la \
+../gen/libgen.la \
 ../unix/libunix.la \
+../ich/libich.la \
 $(EXTERNAL_LIBS)
 
 
