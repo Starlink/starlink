@@ -431,9 +431,6 @@
 
 *  Status:
       INTEGER			STATUS             	! Global status
-
-*  Local Variables:
-      LOGICAL			ALLOC			! Allocate bg memory?
 *.
 
 *  Check inherited global status.
@@ -727,6 +724,8 @@
         LOGICAL			IMG_INCIRC
 
 *  Local Variables:
+      REAL			X, Y, R			! Source position
+
       INTEGER			I, J			! Loop over image
       INTEGER			I1, I2, J1, J2		! Circle bounding box
       INTEGER			S			! Loop over sources
@@ -781,7 +780,7 @@
         CALL ARR_ELEM1R( I_BGM_SRCPTR(3), I__MXBGSRC, I, R, STATUS )
 
 *    Convert position and radius to bounding rectangle
-        CALL IMG_CIRCTOBOX(XC,YC,R,I1,I2,J1,J2,STATUS)
+        CALL IMG_CIRCTOBOX( X, Y, R, I1, I2, J1, J2, STATUS )
         DO J = J1, J2
           DO I = I1, I2
 
@@ -1583,11 +1582,9 @@
 *  Destroy source database?
       IF ( SRC ) THEN
         I_BGM_NSRC = 0
+        IF (
         DO I = 1, I__NSRCATT
-          IF ( I_BGM_ON .AND. (I_BGM_SRCPTR(I) .NE. 0) ) THEN
-            CALL DYN_UNMAP( I_BGM_SRCPTR(I), STATUS )
-          END IF
-          I_BGM_SRCPTR(I) = 0
+          CALL DYN_MAPR( 1, I__MXBGSRC, I_BGM_SRCPTR(I), STATUS )
         END DO
       END IF
 
