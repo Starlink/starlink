@@ -1,0 +1,80 @@
+1 NDF2GASP
+Converts a two-dimensional NDF into a GASP image.
+
+Usage:
+
+   ndf2gasp in out [fillbad]
+
+Description:
+
+   This application converts a two-dimensional NDF into the GAlaxy
+   Surface Photometry (GASP) package's format.  See the Notes for the
+   details of the conversion.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The input NDF data structure. The suggested default is the
+   current NDF if one exists, otherwise it is the current value.
+3 FILLBAD
+FILLBAD = _INTEGER (Read)
+   The value used to replace bad pixels in the NDF's data array
+   before it is copied to the GASP file.  The value must be in the
+   range of signed words (-32768 to 32767).  A null value (!)
+   means no replacements are to be made.  This parameter is
+   ignored if there are no bad values.  [!]
+3 OUT
+OUT = LITERAL (Write)
+   The name of the output GASP image.  Two files are produced
+   with the same name but different extensions.  The ".dat" file
+   contains the data array, and ".hdr" is the associated header
+   file that specifies the dimensions of the image.  The
+   suggested default is the current value.
+2 Examples
+ndf2gasp abell1367 a1367
+   Converts an NDF called abell1367 into the GASP image comprising
+   the pixel file a1367.dat and the header file a1367.hdr.  If
+   there are any bad values present they are copied verbatim to
+   the IRAF image.
+
+ndf2gasp ngc253 ngc253 fillbad=-1
+   Converts the NDF called ngc253 to a GASP image comprising the
+   pixel file ngc253.dat and the header file ngc253.hdr.  Any bad
+   values in the data array are replaced by minus one.
+2 Notes
+The rules for the conversion are as follows:
+
+-  The NDF data array is copied to the ".dat" file.
+
+-  The dimensions of the NDF data array is written to the ".hdr"
+header file.
+
+-  All other NDF components are ignored.
+2 Related_Applications
+   GASP2NDF
+2 References
+   GASP documentation (MUD/66).
+2 Keywords
+   CONVERT, GASP
+2 Authors
+RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 18-JAN-1993 (RAHM):
+    Original version.
+
+ 12-JUL-1993 (RAHM):
+    Tidied up code ready for submission to CONVERT package.
+
+ 1993 July 28 (MJC):
+    Largely rewritten.  Tidied to prologue to the standard style.
+2 Implementation_Status
+   -  The GASP image produced has by definition type SIGNED WORD.
+   There is type conversion of the data array to this type.
+
+   -  Bad values may arise due to type conversion.  These too are
+   substituted by the (non-null) value of FILLBAD.
+
+   -  For an NDF with an odd number of columns, the last column from
+   the GASP image is trimmed.

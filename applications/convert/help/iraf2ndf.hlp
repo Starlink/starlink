@@ -1,0 +1,88 @@
+1 IRAF2NDF
+Converts an IRAF image to an NDF.
+
+Usage:
+
+   iraf2ndf in out
+
+Description:
+
+   This application converts an IRAF image to an NDF.  See the Notes
+   for details of the conversion.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = LITERAL (Read)
+   The name of the IRAF image.  Note that this excludes the
+   extension.
+3 OUT
+OUT = NDF (Write).
+   The name of the NDF to be produced.
+2 Examples
+iraf2ndf ell_galaxy new_galaxy
+   Converts the IRAF image ell_galaxy (comprising files
+   ell_galaxy.imh and ell_galaxy.hdr) to an NDF called new_galaxy.
+2 Notes
+The rules for the conversion are as follows:
+
+-  The NDF data array is copied from the ".pix" file.
+
+-  The title of the IRAF image (object i_title in the ".imh"
+header file) becomes the NDF title.
+
+-  Lines from the IRAF image header file are transferred to the
+FITS extension of the NDF, any compulsory FITS keywords that are
+missing are added.
+
+-  If there is a FITS extension in the NDF, then the elements up
+to the first END keyword of this are added to the `user area' of
+the IRAF header file.
+
+-  Lines from the HISTORY section of the IRAF image are also
+extracted and added to the NDF's FITS extension as FITS HISTORY
+lines.  Two extra HISTORY lines are added to record the original
+name of the image and the date of the format conversion.
+2 Related_Applications
+   NDF2IRAF
+2 Pitfalls
+   -  Bad pixels in the IRAF image are not replaced.
+
+   -  Some of the routines required for accessing the IRAF header
+   file are written in SPP. Macros are used to find the start of the
+   header line section, this constitutes an `Interface violation' as
+   these macros are not part of the IMFORT interface specification.
+   It is possible that these may be changed in the future, so
+   beware.
+2 Keywords
+   CONVERT, IRAF
+2 Authors
+RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
+
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 20-SEP-1992 (RAHM):
+    Original version.
+
+ 23-NOV-1992 (RAHM):
+    Produces NDFs of type UWORD from IRAF short integer
+    type images.
+
+ 9-JUL-1993 (RAHM):
+    Added VERBOSE parameter and tidied up.
+
+ 1993 July 23 (MJC):
+    Reworked the prologue to a standard arrangement.  Tidied, made
+    to conform to SGP/16.  Made to work for cubes.  Fixed some
+    bugs.
+
+ 1993 July 28 (MJC):
+    Removed the VERBOSE parameter.  This functionality should be
+    provided by a global parameter.
+2 Implementation_Status
+   -  Only handles one-, two-, and three-dimensional IRAF files.
+
+   -  The NDF produced has type _WORD or _REAL corresponding to the
+   type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
+   library only supports these data types: signed words and real.)
+   The pixel type of the image can be changed from within IRAF using
+   the 'chpixtype' task in the 'images' package.
