@@ -380,6 +380,57 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::Plot;
 use base qw/ Starlink::AST::FrameSet /;
 
+sub GFlush {
+  my $self = shift;
+  if (@_) { $self->{_gflush} = shift; }
+  return $self->{_gflush};
+}
+
+sub GLine {
+  my $self = shift;
+  if (@_) { $self->{_gline} = shift; }
+  return $self->{_gline};
+}
+
+sub GQch {
+  my $self = shift;
+  if (@_) { $self->{_gqch} = shift; }
+  return $self->{_gqch};
+}
+
+sub GFlush {
+  my $self = shift;
+  if (@_) { $self->{_gflush} = shift; }
+  return $self->{_gflush};
+}
+
+sub GMark {
+  my $self = shift;
+  if (@_) { $self->{_gmark} = shift; }
+  return $self->{_gmark};
+}
+
+sub GText {
+  my $self = shift;
+  if (@_) { $self->{_gtext} = shift; }
+  return $self->{_gtext};
+}
+
+sub GTxExt {
+  my $self = shift;
+  if (@_) { $self->{_gtxext} = shift; }
+  return $self->{_gtxext};
+}
+
+sub GAttr {
+  my $self = shift;
+  if (@_) { $self->{_gattr} = shift; }
+  return $self->{_gattr};
+}
+
+
+
+
 package Starlink::AST::CmpFrame;
 use base qw/ Starlink::AST::Frame /;
 
