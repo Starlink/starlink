@@ -24,7 +24,7 @@
       }{
          The value used to replace bad pixels in the NDF's data array
          before it is copied to the GASP file.  The value must be in the
-         range of signed words (-32768 to 32767).  A null value ({\tt !})
+         range of signed words (-32768 to 32767).  A null value ({\tt{!}})
          means no replacements are to be made.  This parameter is
          ignored if there are no bad values.  {\tt [!]}
       }
@@ -32,8 +32,8 @@
          OUT = LITERAL (Write)
       }{
          The name of the output GASP image.  Two files are produced
-         with the same name but different extensions.  The {\tt "}.dat{\tt "} file
-         contains the data array, and {\tt "}.hdr{\tt "} is the associated header
+         with the same name but different extensions.  The {\tt ".dat"} file
+         contains the data array, and {\tt ".hdr"} is the associated header
          file that specifies the dimensions of the image.  The
          suggested default is the current value.
       }
@@ -43,16 +43,16 @@
          ndf2gasp abell1367 a1367
       }{
          Converts an NDF called abell1367 into the GASP image comprising
-         the pixel file a1367.dat and the header file a1367.hdr.  If
-         there are any bad values present they are copied verbatim to
-         the IRAF image.
+         the pixel file {\tt a1367.dat} and the header file {\tt a1367.hdr}.
+         If there are any bad values present they are copied verbatim to
+         the GASP image.
       }
       \sstexamplesubsection{
          ndf2gasp ngc253 ngc253 fillbad=-1
       }{
          Converts the NDF called ngc253 to a GASP image comprising the
-         pixel file ngc253.dat and the header file ngc253.hdr.  Any bad
-         values in the data array are replaced by minus one.
+         pixel file {\tt ngc253.dat} and the header file {\tt ngc253.hdr}.
+         Any bad values in the data array are replaced by minus one.
       }
    }
    \sstnotes{
@@ -60,10 +60,10 @@
       \sstitemlist{
 
          \sstitem
-         The NDF data array is copied to the {\tt "}.dat{\tt "} file.
+         The NDF data array is copied to the {\tt ".dat"} file.
 
          \sstitem
-         The dimensions of the NDF data array is written to the {\tt "}.hdr{\tt "}
+         The dimensions of the NDF data array is written to the {\tt ".hdr"}
          header file.
 
          \sstitem
@@ -73,7 +73,7 @@
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: GASP2NDF.
+      \CONVERT: GASP2NDF.
    }
    \sstdiytopic{
       References
@@ -97,3 +97,4 @@
       }
    }
 }
+

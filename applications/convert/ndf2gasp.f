@@ -49,7 +49,7 @@
 *        Converts an NDF called abell1367 into the GASP image comprising
 *        the pixel file a1367.dat and the header file a1367.hdr.  If
 *        there are any bad values present they are copied verbatim to
-*        the IRAF image.
+*        the GASP image.
 *     ndf2gasp ngc253 ngc253 fillbad=-1
 *         Converts the NDF called ngc253 to a GASP image comprising the
 *         pixel file ngc253.dat and the header file ngc253.hdr.  Any bad
@@ -141,7 +141,6 @@
       INTEGER PNTRT( 1 )         ! Pointer for the temporary data array
       LOGICAL REPBAD             ! True if there are bad values to
                                  ! replace
-      LOGICAL THERE              ! True if there is a FITS extension
       INTEGER UBND( NDIM )       ! Upper bounds array
       INTEGER*2 WFILBA           ! Value to replace word-type bad values
 

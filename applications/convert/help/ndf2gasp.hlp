@@ -35,7 +35,7 @@ ndf2gasp abell1367 a1367
    Converts an NDF called abell1367 into the GASP image comprising
    the pixel file a1367.dat and the header file a1367.hdr.  If
    there are any bad values present they are copied verbatim to
-   the IRAF image.
+   the GASP image.
 
 ndf2gasp ngc253 ngc253 fillbad=-1
    Converts the NDF called ngc253 to a GASP image comprising the
