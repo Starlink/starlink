@@ -32,6 +32,11 @@
 
 #include <config.h>
 
+#include <unistd.h>		// for STDIN_FILENO
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>		// for open
+#endif
+
 #ifdef HAVE_CSTD_INCLUDE
 #include <cmath>		// for fabs()
 #else
@@ -75,7 +80,14 @@ verbosities DviFile::verbosity_ = normal;
  * be processed in an event-based fashion, by repeatedly calling
  * {@link #getEvent} and handling the returned object.
  *
- * @param fn the name of the DVI file
+ * <p>The DVI file may be specified as "-", in which case the DVI
+ * file will be read from <code>stdin</code>.  In this case, the
+ * postamble is not read, irrespective of the value of parameter
+ * <code>read_post</code>, and this is known not to be seekable, so
+ * the value of parameter <code>seekable</code> is ignored.
+ *
+ * @param fn the name of the DVI file.  The given name is searched for
+ * both as-is, and with an extension <code>.dvi</code> added.
  *
  * @param res the base DPI to be used for processing the file, in
  * pixels-per-inch
@@ -89,8 +101,17 @@ verbosities DviFile::verbosity_ = normal;
  * false, it will be skipped.  This is false by default, but if the
  * postamble is read, then the font declarations there will be read
  * and acted on, which <em>may</em> speed things up.
+ *
+ * @param seekable if true, the input file is seekable; if false, it
+ * is not seekable, the value of <code>read_post</code> is ignored
+ * (taken to be false), and the file is opened without attempting to
+ * add any <code>.dvi</code> extension.
  */
-DviFile::DviFile (string& fn, int res, double externalmag, bool read_post)
+DviFile::DviFile (string& fn,
+		  int res,
+		  double externalmag,
+		  bool read_post,
+		  bool seekable)
     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
       netmag_(1.0), skipPage_(false),
@@ -101,21 +122,39 @@ DviFile::DviFile (string& fn, int res, double externalmag, bool read_post)
 
     try
     {
-	dvif_ = new InputByteStream (fileName_, false, ".dvi");
-	if (read_post) {
-	    read_postamble();
-	    dvif_->seek(0);	// return to beginning
+	if (seekable) {
+	    // ordinary file
+	    if (fileName_ == "-") {
+		read_post = false;
+		dvif_ = new InputByteStream(STDIN_FILENO);
+		if (verbosity_ > normal)
+		    cerr << "DviFile: Reading DVI file from stdin" << endl;
+	    } else {
+		dvif_ = new InputByteStream (fileName_, false, ".dvi");
+	    }
+	    if (read_post) {
+		read_postamble();
+		dvif_->seek(0);	// return to beginning
+	    }
+	} else {
+	    read_post = false;
+	    int fd = open(fileName_.c_str(), O_RDONLY, 0);
+	    if (fd < 0)
+		throw InputByteStreamError("Can't open file " + fileName_
+					   + " to read");
+	    dvif_ = new InputByteStream(fd);
+	    if (verbosity_ > normal)
+		cerr << "DviFile: opened unseekable file " << fileName_
+		     << " to read" << endl;
 	}
-
 #if HOMEMADE_POSSTATESTACK
 	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
 #endif
     }
     catch (InputByteStreamError& e)
     {
-	e.print();
-	//throw DviError ("DviFile: "+e.problem());
-	throw DviError ("DviFile: can't open file");
+	string msg = "DviFile: can't open file: ";
+	throw DviError (msg + e.problem());
     }
 }
 
@@ -136,33 +175,35 @@ DviFile::DviFile (string& fn, int res, double externalmag, bool read_post)
  * postamble is read, then the font declarations there will be read
  * and acted on, which <em>may</em> speed things up.
  */
-DviFile::DviFile (const char* fn, int res, double externalmag, bool read_post)
-    : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
-      current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
-      netmag_(1.0), skipPage_(false),
-      max_drift_(0),
-      widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
-{
-    PkFont::setResolution(res);
+// DviFile::DviFile (const char* fn, int res, double externalmag, bool read_post)
+//     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
+//       current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
+//       netmag_(1.0), skipPage_(false),
+//       max_drift_(0),
+//       widest_page_(-1), deepest_page_(-1), have_read_postamble_(false)
+// {
+//     PkFont::setResolution(res);
 
-    try
-    {
-	dvif_ = new InputByteStream (fileName_, false, ".dvi");
-	if (read_post) {
-	    read_postamble();
-	    dvif_->seek(0);	// return to beginning
-	}
+//     try
+//     {
+// 	dvif_ = new InputByteStream (fileName_, false, ".dvi");
+// 	if (read_post) {
+// 	    read_postamble();
+// 	    dvif_->seek(0);	// return to beginning
+// 	}
 
-#if HOMEMADE_POSSTATESTACK
-	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
-#endif
-    }
-    catch (InputByteStreamError& e)
-    {
-	e.print();
-	throw DviError ("DviFile: can't open file");
-    }
-}
+// #if HOMEMADE_POSSTATESTACK
+// 	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
+// #endif
+//     }
+//     catch (InputByteStreamError& e)
+//     {
+// 	e.print();
+// 	throw DviError ("DviFile: can't open file");
+//     }
+// }
+
+
 // XXX How do I invoke one constructor from another?  If I do
 // DviFile::DviFile (const char* fn, int res, double magmag)
 // {
