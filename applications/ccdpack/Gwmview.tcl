@@ -209,6 +209,12 @@ class Gwmview {
 #        in view coordinates.  This variable controls the actual size 
 #        in screen pixels of the GWM created by the makegwm method.
 #
+#     uselabels = boolean
+#        If true, then the index number of each point will be displayed
+#        alongside the marker when it is plotted and it will be 
+#        possible for the user to select the index of the next point
+#        to be plotted.  The default is false.
+#
 #     zoom = real
 #        A factor giving the number of screen pixels to an NDF pixel.
 #
@@ -735,9 +741,10 @@ class Gwmview {
       public variable uselabels 1 {
 #-----------------------------------------------------------------------
          if { $uselabels } {
-            $itk_component(marknum) configure -hidden 0
+            pack [ groupwin marknum ] -after [ groupwin zoom ] \
+                 -side left -fill y
          } else {
-            $itk_component(marknum) configure -hidden 1
+            pack forget [ groupwin marknum ]
          }
       }
 
