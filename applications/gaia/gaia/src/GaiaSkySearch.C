@@ -633,7 +633,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
  *  required then you must add these here, the origin supplied are
  *  subtracted from the X and Y coordinates).
  */
-GaiaSkySearch::originCmd( int argc, char *argv[] )
+int GaiaSkySearch::originCmd( int argc, char *argv[] )
 {
     if ( argc < 2 ) {
         

@@ -62,7 +62,7 @@ want. Note these options are applied immediately, there is no need to
 redraw the contours.
 
 
-   ---  Generate contours at magnitude intervals.
+   ---  Generate contours at magnitude-like intervals.
 
 Press the "Generate" tab, select the "Algorithm" menu and choose the
 "magnitude" item. Now enter the value of a reference point on your
@@ -71,7 +71,12 @@ button.
 
 I use this option by entering a value somewhat above the sky
 background and then setting the interval to say -0.5 (negative to get
-increasing data values).
+increasing data values). The formulae used is:
+
+                                     (-0.4 * i * step_value)
+   contour_level_i = start_value * 10
+
+For i = 0 up to number of contours required.
 
 
    ---  Contour the region right to the edge of the display.

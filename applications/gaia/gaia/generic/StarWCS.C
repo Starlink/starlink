@@ -73,8 +73,8 @@ extern "C" {
                            int indim, const double (*in)[1], int forward,
                            int ncoord_out, int outdim, double (*out)[1] )
   {
-      astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
-                forward, ncoord_out, outdim, (double (*)[])out);
+      astTranN( map, npoint, ncoord_in, indim, (const double *)in,
+                forward, ncoord_out, outdim, (double *)out );
   }
 }
 

@@ -482,7 +482,7 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
       }
       
       //  Draw the geodesic.
-      astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
+      astPolyCurve( plot, npts, 2, MAXPTS, (const double *) xydata );
 
    } else {
       

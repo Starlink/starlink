@@ -82,7 +82,44 @@ itcl::class gaia::ColourSwatch {
       eval itk_initialize $args
       wm title $w_ "Choose Colour"
 
-      #  Frame for buttons.
+      #  Add short help window
+      make_short_help
+
+      #  Add a file menu for the basic windows controls and selection
+      #  between the various colour selection modes.
+      add_menubar
+      set File [add_menubutton "File" left]
+      configure_menubutton File -underline 0
+
+      #  Add options to switch between the various kinds of colour
+      #  spaces.
+      $File add radio -label "RGB colour space" \
+         -variable [scope colour_space_] \
+         -value rgb \
+         -command [code $this change_colour_space_ rgb]
+      $File add radio -label "CMY colour space" \
+         -variable [scope colour_space_] \
+         -value cmy \
+         -command [code $this change_colour_space_ cmy]
+      $File add radio -label "HSB colour space" \
+         -variable [scope colour_space_] \
+         -value hsb \
+         -command [code $this change_colour_space_ hsb]
+      $File add separator
+
+      #  Add the cancel menu item.
+      $File add command -label Cancel \
+         -command [code $this cancel] \
+         -accelerator {Control-c}
+      bind $w_ <Control-c> [code $this cancel]
+
+      #  Add the accept menu item.
+      $File add command -label Accept \
+         -command [code $this accept] \
+         -accelerator {Control-x}
+      bind $w_ <Control-x> [code $this accept]
+
+      #  Frame for buttons and sliders.
       itk_component add butfrm {
          frame $w_.butfrm \
             -relief raised \
@@ -101,12 +138,9 @@ itcl::class gaia::ColourSwatch {
          scale $itk_component(sliders).r \
             -label Red: \
             -from 0 \
-            -to 255 \
-            -showvalue 1 \
+            -to 1000 \
             -sliderrelief raised \
-            -troughcolor red \
-            -variable [scope redval_] \
-            -command [code $this set_color] \
+            -command [code $this set_colour_] \
             -orient horizontal
       }
 
@@ -115,12 +149,9 @@ itcl::class gaia::ColourSwatch {
          scale $itk_component(sliders).g \
             -label Green: \
             -from 0 \
-            -to 255 \
-            -showvalue 1 \
+            -to 1000 \
             -sliderrelief raised \
-            -troughcolor green \
-            -variable [scope grnval_] \
-            -command [code $this set_color] \
+            -command [code $this set_colour_] \
             -orient horizontal
       }
 
@@ -129,12 +160,9 @@ itcl::class gaia::ColourSwatch {
          scale $itk_component(sliders).b \
             -label Blue: \
             -from 0 \
-            -to 255 \
-            -showvalue 1 \
+            -to 1000 \
             -sliderrelief raised \
-            -troughcolor blue \
-            -variable [scope blueval_] \
-            -command [code $this set_color] \
+            -command [code $this set_colour_] \
             -orient horizontal
       }
 
@@ -142,17 +170,17 @@ itcl::class gaia::ColourSwatch {
       itk_component add visualfrm {
          frame $w_.butfrm.visual
       }
-      itk_component add visualbutton {
-         button $w_.butfrm.visual.button \
+      itk_component add swatch {
+         button $w_.butfrm.visual.swatch \
             -background black \
             -foreground white \
-            -text "Color" \
+            -text "Colour" \
             -height 6 \
             -width 10
       }
-      itk_component add visualent {
-         label $w_.butfrm.visual.ent \
-            -width 7 \
+      itk_component add label {
+         label $w_.butfrm.visual.label \
+            -width 16 \
             -textvariable [scope hexval_] \
             -relief raised
       }
@@ -161,11 +189,11 @@ itcl::class gaia::ColourSwatch {
       pack $itk_component(red) $itk_component(green) $itk_component(blue) \
          -expand 1 -side top
 
-      pack $itk_component(visualbutton) \
+      pack $itk_component(swatch) \
          -anchor nw \
          -side top
 
-      pack $itk_component(visualent) \
+      pack $itk_component(label) \
          -anchor n \
          -side bottom
 
@@ -190,34 +218,37 @@ itcl::class gaia::ColourSwatch {
       set i 0
       foreach colour $collist {
          incr i
-         set tag [$frm create rect 4 [expr $framer * 30] \
-                     200 [expr [expr $framer * 30] + 30]\
-		     -fill "#$colour" \
-		     -width 2]
+         set recttag [$frm create rect 4 [expr $framer * 30] \
+                         200 [expr [expr $framer * 30] + 30]\
+                         -fill "#$colour" \
+                         -width 2]
          scan $colour "%02x%02x%02x" red green blue
-
-         $frm bind $tag <ButtonPress-1> \
-			  [code $this set_rgb_color $red $green $blue]
 
          set temp [expr $red + [expr $green + $blue]]
          set bming [expr abs([expr $green - $blue])]
          set rminb [expr abs([expr $red - $green])]
          set gminr [expr abs([expr $green - $red])]
-
          set sumodiff [expr $gminr + [expr $bming + $rminb]]
 
          set name [lindex $colnamelist $i]
          if {$sumodiff < 350 && $temp < 400} {
-	    set tag [$frm create text 100 [expr [expr $framer *30] + 15] \
-                        -text $name \
-                        -fill white]
+	    set texttag [$frm create text 100 [expr [expr $framer *30] + 15] \
+                            -text $name \
+                            -fill white]
          } else {
-	    set tag [$frm create text 100 [expr [expr $framer *30] + 15] \
-                        -text $name \
-                        -fill black]
+	    set texttag [$frm create text 100 [expr [expr $framer *30] + 15] \
+                            -text $name \
+                            -fill black]
          }
-         $frm bind $tag <ButtonPress-1> \
-			  [code $this set_rgb_color $red $green $blue]
+
+         set red [expr $red*256]
+         set green [expr $green*256]
+         set blue [expr $blue*256]
+
+         $frm bind $recttag <ButtonPress-1> \
+            [code $this set_rgb_colour_ $red $green $blue]
+         $frm bind $texttag <ButtonPress-1> \
+            [code $this set_rgb_colour_ $red $green $blue]
 
          incr framer
       }
@@ -251,16 +282,173 @@ itcl::class gaia::ColourSwatch {
 
    #  Methods:
    #  --------
-   public method set_rgb_color {red green blue} {
+
+   #  Adjust the colour to match a change of a scale, according to the
+   #  current colour space.
+   protected method set_colour_ { args } {
+      set red [$itk_component(red) get]
+      set green [$itk_component(green) get]
+      set blue [$itk_component(blue) get]
+
+      if { $colour_space_ == "rgb"} {
+         set redval_ [format %.0f [expr $red*65.535]]
+         set grnval_ [format %.0f [expr $green*65.535]]
+         set blueval_ [format %.0f [expr $blue*65.535]]
+      } else {
+         if { $colour_space_ == "cmy"} {
+            set redval_ [format %.0f [expr 65535 - $red*65.535]]
+            set grnval_ [format %.0f [expr 65535 - $green*65.535]]
+            set blueval_ [format %.0f [expr 65535 - $blue*65.535]]
+         } else {
+            set list [hsb_to_rgb_ [expr $red/1000.0] \
+                         [expr $green/1000.0] \
+                         [expr $blue/1000.0]]
+            set redval_ [lindex $list 0]
+            set grnval_ [lindex $list 1]
+            set blueval_ [lindex $list 2]
+         }
+      }
+      set hexval_ [format "#%04x%04x%04x" $redval_ $grnval_ $blueval_]
+      set_swatch_
+   }
+
+   #  Update the scales to reflect the current colour.
+   protected method set_scales_ {} {
+      if { $colour_space_ == "rgb"} {
+         $itk_component(red) set [format %.0f [expr $redval_/65.535]]
+         $itk_component(green) set [format %.0f [expr $grnval_/65.535]]
+         $itk_component(blue) set [format %.0f [expr $blueval_/65.535]]
+      } else {
+         if {$colour_space_ == "cmy"} {
+            $itk_component(red) set [format %.0f [expr (65535-$redval_)/65.535]]
+            $itk_component(green) set [format %.0f [expr (65535-$grnval_)/65.535]]
+            $itk_component(blue) set [format %.0f [expr (65535-$blueval_)/65.535]]
+         } else {
+            set list [rgb_to_hsv_ $redval_ $grnval_ $blueval_]
+            $itk_component(red) set [format %.0f [expr {[lindex $list 0] * 1000.0}]]
+            $itk_component(green) set [format %.0f [expr {[lindex $list 1] * 1000.0}]]
+            $itk_component(blue) set [format %.0f [expr {[lindex $list 2] * 1000.0}]]
+         }
+      }
+   }
+
+   # The method below is invoked when a named colour has been
+   # selected from the canvas.
+   protected method set_rgb_colour_ {red green blue} {
       set redval_ $red
       set grnval_ $green
       set blueval_ $blue
-      set_color
+      set_scales_
+      set hexval_ [format "#%04x%04x%04x" $redval_ $grnval_ $blueval_]
+      set_swatch_
    }
 
-   public method set_color {args} {
-      set hexval_ "#[format "%02X%02X%02X" $redval_ $grnval_ $blueval_]"
-      $itk_component(visualbutton) configure \
+   #  Change the colour space.
+   protected method change_colour_space_ {space} {
+      if { $space == "rgb" } {
+         $itk_component(red) configure -label Red
+         $itk_component(green) configure -label Green
+         $itk_component(blue) configure -label Blue
+         set_scales_
+         return
+      }
+      if {$space == "cmy"} {
+         $itk_component(red) configure -label Cyan
+         $itk_component(green) configure -label Magenta
+         $itk_component(blue) configure -label Yellow
+         set_scales_
+         return
+      }
+      if {$space == "hsb"} {
+         $itk_component(red) configure -label Hue
+         $itk_component(green) configure -label Saturation
+         $itk_component(blue) configure -label Brightness
+         set_scales_
+         return
+      }
+   }
+
+   #  Convert an RGB value into a HSB value. It takes red, green, and
+   #  blue components (0-65535) as arguments, and returns a list
+   #  containing HSB components (floating-point, 0-1) as result.  The
+   #  code here is a copy of the code on page 615 of "Fundamentals of
+   #  Interactive Computer Graphics" by Foley and Van Dam.
+   protected method rgb_to_hsv_ {red green blue} {
+      if {$red > $green} {
+         set max $red.0
+         set min $green.0
+      } else {
+         set max $green.0
+         set min $red.0
+      }
+      if {$blue > $max} {
+         set max $blue.0
+      } else {
+         if {$blue < $min} {
+            set min $blue.0
+         }
+      }
+      set range [expr $max-$min]
+      if {$max == 0} {
+         set sat 0
+      } else {
+         set sat [expr {($max-$min)/$max}]
+      }
+      if {$sat == 0} {
+         set hue 0
+      } else {
+         set rc [expr {($max - $red)/$range}]
+         set gc [expr {($max - $green)/$range}]
+         set bc [expr {($max - $blue)/$range}]
+         if {$red == $max} {
+            set hue [expr {.166667*($bc - $gc)}]
+         } else {
+            if {$green == $max} {
+               set hue [expr {.166667*(2 + $rc - $bc)}]
+            } else {
+               set hue [expr {.166667*(4 + $gc - $rc)}]
+            }
+         }
+         if {$hue < 0.0} {
+            set hue [expr $hue + 1.0]
+         }
+      }
+      return [list $hue $sat [expr {$max/65535}]]
+   }
+
+   #  Converts HSB value to RGB.  It takes hue, saturation, and value
+   #  components (floating-point, 0-1.0) as arguments, and returns a
+   #  list containing RGB components (integers, 0-65535) as result.
+   #  The code here is a copy of the code on page 616 of "Fundamentals
+   #  of Interactive Computer Graphics" by Foley and Van Dam.
+   protected method hsb_to_rgb_ {hue sat value} {
+      set v [format %.0f [expr 65535.0*$value]]
+      if {$sat == 0} {
+         return "$v $v $v"
+      } else {
+         set hue [expr $hue*6.0]
+         if {$hue >= 6.0} {
+            set hue 0.0
+         }
+         scan $hue. %d i
+         set f [expr $hue-$i]
+         set p [format %.0f [expr {65535.0*$value*(1 - $sat)}]]
+         set q [format %.0f [expr {65535.0*$value*(1 - ($sat*$f))}]]
+         set t [format %.0f [expr {65535.0*$value*(1 - ($sat*(1 - $f)))}]]
+         case $i \
+            0 {return "$v $t $p"} \
+            1 {return "$q $v $p"} \
+            2 {return "$p $v $t"} \
+            3 {return "$p $q $v"} \
+            4 {return "$t $p $v"} \
+            5 {return "$v $p $q"}
+         error "i value $i is out of range"
+      }
+   }
+
+   #  Set the swatch to the current colour.
+   protected method set_swatch_ {args} {
+      $itk_component(swatch) configure \
          -background "$hexval_" \
          -activebackground "$hexval_"
       set temp [expr [expr $blueval_ + $grnval_] + $redval_]
@@ -268,14 +456,14 @@ itcl::class gaia::ColourSwatch {
       set rminb [expr abs([expr $redval_  - $grnval_])]
       set gminr [expr abs([expr $grnval_ - $redval_])]
       set sumodiff [expr $gminr + [expr $bming + $rminb]]
-      if {$sumodiff < 350 && $temp < 400} {
-         $itk_component(visualbutton) configure \
-	    -foreground white \
-	    -activeforeground white
+      if {$sumodiff < 350*256 && $temp < 400*256} {
+         $itk_component(swatch) configure \
+      	    -foreground white \
+      	    -activeforeground white
       } else {
-         $itk_component(visualbutton) configure \
-	    -foreground black \
-	    -activeforeground black
+         $itk_component(swatch) configure \
+      	    -foreground black \
+      	    -activeforeground black
       }
    }
 
@@ -342,6 +530,9 @@ itcl::class gaia::ColourSwatch {
 
    #  Status of close window request.
    protected variable status_ 0
+
+   #  The colour space.
+   protected variable colour_space_ rgb
 
    #  Common variables: (shared by all instances)
    #  -----------------
