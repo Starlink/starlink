@@ -9,6 +9,7 @@
 #define BITMAPIMAGE_HEADER_READ 1
 
 #include "dvi2bitmap.h"
+#include "verbosity.h"
 
 class BitmapImage {
  public:
@@ -27,6 +28,9 @@ class BitmapImage {
 
     static BitmapImage *newBitmapImage
 	(const string format, const int w, const int h, const int bpp=1);
+    static bool supportedBitmapImage (const string format);
+    static const string defaultBitmapImageFormat;
+    static void verbosity (const verbosities level) { verbosity_ = level; }
 
  protected:
     int w_, h_;
@@ -40,5 +44,6 @@ class BitmapImage {
     static const string *softwareversion;
     static const string *inputfilename;
     static const string *furtherinfo;
+    static verbosities verbosity_;
 };
 #endif // #ifndef BITMAPIMAGE_HEADER_READ
