@@ -30,11 +30,6 @@
       INCLUDE 'FIT_PAR'
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-	INTEGER CHR_LEN
-*    Local constants :
-	INTEGER MAXTHAW			! Max no of params which can
-	PARAMETER (MAXTHAW=20)		! be thawed in one pass
 *    Local variables :
 	CHARACTER*(DAT__SZLOC) FLOC		! Locator to fit_model object
 	CHARACTER*(DAT__SZLOC) MLOC		! Locator to pmodels
@@ -55,9 +50,9 @@
 	INTEGER NVAL				! No of param values entered
 	INTEGER NPARSUM				! Running sum of param number
 	INTEGER NPMIN,NPMAX			! Min/max param nos for pmodel
-	INTEGER PARNO(MAXTHAW)			! Nos of parameters to be thawed
+	INTEGER PARNO(NPAMAX)			! Nos of parameters to be thawed
 	INTEGER I,J				! Loop indices
-	REAL VAL(MAXTHAW)			! Values for thawed params
+	REAL VAL(NPAMAX)			! Values for thawed params
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
@@ -81,7 +76,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Get parameter numbers
-	CALL PRS_GETLIST('PAR',MAXTHAW,PARNO,NTHAW,STATUS)
+	CALL PRS_GETLIST('PAR',NPAMAX,PARNO,NTHAW,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Check for invalid parameter numbers
@@ -94,7 +89,7 @@
 	ENDDO
 
 * Get values at which thawed parameters are to be set
-	CALL USI_GET1R('VALS',MAXTHAW,VAL,NVAL,STATUS)
+	CALL USI_GET1R('VALS',NPAMAX,VAL,NVAL,STATUS)
 	IF(STATUS.EQ.PAR__NULL)THEN
 	  CALL ERR_ANNUL(STATUS)
 	  PVALS=.FALSE.			! Null indicates no resetting of params
@@ -147,9 +142,9 @@ D	  print *,'comp,npmin,npmax,nthaw: ',i,npmin,npmax,nthaw
 *    Thaw parameter
 	      IF(.NOT.FROZEN)THEN
 	        CALL MSG_SETC('PAR',PARNAME)
-	        CALL MSG_OUT('PAR_FROZ','^PAR not frozen',STATUS)
+	        CALL MSG_PRNT( '^PAR not frozen' )
 	        IF(PVALS)THEN
-	          CALL MSG_OUT('RESET','parameter value amended',STATUS)
+	          CALL MSG_PRNT('parameter value amended' )
 	        ENDIF
 	      ELSE
 	        CALL CMP_PUT0L(MIPJLOC,'FROZEN',.FALSE.,STATUS)
