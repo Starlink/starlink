@@ -135,8 +135,9 @@ $generic = "generic";
 use Fcntl;
 use Cwd;
 use SDBM_File;
-use libscb;
-use Ftag;
+use Scb;
+use FortranTag;
+use CTag;
 
 #  Declarations.
 
@@ -407,32 +408,87 @@ sub index_tar {
    popd;
 }
 
-########################################################################
-sub index_fortran_file {
 
-#  Examine and index a fortran source file.
+########################################################################
+sub index_source {
+
+#  Tag and index a source code file.
 
 #  Arguments.
 
    my $path = shift;          #  Logical pathname of file to be indexed.
    my $file = shift;          #  File in current directory to be indexed.
-   my $ftype = shift || 'f';  #  Type of file ('f' or 'gen' - default 'f').
+   my $ftype = shift;         #  Type of file ('f' or 'c').
 
-#  Cycle through source file writing index lines where appropriate.
+#  Tag source file using language-specific tagging routine.
 
-   open F, $file or die "Couldn't open $file in directory ".cwd."\n";
-   $tagged = tag_f join '', <F>;
-   close F;
+   open SOURCE, $file or die "Failed to open $file in directory " . cwd . "\n";
+   if ($ftype eq 'f' || $ftype eq 'gen') {
+      $tagged = FortranTag::tag join '', <SOURCE>;
+   }
+   elsif ($ftype eq 'c') {
+      $tagged = CTag::tag join '', <SOURCE>;
+   }
+   close SOURCE;
 
    while ($tagged =~ /(<[^>]+>)/g) {
       %tag = parsetag $1;
-      if (($tag{'Start'} eq 'a') && ($name = $tag{'name'})) {
-         write_entry $name, $path
+      if (($tag{'Start'} eq 'a') && $tag{'name'}) {
+         write_entry $tag{'name'}, $path;
+      }
+      elsif (($tag{'Start'} eq 'a') && ($tag{'href'} =~ /^INCLUDE-(.*)/)) {
+         $include = uc $1;
       }
    }
 
    $nlines{$ftype} += ($tagged =~ tr/\n/\n/);
 }
+
+
+########################################################################
+# sub index_fortran_file {
+# 
+# #  Examine and index a fortran source file.
+# 
+# #  Arguments.
+# 
+#    my $path = shift;          #  Logical pathname of file to be indexed.
+#    my $file = shift;          #  File in current directory to be indexed.
+#    my $ftype = shift || 'f';  #  Type of file ('f' or 'gen' - default 'f').
+# 
+# #  Cycle through source file writing index lines where appropriate.
+# 
+#    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
+#    $tagged = FortranTag::tag join '', <F>;
+#    close F;
+# 
+#    while ($tagged =~ /(<[^>]+>)/g) {
+#       %tag = parsetag $1;
+#       if (($tag{'Start'} eq 'a') && ($name = $tag{'name'})) {
+#          write_entry $tag{'name'}, $path;
+#       }
+#       elsif (($tag{'Start'} eq 'a') && ($tag{'href'} =~ /^INCLUDE-(.*)/)) {
+#          $include = uc $1;
+#       }
+#    }
+# 
+#    $nlines{$ftype} += ($tagged =~ tr/\n/\n/);
+# }
+
+
+########################################################################
+sub index_c {
+
+#  Examine and index a C source file.
+
+#  Arguments.
+
+   my $path = shift;      #  Logical pathname of .c file.
+   my $file = shift;      #  .c file in current directory to be indexed.
+
+   index_source $path, $file, 'c';
+}
+
 
 ########################################################################
 sub index_f {
@@ -444,8 +500,9 @@ sub index_f {
    my $path = shift;      #  Logical pathname of .f file.
    my $file = shift;      #  .f file in current directory to be indexed.
 
-   index_fortran_file $path, $file, 'f';
+   index_source $path, $file, 'f';
 }
+
 
 ########################################################################
 sub index_gen {
@@ -459,7 +516,7 @@ sub index_gen {
 
 #  Index unprocessed source code.
 
-   index_fortran_file $path, $file, 'gen';
+   index_source $path, $file, 'gen';
 
 #  Move file to scratch space.
 
@@ -478,7 +535,7 @@ sub index_gen {
 
    my $ffile = "$gtmpdir/$tail";
    $ffile =~ s/\.gen$/.f/;
-   index_fortran_file $path, $ffile, 'f';
+   index_source $path, $ffile, 'f';
 
 #  Tidy up.
 
@@ -551,24 +608,22 @@ sub index_h {
 
 
 ########################################################################
-sub index_c {
-
-#  Examine and index a C source file.
-#  This relies on use of the macros in /star/include/f77.h to declare C
-#  functions.
-
-#  Arguments.
-
-   my $path = shift;      #  Logical pathname of .c file.
-   my $file = shift;      #  .c file in current directory to be indexed.
-
-   open C, $file or die "Couldn't open $file in directory ".cwd."\n";
-   while (<C>) {
-      write_entry $name, $path if ($name = module_name 'c', $_);
-      $nlines{'c'}++;
-   }
-   close C;
-}
+# sub index_c {
+# 
+# #  Examine and index a C source file.
+# 
+# #  Arguments.
+# 
+#    my $path = shift;      #  Logical pathname of .c file.
+#    my $file = shift;      #  .c file in current directory to be indexed.
+# 
+#    open C, $file or die "Couldn't open $file in directory ".cwd."\n";
+#    while (<C>) {
+#       write_entry $name, $path if ($name = module_name 'c', $_);
+#       $nlines{'c'}++;
+#    }
+#    close C;
+# }
 
 
 
@@ -599,10 +654,10 @@ sub indexinc_list {
 
    foreach $file (@files) {
       if ($file =~ /\.h$/) {              #  C type header file.
-         write_entry $file, "$path$file";
+         write_entry "INCLUDE-$file", "$path$file";
       }
       elsif ($file !~ /\./) {             #  Fortran type header file.
-         write_entry uc ($file), "$path$file";
+         write_entry "INCLUDE-" . uc ($file), "$path$file";
       }
    }
 }
@@ -634,8 +689,8 @@ sub write_entry {
       $oldloc = $loc{$package};
       $loc{$package} = $location 
          if (!$oldloc ||
-             ($otl = ($oldloc =~ tr/>/>/)) < ($tl = ($location =~ tr/>/>/)) ||
-             $otl == $tl && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/
+             (($oleng = length $oldloc) > ($leng = length $location)) ||
+             ($oleng == $leng && $oldloc =~ /\.gen$/ && $location !~ /\.gen$/)
             );
       $locate{$name} = join ' ', values %loc;
    }
