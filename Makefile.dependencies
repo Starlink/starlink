@@ -1621,8 +1621,10 @@ $(MANIFEST)/trn: \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html
 	cd libraries/trn \

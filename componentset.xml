@@ -2884,7 +2884,7 @@ Ultrix and for SunOS and may still work for them.
   library.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>chr</build><build>cnf</build><build>ems</build><build>hds</build><build>mers</build><build>prm</build><build>sae</build><link>hds</link><link>mers</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
