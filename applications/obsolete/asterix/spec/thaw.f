@@ -16,9 +16,11 @@
 *    Authors :
 *     Trevor Ponman  (BHVAD::TJP)
 *    History :
-*      2 Jul 87: V0.6-1 Original (TJP)
-*     14 Dec 88: V0.6-2 Thaw multiple parameters, allow param resetting (TJP)
-*     20 JUN 89: V1.0-1 ASTERIX88 release (TJP)
+*      2 Jul 87 : V0.6-1 Original (TJP)
+*     14 Dec 88 : V0.6-2 Thaw multiple parameters, allow param resetting (TJP)
+*     20 Jun 89 : V1.0-1 ASTERIX88 release (TJP)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -61,9 +63,11 @@
 	CHARACTER*30 VERSION
 	PARAMETER		(VERSION = 'THAW Version 1.0-1')
 
-*------------------------------------------------------------------------------
+*-
 
 * Version not announced (neater)
+
+        CALL AST_INIT()
 
 * Access and check fit_model object
 	CALL USI_ASSOCI('FIT_MOD','UPDATE',FLOC,INPRIM,STATUS)
@@ -77,7 +81,7 @@
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Get parameter numbers
-	CALL PAR_GET1I('PARAMS',MAXTHAW,PARNO,NTHAW,STATUS)
+	CALL USI_GET1I('PARAMS',MAXTHAW,PARNO,NTHAW,STATUS)
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Check for invalid parameter numbers
@@ -90,7 +94,7 @@
 	ENDDO
 
 * Get values at which thawed parameters are to be set
-	CALL PAR_GET1R('VALS',MAXTHAW,VAL,NVAL,STATUS)
+	CALL USI_GET1R('VALS',MAXTHAW,VAL,NVAL,STATUS)
 	IF(STATUS.EQ.PAR__NULL)THEN
 	  CALL ERR_ANNUL(STATUS)
 	  PVALS=.FALSE.			! Null indicates no resetting of params
@@ -166,5 +170,7 @@ D	    print *,'j: ',j
 	ENDDO
 
 * Exit
- 9000	IF(STATUS.NE.SAI__OK) CALL ERR_REP('EXERR','from THAW',STATUS)
+ 9000   CALL AST_INIT()
+        CALL AST_ERR( STATUS )
+
 	END

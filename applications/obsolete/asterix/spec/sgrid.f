@@ -62,16 +62,17 @@
 *
 *    History :
 *
-*      9 Nov 92 : V1.7-0  Original, derived from SFIT (DJA)
-*      3 Dec 92 : V1.7-1  Corrected calculation of SSCALE in chi-squared
-*                         fitting (DJA)
-*      4 Jan 93 : V1.7-2  Updated quality handling (DJA)
-*      1 Apr 93 : V1.7-3  Add minimum statistic to history (DJA)
-*      7 Apr 93 : V1.7-4  Removed limits on size of axes (DJA)
-*      8 Sep 93 : V1.7-5  Change in behaviour in AUTO mode to handle parameter
-*                         system funnies. Added SPEC_INIT call (DJA)
-*     28 Feb 94 : V1.7-6  Use BIT_ routines to do bit manipulations (DJA)
-*      7 Sep 94 : V1.8-0  Added fit probability option (DJA)
+*      9 Nov 92 : V1.7-0 Original, derived from SFIT (DJA)
+*      3 Dec 92 : V1.7-1 Corrected calculation of SSCALE in chi-squared
+*                        fitting (DJA)
+*      4 Jan 93 : V1.7-2 Updated quality handling (DJA)
+*      1 Apr 93 : V1.7-3 Add minimum statistic to history (DJA)
+*      7 Apr 93 : V1.7-4 Removed limits on size of axes (DJA)
+*      8 Sep 93 : V1.7-5 Change in behaviour in AUTO mode to handle parameter
+*                        system funnies. Added SPEC_INIT call (DJA)
+*     28 Feb 94 : V1.7-6 Use BIT_ routines to do bit manipulations (DJA)
+*      7 Sep 94 : V1.8-0 Added fit probability option (DJA)
+*     24 Nov 94 : V1.8-1 Now use USI for user interface (DJA)
 *
 *    Type definitions :
 *
@@ -81,7 +82,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *
 *    Structure definitions :
@@ -185,7 +185,7 @@
 *    Version :
 *
       CHARACTER*30            VERSION
-	PARAMETER	      ( VERSION='SGRID Version 1.8-0' )
+	PARAMETER	      ( VERSION='SGRID Version 1.8-1' )
 *-
 
 *    Announce version
@@ -199,7 +199,7 @@
       CALL SPEC_INIT( STATUS )
 
 *    Chi-squared or likelihood fitting?
-      CALL PAR_GET0L( 'LIK', LIKSTAT, STATUS )
+      CALL USI_GET0L( 'LIK', LIKSTAT, STATUS )
       CHISTAT=.NOT.LIKSTAT
       IF ( LIKSTAT ) THEN
 	FSTAT = FIT__LOGL
@@ -272,7 +272,7 @@
       CALL SEDIT_LISTPAR( MLOC, NPAR, PCOMP, PPAR, 6, STATUS )
 
 *    Select parameters for grid axes
-      CALL PAR_GET1I( 'PARS', DAT__MXDIM, GPS, NGRIDAX, STATUS )
+      CALL USI_GET1I( 'PARS', DAT__MXDIM, GPS, NGRIDAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check free parameters
@@ -284,11 +284,11 @@
       END IF
 
 *    Get AXISn defaults from errors
-      CALL PAR_GET0L( 'ERR', ERR, STATUS )
+      CALL USI_GET0L( 'ERR', ERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Option for choosing binning characteristics
-      CALL PAR_GET0I( 'OPT', OPTION, STATUS )
+      CALL USI_GET0I( 'OPT', OPTION, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( (OPTION .LT. 1) .OR. (OPTION.GT.3) ) THEN
         STATUS = SAI__ERROR
@@ -332,7 +332,7 @@
           CALL MSG_SETR( 'HI', UB(GPS(I)) )
         END IF
         CALL MSG_MAKE( '^LO:^HI', TEXT, TLEN )
-        CALL PAR_DEF0C( 'AXIS'//PC, TEXT(:TLEN), STATUS )
+        CALL USI_DEF0C( 'AXIS'//PC, TEXT(:TLEN), STATUS )
 
 *      Remind user of units
         IF ( MODEL.UNITS(GPS(I)) .GT. ' ' ) THEN
@@ -347,7 +347,7 @@
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Get # grid values
-        CALL PAR_GET0I( 'NBIN'//PC, GDIMS(I), STATUS )
+        CALL USI_GET0I( 'NBIN'//PC, GDIMS(I), STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( GDIMS(I) .LT. 1 ) THEN
           STATUS = SAI__ERROR
@@ -362,7 +362,7 @@
         ELSE IF ( OPTION .EQ. 2 ) THEN
           LOGARITHMIC = .TRUE.
         ELSE
-          CALL PAR_GET0L( 'LOG'//PC, LOGARITHMIC, STATUS )
+          CALL USI_GET0L( 'LOG'//PC, LOGARITHMIC, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
         END IF
 
@@ -425,7 +425,7 @@
       END DO
 
 *    Get things to be gridded
-      CALL PAR_GET1I( 'GPARS', MXGRID, GPARS, NGRID, STATUS )
+      CALL USI_GET1I( 'GPARS', MXGRID, GPARS, NGRID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check valid
@@ -446,9 +446,9 @@
 
 *    Automatic naming or ask for each one?
       IF ( NGRID .GT. 1 ) THEN
-        CALL PAR_GET0L( 'AUTO', AUTO, STATUS )
+        CALL USI_GET0L( 'AUTO', AUTO, STATUS )
         IF ( AUTO ) THEN
-          CALL PAR_GET0C( 'OUTROOT', ROOT, STATUS )
+          CALL USI_GET0C( 'OUTROOT', ROOT, STATUS )
         END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -472,7 +472,7 @@
 
           IF ( I .EQ. 1 ) THEN
             IF ( NGRID .GT. 1 ) THEN
-              CALL PAR_PROMT( 'OUT', 'Output filename for 1st grid',
+              CALL USI_PROMT( 'OUT', 'Output filename for 1st grid',
      :                                                      STATUS )
             END IF
             CALL USI_ASSOCO( 'OUT', 'BINDS', GLOC(I), STATUS )
@@ -585,9 +585,9 @@
 
 *    Set iteration limits
       IF ( OPTIMISING ) THEN
-        CALL PAR_DEF0I( 'MAX_IT', 30, STATUS )
-        CALL PAR_GET0I( 'MAX_IT', NITMAX, STATUS )
-        CALL PAR_GET0R( 'MINSLOPE', MINSLO, STATUS )
+        CALL USI_DEF0I( 'MAX_IT', 30, STATUS )
+        CALL USI_GET0I( 'MAX_IT', NITMAX, STATUS )
+        CALL USI_GET0R( 'MINSLOPE', MINSLO, STATUS )
         CALL MSG_PRNT( 'There are free non-grid parameters - '/
      :                          /' optimising at each grid point.' )
       ELSE
@@ -614,7 +614,7 @@
       END DO
 
 *    Update the model?
-      CALL PAR_GET0L( 'UPDATE', UP, STATUS )
+      CALL USI_GET0L( 'UPDATE', UP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( UP ) THEN
         CALL MSG_PRNT( '** Updating model spec - do not exit'/
@@ -629,7 +629,7 @@
         IF ( GPARS(I) .EQ. 0 ) THEN
 
 *        Subtract minimum from statistic grid?
-          CALL PAR_GET0L( 'SUBSTAT', SUBSTAT, STATUS )
+          CALL USI_GET0L( 'SUBSTAT', SUBSTAT, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Do subtraction

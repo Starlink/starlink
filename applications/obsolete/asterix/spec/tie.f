@@ -25,6 +25,7 @@
 *    History :
 *
 *     16 Mar 94 : V1.7-0 Original (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -72,7 +73,7 @@
 *    Version :
 *
       CHARACTER*30 		VERSION
-	PARAMETER		(VERSION = 'TIE Version 1.7-0')
+	PARAMETER		(VERSION = 'TIE Version 1.8-0')
 *-
 
 *    Version id
@@ -92,7 +93,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get mode
-      CALL PAR_GET0L( 'ADD', ADD, STATUS )
+      CALL USI_GET0L( 'ADD', ADD, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         ADD = .FALSE.
         CALL ERR_ANNUL( STATUS )
@@ -100,7 +101,7 @@
         GOTO 99
       END IF
       IF ( .NOT. ADD ) THEN
-        CALL PAR_GET0L( 'CANCEL', CANCEL, STATUS )
+        CALL USI_GET0L( 'CANCEL', CANCEL, STATUS )
         IF ( STATUS .EQ. PAR__NULL ) THEN
           CANCEL = .FALSE.
           CALL ERR_ANNUL( STATUS )
@@ -108,7 +109,7 @@
           GOTO 99
         END IF
         IF ( .NOT. CANCEL ) THEN
-          CALL PAR_GET0L( 'SHOW', SHOW, STATUS )
+          CALL USI_GET0L( 'SHOW', SHOW, STATUS )
           IF ( STATUS .EQ. PAR__NULL ) THEN
             SHOW = .FALSE.
             CALL ERR_ANNUL( STATUS )
@@ -150,9 +151,9 @@
 *    Get ties of interest
       IF ( ADD ) THEN
         IF ( THERE ) THEN
-          CALL PAR_DEF0I( 'NUM', NTIE+1, STATUS )
+          CALL USI_DEF0I( 'NUM', NTIE+1, STATUS )
         ELSE
-          CALL PAR_DEF0C( 'NUM', '1', STATUS )
+          CALL USI_DEF0C( 'NUM', '1', STATUS )
         END IF
         CALL PRS_GETLIST( 'NUM', NTIE+1, TIES, NUTIE, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -235,7 +236,7 @@
         CALL DAT_CELL( TLOC, 1, ITIE, TCLOC, STATUS )
 
 *      Get tie info
-        CALL PAR_GET1I( 'PARS', NPAMAX, TPARS, NTPAR, STATUS )
+        CALL USI_GET1I( 'PARS', NPAMAX, TPARS, NTPAR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Remove any existing data

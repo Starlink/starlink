@@ -1,4 +1,4 @@
-*+AST2XSP  -  Converts Asterix spectral files to XSPEC format
+*+ AST2XSP - Converts Asterix spectral files to XSPEC format
        SUBROUTINE AST2XSP(STATUS)
 *    Description :
 *      Program converts an HDS ASTERIX88 spectrum file into a form
@@ -27,15 +27,13 @@
 *     Aug 1992  - fixed a bug in the slicing (LTVAD::RDS)
 *     Apr 1993  - solved a problem which occured when an energy had a
 *                 response in only one PH bin (LTVAD::RDS, XMV::RMJ)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*     <any INCLUDE files containing global constant definitions>
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
 * XSPEC include files to define structures.
 	INCLUDE 'XANADU:[SPECTRAL.INC]PHASF.INC'
@@ -51,7 +49,7 @@
       INTEGER CHR_LEN
         EXTERNAL CHR_LEN
 *    Local constants :
-	INTEGER*4  MAXELS, MAXENR
+	INTEGER  MAXELS, MAXENR
 	PARAMETER (MAXELS=500000, MAXENR=10000)
 *    Local variables :
 	CHARACTER*60  INFILE, OUTPHA, OUTRSP
@@ -62,8 +60,8 @@
 	CHARACTER*40  SNAME,INSTMNT
         CHARACTER*80  STRING
 *     Relate to HDS files.
-	INTEGER*4 EQUINOX, EQFLAG, DIMAXARR
-	INTEGER*4 ENGYARR(MAXELS), CHANARR(MAXELS)
+	INTEGER EQUINOX, EQFLAG, DIMAXARR
+	INTEGER ENGYARR(MAXELS), CHANARR(MAXELS)
 	REAL*8  STRTIME, STPTIME, BTAIDAYS,BTAISECS
 	REAL*4  INTGTIME, PHACNTS(MAXCHAN), CHNSPEC(MAXCHAN)
 	REAL*4  VARPHA(MAXCHAN), BASEAXAR, CHNBNDS(MAXCHAN+1)
@@ -93,14 +91,14 @@
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'AST2XSP version 1.6-3')
+      PARAMETER (VERSION = 'AST2XSP version 1.8-0')
 *-
         IF (STATUS .NE. SAI__OK) RETURN
 *
 *    Initialise:
         CALL MSG_PRNT(VERSION)
 *
-        CALL AST_INIT(STATUS)
+        CALL AST_INIT()
 *
 	IERRSF=0
 	GBEGIN  = '+'
@@ -172,7 +170,7 @@
            CALL MSG_SETI('NSPEC', DIMS(RADIM))
            CALL MSG_PRNT('This file contains ^NSPEC spectra')
 *
-           CALL PAR_GET0I('SLICE', SLICE, STATUS)
+           CALL USI_GET0I('SLICE', SLICE, STATUS)
 *
            IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -772,11 +770,12 @@ c      	print *,ie,resp.e
 *
 999     CONTINUE
 *
-	CALL AST_CLOSE(STATUS)
-*
+	CALL AST_CLOSE()
+        CALL AST_ERR(STATUS)
+
 	END
 
-****************************************************
+
 c	wpkhsf	rashafer	8 March 1985
 *+ AST2XSP_WPKHSF - SF subroutine to write a package header record
 	subroutine AST2XSP_wpkhsf(iunit,pkgtyp,index,nsubs,infoar,

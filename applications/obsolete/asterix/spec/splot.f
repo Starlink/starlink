@@ -180,9 +180,9 @@
 
         IF (MPLOT) THEN
 
-          CALL PAR_GET0R('ELOW',ELOW,STATUS)
-          CALL PAR_GET0R('EUPP',EUPP,STATUS)
-          CALL PAR_GET0I('NCHAN',NCHAN,STATUS)
+          CALL USI_GET0R('ELOW',ELOW,STATUS)
+          CALL USI_GET0R('EUPP',EUPP,STATUS)
+          CALL USI_GET0I('NCHAN',NCHAN,STATUS)
 
         ELSE
 
@@ -326,7 +326,7 @@
 
 
 * Interactive or save mode
-        CALL PAR_GET0L('SAVE',SAVE,STATUS)
+        CALL USI_GET0L('SAVE',SAVE,STATUS)
 
         IF (SAVE) THEN
 * Create file
@@ -338,7 +338,7 @@
 * open device if not already open
           CALL GDV_STATUS(ACTIVE,STATUS)
           IF (.NOT.ACTIVE) THEN
-            CALL PAR_GET0C('DEV',DEV,STATUS)
+            CALL USI_GET0C('DEV',DEV,STATUS)
             CALL GDV_OPEN(DEV,1,1,STATUS)
           ENDIF
         ENDIF
@@ -1007,7 +1007,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
       INCLUDE 'SPLOT_CMN'
@@ -1034,14 +1033,14 @@
 *  get plotting mode
         MODE=' '
         DO WHILE (MODE.EQ.' '.AND.STATUS.EQ.SAI__OK)
-          CALL PAR_DEF0C(PAR,LAST,STATUS)
-          CALL PAR_GET0C(PAR,MODE,STATUS)
+          CALL USI_DEF0C(PAR,LAST,STATUS)
+          CALL USI_GET0C(PAR,MODE,STATUS)
           CALL CHR_UCASE(MODE)
           IF (MODE(:1).EQ.'H'.OR.MODE.EQ.' '.AND.
      :                           STATUS.EQ.SAI__OK) THEN
             CALL SPLOT_PLOTMODE_HELP()
             MODE=' '
-            CALL PAR_CANCL(PAR,STATUS)
+            CALL USI_CANCL(PAR,STATUS)
           ENDIF
         ENDDO
 
@@ -1209,7 +1208,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
       INCLUDE 'SPLOT_CMN'
@@ -1302,7 +1300,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
       INCLUDE 'SPLOT_CMN'
@@ -1409,7 +1406,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
 *    Structure definitions :
@@ -1543,7 +1539,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -1727,7 +1722,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -1851,7 +1845,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -1970,7 +1963,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
       INCLUDE 'SPLOT_CMN'
@@ -2095,7 +2087,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -2252,7 +2243,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
@@ -2375,7 +2365,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -2491,7 +2480,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
 *    Structure definitions :
@@ -2637,7 +2625,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
         INCLUDE 'SPLOT_CMN'
@@ -2774,7 +2761,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Structure definitions :
 *    Import :
@@ -2812,9 +2798,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*    Structure definitions :
 *    Import :
       INTEGER NCHAN
       REAL EL,EU

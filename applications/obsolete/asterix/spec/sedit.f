@@ -28,17 +28,18 @@
 *
 *    History :
 *
-*     18 May 89 : V1.0    Modified from FIT_MODEL (BHVAD::TJP)
-*      3 Jun 89 : V1.1    General tidying-up (PAK)
-*     23 Apr 91 : V2.0    Version for ASTERIX88 (PAK)
-*     23 Oct 92 : V1.7-0  Moved into ASTERIX (DJA)
-*     25 Oct 92 : V1.7-1  SEDIT_LISTPAR changed to make it usable
-*                         from SSHOW (DJA)
-*     23 Aug 93 : V1.7-2  Screen mode added, handles model keys of any
-*                         length. (DJA)
-*     15 Apr 94 : V1.7-3  Reset errors added (DJA)
-*      2 Aug 94 : V1.7-4  Allow Asterix list notation for parameter
-*                         selection. (DJA)
+*     18 May 89 : V1.0   Modified from FIT_MODEL (BHVAD::TJP)
+*      3 Jun 89 : V1.1   General tidying-up (PAK)
+*     23 Apr 91 : V2.0   Version for ASTERIX88 (PAK)
+*     23 Oct 92 : V1.7-0 Moved into ASTERIX (DJA)
+*     25 Oct 92 : V1.7-1 SEDIT_LISTPAR changed to make it usable
+*                        from SSHOW (DJA)
+*     23 Aug 93 : V1.7-2 Screen mode added, handles model keys of any
+*                        length. (DJA)
+*     15 Apr 94 : V1.7-3 Reset errors added (DJA)
+*      2 Aug 94 : V1.7-4 Allow Asterix list notation for parameter
+*                        selection. (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -54,7 +55,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Status :
 *
@@ -88,7 +89,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 1.7-4' )
+        PARAMETER               ( VERSION = 'SEDIT Version 1.8-0' )
 *-
 
 *    Check status
@@ -104,8 +105,8 @@
 
 *      Object doesn't exist - Create it
         CALL ERR_ANNUL(STATUS)
-	CALL DAT_CREAT('FIT_MOD','FIT_MODEL',0,0,STATUS)
-        CALL DAT_ASSOC('FIT_MOD','WRITE',FLOC,STATUS)
+	CALL USI_DCREAT('FIT_MOD','FIT_MODEL',0,0,STATUS)
+        CALL USI_DASSOC('FIT_MOD','WRITE',FLOC,STATUS)
         CALL DAT_NEWC(FLOC,'SPEC',80,0,0,STATUS)
         CALL DAT_NEWC(FLOC,'POLISH',80,0,0,STATUS)
         CALL DAT_NEW(FLOC,'NCOMP','_INTEGER',0,0,STATUS)
@@ -125,7 +126,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Screen mode?
-      CALL PAR_GET0L( 'SCREEN', SCREEN, STATUS )
+      CALL USI_GET0L( 'SCREEN', SCREEN, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    SEDIT needs a screen which is at least 132 columns
@@ -204,8 +205,8 @@
            CALL TSM_RDCH( W_BIG, IOPT, STATUS )
            IF ( IOPT .LT. 255 ) OPTION = CHAR(IOPT)
          ELSE
-           CALL PAR_GET0C('OPTION',OPTION,STATUS)
-           CALL PAR_CANCL('OPTION',STATUS)
+           CALL USI_GET0C('OPTION',OPTION,STATUS)
+           CALL USI_CANCL('OPTION',STATUS)
            IOPT = ICHAR(OPTION(1:1))
          END IF
 
@@ -334,7 +335,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Import :
 *
@@ -373,7 +374,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Delete old model if found :
-      CALL DAT_ASSOC( 'FIT_MOD', 'WRITE', FLOC, STATUS )
+      CALL USI_DASSOC( 'FIT_MOD', 'WRITE', FLOC, STATUS )
       CALL DAT_THERE( FLOC, 'PMODEL', THERE, STATUS )
       IF ( THERE ) THEN
         CALL DAT_ERASE( FLOC, 'PMODEL', STATUS )
@@ -381,9 +382,9 @@
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Get genus from user
-      CALL PAR_DEF0C( 'GENUS', 'SPEC', STATUS )
-      CALL PAR_GET0C( 'GENUS', GENUS, STATUS )
-      CALL PAR_CANCL( 'GENUS', STATUS )
+      CALL USI_DEF0C( 'GENUS', 'SPEC', STATUS )
+      CALL USI_GET0C( 'GENUS', GENUS, STATUS )
+      CALL USI_CANCL( 'GENUS', STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Display menu and enter new model
@@ -396,8 +397,8 @@
         CALL TSM_RDSTR( W_BIG, MODSPEC, STATUS )
       ELSE
         CALL FIT_MENU( GENUS, NCIMP, MENU, STATUS )
-        CALL PAR_GET0C('MODEL_SPEC',MODSPEC,STATUS)
-        CALL PAR_CANCL('MODEL_SPEC',STATUS)
+        CALL USI_GET0C('MODEL_SPEC',MODSPEC,STATUS)
+        CALL USI_CANCL('MODEL_SPEC',STATUS)
       END IF
       IF (STATUS.NE.SAI__OK) GOTO 99
 
@@ -443,7 +444,7 @@
 	       CALL ERR_REP('UNREC_MOD','Unrecognised model component ^UMOD',
      :         STATUS)
 	       CALL ERR_FLUSH(STATUS)
-	       CALL PAR_CANCL('MODEL_SPEC',STATUS)
+	       CALL USI_CANCL('MODEL_SPEC',STATUS)
                GOTO 99
             END IF
          END IF
@@ -453,7 +454,7 @@
       IF (NLB.NE.NRB.OR.NMCOMP.NE.NOP+1) THEN
         CALL ERR_REP('BAD_SYN','Bad model syntax',STATUS)
         CALL ERR_FLUSH(STATUS)
-        CALL PAR_CANCL('MODEL_SPEC',STATUS)
+        CALL USI_CANCL('MODEL_SPEC',STATUS)
         GOTO 99
       END IF
 
@@ -463,7 +464,7 @@
 
 *    Write components to fit_model object :
       CALL DAT_NEW(FLOC,'PMODEL','PRIM_MODEL',1,NMCOMP,STATUS)
-      CALL DAT_ASSOC('FIT_MOD','UPDATE',FLOC,STATUS)
+      CALL USI_DASSOC('FIT_MOD','UPDATE',FLOC,STATUS)
       CALL CMP_PUT0C(FLOC,'SPEC',MODSPEC,STATUS)
       CALL CMP_PUT0C(FLOC,'POLISH',POLISH,STATUS)
       CALL CMP_PUT0I(FLOC,'NCOMP',NMCOMP,STATUS)
@@ -518,8 +519,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get parameter number and locate it :
-      CALL PAR_GET0I('PAR',PARNO,STATUS)
-      CALL PAR_CANCL('PAR',STATUS)
+      CALL USI_GET0I('PAR',PARNO,STATUS)
+      CALL USI_CANCL('PAR',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 99
       IF ( (PARNO.GT.PARTOT) .OR. (PARNO.LT.1) ) THEN
         CALL MSG_SETI ('NUM',PARNO)
@@ -688,7 +689,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Import :
 *
@@ -881,7 +882,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Status :
 *
@@ -930,7 +931,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Status :
 *
@@ -1005,7 +1006,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Status :
 *
@@ -1092,10 +1093,10 @@
       CALL PRS_GETLIST( 'PARS', PARTOT, IP, N, STATUS )
       IF (STATUS.NE.SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL PAR_CANCL ('PARS',STATUS)
+        CALL USI_CANCL ('PARS',STATUS)
         GOTO 99
       END IF
-      CALL PAR_CANCL ('PARS',STATUS)
+      CALL USI_CANCL ('PARS',STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 99
 
 *    Get locator to pmodels :
@@ -1180,10 +1181,10 @@
       CALL PRS_GETLIST( 'PARS', PARTOT, IP, N, STATUS )
       IF (STATUS.NE.SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL PAR_CANCL ('PARS',STATUS)
+        CALL USI_CANCL ('PARS',STATUS)
         GOTO 99
       END IF
-      CALL PAR_CANCL ('PARS',STATUS)
+      CALL USI_CANCL ('PARS',STATUS)
 
 *    Get locator to pmodels :
       CALL DAT_FIND(FLOC,'PMODEL',MLOC,STATUS)
@@ -1285,9 +1286,9 @@
       DO WHILE ( .NOT. OK )
 
 *      Get input string :
-        CALL PAR_DEF0C('VALUES','none',STATUS)
-        CALL PAR_GET0C('VALUES',STRING,STATUS)
-        CALL PAR_CANCL('VALUES',STATUS)
+        CALL USI_DEF0C('VALUES','none',STATUS)
+        CALL USI_GET0C('VALUES',STRING,STATUS)
+        CALL USI_CANCL('VALUES',STATUS)
         IF (STATUS.NE.SAI__OK) GOTO 99
 
 *      Check for default values taken :
@@ -1423,7 +1424,7 @@
 *
 *    Global variables :
 *
-      INCLUDE 'SPECLIB(SEDIT_CMN)'
+      INCLUDE 'SEDIT_CMN'
 *
 *    Import :
 *

@@ -16,9 +16,10 @@
 *    Authors :
 *     Trevor Ponman  (BHVAD::TJP)
 *    History :
-*      2 Jul 87: V0.6-1 Original (TJP)
-*     14 Dec 88: V0.6-2 Freeze multiple parameters, allow param resetting (TJP)
-*     20 Jun 89: V1.0-1 ASTERIX88 initial release (TJP)
+*      2 Jul 87 : V0.6-1 Original (TJP)
+*     14 Dec 88 : V0.6-2 Freeze multiple parameters, allow param resetting (TJP)
+*     20 Jun 89 : V1.0-1 ASTERIX88 initial release (TJP)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -59,11 +60,10 @@
 *    Local data :
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'FREEZE Version 1.0-1')
+	PARAMETER		(VERSION = 'FREEZE Version 1.8-0')
+*-
 
-*------------------------------------------------------------------------------
-
-* Version not announced (neater)
+        CALL AST_INIT()
 
 * Access and check fit_model object
 	CALL USI_ASSOCI('FIT_MOD','UPDATE',FLOC,INPRIM,STATUS)
@@ -166,5 +166,7 @@ D	    print *,'j: ',j
 	ENDDO
 
 * Exit
- 9000	IF(STATUS.NE.SAI__OK) CALL ERR_REP('EXERR','from FREEZE',STATUS)
+ 9000   CALL AST_CLOSE()
+	CALL AST_ERR( STATUS )
+
 	END
