@@ -1,0 +1,6 @@
+HDSPACK.pm
+Makefile.PL
+MANIFEST
+testhds.sdf
+t/copobj.t
+t/delobj.t
