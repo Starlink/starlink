@@ -239,12 +239,12 @@ INTERFACE SGRID
    ENDPARAMETER
 
    PARAMETER MCTRL
-      TYPE 'CHAR'
-      DEFAULT !
+      TYPE '_LOGICAL'
+      DEFAULT FALSE
       VPATH 'CURRENT,DEFAULT'
       PPATH 'CURRENT,DEFAULT'
-      PROMPT 'Minimisation control file'
-      HELP 'Name of minimisation control file, or ! for defaults'
+      PROMPT 'Genetic fitting?'
+      HELP 'Minimisation control files no longer exist'
    ENDPARAMETER
 
    PARAMETER OPT
