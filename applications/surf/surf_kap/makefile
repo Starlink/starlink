@@ -37,21 +37,14 @@ FSOURCES= gethlp.f gthlpi.f pthlpo.f sread.f ctm_xcols.f \
 	kpg1_aslog.f kpg1_rdast.f kpg1_wrast.f kpg1_plcip.f \
 	kpg1_h2ast.f kpg1_ast2h.f kpg1_nmcol.f kpg1_pgsht.f \
 	kpg1_pgsty.f \
-	lpg_assoc.f  lpg_state.f lpg1_init.f lpg1_ptpar.f \
-	ndg_assoc.f ndg_asso1.f ndg_ptsup.f ndg_ndfas.f \
-	ndg1_asexp.f ndg_setsz.f ndg_gtsup.f ndg1_ndfch.f \
-	ndg1_gtyps.f ndg1_expan.f ndg1_appen.f ndg1_fpars.f \
-	ndg1_hfind.f ndg1_lasto.f ndg1_sdfex.f ndg1_sort.f \
-	ndg1_match.f ndg1_hsplt.f ndg1_fparx.f ndg1_hcut.f \
-	ndg1_chscn.f ndg1_subst.f ndg1_pshde.f ndg1_pshdf.f \
-	ndg1_pshdb.f
+	lpg_assoc.f  lpg_state.f lpg1_init.f lpg1_ptpar.f
 
 #	kpg1_agfnd.f  kpg1_asref.f  kpg1_macol.f  kpg1_qidat.f \
 #	kpg1_agatc.f  kpg1_agref.f  kpg1_ivci.f   kpg1_qcol.f \
 #	kpg1_hmsg.f kpg1_palci.f kpg1_scrsz.f \
 #	kpg1_nmcol.f
 
-CSOURCES= kpg1_trmsz.c grf_kappa.c lpg1_rm.c ndg1_wild.c
+CSOURCES= kpg1_trmsz.c grf_kappa.c lpg1_rm.c
 
 
 OBJS = ${FSOURCES:.f=.o}
@@ -107,10 +100,8 @@ CTM_PAR:     ctm_par;                 $(LINK) $? $@
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 KPG_AST:     kpg_ast;                 $(LINK) $? $@
 KPG_PAR:     kpg_par;                 $(LINK) $? $@
-NDG_ERR:     ndg_err;                 $(LINK) $? $@
-NDG_CONST:     ndg_const;                 $(LINK) $? $@
 LPG_COM:     lpg_com;                 $(LINK) $? $@
-LPG_CONST:     lpg_const;                 $(LINK) $? $@
+LPG_CONST:   lpg_const;                 $(LINK) $? $@
 
 SAE_PAR:     $(STAR_INC)/sae_par;     $(LINK) $? $@
 DAT_PAR:     $(STAR_INC)/dat_par;     $(LINK) $? $@
@@ -128,6 +119,7 @@ GRP_ERR:     $(STAR_INC)/grp_err;     $(LINK) $? $@
 AGI_PAR:     $(STAR_INC)/agi_par;     $(LINK) $? $@
 PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
 NDF_ERR:     $(STAR_INC)/ndf_err;     $(LINK) $? $@
+NDG_ERR:     $(STAR_INC)/ndg_err;     $(LINK) $? $@
 SUBPAR_PAR:     $(STAR_INC)/subpar_par;     $(LINK) $? $@
 
 ctm_xcols.o: CTM_PAR

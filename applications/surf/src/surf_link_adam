@@ -61,6 +61,8 @@
 #        Remove IRAS90 dependency
 #     2000 June 2 (TJ)
 #	 Remove SGS dependency.
+#     2000 August 21 (TJ)
+#        Add NDG
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -72,7 +74,7 @@
       echo -L/star/lib `ndf_link_adam` `fio_link_adam` \
            `sla_link_adam` `hlp_link_adam` `pda_link_adam` \
            `prm_link_adam` `agi_link_adam` \
-           `pgp_link_adam` `grp_link_adam` \
+           `pgp_link_adam` `grp_link_adam` `ndg_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
