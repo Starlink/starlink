@@ -413,9 +413,10 @@ F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE) \
 
 F_SUB1 = ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
 ndg1_expan.f ndg1_lasto.f ndg1_pshdf.f ndg_creat.f ndg1_fparx.f \
-ndg1_match.f ndg1_sdfex.f ndg_crexp.f ndg1_hcut.f ndg1_mspec.f \
-ndg1_subst.f ndg_delet.f ndg1_hfind.f ndg1_ndfch.f ndg_annul.f \
-ndg_ndfas.f ndg1_hspec.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f
+ndg1_appen.f ndg_crexp.f ndg1_hcut.f \
+ndg_delet.f ndg1_hfind.f ndg1_ndfch.f ndg_annul.f \
+ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f ndg_ndfcr.f \
+ndg1_sdfex.f ndg1_ndfdl.f
 
 F_SUB2 =  \
 ccd1_asfio.f ccd1_cfgrp.f ccd1_cmprr.f ccd1_ftgrp.f ccd1_hvcon.f \
@@ -1440,17 +1441,14 @@ ndg1_chscn.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_expan.o:	 SAE_PAR GRP_PAR DAT_PAR NDG_CONST NDG_ERR
 ndg1_hcut.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_hfind.o:	 SAE_PAR DAT_PAR NDF_ERR
-ndg1_hspec.o:	 SAE_PAR GRP_PAR
+ndg1_hcopy.o:	 SAE_PAR DAT_PAR
 ndg1_hsplt.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_lasto.o:	 SAE_PAR
-ndg1_match.o:	 SAE_PAR GRP_PAR NDG_CONST
-ndg1_mspec.o:	 SAE_PAR GRP_PAR
 ndg1_ndfch.o:	 SAE_PAR GRP_PAR NDG_CONST NDG_ERR PSX_ERR
 ndg1_pshdb.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshde.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_pshdf.o:	 SAE_PAR DAT_PAR NDF_ERR
 ndg1_sdfex.o:	 SAE_PAR GRP_PAR DAT_PAR
-ndg1_subst.o:	 SAE_PAR
 ndg_asexp.o:	 SAE_PAR NDG_CONST NDG_ERR GRP_PAR
 ndg_assoc.o:	 SAE_PAR GRP_PAR GRP_ERR PAR_ERR NDG_ERR
 ndg_creat.o:	 SAE_PAR GRP_PAR PAR_ERR
