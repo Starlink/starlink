@@ -2,7 +2,6 @@ Interface CROSSPEC
    Parameter    INP1
       position    1
       type        'UNIV'
-      keyword     'INP1'
       prompt      'Enter name of first input object'
       help        '1 dimensional dataset or primitive object'
    EndParameter
@@ -10,7 +9,6 @@ Interface CROSSPEC
    Parameter    INP2
       position    2
       type        'UNIV'
-      keyword     'INP2'
       prompt      'Enter name of second input object'
       help        '1 dimensional dataset or primitive object'
    EndParameter
@@ -18,39 +16,34 @@ Interface CROSSPEC
    Parameter    OUT
       position    3
       type        'UNIV'
-      keyword     'OUT'
       association '->GLOBAL.GRAFDS'
       prompt      'Output dataset'
    EndParameter
 
-   Parameter    WINDOW_SIGMA
+   Parameter    SIGMA
       position    4
-      keyword     'SIGMA'
       type        '_INTEGER'
       prompt      'Enter sigma for smoothing Gaussian (in output bins)'
       help        'Smoothing reduces the variance, but introduces bias. 0 = no smoothing'
    EndParameter
 
-   Parameter    ALIGNMENT_SHIFT
+   Parameter    SHIFT
       position    5
-      keyword     'SHIFT'
       type        '_INTEGER'
       prompt      'Alignment shift (in output bins)'
       help        'Moves first input to the right relative to the second if +ve'
    EndParameter
 
-   Parameter    TAPER_DATA
+   Parameter    TAPER
       type        '_LOGICAL'
-      keyword     'TAPER'
       vpath       'DEFAULT'
       default     Y
       prompt      'Do you require the end of the data to be tapered? (Y/N)'
       help        'Tapering reduces "leakage" in the power spectrum'
    EndParameter
 
-   Parameter    TAPER_SIZE
+   Parameter    FRAC
       type        '_REAL'
-      keyword     'FRAC'
       vpath       'DEFAULT'
       default     0.2
       prompt      'What fraction of the data do you want tapered?'
