@@ -10,7 +10,7 @@ SHELL        = /bin/sh
 FILES        = \
  Batch.tcl ETable.tcl FileSelect.tcl Gaia.tcl GaiaApPhotom.tcl \
  GaiaArd.tcl GaiaAstCopy.tcl GaiaAstDefine.tcl GaiaAstGrid.tcl \
- GaiaAstReference.tcl GaiaAstRefine.tcl GaiaAstSystem.tcl \
+ GaiaAstReference.tcl GaiaAstRefine.tcl GaiaAstSystem.tcl GaiaAstDomain.tcl \
  GaiaAstTable.tcl GaiaAstTransfer.tcl GaiaAstTransferTable.tcl \
  GaiaAstTransform.tcl GaiaContour.tcl GaiaConvertTable.tcl GaiaDemo.tcl \
  GaiaEsp.tcl GaiaEspSelectList.tcl GaiaEspSelectListEditor.tcl \
@@ -41,7 +41,7 @@ FILES        = \
  gaia_version.tcl graphics_features.tcl \
  Catalogue.hlp Gaia.hlp GaiaApPhotom.hlp GaiaArd.hlp GaiaAst.hlp \
  GaiaAstCopy.hlp GaiaAstDefine.hlp GaiaAstGrid.hlp GaiaAstReference.hlp \
- GaiaAstRefine.hlp GaiaAstSystem.hlp GaiaAstTransfer.hlp \
+ GaiaAstRefine.hlp GaiaAstSystem.hlp GaiaAstDomain.hlp GaiaAstTransfer.hlp \
  GaiaAstTransform.hlp GaiaContour.hlp GaiaEsp.hlp GaiaOptPhotom.hlp \
  GaiaPatch.hlp GaiaPositions.hlp GaiaSearch.hlp GaiaSextractor.hlp \
  GaiaTextImport.hlp GaiaXYProfile.hlp StarBlink.hlp \

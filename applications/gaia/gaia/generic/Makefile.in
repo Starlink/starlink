@@ -188,7 +188,7 @@ rtd1_aqual.o: SAE_PAR
 rtd1_ardst.o: GRP_PAR MSG_PAR PRM_PAR SAE_PAR
 rtd1_cenx.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 rtd1_chead.o: SAE_PAR
-rtd1_crfit.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR
+rtd1_crfit.o: DAT_PAR NDF_PAR PRM_PAR SAE_PAR AST_PAR
 rtd1_dewcs.o: AST_PAR SAE_PAR
 rtd1_dofilx.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 rtd1_dofit.o: PRM_PAR SAE_PAR
