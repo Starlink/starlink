@@ -46,6 +46,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1997/11/19 02:24:36  timj
+*     Fix calculation of Azimuth.
+*
 *     Revision 1.1  1997/11/04 23:20:48  timj
 *     Initial revision
 *
@@ -76,6 +79,7 @@
       PARAMETER       (LAT_OBS = 3.46026051751D-1)
 
 *  Local Variables:
+      DOUBLE PRECISION COS_LONG             ! cos(az)
       DOUBLE PRECISION DEC_2000             ! Declination (J2000)
       DOUBLE PRECISION HA                   ! Hour angle
       DOUBLE PRECISION PM1                  ! Proper motion
@@ -132,15 +136,15 @@
 
          LAT = ASIN(SIN_LAT)
 
-*     This is probably incorrect (given that AZ can go 0 to 360)
-         IF (ABS(COS(LAT)) .GT. 1.0E-20) THEN
+*     Calculate the Az from COS and SIN
+*     Ignore the cosE term since it is on the denominator of
+*     both expressions
 
-            SIN_LONG = - COS(DEC_APP) * SIN(HA) / COS(LAT)
-            LONG = ASIN(SIN_LONG)
+         SIN_LONG = -COS(DEC_APP) * SIN(HA)
+         COS_LONG = (SIN(DEC_APP) - SIN(LAT_OBS) * SIN_LAT)
+     :        / COS(LAT_OBS)
 
-         ELSE
-            LONG = 0.0D0
-         END IF
+         LONG = ATAN2(SIN_LONG, COS_LONG)
 
       ELSE IF (OUT_COORDS .EQ. 'HA') THEN
 
