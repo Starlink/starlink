@@ -429,7 +429,7 @@ C For the time
 		  END IF
                   IC = IC + 1
 		  GOTO 2
-  
+
 	       END IF
  
 *            Take next century into account.
@@ -494,6 +494,7 @@ C For the time
      :            .OR. S.LT.0.0D0 .OR. S.GE.60.D0) THEN            
 		  CALL MSG_OUT(' ',
      :            'ERROR INTERPRETING TIME',STATUS)
+                  IC = IC + 1
 		  GOTO 3
 	       END IF
 
