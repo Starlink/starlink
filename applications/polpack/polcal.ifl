@@ -31,7 +31,7 @@ interface POLCAL
       helpkey  '*'
    endparameter
 
-   parameter MODE
+   parameter PMODE
       type     LITERAL
       access   READ
       vpath    'CURRENT, DEFAULT'
@@ -54,7 +54,7 @@ interface POLCAL
       access   READ
       vpath    'DEFAULT '
       ppath    'DEFAULT '
-      default  YES
+      default  !
       prompt   'Are variance values to be generated?'
       helpkey  '*'
    endparameter

@@ -71,6 +71,7 @@
 *           RAY?        PPCKRAY 
 *           ROTATION?   PPCKROT 
 *           YROTATION?  PPCKYROT
+*           STOKES?     PPCKSTOK
 *        [!]
 
 *  Table Format:
@@ -219,12 +220,20 @@
 *        identifies which ray the image is derived from, and can take the 
 *        two values "O" and "E" (upper case). Left undefined by default.
 *
-*        ROTATION (_REAL): This item should only be specified in the 
+*        ROTATION (_REAL):  This item should only be specified in the 
 *        control table if the images being imported are partially processed 
 *        images which have already been aligned. It is the clockwise 
 *        rotation introduced into the image in order to align it with other 
 *        images, in degrees. Left undefined by default.
 *
+*        STOKES (_CHAR):  This item should only be specified in the 
+*        control table if the images being imported are partially processed 
+*        images containing Stokes parameters. It is a string containing one 
+*        character for each plane in the data array of the NDF. Each 
+*        character identifies the quantity stored in the corresponding plane 
+*        of the data array, and will be one of I, Q, U or V. Left
+*        undefined by default.
+*        
 *        WPLATE (_CHAR):  The wave-plate position, in degrees. Must be one 
 *        of; "0.0", "22.5", "45.0", "67.5". There is no default (an error 
 *        is reported if no value is supplied).

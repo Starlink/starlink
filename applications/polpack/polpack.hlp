@@ -622,6 +622,12 @@ LOGFILE = LITERAL (Read)
    output (usually the screen). If a null (!) value is supplied, then
    no log file will be created. Note, this parameter cannot be set
    from the GUI's "Options" menu. [!]
+3 MODE
+MODE = LITERAL (Update)
+   The type of polarisation being measured; Linear or Circular. This 
+   parameter is only accessed if an output cube holding Stokes
+   parameters is being created (i.e. if OUT_S is not given a null (!) 
+   value). [Linear]
 3 NEWCOLMAP
 NEWCOLMAP = _LOGICAL (Read)
    If a true value is supplied for NEWCOLMAP, then the GUI will use

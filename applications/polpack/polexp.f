@@ -57,6 +57,7 @@
 *           PPCKRAY   (RAY)
 *           PPCKROT   (ROTATION)
 *           PPCKYROT  (YROTATION)
+*           PPCKSTOK  (STOKES)
 
 *  Examples:
 *     POLEXP in=^names.lis
@@ -91,7 +92,7 @@
 
 *  Local Constants:
       INTEGER NITEM              ! The number of POLPACK extension items
-      PARAMETER( NITEM = 7 )
+      PARAMETER( NITEM = 8 )
 
 *  Local Variables:
       CHARACTER CARD*80                    ! A FITS header card
@@ -119,10 +120,10 @@
       LOGICAL THERE              ! Does FITS extension exist?
 
       DATA FTNAM / 'PPCKANGR', 'PPCKFILT', 'PPCKIMID', 'PPCKWPLT', 
-     :             'PPCKRAY',  'PPCKROT',  'PPCKYROT' /,
+     :             'PPCKRAY',  'PPCKROT',  'PPCKYROT', 'PPCKSTOK' /,
 
      :     ITNAM / 'ANGROT',   'FILTER',   'IMGID',    'WPLATE', 
-     :             'RAY',      'ROTATION', 'YROTATION'/,
+     :             'RAY',      'ROTATION', 'YROTATION', 'STOKES' /,
 
      :     COMMNT / 'POLPACK: X-axis -> analyser angle (degs)',
      :              'POLPACK: Filter',
@@ -130,7 +131,8 @@
      :              'POLPACK: Waveplate position (degs)',
      :              'POLPACK: Ray (O or E)',
      :              'POLPACK: Rotation of X image axis (degs)',
-     :              'POLPACK: Rotation of Y image axis (degs)'/
+     :              'POLPACK: Rotation of Y image axis (degs)',
+     :              'POLPACK: Identifiers for planes of data'/
 
 *.
 

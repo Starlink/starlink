@@ -1658,12 +1658,12 @@ proc CreateMask {image object} {
 #
 #  Purpose:
 #    This procedure creates a default mask for the supplied image and
-#    ray if it does not already have a mask. A search is made for an
-#    image for which the required mask is defined. If found, the first
-#    such mask is returned. If not found, a search is made for an image
-#    for which the other mask is defined AND which has an OE mapping.
-#    If found, the mapping is used to transform the mask, and the mapped
-#    mask is returned.
+#    ray if it does not already have a mask. A search is made for an image
+#    for which the other mask is defined AND which has an OE mapping,
+#    checking the currently displayed image first. If found, the mapping 
+#    is used to transform the mask, and the mapped mask is returned. If 
+#    not found, a search is made for an image for which the required mask 
+#    is defined. If found, the first such mask is returned. 
 #
 #  Arguments:
 #    image
@@ -1687,6 +1687,7 @@ proc CreateMask {image object} {
 #        is a list of pixel X coordinates. 
 #-
    global E_RAY_MASK
+   global IMAGE_DISP
    global IMAGES
    global O_RAY_MASK
    global OBJTYPE
@@ -1715,28 +1716,40 @@ proc CreateMask {image object} {
          set inv 1
       }
 
-# Search for an image with a mask of the same type. Copy the first
-# one found.
-      foreach im $IMAGES {
-         if { [llength $PNTPX($im,$object)] > 0 } {
-            TranPXY "ref" 0 $im $object $image $object
-            set ok 1
-            break
-         } 
+# Search for an image with a mask of the other type AND an OE mapping. Map 
+# the first such mask found. Check the current image first, and then do all
+# the other images.
+      set map [OEMapping $IMAGE_DISP]
+      if { $map != "" && [llength $PNTPX($IMAGE_DISP,$other)] > 0 } {
+         TranPXY $map $inv $IMAGE_DISP $other $image $object
+         set ok 1
+
+      } {
+
+         foreach im $IMAGES {
+            if { $im != $IMAGE_DISP } { 
+               set map [OEMapping $im]
+               if { $map != "" && [llength $PNTPX($im,$other)] > 0 } {
+                  TranPXY $map $inv $im $other $image $object
+                  set ok 1
+                  break
+               }
+            }
+         }
+
       }
 
 # If no usable mask was found...
       if { !$ok } {
 
-# Search for an image with a mask of the other type AND an OE mapping. Map 
-# the first such mask found.
+# Search for an image with a mask of the same type. Copy the first
+# one found.
          foreach im $IMAGES {
-            set map [OEMapping $im]
-            if { $map != "" && [llength $PNTPX($im,$other)] > 0 } {
-               TranPXY $map $inv $im $other $image $object
+            if { [llength $PNTPX($im,$object)] > 0 } {
+                TranPXY "ref" 0 $im $object $image $object
                set ok 1
                break
-            }
+            } 
          }
       }
 
@@ -1812,7 +1825,7 @@ proc CreateSky {image object} {
          set inv 1
       }
 
-# Create a list of images to seacrh for a sky area. Start with the
+# Create a list of images to search for a sky area. Start with the
 # previously displayed image (if any).
       if { [info exists IMAGE_PREV] && $IMAGE_PREV != "" } {
          set imlist "$IMAGE_PREV $IMAGES"
@@ -1820,9 +1833,20 @@ proc CreateSky {image object} {
          set imlist "$IMAGES"
       }
 
-# If the current image has an image mapping...
+# If the supplied image has the other sky area, and also has an OE mapping,
+# transform the supplied image's other sky area.
+      if { $other != "" && [llength $PNTPX($image,$other)] > 0 } {
+         set map [OEMapping $image]
+         if { $map != "" } {
+            TranPXY $map $inv $image $other $image $object
+            set ok 1
+         }
+      }
+
+# If the sky area has not yet been created, and if the current image has an 
+# image mapping...
       set map0 [ImageMapping $image]
-      if { $map0 != "" } {
+      if { !$ok && $map0 != "" } {
 
 # ... search for an image which has the required sky area, and an image 
 # mapping. The previously displayed image is checked first.
@@ -1838,16 +1862,6 @@ proc CreateSky {image object} {
                   break
                }
             }
-         }
-      }
-
-# If no suitable image was found, transform the supplied image's other sky 
-# area (if it exists - and if an OE mapping is available).
-      if { !$ok && $other != "" && [llength $PNTPX($image,$other)] > 0 } {
-         set map [OEMapping $image]
-         if { $map != "" } {
-            TranPXY $map $inv $image $other $image $object
-            set ok 1
          }
       }
 
@@ -7522,6 +7536,7 @@ proc LoadOptions {} {
    global ATASK_OEFIT
    global ATASK_PHI
    global ATASK_PLO
+   global ATASK_POLMODE
    global ATASK_PSF
    global ATASK_REFCOL
    global ATASK_SAREA
@@ -7545,6 +7560,7 @@ proc LoadOptions {} {
    global OEFITTYPE
    global PHI_REQ
    global PLO_REQ
+   global POLMODE
    global PSF_SIZE
    global REFCOL
    global SAREA
@@ -7553,6 +7569,7 @@ proc LoadOptions {} {
    global SI_VARS
    global SKYOFF               
    global SKYPAR
+   global STOKES
    global VIEW
    global XHAIR
    global XHRCOL
@@ -7679,6 +7696,21 @@ proc LoadOptions {} {
       set ATASK 1
    } {
       set FITTYPE $MAPTYPE(1)
+   }
+
+   if { $STOKES } {
+      if { [info exists ATASK_POLMODE] } {
+         if { [string toupper $ATASK_POLMODE] == "LINEAR" } {
+            set POLMODE Linear
+         } {
+            set POLMODE Circular
+         }
+         set ATASK 1
+      } {
+         set POLMODE Linear
+      }
+   } {
+      set POLMODE "<none>"
    }
 
 # In single-beam mode, there are no O-E mappings, and so OEFITTYPE is not
@@ -8030,8 +8062,11 @@ proc MapRefs {px_name py_name} {
 
 # Get the mapping from the reference image to the first image. Masks are
 # assumed to be aligned in all images, so use a unit ("ref") mapping if
-# we are drawing a reference mask.
-   if { $ref_mask } {
+# we are drawing a reference mask. If the current and reference images
+# are the same, we do not need to go via the first image. In this case
+# pretend that the first image is the reference image (i.e. use a unit
+# mapping).
+   if { $ref_mask || $REFIM_REQ == $IMAGE_DISP } {
       set m2 "ref"
    } {
       set m2 [ImageMapping $REFIM_REQ]
@@ -8041,8 +8076,10 @@ proc MapRefs {px_name py_name} {
 # reference frame (E or O) to the O-ray frame of the first image.
    set m21 [ConcMap $m1 0 $m2 0]
 
-# Get the mapping from the current image to the first image.
-   if { $ref_mask } {
+# Get the mapping from the current image to the first image. If the 
+# current and reference images are the same, pretend the first image is
+# the reference image.
+   if { $ref_mask || $REFIM_REQ == $IMAGE_DISP } {
       set m3 "ref"
    } {
       set m3 [ImageMapping $IMAGE_DISP]
@@ -10043,6 +10080,9 @@ proc Save {} {
 #     PNTPY (Read)
 #        A 2-d array indexed by image and object type. Each element
 #        is a list of pixel Y coordinates. 
+#     POLMODE (Read)
+#        'Linear' or 'Circular'; indicates the type of polarisation for
+#        which Stokes parameters should be created.
 #     RESAVE (Read and Write)
 #        Set to zero if the the mappings and masks have not changed since
 #        the last time the output images were saved. Set to a non-zero
@@ -10088,6 +10128,7 @@ proc Save {} {
    global PNTNXT
    global PNTPX 
    global PNTPY
+   global POLMODE
    global POLPACK_DIR
    global POLY
    global RESAVE
@@ -10172,10 +10213,10 @@ proc Save {} {
 
          if { $STOKES } {
             set stok [frame $topf.stok -background $back]
-            pack $stok -side top -padx 5m -pady 2m
+            pack $stok -side top -padx 5m -pady 2m -fill x -expand 1
             set stoklb [label $stok.lb -text "Producing Stokes parameters:" \
-                                       -anchor w -background $back]
-            pack $stoklb -side left -padx 2m -fill x
+                                   -justify left -anchor w -background $back]
+            pack $stoklb -side left -padx 2m
             set stoktick [label $stok.tick -foreground $back \
                                  -background $back -bitmap @$POLPACK_DIR/tick.bit]
             pack $stoktick -side right
@@ -10594,16 +10635,15 @@ proc Save {} {
          close $intfiles_id
 
 # If required calculate Stokes parameters.
-         if { $STOKES } {
+         if { $ok && $STOKES } {
 
 # Highlight the "Producing Stokes parameters" label in red.
             Wop $stoklb configure -foreground red
             update idletasks
 
 #  Create the Stokes cube.
-            if { ![Obey polpack polcal "in=^$intfiles mode=$POLMODE out=$STKOUT"] } {
+            if { ![Obey polpack polcal "in=^$intfiles pmode=$POLMODE out=$STKOUT"] } {
                set ok 0
-               break
             }
 
 # Make the "Producing Stokes parameters" label (and associated tick mark) in 
@@ -10698,13 +10738,14 @@ proc SaveOptions {} {
    global ATASK_OEFIT
    global ATASK_PHI
    global ATASK_PLO
+   global ATASK_POLMODE 
    global ATASK_PSF
    global ATASK_REFCOL
    global ATASK_SAREA
    global ATASK_SELCOL
    global ATASK_SI
-   global ATASK_SKYPAR
    global ATASK_SKYOFF
+   global ATASK_SKYPAR
    global ATASK_VIEW
    global ATASK_XHAIR
    global ATASK_XHRCOL          
@@ -10719,6 +10760,7 @@ proc SaveOptions {} {
    global OEFITTYPE
    global PHI_REQ
    global PLO_REQ
+   global POLMODE         
    global PSF_SIZE
    global REFCOL
    global SAREA
@@ -10727,6 +10769,7 @@ proc SaveOptions {} {
    global SI_VARS
    global SKYOFF           
    global SKYPAR
+   global STOKES
    global VIEW
    global XHAIR
    global XHRCOL
@@ -10750,6 +10793,7 @@ proc SaveOptions {} {
      set ATASK_INTERP $INTERP
      set ATASK_VIEW $VIEW
      set ATASK_SKYPAR $SKYPAR
+     if { $STOKES } { set ATASK_POLMODE $POLMODE }
 
      foreach fittype [array names MAPTYPE] {
         if { $MAPTYPE($fittype) == $FITTYPE } { break } 
@@ -13400,12 +13444,17 @@ proc UpdateDisplay {args} {
    global IMSEC_DISP
    global IMSEC_REQ
    global MODE
+   global NONE
+   global O_RAY_FEATURES
    global O_RAY_MASK
    global O_RAY_SKY
    global PHI_DISP
    global PHI_REQ
    global PLO_DISP
    global PLO_REQ
+   global RB_CUR
+   global RB_REF
+   global REFALIGN
    global REFALN
    global REFIM_DISP
    global REFIM_REQ
@@ -13416,6 +13465,15 @@ proc UpdateDisplay {args} {
 
 # Cancel any selected area.
    CancelArea
+
+# If a new image is being displayed, set the reference objects to "None",
+# set the Current objects to "O-ray features", and turn off the 
+# "Draw-alinged" button.
+   if { $IMSEC_REQ != $IMSEC_DISP } {
+      $RB_REF($NONE) select
+      $RB_CUR($O_RAY_FEATURES) select
+      $REFALIGN deselect
+   }
 
 # The display is layered. At the bottom is the GWM image. Next comes the
 # markers (canvas items) for the reference objects. The markers for the 

@@ -363,9 +363,11 @@
    if { [info exists stokes] && $stokes != "" } {
       set STOKES 1
       set STKOUT $stokes
+      set stokestate normal
    } {
       set STOKES 0
       set STKOUT ""
+      set stokestate disabled
    }
 
 # Set up convenience variables depending on DBEAM.
@@ -626,6 +628,7 @@
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
    $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map 
+   $OPTSMENU add cascade -label "Polarimetry mode" -menu $OPTSMENU.pol -state $stokestate
    $OPTSMENU add cascade -label "Sky Order" -menu $OPTSMENU.sky -state $skystate 
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
@@ -641,6 +644,7 @@
    MenuHelp $OPTSMENU "Feature Size"    ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
    MenuHelp $OPTSMENU "Interpolation method" ".  The interpolation method to use when finding pixel values in the input images."
    MenuHelp $OPTSMENU "Mapping Types"   ".  The type of mapping to use when aligning images, or when aligning the O and E rays."
+   MenuHelp $OPTSMENU "Polarimetry mode"     ".  Are Stokes parameters describing circular or linear polarisation to be created?"
    MenuHelp $OPTSMENU "Sky Order"       ".  The order of the polynomial fit used on each axis when fitting sky surfaces. A value of 0 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
    MenuHelp $OPTSMENU "Status Items..."      ".  Select which items of information to display in the status area."
    MenuHelp $OPTSMENU "View"            ".  The section to be displayed when a new image is selected from the \"Images\" menu."
@@ -687,6 +691,14 @@
    }
 
    SetHelp $psfmenu ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
+
+# Add items to the Polarimetry Mode sub-menu.
+   set polmenu [menu $OPTSMENU.pol]
+   $polmenu add radiobutton -label Linear -variable POLMODE \
+                             -value Linear -selectcolor $RB_COL 
+   $polmenu add radiobutton -label Circular -variable POLMODE \
+                             -value Circular -selectcolor $RB_COL 
+   SetHelp $polmenu ".  Are Stokes parameters describing circular or linear polarisation to be created?"
 
 # Add items to the "Sky" sub-menu.
    set skymenu [menu $OPTSMENU.sky]
@@ -1118,6 +1130,7 @@
    StatusItem SKYTEXT2     "Sky fit order: "         "The order of the polynomial used on each axis when fitting a sky surface.\n(To change the value, use the \"Options\" menu.)" 16
    StatusItem INTERP       "Interpolation method: "  "The interpolation method to use when sampling the input images.\n(To change the method, use the \"Options\" menu.)" 20
    StatusItem SKYTEXT      "Sky estimated in:"       "The image in which the sky background will be determined. This will either be one of the supplied sky frames, or the displayed image (if no sky frames were supplied)." $maxsfwid
+   StatusItem POLMODE      "Polarimetry mode:"       "Will Stokes parameters be produced describing linear or circular polarisation?" 10
 
 # Load the options supplied by the polka atask.
    LoadOptions

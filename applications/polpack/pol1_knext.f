@@ -72,7 +72,7 @@
 
 *  Local Constants:
       INTEGER NCOMP              ! No. of recognised compoents
-      PARAMETER ( NCOMP = 7 )
+      PARAMETER ( NCOMP = 8 )
 
       INTEGER NMLEN              ! Length of each name string
       PARAMETER ( NMLEN = 15 )
@@ -90,14 +90,17 @@
      :             'RAY',
      :             'ANGROT',
      :             'ROTATION',
-     :             'YROTATION'/
+     :             'YROTATION',
+     :             'STOKES' /
+
       DATA TYPES / '_CHAR',
      :             '_CHAR',
      :             '_CHAR',
      :             '_CHAR',
      :             '_REAL',
      :             '_REAL',
-     :             '_REAL'/
+     :             '_REAL',
+     :             '_CHAR'/
 
 *.
 

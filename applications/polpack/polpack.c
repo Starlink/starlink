@@ -323,7 +323,7 @@ F77_SUBROUTINE(doplmp)( CHARACTER(IMAGE), INTEGER(DPI), LOGICAL(HAREA),
 
 }
 
-F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
+F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3), 
                         INTEGER(DPI), LOGICAL(HAREA),
                         LOGICAL(SAREA), INTEGER(PSF),
                         CHARACTER(SI), INTEGER(FIT),
@@ -334,13 +334,13 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(SKYPAR), LOGICAL(IGRP4), LOGICAL(DBEAM),
-                        INTEGER(STATUS) 
+                        CHARACTER(MODE), INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
-                        TRAIL(VIEW) TRAIL(XHRCOL) ){
+                        TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) ){
 /*
 *  Name:
-*     doplrg
+*     doplka
 
 *  Purpose:
 *     Activates the main Polka tcl script.
@@ -426,6 +426,8 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        cube holding Stokes parameters.
 *     DBEAM = LOGICAL (Given)
 *        Run in dual-beam mode?
+*     MODE = CHARACTER (Given and Returned)
+*        The type of polarisation being measured; Linear or Circular.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -471,6 +473,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_INTEGER(IGRP4)
    GENPTR_LOGICAL(DBEAM)
    GENPTR_INTEGER(STATUS)
+   GENPTR_CHARACTER(MODE)
 
    Tcl_Interp *interp = NULL;
    char *dir = NULL;
@@ -579,6 +582,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if( LOGFIL_length > 0 ) {
       SetSVar( interp, "ATASK_LOGFILE", LOGFIL, LOGFIL_length, STATUS );
    }
+   if( *IGRP4 != GRP__NOID ) {
+      SetSVar( interp, "ATASK_POLMODE", MODE, MODE_length, STATUS );
+   }
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
 
@@ -679,6 +685,9 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GetSVar( interp, "ATASK_CURCOL", CURCOL, CURCOL_length, STATUS );
    GetSVar( interp, "ATASK_REFCOL", REFCOL, REFCOL_length, STATUS );
    GetSVar( interp, "ATASK_SELCOL", SELCOL, SELCOL_length, STATUS );
+   if( *IGRP4 != GRP__NOID ) {
+      GetSVar( interp, "ATASK_POLMODE", MODE, MODE_length, STATUS );
+   }
 
 #if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
 

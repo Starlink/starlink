@@ -27,3 +27,4 @@ RAY?        PPCKRAY          # The ray "O" or "E" (optional)
 ROTATION?   PPCKROT          # The rotation of the aligned image (optional)
 WPLATE?     PPCKWPLT         # The waveplate position
 YROTATION?  PPCKYROT         # The rotation of the Y axis (optional)
+STOKES?     PPCKSTOK         # Identifiers for each plane of the data array

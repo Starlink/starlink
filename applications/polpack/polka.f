@@ -125,6 +125,11 @@
 *        output (usually the screen). If a null (!) value is supplied, then 
 *        no log file will be created. Note, this parameter cannot be set 
 *        from the GUI's "Options" menu. [!]
+*     MODE = LITERAL (Read)
+*        The type of polarisation being measured; Linear or Circular. This 
+*        parameter is only accessed if an output cube holding Stokes
+*        parameters is being created (i.e. if OUT_S is not given a null (!) 
+*        value). [Linear]
 *     NEWCOLMAP = _LOGICAL (Read)
 *        If a true value is supplied for NEWCOLMAP, then the GUI will use
 *        its own private colour map. Otherwise it will share the standard 
@@ -265,8 +270,8 @@
 
 *  Notes:
 *     - The following components are added to the POLPACK extension in the 
-*     output images (the extension is first created if it does not
-*     already exist): 
+*     output intensity images (the extension is first created if it does 
+*     not already exist): 
 *
 *     ROTATION (_REAL): The clockwise rotation from the input 
 *     image to the output image (in degrees). If the input image already
@@ -292,6 +297,15 @@
 *     POLPACK extension with a IMGID value, then the IMGID value is copied
 *     unchanged to the corresponding output images. Otherwise, the name of
 *     the input image (without a directoty path) is used.
+*
+*     - The following components are added to the POLPACK extension in the 
+*     output cube holding Stokes parameter (the extension is first created 
+*     if it does not already exist): 
+*
+*     STOKES (_CHAR):  A string containing one character for each plane in 
+*     the data array of the NDF. Each character identifies the quantity 
+*     stored in the corresponding plane of the data array, and will be one 
+*     of I, Q, U or V. Left undefined by default.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -331,6 +345,7 @@
      :        BADCOL*7,          ! Colour for missing pixels
      :        CURCOL*7,          ! Colour for the current objects
      :        LOGFIL*80,         ! Name of required log file
+     :        MODE*10,           ! Polarimetry mode; Linear or Circular
      :        REFCOL*7,          ! Colour for the reference objects
      :        SELCOL*7,          ! Colour for the selected area box
      :        SI*80,             ! String describing required status items
@@ -417,21 +432,25 @@
 
 *  If we are producing Stokes parameters...
       IF( IGRP4 .NE. GRP__NOID ) THEN
+         IF( SIZEO .GT. 0 ) THEN
 
 *  POLCAL (which calculates the Stokes parameters) does not at the moment 
 *  support single-beam mode, so report an error if single-beam mode has
 *  been selected.
-         IF( .NOT. DBEAM .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'POLKA_ERR2b', 'The facility for creating '//
-     :                    'Stokes paremeters in single beam mode '//
-     :                    'has not yet been implemented.', STATUS )
-            GO TO 999
-         END IF
+            IF( .NOT. DBEAM .AND. STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'POLKA_ERR2b', 'The facility for '//
+     :               'creating Stokes paremeters in single beam mode '//
+     :               'has not yet been implemented.', STATUS )
+               GO TO 999
+            END IF
 
-*  Check that all of the input object frames hasve POLPACK extensions 
+*  See if linear or circular polarisation is being measured.
+            CALL PAR_CHOIC( 'MODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
+     :                      MODE, STATUS )
+
+*  Check that all of the input object frames have POLPACK extensions 
 *  containing WPLATE values. 
-         IF( SIZEO .GT. 0 ) THEN
             DO I = 1, SIZE
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
                WPLATE = VAL__BADR
@@ -449,9 +468,11 @@
                END IF
                CALL NDF_ANNUL( INDF, STATUS )
             END DO
+
          ELSE
             CALL GRP_DELET( IGRP4 )
          END IF
+
       END IF
 
 * Now deal with cases where we are creating aligned intensity images from
@@ -573,12 +594,12 @@
      :                .FALSE., PERCNT, STATUS )
 
 *  Execute the TCL script.
-      CALL DOPLRG( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
+      CALL DOPLKA( IGRP1, IGRP2, IGRP3, DPI, HAREA, SAREA, PSF, 
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
-     :             IGRPS, SSIZE, SKYOFF, SKYPAR, IGRP4, DBEAM,
-     :             STATUS )
+     :             IGRPS, SSIZE, SKYOFF, SKYPAR, IGRP4, DBEAM, 
+     :             MODE( : CHR_LEN( MODE ) ), STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.
@@ -603,6 +624,8 @@
       CALL PAR_PUT1R( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_PUT0C( 'VIEW', VIEW, STATUS )
       CALL PAR_PUT0I( 'SKYPAR', SKYPAR, STATUS )
+      CALL CHR_UCASE( MODE )
+      CALL PAR_PUT0C( 'MODE', MODE, STATUS )
 
 *  Delete the groups.
  999  CONTINUE

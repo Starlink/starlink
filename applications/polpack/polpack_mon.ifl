@@ -33,7 +33,7 @@ interface POLCAL
       helpkey  '*'
    endparameter
 
-   parameter MODE
+   parameter PMODE
       type     LITERAL
       access   READ
       vpath    'CURRENT, DEFAULT'
@@ -56,7 +56,7 @@ interface POLCAL
       access   READ
       vpath    'DEFAULT '
       ppath    'DEFAULT '
-      default  YES
+      default  !
       prompt   'Are variance values to be generated?'
       helpkey  '*'
    endparameter
@@ -725,7 +725,7 @@ interface POLKA
    helplib 'POLPACK_HELP:'
 
    parameter BADCOL
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -735,7 +735,7 @@ interface POLKA
    endparameter
 
    parameter CURCOL
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -796,7 +796,7 @@ interface POLKA
    endparameter
 
    parameter ITEMS
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -806,12 +806,22 @@ interface POLKA
    endparameter
 
    parameter LOGFILE
-      type     _CHAR
+      type     LITERAL
       access   READ
       vpath    'DEFAULT'
       ppath    'DEFAULT'
       default  !
       prompt   'The name of a file in which to store all ATASK messages.'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Linear'
+      prompt   'Type of polarisation being measured'
       helpkey  '*'
    endparameter
 
@@ -895,7 +905,7 @@ interface POLKA
    endparameter
 
    parameter REFCOL
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -905,7 +915,7 @@ interface POLKA
    endparameter
 
    parameter SELCOL
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -966,7 +976,7 @@ interface POLKA
    endparameter
 
    parameter VIEW
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
@@ -986,7 +996,7 @@ interface POLKA
    endparameter
 
    parameter XHAIRCOL
-      type     _CHAR
+      type     LITERAL
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'

@@ -158,7 +158,7 @@
       REAL ETOL                  ! tolerance for E factor convergences
       REAL F, VF                 ! F factor and its variance
       
-      CHARACTER * ( 8 )  MODE    ! Polarimetry mode (LINEAR or CIRCULAR)
+      CHARACTER * ( 8 )  PMODE   ! Polarimetry mode (LINEAR or CIRCULAR)
       CHARACTER * ( 10 ) IMGID( MAXIN )
                                  ! Image ID descriptor
       CHARACTER * ( 1 ) RAY( MAXIN )
@@ -207,19 +207,16 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Defer error reports.
-      CALL ERR_MARK
-
 *  Start an NDF context.
       CALL NDF_BEGIN
 
 *  Find out whether we are doing linear or circular polarimetry. In
 *  circular polarimetry mode there are 2 waveplate positions and in
 *  linear polarimetry mode 4 waveplate positions.
-      CALL PAR_CHOIC( 'MODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
-     :                MODE, STATUS )
+      CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
+     :                PMODE, STATUS )
       NPOS = 4
-      IF ( MODE .EQ. 'CIRCULAR' ) NPOS = 2
+      IF ( PMODE .EQ. 'CIRCULAR' ) NPOS = 2
       
 *  Access the input NDFs using 'READ' access so that they will not be
 *  deleted when released. The minimum number of images allowed is 2
@@ -507,18 +504,18 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
      :                 'polarisation. Cannot continue.', STATUS )
          GO TO 99
 
-      ELSE IF ( MODE .EQ. 'LINEAR' .AND. NU .EQ. 0 ) THEN
+      ELSE IF ( PMODE .EQ. 'LINEAR' .AND. NU .EQ. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADLIN', 'POLCAL: There is not ' //
      :                 'enough information to calculate the linear ' //
      :                 'polarisation. Cannot continue.', STATUS )
          GO TO 99
 
-      ELSE IF ( MODE .EQ. 'CIRCULAR' .AND. NU .NE. 0 ) THEN
+      ELSE IF ( PMODE .EQ. 'CIRCULAR' .AND. NU .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLCAL_BADCIR', 'POLCAL: The detected ' //
      :        'images are compatible with linear polarimetry but ' //
-     :        'MODE=CIRCULAR is selected. Cannot continue.', STATUS )
+     :        'PMODE=CIRCULAR is selected. Cannot continue.', STATUS )
          GO TO 99
 
       ENDIF
@@ -688,7 +685,7 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 * context.
       CALL NDF_BEGIN
       LBND( 3 ) = 1
-      IF ( MODE .EQ. 'LINEAR' ) THEN
+      IF ( PMODE .EQ. 'LINEAR' ) THEN
          UBND( 3 ) = 3
          TITLE = 'Output from POLPACK: Linear polarimetry'
          LABEL = 'Stokes parameters (I, Q, U)'
@@ -799,8 +796,5 @@ c      CALL DAT_ANNUL( TSPLOC, STATUS )
       
 *  End the NDF context.
       CALL NDF_END( STATUS )
-
-*  Release the error stack.
-      CALL ERR_RLSE
 
       END
