@@ -1,0 +1,42 @@
+<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+  <!entity htmlparams.dsl system "../html/slparams.dsl">
+  <!entity latexparams.dsl system "../latex/slparams.dsl">
+]>
+
+<docblock>
+<title>Parameterisation of the DSSSL stylesheets
+<description>
+<p>This file collects together parameters which control various
+aspects of the generation of HTML.  All the things documented as
+`functions' below are really parameters.
+
+<p>Note that a feature of Jade is that if the argument <code/-V
+variable/ is given on the command line, then that variable is set to
+<code/#t/, overriding any setting within the stylesheet.  The
+parameters which are described as `boolean' below can be set in this
+way.
+
+<p>If you want to change any other parameters, then make a copy of the
+parameter file you want to change and call it, say,
+<code/params-mod.dsl/.  Modify it to suit your needs, and 
+create a catalogue file in the same directory which has lines like:
+<p><code>system "sl-html-parameters" "params-mod.dsl"</code>
+<p>Then adjust your <code/$SGML_CATALOG_FILES/ environment variable to put
+this catalogue file early in the path.  You can do the same thing for
+the LaTeX parameterisation with the system identifier
+<code/sl-latex-parameters/.
+
+<authorlist>
+<author id=ng affiliation='Starlink, Glasgow'>Norman Gray
+<copyright>Copyright 1999, Particle Physics and Astronomy Research
+Council
+
+<codegroup>
+<title>HTML parameterisation
+
+&htmlparams.dsl
+
+<codegroup>
+<title>LaTeX parameterisation
+
+&latexparams.dsl
