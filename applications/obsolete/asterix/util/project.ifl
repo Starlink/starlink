@@ -12,7 +12,6 @@ INTERFACE PROJECT
   PARAMETER OUT
     POSITION    2
     TYPE        'UNIV'
-    KEYWORD     'OUT'
     ASSOCIATION '->GLOBAL.BINDS'
     PROMPT      'Output'
     HELP        'Name of output dataset'

@@ -1,9 +1,8 @@
 	INTERFACE LOMBSCAR
 
-	    PARAMETER INPUT
+	    PARAMETER INP
 		POSITION 	1
 		TYPE 		'UNIV'
-                KEYWORD         'INP'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
                 HELP            '1-dimensional datafile'
@@ -31,10 +30,9 @@ HELP  'Oversampling increases the low frequency range - typical value 4 or more'
                 DEFAULT          1
 	    ENDPARAMETER
 
-	    PARAMETER OUTPUT
+	    PARAMETER OUT
 		POSITION 	4
 		TYPE 		'UNIV'
-                KEYWORD         'OUT'
 		PROMPT  	'Output datafile'
                 PPATH           'CURRENT'
                 HELP            'Output filename w/o extension'
