@@ -215,7 +215,7 @@ build:
 prepare:
 
 check_packages:
-[available] Sep 26, 2003 4:06:38 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 27, 2003 4:06:55 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -576,9 +576,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 15 seconds
+Total time: 1 minute 7 seconds

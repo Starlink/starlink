@@ -809,7 +809,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 26, 2003 4:23:43 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Sep 27, 2003 4:24:41 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -858,34 +858,34 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java:233: warning - Tag @see: can't find java.lang.Double.compareTo() in uk.ac.starlink.ast.gui.AstDouble
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
@@ -902,22 +902,22 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "PlotConfiguration is a repository for all the configuration information
   [javadoc]  related to a Plot (i.e. the AST graphics configuration, plus
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:235: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:266: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: uk.ac.starlink.ast
   [javadoc]  addition information such as data limits and antialiasing state,
   [javadoc]  which may be added).
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:235: warning - The first sentence is interpreted to be:
   [javadoc] "Set position along the X axis at which to start labelling
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the X axis at which to start labelling
   [javadoc]  (i.e. the Y axis intersection with the X axis). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxes.java:266: warning - The first sentence is interpreted to be:
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e. the X axis intersection with the Y axis). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: uk.ac.starlink.ast
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: uk.ac.starlink.ast
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
@@ -2033,6 +2033,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphPane.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphUtilities.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/GraphViewEvent.java:25: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/JGraph.html...
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: Tag @see: Malformed: GraphModel, GraphPane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeDragInteractor.java:32: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/NodeInteractor.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/SimpleGraphController.java:52: warning - @rating is an unknown tag.
@@ -2040,8 +2042,6 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/ArcRenderer.java:28: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/BasicEdgeRenderer.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/BasicGraphController.java:53: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graph/JGraph.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/JGraph.java:28: Tag @see: Malformed: GraphModel, GraphPane
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/BasicGraphDemo.java:49: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/BasicGraphDemoApplet.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/basic/BasicGraphModel.java:31: warning - @rating is an unknown tag.
@@ -3276,15 +3276,15 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Object that contains a description of the non-gram AST properties
   [javadoc]  of the plot (i.e. labels etc.)."
-  [javadoc] "Send when a figure is changed (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/XRangeFigure.java:27: warning - Tag @see: malformed: "BasicPlotFigure, BasicFigure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/SimpleDataLimitMenu.java:26: warning - Tag @see: malformed: "#DataLimits, #PlotConfigFrame."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PolylineFigure.java:18: warning - Tag @see: malformed: "BasicPlotFigure, BasicFigure"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/iface/DecimalComboBoxEditor.java:34: warning - Tag @see: malformed: "BasicComboBoxEditor, DecimalField"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Ephemeris.java:14: warning - Tag @see: malformed: "TimeSeries, FoldSeriesDialog"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureListener.java:30: warning - The first sentence is interpreted to be:
+  [javadoc] "Send when a figure is changed (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/FITSHeaderSource.java:17: warning - Tag @see: malformed: "TimeSeriesImpl, FITSTimeSeriesImpl"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1461: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
@@ -3303,58 +3303,58 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return interpolated physical values (i.e. wavelength and data value)
   [javadoc]  that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:434: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup interpolated physical values (i.e. timestamp and data value)
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
+  [javadoc]  correspond to a graphics X coordinate. "
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate, returned in
+  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
+  [javadoc]   "
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
+  [javadoc]  correspond to a graphics X coordinate. "
+  [javadoc] "Lookup the physical values (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
+  [javadoc]   that correspond to a graphics X coordinate, returned in
+  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
+  [javadoc]   "
+  [javadoc] "The full range of coordinates spanned (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
+  [javadoc]  yPos, plus the standard deviations in yPos)."
+  [javadoc] "The full range of coordinates spanned (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
+  [javadoc]  yPos, plus the standard deviations in yPos)."
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
+  [javadoc]  plot, including zoomed regions that you cannot see)."
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
+  [javadoc]  plot, including zoomed regions that you cannot see)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:434: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:1439: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
-  [javadoc]  correspond to a graphics X coordinate. "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramComp.java:406: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate, returned in
-  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
-  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:1555: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
-  [javadoc]  correspond to a graphics X coordinate. "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeriesComp.java:417: warning - The first sentence is interpreted to be:
-  [javadoc] "Lookup the physical values (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Lookup the physical values (i.e. timestamp and data value)
-  [javadoc]   that correspond to a graphics X coordinate, returned in
-  [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
-  [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/FrogSplash.java:20: warning - Tag @see: malformed: "Frog, FrogMain"
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/Gram.java:221: warning - The first sentence is interpreted to be:
-  [javadoc] "The full range of coordinates spanned (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
-  [javadoc]  yPos, plus the standard deviations in yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/TimeSeries.java:295: warning - The first sentence is interpreted to be:
-  [javadoc] "The full range of coordinates spanned (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The full range of coordinates spanned (i.e. min/max values in xPos and
-  [javadoc]  yPos, plus the standard deviations in yPos)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/PlotControl.java:624: warning - The first sentence is interpreted to be:
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
-  [javadoc]  plot, including zoomed regions that you cannot see)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:624: warning - The first sentence is interpreted to be:
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
-  [javadoc]  plot, including zoomed regions that you cannot see)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/data/GramAccess.java:51: warning - The first sentence is interpreted to be:
   [javadoc] "Get the full range (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -4368,13 +4368,11 @@ javadoc-sources:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:55: Tag @see: Malformed: AstAxisLabels,
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -4382,11 +4380,13 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/LineControls.java:38: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:110: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:223: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/SelectCharacters.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/SelectCharacters.java:45: Tag @see: Malformed: InsertCharacters, SelectCharactersModel
@@ -4421,4 +4421,4 @@ export-full:
      [copy] Copying 2 files to /apps/cvsbuild/export
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 53 seconds
+Total time: 15 minutes 2 seconds
