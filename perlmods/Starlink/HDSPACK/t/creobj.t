@@ -4,7 +4,7 @@
 
 use strict;
 use Test;
-BEGIN { plan tests => 12 }
+BEGIN { plan tests => 15 }
 use Starlink::HDSPACK qw/ creobj setobj /;
 use NDF;
 
@@ -67,6 +67,17 @@ ok($status, $good);
 my $nfits = 10;
 $status = creobj($out. ".MORE.FITS", '_CHAR*80',[$nfits], $status);
 ok($status, $good);
+
+# Create a structure inside an array of structures
+$status = creobj( $out. ".MORE.ARRAY", 'ARRAY_OF_STRUCT', [10], $status);
+ok($status, $good);
+
+$status = creobj( $out. ".MORE.ARRAY(1).STRUCT", 'ASTRUCT', $status);
+ok($status, $good);
+
+$status = creobj( $out. ".MORE.ARRAY(1).VAL", '_REAL', $status);
+ok($status, $good);
+
 
 # And put something in it
 my @fits;
