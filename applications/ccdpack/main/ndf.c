@@ -221,8 +221,14 @@
 
 /* Allocate the data structure to hold the client data. */
       ndf = (Ndf *) malloc( sizeof( Ndf ) );
+      if ( tclmemok( interp, ndf ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
       ndfname = Tcl_GetStringFromObj( objv[ 1 ], &nleng );
       ndf->name = malloc( nleng + 1 );
+      if ( tclmemok( interp, ndf->name ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
       strcpy( ndf->name, ndfname );
 
 /* Initialise some elements of the data structure. */
@@ -230,13 +236,12 @@
       ndf->bad = 1;
       ndf->data = NULL;
       *ndf->mtype = '\0';
-      ndf->perchash = malloc( sizeof( Tcl_HashTable ) );
       ndf->plotarray.exists = 0;
       ndf->plotarray.data = NULL;
       ndf->fits.loaded = 0;
       ndf->fits.ncard = 0;
       ndf->fits.data = NULL;
-      Tcl_InitHashTable( ndf->perchash, TCL_ONE_WORD_KEYS );
+      Tcl_InitHashTable( &ndf->perchash, TCL_ONE_WORD_KEYS );
 
       STARCALL( 
 
@@ -305,8 +310,7 @@
 
 /* Release memory we (may) have allocated for the object.  Some or all of
    these could be NULL, but if so, free() will not complain. */
-      Tcl_DeleteHashTable( ndf->perchash );
-      free( ndf->perchash );
+      Tcl_DeleteHashTable( &ndf->perchash );
       free( ndf->name );
       free( ndf->plotarray.data );
       free( ndf );
@@ -331,8 +335,8 @@
 /**********************************************************************/
       if ( ! strcmp( command, "bbox" ) ) {
          Tcl_Obj *ov[ 2 ];
-         double lbox[ ndf->ndim ];
-         double ubox[ ndf->ndim ];
+         double lbox[ NDF__MXDIM ];
+         double ubox[ NDF__MXDIM ];
          int iframe;
 
 /* Check syntax. */
@@ -665,6 +669,11 @@
          percs = malloc( nperc * sizeof( double ) );
          fracs = malloc( nperc * sizeof( double ) );
          vals = malloc( nperc * sizeof( double ) );
+         if ( tclmemok( interp, percs ) != TCL_OK ||
+              tclmemok( interp, fracs ) != TCL_OK ||
+              tclmemok( interp, vals ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
 
 /* Store each of the extra arguments in the percentiles array.  Check that
    each is a number in the correct range as we go, and bail out with an
@@ -688,7 +697,7 @@
          for ( i = 0; i < nperc; i++ ) {
             PercHashKey hkey;
             hkey.data = percs[ i ];
-            if ( Tcl_FindHashEntry( ndf->perchash, hkey.hash ) == NULL ) {
+            if ( Tcl_FindHashEntry( &ndf->perchash, hkey.hash ) == NULL ) {
                fracs[ nfrac++ ] = percs[ i ] * 0.01;
             }
          }
@@ -704,6 +713,9 @@
 
 /* Now do the work of calcluating the percentiles. */
             work = malloc( nfrac * sizeof( double ) );
+            if ( tclmemok( interp, work ) != TCL_OK ) {
+               return TCL_ERROR;
+            }
             STARCALL(
                DECLARE_CHARACTER( type, DAT__SZTYP );
                F77_LOGICAL_TYPE bad;
@@ -736,7 +748,7 @@
                Tcl_HashEntry *entry;
                int new;
                hkey.data = fracs[ i ] * 100.0;
-               entry = Tcl_CreateHashEntry( ndf->perchash, hkey.hash, &new );
+               entry = Tcl_CreateHashEntry( &ndf->perchash, hkey.hash, &new );
                hval.data = vals[ i ];
                Tcl_SetHashValue( entry, hval.hash );
             }
@@ -749,10 +761,10 @@
             PercHashValue hval;
             Tcl_HashEntry *entry; 
             hkey.data = percs[ i ];
-            entry = Tcl_FindHashEntry( ndf->perchash, hkey.hash );
+            entry = Tcl_FindHashEntry( &ndf->perchash, hkey.hash );
             if ( entry == NULL ) {    /* kludge - sorry */
                hkey.data = ( percs[ i ] * 0.01 ) * 100.0;
-               entry = Tcl_FindHashEntry( ndf->perchash, hkey.hash );
+               entry = Tcl_FindHashEntry( &ndf->perchash, hkey.hash );
             }
             hval.hash = Tcl_GetHashValue( entry );
             vals[ i ] = hval.data;
@@ -882,6 +894,8 @@
          int nout;
          int npos;
          const char (*aval);
+         double *inpos;
+         double *outpos;
          AstMapping *imap = NULL;
          AstFrame *outframe;
 
@@ -909,6 +923,9 @@
             }
          }
 
+/* Get number of positions to transform. */
+         npos = objc - nflag - 4;
+
 /* Begin AST context. */
          astBegin;
 
@@ -919,61 +936,76 @@
             nin = astGetI( imap, "Nin" );
             nout = astGetI( imap, "Nout" );
          )
-         npos = objc - nflag - 4;
-         {
-            double inpos[ nin ][ npos ];
-            double outpos[ nout ][ npos ];
+
+/* Allocate space for coordinate transformations. */
+         inpos = malloc( nin * npos * sizeof( double ) );
+         outpos = malloc( nout * npos * sizeof( double ) );
+         if ( tclmemok( interp, inpos ) != TCL_OK ||
+              tclmemok( interp, outpos ) != TCL_OK ) {
+            astEnd;
+            return TCL_ERROR;
+         }
 
 /* Get coordinate lists. */
-            for ( i = 0; i < npos; i++ ) {
-               Tcl_Obj **ov;
-               int oc;
-               Tcl_ListObjGetElements( interp, objv[ 4 + nflag + i ], 
-                                       &oc, &ov );
-               if ( oc != nin ) {
-                  result = Tcl_NewStringObj( "Wrong number of coordinates",
-                                             -1 );
-                  Tcl_SetObjResult( interp, result );
+         for ( i = 0; i < npos; i++ ) {
+            Tcl_Obj **ov;
+            int oc;
+            Tcl_ListObjGetElements( interp, objv[ 4 + nflag + i ], &oc, &ov );
+            if ( oc != nin ) {
+               result = Tcl_NewStringObj( "Wrong number of coordinates", -1 );
+               Tcl_SetObjResult( interp, result );
+               free( inpos );
+               free( outpos );
+               astEnd;
+               return TCL_ERROR;
+            }
+            for ( j = 0; j < nin; j++ ) {
+               if ( Tcl_GetDoubleFromObj( interp, ov[ j ], 
+                                          inpos + j * npos + i ) != TCL_OK ) {
+                  free( inpos );
+                  free( outpos );
                   astEnd;
                   return TCL_ERROR;
                }
-               for ( j = 0; j < nin; j++ ) {
-                  if ( Tcl_GetDoubleFromObj( interp, ov[ j ], 
-                                             &inpos[ j ][ i ] ) != TCL_OK ) {
-                     result = Tcl_NewStringObj( "Coordinate is not numeric",
-                                                -1 );
-                     astEnd;
-                     return TCL_ERROR;
-                  }
-               }
-            }
-
-/* Do the mapping. */
-            ASTCALL(
-               astTranN( imap, npos, nin, npos, (const double (*)[]) inpos, 
-                         1, nout, npos, outpos );
-            )
-
-/* Turn the translated coordinates into Tcl Objects for return. */
-            result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
-            for ( i = 0; i < npos; i++ ) {
-               Tcl_Obj *ov[ nout ];
-               for ( j = 0; j < nout; j++ ) {
-                  if ( form ) {
-                     ASTCALL(
-                        aval = astFormat( outframe, j + 1, outpos[ j ][ i ] );
-                     )
-                     ov[ j ] = Tcl_NewStringObj( aval, -1 );
-                  } else {
-                     ov[ j ] = Tcl_NewDoubleObj( outpos[ j ][ i ] );
-                  }
-               }
-               Tcl_ListObjAppendElement( interp, result, 
-                                         Tcl_NewListObj( nout, ov ) );
             }
          }
 
-/* End AST context. */
+/* Do the mapping. */
+         ASTCALL(
+            astTranN( imap, npos, nin, npos, (const double (*)[]) inpos, 
+                      1, nout, npos, (double (*)[]) outpos );
+         )
+
+/* Turn the translated coordinates into Tcl Objects for return. */
+         result = Tcl_NewListObj( 0, (Tcl_Obj **) NULL );
+         for ( i = 0; i < npos; i++ ) {
+            Tcl_Obj **ov;
+            ov = malloc( nout * sizeof( Tcl_Obj ) );
+            if ( tclmemok( interp, ov ) != TCL_OK ) {
+               free( inpos );
+               free( outpos );
+               astEnd;
+               return TCL_ERROR;
+            }
+            for ( j = 0; j < nout; j++ ) {
+               if ( form ) {
+                  ASTCALL(
+                     aval = astFormat( outframe, j + 1, 
+                                       outpos[ j * npos + i ] );
+                  )
+                  ov[ j ] = Tcl_NewStringObj( aval, -1 );
+               } else {
+                  ov[ j ] = Tcl_NewDoubleObj( outpos[ j * npos + i ] );
+               }
+            }
+            Tcl_ListObjAppendElement( interp, result, 
+                                      Tcl_NewListObj( nout, ov ) );
+            free( ov );
+         }
+
+/* Tidy up. */
+         free( inpos );
+         free( outpos );
          astEnd;
       }
 
@@ -1047,6 +1079,24 @@
 /**********************************************************************/
 /* Auxiliary functions.                                               */
 /**********************************************************************/
+
+/**********************************************************************/
+   int tclmemok( Tcl_Interp *interp, void *ptr ) {
+/**********************************************************************/
+/* This routine is intended to check the result of a memory allocation call.
+   If the given memory value is NULL, it puts a suitable message into
+   the result of the interpreter, and returns TCL_ERROR.  Otherwise, it
+   just returns TCL_OK. */
+      if ( ptr == NULL ) {
+         Tcl_SetObjResult( interp, 
+                           Tcl_NewStringObj( "memory allocation failed", -1 ) );
+         return TCL_ERROR;
+      }
+      else {
+         return TCL_OK;
+      }
+   }
+
 
 /**********************************************************************/
    int dcompare( const void *a, const void *b ) {
@@ -1153,14 +1203,14 @@
 
 /**********************************************************************/
    void getbbox( Ndf *ndf, int iframe, double *lbox, double *ubox, 
-                   int *status ) {
+                 int *status ) {
 /**********************************************************************/
 /* Get the bounding box for an NDF resampled from the Base (GRID) frame
    into another, given, frame. 
 */
       int i;
-      double lbnd[ ndf->ndim ];
-      double ubnd[ ndf->ndim ];
+      double lbnd[ NDF__MXDIM ];
+      double ubnd[ NDF__MXDIM ];
       AstMapping *map;
       int *old_status;
 
@@ -1387,6 +1437,9 @@
             int i;
             AstFrame *frame;
             norm = malloc( leng + 1 );
+            if ( tclmemok( interp, norm ) != TCL_OK ) {
+               return TCL_ERROR;
+            }
             for ( i = 0; i <= leng; i++ ) {
                c = text[ i ];
                norm[ i ] = ( c >= 'a' && c <= 'z' ) ? c + 'A' - 'a' : c;

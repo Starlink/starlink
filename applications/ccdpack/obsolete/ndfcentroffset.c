@@ -150,6 +150,12 @@
       ypos[ 0 ] = malloc( npoint * sizeof( double ) );
       xpos[ 1 ] = malloc( npoint * sizeof( double ) );
       ypos[ 1 ] = malloc( npoint * sizeof( double ) );
+      if ( tclmemok( interp, xpos[ 0 ] ) != TCL_OK ||
+           tclmemok( interp, ypos[ 0 ] ) != TCL_OK ||
+           tclmemok( interp, xpos[ 1 ] ) != TCL_OK ||
+           tclmemok( interp, ypos[ 1 ] ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
       for ( j = 0; j < npoint; j++ ) {
          int poc = 0;
          Tcl_Obj **pov;
@@ -190,6 +196,14 @@
          ymat[ i ] = malloc( npoint * sizeof( double ) );
          gxmat[ i ] = malloc( npoint * sizeof( double ) );
          gymat[ i ] = malloc( npoint * sizeof( double ) );
+         if ( tclmemok( interp, gxpos[ i ] ) != TCL_OK ||
+              tclmemok( interp, gypos[ i ] ) != TCL_OK ||
+              tclmemok( interp, xmat[ i ] ) != TCL_OK ||
+              tclmemok( interp, ymat[ i ] ) != TCL_OK ||
+              tclmemok( interp, gxmat[ i ] ) != TCL_OK ||
+              tclmemok( interp, gymat[ i ] ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
       }
 
 /* Call fortran routines which do the calculations. */

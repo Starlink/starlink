@@ -64,7 +64,7 @@
          int ncard;                /* Number of FITS cards present */
          char loc[ DAT__SZLOC ];   /* Locator to NDF .MORE.FITS extension */
       } fits;                   /* Contents of FITS extension. */
-      Tcl_HashTable *perchash;  /* Pointer to percentiles hash table */
+      Tcl_HashTable perchash;   /* Percentiles hash table */
       char ntype[ DAT__SZTYP ]; /* HDS type of NDF DATA component */
       char mtype[ DAT__SZTYP ]; /* HDS type of mapped data array */
    } Ndf;
@@ -156,6 +156,7 @@
 
 
 /* Prototypes for various auxiliary functions. */
+   int tclmemok( Tcl_Interp *interp, void *ptr );
    int dcompare( const void *a, const void *b );
    void domapdata( Ndf *ndf, int *status );
    void dounmapdata( Ndf *ndf, int *status );
