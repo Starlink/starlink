@@ -12,6 +12,7 @@
 *     LUR   i     I/O unit number for report file
 *     LUS   i     I/O unit number for synopsis file
 *     LUX   i     I/O unit number for log file (zero to suppress)
+*     FRPREF s    Filename prefix for generated FITS files (' ' to suppress)
 *
 *  Both the report and the synopsis file contain Fortran printer
 *  format codes.  In the case of the synopsis file, the code is
@@ -785,7 +786,7 @@
       RECTYP=' '
 
 *   Are we planning to write out FITS files with the WCS information?
-      FITSOP = (FTPREF.NE.'')
+      FITSOP = (FTPREF(1:1).NE.' ')
 
 **************************
 *  PRINCIPAL PARAMETERS  *
@@ -2236,11 +2237,11 @@
      :                 'Transformation to intermed. world coords',
      :                 FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_1',
-     :                 PLTCON(2+MAXSOL,NSOL)/FNORM/D2R, 7, '', FTSTAT)
+     :                 PLTCON(2+MAXSOL,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD1_2',
-     :                 PLTCON(3,NSOL)/FNORM/D2R, 7, '', FTSTAT)
+     :                 PLTCON(3,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_2',
-     :                 PLTCON(3+MAXSOL,NSOL)/FNORM/D2R, 7, '', FTSTAT)
+     :                 PLTCON(3+MAXSOL,NSOL)/FNORM/D2R, 7, ' ', FTSTAT)
 *               Include the relevant coefficients of the TAN distortion.
 *               If we write the undistorted gnomonic projection
 *               coordinates as (\xi, \eta), following C&G, and the distorted 
@@ -2337,7 +2338,8 @@
      :                    WRITE (LUX, '("ERROR 013 FITS error: ",A)')
      :                    FTWS(:FTI)
                      CALL FTGMSG (FTWS)
-                     DO WHILE (FTWS.NE.'')
+*                  Returns with FTWS empty if no more messages
+                     DO WHILE (LEN(FTWS).GT.0)
                         FTI=LEN(FTWS)
                         DO WHILE (FTWS(FTI:FTI).EQ.' '.AND.FTI.GT.0)
                            FTI=FTI-1

@@ -58,7 +58,8 @@
       IF (IARGC().GT.4) THEN
          CALL GETARG(5,FITSFN)
       ELSE
-         FITSFN=''
+*      Blank suppresses generation of FITS files
+         FITSFN=' '
       ENDIF
       IF (IARGC().GT.5) THEN
          CALL GETARG(6,LOGFIL)
