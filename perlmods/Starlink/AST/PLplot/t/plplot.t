@@ -42,6 +42,35 @@ is( Starlink::AST::PLplot::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
 # _GMark( \@x, \@y, $type );
 is( Starlink::AST::PLplot::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 
+# _GText( $text, $x, $y, $justification, $upx, $upy );
+is( Starlink::AST::PLplot::_GText( "Testing", 0.2, 0.4, "CC", 0, 1),
+    1, "Calling _GText()" );
+
+# _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
+my ( $status, $xb, $yb );
+($status, $xb, $yb ) =
+      Starlink::AST::PLplot::_GTxExt( "Testing", 0.2, 0.4, "CC", 0, 1 );
+is( $status, 1, "Calling _GTxtEx()" );
+
+$xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
+Starlink::AST::PLplot::_GLine( $xb, $yb );
+
+
+# _GText( $text, $x, $y, $justification, $upx, $upy );
+is( Starlink::AST::PLplot::_GText( "Testing", 0.2, 0.6, "CC", 0.5, 0.5),
+    1, "Calling _GText()" );
+
+# _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
+my ( $status, $xb, $yb );
+($status, $xb, $yb ) =
+      Starlink::AST::PLplot::_GTxExt( "Testing", 0.2, 0.6, "CC", 0.5, 0.5);
+is( $status, 1, "Calling _GTxtEx()" );
+
+$xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
+Starlink::AST::PLplot::_GLine( $xb, $yb );
+
+
+
 # _GFlush();
 is( Starlink::AST::PLplot::_GFlush(), 1, "Calling _GFlush()" );
 
