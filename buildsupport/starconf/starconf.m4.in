@@ -704,33 +704,39 @@ dnl  and Fink on OSX
 # available, either through [STAR_CHECK_PROGS(star2html)] or otherwise.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
    [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-    STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9][0-9]*/? *\)*$]),
+          [0],
+          [],
+          [AC_FATAL([$0: bad doccode in $1 -- must be eg sun123 or sun123/])])
+    STAR_DOCUMENTATION="$STAR_DOCUMENTATION m4_bpatsubst([$1],[/])"
     m4_ifval([$2],
        [dnl non-empty second argument -- just add to variable
+        m4_if(m4_bregexp([$1], [/]), -1,
+              [],
+              [AC_FATAL([$0: do not mix non-null second argument and .../ syntax])])
         if $_star_build_docs; then
             STAR@&t@_LATEX_DOCUMENTATION="$2"
-            : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
-            AC_SUBST(LATEX2DVI)
-        else
-            AC_MSG_WARN([not installing docs $1])
         fi
         ],
        [dnl second arg empty -- use defaults
         if $_star_build_docs; then
-            _star_tmp=
-            for d in $1
-            do
-                _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
-            done
-            STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
-            : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
-            AC_SUBST(LATEX2DVI)
-        else
-            AC_MSG_WARN([not installing docs $1])
+            AC_FOREACH([DocCode], [$1],
+               [m4_if(m4_bregexp(DocCode,[/]), -1,
+                      [STAR@&t@_LATEX_DOCUMENTATION="$STAR@&t@_LATEX_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar"
+],
+                      [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
+                       STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
+                       AC_SUBST(STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
         fi
         STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
         STAR_CHECK_PROGS([star2html])
        ])
+    if $_star_build_docs; then
+        : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
+        AC_SUBST(LATEX2DVI)
+    else
+        AC_MSG_WARN([not installing docs $1])
+    fi
     AC_SUBST([STAR@&t@_LATEX_DOCUMENTATION])dnl
 ])# STAR_LATEX_DOCUMENTATION
 
@@ -755,13 +761,18 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 # you almost certainly won't need to use this.
 AC_DEFUN([STAR_XML_DOCUMENTATION],
    [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-    STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
+    m4_if(m4_bregexp([$1], [^ *\([a-z][a-z]*[0-9][0-9]*/? *\)*$]),
+          [0],
+          [],
+          [AC_FATAL([$0: bad doccode in $1 -- must be eg sun123 or sun123/])])
+    STAR_DOCUMENTATION="$STAR_DOCUMENTATION m4_bpatsubst([$1],[/])"
     m4_ifval([$2],
        [dnl non-empty second argument -- just add to variable
+        m4_if(m4_bregexp([$1], [/]), -1,
+              [],
+              [AC_FATAL([$0: do not mix non-null second argument and .../ syntax])])
         if $_star_build_docs; then
             STAR@&t@_XML_DOCUMENTATION="$2"
-        else
-            AC_MSG_WARN([not installing docs $1])
         fi
         ],
        [dnl second arg empty -- use defaults
@@ -771,23 +782,26 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
             if test "$JADE" = NOJADE -o "$SGMLNORM" = NOSGMLNORM; then
                 AC_MSG_WARN([can't find (open)jade + (o)sgmlnorm -- skipping XML documentation $1])
             else
-                _star_tmp=
-                for d in $1
-                do
-                    _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
-                done
-                STAR@&t@_XML_DOCUMENTATION="$_star_tmp"
+                AC_FOREACH([DocCode], [$1],
+                   [m4_if(m4_bregexp(DocCode,[/]), -1,
+                          [STAR@&t@_XML_DOCUMENTATION="$STAR@&t@_XML_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar"
+],
+                          [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
+                           STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
+                           AC_SUBST(STAR_XML_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
                 STAR_CHECK_PROGS([sgml2docs sgmlnorm])
                 SGMLKIT_HOME=$prefix/lib/sgmlkit
                 AC_SUBST(SGMLKIT_HOME)
-                : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
-                AC_SUBST(LATEX2DVI)
             fi
-        else
-            AC_MSG_WARN([not installing docs $1])
         fi
         STAR_DECLARE_DEPENDENCIES([sourceset], [sgmlkit])
        ])
+    if $_star_build_docs; then
+        : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
+        AC_SUBST(LATEX2DVI)
+    else
+        AC_MSG_WARN([not installing docs $1])
+    fi
     AC_SUBST([STAR@&t@_XML_DOCUMENTATION])dnl
 ])# STAR_XML_DOCUMENTATION
             
