@@ -3204,7 +3204,7 @@ c      LOGICAL VOK,QOK
         I_DPTR_M=0
         I_XPTR_M=0
         I_YPTR_M=0
-        IF (I_VOK_M)
+        IF (I_VOK_M) THEN
           CALL DYN_UNMAP(I_VPTR_M,STATUS)
           I_VPTR_M=0
         ENDIF
