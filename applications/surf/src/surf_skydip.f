@@ -10,9 +10,9 @@
 *                       selected from the input file and fitted. Permitted 
 *                       values are SHORT, LONG, P1100, P1300 and P2000
 *     T_COLD          - Temperature of cold load
-*     T_AMB           - Air Temperature
-*     T_TEL           - Temperature of telescope
-*     T_HOT           - temperature of hot load
+*     T_AMB           - Air Temperature  - read from FITS
+*     T_TEL           - Temperature of telescope - read from FITS
+*     T_HOT           - temperature of hot load  - read from FITS
 *     ETA_TEL         - Telescope efficiency
 *     B_FIT           - The B parameter (filter transmission)
 *     OUT             - The name of the file to contain the fitted data
@@ -52,9 +52,13 @@
 *    History :
 *     $Id$
 *     $Log$
-*     Revision 1.1  1996/08/16 15:26:31  timj
-*     Initial revision
+*     Revision 1.2  1996/08/26 19:27:43  timj
+*     Use SCULIB_COPYX to copy data to mapped arrays.
+*     Fix bug when writing out T_COLD
 *
+c Revision 1.1  1996/08/16  15:26:31  timj
+c Initial revision
+c
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -140,6 +144,7 @@
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
+      LOGICAL LTEMP                     ! Dummy logical variable
       REAL    MAX_EL                    ! Max elevation of skydip
       INTEGER MEASUREMENT               ! measurement index in DO loop
       REAL    MIN_EL                    ! Min elevation of skydip
@@ -604,10 +609,10 @@
      :        STATUS)
 
 
-         CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, N_SUB,
-     :        SUB_INSTRUMENT, SUB_WAVE, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
-     :        BOL_TYPE, N_BOLS, IN_BOL_CHAN, IN_BOL_ADC, N_SAMP_IN,
-     :        %VAL(SLICE_PTR),
+         CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, 
+     :        N_SUB, SUB_INSTRUMENT, SUB_WAVE, SCUBA__NUM_CHAN,
+     :        SCUBA__NUM_ADC, BOL_TYPE, N_BOLS, IN_BOL_CHAN, IN_BOL_ADC,
+     :        N_SAMP_IN, %VAL(SLICE_PTR),
      :        N_INTEGRATIONS, J_SKY, J_SKY_VARIANCE, 
      :        J_SKY_QUALITY, J_SKY_AV,
      :        J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
@@ -658,7 +663,8 @@
      :     OUT_NDF, STATUS)
 
 * Create a REDS extension to store the FIT parameters
-      CALL NDF_XNEW (OUT_NDF, 'REDS', 'SCUBA_REDS', 0, 0, LOC1, STATUS)
+      CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+     :     LOC1, STATUS)
       CALL DAT_ANNUL (LOC1, STATUS)
 
 * Store fit parameters
@@ -666,10 +672,8 @@
       CALL NDF_XPT0C(INST, OUT_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
       CALL NDF_XPT0C(FILT, OUT_NDF, 'REDS', 'FILTER', STATUS)
       CALL NDF_XPT0R(WAVE, OUT_NDF, 'REDS', 'WAVELENGTH', STATUS)
-      CALL NDF_XPT0R(T_COLD, OUT_NDF, 'REDS', 'T_COLD', STATUS)
-      CALL NDF_XPT0R(T_AMB, OUT_NDF, 'REDS', 'T_AMB', STATUS)
-      CALL NDF_XPT0R(T_TEL, OUT_NDF, 'REDS', 'T_TEL', STATUS)
-
+      CALL NDF_XPT0R(T_COLD(SUB_POINTER), OUT_NDF, 'REDS', 'T_COLD', 
+     :     STATUS)
 
 *  create a history component in the output file
 
@@ -679,7 +683,7 @@
       CALL NDF_CPUT ('Skydip',OUT_NDF,'TITLE',STATUS)
 
 * Data label
-      CALL NDF_CPUT ('Obs. sky temperature', OUT_NDF, 'LABEL',STATUS)
+      CALL NDF_CPUT ('Jsky (measured)', OUT_NDF, 'LABEL',STATUS)
 
 * Data unit
       CALL NDF_CPUT ('K', OUT_NDF, 'UNITS', STATUS)
@@ -697,25 +701,22 @@
       CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE',
      : OUT_DATA_PTR, ITEMP, STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1),JSKY, %VAL(OUT_DATA_PTR),
-     :     STATUS)
+      CALL SCULIB_COPYR(UBND(1),JSKY, %VAL(OUT_DATA_PTR))
 
 * Write VARIANCE
 
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE',
      : OUT_VAR_PTR, ITEMP, STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR),
-     :     STATUS)
+      CALL SCULIB_COPYR(UBND(1),JSKY_VAR, %VAL(OUT_VAR_PTR))
+
 
 * Write QUALITY
 
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_REAL', 'WRITE',
      : OUT_QUAL_PTR, ITEMP, STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR),
-     :     STATUS)
-
+      CALL SCULIB_COPYI(UBND(1),JSKY_QUAL, %VAL(OUT_QUAL_PTR))
 
 * Create the AXES
 
@@ -730,16 +731,13 @@
       CALL NDF_AMAP (OUT_NDF, 'Centre', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR, UBND(1), STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR),
-     :     STATUS)
+      CALL SCULIB_COPYR(UBND(1), AIRMASS, %VAL(OUT_AXIS_PTR))
 
 * Write the AXIS variance (probably pretty inaccurate)
-      CALL NDF_AMAP (OUT_NDF, 'VARIANCE', 1, '_REAL', 'WRITE',
+      CALL NDF_AMAP (OUT_NDF, 'Error', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR, UBND(1), STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1), AIRMASS_VAR, %VAL(OUT_AXIS_PTR),
-     :     STATUS)
-
+      CALL SCULIB_COPYR(UBND(1), AIRMASS_VAR, %VAL(OUT_AXIS_PTR))
 
 * If FIT worked...
 
@@ -764,16 +762,16 @@
      :     MOD_NDF, STATUS)
 
 * Create a REDS extension to store the FIT parameters
-      CALL NDF_XNEW (MOD_NDF, 'REDS', 'SCUBA_REDS', 0, 0, LOC1, STATUS)
+      CALL NDF_XNEW (MOD_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+     :     LOC1, STATUS)
       CALL DAT_ANNUL (LOC1, STATUS)
 
 * Store fit parameters
       CALL NDF_XPT0C(INST, MOD_NDF, 'REDS', 'SUB_INSTRUMENT', STATUS)
       CALL NDF_XPT0C(FILT, MOD_NDF, 'REDS', 'FILTER', STATUS)
       CALL NDF_XPT0R(WAVE, MOD_NDF, 'REDS', 'WAVELENGTH', STATUS)
-      CALL NDF_XPT0R(T_COLD, MOD_NDF, 'REDS', 'T_COLD', STATUS)
-      CALL NDF_XPT0R(T_AMB, MOD_NDF, 'REDS', 'T_AMB', STATUS)
-      CALL NDF_XPT0R(T_TEL, MOD_NDF, 'REDS', 'T_TEL', STATUS)
+      CALL NDF_XPT0R(T_COLD(SUB_POINTER), MOD_NDF, 'REDS', 'T_COLD',
+     :     STATUS)
       CALL NDF_XPT0R(ETA_TEL_FIT, MOD_NDF, 'REDS', 'ETA_TEL', STATUS)
       CALL NDF_XPT0R(B_FIT, MOD_NDF, 'REDS', 'B_FIT', STATUS)
       CALL NDF_XPT0R(TAUZ_FIT, MOD_NDF, 'REDS', 'TAU_Z', STATUS)
@@ -785,7 +783,7 @@
 * Title of DATASET
       CALL NDF_CPUT ('Skydip',MOD_NDF,'TITLE',STATUS)
 * Data label
-      CALL NDF_CPUT ('Model sky temperature', MOD_NDF, 'LABEL',STATUS)
+      CALL NDF_CPUT ('Jsky (Theoretical)', MOD_NDF, 'LABEL',STATUS)
 * Data unit
       CALL NDF_CPUT ('K', MOD_NDF, 'UNITS', STATUS)
 
@@ -803,8 +801,10 @@
       CALL NDF_MAP (MOD_NDF, 'DATA', '_REAL', 'WRITE',
      : OUT_DATA_PTR_M, ITEMP, STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1),J_THEORETICAL, 
-     :     %VAL(OUT_DATA_PTR_M), STATUS)
+      CALL SCULIB_COPYR(UBND(1),J_THEORETICAL, %VAL(OUT_DATA_PTR_M))
+
+* Set the BAD pixel flag
+      CALL NDF_SBAD(.FALSE., MOD_NDF, 'Data', STATUS)
 
 * Create the AXES
       CALL NDF_ACRE(MOD_NDF, STATUS)
@@ -814,9 +814,7 @@
       CALL NDF_AMAP (MOD_NDF, 'Centre', 1, '_REAL', 'WRITE',
      :     OUT_AXIS_PTR_M, UBND(1), STATUS)
 
-      CALL SKYDIP_WRITE_DATA(UBND(1), AIR_MODEL, %VAL(OUT_AXIS_PTR_M),
-     :     STATUS)
-
+      CALL SCULIB_COPYR(UBND(1), AIR_MODEL, %VAL(OUT_AXIS_PTR_M))
 
       ENDIF
 
@@ -839,8 +837,8 @@
       SUBROUTINE SKYDIP_GET_SLICE(RAW_DATA, N_TEMP, N_BOLS, INT_START, 
      :     INT_END, N_INTEGRATIONS, N_POS, SLICE, STATUS)
 *    Description :
-*     This routine extracts a slice of data from the mapped DATA_ARRAY. It is used
-*     to retrieve an entire measurement for a set of integrations.
+*     This routine extracts a slice of data from the mapped DATA_ARRAY. 
+*     It is used to retrieve an entire measurement for a set of integrations.
 *    Invocation :
 *     CALL SKYDIP_GET_SLICE(RAW_DATA, N_TEMP, N_BOLS, INT_START, 
 *    :     INT_END, N_INTEGRATIONS, N_POS, SLICE, STATUS)
@@ -902,43 +900,4 @@
 
       END
 
-*------------------------------------------------------------------------------
-* Write data to output file
 
-      SUBROUTINE SKYDIP_WRITE_DATA (N, IN_DATA, OUT_DATA, STATUS)
-*    Description :
-*     Quick routine to write data to a NDF file given a MAPPED pointer.
-*    Invocation :
-*     CALL SKYDIP_WRITE_DATA (N, IN_DATA, OUT_DATA, STATUS)
-*    Parameters :
-*     N                          = INTEGER (Given)
-*                   Number of data points
-*     IN_DATA                    = REAL (Given)
-*                   input data array
-*     OUT_DATA                   = REAL (Given & returned)
-*                   mapped data array
-*     STATUS                     = INTEGER (Given & returned)
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     T. Jenness (timj@jach.hawaii.edu)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Import :
-      REAL IN_DATA(N)
-      INTEGER N
-*    Import-Export :
-      REAL OUT_DATA(N)        ! Input pointer and output data
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Local Variables :
-      INTEGER I
-*-
-
-      DO I = 1, N
-         OUT_DATA(I) = IN_DATA(I)
-      END DO
-
-      END
