@@ -1,5 +1,5 @@
-      SUBROUTINE KPS1_WALA0( INDF1, INDF2, IWCSR, METHOD, PARAMS, XY1, 
-     :                       XY2, ERRLIM, MAXPIX, STATUS )
+      SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, IWCSR, METHOD, PARAMS, 
+     :                       XY1, XY2, ERRLIM, MAXPIX, STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_WALA0( INDF1, INDF2, IWCSR, METHOD, PARAMS, XY1, XY2, 
+*     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, IWCSR, METHOD, PARAMS, XY1, XY2, 
 *                      ERRLIM, MAXPIX, STATUS )
 
 *  Description:
@@ -29,26 +29,30 @@
 *     is resampled also.
 
 *  Arguments:
+*     NDIM2 = INTEGER (Given)
+*        The numner of axes in the reference NDF.
 *     INDF1 = INTEGER (Given)
 *        Identifier for the input NDF.
 *     INDF2 = INTEGER (Given)
 *        Identifier for the output NDF.
 *     IWCSR = INTEGER (Given)
-*        AST pointer for the WCS FrameSet defining the reference pixel grid.
+*        AST pointer for the WCS FrameSet from the reference NDF.
 *     METHOD = INTEGER (Given)
 *        The interpolation method to use when re-sampling the input
 *        image; AST__NEAREST, AST__LINEAR, AST__SINCSINC, etc.
 *     PARAMS = DOUBLE PRECISION (Given)
 *        An optional array containing ay additonal parameter values
 *        required by the sub-pixel interpolation scheme.
-*     XY1( 2 ) = INTEGER (Given)
+*     XY1( NDIM2 ) = INTEGER (Given)
 *        The indices of the bottom left pixel in the output NDF. If set
 *        to VAL__BADI then default bounds will be found for the output
-*        NDF.
-*     XY2( 2 ) = INTEGER (Given)
+*        NDF. The number iof values in the array should equal the number
+*        of pixel axes in the output NDF.
+*     XY2( NDIM2 ) = INTEGER (Given)
 *        The indices of the top right pixel in the output NDF. If set
 *        to VAL__BADI then default bounds will be found for the output
-*        NDF.
+*        NDF. The number iof values in the array should equal the number
+*        of pixel axes in the output NDF.
 *     ERRLIM = REAL (Given)
 *        The position accuracy required when re-sampling the input NDF.
 *        Given as a number of pixels.
@@ -74,6 +78,8 @@
 *     19-SEP-2001 (DSB):
 *        Allow use with 1-dimensional NDFs by changing kpg1_asget EXACT
 *        argument to .false.
+*     31-OCT-2002 (DSB):
+*        Make N-dimensional.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,13 +98,14 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
+      INTEGER NDIM2
       INTEGER INDF1 
       INTEGER INDF2
       INTEGER IWCSR
       INTEGER METHOD
       DOUBLE PRECISION PARAMS( 2 )
-      INTEGER XY1( 2 )
-      INTEGER XY2( 2 )
+      INTEGER XY1( NDIM2 )
+      INTEGER XY2( NDIM2 )
       REAL ERRLIM
       INTEGER MAXPIX
 
@@ -109,17 +116,17 @@
       CHARACTER DOMLST*50          ! List of preferred alignment domains
       CHARACTER TY_IN*(NDF__SZTYP) ! Data type for processing
       DOUBLE PRECISION DUMMY( 1 )  ! Dummy array.
-      DOUBLE PRECISION PLBND1( 2 ) ! Lower pixel co-ord bounds in input
-      DOUBLE PRECISION PLBND2( 2 ) ! Lower pixel co-ord bounds in output
-      DOUBLE PRECISION PUBND1( 2 ) ! Upper pixel co-ord bounds in input
-      DOUBLE PRECISION PUBND2( 2 ) ! Upper pixel co-ord bounds in output
+      DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower pixel co-ord bounds in input
+      DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower pixel co-ord bounds in output
+      DOUBLE PRECISION PUBND1( NDF__MXDIM ) ! Upper pixel co-ord bounds in input
+      DOUBLE PRECISION PUBND2( NDF__MXDIM ) ! Upper pixel co-ord bounds in output
       DOUBLE PRECISION TOL         ! Max tolerable geometrical distort.
-      DOUBLE PRECISION XL( 2 )     ! I/p position of output lower bound
-      DOUBLE PRECISION XU( 2 )     ! I/p position of output upper bound
+      DOUBLE PRECISION XL( NDF__MXDIM )     ! I/p position of output lower bound
+      DOUBLE PRECISION XU( NDF__MXDIM )     ! I/p position of output upper bound
       INTEGER BAD_PIXELS         ! Value returned from AST_RESAMPLE<x>
-      INTEGER DIM1( NDF__MXDIM ) ! Indices of significant axes in input NDF
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
+      INTEGER I                  ! Loop count
       INTEGER IAT                ! No. of characters in string
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
@@ -130,31 +137,28 @@
       INTEGER IPQ2               ! Pointer to output quality array
       INTEGER IPV1               ! Pointer to input variance array
       INTEGER IPV2               ! Pointer to output variance array
-      INTEGER IPX                ! Pointer to array holding X image coords
-      INTEGER IPY                ! Pointer to array holding Y image coords
       INTEGER IWCS1              ! AST pointer to input WCS FrameSet
       INTEGER IWCS2              ! AST pointer to original output WCS FrameSet
       INTEGER IWCSR2             ! AST pointer to new output WCS FrameSet
-      INTEGER LBND1( 2 )         ! Lower bounds of input NDF
-      INTEGER LBND2( 2 )         ! Lower bounds of output NDF
-      INTEGER LGRID1( 2 )        ! Lower bounds of input grid co-ords
-      INTEGER LGRID2( 2 )        ! Lower bounds of output grid co-ords
+      INTEGER J                  ! Loop count
+      INTEGER LBND1( NDF__MXDIM )         ! Lower bounds of input NDF
+      INTEGER LBND2( NDF__MXDIM )         ! Lower bounds of output NDF
+      INTEGER LGRID1( NDF__MXDIM )        ! Lower bounds of input grid co-ords
+      INTEGER LGRID2( NDF__MXDIM )        ! Lower bounds of output grid co-ords
       INTEGER MAP                ! AST Mapping (i/p PIXEL -> ref. PIXEL)
       INTEGER MAP2               ! AST Mapping (o/p PIXEL -> o/p GRID)
       INTEGER MAP3               ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAP4               ! AST Mapping (i/p GRID -> i/p PIXEL)
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
-      INTEGER NDIM               ! No. of dimensions in input NDF
+      INTEGER NDIM1              ! No. of pixel axes in input NDF
       INTEGER NFRM               ! No. of Frames in input NDF FrameSet
       INTEGER RESULT             ! Dummy value returned from AST_RESAMPLE<x>
-      INTEGER UBND1( 2 )         ! Upper bounds of input NDF
-      INTEGER UBND2( 2 )         ! Upper bounds of output NDF
-      INTEGER UGRID1( 2 )        ! Upper bounds of input grid co-ords
-      INTEGER UGRID2( 2 )        ! Upper bounds of output grid co-ords 
+      INTEGER UBND1( NDF__MXDIM )         ! Upper bounds of input NDF
+      INTEGER UBND2( NDF__MXDIM )         ! Upper bounds of output NDF
+      INTEGER UGRID1( NDF__MXDIM )        ! Upper bounds of input grid co-ords
+      INTEGER UGRID2( NDF__MXDIM )        ! Upper bounds of output grid co-ords 
       LOGICAL BAD_DV             ! Bad pixels present in DATA/VARIANCE arrays?
-      LOGICAL BAD_Q              ! Bad pixels present in QUALITY array?
-      LOGICAL DATA               ! Data component present ?
       LOGICAL QUAL               ! Are quality values to be copied?
       LOGICAL VAR                ! Are variance values to be copied?
 *.
@@ -165,22 +169,22 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Set the number of axes required in the final output NDF. This is one
-*  if the input NDF has one pixel axis and two otherwise.
-      CALL NDF_DIM( INDF1, NDF__MXDIM, DIM1, NDIM, STATUS )
-      IF( NDIM .GT. 2 ) NDIM = 2
-
 *  Find the Mapping from input pixel co-ordinates to reference (i.e.
 *  output) pixel co-ordinates.
 *  =================================================================
 
+*  Get the pixel bounds of the input NDF.
+      CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS ) 
+
 *  Find the index of the PIXEL Frame in the reference NDF.
       CALL KPG1_ASFFR( IWCSR, 'PIXEL', IPIXR, STATUS )
 
-*  Get the WCS FrameSet from the input NDF. Report an error if the NDF is not
-*  2-dimensional.
-      CALL KPG1_ASGET( INDF1, 2, .FALSE., .FALSE., .TRUE., DIM1, 
-     :                 LBND1, UBND1, IWCS1, STATUS )
+*  Get the WCS FrameSet from the input NDF. 
+      CALL KPG1_GTWCS( INDF1, IWCS1, STATUS )
+
+*  Get the number of pixel axes in the input NDF (may not be the same as the
+*  number in the output NDF).
+      NDIM1 = AST_GETI( IWCS1, 'Nin', STATUS )
 
 *  Find the index of the PIXEL Frame in the input NDF.
       CALL KPG1_ASFFR( IWCS1, 'PIXEL', IPIX1, STATUS )
@@ -217,70 +221,69 @@
 *  If the user supplied explicitly specified bounds for the output
 *  images, use them. 
       IF( XY1( 1 ) .NE. VAL__BADI ) THEN
-         LBND2( 1 ) = XY1( 1 )
-         LBND2( 2 ) = XY1( 2 )
-         UBND2( 1 ) = XY2( 1 )
-         UBND2( 2 ) = XY2( 2 )
+         DO I = 1, NDIM2
+            LBND2( I ) = XY1( I )
+            UBND2( I ) = XY2( I )
+         END DO
 
 *  Otherwise, find the bounds of the box within the pixel co-ordinate
 *  Frame of the reference image which just includes the input image.
       ELSE
 
 *  Store the pixel co-ordinate bounds of the input image.
-         PLBND1( 1 ) = DBLE( LBND1( 1 ) - 1 )
-         PLBND1( 2 ) = DBLE( LBND1( 2 ) - 1 )
-         PUBND1( 1 ) = DBLE( UBND1( 1 ) )
-         PUBND1( 2 ) = DBLE( UBND1( 2 ) )
+         DO I = 1, NDIM2
+            PLBND1( I ) = DBLE( LBND1( I ) - 1 )
+            PUBND1( I ) = DBLE( UBND1( I ) )
+         END DO
 
-*  Find the axis 1 bounds of the corresponding area in the output image.
-         CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., 1, PLBND2( 1 ), 
-     :                    PUBND2( 1 ), XL, XU, STATUS ) 
-
-*  Find the axis 2 bounds of the corresponding area in the output image.
-         CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., 2, PLBND2( 2 ), 
-     :                    PUBND2( 2 ), XL, XU, STATUS ) 
+*  Find the bounds on each axis of the corresponding area in the output image.
+         DO I = 1, NDIM2
+            CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., I, 
+     :                       PLBND2( I ), PUBND2( I ), XL, XU, STATUS ) 
 
 *  Convert to pixel index bounds.
-         LBND2( 1 ) = NINT( PLBND2( 1 ) )
-         UBND2( 1 ) = NINT( PUBND2( 1 ) )
-         LBND2( 2 ) = NINT( PLBND2( 2 ) )
-         UBND2( 2 ) = NINT( PUBND2( 2 ) )
+            LBND2( I ) = NINT( PLBND2( I ) )
+            UBND2( I ) = NINT( PUBND2( I ) )
+         END DO
 
       END IF
 
 *  Report the bounds of the output NDF.
-      CALL MSG_SETI( 'LX', LBND2( 1 ) )
-      CALL MSG_SETI( 'LY', LBND2( 2 ) )
-      CALL MSG_SETI( 'UX', UBND2( 1 ) )
-      CALL MSG_SETI( 'UY', UBND2( 2 ) )
+      DO I = 1, NDIM2
+         CALL MSG_SETI( 'B', LBND2( I ) )
+         CALL MSG_SETC( 'B', ':' )
+         CALL MSG_SETI( 'B', UBND2( I ) )
+         IF( I .NE. NDIM2 ) CALL MSG_SETC( 'B', ', ' )
+      END DO
       CALL MSG_OUTIF( MSG__VERB, 'KPS1_WALA0_MSG2', '    The output '//
-     :                'NDF has bounds ( ^LX:^UX, ^LY:^UY )', STATUS )
+     :                'NDF has bounds ( ^B )', STATUS )
 
-*  Get bounds of input NDF in grid co-ords.
-      LGRID1( 1 ) = 1
-      LGRID1( 2 ) = 1
-      UGRID1( 1 ) = UBND1( 1 ) - LBND1( 1 ) + 1
-      UGRID1( 2 ) = UBND1( 2 ) - LBND1( 2 ) + 1
-
-*  Get bounds of output NDF in grid co-ords.
-      LGRID2( 1 ) = 1
-      LGRID2( 2 ) = 1
-      UGRID2( 1 ) = UBND2( 1 ) - LBND2( 1 ) + 1
-      UGRID2( 2 ) = UBND2( 2 ) - LBND2( 2 ) + 1     
+*  Get bounds of the input and output NDFs in grid co-ords
+      DO I = 1, NDIM2
+         LGRID1( I ) = 1
+         UGRID1( I ) = UBND1( I ) - LBND1( I ) + 1
+  
+         LGRID2( I ) = 1
+         UGRID2( I ) = UBND2( I ) - LBND2( I ) + 1
 
 *  Report an error if the output image would be too large.
-      IF( ( UGRID2( 1 ) .GT. 50000 .OR. UGRID2( 2 ) .GT. 50000 ) .AND.
-     :    STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NX', UGRID2( 1 ) )
-         CALL MSG_SETI( 'NY', UGRID2( 2 ) )
-         CALL ERR_REP( 'KPS1_WALA0_ERR1', 'The output image '//
-     :                 'dimensions are too big (^NX,^NY).', STATUS )
-      END IF
+         IF( ( UGRID2( I ) .GT. 50000 ) .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+
+            DO J = 1, NDIM2
+               CALL MSG_SETI( 'B', UBND2( J ) - LBND2( J ) +1 )
+               IF( J .NE. NDIM2 ) CALL MSG_SETC( 'B', ', ' )
+            END DO
+
+            CALL ERR_REP( 'KPS1_WALA0_ERR1', 'The output image '//
+     :                 'dimensions are too big (^B).', STATUS )
+            GO TO 999
+         END IF
+      END DO
 
 *  Change the bounds of the output NDF to the values required to cover
 *  all the input data.
-      CALL NDF_SBND( 2, LBND2, UBND2, INDF2, STATUS )
+      CALL NDF_SBND( NDIM2, LBND2, UBND2, INDF2, STATUS )
 
 *  Store WCS information in the output NDF.
 *  ========================================
@@ -325,10 +328,6 @@
 *  Store this FrameSet in the output NDF.
       CALL NDF_PTWCS( IWCSR2, INDF2, STATUS )
 
-*  The output currently has two pixel axes. If the input NDF only has 1
-*  pixel axis, then throw away the second output pixel axis.
-      IF( NDIM .EQ. 1 ) CALL NDF_SBND( 1, LBND2, UBND2, INDF2, STATUS )
-
 *  Do the resampling.
 *  ==================
 
@@ -362,64 +361,64 @@
 
 *  Call the appropriate resampling routine
       IF ( TY_IN .EQ. '_INTEGER' ) THEN
-         BAD_PIXELS = AST_RESAMPLEI( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLEI( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADI, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADI, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_REAL' ) THEN
-         BAD_PIXELS = AST_RESAMPLER( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLER( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADR, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADR, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_DOUBLE' ) THEN
-         BAD_PIXELS = AST_RESAMPLED( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLED( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADD, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADD, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_BYTE' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEB( MAP5, 2, LGRID1, UGRID1, 
+         BAD_PIXELS = AST_RESAMPLEB( MAP5, NDIM1, LGRID1, UGRID1, 
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADB, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADB, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UBYTE' ) THEN
-         BAD_PIXELS = AST_RESAMPLEUB( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLEUB( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUB, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADUB, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_WORD' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEW( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLEW( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADW, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADW, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
 
       ELSE IF ( TY_IN .EQ. '_UWORD' ) THEN 
-         BAD_PIXELS = AST_RESAMPLEUW( MAP5, 2, LGRID1, UGRID1,
+         BAD_PIXELS = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1,
      :                               %VAL( IPD1 ), %VAL( IPV1 ), METHOD, 
      :                               AST_NULL, PARAMS, FLAGS, TOL, 
-     :                               MAXPIX, VAL__BADUW, 2, LGRID2, 
+     :                               MAXPIX, VAL__BADUW, NDIM2, LGRID2, 
      :                               UGRID2, LGRID2, UGRID2, 
      :                               %VAL( IPD2 ), %VAL( IPV2 ), 
      :                               STATUS )
@@ -452,13 +451,17 @@
          FLAGS = 0
 
 *  Do the resampling.
-         RESULT = AST_RESAMPLEUW( MAP5, 2, LGRID1, UGRID1, %VAL( IPQ1 ), 
-     :                            DUMMY, METHOD, AST_NULL, PARAMS, 
-     :                            FLAGS, TOL, MAXPIX, VAL__BADUW, 2, 
-     :                            LGRID2, UGRID2, LGRID2, UGRID2, 
-     :                            %VAL( IPQ2 ), DUMMY, STATUS )
+         RESULT = AST_RESAMPLEUW( MAP5, NDIM1, LGRID1, UGRID1, 
+     :                            %VAL( IPQ1 ), DUMMY, METHOD, AST_NULL, 
+     :                            PARAMS, FLAGS, TOL, MAXPIX, 
+     :                            VAL__BADUW, NDIM2, LGRID2, UGRID2, 
+     :                            LGRID2, UGRID2, %VAL( IPQ2 ), DUMMY, 
+     :                            STATUS )
       
       END IF
+
+*  Tidy up.
+ 999  CONTINUE
 
 *  End the AST context.
       CALL AST_END( STATUS )

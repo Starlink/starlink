@@ -4,8 +4,7 @@
 *     WCSALIGN
 
 *  Purpose:
-*     Aligns a group of 1 or 2-dimensional NDFs using World Co-ordinate System 
-*     information.
+*     Aligns a group of NDFs using World Co-ordinate System information.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,8 +20,8 @@
 *        The global status.
 
 *  Description:
-*     This application resamples a group of 1 or 2-dimensional input NDFs,
-*     producing corresponding output NDFs which are aligned pixel-for-pixel
+*     This application resamples a group of input NDFs, producing 
+*     corresponding output NDFs which are aligned pixel-for-pixel
 *     with a specified reference NDF. 
 *
 *     The transformations needed to produce alignment are derived from the 
@@ -34,23 +33,23 @@
 *     A message indicating which Frame alignment was achieved in is
 *     displayed.
 *     
-*     The output image values are formed by re-sampling the input image
+*     The output pixel values are formed by re-sampling the input pixel
 *     values using nearest neighbour, bi-linear, sinc, sincsinc, sinccos,
 *     or sincgauss interpolation (see parameter METHOD). 
 *
-*     Two methods exist for determining the bounds of the output images.
+*     Two methods exist for determining the bounds of the output NDFs.
 *     Firstly, the user can give values for parameters LBND and UBND
 *     which are then used as the pixel index bounds for all output
-*     images. Secondly, if a null value is given for LBND or UBND,
-*     default values are generated separately for each output image so
-*     that the output image just encloses the entire area covered by the
-*     corresponding input image. Using the first method will ensure that
-*     all output images have the same pixel origin, and so the resulting
-*     images can be directly compared. However, this may result in the
-*     output images being larger than necessary. In general, the second
-*     method results in smaller images being produced, in less time.
-*     However, the output images will have differing pixel origins which
-*     need to be taken into account when comparing the aligned images.
+*     NDFs. Secondly, if a null value is given for LBND or UBND,
+*     default values are generated separately for each output NDF so
+*     that the output NDF just encloses the entire area covered by the
+*     corresponding input NDF. Using the first method will ensure that
+*     all output NDFs have the same pixel origin, and so the resulting
+*     NDFs can be directly compared. However, this may result in the
+*     output NDFs being larger than necessary. In general, the second
+*     method results in smaller NDFs being produced, in less time.
+*     However, the output NDFs will have differing pixel origins which
+*     need to be taken into account when comparing the aligned NDFs.
 
 *  Usage:
 *     wcsalign in out lbnd ubnd ref 
@@ -65,8 +64,8 @@
 *        supplied for ACC (in pixels), then a smaller region is used. High 
 *        accuracy is paid for by larger run times. [0.5]
 *     IN = NDF (Read)
-*        A group of 2-dimensional input images. This should be given as 
-*        a comma separated list, in which each list element can be:
+*        A group of input NDFs (of any dimensionality). This should be given 
+*        as  a comma separated list, in which each list element can be:
 *
 *        - an NDF name, optionally containing wild-cards and/or regular 
 *        expressions ("*", "?", "[a-z]" etc.). 
@@ -81,15 +80,16 @@
 *        If the value supplied for this parameter ends with a minus
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
-*        images given in this way are concatenated into a single group.
-*     LBND( 2 ) = _INTEGER (Read)
-*        A pair of values giving the lower pixel index bound on each axis 
-*        for the output images. The given values are used for all output 
-*        images.  If a null value (!) is given for this parameter or for 
-*        parameter UBND, then separate default values are calculated for 
-*        each output image which result in the output image just encompassing 
-*        the corresponding input image. The suggested defaults are the 
-*        lower pixel index bounds from the reference image (see parameter REF).
+*        NDFs given in this way are concatenated into a single group.
+*     LBND() = _INTEGER (Read)
+*        An array of values giving the lower pixel index bound on each axis 
+*        for the output NDFs. The number of values supplied should equal
+*        the number of axes in the reference NDF. The given values are used 
+*        for all output NDFs.  If a null value (!) is given for this parameter 
+*        or for parameter UBND, then separate default values are calculated for
+*        each output NDF which result in the output NDF just encompassing 
+*        the corresponding input NDF. The suggested defaults are the 
+*        lower pixel index bounds from the reference NDF (see parameter REF).
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -109,7 +109,7 @@
 *
 *        - "Bilinear" -- the output pixel values are calculated by 
 *        bi-linear interpolation among the four nearest pixels values 
-*        in the input image. Produces smoother output images than
+*        in the input NDF. Produces smoother output NDFs than
 *        the nearest neighbour scheme, but is marginally slower.
 *
 *        - "Nearest" -- the output pixel values are assigned the value 
@@ -121,7 +121,7 @@
 *
 *        - "SincSinc" -- uses the sinc(pi*x)sinc(k*pi*x) kernel. A
 *        valuable general-purpose interpolation scheme, intermediate
-*        in its visual effect on images between the bilinear and
+*        in its visual effect on NDFs between the bilinear and
 *        nearest neighbour schemes. 
 *         
 *        - "SincCos" -- uses the sinc(pi*x)cos(k*pi*x) kernal. Gives
@@ -137,7 +137,7 @@
 *        nearest neighbour need to be treated with care since the spatial 
 *        smoothing produced by this interpolation methods introduces 
 *        correlations in the variance estimates. Also, the degree of 
-*        smoothing produced varies across the image. This is because a 
+*        smoothing produced varies across the NDF. This is because a 
 *        sample taken at a pixel centre will have no contributions from the 
 *        neighbouring pixels, whereas a sample taken at the corner of a 
 *        pixel will have equal contributions from all four neighbouring 
@@ -153,14 +153,14 @@
 *        of input NDFs given for parameter IN. This should be given as 
 *        a comma separated list, in which each list element can be:
 *        - an NDF name. If the name contains an asterisk character "*",
-*        the name of the corresponding input image (without directory or
+*        the name of the corresponding input NDF (without directory or
 *        file suffix) is substituted for the asterisk (for instance, "*_al" 
-*        causes the output image name to be formed by appending the string 
-*        "_al" to the corresponding input image name). Input image names
+*        causes the output NDF name to be formed by appending the string 
+*        "_al" to the corresponding input NDF name). Input NDF names
 *        can also be edited by including original and replacement strings 
 *        between vertical bars after the NDF name (for instance,
 *        *_al|b4|B1| causes any occurrence of the string "B4" in the input 
-*        image name to be replaced by the string "B1" before appending the
+*        NDF name to be replaced by the string "B1" before appending the
 *        string "_al" to the result).
 *
 *        - the name of a text file, preceded by an up-arrow character "^".
@@ -173,7 +173,7 @@
 *        If the value supplied for this parameter ends with a minus
 *        sign "-", then the user is re-prompted for further input until
 *        a value is given which does not end with a minus sign. All the
-*        images given in this way are concatenated into a single group.
+*        NDFs given in this way are concatenated into a single group.
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *        An optional array which consists of additional parameters
 *        required by the Sinc, SincSinc, SincCos, and SincGauss
@@ -194,40 +194,41 @@
 *        run-time default value is 2.0. For the SincGauss scheme, it
 *        specifies the full-width at half-maximum (FWHM) of the Gaussian 
 *        envelope. The minimum value is 0.1, and the run-time default is
-*        1.0. On astronomical images and spectra, good results are often 
+*        1.0. On astronomical NDFs and spectra, good results are often 
 *        obtained by approximately matching the FWHM of the envelope 
 *        function, given by PARAMS(2), to the point spread function of the 
 *        input data. []
 *     REF = NDF (Read)
-*        A 2-dimensional NDF containing the image to which all the input
-*        images are to be aligned. If a null value is supplied for this 
-*        parameter, the first image supplied for parameter IN is used. 
-*     UBND( 2 ) = _INTEGER (Read)
-*        A pair of values giving the upper pixel index bound on each axis 
-*        for the output images. The given values are used for all output 
-*        images.  If a null value (!) is given for this parameter or for 
-*        parameter UBND, then separate default values are calculated for 
-*        each output image which result in the output image just encompassing 
-*        the corresponding input image. The suggested defaults are the 
-*        lower pixel index bounds from the reference image (see parameter REF).
+*        The NDF to which all the input NDFs are to be aligned. If a null 
+*        value is supplied for this parameter, the first NDF supplied for 
+*        parameter IN is used. 
+*     UBND() = _INTEGER (Read)
+*        An array of values giving the upper pixel index bound on each axis 
+*        for the output NDFs. The number of values supplied should equal
+*        the number of axes in the reference NDF. The given values are used 
+*        for all output NDFs.  If a null value (!) is given for this parameter 
+*        or for parameter LBND, then separate default values are calculated for
+*        each output NDF which result in the output NDF just encompassing 
+*        the corresponding input NDF. The suggested defaults are the 
+*        upper pixel index bounds from the reference NDF (see parameter REF).
 
 *  Examples:
 *     wcsalign image1 image1_al ref=image2 accept
-*        This example resamples the 2-dimensional NDF called image1 so that
-*        it is aligned with the 2-dimensional NDF call image2, putting the
-*        output in image1_al. The output image has the same pixel index
-*        bounds as image2 and inherits WCS information from image2.
+*        This example resamples the NDF called image1 so that it is aligned 
+*        with the NDF call image2, putting the output in image1_al. The output 
+*        image has the same pixel index bounds as image2 and inherits WCS 
+*        information from image2.
 *     wcsalign m51* *_al lbnd=! accept
-*        This example resamples all the 2-dimensional NDFs with names 
-*        starting with the string "m51" in the current directory so that 
-*        they are aligned with the first input NDF. The output images
-*        have the same names as the input images, but extended with the
-*        string "_al". Each output image is just big enough to contain all 
-*        the pixels in the corresponding input image.
+*        This example resamples all the NDFs with names starting with the 
+*        string "m51" in the current directory so that 
+*        they are aligned with the first input NDF. The output NDFs
+*        have the same names as the input NDFs, but extended with the
+*        string "_al". Each output NDF is just big enough to contain all 
+*        the pixels in the corresponding input NDF.
 *     wcsalign ^in.lis ^out.lis lbnd=! accept
 *        This example is like the previous example, except that the names
-*        of the input images are read from the text file in.lis, and the
-*        names of the corresponding output images are read from text file
+*        of the input NDFs are read from the text file in.lis, and the
+*        names of the corresponding output NDFs are read from text file
 *        out.lis.
 
 *  Notes:
@@ -262,6 +263,8 @@
 *     19-SEP-2001 (DSB):
 *        Allow use with 1-dimensional NDFs by changing kpg1_asget EXACT
 *        argument to .false.
+*     31-OCT-2002 (DSB):
+*        Make N-dimensional.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -287,26 +290,23 @@
       CHARACTER METHOD*13           ! Interpolation method to use.
       CHARACTER NDFNAM*(GRP__SZNAM) ! The name of an NDF.
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to AST_RESAMPLE<x>
-      INTEGER DIM( NDF__MXDIM )  ! Dimensions of pixel axes
       INTEGER I                  ! Index into input and output groups
       INTEGER IGRP1              ! GRP id. for group holding input NDFs
       INTEGER IGRP2              ! GRP id. for group holding output NDFs
       INTEGER INDF1              ! NDF id. for the input NDF
       INTEGER INDF2              ! NDF id. for the output NDF
       INTEGER INDFR              ! NDF id. for the reference NDF
-      INTEGER IWCSR              ! WCS FrameSet for reference image
-      INTEGER LBND( 2 )          ! Indices of lower left corner of outputs
+      INTEGER IWCSR              ! WCS FrameSet for reference NDF
+      INTEGER LBND( NDF__MXDIM ) ! Indices of lower left corner of outputs
       INTEGER MAXPIX             ! Initial scale size in pixels
       INTEGER METHOD_CODE        ! Integer corresponding to interp. method 
-      INTEGER NDIM               ! Number of pixel axes
+      INTEGER NDIMR              ! Number of pixel axes in reference NDF
       INTEGER NPAR               ! No. of required interpolation parameters
-      INTEGER RESULT             ! Debugging variable
-      INTEGER SDIM( 2 )          ! Indices of significant axis
       INTEGER SIZE               ! Total size of the input group
       INTEGER SIZEO              ! Total size of the output group
-      INTEGER SLBND( 2 )         ! Lower pixel bounds on significant axis
-      INTEGER SUBND( 2 )         ! Upper pixel bounds on significant axis
-      INTEGER UBND( 2 )          ! Indices of upper right corner of outputs
+      INTEGER LBNDR( NDF__MXDIM )! Lower pixel bounds of reference NDF
+      INTEGER UBNDR( NDF__MXDIM )! Upper pixel bounds of reference NDF
+      INTEGER UBND( NDF__MXDIM ) ! Indices of upper right corner of outputs
       REAL ERRLIM                ! Positional accuracy in pixels
 *.
 
@@ -326,7 +326,7 @@
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the reference image.
+*  Get the reference NDF.
       CALL LPG_ASSOC( 'REF', 'READ', INDFR, STATUS )
 
 *  If a null value was supplied, annul the error and use the first NDF
@@ -337,36 +337,30 @@
       END IF
 
 *  Get the associated WCS FrameSet. 
-      CALL KPG1_ASGET( INDFR, 2, .FALSE., .FALSE., .TRUE., SDIM, 
-     :                 SLBND, SUBND, IWCSR, STATUS )
+      CALL KPG1_GTWCS( INDFR, IWCSR, STATUS )
 
-*  If the reference NDF actually only has 1 pixel axis, we create a 1D output 
-*  NDF.
-      CALL NDF_DIM( INDFR, NDF__MXDIM, DIM, NDIM, STATUS )
-      IF( NDIM .GT. 1 ) NDIM = 2
+*  Get the dimensionality and pixel bounds of the reference NDF.
+      CALL NDF_BOUND( INDFR, NDF__MXDIM, LBNDR, UBNDR, NDIMR, STATUS ) 
 
 *  Set the suggested default for LBND and UBND.
-      CALL PAR_DEF1I( 'LBND', NDIM, SLBND, STATUS )
-      CALL PAR_DEF1I( 'UBND', NDIM, SUBND, STATUS )
+      CALL PAR_DEF1I( 'LBND', NDIMR, LBNDR, STATUS )
+      CALL PAR_DEF1I( 'UBND', NDIMR, UBNDR, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the bounds required for the output images.
-      CALL PAR_EXACI( 'LBND', NDIM, LBND, STATUS )
-      CALL PAR_EXACI( 'UBND', NDIM, UBND, STATUS )
+*  Get the bounds required for the output NDFs.
+      CALL PAR_EXACI( 'LBND', NDIMR, LBND, STATUS )
+      CALL PAR_EXACI( 'UBND', NDIMR, UBND, STATUS )
 
 *  If a null value was supplied for LBND or UBND, annul the error and
 *  put bad values in them.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         LBND( 1 ) = VAL__BADI
-         LBND( 2 ) = VAL__BADI
-         UBND( 1 ) = VAL__BADI
-         UBND( 2 ) = VAL__BADI
-      ELSE IF( NDIM .EQ. 1 ) THEN
-         LBND( 2 ) = SLBND( 2 )
-         UBND( 2 ) = SUBND( 2 )
+         DO I = 1, NDIMR 
+            LBND( I ) = VAL__BADI
+            UBND( I ) = VAL__BADI
+         END DO
       END IF
 
 *  Get a group containing the names of the output NDFs.  Base
@@ -460,8 +454,8 @@
          CALL NDG_NDFPR( INDF1, 'UNITS', IGRP2, I, INDF2, STATUS )
 
 *  Process this pair of input and output NDFs.
-         CALL KPS1_WALA0( INDF1, INDF2, IWCSR, METHOD_CODE, PARAMS,
-     :                    LBND, UBND, ERRLIM, MAXPIX, STATUS )
+         CALL KPS1_WALA0( NDIMR, INDF1, INDF2, IWCSR, METHOD_CODE, 
+     :                    PARAMS, LBND, UBND, ERRLIM, MAXPIX, STATUS )
 
 *  Annul the input NDF identifier.
          CALL NDF_ANNUL( INDF1, STATUS )
@@ -511,8 +505,7 @@
 *  Add a context report if anything went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'WCSALIGN_ERR', 'WCSALIGN: Failed to align a '//
-     :                 'group of 2-dimensional NDFs using WCS '//
-     :                 'information.', STATUS )
+     :                 'group of NDFs using WCS information.', STATUS )
       END IF
 
       END
