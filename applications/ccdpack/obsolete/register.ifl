@@ -62,8 +62,8 @@ interface REGISTER
       position 3
       type     _INTEGER
       access   READ
-      vpath    'CURRENT,DEFAULT '
-      ppath    'CURRENT,DEFAULT '
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
       default  1
       prompt   'Position of reference set'
       helpkey  '*'
@@ -92,8 +92,8 @@ interface REGISTER
    parameter OUTFORMAT
       type     LITERAL
       access   UPDATE
-      vpath    'CURRENT,DEFAULT '
-      ppath    'CURRENT,DEFAULT '
+      vpath    'PROMPT'
+      ppath    'CURRENT,DEFAULT'
       default  'WCS'
       prompt   'How transformation is written to output NDF'
       helpkey  '*'

@@ -44,8 +44,8 @@ interface ASTIMP
       position    3
       type        LITERAL
       access      READ
-      vpath       PROMPT
-      ppath       'DEFAULT,CURRENT'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
       prompt      'Domain name for Current import frames'
       helpkey     '*'
       default     !
@@ -54,7 +54,7 @@ interface ASTIMP
    parameter INDICES
       type        _INTEGER
       access      READ
-      vpath       'DYNAMIC,PROMPT'
+      vpath       'PROMPT'
       ppath       'DYNAMIC'
       prompt      'List of sequence values for INDEX frameset identifiers'
       helpkey     '*'

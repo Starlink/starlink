@@ -48,16 +48,16 @@ interface CCDGENERATE
 
    parameter ANGLES
       type     _DOUBLE
-      vpath    'PROMPT,CURRENT,DEFAULT'
+      vpath    'PROMPT'
       ppath    'CURRENT,DEFAULT'
       prompt   'Angle of each output sequence (degrees anticlockwise)'
       helpkey  '*'
-      default  (0D0)
+      default  0D0
    endparameter
 
    parameter ORIGINS
       type     _DOUBLE
-      vpath    'PROMPT,CURRENT'
+      vpath    'PROMPT'
       ppath    'CURRENT'
       prompt   'Origin of each output sequence (X,Y,...)'
       helpkey  '*'
@@ -73,7 +73,7 @@ interface CCDGENERATE
 
    parameter REDUCED
       type     _LOGICAL
-      vpath    'CURRENT'
+      vpath    'PROMPT'
       ppath    'CURRENT,DEFAULT'
       prompt   'Reduced data, or unreduced with bias and flats?'
       default  FALSE

@@ -145,7 +145,7 @@ interface FINDOFF
    parameter USEWCS
       type    _LOGICAL
       access  READ
-      vpath   'CURRENT,DEFAULT'
+      vpath   'PROMPT'
       ppath   'CURRENT,DEFAULT'
       default TRUE
       prompt  'Use NDF World Coordinate System extension if it exists'
@@ -155,7 +155,7 @@ interface FINDOFF
    parameter RESTRICT
       type    _LOGICAL
       access  READ
-      vpath   'CURRENT,DEFAULT'
+      vpath   'PROMPT'
       ppath   'CURRENT,DEFAULT'
       default FALSE
       prompt  'Restrict possible matches to apparently overlapping zones'
@@ -165,7 +165,7 @@ interface FINDOFF
    parameter MAXDISP
       type     _DOUBLE
       access   READ
-      vpath    'CURRENT,DEFAULT'
+      vpath    'PROMPT'
       ppath    'CURRENT,DEFAULT'
       default  !
       prompt   'Maximum displacement of frames relative to initial positioning'

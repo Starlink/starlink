@@ -57,7 +57,7 @@ interface ASTEXP
       position 4
       type        LITERAL
       access      READ
-      vpath       'CURRENT,PROMPT'
+      vpath       'PROMPT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Frame in NDFs to use as Base frame in AST file'
       default     'AXIS'
@@ -66,6 +66,7 @@ interface ASTEXP
 
    parameter BASEEPOCH
       type        _DOUBLE
+      vpath       'PROMPT'
       ppath       'DYNAMIC,CURRENT'
       prompt      'Base frame epoch of observation'
       helpkey     '*'
@@ -94,7 +95,7 @@ interface ASTEXP
    parameter INDICES
       type        _INTEGER
       access      READ
-      vpath       'DYNAMIC,PROMPT'
+      vpath       'PROMPT'
       ppath       'DYNAMIC'
       prompt      'List of sequence values for INDEX frameset identifiers'
       helpkey     '*'
