@@ -499,6 +499,9 @@
           CALL EDI_ALTLEN( OFID, NPT-NOUT, STATUS )
         END IF
 
+*  History
+        CALL HSI_ADD( OFID, VERSION, STATUS )
+
 *    Close if not first file, or if this is the last file
         IF ( (IFILE.GT.1) .OR. (IFILE.EQ.NFILE) ) THEN
           CALL ADI_FCLOSE( OFID, STATUS )
@@ -510,9 +513,6 @@
       IF ( MOK ) THEN
         CALL USI_ANNUL( 'MODEL', STATUS )
       END IF
-
-*  History
-      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Tidy up
  99   CALL PSF_CLOSE( STATUS )
