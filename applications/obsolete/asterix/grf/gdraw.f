@@ -101,7 +101,6 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-
 *  display dataset name
         CALL ADI_FTRACE( IFID, NLEV, PATH, FILE, STATUS )
 	CALL MSG_PRNT('Dataset: '//FILE )
@@ -219,8 +218,7 @@
 	  CALL GDRAW_2DGRAF(STATUS)
 	ENDIF
 
-      ENDIF
-
+      END IF
 
       END
 
@@ -348,11 +346,11 @@
 	ENDIF
 
 *  map x-axis values
-	CALL BDI_MAPR( ID, 'AXIS_1_Data', 'READ', APTR, STATUS )
+	CALL BDI_AXMAPR( ID, 1, 'Data', 'READ', APTR, STATUS )
 
 *  check errors
 	CALL BDI_CHK( ID, 'Variance', VOK, STATUS )
-	CALL BDI_CHK( ID, 'Axis_1_LoWidth,Axis_1_HiWidth', CHK, STATUS )
+	CALL BDI_AXCHK( ID, 1, 'LoWidth,HiWidth', CHK, STATUS )
         XERROK = CHK(1).AND.CHK(2)
 	CALL BDI_CHK( ID, 'LoError,HiError', CHK, STATUS )
         YERROK = CHK(1).AND.CHK(2)
@@ -360,8 +358,8 @@
 
 *  get default title and labels
 	CALL BDI_GET0C( ID, 'Title', TITLE, STATUS )
-	CALL BDI_GET0C( ID, 'Axis_1_Label', LABEL, STATUS )
-	CALL BDI_GET0C( ID, 'Axis_1_Units', UNITS, STATUS )
+	CALL BDI_AXGET0C( ID, 1, 'Label', LABEL, STATUS )
+	CALL BDI_AXGET0C( ID, 1, 'Units', UNITS, STATUS )
 	CALL GFX_DEFLBL(LABEL,UNITS,XLABEL,STATUS)
 	CALL BDI_GET0C( ID, 'Label', LABEL, STATUS )
 	CALL BDI_GET0C( ID, 'Units', UNITS, STATUS )
@@ -387,24 +385,24 @@
 *  map error information if needed
 	IF ( ERRS ) THEN
 	  IF ( AERR ) THEN
-	    CALL BDI_MAPR( ID, 'Axis_1_LoWidth,Axis_1_HiWidth',
+	    CALL BDI_AXMAPR( ID, 1, 'LoWidth,HiWidth',
      :                     'READ', ASXPTR, STATUS )
 	    CALL BDI_MAPR( ID, 'LoError,HiError', 'READ', ASYPTR,
      :                     STATUS )
 	  ELSE
 	    CALL BDI_MAPR( ID, 'Variance', 'READ', VPTR, STATUS )
-	    CALL BDI_MAPR( ID, 'Axis_1_Width', 'READ', WPTR, STATUS )
+	    CALL BDI_AXMAPR( ID, 1, 'Width', 'READ', WPTR, STATUS )
 	  ENDIF
 	ENDIF
 
 *  if step-line need axis widths
 	IF (STEP) THEN
-	  CALL BDI_CHK( ID, 'Axis_1_Width', WOK, STATUS )
+	  CALL BDI_AXCHK( ID, 1, 'Width', WOK, STATUS )
 	  IF ( WOK ) THEN
-	    CALL BDI_MAPR( ID, 'Axis_1_Width', 'READ', WPTR, STATUS )
+	    CALL BDI_AXMAPR( ID, 1, 'Width', 'READ', WPTR, STATUS )
 	    AWID = .FALSE.
 	  ELSE
-	    CALL BDI_MAPR( ID, 'Axis_1_LoWidth,Axis_1_HiWidth',
+	    CALL BDI_AXMAPR( ID, 1, 'LoWidth,HiWidth',
      :                     'READ', ASXPTR, STATUS )
 	    AWID=.TRUE.
 	  ENDIF
@@ -948,7 +946,7 @@
         YDIM = DIMS(2)
 
 *  map x-axis values
-        CALL BDI_CHK( ID, 'Axis_1_Data', XOK, STATUS )
+        CALL BDI_AXCHK( ID, 1, 'Data', XOK, STATUS )
 	IF ( .NOT. XOK ) THEN
 	  XREG=.TRUE.
           XBASE=1.0
@@ -956,12 +954,12 @@
           CALL DYN_MAPR( 1, XDIM, XPTR, STATUS )
           CALL ARR_REG1R( XBASE, XSCALE, XDIM, %VAL(XPTR), STATUS )
 	ELSE
-	  CALL BDI_MAPR( ID, 'Axis_1_Data', 'READ', XPTR, STATUS )
+	  CALL BDI_AXMAPR( ID, 1, 'Data', 'READ', XPTR, STATUS )
 	  CALL ARR_CHKREG(%val(XPTR),XDIM,XREG,XBASE,XSCALE,STATUS)
 	END IF
 
 *  map y-axis values
-        CALL BDI_CHK( ID, 'Axis_2_Data', YOK, STATUS )
+        CALL BDI_AXCHK( ID, 2, 'Data', YOK, STATUS )
 	IF ( .NOT. YOK ) THEN
 	  YREG=.TRUE.
           YBASE=1.0
@@ -969,7 +967,7 @@
           CALL DYN_MAPR( 1, YDIM, YPTR, STATUS )
           CALL ARR_REG1R( YBASE, YSCALE, YDIM, %VAL(YPTR), STATUS )
 	ELSE IF ( .NOT. YREG ) THEN
-	  CALL BDI_MAPR( ID, 'Axis_2_Data', 'READ', YPTR, STATUS )
+	  CALL BDI_AXMAPR( ID, 2, 'Data', 'READ', YPTR, STATUS )
 	  CALL ARR_CHKREG(%val(YPTR),YDIM,YREG,YBASE,YSCALE,STATUS)
 	ENDIF
 

@@ -1117,7 +1117,7 @@
           PMIN = 0.95*PMIN
           PMAX = 1.05*PMAX
         END IF
-	print *,'pix range ',pmin,pmax
+	print *,'pix range ',pmin,pmax,status
         I_PMIN = PMIN
         I_PMAX = PMAX
 
