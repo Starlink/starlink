@@ -122,6 +122,6 @@
 
       S_END  = S_END - 1
 
-      print *,  switch, exp, int, meas, s_start, s_end
+*      print *,  switch, exp, int, meas, s_start, s_end
 
       END
