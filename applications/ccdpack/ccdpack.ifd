@@ -126,14 +126,14 @@ package ccdpack {
       source ccdexp.ifd
    }
 
-   executable ccdpack_nag {
-      source nagmakemos.ifd
-   }
-
    executable ccdpack_scr {
       source reduce.ifd
       source ccdalign.ifd
       source xreduce.ifd
+   }
+
+   command nagmakemos {
+      obsolete {  Command NAGMAKEMOS has been withdrawn - use MAKEMOS instead.}
    }
 
    adam: { 
