@@ -92,6 +92,16 @@
    set MAPTYPE(3) "Shift and magnification"
    set MAPTYPE(4) "Shift, rotation and magnification"
    set MAPTYPE(5) "Full 6 parameter fit"
+   set MAPSTATE(1,0) normal
+   set MAPSTATE(2,0) normal
+   set MAPSTATE(3,0) normal
+   set MAPSTATE(4,0) normal
+   set MAPSTATE(5,0) normal
+   set MAPSTATE(1,1) normal
+   set MAPSTATE(2,1) disabled
+   set MAPSTATE(3,1) normal
+   set MAPSTATE(4,1) disabled
+   set MAPSTATE(5,1) disabled
    set MENUBACK "#b0b0b0"
    set NONE 5
    set O_RAY_FEATURES 0
@@ -323,9 +333,11 @@
    }
 
 # If this script was activated from the polka A-task, then the variable 
-# "in-list" will be defined, holding a list of input images. Otherwise,
-# we get the input and output file names from the command line, and copy
-# them into the variables which would have been used by the a-task.
+# "in-list" will be defined, holding a list of input images (the
+# variables "o_list" and "e_list" will also be defined holding the output O
+# and E images). Otherwise, we get the input and output file names from the 
+# command line, and copy them into the variables which would have been used 
+# by the a-task.
    if { ![info exists in_list] } {
 
       if { $argc == 0 } {
@@ -377,6 +389,19 @@
    } {
       set DBEAM_STATE disabled
       set DBEAM_TEXT "Single-beam"
+   }
+
+# Save the number of supplied E and O output image names.
+   set NEOUT 0
+   set NOOUT 0 
+   if { [info exists o_list] } { set NOOUT [llength $o_list] }
+   if { $DBEAM && [info exists e_list] } { set NEOUT [llength $e_list] }
+
+# Store a flag indicating if any output files are being created.
+   if { $STOKES || $NEOUT > 0 || $NOOUT > 0 } {
+      set GOTOUT 1
+   } {
+      set GOTOUT 0
    }
 
 # Now get the optional list of input sky images. If any sky frames have
@@ -716,7 +741,8 @@
    set mapmenu [menu $OPTSMENU.map]
    for {set type 1} {$type < 6} {incr type} {
       $mapmenu add radiobutton -label $MAPTYPE($type) -variable FITTYPE \
-                               -selectcolor $RB_COL -value $MAPTYPE($type)
+                               -selectcolor $RB_COL -value $MAPTYPE($type) \
+                               -state $MAPSTATE($type,$DBEAM)
       MenuHelp $mapmenu $MAPTYPE($type) ".  Align images using \"$MAPTYPE($type)\"."
    }
    $mapmenu add separator
@@ -733,14 +759,6 @@
    }
 
    SetHelp $oemapmenu ".  The type of mapping to use when aligning the O and E rays. "
-
-# Save the number of E and O output images to create.
-   set NOOUT [llength $o_list]
-   if { $DBEAM } { 
-      set NEOUT [llength $e_list]
-   } {
-      set NEOUT 0
-   }
 
 # Go through every supplied image section.
    set maximwid 0

@@ -342,10 +342,18 @@ The effect of sky subtraction on an image can be previewed using the
 \subsection{\mylabel{POLKA_ALIGNMENT}Image Alignment}
 Alignment of the extracted, sky-subtracted images is based on the
 position of stars identified by the user within the images. The mapping
-between any pair of images is assumed to be linear with a shift of
-origin. Further restrictions may be imposed on the mappings (for
-instance, restricting them to a shift of origin only, or a shift plus a
-magnification, etc). The coefficients of the mappings are determined by
+between any pair of images is assumed to be a shift of origin plus an
+optional magnification. When dealing with polarimeter data these mapping
+types will suffice since any rotation between the images modifies the 
+plane of polarisation reaching the analyser and so confuses the
+estimation of the Stokes parameters.
+
+However, for non-polarimeter data, more flexible mappings can often be
+useful. For this reason options are provided in single-beam mode to allow
+the mapping to include rotation and shear, but these options SHOULD NOT
+BE USED for polarimeter data.
+
+In all cases, the coefficients of the mappings are determined by
 performing a least squares fit between the positions in the two images.
 The images are resampled using either nearest-neighbour or bi-linear
 interpolation once all required mappings have been determined, and any
@@ -425,28 +433,6 @@ shown in the \htmlref{status area}{POLKA_STATUS_AREA} below the image
 display). The current option values may be saved by pressing the {\em
 Save Options} item at the bottom of the {\em Options} menu, in which case
 they become the default values for subsequent invocations of POLKA.
-
-The most important of these options is the type of mapping to be used
-when aligning the input images. To see the available mappings (which are
-all linear but have different restrictions), click on the \htmlref{{\em
-Mapping Types}}{POLKA_MAP_TYPES} menu item. To select a mapping type,
-click over its name. You should choose a mapping appropriate to your
-data, avoiding any which allow more freedom than is justified. For
-instance, if you know that your images all have the same pixel size but
-may be rotated and shifted with respect to each other, then choose {\em
-Shift and rotation} as the mapping type. It is best to avoid the {\em
-Full 6 parameter fit} mapping unless you have a specific reason for using
-it. Note, the magnification produced by the other mappings is the same
-for both axes.
-
-Having done this, you may also want to specify the mapping type to be
-used when aligning the $O$ and $E$ ray areas. To do this, click on the
-{\em O-E Mapping Type} entry in the \htmlref{{\em Mapping
-Types}}{POLKA_MAP_TYPES} entry in the \htmlref{{\em
-Options}}{POLKA_OPTIONS_MENU} menu. A similar menu containing the same
-list of mappings is displayed, from which a selection may be made.
-Usually {\em Shift of origin only} will be the most appropriate.
-
 
 \subsubsection {Identifying $O$-ray features in the first image.}
 The default scaling for the displayed image will usually result in the
@@ -973,6 +959,13 @@ mappings. These allow
 combinations of shift, rotation and magnification, but no shear (i.e. the
 rotation is the same for both axes). In addition, the magnification
 produced by these constrained mappings is always the same on both axes.
+
+NOTE, for polarimeter data, you should choose a mapping type which does
+not allow rotation. This is because any rotation between images
+effectively changes the analyser angle and confuses the Stokes parameter
+calculations. For this reason, the more general mapping types are only
+available in single-beam mode, which is the mode which will be used to
+align non-polararimeter data.
 
 The constrained mappings are specified in terms of the shift, rotation and
 magnification which they produce. Using this description, the original
@@ -1739,6 +1732,17 @@ To be written.
 
 \subsection {\mylabel{POLKA_IDENTIFYING_FEATURES}Identify Image Features}
 To be written.
+
+\subsection {\mylabel{POLKA_STOP_START}Stop and Re-start POLKA}
+Use the \htmlref{{\em Dump}}{POLKA_DUMP} and \htmlref{{\em
+Restore}}{POLKA_RESTORE} commands in the \htmlref{{\em
+File}}{POLKA_FILE_MENU} menu. {\em Dump} creates a text file containing 
+all the features positions, masks, mappings, etc, which you have supplied so 
+far. After using {\em Dump}, you can use \htmlref{{\em Quit}}{POLKA_QUIT}
+to terminate execution of POLKA without creating the output images. You
+can then re-start POLKA later, and use {\em Restore} to read the text
+file created by {\em Dump}. This puts POLKA into the state it was
+in  when the dump file was created.
 
 \subsection {\mylabel{POLKA_EDITING_POLYGONS}Edit polygons}
 Polygons are displayed when one of the {\em mask} or {\em sky

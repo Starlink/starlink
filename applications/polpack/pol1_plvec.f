@@ -138,6 +138,7 @@
       INTEGER JQ                 ! Index of Q plane in input arrays
       INTEGER JU                 ! Index of U plane in input arrays
       INTEGER JV                 ! Index of V plane in input arrays
+      INTEGER NVEC               ! No. of catalogue rows written
       INTEGER PIX                ! Pixel index
       INTEGER ROW                ! Row index
       LOGICAL CIRC               ! Measure circular polarisation?
@@ -218,6 +219,8 @@
 *  If a catalogue is being produced, get CAT identifiers for the required
 *  columns.
       IF( MAKECT ) THEN
+         NVEC = 0
+
          CALL CAT_TIDNT( CI, 'X', XCAT, STATUS )
          CALL CAT_TIDNT( CI, 'Y', YCAT, STATUS )
          CALL CAT_TIDNT( CI, 'I', ICAT, STATUS )
@@ -485,7 +488,8 @@
 
 *  Append the current row buffer to the catalogue.
                   CALL CAT_RAPND( CI, STATUS )
-   
+                  NVEC = NVEC + 1
+
                END IF
             END DO
          END DO
@@ -684,6 +688,7 @@
 
 *  Append the current row buffer to the catalogue.
                   CALL CAT_RAPND( CI, STATUS )
+                  NVEC = NVEC + 1
    
                END IF
 
@@ -692,7 +697,15 @@
 
       END IF
 
- 999  CONTINUE
+*  Display the number of rows written to the catalogue.
+      IF( MAKECT ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETI( 'N', NVEC )
+         CALL MSG_OUT( 'POL1_PLVEC_1', '   ^N vectors written to '//
+     :                 'the output catalogue.', STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
 
+ 999  CONTINUE
 
       END

@@ -5445,13 +5445,14 @@ proc Finish {save} {
 #        mappings and/or masks.
 #-
    global RESAVE
+   global GOTOUT
 
 # If required, save the output images.
    if { $save && $RESAVE } { Save }
 
 # Construct a suitable confirmation question, depending on whether or not
 # the output images have been saved.
-   if { $RESAVE } {
+   if { $RESAVE && $GOTOUT } {
       set quest "The output images have not yet been saved!\n\nQuit Polka?"   
    } {
       set quest "Exit Polka?"   
@@ -10205,11 +10206,15 @@ proc Save {} {
    global STKOUT
    global STOKES
    global S_FONT
+   global GOTOUT
 
-# Begin a temporary file context.
-   set tfc [BeginUF]
+# If no output files are required, tell the user.
+   if { !$GOTOUT } { 
+      Message "No output data files were specified when Polka was run.\n\n(The Dump command in the File menu can still be used to dump the current feature positions, masks, etc.)"
+      return 1 
+   }
 
-# |Display a warning and return if the images have already been saved.
+# Display a warning and return if the images have already been saved.
    if { $STOKES } {
       set out "Stokes cube"
       set w1 "is"
@@ -10222,6 +10227,9 @@ proc Save {} {
       Message "The output $out $w1 already up-to-date with respect to the current mappings and masks."
       return 1 
    }
+
+# Begin a temporary file context.
+   set tfc [BeginUF]
 
 # Tell the user what is happening.
    set told [SetInfo "Creating new output $out. Please wait... " 0]
@@ -12445,7 +12453,7 @@ proc SkySub {data image sub args} {
 # Do the subtraction, then ensure that he bounds are the same as the
 # supplied data (padding with bad pixels if necessary).
       set ssimage [UniqueFile]
-      if { ![Obey kappa sub "in1=$data in2=$SKYIMS($image) out=$ssimage"] } {
+      if { ![Obey kappa maths "exp=ia-ib ia=$data ib=$SKYIMS($image) out=$ssimage"] } {
          set ssimage ""
       } {
          if { ![Obey ndfpack setbound "ndf=$ssimage like=$data"] } {
@@ -12561,7 +12569,7 @@ proc SkySub {data image sub args} {
       if { $ok } {
          if { $sub } {
             set ssimage [UniqueFile]
-            if { ![Obey kappa sub "in1=$data in2=$sky out=$ssimage"] } {
+            if { ![Obey kappa maths "exp=ia-ib ia=$data ib=$sky out=$ssimage"] } {
                set ok 0
             }
          } {

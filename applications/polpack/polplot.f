@@ -149,7 +149,7 @@
 *        hand edge of the key. The second value gives the vertical position of
 *        the top of the key. If the second value is not given, the top of 
 *        the key is placed level with the top of the vector map. Both
-*        values should be in the range 0.0 to 1.0. [0.15]
+*        values should be in the range 0.0 to 1.0. [0.03]
 *     KEYSTYLE = GROUP (Read)
 *        The plotting style to use for the key (see parameter KEY). This 
 *        should be a group of comma-separated name=value strings where "name" 

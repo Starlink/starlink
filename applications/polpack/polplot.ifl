@@ -148,7 +148,7 @@ interface POLPLOT
       vpath       'DEFAULT'
       ppath       'DEFAULT'
       helpkey     '*'
-      default     0.15
+      default     0.03
    endparameter
 
    parameter      KEYSTYLE       

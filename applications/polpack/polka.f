@@ -152,16 +152,16 @@
 *        output images to create in single-beam mode, holding aligned
 *        intensity values from the input images. These should correspond 
 *        one-for-one to the input images supplied using parameter IN. If 
-*        a null (!) value is given, then no intensity images are created. 
-*        Note, the output images cannot be specified within the GUI. 
+*        a null (!) value is given, then the intensity images are not
+*        saved. Note, the output images cannot be specified within the GUI. 
 *     OUT_E = LITERAL (Write)
 *        This parameter is only used if parameter DUALBEAM is given a 
 *        true value. It is a list of the 
 *        names of the E-ray output images to create in dual-beam mode, 
 *        holding aligned E-ray intensity values from the input images. These 
 *        should correspond one-for-one to the input images supplied using 
-*        parameter IN. If  a null (!) value is given, then no E-ray intensity
-*        images are created. Note, the output images cannot be specified 
+*        parameter IN. If  a null (!) value is given, then the E-ray intensity
+*        images are not saved. Note, the output images cannot be specified 
 *        within the GUI. 
 *     OUT_O = LITERAL (Write)
 *        This parameter is only used if parameter DUALBEAM is given a 
@@ -169,8 +169,8 @@
 *        names of the O-ray output images to create in dual-beam mode, 
 *        holding aligned O-ray intensity values from the input images. These 
 *        should correspond one-for-one to the input images supplied using 
-*        parameter IN. If  a null (!) value is given, then no O-ray intensity
-*        images are created. Note, the output images cannot be specified 
+*        parameter IN. If a null (!) value is given, then the O-ray intensity
+*        images are not saved. Note, the output images cannot be specified 
 *        within the GUI. 
 *     PERCENTILES( 2 ) = _REAL (Update)
 *        The percentiles that define the scaling limits for the displayed
@@ -386,8 +386,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get a group containing the names of the object frames to be used.
+*  Tell the user how many are found.
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            SIZE, STATUS )
+      CALL MSG_SETI( 'I', SIZE )
+      CALL MSG_OUT( 'POLKA_MSG_1', '  Using ^I input images.', STATUS ) 
 
 *  Get a group containing the names of the sky frames to be used. If no
 *  sky frames are supplied, then the sky is estimated within the object
@@ -475,6 +478,9 @@
 
       END IF
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 * Now deal with cases where we are creating aligned intensity images from
 * dual-beam data.
       IF ( DBEAM ) THEN
@@ -486,12 +492,23 @@
      :               '  Give more image names...', IGRP2, SIZEO, 
      :               STATUS )
 
+*  If a null value is supplied, the aligned intensity images are not saved.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IGRP2 = GRP__NOID
+         END IF
+
 *  Get a group containing the names of the output NDFs to hold the
 *  registered E-ray areas. Base modification elements on the group 
 *  containing the input NDFs.
          CALL WRNDF( 'OUT_E', IGRP1, SIZE, SIZE, 
      :               '  Give more image names...', IGRP3, SIZEO, 
      :               STATUS )
+*  If a null value is supplied, the aligned intensity images are not saved.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IGRP2 = GRP__NOID
+         END IF
 
 *  In single beam mode, we just get a single set of output images, using
 *  parameter OUT. The second group identifier is set equal to the first
@@ -501,6 +518,12 @@
      :               '  Give more image names...', IGRP2, SIZEO, 
      :               STATUS )
          IGRP3 = GRP__NOID
+
+*  If a null value is supplied, the aligned intensity images are not saved.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            IGRP2 = GRP__NOID
+         END IF
 
       END IF
 
@@ -629,8 +652,8 @@
 
 *  Delete the groups.
  999  CONTINUE
-      CALL GRP_DELET( IGRP1, STATUS )
-      CALL GRP_DELET( IGRP2, STATUS )
+      IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )
+      IF( IGRP2 .NE. GRP__NOID ) CALL GRP_DELET( IGRP2, STATUS )
       IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
       IF( IGRPS .NE. GRP__NOID ) CALL GRP_DELET( IGRPS, STATUS )
 

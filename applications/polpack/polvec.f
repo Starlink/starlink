@@ -26,9 +26,6 @@
 *     created by POLCAL). These calculated values may be stored either in
 *     a series of 2-dimensional NDFs, or in a single table which may be
 *     examined and manipulated using the CURSA package (see SUN/190).
-*
-*     The Stokes parameters may be binned before calculating the output
-*     values.
 
 *  Usage:
 *     polvec in cat [p] [theta] [i] [ip]
@@ -39,9 +36,18 @@
 *        binning the supplied Stokes parameters prior to estimating the
 *        polarisation vectors. If only a single value is given,
 *        then it will be duplicated so that a square bin is used. A value
-*        of 1 produces no binning. If a null (!) value is supplied, then a 
-*        default is used which gives about 30 square bins along the longest 
-*        axis. [!]
+*        of 1 produces no binning, and causes the origin of the output
+*        NDFs and catalogue to be the same as the x-y origin in the input 
+*        cube (the output origin is set to [0.0,0.0] if any binning is
+*        performed).
+*
+*        Note, if the output vectors are being stored in a catalogue, it
+*        is usually better to avoid binning the Stokes vectors in POLVEC
+*        by giving a value of 1 for parameter BOX. The POLBIN application can 
+*        then be used to bin the Stokes vectors creates by this application. 
+*        This ensures that the vector coordinates stored in the catalogue
+*        refer to positions in the x-y frame of the input cube, rather than
+*        to positions in the binned frame. [1]
 *     CAT = LITERAL (Read)
 *        The name of a catalogue to create, holding the calculated
 *        polarisation paremeters tabulated at each point for which Stokes
@@ -68,11 +74,13 @@
 *        and U will be replaced by equivalent columns describing V.
 *
 *        The coordinates contained in columns X and Y refer to pixel
-*        coordinates after binning (i.e. to the pixel coordinate frames
-*        of the output NDFs associated with parameters P, THETA, I, and 
-*        IP). Information describing the mappings between this coordinate 
-*        Frame and any other known coordinate Frames will be stored in the 
-*        catalogue in textual form, as an AST FrameSet (see SUN/210). 
+*        coordinates after any binning (i.e. to the pixel coordinate
+*        Frames of the output NDFs associated with parameters I, P,
+*        THETA, etc). For this reason it is usually better to avoid
+*        binning the Stokes vectors in this application (see parameter BOX).
+*        Information describing the mappings between pixel coordinates and 
+*        any other known coordinate Frames will be stored in the catalogue
+*        in textual form, as an AST FrameSet (see SUN/210). 
 *
 *        The storage format of the catalogue is determined by the "file
 *        type" specified with the file name. If no file type is supplied,
@@ -217,6 +225,7 @@
       INTEGER NYBIN              ! No. of bins along Y axis
       INTEGER UBND( 3 )          ! Upper bounds of input NDF
       INTEGER WKBNSZ             ! Size of workspace for binned data
+      LOGICAL BINNING            ! Is any binning taking place?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
       LOGICAL MAKECT             ! Catalogue output required?
       LOGICAL MAKEI              ! Total intensity output required?
@@ -299,17 +308,25 @@
 
       END IF
 
+*  Set a flag indicating if any binning is taking place.
+      BINNING = ( BOX( 1 ) .NE. 1 .OR. BOX( 2 ) .NE. 1 )
+
 *  Obtain the dimensions and bounds of the binned arrays.
-      NXBIN = DIM( 1 )/BOX( 1 )
-      NYBIN = DIM( 2 )/BOX( 2 )
-      LBND( 1 ) = 1
-      LBND( 2 ) = 1
-      UBND( 1 ) = NXBIN
-      UBND( 2 ) = NYBIN
+      IF( BINNING ) THEN
+         NXBIN = DIM( 1 )/BOX( 1 )
+         NYBIN = DIM( 2 )/BOX( 2 )
+         LBND( 1 ) = 1
+         LBND( 2 ) = 1
+         UBND( 1 ) = NXBIN
+         UBND( 2 ) = NYBIN
+      ELSE
+         NXBIN = DIM( 1 )
+         NYBIN = DIM( 2 )
+      END IF
 
 *  If the bin size is one on each axis, then just use the supplied DATA
 *  and VARIANCE arrays.
-      IF( BOX( 1 ) .EQ. 1 .AND. BOX( 2 ) .EQ. 1 ) THEN
+      IF( .NOT. BINNING ) THEN
          WKBNSZ = 0
          IPDBIN = IPDIN
          IPVBIN = IPVIN
@@ -564,11 +581,11 @@
 *  ============================
 
 *  Store the coefficients of the transformation between cell indices and
-*  cell centre (X,Y) coordinates 9for the catalogue).
-      TR2( 1 ) = 0.5 - REAL( LBND( 1 ) ) 
+*  cell centre (X,Y) coordinates for the catalogue).
       TR2( 2 ) = 1.0
-      TR2( 3 ) = 0.5 - REAL( LBND( 2 ) ) 
+      TR2( 1 ) = REAL( LBND( 1 ) ) - 0.5 - TR2( 2 )
       TR2( 4 ) = 1.0
+      TR2( 3 ) = REAL( LBND( 2 ) ) - 0.5 - TR2( 4 )
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 

@@ -302,10 +302,15 @@ parameters, and display of vector maps.
 \section{\xlabel{introduction}Introduction}
 POLPACK is a package of applications for mapping the linear polarization
 of extended astronomical objects, using data obtained from a dual-beam
-polarimeter\footnote{It is hoped that POLPACK will be extended at the
-next release to include support for circular polarization, and
-single-beam polarimeters.}. Other assumptions regarding the specific form
-of the data or the polarimeter have, as far as possible, been avoided.
+polarimeter\footnote{Partial support is included for circular
+polarization, and single-beam polarimeters. The current restrictions are
+that POLCAL and POLKA cannot produce Stokes vectors for single-beam data,
+and POLPLOT cannot represent circular polarization. It is hoped that
+POLPACK will be extended at the next release to remove these
+restrictions.} It is assumed that the analyser is stepped in units of
+45\dgs\ and that there is no rotation between exposures. Other
+assumptions regarding the specific form of the data or the polarimeter
+have, as far as possible, been avoided.
 
 POLPACK processes data in {\em NDF} format. This is the standard data
 format used by most Starlink software, and is described fully in

@@ -22,9 +22,9 @@ interface POLVEC
 
    parameter      BOX            # Bin size
       type        '_INTEGER'
-      vpath       'PROMPT'
+      vpath       'DEFAULT'
       ppath       'DEFAULT'
-      default     !
+      default     1
       prompt      'Bin size'
       helpkey     '*'
    endparameter

@@ -136,11 +136,17 @@
       IF( THERE ) THEN
          CALL CMP_GET0C( LOC, 'WPLATE', WPLATE, STATUS )
 
-*  If the value is "45" or "0", use "45.0" and "0.0"
+*  If the value is "45" or "0", use "45.0" and "0.0". The existing
+*  WPLATE component will not be long enough to hold the trailing ".0"
+*  so erase it and create a new, longer, WPLATE component.
          IF( WPLATE .EQ. '0' ) THEN
+            CALL DAT_ERASE( LOC, 'WPLATE', STATUS )
+            CALL DAT_NEW0C( LOC, 'WPLATE', 3, STATUS ) 
             CALL CMP_PUT0C( LOC, 'WPLATE', '0.0', STATUS ) 
 
          ELSE IF( WPLATE .EQ. '45' ) THEN
+            CALL DAT_ERASE( LOC, 'WPLATE', STATUS )
+            CALL DAT_NEW0C( LOC, 'WPLATE', 4, STATUS ) 
             CALL CMP_PUT0C( LOC, 'WPLATE', '45.0', STATUS ) 
 
 *  Report an error if the WPLATE extension item has an illegal value.
