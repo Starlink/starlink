@@ -103,6 +103,9 @@
 
 *  External References:
       EXTERNAL			BDI0_BLK		! Ensures inclusion
+
+*  Local Variables:
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -128,6 +131,12 @@
 
 *    Check validity
         CALL BDI0_CHKAOB( ID, STATUS )
+
+*    SHAPE already exists?
+        CALL ADI_THERE( ID, 'SHAPE', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CERASE(  ID, 'SHAPE', STATUS )
+        END IF
 
 *    Write dimensions
         CALL ADI_CPUT1I( ID, 'SHAPE', NDIM, DIMS, STATUS )

@@ -126,9 +126,8 @@
         PARAMETER		( VERSION = 'AXORDER Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80              LABEL, HTXT(5)    !
-      CHARACTER*80              UNITS             !
-      CHARACTER*10              NSTR              !
+      CHARACTER*80              HTXT(5)    		!
+      CHARACTER*10              NSTR              	!
 
       INTEGER			BDID			! Interface object
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
@@ -137,7 +136,7 @@
       INTEGER                   SELAX(ADI__MXDIM) 	! New axis order
       INTEGER                   HLEN, NDIGIT      	! String lengths
       INTEGER                   I                 	! Loop over dimensions
-      INTEGER                   IAPTR, OAPTR      	! Input & output axis data
+      INTEGER                   IAPTR      		! Input & output axis data
       INTEGER			IFID		  	! Input dataset id
       INTEGER                   IWPTR             	! Input axis widths
       INTEGER                   NDIM              	! Dimensionality
