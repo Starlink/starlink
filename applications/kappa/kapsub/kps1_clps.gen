@@ -75,6 +75,9 @@
 *  History:
 *     31-AUG-2000 (DSB):
 *        Original version.
+*     27-OCT-2000 (DSB):
+*        Modified to avoid re-ordering the data if it is already in the
+*        correct order (i.e. if the collapse axis is the last pixel axis).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,8 +141,10 @@
       INTEGER NMAT               ! Size of workspace 
       INTEGER POS1( NDF__MXDIM ) ! Input pixel indices 
       INTEGER POS2( NDF__MXDIM ) ! Output pixel indices 
+      INTEGER START              ! The first input element to use
       INTEGER STEP1              ! Vector step between collaped pixels
       LOGICAL CARRY              ! Increment next axis?
+      LOGICAL USEWRK             ! Use the work arrays?
 
 *.
 
@@ -183,65 +188,82 @@
          STEP1 = STEP1*DIM1( IAX1 )
       END DO
 
+*  If we are collapsing along the last axis, we do not need to re-arrange
+*  the input data and variance values since the CCDPACK combination routines
+*  used at the end of this routine can access them in "natural" order.
+      USEWRK = ( AXIS .NE. NDIM1 ) 
+      IF( .NOT. USEWRK ) THEN
+
+*  Note the index of the first element of the first plane to be included
+*  in the output array.
+         START = ( LO - LBND1( AXIS ) )*STEP1 + 1
+
+*  If we are not collapsing along the last axis, we need to re-arrange
+*  the input data and variance values. 
+      ELSE 
+
 *  Step through every pixel in the output arrays.
-      DO IEL2 = 1, NEL2      
+         DO IEL2 = 1, NEL2      
 
 *  Find the pixel indices of the first input pixel to contribute to
 *  the current output pixel.
-         DO IAX1 = 1, NDIM1
-            IF( IAX1 .LT. AXIS ) THEN 
-               POS1( IAX1 ) = POS2( IAX1 )
-            ELSE IF( IAX1 .EQ. AXIS ) THEN
-               POS1( IAX1 ) = LO
-            ELSE
-               POS1( IAX1 ) = POS2( IAX1 - 1 )
-            END IF
-         END DO
+            DO IAX1 = 1, NDIM1
+               IF( IAX1 .LT. AXIS ) THEN 
+                  POS1( IAX1 ) = POS2( IAX1 )
+               ELSE IF( IAX1 .EQ. AXIS ) THEN
+                  POS1( IAX1 ) = LO
+               ELSE
+                  POS1( IAX1 ) = POS2( IAX1 - 1 )
+               END IF
+            END DO
 
 *  Find the corresponding vector index into the input arrays at this position.
-         IEL1 = 0
-         DO IAX1 = NDIM1 - 1, 1, -1
-            IEL1 = ( POS1( IAX1 + 1 ) - LBND1( IAX1 + 1 ) + IEL1 )*
-     :              DIM1( IAX1 )
-         END DO
-         IEL1 = IEL1 + POS1( 1 ) - LBND1( 1 ) + 1
+            IEL1 = 0
+            DO IAX1 = NDIM1 - 1, 1, -1
+               IEL1 = ( POS1( IAX1 + 1 ) - LBND1( IAX1 + 1 ) + IEL1 )*
+     :                 DIM1( IAX1 )
+            END DO
+            IEL1 = IEL1 + POS1( 1 ) - LBND1( 1 ) + 1
 
 *  Loop through the pixels to be collapsed in this "column".
-         K = 0
-         DO J = LO, HI
-            K = K + 1
+            K = 0
+            DO J = LO, HI
+               K = K + 1
 
 *  Store this pixel value in a work array.
-            WORK1( IEL2, K ) = DIN( IEL1 )
-            IF( VAR ) WORK2( IEL2, K ) = VIN( IEL1 )
+               WORK1( IEL2, K ) = DIN( IEL1 )
+               IF( VAR ) WORK2( IEL2, K ) = VIN( IEL1 )
 
 *  Move on to the next input pixel.
-            IEL1 = IEL1 + STEP1
+               IEL1 = IEL1 + STEP1
 
-         END DO
+            END DO
 
 *  Update the pixel indices of the current output pixel.
-         CARRY = .TRUE.
-         IAX2 = 1
-         DO WHILE( CARRY )
-            POS2( IAX2 ) = POS2( IAX2 ) + 1
-            IF( POS2( IAX2 ) .LE. UBND2( IAX2 ) ) THEN
-               CARRY = .FALSE.
-            ELSE
-               POS2( IAX2 ) = LBND2( IAX2 )
-               IAX2 = IAX2 + 1
-               IF( IAX2 .GT. NDIM2 ) CARRY = .FALSE.
-            END IF
-         END DO            
+            CARRY = .TRUE.
+            IAX2 = 1
+            DO WHILE( CARRY )
+               POS2( IAX2 ) = POS2( IAX2 ) + 1
+               IF( POS2( IAX2 ) .LE. UBND2( IAX2 ) ) THEN
+                  CARRY = .FALSE.
+               ELSE
+                  POS2( IAX2 ) = LBND2( IAX2 )
+                  IAX2 = IAX2 + 1
+                  IF( IAX2 .GT. NDIM2 ) CARRY = .FALSE.
+               END IF
+            END DO            
+   
+         END DO
 
-      END DO
+      END IF
 
-*  Now we have the input data re-ordered in the work arrays. Combine
-*  the values together into the output data and variances. The CCDPACK
-*  combination routines used below expect the data to be supplied as a
-*  series of lines in a 2D array. Each line comprises one "image" and
-*  each column gives the pixels to be combined. The result is a single
-*  line of data.
+*  Now we have the input data in the order needed by the CCDPACK
+*  combination routines. Combine the values together into the output 
+*  data and variances. The CCDPACK combination routines used below 
+*  expect the data to be supplied as a series of lines in a 2D array. 
+*  Each line comprises one "image" and each column gives the pixels to 
+*  be combined. The result is a single line of data. Allocate the
+*  required work arrays...
       NLIN = HI - LO + 1
       NMAT = NLIN * ( NLIN + 1 )/ 2
 
@@ -251,37 +273,69 @@
       CALL PSX_CALLOC( NLIN, '_INTEGER', IPPNT, STATUS )
       CALL PSX_CALLOC( NLIN, '_LOGICAL', IPUSED, STATUS )
 
+*  First deal with cases where input variances are available.
+*  Output variances are generated based on these input variances.
       IF( VAR ) THEN
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN*( NLIN + 1 )/2 
          CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
   
-         CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, IMETH, 
-     :                    MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
-     :                    7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
-     :                    %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                    %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
-     :                    %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                    %VAL (IPUSED ), STATUS )
+*  If the axis along which the input array was collapsed was not the last
+*  axis, we need to use the re-ordered data in the work arrays.
+         IF( USEWRK ) THEN   
+            CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, IMETH, 
+     :                       MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                       7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
+     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
+     :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
+     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
+     :                       %VAL (IPUSED ), STATUS )
+
+*  If the collapse axis is the last axis, we can use the original input
+         ELSE 
+            CALL CCG1_CM1<T><T>( DIN( START ), NEL2, NLIN, VIN( START ), 
+     :                       IMETH, MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                       7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
+     :                       %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
+     :                       %VAL( IPPP ), %VAL( IPCOV ), NMAT, 
+     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
+     :                       %VAL (IPUSED ), STATUS )
+         END IF
 
          CALL PSX_FREE( IPPP, STATUS )
          CALL PSX_FREE( IPCOV, STATUS )
 
+*  Now deal with cases where input variances are not available. No output
+*  variances will be created.
       ELSE
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPVAR, STATUS )
          CALL KPG1_FILLD( 1.0D0, NLIN, %VAL( IPVAR ), STATUS )
 
-         CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, %VAL( IPVAR ), IMETH,
-     :                    MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
-     :                    7, 4.0, 0.0, 0.0, 0.0,
-     :                    DOUT, %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
-     :                    %VAL( IPNCON ), %VAL( IPPNT ), 
-     :                    %VAL (IPUSED ), STATUS )
+*  If the axis along which the input array was collapsed was not the last
+*  axis, we need to use the re-ordered data in the work arrays.
+         IF( USEWRK ) THEN   
+            CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, %VAL( IPVAR ), IMETH,
+     :                       MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                       7, 4.0, 0.0, 0.0, 0.0,
+     :                       DOUT, %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
+     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
+     :                       %VAL (IPUSED ), STATUS )
+
+*  If the collapse axis is the last axis, we can use the original input data.
+         ELSE 
+            CALL CCG1_CM3<T><T>( DIN( START ), NEL2, NLIN, %VAL( IPVAR ), 
+     :                       IMETH, MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                       7, 4.0, 0.0, 0.0, 0.0,
+     :                       DOUT, %VAL( IPWRK1 ), %VAL( IPWRK2 ), 
+     :                       %VAL( IPNCON ), %VAL( IPPNT ), 
+     :                       %VAL (IPUSED ), STATUS )
+         END IF
 
          CALL PSX_FREE( IPVAR, STATUS )
 
       END IF
 
+*  Free the remaining work space.
       CALL PSX_FREE( IPWRK1, STATUS )
       CALL PSX_FREE( IPWRK2, STATUS )
       CALL PSX_FREE( IPNCON, STATUS )
