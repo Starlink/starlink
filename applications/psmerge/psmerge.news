@@ -1,0 +1,16 @@
+1 PSMERGE - Encapsulated PostScript File manipulation
+                                                        Expires: **.**.**
+
+ PSMERGE is a program for manipulating Encapsulated PostScript Files,
+ (EPSF).  It allows one or more EPS files to be combined in on one
+ PostScript or EPS file with each included file scaled, rotated or
+ shifted independently.
+
+ A description of the use of PSMERGE can be found in `PSMERGE - Encapsulated
+ PostScript Handling Utility' (SUN/164).  There is a hypertext version 
+ available (`showme sun164' or `findme psmerge').
+
+ v1.0-5 is a maintenance release to update the PSMERGE makefile and solve a bug
+ in the arguement handling, which caused arguments like '-t0x72' to cause a
+ segmentation violation on Linux.
+
