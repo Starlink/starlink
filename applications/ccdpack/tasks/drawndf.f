@@ -635,7 +635,7 @@ c        CALL PGSCLP( 0 )
 *  Set the size of the marker to plot at the origin (a fraction of a
 *  character height, specified in units of 1/200 inches).
       CALL PGQCS( 1, XCH, YCH )
-      MLW = MAX( 1, MIN( 200, XCH * 2D2 * 0.2D0 ) )
+      MLW = MAX( 1, INT( MIN( 2D2, XCH * 2D2 * 0.2D0 ) ) )
 
 *  Set the length of the offset vector for text labels.
       CALL PGQCS( 4, XCH, YCH )
