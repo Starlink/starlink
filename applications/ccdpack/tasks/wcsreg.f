@@ -22,7 +22,7 @@
 *  Description:
 *     This application takes a set of NDFs which have World Coordinate
 *     System (WCS) components, and tries to align them all according
-*     to an ordered list of frame domains.  If successful, it adds a 
+*     to a given list of frame domains.  If successful, it adds a 
 *     new frame to the WCS component of each within which they are 
 *     all aligned.  The TRANLIST or TRANNDF applications can then be
 *     used on the resulting NDFs.
@@ -35,7 +35,7 @@
 *     of alignment types where first choices are not available.
 *
 *     The application operates on a set of NDFs, IN.  A list of 
-*     domains DOMAINLIST within which to align, in order of preference,
+*     domains DOMAINS within which to align, in order of preference,
 *     is specified, and a reference NDF is denoted by REFPOS.  On 
 *     successful completion, a new frame (which becomes Current), with
 *     a domain given by OUTDOMAIN (default CCD_WCSREG) is added to
@@ -47,20 +47,21 @@
 *     program attempts to find a mapping from the reference NDF to it.
 *     If it and the reference NDF do not share frames in any of the
 *     domains given by the DOMAINS parameter, it will try to use the 
-*     WCS components of intermediate NDFs to find a path between them,
-*     using only the domains given.  The shortest available path which
-*     provides a link is chosen, and if there is more than one which
+*     WCS components of intermediate NDFs to find a path between them;
+*     this path is a subgraph of a graph in which the nodes are the 
+*     NDFs and an edge exists between two nodes if the NDFs share a
+*     domain in the given list.  The shortest available path which
+*     connects a pair is chosen, and if there is more than one which
 *     meets this criterion, one which uses domains nearest the head of
 *     the list is preferred.
 *
-*     If there is no path from the reference NDF to one of the other
-*     NDFs using the domains given, then no new frame will be written
-*     to that NDF (and a message indicating failure will be output),
-*     but any previously existing frames in the output domain will 
-*     be removed.
+*     If the graph is not fully connected, a list of the existing
+*     subgraphs is output, and the program will normally terminate,
+*     however it can be made to continue with registration of the 
+*     connected NDFs by setting the OVERRIDE parameter.
 
 *  Usage:
-*     WCSREG in domainlist
+*     WCSREG in domains
 
 *  ADAM Parameters:
 *     DOMAINS( * ) = LITERAL (Read)
@@ -123,10 +124,10 @@
 *        [FALSE]
 *     REFPOS = _INTEGER (Read)
 *        The position within the IN list which corresponds to the 
-*        reference NDF.  For each domain in DOMAINLIST, alignment will
+*        reference NDF.  For each domain in DOMAINS, alignment will
 *        be attempted with the reference NDF first, and the mapping 
 *        between the output frame and the first matching name in 
-*        DOMAINLIST is a unit mapping.
+*        DOMAINS is a unit mapping.
 *        [1]
 
 *  Examples:
@@ -148,7 +149,7 @@
 *        After this process, the NDFs can be presented to TRANNDF for
 *        resampling prior to making a mosaic.
 *     wcsreg "obs1_*,obs2_*" outdomain=final 
-*            domainlist="ccd_reg,inst_obs1,inst_obs2"
+*            domains="ccd_reg,inst_obs1,inst_obs2"
 *        NDFs with names starting 'obs1_' and 'obs2_' are aligned.
 *        Where they share the CCD_REG domain this will be used for  
 *        alignment, but otherwise the domains INST_OBS1 and INST_OBS2
@@ -266,12 +267,7 @@
          CALL IRH_GET( INGRP, I, 1, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'N', I )
-         IF ( I .EQ. REFPOS ) THEN 
-            CALL MSG_SETC( 'REF', '(reference)' )
-         ELSE
-            CALL MSG_SETC( 'REF', ' ' )
-         END IF
-         CALL CCD1_MSG( ' ', '  ^N) ^FNAME ^REF', STATUS )
+         CALL CCD1_MSG( ' ', '  ^N) ^FNAME', STATUS )
  6    CONTINUE
       CALL CCD1_MSG( ' ', ' ', STATUS )
  
@@ -382,7 +378,7 @@
 
 *  Construct the new frame.
       OUTFR = AST_FRAME( 2, ' ', STATUS )
-      CALL AST_SETC( OUTFR, 'Title', 'Added by WCSREG', STATUS )
+      CALL AST_SETC( OUTFR, 'Title', 'Alignment by WCSREG', STATUS )
       CALL AST_SETC( OUTFR, 'Domain', OUTDM, STATUS )
 
 *  Exit if there's trouble.
