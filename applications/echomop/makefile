@@ -456,7 +456,7 @@ PKG_VERS = 3.3-6b1
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
    $(TEST_FILES_ARCHIVE) $(DEMO_FILES_ARCHIVE) $(PKG_NAME)_data.tar \
    $(ARC_FILES_ARCHIVE) $(PKG_NAME)_inc.tar $(PKG_NAME)_ifl.tar \
-   $(HYPERTEXT_ARCHIVE) $(PKG_NAME)_def.tar
+   $(HYPERTEXT_ARCHIVE) $(PKG_NAME)_def.tar $(PKG_NAME)_demo.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -1636,10 +1636,14 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z ||  \
+	    rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	    | compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z ||  \
+	    rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM).tar.Z \
+		$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -1671,11 +1675,16 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-           $(ARCHIVE_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+		$(ARCHIVE_FILES) $(DATE_STAMP) .BUILT \
+		| compress -v \
+			> $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z \
+		$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1699,10 +1708,14 @@ export_source: $(EXPORT)/$(PKG_NAME).tar.Z
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+	test ! -f $(EXPORT)/$(PKG_NAME).tar.Z || \
+		rm -f $(EXPORT)/$(PKG_NAME).tar.Z
+	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z \
+		$(EXPORT)/$(PKG_NAME).tar.Z
 
 #  export_dev: Build the source tar files.
 #  ---------------------------------------
