@@ -195,12 +195,16 @@
 *    Test for standard keywords
         ELSE
           CALL ERR_ANNUL( STATUS )
+
           CALL ADI2_HGKYD( PHDU, 'CRPIX'//CAX, RPIX, CMNT, STATUS )
           CALL ADI2_HGKYD( PHDU, 'CDELT'//CAX, PIXW, CMNT, STATUS )
-          if (cax.eq.'1' .and. pixw.gt.0.0d0) then
+
+          if (cax.eq.'1' .and. pixw.gt.0.0d0 .and. status.eq.0) then
             print*, '*** Warning: CDELT1 made -ve, trying to correct'
             pixw = -1.0d0 * pixw
-            call adi2_hpkyd( phdu, 'CDELT'//cax, pixw, cmnt, status )
+            call adi2_hpkyd( phdu, 'CDELT1', pixw, cmnt, status )
+            CALL ADI2_HGKYD( PHDU, 'CDELT1', PIXW, CMNT, STATUS )
+	    print*, 'CDELT1',real(pixw),' ',cmnt(:chr_len(cmnt)),status
           end if
 
 *      Standard keywords there?
