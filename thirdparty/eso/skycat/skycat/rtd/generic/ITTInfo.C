@@ -81,33 +81,39 @@ ITTInfo* ITTInfo::get(char* filename)
     for (m = itts_; m; m = m->next()) 
 	if (strcmp(m->name(), name) == 0)
 	    break;
-    if (m) 
-	return m;
+    if (m) {
+      free( name );
+      return m;
+    }
 
     // have to read file
     ifstream f(filename);
     if (! f) {
-	error("could not open ITT file: ", filename);
-	return (ITTInfo*) NULL;
+      free( name );
+      error("could not open ITT file: ", filename);
+      return (ITTInfo*) NULL;
     }
 
     double* value = new double[MAX_ITT];
     if (! value) {
-	error("could not allocate ITT color table");
-	return (ITTInfo*) NULL;
+      free( name );
+      error("could not allocate ITT color table");
+      return (ITTInfo*) NULL;
     }
     for (int i = 0; i < MAX_ITT; i++) {
 	f >> value[i];
     }
     if (! f) {
-	error("error reading ITT file: ", filename);
-	return (ITTInfo*) NULL;
+      free( name );
+      error("error reading ITT file: ", filename);
+      return (ITTInfo*) NULL;
     }
 
     m = new ITTInfo(name, value);
-    if (! m) 
-	error("could not create ITT");
-
+    if (! m) {
+      error("could not create ITT");
+    }
+    free( name );
     return m;
 }
 
