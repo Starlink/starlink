@@ -24,7 +24,8 @@
 *     squares etc.) at positions specified in series of position lists.
 *     Before this application can be run an image (or other graphical
 *     output such as a contour image) must have been displayed using a
-*     suitable routine such as KAPPA DISPLAY (SUN/95).
+*     suitable routine such as KAPPA's DISPLAY (SUN/95) or CCDPACK's
+*     OUTLINE.
 *
 *     For a more interactive display of markers on an Xwindows display,
 *     you can use the IDICURS program instead.
