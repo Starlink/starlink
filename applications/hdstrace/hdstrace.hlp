@@ -1,3 +1,6 @@
+0 HDSPACK
+This is a dummy zeroth level required by the help system.
+
 1 HDSTRACE
 Examines the contents of a data-system object.
 
@@ -14,7 +17,7 @@ Description:
    Now rather than writing separate code to read a variety of
    structures, this application is sufficiently general to examine
    almost all HDS structures or objects.  The examination may also
-   be written to a text file as well as being reported to the user.
+   be written to an ASCII file as well as being reported to the user.
 
    For the specified ADAM data-system object (X) there are three
    cases which are handled:
@@ -154,7 +157,7 @@ MJC: Malcolm J. Currie (STARLINK)
     line, so have done likewise for a primitive object, and removed
     the blank line before the "End of Trace" message.
 
- 1992 September 25 (MJC):
+ 1992 Sepember 25 (MJC):
     Removed AIF calls.
 
  1993 November 4 (MJC):
