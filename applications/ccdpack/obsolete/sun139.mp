@@ -1,16 +1,27 @@
 
 input boxes;
-% prologues:=1;
+prologues:=1;
+
+% The following works round the fact that the postscript fonts in my
+% teTeX installation aren't called the same as their postscript reserved
+% names.
+
+special "/ptmr /Times-Roman def";
+special "/fshow {exch findfont exch scalefont setfont show} bind def";
+special "/phvr /Helvetica def";
+special "/fshow {exch findfont exch scalefont setfont show} bind def";
+special "/pcrr /Courier def";
+special "/fshow {exch findfont exch scalefont setfont show} bind def";
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(4);
 
-defaultfont:="cmr12";
+defaultfont:="ptmr";
 save gap, u;
 
-w = 14bp;
+w = 18bp;
 h = 12bp;
-u = 4.5bp;
+u = 6bp;
 gap = 1/2u;
 frac = 1/3;
 pair origin;
@@ -20,7 +31,7 @@ origin = ( 30, 30 );
 color boxinside;
 boxinside = 1/1024[white,black];
 
-textsize = 1.4;
+textsize = 1.6;
 defaultscale := textsize;
 
 def bend(expr a, patha, b, pathb, mult, theta) =
@@ -100,8 +111,8 @@ over = (0,h);
 object.grp - pairndf.desc
 = 3over;
 
-defaultfont := "cmss12";
-defaultscale := 1.0textsize;
+defaultfont := "phvr";
+defaultscale := 0.8textsize;
 
 label("automatic", findobj.desc);
 label("semi-automatic", pairndf.desc);
@@ -169,7 +180,7 @@ endfig;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 beginfig(3); 
 
-defaultfont:="cmtt12";
+defaultfont:="pcrr";
 defaultscale:=1.6;
 
 path ccd[]a, ccd[]b, ccd[]c;
