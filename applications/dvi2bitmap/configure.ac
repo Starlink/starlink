@@ -49,28 +49,6 @@ AC_PROG_LIBTOOL
 dnl   use C++ to compile test programs
 AC_LANG([C++])
 
-dnl   Does -MM option work?
-dnl   (no longer need to check this -- automake/autoconf does all the
-dnl   dependency checking we might need)
-dnl AC_MSG_CHECKING(whether ${CXX} -MM does the Right Thing)
-dnl AC_SUBST(CXXMM)
-dnl cat <<EOD >conftest.cc
-dnl #include <stdio.h>
-dnl #include "DviError.h"
-dnl void f(){}
-dnl EOD
-dnl if AC_TRY_COMMAND([${CXX} -MM conftest.cc >conftest.Mout 2>&1]); then
-dnl   if grep 'stdio.h' conftest.Mout >/dev/null 2>&1; then
-dnl     AC_MSG_RESULT([nearly, but not nearly enough])
-dnl   else
-dnl     CXXMM=-MM
-dnl     AC_MSG_RESULT(yes)
-dnl   fi
-dnl else
-dnl   AC_MSG_RESULT(no)
-dnl fi
-dnl rm -f conftest*
-
 AC_PATH_PROG(PERL, perl)
 
 dnl   Checks for header files.
@@ -84,7 +62,7 @@ dnl   strstream
 AC_CHECK_HEADERS(sstream)
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(pipe snprintf)
+AC_CHECK_FUNCS(pipe snprintf setenv putenv)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)
@@ -152,9 +130,6 @@ dnl   inconvenient than having to rebuild dvi2bitmap with
 dnl   font-generation forced on.
 dnl
 needfontfinding=1
-dnl AC_SUBST(KPATHSEAOBJ)
-dnl orig_CPPFLAGS="$CPPFLAGS"
-dnl orig_LIGS="$LIBS"
 AC_ARG_WITH(kpathsea,
 [  --with-kpathsea[[=path]]  Use kpathsea, giving optional path to library
   --without-kpathsea      Do not use kpathsea library],
@@ -172,55 +147,12 @@ if test -n "$extrapath"; then
     LIBS="$LIBS -L$extrapath/lib"
   fi
   AC_CHECK_HEADER(kpathsea/pathsearch.h,
-                [AC_CHECK_LIB(kpathsea, kpse_find_file,
-                              [AC_DEFINE(ENABLE_KPATHSEA)]
-                              EXTRALO="$EXTRALO kpathsea.lo"
-                              LIBS="$LIBS -lkpathsea"
-                              needfontfinding=0)])
+                  [AC_CHECK_LIB(kpathsea, kpse_find_file,
+                                [AC_DEFINE(ENABLE_KPATHSEA)]
+                                EXTRALO="$EXTRALO kpathsea.lo"
+                                LIBS="$LIBS -lkpathsea"
+                                needfontfinding=0)])
 fi
-
-dnl AC_ARG_WITH(kpathsea,
-dnl [  --without-kpathsea      Do not use kpathsea library
-dnl   --with-kpathsea[[=path]]  Use kpathsea, giving optional path to library],
-dnl   if test "$withval" = "yes"
-dnl   then
-dnl     [AC_CHECK_HEADER(kpathsea/pathsearch.h,
-dnl                      [AC_CHECK_LIB(kpathsea, kpse_find_file,
-dnl                                    [AC_DEFINE(ENABLE_KPATHSEA)]
-dnl dnl                                    KPATHSEAOBJ="kpathsea.o" 
-dnl dnl                                    LIBS="$LIBS -lkpathsea"
-dnl dnl                                   AC_LIBOBJ([kpathsea])
-dnl                                    EXTRALO="$EXTRALO kpathsea.lo"
-dnl                                    needfontfinding=0)])]
-dnl   elif test "$withval" != "no"
-dnl   then
-dnl     safe_CPPFLAGS="$CPPFLAGS"
-dnl     CPPFLAGS="$CPPFLAGS -I$withval/include"
-dnl     safe_LIBS="$LIBS"
-dnl     LIBS="$LIBS -L$withval/lib"
-dnl dnl    LIBS="$LIBS -L$withval/lib -lkpathsea"
-dnl echo "!!kpathsea CPPFLAGS=$CPPFLAGS  LIBS=$LIBS"
-dnl     [AC_CHECK_HEADER(kpathsea/pathsearch.h,
-dnl                      [AC_CHECK_LIB(kpathsea, kpse_find_file,
-dnl                                    [AC_DEFINE(ENABLE_KPATHSEA)]
-dnl dnl                                   KPATHSEAOBJ="kpathsea.o" 
-dnl dnl                                   AC_LIBOBJ([kpathsea])
-dnl                                    EXTRALO="$EXTRALO kpathsea.lo"
-dnl                                    safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
-dnl                                    safe_LIBS="$safe_LIBS -L$withval/lib -lkpathsea"
-dnl                                    needfontfinding=0)])]
-dnl     CPPFLAGS="$safe_CPPFLAGS"
-dnl     LIBS="$safe_LIBS"
-dnl   fi,
-dnl   [AC_CHECK_HEADER(kpathsea/pathsearch.h,
-dnl                    [AC_CHECK_LIB(kpathsea, kpse_find_file,
-dnl                                  [AC_DEFINE(ENABLE_KPATHSEA)]
-dnl dnl                                 KPATHSEAOBJ="kpathsea.o" 
-dnl dnl                                 LIBS="$LIBS -lkpathsea"
-dnl dnl                                 AC_LIBOBJ([kpathsea])
-dnl                                  EXTRALO="$EXTRALO kpathsea.lo"
-dnl                                  needfontfinding=0)])])
-
 
 dnl   Specify an alternative, or additional, font-finding script.
 dnl   This should be expressed as a `font-string template', as
@@ -250,7 +182,6 @@ dnl   must make sure that we pick up that one.  If this test is
 dnl   placed before kpathsea, we can end up defining getopt twice.
 AC_CHECK_FUNCS(getopt)
 AC_CHECK_DECLS([getopt,getsubopt,getopt_long])
-dnl AC_SUBST(GETOPT_LONG_OBJ)
 AC_REPLACE_FUNCS(getopt_long getsubopt)
 
 
@@ -368,7 +299,6 @@ dnl   need the function png_set_write_user_transform_fn (which means later
 dnl   than version 0.96).
 dnl
 dnl   Test this by default (ie, unless the option --disable-png is given).
-dnl AC_SUBST(PNGOBJ)
 AC_ARG_WITH(png,
 [  --with-png[[=path]]       Generate png files, giving optional path to library
   --without-png           Do not use png library],
@@ -380,98 +310,24 @@ AC_ARG_WITH(png,
     extrapath=$withval
   fi,
   extrapath=default)
-dnl if test -n "$extrapath" -a "$extrapath" != "default"; then
-dnl   CPPFLAGS="$CPPFLAGS -I$withval/include"
-dnl   LIBS="$LIBS -L$withval/lib -lpng"
-dnl fi
 if test -n "$extrapath"; then
   if test "$extrapath" != default; then
     CPPFLAGS="$CPPFLAGS -I$extrapath/include"
     LIBS="$LIBS -L$extrapath/lib"
   fi
-dnl  LIBS="$LIBS -lpng -lz"
-AC_CHECK_HEADER(png.h,
-                [AC_CHECK_LIB(png, png_libpng_ver,
-                              [AC_DEFINE(ENABLE_PNG)]
-                              EXTRALO="$EXTRALO PNGBitmap.lo"
-                              LIBS="$LIBS -lpng -lz",
-                              echo "png library not found or too old -- not including PNG support",
-                              -lz)])
+  AC_CHECK_HEADER(png.h,
+                  [AC_CHECK_LIB(png, png_libpng_ver,
+                                [AC_DEFINE(ENABLE_PNG)]
+                                EXTRALO="$EXTRALO PNGBitmap.lo"
+                                LIBS="$LIBS -lpng -lz",
+                                echo "png library not found or too old -- not including PNG support",
+                                -lz)])
 fi
 
-dnl AC_ARG_WITH(png,
-dnl [  --with-png[[=path]]       Generate png files, giving optional path to library
-dnl  --without-png           Do not use png library],
-dnl  if test "$withval" = "yes"
-dnl  then
-dnl    [AC_CHECK_HEADER(png.h,
-dnl                     [AC_CHECK_LIB(png, png_libpng_ver,
-dnl                                   [AC_DEFINE(ENABLE_PNG)]
-dnl dnl                                   PNGOBJ="PNGBitmap.o" 
-dnl dnl                                   LIBS="$LIBS -lpng -lz",
-dnl dnl                                   AC_LIBOBJ([PNGBitmap]),
-dnl                                   EXTRALO="$EXTRALO PNGBitmap.lo",
-dnl                                   echo "png library not found or too old -- not including PNG support",
-dnl                                   -lz)])]
-dnl  elif test "$withval" != "no"
-dnl  then
-dnl    safe_CPPFLAGS="$CPPFLAGS"
-dnl    CPPFLAGS="$CPPFLAGS -I$withval/include"
-dnl    safe_LIBS="$LIBS"
-dnl    LIBS="$LIBS -L$withval/lib -lpng"
-dnl echo "!!png CPPFLAGS=$CPPFLAGS  LIBS=$LIBS"
-dnl    [AC_CHECK_HEADER(png.h,
-dnl                     [AC_CHECK_LIB(png, png_libpng_ver,
-dnl                                   [AC_DEFINE(ENABLE_PNG)]
-dnl dnl                                   PNGOBJ="PNGBitmap.o" 
-dnl                                   AC_LIBOBJ([PNGBitmap])
-dnl                                   safe_CPPFLAGS="$safe_CPPFLAGS -I$withval/include"
-dnl                                   safe_LIBS="$safe_LIBS -L$withval/lib -lpng",
-dnl                                   echo "png library not found or too old -- not including PNG support",
-dnl                                   -lz)])]
-dnl    CPPFLAGS="$safe_CPPFLAGS"
-dnl    LIBS="$safe_LIBS"
-dnl  fi,
-dnl  [AC_CHECK_HEADER(png.h,
-dnl                   [AC_CHECK_LIB(png, png_libpng_ver,
-dnl                                 [AC_DEFINE(ENABLE_PNG)]
-dnl dnl                                 PNGOBJ="PNGBitmap.o" 
-dnl dnl                                 LIBS="$LIBS -lpng -lz"
-dnl                                 AC_LIBOBJ([PNGBitmap])
-dnl                                 )])])
-
-
-dnl  WAS...
-dnl
-dnl AC_SUBST(PNGOBJ)
-dnl AC_ARG_ENABLE(png,
-dnl [  --enable-png            Enable output of PNG files],
-dnl  if test "$enableval" = "yes"
-dnl  then
-dnl    [AC_CHECK_HEADER(png.h,
-dnl                     [AC_CHECK_LIB(png, png_libpng_ver,
-dnl                                   [AC_DEFINE(ENABLE_PNG)]
-dnl                                   PNGOBJ="PNGBitmap.o"
-dnl                                   LIBS="$LIBS -lpng -lz",
-dnl                                   echo "png library not found or too old -- not including PNG support",
-dnl                                   -lz)])]
-dnl  fi,
-dnl  [AC_CHECK_HEADER(png.h,
-dnl                   [AC_CHECK_LIB(png, png_libpng_ver,
-dnl                                 [AC_DEFINE(ENABLE_PNG)]
-dnl                                 PNGOBJ="PNGBitmap.o"
-dnl                                 LIBS="$LIBS -lpng -lz",
-dnl                                 echo "png library not found or too old -- not including PNG support",
-dnl                                 -lz)])])
-
-
 dnl   Specify support for GIF output
-dnl AC_SUBST(GIFOBJ)
 AC_ARG_ENABLE(gif, 
 [  --enable-gif            Enable output of GIF files],
   [AC_DEFINE(ENABLE_GIF)]
-dnl  GIFOBJ="GIFBitmap.o"
-dnl  AC_LIBOBJ([GIFBitmap])
   EXTRALO="$EXTRALO GIFBitmap.lo"
   )
 
