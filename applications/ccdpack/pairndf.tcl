@@ -198,6 +198,10 @@
    "   If you mark any in error, they can be removed by clicking on them" \
    "   with the right mouse button." \
    "" \
+   "   The images cannot be moved when any features are marked on them."\
+   "   If you have marked some features and wish to realign the images,"\
+   "   remove the features using the right mouse button then drag again."\
+   "" \
    "   When you are happy with the features that you have marked, click the" \
    "   `Done' button.  The marked features will then be centroided in both" \
    "   the images to provide an accurate alignment." \
