@@ -12,6 +12,9 @@ These are notes associated with the (untested) port to Linux.
  - all demo programs can be built from the makefile
    (make check will work where appropriate)
 
+ - Help system replaced with call to SHL and curses no longer
+   required for build (also uses one_ )
+
 The following nag routines are used in iras90:
 
   e01baf
@@ -29,6 +32,9 @@ The following nag routines are used in iras90:
      irm_lintr.f
   g02caf
      irc1_sbfit.f
+
+They are currently replaced with error calls rather than attempting
+to use autoconf to compile with NAG if available.
 
 Other porting notes:
 
