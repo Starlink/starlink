@@ -43,6 +43,8 @@
 *        Original version.
 *     27-JUL-1994 (PDRAPER):
 *        Added checks for blank records.
+*     20-OCT-2000 (PDRAPER):
+*        Now fills extra records with blanks.
 *     {enter_further_changes_here}
 
 *  Bugs:
