@@ -207,7 +207,7 @@
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
             default !
-            prompt {Number of electrons per ADU}
+            prompt "Number of electrons per ADU[ccd_global]"
             association <-global.ccdpack_adc
             helpkey *
           }
@@ -218,7 +218,7 @@
             access READ
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
-            prompt {Pixel indices of bias strips (in pairs)}
+            prompt "Pixel indices of bias strips (in pairs)[ccd_global]"
             association <-global.ccdpack_bounds
             size *
             default !
@@ -232,7 +232,7 @@
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
             default !
-            prompt {Readout noise (ADUs)}
+            prompt "Readout noise (ADUs)[ccd_global]"
             association <-global.ccdpack_rnoise
             helpkey *
           }
@@ -255,7 +255,7 @@
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
             default !
-            prompt {Data saturation value (ADUs)}
+            prompt "Data saturation value (ADUs)[ccd_global]"
             association <-global.ccdpack_satval
             helpkey *
           }
@@ -267,7 +267,7 @@
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
             default !
-            prompt {Readout direction (X or Y)}
+            prompt "Readout direction (X or Y)[ccd_global]"
             association <-global.ccdpack_direct
             helpkey *
           }
@@ -279,7 +279,7 @@
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
             default !
-            prompt {Deferred charge (ADUs)}
+            prompt "Deferred charge (ADUs)[ccd_global]"
             association <-global.ccdpack_defer
             helpkey *
           }
@@ -290,7 +290,7 @@
             access READ
             vpath GLOBAL DEFAULT
             ppath GLOBAL DEFAULT
-            prompt {Useful CCD region (xmin,xmax,ymin,ymax)}
+            prompt "Useful CCD region (xmin,xmax,ymin,ymax)[ccd_global]"
             default !
             size *
             association <-global.ccdpack_extent
@@ -326,7 +326,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -337,7 +337,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            prompt {logfile name}
+            prompt "Logfile name[ccd_global]"
             association <-global.ccdpack_logfile
             default CCDPACK.LOG
             helpkey *

@@ -34,7 +34,7 @@
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_ndfnam
             default TRUE
-            prompt {Position list names are located in NDF extensions}
+            prompt "Position list names are located in NDF extensions[ccd_global]"
             helpkey *
           }
 
@@ -144,7 +144,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logto
-            prompt {Write log to (Logfile,Terminal,Neither,Both)}
+            prompt "Write log to (Logfile,Terminal,Neither,Both)[ccd_global]"
             default Both
             helpkey *
           }
@@ -156,7 +156,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_logfile
-            prompt {Logfile name}
+            prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
             helpkey *
           }
