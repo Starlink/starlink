@@ -38,6 +38,12 @@ STAR_CHECK_PROGS(tifftopnm)
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
 
+dnl    Ranlib is needed on OS X so that we can update the static libraries
+dnl    (the archive index is considered out of date if it doesn't match the
+dnl    date of the archive file, so a simple copying invalidates this, this
+dnl    noted in the OS X ranlib man page as a bug, so may not always be true).
+AC_PROG_RANLIB
+
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
 
@@ -46,20 +52,29 @@ AC_CONFIG_SUBDIRS([libaif libcof libcoi libcon idl iraf])
 
 dnl    Check if we have any IRAF libraries on this platform.
 dnl    On success this section gives a -DHAVE_IRAF_LIBIMFORT_A=1 macro
-dnl    definition and substitutes @IRAFLIBS@ in the Makefile.am/.in.
-dnl    We cd into iraf, rather than perform this test there as this configure
-dnl    script is ran first.
-(cd iraf
-if test -f "libimfort.a"; then
-  rm libimfort.a
-fi
-STAR_PLATFORM_SOURCES([libcompat.a libimfort.a libos.a libsys.a libvops.a],
-        [_pc_linux_gnu _sun_solaris _dec_osf _mips _apple_darwin NONE]))
+dnl    definition. We cd into iraf, rather than perform this test in the
+dnl    configure script in iraf, as this configure script is ran first, so
+dnl    cannot depend on the results of a later configure.
 
-AC_CHECK_FILES([iraf/libimfort.a],
- [IRAFLIBS="iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a"],
- [IRAFLIBS=])
-AC_SUBST(IRAFLIBS)
+(
+cd iraf
+IRAFSUPPORT="libcompat.a libimfort.a libos.a libsys.a libvops.a"
+for f in $IRAFSUPPORT; do
+  if test -f $f; then
+    rm -f $f
+  fi
+done
+STAR_PLATFORM_SOURCES([$IRAFSUPPORT], 
+     [_pc_linux_gnu _sun_solaris _dec_osf _mips _apple_darwin NONE])
+for f in $IRAFSUPPORT; do
+  if test -f $f; then
+    $RANLIB $f
+  fi
+done
+)
+
+dnl    Define -DHAVE_IRAF_LIBIMFORT_A=1, if libimfort.a exists.
+AC_CHECK_FILES([iraf/libimfort.a])
 
 dnl    Configure .in files.
 AC_CONFIG_FILES([Makefile component.xml])

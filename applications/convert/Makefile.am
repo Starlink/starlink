@@ -7,10 +7,6 @@ SUBDIRS = @subdirs@
 ## fail. 
 FIGLIBS = -ldta -lich
 
-## The IRAF libraries are platform dependent, so we must be prepared to deal
-## with their absence.
-IRAFLIBS=@IRAFLIBS@
-
 bin_SCRIPTS = convert.csh convert.icl gif2ndf ndf2gif tiff2ndf mtfits2ndf.tcsh\
  convertndf convertawk
 
