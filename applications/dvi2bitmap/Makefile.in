@@ -111,7 +111,7 @@ version.h README dvi2bitmap.1 Makefile.starlink: VERSION
 # Build defects list.  This requires non-distributed scripts,
 # so is not buildable after distribution.
 defects.html: defects.xml
-	java com.jclark.xsl.sax.Driver defects.xml /home/norman/sgml/defect/defects.xslt defects.html
+	java com.jclark.xsl.sax.Driver defects.xml /home/norman/sgml/w/sgml/defect/defects.xslt defects.html
 
 test: FORCE
 	cd test; $(MAKE) test

@@ -24,7 +24,8 @@ than others.</p>
      -->
 
 <defect status="open" 
-	originator="Eitan Gurari, gurari@cis.ohio-state.edu"
+	originator="Eitan Gurari"
+	originatoremail="gurari@cis.ohio-state.edu"
 	date='13-May-2000'>
 
 <title>dvi2bitmap crashes/hangs when given non-existent input file</title>
@@ -85,7 +86,8 @@ font-reading, when it always returned 10pt.</p>
 </defect>
 
 <defect status="open"
-	originator="Walter Boehm, boehm@isis.wu-wien.ac.at"
+	originator="Walter Boehm"
+	originatoremail="boehm@isis.wu-wien.ac.at"
 	date="13-Sep-2000">
 
 <title>Horizontal spacing wrong with 11pt option</title>
