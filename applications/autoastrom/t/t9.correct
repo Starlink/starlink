@@ -1,46 +1,53 @@
 === Test 1 ===
 --I Starting monoliths...
 --I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
 --I Processing NDF <testndf1>
 --I NDF <testndf1> examined OK
 --I WCS information from AST
 --I Obtaining catalogue from usno@eso...
 --I Obtained catalogue, 500 entries, from usno@eso
 --I Using pre-existing CCD catalogue testndf1.ccdcat.munged
+--I Object extraction successful
 --I Iteration 0...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
 --I Iteration 1...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
---I ASTROM found a 8-parameter fit
+--I ASTROM found a 9-parameter fit
 --I Iteration 2...
 --I Matching position lists...
-  2 names accessed using parameter INLIST
---I That match didn't work.  Trying again, with a larger error
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
 --I Iteration 3...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
 --I Iteration 4...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
 --I Iteration 5...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
 --I Iteration 6...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 9-parameter fit
@@ -56,75 +63,84 @@ CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection
 RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
 EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
 LONPOLE =                  180 / Native longitude of celestial pole             
-CRVAL1  =          261.4898672 / Projection pole -- RA =   17:25:57.6           
-CRVAL2  =           74.4887044 / Projection pole -- Dec = +74:29:19             
-CRPIX1  =         3602.3870179 / Projection pole -- x-pixels                    
-CRPIX2  =         2899.1011340 / Projection pole -- y-pixels                    
+CRVAL1  =          261.5752255 / Projection pole -- RA =   17:26:18.1           
+CRVAL2  =           74.5390965 / Projection pole -- Dec = +74:32:21             
+CRPIX1  =         3051.9734031 / Projection pole -- x-pixels                    
+CRPIX2  =         2661.2834510 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-CD1_1   =       -1.5586372E-06 / Transformation to intermed. world coords       
-CD2_1   =       -9.2217954E-05                                                  
-CD1_2   =       -9.2377669E-05                                                  
-CD2_2   =        1.7019849E-06                                                  
+CD1_1   =       -1.6383498E-06 / Transformation to intermed. world coords       
+CD2_1   =       -9.2033431E-05                                                  
+CD1_2   =       -9.2308569E-05                                                  
+CD2_2   =        1.8874713E-06                                                  
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
-PV1_7   =       -6.6900338E-02 / a_7 x^3   = -q                                 
-PV1_9   =       -6.6900338E-02 / a_9 xy^2  = -q                                 
-PV1_17  =        1.3426966E-02 / a_17 x^5  = 3q^2                               
-PV1_21  =        1.3426966E-02 / a_21 xy^4 = 3q^2                               
-PV1_31  =       -3.5930741E-03 / a_31 x^7  = -12q^3                             
-PV1_37  =       -3.5930741E-03 / a_37 xy^6 = -12q^3                             
+PV1_7   =       -8.9167469E-02 / a_7 x^3   = -q                                 
+PV1_9   =       -8.9167469E-02 / a_9 xy^2  = -q                                 
+PV1_17  =        2.3852513E-02 / a_17 x^5  = 3q^2                               
+PV1_21  =        2.3852513E-02 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -8.5074727E-03 / a_31 x^7  = -12q^3                             
+PV1_37  =       -8.5074727E-03 / a_37 xy^6 = -12q^3                             
 PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
 PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
-PV2_7   =       -6.6900338E-02 / b_7 y^3   = -q                                 
-PV2_9   =       -6.6900338E-02 / b_9 yx^2  = -q                                 
-PV2_17  =        1.3426966E-02 / b_17 y^5  = 3q^2                               
-PV2_21  =        1.3426966E-02 / b_21 yx^4 = 3q^2                               
-PV2_31  =       -3.5930741E-03 / b_31 y^7  = -12q^3                             
-PV2_37  =       -3.5930741E-03 / b_37 yx^6 = -12q^3                             
+PV2_7   =       -8.9167469E-02 / b_7 y^3   = -q                                 
+PV2_9   =       -8.9167469E-02 / b_9 yx^2  = -q                                 
+PV2_17  =        2.3852513E-02 / b_17 y^5  = 3q^2                               
+PV2_21  =        2.3852513E-02 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -8.5074727E-03 / b_31 y^7  = -12q^3                             
+PV2_37  =       -8.5074727E-03 / b_37 yx^6 = -12q^3                             
 MJD-OBS =        50985.1119714 / Obs. start J1998.468 (1998-06-21T02:41)        
 END                                                                             
 === Test 2 ===
 --I Starting monoliths...
 --I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
 --I Processing NDF <testndf2>
 --I NDF <testndf2> examined OK
 --I WCS information from AST
 --I Obtaining catalogue from usno@eso...
 --I Obtained catalogue, 500 entries, from usno@eso
 --I Using pre-existing CCD catalogue testndf2.ccdcat.munged
+--I Object extraction successful
 --I Iteration 0...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 1...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 2...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 3...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 4...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 5...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
 --I Iteration 6...
 --I Matching position lists...
+--I Match positions with findoff
   2 names accessed using parameter INLIST
 --I Fitting astrometry
 --I ASTROM found a 6-parameter fit
@@ -142,14 +158,200 @@ EQUINOX =               2000.0 / Equator and equinox of J2000.0
 LONPOLE =                  180 / Native longitude of celestial pole             
 CRVAL1  =          150.0004167 / Projection pole -- RA =   10:00:00.1           
 CRVAL2  =          -30.0002778 / Projection pole -- Dec = -30:00:01             
-CRPIX1  =          176.9726518 / Projection pole -- x-pixels                    
-CRPIX2  =          176.6501346 / Projection pole -- y-pixels                    
+CRPIX1  =          176.9149463 / Projection pole -- x-pixels                    
+CRPIX2  =          176.6300603 / Projection pole -- y-pixels                    
 CUNIT1  = 'deg     '           / RA always given in degrees                     
 CUNIT2  = 'deg     '           / Dec always given in degrees                    
-CD1_1   =       -4.7169128E-04 / Transformation to intermed. world coords       
-CD2_1   =       -3.9115498E-06                                                  
-CD1_2   =       -4.6313252E-06                                                  
-CD2_2   =        4.7199225E-04                                                  
+CD1_1   =       -4.7160440E-04 / Transformation to intermed. world coords       
+CD2_1   =       -3.9816503E-06                                                  
+CD1_2   =       -4.6218127E-06                                                  
+CD2_2   =        4.7203689E-04                                                  
+PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
+PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
+PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 
+PV1_9   =       -0.0000000E+00 / a_9 xy^2  = -q                                 
+PV1_17  =        0.0000000E+00 / a_17 x^5  = 3q^2                               
+PV1_21  =        0.0000000E+00 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -0.0000000E+00 / a_31 x^7  = -12q^3                             
+PV1_37  =       -0.0000000E+00 / a_37 xy^6 = -12q^3                             
+PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
+PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
+PV2_7   =       -0.0000000E+00 / b_7 y^3   = -q                                 
+PV2_9   =       -0.0000000E+00 / b_9 yx^2  = -q                                 
+PV2_17  =        0.0000000E+00 / b_17 y^5  = 3q^2                               
+PV2_21  =        0.0000000E+00 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3                             
+PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
+MJD-OBS =         1980.1998631 / Obs. start J1864.300 (1864-04-19T04:48)        
+END                                                                             
+=== Test 3 ===
+--I Starting monoliths...
+--I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
+--I Processing NDF <testndf1>
+--I NDF <testndf1> examined OK
+--I WCS information from AST
+--I Obtaining catalogue from usno@eso...
+--I Obtained catalogue, 500 entries, from usno@eso
+--I Using pre-existing CCD catalogue testndf1.ccdcat.munged
+--I Object extraction successful
+--I Iteration 0...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 1...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 2...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 3...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 4...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 5...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--I Iteration 6...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity 0
+--I Fitting astrometry
+--I ASTROM found a 9-parameter fit
+--W Not inserting WCS information into NDF <testndf1>
+--I Retaining WCS information in t9-temp-testndf3.final-fits.fits
+SIMPLE  =                    T / file does conform to FITS standard             
+BITPIX  =                    8 / number of bits per data pixel                  
+NAXIS   =                    2 / number of data axes                            
+NAXIS1  =                    1 / length of data axis 1                          
+NAXIS2  =                    1 / length of data axis 2                          
+CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
+CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
+RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
+EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
+LONPOLE =                  180 / Native longitude of celestial pole             
+CRVAL1  =          261.4601898 / Projection pole -- RA =   17:25:50.4           
+CRVAL2  =           74.4628212 / Projection pole -- Dec = +74:27:46             
+CRPIX1  =         3876.9798389 / Projection pole -- x-pixels                    
+CRPIX2  =         2980.0508846 / Projection pole -- y-pixels                    
+CUNIT1  = 'deg     '           / RA always given in degrees                     
+CUNIT2  = 'deg     '           / Dec always given in degrees                    
+CD1_1   =       -1.5331932E-06 / Transformation to intermed. world coords       
+CD2_1   =       -9.2463221E-05                                                  
+CD1_2   =       -9.2499152E-05                                                  
+CD2_2   =        1.4684650E-06                                                  
+PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
+PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
+PV1_7   =       -6.5524521E-02 / a_7 x^3   = -q                                 
+PV1_9   =       -6.5524521E-02 / a_9 xy^2  = -q                                 
+PV1_17  =        1.2880388E-02 / a_17 x^5  = 3q^2                               
+PV1_21  =        1.2880388E-02 / a_21 xy^4 = 3q^2                               
+PV1_31  =       -3.3759251E-03 / a_31 x^7  = -12q^3                             
+PV1_37  =       -3.3759251E-03 / a_37 xy^6 = -12q^3                             
+PV2_0   =        0.0000000E+00 / Distortion function for y: b_0=0               
+PV2_1   =        1.0000000E+00 / b_1 y     = 1                                  
+PV2_7   =       -6.5524521E-02 / b_7 y^3   = -q                                 
+PV2_9   =       -6.5524521E-02 / b_9 yx^2  = -q                                 
+PV2_17  =        1.2880388E-02 / b_17 y^5  = 3q^2                               
+PV2_21  =        1.2880388E-02 / b_21 yx^4 = 3q^2                               
+PV2_31  =       -3.3759251E-03 / b_31 y^7  = -12q^3                             
+PV2_37  =       -3.3759251E-03 / b_37 yx^6 = -12q^3                             
+MJD-OBS =        50985.1119714 / Obs. start J1998.468 (1998-06-21T02:41)        
+END                                                                             
+=== Test 4 ===
+--I Starting monoliths...
+--I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
+--I Processing NDF <testndf2>
+--I NDF <testndf2> examined OK
+--I WCS information from AST
+--I Obtaining catalogue from usno@eso...
+--I Obtained catalogue, 500 entries, from usno@eso
+--I Using pre-existing CCD catalogue testndf2.ccdcat.munged
+--I Object extraction successful
+--I Iteration 0...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 1...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 2...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 3...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 4...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 5...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--I Iteration 6...
+--I Matching position lists...
+--I Match positions with match
+--I match_positions_match: transform scale 1, non-perpendicularity -0
+--I Fitting astrometry
+--I ASTROM found a 6-parameter fit
+--W Not inserting WCS information into NDF <testndf2>
+--I Retaining WCS information in t9-temp-testndf4.final-fits.fits
+SIMPLE  =                    T / file does conform to FITS standard             
+BITPIX  =                    8 / number of bits per data pixel                  
+NAXIS   =                    2 / number of data axes                            
+NAXIS1  =                    1 / length of data axis 1                          
+NAXIS2  =                    1 / length of data axis 2                          
+CTYPE1  = 'RA---TAN'           / RA -- tangent-plane projection                 
+CTYPE2  = 'DEC--TAN'           / DEC -- tangent-plane projection                
+RADESYS = 'FK5     '           / Celestial coordinates in FK5 system            
+EQUINOX =               2000.0 / Equator and equinox of J2000.0                 
+LONPOLE =                  180 / Native longitude of celestial pole             
+CRVAL1  =          150.0004167 / Projection pole -- RA =   10:00:00.1           
+CRVAL2  =          -30.0002778 / Projection pole -- Dec = -30:00:01             
+CRPIX1  =          176.9758950 / Projection pole -- x-pixels                    
+CRPIX2  =          176.6673222 / Projection pole -- y-pixels                    
+CUNIT1  = 'deg     '           / RA always given in degrees                     
+CUNIT2  = 'deg     '           / Dec always given in degrees                    
+CD1_1   =       -4.7178062E-04 / Transformation to intermed. world coords       
+CD2_1   =       -3.9020998E-06                                                  
+CD1_2   =       -4.2867494E-06                                                  
+CD2_2   =        4.7217750E-04                                                  
 PV1_0   =        0.0000000E+00 / Distortion function for x: a_0=0               
 PV1_1   =        1.0000000E+00 / a_1 x     = 1                                  
 PV1_7   =       -0.0000000E+00 / a_7 x^3   = -q                                 

@@ -20,10 +20,18 @@ export AUTOASTROM_DIR KAPPA_DIR CCDPACK_DIR ATOOLS_DIR
 
 PREFIX=t9-temp-
 
+# The --defects options in the command lines below are actually
+# redundant, since we're getting the CCD catalogue information from
+# --xxxccdcat, but I keep them in to remind me they have to be there
+# when/if I regenerate the xxxccdcat (the same command, but with the
+# xxxccdcat file not existing, and without the xxxndfinfo option, and
+# with the real r106282xx.sdf file as argument).
+
 $AUTOASTROM_DIR/autoastrom \
     --verbose \
     --xxxccdcat=testndf1.ccdcat.munged \
     --xxxndfinfo=dim1=2048,dim2=4097 \
+    --defects \
     --noinsert \
     --keepfits=${PREFIX}testndf1.final-fits.fits \
     --nokeeptemps \
@@ -43,11 +51,39 @@ $AUTOASTROM_DIR/autoastrom \
     >${PREFIX}testndf2.STDOUT \
     2>${PREFIX}testndf2.STDERR
 
+# Now the same two fits, but with --match=match
+
+$AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --xxxccdcat=testndf1.ccdcat.munged \
+    --xxxndfinfo=dim1=2048,dim2=4097 \
+    --defects \
+    --noinsert \
+    --keepfits=${PREFIX}testndf3.final-fits.fits \
+    --match=match \
+    --nokeeptemps \
+    testndf1.sdf \
+    >${PREFIX}testndf3.STDOUT \
+    2>${PREFIX}testndf3.STDERR
+
+$AUTOASTROM_DIR/autoastrom \
+    --verbose \
+    --xxxccdcat=testndf2.ccdcat.munged \
+    --xxxndfinfo=dim1=353,dim2=353 \
+    --obsdata=col=600 \
+    --noinsert \
+    --keepfits=${PREFIX}testndf4.final-fits.fits \
+    --match=match \
+    --nokeeptemps \
+    testndf2 \
+    >${PREFIX}testndf4.STDOUT \
+    2>${PREFIX}testndf4.STDERR
+
 
 
 # Dump results to stdout, removing version string
-echo "=== Test 1 ==="
 # Remove lines containing version-number and HTTP proxy
+echo "=== Test 1 ==="
 egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf1.STDOUT
 if test -f ${PREFIX}testndf1.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf1.final-fits.fits
@@ -60,6 +96,20 @@ if test -f ${PREFIX}testndf2.final-fits.fits; then
     ./fitsdump ${PREFIX}testndf2.final-fits.fits
 else
     echo "Can't find file ${PREFIX}testndf2.final-fits.fits"
+fi
+echo "=== Test 3 ==="
+egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf3.STDOUT
+if test -f ${PREFIX}testndf3.final-fits.fits; then
+    ./fitsdump ${PREFIX}testndf3.final-fits.fits
+else
+    echo "Can't find file ${PREFIX}testndf3.final-fits.fits"
+fi
+echo "=== Test 4 ==="
+egrep -v '(autoastrom, v|HTTP proxy)' ${PREFIX}testndf4.STDOUT
+if test -f ${PREFIX}testndf4.final-fits.fits; then
+    ./fitsdump ${PREFIX}testndf4.final-fits.fits
+else
+    echo "Can't find file ${PREFIX}testndf4.final-fits.fits"
 fi
 
 rm -f ${PREFIX}*
