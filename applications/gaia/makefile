@@ -567,7 +567,8 @@ RUNTIME_BINARIES = gaia_swish gaia_stcl rtdClient rtdServer \
 
 #  Names of scripts that will need 755 protections.
 RUNTIME_SCRIPTS = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
-                  displaycat
+                  displaycat gaiacut zoomcutandflip gaiawcs2tab \
+                  pix2wcs wcs2pix
 
 ################################################################################
 #-------------------------------------------------------------------------------
