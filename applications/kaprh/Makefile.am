@@ -70,7 +70,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 kaprh.hlp: $(KAPRH_F_ROUTINES) kaprh_master.hlp
 	cat $(KAPRH_F_ROUTINES) > all.f
-	PATH=$(PATH):$(STARLINK)/bin/sst; \
+	PATH="$(PATH)":$(STARLINK)/bin/sst; \
+	export PATH ; \
 	@PROHLP@ in=all.f out=all.hlp single=no
 	cat kaprh_master.hlp all.hlp > kaprh.hlp
 	-rm -f all.hlp
