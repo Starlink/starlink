@@ -69,7 +69,10 @@ test_iostat: $(test_iostat_OBJECTS)
 		$(test_iostat_OBJECTS) -lemsf -lems \
 		`cnf_link`
 
-#  Because we invoke `ems_link`, the following
+#  Because we invoke `ems_link` while building the test program -- ie,
+#  before the scripts are installed -- the following LDADD assignment
+#  must have  $(srcdir) in it, so that it's the uninstalled ems_link
+#  that's invoked.
 ems_test_SOURCES = ems_test.c
 ems_test_LDADD = `$(srcdir)/ems_link`
 
