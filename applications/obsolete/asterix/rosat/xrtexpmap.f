@@ -276,7 +276,7 @@ c	From INTEGER to improve exposure time evaluation
       CALL USI_GET0I( 'IFILE', IFILE, STATUS )
 
 *    Get directory containing detector map files
-      CALL PSX_GETENV( 'XRTEXPMAP_DIR', DETDIR, STATUS )
+      CALL PSX_GETENV( 'AST_ETC', DETDIR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Switch on detector
