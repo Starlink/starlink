@@ -4,7 +4,7 @@ Reports the co-ordinates of positions selected using the cursor.
 
 Usage:
 
-   cursor [mode] [name] [outlist] [device]
+   cursor [mode] [name] [outcat] [device]
 
 Description:
 
@@ -12,13 +12,11 @@ Description:
    using a cursor and displays them on your terminal. The selected
    positions may be marked in various ways on the device (see parameter
    PLOT), and can be written to an output positions list so that subsequent
-   applications can make use of them (see parameter OUTLIST). The format
+   applications can make use of them (see parameter OUTCAT). The format
    of the displayed positions may be controlled using parameter STYLE.
 
    Positions may be reported in several different co-ordinate Frames
-   (see parameter FRAME). Optionally, the corresponding pixel
-   co-ordinates at each position may also be reported (see parameter
-   SHOWPIXEL).
+   (see parameter FRAME).
 
    The picture or pictures within which positions are required can be
    selected in several ways (see parameters MODE and NAME).
@@ -33,30 +31,30 @@ For information on individual parameters, select from the list below:
 
 CLOSE
 
-CLOSE = _LOGICAL (Read)
+CLOSE = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
-   "Chain" or "Poly". If TRUE, polygons will be closed by joining
-   the first position to the last position. [current value]
+   "Chain" or "Poly". If TRUE, polgons will be closed by joining
+   the first position to the last position. [Current value]
 
 DESCRIBE
 
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    subsequent positions will be reported is produced each time a
-   position is reported within a new picture. [current value]
+   position is reported within a new picture. [Current value]
 
 DEVICE
 
 DEVICE = DEVICE (Read)
    The graphics workstation.  This device must support cursor
-   interaction. [current graphics device]
+   interaction. [The current graphics device]
 
 EPOCH
 
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an
-   epoch value is needed to qualify it. This is the epoch at
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter FRAME) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
    which the supplied sky positions were determined. It should be
    given as a decimal years value, with or without decimal places
    ("1996.8" for example). Such values are interpreted as a Besselian
@@ -73,7 +71,7 @@ FRAME = LITERAL (Read)
    any of the co-ordinate Frames stored with each picture. The
    string supplied for FRAME can be one of the following:
 
-   - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
+   - A Domain name such as SKY, AXIS, PIXEL, etc. The special Domains
    AGI_WORLD and AGI_DATA are used to refer to the world and data
    co-ordinate system stored in the AGI graphics database. They can
    be useful if no WCS information was store with the picture when
@@ -81,8 +79,8 @@ FRAME = LITERAL (Read)
 
    - An integer value giving the index of the required Frame.
 
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
-   section "Sky Co-ordinate Systems" in SUN/95).
+   - An IRAS90 Sky Co-ordinate System (SCS) values such as
+   EQUAT(J2000) (see SUN/163).
 
    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the picture was created.
@@ -90,10 +88,10 @@ FRAME = LITERAL (Read)
 
 GEODESIC
 
-GEODESIC = _LOGICAL (Read)
+GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Poly". It specifies whether the curves drawn between
-   positions should be straight lines, or should be geodesic curves.
+   positions should be stright lines, or should be geodesic curves.
    In many co-ordinate Frames geodesic curves will be simple straight
    lines. However, in others (such as the majority of celestial
    co-ordinates Frames) geodesic curves will be more complex curves
@@ -102,7 +100,7 @@ GEODESIC = _LOGICAL (Read)
 
 INFO
 
-INFO = _LOGICAL (Read)
+INFO = LOGICAL (Read)
    If TRUE then messages are displayed describing the use of the
    mouse prior to obtaining the first position. Note, these
    informational messages are not suppressed by setting parameter
@@ -127,12 +125,12 @@ LOGFILE = FILENAME (Write)
    The name of the text file in which the formatted co-ordinates of
    positions selected with the cursor may be stored. This is intended
    primarily for recording the screen output, and not for communicating
-   positions to subsequent applications (use parameter OUTLIST for this
+   positions to subsequent applications (use parameter OUTCAT for this
    purpose). A null string (!) means that no file is created.  [!]
 
 MARKER
 
-MARKER = _INTEGER (Read)
+MARKER = INTEGER (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Mark". It specifies the symbol with which each
    position should be marked, and should be given as an integer
@@ -142,14 +140,14 @@ MARKER = _INTEGER (Read)
 
 MAXPOS
 
-MAXPOS = _INTEGER (Read)
+MAXPOS = INTEGER (Read)
    The maximum number of positions which may be supplied before the
    application terminates. The number must be in the range 1 to 500.
    [500]
 
 MINPOS
 
-MINPOS = _INTEGER (Read)
+MINPOS = INTEGER (Read)
    The minimum number of positions which may be supplied. The user
    is asked to supply more if necessary. The number must be in the
    range 0 to the value of parameter MAXPOS. [0]
@@ -190,17 +188,19 @@ NUMBER = _INTEGER (Write)
    The number of positions selected with the cursor (excluding
    invalid positions).
 
-OUTLIST
+OUTCAT
 
-OUTLIST = FILENAME (Write)
-   An output positions list in which to store the valid selected
-   positions (only positions in the first selected picture are
-   recorded). This is the name of a text file which can be used to
-   communicate positions to subsequent applications. It includes
-   information describing the available co-ordinate Frames as well as
-   the positions themselves. If you want a simple record of the
-   positions displayed on the screen, use parameter LOGFILE instead.
-   If a null value is supplied, no output positions list is produced. [!]
+OUTCAT = FILENAME (Write)
+   An output catalogue in which to store the valid selected positions.
+   The catalogue has the form of a positions list such as created by
+   application LISTMAKE. Only positions in the first selected picture
+   are recorded. This application uses the conventions of the CURSA
+   package (SUN/190) for determining the format of the catalogue. If a
+   file type of .fits is given, then the catalogue is stored as a FITS
+   binary table. If a file type of .txt is given, then the catalogue
+   is stored in a text file in "Small Text List" (STL) format. If no
+   file type is given, then ".fit" is assumed. If a null value is
+   supplied, no output positions list is produced. [!]
 
 PLOT
 
@@ -226,58 +226,32 @@ PLOT = LITERAL (Read)
    position. Parameters MARKER, GEODESIC and CLOSE are used to
    specify the symbols and lines to use.
 
-   [current value]
+   [Current value]
 
 QUIET
 
-QUIET = _LOGICAL (Read)
+QUIET = LOGICAL (Read)
    If TRUE then positions are not reported on the screen. Output
    parameters and files are still created. The display of informational
    messages describing the use of the cursor is controlled by the
    parameter INFO. [FALSE]
 
-SHOWPIXEL
-
-SHOWPIXEL = _LOGICAL (Read)
-   If TRUE, the pixel co-ordinates of each selected position are
-   shown on a separate line, following the co-ordinates requested
-   using parameter FRAME. If pixel co-ordinates are being displayed
-   anyway (see parameter FRAME) then a value of FALSE is used for.
-   SHOWPIXEL. [current value]
-
 STYLE
 
 STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the graphics specified by parameter PLOT. The format
-   of the positions reported on the screen may also be controlled.
+   The name of a text file containing a description of the plotting
+   style to use when drawing the graphics specified by parameter PLOT.
+   By specifying suitable values for Frame attributes (eg Digits(1),
+   Digits(2), Symbol(1), Symbol(2), etc), it can also be used to
+   control the format for the displayed axis values.
 
-   A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported). [current value]
-
-   In addition to the attributes which control the appearance of
-   the graphics (Colour, Font, etc), the following attributes may
-   be set in order to control the appearance of the formatted axis
-   values reported on the screen: Format, Digits, Symbol, Unit. These
-   may be suffixed with an axis number (eg "Digits(2)") to refer to
-   the values displayed for a specific axis. [current value]
+   Each line in the file should contain a string of the form
+   <name>=<value>, in which <name> is the name of an attribute,
+   and <value> is the value to assign to the attribute. The file may
+   contain blank lines and comment lines starting with a hash (#) sign.
+   Default values will be used for any unspecified attributes. All
+   attributes will be defaulted if a null value (!) is supplied,
+   or if the specified file cannot be accessed. [Current value]
 
 Examples
 
@@ -301,12 +275,12 @@ cursor describe plot=mark marker=3 style="colour=red,size=2"
    marked with PGPLOT marker 3 (an asterisk). The markers are
    red and are twice the default size.
 
-cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
+cursor current maxpos=2 minpos=2 plot=poly quiet outcat=slice
    Exactly two positions are obtained within the current picture,
    and are joined with a straight line. The positions are written to
-   a text file called slice but are not displayed on the screen. The
-   text file may be used to communicate the positions to later
-   applications.
+   a FITS binary catalogue called slice.fit but are not displayed on
+   the screen. The catalogue may be used to communicate the positions
+   to later applications (LISTSHOW, PROFILE, etc).
 
 cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
    This obtains co-ordinates within any visible DATA picture on
@@ -326,11 +300,6 @@ celestial co-ordinate values are stored in radians.
 -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
-
--  Pixel co-ordinates are formatted with 1 decimal place unless a
-format has already been specified by setting the Format attributes
-for the axes of the PIXEL co-ordinate Frame (eg using application
-WCSATTRIB).
 
 -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the

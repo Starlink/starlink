@@ -1,20 +1,20 @@
 .help listmake Starlink kappa
 .nf
-Creates a text file holding a positions list.
+Creates a catalogue holding a positions list.
 
 Usage:
 
-   listmake outlist [ndf] [mode] [file]
+   listmake outcat [ndf] [mode] [file]
 
 Description:
 
-   This application creates a text file containing a list of positions
-   supplied by the user. Positions list are primarily intended for
-   communicating positions between applications. In addition to the
-   positions themselves, they contain information describing the
-   co-ordinate Frames in which the positions are defined. They also
-   contain integer position identifiers which allow positions to be
-   distinguished.
+   This application creates a catalogue containing a list of positions
+   supplied by the user, together with information describing the
+   co-ordinate Frames in which the positions are defined. Integer
+   position identifiers which allow positions to be distinguished are
+   also stored in the catalogue. The catalogue may be manipulated
+   using the CURSA package (SUN/190), and is stored in either FITS
+   binary format or the "Small Text List" (STL) format defined by CURSA.
 
    If an NDF is specified using parameter NDF, then the positions should
    be given in the current co-ordinate Frame of the NDF. Information
@@ -24,18 +24,18 @@ Description:
    data sets.
 
    If no NDF is specified, then the user must indicate the co-ordinate
-   Frame in which the positions will be supplied using parameter FRAME.
+   Frame in which the positions will be supplied using parameter DOMAIN.
    A description of this Frame will be written to the output positions
    list for use by subsequent applications.
 
-   The positions themselves may be supplied within another text file,
+   The positions themselves may be supplied within a text file,
    or may be given in response to repeated prompts for a parameter.
    Alternatively, the pixel centres in the NDF supplied for parameter
    NDF can be used (see parameter MODE).
 
    The output can be initialised by copying positions from an existing
    positions list. Any positions supplied directly by the user are then
-   appended to the end of this initial list (see parameter INLIST).
+   appended to the end of this initial list (see parameter INCAT).
 
 Parameters
 
@@ -43,28 +43,41 @@ For information on individual parameters, select from the list below:
 
 DESCRIBE
 
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    positions are required will be displayed before the positions
-   are obtained using either parameter POSITION or FILE. [current value]
+   are obtained using either parameter POSITION or FILE. [Current value]
 
 DIM
 
 DIM = _INTEGER (Read)
-   The number of axes in the co-ordinate Frame in which the positions
-   will be supplied. Only accessed if a null value is supplied for
-   parameter NDF.
+   The number of axes for each position. Only accessed if a null
+   value is supplied for parameter NDF.
+
+DOMAIN
+
+DOMAIN = LITERAL (Read)
+   Specifies the Domain of the positions supplied using parameter
+   POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string
+   such as EQUAT(J2000) is supplied (see SUN/163), then the positions
+   are assumed to be 2-dimensional celestial co-ordinates in the
+   specified system. Otherwise, the given Domain name is used without
+   any interpretation. Any string may be supplied, but normally one
+   of the standard Domain names such as GRID, PIXEL, GRAPHICS, etc,
+   should be given. Parameter DIM is used to determine the number
+   of axes in the Frame. This parameter is only accessed if the
+   parameter NDF is given a null value.
 
 EPOCH
 
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an epoch
-   value is needed to qualify it. This is the epoch at which the
-   supplied sky positions were determined. It should be given as a
-   decimal years value, with or without decimal places  ("1996.8" for
-   example). Such values are interpreted as a Besselian epoch if less
-   than 1984.0 and as a Julian epoch otherwise.
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter DOMAIN) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
 
 FILE
 
@@ -74,27 +87,13 @@ FILE = FILENAME (Read)
    for a single position, separated by white space. Only accessed if
    parameter MODE is given the value "File".
 
-FRAME
+INCAT
 
-FRAME = LITERAL (Read)
-   Specifies the domain of the positions supplied using parameter
-   POSITION or FILE. If a "Sky Co-ordinate System" (SCS) string
-   such as EQUAT(J2000) is supplied (see section "Sky Co-ordinate
-   Systems" in SUN/95), then the positions are assumed to be
-   2-dimensional celestial co-ordinates in the specified system.
-   Otherwise, the given domain name is used without any interpretation.
-   Any string may be supplied, but normally one of the standard domain
-   names such as GRID, PIXEL, GRAPHICS, etc, should be given. Parameter
-   DIM is used to determine the number of axes in the Frame. This
-   parameter is only accessed if the parameter NDF is given a null value.
-
-INLIST
-
-INLIST = FILENAME (Read)
-   A text file containing an existing positions list which is to be
+INCAT = FILENAME (Read)
+   A catalogue containing an existing positions list which is to be
    included at the start of the output positions list. These positions
    are mapped into the current co-ordinate Frame of the supplied
-   NDF, or into the Frame specified by parameter FRAME if no NDF was
+   NDF, or into the Frame specified by parameter DOMAIN if no NDF was
    supplied. A message is displayed indicating the Frame in which
    alignment occurred. They are then stored in the output list before
    any further positions are added. A null value may be supplied
@@ -119,31 +118,31 @@ MODE = LITERAL (Read)
 
 NDF
 
-NDF = NDF (Read)
+NDF = NDF (READ)
    The NDF which defines the available co-ordinate Frames in the
    output positions list. If an NDF is supplied, the positions
    obtained using parameter POSITION or FILE are assumed to be in
    the current co-ordinate Frame of the NDF, and the WCS component
    of the NDF is copied to the output positions list. If a null
    value is supplied, the single co-ordinate Frame defined by parameter
-   FRAME is stored in the output positions list, and supplied
+   DOMAIN is stored in the output positions list, and supplied
    positions are assumed to be in the same Frame. [!]
 
-OUTLIST
+OUTCAT
 
-OUTLIST = FILENAME (Write)
-   The output positions list.
+OUTCAT = FILENAME (Write)
+   The catalogue holding the output positions list.
 
 POSITION
 
 POSITION = LITERAL (Read)
    The co-ordinates of a single position to be stored in the output
-   positions list. Supplying a colon ":" will display details of the
-   co-ordinate Frame in which the position is required. The position
-   should be given as a list of formatted axis values separated by
-   commas or spaces. You are prompted for new values for this parameter
-   until a null value (!) is entered. This parameter is only accessed
-   if parameter MODE is given the value "Interface".
+   positions list. Supplying ":" will display details of the co-ordinate
+   Frame in which the position is required. The position should be
+   given as a list of formatted axis values separated by white space.
+   You are prompted for new values for this parameter until a null
+   value is entered. Only accessed if parameter MODE is given the
+   value "Interface".
 
 TITLE
 
@@ -156,57 +155,52 @@ TITLE = LITERAL (Read)
 
 Examples
 
-listmake newlist frame=pixel dim=2
-   This creates a text file called newlist containing a list of
-   positions, together with a description of a single 2-dimensional
-   pixel co-ordinate Frame. The positions are supplied as a set of
-   space-separated pixel co-ordinates in response to repeated prompts
-   for the parameter POSITION.
+listmake newlist domain=pixel dim=2
+   This creates a FITS binary catalogue called newlist.fit containing a
+   list of positions, together with a description of a single
+   2-dimensional pixel co-ordinate Frame. The positions are supplied as
+   a set of space-separated pixel co-ordinates in response to repeated
+   prompts for the parameter POSITION.
 
-listmake stars.dat frame=equat(B1950) epoch=1962.3
-   This creates a text file called stars.dat containing a list of
+listmake stars.txt domain=equat(B1950) epoch=1962.3
+   This creates a catalogue called stars.txt containing a list of
    positions, together with a description of a single FK4 equatorial
    RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
-   positions were determined at epoch B1962.3. The epoch of
-   observation is required since the underlying model on which the
-   FK4 system is based is non-inertial and rotates slowly with time,
-   introducing fictitious proper motions. The positions are supplied
-   as hours and degrees values in response to repeated prompts for
-   parameter POSITIONS.
+   catalogue is stored in a text file using the CAT "Small Text List"
+   format ("STL" - see SUN/190). The positions were determined at epoch
+   B1962.3. The epoch of observation is required since the underlying
+   model on which the FK4 system is based is non-inertial and rotates
+   slowly with time, introducing fictitious proper motions. The
+   positions are supplied hours and degrees values in reponse to
+   repeated prompts for parameter POSITIONS.
 
 listmake outlist ndf=allsky mode=file file=stars
-   This creates a text file called outlist containing a list of
-   positions, together with descriptions of all the co-ordinate
+   This creates a FITS binary catalogue called outlist.fit containing a
+   list of positions, together with descriptions of all the co-ordinate
    Frames contained in the NDF allsky. The positions are supplied
-   within the current co-ordinate Frame of the NDF. Application
-   WCSFRAME can be used to find out what this Frame is.
-   The positions are supplied in a text file called stars. It may
-   seem pointless to copy positions out of one text file into
-   another. The input and output text files are, however, different in
-   two important respects: the output file contains Frame descriptions
-   which enable subsequent applications to align the positions with
-   other data, and it also contains integer position identifiers which
-   allow the positions to be distinguished.
+   as co-ordinates within the current co-ordinate Frame of the NDF.
+   Application WCSFRAME can be used to find out what this Frame is.
+   The positions are supplied in a text file called stars.
 
-listmake out inlist=old.dat frame=gal
-   This creates a text file called out containing a list of
-   positions, together with a description of a single galactic
-   co-ordinate Frame. The positions contained in the existing
-   positions list old.dat are mapped into galactic co-ordinates (if
-   possible) and stored in the output positions list. Further
-   galactic co-ordinate positions are then obtained by repeated
+listmake out.txt incat=old.fit domain=gal
+   This creates an STL format catalogue stored in a text file called
+   out.txt containing a list of positions, together with a description
+   of a single galactic co-ordinate Frame. The positions contained in
+   the existing binary FITS catalogue old.fit are mapped into galactic
+   co-ordinates (if possible) and stored in the output positions list.
+   Further galactic co-ordinate positions are then obtained by repeated
    prompting for the parameter POSITION. These positions are
-   appended to the positions obtained from file old.dat.
+   appended to the positions obtained from file old.fit.
 
-listmake out inlist=old.dat ndf=cobe
+listmake out.txt incat=old.fit ndf=cobe
    As above but the output positions list contains copies of all the
-   Frames in the NDF cobe. The positions in old.dat are mapped into
+   Frames in the NDF cobe. The positions in old.fit are mapped into
    the current co-ordinate Frame of the NDF (if possible) before
-   being stored in the output positions list. The new positions must
+   being stored in the output positions list. The new positons must
    also be supplied in the same Frame (using parameter POSITION).
 
 listmake profpos ndf=prof1 mode=pixel
-   This creates a positions list called profpos containing the
+   This creates a positions list called profpos.fit containing the
    positions of all the pixel centres in the 1-dimensional NDF
    called prof. This could for instance be used as input to
    application PROFILE in order to produce another profile in which
@@ -214,34 +208,27 @@ listmake profpos ndf=prof1 mode=pixel
 
 Notes
 
+-  This application uses the conventions of the CURSA package
+for determining the formats of input and output catalogues. If a file
+type of .fits is given, then the catalogue is assumed to be a FITS
+binary table. If a file type of .txt is given, then the catalogue is
+assumed to be stored in a text file in STL format. If no file type is
+given, then ".fit" is assumed.
+
 -  There is a limit of 200 on the number of positions which can be
 given using parameter POSITION. There is no limit on the number of
 positions which can be given using parameter FILE.
 
--  Position identifiers are assigned to the supplied positions in
+-  Position identifiers are asigned to the supplied positions in
 the order in which they are supplied. If no input positions list is
-given using parameter INLIST, then the first supplied position will
+given using parameter INCAT, then the first supplied position will
 be assigned the identifier "1". If an input positions list is
 given, then the first supplied position is assigned an identifier
 one greater than the largest identifier in the input positions list.
 
--  Each line in the created file will either be a comment line
-commencing with a "#" character, or will contain a single integer
-position identifier, followed by a set of space separated double
-precision floating point axis values. A block of comments will be
-included at the end of the file containing a description of the
-co-ordinates Frames in which the positions are defined (an AST
-"FrameSet" - see SUN/210). The structure of such FrameSets is
-complicated and will usually be created by applications, not directly
-by the user. The positions stored in file are in the Base Frame of
-the FrameSet. If no FrameSet is included (for instance if a user
-creates a positions list using a text editor and does not include
-a FrameSet), then subsequent applications will assume that the
-positions are pixel co-ordinates.
-
 Related_Applications
 
-   KAPPA: CURSOR, LISTSHOW
+   KAPPA: CURSOR, LISTSHOW; CURSA: XCATVIEW, CATSELECT
 
 Authors
 

@@ -1243,9 +1243,9 @@ $(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
-$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
+$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
-	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
+	         gropen.o $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o lsfun1.o $(LINK_SCRIPT)

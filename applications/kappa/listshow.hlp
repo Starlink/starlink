@@ -4,21 +4,22 @@ Reports the positions stored in a positions list.
 
 Usage:
 
-   listshow inlist [frame] [first] [last] [plot] [device]
+   listshow incat [frame] [first] [last] [plot] [device]
 
 Description:
 
-   This application reports positions contained in a text file. The
-   text file should have the form of a positions list as produced (for
-   instance) by application LISTMAKE. By default all positions in the
-   file are reported, but a subset may be reported by specifying a range
-   of "position identifiers" (see parameters FIRST and LAST).
+   This application reports positions contained in a catalogue. The
+   catalogue should have the form of a positions list as produced (for
+   instance) by applications LISTMAKE and CURSOR. By default all positions
+   in the catalogue are reported, but a subset may be reported by
+   specifying a range of "position identifiers" (see parameters FIRST
+   and LAST).
 
-   Positions may be reported in a range of co-ordinate Frames dependent
+   Positions may be reported in a range of co-ordinate Frames dependant
    on the information stored in the supplied positions list (see parameter
    FRAME). The selected positions are written to an output parameter
    (parameter POSNS), and may also be written to an output positions
-   list (see parameter OUTLIST). The formatted screen output can be saved
+   list (see parameter OUTCAT). The formatted screen output can be saved
    in a logfile (see parameter LOGFILE). The formats used to report the
    axis values can be controlled using parameter STYLE.
 
@@ -37,44 +38,44 @@ For information on individual parameters, select from the list below:
 
 CLOSE
 
-CLOSE = _LOGICAL (Read)
+CLOSE = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
-   "Chain" or "Poly". If TRUE, polygons will be closed by joining
-   the first position to the last position. [current value]
+   "Chain" or "Poly". If TRUE, polgons will be closed by joining
+   the first position to the last position. [Current value]
 
 DESCRIBE
 
-DESCRIBE = _LOGICAL (Read)
+DESCRIBE = LOGICAL (Read)
    If TRUE, a detailed description of the co-ordinate Frame in which
    the positions will be reported is displayed before the
-   positions. [current value]
+   positions. [Current value]
 
 DEVICE
 
 DEVICE = DEVICE (Read)
    The graphics workstation.  Only accessed if parameter PLOT
-   indicates that graphics are required. [current graphics device]
+   indicates that graphics are required. [The current graphics device]
 
 DIM
 
 DIM = _INTEGER (Write)
-   The number of co-ordinate values for each position written to output
-   parameter POSNS.
+   The number of axes for each position written to output parameter
+   POSNS.
 
 EPOCH
 
-EPOCH = _DOUBLE (Read)
-   If a "Sky Co-ordinate System" specification is supplied (using
-   parameter FRAME) for a celestial co-ordinate system, then an epoch
-   value is needed to qualify it. This is the epoch at which the
-   supplied sky positions were determined. It should be given as a
-   decimal years value, with or without decimal places  ("1996.8" for
-   example). Such values are interpreted as a Besselian epoch if less
-   than 1984.0 and as a Julian epoch otherwise.
+EPOCH = DOUBLE PRECISION (Read)
+   If an IRAS90 Sky Co-ordinate System specification is supplied
+   (using parameter FRAME) for a celestial co-ordinate system,
+   then an epoch value is needed to qualify it. This is the epoch at
+   which the supplied sky positions were determined. It should be
+   given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
 
 FIRST
 
-FIRST = _INTEGER (Read)
+FIRST = INTEGER (Read)
    The identifier for the first position to be displayed. Positions
    are only displayed which have identifiers in the range given by
    parameters FIRST and LAST. The dynamic default is the lowest
@@ -92,8 +93,8 @@ FRAME = LITERAL (Read)
 
    - An integer value giving the index of the required Frame.
 
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
-   section "Sky Co-ordinate Systems" in SUN/95).
+   - An IRAS90 Sky Co-ordinate System (SCS) values such as
+   EQUAT(J2000) (see SUN/163).
 
    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the positions list was
@@ -102,25 +103,25 @@ FRAME = LITERAL (Read)
 
 GEODESIC
 
-GEODESIC = _LOGICAL (Read)
+GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Poly". It specifies whether the curves drawn between
-   positions should be straight lines, or should be geodesic curves.
+   positions should be stright lines, or should be geodesic curves.
    In many co-ordinate Frames geodesic curves will be simple straight
    lines. However, in others (such as the majority of celestial
    co-ordinates Frames) geodesic curves will be more complex curves
    tracing the shortest path between two positions in a non-linear
    projection. [FALSE]
 
-INLIST
+INCAT
 
-INLIST = FILENAME (Read)
-   A text file containing a positions list such as produced by
-   applications LISTMAKE, or CURSOR.
+INCAT = FILENAME (Read)
+   A catalogue containing a positions list such as produced by
+   applications LISTMAKE, CURSOR, etc.
 
 LABEL
 
-LABEL = _LOGICAL (Read)
+LABEL = LOGICAL (Read)
    If TRUE the positions are labelled with the corresponding integer
    identifiers on the graphics device specified by parameter DEVICE.
    The offset from each position to the centre of the corresponding
@@ -131,11 +132,11 @@ LABEL = _LOGICAL (Read)
 
 LAST
 
-LAST = _INTEGER (Read)
+LAST = INTEGER (Read)
    The identifier for the last position to be displayed. Positions
    are only displayed which have identifiers in the range given by
-   parameters FIRST and LAST. The dynamic default is the highest
-   identifier value in the positions list. []
+   parameters FIRST and LAST. parameters FIRST and LAST. The dynamic
+   default is the highest identifier value in the positions list. []
 
 LOGFILE
 
@@ -148,7 +149,7 @@ LOGFILE = FILENAME (Write)
 
 MARKER
 
-MARKER = _INTEGER (Read)
+MARKER = INTEGER (Read)
    This parameter is only accessed if parameter PLOT is set to
    "Chain" or "Mark". It specifies the symbol with which each
    position should be marked, and should be given as an integer
@@ -159,14 +160,13 @@ MARKER = _INTEGER (Read)
 NUMBER
 
 NUMBER = _INTEGER (Write)
-   On exit, this holds the number of positions selected.
+   The number of positions selected.
 
-OUTLIST
+OUTCAT
 
-OUTLIST = FILENAME (Write)
-   The output positions list in which to store the selected
-   positions. If a null value is supplied, no output positions list
-   is produced. [!]
+OUTCAT = FILENAME (Write)
+   The output catalogue in which to store the selected positions. If a
+   null value is supplied, no output catalogue is produced. [!]
 
 PLOT
 
@@ -198,11 +198,11 @@ PLOT = LITERAL (Read)
 POSNS
 
 POSNS() = _DOUBLE (Write)
-   On exit, this holds the unformatted co-ordinates of the positions
-   selected by parameters FIRST and LAST, in the co-ordinate Frame
-   selected by FRAME. The axis values are stored as a 1-dimensional
-   vector. All the axis 1 values for the selected positions are stored
-   first, followed by the axis 2 values, etc. The number of positions in
+   The unformatted co-ordinates of the positions selected by
+   parameters FIRST and LAST, in the co-ordinate Frame selected by
+   FRAME. The axis values are stored as a 1-dimensional vector. All
+   the axis 1 values for the selected positions are stored first,
+   followed by the axis 2 values, etc. The number of positions in
    the vector is written to the output parameter NUMBER, and the
    number of axes per position is written to the output parameter
    DIM. The axis values may not be in the same units as the
@@ -211,7 +211,7 @@ POSNS() = _DOUBLE (Write)
 
 QUIET
 
-QUIET = _LOGICAL (Read)
+QUIET = LOGICAL (Read)
    If TRUE then nothing is displayed on the screen while the
    application is running (other than error messages). Output
    parameters and files are still created. The dynamic default is
@@ -221,67 +221,58 @@ QUIET = _LOGICAL (Read)
 STYLE
 
 STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style to use
-   when drawing the graphics specified by parameter PLOT. The format
-   of the positions reported on the screen may also be controlled.
+   The name of a text file containing a description of a plotting
+   style. It is used only to control the labels and format for the
+   displayed axis values, by specifying suitable values for Frame
+   attributes (eg  Digits(1), Digits(2), Symbol(1), Symbol(2), etc).
 
-   A comma-separated list of strings should be given in which each
-   string is either an attribute setting, or the name of a text file
-   preceded by an up-arrow character "^". Such text files should
-   contain further comma-separated lists which will be read and
-   interpreted in the same manner. Attribute settings are applied in
-   the order in which they occur within the list, with later settings
-   over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
-   the value to assign to the attribute. Default values will be
-   used for any unspecified attributes. All attributes will be
-   defaulted if a null value (!) is supplied. See section "Plotting
-   Attributes" in SUN/95 for a description of the available
-   attributes. Any unrecognised attributes are ignored (no error is
-   reported). [current value]
-
-   In addition to the attributes which control the appearance of
-   the graphics (Colour, Font, etc), the following attributes may
-   be set in order to control the appearance of the formatted axis
-   values reported on the screen: Format, Digits, Symbol, Unit. These
-   may be suffixed with an axis number (eg "Digits(2)") to refer to
-   the values displayed for a specific axis. [current value]
+   Each line in the file should contain a string of the form
+   <name>=<value>, in which <name> is the name of an attribute,
+   and <value> is the value to assign to the attribute. The file may
+   contain blank lines and comment lines starting with a hash (#) sign.
+   Default values will be used for any unspecified attributes. All
+   attributes will be defaulted if a null value (!) is supplied.
+   [Current value]
 
 Examples
 
-listshow stars.dat pixel
+listshow stars pixel
    This displays the pixel co-ordinates of all the positions
-   stored in the text file stars.dat. They are all written to
-   the output parameter POSNS as well as to the screen.
+   stored in the FITS binary catalogue stars.fit. They are all written
+   to the output parameter POSNS as well as to the screen.
 
-listshow stars.dat equat(J2010) first=3 last=3 quiet
-   This extracts position 3 from the text file stars.dat transforming
+listshow stars.fit equat(J2010) first=3 last=3 quiet
+   This extracts position 3 from the catalogue stars.fit transforming
    it into FK5 equatorial RA/DEC co-ordinates (referenced to the
    J2010 equinox) if possible. The RA/DEC values (in radians) are
    written to the output parameter POSNS, but not to the screen.
 
-listshow stars.dat style="digits(1)=5,digits(2)=7"
-   This lists the positions in stars.dat in their original
-   co-ordinate Frame. By default, 5 digits are used to format axis
-   1 values, and 7 to format axis 2 values. These defaults are
-   over-ridden if the attributes Format(1) and/or Format(2) are
-   assigned values in the description of the current Frame stored in
-   the positions list.
+listshow stars_2.txt style="digits(1)=5,digits(2)=7"
+   This lists the positions in the STL format catalogue contained
+   in text file stars_2.txt in their original co-ordinate Frame. By
+   default, 5 digits are used to format axis 1 values, and 7 to format
+   axis 2 values. These defaults are over-ridden if the attributes
+   Format(1) and/or Format(2) are assigned values in the description
+   of the current Frame stored in the positions list.
 
-listshow stars.dat plot=3 style="colour=red,size=2"
-   This lists the positions in stars.dat on the screen in their original
-   co-ordinate Frame, and also marks them on the currently selected
-   graphics device using PGPLOT marker 3 (an asterisk). The markers are
-   red and are twice the default size.
+listshow stars_2.txt plot=3 style="colour=red,size=2"
+   This lists the positions in stars_2.txt on the screen in their
+   original co-ordinate Frame, and also marks them on the currently
+   selected graphics device using PGPLOT marker 3 (an asterisk). The
+   markers are red and are twice the default size.
+
+Notes
+
+-  This application uses the conventions of the CURSA package (SUN/190)
+for determining the formats of input and output catalogues. If a file
+type of .fits is given, then the catalogue is assumed to be a FITS
+binary table. If a file type of .txt is given, then the catalogue is
+assumed to be stored in a text file in "Small Text List" (STL) format.
+If no file type is given, then ".fit" is assumed.
 
 Related_Applications
 
-   KAPPA: CURSOR, LISTMAKE
+   KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT
 
 Authors
 

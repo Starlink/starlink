@@ -18,7 +18,7 @@ kappa_data_sun4_Solaris
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
-c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd \
+c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd grecom.inc grerr \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
 ira_err ndg_const ndg_err kpg_ast kpg_par grf.h style.def tkast.tcl
 
