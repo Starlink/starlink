@@ -497,13 +497,16 @@
 	  <p>The value of the <code>--obsdata</code> option can specify
 	    approximate astrometry through a comma-separated list of
 	    <code>key=value</code> pairs.  For example, to supply a
-	    plate centre, overriding any astrometry in the file, you might
-	    write 
+            value for the centre of a CCD, overriding any astrometry
+            in the file, you might write 
 	    <verbatim>
 	      --obsdata=ra=14:24:00,dec=-12.34
 	    </verbatim>
-	    and to supply this as a backup, in case there is no
-	    astrometry elsewhere, you could write
+            This value indicates the centre of the CCD even when this
+            is not the centre of distortion, which would be the case
+            when, for example, the CCD represents an off-centre
+            section of a Schmidt plate.  To supply this as a backup,
+            in case there is no astrometry elsewhere, you could write
 	    <verbatim>
 	      --obsdata=source=AST:FITS:USER,ra=14:24:00,dec=-12.34
 	    </verbatim>
@@ -528,7 +531,7 @@
 		  </row>
 		  <row>
 		    <entry>ra</entry>
-		    <entry>Right ascention of the centre of the pixel
+		    <entry>Right ascension of the centre of the pixel
 		      grid, in colon-separated HMS or decimal
 		      degrees.  Required.</entry>
 		  </row>
