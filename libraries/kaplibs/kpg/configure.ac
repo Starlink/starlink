@@ -22,7 +22,7 @@ AC_CHECK_HEADERS([tcl.h tk.h])
 STAR_CHECK_PROGS([generic])
 
 dnl    Other options here, such as
-dnl STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
