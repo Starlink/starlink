@@ -205,6 +205,7 @@
 		   
 *  Status:     
       INTEGER STATUS                  ! Global status
+      INTEGER IOSTATUS                ! For OPEN command
 
 C For the time
       integer  tarray(9), time
@@ -549,16 +550,36 @@ C  GET UT in an array
 *      Get an unused unit number.
          CALL FIO_GUNIT(FIOD2,STATUS)
 
-*      Open the file.
+*     Open the file. This is fatal if they can not be opened.
+*     Should really be using FIO but this is historical.
          IF (DATE.GT.960523) THEN
             OPEN(UNIT=FIOD2,FILE=PATH(1:LPATH)//'/scuba.dat',
-     1           STATUS='OLD')
+     1           STATUS='OLD',IOSTAT=IOSTATUS)
+            IF (IOSTATUS .NE. 0) THEN
+               IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
+               CALL MSG_SETC('PATH',PATH(1:LPATH))
+               CALL ERR_REP(' ','Error opening ^PATH/scuba.dat',STATUS)
+               GOTO 9999
+            END IF
          ELSE IF (DATE.GE.920807.AND.DATE.LE.960523) THEN
             OPEN(UNIT=FIOD2,FILE=PATH(1:LPATH)//'/ukt14.dat',
-     1           STATUS='OLD')
+     1           STATUS='OLD',IOSTAT=IOSTATUS)
+            IF (IOSTATUS .NE. 0) THEN
+               IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
+               CALL MSG_SETC('PATH',PATH(1:LPATH))
+               CALL ERR_REP(' ','Error opening ^PATH/ukt14.dat',STATUS)
+               GOTO 9999
+            END IF
          ELSE
             OPEN(UNIT=FIOD2,FILE=PATH(1:LPATH)//'/ukt14_old.dat',
-     1           STATUS='OLD')
+     1           STATUS='OLD',IOSTAT=IOSTATUS)
+            IF (IOSTATUS .NE. 0) THEN
+               IF (STATUS .EQ. SAI__OK) STATUS = SAI__ERROR
+               CALL MSG_SETC('PATH',PATH(1:LPATH))
+               CALL ERR_REP(' ','Error opening ^PATH/ukt14_old.dat',
+     :              STATUS)
+               GOTO 9999
+            END IF
          ENDIF
    	 READ(FIOD2,122) NF
  122     FORMAT(29X,I2)
@@ -1586,7 +1607,7 @@ C  GET UT in an array
      
 *     Data arrays:
 *     TB1AR  - array of 100 TB'S for MJD's 46040 - 50000 in steps of 40 days
-*     TBWRIGHT - array of 327 TB's from simplified Wright model; step 40 days
+*     TBWRIGHT - array of 326 TB's from simplified Wright model; step 40 days
 *     Input:
 *     RJD    - J.D. for which M.350.TB. is calculated by interpolation
 *     Output:
@@ -1603,7 +1624,7 @@ C  GET UT in an array
       
 *   Variables:
       REAL*8 DAT1I,DAT1I1,RJD,TBAR,TB1I,TB1I1,
-     :     TB1AR(100),TBWRIGHT(327)
+     :     TB1AR(100),TBWRIGHT(326)
       INTEGER I,IERR
      
 *   Data:
@@ -1682,7 +1703,7 @@ C  GET UT in an array
       DAT1I = 2442760.5D0 + ((I-1) * 40.0D0)
       DAT1I1 = DAT1I + 40.0D0
       IERR=0
-      IF ((I.LE.0).OR.(I.GE.327)) THEN
+      IF ((I.LE.0).OR.(I.GE.326)) THEN
 	 IERR=1
       ELSEIF ((I.LE.82).OR.(I.GE.183)) THEN
 	 TB1I = TBWRIGHT(I)-2.56
@@ -1691,7 +1712,7 @@ C  GET UT in an array
       ENDIF
     
       I=I+1
-      IF ((I.LE.0).OR.(I.GT.327)) THEN
+      IF ((I.LE.0).OR.(I.GT.326)) THEN
 	 IERR=1
 	 CALL MSG_OUT(' ',
      :        'Interpolation problem in subroutine TB350!',
