@@ -61,6 +61,7 @@
 *    External references :
 *
       INTEGER CHR_LEN
+      LOGICAL HCOPY_CDIM
 *
 *    Local Constants :
 *
@@ -81,11 +82,11 @@
         INTEGER IKET                    ! ] position
         INTEGER L			! Len of output specifier
         INTEGER NDIM                    ! Input dimensionality
-        INTEGER NELM                    ! Input dimensionality
+        INTEGER INELM,ONELM                    ! Input dimensionality
         INTEGER ONDIM                    ! Input dimensionality
         INTEGER DIMS(DAT__MXDIM)        ! Input dimensions
         INTEGER ODIMS(DAT__MXDIM)        ! Input dimensions
-        INTEGER IDIM, PPOS, IPTR
+        INTEGER PPOS, IPTR
 
       LOGICAL			ALLONES
       LOGICAL 			STRUC, PRIM		! Input attributes
@@ -235,7 +236,7 @@
 
 *            Get output type and map input data with that type
               CALL DAT_TYPE( ILOC, TYPE, STATUS )
-              CALL DAT_MAPV( ILOC, TYPE, 'READ', IPTR, NELM, STATUS )
+              CALL DAT_MAPV( ILOC, TYPE, 'READ', IPTR, INELM, STATUS )
 
 *            Write data to output
               CALL DAT_PUT( CLOC, TYPE, ONDIM, ODIMS, %VAL(IPTR),
