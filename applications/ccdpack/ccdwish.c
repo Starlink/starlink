@@ -84,11 +84,27 @@
    Tcl_AsyncProc ccdEndinterp;
    void ccdSigtcl( int sig );
    void ccdPipestcl( int ifd, int ofd );
-   int main( int argc, char **argv );
 
+/* Fortran functions for querying the command line */
+extern F77_INTEGER_FUNCTION(iargc)();
+extern F77_SUBROUTINE(getarg)
+     (INTEGER(k), CHARACTER(argstring) TRAIL(argstring));
 
+/* Release the memory allocated to my_argv */
+#define RELEASE_ARGV                                    \
+    if (my_argv != NULL) {                              \
+        int n;                                          \
+        for (n=0; n<my_argc; n++) free (my_argv[n]);    \
+        free (my_argv);                                 \
+    }
+    
 
-   int main( int argc, char **argv ) {
+/* Declare the maximum size of the string which will receive the string 
+   arguments.  1024 should be large enough, I hope. */
+#define MAX_ARG_LEN 1024
+
+/* FC_MAIN is a macro expanding to the entry point used by the Fortran RTL */
+   int FC_MAIN() {
 /*
 *+
 *  Name:
@@ -102,12 +118,40 @@
       int ofd;                       /* File descriptor of upward pipe */
       char *ccddir;                  /* CCDPACK_DIR value */
 
+      int my_argc;                   /* Number of arguments */
+      char **my_argv;                /* Vector of arguments, [0..my_argc-1] */
+      int last_arg;                  /* Index of the last arg, = my_argc-1  */
+
+/* Arguments to Fortran functions */
+      DECLARE_INTEGER(k);
+      DECLARE_CHARACTER(argstr, MAX_ARG_LEN);
+
+
 /* Tweak floating point behaviour on linux. */
       F77_CALL(ccd1_linflt)();
 
-/* Pass on the command-line to Fortran getarg() */
-      FC_SETARG(argc, argv);
+/* Extract the arguments using Fortran functions iargc and getarg,
+   putting them into my_argv[0..my_argc-1] */
+      last_arg = F77_CALL(iargc)();
+      my_argc = last_arg + 1;
 
+      if (( my_argv = (char**) malloc ( my_argc+1 ) ) == NULL ) {
+          fprintf( stderr, "Can't allocate memory for argv\n");
+          return 1;
+      }
+      for ( k=0; k<my_argc; k++ ) {
+          F77_CALL(getarg)(INTEGER_ARG(&k),
+                           CHARACTER_ARG(argstr) TRAIL_ARG(argstr));
+          if (( my_argv[k] = (char*) malloc( MAX_ARG_LEN + 1 )) == NULL ) {
+              fprintf( stderr, "Can't allocate (%d bytes) for arg %d\n", 
+                       MAX_ARG_LEN, k );
+              return 1;
+          }
+          cnfImprt( argstr, MAX_ARG_LEN, my_argv[k] );
+      }
+      my_argv[my_argc] = 0;     /* terminate argv list conventionally */
+
+      
 /* Set the TCL library environment variables to the same value as CCDPACK_DIR.
    This will cause the autoloader to look there for various library files. */
       ccddir = getenv( "CCDPACK_DIR" );
@@ -121,12 +165,12 @@
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
    signal an error and bail out. */
-      if ( argc > 1 && *argv[ 1 ] == '-' ) {
-         if ( strcmp( argv[ 1 ], "-pipes" ) != 0 ||
-              argc != 4 ||
-              sscanf( argv[ 2 ], "%d", &ifd ) != 1 ||
-              sscanf( argv[ 3 ], "%d", &ofd ) != 1 ) {
-            fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", argv[ 0 ] );
+      if ( my_argc > 1 && *my_argv[ 1 ] == '-' ) {
+         if ( strcmp( my_argv[ 1 ], "-pipes" ) != 0 ||
+              my_argc != 4 ||
+              sscanf( my_argv[ 2 ], "%d", &ifd ) != 1 ||
+              sscanf( my_argv[ 3 ], "%d", &ofd ) != 1 ) {
+            fprintf( stderr, "Usage: %s [-pipes ifd ofd]\n", my_argv[ 0 ] );
             return 1;
          }
 
@@ -140,16 +184,21 @@
          ccdPipestcl( ifd, ofd );
 
 /* If the previous call returns then the wish did not run properly. */
-         fprintf( stderr, "%s failed.\n", argv[ 0 ] );
+         fprintf( stderr, "%s failed.\n", my_argv[ 0 ] );
+
+         RELEASE_ARGV;
+         
          return 1;
       }
 
 /* We are not running in pipe mode.  Call Tk_main and run as a normal
    freestanding wish. */
-      Tk_Main( argc, argv, Tcl_AppInit );
+      Tk_Main( my_argc, my_argv, Tcl_AppInit );
+
+      RELEASE_ARGV;
+         
       return 0;
    }
-
 
 
    void ccdPipestcl( int ifd, int ofd ) {
