@@ -20,6 +20,7 @@
 *       8 Aug 94: V1.7-3 Length of filename increased (RJV)
 *       5 Sep 94: V1.7-4 OFF option added (RJV)
 *       6 Sep 94: V1.7-5 numbering hived off to GFX routine (RJV)
+*      10 Apr 95: V1.8-0 ALL option for internal list (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -42,6 +43,7 @@
       CHARACTER*80 REC,RAS*20,DECS*20
       DOUBLE PRECISION RA,DEC
       REAL SIZE
+      INTEGER I
       INTEGER NSRC,NPOS
       INTEGER RAPTR,DECPTR
       INTEGER IFD
@@ -51,12 +53,13 @@
       LOGICAL OK
       LOGICAL POK
       LOGICAL CURR
+      LOGICAL ALL
       LOGICAL EXIST
       LOGICAL NUMBER
       LOGICAL OFF
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IMARK Version 1.7-5')
+      PARAMETER (VERSION = 'IMARK Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -83,8 +86,19 @@
           CALL USI_GET0R('SIZE',SIZE,STATUS)
           CALL USI_GET0I('BOLD',BOLD,STATUS)
 
-*  see if current position to be marked
-          CALL USI_GET0L('CURR',CURR,STATUS)
+*  mark positions in internal list?
+          IF (I_NPOS.GT.0) THEN
+            CALL USI_GET0L('ALL',ALL,STATUS)
+          ELSE
+            ALL =.FALSE.
+          ENDIF
+
+*  see if only current position to be marked
+          IF (.NOT.ALL) THEN
+            CALL USI_GET0L('CURR',CURR,STATUS)
+          ELSE
+            CURR=.FALSE.
+          ENDIF
 
 *      Number sources?
           IF ( .NOT. CURR ) THEN
@@ -113,6 +127,21 @@
             CALL GCB_SET1R('MARKER_SIZE',NMARK,1,SIZE,STATUS)
             CALL GCB_SET1I('MARKER_BOLD',NMARK,1,BOLD,STATUS)
             CALL GCB_SET1I('MARKER_COLOUR',NMARK,1,COLOUR,STATUS)
+
+*  mark positions in current list
+          ELSEIF (ALL) THEN
+
+            DO I=1,I_NPOS
+
+*  get each entry
+              CALL GRP_GET(I_POS_ID,I,1,REC,STATUS)
+*  split into ra and dec
+              CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
+*  parse and save
+              CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+              CALL IMARK_SAVE(1,RA,DEC,SYMBOL,COLOUR,SIZE,BOLD,STATUS)
+
+            ENDDO
 
 *  otherwise get list of positions from file
           ELSE
