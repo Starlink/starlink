@@ -1,0 +1,34 @@
+*+  DTASK_SYS - internal constants for DTASK library
+*    History
+*     25.04.1991:  original (REVAD::BDK)
+*     03.05.1991:  increase MAXACT to match SUBPAR limit (REVAD::BDK)
+*     13.05.1991:  update comments (REVAD::BDK)
+*     13.10.1992:  add DTASK__SYSNORM (RLVAD::AJC)
+*    endhistory
+*-
+
+      INTEGER DTASK__MAXACT                   ! maximum number of
+      PARAMETER ( DTASK__MAXACT = 300 )       ! actions for d-task 
+                                              ! should be SUBPAR__MAXACT
+                                              ! and must be < 32767 to 
+                                              ! fit into I*2
+
+      INTEGER DTASK__MAXACTTOT                ! maximum value of action 
+      PARAMETER ( DTASK__MAXACTTOT = 32767 )  ! counter before it wraps 
+                                              ! to 1 ( must be within I*2) 
+*
+*   definitions of current state of actions
+*
+      INTEGER DTASK__ACTIVE
+      PARAMETER ( DTASK__ACTIVE = 1 )
+      INTEGER DTASK__REMOVED
+      PARAMETER ( DTASK__REMOVED = 2 )
+
+*
+*   definition of system normal status
+*
+      INTEGER DTASK__SYSNORM                  ! VMS normal status
+      PARAMETER ( DTASK__SYSNORM = 1 )        ! This is defined here to
+                                              ! allow common code for VMS and
+                                              ! Unix. It should correspond with
+                                              ! VMS SS$_NORMAL

@@ -1,0 +1,320 @@
+#!/bin/sh
+
+# Description:
+#	alink - link an ADAM A-task or A-task monolith for Unix
+#
+# Invocation:
+#       % alink [-xdbx] prog_module [other_arguments]
+#
+# Arguments:
+#       -xdbx Must be the first argument if it is used.
+#         Its effect is to add a -g option to the compile/link command,
+#         create a dummy source file for dtask_main, the top-level routine 
+#         of an ADAM task and to prevent the deletion of the otherwise 
+#         temporary dtask_applic files. This overcomes some problems using
+#         xdbx and ups on Suns and may be helpful in other cases where
+#         debuggers are used.
+#
+#       prog_module specifies a file containing the task's main subroutine.
+#         It may take the form prog.f, prog.c, prog.o or prog. If no extension
+#         is given, .o will be assumed. prog must be the name of the task's 
+#         main subroutine, and will be the name of the executable produced.
+#         The main subroutine must have one argument, INTEGER for Fortran
+#         and (int *) for C. If the main subroutine is a .c file, a wrapper
+#         subroutine is created to interface between it and the ADAM task
+#         fixed part. (N.B. This will not occur if the main subroutine is in
+#         an object file, so C main subroutines must always be compiled by
+#         the alink command.)
+#       
+#       other_arguments is a space-separated list list of modules, and 
+#         compiler or linker options. Fortran and C source files may be
+#         mixed, they will be presented to the appropriate compiler.
+#         Flags other than -I required for the C compiler must be specified
+#         in the CFLAGS environment variable.
+#
+# Authors:
+#	CAAG: C A A Goswell (RLVAD::CAAG)
+#       AJC:  A J Chipperfield (Starlink)
+#
+# History:
+#	24.07.1991 (CAAG):
+#	   Original version (RLVAD::CAAG)
+#       01.08.1991 (AJC):
+#          Add ADAM bits (RLVAD::AJC)
+#       23.06.1992 (AJC):
+#          Add HLP and PSX and terminal size libraries
+#        6.11.1992 (AJC):
+#          Add REQUEST to PUT and GET_CURRINFO in DTASK_APPLIC
+#          Set REQUEST to ACT__END
+#          Private libs
+#          Add MESSYS and MSC
+#          Add ADAM and MSP
+#       27.04.1993 (AJC):
+#          Improve comments
+#          Remove FFLAGS
+#          Add -B for static and dynamic link options
+#          Add directory of libraries (to be edited during installation)
+#          Use library link scripts
+#          Don't pre-compile .f files
+#       29.06.1993 (AJC):
+#          Put -L's before $(ARGS)
+#          Include both new and Starlink libraries
+#       08.11.1993 (AJC):
+#          Don't assume .o for arguments other than the first.
+#          Simplify link files for efficiency.
+#          Fortran compiler name to be edited
+#          Allow pathname on first argument
+#       10.12.1993 (AJC):
+#          Switch -Ls to after $ARGS
+#       10.02.1994 (AJC):
+#          Add -xdbx option to aid debugging
+#       26.05.1995 (AJC):
+#          Add ADAM_TASK_TYPE switch to prevent SUBPAR_DEACT
+#       30.01.1996 (AJC):
+#          Add TTYPE as argument of SUBPAR_DEACT
+#       23.09.1996 (AJC):
+#          Don't report error on rm dtask_applic.[fo]
+#       21.11.1996 (AJC):
+#          Allow for shareable linking (currently for Linux)
+#       24-MAR-1998 (AJC):
+#          Allow C source files.
+#       14-OCT-1998 (AJC):
+#          Retain directory spec for C files
+#          Add -D's to CARGS
+#          Put CARGS before standard -I's
+#          Let installation remove repeat -I if INSTALL==STARLINK
+#       10-MAY-1999 (AJC):
+#          Don't search shared lib directories
+#          Include ALINK_FLAGS1/2 to alter this if required.
+#-
+
+set -e
+
+# produce help message if requested
+
+if [ "$1" = "-?" ]
+then
+	cat >&2 <<FOO
+	usage: `basename $0` [-xdbx] <name of program> [ other files, libraries and options ]
+	
+	e.g.
+	\$ f77 -c fred-aux.o
+	\$ $0 fred.f fred-aux.o -lgks
+FOO
+	exit 1
+fi
+
+# get name of program by inquiry if necessary
+
+if [ -z "$1" ]
+then
+	echo >&2 -n `basename $0`: 'name of execution module: '
+	read PROGNAME
+else
+# Check is the first argument is a -xdbx option
+        XDBX=" "
+        if [ "$1" = "-xdbx" ]
+        then
+           XDBX="-g"
+           shift
+        fi
+        PROGNAME=$1
+        # shift all the arguments left by one to remove the first argument
+        shift
+fi
+
+# next determine name of program allowing a certain amount of flexibility
+# first get any path component
+
+DIR=`dirname $PROGNAME`
+
+# Set PROGNAME to the name to be called by DTASK_APPLIC
+#     EXENAME to the name to call the executable
+
+case $PROGNAME in
+*.o)
+	EXENAME=`basename $PROGNAME .o`
+        PROGNAME=$EXENAME
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+*.f)
+	EXENAME=`basename $PROGNAME .f`
+        PROGNAME=$EXENAME
+	ARGS=${DIR}/${PROGNAME}.f
+	;;
+*.c)
+        CFILE="YES"
+	EXENAME=`basename $PROGNAME .c`
+        PROGNAME=dtask_wrap
+	CARGS="${DIR}/${EXENAME}.c dtask_wrap.c"
+        ARGS="${EXENAME}.o dtask_wrap.o"
+cat >dtask_wrap.c <<FOO
+#include "f77.h"
+void $EXENAME(int *status);
+
+F77_SUBROUTINE(dtask_wrap)(INTEGER(fstatus)) {
+int status;
+F77_IMPORT_INTEGER(*fstatus,status);
+$EXENAME(&status);
+F77_EXPORT_INTEGER(status,*fstatus);
+return;
+}
+FOO
+	;;
+*)
+	EXENAME=`basename $PROGNAME`
+        PROGNAME=$EXENAME
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+esac
+
+# Add remaining arguments to ARGS
+
+while [ $# != 0 ]
+do
+	case $1 in
+        *.c) 
+          CFILE="YES"
+          NAME=`basename $1 .c`
+          CARGS="$CARGS $1"
+          ARGS="$ARGS ${NAME}.o"
+          ;;
+        -I*)
+          CARGS="$CARGS $1"
+          ARGS="$ARGS $1"
+          ;;
+        -D*)
+          CARGS="$CARGS $1"
+          ARGS="$ARGS $1"
+          ;;
+        *)
+          ARGS="$ARGS $1"
+          ;;
+        esac
+	shift
+done
+
+# Compile C files if any
+if [ -n "$CFILE" ]
+then
+echo "Compiling C files"
+CC $CFLAGS $CARGS \
+-IINSTALL/include \
+-ISTARLINK/include \
+-c
+fi
+
+cat >dtask_applic.f <<FOO
+*+  DTASK_APPLIC_DEACT - routine to call an A-task routine
+      SUBROUTINE DTASK_APPLIC ( CONTEXT, ACTCODE, ANAME, ACTPTR, SEQ,
+     :  VALUE, SCHEDTIME, REQUEST, STATUS ) 
+*    Description :
+*     This routine is edited automatically to call the main application
+*     routine. It is a modification of the DTASK_APPLIC_NEW routine to
+*     include a parameter system deactivation sequence and handle the
+*     normal A-task OK status.
+*    Invocation :
+*     CALL name[(argument_list)]
+*    Parameters :
+*     parameter[(dimensions)]=type(access)
+*           <description of parameter>
+*    Method :
+*     The routine first copies details of this entry to the application
+*     routine into the TASK library then it calls the application. 
+*     On return from the application, it calls the parameter system 
+*     deactivation routine.
+*     Finally, it retrieves values which may have been altered by the 
+*     application from the TASK library.
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     W.F.Lupton (AAOEPP::WFL)
+*    History :
+*     20.05.1991:  Original mod of DTASK_APPLIC_NEW (RLVAD::AJC)
+*     04.06.1991:  Update/correct comments (ROE::BMC)
+*     07.06.1991:  remove PATH and MESSID (REVAD::BDK)
+*     07.06.1991:  change NAMECODE to ACTCODE (REVAD::BDK)
+*     22.08.1991:  add REQUEST (REVAD::BDK)
+*     14.05.1993:  UNIX version for substituting PROGNAME (RLVAD::AJC)
+*    endhistory
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'STARLINK/include/sae_par'
+      INCLUDE 'INSTALL/include/act_err'
+*    Import :
+      INTEGER CONTEXT
+      INTEGER ACTCODE
+      CHARACTER*(*) ANAME
+      INTEGER ACTPTR
+*    Import-Export :
+      INTEGER SEQ
+      CHARACTER*(*) VALUE
+*    Export :
+      INTEGER SCHEDTIME
+      INTEGER REQUEST
+*    Status :
+      INTEGER STATUS
+*    Local variables :
+      INTEGER LSTAT
+      CHARACTER*1 TTYPE
+*-
+      IF ( STATUS .NE. SAI__OK ) RETURN      
+*
+*   Copy information about this action into the TASK library
+*
+      CALL TASK_PUT_CURRINFO ( ACTPTR, CONTEXT, ACTCODE, ANAME, SEQ,
+     :  VALUE, ACT__END, STATUS )
+*
+*   Call the application routine.
+*
+      CALL $PROGNAME ( STATUS )
+*
+*   Run-down the parameter system - this writes any global associations 
+*   and 'frees' associated files. If environment variable ADAM_TASK_TYPE
+*   is not set to I, all parameters are reset to the 'ground' state.
+*
+      CALL ERR_MARK
+      LSTAT = SAI__OK
+      CALL PSX_GETENV( 'ADAM_TASK_TYPE', TTYPE, LSTAT )
+      IF ( LSTAT .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( LSTAT )      
+         TTYPE = ' '
+      ENDIF
+      CALL ERR_RLSE
+
+      CALL SUBPAR_DEACT( TTYPE, STATUS )      
+*
+*  Retrieve values that may have been set by the application routine.
+*
+      LSTAT = SAI__OK
+      CALL TASK_GET_CURRINFO ( SEQ, VALUE, SCHEDTIME, REQUEST, LSTAT ) 
+
+      END
+FOO
+
+if [ "$XDBX" = "-g" ]
+then
+           sed -e s#PROGNAME#$PROGNAME# INSTALL/etc/dtask_main.txt \
+           >dtask_main.f
+fi
+
+FC $FFLAGS -o $EXENAME \
+$XDBX \
+INSTALL/lib/dtask_main.o \
+dtask_applic.f \
+$ALINK_FLAGS1 \
+$ARGS \
+-LINSTALL/lib \
+-LSTARLINK/lib \
+-lhdspar_adam \
+-lpar_adam \
+`dtask_link_adam` \
+$ALINK_FLAGS2
+
+if [ "$XDBX" != "-g" ]
+then
+   rm -f dtask_applic.[fo] dtask_wrap.[co]
+fi

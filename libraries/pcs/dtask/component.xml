@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="dtask">
+  <version>3.0</version>
+  <path>libraries/pcs/dtask</path>
+  <description>DTASK linking library</description>
+  <abstract><p>ADD DETAILS!</p></abstract>
+  <dependencies>
+    <build> sae cnf psx subpar messys adam messgen</build>
+    <use> chr ams hds msg psx atimer string</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

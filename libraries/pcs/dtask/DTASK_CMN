@@ -1,0 +1,49 @@
+*+  DTASK_CMN - DTASK library common blocks
+*    Authors :
+*     John Cooke (REVS::JAC) 17May84
+*    History :
+*     19Jun84:  added 'actcount' (REVA::ADAM) (John Cooke)
+*     19Jun84:  changed ASTCOM to hold two identifiers (REVA::ADAM)
+*               (John Cooke) 
+*     23.06.1985:  added ASTNAME  (REVAD::BDK)
+*     14.11.1989: Change value MAXACTTOT from 2**30  (RLVAD::AJC)
+*     25.04.1991: merged separate INCLUDE files, removed PARAMETERs 
+*                 (REVAD::BDK)
+*     30.04.1991: remove ASTNAME and REQASTPAR, use PAR__SZNAM instead of 
+*                 NAMELEN (REVAD::BDK)
+*     01.05.1991: remove ACTTOT (REVAD::BDK)
+*     03.05.1991: add ACTTIM (REVAD::BDK)
+*     09.05.1991: add ACTKEY (REVAD::BDK)
+*     09.05.1991: use SAVE statement (REVAD::BDK)
+*     13.05.1991: remove AST common block (REVAD::BDK)
+*     04.05.1991:  Rename ACTSTATE to ACTSTATUS (ROE::BMC)
+*     11.06.1991: add ACTCODE (REVAD::BDK)
+*     23.08.1993: Use SUBPAR__NAMELEN not PAR__SZNAM (RLVAD::AJC)
+*    endhistory
+*-
+
+*
+*   Dtask action list common blocks.
+*   Hold details of the states of actions relating to this task.
+*
+      INTEGER ACTSTATE(DTASK__MAXACT)    ! state of list entry
+      INTEGER ACTPATH(DTASK__MAXACT)     ! path to calling task
+      INTEGER ACTMESSID(DTASK__MAXACT)   ! transaction number
+      INTEGER ACTCOUNT(DTASK__MAXACT)    ! action count id
+      INTEGER ACTSEQ(DTASK__MAXACT)      ! sequence number
+      INTEGER ACTTIM(DTASK__MAXACT)      ! timer id for action
+      INTEGER ACTCODE(DTASK__MAXACT)     ! parameter system number for 
+                                         ! action
+      INTEGER NACTS                      ! number of actions in list
+
+      CHARACTER*(SUBPAR__NAMELEN) ACTNAME(DTASK__MAXACT)   ! action name
+      CHARACTER*(SUBPAR__NAMELEN) ACTKEY(DTASK__MAXACT)    ! action keyword
+
+      COMMON / DTASK_ACTLIST / ACTSTATE, ACTPATH, ACTMESSID,
+     :  ACTCOUNT, ACTSEQ, ACTTIM, ACTCODE, NACTS
+
+      COMMON / DTASK_ACTLIST_C / ACTNAME, ACTKEY
+
+
+      SAVE / DTASK_ACTLIST /
+      SAVE / DTASK_ACTLIST_C /

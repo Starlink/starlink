@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pcs/dtask</path>
+  <description>DTASK linking library</description>
+  <abstract><p>ADD DETAILS!</p></abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

@@ -1,0 +1,26 @@
+*+  DTASK_PAR - general parameter definitions dtasks
+*    Description:
+*     Global parameter definitions for use by dtasks
+*    Authors:
+*     B.D.Kelly (REVAD::BDK)
+*    History:
+*     12.02.1987:  'applications' parameters copied from MESDEFNS 
+*                  (REVAD::BDK)
+*     07.03.1988:  add MESSAGE (REVAD::BDK)
+*     30.04.1991:  remove MESSAGE (use MESSYS__MESSAGE instead 
+*                  (REVAD::BDK)
+*    endhistory
+*    Global constants:
+
+      INTEGER INFINITE  !  infinite timeout for ADAM_ calls
+      PARAMETER ( INFINITE = -1 )
+
+*   event flag numbers for use by Dtask writers
+      INTEGER EF_APP01    !  event flag for applications
+      PARAMETER ( EF_APP01 = 21 )
+      INTEGER EF_APP02    !  event flag for applications
+      PARAMETER ( EF_APP02 = 22 )
+      INTEGER EF_APP03    !  event flag for applications
+      PARAMETER ( EF_APP03 = 23 )
+
+*-
