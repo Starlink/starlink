@@ -97,7 +97,6 @@
 	CALL AST_INIT()
 
         CALL MSG_PRNT(VERSION)
-        CALL NAG_MISSING( 'G05DRF (broken)', STATUS )
 
 *	Get name of output file
 
