@@ -15,7 +15,7 @@ ask 'shift (MHz)' sh ?
 fdiff = 0.0
 frest = f_rest(1)
 !OLD slowfreq routine
-if (frest < 300e6 or frest >= 400e6)
+if ((frest < 300.0e6) ! (frest >= 400.0e6))
   f1 = nint(frest/1.e2+sh*10.0)
   f2 = nint(frest/1.e2-sh*10.0)
   fdiff = frest / 1.0e6
