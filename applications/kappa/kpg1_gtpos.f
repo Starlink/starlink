@@ -78,6 +78,10 @@
 *        If a null parameter is given use the dynamic default value.
 *     3-SEP-1999 (DSB):
 *        Added NULL argument.
+*     13-JAN-2000 (DSB):
+*        Specify explicit axis numbers when using Digits attribute, and
+*        protect against infinite looping when finding required
+*        formatting accuracy.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,7 +143,7 @@
       INTEGER NBAXES             ! No. of axes in base Frame
       INTEGER NC                 ! No. of characters read from string
       INTEGER NCAXES             ! No. of axes in current Frame
-      INTEGER OLDDIG             ! Original Frame Digits value
+      INTEGER OLDDIG( NDF__MXDIM )! Original Frame Digits value
       LOGICAL GOOD               ! Is position good?
       LOGICAL GOTFS              ! Was a FrameSet supplied?
       LOGICAL LOOP               ! Get a new parameter value?
@@ -219,17 +223,8 @@
 *  Normalize it.
          CALL AST_NORM( CURFRM, CC, STATUS )
 
-*  Temporarily clear any Digits attributes for the current Frame. Save 
-*  any set value so that it can be re-instated later.
-         IF( AST_TEST( CURFRM, 'DIGITS', STATUS ) ) THEN
-            OLDDIG = AST_GETI( CURFRM, 'DIGITS', STATUS )
-            CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
-         ELSE
-            OLDDIG = -1
-         END IF
-
-*  Temporarily clear any Format attributes for the Axes within the 
-*  current Frame. Save any set values so that they can be re-instated 
+*  Temporarily clear any Format and DIGITS attributes for the Axes within 
+*  the current Frame. Save any set values so that they can be re-instated 
 *  later.
          DO I = 1, NCAXES
 
@@ -245,6 +240,18 @@
                OLDFMT( I ) = ' '
             END IF
 
+            ATT = 'DIGITS('
+            IAT = 7
+            CALL CHR_PUTI( I, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+
+            IF( AST_TEST( CURFRM, ATT, STATUS ) ) THEN
+               OLDDIG( I ) = AST_GETI( CURFRM, ATT, STATUS )
+               CALL AST_CLEAR( CURFRM, ATT, STATUS )
+            ELSE
+               OLDDIG( I ) = -1
+            END IF
+
          END DO
 
 *  Loop round increasing Digits until the supplied default values can
@@ -253,14 +260,19 @@
          LOOP = .TRUE.
          DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
 
-*  Set the current Digits value.
-            CALL AST_SETI( CURFRM, 'DIGITS', DIGS, STATUS )
-
 *  Assume the current Digits value is OK.
             LOOP = .FALSE.
 
 *  Check each axis.
             DO I = 1, NCAXES
+
+*  Set the current Digits value for all axes.
+               ATT = 'DIGITS('
+               IAT = 7
+               CALL CHR_PUTI( I, ATT, IAT )
+               CALL CHR_APPND( ')', ATT, IAT )
+
+               CALL AST_SETI( CURFRM, ATT, DIGS, STATUS )
 
 *  Format this axis value.
                POS = AST_FORMAT( CURFRM, I, CC( I ), STATUS )
@@ -273,7 +285,7 @@
                IF( ABS( CC( I ) - TEST ) .GT. 
      :             ABS( 10000.0*VAL__EPSD*CC( I ) ) ) THEN
                   DIGS = DIGS + 1
-                  LOOP = .TRUE.             
+                  IF( DIGS .LE. 30 ) LOOP = .TRUE.             
                   GO TO 10                                 
                END IF
 
@@ -299,23 +311,33 @@
 *  Clear the Digits value.
          CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
 
-*  Re-instate any previous Digits value.
-         IF( OLDDIG .NE. -1 ) CALL AST_SETI( CURFRM, 'DIGITS', OLDDIG, 
-     :                                       STATUS )
-
-*  Re-instate any previous Format values. Do each axis in turn.
+*  Remove the temporary Format and Digits values set up above, and re-instate 
+*  any previous Format and Digits values. Do each axis in turn.
          DO I = 1, NCAXES
+            ATT = 'FORMAT('
+            IAT = 7
+            CALL CHR_PUTI( I, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+
             IF( OLDFMT( I ) .NE. ' ' ) THEN
-
-               ATT = 'FORMAT('
-               IAT = 7
-               CALL CHR_PUTI( I, ATT, IAT )
-               CALL CHR_APPND( ')', ATT, IAT )
-
                CALL AST_SETC( CURFRM, ATT, 
      :                        OLDFMT( I )( : CHR_LEN( OLDFMT( I ) ) ), 
      :                        STATUS )
+            ELSE
+               CALL AST_CLEAR( CURFRM, ATT, STATUS )
             END IF
+
+            ATT = 'DIGITS('
+            IAT = 7
+            CALL CHR_PUTI( I, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+
+            IF( OLDDIG( I ) .NE. -1 ) THEN
+               CALL AST_SETI( CURFRM, ATT, OLDDIG( I ), STATUS )
+            ELSE
+               CALL AST_CLEAR( CURFRM, ATT, STATUS )
+            END IF
+
          END DO
 
 *  Otherwise, use PAR_UNSET to ensure any previous dynamic default is 

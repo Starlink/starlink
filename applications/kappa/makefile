@@ -433,7 +433,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.14-3
+PKG_VERS = 0.14-4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -903,7 +903,7 @@ kappa_display_keystyle.def
 
 #  Define the package demo files for use with stardemo.tcl
 
-DEMO_FILES = kappa.demo v0.14-3.demo
+DEMO_FILES = kappa.demo v0.14-4.demo
 
 #  List of TK/TCL object libraries.
 
