@@ -117,8 +117,9 @@
 *  Read text string
       CLEN = 0
       NTRY = 0
+      OK = .FALSE.
       DO WHILE ( (CLEN.EQ.0) .AND. (NTRY.LT.MAXTRY)
-     :           .AND. (STATUS.EQ.SAI__OK) )
+     :                  .AND. (STATUS.EQ.SAI__OK) )
 
 *    Get value from environment
         CALL UCLGST( PAR, CVAL, CLEN )
@@ -143,6 +144,7 @@
         IF ( (STATUS.NE.SAI__OK) .AND. (STATUS.NE.PAR__NULL) .AND.
      :       (STATUS.NE.PAR__ABORT) .AND. (NTRY .LT. MAXTRY) ) THEN
           CALL ERR_ANNUL( STATUS )
+          CLEN = 0
         END IF
 
       END DO
