@@ -1,0 +1,82 @@
+      SUBROUTINE CCG1_COPS<T>( SFIRST, SRC, N, DFIRST, DEST, STATUS )
+*+
+*  Name:
+*     CCG1_COPS<T>
+
+*  Purpose:
+*     To copy a section of one vectorised array to another.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CCG1_COPS<T>( SFIRST, SRC, N, DFIRST, DEST, STATUS )
+
+*  Description:
+*     N elements, starting at element SFIRST, are copied from the input
+*     array SRC to a section of the output array DEST starting at 
+*     element DFIRST.
+
+*  Arguments:
+*     SFIRST = INTEGER (Given)
+*        The first element of the source array to be copied.
+*     SRC( * ) = <COMM> (Given)
+*        The array to be copied from.
+*     N = INTEGER (Given)
+*        The number of elements to copy.
+*     DFIRST = INTEGER (Given)
+*        The position in the destination array to which the first element
+*        should be copied.
+*     DEST( * ) = <COMM> (Returned)
+*        The array to be copied into.
+*     STATUS = INTEGER (Given and Returned)
+*        Global Status.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JUL-2000 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER SFIRST
+      <TYPE> SRC( * )
+      INTEGER N
+      INTEGER DFIRST
+
+*  Arguments Returned:
+      <TYPE> DEST( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop over the whole of the input array copying the values to the
+*  output array.
+      DO 1 I = 0, N - 1
+         DEST( DFIRST + I ) = SRC( SFIRST + I )
+ 1    CONTINUE
+
+      END
+* $Id$
