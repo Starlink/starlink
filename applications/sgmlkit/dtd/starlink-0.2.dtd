@@ -156,15 +156,33 @@
 <!entity % req.abstract "abstract?,"	-- optional abstract -->
 
 <!--=========== Feature Switches ==========-->
+
 <!--
   Use %Only.paper and %Only.web in source documents to distinguish
   variant texts for paper and hypertext versions.  More
-  meta-information than the ones above, which concern themselves with
-  the output format, and which are intended to be used only within
-  this DTD.  Some documents may be invalid unless one of these is defined.
+  meta-information than the ones below, which concern themselves with
+  the features of the DTD, and which are intended to be used only within
+  this DTD.  Note that it is possible for some document instances to
+  be invalid unless one of these is defined.
 -->
 <!entity % Only.paper	"IGNORE">
 <!entity % Only.web	"IGNORE">
+
+<!--
+  Use %Feature.Everything to switch on _all_ the features.  Note that
+  this is here purely for documentation purposes, and should not be
+  used for any user-visible document type.  Since it defines both
+  %Feature.versioning and %Internal.Feature.dateonly, it isn't even
+  fully consistent.
+-->
+<!entity % Feature.Everything		'ignore'>
+<![ %Feature.Everything [
+  <!entity % Feature.Versioning		'include'>
+  <!entity % Internal.Feature.Dateonly	'include'>
+  <!entity % Feature.Docnumber		'include'>
+  <!entity % Feature.Routinelist	'include'>
+  <!entity % Feature.EnforceLinkpolicy	'include'>
+]]>
 
 <!--
   The entity %Feature.Versioning controls whether the HISTORY and UPDATE
@@ -666,8 +684,8 @@
 
 <!-- see %body.content above -->
 <!entity % simplephrase	"em | strong | quote | code | kbd | cite">
-<!entity % references	"ref | docxref | webref | url">
-<!entity % special	"index | note | draftnote | citation">
+<!entity % references	"ref | docxref | webref | url | citation">
+<!entity % special	"index | note | draftnote">
 <!entity % structuring	"blockquote | dl | ul | ol | verbatim">
 <!entity % maths	"m | mequation | meqnarray">
 <!entity % simpletext	"(#pcdata | %simplephrase | %maths )*">
@@ -732,7 +750,7 @@
 <!element BLOCKQUOTE - - (attribution?, px+)	-- extended quotation -->
 <!element QUOTE - - (attribution?, (%phrase)+)	
 					-- simple quotation  -->
-<!element ATTRIBUTION - - (#pcdata)	-- source of quotation -->
+<!element ATTRIBUTION - - (%phrase)	-- source of quotation -->
 
 <!element DRAFTNOTE - - (#pcdata)	-- Notes during drafting -->
 
