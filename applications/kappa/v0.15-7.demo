@@ -1,0 +1,150 @@
+## Allow 3 seconds to read each line of text (assuming a maximum line length 
+# of 68 characters), or 3 words per second. 
+
+demo v0.15-7 {
+
+   info "This demonstration highlights the main
+   changes which have occurred within the <PACK KAPPA> package between
+   version 0.14-5 and V0.15-7. See the '<htx:sun95|se_changes <emph
+   Release Notes>>' section of <doc SUN/95> for a complete list."
+
+   env KAPPA_DIR
+
+   step {
+
+      command {exec echo "border=1" > stardemo.tmp}
+      command {exec echo "DrawAxes=0" >> stardemo.tmp}
+      command {exec echo "DrawTitle=0" >> stardemo.tmp}
+      command {exec echo "Grid=0" >> stardemo.tmp}
+      command {exec echo "NumLab=0" >> stardemo.tmp}
+      command {exec echo "MajTickLen=0" >> stardemo.tmp}
+      command {exec echo "MinTickLen=0" >> stardemo.tmp}
+      command {exec echo "TextLab(2)=0" >> stardemo.tmp}
+      command {exec echo "Label(1)=Version 0.15-7   " >> stardemo.tmp}
+      command {exec echo "LabelUnits=0" >> stardemo.tmp}
+      command {exec echo "TextLabGap(1)=0.25" >> stardemo.tmp}
+      command {exec echo "Size(TextLab)=2" >> stardemo.tmp}
+      command {exec echo "Width(TextLab)=2" >> stardemo.tmp}
+      command {exec echo "Colour(TextLab)=silver" >> stardemo.tmp}
+      command {exec echo "Colour(Border)=black" >> stardemo.tmp}
+      
+      command {Obey kapview display "in=$KAPPA_DIR/logo lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^stardemo.tmp accept"}
+      command {exec rm -f stardemo.tmp}
+
+
+      text "A new application called <command collapse> has been added.
+      This allows (for instance) a selected range of planes in a 3-D cube
+      to be collapsed into a single 2-D image, or a range of rows in a
+      2-D image to be collapsed into a single 1-D array."
+
+      pause 10
+
+      text "<command compadd> and <command compave> : New parameters
+      <param TRIM> and <param ALIGN> have been added to give greater 
+      control over the exact placement of the compression bins within 
+      the input image."
+
+      pause 8
+
+      text "<command fitsin> and <command fitsdin> : Now support the new
+      FITS WCS standards based on keywords <file CDi_j>, <file PVj_m>, 
+      <for etc>, plus explicit support for the previous draft standard 
+      (based on <file PCjjjiii> keywords), and the AIPS WCS system (based 
+      on keywords <file CDELTj> and <file CROTAj>)."
+
+      pause 12
+
+      text "<command gausmooth> : The <param FWHM> parameter can now accept 
+      values up to 10000.0."
+
+      pause 4
+
+      text "<command gdstate> : The bounds of the current picture can now 
+      be reported in any of the co-ordinate Frames included in the WCS 
+      information stored with the picture. The graphical attributes of the 
+      box drawn round the current picture can now be controlled using the
+      new <param STYLE> parameter. The Domain of the current Frame 
+      associated with the picture is now writen to an output parameter. 
+      Some parameters have been removed and new ones added (see the
+      '<htx:sun95|se_changes <emph Release Notes>>' section of 
+      <doc SUN/95> for details)."
+
+      pause 22
+
+      text "<command glitch > : This has been rewritten to use the NDF 
+      library and thus can take advantage of NDF facilities including 
+      sections and history, and can accept foreign-format files. 
+      Variance information is now propagated from input to output. The
+      associated with each replaced pixel is the variance on the median 
+      of the corresponding input pixels. The format of text files used to
+      supply positions of bad pixels has changed slightly and some
+      parameter names have changed (see the '<htx:sun95|se_changes <emph 
+      Release Notes>>' section of <doc SUN/95> for details. Pixel positions 
+      can now be supplied in a positions list catalogue such as created by 
+      <command cursor>, <command listmake>, <for etc>."
+
+      pause 26
+
+      text "<command idstate > : The changes made to <command gdstate> have 
+      also been made to <command idstate>."
+
+      pause 4
+
+      text "<command ndfcopy > : New parameters <param TRIM>, <param
+      TRIMWCS> and <param USEAXIS> control the removal of output axes 
+      which span only a single pixel. Thus, <command ndfcopy> can now be 
+      used to extract a single plane from a cube and create a genuinely 
+      2 dimensional output image (previously, the third pixel axis was 
+      retain with bounds spanning a single pixel)."
+
+      pause 15
+
+      text "<command psf > : The default normalization of the model 
+      PSF is now chosen to give a peak value of exactly 1.0. Previously, 
+      the peak value could be higher or lower than 1.0 depending on whether 
+      the PSF was narrower or wider than a Gaussian. New parameter <param 
+      NORM> allows the peak value of the model PSF to be set equal to the 
+      fitted peak value of the first usable star, instead of the default 
+      value of 1.0. New parameter <param AMP1> is an output parameter which 
+      receives the fitted peak value of the first usable star, in the data 
+      units of the input NDF."
+
+      pause 20
+
+      text "<command segment > : Input positions may now be supplied in
+      the form of positions lists as produced by <command cursor>,
+      <command listmake>, <for etc>.  In \"Interface\" and \"File\" modes,
+      co-ordinates are now required in the current Frame of the first
+      supplied input NDF. A wider range of graphics are now available to
+      mark the supplied positions when using cursor mode, and the
+      attributes of these graphics can now be controlled using the new
+      <param STYLE> parameter. Some parameters have been removed and new
+      ones added (see the '<htx:sun95|se_changes <emph Release Notes>>'
+      section of <doc SUN/95> for details)."
+
+      pause 25
+
+      text "<command setaxis > : Axis structures can now be added to an
+      NDF by copying them from another NDF. The template NDF is specified
+      using the new parameter <param LIKE>."
+
+      pause 8
+
+      text "<command surfit > : A new output parameter called <param RMS>
+      has been added. The RMS deviation of the fit from the original data
+      (per pixel) is stored in this output parameter on exit."
+
+      pause 8
+
+      text "<command zaplin > : Positions are now supplied and reported
+      in the current co-ordinate Frame of the input NDF. A wider range of
+      graphics are now available to mark the supplied image areas when
+      using cursor mode, and the attributes of these graphics can now be
+      controlled using the new <param STYLE> parameter. Some parameters
+      have been removed and new ones added (see the '<htx:sun95|se_changes 
+      <emph Release Notes>>' section of <doc SUN/95> for details)."
+
+      pause 20
+
+   }
+} 
