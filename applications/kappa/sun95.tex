@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.31}
 \newcommand{\stardocnumber}    {95.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {17th March 2005}
+\newcommand{\stardocdate}      {23rd March 2005}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.4-2}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -14056,23 +14056,37 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 \sstroutine{
    BLOCK
 }{
-   Smooths a one- or two-dimensional image using a square or rectangular box
-   filter
+   Smooths an NDF using a 1- or 2-dimensional square or rectangular
+   box filter.
 }{
    \sstdescription{
-      This application applies a square or rectangular box filter to a
-      one- or two-dimensional image so as to smooth it.  Each output pixel
-      is either the mean or the median of the input pixels within the
-      filter box.  The mean estimator provides one of the fastest
-      methods of smoothing an image and is often useful as a
-      general-purpose smoothing algorithm when the exact form of the
-      smoothing point-spread function is not important.  The image is
-      held in an \NDFref{NDF} data structure.
+      This application smooths an NDF using a one- or two-dimensional square or
+      rectangular box filter. Each output pixel is either the mean or the 
+      median of the input pixels within the filter box. The mean estimator 
+      provides one of the fastest methods of smoothing an image and is often 
+      useful as a general-purpose smoothing algorithm when the exact form of 
+      the smoothing point-spread function is not important.  
+ 
+      The NDF may have up to 3 dimensions. If it has 3 dimensions, then
+      the filter is applied in turn to each plane in the cube and the
+      result written to the corresponding plane in the output cube. The
+      orientation of the smoothing plane can be specified using the
+      AXES parameter.
    }
    \sstusage{
       block in out box [estimator]
    }
    \sstparameters{
+      \sstsubsection{
+         AXES(2) = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if the NDF has exactly three 
+         significant pixel axes. It should be set to the indices of the NDF 
+         pixel axes which span the plane in which smoothing is to be
+         applied. All pixel planes parallel to the specified plane will
+         be smoothed independently of each other. The dynamic default
+         is the indices of the first two significant axes in the NDF. {\tt []}
+      }
       \sstsubsection{
          BOX(2) = \_INTEGER (Read)
       }{
@@ -48452,6 +48466,11 @@ ABORT.
 bounds of the NDF within each WCS Frame if FULLFRAME is set to YES.
 Also, the bounds of the NDF within the current WCS Frame are written to
 the new output parameters FLBND and FUBND.
+
+\item The \htmlref{BLOCK}{BLOCK} application can now smooth 3-d NDFs, in
+the sense that it will smooth all the 2-d planes within a 3-d NDF
+independently, using the same 2-dimensional box. The smoothing plane can
+be parallel to any face of the cube.
 
 \end{itemize}
 

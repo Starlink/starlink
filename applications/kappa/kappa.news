@@ -7,6 +7,10 @@
    within the current WCS Frame are written to the new output parameters 
    FLBND and FUBND.
 
+   o The BLOCK application can now smooth 3-d NDFs, in the sense that it 
+   will smooth all the 2-d planes within a 3-d NDF independently, using 
+   the same 2-dimensional box. The smoothing plane can be parallel to any 
+   face of the cube.
 
 Changes introduced in version 1.4-1
 

@@ -4,7 +4,7 @@
 *     BLOCK
 
 *  Purpose:
-*     Smooths a 1- or 2-dimensional image using a square or rectangular
+*     Smooths an NDF using a 1- or 2-dimensional square or rectangular
 *     box filter.
 
 *  Language:
@@ -21,32 +21,42 @@
 *        The global status.
 
 *  Description:
-*     This application applies a square or rectangular box filter to a
-*     1- or 2-dimensional image so as to smooth it.  Each output pixel
-*     is either the mean or the median of the input pixels within the
-*     filter box.  The mean estimator provides one of the fastest
-*     methods of smoothing an image and is often useful as a
-*     general-purpose smoothing algorithm when the exact form of the
-*     smoothing point-spread function is not important.  The image is
-*     held in an NDF data structure.
+*     This application smooths an NDF using a 1- or 2-dimensional square or 
+*     rectangular box filter. Each output pixel is either the mean or the 
+*     median of the input pixels within the filter box. The mean estimator 
+*     provides one of the fastest methods of smoothing an image and is often 
+*     useful as a general-purpose smoothing algorithm when the exact form of 
+*     the smoothing point-spread function is not important.  
+*
+*     The NDF may have up to 3 dimensions. If it has 3 dimensions, then
+*     the filter is applied in turn to each plane in the cube and the
+*     result written to the corresponding plane in the output cube. The
+*     orientation of the smoothing plane can be specified using the
+*     AXES parameter.
 
 *  Usage:
 *     block in out box [estimator]
 
 *  ADAM Parameters:
+*     AXES(2) = _INTEGER (Read)
+*        This parameter is only accessed if the NDF has exactly three 
+*        significant pixel axes. It should be set to the indices of the NDF 
+*        pixel axes which span the plane in which smoothing is to be
+*        applied. All pixel planes parallel to the specified plane will
+*        be smoothed independently of each other. The dynamic default
+*        is the indices of the first two significant axes in the NDF. []
 *     BOX(2) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the rectangular box to be
 *        applied to smooth the image.  If only a single value is given,
 *        then it will be duplicated so that a square filter is used,
 *        except where the image is 1-dimensional, for which the box size
 *        along the insignificant dimension is set to 1.  The values
-*        given will be rounded up to positive odd integers, if
-*        necessary.
+*        given will be rounded up to positive odd integers, if necessary.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
 *        can be either "Mean" or "Median". ["Mean"]
 *     IN = NDF (Read)
-*        The input NDF containing the 1- or 2-dimensional image to which
+*        The input NDF containing the 1-, 2- or 3-dimensional image to which
 *        box smoothing is to be applied.
 *     OUT = NDF (Write)
 *        The output NDF which is to contain the smoothed image.
@@ -175,6 +185,8 @@
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     23-MAR-2005 (DSB):
+*        Added support for smoothing all 2D planes in a 3D cube.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -205,28 +217,39 @@
       CHARACTER * ( 6 ) ESTIM    ! Method to use to estimate smoothed values
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
+      INTEGER AXSUM              ! Sum of all significant pixel axes
       INTEGER BOX( NDIM )        ! Smoothing box size
       INTEGER BOXSIZ             ! Number of pixels in smoothing box
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! Number of mapped array elements
       INTEGER I                  ! Loop counter
       INTEGER IBOX( NDIM )       ! Smoothing box half-size
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF pixel axes
+      INTEGER NAX                ! Number of significant pixel axes
       INTEGER NDF1               ! Identifier for input NDF
+      INTEGER NDF1B              ! Section of input NDF to be smoothed
       INTEGER NDF2               ! Identifier for output NDF
+      INTEGER NDF2B              ! Section of output NDF to be filled
       INTEGER NDIMS              ! Number of NDF dimensions
       INTEGER NLIM               ! Minimum good pixel limit
       INTEGER NVAL               ! Number of values obtained
+      INTEGER PAXHI              ! Upper pixel bound of perp. axis 
+      INTEGER PAXLO              ! Lower pixel bound of perp. axis 
+      INTEGER PAXVAL             ! Current pixel value on perp. axis 
+      INTEGER PERPAX             ! Index of axis perp. to smoothing plane
       INTEGER PNTR1( 2 )         ! Pointers for mapped input arrays
       INTEGER PNTR2( 2 )         ! Pointers for mapped output arrays
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF pixel axes
       INTEGER WPNTR1             ! Mapped workspace pointer
       INTEGER WPNTR2             ! Mapped workspace pointer
       LOGICAL BAD                ! Check for bad input pixels?
+      LOGICAL BADDAT             ! Bad values stored in output data array?
       LOGICAL BADOUT             ! Bad pixels in output array?
+      LOGICAL BADVAR             ! Bad values stored in output variance array?
       LOGICAL SAMBAD             ! Propagate bad pixels to same place?
       LOGICAL VAR                ! Variance array present?
       REAL WLIM                  ! Fraction of good pixels required
-
 *.
 
 *  Check inherited global status.
@@ -238,9 +261,44 @@
 *  Obtain the input NDF.
       CALL LPG_ASSOC( 'IN', 'READ', NDF1, STATUS )
 
-*  Find whether or not there are no more than two significant
-*  dimensions and which ones they are.
-      CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
+*  Determine the NDF bounds.  
+      CALL NDF_BOUND( NDF1, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
+
+*  Count the number of significant pixel axes, storing the indicies of
+*  the first two in SDIM. Also note the index of the first insignificant
+*  pixel axis.
+      AXSUM = 0
+      NAX = 0
+      PERPAX = 0
+      DO I = 1, NDIMS
+         DIM( I ) = UBND( I ) - LBND( I ) + 1
+         IF( DIM( I ) .GT. 1 ) THEN
+            NAX = NAX + 1
+            IF( NAX .LT. 3 ) SDIM( NAX ) = I
+            AXSUM = AXSUM + I
+         ELSE IF( PERPAX .EQ. 0 ) THEN
+            PERPAX = I
+         END IF
+      END DO
+
+*  If there is no insignificant axis, use an additional trailing axis.
+      IF( PERPAX .EQ. 0 ) PERPAX = NDIMS + 1
+
+*  If there are exactly 3 significant pixel axes, see which two span the
+*  plane to be smoothed.
+      IF( NAX .EQ. 3 ) THEN
+         CALL PAR_GDR1I( 'AXES', 2, SDIM, 1, NDIMS, .TRUE., SDIM, 
+     :                   STATUS )
+
+*  Find the index of the pixel axis which is perpendicular to the smoothing
+*  plane.
+         PERPAX = AXSUM - SDIM( 1 ) - SDIM( 2 )
+
+*  If the NDF does not have exactly 3 significant axes, find whether or not 
+*  there are no more than two significant dimensions and which ones they are.
+      ELSE
+         CALL KPG1_SDIMP( NDF1, NDIM, SDIM, STATUS )
+      END IF
 
 *  Exit if an error occurred.  This is needed because the significant
 *  dimensions are used as array indices.
@@ -249,7 +307,6 @@
 *  Determine its dimensions.  Note that only two dimensions can be
 *  accommodated, but of these only one need be siginifcant.  Then
 *  ignore non-significant dimensions.
-      CALL NDF_DIM( NDF1, SDIM( NDIM ), DIM, NDIMS, STATUS )
       DIM( 1 ) = DIM( SDIM( 1 ) )
       DIM( 2 ) = DIM( SDIM( 2 ) )
 
@@ -315,11 +372,6 @@
      :               STATUS )
       CALL NDF_STYPE( DTYPE, NDF2, COMP, STATUS )
 
-*  Map the input and output arrays.
-      CALL KPG1_MAP( NDF1, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
-      CALL KPG1_MAP( NDF2, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
-
 *  See if it is necessary to check for bad pixels in the input arrays.
       CALL NDF_MBAD( .TRUE., NDF1, NDF1, COMP, .FALSE., BAD, STATUS )
 
@@ -332,81 +384,116 @@
          CALL PSX_CALLOC( BOXSIZ, '_INTEGER', WPNTR2, STATUS )
       END IF
 
+*  Initialise bad flags
+      BADDAT = .FALSE.
+      BADVAR = .FALSE.
+
+*  Loop round every slice to be smoothed.
+      PAXLO = LBND( PERPAX )
+      PAXHI = UBND( PERPAX )
+      DO PAXVAL= PAXLO, PAXHI
+
+*  Get identifiers for the required slices of the input and output NDF.
+         LBND( PERPAX ) = PAXVAL
+         UBND( PERPAX ) = PAXVAL
+         CALL NDF_SECT( NDF1, NDF__MXDIM, LBND, UBND, NDF1B, STATUS )
+         CALL NDF_SECT( NDF2, NDF__MXDIM, LBND, UBND, NDF2B, STATUS )
+
+*  Map these input and output arrays.
+         CALL KPG1_MAP( NDF1B, COMP, ITYPE, 'READ', PNTR1, EL, STATUS )
+         CALL KPG1_MAP( NDF2B, COMP, ITYPE, 'WRITE', PNTR2, EL, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Apply smoothing to the mapped data array, using the appropriate
 *  numeric type of processing.
 *
 *  Real
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-
-         IF ( ESTIM .EQ. 'MEAN' ) THEN
-            CALL KPG1_BLOCR( BAD, SAMBAD, .FALSE., DIM( 1 ), DIM( 2 ),
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-         ELSE
-            CALL KPG1_BMEDR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-         END IF    
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+         
+            IF ( ESTIM .EQ. 'MEAN' ) THEN
+               CALL KPG1_BLOCR( BAD, SAMBAD, .FALSE., DIM( 1 ), 
+     :                          DIM( 2 ),
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+            ELSE
+               CALL KPG1_BMEDR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+            END IF    
 
 *  Double precision
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
-         IF ( ESTIM .EQ. 'MEAN' ) THEN
-            CALL KPG1_BLOCD( BAD, SAMBAD, .FALSE., DIM( 1 ), DIM( 2 ),
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-         ELSE
-            CALL KPG1_BMEDD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-         END IF    
+            IF ( ESTIM .EQ. 'MEAN' ) THEN
+               CALL KPG1_BLOCD( BAD, SAMBAD, .FALSE., DIM( 1 ), 
+     :                          DIM( 2 ),
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+            ELSE
+               CALL KPG1_BMEDD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 1 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 1 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+            END IF    
 
-      END IF
+         END IF
 
-*  Indicate whether or not the output data array has bad pixels.
-      CALL NDF_SBAD( BADOUT, NDF2, 'Data', STATUS )
+*  Update the bad data flag.
+         IF( BADOUT ) BADDAT = .TRUE.
 
 *  If a variance array is present, then also apply smoothing to it.
 *  At the moment, variances are found only if the mean estimator is
 *  being used.
-      IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
-         IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_BLOCR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_BLOCD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
-     :                       %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
-     :                       IBOX( 1 ), IBOX( 2 ),
-     :                       NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
-     :                       BADOUT,
-     :                       %VAL( CNF_PVAL( WPNTR1 ) ), 
-     :                       %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+         IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_BLOCR( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+         
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL KPG1_BLOCD( BAD, SAMBAD, .TRUE., DIM( 1 ), DIM( 2 ), 
+     :                          %VAL( CNF_PVAL( PNTR1( 2 ) ) ), 
+     :                          IBOX( 1 ), IBOX( 2 ),
+     :                          NLIM, %VAL( CNF_PVAL( PNTR2( 2 ) ) ), 
+     :                          BADOUT,
+     :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
+     :                          %VAL( CNF_PVAL( WPNTR2 ) ), STATUS )
+            END IF
+           
+*  Update the bad data flag.
+            IF( BADOUT ) BADVAR = .TRUE.
          END IF
 
-*  Indicate whether or not the output variance array has bad pixels.
-         CALL NDF_SBAD( BADOUT, NDF2, 'Variance', STATUS )
+*  Free the section identifiers.
+         CALL NDF_ANNUL( NDF1B, STATUS )
+         CALL NDF_ANNUL( NDF2B, STATUS )
+
+      END DO
+
+*  Indicate whether or not the output data and/or variance array has bad 
+*  pixels.
+      CALL NDF_SBAD( BADDAT, NDF2, 'Data', STATUS )
+      IF ( VAR .AND. ESTIM .EQ. 'MEAN' ) THEN
+         CALL NDF_SBAD( BADVAR, NDF2, 'Variance', STATUS )
       END IF
 
 *  Release the temporary workspace arrays.
@@ -424,8 +511,8 @@
 *  If an error occurred, then report contextual information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'BLOCK_ERR',
-     :     'BLOCK: Error smoothing a 1- or 2-dimensional image using '/
-     :     /'a rectangular box filter.', STATUS )
+     :     'BLOCK: Error smoothing an NDF using a 1- or 2-dimensional '/
+     :     /'rectangular box filter.', STATUS )
       END IF
 
       END
