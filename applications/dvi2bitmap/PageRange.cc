@@ -40,54 +40,75 @@
 
 verbosities PageRange::verbosity_ = normal;
 
+/**
+ * Constructs a new PageRange object.  This represents a selection of
+ * selected pages.  When created, the <code>PageRange</code> object
+ * represents all pages, but this set can be constrained in a variety
+ * of ways using the {@link #addSpec} method.  The resulting object
+ * can be queried, to ask whether a particular page would be included
+ * in the set, using the {@link #isSelected} method.
+ */
 PageRange::PageRange()
     : useCounts_(true), useCountNo_(0),
       first_(0), last_(0), rangeType_(unset)
 {
 }
 
+/**
+ * Add a constraint to the set of selected pages represented by this
+ * PageRange object.  The arguments are a selector, which is one of
+ * the characters `l', `p', or `P', and a string representing one or
+ * more numbers.  The meanings of the three selectors are as follows.
+ *
+ * <dl>
+ * <dt>'l' pagenum</dt>
+ *        <dd>The  last  page  printed will be the first one num-
+ *        bered num Default is the last page in the document.
+ *        If  the  num is prefixed by an equals sign, then it
+ *        (and any argument to the -p option) is treated as a
+ *        sequence  number,  rather  than  a value to compare
+ *        with <code>\\count0</code> values.  Thus, using -l  =9  will  end
+ *        with the ninth page of the document, no matter what
+ *        the pages are actually numbered.</dd>
+ *
+ * <dt>'p' pagenum</dt>
+ *        <dd>The  first  page printed will be the first one num-
+ *        bered num.  Default is the first page in the  docu-
+ *        ment.   If  the  num is prefixed by an equals sign,
+ *        then it (and any argument  to  the  -l  option)  is
+ *        treated  as  a sequence number, rather than a value
+ *        to compare with <code>\\count0</code> values.  Thus, using -p  =3
+ *        will  start with the third page of the document, no
+ *        matter what the pages are actually numbered.</dd>
+ *
+ * <dt>'P' pagelist</dt>
+ *        <dd>A comma-separated list of pages  and  ranges  (a-b)
+ *        may  be given, which will be interpreted as <code>\\count0</code>
+ *        values.  Pages not specified will not  be  printed.
+ *        Multiple  -pp options may be specified or all pages
+ *        and page ranges  can  be  specified  with  one  -pp
+ *        option.</dd>
+ * </dl>
+ *
+ * <p>Any of these specifications may be prefixed by either
+ * <code>=</code> or <code>:n:</code>
+ * In the former case, DVI page numbers are used rather than TeX
+ * <code>\\count</code> registers; in the latter case, the program examines the
+ * <code>\\countn</code> register rather than the default <code>\\count0</code>
+ *
+ * <p>Thus, the syntax of pagelist is extended to satisfy:
+ * <pre>
+ *    pagenum:  prefix* number
+ *    pagelist: prefix* page-or-range [',' page-or-range]*
+ *    prefix: '=' | ':' number ':'
+ *    page-or-range: number | number-number
+ * </pre>
+ *
+ * @param type one of the letters `l', `p', `P'.
+ * @param spec a page specification conforming to the grammar above
+ */
 bool PageRange::addSpec (const char type, const char *spec) 
 {
-    //  'l' pagenum
-    //        The  last  page  printed will be the first one num-
-    //        bered num Default is the last page in the document.
-    //        If  the  num is prefixed by an equals sign, then it
-    //        (and any argument to the -p option) is treated as a
-    //        sequence  number,  rather  than  a value to compare
-    //        with \count0 values.  Thus, using -l  =9  will  end
-    //        with the ninth page of the document, no matter what
-    //        the pages are actually numbered.
-    //
-    //  'p' pagenum
-    //        The  first  page printed will be the first one num-
-    //        bered num.  Default is the first page in the  docu-
-    //        ment.   If  the  num is prefixed by an equals sign,
-    //        then it (and any argument  to  the  -l  option)  is
-    //        treated  as  a sequence number, rather than a value
-    //        to compare with \count0 values.  Thus, using -p  =3
-    //        will  start with the third page of the document, no
-    //        matter what the pages are actually numbered.
-    //
-    // 'P' pagelist
-    //        A comma-separated list of pages  and  ranges  (a-b)
-    //        may  be given, which will be interpreted as \count0
-    //        values.  Pages not specified will not  be  printed.
-    //        Multiple  -pp options may be specified or all pages
-    //        and page ranges  can  be  specified  with  one  -pp
-    //        option.
-    //
-    // Any of these specifications may be prefixed by either = or ':n:'
-    // In the former case, DVI page numbers are used rather than TeX
-    // \count registers; in the latter case, the program examines the
-    // \countn register rather than the default \count0
-    //
-    // Thus, the syntax of pagelist is extended to satisfy:
-    //
-    //    pagenum:  prefix* number
-    //    pagelist: prefix* page-or-range [',' page-or-range]*
-    //    prefix: '=' | ':' number ':'
-    //    page-or-range: number | number-number
-    //
     bool parseOK = true;
 
     // prefix*
@@ -203,9 +224,17 @@ bool PageRange::addSpec (const char type, const char *spec)
     return parseOK;
 }
 
-// Returns true if the specified page is to be included.  pagenum is a
-// page-sequence number, counting pages from the beginning of the DVI
-// file; count[0-9] is the array of TeX \count0-9 registers.
+/**
+ * Returns true if the specified page is to be included.  We test
+ * either the page-sequence number or the TeX <code>\\count0-9</code>
+ * registers, depending on how the page range was specified.
+ *
+ * @param pagenum a page-sequence number, counting pages from the
+ * beginning of the DVI file
+ * @param count is the array of TeX <code>\\count0-9</code> register
+ * @return true if the current settings of this PageRange object
+ * would indicate that the specified page is to be printed
+ */
 bool PageRange::isSelected (const int pagenum, const int* count)
 {
     bool rval;

@@ -36,7 +36,7 @@
 namespace Util
 {
     string runCommandPipe (string cmd) throw (DviError);
-    bool parseRGB (Bitmap::BitmapColour&, char*);
+    bool parseRGB (Bitmap::BitmapColour&, const char*);
 
     void verbosity (const verbosities level);
 }

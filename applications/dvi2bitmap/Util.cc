@@ -47,15 +47,24 @@ using std::cerr;
 #include "Util.h"
 #include "stringstream.h"
 
+/**
+ * Various utility functions.
+ */
 namespace Util
 {
     verbosities verbosity_ = normal;
 }
 
 
-// Open a pipe with the given command, and read from it until EOF.
-// Return this output as a single string.  Throw DviError on errors.
-// If there's no way of doing this on a particular platform, throw DviError.
+/**
+ * Open a pipe with the given command, and read from it until EOF.
+ * 
+ * <p>If there's no way of doing this on a particular platform, throw
+ * <code>DviError</code> always.
+ *
+ * @return the command's output as a single string
+ * @throws DviError on any errors
+*/
 string Util::runCommandPipe (string cmd)
     throw (DviError)
 {
@@ -114,16 +123,22 @@ string Util::runCommandPipe (string cmd)
     return response;
 }
 
-// Parse an RGB spec which is either a sequence of three integers
-// separated by slashes (or in fact any non-number character), or else
-// a string of the form '#RRGGBB'.  Set the `rgb' structure to the
-// resulting numbers.  The integers must be in the range [0,255], and
-// may be specified in decimal, octal, or hex.
-//
-// Return true if the parse is successful.
-bool Util::parseRGB (Bitmap::BitmapColour& rgb, char* s)
+/**
+ * Parse an RGB specification.  This is either a sequence of three integers
+ * separated by slashes (or in fact any non-number character), or else
+ * a string of the form <code>#RRGGBB</code>.  Set the `rgb' structure to the
+ * resulting numbers.  The integers must be in the range [0,255], and
+ * may be specified in decimal, octal, or hex.
+ *
+ * @param rgb the <code>BitmapColour</code> corresponding to the
+ * <code>s</code> argument
+ * @param s the RGB specification
+ *
+ * @return true if the parse is successful.
+*/
+bool Util::parseRGB (Bitmap::BitmapColour& rgb, const char* s)
 {
-    char *p = s;
+    const char *p = s;
     unsigned long val;
 
     while (*p != '\0' && isspace(*p))
@@ -151,7 +166,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	if (val > 255) return false;
 	rgb.blue = static_cast<Byte>(val);
     } else {
-	val = strtoul (s, &p, 0);
+	val = strtoul (s, const_cast<char**>(&p), 0);
 	if (val > 255) return false;
 	rgb.red = static_cast<Byte>(val);
 	if (p == s)			// no digit
@@ -165,7 +180,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	    s++;
 	}
 
-	val = strtoul (s, &p, 0);
+	val = strtoul (s, const_cast<char**>(&p), 0);
 	if (val > 255) return false;
 	rgb.green = static_cast<Byte>(val);
 	if (p == s)			// no digit
@@ -179,7 +194,7 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, char* s)
 	    s++;
 	}
 
-	val = strtoul (s, &p, 0);
+	val = strtoul (s, const_cast<char**>(&p), 0);
 	if (val > 255) return false;
 	rgb.blue = static_cast<Byte>(val);
 	if (p == s)			// no digit
@@ -189,6 +204,11 @@ bool Util::parseRGB (Bitmap::BitmapColour& rgb, char* s)
     return true;
 }
 
+/**
+ * Sets the verbosity of the methods in this class
+ *
+ * @param level how verbose the class's methods should be
+ */
 void Util::verbosity (const verbosities level)
 {
     verbosity_ = level;

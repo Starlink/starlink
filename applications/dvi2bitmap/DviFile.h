@@ -178,6 +178,7 @@ private:
 		  : static_cast<int>(magfactor_*(double)i)); }
     void read_postamble ();
     void process_preamble(DviFilePreamble *);
+    void fnt_def_(unsigned int dvimag, int nbytes);
     void check_duplicate_font(int);
     int pixel_round(int);
     int charWidth_ (int charno);
@@ -297,6 +298,7 @@ class DviFileEvent {
     /**
      * Creates a new event.
      *
+     * @param opcode the DVI opcode which resulted in this event 
      * @param t the type of this event
      * @param dp the <code>DviFile</code> it is associated with
      */

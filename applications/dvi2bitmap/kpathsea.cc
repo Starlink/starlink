@@ -41,6 +41,10 @@
 #include <stdlib.h>
 #endif
 
+#ifdef HAVE_STD_NAMESPACE
+using std::cerr;
+#endif
+
 #include "kpathsea.h"
 
 // The Kpathsea library interface has to be isolated in this class because the

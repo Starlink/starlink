@@ -501,9 +501,9 @@ be in the range [0,255], and can be specified in decimal, octal or hex
 be of the form <code>#rrggbb</code>, where `rr', `gg' and `bb' are
 each a pair of hex digits.</p></dd>
 
-<dt><code>-s, &ddash;scalefactor=[number]</code></dt>
-<dd>Reduces the linear size of the output bitmap by a factor
-<code>scalefactor</code> (default 1).</dd>
+<dt><code>-s, &ddash;scaledown=[number]</code></dt>
+<dd>Reduces the linear size of the output bitmap by the given factor
+(default 1).</dd>
 
 <dt><code>-T, &ddash;output=type=[type]</code></dt>
 
@@ -1084,13 +1084,21 @@ and new default setting.</update>
 Changed the disable-kpathsea configuration option to without-kpathsea
 (see also release notes for this version).</update>
 
-
-<p>To configure and build:
+<p>The package uses a automake/autoconf/libtool build system.
+Building should therefore be simple:
 <verbatim>
 % ./configure
 % make
+% make install
 </verbatim>
-but see the configuration options below.
+but see the configuration options below.</p>
+
+<p>By default, both a static and a dynamic library are built.
+Building the dynamic library fails on OSX when linking against
+kpathsea versions up to at least 7.4.6.  I've submitted a kpathsea
+patch to address that, but if this fails for you on OSX, configure
+using <code>&ddash;disable-shared</code> and you'll build a static
+library only.</p>
 
 <p>It's a good idea to run `<code/make test>' as well.  See <ref
 id=usage.fonts.finding/>.

@@ -1,9 +1,0 @@
-make t2.run >/dev/null 2>&1
-test $? = 0 || exit 1
-
-run=./t2.run
-
-$run "f=%f m=%m b=%b d=%d M=%M %%" ibmvga cmr10 330 110 3
-$run "%f%m%b%d%M" ibmvga cmr10 330 110 3
-
-exit 0

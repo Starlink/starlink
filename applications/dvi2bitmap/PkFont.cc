@@ -114,6 +114,9 @@ bool PkFont::makeMissingFonts_ = true;
 bool PkFont::makeMissingFonts_ = false;
 #endif
 
+/**
+ * Represents a font.
+ */
 PkFont::PkFont(unsigned int dvimag,
 	       unsigned int c,
 	       unsigned int s,
@@ -236,16 +239,22 @@ void PkFont::verbosity (const verbosities level)
 #endif
 }
 
-// Find a font.  Uses the flags in fontSearchStrategies_ to decide
-// which methods to try.  The result of the first one which succeeds
-// is the one returned.
-//
-// Return true if we found a file to open, and return the path in the
-// argument, which is unchanged otherwise.  Return false on error.
-// Success doesn't guarantee that the file exists, just that it was
-// constructed without problems (in fact, in both cases, success
-// _does_ mean that the file was found, but this is not guaranteed by
-// this routine).
+/**
+ * Find a font.  Uses one or all of the font-search strategies
+ * specified using the <code>setFontSearch...</code> methods.  The
+ * result of the first one which succeeds is the one returned.
+ *
+ * <p>Return true if we found a file to open, and return the path in the
+ * argument, which is unchanged otherwise.  Return false on error.
+ * Success doesn't guarantee that the file exists, just that it was
+ * constructed without problems (in the current implementation, success
+ * <em>does</em> mean that the file was found, but this is not guaranteed by
+ * this routine).
+ *
+ * @param path reference to a path, which is filled in on output if
+ * the search was successful
+ * @return true on success, false on error
+ */
 bool PkFont::find_font (string& path)
 {
     bool got_it = false;
@@ -367,15 +376,24 @@ bool PkFont::find_font (string& path)
     return got_it;
 }
 
-// Find a file on the colon-separated path, with the specified name,
-// at the specified resolution.  Return a reference to a static
-// string.  If not found, return a zero-length string.
-//
-// Do font rounding: Check all the integers between 0.998 and 1.002 of
-// the specified resolution.  If, however, this range falls within
-// (n,n+1) (non-inclusive) (ie, it doesn't span _any_ integers) then
-// simply round the number.
-// See DVI Driver Standard.
+/**
+ * Find a file on the font path, with the specified name,
+ * at the specified resolution.
+ *
+ * <p>Do font rounding: Check all the integers between 0.998 and 1.002 of
+ * the specified resolution.  If, however, this range falls within
+ * (n,n+1) (non-inclusive) (ie, it doesn't span <em>any</em> integers) then
+ * simply round the number.
+ * See the DVI Driver Standard for more details on the font-rounding
+ * algorithm.
+ *
+ * @param path a colon-separated list of directories to search for fonts
+ * @param name the name of the font to look for
+ * @param resolution the required resolution of the font
+ *
+ * @return a reference to a static string; if not found, return a
+ * zero-length string
+ */
 string& PkFont::search_pkpath (string path, string name, double resolution)
 {
     static string fname;		// return value
@@ -452,21 +470,34 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
     return fname;
 }
 
-// Given a format string, return a reference to a string with format
-// specifiers replaced by font information.
-//
-// Replacements are:
-//     %M = mode (eg. ibmvga)
-//     %f = font name (eg. cmr10)
-//     %d = dpi (eg. 330)
-//     %b = base dpi (eg. 110)
-//     %m = magnification (eg. 3)
-//     %% = %
-//
-// The return value is a reference to a static string, which is
-// overwritten on each call.
-//
-// Throws a PkError exception if it encounters an illegal format element.
+/**
+ * Given a format string, return a reference to a string with format
+ * specifiers replaced by font information.
+ *
+ * <p>The format specifiers are:
+ * <table>
+ * <tr><td>%M<td>mode<td>ibmvga
+ * <tr><td>%f<td>font name<td>cmr10
+ * <tr><td>%d<td>dpi<td>330
+ * <tr><td>%b<td>base dpi<td>110
+ * <tr><td>%m<td>magnification<td>3
+ * <tr><td>%%<td>literal %-character
+ * </table>
+ * Any other format specifiers constitute an error.  There is no
+ * support for any backslash escapes.
+ *
+ * @param fmt the format string, with the format specifiers described above
+ * @param mode a Metafont mode string, such as <code>ibmvga</code>
+ * @param fontname the name of a font, such as <code>cmr10</code>
+ * @param dpi the requested size of a font in dots-per-inch
+ * @param basedpi the design size of a font
+ * @param magnification of the font
+ *
+ * @returns a reference to the formatted string; this is a static
+ * string, which is overwritten on each call
+ *
+ * @throws PkError if it encounters an illegal format element.
+ */
 string& PkFont::substitute_font_string (const string fmt,
 					const string mode,
 					const string fontname,
@@ -775,8 +806,12 @@ void PkFont::read_font (InputByteStream& pkf)
 	cerr << "PkFont::read_font ...finished reading " << name_ << endl;
 }
 
-// Return magnification, including both font scaling and overall DVI
-// file magnification.
+/**
+ * Obtain the magnification of this font.  This includes both font scaling
+ * and overall DVI file magnification.
+ *
+ * @return the font magnification
+ */
 double PkFont::magnification() const
 {
     double rval = ((double)font_header_.s * (double)dvimag_)
@@ -788,6 +823,10 @@ double PkFont::magnification() const
     return rval;
 }
 
+/**
+ * Set the list of directories in which to look for fonts.
+ * @param fp the colon-separated font path
+ */
 void PkFont::setFontSearchPath(string fp) 
 {
     if (fp.length() == 0)
@@ -795,16 +834,34 @@ void PkFont::setFontSearchPath(string fp)
 	fontSearchPath_ = fp;
     setFontSearchPath(true);
 }
+/**
+ * Set the list of directories in which to look for fonts.
+ * @param fp the colon-separated font path
+ */
 void PkFont::setFontSearchPath(char *fp) 
 {
     string s = (fp == 0 ? "" : fp);
     setFontSearchPath(s);
 }
+/**
+ * Enable or disable using the font-path when searching for fonts.
+ * @param usePath if true, use the font path
+ * @see #setFontSearchPath(string)
+ */
 void PkFont::setFontSearchPath(bool usePath)
 {
     setFontSearchStrategy_(fontSearchStrategyPath_, usePath);
 }
 
+/**
+ * Set the shell command which is used when searching for fonts.  The
+ * specified string should be a template string with the formatting
+ * characters managed by {@link #substitute_font_string}, and these
+ * will be substituted with the required values before the command is
+ * run.
+ *
+ * @param cmd the shell command template
+ */
 void PkFont::setFontSearchCommand(string cmd)
 {
     // if cmd is zero length, simply enable this
@@ -812,16 +869,35 @@ void PkFont::setFontSearchCommand(string cmd)
 	fontSearchCommand_ = cmd;
     setFontSearchCommand(true);
 }
+/**
+ * Set the shell command which is used when searching for fonts.  The
+ * specified string should be a template string with the formatting
+ * characters managed by {@link #substitute_font_string}, and these
+ * will be substituted with the required values before the command is
+ * run.
+ *
+ * @param cmd the shell command template
+ */
 void PkFont::setFontSearchCommand(char* cmd)
 {
     string s = (cmd == 0 ? "" : cmd);
     setFontSearchCommand(s);
 }
+/**
+ * Enable or disable using a font-search command when searching for fonts.
+ * @param useCommand if true, use the command
+ * @see #setFontSearchCommand(string)
+ */
 void PkFont::setFontSearchCommand(bool useCommand)
 {
     setFontSearchStrategy_(fontSearchStrategyCommand_, useCommand);
 }
  
+/**
+ * Enable or disable using the <code>kpathsea</code> library when
+ * searching for fonts.
+ * @param useKpse if true, use the library
+ */
 void PkFont::setFontSearchKpse(bool useKpse)
 {
     setFontSearchStrategy_(fontSearchStrategyKpse_, useKpse);
@@ -836,6 +912,9 @@ void PkFont::setFontSearchStrategy_(unsigned int strat, bool useit)
 }
 
 
+/**
+ * Represents a single glyph in a font.
+ */
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
 		 unsigned int dm,

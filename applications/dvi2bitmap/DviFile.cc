@@ -799,6 +799,34 @@ void DviFile::read_postamble()
     bool keepreading = true;
     while (keepreading)
     {
+	Byte opcode = getByte();
+	switch (opcode)
+	{
+	  case 243:		// fnt_def1
+	    fnt_def_(dvimag, 1);
+	    break;
+	  case 244:		// fnt_def2
+	    fnt_def_(dvimag, 2);
+	    break;
+	  case 245:		// fnt_def3
+	    fnt_def_(dvimag, 3);
+	    break;
+	  case 246:		// fnt_def4
+	    fnt_def_(dvimag, 4);
+	    break;
+
+	  case 249:		// post_post
+	    keepreading = false;
+	    break;
+
+	  default:		// error
+	    throw DviError ("unexpected opcode (%d) in postamble", opcode);
+	    break;
+	}
+    }
+    
+#if 0
+    {
 	int num;
 	unsigned int c, s, d;
 	string fontdir, fontname;
@@ -877,6 +905,46 @@ void DviFile::read_postamble()
 	    throw DviError ("unexpected opcode (%d) in postamble", opcode);
 	}
     }
+#endif
+}
+
+/**
+ * Read a font-definition, either in the postamble on in-line.
+ * We read from one to four bytes of font-number, depending on whether
+ * it was opcode 243..246 (<code>fnt_def1..4</code>) which invoked
+ * this.
+ *
+ * @param dvimag dvi file magnification
+ * @param nbytes number of bytes of font-number to read
+ */
+void DviFile::fnt_def_(unsigned int dvimag, int nbytes)
+{
+    int num;
+    unsigned int c, s, d;
+    string fontdir, fontname;
+
+    if (nbytes < 1 || nbytes > 4)
+	throw DviBug ("Impossible number of bytes (%d) to read in nbytes",
+		      nbytes);
+
+    if (nbytes == 4)
+	num = getSIS(nbytes);
+    else
+	num = getSIU(nbytes);
+
+    if (fontMap_[num] != 0)
+	throw DviError ("Font %d defined twice", num);
+    c = getUIU(4);	// checksum (see DVI std, A.4)
+    s = getUIU(4);	// scale factor, DVI units
+    d = getUIU(4);	// design size
+    fontdir = "";	// to be discarded
+    fontname = "";
+    for (int a = getSIU(1); a>0; a--)
+	fontdir += static_cast<char>(getByte());
+    for (int l = getSIU(1); l>0; l--)
+	fontname += static_cast<char>(getByte());
+    fontMap_[num] = new PkFont(dvimag, c, s, d, fontname);
+    return;
 }
 
 /**

@@ -1,3 +1,0 @@
-make t4.run >/dev/null 2>&1
-test $? = 0 || exit 1
-exec ./t4.run

@@ -1,0 +1,65 @@
+
+From 0.11, uses autoconf/automake.  Needs autoconf better than 2.50
+(I think -- the first one after this which I've used is 2.57)
+
+Files to add:
+    Notes (this file)
+    configure.ac
+    NEWS AUTHORS ChangeLog (to keep automake happy)
+    ?files: install-sh mkinstalldirs missing config.guess config.sub
+          COPYING INSTALL depcomp installed by automake
+Files to delete:
+    config/
+    Makefile.in
+
+To build:
+
+    aclocal [? -I $D/tools/libtool-1.5/share/aclocal]
+    automake --add-missing
+    autoconf
+    ./configure
+
+I've disabled autoheader in configure.ac.  It's terribly clever, and
+all that, but an extra step that can go wrong, and unnecessary, since
+I have a perfectly good config.h.in.  Also, when I duly added that
+documentation to each AC_DEFINE in configure.ac, the resulting file
+isn't as nicely formatted, nor as rationally ordered, as the
+config.h.in I started off with.  The magic that disables this is the
+line `AUTOHEADER="echo autoheader ignored"' in configure.ac, following
+<http://mail.gnu.org/archive/html/automake/2003-01/msg00051.html>
+
+OK, I've committed that in a form which builds dvi2bitmap, then
+modified it to use libtool.  That involved adding AC_PROG_LIBTOOL to
+configure.ac, but when I follow the instructions to run aclocal then
+autoconf, it doesn't work, complaining that it can't find that
+DEFINE.  So I installed libtool-1.5, then installed automake-1.7.5,
+and now aclocal works if I add `-I
+$D/tools/libtool-1.5/share/aclocal', but then automake fails because
+it objects that it can't find ltmain.sh -- what's up?  I'll start
+again from scratch (as far as all the ac... stuff goes) next time,
+and see where that gets me.
+
+Installed fresh copies of autoconf 2.57, libtool 1.5 and automake
+1.7.5 in $D/tools/config-tools-20030608, and this now appears to work
+if I bootstrap it with
+
+    find . -type l -maxdepth 1 -exec rm {} ;
+    rm -Rf Makefile Makefile.in configure aclocal.m4 config.status config.log autom4te.cache config.h
+    aclocal
+    libtoolize
+    automake --add-missing
+    autoconf
+
+(I think automake is supposed to run libtoolize if ltmain.sh and
+ltconfig aren't present -- according to the autobook documentation --
+but it doesn't).  This set of commands is now in the script `bootstrap'.
+
+With kpathsea in web2c-7.4.5, I can't build the dynamic library: I get
+the "common symbols not allowed with MH_DYLIB output format" error.
+This is due to an uninitialised global in tex-file.c.  I've submitted
+a patch for this to the tex-k list.  Works when I configure with
+--disable-shared, and works with a dynamic library when I apply my
+patch to tex-file.c in the kpathsea distribution.
+
+I've given up trying to use automake for the tests in tests/.  Instead
+I'm just using Makefile.in.

@@ -18,7 +18,22 @@ using std::exit;
 using std::endl;
 #endif
 
+struct {
+    const char* testcase;
+    int expectedR;		// negative if expected bad
+    int expectedG;
+    int expectedB;
+} tests[] = {
+    { "1/2/3", 1, 2, 3, },
+    { "077;0177;0xff", 63, 127, 255, },
+    { "256,0,0", -1, -1, -1, },
+    { " 1   2   3  ", 1, 2, 3, },
+    { "#cc77ff", 204, 119, 255, },
+    { "   #007f0c", 0, 127, 12, },
+};
+int ntests = sizeof(tests)/sizeof(tests[0]);
 
+#if 0
 void reportRGB(char *spec)
 {
     Bitmap::BitmapColour rgb;
@@ -33,15 +48,56 @@ void reportRGB(char *spec)
     else
 	cout << " bad" << endl;
 }
-
+#endif
 
 int main (int argc, char **argv)
 {
-    reportRGB("1/2/3");
-    reportRGB("077;0177;0xff");
-    reportRGB("256,0,0");
-    reportRGB(" 1   2   3  ");
-    reportRGB("#cc77ff");
-    reportRGB("   #007f0c");
+    if (freopen("t4.stderr", "w", stderr) == NULL) {
+	cerr << "Can't reopen t4.stderr" << endl;
+	exit(1);
+    }
+
+    int i;
+    int nfails = 0;
+
+    for (i=0; i<ntests; i++) {
+	Bitmap::BitmapColour rgb;
+	bool res;
+	res = Util::parseRGB(rgb, tests[i].testcase);
+	if (res) {
+	    if (tests[i].expectedR < 0) {
+		// was expected to fail
+		cerr << "Test " << i << " unexpectedly succeeded: "
+		     << (int)rgb.red << ','
+		     << (int)rgb.green << ','
+		     << (int)rgb.blue << endl;
+		nfails++;
+	    } else {
+		if (tests[i].expectedR != (int)rgb.red
+		    || tests[i].expectedG != (int)rgb.green
+		    || tests[i].expectedB != (int)rgb.blue) {
+		    cerr << "Test " << i << ": expected "
+			 << tests[i].expectedR << ','
+			 << tests[i].expectedG << ','
+			 << tests[i].expectedB
+			 << ", got "
+			 << (int)rgb.red << ','
+			 << (int)rgb.green << ','
+			 << (int)rgb.blue << endl;
+		    nfails++;
+		}
+	    }
+	} else {
+	    // test failed
+	    if (tests[i].expectedR >= 0) {
+		// was expected to succeed
+		cerr << "Test " << i << ", spec=<" << tests[i].testcase
+		     << "> unexpectedly failed" << endl;
+		nfails++;
+	    }
+	}
+    }
+    
+    exit(nfails);
 }
 

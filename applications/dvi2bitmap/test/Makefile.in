@@ -9,28 +9,39 @@
 #
 # $Id$
 
+# These need to be substituted from ../configure.  I don't konw quite
+# what top_builddir is, but the LIBTOOL substitution requires it
 CXX=@CXX@
 CXXFLAGS=-I.. @CXXFLAGS@
 PERLBIN=@PERL@
 LIBS=@LIBS@
+top_builddir=@top_builddir@
+LIBTOOL=@LIBTOOL@
+
+TESTS=t1.test t2.test t3.test t4.test
 
 all: test
 
 test: regression pathtest
 
-regression:
-	cd ..; $(MAKE) libdvi2bitmap.a
-	PERLBIN=$(PERLBIN) ./runtests
+regression: $(TESTS)
+	for f in $(TESTS); do \
+	    if ./$$f; then\
+		echo $$f: ok; \
+	    else \
+		echo $$f: FAILED; \
+	    fi; \
+	done
 
 pathtest: hello.dvi
-	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi
-	touch pathtest
+	sh ./test-font-gen.sh ../dvi2bitmap hello.dvi temp-hello-output
+#	touch pathtest
 
 magtest: magtest.dvi
-	sh ./test-font-gen.sh ../dvi2bitmap magtest.dvi magtest-output
+	sh ./test-font-gen.sh ../dvi2bitmap magtest.dvi temp-magtest-output
 
 modetest: modetest.dvi
-	sh ./test-font-gen.sh ../dvi2bitmap modetest.dvi modetest-output
+	sh ./test-font-gen.sh ../dvi2bitmap modetest.dvi temp-modetest-output
 
 hello.dvi: hello.tex
 	tex hello
@@ -42,24 +53,13 @@ modetest.dvi: modetest.tex
 	latex modetest
 
 
-# These regression tests depend on a libdvi2bitmap.a from the source
-# directory.  That directory doesn't use it, but we need it here,
-# otherwise linking all the tests is too complicated to deal with happily.
-# Add a suffix rule for stupid makes (hello, Tru64...)
-.SUFFIXES: .o .cc .run
-# .cc.o:
-# 	$(CXX) $(CXXFLAGS) -c $<
-#
-# .o.run:
-# 	cd ..; $(MAKE) libdvi2bitmap.a
-# 	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap
-#  ARGH.  Tru64's make seems unable to cope even with implied dependencies!
-.cc.run:
-	cd ..; $(MAKE) libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ $< -L.. -ldvi2bitmap $(LIBS) -lm
-
+.SUFFIXES: .o .cc .test
+.cc.o:
+	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $@ $<
+.o.test:
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $< ../libdvi2bitmap.la $(LIBS) -lm
 
 clean:
-	rm -f *~ *.o *.run
+	rm -f *~ *.o *.test *.stderr
 	rm -f *.log *.aux *.dvi *.pdf
-	rm -f pathtest test-output*
+	rm -f test-output*

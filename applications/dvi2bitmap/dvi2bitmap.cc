@@ -185,7 +185,7 @@ int main (int argc, char **argv)
 	{ (char*)"resolution",    1, 0, 'r' },
 	{ (char*)"colours",       1, 0, 'R' },
 	{ (char*)"colors",        1, 0, 'R' },	// synonym
-	{ (char*)"scale",         1, 0, 's' },
+	{ (char*)"scaledown",     1, 0, 's' },
 	{ (char*)"paper-size",    1, 0, 't' },
 	{ (char*)"output-type",   1, 0, 'T' },
 	{ (char*)"verbose",       1, 0, 'v' },
@@ -539,7 +539,7 @@ int main (int argc, char **argv)
 	    }
 	    break;		    
 
-	  case 's':		// --scale
+	  case 's':		// --scaledown
 	    bm.bitmap_scale_factor = atoi (optarg);
 	    break;
 
@@ -1402,7 +1402,7 @@ void show_help()
 "  --resolution=n                 Output resolution, pixels-per-inch",
 "  --start-page=n, --end-page=n, --page-range=spec",
 "                                 Control which pages are processed",
-"  --scalefactor=n                Scale output bitmap down by n",
+"  --scaledown=n                  Scale output bitmap down by n",
 "  --verbose=[quiet|silent]       Suppress chatter",
 "  -V, --version                  Show version and configuration info",
     };

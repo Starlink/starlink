@@ -1,5 +1,6 @@
+.\" t
 .\" $Id$
-.TH DVI2BITMAP 1 "Feburary 2003"
+.TH DVI2BITMAP 1 "June 2003"
 .SH NAME
 dvi2bitmap
 .SH SYNOPSIS
@@ -8,12 +9,12 @@ dvi2bitmap
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
 system, converting each page to a single bitmap.
-.PP
-This man-page documents 
-.I dvi2bitmap
-version
-.\" %%VERSION%%
-.I "0.10"
+.\" .PP
+.\" This man-page documents 
+.\" .I dvi2bitmap
+.\" version
+.\" .\" %%VERSION%%
+.\" .I "0.10"
 .PP
 This program is intended to conform to the DVI processing standard.
 .PP
@@ -23,7 +24,7 @@ distributed with it.  This man-page may differ from the documentation there.
 .PP
 Various of the options below have common syntax features.
 .TP
-.I [keyword-value-list]
+.I [keyword-list]
 This indicates a sequence of
 .I keyword=value
 pairs, separated by commas.  Not all keywords necessarily have a
@@ -37,7 +38,7 @@ This can be `yes', `true' or `on' indicating
 .PP
 The options are as follows:
 .TP
-.I "-c, --crop=[keyword-value-pairs]"
+.I "-c, --crop=[keyword-list]"
 .\" .I "\-c[edge] dimen, \-C[edge] dimen"
 The 
 .I "--crop"
@@ -67,7 +68,7 @@ See below for TeX
 .I "\especial"
 commands which set this within the TeX file.
 .TP
-.I "-F, --font-search=[keyword-value-list]"
+.I "-F, --font-search=[keyword-list]"
 Specifies how 
 .I dvi2bitmap
 is to find the fonts it needs.  Keywords are as follows:
@@ -93,7 +94,8 @@ configured into the program at compile-time.  This script is any
 program which will search the filesystem and produce a single line on
 output, giving the full path to the specified font.  For example, this
 might be given as
-.I "kpsewhich pk %f.%dpk"
+    --font-search=command="kpsewhich pk %f.%dpk"
+.br
 to run the
 .I kpsewhich
 program.  The command name is a font-string
@@ -135,7 +137,6 @@ debugging information may be uninformative or unintelligible; it might
 even crash the program (mention that to me).
 .TP
 .I "-h, --height=size; -w, --width=size"
-.\" .I "\-bh size, \-bw size"
 Specify the height and width of the canvas on which the output
 bitmap is painted.  The program tries to make an estimate of this
 based on information within the DVI file, but it can't efficiently get
@@ -262,14 +263,12 @@ may be no spaces in the
 The page numbers may be negative.
 .IP
 Examples:
-.IP
-.I "dvi2bitmap \--page-range=3,6\-10 ..."
-.IP
-process only the specified pages
-.IP
-.I "dvi2bitmap \--page-range=:2:1 ..."
-.IP
-process only pages where
+    dvi2bitmap \--page-range=3,6\-10 ...
+.br
+processes only the specified pages, and
+    dvi2bitmap \--page-range=:2:1 ...
+.br
+processes only pages where
 .I "\ecount2"
 was 1.
 .TP
@@ -280,7 +279,7 @@ itself, prefixed by a `Q', the keyword and a space, so that, for
 example, each of the lines produced by the
 .I "--query=missing-fonts"
 option would start
-.I "Qmissing-fonts cmbx10 110 ..."
+    Qmissing-fonts cmbx10 110 ...
 .IP
 Some of these options (
 .I --query=missing-fonts
@@ -379,7 +378,7 @@ the default
 .I "ibmvga"
 metafont mode.
 .TP
-.I "-R, --colours=[keyword-value-pairs], --colors=[keyword-value-pairs]"
+.I "-R, --colours=[keyword-list], --colors=[keyword-list]"
 Specifies the foreground or background colours, as RGB triples.  The
 keywords are either
 .I foreground
@@ -394,9 +393,9 @@ be specified in decimal, octal or hex (for example
 .I "#rrggbb"
 , where `rr', `gg' and `bb' are each a pair of hex digits.
 .TP
-.I "-s, --scalefactor=[number]"
+.I "-s, --scaledown=[number]"
 Reduces the linear size of the output bitmap by a factor
-.I "scalefactor"
+.I "scaledown"
 (default 1).
 .TP
 .I "-T, --output=type=[type]"
@@ -428,8 +427,8 @@ chatter, and does not display warnings or errors either.
 .TP
 .I "-V, --version"
 Display the version number and compilation options, and exit.
-.TP
-.I "-X, --process=[keyword-value-list]"
+.IP
+.I "-X, --process=[keyword-list]"
 Specifies the processing to be done.
 Keywords are as follows
 .IP
@@ -606,22 +605,20 @@ position in the file where this special appears, 2pt to the right,
 10pt above and 2.5pt below.
 .IP
 A useful bit of TeX magic is:
-.IP
-{\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
-\edef\eDBstrut{\estrut\especial{dvi2bitmap strut 0 0 
-\eexpandafter\eDB@PT\ethe\eht\estrutbox
-\espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}
-.IP
+  {\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
+   \edef\eDBstrut{%
+     \estrut\especial{dvi2bitmap strut 0 0 
+       \eexpandafter\eDB@PT\ethe\eht\estrutbox
+       \espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}
+.br
 Once you've done that, the command 
 .I "\eDBstrut"
 will put an appropriate strut in the output.
-
 .PP
-For example, the pair of commands
-.IP
-\especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
-\especial{dvi2bitmap absolute crop left 0}
-.PP
+As an example, the pair of commands
+  \especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
+  \especial{dvi2bitmap absolute crop left 0}
+.br
 will change the output filename pattern for the rest of the DVI file,
 and set a 5pt margin round the bounding box.  The current page,
 however, will have a left-hand crop zero points in from the left hand
@@ -680,19 +677,18 @@ would have executed the command
 .I ".../kpsewhich pk cmr10.330pk"
 , which would have returned with a suitable font path.
 .SH EXAMPLES
-% dvi2bitmap --resolution=110 --magnification=2 \e
-    --scale=2 --output-type=gif hello.dvi
-.PP
+    % dvi2bitmap --resolution=110 --magnification=2 \e
+        --scale=2 --output-type=gif hello.dvi
+.br
 This converts the file hello.dvi to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
 (eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
 obtain a bitmap of the correct size.
 .PP
-% dvi2bitmap -n --query=missing-fonts --resolution=110 \e
-    --magnification=1.5 --verbose=quiet hello.dvi
+    % dvi2bitmap -n --query=missing-fonts --resolution=110 \e
+        --magnification=1.5 --verbose=quiet hello.dvi
+    Qmissing-fonts cmr10 165 110 1.5 localfont
 .br
-Qmissing-fonts cmr10 165 110 1.5 localfont
-.PP
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
 produces a list of parameters which could be used to generate the
@@ -706,9 +702,8 @@ generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
 by hand.  In the case of teTeX, the command you'd use in the above
 example would be:
-.PP
-% MakeTeXPK cmr10 165 110 1.5 ibmvga
-.PP
+    % MakeTeXPK cmr10 165 110 1.5 ibmvga
+.br
 assuming you want to use the 
 .I ibmvga
 metafont mode.  If you want to use the same mode as you use for other
@@ -723,13 +718,11 @@ which has been tweaked to be readable at small resolutions.  See the file
 somewhere in your metafont distribution for the list of possibilities.
 .PP
 If you're using the TeXLive distribution, the command would be:
-.PP
-% mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
+    % mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
 .PP
 Then try giving the command
-.PP
-% kpsewhich pk cmr10.165pk
-.PP
+    % kpsewhich pk cmr10.165pk
+.br
 to confirm that TeX and friends can find the new fonts, and that your 
 dvi2bitmap environment variable is set correctly.
 .SH ENVIRONMENT
