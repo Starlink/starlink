@@ -1123,7 +1123,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    boundary of the Ellipse for it still to be considered to be on the boundary.
    First get the Region which defines the uncertainty within the Ellipse being
    checked (in its base Frame), and get its bounding box. */
-   tunc = astGetUnc( this, AST__BASE );      
+   tunc = astGetUncFrm( this, AST__BASE );      
    astRegCurBox( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of 
@@ -1330,7 +1330,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get the Region describing the positional uncertainty within the Ellipse in
    its current Frame. */
-   unc = astGetUnc( new, AST__CURRENT );
+   unc = astGetUncFrm( new, AST__CURRENT );
 
 /* Transform the PointSet holding the ellipse centre into the current
    Frame, and copy the axis values into a new array. */

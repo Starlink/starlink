@@ -517,17 +517,31 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 /* Check the inherited status */
    if( !astOK ) return result;
 
+/* If the Region structure contains a pointer to a PointSet holding 
+   a previously created mesh, return it. */
+   if( this->basemesh ) {
+      result = astClone( this->basemesh );
+
+/* Otherwise, create a new mesh. */
+   } else {
+
 /* Get the number of base Frame axes */
-   nc = astGetNin( this->frameset );
+      nc = astGetNin( this->frameset );
 
 /* Create the PointSet. */
-   result = astPointSet( 1, nc, "" );
+      result = astPointSet( 1, nc, "" );
 
 /* Get a pointer to the axis values. */
-   ptr = astGetPoints( result );
+      ptr = astGetPoints( result );
 
 /* If OK, store AST__BAD on every axis. */
-   if( astOK ) for( i = 0; i < nc; i++ ) ptr[ i ][ 0 ] = AST__BAD;
+      if( ptr ) for( i = 0; i < nc; i++ ) ptr[ i ][ 0 ] = AST__BAD;
+
+/* Same the returned pointer in the Region structure so that it does not
+   need to be created again next time this function is called. */
+      if( astOK && result ) this->basemesh = astClone( result );
+
+   }
 
 /* Return the result. */
    return result;

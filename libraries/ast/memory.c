@@ -1954,7 +1954,7 @@ void astIdHandler_( void *new, const char *verb ){
 *        Text to include in message.
 *-
 */
-   if( (((Memory *)new)-1)->id == watch_id ) IdAlarm( verb );
+   if( new && (((Memory *)new)-1)->id == watch_id ) IdAlarm( verb );
 }
 
 void IdAlarm( const char *verb ){

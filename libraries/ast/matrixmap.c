@@ -5007,6 +5007,7 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
 /* Local Variables: */
    AstMatrixMap *new;            /* Pointer to the new MatrixMap */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
+   const char *form;             /* String form */
    int def;                      /* Is the matrix defined? */
    int el;                       /* Element index */
    int nel;                      /* No. of elements in the matrix */
@@ -5050,10 +5051,10 @@ AstMatrixMap *astLoadMatrixMap_( void *mem, size_t size,
       astReadClassData( channel, "MatrixMap" );
 
 /* Now obtain the Matrix storage form from this list. */
-      new->form = FindString( 3, Form, 
-                              astReadString( channel, "form", Form[FULL]), 
-                              "the MatrixMap component 'Form'", 
+      form = astReadString( channel, "form", Form[FULL] ); 
+      new->form = FindString( 3, Form, form, "the MatrixMap component 'Form'",
                               "astRead", astGetClass( channel ) );
+      form = astFree( (void *) form );
 
 /* Find the number of elements stored for each matrix. */
       nin = astGetNin( (AstMapping *) new );

@@ -1105,7 +1105,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get the Region describing the positional uncertainty within the
    supplied PointList, in its current Frame. */
-      unc = astGetUnc( new, AST__CURRENT );
+      unc = astGetUncFrm( new, AST__CURRENT );
 
 /* Allocate memory to hold the lists to pass to the PointList
    constructor. */
@@ -1290,7 +1290,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    }
 
 /* Get the base Frame uncertainty Region. Temporarily set its negated flag. */
-   unc = astGetUnc( this, AST__BASE );
+   unc = astGetUncFrm( this, AST__BASE );
    astSetNegated( unc, 1 );
 
 /* Transform the PointList PointSet into the base Frame of the uncertainty

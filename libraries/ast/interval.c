@@ -366,7 +366,7 @@ AstInterval *astBoxInterval_( AstBox *box ) {
       frm = astGetFrame( ((AstRegion *) box )->frameset, AST__BASE );
 
 /* If the supplied Box has a set uncertainty, get it in its base Frame. */
-      unc = astTestUnc( box ) ? astGetUnc( box, AST__BASE ) : NULL;
+      unc = astTestUnc( box ) ? astGetUncFrm( box, AST__BASE ) : NULL;
 
 /* Create the Interval representing an area within the base Frame of the 
    supplied Box. */
@@ -530,7 +530,7 @@ static void Cache( AstInterval *this ){
          bfrm = astGetFrame( reg->frameset, AST__BASE );
          cfrm = astGetFrame( reg->frameset, AST__BASE );
          map = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
-         unc = astTestUnc( reg ) ? astGetUnc( reg, AST__BASE ) : NULL;
+         unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
 
          bbox = astBox( bfrm, 1, lbnd, ubnd, unc, "" );
          if( astIsAUnitMap( map ) ){
@@ -877,8 +877,8 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
    Regions from the two Regions (in their base Frame) and combine them into 
    a Prism. Then simplify the Prism. */
          if( astTestUnc( reg ) || astTestUnc( this ) ) {
-            unc_reg = astGetUnc( reg, AST__BASE );
-            unc_this = astGetUnc( this, AST__BASE );
+            unc_reg = astGetUncFrm( reg, AST__BASE );
+            unc_this = astGetUncFrm( this, AST__BASE );
             punc = astPrism( unc_reg, unc_this, "" );
             unc = astSimplify( punc );
             unc_reg = astAnnul( unc_reg );
@@ -1232,8 +1232,8 @@ static int Overlap( AstRegion *this, AstRegion *that ){
 
 /* Get the uncertainty Regions for both Intervals, expressed in the base
    Frames of the Intervals. */
-            unc_this = astGetUnc( this, AST__BASE );
-            unc_temp = astGetUnc( that, AST__BASE );
+            unc_this = astGetUncFrm( this, AST__BASE );
+            unc_temp = astGetUncFrm( that, AST__BASE );
 
 /* Map the uncertainty Region for the second Interval from the base Frame
    of the second Interval into the base Frame of the first Interval. */
@@ -2118,7 +2118,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       
 /* Create a new Box representing the box found above. */
             bfrm = astGetFrame( new->frameset, AST__BASE );
-            unc = astTestUnc( new ) ? astGetUnc( new, AST__BASE ) : NULL;
+            unc = astTestUnc( new ) ? astGetUncFrm( new, AST__BASE ) : NULL;
             box = astBox( bfrm, 1, lbnd, ubnd, unc, "" );
             if( unc ) unc = astAnnul( unc );
       
@@ -2256,7 +2256,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
          
 /* Create the simplified Interval from the current Frame limits found
    above, and use it in place of the original. */
-                     unc = astTestUnc( new ) ? astGetUnc( new, AST__CURRENT ) : NULL;
+                     unc = astTestUnc( new ) ? astGetUncFrm( new, AST__CURRENT ) : NULL;
                      astAnnul( new );
                      new = (AstRegion *) astInterval( cfrm, slbnd, subnd, unc, "" );
                      if( unc ) unc = astAnnul( unc );
@@ -2466,7 +2466,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* If not yet done so, get the bounding box of the uncertainty Region in the 
    base Frame of the Interval */
                         if( !unc ) {
-                           unc = astGetUnc( reg, AST__BASE );
+                           unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            astRegCurBox( unc, lbnd_unc, ubnd_unc );
@@ -2629,7 +2629,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* If not yet done so, get the bounding box of the uncertainty Region in the 
    base Frame of the Interval */
                         if( !unc ) {
-                           unc = astGetUnc( reg, AST__BASE );
+                           unc = astGetUncFrm( reg, AST__BASE );
                            lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
                            astRegCurBox( unc, lbnd_unc, ubnd_unc );

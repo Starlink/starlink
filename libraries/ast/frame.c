@@ -6149,6 +6149,9 @@ static void Overlay( AstFrame *template, const int *template_axes,
    OVERLAY(Epoch);
    OVERLAY(Title);
 
+/* Transfer the ActiveUnit flag. */
+   astSetActiveUnit( result, astGetActiveUnit( template ) );
+
 /* Only overlay the System and AlignSystem attribute if the values are
    valid for the result class. */
    if( astTestSystem( template ) ) {

@@ -404,7 +404,7 @@ static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
    bubnd = astMalloc( sizeof( double )*(size_t) nc );
 
 /* Check pointers can be used safely */
-   if( astOK ) {
+   if( bubnd ) {
 
 /* Get the bounding box of the uncertainty region. */
       astRegCurBox( unc, lbnd, ubnd ); 
@@ -671,7 +671,7 @@ static void Cache( AstBox *this, int lohi ){
 
 /* Get the bounding box of the uncertainty Region in the base Frame of
    the supplied Box. */
-            unc = astGetUnc( this, AST__BASE );
+            unc = astGetUncFrm( this, AST__BASE );
             astRegCurBox( unc, lbnd_unc, ubnd_unc );
 
 /* Ensure the shrunk extents are at least half the width of the uncertainty 
@@ -1412,6 +1412,9 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
                ip += MakeGrid( naxes, ptr, ip, lbnd, ubnd, np_axis, iaxis, 
                                lbnd[ iaxis ] );
             }
+
+/* Remove any unused space at the end of the PointSet. */
+            if( ip < np ) astSetNpoint( result, ip );
          }
       }
 
@@ -1713,7 +1716,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    boundary of the Box for it still to be considered to be on the boundary. 
    First get the Region which defines the uncertainty within the Box being
    checked (in its base Frame), and get its bounding box. */
-   tunc = astGetUnc( this, AST__BASE );      
+   tunc = astGetUncFrm( this, AST__BASE );      
 
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
@@ -2267,7 +2270,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get any uncertainty from the supplied Box (it will already have been
    simplified by the parent Simplify method). */
-            unc = astTestUnc( new ) ? astGetUnc( new, AST__CURRENT ) : NULL;
+            unc = astTestUnc( new ) ? astGetUncFrm( new, AST__CURRENT ) : NULL;
 
 /* Get the Frame represented by the Region. */
             frm = astGetFrame( new->frameset, AST__CURRENT );
@@ -2319,7 +2322,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get the Region describing the positional uncertainty within the Box in
    its current Frame. */
-      unc = astGetUnc( new, AST__CURRENT );
+      unc = astGetUncFrm( new, AST__CURRENT );
  
 /* Find the best fitting box (defined in the current Frame) through these 
    points */

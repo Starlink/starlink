@@ -905,7 +905,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    boundary of the Circle for it still to be considered to be on the boundary. 
    First get the Region which defines the uncertainty within the Circle being
    checked (in its base Frame), and get its bounding box. */
-   tunc = astGetUnc( this, AST__BASE );      
+   tunc = astGetUncFrm( this, AST__BASE );      
 
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
@@ -1119,7 +1119,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get the Region describing the positional uncertainty within the Circle in
    its current Frame. */
-      unc = astGetUnc( new, AST__CURRENT );
+      unc = astGetUncFrm( new, AST__CURRENT );
 
 /* Transform the PointSet holding the circle centre into the current
    Frame, and copy the axis values into a new array. */

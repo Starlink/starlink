@@ -111,6 +111,7 @@ typedef struct AstRegionVtab {
    AstPointSet *(* RegBaseMesh)( AstRegion * );
    AstPointSet *(* RegBaseGrid)( AstRegion * );
    AstPointSet *(* BndBaseMesh)( AstRegion *, double *, double * );
+   AstRegion *(* GetUncFrm)( AstRegion *, int );
    AstRegion *(* GetUnc)( AstRegion *, int );
    AstRegion *(* GetDefUnc)( AstRegion * );
    void (* SetUnc)( AstRegion *, AstRegion * );
@@ -201,6 +202,7 @@ int astMaskUI_( AstRegion *, AstMapping *, int, int, const int[], const int[], u
 int astMaskUL_( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int );
 int astMaskUS_( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int );
 void astSetUnc_( AstRegion *, AstRegion * );
+AstRegion *astGetUnc_( AstRegion *, int );
 
 #if defined(astCLASS)            /* Protected */
 AstRegion *astMapRegion_( AstRegion *, AstMapping *, AstFrame * );
@@ -220,7 +222,7 @@ AstPointSet *astRegGrid_( AstRegion * );
 AstPointSet *astRegBaseMesh_( AstRegion * );
 AstPointSet *astRegBaseGrid_( AstRegion * );
 AstPointSet *astBndBaseMesh_( AstRegion *, double *, double * );
-AstRegion *astGetUnc_( AstRegion *, int );
+AstRegion *astGetUncFrm_( AstRegion *, int );
 AstRegion *astGetDefUnc_( AstRegion * );
 int astOverlapX_( AstRegion *, AstRegion * );
 void astSetRegFS_( AstRegion *, AstFrame * );
@@ -326,6 +328,7 @@ astINVOKE(V,astMaskUL_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astMaskUS(this,map,inside,ndim,lbnd,ubnd,in,val) \
 astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),inside,ndim,lbnd,ubnd,in,val))
 #define astSetUnc(this,unc) astINVOKE(V,astSetUnc_(astCheckRegion(this),unc?astCheckRegion(unc):NULL))
+#define astGetUnc(this,def) astINVOKE(O,astGetUnc_(astCheckRegion(this),def))
 
 /* Interfaces to protected member functions. */
 /* ----------------------------------------- */
@@ -334,7 +337,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astClearUnc(this) astINVOKE(V,astClearUnc_(astCheckRegion(this)))
 #define astDumpUnc(this) astINVOKE(V,astDumpUnc_(astCheckRegion(this)))
 #define astGetBounded(this) astINVOKE(V,astGetBounded_(astCheckRegion(this)))
-#define astGetUnc(this,ifrm) astINVOKE(O,astGetUnc_(astCheckRegion(this),ifrm))
+#define astGetUncFrm(this,ifrm) astINVOKE(O,astGetUncFrm_(astCheckRegion(this),ifrm))
 #define astGetDefUnc(this) astINVOKE(O,astGetDefUnc_(astCheckRegion(this)))
 #define astMapRegion(this,map,frame) astINVOKE(O,astMapRegion_(astCheckRegion(this),astCheckMapping(map),astCheckFrame(frame)))
 #define astOverlapX(that,this) astINVOKE(V,astOverlapX_(astCheckRegion(that),astCheckRegion(this)))
@@ -349,7 +352,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegMesh(this) astINVOKE(O,astRegMesh_(astCheckRegion(this)))
 #define astRegOverlay(this,that) astINVOKE(V,astRegOverlay_(astCheckRegion(this),astCheckRegion(that)))
 #define astRegDummyFS(this) astINVOKE(V,astRegDummyFS_(astCheckRegion(this)))
-#define astRegPins(this,pset,unc,mask) astINVOKE(V,astRegPins_(astCheckRegion(this),astCheckPointSet(pset),astCheckRegion(unc),mask))
+#define astRegPins(this,pset,unc,mask) astINVOKE(V,astRegPins_(astCheckRegion(this),astCheckPointSet(pset),unc?astCheckRegion(unc):unc,mask))
 #define astRegTranPoint astRegTranPoint_
 #define astSetRegFS(this,frm) astINVOKE(V,astSetRegFS_(astCheckRegion(this),astCheckFrame(frm)))
 #define astTestUnc(this) astINVOKE(V,astTestUnc_(astCheckRegion(this)))

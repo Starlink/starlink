@@ -98,7 +98,7 @@ static int class_init = 0;          /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *(* parent_getunc)( AstRegion *, int );
+static AstRegion *(* parent_getuncfrm)( AstRegion *, int );
 static void (* parent_clearunc)( AstRegion * );
 static int (* parent_testunc)( AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
@@ -123,7 +123,7 @@ AstPrism *astPrismId_( void *, void *, const char *, ... );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *GetUnc( AstRegion *, int );
+static AstRegion *GetUncFrm( AstRegion *, int );
 static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
@@ -617,10 +617,10 @@ static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
    *neg = astGetNegated( (AstRegion *) this );
 }
 
-static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
+static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
 /*
 *  Name:
-*     GetUnc
+*     GetUncFrm
 
 *  Purpose:
 *     Obtain a pointer to the uncertainty Region for a given Region.
@@ -630,10 +630,10 @@ static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
 
 *  Synopsis:
 *     #include "prism.h"
-*     AstRegion *GetUnc( AstRegion *this, int ifrm ) 
+*     AstRegion *GetUncFrm( AstRegion *this, int ifrm ) 
 
 *  Class Membership:
-*     Prism method (over-rides the astGetUnc method inherited from
+*     Prism method (over-rides the astGetUncFrm method inherited from
 *     the Region class).
 
 *  Description:
@@ -688,7 +688,7 @@ static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
    use it in preference to any uncertainty Region stored in the component 
    Regions. */
    if( (* parent_testunc)( this_region ) ) {
-      bunc = (* parent_getunc)( this_region, AST__BASE );
+      bunc = (* parent_getuncfrm)( this_region, AST__BASE );
 
 /* Otherwise construct an uncertainty Region from the uncertainty Regions
    in the two component Regions. The current Frames in the component
@@ -696,8 +696,8 @@ static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
    So we may need to map the component uncertainty into the current Region of 
    the parent if required later on. */
    } else {
-      bunc1 = astGetUnc( this->region1, AST__CURRENT );
-      bunc2 = astGetUnc( this->region2, AST__CURRENT );
+      bunc1 = astGetUncFrm( this->region1, AST__CURRENT );
+      bunc2 = astGetUncFrm( this->region2, AST__CURRENT );
 
 /* Combine them into a Prism. */
       bunc = (AstRegion *) astPrism( bunc1, bunc2, "" );
@@ -818,8 +818,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
-   parent_getunc = region->GetUnc;
-   region->GetUnc = GetUnc;
+   parent_getuncfrm = region->GetUncFrm;
+   region->GetUncFrm = GetUncFrm;
 
    parent_clearunc = region->ClearUnc;
    region->ClearUnc = ClearUnc;
@@ -1733,7 +1733,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    "reg1". We must also get the uncertainty in the base Frame of the
    component Region. */
    ps1b = astRegTransform( reg1, ps1, 0, NULL, NULL );
-   unc1 = astGetUnc( reg1, AST__BASE );
+   unc1 = astGetUncFrm( reg1, AST__BASE );
    astRegPins( reg1, ps1b, unc1, &mask1 );
 
 /* Also determine which of the points are on or in theboundary by using
@@ -1745,7 +1745,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    ps2 = astPointSet( np, nax2, "" );
    astSetSubPoints( pset, 0, nax1, ps2 );
    ps2b = astRegTransform( reg2, ps2, 0, NULL, NULL );
-   unc2 = astGetUnc( reg2, AST__BASE );
+   unc2 = astGetUncFrm( reg2, AST__BASE );
    astRegPins( reg2, ps2b, unc2, &mask2 );
    ps2b2 = astTransform( reg2, ps2b, 1, NULL );
 

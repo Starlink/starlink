@@ -102,8 +102,10 @@ f     following routines may also be applied to all Regions:
 *
 c     - astGetRegionFrame: Get a copy of the Frame represent by a Region
 f     - AST_GETREGIONFRAME: Get a copy of the Frame represent by a Region
-c     - astMapRegion: Transform a Region into a new coordinate system.
-f     - AST_MAPREGION: Transform a Region into a new coordinate system.
+c     - astGetUnc: Obtain uncertainty information from a Region
+f     - AST_GETUNC: Obtain uncertainty information from a Region
+c     - astMapRegion: Transform a Region into a new coordinate system
+f     - AST_MAPREGION: Transform a Region into a new coordinate system
 c     - astNegate: Toggle the value of the Negated attribute
 f     - AST_NEGATE: Toggle the value of the Negated attribute
 c     - astOverlap: Determines the nature of the overlap between two Regions
@@ -817,6 +819,7 @@ static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
 static int GetBounded( AstRegion * );
 static AstRegion *GetDefUnc( AstRegion * );
 
+static AstRegion *GetUncFrm( AstRegion *, int );
 static AstRegion *GetUnc( AstRegion *, int );
 static int TestUnc( AstRegion * );
 static void ClearUnc( AstRegion * );
@@ -2929,11 +2932,117 @@ static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 
 }
 
-static AstRegion *GetUnc( AstRegion *this, int ifrm ) {
+static AstRegion *GetUnc( AstRegion *this, int def ){
+/*
+*++
+*  Name:
+c     astGetUnc
+f     AST_GETUNC
+
+*  Purpose:
+*     Obtain uncertainty information from a Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     AstRegion *astGetUnc( AstRegion *this, int def )
+f     RESULT = AST_GETUNC( THIS, DEF, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+*     This function returns a Region which represents the uncertainty
+*     associated with positions within the supplied Region. See
+c     astSetUnc
+f     AST_SETUNC
+*     for more information about Region uncertainties and their use.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+c     def
+f     DEF = LOGICAL (Given)
+*        Controls what is returned if no uncertainty information has been
+*        associated explicitly with the supplied Region. If
+c        a non-zero value
+f        .TRUE. 
+*        is supplied, then the default uncertainty Region used internally 
+*        within AST is returned. This will usually be a small fraction of the 
+*        bounding box of the supplied Region. If
+c        zero is supplied, then NULL
+f        .FALSE. is supplied, then AST__NULL
+*        will be returned (without error).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetUnc()
+f     AST_GETUNC = INTEGER
+*        A pointer to a Region describing the uncertainty in the supplied
+*        Region.
+
+*  Notes:
+*     - If uncertainty information is associated with a Region, and the 
+*     coordinate system described by the Region is subsequently changed
+*     (e.g. by changing the value of its System attribute, or using the 
+c     astMapRegion
+f     AST_MAPREGION
+*     function), then the uncertainty information returned by this function 
+*     will be modified so that it refers to the coordinate system currently 
+*     described by the supplied Region.
+f     - A null Object pointer (AST__NULL) will be returned if this
+f     function is invoked with STATUS set to an error value, or if it
+c     - A null Object pointer (NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+*     should fail for any reason.
+
+*--
+*/
+
+/* Local Variables: */
+   AstRegion *result;       /* Pointer to returned uncertainty Region */
+   AstRegion *unc;          /* Pointer to original uncertainty Region */
+
+/* Initialise */
+   result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
+/* Check that we have an uncertainty Region to return (either assigned or
+   default). */
+   if( def || astTestUnc( this ) ) {
+
+/* Obtain the uncertainty Region and take a copy so that we can modify it
+   without affecting the supplied Region. */
+      unc = astGetUncFrm( this, AST__CURRENT );
+      result = astCopy( unc );
+      unc = astAnnul( unc );
+
+/* In its current context, the uncertainty region is known to refer to
+   the Frame of the supplied Region and so its RegionFS attribute will be
+   set to zero, indicating that the uncertainty FrameSet need not be
+   dumped. However, outside of AST this information cannot be implied, so
+   clear the RegionFS attribute so that the returned pointer will include
+   Frame information if it is dumped to a Channel. */
+      astClearRegionFS( result );
+
+   }
+
+/* Return the result. */
+   return result;
+
+}
+
+static AstRegion *GetUncFrm( AstRegion *this, int ifrm ) {
 /*
 *+
 *  Name:
-*     astGetUnc
+*     astGetUncFrm
 
 *  Purpose:
 *     Obtain a pointer to the uncertainty Region for a given Region.
@@ -2943,7 +3052,7 @@ static AstRegion *GetUnc( AstRegion *this, int ifrm ) {
 
 *  Synopsis:
 *     #include "region.h"
-*     AstRegion *astGetUnc( AstRegion *this, int ifrm ) 
+*     AstRegion *astGetUncFrm( AstRegion *this, int ifrm ) 
 
 *  Class Membership:
 *     Region virtual function.
@@ -3555,8 +3664,9 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegGrid = RegGrid;
    vtab->RegMesh = RegMesh;
    vtab->GetDefUnc = GetDefUnc;
-   vtab->GetUnc = GetUnc;
+   vtab->GetUncFrm = GetUncFrm;
    vtab->SetUnc = SetUnc;
+   vtab->GetUnc = GetUnc;
    vtab->RegCurBox = RegCurBox;
    vtab->RegOverlay = RegOverlay;
    vtab->RegFrame = RegFrame;
@@ -5225,7 +5335,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 /* Also transform the Region describing the positional uncertainty within 
    the second supplied Region into the base Frame of the first supplied 
    Region. */
-      unc = astGetUnc( reg2, AST__CURRENT );
+      unc = astGetUncFrm( reg2, AST__CURRENT );
       unc1 = astMapRegion( unc, map, frm_reg1 );
 
 /* See if all points within this transformed mesh fall on the boundary of
@@ -6136,6 +6246,7 @@ static AstPointSet *RegMesh( AstRegion *this ){
 
 /* Local Variables; */
    AstMapping *map;          /* Base -> current Frame Mapping */
+   AstPointSet *bmesh;       /* Base Frame mesh */
    AstPointSet *result;      /* Pointer to returned PointSet */
 
 /* Initialise the returned pointer */
@@ -6144,28 +6255,26 @@ static AstPointSet *RegMesh( AstRegion *this ){
 /* Check the local error status. */
    if ( !astOK ) return result;
 
-/* If the Region structure does not contain a pointer to a PointSet holding 
-   positions evenly spread over the boundary of the Region in the base
-   Frame, create one now. Note, we cannot cache the mesh in the current
-   Frame in this way since the current Frame mesh depends on the proprties
-   of the current Frame (e.g. System) which can be changed at any time. */
-   if( !this->basemesh ) this->basemesh = astRegBaseMesh( this );
+/* Get a pointer to a PointSet holding positions evenly spread over the 
+   boundary of the Region in the base Frame. */
+   bmesh = astRegBaseMesh( this );
 
 /* Get the simplified base->current Mapping */
    map = RegMapping( this );
 
-/* If the Mapping is a UnitMap, just return a clone of the PointSet
-   pointer stored in the Region structure. */
+/* If the Mapping is a UnitMap, just return a clone of the mesh PointSet
+   pointer. */
    if( astIsAUnitMap( map ) ){
-      result = astClone( this->basemesh );
+      result = astClone( bmesh );
 
 /* Otherwise, create a new PointSet holding the above points transformed 
    into the current Frame. */
    } else {
-      result = astTransform( map, this->basemesh, 1, NULL );
+      result = astTransform( map, bmesh, 1, NULL );
    }
 
 /* Free resources.*/
+   bmesh = astAnnul( bmesh );
    map = astAnnul( map );
 
 /* If an error has occurred, annul the returned PointSet. */
@@ -7001,10 +7110,8 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Take a copy of the supplied Frame and ensure its ActiveUnits flag is
-   set. */
+/* Take a copy of the supplied Frame. */
    f1 = astCopy( frm );
-   astSetActiveUnit( f1, 1 );
 
 /* Create the new FrameSet. First take another copy of the supplied Frame 
    so that modifications using the supplied pointer will not affect the new
@@ -7298,7 +7405,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    } else {
 
 /* Obtain the Region's uncertainty. */
-      unc = astGetUnc( new, AST__BASE );
+      unc = astGetUncFrm( new, AST__BASE );
 
 /* Get the base->current Mapping from "this". */
       map = astGetMapping( this->frameset, AST__BASE, AST__CURRENT );
@@ -9054,7 +9161,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* ----------- */
 /* Only dump the uncertinaty Region if required. */
    if( astDumpUnc( this ) ) {
-      unc = astGetUnc( this, AST__BASE );
+      unc = astGetUncFrm( this, AST__BASE );
       astWriteObject( channel, "Unc", 1, 1, unc, 
                       "Region defining positional uncertainties." );
       unc = astAnnul( unc );
@@ -9591,13 +9698,17 @@ double *astRegCentre_( AstRegion *this, double *cen, double **ptr, int index,
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,RegCentre))( this, cen, ptr, index, ifrm );
 }
-AstRegion *astGetUnc_( AstRegion *this, int ifrm ){
+AstRegion *astGetUncFrm_( AstRegion *this, int ifrm ){
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Region,GetUnc))( this, ifrm );
+   return (**astMEMBER(this,Region,GetUncFrm))( this, ifrm );
 }
 AstRegion *astGetDefUnc_( AstRegion *this ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,GetDefUnc))( this );
+}
+AstRegion *astGetUnc_( AstRegion *this, int def ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,GetUnc))( this, def );
 }
 void astSetUnc_( AstRegion *this, AstRegion *unc ){
    if ( !astOK ) return;

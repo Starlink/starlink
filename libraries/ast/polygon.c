@@ -798,7 +798,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    being checked (in its base Frame), and get its bounding box. The current
    Frame of the uncertainty Region is the same as the base Frame of the
    Polygon. */
-   tunc = astGetUnc( this, AST__BASE );      
+   tunc = astGetUncFrm( this, AST__BASE );      
    astRegCurBox( tunc, lbnd_tunc, ubnd_tunc ); 
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of 
@@ -1002,7 +1002,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
       mesh = astRegMesh( new );
 
 /* Get the Region describing the positional uncertainty in this Frame. */
-      unc = astGetUnc( new, AST__CURRENT );
+      unc = astGetUncFrm( new, AST__CURRENT );
 
 /* Get the positions of the vertices within this Frame. */
       ps2 = astRegTransform( this, this->points, 1, NULL, NULL );

@@ -113,7 +113,7 @@ static int class_init = 0;          /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *(* parent_getunc)( AstRegion *, int );
+static AstRegion *(* parent_getuncfrm)( AstRegion *, int );
 static void (* parent_clearunc)( AstRegion * );
 static int (* parent_testunc)( AstRegion * );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
@@ -137,7 +137,7 @@ AstCmpRegion *astCmpRegionId_( void *, void *, int, const char *, ... );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstRegion *GetUnc( AstRegion *, int );
+static AstRegion *GetUncFrm( AstRegion *, int );
 static AstRegion *MatchRegion( AstRegion *, int, AstRegion *, const char * );
 static double GetFillFactor( AstRegion * );
 static int Equal( AstObject *, AstObject * );
@@ -704,10 +704,10 @@ static void GetRegions( AstCmpRegion *this, AstRegion **reg1, AstRegion **reg2,
    }
 }
 
-static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
+static AstRegion *GetUncFrm( AstRegion *this_region, int ifrm ) {
 /*
 *  Name:
-*     GetUnc
+*     GetUncFrm
 
 *  Purpose:
 *     Obtain a pointer to the uncertainty Region for a given Region.
@@ -717,10 +717,10 @@ static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
 
 *  Synopsis:
 *     #include "cmpregion.h"
-*     AstRegion *GetUnc( AstRegion *this, int ifrm ) 
+*     AstRegion *GetUncFrm( AstRegion *this, int ifrm ) 
 
 *  Class Membership:
-*     CmpRegion method (over-rides the astGetUnc method inherited from
+*     CmpRegion method (over-rides the astGetUncFrm method inherited from
 *     the Region class).
 
 *  Description:
@@ -773,23 +773,23 @@ static AstRegion *GetUnc( AstRegion *this_region, int ifrm ) {
    use it in preference to any uncertainty Region stored in the component 
    Regions. */
    if( (* parent_testunc)( this_region ) ) {
-      bunc = (* parent_getunc)( this_region, AST__BASE );
+      bunc = (* parent_getuncfrm)( this_region, AST__BASE );
 
 /* Otherwise, if the first component has a defined uncertainty, use it. The 
    current Frame in the component Region is equivalent to the base Frame in the
    parent Region structure. So we may need to map the component uncertainty 
    into the current Region of the parent is required later on. */
    } else if( astTestUnc( this->region1 ) ) {
-      bunc = astGetUnc( this->region1, AST__CURRENT );
+      bunc = astGetUncFrm( this->region1, AST__CURRENT );
 
 /* Otherwise, if the second component has a defined uncertainty, use it. */
    } else if( astTestUnc( this->region2 ) ) {
-      bunc = astGetUnc( this->region2, AST__CURRENT );
+      bunc = astGetUncFrm( this->region2, AST__CURRENT );
 
-/* Otherwise invoke the astGetUnc method inherited from the parent Region
+/* Otherwise invoke the astGetUncFrm method inherited from the parent Region
    class to create a default uncertainty region. */
    } else {
-      bunc = (* parent_getunc)( this_region, AST__BASE );
+      bunc = (* parent_getuncfrm)( this_region, AST__BASE );
    }
 
 /* The above code obtains an uncertainty Region in the base Frame of the
@@ -903,8 +903,8 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
-   parent_getunc = region->GetUnc;
-   region->GetUnc = GetUnc;
+   parent_getuncfrm = region->GetUncFrm;
+   region->GetUncFrm = GetUncFrm;
 
    parent_clearunc = region->ClearUnc;
    region->ClearUnc = ClearUnc;

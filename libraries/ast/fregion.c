@@ -20,6 +20,7 @@
 *     AST_GETREGIONFRAME
 *     AST_OVERLAP
 *     AST_SETUNC
+*     AST_GETUNC
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -91,6 +92,20 @@ F77_INTEGER_FUNCTION(ast_getregionframe)( INTEGER(THIS),
    astAt( "AST_GETREGIONFRAME", NULL, 0 );
    astWatchSTATUS(
       RESULT = astP2I( astGetRegionFrame( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_getunc)( INTEGER(THIS), 
+                                  LOGICAL(DEF), 
+                                  INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_LOGICAL(DEF)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_GETUNC", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astGetUnc( astI2P( *THIS ), F77_ISTRUE( *DEF ) ? 1 : 0 ) );
    )
    return RESULT;
 }
