@@ -45,14 +45,17 @@
 #  Constructor.
 ########################################################################
       constructor { args } {
-
          itk_component add control {
-            menubutton [ childsite ].control \
+            frame [ childsite ].control
+         }
+         itk_component add percentile {
+            menubutton $itk_component(control).percentile \
                -width 10 \
                -relief raised \
-               -menu [ childsite ].control.menu
+               -menu $itk_component(control).percentile.menu
          }
-         set menubutton $itk_component(control)
+         pack $itk_component(percentile)
+         set menubutton $itk_component(percentile)
          itk_component add menu {
             menu $menubutton.menu
          }
