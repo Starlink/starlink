@@ -19,7 +19,7 @@
 \newcommand{\stardocauthors}   {M. B. Taylor}
 \newcommand{\stardocdate}      {1 December 1998}
 \newcommand{\stardoctitle}     {SCB --- Source Code Browser}
-\newcommand{\stardocversion}   {1.0-0}
+\newcommand{\stardocversion}   {1.0-1}
 \newcommand{\stardocmanual}    {Use and installation guide}
 \newcommand{\stardocabstract}  {
 This document describes the installation and use of SCB, 
@@ -348,12 +348,11 @@ There are some environment variables which affect the
 installation, determining for instance the locations of the 
 indexes and temporary directories.  
 All default to sensible values, but if you are building the package
-you can tailor them to your requirements.
+you can tailor them to your requirements by setting them at build time.
 If you have a pre-built version of the package for your system,
-the default built values 
-(recorded in the {\tt scb\_datestamp} file)
-cannot be changed, but they can 
-be overridden if the same environment variables are set at run time.
+the default values will be as recorded in the {\tt scb\_datestamp} file,
+but they can be
+overridden by setting the same environment variables at run time.
 These variables are as follows:
 \begin{description}
 \item[SCB\_SOURCES]
@@ -380,10 +379,6 @@ If undefined at build time and run time, SCB\_BROWSER\_TMP defaults to
 The directory used by the indexer program to store temporary files. 
 If undefined at build time and run time, SCB\_INDEXER\_TMP defaults to
 {\tt /usr/tmp/scb}.
-\end{description}
-The following should also be set to locally sensible values,
-although the program will still work if they are not set properly:
-\begin{description}
 \item[HTX\_SERVER]
 The URL of an HTTP server which will provide HTX versions of the Starlink
 documents (see \xref{SUN/188}{sun188}{remote_document_servers}).
@@ -402,8 +397,8 @@ It is used for the CGI script
 to serve some non-text documents as their proper MIME types,
 but not much functionality is lost if it does not point to a suitable file.
 \end{description}
-The build-time values of all these variables will be recorded
-in the file 
+It is possible to change the defaults from the built values by
+modifying the file {\tt \$PERL\_MOD\_DIR/Scb.pm}.
 
 An example site installation from source files might go as follows:
 \begin{quote}
