@@ -47,6 +47,12 @@ SCB_BROWSER_TMP=/usr/tmp/scb
 SCB_INDEXER_TMP=/usr/tmp/scbindexer
 HTX_SERVER=http://star-www.rl.ac.uk/cgi-bin/htxserver/
 
+AC_SUBST(SCB_INDEX)
+AC_SUBST(SCB_SOURCES)
+AC_SUBST(SCB_BROWSER_TMP)
+AC_SUBST(SCB_INDEXER_TMP)
+AC_SUBST(HTX_SERVER)
+
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun225)
