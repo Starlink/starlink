@@ -54,6 +54,7 @@
       CHARACTER*(DAT__SZLOC)	TLOC			! TIES object
       CHARACTER*(DAT__SZTYP)	TYP			! Fit model spec type
 
+      INTEGER			FID			! Input file identifer
       INTEGER			FSTAT			! i/o status code
       INTEGER			ITIE			! Loop over ties
       INTEGER			NDIM			! Returned by DAT_SHAPE
@@ -65,7 +66,6 @@
 
       LOGICAL			ADD			! ADD mode?
       LOGICAL			CANCEL			! CANCEL mode?
-      LOGICAL			INPRIM			! Input primitive?
       LOGICAL			PTHERE			! TIES.PARS object exists?
       LOGICAL			SHOW			! SHOW mode?
       LOGICAL			THERE			! TIES object exists?
@@ -83,7 +83,8 @@
       CALL AST_INIT()
 
 *    Access and check fit_model object
-      CALL USI_ASSOCI( 'MODEL', 'UPDATE', FLOC, INPRIM, STATUS )
+      CALL USI_ASSOC( 'MODEL', '*', 'UPDATE', FID, STATUS )
+      CALL ADI1_GETLOC( FID, FLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       CALL DAT_TYPE(FLOC,TYP,STATUS)
       IF(TYP.NE.'FIT_MODEL')THEN
