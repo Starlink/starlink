@@ -68,7 +68,8 @@
 *        unambiguous abbreviation may be given.  TYPE is ignored when
 *        COMP = "Quality" since the QUALITY component must comprise
 *        unsigned bytes (equivalent to TYPE = "_UBYTE") to be a valid
-*        NDF. The suggested default is the current value.  ["_REAL"]
+*        NDF. The suggested default is the current value.  TYPE is only
+*        accessed when FITS is FALSE. ["_REAL"]
 
 *  Examples:
 *     ascii2ndf ngc253.dat ngc253 shape=[100,60]
