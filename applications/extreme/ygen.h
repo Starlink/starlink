@@ -44,9 +44,9 @@
 /* Name of the executable. */
       char *name;
 
-/* Offset into yylval at which the matched token itself starts (anything 
-   before this is some sort of delimiting space). */
-      int ymatchst;
+/* Start of part of yylval string which actually matches the token, rather
+   than the preceding fluff. */
+      char *ymatst;
 
 
 /*
