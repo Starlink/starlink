@@ -21,9 +21,6 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
-AC_CHECK_HEADERS(termios.h)
-AC_CHECK_HEADERS(sys/ioctl.h)
-
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    This package depends on HLP
