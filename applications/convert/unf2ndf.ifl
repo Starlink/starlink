@@ -1,0 +1,103 @@
+## UNF2NDF - Converts a Sequential unformatted file to an NDF.
+
+#+
+#  Name:
+#     UNF2NDF.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 September 18 (MJC):
+#	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface UNF2NDF
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy from the unformatted file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS header
+      type        '_LOGICAL'
+      prompt      'Read a FITS header from the unformatted file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input sequential unformatted file
+      position    1
+      type        'FILENAME'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Sequential unformatted file'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per input record
+      position    4
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per unformatted record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'UPDATE'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE          # Shape of the output NDF
+      position    6
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Shape of the output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      SKIP           # Number of records to skip
+      position    5
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of records to skip'
+      helpkey     '*'
+      default     0
+   endparameter
+
+   parameter      TYPE           # Output data type
+      position    7
+      type        'LITERAL'
+      vpath       'DYNAMIC'
+      ppath       'CURRENT,DYNAMIC'
+      default     'R'
+      prompt      'Interim data type required'
+      helpkey     '*'
+   endparameter
+
+endinterface
