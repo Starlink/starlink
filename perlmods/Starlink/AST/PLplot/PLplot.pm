@@ -1,11 +1,11 @@
-package Starlink::AST::PLPLOT;
+package Starlink::AST::PLplot;
 
 use strict;
 use vars qw/ $VERSION /;
 use constant R2D     => 57.29578;        # Radians to degrees factor
 use constant FLT_MAX => 3.40282347e+38;  # Maximum float on ix86 platform
 
-use Graphics::PLPLOT;
+use Graphics::PLplot;
 use Starlink::AST;
 use Carp;
 
@@ -13,11 +13,11 @@ use Carp;
 
 =head1 NAME
 
-Starlink::AST::PLPLOT - AST wrapper to the PLPLOT library
+Starlink::AST::PLplot - AST wrapper to the PLplot library
 
 =head1 SYNOPSIS
 
-   use Starlink::AST::PLPLOT
+   use Starlink::AST::PLplot
 
 The main methods which need to be registered with the AST package
 are shown below,
@@ -34,10 +34,7 @@ are shown below,
 =head1 DESCRIPTION
 
 This file implements the low level graphics functions required by the rest
-of AST, by calling suitable PLPLOT functions.
-
-This file can be used as a template for the development of similar modules
-to support alternative graphics systems.
+of AST, by calling suitable PLplot functions.
 
 =head1 NOTES
 
@@ -139,7 +136,7 @@ top on the screen.
 sub _GText {
   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
 
-  warn "_GText: not yet implemented for PLPLOT\n";
+  warn "_GText: not yet implemented for PLplot\n";
   return 0;
 }
 
@@ -223,7 +220,7 @@ Notes:
 sub _GTxExt {
   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
 
-  warn "_GTxExt: not yet implemented for PLPLOT\n";
+  warn "_GTxExt: not yet implemented for PLplot\n";
   return 0;
 }
 
@@ -243,7 +240,7 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-  warn "_GQch: not yet implemented for PLPLOT\n";
+  warn "_GQch: not yet implemented for PLplot\n";
   return 0;
 }
 
@@ -284,7 +281,7 @@ sub _GAttr {
   my $value = shift;
   my $prim = shift;
 
-  warn "_GAttr: not yet implemented for PLPLOT\n";
+  warn "_GAttr: not yet implemented for PLplot\n";
   return 0;
 }
 
@@ -337,7 +334,7 @@ sub _GCap {
   my $cap = shift;
   my $value = shift;
 
-  warn "_GCap: not yet implemented in PLPLOT\n";
+  warn "_GCap: not yet implemented in PLplot\n";
   return 0;
 }
 
@@ -345,7 +342,7 @@ sub _GCap {
 # Internal error setting routine
 sub ReportGrfError {
   my $text = shift;
-  warn "Generated AST error in perl PLPLOT callback: $text\n";
+  warn "Generated AST error in perl PLplot callback: $text\n";
   Starlink::AST::_Error( &Starlink::AST::Status::AST__GRFER(), $text);
 }
 
