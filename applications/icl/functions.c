@@ -431,7 +431,7 @@ func_dec2s(void)
     if (isexc(val = interpret_to_real(arg1)))
 	return val;
     secs = 360 * 3600 * real_part(val) / (2 * M_PI);
-    sign = ( real_part(val) > 0 ? '+' : '-' );
+    sign = ( real_part(val) < 0 ? '-' : '+' );
     if (isexc(val = interpret_to_integer(arg2)))
 	return val;
     ndp = integer_part(val);
@@ -465,14 +465,13 @@ func_dec2s(void)
   	    ++deg;
         }
     }
-    deg =  ( deg < 0 ? (-1*deg) : deg);
     if (deg > 99)
 	sprintf(res, "%c%03d%c%02d%c%0*.*f",
-		sign,deg, sep, min, sep,
+		sign,abs(deg), sep, min, sep,
 		(ndp ? ndp + 3 : 2), ndp, secs);
     else
 	sprintf(res, "%c%02d%c%02d%c%0*.*f",
-		sign, deg, sep, min, sep, (ndp ? ndp + 3 : 2), ndp, secs);
+		sign, abs(deg), sep, min, sep, (ndp ? ndp + 3 : 2), ndp, secs);
     return value_string(res);
 }
 
