@@ -3,8 +3,9 @@
 #
 # $Id$
 
-sgmllib.sgml: img-eqlist.pl.sgml
+SCRIPTS=img-eqlist.pl
 
-%.sgml: %
-	sed -f script2sgml.sed $< > $@
+libdocs.sgml: $(SCRIPTS)
+	cp libdocs.head $@
+	for f in $(SCRIPTS); do sed -f script2sgml.sed $$f >> $@; done
 
