@@ -243,7 +243,7 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
 #endif	/* ! (HAVE_MMAP && HAVE_SYS_STAT_H) */
 
 	buflen_ = S.st_size;
-	buf_ = static_cast<Byte*>(mmap(0, buflen_,
+	buf_ = reinterpret_cast<Byte*>(mmap(0, buflen_,
                                        PROT_READ, MAP_SHARED,
                                        fd_, 0));
 	if (buf_ == MAP_FAILED) {
@@ -664,7 +664,7 @@ void InputByteStream::close(void)
 	    cerr << "InputByteStream::close: -- odd, already deallocated"
 		 << endl;
 	else {
-	    if (munmap(static_cast<void*>(buf_), buflen_) == -1) {
+	    if (munmap(reinterpret_cast<MMAP_TYPE>(buf_), buflen_) == -1) {
 		string errstr = strerror(errno);
 		cerr << "InputByteStream: close: can't unmap file: "
 		     << errstr << endl;
