@@ -1,0 +1,81 @@
+\newpage
+\sstroutine{
+   IRAF2NDF
+}{
+   Converts an IRAF image to an NDF
+}{
+   \sstdescription{
+      This application converts an IRAF image to an NDF.
+      See the Notes for details of the conversion.
+   }
+   \sstusage{
+      iraf2ndf in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The name of the IRAF image.  Note that this excludes the extension.
+      }
+      \sstsubsection{
+         OUT = NDF (Write).
+      }{
+         The name of the NDF to be produced.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         iraf2ndf ell\_galaxy new\_galaxy
+      }{
+         Converts the IRAF image ell\_galaxy (comprising files
+         ell\_galaxy.imh and ell\_galaxy.hdr) to an NDF called new\_galaxy.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied from the {\tt "}.pix{\tt "} file.
+
+         \sstitem
+         The title of the IRAF image (object i\_title in the {\tt "}.imh{\tt "}
+         header file) becomes the NDF title.
+
+         \sstitem
+         Lines from the IRAF image header file are transferred to the
+         FITS extension of the NDF, any compulsory FITS keywords that are
+         missing are added.
+
+         \sstitem
+         If there is a FITS extension in the NDF, then the elements up
+         to the first END keyword of this are added to the `user area' of
+         the IRAF header file.
+
+         \sstitem
+         Lines from the HISTORY section of the IRAF image are also
+         extracted and added to the NDF's FITS extension as FITS HISTORY
+         lines.  Two extra HISTORY lines are added to record the original
+         name of the image and the date of the format conversion.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      NDF2IRAF
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Only handles one-, two-, and three-dimensional IRAF files.
+
+         \sstitem
+         The NDF produced has type \_WORD or \_REAL corresponding to the
+         type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
+         library only supports these data types: signed words and real.)
+         The pixel type of the image can be changed from within IRAF using
+         the {\bf chpixtype} task in the {\bf images} package.
+      }
+   }
+}
