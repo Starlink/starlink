@@ -9,9 +9,11 @@
 <!ELEMENT dtddescription - O (dtdsummary,(element+))>
 <!ELEMENT element - O (p+, attribute*)>
 <!ELEMENT attribute - O (p+)>
-<!ELEMENT p - O (#PCDATA | elemref | example | code | em)+>
+<!ELEMENT p O O (#PCDATA | elemref | example | code | em | url | webref)+>
 <!ELEMENT elemref - O EMPTY>
 <!ELEMENT (example|code|em) - - (#PCDATA)>
+<!ELEMENT webref - - (#PCDATA)>
+<!ELEMENT url - - (#PCDATA)>
 
 <!-- The output of script dtd2sgml.pl consists of a representation of
      a DTD's structure, marked up using the following elements.  That
@@ -54,6 +56,12 @@
 			   element we're documenting.  Format the element name
 			   as usual, but don't include any sort of link. --
 		(self)	#IMPLIED
+	>
+
+<!ATTLIST webref
+	url		-- URL this element refers to --
+		CDATA
+		#REQUIRED
 	>
 
 <!-- dtdsummary element attributes -->
