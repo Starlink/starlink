@@ -123,4 +123,3 @@
       done 2>>$warnfile
       echo "Non-conforming summary files logged in $warnfile."
 
-# $Id$
