@@ -854,64 +854,6 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
-\subsection{Release - 2.5}
-  This release (which was only available from the Starlink Software
-  Store) includes two new toolboxes, various significant improvements
-  and some bug fixes. 
-
-  The first new toolbox provides the long awaited ability to identify
-  and record image positions interactively. It also allows the import
-  of coordinates stored in text files (of various formats) and their
-  transformation to the celestial coordinate system of the displayed
-  image (for instance this allows you to read FK4 positions and
-  correctly position these over an image with an FK5 astrometry). Each
-  position can also be labelled and cumulative image properties
-  (including seeing) are calculated.
-
-  The second toolbox displays the mean X and Y profiles of a
-  rectangular region. If the rectangle is moved the profiles will
-  update in real time. This is useful for detecting background trends
-  and binning up linear features.
-
-  A further major change is the addition of support for displaying
-  multiple extension FITS files (MEFs). It is now possible to examine
-  images and catalogues stored in these files. A similar feature has
-  also been introduced for NDFs that are stored in the same container
-  file.
-
-  Additional minor changes are:
-  \begin{itemize}
-
-    \item The SExtractor toolbox has been updated to work with the
-    latest version of EXTRACTOR and SExtractor (see
-    \xref{SUN/226}{sun226}{}).
-
-    \item The SExtractor toolbox no longer requires that you press
-    \mytt{<Return>} to update any text fields (this seemed to cause a
-    lot of confusion).
-
-    \item A new command-line option \mytt{-quiet\_exit} has been
-    introduced. This can make GAIA ask before exiting the main
-    window. The default remains to not ask.
-
-    \item The file selection dialog now attempts to preserve the last
-    filter pattern.
-
-    \item GAIA should now work correctly with X servers whose default
-    visual doesn't match the requested visual.
-
-    \item A bug in the aperture photometry toolbox that caused some
-    detached sky regions to randomly move has been fixed.
-
-    \item Catalogue windows now have the option to interpret X and Y
-    coordinates as \xref{NDF}{sun33}{} \xref{pixel
-    coordinates}{sun95}{se_pixgrd} (useful for plotting
-    \xref{POLPACK}{sun223}{} results).
-
-    \item The precision shown for the RA and DEC fields in the main
-    window has been restored to show 0.1 arcsec resolution.
-  \end{itemize}
-
 \subsection{Release - 2.6} 
   Release 2.6 includes a new toolbox and various enhancements.
 
@@ -1017,7 +959,7 @@ to read about ``SkyCat plugins''.
        especially at low resolutions.
 \end{itemize}
 
-\subsection{This release - 2.6-9}
+\subsection{Release 2.6-9}
 
 This release contains a few updates. 
 \begin{itemize}
@@ -1041,9 +983,34 @@ This release contains a few updates.
    \item The image print window has been modified to swap the page width
      and length values when changing between landscape and portrait
      formats. This should make better use of the full page by default.
-
-
 \end{itemize}
+
+\subsection{This release - 2.6-10}
+
+New to this release:
+\begin{itemize}
+
+    \item When North and East are interchanged the \mytt{Show all
+    coordinates} toolbox displayed the wrong coordinates in the left
+    and right columns, and incorrectly formatted RA as DD:MM:SS and
+    Dec as HH:MM:SS. These problems are now fixed.
+
+    \item The direction arrows shown in the pan window could be
+    displayed at the wrong size, again when North and East where
+    interchanged. This problem is now fixed.
+   
+    \item The command-line options of GAIA can now be configured using
+    the new \mytt{File->Startup options} window. The set of options
+    selected are used whenever GAIA starts up (this removes the
+    tedious need to either specify these on the command-line, or add
+    them to your X resources).
+
+    \item A new configuration option \mytt{-extended\_precision} has
+    been added. This makes GAIA work at approximately milli-arcsecond
+    resolution. This option can be switched on using the new
+    \mytt{File->Startup options} window.
+\end{itemize}
+
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 
