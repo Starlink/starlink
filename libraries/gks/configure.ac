@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-dnl    Note that for GKS the RAL version number if 1.37 but
+dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
 AC_INIT(gks, 1.37-1, ussc@star.rl.ac.uk)
@@ -25,12 +25,11 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
-dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf gwm])
-STAR_DECLARE_DEPENDENCIES(link,  [gwm ems])
+STAR_DECLARE_DEPENDENCIES(link,  [ems gwm starx])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
