@@ -11,7 +11,7 @@
 
     PARAMETER SELAX
        POSITION 2
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        VPATH 'PROMPT'
        PROMPT 'Axis numbers to flip - separate by spaces'
        HELP 'The direction of these axes will reversed. eg. 1 3'
