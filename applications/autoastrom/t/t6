@@ -26,7 +26,7 @@ my $pfits;
 	    'ra' => '12:0:0',
 	    'dec' => '90',	# should make LONPOLE 0
 	    'scale' => 2,
-	    'pa' => 45,
+	    'angle' => 45,
 	    'invert' => 0,	# keyword present with default value
 	   },
 	   {
@@ -34,14 +34,14 @@ my $pfits;
 	    'dec' => '-12:0:0',
 	    'scale' => 0.5,
 	    'invert' => 1,	# L-H coordinate system
-	    'pa' => '270'	# large rotation
+	    'angle' => '270'	# large rotation
 	   },
 	   {
 	    'ra' => '17:27:10.94',
 	    'dec' => '74:31:58.00',
 	    'scale' => 0.33,
 	    'invert' => 1,
-	    'pa' => 88.7,
+	    'angle' => 88.7,
 	   },
 	   {
 	    'ra' => 210,

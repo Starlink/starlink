@@ -22,7 +22,7 @@ EQUINOX = '2000.0'
 END     
 
 
-dec=90  invert=0  pa=45  ra=12:0:0  scale=2  ...
+angle=45  dec=90  invert=0  ra=12:0:0  scale=2  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -30,7 +30,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =             0.000000
-COMMENT   dec=90 invert=0 pa=45 ra=12:0:0 scale=2
+COMMENT   angle=45 dec=90 invert=0 ra=12:0:0 scale=2
 CRVAL1  =           180.000000 / RA    12 00 00.000
 CRVAL2  =            90.000000 / Dec   90 00 00.000
 CUNIT1  = 'deg       '
@@ -46,7 +46,7 @@ EQUINOX = '2000.0'
 END     
 
 
-dec=-12:0:0  invert=1  pa=270  ra=12:0:0  scale=0.5  ...
+angle=270  dec=-12:0:0  invert=1  ra=12:0:0  scale=0.5  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -54,7 +54,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =           180.000000
-COMMENT   dec=-12:0:0 invert=1 pa=270 ra=12:0:0 scale=0.5
+COMMENT   angle=270 dec=-12:0:0 invert=1 ra=12:0:0 scale=0.5
 CRVAL1  =           180.000000 / RA    12 00 00.000
 CRVAL2  =           -12.000000 / Dec   -12 00 00.000
 CUNIT1  = 'deg       '
@@ -70,7 +70,7 @@ EQUINOX = '2000.0'
 END     
 
 
-dec=74:31:58.00  invert=1  pa=88.7  ra=17:27:10.94  scale=0.33  ...
+angle=88.7  dec=74:31:58.00  invert=1  ra=17:27:10.94  scale=0.33  ...
 SIMPLE  =                    T
 BITPIX  =                    8
 NAXIS   =                    0
@@ -78,7 +78,7 @@ CTYPE1  = 'RA---AZP  '
 CTYPE2  = 'DEC--AZP  '
 PV2_1   =             0.000000
 LONPOLE =           180.000000
-COMMENT   dec=74:31:58.00 invert=1 pa=88.7 ra=17:27:10.94 scale=0.33
+COMMENT   angle=88.7 dec=74:31:58.00 invert=1 ra=17:27:10.94 scale=0.33
 CRVAL1  =           261.795583 / RA    17 27 10.940
 CRVAL2  =            74.532778 / Dec   74 31 58.000
 CUNIT1  = 'deg       '
