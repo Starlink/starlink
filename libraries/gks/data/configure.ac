@@ -15,12 +15,16 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+
 dnl    Find required versions of the programs we need for configuration
 dnl AC_PROG_CC
 dnl AC_PROG_FC
 dnl AC_PROG_LIBTOOL
+AC_PROG_MAKE_SET
 
-AC_CONFIG_SUBDIRS( [emf fonts wdts] )
+AC_CONFIG_SUBDIRS( emf fonts wdts )
+
+AC_CONFIG_FILES(Makefile)
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
