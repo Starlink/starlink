@@ -59,6 +59,12 @@ AC_SUBST(STARLINK)
 # we prefer the FC macros to the F77 ones, and have modified automake
 # to generate these.  However, we maintain FFLAGS also, so that we
 # allow both.
+if test "$STARLINK" != "!!STARCONF_DEFAULT_PREFIX!!"; then
+    FCFLAGS="$FCFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+    FFLAGS="$FFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+    CFLAGS="$CFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
+    LDFLAGS="$LDFLAGS -L!!STARCONF_DEFAULT_PREFIX!!/lib"
+fi
 FCFLAGS="$FCFLAGS -I$STARLINK/include"
 FFLAGS="$FFLAGS -I$STARLINK/include"
 CFLAGS="$CFLAGS -I$STARLINK/include"
