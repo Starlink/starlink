@@ -25,6 +25,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.1  2004/07/14 20:07:21  timj
+*     first attempt at autoconf
+*
 *     Revision 1.8  2003/04/01 01:10:17  timj
 *     Increase the max number of FITS headers to allow for the increased
 *     number of maps in REBIN.

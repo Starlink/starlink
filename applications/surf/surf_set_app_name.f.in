@@ -37,6 +37,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  2004/07/14 20:07:20  timj
+*     first attempt at autoconf
+*
 *     Revision 1.1  2004/07/14 19:24:48  timj
 *     after substitution file should be .f not .fpp
 *
@@ -55,12 +58,8 @@
 *
 
 *  Notes:
-*     - This routine should be compiled using the C pre-processor
-*       with a define for the PKG_VERS cpp variable. This variable
-*       should include the required quotes (since CPP will not change
-*       quoted strings). An example could be:
-*                 f77 -DPKG_VERS="'5.2-4'" surf_set_app_name.F
-*       The V is prepended automatically.
+*     - This routine is generated from surf_set_app_name.f.in by
+*       the configure step.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -87,7 +86,7 @@
 
 *  Local Constants:
       CHARACTER * (10) VERSION         ! Version number of monolith
-      PARAMETER ( VERSION = PKG_VERS ) ! PKG_VERS replaced by CPP
+      PARAMETER ( VERSION = '@PACKAGE_VERSION@' ) ! Version inserted by autoconf
 
 *  Local Variables:
       INTEGER I                 ! Loop counter

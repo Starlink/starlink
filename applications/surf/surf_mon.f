@@ -36,6 +36,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.1  2004/07/14 20:07:20  timj
+*     first attempt at autoconf
+*
 *     Revision 1.34  2000/06/16 01:23:15  timj
 *     Add scuclkerr
 *
