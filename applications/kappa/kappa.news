@@ -1,13 +1,24 @@
 1 KAPPA_Version_0.18
 
-   A new release of KAPPA (V.18) has been made. The changes are
-   described fully in sun95.
+   A new release of KAPPA (V0.18-4) has been made. The changes are
+   described fully in sun95. The following is a summary of the main
+   changes since the last Starlink CD (V0.14-5):
 
-   - The following new commands have been added: ARDPLOT
+   - The following new commands have been added: ARDPLOT, COLLAPSE,
+   LUTWARM, OUTLINE, PERMAXES.
 
-   - The following commands have been converted to use the WCS component
-   of the NDF structure (COSYS parameters have been removed from these
-   commands): ARDMASK
+   - New features have been added and major changes made to the following 
+   commands to enable them to make full use of WCS information, the NDF 
+   structure, or to use PGPLOT for graphics. These changes may potentially 
+   require changes to any scripts, etc, which use these commands. See the 
+   "Release Notes" section SUN/95 for details: ARDGEN, ARDMASK, CREFRAME,
+   GDSTATE, GLITCH, HISTAT, IDSTATE, PICIN, PICCUR, PICTRANS, SEGMENT,
+   ZAPLIN.
+
+   - More minor changes, such as new features, etc, have been made to the 
+   following commands (existing scripts should not require any changes):
+   COMPAVE, COMPADD, CONTOUR, ELPROF, FITSIN, FITSDIN, GAUSMOOTH, HISTOGRAM,
+   LOOK, NDFCOPY, PSF, SETAXIS, SURFIT, THRESH, WCSALIGN.
 
    - The following obsolete commands have been removed from KAPPA -
    alternatives are indicate in SUN/95:
@@ -18,32 +29,8 @@
    KAPRH in order to satisfy any occasional need that may occur for them
    (see SUN/239):
 
-   - The ARDGEN command has been re-written to use the PGPLOT graphics library.
-   A new parameter called STYLE has been added, and the PALNUM and POICOL 
-   parameters have been removed. Three new options have been added for 
-   parameter OPTION: "Undo", "Draw", and "Style".
-
-   - A bug has been fixed in COLLAPSE which caused unnecessary memory to be
-   allocated when ESTIMATOR=MEAN, resulting in an error if insufficient
-   memory was available.
-
-   - Various parameters have been removed from PICCUR. It should no longer 
-   be used to obtain co-ordinates from a graphics device. CURSOR should be 
-   used for this purpose. The sole purpose of PICCUR is now to allow a
-   new current picture to be selected using a cursor. 
-
-   - The PICIN and PICTRANS have been modified to use any WCS information
-   associated with graphics pictures. Various parameters have been changed,
-   removed or added.
-
-   - The PSF command now has a parameter PROFOUT which allows the
-   displayed profile to be saved in a 1-dimensional NDF.
-
-   - The SETAXIS command will now create AXIS arrays by copying values
-   from the corresponding axis of the current Frame in the WCS component
-   of the NDF.
-
-   - The WCSALIGN command can now be used with 1-dimensonal NDFs.
+   - Bugs have been fixed in the following commands: COLLAPSE, FILLBAD,
+   FITSEDIT, NORMALIZE, THRESH, WCSATTRIB.
 
    - Many of the internal subroutines used within KAPPA are of potential
    use to people developing their own applications. To make it easier for
