@@ -705,7 +705,11 @@
       IF ( WOK ) THEN
 
 *    Establish direction
-        DIR = (CEN(N)-CEN(1))/ABS(CEN(N)-CEN(1))
+        IF ( N .EQ. 1 ) THEN
+          DIR = 1.0
+        ELSE
+          DIR = (CEN(N)-CEN(1))/ABS(CEN(N)-CEN(1))
+        END IF
 
         DO I = 1, N
           HWID = WID(I)*DIR/2.0
