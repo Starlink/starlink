@@ -13,8 +13,8 @@
 *     CALL GCB_FLOAD( FID, STATUS )
 
 *  Description:
-*     Loads Grafix Control Block from file object. Currently just calls the
-*     HDS version.
+*     Loads Grafix Control Block from file object specified by FID. This is
+*     done by invoking the LoadGCB method on that argument.
 
 *  Arguments:
 *     FID = INTEGER (given)
@@ -82,7 +82,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+
+*  Global Variables:
+      INCLUDE 'GCB_CMN'                                 ! GCB globals
+*        G_MTHINIT = LOGICAL (given and returned)
+*           GCB definitions load attempted?
 
 *  Arguments Given:
       INTEGER			FID			! File object id
@@ -91,15 +95,17 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! HDS file handle
+      INTEGER			RESID			! Ignored return data
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator and call HDS routine
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
-      CALL GCB_LOAD( LOC, STATUS )
+*  Check initialised
+      IF ( .NOT. G_MTHINIT ) CALL GCB0_INIT( STATUS )
+
+*  Simply invoke the method
+      CALL ADI_EXEC( 'LoadGCB', 1, FID, RESID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB_FLOAD', STATUS )

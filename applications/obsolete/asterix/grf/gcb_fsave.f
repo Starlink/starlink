@@ -7,14 +7,14 @@
 *     Saves Grafix Control Block to file object
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL GCB_FSAVE( FID, STATUS )
 
 *  Description:
-*     Saves Grafix Control Block to file object. Currently just calls the
-*     HDS version.
+*     Saves Grafix Control Block to file object by invoking the SaveGCB
+*     method in the FID argument.
 
 *  Arguments:
 *     FID = INTEGER (given)
@@ -54,20 +54,14 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     GCB Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gcb.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:gcb, usage:public
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
@@ -88,7 +82,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+
+  Global Variables:
+      INCLUDE 'GCB_CMN'                                 ! GCB globals
+*        G_MTHINIT = LOGICAL (given and returned)
+*           GCB definitions load attempted?
 
 *  Arguments Given:
       INTEGER			FID			! File object id
@@ -97,15 +95,17 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! HDS file handle
+      INTEGER                   RESID                   ! Ignored return data
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator and call HDS routine
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
-      CALL GCB_SAVE( LOC, STATUS )
+*  Check initialised
+      IF ( .NOT. G_MTHINIT ) CALL GCB0_INIT( STATUS )
+
+*  Simply invoke the method
+      CALL ADI_EXEC( 'SaveGCB', 1, FID, RESID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB_FSAVE', STATUS )
