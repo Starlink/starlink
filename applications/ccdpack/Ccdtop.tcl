@@ -170,7 +170,7 @@ class Ccdtop {
          lappend controls $widget
          pack $widget \
             -side left \
-            -padx 2 -pady 2 -fill y \
+            -padx 2 -pady 2 -fill both -expand 1 \
             -in [ $groups($grpname) childsite ]
       }
 
@@ -271,13 +271,18 @@ class Ccdtop {
       public method geomset { } {
 #-----------------------------------------------------------------------
 
+#  Only proceed if we have not done this already.
+         if { [ wm minsize $itk_interior ] == {1 1} } {
+
 #  Arrange for geometry constraints to be met.
-         set wnow [ winfo reqwidth $itk_component(panel) ]
-         set hnow [ winfo reqheight $itk_interior ]
-         wm minsize $itk_interior $wnow [ min $hnow $wnow ]
+            set wnow [ winfo width $itk_component(panel) ]
+            set hnow [ winfo height $itk_interior ]
+            wm minsize $itk_interior [ max 2 $wnow ] \
+                                     [ max 2 [ min $hnow $wnow ] ]
 
 #  Set binding to handle window resize events.
-         bind $itk_interior <Configure> [ code $this winch ]
+            bind $itk_interior <Configure> [ code $this winch ]
+         }
       }
 
 
