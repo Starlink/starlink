@@ -119,8 +119,10 @@ and stdout, and ignores normal files.
 
 C routine modifications:
 
-  gktsest.c     - rewritten for autoconf. Supports both the
+  gktset.c     - rewritten for autoconf. Supports both the
                   termio and sgtty approach.
+
+  gkgtsp.c      - rewritten for autoconf similarly to gktset.c
 
 Include files
 =============

@@ -88,4 +88,4 @@ FPP_ROUTINES = gkdate.fpp gkdfop.fpp gkiobi.fpp gkiobo.fpp \
 	gkioci.fpp gkioco.fpp gkiofo.fpp gklor.fpp gkland.fpp \
 	gktime.fpp getfd.fpp
 
-C_ROUTINES = gktset.c
+C_ROUTINES = gktset.c gkgtsp.c
