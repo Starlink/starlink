@@ -234,7 +234,7 @@ if any fonts were missing.
 formatting descriptor, which will be replaced in output filenames
 with the page number.  This can be overridden on a per-page basis by
 a &tex; <code/\special> embedded in the DVI file (see <ref
-id=usage.special.opf/>).  If there is no 
+id=usage.special.opf/> in <ref id=usage.special/>).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 
@@ -910,7 +910,7 @@ and build it as usual, ignoring the warnings about the missing main
 <p>Bugs:
 <ul>
 <li>There are way too many options.  I'd better switch to using 
-<code/getopts/ as soon as I get the chance.
+<code/getopts> as soon as I get the chance.
 
 </ul>
 
