@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libkpg.la libkpgtk.la libkpg_adam.la
+lib_LTLIBRARIES = libkpg.la libkpg_adam.la
 
 libkpg_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -12,7 +12,6 @@ libkpg_la_SOURCES = \
 libkpg_adam_la_SOURCES = \
 	$(ADAM_F_ROUTINES)
 
-libkpgtk_la_SOURCES = $(TK_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
@@ -22,8 +21,6 @@ BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c
-
-TK_ROUTINES = kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
@@ -642,4 +639,4 @@ KPG_ADAM_N_GEN = kpg1_dara.gn
 	$(GENERIC) $(<)
 
 
-AM_FCFLAGS = -I../ira @TCL_CFLAGS@ @TK_CFLAGS@
+AM_FCFLAGS = -I../ira 
