@@ -31,6 +31,8 @@ sub get_temp_files ();
 my $noregenerate = 0;
 my @tempfiles = ();
 
+# Useful values
+my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 
 sub extract_objects ($$$$) {
     my ($extractor, $ndfname, $maxobj, $tempdir) = @_;
@@ -601,17 +603,19 @@ sub generate_astrom ($$$$\@$$$) {
     $pcy = ($ndfbound[1] + $ndfbound[3])/2.0;
     if (defined($bestastrometry)) {
 	# Do the calculation by getting the plate centre in pixels,
-	# and converting this to SKY coordinates using ATOOLS/asttran2
+	# and converting this to SKY coordinates using ATOOLS/asttrann
 	my @row = ($pcx, $pcy);
 	my @dat = (\@row);
 	my $inndfname = twodarray2ndf (@dat, "$tempfn-coordtrans");
 	my $outndfname = "$inndfname-out";
-	my $status = $ATOOLS->obeyw("asttran2", "frameset=$bestastrometry incoord=$inndfname outcoord=$outndfname tosky=true degrees=true");
+	my $status = $ATOOLS->obeyw("asttrann", "mapping=$bestastrometry incoord=$inndfname outcoord=$outndfname forward=true");
 	($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-	  || carp "generate_astrom: error running asttran2";
+	  || carp "generate_astrom: error running asttrann";
 	push (@tempfiles, ("$outndfname.sdf", "$inndfname.sdf"));
 	my $skyd = ndf2twodarray ($outndfname);
 	@platecentre = @{$skyd->[0]};
+	$platecentre[0] *= $d2r;
+	$platecentre[1] *= $d2r;
 	print STDERR "Plate centre: ($pcx,$pcy)->($bestastrometry)->($platecentre[0],$platecentre[1])\n";
     } else {
 	# Apply the offset obtained from the last step.  The offset is
@@ -632,7 +636,7 @@ sub generate_astrom ($$$$\@$$$) {
 	print STDERR "Plate centre: offset ($xoffset,$yoffset): ($pcx,$pcy)->($platecentre[0],$platecentre[1])\n";
     }
     
-    printf ASTROMOUT "%s   %s   J2000  %s\n",
+    printf ASTROMOUT "%s   %s   J2000  %s  * Plate centre\n",
         dmshms ($platecentre[0], 1),
         dmshms ($platecentre[1], 0),
         $NDFinforef->[0];
@@ -707,6 +711,8 @@ sub run_astrom ($$) {
 	};
     }
     close (SUM);
+
+    @ret || print STDERR "run_astrom: no return values! Either astrom failed, or the log file was incomplete\n";
 
     return @ret;
 }
