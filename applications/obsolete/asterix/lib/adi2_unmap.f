@@ -70,11 +70,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*     10 Apr 1997 (RB):
+*        Alter to reflect changes in STOMAP
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,7 +98,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*2		FORM			! Object form
+      CHARACTER*3		FORM			! Object form
       CHARACTER*6		MODE			! Access mode
       CHARACTER*8		TYPE			! Mapping type
 
@@ -113,7 +116,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get the kind of object mapped
-      CALL ADI_CGET0C( PSID, 'Form', FORM, STATUS )
+      CALL ADI_CGET0C( PSID, 'MapSystem', FORM, STATUS )
 
 *  Extract pointer and mode
       CALL ADI_CGET0C( PSID, 'Mode', MODE, STATUS )
