@@ -392,7 +392,7 @@
      :                       'Normalization plot', 'XDATA', 'YDATA', 3, 
      :                       .TRUE., VAL__BADR, VAL__BADR, VAL__BADR,
      :                       VAL__BADR, 'KAPPA_NORMALIZE', .TRUE., 
-     :                       IPLOT, STATUS )
+     :                       .FALSE., IPLOT, STATUS )
 
 *  If a Plot was produced, we need to draw the best fitting straight line
 *  over it.
@@ -414,7 +414,7 @@
 
 *  Annul the Plot, and shut down the graphics workstation and database.
                CALL AST_ANNUL( IPLOT, STATUS )
-               CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+               CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
             END IF
 

@@ -1,294 +1,240 @@
-*+  EXPON - Takes the exponential of each pixel of a data array
-*           (specified base)
+      SUBROUTINE EXPON( STATUS )
+*+
+*  Name:
+*     EXPON
 
-      SUBROUTINE EXPON ( STATUS )
-*
-*    Description :
-*
-*     This routine takes the exponential to an input base of each pixel 
-*     of a data array. The result goes into a new output data array.
-*     Both data arrays are stored in the IMAGE format.
-*
-*     The magic-value method is used for processing bad data.
-*
-*    Invocation :
-*
+*  Purpose:
+*     Takes the exponential (specified base) of an NDF data structure.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL EXPON( STATUS )
-*
-*    Parameters :
-*
-*     INPIC  =  IMAGE( READ )
-*         Input IMAGE structure containing the data array
-*     BASE  =  REAL( READ )
-*         Base of exponential to be taken of each input data array pixel
-*     OUTPIC  =  IMAGE( WRITE )
-*         Output IMAGE structure holding result of exponentiated array 
-*     OTITLE  =  CHAR( READ )
-*         Title string for the output IMAGE structure
-*
-*    Arguments:
-*
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Get locator for input structure
-*     If no error then
-*        Determine shape of input structure's data array
-*        Map data-array component
-*        If no error then
-*           Get base of the exponential to be used
-*           If no error then
-*              Create output IMAGE structure
-*              Propagate NDF QUALITY and MORE from the input data file
-*              If no error then
-*                 Map a new data-array component in output
-*                 If no error then
-*                    Call subroutine to take exponential of array,
-*                      results going into output array
-*                    Unmap output data array
-*                 Else
-*                    Report error
-*                 Endif
-*                 Annul output IMAGE structure
-*              Else
-*                 Report error
-*              Endif
-*           Else
-*              Report error
-*           Endif
-*           Unmap input data array
-*        Else
-*           Report error
-*        Endif
-*        Annul input IMAGE structure
-*     Else
-*        Report error
-*     Endif
-*     End
-*
-*    Bugs :
-*
-*     None known.
-*
-*    Authors :
-*
-*     Mark McCaughrean UoE ( REVA::MJM )
-*     Malcolm Currie RAL ( UK.AC.RL.STAR::CUR )
-*
-*    History :
-*
-*     02-07-1986 : First implementation (REVA::MJM)
-*     1986 Aug 6 : Renamed algorithm subroutine (EXPARR), changed new
-*                  2nd argument to total number of pixels (RAL::CUR).
-*     1986 Aug 28: Added argument section, generalised to vectors and
-*                  tidied (RAL::CUR).
-*     1987 Oct 15: Reordered tidying and used CMP_SHAPE (RAL::CUR)
-*     1988 Mar 17: Referred to `array' rather than `image'
-*                  (RAL::CUR)
-*     1988 May 30: More reporting of error context (RAL::CUR)
-*     1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-*     1991 Oct 25: Propagates AXIS, LABEL, and HISTORY (RAL::CUR).
-*     1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*
-*    Type definitions :
 
-      IMPLICIT  NONE           ! no default typing allowed
+*  Description:
+*     This routine takes the exponential to a specified base of each
+*     pixel of a NDF to produce a new NDF data structure.
 
-*    Global constants :
+*  Usage:
+*     expon in out base
 
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
+*  ADAM Parameters:
+*     BASE = LITERAL (Read)
+*        The base of the exponential to be applied.  A special value
+*        "Natural" gives natural (base-e) exponentiation.
+*     IN = NDF (Read)
+*        Input NDF data structure.
+*     OUT = NDF (Write)
+*        Output NDF data structure being the exponential of the input
+*        NDF.
+*     TITLE = LITERAL (Read)
+*        Value for the title of the output NDF.  A null value will cause
+*        the title of the NDF supplied for parameter IN to be used
+*        instead. [!]
 
-*    Status :
+*  Examples:
+*     expon a b 10
+*        This takes exponentials to base ten of the pixels in the NDF
+*        called a, to make the NDF called b.  NDF b inherits its title
+*        from a.
+*     expon base=8 title="HD123456" out=b in=a
+*        This takes exponential to base eight of the pixels in the NDF
+*        called a, to make the NDF called b.  NDF b has the title
+*        "HD123456".
 
-      INTEGER  STATUS
+*  Related Applications:
+*     KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPE, POW; Figaro: IALOG, ILOG,
+*     IPOWER.
 
-*    Local Constants :
+*  Implementation Status:
+*     -  This routine correctly processes the AXIS, DATA, QUALITY,
+*     LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of an
+*     NDF data structure and propagates all extensions.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
+*     -  All non-complex numeric data types can be handled.
 
-      INTEGER
-     :    MXDIMS               ! maximum dimensionality of input arrays
-      PARAMETER( MXDIMS = DAT__MXDIM )
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
-      REAL
-     :    MXBASE,              ! maximum base allowed in exponentiation
-     :    MNBASE               ! minimum   "     "     "       "   
-      PARAMETER( MXBASE  =  1000 )
-      PARAMETER( MNBASE  =  0.001 )
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-*    Local variables :
+*  History:
+*     1997 November 5 (MJC):
+*        Original NDF version.
+*     1-OCT-1999 (DSB):
+*        Changed to use LPG.
+*     {enter_changes_here}
 
-      INTEGER
-     :  IDIMS( MXDIMS ),       ! dimensions of input array
-     :  DIMTOT,                ! number of pixels in input array
-     :  NDIMS,                 ! number of dimensions of input array
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI,                 ! pointer to input data
-     :  PNTRO                  !    "     " output data
-
-      REAL
-     :  BASE                   ! base of exponential to be taken of
-                               ! each pixel of input array
-
-      CHARACTER*(DAT__SZLOC)   ! locators for :
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCDO,                 ! structure containing the output data
-                               ! array
-     :  LOCI,                  ! input data structure
-     :  LOCO                   ! output data structure
-
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI,                ! Name of the input data-array component
-     :  DNAMEO                 ! Name of the output data-array component
+*  Bugs:
+*     {note_any_bugs_here}
 
 *-
-*    check status on entry - return if not o.k.
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'PRM_PAR'          ! VAL_ public constants
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      DOUBLE PRECISION MXBASE    ! Maximum base allowed for exponential
+      PARAMETER( MXBASE = 1000 )
+
+      DOUBLE PRECISION MNBASE    ! Minimum base allowed for exponential
+      PARAMETER( MNBASE = 0.001 )
+
+*  Local Variables:
+      LOGICAL BAD                ! Need to check for bad pixels?
+      DOUBLE PRECISION BASE      ! Base of exponential to be taken of
+                                 ! each pixel of input array
+      CHARACTER * ( VAL__SZD ) CBASE ! Base of exponential to be taken
+                                 ! (value of parameter BASE)
+      CHARACTER * ( 13 ) COMPS   ! Array components to map
+      INTEGER EL                 ! Number of mapped elements
+      CHARACTER * ( NDF__SZFRM ) FORM ! Form of the ARRAY
+      CHARACTER * ( NDF__SZTYP ) ITYPE ! Data type for processing
+      INTEGER NDFI               ! Identifier for 1st NDF (input)
+      INTEGER NDFO               ! Identifier for 2nd NDF (output)
+      INTEGER NERR               ! Number of errors generated 
+      INTEGER NERRV              ! Number of errors generated (var)
+      INTEGER PNTRI( 2 )         ! Pointer to input NDF mapped array
+      INTEGER PNTRO( 2 )         ! Pointer to output NDF mapped array
+      LOGICAL VAR                ! Variance array to process?
+
+*.
+
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    try to get the input IMAGE structure
+*  Begin an NDF context.
+      CALL NDF_BEGIN
 
-      CALL KPG1_GETIM( 'INPIC', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
+*  Obtain an identifier for the input NDF.
+      CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
-*    if no error then continue
+*  Obtain the scalar value to be added.
+      CALL PAR_MIX0D( 'BASE', 'Natural', MNBASE, MXBASE, 'Natural',
+     :                .FALSE., CBASE, STATUS )
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*       get shape of first array
-
-         CALL CMP_SHAPE( LOCDI, DNAMEI, MXDIMS, IDIMS, NDIMS, STATUS )
-
-*       map the data-array component of the input structure
-
-         CALL CMP_MAPV( LOCDI, DNAMEI, '_REAL', 'READ',
-     :                  PNTRI, DIMTOT, STATUS )
-
-*       if no error then continue
-
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*          try to get the base to exponentiate each input array pixel
-
-            CALL PAR_GDR0R( 'BASE', 2.718282, MNBASE, MXBASE, .FALSE.,
-     :                      BASE, STATUS )
-
-*          if no error then continue
-
-            IF ( STATUS .EQ. SAI__OK ) THEN
-
-*             create an output IMAGE structure
-
-               CALL KPG1_CROUT( 'OUTPIC', 'OTITLE', NDIMS, IDIMS,
-     :                          ORIGIN, LOCO, LOCDO, DNAMEO, STATUS )
-
-*             propagate AXIS, QUALITY, LABEL, HISTORY and extensions
-*             from the input data file
-
-               CALL KPG1_IMPRG( LOCI, 'AXIS,QUALITY', LOCO, STATUS )
-
-*             if no error then continue
-
-               IF ( STATUS .EQ. SAI__OK ) THEN
-     
-*                map a data-array component
-
-                  CALL CMP_MAPV( LOCDO, DNAMEO, '_REAL',
-     :                           'WRITE', PNTRO, DIMTOT, STATUS )
-
-*                check status before accessing pointers
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   call working subroutine to exponentiate each pixel
-*                   of input array, result going into output array
-
-                     CALL EXPARR( %VAL( PNTRI ), DIMTOT, BASE,
-     :                            %VAL( PNTRO ), STATUS )
-
-*                   unmap output data array
-
-                     CALL CMP_UNMAP( LOCDO, DNAMEO, STATUS )
-
-                  ELSE
-
-                     CALL ERR_REP( 'ERR_EXPON_NOMPO',
-     :                 'EXPON : Error occurred whilst trying to map '/
-     :                 /'output frame', STATUS )
-
-*                end of if-no-error-before-accessing-pointers check
-
-                  END IF
-
-*                tidy up output structures
-
-                  CALL DAT_ANNUL( LOCDO, STATUS )
-                  CALL DAT_ANNUL( LOCO, STATUS )
-
-               ELSE
-
-                  IF ( STATUS .NE. PAR__ABORT ) THEN
-                     CALL ERR_REP( 'ERR_EXPON_NOFRO',
-     :                 'EXPON : Error occurred whilst trying to '/
-     :                 /'access output frame', STATUS )
-                  END IF
-
-*             end of if-no-error-after-creating-output check
-
-               END IF
-
-            ELSE
-
-               IF ( STATUS .NE. PAR__ABORT .AND.
-     :              STATUS .NE. PAR__NULL ) THEN
-
-*                announce the error
-
-                  CALL ERR_REP( 'ERR_EXPON_PAR',
-     :              'EXPON : Error obtaining base - aborting',
-     :              STATUS )
-               END IF
-
-*          end of if-no-error-after-getting-base check
-
-            END IF
-
-*          unmap input data array
-
-            CALL CMP_UNMAP( LOCDI, DNAMEI, STATUS )
-
-         ELSE
-
-            CALL ERR_REP( 'ERR_EXPON_NOMPI',
-     :        'EXPON : Error occurred whilst trying to map or find '/
-     :        /'the shape of input frame', STATUS )
-
-*       end of if-no-error-after-mapping-input-array check
-
-         END IF
-
-*       tidy up the input structures
-
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL( LOCI, STATUS )
-
+*  Convert the string to a value.  PAR_MIX0D will give an error if the
+*  value is neither numeric nor "Natural" so no need to check again.
+      IF ( CBASE .EQ. 'NATURAL' ) THEN
+         BASE = 2.718281828459
       ELSE
-
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_EXPON_NOFRI',
-     :        'EXPON : Error occurred whilst trying to access input '/
-     :        /'frame', STATUS )
-         END IF
-
-*    end of if-no-error-after-getting-input-array check
-
+         CALL CHR_CTOD( CBASE, BASE, STATUS )
       END IF
 
-*    return and end
+*  Create a new output NDF based on the input NDF. Propagate the axis,
+*  quality, and world co-ordinate system, in addition to the defaulted
+*  components.
+      CALL LPG_PROP( NDFI, 'Axis,Quality,WCS', 'OUT', NDFO, STATUS )
+
+*  See if variance is present.
+      CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
+      IF ( VAR ) THEN
+         COMPS = 'Data,Variance'
+      ELSE
+         COMPS = 'Data'
+      END IF
+
+*  Determine which data type to use to process the input data array.
+      CALL NDF_TYPE( NDFI, COMPS, ITYPE, STATUS )
+
+*  Map the input and output arrays.
+      CALL NDF_MAP( NDFI, COMPS, ITYPE, 'READ', PNTRI, EL, STATUS )
+      CALL NDF_MAP( NDFO, COMPS, ITYPE, 'WRITE', PNTRO, EL, STATUS )
+
+*  See if checks for bad pixels are needed.
+      CALL NDF_BAD( NDFI, COMPS, .FALSE., BAD, STATUS )
+
+*  Select the appropriate routine for the data type being processed and
+*  add the constant to the data array.
+      IF ( ITYPE .EQ. '_BYTE' ) THEN
+         CALL KPG1_EXPOB( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+         CALL KPG1_EXPOUB( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+         CALL KPG1_EXPOD( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+         CALL KPG1_EXPOI( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+         CALL KPG1_EXPOR( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+         CALL KPG1_EXPOW( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+ 
+      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+         CALL KPG1_EXPOUW( BAD, EL, %VAL( PNTRI( 1 ) ), VAR,
+     :                    %VAL( PNTRI( 2 ) ), BASE, %VAL( PNTRO( 1 ) ),
+     :                    %VAL( PNTRO( 2 ) ), NERR, NERRV, STATUS )
+      END IF
+
+*  See if there may be bad pixels in the output data array and set the
+*  output bad pixel flag value accordingly unless the output NDF is
+*  primitive.
+      CALL NDF_FORM( NDFO, 'Data', FORM, STATUS )
+
+      IF ( FORM .NE. 'PRIMITIVE' ) THEN
+         CALL NDF_SBAD( BAD .OR. ( NERR .NE. 0 ), NDFO, 'Data', STATUS )
+      END IF
+
+*  See if there may be bad pixels in the output variance array and set
+*  the output bad pixel flag value accordingly unless the output NDF is
+*  primitive.
+      IF ( VAR ) THEN
+         CALL NDF_FORM( NDFO, 'Variance', FORM, STATUS )
+
+         IF ( FORM .NE. 'PRIMITIVE' ) THEN
+            CALL NDF_SBAD( BAD .OR. ( NERRV .NE. 0 ), NDFO, 'Variance',
+     :                     STATUS )
+         END IF
+      END IF
+
+*  Obtain a new title for the output NDF.
+      CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
+
+  999 CONTINUE
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
+
+*  If an error occurred, then report context information.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'EXPON_ERR',
+     :      'EXPON: Error taking the exponential of an NDF data '/
+     :      /'structure.', STATUS )
+      END IF
 
       END

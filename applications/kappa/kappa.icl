@@ -82,7 +82,6 @@ define   csub       $KAPPA_DIR/kappa_mon
 define   div        $KAPPA_DIR/kappa_mon
 define   errc(lip)  $KAPPA_DIR/kappa_mon
 define   exp1(0)    $KAPPA_DIR/kappa_mon
-define   expe       $KAPPA_DIR/kappa_mon
 define   expo(n)    $KAPPA_DIR/kappa_mon
 define   ffcl(ean)  $KAPPA_DIR/kappa_mon
 define   fill(bad)  $KAPPA_DIR/kappa_mon
@@ -273,9 +272,13 @@ defproc  lutsp(ec)  $KAPPA_DIR/kappa_proc.icl
 defproc  lutz(ebra) $KAPPA_DIR/kappa_proc.icl
 
 { Define other synonyms.
+defstring exp10     expon base=10D0
+defstring expe      expon base=natural
 defstring fitsexi(st) fitsmod edit=exist mode=interface
 defstring fitsv(al) fitsmod edit=print mode=interface
 defstring fitsw(rite) fitsmod edit=write mode=interface position=!
+defstring log10     logar base=10D0
+defstring loge      logar base=natural
 
 defstring picb(ase) piclist picnum=1
 defstring picd(ata) piclist name=data picnum=last
@@ -320,8 +323,6 @@ defhelp  drawsig    $KAPPA_HELP
 defhelp  elprof     $KAPPA_HELP
 defhelp  erase      $KAPPA_HELP
 defhelp  errclip    $KAPPA_HELP
-defhelp  exp10      $KAPPA_HELP
-defhelp  expe       $KAPPA_HELP
 defhelp  expon      $KAPPA_HELP
 defhelp  ffclean    $KAPPA_HELP
 defhelp  fillbad    $KAPPA_HELP
@@ -366,9 +367,7 @@ defhelp  laplace    $KAPPA_HELP
 defhelp  linplot    $KAPPA_HELP
 defhelp  listmake   $KAPPA_HELP
 defhelp  listshow   $KAPPA_HELP
-defhelp  log10      $KAPPA_HELP
 defhelp  logar      $KAPPA_HELP
-defhelp  loge       $KAPPA_HELP
 defhelp  look       $KAPPA_HELP
 defhelp  lucy       $KAPPA_HELP
 defhelp  lutable    $KAPPA_HELP
@@ -486,9 +485,13 @@ defhelp  zaplin     $KAPPA_HELP
 {defhelp  hide       $KAPPA_HELP
 
 { Define help for synonyms.
+defhelp  exp10      $KAPPA_HELP
+defhelp  expe       $KAPPA_HELP
 defhelp  fitsexist  $KAPPA_HELP
 defhelp  fitsval    $KAPPA_HELP
 defhelp  fitswrite  $KAPPA_HELP
+defhelp  log10      $KAPPA_HELP
+defhelp  loge       $KAPPA_HELP
 defhelp  picbase    $KAPPA_HELP
 defhelp  picdata    $KAPPA_HELP
 defhelp  picframe   $KAPPA_HELP
@@ -518,8 +521,6 @@ define   kap_cref(rame) $KAPPA_DIR/kappa_mon creframe
 define   kap_csub       $KAPPA_DIR/kappa_mon csub
 define   kap_div        $KAPPA_DIR/kappa_mon div
 define   kap_errc(lip)  $KAPPA_DIR/kappa_mon errclip
-define   kap_exp1(0)    $KAPPA_DIR/kappa_mon exp10
-define   kap_expe       $KAPPA_DIR/kappa_mon expe
 define   kap_expo(n)    $KAPPA_DIR/kappa_mon expon
 define   kap_ffcl(ean)  $KAPPA_DIR/kappa_mon ffclean
 define   kap_fill(bad)  $KAPPA_DIR/kappa_mon fillbad
@@ -536,9 +537,7 @@ define   kap_kste(st)   $KAPPA_DIR/kappa_mon kstest
 define   kap_lapl(ace)  $KAPPA_DIR/kappa_mon laplace
 define   kap_listmake   $KAPPA_DIR/kappa_mon listmake
 define   kap_listshow   $KAPPA_DIR/kappa_mon listshow
-define   kap_log1(0)    $KAPPA_DIR/kappa_mon log10
 define   kap_loga(r)    $KAPPA_DIR/kappa_mon logar
-define   kap_loge       $KAPPA_DIR/kappa_mon loge
 define   kap_look       $KAPPA_DIR/kappa_mon look
 define   kap_lucy       $KAPPA_DIR/kappa_mon lucy
 define   kap_makes(urface) $KAPPA_DIR/kappa_mon makesurface
@@ -708,12 +707,16 @@ defproc  kap_lutsp(ec)  $KAPPA_DIR/kappa_proc.icl
 defproc  kap_lutz(ebra) $KAPPA_DIR/kappa_proc.icl
 
 { Define full names for other synonyms.
+defstring kap_exp10     expon base=10D0
+defstring kap_expe      expon base=natural
 defstring kap_fitsexi(st) fitsmod edit=exist mode=interface
-defstring kap_fitsv(al) fitsmod edit=print mode=interface
-defstring kap_fitsw(rite) fitsmod edit=write mode=interface position=!
 defstring kap_fitsexi(st) fitsmod mode=exist
+defstring kap_fitsv(al) fitsmod edit=print mode=interface
 defstring kap_fitsv(al) fitsmod mode=print
+defstring kap_fitsw(rite) fitsmod edit=write mode=interface position=!
 defstring kap_fitsw(rite) fitsmod mode=write
+defstring kap_log10     logar base=10D0
+defstring kap_loge      logar base=natural
 defstring kap_picb(ase) piclist picnum=1
 defstring kap_picd(ata) piclist name=data picnum=last
 defstring kap_picf(rame) piclist name=frame picnum=last
@@ -756,8 +759,6 @@ defhelp  kap_drawsig    $KAPPA_HELP drawsig
 defhelp  kap_elprof     $KAPPA_HELP elprof
 defhelp  kap_erase      $KAPPA_HELP erase
 defhelp  kap_errclip    $KAPPA_HELP errclip
-defhelp  kap_exp10      $KAPPA_HELP exp10
-defhelp  kap_expe       $KAPPA_HELP expe
 defhelp  kap_expon      $KAPPA_HELP expon
 defhelp  kap_ffclean    $KAPPA_HELP ffclean
 defhelp  kap_fillbad    $KAPPA_HELP fillbad
@@ -802,9 +803,7 @@ defhelp  kap_laplace    $KAPPA_HELP laplace
 defhelp  kap_linplot    $KAPPA_HELP linplot
 defhelp  kap_listmake   $KAPPA_HELP listmake
 defhelp  kap_listshow   $KAPPA_HELP listshow
-defhelp  kap_log10      $KAPPA_HELP log10
 defhelp  kap_logar      $KAPPA_HELP logar
-defhelp  kap_loge       $KAPPA_HELP loge
 defhelp  kap_look       $KAPPA_HELP look
 defhelp  kap_lucy       $KAPPA_HELP lucy
 defhelp  kap_lutable    $KAPPA_HELP lutable
@@ -924,9 +923,13 @@ defhelp  kap_zaplin     $KAPPA_HELP zaplin
 {defhelp  kap_hide       $KAPPA_HELP hide
 
 { Define help for full-name synonyms.
+defhelp  kap_exp10      $KAPPA_HELP exp10
+defhelp  kap_expe       $KAPPA_HELP expe
 defhelp  kap_fitsexist  $KAPPA_HELP fitsexist
 defhelp  kap_fitsval    $KAPPA_HELP fitsval
 defhelp  kap_fitswrite  $KAPPA_HELP fitsexist
+defhelp  kap_log10      $KAPPA_HELP log10
+defhelp  kap_loge       $KAPPA_HELP loge
 defhelp  kap_picbase    $KAPPA_HELP picbase
 defhelp  kap_picdata    $KAPPA_HELP picdata
 defhelp  kap_picframe   $KAPPA_HELP picframe

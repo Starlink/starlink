@@ -1,8 +1,8 @@
-      SUBROUTINE KPG1_GRLIM( PARAM, N, D1, D2, NSIGMA, SIGMA, LIM1, 
+      SUBROUTINE KPG1_GRLM1( PARAM, N, D1, D2, NSIGMA, SIGMA, LIM1, 
      :                       LIM2, STATUS )
 *+
 *  Name:
-*     KPG1_GRLIM
+*     KPG1_GRLM1
 
 *  Purpose:
 *     Find the default limits for a graph axis.
@@ -11,14 +11,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_GRLIM( PARAM, N, D1, D2, NSIGMA, SIGMA, LIM1, LIM2, 
+*     CALL KPG1_GRLM1( PARAM, N, D1, D2, NSIGMA, SIGMA, LIM1, LIM2, 
 *                      STATUS )
 
 *  Description:
-*     This routine returns the default limits for a graph axis. The 
-*     way in which the limits are chosen is specified by the user through
-*     the parameter specified by PARAM. This parameter can take the 
-*     following values:
+*     This routine returns one or both default limits for a graph axis. 
+*     Any limits which are supplied by the calling routine are used as
+*     supplied. The user is only allowed to over-ride limits which are 
+*     supplied as VAL__BADR. The way in which these limits are chosen is 
+*     specified by the user through the parameter specified by PARAM. 
+*     This parameter can take the following values:
 *
 *        - "Range" -- LIM1 and LIM2 are returned equal to the lowest and
 *        highest supplied data values (including error bars).
@@ -74,7 +76,7 @@
 *        An associated mask array. D1( I ) is only used if both D1( I ) and 
 *        D2( I ) are not equal to VAL__BADR.
 *     NSIGMA = REAL (Given)
-*        Controls the length of the vertical error bars. The error bars are 
+*        Controls the length of the error bars. The error bars are 
 *        assumed to extended from D1( I ) - NSIGMA*SIGMA( I ) to 
 *        D1( I ) + NSIGMA*SIGMA( I ). A value of zero suppresses error
 *        bars. 
@@ -191,7 +193,7 @@
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'P', PARAM )
                CALL MSG_SETC( 'V', PVALS( 2 ) )
-               CALL ERR_REP( 'KPG1_GRLIM_ERR1', 'Extra value (^V) '//
+               CALL ERR_REP( 'KPG1_GRLM1_ERR1', 'Extra value (^V) '//
      :                       'supplied after ''RANGE'' for parameter'//
      :                       ' %^P.', STATUS )
                GO TO 999
@@ -206,7 +208,7 @@
                   CALL MSG_SETC( 'V', PVALS( I ) )
                END DO
    
-               CALL ERR_REP( 'KPG1_GRLIM_ERR2', 'Extra values (^V) '//
+               CALL ERR_REP( 'KPG1_GRLM1_ERR2', 'Extra values (^V) '//
      :                       'supplied after ''RANGE'' for parameter '//
      :                       '%^P.', STATUS )
                GO TO 999
@@ -233,7 +235,7 @@
                CALL MSG_SETC( 'V', PVALS( 1 ) )
                CALL MSG_SETC( 'V1', PVALS( 2 ) )
    
-               CALL ERR_REP( 'KPG1_GRLIM_ERR3', 'Non-numeric value '//
+               CALL ERR_REP( 'KPG1_GRLM1_ERR3', 'Non-numeric value '//
      :                       '(^V1) supplied after ''^V'' for '//
      :                       'parameter %^P.', STATUS )
                GO TO 999
@@ -249,7 +251,7 @@
                CALL MSG_SETC( 'V', PVALS( 1 ) )
                CALL MSG_SETC( 'V2', PVALS( 3 ) )
    
-               CALL ERR_REP( 'KPG1_GRLIM_ERR4', 'Non-numeric value '//
+               CALL ERR_REP( 'KPG1_GRLM1_ERR4', 'Non-numeric value '//
      :                       '(^V2) supplied after ''^V'' for '//
      :                       'parameter %^P.', STATUS )
                GO TO 999
@@ -361,7 +363,7 @@
    
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( 'KPG1_GRLIM_ERR5', 'No good data to '//
+                  CALL ERR_REP( 'KPG1_GRLM1_ERR5', 'No good data to '//
      :                          'plot.', STATUS )
                END IF
 
@@ -415,7 +417,7 @@
 
                IF( STATUS .EQ. SAI__OK ) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP( 'KPG1_GRLIM_ERR6', 'No good data to '//
+                  CALL ERR_REP( 'KPG1_GRLM1_ERR6', 'No good data to '//
      :                          'plot.', STATUS )
                END IF
 

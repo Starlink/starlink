@@ -72,6 +72,8 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +87,10 @@
 *     30-OCT-1998 (DSB):
 *        Modified to save current palette in the adam directory so that
 *        subsequent PGPLOT applications can read it back in again.
+*     22-JUL-1999 (TDCA):
+*        Modified to use PGPLOT.
+*     1-OCT-1999 (DSB):
+*        Tidied up. Use KPG1_PGOPN instead of AGP_ASSOC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,115 +113,50 @@
       PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
-      INTEGER
-     :  IPIXX,                   ! Dummy
-     :  IPIXY,                   ! Dummy
-     :  NINTS,                   ! Total number of colour indices
-                                 ! on the chosen device
-     :  PALNUM,                  ! Palette entry number to have its
-                                 ! colour changed
-     :  WKID,                    ! Work station identification
-     :  ZONE                     ! Input zone identification
-
-      REAL
-     :  RGBINT( NPRICL )         ! RGB intensities of the chosen colour
-
-      LOGICAL                    ! True if :
-     :  DEVCAN                   ! Image-display parameter is to be
-                                 ! cancelled
-
+      INTEGER DOWN               ! Lowest available colour index
+      INTEGER PALNUM             ! Palette entry number to have its colour changed
+      INTEGER IPIC               ! AGI identifier for current picture
+      INTEGER UP                 ! Highest available colour index
+      REAL RGBINT( NPRICL )      ! RGB intensities of the chosen colour
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      DEVCAN = .FALSE.
+*  Open up PGPLOT in update mode as only some colours are to be changed.
+      CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC, STATUS )
 
-*    Start the graphics system.
-*    ==========================
-
-*    Open up SGS in update mode as only some colours are to be changed.
-
-      CALL SGS_ASSOC( 'DEVICE', 'UPDATE', ZONE, STATUS )
-
-*    Check whether chosen device is an 'image display'.  It must have
-*    a suitable minimum number of colour indices, and will not reset
-*    when opened.
-
-      CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
+*  Check whether chosen device is an 'image display'.  It must have
+*  a suitable minimum number of colour indices, and will not reset
+*  when opened.
+      CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
      :                /'WINDOW,WINDOW_OVERLAY,MATRIX_PRINTER',
-     :                'COLOUR', 2, STATUS )
+     :                'COLOUR', 2, UP, STATUS )
 
-*    Obtain the number of colour indices and the maximum display
-*    surface.
-
-      CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY, STATUS )
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*       The device name is to be cancelled to prevent an invalid device
-*       being stored as the current value.
-
-         DEVCAN = .TRUE.
-         GOTO 999
-      END IF
-
-*    Find the workstation identifier.
-
-      CALL SGS_ICURW( WKID )
-      
-*    Obtain the new palette colour.
-*    ==============================
-
-*    The suggested default will usually have a grey colour.
-
-      CALL PAR_GDR0I( 'PALNUM', 1, 0, MIN( CTM__RSVPN, NINTS ) - 1,
+*  The suggested default will usually have a grey colour.
+      CALL PAR_GDR0I( 'PALNUM', 1, 0, MIN( CTM__RSVPN, UP ) - 1,
      :                .FALSE., PALNUM, STATUS )
 
-*    Get one colour for the palette number.
-
+*  Get one colour for the palette number.
       CALL KPG1_GPCOL( 'COLOUR', RGBINT, STATUS )
 
-*    Install the palette into image-display colour table.
-*    ====================================================
+*  Install the palette into image-display colour table.
+      IF ( STATUS .EQ. SAI__OK ) CALL PGSCR( PALNUM, RGBINT( 1 ), 
+     :                                       RGBINT( 2 ), RGBINT( 3 ) )
 
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL GSCR( WKID, PALNUM, RGBINT( 1 ), RGBINT( 2 ),
-     :              RGBINT( 3 ) )
+*  Save the modified palette entry in the adam directory so that it can be 
+*  read back again by subsequent applications (PGPLOT resets the colour 
+*  palette when it opens a device, so the palette then needs to be 
+*  re-instated). Other elements in the saved palette are left unchanged. 
+      CALL KPG1_PLSAV( PALNUM, PALNUM, .FALSE., STATUS )
 
-*    See whether GKS had an internal error.
+*  Shut down the graphics system.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-         CALL GKS_GSTAT( STATUS )
-
-*    Save the modified palette entry in the adam directory so that it can be 
-*    read back again by subsequent applications (PGPLOT resets the colour 
-*    palette when it opens a device, so the palette then needs to be 
-*    re-instated). Other elements in the saved palette are left unchanged.
-         CALL KPG1_PLSAV( PALNUM, PALNUM, .FALSE., STATUS )
-
-      END IF
-
-*    If an error occurred, then report a contextual message.
-
-  999 CONTINUE
+*  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'PALENTRY_ERR',
-     :   'PALENTRY: Unable to enter a colour into the palette.',
-     :   STATUS )
+         CALL ERR_REP( 'PALENTRY_ERR', 'PALENTRY: Unable to enter '//
+     :                 'a colour into the palette.', STATUS )
       END IF
-
-*    Tidy the graphics system.
-
-      IF ( DEVCAN ) THEN
-         CALL SGS_CANCL( 'DEVICE', STATUS )
-      ELSE
-         CALL SGS_ANNUL( ZONE, STATUS )
-      END IF
-
-*    Deactivate SGS so that the next call to SGS_ASSOC will initialise
-*    SGS, and hence can work in harmony with AGI-SGS applications.
-
-      CALL SGS_DEACT( STATUS )
 
       END

@@ -15,16 +15,13 @@
 *  Description:
 *     This routine saves a section of the colour palette for the currently 
 *     open graphics device in an HDS container file in the users ADAM 
-*     directory. The file is called "kappa.palette.sdf" and contains 
+*     directory. The file is called "kappa_palette.sdf" and contains 
 *     palettes for different devices. Each palette is a _REAL array of 
 *     shape (3,n) where n is the number of colours in the palette. The 
 *     first colour (i.e. the first element in the array) is the background 
 *     colour and is refered to as colour index zero. Therefore the highest 
 *     colour index in the array is (n-1). Each array has a name which 
-*     identifies the graphics device to which it refers. At the moment, the 
-*     array names are the GKS workstation types (integers). This will need 
-*     to change when KAPPA changes over to use native PGPLOT, instead of 
-*     GKS PGPLOT.
+*     identifies the graphics device to which it refers. 
 *
 *     If a palette already exists for the device in the HDS container file,
 *     then the values stored in the HDS palette for the range of colour 
@@ -57,11 +54,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1998 (DSB):
 *        Original version.
+*     26-JUL-1999 (TDCA):
+*        Converted to PGPLOT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,26 +94,21 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
-      CHARACTER TYPE*10          ! Device name
+      CHARACTER TYPE*15          ! Device name
+      CHARACTER PREFIX*15        ! Prefix to be added to TYPE
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
-      INTEGER GSTAT              ! GKS status
-      INTEGER ICON               ! GKS connection identifier
-      INTEGER IWKID              ! GKS workstation identifier
-      INTEGER IWKTYP             ! GKS workstation type
       INTEGER LCI1               ! Local copy of CI1
       INTEGER LCI2               ! Local copy of CI2
-      INTEGER MFA                ! Max.no. of fill-area  "    "     "
-      INTEGER MPI                ! Max.no. of pattern indices
-      INTEGER MPL                ! Max.no. of polyline   "    "     "
-      INTEGER MPM                ! Max.no. of polymarker "    "     "
-      INTEGER MTX                ! Max.no. of text  bundle table entries
+      INTEGER LENGTH             ! Length of string returned by PGQINF
+      INTEGER LOWER              ! Lowest colour index
       INTEGER NC                 ! Number of characters in the buffer
       INTEGER NDIM               ! Number of array dimensions
       INTEGER NINTS              ! Number of colour indices on the workstation
       INTEGER PNTR               ! Pointer to mapped array
+      INTEGER UPPER              ! Highest colour index
       LOGICAL THERE              ! Object present?
-  
+
 *.
 
 *  Check the inherited status. 
@@ -170,32 +165,25 @@
 *  contains the palette for the currently opened graphics device. 
 *  =================================================================
 
-*  Get the workstation identifier for the currently open graphics device.
-      CALL SGS_ICURW( IWKID ) 
+*  Get the workstation type, and remove any blanks.
+      CALL PGQINF( 'TYPE', TYPE, LENGTH )
+      CALL CHR_RMBLK( TYPE )
 
-*  Get the corresponding GKS workstation type.
-      CALL GQWKC( IWKID, GSTAT, ICON, IWKTYP )
-
-*  Inquire whether GKS/SGS has reported an error
-      CALL GKS_GSTAT( STATUS )
-
-*  Format the workstation type, prepending the string "GKS_" to it.
-      TYPE = 'GKS_'
+*  Format the workstation type, prepending the string "PGP_" to it.
+      PREFIX = 'PGP_'
       NC = 4
-      CALL CHR_PUTI( IWKTYP, TYPE, NC )
+      CALL CHR_PUTC( TYPE, PREFIX, NC )
+      TYPE = PREFIX
 
 *  Create an array of suitable dimensions within the container file to
 *  store the palette data.
 *  ===================================================================
 
 *  Get the number of colour indices available on the current device.
-      CALL GQLWK( IWKTYP, GSTAT, MPL, MPM, MTX, MFA, MPI, NINTS )
+      CALL PGQCOL( LOWER, NINTS )
 
 *  Limit the number of palette entries to the size of the palette.
       NINTS = MIN( NINTS, CTM__RSVPN )
-
-*  Inquire whether GKS/SGS has reported an error
-      CALL GKS_GSTAT( STATUS )
 
 *  See if a component with this name already exists within the container
 *  file.

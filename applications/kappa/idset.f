@@ -41,14 +41,20 @@
 
 *  Related Applications:
 *     KAPPA: GDSET, IDSTATE, OVSET; Figaro: SOFT.
-				    
+                                    
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 June 27 (MJC):
 *        Original version.
+*     22-JUL-1999 (TDCA):
+*        Modified to use PGPLOT.
+*     30-SEP-1999 (DSB):
+*        Tidied up.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,47 +67,42 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
-      INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'CTM_PAR'        ! Colour-table management constants
 
 *  Status:
       INTEGER STATUS
 
 *  Local Constants:
-      INTEGER
-     :  MINCOL                 ! Minimum number of colour indices on
+      INTEGER MINCOL           ! Minimum number of colour indices on
                                ! device to be classed as an image
                                ! display
       PARAMETER ( MINCOL = 8 + CTM__RSVPN )
 
 *  Local Variables:
-      INTEGER
-     :  PICID,                 ! AGI input picture identifier
-     :  ZONE                   ! SGS current zone
+      INTEGER PICID            ! AGI input picture identifier
+      INTEGER UP               ! Highest available colour index available
 
-      LOGICAL                  ! True if :
-     :  DEVCAN                 ! Image-display parameter is to be
-                               ! cancelled
-      
 *.
 
-*    Check the inherited status on entry.
+*  Check the inherited status on entry.
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Open the AGI workstation to read the device, and activate PGPLOT.
+      CALL KPG1_PGOPN( 'DEVICE', 'READ', PICID, STATUS )
 
-*    Open the AGI workstation to read the device, and activate SGS/GKS.
+*  Check whether chosen device is an 'image display' with a suitable
+*  minimum number of colour indices.
+      CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
+     :                 /'WINDOW,MATRIX_PRINTER', ' ', MINCOL, 
+     :                 UP, STATUS )
 
-      CALL AGS_ASSOC( 'DEVICE', 'READ', ' ', PICID, ZONE, STATUS )
+*  AGI closedown sequence.
+      CALL KPG1_PGCLS('DEVICE', .FALSE., STATUS )
 
-*    Check whether chosen device is an 'image display' with a suitable
-*    minimum number of colour indices.
-
-      CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
-     :                /'WINDOW,MATRIX_PRINTER', ' ', MINCOL, STATUS )
-
-*    AGI closedown sequence.
-
-      DEVCAN = STATUS .NE. SAI__OK
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
+*  If an error occurred, add a context message.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'IDSET_ERR', 'IDSET: Unable to set current '//
+     :                 'image display device.', STATUS )
+      END IF
 
       END

@@ -1559,9 +1559,7 @@
       IF( FRYCEN ) CALL PSX_FREE( IPYCEN, STATUS )
 
 *  Shutdown PGPLOT and the graphics database.
-      CALL ERR_BEGIN( STATUS )
-      CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
-      CALL ERR_END( STATUS )
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

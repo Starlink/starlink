@@ -494,29 +494,13 @@
 
 *  Open the graphics device for plotting with PGPLOT, obtaining an
 *  identifier for the current AGI picture.
-         CALL AGP_ASSOC( 'DEVICE', 'UPDATE', ' ', .FALSE., IPIC0, 
-     :                   STATUS )
-
-*  If the device could not be opened, cancel the parameter association
-*  so that a different device will be used next time. Otherwise, the
-*  association is retained so that the same device will be used.
-         IF( STATUS .NE. SAI__OK .AND. STATUS .NE. PAR__ABORT .AND.
-     :      STATUS .NE. PAR__NULL ) THEN
-            CALL ERR_BEGIN( STATUS )
-            CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
-            CALL ERR_BEGIN( STATUS )
-         END IF
+         CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC0, STATUS )
 
 *  Start a PGPLOT buffering context.
          IF( STATUS .EQ. SAI__OK ) THEN
             CALL PGBBUF
             PGBUF = .TRUE.
          END IF
-
-*  PGPLOT resets the colour palette when the device is opened. Therefore we
-*  need to re-instate the colour palette set by the user, reading it from
-*  the HDS file kappa-palette.sdf in the users adam directory.
-         CALL KPG1_PLLOD( STATUS )
 
 *  Get the name of the picture to use, convert to upper case and remove 
 *  blanks.
@@ -749,10 +733,8 @@
 
 *  End the PGPLOT buffering context (if started), shutdown PGPLOT and the 
 *  graphics database.
-         CALL ERR_BEGIN( STATUS )
          IF( PGBUF ) CALL PGEBUF 
-         CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
-         CALL ERR_END( STATUS )
+         CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
       END IF
 

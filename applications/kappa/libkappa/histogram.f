@@ -910,13 +910,13 @@
      :                    0.0, 0.0,  XL, YL, 'Histogram plot', 'XDATA',
      :                    'YDATA', 1, .TRUE., VAL__BADR, VAL__BADR, 
      :                    0.0, VAL__BADR, 'KAPPA_HISTOGRAM', .TRUE., 
-     :                    IPLOT, STATUS )  
+     :                    .FALSE., IPLOT, STATUS )  
 
 *  If anything was plotted, annul the Plot, and shut down the graphics 
 *  workstation and database.
          IF( IPLOT .NE. AST__NULL ) THEN
             CALL AST_ANNUL( IPLOT, STATUS )
-            CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+            CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
          END IF
 
 *  End of check for no error getting workspace to plot histogram.

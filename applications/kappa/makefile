@@ -426,7 +426,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.14
+PKG_VERS = 0.14-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -565,7 +565,7 @@ KAPGEN_F_ROUTINES = \
 bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalr.f copad.f copar.f copy1d.f copy2d.f \
 copy3d.f cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f \
-elnmbr.f exparr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f \
+elnmbr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f \
 kpg1_agfnd.f kpg1_agref.f kpg1_ainbd.f kpg1_ainbr.f kpg1_aindd.f \
 kpg1_akerd.f kpg1_akerr.f kpg1_antso.f kpg1_arcog.f kpg1_arcol.f \
 kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f kpg1_asffr.f \
@@ -658,12 +658,15 @@ kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
-kpg1_wcatw.f kpg1_srcta.f kpg1_fit1d.f \
+kpg1_wcatw.f kpg1_srcta.f kpg1_fit1d.f kpg1_pgclr.f \
 kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f kpg1_mkpos.f \
 kpg1_pseed.f kpg1_ndfnm.f kpg1_graph.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
-kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f \
-kpg1_cpbdd.f kpg1_mixvr.f
+kpg1_cpndw.f kpg1_rglmt.f kpg1_envdf.f kpg1_env0r.f kpg1_grlm2.f kpg1_grlm1.f \
+kpg1_cpbdd.f kpg1_cpbdr.f kpg1_mixvr.f kpg1_pgopn.f kpg1_pgcls.f \
+kpg1_expob.f kpg1_expoi.f kpg1_expoub.f kpg1_expow.f kpg1_expod.f \
+kpg1_expor.f kpg1_expouw.f kpg1_logab.f kpg1_logai.f kpg1_logaub.f \
+kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -686,12 +689,12 @@ block.f cadd.f calc.f calpol.f cdiv.f \
 centroid.f chpix.f cmult.f compadd.f \
 compave.f compick.f convolve.f copybad.f \
 creframe.f csub.f kap_div.f errclip.f \
-exp10.f expe.f expon.f ffclean.f \
+expon.f ffclean.f \
 fillbad.f fitsurface.f flip.f fourier.f \
 gausmooth.f glitch.f globals.f \
 histat.f histeq.f histogram.f \
-kaphelp.f laplace.f kap_log10.f kstest.f \
-logar.f loge.f look.f lucy.f manic.f \
+kaphelp.f laplace.f kstest.f \
+logar.f look.f lucy.f manic.f \
 makesurface.f maths.f median.f \
 mosaic.f mstats.f mult.f noglobals.f nomagic.f \
 normalize.f numb.f outset.f parget.f paste.f \
@@ -1669,10 +1672,8 @@ install:
 #  run-time library clashes.  To save listing the tasks more than once
 #  the same operation must be applied to their interface files too.
 	$(LINK) ./kap_div $(INSTALL_BIN)/div
-	$(LINK) ./kap_log10 $(INSTALL_BIN)/log10
 	$(LINK) ./kap_pow $(INSTALL_BIN)/pow
 	$(LINK) ./kap_div.ifc $(INSTALL_BIN)/div.ifc
-	$(LINK) ./kap_log10.ifc $(INSTALL_BIN)/log10.ifc
 	$(LINK) ./kap_pow.ifc $(INSTALL_BIN)/pow.ifc
 #
 #  Install the package startup script.  The package version number,
@@ -1740,7 +1741,6 @@ install:
 #  run-time library clashes.  To save listing the tasks more than once
 #  the same operation must be applied to their .par files too.
 	$(LINK) $(INSTALL_IRAF)/kap_div.par $(INSTALL_IRAF)/div.par
-	$(LINK) $(INSTALL_IRAF)/kap_log10.par $(INSTALL_IRAF)/log10.par
 	$(LINK) $(INSTALL_IRAF)/kap_pow.par $(INSTALL_IRAF)/pow.par
 #
 #  Install the IRAF-special interface files giving them world read permission.
@@ -1929,10 +1929,8 @@ do_deinstall:
 #  Remove the links to applications whose name clashes with the C run-time 
 #  library.  Also remove their corresponding compiled interface file links.
 	-rm -f $(INSTALL_BIN)/div
-	-rm -f $(INSTALL_BIN)/log10
 	-rm -f $(INSTALL_BIN)/pow
 	-rm -f $(INSTALL_BIN)/div.ifc
-	-rm -f $(INSTALL_BIN)/log10.ifc
 	-rm -f $(INSTALL_BIN)/pow.ifc
 #
 #  Deinstall the monoliths, if installed versions exist.
@@ -2053,7 +2051,6 @@ do_deinstall:
 #  Remove the links to the .par files of applications whose name clashes 
 #  with the C run-time library.
 	-rm -f $(INSTALL_IRAF)/div.par
-	-rm -f $(INSTALL_IRAF)/log10.par
 	-rm -f $(INSTALL_IRAF)/pow.par
 #
 #  Deinstall the IRAF-special interface files, if installed versions exist.
@@ -2535,9 +2532,6 @@ elnmbr.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 elprof.o:	 SAE_PAR PRM_PAR PAR_ERR
 erase.o:	 SAE_PAR DAT_PAR FIO_PAR PAR_ERR
 errclip.o:	 SAE_PAR PRM_PAR MSG_PAR
-exp10.o:	 SAE_PAR DAT_PAR PAR_ERR
-exparr.o:	 SAE_PAR PRM_PAR
-expe.o:	         SAE_PAR DAT_PAR PAR_ERR
 expon.o:	 SAE_PAR DAT_PAR PAR_ERR
 ffclean.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
 fillbad.o:	 SAE_PAR NDF_PAR PRM_PAR
@@ -2700,7 +2694,6 @@ ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
 ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 kap_div.o:	 SAE_PAR NDF_PAR
-kap_log10.o:	 SAE_PAR DAT_PAR PAR_ERR
 kap_pow.o:	 SAE_PAR DAT_PAR PAR_ERR
 kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
@@ -3511,7 +3504,6 @@ listsb.o:	 SAE_PAR PAR_ERR PRM_PAR
 listshow.o:	 SAE_PAR AST_PAR GRP_PAR PAR_ERR PRM_PAR
 logar.o:	 SAE_PAR DAT_PAR PAR_ERR
 logarr.o:	 SAE_PAR PRM_PAR
-loge.o:	         SAE_PAR DAT_PAR PAR_ERR
 look.o:	         SAE_PAR DAT_PAR PAR_ERR
 lpg1_init.o:	 DAT_PAR LPG_CONST GRP_PAR LPG_COM
 lpg1_ptpar.o:	 SAE_PAR GRP_PAR DAT_PAR

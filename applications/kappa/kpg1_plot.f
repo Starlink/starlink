@@ -193,7 +193,7 @@
 *     -  Picture identifiers are returned equal to -1 if an error occurs,
 *     or if any pictures cannot be created.
 *     -  Close down AGI and PGPLOT using:
-*           CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+*           CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)

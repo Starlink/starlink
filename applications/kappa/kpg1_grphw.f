@@ -1,6 +1,7 @@
       SUBROUTINE KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, 
-     :                       APP, QUIET, DX, DY, DBAR, IPLOT, STATUS )
+     :                       APP, QUIET, LMODE, DX, DY, DBAR, IPLOT, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_GRPHW
@@ -14,7 +15,7 @@
 *  Invocation:
 *     CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
 *                      XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP, 
-*                      QUIET, DX, DY, DBAR, IPLOT, STATUS )
+*                      QUIET, LMODE, DX, DY, DBAR, IPLOT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied 
@@ -25,7 +26,7 @@
 *     the workstation:
 *
 *       CALL AST_ANNUL( IPLOT, STATUS )
-*       CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+*       CALL KPG_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  Environment Parameters:
 *     The following envirnment parameter names are used by this routine,
@@ -37,6 +38,45 @@
 *           TRUE if the graphics device is to be cleared on opening. 
 *        DEVICE = DEVICE (Read)
 *           The plotting device. 
+*        LMODE = LITERAL (Read)
+*           If the subroutine argument LMODE is .TRUE., then parameter
+*           LMODE is used to specify how the default values for YBOT and 
+*           YTOP are found. If argument LMODE is .FALSE. then "Extended"
+*           mode is always used. This parameter can take the following 
+*           values:
+*
+*           - "Range" -- The lowest and highest supplied data values are
+*           used (including error bars).
+*    
+*           - "Extended" -- The lowest and highest supplied data values 
+*           are used (including error bars), extended to give a margin of 
+*           2.5% of the total data range at each end.
+*    
+*           - "Extended,10,5" -- Like "Extended", except the margins at the 
+*           two ends are specified as a pair of numerical value in the second 
+*           and third elements of the array. These values are percentages of 
+*           the total data range. So, "Extended,10,5" includes a margin of 10%
+*           of the total data range in YBOT, and 5% in YTOP. If only one 
+*           numerical value is given, the same value is used for both limits. 
+*           If no value is given, both limits default to 2.5. "Range" is 
+*           equivalent to "Extended,0,0".
+*    
+*           - "Percentiles,5,95" -- The second and third elements of the array 
+*           are interpreted as percentiles. For instance, "Perc,5,95" causes 
+*           5% of the data points (ignoring error bars) to be below YBOT, and 
+*           10% to be above the YTOP. If only 1 value (p1) is supplied, the 
+*           other one, p2, defaults to (100 - p1). If no values are supplied, 
+*           p1 and p2 default to 5 and 95.
+*           
+*           - "Sigma,2,3" -- The second and third elements of the array are 
+*           interpreted as multiples of the standard deviation of the data 
+*           values (ignoring error bars). For instance, "S,2,3" causes the 
+*           YBOT to be the mean of the data values, minus two sigma, and YTOP
+*           to be the mean plus three sigma. If only 1 value is supplied, the 
+*           same value is used for both limits. If no values are supplied, 
+*           both values default to 3.0.
+*                 
+*        The above strings can be abbreviated to one character.
 *        MARGIN( 4 ) = _REAL (Read)
 *           The widths of the margins to leave for axis annotation, given 
 *           as fractions of the corresponding dimension of the DATA picture. 
@@ -149,6 +189,12 @@
 *        If .FALSE., a message is displayed indicating the number of
 *        points which were plotted. If .TRUE., nothing is displayed on
 *        the alpha screen.
+*     LMODE = LOGICAL (Given)
+*        If .TRUE., then the user is given the chance to specify the
+*        default vertical bounds for the plot using parameter LMODE. If 
+*        .FALSE., the supplied bounds (YB, YT ) are used, and the 
+*        eqivalent of "Extended" LMODE is used for any bounds which are 
+*        not supplied.
 *     DX( N ) = DOUBLE PRECISION (Given and Returned)
 *        Work space.
 *     DY( N ) = DOUBLE PRECISION (Given and Returned)
@@ -178,6 +224,9 @@
 *        are drawn last (this looks better for instance, if a histogram is
 *        drawn in which may bins have value zero and are therefore drawn 
 *        on the bottom axis).
+*     1-OCT-1999 (DSB):
+*        Added argument LMODE. Attempt to draw all points, including ones 
+*        which are outside the plot. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,6 +262,7 @@
       REAL YT
       CHARACTER APP*(*)
       LOGICAL QUIET
+      LOGICAL LMODE
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION DX( N )
@@ -229,6 +279,7 @@
       INTEGER CHR_LEN         ! Used length of a string.
 
 *  Local Variables:
+      CHARACTER PLMODE*5      ! LMODE parameter name
       DOUBLE PRECISION BOX(4) ! Bounding box for plot
       INTEGER AXMAPS( 2 )     ! 1-D Mappings for each axis
       INTEGER I               ! Loop index
@@ -264,58 +315,27 @@
 *  Start and AST context.
       CALL AST_BEGIN( STATUS )
 
-*  If any of the plot limits have not been supplied, find the bounds of the 
-*  supplied data (including error bars).
-      IF( XL .EQ. VAL__BADR .OR. XR .EQ. VAL__BADR .OR. 
-     :    YT .EQ. VAL__BADR .OR. YB .EQ. VAL__BADR ) THEN
+*  Find the default values for parameters XLEFT and XRIGHT. These are 
+*  the whole range extended by 2.5% at each end.
+      XLEFT = XL
+      XRIGHT = XR
+      CALL KPG1_GRLM1( ' ', N, X, Y, 0.0, 0.0, XLEFT, XRIGHT, 
+     :                 STATUS )
 
-         XLEFT = VAL__MAXR
-         YBOT = VAL__MAXR
-         XRIGHT = VAL__MINR
-         YTOP = VAL__MINR
-
-         IF( NSIGMA .GT. 0.0 ) THEN
-
-            DO I = 1, N
-               IF( X( I ) .NE. VAL__BADR .AND. Y( I ) .NE. VAL__BADR 
-     :             .AND. YSIGMA( I ) .NE. VAL__BADR ) THEN
-                  XLEFT = MIN( XLEFT, X( I ) )
-                  YBOT = MIN( YBOT, Y( I ) - NSIGMA*YSIGMA( I ) )
-                  XRIGHT = MAX( XRIGHT, X( I ) )
-                  YTOP = MAX( YTOP, Y( I ) + NSIGMA*YSIGMA( I ) )
-               END IF
-            END DO
-
-         ELSE
-
-            DO I = 1, N
-               IF( X( I ) .NE. VAL__BADR .AND. 
-     :             Y( I ) .NE. VAL__BADR ) THEN
-                  XLEFT = MIN( XLEFT, X( I ) )
-                  YBOT = MIN( YBOT, Y( I ) )
-                  XRIGHT = MAX( XRIGHT, X( I ) )
-                  YTOP = MAX( YTOP, Y( I ) )
-               END IF
-            END DO
-
-         END IF
-
-*  Add 5% onto both end end of each axis.
-         DELTA = 0.05*( XRIGHT - XLEFT )
-         XLEFT = XLEFT - DELTA
-         XRIGHT = XRIGHT + DELTA
-
-         DELTA = 0.05*( YTOP - YBOT )
-         YBOT = YBOT - DELTA
-         YTOP = YTOP + DELTA
-
+*  Find the default values for parameters YBOT and YTOP. Use parameter 
+*  LMODE to determine the method to use if argument LMODE is .TRUE., 
+*  otherwise a blank parameter name is used which results in "Extended" 
+*  mode being used. 
+      IF( LMODE ) THEN
+         PLMODE = 'LMODE'
+      ELSE
+         PLMODE = ' '
       END IF
 
-*  Use any supplied limits in preference to the data limits found above.
-      IF( XL .NE. VAL__BADR ) XLEFT = XL
-      IF( XR .NE. VAL__BADR ) XRIGHT = XR
-      IF( YB .NE. VAL__BADR ) YBOT = YB
-      IF( YT .NE. VAL__BADR ) YTOP = YT
+      YBOT = YB
+      YTOP = YT
+      CALL KPG1_GRLM1( PLMODE, N, Y, X, NSIGMA, YSIGMA, YBOT, YTOP, 
+     :                 STATUS )
 
 *  Get new bounds for the plot, using these as dynamic defaults.
       IF( STATUS .EQ. SAI__OK ) THEN
@@ -354,8 +374,7 @@
       YMIN = MIN( YTOP, YBOT )
       YMAX = MAX( YTOP, YBOT )
 
-*  Copy the supplied data to the double precision work arrays, setting
-*  any data outside the above limits bad.
+*  Copy the supplied data to the double precision work arrays.
       NGOOD = 0
       IF( NSIGMA .GT. 0.0 ) THEN
 
@@ -364,19 +383,11 @@
             YY = Y( I )
 
             IF( XX .NE. VAL__BADR .AND. YY .NE. VAL__BADR ) THEN
-               IF( XX .GE. XMIN .AND. XX .LE. XMAX .AND.
-     :             YY .GE. YMIN .AND. YY .LE. YMAX ) THEN
-                  DX( I ) = DBLE( XX )
-                  DY( I ) = DBLE( YY )
-                  DBAR( I, 1 ) = DBLE( YY - NSIGMA*YSIGMA( I ) )
-                  DBAR( I, 2 ) = DBLE( YY + NSIGMA*YSIGMA( I ) )
-                  NGOOD = NGOOD + 1
-               ELSE
-                  DX( I ) = AST__BAD
-                  DY( I ) = AST__BAD
-                  DBAR( I, 1 ) = AST__BAD
-                  DBAR( I, 2 ) = AST__BAD
-               END IF
+               DX( I ) = DBLE( XX )
+               DY( I ) = DBLE( YY )
+               DBAR( I, 1 ) = DBLE( YY - NSIGMA*YSIGMA( I ) )
+               DBAR( I, 2 ) = DBLE( YY + NSIGMA*YSIGMA( I ) )
+               NGOOD = NGOOD + 1
             ELSE
                DX( I ) = AST__BAD
                DY( I ) = AST__BAD
@@ -393,15 +404,9 @@
             YY = Y( I )
 
             IF( XX .NE. VAL__BADR .AND. YY .NE. VAL__BADR ) THEN
-               IF( XX .GE. XMIN .AND. XX .LE. XMAX .AND.
-     :             YY .GE. YMIN .AND. YY .LE. YMAX ) THEN
-                  DX( I ) = DBLE( XX )
-                  DY( I ) = DBLE( YY )
-                  NGOOD = NGOOD + 1
-               ELSE
-                  DX( I ) = AST__BAD
-                  DY( I ) = AST__BAD
-               END IF
+               DX( I ) = DBLE( XX )
+               DY( I ) = DBLE( YY )
+               NGOOD = NGOOD + 1
             ELSE
                DX( I ) = AST__BAD
                DY( I ) = AST__BAD
@@ -451,7 +456,6 @@
          END DO
       END IF
 
-
 *  Create a FrameSet containing a single Frame in which the default values 
 *  for labels, symbols, title, etc can be set.
       IFRM = AST_FRAMESET( AST_FRAME( 2, 'DOMAIN=DATAPLOT', STATUS ), 
@@ -489,7 +493,7 @@
       IF( STATUS .EQ. PAR__NULL ) THEN
          IF( NULL ) THEN
             CALL AST_ANNUL( IPLOT, STATUS )
-            CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+            CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
             CALL ERR_ANNUL( STATUS )
          END IF
 
@@ -555,7 +559,7 @@
 *  graphics system.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL AST_ANNUL( IPLOT, STATUS )
-         CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+         CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
       END IF
 
 *  End AST context.

@@ -475,10 +475,11 @@
      :                 LAB1( : LEN1 ), LAB2( : LEN2 ), 'Scatter plot',
      :                 'XDATA', 'YDATA', 3, .FALSE., PERV1( 1 ), 
      :                 PERV1( 2 ), PERV2( 1 ), PERV2( 2 ), 
-     :                 'KAPPA_SCATTER', .FALSE., IPLOT, STATUS )
+     :                 'KAPPA_SCATTER', .FALSE., .FALSE., IPLOT, 
+     :                 STATUS )
 
 *  Close the workstation.
-      CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  Tidy up from here.
  999  CONTINUE

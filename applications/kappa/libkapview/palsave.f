@@ -62,11 +62,17 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1991 July 19 (MJC):
 *        Original version.
+*     23-JUL-1999 (TDCA):
+*        Modified to use PGPLOT.
+*     30-SEP-1999 (DSB):
+*        Tidied up.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,101 +98,51 @@
       PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
-      INTEGER
-     :  DIMS( NDIM ),            ! Dimensions of the output NDF
-     :  GSTAT,                   ! Graphics status
-     :  J,                       ! Loop counter
-     :  WKID,                    ! Work station identification
-     :  ZONE                     ! Input zone identification
-
-      REAL
-     :  PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Reserved palette colours
-
-      LOGICAL                    ! True if :
-     :  DEVCAN                   ! Image-display parameter is to be
-                                 ! cancelled
+      INTEGER DIMS( NDIM )       ! Dimensions of the output NDF
+      INTEGER IPIC1              ! ID for current picture
+      INTEGER J                  ! Loop counter
+      INTEGER UP                 ! Highest available colour index
+      REAL PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Reserved palette colours
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      DEVCAN = .FALSE.
+*  Open up PGPLOT without clearing the screen.
+      CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC1, STATUS )
 
-*    Start the graphics system.
-*    ==========================
-
-*    Open up SGS in read mode.
-
-      CALL SGS_ASSOC( 'DEVICE', 'READ', ZONE, STATUS )
-
-*    Check whether chosen device is an 'image display'.  It must have
-*    a suitable minimum number of colour indices, and will not reset
-*    when opened.
-
-      CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
+*  Check whether chosen device is an 'image display'.  It must have
+*  a suitable minimum number of colour indices, and will not reset
+*  when opened.
+      CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
      :                /'WINDOW', 'COLOUR,RESET', CTM__RSVPN + 8,
-     :                STATUS )
+     :                UP, STATUS )
 
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*       The device name is to be cancelled to prevent an invalid device
-*       being stored as the current value.
-
-         DEVCAN = .TRUE.
-         GOTO 999
+*  Inquire the palette colour indices.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         DO  J = 0, CTM__RSVPN - 1
+            CALL PGQCR( J, PALETT( 1, J ), PALETT( 2, J ),
+     :                  PALETT( 3, J ) )
+         END DO
       END IF
 
-*    Find the workstation identifier.
-
-      CALL SGS_ICURW( WKID )
-      
-*    Inquire the palette colour indices.
-*    ===================================
-
-      DO  J = 0, CTM__RSVPN - 1
-         CALL GQCR( WKID, J, 1, GSTAT, PALETT( 1, J ), PALETT( 2, J ),
-     :              PALETT( 3, J ) )
-      END DO
-
-*    See if within GKS an error has occurred.
-
-      CALL GKS_GSTAT( STATUS )
-
-*    Save the reserved colours in an NDF.
-*    ====================================
-
-*    Specify the dimensions of the new NDF.
-
+*  Save the reserved colours in an NDF. First specify the dimensions of the 
+*  new NDF.
       DIMS( 1 ) = NPRICL
       DIMS( 2 ) = CTM__RSVPN
 
-*    Create a new primitive NDF containing the colour table and a title.
-*    A null response will be handled transparently.
-
+*  Create a new primitive NDF containing the colour table and a title.
+*  A null response will be handled transparently.
       CALL KPG1_CPNTR( 'PALETTE', 'TITLE', NDIM, DIMS, PALETT, .TRUE.,
      :                 STATUS )
 
-*    If an error occurred, then report a contextual message.
+*  Shutdown the graphics system.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-  999 CONTINUE
+*  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'PALSAVE_ERR',
-     :   'PALSAVE: Unable to save the current reserved colours.',
-     :   STATUS )
+         CALL ERR_REP( 'PALSAVE_ERR', 'PALSAVE: Unable to save the '//
+     :                 'current reserved colours.', STATUS )
       END IF
-
-*    Tidy the graphics system.
-
-      IF ( DEVCAN ) THEN
-         CALL SGS_CANCL( 'DEVICE', STATUS )
-      ELSE
-         CALL SGS_ANNUL( ZONE, STATUS )
-      END IF
-
-*    Deactivate SGS so that the next call to SGS_ASSOC will initialise
-*    SGS, and hence can work in harmony with AGI-SGS applications.
-
-      CALL SGS_DEACT( STATUS )
 
       END

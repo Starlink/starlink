@@ -143,51 +143,11 @@
 *        This maps the lookup table stored in the NDF called rococo
 *        linearly to the full colour table on the current image-display
 *        device, i.e. ignoring the reserved pens.
-*     lutable hi gr ndf=nebula shade=0 percentiles=[5,90]
+*     lutable hi gr ndf=nebula shade=0 percentiles=[5 90]
 *        This maps the greyscale lookup table via histogram
 *        equalisation between the 5 and 90 percentiles of an NDF called
 *        nebula to the colour table on the current image-display
 *        device.  There is no bias or shading to white or black.
-
-*  Algorithm:
-*     -  Associate the image display with the graphics database and
-*     get picture and zone identifiers of the current picture.  Get
-*     device attributes and check that device is an image display.
-*     -  Ascertain whether the full colour-table is to be written to or
-*     not.  Hence find the number of available pens.  Find whether
-*     interpolation or nearest-neighbour method required.
-*     -  Start the NDF context although it may not be used.
-*     -  Start the loop.  Everything will be performed in this loop
-*     except the tidying operations.
-*     -  Determine whether looping is required.
-*     -  Obtain and implement the colour distribution/mapping.  The
-*     logarithmic is calculated via an approximate scaling to compute
-*     the offset for the first pen, and then improved.  Fitting pens
-*     to a + log10( b * pen ).
-*     -  For histogram-equalisation mapping
-*        o  If the NDF has not already been obtained, check there is a
-*        data array already displayed by enquiring of the database.
-*        Find and report the referenced object. Associate an NDF.
-*        Obtain its dimensions.  Check that it is 2-d.  Find the
-*        processing type.  Map the data and obtain the miimum and
-*        maximum values.  Given no error set the flag to indicate the
-*        NDF has been obtained.
-*        o  Get the parameters for the scaling.  Compute the values at
-*        the percentiles.
-*        o  Create and map work arrays.
-*        o  Perform the histogram equalisation.  If the equalisation
-*        failed, say due to unsuitable percentiles, use a linear
-*        mapping.
-*        o  Tidy the work arrays.
-*     -  Obtain and set the required colour table.  The only tricky
-*     one is to obtain one from an NDF.  Obtain an NDF identifier,
-*     validate that the NDF is a LUT, and map the data array.  Inquire
-*     its dimensions.  If an error occurs set the LUT to a greyscale,
-*     otherwise copy in the data array into the LUT.  Load the LUT
-*     into the colour table of the device.
-*     -  If looping occurs, cancel the valus of the parameters in the
-*     loop.
-*     -  Tidy NDF and AGI.
 
 *  Related Applications:
 *     KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
@@ -202,6 +162,8 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -219,6 +181,10 @@
 *        Works directly on double-precision NDFs.  Replaced old
 *        subroutines.  Use PSX for workspace.  Used modern-style
 *        commenting and variable declarations.
+*     22-JUL-1999 (TDCA):
+*        Modified to use PGPLOT.
+*     30-SEP-1999 (DSB):
+*        Tidied up. Replace call to KPG1_QIDAT by PGQCOL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -267,6 +233,7 @@
                                  ! reserved pens
       LOGICAL BAD                ! May array contain bad pixels and
                                  ! therefore testing should occur?
+      INTEGER CI1                ! Lowest available colour index
       INTEGER CIFILL             ! Number of extra colour indices to
                                  ! fill above equal-sized coloured
                                  ! blocks
@@ -277,8 +244,6 @@
       REAL COLSET( NPRICL, NLUTST ) ! Standard coloured LUT
       REAL COPB                  ! Average number of colour indices in a
                                  ! standard colour-set block
-      LOGICAL DEVCAN             ! Image-display parameter is to be
-                                 ! cancelled?
       DOUBLE PRECISION DMAXV     ! Minimum value in the array
       DOUBLE PRECISION DMINV     ! Maximum value in the array
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after processing (not
@@ -289,7 +254,7 @@
       REAL FROB                  ! Fraction of standard coloured blocks
                                  ! that will have an extra index
       LOGICAL FULL               ! Full colour table is to be saved?
-      REAL GKSCOL( NPRICL )      ! Used to transfer the colour of one pen
+      REAL PGPCOL( NPRICL )      ! Used to transfer the colour of one pen
                                  ! to the image-display colour table
       INTEGER HIST( NUMBIN )     ! Array containing histogram for
                                  ! percentiles
@@ -298,10 +263,8 @@
       REAL IMDSET( NPRICL, 0:CTM__MXPEN - 1 ) ! Lookup table that will
                                  ! be used for the image-display colour
                                  ! table
-      INTEGER IPIXX              ! Maximum number of columns of pixels
-                                 ! of the image display
-      INTEGER IPIXY              ! Maximum number of lines of pixels
-                                 ! of the image display
+      INTEGER IPIC1              ! Graphics' database ident. on input
+      INTEGER IPIC2              ! Graphics' database ident. recalled
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing type of the image
       INTEGER J                  ! General variable
       INTEGER K                  ! General variable
@@ -332,8 +295,6 @@
       LOGICAL NN                 ! Mapping the input LUT via
                                  ! nearest-neighbour method?
       REAL OFFSET                ! Logarithmic offset
-      INTEGER PICID1             ! Graphics' database ident. on input
-      INTEGER PICID2             ! Graphics' database ident. recalled
       INTEGER PENS( 0:CTM__MXPEN - 1 ) ! Entries in the colour table assigned
                                  ! to each pen
       CHARACTER * ( 12 ) PENTBL  ! Type of colour distribution to be
@@ -348,19 +309,17 @@
       REAL RMAXV                 ! Minimum value in the array
       REAL RMINV                 ! Maximum value in the array
       REAL RNINTS                ! Scaling factor to convert lookup table
-                                 ! to range 0 to 1 for GKS
+                                 ! to range 0 to 1
       INTEGER SDIM( NDIM )       ! Indices of significant axes
       REAL SHADE                 ! Type of shading emphasis
       INTEGER SLBND( NDIM )      ! Lower bounds of significant axes
       INTEGER SUBND( NDIM )      ! Upper bounds of significant axes
       INTEGER TABSTA             ! The state of the COLTAB parameter
       LOGICAL VALID              ! NDF identifier is valid?
-      INTEGER WKID               ! GKS workstation identifier
       INTEGER WPNTR1             ! Pointer to a work array
       INTEGER WPNTR2             ! Pointer to a work array
       INTEGER WPNTR3             ! Pointer to a work array
       INTEGER WPNTR4             ! Pointer to a work array
-      INTEGER ZONEID             ! SGS zone identifier
 
 *  Local Data:
       DATA COLSET/0.0, 0.0, 0.5,
@@ -385,52 +344,38 @@
 *.
 
 *  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF( STATUS .NE. SAI__OK ) RETURN
 
 *  Full colour table required?
       CALL PAR_GTD0L( 'FULL', .FALSE., .TRUE., FULL, STATUS )
 
-*  Do not mark the graphics device for being cancelled.
-      DEVCAN = .FALSE.
-
-*  Open SGS and not clearing the screen.
-      CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID1, ZONEID, STATUS )
+*  Open workstation without clearing the screen.
+      CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC1, STATUS )
 
 *  Check whether chosen device is an 'image display' with a suitable
 *  minimum number of colour indices, and will not reset when opened.
-      IF ( FULL ) THEN
-         CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,'/
+      IF( FULL ) THEN
+         CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,'/
      :                   /'IMAGE_OVERLAY,WINDOW,MATRIX_PRINTER',
-     :                   'RESET', 8 + CTM__RSVPN, STATUS )
+     :                   'RESET', 8 + CTM__RSVPN, NINTS, STATUS )
       ELSE
-         CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,'/
+         CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,'/
      :                   /'IMAGE_OVERLAY,WINDOW,MATRIX_PRINTER',
-     :                   'RESET', 8, STATUS )
+     :                   'RESET', 8, NINTS, STATUS )
       END IF
 
-*  Obtain the number of colour indices and the maximum display surface.
-      CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY, STATUS )
-
-*  Abort if the device is not suitable or something has gone wrong
-*  associating the device.
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*  The device name is to be cancelled.
-         DEVCAN = .TRUE.
-         GOTO 980
-      END IF
+*  Increment the number of colours is one more than the highest colour
+*  index (because the background colour index is zero).
+      NINTS = NINTS + 1
 
 *  Map the lookup table to the colour table by interpolation or by
 *  nearest neighbour?
       CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*  Obtain GKS workstation identifier
-      CALL SGS_ICURW( WKID )
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Derive the colour-index offset depending on whether reserved colour
 *  indices are to be written to or not.
-      IF ( FULL ) THEN
+      IF( FULL ) THEN
          CIOFF = 0
       ELSE
          CIOFF = CTM__RSVPN
@@ -465,7 +410,7 @@
      :          MAPSTA .NE. PAR__ACTIVE
 
 *  Let the user know how to exit the loop the first time around.
-         IF ( FIRST .AND. LOOP ) CALL MSG_OUT( 'COMMENT',
+         IF( FIRST .AND. LOOP ) CALL MSG_OUT( 'COMMENT',
      :     'Type a ! in response to a prompt to exit the loop.',
      :     STATUS )
          FIRST = .FALSE.
@@ -484,21 +429,21 @@
 
 *  If the entry was invalid or null then exit from the loop leaving the
 *  display unchanged.
-         IF ( STATUS .NE. SAI__OK ) THEN
+         IF( STATUS .NE. SAI__OK ) THEN
 
-            IF ( STATUS .NE. PAR__ABORT ) THEN
+            IF( STATUS .NE. PAR__ABORT ) THEN
                CALL ERR_REP( 'ERR_LUTABLE_DUN',
      :           'LUTABLE: Display unchanged.', STATUS )
             END IF
 
 *  A null is not an error here.
-            IF ( STATUS .EQ. PAR__NULL ) THEN
+            IF( STATUS .EQ. PAR__NULL ) THEN
                CALL ERR_FLUSH( STATUS )
             END IF
             CALL ERR_RLSE
 
 *  Exit from the outer loop.
-            GOTO 960
+            GO TO 960
          END IF
 
 *  Release the new error context.
@@ -510,7 +455,7 @@
 *  If the colours are to be mapped straight onto the pens then, set up
 *  the colour lookup table for the pens so that each pen is assigned
 *  its appropriate colour.
-         IF ( PENTBL( 1:2 ) .EQ. 'LI' ) THEN
+         IF( PENTBL( 1:2 ) .EQ. 'LI' ) THEN
 
             DO  I = 0, ANINTS - 1, 1
                PENS( I ) = I
@@ -521,7 +466,7 @@
 
 *  If the colours are to be mapped logarithmically, then set up the pen
 *  lookup array accordingly, with pen n pointing to colour n.
-         ELSE IF ( PENTBL( 1:2 ) .EQ. 'LO' ) THEN
+         ELSE IF( PENTBL( 1:2 ) .EQ. 'LO' ) THEN
 
 *  Determine the transformation parameters so the pens span the same
 *  range.  First the approximate scaling to compute an offset.
@@ -550,22 +495,22 @@
 *  If the colours are to have equal use when displaying the array, then
 *  try to do a histogram equalisation.  If this fails, then just use the
 *  linear table.
-         ELSE IF ( PENTBL( 1:2 ) .EQ. 'HI' ) THEN
+         ELSE IF( PENTBL( 1:2 ) .EQ. 'HI' ) THEN
 
 *  If no array has been read in already, then read one in.
-            IF ( .NOT. IMAGE ) THEN
+            IF( .NOT. IMAGE ) THEN
 
 *  This flag is needed to know what should be tidied.
                IMAGE = .TRUE.
 
 *  Determine whether or not an array is already displayed.
-               CALL AGI_RCL( 'DATA', PICID2, STATUS )
+               CALL AGI_RCL( 'DATA', IPIC2, STATUS )
 
-               IF ( STATUS .NE. SAI__OK ) THEN
+               IF( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_REP( 'ERR_LUTABLE_NDB',
      :              'LUTABLE:  Some data must be displayed before '/
      :              /'using this option.', STATUS )
-                  GOTO 960
+                  GO TO 960
                END IF
 
 *  Report the object associated with the DATA picture.
@@ -576,14 +521,14 @@
 
 *  Determine whether or not there is a reference object associated with
 *  the current picture.
-               CALL KPG1_AGREF( PICID2, 'READ', REFOBJ, REFNAM, STATUS )
+               CALL KPG1_AGREF( IPIC2, 'READ', REFOBJ, REFNAM, STATUS )
 
 *  If one exists translate its locator reference to a token containing
 *  the path name and file name, and tidy the reference locator; or just
 *  use the reference name.
-               IF ( REFOBJ ) THEN
+               IF( REFOBJ ) THEN
                   CALL DAT_VALID( REFNAM( :DAT__SZLOC ), VALID, STATUS )
-                  IF ( VALID ) THEN
+                  IF( VALID ) THEN
                      CALL KPG1_HMSG( 'NAME', REFNAM( :DAT__SZLOC ) )
                      CALL REF_ANNUL( REFNAM( :DAT__SZLOC ), STATUS )
                   ELSE
@@ -615,11 +560,11 @@
      :                       STATUS )
 
 *  Obtain the maximum and minimum values.
-               IF ( ITYPE .EQ. '_REAL' ) THEN
+               IF( ITYPE .EQ. '_REAL' ) THEN
                    CALL KPG1_MXMNR( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
      :                              RMAXV, RMINV, MAXPOS, MINPOS,
      :                              STATUS )
-               ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                    CALL KPG1_MXMND( BAD, EL, %VAL( PNTRI( 1 ) ), NINVAL,
      :                              DMAXV, DMINV, MAXPOS, MINPOS,
      :                              STATUS )
@@ -627,11 +572,11 @@
 
 *  If the data were not accessed successfully then leave the
 *  application.
-               IF ( STATUS .NE. SAI__OK ) THEN
+               IF( STATUS .NE. SAI__OK ) THEN
                   CALL NDF_VALID( NDF, VALID, STATUS )
-                  IF ( VALID ) CALL NDF_ANNUL( NDF, STATUS )
+                  IF( VALID ) CALL NDF_ANNUL( NDF, STATUS )
                   IMAGE = .FALSE.
-                  GOTO 960
+                  GO TO 960
                END IF
 
 *  End of image-already-accessed check.
@@ -663,13 +608,13 @@
 *  Generate the histogram between those bounds, calling the routine of
 *  the appropriate type.  The d.p. verson of the range is needed for the
 *  percentile routine.
-            IF ( ITYPE .EQ. '_REAL' ) THEN
+            IF( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GHSTR( BAD, EL, %VAL( PNTRI( 1 ) ),
      :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
                DMAXV = DBLE( RMAXV )
                DMINV = DBLE( RMINV )
 
-            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_GHSTD( BAD, EL, %VAL( PNTRI( 1 ) ),
      :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
             END IF
@@ -680,10 +625,10 @@
 
 *  If the data were not accessed successfully then leave the
 *  application
-            IF ( STATUS .NE. SAI__OK ) GOTO 960
+            IF( STATUS .NE. SAI__OK ) GO TO 960
 
 *  Cancel the parameters for the loop.
-            IF ( LOOP ) THEN
+            IF( LOOP ) THEN
                CALL PAR_CANCL( 'SHADE', STATUS )
                CALL PAR_CANCL( 'PERCENTILES', STATUS )
             END IF
@@ -700,14 +645,14 @@
 *  Start a new error context so that an error can be handled invisibly.
 *  Call a routine appropriate for the data type.
             CALL ERR_MARK
-            IF ( ITYPE .EQ. '_REAL' ) THEN
+            IF( ITYPE .EQ. '_REAL' ) THEN
                CALL KPS1_HEQPR( BAD, EL, %VAL( PNTRI( 1 ) ), SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
      :                          %VAL( WPNTR1 ), %VAL( WPNTR2 ),
      :                          %VAL( WPNTR3 ), %VAL( WPNTR4 ), STATUS )
 
-            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_HEQPD( BAD, EL, %VAL( PNTRI( 1 ) ), SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
@@ -715,7 +660,7 @@
      :                          %VAL( WPNTR3 ), %VAL( WPNTR4 ), STATUS )
             END IF
 
-            IF ( STATUS .NE. SAI__OK ) THEN
+            IF( STATUS .NE. SAI__OK ) THEN
 
 *  Use a linear lookup table.
                CALL ERR_REP( 'ERR_LUTABLE_HSE',
@@ -740,7 +685,7 @@
 *  End of the section to define the colour mapping.
 *  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-         IF ( STATUS .EQ. SAI__OK ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Start a new error context.
             CALL ERR_MARK
@@ -753,21 +698,21 @@
      :                      'Colour,Grey,Negative,External', .FALSE.,
      :                      LUT, STATUS )
 
-            IF ( STATUS .NE. SAI__OK ) THEN
+            IF( STATUS .NE. SAI__OK ) THEN
 
-               IF ( STATUS .NE. PAR__ABORT ) THEN
+               IF( STATUS .NE. PAR__ABORT ) THEN
                   CALL ERR_REP( 'ERR_LUTABLE_COS',
      :              'LUTABLE: Pens unchanged.', STATUS )
                END IF
 
 *  A null is not an error here.
-               IF ( STATUS .EQ. PAR__NULL ) THEN
+               IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_FLUSH( STATUS )
                END IF
                CALL ERR_RLSE
 
 *  Leaving the outer loop.
-               GOTO 960
+               GO TO 960
             END IF
 
 *  Release the new error context.
@@ -775,7 +720,7 @@
 
 *  Grey LUT.
 *  =========
-            IF ( LUT( 1:2 ) .EQ. 'GR' ) THEN
+            IF( LUT( 1:2 ) .EQ. 'GR' ) THEN
 
 *  Set up a grey scale.
                DO  I = 0, ANINTS - 1, 1
@@ -786,7 +731,7 @@
 
 *  Negative grey LUT.
 *  ==================
-            ELSE IF ( LUT( 1:2 ) .EQ. 'NE' ) THEN
+            ELSE IF( LUT( 1:2 ) .EQ. 'NE' ) THEN
 
 *  Set up a negative grey scale.
                DO  I = 0, ANINTS - 1, 1
@@ -797,7 +742,7 @@
 
 *  Coloured LUT.
 *  =============
-            ELSE IF ( LUT( 1:2 ) .EQ. 'CO' ) THEN
+            ELSE IF( LUT( 1:2 ) .EQ. 'CO' ) THEN
 
 *  Try to make the blocks equal sized, but this is usually not
 *  possible.  Therefore make some blocks one index larger to fill the
@@ -805,7 +750,7 @@
 *  coloured block and the average number of pens per coloured block.
                LUTMIN = ANINTS / NLUTST
 
-               IF ( LUTMIN .GE. 1 ) THEN
+               IF( LUTMIN .GE. 1 ) THEN
                   COPB = REAL( ANINTS ) / REAL( NLUTST )
 
 *  Hence derive the fraction of blocks that are one colour index larger
@@ -836,7 +781,7 @@
 *  block is to be larger.  Also prevent the index from exceeding the
 *  colour-table bounds.
                   CIFRAC = CIFRAC + FROB
-                  IF ( CIFRAC .GT. 1.0 .AND. NFILL .LT. CIFILL ) THEN
+                  IF( CIFRAC .GT. 1.0 .AND. NFILL .LT. CIFILL ) THEN
 
 *  The block is extended by one colour index.
                       NCI = LUTMIN + 1
@@ -862,13 +807,13 @@
 
 *  LUT in an NDF.
 *  ==============
-            ELSE IF ( LUT( 1:2 ) .EQ. 'EX' ) THEN
+            ELSE IF( LUT( 1:2 ) .EQ. 'EX' ) THEN
 
 *  Start another NDF context.
 
                CALL NDF_BEGIN
 
-               IF ( .NOT. EXL1ST ) THEN
+               IF( .NOT. EXL1ST ) THEN
 
 *  We want to be able to store the last LUT file accessed, yet at the
 *  same time provide looping for which we must cancel the LUT
@@ -878,7 +823,7 @@
 *  and purge any error that arises.
                   CALL ERR_MARK
                   CALL PAR_CANCL( 'LUT', STATUS )
-                  IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+                  IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
                   CALL ERR_RLSE
                END IF
 
@@ -894,21 +839,21 @@
 
 *  Null status means exit the loop, but without reporting an error.
 *  Also skip over the portion
-               IF ( STATUS .EQ. PAR__NULL ) THEN
+               IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
                   CALL ERR_RLSE
-                  GOTO 960
+                  GO TO 960
 
 *  Abort immediately.
-               ELSE IF ( STATUS .EQ. PAR__ABORT ) THEN
+               ELSE IF( STATUS .EQ. PAR__ABORT ) THEN
                   CALL ERR_RLSE
-                  GOTO 960
+                  GO TO 960
 
 *  Something else has gone wrong.
-               ELSE IF ( STATUS .NE. SAI__OK ) THEN
+               ELSE IF( STATUS .NE. SAI__OK ) THEN
 
 *  We want to continue if we are in a loop.
-                  IF ( LOOP ) THEN
+                  IF( LOOP ) THEN
                      CALL ERR_FLUSH( STATUS )
                      CALL MSG_OUT( 'GREYSCALE',
      :                 'Using a greyscale lookup table.', STATUS )
@@ -925,9 +870,9 @@
 *  status rather than an explicit PAR_CANCL call.
                   ELSE
                      CALL NDF_VALID( NDFL, VALID, STATUS )
-                     IF ( VALID ) CALL NDF_ANNUL( NDFL, STATUS )
+                     IF( VALID ) CALL NDF_ANNUL( NDFL, STATUS )
                      CALL ERR_RLSE
-                     GOTO 960
+                     GO TO 960
                   END IF
 
 *  A valid LUT has been obtained and mapped.
@@ -949,35 +894,35 @@
 *  End of the colour-table cases.
             END IF
 
-            IF ( STATUS .EQ. SAI__OK ) THEN
+            IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Load up the image-display colour table.
 *  =======================================
-               DO  I = 0, ANINTS - 1, 1
+                DO  I = 0, ANINTS - 1, 1
 
 *  Apply the mapping to the lookup table.
-                  DO  J = 1, NPRICL, 1
-                     GKSCOL( J ) = IMDSET( J, PENS( I ) )
-                  END DO
+                   DO  J = 1, NPRICL, 1
+                      PGPCOL( J ) = IMDSET( J, PENS( I ) )
+                   END DO
 
 *  Finally, allow for the reserved pens when setting the colour
 *  representation.  Allow for rounding errors.
-                  CALL GSCR( WKID, I + CIOFF,
-     :                       MIN( 1.0, MAX( 0.0, GKSCOL( 1 ) ) ),
-     :                       MIN( 1.0, MAX( 0.0, GKSCOL( 2 ) ) ),
-     :                       MIN( 1.0, MAX( 0.0, GKSCOL( 3 ) ) ) )
+                    CALL PGSCR( I + CIOFF,
+     :                       MIN( 1.0, MAX( 0.0, PGPCOL( 1 ) ) ),
+     :                       MIN( 1.0, MAX( 0.0, PGPCOL( 2 ) ) ),
+     :                       MIN( 1.0, MAX( 0.0, PGPCOL( 3 ) ) ) )
 
-               END DO
+                END DO
 
 *  Make the change visible immediately.
-               CALL SGS_FLUSH
-            END IF
+                CALL PGUPDT
+             END IF
 
 *  End-no-invalid-entry-in-stage-one check
          END IF
 
 *  Cancel the parameters if there is a loop.
-         IF ( LOOP ) THEN
+         IF( LOOP ) THEN
             CALL PAR_CANCL( 'MAPPING', STATUS )
             CALL PAR_CANCL( 'COLTAB', STATUS )
          END IF
@@ -986,15 +931,19 @@
       END DO
 
 *  Unmap and annul NDF data.
-*  =========================
  960  CONTINUE
-      IF ( IMAGE ) CALL NDF_END( STATUS )
+      IF( IMAGE ) CALL NDF_END( STATUS )
+
+*  Tidy up.
+ 999  CONTINUE
 
 *  AGI closedown sequence.
-*  =======================
- 980  CONTINUE
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
- 999  CONTINUE
+* If an error occurred, then report a contextual message.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'LUTABLE_ERR', 'LUTABLE: Unable to manipulate '//
+     :                 ' an image-display colour table.', STATUS )
+      END IF
 
       END

@@ -28,7 +28,7 @@
 *        The global status.
 
 *  Notes:
-*     -  A graphics device must previously have been opened using SGS/GKS.
+*     -  A graphics device must previously have been opened using PGPLOT.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -37,6 +37,8 @@
 *  History:
 *     30-OCT-1998 (DSB):
 *        Original version.
+*     1-OCT-1999 (DSB):
+*        Converted to PGPLOT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -62,8 +64,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER GSTAT              ! GKS status
-      INTEGER IWKID              ! GKS workstation identifier
       INTEGER I                  ! Loop count
   
 *.
@@ -71,19 +71,9 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the workstation identifier for the currently open graphics device.
-      CALL SGS_ICURW( IWKID ) 
-
-*  Inquire whether GKS/SGS has reported an error
-      CALL GKS_GSTAT( STATUS )
-
 *  Inquire the palette colour indices, and store in the array.
       DO  I = CI1, CI2
-         CALL GQCR( IWKID, I, 1, GSTAT, ARRAY( 1, I ), ARRAY( 2, I ), 
-     :              ARRAY( 3, I ) )
+         CALL PGQCR( I, ARRAY( 1, I ), ARRAY( 2, I ), ARRAY( 3, I ) )
       END DO
-
-*  See if within GKS an error has occurred.
-      CALL GKS_GSTAT( STATUS )
 
       END

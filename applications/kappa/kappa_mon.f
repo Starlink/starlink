@@ -92,7 +92,7 @@
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the KAPPA release source tar file 
 *  is contructed.
-      CALL NDF_HAPPN( NAME // ' (KAPPA PKG_VERS)', STATUS )
+      CALL NDF_HAPPN( NAME // ' (KAPPA 0.14)', STATUS )
 
 *  See if NDF names should be reported when looping.
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
@@ -200,14 +200,6 @@
          ELSE IF ( NAME .EQ. 'ERRCLIP' ) THEN
             CALL ERRCLIP ( STATUS )
 
-*  Takes the base-10 exponential of each pixel of a data array.
-         ELSE IF ( NAME .EQ. 'EXP10' ) THEN
-            CALL EXP10 ( STATUS )
-
-*  Takes the exponential of each pixel of a data array (base e).
-         ELSE IF ( NAME .EQ. 'EXPE' ) THEN
-            CALL EXPE ( STATUS )
-
 *  Takes the exponential of each pixel of a data array (specified base).
          ELSE IF ( NAME .EQ. 'EXPON' ) THEN
             CALL EXPON ( STATUS )
@@ -278,17 +270,9 @@
          ELSE IF ( NAME .EQ. 'LISTSHOW' ) THEN
             CALL LISTSHOW ( STATUS )
 
-*  Takes the base-10 logarithm of each pixel of a data array.
-         ELSE IF ( NAME .EQ. 'LOG10' ) THEN
-            CALL KAP_LOG10 ( STATUS )
-
 *  Takes the logarithm of each pixel of a data array (specified base).
          ELSE IF ( NAME .EQ. 'LOGAR' ) THEN
             CALL LOGAR ( STATUS )
-
-* Takes the natural logarithm of each pixel of a data array.
-         ELSE IF ( NAME .EQ. 'LOGE' ) THEN
-            CALL LOGE ( STATUS )
 
 *  Outputs the values of a sub-array of a 2-d data array to the
 *  screen or an ASCII file.

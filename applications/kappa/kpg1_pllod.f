@@ -24,9 +24,8 @@
 *     in the array) is the background colour and is usually refered to as 
 *     colour index zero. Therefore the highest colour index in the array is
 *     (n-1). Each array has a name which identifies the graphics device
-*     to which it refers. At the moment, the array names are the GKS 
-*     workstation types (integers). This will need to change when KAPPA 
-*     changes over to use native PGPLOT, instead of GKS PGPLOT.
+*     to which it refers. Each array has a name which identifies the 
+*     graphics device to which it refers. 
 *
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -68,6 +67,7 @@
       CHARACTER LOC*(DAT__SZLOC) ! Locator to top-level container file object
       CHARACTER PATH*132         ! Path to the container file
       CHARACTER PLOC*(DAT__SZLOC)! Locator to palette array 
+      CHARACTER PREFIX*25        ! Device prefix
       CHARACTER TYPE*20          ! Device name
       INTEGER DIMS( 2 )          ! Array dimensions
       INTEGER EL                 ! Number of mapped array elements
@@ -135,17 +135,15 @@
 *  contains the palette for the currently opened graphics device. 
 *  =================================================================
 
-*  Get the GKS workstation identifier for the currently open graphics device.
-*  The integer value is formatted by this PGPLOT call. Prepend it with the
-*  the string "GKS_".
-         TYPE = 'GKS_'
-         CALL PGQINF( 'TYPE', TYPE( 5 : ), NC )
-
-*  Remove any spaces.
+*  Get the workstation type, and remove any leading blanks.
+         CALL PGQINF( 'TYPE', TYPE, NC )
          CALL CHR_RMBLK( TYPE )
 
-*  Find the new length.
-         NC = CHR_LEN( TYPE )
+*  Format the workstation type, prepending the string "PGP_" to it.
+         PREFIX = 'PGP_'
+         NC = 4
+         CALL CHR_APPND( TYPE, PREFIX, NC )
+         TYPE = PREFIX
 
 *  Find the palette array within the container file.
 *  =================================================

@@ -64,6 +64,8 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +76,10 @@
 *     30-OCT-1998 (DSB):
 *        Modified to save current palette in the adam directory so that
 *        subsequent PGPLOT applications can read it back in again.
+*     22-JUL-1999 (TDCA):
+*        Modified to use PGPLOT.
+*     30-SEP-1999 (DSB):
+*        Tidied up.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,101 +102,55 @@
       PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
-      INTEGER
-     :  I,                       ! Loop counter
-     :  WKID,                    ! Work station identification
-     :  ZONE                     ! Input zone identification
-
-      REAL
-     :  PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Reserved palette colours
-
-      LOGICAL                    ! True if :
-     :  DEVCAN                   ! Image-display parameter is to be
-                                 ! cancelled
+      INTEGER I                  ! Loop counter
+      INTEGER IPIC1              ! Current picture identifier
+      INTEGER UP                 ! Highest available colour index. 
+      REAL PALETT( NPRICL, 0:CTM__RSVPN - 1 ) ! Reserved palette colours
 
 *.
 
-*    Check the inherited global status.
-
+*  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      DEVCAN = .FALSE.
+*  Open up workstation in update mode as only some colours 
+*  are to be changed.
+      CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC1, STATUS )
 
-*    Start the graphics system.
-*    ==========================
+*  Check whether chosen device is an 'image display'.  It must have
+*  a suitable minimum number of colour indices, and will not reset
+*  when opened.
+      CALL KPG1_PQVID( 'DEVICE', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
+     :                /'WINDOW,MATRIX_PRINTER', 'RESET', 
+     :                8 + CTM__RSVPN, UP, STATUS )
 
-*    Open up SGS in update mode as only some colours are to be changed.
-
-      CALL SGS_ASSOC( 'DEVICE', 'UPDATE', ZONE, STATUS )
-
-*    Check whether chosen device is an 'image display'.  It must have
-*    a suitable minimum number of colour indices, and will not reset
-*    when opened.
-
-      CALL KPG1_QVID( 'DEVICE', 'SGS', 'IMAGE_DISPLAY,IMAGE_OVERLAY,'/
-     :                /'WINDOW,MATRIX_PRINTER', 'COLOUR',
-     :                CTM__RSVPN + 8, STATUS )
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-
-*       The device name is to be cancelled to prevent an invalid device
-*       being stored as the current value.
-
-         DEVCAN = .TRUE.
-         GOTO 999
-      END IF
-
-*    Find the workstation identifier.
-
-      CALL SGS_ICURW( WKID )
-      
-*    Create the pre-defined palette colours.
-*    =======================================
-
-*    There are only CTM__RSVPN standard colour indices that form a
-*    palette.
-
+*  Create the pre-defined palette colours. There are only CTM__RSVPN 
+*  standard colour indices that form a palette. 
       CALL KPS1_CLPAL( CTM__RSVPN, 1, PALETT, STATUS )
 
+*  Install the palette into image-display colour table.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         DO  I = 0, CTM__RSVPN - 1, 1
+            CALL PGSCR( I, PALETT( 1, I ), PALETT( 2, I ),
+     :                  PALETT( 3, I ) )
+         END DO
+      END IF
 
-*    Install the palette into image-display colour table.
-*    ====================================================
-
-      DO  I = 0, CTM__RSVPN - 1, 1
-         CALL GSCR( WKID, I, PALETT( 1, I ), PALETT( 2, I ),
-     :              PALETT( 3, I ) )
-      END DO
-      CALL GKS_GSTAT( STATUS )
-
-*    Save the palette in the adam directory so that it can be read back
-*    again by subsequent applications (PGPLOT resets the colour palette
-*    when it opens a device, so the palette then needs to be re-instated).
-*    The first two pens ( 0 and 1, the background and foreground colours) 
-*    are not saved, but reset to their default (unspecified) values. This
-*    means (for instance), that foreground text will be white on black 
-*    on an xwindow, but black on white on a printer.
+*  Save the palette in the adam directory so that it can be read back
+*  again by subsequent applications (PGPLOT resets the colour palette
+*  when it opens a device, so the palette then needs to be re-instated).
+*  The first two pens ( 0 and 1, the background and foreground colours) 
+*  are not saved, but reset to their default (unspecified) values. This
+*  means (for instance), that foreground text will be white on black 
+*  on an xwindow, but black on white on a printer.
       CALL KPG1_PLSAV( 2, 0, .TRUE., STATUS )
 
-*    If an error occurred, then report a contextual message.
+*  Close the graphics system.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
-  999 CONTINUE
+* If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'PALDEF_ERR',
-     :   'PALDEF: Unable to load the standard palette colours.',
-     :   STATUS )
+         CALL ERR_REP( 'PALDEF_ERR', 'PALDEF: Unable to load the '//
+     :                 'standard palette colours.', STATUS )
       END IF
-
-*    Tidy the graphics system.
-
-      IF ( DEVCAN ) THEN
-         CALL SGS_CANCL( 'DEVICE', STATUS )
-      ELSE
-         CALL SGS_ANNUL( ZONE, STATUS )
-      END IF
-
-*    Deactivate SGS so that the next call to SGS_ASSOC will initialise
-*    SGS, and hence can work in harmony with AGI-SGS applications.
-
-      CALL SGS_DEACT( STATUS )
 
       END

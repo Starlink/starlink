@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                       XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, 
-     :                       APP, QUIET, IPLOT, STATUS )
+     :                       APP, QUIET, LMODE, IPLOT, STATUS )
 *+
 *  Name:
 *     KPG1_GRAPH
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL KPG1_GRAPH( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL, XSYM,
 *                      YSYM, MODE, NULL, XL, XR, YB, YT, APP, QUIET, 
-*                      IPLOT, STATUS )
+*                      LMODE, IPLOT, STATUS )
 
 *  Description:
 *     Opens a graphics device and draws a graph displaying a supplied 
@@ -28,56 +28,9 @@
 *       CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
 
 *  Environment Parameters:
-*     The following envirnment parameter names are used by this routine,
-*     to encourage uniformity in parameter naming, and behaviour:
-*
-*        AXES = _LOGICAL (Read)
-*           TRUE if annotated axes are to be produced.
-*        CLEAR = _LOGICAL (Read)
-*           TRUE if the graphics device is to be cleared on opening. 
-*        DEVICE = DEVICE (Read)
-*           The plotting device. 
-*        MARGIN( 4 ) = _REAL (Read)
-*           The widths of the margins to leave for axis annotation, given 
-*           as fractions of the corresponding dimension of the DATA picture. 
-*           Four values may be given, in the order - bottom, right, top, left. 
-*           If less than four values are given, extra values are used equal to 
-*           the first supplied value. If these margins are too narrow any axis 
-*           annotation may be clipped. The dynamic default is 0.18 (for all 
-*           edges) if either annotated axes or a key are produced, and zero 
-*           otherwise. 
-*        MARKER = INTEGER )Read)
-*           The PGPLOT marker type to use. Only accessed if MODE is 3 or 5.
-*        STYLE = GROUP (Read)
-*           A description of the plotting style required. The following 
-*           synonyms for graphical elements may be used: 
-*           "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
-*                         scales the size of the serifs (i.e. a size value of 
-*                         1.0 produces a default size).
-*           "Sym(bols)" - Specifies colour, etc for markers (used in modes 3
-*                         and 5).
-*           "Lin(es)"   - Specifies colour, etc for lines (used in modes 1, 2
-*                         and 5).
-*        XLEFT = LITERAL (Read)
-*           The axis value to place at the left hand end of the horizontal
-*           axis. The dynamic default is specified by argument XL. The value 
-*           supplied may be greater than or less than the value supplied for 
-*           XRIGHT. 
-*        XRIGHT = LITERAL (Read)
-*           The axis value to place at the right hand end of the horizontal
-*           axis. The dynamic default is specified by argument XR. The value 
-*           supplied may be greater than or less than the value supplied for 
-*           XLEFT. 
-*        YBOT = LITERAL (Read)
-*           The axis value to place at the bottom end of the vertical 
-*           axis. The dynamic default is specified by argument YB. The value 
-*           supplied may be greater than or less than the value supplied for 
-*           YTOP. 
-*        YTOP = LITERAL (Read)
-*           The axis value to place at the top end of the vertical axis. 
-*           The dynamic default is specified by argument YT. The value 
-*           supplied may be greater than or less than the value supplied 
-*           for YBOT. 
+*     Various envirnment parameter names are used by this routine,
+*     to encourage uniformity in parameter naming, and behaviour.
+*     See KPG1_GRPHW for details.
 
 *  Arguments:
 *     N = INTEGER (Given)
@@ -150,6 +103,12 @@
 *        If .FALSE., a message is displayed indicating the number of
 *        points which were plotted. If .TRUE., nothing is displayed on
 *        the alpha screen.
+*     LMODE = LOGICAL (Given)
+*        If .TRUE., then the user is given the chance to specify the
+*        default vertical bounds for the plot using parameter LMODE. If 
+*        .FALSE., the supplied bounds (YB, YT ) are used, and the 
+*        eqivalent of "Extended" LMODE is used for any bounds which are 
+*        not supplied.
 *     IPLOT = INTEGER (Returned)
 *        The AST Plot used to do the drawing.
 *     STATUS = INTEGER (Given and Returned)
@@ -167,6 +126,8 @@
 *  History:
 *     17-JUN-1999 (DSB):
 *        Original version.
+*     1-OCT-1999 (DSB):
+*        Added argument LMODE. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,6 +160,7 @@
       REAL YT
       CHARACTER APP*(*)
       LOGICAL QUIET
+      LOGICAL LMODE
 
 *  Arguments Returned:
       INTEGER IPLOT
@@ -228,8 +190,8 @@
 *  Draw the graph.
       CALL KPG1_GRPHW( N, X, Y, NSIGMA, YSIGMA, XLAB, YLAB, TTL,
      :                 XSYM, YSYM, MODE, NULL, XL, XR, YB, YT, APP, 
-     :                 QUIET, %VAL( IPW1 ), %VAL( IPW2 ), %VAL( IPW3 ), 
-     :                 IPLOT, STATUS )
+     :                 QUIET, LMODE, %VAL( IPW1 ), %VAL( IPW2 ), 
+     :                 %VAL( IPW3 ), IPLOT, STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )

@@ -57,6 +57,9 @@
 *  History:
 *     14-AUG-1998 (DSB):
 *        Original version, based on KPG1_QVID by MJC.
+*     30-SEP-1999 (DSB):
+*        DO not report a "no colour" error if colour has been requested
+*        but only 1 colour is required.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -185,7 +188,7 @@ c      END IF
 *  If colour is not available but was required, report a helpful error 
 *  message.  Note do not exit as the workstation may fail on more than 
 *  one criterion.
-            IF ( UP .EQ. 1 ) THEN
+            IF ( UP .EQ. 1 .AND. MININT .GT. 1 ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'NAME', PNDEV )
                CALL ERR_REP( 'KPG1_PQVID_COLOUR',

@@ -210,7 +210,7 @@
      :                 DEFLAB( : IAT ), 'Intensity', 
      :                 'Mean Star Profile', 'XDATA', 'YDATA', 3, 
      :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX, 
-     :                 'KAPPA_PSF', .TRUE., IPLOT, STATUS ) 
+     :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS ) 
 
 *  Only proceed if a plot was produced.
       IF( IPLOT .NE. AST__NULL ) THEN
@@ -224,7 +224,7 @@
 
 *  Annul the Plot, and shut down the graphics workstation, and database.
          CALL AST_ANNUL( IPLOT, STATUS )
-         CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
+         CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
       END IF
 

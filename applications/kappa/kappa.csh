@@ -138,8 +138,6 @@ alias drawsig   $KAPPA_DIR/drawsig
 alias elprof    $KAPPA_DIR/elprof
 alias erase     $KAPPA_DIR/erase
 alias errclip   $KAPPA_DIR/errclip
-alias exp10     $KAPPA_DIR/exp10
-alias expe      $KAPPA_DIR/expe
 alias expon     $KAPPA_DIR/expon
 alias ffclean   $KAPPA_DIR/ffclean
 alias fillbad   $KAPPA_DIR/fillbad
@@ -181,9 +179,7 @@ alias laplace   $KAPPA_DIR/laplace
 alias linplot   $KAPPA_DIR/linplot
 alias listmake  $KAPPA_DIR/listmake
 alias listshow  $KAPPA_DIR/listshow
-alias log10     $KAPPA_DIR/log10
 alias logar     $KAPPA_DIR/logar
-alias loge      $KAPPA_DIR/loge
 alias look      $KAPPA_DIR/look
 alias lucy      $KAPPA_DIR/lucy
 alias lutable   $KAPPA_DIR/lutable
@@ -289,9 +285,13 @@ alias zaplin    $KAPPA_DIR/zaplin
 #
 # Define procedures and commands requiring the above symbols.
 #
+alias exp10       'expon base=10D0'
+alias expe        'expon base=natural'
 alias fitsexist   'fitsmod edit=exist mode=interface'
 alias fitsval     'fitsmod edit=print mode=interface'
 alias fitswrite   'fitsmod edit=write mode=interface position=\!'
+alias log10       'logar base=10D0'
+alias loge        'logar base=natural'
 alias lutbgyrw    'lutable mapping=linear coltab=external lut=$KAPPA_DIR/bgyrw_lut'
 alias lutcol      'lutable mapping=linear coltab=colour'
 alias lutcont     'lutable mapping=linear coltab=external lut=$KAPPA_DIR/cont_lut nn'
@@ -350,8 +350,6 @@ alias kap_drawsig   $KAPPA_DIR/drawsig
 alias kap_elprof    $KAPPA_DIR/elprof
 alias kap_erase     $KAPPA_DIR/erase
 alias kap_errclip   $KAPPA_DIR/errclip
-alias kap_exp10     $KAPPA_DIR/exp10
-alias kap_expe      $KAPPA_DIR/expe
 alias kap_expon     $KAPPA_DIR/expon
 alias kap_ffclean   $KAPPA_DIR/ffclean
 alias kap_fillbad   $KAPPA_DIR/fillbad
@@ -393,9 +391,7 @@ alias kap_laplace   $KAPPA_DIR/laplace
 alias kap_linplot   $KAPPA_DIR/linplot
 alias kap_listmake  $KAPPA_DIR/listmake
 alias kap_listshow  $KAPPA_DIR/listshow
-alias kap_log10     $KAPPA_DIR/log10
 alias kap_logar     $KAPPA_DIR/logar
-alias kap_loge      $KAPPA_DIR/loge
 alias kap_look      $KAPPA_DIR/look
 alias kap_lucy      $KAPPA_DIR/lucy
 alias kap_lutable   $KAPPA_DIR/lutable
@@ -501,9 +497,13 @@ alias kap_zaplin    $KAPPA_DIR/zaplin
 #
 # Define procedures and commands requiring the above symbols.
 #
+alias kap_exp10       'expon base=10D0'
+alias kap_expe        'expon base=natural'
 alias kap_fitsexist   'fitsmod edit=exist mode=interface'
 alias kap_fitsval     'fitsmod edit=print mode=interface'
 alias kap_fitswrite   'fitsmod edit=write mode=interface position=\!'
+alias kap_log10       'logar base=10D0'
+alias kap_loge        'logar base=natural'
 alias kap_lutbgyrw    'lutable mapping=linear coltab=external lut=$KAPPA_DIR/bgyrw_lut'
 alias kap_lutcol      'lutable mapping=linear coltab=colour'
 alias kap_lutcont     'lutable mapping=linear coltab=external lut=$KAPPA_DIR/cont_lut nn'

@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.14}
 \newcommand{\stardocnumber}    {95.14}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {14 September 1999}
+\newcommand{\stardocdate}      {30 September 1999}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.14}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -933,7 +933,7 @@ time-series polarimetry (\TSPref ), instrument-specific (\CGSDRref ,
 \IRASref , \IRCAMPACKref , \JCMTDRref ) {\it etc.}  {\em Thus the
 functionality of {\footnotesize KAPPA} should not be regarded in isolation.}
 
-Nor should {\footnotesize KAPPA} should be perceived as a rival to {\footnotesize FIGARO}.
+Nor should {\footnotesize KAPPA} be perceived as a rival to {\footnotesize FIGARO}.
 As {\footnotesize FIGARO} {\em applications\/} become more integrated with
 Starlink packages, for example by using the NDF library, they should
 be seen as complementary, with {\footnotesize FIGARO} concentrating on
@@ -9422,7 +9422,7 @@ documentation for each command should be consulted for details.
 Sometimes you may want to slow down the speed at which data files are
 processed. For instance, if you display several small images using a
 single DISPLAY command, you may want time to examine each image before
-the moving on to the next. You can introduce a delay between invocations
+moving on to the next. You can introduce a delay between invocations
 by setting the shell environment variable KAPPA\_LOOP\_DELAY to the
 required delay time (in units of seconds). For instance, in the
 C-shell:
@@ -9433,12 +9433,13 @@ C-shell:
 \end{verbatim}
 \normalsize
 
-causes a delay of 2.5 seconds between invocations of any {\footnotesize KAPPA} command.
-To remove the delay, you should undefined KAPPA\_LOOP\_DELAY. In C-shell:
+causes a delay of 2.5 seconds between invocations of any {\footnotesize KAPPA} 
+command. To remove the delay, you should undefined KAPPA\_LOOP\_DELAY. In 
+C-shell:
 
 \small
 \begin{verbatim}
-    % UN setenv KAPPA_LOOP_DELAY
+    % unsetenv KAPPA_LOOP_DELAY
 \end{verbatim}
 \normalsize
 
@@ -9519,13 +9520,14 @@ through \htmlref{`on-the-fly conversion'}{se:autoconvert} (see
 \latexonly{Section~\ref{se:autoconvert} and} \xref{SUN/55}{sun55}{}).
 
 When this scheme is in use, you need not include explicit file types for
-all input file names. If no file type is given, all matching files with
-any of the known foreign file types will be included in the group
-returned to the application. For instance, an input specification of
-``\verb+a*+'' will cause all known data files beginning with \verb+a+ in
-the current directory to be used, regardless of their file types. This
-may, for instance, pick up files with types \verb+.fit+,
-\verb+.dst+, \verb+.imh+, \emph{etc.},  in addition to \verb+.sdf+.
+all input file names. If no file type is given, the file with the highest
+priority file type amongst all files with the specified base name will be 
+used. The priority of a file type is determined by its position within the 
+list of file types given by \htmlref{NDF\_FORMATS\_IN}{se:autoconvert} 
+environment variable \latexonly{(see Section~\ref{se:autoconvert})}. File 
+types near the start of the list have higher priority than those which
+follow. Note, native NDF files always have the highest priority and will
+be used (if they exist) in preference to all other files types.
 
 \subsection{Disabling Multiple Invocations of Applications}
 In certain circumstances, you may possibly want to disable the automatic
@@ -11308,11 +11310,11 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
 \menuitem{ERRCLIP}{
  Removes pixels with large errors from an NDF.}
 \menuitem{EXP10}{
- Takes the base-10 exponential of each pixel of  a data array.}
+ Takes the base-10 exponential of each pixel of an NDF.}
 \menuitem{EXPE}{
- Takes the exponential of each pixel of a data  array (base e).}
+ Takes the exponential of each pixel of an NDF (base e).}
 \menuitem{EXPON}{
- Takes the exponential of each pixel   of a data array.}
+ Takes the exponential (specified base) of each pixel of am NDF.}
 \menuitem{FFCLEAN}{
  Removes defects from a substantially flat 1- or 2-dimensional NDF.}
 \menuitem{FILLBAD}{
@@ -11400,11 +11402,11 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
 \menuitem{LISTSHOW}{
  Reports the positions stored in a positions list.}
 \menuitem{LOG10}{
- Takes the base-10 logarithm of each pixel of a  data array.}
+ Takes the base-10 logarithm of each pixel of an NDF.}
 \menuitem{LOGAR}{
- Takes the logarithm of each pixel of a data  array (specified base).}
+ Takes the logarithm of each pixel of an NDF (specified base).}
 \menuitem{LOGE}{
- Takes the natural logarithm of each pixel  of a data array.}
+ Takes the natural logarithm of each pixel of an NDF.}
 \menuitem{LOOK}{
  Outputs the values of a sub-array of a 2-d  data array to the screen or a text file.}
 \menuitem{LUCY}{
@@ -11904,17 +11906,17 @@ functions as follows.
 \classitem{DIV}
  Divides one NDF data structure by another.
 \classitem{EXP10}
- Takes the base-10 exponential of each pixel of a data array.
+ Takes the base-10 exponential of each pixel of an NDF.
 \classitem{EXPE}
- Takes the exponential of each pixel of a data array (base $e$).
+ Takes the exponential of each pixel of an NDF (base $e$).
 \classitem{EXPON}
- Takes the exponential of each pixel of a data array (specified base).
+ Takes the exponential (specified base) of each pixel of am NDF.
 \classitem{LOG10}
- Takes the base-10 logarithm of each pixel of a data array.
+ Takes the base-10 logarithm of each pixel of an NDF. 
 \classitem{LOGAR}
- Takes the logarithm of each pixel of a data array (specified base).
+ Takes the logarithm of each pixel of an NDF (specified base).
 \classitem{LOGE}
- Takes the natural logarithm of each pixel of a data array.
+ Takes the natural logarithm of each pixel of an NDF. 
 \classitem{MATHS}
  Evaluates mathematical expressions applied to NDF data structures.
 \classitem{MULT}
@@ -18286,102 +18288,229 @@ plot (101k).
       }
    }
 }
-\manroutine {{\manheadstyle{EXP10}}}{ Takes the base-10 exponential of each pixel of
-  a data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the exponential to base 10 of each pixel of
-  a data array. The result goes into a new output data array.
-  Both data arrays are stored in the {\mantt{IMAGE}} format.
+\sstroutine{
+   EXP10
+}{
+   Takes the base-10 exponential of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the base-10 exponential of each
+      pixel of a NDF to produce a new NDF data structure.
 
-  The magic-value method is used for processing bad data.
+      This command is a synonym for {\tt expon base=10D0}.
+   }
+   \sstusage{
+      exp10 in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the exponential of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         exp10 a b
+      }{
+         This takes exponentials to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         exp10 title="Abell 4321" out=b in=a
+      }{
+         This takes exponentials to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "Abell 4321"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOG10, LOGAR, LOGE, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  EXP10
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of exponential to be taken of each input data array pixel. \mbox{\mantt [10]}
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of exponentiated array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Exp10']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 
-\manroutine {{\manheadstyle{EXPE}}}{ Takes the exponential of each pixel of a data
-  array (base e).}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the exponential to base e of each pixel of
-  a data array. The result goes into a new output data array.
-  Both data arrays are stored in the {\mantt{IMAGE}} format.
+\sstroutine{
+   EXPE
+}{
+   Takes the natural exponential of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the natural exponential of each
+      pixel of a NDF to produce a new NDF data structure.
 
-  The magic-value method is used for processing bad data.
+      This command is a synonym for {\tt expon base=natural}.
+   }
+   \sstusage{
+      expe in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the exponential of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         loge a b
+      }{
+         This takes the natural exponential of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         loge title="Cas A" out=b in=a
+      }{
+         This takes natural exponentials of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "Cas A"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPON, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  EXPE
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of exponential to be taken of each input data array pixel.
-  \mbox{\mantt [2.718282]}
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of exponentiated array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Expe']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 
-\manroutine {{\manheadstyle{EXPON}}}{ Takes the exponential of each pixel
-   of a data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the exponential to an input base of each pixel
-  of a data array. The result goes into a new output data array.
-  Both data arrays are stored in the {\mantt{IMAGE}} format.
 
-  The magic-value method is used for processing bad data.
+\sstroutine{
+   EXPON
+}{
+   Takes the exponential (specified base) of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the exponential to a specified base of each
+      pixel of a NDF to produce a new NDF data structure.
+   }
+   \sstusage{
+      expon in out base
+   }
+   \sstparameters{
+      \sstsubsection{
+         BASE = LITERAL (Read)
+      }{
+         The base of the exponential to be applied.  A special value
+         {\tt "Natural"} gives natural (base-e) exponentiation.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the exponential of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         expon a b 10
+      }{
+         This takes exponentials to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         expon base=8 title="HD123456" out=b in=a
+      }{
+         This takes expoentials to base eight of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "HD123456"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOG10, LOGAR, LOGE, EXP10, EXPE, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  EXPON
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of exponential to be taken of each input data array pixel.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of exponentiated array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Expon']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 
 \sstroutine{
    FFCLEAN
@@ -25863,102 +25992,228 @@ plot (10k).
       KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT
    }
 }
-\manroutine {{\manheadstyle{LOG10}}}{ Takes the base-10 logarithm of each pixel of a
-  data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the logarithm to base 10 of each pixel of
-  a data array. The result goes into a new output data array.
-  Both data arrays are stored in the {\mantt{IMAGE}} format.
 
-  The magic-value method is used for processing bad data.
+\sstroutine{
+   LOG10
+}{
+   Takes the base-10 logarithm of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the base-10 logarithm of each
+      pixel of a NDF to produce a new NDF data structure.
 
-\manroutineitem {Invocation }{}
-  LOG10
+      This command is a synonym for {\tt logar base=10D0}.
+   }
+   \sstusage{
+      log10 in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the logarithm of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         log10 a b
+      }{
+         This takes logarithms to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         log10 title="Abell 4321" out=b in=a
+      }{
+         This takes logarithms to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "Abell 4321"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOGAR, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of logarithm to be taken of each input data array pixel.
-  {\mantt [10]}
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of processed data.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Log10']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutine {{\manheadstyle{LOGAR}}}{ Takes the logarithm of each pixel of a data
-  array (specified base).}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the logarithm to a specified base of each
-  pixel of a data array. The result goes into a new output data
-  array. Both data arrays are stored in the {\mantt{IMAGE}} format.
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 
-  The magic-value method is used for processing bad data.
+\sstroutine{
+   LOGAR
+}{
+   Takes the logarithm (specified base) of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the logarithm to a specified base of each
+      pixel of a NDF to produce a new NDF data structure.
+   }
+   \sstusage{
+      logar in out base
+   }
+   \sstparameters{
+      \sstsubsection{
+         BASE = LITERAL (Read)
+      }{
+         The base of the logarithm to be applied.  A special value
+         {\tt "Natural"} gives natural (base-e) logarithms.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the logarithm of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         logar a b 10
+      }{
+         This takes logarithms to base ten of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         logar base=8 title="HD123456" out=b in=a
+      }{
+         This takes logarithms to base eight of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "HD123456"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOG10, LOGE, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-\manroutineitem {Invocation }{}
-  LOGAR
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of logarithm to be taken of each input data array pixel.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of processed data.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Logar']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
+\sstroutine{
+   LOGE
+}{
+   Takes the natural logarithm of an NDF data structure
+}{
+   \sstdescription{
+      This routine takes the natural logarithm of each
+      pixel of a NDF to produce a new NDF data structure.
 
-\manroutine {{\manheadstyle{LOGE}}}{ Takes the natural logarithm of each pixel
-  of a data array.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  This routine takes the logarithm to base e of each pixel of
-  a data array. The result goes into a new output data array.
-  Both data arrays are stored in the {\mantt{IMAGE}} format.
+      This command is a synonym for {\tt logar base=natural}.
+   }
+   \sstusage{
+      loge in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure being the logarithm of the input NDF.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Value for the title of the output NDF.  A null value will cause
+         the title of the NDF supplied for parameter IN to be used
+         instead. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         loge a b
+      }{
+         This takes the natural logarithm of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b inherits its title
+         from a.
+      }
+      \sstexamplesubsection{
+         loge title="Cas A" out=b in=a
+      }{
+         This takes natural logarithms of the pixels in the NDF
+         called a, to make the NDF called b.  NDF b has the title
+         {\tt "Cas A"}.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: LOG10, LOGAR, EXP10, EXPE, EXPON, POW; Figaro: IALOG, ILOG,
+      IPOWER.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
 
-  The magic-value method is used for processing bad data.
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         LABEL, TITLE, UNITS, HISTORY, WCS, and VARIANCE components of
+         an NDF data structure and propagates all extensions.
 
-\manroutineitem {Invocation }{}
-  LOGE
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  Input {\mantt{IMAGE}} structure containing the data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}}  }{{\mantt{\_REAL}}}
-  Base of logarithm to be taken of each input data array pixel. {\mantt [2.718282]}
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
-  Output {\mantt{IMAGE}} structure holding result of processed data.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
-  Title string for the output {\mantt{IMAGE}} structure. \mbox{\mantt ['KAPPA - Loge']}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
-
-\manroutineitem {Authors }{}
-  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-\end{manroutinedescription}
+         \sstitem
+         All non-complex numeric data types can be handled.
+      }
+   }
+}
 
 \manroutine {{\manheadstyle{LOOK}}}{ Outputs the values of a sub-array of a 2-d
   data array to the screen or a text file.}
@@ -43556,7 +43811,7 @@ new parameters.
 
 \begin{quote}
 \emph{ Scripts which make use of any of the removed or modified parameters
-will fail when run with KAPPA V0.14. Such scripts will need to be changed
+will fail when run with KAPPA V0.14-1. Such scripts will need to be changed
 to take account of the new features introduced in this release. Check the
 lists below for details.}
 \end{quote}
@@ -43632,6 +43887,15 @@ The following applications have been modified:
          picture identifiers (and consequently aborting) if more than
          40 positions were given.
 
+      \item [\htmlref{EXP10}{EXP10}] \mbox{}
+         This command is now a synonym for {\tt expon base=10D0}.
+
+      \item [\htmlref{EXPE}{EXPE}] \mbox{}
+         This command is now a synonym for {\tt expon base=natural}.
+
+      \item [\htmlref{EXPON}{EXPON}] \mbox{}
+         Re-written to use NDF data structures.
+
       \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
          A new output parameter EXISTS has been added to store the result
          of the final "Exist" operation.
@@ -43684,6 +43948,15 @@ The following applications have been modified:
          A new parameter LMODE has been added to allow the default limits
          for the vertical axis to be chosen in various ways (for instance
          using percentiles, multiples of the standard deviation, \emph{etc}).
+
+      \item [\htmlref{LOG10}{LOG10}] \mbox{}
+         This command is now a synonym for {\tt logar base=10D0}.
+
+      \item [\htmlref{LOGAR}{LOGAR}] \mbox{}
+         Re-written to use NDF data structures.
+
+      \item [\htmlref{LOGE}{LOGE}] \mbox{}
+         This command is now a synonym for {\tt logar base=natural}.
 
       \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
          \begin{itemize}
@@ -44257,17 +44530,17 @@ functions as follows.
 \classitem{DIV}
  Divides one NDF data structure by another.
 \classitem{EXP10}
- Takes the base-10 exponential of each pixel of a data array.
+ Takes the base-10 exponential of each pixel of an NDF.
 \classitem{EXPE}
- Takes the exponential of each pixel of a data array (base $e$).
+ Takes the exponential of each pixel of an NDF (base $e$).
 \classitem{EXPON}
- Takes the exponential of each pixel of a data array (specified base).
+ Takes the exponential (specified base) of each pixel of am NDF.
 \classitem{LOG10}
- Takes the base-10 logarithm of each pixel of a data array.
+ Takes the base-10 logarithm of each pixel of an NDF.
 \classitem{LOGAR}
- Takes the logarithm of each pixel of a data array (specified base).
+ Takes the logarithm of each pixel of an NDF (specified base).
 \classitem{LOGE}
- Takes the natural logarithm of each pixel of a data array.
+ Takes the natural logarithm of each pixel of an NDF.
 \classitem{MATHS}
  Evaluates mathematical expressions applied to NDF data structures.
 \classitem{MULT}
