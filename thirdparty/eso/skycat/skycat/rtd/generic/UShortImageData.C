@@ -31,9 +31,8 @@ void UShortImageData::initShortConversion()
     scaledLowCut_ = (ushort)lowCut_;
     scaledHighCut_ = (ushort)highCut_;
     if (haveBlank_)
-	scaledBlankPixelValue_ = blank_;
+	scaledBlankPixelValue_ = LOOKUP_BLANK;
 }
-
 
 /*
  * Include some standard methods as (cpp macro) templates:

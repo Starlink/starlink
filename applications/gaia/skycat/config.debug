@@ -3,6 +3,6 @@
 
 set dir = $PWD
 
-configure -prefix $dir/../install --with-debug --with-gcc
+configure -prefix $dir/../built --with-debug --with-gcc
 make
 
