@@ -42,6 +42,10 @@ $!
 $!  History:
 $!     1993 July 29 (MJC):
 $!        Original version.
+$!     1997 August 1 (MJC):
+$!        Fetch IRAF_IX86_LINUX_LIBRARIES, BOURNE-SHELL_SCRIPTS, 
+$!        AWK_SCRIPTS, and PUBLIC_TASKS groups.  Used renamed
+$!        IRAF_SUN4_SOLARIS_LIBRARIES group.
 $!     {enter_changes_here}
 $!
 $!  Bugs:
@@ -143,7 +147,7 @@ $!  ==============
 $!
 $!  Fetch the IRAF libraries
 $!
-$    CMS FETCH'CF' IRAF_SOLARIS_LIBRARIES,IRAF_ALPHA_OSF1_LIBRARIES
+$    CMS FETCH'CF' IRAF_SUN4_SOLARIS_LIBRARIES,IRAF_ALPHA_OSF1_LIBRARIES,IRAF_IX86_LINUX_LIBRARIES
 $!
 $!  Help source files.
 $!  ==================
@@ -154,14 +158,14 @@ $!
 $    @[]HLP_UNIX_RELEASE 'P1'
 $    DELETE HLP_UNIX_RELEASE.COM;0
 $!
-$!  C-shell scripts.
-$!  ================
+$!  Scripts and procedures
+$!  ======================
 $!
-$!  Fetch the C-shell scripts for running tasks or defining commands.
-$!  prefixes.
+$!  Fetch the C-shell script and ICL procedure for running tasks or
+$!  defining commands.  Also fetch the Bourne-shell scripts for
+$!  graphic-file conversions, and the awk scripts.
 $!
-$    CMS FETCH'CF' C_SHELL_SCRIPTS
-$    RENAME *.CSH *.
+$    CMS FETCH'CF' C_SHELL_SCRIPTS,CONVERT.ICL,BOURNE-SHELL_SCRIPTS,AWK_SCRIPTS
 $!
 $!  Build files.
 $!  ============
@@ -171,6 +175,13 @@ $!  prefixes.
 $!
 $    CMS FETCH'CF' UNIX_BUILDING
 $    RENAME UNIX_MAKEFILE. MAKEFILE.
+$!
+$!  Public tasks.
+$!  =============
+$!
+$!  Fetch the pre-built UNIX programmes needed in a UNIX release.
+$!
+$    CMS FETCH'CF' PUBLIC_TASKS
 $!
 $!  Documentation.
 $!  ==============
