@@ -87,7 +87,7 @@
 
 #  Edit the kplsearch script to include the names and purposes of
 #  all routines.
-      $KAPLIBS_DEV/bin/make_kplsearch
+      $KAPLIBS_DEV/bin/make_kplsearch.csh
 
 #  Tar up all the release files and then remove them.
       echo "Creating kaplibs.tar"
