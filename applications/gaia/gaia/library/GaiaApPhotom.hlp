@@ -160,3 +160,44 @@ can be set by selecting the "Parameters" tab. You should read SUN/45
 WARNING: the error estimates in the measurements will be wrong unless
 you set the image bias and data units to photons conversion factor
 correctly.
+
+
+   --- Understand the results for an aperture:
+
+The results shown for an aperture have the following meanings:
+
+   Aperture index:  just a sequence number to distinguish measurements
+
+   X position:      before a making a measurement, the position of the 
+   Y position:      center of the aperture, after making the
+                    measurement, the centroided position -- if you've
+                    selected centroiding
+
+   Magnitude:       the magnitude of the object, this is sky
+                    subtracted and scaled using the photons per data
+                    unit and exposure factors
+
+   Magnitude error: error in the magnitude, the error is derived using 
+                    either the sky variance, photon statistics, or the
+                    data variance, if you are using photon statistics
+                    then a good knowledge of the bias level and
+                    photons per data unit are required
+
+   Sky value:       the estimated sky, either derived from the
+                    annulus, or detached sky regions, or a constant,
+                    scaled by photons per data unit factor
+      
+
+   Sum in aperture: sum of object data counts in aperture, scaled 
+                    by the photon per data unit value and the exposure 
+                    factors
+       
+   Error code:      status of measurement:
+                    
+                       OK measurement has no problems
+                       B  one or more pixels in aperture is bad 
+                       S  one or more pixels in aperture is saturated
+                       E  the object aperture intersects the edge of 
+                          the data array
+                       ?  there are other problems with the measurement
+
