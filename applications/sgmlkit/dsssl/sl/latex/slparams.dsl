@@ -263,6 +263,16 @@ stylesheet will be written to the file named by '%latex-manifest%'.
 	)
 
 <func>
+<routinename>%short-crossrefs%
+<description>If true, this will make the down-converter generate shorter 
+link texts for cross-references.
+<returnvalue type=boolean>
+<argumentlist none>
+<codebody>
+(define %short-crossrefs%
+  #t)
+
+<func>
 <routinename>suppress-manifest
 <description>
 If true, this will suppress the generation of a manifest, even if the variable 

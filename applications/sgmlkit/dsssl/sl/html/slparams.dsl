@@ -228,3 +228,13 @@ for them.
 <codebody>
 (define suppress-printable #f)
 
+<func>
+<routinename>%short-crossrefs%
+<description>If true, this will make the down-converter generate shorter 
+link texts for cross-references.
+<returnvalue type=boolean>
+<argumentlist none>
+<codebody>
+(define %short-crossrefs%
+  #t)
+

@@ -35,12 +35,14 @@ command stands out somewhat).
 						   (current-node))))
 	(linktext (attribute-string (normalize "text")
 				    (current-node))))
-    (if (member (gi target) (target-element-list))
+    (if (member (gi target) (ref-target-element-list))
 	(if linktext
 	    (literal linktext)	;override generation of link text
 	    (if (member (gi target) (section-element-list))
 		(make command name: "textit"
-		      (make-section-reference target: target specify-type: #t))
+		      (make-section-reference target: target
+					      specify-type: #t
+					      short-ref: %short-crossrefs%))
 		(with-mode section-reference
 			(process-node-list target))))
 	(error (string-append
@@ -115,12 +117,14 @@ it produces an <funcname/error/.
   (element documentsummary
     (process-matching-children 'docinfo))
   (element docinfo
-    (let ((dn (getdocnumber))
-	  (dtitle (getdocinfo 'title)))
-      (make sequence
-	(literal (string-append dn ", "))
-	(make command name: "textit"
-	      (process-node-list dtitle))))))
+    (if %short-crossrefs%
+	(literal (getdocnumber))
+	(let ((dn (getdocnumber))
+	      (dtitle (getdocinfo 'title)))
+	  (make sequence
+	    (literal (string-append dn ", "))
+	    (make command name: "textit"
+		  (process-node-list dtitle)))))))
 
 <misccode>
 <description><code/webref/ elements are simply transformed into 

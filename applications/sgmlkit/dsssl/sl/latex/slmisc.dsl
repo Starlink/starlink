@@ -59,6 +59,7 @@ mode make-manifest-mode in sl.dsl.
 	(case ent-notation
 	  (("EPS")
 	   (make empty-command name: "includegraphics"
+		 escape-tex?: #f
 		 parameters: (list ent-sysid)))
 	  (("LATEXGRAPHICS")
 	   (let ((package (entity-attribute-string ent
@@ -75,8 +76,9 @@ mode make-manifest-mode in sl.dsl.
 	  (if cont-notation
 	      (if (string=? cont-notation "LATEXGRAPHICS")
 		  (make fi data: (data (current-node)))
-		  (error (string-append "Can't process inline graphics of type"
-					cont-notation)))
+		  (error (string-append
+			  "Can't process inline graphics of type "
+			  cont-notation)))
 	      (error "Can't extract entity"))))))
 
 (element coverimage
@@ -131,8 +133,14 @@ to need explanation or elaboration.
     (process-children)))
 
 (element dt
-  (make empty-command name: "item"
-	parameters: (list (string-append "?" (data (current-node))))))
+  (let ((is-compact? (attribute-string (normalize "compact")
+				       (parent (current-node)))))
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: (list (string-append "?" (data (current-node)))))
+      (if is-compact?
+	  (empty-sosofo)
+	  (make fi data: "\\\\")))))
 
 (element dd
   (process-children))
@@ -165,8 +173,16 @@ to need explanation or elaboration.
     (process-children-trim)))
 
 (element blockquote
-  (make environment name: "quotation"
+  (make environment name: "quote"
     (process-children-trim)))
+
+(element linespecific
+  (make environment name: "verse"
+    (process-children-trim)))
+(element line
+  (make sequence
+    (process-children-trim)
+    (make fi data: "\\\\")))
 
 (element verbatim
   (make environment

@@ -38,9 +38,19 @@ section ready to flow into whatever contains this.
   <description>The body of the section.
 <codebody>
 (define ($html-section$ #!optional (bod ($html-section-body$)))
-  (html-document (with-mode section-reference
-		   (process-node-list (current-node)))
-		 bod))
+  (let ((title (select-elements (descendants (current-node))
+				(list (normalize "subhead")
+				      (normalize "title")))))
+    (if title
+	(html-document (make formatting-instruction data: (data title))
+		       bod)
+	(error "Can't find title of section"))))
+
+;(define ($html-section$ #!optional (bod ($html-section-body$)))
+;   (html-document (with-mode section-reference
+;                  (process-node-list (current-node)))
+;                bod))
+
 
 <func>
 <routinename>$html-section-body$
@@ -64,22 +74,18 @@ the section title.
 <argumentlist none>
 <codebody>
 (define ($html-section-title$)
-  (make sequence
-    (make element
-      gi: (string-append "H" (number->string (sectlevel)))
-      (if (attribute-string (normalize "id") (current-node))
-	  (make element
-	    gi: "A"
-	    attributes: (list
-			 (list "name" (string-append
-				       "xref_"
-				       (attribute-string (normalize "id")
-							 (current-node)))
-				    ))
+  (let ((id (attribute-string (normalize "id") (current-node))))
+    (make sequence
+      (make element
+	gi: (string-append "H" (number->string (sectlevel)))
+	(if id
+	    (make element
+	      gi: "A"
+	      attributes: (list (list "name" (string-append "xref_" id)))
+	      (with-mode section-reference
+		(process-node-list (current-node))))
 	    (with-mode section-reference
-	      (process-node-list (current-node))))
-	  (with-mode section-reference
-	    (process-node-list (current-node)))))))
+	      (process-node-list (current-node))))))))
 
 <misccode>
 <description>Rules for the various section elements in the DTD

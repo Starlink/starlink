@@ -149,11 +149,12 @@ appropriate arguments
 	(sid (img-equation-sysid)))
     (if sid
 	(make sequence
-	  (make element gi: "p"
-		(make element gi: "a"
-		      attributes: (list (list "name" ref))
-		      (make empty-element gi: "img"
-			    attributes: (list (list "src" sid))))))
+	  (make empty-element gi: "br")
+	  (make element gi: "a"
+		attributes: (list (list "name" ref))
+		(make empty-element gi: "img"
+		      attributes: (list (list "src" sid))))
+	  (make empty-element gi: "br"))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
 
@@ -163,11 +164,12 @@ appropriate arguments
 	(sid (img-equation-sysid)))
     (if sid
 	(make sequence
-	  (make element gi: "p"
-		(make element gi: "a"
-		      attributes: (list (list "name" ref))
-		      (make empty-element gi: "img"
-			    attributes: (list (list "src" sid))))))
+	  (make empty-element gi: "br")
+	  (make element gi: "a"
+		attributes: (list (list "name" ref))
+		(make empty-element gi: "img"
+		      attributes: (list (list "src" sid))))
+	  (make empty-element gi: "br"))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
 

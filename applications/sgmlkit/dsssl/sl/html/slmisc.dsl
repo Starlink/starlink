@@ -177,8 +177,17 @@ to need explanation or elaboration.
 ;;; Paragraphing
 
 (element p
-  (make element
-    (process-children-trim)))
+  (let ((id (attribute-string (normalize "id")
+			      (current-node))))
+    (if id
+	(let ((kids (children (current-node))))
+	  (make sequence
+	    (make element gi: "a"
+		  attributes: (list (list "name" (string-append "xref_" id)))
+		  (process-node-list (node-list-first kids)))
+	    (process-node-list (node-list-rest kids))))
+	(make element gi: "p"
+	      (process-children-trim)))))
 
 (element px
   (make element gi: "p"
@@ -191,6 +200,14 @@ to need explanation or elaboration.
 (element blockquote
   (make element
     (process-children-trim)))
+
+(element linespecific
+  (make element gi: "blockquote"	; a reasonable choice?
+	(process-children-trim)))
+(element line
+  (make sequence
+    (process-children-trim)
+    (make empty-element gi: "br")))
 
 (element attribution
   (make element gi: "em"

@@ -36,7 +36,7 @@ target in mode <code/section-reference/.
 	 (target (element-with-id target-id))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
-    (if (member (gi target) (target-element-list))
+    (if (member (gi target) (ref-target-element-list))
 	(make element
 	  gi: "A"
 	  attributes: (list (list "href" (href-to target)))
@@ -45,13 +45,41 @@ target in mode <code/section-reference/.
 	  (if linktext
 	      (literal linktext)
 	      (if (member (gi target) (section-element-list))
-		  (make-section-reference target: target specify-type: #t)
+		  (make-section-reference target: target specify-type: #t
+					  short-ref: %short-crossrefs%)
 		  (with-mode section-reference
 		    (process-node-list target))))
 	  )
 	(error (string-append
 		"stylesheet can't link to ID " target-id " of type "
 		(gi target))))))
+
+;;; The following mode section-reference definition of REF (and the
+;;; similar ones for DOCXREF, WEBREF and URL) is for dealing with
+;;; DISPLAYTITLEs.  There's a problem using these, since DISPLAYTITLEs
+;;; within the section names which are used as link text make an extra
+;;; link within the link text!  The plan is that these simpler
+;;; versions of the cross-referencing elements would be used in these
+;;; contexts.
+;;;
+;;; This works, but I've since tentatively removed the DISPLAYTITLE
+;;; element from the DTD.
+; (mode section-reference
+;   (element ref
+;     (let ((target (element-with-id (attribute-string (normalize "id")
+; 						     (current-node))))
+; 	  (linktext (attribute-string (normalize "text")
+; 				      (current-node))))
+;       (if (member (gi target) (ref-target-element-list))
+; 	  (if linktext
+; 	      (literal linktext)	;override generation of link text
+; 	      (if (member (gi target) (section-element-list))
+; 		  (make-section-reference target: target specify-type: #t)
+; 		  (with-mode section-reference
+; 		    (process-node-list target))))
+; 	  (error (string-append
+; 		  "The stylesheet is presently unable to link to elements of type "
+; 	          (gi target)))))))
 
 <misccode>
 <description>The <code/docxref/ element has a required attribute
@@ -130,16 +158,38 @@ it produces an <funcname/error/.
 		     (xrefent (string-append "DOCXREF: couldn't get sysid from " xrefent))
 		     (else "DOCXREF: no DOC attribute"))))))
 
+; (mode section-reference
+;   (element docxref
+;     (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
+; 	   (docelem (and xrefent
+; 			 (document-element
+; 			  (sgml-parse (entity-generated-system-id xrefent)))))
+; 	   (linktext (attribute-string (normalize "text")
+; 				       (current-node))))
+;       (if (string=? (gi docelem)
+; 		    (normalize "documentsummary")) ; sanity check...
+; 	  (if xrefent
+; 	      (if linktext
+; 		  (literal linktext)	;override generation of link text
+; 		  (with-mode mk-docxref
+; 		    (process-node-list docelem)))
+; 	      (error "No value for docxref's DOC attribute"))
+; 	  (error (string-append "DOCXREF target " xrefent
+; 				" has document type " (gi docelem)
+; 				": expected DOCUMENTSUMMARY"))))))
+
 (mode mk-docxref
   (element documentsummary
     (process-matching-children 'docinfo))
   (element docinfo
-    (let ((dn (getdocnumber))
-	  (dtitle (getdocinfo 'title)))
-      (make sequence
-	(literal (string-append dn ", "))
-	(make element gi: "CITE"
-	      (process-node-list dtitle))))))
+    (if %short-crossrefs%
+	(literal (getdocnumber))
+	(let ((dn (getdocnumber))
+	      (dtitle (getdocinfo 'title)))
+	  (make sequence
+	    (literal (string-append dn ", "))
+	    (make element gi: "CITE"
+		  (process-node-list dtitle)))))))
 
 <misccode>
 <description><code/webref/ elements are simply transformed into HTML
@@ -163,4 +213,14 @@ the URL as link text
 						     (current-node)))
 		      (list "title" (normalise-string (data (current-node)))))
     (process-children)))
+
+; (mode section-reference
+;   (element url
+;     (make element gi: "code"
+; 	(make sequence
+; 	  (literal "<")
+; 	  (process-children)
+; 	  (literal ">"))))
+;   (element webref
+;     (process-children)))
 
