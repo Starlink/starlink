@@ -2403,9 +2403,11 @@ There are several script options:
 <dl compact>
 <dt><code/--html/
 <dd>Generate HTML (the default).
+<dt><code/--htmlsingle/
+<dd>Generate HTML, but in a single file rather than a collection.
 <dt><code/--latex/
 <dd>Generate &latex;.
-<dt><code/--package-dir my-dir/
+<dt><code/--packagedir my-dir/
 <dd>Package up the generated files into a directory called `my-dir'.
 <dt><code/--tarball my.tar/
 <dd>Bundle the package-dir into a tarball named `my.tar'.  If you do
@@ -2413,6 +2415,10 @@ not give an absolute pathname, it will be located relative to the
 current directory.
 <dt><code/--jadeflags flags/
 <dd>Pass the given flags to Jade.
+<dt><code/--help/
+<dd>Show brief usage instructions.
+<dt><code/--debug/
+<dd>Don't delete the working directory at the end (allows you to explore).
 </dl>
 
 <p>The final option, <code/--jadeflags/, allows you to do some limited
