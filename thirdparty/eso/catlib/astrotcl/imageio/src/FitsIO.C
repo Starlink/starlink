@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: FitsIO.C,v 1.30 2001/08/27 10:10:11 abrighto Exp $" 
+ * "@(#) $Id: FitsIO.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $" 
  *
  * FitsIO.C - method definitions for class FitsIO, for operating on
  *            Fits files.
@@ -14,7 +14,7 @@
  *                           for bitpix=16 for H_COMPRESS.
  *                 12/03/98  Initialize WCS in constructor.
  */
-static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.30 2001/08/27 10:10:11 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $";
 
 
 #include <stdio.h>
@@ -351,7 +351,8 @@ fitsfile* FitsIO::openFitsMem(Mem& header)
     }
     else {
 	filename = "FitsIO";
-	rw_flag++;
+	//rw_flag++;		// rw_flag isn't initialised
+	rw_flag = 1;		// -- is this what is meant?
     } 
 
     // use the cfitsio library routines to access the file in memory
