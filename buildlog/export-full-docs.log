@@ -710,20 +710,17 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "WhiteboardView is responsible for view-specific operations
   [javadoc]  on the document (cut, paste, print, etc.)  "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/package-summary.html...
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e. those with element name "strings"). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - The first sentence is interpreted to be:
   [javadoc] "PlotConfiguration is a repository for all the configuration information
   [javadoc]  related to a Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -732,6 +729,9 @@ javadoc-sources:
   [javadoc]  addition information such as data limits and antialiasing state,
   [javadoc]  which may be added).
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: PlotConfiguration
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: StoreConfigurator
@@ -834,16 +834,16 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstFigureStore.java:84: warning - Tag @link: reference not found: DrawActions
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstFigureStore.java:78: warning - Tag @link: reference not found: DrawActions
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:90: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstNumberLabels.html...
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:115: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:90: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:115: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStyleBox.java:16: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstTitle.java:72: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstTitle.html...
@@ -2329,4 +2329,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 9 minutes 58 seconds
+Total time: 10 minutes 26 seconds
