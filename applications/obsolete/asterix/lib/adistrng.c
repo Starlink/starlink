@@ -130,7 +130,7 @@ void strx_free( char *ptr, ADIstatus status )
       StrStorePtr       dblock = curp;  /* The dead block */
 
       if ( ! lcurp )                    /* Is this the first block? */
-        ss_first = curp->link;          /* Replace list head */
+	ss_first = curp->link;          /* Replace list head */
       else
         lcurp->link = curp->link;       /* Unhook block from list */
 
@@ -265,11 +265,11 @@ void strx_expf( int inlen, char *in, int outlen, char *out )
 
   if ( inlen < outlen )			/* Pad with spaces */
     memset( out + inlen, ' ',
-               outlen - nc );
+	       outlen - nc );
   }
 
 
-int strx_cmpi( ADIobj str1, ADIobj str2 )
+int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
   {
   int           cp;
   int           minlen;
@@ -280,10 +280,9 @@ int strx_cmpi( ADIobj str1, ADIobj str2 )
   if ( str1 == str2 )
     return test;
 
-  minlen = _MIN(_str_len(str1),
-	        _str_len(str2));
+  minlen = _MIN(len1,len2);		/* Minimum of input lengths */
 
-  for( cp=1,sc1 = _str_dat(str1),sc2 = _str_dat(str2);
+  for( cp=1,sc1 = str1,sc2 = str2;
        (cp<=minlen) && !test; cp++ )
     {
     c1 = *sc1++; c2 = *sc2++;
@@ -294,10 +293,19 @@ int strx_cmpi( ADIobj str1, ADIobj str2 )
     test = c1-c2;
     }
 
-  if ( test || (_str_len(str1)==_str_len(str2)) )
+  if ( test || (len1==len2) )
     return test;
   else
-    return (_str_len(str1) >_str_len(str2)) ? 1 : -1;
+    return (len1 > len2) ? 1 : -1;
+  }
+
+
+int strx_cmpi( ADIobj str1, ADIobj str2 )
+  {
+  return strx_cmpi2c( _str_dat(str1),
+		      _str_len(str1),
+		      _str_dat(str2),
+		      _str_len(str2) );
   }
 
 

@@ -153,15 +153,29 @@ ADIblockID adix_bb_new( ADIblockCtrl *ctrl, int nunit, ADIstatus status )
     newb = (ADIblockPtr) adix_mem_alloc(sizeof(ADIblock),status);
 
     if ( newb ) {
+      size_t	bbytes;			/* Number of bytes in block */
+
       newb->ctrl = ctrl;
       newb->nunit = _MAX(nunit,ctrl->nunit);
       newb->nfree = newb->nunit;
-      newb->data = adix_mem_alloc(ctrl->size*newb->nunit,status);
-      n8bit = (newb->nunit-1)/CHAR_BIT + 1;
-      newb->used = (unsigned char *) adix_mem_alloc(n8bit,status);
 
-      if ( newb->used )
+      bbytes = ctrl->size*newb->nunit;	/* Enough space for object data */
+      n8bit = (newb->nunit-1)/CHAR_BIT + 1;
+
+/* Only allocate space for bit used array if default number of items in
+   block. If more then entire block is allocated in one lump so this extra
+   memory is not needed */
+      if ( newb->nunit <= ctrl->nunit )
+	bbytes += n8bit;
+
+      newb->data = adix_mem_alloc(bbytes,status);
+
+      if ( newb->nunit > ctrl->nunit )	/* Set address of used bit array */
+	newb->used = NULL;
+      else {
+	newb->used = (unsigned char *) newb->data + ctrl->size*newb->nunit;
 	memset( newb->used, 0, n8bit );
+	}
 
       iblk = ADI_G_nblk;                  /* Add block to block list */
       ADI_G_blks[ADI_G_nblk++] = newb;
@@ -214,7 +228,7 @@ ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIboolean scalar,
 
       if ( nval > 1 )			/* Must check contiguous for multiple */
         {				/* allocation */
-        int         ncontig;
+	int         ncontig;
 
 	for( i8=bptr->nunit/CHAR_BIT; i8; i8-- )
           {
@@ -236,7 +250,7 @@ ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIboolean scalar,
       else
         {
         for( i8=0;                            /* Scan block to find unused slot */
-          (bptr->used[i8] == 0xFF) && i8 < (ctrl->nunit/CHAR_BIT); i8++ );
+	  (bptr->used[i8] == 0xFF) && i8 < (ctrl->nunit/CHAR_BIT); i8++ );
         found = ADI__true;
         }
       }
@@ -280,7 +294,7 @@ ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIboolean scalar,
       uchar = 0;
       for( ibit=0;
            ibit<(nval%CHAR_BIT); ibit++ )
-        uchar |= bit_mask[ibit];
+	uchar |= bit_mask[ibit];
 
       bptr->used[i8] = uchar;
       }
@@ -305,6 +319,22 @@ ADIobj adix_bb_alloc( ADIblockCtrl *ctrl, ADIstatus status )
   }
 
 
+void adix_bb_bfree( int iblk, ADIblockPtr bptr, ADIstatus status )
+  {
+  size_t	bbytes = bptr->nunit*bptr->ctrl->size;
+
+  if ( bptr->used )
+    bbytes += (bptr->nunit-1) / CHAR_BIT + 1;
+
+  adix_mem_free( bptr->data, bbytes,
+		 status);
+
+  adix_mem_free( bptr, sizeof(ADIblock), status );
+
+  ADI_G_blks[iblk] = NULL;
+  }
+
+
 void adix_bb_free( ADIobj *id, int nval, ADIstatus status )
   {
   static short bit_mask[] =
@@ -321,41 +351,35 @@ void adix_bb_free( ADIobj *id, int nval, ADIstatus status )
 
   i8 = iobj / CHAR_BIT;		        /* Find allocation first cell */
 
-  if ( nval > 1 )                       /* Multiple bit reset */
+  if ( ! bptr->used ) {			/* Dedicated block? */
+    if ( nval != bptr->nunit )
+      adic_setecs( ADI__PRGERR, "Block deallocation error - entire dedicated basic block must be deallocated at once", status );
+    else
+      adix_bb_bfree( _ID_IBLK(*id), bptr, status );
+    }
+  else if ( nval > 1 )                  /* Multiple bit reset */
     {
     for( j8=i8; j8<(nval/CHAR_BIT);     /* Loop over whole used slots */
-         i8++, j8++ )
+	 i8++, j8++ )
       bptr->used[j8] = 0x00;            /* Reset all bits */
 
     for( ibit=0; ibit<(nval%CHAR_BIT);  /* Loop over partially used slot */
-         ibit++ )
+	 ibit++ )
       bptr->used[i8] &=                 /* Reset allocated bit */
-          (bit_mask[ibit] ^ 0xFF);
+	  (bit_mask[ibit] ^ 0xFF);
     }
   else                                  /* Single bit to mask */
     {
     ibit = iobj % CHAR_BIT;             /* Identify the bit */
 
     bptr->used[i8] &=                   /* Reset allocated bit */
-          (bit_mask[ibit] ^ 0xFF);
+	  (bit_mask[ibit] ^ 0xFF);
 
     }
   bptr->nfree += nval;			/* Keep counter up to date */
 
   *id = ADI__nullid;			/* Reset identifier */
   }
-
-
-void adix_bb_freeb( ADIblockPtr bptr, ADIstatus status )
-  {
-  adix_mem_free( bptr->data,
-                 bptr->ctrl->size*bptr->nunit,status);
-
-  adix_mem_free( bptr->used,
-                 (bptr->nunit-1) / CHAR_BIT + 1,
-                 status);
-  }
-
 
 void adix_mem_begin( void )
   {
@@ -380,10 +404,8 @@ void adix_mem_end( ADIstatus status )
 
 strx_exit( status );
   for( i=0; i<ADI_G_nblk; i++ )
-    {
-    adix_bb_freeb( ADI_G_blks[i], status );
-    adix_mem_free( ADI_G_blks[i], sizeof(ADIblock), status );
-    }
+    if ( ADI_G_blks[i] )
+      adix_bb_bfree( i, ADI_G_blks[i], status );
 
 #ifdef MEMORY_TRACING
 {
@@ -398,5 +420,6 @@ for( ; j<ADI__MXMTR; j++ )
 
   if ( ADI_G_nbyte )
     printf( "ADI left %ld bytes in %ld allocations...\n",
-            ADI_G_nbyte, ADI_G_nalloc );
+	    ADI_G_nbyte, ADI_G_nalloc );
   }
+

@@ -1268,7 +1268,7 @@ void adic_find( ADIobj id, char *name, ADIobj *cid, ADIstatus status )
 
   _ERR_IN("adic_find");			/* Mark routine for error reporting */
 
-  *cid = adix_cloc( id, name,		/* Invoke kernel routine */
+  *cid = adix_find( id, name,		/* Invoke kernel routine */
 	 _CSTRING_MARK, status );
 
   _ERR_OUT;
@@ -1366,7 +1366,7 @@ void adic_there( ADIobj id, char *name, ADIboolean *there, ADIstatus status )
 
   _ERR_IN("adic_there");		/* Mark routine for error reporting */
 
-  *there = adix_cexist( id, name,	/* Invoke kernel routine */
+  *there = adix_there( id, name,	/* Invoke kernel routine */
 	 _CSTRING_MARK, status );
 
   _ERR_OUT;

@@ -1672,7 +1672,7 @@ F77_SUBROUTINE(adifn(find))( INTEGER(id), CHARACTER(name),
 
   _ERR_IN("ADI_FIND");		/* Mark routine for error reporting */
 
-  *((ADIobj *) &cid) = adix_cloc( (ADIobj) *id, name,
+  *((ADIobj *) &cid) = adix_find( (ADIobj) *id, name,
 		      name_length, status );
 
   _ERR_OUT;
@@ -1692,7 +1692,7 @@ F77_SUBROUTINE(adifn(there))( INTEGER(id), CHARACTER(name),
 
   _ERR_IN("ADI_THERE");			/* Mark routine for error reporting */
 
-  cres = adix_cexist( (ADIobj) id, name,
+  cres = adix_there( (ADIobj) id, name,
 		      name_length, status );
 
   _ASSFLOG(*there,cres);		/* Set return value */

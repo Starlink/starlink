@@ -113,6 +113,9 @@
 #define _GET_STRING(_name,_len) \
   if ( (_len)==_CSTRING_MARK ) (_len) = _name ? strlen(_name) : 0
 
+#define _GET_NAME(_name,_len) \
+  _GET_STRING(_name,_len); if ( _len ) adix_ntrunc( _name, &_len );
+
 /*  Forward definitions
  *
  */
@@ -130,6 +133,7 @@ ADIobj adix_locgen( ADIobj name, int narg, ADIstatus status );
 /* Declare kernel data types
  *
  */
+_DEF_STATIC_CDEF("_MappingControl",mapctrl,8,NULL,NULL);
 _DEF_STATIC_CDEF("_Method",mthd,48,NULL,NULL);
 _DEF_STATIC_CDEF("_MethodCombinationForm",mco,8,adix_delmco,NULL);
 _DEF_STATIC_CDEF("_GenericFunction",gnrc,24,adix_delgen,NULL);
@@ -258,6 +262,19 @@ int adix_sumdim( int ndim, int dims[] )
 
   return nelm;
   }
+
+/*
+ * Adjust name length variable to ignore trailing white space
+ */
+void adix_ntrunc( char *name, int *len )
+  {
+  char *nptr = name + (*len) - 1;
+
+  while( (*len) && isspace(*nptr) ) {
+    (*len)--; nptr--;
+    }
+  }
+
 
 void adix_aryidx( int ndim, int dims[], int offset, int index[],
 		  ADIstatus status )
@@ -620,7 +637,7 @@ ADIobj adix_new_cdef( char *name, int nlen,
   if ( !_ok(status) )                   /* Check status on entry */
     return ADI__nullid;
 
-  _GET_STRING(name,nlen);               /* Import strings */
+  _GET_NAME(name,nlen);               	/* Import string */
 
   typid = adix_bb_alloc(                /* New class definition structure */
 	&KT_ALLOC_cdef, status );
@@ -1053,8 +1070,8 @@ void adix_defgen( char *spec, int slen, char *options, int olen,
 
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(spec,slen);               /* Import strings used in this rtn */
-  _GET_STRING(options,olen);
+  _GET_NAME(spec,slen);               	/* Import strings used in this rtn */
+  _GET_NAME(options,olen);
 
   ADIclearStream( &pstream, status );   /* Clear the parsing stream */
 
@@ -1128,7 +1145,7 @@ void adix_defmth( char *spec, int slen,
 
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(spec,slen);               /* Import strings used in this rtn */
+  _GET_NAME(spec,slen);               	/* Import strings used in this rtn */
 
   ADIclearStream( &pstream, status );   /* Clear the parsing stream */
 
@@ -2315,7 +2332,7 @@ void adix_newn( ADIobj pid, char *name, int nlen,
 
   _chk_stat;                            /* Standard checks */
 
-  _GET_STRING(cls,clen);                /* Import string */
+  _GET_NAME(cls,clen);                	/* Import string */
 
   adix_findcls( cls, clen,              /* Locate allocator object */
 		&alloc, status );
@@ -2797,26 +2814,22 @@ void adix_mtacop_c( int in_is_adi, char *in, int ilen,
 
   for( ; ival; ival-- )                 /* Loop over input strings */
     {
-    if ( interm )                       /* Find length of this input */
-      {
+    if ( interm ) {                     /* Find length of this input */
       ibuf = *idptr;
       lilen = strlen( ibuf );
       }
-    else if ( in_is_adi )
-      {
+    else if ( in_is_adi ) {
       ibuf = isptr->data;
       lilen = isptr->len;
       }
     else
       ibuf = iptr;
 
-    if ( out_is_adi )                   /* Allowed length for output */
-      {
+    if ( out_is_adi ) {                 /* Allowed length for output */
       obuf = osptr->data;
       lolen = osptr->len;
       }
-    else if ( onterm )
-      {
+    else if ( onterm ) {
       obuf = *odptr;
       lolen = 999;
       }
@@ -2998,6 +3011,12 @@ void adix_mtaid( ADIobj id, ADImtaPtr mta, ADIstatus status )
       for( i=0; i<mta->ndim; i++ )
 	mta->ddims[i] = bdims[i];
 
+/* Decide whether data is contiguous in memory. The condition for this */
+/* to be the case is that all but the last used dimension must be equal */
+/* in size to the declared dimension */
+      for( i=0; i<(mta->ndim-1); i++ )
+	mta->contig |= (mta->udims[i] == mta->ddims[i]);
+
       mta->data = _DTDAT(adata->data);	/* Point mta data to object */
       }
     else
@@ -3024,7 +3043,7 @@ void adix_findmem( ADIobj id, char *mem, int mlen,
 
   _chk_stat;
 
-  _GET_STRING(mem,mlen);                /* Import member name */
+  _GET_NAME(mem,mlen);                	/* Import member name */
 
   tdef = _DTDEF(id);
   curmem = tdef->members;
@@ -3182,20 +3201,21 @@ void adix_locdat( ADIobj *id, char *name, int nlen, int flgs,
 		  lnlen, iswrite,
 		  did, parid, status );
 
-  if ( _ok(status) &&                   /* Ok so far and object exists? */
-       ! _null_q(**did) ) {
-    ADIobj  hid = _han_id(**did);
-    if ( flgs & DA__ARRAY )		/* Object is required to be an array */
-      if ( ! _ary_q(hid) )
-        adic_setecs( ADI__INVARG,
+  if ( _ok(status) && (*did) ) {        /* Ok so far and address defined? */
+    if ( ! _null_q(**did) ) {
+      ADIobj  hid = _han_id(**did);
+      if ( flgs & DA__ARRAY )		/* Object is required to be an array */
+	if ( ! _ary_q(hid) )
+	  adic_setecs( ADI__INVARG,
 		"Array object expected", status );
+      }
     }
   }
 
 /*
  * Does a component exist?
  */
-ADIboolean adix_cexist( ADIobj id, char *name, int nlen, ADIstatus status )
+ADIboolean adix_there( ADIobj id, char *name, int nlen, ADIstatus status )
    {
   ADIobj	*lid;
 
@@ -3203,8 +3223,12 @@ ADIboolean adix_cexist( ADIobj id, char *name, int nlen, ADIstatus status )
 	       DA__DEFAULT, &lid,
 	       NULL, status );
 
-  if ( _ok(status) )			/* Status good if component exists */
-    return lid ? ADI__true : ADI__false;
+  if ( _ok(status) ) {			/* Status good if component exists */
+    if ( lid )
+      return _valid_q(*lid) ? ADI__true : ADI__false;
+    else
+      return ADI__false;
+    }
   else {
     adix_errcnl( status );
     return ADI__false;
@@ -3214,7 +3238,7 @@ ADIboolean adix_cexist( ADIobj id, char *name, int nlen, ADIstatus status )
 /*
  * Locate a component
  */
-ADIobj adix_cloc( ADIobj id, char *name, int nlen, ADIstatus status )
+ADIobj adix_find( ADIobj id, char *name, int nlen, ADIstatus status )
   {
   ADIobj	*lid;
 
@@ -3490,6 +3514,114 @@ void adix_get_n( int clang, ADIobj id, char *name, int nlen,
       for( idim=0; idim<ndim; idim++ )
         nactdims[idim] = omta.udims[idim];/* Actual data used */
     }
+  }
+
+
+void adix_chkmode( char *mode, int mlen, ADIacmode *amode,
+		   ADIstatus status )
+  {
+  _chk_stat;				/* Check status on entry */
+
+  _GET_STRING(mode,mlen);		/* Import the string */
+
+  if ( ! strx_cmpi2c( mode, mlen, "READ", _MIN(4,mlen) ) )
+    *amode = ADI__read;
+  else if ( ! strx_cmpi2c( mode, mlen, "WRITE", _MIN(5,mlen) ) )
+    *amode = ADI__write;
+  else if ( ! strx_cmpi2c( mode, mlen, "UPDATE", _MIN(6,mlen) ) )
+    *amode = ADI__update;
+  else {
+    adic_setetc( "MODE", mode, mlen );
+    adic_setecs( ADI__INVARG, "Invalid access mode", status );
+    }
+  }
+
+ADIobj adix_new_mapctrl( ADIacmode mode, ADIclassCode mtype,
+			 size_t nbyte, ADIboolean dynamic,
+			 ADIstatus status )
+  {
+  ADIobj	newm;			/* New object */
+
+  _chk_stat_ret(ADI__nullid);		/* Check status on entry */
+
+  newm = adix_bb_alloc( &KT_ALLOC_mapctrl,  /* Allocate new map control */
+			status );
+
+  if ( _ok(status) ) {			/* Allocation went ok? */
+    _mapctrl_mode(newm) = mode;
+    _mapctrl_nbyte(newm) = nbyte;
+    _mapctrl_type(newm) = mtype;
+    _mapctrl_dynamic(newm) = dynamic;
+
+    if ( dynamic ) {			/* Dynamic data is required? */
+      _mapctrl_dptr(newm) = (void *) adix_mem_alloc( nbyte, status );
+      }
+    }
+  else
+    newm = ADI__nullid;
+
+  return newm;				/* Set return value */
+  }
+
+
+/* Map value of object, or object component
+ */
+void adix_map_n( int clang, ADIobj id, char *name, int nlen,
+		 char *mode, int mlen,
+		 ADIclassCode vtype, int vsize,
+		 void **vptr, ADIstatus status )
+  {
+  int           idim;                   /* Loop over dimensions */
+  ADIacmode	imode;			/* Mapping mode */
+  ADImta        imta;                   /* MTA for the object */
+  ADIobj        *lid;                   /* Object to be accessed */
+  ADIobj	mctrl;			/* Map control object */
+  ADImta        omta = _DEF_1D_MTA;     /* Output value MTA */
+
+  adix_chkmode( mode, mlen, &imode,	/* Validate mapping mode */
+		status );
+
+  adix_locdat( &id, name, nlen,		/* Find data insertion point */
+	       DA__DEFAULT, &lid, NULL,
+	       status );
+
+  if ( _ok(status) ) {
+    size_t	nbyte = 0;
+    ADIboolean	dynamic = ADI__false;
+
+    adix_mtaid( *lid, &imta, status );  /* Set input channel */
+
+/* Need dynamic memory if different types or if mapped object is */
+/* non-contiguous in memory */
+    if ( (vtype!=imta.type) || ! imta.contig ) {
+      dynamic = ADI__true;
+      nbyte = vsize * adix_sumdim( imta.ndim, imta.udims );
+      }
+
+/* Create the mapping control object */
+    mctrl = adix_new_mapctrl( imode, vtype, nbyte, dynamic, status );
+
+/* Perform data conversion if dynamic, otherwise just point to the input */
+/* data object */
+    if ( dynamic ) {
+      omta.type = vtype;                  /* Set output channel */
+      omta.data = _mapctrl_dptr(mctrl);
+      omta.size = vsize;
+      omta.ndim = imta.ndim;
+      for( idim=0; idim<imta.ndim; idim++ )
+	omta.ddims[idim] = imta.udims[idim];
+      omta.nulterm = clang;
+
+      adix_mtacop( &imta, &omta, status );/* Perform transfer */
+      }
+    else
+      _mapctrl_dptr(mctrl) = (void *) imta.data;
+
+/* Attach map control object is access list of handled object */
+    }
+
+/* Set value of returned pointer */
+  *vptr = _ok(status) ? _mapctrl_dptr(mctrl) : NULL;
   }
 
 
@@ -4321,7 +4453,7 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(name,nlen);               /* Import string */
+  _GET_NAME(name,nlen);               	/* Import string */
 
   while ( (curp!=ADI__nullid) &&        /* Loop until found or finished */
 	  _ok(status) &&
@@ -4354,7 +4486,7 @@ void adix_defrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(name,nlen);               /* Import string */
+  _GET_NAME(name,nlen);               	/* Import string */
 
   adic_new0( "FileRepresentation", &newid, status );
 
@@ -4394,7 +4526,7 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
   {
   _chk_stat;
 
-  *rtn = adix_cloc( rid, name, nlen,    /* Find member data identifier */
+  *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
                     status );
   }
 
@@ -4470,7 +4602,7 @@ void adix_defmcf( char *name, int nlen,
 
   _chk_stat;                            /* Check status on entry */
 
-  _GET_STRING(name,nlen);               /* Import string used in this rtn */
+  _GET_NAME(name,nlen);               	/* Import string used in this rtn */
 
   if ( _null_q(rtn) ) {                 /* Check not null routine */
     adic_setecs( ADI__INVARG,
@@ -4860,7 +4992,7 @@ ADIobj adix_exec( char *func, int flen, int narg,
 
   _chk_stat_ret(ADI__nullid);           /* Check status on entry */
 
-  _GET_STRING(func,flen);               /* Import name */
+  _GET_NAME(func,flen);               	/* Import name */
 
   fname = adix_cmn( func, flen,         /* Locate in common string table */
 		      status );
