@@ -19,6 +19,7 @@ AstPolyMap *	T_PTROBJ
 AstShiftMap *	T_PTROBJ
 AstSkyFrame *	T_PTROBJ
 AstSlaMap *	T_PTROBJ
+AstSphMap *	T_PTROBJ
 AstSpecFrame *	T_PTROBJ
 AstSpecMap *	T_PTROBJ
 AstUnitMap *	T_PTROBJ

@@ -159,6 +159,9 @@ use base qw/ AstMappingPtr /;
 package AstSlaMapPtr;
 use base qw/ AstMappingPtr /;
 
+package AstSphMapPtr;
+use base qw/ AstMappingPtr /;
+
 package AstSpecMapPtr;
 use base qw/ AstMappingPtr /;
 

@@ -616,6 +616,19 @@ new( class, flags, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::SphMap
+
+AstSphMap *
+new( class, options )
+  char * class
+  char * options
+ CODE:
+  ASTCALL(
+   RETVAL = astSphMap( options );
+  )
+ OUTPUT:
+  RETVAL
+
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::SpecMap
 
 AstSpecMap *
