@@ -50,14 +50,13 @@
 *        array.
 *
 *        BITPIX must be enclosed in double quotes and may be a list of 
-*        comma-separated values to be applied to each conversion in turn.
-*        An error results if more values than the number of input NDFs 
-*        are supplied.  If too few are given, the last value in the list
-*        applied to all the conversions.  The given values must be in the
-*        file may be used.  If more than one line is required to enter the
-*        information at a prompt then place a "-" at the end of each line
-*        where a continuation line is desired.
-*        [0]
+*        comma-separated values to be applied to each conversion in
+*        turn.  An error results if more values than the number of input
+*        NDFs  are supplied.  If too few are given, the last value in 
+*        the list applied to all the conversions.  The given values must
+*        be in the file may be used.  If more than one line is required
+*        to enter the information at a prompt then place a "-" at the
+*        end of each line where a continuation line is desired.  [0]
 *     COMP = LITERAL (Read)
 *        The list of array components to attempt to transfer to each
 *        FITS file.  The acceptable values are "D" for the main data
@@ -82,18 +81,38 @@
 *        Indirection through a text file may be used.  If more than one
 *        line is required to enter the information at a prompt then 
 *        place a "-" at the end of each line where a continuation line
-*        is desired.
-*        ["A"]
+*        is desired.  ["A"]
+*     ENCODING = LITERAL (Read)
+*        Controls the FITS keywords which will be used to encode the 
+*        World Co-ordinate System (WCS) information within the FITS 
+*        header. The value supplied should be one of the encodings listed
+*        in the "World Co-ordinate Systems" section below. In addition, 
+*        the value "Auto" may also be supplied, in which case a suitable
+*        default encoding is chosen based on the contents of the NDFs
+*        FITS extension and WCS component.  ["Auto"]
 *     IN = LITERAL (Read)
 *        The names of the NDFs to be converted into FITS format.  It
 *        may be a list of NDF names or direction specifications
-*        separated by commas and enclosed in double quotes. NDF names
-*        may include the regular expressions ("*", "?", "[a-z]" etc.).
-*        Indirection may occur through text files (nested up to seven
-*        deep).  The indirection character is "^".  If extra prompt
-*        lines are required, append the continuation character "-" to
-*        the end of the line.  Comments in the indirection file begin
-*        with the character "#".
+*        separated by commas and enclosed in double quotes.  NDF names
+*        may include wild-cards ("*", "?").  Indirection may occur
+*        through text files (nested up to seven deep).  The indirection
+*        character is "^".  If extra prompt lines are required, append
+*        the continuation character "-" to the end of the line. 
+*        Comments in the indirection file begin with the character "#".
+*     NATIVE = _LOGICAL (Read)
+*        If a TRUE value is given for parameter NATIVE, then World
+*        Co-ordinate System (WCS) information will be written to the 
+*        FITS header in the form of a `native' encoding (see "World
+*        Co-ordinate Systems" below).  This will be in addition to the
+*        encoding specified using parameter ENCODING, and will usually
+*        result in two descriptions of the WCS information being stored
+*        in the FITS header (unless the ENCODING parameter produces a
+*        native encoding in which case only one native encoding is
+*        stored in the header).  Including a native encoding in the
+*        header will enable other AST-based software (such as FITS2NDF)
+*        to reconstruct the full details of the WCS information.  The
+*        other non-native encodings will usually result in some
+*        information being lost.  [FALSE]
 *     ORIGIN = LITERAL (Read)
 *        The origin of the FITS files.  This becomes the value of the
 *        ORIGIN keyword in the FITS headers.  If a null value is given
@@ -102,31 +121,26 @@
 *     OUT = LITERAL (Write)
 *        The names for the output FITS files.  These may be enclosed in
 *        double quotes and specified as a list of comma-separated names,
-*        OR, using modification elements to specify output filenames
-*        based on the input filenames.  Indirection may be used if 
-*        required.
-*
-*        The simplest modification element is the asterisk "*", which
-*        means call the output FITS files the same name (without any
-*        directory specification) as the corresponding input NDF, but
-*        with file extension ".fit" instead of the NDF's extension of
-*        ".sdf".
-*
-*        Other types of modification can also occur so OUT = "x*.fit"
-*        would mean that the output files would have the same name
-*        as the input NDFs except for an "x" prefix, and the file
-*        extension of ".fit".  You can also replace a specified string
-*        in the output filename, for example OUT="x*.fit/cal/Starlink/"
-*        replaces the string "cal" with "Starlink" in any of the output
-*        names "x*.fit".
+*        or they may be created automatically on the basis of the input
+*        NDF names. To do this, the string supplied for this parameter
+*        should include an asterisk "*". This character is a token which 
+*        represents the name of the corresponding input NDF, but with a 
+*        file type of ".fit" instead of ".sdf", and with no directory
+*        specification. Thus, simply supplying "*" for this parameter
+*        will create a group of output files in the current directory
+*        with the same names as the input NDFs, but with file type
+*        ".fit". You can also specify some simple editing to be
+*        performed.  For instance, "new-*|.fit|.fits|" will add the
+*        string "new-" to the start of every file name, and will
+*        substitute the string ".fits" for the original string ".fit".
 *     PROEXTS = _LOGICAL (Read)
 *        If TRUE, the NDF extensions (other than the FITS extension)
 *        are propagated to the FITS files as FITS binary-table
-*        extensions, one per structure of the hierarchy. [FALSE]
+*        extensions, one per structure of the hierarchy.  [FALSE]
 *     PROFITS = _LOGICAL (Read)
 *        If TRUE, the contents of the FITS extension of the NDF are
 *        merged with the header information derived from the standard
-*        NDF components.  See the Notes for details of the merger.
+*        NDF components.  See the Notes for details of the merger. 
 *        [TRUE]
 *     PROHIS = _LOGICAL (Read)
 *        If TRUE, any NDF history records are written to the primary
@@ -158,7 +172,7 @@
 *     ndf2fits "data/a*z" * comp=v noprofits bitpix=-32
 *        This converts the NDFs with names beginning with "a" and ending
 *        in "z" in the directory called data into FITS files of the same
-*        name and with a file extension called .fits.  The variance
+*        name and with a file extension called .fit.  The variance
 *        array becomes the data array of each FITS file.  The data type
 *        of the FITS primary data array single-precision floating
 *        point.  Any FITS extension in the NDF is ignored.
@@ -166,9 +180,20 @@
 *        This converts the NDFs called abc and def into FITS files
 *        called jvp1.fit and jvp2.fit respectively.  The data type of
 *        the FITS primary data array is signed integer words in
-*        jvp1.fit, and double-precision floating point in jvp2.fit. The
+*        jvp1.fit, and double-precision floating point in jvp2.fit.  The
 *        FITS extension in each NDFs is merged into the FITS header of
 *        the corresponding FITS file.
+*     ndf2fits horse logo.fit d native encoding="fits-wcs"
+*        This is the same as the first example except that the
+*        co-ordinate system information stored in the NDF's WCS
+*        component is written to the FITS file twice; once using the
+*        FITS-WCS headers, and once using a special set of `native'
+*        keywords recognised by the AST library (see SUN/210).  The
+*        native encoding provides a `loss-free' means of transferring
+*        co-ordinate system information (i.e. no information is lost;
+*        other encodings may cause information to be lost).  Only
+*        applications based on the AST library (such as FITS2NDF) 
+*        are able to interpret native encodings.
 
 *  Notes:
 *     The rules for the conversion are as follows:
@@ -198,10 +223,9 @@
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array;
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
-*          the NDF axis structures if possible.  If no linear NDF axis
-*          structures are present, the values in the NDF FITS extension
-*          are copied (when parameter PROFITS is TRUE).  If any axes
-*          are non-linear, all FITS axis information is lost.
+*          the NDF WCS component if possible (see "World Co-ordinate
+*          Systems").  If this is not possible, and if PROFITS is TRUE, 
+*          then they are copied from the NDF FITS extension.
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
 *          label, and units components respectively are used if
 *          they are defined; otherwise any values found in the FITS
@@ -266,6 +290,62 @@
 *     EXTTYPE, EXTSHAPE and EXTLEVEL keywords (see above) are written
 *     to the binary-table header.
 
+*  World Co-ordinate Systems:
+*     Any co-ordinate system information stored in the WCS component of
+*     the NDF is written to the FITS header using one of the following
+*     encoding systems (the encodings used are determined by parameters
+*     ENCODING and NATIVE):
+*
+*        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and
+*        the system commonly used by IRAF.  It is described in the
+*        document "World Coordinate Systems Representations Within the
+*        FITS Format" by R.J. Hanisch and D.G. Wells, 1988, available by
+*        ftp from fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
+*
+*        "FITS-WCS" --- This is the proposed FITS standard WCS encoding
+*        scheme described in the paper "Representation of celestial
+*        coordinates in FITS"
+*        (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).  It is
+*        very similar to "FITS-IRAF" but supports a wider range of
+*        projections and co-ordinate systems.  Once the standard has
+*        been agreed, this encoding should be understood by any 
+*        FITS-WCS compliant software and it is likely to be adopted
+*        widely for FITS data in future. 
+*
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, 
+*        PCiiijjj, etc., as described in a previous (now superseded)
+*        draft of the above FITS world co-ordinate system paper by
+*        E.W.Greisen and M.Calabretta.
+*
+*        "FITS-AIPS" --- This uses conventions described in the document
+*        "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen
+*        (revised 9th September, 1994), available by ftp from
+*        fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z.  It is
+*        currently employed by the AIPS data-analysis facility (amongst
+*        others), so its use will facilitate data exchange with AIPS. 
+*        This encoding uses CROTAi and CDELTi keywords to describe axis
+*        rotation and scaling.
+*
+*        "DSS" --- This is the system used by the Digital Sky Survey,
+*        and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+*
+*        "NATIVE" --- This is the native system used by the AST library 
+*        (see SUN/210) and provides a loss-free method for transferring
+*        WCS information between AST-based application.  It allows more
+*        complicated WCS information to be stored and retrieved than any
+*        of the other encodings.
+*
+*     Values for FITS keywords generated by the above encodings will
+*     always be used in preference to any corresponding keywords found 
+*     in the FITS extension (even if PROFITS is TRUE). If this is not
+*     what is required, the WCS component of the NDF should be erased
+*     using the KAPPA command ERASE before running NDF2FITS.  Note, if 
+*     PROFITS is TRUE, then any WCS-related keywords in the FITS
+*     extension which are not replaced by keywords derived from the WCS
+*     component may appear in the output FITS file.  If this causes a
+*     problem, then PROFITS should be set to FALSE or the offending
+*     keywords removed using KAPPA FITSEDIT, for example.
+
 *  Special Formats:
 *     In the general case, NDF extensions (excluding the FITS extension)
 *     may be converted to one-row binary tables in the FITS file when
@@ -327,6 +407,7 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -347,6 +428,27 @@
 *        OBJECT extension generates wider binary tables (from 210 to
 *        224 bytes).  Now propagates primitive NDF extensions to binary
 *        tables.
+*     18-DEC-1997 (DSB):
+*        Added support for the NDF WCS component.
+*     1997 January 6 (MJC):
+*        Correct prologe for DATE and ORIGIN.
+*      2-FEB-1998 (DSB):
+*        Add ENCODING examples
+*      9-NOV-1998 (DSB):
+*        Added FITS-IRAF encoding. Replaced the ENCODINGS parameter with
+*        the NATIVE parameter.
+*     22-JUN-1999 (DSB):
+*        Added ENCODING parameter
+*     7-MAR-2000 (DSB):
+*        Report an error if no usable input NDFs are supplied.
+*     11-APR-2000 (DSB):
+*        Added FITS-PC and FITS-AIPS encodings. Default encoding (if
+*        ENCODING=AUTO) is now chosen on the basis of the contents of 
+*        the FITS extension (because DSS and FITS-WCS can both now
+*        be used to encode a TAN projection and so we need to look at
+*        what encoding was used in the original data to make the choice).
+*     21-AUG-2000 (DSB):
+*        Converted to use NDG to access the input NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -395,36 +497,25 @@
                                  ! input via continuation lines
       CHARACTER * ( 3 ) COMPS    ! Array-component code
       LOGICAL DATSEL             ! True if DATA component was selected
+      CHARACTER * ( 10 ) ENCOD   ! FITS encoding requested for WCS info
       INTEGER FGROUP             ! Group identifier of default list of
                                  ! FITS files
       CHARACTER * ( 255 ) FILNAM ! Name of FITS file
-      CHARACTER * ( 255 ) FSPEC  ! File specification
       LOGICAL GOOD               ! True if all group values are valid
-      CHARACTER * ( DAT__SZLOC ) HLOC ! Locator to HDS input file
       INTEGER I                  ! Loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
-      CHARACTER * ( 255 ) INFILE ! Input-file name
-      INTEGER IGRP1              ! Group identifier of input files
       INTEGER IGRP2              ! Group identifier of input NDFs
       INTEGER IGRP3              ! Group identifier of input purged NDFs
-      INTEGER IWILD              ! Counter of the wild-carded files
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
-      LOGICAL LEAVE              ! True if the NDF-testing is finished
-      INTEGER LP                 ! Loop counter
       INTEGER NAC                ! Number of COMP values
       INTEGER NAPRES             ! Number of array components requested
                                  ! and present in the NDF
+      LOGICAL NATIVE             ! Include a NATIVE encoding of WCS info?
       INTEGER NBP                ! Number of BITPIX values
       INTEGER NDF                ! NDF identifier
-      CHARACTER * ( 255 ) NDFNAM ! Name of NDF
-      INTEGER NDIM               ! NDF dimensions
       INTEGER NIFILE             ! Number of NDF files
       INTEGER NOFILE             ! Number of output files
-      INTEGER NLEV               ! Number of path levels
-      INTEGER NGLIST             ! No. of items in input list
       INTEGER OGROUP             ! Group identifier of output FITS files
       CHARACTER * ( 68 ) ORIGIN  ! Place of origin of the FITS file
-      CHARACTER * ( 255 ) PATH   ! Input-file HDS path
       LOGICAL PROEXT             ! True if the other extensions are
                                  ! propagated
       LOGICAL PROFIT             ! True if the FITS extension is
@@ -434,7 +525,6 @@
       LOGICAL QUAPRE             ! True if the QUA:LITY component is
                                  ! present
       LOGICAL QUASEL             ! True if QUALITY was selected
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL VARPRE             ! True if the VARIANCE component is
                                  ! present
       LOGICAL VARSEL             ! True if VARIANCE was selected
@@ -446,118 +536,9 @@
 
 *  Get file list and check the number of specifications.
 *  =====================================================
-*
-*  Use GRP to get a list of wildcarded filenames.
-
-*  Create a new group to contain the input file names.
-      CALL GRP_NEW( 'Input files', IGRP1, STATUS )
-
-*  Allow for continuation lines.
-      CFLAG = .TRUE.
-      DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
-
-*  Get the list of file names from the environment.
-         CALL GRP_GROUP( 'IN', GRP__NOID, IGRP1, NGLIST, ADDED, 
-     :                   CFLAG, STATUS )
-
-*  Cancel the parameter association in order to get more group values
-*  through the parameter, unless there are no more to obtain.
-         IF ( CFLAG ) CALL PAR_CANCL( 'IN', STATUS )
-      END DO
-
-*  Tidy and exit if there has been an error.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL GRP_DELET( IGRP1, STATUS )
-         GOTO 999
-      END IF
-
-*  Create a second group to hold the filenames including expanded
-*  wildcards.
-      CALL GRP_NEW( 'Expanded wild card files', IGRP2, STATUS )
-
-*  Expand the wildcards.
-*  =====================
-*
-*  Initialise the count of the number of files and the index to the
-*  expanded file.
-      NIFILE = 0
-      IWILD = DAT__NOWLD
-      DO LP = 1, NGLIST
-
-*  Get a file specification from the input group.
-         CALL GRP_GET( IGRP1, LP, 1, FSPEC, STATUS )
-         
-*  Find the files which match this specification.
-         LEAVE = .FALSE.
-
-*  Start new error context.
-         CALL ERR_MARK
-
-*  Loop for all the files in the wildcard specification.
-         DO WHILE ( .NOT. LEAVE )
-
-*  Get a single HDS file that matches this specification.  This assumes
-*  a file extension of ".sdf".   However, it does not discriminate
-*  between NDFs (there is no NDF_WILD yet).
-            CALL HDS_WILD( FSPEC, 'READ', IWILD, HLOC, STATUS )
-
-*  Check if a file has been found and can be read.
-            IF ( HLOC .NE. DAT__NOLOC .AND. STATUS .EQ. SAI__OK ) THEN
-
-*  Next validate it as an NDF.
-               CALL NDF_FIND( HLOC, ' ', NDF, STATUS )
-
-*  Call something to validate it (up to a point).
-               CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM,
-     :                         STATUS )
-
-*  Take a bad status to mean that this is not an NDF.
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
-               ELSE
-
-*  Get the path and file name associated with this NDF.
-                  CALL HDS_TRACE( HLOC, NLEV, PATH, INFILE, STATUS )
-
-*  Add this NDF into the output group.  NFILE keeps a count of the
-*  number of files in the output group.
-                  CALL GRP_GRPEX( INFILE, GRP__NOID, IGRP2, NIFILE, 
-     :                            ADDED, CFLAG, STATUS )
-               END IF
-
-*  Tidy the NDF.
-               CALL NDF_ANNUL( NDF, STATUS )
-
-*  Tidy the HDS file.
-               CALL DAT_ANNUL( HLOC, STATUS )
-
-*  Annul a bad status as we want to read files from subsequent entries
-*  in the list, but not leave the cycle.  This might have resulted from
-*  a file protection, or it has just been deleted.  There is an
-*  exception when no HDS files were found on the first call to
-*  HDS_WILD.
-            ELSE IF ( STATUS .NE. DAT__FILNF .AND.
-     :                STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )
-
-            ELSE
-
-*  Go to the next GRP expression.
-               LEAVE = .TRUE.
-
-            END IF
-
-         END DO
-
-*  Release the resources assoicated with the wild-card search.
-         CALL HDS_EWILD( IWILD, STATUS )
-      END DO
-
-*  Release the error context.
-      CALL ERR_RLSE
-
-*  Finished with the first group so delete it.
-      CALL GRP_DELET( IGRP1, STATUS )
+*  Get a group containing the names of the NDFs to be processed.
+      CALL CON_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
+     :                 IGRP2, NIFILE, STATUS )
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -573,6 +554,13 @@
 
 *  Find the number of NDFs after the purge.
       CALL GRP_GRPSZ( IGRP3, NIFILE, STATUS )
+
+*  Report an error if the group is empty.
+      IF( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'NDF2FITS_NOFILES', 'NDF2FITS: No usable '//
+     :                 'input NDFs supplied.', STATUS )
+      END IF
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -879,6 +867,22 @@
 *  Determine whether or not the HISTORY component is to be propagated.
       CALL PAR_GET0L( 'PROHIS', PROHIS, STATUS )
 
+*  Abort if there has been an error.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the AST encoding to use when converting WCS information to FITS
+*  headers. If a null "auto" is supplied, the choice is made automatically.
+*  Convert the "auto" string to a blank string which is recognised by the 
+*  lower level routines.
+      CALL PAR_CHOIC( 'ENCODING', 'Auto', 'Auto,FITS-IRAF,FITS-WCS,'//
+     :                'FITS-PC,FITS-AIPS,DSS,NATIVE', .FALSE., ENCOD, 
+     :                STATUS )
+      IF( ENCOD .EQ. 'AUTO' ) ENCOD = ' '
+
+*  See if a NATIVE encoding of the WCS component is to be included in
+*  the FITS header, along with the encoding selected above.
+      CALL PAR_GET0L( 'NATIVE', NATIVE, STATUS )
+
 *  Process each file.
 *  ==================
       DO IFILE = 1, NIFILE
@@ -886,10 +890,7 @@
 *  Obtain the values for the parameters.
 *  =====================================
 
-*  Find the input NDF name.
-         CALL GRP_GET( IGRP3, IFILE, 1, NDFNAM, STATUS )
-
-*  Find the input NDF name.
+*  Find the output NDF name.
          CALL GRP_GET( OGROUP, IFILE, 1, FILNAM, STATUS )
 
 *  Find the BITPIX and convert it to an integer value.
@@ -901,12 +902,7 @@
 
 *  Access the NDF.
 *  ===============
-
-*  Open NDF as an HDS file.  This assumes a file extension of ".sdf".
-         CALL HDS_OPEN( NDFNAM, 'READ', HLOC, STATUS )
-
-*  Next obtain an NDF for it.
-         CALL NDF_FIND( HLOC, ' ', NDF, STATUS )
+         CALL NDG_NDFAS( IGRP3, IFILE, 'READ', NDF, STATUS )
 
 *  Generate the component list.
 *  ============================
@@ -1048,17 +1044,18 @@
 
 *  Finally convert the NDF to the FITS file, as best we can.
             CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
+     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
+     :                      NATIVE, STATUS )
          ELSE
 
 *  Convert the NDF to the FITS file.
             CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, STATUS )
+     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
+     :                      NATIVE, STATUS )
          END IF
 
 *  Tidy the NDF.
          CALL NDF_ANNUL( NDF, STATUS )
-         CALL DAT_ANNUL( HLOC, STATUS )
       END DO
 
 *  Delete the groups.

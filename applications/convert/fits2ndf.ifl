@@ -9,6 +9,8 @@
 
 #  Author:
 #     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     AJC: Alan J. Chipperfield (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -16,6 +18,12 @@
 #	 Original version.
 #     1997 March 11 (MJC):
 #     	 Changed from GROUP types back to LITERAL.
+#     18-DEC-1997 (DSB):
+#        Added ENCODINGS.
+#      4-APR-2000 (AJC):
+#        Added EXTABLE
+#     31-AUG-2000 (AJC):
+#        Added CONTAINER
 #     {enter_further_changes_here}
 
 #-
@@ -23,6 +31,32 @@
 interface FITS2NDF
 
    helplib        'CONVERT_HELP:'
+
+   parameter      CONTAINER        # Create a container file
+      type        '_LOGICAL'
+      prompt      'Create a container file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      ENCODINGS      # AST encodings for WCS components
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT'
+      prompt      'FITS keywords to use when creating NDF WCS components'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      EXTABLE
+      type        'FILENAME'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Table of extension specifiers'
+      helpkey     '*'
+      default     !
+   endparameter
 
    parameter      FMTCNV         # Apply scale and zero
       position    3
@@ -81,6 +115,15 @@ interface FITS2NDF
       vpath       'DEFAULT'
       default     TRUE
       helpkey     '*'
+   endparameter
+
+   parameter      WCSATTRS      # AST attributes for WCS FitsChan
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT,CURRENT'
+      prompt      'Attributes for WCS conversion'
+      helpkey     '*'
+      default     !
    endparameter
 
 endinterface

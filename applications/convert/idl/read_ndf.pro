@@ -1,0 +1,214 @@
+;; NAME:
+;;    read_ndf.pro
+;;
+;; PURPOSE:
+;;    To convert a Starlink NDF of up to seven dimensions to an IDL array.
+;;
+;; CALLING SEQUENCE:
+;;    This function is called with the following IDL command:
+;;
+;;	IDL> array = read_ndf( ndf_name[, bad_value][,component=comp_name])
+;;
+;; ARGUMENTS:
+;;    ndf_name (Given)
+;;       A string expression specifying the name of the NDF to be read.
+;;
+;;    [bad_value] (Given)
+;;       Optional - A value to replace in the IDL array any occurrence of
+;;       the PRIMDAT bad value in the NDF component.  The value must be the 
+;;       same type as the array.
+;;
+;;    [component=comp_name] (Given)
+;;       Optional - A string expression specifying the NDF component to be 
+;;       read.  It may be 'DATA', 'VARIANCE' or 'QUALITY' and defaults to 
+;;       'DATA'. The case of the string does not matter and it may be 
+;;       abbreviated to one or more characters.
+;;       
+;; RETURNED VALUE:
+;;    An IDL array of a size and type corresponding with the NDF. The type
+;;    correspondence is as follows:
+;;          _REAL -> floating 
+;;          _DOUBLE -> double-precision 
+;;          _UBYTE -> byte 
+;;          _WORD -> integer 
+;;          _INTEGER -> longword integer 
+;;
+;; DEFICIENCES:
+;;      - No conversion of the given bad value to the appropriate type for
+;;        the array will be attempted; instead an error will be reported.
+;;
+;; BUGS:
+;;      None known
+;;
+;; HISTORY:
+;;       8-JUN-1999 (AJC):
+;;         Version for CONVERT package
+;;      18-FEB-2000 (AJC)
+;;         Rename ndf_idl.so to convert_idl.so
+;;      18-FEB-2002 (AJC):
+;;         Terminate gracefully if 64-bit Solaris
+;;
+;; EXAMPLE:
+;;-----------------------------------------------------------------------------
+;;
+;;    Assuming my_ndf_file.sdf is an NDF with a _REAL data component of type
+;;     _REAL and a QUALITY component of type _UBYTE,
+;;
+;;	IDL> data_array = read_ndf('my_ndf_file')
+;;
+;;    creates an IDL floating array, data_array, with the same dimensions as 
+;;    the NDF and containing the values from its DATA component.
+;;
+;;	IDL> data_array = read_ndf('my_ndf_file', !values.f_nan)
+;;
+;;    As above except that any occurrence of a bad value (VAL__BADR as defined
+;;    by the Starlink PRIMDAT package) in the NDF will be replaced by NaN in 
+;;    the IDL array.
+;;
+;;	IDL> quality = read_ndf('my_ndf_file',comp='q')
+;;
+;;    creates an IDL byte array from the QUALITY component of the same NDF.
+;;    (Note that the keyword 'component' and the value 'QUALITY' are case-
+;;    independent and can be abbreviated.)
+;;
+;;-----------------------------------------------------------------------------
+
+	FUNCTION READ_NDF, NDF_NAME, BAD_VALUE, COMPONENT=COMP
+
+;;      Return to caller if error
+        ON_ERROR, 2
+
+;; 	Different platforms have different filename extensions and entry
+;;	point formats. Determine what type of machine we are on and set the 
+;;	correct names.
+
+	CASE !VERSION.ARCH OF 
+	   'sparc': BEGIN		;Sun or Solaris
+            IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
+               MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
+            ENDIF
+		LIB_EXT		= 'so'
+		ENTRY_PREFIX	= ''
+         END
+         'alpha': BEGIN		;Dec OSF1
+            LIB_EXT = 'so'
+            ENTRY_PREFIX    = ''
+         END
+         'x86': BEGIN		;PC running Linux
+            LIB_EXT = 'so'
+		ENTRY_PREFIX    = ''
+         END    
+         ELSE: BEGIN
+		MESSAGE,"ERROR: Unsupported platform."
+         END
+	ENDCASE
+
+;;	Determine the entry point and library name to use in the 
+;;	CALL_EXTERNAL function.
+
+;;	Get the library name and check that it is there
+        LIB_NAME   = 'INSTALL_BIN/convert_idl.' + LIB_EXT
+
+;;	Ensure that the library file exists
+	DUM = findfile(LIB_NAME, COUNT=CNT)
+
+	IF(CNT eq 0)THEN BEGIN
+;;	  The library file has not been made. Write a message and 
+;; 	  exit.
+	  MESSAGE, "The library file: "+ LIB_NAME +" Does not exist."
+	END 
+
+;; Statements initalising returned values.
+        NDIM=7L
+        DIMS = [1L,2L,3L,4L,5L,6L,7L]
+        DATA_TYPE="default"
+
+;;      See if component name is set
+;;      If so, check for valid name (abbreviations allowed).
+        IF KEYWORD_SET(COMP) THEN BEGIN
+           COMPONENT = STRUPCASE(STRTRIM(COMP,2))
+           IF NOT STRPOS('VARIANCE', COMPONENT) THEN COMPONENT = 'VARIANCE' $
+           ELSE IF NOT STRPOS('QUALITY', COMPONENT) THEN COMPONENT = 'QUALITY' $
+           ELSE IF NOT STRPOS('DATA', COMPONENT) THEN COMPONENT = 'DATA' $
+           ELSE MESSAGE, $
+             "Component name must be 'DATA', 'QUALITY' or 'VARIANCE'."
+        ENDIF ELSE COMPONENT = 'DATA'
+
+;; Probe the NDF to determine its dimensions.
+        ENTRY_NAME = ENTRY_PREFIX+'probe_ndf'
+        IF ( NOT CALL_EXTERNAL( LIB_NAME, ENTRY_NAME,  $
+                 NDF_NAME,      $;NDF Filename (given)
+                 COMPONENT,     $;Component name (given)
+                 DATA_TYPE,     $;String to contain data type (returned)
+                 NDIM,          $;Number of dimensions (returned)
+                 DIMS           $;Array to contain dimension values (returned)
+                 ) ) THEN MESSAGE, "Failed to probe the NDF for information."; 
+
+;;      Create an IDL array here for the NDF data to be read into.
+;;      First select the IDL command to use
+        CASE DATA_TYPE OF
+          '_UBYTE':   ARRTYPE = 'BYTARR'
+          '_WORD':    ARRTYPE = 'INTARR'
+          '_INTEGER': ARRTYPE = 'LONARR'
+          '_REAL':    ARRTYPE = 'FLTARR'
+          '_DOUBLE':  ARRTYPE = 'DBLARR'
+        ELSE: MESSAGE, "Can't read NDF of given type."
+        ENDCASE
+
+;;      Now create array of required size and shape
+        CASE NDIM OF
+          2: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1])
+          1: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0])
+          3: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1],DIMS[2])
+          4: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1],DIMS[2],$
+                                               DIMS[3])
+          5: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1],DIMS[2],$
+                                               DIMS[3],DIMS[4])
+          6: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1],DIMS[2],$
+                                               DIMS[3],DIMS[4],DIMS[5])
+          7: IDL_ARRAY = CALL_FUNCTION(ARRTYPE,DIMS[0],DIMS[1],DIMS[2],$
+                                               DIMS[3],DIMS[4],DIMS[5],DIMS[6])
+        ELSE: PRINT, 'Array must be 1 to 7 dimensional!'
+        ENDCASE
+
+;;      Get IDL type of the array
+        ARR_SIZE = SIZE( IDL_ARRAY )
+
+;;      See if BAD_VALUE is set
+        IF N_PARAMS() GT 1 THEN BEGIN
+;;      Check BAD_VALUE is scalar and correct type
+          BAD_SIZE = SIZE( BAD_VALUE )
+          IF BAD_SIZE[0] THEN $
+             MESSAGE, 'BAD_VALUE is not scalar.' $
+          ELSE IF BAD_SIZE[1] NE ARR_SIZE[ ARR_SIZE[0] + 1 ] THEN $
+             MESSAGE, 'BAD_VALUE is incorrect type.'
+;;      Inform user of bad value
+          PRINT, "READ_NDF: Bad pixel value set to ", BAD_VALUE
+          BAD_SET = 1
+        ENDIF ELSE BEGIN
+          BAD_SET = 0
+          BAD_VALUE = 0
+        ENDELSE
+
+;;      Now call the program to read the NDF into the IDL array.
+        ENTRY_NAME = ENTRY_PREFIX+'read_ndf'
+        IF ( NOT CALL_EXTERNAL( LIB_NAME, ENTRY_NAME,   $
+                 NDF_NAME,      $;NDF Filename (given)
+                 COMPONENT,     $;Component name (DATA, QUALITY, VARIANCE) (given)
+                 DATA_TYPE,     $;NDF Type (given)
+                 IDL_ARRAY,     $;Number of dimensions (given)
+                 BAD_SET,       $;Whether BAD value is set (given)
+                 BAD_VALUE      $;BAD value (given)
+                 ) ) THEN MESSAGE, "Failed.";
+
+	RETURN, IDL_ARRAY
+
+	END
+
+
+
+
+
+
+
+

@@ -34,14 +34,252 @@
 *     (after being squared).  In addition, FITS2NDF can restore NDFs
 *     converted to FITS by the sister task NDF2FITS.
 *
+*     A more general facility is also provided to associate specified
+*     FITS extensions with NDF components by means of entries in a text
+*     file (see the EXTABLE parameter).
+
 *     Details of the supported special formats and rules for processing
 *     them are given in topic "Special Formats"; the general-case
 *     processing rules are described in the "Notes".
+
+*     Both NDF and FITS use the term extension, and they mean different
+*     things. Thus to avoid confusion in the descriptions below, the term
+*     `sub-file' is used to refer to a FITS IMAGE, TABLE or BINTABLE
+*     Header and Data Unit (HDU).
 
 *  Usage:
 *     fits2ndf in out
 
 *  ADAM Parameters:
+*     CONTAINER = _LOGICAL (Read)
+*        If TRUE causes each HDU from the FITS file to be written as
+*        a component of the HDS container file specified by the OUT
+*        parameter.  Each component will be named HDU_n, where n is the
+*        FITS HDU number.  The primary HDU is numbered 0.  Primary and
+*        IMAGE HDUs will become NDFs and if the PROFITS parameter is
+*        TRUE, each NDF's FITS extension will be created from the
+*        header of the FITS sub-file.  It will have the form of a
+*        primary header and may include cards inherited from the
+*        primary header.  If the FITS HDU has no data array, an NDF
+*        will not be created---if PROFITS is TRUE, a structure of type
+*        FITS_HEADER, containing the FITS header as an array of type
+*        _CHAR*80, is created; if PROFITS is FALSE, no component is
+*        created.  Binary and ASCII tables become components of type
+*        'TABLE', formatted as in the general rules under "Notes" below.
+*        [FALSE]
+*     ENCODINGS = LITERAL (Read)
+*        Determines which FITS keywords should be used to define the
+*        world co-ordinate systems to be stored in the NDF's WCS 
+*        component.  The allowed values (case-insensitive) are:
+*
+*        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and is
+*           the system commonly used by IRAF. It is described in the
+*           document "World Coordinate Systems Representations Within
+*           the FITS Format"  by R.J. Hanisch and D.G. Wells, 1988,
+*           available by ftp from fits.cv.nrao.edu
+*           /fits/documents/wcs/wcs88.ps.Z. 
+*	    
+*        "FITS-WCS" --- This is the proposed FITS standard WCS encoding 
+*           scheme described in the paper "Representation of celestial
+*           co-ordinates in FITS"
+*           (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).  It
+*           is very similar to \texttt{"FITS-IRAF"} but supports a wider range of
+*           projections and co-ordinate systems.  Once the standard has 
+*           been agreed, this encoding should be understood by any
+*           FITS-WCS  compliant software and it is likely to be adopted
+*           widely for FITS data in future. 
+*
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+*           PCiiijjj,  etc, as described in a previous (now superseded)
+*           draft of the above FITS world co-ordinate system paper by
+*           E.W.Greisen and  M.Calabretta.
+*
+*        "FITS-AIPS" --- This uses conventions described in the document
+*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen 
+*           (revised 9th September, 1994), available by ftp from 
+*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z.  It is
+*           currently employed by the AIPS data-analysis facility
+*           (amongst others), so its use will facilitate data exchange
+*           with AIPS.  This encoding uses CROTAi and CDELTi keywords to
+*           describe axis rotation and scaling.
+*	    
+*        "DSS" --- This is the system used by the Digital Sky Survey,
+*           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
+*	    
+*        "NATIVE" --- This is the native system used by the AST library
+*           (see SUN/210) and provides a loss-free method for 
+*           transferring WCS information between AST-based applications. 
+*           It allows more complicated WCS information to be stored and
+*           retrieved than any of the other encodings.
+*
+*        A comma-separated list of up to six values may be supplied,
+*        in which case the value actually used is the first in the
+*        list for which corresponding keywords can be found in the FITS
+*        header.
+*        
+*        A FITS header may contain keywords from more than one of these
+*        encodings, in which case it is possible for the encodings to
+*        be inconsistent with each other.  This may happen for instance
+*        if an application modifies the keyword associated with one
+*        encoding but fails to make equivalent modifications to the
+*        others.
+*
+*        If a null parameter value (!) is supplied for
+*        ENCODINGS, then an attempt is made to determine the most
+*        reliable encoding to use as follows.  If both native and
+*        non-native encodings are available, then the first non-native
+*        encoding to be found which is inconsistent with the native
+*        encoding is used.  If all encodings are consistent, then the
+*        native encoding is used (if present). [!]
+*     EXTABLE = FILE (Read)
+*        This specifies the name of a text file containing a table
+*        associating sub-files from a multi-extension FITS file with
+*        specific NDF components.  If the null value (!) is given for
+*        EXTABLE, FITS sub-files are treated as determined by the
+*        PROEXTS parameter (see below).
+*
+*        An EXTABLE file contains records which may be:
+*
+*        'component specifier records', which associate FITS sub-files
+*          with NDF components;
+*        'NDFNAMES records', which specify the names of the NDFs to be
+*          created. Normally they will be created within the top-level
+*          HDS container file specified by the OUT parameter;
+*        'directive records', which inform the table file parser.
+*
+*        Spaces are allowed between elements within records and blank 
+*        records are ignored.
+*
+*        Component specifier records have the form:
+*
+*          component; sub-file_specifiers; transformation_code
+*
+*          Where:
+*           'component' (case-insensitive) specifies the NDF component 
+*              and is DATA, VARIANCE, QUALITY or EXTNi.name.  The
+*              EXTNi.name form specifies the name 'name' of an NDF
+*              extension to be created.  'name' may be omitted in which
+*              case 'FITS_EXT_n' is assumed,  where n is the FITS
+*              sub-file number. 'i' compries any characters and may be 
+*              omitted; it serves to differentiate component specifiers
+*              where the default name is to be used.
+*           'sub-file_specifiers' is a list of FITS sub-file specifiers,
+*              separated by commas. The nth sub-file specifier from each
+*              component specifier record forms an 'sub-file  set' and 
+*              each sub-file set will be used to create one NDF in the
+*              output file.
+*
+*              Each sub-file specifier may be:
+*              1. An integer specifying the FITS Header and Data Unit 
+*                 (HDU) number.  The primary HDU number is 0.
+*              2. keyword=value (case-insensitive), specifying a FITS
+*                 HDU where the specified keyword has the specified
+*                 value, e.g. EXTNAME=IM2.  The 'keyword=' may be 
+*                 omitted, in which case EXTNAME is assumed.
+*                 Multiple keyword=value pairs separated by commas and
+*                 enclosed in [] may be given as a single sub-file
+*                 specifier.  All the given keywords must match the
+*                 sub-file header values.
+*              3. Omitted to indicate that the component is not required
+*                 for the corresponding NDF.  (Commas may be needed to
+*                 maintain correct sub-file set alignment for later
+*                 sub-file specifiers.)  If the last character of
+*                 'sub-file_specifiers' is comma, it indicates an 
+*                 omitted specifier at the end.  Note that if a sub-file 
+*                 is not specified for the DATA component of an NDF, an
+*                 error will be reported at closedown.
+*           'transformation_code' (case-insensitive) is a character
+*              string specifying a  transformation to be applied to the
+*              FITS data before it is written into the NDF component.
+*              The code and preceding ";" may be omitted in which case
+*              "NONE" (no transformation) is assumed.  Currently the
+*              only permitted code is "NONE".
+*          There may be more than one component specifier record for a
+*          given component, the sub-file specifiers will be
+*          concatenated.  A sub-file specifier may not span records and
+*          only the transformation code specified by the last record
+*          for the component will be effective.
+*
+*        An NDFNAMES record has the format:
+*          NDFNAMES name_list
+*           Where name_list is a list of names for the NDFs to be
+*           created, one for each sub-file set specified by the
+*           component specifier lines.  The names are separated by
+*           commas.  If any of the names are omitted, the last name
+*           specified is assumed to be a root name to which an integer
+*           counter is to be added until a new name is found.  If no
+*           names are specified, 'EXTN_SET' is used as the root name.
+*           For example, NDFNAMES NDF,,SET_ would result in NDFs named
+*           NDF1, NDF2, SET_1, SET_2 etc. up to the given number of
+*           sub-file sets.
+*
+*           There may be multiple NDFNAMES records, the names will be
+*           concatenated.  A name may not span records and a comma as
+*           the last non-blank character indicates an omitted name. 
+*
+*           If there is only one sub-file set, the name_list may be '*',
+*           in which case the NDF will be created at the top level of
+*           the output file.
+*
+*        Directive records have # in column 1 and will generally be
+*           treated as comments and ignored.  An exception is a record
+*           starting with '#END', which may optionally be used to
+*           terminate the file.
+*
+*        Each HDU of the FITS file is processed in turn.  If it matches 
+*        on of the sub-file specifiers in the table, it is used to
+*        create the  specified component of the appropriate NDF in the
+*        output file; otherwise the next HDU is processed.  The table is
+*        searched in sub-file set order.  If a table entry is matched it
+*        is removed from the table; this means that the same FITS
+*        sub-file specifier may be repeated for another NDF component
+*        but each FITS HDU can only be used once.  If sub-file
+*        specifiers remain unmatched at the end, a warning message is
+*        displayed.
+*
+*        A simple example of an EXTABLE is:
+*
+*          # A simple example
+*          DATA;0,1,2,3,4,5,6
+*          #END
+*
+*        The primary HDU and sub-files 1--6 of the FITS file will be 
+*        written as the DATA components of NDFs EXTN_SET1--EXTN_SET7
+*        within the HDS container file specified by the OUT parameter. 
+*
+*        A contrived example,showing more of the facilities, is:
+*
+*          # A contrived example
+*          NDFNAMES obs_
+*          DATA; 1, EXTNAME=IM4, IM7; none
+*          VARIANCE; 2,im5, im8
+*          EXTN.CAL;3 ,,[extname=cal_3,extver=2]
+*          #END
+*
+*        The HDS container file specified by the OUT parameter will
+*        contain three NDFs, the NDFNAMES record specifies that they
+*        will be named OBS_1, OBS_2 and OBS_3.
+*
+*        NDF OBS_1 will have its DATA component created from the first
+*        extension  (HDU 1) of the FITS file specified by the IN
+*        parameter, and its VARIANCE from the second.  NDF OBS_1 will
+*        have an extension named CAL created from the third FITS
+*        extension.
+*
+*        NDF OBS_2 has DATA and VARIANCE components created from the
+*        FITS sub-files whose EXTNAME keywords have the value IM4 and
+*        IM5 respectively; no CAL extension is created in OBS_2.
+*
+*        OBS_3 DATA and VARIANCE are created from FITS sub-files named
+*        IM7 and IM8 and the CAL extension from the FITS sub-file whose
+*        EXTNAME and EXTVER keywords have values "CAL" and "2"
+*        respectively.
+*
+*        In all cases, if the PROFITS parameter is TRUE, the NDF's FITS
+*        extension will be created from the header of the sub-file 
+*        associated with the DATA component of the NDF.  It will have
+*        the form of a primary header and may include cards inherited
+*        from the primary header [!]
 *     FMTCNV = LITERAL (Read)
 *        This specifies whether or not format conversion will occur.
 *        The conversion applies the values of the FITS keywords BSCALE
@@ -69,14 +307,24 @@
 *        is desired.  ["TRUE"]
 *     IN = LITERAL (Read)
 *        The names of the FITS-format files to be converted to NDFs.
-*        It may be a list of file names or direction specifications
+*        It may be a list of file names or indirection specifications
 *        separated by commas and enclosed in double quotes.  FITS file
 *        names may include the regular expressions ("*", "?", "[a-z]"
-*        etc.).  Indirection may occur through text files (nested up to
-*        seven deep).  The indirection character is "^".  If extra
-*        prompt lines are required, append the continuation character
-*        "-" to the end of the line.  Comments in the indirection file
-*        begin with the character "#".
+*        etc.) but a "[]" construct at the end of the name is assumed to
+*        be a sub-file specifier to specify a particular FITS sub-file
+*        to be converted.  (See the description of an EXTABLE file
+*        above for allowed sub-file specifiers, but note that only a
+*        single keyword=value pair is allowed here.  Note also that if a
+*        specifier contains a keyword=value pair, the name(s) must be
+*        enclosed in double quotes.)  If you really want to have an
+*        [a-z]-type regular expression at the end of the filename, you
+*        can put a null sub-file specifier "[]" after it.
+*
+*        Indirection may occur through text files (nested up to seven
+*        deep).  The indirection character is "^".  If extra prompt
+*        lines are required, append the continuation character "-" to
+*        the end of the line.  Comments in the indirection file begin
+*        with the character "#".
 *     OUT = LITERAL (Write)
 *        The names for the output NDFs.  These may be enclosed in
 *        double quotes and specified as a list of comma-separated names,
@@ -93,25 +341,48 @@
 *        mean that the output files would have the same name as the
 *        input FITS files except for an "x" prefix.  You can also
 *        replace a specified string in the output filename, for example
-*        OUT="x*/cal/Starlink/" replaces the string "cal" with
+*        OUT="x*|cal|Starlink|" replaces the string "cal" with
 *        "Starlink" in any of the output names "x*".
+*
+*        Some of the options create a series of NDFs in the original
+*        NDF, which becomes just an HDS container and no longer an NDF.
 *     PROEXTS = _LOGICAL (Read)
-*        This governs how any extension (here called a sub-file) within
-*        the FITS file are processed in the general case.  If TRUE, any
-*        FITS sub-file is propagated to the NDF as an NDF extension
-*        called NDF_EXT_n, where n is the number of the extension.  If
-*        FALSE, any FITS-file extensions are ignored.  The "Notes" of
-*        the general conversion contain details of where and in what
-*        form the various FITS extensions are stored in the NDF.
+*        This governs how any extensions within the FITS file are
+*        processed in the general case.  If TRUE, any FITS-file extension
+*        is propagated to the NDF as an NDF extension called FITS_EXT_n,
+*        where n is the number of the extension.  If FALSE, any FITS-file
+*        extensions are ignored.  The "Notes" of the general conversion
+*        contain details of where and in what form the various FITS-file
+*        extensions are stored in the NDF.
 *
 *        This parameter is ignored when the supplied FITS file is one
-*        of the special formats, but excluding NDF2FITS-created files,
-*        whose structure in terms of multiple FITS objects is defined.
-*        Specialist NDF extensions may be created in this case.  See
-*        topic "Special Formats" for details.  [TRUE]
+*        of the special formats, including one defined by an EXTABLE but
+*        excluding NDF2FITS-created files, whose structure in terms of
+*        multiple FITS objects is defined.  Specialist NDF extensions
+*        may be created in this case.  See topic "Special Formats" for
+*        details.
+*
+*        It is also ignored if a sub-file is specified as the IN 
+*        parameter, or parameter CONTAINER is TRUE.  [TRUE]
 *     PROFITS = _LOGICAL (Read)
-*        If TRUE, the primary headers of the FITS file are written
-*        verbatim to the NDF's FITS extension.  [TRUE]
+*        If TRUE, the headers of the FITS file are written to the NDF's
+*        FITS extension.  If a specific FITS sub-file has been specified
+*        or parameter CONTAINER is TRUE or an EXTABLE is in use, the 
+*        FITS extension will appear as a primary header and may include
+*        cards inherited from the primary HDU; otherwise the FITS header
+*        is written verbatim.  [TRUE]
+*     WCSATTRS = LITERAL (Read)
+*        A comma-separated list of keyword=value pairs which modify 
+*        the way WCS information is extracted from the FITS headers. 
+*        Each of the keywords should be an attribute of an AST
+*        FitsChan.  This is the object which is responsible for
+*        interpreting the FITS WCS headers, and is described full in
+*        the documentation for the AST library (see SUN/210).  For
+*        instance, to force CAR projections to be interpreted as simple
+*        linear mappings from pixel co-ordinates to celestial
+*        co-ordinates (rather than the non-linear mapping  implied by
+*        the FITS-WCS conventions), use WCSATTRS="CarLin=1".  A null 
+*        value (!) results in all attributes using default values.  [!]
 
 *  Examples:
 *     fits2ndf 256.fit f256 fmtcnv=f
@@ -124,7 +395,7 @@
 *        conversion from a FITS integer data type to floating point in
 *        the NDF using the BSCALE and BZERO keywords, and there will be
 *        no extensions written within f256.
-*     fits2ndf "*.fit,p*.fits" "*"
+*     fits2ndf "*.fit,p*.fits" *
 *        This converts a set of FITS files given by the list
 *        "*.fit,p*.fits", where * is the match-any-character wildcard.
 *        The resultant NDFs take the filenames of the FITS files, so if
@@ -134,8 +405,15 @@
 *        FITS sub-files present are propagated to NDF extensions.
 *     fits2ndf swp25000.mxlo mxlo25000
 *        This converts the IUE MXLO FITS file called swp25000.mxlo to
-*        the NDF called mxlo25000.
-*     fits2ndf "data/*.silo" "silo*|swp||" noprofits
+*        the NDF called mxlo25000.  Should the dataset comprise both
+*        the large- and small-aperture spectra, they will be found in
+*        NDFs mxlo25000.large and mxlo25000.small respectively.
+*     fits2ndf SWP19966.MXHI mxhi19966
+*        This converts the IUE MXHI FITS file called SWP19966.MXHI to a
+*        series of NDFs within a file mxhi19966.sdf.  Each NDF
+*        corresponds to an order.  Thus for instance the one hundredth
+*        order will be in the NDF called mxhi19966.order100.
+*     fits2ndf data/*.silo silo*|swp|| noprofits
 *        This converts all the IUE SILO FITS files with file extension
 *        .silo in directory data to NDFs in the current directory.
 *        Each name of an NDF is derived from the corresponding FITS
@@ -148,20 +426,55 @@
 *        to abc.fit but not to def.fts.  FITS extensions are created
 *        in the NDFs but there are no extensions for any FITS sub-files
 *        that may be present.
-
+*     fits2ndf 256.fit f256 fmtcnv=f encodings=DSS
+*        This is the same as the first example except that it is
+*        specified that the co-ordinate system information to be stored
+*        in the WCS component of the NDF must be based on the FITS
+*        keywords written with Digitised Sky Survey (DSS) images.  If
+*        these keywords are not present in the FITS header then no WCS
+*        component will be created.  All the earlier examples retained
+*        the default null value for the ENCODINGS parameter, resulting
+*        in the choice of keywords being based on the contents of the
+*        FITS header (see the description of the ENCODINGS parameter
+*        for details).
+*     fits2ndf 256.fit f256 fmtcnv=f encodings="DSS,native"
+*        This is the same as the previous example except that if no
+*        DSS keywords are available, then the co-ordinate system
+*        information stored in the NDF's WCS component will be based on
+*        keywords written by applications which use the AST library (see
+*        SUN/210).  One such application is NDF2FITS.  This `native'
+*        encoding provides a `loss-free' means of transferring
+*        information about co-ordinate systems (i.e. no information is
+*        lost; this may not be the case with other encodings).  If the
+*        file 256.fit contains neither DSS nor native AST keywords, then
+*        no WCS component will be created.
+*     fits2ndf "multifile.fit[extname=im3]" *
+*        This will create an NDF, multifile, from the first FITS
+*         extension in file multifile.fit whose EXTNAME keyword has the
+*         value "im3".
+*     fits2ndf multifile.fit multifile extable=table1
+*        This will create a series of NDFs in the container file
+*        multifile.sdf according to the specifications in the
+*        EXTABLE-format file, table1.
+*
 *  Notes:
 *     -  Some sources of FITS files that require special conversion
 *     rules, particularly because they use binary tables, are
 *     recognised.  Details of the processing for these is given within
-*     topic "Special Formats".  Both NDF and FITS use the term
-*     extension, and they mean different things.  Thus to avoid
-*     confusion in the descriptions below, the term `sub-file' is used
-*     to refer to a FITS IMAGE, TABLE or BINTABLE extension.
+*     topic "Special Formats".
 *
-*     The general rules for the conversion are as follows.
-
+*     Two other special cases are when a particular sub-file is
+*     specified by the IN parameter and when conversion is driven by an
+*     EXTABLE file.
+*
+*     The general rules for the conversion apply if the FITS file is not
+*     one of the "Special Formats" (including one defined by an EXTABLE)
+*     and parameter CONTAINER is not TRUE.
+*
+*     The general rules are as follows.
+*
 *     -  The primary data array of the FITS file becomes the NDF's data
-*     array.  There is an option using parameter FMTCNV to convert
+*     array. There is an option using parameter FMTCNV to convert
 *     integer data to floating point using the values of FITS keywords
 *     BSCALE and BZERO.
 *     -  Any integer array elements with value equal to the FITS
@@ -175,13 +488,7 @@
 *     -  Here are details of the processing of standard items from the
 *     the FITS header, listed by FITS keyword.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- define the NDF's
-*          AXIS structure along the nth axis.  For a given axis CRVALn,
-*          CRPIXn, and CDELTn must all be present to define the axis
-*          centres.  Where one or more of these is absent, the axis
-*          centres become pixel co-ordinates, and if this applies to all
-*          dimensions in a multiple-axis dataset, no NDF AXIS structure
-*          is made.  CTYPEn defines the label and CUNITn the units for
-*          the nth axis.
+*          WCS component (see parameter ENCODINGS).
 *        OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
 *          title, label, and units components respectively.
 *        LBOUNDn --- if present, this specifies the pixel origin for
@@ -195,14 +502,15 @@
 *     -  A BINTABLE or TABLE sub-file are converted into a structure
 *     of type TABLE ().  This has a NROWS component specifying the
 *     number of rows, and a COLUMNS structure containing a series of
-*     further structures, each of which has has the name of the
-*     corresponding column in the FITS table.  These COLUMN structures
-*     contain a column of table data values in component DATA,
-*     preserving the original data type; and optional UNITS and COMMENT
-*     components which specify the column's units and the meaning of
-*     the column.  Thus for example, for the third sub-file of NDF
-*     called ABC, the data for column called RA would be located in
-*     ABC.MORE.NDF_EXT_3.COLUMNS.RA.DATA.
+*     further structures, each of which takes its name from the label
+*     of the corresponding column in the FITS table.  If there is no
+*     label for the nth column, the structure is called COLUMNn.
+*     These COLUMN structures contain a column of table data values in
+*     component DATA, preserving the original data type; and optional
+*     UNITS and COMMENT components which specify the column's units and
+*     the meaning of the column.  Thus for example, for the third
+*     sub-file of NDF called ABC, the data for column called RA would
+*     be located in ABC.MORE.FITS_EXT_3.COLUMNS.RA.DATA.
 *     -  A random-group FITS file creates an NDF for each group.  As
 *     they are related observations the series of NDFs are stored in a
 *     single HDS container file whose name is still given by parameter
@@ -232,8 +540,8 @@
 *
 *     -  FITS ASCII and binary tables become NDF extensions, however,
 *     the original structure path and data type are restored using
-*     the values of the EXTNAME and EXTTYPE keywords respectively.
-*     An extension may be an array of structures, the shape being stored
+*     the values of the EXTNAME and EXTTYPE keywords respectively.  An
+*     extension may be an array of structures, the shape being stored
 *     in the EXTSHAPE keyword.  The shapes of multi-dimensional arrays
 *     within the extensions are also restored.
 *
@@ -242,8 +550,7 @@
 *     provided the HISTORY headers have not been tampered.  Such
 *     headers are not transferred to the FITS airlock, when
 *     PROFITS=TRUE.
-
-
+*
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *     -  This converts an IUE LI or SI product stored as a FITS primary
@@ -276,10 +583,11 @@
 *     o  IUE Final Archive MXLO
 *
 *     -  This will usually be a single 1-dimensional NDF, however, if
-*     the binary table contains more than one row, a series of NDFs are
-*     stored in a single HDS container file whose name is specified by
-*     parameter OUT.  The name of each NDF is the row number.  Thus for
-*     OUT=ABC, the second observation will be in NDF ABC.2.
+*     the binary table contains two rows, a pair of NDFs are stored in
+*     a single HDS container file whose name is specified by parameter
+*     OUT.  The name of each NDF is either SMALL or LARGE depending on
+*     the size of the aperture used.  Thus for OUT=ABC, the
+*     small-aperture observation will be in an NDF called ABC.SMALL.
 *     -  Only the most-significant 8 bits of the quality flags are
 *     transferred to the NDF.
 *     -  The primary headers may be written to the standard FITS
@@ -296,8 +604,57 @@
 *        remaining columns      Component in IUE_MX extension (NET and
 *                               BACKGROUND are NDFs)
 
-*     o  ISO CAM auto-analysis (CMAP, CMOS)
+*     o  IUE Final Archive MXHI
+*
+*     -  This creates a series of NDFs within a single HDS container
+*     file whose name is specified by parameter OUT.  Each NDF
+*     corresponds to a spectral order, and may be accessed individually.
+*     The name of each NDF is ORDER followed by the spectral-order
+*     number.  For instance, when OUT=SWP, the 85th-order spectrum will
+*     be in an NDF called SWP.ORDER85.
+*     -  Only the most-significant 8 bits of the quality flags are
+*     transferred to the NDF.
+*     -  The primary headers may be written to the standard FITS
+*     airlock extension when PROFITS is TRUE.  To save space, this
+*     appears once in the NDF specified by parameter OUT.
+*     -  The conversion from binary-table columns and headers to NDF
+*     objects is as follows:
+*
+*        NPOINTS                Number of non-zero elements
+*        WAVELENGTH             Start wavelength of the non-zero
+*                               elements, label, and units
+*        STARTPIX               Lower bound of the non-zero elements
+*        DELTAW                 Incremental wavelength
+*        ABS_CAL                Data array, label, and units
+*        QUALITY                Quality array
+*        remaining columns      Component in IUE_MH extension (NOISE,
+*         (except 14-17)        NET, BACKGROUND, and RIPPLE are NDFs
+*                               each comprising a data array, label,
+*                               units and wavelength axis)
+*     -  It may be possible to evaluate an approximate error array for
+*     the absolutely calibrated data (ABS_CAL), by multiplying the
+*     NOISE by the ratio ABS_CAL / NET for each element.
+*     -  The Chebyshev coefficients, limits, and scale factor in
+*     columns 14 to 17 are omitted as the evaluated background fit is
+*     propagated in BACKGROUND.
 
+*     o  IUE INES reduced spectra
+*
+*     -  This generates a single 1-dimensional NDF. 
+*     -  Only the most-significant 8 bits of the quality flags are
+*     transferred to the NDF.
+*     -  The primary headers may be written to the standard FITS
+*     airlock extension when PROFITS is TRUE.
+*     -  The conversion from binary-table columns and headers to NDF
+*     objects is as follows:
+*
+*        WAVELENGTH             Start wavelength, axis label and units
+*        FLUX                   Data array, label, units, bad-pixel flag
+*        SIGMA                  Data-error array
+*        QUALITY                Quality array
+*
+*     o  ISO CAM auto-analysis (CMAP, CMOS)
+*
 *     -  The CAM auto-analysis FITS products have a binary table using
 *     the "Green Bank" convention, where rows of the table represent a
 *     series of observations, and each row is equivalent to a normal
@@ -308,7 +665,7 @@
 *     NDF is used to store a series of NDFs---one for each
 *     observation---called OBSn, where n is the observation number.
 *     Each observation comprises three rows in the binary table
-*     corrsponding to the flux, the r.m.s. errors, and the integration
+*     corresponding to the flux, the r.m.s. errors, and the integration
 *     times.
 *     -  The conversion from binary-table columns to NDF objects is as
 *     follows:
@@ -408,7 +765,7 @@
 *        FITS file.
 *        -  Other IMAGE and BINTABLE extensions are propagated to the
 *        NDF extension.  It uses the extension name and type found in
-*        the EXTNAME and EXTTYPE keywords, or names it NDF_EXT_n for
+*        the EXTNAME and EXTTYPE keywords, or names it FITS_EXT_n for
 *        the nth FITS extension.
 *        -  A FITS extension in the NDF may be written to store the
 *        primary data unit's headers when parameter PROFITS is TRUE.
@@ -423,7 +780,7 @@
 *       the Flexible Image Transport System (FITS)", version 1.1.
 
 *  Related Applications:
-*     CONVERT: NDF2FITS; KAPPA: FITSDIN, FITSIN.
+*     CONVERT: NDF2FITS; CURSA/xcatview; KAPPA: FITSDIN, FITSIN.
 
 *  Implementation Deficiencies:
 *     - There is no propagation of arbitrary FITS HISTORY headers to
@@ -434,6 +791,8 @@
 *  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -448,7 +807,50 @@
 *     1997 November 16 (MJC):
 *        Filters out NDF-style history from the FITS airlock.  Fixed bug
 *        creating NDF extensions which are arrays of structures.
+*     18-DEC-1997 (DSB):
+*        Added support for the NDF WCS component.
+*     22-JAN-1998 (DSB):
+*        Changed the scheme for naming multiple IUE MXLO NDFs within
+*        the output container file; previously the row number was used,
+*        but NDF names cannot start with numeric characters and an
+*        error was consequently reported.  The word "ROW" is now
+*        prepended to the row number.
+*     1998 January 26 (MJC):
+*        Added IUE MXHI format.  Tidied the prologue.  Changed the
+*        MXLO NDF names to LARGE and SMALL instead of ROW1 and ROW2.
+*      2-FEB-1998 (DSB):
+*        Add ENCODING examples.
+*     1998 August 16 (MJC)
+*        Improved Notes on BINTABLE conversion and added CURSA to
+*        Related Applications.
+*     9-NOV-1998 (DSB):
+*        Added FITS-IRAF encoding.
+*     7-MAR-2000 (DSB):
+*        Report an error if no input FITS files are supplied.
+*     11-APR-2000 (DSB):
+*        Added FITS-PC and FITS-AIPS WCS encodings.
+*     12-APR-2000 (AJC):
+*        Allow FITS extension specifier in FITS filenames
+*        Correctly comment getting FMTCNV values (not BITPIX)
+*     13-APR-2000 (AJC):
+*        Added EXTABLE parameter
+*     17-APR-2000 (AJC):
+*        Annul errors before call MSG_OUT on illegal FMTCNV value
+*      9-MAY-2000 (AJC):
+*        Add NDF names to COF_EXTAB
+*     12-JUN-2000 (AJC):
+*        Major revision of EXTABLE description
+*     12-JUL-2000 (AJC)
+*        More tweaks to description
+*     30-AUG-2000 (AJC):
+*        Correct description FITS_EXT_n not NDF_EXT_n
+*        Add the CONTAINER parameter
+*        Tweak description of EXTABLE EXTN.name
+*     20-FEB-2002 (DSB):
+*        Added WCSATTRS parameter, mainly to deal with non-standard CAR 
+*        projections.
 *     {enter_further_changes_here}
+
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -483,10 +885,16 @@
       INTEGER BLOCKF             ! Blocking factor
       PARAMETER ( BLOCKF = 1 )
 
+      INTEGER MAXCOD             ! No. of known AST encodings.
+      PARAMETER ( MAXCOD = 6 )
+
 *  Local Variables:
       INTEGER ADDED              ! Number of items added to a group
       LOGICAL CFLAG              ! True if a group requires further
                                  ! input via continuation lines
+      INTEGER ENCGRP             ! Group identifier of ENCODINGS
+      CHARACTER * ( GRP__SZNAM ) ENCODS( MAXCOD ) ! AST encodings for WCS 
+                                 ! component
       INTEGER FCGRP              ! Group identifier of FMTCNVs
       INTEGER FDL                ! FIle descriptor for logfile
       LOGICAL FILEXS             ! FITS file exists
@@ -494,6 +902,10 @@
       LOGICAL FMTCNV             ! Apply scale and zero?
       CHARACTER * ( 5 ) FMTCON   ! Character form of a FMTCNV value
       CHARACTER * ( 255 ) FSPEC  ! File specification
+      INTEGER FLEN               ! Length of filename part of FSPEC
+      INTEGER EXTLEN             ! Length extension part of FSPEC
+      CHARACTER * ( 255 ) IFSPEC ! Individual File specification
+      INTEGER IPOSN              ! String index
       LOGICAL GOOD               ! True if all group values are valid
       INTEGER I                  ! Loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
@@ -510,6 +922,7 @@
       INTEGER LP                 ! Loop counter
       INTEGER NDF                ! NDF identifier
       CHARACTER * ( 255 ) NDFNAM ! Name of NDF
+      INTEGER NENCOD             ! No. of of WCS encodings supplied
       INTEGER NFC                ! Number of FMTCNV values
       INTEGER NGLIST             ! No. of items in input list
       INTEGER NGROUP             ! Group identifier of default list of
@@ -520,9 +933,11 @@
       INTEGER PLACE              ! NDF placeholder
       LOGICAL PROEXT             ! True if the other FITS extensions are
                                  ! propagated to NDF extensions
+      LOGICAL CONTNR             ! True if FITS HDU's are to be written as
+                                 ! components of an HDS container file.
       LOGICAL PROFIT             ! True if the FITS extension is created
       INTEGER TSTAT              ! Temporary status
-
+      CHARACTER WCSATT*255       ! Attributes for the WCS FitsChan
 *.
 
 *  Check the inherited global status.
@@ -590,6 +1005,9 @@
 *  Get a file specification from the input group.
          CALL GRP_GET( IGRP1, LP, 1, FSPEC, STATUS )
          
+*  Extract any extension specifier
+         CALL COF_EXTXT( FSPEC, FLEN, EXTLEN, STATUS )
+
 *  Find the files which match this specification... First initialise
 *  the context counter and looping flag.
          IWILD = 0
@@ -602,7 +1020,7 @@
          DO WHILE ( .NOT. LEAVE )
 
 *  Get a single FITS file that matches this specification.
-            ISTAT = CON_FINDF( FSPEC, INFILE, IWILD )
+            ISTAT = CON_FINDF( FSPEC(1:FLEN), INFILE, IWILD )
 
 *  Check if a file has been found.  Odd status is good, even is bad.
             IF ( MOD( ISTAT, 2 ) .EQ. 1 ) THEN
@@ -617,15 +1035,21 @@
                   CALL MSG_SETI( 'MXFNC', FIO__SZFNM )
                   CALL MSG_SETC( 'FNAME', INFILE )
                   CALL ERR_REP( 'FITSDIN_TRUNC',
-     :              'File name is too long.  Maximum is ^MXFNC '/
-     :              /'characters.  Truncated to ^FNAME.', STATUS )
+     :              'File ^FNAME cannot be opened - the name may have'//
+     :              ' been truncated to the maximum ^MXFNC characters.'
+     :              , STATUS )
                   CALL ERR_RLSE
                   GOTO 999
                END IF
 
 *  Add this FITS file into the output group.  NIFILE keeps a count of
 *  the number of files in the output group.
-               CALL GRP_GRPEX( INFILE, GRP__NOID, IGRP2, NIFILE, 
+               IFSPEC = ' '
+               IPOSN = 0
+               CALL CHR_APPND( INFILE, IFSPEC, IPOSN )
+               CALL CHR_APPND(
+     :            FSPEC(FLEN+1:FLEN+EXTLEN), IFSPEC, IPOSN )
+               CALL GRP_GRPEX( IFSPEC, GRP__NOID, IGRP2, NIFILE, 
      :                         ADDED, CFLAG, STATUS )
 
             ELSE
@@ -656,13 +1080,25 @@
 
 *  If no files were found, then report an error, and exit.
       IF ( NIFILE .LE. 0 ) THEN
-         CALL GRP_GET( IGRP1, 1, 1, FSPEC, STATUS )
+
+         IF( IGRP1 .NE. GRP__NOID ) THEN
+            CALL GRP_GET( IGRP1, 1, 1, FSPEC, STATUS )
+         ELSE
+            FSPEC = ' '
+         END IF
+
          STATUS = SAI__ERROR
-         CALL MSG_SETC( 'SPEC', FSPEC )
-         CALL ERR_REP( 'FITSDIN_NOFILES',
-     :     'No input files found matching the specification "^SPEC".',
-     :      STATUS )
+         IF( FSPEC .NE. ' ' ) THEN
+            CALL MSG_SETC( 'SPEC', FSPEC )
+            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '//
+     :                   'matching the specification "^SPEC".', STATUS )
+         ELSE
+            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '//
+     :                  'matching the supplied specification.', STATUS )
+         END IF
+
          GOTO 999
+
       END IF
 
 *  Purge any duplication from the FITS files.
@@ -673,6 +1109,13 @@
 
 *  Find the number of FITS files after the purge.
       CALL GRP_GRPSZ( IGRP3, NIFILE, STATUS )
+
+*  Report an error if the group is empty.
+      IF( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'FITS2NDF_NOFILES', 'FITS2NDF: No usable '//
+     :                 'input FITS files supplied.', STATUS )
+      END IF
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -766,14 +1209,14 @@
   100 CONTINUE
       IF ( .NOT. GOOD ) THEN
 
-*  Create a new group to contain the input BITPIXs.
+*  Create a new group to contain the input FMTCNVs.
          CALL GRP_NEW( 'FMTCNV values', FCGRP, STATUS )
 
 *  Allow for continuation lines.
          CFLAG = .TRUE.
          DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
 
-*  Get the list of BITPIXs from the environment.
+*  Get the list of FMTCNVs from the environment.
             CALL GRP_GROUP( 'FMTCNV', GRP__NOID, FCGRP, NFC, ADDED,
      :                      CFLAG, STATUS )
 
@@ -797,11 +1240,11 @@
 *  and then test that the conversion was successful.
          DO I = 1, NFC
             CALL GRP_GET( FCGRP, I, 1, FMTCON, STATUS )
-
             CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
-
-*  Report the error, including the incorrect string.
+*  Annul the error status.
+               CALL ERR_ANNUL( STATUS )
+*  Display an informational message, including the incorrect string.
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETC( 'TH', CHR_NTH( I ) )
                CALL MSG_SETC( 'GM', FMTCON )
@@ -827,8 +1270,8 @@
          CALL MSG_SETI( 'NI', NIFILE )
          CALL MSG_SETI( 'NFC', NFC )
          CALL ERR_REP( 'FITS2NDF_FILECOUNT',
-     :     'FITS2NDF: The number of BITPIX values (^NFC) exceeds '/
-     :     /'the number of input NDFs (^NI).', STATUS )
+     :     'FITS2NDF: The number of FMTCNV values (^NFC) exceeds '/
+     :     /'the number of input files (^NI).', STATUS )
 
 *  Tidy up and exit.
          CALL GRP_DELET( FCGRP, STATUS )
@@ -839,7 +1282,7 @@
 *  Extend the group by duplication to give the same number of values
 *  as input files.  The last value is duplicated.
       ELSE IF ( NFC .LT. NIFILE ) THEN
-
+        
 *  Obtain the last value.
          CALL GRP_GET( FCGRP, NFC, 1, FMTCON, STATUS )
 
@@ -862,6 +1305,55 @@
 *  additional NDF extensions FITS_n.
       CALL PAR_GET0L( 'PROEXTS', PROEXT, STATUS )
 
+*  Determine whether or not a container file is to be created.
+      CALL PAR_GET0L( 'CONTAINER', CONTNR, STATUS )
+
+*  Abort if there has been an error.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get a group from parameter ENCODINGS holding the AST encodings to use 
+*  when creating the WCS component from the FITS header.
+      CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
+      CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
+
+      CFLAG = .TRUE.
+      DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
+         CALL GRP_GROUP( 'ENCODINGS', GRP__NOID, ENCGRP, NENCOD, ADDED,
+     :                   CFLAG, STATUS )
+         IF ( CFLAG ) CALL PAR_CANCL( 'ENCODINGS', STATUS )
+      END DO
+
+*  If a NULL parameter value was given for ENCODINGS annul the error,
+*  and find the real number of values in the group.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL GRP_GRPSZ( ENCGRP, NENCOD, STATUS )
+      END IF
+
+*  Limit the number of encodings used to MAXCOD.
+      IF( NENCOD .GT. MAXCOD ) THEN
+         CALL MSG_OUTIF( MSG__NORM, 'ENCODINGS', 'Only the first ^MX '//
+     :                   'values for parameter %ENCODINGS will be '//
+     :                   'used.', STATUS )
+         NENCOD = MAXCOD
+      END IF
+
+*  Extract the encodings from the group into an array.
+      CALL GRP_GET( ENCGRP, 1, NENCOD, ENCODS, STATUS )
+
+* Get any extra attributes for the FitsChan.
+      IF( STATUS .EQ. SAI__OK ) THEN 
+         CALL PAR_GET0C( 'WCSATTRS', WCSATT, STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            WCSATT = ' '
+         END IF
+      END IF
+
+*  Get the EXTABLE information
+*  (Assumes this is good for all FITS files).
+      CALL COF_EXTAB( STATUS )
+
 *  Process each file.
 *  ==================
       DO IFILE = 1, NIFILE
@@ -875,7 +1367,7 @@
 *  Find the output NDF name.
          CALL GRP_GET( OGROUP, IFILE, 1, NDFNAM, STATUS )
 
-*  Find the BITPIX and convert it to an integer value.
+*  Find the FMTCNV and convert it to a logical value.
          CALL GRP_GET( FCGRP, IFILE, 1, FMTCON, STATUS )
          CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
 
@@ -898,8 +1390,9 @@
 *  ======================
 
 *  Convert the FITS file into an NDF as best we can.
-         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV,
-     :                   PROFIT, PROEXT, STATUS )
+         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, PROFIT, 
+     :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT, 
+     :                   STATUS )
 
 *  Tidy the NDF.  Some of the options create a series of NDFs in the
 *  original NDF, which has become just a container file and no longer an
@@ -923,6 +1416,7 @@
       CALL GRP_DELET( FCGRP, STATUS )
       CALL GRP_DELET( OGROUP, STATUS )
       CALL GRP_DELET( IGRP3, STATUS )
+      CALL GRP_DELET( ENCGRP, STATUS )
 
  999  CONTINUE
 

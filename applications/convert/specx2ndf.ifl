@@ -1,0 +1,81 @@
+#+
+#  Name:
+#     SPECX2NDF.IFL
+#
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#
+#  History:
+#     25/6/97 (ACD): Original version.
+#     8/1/98  (ACD): First stable version.
+#     6/3/03 (DSB): Removed several parameters.
+#-
+
+interface SPECX2NDF
+
+   helplib 'CONVERT_HELP:'
+
+   parameter GRIDFILE                     # Flag; write map schematic?
+      position 3
+      type     'LITERAL'
+      default  !
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Map schematic file'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                          # Name of the input SPECX map.
+      position 1
+      type     'NDF'
+      access   'READ'
+      ppath    'CURRENT'
+      vpath    'DEFAULT'
+      prompt   'Input SPECX map'
+      helpkey  '*'
+   endparameter
+
+   parameter LATITUDE                 # Latitude of telescope.
+      position 5
+      type     'LITERAL'
+      default  '19:49:33'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Geodetic (geographic) latitude of telescope'
+      helpkey  '*'
+   endparameter
+
+   parameter LONGITUDE                 # Longitude of telescope.
+      position 6
+      type     'LITERAL'
+      default  '155:28:47'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Geodetic (geographic) longitude of telescope'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                         # Name of the output cube.
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF cube'
+      helpkey     '*'
+   endparameter
+
+   parameter TELESCOPE                 # Name of the telescope.
+      position 4
+      type     'LITERAL'
+      default  'JCMT'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'Telescope'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -9,6 +9,5 @@ BEGIN {out=0}
 END    {if(out==1)
           {print "!  ** Returning to main application"
            print
-           exit 1
           }
        }

@@ -1,0 +1,207 @@
+;; NAME:
+;;    write_ndf.pro
+;;
+;; PURPOSE:
+;;    To convert an IDL array of up to seven dimensions to an NDF file.
+;;
+;; CALLING SEQUENCE:
+;;    This function is called with the following IDL command:
+;;
+;;      IDL> write_ndf, IDL_array, ndf_name[, bad_value][, component=comp_name]
+;;
+;; ARGUMENTS:
+;;    IDL_array  (Given)
+;;	 The IDL array to be converted. This may be an array name or constant
+;;       of up to seven dimensions. The type of the NDF component created
+;;       will depend on the type of the given array:
+;;          floating -> _REAL
+;;          double-precision -> _DOUBLE
+;;          byte -> _UBYTE
+;;          integer -> _WORD
+;;          longword integer -> _INTEGER
+;;       No other types are allowed.
+;;
+;;    ndf_name (Given)
+;;       A string expression specifying the name of the NDF to be created or 
+;;       updated.
+;;
+;;    [bad_value] (Given)
+;;       Optional - A value any occurrence of which in the IDL array is to be
+;;       replaced by the appropriate PRIMDAT bad value in the NDF component.
+;;       If no such value is found, the NDF bad pixel flag for the component
+;;       is set FALSE.  The value must be the same type as the array.
+;;
+;;    [component=comp_name] (Given)
+;;       Optional - A string expression specifying the NDF component to be 
+;;       written - it defaults to 'DATA'. The case of the string does not
+;;       matter and it may be abbreviated to one or more characters.
+;;       
+;;       The following values are allowed:
+;;          'DATA'  A new NDF is created with the same dimensions as the IDL
+;;                  array, and the DATA component written.
+;;          'VARIANCE' An existing NDF is opened and a new component written.
+;;                  The size of the given array must be the same as the NDF.
+;;          'QUALITY' An existing NDF is opened and a new component written.
+;;                  The size of the given array must be the same as the NDF
+;;                  and the type of the IDL array must be Byte.
+;;
+;; DEFICIENCIES:
+;;      - No conversion of the given bad value to the appropriate type for
+;;        the array will be attempted; instead an error will be reported.
+;;      - Not implemented for PC's yet
+;;
+;; BUGS:
+;;      None known
+;;
+;; HISTORY:
+;;       8-JUN-1999 (AJC):
+;;         Version for CONVERT package
+;;      18-FEB-2000 (AJC)
+;;         Rename ndf_idl.so to convert_idl.so
+;;      18-FEB-2002 (AJC):
+;;         Terminate gracefully if 64-bit Solaris
+;;
+;; EXAMPLES:
+;;-----------------------------------------------------------------------------
+;;
+;;      Assuming my_data is an IDL floating array,
+;;
+;;	   IDL> write_ndf, my_data, 'my_ndf'
+;;
+;;      creates the NDF 'my_ndf.sdf' with the same dimensions as the IDL
+;;      array 'my_data', and writes the array to its DATA component (of
+;;      type _REAL). No checks on bad values are made.
+;;
+;;	   IDL> write_ndf, my_data, 'my_ndf', !values.f_nan
+;;
+;;      As above except that any occurrence of the value NaN in the array
+;;      will be replaced by the VAL__BADR value as defined by the Starlink
+;;      PRIMDAT package.
+;;
+;;         IDL> write_ndf, my_variances, 'my_ndf', comp='v'
+;;
+;;      Writes the IDL array 'my-variances' to the VARIANCES component of
+;;      the NDF created above. A check is made that the size of the array 
+;;      corresponds with the size of the NDF. (Note that the keyword 
+;;      'component' and the value 'VARIANCE' are case-independent and can 
+;;      be abbreviated.)
+;;
+;;-----------------------------------------------------------------------------
+
+	PRO WRITE_NDF, ARR, NDF_NAME, BAD_VALUE, COMPONENT=COMP
+
+;;      Return to caller if error
+        ON_ERROR, 2
+
+;; 	Different platforms have different filename extensions and entry
+;;	point formats. Determine what type of machine we are on and set the 
+;;	correct names.
+
+	CASE !VERSION.ARCH OF 
+	   'sparc'	:BEGIN		;Sun or Solaris
+            IF (!VERSION.MEMORY_BITS eq 64) THEN BEGIN
+               MESSAGE,"Starlink converters only run on 32-bit IDL (% idl -32)"
+            ENDIF
+		LIB_EXT		= 'so'
+		ENTRY_PREFIX	= ''
+	   END
+         'alpha'     :BEGIN		;Dec OSF1
+             LIB_EXT = 'so'
+             ENTRY_PREFIX    = ''
+         END
+         'x86'	:BEGIN		;PC running Linux
+		LIB_EXT = 'so'
+		ENTRY_PREFIX    = ''
+         END
+	   ELSE	:BEGIN
+		MESSAGE,"ERROR: Unsupported platform.", $
+			/CONTINUE
+	      RETURN
+	   END
+	ENDCASE
+
+;;	Determine the entry point and library name to use in the 
+;;	CALL_EXTERNAL function.
+
+;;	Get the library name and check that it is there
+	
+        LIB_NAME   = 'INSTALL_BIN/convert_idl.' + LIB_EXT
+
+;;	Ensure that the library file exists
+
+	DUM = findfile(LIB_NAME, COUNT=CNT)
+
+	IF(CNT eq 0)THEN BEGIN
+
+;;	  The library file has not been made. Write a message and 
+;; 	  exit.
+
+	  MESSAGE, "The library file: "+ LIB_NAME +" Does not exist."
+
+	  RETURN
+
+	END 
+
+	ENTRY_NAME = ENTRY_PREFIX+'write_ndf'
+
+;;      Initalise the dimensions array
+
+        ARR_SIZE  = SIZE(ARR)
+
+        N_DIM = ARR_SIZE[0]
+        IF ( N_DIM LT 1 OR N_DIM GT 7 ) THEN $
+           MESSAGE, "Data must be 1 to 7 dimensional."
+
+;;      Convert type to NDF format
+        CASE ARR_SIZE[ ARR_SIZE[0] + 1 ] OF
+          1: TYPE = '_UBYTE'
+          2: TYPE = '_WORD'
+          3: TYPE = '_INTEGER'
+          4: TYPE = '_REAL'
+          5: TYPE = '_DOUBLE'
+        ELSE: MESSAGE, "Can't write NDF of given type."
+        ENDCASE
+
+;;      See if BAD_VALUE is set
+        IF N_PARAMS() GT 2 THEN BEGIN
+;;      Check BAD_VALUE is scalar and correct type
+          BAD_SIZE = SIZE( BAD_VALUE )
+          IF BAD_SIZE[0] THEN $
+             MESSAGE, 'BAD_VALUE is not scalar.' $
+          ELSE IF BAD_SIZE[1] NE ARR_SIZE[ ARR_SIZE[0] + 1 ] THEN $
+             MESSAGE, 'BAD_VALUE is incorrect type.'
+;;      Inform user of bad value
+          PRINT, "WRITE_NDF: Bad pixel value set to ", BAD_VALUE
+          BAD_SET = 1
+        ENDIF ELSE BEGIN
+          BAD_SET = 0
+          BAD_VALUE = 0
+        ENDELSE
+
+;;      See if component name is set
+;;      If so, check for valid name (abbreviations allowed).
+        IF KEYWORD_SET(COMP) THEN BEGIN
+           COMPONENT = STRUPCASE(STRTRIM(COMP,2))
+           IF NOT STRPOS('VARIANCE', COMPONENT) THEN COMPONENT = 'VARIANCE' $
+           ELSE IF NOT STRPOS('QUALITY', COMPONENT) THEN COMPONENT = 'QUALITY' $
+           ELSE IF NOT STRPOS('DATA', COMPONENT) THEN COMPONENT = 'DATA' $
+           ELSE MESSAGE, $
+             "Component name must be 'DATA', 'QUALITY' or 'VARIANCE'."
+        ENDIF ELSE COMPONENT = 'DATA'
+
+;;      Now call the program to write the NDF
+        IF ( NOT CALL_EXTERNAL( LIB_NAME, ENTRY_NAME,   $
+           ARR,            $;Float array (given)
+           N_DIM,          $;Number of dimensions (given)
+           ARR_SIZE[1:N_DIM+2],       $;Dimensions array (given)
+           NDF_NAME,       $;Name of NDF file (given)
+           COMPONENT,      $;NDF component (DATA, QUALITY, VARIANCE) (given)
+           TYPE,           $;Type of NDF to create (given)
+           BAD_SET,        $;Whether BAD value is set (given)
+           BAD_VALUE       $;BAD value (given)
+           ) ) THEN MESSAGE, "Failed.";
+
+
+	RETURN
+
+	END

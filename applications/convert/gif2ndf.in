@@ -14,7 +14,7 @@
 #     This Bourne-shell script converts a Graphics Interchange Format
 #     (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
 #     It handles one- or two-dimensional images.  The script uses
-#     various PBMPLUS utilities to produce a FITS file, flipped top
+#     various Netpbm utilities to produce a FITS file, flipped top
 #     to bottom, and then FITS2NDF to produce the final NDF.  Error
 #     messages are converted into Starlink style (preceded by !).
 
@@ -23,8 +23,8 @@
 
 #  Parameters:
 #     IN = FILENAME (Read)
-#        The name of the GIF file to be converted (without the .gif extension
-#        which is assumed).
+#        The name of the GIF file to be converted. (A .gif name extension
+#        is assumed if omitted.)
 #     OUT = NDF (Write)
 #        The name of the NDF to be generated (without the .sdf extension).
 #        If the OUT parameter is omitted, the value of the IN parameter
@@ -47,7 +47,7 @@
 #
 #     Input image filenames must have the extension .gif.
 #
-#     The PBMPLUS utilities giftopnm, ppmtopgm and pgmtofits 
+#     The Netpbm utilities giftopnm, ppmtopgm, pnmflip and pnmtofits 
 #     must be available on your PATH.
  
 #  Authors:
@@ -65,6 +65,12 @@
 #     1997 October 3 (MJC):
 #        Improved the parameter handling to allow for no arguments, and
 #        to remove any .gif that may be present in the first argument.
+#     1998 November 19 (AJC):
+#        Use Netpbm - common for all platforms
+#          Use giftopnm not giftoppm
+#          Use pnmtofits not pgmtofits 
+#     1999 March 11 (AJC):
+#        Correct removal of .gif from name
 #     {note_further_changes_here}
 
 #  Bugs:
@@ -81,7 +87,7 @@ then
 fi
 
 # Remove any .gif file extension.
-root=`echo $1 | sed 's#.gif##'`
+root=`echo $1 | sed 's#\.gif$##'`
 
 # Find the filename less any path.
 name=`basename $root`
@@ -96,10 +102,10 @@ out=${2:-$name}
 # Convert image from GIF format to FITS, flipping it from top to bottom.
 # The error output is written to temporary files.  Make the error look
 # as if it came from MSG.
-giftoppm ${root}.gif 2> convert_err1_$name.lis | \
-ppmtopgm 2> convert_err2_$name.lis | \
-pnmflip -topbottom 2> convert_err3_$name.lis | \
-pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
+giftopnm ${root}.gif 2> convert_err1_$name.lis | \
+  ppmtopgm 2> convert_err2_$name.lis | \
+  pnmflip -topbottom 2> convert_err3_$name.lis | \
+  pnmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
   { sed 's/^/!  GIF2NDF:/' convert_err?_$name.lis 1>&2
     rm -f convert_err?_$name.lis convert_temp_$name.fit
     exit 1

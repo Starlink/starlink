@@ -55,6 +55,8 @@
 
 *  Notes:
 *     The rules for the conversion are as follows:
+*     -  The NDF is created with bounds determined by any LBOUNDn 
+*        keywords in the IRAF image header.
 *     -  The NDF data array is copied from the ".pix" file.
 *     -  The title of the IRAF image (object i_title in the ".imh"
 *     header file) becomes the NDF title.  Likewise headers OBJECT and
@@ -128,6 +130,7 @@
 *     library only supports these data types: signed words and real.)
 *     The pixel type of the image can be changed from within IRAF using
 *     the 'chpixtype' task in the 'images' package.
+*     -  See "Release Notes" for IRAF version compatibility.
 *
 *  Implementation Deficiencies:
 *     -  Does not support wildcards.

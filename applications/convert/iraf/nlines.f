@@ -15,7 +15,7 @@
       integer rp
       integer ua
       save
-         ua = ((((im+713 )-1)*2+1))
+         ua = ((((im+(200 +1024 ) )-1)*2+1))
          nlin = 0
          rp=ua
 110      if (.not.(memc(rp) .ne. 0)) goto 112

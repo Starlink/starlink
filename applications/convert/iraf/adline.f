@@ -19,10 +19,10 @@
 	character*(*) card
       save
          call smark (sp)
-         call salloc (cp, 161 , 2)
-         call f77upk (card, memc(cp), 161 )
-         maxlea = (200 + memi(im+6) - 713 + 1) * 2
-         ua = ((((im+713 )-1)*2+1))
+         call salloc (cp, 1023 , 2)
+         call f77upk (card, memc(cp), 1023 )
+         maxlea = (200 + memi(im+8) - (200 +1024 ) + 1) * 2
+         ua = ((((im+(200 +1024 ) )-1)*2+1))
          rp=ua
 110      if (.not.(memc(rp) .ne. 0)) goto 112
 111         rp=rp+1
@@ -45,14 +45,14 @@
 141         op = op + 1
             goto 140
 142      continue
-160      if (.not.(op .le. rp+80)) goto 162
+160      if (.not.(op .lt. rp+80)) goto 162
             memc(op) = 32
 161         op = op + 1
             goto 160
 162      continue
          memc(op) = 10
          memc(op+1) = 0
-         memi(im+2) = 1
+         memi(im+3) = 1
          call sfree (sp)
 100      return
       end

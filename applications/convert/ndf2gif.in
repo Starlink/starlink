@@ -11,48 +11,112 @@
 #     Bourne shell script
  
 #  Usage:
-#     ndf2gif in [out]
+#     ndf2gif in [out] [scale] {high=? low=?
+#                              {percentiles=[?,?], [numbin=?]
+#                              {sigmas=[?,?]
 
 #  Description:
 #     This Bourne shell script converts an NDF into a 256 grey-level
 #     Graphics Interchange Format (GIF) file.  One- or two-dimensional
-#     images can be handled.  The script uses the CONVERT utility
-#     NDF2TIFF to produce a TIFF file and then various PBMPLUS utilities
-#     to convert the TIFF file into a GIF file.
+#     images can be handled and various methods of scaling the data are
+#     provided.  The script uses the CONVERT utility NDF2TIFF to produce
+#     a TIFF file and then various Netpbm utilities to convert the TIFF 
+#     file into a GIF file.
 #
 #     Error messages are converted into Starlink style (preceded by !).
  
 #  Parameters:
 #     IN = NDF (Read)
-#        The name of the input NDF (without the .sdf extension).
+#        The name of the input NDF (the .sdf extension is not required).
 #     OUT = FILENAME (Write)
-#        The name of the GIF file to be generated (without the .gif 
-#        extension which is appended).  If this is omitted, the value of
-#        the IN parameter is used.
+#        The name of the GIF file to be generated.  (A .gif name extension
+#        is added if it is omitted.) If OUT is omitted, the value of the IN
+#        parameter is used.  Any existing file with the same name will be
+#        overwritten.
+#
+#     The following parameters are actually parameters of the ADAM task
+#     NDF2TIFF. Their values on the NDF2GIF command line are just passed 
+#     through to NDF2TIFF, which may prompt for other required values.
+#     The output parameters SCAHIGH and SCALOW will be found in NDF2TIFF's 
+#     parameter file.
+#
+#     SCALE = LITERAL (Read)
+#        The type of scaling to be applied to the array.  [Range]
+#        The options, which may be abbreviated to an unambiguous string
+#        and are case-insensitive, are described below:
+#          "Range"       - The image is scaled between the minimum and
+#                          maximum data values. (This is the default.)
+#          "Faint"       - The image is scaled from the mean minus one
+#                          standard deviation to the mean plus seven
+#                          standard deviations.
+#          "Percentiles" - The image is scaled between the values
+#                          corresponding to two percentiles.  
+#          "Scale"       - You define the upper and lower limits
+#                          between which the image is to be scaled.  The
+#                          application suggests the maximum and the
+#                          minimum values when prompting.
+#          "Sigmas"      - The image is scaled between two standard-
+#                          deviation limits.
+#     HIGH = _DOUBLE (Read)
+#        Only required if SCALE is "Scale".
+#        The array value that scales to 255 in the TIFF file.
+#        All larger array values are set to 255 when HIGH is greater than
+#        LOW, otherwise all array values less than HIGH are set to 255.
+#        The dynamic default is the maximum data value.  There is an
+#        efficiency gain when both LOW and HIGH are given on the
+#        command line, because the extreme values need not be computed.
+#        The highest data value is suggested in prompts.
+#     LOW = _DOUBLE (Read)
+#        Only required if SCALE is "Scale".
+#        The array value that scales to 0 in the TIFF file.
+#        All smaller array values are also set to 0 when LOW is less than
+#        HIGH, otherwise all array values greater than LOW are set to 0.
+#        The dynamic default is the minimum data value.  There is an
+#        efficiency gain when both LOW and HIGH are given on the
+#        command line, because the extreme values need not be computed.
+#        The lowest data value is suggested in prompts.
+#     NUMBIN  =  _INTEGER (Read)
+#        Only used if SCALE is "Percentiles".
+#        The number of histogram bins used to compute percentiles for
+#        scaling. (Percentiles mode) [2048]
+#     PERCENTILES( 2 ) = _REAL (Read)
+#        Only required if SCALE is "Percentiles".
+#        The percentiles that define the scaling limits. For example,
+#        [25,75] would scale between the quartile values.
+#     SIGMAS( 2 ) = _REAL (Read)
+#        Only required if SCALE is "Sigmas".
+#        The standard-deviation bounds that define the scaling limits.
+#        To obtain values either side of the mean both a negative and
+#        a positive value are required.  Thus [-2,3] would scale
+#        between the mean minus two and the mean plus three standard
+#        deviations.  [3,-2] would give the negative of that.
+#     SCAHIGH = _DOUBLE (Write)
+#        The array value scaled to the maximum colour index for display.
+#     SCALOW = _DOUBLE (Write)
+#        The array value scaled to the minimum colour index for display.
+#     MSG_FILTER = The output message filtering level, QUIET, NORMAL or
+#        VERBOSE. If set to verbose, the scaling limits used will be
+#        displayed. [NORMAL]
  
 #  Examples:
 #     ndf2gif old new
 #        This converts the NDF called old (in file old.sdf)
 #        into a GIF file new.gif.
-#     ndf2gif horse
-#        This converts the NDF called horse (in file old.sdf)
-#        into a GIF file horse.gif.
+#     ndf2gif horse scale=percentiles
+#        This converts the NDF called horse (in file horse.sdf)
+#        into a GIF file horse.gif using percentile scaling.
+#        The user will be prompted for the percentiles to use.
 
 #  Notes:
 #     -  This initial version of the script handles only 256 grey 
 #     levels and does not use the image colour lookup table so
 #     absolute data values may be lost.
 #
-#     -  The PBMPLUS utilities tifftopnm and ppmtogif must be available
+#     -  The Netpbm utilities tifftopnm and ppmtogif must be available
 #     on your PATH.
 
-#     -  At the time of writing, this utility uses a special Netpbm version
-#     of tifftopnm on alpha OSF/1 due to a problem with tifftopnm in the
-#     standard release of PBMPLUS.  Netpbm is based on PBMPLUS but
-#     contains many improvements and additions.
-
 #  Related Applications:
-#     CONVERT: GIF2NDF
+#     CONVERT: GIF2NDF, NDF2TIFF
  
 #  Authors:
 #     MJC: Malcolm J. Currie (STARLINK)
@@ -74,65 +138,71 @@
 #        Improved the parameter handling to allow for no arguments, and
 #        to remove any .sdf that may be present in the first argument.
 #        Fixed bug that gave incorrect extraction of the base name.
- 
+#     1998 November 17 (AJC):
+#        Rationalise for Netpbm on all platforms.
+#     1999 March 08 (AJC)
+#        Added scaling parameters passed to NDF2TIFF
+#        Use task exit value for NDF2TIFF error checking
+#        Correct removal of .sdf from end of name
+#     2000 June 20 (AJC):
+#        Remove toupper in awk command - not available in Solaris awk.
 #-
 
 # Check that a file name was given.
 if [ "$#" -eq 0 ]
 then
    echo "!! NDF2GIF: no NDF name supplied"
-   echo "!  Usage: ndf2gif in [out]"
+   echo "!  Usage: ndf2gif in [out] [scale=] [...]"
    exit
 fi
 
 # Remove any .sdf file extension.
-root=`echo $1 | sed 's#.sdf##'`
+root=`echo $1 | sed 's#\.sdf$##'`
+shift
 
 # Find the filename less any path.
 name=`basename $root`
 
 # Set required output file name.  Defaults to the input name.
-out=${2:-$name}
+if [ -n "$1" ]
+then
+# there is a second argument
+   if [ -z "`echo $1 | awk '/[Ss][Cc][Aa][Ll][Ee]=/{print}'`" ] 
+   then
+# Not SCALE= - must be output name
+      out=$1
+      shift
+   else
+# Is SCALE= - assume out name same as in
+      out=$name
+   fi
+else
+# No second argument
+   out=$name
+fi
 
-# Determine whether the operating system is alpha_OSF1 or not.
-machine=`uname -m`
-opsys=`uname`
+# Remove any .gif file extension.
+out=`echo $out | sed 's#\.gif$##'`
 
 # Use NDF2TIFF to create a TIFF file.  Only the DATA component is 
 # propagated.
+ADAM_EXIT=""
+export ADAM_EXIT
 
-$CONVERT_DIR/ndf2tiff in=$root out=convert_temp_$name \
-  </dev/null  2>&1 | \
-  sed 's/^\!\!/\! /' | \
-  awk \
-'BEGIN{err=0}\
-/^\!/{if(err==0){err=1;print "!! NDF2GIF: Error reports from NDF2TIFF"}};\
-{print};\
-END{if(err==1){exit 1}}' || \
-  (rm -f convert_temp_$name.tif
+if $CONVERT_DIR/ndf2tiff $root convert_temp_$name $1 $2 $3 $4 $5
+then
+   :
+else 
    echo "!  NDF2GIF: Abandoned at NDF2TIFF"
    exit 1
-  ) || exit 1
-
-# Use PBMPLUS tools to convert the TIFF file to a GIF image (except
-# use the Netpbm version of tifftopnm on alpha_OSF1 because of a bug
-# in the released PBMPLUS version).
-if test "$machine" = "alpha" -a  "$opsys" = "OSF1"
-then
-   $CONVERT_DIR/tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
-     ppmtogif 2> convert_err2_$name.lis > ${out}.gif || \
-     { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
-       rm -f convert_err?_$name.lis convert_temp_$name.tif
-       exit 1
-     }
-
-else
-   tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
-     ppmtogif 2> convert_err2_$name.lis > ${out}.gif || \
-     { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
-       rm -f convert_err?_$name.lis convert_temp_$name.tif
-       exit 1
-     }
 fi
-  rm -f convert_err?_$name.lis 
-  rm -f convert_temp_$name.tif
+
+# Use PBMPLUS tools to convert the TIFF file to a GIF image
+tifftopnm convert_temp_$name.tif 2> convert_err1_$name.lis | \
+  ppmtogif 2> convert_err2_$name.lis > ${out}.gif || \
+  { sed 's/^/!  NDF2GIF:/' convert_err?_$name.lis 1>&2
+    rm -f convert_err?_$name.lis convert_temp_$name.tif
+    exit 1
+  }
+rm -f convert_err?_$name.lis 
+rm -f convert_temp_$name.tif

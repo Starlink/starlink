@@ -159,7 +159,7 @@
 *        -  Other extensions are not propagated.
 
 *  Related Applications:
-*     CONVERT: ASCII2NDF; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+*     CONVERT: ASCII2NDF; KAPPA: TRANDAT; FIGARO: ASCIN and ASCOUT.
 
 *  Implementation Status:
 *     -  All non-complex numeric data types are supported.

@@ -9,6 +9,7 @@
 
 #  Author:
 #     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -16,6 +17,12 @@
 #	 Original version.
 #     1997 January 13 (MJC):
 #     	 Added PROHIS.  Changed from GROUP types back to LITERAL.
+#     18-DEC-1997 (DSB):
+#        Added ENCODINGS.
+#     9-NOV-1998 (DSB):
+#        Replaced ENCODINGS by NATIVE.
+#     22-JUN-1999 (DSB):
+#        Added ENCODING.
 #     {enter_further_changes_here}
 
 #-
@@ -46,6 +53,15 @@ interface NDF2FITS
       default     'A'
    endparameter
 
+   parameter      ENCODING       # Encoding to use for WCS info
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Encoding to use for WCS information'
+      helpkey     '*'
+      default     'Auto'
+   endparameter
+
    parameter      IN             # Input NDF(s)
       position    1
       type        'LITERAL'
@@ -58,7 +74,16 @@ interface NDF2FITS
       helpkey     '*'
    endparameter
 
-   parameter      OUT            # Output FITS file(s)
+   parameter      NATIVE          # Produce a NATIVE WCS encoding?
+      type        '_LOGICAL'
+      prompt      'Include a native WCS encoding in the FITS header?'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+    parameter      OUT            # Output FITS file(s)
       position    2
       type        'LITERAL'
       access      'WRITE'

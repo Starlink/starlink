@@ -1,46 +1,121 @@
-1 CONVERT_Version_1.0
-                                            Expires: 1997 October 31
+1 CONVERT_Version_1.5-4
+  Added IRAF compatibility libs for Linux systems. Convert should now
+  build on any ix86 Linux platform. 
 
- A new version of CONVERT is now available.  It offers three new
- tasks: 
+1 CONVERT_Version_1.5
 
-  o  FITS2NDF is a powerful FITS reader that supports all standard
-     FITS extensions.  It converts many FITS data products from ISO,
-     the IUE Final Archive, and 2dF to NDF format.
+ SPECX2NDF has been revamped so that it now uses the new AST SpecFrame
+ functionality allowing translation between spectral frames without
+ re-running SPECX2NDF.  The SPECTRUM parameter (and associated
+ parameters SOR, DOPPLER) are no longer required since they can be
+ changed after conversion using the KAPPA:WCSATTRIB application. 
+ **Scripts using SPECX2NDF may therefore need modification.**  In
+ addition to dealing with map files, SPECX2NDF has now been extended
+ to deal with SPECX data files; each spectrum in the file is
+ translated to an NDF spectrum in the output HDS container file.
 
-  o  DA2NDF and NDF2DA for conversion between NDFs and unformatted
-     direct-access/stream files.
+ FITS2NDF converts INES archive IUE spectra.
 
- There are two new formats allowed for automatic conversion:
+ Improved propagation of existing world co-ordinate system (WCS)
+ headers in NDF2FITS partially from improvements to the AST
+ subroutine library.  For example, long-slit spectra with a
+ three-dimensional WCS, but stored in a two-dimensional image, retain
+ their three-dimensional WCS headers.  Comments are preserved where
+ values have not changed significantly.
 
-  o  GZIP for gzip compressed NDFs.  Its file type is ".sdf.gz".
+1 CONVERT_Version_1.4-4
+ Fixed a bug in FITS2NDF caused by a missing END card on a merged header.
+  
+1 CONVERT_Version_1.4-3
+ Fixed a problem in NDF2FITS caused by a mismatch of conventions used in the
+ TFORMn and TDIMn header cards for multi-dimensional character arrays.
+ A corresponding fix was required for FITS2NDF.
+ 
+1 CONVERT_Version_1.4-2
+ Parameter WCSATTRS is added to FITS2NDF. This enables users to modify 
+ the way WCS information is extracted from the FITS headers. This can
+ be useful when the headers do not conform to conventions. 
 
-  o  STREAM for unformatted Fortran direct-access files and C
-     unformatted data files.  Its file type is "das".
+1 CONVERT_Version_1.4-1
+ Updated the IDL converters to work with IDL 5.5. Fix a problem causing a
+ crash on Linux and document the fact that the Starlink IDL converters
+ cannot be used with the 64-bit Solaris version of IDL - terminate gracefully
+ where possible.
 
- Many commands have been improved.  Some of the most important changes
- are listed below.
+ Corrected an error in the section of this document describing the easy
+ way to do IDL/NDF conversions. WRITE_NDF was described as if it were a
+ function rather than a procedure.  
 
-  o  IRAF2NDF and NDF2IRAF now support propagation of axis
-     information as far as is possible between NDFs and the IRAF
-     Mini World Coordinate System.  New parameters allow control of
-     of the transfer of HISTORY and header information.  The pixel
-     origin is transferred through headers...
+1 CONVERT_Version_1.4
+ MTFITS2NDF added - a tcsh script to convert FITS tapes to NDF using FITS2NDF.
 
-  o  NDF2FITS now generates headers in the FITS file, which enable
-     FITS2NDF to recreate an NDF including NDF extension information.
-     There is special processing of 2dF datasets.  It is now possible
-     to recreate an original FITS data type, even though FITS2NDF
-     may have converted the data from an integer to floating-point...
+1 CONVERT_Version_1.3-8
+ Corrects bugs in ASCII2NDF which caused segmentation violation.
 
-  o  ASCII2NDF runs about 100 times faster.
+1 CONVERT_Version_1.3-7
+ NDF2FITS Corrects inappropriate axis symbols being used for CTYPE keywords.
 
- A revised SUN/55 has been issued, and it is available in hypertext
- form (enter "showme sun55" or "findme CONVERT").
+1 CONVERT_Version_1.3-6
+ FITS2NDF:
+  o Improve error reporting if no WCS encoding can be used.
 
- You can find further details of the changes made at this release by
- looking at the CONVERT help "conhelp Changes V1.0", or the release
- notes in the hypertext version of SUN/55 ("findme Release sun55").
+  o Don't handle WCS if NDIM less than or = 0.
 
- Malcolm Currie
- mjc@star.rl.ac.uk
+  o Correct handling of NDF history records in the FITS header.
+
+  
+1 CONVERT_Version_1.3-5
+ FITS2NDF creates a component of type FITS_HEADER, not NDF, in a container
+ file for multi-extension FITS files if the FITS extension does not contain
+ a data array.
+
+1 CONVERT_Version_1.3-4
+
+ Corrects a bug in FITS2NDF so that NAXIS > 0 and NAXISn = 0 is equivalent
+ to NAXIS = 0.
+
+ Corrects a bug in NDF2PGM which causes the image to be offset by 3 bytes.
+
+1 CONVERT_Version_1.3-3
+
+ Corrects a problem with NDF2FITS if there is garbage beyond the END header
+ record in the NDF's FITS airlock, and stops a second ORIGIN header being
+ output (copied from the airlock) if the ORIGIN parameter has been used to
+ specify a non-default ORIGIN.
+ 
+1 CONVERT_Version_1.3-2
+  
+ Two new converters, HDS2IDL and IDL2HDS, are provided for IDL users. They
+ handle complete structures, unlike READ_NDF and WRITE_NDF which only handle
+ the main arrays of NDFs. 
+
+ NDF2FITS and FITS2NDF have been enhanced by the addition of FITS-AIPS and
+ FITS-PC encodings. Also, appropriate messages are  output if there are no
+ valid input files.
+
+ FITS2NDF has also been enhanced to allow more flexibility over the handling
+ of multi-extension FITS files. Syntax such as filename.fit[1] or 
+ "filename.fit[extname=im2]" can be used to specify a single FITS extension
+ to be converted, and additional parameters EXTABLE and CONTAINER allow FITS
+ extensions to be combined to produce a single NDF or a series of components
+ of a top-level HDS container file.
+
+ The scripts associated with the NDF on-the-fly conversion system have been
+ modified to allow a single extension from a multi-extension FITS file to be
+ specified This feature requires applications to have been built with NDF 
+ V1.5-6 or later.
+
+ Different numbers of axes in the BaseFrames of the NDF and FitsChan FrameSets
+ are now allowed when creating the NDF's WCS component.
+
+ NDF2FITS now uses the NDG library to allow conversion of NDFs stored as
+ sub-components within an HDS container file (eg scuba data, etc).
+
+ Libraries from IRAF release V2.11.3 are used in this release for building
+ NDF2IRAF and IRAF2NDF.
+
+ SUN/55 has been updated to describe the new applications and enhancements,
+ and to include the 'IRAF Versions' section. Early release-note sections have
+ been removed. On installation, only a link to the installed LaTeX document
+ is now retained in the source directory.
+

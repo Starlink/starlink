@@ -92,7 +92,7 @@
 *
 *     -  The NDF title, label, units are written to the header keywords
 *     TITLE, OBJECT, and BUNIT respectively if they are defined.
-*     Otherwise anys values for these keywords found in the FITS
+*     Otherwise any values for these keywords found in the FITS
 *     extension are used (provided parameter PROFITS is TRUE).  There
 *     is a limit of twenty characters for each.
 *     -  The NDF pixel origins are stored in keywords LBOUNDn for the
@@ -145,6 +145,7 @@
 *     'images' package.
 *     -  Bad values may arise due to type conversion.  These too are
 *     substituted by the (non-null) value of FILLBAD.
+*     -  See "Release Notes" for IRAF version compatibility.
 
 *  Implementation Deficiencies
 *     Should create an IRAF bad-pixel-mask file rather than replacing
@@ -187,6 +188,9 @@
 *        No longer write an END header.  The END keyword is not
 *        significant in the IRAF headers, and additional headers may be
 *        written following it.  Added examples.
+*     1997 Nov 24 (AJC):
+*        Remove use of CHR_MOVE (obsolete).
+*        Remove unnecessary initialisations of CARD.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -522,18 +526,12 @@
 *  FITS-format HISTORY line to say where the image came from.
 
 *  Initialise the line.
-      LINE = ' '
-
-*  Copy information to a string.
-      CALL CHR_MOVE( 'HISTORY Image converted using STARLINK'/
-     :               /' utility NDF2IRAF from the NDF:', LINE ) 
+      LINE = 'HISTORY Image converted using STARLINK utility NDF2IRAF'/
+     :       /' from the NDF:'
 
 *  Add the line to the image.
       CALL ADLINE( IMDESC, LINE )
       
-*  Initialise the line.
-      LINE = ' '
-
 *  Find the name of the NDF and the current time counter.
       CALL NDF_MSG( 'NDFNAME', NDF )
       CALL PSX_TIME( NTICKS, STATUS )

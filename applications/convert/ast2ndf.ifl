@@ -1,0 +1,38 @@
+#+
+#  Name:
+#     AST2NDF.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     13/7/97 (ACD): Original version.
+#     3/9/97  (ACD): First stable version.
+#-
+
+interface AST2NDF
+
+   helplib 'CONVERT_HELP:'
+
+   parameter IN                          # Name of the input Asterix file.
+      position 1
+      type     '_CHAR'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'CURRENT'
+      prompt   'input Asterix file:'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                         # Name of the output cube.
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'output cube:'
+      helpkey     '*'
+   endparameter
+
+endinterface

@@ -159,7 +159,7 @@
 *        header.
 
 *  Related Applications:
-*     CONVERT: NDF2ASCII; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+*     CONVERT: NDF2ASCII; KAPPA: TRANDAT; FIGARO: ASCIN and ASCOUT.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

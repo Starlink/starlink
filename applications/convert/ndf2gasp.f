@@ -94,6 +94,8 @@
 *        Tidied up code ready for submission to CONVERT package.
 *     1993 July 28 (MJC):
 *        Largely rewritten.  Tidied to prologue to the standard style.
+*     11_JUN-1999 (AJC):
+*        Correct NDF to NDF in call to NDF_MSG
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -260,7 +262,7 @@
       IF ( NREP .GT. 0 ) THEN
          CALL MSG_SETI( 'NR', NREP )
          CALL MSG_SETI( 'RV', FILBAD )
-         CALL NDF_MSG( NDF, NDF )
+         CALL NDF_MSG( 'NDF', NDF )
          CALL MSG_OUTIF( MSG__NORM, 'NUMREP',
      :      '^NR bad values in the NDF ^NDF have been replaced by ^RV.',
      :      STATUS )

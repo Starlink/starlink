@@ -10,6 +10,7 @@
 #  Authors:
 #     GJP: Grant Privett (STARLINK)
 #     MJC: Malcolm J. Currie (STARLINK)
+#     AJC: Alan J. Chipperfield (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -17,9 +18,11 @@
 #        Original version.
 #      5-DEC-1995 (AJC):
 #        Added helplib
-#     1996 February 19 (MJC):
+#     19-FEB-1996 (MJC):
 #     	 Converted to standard (and more readable) style, and added
 #	 function banner.
+#      4-FEB-1999 (AJC):
+#        Added Scaling parameters
 #     {enter_further_changes_here}
 
 #-    
@@ -35,7 +38,6 @@ interface NDF2TIFF
       prompt      'NDF to convert'
       ppath       'GLOBAL,CURRENT'
       vpath       'PROMPT'
-      association '<->GLOBAL.DATA_ARRAY'
       helpkey     '*'
    endparameter
 
@@ -46,6 +48,91 @@ interface NDF2TIFF
       prompt      'TIFF file'
       ppath       'CURRENT,DEFAULT'
       vpath       'PROMPT'
+      helpkey     '*'
+   endparameter
+
+   parameter      SCALE           # Scaling method
+      position    3
+      type        'LITERAL'
+      keyword     'SCALE'
+      vpath       'DEFAULT'
+      default     'Range'
+      prompt      'Method to define the scaling limits'
+      helpkey     '*'
+#     in          'Flash', 'Faint', 'Percentiles', 'Scale', 'Range', 'Sigma'
+   endparameter
+
+   parameter      HIGH           # Upper scaling limit
+      type        '_DOUBLE'
+      keyword     'HIGH'
+      prompt      'High value for display'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      LOW            # Lower scaling limit
+      type        '_DOUBLE'
+      keyword     'LOW'
+      prompt      'Low value for display'
+      vpath       'PROMPT'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      NUMBIN         # Number of histogram bins
+      keyword     'NUMBIN'
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      default     2048
+      prompt      'Number of bins to compute percentiles'
+      helpkey     '*'
+   endparameter
+
+   parameter      PERCENTILES    # Percentiles for scaling
+      keyword     'PERCENTILES'
+      type        '_REAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     10,90
+      prompt      'Percentiles for scaling'
+      helpkey     '*'
+   endparameter
+
+   parameter      SCAHIGH        # Upper scaling value
+      keyword     'SCAHIGH'
+      access      'WRITE'
+      type        '_DOUBLE'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the upper scaling value.'
+      default     0.0
+   endparameter
+
+   parameter      SCALOW         # Lower scaling value
+      keyword     'SCALOW'
+      access      'WRITE'
+      type        '_DOUBLE'
+      vpath       'DEFAULT'
+      prompt      'Object to contain the lower scaling value.'
+      default     0.0
+   endparameter
+
+   parameter      SIGMAS         # Standard-deviation scaling limits
+      keyword     'SIGMAS'
+      type        '_REAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      default     -2,2
+      prompt      'Standard-deviation limits for scaling'
+      helpkey     '*'
+   endparameter
+
+   parameter      MSG_FILTER     # MSG filtering level
+      keyword     'MSG_FILTER'
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      default     'NORMAL'
+      prompt      'Message filtering level'
       helpkey     '*'
    endparameter
 

@@ -17,15 +17,15 @@
 #      This Bourne-shell script converts a 256 grey-level or
 #      black-and-white dithered Tag Image File Format (TIFF) into an
 #      unsigned-byte NDF file.  It handles one- or two-dimensional
-#      images.  The script uses various PBMPLUS utilities to produce a
+#      images.  The script uses various Netpbm utilities to produce a
 #      FITS file, flipped top to bottom, and then FITS2NDF to produce
 #      the final NDF.  Error messages are converted into Starlink style
 #      (preceded by !).
  
 #  Parameters:
 #     IN = FILENAME (Read)
-#        The name of the TIFF file to be converted (without the .tif 
-#        extension, which is assumed).
+#        The name of the TIFF file to be converted. (A .tif name extension
+#        is assumed if omitted.)
 #     OUT = NDF (Write)
 #        The name of the NDF to be generated (without the .sdf extension).
 #        If the OUT parameter is omitted, the value of the IN parameter
@@ -47,8 +47,8 @@
 #
 #     -  Input image file names must have the extension .tif.
 #
-#     -  The PBMPLUS utilities tifftopnm, ppmtopgm and pgmtofits must 
-#     be available on your PATH.
+#     -  The Netpbm utilities tifftopnm, ppmtopgm, pnmflip and pnmtofits
+#        must be available on your PATH.
  
 #  Related Applications:
 #     CONVERT: NDF2TIFF
@@ -74,6 +74,12 @@
 #     1997 October 3 (MJC):
 #        Improved the parameter handling to allow for no arguments, and
 #        to remove any .tif that may be present in the first argument.
+#     1998 November 19 (AJC):
+#        Use Netpbm - common for all platforms
+#          Use pnmtofits not pgmtofits 
+#     1999 March 11 (AJC):
+#        Only remove .tif if at end of name
+#     {note_further_changes_here}
  
 #  Bugs:
 #     {note_any_bugs_here}
@@ -88,8 +94,8 @@ then
    exit
 fi
 
-# Remove any .gif file extension.
-root=`echo $1 | sed 's#.tif##'`
+# Remove any .tif file extension.
+root=`echo $1 | sed 's#\.tif$##'`
 
 # Find the filename less any path.
 name=`basename $root`
@@ -97,37 +103,19 @@ name=`basename $root`
 # Set required output file name.  Defaults to the input name.
 out=${2:-$name}
 
-# Determine whether the operating system is alpha_OSF1 or not.
-machine=`uname -m`
-opsys=`uname`
-
 # Convert the image removing temporary files at each stage.
 
 # Convert image from TIFF format to FITS, flipping it from top to bottom.
-# Use the Netpbm version of tifftopnm on alpha_OSF1 because of a bug
-# in the released PBMPLUS version.  The error output is written to
-# temporary files.  Make the error look as if it came from MSG.
-if test "$machine" = "alpha" -a  "$opsys" = "OSF1"
-then
-   $CONVERT_DIR/tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
-   ppmtopgm 2> convert_err2_$name.lis | \
-   pnmflip -topbottom 2> convert_err3_$name.lis | \
-   pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
-     { sed 's/^/!  TIFF2NDF:/' convert_err?_$name.lis 1>&2
-       rm -f convert_err?_$name.lis convert_temp_$name.fit
-       exit 1
-     }
-
-else
-   tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
-   ppmtopgm 2> convert_err2_$name.lis | \
-   pnmflip -topbottom 2> convert_err3_$name.lis | \
-   pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
-     { sed 's/^/!  TIFF2NDF:/' convert_err?_$name.lis 1>&2
-       rm -f convert_err?_$name.lis convert_temp_$name.fit
-       exit 1
-     }
-fi
+# The error output is written to temporary files.  Make the error look as
+# if it came from MSG.
+tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
+  ppmtopgm 2> convert_err2_$name.lis | \
+  pnmflip -topbottom 2> convert_err3_$name.lis | \
+  pnmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
+  { sed 's/^/!  TIFF2NDF:/' convert_err?_$name.lis 1>&2
+    rm -f convert_err?_$name.lis convert_temp_$name.fit
+    exit 1
+  }
 rm -f convert_err?_$name.lis
 
 # Convert the image to an NDF of data type _UBYTE.  Make the error look

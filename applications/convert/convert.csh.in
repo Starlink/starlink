@@ -39,6 +39,20 @@
 #        file extensions.  Some reordering of NDF_FORMATS_IN/OUT; also
 #        used multi-line creation for clarity.  Corrected con_tiff2ndf
 #        and con_ndf2tiff aliases.
+#     1998 January 13 (AJC):
+#        Added AST2NDF and SPECX2NDF
+#     1998 January 30 (AJC):
+#        Added mxhi to NDF_FORMATS_IN
+#     1999 June 10 (AJC):
+#        If IDL_PATH set, add $CONVERT_DIR to it
+#     2000 February 18 (AJC):
+#        Also set IDL_DLM_PATH if IDL_PATH set
+#     2000 July 7 (AJC):
+#        Add ^fxs to convertndf calls (required for NDF_FROM_FITS)
+#     2001 October 31 (AJC):
+#        Add MTFITS2NDF
+#     2004 March 12 (MJC):
+#        Add FITS(.fits) to NDF_FORMATS_OUT.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -76,6 +90,7 @@ setenv CONVERT_HELP INSTALL_HELP/convert
 #  ====================================
 #
 alias ascii2ndf  $CONVERT_DIR/ascii2ndf
+alias ast2ndf    $CONVERT_DIR/ast2ndf
 alias conhelp    $CONVERT_DIR/conhelp
 alias dst2ndf    $CONVERT_DIR/dst2ndf
 alias da2ndf     $CONVERT_DIR/da2ndf
@@ -84,6 +99,8 @@ alias fits2ndf   $CONVERT_DIR/fits2ndf
 alias gif2ndf    $CONVERT_DIR/gif2ndf
 alias iraf2ndf   $CONVERT_DIR/iraf2ndf
 alias ircam2ndf  $CONVERT_DIR/ircam2ndf
+alias mtfits2ndf tcsh $CONVERT_DIR/mtfits2ndf.tcsh
+alias specx2ndf  $CONVERT_DIR/specx2ndf
 alias tiff2ndf   $CONVERT_DIR/tiff2ndf
 alias unf2ndf    $CONVERT_DIR/unf2ndf
 alias ndf2ascii  $CONVERT_DIR/ndf2ascii
@@ -100,6 +117,7 @@ alias ndf2unf    $CONVERT_DIR/ndf2unf
 #  Now repeat for the full command names.
 #
 alias con_ascii2ndf  $CONVERT_DIR/ascii2ndf
+alias con_ast2ndf    $CONVERT_DIR/ast2ndf
 alias con_conhelp    $CONVERT_DIR/conhelp
 alias con_da2ndf     $CONVERT_DIR/da2ndf
 alias con_dst2ndf    $CONVERT_DIR/dst2ndf
@@ -108,6 +126,8 @@ alias con_gasp2ndf   $CONVERT_DIR/gasp2ndf
 alias con_gif2ndf    $CONVERT_DIR/gif2ndf
 alias con_iraf2ndf   $CONVERT_DIR/iraf2ndf
 alias con_ircam2ndf  $CONVERT_DIR/ircam2ndf
+alias con_mtfits2ndf tcsh $CONVERT_DIR/mtfits2ndf.tcsh
+alias con_specx2ndf  $CONVERT_DIR/specx2ndf
 alias con_tiff2ndf   $CONVERT_DIR/tiff2ndf
 alias con_unf2ndf    $CONVERT_DIR/unf2ndf
 alias con_ndf2ascii  $CONVERT_DIR/ndf2ascii
@@ -145,14 +165,14 @@ setenv NDF_FORMATS_IN \
 $NDF_FORMATS_IN',FITS(.lilo),FITS(.lihi),FITS(.silo),FITS(.sihi)'
 
 setenv NDF_FORMATS_IN \
-$NDF_FORMATS_IN',FITS(.mxlo),FITS(.rilo),FITS(.rihi),FITS(.vdlo)'
+$NDF_FORMATS_IN',FITS(.mxlo),FITS(.mxhi),FITS(.rilo),FITS(.rihi),FITS(.vdlo)'
 
 setenv NDF_FORMATS_IN \
 $NDF_FORMATS_IN',FITS(.vdhi),STREAM(.str)'
 
 #  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT \
-'.,FITS(.fit),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
+'.,FITS(.fit),,FITS(.fits),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
 
 setenv NDF_FORMATS_OUT \
 $NDF_FORMATS_OUT',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
@@ -169,38 +189,38 @@ $NDF_FORMATS_OUT',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
 #  HDS scratch file.
 if ( $?HDS_SCRATCH ) then
-   setenv NDF_TEMP_FITS "$HDS_SCRATCH/temp_fits_^name"
+   setenv NDF_TEMP_FITS "$HDS_SCRATCH/temp_fits_^name^fxscl"
 else
-   setenv NDF_TEMP_FITS 'temp_fits_^name'
+   setenv NDF_TEMP_FITS 'temp_fits_^name^fxscl'
 endif
 
 setenv NDF_FROM_FITS \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_FITS \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  FIGARO conversions.
 #  ------------------
 setenv NDF_FROM_FIGARO \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_FIGARO \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  IRAF conversions:
 #  ----------------
 setenv NDF_FROM_IRAF \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_IRAF \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  N.B. deletion of IRAF datasets requires a separate command, since two
 #  files are involved.
@@ -211,11 +231,11 @@ setenv NDF_DEL_IRAF \
 #  ----------------
 setenv NDF_FROM_GASP \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_GASP \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  N.B. deletion of GASP datasets requires a separate command, since two
 #  files are involved.
@@ -226,71 +246,71 @@ setenv NDF_DEL_GASP \
 #  -------------------------------------------
 setenv NDF_FROM_UNFORMATTED \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_UNFORMATTED \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  UNF0 conversions (no FITS headers).
 #  ----------------------------------
 setenv NDF_FROM_UNF0 \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_UNF0 \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  STREAM (direct-access) conversions
 #  ----------------------------------
 setenv NDF_FROM_STREAM \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_STREAM \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  ASCII conversions (with FITS headers).
 #  -------------------------------------
 setenv NDF_FROM_ASCII \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_ASCII \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  TEXT conversions (like ASCII but without FITS headers).
 #  ------------------------------------------------------
 setenv NDF_FROM_TEXT \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_TEXT \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  GIF conversions.
 #  ----------------
 setenv NDF_FROM_GIF \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_GIF \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  TIFF conversions.
 #  -----------------
 setenv NDF_FROM_TIFF \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_TIFF \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 #  COMPRESSED conversions.
 #  ----------------------
@@ -298,11 +318,11 @@ setenv NDF_TO_TIFF \
 #  process, even when they appear to have worked OK. It's not clear why.
 setenv NDF_FROM_COMPRESSED \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_COMPRESSED \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if ( $?HDS_SCRATCH ) then
    setenv NDF_TEMP_COMPRESSED "$HDS_SCRATCH/temp_Z_^name"
@@ -314,11 +334,11 @@ endif
 #  -----------------------------
 setenv NDF_FROM_GZIP \
 '$CONVERT_DIR/convertndf from \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 setenv NDF_TO_GZIP \
 '$CONVERT_DIR/convertndf to \
-'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^ndf\'
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if ( $?HDS_SCRATCH ) then
    setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_Z_^name"
@@ -330,6 +350,17 @@ endif
 #  -----
 #  Switch off display all conversion operations for debugging.
 setenv NDF_SHCVT 0
+
+#  Set up IDL_PATH and IDL_DLM_PATH if IDL is activated
+#  ----------------------------------------------------
+if ( ${?IDL_PATH} ) then
+   setenv IDL_PATH ${IDL_PATH}:$CONVERT_DIR
+   if ( ${?IDL_DLM_PATH} ) then
+      setenv IDL_DLM_PATH ${IDL_DLM_PATH}:$CONVERT_DIR
+   else
+      setenv IDL_DLM_PATH $CONVERT_DIR
+   endif         
+endif
 
 #
 #  Tell the user that CONVERT commands are now available.
