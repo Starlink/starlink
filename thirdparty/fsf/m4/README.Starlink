@@ -22,11 +22,19 @@ CVS import, for example:
     % cvs -d $starcvs co -jm4-1-4 -jm4-1-4-1 thirdparty/fsf/m4
     % cd thirdparty/fsf/m4
 
-At this point, resolve any conflicts that have arisen, and regenerate
-configure from configure.in.  This need not be done using the Starlink
-autoconf, but it shouldn't matter.  Use a similar autotools version,
-though (the import of 1.4.1 was done using 2.57, which is the same
-version that Starlink autoconf is based on).  Use autoreconf, and
-ignore the deprecation warnings.
+At this point, resolve any conflicts that have arisen.
 
-Commit the result.
+It's not completely clear what to do next.
+
+When m4 is being built as part of the Starlink build system, it is
+built in a context which does not have any of the autotools available,
+it is therefore important that it does not call any.  CVS preserves
+timestamps on checkout, though it doesn't on updates, what's checked
+in, therefore, must be checked out in such a way that stamp-h.in is no
+older than configure.in, aclocal.m4 and acconfig.h, and configure no
+older than configure.in and aclocal.m4.  Note that CVS appears to use
+the one-second-resolution _commit_ time as a timestamp in the
+repository.  What's currently in the repository (2005 January 26)
+appears to work, but it would be nice to feel this was less fragile.
+
+Perhaps update these instructions when this is next updated.
