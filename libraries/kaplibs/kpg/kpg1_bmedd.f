@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_BMEDD( BAD, SAMBAD, VAR, NX, NY, IN, HX, HY,
      :                        NLIM, OUT, BADOUT, WORK1, WORK2, STATUS )
 *+
-* Name:
+*  Name:
 *     KPG1_BMEDx
  
 *  Purpose:

@@ -390,6 +390,11 @@ codes are:
 \item [l] - Logical 
 \end{description}
 
+Sometimes, routine names are documented as ending with a lower case
+``x''. This indicates that routines exist for various of the above
+numerical types. The \emph{actual} routines names will not include the trailing
+``x'', but will have one of the above codes in place of the ``x''.
+
 \section{\xlabel{search}Finding the Routines you Need}
 \begin{latexonly}
 
