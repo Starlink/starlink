@@ -129,9 +129,9 @@ push(@lines, "      END\n");
 
 
 # Now write the grexec.f
-open(my $GR, ">$outfile") or die "Error opening file grexec.f for write: $!";
-print $GR @lines;
-close($GR);
+open(GR, ">$outfile") or die "Error opening file grexec.f for write: $!";
+print GR @lines;
+close(GR);
 
 __DATA__
 C*GREXEC -- PGPLOT device handler dispatch routine
