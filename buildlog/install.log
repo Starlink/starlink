@@ -233,6 +233,7 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -1122,4 +1123,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 37 seconds
+Total time: 4 minutes 16 seconds
