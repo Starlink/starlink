@@ -77,12 +77,6 @@
 *  names.
       CALL TASK_GET_NAME( ACTION, STATUS )
 
-
-*  Define the current application name for history. The package version
-*  number gets substituted in here from autoconf
-*  is contructed.
-      CALL NDF_HAPPN( ACTION // ' (CHART X.Y-Z)', STATUS )
-
 *  Test the action name against each valid value in turn, calling the
 *  appropriate routine...
 

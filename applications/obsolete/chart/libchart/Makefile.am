@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in
+AM_FCFLAGS = -I../
 
-lib_LTLIBRARIES = libchart.la
-libchart_la_SOURCES = $(F_ROUTINES) $(PRIVATE_INCLUDES)
+noinst_LTLIBRARIES = libchart.la
+libchart_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(PRIVATE_INCLUDES)
 
+FPP_ROUTINES = fileopen.fpp
 
 F_ROUTINES = catinf.f convdec.f ellipse.f hdng.f near.f page.f prt26.f \
 set.f subbsrch.f titles.f catrec.f conv.f finput.f ident.f nnint.f     \
@@ -16,4 +18,5 @@ ttyout.f con_factor.f decmk.f gsout.f magns.f offs.f preces.f sbar.f   \
 starp.f telcor.f ttypalp.f const.f delay.f guid13.f merz26.f output.f  \
 proj.f select.f store.f tiltx.f val.f
 
-PRIVATE_INCLUDES = spt_cmn catinf_cmn filenames convf
+PRIVATE_INCLUDES = SPT_CMN CONVF CATINF_CMN FILENAMES
+

@@ -16,25 +16,17 @@ STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
-AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 STAR_CHECK_PROGS(ifd2star)
 STAR_CHECK_PROGS(hlib)
 
-dnl    Open specifiers
-AC_FC_OPEN_SPECIFIERS(readonly)
-AC_FC_OPEN_SPECIFIERS(carriagecontrol='LIST')
-
-dnl    What unit does OPEN's recl specifier assume?
-AC_FC_RECL_UNIT
-
-
 dnl    Look for NAG
 AC_LANG_PUSH(Fortran)
-AC_CHECK_LIB(nag, a01bcd)
+AC_CHECK_LIB(nag, m01dbf)
 AC_LANG_POP(Fortran)
 
 

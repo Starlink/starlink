@@ -176,14 +176,20 @@
         IF ( RECL .EQ. 0 ) THEN
       
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
-     :      ACCESS = ACCESS, FORM = FORM, ERR = 500,
-     :      CARRIAGECONTROL = 'LIST' )
+     :      ACCESS = ACCESS, FORM = FORM,
+#if HAVE_FC_OPEN_CARRIAGECONTROLLIST
+     :      CARRIAGECONTROL = 'LIST',
+#endif
+     :          ERR = 500 )
 
         ELSE
 
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
-     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500,
-     :      CARRIAGECONTROL = 'LIST' )
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM,
+#if HAVE_FC_OPEN_CARRIAGECONTROLLIST
+     :      CARRIAGECONTROL = 'LIST',
+#endif
+     :          ERR = 500 )
 
         ENDIF
       
@@ -201,8 +207,11 @@
         ELSE
 
             OPEN( UNIT = UNIT, FILE = FILE, STATUS = STAT,
-     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500, 
-     :      READONLY )
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM,
+#if HAVE_FC_OPEN_READONLY
+     :          READONLY,
+#endif
+     :          ERR = 500)
             
         ENDIF
 
@@ -223,7 +232,7 @@
         ELSE
 
             OPEN ( UNIT = UNIT, FILE = FILE, STATUS = STAT,
-     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM, ERR = 500,
+     :      ACCESS = ACCESS, RECL = RECL, FORM = FORM,
 #if HAVE_FC_OPEN_READONLY
      :          READONLY,
 #endif

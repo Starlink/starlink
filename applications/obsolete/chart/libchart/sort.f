@@ -19,6 +19,8 @@
 *       NAG routine M01ALF as it was withdrawn at Mark 13.
 *     3-MAR-1993 (AJJB):
 *       STATUS argument added.
+*     4-AUG-2004 (TIMJ):
+*       Remove TYPE and replace with PRINT
 *
 
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
@@ -48,7 +50,7 @@
          IFAIL=0
          CALL M01DBF(IA,1,NUM,'A',IP,IFAIL)
          CALL M01CBF(IA,1,NUM,'A',IFAIL)
-         IF (IFAIL.NE.0) TYPE *,'SORTING FAILURE'
+         IF (IFAIL.NE.0) PRINT *,'SORTING FAILURE'
 *
 *   From now on only consider the 'MAXNUM'
 *   Brightest Stars.
