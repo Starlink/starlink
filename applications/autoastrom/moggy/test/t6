@@ -10,7 +10,7 @@ test -n "$PERLBIN" || exit 1
 # (down to the definition of $puss) is _duplicated_ on stdout. 
 # I don't understand this one tiny bit.
 
-AUTOASTROM_DIR=`cd ..; echo $PWD`;	export AUTOASTROM_DIR
+AUTOASTROM_DIR=`cd ../..; echo $PWD`;	export AUTOASTROM_DIR
 TESTDIR=$PWD;				export TESTDIR
 # Name the report file t<number>*.tmp, so it's deleted by the driver at the end
 REPORTFILE=t6.report.tmp;		export REPORTFILE
@@ -61,6 +61,11 @@ print REPORT "  $nrows x $ncols:";
 for ($i = 0; $i<=$#{$colref}; $i++) {
     print REPORT " <${$colref}[$i]>";
 }
+print REPORT "   column ra:", $cat->resulthascolumn('ra');
+print REPORT "   Id:", $cat->resulthascolumn('id');
+print REPORT "  /d/:", $cat->resulthascolumn('/d/');
+print REPORT "  /D./:", $cat->resulthascolumn('/d./');
+print REPORT "  xxx:", $cat->resulthascolumn('xxx');
 print REPORT "\n";
 for ($i = 0; $i<$nrows; $i++) {
     for ($j=0; $j<$ncols; $j++) {
