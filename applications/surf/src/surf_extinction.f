@@ -714,9 +714,16 @@
       END IF
 
 *  get the sky opacities at times bracketing the observation
+*  Use a default of 0 for FIRST_TAU and FIRST_LST but use
+*  a dynamic default of FIRST_* for SECOND_*
 
       CALL PAR_GET0R ('FIRST_TAU', FIRST_TAU, STATUS)
       CALL PAR_GET0C ('FIRST_LST', FIRST_LST, STATUS)
+
+*     Set up defaults
+      CALL PAR_DEF0R('SECOND_TAU', FIRST_TAU, STATUS)
+      CALL PAR_DEF0C('SECOND_LST', FIRST_LST, STATUS)
+
       CALL PAR_GET0R ('SECOND_TAU', SECOND_TAU, STATUS)
       CALL PAR_GET0C ('SECOND_LST', SECOND_LST, STATUS)
 
