@@ -149,7 +149,7 @@
 *        NDF currently displayed in the most recently created DATA picture.
 *        If a value is supplied on the command line for this parameter it
 *        will be used. Otherwise, the NDF to used is found by
-*        interogating the graphics database (which contains references to
+*        interrogating the graphics database (which contains references to
 *        displayed images). If no reference NDF can be obtained from the
 *        graphics database, the user will be prompted for a value.
 *     NN = _LOGICAL (Read)
