@@ -82,13 +82,13 @@ $Id$
       (make environment name: "itemize"
 	    (process-children))))
   (element author
-    (let ((attrib (attribute-string (normalize "attribution")))
+    (let ((affil (attribute-string (normalize "affiliation")))
 	  (id (attribute-string (normalize "id"))))
       (make sequence
 	(make empty-command name: "item")
 	(process-children)
-	(if attrib
-	    (literal (string-append " (" attrib ")"))
+	(if affil
+	    (literal (string-append " (" affil ")"))
 	    (empty-sosofo)))))
   (element authorref
     (let* ((aut-id (attribute-string (normalize "id")))
@@ -136,17 +136,63 @@ $Id$
 					  ", "
 					  (format-date date-str))))
 	(process-children))))
-  ;; Process the codeprologue elements.  Code here relies on the
-  ;; elements being in the `correct' order, and would have to be
-  ;; changed if we adopt an unordered content model (ampersand connectors)
-  (element codeprologue
-      (process-children))
+  (element routineopener
+    (empty-sosofo))
+  (element description
+    (process-children))
+  
+  ;; The funcname element could be made more sophisticated, so that
+  ;; it includes a link (possibly using the source-code browser) to
+  ;; the function definition/documentation.
+  (element funcname
+    (make command name: "texttt"
+          (literal (string-append "(" (data (current-node)) ")"))))
+  ;; discard the following elements, at present
+  (element codebody
+    (empty-sosofo))
+  ;;(element misccode
+  ;;  (empty-sosofo))
+  )
+
+(mode routine-ref-sst
+  (element routineprologue
+    (let ((kids (nl-to-pairs (children (current-node)))))
+      (make sequence
+	(make command name: "sstroutine"
+	      (let ((name (assoc (normalize "routinename") kids)))
+		(if name
+		    (process-node-list (cdr name))
+		    (literal "Unknown name!"))))
+	(make environment brackets: '("{" "}")
+	      (let ((purp (assoc (normalize "purpose") kids)))
+		(if purp
+		    (process-node-list (cdr purp))
+		    (empty-sosofo))))
+	(make environment brackets: '("{" "}")
+	      (apply sosofo-append
+		     (map (lambda (gi)
+			    (let ((gi-and-nd (assoc (normalize gi) kids)))
+			      (if gi-and-nd
+				  (process-node-list (cdr gi-and-nd))
+				  (empty-sosofo))))
+			  '(;;"routinename"
+			    ;;"purpose"
+			    "description"
+			    "returnvalue"
+			    "argumentlist"
+			    "parameterlist"
+			    ;;"authorlist"
+			    ;;"history"
+			    "usage"
+			    "invocation"
+			    "examplelist"
+			    "notelist"
+			    "implementationstatus"
+			    "bugs")))))))
   (element routinename
-    (make sequence
-      (make command name: "subsection"
-	    (process-children))))
+    (process-children))
   (element name
-    (make command name: "textbf"
+    (make command name: "Code"
 	  (process-children)))
   (element othernames
     (let* ((names (children (current-node)))
@@ -158,60 +204,80 @@ $Id$
 			    (string-append res ", " (data i))))
 		      "")))
       (literal (string-append " (also: " namelist ")"))))
-  (element purpose
-    (make sequence
-      (make command name: "textbf"
-	    (literal "Purpose: "))
-      (process-children)))
+  ;;  (element purpose
+  ;;    (make sequence
+  ;;      (make command name: "textbf"
+  ;;	    (literal "Purpose: "))
+  ;;      (process-children)))
   (element description
-    (process-children))
+    (make command name: "sstdescription"
+	  (process-children)))
   (element returnvalue
     (let ((none-att (attribute-string (normalize "none")))
 	  (type-att (attribute-string (normalize "type"))))
-      (if none-att
-	  (make command name: "subsubsection"
-		(literal "No return value")) ;...and discard any data
-	  (make sequence
-	    (make command name: "subsubsection"
-		  (literal "Return value"))
-	    (if type-att
-		(literal (string-append "Type: " type-att))
-		(empty-sosofo))
-	    (process-children)))))
+      (make command name: "sstreturnedvalue"
+	    (if none-att
+		(make command name: "emph"
+		      (literal "No return value")) ;...and discard any data
+		(process-children)))))
+  (element parameterlist
+    (let ((none-att (attribute-string (normalize "none"))))
+      (make command name: "sstparameters"
+	    (if none-att
+		(make command name: "sstsubsection"
+		      (literal "No parameters"))
+		(process-children)))))
   (element argumentlist
     (let ((none-att (attribute-string (normalize "none"))))
-      (if none-att
-	  (make command name: "subsubsection"
-		(literal "No arguments"))
-	  (make sequence
-	    (make command name: "subsubsection"
-		  (literal "Argument list"))
-	    (process-children)))))
+      (make command name: "sstarguments"
+	    (if none-att
+		(literal "No arguments")
+		(process-children)))))
   (element parameter
     (let* ((kids (children (current-node)))
 	   (name (select-elements kids (normalize "name")))
 	   (type (select-elements kids (normalize "type")))
 	   (desc (select-elements kids (normalize "description")))
-	   (opt-att (attribute-string (normalize "optional")))
+	   ;;(opt-att (attribute-string (normalize "optional")))
 	   (dir-att (attribute-string (normalize "direction"))))
       (make sequence
-	(process-node-list name)
-	(literal (string-append " (" (data type) ") " dir-att
-				(if opt-att
-				    (string-append ", " opt-att)
-				    "")))
-	(process-node-list desc))))
-  ;; The funcname element could be made more sophisticated, so that
-  ;; it includes a link (possibly using the source-code browser) to
-  ;; the function definition/documentation.
-  (element funcname
-    (make command name: "texttt"
-          (literal (string-append "(" (data (current-node)) ")"))))
-  ;; discard the following elements, at present
-  (element codebody
-    (empty-sosofo))
-  (element misccode
-    (empty-sosofo)))
+	(make command name: "sstsubsection"
+	      (make sequence
+		(process-node-list name)
+		(literal "=")
+		(process-node-list type)
+		(literal "(" dir-att ")")))
+	(make environment brackets: '("{" "}")
+	      (process-node-list desc)))))
+  (element examplelist
+    (make command name: "sstexamples"
+	  (process-children)))
+  (element example
+    (make sequence
+      (make command name: "sstexamplesubsection"
+	    (process-children))))
+  (element usage
+    (make command name: "sstusage"
+	  (process-children)))
+  (element invocation
+    (make command name: "sstinvocation"
+	  (process-children)))
+  (element implementationstatus
+    (make command name: "sstimplementationstatus"
+	  (process-children)))
+  (element bugs
+    (make command name: "sstbugs"
+	  (process-children)))
+  (element notelist
+    (process-children))
+  (element othernote
+    (let ((kids (children (current-node))))
+      (make sequence
+	(make command name: "sstdiytopic"
+	      parameters: (list (data (node-list-first kids)))
+	      (process-node-list (node-list-rest kids))))))
+  )
+
 
 ;; Mode which includes assorted variants of the handlers above, designed
 ;; to extract information to which other handlers have made cross-reference.
