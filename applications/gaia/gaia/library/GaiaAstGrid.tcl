@@ -529,20 +529,27 @@ itcl::class gaia::GaiaAstGrid {
          }
       }
       
-      #  And set the axes number formatting to be used.
+      #  And set the axes number formatting to be used. Note this is
+      #  quite different for SkyFrames and ordinary Frames.
       if { ! $format_($this,noformat) } {
-         set format1 "format(1)=$Xformat_($this,sep)"
-         set format2 "format(2)=$Yformat_($this,sep)"
-         foreach {lname ident} $formatattrib_ {
-            if { $Xformat_($this,$ident) } {
-               lappend format1 $ident
+         if { [$itk_option(-rtdimage) astcelestial] } {
+            set format1 "format(1)=$Xformat_($this,sep)"
+            set format2 "format(2)=$Yformat_($this,sep)"
+            foreach {lname ident} $formatattrib_ {
+               if { $Xformat_($this,$ident) } {
+                  lappend format1 $ident
+               }
+               if { $Yformat_($this,$ident) } {
+                  lappend format2 $ident
+               }
             }
-            if { $Yformat_($this,$ident) } {
-               lappend format2 $ident
-            }
+            lappend format1 ".$Xformat_($this,.)"
+            lappend format2 ".$Yformat_($this,.)"
+         } else {
+            #  Simple C-printf precision format only.
+            set format1 "format(1)=%%.$Xformat_($this,.)g"
+            set format2 "format(2)=%%.$Xformat_($this,.)g"
          }
-         lappend format1 ".$Xformat_($this,.)"
-         lappend format2 ".$Yformat_($this,.)"
          lappend options $format1
          lappend options $format2
       }
