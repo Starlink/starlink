@@ -8,12 +8,15 @@
  The commands available are:
 
      ASCII2NDF -- Converts an ASCII file to an NDF.
+     DA2NDF    -- Converts a direct-access unformatted file to an NDF.
      DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
+     FITS2NDF  -- Converts FITS files into NDFs.
      GASP2NDF  -- Converts an image in GASP format to an NDF.
      GIF2NDF   -- Converts a GIF file to an NDF.
      IRAF2NDF  -- Converts an IRAF image to an NDF.
      IRCAM2NDF -- Converts an IRCAM data file to a series of NDFs.
      NDF2ASCII -- Converts an NDF to an ASCII file.
+     NDF2DA    -- Converts an NDF to a direct-access unformatted file.
      NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
      NDF2FITS  -- Converts an NDF to a FITS file.
      NDF2GASP  -- Converts a two-dimensional NDF into a GASP image.
