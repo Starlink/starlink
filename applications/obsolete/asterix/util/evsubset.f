@@ -74,7 +74,6 @@
 *
       CHARACTER*(DAT__SZLOC)  CLOC                 ! Component locator
       CHARACTER*(DAT__SZLOC)  DLOC                 ! List DATA_ARRAY locator
-      CHARACTER*(DAT__SZLOC)  HEADER               ! Locator to HEADER info
       CHARACTER*(DAT__SZLOC)  ILLOC (LIST__MXNL)   ! Locators to input LISTs
       CHARACTER*(DAT__SZLOC)  INPL                 ! Locator to input dataset
       CHARACTER*(DAT__SZLOC)  OLLOC                ! Locators to output LISTs
@@ -137,7 +136,6 @@
       BYTE		      BVAL                 ! Array initialisation value
 
       LOGICAL                 INDEXMODE            ! Index mode on?
-      LOGICAL                 INPRIM               ! Is input primitive?
       LOGICAL                 INT_TYPE             ! Is list of integer type
       LOGICAL                 KEEP(LIST__MXNL)     ! Keep selected ranges?
       LOGICAL                 OK		   ! General validity check
