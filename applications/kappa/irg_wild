@@ -54,6 +54,7 @@
 #  Authors:
 #     RFWS: Rodney Warren-Smith (Starlink)
 #     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     DSB: David S. Berry (Starlink)
 #     {enter_new_authors_here}
 
 #  History:
@@ -71,9 +72,21 @@
 #        all possible names (this fixes the problem where say a file
 #        "m.fit" isn't seen when its name is given as "m" because
 #        the preferred expansion name is "m.sdf").
+#     9-JAN-1998 (DSB):
+#        The awk command which finds the file with the given name and 
+#        highest priority file type has been modified so that file types 
+#        with more than one dot (.sdf.Z, .sdf.gz, etc) are recognised. 
+#        Previously, the last dot was used as the start of the file type. 
+#        Now, the first dot following the last "/" is used instead.
+#     29-JAN-1998 (PDRAPER):
+#        Patched up changes to work with full and relative filenames
+#        as well as local ones.
 #     {enter_further_changes_here}
 
 #  Bugs:
+#      - on OSF/1 under some circumstances this fails. A work
+#      around is appended to this file. I suspect that the real
+#      problem lies elsewhere.
 #     {note_any_bugs_here}
 
 #-
@@ -133,11 +146,28 @@ done | for file in `cat`; do
        {
           if ( ! nt ) nt = split( types, type )
           file = ""
-          for ( i = 1; i <= nt; i++ ) {
-             nbits = split( $0, bits, "." )
-             if ( "."bits[ nbits ] == type[ i ] ) {
-                file = substr( $0, 1, length( $0 ) - length( type[ i ] ) )
-                break
+
+#  Extract the text following the last "/" character. This marks the start of 
+#  the file base name.
+          nslash = split( $0, path, "/" )
+          text = path[ nslash ]                    
+
+#  Find the first dot in this text. This marks the end of the base file name. 
+#  Pass on, leaving "file" blank if there is no dot, or if the base file 
+#  name is null.
+          dot = index( text, "." )
+          if ( dot > 1 ) {
+
+#  Extract the file type.
+             ftype = substr( text, dot, length( text ) )
+
+#  Compare the file type with each known type in turn. Leave the loop if a
+#  match is found.
+             for ( i = 1; i <= nt; i++ ) {
+                if ( ftype == type[ i ] ) {
+                   file = substr( $0, 1, length( $0 ) - length( type[ i ] ) )
+                   break
+                }
              }
           }
           if ( file != "" ) { 
@@ -157,3 +187,4 @@ done | for file in `cat`; do
           }
        }' types="${types}" - | sort -u 
 
+echo > /dev/null "Fix for OSF pipe bug? `printenv`"
