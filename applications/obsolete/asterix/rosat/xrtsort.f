@@ -2626,7 +2626,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 *     A special case for HRI. If it can't find a PI channel then it
 *     maps to the PHA channel.
-      IF ( PI .EQ. .FALSE. ) THEN
+      IF (.NOT. PI ) THEN
           CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
           CALL FTGCVJ(IUNIT,6,FBEG,1,NROWS,0,%VAL(PTRA(7)),
      :    ANYF,STATUS)
