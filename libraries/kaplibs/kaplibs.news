@@ -6,6 +6,12 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
+Version 2.8
+
+   - Can now be built as a shared library
+   - Add kpg1_astcmn to provide access to KPG_AST private common block
+
+
 Version 2.7. includes the following changes:
 
    - New routine LPG_REPLA controls a new option which allows a single NDF
