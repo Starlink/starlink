@@ -5236,6 +5236,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Global constants :
         INCLUDE 'SAE_PAR'
         INCLUDE 'DAT_PAR'
+        INCLUDE 'PRM_PAR'
 *    Global variables :
         INCLUDE 'IMG_CMN'
 *  Import :
@@ -5245,7 +5246,7 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 *  Local constants :
 *  Local variables :
       INTEGER NVAL
-
+      INTEGER ID
 
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -5263,6 +5264,13 @@ C        CALL BDA_GETAXVAL(ILOC,I_YAX,I_YBASE,I_YSCALE,I_NY,STATUS)
 
         ENDIF
 
+*  being run from a GUI so update noticeboard
+        IF (I_GUI) THEN
+          CALL NBS_FIND_ITEM(I_NBID,'MIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,I_DMIN,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'MAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,I_DMAX,STATUS)
+        ENDIF
 
       ENDIF
 
