@@ -30,7 +30,7 @@
 *     used (see parameter MAPTYPE).
 *     
 *     When adding a new Frame to a WCS component, the Mapping is used to 
-*     connect the the new Frame to an existing one (called the "basis" 
+*     connect the new Frame to an existing one (called the "basis" 
 *     Frame). The newly added Frame is a copy of the basis Frame, with 
 *     the new Domain attribute specified by parameter DOMAIN, and becomes 
 *     the current co-ordinate Frame in the NDF. If necessary, other 
