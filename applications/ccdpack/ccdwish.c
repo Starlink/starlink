@@ -186,6 +186,7 @@
 /* Local variables. */
       Tcl_Interp *interp;
       char *c;
+      char *initfile = "ccdwishrc";
       int len;
       int tclrtn;
       int *sp;
@@ -196,6 +197,13 @@
 
 /* Initialise the interpreter. */
       Tcl_AppInit( interp );
+
+/* Source initialisation script. */
+      sprintf( buffer, "%s/%s", getenv( "CCDPACK_DIR" ), initfile );
+      if ( Tcl_EvalFile( interp, buffer ) != TCL_OK ) {
+         fprintf( stderr, "Error while sourcing %s:\n%s\n", initfile,
+                          Tcl_GetStringResult( interp ) );
+      }
 
 /* Create an asynchronous event handler which can be used for handling
    signals. */
