@@ -16,12 +16,16 @@
 *     CALL REDUCE( STATUS )
 *    Authors :
 *     P. N. Daly (PND@JACH.HAWAII.EDU)
+*     MJC: Malcolm J. Currie
 *    History :
-*     18-May-1994: Original version                                      (PND)
+*     18-May-1994: Original version                                (PND)
 *     01-Aug-1994: Added error catches, more comments, changed copying from 
 *                  VMS specific IO_COPYFILE to HDS_COPY, filename now passed 
 *                  as parameter, reduced number of times O file opened (SKL) 
 *     23-Sept-1994 Added case sensitivity for UNIX                (SKL@JACH)
+*     1999 Sept 29: Writes .ok file to RODIR, invoking revised RONAME
+*                   subroutine. (MJC)
+
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -36,17 +40,23 @@
       INTEGER CHR_LEN
 *    Local variables :
       INTEGER 
-     :  CLEN,                  ! Length of string
-     :  CASE,                  ! Flag for upper/lower case chop filename
-     :  L1, CHR_LEN
+     :  CLEN,                        ! Length of string
+     :  CASE,                        ! Flag for upper/lower case chop
+                                     ! filename
+     :  FD,                          ! Fortran file descriptor
+     :  L1,
+     :  LSTAT                        ! Local status
       CHARACTER*80 
-     :  DATE_OBS,                    ! UT date and obs number string for name
+     :  DATE_OBS,                    ! UT date and obs number string for
+                                     ! name
      :  NAME,                        ! Object name
      :  ANAME,                       ! Object name
      :  BNAME,                       ! Object name
      :  INAME,                       ! Integration name
      :  ONAME,                       ! Observation name
-     :  RNAME                        ! Reduced observation name
+     :  RNAME,                       ! Reduced observation name
+     :  RODIR                        ! RO directory name
+      CHARACTER * ( 5 ) OBSNUM       ! Observation number
       CHARACTER*(DAT__SZLOC)
      :  ILOC,                        ! Locator to top-level of I-file
      :  ILOCA,                       ! Locator to top-level of I-file, A chop
@@ -70,7 +80,8 @@
 
       CALL PAR_GET0C( 'DATE_OBS', DATE_OBS, STATUS )
 
-      CALL RONAME( DATE_OBS, INAME, ONAME, RNAME, STATUS )
+      CALL RONAME( DATE_OBS, INAME, ONAME, RNAME, RODIR, OBSNUM,
+     :             STATUS )
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -330,6 +341,15 @@
           CALL MSG_SETC( 'RNAME', RNAME )
           CALL MSG_OUT( ' ', 'Converted ^INAME to ^RNAME OK', STATUS )
         END IF
+      END IF
+
+*   Write the ok file.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         LSTAT = SAI__OK
+         CALL FIO_OPEN( RODIR( : CHR_LEN( RODIR ) ) // '.' //
+     :                  DATE_OBS( : CHR_LEN( DATE_OBS ) ) // '_ok',
+     :                  'WRITE', 'NONE', 0, FD, LSTAT )
+         CALL FIO_CLOSE( FD, LSTAT )
       END IF
 
 *   Exit this subroutine
