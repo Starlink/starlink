@@ -278,10 +278,6 @@ ZERO = _LOGICAL (Read)
    parameter). By default, no zero-point corrections are applied.
    [FALSE]
 
-{enter_further_parameters_here}
-
-{enter_further_parameters_here}
-
 Examples
 
 drizzle * out pixfrac=0.7
@@ -300,8 +296,6 @@ drizzle in=img* out=combined scale=true zero=true ref=! multi=4.0
    and output images is set to 4, i.e. the input pixel is 4
    times larger than the output pixel and contains 16 output
    pixels.
-
-{enter_further_examples_here}
 
 Notes
 
