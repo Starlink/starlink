@@ -84,6 +84,69 @@ AC_PATH_PROG([JAVA], [java], [NOJAVA])
 AC_ARG_VAR([JAVA], [Location of java runtime])
 AC_PATH_PROG([JAR], [jar], [NOJAR])
 
+
+# STAR_CHECK_JAVAC([version])
+# ---------------------------
+# Check that $JAVAC can compile Java code.  If VERSION is present, it must
+# be of the form 1.x, and the $JAVAC is checked to compile that version
+# of Java.  If not present, check 1.4.
+## (1) Yes, this is overkill for this problem, but (a) it might be useful
+## for the java/ part of the tree, and (b) it's not much more hassle to do
+## it properly than to hack it up.
+## (2) The ac_ext, _AC_RUN_LOG and _AC_MSG_LOG_CONFTEST below are all
+## internal to autoconf.
+AC_DEFUN([STAR_CHECK_JAVAC],
+ [if test "$JAVAC" = NOJAVA; then
+    AC_MSG_NOTICE([No Java compiler found -- skipping version check])
+  else
+    m4_ifval([$1],
+             [m4_define([tmp_v],m4_bregexp([$1], [^1\.\([0-9]\)$], \1))dnl
+              jdkversion=m4_ifval(tmp_v,tmp_v,
+                                  [AC_FATAL([$0: malformed version $1])])
+              m4_undefine([tmp_v])],
+             [jdkversion=4])
+    ac_ext=java
+    AC_MSG_CHECKING([whether ${JAVAC} can compile Java 1.$jdkversion code])
+    rm -f conftest.*
+    exec 8>conftest.java
+    test $jdkversion -ge 2 && echo "import java.util.Map;"           >&8
+    test $jdkversion -ge 3 && echo "import java.util.Timer;"         >&8
+    test $jdkversion -ge 4 && echo "import java.util.regex.Pattern;" >&8
+    echo "public class conftest { public static void main(String args[]) {" >&8
+    test $jdkversion -ge 4 && echo "assert(true);"                   >&8
+    echo "System.exit(0); } }"                                       >&8
+    exec 8>&-
+
+    if test $jdkversion -ge 4; then
+        trycmds="$JAVAC -source 1.4|$JAVAC"
+    else
+        trycmds="$JAVAC"
+    fi
+    JAVAC=NOJAVAC
+    as_save_IFS=$IFS; IFS=\|
+    for cmd in $trycmds
+    do
+        IFS=$as_save_IFS
+        if _AC_RUN_LOG([$cmd conftest.java], [echo Testing $cmd]); then
+            JAVAC="$cmd"
+            break
+        else
+            _AC_MSG_LOG_CONFTEST
+        fi
+    done
+    if test "$JAVAC" = NOJAVAC; then
+        AC_MSG_RESULT(no)
+    else
+        AC_MSG_RESULT(yes)
+    fi
+    rm -f conftest.*
+  fi
+])# STAR_CHECK_JAVAC
+
+STAR_CHECK_JAVAC(1.4)
+
+
+
 # We install material in the aclocal macro directory with aclocal_DATA
 # (as recommended in the automake manual).  However (slightly
 # unexpectedly) this won't work unless we also define aclocaldir --
