@@ -665,6 +665,8 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
        [dnl non-empty second argument -- just add to variable
         if $_star_build_docs; then
             STAR@&t@_LATEX_DOCUMENTATION="$2"
+            : ${LATEX2DVI='$$LATEX $<; $$LATEX $<'}
+            AC_SUBST(LATEX2DVI)
         else
             AC_MSG_WARN([not installing docs $1])
         fi
