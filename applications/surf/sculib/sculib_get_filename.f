@@ -22,7 +22,7 @@
 *       Global status
 
 *  Implementation Status:
-*     Use SUBPAR
+*     Uses SUBPAR
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -31,6 +31,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.2  1997/09/05 01:49:34  timj
+*     Strip the path and leave just the filename.
+*
 *     Revision 1.1  1997/09/03 21:54:39  timj
 *     Initial revision
 *
@@ -57,13 +60,34 @@
 
 *  Local Variables:
       INTEGER IPAR                   ! Location in the parameter system
+      INTEGER IPOSN                  ! Position in string
+
+*  External references:
+      INTEGER CHR_LEN
+      EXTERNAL CHR_LEN
 
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Get the filename from the parameter sub-system
+
       CALL SUBPAR_FINDPAR(PARAM, IPAR, STATUS)
       CALL SUBPAR_GETNAME(IPAR, FILENAME, STATUS)
+
+*     It is possible that this name will include a full path
+*     In general we don't want to have a full path as a default name
+*     so strip everything except the last '/'
+
+*     Search backwards for a /
+
+      IPOSN = CHR_LEN(FILENAME)
+
+      CALL CHR_FIND(FILENAME, '/', .FALSE., IPOSN)
+
+      IF (IPOSN .GE. 1) THEN
+         FILENAME = FILENAME(IPOSN+1:)
+      END IF
 
       END
 
