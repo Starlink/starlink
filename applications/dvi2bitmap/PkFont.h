@@ -12,6 +12,8 @@
 #endif
 
 #include <string>
+// We only need to include <ostream> here, but <iostream> is on more machines
+#include <iostream>
 #include "InputByteStream.h"
 #include "Byte.h"
 #include "DviError.h"

@@ -87,6 +87,9 @@ AC_TRY_COMPILE([#include <cstdio>],,
   AC_MSG_RESULT(no))
 
 dnl   Are the standard functions in the std namespace?
+dnl   We only need to check <ostream> here, but <iostream> is on more
+dnl   machines (specifically, and irritatingly, <ostream> appears to
+dnl   be missing from egcs-2.91.66)
 AC_MSG_CHECKING(whether standard functions are in namespace std)
 AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
   AC_MSG_RESULT(no),
@@ -360,11 +363,12 @@ AC_ARG_WITH(path-seps,
     test -n "$COLON" && AC_DEFINE_UNQUOTED(SRCHPATH_SEP,'$COLON')
   fi)
 
-
 AC_CONFIG_FILES([Makefile test/Makefile])
 AC_OUTPUT
 
-dnl   Check the dependencies.  We can't do this once in the
+
+dnl   Check the dependencies, and append them to the just-generated Makefile.
+dnl   We can't do this once in the
 dnl   Makefile.in file, because the dependencies vary depending on the
 dnl   modules included.  Use the -MM flag rather than just -M so that
 dnl   we ignore dependencies on system files (well that's the plan,
