@@ -127,6 +127,9 @@ itcl::class gaia::LabelEntryMenu {
             value {
                set value $arg
             }
+            default {
+               lappend cmd $opt $arg
+            }
          }
       }
       if { ! [info exists value] } { 
@@ -194,7 +197,6 @@ itcl::class gaia::LabelEntryMenu {
    #  Global variable linked to menu.
    itk_option define -variable variable Variable {} {
       set variable_ $itk_option(-variable)
-      global $variable_
       trace variable $variable_ w [code $this variable_changed]
    }
 

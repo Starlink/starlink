@@ -611,9 +611,17 @@ itcl::class gaia::Gaia {
          {Create and manipulate astrometry information} \
          -menu [menu $m.astrom]
 
-      add_menuitem $m.astrom command "Simple automated..." \
-         {Create a WCS for image using autoastrom} \
-         -command [code $this make_toolbox autoastrom]
+      add_menuitem $m.astrom cascade "Automatic position matching" \
+         {Create and manipulate astrometry information} \
+         -menu [menu $m.astrom.auto]
+
+      add_menuitem $m.astrom.auto command "Simple..." \
+         {Create a WCS for image using AUTOASTROM} \
+         -command [code $this make_toolbox simpleautoastrom]
+
+      add_menuitem $m.astrom.auto command "Advanced..." \
+         {Create a WCS for image using AUTOASTROM} \
+         -command [code $this make_toolbox advancedautoastrom]
 
       add_menuitem $m.astrom command "Fit to star positions..." \
          {Create a WCS for image using reference positions} \
@@ -809,15 +817,31 @@ itcl::class gaia::Gaia {
    }
 
    #  Make the simple autoastrom toolbox.
-   public method make_autoastrom_toolbox {name {cloned 0}} {
+   public method make_simpleautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
          GaiaAutoAstromSimple $w_.\#auto \
+            -expert 0 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -notify_cmd [code $this redraw_specials_ 1] \
-            -clone_cmd [code $this make_toolbox autoastrom 1] \
+            -clone_cmd [code $this make_toolbox simpleautoastrom 1] \
+            -really_die $cloned
+      }
+   }
+
+   #  Make the advanced autoastrom toolbox.
+   public method make_advancedautoastrom_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaAutoAstromSimple $w_.\#auto \
+            -expert 1 \
+            -rtdimage [$image_ get_image] \
+            -image $image_ \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -notify_cmd [code $this redraw_specials_ 1] \
+            -clone_cmd [code $this make_toolbox advancedautoastrom 1] \
             -really_die $cloned
       }
    }
@@ -1675,7 +1699,7 @@ window gives you access to this."
    }
 
    #  Whether toolboxes are transient (iconize with main window).
-   itk_option define -transient_tools transient_tools Transient_Tools 1
+   itk_option define -transient_tools transient_tools Transient_Tools 0
 
    #  The known file types.
    itk_option define -file_types file_types File_Types {{any *}}
