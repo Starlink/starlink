@@ -71,7 +71,7 @@
 *        The name of the catalogue column holding the orientation of each 
 *        vector. The values are considered to be in units of degrees unless 
 *        the UNITS attribute of the column has the value "Radians" (case 
-*        insensitive).  The positive Y axis defines zero orientation, and 
+*        insensitive).  The positive X axis defines zero orientation, and 
 *        rotation from the X axis to the Y axis is considered positive. 
 *        A list of available column names is displayed if a non-existent
 *        column name is given. [ANG]

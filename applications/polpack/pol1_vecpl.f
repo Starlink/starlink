@@ -29,9 +29,9 @@
 *     VECORN( NVEC ) = REAL (Given)
 *        The data values defining the vector orientations.  Positive
 *        values correspond to rotation in the same sense as from the x
-*        axis to the y axis.  Zero corresponds to the y axis.  The
+*        axis to the y axis.  Zero corresponds to the x axis.  The
 *        units are defined by argument ANGFAC.
-*     ANGFAC = REAL (gIVEN)
+*     ANGFAC = REAL (Given)
 *        The factor which converts values from VECORN into units of
 *        radians.
 *     ANGROT = REAL (Given)
@@ -93,6 +93,10 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      REAL PIBY2                 ! 90 degrees in radians
+      PARAMETER ( PIBY2 = 1.5707963268 )
+
 *  Local Variables:
       INTEGER I                  ! Vector index
       INTEGER NPLOT              ! No. of vectors plotted
@@ -119,8 +123,11 @@
 *  Calculate the length of the vector in units of pixels.
             VECLEN = VECMAG( I ) / DSCALE
 
-*  Calculate the vector orientation, in radians.
-            VECANG = ANGFAC * VECORN( I ) + ANGROT
+*  Calculate the vector orientation, in radians. Within KPG1_VECT, the
+*  vector orientations are measured from the Y axis, but the supplied
+*  VECORN values are measured from the X axis. So subtract 90 degrees
+*  from the supplied value to make zero equivalent to the Y axis.
+            VECANG = ANGFAC * VECORN( I ) + ANGROT - PIBY2
 
 *  Plot the vector.      
             CALL KPG1_VECT( REAL( X( I ) ), REAL( Y( I ) ), JUST, 
