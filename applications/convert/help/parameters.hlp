@@ -1,0 +1,243 @@
+1 Parameters
+CONVERT is a command-driven package.  Commands have parameters by
+which you can qualify their behaviour.  Parameters are obtained in
+response to prompts or supplied on a command line.
+
+For convenience, the main aspects of the ADAM parameter system as
+seen by a user of CONVERT are described below.  Though note that most
+of what follows is applicable to any ADAM application.
+
+2 Defaults
+Command-line values are used mostly for those parameters that are
+normally defaulted by the application.   Defaulted parameters enable
+applications to have many options, say for controlling the
+appearance of some graphical output, without making routine
+operations tedious because of a large number of prompts. The values
+of normally defaulted parameters are given in the help for each
+parameter within each application. They are enclosed in square
+brackets at the end of the parameter description for NDF
+applications.
+ 
+     ICL> HELP NDF2DST PARAM *
+ 
+gives details of all parameters in application NDF2DST.  The values
+of parameters that are normally defaulted appear at the end of the
+parameter description within square brackets. If you want to override
+one of these defaults, then you must specify the parameter's value on
+the command line.
+
+When you are prompted you will usually be given a suggested default
+value in / / delimiters.  You can choose to accept the default by
+pressing carriage return.  For example, 64 is the suggested value
+below.
+ 
+     DESCRIP - Write the BDF descriptors to the screen? /FALSE/ >
+ 
+Alternatively, enter a different value
+ 
+     DESCRIP - Write the BDF descriptors to the screen? /FALSE/ > T
+ 
+to override the default.  Some defaults begin with an @.
+ 
+     IN - NDF to be converted /@starfield/ > 
+ 
+These are associated with files. If you want to override the default
+given, you do not have to prefix your value with an @, e.g.
+ 
+     IN - NDF to be converted /@starfield/ > horse
+ 
+There are rare cases when the syntax is ambiguous, and it is then
+that you need to include the @. One occasion where you would need
+it is when the filename is a number, e.g. if your NDF was called 234
+you must enter @234, otherwise ADAM will think you are giving the
+integer 234.  Note that the file extension must not be included
+when giving the name of an NDF file.  Otherwise HDS will look
+for an object called SDF within the file. 
+
+Responses to prompts are case insensitive. 
+
+The default value can be edited to save typing by first pressing the
+<TAB> key. The editor behaves like the DCL command-line editor.
+Defaults may change as data are processed by CONVERT.  Often the
+current (last) value of the parameter will be substituted, or a
+dynamic value is suggested depending on the values of other
+parameters.
+
+Current values of CONVERT parameters are stored in the HDS file
+ADAM_USER:CONVERT.SDF for ICL CONVERT, and ADAM_USER:application.SDF
+for the DCL commands.  These enable the defaults to persist between
+CONVERT sessions.  These files should not be deleted unless CONVERT
+parameters are to be completely reset. 
+
+2 Globals
+CONVERT uses the KAPPA global parameter that records the last NDF
+accessed or created, in order to reduce typing in response to
+prompts.  Global means that it is  shared between applications. 
+Thus the suggested input NDF for NDF2x applications is the value of
+that global parameter.  If you just press <CR> to the prompt for an
+input NDF, the global value is unchanged.  Only when you modify the
+parameter and the application completes without error is the global
+value updated, and so becomes the suggested default value for the
+next prompt for an NDF.  Similarly an x2NDF application updates the
+global parameter with the name of the NDF it has just made.
+
+All global parameters are stored in HDS file ADAM_USER:GLOBAL.SDF.
+
+2 Abort and Null
+Responding to a prompt with a null value ! will not necessarily
+cause the application to abort, but it can force a suitable default
+to be used, where this is the most-sensible action.
+
+Responding to a prompt with an abort request !! will abort the
+application.  This process includes the various tidying operations
+such as the unmapping and closing of files.  Any other method of
+stopping an application prematurely can leave files mapped or
+corrupted. 
+
+2 Help
+To get help about a parameter enter ?.  This will give access to the
+help-library information for that parameter, for example,
+ 
+     TYPE - Interim data type required /'R'/ > ?
+
+     NDF2BDF
+
+       Parameters
+
+         TYPE = LITERAL (Read)
+            The data type of the output BDF.  It must be one of the
+            following Interim types: "SB", "SW", "R", "SL", "DP", "UB",
+            "UW" corresponding to signed byte, signed word, real, signed
+            longword, double precision, unsigned byte, unsigned word.
+            See SUN/4 for further details.  The default is the type
+            corresponding to that of the NDF.  []
+
+     TYPE - Interim data type required /'R'/ >
+ 
+and then immediately reprompt you for the parameter.  There are
+occasions when information about the parameter is insufficient; you
+may require to examine the examples or the description of related
+parameters.  This can be achieved via entering ?? to the prompt.
+You can then delve anywhere in the help information.  When you exit
+the help system you're reprompted for the parameter.
+
+2 Menus
+Some CONVERT parameters are menus from which you select an option.
+You do not have to enter the full option string, but merely a string
+that selects a choice unambiguously.  In many cases this can be as
+little as a single character.  Here is an example:
+
+     TYPE - HDS data type required for NDF /'_REAL'/ ?
+
+     NDF2BDF
+
+       Parameters
+
+         TYPE = LITERAL (Read)
+            The data type of the output NDF.  It must be one of the
+            following HDS types: "_BYTE", "_WORD", "_REAL", "_INTEGER",
+            "_DOUBLE", "_UBYTE", "_UWORD" corresponding to signed byte,
+            signed word, real, integer, double precision, unsigned byte,
+            and unsigned word.  See SUN/92 for further details.  An
+            unambiguous abbreviation may be given.  The default is the
+            type corresponding to that of the BDF.  []
+ 
+where a _R would be sufficient to select the _REAL type, but at
+least two characters would be needed if you wanted unsigned byte
+or unsigned word.
+
+2 Logical names
+From DCL, ordinary process logical names may be used as normal.
+However, logical names to be used by applications (including CONVERT)
+from within ICL must be defined with the /JOB qualifier. Thus if
+your NDF data files are stored in IMAGEDIR alias
+DISK$USER1:[XYZ.IRCAM.IMAGES]
+ 
+    $ DEFINE/JOB IMAGEDIR DISK$USER1:[XYZ.IRCAM.IMAGES]
+ 
+will enable you to respond to a prompt thus
+ 
+     IN - NDF to be converted /@starfield/ > imagedir:ngc1365
+ 
+Regrettably, at present ICL cannot change default directories for
+CONVERT.  The DEFAULT command only applies to ICL and the DCL
+process. Therefore, if you need to access files in several
+directories with the minimum of typing, you should define some job
+logical names as described above.  If you require many then you will
+need your JTQUOTA increased.  See your site manager if you run into
+difficulties.  It is advisable to set default to the directory
+containing your data files before entering ICL.
+
+2 Specifying_Parameter_Values_on_Command_Lines
+Parameters may be assigned values on the command line. This is
+useful for running CONVERT in batch mode and in procedures, and for
+specifying the values of parameters that would otherwise be
+defaulted. A command-line parameter will prevent prompting for that
+parameter unless there is an error with the given value, say giving
+an alphabetic character string where a floating-point value is
+demanded.
+
+There are two ways in which parameter values may be given on the
+command line: by keyword and by position. The two forms may be mixed
+with care. The parser looks for positional parameters then keywords,
+so you can have some positional values followed by keyword values.
+See some of the "Examples" sub-topics presented in help on individual
+applications.
+
+Keywords may appear in any order.  Here is an example of
+command-line defaults using keywords: 
+ 
+     ICL> BDF2NDF DESCRIP TYPE=_REAL MYZNDF
+ 
+TYPE is a literal parameter.  DESCRIP is a logical parameter; by giving
+just its name it is given the value TRUE.  DESCRIP=T would
+have the same effect.  To obtain a false value for a logical parameter
+you add a NO prefix to keyword, for example,
+ 
+     ICL> BDF2NDF NODESCRIP 
+ 
+would be equivalent to DESCRIP=F.
+
+Alternatively, you can specify command-line values by position:
+ 
+     $ DST2NDF MYDST MYNDF
+ 
+The application converts the Figaro DST file called MYDST.DST to the
+NDF called MYNDF.  Note trailing parameters may missed but
+intermediate ones may not. The position of a parameter can be found
+in the "Usage" topic for the application.
+
+Another consideration is that some parameters do not have defined
+positions because they are normally defaulted. Thus the keyword
+technique is recommended for most parameters.
+
+2 Special Keywords:_ACCEPT,_PROMPT,_RESET
+Another way in which prompts and default values can be controlled is
+by use of the keywords ACCEPT, PROMPT and RESET.
+
+The RESET keyword causes the default value of all parameters (apart
+from those already specified before it on the command line) to be
+set to the original values specified by the application or its
+interface file.  In other words global and current values are
+ignored.
+
+The PROMPT keyword forces a prompt to appear for every application
+parameter.  This can be useful if you cannot remember the name of a
+defaulted parameter or there would be too much to type on the
+command line.  
+
+The ACCEPT keyword forces the parameter system to accept the
+suggested default values for every application parameter.  In other
+words, those parameters which would normally be prompted with a
+value between `/ /' delimeters take the value between those
+delimiters.  Parameters that are normally defaulted behave as
+normal.  The ACCEPT keyword needs to be used with care because not
+every parameter has a default, and therefore must be given on the
+command line for the application to work properly. 
+
+There is a shorthand for ACCEPT---a backslash at the end of the
+command line.  For example,
+
+     $ dipso2ndf \
+ 
+though this is not a particularly useful it this case.
