@@ -57,6 +57,9 @@
 *    External references :
 *    Global variables :
 *    Local Constants :
+      INTEGER BOUNDARY                     ! Number of bytes used for
+      PARAMETER (BOUNDARY = VAL__NBD)      ! sentinel integers. Also the 
+                                           ! alignment size for data
 *    Local variables :
 *    Internal References :
 *    Local data :
@@ -73,22 +76,24 @@
       ELSE
 
 
-*  Make sure data ends on 4 byte boundary (problems with BYTE allocs)
-*  This is because of the CFILLI used for the sentinel number
+*     Make sure data ends on 4 byte boundary (problems with BYTE allocs)
+*     This is because of the CFILLI used for the sentinel number
+*     The Alpha wants 8byte boundaries for DOUBLE arrays so use VAL__NBD
+*     even though this is overkill for all the other smaller arrays.
 
-         IF (MOD(SIZE, VAL__NBI) .NE. 0) THEN
-            SIZE = SIZE + (VAL__NBI - MOD(SIZE, VAL__NBI))
+         IF (MOD(SIZE, BOUNDARY) .NE. 0) THEN
+            SIZE = SIZE + (BOUNDARY - MOD(SIZE, BOUNDARY))
          END IF
 
 *  get memory
-         CALL PSX_MALLOC (SIZE + 2 * VAL__NBI, START_PTR, STATUS)
+         CALL PSX_MALLOC (SIZE + 2 * BOUNDARY, START_PTR, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
-            START_PTR = START_PTR + VAL__NBI
+            START_PTR = START_PTR + BOUNDARY
             END_PTR = START_PTR + SIZE - 1
 
 *  set sentinel integers
-            CALL SCULIB_CFILLI (1, 37, %val(START_PTR - VAL__NBI))
+            CALL SCULIB_CFILLI (1, 37, %val(START_PTR - BOUNDARY))
             CALL SCULIB_CFILLI (1, 37, %val(END_PTR + 1))
          ELSE
             START_PTR = 0
