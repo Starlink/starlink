@@ -37,7 +37,7 @@ for s in "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
 do
     test -n "$s" && STARCONF_DEFAULT_STARLINK=$s && break
 done
-if expr $STARCONF_DEFAULT_STARLINK : '.*/$'; then
+if expr $STARCONF_DEFAULT_STARLINK : '.*/$' >/dev/null; then
     echo "STARCONF_DEFAULT_STARLINK=$STARCONF_DEFAULT_STARLINK has trailing slash" >&2
     exit 1
 fi
@@ -58,7 +58,7 @@ for s in "$STARCONF_DEFAULT_PREFIX" "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /st
 do
     test -n "$s" && STARCONF_DEFAULT_PREFIX="$s" && break
 done
-if expr $STARCONF_DEFAULT_PREFIX : '.*/$'; then
+if expr $STARCONF_DEFAULT_PREFIX : '.*/$' >/dev/null; then
     echo "STARCONF_DEFAULT_PREFIX=$STARCONF_DEFAULT_PREFIX has trailing slash" >&2
     exit 1
 fi
