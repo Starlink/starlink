@@ -683,6 +683,17 @@ AST__RDERR()
   RETVAL
 
 StatusType
+AST__REGIN()
+ CODE:
+#ifdef AST__REGIN
+    RETVAL = AST__REGIN;
+#else
+    Perl_croak(aTHX_ "Constant AST__REGIN not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
 AST__REMIN()
  CODE:
 #ifdef AST__REMIN
@@ -1250,6 +1261,39 @@ AST__ZERAX()
     RETVAL = AST__ZERAX;
 #else
     Perl_croak(aTHX_ "Constant AST__ZERAX not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__BADOC()
+ CODE:
+#ifdef AST__BADOC
+    RETVAL = AST__BADOC;
+#else
+    Perl_croak(aTHX_ "Constant AST__BADOC not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MPGER()
+ CODE:
+#ifdef AST__MPGER
+    RETVAL = AST__MPGER;
+#else
+    Perl_croak(aTHX_ "Constant AST__MPGER not defined\n");
+#endif
+ OUTPUT:
+  RETVAL
+
+StatusType
+AST__MPIND()
+ CODE:
+#ifdef AST__MPIND
+    RETVAL = AST__MPIND;
+#else
+    Perl_croak(aTHX_ "Constant AST__MPIND not defined\n");
 #endif
  OUTPUT:
   RETVAL
