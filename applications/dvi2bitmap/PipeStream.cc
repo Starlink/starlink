@@ -50,6 +50,7 @@
 #endif
 
 #if HAVE_SIGNAL_H
+// <csignal> is odd -- I don't understand what's there and what's not
 #  include <signal.h>
 #endif
 
@@ -70,19 +71,29 @@ using std::cerr;
 
 #include <stringstream.h>
 
-	
+/**
+ * Takes care of the signal handling necessary for the functions in
+ * the {@link PipeStream} class.  If your application for whatever
+ * reason has to catch <code>SIGCHLD</code>, then to avoid interference
+ * between these, you should do so using functions {@link
+ * #expectAnother} and {@link #got_status}.  These two functions are the 
+ * only `public' API in this namespace.
+ */	
 namespace PipeStreamSignalHandling {
     /* Handle SIGCHLDs by maintaining a set of pid/caught-status pairs. */
     struct process_status {
 	sig_atomic_t pid;
 	sig_atomic_t status;
+	process_status() : pid(0), status(-1) { }
+	void clear() { pid=0; status=-1; }
     };
     struct process_status* procs = 0; // initial value triggers initialisation
-    sig_atomic_t nprocs = 8;	// max no of children we can wait for
-    sig_atomic_t nprocs_used = 0;
+    sig_atomic_t nprocs;	// max no of children we can wait for
+    sig_atomic_t nprocs_used;	// number of slots used
     bool got_status(pid_t pid, int* status);
-    bool init();
+    void expectAnother() throw (InputByteStreamError);
     extern "C" void childcatcher(int);
+    extern "C" void alarmcatcher(int);
 };
 
 
@@ -129,8 +140,7 @@ PipeStream::PipeStream (string cmd, string envs)
      * Implementation here follows useful example in
      * <http://www.erack.de/download/pipe-fork.c> 
      */
-    if (! PipeStreamSignalHandling::init())
-	throw new DviError("PipeStream: can't initialise signal handling, or too many running children");
+    PipeStreamSignalHandling::expectAnother();
 
     int fd[2];
 
@@ -412,15 +422,29 @@ int PipeStream::getTerminationStatus(void)
  * <http://www.cs.wustl.edu/~schmidt/signal-patterns.html>
  */
 
-bool PipeStreamSignalHandling::init()
+/**
+ * Note that we expect to start another child.  This function must
+ * be called before doing each <code>fork()</code>, as it does the
+ * initialisation of the structures used by this set of functions, and
+ * subsequently ensures that there is enough space in the list of
+ * statuses to hold another one.
+ *
+ * @throws InputByteStreamError if we can't do this for some reason
+ */
+void PipeStreamSignalHandling::expectAnother()
+    throw (InputByteStreamError)
 {
+    sigset_t chld, oldmask;
+    sigemptyset(&chld);
+    sigaddset(&chld, SIGCHLD);
+    if (sigprocmask(SIG_BLOCK, &chld, &oldmask) < 0)
+	throw InputByteStreamError("Can't set signal mask");
+    
     if (procs == 0) {
 	// first time
+	nprocs = 8;
+	nprocs_used = 0;
 	procs = new struct process_status[nprocs];
-	for (int i=0; i<nprocs; i++) {
-	    procs[i].pid = 0;
-	    procs[i].status = -1; // sentinel value
-	}
 
 	struct sigaction sa_chld;
 	sa_chld.sa_handler = &PipeStreamSignalHandling::childcatcher;
@@ -431,10 +455,10 @@ bool PipeStreamSignalHandling::init()
 	sa_chld.sa_flags = 0;
 #endif
 	if (sigaction(SIGCHLD, &sa_chld, 0) < 0)
-	    return false;
+	    throw new InputByteStreamError("Can't install CHLD handler");
 
 	struct sigaction sa_alrm;
-	sa_alrm.sa_handler = &PipeStreamSignalHandling::childcatcher;
+	sa_alrm.sa_handler = &PipeStreamSignalHandling::alarmcatcher;
 	sigemptyset(&sa_alrm.sa_mask);
 #ifdef SA_INTERRUPT
 	sa_alrm.sa_flags = SA_INTERRUPT; // some SunOS
@@ -442,18 +466,26 @@ bool PipeStreamSignalHandling::init()
 	sa_alrm.sa_flags = 0;
 #endif
 	if (sigaction(SIGALRM, &sa_alrm, 0) < 0)
-	    return false;
+	    throw new InputByteStreamError("Can't install ALRM handler");
+
+    } else if (nprocs_used >= nprocs-1) {
+	int newnprocs = nprocs * 2;
+	struct process_status* newprocs = new struct process_status[nprocs];
+	for (int i=0; i<nprocs; i++)
+	    newprocs[i] = procs[i];
+	nprocs = newnprocs;
+	delete[] procs;
+	procs = newprocs;
     }
-    if (nprocs_used >= nprocs)
-	return false;
-    else
-	return true;
+    if (sigprocmask(SIG_SETMASK, &oldmask, 0) < 0)
+	throw InputByteStreamError("Can't reset set signal mask");
 }
 
 /**
  * Checks to see if the given process has exited.  If there's an entry
  * for this PID in the list, then put the corresponding status in the
- * <code>status</code> parameter, and return true.
+ * <code>status</code> parameter, and return true.  If not, return false; 
+ * <code>*status</code> is then unchanged.
  *
  * @param pid the PID to check
  * @param status a pointer to the status to be returned
@@ -467,7 +499,7 @@ bool PipeStreamSignalHandling::got_status(pid_t pid, int* status)
 	if (procs[i].pid == pid) {
 	    // found a slot with the required PID in it
 	    *status = static_cast<int>(procs[i].status);
-	    procs[i].pid = 0;	// clear the slot
+	    procs[i].clear();
 	    nprocs_used--;
 	    return true;
 	}
@@ -477,30 +509,25 @@ bool PipeStreamSignalHandling::got_status(pid_t pid, int* status)
 
 void PipeStreamSignalHandling::childcatcher(int signum)
 {
-    switch (signum) {
-      case SIGCHLD:
-	{
-	    int i;
-	    int status;
-	    pid_t caughtpid = waitpid(0, &status, 0);
-	    for (i=0; i<nprocs; i++) {
-		if (procs[i].pid == 0) { // free slot
-		    procs[i].pid = static_cast<sig_atomic_t>(caughtpid);
-		    procs[i].status = static_cast<sig_atomic_t>(status);
-		    nprocs_used++;
-		}
-	    }
-	    // If i=nprocs, then there's no space to store this signal.
-	    // Nothing much we can do -- but at least it isn't a zombie.
+    assert(signum == SIGCHLD);
+
+    int i;
+    int status;
+    pid_t caughtpid = waitpid(0, &status, 0);
+    for (i=0; i<nprocs; i++) {
+	if (procs[i].pid == 0) { // free slot
+	    procs[i].pid = static_cast<sig_atomic_t>(caughtpid);
+	    procs[i].status = static_cast<sig_atomic_t>(status);
+	    nprocs_used++;
 	}
-	break;
-
-      case SIGALRM:
-	// nothing to do
-	break;
-
-      default:
-	assert(false);
-	break;
     }
+    // If i=nprocs, then there's no space to store this signal.
+    // Nothing much we can do -- but at least it isn't a zombie.
+    return;
 }
+void PipeStreamSignalHandling::alarmcatcher(int signum)
+{
+    assert(signum == SIGALRM);
+    return;			// nothing to do
+}
+
