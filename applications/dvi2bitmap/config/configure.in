@@ -63,7 +63,7 @@ AC_ARG_ENABLE(texmfcnf,
   T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"))
 
-dnl   --enable-mktexpk
+dnl   --enable-mktexpk.  See also --enable-fontgen
 AC_PATH_PROG(MKTEXPK_PATH, mktexpk)
 AC_ARG_ENABLE(mktexpk,
 [  --enable-mktexpk[=prog] Enable mktexpk (default), giving optional program],
@@ -90,12 +90,29 @@ AC_ARG_ENABLE(maketexpk,
 dnl   Do we want to use the fake_progname feature in kpathsea.cc?
 AC_PATH_PROG(XDVI_PATH, xdvi)
 AC_ARG_ENABLE(fake-progname,
-[  --enable-fake-progname[=prog] Have dvi2bitmap lie about its name],
+[  --enable-fake-progname[=prog]
+                          Have dvi2bitmap lie about its name],
   if test "$enableval" = "yes"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${XDVI_PATH}")
   elif test "$enableval" != "no"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${enableval}")
   fi)
+
+dnl   Do we enable automatic font-generation?
+AC_ARG_ENABLE(fontgen,
+[  --enable-fontgen[=mode,res]
+                          Enable automatic font gen., opt. giving mode,res],
+  if test "$enableval" = "yes"
+    then AC_DEFINE(ENABLE_FONT_GEN,1)
+  elif test "$enableval" = "no"
+    then AC_DEFINE(ENABLE_FONT_GEN,0)
+  else
+    [eval `echo $enableval | awk -F, '{printf "GENMODE=%s GENRES=%s",$1,$2}'`]
+    AC_DEFINE(ENABLE_FONT_GEN,1)
+    AC_DEFINE_UNQUOTED(DEFAULT_MFMODE,"$GENMODE")
+    test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,"$GENRES")
+  fi,
+  AC_DEFINE(ENABLE_FONT_GEN,1))
 
 dnl   Specify support for Kpathsea library
 AC_SUBST(KPATHSEAOBJ)
