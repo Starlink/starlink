@@ -160,7 +160,7 @@
 *        On exit this holds the total length in pixels of the contours at each 
 *        selected height.  These values are only computed when parameter STATS 
 *        is TRUE.
-*     MARGIN( 4 ) = _REAL (Write)
+*     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the contour map for axis 
 *        annotation. The widths should be given as fractions of the 
 *        corresponding dimension of the DATA picture. 

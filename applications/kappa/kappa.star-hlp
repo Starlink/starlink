@@ -5520,7 +5520,7 @@ LENGTH() = _REAL (Write)
    selected height.  These values are only computed when parameter STATS
    is TRUE.
 3 MARGIN
-MARGIN( 4 ) = _REAL (Write)
+MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the contour map for axis
    annotation. The widths should be given as fractions of the
    corresponding dimension of the DATA picture.
@@ -7964,7 +7964,7 @@ LUT = NDF (Read)
    controlled by parameter NN.  Also the LUT's values must lie in
    the range 0.0--1.0. [!]
 3 MARGIN
-MARGIN( 4 ) = _REAL (Write)
+MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave around the image for axis
    annotations, given as fractions of the corresponding dimension
    of the DATA picture. The actual margins used may be increased to
@@ -16373,7 +16373,7 @@ KEYSTYLE = LITERAL (Read)
    attributes. Any unrecognised attributes are ignored (no error is
    reported). [current value]
 3 MARGIN
-MARGIN(4) = _REAL (Read)
+MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
    as fractions of the corresponding dimension of the DATA picture.
    Four values may be given, in the order - bottom, right, top, left.
