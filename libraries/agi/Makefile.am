@@ -82,5 +82,5 @@ BUILT_SOURCES = AGI_ERR
 TESTS = agi_test
 check_PROGRAMS = agi_test
 
-agi_test_SOURCES = agi_test.fpp
+agi_test_SOURCES = agi_test.F
 agi_test_LDADD = libagi.la `ref_link` `trn_link` `sgs_link` `pgp_link` `idi_link`
