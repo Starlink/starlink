@@ -198,8 +198,9 @@ by BibTeX.
   (let* ((kids (select-by-class (descendants (document-element)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
 	 ;;(bibelement (select-elements kids (normalize "bibliography")))
-	 (bibname (attribute-string (normalize "bibliography")
-				    (getdocbody 'backmatter)))
+	 (bm (getdocbody 'backmatter))
+	 (bibname (and bm
+		       (attribute-string (normalize "bibliography") bm)))
 	 )
     (if (node-list-empty? citations)
 	(empty-sosofo)
