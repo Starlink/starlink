@@ -1,0 +1,23 @@
+1 ONE_Version_1.0
+
+   The Odds and Ends Library (V1.0) is now released. The full specification
+   can be found in sun234.1.
+
+   This Library is a set of Fortran and C routines of a general nature and
+   usefulness, which are not suitable for inclusion in any other more focussed
+   libraries.
+
+   This first release contains the following routines:
+
+   - ONE_EXEC: A Fortran callable routine written in C to access the UNIX
+   system command.
+
+   - ONE_FIND_FILE: Fortran callable routine written in C to find the next file
+   in a list, specified by a file specification including wild card characters.
+
+   - ONE_FIND_FILE_END: Fortran callable routine written in C to end a sequence
+   of calls to ONE_FIND_FILE.
+
+   - ONE_SCRSZ: Fortran callable routine written in C to find the width and
+   height of the terminal output screen.
+
