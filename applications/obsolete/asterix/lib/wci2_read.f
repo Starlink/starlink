@@ -373,7 +373,7 @@
       END IF
       CALL ADI_CPUTID( OARG, 'Proj', PRJID, STATUS )
       CALL ADI_CPUTID( OARG, 'Sys', SYSID, STATUS )
-	call adi_print(oarg,status)
+
 *  Release primary HDU
       CALL ADI_ERASE( PHDU, STATUS )
 
