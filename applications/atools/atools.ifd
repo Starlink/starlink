@@ -4,6 +4,26 @@ package atools {
 
    executable atools_mon {
             
+      action astcopy {
+         helplib {$ATOOLS_HELP}
+         parameter result {
+            position 2
+            type LITERAL
+            prompt {The output Object}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Object}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+      }
+
       action astpolymap {
          helplib {$ATOOLS_HELP}
 
