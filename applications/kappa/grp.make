@@ -7,7 +7,12 @@
 
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kappa_ifls kappa_source kappa_sub kapsub_sub \
-kapview_sub ndfpack_sub kappa_iraf kappa_ccdpack kappa_data
+kapview_sub ndfpack_sub kappa_iraf kappa_ccdpack kappa_data \
+kappa_atools 
+
+# The contents of the kappa_atools.tar file:
+KAPPA_ATOOLS = atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
+atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
 
 # The contents of the kappa_ccdpack.tar file:
 KAPPA_CCDPACK = ccd1_orvar.f ccd1_par ccg1_bmd1d.f ccg1_bmd3d.f \
@@ -275,9 +280,7 @@ kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f kps1_ltaba.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_look.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f \
-kps1_msa.f kps1_mss.f \
-atl1_creat.f  atl1_gtobj.f  atl1_rdfch.f \
-atl1_gtgrp.f  atl1_rdch.f   atl1_rdgrp.f
+kps1_msa.f kps1_mss.f 
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
@@ -320,7 +323,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(KAPPA_DATA) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) \
-$(KAPPA_CCDPACK) $(KAPVIEW_SUB) $(NDFPACK_SUB) $(OTHER_HELPS)
+$(KAPPA_CCDPACK) $(KAPPA_ATOOLS) $(KAPVIEW_SUB) $(NDFPACK_SUB) $(OTHER_HELPS)
 
 #  The contents of kappa.tar.
 UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
@@ -328,7 +331,7 @@ sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps sun95_gd5.eps sun95_gd9.eps \
 sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps sun95_ardwork.eps sun95.htx_tar \
 sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
 kappa_sub.tar \
-kapsub_sub.tar kappa_ccdpack.tar \
+kapsub_sub.tar kappa_ccdpack.tar kappa_atools.tar \
 kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data.tar sun221.tex sun221.htx_tar kappa_iraf.tar
 

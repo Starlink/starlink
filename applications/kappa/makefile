@@ -446,9 +446,9 @@ PKG_VERS = 0.19
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-               kappa_sub.tar kapsub_sub.tar kappa_ccdpack.tar kapview_sub.tar \
-               ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
-               $(PKG_NAME)_data.tar
+               kappa_sub.tar kapsub_sub.tar kappa_ccdpack.tar kappa_atools.tar \
+               kapview_sub.tar ndfpack_sub.tar $(PKG_NAME)_ifls.tar \
+               $(PKG_NAME)_iraf.tar $(PKG_NAME)_data.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -483,10 +483,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = $(I_KAPPA) $(I_CCDPACK)
+PRIVATE_INCLUDES = $(I_KAPPA) $(I_CCDPACK) $(I_ATOOLS)
 
 I_KAPPA = c1_com me_com sft_com grecom.inc grerr 
 I_CCDPACK = ccd1_par
+I_ATOOLS = 
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -505,7 +506,7 @@ EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines and the main routine, which are treated separately).
 
-F_ROUTINES = $(CCDPACK_F_ROUTINES) \
+F_ROUTINES = $(CCDPACK_F_ROUTINES) $(ATOOLS_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPPA_F2_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
              $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) \
@@ -560,6 +561,10 @@ listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
 #  kappa routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
 KAPPA_F_ROUTINES = $(KAPPA_F1_ROUTINES) $(KAPPA_F3_ROUTINES)
+
+ATOOLS_F_ROUTINES = \
+atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
+atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
 
 CCDPACK_F_ROUTINES = \
 ccd1_orvar.f ccg1_bmd1d.f ccg1_bmd3d.f ccg1_bmr1r.f ccg1_bmr3r.f \
@@ -662,9 +667,7 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
 kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
 kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f \
-kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f \
-atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
-atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
+kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f 
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -972,6 +975,11 @@ $(I_CCDPACK) $(CCDPACK_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
+$(I_ATOOLS) $(ATOOLS_F_ROUTINES) :
+	$(TAR_OUT) kappa_atools.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
 $(KAPVIEW_F_ROUTINES) :
 	$(TAR_OUT) kapview_sub.tar $@
 	@ if test -f $@; then :;\
@@ -1015,11 +1023,13 @@ $(IRAF_DEMO) :
 #  for performing the compilations.
 
 OBJECT_FILES = $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(CCDPACK_OBJECT_FILES) \
-               $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
+               $(ATOOLS_OBJECT_FILES) $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(KAPPA_F2_ROUTINES:.f=.o) $(MEM_F_ROUTINES:.f=.o)
 
 KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o) $(KAPSUB_C_ROUTINES:.c=.o)
+
+ATOOLS_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
 
 CCDPACK_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
 
@@ -1037,7 +1047,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 #  them.
 
 OBJECT_LIBRARIES = \
-libkappa.a libkapview.a libndfpack.a libkapsub.a libccdpack.a
+libkappa.a libkapview.a libndfpack.a libkapsub.a libccdpack.a libatools.a
 
 #
 libkappa.a: $(KAPPA_OBJECT_FILES)
@@ -1049,6 +1059,10 @@ libkapsub.a: $(KAPSUB_OBJECT_FILES)
 	$(RANLIB) $@
 #
 libccdpack.a: $(CCDPACK_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libatools.a: $(ATOOLS_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1161,7 +1175,7 @@ $(INSTALL_DIRS):
 #  created and updated(?).
 
 archive: $(PKG_NAME)_source.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-         ndfpack_sub.tar $(PKG_NAME)_ifls.tar kappa_ccdpack.tar \
+         ndfpack_sub.tar $(PKG_NAME)_ifls.tar kappa_ccdpack.tar kappa_atools.tar \
          $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
 #
 	@ echo "   Build of the $(PACK_NAME) tar files is complete."
@@ -2190,6 +2204,9 @@ kapsub_sub.tar:
 
 kappa_ccdpack.tar:
 	$(TAR_IN) kappa_ccdpack.tar $(CCDPACK_F_ROUTINES) $(I_CCDPACK)
+
+kappa_atools.tar:
+	$(TAR_IN) kappa_atools.tar $(ATOOLS_F_ROUTINES) $(I_ATOOLS)
 
 kapview_sub.tar:
 	$(TAR_IN) kapview_sub.tar $(KAPVIEW_F_ROUTINES)
