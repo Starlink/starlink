@@ -2,7 +2,7 @@
      :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, 
      :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, 
      :     B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR,
-     :     B_ERROR, SIGMA, STATUS)
+     :     B_ERROR, RESIDUAL, SIGMA, STATUS)
 *+
 *  Name:
 *     SCULIB_FIT_SKYDIP
@@ -17,7 +17,7 @@
 *     CALL SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, J_MEASURED,
 *    :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
 *    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-*    :  REXISQ, STATUS)
+*    :  REXISQ, TAU_ERROR, ETA_ERROR, B_ERROR, RESIDUAL, SIGMA, STATUS)
 
 *  Description:
 *     This routine fits a sub-instrument's measurements of the sky 
@@ -106,6 +106,8 @@
 *              error in eta_tel
 *     B_ERROR                   = REAL (Returned)
 *              error in B
+*     RESIDUAL                  = DOUBLE (Returned)
+*              Absolute difference between the model and the fit.
 *     SIGMA                     = DOUBLE (Returned)
 *              standard deviation of the difference between the
 *              model and the fit.
@@ -131,6 +133,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.19  2000/05/11 20:00:27  timj
+*     Handle RESIDUAL
+*
 *     Revision 1.18  1999/08/19 03:37:11  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -214,6 +219,7 @@
       REAL    B_FIT
       REAL    TAUZ_FIT
       REAL    ETA_TEL_FIT
+      DOUBLE PRECISION RESIDUAL      ! Residual of fit
       REAL             REXISQ        ! Reduced chi square
       DOUBLE PRECISION SIGMA
       REAL    B_ERROR
@@ -473,6 +479,7 @@
             TAU_ERROR = VAL__BADR
             ETA_ERROR = VAL__BADR
             SIGMA = VAL__BADD
+            RESIDUAL = VAL__BADD
 
          ELSE
 
@@ -481,8 +488,8 @@
 
 * First we need a more realistic estimate of the data variance
 
-            CALL SCULIB_SKYDIP_VAR(VAR, N_MEASUREMENTS, FIT,
-     :           NDEG, STATUS)
+            CALL SCULIB_SKYDIP_VAR(RESIDUAL, VAR, N_MEASUREMENTS,
+     :           FIT, NDEG, STATUS)
 
 *  Calculate the std deviation of the scatter about the fit
 
@@ -600,6 +607,11 @@
 
             CALL MSG_SETC ('SIGBUFFER', SIGBUFFER)
             CALL MSG_OUTIF (MSG__NORM,' ', ' ^SIGBUFFER', STATUS)
+
+*     Write out the residual
+            CALL MSG_SETR('RES', REAL(RESIDUAL))
+            CALL MSG_OUTIF(MSG__NORM, ' ', ' Residual of fit: ^RES K',
+     :           STATUS)
 
          END IF
       END IF
