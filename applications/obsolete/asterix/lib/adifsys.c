@@ -502,7 +502,7 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
         if ( ! icp ) fjcp = jcp;
 
 /*   Create instance of class */
-        adix_newn( ADI__nullid, NULL, 0, cls, jcp-icp, 0, NULL,
+        adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
 		   &newid, status );
 
 /*   Try to link them */
