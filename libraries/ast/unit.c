@@ -2722,7 +2722,8 @@ static AstMapping *MakeMapping( UnitNode *tree ) {
 /* Create the MathMap. */
             result = (AstMapping *) astMathMap( 1, 1, 1, 
                                                 (const char **) &fwdfun, 1, 
-                                                (const char **) &invfun, "" );
+                                                (const char **) &invfun, 
+                                                "SimpFI=1,SimpIF=1" );
          }
 
 /* Free resources. */
