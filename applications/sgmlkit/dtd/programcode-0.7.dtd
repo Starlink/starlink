@@ -104,10 +104,57 @@
         "language NOTATION (%notationlist;) #IMPLIED">
 
 <!-- Just for convenience, also define &lt, &gt and &amp entities -->
+<!--
 <!ENTITY lt "<">
 <!ENTITY gt ">">
 <!ENTITY amp "&">
 <!ENTITY quot '"'>
+-->
+
+<!--========== Entities for special symbols ==========-->
+<!ENTITY % LaTeX.entities 'IGNORE'>
+<!ENTITY % HTML.entities 'IGNORE'>
+
+<!ENTITY % Full.SGML.Only 'INCLUDE'>
+
+<![ %Full.SGML.Only; [
+<![ %LaTeX.entities; [
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"
+	>
+]]>
+<![ %HTML.entities; [
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"
+	>
+]]>
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN"
+	>
+<!ENTITY % ISOents
+	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"
+	>
+]]>
+
+<!-- Finally, the XML versions -->
+<!ENTITY % ISOents
+	PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//Unicode"
+	"ISOent/xml/iso-lat1.ent"
+	>
+<!-- Most of these `additional' entities are selections from the ISO set. -->
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//Unicode"
+	"entities-unicode.ent"
+	>
+
+%Additional.Char.Ents;
+%ISOents;
 
 <!-- Language notations are declared here.  The DTDs which INCLUDE
      this one may declare attributes to these notations (for example, the
