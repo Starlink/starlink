@@ -1,4 +1,4 @@
-#!/star/bin/ndfperl 
+#!/star/bin/ndfperl
 #
 #  This program requires the NDF module and ndfperl.
 #  This program will run as long as ndfperl exists in /star/bin
@@ -8,6 +8,8 @@
 #  Produce journal of scuba observations
 #
 
+use Carp;
+use sigtrap qw/stack-trace normal-signals error-signals/;
 use NDF;
 
 # Safe way to get current working directory
@@ -65,13 +67,13 @@ also
   Where nn is an integer and 'obs' is a comma delimited list of obsmodes.
   Use 'showme sun216' or 'scuhelp sculog' for more information.
 Author:
-  Tim Jenness (timj\@jach.hawaii.edu)
+  Tim Jenness (t.jenness\@jach.hawaii.edu)
 
 /;
     exit;
 };
 
-sub bydatakeys {$datakeys[$a] <=> $datakeys[$b]; }
+# sub bydatakeys {$datakeys[$a] <=> $datakeys[$b]; }
 
 # CWD
 
@@ -93,6 +95,7 @@ if ($prog =~ /photsum|mapsum|pointsum|skysum/) {
 }
 
 # Set up mode filter
+$whichmode = '';
 if ($prog eq "photsum") {
   $whichmode = "photom,skydip,polphot";
 } elsif ($prog eq "mapsum") {
@@ -147,315 +150,383 @@ push(@dirlist,$ENV{'DATADIR'}) if defined $ENV{'DATADIR'};
 #   1) Range
 #   2) Whether we are selecting demodulated
 #   3) Whether we want reduced
-# Modify the pattern match accordingly
+# Modify the pattern match accordingly and then include the .sdf pattern at the end
 
-$pattern = ".*";
-$pattern = "_dem_" if $demod;
-$pattern = "_red_" if $reduced;
-$pattern = "_(red|dem)_" if ($reduced & $demod); # Yes this is a kludge
+if ($reduced & $demod) {
+  $pattern = q/_(red|dem)_\d+\.sdf$/;
+} elsif ($reduced) {
+  $pattern = q/_red_\d+\.sdf$/;
+} elsif ($demod) {
+  $pattern = q/_dem_\d+\.sdf$/;
+} else {
+  $pattern = q/\.sdf$/;
+}
+ 
+#$pattern = ".*\.sdf$";
+#$pattern = "_dem_" if $demod;
+#$pattern = "_red_" if $reduced;
+#$pattern = "_(red|dem)_" if ($reduced & $demod); # Yes this is a kludge
 
  
-@datalis = ();
-%location = ();
- 
-foreach $ddir (@dirlist) {
- 
-    $current_size = ($#datalis > -1 ? $#datalis : -1);
+%files = ();
 
-    opendir(DATADIR,"$ddir");
-    # I like this line :-)
-    # Get all the sdf files and remove the trailing .sdf
-    push(@datalis,grep(s/\.sdf$//, readdir(DATADIR)));
-    closedir(DATADIR);
+# Loop over all specified directories
+DIRS: foreach my $ddir (@dirlist) {
 
-    # Now see if we need to drop files (ie if $demod)
-    @datalis = grep(/$pattern/,@datalis);
+  # Open the directory
+  opendir (DATADIR, $ddir) ||
+    do { print "WARNING: unable to read directory $ddir\n"; next DIRS};
 
-    # Associate each file with a directory
-    for ($i = $current_size + 1; $i <= $#datalis; $i++) {
-      $location{$datalis[$i]} = $ddir;
+  # Loop over all the files in the directory looking for .sdf files
+  FILES: foreach my $file (readdir(DATADIR)) {
+
+    # First check that it matches the required pattern
+    if ($file =~ /$pattern/) {
+      # Remove the suffix
+      $file =~ s/\.sdf$//;
+
+      # Now split the filename into bits based on an '_';
+      my @bits = split('_', $file);
+
+      # If bits only has one part then we had a problem
+      if ($#bits == 0) {
+	# Try matching as non-number and number
+	if ( $file =~ /(\D+)(\d+$ )/ ) { 
+	  $bits[0] = $1; 
+	  $bits[1] = $2; 
+	} else {
+	  # No match so just use a default
+	  $bits[0] =  0;  # UTdate 0
+	  $bits[1] =  0;  # ObsNum 0
+	}
+      }
+
+      # Check range of number
+      next FILES unless (($bits[-1] >= $start) && ($bits[-1] <= $stop));
+
+      # Now store the valid file name and index by directory and UT date and obs number
+      # This uses a lot of storage space if there are a few files with numbers > 1000
+      $files{$ddir}{$bits[0]}[$bits[-1]] = $file;
     }
+  }
 
-};
+  # Close the directory
+  closedir DATADIR;
+
+}
 
 # If we have no files then we may as well die
-die "\nSorry but no observation files have been found.\n\n" if $#datalis < 0;
- 
-# Now sort them by observation number
- 
-foreach (@datalis) {
-  # Find the run number (the number before the . and after _ or month
-  ($root,$junk) = split(/\./);
-  @bits = split(/\D/,$root);
-  $num = 0 + $bits[$#bits];
-  do {
-    push(@datakeys, $bits[$#bits]);
-    push(@keep, $_);
-  } if (($num >= $start) && ($num <= $stop));
-}
-@sortndf = @keep[ sort bydatakeys $[..$#keep ];
+die "\nSorry but no observation files have been found.\n\n" if keys(%files) < 0;
 
-# Now begin to read in FITS information
+# Start Error reporting system
+my $status = &NDF::SAI__OK;
+err_begin($status);
 
-foreach $scufile (@sortndf) {
-
-  err_annul($status) if $status != &NDF::SAI__OK;
+# Now loop over each file and directory reading FITS headers
+# Start with directories
+foreach my $ddir (keys %files) {
 
   # Go to the correct directory
-  chdir $location{$scufile} || 
-    die "Error changing to directory $location{$scufile}\n";
+  chdir $ddir || 
+    die "Error changing to directory $ddir\n";
 
-  # Is this an ro_ file
-  $scufile =~ /^ro_|_red_/ && ($scufile .= $rohead);
+  # Cant write the directory location out until we have decided on the header
+  # information
+  $write_dir = 1;
 
-  # Read the FITS header
-  my ($fitsref, $status) = fits_read_header($scufile);
+  # Now loop over UT dates in $ddir
+  # First read them so that I can decide whether to print the information out
+  my @utdates = keys %{ $files{$ddir} };
 
-  if ($status != &NDF::SAI__OK) {
-    err_rep('READERR',"$prog: Error reading header from $scufile", $status);
-    err_flush($status);
-    next;
-  }
+  foreach my $ut (@utdates) {
 
-  # Copy the contents from the reference
-  %fitsitem = %$fitsref;
-
-  # next if the mode keyword does not exist
-  next unless exists $fitsitem{'MODE'};
-
-  # Now check the observation mode against $whichmode
-  # If whichmode is not specified run anyway
-  if ($whichmode !~ /./ | $whichmode =~ /$fitsitem{'MODE'}/i) {
-
-
-    #######################
-    # Calculate some things
-
-    $mean_air = ($fitsitem{'AMSTART'} + $fitsitem{'AMEND'}) / 2.0;
-    $mean_hum = ($fitsitem{'HUMSTART'} + $fitsitem{'HUMEND'}) / 2.0;
-    $mean_hum = sprintf("%d", $mean_hum);
-
-    $az = ($fitsitem{'END_AZD'} + $fitsitem{'STRT_AZD'}) / 2.0;
-    $az = sprintf("%d", $az);
-    $el = ($fitsitem{'END_ELD'} + $fitsitem{'STRT_ELD'}) / 2.0;
-    $el = sprintf("%d", $el);
-
-    $hst = $fitsitem{'HSTSTART'};
-    $hst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
-    $hst = '0'.$hst if length($hst) < 5;
-
-    $lst = $fitsitem{'STSTART'};
-    $lst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
-    $lst = '0'.$lst if length($lst) < 5;
-
-    # Work out whether the seeing and tau values are current
-    # (ie less than 1 hour old)
-    # For now I will just give the value regardless
-    $seedate = $fitsitem{'SEE_DATE'};
-    
-    $seeing = $fitsitem{'SEEING'};
-    $csotau = $fitsitem{'TAU_225'};
-
-    # Make sure the file name is just the filename and not .HEADER
-    (@junk) = split(/\//,$scufile);
-    $fname = $junk[$#junk];
-    $fname =~ s/$rohead$//;
-
-    # SKYDIP requires that I put some work in - I need to open
-    # The SKYDIP_FIT extension to examine the fit results
-
-    @tauz = &find_skydip if $dotau;
-
-    # Find the PHOTOM data in a _red_ file
-    @photom = &find_photom if ($prog eq 'photsum');
-
-    # Undef variables referring to unused subinstruments
-    for ($i = $fitsitem{'N_SUBS'}+1; $i <= $MAX_SUB; $i++) {
-      $fitsitem{"SUB_$i"} = undef;
-      $fitsitem{"FILT_$i"} = undef;
-    }
-
-    # If it's a planet (moving source) we need to use MEANRA
-    # Convert radians RA and DEC to HMS/DMS
-
-    @ra = ();
-    @dec = ();
-
-    if ($fitsitem{'CENT_CRD'} eq 'PLANET') {
-
-      $ra_rad = $fitsitem{'MEANRA'} * $pi / 180.0;
-      $dec_rad= $fitsitem{'MEANDEC'} * $pi / 180.0;
-
-      ($ra_sign, @ra) = Dr2tf(2,$ra_rad);
-      ($dec_sign, @dec) = Dr2af(1,$dec_rad);
-
-      # combine the result such that the minus joins with the first entry
-      # and the seconds receive the decimal places.
-      $dec[0] = $dec_sign.$dec[0] if ($dec_sign eq '-');
-      $ra[2] .= ".".pop(@ra);
-      $dec[2] .= ".".pop(@dec);
-
+    # Print the UT date if required
+    if ($ut != 0 && $#utdates > 0) {
+      $write_ut = 1;
     } else {
-      
-      # Read the requested map centre
-      $lat = $fitsitem{'LAT'};
-      $long = $fitsitem{'LONG'};
-
-      @ra = split(/:/,$long);
-      @dec = split(/:/,$lat);
-
-      # Remove spurious leading zeroes and plus signs
-      $ra[0] *= 1.0;
-      $dec[0] *= 1.0;
-
+      $write_ut = 0;
     }
 
-    # Read EQUINOX
+    # Read files into temp array -- testing
+    my $ref =  $files{$ddir}{$ut};
+    my @allfiles = (@$ref);
 
-    $equinox = ($fitsitem{'EQUINOX'} == 2000 ? J : B).$fitsitem{'EQUINOX'};
-
-    # Set format
-
-    $^ = STDOUT_TOP;
-    $~ = ($fitsitem{'MODE'} =~ /^$/ ? "NOFITS" : $fitsitem{'MODE'});
-
-    if ($prog eq 'photsum') {
-
-      $^ = PHOTSUM_TOP;
-
-      # Only set if mode is recognised 
-      # of course shouldnt be in here if that is the case since I
-      # am only processing photometry data
-      if ($~ !~ /NOFITS/) {
-	if ($fitsitem{'MODE'} eq 'SKYDIP') {
-	  $~ = SKYDIP_SUM;
-	} else {
-
-	  # For PHOTSUM we want to rewrite SAM_MODE to be POLJIGG or
-	  # POLRAST for polarimetry
-	  $IsPol = '';
-	  if ($fitsitem{'MODE'} eq 'POLPHOT')  {
-	    $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
-	    $IsPol = '*';  # Flag to indicate pol observation
-	  }
-
-	  $~ = PHOTSUM
-	}
-      }
-    } elsif ($prog eq 'pointsum') {
-
-      $^ = POINTSUM_TOP;
-
-      # Only set if mode is recognised 
-      # of course shouldnt be in here if that is the case since I
-      # am only processing photometry data
-      if ($~ !~ /NOFITS/) {
-	if ($fitsitem{'MODE'} eq 'POINTING') {
-	  $~ = POINTSUM;
-	}
-      }
-
-    } elsif ($prog eq 'mapsum') {
-
-      $^ = MAPSUM_TOP;
-
-      # Only set if mode is recognised 
-      # of course shouldnt be in here if that is the case since I
-      # am only processing map data
-      if ($~ !~ /NOFITS/) {
-	if ($fitsitem{'MODE'} eq 'SKYDIP') {
-	  $~ = SKYDIP_SUM;
-	} else {
-
-	  # For MAPSUM we want to rewrite SAM_MODE to be POLJIGG or
-	  # POLRAST for polarimetry
-	  if ($fitsitem{'MODE'} eq 'POLMAP')  {
-	    $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
-	  }
-
-	  $~ = MAPSUM;
-	}
-      }
-
-    } elsif ($prog eq 'skysum') {
-
-      # This is the skydip summary mode
-
-      $^ = SKYSUM_TOP;
+    # Now loop over the files disregarding undefined values ($scufile is global)
+    SCUFILES: foreach $scufile (@allfiles) {
 	
-      $~ = SKYSUM;
+	next SCUFILES unless defined $scufile;
+
+	# Is this an ro_ file
+	$scufile =~ /^ro_|_red_/ && ($scufile .= $rohead);
+
+	# Read the FITS header
+	my ($fitsref, $status) = fits_read_header($scufile);
+	if ($status != &NDF::SAI__OK) {
+	  err_rep('READERR',"$prog: Error reading header from $scufile", $status);
+	  err_flush($status);
+	  next SCUFILES;
+	}
+
+	# Copy the contents from the reference to a global
+	%fitsitem = %$fitsref;
+
+	# next if the mode keyword does not exist
+	next SCUFILES unless exists $fitsitem{'MODE'};
+
+	# Now check the observation mode against $whichmode
+	# If whichmode is not specified run anyway
+	if ($whichmode !~ /./ | $whichmode =~ /$fitsitem{'MODE'}/i) {
 
 
-    } elsif ($summary) {
+	  #######################
+	  # Calculate some things
 
-      if ($~ !~ /NOFITS/) {
+	  $mean_air = ($fitsitem{'AMSTART'} + $fitsitem{'AMEND'}) / 2.0;
+	  $mean_hum = ($fitsitem{'HUMSTART'} + $fitsitem{'HUMEND'}) / 2.0;
+	  $mean_hum = sprintf("%d", $mean_hum);
 
-	if ($fitsitem{'MODE'} eq 'NOISE') {
+	  $az = ($fitsitem{'END_AZD'} + $fitsitem{'STRT_AZD'}) / 2.0;
+	  $az = sprintf("%d", $az);
+	  $el = ($fitsitem{'END_ELD'} + $fitsitem{'STRT_ELD'}) / 2.0;
+	  $el = sprintf("%d", $el);
 
-	  $~ = SHORT_NOISE;
+	  $hst = $fitsitem{'HSTSTART'};
+	  $hst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
+	  $hst = '0'.$hst if length($hst) < 5;
 
-	} elsif ($fitsitem{'MODE'} eq 'SKYDIP') {
+	  $lst = $fitsitem{'STSTART'};
+	  $lst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
+	  $lst = '0'.$lst if length($lst) < 5;
 
-	  $~ = SHORT_SKYDIP;
+	  # Work out whether the seeing and tau values are current
+	  # (ie less than 1 hour old)
+	  # For now I will just give the value regardless
+	  $seedate = $fitsitem{'SEE_DATE'};
+    
+	  $seeing = $fitsitem{'SEEING'};
+	  $csotau = $fitsitem{'TAU_225'};
 
-	} else {
+	  # Make sure the file name is just the filename and not .HEADER
+	  (@junk) = split(/\//,$scufile);
+	  $fname = $junk[$#junk];
+	  $fname =~ s/$rohead$//;
 
-	  # Have to rename MAP mode to RASTMAP or JIGGMAP
-	  # for clarity
-	  if ($fitsitem{'MODE'} eq 'MAP') {
-	    $fitsitem{'MODE'} = substr($fitsitem{'SAM_MODE'},0,4) .
-	      $fitsitem{'MODE'};
-	  } elsif ($fitsitem{'MODE'} eq 'POLMAP') {
-	    $fitsitem{'MODE'} .= lc(substr($fitsitem{'SAM_MODE'},0,1));
+	  # SKYDIP requires that I put some work in - I need to open
+	  # The SKYDIP_FIT extension to examine the fit results
+
+	  @tauz = &find_skydip if $dotau;
+
+	  # Find the PHOTOM data in a _red_ file
+	  @photom = &find_photom if ($prog eq 'photsum');
+
+	  # Undef variables referring to unused subinstruments
+	  for ($i = $fitsitem{'N_SUBS'}+1; $i <= $MAX_SUB; $i++) {
+	    $fitsitem{"SUB_$i"} = undef;
+	    $fitsitem{"FILT_$i"} = undef;
 	  }
 
+	  # If it's a planet (moving source) we need to use MEANRA
+	  # Convert radians RA and DEC to HMS/DMS
 
-	  $~ = SHORT;
-	}
-      }
+	  @ra = ();
+	  @dec = ();
 
-      $^ = SUMMARY_TOP;
+	  if ($fitsitem{'CENT_CRD'} eq 'PLANET') {
 
-    }
+	    $ra_rad = $fitsitem{'MEANRA'} * $pi / 180.0;
+	    $dec_rad= $fitsitem{'MEANDEC'} * $pi / 180.0;
 
-    write;
+	    ($ra_sign, @ra) = Dr2tf(2,$ra_rad);
+	    ($dec_sign, @dec) = Dr2af(1,$dec_rad);
+
+	    # combine the result such that the minus joins with the first entry
+	    # and the seconds receive the decimal places.
+	    $dec[0] = $dec_sign.$dec[0] if ($dec_sign eq '-');
+	    $ra[2] .= ".".pop(@ra);
+	    $dec[2] .= ".".pop(@dec);
+	    
+	  } else {
+	    
+	    # Read the requested map centre
+	    $lat = $fitsitem{'LAT'};
+	    $long = $fitsitem{'LONG'};
+
+	    @ra = split(/:/,$long);
+	    @dec = split(/:/,$lat);
+
+	    # Remove spurious leading zeroes and plus signs
+	    $ra[0] *= 1.0;
+	    $dec[0] *= 1.0;
+
+	  }
+
+	  # Read EQUINOX
+	  $equinox = ($fitsitem{'EQUINOX'} == 2000 ? J : B).$fitsitem{'EQUINOX'};
+
+	  # Set format
+
+	  $^ = STDOUT_TOP;
+	  $~ = ($fitsitem{'MODE'} =~ /^$/ ? "NOFITS" : $fitsitem{'MODE'});
+
+	  if ($prog eq 'photsum') {
+
+	    $^ = PHOTSUM_TOP;
+
+	    # Only set if mode is recognised 
+	    # of course shouldnt be in here if that is the case since I
+	    # am only processing photometry data
+	    if ($~ !~ /NOFITS/) {
+	      if ($fitsitem{'MODE'} eq 'SKYDIP') {
+		$~ = SKYDIP_SUM;
+	      } else {
+
+		# For PHOTSUM we want to rewrite SAM_MODE to be POLJIGG or
+		# POLRAST for polarimetry
+		$IsPol = '';
+		if ($fitsitem{'MODE'} eq 'POLPHOT')  {
+		  $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
+		  $IsPol = '*';  # Flag to indicate pol observation
+		}
+		
+		$~ = PHOTSUM
+	      }
+	    }
+	  } elsif ($prog eq 'pointsum') {
+
+	    $^ = POINTSUM_TOP;
+
+	    # Only set if mode is recognised 
+	    # of course shouldnt be in here if that is the case since I
+	    # am only processing photometry data
+	    if ($~ !~ /NOFITS/) {
+	      if ($fitsitem{'MODE'} eq 'POINTING') {
+		$~ = POINTSUM;
+	      }
+	    }
+
+	  } elsif ($prog eq 'mapsum') {
+	    
+	    $^ = MAPSUM_TOP;
+
+	    # Only set if mode is recognised 
+	    # of course shouldnt be in here if that is the case since I
+	    # am only processing map data
+	    if ($~ !~ /NOFITS/) {
+	      if ($fitsitem{'MODE'} eq 'SKYDIP') {
+		$~ = SKYDIP_SUM;
+	      } else {
+		
+		# For MAPSUM we want to rewrite SAM_MODE to be POLJIGG or
+		# POLRAST for polarimetry
+		if ($fitsitem{'MODE'} eq 'POLMAP')  {
+		  $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
+		}
+		
+		$~ = MAPSUM;
+	      }
+	    }
+	    
+	  } elsif ($prog eq 'skysum') {
+	    
+	    # This is the skydip summary mode
+	    
+	    $^ = SKYSUM_TOP;
+	    
+	    $~ = SKYSUM;
+	    
+
+	  } elsif ($summary) {
+
+	    if ($~ !~ /NOFITS/) {
+
+	      if ($fitsitem{'MODE'} eq 'NOISE') {
+
+		$~ = SHORT_NOISE;
+		
+	      } elsif ($fitsitem{'MODE'} eq 'SKYDIP') {
+
+		$~ = SHORT_SKYDIP;
+
+	      } else {
+
+		# Have to rename MAP mode to RASTMAP or JIGGMAP
+		# for clarity
+		if ($fitsitem{'MODE'} eq 'MAP') {
+		  $fitsitem{'MODE'} = substr($fitsitem{'SAM_MODE'},0,4) .
+		    $fitsitem{'MODE'};
+		} elsif ($fitsitem{'MODE'} eq 'POLMAP') {
+		  $fitsitem{'MODE'} .= lc(substr($fitsitem{'SAM_MODE'},0,1));
+		}
+		
+
+		$~ = SHORT;
+	      }
+	    }
+	    $^ = SUMMARY_TOP;
+
+	  }
+
+	  # Write the directory name if required
+	  if ($write_dir) {
+	    $CDIR = $ddir;
+	    my $curr = $~;
+	    $~ = CHDIR;
+	    write;
+	    $write_dir = 0;
+	    $~ = $curr;
+	  }
+
+	  # Write UT date is required
+	  if ($write_ut) {
+	    $CurrUT = $ut;
+	    my $curr = $~;
+	    $~ = CURRUT;
+	    write;
+	    $write_ut = 0;
+	    $~ = $curr;
+	  }
+
+	  write;
     
-    # Read in HISTORY information if present and if we are using SCULOG
-    if (!$summary && $prog eq 'sculog') {
+	  # Read in HISTORY information if present and if we are using SCULOG
+	  if (!$summary && $prog eq 'sculog') {
 
-      my $status = &NDF::SAI__OK;
+	    my $status = &NDF::SAI__OK;
 
-      ndf_begin;
-      err_begin($status);
+	    ndf_begin;
+	    err_begin($status);
+	    # Open scufile again
+	    ndf_find(&NDF::DAT__ROOT, $scufile, my $indf, $status);
+	    ndf_hnrec($indf,my $nrec,$status);
 
-      # Open scufile again
-      ndf_find(&NDF::DAT__ROOT, $scufile, my $indf, $status);
-      ndf_hnrec($indf,my $nrec,$status);
+	    # if there is history...
+	    if ($status == &NDF::SAI__OK) {
 
-      # if there is history...
-      if ($status == &NDF::SAI__OK) {
-
-	# Loop through the history components and find last "APPLICATION"
-	for (my $i=$nrec; $i > 0; $i--) {
-	  ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
-	  last if $value !~ /<unknown>/;
+	      # Loop through the history components and find last "APPLICATION"
+	      for (my $i=$nrec; $i > 0; $i--) {
+		ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
+		last if $value !~ /<unknown>/;
+	      }
+	      # Get date as well
+	      ndf_hinfo($indf, 'DATE', $i, $date, $status);
+	      $~ = "HISTORY";
+	      write;
+	    }
+	    # Close file
+	    ndf_annul($indf,$status);
+	    
+	    # End the error reporting and NDF
+	    err_annul($status) if $status != &NDF::SAI__OK;
+	    err_end($status);
+	    ndf_end($status);
+	  }
 	}
-	# Get date as well
-	ndf_hinfo($indf, 'DATE', $i, $date, $status);
-	$~ = "HISTORY";
-	write;
       }
-      # Close file
-      dat_annul($xloc,$status);
-      ndf_annul($indf,$status);
 
-      # End the error reporting and NDF
-      err_annul($status) if $status != &NDF::SAI__OK;
-      err_end($status);
-      ndf_end($status);
-    }
   }
+
 }
+err_end($status);
 
 chdir $startdir;
 
@@ -627,20 +698,25 @@ sub find_photom {
 
 # FORMATS
 
+format CHDIR =
+Log for observations from directory: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$CDIR
+
+.
+
+format CURRUT =
+Observations from UT date: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$CurrUT
+.
 
 format SUMMARY_TOP = 
--Log for directory: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$dirlist[0]
-~                   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-$dirlist[1]
-
  #    HST    Obsmode   Source   Meas/Int Airmass  Filter  Bolometers
 ---- -----   --------- -------  -------- ------- -------- ----------
 .
 
 
 format STDOUT_TOP = 
--Log for directory: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+-Log for directories: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $dirlist[0]
 ~                   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $dirlist[1]
@@ -663,7 +739,7 @@ $scufile
 format HISTORY = 
    Most recent HISTORY entry:
         @<<<<<<<<<<<<<<<<<<<<<<<<          @<<<<<<<<<<<<<<<<
-$date $value
+$date, $value
 
 .
 
@@ -869,12 +945,12 @@ $fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJECT'}, $fitsitem{'N_MEA
 .
 
 format SHORT_NOISE =
-@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<<   @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJ_TYPE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
 .
 
 format SHORT_SKYDIP =
-@<<< @<<<<<< @<<<<<<<< SKY        @>/@<<       @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+@<<< @<<<<<< @<<<<<<<< SKY        @>/@<<         @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
 .
 
