@@ -49,6 +49,10 @@
 *  History:
 *     1-APR-1999 (DSB):
 *        Original version.
+*     17-JUL-2001 (DSB):
+*        Changed to find SkyFrames even if they are embedded in a CmpFrame.
+*        Also changed to allow more than 2 pixel axes. All this is to
+*        support spectropolarimetry data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,6 +66,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST__ constants
+      INCLUDE 'NDF_PAR'          ! NDF__ constants
 
 *  Arguments Given:
       INTEGER IWCS 
@@ -79,21 +84,20 @@
       PARAMETER ( DTOR = 0.0174532925)
 
 *  Local Variables:
-      DOUBLE PRECISION A         ! Sky longitude at 1 point
       DOUBLE PRECISION ARC       ! Arc-distance between 2 points in radians
-      DOUBLE PRECISION B         ! Sky latitude at 1 point
-      DOUBLE PRECISION P1( 2 )   ! 2D co-ordinates at 1 point
-      DOUBLE PRECISION P2( 2 )   ! 2D co-ordinates at a second point
-      DOUBLE PRECISION XIN( 2 )  ! X pixel co-ordinates at 2 points
-      DOUBLE PRECISION XOUT( 2 ) ! Sky axis 1 co-ordinates at 2 points
-      DOUBLE PRECISION YIN( 2 )  ! X pixel co-ordinates at 2 points
-      DOUBLE PRECISION YOUT( 2 ) ! Sky axis 2 co-ordinates at 2 points
-      INTEGER FS                 ! Pointer to a FrameSet joining the SkyFrames
+      DOUBLE PRECISION IN( 2, NDF__MXDIM )  ! Pixel co-ordinates at 2 points
+      DOUBLE PRECISION OUT( 2, NDF__MXDIM ) ! Sky (etc) coords at 2 points
+      DOUBLE PRECISION P1( NDF__MXDIM )   ! Co-ordinates at 1 point
+      DOUBLE PRECISION P2( NDF__MXDIM )   ! Co-ordinates at a second point
+      INTEGER CMPT               ! The search template
+      INTEGER DEFT               ! A Frame used within the search template
+      INTEGER FSET               ! Pointer to a FrameSet 
+      INTEGER I                  ! Loop count
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
-      INTEGER ISKY               ! Index of SkyFrame
-      INTEGER SKYF1              ! Pointer to the IWCS SKyFrame
-      INTEGER SKYF2              ! Pointer to a new SKyFrame
+      INTEGER NIN                ! Number of pixel axes
+      INTEGER NOUT               ! Number of sky (etc) axes
+      INTEGER SKYT               ! SkyFrame used within the search template
 *.
 
 *  Check the inherited global status.
@@ -102,149 +106,109 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Save the index of the original Current Frame (this may be changed by
-*  AST_FINDFRAME).
+*  Initially, assume that no sky latitude axes is available. Set the
+*  returned value to be +90 (i.e. the +ve Y axis).
+      ANGROT = 90.0
+
+*  Save the indices of the original Base and Current Frames.
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+      IBASE = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  Attempt to find a SkyFrame in the supplied FrameSet.
-      IF( AST_FINDFRAME( IWCS, AST_SKYFRAME( ' ', STATUS ), ' ', 
-     :                   STATUS ) .NE. AST__NULL ) THEN
-
-*  If a SkyFrame was found, the Current Frame in the FrameSet will have
-*  been set to identify the SkyFrame. Save its index.
-         ISKY = AST_GETI( IWCS, 'CURRENT', STATUS ) 
-
-*  We now need to set the Base Frame to the PIXEL Frame. First record the 
-*  index of the original Base Frame.
-         IBASE = AST_GETI( IWCS, 'BASE', STATUS )
-
-*  Attempt to find a 2D Frame with Domain PIXEL in the supplied FrameSet.
-         IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, ' ', STATUS ), 'PIXEL', 
-     :                      STATUS ) .NE. AST__NULL ) THEN
+*  Attempt to find a Frame with Domain PIXEL in the supplied FrameSet.
+*  Set MaxAxes large so that we pick up PIXEL Frames with any number of axes
+*  (e.g. specpol data has more than 2 pixel axes).
+      IF( AST_FINDFRAME( IWCS, AST_FRAME( 2, 'MAXAXES=100', STATUS ), 
+     :                   'PIXEL', STATUS ) .NE. AST__NULL ) THEN
 
 *  AST_FINDFRAME will have made the PIXEL Frame the Current Frame. Make
 *  it the Base Frame also.
-            CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', 
-     :                                             STATUS ), STATUS )
+         CALL AST_SETI( IWCS, 'BASE', AST_GETI( IWCS, 'CURRENT', 
+     :                                          STATUS ), STATUS )
 
-*  Make the Current Frame the SkyFrame.
-            CALL AST_SETI( IWCS, 'CURRENT', ISKY, STATUS )
+*  Create a template CmpFrame which will match a SkyFrame or a CmpFrame
+*  containing a SkyFrame.
+         SKYT = AST_SKYFRAME( ' ', STATUS )
+         DEFT = AST_FRAME( 1, 'MINAXES=0,MAXAXES=100', STATUS )
+         CMPT = AST_CMPFRAME( SKYT, DEFT, ' ', STATUS )
+
+*  Attempt to find a matching Frame in the supplied FrameSet.
+         FSET = AST_FINDFRAME( IWCS, CMPT, ' ', STATUS )
+
+*  If a matching Frame was found...
+         IF( FSET .NE. AST__NULL ) THEN
+
+*  The FrameSet returned by AST_FINDFRAME will have the PIXEL Frame as the
+*  Base Frame, and the Current Frame will look like the template Frame -
+*  specifically, axes 1 and 2 will be sky longitude and latitude. Note the 
+*  number of Base and Current Frame axes.
+            NIN = AST_GETI( FSET, 'NIN', STATUS )
+            NOUT = AST_GETI( FSET, 'NOUT', STATUS )
 
 *  Now transform the supplied central pixel position into the SkyFrame.
-*  Also transform another point about one pixel away from the 
-*  supplied position.
-            XIN( 1 ) = DBLE( XC )
-            XIN( 2 ) = DBLE( XC + 1.0 )
-            YIN( 1 ) = DBLE( YC )
-            YIN( 2 ) = DBLE( YC + 1.0 )
+*  Also transform another point about one pixel away from the supplied 
+*  position. Any extra pixel axes (3 and above) are assigned the value zero.
+*  The value on these extra axes should make no difference since the sky
+*  axes should be independant of the others.
+            IN( 1, 1 ) = DBLE( XC )
+            IN( 2, 1 ) = DBLE( XC + 1.0 )
+            IN( 1, 2 ) = DBLE( YC )
+            IN( 2, 2 ) = DBLE( YC + 1.0 )
 
-            CALL AST_TRAN2( IWCS, 2, XIN, YIN, .TRUE., XOUT, YOUT, 
+            DO I = 3, NIN
+              IN( 1, I ) = 0.0
+              IN( 2, I ) = 0.0
+            END DO
+
+            CALL AST_TRANN( FSET, 2, NIN, 2, IN, .TRUE., NOUT, 2, OUT,
      :                      STATUS )
 
 *  Check that the transformed positions are defined.
-            IF( XOUT( 1 ) .NE. AST__BAD .AND. 
-     :          YOUT( 1 ) .NE. AST__BAD .AND.
-     :          XOUT( 2 ) .NE. AST__BAD .AND.
-     :          YOUT( 2 ) .NE. AST__BAD ) THEN
+            IF( OUT( 1, 1 ) .NE. AST__BAD .AND. 
+     :          OUT( 1, 2 ) .NE. AST__BAD .AND.
+     :          OUT( 2, 1 ) .NE. AST__BAD .AND.
+     :          OUT( 2, 2 ) .NE. AST__BAD ) THEN
 
-*  Get the arc distance between the two points.
-               P1( 1 ) = XOUT( 1 )
-               P1( 2 ) = YOUT( 1 )
-               P2( 1 ) = XOUT( 2 )
-               P2( 2 ) = YOUT( 2 )
-               ARC = AST_DISTANCE( IWCS, P1, P2, STATUS )
+*  Get the arc distance between the two points. Assign zero to any extra 
+*  axes.
+               P1( 1 ) = OUT( 1, 1 )
+               P1( 2 ) = OUT( 1, 2 )
+               P2( 1 ) = OUT( 2, 1 )
+               P2( 2 ) = OUT( 2, 2 )
+               DO I = 3, NOUT
+                  P1( I ) = 0.0
+                  P2( I ) = 0.0
+               END DO
 
-*  If the returned value is bad, or zero, return +90 (i.e. the +ve Y axis) 
-*  for the reference direction.
-               IF( ARC .EQ. AST__BAD .OR. ARC .EQ. 0.0 ) THEN
-                  ANGROT = 90.0
+               ARC = AST_DISTANCE( FSET, P1, P2, STATUS )
 
-*  Otherwise, offset northwards by this arc distance from the supplied
-*  central position.
-               ELSE
-
-*  Which axis is north (+latitude)? Usually, the second axis. But it is
-*  possible that the axis order may have been swapped. Therefore we need
-*  to check which axis is which. This is not so easy! First create a new
-*  SkyFrame with the same attributes as the one in the FrameSet, but with
-*  the default axis order (longitude,latitude).
-                  SKYF1 = AST_GETFRAME( IWCS, ISKY, STATUS )
-                  SKYF2 = AST_SKYFRAME( ' ', STATUS )
-                  CALL AST_SETD( SKYF2, 'EPOCH', AST_GETD( SKYF1,
-     :                                           'EPOCH', STATUS ),
-     :                           STATUS )
-                  CALL AST_SETD( SKYF2, 'EQUINOX', AST_GETD( SKYF1,
-     :                                           'EQUINOX', STATUS ),
-     :                           STATUS )
-                  CALL AST_SETC( SKYF2, 'SYSTEM', AST_GETC( SKYF1,
-     :                                           'SYSTEM', STATUS ),
-     :                           STATUS )
-
-*  Obtain a FrameSet representing a mapping from the IWCS SkyFrame to the 
-*  new SkyFrame.
-                  FS = AST_CONVERT( SKYF1, SKYF2, ' ', STATUS )
-
-*  If not succesfull, return +90 (i.e. the +ve Y axis) for the reference 
-*  direction.
-                  IF( FS .EQ. AST__NULL ) THEN
-                     ANGROT = 90.0
-
-*  Otherwise, transform the central sky position using this mapping.
-*  This will swap the axes if necessary to ensure that the resulting
-*  position is in the SkyFrame defined by SKYF2 (i.e. with axes in the 
-*  order (longitude,latitude) ).
-                  ELSE
-                     CALL AST_TRAN2( FS, 1, XOUT, YOUT, .TRUE., A, B, 
-     :                               STATUS )
-
-*  We now know for sure that A is the longitude and B is the latitude at
-*  the central point. Increase its latitude by the arc-size of a pixel.
-                     B = B + ARC
-
-*  Transform this position back into the (potentially swapped) IWCS 
-*  SkyFrame.
-                     CALL AST_TRAN2( FS, 1, A, B, .FALSE., XOUT( 2 ),
-     :                               YOUT( 2 ), STATUS )
+*  If the returned value is good, and not zero, find the long/lat of a 
+*  point one pixel to the north of the central point.
+               IF( ARC .NE. AST__BAD .AND. ARC .GT. 0.0 ) THEN
+                  OUT( 2, 1 ) = OUT( 1, 1 )
+                  OUT( 2, 2 ) = OUT( 1, 2 ) + ARC
 
 *  X/YOUT( 1 ) now holds the sky coords at the central point, and 
 *  X/YOUT( 2 ) holds the sky coords at a point just to the north of the
 *  central point. Convert these back into pixel coordinates.
-                     CALL AST_TRAN2( IWCS, 2, XOUT, YOUT, .FALSE., XIN, 
-     :                               YIN, STATUS )
+                  CALL AST_TRANN( FSET, 2, NOUT, 2, OUT, .FALSE., NIN, 
+     :                            2, IN, STATUS )
 
 *  Find the anti-clockwise angle from the +ve X axis to the line joining
 *  the two transformed sky positions.
-                     ANGROT = ATAN2( YIN( 2 ) - YIN( 1 ), 
-     :                               XIN( 2 ) - XIN( 1 ) )/DTOR
-
-                  END IF
+                  ANGROT = ATAN2( IN( 2, 2 ) - IN( 1, 2 ), 
+     :                            IN( 2, 1 ) - IN( 1, 1 ) )/DTOR
 
                END IF
 
-*  If the sky position at the supplied central position (or its
-*  neighbour) were not defined, return +90 (i.e. the +ve Y axis) for the
-*  reference direction.
-            ELSE
-               ANGROT = 90.0
             END IF
 
-*  If no PIXEL Frame was found, return +90 (i.e. the +ve Y axis) for the
-*  reference direction.
-         ELSE
-            ANGROT = 90.0
          END IF
 
-*  Re-instate the original Base Frame
-         CALL AST_SETI( IWCS, 'BASE', IBASE, STATUS )
-
-*  If no SkyFrame could be found in the supplied FrameSet, return +90 
-*  (i.e. the +ve Y axis) for the reference direction.
-      ELSE
-         ANGROT = 90.0
       END IF
 
-*  Re-instate the original Current Frame.
+*  Re-instate the original Base and Current Frames.
       CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+      CALL AST_SETI( IWCS, 'BASE', IBASE, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
