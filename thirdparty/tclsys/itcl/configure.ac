@@ -30,12 +30,24 @@ itcl_subdirs="itcl itk iwidgets2.2.0 iwidgets3.0.0"
 AC_SUBST(itcl_subdirs)
 
 dnl    To configure iTcl, run ./configure in the subdirectories.
+
+#  Look for --disable-shared and pass it on.
+star_extra_items=
+for ac_arg in $ac_configure_args; do
+   case $ac_arg in 
+      *-disable-shared*)
+         star_extra_items="--disable-shared"
+      ;;
+   esac
+done
+export star_extra_items
 (
     for d in $itcl_subdirs
     do
        ( cd $d; \
          cmd="./configure --prefix=$prefix \
                           --srcdir=. \
+                          $star_extra_items \
                           --cache-file=../config.cache"; \
          echo $cmd; \
          $cmd; ) \
