@@ -112,7 +112,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 /* ======================== */
 /* Enum to represent the data type when resampling a grid of data. */
 typedef enum DataType {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
    TYPE_LD,
+#endif
    TYPE_D,
    TYPE_F,
    TYPE_L,
@@ -157,6 +159,11 @@ static void (* parent_setattrib)( AstObject *, const char * );
 
 /* Prototypes for private member functions. */
 /* ======================================== */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+static int InterpolatePixelLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double *, int, long double, long double *, long double * );
+static int InterpolatePixelNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double *, int, long double, long double *, long double * );
+#endif
+
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
@@ -177,7 +184,6 @@ static int InterpolatePixelLinearD( int, const int *, const int *, const double 
 static int InterpolatePixelLinearF( int, const int *, const int *, const float *, const float *, int, const int *, double *, int, float, float *, float * );
 static int InterpolatePixelLinearI( int, const int *, const int *, const int *, const int *, int, const int *, double *, int, int, int *, int * );
 static int InterpolatePixelLinearL( int, const int *, const int *, const long int *, const long int *, int, const int *, double *, int, long int, long int *, long int * );
-static int InterpolatePixelLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double *, int, long double, long double *, long double * );
 static int InterpolatePixelLinearS( int, const int *, const int *, const short int *, const short int *, int, const int *, double *, int, short int, short int *, short int * );
 static int InterpolatePixelLinearUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, double *, int, unsigned char, unsigned char *, unsigned char * );
 static int InterpolatePixelLinearUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, double *, int, unsigned int, unsigned int *, unsigned int * );
@@ -188,7 +194,6 @@ static int InterpolatePixelNearestD( int, const int *, const int *, const double
 static int InterpolatePixelNearestF( int, const int *, const int *, const float *, const float *, int, const int *, double *, int, float, float *, float * );
 static int InterpolatePixelNearestI( int, const int *, const int *, const int *, const int *, int, const int *, double *, int, int, int *, int * );
 static int InterpolatePixelNearestL( int, const int *, const int *, const long int *, const long int *, int, const int *, double *, int, long int, long int *, long int * );
-static int InterpolatePixelNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double *, int, long double, long double *, long double * );
 static int InterpolatePixelNearestS( int, const int *, const int *, const short int *, const short int *, int, const int *, double *, int, short int, short int *, short int * );
 static int InterpolatePixelNearestUB( int, const int *, const int *, const unsigned char *, const unsigned char *, int, const int *, double *, int, unsigned char, unsigned char *, unsigned char * );
 static int InterpolatePixelNearestUI( int, const int *, const int *, const unsigned int *, const unsigned int *, int, const int *, double *, int, unsigned int, unsigned int *, unsigned int * );
@@ -240,15 +245,15 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                         const int ubnd[], Xtype out[], Xtype out_var[] ) { \
 \
 /* Local Variables: */ \
-   AstMapping *simple; \
-   int coord_out; \
-   int npix; \
-   int result; \
+   AstMapping *simple;           /* Pointer to simplified Mapping */ \
+   int coord_out;                /* Loop counter for output coordinates */ \
+   int npix;                     /* Number of pixels in output section */ \
+   int result;                   /* Result value to return */ \
 \
 /* Initialise. */ \
    result = 0; \
 \
-/* Check the gklobal error status. */ \
+/* Check the global error status. */ \
    if ( !astOK ) return result; \
 \
 /* Loop to determine how many pixels require resampled values. */ \
@@ -266,8 +271,12 @@ static int Resample##X( AstMapping *this, int ndim_in, \
       simple = astClone( this ); \
    } \
 \
-/* Perform the resampling, passing the grid data via void pointers, \
-   but supplying an argument to identify their data type. */ \
+/* Perform the resampling. Note that we pass all gridded data, the \
+   interpolation function and the bad pixel value by means of pointer \
+   types that obscure the underlying data type. This is to avoid \
+   having to replicate functions unnecessarily for each data \
+   type. However, we also pass an argument that identifies the data \
+   type we have obscured. */ \
    result = ResampleAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
                                 (const void *) in, (const void *) in_var, \
                                 TYPE_##X, (int (*)()) interp, tol, linscale, \
@@ -276,7 +285,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                                 lbnd, ubnd, \
                                 (void *) out, (void *) out_var ); \
 \
-/* Annul the pointer to the simplified Mapping. */ \
+/* Annul the pointer to the simplified/cloned Mapping. */ \
    simple = astAnnul( simple ); \
 \
 /* If an error occurred, clear the returned result. */ \
@@ -288,7 +297,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 
 /* Expand the above macros to generate a function for each required
    data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
 MAKE_RESAMPLE(LD,long double)
+#endif
 MAKE_RESAMPLE(D,double)
 MAKE_RESAMPLE(F,float)
 MAKE_RESAMPLE(L,long int)
@@ -1386,6 +1397,9 @@ static void InitVtab( AstMappingVtab *vtab ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+   vtab->ResampleLD = ResampleLD;
+#endif
    vtab->ClearInvert = ClearInvert;
    vtab->ClearReport = ClearReport;
    vtab->GetInvert = GetInvert;
@@ -1404,7 +1418,6 @@ static void InitVtab( AstMappingVtab *vtab ) {
    vtab->ResampleF = ResampleF;
    vtab->ResampleI = ResampleI;
    vtab->ResampleL = ResampleL;
-   vtab->ResampleLD = ResampleLD;
    vtab->ResampleS = ResampleS;
    vtab->ResampleUB = ResampleUB;
    vtab->ResampleUI = ResampleUI;
@@ -2237,11 +2250,16 @@ static int InterpolatePixelLinear##X( int ndim_in, \
 
 /* Expand the above macros to generate a function for each required
    data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
 MAKE_INTERPOLATE_PIXEL_LINEAR(LD,long double,1,1,long double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(D,double,1,1,double)
-MAKE_INTERPOLATE_PIXEL_LINEAR(F,float,1,1,float)
 MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,1,0,long double)
 MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,0,long double)
+#else
+MAKE_INTERPOLATE_PIXEL_LINEAR(L,long int,1,0,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(UL,unsigned long int,0,0,double)
+#endif     
+MAKE_INTERPOLATE_PIXEL_LINEAR(D,double,1,1,double)
+MAKE_INTERPOLATE_PIXEL_LINEAR(F,float,1,1,float)
 MAKE_INTERPOLATE_PIXEL_LINEAR(I,int,1,0,double)
 MAKE_INTERPOLATE_PIXEL_LINEAR(UI,unsigned int,0,0,double)
 MAKE_INTERPOLATE_PIXEL_LINEAR(S,short int,1,0,float)
@@ -2688,7 +2706,9 @@ static int InterpolatePixelNearest##X( int ndim_in, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
 MAKE_INTERPOLATE_PIXEL_NEAREST(LD,long double,1)
+#endif
 MAKE_INTERPOLATE_PIXEL_NEAREST(D,double,1)
 MAKE_INTERPOLATE_PIXEL_NEAREST(F,float,1)
 MAKE_INTERPOLATE_PIXEL_NEAREST(L,long int,1)
@@ -4316,7 +4336,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *     ResampleAdaptively
 
 *  Purpose:
-*     Resample a section of a data grid efficiently.
+*     Resample a section of a data grid adaptively.
 
 *  Type:
 *     Private function.
@@ -4328,7 +4348,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *                             const void *in, const void *in_var,
 *                             DataType type, int (* interp)(),
 *                             double tol, double linscale, int flags,
-*                             const void *badval_ptr,
+*                             const void *badval_ptr, params,
 *                             int ndim_out, const int *lbnd_out,
 *                             const int *ubnd_out, const int *lbnd,
 *                             const int *ubnd, void *out, void *out_var )
@@ -4352,7 +4372,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *     Mapping supplied and to sub-divide the section being resampled
 *     into smaller sections within which a linear approximation to the
 *     Mapping may be used.  This reduces the number of Mapping
-*     evaluations, thereby improving efficiency, particularly when
+*     evaluations, thereby improving efficiency particularly when
 *     complicated Mappings are involved.
 
 *  Parameters:
@@ -4423,11 +4443,11 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *        functions to this accuracy, then such functions may be used
 *        instead of the Mapping in order to improve
 *        performance. Otherwise, every output pixel position will be
-*        transformed explicitly by the Mapping.
+*        transformed individually using the Mapping.
 *
 *        If linear approximation is not required, a "tol" value of
 *        zero may be given. This will ensure that the Mapping is used
-*        explicitly without any approximation.
+*        without any approximation.
 *     linscale
 *        A value which specifies the approximate scale size on which
 *        to search for non-linearities in the Mapping supplied. This
@@ -4449,7 +4469,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *
 *        If too small a value is given, it will have the effect of
 *        preventing linear approximation occurring at all (equivalent
-*        to setting "tol" to zero).  Although this might degrade
+*        to setting "tol" to zero).  Although this may degrade
 *        performance, accurate results will still be obtained.
 *     flags
 *        The bitwise OR of a set of flag values which control the
@@ -4554,11 +4574,13 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Loop through the output grid dimensions. */
+/* Further initialisation. */
    npix = 1;
    mxdim = 0;
    dimx = 1;
    nvertex = 1;
+
+/* Loop through the output grid dimensions. */
    for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
 
 /* Obtain the extent in each dimension of the output section which is
@@ -4590,8 +4612,8 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    toosmall = ( npix < ( 4 * npoint ) );
 
 /* Note if the maximum dimension of the output section exceeds the
-   user-supplied maximum section size. */
-   toobig = ( ( (double) mxdim ) > linscale );
+   user-supplied scale factor. */
+   toobig = ( linscale < (double) mxdim );
 
 /* Assume the Mapping is significantly non-linear before deciding
    whether to sub-divide the output section. */
@@ -4606,10 +4628,10 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
       divide = 0;
 
 /* Otherwise, if the largest output section dimension exceeds the
-   maximum permitted section size, we will sub-divide. This offers the
-   possibility of obtaining a linear approximation to the Mapping over
-   a reduced range of output coordinates (which will be handled by a
-   recursive invocation of this function). */
+   scale length given, we will sub-divide. This offers the possibility
+   of obtaining a linear approximation to the Mapping over a reduced
+   range of output coordinates (which will be handled by a recursive
+   invocation of this function). */
    } else if ( toobig ) {
       divide = 1;
 
@@ -4617,12 +4639,12 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    approximation to the Mapping's inverse transformation over the
    range of coordinates covered by the output section. */
    } else {
-     linear_fit = LinearApprox( this, ndim_in, ndim_out, lbnd, ubnd, tol );
+      linear_fit = LinearApprox( this, ndim_in, ndim_out, lbnd, ubnd, tol );
 
 /* If a linear fit was obtained, we will use it and therefore do not
    wish to sub-divide further. Otherwise, we sub-divide in the hope
    that this may result in a linear fit next time. */
-     divide = !linear_fit;
+      divide = !linear_fit;
    }
 
 /* If no sub-division is required, perform resampling (in a
@@ -4633,7 +4655,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
       if ( !divide ) {
          result = ResampleWithBlocking( this, linear_fit,
                                         ndim_in, lbnd_in, ubnd_in,
-                                        in, (void *) in_var, type, interp,
+                                        in, in_var, type, interp,
                                         flags, badval_ptr, params,
                                         ndim_out, lbnd_out, ubnd_out,
                                         lbnd, ubnd, out, out_var );
@@ -4670,13 +4692,16 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
             lo[ dimx ] = hi[ dimx ] + 1;
             hi[ dimx ] = ubnd[ dimx ];
 
-/* Resample this section in the same way, summing the returned
-   values. */
-            result += ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
-                                          in, in_var, type, interp, tol,
-                                          linscale, flags, badval_ptr, params,
-                                          ndim_out, lbnd_out, ubnd_out,
-                                          lo, hi, out, out_var );
+/* If this section contains pixels, resample it in the same way,
+   summing the returned values. */
+            if ( lo[ dimx ] <= hi[ dimx ] ) {
+               result += ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
+                                             in, in_var, type, interp, tol,
+                                             linscale, flags, badval_ptr,
+                                             params,
+                                             ndim_out, lbnd_out, ubnd_out,
+                                             lo, hi, out, out_var );
+            }
          }
 
 /* Free the workspace. */
@@ -5273,7 +5298,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
        
 /* Use the above macro to invoke the appropriate function. */
          switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
             NEAREST_CASE(LD,long double)
+#endif
             NEAREST_CASE(D,double)
             NEAREST_CASE(F,float)
             NEAREST_CASE(L,long int)
@@ -5310,7 +5337,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the appropriate function. */
          switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
             LINEAR_CASE(LD,long double)
+#endif
             LINEAR_CASE(D,double)
             LINEAR_CASE(F,float)
             LINEAR_CASE(L,long int)
@@ -5345,7 +5374,9 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the function. */
          switch ( type ) {
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
             USER_CASE(LD,long double)
+#endif
             USER_CASE(D,double)
             USER_CASE(F,float)
             USER_CASE(L,long int)
@@ -8345,7 +8376,9 @@ int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                                                    ubnd_out, lbnd, ubnd, out, \
                                                    out_var ); \
 }
+#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
 MAKE_RESAMPLE_(LD,long double)
+#endif
 MAKE_RESAMPLE_(D,double)
 MAKE_RESAMPLE_(F,float)
 MAKE_RESAMPLE_(L,long int)
