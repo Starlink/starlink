@@ -556,23 +556,16 @@ $Id$
 		  (literal "Examples")))
       (make element gi: "dd"
 	    (make empty-element gi: "br")
-	    (make element gi: "dl"
-		  (process-children)))))
-  ;;(element example
-  ;;  (make sequence
-  ;;    (make element gi: "dt"
-  ;;	  (literal "Example " (number->string (child-number (current-node)))))
-  ;;    (make empty-element gi: "br")
-  ;;    (make element gi: "code"
-  ;;	    (process-children))))
+	    (process-children))))
   (element example
     (make sequence
-      (make element gi: "dt"
-	    (make element gi: "code"
-		  (process-children)))))
+      (make element gi: "p"
+	    (literal "Example "
+		     (number->string (child-number (current-node))) ":"))
+      (make element gi: "pre"
+	    (process-children))))
   (element examplenote
-    (make element gi: "dd"
-	  (process-children)))
+    (process-children))
   ;; The funcname element could be made more sophisticated, so that
   ;; it includes a link (possibly using the source-code browser) to
   ;; the function definition/documentation.
