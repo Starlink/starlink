@@ -1025,7 +1025,6 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       INTEGER			LASTR			!
       INTEGER			LC			! Last channel bin
       INTEGER			LE			! Last energy bin
-      INTEGER			LUN			! Logical unit
       INTEGER			MAX_NGRP		! Max value of N_GRP
       INTEGER			MAX_SMAT		! Max width of matrix
       INTEGER			NDIG			!
@@ -1369,7 +1368,7 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       INTEGER			RMFID			!
 
 *  Status:
-      INTEGER                   STATUS, FSTAT           ! Global status
+      INTEGER                   STATUS			! Global status
 
 *  Local Variables:
       CHARACTER*8		TTYPE(3)		! Column names
@@ -1379,7 +1378,6 @@ c 	CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
       INTEGER			CBPTR			! Channel energies
       INTEGER			FSTAT			! FITSIO status
       INTEGER			I			!
-      INTEGER			LUN			! Logical unit
       INTEGER			NCHAN			! Number of channels
       INTEGER			BWIDTH			! Width of binary table in bytes
       INTEGER			HDUTYPE
