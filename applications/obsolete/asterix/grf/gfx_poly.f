@@ -24,7 +24,7 @@
       REAL X1,X2,Y1,Y2
       REAL XW1,XW2,YW1,YW2
       REAL XX,YY
-      INTEGER I,N
+      INTEGER I
       INTEGER STYLE,WIDTH,COLOUR
       LOGICAL OK
       LOGICAL XLOG,YLOG			! whether axes are log

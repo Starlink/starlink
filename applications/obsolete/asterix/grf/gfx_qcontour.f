@@ -36,7 +36,7 @@
       PARAMETER (IX=50,JY=50)
 *    Local variables :
       REAL TILE(IX,JY)
-      INTEGER I,J,L
+      INTEGER I,J
       INTEGER II,JJ,III,JJJ,NI,NJ
       INTEGER IXT,JYT,NXT,NYT
       INTEGER SXT,SYT,SNX,SNY
