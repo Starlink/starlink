@@ -766,8 +766,8 @@
 *          Make gaussian of this width
             SIGP = (WID(ISRC) / (2.0 * SQRT(2.0*ALOG(2.0))))
      :             / (ABS(DX)*MATH__RTOD*60.0)
-            CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, REAL(TPW)/2.0,
-     :                          REAL(TPW)/2.0, 0.0, 0.0, TPW, TPW,
+            CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, 0.0, 0.0,
+     :                          0.0, 0.0, 1.0, 1.0, TPW, TPW,
      :                          PKERN, STATUS )
 
 *          Make copy of psf
