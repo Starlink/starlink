@@ -360,7 +360,7 @@ Error m_SXRegrid( Object *in, Object *out ){
 /*  Abort if no fields were found. */
 
       if( !head ) {
-         DXSetError( ERROR_INVALID_DATA, "no fields found in \"input\"." );
+         DXSetError( ERROR_DATA_INVALID, "no fields found in \"input\"." );
          goto error;
       }
 
@@ -393,17 +393,17 @@ Error m_SXRegrid( Object *in, Object *out ){
          if( !DXGetArrayInfo( inpos_array, &npos, &type, &cat, &rank, &npindim ) ) goto error;
 
          if( type != TYPE_FLOAT ){
-            DXSetError( ERROR_INVALID_DATA, "positions component in \"input\" is not of type FLOAT." );
+            DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of type FLOAT." );
             goto error;
          }
                      
          if( cat != CATEGORY_REAL ){
-            DXSetError( ERROR_INVALID_DATA, "positions component in \"input\" is not of category REAL." );
+            DXSetError( ERROR_DATA_INVALID, "positions component in \"input\" is not of category REAL." );
             goto error;
          }
                      
          if( rank > 1 ){
-            DXSetError( ERROR_INVALID_DATA, "rank %d positions component found in \"input\".", rank );
+            DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"input\".", rank );
             goto error;
          }
 
@@ -413,7 +413,7 @@ Error m_SXRegrid( Object *in, Object *out ){
          }
                      
          if( npindim != ndim ){
-            DXSetError( ERROR_INVALID_DATA, "dimensionality of \"input\" (%d) does not match \"grid\" (%d).", npindim, ndim );
+            DXSetError( ERROR_DATA_INVALID, "dimensionality of \"input\" (%d) does not match \"grid\" (%d).", npindim, ndim );
             goto error;
          }
 

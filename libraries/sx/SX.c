@@ -2122,7 +2122,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Check that it holds REAL values */
 
       if( categ != CATEGORY_REAL ) {
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "REAL values required for parameter \"%s\".",
                      name );
          return( NULL );
@@ -2146,7 +2146,7 @@ float *SXGet1r( char *name, Object in, int *n ){
 /*  Check that it is now a scalar list */
 
       if( rank > 0 ) {
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "parameter \"%s\" should be a 1-D list of scalar values.",
                      name );
          return( NULL );
@@ -2243,7 +2243,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Check that it holds REAL values */
 
       if( categ != CATEGORY_REAL ) {
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "REAL values required for parameter \"%s\".",
                      name );
          return( NULL );
@@ -2267,7 +2267,7 @@ int *SXGet1i( char *name, Object in, int *n ){
 /*  Check that it is now a scalar list */
 
       if( rank > 0 ) {
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "parameter \"%s\" should be a 1-D list of scalar values.",
                      name );
          return( NULL );
@@ -2753,7 +2753,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 /*  Store the input positions object and tag value. */
 
          if( !(fp->pos = DXGetComponentValue( (Field) in, "positions" ) ) ){
-            DXSetError( ERROR_INVALID_DATA, "missing \"positions\" in input." );
+            DXSetError( ERROR_DATA_INVALID, "missing \"positions\" in input." );
             goto error;
          }
 
@@ -2764,7 +2764,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
 
          fp->data = DXGetComponentValue( (Field) in, "data" );
          if( !fp->data ){
-            DXSetError( ERROR_INVALID_DATA, "missing \"data\" in input." );
+            DXSetError( ERROR_DATA_INVALID, "missing \"data\" in input." );
             goto error;
          }
 
@@ -2775,13 +2775,13 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
                      
          if( typecheck == 1 ){
             if( fp->datatype != TYPE_FLOAT && fp->datatype != TYPE_DOUBLE ){
-               DXSetError( ERROR_INVALID_DATA, "non-floating point data component found in \"input\"." );
+               DXSetError( ERROR_DATA_INVALID, "non-floating point data component found in \"input\"." );
                goto error;
             }
          }
                      
          if( cat != CATEGORY_REAL ){
-            DXSetError( ERROR_INVALID_DATA, "data component in \"input\" is not of category REAL." );
+            DXSetError( ERROR_DATA_INVALID, "data component in \"input\" is not of category REAL." );
             goto error;
          }
                      
@@ -2794,12 +2794,12 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
          }
                      
          if( rank > maxrank ){
-            DXSetError( ERROR_INVALID_DATA, "rank %d data component found in \"input\".", rank );
+            DXSetError( ERROR_DATA_INVALID, "rank %d data component found in \"input\".", rank );
             goto error;
          }
 
          if( fp->datalen > maxshape ){
-            DXSetError( ERROR_INVALID_DATA, "%s dimensional data component found in \"input\".", fp->datalen );
+            DXSetError( ERROR_DATA_INVALID, "%s dimensional data component found in \"input\".", fp->datalen );
             goto error;
          }
 
@@ -2813,7 +2813,7 @@ Object SXMakeOut( Object in, Field template, int typecheck, int maxrank,
             }
 
             if( strcmp( text, dep ) ){
-               DXSetError( ERROR_INVALID_DATA, "\"input\" data components must be dependant on %s.",dep);
+               DXSetError( ERROR_DATA_INVALID, "\"input\" data components must be dependant on %s.",dep);
                goto error;
             }
 
@@ -3277,7 +3277,7 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
 /*  Check that the object supplied is a field. */
 
       if( DXGetObjectClass( in ) != CLASS_FIELD ){
-         DXSetError( ERROR_INVALID_DATA, "the \"grid\" object is not a field." );
+         DXSetError( ERROR_DATA_INVALID, "the \"grid\" object is not a field." );
          return( NULL );
       }
 
@@ -3302,17 +3302,17 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
       if( !DXGetArrayInfo( gridpos_array, nsamp, &type, &cat, &rank, ndim ) ) return( NULL );
 
       if( type != TYPE_FLOAT ){
-         DXSetError( ERROR_INVALID_DATA, "positions component in \"grid\" is not of type FLOAT." );
+         DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of type FLOAT." );
          return( NULL );
       }
                      
       if( cat != CATEGORY_REAL ){
-         DXSetError( ERROR_INVALID_DATA, "positions component in \"grid\" is not of category REAL." );
+         DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of category REAL." );
          return( NULL );
       }
                      
       if( rank > 1 ){
-         DXSetError( ERROR_INVALID_DATA, "rank %d positions component found in \"grid\".", rank );
+         DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"grid\".", rank );
          return( NULL );
       }
 
@@ -3322,7 +3322,7 @@ float *SXGetGrid( Object in, int *nsamp, int *ndim, float *lbnd, float
       }
                      
       if( *ndim > 3 ){
-         DXSetError( ERROR_INVALID_DATA, "%d-dimensional positions component found in \"grid\".", *ndim );
+         DXSetError( ERROR_DATA_INVALID, "%d-dimensional positions component found in \"grid\".", *ndim );
          return( NULL );
       }
 
@@ -3963,7 +3963,7 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
 /*  Check that the object supplied is a field. */
 
       if( DXGetObjectClass( in ) != CLASS_FIELD ){
-         DXSetError( ERROR_INVALID_DATA, "the \"grid\" object is not a field." );
+         DXSetError( ERROR_DATA_INVALID, "the \"grid\" object is not a field." );
          return( NULL );
       }
 
@@ -3988,17 +3988,17 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
       if( !DXGetArrayInfo( gridpos_array, NULL, &type, &cat, &rank, ndim ) ) return( NULL );
 
       if( type != TYPE_FLOAT ){
-         DXSetError( ERROR_INVALID_DATA, "positions component in \"grid\" is not of type FLOAT." );
+         DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of type FLOAT." );
          return( NULL );
       }
                      
       if( cat != CATEGORY_REAL ){
-         DXSetError( ERROR_INVALID_DATA, "positions component in \"grid\" is not of category REAL." );
+         DXSetError( ERROR_DATA_INVALID, "positions component in \"grid\" is not of category REAL." );
          return( NULL );
       }
                      
       if( rank > 1 ){
-         DXSetError( ERROR_INVALID_DATA, "rank %d positions component found in \"grid\".", rank );
+         DXSetError( ERROR_DATA_INVALID, "rank %d positions component found in \"grid\".", rank );
          return( NULL );
       }
 
@@ -4008,7 +4008,7 @@ Interpolator SXGetIntp( Object in, int *ncon, int *ndim, Object *grid ){
       }
                      
       if( *ndim > 3 ){
-         DXSetError( ERROR_INVALID_DATA, "%d-dimensional positions component found in \"grid\".", *ndim );
+         DXSetError( ERROR_DATA_INVALID, "%d-dimensional positions component found in \"grid\".", *ndim );
          return( NULL );
       }
 

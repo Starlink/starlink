@@ -100,7 +100,7 @@ Error m_SXPercents( Object *in, Object *out ){
       } 
 
       if( DXGetObjectClass( in[0] ) != CLASS_FIELD ){
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "Parameter \"input\" should be a field." );
          goto error;
       }      
@@ -132,7 +132,7 @@ Error m_SXPercents( Object *in, Object *out ){
 
       if( ( type != TYPE_FLOAT ) || ( cat !=CATEGORY_REAL ) ||
           ( rank != 0 ) ){
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "Input data should be 1-D array of real floating point values.");
          goto error;
       }
@@ -146,7 +146,7 @@ Error m_SXPercents( Object *in, Object *out ){
                       (String) DXGetComponentAttribute( (Field) in[0],
                                                         "data", "dep" ) );
       if( !attr ){
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "Missing data dependancy attribute in parameter \"input\".");
          goto error;
       }
@@ -155,7 +155,7 @@ Error m_SXPercents( Object *in, Object *out ){
          npos = nel + 1;
 
       } else {
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "Input data (%s) must be dependant on connections.",attr);
          goto error;
 
@@ -194,7 +194,7 @@ Error m_SXPercents( Object *in, Object *out ){
 
       if( ( type != TYPE_FLOAT ) || ( cat !=CATEGORY_REAL ) ||
           ( rank != 0 ) || ( pnel != npos ) ){
-         DXSetError( ERROR_INVALID_DATA, 
+         DXSetError( ERROR_DATA_INVALID, 
                      "Input \"positions\" component does not match \"data\" component.");
          goto error;
       }
