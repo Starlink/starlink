@@ -90,8 +90,6 @@ itcl::class gaia::GaiaPosTable {
       add_short_help $itk_component(flipx) {disabled}
       $itk_component(flipy) configure -state disabled
       add_short_help $itk_component(flipy) {disabled}
-      $itk_component(reset) configure -state disabled
-      add_short_help $itk_component(reset) {disabled}
 
       #  Update short help for centroid, which now also updates RA/Dec.
       add_short_help $itk_component(centroid) {Centroid positions}

@@ -10,7 +10,7 @@
 
 #  Description:
 #     This class creates objects for creating a local catalogue of
-#     positions from objects identified on the image. It also presents 
+#     positions from objects identified on the image. It also presents
 #     image quality information determined from the list of positions
 #     (this includes FWHM to estimate the global seeing).
 
@@ -195,6 +195,15 @@ itcl::class gaia::GaiaPositions {
       $short_help_win_ add_menu_short_help $File \
          {New window} {Create a new toolbox}
 
+      #  Import positions from a text file.
+      $File add command -label {Import text file...} \
+         -command [code $this import_text_] \
+         -accelerator {Control-m}
+      bind $w_ <Control-m> [code $this import_text_]
+      $short_help_win_ add_menu_short_help $File \
+         {Import text file...}\
+         {Import positions from a plain text file}
+
       #  And the options to save positions and re-read from file.
       $File add command -label {Write positions to file...} \
          -command [code $this save_positions_] \
@@ -271,7 +280,7 @@ itcl::class gaia::GaiaPositions {
       #  Markers menu (filled by GaiaPosTable).
       add_menubutton Markers
    }
-   
+
    #  Add controls for image quality estimates.
    protected method add_image_quality_ {} {
       itk_component add rule {
@@ -395,7 +404,7 @@ itcl::class gaia::GaiaPositions {
          if { [catch {$itk_option(-rtdimage) globalstats \
                          $coords $itk_option(-iqesize)} msg] == 0 } {
             lassign $msg fwhmx rfwhmx fwhmy rfwhmy angle peak back nused
-            
+
             #  Get image scale.
             set ix [lindex $coords 0]
             set iy [lindex $coords 1]
@@ -431,6 +440,36 @@ itcl::class gaia::GaiaPositions {
          }
       } else {
          warning_dialog "No positions available"
+      }
+   }
+
+   #  Import displayed positions from a text file.
+   protected method import_text_ {} {
+      busy {
+
+         #  Start import dialog. The output file is fixed and the user
+         #  chooses the input file. The format of the output file is
+         #  the correct astrometry format.
+         set importer [gaia::GaiaTextImport $w_.\#auto \
+                          -outfile "GaiaPositions.Dat" \
+                          -format ast \
+                          -show_infile 1 \
+                          -show_outfile 0]
+         lassign [$importer activate] outfile ra dec x y
+
+         #  Get "id ra dec x y" positions from new file and read into
+         #  table.
+         if { $outfile != {} } {
+            $itk_component(table) read_positions $outfile
+            
+            #  If X and Y or RA/Dec where missing then project them
+            #  from the given coordinates.
+            if { $x == -1 && $y == -1 } {
+               $itk_component(table) update_x_and_y
+            } elseif { $ra == -1 && $dec == -1 } {
+               $itk_component(table) update_ra_and_dec
+            }
+         }
       }
    }
 

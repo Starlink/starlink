@@ -69,9 +69,6 @@ itcl::class gaia::GaiaTabStops {
    #  ------------
    constructor {args} {
 
-      #  Evaluate options (note no keep sections allowed beyond this point).
-      eval itk_initialize $args
-
       #  Create the display elements. These are a scrolled canvas
       #  region with a label, a creator blue triangle and a series of
       #  red triangles pointing to the tab positions.
@@ -85,12 +82,19 @@ itcl::class gaia::GaiaTabStops {
       pack $itk_component(canvas) -side top -fill both -expand 1
       set canvas_ $itk_component(canvas)
 
+      #  Use label to display text.
       itk_component add label {
          label $canvas_.textlabel \
             -textvariable [scope itk_option(-text)]
+      } {
+         rename -font -textfont textFont TextFont
       }
+
+      #  Evaluate options (note no keep sections allowed beyond this point).
+      eval itk_initialize $args
       set label_ $itk_component(label)
       update_label_size_
+
 
       #  Work out a geometry for all triangles.
       set trioffset_ [expr int($entheight_)+1]
@@ -155,6 +159,7 @@ itcl::class gaia::GaiaTabStops {
    #  Remove a tab-stop.
    protected method remove_stop_ {id} {
       $canvas_ delete $id
+      update_stops_
    }
 
    #  Add a tab-stop, returns the canvas identifier.

@@ -97,6 +97,8 @@ proc gaia::setXdefaults {} {
     option add *GaiaQueryResult.headingLines 1
     option add *GaiaQueryResult.titleFont    $labelFont
 
+    option add *GaiaTabStops.textFont        $textFont
+
     #  Stop ugly tearoff menus and post using "flush", as in Tk4.2.
     option add *TearOff  0 userDefault
     option add *Menubutton*direction flush

@@ -234,11 +234,12 @@ itcl::class gaia::GaiaTextImport {
       configure -outfile {}
    }
 
-   #  Activate interface, waiting until window is closed.
+   #  Activate interface, waiting until window is closed. Return the 
+   #  filename and which coordinates where found.
    public method activate {} {
       wm deiconify $w_
-      tkwait variable itk_option(-outfile)
-      return $itk_option(-outfile)
+      tkwait variable [scope itk_option(-outfile)]
+      return "$itk_option(-outfile) $raout_ $decout_ $xout_ $yout_"
    }
 
    #  Reset window to defaults.
@@ -612,6 +613,10 @@ itcl::class gaia::GaiaTextImport {
       if { $itk_option(-outfile) != {} } {
          set outid [::open $itk_option(-outfile) w]
          set inid [::open $itk_option(-infile) r]
+         set raout_ -1
+         set decout_ -1
+         set xout_ -1
+         set yout_ -1
          if { $itk_option(-format) == "tab" } {
 
             #  Write a TAB table.
@@ -625,15 +630,19 @@ itcl::class gaia::GaiaTextImport {
             }
             if { $values_($this,ra) != {} } {
                puts $outid "ra_col: $values_($this,ra)"
+               set raout_ 1
             }
             if { $values_($this,dec) != {} } {
                puts $outid "dec_col: $values_($this,dec)"
+               set decout_ 1
             }
             if { $values_($this,x) != {} } {
                puts $outid "x_col: $values_($this,x)"
+               set xout_ 1
             }
             if { $values_($this,y) != {} } {
                puts $outid "y_col: $values_($this,y)"
+               set yout_ 1
             }
             set headings ""
             for {set i 0} {$i < $ncolumns_} {incr i} {
@@ -675,16 +684,16 @@ itcl::class gaia::GaiaTextImport {
                set id $values_($this,id)
             }
             if { $values_($this,ra) != {} } {
-               set ra $values_($this,ra)
+               set raout_ $values_($this,ra)
             }
             if { $values_($this,dec) != {} } {
-               set dec $values_($this,dec)
+               set decout_ $values_($this,dec)
             }
             if { $values_($this,x) != {} } {
-               set x $values_($this,x)
+               set xout_ $values_($this,x)
             }
             if { $values_($this,y) != {} } {
-               set y $values_($this,y)
+               set yout_ $values_($this,y)
             }
 
             #  Set defaults, if RA/DEC etc. not selected. Note these
@@ -694,44 +703,44 @@ itcl::class gaia::GaiaTextImport {
             if { $ncolumns_ >= 5 } {
 
                #  Five columns or more. Defaults are id, ra, dec, x, y.
-               if { $id == -1 && $ra == -1 && $dec == -1 &&
-                    $x == -1 && $y == -1} {
+               if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
+                    $xout_ == -1 && $yout_ == -1} {
                   set values_($this,id) 0
                   set id 0
                   set values_($this,ra) 1
-                  set ra 1
+                  set raout_ 1
                   set values_($this,dec) 2
-                  set dec 2
+                  set decout_ 2
                   set values_($this,x) 3
-                  set x 3
+                  set xout_ 3
                   set values_($this,y) 4
-                  set y 4
+                  set yout_ 4
                }
             } elseif { $ncolumns_ == 4 } {
 
                #  Only four columns. Defaults are ra, dec, x, y.
-               if { $id == -1 && $ra == -1 && $dec == -1 &&
-                    $x == -1 && $y == -1} {
+               if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
+                    $xout_ == -1 && $yout_ == -1} {
                   set values_($this,ra) 0
-                  set ra 0
+                  set raout_ 0
                   set values_($this,dec) 1
-                  set dec 1
+                  set decout_ 1
                   set values_($this,x) 2
-                  set x 2
+                  set xout_ 2
                   set values_($this,y) 3
-                  set y 3
+                  set yout_ 3
                }
             } elseif { $ncolumns_ == 3 } {
 
                #  Only three columns. Defaults are id, ra, dec.
-               if { $id == -1 && $ra == -1 && $dec == -1 &&
-                    $x == -1 && $y == -1} {
+               if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
+                    $xout_ == -1 && $yout_ == -1} {
                   set values_($this,id) 0
                   set id 0
                   set values_($this,ra) 1
-                  set ra 1
+                  set raout_ 1
                   set values_($this,dec) 2
-                  set dec 2
+                  set decout_ 2
                }
             }
 
@@ -753,23 +762,23 @@ itcl::class gaia::GaiaTextImport {
                         } else {
                            set vid $count
                         }
-                        if { $ra != -1 } {
-                           set vra [lindex $wordlist_ $ra]
+                        if { $raout_ != -1 } {
+                           set vra [lindex $wordlist_ $raout_]
                         } else {
                            set vra "00:00:00"
                         }
-                        if { $dec != -1 } {
-                           set vdec [lindex $wordlist_ $dec]
+                        if { $decout_ != -1 } {
+                           set vdec [lindex $wordlist_ $decout_]
                         } else {
                            set vdec "00:00:00"
                         }
-                        if { $x != -1 } {
-                           set vx [lindex $wordlist_ $x]
+                        if { $xout_ != -1 } {
+                           set vx [lindex $wordlist_ $xout_]
                         } else {
                            set vx 0.0
                         }
-                        if { $y != -1 } {
-                           set vy [lindex $wordlist_ $y]
+                        if { $yout_ != -1 } {
+                           set vy [lindex $wordlist_ $yout_]
                         } else {
                            set vy 0.0
                         }
@@ -825,6 +834,13 @@ itcl::class gaia::GaiaTextImport {
 
    #  Current list of parsed words.
    protected variable wordlist_
+
+   #  The coordinates (ra,dec,x,y) found when the output file 
+   #  was written.
+   protected variable raout_ -1
+   protected variable decout_ -1
+   protected variable xout_ -1
+   protected variable yout_ -1
 
    #  Common variables: (shared by all instances)
    #  -----------------

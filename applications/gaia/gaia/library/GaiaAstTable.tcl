@@ -760,6 +760,24 @@ itcl::class gaia::GaiaAstTable {
       return $rms
    }
 
+   #  Update the ra and dec positions using the current x and y
+   #  positions.
+   public method update_ra_and_dec {} {
+      set nrows [$itk_component(table) total_rows]
+      set oldcon [$itk_component(table) get_contents]
+      $itk_component(table) clear
+      for { set i 0 } { $i < $nrows } { incr i } {
+         lassign [lindex $oldcon $i] id ra dec x y
+         if { [ catch { $itk_option(-rtdimage) astpix2wcs $x $y } msg ] == 0 } {
+            #  Insert these into the table.
+            lassign $msg newra newdec
+            $itk_component(table) append_row [list $id $newra $newdec $x $y]
+         }
+      }
+      $itk_component(table) new_info
+      redraw
+   }
+
    #  Centroid the X and Y positions, hopefully making them more accurate.
    public method centroid {} {
 

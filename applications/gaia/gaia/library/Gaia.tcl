@@ -61,6 +61,11 @@
 #        with click-to-focus + autoraise under CDE.
 #     06-DEC-1999 (PWD):
 #        Added Norman Gray's ESP toolbox. Commented out as not ready.
+#     05-MAY-2000 (PWD):
+#        Changed so that CATLIB_CONFIG is used in preference to
+#        all other configuration files when set (otherwise need
+#        to delete ~/.skycat/skycat.cfg before can use another 
+#        configuration file).
 #     {enter_changes_here}
 
 #-
@@ -235,12 +240,6 @@ itcl::class gaia::Gaia {
 
       #  Center image first time.
       after 0 [code $image_ center]
-
-      #  XXX DEBUGGING CODE XXX
-      source GaiaTextImport.tcl 
-      gaia::GaiaTextImport .imp \
-         -outfile temp.ast -infile test.ASC -format ast \
-         -show_infile 0 -show_outfile 0
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -1108,16 +1107,20 @@ itcl::class gaia::Gaia {
       }
 
       #  Where to look for catalog config file:
-      #    use ~/.skycat/skycat.cfg if it exists, since it may contain
-      #    user's preferences, otherwise use $SKYCAT_CONFIG if set, or
-      #    $CATLIB_CONFIG (note native implimentation ignores
-      #    SKYCAT_CONFIG as this may be set by CURSA, which is bad).
-      #  Make sure ~/.skycat exists.
-      set config_file [utilGetConfigFilename .skycat skycat.cfg]
-      if {[file exists $config_file]} {
-         set env(CATLIB_CONFIG) "file:$config_file"
-      } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
-         set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+      #    use CATLIB_CONFIG, if set (assume this is deliberate)
+      #    next use ~/.skycat/skycat.cfg if it exists (this contains
+      #    the user's preferences), finally use $SKYCAT_CONFIG if set
+      #    (note native implimentation ignores SKYCAT_CONFIG as this 
+      #    may be set by CURSA, which is bad).
+      if { ! [info exists env(CATLIB_CONFIG)] } {
+
+         #  Make sure ~/.skycat exists.
+         set config_file [utilGetConfigFilename .skycat skycat.cfg]
+         if {[file exists $config_file]} {
+            set env(CATLIB_CONFIG) "file:$config_file"
+         } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
+            set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+         }
       }
       if { ! $native } {
          setup_starlink_env [file dirname [info nameofexecutable]]
