@@ -9,7 +9,8 @@ noinst_LTLIBRARIES = libpgplot_drivers.la
 libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 bin_PROGRAMS = pgxwin_server
-pgxwin_server = pgxwin_server.c
+pgxwin_server_SOURCES = pgxwin_server.c
+pgxwin_server_LDADD = $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
 
 #  List of Fortran routines required for building the package.  This is
@@ -19,7 +20,7 @@ pgxwin_server = pgxwin_server.c
 #  order.
 
 F_ROUTINES = exdriv.f pgdriv.f \
-vbdriv.f cadriv.f hgdriv.f lhdriv.f	   \
+cadriv.f hgdriv.f 	   \
 lxdriv.f ppdriv.f vtdriv.f gidriv.f	   \
 hidriv.f psdriv.f ttdriv.f cwdriv.f \
 gldriv.f nedriv.f wddriv.f	   \
@@ -31,8 +32,8 @@ xmdriv.c figdisp_comm.c pgxwin.c pndriv.c tkdriv.c xadriv.c xwdriv.c
 AM_CFLAGS = -DPG_PPU
 
 F_ROUTINES_NOTLINUX = bcdriv.f gvdriv.f ladriv.f lvdriv.f tfdriv.f \
-xedriv.f gcdriv.f todriv.f zedriv.f ccdriv.f ljdriv.f \
-mfdriv.f hjdriv.f lndriv.f pxdriv.f txdriv.f epdriv.f godriv.f wsdriv.f
+xedriv.f gcdriv.f todriv.f zedriv.f ccdriv.f ljdriv.f lhdriv.f \
+mfdriv.f hjdriv.f lndriv.f pxdriv.f txdriv.f epdriv.f godriv.f wsdriv.f vbdriv.f
 
 ## Problems with GRWARN //
 
