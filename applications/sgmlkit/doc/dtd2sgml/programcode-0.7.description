@@ -423,12 +423,13 @@ list of parameters to a function.
 </element>
 
 <element gi="purpose" status="beta">
-<p>A brief description of the function being documented.  If this is
-missing, then the contents of the <elemref gi="description"/> are used
-instead, but if that element has a lot of content, then you should
-provide a <elemref gi="purpose" self="self"/> element, to be used in contexts
-where only a brief function description is required.
-</p>
+<p>A brief description of the function being documented, to be used in
+contexts where only a brief function summary is required.  If this
+element is missing, then the contents of the first paragraph of the
+<elemref gi="description"/> are used instead.  This means that you can
+safely omit this element if the first paragraph of your description is
+also an adequate summary, or if the function is minor enough that it
+only warrants a one-line explanation anyway.</p>
 </element>
 
 <element gi="px" status="beta">
