@@ -2409,7 +2409,7 @@ sub handle_monoliths
                                       VAR_CONFIGURE, '', TRUE,
                                       subst ('LDFLAGS'),
                                       '', INTERNAL, VAR_ASIS);
-      }
+        }
       set_seen ($xname . '_LDFLAGS');
 
       # Determine program to use for link -- we just force this
@@ -2524,6 +2524,10 @@ sub handle_monoliths
   Automake::Variable::define ('bin_MONOLITH_IFCS', VAR_AUTOMAKE, '', TRUE,
                               "@all_tasks",
                               '', INTERNAL, VAR_PRETTY);
+  # These .ifc files should be built at 'make all' time
+  push (@all, '$(bin_MONOLITH_IFCS)');
+  # The collection of task-monolith pairs is used when installing/linking
+  # .ifc files
   Automake::Variable::define ('TASK_MONOLITH_PAIRS', VAR_AUTOMAKE, '', TRUE,
                               "@task_monolith_pairs",
                               '', INTERNAL, VAR_PRETTY);
