@@ -35,7 +35,7 @@
 
      PARAMETER OUT
                POSITION 2
-               TYPE    '_UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Output source filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
@@ -45,7 +45,7 @@
 
      PARAMETER BOUT
                POSITION 3
-               TYPE    '_UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Output background filename'
                PPATH   'CURRENT'
                VPATH   'PROMPT'
