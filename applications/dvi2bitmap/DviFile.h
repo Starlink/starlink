@@ -43,6 +43,8 @@ public:
     // Return first, and subsequent defined fonts.
     PkFont *firstFont();
     PkFont *nextFont();
+    // Return the net magnification factor for the DVI file
+    double magnification() const { return magfactor_; }
 
 private:
     const string fileName_;
