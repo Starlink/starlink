@@ -9,6 +9,7 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * Peter W. Draper 27 Jan 03  Added extra_precision flags for milli-arcsec
  */
 static const char* const rcsId="@(#) $Id: HMS.C,v 1.5 1998/07/01 09:54:29 abrighto Exp $";
 
@@ -59,7 +60,12 @@ HMS::HMS(double val)
 	sign_ = '+';
     }
 
-    dd = v + 0.0000000001;
+    if ( extra_precision ) {
+       dd = v + 0.000000000001;
+    }
+    else {
+       dd = v + 0.0000000001    
+    } 
     hours_ = (int)dd;
     md = (dd - hours_) * 60.;
     min_ = (int)md;
@@ -148,28 +154,28 @@ void HMS::print_normal_precise_( char *buf ) const
     }
 }
 
-//  Show 3 digits prec for dec, 4 for ra
+//  Show 4 digits prec for dec, 5 for ra
 void HMS::print_extra_precise_( char *buf ) const
 {
     char secs[8];
     if (show_sign_) {
-	if ( sec_ < 100 ) {
-            // ??? When would this not be true?
-	    sprintf( secs, "%02d.%03d", int( sec_ ),
-                     int( ( ( sec_ - int( sec_ ) ) + 0.0005 ) * 1000 ) );
-	}
-	else {
-	    sprintf(secs, "%02.3f", sec_);
-	}
-    }
-    else {
 	if ( sec_ < 1000 ) {
-            //  ??? When would this not be true?
+            // ??? When would this not be true?
 	    sprintf( secs, "%02d.%04d", int( sec_ ),
                      int( ( ( sec_ - int( sec_ ) ) + 0.00005 ) * 10000 ) );
 	}
 	else {
-	    sprintf( secs, "%02.4f", sec_ );
+	    sprintf(secs, "%02.4f", sec_);
+	}
+    }
+    else {
+	if ( sec_ < 10000 ) {
+            //  ??? When would this not be true?
+	    sprintf( secs, "%02d.%05d", int( sec_ ),
+                     int( ( ( sec_ - int( sec_ ) ) + 0.000005 ) * 100000 ) );
+	}
+	else {
+	    sprintf( secs, "%02.5f", sec_ );
 	}
     }
 
