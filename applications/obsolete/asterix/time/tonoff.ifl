@@ -1,7 +1,7 @@
 interface TONOFF
   parameter INP
     position 1
-    type '_CHAR'
+    type '_UNIV'
     prompt 'Time series'
     help 'Name of time series file'
   endparameter
