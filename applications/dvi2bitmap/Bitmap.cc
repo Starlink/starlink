@@ -397,11 +397,15 @@ void Bitmap::write (const string filename, const string format)
     BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
     if (bi == 0)		// invalid format
     {
+	const string& deffmt = BitmapImage::defaultBitmapImageFormat();
 	if (verbosity_ >= normal)
 	    cerr << "Bitmap: can't create image with format "
-		 << format << "\n";
+		 << format
+		 << ".  Trying format "
+		 << deffmt
+		 << " instead\n";
 	bi = BitmapImage::newBitmapImage
-	    (BitmapImage::defaultBitmapImageFormat, hsize, vsize, bpp_);
+	    (deffmt, hsize, vsize, bpp_);
 	if (bi == 0)
 	    throw BitmapError
 		("Bitmap: can't create image with default format");
