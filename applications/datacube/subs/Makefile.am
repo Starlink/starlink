@@ -12,7 +12,7 @@ libdatacube_subs_la_SOURCES = \
 #  order.
 
 F_ROUTINES = \
-  copyaxis.f  cub1_ainit.f  getbound.f  putaxis.f 
+  cub1_ainit.f
 
 GEN_ROUTINES = \
   cug1_cpya.gen   cug1_doast.gen  cug1_filla.gen
