@@ -121,7 +121,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 1.8-1')
+        PARAMETER           (VERSION = 'CQUALITY Version 1.8-2')
 *-
 
       CALL MSG_PRNT( VERSION )
