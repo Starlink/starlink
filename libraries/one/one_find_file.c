@@ -283,6 +283,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    int Nchars;           /* Maximum number of chars that can be copied */
    int NullFd;           /* File descriptor for the null device */
    char *PointFSpec;     /* Local copy of FileSpec          */
+   int STATUS;           /* Local fork STATUS */
 
    /*  Start off by checking for good status  */
 
@@ -342,7 +343,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
              *  will use to give us the filenames we want.
              */
 
-            int STATUS = fork();
+            STATUS = fork();
             if (STATUS < 0) {
 
                 /* error: unable to fork */
