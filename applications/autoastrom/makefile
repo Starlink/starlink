@@ -1141,7 +1141,8 @@ $(PKG_NAME)_source.tar:
 	cd moggy && test -f configure || sh bootstrap || (echo "Need newer version of autoconf!" && false)
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
-	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib plugin-*.pl t
+# Do not include the t/images directory -- large files!
+	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib plugin-*.pl `find t -maxdepth 1`
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
