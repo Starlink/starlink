@@ -447,9 +447,10 @@
                   label $itk_component(plot$index:display).instruct$index \
                      -justify $side -text $msg
                }
+               global CCDdir
                itk_component add plot$index:arrow {
                   label $itk_component(plot$index:display).arrow$index \
-                     -bitmap @arrow_$side.xbm
+                     -bitmap @$CCDdir/arrow_$side.xbm
                }
                pack $itk_component(plot$index:arrow) \
                   -side $side -anchor n -expand 0
