@@ -273,7 +273,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 59 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 58 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -296,7 +296,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/astgui/build/java
-     [copy] Copying 41 files to /apps/cvsbuild/java/source/astgui/build/java
+     [copy] Copying 44 files to /apps/cvsbuild/java/source/astgui/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/astgui/build/java
      [echo] Executing JNIHDS target: javadoc-sources
 
@@ -415,11 +415,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1737 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1741 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 41 seconds
+Total time: 44 seconds

@@ -2339,8 +2339,11 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstCellEditor.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDouble.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleDocument.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstDoubleField.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstFigureProps.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstFigureStore.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstGrid.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java
+U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstPlotSource.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStrings.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStyleBox.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTicks.java
@@ -9082,7 +9085,7 @@ U java/source/util/src/main/uk/ac/starlink/util/IOUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
 U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
-U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
+U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/ProxySetup.java
 U java/source/util/src/main/uk/ac/starlink/util/ReaderThread.java
 U java/source/util/src/main/uk/ac/starlink/util/ResourceDataSource.java
@@ -9091,13 +9094,12 @@ U java/source/util/src/main/uk/ac/starlink/util/StarEntityResolver.java
 U java/source/util/src/main/uk/ac/starlink/util/SuperJar.java
 U java/source/util/src/main/uk/ac/starlink/util/TemporaryFileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/TestCase.java
-U java/source/util/src/main/uk/ac/starlink/util/Tester.java
 U java/source/util/src/main/uk/ac/starlink/util/URLDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/URLUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/UncompressInputStream.java
-U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java
+U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeDecode.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/gui
-U java/source/util/src/main/uk/ac/starlink/util/gui/AWTXMLEncodeAndDecode.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/AWTXMLEncodeDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFontChooser.java
