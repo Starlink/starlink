@@ -1,6 +1,6 @@
       SUBROUTINE FIT_MIN( NDS, IMOD, MCTRL, OPCHAN,
      :                    PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
-     :                    FSTAT, PREDICTOR, PARAM, DPAR,
+     :                    LNDFAC, FSTAT, PREDICTOR, PARAM, DPAR,
      :                    PEGGED, STAT, FINISHED, FITERR, STATUS )
 *+
 *  Name:
@@ -116,6 +116,8 @@
 *  History:
 *     17 Apr 1996 (DJA):
 *        Original version. Old FIT_MIN became FIT_MIN1
+*     28 May 1998 (ELD):
+*        FIT_MIN4 called based on style; LNDFAC added
 *     {enter_changes_here}
 
 *  Bugs:
@@ -140,6 +142,7 @@ c     RECORD /MODEL_SPEC/ 	MODEL
       REAL			LB(*), UB(*)
       LOGICAL			PRGRES, FROZEN(*)
       EXTERNAL			PREDICTOR
+      DOUBLE PRECISION          LNDFAC
 
 *  Arguments Given and Returned:
       LOGICAL			PEGGED(*)
@@ -168,9 +171,21 @@ c     RECORD /PREDICTION/	PREDDAT(NDS)
 
 *    CURFIT algorithm
 	CALL FIT_MIN1( NDS, IMOD, MCTRL, OPCHAN,
-     :                 PRGRES, NPAR, LB, UB, FROZEN, SSCALE,
+     :                 PRGRES, NPAR, LB, UB, FROZEN, SSCALE, LNDFAC,
      :                 FSTAT, PREDICTOR, PARAM, DPAR,
      :                 PEGGED, STAT, FINISHED, FITERR, STATUS )
+
+      ELSEIF ( STYLE .EQ. 'GENALG' )THEN
+
+                 CALL FLUSH(6)
+
+*    Genetic algorithm
+        CALL FIT_MIN4( NDS, OBDAT, INSTR, MODEL, PRGRES, NPAR,
+     :          LB, UB, FROZEN, SSCALE, LNDFAC, FSTAT, PREDICTOR,
+     :          PREDDAT, PARAM, PEGGED, STAT, FINISHED, FITERR,
+     :          MCTRL, STATUS )
+
+
 
 *  Otherwise unknown
       ELSE
