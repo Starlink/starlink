@@ -38,11 +38,9 @@ fmode = true
 ask 'Use orig. scannr (else seqnr)?' fmode ?
 
 ! Give file name option
-mixid = 'a'
-ask 'Mixer id a,b,..? [a]' mixid ?
-if (mixid = '' or mixid = ' ') then
-  mixid = 'a'
-endif
+print 'TOFITS> Use an id character to identify different mixers etc.'
+mixid = ' '
+ask 'Extra id a,b,..? [none]' mixid ?
 
 ! Loop over spectra in file
 do kscan fscan lscan
@@ -54,11 +52,19 @@ do kscan fscan lscan
    cscan = scan_title
    csscan = subscan_no
    fitsname = ' '
-   if (fmode) then
+   if (fmode)
      read scan_no cscan
-     write fitsname 'jcmt_',cscan,'_',csscan,'_',mixid,'.fits'
+     if (mixid <> '' & mixid <> ' ')
+       write fitsname 'jcmt_',cscan,'_',csscan,'_',mixid,'.fits'
+     else
+       write fitsname 'jcmt_',cscan,'_',csscan,'.fits'
+     endif
    else
-     write fitsname 'jcmt_',kscan:i4.4,'_',mixid,'.fits'
+     if (mixid <> '' & mixid <> ' ')
+       write fitsname 'jcmt_',kscan:i4.4,'_',mixid,'.fits'
+     else
+       write fitsname 'jcmt_',kscan:i4.4,'.fits'
+     endif
    endif     
 
    ! Actually write file

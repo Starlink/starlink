@@ -16,6 +16,7 @@ declare  b34        r4
 
 ask 'GSD scan #?', iscan, ?
 
+bpart = 0
 print '      Baseline using outer x km/s of each section?'
 print '      (the extreme outer 10% will be avoided in the fit regardless)'
 ask 'Outer x km/s [0:none]? ', bpart, ?
@@ -29,12 +30,12 @@ set-x \3\\\
 
 ! read subsystem 1 or 2 of the scan and das-merge 
 
-r-d-g  iscan 1
+r-g-d  iscan
 d-m \\\\
 
 ! do baseline fit if requested
 
-if (bpart > 0.1) then
+if (bpart > 0.1)
 
   ! fit a linear baseline to the section outside +/-bpart km/s 
   ! from the center. calculate baseline parts first.
@@ -49,7 +50,7 @@ if (bpart > 0.1) then
 
   ! LSB and USB spectra run in 'opposite directions in vel. space:
 
-  if (f_cen/1e06 < lo_freq) then
+  if (f_cen/1e06 < lo_freq)
     r-l-b \b3 b34\b34 b4\
   else
     r-l-b \b1 b12\b12 b2\
@@ -59,12 +60,12 @@ endif
 
 ! repeat procedure for subsystem 2
 
-r-d-g  iscan 2
+xy
 d-m \\\\
 
-if (bpart > 0.1) then
+if (bpart > 0.1)
 
-  if (f_cen/1e06 < lo_freq) then
+  if (f_cen/1e06 < lo_freq)
     r-l-b \b1 b12\b12 b2\
   else
     r-l-b \b3 b34\b34 b4\
@@ -82,7 +83,7 @@ concat
 
 merge-q n
 
-if (bpart > 0.1) then
+if (bpart > 0.1)
   print ' '
   print 'Baseline used: ', b1:f7.1, b2:f7.1,'   and ', b3:f7.1, b4:f7.1
   print ' '
