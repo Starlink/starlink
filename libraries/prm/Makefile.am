@@ -23,6 +23,11 @@ make_prm_par_LDADD = -lm
 include_HEADERS = $(NORMAL_INCLUDES) $(PLATFORM_INCLUDES)
 include_MESSAGES = PRM_ERR
 noinst_MESSAGES = prm_err.h
+dist_pkgdata_DATA = prm.news
+
+# The common block should not be installed since it will not
+# work with shared libraries. The correct API should be used instead
+noinst_HEADERS = $(PLATFORM_PRIVATE_INCLUDES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
@@ -102,7 +107,8 @@ vec_tanhd.f vec_tanhr.f vec_tanr.f vec_ubtob.f vec_ubtod.f vec_ubtoi.f \
 vec_ubtor.f vec_ubtoub.f vec_ubtouw.f vec_ubtow.f vec_uwtob.f \
 vec_uwtod.f vec_uwtoi.f vec_uwtor.f vec_uwtoub.f vec_uwtouw.f \
 vec_uwtow.f vec_wtob.f vec_wtod.f vec_wtoi.f vec_wtor.f vec_wtoub.f \
-vec_wtouw.f vec_wtow.f
+vec_wtouw.f vec_wtow.f \
+num_clearerr.f num_wasok.f num_geterr.f
 
 # Module num1_cvt.c is not in fact necessary in cases where the
 # Fortran compiler supports the IZEXT (and related) intrinsic.  We
@@ -135,7 +141,8 @@ NORMAL_INCLUDES = \
 # NUM_DEF_{R,D}   uses non-standard SIND (etc) intrinsics.
 # NUM_DEF_CVT     uses non-standard intrinsics when available,
 #                 and functions from num1_cvt.c otherwise.
-PLATFORM_INCLUDES = NUM_DEF_D NUM_DEF_R NUM_DEF_CVT NUM_CMN
+PLATFORM_INCLUDES = NUM_DEF_D NUM_DEF_R NUM_DEF_CVT
+PLATFORM_PRIVATE_INCLUDES = NUM_CMN
 
 # Here are the dependencies for these files
 #NUM_CMN: NUM_CMN.fpp
@@ -173,7 +180,7 @@ PRM_PAR prm_par.h: make-prm-par$(EXEEXT)
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
 BUILT_SOURCES = $(include_MESSAGES) $(noinst_MESSAGES) PRM_PAR prm_par.h \
-	$(PLATFORM_INCLUDES)
+	$(PLATFORM_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES)
 
 
 # Tests
@@ -185,5 +192,6 @@ prm_test_SOURCES = prm_test.f
 prm_test_LDADD = libprm.la libprm_a.la
 
 # Files for distribution that are not picked up elsewhere.
-EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.fpp) $(PRIVATE_INCLUDES)
+EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.fpp) \
+	$(PRIVATE_INCLUDES) $(PLATFORM_PRIVATE_INCLUDES:=.fpp)
 

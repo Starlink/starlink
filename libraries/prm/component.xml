@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="prm">
-  <version>1.3-1</version>
+  <version>1.4-1</version>
   <path>libraries/prm</path>
   <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
   <abstract><p>This document describes the PRIMDAT package, which
