@@ -23,8 +23,8 @@ AC_PATH_PROG(PERL, perl)
 
 dnl    If you write AC_PROG_YACC here, autoconf may try to use bison -y.
 dnl    This doesn't seem to work for some reason, but yacc does, so get
-dnl    it by hand.
-AC_PATH_PROG(YACC, yacc)
+dnl    it by hand. SCB also prefers byacc on Cygwin.
+AC_PATH_PROG(YACC, [byacc yacc])
 
 dnl    Locate lex, and customise it to use a local skel flag if it's flex.
 dnl    If not, audibly deprecate for distribution, since lex-generated
