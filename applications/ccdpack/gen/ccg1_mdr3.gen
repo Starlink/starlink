@@ -53,11 +53,15 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-MAY-1992 (PDRAPER):
 *        Original version.
+*     27-NOV-2000 (MBT):
+*        Fixed bug; variance values were not sorted corresponding to 
+*        order of data values being stacked.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,6 +107,7 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
+      REAL WT                    ! Dummy variable for weight value
       DOUBLE PRECISION VAL       ! Weighted median
       INTEGER NGOOD              ! Number of good pixels
 
@@ -136,8 +141,8 @@
 *  Convert input type floating point value.
                WRK1( NGOOD ) = NUM_<T>TOR( STACK( I, J ) )
 
-*  Change variance to weight.
-               WRK2( NGOOD ) = REAL( 1.0D0 / VARS( J ) )
+*  Test if the variance can be changed to a weight without error.
+               WT = REAL( 1.0D0 / VARS( J ) )
 
 *  Trap conversion failures.
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
@@ -154,6 +159,11 @@
 
 *  Sort these values into increasing order.
             CALL CCG1_IS2R( WRK1, POINT, NGOOD, STATUS )
+
+*  Construct the corresponding weight array in the right order.
+            DO 4 J = 1, NGOOD
+               WRK2( J ) = REAL( 1.0D0 / VARS( POINT( J ) ) )
+ 4          CONTINUE
 
 *  Find the weighted median.
             CALL CCG1_WTM2R( WRK1, WRK2, NGOOD, USED, VAL, STATUS )

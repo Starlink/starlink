@@ -18,6 +18,10 @@
 
   The following minor changes have also been made since v3.1-0:
 
+   - There have been bug fixes to MAKEMOS: when SCALE was true, data 
+     combination methods MEAN and MEDIAN were applying weights to the
+     wrong input images in overlap regions.
+     
    - There have been some improvements and bug fixes to the percentile
      location routine used by FINDOBJ.
 

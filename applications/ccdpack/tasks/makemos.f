@@ -698,6 +698,8 @@
 *        Removed WRITESZ.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     27-NOV-2000 (MBT):
+*        Modified CCD1_DOMOS call due to bug fix.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -804,6 +806,7 @@
       INTEGER WRK4               ! Workspace pointer
       INTEGER WRK5               ! Workspace pointer
       INTEGER WRK6               ! Workspace pointer
+      INTEGER WRK7               ! Workspace pointer
       LOGICAL ADJUST             ! Apply scale/zero corrections?
       LOGICAL CMPVAR             ! Use variance in inter-comparisons?
       LOGICAL DOITER             ! Inter-comparisins are iterative?
@@ -1646,6 +1649,7 @@
       CALL PSX_CALLOC( 2 * NIN, '_INTEGER', WRK4, STATUS )
       CALL PSX_CALLOC( 2 * NIN, '_INTEGER', WRK5, STATUS )
       CALL PSX_CALLOC( NIN, '_DOUBLE', WRK6, STATUS )
+      CALL PSX_CALLOC( NIN, '_DOUBLE', WRK7, STATUS )
 
 *  Generate the mosaic and/or correct the input NDFs.
       CALL CCD1_DOMOS( NIN, NDF, LBND, UBND, ADJUST, SCALE, DSCALE,
@@ -1653,7 +1657,8 @@
      :                 GENVAR, USEWT, WEIGHT, IMETH, ALPHA, NSIGMA,
      :                 NITER, RMIN, RMAX, NDFOUT, %VAL( WRK1 ),
      :                 %VAL( WRK2 ), %VAL( WRK3 ), %VAL( WRK4 ),
-     :                 %VAL( WRK5 ), %VAL( WRK6 ), STATUS )
+     :                 %VAL( WRK5 ), %VAL( WRK6 ), %VAL( WRK7 ), 
+     :                 STATUS )
 
 *  Release the workspace.
       CALL PSX_FREE( WRK1, STATUS )
@@ -1662,6 +1667,7 @@
       CALL PSX_FREE( WRK4, STATUS )
       CALL PSX_FREE( WRK5, STATUS )
       CALL PSX_FREE( WRK6, STATUS )
+      CALL PSX_FREE( WRK7, STATUS )
 
 *  If appropriate, say where the output mosaic has been written.
       IF ( DOOUT ) THEN

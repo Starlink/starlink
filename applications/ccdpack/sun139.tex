@@ -2578,7 +2578,7 @@ to print them out, use \xroutine{PLOTLIST}.
 
 CCDPACK provides the routine
 \begin{itemize}
-\item \routine{WCSEDIT}
+\item \xroutine{WCSEDIT}
 \end{itemize}
 for direct manipulation of the coordinate system information attached
 to an image or a group of images.
@@ -9272,7 +9272,6 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 }
 \sstroutine{IDICURS}{
    Views and writes position lists interactively.
-
 }{
    \sstdescription{
       This program displays an image on the screen and provides a 
@@ -16177,8 +16176,12 @@ This is a major update to CCDPACK.
   The following minor changes have also been made since v3.1-0:
   \begin{itemize}
   \item
+     There have been bug fixes to \xroutine{MAKEMOS}: when SCALE was true, data
+     combination methods MEAN and MEDIAN were applying weights to the
+     wrong input images in overlap regions.
+  \item
      There have been some improvements and bug fixes to the percentile
-     location routine used by FINDOBJ.
+     location routine used by \xroutine{FINDOBJ}.
   \end{itemize}
 
 

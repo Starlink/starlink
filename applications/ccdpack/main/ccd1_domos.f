@@ -3,7 +3,7 @@
      :                       DOOUT, USEVAR, GENVAR, USEWT, WEIGHT,
      :                       IMETH, ALPHA, NSIGMA, NITER, RMIN, RMAX,
      :                       NDFOUT, BAD, BADIN, IBOUND, LIST, PNTR,
-     :                       VARS, STATUS )
+     :                       VARS, VARLIN, STATUS )
 *+
 *  Name:
 *     CCD1_DOMOS
@@ -19,7 +19,7 @@
 *                      ZERO, DZERO, ORIGIN, MODIFY, DOOUT, USEVAR,
 *                      GENVAR, USEWT, WEIGHT, IMETH, ALPHA, NSIGMA,
 *                      NITER, RMIN, RMAX, NDFOUT, BAD, BADIN, IBOUND,
-*                      LIST, PNTR, VARS, STATUS )
+*                      LIST, PNTR, VARS, VARLIN, STATUS )
 
 *  Description:
 *     The routine merges an arbitrary set of "input" NDFs into a mosaic
@@ -157,6 +157,8 @@
 *        Workspace.
 *     VARS( NIN ) = DOUBLE PRECISION (Returned)
 *        Workspace.
+*     VARLIN( NIN ) = DOUBLE PRECISION (Returned)
+*        Workspace.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -242,6 +244,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -307,6 +310,9 @@
 *        variances. Related changes are increasing the minimum number of
 *        contributing pixels to 2, when variances are estimated (the
 *        associated variance of such regions would be BAD anyway).
+*     27-NOV-2000 (MBT):
+*        Fixed bug; the weight array being passed to CCG1_CM3 routines
+*        was not indexed correctly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -353,6 +359,7 @@
       INTEGER LIST( 2, NIN )
       INTEGER PNTR( 2, NIN )
       DOUBLE PRECISION VARS( NIN )
+      DOUBLE PRECISION VARLIN( NIN )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -839,7 +846,8 @@
      :                        IEND, I, SCALE( II ), DSCALE( II ),
      :                        ZERO( II ), DZERO( II ), ORIGIN( II ),
      :                        ISTART, IEND, DATSTK, NBADD, STATUS )
-                           IF ( UVAR ) CALL CCD1_MVDAT( ITYPE1,
+                           IF ( UVAR ) THEN
+                              CALL CCD1_MVDAT( ITYPE1,
      :                        ( ADJUST .AND. ( .NOT. MODIFY ) ),
      :                        BAD( 2, II ), .TRUE.,
      :                        MAX( LBND( IFIRST, II ), LBC ),
@@ -848,6 +856,12 @@
      :                        IEND, I, SCALE( II ), DSCALE( II ),
      :                        ZERO( II ), DZERO( II ), ORIGIN( II ),
      :                        ISTART, IEND, VARSTK, NBADV, STATUS )
+                           ELSE
+
+*  Set up an array of variances indexed by line using the array of 
+*  variances indexed by NDF.
+                              VARLIN( I ) = VARS( II )
+                           END IF
                            IF ( STATUS .NE. SAI__OK ) GO TO 98
  8                      CONTINUE
 
@@ -878,8 +892,8 @@
 *  _REAL processing, no variances.
                         IF ( ITYPE1 .EQ. '_REAL' ) THEN
                            IF ( .NOT. UVAR ) THEN
-                              CALL CCG1_CM3RR( %VAL( DATSTK ), EL,
-     :                                  NII, VARS, IMETH, MINPIX, NITER,
+                              CALL CCG1_CM3RR( %VAL( DATSTK ), EL, NII,
+     :                                  VARLIN, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
      :                                  %VAL( RESDAT ),
      :                                  %VAL( WRK1 ), %VAL( WRK2 ),
@@ -902,8 +916,8 @@
 *  _DOUBLE processing, no variances.
                         ELSE IF ( ITYPE1 .EQ. '_DOUBLE' ) THEN
                            IF ( .NOT. UVAR ) THEN
-                              CALL CCG1_CM3DD( %VAL( DATSTK ), EL,
-     :                                  NII, VARS, IMETH, MINPIX, NITER,
+                              CALL CCG1_CM3DD( %VAL( DATSTK ), EL, NII,
+     :                                  VARLIN, IMETH, MINPIX, NITER,
      :                                  NSIGMA, ALPHA, RMIN, RMAX,
      :                                  %VAL( RESDAT ),
      :                                  %VAL( WRK1 ), %VAL( WRK2 ),
