@@ -195,13 +195,14 @@ itcl::class gaia::Gaia {
       set gaia_logo [image create pixmap -file $gaia_library/gaia_logo.xpm]
       set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
       rtd_set_cmap $w
-      wm title $w " "
-#      wm overrideredirect $w 1
+      wm title $w "GAIA::SkyCat loading..."
       wm withdraw $w_
       pack \
          [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
+         -side top -padx 1m -pady 1m
+      pack \
          [message $w.msg -text $about_skycat \
-             -width 6i \
+             -width 8i \
              -justify center \
              -borderwidth 2 -relief groove] \
          [ProgressBar $w.progress \
