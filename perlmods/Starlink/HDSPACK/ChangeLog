@@ -1,3 +1,10 @@
+2003-03-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* t/creobj.t: First version
+
+	* HDSPACK.pm (creobj): Add creobj. Make sure that _find_loc can
+	access CELLs (e.g AXIS(1)).
+
 2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* HDSPACK.pm (retrieve_locs): Fix problem when file name uses ./

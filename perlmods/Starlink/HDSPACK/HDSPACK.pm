@@ -10,12 +10,15 @@ Starlink::HDSPACK - routines for high level HDS manipulation
 
   $status = copobj("file.more.fits","file1.more", $status);
   $status = delobj("file.more.fits", $status);
+  $status = creobj("file", "NDF", $status);
+  $status = creobj("file.DATA_ARRAY", "ARRAY", $status);
+  $status = creobj("file.DATA_ARRAY.DATA", "_REAL",[20,30], $status);
 
 =head1 DESCRIPTION
 
 This module provides wrapper routines for common HDS manipulations.
-Functions are provided for copying data structures between locations
-and for deleting structures.
+Functions are provided for copying data structures between locations,
+deleting structures and creating structures/primitives.
 
 
 =cut
@@ -35,7 +38,7 @@ use constant SAI__ERROR => &NDF::SAI__ERROR;
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
 
 $DEBUG = 0;
-@EXPORT_OK = qw( copobj retrieve_locs delobj);
+@EXPORT_OK = qw( copobj retrieve_locs delobj creobj);
 
 =head2 FUNCTIONS
 
@@ -157,21 +160,17 @@ sub copobj {
 
   # First remove the final target name -- we don't want a locator
   # to that since we are putting our copied object there
-  # need a non-greedy pattern match that starts from the back...
-  # benchmarking shows that reverse is twice as fast a joining
-  # back together after splitting.
-  (my $outname, $target) = split(/\./, reverse($target), 2);
-  $target = reverse($target);
-  $outname = reverse($outname);
+  ($target, my $outname) = _split_path( $target );
 
-  print "Source location: $source\n" if $DEBUG;
-  print "Output location: $target called $outname\n" if $DEBUG;
+  print "# Source location: $source\n" if $DEBUG;
+  print "# Output location: $target called $outname\n" if $DEBUG;
 
   # Find HDS locators to all the structures listed
   # The first structure in the array is the file locator.
   # the last locator in the array points to the requested structure/object
   ($status, my @srclocs) = retrieve_locs($source, 'READ', $status);
-  ($status, my @tarlocs) = retrieve_locs($target, 'UPDATE', $status)
+  my @tarlocs;
+  ($status, @tarlocs) = retrieve_locs($target, 'UPDATE', $status)
     if length($target) > 0;
 
   # If tarlocs contains nothing and status is good, we have
@@ -179,12 +178,12 @@ sub copobj {
   # can be created with the first HDS structure.
 
   if ($status == SAI__OK && scalar(@tarlocs) == 0 && scalar(@srclocs) != 0) {
-    print "Create new HDS container... $outname\n" if $DEBUG;
+    print "# Create new HDS container... $outname\n" if $DEBUG;
 
     # Need to read the structure name from the locator so that
     # we dont change it (should match the end of the requested source string)
     dat_name($srclocs[-1], my $structname, $status);
-    
+
     # Copy to the new root
     hds_copy($srclocs[-1], $outname, $structname, $status);
 
@@ -202,7 +201,7 @@ sub copobj {
 	err_rep("STRUCT","copobj: Target object ($target) is not an HDS structure", $status);
       }
     }
-    
+
     # Check to see if the target object is present
     # If it is - we delete it
     my $there;
@@ -211,7 +210,7 @@ sub copobj {
       if ($status != SAI__OK) {
 	err_rep('THERE', "copobj: Error checking for existence of ${target}.$outname", $status);
       }
-      
+
     }
 
     # erase it
@@ -245,7 +244,7 @@ has been called).
 
 
 sub delobj {
-  
+
   croak 'Usage: delobj(object, status)' unless scalar(@_) == 2;
 
   # read arguments
@@ -262,12 +261,11 @@ sub delobj {
   }
 
   # Chop off the last component
-  (my $delname, $object) = split(/\./, reverse($object), 2);
-  $object = reverse($object);
-  $delname = reverse($delname);
+  ($object, my $delname) = _split_path( $object );
 
   # Find the HDS locator referenced
-  ($status, my @srclocs) = retrieve_locs($object, 'UPDATE', $status)
+  my @srclocs;
+  ($status, @srclocs) = retrieve_locs($object, 'UPDATE', $status)
     if length($object) > 0;
 
   # If no locators were retrieved we assume that an entire container
@@ -279,7 +277,7 @@ sub delobj {
     hds_erase($ploc, $status);
 
   } else {
-    
+
     # Check to see if it is there
     dat_there($srclocs[-1], $delname, my $there, $status);
 
@@ -296,7 +294,128 @@ sub delobj {
   return $status;
 }
 
+=item B<creobj>
 
+Create a new HDS object, structure orprimitive, scalar or array.
+Generally used to tweak data structures.
+
+  $status = creobj( $object, $type, \@dims, $status );
+
+Where C<$object> is the name of the object to be created including
+a full HDS path. Anything before the first dot is assumed to be
+a filename specification (directory specification is allowed) and
+everything after the first do is assumed to be a HDS hierarchy.
+The entire hierarchy must exist except for the last element.
+
+The second argument is the HDS type of the new object. Values such
+as '_REAL', '_INTEGER' are treated as primitive types, all other
+values are treated as structures (e.g. 'NDF'). Note that a character
+string must be specified with its expected length if you wish
+it to be presized (e.g. '_CHAR' would create a single character
+whereas '_CHAR*15' would create space for 15 characters).
+
+The third (optional) argument specfiies the dimensions of the new
+object supplied as a reference to an array. If no argument is
+specified the object is assumed to be a scalar (dims=0).
+
+The last argument must be Starlink status.
+
+  $status = creobj("file", "NDF", $status);
+
+Creates a file on disk of type "NDF".
+
+  $status = creobj("file.DATA_ARRAY", 'ARRAY', $status);
+
+Creates a DATA_ARRAY structure of type "ARRAY".
+
+  $status = creobj("file.DATA_ARRAY.DATA", '_REAL', [20,30],
+                   $status);
+
+Creates a REAL array of dimension 20x30 called 'DATA'.
+
+Accepts and returns Starlink status. This routine assumes we are in a
+valid error context (eg err_begin() has been called).
+
+Attempting to create entire NDFs using this routine is not recommended.
+
+=cut
+
+sub creobj {
+  croak 'Usage: creobj(object, type, \@dims, status)'
+    unless (scalar(@_) == 3 || scalar(@_) == 4);
+
+  # Read arguments (taking care for the optional third
+  my $object = shift;
+  my $type = shift;
+  my $indims = [];
+  if (scalar(@_) == 2) {
+    $indims = shift;
+  }
+  my $status = shift;
+
+  # Return status if not good
+  return $status if $status != SAI__OK;
+
+  # Sanity check
+  # Check args
+  unless (defined $object) {
+    $status = SAI__ERROR;
+    err_rep('NOOBJECT','Starlink::HDSPACK::creobj - no object defined', 
+	    $status);
+    return $status;
+  }
+
+  unless (defined $type) {
+    $status = SAI__ERROR;
+    err_rep('NOTYPE','Starlink::HDSPACK::creobj - no object TYPE defined', 
+	    $status);
+    return $status;
+  }
+
+  unless (ref($indims) eq 'ARRAY') {
+    $status = SAI__ERROR;
+    err_rep('NODIMS','Starlink::HDSPACK::creobj - no dims not array ref', 
+	    $status);
+    return $status;
+  }
+
+  # The dims array must be turned into an array
+  # We use a separate ndims variable to indicate scalars
+  # (indicated by single value of 0 in the array or empty array)
+  my (@dims, $ndims);
+  if (scalar(@$indims) == 0 || $indims->[0] == 0) {
+    $ndims = 0;
+    @dims = (0);
+  } else {
+    @dims = @$indims;
+    $ndims = scalar(@$indims);
+  }
+
+
+  # The last component is the one we want to create
+  ($object, my $new) = _split_path( $object );
+
+  # Get the HDS locator hierarchy
+  my @locs;
+  ($status, @locs) = retrieve_locs( $object, 'UPDATE', $status)
+    if length($object) > 0;
+
+  # If we have no locators, assume we have to create a top level
+  my $nloc;
+  if (scalar(@locs) == 0) {
+    hds_new( $new, $new, $type, $ndims, @dims, $nloc, $status );
+  } else {
+    dat_new($locs[-1], $new, $type, $ndims, @dims, $status);
+  }
+
+  # Free up the locators
+  foreach my $loc ($nloc, reverse(@locs)) {
+    next unless defined $nloc;
+    dat_annul($loc, $status);
+  }
+
+  return $status;
+}
 
 
 
@@ -311,6 +430,9 @@ sub delobj {
 # in the structure which contains locators from all levels below it!
 # these disappear as you unwind the recursion
 
+# If a name includes an array specified, eg AXIS(1)
+# we find 'AXIS' and then locate the CELL.
+
 sub _find_loc {
 
    my $parent = shift;
@@ -319,18 +441,65 @@ sub _find_loc {
 
    my $nextcmp = shift;
 
+   my ($iscell, @index);
+   if ($nextcmp =~ /^(.*)\((.*)\)$/) {
+     $iscell = 1;
+     @index = split(',',$2);
+     $nextcmp = $1;
+   }
+
    # Get next locator
-   print "Looking for $nextcmp\n" if $DEBUG; 
+   print "# Looking for $nextcmp\n" if $DEBUG; 
    dat_find($parent, $nextcmp, my $child, $status);
+
+   # If we are a cell find it,
+   my $cellloc;
+   if ($iscell) {
+     # V1.44 of NDF module and older have bug in dat_cell
+     # Once V1.45 is release we can remove this line. It simply
+     # forces the locator to look right - it is incorrectly
+     # treated as an input argument
+     $cellloc = $child;
+
+     print "# Accessing CELL ".join(",",@index)."\n" if $DEBUG;
+     dat_cell($child, scalar(@index), @index, $cellloc, $status);
+   }
 
    # If we have more things on the argument stack we call ourselves
    my @locators = ();
    ($status, @locators) = _find_loc($child, $status, @_) if @_;
 
-   # Now put $child onto the list
+   # Now put $child onto the list (and cell if required)
+   unshift(@locators, $cellloc) if defined $cellloc;
    unshift(@locators, $child);
 
+
    return ( $status, @locators );
+}
+
+# Extract the last entry from the HDS hierarchy
+# ($root, $last) = _split_path( $path );
+# Turns:  file.a.b  to "file.a" and "b"
+# Note that if there is no sub component this routine
+# will return ('','file');
+sub _split_path {
+  my $path = shift;
+
+  # Chop off the last component
+  # need a non-greedy pattern match that starts from the back...
+  # benchmarking shows that reverse is twice as fast a joining
+  # back together after splitting.
+  my ($last, $root) = split(/\./, reverse($path), 2);
+  $last = reverse($last);
+  $root = reverse($root);
+
+  # If the path ends in '.sdf' assume this is just a file name
+  if ($last eq 'sdf') {
+    $last = $root;
+    $root = '';
+  }
+
+  return($root, $last);
 }
 
 
