@@ -73,10 +73,11 @@ set about_gaia "\
 
 GAIA version $gaia_version
 
-Copyright (C) 1997-1999 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2000 Central Laboratory of the Research Councils (U.K.)
 
 Authors:
 Peter W. Draper (P.W.Draper@durham.ac.uk)
+Norman Gray (norman@astro.gla.ac.uk)
 
 GAIA is derived from SkyCat version [skycat_version]
 Copyright (C) 1996-1999 ESO - European Southern Observatory
@@ -88,7 +89,7 @@ Miguel Albrecht (malbrech@eso.org)
 Daniel Durand (durand@dao.nrc.ca)
 Peter Biereichel (pbiereic@eso.org)
 
-Bug reports and suggestions to: ussc@star.rl.ac.uk
+Bug reports and suggestions to: gaia@star.rl.ac.uk
 
 "
 
