@@ -16,6 +16,7 @@
 
 
 
+
 SOURCES = $(libfio_la_SOURCES) $(libfio_adam_la_SOURCES)
 
 srcdir = @srcdir@
@@ -55,7 +56,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libfio_la_LIBADD =
@@ -76,6 +77,8 @@ am__objects_5 = fio1_chkfp.lo fio1_fndfp.lo fio1_getfp.lo fio_activ.lo \
 	rio_annul.lo rio_assoc.lo rio_cancl.lo
 am_libfio_adam_la_OBJECTS = $(am__objects_4) $(am__objects_5)
 libfio_adam_la_OBJECTS = $(am_libfio_adam_la_OBJECTS)
+binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
+SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
 FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
 LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(AM_FCFLAGS) $(FCFLAGS)
@@ -88,11 +91,11 @@ includeHEADERS_INSTALL = $(INSTALL_HEADER)
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
-SUFFIXES = .tex .dvi .ps .htx_tar
 stardocsSTARDATA_INSTALL = $(INSTALL_STARDATA)
 starhelpSTARDATA_INSTALL = $(INSTALL_STARDATA)
 STARDATA = $(stardocs_STARDATA) $(starhelp_STARDATA)
 INSTALL_STARDATA = $(INSTALL_DATA)
+SUFFIXES = .tex .dvi .ps .htx_tar
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST) \
 	$(STAR_EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
@@ -215,6 +218,7 @@ starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 lib_LTLIBRARIES = libfio.la libfio_adam.la
+bin_SCRIPTS = fio_link fio_link_adam
 libfio_la_SOURCES = $(BLOCK_DATA_STANDALONE) $(F_ROUTINES) $(PLATFORM_F)
 libfio_adam_la_SOURCES = $(BLOCK_DATA_ADAM) $(F_ROUTINES_ADAM)
 include_HEADERS = $(PUBLIC_INCLUDES)
@@ -394,6 +398,28 @@ libfio.la: $(libfio_la_OBJECTS) $(libfio_la_DEPENDENCIES)
 	$(FCLINK) -rpath $(libdir) $(libfio_la_LDFLAGS) $(libfio_la_OBJECTS) $(libfio_la_LIBADD) $(LIBS)
 libfio_adam.la: $(libfio_adam_la_OBJECTS) $(libfio_adam_la_DEPENDENCIES) 
 	$(FCLINK) -rpath $(libdir) $(libfio_adam_la_LDFLAGS) $(libfio_adam_la_OBJECTS) $(libfio_adam_la_LIBADD) $(LIBS)
+install-binSCRIPTS: $(bin_SCRIPTS)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(bindir)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  if test -f $$d$$p; then \
+	    f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	    echo " $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f"; \
+	    $(binSCRIPT_INSTALL) $$d$$p $(DESTDIR)$(bindir)/$$f; \
+	    if test -n "$$MANIFEST_FILE"; then \
+		echo "$(DESTDIR)$(bindir)/$$f" >>$$MANIFEST_FILE; \
+	    else :; fi; \
+	  else :; fi; \
+	done
+
+uninstall-binSCRIPTS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_SCRIPTS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's|^.*/||;$(transform)'`; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -486,39 +512,6 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-# Templates to generate documentation
-.tex.dvi:
-	latex $<
-.dvi.ps:
-	dvips -o $@ $<
-# Don't express a dependency via the directory .htx, or else Make
-# tries to delete it as an intermediate.  An alternative is to use
-# .PRECIOUS, but that's not completely straightforward to arrange.
-.tex.htx_tar:
-	- star2html $<
-	tar cf $@ ${<:.tex=.htx}
-
 # Compile messages for message file fio_err.msg
 FIO_ERR: fio_err.msg
 	$(STARLINK)/bin/messgen -F fio_err.msg
@@ -568,6 +561,39 @@ uninstall-starhelpSTARDATA:
 	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
 	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
 	done
+
+# Create an install manifest, and install it in the required manifest location
+install-manifest.xml: all-am
+	rm -f $@
+	echo "<?xml version='1.0'?>"                            >$@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+	echo "<manifest component='$(PACKAGE)'>"                >>$@
+	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
+	echo "<files>"                                          >>$@
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
+	echo "</files>"                                         >>$@
+	echo "</manifest>"                                      >>$@
+
+# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
+# We should respect $(DESTDIR), but needn't worry about $(srcdir),
+# since we know that the file was created in the current directory.
+# Having done that, delete the install-manifest.xml file
+install-manifest: install-manifest.xml
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) install-manifest.xml \
+		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+# Templates to generate documentation
+.tex.dvi:
+	latex $<
+.dvi.ps:
+	dvips -o $@ $<
+# Don't express a dependency via the directory .htx, or else Make
+# tries to delete it as an intermediate.  An alternative is to use
+# .PRECIOUS, but that's not completely straightforward to arrange.
+.tex.htx_tar:
+	- star2html $<
+	tar cf $@ ${<:.tex=.htx}
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -698,9 +724,10 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(HEADERS) $(STARDATA) config.h
+all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(HEADERS) $(STARDATA) \
+		config.h
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(includedir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(starhelpdir)
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -749,7 +776,7 @@ info-am:
 install-data-am: install-includeHEADERS install-stardocsSTARDATA \
 	install-starhelpSTARDATA
 
-install-exec-am: install-libLTLIBRARIES
+install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -776,9 +803,9 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS uninstall-info-am \
-	uninstall-libLTLIBRARIES uninstall-stardocsSTARDATA \
-	uninstall-starhelpSTARDATA
+uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
+	uninstall-info-am uninstall-libLTLIBRARIES \
+	uninstall-stardocsSTARDATA uninstall-starhelpSTARDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-am clean \
 	clean-generic clean-libLTLIBRARIES clean-libtool ctags dist \
@@ -786,14 +813,15 @@ uninstall-am: uninstall-includeHEADERS uninstall-info-am \
 	distcheck distclean distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags distcleancheck \
 	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-data install-data-am \
-	install-exec install-exec-am install-includeHEADERS \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-stardocsSTARDATA install-starhelpSTARDATA \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
-	pdf pdf-am ps ps-am tags uninstall uninstall-am \
+	info-am install install-am install-binSCRIPTS install-data \
+	install-data-am install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-libLTLIBRARIES install-man install-stardocsSTARDATA \
+	install-starhelpSTARDATA install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags uninstall uninstall-am uninstall-binSCRIPTS \
 	uninstall-includeHEADERS uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-stardocsSTARDATA \
 	uninstall-starhelpSTARDATA

@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 lib_LTLIBRARIES = libfio.la libfio_adam.la
+bin_SCRIPTS = fio_link fio_link_adam
 
 libfio_la_SOURCES = $(BLOCK_DATA_STANDALONE) $(F_ROUTINES) $(PLATFORM_F)
 libfio_adam_la_SOURCES = $(BLOCK_DATA_ADAM) $(F_ROUTINES_ADAM)
