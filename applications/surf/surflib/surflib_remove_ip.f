@@ -86,6 +86,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/07/15 01:45:52  timj
+*     Check for division by zero in IP variance calculation
+*
 *     Revision 1.1  1999/02/27 04:34:19  timj
 *     First version
 *
@@ -239,8 +242,13 @@
                ANG_VAR = ((2.0 * SIN((4.0*WPANG)-(2.0*THETA_IP)))
      :              ** 2.0) * THETA_IP_VAR
                
-               IP_VAR = (IP**2)*( (P_IP_VAR/(P_IP**2)) + 
-     :              (ANG_VAR/(ANG_BIT**2)) )
+*     check for division by zero problems
+               IF (P_IP .EQ. 0.0 .OR. ANG_BIT .EQ. 0) THEN
+                  IP_VAR = VAL__BADR
+               ELSE
+                  IP_VAR = (IP**2)*( (P_IP_VAR/(P_IP**2)) + 
+     :                 (ANG_VAR/(ANG_BIT**2)) )
+               END IF
 
 *     ...and modify the input data
 
@@ -248,10 +256,15 @@
                   BEFORE = BOL_DATA(BOL) ! Needed for variance calc
                   BOL_DATA(BOL) = BOL_DATA(BOL) / (1 + IP)
 
-                  IF (BOL_VAR(BOL) .NE. VAL__BADR) THEN
+*     Division by zero protection
+                  IF (BOL_VAR(BOL) .NE. VAL__BADR
+     :                 .AND. BEFORE .NE. 0.0
+     :                 .AND. IP_VAR .NE. VAL__BADR ) THEN
                      BOL_VAR(BOL) = (BOL_DATA(BOL)**2) *
-     :                    ( (BOL_VAR(BOL) / (BEFORE**2)) +
-     :                    ( IP_VAR / (IP**2)))
+     :                    ( (BOL_VAR(BOL) / (BEFORE**2) ) +
+     :                    ( IP_VAR / (1 +IP)**2 ) )
+                  ELSE
+                     BOL_VAR(BOL) = VAL__BADR
                   END IF
 
                ELSE
