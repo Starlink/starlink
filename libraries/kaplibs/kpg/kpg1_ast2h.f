@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_AST2H( DATA, ILINE, LINE, STATUS )
 *+
-* Name:
-*    KPG1_AST2H
+*  Name:
+*     KPG1_AST2H
 
 *  Purpose:
 *     Copy AST_ data to an HDS object.
