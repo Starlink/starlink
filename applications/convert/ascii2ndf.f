@@ -237,8 +237,6 @@
       INTEGER ONDIM              ! The dimensionality of the existing
                                  ! NDF
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
-      INTEGER RECL               ! Maximum recordlength of input file
-                                 ! in bytes
       INTEGER SKIP               ! Number of header records to skip
       CHARACTER * ( DAT__SZLOC ) TLOC ! Locator to workspace holding the
                                  ! FITS-like headers
@@ -257,7 +255,7 @@
 *  ===================
 
 *  Open the FORTRAN file.
-      CALL FIO_ASSOC( 'IN', 'READ', 'LIST', RECL, FD, STATUS )
+      CALL FIO_ASSOC( 'IN', 'READ', 'LIST', 0, FD, STATUS )
 
 *  See how to handle a header.
 *  ===========================
