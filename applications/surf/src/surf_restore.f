@@ -47,7 +47,7 @@
 
 *  Notes:
 *     Uses the Emerson, Klein and Haslam algorithm (1979, A&A, 76, 92).
-
+*     Can be run before or after EXTINCTION.
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
@@ -91,7 +91,7 @@
       CHARACTER*15 CHOP_FUN             ! chop mode used in observation
       REAL         CHOP_THROW           ! chopper throw (arcsec)
       INTEGER      DIM (MAXDIM)         ! the dimensions of an array
-      LOGICAL      EXTINCTION           ! .TRUE. if the EXTINCTION application
+      LOGICAL      RESTORE              ! .TRUE. if the RESTORE application
                                         ! has already been run on the 
                                         ! input file
       CHARACTER*80 FITS (SCUBA__MAX_FITS)
@@ -237,7 +237,7 @@
          END IF
 
          REDUCE_SWITCH = .FALSE.
-         EXTINCTION = .FALSE.
+         RESTORE = .FALSE.
 
          IF (NREC .GT. 0) THEN
             DO I = 1, NREC
@@ -245,8 +245,8 @@
                CALL CHR_UCASE (STEMP)
                IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
-                  EXTINCTION = .TRUE.
+               ELSE IF (STEMP .EQ. 'RESTORE') THEN
+                  RESTORE = .TRUE.
                END IF
             END DO
          END IF
@@ -260,13 +260,13 @@
      :           'on the input file', STATUS)
             END IF
 
-            IF (EXTINCTION) THEN
+            IF (RESTORE) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP (' ', '^TASK: the '//
-     :           'EXTINCTION application has already been run '//
-     :           'on the input file. RESTORE should be run before '//
-     :           'EXTINCTION', STATUS)
+     :              'RESTORE application has already been run '//
+     :              'on the input file.',
+     :              STATUS)
             END IF
          END IF
       END IF
