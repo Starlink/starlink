@@ -4641,7 +4641,7 @@ ADIobj adix_locgen( ADIobj name, int narg, ADIstatus status )
 
 /* Scan list looking for the first which matches the number of arguments */
     curp = glist;
-    while ( _valid_q(curp) || ! found ) {
+    while ( _valid_q(curp) && ! found ) {
       _GET_CARCDR( cbind, curp, curp );
 
       gnid = _sbind_defn(cbind);
