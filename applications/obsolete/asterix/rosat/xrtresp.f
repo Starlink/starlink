@@ -179,7 +179,7 @@
 * If NR > 10 issue a warning
         IF (NR .GT. 10) THEN
            CALL MSG_SETI('SIZ',NR*3000)
-           CALL MSG_PRNT(' Warning: the output file will be ^SIZ blocks')
+           CALL MSG_PRNT( Warning: the output file will be ^SIZ blocks')
 *
 *    Ask if user wants to continue
            CALL USI_GET0L('CONTINUE', LCONT, STATUS)
@@ -1115,57 +1115,54 @@ C      CALL HDX_PUTC(ELOC,'VERSION',1,VERSION,STATUS)
 *
 *
 *     Write Energy list
-         CALL DAT_NEW(ELOC,'ENERGY','LIST',0,0,STATUS)
-         CALL DAT_FIND(ELOC,'ENERGY',ENLOC,STATUS)
+      CALL DAT_NEW(ELOC,'ENERGY','LIST',0,0,STATUS)
+      CALL DAT_FIND(ELOC,'ENERGY',ENLOC,STATUS)
 *
 *     Write Energy index list
-         CALL HDX_PUTI(ENLOC,'DATA_ARRAY',NEN,
+      CALL HDX_PUTI(ENLOC,'DATA_ARRAY',NEN,
      &                                     ENERGY_LIST,STATUS)
 *
 *     Write Energy of centre of each bin
-         CALL HDX_PUTR(ENLOC,'ENERGY_SPEC',NEN,
+      CALL HDX_PUTR(ENLOC,'ENERGY_SPEC',NEN,
      &                                     ENERGY_SPEC,STATUS)
 *
 *     Write Energy boundarys of each bin
-         CALL HDX_PUTR(ENLOC,'ENERGY_BOUNDS',NEN+1,
+      CALL HDX_PUTR(ENLOC,'ENERGY_BOUNDS',NEN+1,
      &                                   ENERGY_BOUNDS,STATUS)
 *
-         CALL DAT_ANNUL(ENLOC, STATUS)
+      CALL DAT_ANNUL(ENLOC, STATUS)
 *
 *
 *     Write Channel list
-         CALL DAT_NEW(ELOC,'CHANNEL','LIST',0,0,STATUS)
-         CALL DAT_FIND(ELOC,'CHANNEL',CHLOC,STATUS)
+      CALL DAT_NEW(ELOC,'CHANNEL','LIST',0,0,STATUS)
+      CALL DAT_FIND(ELOC,'CHANNEL',CHLOC,STATUS)
 *
 *     Write Channel index list
-         IF (NLIST .NE. 0) THEN
-            CALL HDX_PUTI(CHLOC,'DATA_ARRAY',NEN,
+      CALL HDX_PUTI(CHLOC,'DATA_ARRAY',NEN,
      &                                     CHAN_LIST,STATUS)
-         ENDIF
 *
 *     Write Channel of centre of each bin
-         CALL HDX_PUTR(CHLOC,'CHANNEL_SPEC',1,
+      CALL HDX_PUTR(CHLOC,'CHANNEL_SPEC',1,
      &                                     CHAN_SPEC,STATUS)
 *
 *     Write Channel boundaries of each bin
-         CALL HDX_PUTR(CHLOC, 'CHANNEL_BOUNDS', 2,
+      CALL HDX_PUTR(CHLOC, 'CHANNEL_BOUNDS', 2,
      &                                       CHAN_BOUNDS, STATUS)
 *
-         CALL DAT_ANNUL(CHLOC, STATUS)
+      CALL DAT_ANNUL(CHLOC, STATUS)
 *
 
 *    Create Response list structure
-         CALL DAT_NEW(CLOC,'RESPONSE','LIST',0,0,STATUS)
-         CALL DAT_FIND(CLOC,'RESPONSE',RELOC,STATUS)
+      CALL DAT_NEW(ELOC,'RESPONSE','LIST',0,0,STATUS)
+      CALL DAT_FIND(ELOC,'RESPONSE',RELOC,STATUS)
 *
 *     Write Response array
-         CALL HDX_PUTR(RELOC,'DATA_ARRAY',NEN,MATRIX,STATUS)
+      CALL HDX_PUTR(RELOC,'DATA_ARRAY',NEN,MATRIX,STATUS)
 *
 *
-         CALL DAT_ANNUL(RELOC,STATUS)
-         CALL DAT_ANNUL(ELOC,STATUS)
+      CALL DAT_ANNUL(RELOC,STATUS)
+      CALL DAT_ANNUL(ELOC,STATUS)
 *
-      ENDDO
 *
  999  CONTINUE
 *
