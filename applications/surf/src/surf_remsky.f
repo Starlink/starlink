@@ -21,7 +21,7 @@
 
 *  Description :
 *     This task removes sky noise and constant offsets from SCUBA jiggle
-*     data. It does this by requesting 'sky' bolometers, calculating some
+*     data. It does this by requesting `sky' bolometers, calculating some
 *     average value for each jiggle and then subtracts this off the
 *     jiggle. Each jiggle is analysed in turn. The average value can be
 *     calculated in two ways: either MEDIAN or MEAN.
@@ -32,7 +32,9 @@
 *       from the mean are treated as spikes and removed. Note that for mapping 
 *       this despiking algorithm is only useful for very weak
 *       sources; bright sources will be removed (since a bolometer
-*       jiggles on and off bright sources).
+*       jiggles on and off bright sources). Photometry observations
+*       do not suffer from this problem as the bolometers are always on 
+*       source.
 
 *  Usage:
 *     remsky in out
@@ -84,15 +86,18 @@
 *       image (since NA shows the signal measured by each bolometer
 *       throughout the observation without source rotation).
 *     - The despiking routine is very primitive and should not be used
-*       with jiggle map data of bright sources. It can probably be used
-*       on PHOTOM data since the jiggle pattern never moves off source.
+*       with jiggle map data of bright sources. It can be used
+*       on PHOTOM data since the jiggle pattern never moves off source
+*       (although SIGCLIP is probably more effective).
 
 *  Implementation status:
 *     The despiking routine sets QUALITY bit 5 to bad. It does not affect
-*     the data.
+*     the data. The effects of despiking can be removed by using the 
+*     Kappa task SETBB to unset quality bit 5.
 
 *  Related Applications:
-*     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER
+*     SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER, SIGCLIP;
+*     KAPPA: SETBB
  
 *  Authors:
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
