@@ -218,7 +218,8 @@ sub check_configure {
 
     open (CF, "<$fn") || die "Can't open file $fn to read";
 
-    $has_star_default = 0;
+    my $has_star_default = 0;
+    my $configures_component = 0;
     while (<CF>) {
         /^ *STAR_DEFAULT/ && do {
             if ($has_star_default) {
@@ -229,12 +230,21 @@ sub check_configure {
             }
             $has_star_default++;
         };
+
+        # Following is not a perfect regexp, but will do in most cases
+        /^ *AC_CONFIG_FILES.*component.xml/ && do {
+            $configures_component = 1;
+        }
     }
 
     close (CF);
 
-    if ($has_star_default == 0) {
+    if (! $has_star_default) {
         print_error ($fn, $., "has no STAR_DEFAULT");
+        $nerrors++;
+    }
+    if (! $configures_component) {
+        print_error ($fn, $., "does not appear to configure component.xml");
         $nerrors++;
     }
 
