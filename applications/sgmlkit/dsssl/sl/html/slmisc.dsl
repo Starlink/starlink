@@ -32,18 +32,37 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
 (element figure
   (let* ((caption-details (get-caption-details (current-node)))
 	 (caption-id (cadr caption-details)))
-    (make sequence
-      (make element gi: "div"
-	    attributes: '(("align" "center"))
-	    (process-matching-children 'figurecontent))
-      (make element gi: "blockquote"
-	    (make element gi: "p"
-		  (if caption-id
-		      (make element gi: "a"
-			    attributes: (list (list "name" caption-id))
-			    (literal (car caption-details)))
-		      (literal (car caption-details))))
-	    (process-matching-children 'caption)))))
+    (make element gi: "table"
+	  attributes: '(("align" "center") ("border" "1"))
+      (make element gi: "tr"
+	    (make element gi: "td"
+		  (process-matching-children 'figurecontent)))
+      (make element gi: "tr"
+	    attributes: '(("align" "left"))
+	    (make element gi: "td"
+		  (make sequence
+		    (if caption-id
+			(make element gi: "a"
+			      attributes: (list (list "name" caption-id))
+			      (literal (car caption-details)))
+			(literal (car caption-details)))
+		    (literal ": ")
+		    (process-matching-children 'caption)))))))
+; (element figure
+;   (let* ((caption-details (get-caption-details (current-node)))
+; 	 (caption-id (cadr caption-details)))
+;     (make sequence
+;       (make element gi: "div"
+; 	    attributes: '(("align" "center"))
+; 	    (process-matching-children 'figurecontent))
+;       (make element gi: "blockquote"
+; 	    (make element gi: "p"
+; 		  (if caption-id
+; 		      (make element gi: "a"
+; 			    attributes: (list (list "name" caption-id))
+; 			    (literal (car caption-details)))
+; 		      (literal (car caption-details))))
+; 	    (process-matching-children 'caption)))))
 
 (element caption
   (process-children))
@@ -81,6 +100,10 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
 
 (element kbd
   (make element gi: "code"
+	(process-children)))
+
+(element verbatim
+  (make element gi: "pre"
 	(process-children)))
 
 (element quote
@@ -149,3 +172,4 @@ This file forms the effective body of sl.dsl, the main DSSSL stylesheet.
     gi: "strong"
     (literal "Draft Note:")
     (process-children)))
+
