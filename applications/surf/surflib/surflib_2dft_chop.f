@@ -1,5 +1,5 @@
       SUBROUTINE SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE,
-     :     IDIMS, FT_DATA, FT_VARIANCE, WT_DATA, WT_VARIANCE, STATUS)
+     :     NX, NY, FT_DATA, FT_VARIANCE, WT_DATA, WT_VARIANCE, STATUS)
 *+
 *  Name:
 *    SURFLIB_2DFT_CHOP
@@ -12,7 +12,7 @@
  
 *  Invocation:
 *     CALL SURFLIB_2DFT_CHOP (CHOP_THROW, CHOP_PA, PIXSIZE,
-*    :     IDIMS, FT_DATA, FT_VARIANCE, WT_DATA, WT_VARIANCE, STATUS)
+*    :     NX, NY, FT_DATA, FT_VARIANCE, WT_DATA, WT_VARIANCE, STATUS)
 
 *  Description:
 *     Given the chop parameters calculate the FT of the chop.
@@ -32,8 +32,10 @@
 *           from North. This angle is in degrees.
 *     PIXSIZE                     = REAL (Given)
 *           pixel size in arcsec
-*     IDIMS ( 2 )                  = INTEGER (Given)
-*           dimensions of arrays
+*     NX                          = INTEGER (Given)
+*           Number of pixels in X
+*     NY                          = INTEGER (Given)
+*           Number of pixels in Y
 *     FT_DATA (IDIMS(1), IDIMS(2)) = REAL (Returned)
 *           data array containing F.T. of chop
 *     FT_VARIANCE (IDIMS(1), IDIMS(2))       = REAL (Returned)
@@ -57,6 +59,10 @@
  
 *    History:
 *     $Log$
+*     Revision 1.3  1998/06/18 02:27:33  timj
+*     Replace IDIMS with NX and NY since Linux (g77) can not handle
+*     arrays that control dimensions of other arrays.
+*
 *     Revision 1.2  1998/06/05 03:03:16  timj
 *     Fix problem with half pixel shift.
 *
@@ -76,13 +82,14 @@
       REAL    CHOP_THROW
       REAL    CHOP_PA
       REAL    PIXSIZE
-      INTEGER IDIMS ( 2 )
+      INTEGER NX
+      INTEGER NY
  
 *  Arguments Returned:
-      REAL    FT_DATA (IDIMS(1), IDIMS(2))
-      REAL    FT_VARIANCE (IDIMS(1), IDIMS(2))
-      REAL    WT_DATA (IDIMS(1), IDIMS(2))
-      REAL    WT_VARIANCE (IDIMS(1), IDIMS(2))
+      REAL    FT_DATA (NX, NY)
+      REAL    FT_VARIANCE (NX, NY)
+      REAL    WT_DATA (NX, NY)
+      REAL    WT_VARIANCE (NX, NY)
  
 *  Status:
       INTEGER STATUS
@@ -100,6 +107,7 @@
       REAL    DX                ! X Distance from centre (unrotated)
       REAL    DY                ! Y distance from centre (unrotated)
       REAL    HALF_CHOP         ! Half the chop in pixels
+      INTEGER IDIMS ( 2 )       ! X and Y dims
       REAL    RPA               ! Position angle in radians
       REAL    RX                ! X distance from centre in rotated frame
       REAL    RY                ! Y distance from centre in rotated frame
@@ -120,6 +128,10 @@
 *.
  
       IF (STATUS .NE. SAI__OK) RETURN
+
+*     Setup IDIMS
+      IDIMS ( 1 ) = NX
+      IDIMS ( 2 ) = NY
  
 *     Calculate half the chop in pixels
       HALF_CHOP = CHOP_THROW / (2.0 * PIXSIZE)
