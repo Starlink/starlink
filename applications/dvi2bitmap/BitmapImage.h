@@ -12,10 +12,7 @@
 
 class BitmapImage {
  public:
-    BitmapImage(const int w, const int h)
-	: w_(w), h_(h),
-    	bitmap_(0), allocBitmap_(0), myBitmap_(false), bitmapRows_(0),
-    	isTransparent_(false) { };
+    BitmapImage(const int w, const int h, const int bpp=1);
     virtual ~BitmapImage();
     void setBitmap (const Byte *B);
     void setBitmapRow (const Byte *B);
@@ -23,6 +20,10 @@ class BitmapImage {
     void setTransparent (const bool sw) { isTransparent_ = sw; };
     virtual void write (const string filename) = 0;
     virtual string fileExtension() const = 0;
+
+    // Information about environment
+    enum infoFields {SOFTWAREVERSION, INPUTFILENAME, FURTHERINFO};
+    static void setInfo (const infoFields which, const string *s);
 
     static BitmapImage *newBitmapImage
 	(const string format, const int w, const int h, const int bpp=1);
@@ -35,5 +36,9 @@ class BitmapImage {
     bool myBitmap_;
     int bitmapRows_;
     bool isTransparent_;
+
+    static const string *softwareversion;
+    static const string *inputfilename;
+    static const string *furtherinfo;
 };
 #endif // #ifndef BITMAPIMAGE_HEADER_READ

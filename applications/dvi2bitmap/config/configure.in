@@ -3,8 +3,10 @@ dnl   Configure script for dvi2bitmap
 dnl
 dnl   Copyright 1999, Particle Physics and Astronomy Research Council.
 dnl   See file LICENCE for conditions.
-dnl
-dnl   $Id$
+
+
+AC_REVISION($Id$)dnl
+
 
 AC_INIT(dvi2bitmap.cc)
 
@@ -55,27 +57,71 @@ AC_TRY_COMPILE([#include <cstdio>],,
   AC_MSG_RESULT(yes),
   AC_DEFINE(NO_CSTD_INCLUDE) AC_MSG_RESULT(no))
 
+dnl dnl   Specify support for Kpathsea library
+dnl AC_SUBST(KPATHSEAOBJ)
+dnl AC_ARG_WITH(kpathsea,
+dnl [  --with-kpathsea         Use Kpathsea library],
+dnl   AC_CHECK_HEADER(kpathsea/pathsearch.h,
+dnl     AC_CHECK_LIB(kpathsea, main,
+dnl       AC_DEFINE(ENABLE_KPATHSEA) 
+dnl       KPATHSEAOBJ="kpathsea.o" 
+dnl       LIBS="$LIBS -lkpathsea")))
+
+dnl   Specify support for Kpathsea library
+dnl
+dnl   The texmfcnf, mktexpk, maketexpk, fake-progname, and fontgen options
+dnl   are suppressed if the support for kpathsea is turned off.  This is
+dnl   because they largely depend on kpathsea searching being present, 
+dnl   so that if font-generation (say) is turned on, but kpathsea is turned
+dnl   off, you get puzzling errors: fonts might be generated even when
+dnl   they're not really missing (because the non-kpathsea search mechanism
+dnl   can't find them), but the program still can't find them afterwards 
+dnl   (because the font-generation method has put them where only kpathsea
+dnl   expects to find them).
+dnl
+usekpse=false
+AC_SUBST(KPATHSEAOBJ)
+AC_ARG_ENABLE(kpathsea,
+[  --disable-kpathsea      Do not use Kpathsea library],
+  test "$enableval" = "yes" && AC_CHECK_HEADER(kpathsea/pathsearch.h,
+    AC_CHECK_LIB(kpathsea, main,
+      AC_DEFINE(ENABLE_KPATHSEA) 
+      KPATHSEAOBJ="kpathsea.o" 
+      LIBS="$LIBS -lkpathsea"
+      usekpse=true)),
+  AC_CHECK_HEADER(kpathsea/pathsearch.h,
+    AC_CHECK_LIB(kpathsea, main,
+      AC_DEFINE(ENABLE_KPATHSEA) 
+      KPATHSEAOBJ="kpathsea.o" 
+      LIBS="$LIBS -lkpathsea"
+      usekpse=true)))
+
 dnl   --disable-texmfcnf
+if $usekpse; then
 AC_ARG_ENABLE(texmfcnf,
 [  --disable-texmfcnf      Disable setting of TEXMFCNF in environment],
   test "$enableval" = "yes" && T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"),
-  T=`kpsewhich cnf texmf.cnf`
+  test "$usekpse" = "yes" && T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"))
+fi
 
 dnl   --enable-mktexpk.  See also --enable-fontgen
+if $usekpse; then
 AC_PATH_PROG(MKTEXPK_PATH, mktexpk)
 AC_ARG_ENABLE(mktexpk,
 [  --enable-mktexpk[=prog] Enable mktexpk (default), giving optional program],
   if test "$enableval" = "no"
   then unset MKTEXPK_PATH
-  elif test "$enableval" != "yes"
+  elif test "$enableval" != "yes" && -n "$KPATHSEAOBJ"
   then MKTEXPK_PATH=$enableval
   fi
   test -n "$MKTEXPK_PATH" && AC_DEFINE_UNQUOTED(MKTEXPK, "${MKTEXPK_PATH}"),
   test -n "$MKTEXPK_PATH" && AC_DEFINE_UNQUOTED(MKTEXPK, "${MKTEXPK_PATH}"))
+fi
 
 dnl   Use MakeTeXPK.  Don't use this if mktexpk was found
+if $usekpse; then
 AC_PATH_PROG(MAKETEXPK_PATH, MakeTeXPK)
 AC_ARG_ENABLE(maketexpk,
 [  --enable-maketexpk[=prog] Enable MakeTeXPK, giving optional alternative],
@@ -86,8 +132,10 @@ AC_ARG_ENABLE(maketexpk,
   fi
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"),
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"))
+fi
 
 dnl   Do we want to use the fake_progname feature in kpathsea.cc?
+if $usekpse; then
 AC_PATH_PROG(XDVI_PATH, xdvi)
 AC_ARG_ENABLE(fake-progname,
 [  --enable-fake-progname[=prog]
@@ -97,8 +145,10 @@ AC_ARG_ENABLE(fake-progname,
   elif test "$enableval" != "no"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${enableval}")
   fi)
+fi
 
 dnl   Do we enable automatic font-generation?
+if $usekpse; then
 AC_ARG_ENABLE(fontgen,
 [  --enable-fontgen[=mode,res]
                           Enable automatic font gen., opt. giving mode,res],
@@ -113,16 +163,7 @@ AC_ARG_ENABLE(fontgen,
     test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,$GENRES)
   fi,
   AC_DEFINE(ENABLE_FONT_GEN,1))
-
-dnl   Specify support for Kpathsea library
-AC_SUBST(KPATHSEAOBJ)
-AC_ARG_WITH(kpathsea,
-[  --with-kpathsea         Use Kpathsea library],
-  AC_CHECK_HEADER(kpathsea/pathsearch.h,
-    AC_CHECK_LIB(kpathsea, main,
-      AC_DEFINE(ENABLE_KPATHSEA) 
-      KPATHSEAOBJ="kpathsea.o" 
-      LIBS="$LIBS -lkpathsea")))
+fi
 
 dnl   Specify support for PNG output
 AC_SUBST(PNGOBJ)

@@ -59,7 +59,7 @@ const unsigned long GIFBitmap::masks[]
 
 
 GIFBitmap::GIFBitmap (const int w, const int h, const int bpp)
-    : BitmapImage (w, h), bpp_(bpp),
+    : BitmapImage (w, h, bpp),
       Pass(0), maxbits(BITS), hsize(HSIZE), free_ent(0), clear_flg(0),
       in_count(1), out_count(0), cur_accum(0), cur_bits(0)
 {

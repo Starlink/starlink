@@ -37,6 +37,7 @@ using std::exit;
 #include "DviFile.h"
 #include "PkFont.h"
 #include "Bitmap.h"
+#include "BitmapImage.h"
 #include "verbosity.h"
 #include "PageRange.h"
 #include "version.h"
@@ -44,6 +45,8 @@ using std::exit;
 #if ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
+
+#define DVI2BITMAPURL "http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/"
 
 typedef vector<string> string_list;
 
@@ -101,6 +104,11 @@ main (int argc, char **argv)
 #if ENABLE_KPATHSEA
     kpathsea::init (progname, resolution);
 #endif
+
+    BitmapImage::setInfo (BitmapImage::SOFTWAREVERSION,
+			  new string(version_string));
+    BitmapImage::setInfo (BitmapImage::FURTHERINFO,
+			  new string (DVI2BITMAPURL));
 
     bool absCrop = false;
 
@@ -320,28 +328,31 @@ main (int argc, char **argv)
 #if ENABLE_GIF
 		cout << "ENABLE_GIF\n";
 #endif
+#if ENABLE_PNG
+		cout << "ENABLE_PNG\n";
+#endif
 #if ENABLE_KPATHSEA
 		cout << "ENABLE_KPATHSEA\n";
 #endif
 #ifdef MKTEXPK
-		cout << "MKTEXPK=" << MKTEXPK << '\n';
+		cout << "  MKTEXPK=" << MKTEXPK << '\n';
 #endif
 #ifdef MAKETEXPK
-		cout << "MAKETEXPK=" << MAKETEXPK << '\n';
+		cout << "  MAKETEXPK=" << MAKETEXPK << '\n';
 #endif
 #ifdef DEFAULT_TEXMFCNF
-		cout << "DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
+		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif
 #ifdef FAKE_PROGNAME
-		cout << "FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
+		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
 #endif
 #ifdef DEFAULT_MFMODE
-		cout << "DEFAULT_MFMODE=" << DEFAULT_MFMODE << '\n';
+		cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << '\n';
 #endif
 #ifdef DEFAULT_RESOLUTION
-		cout << "DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << '\n';
+		cout << "  DEFAULT_RESOLUTION=" << DEFAULT_RESOLUTION << '\n';
 #endif
-		if (*++*argv == 'V')
+		//if (*++*argv == 'V')
 		    cout << RCSID << '\n';
 		exit(0);	// ...and exit
 
@@ -564,6 +575,10 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			    bitmap->setTransparent(true);
 			if (b.bitmap_scale_factor != 1)
 			    bitmap->scaleDown (b.bitmap_scale_factor);
+			const string *fn = dvif->filename();
+			if (fn->length() != 0)
+			    BitmapImage::setInfo (BitmapImage::INPUTFILENAME,
+						  fn);
 			if (b.ofile_name.length() == 0)
 			{
 			    char fn[100];

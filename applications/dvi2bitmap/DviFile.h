@@ -46,6 +46,7 @@ public:
     PkFont *nextFont();
     // Return the net magnification factor for the DVI file
     double magnification() const { return magfactor_; }
+    const string *filename () const { return &fileName_; }
 
 private:
     const string fileName_;

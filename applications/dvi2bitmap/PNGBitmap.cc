@@ -26,7 +26,7 @@ png_infop PNGBitmap::info_ptr_ = 0;
 
 
 PNGBitmap::PNGBitmap (const int w, const int h, const int bpp)
-    : BitmapImage (w, h)
+    : BitmapImage (w, h, bpp)
 {
 }
 
@@ -68,12 +68,17 @@ void PNGBitmap::write (const string filename)
 	{
 	    png_destroy_write_struct (&png_ptr_, &info_ptr_);
 	    fclose (pngfile);
-	    throw BitmapError ("Can't setjmp");
+	    throw BitmapError ("libpng internal error");
 	}
     }
 
     // Set up output code
     png_init_io (png_ptr_, pngfile);
+
+    cout << "Initialising png_set_IHDR: w="<<w_
+	 << " h=" << h_
+	 << " bpp=" << bpp_
+	 << "\n";
 
     png_set_IHDR (png_ptr_, info_ptr_, w_, h_, bpp_,
 		  PNG_COLOR_TYPE_GRAY, PNG_INTERLACE_ADAM7,
@@ -81,20 +86,47 @@ void PNGBitmap::write (const string filename)
 		  PNG_FILTER_TYPE_DEFAULT);
 
     png_text text_fields[2];
-    text_fields[0].key = "Comment";
-    text_fields[0].text = "Converted from DVI file by dvi2bitmap";
-    text_fields[0].text_length = strlen (text_fields[0].text);
-    text_fields[0].compression = 0;
+    int nfields = 0;
+    if (softwareversion != 0)
+    {
+	text_fields[nfields].key = "Software";
+	text_fields[nfields].text
+	    = const_cast<char*>(softwareversion->c_str());
+	text_fields[nfields].text_length = strlen (text_fields[nfields].text);
+	text_fields[nfields].compression = 0;
+	nfields++;
+    }
 
-    text_fields[1].key = "Software";
-    text_fields[1].text = "dvi2bitmap version ???";
-    text_fields[1].text_length = strlen (text_fields[1].text);
-    text_fields[1].compression = 0;
+    string *t1, *t2;
+    if (inputfilename != 0)
+    {
+	text_fields[nfields].key = "Comment";
+	t1 = new string ("Converted from DVI file ");
+	//t1 += inputfilename;
+	text_fields[nfields].text = const_cast<char*>(t1->c_str());
+	text_fields[nfields].text_length = strlen (text_fields[nfields].text);
+	text_fields[nfields].compression = 0;
+	nfields++;
+    }
 
-    png_set_text (png_ptr_, info_ptr_, text_fields, 2);
+    if (furtherinfo != 0)
+    {
+	text_fields[nfields].key = "Comment";
+	t2 = new string ("See ");
+	//t2 += furtherinfo;
+	text_fields[nfields].text = const_cast<char*>(t2->c_str());
+	text_fields[nfields].text_length = strlen (text_fields[nfields].text);
+	text_fields[nfields].compression = 0;
+	nfields++;
+    }
+
+    if (nfields > 0)
+	png_set_text (png_ptr_, info_ptr_, text_fields, nfields);
 
     png_write_info (png_ptr_, info_ptr_);
 
+    // data is supplied one pixel per byte: tell libpng this
+    png_set_packing (png_ptr_);
     
     // Now write the image.  png_write_image requires an array of
     // pointers to rows in the bitmap.  Create this here, possibly
@@ -102,22 +134,31 @@ void PNGBitmap::write (const string filename)
     static const Byte **rows;
     static int rows_alloc = -1;	// rely on this being initialised less
 				// than any bitmapRows_
-    if (rows_alloc < bitmapRows_)
+    if (rows_alloc < h_)
     {
 	if (rows_alloc >= 0)		// previously allocated
 	    delete[] rows;
-	// find the next power-of-two above bitmapRows_
+	// find the next power-of-two above h_
 	rows_alloc = 1;
-	for (int pow2=bitmapRows_; pow2 != 0; pow2 >>= 1)
+	for (int pow2=h_; pow2 != 0; pow2 >>= 1)
 	    rows_alloc <<= 1;
 	rows = new (const Byte*)[rows_alloc];
 	cerr << "PNGBitmap: allocated " << rows_alloc
-	     << "(" << bitmapRows_ << ") row elements\n";
+	     << "(" << h_ << ") row elements\n";
     }
-    for (int r=0; r<bitmapRows_; r++)
+    for (int r=0; r<h_; r++)
 	rows[r] = &bitmap_[r*w_];
 
-    png_write_image (png_ptr_, rows);
+    /*
+    for (int r=0; r<h_; r++)
+    {
+	for (int c=0; c<w_; c++)
+	    cout << (rows[r][c] ? '*' : ' ');
+	cout << '\n';
+    }
+    */
+
+    png_write_image (png_ptr_, const_cast<Byte**>(rows));
 
     png_write_end (png_ptr_,info_ptr_);
 

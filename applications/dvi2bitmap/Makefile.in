@@ -5,14 +5,14 @@ CXX=@CXX@
 CXXFLAGS=-Wall @CXXFLAGS@
 DEFS=@DEFS@
 LIBS=-lm @LIBS@
-GIF_OBJ=@GIFOBJ@
 KPATHSEA_OBJ=@KPATHSEAOBJ@
 PNG_OBJ=@PNGOBJ@
+GIF_OBJ=@GIFOBJ@
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 	BitmapImage.o XBMBitmap.o PageRange.o \
-	$(GIF_OBJ) $(KPATHSEA_OBJ) $(PNG_OBJ)
+	$(KPATHSEA_OBJ) $(PNG_OBJ) $(GIF_OBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
