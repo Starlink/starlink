@@ -1,0 +1,47 @@
+.TH SEXTRACTOR "1" "@DATE3@" "SWarp @PACKAGE_VERSION@" "User Commands"
+.SH NAME
+sex \- extract a source catalog from an astronomical FITS image
+.SH SYNOPSIS
+.B sex \fIimage\fR [\fI-c configuration-file\fR]
+.RS
+[\fI-parameter1 value1 -parameter2 value2 ...\fR]
+.RE
+.TP
+.B sex \fIimage\_detect\fR \fIimage_measure\fR [\fI-c configuration-file\fR]
+.RS
+[\fI-parameter1 value1 -parameter2 value2 ...\fR]
+.RE
+.TP
+.B sex \fI-d\fR
+.SH DESCRIPTION
+SExtractor is a program that builds a catalogue of objects from an astronomical
+image. Although it is particularly oriented towards reduction of large scale
+galaxy-survey data, it performs rather well on moderately crowded star fields.
+.RE
+See http://terapix.iap.fr/soft/sextractor for more details.
+.SS "Operation modes:"
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+print this help, then exit
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+print version number, then exit
+.TP
+\fB\-d\fR, \fB\-\-dump\fR
+dump a default configuration file
+.SH AUTHOR
+Written by Emmanuel Bertin (Institut d'Astrophysique de Paris and Observatoire de Paris).
+.PP
+Copyright 1994-2003 Emmanuel Bertin
+.RE
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "REPORTING BUGS"
+Report bugs to <sextractor@iap.fr>.
+.SH "SEE ALSO"
+.BR swarp (1)
+.PP
+The full documentation for
+.B SExtractor
+is maintained as a Postscript manual available at
+.B http://terapix.iap.fr/soft/sextractor
