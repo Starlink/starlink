@@ -96,7 +96,7 @@
 *     such an axis array, it processes the array using the following
 *     rules, rather than those given above.
 *
-*     .X.DATA    ->      .AXIS[1].MORE.FIGARO.DATA
+*     .X.DATA    ->      .AXIS[1].MORE.FIGARO.DATA_ARRAY
 *                        (AXIS[1].DATA_ARRAY is filled with pixel
 *                        co-ordinates)
 *     .X.ERRORS  ->      .AXIS[1].MORE.FIGARO.VARIANCE (after
@@ -186,6 +186,13 @@
 *     1993 October 25 (MJC):
 *        Added FORM argument to control the NDF storage format rather
 *        than use the value of the bad-pixel flag to decide.
+*     1995 December 19 (MJC):
+*        Places an n-dimensional axis into AXIS.MORE.FIGARO.DATA_ARRAY.
+*        Previously, the component name was DATA.
+*     1996 February 10 (MJC):
+*        Allowed for scalar width in DST.  Fixed bug which prevented a
+*        missing axis being created whenever there was no FITS extension
+*        to write.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -235,8 +242,10 @@
       BYTE      BARRAY(100)      ! Used to read in BYTE type data items
       INTEGER   CDIMS(7)         ! Dimensions of character objects
       CHARACTER COMMENT*50       ! FITS item comment
+      INTEGER   CW               ! Length of the output width component
       DOUBLE PRECISION DARRAY(100) ! Used to read in DP type data items
       INTEGER   DIMS(7)          ! Dimensions of output data
+      DOUBLE PRECISION DWIDTH    ! Scalar width
       INTEGER   DSTAT            ! DTA_ routine returned status
       CHARACTER ENVIRN * ( 80 )  ! Environment structure name
       CHARACTER EPATH * ( 80 )   ! The effective path
@@ -327,6 +336,7 @@
       CHARACTER STRING*64        ! Used for units and labels
       LOGICAL   STRUCT           ! True if item is a structure
       CHARACTER TYPE*16          ! Data object type
+      REAL      WIDTH            ! Scalar width
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -1135,14 +1145,14 @@
                               AXMFEX( IAXIS ) = .TRUE. 
                            END IF
 
-*                        Copy the non-standard data to 
-*                        OUTPUT.AXIS(n).MORE.FIGARO.DATA.  Since the
-*                        flag to indicate whether or not the NDF's
+*                        Copy the non-standard data to
+*                        OUTPUT.AXIS(n).MORE.FIGARO.DATA_ARRAY.  Since
+*                        the flag to indicate whether or not the NDF's
 *                        AXIS(n).DATA_ARRAY has been created is still
 *                        false, the NDF axis centres will be filled
 *                        with pixel co-ordinates near the end of this
 *                        routine.
-                           CALL DTA_CRNAM( AXMORF, 'DATA', 0, 0,
+                           CALL DTA_CRNAM( AXMORF, 'DATA_ARRAY', 0, 0,
      :                                     AXOUTD, DSTAT )
                            CALL DTA_CYVAR( LEVEL2, AXOUTD, DSTAT )
                            IF ( DSTAT .NE. 0 ) GOTO 400
@@ -1256,6 +1266,99 @@
                            CALL DTA_CYVAR( LEVEL2, AXOUTW, DSTAT )
                            IF ( DSTAT .NE. 0 ) GOTO 400
 
+*                     DST supports scalar widths.  This must be expanded
+*                     into a vector for NDF.
+                        ELSE IF ( NDIM .EQ. 0 ) THEN
+
+*                        Find the true dimension of the axis.
+                           CALL DTA_SZVAR( 'INPUT.Z.DATA', 7, NDIM,
+     :                                     DIMS, DSTAT )
+
+*                        Create the full name of the output axis-width
+*                        array, including the axis dimension.
+                           CALL DTA_CRNAM( AXOUT, 'WIDTH', 1,
+     :                                     DIMS( IAXIS ), AXOUTW,
+     :                                     DSTAT )
+
+*                        Obtain the data type of the scalar width.
+                           CALL DTA_TYVAR( NAME2, TYPE, DSTAT )
+
+*                        Obtain the real scalar width value.
+                           IF ( TYPE .EQ. 'FLOAT' ) THEN
+                              CALL DTA_RDVARF( LEVEL2, 1, WIDTH,
+     :                                         STATUS )
+
+*                           Create an axis data array of the
+*                           appropriate size and type.
+                              CALL DTA_CRVAR( AXOUTW, 'FLOAT', DSTAT )
+
+*                           Create the name of the output axis-width
+*                           array, excluding the axis dimension.
+                              CALL DTA_CRNAM( AXOUT, 'WIDTH', 0, 0,
+     :                                        AXOUTW, DSTAT )
+                              CW = CHR_LEN( AXOUTW )
+
+*                           Map the newly created structure for update.
+                              CALL DTA_MUVARF( AXOUTW( 1:CW ),
+     :                                         DIMS( IAXIS ), IPTR,
+     :                                         DSTAT )
+
+*                        Obtain the double-precision scalar width value.
+                           ELSE
+                              CALL DTA_RDVARD( NAME2, 1, DWIDTH,
+     :                                         STATUS )
+
+*                           Create an axis data array of the
+*                           appropriate size and type.
+                              CALL DTA_CRVAR( AXOUTW, 'DOUBLE', DSTAT )
+
+*                           Create the name of the output axis-width
+*                           array, excluding the axis dimension.
+                              CALL DTA_CRNAM( AXOUT, 'WIDTH', 0, 0,
+     :                                        AXOUTW, DSTAT )
+                              CW = CHR_LEN( AXOUTW )
+
+*                           Map the newly created structure for update.
+                              CALL DTA_MUVARD( AXOUTW( 1:CW ),
+     :                                         DIMS( IAXIS ), IPTR,
+     :                                         DSTAT )
+                           END IF
+
+*                        Report an error condition.
+                           IF ( DSTAT .NE. 0 ) THEN
+                              STATUS = DSTAT
+                              CALL MSG_SETI( 'AXNO', IAXIS )
+                              CALL ERR_REP( 'DST2NDF_MAPACEW', 
+     :                          'DST2NDF: Error mapping the output '/
+     :                          /'array of axis widths in dimension '/
+     :                          /'^AXNO.', STATUS )
+                              GOTO 500
+                           END IF
+
+*                       Fill array with the constant.
+                           IF ( TYPE .EQ. 'FLOAT' ) THEN
+                              CALL CON_FILL( DIMS( IAXIS ), WIDTH, 0.0,
+     :                                       %VAL( IPTR ), STATUS )
+                           ELSE
+                              CALL CON_FILLD( DIMS( IAXIS ), DWIDTH,
+     :                                        0.0D0, %VAL( IPTR ),
+     :                                        STATUS )
+                           END IF
+
+*                       Unmap the width array.
+                          CALL DTA_FRVAR( AXOUTW, DSTAT )
+
+*                       Report an error condition.
+                          IF ( DSTAT .NE. 0 ) THEN
+                             STATUS = DSTAT
+                             CALL MSG_SETI( 'AXNO', IAXIS )
+                             CALL ERR_REP( 'DST2NDF_UMPACEW', 
+     :                         'DST2NDF: Error unmapping the output '/
+     :                         /'array of axis widths in dimension '/
+     :                         /'^AXNO.', STATUS )
+                             GOTO 500
+                          END IF
+
 *                     The axis widths are not 1-dimensional so move
 *                     them to the Figaro axis extension.
                         ELSE
@@ -1264,7 +1367,7 @@
 *                        present in the NDF, by generating the full
 *                        component names of the input and output
 *                        objects.
-                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
+                           IF ( .NOT. AXMFEX( IAXIS ) ) THEN
                               CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
      :                                        AXMOR, DSTAT )
                               CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
@@ -1398,270 +1501,272 @@
 *     Deal with the FITS structure.
 *     =============================
 
-      IF ( .NOT. FITS ) GOTO 500
+      IF ( FITS ) THEN
 
-*   Count the number of FITS items, ending when the list of components
-*   has been exhausted.
-      NFITS = 0
-      IPOSN1 = 1
-      DO WHILE ( NMSTA1 .EQ. 0 )
-         CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
-         IPOSN1 = IPOSN1 + 1
-         IF ( NMSTA1 .EQ. 0 ) THEN
-            NFITS = NFITS + 1
-         END IF
-      END DO
+*      Count the number of FITS items, ending when the list of components
+*      has been exhausted.
+         NFITS = 0
+            IPOSN1 = 1
+         DO WHILE ( NMSTA1 .EQ. 0 )
+            CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
+            IPOSN1 = IPOSN1 + 1
+            IF ( NMSTA1 .EQ. 0 ) THEN
+               NFITS = NFITS + 1
+            END IF
+         END DO
 
-*   Create a .MORE.FITS array of 80-character card images.
-      FDIMS( 1 ) = 80
-      FDIMS( 2 ) = NFITS
-      CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS, NAMOUT,
-     :                DSTAT )
-      CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
+*      Create a .MORE.FITS array of 80-character card images.
+         FDIMS( 1 ) = 80
+         FDIMS( 2 ) = NFITS
+         CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS,
+     :                   NAMOUT, DSTAT )
+         CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
-*   Now deal with the FITS items one by one.
-      NFITS = 0
-      NMSTA1 = 0
-      IPOSN1 = 1
-      DO WHILE ( NMSTA1 .EQ. 0 )
+*      Now deal with the FITS items one by one.
+         NFITS = 0
+         NMSTA1 = 0
+         IPOSN1 = 1
+         DO WHILE ( NMSTA1 .EQ. 0 )
 
-*      Obtain the IPOSN1th object's name.
-         CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
-         IPOSN1 = IPOSN1  +  1
-         IF ( NMSTA1 .EQ. 0 ) THEN
+*         Obtain the IPOSN1th object's name.
+            CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
+            IPOSN1 = IPOSN1  +  1
+            IF ( NMSTA1 .EQ. 0 ) THEN
 
-*         Generate the name of the FITS item.  This can be either a
-*         primitive item, or a structure.  If it is a structure, it
-*         contains the comment as well as the data.  If it is not, the
-*         comment may be in a separate .COMMENTS structure.
-            FITNAM = 'INPUT.FITS.'//NAME2
-            LENAME = CHR_LEN( FITNAM )
-            CALL DTA_STRUC( FITNAM, STRUCT, DSTAT )
-            EXIST = DSTAT .EQ. 0
-            NFITS = NFITS + 1      
-            IF ( EXIST ) THEN
-               IF ( STRUCT ) THEN
-                  NAME = FITNAM( :LENAME )//'.DATA'
-               ELSE
-                  NAME = FITNAM
+*            Generate the name of the FITS item.  This can be either a
+*            primitive item, or a structure.  If it is a structure, it
+*            contains the comment as well as the data.  If it is not,
+*            the comment may be in a separate .COMMENTS structure.
+               FITNAM = 'INPUT.FITS.'//NAME2
+               LENAME = CHR_LEN( FITNAM )
+               CALL DTA_STRUC( FITNAM, STRUCT, DSTAT )
+               EXIST = DSTAT .EQ. 0
+               NFITS = NFITS + 1      
+               IF ( EXIST ) THEN
+                  IF ( STRUCT ) THEN
+                     NAME = FITNAM( :LENAME )//'.DATA'
+                  ELSE
+                     NAME = FITNAM
+                  END IF
+                  CALL DTA_TYVAR( NAME, TYPE, DSTAT )
+                  EXIST = DSTAT.EQ.0
                END IF
-               CALL DTA_TYVAR( NAME, TYPE, DSTAT )
-               EXIST = DSTAT.EQ.0
-            END IF
 
-*         Now read the comment associated with the object, if any.
-*         FITS items may be stored with the values in the .FITS
-*         structure and comments in a separate .COMMENTS structure.
-*         Alternatively, both may be in the FITS structure, with the
-*         values in the .FITS.DATA structure and the comments in
-*         .FITS.DESCRIPTION.
- 
-            LENAME = CHR_LEN( FITNAM )
-            IF (STRUCT) THEN
-               FITCOM = FITNAM( :LENAME )//'.DESCRIPTION'
-            ELSE
-               FITCOM = 'INPUT.COMMENTS.'//NAME2
-            END IF
-            CALL DTA_RDVARC( FITCOM, 50, COMMENT, DSTAT )
-            IF ( DSTAT .NE. 0 ) COMMENT = ' '
-
-*         Initialise the FITS value as part of it may only be
-*         overwritten otherwise.
-            FITVAL = ' '
-
-*         Read the FITS item value. Each type possibility must be
-*         catered for separately. The item value is then converted
-*         into a character string.  Note that numeric and logical
-*         types are right justified to 20 characters.  Character
-*         values may be longer, and are left justified.
-            NDATA = 1
-            IF ( TYPE .EQ. 'BYTE' ) THEN    
-               CALL DTA_RDVARB( NAME, NDATA, BARRAY, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-               IARRAY( 1 ) = NUM_BTOI( BARRAY( 1 ) )
-               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-
-            ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
-               CALL DTA_RDVARC( NAME, FDIMS( 1 ), FITVAL, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-
-            ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
-               CALL DTA_RDVARD( NAME, NDATA, DARRAY, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CHR_DTOC( DARRAY( 1 ), FITVAL( :20 ), NC )
-
-            ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
-               CALL DTA_RDVARF( NAME, NDATA, FARRAY, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CHR_RTOC( FARRAY( 1 ), FITVAL( :20 ), NC )
-
-            ELSE IF ( TYPE .EQ. 'INT' ) THEN    
-               CALL DTA_RDVARI( NAME, NDATA, IARRAY, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-
-            ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
-               CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
-               IF ( DSTAT .NE. 0 ) GOTO 450
-               IARRAY( 1 ) = NUM_WTOI( SARRAY( 1 ) )
-               CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
-            END IF
-
-*         Initialise the FITS card-image character string.
-            FITSTR = ' '
-
-*         Format the FITS character string or "card image".  It is
-*         composed of the following items.
-*           o  A keyword occupies the first eight columns.
-*           o  An equals sign and a following blank go into spaces 8
-*              and 9.
-*           o  The remaining spaces up to space 31 are used for the
-*              value of the FITS item.  Hence the length of FITVAL is
-*              20 (it used to be variable STRING*64), except for
-*              character strings which may fill the card.
-*              -  Character type items are left justified and other
-*                 types are right justified.
-*              -  Character items are enclosed in quotes and must be at
-*                 least 8 characters long.  Given the comments, it is
-*                 limited to 18 characters.
-*           o  The comment delimiter is in column 32, and comments start
-*              at column 34.
-*           o  Columns 31 and 33 are spaces.
-
-*         Find the lengths of the value and keyword.
-            NSTRT = CHR_LEN( FITVAL )
-            NSTR = NSTRT
-            NF = CHR_LEN( NAME2 )
-
-*         Start to build the FITS card image.
-            FITSTR( 1:NF ) = NAME2( 1:NF )
-            FITSTR( 9:10 ) = '= '
-
-*         Insert the value strings.
-            IF ( TYPE .EQ. 'CHAR' ) THEN
-
-*            Constrain the length of the character value.
-               NSTR = MIN( 68, MAX( 8, NSTR ) )
-
-*            Insert the leading quote, the value, and then the trailing
-*            quote.
-               FITSTR( 11:11 ) = ''''
-
-*            The valued can be extracted verbatim when it does not
-*            contain any quotes.  If it does include quotes these
-*            must be doubled in the FITS character value.  So first look
-*            for a quote.
-               NCQ = INDEX( FITVAL, '''' )
-               IF ( NCQ .EQ. 0 ) THEN
-                  FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
-
-*               Insert the trailing quote.
-                  FITSTR( NSTR+12:NSTR+12 ) = ''''
-
-*            Search for the quotes, and form the FITS value string
-*            piecemeal, adding an extra quote and appending the text
-*            between the quotes.
+*            Now read the comment associated with the object, if any.
+*            FITS items may be stored with the values in the .FITS
+*            structure and comments in a separate .COMMENTS structure.
+*            Alternatively, both may be in the FITS structure, with the
+*            values in the .FITS.DATA structure and the comments in
+*            .FITS.DESCRIPTION.
+               LENAME = CHR_LEN( FITNAM )
+               IF (STRUCT) THEN
+                  FITCOM = FITNAM( :LENAME )//'.DESCRIPTION'
                ELSE
+                  FITCOM = 'INPUT.COMMENTS.'//NAME2
+               END IF
+               CALL DTA_RDVARC( FITCOM, 50, COMMENT, DSTAT )
+               IF ( DSTAT .NE. 0 ) COMMENT = ' '
 
-*               Start the search at the first column of the input value,
-*               but in column 12 of the FITS card image.
-                  NCI = 1
-                  NCO = 12
-                  MINLEN = 8
+*            Initialise the FITS value as part of it may only be
+*            overwritten otherwise.
+               FITVAL = ' '
+
+*            Read the FITS item value. Each type possibility must be
+*            catered for separately. The item value is then converted
+*            into a character string.  Note that numeric and logical
+*            types are right justified to 20 characters.  Character
+*            values may be longer, and are left justified.
+               NDATA = 1
+               IF ( TYPE .EQ. 'BYTE' ) THEN    
+                  CALL DTA_RDVARB( NAME, NDATA, BARRAY, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+                  IARRAY( 1 ) = NUM_BTOI( BARRAY( 1 ) )
+                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
+
+               ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
+                  CALL DTA_RDVARC( NAME, FDIMS( 1 ), FITVAL, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+
+               ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
+                  CALL DTA_RDVARD( NAME, NDATA, DARRAY, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+                  CALL CHR_DTOC( DARRAY( 1 ), FITVAL( :20 ), NC )
+
+               ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
+                  CALL DTA_RDVARF( NAME, NDATA, FARRAY, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+                  CALL CHR_RTOC( FARRAY( 1 ), FITVAL( :20 ), NC )
+
+               ELSE IF ( TYPE .EQ. 'INT' ) THEN    
+                  CALL DTA_RDVARI( NAME, NDATA, IARRAY, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
+
+               ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
+                  CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
+                  IF ( DSTAT .NE. 0 ) GOTO 450
+                  IARRAY( 1 ) = NUM_WTOI( SARRAY( 1 ) )
+                  CALL CHR_ITOC( IARRAY( 1 ), FITVAL( :20 ), NC )
+               END IF
+
+*            Initialise the FITS card-image character string.
+               FITSTR = ' '
+
+*            Format the FITS character string or "card image".  It is
+*            composed of the following items.
+*              o  A keyword occupies the first eight columns.
+*              o  An equals sign and a following blank go into spaces 8
+*                 and 9.
+*              o  The remaining spaces up to space 31 are used for the
+*                 value of the FITS item.  Hence the length of FITVAL is
+*                 20 (it used to be variable STRING*64), except for
+*                 character strings which may fill the card.
+*                 -  Character type items are left justified and other
+*                    types are right justified.
+*                 -  Character items are enclosed in quotes and must be
+*                    at least 8 characters long.  Given the comments,
+*                    it is limited to 18 characters.
+*              o  The comment delimiter is in column 32, and comments start
+*                 at column 34.
+*              o  Columns 31 and 33 are spaces.
+
+*            Find the lengths of the value and keyword.
+               NSTRT = CHR_LEN( FITVAL )
+               NSTR = NSTRT
+               NF = CHR_LEN( NAME2 )
+
+*            Start to build the FITS card image.
+               FITSTR( 1:NF ) = NAME2( 1:NF )
+               FITSTR( 9:10 ) = '= '
+
+*            Insert the value strings.
+               IF ( TYPE .EQ. 'CHAR' ) THEN
+
+*               Constrain the length of the character value.
+                  NSTR = MIN( 68, MAX( 8, NSTR ) )
+
+*               Insert the leading quote, the value, and then the
+*               trailing quote.
+                  FITSTR( 11:11 ) = ''''
+
+*               The valued can be extracted verbatim when it does not
+*               contain any quotes.  If it does include quotes these
+*               must be doubled in the FITS character value.  So first
+*               look for a quote.
+                  NCQ = INDEX( FITVAL, '''' )
+                  IF ( NCQ .EQ. 0 ) THEN
+                     FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
+
+*                  Insert the trailing quote.
+                     FITSTR( NSTR+12:NSTR+12 ) = ''''
+
+*               Search for the quotes, and form the FITS value string
+*               piecemeal, adding an extra quote and appending the text
+*               between the quotes.
+                  ELSE
+
+*                  Start the search at the first column of the input
+*                  value, but in column 12 of the FITS card image.
+                     NCI = 1
+                     NCO = 12
+                     MINLEN = 8
 
 *               Loop until there are no more quotes in the string.
-                  DO WHILE ( NCQ .NE. 0 )
+                     DO WHILE ( NCQ .NE. 0 )
 
 *                  Extract the portion of the value up to and including
 *                  the quote.
-                     FITSTR( NCO:NCO + NCQ - 1 ) =
-     :                       FITVAL( NCI:NCI + NCQ - 1 )
+                        FITSTR( NCO:NCO + NCQ - 1 ) =
+     :                          FITVAL( NCI:NCI + NCQ - 1 )
 
-*                  Move the counters to the character after the quote.
-                     NCO = NCO + NCQ
-                     NCI = NCI + NCQ
+*                     Move the counters to the character after the
+*                     quote.
+                        NCO = NCO + NCQ
+                        NCI = NCI + NCQ
 
-*                  Add the extra quote to the FITS value and moving the
-*                  character counter along.
+*                     Add the extra quote to the FITS value and moving
+*                     the character counter along.
+                        FITSTR( NCO:NCO ) = ''''
+                        NCO = NCO + 1
+
+*                     Look for the next quote.
+                        NCQ = INDEX( FITVAL( NCI: ), '''' )
+
+*                     We do not want trailing blanks when the original
+*                     value had less than eight characters.  So
+*                     decrement the effective length of the value so we
+*                     have replaced trailing blanks with second quotes.
+                        IF ( NSTRT .LT. MINLEN ) THEN
+                           NSTR = NSTR - 1
+                           MINLEN = MINLEN - 1
+                        END IF
+                     END DO
+
+*                  Append the remainder of the text that follows the
+*                  last quote.  Increment the character counter.
+                     FITSTR( NCO:NCO + NSTR - NCI ) = FITVAL( NCI: )
+                     NCO = NCO + NSTR - NCI + 1
+
+*                  Insert the trailing quote.
                      FITSTR( NCO:NCO ) = ''''
-                     NCO = NCO + 1
 
-*                  Look for the next quote.
-                     NCQ = INDEX( FITVAL( NCI: ), '''' )
+*                  Revise the length, which will be used to specify the
+*                  location of the comment field.
+                     NSTR = NCO - 12
+                  END IF
 
-*                  We do not want trailing blanks when the original
-*                  value had less than eight characters.  So decrement
-*                  the effective length of the value so we have replaced
-*                  trailing blanks with second quotes.
-                     IF ( NSTRT .LT. MINLEN ) THEN
-                        NSTR = NSTR - 1
-                        MINLEN = MINLEN - 1
-                     END IF
-                  END DO
-
-*               Append the remainder of the text that follows the last
-*               quote.  Increment the character counter.
-                  FITSTR( NCO:NCO + NSTR - NCI ) = FITVAL( NCI: )
-                  NCO = NCO + NSTR - NCI + 1
-
-*               Insert the trailing quote.
-                  FITSTR( NCO:NCO ) = ''''
-
-*               Revise the length, which will be used to specify the
-*               location of the comment field.
-                  NSTR = NCO - 12
-               END IF
-
-            ELSE
-
-*            Insert the non-character value, right justified.
-               FITSTR( 31-NSTR:30 ) = FITVAL( 1:NSTR )
-
-*            By definition the length of the value must be 20.
-               NSTR = 20
-            END IF                
-
-*         The backslash to separate the item value from the comment and
-*         a following blank are inserted after the value if there is
-*         room. It must have capacity to write at least four characters
-*         of comment plus 3 for the comment delimiter and the spaces
-*         bracketing it.
-            IF ( NSTR .LE. 61 ) THEN
-
-*            For numeric data the delimiter will occur in column 32.
-               IF ( TYPE .NE. 'CHAR' ) THEN
-                  NCC = 32
-
-*            The furthest left the delimiter can go is column 32,
-*            and therefore the comment must come after column 33.
                ELSE
-                  NCC = MAX( 32, NSTR + 14 )
+
+*               Insert the non-character value, right justified.
+                  FITSTR( 31-NSTR:30 ) = FITVAL( 1:NSTR )
+
+*               By definition the length of the value must be 20.
+                  NSTR = 20
+               END IF                
+
+*            The backslash to separate the item value from the comment
+*            and a following blank are inserted after the value if
+*            there is room. It must have capacity to write at least
+*            four characters of comment plus 3 for the comment
+*            delimiter and the spaces bracketing it.
+               IF ( NSTR .LE. 61 ) THEN
+
+*               For numeric data the delimiter will occur in column 32.
+                  IF ( TYPE .NE. 'CHAR' ) THEN
+                     NCC = 32
+
+*               The furthest left the delimiter can go is column 32,
+*               and therefore the comment must come after column 33.
+                  ELSE
+                     NCC = MAX( 32, NSTR + 14 )
+                  END IF
+
+*               Write the delimiter to the card image.
+                  FITSTR( NCC:NCC+1 ) = '/ '
+
+*               The comment itself is copied into the remaining space,
+*               provided there is a comment.
+                  NCOM = CHR_LEN( COMMENT )
+                  IF ( NCOM .GT. 0 ) THEN
+                     NCOM = MAX( CHR_LEN( COMMENT ), 79 - NCC )
+                     FITSTR( NCC + 2:NCC + 1 + NCOM ) =
+     :                 COMMENT( 1:NCOM )
+                  END IF
                END IF
 
-*            Write the delimiter to the card image.
-               FITSTR( NCC:NCC+1 ) = '/ '
+*            Obtain the name of the FITS extension.  (Why is this in
+*            the loop?---MJC.)
+               FDIMS( 1 ) = 1
+               FDIMS( 2 ) = NFITS
+               CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2,
+     :                         FDIMS, NAMOUT, DSTAT )
 
-*            The comment itself is copied into the remaining space,
-*            provided there is a comment.
-               NCOM = CHR_LEN( COMMENT )
-               IF ( NCOM .GT. 0 ) THEN
-                  NCOM = MAX( CHR_LEN( COMMENT ), 79 - NCC )
-                  FITSTR( NCC + 2:NCC + 1 + NCOM ) = COMMENT( 1:NCOM )
-               END IF
+*            Write the FITS card image to the FITS extension.
+               CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 500
             END IF
-
-*         Obtain the name of the FITS extension.  (Why is this in the
-*         loop?---MJC.)
-            FDIMS( 1 ) = 1
-            FDIMS( 2 ) = NFITS
-            CALL DTA_CRNAM( OUTNDF( :NPC )//'.MORE', 'FITS', 2, FDIMS, 
-     :                      NAMOUT, DSTAT )
-
-*         Write the FITS card image to the FITS extension.
-            CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
-            IF ( DSTAT .NE. 0 ) GOTO 500
-         END IF
-      END DO
+         END DO
+      END IF
 
 *   Validate the axis structure.
 *   ============================
