@@ -65,14 +65,10 @@
 *  simple case of lin/lin axes
         IF (.NOT.(XLOG.OR.YLOG)) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
                 CALL PGMOVE(X1,Y(I))
@@ -90,14 +86,10 @@
 *  one or both log axes
         ELSEIF (XLOG.AND..NOT.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (X1.GT.VAL__SMLR
      :              .AND.BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
@@ -115,14 +107,10 @@
 
         ELSEIF (.NOT.XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (Y(I).GT.VAL__SMLR.AND.
      :                  BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
@@ -141,14 +129,10 @@
 
         ELSEIF (XLOG.AND.YLOG) THEN
           FIRST=.TRUE.
-          X2=X(N1)-(X(N1+1)-X(N1))/2.0
+          X2=X(N1)-XW(N1)/2.0
           DO I=N1,N2
             X1=X2
-            IF (I.LT.N2) THEN
-              X2=(X(I)+X(I+1))/2.0
-            ELSE
-              X2=X(I)+(X(I)-X(I-1))/2.0
-            ENDIF
+            X2=X(I)+XW(I)/2.0
             IF (X1.GT.VAL__SMLR.AND.Y(I).GT.VAL__SMLR.AND.
      :                        BIT_ANDUB(Q(I),MASK).EQ.QUAL__GOOD) THEN
               IF (FIRST) THEN
