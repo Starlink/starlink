@@ -242,6 +242,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
    DECLARE_CHARACTER(tmpname, MAXNDFNAME);   /* Local copy of filename (F77) */
    DECLARE_INTEGER(status);                  /* Global status */
    DECLARE_POINTER(charPtr);                 /* Pointer to F77 character array */
+   char *tmpPtr;
 
    /* Convert the file name into an F77 string */
    if ( strlen( filename ) <= MAXNDFNAME ) {
@@ -267,8 +268,9 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
        }
 
        /* Convert the FITS headers into a C string */
-       *header = cnfCreib( (char *)charPtr, 80 * (*header_length) );
-       cnfFree( (void *)charPtr );
+       F77_IMPORT_POINTER( charPtr, tmpPtr );
+       *header = cnfCreib( tmpPtr, 80 * (*header_length) );
+       cnfFree( (void *)tmpPtr );
        emsRlse();
        return 1;
    }
