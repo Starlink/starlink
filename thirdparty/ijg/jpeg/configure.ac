@@ -35,11 +35,15 @@ AC_SUBST(MAIN_TARGET)
 dnl  The special install command is processed at a different time from
 dnl  the rest of the script, so can't be skipped within the header
 dnl  check above.  It thus has to be written to respect the result of
-dnl  the test above.
+dnl  the test above.  Also, the src/makefile.cfg doesn't create its
+dnl  installation directories, so we have to do that by hand.
 STAR_SPECIAL_INSTALL_COMMAND([
     if test $(MAIN_TARGET) = jpeglib; then
       cd src;
-      $(MAKE) INSTALL_ROOT=$$DESTDIR install;
+      for d in bin lib include man/man1;
+        do $(mkdir_p) $$DESTDIR$(prefix)/$$d;
+      done;
+      $(MAKE) DESTDIR=$$DESTDIR install;
     fi])
 
 
