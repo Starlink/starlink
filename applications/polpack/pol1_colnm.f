@@ -219,7 +219,7 @@
             END DO
 
 *  Annul the end of file error.
-            IF( STATUS .NE. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+            IF( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
 
 *  Close the config file.
             CALL FIO_CLOSE( FD, STATUS )
