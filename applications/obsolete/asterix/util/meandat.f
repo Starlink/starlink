@@ -103,11 +103,11 @@
 * Find how many files are wanted
       CALL USI_GET0I('NFILES', NFILES, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
       IF (NFILES .LT. 2 .OR. NFILES .GT. 20) THEN
          CALL MSG_PRNT('Number of files must be between 2 and 20')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
 * Open files
@@ -118,7 +118,7 @@
 *
          CALL USI_TASSOCI( PARAM, 'READ', IFID(LP), STATUS)
 *
-         IF (STATUS .NE. SAI__OK) GOTO 999
+         IF (STATUS .NE. SAI__OK) GOTO 99
 *
       ENDDO
 *
@@ -135,7 +135,7 @@
 *
          IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error looking for data array ^FNO')
-            GOTO 999
+            GOTO 99
          ELSE
 *
 *  Test if dimensions are the same as for file 1
@@ -143,7 +143,7 @@
                IF (DIMS(AXLP) .NE. TDIMS(AXLP)) THEN
                   CALL MSG_PRNT('File ^FNO has different dimensions'/
      &                         /' to file 1')
-                  GOTO 999
+                  GOTO 99
                ENDIF
             ENDDO
 *
@@ -152,7 +152,7 @@
 *
             IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_PRNT('Error mapping data array ^FNO')
-               GOTO 999
+               GOTO 99
             ENDIF
          ENDIF
 *
@@ -201,7 +201,7 @@
 *    Create an output file
       CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Copy everything from the first file into the output file
       CALL ADI_FCOPY( IFID(1), OFID, STATUS)
@@ -215,7 +215,7 @@
       IF (LVAR) THEN
          CALL BDI_MAPVAR(OFID, 'UPDATE', OVP, STATUS)
 *
-         IF (STATUS .NE. SAI__OK) GOTO 999
+         IF (STATUS .NE. SAI__OK) GOTO 99
          CALL ARR_INIT1R(0.0, NELS, %val(OVP), STATUS)
 *
       ELSE
@@ -231,7 +231,7 @@
       IF (LQUAL) THEN
          CALL BDI_MAPQUAL(OFID, 'UPDATE', OQP, STATUS)
 *
-         IF (STATUS .NE. SAI__OK) GOTO 999
+         IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Zero the quality array
          CALL ARR_INIT1B( QUAL__GOOD, NELS, %val(OQP), STATUS )
@@ -248,14 +248,14 @@
 * the command line then the output will be the sum of these files.
       CALL USI_GET0L('AVERAGE', AVERAGE, STATUS)
 *
-      IF (STATUS .NE. SAI__OK) GOTO 999
+      IF (STATUS .NE. SAI__OK) GOTO 99
 *
 * Create a workspace array and zero it
       CALL DYN_MAPR(7, DIMS, CPTR, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error creating dynamic space')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
       CALL ARR_INIT1R(0.0, NELS, %val(CPTR), STATUS)
@@ -352,7 +352,7 @@
 *
          CALL USI_GET0C('WTMETH', WTMETH, STATUS)
 *
-         IF (STATUS .NE. SAI__OK) GOTO 999
+         IF (STATUS .NE. SAI__OK) GOTO 99
 *
          CALL CHR_UCASE(WTMETH)
 *
@@ -393,7 +393,7 @@
 *     Ask for the weighting for this file
             CALL USI_GET0R(PARAM, WEIGHT, STATUS)
 *
-            IF (STATUS .NE. SAI__OK) GOTO 999
+            IF (STATUS .NE. SAI__OK) GOTO 99
 *
          ENDIF
 *
@@ -408,12 +408,12 @@
 *    have them summed by not dividing by the number of elements used in each
 *    output bin.
       DO LP=1,NELS
-*
-*   Test if this element had any contribution from the input file
-         IF (WTSUM(LP) .GT. 0.0) THEN
-*
-*     Average the arrays if producing a mean rather than a sum
-            IF (AVERAGE) THEN
+
+*    Test if this element had any contribution from the input file
+        IF (WTSUM(LP) .GT. 0.0) THEN
+
+*    Average the arrays if producing a mean rather than a sum
+          IF (AVERAGE) THEN
 
                ODATA(LP) = ODATA(LP) / WTSUM(LP)
 *
@@ -433,10 +433,10 @@
 *
          ENDIF
 *
-      ENDDO
+      END DO
 
 *    Tidy up
- 999  IF (STATUS .NE. SAI__OK) THEN
+ 99   IF (STATUS .NE. SAI__OK) THEN
         CALL AST_REXIT( 'MEANDAT_AVERAGE', STATUS )
       END IF
 
