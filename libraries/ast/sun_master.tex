@@ -8915,6 +8915,1920 @@ f-
 %\section{\label{ss:searching}TBW - Searching for Coordinate Systems}
 
 \cleardoublepage
+%docstatus plots:            I(cf)
+%\include{plots}
+\section{\label{ss:plots}Producing Graphical Output (Plots)}
+
+Graphical output from AST is performed though an Object called a Plot,
+which is a specialised form of FrameSet. A Plot does not represent the
+graphical content itself, but is a route through which plotting
+operations, such as drawing lines and curves, are conveyed on to a
+plotting surface to appear as visible graphics.
+
+\subsection{The Plot Model}
+
+When a Plot is created, it is initialised by providing a FrameSet
+whose base Frame (as specified by its Base attribute) is mapped
+linearly on to a {\em{plotting area.}} This is a rectangular region in
+the graphical coordinate space of the underlying graphics system and
+becomes the new base Frame of the Plot. In effect, the Plot becomes
+attached to the plotting surface, in rather the same way that a basic
+FrameSet might be attached to (say) an image.
+
+The current Frame of the Plot (derived from the current Frame of the
+FrameSet supplied) is used to represent a {\em{physical coordinate
+system.}} This is the system in which plotting operations are
+performed by your program.  Every plotting operation is then
+transformed through the Mapping which inter-relates the Plot's current
+and base Frames in order to appear on the plotting surface.
+
+An example may help here. Suppose we start with a FrameSet whose base
+Frame describes the pixel coordinates of an image and whose current
+Frame describes a celestial (equatorial) coordinate system. Let us
+assume that these two Frames are inter-related by a Mapping within the
+FrameSet which represents a particular sky projection.
+
+When a Plot is created from this FrameSet, we specify how the pixel
+coordinates (the base Frame) maps on to the plotting surface. This
+simply corresponds to telling the Plot where we have previously
+plotted the image data. If we now use the Plot to plot a line with
+latitude zero in our physical coordinate system, as given by the
+current Frame, this line would appear as a curve (the equator) on the
+plotting surface, correctly registered with the image.
+
+There are a number of plotting functions provided, which all work in a
+similar way. Plotting operations are transformed through the Mapping
+which the Plot represents before they appear on the plotting
+surface.\footnote{Like any FrameSet, a Plot can be used as a
+Mapping. In this case it is the inverse transformation which is used
+when plotting ({\em{i.e.}}\ that which transforms between the current
+and base Frames).}  It is possible to draw symbols, lines, axes,
+entire grids and more in this way.
+
+%\subsection{TBW---Creating a Plot}
+
+\subsection{Plotting Symbols}
+
+c+
+The simplest form of plotting is to draw symbols (termed
+{\em{markers}}) at a set of points. This is performed by astMark,
+which is supplied with a set of physical coordinates at which to place
+the markers:
+c-
+f+
+The simplest form of plotting is to draw symbols (termed
+{\em{markers}}) at a set of points. This is performed by AST\_MARK,
+which is supplied with a set of physical coordinates at which to place
+the markers:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include "ast.h"
+#define NCOORD 2
+#define NMARK 10
+double in[ NCOORD ][ NMARK ];
+int type;
+
+...
+
+astMark( plot, NMARK, NCOORD, NCOORD, in, type );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INCLUDE 'AST_PAR'
+      INTEGER NCOORD, NMARK, TYPE, STATUS
+      DOUBLE PRECISION IN( NMARK, NCOORD )
+
+      STATUS = 0
+
+      ...
+
+      CALL AST_MARK( PLOT, NMARK, NCOORD, NMARK, IN, TYPE, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, NMARK specifies how many markers to plot and NCOORD specifies
+how many coordinates are being supplied for each
+point.\footnote{Remember, the physical coordinate space need not
+necessarily be 2-dimensional, even if the plotting surface is.} The
+array ``in'' supplies the coordinates and the integer ``type''
+specifies which type of marker to plot.
+c-
+f+
+Here, NMARK specifies how many markers to plot and NCOORD specifies
+how many coordinates are being supplied for each
+point.\footnote{Remember, the physical coordinate space need not
+necessarily be 2-dimensional, even if the plotting surface is.} The
+array IN supplies the coordinates and the integer TYPE specifies which
+type of marker to plot.
+f-
+
+\subsection{\label{ss:plottinggeodesics}Plotting Geodesic Curves}
+
+There is no Plot routine to draw a straight line, because any straight
+line in physical coordinates can potentially turn into a curve in
+graphical coordinates. We therefore start by considering how to draw
+geodesic curves.  These are curves which trace the path of shortest
+distance between two points in physical coordinates
+ and are the basic drawing element in a Plot. 
+
+c+
+In many instances, the geodesic will, in fact, be a straight line, but
+this depends on the Plot's current Frame. If this represents a
+celestial coordinate system, for instance, it will be a great circle
+(corresponding with the behaviour of the astDistance function which
+defines the metric of the physical coordinate space).  The geodesic
+will, of course, be transformed into graphics coordinates before being
+plotted. A geodesic curve is plotted using astCurve as follows:
+c-
+f+
+In many instances, the geodesic will, in fact, be a straight line, but
+this depends on the Plot's current Frame. If this represents a
+celestial coordinate system, for instance, it will be a great circle
+(corresponding with the behaviour of the AST\_DISTANCE function which
+defines the metric of the physical coordinate space).  The geodesic
+will, of course, be transformed into graphics coordinates before being
+plotted. A geodesic curve is plotted using AST\_CURVE as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+double start[ NCOORD ], finish[ NCOORD ];
+
+...
+
+astCurve( plot, start, finish );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      DOUBLE PRECISION START( NCOORD ), FINISH( NCOORD )
+
+      ...
+
+      CALL AST_CURVE( PLOT, START, FINISH, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, ``start'' and ``finish'' are arrays containing the starting and
+finishing coordinates of the curve. The astOffset and astDistance
+functions can often be useful for computing these
+(\secref{ss:distanceandoffset}).
+c-
+f+
+Here, START and FINISH are arrays containing the starting and
+finishing coordinates of the curve. The AST\_OFFSET and AST\_DISTANCE
+routines can often be useful for computing these
+(\secref{ss:distanceandoffset}).
+f-
+
+\subsection{Plotting Curves Parallel to Axes}
+
+c+
+As there is no Plot function to draw a ``straight line'', drawing axes
+and grid lines to represent coordinate systems requires a slightly
+different approach. The problem is that for some coordinate systems,
+these grid lines will not be geodesics, so astCurve
+(\secref{ss:plottinggeodesics}) cannot easily be used (you would have
+to resort to approximating grid lines by many small elements). Lines
+of constant celestial latitude provide an example of this, with the
+exception of the equator which is a geodesic.
+c-
+f+
+As there is no Plot routine to draw a ``straight line'', drawing axes
+and grid lines to represent coordinate systems requires a slightly
+different approach. The problem is that for some coordinate systems,
+these grid lines will not be geodesics, so AST\_CURVE
+(\secref{ss:plottinggeodesics}) cannot easily be used (you would have
+to resort to approximating grid lines by many small elements). Lines
+of constant celestial latitude provide an example of this, with the
+exception of the equator which is a geodesic.
+f-
+
+c+
+The astGridLine function allows these curves to be drawn, as follows:
+c-
+f+
+The AST\_GRIDLINE routine allows these curves to be drawn, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+int axis;
+double length;
+
+...
+
+astGridLine( plot, axis, start, length );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER AXIS
+      DOUBLE PRECISION LENGTH
+
+      ...
+
+      CALL AST_GRIDLINE( PLOT, AXIS, START, LENGTH, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, ``axis'' specifies which physical coordinate axis we wish to
+draw parallel to. The ``start'' array contains the coordinates of the
+start of the curve and ``length'' specifies the distance to draw along
+the axis in physical coordinate space.
+c-
+f+
+Here, AXIS specifies which physical coordinate axis we wish to draw
+parallel to. The START array contains the coordinates of the start of
+the curve and LENGTH specifies the distance to draw along the axis in
+physical coordinate space.
+f-
+
+\subsection{\label{ss:clipping}Clipping}
+
+Like many graphics systems, a Plot allows you to {\em{clip}} the graphics
+you produce. This means that plotting is restricted to certain regions
+of the plotting surface so that anything drawn outside these regions
+will not appear.  All Plots automatically clip at the edges of the
+plotting area specified when the Plot is created. This means that
+graphics are ultimately restricted to the rectangular region of
+plotting space to which you have attached the Plot.
+
+In addition to this, you may also specify lower and upper limits on
+each axis at which clipping should occur. This permits you to further
+restrict the plotting region. Moreover, you may attach these clipping
+limits to {\em{any}} of the Frames in the Plot. This allows you to
+place restrictions on where plotting will take place in either the
+physical coordinate system, the graphical coordinate system, or in any
+other coordinate system which is described by a Frame within the Plot.
+
+For example, you could plot using equatorial coordinates and set up
+clipping limits in galactic coordinates. In general, you could set up
+arbitrary clipping regions by adding a new Frame to a Plot (in which
+clipping will be performed) and inter-relating this to the other
+Frames in a suitable way.
+
+c+
+Clipping limits are defined using the astClip function, as follows:
+c-
+f+
+Clipping limits are defined using the AST\_CLIP routine, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#define NAXES 2
+int iframe;
+double lbnd[ NAXES ], ubnd[ NAXES ];
+
+...
+astClip( plot, iframe, lbnd, ubnd);
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER IFRAME, NAXES
+      DOUBLE PRECISION LBND( NAXES ), UBND( NAXES )
+
+      ...
+
+      CALL AST_CLIP( PLOT, IFRAME, LBND, UBND, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, the ``iframe'' value gives the index of the Frame within the
+Plot to which clipping is to be applied, while ``lbnd'' and ``ubnd''
+give the limits on each axis of the selected Frame (NAXES is the
+number of axes in this Frame).
+c-
+f+
+Here, the IFRAME value gives the index of the Frame within the Plot to
+which clipping is to be applied, while LBND and UBND give the limits
+on each axis of the selected Frame (NAXES is the number of axes in
+this Frame).
+f-
+
+c+
+You can remove clipping by giving a value of AST\_\_NOFRAME for ``iframe''.
+c-
+f+
+You can remove clipping by giving a value of AST\_\_NOFRAME for IFRAME.
+f-
+
+\subsection{Using a Plot as a Mapping}
+
+All Plots are also Mappings (just like the FrameSets from which they
+are derived), so can be used to transform coordinates.
+
+Like FrameSets, the forward transformation of a Plot will convert
+coordinates between the base and current Frames ({\em{i.e.}}\ between
+graphical and physical coordinates). This would be useful if you were
+(say) reading a cursor position in graphical coordinates and needed to
+convert this into physical coordinates for display.
+
+c+
+Conversely, a Plot's inverse transformation converts between its
+current and base Frames ({\em{i.e.}}\ from physical coordinates to
+graphical coordinates). This transformation is applied automatically
+whenever plotting operations are carried out by AST functions. It may
+also be useful to apply it directly, however, if you wish to perform
+additional plotting operations ({\em{e.g.}}\ those provided by the
+native graphics system) at positions specified in physical
+coordinates.
+c-
+f+
+Conversely, a Plot's inverse transformation converts between its
+current and base Frames ({\em{i.e.}}\ from physical coordinates to
+graphical coordinates). This transformation is applied automatically
+whenever plotting operations are carried out by AST routines. It may
+also be useful to apply it directly, however, if you wish to perform
+additional plotting operations ({\em{e.g.}}\ those provided by the
+native graphics system) at positions specified in physical
+coordinates.
+f-
+
+c+
+There is, however, one important difference between using a FrameSet
+and a Plot to transform coordinates, and this is that clipping may be
+applied by a Plot (if it has been enabled using
+astClip---\secref{ss:clipping}). Any point which lies within the
+clipped region of a Plot will, when transformed, yield coordinates
+with the value AST\_\_BAD. If you wish to avoid this clipping, you
+should extract the relevant Mapping from the Plot (using
+astGetMapping) and use this, instead of the Plot, to transform the
+coordinates.
+c-
+f+
+There is, however. one important difference between using a FrameSet
+and a Plot to transform coordinates, and this is that clipping may be
+applied by a Plot (if it has been enabled using
+AST\_CLIP---\secref{ss:clipping}). Any point which lies within the
+clipped region of a Plot will, when transformed, yield coordinates
+with the value AST\_\_BAD. If you wish to avoid this clipping, you
+should extract the relevant Mapping from the Plot (using
+AST\_GETMAPPING) and use this, instead of the Plot, to transform the
+coordinates.
+f-
+
+\subsection{Using a Plot as a Frame}
+
+Every Plot is also a Frame, so can be used to obtain the values of
+Frame attributes such as a Title, axis Labels, axis Units,
+{\em{etc.,}} which are typically used when displaying data and/or
+coordinates. These attributes are, as for any FrameSet, derived from
+the current Frame of the Plot (\secref{ss:framesetasframe}). They are
+also used automatically when using the Plot to plot coordinate axes
+and coordinate grids ({\em{e.g.}}\ for labelling
+them---\secref{ss:plottingagrid}).
+
+c+
+Because the current Frame of a Plot represents physical coordinates,
+any Frame operation applied to the Plot will effectively be working in
+this coordinate system. For example, the astDistance and astOffset
+functions will compute distances and offsets in physical coordinate
+space, while astFormat and astNorm will format physical coordinates in
+an appropriate way for display.
+c-
+f+
+Because the current Frame of a Plot represents physical coordinates,
+any Frame operation applied to the Plot will effectively be working in
+this coordinate system. For example, the AST\_DISTANCE and AST\_OFFSET
+routines will compute distances and offsets in physical coordinate
+space, and AST\_FORMAT will format physical coordinates in an
+appropriate way for display.
+f-
+
+\subsection{\label{ss:validphysicalcoordinates}Regions of Valid Physical Coordinates}
+
+When points in physical coordinate space are transformed by a Plot
+into graphics coordinates for plotting, they may not always yield
+valid coordinates, irrespective of any clipping being applied
+(\secref{ss:clipping}). To indicate this, the resulting coordinate
+values will be set to the value AST\_\_BAD
+(\secref{ss:badcoordinates}).
+
+There are a number of reasons why this may occur, but typically it
+will be because physical coordinates only map on to a subset of the
+graphics coordinate space. This situation is commonly encountered with
+all-sky projections where, typically, the celestial sphere appears,
+when plotted, as a distorted shape ({\em{e.g.}}\ an ellipse) which
+does not entirely fill the graphics space. In some cases, there may
+even be multiple regions of valid and invalid physical coordinates.
+
+When plotting is performed {\em{via}} a Plot, graphical output will
+only appear in the regions of valid physical coordinates. Nothing will
+appear where invalid coordinates occur. Such output is effectively
+clipped. If you wish to plot in these areas, you must change
+coordinate system and use, say, graphical coordinates to address the
+plotting surface directly.
+
+\subsection{Plotting Borders}
+
+c+
+The astBorder function is provided to draw a (line) border around your
+graphical output. With most graphics systems, this would simply be a
+rectangular box around the plotting area. With a Plot, however, this
+boundary follows the edge of each region containing valid, unclipped
+physical coordinates (\secref{ss:validphysicalcoordinates}).
+c-
+f+
+The AST\_BORDER routine is provided to draw a (line) border around
+your graphical output. With most graphics systems, this would simply
+be a rectangular box around the plotting area. With a Plot, however,
+this boundary follows the edge of each region containing valid,
+unclipped physical coordinates (\secref{ss:validphysicalcoordinates}).
+f-
+
+c+
+This means, for example, that if you were plotting an all-sky
+projection, this boundary would outline the perimeter of the celestial
+sphere when projected on to your plotting surface. Of course, if there
+is no clipping and all physical coordinates are valid, then you will
+get the traditional rectangular box. astBorder requires only
+a pointer to the Plot:
+c-
+f+
+This means, for example, that if you were plotting an all-sky
+projection, this boundary would outline the perimeter of the celestial
+sphere when projected on to your plotting surface. Of course, if there
+is no clipping and all physical coordinates are valid, then you will
+get the traditional rectangular box. AST\_BORDER requires only a
+pointer to the Plot and the usual STATUS argument:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+int holes;
+
+...
+
+holes = astBorder( plot );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      LOGICAL HOLES
+
+      ...
+
+      HOLES = AST_BORDER( PLOT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+It returns boolean (integer) value to indicate if any invalid or
+clipped physical coordinates were found within the plotting area. If
+they were, it will draw around the valid unclipped regions and return
+a value of one.  Otherwise, it will draw a simple rectangular border
+and return zero.
+c-
+f+
+It returns a logical value to indicate if any invalid or clipped
+physical coordinates were found within the plotting area. If they
+were, it will draw around the valid unclipped regions and return
+.TRUE.. Otherwise, it will draw a simple rectangular border and return
+.FALSE..
+f-
+
+\subsection{Plotting Text}
+
+c+
+Using a Plot to draw text involves supplying a string of text to be
+displayed and a position in physical coordinates where the text is to
+appear. The position is transformed into graphical coordinates to
+determine where the text should appear on the plotting surface. You
+must also provide a 2-element ``up'' vector which gives the upward
+direction of the text in graphical coordinates. This allows text to be
+drawn at any angle.
+c-
+f+
+Using a Plot to draw text involves supplying a string of text to be
+displayed and a position in physical coordinates where the text is to
+appear. The position is transformed into graphical coordinates to
+determine where the text should appear on the plotting surface. You
+must also provide a 2-element UP vector which gives the upward
+direction of the text in graphical coordinates. This allows text to be
+drawn at any angle.
+f-
+
+c+
+Plotting is performed by astText, for example:
+c-
+f+
+Plotting is performed by AST\_TEXT, for example:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+char text[ 21 ];
+double pos[ NCOORD ];
+float up[ 2 ] = { 0.0f, 1.0f };
+
+...
+
+astText( plot, text, pos, up, "TL" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CHARACTER * ( 20 ) TEXT
+      DOUBLE PRECISION POS( NCOORD )
+      REAL UP( 2 )
+      DATA UP / 0.0, 1.0 /
+
+      ...
+
+      CALL AST_TEXT( PLOT, TEXT, POS, UP, 'TL', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, ``text'' contains the string to be drawn, ``pos'' is an array of
+physical coordinates and ``up'' specifies the upward vector. In this
+case, the text will be drawn horizontally. The final argument
+specifies the text justification, here indicating that the top left
+corner of the text should appear at the position given.
+c-
+f+
+Here, TEXT contains the string to be drawn, POS is an array of
+physical coordinates and UP specifies the upward vector. In this case,
+the text will be drawn horizontally. The penultimate argument
+specifies the text justification, here indicating that the top left
+corner of the text should appear at the position given.
+f-
+
+Further control over the appearance of the text is possible by setting
+values for various Plot attributes, for example Colour, Font and Size.
+
+\subsection{\label{ss:plottingagrid}Plotting a Grid}
+
+c+
+The most comprehensive plotting function available is astGrid, which
+can be used to draw labelled coordinate axes and, optionally, to
+overlay coordinate grids on the plotting area
+(Figure~\ref{fig:gridplot}). The routine is straightforward to use,
+simply requiring a pointer to the Plot:
+c-
+f+
+The most comprehensive plotting routine available is AST\_GRID, which
+can be used to draw labelled coordinate axes and, optionally, to
+overlay coordinate grids on the plotting area
+(Figure~\ref{fig:gridplot}). The routine is straightforward to use,
+simply requiring a pointer to the Plot and a STATUS argument:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astGrid( plot );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_GRID( PLOT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+It will draw both linear and curvilinear axes and grids, as required
+by the particular Plot. The appearance of the output can be modified
+in a wide variety of ways by setting various Plot attributes.
+
+\cleardoublepage
+%\include{selfmappings}
+\section{\label{ss:intramaps}Creating Your Own Private Mappings (IntraMaps)}
+
+\subsection{The Need for Extensibility}
+
+However many Mapping classes are provided by AST, sooner or later you
+will want to transform coordinates in some way that has not been
+foreseen. You might want to plot a graph in some novel curvilinear
+coordinate system (perhaps you already have a WCS system in your
+software and just want to use AST for its graphical capabilities).
+Alternatively, you might need to calibrate a complex dataset (like an
+objective prism plate) where each position must be converted to world
+coordinates with reference to calibration data under the control of an
+elaborate algorithm.
+
+In such cases, it is clear that the basic pre-formed components
+provided by AST for building Mappings are just not enough. What you
+need is access to a programming language. However, if you write your
+own software to transform coordinate values, then it must be made
+available in the form of an AST class (from which you can create
+Objects) before it can be used in conjunction with other AST
+facilities.
+
+At this point you might consider writing your own AST class, but this
+is not recommended. Not only would the internal conventions used by
+AST take some time to master, but you might also find yourself having
+to change your software whenever a new version of AST was
+released. Fortunately, there is a much easier route provided by the
+IntraMap class.
+
+\subsection{The IntraMap Model}
+
+c+
+To allow you to write your own Mappings, AST provides a special kind
+of Mapping called an IntraMap. An IntraMap is a sort of ``wrapper''
+for a coordinate transformation function written in C. You write this
+function yourself and then register it with AST. This, in effect,
+creates a new class from which you can create Mappings
+({\em{i.e.}}\ IntraMaps) which will transform coordinates in whatever
+way your transformation function specifies.
+c-
+f+
+To allow you to write your own Mappings, AST provides a special kind
+of Mapping called an IntraMap. An IntraMap is a sort of ``wrapper''
+for a coordinate transformation routine written in Fortran. You write
+this routine yourself and then register it with AST. This, in effect,
+creates a new class from which you can create Mappings
+({\em{i.e.}}\ IntraMaps) which will transform coordinates in whatever
+way your transformation routine specifies.
+f-
+
+Because IntraMaps are Mappings, they may be used in the same way as
+any other Mapping. For instance, they may be combined in series or
+parallel with other Mappings using a CmpMap (\secref{ss:cmpmaps}),
+they may be inverted (\secref{ss:invertingmappings}), you may enquire
+about their attributes (\secref{ss:gettingattributes}), they may be
+inserted into FrameSets (\secref{ss:framesets}), {\em{etc.}} They do,
+however, have some important limitations of which you should be aware
+before we go on to consider how to create them.
+
+\subsection{\label{ss:intramaplimitations}Limitations of IntraMaps}
+
+c+
+By now, you might be wondering why any other kind of Mapping is
+required at all. After all, why not simply write your own coordinate
+transformation functions in C, wrap them up in IntraMaps and do away
+with all the other Mapping classes in AST?
+c-
+f+
+By now, you might be wondering why any other kind of Mapping is
+required at all. After all, why not simply write your own coordinate
+transformation routines in Fortran, wrap them up in IntraMaps and do
+away with all the other Mapping classes in AST?
+f-
+
+c+
+The reason is not too hard to find. Any transformation function you
+write is created solely by you, so it is a private extension which
+does not form a permanent part of AST. If you use it to calibrate some
+data and then pass that data to someone else, who has only the
+standard version of AST, then they will not be able to interpret it.
+c-
+f+
+The reason is not too hard to find. Any transformation routine you
+write is created solely by you, so it is a private extension which
+does not form a permanent part of AST. If you use it to calibrate some
+data and then pass that data to someone else, who has only the
+standard version of AST, then they will not be able to interpret it.
+f-
+
+c+
+Thus, while an IntraMap is fine for use by you and your collaborators
+(who we assume have access to the same transformation functions), it
+does not address the need for universal data exchange like other AST
+Mappings do. This is where the ``Intra'' in the class name
+``IntraMap'' comes from, implying private or internal usage.
+c-
+f+
+Thus, while an IntraMap is fine for use by you and your collaborators
+(who we assume have access to the same transformation routines), it
+does not address the need for universal data exchange like other AST
+Mappings do. This is where the ``Intra'' in the class name
+``IntraMap'' comes from, implying private or internal usage.
+f-
+
+For this reason, it is unwise to store IntraMaps in datasets, unless
+they will be used solely for communication between collaborating items
+of software which share conventions about their use.  A private
+database describing coordinate systems on a graphics device might be
+an example where IntraMaps would be suitable, because the data would
+probably never be accessed by anyone else's software. Restricting
+IntraMap usage to within a single program ({\em{i.e.}} never writing
+it out) is, of course, completely safe.
+
+c+
+If, by accident, an IntraMap should happen to escape as part of a
+dataset, then the unsuspecting recipient is likely to receive an error
+message when they attempt to read the data. However, AST will
+associate details of the IntraMap's transformation function and its
+author (if provided) with the data, so that the recipient can make an
+intelligent enquiry to obtain the necessary software if this proves
+essential.
+c-
+f+
+If, by accident, an IntraMap should happen to escape as part of a
+dataset, then the unsuspecting recipient is likely to receive an error
+message when they attempt to read the data. However, AST will
+associate details of the IntraMap's transformation routine and its
+author (if provided) with the data, so that the recipient can make an
+intelligent enquiry to obtain the necessary software if this proves
+essential.
+f-
+
+c+
+\subsection{\label{ss:transformationfunctions}Writing a Transformation Function}
+c-
+f+
+\subsection{\label{ss:transformationfunctions}Writing a Transformation Routine}
+f-
+
+c+
+The first stage in creating an IntraMap is to write the coordinate
+transformation function. This should have a calling interface like the
+astTranP function provided by AST ({\em{q.v.}}), except that the first
+parameter (the Mapping pointer) is not required and should be
+omitted. Here is a simple example of a suitable transformation
+function which transforms coordinates by squaring them:
+c-
+f+
+The first stage in creating an IntraMap is to write the coordinate
+transformation routine. This should have a calling interface like the
+AST\_TRANN function provided by AST ({\em{q.v.}}), except that the
+first argument (the Mapping pointer) is not required and should be
+omitted. Here is a simple example of a suitable transformation routine
+which transforms coordinates by squaring them:
+f-
+\xlabel{SqrTran}
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include "ast.h"
+#include <math.h>
+
+void SqrTran( int npoint, int ncoord_in, const double *ptr_in[],
+              int forward, int ncoord_out, double *ptr_out[] ) {
+   int point, coord;
+   double x;
+
+/* Forward transformation. */
+   if ( forward ) {
+      for ( point = 0; point < npoint; point++ ) {
+         for ( coord = 0; coord < ncoord_in; coord++ ) {
+            x = ptr_in[ coord ][ point ];
+            ptr_out[ coord ][ point ] = ( x == AST__BAD ) ? AST__BAD : x * x;
+         }
+      }
+
+/* Inverse transformation. */
+   } else {
+      for ( point = 0; point < npoint; point++ ) {
+         for ( coord = 0; coord < ncoord_in; coord++ ) {
+            x = ptr_in[ coord ][ point ];
+            ptr_out[ coord ][ point ] =
+               ( x < 0.0 || x == AST__BAD ) ? AST__BAD : sqrt( x );
+         }
+      }
+   }
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      SUBROUTINE SQRTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+    :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
+      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
+      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
+      LOGICAL FORWARD
+
+      INCLUDE 'AST_PAR'
+      DOUBLE PRECISION X
+      INTEGER COORD, POINT
+
+*  Forward transformation.
+      IF ( FORWARD ) THEN
+         DO 2 POINT = 1, NPOINT
+            DO 1 COORD = 1, NCOORD_IN
+               X = IN( POINT, COORD )
+               IF ( X .EQ. AST__BAD ) THEN
+                  OUT( POINT, COORD ) = AST__BAD
+               ELSE
+                  OUT( POINT, COORD ) = X * X
+               ENDIF
+ 1          CONTINUE
+ 2       CONTINUE
+
+*  Inverse transformation.
+      ELSE
+         DO 4 POINT = 1, NPOINT
+            DO 3 COORD = 1, NCOORD_IN
+               X = IN( POINT, COORD )
+               IF ( X .LT. 0.0D0 .OR. X .EQ. AST__BAD ) THEN
+                  OUT( POINT, COORD ) = AST__BAD
+               ELSE
+                  OUT( POINT, COORD ) = SQRT( X )
+               ENDIF
+ 3          CONTINUE
+ 4       CONTINUE
+      ENDIF
+      END
+\end{verbatim}
+\normalsize
+f-
+
+c+
+As you can see, the function comes in two halves which implement the
+forward and inverse coordinate transformations. The number of points
+to be transformed (``npoint'') and the numbers of input and output
+coordinates per point (``ncoord\_in'' and ``ncoord\_out''---in this
+case both are assumed equal) are passed to the function. A pair of
+loops then accesses all the coordinate values.  Note that it is
+legitimate to omit one or other of the forward/inverse transformations
+and simply not to implement it, if it will not be required. It is also
+permissible to require that the numbers of input and output
+coordinates be fixed ({\em{e.g.}}\ at 2), or to write the function so
+that it can handle arbitrary dimensionality, as here.
+c-
+f+
+As you can see, the routine comes in two halves which implement the
+forward and inverse coordinate transformations. The number of points
+to be transformed (NPOINT) and the numbers of input and output
+coordinates per point (NCOORD\_IN and NCOORD\_OUT---in this case both
+are assumed equal) are passed to the routine. A pair of loops then
+accesses all the coordinate values.  Note that it is legitimate to
+omit one or other of the forward/inverse transformations and simply
+not to implement it, if it will not be required. It is also
+permissible to require that the numbers of input and output
+coordinates be fixed ({\em{e.g.}}\ at 2), or to write the routine so
+that it can handle arbitrary dimensionality, as here.
+f-
+
+c+
+Before using an incoming coordinate, the function must first check
+that it is not set to the value AST\_\_BAD, which indicates missing
+data (\secref{ss:badcoordinates}). If it is, the same value is also
+assigned to any affected output coordinates. The value AST\_\_BAD is
+also generated if any coordinates cannot be transformed. In this
+example, this can happen with the inverse transformation if negative
+values are encountered, so that the square root cannot be taken.
+c-
+f+
+Before using an incoming coordinate, the routine must first check that
+it is not set to the value AST\_\_BAD, which indicates missing data
+(\secref{ss:badcoordinates}). If it is, the same value is also
+assigned to any affected output coordinates. The value AST\_\_BAD is
+also generated if any coordinates cannot be transformed. In this
+example, this can happen with the inverse transformation if negative
+values are encountered, so that the square root cannot be taken.
+f-
+
+c+
+There are very few restrictions on what a coordinate transformation
+function may do. For example, it may freely perform I/O to access any
+external data needed, it may invoke other AST facilities (but beware
+of unwanted recursion), {\em{etc.}} Typically, you may also want to
+pass information to it {\em{via}}\ global variables. Remember,
+however, that whatever facilities the transformation function requires
+must be available in every program which uses it.
+c-
+f+
+There are very few restrictions on what a coordinate transformation
+routine may do. For example, it may freely perform I/O to access any
+external data needed, it may invoke other AST facilities (but beware
+of unwanted recursion), {\em{etc.}} Typically, you may also want to
+pass information to it {\em{via}}\ global variables held in common
+blocks.  Remember, however, that whatever facilities the
+transformation routine requires must be available in every program
+which uses it.
+f-
+
+c+
+Generally, it is not a good idea to retain context information within
+a transformation function. That is, it should transform each set of
+coordinates as a single point and retain no memory of the points it
+has transformed before. Partly, this is in order to conform with the
+AST model of a Mapping, but you may also run into trouble if you use
+the same transformation function with several IntraMaps, since it will
+not be able to tell when you have swapped to use a different one.
+c-
+f+
+Generally, it is not a good idea to retain context information within
+a transformation routine. That is, it should transform each set of
+coordinates as a single point and retain no memory of the points it
+has transformed before. Partly, this is in order to conform with the
+AST model of a Mapping, but you may also run into trouble if you use
+the same transformation routine with several IntraMaps, since it will
+not be able to tell when you have swapped to use a different one.
+f-
+
+c+
+If an error occurs within a transformation function, it should use the
+astSetStatus function (\secref{ss:errordetection}) to set the AST
+status to an error value before returning. This will alert AST to the
+error, causing it to abort the current operation.
+c-
+f+
+If an error occurs within a transformation routine, it should set its
+STATUS argument to an error value before returning. This will alert
+AST to the error, causing it to abort the current operation.
+f-
+
+c+
+\subsection{\label{ss:registeringintramaps}Registering a Transformation Function}
+c-
+f+
+\subsection{\label{ss:registeringintramaps}Registering a Transformation Routine}
+f-
+
+c+
+Having written your coordinate transformation function, the next step
+is to register it with AST. Registration is performed using
+astIntraReg, as follows:
+c-
+f+
+Having written your coordinate transformation routine, the next step
+is to register it with AST. Registration is performed using
+AST\_INTRAREG, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void SqrTran( int, int, const double *[], int, int, double *[] );
+
+const char *author, *contact, *purpose;
+
+...
+
+purpose = "Square each coordinate value";
+author =  "R.F. Warren-Smith & D.S. Berry";
+contact = "http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/?xref_SqrTran";
+
+astIntraReg( "SqrTran", 2, 2, SqrTran, 0, purpose, author, contact );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      EXTERNAL SQRTRAN
+
+      CHARACTER * ( 80 ) AUTHOR, CONTACT, PURPOSE
+
+      ...
+
+      PURPOSE = 'Square each coordinate value'
+      AUTHOR  = 'R.F. Warren-Smith & D.S. Berry'
+      CONTACT = 'http://star-www.rl.ac.uk/cgi-bin/htxserver/' //
+                'sun210.htx/?xref_SqrTran'
+
+      CALL AST_INTRAREG( 'SqrTran', 2, 2, SQRTRAN, 0,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Note that you should also provide a function prototype to describe the
+transformation function (the implementation of the function itself
+would suffice, of course).
+c-
+f+
+Note that the transformation routine must also appear in a Fortran
+EXTERNAL statement.
+f-
+
+c+
+The first argument to astIntraReg is a name by which the
+transformation function will be known. This will be used when we come
+to create an IntraMap and is case sensitive. We recommend that you use
+the actual function name here and make this sufficiently unusual that
+it is unlikely to clash with any other functions in most people's
+software.
+c-
+f+
+The first argument to AST\_INTRAREG is a name by which the
+transformation routine will be known. This will be used when we come
+to create an IntraMap and is case sensitive. We recommend that you
+base this on the actual routine name and make this sufficiently
+unusual that it is unlikely to clash with any other routines in most
+people's software.
+f-
+
+c+
+The next two arguments specify the number of input and output
+coordinates which the transformation function will handle. These
+correspond with the Nin and Nout attributes of the IntraMap we will
+create. Here, we have set them both to 2, which means that we will
+only be able to create IntraMaps with 2 input and 2 output coordinates
+(despite the fact that the transformation function can actually handle
+other dimensionalities). We will see later
+(\secref{ss:variableintramapcoordinates}) how to remove this
+restriction.
+c-
+f+
+The next two arguments specify the number of input and output
+coordinates which the transformation routine will handle. These
+correspond with the Nin and Nout attributes of the IntraMap we will
+create. Here, we have set them both to 2, which means that we will
+only be able to create IntraMaps with 2 input and 2 output coordinates
+(despite the fact that the transformation routine can actually handle
+other dimensionalities). We will see later
+(\secref{ss:variableintramapcoordinates}) how to remove this
+restriction.
+f-
+
+c+
+The fourth argument should contain a set of flags which describe the
+transformation function in a little more detail. We will return to
+this shortly (\secref{ss:restrictedintramaps} \&
+\secref{ss:simplifyingintramaps}). For now, we supply a value of zero.
+c-
+f+
+The fourth argument should contain a set of flags which describe the
+transformation routine in a little more detail. We will return to this
+shortly (\secref{ss:restrictedintramaps} \&
+\secref{ss:simplifyingintramaps}). For now, we supply a value of zero.
+f-
+
+c+
+The remaining arguments are character strings which document the
+transformation function, mainly for the benefit of anyone who is
+unfortunate enough to encounter a reference to it in their data which
+they cannot interpret. As explained above
+(\secref{ss:intramaplimitations}), you should try and avoid this, but
+accidents will happen, so you should always provide strings containing
+the following:
+c-
+f+
+The remaining arguments are character strings which document the
+transformation routine, mainly for the benefit of anyone who is
+unfortunate enough to encounter a reference to it in their data which
+they cannot interpret. As explained above
+(\secref{ss:intramaplimitations}), you should try and avoid this, but
+accidents will happen, so you should always provide strings containing
+the following:
+f-
+
+\begin{enumerate}
+c+
+\item A short description of what the transformation function is for.
+c-
+f+
+\item A short description of what the transformation routine is for.
+f-
+\item The name of the author.
+\item Contact details, such as an e-mail or WWW address.
+\end{enumerate}
+
+c+
+The idea is that anyone finding an IntraMap in their data, but lacking
+the necessary transformation function, should be able to contact the
+author and make a sensible enquiry in order to obtain it. If you
+expect many enquiries, you may like to set up a World Wide Web page
+and use that instead (in the example above, we use the WWW address of
+the relevant part of this document).
+c-
+f+
+The idea is that anyone finding an IntraMap in their data, but lacking
+the necessary transformation routine, should be able to contact the
+author and make a sensible enquiry in order to obtain it. If you
+expect many enquiries, you may like to set up a World Wide Web page
+and use that instead (in the example above, we use the WWW address of
+the relevant part of this document).
+f-
+
+\subsection{Creating an IntraMap}
+
+c+
+Once a transformation function has been registered, creating an
+IntraMap from it is simple:
+c-
+f+
+Once a transformation routine been registered, creating an IntraMap
+from it is simple:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstIntraMap *intramap;
+
+...
+
+intramap = astIntraMap( "SqrTran", 2, 2, "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER INTRAMAP
+
+      ...
+
+      INTRAMAP = AST_INTRAMAP( 'SqrTran', 2, 2, ' ', STATUS );
+\end{verbatim}
+\normalsize
+f-
+
+c+
+We simply use the astIntraMap constructor function and pass it the
+name of the transformation function to use. This name is the same
+(case sensitive) one that we associated with the function when we
+registered it using astIntraReg (\secref{ss:registeringintramaps}).
+c-
+f+
+We simply use the AST\_INTRAMAP constructor function and pass it the
+name of the transformation routine to use. This name is the same (case
+sensitive) one that we associated with the routine when we registered
+it using AST\_INTRAREG (\secref{ss:registeringintramaps}).
+f-
+
+c+
+You can, of course, register any number of transformation functions
+and select which one to use whenever you create an IntraMap. You can
+also create any number of independent IntraMaps using each
+transformation function. In this sense, each transformation function
+you register effectively creates a new ``sub-class'' of IntraMap, from
+which you can create Objects just like any other class. However, an
+error will occur if you attempt to use a transformation function that
+has not yet been registered.
+c-
+f+
+You can, of course, register any number of transformation routines and
+select which one to use whenever you create an IntraMap. You can also
+create any number of independent IntraMaps using each transformation
+routine. In this sense, each transformation routine you register
+effectively creates a new ``sub-class'' of IntraMap, from which you
+can create Objects just like any other class. However, an error will
+occur if you attempt to use a transformation routine that has not yet
+been registered.
+f-
+
+c+
+The second and third arguments to astIntraMap are the numbers of input
+and output coordinates. These define the Nin and Nout attributes for
+the IntraMap that is created and they must match the corresponding
+numbers given when the transformation function was registered.
+c-
+f+
+The second and third arguments to AST\_INTRAMAP are the numbers of
+input and output coordinates. These define the Nin and Nout attributes
+for the IntraMap that is created and they must match the corresponding
+numbers given when the transformation routine was registered.
+f-
+
+c+
+The final argument is the usual attribute initialisation string. You
+may set attribute values for an IntraMap in exactly the same way as
+for any other Mapping (\secref{ss:settingattributes}).
+c-
+f+
+The penultimate argument is the usual attribute initialisation
+string. You may set attribute values for an IntraMap in exactly the
+same way as for any other Mapping (\secref{ss:settingattributes}).
+f-
+
+c+
+\subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Functions}
+c-
+f+
+\subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Routines}
+f-
+
+c+
+You may not always want to use both the forward and inverse
+transformations when you create an IntraMap, so it is possible to omit
+either from the underlying coordinate transformation
+function. Consider the following, for example:
+c-
+f+
+You may not always want to use both the forward and inverse
+transformations when you create an IntraMap, so it is possible to omit
+either from the underlying coordinate transformation routine. Consider
+the following, for example:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void Poly3Tran( int npoint, int ncoord_in, const double *ptr_in[],
+                int forward, int ncoord_out, double *ptr_out[] ) {
+   double x;
+   int point;
+
+/* Forward transformation. */
+   for ( point = 0; point < npoint; point++ ) {
+      x = ptr_in[ 0 ][ point ];
+      ptr_out[ 0 ][ point ] = ( x == AST__BAD ) ? AST__BAD :
+         6.18 + x * ( 0.12 + x * ( -0.003 + x * 0.0000101 ) );
+   }
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      SUBROUTINE POLY3TRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+     :                      NCOORD_OUT, OUTDIM, OUT, STATUS
+      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS,
+      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
+      LOGICAL FORWARD
+
+      INCLUDE 'AST_PAR'
+      DOUBLE PRECISION X
+      INTEGER POINT
+
+*  Forward transformation.
+      DO 1 POINT = 1, NPOINT
+         X = IN( POINT, 1 )
+         IF ( X .EQ. AST__BAD ) THEN
+            OUT( POINT, 1 ) = AST__BAD
+         ELSE
+            OUT( POINT, 1 ) =
+     :      6.18D0 + X * ( 0.12D0 + X * ( -0.003D0 + X * 0.0000101D0 ) )
+         END IF
+ 1    CONTINUE
+      END
+\end{verbatim}
+\normalsize
+f-
+
+c+
+This implements a 1-dimensional cubic polynomial transformation. Since
+this is somewhat awkward to invert, however, we have only implemented
+the forward transformation.  When registering the function, this is
+indicated via the ``flags'' argument to astIntraReg, as follows:
+c-
+f+
+This implements a 1-dimensional cubic polynomial transformation. Since
+this is somewhat awkward to invert, however, we have only implemented
+the forward transformation.  When registering the routine, this is
+indicated via the FLAGS argument to AST\_INTRAREG, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void Poly3Tran( int, int, const double *[], int, int, double *[] );
+
+...
+
+astIntraReg( "Poly3Tran", 1, 1, Poly3Tran, AST__NOINV,
+             purpose, author, contact );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      EXTERNAL POLY3TRAN
+
+      ...
+
+      CALL AST_INTRAREG( 'Poly3Tran', 1, 1, POLY3TRAN, AST__NOINV,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, the fifth argument has been set to the flag value AST\_\_NOINV
+to indicate the lack of an inverse. If the forward transformation were
+absent, we would use AST\_\_NOFOR instead. Flag values for this
+argument may be combined using a bitwise OR if necessary.
+c-
+f+
+Here, the fifth argument has been set to the flag value AST\_\_NOINV
+to indicate the lack of an inverse. If the forward transformation were
+absent, we would use AST\_\_NOFOR instead. Flag values for this
+argument may be combined by summing them if necessary.
+f-
+
+\subsection{\label{ss:variableintramapcoordinates}Variable Numbers of Coordinates}
+
+c+
+In our earlier examples, we have used a fixed number of input and
+output coordinates when registering a coordinate transformation
+function. It is not necessary to impose this restriction, however, if
+the transformation function can cope with a variable number of
+coordinates (as with the example in
+\secref{ss:transformationfunctions}). We indicate the acceptability of
+a variable number when registering the transformation function by
+supplying the value AST\_\_ANY for the number of input and/or output
+coordinates, as follows:
+c-
+f+
+In our earlier examples, we have used a fixed number of input and
+output coordinates when registering a coordinate transformation
+routine. It is not necessary to impose this restriction, however, if
+the transformation routine can cope with a variable number of
+coordinates (as with the example in
+\secref{ss:transformationfunctions}). We indicate the acceptability of
+a variable number when registering the transformation routine by
+supplying the value AST\_\_ANY for the number of input and/or output
+coordinates, as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astIntraReg( "SqrTran", AST__ANY, AST__ANY, SqrTran, 0,
+             purpose, author, contact );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_INTRAREG( 'SqrTran', AST__ANY, AST__ANY, SQRTRAN, 0,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+The result is that an IntraMap may now be created with any number of
+input and output coordinates. For example:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstIntraMap *intramap1, *intramap2;
+
+...
+
+intramap1 = astIntraMap( "SqrTran", 1, 1, "" );
+intramap2 = astIntraMap( "SqrTran", 3, 3, "Invert=1" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER INTRAMAP1, INTRAMAP2
+
+      ...
+
+      INTRAMAP1 = AST_INTRAMAP( 'SqrTran', 1, 1, ' ', STATUS )
+      INTRAMAP2 = AST_INTRAMAP( 'SqrTran', 3, 3, 'Invert=1', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+It is possible to fix either the number of input or output coordinates
+(by supplying an explicit number to astIntraReg), but more subtle
+restrictions on the number of coordinates, such as requiring that Nin
+and Nout be equal, are not supported. This means that:
+c-
+f+
+It is possible to fix either the number of input or output coordinates
+(by supplying an explicit number to AST\_INTRAREG), but more subtle
+restrictions on the number of coordinates, such as requiring that Nin
+and Nout be equal, are not supported. This means that:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+intramap = astIntraMap( "SqrTran", 1, 2, "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTRAMAP = AST_INTRAMAP( 'SqrTran', 1, 2, ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+will be accepted without error, although the transformation function
+cannot actually handle such a combination sensibly. If this is
+important, it would be worth adding a check within the transformation
+function itself, so that the error would be detected when it came to
+be used.
+c-
+f+
+will be accepted without error, although the transformation routine
+cannot actually handle such a combination sensibly. If this is
+important, it would be worth adding a check within the transformation
+routine itself, so that the error would be detected when it came to be
+used.
+f-
+
+\subsection{\xlabel{MaxTran}\label{ss:simplifyingintramaps}Simplifying IntraMaps}
+
+c+
+A notable disadvantage of IntraMaps is that they are ``black boxes''
+as far as AST is concerned. This means that they have limited ability
+to participate in the simplification of compound Mappings performed,
+{\em{e.g.}}, by astSimplify (\secref{ss:simplifyingcmpmaps}), because
+AST cannot know how they interact with other Mappings. In reality, of
+course, they will often implement such specialised coordinate
+transformations that the simplification possibilities will be rather
+limited anyway.
+c-
+f+
+A notable disadvantage of IntraMaps is that they are ``black boxes''
+as far as AST is concerned. This means that they have limited ability
+to participate in the simplification of compound Mappings performed,
+{\em{e.g.}}, by AST\_SIMPLIFY (\secref{ss:simplifyingcmpmaps}),
+because AST cannot know how they interact with other Mappings. In
+reality, of course, they will often implement such specialised
+coordinate transformations that the simplification possibilities will
+be rather limited anyway.
+f-
+
+One important simplification, however, is the ability of a Mapping to
+cancel with its own inverse to yield a unit Mapping (a UnitMap). This
+is important because Mappings are frequently used to relate a dataset
+to some external standard (a celestial coordinate system, for
+example). When inter-relating two similar datasets calibrated using
+the same standard, part of the Mapping often cancels, because it is
+applied first in one direction and then the other, effectively
+eliminating the reference to the standard. This is often a useful
+simplification and can lead to greater efficiency.
+
+c+
+Many transformations have this property of cancelling with their own
+inverse, but not necessarily all. Consider the following
+transformation function, for example:
+c-
+f+
+Many transformations have this property of cancelling with their own
+inverse, but not necessarily all. Consider the following
+transformation routine, for example:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void MaxTran( int npoint, int ncoord_in, const double *ptr_in[],
+              int forward, int ncoord_out, double *ptr_out[] ) {
+   double hi, x;
+   int coord, point;
+
+/* Forward transformation. */
+   if ( forward ) {
+      for ( point = 0; point < npoint; point++ ) {
+         hi = AST__BAD;
+         for ( coord = 0; coord < ncoord_in; coord++ ) {
+            x = ptr_in[ coord ][ point ];
+            if ( x != AST__BAD ) {
+               if ( x > hi || hi == AST__BAD ) hi = x;
+            }
+         }
+         ptr_out[ 0 ][ point ] = hi;
+      }
+
+/* Inverse transformation. */
+   } else {
+      for ( coord = 0; coord < ncoord_out; coord++ ) {
+         for ( point = 0; point < npoint; point++ ) {
+            ptr_out[ coord ][ point ] = ptr_in[ 0 ][ point ];
+         }
+      }      
+   }
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      SUBROUTINE MAXTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
+     :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
+      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
+      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
+      LOGICAL FORWARD
+
+      INCLUDE 'AST_PAR'
+      DOUBLE PRECISION HI, X
+      INTEGER COORD, POINT
+
+*  Forward transformation.
+      IF ( FORWARD ) THEN
+         DO 2 POINT = 1, NPOINT
+            HI = AST__BAD
+            DO 1 COORD = 1, NCOORD_IN
+               X = IN( POINT, COORD )
+               IF ( X .NE. AST__BAD ) THEN
+                  IF ( X .GT. HI .OR. HI .EQ. AST__BAD ) HI = X
+               END IF
+ 1          CONTINUE
+ 2       CONTINUE
+
+*  Inverse transformation.
+      ELSE
+         DO 4 COORD = 1, NCOORD_OUT
+            DO 3 POINT = 1, NPOINT
+               OUT( POINT, COORD ) = IN( POINT, 1 )
+ 3          CONTINUE
+ 4       CONTINUE
+      END IF
+      END
+\end{verbatim}
+\normalsize
+f-
+
+c+
+This function takes any number of input coordinates and returns a
+single output coordinate which is the maximum value of the input
+coordinates. Its inverse (actually a ``pseudo-inverse'') sets all the
+input coordinates to the value of the output
+coordinate.\footnote{Remember that ``ptr\_in'' identifies the original
+``output'' coordinates when applying the inverse transformation and
+``ptr\_out'' identifies the original ``input'' coordinates.}
+c-
+f+
+This routine takes any number of input coordinates and returns a
+single output coordinate which is the maximum value of the input
+coordinates. Its inverse (actually a ``pseudo-inverse'') sets all the
+input coordinates to the value of the output
+coordinate.\footnote{Remember that IN holds the original ``output''
+coordinates when applying the inverse transformation and OUT holds the
+original ``input'' coordinates.}
+f-
+
+c+
+If this function is applied in the forward direction and then in the
+inverse direction, it does {\bf{not}} in general restore the original
+coordinate values. However, if applied in the inverse direction and
+then the forward direction, it does. Hence, replacing the sequence of
+operations with an equivalent UnitMap is possible in the latter case,
+but not in the former.
+c-
+f+
+If this routine is applied in the forward direction and then in the
+inverse direction, it does {\bf{not}} in general restore the original
+coordinate values. However, if applied in the inverse direction and
+then the forward direction, it does. Hence, replacing the sequence of
+operations with an equivalent UnitMap is possible in the latter case,
+but not in the former.
+f-
+
+c+
+To distinguish these possibilities, two flag values are provided for
+use with astIntraReg to indicate what simplification (if any) is
+possible. For example, to register the above transformation function,
+we might use:
+c-
+f+
+To distinguish these possibilities, two flag values are provided for
+use with AST\_INTRAREG to indicate what simplification (if any) is
+possible. For example, to register the above transformation routine,
+we might use:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void MaxTran( int, int, const double *[], int, int, double *[] );
+
+...
+
+astIntraReg( "MaxTran", AST__ANY, 1, MaxTran, AST__SIMPIF,
+             purpose, author, contact );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      EXTERNAL MAXTRAN
+
+      ...
+
+      CALL AST_INTRAREG( 'MaxTran', AST__ANY, 1, MAXTRAN, AST__SIMPIF,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, the flag value AST\_\_SIMPIF supplied for the fifth argument
+indicates that simplification is possible if the transformation is
+applied in the inverse direction followed by the forward direction. To
+indicate the complementary case, the flag AST\_\_SIMPFI would be used
+instead. If both simplifications are possible (as with the SqrTran
+function in \secref{ss:transformationfunctions}), then we would use
+the bitwise OR of both values.
+c-
+f+
+Here, the flag value AST\_\_SIMPIF supplied for the fifth argument
+indicates that simplification is possible if the transformation is
+applied in the inverse direction followed by the forward direction. To
+indicate the complementary case, the flag AST\_\_SIMPFI would be used
+instead. If both simplifications are possible (as with the SQRTRAN
+function in \secref{ss:transformationfunctions}), then we would use
+the sum of both values.
+f-
+
+c+
+In practice, some judgement is usually necessary when deciding whether
+to allow simplification. For example, seen in one light our SqrTran
+function (\secref{ss:transformationfunctions}) does not cancel with
+its own inverse, because squaring a coordinate value and then taking
+its square root can change the original value, if this was
+negative. Therefore, replacing this combination with a UnitMap will
+change the behaviour of a compound Mapping and should not be
+allowed. Seen in another light, however, where the coordinates being
+processed are intrinsically all positive, it is a permissible and
+probably useful simplification.
+c-
+f+
+In practice, some judgement is usually necessary when deciding whether
+to allow simplification. For example, seen in one light our SQRTRAN
+routine (\secref{ss:transformationfunctions}) does not cancel with its
+own inverse, because squaring a coordinate value and then taking its
+square root can change the original value, if this was
+negative. Therefore, replacing this combination with a UnitMap will
+change the behaviour of a compound Mapping and should not be
+allowed. Seen in another light, however, where the coordinates being
+processed are intrinsically all positive, it is a permissible and
+probably useful simplification.
+f-
+
+c+
+If such distinctions are ever important in practice, it is simple to
+register the same transformation function twice with different flag
+values (use a separate name for each) and then use whichever is
+appropriate when creating an IntraMap.
+c-
+f+
+If such distinctions are ever important in practice, it is simple to
+register the same transformation routine twice with different flag
+values (use a separate name for each) and then use whichever is
+appropriate when creating an IntraMap.
+f-
+
+\subsection{\label{ss:readingandwritingintramaps}Writing and Reading IntraMaps}
+
+c+
+It is most important to realise that when you write an IntraMap to a
+Channel (\secref{ss:writingtoachannel}), the transformation function
+which it uses is not stored with it. To do so is impossible, because
+the function has been compiled and loaded into memory ready for
+execution before AST gets to see it. However, AST does store the name
+associated with the transformation function and various details about
+the IntraMap itself.
+
+c-
+f+
+It is most important to realise that when you write an IntraMap to a
+Channel (\secref{ss:writingtoachannel}), the transformation routine
+which it uses is not stored with it. To do so is impossible, because
+the routine has been compiled and loaded into memory ready for
+execution before AST gets to see it. However, AST does store the name
+associated with the transformation routine and various details about
+the IntraMap itself.
+f-
+
+c+
+This means that any program attempting to read the IntraMap
+(\secref{ss:readingfromachannel}) cannot make use of it unless it also
+has independent access to the original transformation function. If it
+does not have access to this function, an error will occur at the
+point where the IntraMap is read and the associated error message will
+direct the user to the author of the transformation function for more
+information.
+c-
+f+
+This means that any program attempting to read the IntraMap
+(\secref{ss:readingfromachannel}) cannot make use of it unless it also
+has independent access to the original transformation routine. If it
+does not have access to this routine, an error will occur at the point
+where the IntraMap is read and the associated error message will
+direct the user to the author of the transformation routine for more
+information.
+f-
+
+c+
+However, if the necessary transformation function is available, and
+has been registered before the read operation takes place, then AST is
+able to re-create the original IntraMap and will do so. Registration
+of the transformation function must, of course, use the same name
+(and, in fact, be identical in most particulars) as was used in the
+original program which wrote the data.
+c-
+f+
+However, if the necessary transformation routine is available, and
+has been registered before the read operation takes place, then AST is
+able to re-create the original IntraMap and will do so. Registration
+of the transformation routine must, of course, use the same name
+(and, in fact, be identical in most particulars) as was used in the
+original program which wrote the data.
+f-
+
+c+
+This means that a set of co-operating programs which all have access
+to the same set of transformation functions and register them in
+identical fashion (see \secref{ss:intramaplibrary} for how this can
+best be achieved) can freely exchange data that contain IntraMaps. The
+need to avoid exporting such data to unsuspecting third parties
+(\secref{ss:intramaplimitations}) must, however, be re-iterated.
+c-
+f+
+This means that a set of co-operating programs which all have access
+to the same set of transformation routines and register them in
+identical fashion (see \secref{ss:intramaplibrary} for how this can
+best be achieved) can freely exchange data that contain IntraMaps. The
+need to avoid exporting such data to unsuspecting third parties
+(\secref{ss:intramaplimitations}) must, however, be re-iterated.
+f-
+
+c+
+\subsection{\label{ss:intramaplibrary}Managing Transformation Functions in Libraries}
+c-
+f+
+\subsection{\label{ss:intramaplibrary}Managing Transformation Routines in Libraries}
+f-
+
+c+
+If you are developing a large suite of data reduction software, you
+may have a need to use IntraMaps at various points within it. Very
+probably this will occur in unrelated modules which are compiled
+separately and then stored in a library. Since the transformation
+functions required must be registered before they can be used, this
+makes it difficult to decide where to perform this registration,
+especially since any particular data reduction program may use an
+arbitrary subset of the modules in your library.
+c-
+f+
+If you are developing a large suite of data reduction software, you
+may have a need to use IntraMaps at various points within it. Very
+probably this will occur in unrelated modules which are compiled
+separately and then stored in a library. Since the transformation
+routines required must be registered before they can be used, this
+makes it difficult to decide where to perform this registration,
+especially since any particular data reduction program may use an
+arbitrary subset of the modules in your library.
+f-
+
+c+
+To assist with this problem, AST allows you to perform the same
+registration of a transformation function any number of times, so long
+as it is performed using an identical invocation of astIntraReg on
+each occasion ({\em{i.e.}}\ all of its arguments must be
+identical). This means you do not have to keep track of whether a
+particular function has already been registered but could, in fact,
+register it on each occasion immediately before it is required
+(wherever that may be). In order that all registrations are identical,
+however, it is recommended that you group them all together into a
+single function, perhaps as follows:
+c-
+f+
+To assist with this problem, AST allows you to perform the same
+registration of a transformation routine any number of times, so long
+as it is performed using an identical invocation of AST\_INTRAREG on
+each occasion ({\em{i.e.}}\ all of its arguments must be
+identical). This means you do not have to keep track of whether a
+particular routine has already been registered but could, in fact,
+register it on each occasion immediately before it is required
+(wherever that may be). In order that all registrations are identical,
+however, it is recommended that you group them all together into a
+single routine, perhaps as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+void MyTrans( void ) {
+
+   ...
+
+   astIntraReg( "MaxTran", AST__ANY, 1, MaxTran, AST__SIMPIF,
+                purpose, author, contact );
+
+   ...
+
+   astIntraReg( "Poly3Tran", 1, 1, Poly3Tran, AST__NOINV,
+                purpose, author, contact );
+
+   ...
+
+   astIntraReg( "SqrTran", 2, 2, SqrTran, 0,
+                purpose, author, contact );
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      SUBROUTINE MYTRANS( STATUS )
+      INTEGER STATUS
+
+      INCLUDE 'AST_PAR'
+      EXTERNAL MAXTRAN, POLY3TRAN, SQRTRAN
+
+      ...
+
+      CALL AST_INTRAREG( 'MaxTran', AST__ANY, 1, MAXTRAN, AST__SIMPIF,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+
+      ...
+
+      CALL AST_INTRAREG( 'Poly3Tran', 1, 1, POLY3TRAN, AST__NOINV,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+
+      ...
+
+      CALL AST_INTRAREG( 'SqrTran, 2, 2, SQRTRAN, 0,
+     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
+      END
+\end{verbatim}
+\normalsize
+f-
+
+c+
+You can then simply invoke this function wherever necessary. It is, in
+fact, particularly important to register all relevant transformation
+functions in this way before you attempt to read an Object that might
+be (or contain) an IntraMap
+(\secref{ss:readingandwritingintramaps}). This is because you may not
+know in advance which of these transformation functions the IntraMap
+will use, so they must all be available in order to avoid an error.
+c-
+f+
+You can then simply invoke this routine wherever necessary. It is, in
+fact, particularly important to register all relevant transformation
+routines in this way before you attempt to read an Object that might
+be (or contain) an IntraMap
+(\secref{ss:readingandwritingintramaps}). This is because you may not
+know in advance which of these transformation routines the IntraMap
+will use, so they must all be available in order to avoid an error.
+f-
+
+\cleardoublepage
 %docstatus channel:          I(cf),G(cf),F(cf),T(cf)
 %\include{channel}
 \section{\label{ss:channels}Saving and Restoring Objects (Channels)}
@@ -12057,1920 +13971,6 @@ software. Whether you consider this a worthwhile risk probably depends
 on the use to which you expect your data to be put.
 
 \cleardoublepage
-%\include{selfmappings}
-\section{\label{ss:intramaps}Creating Your Own Private Mappings (IntraMaps)}
-
-\subsection{The Need for Extensibility}
-
-However many Mapping classes are provided by AST, sooner or later you
-will want to transform coordinates in some way that has not been
-foreseen. You might want to plot a graph in some novel curvilinear
-coordinate system (perhaps you already have a WCS system in your
-software and just want to use AST for its graphical capabilities).
-Alternatively, you might need to calibrate a complex dataset (like an
-objective prism plate) where each position must be converted to world
-coordinates with reference to calibration data under the control of an
-elaborate algorithm.
-
-In such cases, it is clear that the basic pre-formed components
-provided by AST for building Mappings are just not enough. What you
-need is access to a programming language. However, if you write your
-own software to transform coordinate values, then it must be made
-available in the form of an AST class (from which you can create
-Objects) before it can be used in conjunction with other AST
-facilities.
-
-At this point you might consider writing your own AST class, but this
-is not recommended. Not only would the internal conventions used by
-AST take some time to master, but you might also find yourself having
-to change your software whenever a new version of AST was
-released. Fortunately, there is a much easier route provided by the
-IntraMap class.
-
-\subsection{The IntraMap Model}
-
-c+
-To allow you to write your own Mappings, AST provides a special kind
-of Mapping called an IntraMap. An IntraMap is a sort of ``wrapper''
-for a coordinate transformation function written in C. You write this
-function yourself and then register it with AST. This, in effect,
-creates a new class from which you can create Mappings
-({\em{i.e.}}\ IntraMaps) which will transform coordinates in whatever
-way your transformation function specifies.
-c-
-f+
-To allow you to write your own Mappings, AST provides a special kind
-of Mapping called an IntraMap. An IntraMap is a sort of ``wrapper''
-for a coordinate transformation routine written in Fortran. You write
-this routine yourself and then register it with AST. This, in effect,
-creates a new class from which you can create Mappings
-({\em{i.e.}}\ IntraMaps) which will transform coordinates in whatever
-way your transformation routine specifies.
-f-
-
-Because IntraMaps are Mappings, they may be used in the same way as
-any other Mapping. For instance, they may be combined in series or
-parallel with other Mappings using a CmpMap (\secref{ss:cmpmaps}),
-they may be inverted (\secref{ss:invertingmappings}), you may enquire
-about their attributes (\secref{ss:gettingattributes}), they may be
-inserted into FrameSets (\secref{ss:framesets}), {\em{etc.}} They do,
-however, have some important limitations of which you should be aware
-before we go on to consider how to create them.
-
-\subsection{\label{ss:intramaplimitations}Limitations of IntraMaps}
-
-c+
-By now, you might be wondering why any other kind of Mapping is
-required at all. After all, why not simply write your own coordinate
-transformation functions in C, wrap them up in IntraMaps and do away
-with all the other Mapping classes in AST?
-c-
-f+
-By now, you might be wondering why any other kind of Mapping is
-required at all. After all, why not simply write your own coordinate
-transformation routines in Fortran, wrap them up in IntraMaps and do
-away with all the other Mapping classes in AST?
-f-
-
-c+
-The reason is not too hard to find. Any transformation function you
-write is created solely by you, so it is a private extension which
-does not form a permanent part of AST. If you use it to calibrate some
-data and then pass that data to someone else, who has only the
-standard version of AST, then they will not be able to interpret it.
-c-
-f+
-The reason is not too hard to find. Any transformation routine you
-write is created solely by you, so it is a private extension which
-does not form a permanent part of AST. If you use it to calibrate some
-data and then pass that data to someone else, who has only the
-standard version of AST, then they will not be able to interpret it.
-f-
-
-c+
-Thus, while an IntraMap is fine for use by you and your collaborators
-(who we assume have access to the same transformation functions), it
-does not address the need for universal data exchange like other AST
-Mappings do. This is where the ``Intra'' in the class name
-``IntraMap'' comes from, implying private or internal usage.
-c-
-f+
-Thus, while an IntraMap is fine for use by you and your collaborators
-(who we assume have access to the same transformation routines), it
-does not address the need for universal data exchange like other AST
-Mappings do. This is where the ``Intra'' in the class name
-``IntraMap'' comes from, implying private or internal usage.
-f-
-
-For this reason, it is unwise to store IntraMaps in datasets, unless
-they will be used solely for communication between collaborating items
-of software which share conventions about their use.  A private
-database describing coordinate systems on a graphics device might be
-an example where IntraMaps would be suitable, because the data would
-probably never be accessed by anyone else's software. Restricting
-IntraMap usage to within a single program ({\em{i.e.}} never writing
-it out) is, of course, completely safe.
-
-c+
-If, by accident, an IntraMap should happen to escape as part of a
-dataset, then the unsuspecting recipient is likely to receive an error
-message when they attempt to read the data. However, AST will
-associate details of the IntraMap's transformation function and its
-author (if provided) with the data, so that the recipient can make an
-intelligent enquiry to obtain the necessary software if this proves
-essential.
-c-
-f+
-If, by accident, an IntraMap should happen to escape as part of a
-dataset, then the unsuspecting recipient is likely to receive an error
-message when they attempt to read the data. However, AST will
-associate details of the IntraMap's transformation routine and its
-author (if provided) with the data, so that the recipient can make an
-intelligent enquiry to obtain the necessary software if this proves
-essential.
-f-
-
-c+
-\subsection{\label{ss:transformationfunctions}Writing a Transformation Function}
-c-
-f+
-\subsection{\label{ss:transformationfunctions}Writing a Transformation Routine}
-f-
-
-c+
-The first stage in creating an IntraMap is to write the coordinate
-transformation function. This should have a calling interface like the
-astTranP function provided by AST ({\em{q.v.}}), except that the first
-parameter (the Mapping pointer) is not required and should be
-omitted. Here is a simple example of a suitable transformation
-function which transforms coordinates by squaring them:
-c-
-f+
-The first stage in creating an IntraMap is to write the coordinate
-transformation routine. This should have a calling interface like the
-AST\_TRANN function provided by AST ({\em{q.v.}}), except that the
-first argument (the Mapping pointer) is not required and should be
-omitted. Here is a simple example of a suitable transformation routine
-which transforms coordinates by squaring them:
-f-
-\xlabel{SqrTran}
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-#include "ast.h"
-#include <math.h>
-
-void SqrTran( int npoint, int ncoord_in, const double *ptr_in[],
-              int forward, int ncoord_out, double *ptr_out[] ) {
-   int point, coord;
-   double x;
-
-/* Forward transformation. */
-   if ( forward ) {
-      for ( point = 0; point < npoint; point++ ) {
-         for ( coord = 0; coord < ncoord_in; coord++ ) {
-            x = ptr_in[ coord ][ point ];
-            ptr_out[ coord ][ point ] = ( x == AST__BAD ) ? AST__BAD : x * x;
-         }
-      }
-
-/* Inverse transformation. */
-   } else {
-      for ( point = 0; point < npoint; point++ ) {
-         for ( coord = 0; coord < ncoord_in; coord++ ) {
-            x = ptr_in[ coord ][ point ];
-            ptr_out[ coord ][ point ] =
-               ( x < 0.0 || x == AST__BAD ) ? AST__BAD : sqrt( x );
-         }
-      }
-   }
-}
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      SUBROUTINE SQRTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-    :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
-      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
-      LOGICAL FORWARD
-
-      INCLUDE 'AST_PAR'
-      DOUBLE PRECISION X
-      INTEGER COORD, POINT
-
-*  Forward transformation.
-      IF ( FORWARD ) THEN
-         DO 2 POINT = 1, NPOINT
-            DO 1 COORD = 1, NCOORD_IN
-               X = IN( POINT, COORD )
-               IF ( X .EQ. AST__BAD ) THEN
-                  OUT( POINT, COORD ) = AST__BAD
-               ELSE
-                  OUT( POINT, COORD ) = X * X
-               ENDIF
- 1          CONTINUE
- 2       CONTINUE
-
-*  Inverse transformation.
-      ELSE
-         DO 4 POINT = 1, NPOINT
-            DO 3 COORD = 1, NCOORD_IN
-               X = IN( POINT, COORD )
-               IF ( X .LT. 0.0D0 .OR. X .EQ. AST__BAD ) THEN
-                  OUT( POINT, COORD ) = AST__BAD
-               ELSE
-                  OUT( POINT, COORD ) = SQRT( X )
-               ENDIF
- 3          CONTINUE
- 4       CONTINUE
-      ENDIF
-      END
-\end{verbatim}
-\normalsize
-f-
-
-c+
-As you can see, the function comes in two halves which implement the
-forward and inverse coordinate transformations. The number of points
-to be transformed (``npoint'') and the numbers of input and output
-coordinates per point (``ncoord\_in'' and ``ncoord\_out''---in this
-case both are assumed equal) are passed to the function. A pair of
-loops then accesses all the coordinate values.  Note that it is
-legitimate to omit one or other of the forward/inverse transformations
-and simply not to implement it, if it will not be required. It is also
-permissible to require that the numbers of input and output
-coordinates be fixed ({\em{e.g.}}\ at 2), or to write the function so
-that it can handle arbitrary dimensionality, as here.
-c-
-f+
-As you can see, the routine comes in two halves which implement the
-forward and inverse coordinate transformations. The number of points
-to be transformed (NPOINT) and the numbers of input and output
-coordinates per point (NCOORD\_IN and NCOORD\_OUT---in this case both
-are assumed equal) are passed to the routine. A pair of loops then
-accesses all the coordinate values.  Note that it is legitimate to
-omit one or other of the forward/inverse transformations and simply
-not to implement it, if it will not be required. It is also
-permissible to require that the numbers of input and output
-coordinates be fixed ({\em{e.g.}}\ at 2), or to write the routine so
-that it can handle arbitrary dimensionality, as here.
-f-
-
-c+
-Before using an incoming coordinate, the function must first check
-that it is not set to the value AST\_\_BAD, which indicates missing
-data (\secref{ss:badcoordinates}). If it is, the same value is also
-assigned to any affected output coordinates. The value AST\_\_BAD is
-also generated if any coordinates cannot be transformed. In this
-example, this can happen with the inverse transformation if negative
-values are encountered, so that the square root cannot be taken.
-c-
-f+
-Before using an incoming coordinate, the routine must first check that
-it is not set to the value AST\_\_BAD, which indicates missing data
-(\secref{ss:badcoordinates}). If it is, the same value is also
-assigned to any affected output coordinates. The value AST\_\_BAD is
-also generated if any coordinates cannot be transformed. In this
-example, this can happen with the inverse transformation if negative
-values are encountered, so that the square root cannot be taken.
-f-
-
-c+
-There are very few restrictions on what a coordinate transformation
-function may do. For example, it may freely perform I/O to access any
-external data needed, it may invoke other AST facilities (but beware
-of unwanted recursion), {\em{etc.}} Typically, you may also want to
-pass information to it {\em{via}}\ global variables. Remember,
-however, that whatever facilities the transformation function requires
-must be available in every program which uses it.
-c-
-f+
-There are very few restrictions on what a coordinate transformation
-routine may do. For example, it may freely perform I/O to access any
-external data needed, it may invoke other AST facilities (but beware
-of unwanted recursion), {\em{etc.}} Typically, you may also want to
-pass information to it {\em{via}}\ global variables held in common
-blocks.  Remember, however, that whatever facilities the
-transformation routine requires must be available in every program
-which uses it.
-f-
-
-c+
-Generally, it is not a good idea to retain context information within
-a transformation function. That is, it should transform each set of
-coordinates as a single point and retain no memory of the points it
-has transformed before. Partly, this is in order to conform with the
-AST model of a Mapping, but you may also run into trouble if you use
-the same transformation function with several IntraMaps, since it will
-not be able to tell when you have swapped to use a different one.
-c-
-f+
-Generally, it is not a good idea to retain context information within
-a transformation routine. That is, it should transform each set of
-coordinates as a single point and retain no memory of the points it
-has transformed before. Partly, this is in order to conform with the
-AST model of a Mapping, but you may also run into trouble if you use
-the same transformation routine with several IntraMaps, since it will
-not be able to tell when you have swapped to use a different one.
-f-
-
-c+
-If an error occurs within a transformation function, it should use the
-astSetStatus function (\secref{ss:errordetection}) to set the AST
-status to an error value before returning. This will alert AST to the
-error, causing it to abort the current operation.
-c-
-f+
-If an error occurs within a transformation routine, it should set its
-STATUS argument to an error value before returning. This will alert
-AST to the error, causing it to abort the current operation.
-f-
-
-c+
-\subsection{\label{ss:registeringintramaps}Registering a Transformation Function}
-c-
-f+
-\subsection{\label{ss:registeringintramaps}Registering a Transformation Routine}
-f-
-
-c+
-Having written your coordinate transformation function, the next step
-is to register it with AST. Registration is performed using
-astIntraReg, as follows:
-c-
-f+
-Having written your coordinate transformation routine, the next step
-is to register it with AST. Registration is performed using
-AST\_INTRAREG, as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void SqrTran( int, int, const double *[], int, int, double *[] );
-
-const char *author, *contact, *purpose;
-
-...
-
-purpose = "Square each coordinate value";
-author =  "R.F. Warren-Smith & D.S. Berry";
-contact = "http://star-www.rl.ac.uk/cgi-bin/htxserver/sun211.htx/?xref_SqrTran";
-
-astIntraReg( "SqrTran", 2, 2, SqrTran, 0, purpose, author, contact );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      EXTERNAL SQRTRAN
-
-      CHARACTER * ( 80 ) AUTHOR, CONTACT, PURPOSE
-
-      ...
-
-      PURPOSE = 'Square each coordinate value'
-      AUTHOR  = 'R.F. Warren-Smith & D.S. Berry'
-      CONTACT = 'http://star-www.rl.ac.uk/cgi-bin/htxserver/' //
-                'sun210.htx/?xref_SqrTran'
-
-      CALL AST_INTRAREG( 'SqrTran', 2, 2, SQRTRAN, 0,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Note that you should also provide a function prototype to describe the
-transformation function (the implementation of the function itself
-would suffice, of course).
-c-
-f+
-Note that the transformation routine must also appear in a Fortran
-EXTERNAL statement.
-f-
-
-c+
-The first argument to astIntraReg is a name by which the
-transformation function will be known. This will be used when we come
-to create an IntraMap and is case sensitive. We recommend that you use
-the actual function name here and make this sufficiently unusual that
-it is unlikely to clash with any other functions in most people's
-software.
-c-
-f+
-The first argument to AST\_INTRAREG is a name by which the
-transformation routine will be known. This will be used when we come
-to create an IntraMap and is case sensitive. We recommend that you
-base this on the actual routine name and make this sufficiently
-unusual that it is unlikely to clash with any other routines in most
-people's software.
-f-
-
-c+
-The next two arguments specify the number of input and output
-coordinates which the transformation function will handle. These
-correspond with the Nin and Nout attributes of the IntraMap we will
-create. Here, we have set them both to 2, which means that we will
-only be able to create IntraMaps with 2 input and 2 output coordinates
-(despite the fact that the transformation function can actually handle
-other dimensionalities). We will see later
-(\secref{ss:variableintramapcoordinates}) how to remove this
-restriction.
-c-
-f+
-The next two arguments specify the number of input and output
-coordinates which the transformation routine will handle. These
-correspond with the Nin and Nout attributes of the IntraMap we will
-create. Here, we have set them both to 2, which means that we will
-only be able to create IntraMaps with 2 input and 2 output coordinates
-(despite the fact that the transformation routine can actually handle
-other dimensionalities). We will see later
-(\secref{ss:variableintramapcoordinates}) how to remove this
-restriction.
-f-
-
-c+
-The fourth argument should contain a set of flags which describe the
-transformation function in a little more detail. We will return to
-this shortly (\secref{ss:restrictedintramaps} \&
-\secref{ss:simplifyingintramaps}). For now, we supply a value of zero.
-c-
-f+
-The fourth argument should contain a set of flags which describe the
-transformation routine in a little more detail. We will return to this
-shortly (\secref{ss:restrictedintramaps} \&
-\secref{ss:simplifyingintramaps}). For now, we supply a value of zero.
-f-
-
-c+
-The remaining arguments are character strings which document the
-transformation function, mainly for the benefit of anyone who is
-unfortunate enough to encounter a reference to it in their data which
-they cannot interpret. As explained above
-(\secref{ss:intramaplimitations}), you should try and avoid this, but
-accidents will happen, so you should always provide strings containing
-the following:
-c-
-f+
-The remaining arguments are character strings which document the
-transformation routine, mainly for the benefit of anyone who is
-unfortunate enough to encounter a reference to it in their data which
-they cannot interpret. As explained above
-(\secref{ss:intramaplimitations}), you should try and avoid this, but
-accidents will happen, so you should always provide strings containing
-the following:
-f-
-
-\begin{enumerate}
-c+
-\item A short description of what the transformation function is for.
-c-
-f+
-\item A short description of what the transformation routine is for.
-f-
-\item The name of the author.
-\item Contact details, such as an e-mail or WWW address.
-\end{enumerate}
-
-c+
-The idea is that anyone finding an IntraMap in their data, but lacking
-the necessary transformation function, should be able to contact the
-author and make a sensible enquiry in order to obtain it. If you
-expect many enquiries, you may like to set up a World Wide Web page
-and use that instead (in the example above, we use the WWW address of
-the relevant part of this document).
-c-
-f+
-The idea is that anyone finding an IntraMap in their data, but lacking
-the necessary transformation routine, should be able to contact the
-author and make a sensible enquiry in order to obtain it. If you
-expect many enquiries, you may like to set up a World Wide Web page
-and use that instead (in the example above, we use the WWW address of
-the relevant part of this document).
-f-
-
-\subsection{Creating an IntraMap}
-
-c+
-Once a transformation function has been registered, creating an
-IntraMap from it is simple:
-c-
-f+
-Once a transformation routine been registered, creating an IntraMap
-from it is simple:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-AstIntraMap *intramap;
-
-...
-
-intramap = astIntraMap( "SqrTran", 2, 2, "" );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INTEGER INTRAMAP
-
-      ...
-
-      INTRAMAP = AST_INTRAMAP( 'SqrTran', 2, 2, ' ', STATUS );
-\end{verbatim}
-\normalsize
-f-
-
-c+
-We simply use the astIntraMap constructor function and pass it the
-name of the transformation function to use. This name is the same
-(case sensitive) one that we associated with the function when we
-registered it using astIntraReg (\secref{ss:registeringintramaps}).
-c-
-f+
-We simply use the AST\_INTRAMAP constructor function and pass it the
-name of the transformation routine to use. This name is the same (case
-sensitive) one that we associated with the routine when we registered
-it using AST\_INTRAREG (\secref{ss:registeringintramaps}).
-f-
-
-c+
-You can, of course, register any number of transformation functions
-and select which one to use whenever you create an IntraMap. You can
-also create any number of independent IntraMaps using each
-transformation function. In this sense, each transformation function
-you register effectively creates a new ``sub-class'' of IntraMap, from
-which you can create Objects just like any other class. However, an
-error will occur if you attempt to use a transformation function that
-has not yet been registered.
-c-
-f+
-You can, of course, register any number of transformation routines and
-select which one to use whenever you create an IntraMap. You can also
-create any number of independent IntraMaps using each transformation
-routine. In this sense, each transformation routine you register
-effectively creates a new ``sub-class'' of IntraMap, from which you
-can create Objects just like any other class. However, an error will
-occur if you attempt to use a transformation routine that has not yet
-been registered.
-f-
-
-c+
-The second and third arguments to astIntraMap are the numbers of input
-and output coordinates. These define the Nin and Nout attributes for
-the IntraMap that is created and they must match the corresponding
-numbers given when the transformation function was registered.
-c-
-f+
-The second and third arguments to AST\_INTRAMAP are the numbers of
-input and output coordinates. These define the Nin and Nout attributes
-for the IntraMap that is created and they must match the corresponding
-numbers given when the transformation routine was registered.
-f-
-
-c+
-The final argument is the usual attribute initialisation string. You
-may set attribute values for an IntraMap in exactly the same way as
-for any other Mapping (\secref{ss:settingattributes}).
-c-
-f+
-The penultimate argument is the usual attribute initialisation
-string. You may set attribute values for an IntraMap in exactly the
-same way as for any other Mapping (\secref{ss:settingattributes}).
-f-
-
-c+
-\subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Functions}
-c-
-f+
-\subsection{\label{ss:restrictedintramaps}Restricted Implementations of Transformation Routines}
-f-
-
-c+
-You may not always want to use both the forward and inverse
-transformations when you create an IntraMap, so it is possible to omit
-either from the underlying coordinate transformation
-function. Consider the following, for example:
-c-
-f+
-You may not always want to use both the forward and inverse
-transformations when you create an IntraMap, so it is possible to omit
-either from the underlying coordinate transformation routine. Consider
-the following, for example:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void Poly3Tran( int npoint, int ncoord_in, const double *ptr_in[],
-                int forward, int ncoord_out, double *ptr_out[] ) {
-   double x;
-   int point;
-
-/* Forward transformation. */
-   for ( point = 0; point < npoint; point++ ) {
-      x = ptr_in[ 0 ][ point ];
-      ptr_out[ 0 ][ point ] = ( x == AST__BAD ) ? AST__BAD :
-         6.18 + x * ( 0.12 + x * ( -0.003 + x * 0.0000101 ) );
-   }
-}
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      SUBROUTINE POLY3TRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                      NCOORD_OUT, OUTDIM, OUT, STATUS
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS,
-      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
-      LOGICAL FORWARD
-
-      INCLUDE 'AST_PAR'
-      DOUBLE PRECISION X
-      INTEGER POINT
-
-*  Forward transformation.
-      DO 1 POINT = 1, NPOINT
-         X = IN( POINT, 1 )
-         IF ( X .EQ. AST__BAD ) THEN
-            OUT( POINT, 1 ) = AST__BAD
-         ELSE
-            OUT( POINT, 1 ) =
-     :      6.18D0 + X * ( 0.12D0 + X * ( -0.003D0 + X * 0.0000101D0 ) )
-         END IF
- 1    CONTINUE
-      END
-\end{verbatim}
-\normalsize
-f-
-
-c+
-This implements a 1-dimensional cubic polynomial transformation. Since
-this is somewhat awkward to invert, however, we have only implemented
-the forward transformation.  When registering the function, this is
-indicated via the ``flags'' argument to astIntraReg, as follows:
-c-
-f+
-This implements a 1-dimensional cubic polynomial transformation. Since
-this is somewhat awkward to invert, however, we have only implemented
-the forward transformation.  When registering the routine, this is
-indicated via the FLAGS argument to AST\_INTRAREG, as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void Poly3Tran( int, int, const double *[], int, int, double *[] );
-
-...
-
-astIntraReg( "Poly3Tran", 1, 1, Poly3Tran, AST__NOINV,
-             purpose, author, contact );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      EXTERNAL POLY3TRAN
-
-      ...
-
-      CALL AST_INTRAREG( 'Poly3Tran', 1, 1, POLY3TRAN, AST__NOINV,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, the fifth argument has been set to the flag value AST\_\_NOINV
-to indicate the lack of an inverse. If the forward transformation were
-absent, we would use AST\_\_NOFOR instead. Flag values for this
-argument may be combined using a bitwise OR if necessary.
-c-
-f+
-Here, the fifth argument has been set to the flag value AST\_\_NOINV
-to indicate the lack of an inverse. If the forward transformation were
-absent, we would use AST\_\_NOFOR instead. Flag values for this
-argument may be combined by summing them if necessary.
-f-
-
-\subsection{\label{ss:variableintramapcoordinates}Variable Numbers of Coordinates}
-
-c+
-In our earlier examples, we have used a fixed number of input and
-output coordinates when registering a coordinate transformation
-function. It is not necessary to impose this restriction, however, if
-the transformation function can cope with a variable number of
-coordinates (as with the example in
-\secref{ss:transformationfunctions}). We indicate the acceptability of
-a variable number when registering the transformation function by
-supplying the value AST\_\_ANY for the number of input and/or output
-coordinates, as follows:
-c-
-f+
-In our earlier examples, we have used a fixed number of input and
-output coordinates when registering a coordinate transformation
-routine. It is not necessary to impose this restriction, however, if
-the transformation routine can cope with a variable number of
-coordinates (as with the example in
-\secref{ss:transformationfunctions}). We indicate the acceptability of
-a variable number when registering the transformation routine by
-supplying the value AST\_\_ANY for the number of input and/or output
-coordinates, as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-astIntraReg( "SqrTran", AST__ANY, AST__ANY, SqrTran, 0,
-             purpose, author, contact );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      CALL AST_INTRAREG( 'SqrTran', AST__ANY, AST__ANY, SQRTRAN, 0,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-The result is that an IntraMap may now be created with any number of
-input and output coordinates. For example:
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-AstIntraMap *intramap1, *intramap2;
-
-...
-
-intramap1 = astIntraMap( "SqrTran", 1, 1, "" );
-intramap2 = astIntraMap( "SqrTran", 3, 3, "Invert=1" );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INTEGER INTRAMAP1, INTRAMAP2
-
-      ...
-
-      INTRAMAP1 = AST_INTRAMAP( 'SqrTran', 1, 1, ' ', STATUS )
-      INTRAMAP2 = AST_INTRAMAP( 'SqrTran', 3, 3, 'Invert=1', STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-It is possible to fix either the number of input or output coordinates
-(by supplying an explicit number to astIntraReg), but more subtle
-restrictions on the number of coordinates, such as requiring that Nin
-and Nout be equal, are not supported. This means that:
-c-
-f+
-It is possible to fix either the number of input or output coordinates
-(by supplying an explicit number to AST\_INTRAREG), but more subtle
-restrictions on the number of coordinates, such as requiring that Nin
-and Nout be equal, are not supported. This means that:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-intramap = astIntraMap( "SqrTran", 1, 2, "" );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INTRAMAP = AST_INTRAMAP( 'SqrTran', 1, 2, ' ', STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-will be accepted without error, although the transformation function
-cannot actually handle such a combination sensibly. If this is
-important, it would be worth adding a check within the transformation
-function itself, so that the error would be detected when it came to
-be used.
-c-
-f+
-will be accepted without error, although the transformation routine
-cannot actually handle such a combination sensibly. If this is
-important, it would be worth adding a check within the transformation
-routine itself, so that the error would be detected when it came to be
-used.
-f-
-
-\subsection{\xlabel{MaxTran}\label{ss:simplifyingintramaps}Simplifying IntraMaps}
-
-c+
-A notable disadvantage of IntraMaps is that they are ``black boxes''
-as far as AST is concerned. This means that they have limited ability
-to participate in the simplification of compound Mappings performed,
-{\em{e.g.}}, by astSimplify (\secref{ss:simplifyingcmpmaps}), because
-AST cannot know how they interact with other Mappings. In reality, of
-course, they will often implement such specialised coordinate
-transformations that the simplification possibilities will be rather
-limited anyway.
-c-
-f+
-A notable disadvantage of IntraMaps is that they are ``black boxes''
-as far as AST is concerned. This means that they have limited ability
-to participate in the simplification of compound Mappings performed,
-{\em{e.g.}}, by AST\_SIMPLIFY (\secref{ss:simplifyingcmpmaps}),
-because AST cannot know how they interact with other Mappings. In
-reality, of course, they will often implement such specialised
-coordinate transformations that the simplification possibilities will
-be rather limited anyway.
-f-
-
-One important simplification, however, is the ability of a Mapping to
-cancel with its own inverse to yield a unit Mapping (a UnitMap). This
-is important because Mappings are frequently used to relate a dataset
-to some external standard (a celestial coordinate system, for
-example). When inter-relating two similar datasets calibrated using
-the same standard, part of the Mapping often cancels, because it is
-applied first in one direction and then the other, effectively
-eliminating the reference to the standard. This is often a useful
-simplification and can lead to greater efficiency.
-
-c+
-Many transformations have this property of cancelling with their own
-inverse, but not necessarily all. Consider the following
-transformation function, for example:
-c-
-f+
-Many transformations have this property of cancelling with their own
-inverse, but not necessarily all. Consider the following
-transformation routine, for example:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void MaxTran( int npoint, int ncoord_in, const double *ptr_in[],
-              int forward, int ncoord_out, double *ptr_out[] ) {
-   double hi, x;
-   int coord, point;
-
-/* Forward transformation. */
-   if ( forward ) {
-      for ( point = 0; point < npoint; point++ ) {
-         hi = AST__BAD;
-         for ( coord = 0; coord < ncoord_in; coord++ ) {
-            x = ptr_in[ coord ][ point ];
-            if ( x != AST__BAD ) {
-               if ( x > hi || hi == AST__BAD ) hi = x;
-            }
-         }
-         ptr_out[ 0 ][ point ] = hi;
-      }
-
-/* Inverse transformation. */
-   } else {
-      for ( coord = 0; coord < ncoord_out; coord++ ) {
-         for ( point = 0; point < npoint; point++ ) {
-            ptr_out[ coord ][ point ] = ptr_in[ 0 ][ point ];
-         }
-      }      
-   }
-}
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      SUBROUTINE MAXTRAN( NPOINT, NCOORD_IN, INDIM, IN, FORWARD,
-     :                     NCOORD_OUT, OUTDIM, OUT, STATUS )
-      INTEGER NPOINT, NCOORD_IN, INDIM, NCOORD_OUT, OUTDIM, STATUS
-      DOUBLE PRECISION IN( INDIM, NCOORD_IN ), OUT( OUTDIM, NCOORD_OUT )
-      LOGICAL FORWARD
-
-      INCLUDE 'AST_PAR'
-      DOUBLE PRECISION HI, X
-      INTEGER COORD, POINT
-
-*  Forward transformation.
-      IF ( FORWARD ) THEN
-         DO 2 POINT = 1, NPOINT
-            HI = AST__BAD
-            DO 1 COORD = 1, NCOORD_IN
-               X = IN( POINT, COORD )
-               IF ( X .NE. AST__BAD ) THEN
-                  IF ( X .GT. HI .OR. HI .EQ. AST__BAD ) HI = X
-               END IF
- 1          CONTINUE
- 2       CONTINUE
-
-*  Inverse transformation.
-      ELSE
-         DO 4 COORD = 1, NCOORD_OUT
-            DO 3 POINT = 1, NPOINT
-               OUT( POINT, COORD ) = IN( POINT, 1 )
- 3          CONTINUE
- 4       CONTINUE
-      END IF
-      END
-\end{verbatim}
-\normalsize
-f-
-
-c+
-This function takes any number of input coordinates and returns a
-single output coordinate which is the maximum value of the input
-coordinates. Its inverse (actually a ``pseudo-inverse'') sets all the
-input coordinates to the value of the output
-coordinate.\footnote{Remember that ``ptr\_in'' identifies the original
-``output'' coordinates when applying the inverse transformation and
-``ptr\_out'' identifies the original ``input'' coordinates.}
-c-
-f+
-This routine takes any number of input coordinates and returns a
-single output coordinate which is the maximum value of the input
-coordinates. Its inverse (actually a ``pseudo-inverse'') sets all the
-input coordinates to the value of the output
-coordinate.\footnote{Remember that IN holds the original ``output''
-coordinates when applying the inverse transformation and OUT holds the
-original ``input'' coordinates.}
-f-
-
-c+
-If this function is applied in the forward direction and then in the
-inverse direction, it does {\bf{not}} in general restore the original
-coordinate values. However, if applied in the inverse direction and
-then the forward direction, it does. Hence, replacing the sequence of
-operations with an equivalent UnitMap is possible in the latter case,
-but not in the former.
-c-
-f+
-If this routine is applied in the forward direction and then in the
-inverse direction, it does {\bf{not}} in general restore the original
-coordinate values. However, if applied in the inverse direction and
-then the forward direction, it does. Hence, replacing the sequence of
-operations with an equivalent UnitMap is possible in the latter case,
-but not in the former.
-f-
-
-c+
-To distinguish these possibilities, two flag values are provided for
-use with astIntraReg to indicate what simplification (if any) is
-possible. For example, to register the above transformation function,
-we might use:
-c-
-f+
-To distinguish these possibilities, two flag values are provided for
-use with AST\_INTRAREG to indicate what simplification (if any) is
-possible. For example, to register the above transformation routine,
-we might use:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void MaxTran( int, int, const double *[], int, int, double *[] );
-
-...
-
-astIntraReg( "MaxTran", AST__ANY, 1, MaxTran, AST__SIMPIF,
-             purpose, author, contact );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      EXTERNAL MAXTRAN
-
-      ...
-
-      CALL AST_INTRAREG( 'MaxTran', AST__ANY, 1, MAXTRAN, AST__SIMPIF,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, the flag value AST\_\_SIMPIF supplied for the fifth argument
-indicates that simplification is possible if the transformation is
-applied in the inverse direction followed by the forward direction. To
-indicate the complementary case, the flag AST\_\_SIMPFI would be used
-instead. If both simplifications are possible (as with the SqrTran
-function in \secref{ss:transformationfunctions}), then we would use
-the bitwise OR of both values.
-c-
-f+
-Here, the flag value AST\_\_SIMPIF supplied for the fifth argument
-indicates that simplification is possible if the transformation is
-applied in the inverse direction followed by the forward direction. To
-indicate the complementary case, the flag AST\_\_SIMPFI would be used
-instead. If both simplifications are possible (as with the SQRTRAN
-function in \secref{ss:transformationfunctions}), then we would use
-the sum of both values.
-f-
-
-c+
-In practice, some judgement is usually necessary when deciding whether
-to allow simplification. For example, seen in one light our SqrTran
-function (\secref{ss:transformationfunctions}) does not cancel with
-its own inverse, because squaring a coordinate value and then taking
-its square root can change the original value, if this was
-negative. Therefore, replacing this combination with a UnitMap will
-change the behaviour of a compound Mapping and should not be
-allowed. Seen in another light, however, where the coordinates being
-processed are intrinsically all positive, it is a permissible and
-probably useful simplification.
-c-
-f+
-In practice, some judgement is usually necessary when deciding whether
-to allow simplification. For example, seen in one light our SQRTRAN
-routine (\secref{ss:transformationfunctions}) does not cancel with its
-own inverse, because squaring a coordinate value and then taking its
-square root can change the original value, if this was
-negative. Therefore, replacing this combination with a UnitMap will
-change the behaviour of a compound Mapping and should not be
-allowed. Seen in another light, however, where the coordinates being
-processed are intrinsically all positive, it is a permissible and
-probably useful simplification.
-f-
-
-c+
-If such distinctions are ever important in practice, it is simple to
-register the same transformation function twice with different flag
-values (use a separate name for each) and then use whichever is
-appropriate when creating an IntraMap.
-c-
-f+
-If such distinctions are ever important in practice, it is simple to
-register the same transformation routine twice with different flag
-values (use a separate name for each) and then use whichever is
-appropriate when creating an IntraMap.
-f-
-
-\subsection{\label{ss:readingandwritingintramaps}Writing and Reading IntraMaps}
-
-c+
-It is most important to realise that when you write an IntraMap to a
-Channel (\secref{ss:writingtoachannel}), the transformation function
-which it uses is not stored with it. To do so is impossible, because
-the function has been compiled and loaded into memory ready for
-execution before AST gets to see it. However, AST does store the name
-associated with the transformation function and various details about
-the IntraMap itself.
-
-c-
-f+
-It is most important to realise that when you write an IntraMap to a
-Channel (\secref{ss:writingtoachannel}), the transformation routine
-which it uses is not stored with it. To do so is impossible, because
-the routine has been compiled and loaded into memory ready for
-execution before AST gets to see it. However, AST does store the name
-associated with the transformation routine and various details about
-the IntraMap itself.
-f-
-
-c+
-This means that any program attempting to read the IntraMap
-(\secref{ss:readingfromachannel}) cannot make use of it unless it also
-has independent access to the original transformation function. If it
-does not have access to this function, an error will occur at the
-point where the IntraMap is read and the associated error message will
-direct the user to the author of the transformation function for more
-information.
-c-
-f+
-This means that any program attempting to read the IntraMap
-(\secref{ss:readingfromachannel}) cannot make use of it unless it also
-has independent access to the original transformation routine. If it
-does not have access to this routine, an error will occur at the point
-where the IntraMap is read and the associated error message will
-direct the user to the author of the transformation routine for more
-information.
-f-
-
-c+
-However, if the necessary transformation function is available, and
-has been registered before the read operation takes place, then AST is
-able to re-create the original IntraMap and will do so. Registration
-of the transformation function must, of course, use the same name
-(and, in fact, be identical in most particulars) as was used in the
-original program which wrote the data.
-c-
-f+
-However, if the necessary transformation routine is available, and
-has been registered before the read operation takes place, then AST is
-able to re-create the original IntraMap and will do so. Registration
-of the transformation routine must, of course, use the same name
-(and, in fact, be identical in most particulars) as was used in the
-original program which wrote the data.
-f-
-
-c+
-This means that a set of co-operating programs which all have access
-to the same set of transformation functions and register them in
-identical fashion (see \secref{ss:intramaplibrary} for how this can
-best be achieved) can freely exchange data that contain IntraMaps. The
-need to avoid exporting such data to unsuspecting third parties
-(\secref{ss:intramaplimitations}) must, however, be re-iterated.
-c-
-f+
-This means that a set of co-operating programs which all have access
-to the same set of transformation routines and register them in
-identical fashion (see \secref{ss:intramaplibrary} for how this can
-best be achieved) can freely exchange data that contain IntraMaps. The
-need to avoid exporting such data to unsuspecting third parties
-(\secref{ss:intramaplimitations}) must, however, be re-iterated.
-f-
-
-c+
-\subsection{\label{ss:intramaplibrary}Managing Transformation Functions in Libraries}
-c-
-f+
-\subsection{\label{ss:intramaplibrary}Managing Transformation Routines in Libraries}
-f-
-
-c+
-If you are developing a large suite of data reduction software, you
-may have a need to use IntraMaps at various points within it. Very
-probably this will occur in unrelated modules which are compiled
-separately and then stored in a library. Since the transformation
-functions required must be registered before they can be used, this
-makes it difficult to decide where to perform this registration,
-especially since any particular data reduction program may use an
-arbitrary subset of the modules in your library.
-c-
-f+
-If you are developing a large suite of data reduction software, you
-may have a need to use IntraMaps at various points within it. Very
-probably this will occur in unrelated modules which are compiled
-separately and then stored in a library. Since the transformation
-routines required must be registered before they can be used, this
-makes it difficult to decide where to perform this registration,
-especially since any particular data reduction program may use an
-arbitrary subset of the modules in your library.
-f-
-
-c+
-To assist with this problem, AST allows you to perform the same
-registration of a transformation function any number of times, so long
-as it is performed using an identical invocation of astIntraReg on
-each occasion ({\em{i.e.}}\ all of its arguments must be
-identical). This means you do not have to keep track of whether a
-particular function has already been registered but could, in fact,
-register it on each occasion immediately before it is required
-(wherever that may be). In order that all registrations are identical,
-however, it is recommended that you group them all together into a
-single function, perhaps as follows:
-c-
-f+
-To assist with this problem, AST allows you to perform the same
-registration of a transformation routine any number of times, so long
-as it is performed using an identical invocation of AST\_INTRAREG on
-each occasion ({\em{i.e.}}\ all of its arguments must be
-identical). This means you do not have to keep track of whether a
-particular routine has already been registered but could, in fact,
-register it on each occasion immediately before it is required
-(wherever that may be). In order that all registrations are identical,
-however, it is recommended that you group them all together into a
-single routine, perhaps as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-void MyTrans( void ) {
-
-   ...
-
-   astIntraReg( "MaxTran", AST__ANY, 1, MaxTran, AST__SIMPIF,
-                purpose, author, contact );
-
-   ...
-
-   astIntraReg( "Poly3Tran", 1, 1, Poly3Tran, AST__NOINV,
-                purpose, author, contact );
-
-   ...
-
-   astIntraReg( "SqrTran", 2, 2, SqrTran, 0,
-                purpose, author, contact );
-}
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      SUBROUTINE MYTRANS( STATUS )
-      INTEGER STATUS
-
-      INCLUDE 'AST_PAR'
-      EXTERNAL MAXTRAN, POLY3TRAN, SQRTRAN
-
-      ...
-
-      CALL AST_INTRAREG( 'MaxTran', AST__ANY, 1, MAXTRAN, AST__SIMPIF,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-
-      ...
-
-      CALL AST_INTRAREG( 'Poly3Tran', 1, 1, POLY3TRAN, AST__NOINV,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-
-      ...
-
-      CALL AST_INTRAREG( 'SqrTran, 2, 2, SQRTRAN, 0,
-     :                   PURPOSE, AUTHOR, CONTACT, STATUS )
-      END
-\end{verbatim}
-\normalsize
-f-
-
-c+
-You can then simply invoke this function wherever necessary. It is, in
-fact, particularly important to register all relevant transformation
-functions in this way before you attempt to read an Object that might
-be (or contain) an IntraMap
-(\secref{ss:readingandwritingintramaps}). This is because you may not
-know in advance which of these transformation functions the IntraMap
-will use, so they must all be available in order to avoid an error.
-c-
-f+
-You can then simply invoke this routine wherever necessary. It is, in
-fact, particularly important to register all relevant transformation
-routines in this way before you attempt to read an Object that might
-be (or contain) an IntraMap
-(\secref{ss:readingandwritingintramaps}). This is because you may not
-know in advance which of these transformation routines the IntraMap
-will use, so they must all be available in order to avoid an error.
-f-
-
-\cleardoublepage
-%docstatus plots:            I(cf)
-%\include{plots}
-\section{\label{ss:plots}Producing Graphical Output (Plots)}
-
-Graphical output from AST is performed though an Object called a Plot,
-which is a specialised form of FrameSet. A Plot does not represent the
-graphical content itself, but is a route through which plotting
-operations, such as drawing lines and curves, are conveyed on to a
-plotting surface to appear as visible graphics.
-
-\subsection{The Plot Model}
-
-When a Plot is created, it is initialised by providing a FrameSet
-whose base Frame (as specified by its Base attribute) is mapped
-linearly on to a {\em{plotting area.}} This is a rectangular region in
-the graphical coordinate space of the underlying graphics system and
-becomes the new base Frame of the Plot. In effect, the Plot becomes
-attached to the plotting surface, in rather the same way that a basic
-FrameSet might be attached to (say) an image.
-
-The current Frame of the Plot (derived from the current Frame of the
-FrameSet supplied) is used to represent a {\em{physical coordinate
-system.}} This is the system in which plotting operations are
-performed by your program.  Every plotting operation is then
-transformed through the Mapping which inter-relates the Plot's current
-and base Frames in order to appear on the plotting surface.
-
-An example may help here. Suppose we start with a FrameSet whose base
-Frame describes the pixel coordinates of an image and whose current
-Frame describes a celestial (equatorial) coordinate system. Let us
-assume that these two Frames are inter-related by a Mapping within the
-FrameSet which represents a particular sky projection.
-
-When a Plot is created from this FrameSet, we specify how the pixel
-coordinates (the base Frame) maps on to the plotting surface. This
-simply corresponds to telling the Plot where we have previously
-plotted the image data. If we now use the Plot to plot a line with
-latitude zero in our physical coordinate system, as given by the
-current Frame, this line would appear as a curve (the equator) on the
-plotting surface, correctly registered with the image.
-
-There are a number of plotting functions provided, which all work in a
-similar way. Plotting operations are transformed through the Mapping
-which the Plot represents before they appear on the plotting
-surface.\footnote{Like any FrameSet, a Plot can be used as a
-Mapping. In this case it is the inverse transformation which is used
-when plotting ({\em{i.e.}}\ that which transforms between the current
-and base Frames).}  It is possible to draw symbols, lines, axes,
-entire grids and more in this way.
-
-%\subsection{TBW---Creating a Plot}
-
-\subsection{Plotting Symbols}
-
-c+
-The simplest form of plotting is to draw symbols (termed
-{\em{markers}}) at a set of points. This is performed by astMark,
-which is supplied with a set of physical coordinates at which to place
-the markers:
-c-
-f+
-The simplest form of plotting is to draw symbols (termed
-{\em{markers}}) at a set of points. This is performed by AST\_MARK,
-which is supplied with a set of physical coordinates at which to place
-the markers:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-#include "ast.h"
-#define NCOORD 2
-#define NMARK 10
-double in[ NCOORD ][ NMARK ];
-int type;
-
-...
-
-astMark( plot, NMARK, NCOORD, NCOORD, in, type );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INCLUDE 'AST_PAR'
-      INTEGER NCOORD, NMARK, TYPE, STATUS
-      DOUBLE PRECISION IN( NMARK, NCOORD )
-
-      STATUS = 0
-
-      ...
-
-      CALL AST_MARK( PLOT, NMARK, NCOORD, NMARK, IN, TYPE, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, NMARK specifies how many markers to plot and NCOORD specifies
-how many coordinates are being supplied for each
-point.\footnote{Remember, the physical coordinate space need not
-necessarily be 2-dimensional, even if the plotting surface is.} The
-array ``in'' supplies the coordinates and the integer ``type''
-specifies which type of marker to plot.
-c-
-f+
-Here, NMARK specifies how many markers to plot and NCOORD specifies
-how many coordinates are being supplied for each
-point.\footnote{Remember, the physical coordinate space need not
-necessarily be 2-dimensional, even if the plotting surface is.} The
-array IN supplies the coordinates and the integer TYPE specifies which
-type of marker to plot.
-f-
-
-\subsection{\label{ss:plottinggeodesics}Plotting Geodesic Curves}
-
-There is no Plot routine to draw a straight line, because any straight
-line in physical coordinates can potentially turn into a curve in
-graphical coordinates. We therefore start by considering how to draw
-geodesic curves.  These are curves which trace the path of shortest
-distance between two points in physical coordinates
- and are the basic drawing element in a Plot. 
-
-c+
-In many instances, the geodesic will, in fact, be a straight line, but
-this depends on the Plot's current Frame. If this represents a
-celestial coordinate system, for instance, it will be a great circle
-(corresponding with the behaviour of the astDistance function which
-defines the metric of the physical coordinate space).  The geodesic
-will, of course, be transformed into graphics coordinates before being
-plotted. A geodesic curve is plotted using astCurve as follows:
-c-
-f+
-In many instances, the geodesic will, in fact, be a straight line, but
-this depends on the Plot's current Frame. If this represents a
-celestial coordinate system, for instance, it will be a great circle
-(corresponding with the behaviour of the AST\_DISTANCE function which
-defines the metric of the physical coordinate space).  The geodesic
-will, of course, be transformed into graphics coordinates before being
-plotted. A geodesic curve is plotted using AST\_CURVE as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-double start[ NCOORD ], finish[ NCOORD ];
-
-...
-
-astCurve( plot, start, finish );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      DOUBLE PRECISION START( NCOORD ), FINISH( NCOORD )
-
-      ...
-
-      CALL AST_CURVE( PLOT, START, FINISH, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, ``start'' and ``finish'' are arrays containing the starting and
-finishing coordinates of the curve. The astOffset and astDistance
-functions can often be useful for computing these
-(\secref{ss:distanceandoffset}).
-c-
-f+
-Here, START and FINISH are arrays containing the starting and
-finishing coordinates of the curve. The AST\_OFFSET and AST\_DISTANCE
-routines can often be useful for computing these
-(\secref{ss:distanceandoffset}).
-f-
-
-\subsection{Plotting Curves Parallel to Axes}
-
-c+
-As there is no Plot function to draw a ``straight line'', drawing axes
-and grid lines to represent coordinate systems requires a slightly
-different approach. The problem is that for some coordinate systems,
-these grid lines will not be geodesics, so astCurve
-(\secref{ss:plottinggeodesics}) cannot easily be used (you would have
-to resort to approximating grid lines by many small elements). Lines
-of constant celestial latitude provide an example of this, with the
-exception of the equator which is a geodesic.
-c-
-f+
-As there is no Plot routine to draw a ``straight line'', drawing axes
-and grid lines to represent coordinate systems requires a slightly
-different approach. The problem is that for some coordinate systems,
-these grid lines will not be geodesics, so AST\_CURVE
-(\secref{ss:plottinggeodesics}) cannot easily be used (you would have
-to resort to approximating grid lines by many small elements). Lines
-of constant celestial latitude provide an example of this, with the
-exception of the equator which is a geodesic.
-f-
-
-c+
-The astGridLine function allows these curves to be drawn, as follows:
-c-
-f+
-The AST\_GRIDLINE routine allows these curves to be drawn, as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-int axis;
-double length;
-
-...
-
-astGridLine( plot, axis, start, length );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INTEGER AXIS
-      DOUBLE PRECISION LENGTH
-
-      ...
-
-      CALL AST_GRIDLINE( PLOT, AXIS, START, LENGTH, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, ``axis'' specifies which physical coordinate axis we wish to
-draw parallel to. The ``start'' array contains the coordinates of the
-start of the curve and ``length'' specifies the distance to draw along
-the axis in physical coordinate space.
-c-
-f+
-Here, AXIS specifies which physical coordinate axis we wish to draw
-parallel to. The START array contains the coordinates of the start of
-the curve and LENGTH specifies the distance to draw along the axis in
-physical coordinate space.
-f-
-
-\subsection{\label{ss:clipping}Clipping}
-
-Like many graphics systems, a Plot allows you to {\em{clip}} the graphics
-you produce. This means that plotting is restricted to certain regions
-of the plotting surface so that anything drawn outside these regions
-will not appear.  All Plots automatically clip at the edges of the
-plotting area specified when the Plot is created. This means that
-graphics are ultimately restricted to the rectangular region of
-plotting space to which you have attached the Plot.
-
-In addition to this, you may also specify lower and upper limits on
-each axis at which clipping should occur. This permits you to further
-restrict the plotting region. Moreover, you may attach these clipping
-limits to {\em{any}} of the Frames in the Plot. This allows you to
-place restrictions on where plotting will take place in either the
-physical coordinate system, the graphical coordinate system, or in any
-other coordinate system which is described by a Frame within the Plot.
-
-For example, you could plot using equatorial coordinates and set up
-clipping limits in galactic coordinates. In general, you could set up
-arbitrary clipping regions by adding a new Frame to a Plot (in which
-clipping will be performed) and inter-relating this to the other
-Frames in a suitable way.
-
-c+
-Clipping limits are defined using the astClip function, as follows:
-c-
-f+
-Clipping limits are defined using the AST\_CLIP routine, as follows:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-#define NAXES 2
-int iframe;
-double lbnd[ NAXES ], ubnd[ NAXES ];
-
-...
-astClip( plot, iframe, lbnd, ubnd);
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INTEGER IFRAME, NAXES
-      DOUBLE PRECISION LBND( NAXES ), UBND( NAXES )
-
-      ...
-
-      CALL AST_CLIP( PLOT, IFRAME, LBND, UBND, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, the ``iframe'' value gives the index of the Frame within the
-Plot to which clipping is to be applied, while ``lbnd'' and ``ubnd''
-give the limits on each axis of the selected Frame (NAXES is the
-number of axes in this Frame).
-c-
-f+
-Here, the IFRAME value gives the index of the Frame within the Plot to
-which clipping is to be applied, while LBND and UBND give the limits
-on each axis of the selected Frame (NAXES is the number of axes in
-this Frame).
-f-
-
-c+
-You can remove clipping by giving a value of AST\_\_NOFRAME for ``iframe''.
-c-
-f+
-You can remove clipping by giving a value of AST\_\_NOFRAME for IFRAME.
-f-
-
-\subsection{Using a Plot as a Mapping}
-
-All Plots are also Mappings (just like the FrameSets from which they
-are derived), so can be used to transform coordinates.
-
-Like FrameSets, the forward transformation of a Plot will convert
-coordinates between the base and current Frames ({\em{i.e.}}\ between
-graphical and physical coordinates). This would be useful if you were
-(say) reading a cursor position in graphical coordinates and needed to
-convert this into physical coordinates for display.
-
-c+
-Conversely, a Plot's inverse transformation converts between its
-current and base Frames ({\em{i.e.}}\ from physical coordinates to
-graphical coordinates). This transformation is applied automatically
-whenever plotting operations are carried out by AST functions. It may
-also be useful to apply it directly, however, if you wish to perform
-additional plotting operations ({\em{e.g.}}\ those provided by the
-native graphics system) at positions specified in physical
-coordinates.
-c-
-f+
-Conversely, a Plot's inverse transformation converts between its
-current and base Frames ({\em{i.e.}}\ from physical coordinates to
-graphical coordinates). This transformation is applied automatically
-whenever plotting operations are carried out by AST routines. It may
-also be useful to apply it directly, however, if you wish to perform
-additional plotting operations ({\em{e.g.}}\ those provided by the
-native graphics system) at positions specified in physical
-coordinates.
-f-
-
-c+
-There is, however, one important difference between using a FrameSet
-and a Plot to transform coordinates, and this is that clipping may be
-applied by a Plot (if it has been enabled using
-astClip---\secref{ss:clipping}). Any point which lies within the
-clipped region of a Plot will, when transformed, yield coordinates
-with the value AST\_\_BAD. If you wish to avoid this clipping, you
-should extract the relevant Mapping from the Plot (using
-astGetMapping) and use this, instead of the Plot, to transform the
-coordinates.
-c-
-f+
-There is, however. one important difference between using a FrameSet
-and a Plot to transform coordinates, and this is that clipping may be
-applied by a Plot (if it has been enabled using
-AST\_CLIP---\secref{ss:clipping}). Any point which lies within the
-clipped region of a Plot will, when transformed, yield coordinates
-with the value AST\_\_BAD. If you wish to avoid this clipping, you
-should extract the relevant Mapping from the Plot (using
-AST\_GETMAPPING) and use this, instead of the Plot, to transform the
-coordinates.
-f-
-
-\subsection{Using a Plot as a Frame}
-
-Every Plot is also a Frame, so can be used to obtain the values of
-Frame attributes such as a Title, axis Labels, axis Units,
-{\em{etc.,}} which are typically used when displaying data and/or
-coordinates. These attributes are, as for any FrameSet, derived from
-the current Frame of the Plot (\secref{ss:framesetasframe}). They are
-also used automatically when using the Plot to plot coordinate axes
-and coordinate grids ({\em{e.g.}}\ for labelling
-them---\secref{ss:plottingagrid}).
-
-c+
-Because the current Frame of a Plot represents physical coordinates,
-any Frame operation applied to the Plot will effectively be working in
-this coordinate system. For example, the astDistance and astOffset
-functions will compute distances and offsets in physical coordinate
-space, while astFormat and astNorm will format physical coordinates in
-an appropriate way for display.
-c-
-f+
-Because the current Frame of a Plot represents physical coordinates,
-any Frame operation applied to the Plot will effectively be working in
-this coordinate system. For example, the AST\_DISTANCE and AST\_OFFSET
-routines will compute distances and offsets in physical coordinate
-space, and AST\_FORMAT will format physical coordinates in an
-appropriate way for display.
-f-
-
-\subsection{\label{ss:validphysicalcoordinates}Regions of Valid Physical Coordinates}
-
-When points in physical coordinate space are transformed by a Plot
-into graphics coordinates for plotting, they may not always yield
-valid coordinates, irrespective of any clipping being applied
-(\secref{ss:clipping}). To indicate this, the resulting coordinate
-values will be set to the value AST\_\_BAD
-(\secref{ss:badcoordinates}).
-
-There are a number of reasons why this may occur, but typically it
-will be because physical coordinates only map on to a subset of the
-graphics coordinate space. This situation is commonly encountered with
-all-sky projections where, typically, the celestial sphere appears,
-when plotted, as a distorted shape ({\em{e.g.}}\ an ellipse) which
-does not entirely fill the graphics space. In some cases, there may
-even be multiple regions of valid and invalid physical coordinates.
-
-When plotting is performed {\em{via}} a Plot, graphical output will
-only appear in the regions of valid physical coordinates. Nothing will
-appear where invalid coordinates occur. Such output is effectively
-clipped. If you wish to plot in these areas, you must change
-coordinate system and use, say, graphical coordinates to address the
-plotting surface directly.
-
-\subsection{Plotting Borders}
-
-c+
-The astBorder function is provided to draw a (line) border around your
-graphical output. With most graphics systems, this would simply be a
-rectangular box around the plotting area. With a Plot, however, this
-boundary follows the edge of each region containing valid, unclipped
-physical coordinates (\secref{ss:validphysicalcoordinates}).
-c-
-f+
-The AST\_BORDER routine is provided to draw a (line) border around
-your graphical output. With most graphics systems, this would simply
-be a rectangular box around the plotting area. With a Plot, however,
-this boundary follows the edge of each region containing valid,
-unclipped physical coordinates (\secref{ss:validphysicalcoordinates}).
-f-
-
-c+
-This means, for example, that if you were plotting an all-sky
-projection, this boundary would outline the perimeter of the celestial
-sphere when projected on to your plotting surface. Of course, if there
-is no clipping and all physical coordinates are valid, then you will
-get the traditional rectangular box. astBorder requires only
-a pointer to the Plot:
-c-
-f+
-This means, for example, that if you were plotting an all-sky
-projection, this boundary would outline the perimeter of the celestial
-sphere when projected on to your plotting surface. Of course, if there
-is no clipping and all physical coordinates are valid, then you will
-get the traditional rectangular box. AST\_BORDER requires only a
-pointer to the Plot and the usual STATUS argument:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-int holes;
-
-...
-
-holes = astBorder( plot );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      LOGICAL HOLES
-
-      ...
-
-      HOLES = AST_BORDER( PLOT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-It returns boolean (integer) value to indicate if any invalid or
-clipped physical coordinates were found within the plotting area. If
-they were, it will draw around the valid unclipped regions and return
-a value of one.  Otherwise, it will draw a simple rectangular border
-and return zero.
-c-
-f+
-It returns a logical value to indicate if any invalid or clipped
-physical coordinates were found within the plotting area. If they
-were, it will draw around the valid unclipped regions and return
-.TRUE.. Otherwise, it will draw a simple rectangular border and return
-.FALSE..
-f-
-
-\subsection{Plotting Text}
-
-c+
-Using a Plot to draw text involves supplying a string of text to be
-displayed and a position in physical coordinates where the text is to
-appear. The position is transformed into graphical coordinates to
-determine where the text should appear on the plotting surface. You
-must also provide a 2-element ``up'' vector which gives the upward
-direction of the text in graphical coordinates. This allows text to be
-drawn at any angle.
-c-
-f+
-Using a Plot to draw text involves supplying a string of text to be
-displayed and a position in physical coordinates where the text is to
-appear. The position is transformed into graphical coordinates to
-determine where the text should appear on the plotting surface. You
-must also provide a 2-element UP vector which gives the upward
-direction of the text in graphical coordinates. This allows text to be
-drawn at any angle.
-f-
-
-c+
-Plotting is performed by astText, for example:
-c-
-f+
-Plotting is performed by AST\_TEXT, for example:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-char text[ 21 ];
-double pos[ NCOORD ];
-float up[ 2 ] = { 0.0f, 1.0f };
-
-...
-
-astText( plot, text, pos, up, "TL" );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      CHARACTER * ( 20 ) TEXT
-      DOUBLE PRECISION POS( NCOORD )
-      REAL UP( 2 )
-      DATA UP / 0.0, 1.0 /
-
-      ...
-
-      CALL AST_TEXT( PLOT, TEXT, POS, UP, 'TL', STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-c+
-Here, ``text'' contains the string to be drawn, ``pos'' is an array of
-physical coordinates and ``up'' specifies the upward vector. In this
-case, the text will be drawn horizontally. The final argument
-specifies the text justification, here indicating that the top left
-corner of the text should appear at the position given.
-c-
-f+
-Here, TEXT contains the string to be drawn, POS is an array of
-physical coordinates and UP specifies the upward vector. In this case,
-the text will be drawn horizontally. The penultimate argument
-specifies the text justification, here indicating that the top left
-corner of the text should appear at the position given.
-f-
-
-Further control over the appearance of the text is possible by setting
-values for various Plot attributes, for example Colour, Font and Size.
-
-\subsection{\label{ss:plottingagrid}Plotting a Grid}
-
-c+
-The most comprehensive plotting function available is astGrid, which
-can be used to draw labelled coordinate axes and, optionally, to
-overlay coordinate grids on the plotting area
-(Figure~\ref{fig:gridplot}). The routine is straightforward to use,
-simply requiring a pointer to the Plot:
-c-
-f+
-The most comprehensive plotting routine available is AST\_GRID, which
-can be used to draw labelled coordinate axes and, optionally, to
-overlay coordinate grids on the plotting area
-(Figure~\ref{fig:gridplot}). The routine is straightforward to use,
-simply requiring a pointer to the Plot and a STATUS argument:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-astGrid( plot );
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      CALL AST_GRID( PLOT, STATUS )
-\end{verbatim}
-\normalsize
-f-
-
-It will draw both linear and curvilinear axes and grids, as required
-by the particular Plot. The appearance of the output can be modified
-in a wide variety of ways by setting various Plot attributes.
-
-\cleardoublepage
 %docstatus building:         I(cf)
 %\include{building}
 \section{Compiling and Linking Software that Uses AST}
@@ -14739,11 +14739,28 @@ calculate the size which an image would have if it were transformed by
 the Mapping.
 c-
 f+
-\item A new routine AST_MAPBOX has been introduced. This allows you to
-find the extent of a ``bounding box'' which just encloses another box
-after it has been transformed by a Mapping. A typical use might be to
-calculate the size which an image would have if it were transformed by
-the Mapping.
+\item A new routine AST\_MAPBOX has been introduced. This allows you
+to find the extent of a ``bounding box'' which just encloses another
+box after it has been transformed by a Mapping. A typical use might be
+to calculate the size which an image would have if it were transformed
+by the Mapping.
+f-
+
+c+
+\item A problem has been fixed which could result when using astRead
+to read FITS headers in which the CDELT value is zero. Previously,
+this could produce a Mapping whose inverse transformation was not
+defined and this could unnecessarily restrict the use to which it
+could be put. The problem has been overcome by supplying a suitable
+small CDELT value for FITS axes which have only a single pixel.
+c-
+f+
+\item A problem has been fixed which could result when using AST\_READ
+to read FITS headers in which the CDELT value is zero. Previously,
+this could produce a Mapping whose inverse transformation was not
+defined and this could unnecessarily restrict the use to which it
+could be put. The problem has been overcome by supplying a suitable
+small CDELT value for FITS axes which have only a single pixel.
 f-
 
 f+

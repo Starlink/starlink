@@ -20756,6 +20756,19 @@ encapsulates a privately-defined coordinate transformation function
 Mapping. This allows you to create Mappings that perform any
 conceivable coordinate transformation.
 
+\item A new function \htmlref{astMapBox}{astMapBox} has been introduced. This allows you to
+find the extent of a ``bounding box'' which just encloses another box
+after it has been transformed by a Mapping. A typical use might be to
+calculate the size which an image would have if it were transformed by
+the Mapping.
+
+\item A problem has been fixed which could result when using \htmlref{astRead}{astRead}
+to read FITS headers in which the CDELT value is zero. Previously,
+this could produce a Mapping whose inverse transformation was not
+defined and this could unnecessarily restrict the use to which it
+could be put. The problem has been overcome by supplying a suitable
+small CDELT value for FITS axes which have only a single pixel.
+
 \end{enumerate}
 
 Applications which are statically linked will need to be re-linked in
