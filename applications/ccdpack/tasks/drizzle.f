@@ -20,13 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This routine transforms a set of images from their pixel
-*     into their Current attached coordinate system.
-*     The resulting images are combined together onto
-*     a single output grid, which can therefore form a mosaic of 
-*     the input images.  Normalisation of the images can optionally 
-*     be carried out so that in overlapping regions the scaling and
-*     zero point values of the images are consistent with each other.
+*     This routine transforms a set of NDFs from their pixel into
+*     their Current coordinate system.  The resulting NDFs are
+*     combined together onto a single output grid, which can therefore
+*     form a mosaic of the input images.  Normalisation of the images
+*     can optionally be carried out so that in overlapping regions the
+*     scaling and zero point values of the images are consistent with
+*     each other.
 *
 *     The algorithm used for combining the images on the output grid
 *     is Variable-Pixel Linear Reconstruction, or so-called 'drizzling'.
@@ -139,11 +139,12 @@
 *        null value), then the weighting will instead be relative to
 *        the "reference NDF" supplied via this parameter.
 *
-*        If scale-factor, zero-point corrections (see the SCALE and ZERO
-*        parameters respectively) have not been specified via a sequential
-*        file listing (see the CORRECT parameter) then if an NDF is given
-*        via the REF parameter the program will attempt to normalise the
-*        input NDFs to the "reference NDF" supplied.
+*        If scale-factor, zero-point corrections (see the SCALE and
+*        ZERO parameters respectively) have not been specified via a
+*        sequential file listing (see the CORRECT parameter) then if
+*        an NDF is given via the REF parameter the program will
+*        attempt to normalise the input NDFs to the "reference NDF"
+*        supplied.
 *
 *        This provides a means of retaining the calibration of a set of
 *        data, even when corrections are being applied, by nominating a
@@ -157,9 +158,9 @@
 *        identify which of the input NDFs should be used as a
 *        reference, to which the others will be adjusted. In this case,
 *        the scale-factor, zero-point corrections and/or weightings
-*        applied to the nominated input NDF will be set to one, zero and
-*        one respectively, and the corrections for the others will be adjusted
-*        accordingly.
+*        applied to the nominated input NDF will be set to one, zero
+*        and one respectively, and the corrections for the others will
+*        be adjusted accordingly.
 *
 *        Alternatively, if the reference NDF does not appear as one of
 *        the input NDFs, then it will be included as an additional set
@@ -266,26 +267,28 @@
 
 *  Examples:
 *     drizzle * out pixfrac=0.7
-*        Drizzles a set of NDFs matching the wild-card "*" into a mosaic
-*        called "out". The drop size of the input pixel is set to 0.7, i.e.
-*        it is scaled to 70% of its orginal size before being drizzled onto
-*        the output grid.
+*        Drizzles a set of NDFs matching the wild-card "*" into a
+*        mosaic called "out". The drop size of the input pixel is set
+*        to 0.7, i.e.  it is scaled to 70% of its orginal size before
+*        being drizzled onto the output grid.
+*
 *     drizzle in=img* out=combined scale=true zero=true ref=! multi=4.0
 *        Drizzles a set of NDFs matching the wild-card "img*" into a
-*        mosaic called "combined". Both scaling and zero-point corrections
-*        are enabled (the program will request a correction file), however
-*        no reference image has been supplied (the program will use the
-*        first NDF supplied in the input list). The multiplicative scaling
-*        factor between input and output images is set to 4, i.e. the
-*        input pixel is 4 times larger than the output pixel and contains
-*        16 output pixels.
+*        mosaic called "combined". Both scaling and zero-point
+*        corrections are enabled (the program will request a
+*        correction file), however no reference image has been
+*        supplied (the program will use the first NDF supplied in the
+*        input list). The multiplicative scaling factor between input
+*        and output images is set to 4, i.e. the input pixel is 4
+*        times larger than the output pixel and contains 16 output
+*        pixels.
 *     {enter_further_examples_here}
 
 *  Implementation Status:
 *     -  All non-complex numeric data types are supported, however the
 *        output mosaic will be of data type _REAL
 *     -  Bad pixels are supported.
-*     -  The algorithm is restricted to handiling 2D NDFs only
+*     -  The algorithm is restricted to handling 2D NDFs only
 
 *  Algorithms Used:
 *     Taken from Fruchter et al., "A package for the reduction of dithered
@@ -293,30 +296,33 @@
 *     Workshop, STSCI, 1997, pp. 518-528
 *
 *     "The drizzle algorithm is conceptually straightforward. Pixels in 
-*      the original input images are mapped into pixels in the subsampled
-*      output image, taking into account shifts and rotations between the
-*      images and the optical distortion of the camera. However, in order
-*      to avoid convolving the image with the larger pixel `footprint' of
-*      the camera, we allow the user to shrink the pixel before it is
-*      averaged into the output image.
+*      the original input images are mapped into pixels in the
+*      subsampled output image, taking into account shifts and
+*      rotations between the images and the optical distortion of the
+*      camera. However, in order to avoid convolving the image with
+*      the larger pixel `footprint' of the camera, we allow the user
+*      to shrink the pixel before it is averaged into the output
+*      image.
 *
-*      The new shrunken pixels, or `drops', rain down upon the subsampled
-*      output. In the case of the Hubble Deep Field (HDF), the drops used
-*      had linear dimensions one-half that of the input pixel -- slightly
-*      larger than the dimensions of the output subsampled pixels. The value 
-*      of an input pixel is averaged into the output pixel with a weight
-*      proportional to the area of overlap between the `drop' and the output
-*      pixel. Note that, if the drop size if sufficently small, not all 
-*      output pixels have data added to them from each input image. One 
-*      must therefore choose a drop size that is small enough to avoid 
-*      degrading the image, but large enough so that after all images 
-*      are `dripped' the coverage is fairly uniform.
+*      The new shrunken pixels, or `drops', rain down upon the
+*      subsampled output. In the case of the Hubble Deep Field (HDF),
+*      the drops used had linear dimensions one-half that of the input
+*      pixel -- slightly larger than the dimensions of the output
+*      subsampled pixels. The value of an input pixel is averaged into
+*      the output pixel with a weight proportional to the area of
+*      overlap between the `drop' and the output pixel. Note that, if
+*      the drop size if sufficently small, not all output pixels have
+*      data added to them from each input image. One must therefore
+*      choose a drop size that is small enough to avoid degrading the
+*      image, but large enough so that after all images are `dripped'
+*      the coverage is fairly uniform.
 *
-*      The drop pize if controlled by a user-adjustable parameter called
-*      PIXFRAC, which is simply the ratio of the linear size of the drop to
-*      the input pixel (before any adjustment due to geometric distortion
-*      of the camera). Thus interlacing is equivalent to setting PIXFRAC=0.0,
-*      while shift-and-add is equivalent to PIXFRAC=1.0.
+*      The drop pize if controlled by a user-adjustable parameter
+*      called PIXFRAC, which is simply the ratio of the linear size of
+*      the drop to the input pixel (before any adjustment due to
+*      geometric distortion of the camera). Thus interlacing is
+*      equivalent to setting PIXFRAC=0.0, while shift-and-add is
+*      equivalent to PIXFRAC=1.0.
 *
 *      When a drop with value i_{xy} and a user-defined weight w_{xy}
 *      is added to an image with pixel value I_{xy}, weight W_{xy}, and
