@@ -85,6 +85,7 @@
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a character component
       INTEGER CRCOL              ! Column where "Current record:" begins
       CHARACTER * ( NDF__SZHDT ) CREATD ! History creation date
+      LOGICAL CRETEX             ! Create TEXT component in a record?
       INTEGER CSIZE              ! Width of a character component
       INTEGER CURREC             ! Current record number
       CHARACTER * ( NDF__SZHDT ) DATE ! History record date
@@ -320,8 +321,10 @@
                CALL DAT_PUT0C( CLOC, REFER, STATUS )
                CALL DAT_ANNUL( CLOC, STATUS )
 
-*  Initialise the more-text flag, and column and record counters.
+*  Initialise the more-text and create text flags, and column and
+*  record counters.
                MORTEX = .TRUE.
+               CRETEX = .TRUE.
                PARCOL = 0
                JREC = 0
   140          CONTINUE
@@ -347,9 +350,14 @@
 *  Is there any text to write?
                      IF ( PARCOL .GT. 0 ) THEN
  
-*  Create the TEXT component and get a locator to it.
-                        CALL DAT_NEW1C( ELOC, 'TEXT', WIDTH, 1, STATUS )
-                        CALL DAT_FIND( ELOC, 'TEXT', TLOC, STATUS )
+*  Create the TEXT component and get a locator to it.  This should only
+*  be done for the first paragraph.
+                        IF ( CRETEX ) THEN
+                           CALL DAT_NEW1C( ELOC, 'TEXT', WIDTH, 1,
+     :                                     STATUS )
+                           CALL DAT_FIND( ELOC, 'TEXT', TLOC, STATUS )
+                           CRETEX = .FALSE.
+                        END IF
 
 *  Convert the text into paragraphs of WIDTH characters.
                         TEXCOL = 1
