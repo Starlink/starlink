@@ -64,12 +64,16 @@
             ENDIF
           ENDIF
 
+        ELSE
+          SHOW=.FALSE.
+          SEL=.FALSE.
+        ENDIF
+
 *  single position mode
-          IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
+        IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
 
-            CALL IPOSIT_SINGLE(STATUS)
+          CALL IPOSIT_SINGLE(STATUS)
 
-          ENDIF
 
         ENDIF
 
