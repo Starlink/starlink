@@ -80,6 +80,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (Starlink, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +93,8 @@
 *        parameters SCALOW and SCAHIGH into display.f.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2004 September 30 (PWD):
+*        Move CNF_PAR include into declarations.
 *     {enter_further_changes_here}
 
 *-
@@ -105,6 +108,7 @@
       INCLUDE 'NDF_PAR'        ! NDF_ public constants
       INCLUDE 'NDF_ERR'        ! NDF_ error constants
       INCLUDE 'SUBPAR_PAR'     ! SUBPAR constants
+      INCLUDE 'CNF_PAR'        ! CNF functions
 
 *  Arguments Given:
       INTEGER INDF 
@@ -194,7 +198,6 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
 *.
 
 *  Initialise.
