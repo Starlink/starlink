@@ -36,13 +36,14 @@
 
 use autoastrom qw ( decompose_transform );
 
+my $matchprog = $ENV{AUTOASTROM_DIR} . '/match';
+
 sub match_positions_match ($$$$$) {
     my ($helpers, $cat1, $cat2, $matchopts, $tempfn) = @_;
 
     my $cat1file = "$tempfn-match-in-1";
     my $cat2file = "$tempfn-match-in-2";
     my $matchoutstem = "$tempfn-match-out";
-    my $matchprog = $ENV{AUTOASTROM_DIR} . '/match';
 
     my $myname = 'match_positions_match';
 
@@ -168,26 +169,24 @@ sub match_positions_match ($$$$$) {
 	      if $verbose;
 	    # Format is `TRANS: a=nnn b=nnn...'
 	    my @valstrings = split (' ', $matchresponse);
-	    my @vals = ();
+	    my %vals = ();
 	    shift (@valstrings); # shift off `TRANS:'
 	    foreach my $v (@valstrings) {
-		($v =~ /^[a-z]=([-+.eE0-9]*)$/)
+		($v =~ /^(\w+)=([-+.eE0-9]+)$/)
 		  || wmessage ('fatal',
 			       "match response malformed: $matchresponse");
-		push (@vals, $1);
+		$vals{$1} = $2;
 	    }
 	    if ($verbose) {
 		print STDERR "$myname: $matchprog returned...\n";
-		my $coef = 'a';
-		foreach my $vn (@vals) {
-		    print STDERR "\t$coef = $vn\n";
-		    $coef++;
+		foreach my $vn (sort(keys(%vals))) {
+		    print STDERR "\t$vn= $vals{$vn}\n";
 		}
 	    }
 	    # Decompose the transform into scales and angles.
 	    my @transcpts
-	      = decompose_transform ($vals[0], $vals[1], $vals[2],
-				     $vals[3], $vals[4], $vals[5]);
+	      = decompose_transform ($vals{a}, $vals{b}, $vals{c},
+				     $vals{d}, $vals{e}, $vals{f});
 	    printf STDERR ("decompose_transform: xz=%f yz=%f sx=%f, sy=%f perp=%f orient=%f\n",
 			   $transcpts[0],
 			   $transcpts[1],
@@ -293,6 +292,14 @@ sub match_positions_match ($$$$$) {
     return (\@rescat1, \@rescat2, 1);
 }
 
-$helpers{'plugin-match-match'} = \&match_positions_match;
+# Check that the match program is actually present
+if (-x $matchprog) {
+    # It is, so install the plugin.
+    $helpers{'plugin-match-match'} = \&match_positions_match;
+} else {
+    # It's not, so give a warning and don't install the plugin.
+    wmessage ('warning',
+      "Match program $matchprog not found: match plugin not installed");
+}
 
 1;
