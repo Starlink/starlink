@@ -52,26 +52,33 @@ while ( $ARGV[0] =~ /^-/ ) {
 }
 
 #  Create a scratch directory.
-print( stderr
-       `if test ! -e /tmp/makeh.tmp; then mkdir /tmp/makeh.tmp; else :; fi` );
+$tmpdir='/tmp/makeh.tmp';
+unless ( -d $tmpdir && -w $tmpdir ) {
+    if ( -e $tmpdir ) {
+        die "Temp $tmpdir exists, but is unwritable or is not a directory\n";
+    }
+    mkdir $tmpdir ||
+        die "Failed to create temporary directory $tmpdir\n";
+}
 
 #  Open each input file.
 foreach $file ( @ARGV ) {
    protect_copy_file( $file );
 }
 
-if ( $need_config_h ) {
-#  Copy config.h to the temp directory, too, and put it at the
-#  beginning of the list of files to concatenate.
-   unshift (@ARGV, "config.h");
-   protect_copy_file( "config.h" );
-}
 
-
-#  Open a pipe to a scipt (in the current directory) which runs the C preprocessor
-# and direct its output to a scratch file.
+#  Open a pipe to a scipt (in the current directory) which runs the C
+# preprocessor and direct its output to a scratch file.
 open( CC, '| ./ast_cpp >/tmp/ast.h' ) ||
                                 die "Can't open pipe to C preprocessor (cpp)";
+
+if ( $need_config_h ) {
+# Include this directory's config.h, unescaped, in the output.  We
+# need to pay attention to the values in this file, but don't want
+# them unexpanded in the final ast.h.
+    chomp($cwd = `pwd`);
+    print(CC "#include \"$cwd/config.h\"\n");
+}
 
 #  Before including each file, write an underlined heading in the form of
 #  C comments (with comment characters suitably protected so that they will
@@ -88,13 +95,14 @@ foreach $file ( @ARGV ) {
 #  preprocesses) each of the temporary files created above in turn.
    $tmp_file = $file;
    $tmp_file =~ s|^.*/||;
-   print( CC "#include \"" . '/tmp/makeh.tmp/'. $tmp_file . "\"\n" ) };
+   printf(CC "#include \"%s/%s\"\n", $tmpdir, $tmp_file);
+};
 
 #  Close the pipe to cpp.
 close( CC ) || die "C preprocessor (cpp) error";
 
 #  Remove the temporary directory and the files it contains.
-#print( stderr `rm -r /tmp/makeh.tmp` );
+print( stderr `rm -r $tmpdir` );
 
 #  Write the output preamble.
 print(
@@ -198,12 +206,12 @@ sub protect_copy_file {
 #  Open an output file with the same name in the temporary directory.
    $tmp_file = $file;
    $tmp_file =~ s|^.*/||;
-   open( TEMP, '>/tmp/makeh.tmp/' . $tmp_file );
+   open( TEMP, ">$tmpdir/$tmp_file" );
 
 #  Read the input file and detect "#include <...>" lines, extracting the name
 #  of the header file being included.
 line: while ( <INCLUDE> ) {
-#  Omit any config.h includes      
+#  Omit any config.h includes, and note that we saw this
       if (/^\s*\#\s*include\s+<config.h>/) {
           $need_config_h = 1;
           next line;
