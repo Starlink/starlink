@@ -93,12 +93,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'MATH_PAR'
 
 *  Global Variables:
       INCLUDE 'WCI_CMN'                 ! ASTERIX WCI common block
 *       WCS_INIT = LOGICAL (given)
 *         WCI class definitions loaded?
-	include '../include/MATH_PAR'
 
 *  Arguments Given:
       DOUBLE PRECISION		SPOS(2)			! Celestial position
