@@ -151,7 +151,7 @@ it produces an <funcname/error/.
 	   ;;					" has a SYSTEM id")))
 	   (xrefent-gen-sysid (error (string-append
 				      "DOCXREF: Couldn't parse "
-				      xrefent-sysid)))
+				      xrefent)))
 	   (xrefent-pubid (if linktext
 			      (literal linktext)
 			      (let* ((pfpi (parse-fpi xrefent-pubid))
