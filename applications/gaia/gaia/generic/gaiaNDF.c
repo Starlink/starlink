@@ -805,7 +805,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
         /*  If all is well, cancel pending error message (from initial
             attempt to open) */
-        if ( status == SAI__OK ) {
+        if ( status == SAI__OK && emess != NULL ) {
             free( emess );
             emess = NULL;
         }
