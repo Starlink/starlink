@@ -50,7 +50,7 @@
 # Roland McGrath, Noah Friedman, david d zuhn, and many others.
 #
 # Extended by Martin Wilck (2000), Norman Gray and Toby White (2004),
-# to add support for preprocessable Fortran (fpp).
+# to add support for preprocessable Fortran (ppfc language).
 
 
 # XXX Temporary notes on the fpp work, which should turn into a ChangeLog
@@ -64,11 +64,8 @@
 # are as follows:
 #
 # - Change define to m4_define, to match newer (post 2.50) versions of autoconf
-# - Change .F to .fpp (on case-insensitive filesystems such as HFS+,
-#   file.f and file.F are the same file)
 # - Added second, optional, FPP-SRC-EXT parameter to AC_PROG_FPP, to set the
-#   extension expected, in case you (persistent!) want to use .F
-#   instead of .fpp
+#   extension expected, in case you want to use something other than .F
 # - Slight changes to tests, following comments by Akim Demaille
 #   on the mailing list (including Martin's cunning
 #   _AC_SHELL_POSITIONAL).
@@ -200,7 +197,7 @@ ac_compiler_gnu=$ac_cv_fc_compiler_gnu
 # --------------------------------
 # We need a separate `preprocessed' language, because not all Fortran 
 # compilers have a preprocessor built in.  Therefore we may need to
-# resort to an `indirect' compilation, .fpp->.f->.o, including the
+# resort to an `indirect' compilation, .F->.f->.o, including the
 # generation of a suitable extra build rule.  The language extension
 # is set in macro AC_PROG_FPP, to $FPP_SRC_EXT.
 m4_define([AC_LANG(Preprocessed Fortran)],
@@ -2028,7 +2025,7 @@ rm -f conftest*
 
 # _AC_PROG_FPP
 # ------------
-# Try to figure out how to preprocess .fpp files for use with the selected
+# Try to figure out how to preprocess .F files for use with the selected
 # Fortran compiler
 #
 # Must be run after _AC_PROG_FC_CPP
@@ -2116,19 +2113,41 @@ AC_LANG_ASSERT(Preprocessed Fortran)
 # Note we force extension .$FPP_SRC_EXT here and in the ac_cmd lines below, to
 # make sure that we don't use the default extension for the language.
 # We mustn't blindly set ac_ext=$FPP_SRC_EXT, however, or else this
-# would break the $(ac_link) command below.
-cat > conftest.$FPP_SRC_EXT << \_ACEOF
+# would break the $(ac_link) command below.  Yes, this test file has
+# the literal extension .FPP_SRC_EXT (see below).
+cat > conftest.FPP_SRC_EXT << \_ACEOF
 _AC_LANG_PROGRAM_FPP_ONLY
 _ACEOF
 dnl AC_LANG_POP(Preprocessed Fortran)dnl
 
 AC_LANG_PUSH(Fortran)
-ac_cmd='$FPP $FPPFLAGS conftest.$FPP_SRC_EXT '"$ac_fpp_out"
+
+# We must not fail, here, in the case where the filesystem is
+# case-insensitive, so that conftest.F and conftest.f are the same
+# file.
+if test -n "$ac_fpp_out"; then
+   # If $ac_fpp_out is non-null, then preprocessor output goes to
+   # stdout, which we send to conftest.f _without_ immediately clobbering
+   # the input file as it is being read.  We do clobber it in the
+   # end, however, which is why we copy .FPP_SRC_EXT to .$FPP_SRC_EXT
+   # each time.
+   ac_tmp='>conftest.tmp && mv conftest.tmp conftest.f'
+else
+   # conftest.F is preprocessed directly to conftest.f.  We can
+   # assume that the filesystem is case-sensitive, since otherwise
+   # this compiler/preprocessor would be simply non-functional on
+   # this platform.
+   ac_tmp=
+fi
+cp conftest.FPP_SRC_EXT conftest.$FPP_SRC_EXT
+ac_cmd='$FPP $FPPFLAGS conftest.$FPP_SRC_EXT '"$ac_tmp"
+echo "ac_cmd=$ac_cmd ; ac_link=$ac_link"
 ## use ac_link from the Fortran language
 if AC_TRY_EVAL(ac_cmd) &&
      AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
    ac_cv_prog_fpp_p=
 else
+   cp conftest.FPP_SRC_EXT conftest.$FPP_SRC_EXT
    ac_save_FPPFLAGS=$FPPFLAGS
    FPPFLAGS="$FPPFLAGS -P"
    if AC_TRY_EVAL(ac_cmd) &&
@@ -2283,15 +2302,16 @@ dnl AC_LANG_POP()dnl
 # Figure out how to build from cpp/Fortran sources
 #
 # If we need to use a separate preprocessor, we must override make's
-# `direct' .fpp.o rule in order to do `indirect' compilation
-# (.fpp -> .f then .f -> .o). PWD: see FIXME.
+# `direct' .F.o rule in order to do `indirect' compilation
+# (.F -> .f then .f -> .o).
 #
 # Configure variables set here:
 #
 #   FPP_SRC_EXT
 #     This is the file extension (without a dot) of preprocessable
-#     Fortran files; by default this is `fpp', but `F' is also
-#     common. [set in AC_PROG_FPP, but documented here for consistency]
+#     Fortran files; by default this is `F', but others are occasionally
+#     used, though they are surely less portable. [set in AC_PROG_FPP,
+#     but documented here for consistency]
 #
 #   FPP_COMPILE_EXT
 #     This contains the file extension which the Fortran compiler will
@@ -2317,17 +2337,33 @@ dnl AC_LANG_POP()dnl
 #
 # These are used in Automake's lang_ppfc_finish subroutine.
 #
-# FIXME: Martin Wilck's original version of these macros noted that it
-# was necessary to generate explicit rules for .fpp -> .o compilations
+# NOTE 1: There would seem to be a problem here with the use of .F as
+# the extension for preprocessed files.  On case-insensitive
+# filesystems such as HFS+, as used on MacOS X, foo.F and foo.f are
+# the same file.  This means that indirect compilation would lose badly, since
+# converting foo.F to foo.f would clobber the original.  This is
+# probably not a problem in practice, since the compilers (g77, gfortran,
+# nag, and xlf) actually likely to be used on OS X -- which is a
+# recent platform, and thus with only recent Fortrans on it -- can all
+# do direct compilation of preprocessable Fortran.  Just in case, we
+# check below whether we are in this fatal situation, and collapse
+# noisily if necessary.
+#
+# NOTE 2: Martin Wilck's original version of these macros noted that it
+# was necessary to generate explicit rules for .F -> .o compilations
 # in order to override make's builtin rules in a portable manner
-# (i.e. without using make extensions).  Is this true? 
-# PWD: yes it is, not all makes do chains of implicit rules, so we cannot 
-#      depend on .fpp.f, .f.o rules generating a .f file. We need 
-#      unified .fpp.o and .fpp.lo rules, but that's complicated, 
-#      an alternative is to name the intermediary .f files in the Makefiles.
-# POSIX/Single-Unix states that inference rules can be redefined, and
-# there's no warning against this in Autoconf's section on
-# `Limitations of Make'.
+# (i.e. without using make extensions).  Not all makes do chains of
+# implicit rules, so we cannot depend on .F.f, .f.o rules generating
+# a .f file.  We need unified .F.o and .F.lo rules, but that's
+# complicated, an alternative is to name the intermediary .f files in
+# the Makefiles.  Again, this may not be much of a problem in fact,
+# since the main culprit seems to be Solaris make, but Solaris f77
+# can do direct compilation, so that the issue of chaining rules
+# doesn't arise.
+#
+# POSIX/Single-Unix states that inference rules can be
+# redefined, and there's no warning against this in Autoconf's section
+# on `Limitations of Make'.
 #
 AC_DEFUN([_AC_FPP_BUILD_RULE],
 [AC_CACHE_CHECK([how to build from preprocessed Fortran sources],
@@ -2374,7 +2410,7 @@ else
    else
      ac_cv_fpp_build_rule=direct
    fi
-fi   
+fi
 ])
 
 if test -z "$ac_fpp_status"; then
@@ -2392,13 +2428,30 @@ elif test $ac_fpp_status = fail; then
 
 fi
 
-# FIXME: Are DEFAULT_INCLUDES and AM_CPPFLAGS the right set of
-# variables to be including here?  I confess (NG) to being somewhat
-# confused about which one's which (same applies to rules in lang-compile.am).
+# Before we go any further, check that we're not courting disaster,
+# here, by using indirect compilation (.F -> .f -> .o) on a
+# case-insensitive filesystem.  If we are, there's nothing we can do
+# other than fail noisily.
+if test $ac_cv_fpp_build_rule = indirect; then
+    _AC_FC_CHECK_CIFS
+    if test $ac_cv_fc_cifs = yes; then
+        AC_MSG_ERROR([disaster: this Fortran needs indirect compilation, but we
+ have a case-insensitive filesystem, so .F -> .f would fail; further compilation isn't going to work -- consider filing a bug])
+    fi
+fi
+
+# The flags here are those included in the 'compile' field of the
+# 'ppfc' language in automake.in, minus the {AM_,}FCFLAGS variables.
+# It's not _absolutely_ guaranteed that these are the correct ones,
+# and I (NG) would be open to argument about both {AM_,}CPPFLAGS and
+# {AM_,}FCFLAGS, but this set appears to work.  The .f_in extension
+# doesn't mean anything particular, but it's a useful and harmless
+# default, which can potentially be used in a user rule for an
+# explicit preprocessing step.
 if test $ac_cv_fpp_build_rule = direct; then
     FPP_COMPILE_EXT=$FPP_SRC_EXT
-    FPP_PREPROCESS_EXT=DUMMY$FPP_SRC_EXT
-    FPP_MAKE_FLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS)'
+    FPP_PREPROCESS_EXT=f_in
+    FPP_MAKE_FLAGS='$(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)'
 else
     FPP_COMPILE_EXT=DUMMYf
     FPP_PREPROCESS_EXT=$FPP_SRC_EXT
@@ -2415,11 +2468,28 @@ fi
 ])# _AC_FPP_BUILD_RULE
 
 
+# _AC_FC_CHECK_CIFS
+# -----------------
+# Check whether the filesystem is case-insensitive (eg, HFS+ on
+# MacOS X).  Set ac_cv_fc_cifs=yes if so.
+AC_DEFUN([_AC_FC_CHECK_CIFS],
+   [AC_CACHE_CHECK([whether the filesystem is case-insensitive],
+        ac_cv_fc_cifs,
+       [rm -f conftest.*
+        echo wibble >conftest.F
+        ac_cv_fc_cifs=no
+        if test -f conftest.f -a `cat conftest.f` = wibble; then
+            ac_cv_fc_cifs=yes
+        fi
+])])# _AC_FC_CHECK_CIFS
+
+
+
 # -----------------------
 # User macros
 # -----------------------
 
-# AC_CHECK_FC_FPP([required features], [FPP-SRC-EXT=.fpp], [ACTION-IF-YES], [ACTION-IF-NO])
+# AC_CHECK_FC_FPP([required features], [FPP-SRC-EXT=.F], [ACTION-IF-YES], [ACTION-IF-NO])
 # --------------------------------------------------
 #
 # [required features] is a space-separated list of features that the Fortran
@@ -2440,13 +2510,13 @@ fi
 
 _AC_PROG_FPP_FEATURES([$1])
 
-# Default optional second argument to fpp
-FPP_SRC_EXT=m4_default([$2], [fpp])
+# Default optional second argument to F
+FPP_SRC_EXT=m4_default([$2], [F])
 
 # Test FPP_SRC_EXT
 ac_fpp_srcext_failed=no
-AC_FPP_SRCEXT(m4_default([$2], [fpp]),[],[ac_fpp_srcext_failed=yes])
-if test $ac_fpp_srcext_failed = yes; then
+AC_FPP_SRCEXT(m4_default([$2], [F]),[],[ac_fpp_srcext_failed=yes])
+if test $ac_fpp_srcext_failed = yes -a "$2" != F; then
     AC_MSG_NOTICE([Could not use .$FPP_SRC_EXT as extension; trying .F])
     FPP_SRC_EXT=F
     AC_FPP_SRCEXT([F])
@@ -2517,7 +2587,7 @@ fi
 
 ])# AC_CHECK_FC_FPP
 
-# AC_CHECK_FC_FREEFORM_FPP([required features], [FPP-SRC-EXT=.fpp], [ACTION-IF-YES], [ACTION-IF-NO])
+# AC_CHECK_FC_FREEFORM_FPP([required features], [FPP-SRC-EXT=.F], [ACTION-IF-YES], [ACTION-IF-NO])
 # --------------------------------------------------
 #
 # [required features] is a space-separated list of features that the Fortran
@@ -2540,7 +2610,7 @@ fi
 
 _AC_PROG_FPP_FEATURES([$1])
 
-# Default optional second argument to fpp
+# Default optional second argument to F90
 FPP_SRC_EXT=m4_if([$2], [$2], [F90])
 
 # Test FPP_SRC_EXT
@@ -2548,7 +2618,7 @@ AC_MSG_NOTICE([1: $ac_fpp_compile])
 ac_fc_srcext_failed=no
 AC_FC_SRCEXT([$FPP_SRC_EXT],[],[ac_fc_srcext_failed=yes])
 AC_MSG_NOTICE([2: $ac_fpp_compile])
-if test $ac_fc_srcext_failed = yes; then
+if test $ac_fc_srcext_failed = yes -a "$2" != F; then
     AC_MSG_NOTICE([Could not use F90 as extension; trying .F])
     FPP_SRC_EXT=F
     AC_FC_SRCEXT([F])
@@ -2616,7 +2686,7 @@ fi
 ])# AC_CHECK_FC_FREEFORM_FPP
 
 
-# AC_PROG_FPP([required features], [FPP-SRC-EXT=.fpp])
+# AC_PROG_FPP([required features], [FPP-SRC-EXT=.F])
 # --------------------------------------------------
 #
 # [required features] is a space-separated list of features that the Fortran
@@ -2625,9 +2695,7 @@ fi
 #
 # [FPP-SRC-EXT] is an optional specification of the file extension for
 # preprocessable Fortran source files (without a leading dot).  It
-# defaults to `fpp', which is better than .F in general, since .F and
-# .f are indistinguishable on case-insensitive filesystems (such as
-# HFS+ on MacOS X).
+# defaults to `F'.
 #
 # Supported features are:
 #
@@ -2669,7 +2737,7 @@ AC_CHECK_FC_FPP([$1],[$2])
 # Now we check how to invoke a preprocessor that outputs Fortran code
 # that FC can understand
 # The next macro sets FPP (unless already set by the user)
-ac_ext=fpp
+ac_ext=F
 _AC_PROG_FPP
 _AC_PROG_FPP_P
 
@@ -2739,7 +2807,7 @@ AC_CACHE_CHECK([whether $FPP fulfills requested features],
 
 # We have all necessary information.
 # It remains to construct optimal build rules 
-# (direct: .fpp.o or indirect: .fpp.f)
+# (direct: .F.o or indirect: .F.f)
 # and carry out the substitutions.
 _AC_FPP_BUILD_RULE
 
