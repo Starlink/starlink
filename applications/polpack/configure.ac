@@ -35,6 +35,6 @@ STAR_LATEX_DOCUMENTATION(sun223)
 
 AC_CONFIG_SUBDIRS([polsub ccdpack])
 
-AC_CONFIG_FILES(Makefile component.xml polpack_mon.f polpack.ifd polka.tcl adamMessageRelay, [chmod +x polka.tcl adamMessageRelay])
+AC_CONFIG_FILES(Makefile component.xml polpack_mon.f polpack.ifd Polka.tcl adamMessageRelay, [chmod +x polka.tcl adamMessageRelay])
 
 AC_OUTPUT
