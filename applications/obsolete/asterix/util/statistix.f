@@ -65,6 +65,7 @@
 *     15 Sep 92 : V1.6-2 Warns if using slice. Bug fix printing min/max
 *                        positions. Traps huge weights. (DJA)
 *      4 May 94 : V1.7-0 Updated i/o to AIO (DJA)
+*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -112,7 +113,7 @@
 *    Version id :
 *
       CHARACTER*25           VERSION
-        PARAMETER            ( VERSION = 'STATISTIX Version 1.6-2' )
+        PARAMETER            ( VERSION = 'STATISTIX Version 1.8-0' )
 *-
 
 *    Check status
@@ -121,7 +122,7 @@
 *    Version anouncement
       CALL MSG_PRNT( VERSION )
 
-*    ASTERIX initialisation
+*    Start ASTERIX
       CALL AST_INIT( STATUS )
 
 *    Obtain name of data file, and get a locator to it.
@@ -143,7 +144,7 @@
       END IF
 
 *    Simple mode?
-      CALL PAR_GET0L( 'SIMPLE', SIMPLE, STATUS )
+      CALL USI_GET0L( 'SIMPLE', SIMPLE, STATUS )
 
 *    Look for components.
       CALL BDA_CHKDATA( ILOC, DATAOK, NDIM, DIMS, STATUS )
@@ -155,13 +156,13 @@
 *      Look for quality - ask user if present
         CALL BDA_CHKQUAL( ILOC, QUALOK, TNDIM, TDIMS, STATUS )
         IF ( QUALOK ) THEN
-          CALL PAR_GET0L( 'USEQUALITY', QUALOK, STATUS )
+          CALL USI_GET0L( 'USEQUALITY', QUALOK, STATUS )
         END IF
 
 *      Look for variance - ask user if present
         CALL BDA_CHKVAR( ILOC, VAROK, TNDIM, TDIMS, STATUS )
         IF ( VAROK ) THEN
-          CALL PAR_GET0L( 'USEERRORS', VAROK, STATUS)
+          CALL USI_GET0L( 'USEERRORS', VAROK, STATUS)
         END IF
 
 *      Check axis values
@@ -185,7 +186,7 @@
       END IF
 
 *    Find out if looping is required
-      CALL PAR_GET0L( 'LOOP', LOOP, STATUS )
+      CALL USI_GET0L( 'LOOP', LOOP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map data as _DOUBLE
@@ -234,7 +235,7 @@
       CALL BDA_RELEASE( ILOC, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
@@ -441,8 +442,8 @@
         SIGMA = 0.0D0
         INPUT = .TRUE.
         DO WHILE ( INPUT )
-          CALL PAR_GET0D('SIGMA', SIGMA, STATUS )
-          CALL PAR_CANCL('SIGMA', STATUS )
+          CALL USI_GET0D('SIGMA', SIGMA, STATUS )
+          CALL USI_CANCL('SIGMA', STATUS )
 
           IF ((STATUS .EQ. PAR__ABORT) .OR.(STATUS .EQ. PAR__NULL)) THEN
             GOTO 99
@@ -456,10 +457,10 @@
 *      Ask user if output of ignored values is required.
         INPUT = .TRUE.
         DO WHILE ( INPUT )
-          CALL PAR_GET0L( 'DISPLAY', DISPLAY, STATUS)
+          CALL USI_GET0L( 'DISPLAY', DISPLAY, STATUS)
           IF ( STATUS .NE. SAI__OK ) THEN
             STATUS = SAI__OK
-            CALL PAR_CANCL( 'DISPLAY', STATUS)
+            CALL USI_CANCL( 'DISPLAY', STATUS )
           ELSE
             INPUT = .FALSE.
           END IF
