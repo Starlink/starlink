@@ -231,7 +231,7 @@
 *       Taper 10% of data at each end if required
 *       Should the fraction tapered be user selectable??
          IF ( TAPER ) THEN
-            CALL ARR_TAPER( %VAL(DPTR), NDAT, 0.1, STATUS )
+            CALL ARR_TAPERR( NDAT, 0.1, %VAL(DPTR), STATUS )
          END IF
 
 *       Compute power spectrum
