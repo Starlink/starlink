@@ -278,7 +278,7 @@
 *  Construct a string holding the default position (a comma separated
 *  list of formatted axis values) using the Digits value set above.
          DPOS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
-         IAT = CHR_LEN( POS )
+         IAT = CHR_LEN( DPOS )
          DO I = 2, NCAXES
             IAT = IAT + 1
             CALL CHR_APPND( AST_FORMAT( CURFRM, I, CC( I ), STATUS ),
