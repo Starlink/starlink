@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {ssn\stardocnumber}
 \newcommand{\stardocnumber}    {69.1(Draft)}
 \newcommand{\stardocauthors}   {Mark Taylor}
-\newcommand{\stardocdate}      {9 June 1998}
+\newcommand{\stardocdate}      {6 July 1998}
 \newcommand{\stardoctitle}     {
    CCDBIG: assessing CCDPACK resource usage for large data sets
 }
@@ -359,7 +359,7 @@ is after the initial comment section, and looks like this:
       # Do we want to normalize the frames for scale and zero factors?
             set normalise = TRUE
 
-      # Data type (_REAL, _WORD, _DOUBLE are sensible)
+      # Data type (_WORD, _INTEGER, _REAL or _DOUBLE)
             set datatype = _REAL
 
       # List of image sizes for frames (pixels along a side)
@@ -458,7 +458,7 @@ application processes.
 A smaller value will improve the resolution of the statistics,
 but will place a heavier load on the system.
 %
-\item {\tt timelogfile}:
+\item {\tt reslogfile}:
 This is the name of the file to which the resource usage summary is logged.
 \end{itemize}
 
@@ -494,6 +494,8 @@ after the invocations of MAKEMOS:
       compave mosaic shrunk-mosaic 2
 \end{verbatim}
 \end{quote}
+Examples of this can easily be seen by examining the {\tt ccdbig} 
+script as distributed.
 
 In the case that more complex modifications are to be
 made however, e.g.\ running more than one command 
@@ -523,16 +525,18 @@ the number of objects in the data frame,
 the name of the application being run,
 the CPU time and
 elapsed time in seconds,
-and
 the maximum total (virtual memory) size and
-maximum resident (real memory) size of the process in kilobytes.
+maximum resident (real memory) size of the process in kilobytes,
+and the remaining disk space.
 A section of a log file could therefore look something like this:
 \begin{quote}
 \begin{verbatim}
-SunOS cass60 5.6 Generic_105181-04 sun4u sparc SUNW,Ultra-1
-  5:25pm  up 37 day(s), 9 hr(s),  3 users,  load average: 0.33, 0.46, 0.74
-Thu Jun 11 17:25:49 BST 1998
-3059    /data/cass60a/mbt/ccdbig
+                            Elapsed(s)   CPU(s)   RSS(k)  Size(k) Diskfree(M)
+SunOS cass58 5.6 Generic sun4u sparc SUNW,Ultra-1
+ 10:32am  up 19 day(s), 22:21,  0 users,  load average: 0.04, 0.14, 0.12
+Tue Jul  7 10:32:57 BST 1998
+714     /data/cass58a/mbt/scratch
+ 
 Variance:           FALSE
 Keepard:            FALSE 
 Biasframe:          TRUE
@@ -542,20 +546,18 @@ Logging interval:   15
 
 Pixels Objects     Command
                             Elapsed(s)   CPU(s)   RSS(k)  Size(k) Diskfree(M)
-   3000   1012 ccdgenerate:        415      132   141456   149408         301
-   3000   1012     display:         18        2    16952    45976         301
-   3000   1012    makebias:         38       31    39120    42840         301
-   3000   1012      debias:        539       56   190384   211064         197
-   3000   1012     display:          1        0     3360     9336         197
-   3000   1012    makeflat:        163       63    97856   101632         140
+   3000   1012     ccdbgen:        403      349    39024    42024        2910
+   3000   1012     display:          3        2    19496    45984        2910
+   3000   1012    makebias:         43       36    39440    42840        2879
+   3000   1012      debias:        593       54   174208   179784        2715
+   3000   1012     display:         17        2    14664    41944        2715
+   3000   1012    makeflat:        179       60    92384   101632        2635
    3000   1012     ardmask:          6        3    94800   135424         140
-   3000   1012     flatcor:         37        7    89816   101616         140
-   3000   1012     findobj:          7        4    35608    42544         140
-   3000   1012    plotlist:          1        0     4296    11264         140
-   3000   1012     tranndf:        311      175    68608   105384         133
-   3000   1012 makemosnorm:        544      386    51464    59248         130
-   3000   1012  makmoscomb:         41        8     4816    12136         123
-   3000   1012     display:         27        2    19848    83848         123
+   3000   1012     flatcor:         17        4    89032   101616        2635
+   3000   1012     findobj:         25       16    35944    42760        2635
+   3000   1012     tranndf:        187      167    95568   105360        2600
+   3000   1012 makemosnorm:        600      515    51704    59256        2567
+   3000   1012  makmoscomb:         47        7     4920    12128        2546
 \end{verbatim}
 \end{quote}
 
@@ -594,7 +596,7 @@ usage by other processes as well.
 Number of seconds of system plus user time spent by the program executing.
 %
 \item {\bf RSS}:
-Maximum amount of real memory used (resident set size) in kilobytes. 
+The maximum amount of real memory used (resident set size) in kilobytes. 
 This will not exceed the physical memory installed in the machine.
 %
 \item {\bf Size}:
@@ -666,7 +668,8 @@ The script {\tt ccdbig} itself aims to
 emulate a typical data reduction sequence,
 under a few different circumstances 
 as specified by the user,
-with particular attention to the most expensive parts of the process.
+with particular attention to the most expensive (especially with 
+regard to memory) parts of the process.
 It does not however work through all the possibilities 
 one might require in treating large CCD frames,
 and there are certainly problems which might arise
