@@ -63,6 +63,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     ACD: A C Davenhall (Edinburgh)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -73,7 +74,6 @@
 *        the NDF is copied to the DX dataset.
 *     29-AUG-2004 (TIMJ)
 *        Do not directly compare logicals with TRUE/FALSE
-
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -675,11 +675,15 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
 *  History:
 *     12-OCT-1995 (GJP)
-*     (Original version)
+*        (Original version)
+*     31-AUG-2004 (TIMJ)
+*        Use CNF_PVAL
  
+
 *  Bugs:
 *     None known.
  
@@ -691,6 +695,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
  
 *  Arguments Given:
       CHARACTER *(NDF__SZTYP) VTSETD  ! Type of data in data          
@@ -756,11 +761,14 @@
 
 *   Look to see how many bad pixels there are.
       IF (VTSETD.EQ.'_INTEGER') CALL NDF2DX_CBADI
-     :   (%VAL(POINTD(1)),%VAL(POINTV(1)),ELEMS,COUNT,STATUS)
+     :   (%VAL(CNF_PVAL(POINTD(1))),%VAL(CNF_PVAL(POINTV(1))),
+     :    ELEMS,COUNT,STATUS)
       IF (VTSETD.EQ.'_REAL') CALL NDF2DX_CBADR
-     :   (%VAL(POINTD(1)),%VAL(POINTV(1)),ELEMS,COUNT,STATUS)
+     :   (%VAL(CNF_PVAL(POINTD(1))),%VAL(CNF_PVAL(POINTV(1))),
+     :    ELEMS,COUNT,STATUS)
       IF (VTSETD.EQ.'_DOUBLE') CALL NDF2DX_CBADD
-     :   (%VAL(POINTD(1)),%VAL(POINTV(1)),ELEMS,COUNT,STATUS)
+     :   (%VAL(CNF_PVAL(POINTD(1))),%VAL(CNF_PVAL(POINTV(1))),
+     :    ELEMS,COUNT,STATUS)
 
 *   Bailout if there were none found.
       IF (COUNT.EQ.0) THEN
@@ -803,14 +811,14 @@
 
 *   Save the invalid points.
       IF (VTSETD.EQ.'_INTEGER') CALL NDF2DX_WRIBADI
-     :                         (BMODE,FIOD,%VAL(POINTD(1)),
-     :                         %VAL(POINTV(1)),ELEMS,STATUS)
+     :                         (BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),
+     :                         %VAL(CNF_PVAL(POINTV(1))),ELEMS,STATUS)
       IF (VTSETD.EQ.'_REAL') CALL NDF2DX_WRIBADR
-     :                       (BMODE,FIOD,%VAL(POINTD(1)),
-     :                       %VAL(POINTV(1)),ELEMS,STATUS)
+     :                       (BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),
+     :                       %VAL(CNF_PVAL(POINTV(1))),ELEMS,STATUS)
       IF (VTSETD.EQ.'_DOUBLE') CALL NDF2DX_WRIBADD
-     :                         (BMODE,FIOD,%VAL(POINTD(1)),
-     :                         %VAL(POINTV(1)),ELEMS,STATUS)
+     :                         (BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),
+     :                         %VAL(CNF_PVAL(POINTV(1))),ELEMS,STATUS)
 
 *   Add the attribute reference at the end.         
       NC=0
@@ -1048,11 +1056,14 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
 *  History:
 *     12-OCT-1995 (GJP)
-*     (Original version)
- 
+*       (Original version)
+*     31-AUG-2004 (TIMJ)
+*       Use CNF_PVAL
+
 *  Bugs:
 *     None known.
  
@@ -1064,6 +1075,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
  
 *  Arguments Given:
       CHARACTER* (NDF__SZTYP) VTSETD  ! Mapping type for data           
@@ -1166,13 +1178,13 @@
 
 *   Save the data.
       IF (VTSETD.EQ.'_INTEGER') 
-     :   CALL NDF2DX_WRIDATI(BMODE,FIOD,%VAL(POINTD(1)),ELEMS,
+     :   CALL NDF2DX_WRIDATI(BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),ELEMS,
      :                       STATUS)
       IF (VTSETD.EQ.'_REAL') 
-     :   CALL NDF2DX_WRIDATR(BMODE,FIOD,%VAL(POINTD(1)),ELEMS,
+     :   CALL NDF2DX_WRIDATR(BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),ELEMS,
      :                       STATUS)
       IF (VTSETD.EQ.'_DOUBLE') 
-     :   CALL NDF2DX_WRIDATD(BMODE,FIOD,%VAL(POINTD(1)),ELEMS,
+     :   CALL NDF2DX_WRIDATD(BMODE,FIOD,%VAL(CNF_PVAL(POINTD(1))),ELEMS,
      :                       STATUS)
       IF( STATUS.NE.SAI__OK) GOTO 9999
 
@@ -1227,13 +1239,16 @@
 
 *      Save the variance.
          IF (VTSETD.EQ.'_INTEGER') 
-     :     CALL NDF2DX_WRIDATI(BMODE,FIOD,%VAL(POINTV(1)),ELEMS,
+     :     CALL NDF2DX_WRIDATI(BMODE,FIOD,%VAL(CNF_PVAL(POINTV(1))),
+     :                         ELEMS,
      :                         STATUS)
          IF (VTSETD.EQ.'_REAL') 
-     :     CALL NDF2DX_WRIDATR(BMODE,FIOD,%VAL(POINTV(1)),ELEMS,
+     :     CALL NDF2DX_WRIDATR(BMODE,FIOD,%VAL(CNF_PVAL(POINTV(1))),
+     :                         ELEMS,
      :                         STATUS)
          IF (VTSETD.EQ.'_DOUBLE') 
-     :     CALL NDF2DX_WRIDATD(BMODE,FIOD,%VAL(POINTV(1)),ELEMS,
+     :     CALL NDF2DX_WRIDATD(BMODE,FIOD,%VAL(CNF_PVAL(POINTV(1))),
+     :                         ELEMS,
      :                         STATUS)
          IF( STATUS.NE.SAI__OK) GOTO 9999
 
@@ -1435,11 +1450,14 @@
  
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
- 
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
 *  History:
 *     12-OCT-1995 (GJP)
-*     (Original version)
- 
+*       (Original version)
+*     31-AUG-2004 (TIMJ)
+*       Use CNF_PVAL
+
 *  Bugs:
 *     None known.
  
@@ -1451,6 +1469,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'               ! Standard SAE constants
       INCLUDE 'NDF_PAR'               ! NDF public constants
+      INCLUDE 'CNF_PAR'               ! For CNF_PVAL function
  
 *  Arguments Given:
       LOGICAL BMODE                   ! Is data saved as binary
@@ -1487,15 +1506,18 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 *   Create each required term of the product array defining the positions.
-      CALL NDF2DX_PTERM( 1, 'xaxis', PRANGE(1), %VAL( PNTRX(1) ), NDIM,
+      CALL NDF2DX_PTERM( 1, 'xaxis', PRANGE(1), 
+     :                   %VAL( CNF_PVAL( PNTRX(1) ) ), NDIM,
      :                   BMODE, FIOD, DEP, STATUS )
 
       IF( NDIM .GT. 1 ) THEN
-         CALL NDF2DX_PTERM( 2, 'yaxis', PRANGE(2), %VAL( PNTRY(1) ), 
+         CALL NDF2DX_PTERM( 2, 'yaxis', PRANGE(2), 
+     :                      %VAL( CNF_PVAL( PNTRY(1) ) ),
      :                      NDIM, BMODE, FIOD, DEP, STATUS )
 
          IF( NDIM .GT. 2 ) THEN
-            CALL NDF2DX_PTERM( 3, 'zaxis', PRANGE(3), %VAL( PNTRZ(1) ),
+            CALL NDF2DX_PTERM( 3, 'zaxis', PRANGE(3), 
+     :                         %VAL( CNF_PVAL( PNTRZ(1) ) ),
      :                         NDIM, BMODE, FIOD, DEP,  STATUS )
          END IF
 
