@@ -151,7 +151,7 @@
         END IF
 
 *    Store the returned object on the property list of the object
-        CALL ADI_CPUTID( ID, '.WCS', RESID, STATUS )
+        CALL ADI_CPUTID( ID, WCI_PROP, RESID, STATUS )
 
       END IF
 
