@@ -7,7 +7,7 @@
 *     Copy a dataset
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ADI_FCOPY( IN, OUT, STATUS )
@@ -62,10 +62,10 @@
 *     {DIY_prologue_text}
 
 *  References:
-*     {routine_references}...
+*     ADI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/adi.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:adi, usage:public
 
 *  Copyright:
 *     {routine_copyright}
@@ -106,8 +106,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract locators and copy
-      CALL ADI_CGET0C( IN, '.LOCATOR', ILOC, STATUS )
-      CALL ADI_CGET0C( OUT, '.LOCATOR', OLOC, STATUS )
+      CALL ADI1_GETLOC( IN, ILOC, STATUS )
+      CALL ADI1_GETLOC( OUT, OLOC, STATUS )
       CALL HDX_COPY( ILOC, OLOC, STATUS )
 
 *  Report any errors

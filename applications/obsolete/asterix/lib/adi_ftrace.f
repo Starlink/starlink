@@ -7,7 +7,7 @@
 *     Return text description of file position of identifier
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ADI_FTRACE( ID, NLEV, PATH, FILE, STATUS )
@@ -113,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract locator
-      CALL ADI_CGET0C( ID, '.LOCATOR', LOC, STATUS )
+      CALL ADI1_GETLOC( ID, LOC, STATUS )
 
 *  Do the trace
       CALL HDS_TRACE( LOC, NLEV, PATH, FILE, STATUS )
