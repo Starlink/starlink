@@ -1,9 +1,9 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V4.0-5b.
+#  Package CCDPACK version V4.0-7b.
 #  
-makefile: 1.77
+makefile: 1.79
 mk: 1.3
-sun139.tex: 1.98
+sun139.tex: 1.99
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -252,7 +252,7 @@ Helpcontrol.tcl: 1.3
 Marknumcontrol.tcl: 1.5
 Markstylecontrol.tcl: 1.6
 Ndfalign.tcl: 1.23
-Ndfchoose.tcl: 1.36
+Ndfchoose.tcl: 1.37
 Ndfview.tcl: 1.23
 Percentilecontrol.tcl: 1.8
 Stylecontrol.tcl: 1.7
@@ -709,7 +709,7 @@ ccg1_fmd3.gen: 1.2
 ccg1_kthx.gen: 1.4
 ccg1_asli.gen: 1.2
 ccg1_dodiz.gen: 1.7
-ccg1_frac.gen: 1.8
+ccg1_frac.gen: 1.9
 ccg1_ghst.gen: 1.1
 ccg1_iblk.gen: 1.2
 ccg1_ord.gen: 1.2
