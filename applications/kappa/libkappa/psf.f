@@ -379,6 +379,9 @@
 *        MAP1 would also invert MAP3.
 *     10-JUL-2001 (DSB):
 *        Added parameter PROFOUT.
+*     13-AUG-2001 (DSB):
+*        Corrected size of work arrays IPW3 and IPW4 so that no segvio
+*        occurs if the OUT image is not square.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -447,6 +450,7 @@
       INTEGER NCF               ! Character column counter of filenames
       INTEGER NDIMS             ! No. of dimensions in input NDF
       INTEGER NPOS              ! Number of non-comment lines in the x-y file
+      INTEGER NW                ! Size of work array
       INTEGER PSFDIM( NDIM )    ! PSF dimensions
       INTEGER PSFSIZ            ! Dimension of region used to calculate mean PSF
       INTEGER SDIM( NDF__MXDIM )! Significant dimensions of the NDF
@@ -806,10 +810,9 @@
       CALL NDF_MAP( INDF2, 'Data', '_REAL', 'WRITE', IPPSF, EL, STATUS )
 
 *  Get workspace.
-      CALL PSX_CALLOC( UBND( 1 ) - LBND( 1 ) + 3, '_DOUBLE', IPW3, 
-     :                 STATUS )
-      CALL PSX_CALLOC( UBND( 2 ) - LBND( 2 ) + 3, '_DOUBLE', IPW4, 
-     :                 STATUS )
+      NW = MAX( UBND( 1 ) - LBND( 1 ) + 3, UBND( 2 ) - LBND( 2 ) + 3 )
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPW3, STATUS )
+      CALL PSX_CALLOC( NW, '_DOUBLE', IPW4, STATUS )
 
 *  Fill the data array with the evaluated point-spread function.
       IF( STATUS .EQ. SAI__OK ) THEN

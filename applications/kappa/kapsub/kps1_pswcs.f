@@ -30,9 +30,11 @@
 *     UBND( 2 ) = INTEGER (Given)
 *        Upper pixel index bounds in output NDF.
 *     X( * ) = DOUBLE PRECISION (Given and Returned)
-*        Work space. Must have at least UBND( 1 ) - LBND( 1 ) + 3 elements.
+*        Work space. Must have at least 
+*        MAX( LBND( 1 ) - LBND( 1 ) + 3, LBND( 2 ) - LBND( 2 ) + 3 ) elements.
 *     Y( * ) = DOUBLE PRECISION (Given and Returned)
-*        Work space. Must have at least UBND( 2 ) - LBND( 2 ) + 3 elements.
+*        Work space. Must have at least 
+*        MAX( LBND( 1 ) - LBND( 1 ) + 3, LBND( 2 ) - LBND( 2 ) + 3 ) elements.
 *     STATUS = INTEGER (Given)
 *        The global status.
 
