@@ -1,4 +1,4 @@
-      SUBROUTINE TCI_NEW( TIMID, STATUS )
+      SUBROUTINE TCI_NEW( SYSTEM, TIMID, STATUS )
 *+
 *  Name:
 *     TCI_NEW
@@ -10,12 +10,14 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL TCI_NEW( TIMID, STATUS )
+*     CALL TCI_NEW( SYSTEM, TIMID, STATUS )
 
 *  Description:
 *     Creates a new timing information object
 
 *  Arguments:
+*     SYSTEM = CHARACTER*(*) (given)
+*        Time frame, eg. LOCAL, BARYCENTRIC etc
 *     TIMID = INTEGER (returned)
 *        ADI identifier of timing info
 *     STATUS = INTEGER (given and returned)
@@ -88,8 +90,11 @@
 *       TCI_INIT = LOGICAL (given)
 *         TCI class definitions loaded?
 
+*  Arguments Given:
+      CHARACTER*(*)		SYSTEM
+
 *  Arguments Returned:
-      INTEGER                   TIMID                   ! Detector info
+      INTEGER                   TIMID
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
@@ -103,6 +108,11 @@
 
 *  Create new object
       CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
+
+*  Define system if supplied
+      IF ( SYSY .GT. ' ' ) THEN
+        CALL ADI_CPUT0C( TIMID, 'System', SYSTEM, STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'TCI_NEW', STATUS )
