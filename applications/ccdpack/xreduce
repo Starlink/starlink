@@ -102,6 +102,7 @@
 
 #  Authors:
 #     PDRAPER: P.W. Draper (STARLINK, Durham University)
+#     MBT: M.B. Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -109,6 +110,8 @@
 #        Original version.
 #     2-JUN-1997 (PDRAPER):
 #        Added ITCL_LIBRARY for itcl2.0 support.
+#     10-OCT-2000 (MBT):
+#        Modified for use with Tcl8.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -157,11 +160,10 @@ if test -r $CCDPACK_DIR/CCDMain.tcl ; then
     oldkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
 
 #  And run up the interface.
-    $CCDPACK_DIR/ccdwish -f $CCDPACK_DIR/CCDMain.tcl ${1+"$@"}
+    $CCDPACK_DIR/ccdwish $CCDPACK_DIR/CCDMain.tcl ${1+"$@"}
 
 #  Trap pids of any new KAPPA processes.
     newkappa=`ps | grep kappa | grep -v grep | awk '{print $1}'`
-
 
 #  Kill any new processes.
     for newpid in "$newkappa"; do
