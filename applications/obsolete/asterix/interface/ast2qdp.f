@@ -120,7 +120,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2QDP Version 2.2-0' )
+        PARAMETER		( VERSION = 'AST2QDP Version rb test' )
 
 *  Local Variables:
       CHARACTER*80              LABEL              	!
@@ -195,11 +195,12 @@
 *  Check axis data and widths
       IF ( .NOT. PRIM ) THEN
         CALL BDI_AXCHK( IFID, 1, 'Data', AOK, STATUS )
-        CALL BDI_AXCHK( IFID, 1, 'Width', AWOK, STATUS )
         IF ( .NOT. AOK ) THEN
           CALL MSG_PRNT( 'No axis values present in input, will use'/
      :                   /' pixel number instead' )
           AWOK = .FALSE.
+        ELSE
+          AWOK = .TRUE.
         END IF
       ELSE
         AOK = .FALSE.
@@ -215,6 +216,10 @@
 *  Widths
       IF ( AWOK ) THEN
         CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', AWPTR, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          AWOK = .FALSE.
+        END IF
       END IF
 
 *  Map quality
@@ -245,7 +250,7 @@
       CALL BDI_GET0C( IFID, 'Title', TITLE, STATUS )
       IF ( TITLE .GT. ' ' ) THEN
         CALL MSG_SETC( 'LAB', TITLE )
-        CALL AIO_WRITE( OID, 'LAB T "^LAB"', STATUS )
+        CALL AIO_WRITE( OID, 'LABEL T "^LAB"', STATUS )
       END IF
 
 *  X axis label and units
@@ -255,10 +260,10 @@
         IF ( UNITS .GT. ' ' ) THEN
           CALL MSG_SETC( 'LAB', LABEL )
           CALL MSG_SETC( 'UNIT', UNITS )
-          CALL AIO_WRITE( OID, 'LAB X "^LAB (^UNIT)"', STATUS )
+          CALL AIO_WRITE( OID, 'LABEL X "^LAB (^UNIT)"', STATUS )
         ELSE
           CALL MSG_SETC( 'LAB', LABEL )
-          CALL AIO_WRITE( OID, 'LAB X "^LAB"', STATUS )
+          CALL AIO_WRITE( OID, 'LABEL X "^LAB"', STATUS )
         END IF
       END IF
 
@@ -269,10 +274,10 @@
         IF ( UNITS .GT. ' ' ) THEN
           CALL MSG_SETC( 'LAB', LABEL )
           CALL MSG_SETC( 'UNIT', UNITS )
-          CALL AIO_WRITE( OID, 'LAB Y "^LAB (^UNIT)"', STATUS )
+          CALL AIO_WRITE( OID, 'LABEL Y "^LAB (^UNIT)"', STATUS )
         ELSE
           CALL MSG_SETC( 'LAB', LABEL )
-          CALL AIO_WRITE( OID, 'LAB Y "^LAB"', STATUS )
+          CALL AIO_WRITE( OID, 'LABEL Y "^LAB"', STATUS )
         END IF
       END IF
 
