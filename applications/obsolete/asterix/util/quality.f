@@ -512,7 +512,7 @@
         ELSE
           CALL QUALITY_GETQV( 'QVAL', 'New quality value', QVAL,
      :                                           BQVAL, STATUS )
-          TEXT(1) = '     QUALITY set to '//QVAL
+          TEXT(1) = 'QUALITY set to '//QVAL
         END IF
         CALL QUALITY_SET( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                     STATUS )
@@ -521,38 +521,38 @@
         BQVAL = QUAL__IGNORE
         CALL QUALITY_OR( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                    STATUS )
-        TEXT(1) = '     IGNORE mode'
+        TEXT(1) = 'IGNORE mode'
 
       ELSE IF ( Q_RESTORE ) THEN
         BQVAL = BIT_NOTUB(QUAL__IGNORE)
         CALL QUALITY_AND( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                     STATUS )
-        TEXT(1) = '     RESTORE mode'
+        TEXT(1) = 'RESTORE mode'
 
       ELSE IF ( Q_AND ) THEN
         CALL QUALITY_GETQV( 'QVAL', 'Value for AND operation', QVAL,
      :                                               BQVAL, STATUS )
         CALL QUALITY_AND( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                     STATUS )
-        TEXT(1) = '     QUALITY ANDed with '//QVAL
+        TEXT(1) = 'QUALITY ANDed with '//QVAL
 
       ELSE IF ( Q_OR ) THEN
         CALL QUALITY_GETQV( 'QVAL', 'Value for OR operation', QVAL,
      :                                              BQVAL, STATUS )
         CALL QUALITY_OR( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                    STATUS )
-        TEXT(1) = '     QUALITY ORed with '//QVAL
+        TEXT(1) = 'QUALITY ORed with '//QVAL
 
       ELSE IF ( Q_EOR ) THEN
         CALL QUALITY_GETQV( 'QVAL', 'Value for EOR operation', QVAL,
      :                                               BQVAL, STATUS )
         CALL QUALITY_EOR( NELM, BQVAL, %VAL(CPTR), %VAL(QPTR), NCH,
      :                                                     STATUS )
-        TEXT(1) = '     QUALITY EORed with '//QVAL
+        TEXT(1) = 'QUALITY EORed with '//QVAL
 
       ELSE IF ( Q_NOT ) THEN
         CALL QUALITY_NOT( NELM, %VAL(CPTR), %VAL(QPTR), NCH, STATUS )
-        TEXT(1) = '     QUALITY complemented'
+        TEXT(1) = 'QUALITY complemented'
 
       END IF
 
@@ -580,7 +580,7 @@
       CALL HSI_ADD( OFID, VERSION, STATUS )
       NLINES = 1
       IF ( QSEL ) THEN
-        TEXT(2) = ' Only points having QUALITY = '//MODQUAL//' altered'
+        TEXT(2) = 'Only points having QUALITY = '//MODQUAL//' altered'
         NLINES  = 2
       END IF
 
