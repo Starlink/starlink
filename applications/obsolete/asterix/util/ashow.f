@@ -107,8 +107,10 @@
 *  Local Constants:
       INTEGER			IC_WCS
         PARAMETER ( IC_WCS = 1 )
+      INTEGER			IC_MIS
+        PARAMETER ( IC_MIS = 2 )
       INTEGER			IC_ALL
-        PARAMETER ( IC_ALL = IC_WCS )
+        PARAMETER ( IC_ALL = IC_WCS+IC_MIS )
 
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'ASHOW Version 1.8-0' )
@@ -151,6 +153,9 @@
           IF ( CHR_INSET( ITEM, 'WCS' ) ) THEN
             ITEMC = ITEMC + IC_WCS
 
+          ELSE IF ( CHR_INSET( ITEM, 'MISS' ) ) THEN
+            ITEMC = ITEMC + IC_WCS
+
 *      Otherwise error
           ELSE
             CALL MSG_SETC( 'ITEM', ITEM )
@@ -176,6 +181,11 @@
 *    World coordinates?
         IF ( IAND( ITEMC, IC_WCS ) .NE. 0 ) THEN
           CALL ASHOW_WCS( IFID, OCH, STATUS )
+        END IF
+
+*    Mission strings?
+        IF ( IAND( ITEMC, IC_MIS ) .NE. 0 ) THEN
+          CALL ASHOW_MIS( IFID, OCH, STATUS )
         END IF
 
       END IF
@@ -384,5 +394,151 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_WCS', STATUS )
+
+      END
+
+
+      SUBROUTINE ASHOW_WCS( IFID, OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_WCS
+
+*  Purpose:
+*     Display world coordinates data
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_WCS( [p]... )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
+*        {argument_description}
+*     STATUS = INTEGER ({status_access_mode})
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      INTEGER			IFID			! Input dataset id
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*50		STR
+
+      INTEGER			NVAL			! Values read from obj
+      INTEGER			DETID			! DCI info
+
+      LOGICAL			THERE			! Object exists?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Load mission strings
+      CALL DCI_GETID( IFID, DETID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Write heading
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL AIO_IWRITE( OCH, 2, 'Mission Description Strings :', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  The observation details
+      CALL AIO_IWRITE( OCH, 4, 'Observation Details :', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL ADI_CGET0C( DETID, 'Observer', STR, STATUS )
+      CALL MSG_SETC( 'OBS', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Observer        : ^OBS', STATUS )
+      CALL ADI_CGET0C( DETID, 'Target', STR, STATUS )
+      CALL MSG_SETC( 'TARG', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Target          : ^TARG', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  The hardware
+      CALL AIO_IWRITE( OCH, 4, 'Instrument Configuration :', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+      CALL ADI_CGET0C( DETID, 'Mission', STR, STATUS )
+      CALL MSG_SETC( 'MISSION', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Mission         : ^MISSION', STATUS )
+      CALL ADI_CGET0C( DETID, 'Instrument', STR, STATUS )
+      CALL MSG_SETC( 'INSTRUM', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Instrument      : ^INSTRUM', STATUS )
+      CALL ADI_CGET0C( DETID, 'Detector', STR, STATUS )
+      CALL MSG_SETC( 'DET', STR )
+      CALL AIO_IWRITE( OCH, 6, 'Detector        : ^DET', STATUS )
+      CALL AIO_BLNK( OCH, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_MIS', STATUS )
 
       END
