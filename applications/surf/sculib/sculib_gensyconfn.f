@@ -81,6 +81,10 @@
 *        Original version.
 *      3-MAY-1991 (REVAD::JFL): Comments and description updated.
 *     12-OCT-1995 (jfl@roe.ac.uk): Renamed to SCULIB_GENSYCONFN.
+*      6-JAN-1997 (jfl@roe.ac.uk): Changed calculation of SUMT, added in
+*                                  contribution from more delta functions 
+*                                  beyond the ends of the convolution
+*                                  function range.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -141,20 +145,18 @@
 *  In principle the convolution function has infinite length but the
 *  delta functions far off have such a small effect that they can be ignored.
 *  Therefore, take into account only those delta functions covered by the
-*  length of the convolution function plus 3 outside it.
+*  length of the convolution function plus 5 outside it.
 
-      NSINC = INT (REAL(NPIX) / PIXBSEP) + 3  ! no deltas on + side of origin
+      NSINC = INT (REAL(NPIX) / PIXBSEP) + 5  ! no. deltas on + side of origin
       NDELTA = NSINC*2 + 1                    ! total number over whole fn
 
 *  cycle through pixels in convolution function
 
-      SUMT = 0
       DO I = 1, NCFN
-
-         DX = I-NPIX                       ! position in pixels rel to centre
-         SUM = 0
-         B1 = 0.0 - REAL(NSINC)*PIXBSEP   ! position of first delta in pixels
-*                                            rel to centre
+         DX = REAL (I-NPIX)                ! position in pixels rel to centre
+         SUM = 0.0
+         B1 = 0.0 - REAL(NSINC)*PIXBSEP    ! position of first delta in pixels
+                                           ! rel to centre
 
 *  then, for each delta function...
 
@@ -165,24 +167,25 @@
 
             SUM = SUM + SINC(DX-B1)
             B1 = B1 + PIXBSEP
-
          END DO
 
 *  the delta functions are negative
 
          CONF(I) = - SUM
-         SUMT = SUMT + SUM
-
       END DO
 
 *  calculate area under half the convolution function (same length as map)
 
-      SUMT = SUMT * REAL(NPIX) / REAL(NCFN)
+      SUMT = 0.0
+      DO I = 1, NPIX
+         SUMT = SUMT + CONF(I)
+      END DO
 
 *  normalize the convolution function so that sum over map length is -1
 
       DO I = 1, NCFN
          CONF(I) = CONF(I) / SUMT
+         conf(i) = 0.0
       END DO
 
 * !!! now add in the first component of the convolution function as described
