@@ -19,6 +19,8 @@
 #     	 Original version.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     11-OCT-2000 (MBT):
+#        Modified to accommodate changes from IDI to Tcl GUI.
 #     {enter_changes_here}
 
 #-
@@ -47,114 +49,20 @@
             prompt {Names for output lists}
             default *.DAT
             helpkey *
-          }
-
-         parameter device {
-                           # Name of IDI device
-            position 3
-            ptype DEVICE
-            access READ
-            vpath GLOBAL PROMPT CURRENT DEFAULT
-            ppath GLOBAL CURRENT DEFAULT
-            association <->GLOBAL.IMAGE_DISPLAY
-            default xwindows
-            prompt {Name of display device}
-            helpkey *
-          }
+         }
 
          parameter percentiles {
-                                # Percentage histogram range
-            position 4
+                                # Display percentile values
+            position 3
             type _DOUBLE
-            access READ
-            vpath PROMPT CURRENT DEFAULT
+            access UPDATE
+            vpath CURRENT PROMPT
             ppath CURRENT DEFAULT
             default 2 98
             prompt {Display percentiles}
             helpkey *
             size *
-          }
-
-         parameter palfrac {
-                            # Fraction of display surface used
-            type _DOUBLE
-                        #	for palette (X)
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default 0.25D0
-            prompt {Fraction of display surface for palette}
-            helpkey *
-          }
-
-         parameter fillfrac {
-                             # Fraction of scratch area which an
-				 # image may fill.
-            type _DOUBLE
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default 0.55D0
-            prompt {Fraction of scratch area for displayed image}
-            helpkey *
-          }
-
-         parameter keeplut {
-                            # Keep current look-up-table?
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default TRUE
-            prompt {Keep the current Look-Up-Table}
-            helpkey *
-          }
-
-         parameter makebig {
-                            # Make images big enough to fill area aways
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default TRUE
-            prompt {Make images as big as possible}
-            helpkey *
-          }
-
-         parameter msize {
-                          # Size of marker as fraction of display
-				 # width
-            type _REAL
-            access READ
-            vpath CURRENT DEFAULT PROMPT
-            ppath CURRENT DEFAULT
-            default 0.03
-            prompt {Relative size of feature marker (0-1)}
-            helpkey *
-          }
-
-         parameter thick {
-                          # Line thickness
-            type _INTEGER
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default 3
-            prompt {Feature marker thickness}
-            helpkey *
-          }
-
-         parameter memory {
-                           # Memory id
-            type _INTEGER
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default 0
-            range 0 1
-            prompt {Memory id}
-            helpkey *
-          }
+         }
 
          parameter namelist {
             type LITERAL
@@ -188,6 +96,51 @@
             default CCDPACK.LOG
             helpkey *
           }
+
+         parameter zoom {
+                         # Zoom factor
+            type _DOUBLE
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Number of screen pixels per NDF pixel}
+            helpkey *
+         }
+
+         parameter maxcanv {
+                            # Maximum dimension of display region
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 500
+            prompt {Maximum X or Y dimension of scrolled display region}
+            helpkey *
+         }
+
+         parameter winx {
+                         # Window X dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 200
+            prompt {Width of display window in pixels}
+            helpkey *
+         }
+
+         parameter winy {
+                         # Window Y dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 300
+            prompt {Height of display window in pixels}
+            helpkey *
+         }
+
 
       }
 

@@ -19,38 +19,25 @@
 #     	 Original version.
 #     6-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
-#     29-AUG-2000 (MBT):
-#        Removed CCDNDFAC parameters since CCDALIGN no longer calls this
-#        Atask routine.
+#     11-OCT-2000 (MBT):
+#        Modified to accommodate change from IDI to Tcl GUI.
 #     {enter_changes_here}
 
 #-
          helplib {$CCDPACK_HELP}
 
-         parameter device {
-                           # Name of display device.
-            position 1
-            type _CHAR
-            access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default xw
-            prompt {Name of display device}
-            helpkey *
-          }
-
          parameter percentiles {
-                                # Percentage histogram range
+                                # Display percentile values
             position 2
-            type _REAL
-            access READ
-            vpath PROMPT CURRENT DEFAULT
+            type _DOUBLE
+            access UPDATE
+            vpath CURRENT PROMPT
             ppath CURRENT DEFAULT
             default 2 98
             prompt {Display percentiles}
             helpkey *
             size *
-          }
+         }
 
          parameter in {
                        # Single input group
@@ -61,36 +48,6 @@
             ppath CURRENT DEFAULT
             prompt {List of NDFs}
             default !
-            helpkey *
-          }
-
-         parameter hardcopy {
-            type _LOGICAL
-            access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Do you want a hardcopy of the image display}
-            default TRUE
-            helpkey *
-          }
-
-         parameter harddev {
-            type _CHAR
-            access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Hardcopy device}
-            default ps_p
-            helpkey *
-          }
-
-         parameter printcmd {
-            type _CHAR
-            access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Command to use to print snapshot.ps}
-            default {lpr snapshot.ps}
             helpkey *
           }
 
@@ -114,6 +71,50 @@
             range 1 5
             helpkey *
           }
+
+         parameter zoom {
+                         # Zoom factor
+            type _DOUBLE
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Number of screen pixels per NDF pixel}
+            helpkey *
+         }
+
+         parameter maxcanv {
+                            # Maximum dimension of display region
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1280
+            prompt {Maximum X or Y dimension of scrolled display region}
+            helpkey *
+         }
+
+         parameter winx {
+                         # Window X dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 200
+            prompt {Width of display window in pixels}
+            helpkey *
+         }
+
+         parameter winy {
+                         # Window Y dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 300
+            prompt {Height of display window in pixels}
+            helpkey *
+         }
 
          parameter logto {
                           # Logging system interaction level

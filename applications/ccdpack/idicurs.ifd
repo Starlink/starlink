@@ -16,129 +16,95 @@
 
 #  History:
 #     8-JUL-1992 (PDRAPER):
-#     	 Original version.
+#        Original version.
 #     7-MAY-1999 (MBT):
 #        Generated IFD file from IFL file.
+#     20-JUL-2000 (MBT):
+#        Rewrote to accommodate change from IDI to Tcl GUI.
 #     {enter_changes_here}
-
 #-
 
          helplib {$CCDPACK_HELP}
 
-         parameter outlist {
-                            # Name of output list
+         parameter in {
+                       # Group of NDFs to be examined
             position 1
             type LITERAL
             access READ
-            vpath PROMPT CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default IDICURS.LIS
-            prompt {Filename for output list}
+            vpath CURRENT PROMPT
+            ppath CURRENT
+            prompt {NDF to associate with positions}
             helpkey *
-          }
+         }
 
-         parameter device {
-                           # Name of the device.
+         parameter outlist {
+                            # Files to use for output position lists
             position 2
-            type DEVICE
-            access READ
-            vpath GLOBAL PROMPT CURRENT DEFAULT
-            ppath GLOBAL CURRENT DEFAULT
-            association <->GLOBAL.IMAGE_DISPLAY
-            default xwindows
-            prompt {X display device}
-            helpkey *
-          }
-
-         parameter in {
-                       # NDFs to have extensions updated
             type LITERAL
             access READ
+            vpath CURRENT PROMPT
+            ppath CURRENT DEFAULT
+            default *.lis
+            prompt {Output file for positions}
+            helpkey *
+         }
+
+         parameter percentiles {
+                                # Display percentile values
+            type _DOUBLE
+            access UPDATE
+            vpath CURRENT PROMPT
+            ppath CURRENT DEFAULT
+            default 2 98
+            prompt {Display percentiles}
+            helpkey *
+            size *
+         }
+
+         parameter zoom {
+                         # Zoom factor
+            type _DOUBLE
+            access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default !
-            prompt {List of NDFs to associate with positions}
+            default 1
+            prompt {Number of screen pixels per NDF pixel}
             helpkey *
-          }
+         }
 
-         parameter keeplut {
-                            # Keep current look-up-table?
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default TRUE
-            prompt {Keep the current Look-Up-Table}
-            helpkey *
-          }
-
-         parameter scroll {
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Enable scrolling when zoomed}
-            helpkey *
-          }
-
-         parameter arrows {
-            type _LOGICAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default FALSE
-            prompt {Use keyboard arrows for controlling scroll}
-            helpkey *
-          }
-
-         parameter colour {
-                           # Marker colour
+         parameter maxcanv {
+                            # Maximum dimension of display region
             type _INTEGER
-            access READ
+            access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 3
-            range 0 4
-            prompt {Marker colour index (0-4)}
+            default 1280
+            prompt {Maximum X or Y dimension of scrolled display region}
             helpkey *
-          }
+         }
 
-         parameter msize {
-                          # Size of marker as fraction of display
-                                 # width
-            type _REAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default 0.03
-            prompt {Relative size of marker (0-1)}
-            helpkey *
-          }
-
-         parameter thick {
-                          # Line thickness
+         parameter winx {
+                         # Window X dimension
             type _INTEGER
-            access READ
+            access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 3
-            prompt {Line thickness}
+            default 200
+            prompt {Width of display window in pixels}
             helpkey *
-          }
-
-         parameter memory {
-                           # Memory id
+         }
+            
+         parameter winy {
+                         # Window Y dimension
             type _INTEGER
-            access READ
+            access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 0
-            range 0 1
-            prompt {Memory id}
+            default 300
+            prompt {Height of display window in pixels}
             helpkey *
-          }
-
+         }
+            
          parameter logto {
                           # Logging system interaction level
             type LITERAL
@@ -163,5 +129,4 @@
             helpkey *
           }
 
-      }
-# $Id$
+       }
