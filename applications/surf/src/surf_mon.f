@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.22  1997/10/14 18:55:26  jfl
+*     added despike
+*
 *     Revision 1.21  1997/06/13 00:41:44  timj
 *     Change all subroutines to SURF_
 *
@@ -144,6 +147,10 @@ c
 
          CALL SURF_CHGQUAL (STATUS)
 
+      ELSE IF (NAME .EQ. 'DESPIKE') THEN
+
+         CALL SURF_DESPIKE (STATUS)
+
       ELSE IF (NAME .EQ. 'EXTINCTION') THEN
 
          CALL SURF_EXTINCTION (STATUS)
@@ -179,6 +186,7 @@ c
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
          CALL SURF_REDUCE_SWITCH (STATUS)
+
       ELSE IF (NAME .EQ. 'REMSKY') THEN
 
          CALL SURF_REMSKY (STATUS)
