@@ -1321,6 +1321,7 @@ astOffset( this, point1, point2, offset )
   double * bb;
   double * point3;
   int i;
+  AV * myoffset;
  PPCODE:
   naxes = astGetI( this, "Naxes" );
 
@@ -1343,13 +1344,17 @@ astOffset( this, point1, point2, offset )
   )
 
   /* now need to push the resulting values onto the return stack */
+  /* Put everything in an array [rather than the stack] in order to
+     be consistent in returning C arrays as perl arrays. */
+  myoffset = newAV();
   for (i =0; i < naxes; i++ ) {
-    XPUSHs(sv_2mortal(newSVnv(point3[i])));
+    av_push( myoffset, newSVnv( point3[i] ));
   }
+  XPUSHs( newRV_noinc( (SV*)myoffset ));
 
-# This method technically returns an angle and a pair of coordinates
-# We could return this as a list of the angle and ref to array.
-# Currently return 3 numbers - XXXX
+
+
+# Returns angle and reference to array of pair of coordinates
 
 void
 astOffset2( this, point1, angle, offset )
@@ -1363,6 +1368,7 @@ astOffset2( this, point1, angle, offset )
   double * point2;
   int i;
   double RETVAL;
+  AV * myoffset;
  PPCODE:
   naxes = astGetI( this, "Naxes" );
 
@@ -1382,10 +1388,14 @@ astOffset2( this, point1, angle, offset )
   /* Push the angle on to the stack */
   XPUSHs(sv_2mortal(newSVnv(RETVAL)));
 
-  /* now need to push the resulting values onto the return stack */
+  /* Put everything in an array [rather than the stack] in order to
+     be consistent in returning C arrays as perl arrays. */
+  myoffset = newAV();
   for (i =0; i < naxes; i++ ) {
-    XPUSHs(sv_2mortal(newSVnv(point2[i])));
+    av_push( myoffset, newSVnv( point2[i] ));
   }
+  XPUSHs( newRV_noinc( (SV*)myoffset ));
+
 
 void
 astPermAxes( this, perm )
