@@ -99,7 +99,7 @@ require AutoLoader;
 			/],
 
 		'misc'=>[qw/mem2string string2mem array2mem mem2array
-			 par_get
+			 par_get fits_read_header
 			 fits_get_nth_item fits_get_item fits_extract_key_val
 			 fits_construct_string/]
 	       );
@@ -373,6 +373,119 @@ sub par_get ($$$) {
 
 ######### F I T S #########
 
+# Routine to read the fits header from an NDF
+#
+#  Input arguments: NDF name (no sdf)
+#  Returns:         Reference to %header, The starlink status
+
+sub fits_read_header ($) {
+
+  use strict;
+
+  croak 'Usage: ($hashref, $status) = fits_read_header($file)'
+    if $#_!=0;
+
+  # Variable declarations
+  my ($indf, $xloc, %fitsitem, $status);
+  
+  my $task = "NDF::fits_read_header";
+
+  my $file = shift;
+
+  # Strip trailing .sdf if one is present
+  # File is the first thing before a .
+  $file =~ s/\.sdf$//;
+
+  # Setup good status
+  my $good = $status = &SAI__OK;
+
+  # Begin NDF and ERR sessions
+  err_begin($status);
+  ndf_begin();
+
+  # Open the file
+  ndf_find(&DAT__ROOT(), $file, $indf, $status);
+
+  if ($status == $good) {
+    
+    # Find the FITS extension
+    ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+
+    if ($status == $good) {
+
+      # Variables...
+      my (@dim, $ndim, $nfits, $maxdim);
+
+      # Get the dimensions of the FITS array
+      # Should only be one-dimensional
+      $maxdim = 7;
+      dat_shape($xloc, $maxdim, \@dim, $ndim, $status);
+
+      if ($status == $good) {
+ 
+	if ($ndim != 1) {
+	  $status = &SAI__ERROR;
+	  err_rep(' ',"$task: Dimensionality of FITS array should be 1 but is $ndim", $status);
+
+	}
+
+      }
+
+      # Set the FITS array to empty
+      my @fits = ();   # Note that @fits only exists in this block
+
+      # Read the FITS extension
+      dat_get1c($xloc, $dim[0], \@fits, $nfits, $status);
+
+      # Check status and read into hash
+      if ($status == $good) {
+
+	my $i = 0;
+
+	for ($i = 0; $i < $nfits; $i++) {
+	  my ($item, $value, $comment) = fits_get_nth_item(\@fits,$i);
+	  $fitsitem{$item} = $value;
+	}
+
+      } else {
+	
+	err_rep(' ',"$task: Error reading FITS array", $status);
+
+      }
+
+      # Anull the locator
+      dat_annul($xloc, $status);
+
+    } else {
+
+      # Add my own message to status
+      err_rep(' ', "$task: Error locating FITS extension",
+	     $status);
+
+    }
+
+    # Close the NDF identifier
+    ndf_annul($indf, $status);
+
+  } else {
+    
+    # An error message to make sure we got here
+    err_rep(' ',"$task: Error opening NDF file", $status);
+
+  }
+
+
+  # End NDF and ERR
+  ndf_end($status);
+  err_end($status);
+
+  # Return the hash and status
+  # Note that the hash may be empty if status was bad
+  return \%fitsitem, $status;
+
+}
+
+
  
 # Routine to extract nth FITS value and keyword from FITS array
 #
@@ -427,9 +540,15 @@ sub fits_extract_key_val ($) {
   my $fits_entry = shift;
   my ($keyword, $value, $comment);
 
+  undef $value;
+
   $keyword = $value = $comment = undef;
   # Extract the value
   ($keyword, $value, $comment) = split(/=|\s\//,$fits_entry);
+
+  # Return if no value
+  return ($keyword, undef, undef) unless defined $value;
+
 
   # Tidy up the keyword
   $keyword =~ s/\s//g;    # Remove white space
@@ -478,16 +597,15 @@ sub fits_construct_string ($$$) {
 
   return $fitsent;
 }
- 
- 
+
+  
 1;
 __END__
 # This is the documentation
 
 =head1 NAME
 
-NDF - Perl extension for accessing Starlink N-dimensional data structures
-(NDFs)
+NDF - Perl extension for accessing Starlink N-dimensional data structures (NDFs)
 
 =head1 SYNOPSIS
 
@@ -684,6 +802,14 @@ Remember that perl has associative arrays, such that
 
 So that C<'print "$fitsitem{'INSTRUME'}\n";'> will print SCUBA.
 
+A general routine exists for reading the FITS header. fits_read_header
+reads the FITS extension and returns the reference to a hash array:
+
+  ($hashref, $status) = fits_read_header($file);
+
+The FITS entries can then be accessed as $$hashref{'ITEM'}.
+This takes the filename as an argument and returns the Starlink status.
+
 
 =head1 NOTES
 
@@ -751,6 +877,7 @@ returns the current data set (stored in GLOBAL.sdf). Note that the
 data is returned in an array context. The routine returns without
 action if $status is not set to SAI__OK on entry.
 
+For direct access to ADAM monoliths and parameters see L<Starlink::ADAMTASK (3)>.
 
 =head1 Implemented routines
 
@@ -816,7 +943,8 @@ cmp_type cmp_unmap
 =item :misc
 
 mem2string string2mem array2mem mem2array fits_get_nth_item
-fits_get_item fits_extract_key_val fits_construct_string par_get
+fits_read_header fits_get_item fits_extract_key_val 
+fits_construct_string par_get
 
 
 =back
