@@ -101,9 +101,6 @@
       set maxleng 0
       foreach ns $NDFSETS {
          incr nndfset
-         if { [ llength $ns ] > 2 || [ lindex $ns 0 ] != [ lindex $ns 1 ] } {
-            set ns [ lreplace $ns 0 0 "set:[ lindex $ns 0 ]" ]
-         }
          set ndfset [ eval ndfset $ns ]
          set ndfsets($nndfset) $ndfset
          lappend ndfsetlist $ndfset
@@ -297,7 +294,7 @@
    "When this is done, the image will be displayed in the upper part of" \
    "the window on that side, and some information about it in the lower part." \
    "" \
-   "Normally images are plotted when they are selected, which may be slow.",
+   "Normally images are plotted when they are selected, which may be slow." \
    "Clicking the `Pre-plot' button causes all the images to be plotted" \
    "straight away, so subsequent selections are (almost) instantaneous." \
    "" \
