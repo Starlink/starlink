@@ -1,7 +1,7 @@
       SUBROUTINE KPG1_GTNDF( PARAM, NDIM, EXACT, MODE, INDF, SDIM, 
      :                       SLBND, SUBND, STATUS )
 *+
-* Name:
+*  Name:
 *     KPG1_GTNDF
 
 *  Purpose:

@@ -1,6 +1,6 @@
       SUBROUTINE KPG1_GDPUT( IPIC, WDOM, DDOM, IPLOT, STATUS ) 
 *+ 
-* Name: 
+*  Name: 
 *     KPG1_GDPUT
 
 *  Purpose:

@@ -390,33 +390,36 @@ codes are:
 \item [l] - Logical 
 \end{description}
 
-\section{Finding the Routines you Need}
-The heading for each KAPLIBS routine in
-\latexelsehtml{Appendix~\ref{ro:full}}{the \htmlref{Routine Descriptions
-section}{ro:full}} includes a short description of the routine. The {\tt
-kplsearch} command will display a list of the KAPLIBS routines which
-contain a given search phrase (or any sub-string of the search phrase)
-within this short descriptive heading. Thus:
+\section{\xlabel{search}Finding the Routines you Need}
+\begin{latexonly}
+
+   The hypertext version of this document contains a tool which allows
+   the reference documentation to be searched for given words or phrases
+   in a versatile manner, reporting the names of routines which match the
+   given criteria. This provides a potentially powerfull method for
+   finding the routines you need. To access the tool, do:
 
 \small
 \begin{verbatim}
-   % kplsearch "pgplot wcs" 
+   % showme sun238 search
 \end{verbatim}
 \normalsize
 
-will search for routines which contain either or both of the words
-``pgplot'' and ``wcs'' within their short descriptions. The results are
-usually ordered by relevance, but can be ordered alphabetically by
-including the ``{\tt -alpha}'' option on the command.
+\end{latexonly}
 
-For more help, including descriptions of all the available options, type:
+\begin{htmlonly}
+  \begin{rawhtml} 
+    <SCRIPT LANGUAGE=JavaScript>
+       open( "./search.html" );
+    </SCRIPT>
+  \end{rawhtml}
 
-\small
-\begin{verbatim}
-   % kplsearch -help
-\end{verbatim}
-\normalsize
+   Use the pop-up window to search for KAPLIBS routines which match your
+   requirements. Matching routines will appear at the right hand side of
+   the pop-up window. Clicking on the name of a matching routine will
+   display the full documentation for that routine in this window.
 
+\end{htmlonly}
 
 \section{Compiling and Linking}
 To compile and link an application with the KAPLIBS package, the following
