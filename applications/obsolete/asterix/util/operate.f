@@ -328,7 +328,7 @@
       IF ( (NBAD.GT.0) .AND. .NOT. QOK ) THEN
         CALL BDI_PUT( OFID, 'Quality', 'UBYTE', 1, NELM, %VAL(QPTR),
      :                STATUS )
-        CALL BDI_PUT0I( OFID, 'QualityMask', MASK, STATUS )
+        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, MASK, STATUS )
       END IF
 
 *  Amend data label if present
