@@ -7019,6 +7019,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSHeaderSource.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/HdxInputNameParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/InputNameParser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDMEMSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDTXTSpecDataImpl.java
@@ -7074,6 +7075,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotPanner.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotPannerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotStyleBox.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotTableModel.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotWindowOrganizer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ProxySetupFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SelectTextField.java
@@ -7093,12 +7095,14 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowserMain.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatLookAndFeelManager.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatName.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatPlotTable.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSplash.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRange.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRangesModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRangesView.java
@@ -7285,6 +7289,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/Sort.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatException.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServices.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/TreeviewAccess.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtGenerator.java
