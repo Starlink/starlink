@@ -132,27 +132,37 @@ Not Yet Implemented.
 
 These methods will work on all classes of AST objects.
 
-
-
 =head2 Mapping methods
+
+TODO
 
 =head2 FrameSet methods
 
+TODO
+
 =head1 EXCEPTIONS
 
-Rather than using the C<astOK> function provided to the C interface (which
-is not thread safe) AST errors are converted to Perl exceptions which can
-be caught with an eval.
+Rather than using the C<astOK> function provided to the C interface
+(which is not thread safe) AST errors are converted to Perl exceptions
+(currently croaks) which can be caught with an eval.
 
 =head1 TODO
 
  + Convert AST croaks to true exceptions of class Starlink::AST::Error
 
- + Provide interface to the plotting routines
+ + Tidy up the interfaces to the constructors
+
+ + Properly document the Perl interface
+
+ + Finalise the interface
+
+=head1 SEE ALSO
+
+The AST library can be downloaded from http://www.stalrink.ac.uk/ast
 
 =head1 AUTHOR
 
-Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt>
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 Copyright (C) 2004 Tim Jenness. All Rights Reserved.
 
