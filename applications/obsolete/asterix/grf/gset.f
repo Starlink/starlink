@@ -11,6 +11,7 @@
 *      24 Nov 94 : 1.7-5 SUPPRESS added (RJV)
 *      10 Feb 95 : 1.8-0 open in READ mode for SHOW or DUMP (RJV)
 *      12 Sep 95 : 2.0-0 ADI port (DJA)
+*      28 Nov 95 : 2.0-1 FUNC switch added (RJV)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -27,7 +28,7 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GSET Version 2.0-0')
+      PARAMETER (VERSION='GSET Version 2.0-1')
 *    Local variables :
       CHARACTER*10 SWITCH
       CHARACTER*20 CONTEXT
@@ -286,6 +287,13 @@
           CALL GSET_KEY_CANCEL(LIVE,NSEL,NDFS,STATUS)
         ELSE
           CALL GSET_KEY_SET(LIVE,NSEL,NDFS,STATUS)
+        ENDIF
+*  superimposed function
+      ELSEIF (SWITCH.EQ.'FUN') THEN
+        IF (CANCEL) THEN
+          CALL GSET_FUNC_CANCEL(LIVE,NSEL,NDFS,STATUS)
+        ELSE
+          CALL GSET_FUNC_SET(LIVE,NSEL,NDFS,STATUS)
         ENDIF
 *  ID stamp
       ELSEIF (SWITCH.EQ.'STA') THEN
@@ -1091,6 +1099,169 @@
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL AST_REXIT( 'GSET_STAMP_SET',STATUS)
+        ENDIF
+
+      ENDIF
+      END
+
+
+
+*+
+      SUBROUTINE GSET_FUNC_CANCEL(LIVE,NSEL,NDFS,STATUS)
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+      LOGICAL LIVE
+      INTEGER NSEL
+      INTEGER NDFS(*)
+*    Import-export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Local Constants :
+*    Local variables :
+      CHARACTER*12 NAME
+      INTEGER I
+      INTEGER ISEL,GFID
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        DO ISEL=1,NSEL
+
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
+
+          CALL GCB_CANL('FUNC_FLAG',STATUS)
+          CALL GCB_CANI('FUNC_STYLE',STATUS)
+          CALL GCB_CANI('FUNC_WIDTH',STATUS)
+          CALL GCB_CANI('FUNC_COLOUR',STATUS)
+          CALL GCB_CANC('FUNC_TYPE',STATUS)
+          NAME='FUNC_PAR'
+          DO I=1,6
+            WRITE(NAME(9:9),'(I1)') I
+            CALL GCB_CANR(NAME,STATUS)
+          ENDDO
+
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
+
+        ENDDO
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL AST_REXIT('GSET_FUNC_CANCEL',STATUS)
+        ENDIF
+
+      ENDIF
+      END
+
+*+
+      SUBROUTINE GSET_FUNC_SET(LIVE,NSEL,NDFS,STATUS)
+
+*    Authors :
+*             (BHVAD::RJV)
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+      LOGICAL LIVE
+      INTEGER NSEL
+      INTEGER NDFS(*)
+*    Import-export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Local Constants :
+*    Local variables :
+      CHARACTER*6 TYPE
+      CHARACTER*12 NAME
+      REAL PAR(6)
+      INTEGER ISEL,GFID
+      INTEGER STYLE,WIDTH,COLOUR
+      INTEGER I,J
+      LOGICAL SETS,SETW,SETC,SETT,SETP(6)
+      LOGICAL MORE
+*-
+
+      SETS=.TRUE.
+      SETW=.TRUE.
+      SETC=.TRUE.
+      SETT=.TRUE.
+      DO I=1,6
+        SETP(I)=.TRUE.
+      ENDDO
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  get individual control parameters - NULL means no change
+        CALL GSET_GET0C( 'FUNC', SETT, TYPE, STATUS)
+        MORE=.TRUE.
+        I=1
+        NAME='PAR'
+        DO WHILE (MORE)
+          WRITE(NAME(4:4),'(I1)') I
+          CALL GSET_GET0R( NAME, SETP(I), PAR(I), STATUS)
+          IF (SETP(I)) THEN
+            I=I+1
+          ELSE
+            MORE=.FALSE.
+            DO J=I,6
+              SETP(J)=.FALSE.
+            ENDDO
+          ENDIF
+        ENDDO
+        CALL GSET_GET0I( 'STYLE', SETS, STYLE, STATUS )
+        CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
+        CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
+
+*  NSEL is set to 1 for LIVE mode or single dataset
+*  otherwise to number of NDFs selected from multiple dataset
+        DO ISEL=1,NSEL
+
+*      Load GCB
+          CALL GSET_LOAD_GCB(LIVE,ISEL,NDFS,GFID,STATUS)
+
+*  set new values
+          CALL GCB_SETL('FUNC_FLAG',.TRUE.,STATUS)
+
+          IF (SETT) THEN
+            CALL GCB_SETC('FUNC_TYPE',TYPE,STATUS)
+          ENDIF
+
+          DO I=1,6
+            NAME='FUNC_PAR'
+            IF (SETP(I)) THEN
+              WRITE(NAME(9:9),'(I1)') I
+              CALL GCB_SETR(NAME,PAR(I),STATUS)
+            ENDIF
+          ENDDO
+
+          IF (SETS) THEN
+            CALL GCB_SETI('FUNC_STYLE',STYLE,STATUS)
+          ENDIF
+
+          IF (SETW) THEN
+            CALL GCB_SETI('FUNC_WIDTH',WIDTH,STATUS)
+          ENDIF
+
+          IF (SETC) THEN
+            CALL GCB_SETI('FUNC_COLOUR',COLOUR,STATUS)
+          ENDIF
+
+*  resave if necessary
+          CALL GSET_RLSE_GCB( .TRUE., LIVE, GFID, STATUS )
+
+        ENDDO
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL AST_REXIT( 'GSET_FUNC_SET',STATUS)
         ENDIF
 
       ENDIF
