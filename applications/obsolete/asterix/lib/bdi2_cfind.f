@@ -352,7 +352,7 @@
 
 *      Try the next best option...
           IF ( CACHEID .EQ. ADI__NULLID ) THEN
-            CALL ADI2_CFIND( FITID, ' ', '.CRVAL'//CAX, ' ', CREATE,
+            CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
      :                       DELETE, 'REAL', 0, 0, DIDCRE, CACHEID,
      :                       STATUS )
 
