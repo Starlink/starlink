@@ -396,6 +396,7 @@
 
 *  Local Variables:
       CHARACTER DOMAIN*30        ! Domain containing vector positions
+      CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER JUST*6           ! Vector justification: CENTRE or START
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
       CHARACTER TITLE*80         ! Title from input catalogue
@@ -496,7 +497,7 @@
       CALL AST_BEGIN( STATUS )
 
 *  Open the input catalogue, and get its name.
-      CALL CAT_ASSOC( 'CAT', 'READ', CI, STATUS )
+      CALL CTG_ASSO1( 'CAT', 'READ', CI, FIELDS, STATUS )
 
 *  Get CAT identifiers for the columns which are to be used to define the 
 *  vector magnitudes, orientations, X and Y coordinates.

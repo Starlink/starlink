@@ -93,6 +93,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NAME*250         ! Catalogue specification
       INTEGER II                 ! CAT identifier for most recent part
       INTEGER FRM                ! Pointer to Base Frame
       INTEGER QI                 ! Identifier for a catalogue parameter
@@ -106,7 +107,7 @@
       FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
 
 *  Create the catalogue.
-      CALL CAT_CREAT( PARAM, CI, STATUS )
+      CALL CTG_CREA1( PARAM, CI, NAME, STATUS )
 
 *  If required, set the TITLE parameter.
       IF( TITLE .NE. ' ' ) THEN

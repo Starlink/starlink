@@ -185,6 +185,7 @@
       PARAMETER ( V_ID = 4 )
 
 *  Local Variables:
+      CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER METH*6           ! Binning method
       CHARACTER EXPR*(CAT__SZEXP)! CAT expression
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
@@ -269,7 +270,7 @@
       CALL NDF_BEGIN
 
 *  Open the input catalogue, and get its name.
-      CALL CAT_ASSOC( 'IN', 'READ', CI, STATUS )
+      CALL CTG_ASSO1( 'IN', 'READ', CI, FIELDS, STATUS )
 
 *  See if the output NDF is to be 2-dimensional.
       CALL PAR_GET0L( 'SHAPE', SHAPE, STATUS )

@@ -157,6 +157,7 @@
       PARAMETER ( DU_ID = 8 )
 
 *  Local Variables:
+      CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
       CHARACTER METH*6           ! Binning method
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
       CHARACTER STOKES*3         ! Identifiers for cube planes
@@ -247,7 +248,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Open the input catalogue, and get its name.
-      CALL CAT_ASSOC( 'IN', 'READ', CIIN, STATUS )
+      CALL CTG_ASSO1( 'IN', 'READ', CIIN, FIELDS, STATUS )
 
 *  Store the values of the required catalogue columns in work arrays.
 *  ==================================================================
