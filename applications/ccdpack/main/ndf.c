@@ -190,6 +190,10 @@
 #include "ast.h"
 #include "cpgplot.h"
 
+/* Temporary measure: define the new AST__BLOCKAVE interpolation scheme
+   macro here, since it has not yet made it into the development system
+   AST include file. */
+#define AST__BLOCKAVE 10
 
 /* Unions for use with the Tcl hashes which store calculated percentiles.
    Tcl hash tables use something the size of a pointer for both the key
@@ -1601,14 +1605,14 @@
 /* Set the resampling scheme.  If we are resampling onto a much coarser
    grid, then use a scheme which reblocks the data (averages over all pixels
    of a square), otherwise just use a simple linear interpolation. 
-   The reblocking can be quite slow, but if the image is a bit noisy it
+   The reblocking can be a bit slow, but if the image is a bit noisy it
    smooths it out quite significantly. */
          factor = zoom * psize;
          if ( factor > 0.35 ) {
-            ischeme = AST__NEAREST;
+            ischeme = AST__LINEAR;
          }
          else {
-            ischeme = AST__UINTERP;
+            ischeme = AST__BLOCKAVE;
             iparams[ 0 ] = floor( ( ( 1.0 / factor ) - 0.5 ) / 2.0 );
          }
 
