@@ -416,12 +416,12 @@
 
 *  Get the output images. How this is done depends on whether we are
 *  in single or dual beam mode, and whether we are producing Stokes
-*  parameters or aligned intensity images. FOr STokes parameters a 
+*  parameters or aligned intensity images. For STokes parameters a 
 *  single output stack is required.
       IF ( STOKES ) THEN
          CALL WRNDF( 'OUTSTK', GRP__NOID, 1, 1, ' ', IGRP2, SIZEO,
      :               STATUS )
-         IGRP3 = IGRP2
+         IGRP3 = GRP__NOID
 
 * Now deal with cases where we are creating aligned intensity images from
 * dual-beam data.
@@ -448,7 +448,7 @@
          CALL WRNDF( 'OUT', IGRP1, SIZE, SIZE, 
      :               '  Give more image names...', IGRP2, SIZEO, 
      :               STATUS )
-         IGRP3 = IGRP2
+         IGRP3 = GRP__NOID
 
       END IF
 
@@ -576,7 +576,7 @@
 *  Delete the groups.
       CALL GRP_DELET( IGRP1, STATUS )
       CALL GRP_DELET( IGRP2, STATUS )
-      IF( DBEAM ) CALL GRP_DELET( IGRP3, STATUS )
+      IF( IGRP3 .NE. GRP__NOID ) CALL GRP_DELET( IGRP3, STATUS )
       IF( IGRPS .NE. GRP__NOID ) CALL GRP_DELET( IGRPS, STATUS )
 
 *  If an error occurred, then report a contextual message.
