@@ -1,6 +1,6 @@
-1 KAPPA_Version_1.2
+1 KAPPA_Version_1.1-2
 
-   A new release of KAPPA (v1.2) has been made. The main changes are:
+   A new release of KAPPA (v1.1-2) has been made. The main changes are:
 
    - Modified COLLAPSE so that output variances can be created for any
    size of input array when using the median estimator.
