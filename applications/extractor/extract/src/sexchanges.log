@@ -1,0 +1,232 @@
+/*
+                                sexchanges.log
+
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*
+*       Part of:        SExtractor
+*
+*       Author:         E. BERTIN, IAP, Leiden observatory & ESO
+*
+*       Contents:       log of changes made to the SExtractor source
+*
+*       Last modify:    11/08/98
+*
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+
+Who     When            Where(mostly)   What
+
+EB      03/07/97        clean.c         Make removal of LSB sources optional.
+                        scanimage()     Idem.
+                        clean.h
+                        types.h         Move prototypes from types.h to clean.h
+
+EB      23/07/97        -               Blanking of detections. Major update.
+                                        outobj2 components are now handled
+                                        through the obj2 pointer.
+
+EB      31/07/97        photom.c        MAGERR_APER bug introduced during the
+                                        add of blanking fixed.
+
+EB      01/08/97        LDACTools       Upgraded from the EIS version.
+
+EB      04/08/97        -               Added handling of external FLAG-maps.
+                        read_prefs()    Upgraded from the WeightWatcher code.
+                        newfield()      Changed slightly the frame description
+                                        display.
+EB      13/08/97        filterback()    Fixed bug with even BACK_FILTERSIZE
+                        localback()     Fixed bug with LOCAL backgrounds for
+                                        BLANKed detections.
+
+EB      27/08/97        -               Added handling of external WEIGHT-maps.
+
+EB      02/09/97        makeback()      Added display of currently processed
+                                        line.
+                        sexheadsc.h
+                        catout.c        New ASCII_SKYCAT catalog format.
+
+EB      05/09/97        -               Fixed -PROTOTYPES check-image bug.
+
+EB      13/09/97        filter.c        Added FILTER_THRESH option.
+                        scan.c          Fixed WEIGHT-map detection bug.
+
+EB      10/10/97        examine_iso()
+                        clean()         Improve CLEANing and take into account
+                                        variable S/N.
+                        plist.[c,h]     New memory-friendly propagation of
+                                        information through deblending.
+
+EB      16/10/97        main()          New syntax for dual-image mode.
+
+EB      18/10/97        analyse.c
+                        photom.c        Exact computation of photometric errors
+                                        in the context of variable S/N.
+
+EB      20/10/97        prefs.h         new MAMA_CORFLEX preferences parameter,
+                        astrom.c
+                        param.h         new X_MAMA and Y_MAMA output parameters
+
+EB      21/10/97        createblank()   Bug in single-image mode fixed.
+                        sortit()        Bug in dual-image + BLANKing mode.
+
+EB      24/10/97        astrom.c        X_MAMA and Y_MAMA computed differently
+                        addcleanobj()   Bug in the automag flagging fixed by
+                                        modifying the margin computations
+
+EB      26/10/97        analyse()       ASSOC selection added.
+                        photom.c        MASKing with photometric CORRECTion
+                                        added.
+
+EB      04/11/97        readprefs()     Added support for ENV variables within
+                                        .sex config file.
+
+EB      06/11/97        photom.c        Bug in FLUXERR_ISOCOR fixed.
+
+EB      13/11/97        end_readobj()
+                        end_writeobj()  "Potential bug" fixed.
+
+EB      18/11/97        flag.[c,h]      New module for computing flags from
+                                        flag-map.
+
+EB      21/11/97        newfield()      PIXEL_SCALE pb with non-WCS images
+                                        fixed.
+
+EB      24/11/97        prefs.h         CROSS_ID keyval changed to MATCHED.
+                        initcheck()     WCS rescaling for MINIBACKGROUND and
+                                        MINIBACKRMS added.
+
+EB      28/11/97        initcheck()     Bug fixed in WCS coordinates of MINIs.
+
+EB      29/11/97        initcheck()     Another bug added in MINIs fixed.
+                        sexhead.h       Corrected SEXTHLD value.
+
+EB      19/12/97        readprefs()     Test length of command-line arguments
+
+EB      21/12/97        endobject()     Replace prefs pixel-scale by field
+                                        pixel-scale for S/G separation.
+
+EB      06/01/98        readimagehead() Load basic WCS infos even if no astrom
+                                        parameter is requested (for MINIBACKs).
+                                        Added handling of CDxx_xx (thanks to
+                                        D. Mink)
+
+EB      29/01/98        -               Added crude interpolation scheme in
+                                        presence of image weighting: new
+                                        interpolate.c module.
+
+EB      30/01/98        preanalyse()
+                        examineiso()    Changed the rules concerning the
+                                        handling of "infinitely thin"
+                                        detections (B_IMAGE=0).
+
+EB      31/01/98        parcelout()     Fixed a big (but intermittent) bug
+                                        preventing proper deblending in
+                                        weighted images.
+
+EB      07/02/98        photom.c
+                        scan.c
+                        makeit.c        Revisited completely the handling of
+                                        bad pixels for the photometry.
+
+EB      10/02/98        endobject()     (De)blanking strategy slightly changed.
+
+EB	16/02/98        -               New parameters XPEAK_ and YPEAK_ added.
+
+EB      13/03/98        -               Finalization of the handling of weights
+                                        (Background RMS, weight threshold).
+                        endobject()     SEGMENTATION check-image bug fixed.
+
+EB      16/03/98        readprefs()     Management of the conflicts between
+                                        weight-types seriously updated.
+
+EB      20/03/98        photom.c        MAGERR bug in presence of weighting
+                                        fixed.
+
+EB      23/03/98        clean()         Wrong handling of abcor factor
+                                        corrected.
+
+EB      25/03/98        clean()         realloc() bug in CLEANing with Linux
+                        scan.c          fixed.
+
+EB      26/03/98        readimagehead() Typo in OBS-DATE FITS keyword reading.
+
+EB      27/03/98        sortit()        Bug that prevented some faint
+                                        detections to be CLEANed fixed.
+                        -               Add a new EXTRA_WARNINGS prefs option.
+
+EB      11/04/98        -               Added FITS_UNSIGNED option.
+                        filterback()    Bug with empty images fixed.
+                        main()          New banner.
+
+EB      15/04/98        getflag()       Potential bug for big objects with
+                                        FLAGTYPE MOST fixed.
+                        examineiso()    Wrong detection threshold for CLEANing
+                                        in multi-image mode replaced with
+                                        correct one.
+EB      29/04/98        -               Allow multiple FLAG-MAPs (up to 4
+                                        currently): IMAFLAG_ISO and
+                                        NIMAFLAG_ISO have become vectors.
+                        getflags()      Bug with FLAG_TYPEs MIN and MAX fixed.
+
+EB      30/04/98        copyastrom()    Fixed a bug with INTERP_TYPE VAR_ONLY.
+                        -               Simplified access init_interpolate.
+
+EB      02/05/98        define.h
+                        fitsread()      Improve stability with incorrect FITS
+                                        headers.
+
+EB      03/05/98        filterback()    RMS determination more tolerant towards
+                                        constant weight-maps.
+                                        BACK_FILTERing anisotropy bug fixed.
+                        makeit()        Bad closing of CHECKIMAGEs fixed.
+                        -               New CATALOG_TYPE NONE option.
+                        -               APER measurements functional again
+                                        (recently introduced bug).
+
+EB      06/05/98        readimagehead() Pb with FITS astrometric strings fixed.
+
+EB      07/05/98        getconv()       Uninitialized variable pb fixed.
+
+EB      12/05/98        loadstrip()     Bug in the production of BACKGROUND
+                                        CHECK-image fixed.
+
+EB      28/05/98        define.h        new VECFLAG() macro for flagging arrays.
+                        prefs.h         Remove "&" before ptrs to static arrays.
+
+EB      13/06/98        initastrom()    Wrong mapping of PC components fixed.
+                        readimagehead() Wrong mapping of CD components fixed.
+
+EB      29/06/98        makeit()        Handling of weight-maps+interpolation
+                                        simplified.
+                        scanimage()     Missing reference field in the reading
+                                        of dwscan added.
+                        useprefs()      Bad default threshold in VAR_ONLY
+                                        interpolation mode fixed.
+
+EB      30/06/98        backguess()     Missing scaling of "sig" in the
+                                        computation of "*mean" added, but
+                                        threshold changed from 0.2 to 0.0,
+                                        awaiting for more tests.
+
+EB      08/07/98        readimagehead() CDx_x FITS WCS parameters are now
+                                        given priority before PCxxxx.
+
+EB      09/07/98        filterback()    Filtering bug at image borders fixed.
+
+EB      21/07/98        photom.c        Division by zero for unphotometrable
+                                        objects fixed.
+
+EB      23/07/98        fitswrite()     Pb with very long strings fixed.
+                        readcatparams() Reading of .param files more robust.
+                                        Comments starting with '#' now allowed.
+
+EB      27/07/98        readimagehead()
+                        initcheck()     Changed the handling of CDELTx params
+                                        when CDx_x are used. Now works with
+                                        MINIBACKGROUND check-images.
+
+EB      11/08/98        photom.c        Purify warning fixed in
+                                        computeautoflux()
+                        scan.c          Purify warning fixed in scanimage().
+                                        BLANKing procedure of CLEANed pixels
+                                        fixed. Memory leaks fixed.

@@ -1,0 +1,11 @@
+This directory contains the C portion of the WCS library. It was
+downloaded from ftp://ftp.cv.nrao.edu/fits/src/wcs/. The WCS library is used in
+SExtractor for converting pixel (IMAGE) coordinates to world coordinates.
+All I did here is to change theMmakefile and the names of a few functions to
+avoid conflicts with preexisting functions on some systems. The original
+distribution can be found in the wcs_ori/ subdirectory.
+
+The proposed "World Coordinate System" (WCS) convention in FITS (Flexible Image
+Transport System) is described in "Representations of Celestial Coordinates in
+FITS" by Eric W. Greisen and Mark Calabretta.  A draft of this document is
+available at ftp://fits.cv.nrao.edu/fits/documents/wcs/.

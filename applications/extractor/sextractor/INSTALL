@@ -1,0 +1,8 @@
+Installing SExtractor is really easy:
+- Go to the source/ subdirectory
+- Type ``make'' and see if your machine type is listed.
+- If this is the case, you can start the compilation with
+  ``make SEXMACHINE=<machine_type>''
+- The compilation produces the SExtractor executable called ``sex''.
+  You may now copy it anywhere in your path and run it with
+  configuration files like those in the config/ subdirectory.

@@ -1,0 +1,229 @@
+This is V2.0.15 (August 20 1998). New features include:
+- ``Purify'' warnings and memory leaks fixed in several parts of the program.
+- BLANKing bug of CLEANed pixels fixed.
+
+/*- Previous notes for V2.0.14 (July 28 1998) */
+- Internal handling of CDELTx changed (once more!) to allow proper scaling on the
+  MINIBACKGROUND images.
+
+/*- Previous notes for V2.0.13 (July 23 1998) */
+- 2 small (but fatal on some machines) bug fixes.
+- Comments (beginning with #) now allowed at every line in .param files
+- Default parameters updated in the config files (reflecting the increase
+  of processing power during the last years!!)
+
+/*- Previous notes for V2.0.11 (July 9 1998) */
+- Background filtering bug at image borders fixed.
+- CDx_x FITS WCS parameters are now given priority.
+
+/*- Previous notes for V2.0.10 (June 30 1998) */
+- Astrometry bug with CDx_x FITS parameters fixed.
+- Interpolation bug in VAR_ONLY mode fixed.
+
+/*- Previous notes for V2.0.8 (May 14 1998) */
+- BACKGROUND check-image bug fixed.
+- Old bug in filter normalization fixed.
+- Bug in the reading of FITS header astrometric info fixed.
+
+/*- Previous notes for V2.0.7 (May 3 1998) */
+- Bug with VAR_ONLY interpolations fixed.
+- Improve robustness toward incorrect FITS headers and empty images.
+- A few bugs corrected (most of them introduced in the previous release!!)
+
+/*- Previous notes for V2.0.5 (April 30 1998) */
+- Multiple FLAG_MAPs now supported: IMAFLAG_ISO and NIMAFLAG_ISO have become
+  vectors.
+- Bug with FLAG_TYPEs MIN and MAX fixed.
+
+/*- Previous notes for V2.0.2 (April 15 1998) */
+- New banner
+- Bug fixes: background on empty images, CLEANing in double-image mode.
+
+/*- Previous notes for V2.0.0 (March 30 1998) */
+- Renaming of the software and update of the proto-documentation
+- New EXTRA_WARNINGS option to VERBOSE_TYPE config parameter.
+- The usual amount of bug-fixes.
+
+/*- Previous notes for V1.2b20b (March 24 1998) */
+- XPEAK_ and YPEAK_ catalog parameters, that give the position of the brightest
+  pixel in an object.
+- THRESHOLD and MU_THRESHOLD are now set to the real extraction threshold.
+- New CLEANing procedure.
+- Many bugs corrected in the weighting/interpolation.
+- SEGMENTATION check-image bug fixed.
+
+/*- Previous notes for V1.2b18d (Feb 10 1998) */
+- (Crude) interpolation with weight images, controlled with the INTERP set of prefs.
+- BACKGROUND, MAP_VAR and MAP_RMS WEIGHT_TYPEs are now fully operational.
+- Improved handling of bad pixels in photometry.
+- First release of the first, very uncomplete "proto-doc" for the 2.0 version.
+
+/*- Previous notes for V1.2b16h (Dec 15 1998) */
+- Bug in end_writeobj(), bug in computing FLUXERR_ISOCOR, and bug with the pixel
+  scales for non-WCS images fixed.
+- New FLAG_TYPE config parameter for compositing the flag-map values (IMAFLAGS_ISO):
+  OR, AND, MIN, MAX et MOST (keeps only the most frequent, non-zero flag-map value).
+- New NIMAFLAGS_ISO catalog parameter, returning the number of selected flag-map pixels.
+- Maximum string length for pathes, filenames, etc. extended to 512 characters.
+- Handling of WCS CDxx_xx parameters (thanks to Doug Mink).
+- WCS information propagated to MINIBACK-like check-images.
+
+/*- Previous notes for V1.2b15 (November 4 1997) */
+- Handling of environment variables within the configuration files.
+- Selection of ASSOCiated data through ASSOCSELEC_TYPE: ALL means no filtering,
+  MATCHED means keep only ASSOCiated data in the output catalog, -MATCHED is the
+  opposite.
+
+/*- Previous notes for V1.2b14 (October 26 1997) */
+- Bug in the flagging cropped apertures fixed.
+- BLANK and SCAN_ISOAPRATIO config parameters removed.
+- New MASK_TYPE config parameter. Options are: NONE (no MASKing of the detections),
+  BLANK (like BLANK Y in the previous versions), and CORRECT (photometric correction of 
+  overlaps between objects by replacing with the symetrical pixel values)
+
+/*- Previous notes for V1.2b13b (October 21 1997) */
+- Handling of uncalibrated WEIGHT images for images with variable S/N:
+  WEIGHT_IMAGE is the name of the external WEIGHT-map (FITS image)
+  WEIGHT_TYPE parameter specifies which type of map it is (currently, only NONE
+  and MAP_WEIGHT are supported). The detection threshold and CLEANing are now adaptive;
+  photometric error computations take the variable S/N into account, too.
+- DETECT_IMAGE parameter suppressed: in double-image mode, one should use instead
+  of "sex <image>" "sex <detect_image>,<measure_image>"
+- Bugs in the deblending routine and absolute threshold modes fixed.
+
+/*- Previous notes for V1.2b10b (August 19 1997) */
+- BLANKing option which allows masking of neighbour detections and makes some measurements
+like MAG_AUTO or MAG_APER more robust towards contamination by other sources.
+- FLAG_IMAGE option and FLAGIMA_ISO parameter for forwarding external flag-map information
+to the output catalog.
+- Support for multiple CHECKIMAGEs.
+- New "-OBJECTS" CHECKIMAGE_TYPE: input image with both background and detections removed.
+- Support for optional config parameters (like FLAG_IMAGE or DETECT_IMAGE)
+- CLEAN_OBJSTACK has become MEMORY_OBJSTACK (reflects a deep change in the handling of
+detections within SExtractor).
+
+/*- Previous notes for V1.2b9b (June 8 1997) */
+*Two bugs where found in V1.2b9a:
+- X_IMAGE and Y_IMAGE where offset by 1 pixel if no WORLD info was requested
+in the .param file.
+- The DATE-OBS reading code was completely crippled. Thanks to B. Thomsen for the
+info.
+*New parameter:
+- VIGNET_SHIFT(,) is similar to VIGNET(,), except that it produces a sinc-resampled
+vignet with sub-pixel centering on object (beware of distorsions with undersampled
+images).
+*New ultrix Makefile option for DECstations running ULTRIX.
+
+/*- Previous notes for V1.2b9a (June 1 1997) */
+New features include:
+- support for WCS coordinates. This means that you can get the
+alpha and delta for objects detected on FITS images which comply with the WCS
+standard (see http://www.cv.nrao.edu/fits/documents/wcs/wcs.html). The astrometric
+mapping relies on Mark Calabretta's WCS library (V2.4 in C). SExtractor also
+handles precession in the FK5 system, as well as transformations from J2000 (FK5)
+to B1950 (FK4) coordinates. Shape parameters are transformed through a local,
+linear approximation of the astrometric mapping. I am not an astrometrist, I
+would therefore appreciate some feedback concerning these features. All
+informations concerning precession in the FK4 system are welcome, as SExtractor
+does only precess in the FK4 system presently. I would also gladly add support
+for DSS images if someone can provide me with a decent description of their
+astrometric parameters!
+- 2D positional error estimate through ERRA_xxx, ERRB_xxx and ERRTHETA_xxx. Note:
+these estimates are exact for unconvolved, white-noised images only.
+- Linear photometric parameters (FLUX_xxx and FLUXERR_xxx in addition to MAG_xxx
+and MAGER_xxx).
+- Better outputs: units and vectors in FITS, (limited) backward compatibility
+with the old V1.0 output format (CATALOG_TYPE FITS_1.0), new detailed ASCII
+output mode (CATALOG_TYPE ASCII_HEAD).
+- Handling of gigantic images (up to 2e9x2e9 pixels on 64bit machines).
+- Online decompression of compressed DeNIS images.
+- New "vignet" vector output: for instance VIGNET(8,5) in the .param file will
+write in the output catalog a small 8x5 pixels array around each detection center.
+- Many bugs corrected, among which: crash in the background mapping on
+very large images and incorrect THRESHOLD output for blended objets.
+
+The documentation is currently being written. In the meanwhile you may consult
+the param.h file in the source/ directory for a minimum description of each
+parameter.
+
+/*- Previous notes for V1.2b5 (Jan 1997) */
+Note that the CLASS_STAR, FWHM_IMAGE an FWHM_WORLD parameters haven't be tested
+in this version (they shall be replaced by better estimators in future
+versions). Many algorithms have been changed in this version. Therefore it is
+expected that most measurements should yield results (slightly) different than
+those obtained with earlier versions. In general accuracy and detection
+performances should have increased, especially at low S/N; however I would
+appreciate to have feedback from people involved in weak-lensing studies or
+astrometrical work for instance concerning the accuracy of X,Y,A,B and THETA
+parameters, which are now computed on FILTERED images.
+The FITS catalog output format is yet in a temporary state; it is recommended
+not to use it.
+The documentation has not been updated yet; the following lines describe changes
+made to the configuration files.
+
+In the "config/" sub-directory you will find some configuration files. They are
+basically the same as in the previous version except that:
+- in the *.conv files:
+  There is now a "NORM" keyword next to the "CONV" keyword. It just says that
+  the convolution mask must be normalized ("NONORM" for no normalization). In
+  previous versions this feature was controlled through the "CONVOLVE_NORM"
+  keyword in the .sex file. However, old *.conv files are still accepted by the
+  new version, and are automatically normalized, while a warning message is
+  printed.
+- in the default.sex file: many things have changed.
+ *There is now a new "DETECT_IMAGE" parameter which requires a string as
+  argument. If it set to "SAME", it means that the input image will be used for
+  both detection and measurement, as in the old version. If you give it an
+  image  filename (provided that the dimensions of this image are the same as
+  those of the input image), it will be used as a kind of ``detection
+  template'': all sources will be detected and deblended on this image, and will
+  serve as reference for the measurements done on the regular image.
+ *The EXTRACT_MINAREA keyword has become DETECT_MINAREA (for aesthetic reasons),
+  but keeps exactly the same function. Idem for CONVOLVE -> FILTER and
+  CONVOLVE_NAME -> FILTER_NAME.
+ *The old THRESHOLD parameter has been now split in two: DETECT_THRESH and
+  ANALYSIS_THRESH.
+  DETECT_THRESH is the threshold of detection, just as before.
+  You may express it in units of sigma of the background noise, or in surface
+  brightness units, associated to a magnitude Zero-Point of the detection frame.
+  Ex: "DETECT_THRESH 3.0" will set the threshold at 3.0 sigma,
+      "DETECT_THRESH 22.0,25.4" will set the threshold at 22 mag.arcsec-2 for
+      a detection-image whose mag-ZP is 25.4 mag. (note: the "PIXEL_SCALE"
+      should have been set to the right value).
+  In this way, the THRESHOLD_TYPE parameter has been eliminated.
+  ANALYSIS_THRESH is a threshold in the measurement-frame (it can be the same as
+  the detection-frame). It is used only for estimators that need accurate
+  informations about the object profile in the measurement frame: star/galaxy
+  separation and FWHM. If you don't know what to do with it, just leave it to
+  3.0 (sigmas, you may also express it in mag.arcsec-2 like for DETECT_THRESH,
+  but in this case the mag-ZP will refer to the measurement image).
+ *BACK_XSIZE and BACK_YSIZE have been replaced by a single keyword,
+  BACK_SIZE, which can accept up to 2 parameters (width and height of
+  the background meshes). If only one number is given, width and height
+  are simultaneously set to this value (useful because most of the time,
+  people use square meshes!). The same happens for the BACK_FLTRXSIZE and
+  BACK_FLTRYSIZE which have become BACK_FILTERSIZE. Similarly, the 3 Kron
+  parameters PHOTOM_K... have been replaced by a common PHOT_AUTOPARAMS
+  which requires 2 arguments, equivalent resp. to the former PHOTOM_KPAR
+  and PHOTOM_KMINSIG. PHOTOM_KSIG is now set definitely to 6.0 in the
+  code. This is because the new MAG_AUTO apertures are much more robust to
+  crowding effects than before. Also, for aesthetic reasons,
+  PHOTOM_APERTURE has become PHOT_APERTURES. There is an S at ApertureS,
+  because the software can now photometer each source simultaneously
+  through up to 4 apertures (see default.param). In default.param,
+  MAG_APER is equivalent to MAG_APER1, and MAGERR_APER is equivalent to
+  MAGERR_APER1.
+ *CHECKIMAGE_TYPE now accepts a new type: MINIBACKGROUND. It produces in
+  output a FITS image in which each physical pixel corresponds to one
+  background mesh. This image is therefore roughly BACK_SIZE smaller than
+  the input frame. The CONVOLVED option is now called FILTERED.
+- The MAG_AUTO magnitudes are computed in a slightly different way than
+  before, leading to a gain of about 20% in photometric precision in most
+  extragalactic fields, especially in clusters. Obviously MAG_BEST
+  benefits from this.
+- The CLEAN_PARAM efficiency has increased, compared to previous versions.
+  Smaller values (around 1.0) should now be used.
+
+Please report all bugs to sextractor@iap.fr or bertin@iap.fr. Thanks!
+
+						Emmanuel Bertin.

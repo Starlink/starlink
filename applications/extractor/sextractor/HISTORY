@@ -1,0 +1,94 @@
+April 98: 2.0
+        - New documentation
+
+January 97 - March 98:1.2
+	- Rewriting of an important part of the software, in order to
+	  prepare the future... Further optimization of many functions:
+	  V1.2 is 30 to 500% faster than V1.0.
+	- (natural) bicubic spline interpolation added to the background-map
+	  processing.
+	- Possibility to use another FITS frame for detecting objects,
+	  allowing pixel-to-pixel colour measurements.
+	- New MAG_AUTO magnitudes, more robust towards contamination by
+	  neighbouring sources (MASKing option).
+	- New .sex format.
+	- New CHECKIMAGE_TYPEs: MINIBACKGROUND (produces small background maps),
+				BACKGROUND_RMS (produces noise maps)
+				MINIBACK_RMS (produces small noise maps)
+				IDENTICAL (useful for converting data types)
+	                        -OBJECTS (background and detections removed).
+        - Multiple CHECKIMAGE output.
+	- New astrometric parameters using the WCS library.
+        - Handling of external flag-maps.
+        - Handling of images with variable S/N and external noise- or weight-
+          maps, with interpolation.
+        - Real-time cross-identification with an ASCII catalog.
+
+May 96:	1.1 "DeNIS" version (not distributed officially)
+	- Corrects 2 fatal bugs which sometimes appeared with DEC-Alphas
+	- Incorporates a new extended FITS output format.
+	- Added possibility to measure within multiple apertures.
+
+May 95: Passed 1.0a version: -> FIRST OFFICIAL RELEASE!!! <-
+	- Now the NNW filename is correct in FITS catalog headers.
+	- Corrected a convolution bug with large masks at the bottom of
+	  the frame. Added a better-than-nothing normalization of
+	  zero-sum masks.
+	- Display of the FITS ID limited to 20 characters.
+	- New default.nnw enhanced and with a larger seeing range.
+	- FWHM parameters slightly tuned for undersampled profiles.
+	- The ``sexcopy'' SExTool put in the previous archive wasn't the
+	  right one! Replaced.
+	- 2 new SExtools released: sexreduce and sexin.
+
+Apr 95: FIRST 1.0 version:
+	- Neural-network based star/galaxy classifier implemented. NNW-file
+	  for Moffat-like PSFs in the optical, generated from simulations.
+	- User's manual updated.
+	- FWHM_IMAGE, FWHM_IMAGE and ELONGATION parameters added.
+	- many more typical convolution files included in the archive.
+	- Comments (beginning with a `#') are now allowed within all the
+	  configuration files.
+	- 2 SExTools released: sexcat and sexcopy.
+	- Alpha VMS version added (thanks to R. Johnstone).
+
+Feb 95: 1.0 beta 5e version:
+	- 2 bugs major corrected: background interpolation when very special
+	  convolution masks are used, and (fixed) aperture magnitude (improved
+	  to sub-pixel integration).
+	- Possibility to change preference keywords from the command line.
+
+Dec 94: 1.0 beta 5 version:
+	- Major update! Too many changes to mention.
+	- Code optimized and much more stable now.
+	- New executables for IBM RS6000 and AMIGA added.
+	- "II" dropped: call me simply "SExtractor" now.
+
+Sep 94: 1.0 beta 4 version:
+	- "clean" distribution with source and makefiles for DEC Alpha,
+	  HP/UX, and SUN workstations.
+	- SATUR_LEVEL keyword added.
+	- FLAGS parameter now reliable and written in decimal in ASCII cat.
+	- KRON_RADIUS parameter now reliable.
+	- MAG_ISO_ERR and MAG_APER_ERR now give trusty estimates.
+	- BACKGROUND parameter now in "raw" units.
+	- catalog index numbering starts now from 1.
+	- 2 huge fatal bugs corrected in deblending and background estimation
+	  procedures.
+
+
+Jun 94: 1.0 beta 3 version: many bugs corrected thanks to enthousiastic
+	testers! First public release.
+
+May 94: 1.0 beta 2 version: reads now all kinds of FITS data. C code
+	completely rewritten in ANSI; image bitmaps are now stored in
+	floating-point. Now controlled through configuration files.
+	User's manual written.
+
+Feb 94: 1.0 beta 1 version of "Sextractor II", still limited to 16 bits FITS
+	frames, but pipelined processing allows now frames with size up to
+	65534x65534 to be processable on most machines.
+
+Mar 93: final version of "Sextractor I": limited to 16 bits 2048x2048 max. FITS
+	frames, specifically oriented toward Schmidt plate data processing.
+	Has reduced more than 1.2e10 pixels within 10 months...

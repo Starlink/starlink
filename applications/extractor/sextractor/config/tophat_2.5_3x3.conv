@@ -1,0 +1,5 @@
+CONV NORM
+# 3x3 convolution mask of a top-hat PSF with diameter = 2.5 pixels.
+0.260000 0.700000 0.260000
+0.700000 1.000000 0.700000
+0.260000 0.700000 0.260000

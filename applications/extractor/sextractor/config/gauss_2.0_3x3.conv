@@ -1,0 +1,6 @@
+CONV NORM
+# 3x3 convolution mask of a gaussian PSF with FWHM = 2.0 pixels.
+0.260856 0.483068 0.260856 
+0.483068 0.894573 0.483068 
+0.260856 0.483068 0.260856
+
