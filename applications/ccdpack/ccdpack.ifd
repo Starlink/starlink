@@ -172,6 +172,9 @@ package ccdpack {
       alias wcsexercise $CCDPACK_DIR/wcsexercise
       alias ccd_wcsexercise $CCDPACK_DIR/wcsexercise
 
+      alias ccdwish $CCDPACK_DIR/ccdwish
+      alias ccd_ccdwish $CCDPACK_DIR/ccdwish
+
       alias ccdwww $CCDPACK_DIR/ccdwww
       alias ccd_ccdwww $CCDPACK_DIR/ccdwww
 
