@@ -93,7 +93,6 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
-STARLINK = @STARLINK@
 STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
 STAR_DOCDIR = @STAR_DOCDIR@
 STAR_MANIFESTDIR = @STAR_MANIFESTDIR@
@@ -195,7 +194,7 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
 
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = install-with-manifest component.xml
 LTLIBRARIES = $(lib_LTLIBRARIES)
@@ -226,7 +225,7 @@ SCRIPTS = $(bin_SCRIPTS)
 
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
-depcomp = $(SHELL) $(top_srcdir)/depcomp
+depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = ./$(DEPDIR)/chr_etom.Plo \
 @AMDEP_TRUE@	./$(DEPDIR)/chr_mtoe.Plo
@@ -246,10 +245,11 @@ DIST_SOURCES = $(libchr_la_SOURCES)
 HEADERS = $(include_HEADERS)
 
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.starconf \
-	Makefile.am Makefile.in acinclude.m4 aclocal.m4 \
-	component.xml.in config.guess config.h.in config.sub configure \
-	configure.ac depcomp install-sh install-with-manifest.in \
-	ltmain.sh missing mkinstalldirs
+	../../config.guess ../../config.sub ../../depcomp \
+	../../install-sh ../../ltmain.sh ../../missing \
+	../../mkinstalldirs Makefile.am Makefile.in acinclude.m4 \
+	aclocal.m4 component.xml.in config.h.in configure configure.ac \
+	install-with-manifest.in
 SOURCES = $(libchr_la_SOURCES)
 
 all: $(BUILT_SOURCES) config.h
@@ -497,7 +497,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/.
+	$(mkinstalldirs) $(distdir)/. $(distdir)/../..
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
