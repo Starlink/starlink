@@ -6,6 +6,7 @@
 *    Authors :
 *     BHVAD::RJV
 *    History :
+*     18 Sep 1995 V2.0-0 : ADI port (DJA)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -20,16 +21,15 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC
-      CHARACTER*80 GDAT
+      CHARACTER*132	GDAT
       CHARACTER*20 DEV
       INTEGER NX,NY
+      INTEGER			IFID			! Input dataset
       LOGICAL ACTIVE
-      LOGICAL PRIM
       LOGICAL MULTI
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'GLOAD Version 1.7-0')
+      PARAMETER (VERSION = 'GLOAD Version 2.0-0')
 *-
       CALL MSG_PRNT(VERSION)
 
@@ -41,39 +41,38 @@
 *  close previous data if loaded
         CALL USI_INIT()
         IF (G_MULTI) THEN
-          CALL HDS_CLOSE(G_MLOC,STATUS)
+          CALL ADI_ERASE(G_MFID,STATUS)
         ELSE
-          CALL BDA_RELEASE(G_LOC,STATUS)
-          CALL HDS_CLOSE(G_LOC,STATUS)
+          CALL ADI_ERASE(G_ID,STATUS)
         ENDIF
         G_OPEN=.FALSE.
-      ENDIF
 
-*  get input image
-      CALL USI_GET0C('INP',GDAT,STATUS)
-      CALL HDS_OPEN(GDAT,'UPDATE',ILOC,STATUS)
-      CALL DAT_PRIM(ILOC,PRIM,STATUS)
+      END IF
 
-      IF (STATUS.EQ.SAI__OK.AND..NOT.PRIM) THEN
+*  Get input dataset
+      CALL USI_GET0C( 'INP', GDAT, STATUS )
+      CALL ADI_FOPEN( GDAT, 'MultiGraph|BinDS', 'UPDATE', IFID,
+     :                STATUS )
 
-        CALL GMD_QMULT(ILOC,MULTI,STATUS)
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL GMI_QMULT(IFID,MULTI,STATUS)
         IF (.NOT.MULTI) THEN
-          CALL GFX_NDFTYPE(ILOC,STATUS)
+          CALL GFX_NDFTYPE(IFID,STATUS)
         ENDIF
 
         IF (STATUS.EQ.SAI__OK) THEN
           G_OPEN=.TRUE.
+          G_MULTI = MULTI
           IF (MULTI) THEN
-            G_MULTI=.TRUE.
-            G_MLOC=ILOC
+            G_MFID=IFID
           ELSE
-            G_MULTI=.FALSE.
-            G_LOC=ILOC
+            G_ID=IFID
           ENDIF
         ELSE
           CALL MSG_PRNT('AST_ERR: no data loaded')
           G_OPEN=.FALSE.
-          CALL HDS_CLOSE(ILOC,STATUS)
+          CALL ADI_FCLOSE(IFID,STATUS)
         ENDIF
 
 *  get graphics device
@@ -89,17 +88,14 @@
 *  connect Grafix Control Block and load contents from file
         CALL GCB_ATTACH('GRAFIX',STATUS)
         IF (.NOT.MULTI) THEN
-          CALL GCB_LOAD(ILOC,STATUS)
+          CALL GCB_FLOAD(IFID,STATUS)
         ENDIF
 
 *  set default attributes
         CALL GCB_SETDEF(STATUS)
-
 
       ENDIF
 
       CALL USI_CLOSE()
 
       END
-
-
