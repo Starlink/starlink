@@ -355,7 +355,7 @@ sub index_pack {
    if (-d $pack_file) {
       my ($file, @files);
       pushd $pack_file;
-      foreach $file (glob "mk makefile *CONDITIONS *.news *.tex *.ps *.eps") {
+      foreach $file (glob "*CONDITIONS *.news *.tex *.ps *.eps") {
          push @files, $file if (-f $file);
       }
       index_files "$package#", @files;
