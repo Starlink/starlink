@@ -283,7 +283,7 @@
                           -master $chooser \
                           -title "PAIRNDF: Confirm exit" \
                           -text $confirmtext ]
-      $quitdialog buttonconfigure Cancel -text "Finish pairing"
+      $quitdialog buttonconfigure Cancel -text "Exit"
       $quitdialog buttonconfigure OK -text "Continue"
       $quitdialog hide Help
 
