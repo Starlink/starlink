@@ -35,7 +35,7 @@ INSTOPTS = -g jcmtsw
 # Source code
 
 FSOURCES= add.f compressq.f convol.f copybf.f dasmerge.f \
-decdat.f dectim.f doquad.f exchnge.f four2.f frqfix.f \
+dectim.f doquad.f exchnge.f four2.f frqfix.f \
 get_subarr.f icheck.f ichkq2.f init_array.f initlun.f \
 initnpnew.f initvm.f inquad.f interp.f islct1q.f \
 islctq.f lmm2.f lun_hndl.f mult.f npts2.f ntot.f \
