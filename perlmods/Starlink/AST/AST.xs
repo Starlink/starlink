@@ -86,6 +86,12 @@ typedef void AstXmlChan;
 typedef void AstTranMap;
 #endif
 
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 2) || AST_MAJOR_VERS >= 4 )
+#define HASRATE
+#else
+typedef void AstRate;
+#endif
+
 /* Helper functions */
 #include "arrays.h"
 #include "astTypemap.h"
@@ -1750,6 +1756,9 @@ astRate( this, at, ax1, ax2 )
   double RETVAL;
   double d2;
  PPCODE:
+#ifndef HASRATE
+   Perl_croak(aTHX_ "Rate: Please upgrade to AST V3.2-5 or greater");
+#else
   nin = astGetI( this, "Nin");
   len = av_len( at ) + 1;
   if (nin != len)
@@ -1766,6 +1775,7 @@ astRate( this, at, ax1, ax2 )
   } else {
      XSRETURN_EMPTY;
   }
+#endif
 
 
 # astResample XXXX
