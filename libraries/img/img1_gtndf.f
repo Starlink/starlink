@@ -86,6 +86,10 @@
 *     29-NOV-1995 (PDRAPER):
 *        Backed out of UPDATE mode access. This is now controlled by
 *        RONLY argument.
+*     04-MAR-2003 (PDRAPER):
+*        Changed to add NDF to INDF array indexed by NPAR, rather
+*        than SLOT. The upshot of this was that all images, from previous
+*        calls as well as this one, where trimmed to the same dimensions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -248,7 +252,7 @@
                            IF ( STATUS .EQ. SAI__OK ) THEN
                               ISLOT( NPAR ) = SLOT
                               OLD( NPAR ) = .FALSE.
-                              INDF( SLOT ) = PCB_INDF( SLOT )
+                              INDF( NPAR ) = PCB_INDF( SLOT )
                               NNEW = NNEW + 1
                            
 *  If an error occurred need to free the PCB slot.
@@ -295,16 +299,16 @@
                         CALL ERR_MARK
  1                      CONTINUE ! Start of 'DO WHILE' loop
                         IF ( RONLY ) THEN
-                           CALL NDF_ASSOC( VPAR, 'READ', INDF( SLOT ), 
+                           CALL NDF_ASSOC( VPAR, 'READ', INDF( NPAR ), 
      :                                     STATUS )
                         ELSE 
-                           CALL NDF_ASSOC( VPAR, 'UPDATE', INDF( SLOT ),
+                           CALL NDF_ASSOC( VPAR, 'UPDATE', INDF( NPAR ),
      :                                     STATUS )
                         END IF
                         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If an NDF has been obtained, then determine its dimension sizes.
-                           CALL NDF_DIM( INDF( SLOT ), MXDIM, DIM, NDIM,
+                           CALL NDF_DIM( INDF( NPAR ), MXDIM, DIM, NDIM,
      :                                   STATUS )
 
 *  If it has more dimensions than can be handled, then annul the error.
@@ -313,7 +317,7 @@
 
 *  Report a new one explaining the problem.
                               STATUS = NDF__XSDIM
-                              CALL NDF_MSG( 'NDF', INDF( SLOT ) )
+                              CALL NDF_MSG( 'NDF', INDF( NPAR ) )
                               CALL MSG_SETI( 'MXDIM', MXDIM )
                               CALL ERR_REP( 'IMG1_GTNDF_XS2',
      :                                      'The NDF structure ^NDF ' //
@@ -324,7 +328,7 @@
 *  Flush the error message, release the NDF, cancel the parameter
 *  association and return to obtain another NDF.
                               CALL ERR_FLUSH( STATUS )
-                              CALL NDF_ANNUL( INDF( SLOT ), STATUS )
+                              CALL NDF_ANNUL( INDF( NPAR ), STATUS )
                               CALL DAT_CANCL( VPAR, STATUS )
                               CALL ERR_ANNUL( STATUS )
                               GO TO 1
@@ -402,7 +406,7 @@
 *  For new NDFs, insert the modified identifier back into the
 *  appropriate PCB slot.
             ELSE
-               PCB_INDF( ISLOT( I ) ) = INDF( ISLOT( I ) )
+               PCB_INDF( ISLOT( I ) ) = INDF( I )
 
 *  Map each NDF's data array. If RONLY then map with READ/ZERO,
 *  otherwise use UPDATE/ZERO.
