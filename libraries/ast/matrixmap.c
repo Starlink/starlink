@@ -84,6 +84,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *        More corrections to MapMerge: Cleared up errors in the use of the 
 *        supplied invert flags, and corrected logic for deciding which 
 *        neighbouring Mapping to swap with. 
+*     16-JUL-1999 (DSB):
+*        Fixed memory leaks in MatWin and MapMerge.
 *class--
 */
 
@@ -376,9 +378,8 @@ static int CanSwap( AstMapping *map1, AstMapping *map2, int inv1, int inv2 ){
             if( ret && ( nomat == map2 ) ) {
 
                if( nin != nax ){
-                  astError( AST__RDERR, "Inverse PermMap produces %d inputs, "
-                            "but the preceding MatrixMap has %d outputs\n",
-                            nin, nax );
+                  astError( AST__RDERR, "Inverse PermMap produces %d inputs, but the "
+                            "preceeding MatrixMap has %d outputs\n", nin, nax );
                   ret = 0;
                }
 
@@ -1217,20 +1218,22 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Local Variables: */
    AstMapping **maplt;   /* New mappings list pointer */
-   AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstMapping *map2;     /* Pointer to replacement Mapping */
+   AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
+   AstMapping *smc0;     /* Simplied Mapping */
+   AstMapping *smc1;     /* Simplied Mapping */
    AstMatrixMap *mm;     /* Pointer to supplied MatrixMap */
    AstMatrixMap *newmm;  /* Pointer to replacement MatrixMap */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    double *b;            /* Pointer to scale terms */
+   int *invlt;           /* New invert flags list pointer */
    int i1;               /* Index of first MatrixMap to merge */
    int i2;               /* Index of last MatrixMap to merge */
    int i;                /* Loop counter */
    int ic[2];            /* Copies of supplied invert flags to swap */
    int invert;           /* Should the inverted Mapping be used? */
-   int *invlt;           /* New invert flags list pointer */
    int neighbour;        /* Index of Mapping with which to swap */
    int nin;              /* Number of input coordinates for MatrixMap */
    int nmapt;            /* No. of Mappings in list */
@@ -1238,9 +1241,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int nstep1;           /* No. of Mappings backwards to next mergable Mapping */
    int nstep2;           /* No. of Mappings forward to next mergable Mapping */
    int result;           /* Result value to return */
-   int zoom;             /* Can MatrixMap be replaced by a ZoomMap? */
    int swaphi;           /* Can MatrixMap be swapped with higher neighbour? */
    int swaplo;           /* Can MatrixMap be swapped with lower neighbour? */
+   int zoom;             /* Can MatrixMap be replaced by a ZoomMap? */
 
 /* Initialise. */
    result = -1;
@@ -1254,8 +1257,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Get the number of input and output axes for the MatrixMap. Swap these
    if the supplied invert flag is not the same as the Invert attribute of
    the Mapping. */
-   if( ( invert && !( *invert_list )[ where ] ) || 
-       ( !invert && ( *invert_list )[ where ] ) ){
+   if(  invert && !( *invert_list )[ where ] || 
+       !invert && ( *invert_list )[ where ] ){
       nout = astGetNin( ( *map_list )[ where ] );
       nin = astGetNout( ( *map_list )[ where ] );
 
@@ -1606,10 +1609,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If neither of the swapped Mappings can be simplified further, then there
    is no point in swapping the Mappings, so just annul the map copies. */
-                     if( astGetClass( astSimplify( mc[0] ) ) == 
-                         astGetClass( mc[0] ) &&
-                         astGetClass( astSimplify( mc[1] ) ) == 
-                         astGetClass( mc[1] ) ) {
+                     smc0 = astSimplify( mc[0] );
+                     smc1 = astSimplify( mc[1] );
+
+                     if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
+                         astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
       
                         mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
                         mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
@@ -1630,6 +1634,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                         result = i1;
                         break;
                      }
+
+/* Annul the simplied Mappings */
+                     smc0 = astAnnul( smc0 );
+                     smc1 = astAnnul( smc1 );
+
                   }
                }
             }
@@ -2307,6 +2316,7 @@ static void MatWin( AstMapping **maps, int *inverts, int imm  ){
    supplied WinMap. */
    m1 = astAnnul( m1 );
    pset1 = astAnnul( pset1 );
+   pset2 = astAnnul( pset2 );
 
 /* Free the copies of the scale and shift terms from the supplied WinMap. */
    b = (double *) astFree( (void *) b );
@@ -3567,8 +3577,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             matrix_element = matrix;
 
 
-/* Each output coordinate value is created by summing the product of the 
-   corresponding input coordinates and the elements of one row of the 
+/* Each output co-ordinate value is created by summing the product of the 
+   corresponding input co-ordinates and the elements of one row of the 
    matrix. */
             for ( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
                sum = 0.0;
@@ -4626,4 +4636,3 @@ AstMatrixMap *astMtrMult_( AstMatrixMap *this, AstMatrixMap *a ){
    if( !astOK ) return NULL;
    return (**astMEMBER(this,MatrixMap,MtrMult))( this, a );
 }
-
