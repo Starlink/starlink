@@ -43,11 +43,14 @@ $indexfile = "/local/devel/scb/index";
 
 #  Directory locations.
 
-$tmpdir = "/local/junk/scb";         # scratch directory
+$tmpdir = "/local/junk/scb/unpack";    # scratch directory
 
 #  Name of this program relative to this program.
 
-$scb = 'scb.pl';
+$self = $0;
+$self =~ s%.*/%%;
+$scb = $self;
+$usage = "Usage: $self <module>\n";
 
 #  Required libraries.
 
@@ -57,10 +60,14 @@ use libscb;
 
 #  Declarations.
 
+sub get_module;
+sub query_form;
 sub extract_file;
 sub output;
 sub error;
 sub header;
+sub footer;
+sub hprint;
 
 #  Determine operating environment.
 
@@ -69,47 +76,98 @@ $html = $cgi;
 
 #  Name of source module to locate.
 
-$module = $ARGV[0];
-$module =~ s/^module=//;
+if ($cgi) {
+   $module = $ENV{'QUERY_STRING'};
+}
+else {
+   $module = shift @ARGV;
+}
 
-error "Source code browser" unless ($module);
-
-#  Open index file, tied to index hash %locate.
-
-tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
-
-#  Set locations of logical names appearing in logical paths.
-#  It may be desirable to override these if the database has been moved.
-
-$basedir{'SOURCE'}  = $locate{'#SOURCE'};
-$basedir{'INCLUDE'} = $locate{'#INCLUDE'};
-
-#  Set up scratch directory.
-
-system "mkdir -p $tmpdir" and error "Failed to mkdir $tmpdir: $?";
-chdir $tmpdir             or  error "Failed to enter $tmpdir";
-
-#  Get logical path name from database.
-
-$location = $locate{$module};
-error "Failed to find $module; index may be outdated." unless $location;
-
-#  Substitute in base directory name.
-
-$location =~ s%(^[^/]*)(.*)$%$basedir{$1}/$2%;
-
-#  Extract file from logical path.
-
-extract_file $location;
+if ($module) {
+   $module =~ s/^module=//;
+   get_module $module;
+}
+else {
+   if ($cgi) {
+      query_form;
+   }
+   else {
+      $0 =~ s%.*/%%;
+      die $usage;
+   }
+}
 
 #  End
 
 exit;
 
-
 ########################################################################
 # Subroutines.
+########################################################################
 
+
+########################################################################
+sub query_form {
+
+#  CGI output of the program when no arguments have been specified.
+
+   header $self;
+   hprint <<"   END"
+      <h1>$self: Starlink Source Code Browser</h1>
+      <form method=GET action="$self">
+          Name of source module:
+          <input name=module size=24 value=''>
+      </form>
+   END
+   ;
+
+   footer;
+}
+   
+
+
+
+########################################################################
+sub get_module {
+
+#  This routine takes the name of a module, locates it using the index
+#  dbm, and outputs it in an appropriate form.
+
+#  Arguments.
+
+   $module = shift;
+
+#  Open index file, tied to index hash %locate.
+
+   tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
+
+#  Set locations of logical names appearing in logical paths.
+#  It may be desirable to override these if the database has been moved.
+
+   $basedir{'SOURCE'}  = $locate{'#SOURCE'};
+   $basedir{'INCLUDE'} = $locate{'#INCLUDE'};
+
+#  Set up scratch directory.
+
+   system "mkdir -p $tmpdir" and error "Failed to mkdir $tmpdir: $?";
+   chdir $tmpdir             or  error "Failed to enter $tmpdir";
+
+#  Get logical path name from database.
+
+   $location = $locate{$module};
+   error "Failed to find $module; index may be outdated." unless $location;
+
+#  Substitute in base directory name.
+
+   $location =~ s%(^[^/]*)(.*)$%$basedir{$1}/$2%;
+
+#  Extract file from logical path.
+
+   extract_file $location;
+
+}
+
+########################################################################
 sub extract_file {
 
 #  This routine takes as argument the logical path name of a file, 
@@ -135,6 +193,7 @@ sub extract_file {
 }
 
 
+########################################################################
 sub output {
 
 #  Arguments.
@@ -202,7 +261,7 @@ sub output {
 
 #           Identify and deal with fortran subroutine calls.
 
-            if ($body =~ /\bCALL([A-Z0-9_]+)[^=]*$/) {
+            if ($body =~ /\bCALL(\w+)[^=]*$/) {
                $sub = $1;
                s%$sub%<a href='$scb?$sub#$sub'>$sub</a>%;
             }
@@ -218,11 +277,12 @@ sub output {
 
 #  Output appropriate footer text.
 
-   print "</pre>\n</body>\n</html>\n" if ($html);
+   footer;
 
 }
 
 
+########################################################################
 sub error {
 
 #  Arguments.
@@ -233,7 +293,7 @@ sub error {
       header "Error";
       print "<h1>Error</h1>\n";
       print "$message\n";
-      print "</body>\n</html>\n";
+      footer;
       exit 1;
    }
    else {
@@ -242,6 +302,8 @@ sub error {
 }
 
 
+
+########################################################################
 sub header {
 
 #  Arguments.
@@ -259,4 +321,21 @@ sub header {
 }
 
 
+########################################################################
+sub footer {
+   print "</body>\n</html>\n" if $html;
+}
 
+
+########################################################################
+sub hprint {
+
+#  Utility routine - this just prints a string of which each of the 
+#  lines may have a load of leading spaces.  Its only purpose is to
+#  allow here documents which don't mess up the indenting of the 
+#  perl source.
+
+   local $_ = shift;
+   s%^\s*%%mg;
+   print;
+}
