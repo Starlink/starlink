@@ -1,0 +1,69 @@
+## SCUPHOT - Process photometry observations.
+
+#+
+#  Name:
+#     SCUPHOT.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 August (TIMJ)
+#       Use PAR_CHOIC for sub_instrument
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     {enter_further_changes_here}
+ 
+#-
+
+   INTERFACE SCUPHOT
+
+      HELPLIB 'SCUBA_HELP:'
+
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated data'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER ANALYSIS
+         POSITION 2
+	 TYPE     '_CHAR'
+	 DEFAULT  'AVERAGE'
+	 PROMPT   'Which reduction method'
+         IN       'AVERAGE', 'PARABOLA'
+ 	 HELPKEY '*'
+      ENDPARAMETER
+
+
+      PARAMETER OUT
+         TYPE    '_CHAR'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of container file to hold map and time-sequence data'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER FILE
+         TYPE    'FILENAME'
+         VPATH   'PROMPT'
+         PROMPT  'Name of ASCII file to contain results summary'
+         PPATH   'CURRENT,DEFAULT'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+   ENDINTERFACE
