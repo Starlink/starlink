@@ -88,5 +88,6 @@
   New "gaiadispmany" command to load a list of images into GAIA from the
   command-line.
 
-
   Experimental tabbed interface.
+
+  Long (2 pixels) thin or tall images now display readout of positions.
