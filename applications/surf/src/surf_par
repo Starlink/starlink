@@ -1,0 +1,52 @@
+*  REDS_SYS include file containing some handy SCUBA definitions
+
+      DOUBLE PRECISION PI
+      PARAMETER (PI = 3.14159265359D0)
+
+      DOUBLE PRECISION R2AS                 ! radians to arcsec conversion
+      PARAMETER (R2AS = 206264.806247D0)
+
+      INTEGER SCUBA__MAX_BEAM               ! max number of bolometers that
+      PARAMETER (SCUBA__MAX_BEAM = 3)       ! in an single sub-instrument that
+					    ! actually observe the source in
+					    ! a PHOTOM observation
+
+      INTEGER SCUBA__MAX_MEAS               ! max number of measurements in
+      PARAMETER (SCUBA__MAX_MEAS = 200)     ! an observation
+
+      INTEGER SCUBA__MAX_INT                ! max number of integrations in
+      PARAMETER (SCUBA__MAX_INT = 1000)     ! an observation
+
+      INTEGER SCUBA__MAX_EXP                ! max number of exposures in
+      PARAMETER (SCUBA__MAX_EXP = 128)      ! an observation
+
+      INTEGER SCUBA__MAX_SWITCH             ! max number of switches in
+      PARAMETER (SCUBA__MAX_SWITCH = 3)     ! an observation
+
+
+      INTEGER SCUBA__MAX_JIGGLE             ! max number of offsets in pattern
+      PARAMETER (SCUBA__MAX_JIGGLE = 512)
+
+      INTEGER SCUBA__MAX_POINT              ! max number of pointing corrections
+      PARAMETER (SCUBA__MAX_POINT = 20)
+
+      INTEGER SCUBA__MAX_SUB                ! max number of sub-instruments
+      PARAMETER (SCUBA__MAX_SUB = 5)        
+
+      INTEGER SCUBA__NUM_ADC                ! number of A/D cards
+      PARAMETER (SCUBA__NUM_ADC = 9)
+
+      INTEGER SCUBA__NUM_CHAN               ! number of channels per A/D card
+      PARAMETER (SCUBA__NUM_CHAN = 16)
+
+      INTEGER SCUBA__MAX_FITS               ! max number of FITS items in file
+      PARAMETER (SCUBA__MAX_FITS = 200)
+
+      INTEGER SCUBA__MAX_SECT               ! max number of SCUBA sections
+      PARAMETER (SCUBA__MAX_SECT = 10)      ! that can be specified
+
+      CHARACTER * 10 PACKAGE                ! Name of SCUBA package
+      PARAMETER (PACKAGE = 'SURF')
+
+      INTEGER SCUBA__N_TEMPS            ! Number of temperatures per reading
+      PARAMETER (N_TEMPS = 3)           ! for SKYDIP: HOT, COLD, SKY
