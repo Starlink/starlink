@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun95.13}
 \newcommand{\stardocnumber}    {95.13}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {12 October 1998}
+\newcommand{\stardocdate}      {19 October 1998}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.13}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -952,7 +952,7 @@ NDF \htmlref{FITS extension}{se:fitsairlock};
 \htmlref{NDF creation from text files}{TRANDAT};
 \item setting and examining \htmlref{NDF components}{ap:NDFformat};
 \item definition or \htmlref{calculation of a sky co-ordinate
-system}{SETSKY} for use in conjunction with \IRASref\ tools;
+system}{SETSKY};
 \item arithmetic including a \htmlref{powerful application}{MATHS}
 that handles expressions;
 \item \htmlref{pixel and region editing}{cl:pixedit}, including polygons and
@@ -961,7 +961,8 @@ filtering}{GLITCH}; and \htmlref{pasting arrays over others}{PASTE};
 \item \htmlref{masking}{se:masking} of regions, and of \htmlref{pixels
 whose variances are too large}{ERRCLIP};
 \item configuration change: \htmlref{flip}{FLIP},
-\htmlref{rotate}{ROTATE}, \htmlref{shift}{SLIDE}, subset, change
+\htmlref{rotate}{ROTATE}, \htmlref{shift}{SLIDE},
+\htmlref{reshape}{RESHAPE}, subset, change
 dimensionality;
 \item forming image mosaics; normalisation of NDF pairs;
 \item \htmlref{compression and expansion of images}{cl:compexp};
@@ -983,14 +984,15 @@ statistics over a sequence of images}{MSTATS};
 and \htmlref{Laplacian}{LAPLACE}, convolution, edge enhancement via a
 \htmlref{shadow effect}{SHADOW}, \htmlref{thresholding}{THRESH};
 \item \htmlref{calculation of polarimetry images}{CALPOL};
+\item \htmlref{creation of 1-dimensional profiles through n-dimensional
+data sets}{PROFILE};
 \end{itemize}
 
 There are also many applications for data visualisation:
 \begin{itemize}
 \item use of the \htmlref{graphics database}{se:agitate}, AGI, to pass
 information about pictures between tasks; tools for the creation, labelling,
-selection of pictures, and obtaining world and data co-ordinate
-information from them;
+selection of pictures, and obtaining co-ordinate information from them;
 \item \htmlref{image}{DISPLAY} and \htmlref{greyscale}{GREYPLOT} plots with
 a selection of scaling modes and many options such as axes;
 \item creation, selection, saving and manipulation of \htmlref{colour
@@ -1002,12 +1004,13 @@ and borders);
 plots}{LINPLOT} of 1-dimensional arrays, and \htmlref{multiple-line
 plot}{MLINPLOT} of images; \htmlref{pie sections}{ELPROF}, and slices
 through an image; \htmlref{vector plot}{VECPLOT} of image; all of
-which offer some control of the appearance of plots.
+which offer control of the appearance of plots.
 \end{itemize} 
 
 \subsubsection{General}
 {\footnotesize KAPPA} handles \htmlref{bad pixels, and processes
-quality}{se:masking}, variance, and other information stored within
+quality}{se:masking}, variance, World Co-ordinate System (WCS), and other 
+information stored within
 NDFs \latexonly{(SUN/33 and Section~\ref{se:datastr})}.  In order to
 achieve generality {\footnotesize KAPPA} does not process non-standard
 extensions; however, it does not lose non-standard ancillary data
@@ -1039,9 +1042,9 @@ overlays are supported.
 are dealt with promptly.
 
 It is continuing to be developed and additional applications
-functionality are envisaged, particularly a graphical-user interface
-for image processing.  [If you wish to suggest new tasks or
-enhancements to existing ones please contact the author.  Small jobs
+functionality are envisaged. [If you wish to suggest new tasks or
+enhancements to existing ones please contact the Starlink Software
+Librarian {\tt ussc@star.rl.ac.uk}.  Small jobs
 may be undertaken quite quickly.  Requests involving substantial
 pieces of work need to gain the support of others to be included in
 Starlink's software plans, and so the best way to influence the
@@ -1087,7 +1090,7 @@ only be issued once per login session.  Thus you will see
 
 \small
 \begin{verbatim}
-      KAPPA commands are now available -- (Version 0.9-0)
+      KAPPA commands are now available -- (Version 0.13)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
@@ -1365,7 +1368,7 @@ You should see something like the following.
 
      ICL> kappa
  
-        KAPPA commands are now available (Version 0.9-0).
+        KAPPA commands are now available (Version 0.13).
  
         Type `help kappa' or `kaphelp' for help on KAPPA commands.
  
@@ -1473,12 +1476,12 @@ Picture 1 is the current picture, in which future pictures are drawn,
 unless we select a new current picture.
 
 Thus in picture 1 we display an image of Comet West around which we
-draw a yellow border.  The backslash causes the current scaling method
+draw annotated axes.  The backslash causes the current scaling method
 to be used.
 
 \small
 \begin{verbatim}
-     ICL> display comwest border bcolour=yell \
+     ICL> display comwest axes \
      !! Error accessing file '/home/scratch/mjc/comwest.sdf' -
      !     No such file or directory
      !  HDS_OPEN: Error opening an HDS container file.
@@ -1516,12 +1519,14 @@ We select the right-hand picture created earlier.
 \end{verbatim}
 \normalsize
 
-As above we display the current NDF, the bas-relief image, with a yellow
-border on the right of the raw comet image.
+As above we display the current NDF, the bas-relief image, with annotated
+axes on the right of the raw comet image (we do not need to request the
+axes explicitly this time, since the {\tt axes} parameter retains the
+value used in the previous invocation until changed).
 
 \small
 \begin{verbatim}
-     ICL> display border bcolour=Yell \
+     ICL> display border \
      Data will be scaled from -4.721756 to 5.697861.
 \end{verbatim}
 \normalsize
@@ -2219,7 +2224,10 @@ given below.
 \newline
 \newline
 \begin{tabular}{@{\hspace{5ex}}l@{~~ --- ~~}l}
-{\tt GLOBAL.COORD\_SYSTEM}    & Current co-ordinate system.\\
+{\tt GLOBAL.COORD\_SYSTEM}    & Current co-ordinate system\footnote{The
+use of this parameter is being phased out. See 
+\latexelsehtml{Section~\ref{se:co-ordsystem}}{the section on 
+\htmlref{Co-ordinate Systems}{se:co-ordsystem}}.}.\\
 {\tt GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
 {\tt GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
 {\tt GLOBAL.IMAGE\_DISPLAY}   & Current image display (base).\\
@@ -2289,11 +2297,11 @@ a file name, and not a literal value.
 
 \small
 \begin{verbatim}
-     PLTITL - Plot title /' '/ @$ADAM_USER/galaxy.mytitle
+     TITLE - New NDF title /' '/ @$ADAM_USER/galaxy.mytitle
 \end{verbatim}
 \normalsize
-In this example PLTITL has the value of object MYTITLE in {\tt
-galaxy.sdf}.  If the {\tt @} were omitted PLTITL would be {\tt
+In this example TITLE has the value of object MYTITLE in {\tt
+galaxy.sdf}.  If the {\tt @} were omitted TITLE would be {\tt
 "\$ADAM\_USER/galaxy.mytitle"}.  You will need the {\tt @} prefix if your
 file name is a number.  Note that the file extension should not be
 included when giving the name of an \HDSref\ data file, including
@@ -2794,12 +2802,22 @@ You can obtain vector values too.
 
 \begin{verbatim}
     % ndftrace myndf > /dev/null
-    % set axlab = `parget ndftrace axlabel`
-    % display otherndf abslab=$axlab[1] ordlab=$axlab[2] axes 
+    % set axlab = `parget alabel ndftrace`
+    % display otherndf style="'label(1)=$axlab[1],label(2)=$axlab[2]"' axes 
 \end{verbatim}
 \normalsize
 This displays the image otherndf surrounded by axes, but the plot's
-axis labels originate from another dataset called myndf.
+axis labels originate from another dataset called myndf.{\footnote
+The {\tt style} parameter specifies the appearance of the annotated axes,
+and is given as a comma-separated group of \emph{attribute settings}, each
+of which is a {\tt name=value} string specifying the attribute name and
+value. In this case, we assign values to the two attributes {\tt label(1)}
+and {\tt label(2)}. The whole group must be enclosed in single quotes to
+prevent the parameter system splitting the string at the commas. The
+string must then also be enclosed in double quotes to prevent the UNIX shell
+from interpreting the parantheses and equals signs. A simpler way of
+specifying a ploting style is to put the attribute settings in a 
+\htmlref{text file}{se:style} \latexonly{(see Section~\ref{se:style})}.}
 There are more examples in the \xref{{\sl C-Shell Cookbook}}{sc4}{}.
 
 At the time of writing, ICL only permits scalar variables.  To do the
@@ -3059,8 +3077,9 @@ The NDF is more detailed and has been carefully designed to facilitate
 processing by both general applications like {\footnotesize KAPPA} and
 specialist packages.  It contains an $n$-dimensional data array that
 can store most astronomical data such as spectra, images and
-spectral-line data cubes.  The NDF may also contain information like a
-title, axis labels and units, error and quality arrays.  There are
+spectral-line data cubes.  The NDF may also contain other items such as a
+title, axis labels and units, error and quality arrays, and World
+Co-ordinate System (WCS) information.  There are
 also places in the NDF, called {\em extensions}, to store any
 ancillary data associated with the data array, even other NDFs.
 
@@ -3072,7 +3091,7 @@ includes the commands for manipulating the components.  Suffice to say
 here that the IMAGE format is more or less a degenerate form of the NDF,
 and so both formats can be used in parallel throughout {\footnotesize KAPPA};
 those applications using the IMAGE format will have restricted
-functionality, for example limited axis and quality processing, an
+functionality, for example limited co-ordinate and quality processing, an
 inability to handle \htmlref{NDF sections}{se:ndfsect}
 \latexonly{(Section~\ref{se:ndfsect})}, and cannot use the
 `on-the-fly' data-conversion scheme.
@@ -3620,292 +3639,446 @@ co-ordinates of the stars within the image via the cursor.  There are
 two main approaches to achieve this functionality.  The first is to
 duplicate the display code in the cursor application.  This is
 wasteful and inflexible.  The second is to store information about
-{\em pictures\/} in a database that can be accessed by graphics
-programmes.  A picture's position and extent are added to the database
-immediately after the plot is created. The latter technique is
-incorporated in \xref{AGI}{sun48}{} \latexonly{({\it{cf.}}\ SUN/48)}---the
-graphics database---which can store information about plots on any
-graphics device.
+{\em pictures\/} in a database that can be accessed by subsequent graphics
+programmes.  This is the technique used by \footnotesize{KAPPA}.
 
-AGI also stores a {\em name\/} and a {\em comment\/} for each picture.
-Optionally, a {\em label\/} may be added.  `Name' is something of a
-misnomer---`type' would give a clearer indication of its purpose.  In
-the same way `label' would have been called `name', but for the fact
-that `name' was in use.  Confused?  Don't worry.  It will become clear
-in a moment.
+Each graphics application which creates a display on a graphics device,
+also stores information describing the display in the \emph{graphics
+database}. This is a file which usually resides in the user's home
+directory, and is often referred to as the ``AGI
+database''\footnote{``AGI'' is the name of the subroutine library which
+provides access to the graphics database. AGI stands for ``Adam Graphics
+Interface'', and is documented in \xref{SUN/48}{sun48}{}.}. Displays are
+described in terms of \emph{pictures}. A picture is basically a
+rectangular area on the graphics device within which an application
+produces graphical output. Each time an application creates a picture,
+the dimensions and position of the picture (together with other ancillary
+information) are stored in the graphics database. Subsequent applications
+can then read this information back from the database, and use it (for
+instance) to align new graphics with previously displayed graphics.
 
-Currently, the name can take one of four values: {\tt "BASE"} or
-{\tt "FRAME"} or {\tt "DATA"} or {\tt "KEY"}. {\tt "BASE"} is reserved for
-the BASE picture; this is the picture that extends over the whole of the
-plotting area.  {\tt "DATA"} indicates that the picture contains a
-representation of data in a graphical form, {\it{e.g.}}\ a greyscale, an
-histogram.  {\tt "KEY"} is used for keys---there's a surprise. 
-{\tt "FRAME"} usually contains a collection of DATA pictures.  For instance, in
-a contour plot the DATA picture is the area where contours may
-potentially be drawn; whereas the FRAME picture comprises the annotated
-axes and labels, the key, and data area.
+The best way to demonstrate the use of the graphics database is to give 
+some illustrated examples.
 
-The comment is a one-line description of the picture.  At present in
-{\footnotesize KAPPA} the comment is just {\tt "KAPPA\_}{\it
-$<$application$>$}{\tt{"}} where {\it $<$application$>$} is
-the name of the application that created the picture.  However, if
-there is a demand, commentary might be modified to be under your
-control via a parameter in each graphics application, and that
-defaults to the application name as above.  What you can control now
-is the {\em label\/}.  This is a name you assign to a picture for easy
-reference and selection.
+\subsection{\xlabel{se_agiaction}The Graphics Database in Action\label{se:agiaction}}
 
-All {\footnotesize KAPPA} graphics applications use AGI, where new plots are
-being drawn or co-ordinates are required.  The best way to demonstrate
-{\footnotesize KAPPA} and AGI in harness is to give some illustrated examples.
-
-\subsection{\xlabel{se_agiaction}AGI and KAPPA in action\label{se:agiaction}}
-
-Assuming that {\footnotesize KAPPA} is loaded and the graphics device---an
-X-window of geometry 1024 by 780 pixels in the following examples---is
-available.  To create such a window use the {\tt xmake}
-(\xref{SUN/130}{sun130}{}) command
+The following examples assume that {\footnotesize KAPPA} is loaded and
+the graphics device---an X-window containing a plotting area of 900 by
+600 pixels---is available.  To create such a window use the {\tt xmake}
+(\xref{SUN/130}{sun130}{}) command:
 
 \small
 \begin{verbatim}
-     % xmake xwindows -geom 1024x780 -overlay -colours 64
+     % xmake xwindows -height 600 -width 900 -overlay -colours 64 
 \end{verbatim}
 \normalsize
-selecting an overlay and not too many colours.
 
-First of all we make the X-window the current graphics device and
-image display, and the X-window overlay the image-display overlay (as
-described in
-\latexelsehtml{Section~\ref{se:devglobal}).}{in \htmlref{global device
-names}{se:devglobal}.)}  These will remain in force until changed.  The
-following commands would not be necessary if the global parameters
-already had these values.
+This command limits the number of colours used by the X-window to
+64\footnote{It is usally a good idea to be sparing with X-window colours.
+Creating X-windows with too many colours can restrict the availabilty of
+colours for other X applications.} and creates an image overlay plane.
+
+First of all we make the X-window the current graphics device and image
+display, and the X-window overlay the image-display overlay (as described
+in \latexelsehtml{Section~\ref{se:devglobal}).}{in
+\htmlref{global device names}{se:devglobal}.)}  These will remain in force
+until changed.  The following commands would not be necessary if the
+global parameters already had these values:
 
 \small
 \begin{verbatim}
-     ICL> gdset xwindows
-     ICL> idset xwindows
-     ICL> ovset xoverlay
+     % gdset xwindows
+     % idset xwindows
+     % ovset xoverlay
 \end{verbatim}
 \normalsize
-Next we shall clear the X-window, and purge the database of xwindows
-and xoverlay pictures.  Note it does not clear the overlay, just the
-database entries, because AGI knows that the two graphics devices use
-the same screen, but \GKSref\ does not.
+Next we shall clear the X-window, and empty the graphics database
+of xwindows and xoverlay pictures (pictures relating to other graphics 
+devices are retained):
 
 \small
 \begin{verbatim}
-     ICL> gdclear
-     ICL> lutgrey
+     % gdclear
+\end{verbatim}
+\normalsize
+
+The display is now clear, but one picture remains in the graphics
+database; this is the \emph{base} picture and corresponds to the entire
+plotting area. To understand why this base picture is required we need to
+introduce the idea of the \emph{current picture}.
+
+At any time, one of the pictures stored within the graphics database is
+nominated as the \emph{current picture}. All graphical output created by 
+subsequent applications must reside within this current picture. Thus,
+the plotting area used by a graphics application can be controlled by
+selecting a suitable current picture before running the application.
+Since we have just cleared the database, the only picture remaining is the
+base picture, which consequently becomes the current picture. This allows
+subsequent applications to draw in any part of the plotting area.
+
+We now load a grey-scale colour table into the X-windows and display a
+negative image of a CCD frame such that 1 percent of the pixels appear as
+pure black, and 30 percent appear as pure white. We ensure that no
+annotated axes or border are produced (this will result in the image
+being a little larger since no margins need to be left for the axes or
+border):
+
+\small
+\begin{verbatim}
+     % lutgrey
+     % display $KAPPA_DIR/ccdframec noaxes noborder
+     MODE - Method to define the scaling limits /'FLASH'/ > perc
+     PERCENTILES - Percentiles for scaling /[10,90]/ > 99,30
+     Data will be scaled from 3918.688 to 2394.616.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi1.eps}
-   \caption{DISPLAYed CCD image as seen in the X-window except that it is
-   the negative of what you would actually see.  This was done for clarity
-   in high-contrast reproduction.  Yes it {\em could\/} be a lot worse!}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd1.eps}
+   \caption{A CCD frame displayed in the middle of the base picture.}
    \label{fi:agi1}
    \end{center}
    \end{figure}
 \end{latexonly}
 
-One picture remains in the database---the BASE---because AGI must
-always have a current picture into which further plots are drawn.
+\begin{htmlonly}
+   \label{fi:agi1}
+   \htmladdimg{sun95_gd1.gif}
 
-Next we display a CCD frame scaled between defined limits.  (The NDF
-used in this demonstration is {\tt \$KAPPA\_DIR/ccdframec}).  Details
-of the displayed image are recorded in the graphics database, but the
-current picture continues to be the BASE.  In other words {\em the
-current picture on input is the current picture on output}.  This is
-standard practice in {\footnotesize KAPPA}.  The only exceptions are
-applications that manage the database rather than plotting
-data.\footnote{An uncontrolled exit from an application,
-{\it{e.g.}}\ {\tt CTRL/C} may leave the database in an abnormal state.}
-If this rule was not enacted, pictures would become progressively
-smaller, vanishing into the distance, since new pictures cannot be
-drawn outside the current picture.  \htmlref{DISPLAY}{DISPLAY}, in
-keeping with other graphics applications, does not write a label.
-We'll see later how to annotate a picture with a label.
+   Figure 1: A CCD frame displayed in the middle of the base picture.
+\end{htmlonly}
+
+The X-window should now look like Figure~
+\latexelsehtml{\ref{fi:agi1}}{1}). The application has displayed the
+image in the middle of the current picture (the base picture), and has made 
+it as large as possible, subject to the constraints that it must lie entirely 
+within the current picture. As you see, the aspect ratio of the data
+array is retained by default.
+
+Let's now look at the contents of the graphics database (press return in 
+response for the prompt for parameter {\tt PICNUM}):
 
 \small
 \begin{verbatim}
-     ICL> display $KAPPA_DIR/ccdframec centre=[390,300]
-     MODE - Method to define scaling limits /'FLASH'/ > SC
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
+     % piclist
+
+       No. Name             Comment                   Label            Ref
+       -------------------------------------------------------------------
+     C   1 BASE             Base picture
+         2 DATA             KAPPA_DISPLAY                              Ref
+     PICNUM - Number of new current picture /!/ > 
+\end{verbatim}
+\normalsize
+
+This shows us that there are now two pictures in the database, listed in
+the order in which they were created. The current picture is still the
+base picture, as indicated by the letter {\tt C} at the left of the line
+describing picture number 1. The second picture was created by the
+\footnotesize{KAPPA} application DISPLAY, and has the name ``DATA'',
+indicating that it contains a representation of a set of data values. This
+is one of four standard picture \emph{names}. BASE is another of these
+standard names. We shall come across the other two shortly. We will come
+back to the other two columns in the above report (``Label'' and ``Ref'') 
+later. The \htmlref{PICLIST}{PICLIST} application allows you to select a
+new current picture by supplying a picture number in response to the
+prompt for parameter {\tt PICNUM}. Accepting the null default by
+pressing return causes the current picture on entry to be retained.
+
+The above use of \htmlref{DISPLAY}{DISPLAY} illustrates an important 
+rule regarding the behaviour of most graphical applications; {\em the
+current picture is not changed by applications which produce graphical
+output}\footnote{This rule does not apply to applications which 
+manage the database itself rather than producing graphical output. Thus,
+for instance, it is legal for PICLIST to change the current picture if
+you request such a change. Also, an uncontrolled exit from an application,
+{\it{e.g.}}\ {\tt CTRL/C} may leave the database in an abnormal state.}.
+If it were not for this rule, pictures would become progressively
+smaller, vanishing into the distance, since new pictures cannot be
+drawn outside the current picture.  
+
+We will now display the same image again, but this time we will arrange
+for it to be placed in the top right corner of the X-window. To do this,
+we first clear the whole X-window and graphics database using
+\htmlref{GDCLEAR}{GDCLEAR}, and then create a new picture using the
+\htmlref{PICDEF}{PICDEF} command prior to displaying the image. 
+\htmlref{PICDEF}{PICDEF} makes the new picture the current picture, and 
+so \htmlref{DISPLAY}{DISPLAY} is constrained to create its output within 
+this new picture:
+
+\small
+\begin{verbatim}
+     % gdclear
+     % picdef mode=tr
+     % display 
+     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
+     MODE - Method to define scaling limits /'perc'/ >
+     PERCENTILES - Percentiles for scaling /[99,30]/ > 
+     Data will be scaled from 3918.688 to 2394.616.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi2.eps}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd2.eps}
    \caption{CCD image DISPLAYed in the top-right quarter of the BASE picture.}
    \label{fi:agi2}
    \end{center}
    \end{figure}
 \end{latexonly}
 
-Unlike the earlier example where the image was plotted in the centre of the
-screen, here it is shifted down and to the left (see Figure~
-\latexelsehtml{\ref{fi:agi1}}{1}).
-{\tt CENTRE=[390,300]} means position the pixel (390,300) in the array
-at the centre of the current picture. As you can see the pixel can lie
-outside the bounds of the array. By default DISPLAY places the
-central pixel at the centre of the current picture.  When the current
-picture is the BASE, this location is therefore at the centre of the
-screen as we have here.
-
-\begin{htmlonly}
-   \label{fi:agi1}
-   \htmladdimg{sun95_agi1.gif}
-
-   Figure 1: DISPLAYed CCD image as seen in the X-window except that it is
-   the negative of what you would actually see.  This was done for clarity
-   in high-contrast reproduction.  Yes it {\em could\/} be a lot worse!
-\end{htmlonly}
-
-To illustrate this point and introduce a new command we shall plot
-the same data array in a picture at the top right of the screen (Figure~
-\latexelsehtml{\ref{fi:agi2}}{2}).
-
 \begin{htmlonly}
    \label{fi:agi2}
-   \htmladdimg{sun95_agi2.gif}
+   \htmladdimg{sun95_gd2.gif}
 
    Figure 2: CCD image DISPLAYed in the top-right quarter of the BASE picture.
 \end{htmlonly}
 
+
+The X-window should now look like Figure~
+\latexelsehtml{\ref{fi:agi2}}{2}). We can use \htmlref{PICLIST}{PICLIST} 
+again to list the pictures stored in the database:
+
 \small
 \begin{verbatim}
-     ICL> picdef mode=tr
-     ICL> display
-     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
+     % piclist
+       No. Name             Comment                   Label            Ref
+       -------------------------------------------------------------------
+         1 BASE             Base picture
+     C   2 FRAME            KAPPA_PICDEF
+         3 DATA             KAPPA_DISPLAY                              Ref
+     PICNUM - Number of new current picture /!/ > 
 \end{verbatim}
 \normalsize
+
+There are three pictures this time; the BASE picture, the picture created
+by \htmlref{PICDEF}{PICDEF} (number 2), and the picture created by
+\htmlref{DISPLAY}{DISPLAY} (number 3). Picture number 2 was made the
+current picture by \htmlref{PICDEF}{PICDEF}, and (as explained above)
+\htmlref{DISPLAY}{DISPLAY} did not change this. You can see that picture
+number 2 is a FRAME picture. This is the third of the four standard picture
+names mentioned above. A FRAME picture is a special picture which acts as a
+``frame'' for a group of other pictures. A FRAME picture can itself
+contain other nested FRAME pictures, together with DATA and KEY pictures.
+
+The FRAME picture created by \htmlref{PICDEF}{PICDEF} is half the linear
+size of the BASE picture, and is located in the top-right corner (hence
+{\tt mode=tr}).  The picture is initially empty, but it still becomes the
+new current picture.  Therefore when DISPLAY comes along and puts the
+image in the centre of the current picture it plots in the top-right
+corner of the screen, reducing the magnification by a factor of two in
+order to fit the image into the smaller picture.
+
+\htmlref{DISPLAY}{DISPLAY} has two parameters that control the $x$ and $y$ 
+magnifications, but these default to 1.0 on both axes. This produces the 
+largest magnification that displays the image without clipping or distortion. 
+We shall now re-display the image within the same current picture, but with
+magnification of 3.0 on each axis in order to produce an enlarged portion of
+the image.  (See \latexelsehtml{Section~\ref{se:ndfsect}}{\htmlref{NDF
+Sections}{se:ndfsect}} for an alternative way of displaying or
+processing a rectangular portion of an NDF.) Only the part of the
+magnified image that is located within the current picture will be
+visible; there is no spillage into other pictures:
+
+\small
+\begin{verbatim}
+     % display xmagn=3 ymagn=3
+     IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
+     MODE - Method to define scaling limits /'perc'/ >
+     PERCENTILES - Percentiles for scaling /[99,30]/ > 
+     Data will be scaled from 4890.225 to 2404.794.
+\end{verbatim}
+\normalsize
+
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi3.eps}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd3.eps}
    \caption{Magnified portion of the CCD image to the top right.}
    \label{fi:agi3}
    \end{center}
    \end{figure}
 \end{latexonly}
-\htmlref{PICDEF}{PICDEF} creates a new FRAME picture in the database.
-It is half the linear size of the BASE picture, and is located in the
-top-right corner (hence {\tt mode=tr}).  The picture is empty, but it
-still becomes the new current picture.  Therefore when DISPLAY comes
-along and puts the image in the centre of the current picture it plots
-in the top-right corner of the screen.  You will also notice that the
-magnification is correspondingly reduced by a factor of two, from 1.55
-to 0.775.  DISPLAY has two parameters that control the $x$ and $y$
-magnifications, but these default to the give the largest
-magnification that displays the image without clipping or distortion.
-Now we can exceed the default magnifications to produce an enlarged
-portion of the image within the current picture.  (See
-\latexelsehtml{Section~\ref{se:ndfsect}}{\htmlref{NDF
-Sections}{se:ndfsect}} for an alternative way to displaying or
-processing a rectangular portion of an NDF.) Only the part of the
-magnified image that is located within the current picture will be
-visible; there is no spillage into other pictures (Figure~
-\latexelsehtml{\ref{fi:agi3}}{3}).
 
 \begin{htmlonly}
    \label{fi:agi3}
-   \htmladdimg{sun95_agi3.gif}
+   \htmladdimg{sun95_gd3.gif}
 
    Figure 3: Magnified portion of the CCD image to the top right.
 \end{htmlonly}
 
+The X-window should now look like Figure~
+\latexelsehtml{\ref{fi:agi3}}{3}). Looking again at the pictures stored in 
+the database:
+
 \small
 \begin{verbatim}
-     ICL> display xmagn=2.5 ymagn=2.5
+     % piclist
+       No. Name             Comment                   Label            Ref
+       -------------------------------------------------------------------
+         1 BASE             Base picture
+     C   2 FRAME            KAPPA_PICDEF
+         3 DATA             KAPPA_DISPLAY                              Ref
+         4 DATA             KAPPA_DISPLAY                              Ref
+     PICNUM - Number of new current picture /!/ > 
+\end{verbatim}
+\normalsize
+
+We see there are now four pictures. The previous three are still there,
+since we did not empty the database by running \htmlref{GDCLEAR}{GDCLEAR}
+before creating the magnified image. In addition, \htmlref{DISPLAY}{DISPLAY} 
+has added a fourth picture corresponding to the magnified image.
+
+Let's say we now wanted to include an image of the whole CCD frame in the
+left half of the window. This involves plotting outside the FRAME picture
+created by \htmlref{PICDEF}{PICDEF} above, and so we first need to create
+a new FRAME picture in the bottom left corner ({\tt mode=BL}) using
+\htmlref{PICDEF}{PICDEF} as we did above\footnote{By default, the pictures
+created by PICDEF are not constarined to lie within the current
+picture.}. By default this picture would have half the height and width
+of the whole window, giving a short wide picture. This is not well
+matched to the shape of the CCD frame which is taller than it is wide.
+For this reason we specify that the picture should occupy the full height
+of the window and half its width using the {\tt FRACTION} parameter (we
+also suppress the drawing of a box round the picture using the {\tt
+NOOUTLINE} keyword). We then display the image in this new FRAME picture,
+this time including annotated axes (showing pixel co-ordinates in this
+particular case):
+
+\small
+\begin{verbatim}
+     % picdef mode=bl fraction='[0.5,1.0]' nooutline
+     % display axes
      IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     LOW - Low value for display /2250/ > 2300
-     HIGH - High value for display /30790.99/ > 4700
-\end{verbatim}
-\normalsize
-Before we plot any more pictures we can give the current picture---still
-the frame created by PICDEF---a label.
-
-\small
-\begin{verbatim}
-     ICL> piclabel eric
-\end{verbatim}
-\normalsize
-If we move to or create a new current picture, and then want to return
-to ERIC all we have to enter is
-
-\small
-\begin{verbatim}
-     ICL> picsel eric
+     MODE - Method to define scaling limits /'perc'/ >
+     PERCENTILES - Percentiles for scaling /[99,30]/ > 
+     Data will be scaled from 3918.688 to 2394.616.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi4.eps}
-   \caption{Contour plot added to bottom-right.}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd4.eps}
+   \caption{Original CCD image with a magnified sub-section.}
    \label{fi:agi4}
    \end{center}
    \end{figure}
 \end{latexonly}
 
-The graphics database is not restricted to images.  To show this we
-shall draw a contour plot in the bottom-right corner of the BASE
-picture.  The new picture has the aspect ratio of the BASE picture.  Its
-dimension is measured as a fraction of the linear size of the BASE
-picture, which is controlled by the parameter {\tt FRACTION}.  The
-current picture is not cleared before plotting so you can see through
-the contour plot to the galaxy image behind (Figure~
-\latexelsehtml{\ref{fi:agi4}}{4}).  The {\tt NOOUTLINE} prevents an
-outline from being drawn around the picture.
-
 \begin{htmlonly}
    \label{fi:agi4}
-   \htmladdimg{sun95_agi4.gif}
+   \htmladdimg{sun95_gd4.gif}
 
-   Figure 4: Contour plot added to bottom-right.
+   Figure 4: Original CCD image with a magnified sub-section.
 \end{htmlonly}
+
+
+The X-window should now look like Figure~
+\latexelsehtml{\ref{fi:agi4}}{4}). The graphics database now contains the
+following pictures:
 
 \small
 \begin{verbatim}
-     ICL> picdef mode=br fraction=0.65 nooutline
-     ICL> turbocont $KAPPA_DIR/ccdframec(51:250,141:330) noclear ~
-     pltitl="AGI demonstration"
+     % piclist
+       No. Name             Comment                   Label            Ref
+       -------------------------------------------------------------------
+         1 BASE             Base picture
+         2 FRAME            KAPPA_PICDEF
+         3 DATA             KAPPA_DISPLAY                              Ref
+     C   4 FRAME            KAPPA_PICDEF
+         5 FRAME            KAPPA_DISPLAY
+         6 DATA             KAPPA_DISPLAY                              Ref
+     PICNUM - Number of new current picture /!/ > 
+\end{verbatim}
+\normalsize
+
+The bottom-left FRAME picture created by \htmlref{PICDEF}{PICDEF} is
+number 4, and is the current picture. This FRAME picture contains another
+FRAME picture created by \htmlref{DISPLAY}{DISPLAY} (number 5) containing
+the DATA picture (number 6) and the annotated axes.
+
+
+Before we plot any more pictures we can give the current picture---
+the bottom-left frame created by PICDEF---a label:
+
+\small
+\begin{verbatim}
+     % piclabel eric
+\end{verbatim}
+\normalsize
+If we move to or create a new current picture, and then want to return
+to ERIC all we have to enter is:
+
+\small
+\begin{verbatim}
+     % picsel eric
+\end{verbatim}
+\normalsize
+
+The graphics database is not restricted to images.  To show this we shall
+draw a contour plot in the bottom-right corner of the BASE picture. We
+again create a new FRAME picture using \htmlref{PICDEF}{PICDEF} to hold
+the contour map. The new FRAME picture has the aspect ratio of the BASE
+picture.  Its dimension is measured as a fraction of the linear size of
+the BASE picture, which is controlled by the parameter {\tt FRACTION}.
+The current picture is not cleared before plotting so you can see through
+the contour plot to the galaxy image behind (Figure~
+\latexelsehtml{\ref{fi:agi5}}{5}).  The {\tt NOOUTLINE} again prevents an
+outline from being drawn around the picture:
+
+\small
+\begin{verbatim}
+     % picdef mode=br fraction=0.65 nooutline
+     % contour '$KAPPA_DIR/ccdframec(51:250,141:330)' noclear \
+               keystyle='colour=blue'
      MODE - Method for selecting contour heights /'FREE'/ > ar
      NCONT - Give the number of contour heights /6/ > 5
      Contour heights used:
      2478.022,   2560,958,   2697.029,   3042.488,   4050.937.
 \end{verbatim}
 \normalsize
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd5.eps}
+   \caption{Contour plot added to bottom right.}
+   \label{fi:agi5}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:agi5}
+   \htmladdimg{sun95_gd5.gif}
+
+   Figure 5: Contour plot added to bottom right.
+\end{htmlonly}
+
 The PICDEF command allows you to define new pictures with any
 aspect ratio.  To do this you can supply a value for the ASPECT
 parameter, or define explicit limits ({\tt{mode=xy}}) or
 use the cursor ({\tt{mode=cursor}})---the default.  Also, you may
 constrain the new picture to lie within the current picture with
 parameter {\tt CURRENT}.  In this case the fractional size and aspect
-ratio relate to the current picture.
+ratio relate to the current picture:
 
 \small
 \begin{verbatim}
-     ICL> picdef current
-     To select a point press the left button on the mouse or trackerball.
-     To exit press the right button.
+     % picdef current
+
      Use the cursor to select 2 distinct points.
+       To select a point press the space bar or left mouse button
+       To quit press "." or the right mouse button
+
 \end{verbatim}
 \normalsize
+
 If you try to select a point outside the current picture you will be told
-and the cursor position is reset.
+and the cursor position is reset:
 
 \small
 \begin{verbatim}
@@ -3913,73 +4086,76 @@ and the cursor position is reset.
      Co-ordinates are ( 0.5160462, 1.0269577E-02 ) and ( 0.8908858, 0.6046214 )
 \end{verbatim}
 \normalsize
+
 Notice there is an outline of the region selected, as it is drawn
 by default.
 
-Now draw a greyscale plot and its key within the region.
+Now draw a positive greyscale plot and its key within the region.
 The extent of the new current picture can be seen in silhouette against
 the earlier pictures (Figure~
-\latexelsehtml{\ref{fi:agi5}}{5}).
-
-\begin{htmlonly}
-   \label{fi:agi5}
-   \htmladdimg{sun95_agi5.gif}
-
-   Figure 5: Greyplot added within the region of contour picture defined by
-   PICDEF's cursor.
-\end{htmlonly}
+\latexelsehtml{\ref{fi:agi6}}{6}):
 
 \small
 \begin{verbatim}
-     ICL> greyplot $KAPPA_DIR/ccdframec pltitl="AGI demonstration"
+     % greyplot $KAPPA_DIR/ccdframec 
      KEY - Do you want a key of the grey levels and a title ? /TRUE/ >
-     MODE - Method to define scaling limits /'SCALE'/ >
-     BLACK - Value to be black in the plot? /30790.99/ > 4700
-     WHITE - Value to be white in the plot? /2250/ > 2300
+     MODE - Method to define the scaling limits /'scale'/ > perc
+     PERCENTILES - Percentiles for scaling /[10,90]/ > 30,99
+     Data will be scaled from 2394.616 to 3918.688.
 \end{verbatim}
 \normalsize
 
 \begin{latexonly}
    \begin{figure}[ht]
    \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi5.eps}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd6.eps}
    \caption{Greyplot added within the region of contour picture defined by
    PICDEF's cursor.}
-   \label{fi:agi5}
+   \label{fi:agi6}
    \end{center}
    \end{figure}
 \end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:agi6}
+   \htmladdimg{sun95_gd6.gif}
+
+   Figure 6: Greyplot added within the region of contour picture defined by
+   PICDEF's cursor.
+\end{htmlonly}
+
 PICDEF has one further mode---Array.  This enables you to create an
 $n\times m$ grid of new FRAME pictures.  It also has a mechanism for
 labelling all the pictures, so you can easily switch between the
 elements of the picture array.  You might use the following command in
-an \ICLref\ procedure to display a series of up to twelve spectra.
+a shell script to display a series of up to twelve spectra:
 
 \small
 \begin{verbatim}
-     ICL> picdef mode=a prefix=spec xpic=3 ypic=4
+     % picdef mode=a prefix=spec xpic=3 ypic=4
 \end{verbatim}
 \normalsize
+
 The bottom-left picture would be labelled SPEC1 and the rest are
 numbered in sequence from left to right to SPEC12---the top-right
 picture.  You'd call \htmlref{PICSEL}{PICSEL} to select each picture
-in turn via the {\footnotesize ICL} SNAME function \latexonly{(see
-Section~\ref{se:ICLproc})}, or use a {\bf while} loop in a C-shell
+in turn via a {\bf while} loop in a C-shell
 script\latexonly{ (see Section~\ref{se:cshscript})}.  Since this is a
 common operation a shorthand command, \htmlref{PICGRID}{PICGRID}, is
-available.  For instance,
+available.  For instance:
 
 \small
 \begin{verbatim}
-     ICL> picgrid 3 4
+     % picgrid 3 4
 \end{verbatim}
 \normalsize
+
 is equivalent to the previous example, except that the pictures are
 labelled 1 to 12.
 
 You can see that montages of pictures can rapidly be built.
 Occasionally, you will want some earlier picture to become the current
-picture.  As we've seen labelled picture can be recalled via PICSEL,
+picture.  As we've seen, a labelled picture can be recalled via PICSEL,
 but not all pictures will be labelled, especially ones with name {\tt
 DATA}, because of the rule that applications must not change the
 current picture.  Another way to select a new current picture is via
@@ -4026,11 +4202,11 @@ can even plot an outline with the OUTLINE keyword if you can't
 visualise the device co-ordinates.  The current picture does not have
 a label.  If it did this too would be listed by GDSTATE.  PICLIST also
 flags the current picture with a {\tt C} to the left of the picture
-numbers.
+numbers:
 
 \small
 \begin{verbatim}
-     ICL> gdstate
+     % gdstate
  
      Status of the xwindows window graphics device...
         Physical device: 
@@ -4039,49 +4215,37 @@ numbers.
         Comment: KAPPA_PICDEF
         World co-ordinates:
                     X = 0.5160462 to 0.8908858
-                    Y = 1.0269577E-02 to 0.6046214
+                    Y = 0.01026958 to 0.6046214
         Normalised device co-ordinates:
-                    X = 0.3930821 to 0.6786044
-                    Y = 7.822529E-03 to 0.4605515
+                    X = 0.3437003 to 0.5933533
+                    Y = 0.006839803 to 0.4026937
  
 \end{verbatim}
 \normalsize
 
-Let us select the first picture that we displayed (the image to the
+Let us select the second picture that we displayed (the image to the
 bottom left).  Having done so we can then inspect some of the data in
 that picture.  \htmlref{INSPECT}{INSPECT} looks for the topmost data
 picture within the current picture.  This may be the current picture
 itself. Using the database entries it knows the position and extent of
 the picture, and so when you come to place the cursor on a point, its
-pixel co-ordinates can be evaluated.  Notice that AGI remembers the
-name of the source data array and so you need not re-enter it here.
+pixel co-ordinates can be evaluated.  Now we come to that ``Ref'' string
+at the right hand side of the report produced by
+\htmlref{PICLIST}{PICLIST}. It indicates that theDATA picture includes a
+\emph{reference} to the data array which was displayed in the picture 
+(a reference is basically the name of a data file). Since the database
+contains the name of the data file, you need not re-enter it here.
 If you want to inspect another NDF of the same dimensions you can
-override the NDF stored in AGI by specifying the NDF you want on the
+override the NDF stored in the database by specifying the NDF you want on the
 command line.  Sometimes you might obtain the wrong array; see
 \latexelsehtml{Section~\ref{se:probwrongNDF}}{\htmlref{Problems
 Problems}{se:probwrongNDF}} on what to do.  In the example below a
 slice through the CCD frame is plotted on the overlay plane (Figure~
-\latexelsehtml{\ref{fi:agi6}}{6}).
-
-\begin{latexonly}
-   \begin{figure}[hbt]
-   \begin{center}
-   \leavevmode\epsfysize=125mm\epsfbox{sun95_agi6.eps}
-   \caption{A slice through the image drawn on the overlay plane.}
-   \label{fi:agi6}
-   \end{center}
-   \end{figure}
-\end{latexonly}
-\begin{htmlonly}
-   \label{fi:agi6}
-   \htmladdimg{sun95_agi6.gif}
-
-   Figure 6: A slice through the image drawn on the overlay plane.
-\end{htmlonly}
+\latexelsehtml{\ref{fi:agi7}}{7}):
 
 \small
 \begin{verbatim}
-     ICL> piccur
+     % piccur
 
      Use the graphics cursor to define the next point or picture...
         Press left button on mouse/trackerball to select a point.
@@ -4089,7 +4253,7 @@ slice through the CCD frame is plotted on the overlay plane (Figure~
 
       X = 183.4733, Y = 264.575 in KAPPA_DISPLAY ( DATA )
 
-     ICL> inspect
+     % inspect
 
      For certain options, boxes will appear.  The functions are controlled
      by the mouse/trackerball buttons and keyboard...
@@ -4107,6 +4271,24 @@ slice through the CCD frame is plotted on the overlay plane (Figure~
      OPTION - Option required /'Region'/ > E
 \end{verbatim}
 \normalsize
+
+\begin{latexonly}
+   \begin{figure}[hbt]
+   \begin{center}
+   \leavevmode\epsfysize=125mm\epsfbox{sun95_gd7.eps}
+   \caption{A slice through the image drawn on the overlay plane.}
+   \label{fi:gd7}
+   \end{center}
+   \end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+   \label{fi:agi7}
+   \htmladdimg{sun95_gd7.gif}
+
+   Figure 7: A slice through the image drawn on the overlay plane.
+\end{htmlonly}
+
 A word of warning about the device for GDEVICE.  Don't use the base
 plane of the image display, in this case {\tt xwindows}.  Otherwise
 your underlying images will be erased when a line plot is drawn.
@@ -4114,8 +4296,8 @@ The current-graphics-device scheme breaks down here.  Both
 options: no default or occasionally a harmful default,
 are undesirable.  Anyway you've been warned!
 
-Using the same picture we can now demonstrate the contour-overlay
-application, \htmlref{CONTOVER}{CONTOVER}.  The data array we have
+Using the same picture we can now demonstrate the overlaying of contours
+using \htmlref{CONTOUR}{CONTOUR}.  The data array we have
 employed so far is smoothed with \htmlref{GAUSMOOTH}{GAUSMOOTH}; the
 origin is shifted with \htmlref{SETORIGIN}{SETORIGIN}, (moving the
 image ten pixels left and twenty down); and then all values outside a
@@ -4123,13 +4305,26 @@ circle centred at pixel (160,~230), radius 70 pixels are set to zero
 via \htmlref{OUTSET}{OUTSET} to make {\tt \mbox{ccdcircle.sdf}}. See Figure~
 \latexelsehtml{\ref{fi:agi7}}{7}.  The plot is made to the current
 overlay device, defined by \htmlref{OVSET}{OVSET}, namely {\tt xov}.
-Currently, only pixel offsets may be used, but eventually complicated
-transformations will be possible, say for overlaying a radio map on
-the infra-red image of a source.  Note that CONTOVER reports the name
-of the NDF used for the underlying image, so if for some reason it is
-not the one you intended, just abort ({\tt{!!}}) at the prompt for
-parameter OFFSET. (You can check what the reference object will be
-with the \htmlref{PICIN}{PICIN} command.)
+If the {\tt NOCLEAR} keyword is specified when running CONTOUR, then an
+attempt is made to align the new data with the previously displayed data.
+This alignment is based on information describing the World Co-ordinate
+Systems stored with the two data arrays. When \htmlref{DISPLAY}{DISPLAY}
+creates a picture it stores such information with the picture in the
+graphics database. CONTOUR can then read this information from the
+database, and use it to align the new data array with the image created
+by DISPLAY:
+
+\small
+\begin{verbatim}
+     % contour noclear 
+     NDF - Image to be contoured /@$KAPPA_DIR/ccdframec/ > ccdcircle
+     Current picture has name: DATA, comment: KAPPA_DISPLAY
+        Reference data object: /star/bin/kappa/ccdframec.
+     OFFSET - x-y displacement in pixels /0,0/ > 10,20
+     MODE - Method for selecting contour heights /'Free'/ >
+     HEIGHTS - Give the heights of the contours > [2400,2500,2650,2900,3300,3900]
+\end{verbatim}
+\normalsize
 
 \begin{latexonly}
    \begin{figure}[hbt]
@@ -4149,18 +4344,6 @@ with the \htmlref{PICIN}{PICIN} command.)
    original CCD image.
 \end{htmlonly}
 
-\small
-\begin{verbatim}
-     ICL> contover
-     NDF - Image to be contoured /@$KAPPA_DIR/ccdframec/ > ccdcircle
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
-        Reference data object: /star/bin/kappa/ccdframec.
-     OFFSET - x-y displacement in pixels /0,0/ > 10,20
-     MODE - Method for selecting contour heights /'Free'/ >
-     HEIGHTS - Give the heights of the contours > [2400,2500,2650,2900,3300,3900]
-\end{verbatim}
-\normalsize
-
 Application PICCUR has a dual role.  It also provides a means of
 determining the co-ordinates of points in pictures selected with the
 cursor.  Again only the topmost picture at a given cursor location is
@@ -4173,7 +4356,7 @@ cursor position selected.
 
 \small
 \begin{verbatim}
-     ICL> piccur
+     % piccur
 
      Use the graphics cursor to define the next point or picture...
         Press left button on mouse/trackerball to select a point.
@@ -4205,13 +4388,9 @@ applications.  There is also the {\tt XYcur} option in INSPECT; it marks
 the points selected, and allows updating of lists of $x$-$y$ positions
 stored in text files.
 
-\subsection{\xlabel{se_agitidy}Tidying\label{se:agitidy}}
+\subsection{\xlabel{se_agitidy}The Graphics Database File\label{se:agitidy}}
 
-The contents of the graphics database are ephemeral.  Therefore you
-should regularly purge the database entries with
-\htmlref{GDCLEAR}{GDCLEAR} (or optionally via \htmlref{IDCLEAR}{IDCLEAR}
-for the current image display), or delete the database file.  The
-location of the AGI database can be controlled by setting the
+The location of the graphics database file can be controlled by setting the
 environment variable AGI\_USER to the desired location.  If AGI\_USER
 is undefined, the database file is placed in your home directory.
 Thus by default the file is {\tt \$HOME/agi\_}{\it $<$node$>$}{\tt
@@ -4222,9 +4401,111 @@ AGI will purge the database for a device if the graph window has
 changed size, or if you switch between portrait and landscape formats
 for a printer device.
 
+The contents of the graphics database are ephemeral.  Therefore you
+should regularly purge the database entries with
+\htmlref{GDCLEAR}{GDCLEAR} (or optionally via \htmlref{IDCLEAR}{IDCLEAR}
+for the current image display), or delete the database file. 
+
+If a graphics application is aborted abnormally (for instance by pressing 
+{\tt CTRL/C}), the graphics database may be corrupted, potentially 
+resulting in various forms of peculiar behaviour when subsequent graphics
+applications are run. If you get ``strange'' behaviour when running a
+graphics application, deleting the graphics database file and starting
+again will often cure the problem.
+
+\subsection{\xlabel{se_agicomp}The Components of a Picture\label{se:agicomp}}
+
+In addition to the dimensions and position of a rectangular area on the
+graphics device, each AGI picture also contains a {\em name\/} and a {\em
+comment\/}. Optionally, a {\em label\/} may be added.  `Name' is
+something of a misnomer---`type' would give a clearer indication of its
+purpose.  In the same way `label' would have been called `name', but for
+the fact that `name' was in use.  
+
+Currently, the name can take one of four values: {\tt "BASE"} or
+{\tt "FRAME"} or {\tt "DATA"} or {\tt "KEY"}. {\tt "BASE"} is reserved for
+the BASE picture; this is the picture that extends over the whole of the
+plotting area.  {\tt "DATA"} indicates that the picture contains a
+representation of data in a graphical form, {\it{e.g.}}\ a greyscale, an
+histogram.  {\tt "KEY"} is used for keys---there's a surprise. 
+{\tt "FRAME"} usually contains a collection of DATA pictures.  For instance, in
+a contour plot the DATA picture is the area where contours may
+potentially be drawn; whereas the FRAME picture comprises the annotated
+axes and labels, the key, and data area.
+
+The comment is a one-line description of the picture.  At present in
+{\footnotesize KAPPA} the comment is just {\tt "KAPPA\_}{\it
+$<$application$>$}{\tt{"}} where {\it $<$application$>$} is
+the name of the application that created the picture.  However, if
+there is a demand, commentary might be modified to be under your
+control via a parameter in each graphics application, and that
+defaults to the application name as above.  What you can control now
+is the {\em label\/}.  This is a name you assign to a picture for easy
+reference and selection.
+
+A DATA picture may also have associated World Co-ordinate System (WCS) 
+information stored with it in the AGI database. This information is
+copied from the displayed NDF when the picture is is created, and enables 
+subsequent applications to use positions in any of the co-ordinates Frames 
+which were available in the NDF.\footnote{Not all {\footnotesize KAPPA}
+applications use this facility as yet. Those which do will indicate the
+fact in the {\bf Notes:} section of the application description in
+\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
+KAPPA applications}{ap:full}}.}
+
 \newpage
 \section{\xlabel{se_co-ordsystem}Co-ordinate Systems
 \label{se:co-ordsystem}}
+
+\begin{quote}
+\begin{center}
+
+{\em 
+
+{\footnotesize KAPPA} is currently undergoing major changes in the
+way it handles co-ordinate information. The new system uses the
+\htmlref{WCS}{apndf:wcs}
+({\emph World Co-ordinate System}) component of the \NDFref{NDF}\
+structure to allow access to a much wider range of co-ordinate systems
+than has previously been available. For this reason, you will find some
+inconsistencies in the way co-ordinate information is handled by
+different applications. This situation will be rectified once all
+applications have been modified to use the WCS component. Until then,
+please pay particular attention to the descriptions of the co-ordinate
+handling facilities of each application you use. 
+
+The new (converted) applications are identified by the fact that their
+descriptions in
+\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
+KAPPA applications}{ap:full}} include references to the ``WCS
+component'' or to ``WCS information''. In the new system, each NDF has a
+``current co-ordinate Frame''. The converted applications use this
+co-ordinate Frame when referring to any position within the NDF, for
+instance when producing axis annotation, or requesting a position from
+the user. Each NDF has its own current co-ordinate Frame, and the global
+parameter GLOBAL.COORD\_SYSTEM (see
+\latexelsehtml{Section~\ref{se:parglobals}}
+{section \htmlref{Globals}{se:parglobals}}) is ignored. These application
+do not have a {\tt COSYS} parameter which has previously been used to
+specify a co-ordinate system.
+
+In the previous system, there was a ``global'' co-ordinate system which
+was used by all applications irrespective of the contents of the NDF.
+This co-ordinate system was either \emph{data} or \emph{world} and was
+obtained by each application using a {\tt COSYS} parameter. These
+parameters were associated with the global parameter GLOBAL.COORD\_SYSTEM.
+
+The rest of this section describes the old pre-WCS system and will be
+removed when the conversion process is complete. The new system is
+described in
+\latexelsehtml{Section~\ref{se:wcsuse}}
+{the section \htmlref{Using World Co-ordinate Systems}{se:wcsuse}}).
+Information which is common to both systems (for instance the definition
+of pixel co-ordinates) is included in both sections.
+
+}
+\end{center}
+\end{quote}
 
 {\footnotesize KAPPA} uses a number of co-ordinate systems; this section
 describes them, and how to select one.  \htmlref{NDFTRACE}{NDFTRACE}
@@ -4357,7 +4638,7 @@ co-ordinates. For instance,
 
 \small
 \begin{verbatim}
-     % display cosys=w axes \\
+     % greyplot cosys=w axes \\
      % centroid
 \end{verbatim}
 \normalsize
@@ -4369,7 +4650,7 @@ Conversely,
 
 \small
 \begin{verbatim}
-     % display cosys=d axes \\
+     % greyplot cosys=d axes \\
      % centroid
 \end{verbatim}
 \normalsize
@@ -4396,28 +4677,64 @@ applications?  No\ldots well almost certainly not. {\footnotesize KAPPA}
 strives to find a linear transformation between your data co-ordinates
 and pixel co-ordinates, or a logarithmic one in some cases.  If it
 succeeds the transformation is stored in the database.  Thus if you
-plot a spectrum with wavelength along the abscissa, you can then use
-CURSOR to identify lines.
+display an image with offsets in arc-minutes along both axes,
+you can then use CURSOR to identify the offsets in arc-minutes of positions 
+on the screen.
 
-\small
-\begin{verbatim}
-     % linplot spectrum cosys=d \\
-     % cursor
+\newpage
+\section{\xlabel{se_wcsuse}Using World Co-ordinate Systems\label{se:wcsuse}}
 
+\begin{quote}
+\begin{center}
 
-     Use the graphics cursor to define the next point...
-        Press left button on mouse/trackerball to select a point.
-        Press right button on mouse/trackerball to end input.
+{\em 
 
-     X=3934.254, Y=196.118 in KAPPA_LINPLOT( DATA )
-     X=3969.148, Y=196.118 in KAPPA_LINPLOT( DATA )
-\end{verbatim}
-\normalsize
-The $x$ co-ordinates are the wavelengths in {\AA}ngstroms of the Calcium
-II H and K lines.
+{\footnotesize KAPPA} is currently undergoing major changes in the
+way it handles co-ordinate information. This section describes the new
+system which is based on the \htmlref{WCS}{apndf:wcs}
+({\emph World Co-ordinate System}) component of the \NDFref{NDF}\
+structure. See 
+\latexelsehtml{Section~\ref{se:co-ordsystem}}
+{the section \htmlref{Co-ordinate Systems}{se:co-ordsystem}} for a
+description of the old system (based on the use of the {\tt COSYS}
+parameter) which is being replaced.
 
-If the global parameter is undefined you will be prompted for
-a co-ordinate as required.
+The new (converted) applications are identified by the fact that their
+descriptions in
+\latexelsehtml{Appendix~\ref{ap:full}}{the \htmlref{Specifications of
+KAPPA applications}{ap:full}} include references to the ``WCS
+component'' or to ``WCS information''. These applications no longer have a 
+{\tt COSYS} parameter.
+
+The older applications are identified by the fact they make no reference
+to the WCS component, and have a {\tt COSYS} parameter. 
+
+}
+\end{center}
+\end{quote}
+
+\subsection{Introduction}
+What are co-ordinate Frames, and why are they important?
+Some simple examples.
+A general outline of the scheme.
+
+\subsection{Distinguishing between Co-ordinate Frames --- Domains}
+Domain names, SCS specifications, etc.
+
+\subsection{Creating a WCS component}
+
+\subsection{Modifying a WCS component}
+Propagation, attributes.
+
+\subsection{Restrictions on Mappings}
+Problems if Mappings are not bi-directional (eg if Axes are not monotonic).
+
+\subsection{How is World Co-ordinate Information Stored in an NDF?}
+Frames, Mappings, FrameSets. 
+WCS, IRAS90, FITS. 
+AXIS structures.
+
+\subsection{Positions lists}
 
 \newpage
 \section{\xlabel{se_interaction}Interaction Mode\label{se:interaction}}
@@ -4621,7 +4938,7 @@ simultaneously display
 images with certain colour tables, there may be conflict of interests.
 For instance, a linear greyscale colour table's first few colour indices
 will be almost black.  By default, these same indices, particularly
-index 1, are used by \GKSref/\SGSref\ for line graphics, thus
+index 1, are used by the graphics system for line graphics, thus
 any plots will be invisible.  If you reset colour index 1 to white, the
 appearance of your image alters.   Whenever you alter the colour table
 to enhance the look of your image, it will affect the line graphics.
@@ -6444,8 +6761,8 @@ UBOUND parameter arrays.
            ORIGLABEL = "ORIGIN"
         END IF
 
-     { Display the image with axes using the most-ornate fount.
-        DISPLAY (FILE) MODE=PE AXES FONT=NCAR COSYS=D SCALOW=(LOW) SCAHIGH=(HIGH) \
+     { Display the image with axes 
+        DISPLAY (FILE) MODE=PE AXES SCALOW=(LOW) SCAHIGH=(HIGH) \
 
      { Find the extent of the last frame picture, i.e. the one associated
      { with the last displayed image.
@@ -6713,7 +7030,7 @@ complaining about.
 
 \small
 \begin{verbatim}
-     % linplot $KAPPA_DIR/spectrum pltitl="Red-giant plot"
+     % linplot $KAPPA_DIR/spectrum style="Title=Red-giant plot"
      !! The choice plot is not in the menu.  The options are
      !     Data,Quality,Error,Variance.
      !  Invalid selection for parameter COMP.
@@ -6724,7 +7041,7 @@ the {\tt{"}} to cure the problem.
 
 \small
 \begin{verbatim}
-     % linplot $KAPPA_DIR/spectrum pltitl='"Red-giant plot"'
+     % linplot $KAPPA_DIR/spectrum style='"Title=Red-giant plot"'
 \end{verbatim}
 \normalsize
 
@@ -6882,8 +7199,8 @@ monolith interface files.
 \normalsize
 
 
-If that doesn't cure the problem, send me {\tt mjc@star.rl.ac.uk}
-or the Starlink Software Librarian {\tt ussc@star.rl.ac.uk} a log of
+If that doesn't cure the problem, send the Starlink Software Librarian 
+{\tt ussc@star.rl.ac.uk} a log of
 the session demonstrating the problem, and we shall endeavour to
 interpret it for you, and find out what's going wrong.
 
@@ -7078,11 +7395,7 @@ abbreviated.
 
 Several people have contributed complete {\footnotesize KAPPA} programmes, or
 have upgraded earlier versions, or have written original code (which
-eventually became included in {\footnotesize KAPPA} after reworking).
-Particularly noteworthy contributions have been made by David Berry,
-who wrote or improved the Fourier-transform-based commands, and
-provided several other applications, converted some to use the NDF
-library, and made improvements to existing routines.  Rodney
+eventually became included in {\footnotesize KAPPA} after reworking). Rodney
 Warren-Smith converted several of the old IMAGE applications to use
 the NDF\_ library, and supplied several other programmes, especially
 ones that now form the basis of NDFPACK. Other contributions have come
@@ -12361,7 +12674,9 @@ default value.
       of the displayed positions may be controlled using parameter STYLE.
 
       Positions may be reported in several different co-ordinate Frames
-      (see parameter FRAME).
+      (see parameter FRAME). Optionally, the corresponding pixel
+      co-ordinates at each position may also be reported (see parameter
+      SHOWPIXEL).
 
       The picture or pictures within which positions are required can be
       selected in several ways (see parameters MODE and NAME).
@@ -12375,31 +12690,31 @@ default value.
    }
    \sstparameters{
       \sstsubsection{
-         CLOSE = LOGICAL (Read)
+         CLOSE = \_LOGICAL (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
-         {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. If TRUE, polgons will be closed by joining
-         the first position to the last position. [Current value]
+         {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. If TRUE, polygons will be closed by joining
+         the first position to the last position. [current value]
       }
       \sstsubsection{
-         DESCRIBE = LOGICAL (Read)
+         DESCRIBE = \_LOGICAL (Read)
       }{
          If TRUE, a detailed description of the co-ordinate Frame in which
          subsequent positions will be reported is produced each time a
-         position is reported within a new picture. [Current value]
+         position is reported within a new picture. [current value]
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The graphics workstation.  This device must support cursor
-         interaction. [The current graphics device]
+         interaction. [current graphics device]
       }
       \sstsubsection{
-         EPOCH = DOUBLE PRECISION (Read)
+         EPOCH = \_DOUBLE (Read)
       }{
-         If an IRAS90 Sky Co-ordinate System specification is supplied
-         (using parameter FRAME) for a celestial co-ordinate system,
-         then an epoch value is needed to qualify it. This is the epoch at
+         If a {\tt "}Sky Co-ordinate System{\tt "} specification is supplied (using
+         parameter FRAME) for a celestial co-ordinate system, then an
+         epoch value is needed to qualify it. This is the epoch at
          which the supplied sky positions were determined. It should be
          given as a decimal years value, with or without decimal places
          ({\tt "}1996.8{\tt "} for example). Such values are interpreted as a Besselian
@@ -12415,11 +12730,10 @@ default value.
          in the graphics database. This application can report positions in
          any of the co-ordinate Frames stored with each picture. The
          string supplied for FRAME can be one of the following:
-
          \sstitemlist{
 
             \sstitem
-            A Domain name such as SKY, AXIS, PIXEL, etc. The special Domains
+            A domain name such as SKY, AXIS, PIXEL, etc. The special domains
             AGI\_WORLD and AGI\_DATA are used to refer to the world and data
             co-ordinate system stored in the AGI graphics database. They can
             be useful if no WCS information was store with the picture when
@@ -12429,8 +12743,8 @@ default value.
             An integer value giving the index of the required Frame.
 
             \sstitem
-            An IRAS90 Sky Co-ordinate System (SCS) values such as
-            EQUAT(J2000) (see SUN/163).
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95).
 
          }
          If a null value (!) is supplied, positions are reported in the
@@ -12438,11 +12752,11 @@ default value.
          [!]
       }
       \sstsubsection{
-         GEODESIC = LOGICAL (Read)
+         GEODESIC = \_LOGICAL (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Poly{\tt "}. It specifies whether the curves drawn between
-         positions should be stright lines, or should be geodesic curves.
+         positions should be straight lines, or should be geodesic curves.
          In many co-ordinate Frames geodesic curves will be simple straight
          lines. However, in others (such as the majority of celestial
          co-ordinates Frames) geodesic curves will be more complex curves
@@ -12450,7 +12764,7 @@ default value.
          projection. [FALSE]
       }
       \sstsubsection{
-         INFO = LOGICAL (Read)
+         INFO = \_LOGICAL (Read)
       }{
          If TRUE then messages are displayed describing the use of the
          mouse prior to obtaining the first position. Note, these
@@ -12480,7 +12794,7 @@ default value.
          purpose). A null string (!) means that no file is created.  [!]
       }
       \sstsubsection{
-         MARKER = INTEGER (Read)
+         MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter PLOT is set to
          {\tt "}Chain{\tt "} or {\tt "}Mark{\tt "}. It specifies the symbol with which each
@@ -12490,14 +12804,14 @@ default value.
          value must be larger than or equal to -31. [current value]
       }
       \sstsubsection{
-         MAXPOS = INTEGER (Read)
+         MAXPOS = \_INTEGER (Read)
       }{
          The maximum number of positions which may be supplied before the
-         application terminates. The number must be in the range 1 to 500.
-         [500]
+         application terminates. The number must be in the range 1 to 200.
+         [200]
       }
       \sstsubsection{
-         MINPOS = INTEGER (Read)
+         MINPOS = \_INTEGER (Read)
       }{
          The minimum number of positions which may be supplied. The user
          is asked to supply more if necessary. The number must be in the
@@ -12508,7 +12822,6 @@ default value.
       }{
          The method used to select the pictures in which cursor positions are
          to be reported. There are three options:
-
          \sstitemlist{
 
             \sstitem
@@ -12553,7 +12866,7 @@ default value.
          application LISTMAKE. Only positions in the first selected picture
          are recorded. This application uses the conventions of the CURSA
          package (SUN/190) for determining the format of the catalogue. If a
-         file type of .fits is given, then the catalogue is stored as a FITS
+         file type of .fit is given, then the catalogue is stored as a FITS
          binary table. If a file type of .txt is given, then the catalogue
          is stored in a text file in {\tt "}Small Text List{\tt "} (STL) format. If no
          file type is given, then {\tt "}.fit{\tt "} is assumed. If a null value is
@@ -12566,7 +12879,6 @@ default value.
          which have valid co-ordinates.  The appearance of these graphics
          (colour, size, etc ) is controlled by the STYLE parameter. PLOT
          can take any of the following values:
-
          \sstitemlist{
 
             \sstitem
@@ -12590,10 +12902,10 @@ default value.
             specify the symbols and lines to use.
 
          }
-         [Current value]
+         [current value]
       }
       \sstsubsection{
-         QUIET = LOGICAL (Read)
+         QUIET = \_LOGICAL (Read)
       }{
          If TRUE then positions are not reported on the screen. Output
          parameters and files are still created. The display of informational
@@ -12601,24 +12913,47 @@ default value.
          parameter INFO. [FALSE]
       }
       \sstsubsection{
+         SHOWPIXEL = \_LOGICAL (Read)
+      }{
+         If TRUE, the pixel co-ordinates of each selected position are
+         shown on a separate line, following the co-ordinates requested
+         using parameter FRAME. If pixel co-ordinates are being displayed
+         anyway (see parameter FRAME) then a value of FALSE is used for.
+         SHOWPIXEL. [current value]
+      }
+      \sstsubsection{
          STYLE = LITERAL (Read)
       }{
-         The name of a text file containing a description of the plotting
-         style to use when drawing the graphics specified by parameter PLOT.
-         By specifying suitable values for Frame attributes (eg Digits(1),
-         Digits(2), Symbol(1), Symbol(2), etc), it can also be used to
-         control the format for the displayed axis values.
+         A group of attribute settings describing the plotting style to use
+         when drawing the graphics specified by parameter PLOT. The format
+         of the positions reported on the screen may also be controlled.
 
-         Each line in the file should contain a string of the form:
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
 
-         $<$name$>$=$<$value$>$
+         Each individual attribute setting should be of the form:
 
-         where $<$name$>$ is the name of an attribute,
-         and $<$value$>$ is the value to assign to the attribute. The file may
-         contain blank lines and comment lines starting with a hash (\#) sign.
-         Default values will be used for any unspecified attributes. All
-         attributes will be defaulted if a null value (!) is supplied,
-         or if the specified file cannot be accessed. [Current value]
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported). [current value]
+
+         In addition to the attributes which control the appearance of
+         the graphics (Colour, Font, etc), the following attributes may
+         be set in order to control the appearance of the formatted axis
+         values reported on the screen: Format, Digits, Symbol, Unit. These
+         may be suffixed with an axis number (eg {\tt "}Digits(2){\tt "}) to refer to
+         the values displayed for a specific axis. [current value]
       }
    }
    \sstexamples{
@@ -12653,7 +12988,7 @@ default value.
       }{
          Exactly two positions are obtained within the current picture,
          and are joined with a straight line. The positions are written to
-         a FITS binary catalogue called slice.fit but are not displayed on
+         a FITS binary catalogue called slice.FIT but are not displayed on
          the screen. The catalogue may be used to communicate the positions
          to later applications (LISTSHOW, PROFILE, etc).
       }
@@ -12682,6 +13017,12 @@ default value.
          In DYNAMIC and ANCHOR modes, if the cursor is situated at a
          position where there are no pictures of the selected name, the
          co-ordinates in the BASE picture are reported.
+
+         \sstitem
+         Pixel co-ordinates are formatted with 1 decimal place unless a
+         format has already been specified by setting the Format attributes
+         for the axes of the PIXEL co-ordinate Frame (eg using application
+         WCSATTRIB).
 
          \sstitem
          Positions can be removed (the instructions state how), starting
