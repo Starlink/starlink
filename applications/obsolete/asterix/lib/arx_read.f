@@ -17,9 +17,9 @@
 *    Global Variables :
 *    Import :
       CHARACTER*(*) PAR
+      INTEGER ID
 *    Import-Export :
 *    Export :
-      INTEGER ID
 *    Status :
       INTEGER STATUS
 *    External references :
@@ -59,7 +59,6 @@
 
         IF (STATUS.EQ.SAI__OK) THEN
 
-          CALL GRP_NEW('ARD input',ID,STATUS)
 
           IF (FILE) THEN
 *  read from file
