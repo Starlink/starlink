@@ -40,14 +40,14 @@
 *        22.
 *     NOVPRE = INTEGER (Given)
 *        The number of data values per record of the output file, when
-*        FIXED is .FALSE..  It should be in the range 1 to 16383.
+*        FIXED is .TRUE..  It should be in the range 1 to 16383.
 *        The product of NOVPRE and NCPVAL must not exceed the 
 *        recordlength, RECL.
 *     RECL = INTEGER (Write)
 *        The record length in bytes of the output file.  This
 *        must be greater or equal to the product of NOVPRE and NCPVAL,
-*        When fixed is true. When FIXED is FALSE this must be
-*        between 32 and 32766.  
+*        when FIXED is .TRUE..  When FIXED is .FALSE. this must be
+*        between 32 and 512.  
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -72,6 +72,8 @@
 *        Original version.
 *     1992 September 15 (MJC):
 *        Added control of the formatting.
+*     1997 January 22 (MJC):
+*        Reduced the buffer size to 512 bytes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,7 +105,7 @@
                                  ! excluding trailing blanks
 
 *  Local Variables:
-      CHARACTER * ( 32766 ) BUFFER ! Buffer for output records.
+      CHARACTER * ( 512 ) BUFFER ! Buffer for output records
       INTEGER CFREE              ! Number of free characters within
                                  ! buffer
       INTEGER COFF               ! Character offset within buffer
@@ -217,18 +219,12 @@
 *  types use a single conversion routine, and hence a token cannot be
 *  used.
             IF ( INTCON ) THEN
-               CALL CHR_ITOC( NUM_<T>TOI( A( I ) ), CVAL, NC )
+               CALL CHR_ITOC( NUM_<T>TOI( A( I ) ), CVAL, NCV )
             ELSE IF ( SINGLE ) THEN
-               CALL CHR_RTOC( A( I ), CVAL, NC )
+               CALL CHR_RTOC( A( I ), CVAL, NCV )
             ELSE
-               CALL CHR_DTOC( A( I ), CVAL, NC )
+               CALL CHR_DTOC( A( I ), CVAL, NCV )
             END IF
-
-*  Remove leading spaces.
-            CALL CHR_LDBLK( CVAL )
-
-*  Find the length of the string.
-            NCV = CHR_LEN( CVAL )
 
 *  Determine whether there is room to output the value in the current
 *  record.  Remember to allow for the space delimiter.
