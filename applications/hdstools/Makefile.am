@@ -72,12 +72,3 @@ BUILT_SOURCES = hdstools.csh hdstools.icl hdstools_mon.ifl $(hdstools_mon_TASKS:
 TESTS = htest.sh
 
 check_SCRIPTS = htest.sh
-
-check_MONOLITHS = htest
-htest_SOURCES = htest.f \
-	$(FSRC) \
-	$(CSRC) \
-	$(PRIVATE_INCLUDES)
-
-htest_TASKS =
-htest_LDADD = $(LDADD) `$(srcdir)/hdstools_link_adam`

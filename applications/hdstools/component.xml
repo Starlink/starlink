@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hdstools">
+  <version>1.0</version>
+  <path>applications/hdstools</path>
+  <description>HDSTOOLS - Tools To Display and Edit HDS Objects</description>
+  <abstract><p>
+The HDSTOOLS package contains a number of tools
+to edit and display HDS objects. The tools originated in the ASTERIX
+package but have now been modified to run as normal Starlink tasks.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <uname>ajc</uname>
+      <name>A. J. Chipperfield</name>
+      <email>ussc@star.rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation> sun245</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
