@@ -32,6 +32,17 @@
             helpkey *
          }
 
+         parameter mode {
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            default LIST
+            prompt {Set header write mode (LIST,CONTAINER,FITS, or SPLIT)}
+            helpkey *
+         }
+
          parameter indices {
             type _INTEGER
             access READ
@@ -50,16 +61,6 @@
             ppath CURRENT DEFAULT
             prompt {Set NAME attributes}
             default *
-            helpkey *
-         }
-
-         parameter mode {
-            type LITERAL
-            access READ
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            default LIST
-            prompt {Set header write mode (LIST,CONTAINER or FITS)}
             helpkey *
          }
 
@@ -120,6 +121,46 @@
             helpkey *
          }
 
+         parameter out {
+            type literal
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {HDS container files to contain output Sets}
+            helpkey *
+         }
+
+         parameter xstart {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Start positions of split sections in X direction}
+            size *
+            helpkey *
+         }
+
+         parameter ystart {
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Start positions of split sections in Y direction}
+            size *
+            helpkey *
+         }
+
+         parameter sections {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {NDF section specifiers for split sections}
+            default !
+            size *
+            helpkey *
+         }
+             
          parameter logto {
                           # Logging system interaction level
             type LITERAL
