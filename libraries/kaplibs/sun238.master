@@ -1,22 +1,11 @@
-\documentclass[twoside,11pt]{article}
-
-% ? Specify used packages
-% \usepackage{graphicx}        %  Use this one for final production.
-% \usepackage[draft]{graphicx} %  Use this one for drafting.
-% ? End of specify used packages
-
+\documentstyle[11pt]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
-% Fixed part
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
-
-% Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {238.1}
 \newcommand{\stardocauthors}   {D.S. Berry}
 \newcommand{\stardocdate}      {26th April 2001}
@@ -33,38 +22,11 @@ KAPPA routines, so that KAPPA-like applications can be written and built
 independantly of KAPPA.}
 
 % ? End of document identification
+
 % -----------------------------------------------------------------------------
 
-% +
-%  Name:
-%     sun.tex
-%
-%  Purpose:
-%     Template for Starlink User Note (SUN) documents.
-%     Refer to SUN/199
-%
-%  Authors:
-%     AJC: A.J.Chipperfield (Starlink, RAL)
-%     BLY: M.J.Bly (Starlink, RAL)
-%     PWD: Peter W. Draper (Starlink, Durham University)
-%
-%  History:
-%     17-JAN-1996 (AJC):
-%        Original with hypertext macros, based on MDL plain originals.
-%     16-JUN-1997 (BLY):
-%        Adapted for LaTeX2e.
-%        Added picture commands.
-%     13-AUG-1998 (PWD):
-%        Converted for use with LaTeX2HTML version 98.2 and
-%        Star2HTML version 1.3.
-%      1-FEB-2000 (AJC):
-%        Add Copyright statement in LaTeX
-%     {Add further history here}
-%
-% -
-
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markboth{\stardocname}{\stardocname}
+\markright{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -90,9 +52,9 @@ independantly of KAPPA.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
-%  LaTeX2HTML to signify text it shouldn't process).
-%begin{latexonly}
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -127,6 +89,7 @@ independantly of KAPPA.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
+%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -137,28 +100,30 @@ independantly of KAPPA.}
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -171,9 +136,19 @@ independantly of KAPPA.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+\newcommand{\latexonlysection}[1]{\section{#1}}
+\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
+\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+\begin{htmlonly}
+   \newcommand{\latexonlysection}[1]{#1}
+   \newcommand{\latexonlysubsection}[1]{#1}
+   \newcommand{\latexonlysubsubsection}[1]{#1}
+\end{htmlonly}
+\newcommand{\st}[1]{{\em{#1}}}
+\newcommand{\hi}[1]{{\tt{#1}}}
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -185,7 +160,7 @@ independantly of KAPPA.}
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -197,20 +172,16 @@ independantly of KAPPA.}
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
-   {\LARGE\textbf{\stardocversion \\ [4ex]}}
-   {\Huge\textbf{\stardocmanual}}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
    \end{center}
    \vspace{5mm}
-
-% ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
-% ? End of picture
 
 % ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
-      {\Large\textbf{Abstract}}
+      {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -223,26 +194,26 @@ independantly of KAPPA.}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
-   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+   \begin{rawhtml} </H1> \end{rawhtml}
 
-% ? Add picture here if required for the hypertext version.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? Add picture here if required.
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory\ \stardocnumber \\
+   \stardoccategory \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -253,6 +224,7 @@ independantly of KAPPA.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -266,30 +238,18 @@ independantly of KAPPA.}
 %  ==================
 \stardocabstract
 % ? End of document abstract
-
-% -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
-%  =========================
-\begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
-\end{latexonly}
-% ? End of Latex copyright statement
-
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
-
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
@@ -448,33 +408,31 @@ directory to the various include files provided by KAPLIBS. These are
 removed by the \verb+kaplibs_dev remove+ command.
 
 \appendix
-\section{Alphabetical List of Routines}
 
 % Command for displaying routines in routine lists:
 % =================================================
 
-\newcommand{\noteroutine}[3]{{\small \bf {#1}{#2}} \nopagebreak \\
-                             \hspace*{3em} {\em {#3}} \\[1.5ex]}
-
-
-
+\newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
+                             \hspace*{3em}\st{#2}\\[1.5ex]}
 \begin{htmlonly}
-
-\renewcommand{\noteroutine}[3]{
-\begin{description}
-\item [{\small \bf {#1}{#2}}] 
-{\em #3}
-\end{description}
-}
-
+   \renewcommand{\noteroutine}[2]{{\small{\bf{#1}}}\\
+                                  --- \st{#2}\\[1.0ex]}
 \end{htmlonly}
 
+\begin{latexonly}
+  \newpage
+  \latexonlysection{Alphabetical List of Routines}
+  \small
+
 % Insert routine list here...
+
+  \normalsize
+\end{latexonly}
 
 \newpage
 \section{Routine Descriptions}
 
-%+
+% +
 %  Name:
 %     SST.TEX
 
@@ -494,8 +452,11 @@ removed by the \verb+kaplibs_dev remove+ command.
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -515,7 +476,7 @@ removed by the \verb+kaplibs_dev remove+ command.
 %  Bugs:
 %     {note_any_bugs_here}
 
-%-
+% -
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -524,8 +485,7 @@ removed by the \verb+kaplibs_dev remove+ command.
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
+\newfont{\ssttt}{cmtt10 scaled 1095}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -554,8 +514,8 @@ removed by the \verb+kaplibs_dev remove+ command.
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
-\\[1.3ex]{\raggedright \ssttt #1}}
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -601,15 +561,13 @@ removed by the \verb+kaplibs_dev remove+ command.
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -630,12 +588,15 @@ removed by the \verb+kaplibs_dev remove+ command.
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+%  Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
 %  sstroutine.
-   \newcommand{\sstroutine}[3]{
+   \renewcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -643,80 +604,83 @@ removed by the \verb+kaplibs_dev remove+ command.
    }
 
 %  sstdescription
-   \newcommand{\sstdescription}[1]{\item[Description:]
+   \renewcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
-      \\
    }
 
 %  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
+   \renewcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
-      \\
    }
 
 %  sstinvocation
-   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
-      \\
    }
 
 %  sstarguments
-   \newcommand{\sstarguments}[1]{
-      \item[Arguments:] \\
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
       \begin{description}
          #1
       \end{description}
-      \\
    }
 
 %  sstreturnedvalue
-   \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:] \\
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
       \begin{description}
          #1
       \end{description}
-      \\
    }
 
 %  sstparameters
-   \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
       \begin{description}
          #1
       \end{description}
-      \\
    }
 
 %  sstexamples
-   \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
       \begin{description}
          #1
       \end{description}
-      \\
    }
 
 %  sstsubsection
-   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
 
 %  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+      \begin{description}
+         #1
+      \end{description}
    }
 
 %  sstitemlist
@@ -724,19 +688,18 @@ removed by the \verb+kaplibs_dev remove+ command.
       \begin{itemize}
          #1
       \end{itemize}
-      \\
    }
-%  sstitem
-   \newcommand{\sstitem}{\item}
-
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-%.
+% .
+% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
+
+\small
 
 % Insert routine descriptions here...
 
-
+\normalsize
 
 
 \end{document}
