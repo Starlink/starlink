@@ -1,7 +1,7 @@
 interface ILOAD
   parameter INP
     position 1
-    type '_CHAR'
+    type 'LITERAL'
     prompt 'Image'
     help 'Name of image file'
   endparameter

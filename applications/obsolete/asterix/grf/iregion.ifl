@@ -81,12 +81,12 @@ interface IREGION
     help '^filename or direct text input'
   endparameter
   parameter OUT
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Output filename'
     help 'Name of object to hold region mask'
   endparameter
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Input filename'
     help 'Name of object containing region mask to be loaded'
   endparameter

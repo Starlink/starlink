@@ -5,7 +5,7 @@ interface IARITH
   endparameter
   parameter INP
     position 2
-    type 'UNIV'
+    type 'LITERAL'
     prompt 'Image/array/scalar'
     help 'quantity to add/sub etc to/from loaded image'
   endparameter
