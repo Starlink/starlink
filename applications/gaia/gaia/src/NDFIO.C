@@ -280,7 +280,18 @@ int NDFIO::get(const char* keyword, unsigned short& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
     set_header_length();
-    return length ? ! hgeti4(ptr, keyword, (int *)&val) : 1;
+    if ( length ) {
+      int ival;
+      int status = hgeti4(ptr, keyword, &ival);
+      val = (unsigned short) ival;
+      if ( status == 0 ) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else {
+      return 1;
+    }
 }
 
 /*
