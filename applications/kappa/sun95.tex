@@ -6110,18 +6110,25 @@ graphics device. Each Frame is referred to by a \emph{Domain name} (see
 \hyperref{here}{section }{}{se:domains} for more information about
 co-ordinate Frames and Domains). 
 
-The following two Domains may be used to specify positions within any 
+The following three Domains may be used to specify positions within any 
 picture:
 
 \begin{description}
+
 \item [GRAPHICS] --- This gives positions in millimetres from the bottom
 left corner of the graphics device. 
+
 \item [BASEPIC] --- This gives positions within a normalised co-ordinate
 system spanning the BASE picture ({\it i.e.} the entire graphics device). The 
 units on both axes are set so that either the width or the
 height of the graphics device, which-ever is smaller, is set to 1.0
 (put another way, a unit square would fit in the picture and span the
 shorter axis). The bottom left corner of the graphics device is $(0,0)$.
+
+\item [CURPIC] -- similar to BASEPIC except that it covers only the
+specified picture. Thus, the bottom left corner of the each picture is 
+at $(0,0)$ and the shorter dimension of each picture has length 1.0.
+
 \end{description}
 
 DATA pictures have additional co-ordinate Frames inherited from the

@@ -455,9 +455,9 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 #  set.
 
 PUBLIC_SCRIPTS = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
-                 colstar.icl fancylook.icl flatfield.icl \
-                 kappa_proc.icl multistat.icl unsharpmask.icl \
-                 irg_wild nfi.awk tkast.tcl
+colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
+unsharpmask.icl irg_wild nfi.awk tkast.tcl dialog.tcl adamtask.tcl \
+adamMessageRelay stardemo.tcl stardemo_procs.tcl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
