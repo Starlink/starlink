@@ -43,6 +43,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/05/15 01:43:47  timj
+*     Remove unused variables
+*
 *     Revision 1.1  1998/06/17 07:42:07  timj
 *     Initial revision
 *
@@ -73,9 +76,6 @@
       INTEGER I                       ! Loop counter
       INTEGER IPOS                    ! I position in grid
       INTEGER JPOS                    ! J position in grid
-
-      INTEGER NBOL
-      INTEGER NPOS
 
 *.
 
