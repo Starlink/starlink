@@ -1079,7 +1079,7 @@
      
       Obey polpack polprep "in=$imsec ref=$refpar out=$copy" 1
       set WCSDOMAIN($image) [GetParam polpack polprep:frame]
-      if { $WCSDOMAIN($image) == "BADPOL" } {
+      if { $WCSDOMAIN($image) == "'BADPOL'" } {
          Message "$image does not contain either an ANLANG or a WPLATE value. Make sure you have run POLIMP on this image."
          exit 1
       }
