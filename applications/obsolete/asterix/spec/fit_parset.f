@@ -201,6 +201,8 @@
 
 *    Look for appropriate pmodel (by keyword)
  10   CALL AIO_READF( MFD, LINE, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (LINE(1:1).EQ.'#') ) GOTO 10
+
       IF ( INDEX(LINE,'endmenu') .GT. 0 ) THEN
 	STATUS = SAI__ERROR
 	CALL ERR_REP( 'BADMOD', 'Model not found in fit_model file',
@@ -229,7 +231,8 @@
       IF(STATUS.NE.SAI__OK) GOTO 9000
 
 *    Pmodel name
-      CALL AIO_READF( MFD, LINE, STATUS )
+ 20   CALL AIO_READF( MFD, LINE, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (LINE(1:1).EQ.'#') ) GOTO 20
       N = INDEX(LINE,'mname:')
       IF ( N .EQ. 0 ) THEN
 	STATUS = SAI__ERROR
@@ -244,7 +247,8 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Pmodel type (additive/multiplicative)
-      CALL AIO_READF( MFD, LINE, STATUS )
+ 30   CALL AIO_READF( MFD, LINE, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (LINE(1:1).EQ.'#') ) GOTO 30
       N = INDEX(LINE,'type:')
       IF ( N .EQ. 0 ) THEN
 	STATUS = SAI__ERROR
@@ -259,7 +263,8 @@
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
 *    Number of parameters in pmodel
- 30   CALL AIO_READF( MFD, LINE, STATUS )
+ 40   CALL AIO_READF( MFD, LINE, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (LINE(1:1).EQ.'#') ) GOTO 40
       N = INDEX(LINE,'npar:')
       IF(INDEX(LINE,'endmodel').GT.0)THEN
 	STATUS=SAI__ERROR
@@ -271,7 +276,7 @@
 	CALL DAT_NEW( PCELL,'NPAR','_INTEGER',0,0,STATUS)
 	CALL CMP_PUT0I( PCELL,'NPAR',NPAR,STATUS)
       ELSE
-	GOTO 30			! Read next line for current model
+	GOTO 40			! Read next line for current model
       END IF
       IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
@@ -285,6 +290,7 @@
 
 *      Look for parameter start
  50	CALL AIO_READF( MFD, LINE, STATUS )
+        IF ( (STATUS .EQ. SAI__OK) .AND. (LINE(1:1).EQ.'#') ) GOTO 50
 	IF(INDEX(LINE,' parameter').EQ.0)THEN
 	  IF(INDEX(LINE,'endmodel').GT.0)THEN
 	    STATUS=SAI__ERROR
