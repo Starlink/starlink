@@ -31,6 +31,8 @@
 *     27 Sep 89 : Mod. to handle scalar axis WIDTH (TJP)
 *     15 Mar 94 : Don't allocated DFDPPTR. If NMDAT is large then NPAMAX*NMDAT
 *                 can get enormous! (DJA)
+*      4 Mar 1996 (DJA):
+*        Create grouped predicted data array too
 *
 *    Type Definitions :
 *
@@ -129,6 +131,11 @@ c	  CALL DYN_MAPR(1,PREDDAT.NMDAT*NPAMAX,PREDDAT.DFDPPTR,STATUS)
 	PREDDAT.PREDPTR(2) = 0
 	PREDDAT.DFDPPTR = 0
 
+      END IF
+
+*  Grouping? Set up array for grouped predicted model data
+      IF ( OBDAT.GFLAG ) THEN
+        CALL DYN_MAPR( 1, OBDAT.NGDAT, PREDDAT.GDPTR, STATUS )
       END IF
 
 *  Exit
