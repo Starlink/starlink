@@ -79,7 +79,6 @@ fac_$1_err:       $_star_tmp; messgen -e $_star_tmp
 EOD
 ])# STAR_FACILITY_CODE
 
-dnl AC_SUBST_FILE([STAR_BOILERPLATE])
 
 # STAR_MAKE_MANIFEST
 # ------------------
@@ -119,3 +118,35 @@ install-with-manifest.in:
 _EOD
 AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
 ])# STAR_MAKE_MANIFEST
+
+
+
+# STAR_LATEX_DOCUMENTATION(documentcode)
+# --------------------------------------
+# Generate the standard makefile targets to handle LaTeX documentation
+# source.  The parameter documentcode should be something like
+# `sun123' -- it should not include any .tex extension.
+#
+# Defines and AC_SUBSTs @STAR_DOCUMENTATION@; thus one can use
+# $(STAR_DOCUMENTATION) as a Makefile variable, for example in an
+# EXTRA_DIST Makefile.am line.
+#
+# If users need anything complicated done, they should probably not use this
+# standard target.
+AC_DEFUN([STAR_LATEX_DOCUMENTATION],
+[AC_REQUIRE([_STAR_BOILERPLATE])dnl
+m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
+docno=`basename $1 .tex`
+cat >>$STAR_BOILERPLATE <<EOD
+$docno.dvi: $docno.tex
+	latex $docno
+$docno.ps: $docno.dvi
+	dvips -o $docno.ps $docno.dvi
+$docno.htx: $docno.tex
+	star2html $docno.tex
+$docno.htx_tar: $docno.htx
+	tar cf $docno.htx_tar $docno.htx
+EOD
+STAR_DOCUMENTATION="$docno.tex $docno.ps $docno.htx_tar"
+AC_SUBST([STAR_DOCUMENTATION])
+])# STAR_LATEX_DOCUMENTATION
