@@ -30,6 +30,12 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PAR_ERR'
+*     <any INCLUDE files containing global constant definitions>
+*    Global variables :
+*     <global variables held in named COMMON>
+*    Structure definitions :
+*     <specification of FORTRAN structures>
 *    Import :
       CHARACTER*(*) TSTRING             ! String specifying the time range
       DOUBLE PRECISION BASE_MJD         ! Base MJD of the observation
@@ -66,6 +72,7 @@
       CHARACTER*30 TWORD(MAXWRD)           ! Start and stop times
       DOUBLE PRECISION MJD                 ! Time as an MJD
       INTEGER IDOT                         ! Position of full stop
+      INTEGER FERR
 *    Local data :
 *     <any DATA initialisations for local variables>
 *-
@@ -100,7 +107,12 @@
 *   Open file
          CALL FIO_GUNIT(LUNIT, STATUS)
 *
-         OPEN(LUNIT, FILE=FNAME, STATUS='OLD')
+         OPEN(LUNIT, FILE=FNAME, STATUS='OLD', IOSTAT=FERR)
+	 IF (FERR.NE.0) THEN
+            CALL FIO_PUNIT(LUNIT, STATUS)
+	    STATUS = SAI__ERROR
+	    GOTO 999
+         ENDIF
 *
 *   Read in each record as a series of words - which can be interpreted later
          JUMPOUT = .FALSE.
@@ -222,5 +234,6 @@
      &                /'- only ^MAX may be used **')
          STATUS = SAI__ERROR
       ENDIF
+999   CONTINUE
 *
       END
