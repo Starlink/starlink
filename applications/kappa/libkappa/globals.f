@@ -174,22 +174,7 @@
      :  'The current graphics device is       : ^GLOVAL', STATUS )
       CALL ERR_RLSE
 
-*    The image-display device.
-      CALL ERR_MARK
-      PLOC = ' '
-      CALL DAT_FIND( LOC, 'IMAGE_DISPLAY', PLOC, STATUS )
-      CALL CMP_GET0C( PLOC, 'NAMEPTR', GLOVAL, STATUS )
-      IF ( STATUS .EQ. DAT__OBJNF ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL MSG_SETC( 'GLOVAL', '<undefined>' )
-      ELSE
-         CALL MSG_SETC( 'GLOVAL', GLOVAL )
-      END IF
-      CALL MSG_OUT( 'GLOBAL3',
-     :  'The current image-display device is  : ^GLOVAL', STATUS )
-      CALL ERR_RLSE
-
-*    The image-display device.
+*    The image-display overlay device.
       CALL ERR_MARK
       PLOC = ' '
       CALL DAT_FIND( LOC, 'IMAGE_OVERLAY', PLOC, STATUS )

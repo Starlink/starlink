@@ -272,7 +272,6 @@
 \newcommand{\HDSref}{\xref{HDS}{sun92}{}}
 \newcommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}}{sun102}{}}
 \newcommand{\ICLref}{\xref{{\footnotesize ICL}}{sg5}{}}
-\newcommand{\IDIref}{\xref{IDI}{sun65}{}}
 \newcommand{\IRCAMPACKref}{\xref{{\footnotesize IRCAMPACK}}{sun177}{}}
 \newcommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
 \newcommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
@@ -1259,7 +1258,7 @@ in the current directory.
 \normalsize
 
 Next we want to look at the result of our image processing.  The first
-thing to do is to select an image display.  The {\tt xwindows} device
+thing to do is to select an graphics device.  The {\tt xwindows} device
 becomes the current graphics device and remains so until the next
 \htmlref{GDSET}{GDSET} command.  (You may need to enter the
 {\tt xdisplay} command (\xref{SUN/129}{sun129}{}) to redirect
@@ -1275,7 +1274,7 @@ Now we actually display it on the screen.  Some applications have
 many parameters, and it would be impractical to have to specify all
 those preceding the ones we wanted to alter.  The solution is to specify
 the parameter by keyword.  Here we have requested that the scaling of
-the data values to colour indices within the image display uses the
+the data values to colour indices within the graphics device uses the
 current percentile range.  Note that you may abbreviate the options
 of a menu, such as offered by parameter MODE, to any unambiguous
 string.
@@ -1428,7 +1427,7 @@ ADD prompts for it.  Notice that literal parameters are case insensitive.
 This shows that the {\tt demo1} NDF has the same dimensions as the
 smaller of the two NDFs.
 
-We were going to display the image on the current image display, but
+We were going to display the image on the current graphics device, but
 then changed our minds.  A {\tt !!} in response to a prompt
 \htmlref{aborts}{se:abortnull} a task.
 
@@ -2212,7 +2211,6 @@ use of this parameter is being phased out. See
 \htmlref{Co-ordinate Systems}{se:co-ordsystem}}.}.\\
 {\tt GLOBAL.DATA\_ARRAY}      & Last NDF or foreign data file accessed or written.\\
 {\tt GLOBAL.GRAPHICS\_DEVICE} & Current graphics workstation.\\
-{\tt GLOBAL.IMAGE\_DISPLAY}   & Current image display (base).\\
 {\tt GLOBAL.IMAGE\_OVERLAY}   & Current image-display overlay.\\
 {\tt GLOBAL.INTERACTIONMODE}  & Current interaction mode. \\
 {\tt GLOBAL.LUT} & Last lookup table file accessed or written. \\
@@ -2242,7 +2240,6 @@ The values of all global parameters may be inspected with the
      ICL> globals
      The current data file                : @/home/dro/jkt/ccdpic
      The current graphics device is       : @ps_l
-     The current image-display device is  : @xwindows
      The current image-display overlay is : <undefined>
      The current lookup table file is     : @$KAPPA_DIR/spectrum_lut
      The current transformation is        : @/home/dro/deform/warpit
@@ -3251,11 +3248,6 @@ remain unambiguous.
 There are global parameters for the graphics devices.
 \begin{description}
 \item [Graphics Device] --- The device used for line graphics.
-\item [Image Display] --- The device used for displaying images, but this
-does not exclude the possibility of line graphics, such as axes, when
-they are associated with the image.  The image-display device should
-be capable of showing at least 24 colours or grey levels simultaneously,
-and more for certain applications.
 \item [Image-display Overlay] --- The device used for overlays on the image
 display.  Again there is a restriction there should be at least 16
 colours, except for X-windows overlays since these only have a single
@@ -3298,7 +3290,7 @@ some applications, by position.  Here is an example.
 The most commonly used devices are X-windows.  These can require a
 little preparation before you select a device.  Starlink graphics use
 \GWMref\ to manage windows.  It enables a window to persist between
-separate applications; or to be shared by \GKSref\ and \IDIref\ applications,
+separate applications; or to be shared by \GKSref\ applications,
 and even programmes running on different machines.  See
 \xref{SUN/130}{sun130}{} for details of {\footnotesize GWM} and how to
 change your X-defaults file ({\tt{\$HOME/.Xdefaults}}), but the salient
@@ -3356,8 +3348,8 @@ or use a {\tt +} suffix to the device name.
 
 The following set up to place in your X-defaults file is a reasonable
 compromise, as it maximises the number of colour indices for the
-image-display window (xwindows), has a yellow overlay (xoverlay), and
-a line-graphics window (x2windows).  In the defaults file there are
+graphics window (xwindows), has a yellow overlay (xoverlay), and
+a second graphics window (x2windows).  In the defaults file there are
 the following lines
 
 \small
@@ -6243,9 +6235,9 @@ again will often cure the problem.
 Having produced a pretty picture in an X-window, how do we get it onto a
 piece of paper? There are basically two ways. The simplest way is to copy
 the pixel values from the X-window into a PostScript file, and then print
-the file on a suitable PostScript printer. The popular image display and
-manipulation program {\tt xv} can be used to do this, using the {\tt
-Grab} and {\tt Save} commands on the main control panel. The figures in
+the file on a suitable PostScript printer. {\tt GIMP}, or {\tt xv} can be 
+used to do this, using the {\tt Grab} and {\tt Save} commands on the main 
+control panel. The figures in
 this chapter were created using this method. It's easy --- but the results
 only have the resolution of your X screen (typically 72 dots per inch)
 which is usually not good enough for general publication.
@@ -8424,24 +8416,11 @@ CENTROID in file mode.
 Such co-ordinate files can also be created interactively with images by
 \htmlref{CURSOR}{CURSOR}.
 
-\section{\xlabel{se_imagedisplay}Image-display Interface in KAPPA
-\label{se:imagedisplay}}
-
-{\footnotesize KAPPA} utilises \IDIref\ (Image-display Interface) for some
-interactions with images.  However, \GKSref\ is still called to display
-images, plot line graphics, and perform cursor interactions.  IDI is
-much faster for some interactions, such as manipulating the colour
-table, and provides functionality that is excluded from GKS, such as
-pan and zoom.  The two graphics packages share windows through the
-\xref{Graphics Window Manager}{sun130}{} ({\footnotesize GWM}\latexonly{,
-SUN/130}) so that you need not know which {\footnotesize KAPPA} command
-calls which package.
-
 \newpage
-\section{\xlabel{se_coltab}Image-Display Colour Table and Palette
+\section{\xlabel{se_coltab}Graphics Device Colour Table and Palette
 \label{se:coltab}}
 
-An image display has a colour table (sometimes called the video lookup
+An graphice device has a colour table (sometimes called the video lookup
 table) which converts integer values in the display's memory into the
 colours that you see on the monitor. There are usually somewhere
 between 64 and 256 entries or {\em indices\/} in the colour table that
@@ -8621,7 +8600,7 @@ button at the right hand end of the menu bar.
 
 There are four commands for controlling the
 \htmlref{palette}{se:coltab}\latexonly{ (Section~\ref{se:coltab})}, all
-beginning PAL.  If you inherit the image display after a non-{\footnotesize
+beginning PAL.  If you inherit the graphics device after a non-{\footnotesize
 KAPPA} user or after a device reset, you will probably have to reset
 the palette.  You can do this either by loading the default
 palette---black, white, the primary then secondary colours, and eight
@@ -10603,10 +10582,10 @@ or delete the database file
 system's node name for {\it $<$node$>$}).  You will need to redraw the
 last plot if you still require it, say for interaction.
 
-\subsection{Line Graphics are Invisible on an Image Display}
-The reason for invisible line graphics on your image display is
+\subsection{Line Graphics are Invisible on an Graphics Device}
+The reason for invisible line graphics on your graphics device is
 because it is drawn in black or a dark grey.  Most likely is that some
-person has been using other software on your image display or that is
+person has been using other software on your graphics device or that is
 has been reset.  \htmlref{PALDEF}{PALDEF} will set up the default
 colours for the palette, and so most line graphics will then appear in
 white.  Alternatively,
@@ -11215,7 +11194,7 @@ picture.}
 \menuitem{LUCY}{
  Performs a Richardson-Lucy deconvolution of a 1- or 2-dimensional array.}
 \menuitem{LUTABLE}{
- Manipulates an image-display colour table.}
+ Manipulates an graphics device colour table.}
 \menuitem{LUTBGYRW}{
  Loads the {\it BGYRW} lookup table.}
 \menuitem{LUTCOL}{
@@ -11223,7 +11202,7 @@ picture.}
 \menuitem{LUTCONT}{
  Loads a lookup table to give the display the appearance of a contour plot.}
 \menuitem{LUTEDIT}{
- Create or edit an image-display colour table.}
+ Create or edit an graphics device colour table.}
 \menuitem{LUTFC}{
  Loads the standard false-colour lookup table.}
 \menuitem{LUTGREY}{
@@ -11237,9 +11216,9 @@ picture.}
 \menuitem{LUTRAMPS}{
  Loads the coloured-ramps lookup table.}
 \menuitem{LUTREAD}{
- Loads an image-display lookup table from an NDF.}
+ Loads an graphics device lookup table from an NDF.}
 \menuitem{LUTSAVE}{
- Saves the current colour table of an image-display device in an NDF.}
+ Saves the current colour table of an graphics device in an NDF.}
 \menuitem{LUTSPEC}{
  Loads a spectrum-like lookup table.}
 \menuitem{LUTVIEW}{
@@ -11283,13 +11262,13 @@ picture.}
 \menuitem{OUTSET}{
  Sets pixels outside a specified  circle in a 2-d data array to a specified value.}
 \menuitem{OVCLEAR}{
- Clears an image-display overlay.}
+ Clears an graphics device overlay.}
 \menuitem{OVSET}{
- Selects a current image-display overlay.}
+ Selects a current graphics device overlay.}
 \menuitem{PALDEF}{
  Loads the default palette to a colour table.}
 \menuitem{PALENTRY}{
- Enters a colour into an image display's palette.}
+ Enters a colour into an graphics device's palette.}
 \menuitem{PALREAD}{
  Fills the palette of a colour table from an NDF.}
 \menuitem{PALSAVE}{
@@ -11518,7 +11497,7 @@ functions as follows.
 \classitem{GDSET}
  Selects a current graphics device.
 \classitem{OVSET}
- Selects a current image-display overlay.
+ Selects a current graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -11531,7 +11510,7 @@ functions as follows.
 \classitem{GDSTATE}
  Shows the current status of a graphics device.
 \classitem{OVCLEAR}
- Clears an image-display overlay.
+ Clears an graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -11575,7 +11554,7 @@ functions as follows.
 \item {\large\bf Lookup/Colour tables}
 \begin{description}
 \classitem{LUTABLE}
- Manipulates an image-display colour table.
+ Manipulates an graphics device colour table.
 \classitem{LUTBGYRW}
  Loads the {\it BGYRW\/} lookup table.
 \classitem{LUTCOL}
@@ -11583,7 +11562,7 @@ functions as follows.
 \classitem{LUTCONT}
  Loads a lookup table to give the display the appearance of a contour plot.
 \classitem{LUTEDIT}
- Creates or edits an image-display colour table.
+ Creates or edits an graphics device colour table.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTGREY}
@@ -11597,9 +11576,9 @@ functions as follows.
 \classitem{LUTRAMPS}
  Loads the coloured-ramps lookup table.
 \classitem{LUTREAD}
- Loads an image-display lookup table from an NDF.
+ Loads an graphics device lookup table from an NDF.
 \classitem{LUTSAVE}
- Saves the current colour table of an image-display device in an NDF.
+ Saves the current colour table of an graphics device in an NDF.
 \classitem{LUTSPEC}
  Loads a spectrum-like lookup table.
 \classitem{LUTVIEW}
@@ -11648,7 +11627,7 @@ functions as follows.
 \classitem{PALDEF}
  Loads the default palette to a colour table.
 \classitem{PALENTRY}
- Enters a colour into an image display's palette.
+ Enters a colour into an graphics device's palette.
 \classitem{PALREAD}
  Fills the palette of a colour table from an NDF.
 \classitem{PALSAVE}
@@ -14642,7 +14621,7 @@ default value.
          is created by this application. This parameter is not accessed
          if a null (!) value is supplied for parameter OUT. The device
          must have at least 24 colour indices or greyscale intensities.
-         {\tt [current image-display device]}
+         {\tt [current graphics device]}
       }
       \sstsubsection{
          GHIGH = \_DOUBLE (Read)
@@ -15725,7 +15704,7 @@ default value.
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current image-display device]}
+         The plotting device. {\tt [current graphics device]}
       }
       \sstsubsection{
          FAST = \_LOGICAL (Read)
@@ -17155,7 +17134,7 @@ default value.
 }{
    \sstdescription{
       This application displays a 1- or 2-dimensional NDF as an image
-      on the current image-display device. The minimum and maximum data
+      on the current graphics device. The minimum and maximum data
       values to be displayed can be selected in several ways (see
       parameter MODE). Data values outside these limits are displayed
       with the colour of the nearest limit. A key showing the
@@ -17296,7 +17275,7 @@ default value.
       }{
          The name of the graphics device used to display the image.
          The device must have at least 24 colour indices or greyscale
-         intensities. [current image-display device]
+         intensities. [current graphics device]
       }
       \sstsubsection{
          FILL = \_LOGICAL (Read)
@@ -17402,7 +17381,7 @@ default value.
          LUT = NDF (Read)
       }{
          Name of the NDF containing a colour lookup table in its Data
-         array; the lookup table is written to the image-display{\tt '}s colour
+         array; the lookup table is written to the graphics device{\tt '}s colour
          table.  The purpose of this parameter is to provide a means of
          controlling the appearance of the image on certain devices,
          such as colour printers, that do not have a dynamic colour
@@ -17612,14 +17591,14 @@ default value.
       \sstexamplesubsection{
          display ngc6872 mode=p percentiles=[10,90] noaxes
       }{
-         Displays the NDF called ngc6872 on the current image-display
+         Displays the NDF called ngc6872 on the current graphics device
          device.  The scaling is between the 10 and 90 per cent
          percentiles of the image. No annotated axes are produced.
       }
       \sstexamplesubsection{
          display vv256 mode=flash noaxes border borstyle={\tt "}colour=blue,style=2{\tt "}
       }{
-         Displays the NDF called vv256 on the current image-display
+         Displays the NDF called vv256 on the current graphics device
          device.  There is no scaling of the data; instead the modulus
          of each pixel with respect to the number of colour-table
          indices is shown.  No annotated axes are drawn, but a blue border
@@ -17630,7 +17609,7 @@ default value.
          display mode=fa axes style={\tt "}$\wedge$sty,grid=1{\tt "} margin=0.2 clear out=video $\backslash$
       }{
          Displays the current NDF data component with annotated axes
-         after clearing the current picture on the current image-display
+         after clearing the current picture on the current graphics device
          device. The appearance of the axes is specified in the text
          file sty, but this is modified by setting the Grid attribute
          to 1 so that a co-ordinate grid is drawn across the plot. The
@@ -17644,7 +17623,7 @@ default value.
       }{
          Displays the data component of the NDF called video (created
          in the previous example) without scaling within the current
-         picture on the current image-display device.
+         picture on the current graphics device.
       }
       \sstexamplesubsection{
          display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
@@ -17681,7 +17660,7 @@ default value.
          only a fraction of the detail in the data to be plotted.  Therefore,
          large images will be compressed by block averaging when this can be
          done without loss of resolution in the displayed image.  This saves
-         time scaling the data and transmitting them to the image display.
+         time scaling the data and transmitting them to the graphics device.
          Note that the default values for parameters LOW and HIGH are
          the minimum and maximum values in the compressed floating-point
          data.
@@ -22041,7 +22020,7 @@ plot (101k).
    \sstdescription{
       This application selects a current graphics device.  This
       device will be used for all applications requiring an
-      image-display until changed explicitly.
+      graphics device until changed explicitly.
    }
    \sstusage{
       gdset device
@@ -25935,11 +25914,11 @@ plot (10k).
 \sstroutine{
    LUTABLE
 }{
-   Manipulates an image-display colour table
+   Manipulates an graphics device colour table
 }{
    \sstdescription{
       This application allows manipulation of the colour table of an
-      image-display device provided some data are, according to the
+      graphics device provided some data are, according to the
       graphics database, already displayed upon the device.  A
       2-dimensional data array, stored in the input NDF structure, may
       be nominated to assist in defining the colour table via an histogram
@@ -25968,7 +25947,7 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device to be used.  {\tt [}Current graphics device{\tt ]}
       }
       \sstsubsection{
          COLTAB = LITERAL (Read)
@@ -26021,7 +26000,7 @@ plot (10k).
                            other words each pen is used approximately
                            an equal number of times to display the
                            2-dimensional NDF array.  There must be an existing
-                           image displayed.  This is determined by
+                           graphics deviceed.  This is determined by
                            looking for a DATA picture in the database.
                            This is not foolproof as this may be a line
                            plot rather an image.
@@ -26078,7 +26057,7 @@ plot (10k).
       \sstexamplesubsection{
          lutable lo co
       }{
-         Changes the colour table on the current image-display device
+         Changes the colour table on the current graphics device
          to a series of coloured blocks whose size increase
          logarithmically with the table index number.
       }
@@ -26086,14 +26065,14 @@ plot (10k).
          lutable li ex rococo
       }{
          This maps the lookup table stored in the NDF called rococo
-         linearly to the colour table on the current image-display
+         linearly to the colour table on the current graphics device
          device.
       }
       \sstexamplesubsection{
          lutable li ex rococo full
       }{
          This maps the lookup table stored in the NDF called rococo
-         linearly to the full colour table on the current image-display
+         linearly to the full colour table on the current graphics device
          device, {\it i.e.}\ ignoring the reserved pens.
       }
       \sstexamplesubsection{
@@ -26101,7 +26080,7 @@ plot (10k).
       }{
          This maps the greyscale lookup table via histogram
          equalisation between the 5 and 90 percentiles of an NDF called
-         nebula to the colour table on the current image-display
+         nebula to the colour table on the current graphics device
          device.  There is no bias or shading to white or black.
       }
    }
@@ -26142,7 +26121,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the {\it BGYRW\/} lookup table with linear scaling
-      into the current image-display device.  It is a continuous LUT
+      into the current graphics device.  It is a continuous LUT
       starting with blue, followed by green, yellow, red and a splash of
       white.
    }
@@ -26153,15 +26132,15 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the
       parameter cannot be specified on the command line.  You will 
       only be prompted for the DEVICE parameter if the current
-      image display is not suitable or not available.
+      graphics device is not suitable or not available.
    }
 }
 \sstroutine{
@@ -26171,7 +26150,7 @@ plot (10k).
 }{
    \sstdescription{
       Procedure for loading the standard colour lookup table into
-      the current image-display device with linear scaling.
+      the current graphics device with linear scaling.
    }
    \sstusage{
       lutcol
@@ -26180,14 +26159,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -26199,7 +26178,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads a lookup table that gives a contour-plot
-      appearance into the current image-display device.  The lookup table
+      appearance into the current graphics device.  The lookup table
       is mainly black with a set of white stripes and it is loaded with
       linear scaling.
    }
@@ -26210,21 +26189,21 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
 \sstroutine{
    LUTEDIT
 }{
-   Create or edit an image-display colour lookup table
+   Create or edit an graphics device colour lookup table
 }{
    \sstdescription{
       This application allows a lookup table to be created or edited
@@ -26244,12 +26223,12 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The name of an image display device.  If a null (!) value is
+         The name of an graphics device.  If a null (!) value is
          supplied for parameter LUT, then the current LUT associated with
          the specified device will be loaded into the editor initially.
          On exit, the final contents of the editor (if saved) are 
          established as the current LUT for the specified device. 
-         {\tt [Current image-display device]}
+         {\tt [Current graphics device]}
       }
       \sstsubsection{
          LUT = NDF (Read)
@@ -26285,7 +26264,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the standard false-colour lookup table with
-      linear scaling into the current image-display device.
+      linear scaling into the current graphics device.
    }
    \sstusage{
       lutfc
@@ -26294,14 +26273,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -26313,7 +26292,7 @@ plot (10k).
 }{
    \sstdescription{
       Procedure for loading the standard greyscale lookup table into
-      the current image-display device with linear scaling.
+      the current graphics device with linear scaling.
    }
    \sstusage{
       lutgrey
@@ -26322,14 +26301,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -26340,7 +26319,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the {\it heat} lookup table with linear scaling
-      into the current image-display device.
+      into the current graphics device.
    }
    \sstusage{
       lutheat
@@ -26349,14 +26328,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 
@@ -26368,7 +26347,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the default {\it Ikon\/} lookup table with linear
-      scaling into the current image-display device.
+      scaling into the current graphics device.
    }
    \sstusage{
       lutikon
@@ -26377,8 +26356,8 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
@@ -26387,7 +26366,7 @@ plot (10k).
          \sstitem
          This is a procedure that calls LUTABLE.  Therefore, the parameter
          cannot be specified on the command line.  You will only be
-         prompted for the DEVICE parameter if the current image display
+         prompted for the DEVICE parameter if the current graphics device
          is not suitable or not available.
 
          \sstitem
@@ -26402,7 +26381,7 @@ plot (10k).
 }{
    \sstdescription{
       Procedure for loading the standard greyscale lookup table into
-      the current image-display device with negative linear scaling.
+      the current graphics device with negative linear scaling.
    }
    \sstusage{
       lutneg
@@ -26411,14 +26390,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -26429,7 +26408,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the coloured-ramps lookup table with linear
-      scaling into the current image-display device.
+      scaling into the current graphics device.
    }
    \sstusage{
       lutramps
@@ -26438,25 +26417,25 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
 \sstroutine{
    LUTREAD
 }{
-   Loads an image-display lookup table from an NDF
+   Loads an graphics device lookup table from an NDF
 }{
    \sstdescription{
       This application reads a lookup table stored in an NDF with
-      the standard format, and loads it into the current image-display
+      the standard format, and loads it into the current graphics device
       device.
    }
    \sstusage{
@@ -26474,8 +26453,8 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         [Current image-display device]
+         Name of the graphics device whose colour table is to be changed.
+         [Current graphics device]
       }
       \sstsubsection{
          LUT = NDF (Read)
@@ -26498,11 +26477,11 @@ plot (10k).
 \sstroutine{
    LUTSAVE
 }{
-   Saves the current colour table of an image-display device in an
+   Saves the current colour table of an graphics device in an
    NDF
 }{
    \sstdescription{
-      This routine saves the colour table of a nominated image display to
+      This routine saves the colour table of a nominated graphics device to
       an NDF LUT file and/or a text file.
    }
    \sstusage{
@@ -26512,8 +26491,8 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The name of the image-display device whose colour table is to
-         be saved.  {\tt [Current image display]}
+         The name of the graphics device whose colour table is to
+         be saved.  {\tt [Current graphics device]}
       }
       \sstsubsection{
          FULL = \_LOGICAL (Read)
@@ -26552,13 +26531,13 @@ plot (10k).
          lutsave pizza
       }{
          This saves the current colour table on the current
-         image-display device to an NDF called pizza.
+         graphics device to an NDF called pizza.
       }
       \sstexamplesubsection{
          lutsave redshift full
       }{
          This saves in full the current colour table on the current
-         image-display device to an NDF called redshift.
+         graphics device to an NDF called redshift.
       }
    }
    \sstdiytopic{
@@ -26575,7 +26554,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads an optical-spectrum-like lookup table with linear
-      scaling into the current image-display device.
+      scaling into the current graphics device.
    }
    \sstusage{
       lutspec
@@ -26584,14 +26563,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -26603,7 +26582,7 @@ plot (10k).
 }{
    \sstdescription{
       This application displays a key to the current colour table on the
-      specified image display device using the whole of the current colour
+      specified graphics device using the whole of the current colour
       table (excluding the low 16 pens which are reserved for axis
       annotation, \emph{etc}). The key can either be a simple rectangular block
       of colour which ramps through the colour table, a histogram-style
@@ -26653,13 +26632,13 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The image-display device on which the colour table is to be
+         The graphics device on which the colour table is to be
          drawn.  The device must be in one of the following GNS
          categories: IMAGE\_DISPLAY, IMAGE\_OVERLAY, MATRIX\_PRINTER, or
          WINDOW, and have at least 24 greyscale intensities or colour
          indices.  It must also not reset when the device is opened
          (since the colour table would be lost) unless parameter LUT
-         does not have the null value.  {\tt [Current image-display device]}
+         does not have the null value.  {\tt [Current graphics device]}
       }
       \sstsubsection{
          FRAME = LITERAL (Read)
@@ -26725,7 +26704,7 @@ plot (10k).
          LUT = NDF (Read)
       }{
          Name of the NDF containing a lookup table as its data array;
-         the lookup table is written to the image-display{\tt '}s colour
+         the lookup table is written to the graphics device{\tt '}s colour
          table.  The purpose of this parameter is to provide a means of
          controlling the appearance of the image on certain devices,
          such as colour printers, that do not have a dynamic colour
@@ -26849,7 +26828,7 @@ plot (10k).
          lutview
       }{
          Draws an annotated colour table at a position selected via
-         the cursor on the current image-display device.
+         the cursor on the current graphics device.
       }
       \sstexamplesubsection{
          lutview style={\tt '}form=hist,logpop=1{\tt '}
@@ -26893,7 +26872,7 @@ plot (10k).
          lutview p
       }{
          Draws a colour table that fills the current picture on the
-         current image-display device.
+         current graphics device.
       }
       \sstexamplesubsection{
          lutview curpic
@@ -26924,7 +26903,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads the {\it warm\/} lookup table with linear scaling
-      into the current image-display device.  It is a continuous LUT
+      into the current graphics device.  It is a continuous LUT
       going from black to white, passing through warm shades of yellow
       and brown.
    }
@@ -26935,15 +26914,15 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the
       parameter cannot be specified on the command line.  You will 
       only be prompted for the DEVICE parameter if the current
-      image display is not suitable or not available.
+      graphics device is not suitable or not available.
    }
 }
 \sstroutine{
@@ -26953,7 +26932,7 @@ plot (10k).
 }{
    \sstdescription{
       This procedure loads a pseudo-contour lookup table with linear
-      scaling into the current image-display device. The lookup table
+      scaling into the current graphics device. The lookup table
       is mainly black with a set of white stripes.
    }
    \sstusage{
@@ -26963,14 +26942,14 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display whose colour table is to be changed.
-         {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device whose colour table is to be changed.
+         {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstnotes{
       This is a procedure that calls LUTABLE.  Therefore, the parameter
       cannot be specified on the command line.  You will only be
-      prompted for the DEVICE parameter if the current image display
+      prompted for the DEVICE parameter if the current graphics device
       is not suitable or not available.
    }
 }
@@ -30368,7 +30347,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The plotting device. {\tt [current image-display device]}
+         The plotting device. {\tt [current graphics device]}
       }
       \sstsubsection{
          LABOUT = \_LOGICAL (Read)
@@ -30483,7 +30462,7 @@ plot (9k).
 \sstroutine{
    OVCLEAR
 }{
-   Clears an image-display overlay
+   Clears an graphics device overlay
 }{
    \sstdescription{
       This application clears an overlay device, but without purging
@@ -30504,7 +30483,7 @@ plot (9k).
       }{
          The graphics device to be cleared.  It must be in GNS classes
          IMAGE\_OVERLAY or WINDOW\_OVERLAY.
-         {\tt [}Current image-display-overlay device{\tt ]}
+         {\tt [}Current graphics device-overlay device{\tt ]}
       }
    }
    \sstexamples{
@@ -30534,12 +30513,12 @@ plot (9k).
 \sstroutine{
    OVSET
 }{
-   Selects a current image-display overlay
+   Selects a current graphics device overlay
 }{
    \sstdescription{
-      This application selects a current image-display overlay. This
+      This application selects a current graphics device overlay. This
       device will be used for all applications requiring an
-      image-display overlay until changed explicitly.
+      graphics device overlay until changed explicitly.
    }
    \sstusage{
       ovset device
@@ -30548,7 +30527,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The image-display overlay to become the current image-display
+         The graphics device overlay to become the current graphics device
          overlay device.  The device must be in GNS categories
          IMAGE\_OVERLAY or WINDOW\_OVERLAY.
       }
@@ -30557,7 +30536,7 @@ plot (9k).
       \sstexamplesubsection{
          ovset xov
       }{
-         Makes the xov device the current image-display overlay.
+         Makes the xov device the current graphics device overlay.
       }
    }
 }
@@ -30569,7 +30548,7 @@ plot (9k).
 }{
    \sstdescription{
       This application loads the standard palette of colours to fill
-      the portion of the current image display's colour table which is
+      the portion of the current graphics device's colour table which is
       reserved for the palette.  The palette comprises 16 colours and
       is intended to provide coloured annotations, borders, axes,
       graphs {\it etc.}\ that are unaffected by changes to the lookup table
@@ -30586,7 +30565,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device to be used.  {\tt [}Current graphics device{\tt ]}
       }
    }
    \sstexamples{
@@ -30594,7 +30573,7 @@ plot (9k).
          paldef
       }{
          This loads the standard palette into the reserved portion of
-         the colour table of the current image display.
+         the colour table of the current graphics device.
       }
       \sstexamplesubsection{
          paldef xwindows
@@ -30624,11 +30603,11 @@ plot (9k).
 \sstroutine{
    PALENTRY
 }{
-   Enters a colour into an image display's palette
+   Enters a colour into an graphics device's palette
 }{
    \sstdescription{
       This application obtains a colour and enters it into the palette
-      portion of the current image display's colour table.  The palette
+      portion of the current graphics device's colour table.  The palette
       comprises up to 16 colours and is intended to provide coloured
       annotations, borders, axes, graphs {\it etc.}\ that are unaffected by
       changes to the lookup table used for images.
@@ -30663,7 +30642,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used. {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device to be used. {\tt [}Current graphics device{\tt ]}
       }
       \sstsubsection{
          PALNUM = \_INTEGER (Read)
@@ -30715,7 +30694,7 @@ plot (9k).
    \sstdescription{
       This application reads a palette of colours from an NDF, stored as
       red, green and blue intensities, to fill the portion of
-      the current image display's colour table which is reserved for
+      the current graphics device's colour table which is reserved for
       the palette.  The palette comprises 16 colours and is intended
       to provide coloured annotations, borders, axes, graphs {\it etc.}\ that
       are unaffected by changes to the lookup table used for images.
@@ -30727,7 +30706,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device to be used.  {\tt [}Current graphics device{\tt ]}
       }
       \sstsubsection{
          PALETTE = NDF (Read)
@@ -30747,7 +30726,7 @@ plot (9k).
       }{
          This loads the palette stored in the NDF called rustic into
          the reserved portion of the colour table of the current
-         image display.
+         graphics device.
       }
       \sstexamplesubsection{
          palread rustic xwindows
@@ -30796,7 +30775,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
+         Name of the graphics device to be used.  {\tt [}Current graphics device{\tt ]}
       }
       \sstsubsection{
          PALETTE = NDF (Write)
@@ -30817,7 +30796,7 @@ plot (9k).
          palsave rustic
       }{
          This saves the palette of the colour table of the current
-         image display into the NDF called rustic.
+         graphics device into the NDF called rustic.
       }
       \sstexamplesubsection{
          palsave hitec xwindows title="Hi-tech-look palette"
@@ -43710,7 +43689,7 @@ The following new applications have been added:
 
 \begin{description}
    \item [\htmlref{LUTEDIT}{LUTEDIT}] \mbox{}
-      Creates or edits an image-display colour table. It uses a graphical
+      Creates or edits an graphics device colour table. It uses a graphical
       user interface to allow interactive manipulation of the colour
       table in many ways.
 \end{description}
@@ -43838,7 +43817,7 @@ functions as follows.
 \classitem{GDSET}
  Selects a current graphics device.
 \classitem{OVSET}
- Selects a current image-display overlay.
+ Selects a current graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -43851,7 +43830,7 @@ functions as follows.
 \classitem{GDSTATE}
  Shows the current status of a graphics device.
 \classitem{OVCLEAR}
- Clears an image-display overlay.
+ Clears an graphics device overlay.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -43895,7 +43874,7 @@ functions as follows.
 \item {\large\bf Lookup/Colour tables}
 \begin{description}
 \classitem{LUTABLE}
- Manipulates an image-display colour table.
+ Manipulates an graphics device colour table.
 \classitem{LUTBGYRW}
  Loads the {\it BGYRW\/} lookup table.
 \classitem{LUTCOL}
@@ -43903,7 +43882,7 @@ functions as follows.
 \classitem{LUTCONT}
  Loads a lookup table to give the display the appearance of a contour plot.
 \classitem{LUTEDIT}
- Creates or edits an image-display colour table.
+ Creates or edits an graphics device colour table.
 \classitem{LUTFC}
  Loads the standard false-colour lookup table.
 \classitem{LUTGREY}
@@ -43917,9 +43896,9 @@ functions as follows.
 \classitem{LUTRAMPS}
  Loads the coloured-ramps lookup table.
 \classitem{LUTREAD}
- Loads an image-display lookup table from an NDF.
+ Loads an graphics device lookup table from an NDF.
 \classitem{LUTSAVE}
- Saves the current colour table of an image-display device in an NDF.
+ Saves the current colour table of an graphics device in an NDF.
 \classitem{LUTSPEC}
  Loads a spectrum-like lookup table.
 \classitem{LUTVIEW}
@@ -43967,7 +43946,7 @@ functions as follows.
 \classitem{PALDEF}
  Loads the default palette to a colour table.
 \classitem{PALENTRY}
- Enters a colour into an image display's palette.
+ Enters a colour into an graphics device's palette.
 \classitem{PALREAD}
  Fills the palette of a colour table from an NDF.
 \classitem{PALSAVE}
