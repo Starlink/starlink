@@ -5,29 +5,27 @@ AM_FCFLAGS = -I../include
 
 bin_MONOLITHS = figaro3
 
-figaro3_SOURCES = figaro3.f $(F_ROUTINES)
+figaro3_SOURCES = figaro3.f \
+                  $(NORMALTASKS:=.f)
 
-figaro3_TASKS = arc cdist echarc echfind echmask echmerge echselect    \
-findsp flaircomp flairext iarc iscrunch iscruni maskext offdist overpf \
-polext sdist skyliner vachel xcopi xcopy
+figaro3_TASKS = $(NORMALTASKS) $(CODELESSTASKS)
 
-# Not a one-to-one correspondence of fortran to tasks
-F_ROUTINES = arc.f echarc.f echmask.f echselect.f findsp.f flairext.f \
-iscrunch.f offdist.f polext.f skyliner.f xcopi.f cdist.f echfind.f    \
-echmerge.f flaircomp.f iarc.f maskext.f overpf.f sdist.f    \
-vachel.f xcopy.f
+NORMALTASKS = \
+arc cdist echarc echfind echmask echmerge echselect findsp flaircomp \
+flairext iarc iscrunch maskext offdist overpf polext sdist skyliner \
+vachel xcopi xcopy
 
-figaro3_LDADD = \
-../par/libfigpar.la \
-../fla/libfla.la \
+CODELESSTASKS = iscruni 
+
+figaro3_LDADD = $(LDADD) \
 ../appsub/libappsub.la \
 ../fig/libfig.la \
+../fla/libfla.la \
+../fda/libfda.la \
 ../jty/libjty.la \
 ../gen/libgen.la \
 ../gkd/libgkd.la \
-../fda/libfda.la \
+../par/libfigpar.la \
 ../ich/libich.la \
-$(EXTERNAL_LIBS)
-
-EXTERNAL_LIBS = `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
-         `fio_link_adam`
+`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
+`fio_link_adam` 
