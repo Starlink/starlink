@@ -1,0 +1,30 @@
+*+
+*  Name:
+*     EXT_PAR
+*
+*  Purpose:
+*     Provide symbolic constants for use with the EXTREME package.
+*
+*  Language:
+*     Fortran 77
+*
+*  Type of Module:
+*     Include file.
+*
+*  Description:
+*     This file contains PARAMETER declarations for some constants 
+*     which may be required by fortran programs which have been converted
+*     using tools in the EXTREME package.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     2-FEB-2000 (MBT):
+*        Original version.
+*-
+
+*  Long integer constant of with value zero.
+      INTEGER * 8 EXT__ZERO
+
+* $Id$
