@@ -1251,13 +1251,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/View.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/AbstractApplication.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
@@ -2673,4 +2673,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 6 seconds
+Total time: 3 minutes 7 seconds
