@@ -1,0 +1,32 @@
+INTERFACE ASHOW
+
+  PARAMETER INP
+    TYPE 'LITERAL'
+    PROMPT 'Dataset name'
+    HELP 'The name of any HDS or FITS dataset'
+    POSITION 1
+    ASSOCIATION '->GLOBAL.BINDS'
+    PPATH 'GLOBAL'
+    VPATH 'PROMPT'
+  ENDPARAMETER
+
+   PARAMETER ITEM
+     POSITION 2
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     DEFAULT '*'
+     PROMPT 'Items to display (? for list)'
+     HELP 'Response can be one or more of WCS, TIME, ERESP, DET'
+   ENDPARAMETER
+
+  PARAMETER DEV
+    POSITION 3
+    TYPE '_CHAR'
+    VPATH 'DEFAULT'
+    DEFAULT 'TERMINAL'
+    PROMPT 'Output to'
+    HELP 'Valid responses : TERMINAL(default),PRINTER,OLDFILE,NEWFILE or filename'
+  ENDPARAMETER
+
+ENDINTERFACE
