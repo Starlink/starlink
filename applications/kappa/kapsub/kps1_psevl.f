@@ -1,5 +1,6 @@
-      SUBROUTINE KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND1, UBND1,
-     :                       LBND2, UBND2, PX, PY, ARRAY, STATUS )
+      SUBROUTINE KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND1,
+     :                       UBND1, LBND2, UBND2, PX, PY, ARRAY, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPS1_PSEVL
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND1, UBND1,
+*     CALL KPS1_PSEVL( AMP, AXISR, THETA, FWHM, GAMMA, LBND1, UBND1,
 *                      LBND2, UBND2, PX, PY, ARRAY, STATUS )
 
 *  Description:
@@ -25,6 +26,8 @@
 *     point-spread function is at the supplied psoition (PX,PY).
 
 *  Arguments:
+*     AMP = REAL (Given)
+*        Peak amplitude of the fitted PSF.
 *     AXISR = REAL (Given)
 *        The axis ratio of the point-spread function.
 *     THETA = REAL (Given)
@@ -65,6 +68,8 @@
 *        indentation.
 *     21-SEP-1999 (DSB):
 *        Re-written to allow for arbitrary pixel origin, and PSF centre.
+*     7-NOV-2000 (DSB):
+*        Argument AMP added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,6 +84,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
+      REAL AMP
       REAL AXISR
       REAL FWHM
       REAL GAMMA
@@ -161,7 +167,7 @@
 
 *  Evaluate the PSF function allowing for the difference sigma along
 *  the major axis.
-               ARRAY( I, J ) = EXP( -0.5 * ( MINOR /
+               ARRAY( I, J ) = AMP*EXP( -0.5 * ( MINOR /
      :                         MAX( 0.001, SIGMA ) ) ** GAMMA ) *
      :                         EXP( -0.5 * ( MAJOR / AXISR /
      :                         MAX( 0.001, SIGMA ) ) ** GAMMA )
