@@ -19428,6 +19428,46 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   CarLin\sstlabel{CarLin}
+}{
+   Ignore spherical rotations on CAR projections?
+}{
+   \sstdescription{
+      This attribute is a boolean value which specifies how FITS {\tt{"}}CAR{\tt{"}}
+      (plate carree, or {\tt{"}}Cartesian{\tt{"}}) projections should be treated when
+      reading a \htmlref{FrameSet}{FrameSet} from a foreign encoded FITS header. If zero (the
+      default), it is assumed that the CAR projection conforms to the
+      conventions described in the (draft) FITS world coordinate system
+      (FITS-WCS) paper by E.W. Greisen and M. Calabretta (A \& A, in
+      preparation). If CarLin is non-zero, then these conventions are
+      ignored, and it is assumed that the mapping from pixel coordinates to
+      celestial coordinates is a simple linear transformation (hence the
+      attribute name {\tt{"}}CarLin{\tt{"}}). This is appropriate for some older FITS
+      data which claims to have a {\tt{"}}CAR{\tt{"}} projection, but which in fact do
+      not conform to the conventions of the FITS-WCS paper. Furthermore, if
+      CarLin is non-zero, it is assumed that CDELT and CD keywords are
+      in units of degrees rather than radians (as required by the
+      FITS-WCS papers).
+
+      The FITS-WCS paper specifies that headers which include a CAR projection
+      represent a linear mapping from pixel coordinates to {\tt{"}}native spherical
+      coordinates{\tt{"}}, NOT celestial coordinates. An extra mapping is then
+      required from native spherical to celestial. This mapping is a 3D
+      rotation and so the overall \htmlref{Mapping}{Mapping} from pixel to celestial coordinates
+      is NOT linear. See the FITS-WCS papers for further details.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         \htmlref{FitsChan}{FitsChan}
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+}
+\sstroutine{
    Card\sstlabel{Card}
 }{
    Index of current FITS card in a FitsChan
@@ -23760,10 +23800,13 @@ Object            - Base class for all AST Objects
          \htmlref{AllWarnings}{AllWarnings}: A list of the available conditions
 
          \sstitem
-         \htmlref{DefB1950}{DefB1950}: Use FK4 B1950 as default equatorial coordinates?
+         Card: Index of current FITS card in a FitsChan
 
          \sstitem
-         Card: Index of current FITS card in a FitsChan
+         \htmlref{CarLin}{CarLin}: Ignore spherical rotations on CAR projections?
+
+         \sstitem
+         \htmlref{DefB1950}{DefB1950}: Use FK4 B1950 as default equatorial coordinates?
 
          \sstitem
          Encoding: System for encoding Objects as FITS headers
@@ -25993,12 +26036,10 @@ encoding.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-5}
+\subsection{Changes Introduced in V1.8-5}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-4 and V1.8-5 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V1.8-4 and V1.8-5:
 
 \begin{enumerate}
 
@@ -26008,6 +26049,46 @@ These allow graphical attributes (colour, width, etc) to be set for each
 axis individually. Previously, graphical attributes could only be set for
 both axes together, using graphical elements Axes, \htmlref{Grid}{Grid}, NumLabs,
 TextLabs and Ticks.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-7}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-5 and V1.8-7 (the
+current version):
+
+\begin{enumerate}
+
+\item A new attribute called \htmlref{CarLin}{CarLin} has been added to the \htmlref{FitsChan}{FitsChan} class
+which controls the way CAR projections are handled when reading a
+\htmlref{FrameSet}{FrameSet} from a non-native FITS header. Some FITS writers use a CAR 
+projection to represent a simple linear transformation between pixel
+coordinates and celestial sky coordinates. This is not consistent with
+the definition of the CAR projection in the draft FITS-WCS standard, which
+requires the resultant \htmlref{Mapping}{Mapping} to include a 3D rotation from native
+spherical coordinates to celestial spherical coordinates, thus making the
+Mapping non-linear. Setting CarLin to 1 forces 
+AST_READ
+to ignore the FITS-WCS standard and treat any CAR projections as simple 
+linear Mappings from pixel coordinates to celestial coordinates.
+
+\item A bug has been fixed which could result in axis Format attributes
+set by the user being ignored under certain circumstances.
+
+\item A bug in the way tick marks positions are selected in the \htmlref{Plot}{Plot} class
+has been fixed. This bug could result in extra ticks marks being displayed at 
+inappropriate positions. This bug manifested itself, for instance, if the 
+Mapping represented by the Plot was a simple Cartesian to Polar Mapping.
+In this example, the bug caused tick marks to be drawn at negative radius
+values.
+
+\item A bug has been fixed which could prevent attribute settings from
+being read correctly by 
+AST_SET,
+etc., on certain platforms (MacOS, for instance).
 
 \end{enumerate}
 
