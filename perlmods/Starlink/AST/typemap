@@ -22,6 +22,7 @@ AstSkyFrame *	T_ASTOBJ
 AstSlaMap *	T_ASTOBJ
 AstSphMap *	T_ASTOBJ
 AstSpecFrame *	T_ASTOBJ
+AstDSBSpecFrame *	T_ASTOBJ
 AstSpecMap *	T_ASTOBJ
 AstTranMap *	T_ASTOBJ
 AstUnitMap *	T_ASTOBJ

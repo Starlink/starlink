@@ -569,6 +569,8 @@ use base qw/ Starlink::AST::Frame /;
 package Starlink::AST::SpecFrame;
 use base qw/ Starlink::AST::Frame /;
 
+package Starlink::AST::DSBSpecFrame;
+use base qw/ Starlink::AST::SpecFrame /;
 
 
 1;

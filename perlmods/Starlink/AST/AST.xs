@@ -87,6 +87,14 @@ typedef void AstXmlChan;
 typedef void AstTranMap;
 #endif
 
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 4) || AST_MAJOR_VERS >= 4 )
+#define HASDSBSPECFRAME
+#else
+typedef void AstDSBSpecFrame;
+#endif
+
+
+
 /* Helper functions */
 #include "arrays.h"
 #include "astTypemap.h"
@@ -856,6 +864,23 @@ new( class, options )
 #else
   ASTCALL(
    RETVAL = astSpecFrame( options );
+  )
+#endif
+ OUTPUT:
+  RETVAL
+
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::DSBSpecFrame
+
+AstDSBSpecFrame *
+new( class, options )
+  char * class
+  char * options
+ CODE:
+#ifndef HASDSBSPECFRAME
+   Perl_croak(aTHX_ "DSBSpecFrame: Please upgrade to AST V3.4 or greater");
+#else
+  ASTCALL(
+   RETVAL = astDSBSpecFrame( options );
   )
 #endif
  OUTPUT:
