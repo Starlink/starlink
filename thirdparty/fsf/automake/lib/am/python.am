@@ -48,8 +48,8 @@ install-%DIR%PYTHON: $(%DIR%_PYTHON)
 ## Don't perform translation, since script name is important.
 	    echo " $(%DIR%PYTHON_INSTALL) $$b$$p $(DESTDIR)$(%NDIR%dir)/$$d"; \
 	    $(%DIR%PYTHON_INSTALL) $$b$$p $(DESTDIR)$(%NDIR%dir)/$$d; \
-	    if test -n "$(MANIFEST_FD)"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$d" >&$(MANIFEST_FD); \
+	    if test -n "$$MANIFEST_FD"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$d" >&$${MANIFEST_FD-0}; \
 	    else :; fi; \
 	  else :; fi; \
 	done; \

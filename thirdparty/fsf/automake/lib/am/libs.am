@@ -53,8 +53,8 @@ install-%DIR%LIBRARIES: $(%DIR%_LIBRARIES)
 ?!BASE?	    f="$$p"; \
 	    echo " $(%DIR%LIBRARIES_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f"; \
 	    $(%DIR%LIBRARIES_INSTALL) $$p $(DESTDIR)$(%NDIR%dir)/$$f; \
-	    if test -n "$(MANIFEST_FD)"; then \
-		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$(MANIFEST_FD); \
+	    if test -n "$$MANIFEST_FD"; then \
+		echo "$(DESTDIR)$(%NDIR%dir)/$$f" >&$${MANIFEST_FD-0}; \
 	    else :; fi; \
 	  else :; fi; \
 	done
