@@ -125,7 +125,6 @@
       PARAMETER (NBSIZ=65536)
 *    Local variables :
       CHARACTER*8 CNAME
-      CHARACTER*1	C
       INTEGER OLDSIZ
       INTEGER ID,SID,ITEMID
       INTEGER GCBID
@@ -217,13 +216,12 @@
 *   Background modeller sources
         CALL NBS_DEFINE_PRIMITIVE(ID,'BG_NSRC','_INTEGER',0,VAL__NBI,
      :                                                   SID,STATUS)
-        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_TSRC','_INTEGER',0,VAL__NBI,
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRCX','_REAL',0,VAL__NBR,
      :                                                   SID,STATUS)
-        DO I = 1, 8
-          C = CHAR( ICHAR('0') + I )
-          CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRC'//C,'_CHAR',0,33,SID,
-     :                                                       STATUS)
-        END DO
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRCY','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRCR','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
 
 *  colour table
         CNAME='DATA'
