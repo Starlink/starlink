@@ -21,13 +21,13 @@
 #  History:
 #     11-DEC-1997 (DSB):
 #        Original version.
+#     30-JUN-1998 (DSB):
+#        Removed obsolete ROTATION and YROTATION entries.
 #     {enter_changes_here}
 #
 ANGROT?     PPCKANGR         # The orientation of the analyser.
 FILTER?     PPCKFILT         # The filter.
 IMGID?      PPCKIMID         # The image idenrtifier.
 RAY?        PPCKRAY          # The ray "O" or "E" (optional)
-ROTATION?   PPCKROT          # The rotation of the aligned image (optional)
 WPLATE?     PPCKWPLT         # The waveplate position
-YROTATION?  PPCKYROT         # The rotation of the Y axis (optional)
 STOKES?     PPCKSTOK         # Identifiers for each plane of the data array
