@@ -35,10 +35,17 @@ in a separate Jade pass.
 Support backmatter elements.
 <codebody>
 
+;(element backmatter
+;  (make sequence
+;    ;;(make command name: "section"
+;    ;;  (literal "Notes, etc"))
+;    (make-bibliography)
+;    (make-updatelist)))
 (element backmatter
+  (empty-sosofo))
+
+(define (make-backmatter)
   (make sequence
-    ;;(make command name: "section"
-    ;;  (literal "Notes, etc"))
     (make-bibliography)
     (make-updatelist)))
 
@@ -68,10 +75,17 @@ Jade pass.
     (process-children)
     (literal "]")))
 
+(define (hasbibliography?)
+  (get-bibliography-name))
+
+;; Return bibliography name or #f
+(define (get-bibliography-name)
+  (let ((bm (getdocbody 'backmatter)))
+    (and bm
+	 (attribute-string (normalize "bibliography") bm))))
+
 (define (make-bibliography)
-  (let* ((hasbib? (attribute-string (normalize "bibliography")
-				    (getdocbody 'backmatter)))
-	 (bibcontents (and hasbib?
+  (let* ((bibcontents (and (hasbibliography?)
 			   (read-entity (string-append (root-file-name)
 						       ".latexbib.bbl")))))
     (if bibcontents
