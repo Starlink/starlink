@@ -8,7 +8,7 @@
 # Allan Brighton  01 Jun 94  Created
 # Peter W. Draper 26 Mar 99  Removed global statements for $variable_
 #                            itcl3 scoping breaks this
-#                 02 Apr 01  Added delete method to remove a single item.
+#                 02 Apr 01  Added delete and invoke methods for a single item.
 
 itk::usual LabelMenu {}
 
@@ -71,6 +71,12 @@ itcl::class util::LabelMenu {
 
     public method delete {index} {
 	$itk_component(menu) delete $index
+    }
+
+    # invoke an item.
+
+    public method invoke {index} {
+	$itk_component(menu) invoke $index
     }
 
 

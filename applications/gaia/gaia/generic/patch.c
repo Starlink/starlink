@@ -572,7 +572,7 @@ void copyWorktoImage( enum ImageDataType type,
 {
    signed char *scPtr, *scArr;
    unsigned short *usPtr, *usArr;
-   int *iPtr, *iArr;
+   unsigned int *iPtr, *iArr;
    int i, j;
 
    switch ( type ) {

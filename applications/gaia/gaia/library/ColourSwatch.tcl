@@ -1,3 +1,4 @@
+#+
 #  Name:
 #     ColourSwatch
 
@@ -5,11 +6,23 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Dialog for choosing an RGB colour.
+#     Dialog for choosing an RGB colour, either from the full range or
+#     from a set of standard X11 colours.
 
 #  Description:
 #     The standard colours are chosen to closely match the "rgb.txt"
-#     file
+#     file. Normal use follows something like:
+#
+#     ColourSwatch .cs
+#
+#     if {[.cs activate]} {
+#        puts stdout "OK >>==> [.fs get]"
+#     } else {
+#        puts stdout "Cancel"
+#     }
+#     .cs destroy
+#
+#     The object withdraws on accept and close.
 
 #  Invocations:
 #
@@ -53,14 +66,19 @@ itcl::class gaia::ColourSwatch {
 
    #  Inheritances:
    #  -------------
-   inherit util::DialogWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
    constructor {args} {
 
+      #  Withdraw this window immediately, it is restored by the get
+      #  method.
+      wm withdraw $w_
+
       #  Evaluate any options.
       eval itk_initialize $args
+      wm title $w_ "Choose Colour"
 
       #  Frame for buttons.
       itk_component add butfrm {
@@ -84,9 +102,8 @@ itcl::class gaia::ColourSwatch {
             -to 255 \
             -showvalue 1 \
             -sliderrelief raised \
-            -sliderlength 10 \
             -troughcolor red \
-            -variable [scope redval] \
+            -variable [scope redval_] \
             -command [code $this set_color] \
             -orient horizontal
       }
@@ -100,8 +117,7 @@ itcl::class gaia::ColourSwatch {
             -showvalue 1 \
             -sliderrelief raised \
             -troughcolor green \
-            -sliderlength 10 \
-            -variable [scope grnval] \
+            -variable [scope grnval_] \
             -command [code $this set_color] \
             -orient horizontal
       }
@@ -115,8 +131,7 @@ itcl::class gaia::ColourSwatch {
             -showvalue 1 \
             -sliderrelief raised \
             -troughcolor blue \
-            -sliderlength 10 \
-            -variable [scope blueval] \
+            -variable [scope blueval_] \
             -command [code $this set_color] \
             -orient horizontal
       }
@@ -134,15 +149,15 @@ itcl::class gaia::ColourSwatch {
             -width 10
       }
       itk_component add visualent {
-         entry $w_.butfrm.visual.ent \
+         label $w_.butfrm.visual.ent \
             -width 7 \
-            -textvariable hexval \
+            -textvariable [scope hexval_] \
             -relief raised
       }
 
       #  Packing for button frames.
       pack $itk_component(red) $itk_component(green) $itk_component(blue) \
-         -expand 1
+         -expand 1 -side top
 
       pack $itk_component(visualbutton) \
          -anchor nw \
@@ -204,9 +219,27 @@ itcl::class gaia::ColourSwatch {
          
          incr framer
       }
-      
+
+      #  Actions bar.
+      itk_component add actionframe {
+         frame $w_.actions
+      }
+      itk_component add accept {
+         button $itk_component(actionframe).accept \
+            -text {Accept} \
+            -command [code $this accept]
+      }
+      itk_component add cancel {
+         button $itk_component(actionframe).cancel \
+            -text {Cancel} \
+            -command [code $this cancel]
+      }
+      pack $itk_component(accept) $itk_component(cancel) \
+         -side left -fill x -padx 5 -pady 5
+
       pack $itk_component(butfrm) -side top
-      pack $itk_component(canvas) -side bottom 
+      pack $itk_component(canvas) -side top
+      pack $itk_component(actionframe) -side bottom
    }
 
    #  Destructor:
@@ -217,21 +250,21 @@ itcl::class gaia::ColourSwatch {
    #  Methods:
    #  --------
    public method set_rgb_color {red green blue} {
-      set redval $red
-      set grnval $green
-      set blueval $blue
+      set redval_ $red
+      set grnval_ $green
+      set blueval_ $blue
       set_color
    }
 
    public method set_color {args} {
-      set hexval [format "%02X%02X%02X" $redval $grnval $blueval]
+      set hexval_ "#[format "%02X%02X%02X" $redval_ $grnval_ $blueval_]"
       $itk_component(visualbutton) configure \
-         -background "#$hexval" \
-         -activebackground "#$hexval"
-      set temp [expr [expr $blueval + $grnval] + $redval]
-      set bming [expr abs([expr $grnval - $blueval])]
-      set rminb [expr abs([expr $redval  - $grnval])]
-      set gminr [expr abs([expr $grnval - $redval])]
+         -background "$hexval_" \
+         -activebackground "$hexval_"
+      set temp [expr [expr $blueval_ + $grnval_] + $redval_]
+      set bming [expr abs([expr $grnval_ - $blueval_])]
+      set rminb [expr abs([expr $redval_  - $grnval_])]
+      set gminr [expr abs([expr $grnval_ - $redval_])]
       set sumodiff [expr $gminr + [expr $bming + $rminb]]
       if {$sumodiff < 350 && $temp < 400} {
          $itk_component(visualbutton) configure \
@@ -244,21 +277,69 @@ itcl::class gaia::ColourSwatch {
       }
    }
 
+   #  Activate the chooser and allow the selection of a colour.
+   #  Result is 1 or 0 according to whether accept or cancel is
+   #  pressed. 
+   public method activate {} {
+      wm deiconify $w_
+      if { $itk_option(-modal) } {
+         grab $w_
+      }
+
+      #  Wait until the window is closed.
+      tkwait variable [scope status_]
+      wm withdraw $w_
+      return $status_
+   }
+
+   #  Return the current colour.
+   public method get {} {
+      return $hexval_
+   }
+
+   #  Close the window accepting the result.
+   public method accept {} {
+      close_window_
+      set status_ 1
+   }
+
+   #  Close the windows not accepting the result.
+   public method cancel {} {
+      close_window_
+      set status_ 0
+   } 
+
+   #  Close the window.
+   protected method close_window_ {} {
+      wm withdraw $w_
+      if {$itk_option(-modal)} {
+         grab release $w_
+      }      
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
+
+   #  flag: if true, grab the screen
+   itk_option define -modal modal Modal 1
 
    #  Protected variables: (available to instance)
    #  --------------------
 
    #  Selected red value.
-   protected variable redval
+   protected variable redval_
 
    #  Selected green value.
-   protected variable grnval
+   protected variable grnval_
 
    #  Selected blue value.
-   protected variable blueval
+   protected variable blueval_
 
+   #  Selected colour as a hex value.
+   protected variable hexval_
+
+   #  Status of close window request.
+   protected variable status_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------

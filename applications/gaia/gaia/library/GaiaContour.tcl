@@ -183,7 +183,8 @@ itcl::class gaia::GaiaContour {
       #  Add tab table to contain the various controls (too many for a
       #  single pane).
       itk_component add tab {
-         ::iwidgets::tabnotebook $w_.tab -angle 30 -tabpos w -width 370 -height 400
+         ::iwidgets::tabnotebook $w_.tab \
+            -angle 30 -tabpos w -width 370 -height 400
       }
 
       #  Get pane for levels and attributes.
@@ -248,7 +249,7 @@ itcl::class gaia::GaiaContour {
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
 
       #  Set the canvas level tags and record no contours are drawn.
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set leveltags_($i) cont[incr unique_]
          set drawn_($i) 0
       }
@@ -378,7 +379,7 @@ itcl::class gaia::GaiaContour {
             puts $fid "xkeypos = [$itk_component(xkeypos) get]"
             puts $fid "ykeypos = [$itk_component(ykeypos) get]"
             puts $fid "keyfont = [$itk_component(keyfont) get]"
-            set colour $colindex_([$itk_component(keycolour) get])
+            set colour [gaia::ColourMenu::lookup_index [$itk_component(keycolour) get]]
             puts $fid "keycolour = $colour"
             puts $fid "keylength = [$itk_component(keylength) get]"
             puts $fid "keywidth = [$itk_component(keywidth) get]"
@@ -413,7 +414,8 @@ itcl::class gaia::GaiaContour {
                      }
                      default {
                         if { [llength $line] == 3 } {
-                           eval add_contour_ [incr count] $line
+                           eval add_contour_ $count $line
+                           incr count
                         } else {
                            warning_dialog \
                               "unrecognised line in configuration file: $line"
@@ -435,11 +437,13 @@ itcl::class gaia::GaiaContour {
       }
    }
 
-   #  Add a new contour at a given index.
-   protected method add_contour_ {index value colour width} {
-      $itk_component(value$index) configure -value $value
-      $itk_component(width$index) configure -value $width
-      $itk_component(colour$index) configure -value $indexcol_($colour)
+   #  Add a new contour at a given position.
+   protected method add_contour_ {ncont value colour width} {
+      $itk_component(value$ncont) configure -value $value
+      $itk_component(width$ncont) configure -value $width
+      #$itk_component(colour$ncont) configure -value $indexcol_($colour)
+      $itk_component(colour$ncont) \
+         configure -value [gaia::ColourMenu::lookup_index $colour]
    }
 
    #  Assign a parameter value read back from a configuration file.
@@ -468,7 +472,9 @@ itcl::class gaia::GaiaContour {
          keycolour {
             set orig $itk_option(-drawkey)
             set itk_option(-drawkey) 0
-            $itk_component($param) configure -value $indexcol_($value)
+            #$itk_component($param) configure -value $indexcol_($value)
+            $itk_component($param) configure \
+               -value [gaia::ColourMenu::lookup_colour $value]
             set itk_option(-drawkey) $orig
          }
          keytitle -
@@ -561,18 +567,14 @@ itcl::class gaia::GaiaContour {
       grid $itk_component(athead1) $itk_component(athead2) \
          $itk_component(athead3)
 
-      #  Set up the colour index arrays and default values.
-      foreach {index xname} $colourmap_ {
-         set colindex_($xname) $index
-         set indexcol_($index) $xname
-      }
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
-         set index [expr int(fmod($i-1,16)*2)+1]
-         set coldefault_($i) "[lindex $colourmap_ $index]"
+      #  Set up the default colours (wrapped at maximum number).
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+         set index [expr int(fmod($i,15))]
+         set coldefault_($i) [gaia::ColourMenu::lookup_colour $index]
       }
 
       #  Now add the controls for the actual values.
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
 
          #  Entry widget for the contour values.
          itk_component add value$i {
@@ -590,14 +592,10 @@ itcl::class gaia::GaiaContour {
          }
 
          #  Now add all the colours to it.
-         foreach {index xname} $colourmap_ {
-            $itk_component(colour$i) add \
-               -label {    } \
-               -value $xname \
-               -background $xname \
-               -command [code $this set_colour_ $i]
-         }
-
+         gaia::ColourMenu \#auto $itk_component(colour$i) \
+            -change_cmd [code $this set_colour_ $i] \
+            -image $itk_option(-rtdimage) 
+         
          #  Set to next colour in list.
          $itk_component(colour$i) configure -value $coldefault_($i)
 
@@ -713,7 +711,6 @@ itcl::class gaia::GaiaContour {
             set ncont 0
             foreach value "$levels" {
                set att [lindex $atts $ncont]
-               incr ncont
 
                #  Set the tag used to control clear etc.
                $itk_option(-rtdimage) configure -ast_tag \
@@ -728,6 +725,7 @@ itcl::class gaia::GaiaContour {
                #  Add/update the key.
                draw_key_
                update idletasks
+               incr ncont
             }
          } else {
             #  Set the tag used to control clear etc.
@@ -743,7 +741,6 @@ itcl::class gaia::GaiaContour {
             #  Add/update the key.
             draw_key_
             update idletasks
-
          }
       }
 
@@ -754,7 +751,7 @@ itcl::class gaia::GaiaContour {
    #  Get the contour levels from the appropriate entry fields.
    protected method get_levels_ {{ignore 0}} {
       set levels {}
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set value [$itk_component(value$i) get]
          if { $value != {} } {
             lappend levels $value
@@ -773,11 +770,12 @@ itcl::class gaia::GaiaContour {
    #  Get the attributes from the colour and width widgets.
    protected method get_ast_atts_ {} {
       set atts {}
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set value [$itk_component(value$i) get]
          if { $value != {} } {
             set colour [$itk_component(colour$i) get]
-            set colour $colindex_($colour)
+            set colour [gaia::ColourMenu::lookup_index $colour]
+            #set colour $colindex_($colour)
             set width [expr [$itk_component(width$i) get]*0.005]
             lappend atts "colour(curve)=$colour,width(curve)=$width"
          }
@@ -792,7 +790,8 @@ itcl::class gaia::GaiaContour {
       set value [$itk_component(value$index) get]
       if { $value != {} } {
          set colour [$itk_component(colour$index) get]
-         set colour $colindex_($colour)
+         set colour [gaia::ColourMenu::lookup_index $colour]
+         #set colour $colindex_($colour)
          set width [expr [$itk_component(width$index) get]*0.005]
          set atts "colour(curve)=$colour,width(curve)=$width"
       }
@@ -814,11 +813,12 @@ itcl::class gaia::GaiaContour {
    #  Get the levels and attributes as a single string.
    protected method get_levels_and_atts_ {} {
       set atts {}
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          set value [$itk_component(value$i) get]
          if { $value != {} } {
             set colour [$itk_component(colour$i) get]
-            set colour $colindex_($colour)
+            set colour [gaia::ColourMenu::lookup_index $colour]
+            #set colour $colindex_($colour)
             set width [$itk_component(width$i) get]
             lappend atts "$value $colour $width"
          }
@@ -847,13 +847,13 @@ itcl::class gaia::GaiaContour {
    #  Clear the contours levels and attributes, or just the levels.
    public method clear_contours { {all 1} } {
       if { $all } {
-         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
             $itk_component(value$i) configure -value {}
             $itk_component(colour$i) configure -value $coldefault_($i)
             $itk_component(width$i) configure -value 1
          }
       } else {
-         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
             $itk_component(value$i) configure -value {}
          }
       }
@@ -924,7 +924,7 @@ itcl::class gaia::GaiaContour {
    #  Remove all contours. Do it one-by-one so we don't interfere with
    #  other contour objects.
    public method remove_contours {} {
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          $itk_option(-canvas) delete $leveltags_($i)
          set drawn_($i) 0
       }
@@ -946,8 +946,7 @@ itcl::class gaia::GaiaContour {
       draw_key_
    }
 
-   #  Level generation commands. XXX Just use simple generation commands,
-   #  no need to look at image data levels.
+   #  Level generation commands.
    protected method add_gen_controls_ {w} {
 
       #  Add section header.
@@ -1084,14 +1083,14 @@ itcl::class gaia::GaiaContour {
       }
       clear_contours 0
       if { $method == "magnitude" } {
-         for {set i 1} {$i <= $ncont} {incr i} {
+         for {set i 0} {$i < $ncont} {incr i} {
             $itk_component(value$i) configure -value \
-               [expr $start*pow(10.0,-0.4*($i-1)*$incre)]
+               [expr $start*pow(10.0,-0.4*$i*$incre)]
          }
       } elseif { $method == "linear" } {
-         for {set i 1} {$i <= $ncont} {incr i} {
+         for {set i 0} {$i < $ncont} {incr i} {
             $itk_component(value$i) configure -value \
-               [expr $start+($i-1)*$incre]
+               [expr $start+$i*$incre]
          }
       } else {
 
@@ -1106,14 +1105,14 @@ itcl::class gaia::GaiaContour {
 	    set max [$rtdimage max]
 	    set incre [expr double($max-$min)/double($ncont)]
 	    set start [expr $min+$incre*0.5]
-	    for {set i 1} {$i <= $ncont} {incr i} {
+	    for {set i 0} {$i < $ncont} {incr i} {
 	       $itk_component(value$i) configure -value \
-		  [expr $start+($i-1)*$incre]
+		  [expr $start+$i*$incre]
 	    }
 	 } else {
 
 	    #  Percentiles.
-	    set i 1
+	    set i 0
 	    foreach level [$rtdimage percentiles $percent] {
 	       $itk_component(value$i) configure -value $level
 	       incr i
@@ -1130,17 +1129,15 @@ itcl::class gaia::GaiaContour {
 
    #  Set the colour of a contour (if it is drawn), or all contours if
    #  using a single colour.
-   protected method set_colour_ {index} {
-      set colour [$itk_component(colour$index) get]
+   protected method set_colour_ {level colindex} {
+      set colour [gaia::ColourMenu::lookup_colour $colindex]
       if { $single_colour_ } {
-         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
-            if { $i != $index } {
-               $itk_component(colour$i) configure -value $colour
-            }
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+            $itk_component(colour$i) configure -value $colour
             $itk_option(-canvas) itemconfigure $leveltags_($i) -fill $colour
          }
       } else {
-         $itk_option(-canvas) itemconfigure $leveltags_($index) -fill $colour
+         $itk_option(-canvas) itemconfigure $leveltags_($level) -fill $colour
       }
    }
 
@@ -1149,7 +1146,7 @@ itcl::class gaia::GaiaContour {
    protected method set_width_ {index} {
       set width [$itk_component(width$index) get]
       if { $single_width_ } {
-         for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
             if { $i != $index } {
                $itk_component(width$i) configure -value $width
             }
@@ -1365,7 +1362,7 @@ itcl::class gaia::GaiaContour {
       set dy 15.0
 
       #  Title.
-      lassign [get_att_ 1] colour width
+      lassign [get_att_ 0] colour width
       set title [$itk_component(keytitle) get]
       if { $title != {} } {
          $itk_option(-canvas) create text [expr $x+$dx] $y \
@@ -1379,9 +1376,9 @@ itcl::class gaia::GaiaContour {
       }
 
       #  Now add each line and level.
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          if { $drawn_($i) } {
-            set value [lindex $levels [expr $i-1]]
+            set value [lindex $levels $i]
             lassign [get_att_ $i] colour width
             $itk_option(-canvas) create line $x $y [expr $x+$dx] $y \
                -fill $colour \
@@ -1611,13 +1608,11 @@ itcl::class gaia::GaiaContour {
 
    #  Names of the possible colours and their AST index equivalents.
    protected variable colourmap_ {
-      0 "#fff" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      0 "#fff" 1 "#000" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
       7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
-      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4" 1 "#000" }
+      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4" 16 "#0f0" }
 
-   #  Colours-v-indices (set up from colourmap_) and default colours.
-   protected variable colindex_
-   protected variable indexcol_
+   #  Default colours.
    protected variable coldefault_
 
    #  Tags used for configuring each contour levels.

@@ -15,7 +15,7 @@
 //    P.W. Draper (PWD)
 //
 // Copyright:
-//    Copyright (C) 1997-1998 Central Laboratory of the Research Councils
+//    Copyright (C) 1997-2001 Central Laboratory of the Research Councils
 //
 // History:
 //    15-FEB-1996 (PWD):
@@ -36,8 +36,10 @@
 //    13-JAN-1999 (PWD):
 //       Merged in changes from Allan Brighton's GAIA plugin (see
 //       history above).
-//    14-PAR-1999 (PWD):
+//    14-MAR-1999 (PWD):
 //       Added contour command and related changes.
+//    04-APR-2001 (PWD):
+//       Added the astaddcolourCmd member.
 //
 //-
 
@@ -102,6 +104,9 @@ class StarRtdImage : public Skycat {
    //  Return if we are really using X shared memory
    int usingxshmCmd( int argc, char *argv[] );
 
+   //  Add a colour to extend the default set.
+   int astaddcolourCmd( int argc, char *argv[] );
+
    //  Return the value of an AST attribute of the main AstFrameSet.
    int astgetCmd( int argc, char *argv[] );
 
@@ -162,7 +167,7 @@ class StarRtdImage : public Skycat {
    int asttran2Cmd( int argc, char *argv[] );
 
    //  Get a list of the available domains.
-   int astDomainsCmd( int argc, char *argv[] );
+   int astdomainsCmd( int argc, char *argv[] );
 
    //  Write the current image and if new WCS (if modified) to a file.
    int dumpCmd( int argc, char *argv[] );

@@ -144,6 +144,8 @@
 //        ASTWARN cards produced when the WCS is set up.
 //     10-JUL-2000 (PWD):
 //        Added XY profile command.
+//     04-APR-2001 (PWD):
+//        Added astaddcolour command.
 //-
 
 #include <string.h>
@@ -201,11 +203,12 @@ public:
   int max_args;                                      // Maximum number of args
 } subcmds_[] = {
    { "astassign",     &StarRtdImage::astassignCmd,    7, 7 },
+   { "astaddcolour",  &StarRtdImage::astaddcolourCmd, 1, 1 },
    { "astbootstats",  &StarRtdImage::astbootstatsCmd, 4, 4 },
    { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
    { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
    { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
-   { "astdomains",    &StarRtdImage::astDomainsCmd,   0, 0 },
+   { "astdomains",    &StarRtdImage::astdomainsCmd,   0, 0 },
    { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
    { "astget",        &StarRtdImage::astgetCmd,       1, 1 },
    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,   2, 2 },
@@ -1353,7 +1356,7 @@ int StarRtdImage::astgetCmd( int argc, char *argv[] )
     if (!image_) {
         return error("no image loaded");
     }
-    
+
     //  Get the value.
     StarWCS* wcsp = getStarWCSPtr();
     if ( !wcsp ) {
@@ -1388,7 +1391,7 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
     if (!image_) {
         return error("no image loaded");
     }
-    
+
     //  Get the value.
     StarWCS* wcsp = getStarWCSPtr();
     if (!wcsp) {
@@ -1399,6 +1402,27 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
     } else {
         return error( "Failed to set:" , argv[0] );
     }
+}
+
+//+
+//   StarRtdImage::astaddcolourCmd
+//
+//   Purpose:
+//       Make a Tcl colour available in the AST graphics interface.
+//
+//    Return:
+//       TCL status and an index for the colour.
+//
+//-
+int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astaddcolourCmd" << endl;
+#endif
+    astTk_Init( interp_, canvasName_ );  // Make sure that default 
+                                         // colours are established.
+    set_result( astTk_AddColour( argv[0] ) );
+    return TCL_OK;
 }
 
 //+
@@ -4816,7 +4840,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
 
       //  Need NDF path
       char ndfpath[file_buf_size_], naxis1[32], naxis2[32],
-          hasvar[32], hasqual[32]; 
+          hasvar[32], hasqual[32];
       ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
       char buffer[file_buf_size_];
 
@@ -5499,19 +5523,19 @@ int StarRtdImage::swapNeeded()
 }
 
 //+
-//   StarRtdImage::astDomainsCmd
+//   StarRtdImage::astdomainsCmd
 //
 //   Purpose:
 //      Return a list of all the domain names in the current AST
-//      frameset. 
+//      frameset.
 //
 //   Result:
 //      A tcl list of the names.
 //-
-int StarRtdImage::astDomainsCmd( int argc, char *argv[] )
+int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astDomainsCmd" << endl;
+    cout << "Called StarRtdImage::astdomainsCmd" << endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -5520,7 +5544,7 @@ int StarRtdImage::astDomainsCmd( int argc, char *argv[] )
     if ( !wcsp ) {
         return TCL_ERROR;
     }
-    
+
     char *result = wcsp->getDomains();
     Tcl_SetResult( interp_, (char *)result, TCL_VOLATILE );
     free( result );
