@@ -3601,7 +3601,8 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
             id="automakeoverview"/>).  The leading
           <code>@PREDIST@</code> strings mean that this stanza causes
           no problems after distribution, when the
-          <code>error.h.in</code> files are not present.
+          <code>error.h.in</code> files are not present.  See <ref
+            id="macro-predist-sources"/> for more details.
         </p>
 
         <p>This is admittedly a rather crude technique, but it is a
@@ -6251,7 +6252,9 @@ BUILT_SOURCES = $(include_MESSAGES)
 
           <p>Give a (space-separated) list of files which should exist
             only in the pre-distribution (ie, repository checkout)
-            state<index>distribution</index>.  If one of these is
+            state<index>distribution</index><index
+            seealso="starconf!macros!STAR_PREDIST_SOURCES">pre-distribution
+            files</index>.  If one of these is
             found, then the substitution 
             variable <code>PREDIST</code> is set to a blank rather
             than the comment character <code>#</code>.  This means
@@ -6276,6 +6279,13 @@ BUILT_SOURCES = $(include_MESSAGES)
             in the list.  Automake checks that the files listed here
             are not in the list of distributed files, and issues a
             warning if they are.</p>
+
+          <p>If you use this <code>@PREDIST@</code> variable, then it
+            is important to refer to all the files thus protected in a
+            <code>STAR_PREDIST_SOURCES</code> call.  The build will
+            possibly still work if you forget to do this, but if so
+            you are discarding a potentially useful consistency
+            check.</p>
 
           <p>For examples of use, see <ref id="autodistrib"/></p>
 
