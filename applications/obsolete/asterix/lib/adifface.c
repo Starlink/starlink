@@ -197,6 +197,7 @@
 #include "adikrnl.h"
 #include "adimem.h"
 #include "adipkg.h"
+#include "adifsys.h"
 #include "adifface.h"                   /* Prototypes for this module */
 
 
@@ -2119,7 +2120,7 @@ F77_SUBROUTINE(adifn(fclose))( INTEGER(id), INTEGER(status) )
   _ERR_IN("ADI_FCLOSE");		/* Mark routine for error reporting */
 
 /* Invoke kernel routine to close file */
-  adix_fclose( (ADIobj) *id, status );
+  ADIfsysFileClose( (ADIobj) *id, status );
 
   _ERR_OUT;
   }

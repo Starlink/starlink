@@ -193,7 +193,7 @@
 #include "adilist.h"
 #include "adistrng.h"
 #include "adipkg.h"
-#include "aditable.h"
+#include "adifsys.h"
 
 #include "adicface.h"                   /* Prototypes for this module */
 
@@ -1657,7 +1657,7 @@ void adic_fclose( ADIobj id, ADIstatus status )
 
   _ERR_IN("adic_fclose");		/* Mark routine for error reporting */
 
-  adix_fclose( id, status );
+  ADIfsysFileClose( id, status );
 
   _ERR_OUT;
   }
