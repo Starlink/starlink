@@ -357,12 +357,14 @@
       INTEGER			NDIM,DIMS(ADI__MXDIM)	! Data shape
       INTEGER			NELM			! Total # elements
       INTEGER			PCOUNT, GCOUNT		! Group counters
+      INTEGER			IREAD
 
       LOGICAL			EXTEND			! Dataset has extensions?
       LOGICAL			ISTABLE			! Table HDU?
       LOGICAL			MODIFIED		! HDU is modified?
       LOGICAL			MRKDEL			! Object to be deleted?
       LOGICAL			SIMPLE			! HDU is standard?
+      LOGICAL			THERE
 *.
 
 *  Check inherited global status.
@@ -534,10 +536,23 @@ c    :                   'one data group (required keyword)', FSTAT)
 *          Write new data
               ELSE
 
-*            Map the image value in its basic type
-                CALL ADI_CTYPE( IMID, 'Value', TYPE, STATUS )
-                CALL ADI_CMAP( IMID, 'Value', TYPE, 'READ', IPTR,
-     :                         STATUS )
+*            Map the image value in its basic type (any way we can! RB)
+                CALL ADI_THERE( IMID, 'Value', THERE, STATUS )
+                IF ( THERE ) THEN
+                  CALL ADI_CTYPE( IMID, 'Value', TYPE, STATUS )
+                  CALL ADI_CMAP( IMID, 'Value', TYPE, 'READ', IPTR,
+     :                           STATUS )
+                ELSE
+                  CALL ADI_CTYPE( HDUID, 'Image', TYPE, STATUS )
+                  CALL ADI_CMAP( HDUID, 'Image', TYPE, 'READ', IPTR,
+     :                           STATUS )
+c                 CALL ADI_NEW1( TYPE, DIMS(1), IPTR, STATUS )
+c                 CALL ADI_MAP( IMID, TYPE, 'READ', IPTR, STATUS )
+c                 CALL ADI_GET1( IMID, TYPE, DIMS(1), %VAL(IPTR),
+c    :                           IREAD, STATUS )
+                END IF
+
+                IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *            Total number of elements
                 CALL ARR_SUMDIM( NDIM, DIMS, NELM )
@@ -556,7 +571,7 @@ c    :                   'one data group (required keyword)', FSTAT)
                 END IF
 
 *            Unmap data
-                CALL ADI_CUNMAP( IMID, 'Value', IPTR, STATUS )
+c               CALL ADI_CUNMAP( IMID, 'Value', IPTR, STATUS )
 
               END IF
 
