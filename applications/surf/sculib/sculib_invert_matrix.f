@@ -28,7 +28,6 @@
 *    Authors :
 *     J.Lightfoot (JFL@ROE.AC.UK)
 *    History :
-*     $Id$
 *     29-MAR-1995: Original version
 *    endhistory
 *    Type Definitions :
@@ -68,6 +67,9 @@
 *  find the largest element
 
          AMAX = 0.0D0
+
+ 100     CONTINUE
+
          DO I = K, M
             DO J = K, M
                IF (ABS(ARRAY(I,J)) .GT. ABS(AMAX)) THEN
@@ -82,7 +84,7 @@
             STATUS = SAI__ERROR
             CALL ERR_REP (' ', 'SCULIB_INVERT_MATRIX: matrix is '//
      :        'singular', STATUS)
-            GOTO 200
+            RETURN
          END IF
 
          DET = 1.0D0
@@ -91,7 +93,9 @@
 
          I = IK(K)
 
-         IF (I .GT. K) THEN
+         IF (I .LT. K) THEN
+            GOTO 100
+         ELSE IF (I .GT. K) THEN
             DO J = 1, M
                SAVE = ARRAY(K,J)
                ARRAY(K,J) = ARRAY(I,J)
@@ -101,7 +105,9 @@
 
          J = JK(K)
    
-         IF (J .GT. K) THEN
+         IF (J .LT. K) THEN
+            GOTO 100
+         ELSE IF (J .GT. K) THEN
             DO I = 1, M
                SAVE = ARRAY(I,K)
                ARRAY(I,K) = ARRAY(I,J)
@@ -133,10 +139,6 @@
 
          ARRAY(K,K) = 1 / AMAX
          DET = DET * AMAX
-
-         IF (STATUS .NE. SAI__OK) THEN 
-            GOTO 200
-         END IF
       END DO
 
 *  restore ordering of matrix
@@ -158,12 +160,10 @@
          IF (I .GT. K) THEN
             DO J = 1, M
                SAVE = ARRAY(K,J)
-               ARRAY(J,K) = -ARRAY(I,J)
+               ARRAY(K,J) = -ARRAY(I,J)
                ARRAY(I,J) = SAVE
             END DO
          END IF
       END DO
-
- 200  CONTINUE
 
       END
