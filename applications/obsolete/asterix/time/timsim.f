@@ -57,6 +57,7 @@
 *     19 Oct 92 : V1.7-0 History handling corrected (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Apr 95 : V1.8-1 Updated data interface (DJA)
+*     12 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
 *
@@ -87,7 +88,7 @@
 *
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TIMSIM Version 1.8-1')
+      PARAMETER (VERSION = 'TIMSIM Version 2.0-0')
 *-
 
 *    Check status
@@ -99,79 +100,82 @@
 
 *	Get name of output file
 
-	CALL USI_TASSOCO('OUT','TIME',OFID,STATUS)
+	CALL USI_CREAT('OUT',ADI__NULLID,OFID,STATUS)
 
-*       Create axis structure and write labels and units
+*  Establish whether time axis will need to be read in
+      CALL USI_GET0L( 'AXIS', AXIS, STATUS )
 
-	CALL BDI_CREAXES(OFID,1,STATUS)
-	CALL USI_GET0C('AXLAB',AXLAB,STATUS)
-	CALL BDI_PUTAXLABEL(OFID,1,AXLAB,STATUS)
-	CALL USI_GET0C('AXUNI',AXUNI,STATUS)
-	CALL BDI_PUTAXUNITS(OFID,1,AXUNI,STATUS)
-	CALL USI_GET0C('DLAB',DLAB,STATUS)
-	CALL BDI_PUTLABEL(OFID,DLAB,STATUS)
-	CALL USI_GET0C('DUNI',DUNI,STATUS)
-	CALL BDI_PUTUNITS(OFID,DUNI,STATUS)
+*  Create time axis
+      IF ( AXIS ) THEN
+
+*    Get input dataset
+	CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
 	IF (STATUS.NE.SAI__OK) GOTO 9000
 
-*	Establish whether time axis will need to be read in
+*    Get length
+        CALL BDI_GETNEL( IFID, DIM, STATUS )
 
-	CALL USI_GET0L('AXIS',AXIS,STATUS)
+*    Link data object
+        CALL BDI_LINK( 'TimeSeries', 1, DIM, 'REAL', OFID, STATUS )
 
-*          Axis read in
+        CALL BDI_AXCOPY( IFID, 1, ' ', OFID, 1, STATUS )
 
-	IF(AXIS)THEN
-	   CALL USI_TASSOCI('INP','*','READ',IFID,STATUS)
-	   IF (STATUS.NE.SAI__OK) GOTO 9000
-	   CALL BDI_COPAXIS(IFID,OFID,1,1,STATUS)
-	   CALL BDI_MAPAXVAL(IFID,'READ',1,AXPTR,STATUS)
-	   CALL BDI_CHKAXVAL(IFID,1,OK,REG,DIM,STATUS)
-	   CALL BDI_MAPAXWID(IFID,'READ',1,WIPTR,STATUS)
-	   IF (STATUS.NE.SAI__OK) GOTO 9000
+      ELSE
 
-*          Axis created
-
-	ELSE
-	   CALL USI_GET0R('DUR',DUR,STATUS)
-	   CALL USI_GET0R('WID',WID,STATUS)
-	   CALL USI_GET0R('INIT',INIT,STATUS)
-	   IF (STATUS.NE.SAI__OK) GOTO 9000
-	   DIM = NINT(DUR/WID)
-	   CALL BDI_PUTAXVAL(OFID,1,INIT,WID,DIM,STATUS)
-           CALL DYN_MAPR(1,DIM,AXPTR,STATUS)
-           CALL ARR_REG1R( INIT, WID, DIM, %VAL(AXPTR),STATUS )
-	   CALL BDI_PUTAXWID(OFID,1,WID,STATUS)
-           CALL DYN_MAPR(1,DIM,WIPTR,STATUS)
-           CALL ARR_INIT1R(WID,DIM,%VAL(WIPTR),STATUS)
-	   IF (STATUS.NE.SAI__OK) GOTO 9000
-	ENDIF
-
-*	Data Simulation
-
-	CALL BDI_CREDATA(OFID,1,DIM,STATUS)
-	CALL BDI_MAPDATA(OFID,'WRITE',OPTR,STATUS)
-	CALL ARR_INIT1R(0.0,DIM,%VAL(OPTR),STATUS)
-	CALL BDI_CREVAR(OFID,1,DIM,STATUS)
-	CALL BDI_MAPVAR(OFID,'WRITE',VPTR,STATUS)
+*    Get axis parameters
+        CALL USI_GET0R( 'DUR', DUR, STATUS )
+	CALL USI_GET0R( 'WID', WID, STATUS )
+	CALL USI_GET0R( 'INIT', INIT, STATUS )
 	IF (STATUS.NE.SAI__OK) GOTO 9000
+	DIM = NINT( DUR/WID )
 
-*	Option Menu
+*    Link data object
+        CALL BDI_LINK( 'TimeSeries', 1, DIM, 'REAL', OFID, STATUS )
 
-	CALL MSG_PRNT(' 1) Background')
-	CALL MSG_PRNT(' 2) Ramp')
-	CALL MSG_PRNT(' 3) Sine(s)')
-	CALL MSG_PRNT(' 4) Square Wave(s)')
-	CALL MSG_PRNT(' 5) Saw Tooth Wave(s)')
-	CALL MSG_PRNT(' 6) Flare(s)')
-	CALL MSG_PRNT(' 7) Poisson Scatter')
-	CALL PRS_GETLIST('OPT',NMAX,CHOICE,NBACK,STATUS)
-	IF (STATUS.NE.SAI__OK) GOTO 9000
-	DO I=1,NBACK
-	   LOGCHO(CHOICE(I))=.TRUE.
-	ENDDO
+*    Create axis
+        SPARR(1) = INIT
+        SPARR(2) = WID
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0R( OFID, 1, 'ScalarWidth', WID, STATUS )
 
-*	Calling the option subroutines
+      END IF
 
+*  Create axis structure and write labels and units
+      CALL USI_GET0C('AXLAB',AXLAB,STATUS)
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', AXLAB, STATUS )
+      CALL USI_GET0C('AXUNI',AXUNI,STATUS)
+      CALL BDI_AXPUT0C( OFID, 1, 'Units', AXUNI, STATUS )
+      CALL USI_GET0C('DLAB',DLAB,STATUS)
+      CALL BDI_PUT0C( OFID, 'Label', DLAB, STATUS )
+      CALL USI_GET0C('DUNI',DUNI,STATUS)
+      CALL BDI_PUT0C( OFID, 'Units', DUNI, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+
+*  Map axis and width
+      CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS )
+      CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', WIPTR, STATUS )
+
+*  Data Simulation
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', OPTR, STATUS )
+      CALL ARR_INIT1R(0.0,DIM,%VAL(OPTR),STATUS)
+      CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+
+*  Option Menu
+      CALL MSG_PRNT(' 1) Background')
+      CALL MSG_PRNT(' 2) Ramp')
+      CALL MSG_PRNT(' 3) Sine(s)')
+      CALL MSG_PRNT(' 4) Square Wave(s)')
+      CALL MSG_PRNT(' 5) Saw Tooth Wave(s)')
+      CALL MSG_PRNT(' 6) Flare(s)')
+      CALL MSG_PRNT(' 7) Poisson Scatter')
+      CALL PRS_GETLIST('OPT',NMAX,CHOICE,NBACK,STATUS)
+      IF (STATUS.NE.SAI__OK) GOTO 9000
+      DO I = 1, NBACK
+	LOGCHO(CHOICE(I)) = .TRUE.
+      END DO
+
+*  Calling the option subroutines
 	IF (LOGCHO(1)) CALL TIMSIM_BG(DIM,%VAL(AXPTR),%VAL(WIPTR),
      :  %VAL(OPTR),STATUS)
 	   IF (STATUS.NE.SAI__OK) GOTO 9000
@@ -195,22 +199,21 @@
 	   IF (STATUS.NE.SAI__OK) GOTO 9000
 	CALL TIMSIM_VA(DIM,%VAL(OPTR),%VAL(WIPTR),%VAL(VPTR),STATUS)
 
-*    Tidy up
+*  Tidy up
  9000 CONTINUE
 
-*    Set output quality to good
-      CALL BDI_CREQUAL(OFID,1,DIM,STATUS)
-      CALL BDI_MAPQUAL(OFID,'WRITE',QPTR,STATUS)
-      CALL ARR_INIT1B(QUAL__GOOD,DIM,%VAL(QPTR),STATUS)
-      CALL BDI_PUTMASK(OFID,QUAL__MASK,STATUS)
+*  Set output quality to good
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTR, STATUS )
+      CALL ARR_INIT1B( QUAL__GOOD, DIM, %VAL(QPTR), STATUS )
+      CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
 
-*    History :
-      CALL HSI_ADD(OFID,VERSION,STATUS)
+*  History :
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
-	END
+      END
 
 
 
