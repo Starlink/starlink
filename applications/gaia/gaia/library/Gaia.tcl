@@ -581,10 +581,11 @@ itcl::class gaia::Gaia {
    protected method add_graphics_save_menu_item {} {
    }
 
-   #  Make or clone a GAIA toolbox.
-   public method make_toolbox {type {clone 0} } {
+   #  Make or clone a GAIA toolbox. Allow the toolbox to be created
+   #  if no image displayed, only on special request.
+   public method make_toolbox {type {clone 0} {noimage 0} } {
       #  Do nothing if no image is displayed.
-      if { [$image_ cget -file] != "" || $type == "demo" } {
+      if { [$image_ cget -file] != "" || $type == "demo" || $noimage } {
          set basename $type
          if { $clone } {
             #  Request to create a clone (i.e. another) toolbox. Make
