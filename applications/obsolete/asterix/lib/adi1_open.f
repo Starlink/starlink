@@ -93,6 +93,8 @@
 *  External references:
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
+      EXTERNAL			CHR_SIMLR
+        LOGICAL			CHR_SIMLR
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	FLOC			! Object locator
@@ -130,7 +132,13 @@
       END DO
       IF ( EP .GT. 0 ) THEN
         DP = INDEX( FSPEC(EP:), '.' )
-        IF ( DP .GT. 0 ) DP = DP + EP
+        IF ( DP .GT. 0 ) THEN
+          DP = DP + EP
+          IF ( CHR_SIMLR( FSPEC(DP+1:FLEN), 'sdf' ) ) THEN
+            DP = 0
+            FLEN = FLEN - 4
+          END IF
+        END IF
       ELSE
         DP = 0
       END IF
