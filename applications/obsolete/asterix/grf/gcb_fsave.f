@@ -84,7 +84,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GCB_PAR'
 
-  Global Variables:
+*  Global Variables:
       INCLUDE 'GCB_CMN'                                 ! GCB globals
 *        G_MTHINIT = LOGICAL (given and returned)
 *           GCB definitions load attempted?
