@@ -5432,13 +5432,12 @@ f                               LBND, UBND, OUT, OUT_VAR, STATUS )
 *     image) under the control of a geometrical transformation, which
 *     is specified by a Mapping.  The functions operate on a pair of
 *     data grids (input and output), each of which may have any number
-*     of dimensions, and resampling may be restricted to a specified
+*     of dimensions. Resampling may be restricted to a specified
 *     region of the output grid. An associated grid of error estimates
 *     associated with the input data may also be supplied (in the form
 *     of variance values), so as to produce error estimates for the
 *     resampled output data. Propagation of missing data (bad pixels)
-*     is supported, and a choice of sub-pixel interpolation schemes is
-*     provided.
+*     is supported.
 *
 *     You should use a resampling function which matches the numerical
 *     type of the data you are processing by replacing <X> in
@@ -5470,15 +5469,14 @@ f     with type REAL, you should use the function AST_RESAMPLER (see
 *
 *     In practice, transforming the coordinates of every pixel of a
 *     large data grid can be time-consuming, especially if the Mapping
-*     involves a number of complicated functions, such as sky
-*     projections. To improve performance, it is therefore possible to
-*     approximate non-linear Mappings by a set of equivalent simple
-*     linear transformations which are applied piece-wise to separate
-*     sub-regions of the data. This approximation process is applied
-*     automatically by an adaptive algorithm, under control of an
-*     accuracy criterion which expresses the maximum tolerable
-*     geometrical distortion which may be introduced (as a fraction of
-*     a pixel).
+*     involves complicated functions, such as sky projections. To
+*     improve performance, it is therefore possible to approximate
+*     non-linear Mappings by a set of linear transformations which are
+*     applied piece-wise to separate sub-regions of the data. This
+*     approximation process is applied automatically by an adaptive
+*     algorithm, under control of an accuracy criterion which
+*     expresses the maximum tolerable geometrical distortion which may
+*     be introduced, as a fraction of a pixel.
 *     
 *     This algorithm first attempts to approximate the Mapping with a
 *     linear transformation applied over the whole region of the
@@ -5626,9 +5624,9 @@ f        An optional array which should contain
 *        any additional parameter values required by the sub-pixel
 *        interpolation scheme. If such parameters are required, this
 *        will be noted in the "Sub-Pixel Interpolation Schemes"
-c        section below (you may also use this parameter to pass values
+c        section below (you may also use this array to pass values
 c        to your own interpolation function).
-f        section below (you may also use this argument to pass values
+f        section below (you may also use this array to pass values
 f        to your own interpolation routine).
 *
 c        If no additional parameters are required, this array is not
@@ -5859,22 +5857,23 @@ f     only in the Fortran interface to AST).
 *     provided, from which you can choose the one which best suits
 *     your needs.
 *
-*     In general, a compromise must be made between schemes which tend
+*     In general, a balance must be struck between schemes which tend
 *     to degrade sharp features in the data by smoothing them, and
 *     those which attempt to preserve sharp features. The latter will
 *     often tend to introduce unwanted oscillations, typically visible
 *     as "ringing" around sharp features and edges, especially if the
 *     data are under-sampled (i.e. the sharpest features are less than
 *     about two pixels across). In practice, a good interpolation
-*     scheme may exhibit some aspects of both these features.
+*     scheme is likely to be a compromise and may exhibit some aspects
+*     of both these features.
 *
 *     For under-sampled data, some interpolation schemes may appear to
 *     preserve data resolution because they transform single input
 *     pixels into single output pixels, rather than spreading their
 *     data between several output pixels. While this may look
-*     cosmetically better, it can result in a geometrical shift of
+*     better cosmetically, it can result in a geometrical shift of
 *     sharp features in the data. You should beware of this if you
-*     plan to use such features for (e.g.) image alignment.
+*     plan to use such features (e.g.) for image alignment.
 *
 *     The following are two easy-to-use sub-pixel interpolation
 *     schemes which are generally applicable. They are selected by
@@ -5913,16 +5912,18 @@ f     and PARAMS arguments are not used:
 *     surrounding pixel values (not necessarily just the nearest
 *     neighbours). This approach has its origins in the theory of
 *     digital filtering, in which interpolated values are obtained by
-*     conceptually passing the sampled data through a linear filter
-*     which implements a convolution. Because the convolution kernel
-*     is continuous, the convolution may then be evaluated at
-*     fractional pixel positions.  The (possibly multi-dimensional)
-*     kernel is usually regarded as "separable" and formed from the
-*     product of a set of identical 1-dimensional kernel functions,
-*     evaluated along each dimension. Different interpolation schemes
-*     are then distinguished by the choice of this 1-dimensional
-*     interpolation kernel. The number of surrounding pixels which
-*     contribute to the result may also be varied.
+*     conceptually passing the sampled data (represented by a grid of
+*     delta functions) through a linear filter which implements a
+*     convolution. Because the convolution kernel is continuous, the
+*     convolution yields a continuous function which may then be
+*     evaluated at fractional pixel positions. The (possibly
+*     multi-dimensional) kernel is usually regarded as "separable" and
+*     formed from the product of a set of identical 1-dimensional
+*     kernel functions, evaluated along each dimension. Different
+*     interpolation schemes are then distinguished by the choice of
+*     this 1-dimensional interpolation kernel. The number of
+*     surrounding pixels which contribute to the result may also be
+*     varied.
 *
 *     From a practical standpoint, it is useful to divide the weighted
 *     sum of pixel values by the sum of the weights when determining
@@ -5957,10 +5958,10 @@ f     In these cases, the FINTERP argument is not used:
 *     (e.g.) image defects and cosmic ray events. Consequently,
 *     substantial ringing can be experienced with this kernel. The
 *     sinc(x) function also decays slowly with distance, so that many
-*     surrounding pixels are required, causing poor performance.
+*     surrounding pixels are required, leading to poor performance.
 *     Abruptly truncating the kernel (by using only a few neighbouring
 *     pixels) improves performance and may reduce ringing, but a more
-*     gradual truncation (as implemented by other kernels) is
+*     gradual truncation, as implemented by other kernels, is
 *     generally to be preferred. This kernel is provided mainly so
 *     that you can convince yourself not to use it!
 *     - AST__SINCSINC: This scheme uses a rather better kernel, of the
@@ -6067,9 +6068,9 @@ f     identified by occurrences of the BADVAL value in the OUT
 *     - The input position lies inside the boundary of a bad input
 *     pixel. In this context, an input pixel is considered bad if its
 c     data value is equal to "badval" and the AST__USEBAD flag is
-c     set in the "flags" argument.
+c     set via the "flags" parameter.
 f     data value is equal to BADVAL and the AST__USEBAD flag is
-f     set in the FLAGS argument.
+f     set via the FLAGS argument.
 *     (Positions which have half-integral coordinate values, and
 *     therefore lie on a pixel boundary, are regarded as lying within
 *     the pixel with the larger, i.e. more positive, index.)
