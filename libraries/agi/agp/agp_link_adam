@@ -47,7 +47,7 @@
 
 #-
 
-      echo -lagp_adam -lagp  `gns_link_adam` `ref_link_adam` `trn_link_adam` \
+      echo -lagp_adam  `gns_link_adam` `ref_link_adam` `trn_link_adam` \
                              `pgplot_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}

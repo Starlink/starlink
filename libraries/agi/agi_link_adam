@@ -35,6 +35,8 @@
 #  History:
 #     14-JUL-1995 (DLT):
 #        Original version created from template.
+#     1-JUL-2004 (MBT):
+#        libagi_adam now includes rather than augments libagi.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -42,8 +44,8 @@
 
 #-
 
-      echo -lagi_adam -lagi  `ref_link_adam` `trn_link_adam` `sgs_link_adam` \
-                             `pgp_link_adam` `idi_link_adam` \
+      echo -lagi_adam `ref_link_adam` `trn_link_adam` `sgs_link_adam` \
+                      `pgp_link_adam` `idi_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

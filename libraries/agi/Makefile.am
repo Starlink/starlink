@@ -21,15 +21,18 @@ lib_LTLIBRARIES = libagi.la libagi_adam.la libagp.la libagp_adam.la
 
 # AGI libraries
 libagi_la_SOURCES = $(COMMON_F_ROUTINES) $(AGI_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
-libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES)
+libagi_adam_la_SOURCES = $(AGI_ADAM_F_ROUTINES) \
+                         $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
 
 # Shared AGP infrastructure
 libagp_la_SOURCES = $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
-libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES)
+libagp_adam_la_SOURCES = $(AGP_ADAM_F_ROUTINES) \
+                         $(COMMON_F_ROUTINES) $(BLOCK_DATA_ROUTINES)
 
 # AGP libraries also need replacement files from agp directory
 # since the files have the same name but different content
 libagp_la_LIBADD = agp/libagp_base.la
+libagp_adam_la_LIBADD = agp/libagp_base.la
 
 COMMON_F_ROUTINES = agi1_cinit.f  agi1_fdb.f agi1_fetcu.f \
               agi1_finit.f agi1_fname.f agi1_fnext.f agi1_fpar.f \
