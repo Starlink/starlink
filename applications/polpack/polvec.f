@@ -34,8 +34,8 @@
 *  ADAM Parameters:
 *     ANG = NDF (Write)
 *        An output NDF holding the polarization angle (anti-clockwise from 
-*        the pixel X axis to the plane of polarization - in degrees). In the
-*        the case of circular polarization, a value of zero is stored 
+*        the reference direction to the plane of polarization - in degrees). 
+*        In the the case of circular polarization, a value of zero is stored 
 *        if the normalised Stokes parameter V is positive, and a value
 *        of 90 is stored otherwise. A null value can be supplied if this 
 *        output image is not required. [!]
@@ -64,8 +64,8 @@
 *           - Q  -- The Stokes Q parameter.
 *           - U  -- The Stokes U parameter.
 *           - P  -- The percentage polarization.
-*           - ANG  -- The polarization angle (anti-clockwise from the X axis
-*           to the plane of polarization - in degrees).
+*           - ANG  -- The polarization angle (anti-clockwise from the
+*           reference direction to the plane of polarization - in degrees).
 *           - PI -- The polarized intensity.
 *
 *        If VAR is TRUE, then the catalogue will also contain 
@@ -80,11 +80,11 @@
 *        is positive, and 90 otherwise. 
 *
 *        The coordinates contained in columns X and Y refer to pixel
-*        coordinates after any binning. For this reason it is usually better to avoid
-*        binning the Stokes vectors in this application (see parameter BOX).
-*        Information describing the mappings between pixel coordinates and 
-*        any other known coordinate Frames will be stored in the catalogue
-*        in textual form, as an AST FrameSet (see SUN/210). 
+*        coordinates after any binning. For this reason it is usually better 
+*        to avoid binning the Stokes vectors in this application (see 
+*        parameter BOX). Information describing the mappings between pixel 
+*        coordinates and any other known coordinate Frames will be stored in 
+*        the catalogue in textual form, as an AST FrameSet (see SUN/210). 
 *
 *        The storage format of the catalogue is determined by the "file
 *        type" specified with the file name. If no file type is supplied,
@@ -153,6 +153,11 @@
 *  Notes:
 *     -  The output NDFs are deleted if there is an error during the
 *     formation of the polarization parameters.
+*     -  The reference direction for the output Stokes parameters and 
+*     vector angles is specified by the ANGROT component in the POLPACK
+*     extension of the input Stokes cube. This ANGROT value is stored in
+*     the output catalogues and images so that it can be accessed by
+*     later applications.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -501,6 +506,11 @@
          IF ( VAR ) CALL NDF_MAP( INDFT, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPTV, EL, STATUS )
 
+*  Store the ANGROT value in a POLPACK extension.
+         CALL NDF_XNEW( INDFT, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
+     :                  STATUS ) 
+         CALL NDF_XPT0R( ANGROT, INDFT, 'POLPACK', 'ANGROT', STATUS )
+
 *  If no angle NDF was obtained, annul the error and set a flag to
 *  indicate that no angle NDF need be produced.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -568,6 +578,11 @@
          IF ( VAR ) CALL NDF_MAP( INDFQ, 'VARIANCE', '_REAL', 
      :                            'WRITE/BAD', IPQV, EL, STATUS )
 
+*  Store the ANGROT value in a POLPACK extension.
+         CALL NDF_XNEW( INDFQ, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
+     :                  STATUS ) 
+         CALL NDF_XPT0R( ANGROT, INDFQ, 'POLPACK', 'ANGROT', STATUS )
+
 *  If no polarised-intensity NDF was obtained, annul the error and set a
 *  flag to indicate that no Q NDF need be produced.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -600,7 +615,12 @@
          IF ( VAR ) CALL NDF_MAP( INDFU, 'VARIANCE', '_REAL', 
      :                            'WRITE/BAD', IPUV, EL, STATUS )
 
-*  If no polarised-intensity NDF was obtained, annul the error and set a
+*  Store the ANGROT value in a POLPACK extension.
+         CALL NDF_XNEW( INDFU, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
+     :                  STATUS ) 
+         CALL NDF_XPT0R( ANGROT, INDFU, 'POLPACK', 'ANGROT', STATUS )
+
+*  If no U NDF was obtained, annul the error and set a
 *  flag to indicate that no U NDF need be produced.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -632,7 +652,12 @@
          IF ( VAR ) CALL NDF_MAP( INDFV, 'VARIANCE', '_REAL',
      :                            'WRITE/BAD', IPVV, EL, STATUS )
 
-*  If no polarised-intensity NDF was obtained, annul the error and set a
+*  Store the ANGROT value in a POLPACK extension.
+         CALL NDF_XNEW( INDFV, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
+     :                  STATUS ) 
+         CALL NDF_XPT0R( ANGROT, INDFV, 'POLPACK', 'ANGROT', STATUS )
+
+*  If no V NDF was obtained, annul the error and set a
 *  flag to indicate that no V NDF need be produced.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
