@@ -140,6 +140,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.30  1999/07/15 07:59:19  timj
+*     Correct types for some MSG_ calls
+*
 *     Revision 1.29  1999/05/15 01:48:43  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -289,7 +292,7 @@ c
       PARAMETER (A_MAX = 0.15 * DEG2RAD) ! 0.15/deg/sec/sec
       REAL V_MAX                        ! Max velocity of telescope
       PARAMETER (V_MAX = 0.7 * DEG2RAD) ! 0.7 deg/sec
-      REAL MAX_FIT_DATA                 ! Max number of points
+      INTEGER MAX_FIT_DATA              ! Max number of points
       PARAMETER (MAX_FIT_DATA = SCUBA__MAX_MEAS) ! allowed in input data
 
 *    Local variables :
@@ -790,7 +793,7 @@ c
             IF (N_POS .GT. MAX_FIT_DATA) THEN
                CALL MSG_SETI('MAX',MAX_FIT_DATA)
                CALL MSG_SETI('ACT', N_POS)
-               CALL MSG_SETI('TSK',TSKNAME)
+               CALL MSG_SETC('TSK',TSKNAME)
                STATUS = SAI__ERROR
                CALL ERR_REP(' ', '^TSK: Too many data points. ^ACT'//
      :              ' exceeds maximum (^MAX)', STATUS)
@@ -799,7 +802,7 @@ c
             IF (N_MEASUREMENTS .GT. SCUBA__MAX_MEAS) THEN
                CALL MSG_SETI('MEAS', SCUBA__MAX_MEAS)
                CALL MSG_SETI('ACT', N_MEASUREMENTS)
-               CALL MSG_SETI('TSK',TSKNAME)
+               CALL MSG_SETC('TSK',TSKNAME)
                STATUS = SAI__ERROR
                CALL ERR_REP(' ', '^TSK: Too many data points. ^ACT'//
      :              ' measurements exceeds maximum (^MAX)', STATUS)
