@@ -73,6 +73,10 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.12  1997/05/22 03:27:03  timj
+*     Fix problem with setting status to bad early on.
+*     Now allows remote access (DATADIR) of input files.
+*
 *     Revision 1.11  1997/05/22 01:16:07  timj
 *     Check that this is SKYDIP data.
 *
@@ -284,7 +288,7 @@ c
 
       CALL NDF_BEGIN
 
-      CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+      CALL SCULIB_SEARCH_DATADIR('IN', IN_NDF, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -362,8 +366,10 @@ c
 
 * Add _DC suffix to data
 
-      ITEMP = CHR_LEN(SUB_INST)
-      CALL CHR_APPND('_DC', SUB_INST, ITEMP)
+      IF (STATUS .EQ. SAI__OK) THEN
+         ITEMP = CHR_LEN(SUB_INST)
+         CALL CHR_APPND('_DC', SUB_INST, ITEMP)
+      END IF
 
 *  get the number of bolometers measured
 
@@ -434,10 +440,12 @@ c
      :     N_MEASUREMENTS, STATUS)
 
       IF (N_MEASUREMENTS .LE. 1) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC('TASK', TSKNAME)
-         CALL ERR_REP (' ','^TASK: Not enough measurements for fit',
-     :        STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ','^TASK: Not enough measurements for fit',
+     :           STATUS)
+         END IF
       END IF
 
 
@@ -516,9 +524,11 @@ c
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'T_TEL',
      :  T_TEL, STATUS)
 
-      STEMP = 'T_COLD_'
-      ITEMP = 7
-      CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
+      IF (STATUS .EQ. SAI__OK) THEN
+         STEMP = 'T_COLD_'
+         ITEMP = 7
+         CALL CHR_PUTI(SUB_POINTER, STEMP, ITEMP)
+      END IF
 
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, STEMP,
      :  T_COLD, STATUS)
@@ -542,7 +552,7 @@ c
 * Allocate some memory for slice and SKYDIP TEMPERATURES
 
       CALL SCULIB_MALLOC (N_TEMP * N_BOLS * N_INTEGRATIONS * VAL__NBR, 
-     :     SLICE_PTR, SLICE_PTR_END)
+     :     SLICE_PTR, SLICE_PTR_END, STATUS)
 
 * This is a kludge for sculib_skydip_temperatures
       DO I = 1, N_SUB
@@ -622,6 +632,8 @@ c
 *     Now create output files
 *     Only create model if we fitted okay
       DO FILE = 1, NFILES
+
+         IF (STATUS .EQ. SAI__OK) THEN
 
 *     Setup bits that are DIFFERENT between model and data
 
@@ -759,6 +771,8 @@ c
             CALL NDF_ANNUL(OUT_NDF, STATUS)
 
          ENDIF
+
+         END IF
 
       END DO
 
