@@ -185,7 +185,7 @@
           CALL ADI_CELL( ARGS(2), 1, ILINE, CID, STATUS )
 
 *      Locate the (NL+ILINE)'th HDS string
-          CALL DAT_SLICE( TXLOC, 1, NL + ILINE, -1, TXCLOC, STATUS )
+          CALL DAT_CELL( TXLOC, 1, NL + ILINE, TXCLOC, STATUS )
 
 *      Extract the string and write it
           CALL ADI_GET0C( CID, LINE, STATUS )
