@@ -68,6 +68,7 @@
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     SER: S.E. Rankin (Starlink, RAL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -75,6 +76,8 @@
 #        Original version.
 #     9-AUG-1995 (RFWS):
 #        Revised to improve efficiency.
+#     17-May-2004 (SER)
+#        Added file:// to document echo outputs.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -170,12 +173,12 @@
 #  If the file and fragment specifier were found, then output the full local
 #  URL.
             if test -n "${filefrg}"; then
-               echo "${doc}.htx/${filefrg}"
+               echo "file://${doc}.htx/${filefrg}"
 
 #  If they were not found, but no label was given, then output a URL using a
 #  file name based on the document name instead.
             elif test ! -n "${label}"; then
-               echo "${doc}.htx/${docname}.html"
+               echo "file://${doc}.htx/${docname}.html"
 
 #  Otherwise, the required label was not found, so output an error message and
 #  abort.

@@ -140,6 +140,7 @@
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     SER:  S.E. Rankin (Starlink, RAL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -147,6 +148,9 @@
 #        Original version.
 #     6-JAN-1998 (RFWS):
 #        Pass HTX_TTY to "browse".
+#     17-May-2004 (SER)
+#        Added file:// when "${ref}" = 'file'. Local files
+#        will now have file:// at the start of the url.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -244,7 +248,7 @@
 #  If OK, convert it into an absolute file name by adding the current
 #  directory name if necessary.
          url="${1}"
-         case "${url}" in [!/]*) url="`pwd`/${url}";; esac
+         case "${url}" in [!/]*) url="file://`pwd`/${url}";; esac
 
 #  Note we have a local document.
          where='l'

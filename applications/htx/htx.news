@@ -1,6 +1,8 @@
    HTX - Utilities for Accessing Hypertext Documentation
    =====================================================
 
+   Updates 1.2-10 (SER) You can now use Netscape 7.1.
+
    Updates 1.2-9 (SER) Fixed bug when starting Netscape 4.x on 
                        some Solaris systems.
 
