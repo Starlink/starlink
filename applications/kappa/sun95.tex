@@ -33715,7 +33715,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
 \sstroutine{
    RESAMPLE
 }{
-   Applies a geometrical transformation to an NDF
+   Applies an arbitrary geometrical transformation to an NDF
 }{
    \sstdescription{
       This application uses a specified Mapping to transform the pixel
@@ -33796,7 +33796,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          from pixel co-ordinates in the input NDF to the current Frame in
          the input NDF. The output NDF will then have pixel co-ordinates
          which match the co-ordinates of the current Frame of the input
-         NDF (apart from a possible additional scaling as specified by the
+         NDF (apart from possible additional scalings as specified by the
          SCALE parameter).
       }
       \sstsubsection{
@@ -33838,7 +33838,7 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          require additional parameters to be supplied via the PARAMS
          parameter.  A more detailed discussion of these schemes is
          given in the {\tt "}Sub-Pixel Interpolation Schemes{\tt "} section below.
-         {\tt [Nearest]}
+         {\tt ["Nearest"]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -33854,17 +33854,20 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          See the section on {\tt "}Sub-Pixel Interpolation Schemes{\tt "}.
       }
       \sstsubsection{
-         SCALE = \_DOUBLE (Read)
+         SCALE( ) = \_DOUBLE (Read)
       }{
-         A scaling factor which is used to modify the supplied Mapping.
-         In effect, transformed input co-ordinates would be multiplied
-         by this factor to obtain the corresponding output pixel
-         co-ordinates. If a null (!) value is supplied for SCALE, then a
-         default value is used which depends on the value of parameter
-         MAPPING. If a null value is supplied for MAPPING then the default
-         scaling factor is chosen so that the output NDF has a similar size
-         (in pixels) to the input NDF. If as non-null value is supplied
-         for MAPPING then the default scaling factor used is 1.0 (\emph{i.e.} no
+         Axis scaling factors which are used to modify the supplied Mapping.
+         If the number of supplied values is less than the number of output
+         axes associated with the Mapping, the final supplied value is
+         duplicated for the missing axes. In effect, transformed input
+         co-ordinate axis values would be multiplied by these factors to
+         obtain the corresponding output pixel co-ordinates. If a null (!)
+         value is supplied for SCALE, then default values are used which
+         depends on the value of parameter MAPPING. If a null value is
+         supplied for MAPPING then the default scaling factors are chosen
+         so that pixels retain their original size (very roughly) after
+         transformation. If as non-null value is supplied for MAPPING then
+         the default scaling factor used is 1.0 for each axis (\emph{i.e.} no
          scaling). {\tt [!]}
       }
       \sstsubsection{

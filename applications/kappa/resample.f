@@ -83,7 +83,7 @@
 *        from pixel co-ordinates in the input NDF to the current Frame in 
 *        the input NDF. The output NDF will then have pixel co-ordinates 
 *        which match the co-ordinates of the current Frame of the input 
-*        NDF (apart from a possible additional scaling as specified by the
+*        NDF (apart from possible additional scalings as specified by the
 *        SCALE parameter).
 *     METHOD = LITERAL (Read)
 *        The interpolation method used to resample the input array.
@@ -120,16 +120,19 @@
 *        more values may be required to specify the exact resampling
 *        behaviour, according to the value of the METHOD parameter.
 *        See the section on "Sub-Pixel Interpolation Schemes".
-*     SCALE = _DOUBLE (Read)
-*        A scaling factor which is used to modify the supplied Mapping. 
-*        In effect, transformed input co-ordinates would be multiplied 
-*        by this factor to obtain the corresponding output pixel
-*        co-ordinates. If a null (!) value is supplied for SCALE, then a 
-*        default value is used which depends on the value of parameter
-*        MAPPING. If a null value is supplied for MAPPING then the default 
-*        scaling factor is chosen so that the output NDF has a similar size 
-*        (in pixels) to the input NDF. If as non-null value is supplied
-*        for MAPPING then the default scaling factor used is 1.0 (i.e. no 
+*     SCALE( ) = _DOUBLE (Read)
+*        Axis scaling factors which are used to modify the supplied Mapping.
+*        If the number of supplied values is less than the number of output
+*        axes associated with the Mapping, the final supplied value is
+*        duplicated for the missing axes. In effect, transformed input 
+*        co-ordinate axis values would be multiplied by these factors to 
+*        obtain the corresponding output pixel co-ordinates. If a null (!) 
+*        value is supplied for SCALE, then default values are used which 
+*        depends on the value of parameter MAPPING. If a null value is 
+*        supplied for MAPPING then the default scaling factors are chosen 
+*        so that pixels retain their original size (very roughly) after
+*        transformation. If as non-null value is supplied for MAPPING then 
+*        the default scaling factor used is 1.0 for each axis (i.e. no 
 *        scaling). [!]
 *     TITLE = LITERAL (Read)
 *        A Title for the output NDF structure.  A null value (!)
@@ -401,7 +404,9 @@
 *     10-DEC-2001 (MBT):
 *        Original version.
 *     8-Jan-2002 (DSB):
-*        Prologue modified. Some parameter defaults changed.
+*        Prologue modified. Some parameter defaults and logic changed. Allow 
+*        the extra scale factor to be different for each axis. Protect
+*        against AST__BAD values being returned by AST_TRAN.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -440,18 +445,19 @@
       DOUBLE PRECISION LPO       ! Lower bound in output array
       DOUBLE PRECISION PARAMS( 4 ) ! Additional parameters for resampler
       DOUBLE PRECISION PT1I( NDF__MXDIM ) ! First input point
-      DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION PT1O( NDF__MXDIM ) ! First output point
+      DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
       DOUBLE PRECISION S2        ! Sum of squares of displacements
-      DOUBLE PRECISION SRATIO    ! Ratio of base to current pixel size
-      DOUBLE PRECISION SCALE     ! Additional scale factor for transformation
+      DOUBLE PRECISION SCALE( NDF__MXDIM ) ! Axis scale factors
+      DOUBLE PRECISION SCVAL     ! Value of a single axis scale factor
       DOUBLE PRECISION SIZEB     ! Measure of pixel size in base Frame
       DOUBLE PRECISION SIZEC     ! Measure of pixel size in current Frame
+      DOUBLE PRECISION SRATIO    ! Ratio of base to current pixel size
       DOUBLE PRECISION TOL       ! Tolerance for linear transform approximation
+      DOUBLE PRECISION UPO       ! Upper bound in output array
       DOUBLE PRECISION XL        ! Extreme lower value
       DOUBLE PRECISION XU        ! Extreme upper value
-      DOUBLE PRECISION UPO       ! Upper bound in output array
       INTEGER BMAX( NDF__MXDIM ) ! Maximum values for array bounds
       INTEGER CURFRM             ! Index of current Frame
       INTEGER ELI                ! Number of elements in input NDF
@@ -473,18 +479,19 @@
       INTEGER MAPHIO             ! Mapping with half-pixel shifts at both ends
       INTEGER MAPHO              ! Half-pixel shift Mapping at output end
       INTEGER MAPIO              ! Mapping from input to output NDF
-      INTEGER MAPJ               ! Mapping to join input FrameSet to output
+      INTEGER MAPJ               ! Mapping which produces required axis scaling
       INTEGER MAPOI              ! Inverse of MAPIO
       INTEGER MAPP               ! Mapping to non-statutory Frame
       INTEGER MAPX               ! Basic Mapping to use (without extra scaling)
       INTEGER MAXPIX             ! Max size of linear approximation region
       INTEGER NBAD               ! Number of bad pixels
-      INTEGER NDIMI              ! Number of dimensions of input NDF
-      INTEGER NDIMO              ! Number of dimensions of output NDF
       INTEGER NDFI               ! NDF identifier of input NDF
       INTEGER NDFO               ! NDF identifier of output NDF
+      INTEGER NDIMI              ! Number of dimensions of input NDF
+      INTEGER NDIMO              ! Number of dimensions of output NDF
       INTEGER NFRM               ! Number of Frames in a FrameSet
       INTEGER NPARAM             ! Number of parameters required for resampler
+      INTEGER NSCALE             ! Number of supplied scale factors
       INTEGER OWCS               ! WCS FrameSet of the output NDF
       INTEGER UBDEF( NDF__MXDIM ) ! Default value for UBOUND
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel co-ordinates
@@ -492,6 +499,8 @@
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL CURENT             ! Resample into current Frame?
       LOGICAL HASVAR             ! Does the input NDF have Variance component?
+      LOGICAL SCEQU              ! Are all axis scale factors equal?
+*.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -626,84 +635,129 @@
 *  Add an additional scaling factor to the Mapping.
 *  ================================================
 
-*  Get the value of the scale factor from the parameter system. If a null
-*  (!) is supplied, annul the error and calculate a default value.
+*  Get the values of the scale factors from the parameter system. If a null
+*  (!) is supplied, annul the error and calculate default values.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL PAR_GET0D( 'SCALE', SCALE, STATUS )
+      CALL PAR_GET1D( 'SCALE', NDIMO, SCALE, NSCALE, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN 
          CALL ERR_ANNUL( STATUS )
 
 *  If we are using a Mapping specified by parameter MAPPING, the default
-*  scaling factor is unity. Otherwise, we need to calculate a suitable
-*  default value.
+*  scaling factor is unity on all axes. Otherwise, we need to calculate
+*  suitable default values.
          IF( .NOT. CURENT ) THEN
-            SCALE = 1.0
+            SCVAL = 1.0
+            SCEQU = .TRUE.
          ELSE
+
+
+
 
 *  Work out the 'size' of a pixel in the input and output arrays.  
 *  The purpose of this is just to decide whether they are about the 
 *  same size; if they are then SCALE will default to unity, if not 
-*  then it will default to some size-equalising factor.  The value
-*  we use for size is the distance between opposite corners of a
-*  unit cube in the middle of the NDF.  First set up the corners
-*  in the base Frame.
+*  then it will default to some size-equalising factor for each axis.  
+*  First set up the corners in the base Frame of a single pixel at teh
+*  centre of th einput image.
             DO I = 1, NDIMI
                PT1I( I ) = 0.5D0 * DBLE( LBNDI( I ) + UBNDI( I ) ) - 0.5D0
                PT2I( I ) = PT1I( I ) + 1D0
             END DO
 
-*  Transform these vertices into the current Frame.  Doing it with two
-*  separate calls to AST_TRANN prevents having to muck about transposing
-*  the arrays.
-            CALL AST_TRANN( MAPX, 1, NDIMI, 1, PT1I, .TRUE., NDIMO, 1,
-     :                PT1O, STATUS )
-            CALL AST_TRANN( MAPX, 1, NDIMI, 1, PT2I, .TRUE., NDIMO, 1,
-     :                PT2O, STATUS )
-
-*  Calculate the point separations in the two Frames.
-            S2 = 0D0
-            DO I = 1, NDIMI
-               S2 = S2 + ( PT2I( I ) - PT1I( I ) ) ** 2
-            END DO
-            SIZEB = SQRT( S2 )
-            S2 = 0D0
+*  Now find the bounds within the output image of this pixel.
             DO I = 1, NDIMO
-               S2 = S2 + ( PT2O( I ) - PT1O( I ) ) ** 2
+               CALL AST_MAPBOX( MAPX, PT1I, PT2I, .TRUE., I, PT1O( I ),
+     :                          PT2O( I ), XL, XU, STATUS )
             END DO
-            SIZEC = SQRT( S2 )
 
-*  Compare these to see if they are similar (within a factor of 4).
-*  If they are set the default for SCALE to unity; otherwise
-*  set it to a compensating factor.
-            SRATIO = ABS( SIZEB / SIZEC )
-            IF ( SRATIO .GT. 4D0 .OR. SRATIO .LT. 0.25D0 ) THEN
-               SCALE = SRATIO
-            ELSE
-               SCALE = 1D0
-            END IF
+*  Find the scaling factors which result in the transformed and scaled
+*  pixel having a size of unity on each axis. Ignore values between 0.25
+*  and 4. If any transformed position is bad, use a scaling factor of 
+*  1.0 for that axis.
+            SCVAL = 0.0
+            DO I = 1, NDIMO
+               IF( PT1O( I ) .NE. AST__BAD .AND. 
+     :             PT2O( I ) .NE. AST__BAD ) THEN
+                  SCALE( I ) = ABS( PT2O( I ) - PT1O( I ) )
 
+                  IF( SCALE( I ) .GT. 0.0 ) THEN
+                     IF( SCALE( I ) .LE. 0.25 .OR. 
+     :                   SCALE( I ) .GE. 4.0 ) THEN
+                        SCALE( I ) = 1.0/SCALE( I )
+
+                     ELSE
+                        SCALE( I ) = 1.0
+
+                     END IF                     
+
+                  ELSE
+                     SCALE( I ) = 1.0
+
+                  END IF                  
+
+               ELSE
+                  SCALE( I ) = 1.0
+
+               END IF
+
+*  Note if all scale values are equal (SCEQU), and not what this
+*  value is (SCVAL).
+               IF( I .EQ. 1 ) THEN
+                  SCVAL = SCALE( 1 )
+                  SCEQU = .TRUE.
+               ELSE IF( SCALE( I ) .NE. SCVAL ) THEN
+                  SCEQU = .FALSE.
+               END IF
+                  
+            END DO
+            
          END IF
+
+*  If SCALE values were supplied, see if they are all the same, and copy
+*  thre last value to any missing values.
+      ELSE
+         SCVAL = SCALE( 1 )
+         SCEQU = .TRUE.
+         DO I = 2, NDIMO
+            IF( I .LE. NSCALE ) THEN
+               IF( SCALE( I ) .NE. SCVAL ) SCEQU = .FALSE.
+            ELSE
+               SCALE( I ) = SCALE( NSCALE )
+            END IF
+         END DO
 
       END IF
 
-*  If the scale factor is not unity, report it, and use it.
-      IF( SCALE .NE. 1.0 ) THEN     
-         CALL MSG_SETR( 'S', REAL( SCALE ) )
-         CALL MSG_OUT( ' ', '  The supplied Mapping is being modified'//
-     :                 ' by a scale factor of ^S.', STATUS )      
+*  If any scale factor is not unity, report them all, and use them.
+      IF( .NOT. SCEQU .OR. SCVAL .NE. 1.0 ) THEN     
+
+         IF( SCEQU ) THEN 
+            CALL MSG_SETR( 'S', REAL( SCVAL ) )
+            CALL MSG_OUT( ' ', '  The supplied Mapping is being '//
+     :                    'modified by a scale factor of ^S on '//
+     :                    'each axis.', STATUS )      
+           MAPJ = AST_ZOOMMAP( NDIMO, SCVAL, ' ', STATUS )
+
+         ELSE
+            DO I = 1, NDIMO 
+               CALL MSG_SETR( 'S', REAL( SCALE( I ) ) )
+               IF( I .NE. NDIMO ) CALL MSG_SETC( 'S', ',' )
+            END DO
+            CALL MSG_OUT( ' ', '  The supplied Mapping is being '//
+     :                    'modified by scale factors of (^S).',
+     :                    STATUS )      
+            MAPJ = AST_MATRIXMAP( NDIMI, NDIMO, 1, SCALE, ' ', STATUS )
+         END IF 
 
 *  Generate the actual mapping from the input to output array, by
-*  combining the Mapping from base to current frames and a ZoomMap
-*  to account for any scaling.
-         MAPIO = AST_CMPMAP( MAPX, 
-     :                       AST_ZOOMMAP( NDIMO, SCALE, ' ', STATUS ),
-     :                       .TRUE., ' ', STATUS )
-
-*  Simplify the Mapping.
-         MAPIO = AST_SIMPLIFY( MAPIO, STATUS )
+*  combining the Mapping from base to current frames and the Mapping
+*  created above. Simplify it.
+         MAPIO = AST_SIMPLIFY( AST_CMPMAP( MAPX, MAPJ, .TRUE., ' ',
+     :                                     STATUS ), STATUS )
 
 *  Just clone the original Mapping if the scale factor is unity.
       ELSE
+         MAPJ = AST_UNITMAP( NDIMO, ' ', STATUS )
          MAPIO = AST_CLONE( MAPX, STATUS )
       END IF
 
@@ -794,8 +848,8 @@
 
 *  Get the Mapping which will connect the pixel Frame of the output 
 *  FrameSet to the current Frame of the remainder of the input one.  
-*  It is the inverse of the ZoomMap we constructed earlier.
-            MAPJ = AST_ZOOMMAP( NDIMO, 1D0 / SCALE, ' ', STATUS )
+*  It is the inverse of the scaling Maping we constructed earlier.
+            CALL AST_INVERT( MAPJ, STATUS )
          ELSE
 
 *  Store the current Frame index of the input FrameSet, since we will

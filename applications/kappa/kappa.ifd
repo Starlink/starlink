@@ -12707,7 +12707,7 @@ iraf! {
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default !
-            prompt {Additional scaling factor}
+            prompt {Additional scaling factors}
             helpkey *
          }
 
