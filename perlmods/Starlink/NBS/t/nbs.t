@@ -23,14 +23,9 @@
 
 
 use strict;
+use Test;
+BEGIN { plan tests => 9 }
 use Starlink::NBS qw/:nbslib/;
-
-use vars qw/$loaded $NUM/;
-BEGIN { $| = 1; print "1..10\n"; }
-END {print "not ok 1\n" unless $loaded;}
-$loaded = 1;
-$NUM = 1;
-&ok;
 
 my ($status, $sid, $fibsid, $topsid, @dims);
 
@@ -39,20 +34,20 @@ my $good = $status = &Starlink::NBS::SAI__OK;
 # Create a new noticeboard
 
 nbs_begin_definition($topsid, $status);
-check_status($status);
+ok($status,$good);
 
 
 nbs_define_primitive($topsid, 'CURRENT_CONFIG','_CHAR', 0,132, $sid, $status);
 nbs_define_primitive($topsid, 'CURRENT_STATUS', '_DOUBLE', 1,16, $sid, $status);
-check_status($status);
+ok($status,$good);
 
 @dims = ( 72 );
 nbs_define_shape($sid, 1, @dims, $status);
 nbs_define_structure($topsid, 'FIBRE_PARAMETERS','FIBRE_PARAMETERS', $fibsid, $status);
-check_status($status);
+ok($status,$good);
 
 nbs_define_primitive($fibsid, 'TRANS_MATRIX','_INTEGER',2, 4*4, $sid, $status);
-check_status($status);
+ok($status,$good);
 
 @dims = (2,2);
 nbs_define_shape($sid, 2, @dims, $status);
@@ -62,12 +57,12 @@ nbs_define_shape($sid, 2, @dims, $status);
 #nbs_restore_definition('AUTOFIB', 'AUTOFIB', $status);
 
 nbs_end_definition('AUTOFIB','CREATE_NOTICEBOARD', $status);
-check_status($status);
+ok($status, $good);
 
 my (%top, $nbs);
 
 $nbs = new Starlink::NBS("AUTOFIB");
-defined $nbs ? &ok : &notok;
+ok(defined $nbs);
 die unless defined $nbs;
 
 tie(%top, ref($nbs), $nbs);
@@ -75,46 +70,14 @@ tie(%top, ref($nbs), $nbs);
 $top{CURRENT_CONFIG} = 'magnificent';
 
 # Check the return value
-if ($top{CURRENT_CONFIG} eq 'magnificent') {
-  &ok;
-} else {
-  &notok;
-}
-print "WHHOPS\n";
+ok ($top{CURRENT_CONFIG}, 'magnificent');
 
-$top{CURRENT_STATUS} = [52.5,76.2]; 
+$top{CURRENT_STATUS} = [52.5,76.2];
 
-if ($top{CURRENT_STATUS}->[0] == 52.5) {
-  &ok;
-} else {
-  &notok;
-}
-
+ok($top{CURRENT_STATUS}->[0], 52.5);
 
 $top{FIBRE_PARAMETERS}{TRANS_MATRIX} = [1,2,3,4];
 
-if ($top{FIBRE_PARAMETERS}{TRANS_MATRIX}->[2] == 3) {
-  &ok;
-} else {
-  &notok;
-}
+ok($top{FIBRE_PARAMETERS}{TRANS_MATRIX}->[2],3);
 
-# Sub to check status
-sub check_status {
-  my $status = shift;
-  if ($status == $good) {
-    &ok; 
-  } else {
-    &notok;
-  }
-}
 
-sub ok {
-  print "ok $NUM\n";
-  $NUM++;
-}
-
-sub notok {
-  print "not ok $NUM\n";
-  $NUM++;
-}
