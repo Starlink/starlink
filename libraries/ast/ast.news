@@ -57,6 +57,11 @@ o  A bug has been fixed which could result in incorrect naming of the
    FITS sky projection parameters ProjP(0) to ProjP(9) when writing
    them	out as FITS cards.
 
+o  A bug in the FitsChan class has been fixed which could cause
+   confusion between the FITS-IRAF and FITS-WCS encoding schemes if
+   both a CD matrix and a PC matrix are erroneously present in a FITS
+   header.
+
 o  Some minor memory leaks have been fixed.
 
 o  A small number of documentation errors have been corrected.
