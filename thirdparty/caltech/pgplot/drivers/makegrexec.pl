@@ -6,6 +6,13 @@
 
 use strict;
 
+use Getopt::Long;
+
+# Need to find output file
+my $outfile = "grexec.f";
+my $result = GetOptions( "outfile=s" => \$outfile );
+print "Outfile is $outfile with $result\n";
+
 my @files = @ARGV;
 
 # List of driver variants. Each ??driv file is called either once
@@ -53,6 +60,7 @@ my %counts = (
 	      WSDRIV => 0,
 	      X2DRIV => 0,
 	      XWDRIV => 2,
+	      STARXWDRIV => 2,
 	      ZEDRIV => 0,
 	      LHDRIV => 0,
 	      MSDRIV => 0,
@@ -62,6 +70,7 @@ my %counts = (
 	      XADRIV => 0,
 	      TKDRIV => 0,
 	      RVDRIV => 0,
+	      GWMDRIV => 0,
 	     );
 
 # First need to find all the driv files
@@ -114,7 +123,7 @@ push(@lines, "      END\n");
 
 
 # Now write the grexec.f
-open(my $GR, ">grexec.f") or die "Error opening file grexec.f for write: $!";
+open(my $GR, ">$outfile") or die "Error opening file grexec.f for write: $!";
 print $GR @lines;
 close($GR);
 
