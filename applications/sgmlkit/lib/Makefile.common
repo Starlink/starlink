@@ -1,4 +1,16 @@
-#SGMLDIR=/home/norman/s/src/sgml
+# Starlink SGML Common Makefile
+#
+# This is included within the makefiles used to process documents.
+# For example, a document which included some maths might have a makefile
+# as follows:
+#
+#    include $(STARLINK_SGML_DIR)/lib/Makefile.common
+#    mydoc.html.stamp:       mydoc.sgml mydoc.imgeq.list.stamp
+#    mydoc.imgeq.list.stamp: mydoc.sgml
+#    mydoc.latex.stamp:      mydoc.sgml
+#
+# $Id$
+
 LIBDIR=${STARLINK_SGML_DIR}/lib
 DECL=${STARLINK_SGML_DIR}/dtd/starlink.decl
 STYLESHEET=${STARLINK_SGML_DIR}/dsssl/sl
@@ -96,6 +108,18 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 	$(JADE) -t latex -iLaTeX.entities $(JADEFLAGS) \
 		-d $(STYLESHEET)/latex/sl.dsl#latex $< > $@
 
+# The back-matter stamp
+%.back.stamp: %.sgml
+	$(JADE) -t sgml -d $(STYLESHEET)/html/slback.dsl#back.main $< > $@
+	ROOT=`awk -F: '{print $$1}' $@`; \
+	if [ -r $$ROOT.bibliography.aux ]; then \
+		BSTINPUTS=$(LIBDIR); \
+		bibtex $$ROOT.bibliography; \
+		sed -f $(LIBDIR)/postprocess-bbl.sed \
+			$$ROOT.bibliography.bbl > t.bbl; \
+		mv t.bbl $$ROOT.bibliography.bbl; \
+	fi
+
 %.ps: %.dvi
 	dvips $< -o
 
@@ -117,7 +141,12 @@ tidy:
 	rm -f *.parse *~
 
 clean:	tidy
-	rm -f *.html *.stamp HTML.manifest *.tth-eqlist *.tth-html
+	if ls *.html.stamp >/dev/null 2>&1 ; then \
+		for f in *.html.stamp; do \
+			rm -f `awk -F: '{print $$1}' $$f`* ; \
+	done ; \
+	fi
+	rm -f *.stamp HTML.manifest *.tth-eqlist *.tth-html
 
 checkhtml:
 	for i in *.html; do echo $$i; $(SGMLPARSE) -s $(DECL) $$i; done
