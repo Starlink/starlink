@@ -40,8 +40,16 @@
 *     power {parameter_usage}
 
 *  Environment Parameters:
-*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
-*        {parameter_description}
+*     INP = CHAR (read)
+*        Input dataset
+*     TRUNCATE = LOGICAL (read)
+*        Truncate input data
+*     TAPER = LOGICAL (read)
+*        Apply cosine taper to input data?
+*     REMOVE_MEAN = LOGICAL (read)
+*        Remove mean from data before doing FFT?
+*     OUT = CHAR (read)
+*        Output power spectrum dataset
 
 *  Examples:
 *     {routine_example_text}
@@ -200,7 +208,6 @@
 
 *  Create output file
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
-      CALL BDI_LINK( 'PowerSpectrum', NDIM, DIMS, 'REAL', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check number of dimensions
@@ -230,7 +237,7 @@
           IF ( NBAD .GT. 0 ) THEN
             CALL MSG_SETI( 'NBAD', NBAD )
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'WARNING: There are ^NBAD quality '/
+            CALL ERR_REP( ' ', 'WARNING: There are ^NBAD bad quality '/
      :                     /'points present, aborting...', STATUS )
             GOTO 99
           END IF
@@ -283,6 +290,10 @@
 *    Compute power spectrum
         CALL TIM_FPOWER( DIMS(1), %VAL(DPTR), NV, STATUS )
 
+*    Create output data array
+        CALL BDI_LINK( 'PowerSpectrum', 1, NV, 'REAL', OFID, STATUS )
+        CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(DPTR), STATUS )
+
 *    Create components in output file.
 *    Start with the axis values
         SPARR(1) = 0.0
@@ -290,9 +301,6 @@
         CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
         CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
         CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
-
-*    Create output data array
-        CALL BDI_PUT1R( OFID, 'Data', NV, %VAL(DPTR), STATUS )
 
 *    Copy stuff from input
         IF ( ISDS ) THEN
@@ -323,7 +331,7 @@
 *    Copy History.
         CALL HSI_COPY( IFID, OFID, STATUS )
 
-*    Add new history record. ! This should contain more info.
+*    Add new history record
         CALL HSI_ADD( OFID, VERSION, STATUS )
 
       ELSE
