@@ -520,7 +520,7 @@
          pfrm = resamp ? ifrm : AST__BASE;
 
 /* Open the PGPLOT plotting device. */
-         if ( cpgopen( device ) < 0 ) {
+         if ( cpgopen( device ) <= 0 ) {
             result = Tcl_NewStringObj( "Failed to open plotting device", -1 );
             Tcl_SetObjResult( interp, result );
             return TCL_ERROR;
@@ -1512,7 +1512,7 @@
       int ypix = pargs->ypix;
 
 /* Open PGPLOT.  Use the same invocations as in the driver routine. */
-      if ( cpgopen( device ) < 0 ) {
+      if ( cpgopen( device ) <= 0 ) {
          Tcl_SetObjResult( interp, 
              Tcl_NewStringObj( "Failed to open plotting device", -1 ) );
          return TCL_ERROR;

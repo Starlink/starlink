@@ -248,7 +248,7 @@
       }
 
 /* Open the PGPLOT plotting device. */
-      if ( cpgopen( device ) < 0 ) {
+      if ( cpgopen( device ) <= 0 ) {
          result = Tcl_NewStringObj( "", 0 );
          Tcl_AppendObjToObj( result, objv[ 0 ] );
          Tcl_AppendStringsToObj( result, 
@@ -379,7 +379,7 @@
 
 /* Start up PGPLOT.  We use the same invocations here as in the driver 
    routine. */
-      if ( cpgopen( device ) < 0 ) {
+      if ( cpgopen( device ) <= 0 ) {
          Tcl_SetObjResult( interp,
                            Tcl_NewStringObj( "Failed to open plotting device",
                                              -1 ) );
