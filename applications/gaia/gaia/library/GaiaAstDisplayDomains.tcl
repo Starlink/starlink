@@ -176,7 +176,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       #  Locate all the domains.
       set domains_ [$itk_option(-rtdimage) astdomains]
       set i 0
-      set lwidth 10
+      set lwidth 15
       catch {
          set lwidth [expr 3+[string length $domains_]/[llength $domains_]]
       }
@@ -218,16 +218,19 @@ itcl::class gaia::GaiaAstDisplayDomains {
       global ::$var
 
       # For each domain, switch the image to it and then transform the
-      # X and Y coordinates, update the readout.
+      # X and Y coordinates, update the readout. Trap problem domains
+      # (3D etc.) and pass on to later ones.
       set i 0
       foreach domain $domains_ {
-         incr i
-         $itk_option(-rtdimage) astset current $i
-         set oldx [set ::${var}(X)]
-         set oldy [set ::${var}(Y)]
-         lassign [$itk_option(-rtdimage) astpix2cur $oldx $oldy] newx newy
-         set xvalues_($i) $newx
-         set yvalues_($i) $newy
+         catch {
+            incr i
+            $itk_option(-rtdimage) astset current $i
+            set oldx [set ::${var}(X)]
+            set oldy [set ::${var}(Y)]
+            lassign [$itk_option(-rtdimage) astpix2cur $oldx $oldy] newx newy
+            set xvalues_($i) $newx
+            set yvalues_($i) $newy
+         }
       }
 
       #  Restore default domain.
