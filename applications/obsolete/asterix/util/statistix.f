@@ -307,22 +307,22 @@
       IF ( USEGRP ) THEN
 
 *    Map grouping array
-        CALL BDI_MAPI( IFID, 'Grouping', IGPTR, STATUS )
+        CALL BDI_MAPI( IFID, 'Grouping', GPTR, STATUS )
 
 *    Count groups
-        CALL UTIL_CNTGRP( NELM, %VAL(IGPTR), NGRP, STATUS )
+        CALL UTIL_CNTGRP( NELM, %VAL(GPTR), NGRP, STATUS )
 
 *    Map work space
         CALL DYN_MAPD( 1, NGRP, GDPTR, STATUS )
-        IF ( VOK ) THEN
+        IF ( VAROK ) THEN
           CALL DYN_MAPD( 1, NGRP, GVPTR, STATUS )
         END IF
-        IF ( QOK ) THEN
+        IF ( QUALOK ) THEN
           CALL DYN_MAPL( 1, NGRP, GQPTR, STATUS )
         END IF
 
 *    Perform grouping
-        CALL UTIL_GRPVLQ( NELM, %VAL(IDPTR), VOK, %VAL(IVPTR), QOK,
+        CALL UTIL_GRPVLQ( NELM, %VAL(IDPTR), VAROK, %VAL(IVPTR), QUALOK,
      :                    %VAL(IQPTR), %VAL(GPTR), NGRP, %VAL(GDPTR),
      :                    %VAL(GVPTR), %VAL(GQPTR), STATUS )
 
@@ -333,10 +333,10 @@
 
 *    Release grouping workspace
         CALL DYN_UNMAP( GDPTR, STATUS )
-        IF ( VOK ) THEN
+        IF ( VAROK ) THEN
           CALL DYN_UNMAP( GVPTR, STATUS )
         END IF
-        IF ( QOK ) THEN
+        IF ( QUALOK ) THEN
           CALL DYN_UNMAP( GQPTR, STATUS )
         END IF
 
