@@ -90,8 +90,6 @@
          gdset $device \\
          gdclear \\
          paldef \\
-      else
-         kappa
       endif
 
 #  Try to locate the ARD file which goes with the test. If this is 
@@ -569,19 +567,11 @@
       echo "  exposure time) into a single frame which shows the complete"
       echo "  data coverage for the target area."
       echo " "
-# Until TRANNDF is rewritten to be WCS-aware, we use WCSALIGN to do more
-# or less the same job.
-#       tranndf \
-#          in='reduced_data?' \
-#          out='*|reduced|resamp|' \
-#          accept
-# #     end tranndf
-      wcsalign \
+      tranndf \
          in='reduced_data?' \
          out='*|reduced|resamp|' \
-         lbnd=\! \
          accept
-#     end wcsalign
+#     end tranndf
 
 #  Normalise it.
       echo " "
