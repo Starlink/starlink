@@ -34,19 +34,11 @@
 #endif
 
 #if defined(VMS)
-#include "gwm_dir:gwm.h"
-#include "gwm_dir:gwm_err.h"
+#  include "gwm_dir:gwm.h"
+#  include "gwm_dir:gwm_err.h"
 #else
-#  if HAVE_GWM_H 
-#    include "gwm.h"
-#  else
-#    error "GWM must be installed first"
-#  endif
-#  if HAVE_GWM_ERR_H
-#    include "gwm_err.h"
-#  else
-#    error "GWM must be installed first"
-#  endif
+#  include "gwm.h"
+#  include "gwm_err.h"
 #endif
 
 /* Used to check for VMS or Ultrix here. Now use configure */

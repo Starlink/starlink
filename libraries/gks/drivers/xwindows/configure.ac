@@ -26,7 +26,6 @@ AC_PROG_LIBTOOL
 
 AC_HEADER_STDC
 AC_PATH_XTRA
-AC_CHECK_HEADERS( gwm.h gwm_err.h )
 AC_CHECK_HEADERS( X11/DECWmHints.h X11/Xlib.h )
 
 dnl    Other options here, such as
