@@ -107,12 +107,9 @@
       EXTERNAL			BDI0_BLK		! Ensures inclusion
 
 *  Local Variables:
-      CHARACTER*20              LITEM                   ! Local item name
-
       INTEGER			ARGS(3)			! Function args
       INTEGER			C1, C2			! Character pointers
       INTEGER			IITEM			! Item counter
-      INTEGER                   LITL                    ! Used length of LITEM
       INTEGER			OARG			! Return value
 *.
 
@@ -132,18 +129,13 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-*    Check item name is valid, and make a local copy. Removes any
-*    special item names such as E_Axis_Label. If the item name is
-*    not valid we don't have to execute a method
-        CALL BDI0_CHKITM( ID, ITEMS(C1:C2), LITEM, LITL, STATUS )
+*    Import item name
+        CALL BDI0_MKISTR( ID, ITEMS(C1:C2), ARGS(3), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           OKS(IITEM) = .FALSE.
 
         ELSE
-
-*      Construct string for this item
-          CALL ADI_NEWV0C( LITEM(:LITL), ARGS(3), STATUS )
 
 *      Invoke the function
           CALL ADI_FEXEC( 'FileItemChk', 3, ARGS, OARG, STATUS )

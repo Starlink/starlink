@@ -1,25 +1,26 @@
-      SUBROUTINE BDI_DELETE( ID, ITEM, STATUS )
+      SUBROUTINE BDI_DELETE( ID, ITEMS, OKS, STATUS )
 *+
 *  Name:
 *     BDI_DELETE
 
 *  Purpose:
-*     Remove the specified item from a dataset
+*     Delete the named items from a the specified object
 
 *  Language:
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI_DELETE( ID, ITEM, STATUS )
+*     CALL BDI_DELETE( ID, ITEMS, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Deletes the named items if present
 
 *  Arguments:
 *     ID = INTEGER (given)
-*        Dataset id
-*     ITEM = CHARACTER*(*) (given)
-*        Name of item to delete
+*        ADI identifier of BinDS, Array or Scalar object, or derivatives
+*        thereof
+*     ITEMS = CHARACTER*(*) (given)
+*        List of items to be deleted
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -69,7 +70,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     5 Apr 1995 (DJA):
+*     9 Aug 1995 (DJA):
 *        Original version.
 *     {enter_changes_here}
 
@@ -83,42 +84,74 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
+
+*  Global Variables:
+      INCLUDE 'BDI_CMN'                                 ! BDI common block
+*       BDI_INIT = LOGICAL (given)
+*         BDI class definitions loaded?
 
 *  Arguments Given:
-      INTEGER			ID			! Dataset id
-      CHARACTER*(*)		ITEM			! Item name
+      INTEGER			ID
+      CHARACTER*(*)		ITEMS
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			CHR_SIMLR
-        LOGICAL			CHR_SIMLR
+      EXTERNAL			BDI0_BLK		! Ensures inclusion
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! Locator to object
+      INTEGER			ARGS(3)			! Function args
+      INTEGER			C1, C2			! Character pointers
+      INTEGER			IITEM			! Item counter
+      INTEGER			OARG			! Return value
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
+*  Check initialised
+      IF ( .NOT. BDI_INIT ) CALL BDI0_INIT( STATUS )
 
-      IF ( CHR_SIMLR(ITEM,'VARIANCE') ) THEN
-        CALL DAT_ERASE( LOC, 'VARIANCE', STATUS )
+*  First function argument is the identifier
+      ARGS(1) = ID
 
-      ELSEIF ( CHR_SIMLR(ITEM,'DATA') ) THEN
-        CALL DAT_ERASE( LOC, 'DATA_ARRAY', STATUS )
+*  Second is the linked file object
+      CALL ADI_GETLINK( ID, ARGS(2), STATUS )
 
-      ELSE IF ( CHR_SIMLR(ITEM,'QUALITY') ) THEN
-        CALL DAT_ERASE( LOC, 'QUALITY', STATUS )
+*  Loop over items while more of them and status is ok
+      CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
+      DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
-      ELSE
-        CALL MSG_SETC( 'ITEM', ITEM )
-        CALL ERR_REP( ' ', 'Don''t know how to delete ^ITEM', STATUS )
-      END IF
+*    Import the item name
+        CALL BDI0_MKISTR( ID, ITEMS(C1:C2), ARGS(3), STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          OKS(IITEM) = .FALSE.
+
+        ELSE
+
+*      Invoke the function
+          CALL ADI_FEXEC( 'FileItemDel', 3, ARGS, OARG, STATUS )
+
+*      Release the item string
+          CALL ADI_ERASE( ARGS(3), STATUS )
+
+*      Error?
+          IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETC( 'IT', ITEMS(C1:C2) )
+            CALL ERR_REP( ' ', 'Error deleting item /^IT/',
+     :                    STATUS )
+          END IF
+
+*    End of switch on valid item
+        END IF
+
+*    Advance iterator to next item
+        CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
+
+      END DO
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI_DELETE', STATUS )
