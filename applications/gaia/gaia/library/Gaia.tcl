@@ -659,7 +659,7 @@ itcl::class gaia::Gaia {
    #  Make an AST grid toolbox.
    public method make_astgrid_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstGrid $w_.\#auto \
+         GaiaAstGrid $w_.\#auto \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \

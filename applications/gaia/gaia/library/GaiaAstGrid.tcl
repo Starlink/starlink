@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstGrid
+#     GaiaAstGrid
 
 #  Type of Module:
 #     [incr Tk] class
@@ -18,9 +18,9 @@
 
 #  Invocations:
 #
-#        StarAstGrid object_name [configuration options]
+#        GaiaAstGrid object_name [configuration options]
 #
-#     This creates an instance of a StarAstGrid object. The return is
+#     This creates an instance of a GaiaAstGrid object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -156,9 +156,9 @@
 
 #.
 
-itk::usual StarAstGrid {}
+itk::usual GaiaAstGrid {}
 
-itcl::class gaia::StarAstGrid {
+itcl::class gaia::GaiaAstGrid {
 
    #  Inheritances:
    #  -------------
@@ -185,7 +185,7 @@ itcl::class gaia::StarAstGrid {
 
       #  Add window help.
       global gaia_dir
-      add_help_button $gaia_dir/StarAstGrid.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstGrid.hlp "On Window..."
 
       #  Add option to create a new window.
       $File add command -label {New window} \
@@ -445,6 +445,107 @@ itcl::class gaia::StarAstGrid {
       }
    }
 
+   #  Convert state into an AST options list.
+   protected method gen_options_ {} {
+      set options ""
+
+      #  Add the position options.
+      lappend options "edge(1)=$position_($this,edge1)"
+      lappend options "edge(2)=$position_($this,edge2)"
+      if { $position_($this,labelat1) != "" } {
+         lappend options \
+            "labelat(1)=[radec_to_radian_ 1 $position_($this,labelat1)]"
+      }
+      if { $position_($this,labelat2) != "" } {
+         lappend options \
+            "labelat(2)=[radec_to_radian_ 2 $position_($this,labelat2)]"
+      }
+      lappend options "labelup(1)=$position_($this,labelup1)"
+      lappend options "labelup(2)=$position_($this,labelup2)"
+      lappend options "labelling=$position_($this,labelling)"
+      
+      #  Add spacing options.
+      foreach {sname lname default} $scaleattrib_ {
+         lappend options "$sname=$spacing_($sname)"
+      }
+      foreach {sname lname default} $spacingattrib_ {
+         lappend options "$sname=$spacing_($sname)"
+      }
+      foreach {sname lname default} $minorattrib_ {
+         if { $spacing_($sname) != "0.0" } {
+            lappend options "$sname=[expr int($spacing_($sname))]"
+         }
+      }
+      
+      #  Add scaling options.
+      foreach {sname lname deffont defsize} $fontattrib_ {
+         lappend options "size($sname)=$size_($sname)"
+      }
+      foreach {sname lname default} $widthattrib_ {
+         lappend options "width($sname)=[expr $width_($sname)/200.0]"
+      }
+      foreach {sname lname default} $lengthattrib_ {
+         lappend options "$sname=[expr $size_($sname)/100.0]"
+      }
+      
+      #  Add the elements options.
+      foreach {sname lname default} $elementattrib_ {
+         lappend options "$sname=$element_($this,$sname)"
+      }
+      
+      #  Add the colour options.
+      foreach {sname lname default} $colourattrib_ {
+         lappend options "colour($sname)=$colour_($sname)"
+      }
+      
+      #  Add the font options.
+      foreach {sname lname deffont defsize} $fontattrib_ {
+         lappend options "font($sname)=$font_($sname)"
+      }
+      
+      #  Add the astrometric system that we want to plot in.
+      if { $system_(system) != "default" } {
+         lappend options "system=$system_(system)"
+      }
+      set system_(epoch) [$itk_component(Epoch) get]
+      if { $system_(epoch) != "default" } {
+         lappend options "epoch=$system_(epoch)"
+      }
+      set system_(equinox) [$itk_component(Equinox) get]
+      if { $system_(equinox) != "default" } {
+         lappend options "equinox=$system_(equinox)"
+      }
+      
+      #  Add any new labels. Note these are formatted so that
+      #  non-keyboard characters can be used (i.e. \000 type
+      #  numbers)
+      foreach {sname lname} $labelattrib_ {
+         if { $label_($this,$sname) != "" } {
+            eval set value [format \"$label_($this,$sname)\"]
+               lappend options "$sname=$value"
+         }
+      }
+      
+      #  And set the axes number formatting to be used.
+      if { ! $format_($this,noformat) } {
+         set format1 "format(1)=$Xformat_($this,sep)"
+         set format2 "format(2)=$Yformat_($this,sep)"
+         foreach {lname ident} $formatattrib_ {
+            if { $Xformat_($this,$ident) } {
+               lappend format1 $ident
+            }
+            if { $Yformat_($this,$ident) } {
+               lappend format2 $ident
+            }
+         }
+         lappend format1 ".$Xformat_($this,.)"
+         lappend format2 ".$Yformat_($this,.)"
+         lappend options $format1
+         lappend options $format2
+      }
+      return $options
+   }
+   
    #  Draw the grid (really).
    protected method draw_grid_ {} {
       busy {
@@ -458,103 +559,8 @@ itcl::class gaia::StarAstGrid {
          }
          set drawn_ 1
 
-         #  Build up a list of all the options.
-         set options ""
-
-         #  Add the position options.
-         lappend options "edge(1)=$position_($this,edge1)"
-         lappend options "edge(2)=$position_($this,edge2)"
-         if { $position_($this,labelat1) != "" } {
-            lappend options \
-               "labelat(1)=[radec_to_radian_ 1 $position_($this,labelat1)]"
-         }
-         if { $position_($this,labelat2) != "" } {
-            lappend options \
-               "labelat(2)=[radec_to_radian_ 2 $position_($this,labelat2)]"
-         }
-         lappend options "labelup(1)=$position_($this,labelup1)"
-         lappend options "labelup(2)=$position_($this,labelup2)"
-         lappend options "labelling=$position_($this,labelling)"
-
-         #  Add spacing options.
-         foreach {sname lname default} $scaleattrib_ {
-            lappend options "$sname=$spacing_($sname)"
-         }
-         foreach {sname lname default} $spacingattrib_ {
-            lappend options "$sname=$spacing_($sname)"
-         }
-         foreach {sname lname default} $minorattrib_ {
-            if { $spacing_($sname) != "0.0" } {
-               lappend options "$sname=[expr int($spacing_($sname))]"
-            }
-         }
-
-         #  Add scaling options.
-         foreach {sname lname deffont defsize} $fontattrib_ {
-            lappend options "size($sname)=$size_($sname)"
-         }
-         foreach {sname lname default} $widthattrib_ {
-            lappend options "width($sname)=[expr $width_($sname)/200.0]"
-         }
-         foreach {sname lname default} $lengthattrib_ {
-            lappend options "$sname=[expr $size_($sname)/100.0]"
-         }
-
-         #  Add the elements options.
-         foreach {sname lname default} $elementattrib_ {
-            lappend options "$sname=$element_($this,$sname)"
-         }
-
-         #  Add the colour options.
-         foreach {sname lname default} $colourattrib_ {
-            lappend options "colour($sname)=$colour_($sname)"
-         }
-
-         #  Add the font options.
-         foreach {sname lname deffont defsize} $fontattrib_ {
-            lappend options "font($sname)=$font_($sname)"
-         }
-
-         #  Add the astrometric system that we want to plot in.
-         if { $system_(system) != "default" } {
-            lappend options "system=$system_(system)"
-         }
-         set system_(epoch) [$itk_component(Epoch) get]
-         if { $system_(epoch) != "default" } {
-            lappend options "epoch=$system_(epoch)"
-         }
-         set system_(equinox) [$itk_component(Equinox) get]
-         if { $system_(equinox) != "default" } {
-            lappend options "equinox=$system_(equinox)"
-         }
-
-         #  Add any new labels. Note these are formatted so that
-         #  non-keyboard characters can be used (i.e. \000 type
-         #  numbers)
-         foreach {sname lname} $labelattrib_ {
-            if { $label_($this,$sname) != "" } {
-               eval set value [format \"$label_($this,$sname)\"]
-               lappend options "$sname=$value"
-            }
-         }
-
-         #  And set the axes number formatting to be used.
-         if { ! $format_($this,noformat) } {
-            set format1 "format(1)=$Xformat_($this,sep)"
-            set format2 "format(2)=$Yformat_($this,sep)"
-            foreach {lname ident} $formatattrib_ {
-               if { $Xformat_($this,$ident) } {
-                  lappend format1 $ident
-               }
-               if { $Yformat_($this,$ident) } {
-                  lappend format2 $ident
-               }
-            }
-            lappend format1 ".$Xformat_($this,.)"
-            lappend format2 ".$Yformat_($this,.)"
-            lappend options $format1
-            lappend options $format2
-         }
+         #  Get the current options.
+         set options [gen_options_]
 
          #  Set the grid tags, ast_tag for general control, grid_tag_
 	 #  for this particular grid.
@@ -1416,7 +1422,7 @@ itcl::class gaia::StarAstGrid {
                LabelEntry $parent.label$sname \
                   -text "$lname:" \
                   -labelwidth 8 \
-                  -textvariable "::gaia::StarAstGrid::label_($this,$sname)" \
+                  -textvariable "::gaia::GaiaAstGrid::label_($this,$sname)" \
                   -command [code $this redraw_]
             }
             pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
