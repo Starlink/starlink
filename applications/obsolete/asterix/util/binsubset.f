@@ -288,7 +288,7 @@
         SEL(I) = .TRUE.
         KEEP(I)=KEEPDATA
 
-*  get required ranges for this axis
+*    Get required ranges for this axis
         PARNAM='AXIS'//AXID(I:I)
         CALL MSG_SETI( 'AX', I )
 
@@ -346,7 +346,7 @@
 
       END DO
 
-*    Convert ranges into integer pixel ranges
+*  Convert ranges into integer pixel ranges
       IF ( INDEX ) THEN
         DO I = 1,ADI__MXDIM
           IF (SEL(I)) THEN
@@ -375,17 +375,17 @@
       ONDIM = 0
       DO I = 1, NDIM
 
-*  axis wasn't changed
+*    Axis wasn't changed
         IF (.NOT.SEL(I)) THEN
 
           ONDIM=ONDIM+1
           ODIMS(ONDIM)=DIMS(I)
           PARENT(ONDIM)=I
 
-*  was changed
+*    Was changed
         ELSE
 
-*  case of axis reduced to one bin
+*      Case of axis reduced to one bin
           IF (NRANGE(I).EQ.1.AND.AXRANGE(2,1,I).EQ.AXRANGE(1,1,I)) THEN
 
 *  if slicing skip this axis
@@ -570,6 +570,7 @@
 *    Import :
       INTEGER			FID			! Dataset identifier
       LOGICAL                PRIM               ! Input primitive?
+      INTEGER			NDIM			! Dimensionality
       INTEGER                NDIM               ! Number of dimensions
       INTEGER                DIMS(*)            ! Length of each axis
 *    Export :
@@ -577,7 +578,7 @@
       REAL                   AXLO(*)            ! low value  for each axis
       REAL                   AXHI(*)            ! high value for each axis
       REAL                   DIR(*)             ! axis direction indicator
-      INTEGER                NAX                ! Number of axes
+      INTEGER			NAX
 *    Status :
       INTEGER STATUS
 *    Local variables :
@@ -587,33 +588,36 @@
       INTEGER                	I                  	! loop variable
 *-
 
-*    Status check
+*  Status check
       IF (STATUS .NE. SAI__OK) RETURN
 
-*    Get number of axes
-      IF ( .NOT. PRIM ) THEN
-        CALL BDI_CHKAXES( FID, NAX, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_FLUSH( STATUS )
-          STATUS = SAI__OK
-          NAX = 0
-        END IF
-      ELSE
-        NAX = 0
-      END IF
+      NAX = 0
 
-      IF ( NAX .GT. 0 ) THEN
+      IF ( .NOT. PRIM ) THEN
         CALL MSG_PRNT ('The axes present are:')
 
         DO I = 1, NDIM
-          CALL BDI_AXGET0C( FID, I, 'Label', AXLAB, STATUS )
-          CALL BDI_AXGET0C( FID, I, 'Units', AXUNT(I), STATUS )
-          CALL MSG_SETI( 'I', I )
-          CALL MSG_SETC( 'NAME', AXLAB )
-          CALL MSG_PRNT( ' ^I ^NAME' )
-          CALL BDI_AXMAPR( FID, I, 'Data', 'READ', AXPTR, STATUS )
-          CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
-          CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
+          CALL BDI_CHK( FID, I, 'Data', OK, STATUS )
+          IF ( OK ) THEN
+            NAX=NAX+1
+            CALL BDI_AXGET0C( FID, I, 'Label', AXLAB, STATUS )
+            CALL BDI_AXGET0C( FID, I, 'Units', AXUNT(I), STATUS )
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETC( 'NAME', AXLAB )
+            CALL MSG_PRNT( ' ^I ^NAME' )
+            CALL BDI_AXMAPR( FID, I, 'Data', 'READ', AXPTR, STATUS )
+            CALL ARR_ELEM1R( AXPTR, DIMS(I), 1, AXLO(I), STATUS )
+            CALL ARR_ELEM1R( AXPTR, DIMS(I), DIMS(I), AXHI(I), STATUS )
+
+          ELSE
+            AXUNIT(I) = 'pixels'
+            AXLO(I) = 1.0
+            AXHI(I) = DIMS(I)
+          CALL MSG_SETI( 'NA', I )
+          CALL MSG_SETI( 'NP', DIMS(I) )
+          CALL MSG_PRNT( 'The range for axis ^NA is 1 to ^NP pixels' )
+
+          END IF
 
 *    set direction indicator for axis
           IF (AXHI(I).GT.AXLO(I)) THEN
