@@ -5,7 +5,7 @@
 <component id="itcl">
   <version>3.1.0</version>
   <path>thirdparty/tclsys/itcl</path>
-  <description>[incr Tcl]<description>
+  <description>[incr Tcl]</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
     
