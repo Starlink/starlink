@@ -20,6 +20,8 @@
 *      4 May 94 : V1.7-0  Use AIO for output (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *     25 Apr 95 : V1.8-1  Updated data interfaces (DJA)
+*     15 Jan 1996 V2.0-0 (DJA):
+*        Don't use BDI_PRIM
 *
 *    Type definitions :
 *
@@ -52,13 +54,12 @@
       INTEGER                	WIDTH              	! Output width
 
       LOGICAL                POK                ! PROCESSING struc OK?
-      LOGICAL                PRIM               ! Input primitive?
       LOGICAL 		     EDIT
 *
 *    Version :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'HEADER Version 1.8-1')
+        PARAMETER           (VERSION = 'HEADER Version 2.0-0')
 *-
 
 *    Check status
@@ -82,8 +83,6 @@
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, WIDTH, STATUS )
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL BDI_PRIM( FID, PRIM, STATUS )
-        IF (.NOT. PRIM) THEN
 
 *  do editing if required
           IF (EDIT) THEN
@@ -129,10 +128,6 @@
           END IF
           CALL AIO_WRITE( OCH, LINE, STATUS )
 
-        ELSE
-          CALL MSG_PRNT ('AST_ERR: Input is primitive - no header')
-
-        END IF
       END IF
 
 *    Close output channel
