@@ -4822,7 +4822,7 @@ ADIobj adix_execi( ADIobj func, int narg,
   else {                                /* Invoke the method combination */
     ADIobj      mcf = _gnrc_mcomb(gen); /* Locate method combinator */
 
-    (*((ADIcMethodCombinationCB) _eprc_prc(_mco_cexec(mcf))))( gen, narg, args, status );
+    rval = (*((ADIcMethodCombinationCB) _eprc_prc(_mco_cexec(mcf))))( gen, narg, args, status );
     }
 
   return rval;                          /* Set return value */
