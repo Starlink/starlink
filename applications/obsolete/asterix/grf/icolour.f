@@ -1044,7 +1044,7 @@
       REAL RED,GREEN,BLUE
       REAL REDHUE,GREENHUE,BLUEHUE
       INTEGER FLAG
-      INTEGER RID,GID,BID,FID
+      INTEGER CID,RID,GID,BID,FID
       INTEGER NB
       INTEGER CI
       INTEGER J,K,J1,J2
@@ -1054,8 +1054,8 @@
 
 
 *  which colour is being changed
-        CALL NBS_FIND_ITEM(I_NBID,'COLOUR',ID,STATUS)
-        CALL NBS_GET_VALUE(ID,0,VAL__NBI,ICOL,NB,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'COLOUR',CID,STATUS)
+        CALL NBS_GET_VALUE(CID,0,VAL__NBI,ICOL,NB,STATUS)
 
 *  convert to colour index within full range
         J1=MAX(1,ICOL-1)
