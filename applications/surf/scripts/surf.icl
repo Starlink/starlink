@@ -39,6 +39,8 @@
 {        Add REDUCE_NOISE
 {     11-Jan-1999 (TIMJ):
 {        Add ADD_DBM
+{     08-Mar-1999 (TIMJ):
+{        Add REMIP
 {
 {  Bugs:
 {     {note_any_bugs_here}
@@ -63,6 +65,7 @@ define intrebin        $SURF_DIR/surf_mon
 define rebin           $SURF_DIR/surf_mon
 define reduce_noise    $SURF_DIR/surf_mon
 define reduce_switch   $SURF_DIR/surf_mon
+define remip           $SURF_DIR/surf_mon
 define remsky          $SURF_DIR/surf_mon
 define restore         $SURF_DIR/surf_mon
 define scan_rlb        $SURF_DIR/surf_mon
@@ -91,6 +94,7 @@ defhelp intrebin        $SURF_HELP
 defhelp rebin           $SURF_HELP
 defhelp reduce_noise    $SURF_HELP
 defhelp reduce_switch   $SURF_HELP
+defhelp remip           $SURF_HELP
 defhelp remsky          $SURF_HELP
 defhelp restore         $SURF_HELP
 defhelp scan_rlb        $SURF_HELP
@@ -121,6 +125,7 @@ define surf_intrebin        $SURF_DIR/surf_mon intrebin
 define surf_rebin           $SURF_DIR/surf_mon rebin
 define surf_reduce_noise    $SURF_DIR/surf_mon reduce_noise
 define surf_reduce_switch   $SURF_DIR/surf_mon reduce_switch
+define surf_remip           $SURF_DIR/surf_mon remip
 define surf_remsky          $SURF_DIR/surf_mon remsky
 define surf_restore         $SURF_DIR/surf_mon restore
 define surf_scan_rlb        $SURF_DIR/surf_mon scan_rlb

@@ -52,6 +52,8 @@
 #        Add REDUCE_NOISE
 #     January 1999 (TIMJ)
 #        Add ADD_DBM and SCUSETENV
+#     08-Mar-1999 (TIMJ)
+#        Add REMIP
 #     {enter_changes_here}
 #
 #-
@@ -77,6 +79,7 @@ alias intrebin        ${SURF_DIR}/intrebin
 alias rebin           ${SURF_DIR}/rebin
 alias reduce_noise    ${SURF_DIR}/reduce_noise
 alias reduce_switch   ${SURF_DIR}/reduce_switch
+alias remip           ${SURF_DIR}/remip
 alias remsky          ${SURF_DIR}/remsky
 alias restore         ${SURF_DIR}/restore
 alias scan_rlb        ${SURF_DIR}/scan_rlb
@@ -105,6 +108,7 @@ alias surf_intrebin        ${SURF_DIR}/intrebin
 alias surf_rebin           ${SURF_DIR}/rebin
 alias surf_reduce_noise    ${SURF_DIR}/reduce_noise
 alias surf_reduce_switch   ${SURF_DIR}/reduce_switch
+alias surf_remip           ${SURF_DIR}/remip
 alias surf_remsky          ${SURF_DIR}/remsky
 alias surf_restore         ${SURF_DIR}/restore
 alias surf_scan_rlb        ${SURF_DIR}/scan_rlb

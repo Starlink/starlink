@@ -466,7 +466,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.3beta
+PKG_VERS = 1.4alpha
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -493,7 +493,7 @@ remdbm.pl scushift setbolwt.pl
 #  set.
 
 SCUPLOT = scuplot.csh
-PUBLIC_SCRIPTS = sdip.csh scupa.csh $(SCUPLOT) scunoise
+PUBLIC_SCRIPTS = sdip.csh scupa.csh $(SCUPLOT) scunoise scusetenv.csh
 
 # These are all incarnations of sculog. They are invoked by using
 # soft links to sculog. SCULOG uses the name of the softlink to work
@@ -564,7 +564,7 @@ surf_remsky.f surf_restore.f surf_scan_rlb.f surf_scucat.f surf_scuclip.f \
 surf_scuhelp.f surf_scuover.f surf_scuphot.f surf_skydip.f surf_write_data.f \
 surf_write_photom.f surf_write_photom_header.f surf_scuba2mem.f \
 surf_make_weight.f surf_grid_calcsky.f surf_reduce_noise.f \
-surf_add_dbm.f
+surf_add_dbm.f surf_remip.f
 
 SURF_FCPP_ROUTINES = surf_write_map_info.F
 
@@ -579,7 +579,9 @@ surflib_calc_ijpos.f surflib_histogram_grid.f \
 surflib_calc_output_grid.f surflib_plot_grid.f surflib_clip_grid.f \
 surflib_stats_grid.f surflib_decode_remsky_string.f \
 surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
-surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f
+surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f \
+surflib_process_bols.f surflib_fill_polpack_angles.f surflib_remove_ip.f \
+surflib_fill_wplate.f surflib_read_ipfile.f surflib_calc_polpack_angrot.f
 
 SCULIB_FCPP_ROUTINES = sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
@@ -620,7 +622,7 @@ sculib_lst.f sculib_malloc.f sculib_map_allan_variance.f \
 sculib_mask_data.f sculib_mrqcof.f sculib_mrqmin.f \
 sculib_mulcar.f sculib_multare.f sculib_nfilli.f sculib_nfillr.f \
 sculib_par_get.f sculib_photom_bolselect.f sculib_power2.f \
-sculib_process_bols.f sculib_put_fits_c.f sculib_put_fits_d.f \
+sculib_put_fits_c.f sculib_put_fits_d.f \
 sculib_put_fits_i.f sculib_ranged.f sculib_read_jiggle.f \
 sculib_read_numbers.f sculib_read_sky.f sculib_read_tauz.f \
 sculib_readbols.f sculib_reduce_switch.f sculib_remove_demod_int.f \
@@ -676,7 +678,7 @@ TASKS = \
 bolrebin calcsky  change_data change_flat change_pointing change_quality \
 despike despike2 extinction extract_data extract_flat flatfield intrebin \
 rebin reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover \
-scuphot skydip scuba2mem scumakewt reduce_noise add_dbm
+scuphot skydip scuba2mem scumakewt reduce_noise add_dbm remip
 
 #  Monolith routine source name.
 
@@ -704,7 +706,8 @@ HELP_SOURCES = $(PKG_NAME).hlp
 # These are the calibrator signal files
 
 DATA_FILES = calsig_450_850_photom.sdf calsig_450_850_bp2.sdf \
-	calsig_450_map.sdf calsig_450_850_map.sdf calsig_850_map.sdf 
+	calsig_450_map.sdf calsig_450_850_map.sdf calsig_850_map.sdf \
+	ipfile.dat
 
 
 #  Lists of Latex and hypertext documents.
@@ -784,6 +787,8 @@ PAR_ERR:     $(STAR_INC)/par_err;     $(LINK) $? $@
 PRM_PAR:     $(STAR_INC)/prm_par;     $(LINK) $? $@
 SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;  $(LINK) $? $@
+FIO_ERR:   $(STAR_INC)/fio_err;  $(LINK) $? $@
+
 
 #  Rules for extracting source files from the source archive.
 
@@ -1786,7 +1791,6 @@ sculib_mulcar.o: PRM_PAR
 sculib_multare.o: SAE_PAR
 sculib_par_get.o: PRM_PAR SAE_PAR
 sculib_photom_bolselect.o: PRM_PAR SAE_PAR
-sculib_process_bols.o: PRM_PAR SAE_PAR
 sculib_put_fits_c.o: SAE_PAR
 sculib_put_fits_d.o: SAE_PAR
 sculib_put_fits_i.o: SAE_PAR
@@ -1857,6 +1861,8 @@ surflib_rem_timeseries.o: PRM_PAR SAE_PAR
 surflib_remove_dc_from_exp.o: MSG_PAR PRM_PAR SAE_PAR
 surflib_stats_grid.o: PRM_PAR SAE_PAR
 surflib_calc_dual_beam.o: PRM_PAR SAE_PAR
+surflib_process_bols.o: PRM_PAR SAE_PAR
+surflib_read_ipfile.o: FIO_ERR SAE_PAR PRM_PAR
 ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
