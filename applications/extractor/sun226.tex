@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.2}
+\newcommand{\stardocnumber}    {226.3}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {24 April 1999}
+\newcommand{\stardocdate}      {11 November 1999}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.1}
@@ -170,7 +170,7 @@ facilities and can handle images and catalogues in a variety of formats.}
 \newcommand{\EXTRACTOR}{\texttt{EXTRACTOR}}
 \newcommand{\CONVERT}{\texttt{CONVERT}}
 \newcommand{\SExtractor}{\texttt{SExtractor}}
-\newcommand{\IRAFURL}{http://star-www.rl.ac.uk/iraf/web/iraf-homepage.html}
+\newcommand{\IRAFURL}{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
 \newcommand{\FITSURL}{http://fits.gsfc.nasa.gov/}
 \newcommand{\MUD}{mud165.ps}
 \newcommand{\dash}{--}
@@ -495,16 +495,15 @@ facilities and can handle images and catalogues in a variety of formats.}
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk}\\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents.
 %  ================================
@@ -792,14 +791,15 @@ not supported.
 
 If you come across any problems with \EXTRACTOR\ please notify
 Starlink Software Support
-(\htmladdnormallink{ussc@star.rl.ac.uk}{mailto:ussc@star.rl.ac.uk}).
+(\htmladdnormallink{extractor@star.rl.ac.uk}{mailto:extractor@star.rl.ac.uk}).
 
 \section{Changes}
 \subsection{Version 1.1-0}
 
- The \EXTRACTOR\ and \SExtractor\ programs have been updated to \SExtractor\
- version $2.0.19$ (the previous version was $2.0.15$). The changes
- introduced by this are (from the SExtractor change log):
+ The \EXTRACTOR\ and \SExtractor\ programs have been updated to
+ \SExtractor\ version $2.0.19$ (the previous version was
+ $2.0.15$). The changes introduced by this are (from the SExtractor
+ change log):
  \begin{itemize}
  \item SEGMENTATION numbering problem fixed.
  \item new ASSOC\_TYPE NEAREST option.
@@ -819,6 +819,15 @@ Starlink Software Support
 
  The MAG\_APER parameter now works correctly under ICL (and TCL). This
  was crashing during a second run.
+
+\subsection{Version 1.1-3}
+ This is a minor update to the \EXTRACTOR\ program.
+ \begin{itemize}
+ \item  The range of output WCS coordinates should now always be 
+       correctly normalised ({\it i.e.} RA's in range $0-24$hrs).
+ \item Apertures should now be actually visible in the ``APERTURES'' 
+       checkimage.
+ \end{itemize}
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
@@ -964,7 +973,7 @@ PARAMETERS_NAME $EXTRACTOR_DIR/config/default.param
 #------------------------------- Extraction ----------------------------------
 
 DETECT_TYPE     CCD             # "CCD" or "PHOTO" (*)
-FLAG_IMAGE      flag.fits       # filename for an input FLAG-image
+#FLAG_IMAGE     flag            # filename for an input FLAG-image
 DETECT_MINAREA  5               # minimum number of pixels above threshold
 DETECT_THRESH   1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
 ANALYSIS_THRESH 1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
@@ -991,7 +1000,7 @@ SATUR_LEVEL     50000.0         # level (in ADUs) at which arises saturation
 
 MAG_ZEROPOINT   0.0             # magnitude zero-point
 MAG_GAMMA       4.0             # gamma of emulsion (for photographic scans)
-GAIN            0.0             # detector gain in e-/ADU.
+GAIN            1.0             # detector gain in e-/ADU.
 PIXEL_SCALE     1.0             # size of pixel in arcsec (0=use FITS WCS info).
 
 #------------------------- Star/Galaxy Separation ----------------------------

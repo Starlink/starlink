@@ -1,6 +1,6 @@
 1 Update to EXTRACTOR
   
-  A minor update to EXTRACTOR.
+ A minor update to the \EXTRACTOR\ program.
 
      - The range of output WCS coordinates should now always be 
        correctly normalised (i.e. RA's in range 0-24hrs).
