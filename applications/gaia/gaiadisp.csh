@@ -14,12 +14,15 @@
 #     gaiadisp.csh clone_number
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     23-JAN-1997 (PDRAPER):
+#     23-JAN-1997 (PWD):
 #        Original version.
+#     28-JUL-2000 (PWD):
+#        Changed argument passing to quote filename. This may have 
+#        special characters to protect.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -41,11 +44,10 @@ if ( $?CONVERT_DIR && ! $?NDF_FORMATS_IN ) then
 endif
 
 #  Now start up the application proper. 
-
 if ( $?GAIA_DIR ) then 
-   $GAIA_DIR/gaiadisp.sh $*
+   $GAIA_DIR/gaiadisp.sh "$1" $argv[2-]
 else if ( -e /star/bin/gaia/gaiadisp.sh ) then 
-   /star/bin/gaia/gaiadisp.sh $*
+   /star/bin/gaia/gaiadisp.sh "$1" $argv[2-]
 else 
-   echo Sorry cannot find 'gaiadisp' anywhere on your system.
+   echo Sorry cannot find 'gaiadisp' anywhere on your system
 endif
