@@ -128,7 +128,8 @@
       ELSE IF ( ATTR .EQ. 'Units' ) THEN
         CALL ADI1_CCA2HC( LID, 'Units', LLOC, 'UNITS', STATUS )
       ELSE IF ( ATTR .EQ. 'Decreasing' ) THEN
-        CALL ADI1_CCA2HL( LID, 'Decreasing', LLOC, 'DECREASING', STATUS )
+        CALL ADI1_CCA2HL( LID, 'Decreasing', LLOC, 'DECREASING',
+     :                    STATUS )
       ELSE IF ( ATTR .EQ. 'Min' ) THEN
         CALL ADI1_CCA2HT( LID, 'Min', LLOC, 'FIELD_MIN', STATUS )
       ELSE IF ( ATTR .EQ. 'Max' ) THEN

@@ -35,8 +35,8 @@
 *
 *    Global constants :
 *
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/include/dat_par'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -265,8 +265,8 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/include/fio_err'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'FIO_ERR'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -375,8 +375,8 @@
 *
 *    Global constants :
 *
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/include/fio_err'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'FIO_ERR'
 *
 *    Import :
 *
@@ -543,9 +543,9 @@
 *     29-Jun-1990   original (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
-      INCLUDE '/star/include/sae_par'
-      INCLUDE '/star/include/fio_err'
-      INCLUDE '/star/include/dat_par'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'FIO_ERR'
+      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER DFD                         ! FIO descriptor of DSCF file
       INTEGER MAXCOL                      ! Maxnumber of columns allowed
