@@ -2198,7 +2198,6 @@ astMark(this, type, ...)
     }
     
     /* Now call the AST routine */
-    printf("AST.xs: Got %d marks\n", nmarks);
     PLOTCALL( arg,
        astMark( this, nmarks, ncoords, nmarks, cin, type );
     )
