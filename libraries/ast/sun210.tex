@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.8}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {5th December 2000}
+\newcommand{\stardocdate}      {12th December 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -18902,15 +18902,15 @@ Object            - Base class for all AST Objects
    }{
       The FITS-WCS convention uses FITS header cards to describe the
       relationship between pixels in an image (not necessarily
-      2-dimensional) and a related {\tt{"}}world coordinate system{\tt{"}} (often,
-      although not necessarily, a celestial coordinate system) in
-      terms of a sequence of transformations which convert between
-      various intermediate coordinate systems. One of the
-      transformations involved is a {\tt{"}}sky projection{\tt{"}} (e.g. as
+      2-dimensional) and one or more related {\tt{"}}world coordinate systems{\tt{"}}.
+      Often, although not necessarily, one of these systems will be a
+      celestial coordinate system, in which case the sequence of
+      transformations which convert between the various intermediate
+      coordinate systems will include a {\tt{"}}sky projection{\tt{"}} (e.g. as
       implemented by a WcsMap).  The FITS-WCS encoding may only be
       used to store a single AST Object in any set of FITS header
       cards, and that Object must be a FrameSet which conforms to the
-      FITS-WCS model.
+      FITS-WCS model (the FrameSet may, however, contain multiple Frames).
 
       When reading a FITS-WCS encoded Object (using AST\_READ), the FitsChan
       concerned must initially be positioned at the first card (its
@@ -24306,7 +24306,18 @@ WCSNAME keyword. When creating a \htmlref{FrameSet}{FrameSet} from FITS headers,
 the WCSNAME keywords are now used as the \htmlref{Domain}{Domain} names for the corresponding 
 Frames in the returned FrameSet. When writing a FrameSet to a FITS header
 the Domain names of each \htmlref{Frame}{Frame} are stored in WCSNAME keywords in the
-header.
+header. 
+
+\item The FitsChan class now attempts to assigns a \htmlref{Title}{Title} to each Frame in
+a FrameSet read using a foreign encoding. The Title is based on the Domain
+name of the Frame. If the Frame has no Domain name, the default Title
+supplied by the Frame class is retained.
+
+\item The FitsChan class uses the comments associated with CTYPE
+keywords as axis labels when reading a foreign encoding. This behaviour 
+has been modified so that the default labels provided by the Frame class
+are retained (instead of using the CTYPE comments) if any of the CTYPE 
+comments are identical.
 
 \item A new ``interpolation'' scheme identified by the symbolic constant
 AST\_\_BLOCKAVE has been added to the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX} set of
