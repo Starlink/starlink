@@ -178,6 +178,8 @@
      :                    .FALSE., BASE, ' ', STATUS )
         CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
      :                    .FALSE., DELTA, ' ', STATUS )
+        CALL ADI2_GKEY0I( FITID, ' ', 'NAXIS'//ITEM(6:6), .FALSE.,	! try for img_check
+     :                    .FALSE., DIMS(IAX), ' ', STATUS )
         CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
         CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
         CALL ADI2_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
