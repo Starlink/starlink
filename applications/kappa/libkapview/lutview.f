@@ -241,7 +241,7 @@
 *     lutview curpic
 *        Draws a colour table within the current picture positioned
 *        via the cursor.
-*     lutview xy lut=my_lut device=ps_p lbound=[0.92,0.2] ubound=[0.98,0.8]
+*     lutview xy lut=my_lut device=ps_p lbound="0.92,0.2" ubound="0.98,0.8"
 *        Draws the colour table in the NDF called my_lut with an
 *        outline within the BASE picture on the device ps_p, defined
 *        by the x-y bounds (0.92,0.2) and (0.98,0.8).  In other words

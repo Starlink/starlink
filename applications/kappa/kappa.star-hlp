@@ -16615,21 +16615,18 @@ NDF.
 
 Usage:
 
-   lutsave lut [device] [plane]
+   lutsave lut [device]
 
 Description:
 
-   This routine reads the colour table of a nominated plane of
-   an IDI-supported image display, such as X-windows, and then copies
-   it to an NDF LUT file.
+   This routine saves the colour table of a nominated image display to
+   an NDF LUT file and/or a text file.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 DEVICE
 DEVICE = DEVICE (Read)
    The name of the image-display device whose colour table is to
-   be saved.  The name of the base plane should be given even if
-   the overlay colour table is to be saved.
-   [Current image display]
+   be saved.  [Current image display]
 3 FULL
 FULL = _LOGICAL (Read)
    If TRUE the whole colour-table for the device is stored
@@ -16637,20 +16634,19 @@ FULL = _LOGICAL (Read)
    colour table written by another package that does not reserve
    colour indices.  For colour tables produced by KAPPA this
    should be FALSE. [FALSE]
+3 LOGFILE
+LOGFILE = FILENAME (Write)
+   The name of a text file to receive the formatted values in the
+   colour table. Each line i the file contains the red, green and
+   blue intensities for a single pen, separated by spaces. A null
+   string (!) means that no file is created.  [!]
 3 LUT
 LUT = NDF (Write)
    The output NDF into which the colour table is to be stored.
    Its second dimension equals the number of colour-table
    entries that are stored.  This will be less than the
    total number of colour indices on the device if FULL is FALSE.
-3 PLANE
-PLANE = _INTEGER (Read)
-   The number of the memory plane whose colour table is to be
-   saved.  If it is null the base (image) memory's colour table
-   is reversed.  The base memory is 0 and overlays are numbered
-   consecutively from 1.  For an Ikon the only overlay plane is 1.
-   PLANE is only permitted to have a value in the range 0 to the
-   number of planes minus one. [0]
+   No NDF is created if a null (!) value is given.
 3 TITLE
 TITLE = LITERAL (Read)
    The title for the output NDF. ["KAPPA - Lutsave"]
@@ -16659,41 +16655,16 @@ lutsave pizza
    This saves the current colour table on the current
    image-display device to an NDF called pizza.
 
-lutsave ramps ikon 1
-   This saves the current colour table on the Ikon overlay plane
-   an NDF called ramps.
-
 lutsave redshift full
    This saves in full the current colour table on the current
    image-display device to an NDF called redshift.
-2 Notes
--  Only Ikons and X-windows are supported.
-
--  Only the non-reserved portion of the colour table is saved.
 2 Related_Applications
    KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTTWEAK.
 2 Authors
-MJC: Malcolm J. Currie (STARLINK)
+DSB: David S. Berry (STARLINK)
 2 History
- 1990 Apr 13 (MJC):
-    Original version.
-
- 1991 April 10 (MJC):
-    Modified for colour-table management, specifically the reserved
-    pens are not saved.
-
- 1991 June 5 (MJC):
-    Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
-    than n.
-
- 1992 March 26 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-
- 1992 August 5 (MJC):
-    Used new capability 18 to obtain the true number of
-    colour-table entries, which may not be a power of 2, as
-    returned by capability 14.
+ 16-OCT-2001 (DSB):
+    Original PGPLOT version.
 
 1 LUTSPEC
    Loads a spectrum-like lookup table.

@@ -269,7 +269,7 @@ kps1_censg.f kps1_censh.f kps1_nmplt.f kps1_mlpcp.f kps1_mlplb.f \
 kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
 kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
-kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f \
+kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f kps1_ltaba.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_look.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f
 
