@@ -15424,7 +15424,9 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
    double crval;           /* The value for the FITS CRVAL keyword */
    int fits_i;             /* FITS WCS axis index */
    int iax;                /* WCS Frame axis index */
+   int log_axis;           /* Is the axis logarithmically spaced? */
    int nother;             /* Number of axes still to be described */
+   int nc;                 /* Number of characters */
    int npix;               /* Number of pixel axes */
    int nwcs;               /* Number of WCS axes */
    int ok;                 /* Are all remaining axes describable? */
@@ -15512,11 +15514,14 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
 /* If the axis is not logarthmic, we assume it is linear. Create a ShiftMap
    which subtracts off the CRVAL value. */
             if( !axmap ) {
+               log_axis = 0;
                crval = -crval;
                tmap0 = (AstMapping *) astShiftMap( 1, &crval, "" );
                axmap = AddUnitMaps( tmap0, iax, nwcs );
                tmap0 = astAnnul( tmap0 );
                crval = -crval;
+            } else {
+               log_axis = 1;
             }
 
 /* Combine the Mapping for this axis in series with those of earlier axes. */
@@ -15527,19 +15532,20 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
             } else {
                ret = astClone( axmap );
             }
-            axmap = astAnnul( axmap );
             
 /* Get axis label and symbol. */
             sym =  astGetSymbol( wcsfrm, iax );
             lab =  astGetLabel( wcsfrm, iax );
  
-/* The axis symbols are taken as the CTYPE values. */
+/* The axis symbols are taken as the CTYPE values. Append "-LOG" if the
+   axis is logarithmic and the symbold does not already end with "-LOG".  */
             if( sym && strlen( sym ) ) {
-               SetItemC( &(store->ctype), fits_i, s, (char *) sym );
+               nc = sprintf( buf, "%s", sym );
             } else {            
-               sprintf( buf, "AXIS%d", iax + 1 );
-               SetItemC( &(store->ctype), fits_i, s, buf );
+               nc = sprintf( buf, "AXIS%d", iax + 1 );
             }
+            if( log_axis && strcmp( buf + nc - 4, "-LOG" ) ) strcpy( buf + nc, "-LOG" );
+            SetItemC( &(store->ctype), fits_i, s, buf );
 
 /* The axis labels are taken as the comment for the CTYPE keywords and as
    the CNAME keyword (but only if a label has been set and is different to 
@@ -15560,6 +15566,8 @@ static AstMapping *OtherAxes( AstFrameSet *fs, double *dim, int *wperm,
 /* Indicate this axis has now been described. */
             axis_done[ iax ] = 1;
 
+/* Release Resources. */
+            axmap = astAnnul( axmap );
          }
       }
 
@@ -24639,10 +24647,12 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
    AstMapping *ret;          /* The returned Mapping */
    char **comms;             /* Pointer to array of CTYPE commments */
    char buf[ 100 ];          /* Buffer for textual attribute value */
+   char buf2[ 100 ];         /* Buffer for textual attribute value */
    char *newdom;             /* Pointer to new Domain value */
    const char *ckeyval;      /* Pointer to character keyword value */
    int i;                    /* Axis index */
    int j;                    /* Axis index */
+   int len;                  /* Used length of string */
    int naxes;                /* no. of axes in Frame */
    int nother;               /* The number of "other" axes */
    int paxis;                /* Primary axis index */
@@ -24749,35 +24759,38 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 /* Get the CTYPE value. */
             ckeyval = GetItemC( &(store->ctype), i, s, NULL, method, class );
 
-/* If the CTYPE value is of the form "xxxx-LOG", assume it is a
-   logarithmically spaced axis. Get the Mapping from IWC to WCS. */
-            if( ckeyval && !strcmp( ckeyval + 4, "-LOG" ) ){
+/* If the CTYPE value ends with "-LOG", assume it is a logarithmically spaced 
+   axis. Get the Mapping from IWC to WCS. Reduce the used length of the
+   CTYPE string to exlude any trailing "-LOG" string. */
+            len = strlen( ckeyval );
+            if( ckeyval && !strcmp( ckeyval + len - 4, "-LOG" ) ){
                map1 = LogWcs( store, i, s, method, class );
+               sprintf( buf2, "%.*s", len - 4, ckeyval );
 
 /* Otherwise, assume the axis is linearly spaced. */
             } else {            
                map1 = LinearWcs( store, i, s, method, class );
+               sprintf( buf2, "%.*s", len, ckeyval );
             }
 
 /* Append the CTYPE value to the final Domain value for the primary Frame. */
             if( ckeyval && astChrLen( ckeyval ) > 0 ) {
                if( newdom ) {
-                  sprintf( buf, "%s-%s", newdom, ckeyval );
+                  sprintf( buf, "%s-%s", newdom, buf2 );
                } else {
-                  sprintf( buf, "%s", ckeyval );
+                  sprintf( buf, "%s", buf2 );
                   newdom = buf;
                }                  
             }
 
 /* Now modify the axis in the Frame to have appropriate values for the 
    Unit, Label and Symbol attributes. */
-            if( ckeyval ) astSetSymbol( *frm, i, ckeyval );
+            if( ckeyval ) astSetSymbol( *frm, i, buf2 );
 
             ckeyval = GetItemC( &(store->cname), i, s, NULL, method, class );
             if( !ckeyval && usecom ) ckeyval = GetItemC( &(store->ctype_com), 
                                                    i, s, NULL, method, class );
-            if( !ckeyval ) ckeyval = GetItemC( &(store->ctype), i, s, 
-                                                NULL, method, class );
+            if( !ckeyval ) ckeyval = buf2;
             if( ckeyval ) astSetLabel( *frm, i, ckeyval );
 
             ckeyval = GetItemC( &(store->cunit), i, s, NULL, method, class );
