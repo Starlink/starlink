@@ -1,0 +1,17 @@
+## automake - create Makefile.in from Makefile.am
+## Copyright 2004 Council for the Central Laboratories of the Research Councils
+##
+## This file contains material ADDITIONAL to FSF automake, for
+## supporting the Starlink build system.
+
+# Compile messages for message file %MSG%
+%UFAC%_ERR: %MSG%
+	$(STARLINK)/bin/messgen -F %MSG%
+%LFAC%_err: %MSG%
+	$(STARLINK)/bin/messgen -f %MSG%
+%LFAC%_err.h: %MSG%
+	$(STARLINK)/bin/messgen -c %MSG%
+fac_%CODE%_err: %MSG%
+	$(STARLINK)/bin/messgen -e %MSG%
+
+

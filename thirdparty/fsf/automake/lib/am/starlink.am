@@ -1,0 +1,50 @@
+## automake - create Makefile.in from Makefile.am
+## Copyright 2004 Council for the Central Laboratories of the Research Councils
+##
+## This file contains material ADDITIONAL to FSF automake, for
+## supporting the Starlink build system.
+
+# Create an install manifest, and install it in the required manifest location
+install-manifest.xml: all-am
+	rm -f $@
+	echo "<?xml version='1.0'?>"                            >$@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+	echo "<manifest component='$(PACKAGE)'>"                >>$@
+	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
+	echo "<files>"                                          >>$@
+	env MANIFEST_FILE=$@ $(MAKE) install
+	echo "</files>"                                         >>$@
+	echo "</manifest>"                                      >>$@
+
+# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
+# We should respect $(DESTDIR), but needn't worry about $(srcdir),
+# since we know that the file was created in the current directory.
+# Having done that, delete the install-manifest.xml file
+install-manifest: install-manifest.xml
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) install-manifest.xml \
+		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+
+SUFFIXES+=.tex .dvi .ps .htx_tar
+# Templates to generate documentation
+.tex.dvi:
+	latex $<
+.dvi.ps:
+	dvips -o $@ $<
+# Don't express a dependency via the directory .htx, or else Make
+# tries to delete it as an intermediate.  An alternative is to use
+# .PRECIOUS, but that's not completely straightforward to arrange.
+.tex.htx_tar:
+	- star2html $<
+	tar cf $@ ${<:.tex=.htx}
+
+## if %?MESSGEN%
+## # Compile messages, and declare message dependencies
+## @MESSGEN_DEPENDENCIES@
+## SUFFIXES+=.msg .msg_stamp
+## # Create _all_ the message output files, with names in the .msg_stamp file
+## .msg.msg_stamp:
+## 	$(STARLINK)/bin/messgen -cfFeV $< >$@
+## endif %?MESSGEN%
+
