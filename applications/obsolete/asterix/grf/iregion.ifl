@@ -60,14 +60,14 @@ interface IREGION
     prompt 'Angle to x-axis'
     help 'Anticlockwise'
   endparameter
-  parameter LENGTH
+  parameter MAJOR
     type '_REAL'
-    prompt 'Length of slice'
+    prompt 'Length of major axis'
     help 'In world (axis) units'
   endparameter
-  parameter WIDTH
+  parameter MINOR
     type '_REAL'
-    prompt 'Width of slice'
+    prompt 'Length of minor axis'
     help 'In world (axis) units'
   endparameter
   parameter LEV
