@@ -117,6 +117,7 @@ ADIobj  K_Switch = ADI__nullid;
 ADIobj  K_Try = ADI__nullid;
 
 ADIobj  K_While = ADI__nullid;
+ADIobj  K_WildCard = ADI__nullid;
 
 void prsx_init( ADIstatus status )
   {
@@ -209,6 +210,7 @@ void prsx_init( ADIstatus status )
     CSTR_TABLE_ENTRY(K_Try,"Try"),
 
     CSTR_TABLE_ENTRY(K_While,"While"),
+    CSTR_TABLE_ENTRY(K_WildCard,"WildCard"),
   END_CSTR_TABLE;
 
   ADIkrnlAddCommonStrings( stringtable, status );

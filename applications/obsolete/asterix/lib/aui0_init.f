@@ -102,7 +102,7 @@
       IF ( .NOT. AUI_INIT ) THEN
 
 *  Define methods to write auxilliary data
-        CALL ADI_DEFMTH( 'WriteAux(HDSfile,CHAR,_)', AUI1_WRITE, DID,
+        CALL ADI_DEFMTH( 'WriteAux(HDSfile,CHAR,*)', AUI1_WRITE, DID,
      :                   STATUS )
 
         AUI_INIT = .TRUE.
