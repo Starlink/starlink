@@ -13,7 +13,7 @@
 *     CALL ADI1_LOCSORT( ID, CREATE, SLOC, STATUS )
 
 *  Description:
-*     Locate ASTERIX INSTRUMENT structure given HDS object. The routine first
+*     Locate ASTERIX SORT structure given HDS object. The routine first
 *     checks that the object has not already been found, but only creates
 *     if CREATE is specified true.
 
@@ -23,7 +23,7 @@
 *     CREATE = LOGICAL (given)
 *        Create component if it doesn't exist?
 *     SLOC = CHARACTER*(DAT__SZLOC) (returned)
-*        Locator to INSTRUMENT object
+*        Locator to SORT object
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -123,6 +123,7 @@
           CALL DAT_NEW( ILOC, 'SORT', 'EXT', 1, 1, STATUS )
         END IF
         CALL DAT_FIND( ILOC, 'SORT', SLOC, STATUS )
+        CALL ADI1_GRPLOC( ID, SLOC, STATUS )
         CALL ADI_CPUT0C( ID, SPROPN, SLOC, STATUS )
       END IF
 

@@ -90,11 +90,19 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*(DAT__SZGRP)	GRPNAM			! Group name
       CHARACTER*(DAT__SZLOC)	LOC			! Top level locator
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get group name
+      CALL ADI1_MKGRP( FID, GRPNAM, STATUS )
+
+*  Flush associated locators
+      CALL HDS_FLUSH( GRPNAM, STATUS )
+	print *,'Flushing ',grpnam
 
 *  Extract locator
       CALL ADI1_GETLOC( FID, LOC, STATUS )
