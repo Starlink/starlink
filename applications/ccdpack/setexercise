@@ -36,6 +36,15 @@
          endif
       endif
 
+#  Initialise KAPPA within this shell.
+      if ( $?KAPPA_DIR ) then
+         if ( -e $KAPPA_DIR/kappa.csh ) then
+            source $KAPPA_DIR/kappa.csh
+         else
+            exit 1
+         endif
+      endif
+
 #  Establish the current directory as ADAM_USER and clear 
 #  any global values already existing 
       setenv ADAM_USER $cwd
@@ -61,9 +70,8 @@
          set exten = ".sdf"
       endif
 
-#  If we're going to use a device we need KAPPA.
+#  Do graphics device initialisation if necessary.
       if ( "$device" != "NONE" ) then
-         kappa
          idset $device \\
          gdset $device \\
          gdclear \\
@@ -81,7 +89,6 @@
 	 preserve=true \
 	 direction=x \
          reset accept
-#     end ccdsetup
 
 #  Try to locate the object specification file. If this does not exist
 #  then exit.
@@ -100,21 +107,21 @@
          endif
       end
 
-#  Create the test frames:
+#  Create the test data: three Sets of three NDFs each.
       ccdgenerate \
          nseq=3 \
          file=$objfile \
          type=$exten \
          pixels='[64,128]' \
-         origins='[-1,-101,-69,-101,297,-1]' \
+         origins='[19,-101,-49,-101,297,19]' \
          angles='[0,0,270]' \
          reduced=false \
          container=true \
          dataname=data-a \
          biasname=bias-a \
          ffname=ff-a \
+         seed=32767 \
          reset accept
-#     end ccdgenerate
       ccdgenerate \
          nseq=3 \
          file=$objfile \
@@ -127,30 +134,44 @@
          dataname=data-b \
          biasname=bias-b \
          ffname=ff-b \
+         seed=90909 \
          reset accept
-#     end ccdgenerate
       ccdgenerate \
          nseq=3 \
          file=$objfile \
          type=$exten \
          pixels='[64,128]' \
-         origins='[-21,-151,-89,-151,247,-21]' \
+         origins='[20,-51,-49,-51,247,20]' \
          angles='[0,0,270]' \
          reduced=false \
          container=true \
          dataname=data-c \
          biasname=bias-c \
          ffname=ff-c \
+         seed=2112123 \
          reset accept
-#     end ccdgenerate
+
+#  Give the various NDFs different data types.  This is just to try to
+#  confuse subsequent tasks.
+         settype \
+            ndf='"data-{a,b,c}"' \
+            type=_double \
+            reset accept
+         settype \
+            ndf='"ff-{a,b,c}"' \
+            type=_uword \
+            reset accept
+         settype \
+            ndf='"bias-{a,b,c}"' \
+            type=_integer \
+            reset accept
 
 #  Construct Sets.
       makeset \
          in='"data-?,ff-?,bias-?"' \
-         setsize=3 \
+         mode=container \
          addwcs=true \
          reset accept
-#     end makeset
 
 #  Show the Set groupings.
       showset \
@@ -159,7 +180,6 @@
          sortby=name \
          reset \
          accept
-#     end showset
 
 #  If display capability is enabled then display the data frames.
       if ( "$device" != "NONE" ) then
@@ -187,7 +207,6 @@
          useset \
          reset \
 	 accept
-#     end makebias
 
 #  Debias all frames (including flatfields)
       debias \
@@ -195,7 +214,6 @@
 	 out='debias_*' \
          useset \
          reset accept
-#     end debias
 
 #  Display all the debiassed frames.
       if ( "$device" != "NONE" ) then
@@ -220,7 +238,6 @@
          useset \
          reset \
 	 accept
-#     end makeflat
 
 #  Display the master flatfield.
       if ( "$device" != "NONE" ) then 
@@ -237,9 +254,7 @@
          in='debias_data-?' \
 	 out='*|debias|reduced|' \
          useset \
-         reset \
-	 accept
-#     end flatcor
+         reset accept
 
       if ( "$device" != "NONE" ) then
          gdclear accept
@@ -258,97 +273,133 @@
 
 #  Now proceed to test out some alignment functionality.
 
+#  First we will resample the reduced frames into different coordinate
+#  systems - the a-set is left alone, the b-set is shifted so that
+#  its pixel coordinates are entirely outside the range of its grid
+#  coordinates and the c-set is magnified.  The purpose of this is
+#  solely to provide the subsequent tasks with more opportunities to fail.
+      ndfcopy \
+         in='reduced_data-a' \
+         out='*|reduced_data|xdata|' \
+         reset accept
+      wcsedit \
+         in='"reduced_data-b.i1,reduced_data-b.i2"' \
+         mode=add \
+         frame=pixel \
+         maptype=linear \
+         coeffs='[500,1,0,1000,0,1]' \
+         domain=shifted \
+         reset accept
+      wcsedit \
+         in='"reduced_data-b.i3"' \
+         mode=add \
+         frame=pixel \
+         maptype=linear \
+         coeffs='[500,1,0,-1000,0,1]' \
+         domain=shifted \
+         reset accept
+      tranndf \
+         in='reduced_data-b' \
+         out='*|reduced_data|xdata|' \
+         conserve=false \
+         method=nearest \
+         reset accept
+      wcsedit \
+         in=xdata-b \
+         mode=current \
+         frame=ccd_gen \
+         reset accept
+      pixdupe \
+         in='reduced_data-c' \
+         out='*|reduced_data|xdata|' \
+         expand=2 \
+         reset accept
+
+#  Give them different data types as well for the same reason.
+      settype \
+         ndf=xdata-a \
+         type=_uword \
+         reset accept
+      settype \
+         ndf=xdata-b \
+         type=_integer \
+         reset accept
+      settype \
+         ndf=xdata-c \
+         type=_double \
+         reset accept
+
 #  Locate all the objects on the frames
       echo " " 
       echo "  The first stage of the automated registration process is"
       echo "  to detect the positions of objects (stars and galaxies)."
       echo "  "
       findobj \
-        in='reduced_data-?' \
+        in='"xdata-[abc]"' \
 	outlist='*.find' \
         percentile=95 \
 	accept
-#     end findobj
       if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
          picsel label=a1 accept
-         plotlist inlist='reduced_data-a.i1' palnum=4 mtype=23 accept
-         picsel label=a2 accept; plotlist inlist='reduced_data-a.i2' accept
-         picsel label=a3 accept; plotlist inlist='reduced_data-a.i3' accept
-         picsel label=a4 accept; plotlist inlist='reduced_data-b.i1' accept
-         picsel label=a5 accept; plotlist inlist='reduced_data-b.i2' accept
-         picsel label=a6 accept; plotlist inlist='reduced_data-b.i3' accept
-         picsel label=a7 accept; plotlist inlist='reduced_data-c.i1' accept
-         picsel label=a8 accept; plotlist inlist='reduced_data-c.i2' accept
-         picsel label=a9 accept; plotlist inlist='reduced_data-c.i3' accept
+         plotlist inlist='xdata-a.i1' palnum=4 mtype=23 accept
+         picsel label=a2 accept; plotlist inlist='xdata-a.i2' accept
+         picsel label=a3 accept; plotlist inlist='xdata-a.i3' accept
+         picsel label=a4 accept; plotlist inlist='xdata-b.i1' accept
+         picsel label=a5 accept; plotlist inlist='xdata-b.i2' accept
+         picsel label=a6 accept; plotlist inlist='xdata-b.i3' accept
+         picsel label=a7 accept; plotlist inlist='xdata-c.i1' accept
+         picsel label=a8 accept; plotlist inlist='xdata-c.i2' accept
+         picsel label=a9 accept; plotlist inlist='xdata-c.i3' accept
       endif
-	
+
 #  Determine matches between the positions.
       findoff \
-         inlist='reduced_data-?' \
+         inlist='"xdata-[abc]"' \
 	 ndfnames=true \
          usewcs=true \
          restrict=true \
          useset=true \
 	 outlist='*.off' \
 	 accept
-#     end findoff
-      if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
+      if ( "$device" != "NONE" ) then
          picsel label=a1 accept
-         plotlist inlist='reduced_data-a.i1' \
+         plotlist inlist='xdata-a.i1' \
                   palnum=3 mtype=-1 thick=2 msize=1.5 accept
-         picsel label=a2 accept; plotlist inlist='reduced_data-a.i2' accept
-         picsel label=a3 accept; plotlist inlist='reduced_data-a.i3' accept
-         picsel label=a4 accept; plotlist inlist='reduced_data-b.i1' accept
-         picsel label=a5 accept; plotlist inlist='reduced_data-b.i2' accept
-         picsel label=a6 accept; plotlist inlist='reduced_data-b.i3' accept
-         picsel label=a7 accept; plotlist inlist='reduced_data-c.i1' accept
-         picsel label=a8 accept; plotlist inlist='reduced_data-c.i2' accept
-         picsel label=a9 accept; plotlist inlist='reduced_data-c.i3' accept
+         picsel label=a2 accept; plotlist inlist='xdata-a.i2' accept
+         picsel label=a3 accept; plotlist inlist='xdata-a.i3' accept
+         picsel label=a4 accept; plotlist inlist='xdata-b.i1' accept
+         picsel label=a5 accept; plotlist inlist='xdata-b.i2' accept
+         picsel label=a6 accept; plotlist inlist='xdata-b.i3' accept
+         picsel label=a7 accept; plotlist inlist='xdata-c.i1' accept
+         picsel label=a8 accept; plotlist inlist='xdata-c.i2' accept
+         picsel label=a9 accept; plotlist inlist='xdata-c.i3' accept
       endif
 
-########################################################################
-#  This is as far as I've got.
-########################################################################
-   exit
-
-
-
-
-
-
-#  Set the registration structures.
-      echo " "
-      echo "  Now that the object-object correspondence is known it is"
-      echo "  possible to work out the inter-NDF transformations."
-      echo "  The next routine does this for a range of different"
-      echo "  transformation types. It also writes the information into the"
-      echo "  NDFs so that other routines may use it."
-      echo " "
-      rm -f ccdexercise.ast
+#  Create registration frames.
       register \
-         inlist='reduced_data?' \
-	 fittype=2 \
-	 accept
-#     end register
+         inlist='"xdata-[abc]"' \
+         fittype=2 \
+         useset=true \
+         accept reset
 
-#  Export the registration information to an AST file.
-      echo " "
-      echo "  Write World Coordinate System information about the alignment"
-      echo "  of these frames to an external file 'ccdexercise.ast' as a"
-      echo "  record of their mutual alignment."
-      echo " "
-      astexp \
-         in='reduced_data?' \
-         astfile=ccdexercise.ast \
-         idtype=fitsid \
-         fitsid=ISEQ \
-         outdomain=matched \
-         accept
-#     end astexp
+#  Take a look at the alignment.
+      if ( "$device" != "NONE" ) then
+         gdclear
+         bounds \
+            in='"xdata-[abc]"' \
+            labmode='"index,dot"' \
+            penrot=true \
+            useset=true \
+            clear \
+            reset accept
+         plotlist \
+            inlist='"xdata-[abc]"' \
+            reset accept
+      endif
 
 #  Resample the data.
       echo " "
@@ -360,22 +411,21 @@
       echo "  data coverage for the target area."
       echo " "
       tranndf \
-         in='reduced_data?' \
-         out='*|reduced|resamp|' \
+         in='"xdata-[abc]"' \
+         out='*|xdata|rxdata|' \
+         conserve=false \
          accept
-#     end tranndf
 
 #  Normalise it.
       echo " "
       echo "  Normalising and combining the aligned datasets."
       echo " "
       makemos \
-         in='resamp_data?' \
-	 scale=true \
-	 zero=true \
+         in='"rxdata-[abc]"' \
+	 scale=false \
+	 zero=false \
 	 out=mosaic \
 	 accept
-#     end makemos
 
 #  Display the final mosaic.
       if ( "$device" != "NONE" ) then 
@@ -388,14 +438,12 @@
            mode=percentiles \
            percentiles='[2,98]' \
            accept
-#        end display
       endif
 
 #  Exercise is completed.
       ccdnote \
          '"Exercise completed"' \
 	 accept
-#     end ccdnote
 
 #  Exit label
 EXIT:
