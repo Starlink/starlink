@@ -49,20 +49,29 @@
 #  include <assert.h>
 #endif
 
-#if HAVE_SYS_SIGNAL_H
-/* If it's available, use sys/signal.h rather than <csignal> or <signal.h>.
- * If we're compiling in a strict-ansi mode, these will _not_ have signals
- * which are specific to Unix/POSIX, which are, of course, precisely the
- * ones we're hoping to use.
- */
-#  include <sys/signal.h>
-#elif HAVE_SIGNAL_H
-/* Let's hope these do the job */
-#  include <signal.h>
-#endif
-
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
+
+/*
+ * Include <signal.h>, and don't bother with <csignal>, which brings
+ * with it a number of problems related to declarations.  Some of
+ * these are minor ones related to whether functions are or are not in
+ * std, but most are because only a subset of Unix/POSIX signal
+ * handling is part of the C++ standard, and we want to use more.
+ * This whole class is probably fairly Unix-specific, and this doesn't
+ * magically go away if we include <csignal>.
+ * 
+ * If it's available, explicitly include sys/signal.h as well as
+ * <csignal> or <signal.h>.  If we're compiling in a strict-ansi mode,
+ * the compiler may well have carefully avoided including these
+ * signals specific to Unix/POSIX, which are, of course, precisely the
+ * ones we're hoping to use.
+ */
+#include <signal.h>
+#if HAVE_SYS_SIGNAL_H
+#  include <sys/signal.h>
+#endif
+
 #ifdef HAVE_SYS_WAIT_H
 #  include <sys/wait.h>
 #endif
