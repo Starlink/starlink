@@ -1,0 +1,566 @@
+<!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN 0.7 (XML)//EN"
+	"/home/norman/s/src/sgml/w/sgml/dtd/sun-xml-0.7.dtd"
+[
+	<!ENTITY releasenotes SYSTEM "ReleaseNotes">
+	<!ENTITY version SYSTEM "../VERSION">
+	<!ENTITY astrom "<code>ASTROM</code>">
+	<!ENTITY autoastrom "<code>autoastrom</code>">
+	<!ENTITY findoff "<code>findoff</code>">
+	<!ENTITY ddash '--'>
+		<!-- so I can use this in CODE els without it
+		     being recognised as a shortref -->
+]>
+
+<!-- $Id$ -->
+
+<sun>
+  <docinfo>
+    <title>Autoastrometry for Mosaics</title>
+    <authorlist>
+      <author id="ng">Norman Gray</author>
+    </authorlist>
+
+    <softwareversion>&version;</softwareversion>
+
+    <docnumber>242</docnumber>
+
+    <history>
+      <version number="0" date="24-Aug-2001" author="ng">
+	<px>Initial release</px>
+      </version>
+    </history>
+  </docinfo>
+
+  <docbody>
+    <abstract>
+      <px>We describe the &autoastrom; package, which
+	provides an interface to the &astrom; application.
+	This creates a semi-automatic route to doing astrometry on CCD
+	images.</px>
+    </abstract>
+
+    <sect id="intro" export="export">
+      <subhead>
+	<title>Introduction</title>
+      </subhead>
+
+      <p><strong>THIS IS BETA SOFTWARE.  Some features work only partially or
+	  unreliably.  It does not have all the functionality of a
+	  production release.  The interface may well
+	  change.</strong></p>
+
+      <p>Starlink's &astrom; application provides powerful astrometry
+	facilities, for analysing astronomical images; it is, however, 
+	rather cumbersome to use.  As described in SUN/5, &astrom;
+	can:
+	<ul>
+	  <li>
+	    <p>obtain the plate centre and plate scale of a CCD image, 
+	      by comparing plate positions of objects with those in a
+	      reference catalogue, and fitting with both four- and
+	      six-component distortion models;</p>
+	  </li>
+	  <li>
+	    <p>with enough data, obtain cubic distortion and plate
+	      tilt, using seven- to nine-component models;</p>
+	  </li>
+	  <li>
+	    <p>if enough information is available, it will do the
+	      reductions in observed place, correcting for atmospheric 
+	      refraction.</p>
+	  </li>
+	</ul>
+	&autoastrom; provides a shell
+	around &astrom; so that, as well as the core astrometric
+	facilities of &astrom;, &autoastrom; will:
+	<ul>
+	  <li>
+	    <p>work on a CCD image provided as an NDF, as long as it
+	      has at least rough astrometry (plate centre and scale);</p>
+	  </li>
+	  <li>
+	    <p>automatically download appropriate reference catalogue
+	      information from catalogue servers supported by the
+	      SkyCat library;</p>
+	  </li>
+	  <li>
+	    <p>insert the astrometric results into the original NDF,
+	      as a WCS component;</p>
+	  </li>
+	  <li>
+	    <p>alternatively or additionally make the astrometry
+	      available as a set of FITS-WCS header cards.</p>
+	  </li>
+	</ul>
+      </p>
+
+    </sect>
+
+    <sect id="usage" export="export">
+      <subhead>
+	<title>Usage</title>
+      </subhead>
+
+      <p>Summary:
+	<verbatim>autoastrom [options...] &lt;NDF&gt;</verbatim></p>
+      
+      <p>The options available are described in <ref id="tab.opts"/>.
+	Values can be specified in the form <code>&ddash;catalogue
+	  usno@eso</code> or <code>&ddash;catalogue=usno@eso</code>;
+	booleans can be specified as either <code>&ddash;insert</code> or
+	<code>&ddash;noinsert</code>.</p>
+
+      <table id="tab.opts">
+	<caption>
+	  <px>&autoastrom; options.  Further details are in <ref
+	      id="usage.opts"/></px>
+	</caption>
+	<tabular>
+	  <tgroup cols="3">
+	    <thead>
+	      <row>
+		<entry>Option</entry>
+		<entry>Type</entry>
+		<entry>Description</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry><ref id="opt.catalogue">&ddash;catalogue</ref></entry>
+		<entry>string</entry>
+		<entry>SkyCat name of online catalogue to use</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.extractorcat">&ddash;extractorcat</ref></entry>
+		<entry>string</entry>
+		<entry>SExtractor catalogue</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.help">&ddash;help</ref></entry>
+		<entry></entry>
+		<entry>Print usage information and exit</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.insert">&ddash;insert</ref></entry>
+		<entry>boolean</entry>
+		<entry>insert WCS info into NDF at end?</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.keep">&ddash;keep</ref></entry>
+		<entry>boolean</entry>
+		<entry>keep temporary files?</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.maxobj">&ddash;maxobj</ref></entry>
+		<entry>integer</entry>
+		<entry>maximum number of objects to process</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.messages">&ddash;messages</ref></entry>
+		<entry>boolean</entry>
+		<entry>show messages from monoliths?</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.skycatconfig">&ddash;skycatconfig</ref></entry>
+		<entry>string</entry>
+		<entry>SkyCat configuration file</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.temp">&ddash;temp</ref></entry>
+		<entry>string</entry>
+		<entry>name of temporary directory</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.timeout">&ddash;timeout</ref></entry>
+		<entry>integer</entry>
+		<entry>monolith timeout</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.verbose">&ddash;verbose</ref></entry>
+		<entry>boolean</entry>
+		<entry>verbosity</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.wcs">&ddash;wcs</ref></entry>
+		<entry>opt'l.&nbsp;string</entry>
+		<entry>retain WCS in this file (default if empty)</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</tabular>
+      </table>
+
+      <subsect id="usage.position" export="export">
+	<subhead>
+	  <title>Specifying positions</title>
+	</subhead>
+
+	<p>To work, &autoastrom; requires an initial
+	  estimate of the centre of the CCD frame.  At present, the
+	  only way it obtains this is from a WCS component in the NDF, 
+	  so you need to do at least some initial calibration,
+	  possibly using GAIA, to do this.</p>
+
+	<p>Discuss how accurate this initial calibration has to be.</p>
+      </subsect>
+
+      <subsect id="usage.results" export="export">
+	<subhead>
+	  <title>Results</title>
+	</subhead>
+
+	<p>Results can be inserted into the input NDF (see <ref
+	    id="opt.insert"/>), or else retained as a standalone
+	  FITS-WCS file (see <ref id="opt.wcs"/>).  You can choose
+	  both, either, or even choose neither and throw the results
+	  away (strange person!).</p>
+
+	<p>Discussion of the various FITS standards, and a reference
+	  to the A&amp;A article, when it appears.  Mention importing
+	  FITS WCS information into AST.</p>
+      </subsect>
+
+      <subsect id="usage.opts" export="export">
+	<subhead>
+	  <title>Options</title>
+	</subhead>
+
+	<subsubsect id="opt.catalogue">
+	  <subhead>
+	    <title>--catalogue</title>
+	  </subhead>
+	  <p>This is the name of the online catalogue to use to find
+	  reference stars.  The argument should be one of the
+	  catalogue names recognised by <webref
+	  url="http://archive.eso.org/skycat/" >SkyCat</webref>.  The
+	  list of available catalogues depends on the configuration
+	  file used (see <ref id="opt.skycatconfig"/>); the
+	  `<code>short_name</code>' entries in the file are the
+	  allowable values of this option.</p>
+
+	  <p>Default (presently): `usno@eso'</p>
+	</subsubsect>
+
+	<subsubsect id="opt.extractorcat">
+	  <subhead>
+	    <title>--extractorcat</title>
+	  </subhead>
+
+	  <p>This indicates a pre-existing catalogue of objects in the
+	  CCD frame.  This is a catalogue in the format required by
+	  CCDPACK's &findoff; application, with the
+	  exception that the first field, the identification, must be
+	  repeated in the fourth column.</p>
+
+	  <p>If this catalogue does not exist, it will be generated
+	    from the image in the NDF; this option is present
+	    principally because this extraction step is one of the
+	    more time-consuming steps in the astrometry process, and
+	    so allowing the catalogue to be specified can speed things 
+	    up in the case where you are analysing an image several
+	    times.</p>
+
+	  <p>Default: absent</p>
+	</subsubsect>
+
+	<subsubsect id="opt.help">
+	  <subhead>
+	    <title>--help</title>
+	  </subhead>
+
+	  <p>Print usage information, and defaults, and exit.</p>
+	</subsubsect>
+
+	<subsubsect id="opt.insert">
+	  <subhead>
+	    <title>--insert</title>
+	  </subhead>
+
+	  <p>If true, the final fit to the astrometry is inserted into
+	    the input NDF as an AST WCS component.  If false
+	    (<code>--noinsert</code>), the insertion is not done, so
+	    presumably you have decided to handle the WCS information in
+	    a different way, and have set the <ref id="opt.wcs">--wcs
+	      option</ref> to retain the WCS information.</p>
+
+	  <p>Default: true</p>
+	</subsubsect>
+
+	<subsubsect id="opt.keep">
+	  <subhead>
+	    <title>--keep</title>
+	  </subhead>
+
+	  <p>If true, temporary files will not be deleted at the end
+	    of processing.  This is useful for debugging, both at the
+	    low level when there is something wrong with the script
+	    itself, but also when you wish to examine the sequence of
+	    calls to &findoff; and &astrom;, or examine the &astrom; input and
+	    output files.</p>
+
+	  <p>All the temporary files are created in a temporary
+	    directory which is reported during the script's
+	    execution.</p>
+
+	  <p>Default: true (but this <em>will</em> change)</p>
+	</subsubsect>
+
+	<subsubsect id="opt.maxobj">
+	  <subhead>
+	    <title>--maxobj</title>
+	  </subhead>
+
+	  <p>The maximum number of objects to fetch from the catalogue 
+	    server.  The default is generous, and it's unlikely you'd
+	    need to change this.</p>
+
+	  <p>Default: 500</p>
+	</subsubsect>
+
+	<subsubsect id="opt.messages">
+	  <subhead>
+	    <title>--messages</title>
+	  </subhead>
+
+	  <p>If true, the script will pass on messages from the
+	    Starlink applications which the script uses.  These might
+	    be reassuring, but if you don't like the chatter, they can 
+	    be suppressed with <code>--nomessages</code>.</p>
+
+	  <p>Default: true</p>
+	</subsubsect>
+
+	<subsubsect id="opt.skycatconfig">
+	  <subhead>
+	    <title>--skycatconfig</title>
+	  </subhead>
+
+	  <p>The SkyCat library has a default configuration file,
+	    which you can examine at
+	    <url>http://archive.eso.org/skycat/skycat2.0.cfg</url>.  For
+	    some applications, it may be appropriate to use an
+	    alternative configuration file.  If so, you can point to it
+	    using this option.  For more information on SkyCat,
+	    catalogues, and the configuration file, see the <webref
+	      url="http://archive.eso.org/skycat/skycat-faq.html"
+	      >SkyCat FAQ</webref>.</p>
+
+	  <p>Default: absent</p>
+	</subsubsect>
+
+	<subsubsect id="opt.temp">
+	  <subhead>
+	    <title>--temp</title>
+	  </subhead>
+
+	  <p>This option, if present, specifies the directory to be
+	    used for temporary files.</p>
+
+	  <p>This has a double function:
+	    firstly and most straightforwardly, it indicates where
+	    temporary files should be created if, for some reason, the 
+	    default location is unsuitable; secondly, if the script
+	    finds there a file (from a previous run) which it was
+	    about to generate, it does not regenerate it, but
+	    instead simply reuses it.  The first function may be
+	    useful in some circumstances; the second is
+	    primarily a debugging facility, is subtle, and its use is
+	    discouraged.</p>
+
+	  <p>Default: absent</p>
+	</subsubsect>
+
+	<subsubsect id="opt.timeout">
+	  <subhead>
+	    <title>--timeout</title>
+	  </subhead>
+
+	  <p>If present, this specifies how long, in seconds, the
+	    script should wait for its slave applications to
+	    complete.  The default is three minutes.  In some
+	    circumstances -- such as if you have a huge number of
+	    stars to match up -- this might be too short, so that the
+	    script loses patience before the slave application has
+	    finished, and produces a rather messy error message.  In
+	    this circumstance, you can increase the timeout here.</p>
+
+	  <p>Default: 180</p>
+	</subsubsect>
+
+	<subsubsect id="opt.verbose">
+	  <subhead>
+	    <title>--verbose</title>
+	  </subhead>
+
+	  <p>If true, the script produces a good deal of chatter to
+	    the standard error; if false, this is suppressed.</p>
+
+	  <p>Default: false</p>
+	</subsubsect>
+
+	<subsubsect id="opt.wcs">
+	  <subhead>
+	    <title>--wcs</title>
+	  </subhead>
+
+	  <p>The normal mode of operation is for the script to insert
+	    the final astrometry into the input NDF, as an AST WCS
+	    component (see <ref id="opt.insert"/>).  Instead, or
+	    additionally, you can save this 
+	    information as a FITS-WCS file, named by this option.</p>
+
+	  <p>If the argument is missing, or specified as the empty
+	    string, this file is not created.</p>
+
+	  <p>Default: absent</p>
+	</subsubsect>
+
+      </subsect>
+
+    </sect>
+
+    <sect id="helpers" export="export">
+      <subhead>
+	<title>Auxiliary software</title>
+      </subhead>
+
+      <p>The script uses other Starlink software tools.  Although the
+	use of these tools should be transparent, it might be of use
+	to have some indication of sources of further detail.</p>
+
+
+      <p>The script is largely a wrapper for &astrom;.  This is
+	documented fully in SUN/5.</p>
+
+      <p>The pattern matching facilities which the script depends on
+	come from the &findoff; application within CCDPACK.  There are
+	further details in SUN/139.  Need version 4.0-1 or
+	better.</p>
+
+      <p>The WCS information is largely handled by ATOOLS.  This does
+	not have a SUN yet.   Need ATOOLS 1.3 or better.</p>
+
+      <!--
+      <p>NDFPACK and KAPPA: Ref to KAPPA docs.</p>
+      -->
+
+      <p>The concepts underlying WCS, and its interaction with
+	FITS-WCS, are described in the AST documentation.  See SUN/210
+	and 211.</p>
+
+      <p>Extraction of the object catalogues from the CCD is done by
+	Extractor, which is the Starlink version of Emmanuel Bertin's
+	SExtractor.  Extractor is documented in SUN/226.  The original
+	SExtractor source is available at
+	<url>http://www.tass-survey.org/tass/software/software.html#sextract</url>,
+	and the documentation is available at Starlink sites as MUD/165
+	(Postscript only).</p>
+
+      <!--
+      <p>StarPerl: SUN/228</p>
+      -->
+
+      <p>If you need to supply the initial astrometry which this
+	script requires, you can do that using GAIA.  This is
+	documented in SUN/214, but it's very easy to use, and you
+	might be best to simply start it up (give the command
+	<code>gaia image_name</code>, presuming you have already done
+	the initialisation to use Starlink software) and experiment.
+	<!-- Give some help with this. --></p>
+      
+    </sect>
+
+    <sect id="future" export="export">
+      <subhead>
+	<title>Future developments</title>
+      </subhead>
+
+      <p>Very soon, it will be possible to specify the initial
+	estimate astronmetry on the command-line, rather than by
+	using GAIA to create WCS information within the NDF.  As an
+	alternative route, the application will be modified to attempt 
+	to find such astrometry within any FITS headers attached to
+	the image.</p>
+
+      <p>As a longer-term goal, it might be possible to automate even
+	this, if there is some reasonable way of estimating
+	plate-centre and plate-scale information <foreign>ex
+	  nihil</foreign>, from the pattern of objects in the plate.</p>
+
+      <p>At present, only one CCD can be processed at a time.  It
+	would be useful if the application could process images from
+	multiple CCDs, arranged in a mosaic.</p>
+
+      <subsect id="restrictions" export="export">
+	<subhead>
+	  <title>Restrictions and limitations</title>
+	</subhead>
+
+	<p>The script inherits some limitations from &astrom;, and some
+	  from CCDPACK's &findoff;.</p>
+
+	<p>The limitations due to &astrom; are as follows (quoted from
+	  SUN/5, sect.&nbsp;5):</p>
+
+	<p>&astrom; aims to deliver results better than 1&nbsp;arcsec
+	  from typical Schmidt plate measurements, and better than
+	  0.1&nbsp;arcsec from carefully measured JKT and AAT plates
+	  <foreign>etc</foreign>.  Astrometric specialists will,
+	  nonetheless, be aware of a number of shortcomings, including
+	  the following:
+	  <ul>
+	    <li><p>The fit is limited to a 6-coefficient linear model
+	    plus cubic distortion and plate tilt.  Colour effects --
+	    arising for example from chromatic aberrations in the
+	    camera optics -- are not allowed for, no magnitude or
+	    image shape terms are included in the model, and the
+	    refraction cannot be adjusted automatically.</p>
+	    </li>
+
+	    <li><p>The zonal distortions of the reference catalogues are
+		neglected.</p></li>
+
+	    <li><p>There is no provision for the simultaneous fitting
+	    of more than one plate.  This prevents an extended area
+	    being modelled via overlapping plates, and the
+	    determination of proper motion and parallax from plates
+	    taken at different epochs.</p>
+	    </li>
+
+	    <li><p>Only rudimentary error information is produced.</p>
+	    </li>
+	  </ul>
+	  Despite these limitations, which stem mainly from the need
+	  for simplicity of use, the accuracy of the result tends in
+	  practice to be dominated by the quality of the input data
+	  rather than by &astrom; itself.</p>
+
+	<p>Further, &astrom; requires that at least 10 reference stars
+	  are available.  Since &autoastrom; obtains its reference stars 
+	  from well-stocked catalogues, this is not a problem in
+	  practice.</p>
+
+	<p>The restrictions arising from &findoff; are similarly slight, 
+	  and should not be a problem if the initial astrometry is
+	  good enough.  It's not at present <em>completely</em> clear
+	  exactly what `good enough' means.</p>
+
+      </subsect>
+
+    </sect>
+
+    <sect id="releasenotes" export="export">
+      <subhead>
+	<title>Release Notes</title>
+      </subhead>
+
+      &releasenotes;
+    </sect>
+
+  </docbody>
+</sun>
+
+<!-- Local Variables: -->
+<!-- sgml-indent-data: t -->
+<!-- sgml-indent-step: 2 -->
+<!-- End: -->
