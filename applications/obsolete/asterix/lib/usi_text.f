@@ -11,6 +11,7 @@
 *     13 Dec 88 : Original (DJA)
 *     13 Jan 90 : Recoded using SUBPAR_ calls (DJA)
 *     22 Nov 94 : Generic parameter system - removed SUBPAR (DJA)
+*     18 Jan 96 : No longer needs USI common block (DJA)
 *
 *    Type definitions :
 *
@@ -19,11 +20,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'USI_CMN'
 *
 *    Import :
 *
@@ -49,7 +45,6 @@
       CHARACTER*200       	FILE                	! File name of object
       CHARACTER*200       	PATH                	! Path name of object
       CHARACTER*40        	PARNAME             	! Name of parameter
-      CHARACTER           	PLOC*(DAT__SZLOC)   	! Parameter locator
       CHARACTER*140       	WORK(30)            	! Work space
 
       INTEGER             	CODE                	! Internal parameter code
@@ -93,50 +88,16 @@
             WORK(USE) = TEXT(I)
           ELSE
 
-*          Extract parameter name
+*        Extract parameter name
             PARNAME = TEXT(I)((LBRACKPOS+1):(RBRACKPOS-1))
             CALL CHR_UCASE(PARNAME)
+            CALL USI0_FNDADI( PARNAME, PID, STATUS )
 
-*          Is it valid?
-            CODE = 0
-            L1 = CHR_LEN(PARNAME)
-            IP = 1
-            DO WHILE ( (IP.LE.USI__NMAX) .AND. (CODE.EQ.0) )
-              IF ( DS(IP).USED ) THEN
-                L2 = CHR_LEN(DS(IP).PAR)
-                IF ( CHR_SIMLR(PARNAME(:L1),DS(IP).PAR(:L2)) ) THEN
-                  CODE = IP
-                  PVALID = .TRUE.
-                END IF
-              END IF
-              IP = IP + 1
-            END DO
+*        Parameter name is ok - get identifier
+            IF ( PID .NE. ADI__NULLID ) THEN
 
-            IF ( CODE .NE. 0 ) THEN
-
-*            Parameter name is ok - get locator
-              IF ( DS(CODE).ADIFPN ) THEN
-                PID = DS(CODE).ADI_ID
-              ELSE
-                PLOC = DS(CODE).LOC
-              END IF
-              IF ( STATUS .NE. SAI__OK)  THEN
-                CALL ERR_FLUSH( STATUS )
-                PVALID=.FALSE.
-              END IF
-            ELSE
-              PVALID = .FALSE.
-              CALL ERR_ANNUL( STATUS )
-            END IF
-
-            IF ( PVALID ) THEN
-
-*            Do an HDS trace on the object
-              IF ( DS(CODE).ADIFPN ) THEN
-                CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
-              ELSE
-                CALL HDS_TRACE( PLOC, LEVELS, PATH, FILE, STATUS )
-              END IF
+*          Do a trace on the object
+              CALL ADI_FTRACE( PID, LEVELS, PATH, FILE, STATUS )
               IF ( STATUS .NE. SAI__OK ) GOTO 99
                 USE = USE + 1
                 WORK(USE) = TEXT(I)(1:(LBRACKPOS-1))//'File : '
