@@ -4,7 +4,7 @@
 *     DRIZZLE
 
 *  Purpose:
-*     Mosaics and (optionally) normalises NDFs using the drizzling algorithm.
+*     Mosaics images using the drizzling algorithm.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,9 +20,9 @@
 *        The global status.
 
 *  Description:
-*     This routine transforms a set of NDFs from their PIXEL-domain
-*     frame coordinates to the coordinates of the Current frame in their
-*     WCS component.  The resulting images are combined together onto
+*     This routine transforms a set of images from their pixel
+*     into their Current attached coordinate system.
+*     The resulting images are combined together onto
 *     a single output grid, which can therefore form a mosaic of 
 *     the input images.  Normalisation of the images can optionally 
 *     be carried out so that in overlapping regions the scaling and
