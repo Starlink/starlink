@@ -115,6 +115,9 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.17  1997/05/22 03:33:22  timj
+*     Use SCULIB_SEARCH_DATADIR routine.
+*
 *     Revision 1.16  1997/04/30 02:24:02  timj
 *     Add range checking for 'SWITCH' parameter.
 *     Add MSG_OUTIF.
@@ -168,9 +171,7 @@ c
 *    Status :
       INTEGER STATUS
 *    External references :
-      INTEGER GETCWD
-      INTEGER CHDIR
-      EXTERNAL GETCWD, CHDIR
+
 *    Global variables :
 *    Local Constants :
       INTEGER MAXDIM
@@ -190,8 +191,6 @@ c
                                        ! for each beam
       LOGICAL      CALIBRATOR          ! .TRUE. if internal calibrator was ON
       CHARACTER*15 CHOP_FUNCTION       ! type of chop used
-      CHARACTER*64 CWD                 ! Current directory
-      CHARACTER*64 DATA_DIR            ! Data directory
       CHARACTER*20 DATA_KEPT           ! types of data stored in file
       INTEGER      DEMOD_CALIBRATOR_END
                                        ! pointer to end of scratch calibrator
@@ -225,7 +224,6 @@ c
       INTEGER      IN_DATA_PTR         ! pointer to data array of input file
       INTEGER      IN_DEM_PNTR_PTR     ! pointer to input .SCUBA.DEM_PNTR array
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to .SCUBA extension
-      INTEGER      ISTAT               ! temporary status
       INTEGER      ITEMP               ! scratch integer
       INTEGER      LAST_EXP            ! the last exposure number in
                                        ! an aborted observation
@@ -280,7 +278,6 @@ c
       INTEGER      SWITCH2_START       ! index of first point in switch 2
       INTEGER      SWITCH3_END         ! index of last point in switch 3
       INTEGER      SWITCH3_START       ! index of first point in switch 3
-      LOGICAL      TRYING              ! Logical to find NDF files
       INTEGER      UBND (MAXDIM)       ! upper bounds of array
       LOGICAL      USE_CALIBRATOR      ! .TRUE. if internal calibrator signal
                                        ! is be divided into the data
@@ -297,44 +294,7 @@ c
 
       CALL NDF_BEGIN
 
-      TRYING = .TRUE.
-      DO WHILE (TRYING)
-
-         CALL NDF_EXIST('IN', 'READ', IN_NDF, STATUS)
-
-*  The file could be in DATADIR
-
-         IF (IN_NDF.EQ.NDF__NOID) THEN
-            CALL PSX_GETENV('DATADIR', DATA_DIR, STATUS)
-
-            ISTAT = GETCWD(CWD)
-            IF (ISTAT .EQ. 0) THEN
-               ISTAT = CHDIR(DATA_DIR)
-               IF (ISTAT .EQ. 0) THEN
-                  CALL NDF_EXIST('IN', 'READ', IN_NDF, STATUS)
-                  ISTAT = CHDIR(CWD)
-                  IF (IN_NDF .NE. NDF__NOID) TRYING = .FALSE.
-               END IF
-            END IF
-         ELSE
-            TRYING = .FALSE.
-         END IF
-
-        IF (TRYING) THEN
-            CALL ERR_ANNUL(STATUS)
-            CALL MSG_SETC('TASK', TSKNAME)
-            CALL MSG_OUTIF(MSG__QUIET, ' ','^TASK: Failed to'//
-     :           ' find requested file in CWD and DATADIR',
-     :           STATUS)
-            CALL PAR_CANCL('IN', STATUS)
-         END IF
-         
-      END DO
-
-*  does the user want to divide the data by the internal calibrator
-
-      CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
-
+      CALL SCULIB_SEARCH_DATADIR('IN', IN_NDF, STATUS)
 
 *  get some general descriptive parameters of the observation
 
@@ -372,6 +332,7 @@ c
       IF (OBSERVING_MODE .EQ. 'SKYDIP') THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC('PKG', PACKAGE)
+         CALL MSG_SETC ('MODE', OBSERVING_MODE)
          CALL ERR_REP (' ','^PKG: REDUCE_SWITCH can not be run on '//
      :        '^MODE observations', STATUS)
       ENDIF
@@ -449,6 +410,10 @@ c
 
       CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'N_BOLS',
      :  N_BOLS, STATUS)
+
+*  does the user want to divide the data by the internal calibrator
+
+      CALL PAR_GET0L ('USE_CALIBRATOR', USE_CALIBRATOR, STATUS)
 
 *  check input file is OK
 
