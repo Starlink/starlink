@@ -99,6 +99,7 @@
       EXTERNAL                  GCB0_BLK                ! Ensures inclusion
 
 *  Local Variables:
+      INTEGER			FILID			! Base file object
       INTEGER			RESID			! Ignored return data
 *.
 
@@ -108,8 +109,11 @@
 *  Check initialised
       IF ( .NOT. G_MTHINIT ) CALL GCB0_INIT( STATUS )
 
+*  Get base file identifier
+      CALL ADI_GETFILE( ID, FILID, STATUS )
+
 *  Simply invoke the method
-      CALL ADI_EXEC( 'LoadGCB', 1, FID, RESID, STATUS )
+      CALL ADI_EXEC( 'LoadGCB', 1, FILID, RESID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB_FLOAD', STATUS )

@@ -109,6 +109,7 @@
       EXTERNAL			FRI0_BLK		! Ensures inclusion
 
 *  Local Variables:
+      INTEGER			FILID			! Base file object
       INTEGER			OARG			! Method output
       INTEGER			RID			! Ref name string
 *.
@@ -122,8 +123,11 @@
 *  Construct arguments
       CALL ADI_NEWV0C( RNAME, RID, STATUS )
 
+*  Get base file object
+      CALL ADI_GETFILE( FID, FILID, STATUS )
+
 *  Invoke method
-      CALL ADI_EXEC2( 'GetRef', FID, RID, OARG, STATUS )
+      CALL ADI_EXEC2( 'GetRef', FILID, RID, OARG, STATUS )
 
 *  Success?
       IF ( STATUS .EQ. SAI__OK ) THEN

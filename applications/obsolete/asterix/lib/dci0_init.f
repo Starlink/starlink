@@ -114,10 +114,10 @@
         CALL ADI_REQPKG( 'detcnfg', STATUS )
 
 *    Define the methods
-        CALL ADI_DEFMTH( 'ReadDC(HDSfile)', DCI1_READ, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteDC(HDSfile,MissionStrings)',
+        CALL ADI_DEFMTH( 'ReadDC(_HDSfile)', DCI1_READ, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteDC(_HDSfile,_MissionStrings)',
      :                        DCI1_WRITE, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteDC(FITSfile,MissionStrings)',
+        CALL ADI_DEFMTH( 'WriteDC(_FITSfile,_MissionStrings)',
      :                        DCI2_WRITE, DID, STATUS )
 
 *    Now initialised

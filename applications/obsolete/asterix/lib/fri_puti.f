@@ -115,7 +115,7 @@
       IF ( .NOT. FRI_INIT ) CALL FRI0_INIT( STATUS )
 
 *  Construct arguments
-      ARGS(1) = FID
+      CALL ADI_GETFILE( FID, ARGS(1), STATUS )
       CALL ADI_NEWV0C( RNAME, ARGS(2), STATUS )
       ARGS(3) = RID
 

@@ -106,6 +106,9 @@
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  Local Variables:
+      INTEGER			FILID			! Base file object
 *.
 
 *  Check inherited global status.
@@ -117,8 +120,11 @@
 *  Initialise return values
       DETID = ADI__NULLID
 
+*  Get base file
+      CALL ADI_GETFILE( ID, FILID, STATUS )
+
 *  Invoke the read method
-      CALL ADI_EXEC( 'ReadDC', 1, ID, DETID, STATUS )
+      CALL ADI_EXEC( 'ReadDC', 1, FILID, DETID, STATUS )
 
 *  Store the returned object on the property list of the object
       CALL ADI_CPUTID( ID, DCI_PROP, DETID, STATUS )

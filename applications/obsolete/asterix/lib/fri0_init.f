@@ -101,11 +101,11 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Load methods for reading and writing references
-      CALL ADI_DEFMTH( 'ChkRef(HDSfile,CHAR)', FRI1_CHK,
+      CALL ADI_DEFMTH( 'ChkRef(_HDSfile,_CHAR)', FRI1_CHK,
      :                                       DID, STATUS )
-      CALL ADI_DEFMTH( 'GetRef(HDSfile,CHAR)', FRI1_GET,
+      CALL ADI_DEFMTH( 'GetRef(_HDSfile,_CHAR)', FRI1_GET,
      :                                       DID, STATUS )
-      CALL ADI_DEFMTH( 'PutRef(HDSfile,CHAR,*)', FRI1_PUT,
+      CALL ADI_DEFMTH( 'PutRef(_HDSfile,_CHAR,_)', FRI1_PUT,
      :                                       DID, STATUS )
 
 *  Mark as initialised

@@ -110,7 +110,7 @@
       IF ( .NOT. DCI_INIT ) CALL DCI0_INIT( STATUS )
 
 *  Construct argument list
-      ARGS(1) = ID
+      CALL ADI_GETFILE( ID, ARGS(1), STATUS )
       ARGS(2) = DETID
 
 *  Invoke the write method

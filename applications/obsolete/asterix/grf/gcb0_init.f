@@ -107,10 +107,10 @@
       IF ( .NOT. G_MTHINIT ) THEN
 
 *    Define the methods
-        CALL ADI_DEFMTH( 'LoadGCB(HDSfile)', GCB1_LOAD, DID, STATUS )
-        CALL ADI_DEFMTH( 'SaveGCB(HDSfile)', GCB1_SAVE, DID, STATUS )
-        CALL ADI_DEFMTH( 'LoadGCB(FITSfile)', GCB2_LOAD, DID, STATUS )
-        CALL ADI_DEFMTH( 'SaveGCB(FITSfile)', GCB2_SAVE, DID, STATUS )
+        CALL ADI_DEFMTH( 'LoadGCB(_HDSfile)', GCB1_LOAD, DID, STATUS )
+        CALL ADI_DEFMTH( 'SaveGCB(_HDSfile)', GCB1_SAVE, DID, STATUS )
+        CALL ADI_DEFMTH( 'LoadGCB(_FITSfile)', GCB2_LOAD, DID, STATUS )
+        CALL ADI_DEFMTH( 'SaveGCB(_FITSfile)', GCB2_SAVE, DID, STATUS )
 
 *    Now initialised
         G_MTHINIT = .TRUE.

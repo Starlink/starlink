@@ -114,8 +114,8 @@
 *  Check initialised
       IF ( .NOT. AUI_INIT ) CALL AUI0_INIT( STATUS )
 
-*  First method argument is the dataset id
-      ARGS(1) = ID
+*  First method argument is the base file of the input dataset
+      CALL ADI_GETFILE( ID, ARGS(1), STATUS )
 
 *  Create ADI object describing name
       CALL ADI_NEWV0C( NAME, ARGS(2), STATUS )
