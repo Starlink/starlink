@@ -26823,7 +26823,7 @@ DSB: David Berry (STARLINK)
    numeric data types will undergo a type conversion before
    processing occurs.
 1 SEGMENT
-Copies polygonal segments from one NDF to another.
+Copies polygonal segments from one NDF into another.
 
 Usage:
 
@@ -26831,106 +26831,47 @@ Usage:
 
 Description:
 
-   This routine extracts polygonal segments from an NDF, and
-   optionally pastes them into the corresponding positions within
-   another NDF.  The application is intended to allow regions of an
-   NDF to be removed to another for separate processing.  It may
-   also be used to copy bad pixels into a NDF in order to delete a
-   region which is not required.
+   This routine copies one or more polygonal segments from the first
+   input NDF (parameter IN1), and pastes them into the second input NDF
+   (parameter IN2) at the same pixel co-ordinates. The resulting mosaic
+   is stored in the output NDF (see OUT). Either input NDF may be
+   supplied as null ("!") in which case the corresponding areas of the
+   output NDF are filled with bad values. For instance, supplying a null
+   value for IN2 allows segments to be cut from IN1 and pasted onto a
+   background of bad values. Supplying a null value for IN1 allows
+   "holes" to be cut out of IN2 and filled with bad values.
 
-   The vertices of polygonal segments are defined by lists of
-   co-ordinate pairs.  [For convenience these positions are denoted
-   x-y positions although they may not be literally x and y, for
-   example planes in a cube or hypercube.  See the "Notes" for more
-   details.]  Polygons are completed by connecting the last position
-   in the list to the first.  Pixels within each polygonal segment
-   are copied from the first NDF (IN1) to the corresponding position
-   in the second NDF (IN2).  A sequence of polygons may be supplied,
-   and each is copied in turn.  If a null value is given for either
-   NDF, the routine behaves as if an NDF full of bad pixels had been
-   specified.  Thus if IN1 is given a null value the inside of each
-   polygonal segment will be filled with bad values, and if IN2 is
-   given a null value the region outside the polygonal segments will
-   be filled with bad values.
+   Each polygonal segment is specified by giving the positions of its
+   vertices. This may be done using a graphics cursor, by supplying
+   a positions list or text file containing the positions, or by
+   supplying the positions in response to a parameter prompt. The
+   choice is made by parameter MODE.
 
-   The x-y positions may be specified in three ways:
-
-   1) from the parameter system, usually in response to prompting;
-
-   2) within text files (one for each polygon), where the files are
-   free format with x co-ordinates in column one and y co-ordinates
-   in column two (this is the format produced by other KAPPA
-   applications such as CURSOR); and
-
-   3) using a graphics cursor of a nominated device, for which an NDF
-   must already have been displayed on the device.
-
-   The x-y co-ordinates may be given as either data or pixel
-   (`world') co-ordinates.  If data co-ordinates are given, the input
-   NDFs must contain appropriate AXIS structures to allow the
-   corresponding pixel co-ordinates to be found.
+   This application may also be used to cut and paste cylinders with
+   polygonal cross-sections from NDFs with more than 2 dimensions. See
+   the Notes section below for further details.
 2 Parameters
 For information on individual parameters, select from the list below:
-3 AXES
-AXES( 2 ) = _INTEGER (Read)
-   The indices of the axes which span the plane containing the
-   polygon.  Two values should be given, each less than or equal
-   to the minimum of the number of dimensions in the two input
-   NDFs. [1,2]
-3 CLEAR
-CLEAR = _LOGICAL (Read)
-   Whether or not the image display device should be cleared
-   before opening it. [FALSE]
-3 COLOUR
-COLOUR = LITERAL (Read)
-   The colour in which to draw any graphics specified by
-   parameter PLOT.  The options are described below.
-
-     "MAX"          - The maximum colour index used for the
-                      display of the image.
-     "MIN"          - The minimum colour index used for the
-                      display of the image.
-     An integer     - The actual colour index.  It is constrained
-                      between 0 and the maximum colour index
-                      available on the device.
-     A named colour - Uses the named colour from the palette, and
-                      if it is not present, the nearest colour
-                      from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
-   manipulated choose an integer between 0 and 15, or a named
-   colour.  The suggested default is the current value.
-
-   This parameter is ignored on window overlays, where the
-   overlay colour is used.  (Use the PALENTRY command to change
-   this colour.)  An overlay has the advantage that the crosses
-   or polygon can be erased using OVCLEAR once this task is
-   completed.  The parameter is also ignored for terminals.
-   [The current value, but equals "Green" if there is no current
-   value.]
 3 COORDS
-COORDS( 2 ) = _REAL (Read)
-   A pair of x-y co-ordinates representing a single vertex.  It
-   is only used if parameter MODE is given the value "Interface".
-   A null value should be given when the final vertex has been
-   specified.
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system in which the polygon vertices are
-   specified.  This can be either "WORLD" or "DATA".  If COSYS =
-   "DATA" is given, the input co-ordinates (however obtained) are
-   presumed to be data co-ordinates (as defined by AXIS structures
-   within the NDFs).  Otherwise, they are presumed to be world (or
-   `pixel') co-ordinates. [Current co-ordinate system]
+COORDS = LITERAL (Read)
+   The co-ordinates of a single vertex for the current polygon. If
+   parameter MODE is set to "Interface", this parameter is accessed
+   repeatedly to obtain the co-ordinates of all vertices in the
+   polygon. A null value should be given when the final vertex has
+   been specified. Each position should be supplied within the current
+   co-ordinate Frame of the output NDF (see parameter OUT). Supplying
+   a colon ":" will display details of the required co-ordinate Frame.
+   No more than 2 formatted axis values (separated by a comma or space)
+   may be supplied. If the co-ordinate Frame being used has more than
+   2 axes, then the 2 axes to use must be specified using parameter
+   USEAXIS.
 3 DEVICE
 DEVICE = DEVICE (Read)
-   The name of the graphics device on which an image is
-   displayed.  This is only used if parameter MODE is given the
-   value "Cursor".  Any graphics specified by parameter PLOT will
-   be produced on this device.  This device must support cursor
-   interaction, and belong to one of the following classes:
-   TERMINAL, IMAGE_DISPLAY, IMAGE_OVERLAY, WINDOW, and
-   WINDOW_OVERLAY.  [Current image-display-overlay device]
+   The name of the graphics device on which an image is displayed.
+   Only used if parameter MODE is given the value "Cursor". Any
+   graphics specified by parameter PLOT will be produced on this
+   device.  This device must support cursor interaction. [Current
+   graphics device]
 3 IN1
 IN1 = NDF (Read)
    The input NDF containing the data to be copied to the inside of
@@ -26943,26 +26884,77 @@ IN2 = NDF (Read)
    of the supplied polygonal segments.  If a null value is
    supplied, the outside of the polygonal segments will be filled
    with bad values.
+3 INCAT1-INCAT20
+INCAT1-INCAT20 = FILENAME (Read)
+   If MODE is "Catalogue", each of the parameters INCAT1 to INCAT20
+   are used to access catalogues containing the co-ordinates of the
+   vertices of a single polygon.  Suitable catalogues may be created
+   using CURSOR, LISTMAKE, etc. If a value is assigned to INCAT1
+   on the command line, you are not prompted for any of the remaining
+   parameters in this group; additional polygon catalogues must also
+   be supplied on the command line.  Otherwise, you are prompted
+   for INCAT1, then INCAT2, etc. until a null value is given or
+   INCAT20 is reached.
+
+   The positions in each catalogue are mapped into the pixel
+   co-ordinate Frame of the output NDF by aligning the WCS
+   information stored in the catalogue with the WCS information in
+   the output NDF. A message indicating the Frame in which the
+   positions were aligned with the output NDF is displayed.
 3 LOGFILE
 LOGFILE = FILENAME (Write)
    The name of a text file in which the co-ordinates of the
    polygon vertices are to be stored.  A null value (!) means that
    no file is created. [!]
+3 MARKER
+MARKER = INTEGER (Read)
+   This parameter is only accessed if parameter PLOT is set to
+   "Chain" or "Mark". It specifies the type of marker with which
+   each cursor position should be marked, and should be given as
+   an integer PGPLOT marker type. For instance, 0 gives a box, 1
+   gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
+   triangle. The value must be larger than or equal to -31.
+   [current value]
 3 MODE
 MODE = LITERAL (Read)
-   The mode by which the vertices of the polygonal segments are
-   to be obtained.  The options are as follows: "Interface"
-   defines via the parameter system, "Cursor" enables selection
-   by graphics cursor, and "File" reads them from a text file.
-   [Current interaction mode]
+   The mode in which the co-ordinates of each polygon vertex are to
+   be obtained. The supplied string can be one of the following:
+
+   - "Interface": positions are obtained using parameter COORDS.
+   These positions must be supplied in the current co-ordinate
+   Frame of the output NDF (see parameter OUT).
+
+   - "Cursor": positions are obtained using the graphics cursor of
+   the device specified by parameter DEVICE. The WCS information
+   stored with the picture in the graphics database is used to
+   map the supplied cursor positions into the pixel co-ordinate
+   Frame of the output NDF. A message is displayed indicating the
+   co-ordinate Frame in which the picture and the output NDF were
+   aligned.
+
+   - "Catalogue": positions are obtained from positions lists
+   using parameters INCAT1 to INCAT20. Each catalogue defines a
+   single polygon. The WCS information in each catalogue is used to
+   map the positions in the catalogue into the pixel co-ordinate
+   Frame of the output NDF. A message is displayed for each catalogue
+   indicating the co-ordinate Frame in which the catalogue and the
+   output NDF were aligned.
+
+   - "File": positions are obtained from text files using parameters
+   POLY1 to POLY20. Each file defines a single polygon. Each line
+   in a file must contain two formatted axis values in the current
+   co-ordinate Frame of the output NDF (see parameter OUT),
+   separated by white space or a comma.
+
+   [current value]
 3 MAXPOLY
 MAXPOLY = _INTEGER (Read)
    The maximum number of polygons which can be used.  For
    instance, this can be set to 1 to ensure that no more than 1
    polygon is used (this sort of thing can be useful when writing
    procedures or scripts).  A null value causes no limit to be
-   imposed (unless MODE="File" in which case a limit of 20 is
-   imposed). [!]
+   imposed (unless MODE="File" or "Catalogue" in which case a limit
+   of 20 is imposed). [!]
 3 MINPOLY
 MINPOLY = _INTEGER (Read)
    The minimum number of polygons which can be used.  For
@@ -26972,33 +26964,56 @@ MINPOLY = _INTEGER (Read)
    zero. [1]
 3 OUT
 OUT = NDF (Write)
-   The output NDF.
+   The output NDF. If only one input NDF is supplied (that is, if
+   one of IN1 and IN2 is assigned a null value), then the output
+   NDF has the same shape and size as the supplied input NDF. Also,
+   ancillary data such as WCS information is propagated from the
+   supplied input NDF. In particularly, this means that the current
+   co-ordinate Frame of the output NDF (in which vertex positions
+   should be supplied if MODE is "File" or "Interface") is
+   inherited from the input NDF. If two input NDFs are supplied,
+   then the shape and size of the output NDF corresponds to the
+   area of overlap between the two input NDFs (in pixel space), and
+   the WCS information and current Frame are inherited from
+   the NDF associated with parameter IN1.
 3 PLOT
 PLOT = LITERAL (Read)
    The type of graphics to be used to mark the position of each
    selected vertex.  It is only used if parameter MODE is given
-   the value "Cursor".  PLOT can take any of the following values.
+   the value "Cursor".  The appearance of these graphics (colour,
+   size, etc ) is controlled by the STYLE parameter. PLOT can take
+   any of the following values:
 
-     "Poly"  - Causes each vertex to be joined by a straight line
-               to the previous vertex.  The last vertex is joined
-               to the first vertex.
+   - "None" -- No graphics are produced.
 
-     "Cross" - Each vertex is marked by a cross.
+   - "Mark" -- Each position is marked with a marker of type specified
+   by parameter MARKER.
 
-     "None"  - No graphics are produced.
+   - "Poly" -- Causes each position to be joined by a line to the
+   previous position.  Each polygon is closed by joining the last
+   position to the first.
 
-   The initial default is "Poly", then subsequently it is the
-   current value.  []
+   - "Chain" -- This is a combination of "Mark" and "Poly". Each
+   position is marked by a marker and joined by a line to the
+   previous position. Parameter MARKER is used to specify the marker
+   to use. [current value]
 3 POLY1-POLY20
 POLY1-POLY20 = FILENAME (Read)
-   Each of the parameters POLY1 to POLY20 are used to access text
-   files containing the x-y co-ordinates of the vertices of a
-   single polygon.  If a value is assigned to POLY1 on the
-   command line, you are not prompted for any of the remaining
+   If MODE is "File", each of the parameters POLY1 to POLY20 are
+   used to access text files containing the co-ordinates of the
+   vertices of a single polygon.  If a value is assigned to POLY1 on
+   the command line, you are not prompted for any of the remaining
    parameters in this group; additional polygon files must also
    be supplied on the command line.  Otherwise, you are prompted
    for POLY1, then POLY2, etc. until a null value is given or
    POLY20 is reached.
+
+   Each position should be supplied within the current co-ordinate
+   Frame of the output NDF (see parameter OUT). No more than 2
+   formatted axis values (separated by a comma or space) may be
+   supplied on each line. If the co-ordinate Frame being used has
+   more than 2 axes, then the 2 axes to use must be specified using
+   parameter USEAXIS.
 3 QUALITY
 QUALITY = _LOGICAL (Read)
    If a TRUE value is supplied for parameter QUALITY then quality
@@ -27009,6 +27024,49 @@ QUALITY = _LOGICAL (Read)
    do not have defined QUALITY components, then no quality is
    copied.  Note, if a null input NDF is given then the
    corresponding output QUALITY values are set to zero. [TRUE]
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the style to use when
+   drawing the graphics specified by parameter PLOT.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the lines forming the edges of each polygon is
+   controlled by the attributes Colour(Curves), Width(Curves), etc
+   (either of the synonyms Lines and Edges may be used in place of
+   Curves). The appearance of the vertex markers is controlled by the
+   attributes Colour(Markers), Size(Markers), etc (the synonyms
+   Vertices may be used in place of Markers).  [current value]
+3 USEAXIS
+USEAXIS = GROUP (Read)
+   USEAXIS is only accessed if the current co-ordinate Frame of the
+   output NDF has more than 2 axes. A group of two strings should be
+   supplied specifying the 2 axes spanning the plane in which the
+   supplied polygons are defined. Each axis can be specified either
+   by its integer index within the current Frame of the output NDF
+   (in the range 1 to the number of axes in the current Frame), or
+   by its Symbol attribute. A list of acceptable values is displayed
+   if an illegal value is supplied. If a null (!) value is supplied,
+   the axes with the same indices as the first 2 significant NDF pixel
+   axes are used. [!]
 3 VARIANCE
 VARIANCE = _LOGICAL (Read)
    If a TRUE value is supplied for parameter VARIANCE then
@@ -27020,10 +27078,10 @@ VARIANCE = _LOGICAL (Read)
    variances are copied.  Note, if a null input NDF is given then
    the corresponding output VARIANCE values are set bad. [TRUE]
 2 Examples
-segment in1=m51a in2=m51b out=m51_comp poly1=co-ords.lis mode=file
+segment in1=m51a in2=m51b out=m51_comp incat1=coords mode=cat
    Copies a region of the NDF m51a to the corresponding position
    in the output NDF m51_comp.  The region is defined by the list
-   of vertex co-ordinates held in text file co-ords.lis.  All
+   of vertex co-ordinates held in catalogue coords.FIT.  All
    pixels in the output NDF which fall outside this region are
    given the corresponding pixel values from NDF m51b.
 
@@ -27032,27 +27090,26 @@ segment in1=m51a out=m51_cut mode=cursor plot=poly accept
    in the output NDF m51_cut.  The region is defined by selecting
    vertices using a graphics cursor.  The image m51a should
    previously have been displayed.  Each vertex is joined to the
-   previous vertex by a green line on the graphics device.  The
+   previous vertex by a line on the graphics device.  The
    ACCEPT keyword causes the suggested null default value for IN2
    to be accepted.  This means that all pixels outside the region
    identified using the cursor will be set bad in the output NDF.
 2 Notes
+-  Supplied positions are mapped into the pixel co-ordinate Frame
+of the output NDF before being used. This means that the two input
+NDFs (if supplied) must be aligned in pixel space before using this
+application.
+
 -  The routine can handle NDFs of arbitrary dimensionality.  If
 either input has three or more dimensions then all planes in the
-NDF are processed in the same way, that is the same polygonal
-regions are extracted from each plane and copied to the
-corresponding plane of the output NDF.  The polygon is usually
-presumed to lie in the x-y plane (i.e. the plane spanned by the
-first two axes of the NDF), but this can be changed by assigning
-appropriate values to parameter AXES so that for instance the
-polygon lies in the y-z plane (i.e. the plane spanned by axes 2
-and 3).
-
--  The output NDF bounds are defined by the overlap region of the
-input NDFs.
-
--  The log file has a comment line indicating whether the
-co-ordinates are World or Data.
+NDF pixel arrays are processed in the same way, that is the same
+polygonal regions are extracted from each plane and copied to the
+corresponding plane of the output NDF.  The plane containing the
+polygons must be defined using parameter USEAXIS. This plane is a
+plane within the current co-ordinate Frame of the output NDF (which
+is inherited from the first supplied input NDF). This scheme will
+only work correctly if the selected plane in the current co-ordinate
+Frame is parallel to one of the planes of the pixel array.
 2 Related_Applications
    KAPPA: ARDMASK, ERRCLIP, FILLBAD, FFCLEAN, PASTE, SETMAGIC,
    THRESH.
@@ -27083,6 +27140,10 @@ MJC: Malcolm J. Currie (STARLINK)
 
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 15-JAN-2000 (DSB):
+    Big changes to use PGPLOT, and to allow positions to be
+    specified in the current Frame of the output NDF.
 2 Implementation_Status
    -  This routine will propagate VARIANCE component values so long
    as all supplied input NDFs have defined VARIANCE components, and

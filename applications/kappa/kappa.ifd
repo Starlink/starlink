@@ -14606,49 +14606,11 @@ iraf! {
 
          helplib {$KAPPA_HELP}
 
-         parameter axes {
-            size *
-            type _INTEGER
-            vpath DYNAMIC
-            ppath DYNAMIC
-            prompt {Indices of the axes spanning the polygon plane}
-            helpkey *
-          }
-
-         parameter clear {
-            type _LOGICAL
-            vpath DEFAULT
-            ppath DEFAULT
-            default FALSE
-            prompt {Should the graphics device be cleared?}
-            helpkey *
-          }
-
-         parameter colour {
-            type LITERAL
-            prompt {Colour of graphics}
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            helpkey *
-            default Green
-          }
- 
          parameter coords {
-            size *
-            type _REAL
+            type LITERAL
             access READ
             prompt {Co-ordinates of next polygon vertex}
             helpkey *
-          }
-
-         parameter cosys {
-            type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system}
-            association <->GLOBAL.COORD_SYSTEM
-            helpkey *
-            default World
           }
 
          parameter device {
@@ -14682,6 +14644,167 @@ iraf! {
             helpkey *
           }
 
+         parameter incat1 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 1}
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter incat2 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 2}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat3 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 3}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat4 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 4}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat5 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 5}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat6 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 6}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat7 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 7}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat8 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 8}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat9 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 9}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat10 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 10}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat11 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 11}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat12 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 12}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat13 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 13}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat14 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 14}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat15 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 15}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat16 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 16}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat17 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 17}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat18 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 18}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat19 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 19}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter incat20 {
+            type FILENAME
+            vpath PROMPT
+            prompt {Catalogue holding co-ordinates defining polygon 20}
+            ppath CURRENT
+            helpkey *
+          }
+
          parameter logfile {
             type FILENAME
             access READ
@@ -14689,6 +14812,16 @@ iraf! {
             ppath DEFAULT
             prompt {File to store co-ordinates of polygon vertices}
             default !
+            helpkey *
+          }
+
+         parameter marker {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            prompt {The PGPLOT type for vertex markers}
+            ppath CURRENT DEFAULT
+            default 2
             helpkey *
           }
 
@@ -14712,10 +14845,9 @@ iraf! {
 
          parameter mode {
             type LITERAL
-            vpath GLOBAL
-            ppath GLOBAL DYNAMIC DEFAULT
-            prompt {Mode to obtain polygon vertices}
-            association <->GLOBAL.INTERACTIONMODE
+            vpath CURRENT DEFAULT
+            prompt {Mode used to obtain polygon vertices}
+            ppath CURRENT DEFAULT
             default Interface
             helpkey *
           }
@@ -14909,6 +15041,15 @@ iraf! {
             helpkey *
           }
 
+         parameter style {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Style for graphics}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
          parameter variance {
             type _LOGICAL
             access READ
@@ -14916,6 +15057,15 @@ iraf! {
             ppath DEFAULT
             default TRUE
             prompt {Should variance values be copied to the output NDF?}
+            helpkey *
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Two axes to span the plane of the supplied polygons}
+            ppath DYNAMIC DEFAULT
+            default !
             helpkey *
           }
 
