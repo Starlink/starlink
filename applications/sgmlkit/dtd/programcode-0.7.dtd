@@ -411,7 +411,16 @@
 	bugs		sstbugs
 
      This content model is UGLY, but is forced by the demand that
-     diytopics be allowed ad lib within the prologue.
+     diytopics be allowed ad lib within the prologue, while still
+     imposing restrictions on the number and order of the other
+     elements.  This is partly looking forward to an XML version of
+     the DTD.
+
+     It's not obvious that the routineprologue element needs a
+     copyright element as well as the docblock, but the
+     routineprologue elements will (typically?) come from separate
+     files, and it's appropriate that these files have copyright
+     notices of their own.
      -->
 <!ELEMENT routineprologue O O (
 				(routinename,	diytopic*)? &
@@ -422,6 +431,7 @@
 				(argumentlist,	diytopic*)? &
 				(parameterlist,	diytopic*)? &
 				(authorlist,	diytopic*)? &
+				(copyright,	diytopic*)? &
 				(history,	diytopic*)? &
 				(usage,		diytopic*)? & 
 				(invocation,	diytopic*)? & 
