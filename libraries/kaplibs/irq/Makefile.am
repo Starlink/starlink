@@ -32,5 +32,5 @@ G_ROUTINES = irq1_sbad1.gen irq_sbad.gen
 #  Run generic to get numeric types.
 GFLAGS = n
 .gen.f:
-	$(GENERIC) -u -t $(GFLAGS) $<
+	$(GENERIC) -t $(GFLAGS) $<
 
