@@ -59,4 +59,13 @@
 #define CPP_PRAGMA 306
 #define CPP_START 307
 
+#define INT_MIN 401
+#define INT_MAX 402
+#define PRINTF 403
+#define SPRINTF 404
+#define FPRINTF 405
+#define SCANF 406
+#define FSCANF 407
+#define SSCANF 408
+
 /* $Id$ */

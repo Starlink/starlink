@@ -124,6 +124,16 @@ F77_[A-Z]+_FUNCTION		{ count(); return(F77_FUNCTION); }
 F77_EXTERNAL_NAME		{ count(); return(F77_EXTERNAL); }
 F77_CALL			{ count(); return(F77_CALL); }
 
+INT_MAX				{ count(); return(INT_MAX); }
+INT_MIN				{ count(); return(INT_MIN); }
+printf				{ count(); return(PRINTF); }
+fprintf				{ count(); return(FPRINTF); }
+sprintf				{ count(); return(SPRINTF); }
+scanf				{ count(); return(SCANF); }
+fscanf				{ count(); return(FSCANF); }
+sscanf				{ count(); return(SSCANF); }
+
+
 {IDENT}				{ count(); return(IDENTIFIER); }
 
 0[xX]{H}+{IS}?			{ count(); return(CONSTANT); }
@@ -236,7 +246,7 @@ F77_CALL			{ count(); return(F77_CALL); }
 /* Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
       yylval = (char *) memok( malloc( yyleng + 1 ) );
-      ymatchst = preleng;
+      ymatst = yylval + preleng;
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );
@@ -265,11 +275,11 @@ F77_CALL			{ count(); return(F77_CALL); }
 *     Store C comment text in preval.
 *-
 */
-      char c, cl;
+      char c, c1;
       sappend( yytext );
       c = ' ';
-      while ( c != LEXEOF && ( cl != '*' || c != '/' ) ) {
-         cl = c;
+      while ( c != LEXEOF && ( c1 != '*' || c != '/' ) ) {
+         c1 = c;
          c = input();
          cappend( c );
       }
