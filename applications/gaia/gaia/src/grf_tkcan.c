@@ -13,10 +13,10 @@
  *     customized standard and GAIA extended Tk canvas items.
 
  *  Implementation notes:
- *     - This module requires that the "rtd_mark", "rtd_word" and
- *       "rtd_segment" canvas items are available in the Tcl
- *       interpretor (these are distributed as part of GAIA and built
- *       into its standard wish).
+ *     - This module requires that the "rtd_mark", "rtd_word",
+ *       "rtd_segment" and "rtd_polyline" canvas items are available
+ *       in the Tcl interpretor (these are distributed as part of GAIA
+ *       and built into its standard wish).
  *
  *     - Before using any AST plotting routines you must invoke the
  *       "astTk_Init" function. This establishes the names of the Tcl
@@ -80,6 +80,8 @@
 #define WIDLEN 132               /* Maximum length of widget name */
 #define MAXSEG 132               /* Maximum number of segments in one
                                     canvas item */
+enum {SEGMENTS, POLYLINE};       /* Type of lines drawn */
+        
 
 /* Local Macros */
 /* ============ */
@@ -98,6 +100,8 @@ void RtdWordLastBBox( double *xb, double *yp );
 void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
                           const double *x, const double *y,
                           int numPoints );
+void RtdSetLineCoords( Tcl_Interp *interp, const double *x, const double *y,
+                       int numPoints );
 
 /* Static variables. */
 /* ================= */
@@ -113,6 +117,7 @@ static int HaveScale = 0;          /* True after pixel scale is
                                     * initialised */
 static float Scale = 1.0;          /* Pixels per millimetre */
 static int Plotted = 0;            /* Number of segments plotted */
+static int LineType = SEGMENTS;    /* Type of line to draw */
 
 /* Structure to contain the current graphics configuration. */
 typedef struct configInfo {
@@ -298,6 +303,43 @@ void astTk_Tag( const char *newtag ) {
   NewSegment = 1;
 }
 
+void astTk_LineType( int segments ) {
+/*
+ *+
+ *  Name:
+ *     astTk_LineType
+
+ *  Purpose:
+ *     Sets line type used to draw graphics
+
+ *  Synopsis:
+ *     include "grf_tkcan.h"
+ *     void astTk_LineType( int segments )
+
+ *  Description:
+ *     This routine sets the sort of canvas graphics to use when
+ *     drawing lines. These are line segments by default (i.e. every
+ *     polyline is made up of abutted straight-lines), but may be
+ *     switched to polylines. Which to use depends on the type of line
+ *     graphics being drawn, lots of short lines are best represented
+ *     using line segments (which is optimised so handle many of these
+ *     per canvas item) and long lines by polylines (which look better
+ *     when scaled).
+
+ *  Parameters:
+ *     int segment
+ *        Which type of canvas lines to draw, 1 for segments and 0 for 
+ *        polylines.
+
+ *- */
+  if ( segments ) {
+    LineType = SEGMENTS;
+  } else {
+    LineType = POLYLINE;
+  }
+}
+
+
 
 int astGFlush( void ){
 /*
@@ -354,16 +396,22 @@ int astGLine( int n, const float *x, const float *y ) {
  * Description:
  *     This function displays a series of lines that join the
  *     given positions creating a single "polyline".
+ * 
+ *     There are two different types of line that can be drawn, either
+ *     line segments, or a single polyline. 
  *
- *     For efficiency all lines are created as part of the same canvas
- *     "rtd_segment" item (including lines from subsequent calls,
- *     until either the graphics configuration or canvas tag is
- *     changed, or a limit for the number of segmenrs per item is
- *     exceeded). This is so that when global canvas orientation
- *     changes are necessary (such as when tracking image rescaling,
- *     flipping etc.) as many of the lines as possible are dealt with
- *     as one item, so much of the work is performed in C, rather than
- *     Tcl.
+ *     The segments option allows the creation of the line graphics as
+ *     part of the same canvas "rtd_segment" item (including lines
+ *     from subsequent calls, until either the graphics configuration
+ *     or canvas tag is changed, or a limit for the number of segmenrs
+ *     per item is exceeded). This is so that when global canvas
+ *     orientation changes are necessary (such as when tracking image
+ *     rescaling, flipping etc.) as many of the lines as possible are
+ *     dealt with as one item, so much of the work is performed in C,
+ *     rather than Tcl.
+ *
+ *     The polyline option is useful when drawing long continous lines
+ *     as a segmented line shows joins when scaled.
 
  *  Parameters:
  *     int n
@@ -402,32 +450,109 @@ int astGLine( int n, const float *x, const float *y ) {
 
   /*  If we have some data points. */
   if( n > 1 && x && y ) {
-
-    /*  Convert input coordinates into a line-segment based format for 
-        passing to RtdSegmentSetCoords. */
-    npoints = ( 2 * n ) - 2;
-    xlines = malloc( sizeof( double ) * npoints );
-    ylines = malloc( sizeof( double ) * npoints );
-    for ( i = 0, j = 0; i < n - 1; i++, j += 2 ) {
-      xlines[j]   = x[i];
-      xlines[j+1] = x[i+1];
-      ylines[j]   = y[i];
-      ylines[j+1] = y[i+1];
-    }
-
-    /*  If using an existing segment then add these new values,
-        otherwise create a new segment and record its tag. */
-    if ( NewSegment ) {
-      Plotted = 0;
-
+    if ( LineType == SEGMENTS ) {
+      
+      /*  Use line segments */
+      /*  ================= */
+      
+      /*  Convert input coordinates into a line-segment based format for 
+          passing to RtdSegmentSetCoords. */
+      npoints = ( 2 * n ) - 2;
+      xlines = malloc( sizeof( double ) * npoints );
+      ylines = malloc( sizeof( double ) * npoints );
+      for ( i = 0, j = 0; i < n - 1; i++, j += 2 ) {
+        xlines[j]   = x[i];
+        xlines[j+1] = x[i+1];
+        ylines[j]   = y[i];
+        ylines[j+1] = y[i+1];
+      }
+      
+      /*  If using an existing segment then add these new values,
+          otherwise create a new segment and record its tag. */
+      if ( NewSegment ) {
+        Plotted = 0;
+        
+        /*  Configure the command by adding the canvas name and all the
+            required options. */
+        (void) sprintf( buffer, " -fill %s -width %f -tag {%s} \n",
+                        Colours[ConfigInfo.colour], ConfigInfo.width,
+                        ConfigInfo.tag );
+        if ( Tcl_VarEval( Interp, Canvas, " create rtd_segment ", coords, buffer,
+                          (char *) NULL ) != TCL_OK ) {
+          
+          /*  Failed in creation attempt, so issue an error, release the
+              workspace and make sure that a new segment item is created
+              next time. */
+          astError( AST__GRFER, "astGLine: failed to create line (%s)",
+                    Interp->result );
+          free( xlines );
+          free( ylines );
+          NewSegment = 1;
+          return 0;
+          
+        } else {
+          
+          /*  Now send coordinates (which may be a very long list making
+              it worth avoiding the conversion to a string and back
+              again) */
+          RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
+          
+          /*  Record the name of the item we have just created. */
+          (void) strncpy( Segment, Interp->result, TAGLEN - 1 );
+          NewSegment = 0;
+        }
+      } else {
+        
+        /*  Use the existing segment. Do a dummy command to make sure
+            context for new positions is correct */
+        if ( Tcl_VarEval( Interp, Canvas, " coords ", Segment, " null ",
+                          coords, (char *) NULL ) != TCL_OK ) {
+          
+          /*  Failed in creation attempt, so issue an error, release the
+              workspace and make sure that a new segment item is
+              created next time. */
+          astError( AST__GRFER, "astGLine: failed to append line segments (%s)",
+                    Interp->result );
+          free( xlines );
+          free( ylines );
+          NewSegment = 1;
+          return 0;
+        } else {
+          
+          /*  Append new coordinates */
+          RtdSegmentSetCoords( Interp, 1, xlines, ylines, npoints );
+        }
+      }
+      free( xlines );
+      free( ylines );
+      
+      /*  If number of segments exceeds the maximum number allowed per
+          item, then start a new Segment next time */
+      Plotted += n;
+      if ( Plotted > MAXSEG ) {
+        NewSegment = 1;
+      }
+    } else {
+      
+      /*  Use a single polyline. */
+      /*  =====================  */
+      
+      /*  Convert input coordinates into doubles */
+      xlines = malloc( sizeof( double ) * n );
+      ylines = malloc( sizeof( double ) * n );
+      for ( i = 0 ; i < n; i++ ) {
+        xlines[i] = x[i];
+        ylines[i] = y[i];
+      }
+      
       /*  Configure the command by adding the canvas name and all the
           required options. */
       (void) sprintf( buffer, " -fill %s -width %f -tag {%s} \n",
                       Colours[ConfigInfo.colour], ConfigInfo.width,
                       ConfigInfo.tag );
-      if ( Tcl_VarEval( Interp, Canvas, " create rtd_segment ", coords, buffer,
-                        (char *) NULL ) != TCL_OK ) {
-
+      if ( Tcl_VarEval( Interp, Canvas, " create rtd_polyline ",
+                        coords, buffer, (char *) NULL ) != TCL_OK ) {
+        
         /*  Failed in creation attempt, so issue an error, release the
             workspace and make sure that a new segment item is created
             next time. */
@@ -435,56 +560,23 @@ int astGLine( int n, const float *x, const float *y ) {
                   Interp->result );
         free( xlines );
         free( ylines );
-        NewSegment = 1;
         return 0;
-
+        
       } else {
         
         /*  Now send coordinates (which may be a very long list making
             it worth avoiding the conversion to a string and back
             again) */
-        RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
-
-        /*  Record the name of the item we have just created. */
-        (void) strncpy( Segment, Interp->result, TAGLEN - 1 );
-        NewSegment = 0;
+        RtdSetLineCoords( Interp, xlines, ylines, n );
       }
-    } else {
-
-      /*  Use the existing segment. Do a dummy command to make sure
-          context for new positions is correct */
-      if ( Tcl_VarEval( Interp, Canvas, " coords ", Segment, " null ",
-                        coords, (char *) NULL ) != TCL_OK ) {
-
-        /*  Failed in creation attempt, so issue an error, release the
-            workspace and make sure that a new segment item is
-            created next time. */
-        astError( AST__GRFER, "astGLine: failed to append line segments (%s)",
-                  Interp->result );
-        free( xlines );
-        free( ylines );
-        NewSegment = 1;
-        return 0;
-      } else {
-
-        /*  Append new coordinates */
-        RtdSegmentSetCoords( Interp, 1, xlines, ylines, npoints );
-      }
-    }
-    free( xlines );
-    free( ylines );
-
-    /*  If number of segments exceeds the maximum number allowed per
-        item, then start a new Segment next time */
-    Plotted += n;
-    if ( Plotted > MAXSEG ) {
-      NewSegment = 1;
+      free( xlines );
+      free( ylines );
     }
   }
   return 1;
 }
 
-int astGMark( int n, const float *x, const float *y, int type ){
+int astGMark( int n, const float *x, const float *y, int type ) {
 /*
  *+
  *  Name:
