@@ -15,28 +15,14 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-o  A new astPolyCurve function has been added for drawing multiple
-   geodesic curves end-to-end.
- 
-o  A new set of functions (astResample<X>) has been introduced for
+o  A new set of functions, astResample<X>, has been introduced for
    resampling gridded data such as images (i.e. re-gridding) under
    the control of a geometrical transformation specified by a
    Mapping.
 
-o  The "ast_link" command has changed so that the options "-pgp" and
-   "-pgplot" now link against the Starlink and "Native" versions of
-   PGPLOT respectively. Previously these options were synonymous and
-   used whichever version was installed.
-
-o  A new "FITS-IRAF" encoding has been added as an interim method
-   of encoding world coordinate system information in FITS headers,
-   until the proposed official FITS-WCS standard becomes more stable.
-
-o  The astMapBox function's efficiency has been improved.
-
-o  Other improvements have been made to the efficiency and
-   friendliness of various algorithms, particularly in the areas of
-   reading FITS header data and simplification of Mappings.
+o  A new class of Object, the PcdMap, has been introduced. This is a
+   specialised form of Mapping which implements 2-dimensional
+   pincushion or barrel distortion.
 
 o  A few minor bugs have been fixed.
 
@@ -56,4 +42,4 @@ Alternatively, on Starlink systems, type:
 or
       showme sun211 changes
 
-18/12/98
+4/6/1999
