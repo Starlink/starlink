@@ -9305,6 +9305,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NodeLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NumericCellRenderer.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/PasteLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ProgressBarStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/SQLReadDialog.java
@@ -10110,6 +10111,7 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/StoreConfiguration.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreControlFrame.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreFileUtils.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/StoreSource.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/StringPaster.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/package.html
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java

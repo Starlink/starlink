@@ -104,6 +104,10 @@ install:
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
+prepare:
+
+build:
+
 jars:
       [jar] Building MANIFEST-only jar: /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
       [jar] Building jar: /apps/cvsbuild/java/source/aglib/lib/aglib/aglib.jar
@@ -155,7 +159,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 79 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 80 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -252,7 +256,6 @@ webstart:
 
 dist:
      [copy] Copying 284 files to /apps/cvsbuild/java/source/diva/docs/diva
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/diva
@@ -469,7 +472,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/table
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 146 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 147 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -848,4 +851,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 23 seconds
+Total time: 3 minutes 22 seconds

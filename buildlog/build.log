@@ -48,7 +48,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 48 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 49 source files to /apps/cvsbuild/java/source/util/build/classes
      [copy] Copying 18 files to /apps/cvsbuild/java/source/util/build/classes
      [echo] Executing Task target: build
 
@@ -193,7 +193,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 118 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 119 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table

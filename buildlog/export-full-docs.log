@@ -893,10 +893,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -1487,7 +1483,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 581 warnings
+  [javadoc] 577 warnings
 
 install:
 
@@ -1577,6 +1573,10 @@ install:
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
+prepare:
+
+build:
+
 jars:
   [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
@@ -1618,7 +1618,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 79 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 80 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -1898,7 +1898,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 146 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 147 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2217,4 +2217,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 4 minutes 0 seconds
+Total time: 4 minutes 15 seconds

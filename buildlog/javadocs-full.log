@@ -27,7 +27,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/java
-     [copy] Copying 67 files to /apps/cvsbuild/java/source/util/build/java
+     [copy] Copying 68 files to /apps/cvsbuild/java/source/util/build/java
      [echo] Executing Task target: javadoc-sources
 
 javadoc-sources:
@@ -84,7 +84,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 123 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 124 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -297,10 +297,10 @@ javadoc-sources:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] This sentence is different from what will be interpreted as the first sentence in the
   [javadoc] next major release (when that interpretation will be internationalized), which is:
   [javadoc] "Create an abstract application that resides
@@ -643,14 +643,13 @@ javadoc-sources:
   [javadoc]  cause a "snap." "
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/classification/BayesClassifier.java:38: warning - The first sentence is interpreted to be:
   [javadoc] "Compute mu's and sigma's for each class, also computes the
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Compute mu's and sigma's for each class, also computes the
   [javadoc]  coefficients (one per class) that are used in the joint
   [javadoc]  p.d.f. calculation."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  This example figure class illustrates the use of different
@@ -660,6 +659,7 @@ javadoc-sources:
   [javadoc] "CloudFigure is a class that paints itself as a
   [javadoc]  translucent "cloud."
   [javadoc]  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
   [javadoc] "A typed node renderer with the given node renderer
   [javadoc]  as its default (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -956,10 +956,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -1550,7 +1546,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 581 warnings
+  [javadoc] 577 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 9 seconds
+Total time: 1 minute 6 seconds

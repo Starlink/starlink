@@ -1581,12 +1581,8 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:51: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:51: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:51: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 11 warnings
+  [javadoc] 7 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
@@ -3020,4 +3016,4 @@ javadocs:
   [javadoc] 209 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 23 seconds
+Total time: 3 minutes 22 seconds

@@ -91,6 +91,10 @@ install:
 [loggedcopy] Copying 397 files to /apps/cvsbuild/starjava/docs
      [echo] Executing AGLIB target: install
 
+prepare:
+
+build:
+
 jars:
   [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-community-resolver-SNAPSHOT.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/aglib/lib/aglib/astrogrid-store-client-SNAPSHOT.jar
@@ -132,7 +136,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 79 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 80 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -412,7 +416,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 146 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 147 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -731,4 +735,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 6 seconds
+Total time: 3 minutes 5 seconds
