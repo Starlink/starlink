@@ -1,0 +1,65 @@
+\newpage
+\sstroutine{
+   DIPSO2NDF
+}{
+   Converts a DIPSO file (as produced by the DIPSO WRITE command) to
+   an NDF
+}{
+   \sstdescription{
+      This application routine reads a DIPSO format file as produced by
+      the DIPSO `WRITE' command.  The DIPSO TITLE is written to the NDF
+      TITLE.  DIPSO records bad values by means of breaks in the data
+      array.  The number and positions of these breaks are stored in
+      the DIPSO file.  This application inserts bad pixels at these break
+      positions.  The number of bad pixels inserted is based on the
+      size of the gap in the wavelength scale.  At least one bad pixel
+      is inserted at every break point.
+   }
+   \sstusage{
+      DIPSO2NDF IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         Input DIPSO file.  File extension {\tt "}.DAT{\tt "} is assumed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure.  A file extension must not be given
+         after the name.  It becomes the new current NDF.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         DIPSO2NDF OLD NEW
+      }{
+         This converts the DIPSO file OLD.DAT file to the NDF file
+         NEW.SDF.
+      }
+      \sstexamplesubsection{
+         DIPSO2NDF SPECTRE SPECTRE
+      }{
+         This converts the DIPSO file SPECTRE.DAT to the NDF called
+         SPECTRE in file SPECTRE.SDF.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The output NDF has a primitive data array.
+
+         \sstitem
+         The input wavelength and flux data are always of Fortran REAL
+         type, the output data arrays are of HDS type \_REAL.
+
+         \sstitem
+         The application assumes that the bad-pixel padding will not
+         cause the number of elements in the data array to exceed twice
+         the original number.
+      }
+   }
+}
+\end{document}
