@@ -2559,7 +2559,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *      Choose spatial bins
         IX = INT(0.5+(X0-RF_BASE(3,SLOT)) / RF_SCALE(3,SLOT)) + 1
-        IY = INT(0.5+(X0-RF_BASE(4,SLOT)) / RF_SCALE(4,SLOT)) + 1
+        IY = INT(0.5+(Y0-RF_BASE(4,SLOT)) / RF_SCALE(4,SLOT)) + 1
 
 *      Choose energy bin
         IF ( RF_PHA_DEF(SLOT) .AND. (RF_NDIM(SLOT).GT.4) ) THEN
