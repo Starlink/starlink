@@ -1,0 +1,950 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {225.1}
+\newcommand{\stardocauthors}   {A.J. Chipperfield\\
+                                P.W. Draper}
+\newcommand{\stardocdate}      {27 November 1998}
+\newcommand{\stardoctitle}     {EXTRACTOR\\
+                                An Astronomical Source Detection Program}
+\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocmanual}    {User Manual}
+\newcommand{\stardocabstract}  {\EXTRACTOR\ will detect sources in
+an astronomical image and build a catalogue listing them. It is based on the
+popular \SExtractor\ program, has very flexible configuration 
+facilities and can handle images and catalogues in a variety of formats.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+\newcommand{\EXTRACTOR}{\texttt{EXTRACTOR}}
+\newcommand{\CONVERT}{\texttt{CONVERT}}
+\newcommand{\SExtractor}{\texttt{SExtractor}}
+\newcommand{\IRAFURL}{http://star-www.rl.ac.uk/iraf/web/iraf-homepage.html}
+\newcommand{\FITSURL}{http://fits.gsfc.nasa.gov/}
+\newcommand{\MUD}{mud165.ps}
+\newcommand{\dash}{--}
+\begin{htmlonly}
+  \newcommand{\dash}{-}
+\end{htmlonly}
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\textbf \stardocversion \\ [4ex]}
+   {\Huge\textbf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+\section{\xlabel{introduction}\label{introduction}Introduction}
+\EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\ (Source-Extractor)
+program\footnote{BERTIN E. and ARNOUTS S., 1996, A\&AS 117,393}
+packaged as a task for the 
+\xref{Starlink Software Environment}{sg4}{}\latex{ (see SG/4)}.
+It gets parameters via the Starlink Parameter System and handles image files 
+using the Starlink 
+\xref{NDF}{sun33}{abstract}
+library \latex{(see SUN/33)}
+rather than the native FITS handling functions. In this way the program
+can read and write different image formats using the NDF library's
+\xref{`on-the-fly' conversion facility}{ssn20}{abstract}\latex{ (see SSN/20)}.
+You can easily use the Starlink
+\xref{\CONVERT}{sun55}{abstract}
+package \latex{(see SUN/55)} to set up automatic conversion from or to 
+\xref{a large number of different formats}{sun55}{the_default_conversion_commands}
+including 
+\htmladdnormallink{FITS}{\FITSURL}
+and 
+\htmladdnormallink{IRAF}{\IRAFURL}
+OIF.
+
+Native \SExtractor\ is also included in the distribution of \EXTRACTOR\.
+You can find details of \SExtractor's operation, and how to configure it, in 
+the 
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} 
+(which is issued as a Starlink Miscellaneous User Document, MUD/165) 
+\dash\ you configure \EXTRACTOR\ in much the same way, although 
+\htmlref{some restrictions}{some_restrictions}\latex{ (see
+Section~\ref{some_restrictions})} will apply.
+
+Here we describe how to run \EXTRACTOR\, and give brief
+\htmlref{instructions for running \SExtractor}{running_sextractor}
+from the Starlink distribution\latex{ in Section~\ref{running_sextractor}}.
+
+\section{\xlabel{running_extractor}\label{running_extractor}Running \EXTRACTOR}
+Like any Starlink Software Environment task, \EXTRACTOR\ may be run from the
+Unix shell or from a user-interface such as 
+\xref{ICL}{sg5}{abstract}\latex{ (see SG/5)},
+where it is controlled via the ADAM message system.
+A useful summary of the rich variety of methods of specifying parameter values
+for Starlink Environment Programs is given in
+\xref{SUN/95}{sun95}{se_param}.
+
+The examples below assume you are running from the Unix shell but the commands
+and parameters are exactly the same from ICL.
+
+After normal Starlink startup, at the shell prompt, type:
+
+\begin{quote} \begin{verbatim}
+% extract
+\end{verbatim} \end{quote}
+
+You will be prompted for the values of parameters CONFIG and IMAGE in turn:
+
+\begin{quote} \begin{verbatim}
+CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE /'image'/ >
+\end{verbatim} \end{quote}
+
+where CONFIG is the name of the `preferences' file and IMAGE is the name of 
+the image file to be processed.
+
+Suggested values are given between \texttt{//} in the prompt.
+You can accept the suggested values by just typing \verb!<RETURN>!, or type in 
+new values of your own, terminated by \verb!<RETURN>!.
+If you accept the above suggested values, \EXTRACTOR\ will process the NDF
+file \texttt{image} using the installed default configuration files to 
+produce a catalogue named \texttt{test.cat} (this name is specified in the 
+preferences file).
+
+CONFIG has a `default' value of 
+\texttt{\$EXTRACTOR\_DIR/config/default.sex}.
+This file has some 
+\htmlref{sensible defaults}{defaults}
+\latex{(described in Section~\ref{defaults})} but you may wish to copy it to 
+your own directories and modify it to your taste.
+Similarly with the other configuration files. 
+Environment variable \texttt{EXTRACTOR\_DIR} is defined, by Starlink startup,
+pointing to the directory containing the \EXTRACTOR\ executable image and the
+\texttt{config} directory.
+
+Actually, the suggested value given in a prompt will usually be the last value
+used. If you want to return to using the `default' value, you can type:
+\begin{quote} \begin{verbatim}
+% extract reset
+\end{verbatim} \end{quote}
+
+You can also provide parameter values on the command line.
+Either positionally,
+\begin{quote} \begin{verbatim}
+% extract image $EXTRACTOR_DIR/config/default.sex
+\end{verbatim} \end{quote}
+or by keyword,
+\begin{quote} \begin{verbatim}
+% extract config=$EXTRACTOR_DIR/config/default.sex
+\end{verbatim} \end{quote}
+(In this case, you would be prompted for IMAGE but not for CONFIG.)
+
+If you want to read an image in one of the 
+\xref{formats handled by \CONVERT}{sun55}{the_default_conversion_commands}, 
+just start up \CONVERT\ before running \EXTRACTOR\ and specify the image with 
+an appropriate extension. For example:
+
+\begin{quote} \begin{verbatim}
+% convert
+
+   CONVERT commands are now available -- (Version 1.1-1, 1998 June)
+
+   Defaults for automatic NDF conversion are set.
+
+   Type conhelp for help on CONVERT commands.
+   Type "showme sun55" to browse the hypertext documentation.
+
+% extract
+CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE /'image'/ > image.fit
+\end{verbatim} \end{quote}
+will use the FITS file \texttt{image.fit}, automatically converting it to a
+temporary NDF file and then reading the temporary file.
+
+Additional parameters KEYWORDS, NAME and VALUE allow
+configuration parameters specified in the preferences file to be overridden 
+without editing the file. For example:
+\begin{quote} \begin{verbatim}
+% extract KEYWORDS
+NAME > CATALOG_NAME
+VALUE > sky.cat
+NAME > CATALOG_TYPE
+VALUE > ASCII_SKYCAT
+NAME > !
+CATALOG_NAME sky.cat
+CATALOG_TYPE ASCII_SKYCAT
+CONFIG /'$EXTRACTOR_DIR/config/default.sex'/ >
+IMAGE /'image'/ >
+\end{verbatim} \end{quote}
+would change the name and type of the catalogue produced (for this
+run only). The list of changes is terminated by replying with the NULL 
+response (\texttt{!}) to the prompt.
+The 
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
+gives a full list of possible parameter names and values but it is only 
+sensible to change a few in this way.
+
+\section{\label{running_sextractor}\xlabel{running_sextractor}Running \SExtractor}
+The native version of \SExtractor\ is also distributed with \EXTRACTOR.
+This works exclusively with FITS files but will provide the full range of
+facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}.
+and it is run as described in the
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+
+Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
+\begin{quote} \begin{verbatim}
+% alias sex $EXTRACTOR_DIR/sex
+\end{verbatim}\end{quote}
+then type:
+\begin{quote}
+\texttt{\% sex \textit{image} [-c \textit{configuration-file}]} \verb!\! \\
+\texttt{? [-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
+\end{quote}
+(see the 
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}
+for details).
+
+Note that if the \texttt{-c} option is omitted, file \texttt{default.sex} in the
+current working directory will be used \dash\ if you want to use the installed
+default file, you will need to specify it explicitly.
+
+\section{\label{defaults}\xlabel{the_default_configuration}The Default Configuration}
+Directory \texttt{\$EXTRACTOR\_DIR/config} contains the default configuration
+files and a number of `classical' convolution masks.
+
+The main `preferences' file, \texttt{default.sex} is listed in
+Appendix~\ref{default_sex}.
+You will see that it uses the default convolution mask and `Neural Network
+Weights' file, and specifies that an ASCII\_HEAD-type catalogue named
+\texttt{test.cat} is to be produced.
+
+File \texttt{default.param} specifies which parameters are to be placed in the 
+catalogue. The defaults are:
+\begin{quote}\begin{verbatim}
+NUMBER
+X_IMAGE
+Y_IMAGE
+FLUX_ISO
+FLUXERR_ISO
+FLUX_AUTO
+FLUXERR_AUTO
+FLUX_MAX
+ISOAREA_IMAGE
+CXX_IMAGE
+CYY_IMAGE
+CXY_IMAGE
+THETA_IMAGE
+ELLIPTICITY
+FLAGS
+\end{verbatim}\end{quote}
+
+For a full description of the meaning of the configuration parameters, see 
+the 
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+
+\section{\xlabel{some_restrictions}\label{some_restrictions}Some Restrictions}
+\SExtractor\ uses various configuration files to provide numerous processing
+options.
+Many of these options have not been tried via the \EXTRACTOR\ route so it is
+quite possible that problems may arise. Please notify the authors if you
+come across any problems in using \EXTRACTOR. Further development and testing
+is planned.
+
+\begin{itemize}
+\item Some areas which have not been implemented are:
+\begin{itemize}
+ \item Bad pixel support.
+ \item Propagation of anclliary data into check images.
+ \item The catalogue cannot be piped to STDOUT.
+\end{itemize}
+\item Some areas which have not been tried are:
+\begin{itemize}
+ \item Weight images.
+ \item Different measurement images (double-image mode).
+ \item Catalogues other than ASCII\_SKYCAT and FITS\_LDAC.
+\end{itemize}
+\end{itemize}
+
+\section{References}
+Bertin E. and Arnouts S., 1996, A\&AS 117,393\\
+Bertin E. : MUD/165 : 
+SExtractor V2.0 User's Guide (DRAFT).\\
+Lawden M.D.: \xref{SG/4}{sg4}{} : 
+ADAM \dash\ The Starlink Software Environment.\\
+Warren-Smith R.F. : \xref{SUN/33}{sun33}{} : 
+NDF \dash\ Routines for Accessing the Extensible
+N-Dimensional Data Format.\\
+Warren-Smith R.F. : \xref{SSN/20}{ssn20}{} : 
+Adding Format Conversion Facilities to the NDF Data
+Access Library.\\
+Currie M.J. \textit{et al.} : \xref{SUN/55}{sun55}{} : 
+CONVERT \dash\ A Format-conversion Package.\\
+Bailey J.A. : \xref{SG/5}{sg5}{} : 
+ICL \dash\ The Interactive Command Language for ADAM.\\
+Currie M.J. : \xref{SUN/95}{sun95}{} : 
+KAPPA \dash\ Kernel Application Package.
+
+\newpage
+\appendix
+\section{Specification of \EXTRACTOR}
+
+\small
+\sstroutine{
+   EXTRACTOR
+}{
+   Extracts sources from astronomical images.
+}{
+   \sstdescription{
+      \EXTRACTOR\ is a Starlink Software Environment task which will detect
+      sources in an astronomical image and build a catalogue listing them. 
+      It is based on the popular \SExtractor\ program, has very flexible 
+      configuration facilities and can handle images and catalogues in a 
+      variety of formats.
+
+      The program first obtains the name of the image and the preferences 
+      file via the Starlink parameter system and reads and writes image files
+      using the Starlink NDF library, thus readily handling NDF's and opening
+      up the possibility of reading numerous other image formats via the NDF
+      library's automatic conversion facility.
+   }
+   \sstusage{
+      extract image config [keywords] [name] [value]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IMAGE = LITERAL (Read)
+      }{
+         The name of the image file to be processed. If it is an NDF,
+         the .sdf extension must be omitted.  For other format files
+         an appropriate extension (\texttt{.fit}, \texttt{.imh} \textit{etc}.)
+         is essential. \texttt{[image]}
+      }
+      \sstsubsection{
+         CONFIG = LITERAL (Read)
+      }{
+         The name of the preferences file. For details of the preference
+         file contents, see \SExtractor\ documentation.
+      }
+      \sstsubsection{
+         KEYWORDS = \_LOGICAL (Read)
+      }{
+         Whether alternative preferences are to be given to override those
+         in the specified preferences file.
+         \texttt{[FALSE]}
+      }
+      \sstsubsection{
+         NAME = LITERAL (Read)
+      }{
+         The name of a preferences file keyword to be overridden. If 
+         KEYWORDS is TRUE, pairs of NAME/VALUE parameters will be 
+         requested until a null value (\texttt{!}) is given.
+      }
+      \sstsubsection{
+         VALUE = LITERAL (Read)
+      }{
+         The alternative value for the preferences file keyword specified
+         by the corresponding NAME parameter value.
+      }
+   }
+}
+\normalsize
+\newpage
+\section{\label{default_sex}\xlabel{the_default_preferences}The Default
+Preferences}
+This is a listing of \texttt{\$EXTRACTOR\_DIR/config/default.sex}, the 
+installed default preferences file.
+\small
+\begin{quote} \begin{verbatim}
+# Default configuration file for SExtractor V1.2b14 - > 2.0
+# EB 23/07/98
+# Added environment variables for Starlink release.
+# PWD 25/11/98
+# (*) indicates parameters which can be omitted from this config file.
+
+#-------------------------------- Catalog ------------------------------------
+
+CATALOG_NAME	test.cat	# name of the output catalog
+CATALOG_TYPE	ASCII_HEAD	# "NONE","ASCII_HEAD","ASCII","FITS_1.0"
+				# or "FITS_LDAC"
+
+PARAMETERS_NAME	$EXTRACTOR_DIR/config/default.param	
+                                # name of the file containing catalog contents
+
+#------------------------------- Extraction ----------------------------------
+
+DETECT_TYPE	CCD		# "CCD" or "PHOTO" (*)
+FLAG_IMAGE	flag.fits	# filename for an input FLAG-image
+DETECT_MINAREA	5		# minimum number of pixels above threshold
+DETECT_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+ANALYSIS_THRESH	1.5		# <sigmas> or <threshold>,<ZP> in mag.arcsec-2
+
+FILTER		Y		# apply filter for detection ("Y" or "N")?
+FILTER_NAME	$EXTRACTOR_DIR/config/default.conv	
+                                # name of the file containing the filter
+
+DEBLEND_NTHRESH	32		# Number of deblending sub-thresholds
+DEBLEND_MINCONT	0.005		# Minimum contrast parameter for deblending
+
+CLEAN		Y		# Clean spurious detections? (Y or N)?
+CLEAN_PARAM	1.0		# Cleaning efficiency
+
+MASK_TYPE	CORRECT		# type of detection MASKing: can be one of
+				# "NONE", "BLANK" or "CORRECT"
+
+#------------------------------ Photometry -----------------------------------
+
+PHOT_APERTURES	5		# MAG_APER aperture diameter(s) in pixels
+PHOT_AUTOPARAMS	2.5, 3.5	# MAG_AUTO parameters: <Kron_fact>,<min_radius>
+
+SATUR_LEVEL	50000.0		# level (in ADUs) at which arises saturation
+
+MAG_ZEROPOINT	0.0		# magnitude zero-point
+MAG_GAMMA	4.0		# gamma of emulsion (for photographic scans)
+GAIN		0.0		# detector gain in e-/ADU.
+PIXEL_SCALE	1.0		# size of pixel in arcsec (0=use FITS WCS info).
+
+#------------------------- Star/Galaxy Separation ----------------------------
+
+SEEING_FWHM	1.2		# stellar FWHM in arcsec
+STARNNW_NAME	$EXTRACTOR_DIR/config/default.nnw	
+                                # Neural-Network_Weight table filename
+
+#------------------------------ Background -----------------------------------
+
+BACK_SIZE	64		# Background mesh: <size> or <width>,<height>
+BACK_FILTERSIZE	3		# Background filter: <size> or <width>,<height>
+
+BACKPHOTO_TYPE	GLOBAL		# can be "GLOBAL" or "LOCAL" (*)
+BACKPHOTO_THICK	24		# thickness of the background LOCAL annulus (*)
+
+#------------------------------ Check Image ----------------------------------
+
+CHECKIMAGE_TYPE	NONE		# can be one of "NONE", "BACKGROUND",
+				# "MINIBACKGROUND", "-BACKGROUND", "OBJECTS",
+				# "-OBJECTS", "SEGMENTATION", "APERTURES",
+				# or "FILTERED" (*)
+#CHECKIMAGE_NAME	check		# Filename for the check-image (*)
+
+#--------------------- Memory (change with caution!) -------------------------
+
+MEMORY_OBJSTACK	2000		# number of objects in stack
+MEMORY_PIXSTACK	100000		# number of pixels in stack
+MEMORY_BUFSIZE	1024		# number of lines in buffer
+
+#----------------------------- Miscellaneous ---------------------------------
+
+VERBOSE_TYPE	NORMAL		# can be "QUIET", "NORMAL" or "FULL" (*)
+
+#------------------------------- New Stuff -----------------------------------
+\end{verbatim}\end{quote}
+\normalsize
+
+% ? End of main text
+\end{document}
