@@ -1552,14 +1552,15 @@ MLABEL child in the document instance.
   to be referred to.
 <codebody>
 (define (img-eqnref #!optional (nd (current-node)))
-  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY"))
-			  ))
+  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY")))
+	(docprefix (if (have-ancestor? (normalize "programcode") nd)
+		       (hash-of-tree (document-element nd))
+		       "X")))
     (if (node-list-empty? refable-ancestor)
-	(string-append "DUMMYEQ" (gi nd) (number->string (element-number nd)))
-	(string-append "EQ" (gi refable-ancestor)
-		       (number->string (element-number refable-ancestor)))
-	)
-    ))
+	(string-append docprefix "DEQ" (gi nd)
+		       (number->string (element-number nd)))
+	(string-append docprefix "EQ" (gi refable-ancestor)
+		       (number->string (element-number refable-ancestor))))))
 
 <routine>
 <routinename>nl-to-pairs
@@ -1640,6 +1641,54 @@ there is no `media' attribute, return <code>#f</>.
 	     (tokenise-string (normalise-string medstr)
 			      boundary-char?: (lambda (c) (char=? c #\,))))
 	#f)))
+
+<routine>
+<routinename>hash-of-tree
+<purpose>Return some hash of a tree
+<description>Return some hash of a tree.  Returns a string which
+should be reasonably unique to a node sub-tree.  Works by going down a
+number of levels in the node tree, counting the number of children at
+each level, and munging them with a pseudorandomly picked RNG.
+<argumentlist>
+<parameter>nd<type>singleton-node-list<description>The node to be
+hashed
+<parameter>depth<type>number<description>The number of levels to go
+down.  This should not be supplied by external uses of this function.
+<returnvalue type='string'>A string which should be characteristic of
+the node subtree.  Starts with a letter.
+<codebody>
+(define (hash-of-tree nd #!optional (depth #f))
+  (if depth
+      ;; this is an `internal' call
+      (let ((kids (children nd)))
+	(if (node-list-empty? kids)
+	    1
+	    (if (<= depth 0)
+		(node-list-length kids)
+		(node-list-reduce
+		 kids
+		 (lambda (res n)
+		   (hash-mult res (hash-of-tree n (- depth 1))))
+		 1))))
+      ;; This is an `external' call -- call myself, and return number
+      ;; as hex string.
+      (string-append "X" (number->string (hash-of-tree nd 5) 16))))
+
+;; Get the term in a pseudo-RNG next after the number n.  Use the
+;; selector (an integer) to select which RNG to choose from.  The
+;; numbers here are the first few constants for the Quick and Dirty
+;; RNGs in Numerical Recipes, section 7.1
+(define (hash-mult n selector)
+  (let* ((qdrng '(( 6075  106 1283)
+		  ( 7875  211 1663)
+		  ( 7875  421 1663)
+		  ( 6075 1366 1283)
+		  ( 6655  936 1399)
+		  (11979  430 2531)))
+	 (consts (list-ref qdrng (modulo selector (length qdrng)))))
+    (modulo (+ (* n (cadr consts))
+	       (caddr consts))
+	    (car consts))))
 
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->

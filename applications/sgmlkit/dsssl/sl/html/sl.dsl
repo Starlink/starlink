@@ -240,23 +240,38 @@ attributes with ENTITY declared values.  Should I worry about those?
   (element meqnarray
     (make fi data: (string-append (img-equation-sysid (current-node)) "
 ")))
+  (element mdefs
+    (empty-sosofo))
   (element codecollection
     (make sequence
       (let* ((docent (attribute-string (normalize "doc")))
 	     (de (and docent
 		      (document-element-from-entity docent))))
 	(if de
-	    (node-list-reduce
-	     (node-list de		;oddly, subtree isn't in jade-1.2.1
-			(node-list-filter-by-gi
-			 (select-by-class (descendants de) 'element)
-			 (chunk-element-list)))
-	     (lambda (result i)
-	       (sosofo-append
-		result
-		(make fi data: (string-append (html-file target_nd: i) "
+	    (make sequence
+	      ;; find all the chunks and write their names
+	      (node-list-reduce
+	       (node-list de		;oddly, subtree isn't in jade-1.2.1
+			  (node-list-filter-by-gi
+			   (select-by-class (descendants de) 'element)
+			   (chunk-element-list)))
+	       (lambda (result i)
+		 (sosofo-append
+		  result
+		  (make fi data: (string-append (html-file target_nd: i) "
 "))))
-	     (empty-sosofo))
+	       (empty-sosofo))
+	      ;; now find all the maths elements, and write out their
+	      ;; equation-image filenames
+	      (node-list-reduce
+	       (node-list-filter-by-gi
+		(select-by-class (descendants de) 'element)
+		(maths-element-list))
+	       (lambda (result i)
+		 (sosofo-append
+		  result
+		  (process-node-list i)))
+	       (empty-sosofo)))
        	    (error "codecollection: missing required doc attribute")))))
   )
 

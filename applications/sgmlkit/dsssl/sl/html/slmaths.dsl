@@ -76,7 +76,8 @@ appropriate arguments
   (list (normalize "m")
 	(normalize "mequation")
 	(normalize "meqnarray")
-	(normalize "mdefs")))
+	(normalize "mdefs")
+	(normalize "codecollection")))
 
 (mode get-maths-mode
   (element m
@@ -107,7 +108,20 @@ appropriate arguments
       (process-children)
       (make formatting-instruction data: (string-append "
 %%imgmath eqnarray " (img-eqnref) "
-")))))
+"))))
+  (element codecollection
+    (let ((docent (attribute-string (normalize "doc"))))
+      (if docent
+	  (let ((mathels (node-list-filter-by-gi
+			  (select-by-class
+			   (descendants (document-element-from-entity docent))
+			   'element)
+			  (maths-element-list))))
+	    (if (node-list-empty? mathels)
+		(empty-sosofo)
+		(with-mode get-maths-mode
+		  (process-node-list mathels))))
+	  (error "Codecollection has no document entity")))))
 
 <routine>
 <routinename>img-equation

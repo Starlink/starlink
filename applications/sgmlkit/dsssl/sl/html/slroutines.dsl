@@ -703,11 +703,14 @@ $Id$
   (let* ((de (document-element nd))
 	 (db (select-elements (children de) 'docblock))
 	 (ti (select-elements (children db) 'title)))
+;    (string-append (root-file-name de)
+;		   "-P-"
+;		   (number->string (node-list-length (children de)))
+;		   "-"
+;		   (number->string (string-length (data ti))))
     (string-append (root-file-name de)
-		   "-P-"
-		   (number->string (node-list-length (children de)))
-		   "-"
-		   (number->string (string-length (data ti))))))
+		   "-P"
+		   (hash-of-tree de))))
 
 
 (element coderef
