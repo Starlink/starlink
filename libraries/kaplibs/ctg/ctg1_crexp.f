@@ -237,10 +237,15 @@
             IF( ISTAT .EQ. CTG__OK ) THEN
                DIR1 = DIR2
 
+*  Some versions of "ls -d" retain the trailing "/" and some dont.
+*  Ensure that the directory spec ends with a "/".
+               IAT = CHR_LEN( DIR1 )
+               IF( DIR1( IAT : IAT ) .NE. '/' ) THEN
+                  CALL CHR_APPND( '/', DIR1, IAT )
+               END IF
+
 *  Reconstruct the full file name with the expanded directory.
-               NAME = ' '
-               IAT = 0
-               CALL CHR_APPND( DIR1, NAME, IAT )
+               NAME = DIR1
                CALL CHR_APPND( BN1, NAME, IAT )
                CALL CHR_APPND( SUF1, NAME, IAT )
                CALL CHR_APPND( EXT1, NAME, IAT )
