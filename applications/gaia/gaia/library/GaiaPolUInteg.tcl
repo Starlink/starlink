@@ -185,9 +185,16 @@ itcl::class gaia::GaiaPolUInteg {
 #  -----------------------------------------------------------------
    public method calc { {item ""} } {
 
+#  Are the column names OK?
+      if { "$itk_option(-changecmd)" != "" } {
+         set ok [eval $itk_option(-changecmd)]
+      } else {
+         set ok 1
+      }
+
 #  Do nothing if the required statistics have already been calculated or
-#  if no data is available.
-      if { !$done_ && $cat_ != "" } {
+#  if no data is available, or if the column names need checking.
+      if { !$done_ && $cat_ != "" && $ok } {
 
 #  Clear the table.
          $itk_component(table) clear
@@ -226,6 +233,9 @@ itcl::class gaia::GaiaPolUInteg {
 #  Get the data for this single row.
                   set row_ [lindex [$single getData] 0]
 
+#  Also store the column names in the binned catalogue.
+                  set sheads_ [$single getHeadings]
+
 #  Annull the unrequired objects.
                   $single annull
                }
@@ -250,11 +260,12 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Form a list of the values of the required columns.
             set vals ""
-            set icol -1
-            foreach head $headings_ {
-               incr icol
-               if { [lsearch -exact $cols $head] != -1 } {
+            foreach head $cols {
+               set icol [lsearch -exact $sheads_ $head]
+               if { $icol != -1 } {
                   lappend vals [lindex $row_ $icol]
+               } else {
+                  lappend vals ""
                }
             }
 
@@ -429,9 +440,6 @@ itcl::class gaia::GaiaPolUInteg {
 #  ------------------------------------------------------------------------
    public method newVals { {item ""} } {
       saveOld
-      if { "$itk_option(-changecmd)" != "" } {
-         eval $itk_option(-changecmd)
-      }
 
 #  Ensure the table columns and rows are as required.
       tabConfig
@@ -706,7 +714,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  destroyed.
    itk_option define -optdir optdir Optdir {}
 
-#  A command to call when any control values are changed by the user.
+#  A command to call when new statistics are about to be calculated.
    itk_option define -changecmd changecmd Changecmd {}
 
 #  Thw window containing the progress bar
@@ -746,6 +754,9 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  A row of column values produced from the last binning operation.
        variable row_ ""
+
+#  The column headings from the last binned catalogue.
+       variable sheads_ ""
 
    }
 

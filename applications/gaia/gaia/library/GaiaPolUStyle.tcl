@@ -113,7 +113,13 @@ itcl::class gaia::GaiaPolUStyle {
             foreach name [array names values_] {
                if { [regexp {([^,]+),(.*)} $name match obj elem] } {
                   if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
+                     if { $elem == "angcol" } {
+                        puts $fd "set option($elem) \{$acol_\}"
+                     } elseif { $elem == "lencol" } {
+                        puts $fd "set option($elem) \{$lcol_\}"
+                     } else {
+                        puts $fd "set option($elem) \{$values_($name)\}"
+                     }
                      unset values_($name)
                   }
                }
@@ -133,14 +139,19 @@ itcl::class gaia::GaiaPolUStyle {
 #  Store the new headings.
       setHeadings [$cat getHeadings]
 
-#  For the polarization degree and angle quantities, if the column name 
-#  storing the quantity is not the same as the quantity name, set the column 
-#  name.
-      set col [ $cat getColNam P ]
-      if { $col != "P" } { setLcol $col }
+#  If the current vector angle column is no longer available, we need to
+#  select a new one. Use the vector angle column stored in the catalogue
+#  (if there is one).
+      if { [lsearch $headings_ [getAcol]] == -1 } {
+         set col [ $cat getColNam ANG ]
+         if { $col != "" } { setAcol $col }
+      }     
 
-      set col [ $cat getColNam ANG ]
-      if { $col != "ANG" } { setAcol $col }
+#  Do the same for the vector length column.
+      if { [lsearch $headings_ [getLcol]] == -1 } {
+         set col [ $cat getColNam P ]
+         if { $col != "" } { setLcol $col }
+      }     
 
    }
 
@@ -158,6 +169,8 @@ itcl::class gaia::GaiaPolUStyle {
       set values_($this,uflash) [::gaia::GaiaPolStyle::getUflash]
       set values_($this,arot) [::gaia::GaiaPolStyle::getArot]
       set values_($this,nvec) [::gaia::GaiaPolStyle::getNvec]
+      set values_($this,angcol) [::gaia::GaiaPolStyle::getAcol]
+      set values_($this,lencol) [::gaia::GaiaPolStyle::getLcol]
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -172,6 +185,10 @@ itcl::class gaia::GaiaPolUStyle {
          }
       }
 
+#  Save the preferred anfle and length columns, read from the options file.
+      set acol_ $values_($this,angcol)      
+      set lcol_ $values_($this,lencol)      
+
 #  Replace illegal blank values read from the options file with the hardwired 
 #  defaults.
       if { $values_($this,sclr) == "" } { set values_($this,sclr) [::gaia::GaiaPolStyle::getSclr] }
@@ -185,8 +202,6 @@ itcl::class gaia::GaiaPolUStyle {
 #  Hard-wired defaults are used for option values which depend on the 
 #  particular vector map being displayed.
       set values_($this,mag) [::gaia::GaiaPolStyle::getMag]
-      set values_($this,lencol) [::gaia::GaiaPolStyle::getLcol]
-      set values_($this,angcol) [::gaia::GaiaPolStyle::getAcol]
 
 #  Use these values if the controls have been created.
       if { $created_ } { activ }
@@ -197,6 +212,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  and also set the GUI control.
 #  ---------------------------------------------------------------------------
    public method setLcol {col} {
+      set lcol_ $col
       ::gaia::GaiaPolStyle::setLcol $col
       set values_($this,lencol) $col
    }
@@ -219,6 +235,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Set the vector angle column.
 #  -----------------------------
    public method setAcol {col} {
+      set acol_ $col
       ::gaia::GaiaPolStyle::setAcol $col
       set values_($this,angcol) $col
    }
@@ -445,6 +462,8 @@ itcl::class gaia::GaiaPolUStyle {
       set values_($this,uclr) [$itk_component(uclr) get]
       set values_($this,lencol) [$itk_component(lencol) get]
       set values_($this,angcol) [$itk_component(angcol) get]
+      set acol_ $values_($this,angcol)
+      set lcol_ $values_($this,lencol)
 
 #  Use the current values.
       if { "$itk_option(-changecmd)" != "" } {
@@ -731,13 +750,18 @@ itcl::class gaia::GaiaPolUStyle {
             set ok 1
          }
 
-#  Select the menu item which corresponds to the current Lcol property.
-         if { $ok } {
-            set values_($this,lencol) [::gaia::GaiaPolStyle::getLcol]
+#  Add a blank value to the end of the menu.
+         $itk_component(lencol) add -label "" -value "" 
 
-#  If no headings are available, just add a single blank value and select it.
+#  Select the menu item which corresponds to the current preferred Lcol 
+#  property, if any. Otherwise, select the blank item.
+         if { $ok } {
+            if { [lsearch -exact $headings_ $lcol_] != -1 } {
+               set values_($this,lencol) $lcol_
+            } else {
+               set values_($this,lencol) ""
+            }
          } else {
-            $itk_component(lencol) add -label "" -value "" 
             set values_($this,lencol) ""
          }
 
@@ -751,10 +775,14 @@ itcl::class gaia::GaiaPolUStyle {
                -value $colnam 
             set ok 1
          }
+         $itk_component(angcol) add -label "" -value "" 
          if { $ok } {
-            set values_($this,angcol) [::gaia::GaiaPolStyle::getAcol]
+            if { [lsearch -exact $headings_ $acol_] != -1 } {
+               set values_($this,angcol) $acol_
+            } else {
+               set values_($this,angcol) ""
+            }
          } else {
-            $itk_component(lencol) add -label "" -value "" 
             set values_($this,angcol) ""
          }
       }
@@ -777,6 +805,10 @@ itcl::class gaia::GaiaPolUStyle {
 #  Protected data members: 
 #  =======================
    protected {
+
+#  Preferred vector angle and length columns.
+      variable acol_ ""
+      variable lcol_ ""
 
 #  Have the control widgets been created yet?
       variable created_ 0

@@ -1002,6 +1002,8 @@ itcl::class gaia::GaiaPolDisp {
 #  Reset the original vector colour so long as the vector has not changed
 #  its unselected/selected status.
             if { $state == $vec_st_ } {
+
+
                $canvas_ itemconfigure $vec_id_ -fill $col
             }
 

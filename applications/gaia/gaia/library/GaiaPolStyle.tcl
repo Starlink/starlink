@@ -458,7 +458,7 @@ itcl::class gaia::GaiaPolStyle {
       set headings [$cat getHeadings]
       set ret [lsearch -exact $headings $col]
       if { $ret == -1 } {
-         error_dialog "The current vector $w columns ($col) does not exist within the catalogue. Columns are \"$headings\""
+         info_dialog "Please use the \"Rendering\" panel to indicate which column holds the vector $w values."
       }
       return $ret
    }

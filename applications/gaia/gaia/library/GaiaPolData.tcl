@@ -231,32 +231,34 @@ itcl::class gaia::GaiaPolData {
 #  Ensure the POLPACK configuration file is appropriate for the column
 #  names being used. If a file already exists, a temporary copy of it is 
 #  taken, and the name of the copy returned.
-      set oldrc [makepolrc]
+      set oldrc [makepolrc "X Y Z" ]
+      if { $oldrc != "*" } {
 
 #  Get the GaiaApp which provides access to the Polpack "polzconv" command.
-      set polzconv [findGaiaApp "polzconv"]
+         set polzconv [findGaiaApp "polzconv"]
 
 #  Skip if the above failed.
-      if { $polzconv != "" } {
+         if { $polzconv != "" } {
 
 #  Construct the polzconv parameter list.     
-         set plist "cat=$polfile_ "
-         if { $type == "zaval" } {
-            append plist "zcolval=! zaxval=$z "
-         } else {
-            append plist "zcolval=$z zaxval=! "
-         } 
+            set plist "cat=$polfile_ "
+            if { $type == "zaval" } {
+               append plist "zcolval=! zaxval=$z "
+            } else {
+               append plist "zcolval=$z zaxval=! "
+            } 
 
 #  Run polzconv 
-         run $polzconv $plist
+            run $polzconv $plist
 
 #  Form the returned list holding the Z column and axis values calculated by 
 #  polzconv.
-         set ret [list [getparam $polzconv zcoluse] [getparam $polzconv zaxuse]]
-      }
+            set ret [list [getparam $polzconv zcoluse] [getparam $polzconv zaxuse]]
+         }
 
 #  Reinstate the original polpack config file.
-      clearpolrc $oldrc
+         clearpolrc $oldrc
+      }
 
 #  Reset the progress bar.
       $pbar_ reset
@@ -283,76 +285,78 @@ itcl::class gaia::GaiaPolData {
 #  Ensure the POLPACK configuration file is appropriate for the column
 #  names being used. If a file already exists, a temporary copy of it is 
 #  taken, and the name of the copy returned.
-      set oldrc [makepolrc]
+      set oldrc [makepolrc "X Y I P ANG" ]
+      if { $oldrc != "*" } {
 
 #  If we are using the existing data array, we will bin the associated
 #  polpack catalogue.
-      if { $data == "" } {
-         set file $polfile_
+         if { $data == "" } {
+            set file $polfile_
 
 #  Otherwise, we have to create a new polpack catalogue containing the
 #  supplied data.
-      } else {
+         } else {
 
 #  Decide on a name for the new polpack catalogue.
-         set file [tmpFile]
-         append file ".FIT"
+            set file [tmpFile]
+            append file ".FIT"
 
 #  Create a new Tclfile containing the supplied data.
-         set tclfile [newTclFile $data]
+            set tclfile [newTclFile $data]
 
 #  Save the data as a polpack catalogue. This is done using polpack 
 #  application polrdtcl.
-         tclSave $tclfile $polfile_ $file
+            tclSave $tclfile $polfile_ $file
 
-      }
+         }
 
 #  Check the catalogue was produced.
-      if { [file exists $file] } {
+         if { [file exists $file] } {
 
 #  Get the GaiaApp which provides access to the Polpack "polbin" command.
-         set polbin [findGaiaApp "polbin"]
+            set polbin [findGaiaApp "polbin"]
 
 #  Skip if the above failed.
-         if { $polbin != "" } {
+            if { $polbin != "" } {
 
 #  Decide on a name for the binned catalogue.
-            if { $binfile == "" } {
-               set binfile [tmpFile]
-               append binfile ".FIT"
-            }
+               if { $binfile == "" } {
+                  set binfile [tmpFile]
+                  append binfile ".FIT"
+               }
 
 #  Convert the debias value to an PCS YES/NO value.
-            if { $debias } {
-               set debias YES
-            } else {
-               set debias NO
-            }
+               if { $debias } {
+                  set debias YES
+               } else {
+                  set debias NO
+               }
 
 #  Convert the integrate value to an PCS YES/NO value.
-            if { $integ } {
-               set integ YES
-            } else {
-               set integ NO
-            }
+               if { $integ } {
+                  set integ YES
+               } else {
+                  set integ NO
+               }
 
 #  Run polbin on the catalogue created above from $this.
-            run $polbin "in=$file out=$binfile box=$box zbox=1 method=$method debias=$debias minval=$minval sigmas=$sigmas integrate=$integ radec=yes accept"
+               run $polbin "in=$file out=$binfile box=$box zbox=1 method=$method debias=$debias minval=$minval sigmas=$sigmas integrate=$integ radec=yes accept"
 
 #  Check the binned catalogue was created.
-            if { [file exists $binfile] } {
-               set ret $binfile
+               if { [file exists $binfile] } {
+                  set ret $binfile
+               }
             }
          }
-      }
 
 #  Reinstate the original polpack config file.
-      clearpolrc $oldrc
+         clearpolrc $oldrc
 
 #  Delete any temporary files.
-      if { $data != "" } { 
-         catch { file delete $file }
-         catch { file delete $tclfile }
+         if { $data != "" } { 
+            catch { file delete $file }
+            catch { file delete $tclfile }
+         }
       }
 
 #  Reset the progress bar.
@@ -544,30 +548,30 @@ itcl::class gaia::GaiaPolData {
       set fd [open $newfile w]
 
 #  Write out all the attributes of this PolData to the file.
-      puts $fd "set gotwcs_   \"$gotwcs_\""
-      puts $fd "set uses_     \"$uses_\""
-      puts $fd "set headings_ \"$headings_\""  
-      puts $fd "set xlo_      \"$xlo_\""       
-      puts $fd "set ylo_      \"$ylo_\""       
-      puts $fd "set zlo_      \"$zlo_\""       
-      puts $fd "set xhi_      \"$xhi_\""       
-      puts $fd "set yhi_      \"$yhi_\""       
-      puts $fd "set zhi_      \"$zhi_\""       
-      puts $fd "set ncol_     \"$ncol_\""      
-      puts $fd "set nrow_     \"$nrow\""      
-      puts $fd "set ra_       \"$ra_\""       
-      puts $fd "set dec_      \"$dec_\""      
-      puts $fd "set equinox_  \"$equinox_\""  
-      puts $fd "set epoch_    \"$epoch_\""  
-      puts $fd "set xrefpix_  \"$xrefpix_\""  
-      puts $fd "set yrefpix_  \"$yrefpix_\""  
-      puts $fd "set nxpix_    \"$nxpix_\""    
-      puts $fd "set nypix_    \"$nypix_\""    
-      puts $fd "set secpix_   \"$secpix_\""   
-      puts $fd "set fmts_     \"$fmts_\""     
-      puts $fd "set hfmts_    \"$hfmts_\""    
-      puts $fd "set zcunit_   \"$zcunit_\""    
-      puts $fd "set zaunit_   \"$zaunit_\""    
+      puts $fd "set gotwcs_   \"[blanks $gotwcs_]\""
+      puts $fd "set uses_     \"[blanks $uses_]\""
+      puts $fd "set headings_ \"[blanks $headings_]\""  
+      puts $fd "set xlo_      \"[blanks $xlo_]\""       
+      puts $fd "set ylo_      \"[blanks $ylo_]\""       
+      puts $fd "set zlo_      \"[blanks $zlo_]\""       
+      puts $fd "set xhi_      \"[blanks $xhi_]\""       
+      puts $fd "set yhi_      \"[blanks $yhi_]\""       
+      puts $fd "set zhi_      \"[blanks $zhi_]\""       
+      puts $fd "set ncol_     \"[blanks $ncol_]\""      
+      puts $fd "set nrow_     \"[blanks $nrow]\""      
+      puts $fd "set ra_       \"[blanks $ra_]\""       
+      puts $fd "set dec_      \"[blanks $dec_]\""      
+      puts $fd "set equinox_  \"[blanks $equinox_]\""  
+      puts $fd "set epoch_    \"[blanks $epoch_]\""  
+      puts $fd "set xrefpix_  \"[blanks $xrefpix_]\""  
+      puts $fd "set yrefpix_  \"[blanks $yrefpix_]\""  
+      puts $fd "set nxpix_    \"[blanks $nxpix_]\""    
+      puts $fd "set nypix_    \"[blanks $nypix_]\""    
+      puts $fd "set secpix_   \"[blanks $secpix_]\""   
+      puts $fd "set fmts_     \"[blanks $fmts_]\""     
+      puts $fd "set hfmts_    \"[blanks $hfmts_]\""    
+      puts $fd "set zcunit_   \"[blanks $zcunit_]\""    
+      puts $fd "set zaunit_   \"[blanks $zaunit_]\""    
 
 #  Write out the supplied data array
       puts $fd "set data_ \{ \\"
@@ -639,8 +643,10 @@ itcl::class gaia::GaiaPolData {
 #  Saves a copy of any existing polpack configuration file, and then
 #  creates a new one holding the column definitions for $this. The name of 
 #  the file holding the copy of the original configuarion file is returned.
+#  $req is a list of required quanities. Reports an error and returns "*" if 
+#  any required quantity is not available.
 #  ------------------------------------------------------------------------
-   protected method makepolrc {} {
+   protected method makepolrc { req } {
 
 #  Get the name to use for the polpack config file.
       set rcfile [rcfile]
@@ -653,13 +659,36 @@ itcl::class gaia::GaiaPolData {
          set oldrc ""
       }
 
+#  Open the config for for appending.
+      set fd [open $rcfile "a+"]
+
 #  Modify the config file by appending the column definitions for $this 
 #  to the end of the original rc file, overriding any earlier in the file.
-      set fd [open $rcfile "a+"]
-      foreach q "X Y Z RA DEC I Q U V DI DQ DU DV P ANG PI DP DANG DPI" {
-         puts $fd "Column $q [getColNam $q]"
+      set ok 1
+      foreach q "X Y Z RA DEC I Q U V DI DQ DU DV PI P DP ANG DANG DPI" {
+         set colnam [getColNam $q]
+
+#  If no column is available for this qunatity, report an error and abort
+#  if the quantity is one of the required quantities.
+         if { $colnam == "" } {
+            if { [lsearch -exact $req $q] != -1 } {
+               error_dialog "Please use the \"Column Names\" panel to indicate which column holds $q values."
+               set ok 0
+               break 
+            }
+         } 
+         puts $fd "Column $q $colnam"
       }
+
+#  Close the new config file.
       close $fd
+
+#  If any required columns were missing, delete the new config file and
+#  return "*".
+      if { !$ok } {
+         clearpolrc $oldrc
+         set oldrc "*"
+      }
 
 #  Return the name of the original file (if any).
       return $oldrc
@@ -820,18 +849,39 @@ itcl::class gaia::GaiaPolData {
       }
    }
 
-#  Private methods:
+#  Class procedures:
 #  ================
 
 #  Expand name to full path relative to current directory.
 #  --------------------------------------------------------
-   private method full_name {name} {
+   proc full_name {name} {
       if { "[string index $name 0]" != "/"} {
          set fname [pwd]/$name
       } else {
          set fname $name
       }
       return $fname
+   }
+
+
+#  Replace blank elements of a list with a string consisting of two
+#  adjacent double quotes.
+#  ----------------------------------------------------------------
+   proc blanks { l } {
+      if { [llength $l] < 2 } {
+         set ret $l
+      } else {
+         set ret ""
+         foreach el $l {
+            if { $el == "" } { 
+               append ret \{\}
+            } else {
+               append ret $el
+            }
+            append ret " "
+         }
+      }
+      return $ret
    }
 
 #  Public data members:

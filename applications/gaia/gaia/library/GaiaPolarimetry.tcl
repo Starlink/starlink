@@ -330,7 +330,8 @@ itcl::class gaia::GaiaPolarimetry {
       itk_component add integ {
           ::gaia::GaiaPolUInteg $w_.integ -optdir $optdir_ \
                                         -pbar [code $pbar_] \
-                                        -actioncmd "[code $this addAction]" 
+                                        -actioncmd "[code $this addAction]" \
+                                        -changecmd "[code $this newInteg]" 
       }
       $itk_component(notebook) add -label "Integrate" \
                                    -command [code $this selectPage integ]
@@ -604,9 +605,9 @@ itcl::class gaia::GaiaPolarimetry {
                setHold "Configuring control panels..."
 
 #  Notify the control pages that a new catalogue has been opened.
-               $itk_component(newsty) newCat $newcat_
                $itk_component(cols) newCat $newcat_
                $itk_component(spec) newCat $newcat_
+               $itk_component(newsty) newCat $newcat_
 
 #  Reset the key properties used by the display so that default values
 #  will be used when the next key is created.
@@ -759,23 +760,28 @@ itcl::class gaia::GaiaPolarimetry {
 #  Otherwise...
       } else {
 
+#  If there are any unknown columns in the catalogue, ask the user to
+#  check the column names.
+         if { [$itk_component(cols) colsOK] } {
+
 #  Get the binning parameters from the binning control panel.
-         set box [$itk_component(bin) getBox]
-         set method [$itk_component(bin) getMethod]
-         set debias [$itk_component(bin) getDebias]
-         set minval [$itk_component(bin) getMinVal]
-         set sigmas [$itk_component(bin) getSigmas]
+            set box [$itk_component(bin) getBox]
+            set method [$itk_component(bin) getMethod]
+            set debias [$itk_component(bin) getDebias]
+            set minval [$itk_component(bin) getMinVal]
+            set sigmas [$itk_component(bin) getSigmas]
 
 #  Create a new PolCat which is a binned copy of the currently displayed 
 #  PolCat.
-         set cat [$newcat_ bin $box $method $debias $minval $sigmas]
+            set cat [$newcat_ bin $box $method $debias $minval $sigmas]
 
 #  If succsful, replace the original with the new, and display the new 
 #  catalogue.
-         if { $cat != "" } {
-            $newcat_ annull
-            set newcat_ $cat
-            redraw 1 0
+            if { $cat != "" } {
+               $newcat_ annull
+               set newcat_ $cat
+               redraw 1 0
+            }
          }
       }
    }
@@ -1004,11 +1010,25 @@ itcl::class gaia::GaiaPolarimetry {
       }
    }
 
+#  Called when a new integration is about to be performed using the
+#  "Integrate" panel.
+#  --------------------------------------------------------------------
+   protected method newInteg {} {
+
+#  If there are any unknown columns in the catalogue, ask the user to
+#  check the column names.
+      return [$itk_component(cols) colsOK]
+
+   }
+
 #  Called when new column names are chosen. Get the name of the changed 
 #  column and set its value in the GaiaPolCat.
 #  --------------------------------------------------------------------
    protected method newCols {q} {
-      $newcat_ setColNam $q [$itk_component(cols) getCol $q]
+      if { $newcat_ != "" } {
+         $newcat_ setColNam $q [$itk_component(cols) getCol $q]
+         $itk_component(integ) newStats $newcat_
+      }
    }
 
 #  Called when new selction options are chosen. $reset indicates if the
@@ -1234,7 +1254,7 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Store blank column headings in all the options pages which use column
 #  names.
-      $itk_component(cols) setHeadings ""
+      $itk_component(cols) newCat ""
       $itk_component(stats) clear
       $itk_component(integ) clear
 
@@ -1262,7 +1282,7 @@ itcl::class gaia::GaiaPolarimetry {
       catch {$itk_component(spec) setZvals "" }
 
 #  Reset the column headings in the relevant options panels.
-      catch {$itk_component(cols) setHeadings ""}
+      catch {$itk_component(cols) newCat ""}
       catch {$itk_component(stats) setHeadings ""}
       catch {$itk_component(integ) setHeadings ""}
 
