@@ -47,6 +47,7 @@
       CHARACTER*(NFILE) ARG,ARGNAME,ARGVALUE
       INTEGER LUINP,LUREP,LUSYN,LULOG,LU,I,J,N
       INTEGER ARGN
+      INTEGER ACTION
 
       INTEGER IARGC
 
@@ -57,6 +58,7 @@
       LULOG=0
       FITSFN=' '                ! suppresses generation of FITS files
       FITSWCSSTYLE=DEFWCSSTYLE
+      ACTION=0                  ! Call astrml
 
       ARGN=1
       DO WHILE (ARGN.LE.IARGC())
@@ -66,19 +68,25 @@
             I=I+1
             IF (I.EQ.NFILE) GO TO 9015
          ENDDO
+
          J=I
-         DO WHILE (ARG(J:J).NE.'=')
+         IF (ARG(1:1).EQ.'-') THEN
+            ARGNAME=ARG
+         ELSE
+            DO WHILE (ARG(J:J).NE.'=')
+               J=J+1
+               IF (J.EQ.NFILE) GO TO 9015
+            ENDDO
+            ARGNAME=ARG(I:J-1)
             J=J+1
-            IF (J.EQ.NFILE) GO TO 9015
-         ENDDO
-         ARGNAME=ARG(I:J-1)
-         J=J+1
-         I=J
-         DO WHILE (ARG(J:J).NE.' ')
-            J=J+1
-            IF (J.GE.NFILE) GO TO 9015
-         ENDDO
-         ARGVALUE=ARG(I:J-1)
+            I=J
+            DO WHILE (ARG(J:J).NE.' ')
+               J=J+1
+               IF (J.GE.NFILE) GO TO 9015
+            ENDDO
+            ARGVALUE=ARG(I:J-1)
+         ENDIF
+
          IF (ARGNAME(1:5).EQ."input") THEN
             LUINP=11
             LU=LUINP
@@ -107,6 +115,12 @@
             FITSFN=ARGVALUE
          ELSE IF (ARGNAME(1:8).EQ."wcsstyle") THEN
             FITSWCSSTYLE=ARGVALUE
+         ELSE IF (ARGNAME(1:6).EQ."--help") THEN
+            ACTION=1
+         ELSE IF (ARGNAME(1:9).EQ."--version") THEN
+            ACTION=2
+         ELSE IF (ARGNAME(1:2).EQ."-V") THEN
+            ACTION=2
          ELSE
             GO TO 9016
          ENDIF
@@ -116,8 +130,40 @@
 
 *   Don't do anything with the FITS filename template -- leave that to astrml
 
-*  Call the ASTROM mainline program and exit when finished
-      CALL ASTRML(LUINP,LUREP,LUSYN,LULOG,FITSFN,FITSWCSSTYLE)
+      IF (ACTION.EQ.0) THEN
+*      Call the ASTROM mainline program and exit when finished
+         CALL ASTRML(LUINP,LUREP,LUSYN,LULOG,FITSFN,FITSWCSSTYLE)
+
+      ELSE IF (ACTION.EQ.1) THEN
+*      Show help
+         WRITE(*,
+     :    '("Usage: astrom [options] key=value ...")')
+         WRITE(*,
+     :   '("  input=..    ASTROM input file [default=astrom.dat]")')
+         WRITE(*,
+     :   '("  report=..   Report output file [default=astrom.lis]")')
+         WRITE(*,
+     :   '("  summary=..  Summary file [default:terminal]")')
+         WRITE(*,
+     :   '("  log=..      Log file [default:discarded")')
+         WRITE(*,
+     :   '("  fits=..     FITS file prefix [default:none generated]")')
+         WRITE(*,
+     :   '("  wcsstyle=.. WCS style for FITS [default varies]")')
+         WRITE(*,
+     :   '("  --help      Show this help")')
+         WRITE(*,
+     :   '("  --version   Show version")')
+         WRITE(*,
+     :   '("  -V          ditto")')
+
+      ELSE IF (ACTION.EQ.2) THEN
+         WRITE(*,'("ASTROM version ",a)') ASTROMVERSION
+
+      ELSE
+         WRITE(*,'("ASTROM BUG -- impossible action (",i3,")!")') action
+      ENDIF
+      
       GO TO 9999
 
 *  Errors
