@@ -103,6 +103,14 @@ f     The WcsMap class does not define any new routines beyond those
 *        More corrections to MapMerge: Cleared up errors in the use of the 
 *        supplied invert flags, and corrected logic for deciding which 
 *        neighbouring Mapping to swap with. 
+*     12-JUL-1999 (DSB):
+*        -  Report an error if too many or two few projection parameters are
+*        supplied in a WcsMap.
+*        -  Corrected MapMerge to prevent unset projection parameters
+*        being copied to any new WcsMaps.
+*        -  Correct handling of invert flags in WcsPerm.
+*     16-JUL-1999 (DSB):
+*        Fixed memory leak in MapMerge.
 *class--
 */
 
@@ -1593,6 +1601,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Local Variables: */
    AstMapping *mc[2];    /* Copies of supplied Mappings to swap */
    AstMapping *neighbour; /* Pointer to neighbouring Mapping */
+   AstMapping *smc0;     /* Simplied Mapping */
+   AstMapping *smc1;     /* Simplied Mapping */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
@@ -1643,8 +1653,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    } else if( series ) {
 
 /* Store the classes of the neighbouring Mappings in the list. */
-    class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
-    class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
+      class1 = ( where > 0 ) ? astGetClass( ( *map_list )[ where - 1 ] ) : NULL;
+      class2 = ( where < *nmap - 1 ) ? astGetClass( ( *map_list )[ where + 1 ] ) : NULL;
 
 /* A WcsMap can only combine with its own inverse. Set a flag indicating
    that we have not yet found a neighbour with which the WcsMap can be
@@ -1833,10 +1843,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If neither of the swapped Mappings can be simplified further, then there
    is no point in swapping the Mappings, so just annul the map copies. */
-            if( astGetClass( astSimplify( mc[0] ) ) == 
-                astGetClass( mc[0] ) &&
-                astGetClass( astSimplify( mc[1] ) ) == 
-                astGetClass( mc[1] ) ) {
+            smc0 = astSimplify( mc[0] );
+            smc1 = astSimplify( mc[1] );
+
+            if( astGetClass( smc0 ) == astGetClass( mc[0] ) &&
+                astGetClass( smc1 ) == astGetClass( mc[1] ) ) {
 
                mc[ 0 ] = (AstMapping *) astAnnul( mc[ 0 ] );
                mc[ 1 ] = (AstMapping *) astAnnul( mc[ 1 ] );
@@ -1857,6 +1868,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                result = i1;
 
             }
+
+/* Annul the simplied Mappings */
+            smc0 = astAnnul( smc0 );
+            smc1 = astAnnul( smc1 );
+
          }
       }
    }
@@ -2338,10 +2354,18 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                    astClass( this ), FindPrjData( map->type )->desc  );
 
 /* Report an error if the projection parameters were invalid. */
-       } else if ( status == 2 ){
+       } else if ( status == 2 ) {
           astError( AST__WCSPA, "astTransform(%s): The %s has an unusable "
                     "parameter set for a %s projection.", astClass( this ),
                     astClass( this ), FindPrjData( map->type )->desc  );
+
+/* Report an error if there are too many or too few projection
+   parameters. */
+       } else if ( status == 3 ) {
+          astError( AST__WCSPA, "astTransform(%s): Incorrect number of "
+                    "projection parameters supplied in a %s for a %s "
+                    "projection.", astClass( this ), astClass( this ), 
+                    FindPrjData( map->type )->desc  );
        }
 
 /* Copy the remaining axes (i.e. all axes except the longitude and latitude 
@@ -2600,9 +2624,11 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
                          outperm[ latax ] + 1, "" );
       }
 
-/* Copy the projection parameters. */
+/* Copy any projection parameters which have been set. */
       for( ip = 0; ip < AST__WCSMX; ip++ ){
-         astSetProjP( w1, ip, astGetProjP( wm, ip ) );
+         if( astTestProjP( wm, ip ) ) {
+            astSetProjP( w1, ip, astGetProjP( wm, ip ) );
+         }
       }
 
 /* Set the invert flag. */
@@ -2621,8 +2647,11 @@ static void WcsPerm( AstMapping **maps, int *inverts, int iwm  ){
 /* Replace the supplied WcsMap with the one created above, swapping the
    order. */
    if( astOK ){
+      old_pinv = inverts[ 1 - iwm ] ;
+
       (void) astAnnul( wm );
       maps[ 1 - iwm ] = (AstMapping *) w1;
+      inverts[ 1 - iwm ] = inverts[ iwm ] ;
 
       maps[ iwm ] = (AstMapping *) pm;
       inverts[ iwm ] = old_pinv;

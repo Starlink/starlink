@@ -245,6 +245,8 @@ f     using AST_GRID
 *        Modified all calls to the "pow" maths function to avoid using
 *        literal constants as arguments. This seems to cause segmentation
 *        violations on some systems.
+*     16-JUL-1999 (DSB):
+*        Fixed memory leaks in EdgeCrossings and EdgeLabels.
 *class--
 */
 
@@ -8076,7 +8078,6 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    drawable labels. */
       nedge[ axis ] = naxlab;
       llist[ axis ] = labellist;
-
    }
 
 /* We now know how many labels would be produced on each axis if edge
@@ -8113,7 +8114,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    }
 
 /* Free the memory used to store the label information. */
-   for( axis = 0; axis < 2 && ink; axis++ ){
+   for( axis = 0; axis < 2; axis++ ){
       ll = llist[ axis ];
       if( ll ) {
          for( tick = 0; tick < nedge[ axis ]; tick ++ ) {
@@ -8337,6 +8338,12 @@ static int EdgeCrossings( AstPlot *this, int edge, int axis, double axval,
    if( pedge == -1 || pedge != edge || paxis != axis ){
       pedge = edge;
       paxis = axis;
+
+/* Annull any previous static data objects */
+      if( pset1 ) pset1 = astAnnul( pset1 );
+      if( pset2 ) pset2 = astAnnul( pset2 );
+      if( pset4 ) pset4 = astAnnul( pset4 );
+      if( frame ) frame = astAnnul( frame );
 
 /* Store some values so that the code does not need to consider each edge
    separately. First deal with the left hand edge. */
