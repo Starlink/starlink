@@ -30,7 +30,7 @@ generating fonts.  Fixed a couple of typos.
 Altered documentation of font-searching, to match new functionality.
 
 <distribution string="1.0-5" date="06-SEP-1999" author="ng"
-versionid="upd5">Changed description of configuration process.
+versionid="upd5">Assorted changes, to describe significant new functionality.
 </distribution>
 
 </history>
@@ -81,7 +81,8 @@ make things a little clearer.</update>
 <verbatim>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
-    [-s scalefactor] [-t gif|xbm] [-o output] [-b(h|w) size] [-lLnqQV]
+    [-s scalefactor] [-t gif|xbm] [-o output] [-b(h|w) size]
+    [-c[lrtb] dimen] [-C[lrtb] dimen] [-lLnqQV]
     dvi-file
 </verbatim>
 
@@ -111,6 +112,7 @@ tool like this, this wasn't really necessary.
 to support other models of use.
 
 <subsect id=usage.options export>Options
+<update versionid="upd5">Added documentation of -c and -C options</update>
 
 <p><dl>
 <dt><code>-bh size, -bw size</code>
@@ -126,6 +128,25 @@ bottom-right of the bitmap: in this case <code>-bh 6300 -bw
 4200</code> would suffice.  Note that the `h' in <code>-bh</code> stands for
 height, not horizontal!  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
+
+<dt><code>-c[edge] dimen, -C[edge] dimen</code>
+<dd>The <code/-c/ and <code/-C/ options allow you to control how the
+generated bitmaps are cropped before they are written.  The
+<code/[edge]/ may be one of `l', `r', `t' or `b', referring to the
+left, right, top and bottom edge of the bitmap, or be missing, in
+which case it refers to all four sides.  In the case of the <code/-c/
+option, this sets the crop to be <code/dimen/ points from the
+specified edge of the
+bounding box of the blackened pixels; in the case of the <code/-C/
+option, it sets it to be <code/dimen/ points from the left or top of
+the `page'.  The specification <code/-C dimen/, which would set all
+the crops to the same position, is silly, and so is forbidden.
+<p>The conversion from points to pixels takes account of the
+magnification set in the <code/-m/ option, if that's been specified
+already, but it doesn't notice if that's set after this option, and it
+takes no account of any magnification in the DVI file. 
+<p>See <ref id=usage.special> for &tex; <code/\special/ commands which
+set this within the &tex; file.
 
 <dt><code>-f font-path</code>
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
@@ -176,7 +197,11 @@ extension will be added.
 <dt><code/-P[bt]/
 <dd>Specifies processing of the output bitmap.
 <code/-Pb/ blurs the bitmap, making a half-hearted attempt to make a
-low-resolution bitmap look better.
+low-resolution bitmap look better.  This really isn't up to much -- if
+you have the fonts available, or are prepared to wait for them to be
+generated, a better way is to use the <code/-m/ option to magnify the
+DVI file, and then the <code/-s/ option to scale it back down to the
+correct size.
 <code/-Pt/ makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
 <code/-t/
@@ -207,17 +232,69 @@ when the program was configured.
 </dl>
 
 <subsect id=usage.special export>DVI specials
+<update versionid="upd5">
+Rewritten to cover new special commands, particularly support for cropping.
+</update>
 
-<p>dvi2bitmap recognises a single DVI special command, and emits a
+
+<p>dvi2bitmap recognises several DVI special commands, and emits a
 warning if it finds any others.
 
-<p>If the &tex; file contains a special command:
+<p>The syntax of the special commands is 
 <verbatim>
-\special{dvi2bitmap outputfile my_filename}
+\special{dvi2bitmap &lt;special-command&gt;+ }
 </verbatim>
-then the output file used for the current page will be 
-<em/my_filename.gif/
-(the extension will depend on the output type selected).
+There may be one or more <code>&lt;special-command&gt;</code>
+sequences within a single special.
+
+<p>The <code>&lt;special-command&gt;</code> which the program
+recognises are:
+<dl>
+
+<dt><code>default</code>
+<dd>Makes other special-commands in this same special affect
+defaults.  See those commands for details.
+
+<dt><code>outputfile my_filename</code>
+<dd>The output file used for the current page will be named
+<code/my_filename.gif/.  A filename extension will be added if none is
+present, or if it does not match the output type selected.  If the
+<code/default/ command has been given, then this instead specifies the
+default filename pattern, and the `filename' should contain a single
+<code/#/-sign.
+
+<dt><code/absolute/
+<dd>Affects the <code/crop/ command.
+
+<dt><code>crop &lt;side&gt; &lt;dimen&gt;</code>
+<dd>Crop the bitmap on the current page so that the specified edge of
+the bitmap is <code/&lt;dimen&gt;/ points away from the bounding box
+of the blackened pixels.  <code/&lt;side&gt;/ may be one of `left',
+`right', `top', `bottom' or `all', referring to the corresponding
+edge, or all four edges at once.  If the <code/default/ command has
+been given in this special, then this pattern of cropping is
+additionally made the default for subsequent pages.  If the
+<code/absolute/ command has been given, then the crop position is set
+at <code/&lt;dimen&gt;/ points from the appropriate edge of the
+`paper'.
+<p>The <code/-c/ and <code/-C/ command-line options
+(<ref id=usage.options>) have the effect of setting initial defaults.
+In the absence of either of these, the initial crop is exactly at the
+bounding box.
+
+</dl>
+
+<p>For example, the pair of commands
+<verbatim>
+\special{dvi2bitmap default outputfile trial-#.gif crop all 5}
+\special{dvi2bitmap absolute crop left 0}
+</verbatim>
+will change the output filename pattern for the rest of the DVI file,
+and set a 5pt margin round the bounding box.  The current page,
+however, will have a left-hand crop zero points in from the left hand
+side.  Remember that &tex;'s origin is one inch from the left and the
+top of the paper, and it is with respect to this origin that the
+program reckons the absolute distances for the cropping.
 
 <subsect id=usage.exit export>Exit value
 
