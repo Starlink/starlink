@@ -33,11 +33,16 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     5-MAY-1992 (RFWS):
 *        Original version.
+*     12-OCT-1998 (DSB):
+*        Check _REAL and _DOUBLE objects for IEEE NaN and Inf values, 
+*        converting them to the appropriate Starlink bad value if any
+*        are found.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -199,6 +204,28 @@
      :                          STATUS )
                   CALL PSX_FREE( PNTR, STATUS )
                END IF
+            END IF
+
+*  Check for IEEE NaN and Inf values, converting them to the appropriate
+*  Starlink bad value. This is always done for _REAL or _DOUBLE data,
+*  even if no format conversion was necessary above.
+            IF( STATUS .EQ. SAI__OK .AND.
+     :             ( TYPE( : 5 ) .EQ. '_REAL' .OR. 
+     :               TYPE( : 7 ) .EQ. '_DOUBLE' ) ) THEN
+
+*  Map the object for update.
+               CALL DAT_MAPV( LOC, TYPE, 'UPDATE', PNTR, SIZE( 1 ), 
+     :                        STATUS )
+
+*  Do the conversion.
+               IF( TYPE( : 5 ) .EQ. '_REAL' ) THEN
+                  CALL FTS1_RNANR( SIZE( 1 ), %VAL( PNTR ), STATUS )
+               ELSE
+                  CALL FTS1_RNAND( SIZE( 1 ), %VAL( PNTR ), STATUS )
+               END IF
+
+*  Unmap the object.
+               CALL DAT_UNMAP( LOC, STATUS )
             END IF
          END IF
       END IF
