@@ -1,5 +1,5 @@
 
-AM_FCFLAGS = -I../i90
+AM_FCFLAGS = -I../i90 -I../ira
 
 noinst_LTLIBRARIES = libiri.la
 

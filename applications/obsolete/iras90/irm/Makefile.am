@@ -1,4 +1,4 @@
-AM_FCFLAGS = -I../i90 -I../irc -I../iri
+AM_FCFLAGS = -I../i90 -I../ira -I../irc -I../iri -I../irq
 
 noinst_LTLIBRARIES = libirm.la
 
