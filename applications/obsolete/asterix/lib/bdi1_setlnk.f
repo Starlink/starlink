@@ -100,14 +100,21 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ALOC			! Locator array in file
+      CHARACTER*(DAT__SZLOC)	AXCLOC			! AXIS structure cell
+      CHARACTER*(DAT__SZLOC)	AXDLOC			! AXIS data array
+      CHARACTER*(DAT__SZLOC)	AXLOC			! AXIS structure array
       CHARACTER*(DAT__SZLOC)	LOC			! Locator to file
       CHARACTER*(DAT__SZTYP)	TYP			! Top level type
 
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
+      INTEGER			I			! Loop over axis cells
+      INTEGER			IDUM			! Dummy return value
       INTEGER			MDID			! Model data object
       INTEGER			NDIM			! Dimensionality
 
+      LOGICAL			GOTAX			! Got dims from axes?
       LOGICAL			PRIM			! Is object primitive?
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -170,12 +177,47 @@
 *      Store the type as the dataset type
           CALL ADI_CPUT0C( MDID, 'DatasetType', TYP, STATUS )
 
-*      The best chance the primary data array
+*      The best chance is the primary data array
           CALL BDI1_CFIND( MDID, ARGS(2), 'Data', .FALSE.,
      :                     ALOC, NDIM, DIMS, STATUS )
           IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'BDI1_SETLNK', 'Unable to find primary '/
-     :                             /'data array in input', STATUS )
+
+*        New error context to protect axis code below
+            CALL ERR_BEGIN( STATUS )
+
+*        Try looking for AXIS structure as a last resort
+            GOTAX = .FALSE.
+            CALL DAT_THERE( LOC, 'AXIS', THERE, STATUS )
+            IF ( THERE ) THEN
+              CALL DAT_FIND( LOC, 'AXIS', AXLOC, STATUS )
+              CALL DAT_SHAPE( AXLOC, 1, NDIM, IDUM, STATUS )
+              DO I = 1, NDIM
+                CALL DAT_CELL( AXLOC, 1, I, AXCLOC, STATUS )
+                CALL DAT_FIND( AXCLOC, 'DATA_ARRAY', AXDLOC, STATUS )
+                CALL ADI1_ARYSHP( AXDLOC, 1, DIMS(I), IDUM, TYP, STATUS )
+                CALL DAT_ANNUL( AXDLOC, STATUS )
+                CALL DAT_ANNUL( AXCLOC, STATUS )
+              END DO
+
+*          Read all the axes ok?
+              IF ( STATUS .EQ. SAI__OK ) THEN
+                GOTAX = .TRUE.
+                TYP = '_REAL'
+              END IF
+
+            END IF
+
+*        Restore error context
+            CALL ERR_END( STATUS )
+
+*        Report or annul original error
+            IF ( GOTAX ) THEN
+              CALL ERR_ANNUL( STATUS )
+            ELSE
+              CALL ERR_REP( 'BDI1_SETLNK', 'Unable to find primary '/
+     :                               /'data array in input', STATUS )
+            END IF
+
           END IF
 
         END IF
@@ -183,11 +225,16 @@
 *    If all is well...
         IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Get dimensions and type from this object
-          CALL ADI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP, STATUS )
+*      Dimensions not determined from axes?
+          IF ( .NOT. GOTAX ) THEN
 
-*      Free the object
-          CALL DAT_ANNUL( ALOC, STATUS )
+*        Get dimensions and type from this object
+            CALL ADI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP, STATUS )
+
+*        Free the object
+            CALL DAT_ANNUL( ALOC, STATUS )
+
+          END IF
 
 *      Store the info
           CALL BDI_SETSHP( MDID, NDIM, DIMS, STATUS )
