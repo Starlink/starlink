@@ -70,6 +70,7 @@ alias extract_flat    ${SURF_DIR}/extract_flat
 alias flatfield       ${SURF_DIR}/flatfield
 alias intrebin        ${SURF_DIR}/intrebin
 alias rebin           ${SURF_DIR}/rebin
+alias reduce_noise    ${SURF_DIR}/reduce_noise
 alias reduce_switch   ${SURF_DIR}/reduce_switch
 alias remsky          ${SURF_DIR}/remsky
 alias restore         ${SURF_DIR}/restore
@@ -96,6 +97,7 @@ alias surf_extract_flat    ${SURF_DIR}/extract_flat
 alias surf_flatfield       ${SURF_DIR}/flatfield
 alias surf_intrebin        ${SURF_DIR}/intrebin
 alias surf_rebin           ${SURF_DIR}/rebin
+alias surf_reduce_noise    ${SURF_DIR}/reduce_noise
 alias surf_reduce_switch   ${SURF_DIR}/reduce_switch
 alias surf_remsky          ${SURF_DIR}/remsky
 alias surf_restore         ${SURF_DIR}/restore
