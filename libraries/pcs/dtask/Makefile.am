@@ -57,7 +57,7 @@ BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 # Build and install this, taking care to include it in the MANIFEST_FILE, too.
 dtask_main.o: dtask_main.f
 install-exec-local: dtask_main.o
-	$(INSTALL_DATA) dtask_main.o $(DESTDIR)$(libdir)
+	$(INSTALL_PROGRAM) dtask_main.o $(DESTDIR)$(libdir)
 	if test -n "$$MANIFEST_FILE"; then \
 	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >>$$MANIFEST_FILE; \
 	fi
