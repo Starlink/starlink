@@ -4574,7 +4574,7 @@
                 ENDIF
               ENDDO
 
-              CALL GCB_GETI('FUNC_STYLE,OK,IVAL,STATUS)
+              CALL GCB_GETI('FUNC_STYLE',OK,IVAL,STATUS)
               IF (OK) THEN
                 CALL MSG_SETI('STY',IVAL)
               ELSE
