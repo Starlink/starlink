@@ -185,9 +185,11 @@ to need explanation or elaboration.
 		    '())
     (process-children-trim)))
 
+;; embolden dt contents (suggested by Mark)
 (element dt
-  (make element
-    (process-children-trim)))
+  (make element gi: "dt"
+    (make element gi: "strong"
+	  (process-children-trim))))
 
 (element dd
   (make element

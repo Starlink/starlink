@@ -98,7 +98,7 @@ depending on whether the element is to be chunked.
 					    ;sysid (and we haven't
 					    ;turned off chunking)
 		)
-	    (make entity system-id: (debug (or system-id (html-file)))
+	    (make entity system-id: (or system-id (html-file))
 	      (make document-type
 		name: "html"
 		public-id: %html-pubid%)

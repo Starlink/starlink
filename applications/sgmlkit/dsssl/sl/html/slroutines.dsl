@@ -40,8 +40,10 @@ $Id$
 
 ;; Routinelist is simple
 (element routinelist
-  (make element gi: "ul"
-	(process-children)))
+  (make sequence
+    (process-matching-children 'p)
+    (make element gi: "ul"
+	  (process-matching-children 'codecollection))))
 
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
@@ -370,12 +372,19 @@ $Id$
 	(html-document title
 		     (make sequence
 		       (make element gi: "h1"
-			     title)
+			     (make element gi: "a"
+				   attributes:
+				   `(("name" ,(href-to (current-node)
+							frag-only: #t)))
+				   ;; We don't really need this, since
+				   ;; the routine is in a chunk by
+				   ;; itself, but since routine is in
+				   ;; section-element-list, be
+				   ;; consistent with the other
+				   ;; elements in that.
+				   title))
 		       (make element gi: "dl"
-			     (process-node-list rp)))
-		     ;force-chunk?: #t
-		     )
-	)))
+			     (process-node-list rp)))))))
 
   (element routinename
     (empty-sosofo))			; discard, in this mode.  See
@@ -716,14 +725,18 @@ $Id$
 				 target
 				 (ancestor (normalize "routine")
 					   target))))
-	 (targetfragid (and targetroutine
-			    (href-to targetroutine frag-only: #t))))
-    (if targetfragid
+	 (linktext (data (current-node)))
+	 )
+    (if targetroutine
 	(make element gi: "a"
-	      attributes: `(("href" ,(href-to cc force-frag: targetfragid)))
-	      (process-children))
-	(error (string-append "Can't find one of collection "
+	      attributes: `(("href" ,(href-to targetroutine)))
+	      (if (string=? linktext "")
+		  (with-mode section-reference
+		    (process-node-list targetroutine))
+		  (literal linktext)))
+	(error (string-append "Can't locate routine "
+			      (attribute-string (normalize "id"))
+			      " within collection "
 			      (attribute-string (normalize "collection"))
-			      " or routine "
-			      (attribute-string (normalize "id")))))))
+			      )))))
 

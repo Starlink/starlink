@@ -62,10 +62,13 @@ immediately resolve the indirection.
 	  )
 	(if target
 	    (error (string-append
-		    "stylesheet can't link to ID " target-id " of type "
-		    (gi target)))
+		    "stylesheet can't link to elements of type "
+		    (gi target)
+		    " (ID " target-id ")"
+		    ))
 	    (error (string-append
-		    "Can't find element with ID " target-id))))))
+		    "Can't find element with ID " target-id " in this document"
+		    ))))))
 
 ;;; The following mode section-reference definition of REF (and the
 ;;; similar ones for DOCXREF, WEBREF and URL) is for dealing with
