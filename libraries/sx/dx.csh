@@ -128,7 +128,7 @@ else
 #  Run the demo. 
 
    $ibm_dx -exec $SX_DIR/dxexec -macros $SX_DIR -mdf \
-            $SX_DIR/SX.mdf -image $SX_DIR/$net -noImageRWNetFile \
+            $SX_DIR/SX.mdf -image -program $SX_DIR/$net -noImageRWNetFile \
             -execute -memory $use
 
 endif
