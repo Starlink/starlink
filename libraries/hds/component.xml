@@ -27,9 +27,8 @@
       therefore invoked indirectly by many other items of Starlink
       software.</p>
   </abstract>
-  <dependencies>
-    <build> sae cnf ems messgen</build>
-    <use> chr</use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

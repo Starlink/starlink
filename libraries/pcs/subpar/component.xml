@@ -7,9 +7,8 @@
   <path>libraries/pcs/subpar</path>
   <description>Parameter subsystem</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messys chr adam lex ems hds messgen</build>
-    <use> chr dat ems ams hds hlp icl lex parsecon psx</use>
+  <dependencies >
+    <build>adam</build><build>chr</build><build>hds</build><build>ems</build><build>lex</build><build>messys</build><build>sae</build><link>ams</link><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>lex</link><link>misc</link><link>parsecon</link><link>psx</link><link>string</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -7,17 +7,15 @@
   <path>libraries/pcs/ams</path>
   <description>ADAM Message System</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae cnf dtask atimer messys msp adam</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><build>dtask</build><build>atimer</build><build>messys</build><build>msp</build><build>adam</build>
   </dependencies>
   <developers>
-    <person>
-      <person><name>Ian Jenkins (IRJ)</name></person>
-      <person><name>Dennis Kelly (BDK)</name></person>
-      <person><name>Brian McIlwrath (BKM)</name></person>
-      <person><name>Alan Chipperfield (AJC)</name></person>
-      <person><name>David Terrett (DLT)</name></person>
+    <person><name>Ian Jenkins (IRJ)</name></person>
+    <person><name>Dennis Kelly (BDK)</name></person>
+    <person><name>Brian McIlwrath (BKM)</name></person>
+    <person><name>Alan Chipperfield (AJC)</name></person>
+    <person><name>David Terrett (DLT)</name></person>
   </developers>
   <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>

@@ -7,9 +7,8 @@
   <path>libraries/pcs/lex</path>
   <description>SUBPAR lexical analyser</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messgen</build>
-    <use> ems</use>
+  <dependencies >
+    <build>sae</build><link>ems</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -26,7 +25,7 @@
     </person>
   </developers>
   <!-- documentation is maintained in the parent package -->
-  <documentation>ssn29 @STAR_DOCUMENTATION@</documentation>
+  <documentation>ssn29 </documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Part of the PCS package</p></notes>
 </component>

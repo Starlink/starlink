@@ -27,9 +27,8 @@
       therefore invoked indirectly by many other items of Starlink
       software.</p>
   </abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

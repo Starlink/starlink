@@ -7,9 +7,8 @@
   <path>libraries/pcs/sock</path>
   <description>Provides a Unix-socket-based message transport system
     for the MSP system</description>
-  <dependencies>
-    <build> sae messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

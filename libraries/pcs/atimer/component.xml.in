@@ -11,9 +11,8 @@
       associated handler which is invoked when the timer expires.  The
       library is written in C but a Fortran interface, FATIMER, is
       provided.</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

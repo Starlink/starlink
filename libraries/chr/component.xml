@@ -15,9 +15,8 @@
       for building text strings for interactive applications or as a
       basis for more complex text processing applications.
     </p></abstract>
-  <dependencies>
-    <build> sae cnf</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>cnf</build>
   </dependencies>
   <developers>
     <person>

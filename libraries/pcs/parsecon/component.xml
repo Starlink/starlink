@@ -10,9 +10,8 @@
   <abstract><p>Parsing of the interface files associated with SUBPAR.
       The package also includes the interface file compiler,
       COMPIFL.</p></abstract>
-  <dependencies>
-    <build> sae hds hlp subpar ems chr string messgen</build>
-    <use> chr ems string subpar</use>
+  <dependencies >
+    <build>chr</build><build>hds</build><build>ems</build><build>sae</build><build>subpar</build><build option='link'>string</build><link>chr</link><link>ems</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

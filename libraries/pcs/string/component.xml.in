@@ -10,9 +10,8 @@
       subroutines are also used by software items outside the
       parameter system, but the library has no published
       interface</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

@@ -20,9 +20,8 @@
     <p>This document also introduces a preliminary C interface for the PAR
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
-  <dependencies>
-    <build> cnf sae mers subpar messgen</build>
-    <use> chr</use>
+  <dependencies >
+    <build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><link>chr</link><link>mers</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -20,9 +20,8 @@
     <p>This document also introduces a preliminary C interface for the PAR
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

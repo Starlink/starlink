@@ -15,9 +15,8 @@
       for building text strings for interactive applications or as a
       basis for more complex text processing applications.
     </p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

@@ -11,9 +11,8 @@
       error file and a shell script needed for development of software
       in the Starlink environment, and for building the USSC.</p>
   </abstract>
-  <dependencies>
-    <build> messgen</build>
-    <use></use>
+  <dependencies >
+    <sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

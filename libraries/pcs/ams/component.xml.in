@@ -7,17 +7,15 @@
   <path>libraries/pcs/ams</path>
   <description>ADAM Message System</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
-    <person>
-      <person><name>Ian Jenkins (IRJ)</name></person>
-      <person><name>Dennis Kelly (BDK)</name></person>
-      <person><name>Brian McIlwrath (BKM)</name></person>
-      <person><name>Alan Chipperfield (AJC)</name></person>
-      <person><name>David Terrett (DLT)</name></person>
+    <person><name>Ian Jenkins (IRJ)</name></person>
+    <person><name>Dennis Kelly (BDK)</name></person>
+    <person><name>Brian McIlwrath (BKM)</name></person>
+    <person><name>Alan Chipperfield (AJC)</name></person>
+    <person><name>David Terrett (DLT)</name></person>
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>

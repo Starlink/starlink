@@ -7,9 +7,8 @@
   <path>libraries/pcs/dtask</path>
   <description>DTASK linking library</description>
   <abstract><p>ADD DETAILS!</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

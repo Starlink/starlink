@@ -15,9 +15,8 @@
       non-error information and the Error Reporting System, ERR, is
       used specifically for reporting error messages.</p>
   </abstract>
-  <dependencies>
-    <build> ems sae cnf messgen messgen</build>
-    <use> chr psx subpar</use>
+  <dependencies >
+    <build>cnf</build><build>ems</build><build>sae</build><link>chr</link><link>ems</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

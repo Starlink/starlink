@@ -11,9 +11,8 @@
       X/OPEN libraries. The use of this library will enable
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
-  <dependencies>
-    <build> sae messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

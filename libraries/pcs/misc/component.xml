@@ -12,9 +12,8 @@
       directly from a Unix shell and others provide a Fortran
       interface into the C library for platforms (notably Linux) which
       do not include them as part of the system.</p></abstract>
-  <dependencies>
-    <build> cnf</build>
-    <use></use>
+  <dependencies >
+    <build>cnf</build>
   </dependencies>
   <developers>
     <person>

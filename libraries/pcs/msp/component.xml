@@ -12,9 +12,8 @@
       messages. Messages on the sockets specify a `queue' in the
       receiving task for which they are intended and a queue in the
       sending task to which replies should be sent.</p></abstract>
-  <dependencies>
-    <build> sae sock messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>sock</build><link>sock</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -10,9 +10,8 @@
   <abstract><p>Parsing of the interface files associated with SUBPAR.
       The package also includes the interface file compiler,
       COMPIFL.</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

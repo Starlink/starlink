@@ -7,9 +7,8 @@
   <path>libraries/pcs/hdspar</path>
   <description>Part of the HDS system.  HDSPAR declares bulk data
     parameters.</description>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

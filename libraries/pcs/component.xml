@@ -15,9 +15,8 @@
     <p>The PCS libraries will not generally be called directly by
       application programs, but form a basic part of the Starlink
       Software Environment</p></abstract>
-  <dependencies>
-    <build> subpar</build>
-    <use></use>
+  <dependencies >
+    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build>
   </dependencies>
   <developers>
     <person>
@@ -26,7 +25,7 @@
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
   </developers>
-  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

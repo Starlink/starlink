@@ -13,9 +13,8 @@
       ERR without the binding to any software environment (e.g., for
       message output or access to the parameter and data
       systems).</p></abstract>
-  <dependencies>
-    <build> sae cnf messgen</build>
-    <use> cnf ems</use>
+  <dependencies >
+    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

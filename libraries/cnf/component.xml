@@ -13,9 +13,8 @@
       of functions to handle the difference between FORTRAN and C
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
-  <dependencies>
-    <build></build>
-    <use></use>
+  <dependencies >
+    
   </dependencies>
   <developers>
     <person>

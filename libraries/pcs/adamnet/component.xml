@@ -9,9 +9,8 @@
   the ADAM intertask communication software on unix to TCP/IP, thereby
   allowing ADAM tasks on different machines to communicate with one
   another. </description>
-  <dependencies>
-    <build> sae messys adam ams msp sock messgen</build>
-    <use></use>
+  <dependencies >
+    <build>sae</build><build>messys</build><build>adam</build><build>ams</build><build>msp</build><build>sock</build><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

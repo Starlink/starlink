@@ -14,9 +14,8 @@
       message protocol and includes subroutines for encoding and
       decoding data values in messages.  For examples of use, see
       SUN/134.</p></abstract>
-  <dependencies>
-    <build> sae adam dtask messys subpar messgen</build>
-    <use> chr dtask ems mers string subpar</use>
+  <dependencies >
+    <build>adam</build><build>dtask</build><build>messys</build><build>sae</build><build>subpar</build><link>ams</link><link>chr</link><link>dtask</link><link>ems</link><link>mers</link><link>string</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

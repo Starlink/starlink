@@ -7,9 +7,8 @@
   <path>libraries/pcs/messys</path>
   <description>Message system</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build> sae messgen</build>
-    <use> mers ams</use>
+  <dependencies >
+    <build>sae</build><link>ams</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

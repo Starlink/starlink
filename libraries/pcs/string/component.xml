@@ -10,9 +10,8 @@
       subroutines are also used by software items outside the
       parameter system, but the library has no published
       interface</p></abstract>
-  <dependencies>
-    <build> sae chr</build>
-    <use> chr ems</use>
+  <dependencies >
+    <build>sae</build><build>chr</build><link>chr</link><link>ems</link>
   </dependencies>
   <developers>
     <person>

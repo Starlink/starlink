@@ -12,9 +12,8 @@
       directly from a Unix shell and others provide a Fortran
       interface into the C library for platforms (notably Linux) which
       do not include them as part of the system.</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

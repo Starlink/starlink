@@ -7,9 +7,8 @@
   <path>libraries/pcs/dtask</path>
   <description>DTASK linking library</description>
   <abstract><p>ADD DETAILS!</p></abstract>
-  <dependencies>
-    <build> sae cnf psx subpar messys adam messgen</build>
-    <use> chr ams hds msg psx atimer string</use>
+  <dependencies >
+    <build>adam</build><build>cnf</build><build>messys</build><build>psx</build><build>sae</build><build>subpar</build><link>chr</link><link>ems</link><link>mers</link><link>ams</link><link>atimer</link><link>hds</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

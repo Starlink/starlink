@@ -7,9 +7,8 @@
   <path>libraries/pcs/hdspar</path>
   <description>Part of the HDS system.  HDSPAR declares bulk data
     parameters.</description>
-  <dependencies>
-    <build> sae</build>
-    <use> subpar</use>
+  <dependencies >
+    <build>sae</build><link>subpar</link>
   </dependencies>
   <developers>
     <person>

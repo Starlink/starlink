@@ -7,9 +7,8 @@
   <path>libraries/pcs/sock</path>
   <description>Provides a Unix-socket-based message transport system
     for the MSP system</description>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>

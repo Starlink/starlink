@@ -12,9 +12,8 @@
       messages. Messages on the sockets specify a `queue' in the
       receiving task for which they are intended and a queue in the
       sending task to which replies should be sent.</p></abstract>
-  <dependencies>
-    <build>@STAR_BUILD_DEPENDENCIES@</build>
-    <use>@STAR_USE_DEPENDENCIES@</use>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
   <developers>
     <person>
