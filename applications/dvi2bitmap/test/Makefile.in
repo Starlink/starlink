@@ -56,17 +56,22 @@ $(TESTS): ../libdvi2bitmap.la
 # dependencies expressed through implicit rules.
 .cc.test:
 	$(LIBTOOL) --mode=compile $(CXX) -c $(CXXFLAGS) -o $(<:.cc=.lo) $<
-	$(LIBTOOL) --mode=link $(CXX) -o $@ $(<:.cc=.lo) ../libdvi2bitmap.la $(LIBS) -lm
+	$(LIBTOOL) --mode=link $(CXX) -o $@ $(<:.cc=.lo) \
+		../libdvi2bitmap.la $(LIBS) -lm
+
 .dtl.dvi:
 	dt2dv $< $@ >$@.log 2>&1
 
 # t6.test must be linked statically -- it invokes itself in a pipe
 t6.test: t6.cc
-	$(LIBTOOL) --mode=compile $(CXX) -static -c $(CXXFLAGS) -o $(<:.cc=.lo) $<
-	$(LIBTOOL) --mode=link $(CXX) -static -o $@ $(<:.cc=.lo) ../libdvi2bitmap.la $(LIBS) -lm
+	$(LIBTOOL) --mode=compile $(CXX) -static -c $(CXXFLAGS) -o \
+		$(<:.cc=.lo) $<
+	$(LIBTOOL) --mode=link $(CXX) -static -o $@ $(<:.cc=.lo) \
+		../libdvi2bitmap.la $(LIBS) -lm
 
 # t8.test is just a link to t8.pl.
 t8.test: t8.pl
+	if test -w t8.test; then rm -f t8.test;fi
 	$(LN_S) t8.pl t8.test
 
 pathtest: hello.dvi
@@ -109,3 +114,4 @@ clean:
 	rm -Rf .libs
 	rm -f *.log *.aux *.dvi *.pdf
 	rm -f test-output* temp*
+	rm -f modetest*sampler*
