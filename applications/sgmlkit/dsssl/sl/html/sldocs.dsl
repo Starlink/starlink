@@ -201,7 +201,8 @@ are shown at the top of the document.
       (if copyright
 	  (make element gi: "p"
 		(process-node-list copyright))
-	  (empty-sosofo))
+	  (make element gi: "p"
+		(literal %copyright-string%)))
       (if (and %link-extension-list% (not suppress-printable))
 	  (make element gi: "p"
 		(literal "Printable version")

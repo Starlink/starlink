@@ -329,6 +329,7 @@ generated HTML documents.
 
 (define (section-header-navigation elemnode)
   (let ((anc (chunk-ancestors elemnode)))
+    (make element gi: "div" attributes: '(("class" "navbar"))
     (make element gi: "TABLE" attributes: %nav-header-table-attr%
 	  (make sequence
 	    (make element gi: "TR"
@@ -370,7 +371,7 @@ generated HTML documents.
 			  (if (nav-next? elemnode)
 			      (nav-next-link elemnode)
 			      (make element gi: "EM"
-				    (literal "Next"))))))))))
+				    (literal "Next")))))))))))
 
 
 ;; We're producing the footer for the root element (SUN or MUD, or
@@ -432,7 +433,7 @@ generated HTML documents.
 	 (rel (document-release-info))
 	 (subsects (chunk-children elemnode))
 	 (nextchunk (onwards)))
-    (make sequence
+    (make element gi: "div" attributes: '(("class" "navbar"))
       (make element gi: "TABLE" attributes: %nav-footer-table-attr%
 	    (make sequence
 	      (if (node-list-empty? subsects)
@@ -462,7 +463,7 @@ generated HTML documents.
 				    (with-mode section-reference
 				      (process-node-list (cdr nextchunk))))))
 			))))
-      (make element gi: "P" attributes: '(("ALIGN" "RIGHT"))
+      (make element gi: "address" ;"P" attributes: '(("ALIGN" "RIGHT"))
 	    (make element gi: "EM"
 		  (make sequence
 		    (node-list-reduce authors
