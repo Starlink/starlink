@@ -4,18 +4,30 @@
       CHARACTER*80		AIO_FILE			! Output file
       CHARACTER*7   		AIO_TYPE			! Channel type
       CHARACTER*(PAR__SZNAM) 	AIO_PARNAM			! ADAM par name
+      CHARACTER*132		AIO_IPATH			! Input path
+      CHARACTER*132		AIO_DEFEXT			! Input default
+								! extension
+
+      INTEGER                   AIO_IFID(AIO__MXNEST) 		! Input stream
+      INTEGER                   AIO_ILEV			! Current level
 
       INTEGER       		AIO_ITYPE			! Code of _TYPE
       INTEGER 			AIO_FID				! FIO descriptor
       INTEGER			AIO_WIDTH			! Channel width
       INTEGER			AIO_MODE			! Output mode
 
-      LOGICAL       		AIO_DEF				! Channel defined?
+      LOGICAL       		AIO_DEF				! Output channel
+								! defined?
+      LOGICAL       		AIO_IDEF			! Input channel
+								! defined?
+      LOGICAL			AIO_INEST			! Input nested?
       LOGICAL			AIO_WRAP			! Wrap on?
 
 *    Non-character common block
       COMMON /AIO_CMN/ AIO_ITYPE,AIO_FID,AIO_WIDTH,AIO_MODE,AIO_DEF,
-     :                 AIO_WRAP
+     :                 AIO_ILEV, AIO_IFID, AIO_IDEF, AIO_WRAP,
+     :                 AIO_INEST
 
 *    Character common block
-      COMMON /AIO_CMN_C/ AIO_FILE,AIO_TYPE,AIO_PARNAM
+      COMMON /AIO_CMN_C/ AIO_FILE,AIO_TYPE,AIO_PARNAM,AIO_IPATH,
+     :			AIO_DEFEXT

@@ -1,10 +1,10 @@
-*+  AIO_CLOSE - Close Asterix output text channel
+*+  AIO_CLOSE - Close Asterix input or output text channels
       SUBROUTINE AIO_CLOSE( ID, STATUS )
 *
 *    Description :
 *
-*     Closes output text channel. If the channel maps to a file then the
-*     file is closed. If the channel maps to the printer the file is
+*     Closes input or output text channel. If the channel maps to a file
+*     then the file is closed. If the channel maps to the printer the file is
 *     spooled and deleted.
 *
 *    Method :
@@ -20,6 +20,7 @@
 *    History :
 *
 *      4 May 94 : Original. Derived from old UTIL_SELOUT routine (DJA)
+*     11 Nov 94 : Handle input channel too (DJA)
 *
 *    Type definitions :
 *
@@ -50,13 +51,25 @@
 *    External references :
 *
       EXTERNAL              	AIO_BLK
+*
+*    Local variables :
+*
+      INTEGER			I			! Loop over input files
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Input stream?
+      IF ( AIO_IDEF .AND. (ID.EQ.AIO_IFID(1)) ) THEN
+
+        DO I = AIO_ILEV, 1, -1
+          CALL FIO_CLOSE( AIO_IFID(I), STATUS )
+        END DO
+        AIO_IDEF = .FALSE.
+
 *    If not console mode
-      IF ( ID .NE. AIO__M_CONSOLE ) THEN
+      ELSE IF ( ID .NE. AIO__M_CONSOLE ) THEN
 
 *      Close the file
         CALL FIO_CLOSE( AIO_FID, STATUS )
@@ -78,10 +91,10 @@
           END IF
         END IF
 
-      END IF
+*      Not defined now
+        AIO_DEF = .FALSE.
 
-*    Not defined now
-      AIO_DEF = .FALSE.
+      END IF
 
 *    Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN

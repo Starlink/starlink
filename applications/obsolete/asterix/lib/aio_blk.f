@@ -31,18 +31,24 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_PAR'
+      INCLUDE 'AIO_PAR'
 
 *  Global Variables:
       INCLUDE 'ASTLIB(AIO_CMN)'		! AIO Initialisation Switches
 *        AIO_DEF = LOGICAL (Returned)
-*           AIO channel defined?
+*           AIO output channel defined?
+*        AIO_DEF = LOGICAL (Returned)
+*           AIO input channel defined?
 *        AIO_WRAP = LOGICAL (Returned)
 *           AIO line wrapping on?
+*        AIO_IPATH = CHARACTER (Returned)
+*           AIO input path variable
 
 *  Global data:
       DATA AIO_DEF/.FALSE./
+      DATA AIO_IDEF/.FALSE./
       DATA AIO_WRAP/.TRUE./
+      DATA AIO_IPATH/'   '/
 *.
 
       END

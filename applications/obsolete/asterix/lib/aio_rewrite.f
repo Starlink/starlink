@@ -39,7 +39,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'AIO_PAR'
-      INCLUDE 'PAR_PAR'
 *
 *    Global variables :
 *

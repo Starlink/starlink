@@ -28,7 +28,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_PAR'
       INCLUDE 'AIO_PAR'
 *
 *    Global variables :
