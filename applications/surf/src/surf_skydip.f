@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_SKYDIP (STATUS)
+      SUBROUTINE SURF_SKYDIP (STATUS)
 *+
 *  Name:
 *     SKYDIP
@@ -13,7 +13,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_SKYDIP( STATUS )
+*     CALL SURF_SKYDIP( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -21,31 +21,58 @@
  
 *  Description:
 *     This application takes raw SKYDIP data and calculates tau, eta_tel
-*     and B by fitting. Sky temperatures are taken at different airmasses.
+*     and B by fitting. Sky temperatures are taken at different airmasses
+*     and then fitted with a model of the sky.
+
+*  Usage:
+*     skydip in sub_instrument t_cold eta_tel b_fit out model_out
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        The name of the raw skydip data file
-*     B_FIT = _REAL (Read)
+*     B_FIT = REAL (Read)
 *        The B parameter (filter transmission). This efficiency factor
 *        must be between 0 and 1. A negative value allows this parameter
 *        to be free.
-*     ETA_TEL = _REAL (Read)
+*     ETA_TEL = REAL (Read)
 *        The telescope efficiency. Must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
-*     MODEL_OUT = _CHAR (Write)
+*     MODEL_OUT = CHAR (Write)
 *        The name of the output file that contains the fitted sky
 *        temperatures.
-*     OUT = _CHAR (Write)
+*     MSG_FILTER = CHAR (Read)
+*        Message filter level. Default is NORM.
+*     OUT = CHAR (Write)
 *        The name of the output file that contains the measured 
 *        sky temperatures.
-*     SUB_INSTRUMENT = _CHAR (Read)
+*     SUB_INSTRUMENT = CHAR (Read)
 *        The name of the sub-instrument whose data are to be
 *        selected from the input file and fitted. Permitted 
 *        values are SHORT, LONG, P1100, P1350 and P2000
-*     T_COLD = _REAL (Read)
+*     T_COLD = REAL (Read)
 *        Temperature of the cold load. The default value is
 *        taken from the input file.
+
+*  Examples:
+*     skydip jun10_dem_0002 short \
+*        Process the short sub-instrument using the default value
+*        for T_COLD and allowing ETA_TEL and B to be free parameters.
+*        No output files are written.
+*     skydip 19970610_dem_0003 long eta_tel=0.9 out=sky model_out=model
+*        Process the long wave sub-instrument with ETA_TEL fixed at 0.9
+*        and B free. Write the sky temperature to sky.sdf and the fitted
+*        model to model.sdf.
+
+*  Notes:
+*     If the input file is not found in the current directory, the directory
+*     specified by the DATADIR environment variable is searched. This means
+*     that the raw data does not have to be in the working directory.
+*     
+
+*  Related Applications:
+*     SURF: EXTINCTION
+
+*  References:
 
 *  Algorithm:
 *     If status is good on entry, the routine reads in some general information
@@ -73,6 +100,11 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.15  1997/06/13 00:19:45  timj
+*     Use MSG_OUTIF
+*     Change name to SURF
+*     Doc updates.
+*
 *     Revision 1.14  1997/06/05 23:14:28  timj
 *     Initialise pointer.
 *
@@ -138,9 +170,10 @@ c
 *  Global constants :
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
+      INCLUDE 'MSG_PAR'                 ! MSG__ constants
       INCLUDE 'PAR_ERR'                 ! for PAR__ constants
       INCLUDE 'PRM_PAR'                 ! for VAL__ constants
-      INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'SURF_PAR'                ! SURF  constants
 *    Import :
 *    Import-Export :
 *    Export :
@@ -290,6 +323,9 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
 * Start up the NDF system and read in some data
 
       CALL NDF_BEGIN
@@ -320,7 +356,8 @@ c
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG', PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation ',
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation ',
      :     STATUS)
 
 *     Check that this is a SKYDIP observation
@@ -476,7 +513,7 @@ c
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
       CALL MSG_SETC ('PKG', PACKAGE)
       
-      CALL MSG_OUT (' ', '^PKG: file contains data for '//
+      CALL MSG_OUTIF (MSG__NORM, ' ', '^PKG: file contains data for '//
      :  '^N_I integration(s) in ^N_M measurement(s)', STATUS)
 
 * Read in the elevation data from the FITS header
@@ -547,7 +584,8 @@ c
       IF (T_ASK.NE. T_COLD) THEN
          CALL MSG_SETR ('T_COLD', T_COLD)
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_OUT(' ', '^PKG: Redefining T_COLD from ^T_COLD', 
+         CALL MSG_OUTIF(MSG__NORM,' ', 
+     :        '^PKG: Redefining T_COLD from ^T_COLD', 
      :        STATUS)
          T_COLD = T_ASK
       ENDIF
@@ -700,7 +738,7 @@ c
             CALL DAT_ANNUL(LOC1, STATUS)
 
 * Create a REDS extension to store the FIT parameters
-            CALL NDF_XNEW (OUT_NDF, 'REDS', 'REDS_EXTENSION', 0, 0, 
+            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION', 0, 0, 
      :           LOC1, STATUS)
             CALL DAT_ANNUL (LOC1, STATUS)
 
