@@ -2873,10 +2873,7 @@ f     AST_TEST
 *        the UseDefs value of its current Frame.
 *     CmpFrame
 *        The default value of UseDefs for a CmpFrame is redefined to be
-*        the UseDefs value of its first component Frame, if set. If the
-*        first component Frame does not have a set UseDefs value, then 
-*        the second component Frame is used. If neither Frame has a set
-*        UseDefs value, then a default value of 1 is used.
+*        the UseDefs value of its first component Frame.
 *     Region
 *        The default value of UseDefs for a Region is redefined to be
 *        the UseDefs value of its encapsulated Frame.

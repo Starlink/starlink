@@ -2827,18 +2827,8 @@ static int GetUseDefs( AstObject *this_object ) {
    if ( astTestUseDefs( this ) ) {
       result = (*parent_getusedefs)( this_object );
 
-/* Otherwise, if the UseDefs value is set in the first component Frame,
-   return it. */
-   } else if( astTestUseDefs( this->frame1 ) ){
-      result = (*parent_getusedefs)( (AstObject *) this->frame1 );
-
-/* Otherwise, if the UseDefs value is set in the second component Frame,
-   return it. */
-   } else if( astTestUseDefs( this->frame2 ) ){
-      result = (*parent_getusedefs)( (AstObject *) this->frame2 );
-
-/* Otherwise, return the default UseDefs value from the first component
-   Frame. */
+/* Otherwise, use the UseDefs value in the first component Frame as the
+   default. */
    } else {
       result = (*parent_getusedefs)( (AstObject *) this->frame1 );
    }
