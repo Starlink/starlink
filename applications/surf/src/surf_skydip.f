@@ -52,6 +52,9 @@
 *        The telescope efficiency. If available the current telescope value 
 *        is used as the default.  Values must be between 0 and 1.0. 
 *        A negative value allows this parameter to be free.
+*        For data taken before 26 April 2000, the default values supplied
+*        for 850 and 450 are provided by the routine rather than being
+*        read from the FITS header.
 *     ETA_TEL_FIT = REAL (Write)
 *        The fitted value of ETA_TEL.
 *     GOODFIT = LOGICAL (Write)
@@ -148,6 +151,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.33  2000/06/03 03:14:28  timj
+*     Default ETA_TEL correctly
+*
 *     Revision 1.32  2000/05/11 19:59:03  timj
 *     Add RESIDUAL parameter
 *
@@ -374,6 +380,7 @@ c
       REAL    ELEV                      ! Elevation of next integration
       REAL    ELEV_STEP                 ! Elevation increment
       REAL    END_EL                    ! End elevation of skydip
+      REAL    EPOCH                     ! Julian epoch of observation
       REAL    ETA_ERROR                 ! Error in ETA_TEL
       REAL    ETA_TEL                   ! Telescope efficiency
       REAL    ETA_TEL_FIT               ! Fitted eta_tel
@@ -408,6 +415,8 @@ c
       DOUBLE PRECISION MEAN             ! Mean of measurement
       INTEGER MEASUREMENT               ! Measurement loop counter
       DOUBLE PRECISION MEDIAN           ! Median of measurement
+      DOUBLE PRECISION MJD              ! MJD of observation
+      LOGICAL MODIFIED                  ! ETA_TEL default has been modified
       INTEGER NDIM                      ! the number of dimensions in an array
       INTEGER NERR                      ! For VEC_
       INTEGER NFILES                    ! Number of output files
@@ -1253,6 +1262,35 @@ c
 *     If so we will set the dynamic default
 *     Else we do nothing and allow the default to be used from the IFL file
          IF (STATUS .EQ. SAI__OK) THEN
+
+*     As of 26 April 2000 we think we have a better handle of what the
+*     default eta_tel should be for 450 and 850 microns (independent
+*     of the filter profile). In that case, we suggest a default that
+*     is different from the value stored in the header.
+*     Need to get MJD of observation (April 26 2000 is MJD 51660.0) 
+            CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, EPOCH, STATUS)
+
+            IF (MJD < 51660.0D0) THEN
+
+               MODIFIED = .FALSE.
+               IF (FILT .EQ. '850' .AND.
+     :              DEFAULT_ETA_TEL .NE. 0.85) THEN
+                  DEFAULT_ETA_TEL = 0.85
+                  MODIFIED = .TRUE.
+               ELSE IF (FILT .EQ. '450' .AND. 
+     :                 DEFAULT_ETA_TEL .NE. 0.75) THEN
+                  DEFAULT_ETA_TEL = 0.75
+                  MODIFIED = .TRUE.
+               END IF
+*     Let people know what is happening
+               IF (MODIFIED) THEN
+                  CALL MSG_SETC ('PKG', PACKAGE)
+                  CALL MSG_OUTIF(MSG__NORM, ' ',
+     :               '^PKG: Overriding default ETA_TEL found in header',
+     :                 STATUS)
+               END IF
+            END IF
+
             CALL PAR_DEF0R('ETA_TEL', DEFAULT_ETA_TEL, STATUS)
          ELSE
             CALL ERR_ANNUL(STATUS)
