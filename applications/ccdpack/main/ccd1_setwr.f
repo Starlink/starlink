@@ -122,7 +122,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get length of NAME string.
-      NAMLEN = CHR_LEN( NAME )
+      NAMLEN = MAX( CHR_LEN( NAME ), 1 )
 
 *  Add and populate the .MORE.CCDPACK.SET NDF extension.
 *  =====================================================
@@ -148,76 +148,87 @@
          CALL DAT_ERASE( XLOC, 'SET', STATUS )
       END IF
 
+*  Check that we have valid values for the header; if not, then leave
+*  it empty.
+      IF ( NAME .EQ. ' ' .OR. INDEX .LE. 0 ) THEN
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL MSG_SETI( 'INDEX', INDEX )
+         CALL CCD1_MSG( ' ', '      Not adding invalid Set header '//
+     :                  '(Name="^NAME", Index=^INDEX)', STATUS )
+      ELSE
+
 *  Create a new SET structure; having done this we know it is empty.
-      CALL DAT_NEW( XLOC, 'SET', 'CCDPACK_XITEM', 0, 0, STATUS )
+         CALL DAT_NEW( XLOC, 'SET', 'CCDPACK_XITEM', 0, 0, STATUS )
 
 *  Get a locator to it.
-      CALL DAT_FIND( XLOC, 'SET', SLOC, STATUS )
+         CALL DAT_FIND( XLOC, 'SET', SLOC, STATUS )
 
 *  Create, locate, populate and release the SET.NAME item.
-      CALL DAT_NEW0C( SLOC, 'NAME', NAMLEN, STATUS )
-      CALL DAT_FIND( SLOC, 'NAME', ILOC, STATUS )
-      CALL DAT_PUT0C( ILOC, NAME, STATUS )
-      CALL DAT_ANNUL( ILOC, STATUS )
+         CALL DAT_NEW0C( SLOC, 'NAME', NAMLEN, STATUS )
+         CALL DAT_FIND( SLOC, 'NAME', ILOC, STATUS )
+         CALL DAT_PUT0C( ILOC, NAME, STATUS )
+         CALL DAT_ANNUL( ILOC, STATUS )
 
 *  Create, locate, populate and release the SET.INDEX item.
-      CALL DAT_NEW0I( SLOC, 'INDEX', STATUS )
-      CALL DAT_FIND( SLOC, 'INDEX', ILOC, STATUS )
-      CALL DAT_PUT0I( ILOC, INDEX, STATUS )
-      CALL DAT_ANNUL( ILOC, STATUS )
+         CALL DAT_NEW0I( SLOC, 'INDEX', STATUS )
+         CALL DAT_FIND( SLOC, 'INDEX', ILOC, STATUS )
+         CALL DAT_PUT0I( ILOC, INDEX, STATUS )
+         CALL DAT_ANNUL( ILOC, STATUS )
 
 *  Release the .MORE.CCDPACK.SET and .MORE.CCDPACK locators.
-      CALL DAT_ANNUL( SLOC, STATUS )
-      CALL DAT_ANNUL( XLOC, STATUS )
+         CALL DAT_ANNUL( SLOC, STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Add a new frame in domain CCD_SET to the WCS frameset.
 *  ======================================================
 
 *  See if addition of the CCD_SET frame has been requested.
-      IF ( JSET .NE. AST__NOFRAME ) THEN
+         IF ( JSET .NE. AST__NOFRAME ) THEN
 
 *  Begin a new AST context.
-         CALL AST_BEGIN( STATUS )
+            CALL AST_BEGIN( STATUS )
       
 *  Get the WCS frameset from the NDF.
-         CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+            CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
 *  Store the index of the Current frame.
-         JCUR = AST_GETI( IWCS, 'Current', STATUS )
+            JCUR = AST_GETI( IWCS, 'Current', STATUS )
 
 *  Get a copy of the selected frame.
-         SETFRM = AST_COPY( AST_GETFRAME( IWCS, JSET, STATUS ), STATUS )
+            SETFRM = AST_COPY( AST_GETFRAME( IWCS, JSET, STATUS ),
+     :                         STATUS )
 
 *  Set the Domain of the new frame to CCD_SET.
-         CALL AST_SETC( SETFRM, 'Domain', 'CCD_SET', STATUS )
+            CALL AST_SETC( SETFRM, 'Domain', 'CCD_SET', STATUS )
 
 *  Set the Title of the new frame appropriately.
-         IAT = 0
-         CALL CHR_APPND( 'Alignment in CCDPACK Set "', TITLE, IAT )
-         CALL CHR_APPND( NAME( :NAMLEN ), TITLE, IAT )
-         CALL CHR_APPND( '"', TITLE, IAT )
-         CALL AST_SETC( SETFRM, 'Title', TITLE( :CHR_LEN( TITLE ) ),
-     :                  STATUS )
+            IAT = 0
+            CALL CHR_APPND( 'Alignment in CCDPACK Set "', TITLE, IAT )
+            CALL CHR_APPND( NAME( :NAMLEN ), TITLE, IAT )
+            CALL CHR_APPND( '"', TITLE, IAT )
+            CALL AST_SETC( SETFRM, 'Title', TITLE( :CHR_LEN( TITLE ) ),
+     :                     STATUS )
 
 *  Join the new frame to the WCS frameset using a UnitMap.
-         NAXES = AST_GETI( SETFRM, 'Naxes', STATUS )
-         UMAP = AST_UNITMAP( NAXES, ' ', STATUS )
-         CALL AST_ADDFRAME( IWCS, JSET, UMAP, SETFRM, STATUS )
+            NAXES = AST_GETI( SETFRM, 'Naxes', STATUS )
+            UMAP = AST_UNITMAP( NAXES, ' ', STATUS )
+            CALL AST_ADDFRAME( IWCS, JSET, UMAP, SETFRM, STATUS )
 
 *  Restore the Current frame to its previous state.
-         CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
+            CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
 
 *  Calculate the frame index of the newly added frame.
-         JNEW = AST_GETI( IWCS, 'Nframe', STATUS )
+            JNEW = AST_GETI( IWCS, 'Nframe', STATUS )
 
 *  Ensure that there are no other frames with the domain CCD_SET.
-         CALL CCD1_DMPRG( IWCS, 'CCD_SET', .TRUE., JNEW, STATUS )
+            CALL CCD1_DMPRG( IWCS, 'CCD_SET', .TRUE., JNEW, STATUS )
 
 *  Write the WCS frameset back into the NDF.
-         CALL NDF_PTWCS( IWCS, INDF, STATUS )
+            CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
 *  Exit the AST context.
-         CALL AST_END( STATUS )
+            CALL AST_END( STATUS )
+         END IF
       END IF
 
       END
