@@ -582,6 +582,10 @@ sub put {
       $newloc = $location;
    }
 
+#  If there is no write to be done, return successfully.
+
+   return 1 unless ($newloc);
+
 #  Attempt the write.
 
    eval { $rlocate->{$name} = $newloc };
