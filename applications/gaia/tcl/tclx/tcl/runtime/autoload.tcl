@@ -45,6 +45,7 @@ proc auto_load_index {} {
 	if {$issafe} {
 	    catch {source [file join $dir tclIndex]}
 	} elseif {[catch {set f [open [file join $dir tclIndex]]}]} {
+	    catch {source [file join $dir tclIndex]}
 	    continue
 	} else {
 	    set error [catch {
