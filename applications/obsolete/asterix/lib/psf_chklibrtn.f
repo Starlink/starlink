@@ -84,7 +84,7 @@
         IF ( NMATCH .EQ. 0 ) THEN
           CALL MSG_SETC( 'LIB', LIB )
           STATUS = SAI__ERROR
-          CALL ERR_RPE( ' ', 'No such library ^LIB', STATUS )
+          CALL ERR_REP( ' ', 'No such library ^LIB', STATUS )
 
 *      Check for ambiguous definition
         ELSE IF ( NMATCH .GT. 1 ) THEN
