@@ -85,6 +85,9 @@
       mkdir ${REL_DIR}/sun223_figures
       mv `grp figs` ${REL_DIR}/sun223_figures
 
+#  Create the tar file holding the IRAF files.
+      make_iraf
+
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
       tar -cvh -f ${TEMPDIR}/polpack.tar `grp unix_total` 
