@@ -527,8 +527,7 @@ uninstall-info: uninstall-info-recursive
 	maintainer-clean-recursive mostlyclean mostlyclean-generic \
 	mostlyclean-recursive pdf pdf-am pdf-recursive ps ps-am \
 	ps-recursive tags tags-recursive uninstall uninstall-am \
-	uninstall-info-am uninstall-info-recursive uninstall-recursive
-
+	uninstall-info-am uninstall-info-recursive uninstall-recursive \
 			  acx_pthread.m4 acx_prog_cc_optim.m4
 rpm:	dist
 	cp -f $(PACKAGE)-$(VERSION).tar.gz $(RPM_SRCDIR)
