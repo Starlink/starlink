@@ -36,11 +36,11 @@ ifelse(SCRIPTNAME, alink,
 #         is given, .o will be assumed. prog must be the name of the task's 
 #         main subroutine, and will be the name of the executable produced.
 #         The main subroutine must have one argument, INTEGER for Fortran
-#         and (int *) for C. If the main subroutine is a .c file, a wrapper
+#         and (int *) for C.  If the main subroutine is a .c file, a wrapper
 #         subroutine is created to interface between it and the ADAM task
-#         fixed part. (N.B. This will not occur if the main subroutine is in
-#         an object file, so C main subroutines must always be compiled by
-#         the SCRIPTNAME command.)
+#         fixed part.  If the main subroutine is a prog.o, then it is treated
+#         as a Fortran or C file depending on which one of prog.f or prog.c
+#         exists.
 #       
 #       other_arguments is a space-separated list list of modules, and 
 #         compiler or linker options. Fortran and C source files may be
@@ -214,32 +214,66 @@ then
     read PROGNAME
 fi
 
-# next determine name of program allowing a certain amount of flexibility
-# first get any path component
-
+# Next, determine the name of the program, allowing a certain
+# amount of flexibility.  First get any path component.
 DIR=`dirname $PROGNAME`
 
 # Set PROGNAME to the name to be called by DTASK_APPLIC
-#     EXENAME to the name to call the executable
+#     EXENAME  to the name to call the executable
+#     ARGS     to the object file to be linked (first of several)
 
+found_object_file=:
 case $PROGNAME in
     *.o)
         EXENAME=`basename $PROGNAME .o`
-        PROGNAME=$EXENAME
-        ARGS=${DIR}/${PROGNAME}.o
         ;;
     *.f)
         EXENAME=`basename $PROGNAME .f`
-        PROGNAME=$EXENAME
-        ARGS=${DIR}/${PROGNAME}.f
+        found_object_file=false
         ;;
     *.c)
         found_c_files=:
         EXENAME=`basename $PROGNAME .c`
-        PROGNAME=dtask_wrap
+        found_object_file=false
+        ;;
+    *)
+        # Assume a .o extension
+        EXENAME=`basename $PROGNAME`
+        ;;
+esac
+
+if $found_object_file
+then
+    # We don't know what language the .o file came from
+    if [ -f $EXENAME.c ]
+    then
+        # seems to be C, but...
+        if [ -f $EXENAME.f ]
+        then
+            # ...ooops, we don't know if this .o file came from a .f 
+            # or a .c source, since both are present.
+            echo "$0: subroutine is $PROGNAME, but both $EXENAME.c and $EXENAME.f exist.  I'm confused!" >&2
+            exit 1
+        fi
+        found_c_files=:
+    fi
+fi
+
+# Is the subroutine a C file or a compiled C file?
+if $found_c_files; then
+    # It is, so add a C subroutine which can be called from Fortran,
+    # which calls the subroutine in the argument.
+    if $found_object_file
+    then
+        # we were given the object file, so don't compile it again
+        CARGS=dtask_wrap.c
+    else
+        # need to compile $PROGNAME
         CARGS="${DIR}/${EXENAME}.c dtask_wrap.c"
-        ARGS="${EXENAME}.o dtask_wrap.o"
-        cat >dtask_wrap.c <<FOO
+    fi
+    PROGNAME=dtask_wrap
+    ARGS="${EXENAME}.o dtask_wrap.o"
+    cat >dtask_wrap.c <<FOO
 #include "f77.h"
 void $EXENAME(int *status);
 
@@ -251,13 +285,19 @@ F77_EXPORT_INTEGER(status,*fstatus);
 return;
 }
 FOO
-        ;;
-    *)
-        EXENAME=`basename $PROGNAME`
-        PROGNAME=$EXENAME
+else
+    # A Fortran file, or a compiled Fortran file.
+    PROGNAME=$EXENAME
+    if $found_object_file
+    then
+        # don't compile it again
         ARGS=${DIR}/${PROGNAME}.o
-        ;;
-esac
+    else
+        ARGS=${DIR}/${PROGNAME}.f
+    fi
+fi
+
+
 
 # Add remaining arguments to ARGS, starting with any INITOPTS.
 if [ -n "$INITOPTS" ]
@@ -288,6 +328,7 @@ do
     esac
     [[shift]]
 done
+
 
 # Compile C files if any.  This compiles all of the files listed in CARGS.
 # Is this portable?
@@ -420,16 +461,15 @@ cmpdtask="$LIBTOOL --mode=compile @FC@ $extra_mode_args @FCFLAGS@ \
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
-# Link this using the C compiler, linking in the Fortran runtime in FCLIBS
-linkcmd="$LIBTOOL --mode=link @CC@ @CFLAGS@ $extra_mode_args -o $EXENAME \
+linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $extra_mode_args -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
         dtask_applic.lo \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
-        `dtask_link_adam` \
-        @FCLIBS@"
+        @DTASK_LINK_ADAM@ \
+        @C_FC_FCLINK_MAGIC@"
 
 # Substitute any -lX options which refer to a libtool library
 # @libdir@/libX.la,
