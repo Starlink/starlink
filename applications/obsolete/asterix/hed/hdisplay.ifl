@@ -8,8 +8,7 @@
        ASSOCIATION '<->GLOBAL.HDSOBJ'
     ENDPARAMETER
    parameter DEV
-     position 2
-     type '_CHAR'
+     type 'LITERAL'
      vpath 'default'
      default 'TERMINAL'
      prompt 'Output to'
@@ -23,7 +22,7 @@
      help 'Allows you to overide default width of 80 for a terminal'
    endparameter
    parameter SLICE                                                               
-     type '_CHAR'                                                                
+     type 'LITERAL'
      vpath 'DEFAULT'
      default '*'                                                               
      prompt 'Slice'                                                         
