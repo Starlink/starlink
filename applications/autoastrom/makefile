@@ -1152,7 +1152,7 @@ sun242.xml: doc/sun242.xml
 # moggy/Makefile.in and astrom/astrom.f are pseudo-dependencies: if
 # these don't exist, they're created by unpacking the source tarball.
 # The file build-subdirs must not exist at any time.
-build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/astrom.f
+build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a astrom/makefile
 	cd moggy && unset INSTALL; make
 	cd astrom && ./mk build
 
@@ -1161,6 +1161,32 @@ moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
 	CLDIR=`cd $(CATLIBINSTALLDIR);pwd`; \
 		cd moggy && unset INSTALL; \
 		CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$CLDIR
+
+# Creating astrom/makefile configures the astrom package.  The version
+# of astrom currently in the astrom directory is the _same_ as the
+# released version, so it is no longer strictly necessary to carry
+# around our own private version like this.  However, doing it this
+# way means we don't have to bother to check whether the system's
+# astrom version is 3.7 at least; we'll give up on this in a couple of
+# versions, once we can be reasonably confident that astrom 3.7+ is
+# likely to be around.
+#
+# We do need to test what version of AST we are going to be using
+# (implicitly, through ATOOLS).  We want to use the wcsstyle=qtan
+# astrom option as a default, but this is recognised only by AST 2.0-7
+# and better; with earlier ones we must use wcsstyle=xtan by default.
+# DSB added the AST function astVersion_ (macro astVersion) in this
+# same release, so if that function is there, we know we have that
+# release or better.
+astrom/makefile: astrom/makefile.in
+	echo 'int astVersion_(); int main() { astVersion_(); return 0; }' >conftest.c
+	if cc -o conftest conftest.c -L$(STAR_LIB) `$(STAR_BIN)/ast_link` >conftest.log 2>&1; then \
+	    echo "AST >= 2.0-7"; echo DEFWCSSTYLE=qtan >conftest.tanresult; \
+	else \
+	    echo "AST < 2.0-7"; echo DEFWCSSTYLE=xtan >conftest.tanresult; \
+	fi
+	cd astrom && ./configure `cat ../conftest.tanresult`
+	$(RMF) conftest*
 
 #  Build and install the SkyCat cat library.  We install it into the
 #  directory $(CATLIBINSTALLDIR), and pass that to the moggy configure
@@ -1201,7 +1227,7 @@ $(CATLIBINSTALLDIR)/stamp:
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
 #  circular if this depends explicitly on the source tarball
-moggy/Makefile.in astrom/astrom.f:
+moggy/Makefile.in astrom/makefile.in:
 	@ if test ! -f $(PKG_NAME)_source.tar; then \
 		echo "Eh!? Don't have source, and don't have source tarball"; \
 		exit 1; \
