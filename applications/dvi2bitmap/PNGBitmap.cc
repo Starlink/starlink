@@ -104,10 +104,11 @@ void PNGBitmap::write (const string filename)
     // Set up output code
     png_init_io (png_ptr_, pngfile);
 
-    // find the next power-of-two bitdepth above bpp_
-    int png_bitdepth = 1;
-    for (int bd=bpp_; bd != 0; bd >>= 1)
-	    png_bitdepth <<= 1;
+    // find the first power-of-two bitdepth not less than bpp_
+    assert (bpp_ <= 16);	// following loop will terminate
+    int png_bitdepth;
+    for (png_bitdepth = 1; png_bitdepth < bpp_; png_bitdepth *= 2)
+	;
 
     if (verbosity_ > normal)
 	cout << "Initialising png_set_IHDR: w="<<w_
@@ -197,16 +198,18 @@ void PNGBitmap::write (const string filename)
     // pointers to rows in the bitmap.  Create this here, possibly
     // after (re)allocating the array.
     static const Byte **rows;
-    static int rows_alloc = -1;	// rely on this being initialised less
-				// than any bitmapRows_
+    static int rows_alloc = -1;	// rely on this being initialised
+				// negative, and specifically less
+				// than any h_
     if (rows_alloc < h_)
     {
 	if (rows_alloc >= 0)		// previously allocated
 	    delete[] rows;
-	// find the next power-of-two above h_
-	rows_alloc = 1;
-	for (int pow2=h_; pow2 != 0; pow2 >>= 1)
-	    rows_alloc <<= 1;
+	// find the first power-of-two not less than h_ (there's no
+	// real reason why it has to be a power of two, but this means
+	// that the allocated space grows gracefully).
+	for (rows_alloc = 1; rows_alloc < h_; rows_alloc *= 2)
+	    ;
 	rows = new (const Byte*)[rows_alloc];
 	if (verbosity_ > normal)
 	    cerr << "PNGBitmap: allocated " << rows_alloc
@@ -268,7 +271,8 @@ static void png_invert_greyscale (png_structp png_ptr,
     //   png_byte channels      number of channels (1-4)
     //   png_byte pixel_depth   bits per pixel (depth*channels)
 
-    int maxval = (1<<row_info->bit_depth)-1;
+    assert (row_info->bit_depth <= 8); // *dp is a byte
+    unsigned int maxval = (1<<row_info->bit_depth)-1;
 
     /*
     cout << "invert_greyscale: "
@@ -281,6 +285,7 @@ static void png_invert_greyscale (png_structp png_ptr,
 	 << "\n";
     */
 
+    assert (row_info->width >= 0);
     for (unsigned int n=0; n<row_info->width; n++, dp++)
 	*dp = maxval-*dp;
 }
