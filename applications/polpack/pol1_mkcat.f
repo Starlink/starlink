@@ -39,8 +39,9 @@
 *        Are variance values available? If not, the columns containing
 *        standard deviations are not created.
 *     ANGROT = REAL (Given)
-*        ACW angle in degrees from pixel X axis to analyser angle. This
-*        is stored as a parameter of the catalogue.
+*        ACW angle in degrees from pixel X axis to the reference direction 
+*        in the output catalogue. This is stored as a parameter of the 
+*        catalogue.
 *     TITLE = CHARACTER * ( * ) (Given)
 *        A title string to store as the TITLE parameter for the catalogue.
 *        No TITLE parameter is created if TITLE is blank.
@@ -210,6 +211,9 @@
       CALL CAT_PPTSR( CI, 'ANGROT', ANGROT, 'ACW angle from X axis '//
      :                'to ref. direction', QI, STATUS )
       CALL CAT_TRLSE( QI, STATUS )
+
+*  Store the POLPACK version string as a catalogue parameter.
+      CALL POL1_PTVRC( CI, STATUS )
 
 *  Annul the pointer to the Base Fame.
       CALL AST_ANNUL( FRM, STATUS )

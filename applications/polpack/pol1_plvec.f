@@ -1,8 +1,8 @@
       SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
-     :                       ANGROT, STKID, DEBIAS, VAR, MAKEI, MAKEP, 
-     :                       MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
-     :                       CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
-     :                       ATV, AIPV, AQV, AUV, AVV, STATUS )
+     :                       STKID, DEBIAS, VAR, ANGROT, ANGRT, MAKEI, 
+     :                       MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
+     :                       MAKECT, CI, AI, AP, AT, AIP, AQ, AU, AV, 
+     :                       AIV, APV, ATV, AIPV, AQV, AUV, AVV, STATUS )
 *+
 *  Name:
 *     POL1_PLVEC
@@ -14,8 +14,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
-*                      ANGROT, STKID, DEBIAS, VAR, MAKEI, MAKEP, 
+*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
+*                      DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP, 
 *                      MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
 *                      CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
 *                      ATV, AIPV, AQV, AUV, AVV, STATUS )
@@ -41,8 +41,6 @@
 *     VSTOKE( NPIX, NROW, NPLANE ) = REAL (Given)
 *        The variance on the Stokes parameters. It is ignored if VAR is 
 *        .FALSE..
-*     ANGROT = REAL (Given)
-*        ACW angle in degrees from pixel X axis to analyser angle.
 *     STKID = CHARACTER * ( * ) (Given)
 *        A string of characters identifying each plane of the input arrays.
 *        The first character applies to plane 1, the second to plane 2, 
@@ -54,6 +52,12 @@
 *        value.
 *     VAR = LOGICAL (Given)
 *        It is .TRUE. if output variance values are to be returned.
+*     ANGROT = REAL (Given)
+*        ACW angle in degrees from pixel X axis to reference direction in
+*        input cube.
+*     ANGRT = REAL (Given)
+*        ACW angle in degrees from pixel X axis to reference direction in
+*        output NDFs and catalogue.
 *     MAKEI = LOGICAL (Given)
 *        It is .TRUE. if a total intensity output array is required.
 *     MAKEP = LOGICAL (Given)
@@ -124,6 +128,8 @@
 *        being stored in output images.
 *     24-JUN-1998 (DSB):
 *        Added Q,U and V outputs.
+*     6-APR-1999 (DSB):
+*        Added rotation of reference direction (ANGRT).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -145,10 +151,11 @@
       INTEGER NPLANE
       REAL STOKE( NPIX, NROW, NPLANE )
       REAL VSTOKE( NPIX, NROW, NPLANE )
-      REAL ANGROT
       CHARACTER STKID*(*)
       LOGICAL DEBIAS
       LOGICAL VAR
+      REAL ANGROT
+      REAL ANGRT
       LOGICAL MAKEI
       LOGICAL MAKEP
       LOGICAL MAKET
@@ -322,7 +329,7 @@
                UIN = STOKE( PIX, ROW, JU )
                IF( VAR ) VUIN = VSTOKE( PIX, ROW, JU )
 
-*  If any of the four intensities are bad, store bad results.
+*  If any of the intensities are bad, store bad results.
                IF ( IIN .EQ. VAL__BADR .OR. QIN .EQ. VAL__BADR .OR.
      :              UIN .EQ. VAL__BADR ) THEN
    
@@ -361,11 +368,22 @@
 
 *  Normalised Stokes parameters.
                   Q = QIN / IIN
-                  Q2 = Q * Q
-   
                   U = UIN / IIN
-                  U2 = U * U
+
+*  If required, rotate the Q and U vectors to the new reference direction.
+                  IF( ANGROT .NE. ANGRT ) THEN
+                     COS2D = COS( 2*( ANGRT - ANGROT )/RTOD )
+                     SIN2D = SIN( 2*( ANGRT - ANGROT )/RTOD )
+                     QN = Q*COS2D + U*SIN2D
+                     UN = U*COS2D - Q*SIN2D
+                     Q = QN
+                     U = UN
+                  END IF
    
+*  Get the squared Q and U values.
+                  Q2 = Q * Q
+                  U2 = U * U
+
 *  Percentage polarisation.
                   P2 = Q2 + U2 
                   P = 100.0 * SQRT( MAX( 0.0, P2 ) )
@@ -445,7 +463,7 @@
 
                IF ( MAKET ) THEN
                   IF( T .NE. VAL__BADR ) THEN
-                     AT( PIX, ROW ) = ANGROT + T
+                     AT( PIX, ROW ) = T
                   ELSE
                      AT( PIX, ROW ) = VAL__BADR
                   END IF
@@ -490,8 +508,7 @@
      :                            STATUS )
 
                   IF ( T .NE. VAL__BADR ) THEN
-                     CALL CAT_PUT0R( ANCAT,  ANGROT + T, .FALSE.,
-     :                               STATUS )
+                     CALL CAT_PUT0R( ANCAT,  T, .FALSE., STATUS )
                   ELSE
                      CALL CAT_PUT0R( ANCAT,  VAL__BADR, .TRUE., 
      :                               STATUS )

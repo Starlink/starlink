@@ -82,7 +82,7 @@
          exit
       endif
 
-      foreach file (pol1_ptvrs.f)
+      foreach file (pol1_ptvrs.f pol1_ptvrc.f)
          sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
          mv -f temp $file
       end

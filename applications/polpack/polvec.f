@@ -153,11 +153,15 @@
 *  Notes:
 *     -  The output NDFs are deleted if there is an error during the
 *     formation of the polarization parameters.
-*     -  The reference direction for the output Stokes parameters and 
-*     vector angles is specified by the ANGROT component in the POLPACK
-*     extension of the input Stokes cube. This ANGROT value is stored in
-*     the output catalogues and images so that it can be accessed by
-*     later applications.
+*     -  An item named ANGROT is stored with each output dataset. In the
+*     case of NDF outputs, ANGROT is a component of the POLPACK extension. 
+*     In the case of the catalogue output, ANGROT is a catalogue parameter.
+*     In both cases ANGROT gives the anti-clockwise angle from the first 
+*     pixel axis (X) to the reference direction of the Stokes vectors and
+*     polarization vectors. The reference direction will be north if the 
+*     input NDF has a celestial co-ordinate Frame within its WCS component. 
+*     Otherwise, the reference direction will be the second pixel axis (i.e. 
+*     ANGROT will be +90 degrees).
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -198,8 +202,8 @@
 *  Local Variables:
       CHARACTER METH*6           ! Binning method
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
-      CHARACTER UNITS*40         ! Units from input Stokes cube
       CHARACTER TITLE*80         ! Title from input Stokes cube
+      CHARACTER UNITS*40         ! Units from input Stokes cube
       DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
       INTEGER BOX( 2 )           ! Bin size
       INTEGER CI                 ! CAT identifier for output catalogue
@@ -258,7 +262,8 @@
       LOGICAL MAKEU              ! U output required?
       LOGICAL MAKEV              ! V output required?
       LOGICAL VAR                ! Output variances required?
-      REAL ANGROT                ! ACW angle from X axis to analyser axis (degs)
+      REAL ANGROT                ! Input ref. direction 
+      REAL ANGRT                 ! Output ref. direction
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL TR2( 4 )              ! Coeffs. of mapping from cell indices to coordinates
       REAL WLIM                  ! Min. fraction of good input pixels per bin
@@ -298,7 +303,7 @@
 
 *  Get the value of the ANGROT component in the POLPACK extension. 
 *  This is the anti-clockwise angle from the first axis of the image to
-*  the analyser axis (i.e. WPLATE=0.0 axis), in degrees.
+*  the input reference direction, in degrees.
       ANGROT = 0.0
       CALL NDF_XGT0R( INDF1, 'POLPACK', 'ANGROT', ANGROT, STATUS ) 
 
@@ -402,6 +407,12 @@
 *  2D arrays.
       CALL POL1_GTWCS( INDF1, TR, IWCS, STATUS )
 
+*  Get the reference direction for the output catalogue. This may be
+*  different to the reference direction for the input cube.
+      CALL POL1_ANGRT( IWCS, 0.5*REAL( LBND( 1 ) + UBND( 1 ) - 1 ),
+     :                 0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT, 
+     :                 STATUS )
+
 *  Obtain the total-intensity NDF.
 *  ===============================
 
@@ -426,6 +437,9 @@
          IPIV = IPI
          IF ( VAR ) CALL NDF_MAP( INDFI, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIV, EL, STATUS )
+
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFI, STATUS )
 
 *  If no total-intensity NDF was obtained, annul the error and set a
 *  flag to indicate that no total intensity NDF need be produced.
@@ -467,6 +481,9 @@
          IF ( VAR ) CALL NDF_MAP( INDFP, 'VARIANCE', '_REAL', 'WRITE',
      :                           IPPV, EL, STATUS )
 
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFP, STATUS )
+
 *  If no percent-polarisation NDF was obtained, annul the error and set
 *  a flag to indicate that no percent polarisation NDF need be
 *  produced.
@@ -506,10 +523,13 @@
          IF ( VAR ) CALL NDF_MAP( INDFT, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPTV, EL, STATUS )
 
-*  Store the ANGROT value in a POLPACK extension.
+*  Store the ANGROT item in the POLPACK extension.
          CALL NDF_XNEW( INDFT, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
-         CALL NDF_XPT0R( ANGROT, INDFT, 'POLPACK', 'ANGROT', STATUS )
+         CALL NDF_XPT0R( ANGRT, INDFT, 'POLPACK', 'ANGROT', STATUS )
+
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFT, STATUS )
 
 *  If no angle NDF was obtained, annul the error and set a flag to
 *  indicate that no angle NDF need be produced.
@@ -546,6 +566,9 @@
          IF ( VAR ) CALL NDF_MAP( INDFIP, 'VARIANCE', '_REAL', 'WRITE',
      :                            IPIPV, EL, STATUS )
 
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFIP, STATUS )
+
 *  If no polarised-intensity NDF was obtained, annul the error and set a
 *  flag to indicate that no polarised intensity NDF need be produced.
       ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -578,10 +601,13 @@
          IF ( VAR ) CALL NDF_MAP( INDFQ, 'VARIANCE', '_REAL', 
      :                            'WRITE/BAD', IPQV, EL, STATUS )
 
-*  Store the ANGROT value in a POLPACK extension.
+*  Store the ANGROT item in the POLPACK extension.
          CALL NDF_XNEW( INDFQ, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
-         CALL NDF_XPT0R( ANGROT, INDFQ, 'POLPACK', 'ANGROT', STATUS )
+         CALL NDF_XPT0R( ANGRT, INDFQ, 'POLPACK', 'ANGROT', STATUS )
+
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFQ, STATUS )
 
 *  If no polarised-intensity NDF was obtained, annul the error and set a
 *  flag to indicate that no Q NDF need be produced.
@@ -618,7 +644,10 @@
 *  Store the ANGROT value in a POLPACK extension.
          CALL NDF_XNEW( INDFU, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
-         CALL NDF_XPT0R( ANGROT, INDFU, 'POLPACK', 'ANGROT', STATUS )
+         CALL NDF_XPT0R( ANGRT, INDFU, 'POLPACK', 'ANGROT', STATUS )
+
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFU, STATUS )
 
 *  If no U NDF was obtained, annul the error and set a
 *  flag to indicate that no U NDF need be produced.
@@ -655,7 +684,10 @@
 *  Store the ANGROT value in a POLPACK extension.
          CALL NDF_XNEW( INDFV, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
-         CALL NDF_XPT0R( ANGROT, INDFV, 'POLPACK', 'ANGROT', STATUS )
+         CALL NDF_XPT0R( ANGRT, INDFV, 'POLPACK', 'ANGROT', STATUS )
+
+*  Store the current POLPACK version number.
+         CALL POL1_PTVRS( INDFV, STATUS )
 
 *  If no V NDF was obtained, annul the error and set a
 *  flag to indicate that no V NDF need be produced.
@@ -701,7 +733,7 @@
 
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
-     :                 UNITS, VAR, ANGROT, TITLE, CI, STATUS )
+     :                 UNITS, VAR, ANGRT, TITLE, CI, STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -769,13 +801,13 @@
 
 *  Call the routine to do the work.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
-     :                %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
-     :                MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
-     :                MAKECT, CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
-     :                %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ), 
-     :                %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ), 
-     :                %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ), 
-     :                %VAL( IPUV ), %VAL( IPVV ), STATUS )
+     :               %VAL( IPVBIN ), STOKES, DEBIAS, VAR, ANGROT, ANGRT, 
+     :               MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
+     :               MAKECT, CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
+     :               %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ), 
+     :               %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ), 
+     :               %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ), 
+     :               %VAL( IPUV ), %VAL( IPVV ), STATUS )
 
 *  Closedown.
 *  ==========

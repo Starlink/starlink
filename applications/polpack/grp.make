@@ -35,7 +35,7 @@ pol1_clcnt.f pol1_cm1rr.f pol1_cm3rr.f pol1_cpctd.f pol1_cpctr.f \
 pol1_ctclm.f pol1_deftb.f pol1_gtcta.f pol1_gtctc.f pol1_gtctw.f \
 pol1_gtwcs.f pol1_imfit.f pol1_knext.f pol1_lnam.f pol1_mkcat.f \
 pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
-pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_sto0.glrdic \
+pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_sto0.glrdic pol1_ptvrc.f \
 pol1_stoc.glrdic pol1_vecky.f pol1_vecpl.f pol1_vect.f pol_cale.f \
 pol_calf.f pol_calp.f pol_calti.f polbin.f polbin.ifl polcal.f \
 polcal.ifl polcent.f polcent.ifl polexp.csh polexp.f polexp.ifl \
@@ -48,7 +48,7 @@ tick.bit vertex.bit wrndf.f pol1_dbeam.f pol1_blkwr.f pol1_sngvr.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f  pol1_snghd.f  \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_sngfl.f pol1_sngsi.f \
 pol1_sngsm.f pol1_hist2.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f \
-pol1_prsvr.f
+pol1_prsvr.f pol1_gtvrc.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
