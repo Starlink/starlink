@@ -164,8 +164,8 @@ F77_SUBROUTINE(psx_malloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
       sprintf( errbuf, 
-         "Failed to allocate space with malloc. %d bytes requested",
-         *size );
+         "Failed to allocate space with malloc. %u bytes requested",
+         (size_t)(*size) );
       psx1_rep_c( "PSX_MALLOC_NOALL", errbuf, status );
    }
 
