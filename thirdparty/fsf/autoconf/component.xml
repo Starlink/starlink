@@ -6,10 +6,7 @@
   <path>thirdparty/fsf/autoconf</path>
   <description>GNU autoconf</description>
   <!-- <abstract><p></p></abstract> -->
-  <dependencies>
-    <build></build>
-    <use></use>
-  </dependencies>
+  <dependencies/>
   <developers>
     <!-- Cast of thousands, but locally to Starlink... -->
     <person>
