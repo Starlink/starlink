@@ -18,17 +18,27 @@
 
 #  Public Methods:
 #
-#     draw canvas cx cy taglist
+#     draw canvas cx cy taglist label
 #        Draws a marker of the current type on the canvas window given
 #        by the canvas argument at coordinates (cx, cy).
 #        All the elements of the list taglist are added as tags of
-#        the canvas item thus created.
-#
+#        the canvas item thus created.  The label is text printed only
+#        if the 'showindex' of the 'value' configuration variable is
+#        true.
 
 #  Public Variables (Configuration Options):
 #
 #     value
-#        The value which indicates the type of the marker.  This is an
+#        The value which indicates the type of the marker.  This has
+#        the form of a comma-separated list of attribute=value
+#        strings.  The available attributes are:
+#           - colour     -- Colour of the marker.
+#           - size       -- Approximate height of the marker in pixels.
+#           - thickness  -- Approximate thickness of lines in pixels.
+#           - shape      -- One of Plus, Cross, Circle, Square, Diamond
+#           - showindex  -- 1 to show index numbers, 0 not to do so.
+
+
 #        opaque value, and other than reading and writing it, client code
 #        cannot do anything useful with it.
 #
@@ -58,7 +68,7 @@
          itk_component add shower {
             canvas $itk_component(marktype).shower \
                -height 26 \
-               -width 40 
+               -width 50 
          }
 
 #  Pack the control.
@@ -67,13 +77,13 @@
          pack $itk_component(control)
 
 #  Construct the dialog which selects the marker shape.
-         set attmenus {Colour Size Thickness Shape}
-         set option(Colour) {Red Blue Green Yellow White Black}
-         set option(Size) {3 5 7 9 11 15}
-         set option(Thickness) {1 2 3 4 5}
-         set option(Shape) {Plus Cross Circle Square Diamond}
-         set attchecks {Showindex}
-         set checklabels(Showindex) "Show Index"
+         set attmenus {colour size thickness shape}
+         set option(colour) {red blue darkgreen black green yellow white}
+         set option(size) {2 4 6 8 10 12 14 16 18 20 22}
+         set option(thickness) {1 2 3 4 5 6}
+         set option(shape) {plus cross circle square diamond}
+         set attchecks {showindex}
+         set checklabels(showindex) "Show Index"
          set lws ""
          itk_component add markerdialog {
             iwidgets::dialog $itk_interior.markdialog \
@@ -96,7 +106,7 @@
          foreach att $attmenus {
             itk_component add $att {
                iwidgets::optionmenu $menubox.x$att \
-                  -labeltext $att: \
+                  -labeltext [ string totitle $att ]: \
                   -command [ code $this newmarker ]
             }
             eval $itk_component($att) insert end $option($att)
@@ -121,6 +131,13 @@
          }
          eval iwidgets::Labeledwidget::alignlabels $lws
 
+#  Set defaults.
+         setatt colour red
+         setatt size 12
+         setatt thickness 2
+         setatt shape plus
+         setatt showindex 0
+
 #  Add the marker preview canvas.
          itk_component add scratchholder {
             frame $menubox.sh -relief groove -borderwidth 2
@@ -128,7 +145,7 @@
          itk_component add scratchcanvas {
             canvas $itk_component(scratchholder).canv \
                -height 40 \
-               -width 40
+               -width 50
          }
          pack $itk_component(scratchholder) -side top -anchor c
          pack $itk_component(scratchcanvas)
@@ -148,22 +165,25 @@
 #-----------------------------------------------------------------------
       public method draw { canvas cx cy {tags ""} {label ""} } {
 #-----------------------------------------------------------------------
-         set x [ expr round( $cx ) + 0.5 ]
-         set y [ expr round( $cy ) - 0.5 ]
+       # set x [ expr round( $cx ) + 0.5 ]
+       # set y [ expr round( $cy ) - 0.5 ]
+         set x [ expr round( $cx ) ]
+         set y [ expr round( $cy ) ]
+         
          foreach copair $mcopairs {
             lappend coords [ expr [ lindex $copair 0 ] + $x ] \
                            [ expr [ lindex $copair 1 ] + $y ]
          }
          set id [ eval $canvas create $mitem $coords $mconfig ]
          $canvas itemconfigure $id -tags $tags
-         if { $label != "" && [ getatt Showindex ] } {
-            set ss [ getatt Size ]
+         if { $label != "" && [ getatt showindex ] } {
+            set ss [ getatt size ]
             $canvas create text \
                [ expr round( $x ) + $ss * 0.8 ] [ expr round( $y ) ] \
                -tags $tags \
                -anchor w \
-               -font "helvetica [ expr -2 * ( $ss - 1 ) ]" \
-               -fill [ getatt Colour ] \
+               -font "helvetica [ expr -2 * round( $ss * 0.75 ) ]" \
+               -fill [ getatt colour ] \
                -text $label
          }
       }
@@ -186,6 +206,7 @@
 #-----------------------------------------------------------------------
       public method getatt { att } {
 #-----------------------------------------------------------------------
+         set att [ string tolower $att ]
          if { [ lsearch $attmenus $att ] > -1 } {
             return [ $itk_component($att) get ]
          } elseif { [ lsearch $attchecks $att ] > -1 } {
@@ -199,8 +220,16 @@
 #-----------------------------------------------------------------------
       public method setatt { att val } {
 #-----------------------------------------------------------------------
+         set att [ string tolower $att ]
          if { [ lsearch $attmenus $att ] > -1 } {
-            set ival [ max [ lsearch $option($att) $val ] 0 ]
+            if { [ set ival [ lsearch $option($att) $val ] ] < 0 } {
+               set option($att) [ concat $val $option($att) ]
+               set c [ $itk_component($att) cget -command ]
+               $itk_component($att) configure -command ""
+               $itk_component($att) insert 0 $val
+               $itk_component($att) configure -command $c
+               set ival 0
+            }
             $itk_component($att) select $ival
          } elseif { [ lsearch $attchecks $att ] > -1 } {
             set checkvars($att) $val
@@ -239,7 +268,7 @@
          }
          newmarker
          $canv delete sampler
-         set cx [ expr [ $canv cget -width ] / 2 - [ getatt Size ] ]
+         set cx [ expr [ $canv cget -width ] / 2 - [ getatt size ] / 2 ]
          set cy [ expr [ $canv cget -height ] / 2 ]
          draw $canv $cx $cy sampler 1
       }
@@ -264,42 +293,51 @@
       private method newmarker { } {
 #-----------------------------------------------------------------------
 #  Set configuration options for the marker just selected in the dialog.
-         set mconfig "-width [ getatt Thickness ]"
-         set s [ expr int( ( [ getatt Size ] - 1 ) / 2 ) ]
-         switch [ getatt Shape ] {
-            Plus {
+         set s [ expr int( ( [ getatt size ] + 1 ) / 2 ) ]
+         set t [ getatt thickness ]
+         switch [ getatt shape ] {
+            plus {
                set mitem line
                set mcopairs [ list "0 0" "0 -$s" "0 0" "0 $s" \
                                    "0 0" "-$s 0" "0 0" "$s 0" "0 0" ]
-               append mconfig " -joinstyle bevel -fill [ getatt Colour ]"
+               if { [ expr $t / 2 * 2 ] != $t } {
+                  incr t
+               }
+               set mconfig "-joinstyle bevel -fill [ getatt colour ] -width $t"
             }
-            Cross {
+            cross {
                set mitem line
                set mcopairs [ list "0 0" "-$s -$s" "0 0" "-$s $s" \
                                    "0 0" "$s $s" "0 0" "$s -$s" "0 0" ]
-               append mconfig " -fill [ getatt Colour ]"
+               if { [ expr $t / 2 * 2 ] == $t } {
+                  incr t
+               }
+               set mconfig "-fill [ getatt colour ] -width $t"
             }
-            Circle {
+            circle {
                set mitem oval
                set mcopairs [ list "-$s -$s" "$s $s" ]
-               append mconfig " -outline [ getatt Colour ]"
+               set mconfig "-outline [ getatt colour ] -width $t"
             }
-            Square {
+            square {
                set mitem polygon
                set mcopairs [ list "-$s -$s" "-$s $s" "$s $s" "$s -$s" ]
-               append mconfig " -outline [ getatt Colour ] -fill {}"
+               set mconfig "-outline [ getatt colour ] -fill {} -width $t"
             }
-            Diamond {
+            diamond {
                set mitem polygon
                set mcopairs [ list "0 -$s" "$s 0" "0 $s" "-$s 0" ]
-               append mconfig " -outline [ getatt Colour ] -fill {}"
+               set mconfig "-outline [ getatt colour ] -fill {} -width $t"
+            }
+            default {
+               error "No such shape: [ getatt shape ]"
             }
          }
 
 #  Draw the marker on the example canvas.
          foreach c "$itk_component(scratchcanvas)" {
             $c delete sampler
-            set cx [ expr [ $c cget -width ] / 2 - [ getatt Size ] ]
+            set cx [ expr [ $c cget -width ] / 2 - [ getatt size ] / 2 ]
             set cy [ expr [ $c cget -height ] / 2 ]
             draw $c $cx $cy sampler 1
          }
@@ -332,6 +370,7 @@
    itk::usual Marktypecontrol {
       keep -background -cursor -foreground 
    }
+   option add *Marktypecontrol.selectColor #b03060 widgetDefault
 
 
 ########################################################################
