@@ -12,6 +12,13 @@ interface IMARK
     prompt 'Mark current position'
     help 'Otherwise get positions from file'
   endparameter
+  parameter ALL
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Mark all known positions'
+    help 'Mark the positions in the the internal list'
+  endparameter
   parameter LIST
     position 1
     type '_CHAR'
