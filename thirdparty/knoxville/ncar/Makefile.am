@@ -79,6 +79,9 @@ PRIVATE_INCLUDES = ncar.h
 #  List of Fortran sources that must be edited before compilation.
 FPP_ROUTINES = mapint.fpp pwritx.fpp
 
+mapint.f: mapint.fpp
+pwritx.f: pwritx.fpp
+
 # build the data files
 
 noinst_PROGRAMS = convrt pcrbin
