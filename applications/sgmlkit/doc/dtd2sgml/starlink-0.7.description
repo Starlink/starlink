@@ -1,0 +1,1490 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE dtddescription SYSTEM "dtddescription.dtd" [
+<!ENTITY dtdsumm SYSTEM "starlink-0.7.dtdsummary">
+]>
+<!-- $Id$ -->
+
+<!-- Fixed attributes not documented -->
+
+<dtddescription docelem="sun">
+
+&dtdsumm;
+
+<element gi="abstract" status="stable">
+<p>The abstract for the document
+</p>
+<!--splice:abstract-->
+</element>
+
+<element gi="angle" status="beta">
+<p>Allows you to specify an astronomical angle, either in degrees or
+as an hour angle.  All the attributes are (syntactically) individually
+omissable: the system does not perform any check that the
+supplied value is reasonable.
+<example>&lt;angle angle=45 minutes=30 seconds=10 fraction=0&gt; is an angle in
+degrees (the default), and &lt;angle unit=hours angle=6 minutes=45&gt; is
+an angle in hours, with the number of seconds and fractions of seconds
+omitted.  An angle like &lt;angle angle=1000 fraction=10&gt; is
+syntactically acceptable, but astronomical nonsense.</example>
+</p>
+<attribute name="unit">
+<p>May be `hours' or `degrees', defaulting to `degrees'.</p>
+</attribute>
+<attribute name="angle">
+<p>The angle in units of hours or degrees as appropriate.</p>
+</attribute>
+<attribute name="minutes">
+<p>The number of minutes of arc.</p>
+</attribute>
+<attribute name="seconds">
+<p>The number of seconds of arc.</p>
+</attribute>
+<attribute name="fraction">
+<p>The fraction of seconds of arc.
+</p>
+</attribute>
+<!--splice:angle-->
+</element>
+
+
+<element gi="appendices" status="stable">
+<p>The appendices element contains the
+appendices, with one <elemref gi="sect"/> for each appendix. These may be
+preceded by an optional <elemref gi="routinelist"/>, if the specific
+Starlink document type allows that element.  Note that material such
+as bibliography and indexes is in a separate <elemref gi="backmatter"/>
+element, and not an appendix.
+</p>
+<!--splice:appendices-->
+</element>
+
+
+<element gi="attribution" status="stable">
+<p>The source of a quotation, either as free text or a <elemref gi="citation"/> element.
+</p>
+<!--splice:attribution-->
+</element>
+
+
+<element gi="author" status="stable">
+<p>An author/editor of the current document.
+</p>
+<attribute name="affiliation">
+<p>The `home institution' of an author, such as `Starlink, University
+of Glasgow'.
+</p>
+</attribute>
+<attribute name="email">
+<p>An email address for the author.
+</p>
+</attribute>
+<attribute name="id">
+<p>An ID which may be used to refer to the author from within a
+<elemref gi="history"/> element, for example.
+</p>
+</attribute>
+<attribute name="role">
+<p>The role this individual has played in the maintenance of this
+document, if it's different from the straightforward `author'.  For
+example, this might be `maintainer', `original version', and so on.
+</p>
+</attribute>
+<attribute name="webpage">
+<p>A home page for the author, which might contain further contact details.
+</p>
+</attribute>
+<!--splice:author-->
+</element>
+
+
+<element gi="authorlist" status="stable">
+<p>The list of authors and editors who have contributed to a
+document.  If a document is passed on from one person to another, it
+might be appropriate for the original author to retain a credit for
+the document, by being listed as one of the <elemref gi="otherauthors"/>.
+</p>
+<!--splice:authorlist-->
+</element>
+
+
+<element gi="backmatter" status="alpha">
+<p>Bundles together the various backmatter elements.
+</p>
+<attribute name="bibliography">
+<p>Names the bibliography which is to be searched for entries.</p>
+<p>The transformation of this name into an actual bibliography file is
+in principle up to the application which processes the SGML file.  In
+the current application, however, this attribute names a BibTeX
+bib-file (without the .bib extension).
+
+</p>
+</attribute>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 15 Oct 1999 17:22:27 +0100 (BST)</date>
+<subject>Re: DTD topics for discussion</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue Mar 28 18:21:53 2000</otherheader>
+<body>
+[...]
+
+> o Is the bibliography system adequate.
+> 
+>    My opinion is that it's not feasible to force people to use BibTeX.
+>    We could do one of the following:
+> 
+>     - Provide no special handling for bibliographies and just use 
+>       something like
+>         &lt;sect>Bibliography
+>         &lt;p>
+>         &lt;dl>
+>            &lt;dt>Book title &lt;dd>Book authors, date, publication info
+>         &lt;/dl>
+> 
+>     - Provide a rudimentary bibliography element
+>         &lt;bibliography>
+>         &lt;bibentry>
+>            &lt;bibtitle>Book title
+>            &lt;bibauthors>Mr A and Mr B et al.
+>            &lt;bibextra>2nd edition, (1999)
+>         &lt;/bibliography>
+> 
+>     - Provide an all-singing all-dancing bibliography element.
+> 
+>    I'd be inclined towards the second choice at least as a first go.
+>    The complexity which BibTeX allows suggests that it could be 
+>    easy prey to creeping featurism but I'd advocate a general policy of 
+>    resisting this, since on the whole Starlink documents don't seem
+>    to have very complex requirements for bibliographies.
+
+My thought here was to mirror the BibTeX definitions, and more-or-less
+refer folk to the BibTeX manual for details.  That way, we have
+complete bibliography support, plus easy implementation.
+
+[...]
+
+Norman
+
+
+---------------------------------------------------------------------------
+Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+</body>
+</commentary>
+<!--splice:backmatter-->
+</element>
+
+
+<element gi="blockquote" status="stable">
+<p>A substantial quotation which will typically (but not, of course,
+necessarily) be set off from the text around it.
+</p>
+<!--splice:blockquote-->
+</element>
+
+
+<element gi="caption" status="stable">
+<p>Caption of a <elemref gi="figure"/> or <elemref gi="table"/>.
+</p>
+<!--splice:caption-->
+</element>
+
+
+<element gi="change" status="beta">
+<p>Records a change.  See <elemref gi="history"/>.</p>
+<attribute name="date">
+<p>The date this distribution was
+made. Format: dd-MMM-yyyy.</p>
+</attribute>
+<attribute name="author">
+<p>Whom the release is attributable to.  This
+links to one of the author elements.   If this attribute is omitted,
+it defaults to the content of the author attribute of the previous
+<elemref gi="distribution" self="self"/> element.</p>
+</attribute>
+<attribute name="versionid">
+<p>An id to allow UPDATE elements to refer to a
+specific version.  It can be anything, but a
+sensible format is v10-5, for example (it can't
+start with a number)
+
+</p>
+</attribute>
+<!--splice:change-->
+</element>
+
+
+<element gi="citation" status="alpha">
+<p>Refers to an entry in the bibliography associated with
+this document.  In the current application, the content is interpreted
+as the key to an entry in a BibTeX database.</p>
+<attribute name="noref">
+<p>If this attribute is present, then the application should include a
+reference to this citation in the bibliography, but without 
+actually referring to the entry at this position in the text.
+</p>
+</attribute>
+<!--splice:citation-->
+</element>
+
+
+<element gi="cite" status="stable">
+<p>Refer to a book or article, for example, by name.
+</p>
+<!--splice:cite-->
+</element>
+
+
+<element gi="code" status="stable">
+<p>Include `computer text'.  This does not do any escaping of the
+enclosed text: if there are any characters which might be special to
+the SGML parser, then they should be escaped either with an entity
+reference (that is, using an ampersand) or included in a cdata marked
+section.
+</p>
+<p>Text which a user is to type should be marked up with the <elemref gi="kbd"/> element, and larger blocks of text should be marked up with
+<elemref gi="verbatim"/>.
+</p>
+<attribute name="type">
+<p>This allows you to indicate what type of text is being described
+here, and can be used by the processing system as a formatting hint or
+for some other purpose.  The only current value is `fspath', for
+`filesystem path' (for example, the current LaTeX formatter uses this
+as a hint to allow different hyphenation rules to break a long string
+appropriately).
+</p>
+</attribute>
+<!--splice:code-->
+</element>
+
+
+<element gi="codecollection" status="beta">
+<p>This element makes the link between the documentation and a
+collection of code documentation.  The document which this points to
+must be marked up in a DTD which is a client of the programcode
+architecture.  This will typically, but not necessarily, be a suitable
+source code file.
+</p>
+<p>See the documentation which covers this topic for further details.</p>
+<attribute name="doc">
+<p>A document which is marked up in a DTD which is a client of the
+Starlink programcode architecture.</p>
+</attribute>
+<attribute name="ids">
+<p>If present, this lists the elements within the target document
+which should be processed (not currently implemented).
+</p>
+</attribute>
+<!--splice:codecollection-->
+</element>
+
+
+<element gi="colspec" status="stable">
+<p>The colspec element controls the default layout of a column in a table.
+The attributes here take their defaults from attributes with the same
+names in <elemref gi="tabular"/> and <elemref gi="tgroup"/>, and provide
+the default for individual <elemref gi="entry"/> elements.
+</p>
+<p>You do not have to have a <elemref gi="colspec" self="self"/> element for
+each column in the table.  If all of the columns in a table are to be
+left-aligned except the third one, say, then you would specify left
+alignment in the <elemref gi="tgroup"/> start-tag, and give a <elemref gi="colspec" self="self"/> element like <code>&lt;colspec colnum=3
+align=center&gt;</code>.
+</p>
+<attribute name="align">
+<p>Default alignment of entries in cells.</p>
+</attribute>
+<attribute name="char">
+<p>Alignment character (<em>not supported</em>).</p>
+</attribute>
+<attribute name="charoff">
+<p>Alignment character (<em>not supported</em>).</p>
+</attribute>
+<attribute name="colname">
+<p>A name for this column.  An <elemref gi="entry"/> element may refer to
+a column by name in a `colname' or `namest' attribute.</p>
+</attribute>
+<attribute name="colnum">
+<p>This column's number.  If this is omitted, the column's number is
+taken to be one greater than the previous column, with the first
+column being taken to be number 1.</p>
+</attribute>
+<attribute name="colsep">
+<p>The default value of the colsep attribute for entries in this <elemref gi="tgroup"/>. </p>
+</attribute>
+<attribute name="colwidth">
+<p>The width of this column (<em>not supported</em>).</p>
+</attribute>
+<attribute name="rowsep">
+<p>The default value of the rowsep attribute for entries in this <elemref gi="tgroup"/>.
+
+</p>
+</attribute>
+<!--splice:colspec-->
+</element>
+
+
+<element gi="copyright" status="stable">
+<p>Specifies a copyright declaration for the document.
+<example>&lt;copyright&gt;Copyright, 1999, Particle Physics and Astronomy Research Council</example>
+</p>
+<!--splice:copyright-->
+</element>
+
+
+<element gi="coverimage" status="stable">
+<p>This element provides an image, or text, for the cover or front
+page of the document.  It has much the same content as the <elemref gi="figure"/> element; see that element for further discussion.
+</p>
+<!--splice:coverimage-->
+</element>
+
+
+<element gi="dd" status="stable">
+<p>`Description data' in a description list.
+</p>
+<!--splice:dd-->
+</element>
+
+
+<element gi="distribution" status="beta">
+<p>Records the distribution of a version of the document, or some
+other freezing of it.  The content is free-text
+notes on the distribution or the packaging.  See the description of
+<elemref gi="history"/> for an overview of the history element.</p>
+<attribute name="string">
+<p>Identifies the distribution.  This will
+typically be something like 'DR1' or 'aug-pre'.  It should be a single word.</p>
+</attribute>
+<attribute name="date">
+<p>The date this distribution was
+made. Format: dd-MMM-yyyy.</p>
+</attribute>
+<attribute name="author">
+<p>Whom the release is attributable to.  This
+links to one of the author elements.   If this attribute is omitted,
+it defaults to the content of the author attribute of the previous
+<elemref gi="distribution" self="self"/> element.</p>
+</attribute>
+<attribute name="versionid">
+<p>An id to allow UPDATE elements to refer to a
+specific version.  It can be anything, but a
+sensible format is v10-5, for example (it can't
+start with a number)
+</p>
+</attribute>
+<!--splice:distribution-->
+</element>
+
+
+<element gi="dl" status="stable">
+<p>A description list, consisting of a number of pairs of a
+`description term', <elemref gi="dt"/>, and `description data', <elemref gi="dd"/>. Notionally, the <elemref gi="dd"/> is the definition of a term
+introduced by the <elemref gi="dt"/>, but the construction can
+legitimately be used a little more widely than this.</p>
+<attribute name="compact">
+<p>A hint to the formatter, suggesting that the contents of the list
+might benefit from a more compact representation.  As a hint, the
+formatter is free to ignore it.
+</p>
+</attribute>
+<!--splice:dl-->
+</element>
+
+
+<element gi="docbody" status="stable">
+<p>The document body, containing all the printable text of the document.
+</p>
+<!--splice:docbody-->
+</element>
+
+
+<element gi="docdate" status="stable">
+<p>The document date.  The format is `dd-MMM-yyyy' -- a two-digit day
+of the month, the month as three uppercase letters (`JAN', `FEB', and
+so on), and a four-digit year.</p>
+<p>This element will appear in the <elemref gi="docinfo"/> element of
+those DTDs which do not have a <elemref gi="history"/> element.
+</p>
+<!--splice:docdate-->
+</element>
+
+
+<element gi="docinfo" status="stable">
+<p>The document metadata.
+</p>
+<!--splice:docinfo-->
+<!--
+</element>
+
+
+<element gi="docnumber" status="stable">
+<p>The document number, as assigned by the Starlink librarian.
+<example>&lt;docnumber&gt;123</example>
+<example>&lt;docnumber unassigned&gt;</example>
+</p>
+<attribute name="unassigned">
+<p>If this attribute is present, then it records that the document
+number has not (yet?) been assigned by the Starlink librarian.
+</p>
+</attribute>
+-->
+<!--splice:docnumber-->
+</element>
+
+<element gi="docxref" status="experimental">
+<p>Make a cross-reference to another Starlink document.
+<example>&lt;!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN//EN" [
+  &lt;!ENTITY otherdoc PUBLIC "-//Starlink//DOCUMENT Summary SUN/123//EN" SUBDOC&gt;
+]&gt;
+...
+&lt;p&gt;See also &lt;docxref doc=otherdoc&gt;</example>
+</p>
+<attribute name="doc">
+<p>Indicates the document we wish to link to.  The value of this
+attribute is an entity (declared in the document declaration subset),
+which references another document.</p>
+</attribute>
+<attribute name="loc">
+<p>Indicates a location within a document.  The value of the loc
+attribute is an ID reference within the target document.</p>
+</attribute>
+<attribute name="text">
+<p>If present, the attribute's data is used to form the link text,
+rather than generating it based on the target.
+</p>
+</attribute>
+<!--splice:docxref-->
+</element>
+
+
+<element gi="draftnote" status="stable">
+<p>A note to be included in the text of the document.  It'll be
+formatted so that it stands out in some way.
+</p>
+<!--splice:draftnote-->
+</element>
+
+
+<element gi="dt" status="stable">
+<p>The `definition term' in a <elemref gi="dl"/> element.
+</p>
+<!--splice:dt-->
+</element>
+
+
+<element gi="editors" status="stable">
+<p>The list of people who have made adjustments to the document, which
+don't really count as authoring contributions.
+</p>
+<!--splice:editors-->
+</element>
+
+
+<element gi="em" status="stable">
+<p>Emphasised text.
+</p>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 15 Oct 1999 17:22:27 +0100 (BST)</date>
+<subject>Re: DTD topics for discussion</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Tue Mar 28 18:21:53 2000</otherheader>
+<body>
+[...]
+
+> o What is the best model for italics, bold, underline, et al.
+> 
+>    I'm staying well out of this one.
+
+Ach, coward!
+
+My feeling is that we should keep the functional and presentation
+markup separate, so that we have complete control in the
+down-conversion about which bits of presentational markup we should
+map functional markup to. 
+
+For example, at present the `kbd' element is mapped to the underline
+element, as it seems quite important to distinguish that from other
+`code' material.  If authors could appropriate the underline element
+for that, we wouldn't have the freedom within the down-converter to
+use it for something else.  We really have quite a small palette of
+target elements -- just `i', `b', `code' and `u', I think (`blink' is
+OUT, and `font' is probably dodgy in portability terms).  If we have
+more things to express than four, we have to choose which source
+elements we can affort not to distinguish, and in any case we don't
+have enough to afford letting authors appropriate some of these.
+
+[...]
+
+Norman
+
+
+---------------------------------------------------------------------------
+Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+</body>
+</commentary>
+<!--splice:em-->
+</element>
+
+
+<element gi="entry" status="stable">
+<p>A single cell in a table row.  You need not supply all the entries
+for a row.  If an <elemref gi="entry"/> element supplies the `colname'
+or `namest' attributes, then that attribute refers to a <elemref gi="colspec"/> element in the same <elemref gi="tgroup"/>, and this
+entry is taken to have the column number corresponding to that
+<elemref gi="colspec"/>.  If you wish an entry to span more than one
+column, then supply both the `namest' and `nameend' attributes.  It is
+an error if the `colname' or `namest' attributes are inconsistent with
+the number of <elemref gi="entry"/> elements actually supplied.
+<example>&lt;tgroup cols=4&gt;
+&lt;colspec colname=second colnum=2&gt;
+&lt;colspec colname=last colnum=4 align=right&gt;
+&lt;row&gt;
+&lt;entry colname=second&gt;two&lt;entry&gt;three&lt;entry&gt;four
+&lt;row&gt;
+&lt;entry&gt;uno&lt;entry namest=second nameend=last&gt;due a quattro</example>
+</p>
+<attribute name="align">
+<p>Alignment of this entry (<em>not supported</em>).</p>
+</attribute>
+<attribute name="char">
+<p>Character to align on (<em>not supported</em>).</p>
+</attribute>
+<attribute name="charoff">
+<p>Offset for character alignment (<em>not supported</em>).</p>
+</attribute>
+<attribute name="colname">
+<p>Identifies which column this entry corresponds to.</p>
+</attribute>
+<attribute name="colsep">
+<p>If present and non-zero, then this column will have a line separator
+following it (<em>not supported</em>).</p>
+</attribute>
+<attribute name="morerows">
+<p>If present and non-zero, this indicates the number of rows deep this
+entry is to be.  That is, this indicates vertical spanning where the
+`namest' and `nameend' attributes indicate horizontal spanning
+(<em>not supported</em>).</p>
+</attribute>
+<attribute name="nameend">
+<p>Indicates the end of the horizontal span.</p>
+</attribute>
+<attribute name="namest">
+<p>Indicates the start of a horizontal span.</p>
+</attribute>
+<attribute name="rowsep">
+<p>If present and non-zero, this indicates that there should be a line
+separating this row from the next (<em>not supported</em>).</p>
+</attribute>
+<attribute name="valign">
+<p>Controls the vertical alignment of the entry's contents (<em>not supported</em>).
+
+</p>
+</attribute>
+<!--splice:entry-->
+</element>
+
+
+<element gi="figure" status="stable">
+<p>A figure.  The content of the figure, in the <elemref gi="figurecontent"/> elements, may be text or an image of some sort.  The
+application will generate a figure number, and attach it to the figure
+caption supplied.</p>
+<p>You specify the content of the figure by providing zero or more
+<elemref gi="figurecontent"/> elements, possibly followed by a single
+block of paragraphs of text.  These are <em>alternatives</em>, so they
+might indicate the same figure as a EPS file and as a GIF.  Because
+not all formats are appropriate to all media, it is up to the
+formatting application to select one of these alternatives and use
+that as the effective content of the figure.</p>
+<p>Note that there are no formats which a formatter is <em>required</em>
+to recognise, so it is worthwhile providing a respectable spread of
+formats.  Also there is at least one format (MetaPost) which
+<em>no</em> formatter presently recognises.  Even in this case, it is
+worthwhile including a reference to such a `source' format, since the
+declaration will help keep the source for a figure associated with its
+result.  If there are other formats you think should be declared here,
+please do suggest them.</p>
+<p>For an example, see the documentation for the <elemref gi="figurecontent"/> element.</p>
+<attribute name="id">
+<p>An ID which may be used to refer to this figure in references.</p>
+</attribute>
+<attribute name="export">
+<p>If the export attribute is present, then it will be permitted for
+the ID to be referred to from outside this document.</p>
+</attribute>
+<attribute name="float">
+<p>If the float attribute is present and has value `float', then the
+table may be moved to a more suitable place in the document, if this
+would help to avoid an ugly pagebreak, for example.  If the
+attribute is missing or has the value `nofloat', then it is pinned to
+its current location.</p>
+</attribute>
+<attribute name="alt">
+<p>An alternative text for the content, displayed if the figure
+content cannot be shown.  This is extremely useful in an
+online presentation of an image, if the final reader of the text
+cannot, or will not, use images.
+</p>
+</attribute>
+<!--splice:figure-->
+</element>
+
+
+<element gi="figurecontent" status="stable">
+<p>This is one of, possibly, several alternative formats for a
+figure.  When a <elemref gi="figure"/> element is being processed, the
+application examines the declared <elemref gi="figurecontent" self="self"/>
+elements and any trailing block of text, and selects whichever one it
+can best display.</p>
+<p>There are several `notations' for figure contents.  Binary formats,
+such as GIFs, must be kept in separate files and simply referred to
+here.  Text formats, such as LaTeX pictures or MetaPost diagrams, can
+either be kept in separate files, or included within the body of the
+<elemref gi="figurecontent" self="self"/> element.</p>
+<p>The currently allowable notations are <code>eps</code>, <code>jpeg</code> and
+<code>gif89a</code> with obvious meanings, <code>metapost</code>, meaning a
+graphics description using the MetaPost language and
+<code>latexgraphics</code>.</p>
+<p>The last one refers to any LaTeX notation for
+indicating graphics.  The obvious example is a LaTeX <code>picture</code>
+environment, but one can envisage using a LaTeX tabular environment to
+represent some figure.  This mechanism is deliberately loosely
+specified, and therefore somewhat abusable.  Do please try to resist
+inflicting a maintenance nightmare on your successors.
+<example>&lt;!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN//EN" [
+  &lt;!ENTITY fig-eps SYSTEM 'figure1.eps' NDATA eps&gt;
+  &lt;!ENTITY fig-gif SYSTEM 'figure1.gif' NDATA gif89a&gt;
+]&gt;
+...
+&lt;figure&gt;
+&lt;caption&gt;Figure caption&lt;/caption&gt;
+&lt;px&gt;Here is a figure with some text in it&lt;/px&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+&lt;caption&gt;Another figure&lt;/caption&gt;
+&lt;figurecontent image=fig-eps&gt;
+&lt;figurecontent image=fig-gif&gt;
+&lt;figurecontent notation=latexgraphics&gt;
+\begin{picture}
+...
+\end{picture}
+&lt;/figurecontent&gt;
+&lt;/figure&gt;</example>
+</p>
+<p>In this example, there is a text-only figure, followed by another
+figure.  The second figure includes an image.  The declaration subset
+declares two entities, one with `notation' <code>eps</code> (indicating that the
+object <code>figure1.eps</code> is an encapsulated postscript file), and one
+with notation <code>gif89a</code> (indicating that <code>figure1.gif</code> is a
+GIF image.</p>
+<p>The third possibility is a snatch of text in the
+`latexgraphics' notation.</p>
+<p>The processing application will select the most suitable
+image, based on these notations.  For example, an application
+which uses LaTeX to produce printable text will likely choose the
+`latexgraphics' alternative, and an
+application formatting text for on-line delivery will likely choose
+the GIF image.
+</p>
+<p>The currently recognised figure notations are as follows:
+</p>
+<p>
+<code>jpeg</code>, <code>gif89a</code>, <code>eps</code>:
+The usual JPEG, GIF and encapsulated postscript formats.
+</p>
+<p>
+<code>metapost</code>:
+Metapost source code.  This is a text-based drawing package.  That
+sounds odd, but it is in fact very flexible, and useful for drawing
+certain types of diagrams.  It's described in detail on the
+<webref url="http://cm.bell-labs.com/who/hobby/MetaPost.html">MetaPost home page</webref>.
+</p>
+<p>
+<code>latexgraphics</code>:
+This is a flexible notation, which refers to any LaTeX code you
+case to use to produce a figure.  Most typically, this will be a
+<code>picture</code> environment, but it might also be some sort of table,
+for example.
+</p>
+<p>The last two are text formats, and can be
+provided inline as the content of the element.
+</p>
+<p>Note that all of these figure notations are <em>lowercase</em>.
+
+</p>
+<attribute name="image">
+<p>An entity, giving alternative formats for the image to be
+displayed.  The entity must have been declared in the document declaration
+subset, with an appropriate notation.</p>
+</attribute>
+<attribute name="notation">
+<p>The notation of the element content.  Since any entity specified
+with the `image' attribute will have an associated notation in the
+entity declaration, this attribute is redundant if the `image'
+attribute is present.  If they are both present, the notations should
+not conflict.</p>
+<p>If the `image' attribute is not present, then the element must have
+content, and this attribute indicates its notation.  The application
+should signal an error if neither attribute is present.
+</p>
+</attribute>
+<!--splice:figurecontent-->
+</element>
+
+
+<element gi="foreign" status="stable">
+<p>This element indicates that the words it encloses are in a foreign
+language.  For example, you might write <code>&lt;foreign&gt;et
+al.&lt;/foreign&gt;</code>.  This is different from putting them in an
+<elemref gi="em"/> element; whereas emphasises words might be shown as
+such by being put in bold rather than italicised, foreign words should
+always be italicised.
+</p>
+<!--splice:foreign-->
+</element>
+
+
+<element gi="history" status="beta">
+<p>This element records the history of the document.  It is 
+available in most of the Starlink DTDs, but not all, and when it is
+omitted, the <elemref gi="docdate"/> element is required instead.
+</p>
+<p>The history of a document is composed of a sequence of versions,
+changes, and distributions.  A document has a version number of the
+form <code>docnumber.docversion-release</code>.  The document number is the
+number declared in the <elemref gi="docnumber"/> element, as assigned by
+the Starlink librarian.  The document version indicates which edit
+of the document this is -- a significant update to the document should
+be marked by incrementing the document version number.  The release
+information marks a more minor update to a document.
+</p>
+<p>Each of the three elements has paragraph content, to record brief notes
+about the change or distribution.
+</p>
+<p>A version of a document (marked by a <elemref gi="version"/> element
+in the history) is a significant release of a document, perhaps
+describing new functionality in a package.  The number attribute gives
+the version number to be attached to the document.  You would normally
+set the version number to be one greater than the previous version.
+</p>
+<p>A distribution of a document (marked by a <elemref gi="distribution"/>
+element in the history) is a less significant update to a document,
+perhaps for distribution to readers for comments.  The <code>string</code>
+attribute is a label for the distribution, and could be something like
+`draft1' or `comments-13'.
+</p>
+<p>Other changes to the document are labelled by a <elemref gi="change"/>
+element.  These record an edit of a document without a corresponding
+change to an version number.  I anticipate that the <elemref gi="change"/> element could actually cover a range of edits to a
+document: for example the assorted changes made, perhaps over a period
+of some weeks, after a beta-release of the document or any associated
+software.
+</p>
+<p>The <elemref gi="distribution"/> and <elemref gi="change"/> elements have
+an optional <code>versionid</code> attribute.  This allows you to specify a
+label for this edit.  Throughout the rest of the document, you might
+insert <elemref gi="update"/> elements to comment or document a change or
+insertion.  These elements have a required <code>versionid</code> attribute
+which allows them to refer to a distribution or change element, and
+inherit their date and author from them.  These updates can be
+collected together at the end of a document, and serve as a `what's
+new' section for readers of the updated document.
+<example>&lt;author id=ng&gt;Norman
+&lt;editors&gt;
+&lt;author id=mb&gt;Martin
+...
+&lt;history&gt;
+&lt;version author=ng date='02-MAR-1999' number=0&gt;Initial version
+&lt;distribution author=ng date='03-MAR-1999' string='DR-0.2'&gt;Released
+  to programmers for comment.
+&lt;change author=ng date='04-MAR-1999' versionid=post-0.2&gt;Various tidyings
+&lt;version author=mb date='05-MAR-1999' number=1&gt;First public release
+...
+&lt;p&gt;&lt;update versionid=post-0.2&gt;Corrected typos and reexpressed
+argument&lt;/update&gt;In this section...
+&lt;sect&gt;Further details
+&lt;update versionid=post-0.2&gt;Added this section&lt;/update&gt;
+&lt;p&gt;Blah...</example>
+</p>
+<!--splice:history-->
+</element>
+
+
+<element gi="index" status="experimental">
+<p>The contents of the element are to be indexed.</p>
+<attribute name="key">
+<p>If this attribute is present, then the attribute value is used as
+the index key, rather than the element contents.
+
+</p>
+</attribute>
+<!--splice:index-->
+</element>
+
+
+<element gi="kbd" status="stable">
+<p>Verbatim text, marked out as being for a user to type.
+</p>
+<!--splice:kbd-->
+</element>
+
+
+<element gi="keyword" status="beta">
+<p>A keyword suitable for use when indexing this document.  There is
+not yet a list of preferred keywords.
+</p>
+<!--splice:keyword-->
+</element>
+
+
+<element gi="li" status="stable">
+<p>An item in a list.
+</p>
+<!--splice:li-->
+</element>
+
+
+<element gi="line" status="stable">
+<p>A line of text within a <elemref gi="linespecific"/> element.
+</p>
+<!--splice:line-->
+</element>
+
+
+<element gi="linespecific" status="stable">
+<p>It is occasionally necessary to indicate a group of lines for which
+the line-breaks are significant; this might be the case for verse, for
+example.  This element contains a sequence of <elemref gi="line"/>
+elements, each of which contains a single line of text.  There is no
+guarantee that individual lines will not be broken, only that the
+significant line-breaks will be indicated.</p>
+<p>Compare this with the <elemref gi="verbatim"/> element.  That also
+honours line-breaks, but it additionally sets the text in a typewriter
+font.
+</p>
+<!--splice:linespecific-->
+</element>
+
+
+<element gi="manualtype" status="stable">
+<p>Type of manual this is.  You can select one of a preconfigured set
+of manual types, or select `other', in which case the element's
+content is used as the description of the manual's type.  Otherwise,
+the element's content may be left empty.</p>
+<attribute name="type">
+<p>One of `users', `programmers', `programmers.c',
+`programmers.fortran', or `other'.  If you chose `other', then you
+should give the manual type as this element's content.
+</p>
+</attribute>
+<!--splice:manualtype-->
+</element>
+
+
+<element gi="mapidlist" status="beta">
+<p>A list of <elemref gi="mapid"/> elements (q.v.).
+</p>
+<!--splice:mapidlist-->
+</element>
+
+
+<element gi="mapid" status="beta">
+<p>Several elements, including the sectioning elements (see <elemref gi="sect"/>), <elemref gi="table"/> and <elemref gi="figure"/>, have an
+`export' attribute.  Amongst other things, this expresses a
+committment to keep the associated ID valid in future versions of a
+document.  Sometimes, however, it is necessary to remove sections, or
+change their content in such a way that a reference via their original
+ID would be inappropriate.  In this case, you can use the <elemref gi="mapid" self="self"/> element to remap the target of the reference, either to
+some other element which is now appropriate, or to some section which
+explains that the targeted section has been deleted.</p>
+<p>The <elemref gi="mapid" self="self"/> element takes two attributes, the
+original ID and a replacement, to which it is to be transparently and
+silently mapped.</p>
+<attribute name="from">
+<p>The name of the original ID</p>
+</attribute>
+<attribute name="to">
+<p>The name of the ID to which the original ID is to be mapped.
+</p>
+</attribute>
+<!--splice:mapid-->
+</element>
+
+
+<element gi="m" status="stable">
+<p>Inline maths.  Use LaTeX notation, as if you were writing inside a
+<code>$...$</code> pair in a LaTeX document.
+</p>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Tue, 4 Apr 2000 12:53:44 +0100 (BST)</date>
+<subject>latex2eqn</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Tue Apr 04 12:53:47 2000</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12cRty-0007nO-00; Tue, 04 Apr 2000 12:53:46 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12cRu1-0000xr-00; Tue, 04 Apr 2000 12:53:49 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12cRty-0002Jf-00; Tue, 04 Apr 2000 12:53:46 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29.ast.cam.ac.uk [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id MAA26070; Tue, 4 Apr 2000 12:53:45 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id MAA21352; Tue, 4 Apr 2000 12:53:45 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10004041221470.21160-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+Have we any ideas what to do with math content for help downconverters
+(or any other downconverters to non-graphical output)?
+A latex -> eqn (eqn is a roff preprocessor) converter would be a good start, 
+though it obviously couldn't cope with everything; however a quick 
+search doesn't reveal that any such thing exists.  
+
+As things stand the only robust alternative I can see is spitting out the
+latex content, but this is not very friendly to help file readers.
+
+Maybe we need a mechanism which can contain an alternative 
+ascii-art representation of the latex-notation content.  
+This probably needs to be an optional, verbatim-like, element rather 
+than an attribute since it may need line breaks to make sense.
+In practice, as far as I can see, this is only going to
+be a problem for programcode not main document text, since only 
+programcode gets converted to an ascii-like format (unless we envisage
+people reading SUNs with lynx??).  But if we make a modification,
+it's probably best to programcode and main DTDs alike.
+
+Or is this something we've come up with a solution for already and I've
+just forgotten?
+
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    http://www.ast.cam.ac.uk/~mbt/        01223 337535 |
+---------------------------------------------------------------------------
+</body>
+</commentary>
+<!--splice:m-->
+</element>
+
+
+<element gi="meqnarray" status="stable">
+<p>Displayed maths equation.  It consists of a sequence of <elemref gi="mline"/> elements, each of which is a line of a LaTeX
+<code>\\begin{eqnarray}...\\end{eqnarray}</code> environment, and which
+must, therefore, have two ampersands within it.
+</p>
+<!--splice:meqnarray-->
+</element>
+
+
+<element gi="mequation" status="stable">
+<p>Displayed equation.  Use LaTeX notation, as if you were writing
+inside a <code>\\begin{equation}...\\end{equation}</code> pair in a LaTeX
+document.</p>
+<p>You may include a <elemref gi="mlabel"/> element within the equation
+to number and possibly refer to the equation.
+</p>
+<!--splice:mequation-->
+</element>
+
+
+<element gi="mlabel" status="stable">
+<p>This has the dual function of numbering the equation and, if it has
+an id specified, of allowing you to refer to that number from
+elsewhere.</p>
+<attribute name="id">
+<p>This is a unique ID for the equation or equation line which contains it.
+</p>
+</attribute>
+<!--splice:mlabel-->
+</element>
+
+
+<element gi="mline" status="stable">
+<p>A single line of a <elemref gi="meqnarray"/> element.  It consists of
+a line of a LaTeX 
+<code>\\begin{eqnarray}...\\end{eqnarray}</code> environment, and
+must, therefore, have two ampersands within it.
+</p>
+<!--splice:mline-->
+</element>
+
+
+<element gi="note" status="stable">
+<p>A sidenote.  This will be displayed as either a footnote or an
+endnote, depending on the output format.
+
+</p>
+<!--splice:note-->
+</element>
+
+
+<element gi="ol" status="stable">
+<p>An ordered list.</p>
+<attribute name="compact">
+<p>A hint to the formatter, suggesting that the contents of the list
+might benefit from a more compact representation.  As a hint, the
+formatter is free to ignore it.
+</p>
+</attribute>
+<!--splice:ol-->
+</element>
+
+
+<element gi="otherauthors" status="stable">
+<p>This element contains a list of <elemref gi="author"/> elements, which
+give credit to individuals who have contributed to a document without
+being principal or current authors.  If part of a document has been
+included from someone else's document, or if a document has been
+handed over from one maintainer to another, then the appropriate
+author should be credited here.
+</p>
+<!--splice:otherauthors-->
+</element>
+
+
+<element gi="p" status="stable">
+<p>A paragraph.  See also the <elemref gi="px"/> element.
+</p>
+<!--splice:p-->
+</element>
+
+
+<element gi="px" status="stable">
+<p>A restricted paragraph.
+</p>
+<p>In certain contexts, it is convenient to forbid certain elements from
+otherwise-unrestricted paragraph text.  The
+<elemref gi="px" self="self"/> element has the same usage as <elemref gi="p"/>, but
+with a slightly restricted content model.
+</p>
+<!--splice:px-->
+</element>
+
+
+<element gi="quote" status="stable">
+<p>A simple quotation, the in-line companion to the <elemref gi="blockquote"/> element.
+</p>
+<!--splice:quote-->
+</element>
+
+
+<element gi="ref" status="alpha">
+<p>A reference to another point in the same document.  The element has
+no content -- the link text will, in general, be generated for you, based on
+the link target.  Any element which has an ID attribute may be linked
+to.  A small subtlety is that the link is to a complete <em>element</em> of the
+document, rather than a <em>point</em> of the document.
+<example>See also &lt;ref id=other.ref&gt; for more details.</example>
+</p>
+<attribute name="id">
+<p>The ID of the element to link to.</p>
+</attribute>
+<attribute name="text">
+<p>If present, the attribute's data is used to form the link text,
+rather than generating it based on the target.
+</p>
+</attribute>
+<!--splice:ref-->
+</element>
+
+
+<element gi="routinelist" status="beta">
+<p>This element introduces the <elemref gi="codecollection"/> elements
+which link this document to the source code it explains.
+</p>
+<!--splice:routinelist-->
+</element>
+
+
+<element gi="row" status="stable">
+<p>A row of a <elemref gi="tabular"/>
+</p>
+<attribute name="rowsep">
+<p>If present and non-zero, then this row will have a line after it.</p>
+</attribute>
+<attribute name="valign">
+<p>Vertical alignment of entries in this row (<em>not supported</em>).
+</p>
+</attribute>
+<!--splice:row-->
+</element>
+
+
+<element gi="softwareversion" status="stable">
+<p>This element contains text indicating the version of the software
+which this manual is documenting.  This is distinct from the
+information in the <elemref gi="history"/> element, which describes the
+versioning of the <em>document</em>.
+</p>
+<!--splice:softwareversion-->
+</element>
+
+
+<element gi="sect" status="stable">
+<p>This element <em>contains</em> a section.
+</p>
+<p>The content of this element starts with a <elemref gi="subhead"/>
+element, which in turn contains a <elemref gi="title"/> element, and the
+two are followed by the section content.  Note, however, that since 
+the <elemref gi="subhead"/> and <elemref gi="title"/> start and end tags are
+both omissable, you may omit both, and follow the <elemref gi="sect" self="self"/> start tag with the section title.
+</p>
+<p>That is, the structure is formally
+<example>&lt;sect&gt;&lt;subhead&gt;&lt;title&gt;Section title&lt;/title&gt;&lt;subhead&gt;
+&lt;p&gt;Section body&lt;/p&gt;
+&lt;/sect&gt;</example>
+but this may be abbreviated to just
+<example>&lt;sect&gt;Section title
+&lt;p&gt;Section body</example>
+The same is true for the 
+<elemref gi="subsect"/>,
+<elemref gi="subsubsect"/>, and
+<elemref gi="subsubsubsect"/>
+elements.
+</p>
+<p>Note that the <elemref gi="sect" self="self"/> element contains the <elemref gi="subsect"/> element, but not the <elemref gi="subsubsect"/> element -- it
+is therefore impossible to break the sectioning structure.
+</p>
+<attribute name="id">
+<p>An ID for this section, to allow it to be referred to from elsewhere.</p>
+</attribute>
+<attribute name="export">
+<p>If this attribute is present, then the SGML application will allow other
+documents to link to this section using this ID.  In other words, the
+presence of this attribute is a commitment to maintain this ID as a
+meaningful link target in future versions of this document.
+See the <elemref gi="mapid"/> element for a mechanism which allows you to
+rename obsolete IDs.</p>
+<p>You should include this attribute on all sections and subsections.
+This is enforced by the DTD for <elemref gi="sect" self="self"/> and <elemref gi="subsect"/> elements (this can be controlled by the
+<code>%Feature.EnforceLinkPolicy</code> switch: see the main documentation
+for details).</p>
+<p>Note that the DTD and processing system do not <em>default</em> this
+attribute to be present, even though it is required and its presence
+could be inferred.  They require you to insert it explicitly,
+so that you are aware that the ID has been exported, and that it
+might therefore be referred to by another document, so that you should
+not change the ID once the document has been published.</p>
+</attribute>
+<attribute name="indexkey">
+<p>If this attribute is present, then an index entry is made, pointing
+to this section, with the specified key.
+</p>
+</attribute>
+<!--splice:sect-->
+</element>
+
+
+<element gi="strong" status="stable">
+<p>The marked up text is displayed with strong emphasis.  See also
+<elemref gi="em"/>.
+</p>
+<!--splice:strong-->
+</element>
+
+
+<element gi="subhead" status="stable">
+<p>See element <elemref gi="sect"/>
+</p>
+<!--splice:subhead-->
+</element>
+
+
+<element gi="subsect" status="stable">
+<p>See element <elemref gi="sect"/>
+</p>
+<!--splice:subsect-->
+</element>
+
+
+<element gi="subsubsect" status="stable">
+<p>See element <elemref gi="sect"/>
+</p>
+<!--splice:subsubsect-->
+</element>
+
+
+<element gi="subsubsubsect" status="stable">
+<p>See element <elemref gi="sect"/>
+</p>
+<!--splice:subsubsubsect-->
+</element>
+
+
+<element gi="sun" status="stable">
+<p>The top-level of the SUN document type.  Other document types such
+as SSNs, SGPs, etc, have corresponding top-level elements.
+</p>
+<!--splice:sun-->
+</element>
+
+
+<element gi="table" status="stable">
+<p>The <elemref gi="table" self="self"/> element contains a <elemref gi="tabular"/>
+element.  The distinction between the
+two is that the <elemref gi="tabular"/> is the object which contains data
+lined up in columns, whilst the <elemref gi="table" self="self"/> is an object
+which might float from its declared position, which has a <elemref gi="caption"/>, and which can be referred to from elsewhere.</p>
+<attribute name="id">
+<p>An ID for the table.</p>
+</attribute>
+<attribute name="export">
+<p>If present, then the ID is `exported', and may be linked to from
+other Starlink documents.</p>
+</attribute>
+<attribute name="float">
+<p>If the float attribute is present and has value `float', then the
+table may be moved to a more suitable place in the document, if this
+would help to avoid an ugly pagebreak, for example.  If the
+attribute is missing or has the value `nofloat', then it is pinned to
+its current location.
+</p>
+</attribute>
+<!--splice:table-->
+</element>
+
+
+<element gi="tabular" status="stable">
+<p>The Starlink General DTD incorporates the Oasis Exchange Table
+Model, which is a restricted, and hence portable, subset of the full
+CALS table model.
+</p>
+<p>The model is documented in detail in the 
+<webref url="http://www.oasis-open.org/html/techpubs.htm/a503.htm">CALS Exchange Table Standard</webref>.
+</p>
+<p>At present, the Oasis table model is not <em>fully</em> supported by
+the Starlink SGML system.  All of the elements in the model are
+supported, but some of the lesser-used attributes are ignored.  You
+may mark up your document using all the features in the Oasis model.
+I will progressively add support for missing attributes as time
+permits.
+</p>
+<attribute name="colsep">
+<p>If given and non-zero, then separate columns with lines (rightmost
+spec ignored, as it is controlled by the `frame' attribute).</p>
+</attribute>
+<attribute name="frame">
+<p>Controls the production of a frame around the table</p>
+</attribute>
+<attribute name="pgwide">
+<p>If given and non-zero, forces the table to be a full page width
+(<em>not supported</em>).</p>
+</attribute>
+<attribute name="rowsep">
+<p>If given and non-zero, then separate columns by lines (bottom spec
+ignored, since it is controlled by the `frame' attribute).
+</p>
+</attribute>
+<!--splice:tabular-->
+</element>
+
+
+<element gi="tbody" status="stable">
+<p>A table body.  This contains a series of table rows.</p>
+<attribute name="valign">
+<p>Controls vertical alignment of entries (<em>not supported</em>).
+</p>
+</attribute>
+<!--splice:tbody-->
+</element>
+
+
+<element gi="tgroup" status="stable">
+<p>This element is an enclosure for a table body (the <elemref gi="tbody"/> element), optionally preceded by a header (the <elemref gi="thead"/> element).  The number of columns in the table must be
+specified by this element.</p>
+<attribute name="cols">
+<p>The number of columns in the enclosed <elemref gi="thead"/> and
+<elemref gi="tbody"/> elements.</p>
+</attribute>
+<attribute name="align">
+<p>The default alignment of columns</p>
+</attribute>
+<attribute name="colsep">
+<p>If given and non-zero, then separate columns with lines (default taken
+from <elemref gi="tabular"/> element).</p>
+</attribute>
+<attribute name="rowsep">
+<p>If given and non-zero, then separate rows with lines (default taken
+from <elemref gi="tabular"/> element).
+</p>
+</attribute>
+<!--splice:tgroup-->
+</element>
+
+
+<element gi="thead" status="stable">
+<p>Encloses one or more heading rows prefixed to a <elemref gi="tbody"/> (qv)..
+</p>
+<!--splice:thead-->
+</element>
+
+
+<element gi="title" status="stable">
+<p>This element may enclose either the document title, or a section
+title.  As explained in the documentation for the <elemref gi="sect"/>
+element, this element's start and end tags are usually omitted when
+specifying a section title.</p>
+<p>You may have simple markup within the title, but do be aware that
+the contents of this element are quite likely to appear in contexts
+remote from your document, such as a reference in another document, a
+table of contents, or within a search engine.  It is quite likely,
+therefore, that even this simple markup might be stripped at some
+point.
+</p>
+<!--splice:title-->
+</element>
+
+
+<element gi="ul" status="stable">
+<p>An unordered list.</p>
+<attribute name="compact">
+<p>A hint to the formatter, suggesting that the contents of the list
+might benefit from a more compact representation.  As a hint, the
+formatter is free to ignore it.
+</p>
+</attribute>
+<!--splice:ul-->
+</element>
+
+
+<element gi="update" status="beta">
+<p>When updates are made to a document, they should be noted by (at
+least) a <elemref gi="change"/> element in the <elemref gi="history"/>.
+When more, or more localised, detail is desired, an <elemref gi="update" self="self"/> element can include notes within the text.  There may be
+one or more <elemref gi="update" self="self"/> elements as the first children of
+those elements which include it as a child.  The <elemref gi="update" self="self"/> element can also be placed immediately after a section title.
+</p>
+<p>See the documentation of the <elemref gi="history"/> element for an example.</p>
+<attribute name="versionid">
+<p>This links to the `versionid' attribute of one of the <elemref gi="distribution"/> or <elemref gi="change"/> elements in the <elemref gi="history"/>, and therefore implicitly provides the date and author
+of the change.
+</p>
+</attribute>
+<!--splice:update-->
+</element>
+
+
+<element gi="url" status="stable">
+<p>This element encloses a URL, which is displayed appropriately.  If
+the output medium permits it, the URL's text is made a link to the
+remote resource.  The difference between this element and the <elemref gi="webref"/> element is that in the case of the <elemref gi="url" self="self"/>
+element, the link text is the URL itself.</p>
+<attribute name="nolink">
+<p>If present, then the URL is displayed without the URL text being
+made an active link.
+</p>
+</attribute>
+<!--splice:url-->
+</element>
+
+
+<element gi="verbatim" status="stable">
+<p>The enclosed text is displayed verbatim, specifically with
+linebreaks respected, and typically in a fixed-width font.  Note that
+the element's content is <em>not</em> specially escaped.  If you wish to
+include text which is meaningful to the SGML parser, you should
+surround the text with a <code>CDATA</code> marked section.
+</p>
+<!--splice:verbatim-->
+</element>
+
+
+<element gi="version" status="beta">
+<p>The version of the document.  See <elemref gi="history"/> for an
+overview of the history element.</p>
+<attribute name="date">
+<p>When the version was released.</p>
+</attribute>
+<attribute name="author">
+<p>Who approved the distribution.  This is an ID which appears in the
+list of authors.  This might in fact be a reference to an `editor' of
+the document (ie, an `author' listed in the <elemref gi="editors"/>
+element), rather than an author.</p>
+</attribute>
+<attribute name="number">
+<p>The assigned version number.    This is not
+generated automatically, to allow the numbering to start other than at
+one, or to omit numbers for some reason, but the numbers should be
+allocated sequentially, unless there is a good reason to decide
+otherwise.
+</p>
+</attribute>
+<!--splice:version-->
+</element>
+
+
+<element gi="webref" status="beta">
+<p>Make a link to a resource on the web.  The element's content is
+used as the link text.  See also the <elemref gi="url"/> element.</p>
+<attribute name="url">
+<p>The URL of the resource to be linked to.</p>
+</attribute>
+<commentary>
+<from>Rodney Warren-Smith</from>
+<email>rfws@star.rl.ac.uk</email>
+<date>Tue, 25 Jan 2000 17:20:25 +0000 (GMT)</date>
+<subject>More XSL testing</subject>
+<otherheader name='From '>rfws@star.rl.ac.uk Tue Mar 28 18:29:33 2000</otherheader>
+<body>
+Norman, Mark,
+
+[...]
+
+   There are also some confusing things. Like &lt;WEBREF> has &lt;KBD> as
+part of its content, while &lt;KBD> has &lt;WEBREF> as part of its
+content. I can see that one might want to use them either way around,
+but presumably you wouldn't want to nest them recursively. Quite how
+that maps on to XSL I haven't bothered to work out yet. Whatever
+behaviour we decide we want should be documented before I tackle that
+challenge.
+
+[...]
+
+Rod.
+
+-------------------------------------------------------------------------------
+      This email represents the opinion of the author only and
+      should not be construed as reflecting CCLRC's corporate view.
+-------------------------------------------------------------------------------
+
+</body>
+</commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Thu, 30 Mar 2000 18:19:08 +0100 (BST)</date>
+<subject>Mmm, that is an anomaly</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Thu Mar 30 18:19:08 2000</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12aib6-00076k-00 for general-0.6+webref@astro.gla.ac.uk; Thu, 30 Mar 2000 18:19:08 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12aib7-0006yc-00 for general-0.6+webref@astro.gla.ac.uk; Thu, 30 Mar 2000 18:19:09 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10003301808581.25679-100000@goedel.astro.gla.ac.uk></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+This is indeed a bit of an anomaly.  Originally, code and kbd had only
+plain data (#PCDATA) content, and the verbatim element had only `simple
+phrase' elements (#PCDATA | em | strong | quote | code | kbd | cite |
+m | angle | foreign).  Then I explicitly added the references elements
+(ref | docxref | webref | url ) to them both, so that you could make links
+between example text in a document and its documentation.  For example:
+`Now type &lt;kbd>% &lt;ref id=cmd.sect text='cmd'> argument&lt;/kbd>'.
+
+The latter seems very useful, and though it's an anomaly that you can
+have kbd inside webref inside kbd, I'm inclined to leave it, as I don't
+see it causing too many problems.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        http://www.astro.gla.ac.uk/users/norman/
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+</body>
+</commentary>
+<!--splice:webref-->
+</element>
+</dtddescription>

@@ -1,0 +1,766 @@
+<?xml version="1.0"?>
+<!DOCTYPE dtddescription SYSTEM 'dtddescription.dtd' [
+  <!ENTITY dtdsummary SYSTEM 'programcode-0.7.dtdsummary'>
+  <!ENTITY sundtd 'sun'>
+]>
+<!-- $Id$ -->
+
+<dtddescription docelem="programcode">
+
+&dtdsummary;
+
+
+<element gi="angle" status="beta">
+<p>See <elemref gi="angle" dtd="sundtd"/></p>
+<!--splice:angle-->
+</element>
+
+<element gi="argumentlist" status="beta">
+<p>The list of arguments/parameters to a function.  Note that this is
+different from the <elemref gi="parameterlist"/> element, which is the
+list of parameters to an ADAM task.
+</p>
+<attribute name="none">
+<p>If this attribute is present, it indicates that the function has no
+arguments.  In this case, there should be no <elemref gi="parameter"/> content.
+</p>
+</attribute>
+<!--splice:argumentlist-->
+</element>
+
+<element gi="attribution" status="beta">
+<p>See <elemref gi="attribution" dtd="sundtd"/>
+</p>
+<!--splice:attribution-->
+</element>
+
+<element gi="author" status="beta">
+<p>Describes the author of a function.
+</p>
+<p>The <elemref gi="author" self="self"/> element includes full details about
+an author and has a required ID attribute, the <elemref gi="authorref"/> element simply refers to an <elemref gi="author" self="self"/>
+element elsewhere using an IDREF.  We need the distinction since it
+follows from the fact that the element has a (unique) ID attribute,
+that a document can have only one <elemref gi="author" self="self"/> element
+per author.  If the actual text of a document is scattered amongst
+several source-code files, then it would be appropriate for the
+scattered files to have <elemref gi="authorref"/> elements, and for the
+corresponding <elemref gi="author" self="self"/> element to be in a <elemref gi="codegroup"/> element in a `master' file which collects together
+the source-code files for documentation purposes.
+</p>
+<attribute name="id">
+<p>A unique ID for the author.  This is used within <elemref gi="authorref"/> and <elemref gi="change"/> elements.
+</p>
+</attribute>
+<attribute name="affiliation">
+<p>An optional affiliation for the author.  It contains text such as
+`Starlink, University of Glasgow'.
+</p>
+</attribute>
+<attribute name="email">
+<p>An email address for the author.
+</p>
+</attribute>
+<attribute name="webpage">
+<p>A URL for the author.
+</p>
+</attribute>
+<!--splice:author-->
+</element>
+
+<element gi="authorlist" status="beta">
+<p>Contains the collection of authors who have contributed to a
+particular function.  Authors who have indirectly contributed code --
+perhaps a package you've based the function on -- can be credited in
+the <elemref gi="otherauthors"/> element.
+</p>
+<!--splice:authorlist-->
+</element>
+
+<element gi="authornote" status="beta">
+<p>Optional further information about an author.  This might be
+particularly useful when the author is one of those consigned to the
+<elemref gi="otherauthors"/> element.
+</p>
+<p>For example, in the DSSSL code
+written for this SGML project, the ISO standard document describing
+DSSSL was used to supply various functions which were not implemented
+as primitives in the Jade system.  The standard was therefore listed
+as an `other author' of some parts of the code, with a note explaining
+this in the <elemref gi="authornote" self="self"/> element.
+</p>
+<!--splice:authornote-->
+</element>
+
+<element gi="authorref" status="beta">
+<p>A reference to an author whose details are in the <elemref gi="author"/> element referred to by the ID attribute.
+</p>
+<attribute name="id">
+<p>The link to the <elemref gi="author"/> element.
+</p>
+</attribute>
+<attribute name="note">
+<p>A note giving further information about the author, in this
+context.  For example, ISO 10179 was listed as an `author' of some of
+the routines in the DSSSL stylesheet, and this attribute was used to
+list the section of the standard where the code was defined.
+</p>
+</attribute>
+<!--splice:authorref-->
+</element>
+
+<element gi="blockquote" status="beta">
+<p>See <elemref gi="blockquote" dtd="sundtd"/>
+</p>
+<!--splice:blockquote-->
+</element>
+
+<element gi="bugs" status="beta">
+<p>A note of any bugs known in this routine.
+</p>
+<!--splice:bugs-->
+</element>
+
+<element gi="change" status="beta">
+<p>A description of a change made to the code.
+</p>
+<attribute name="author">
+<p>The ID of the author who made the change, linking to a previous
+<elemref gi="author"/> element.</p>
+</attribute>
+<attribute name="date">
+<p>The date the change was made.  Format is dd-MMM-yyyy -- a two-digit
+day of month, a three-letter abbreviation for the month (uppercase),
+and a four-digit year.
+</p>
+</attribute>
+<!--splice:change-->
+</element>
+
+<element gi="cite" status="beta">
+<p>See <elemref gi="cite" dtd="sundtd"/>
+</p>
+<!--splice:cite-->
+</element>
+
+<element gi="code" status="beta">
+<p>See <elemref gi="code" dtd="sundtd"/>
+</p>
+<!--splice:code-->
+</element>
+
+<element gi="codebody" status="beta">
+<p>The actual code of the function.
+</p>
+<attribute name="empty">
+<p>The <elemref gi="codebody"/> element is required, buf if there is no
+code actually included within the document, so that the element is
+empty, then this may be indicated by the presence of this attribute.
+</p>
+</attribute>
+<!--splice:codebody-->
+</element>
+
+<element gi="codegroup" status="beta">
+<p>A codegroup is a collection of functions or other
+code which can sensibly be grouped together.
+There's no particular semantics implied by the
+grouping, as far as this DTD is (currently)
+concerned.
+</p>
+<p>However, the DTDs which include this programcode DTD may add
+semantics to this element.  For example, the DSSSL DTD maps this
+element to the <code>style-specification</code> element in the DSSSL architecture.
+</p>
+<attribute name="language">
+<p>The programming language used by the code within the group.  This
+will be set by the DTD which includes this programcode DTD, and you
+need not (indeed cannot) set it.
+</p>
+</attribute>
+<!--splice:codegroup-->
+</element>
+
+<element gi="codeopener" status="beta">
+<p>The Traditional way of laying out functions in Starlink source code
+is to give the function declaration, then its documentation, and then
+the code body.  This element exists to reflect this.  By design, you
+will typically not need to give it explicitly.  If you do need to
+concern yourself about this (perhaps because you are generating SGML
+using a script, then the usage is:
+<example>   &lt;routine&gt;
+   &lt;codeopener&gt;
+   subroutine try
+   &lt;routineprologue&gt;
+     &lt;routinename&gt;try
+     ...
+   &lt;codebody&gt;
+   print hello
+   return</example>
+</p>
+<!--splice:codeopener-->
+</element>
+
+<element gi="codereference" status="beta">
+<p>Make a link to code in another document.  There is no defined
+semantics attached to this link in general, but it might be used to
+document a dependency between two modules, such as a source code file
+depending on an include file.
+</p>
+<p>The document referred to should be marked up using this programcode DTD.
+</p>
+<p>As with the <elemref gi="codegroup"/> element, the DSSSL DTD adds
+semantics to this element.  It maps this element to the
+<code>external-specification</code> element in the DSSSL architecture.
+</p>
+<attribute name="docid">
+<p>An ID within the target document, if required.
+</p>
+</attribute>
+<attribute name="doc">
+<p>A subdoc entity which references the document being linked to.
+</p>
+</attribute>
+<!--splice:codereference-->
+</element>
+
+<element gi="colspec" status="beta">
+<p>See <elemref gi="colspec" dtd="sundtd"/>
+</p>
+<!--splice:colspec-->
+</element>
+
+<element gi="copyright" status="beta">
+<p>A copyright statement attached to the code.
+</p>
+<!--splice:copyright-->
+</element>
+
+<element gi="description" status="beta">
+<p>A detailed description of the code to follow.  If this is
+extensive, then a brief statement should be included within the
+optional <elemref gi="purpose"/> element.
+</p>
+<!--splice:description-->
+</element>
+
+<element gi="dd" status="beta">
+<p>See <elemref gi="dd" dtd="sundtd"/>
+</p>
+<!--splice:dd-->
+</element>
+
+<element gi="dl" status="beta">
+<p>See <elemref gi="dl" dtd="sundtd"/>
+</p>
+<!--splice:dl-->
+</element>
+
+<element gi="docblock" status="beta">
+<p>A block of documentation, introducing either a complete document,
+or one of the <elemref gi="codegroup"/> or <elemref gi="codereference"/> blocks.
+</p>
+<!--splice:docblock-->
+</element>
+
+<element gi="docxref" status="experimental">
+<p>See <elemref gi="docxref" dtd="sundtd"/></p>
+<!--splice:docxref-->
+</element>
+
+<element gi="dt" status="beta">
+<p>See <elemref gi="dt" dtd="sundtd"/>
+</p>
+<!--splice:dt-->
+</element>
+
+<element gi="em" status="beta">
+<p>See <elemref gi="em" dtd="sundtd"/>
+</p>
+<!--splice:em-->
+</element>
+
+<element gi="entry" status="beta">
+<p>See <elemref gi="entry" dtd="sundtd"/>
+</p>
+<!--splice:entry-->
+</element>
+
+<element gi="example" status="beta">
+<p>The text of an example.  This is followed by a separate description
+element.
+</p>
+<!--splice:example-->
+</element>
+
+<element gi="examplelist" status="beta">
+<p>A list of examples.
+</p>
+<!--splice:examplelist-->
+</element>
+
+<element gi="funcname" status="beta">
+<p>Another function name presumably in the same collection of code.
+There are no restrictions on what function names you can list here.
+The formatting system might, for example, be able to make a link to
+the documentation of that function, if it can find it.
+</p>
+<!--splice:funcname-->
+</element>
+
+<element gi="history" status="beta">
+<p>The change history for the document or block.  The changes should
+be in chronological order, with newest last.
+</p>
+<!--splice:history-->
+</element>
+
+<element gi="implementationstatus" status="beta">
+<p>A string (I don't actually know of guidelines for what should be in
+here).
+
+</p>
+<!--splice:implementationstatus-->
+</element>
+
+<element gi="invocation" status="beta">
+<p>An example of how to invoke the function or task.
+</p>
+<!--splice:invocation-->
+</element>
+
+<element gi="kbd" status="beta">
+<p>See <elemref gi="kbd" dtd="sundtd"/>
+</p>
+<!--splice:kbd-->
+</element>
+
+<element gi="li" status="beta">
+<p>See <elemref gi="li" dtd="sundtd"/>
+</p>
+<!--splice:li-->
+</element>
+
+<element gi="line" status="beta">
+<p>See <elemref gi="line" dtd="sundtd"/>
+</p>
+<!--splice:line-->
+</element>
+
+<element gi="linespecific" status="beta">
+<p>See <elemref gi="linespecific" dtd="sundtd"/>
+</p>
+<!--splice:linespecific-->
+</element>
+
+<element gi="m" status="beta">
+<p>See <elemref gi="m" dtd="sundtd"/>
+</p>
+<!--splice:m-->
+</element>
+
+<element gi="meqnarray" status="beta">
+<p>See <elemref gi="meqnarray" dtd="sundtd"/>
+</p>
+<!--splice:meqnarray-->
+</element>
+
+<element gi="mequation" status="beta">
+<p>See <elemref gi="mequation" dtd="sundtd"/>
+</p>
+<!--splice:mequation-->
+</element>
+
+<element gi="mlabel" status="beta">
+<p>See <elemref gi="mlabel" dtd="sundtd"/>
+</p>
+<!--splice:mlabel-->
+</element>
+
+<element gi="mline" status="beta">
+<p>See <elemref gi="mline" dtd="sundtd"/>
+</p>
+<!--splice:mline-->
+</element>
+
+<element gi="name" status="beta">
+<p>The author/function/parameter name, depending on context.
+</p>
+<!--splice:name-->
+</element>
+
+<element gi="ol" status="beta">
+<p>See <elemref gi="ol" dtd="sundtd"/>
+</p>
+<!--splice:ol-->
+</element>
+
+<element gi="otherauthors" status="beta">
+<p>Other contributors to a package, with a less direct involvement with
+it than would be appropriate for inclusion in an <elemref gi="author"/>
+element.
+</p>
+<!--splice:otherauthors-->
+</element>
+
+<element gi="othernames" status="beta">
+<p>Sometimes a function will have a generic form, as well as specific
+forms for, for example, single and double precision.  In this case,
+the function's generic name can be given in the <elemref gi="routinename"/>'s <elemref gi="name"/> element, and other names for it
+can be included as <elemref gi="othernames" self="self"/>.
+</p>
+<!--splice:othernames-->
+</element>
+
+<element gi="diytopic" status="beta">
+<p>A note, which will be displayed in the same format as the other
+headings in this context.
+</p>
+<!--splice:diytopic-->
+</element>
+
+<element gi="p" status="beta">
+<p>See <elemref gi="p" dtd="sundtd"/>
+</p>
+<!--splice:p-->
+</element>
+
+<element gi="parameter" status="beta">
+<p>A single parameter for a function.</p>
+<attribute name="given">
+<p>If the parameter is read by the function, this attribute should be
+present.  If neither this, nor the `returned' attribute is present,
+the default is taken to be `given'.</p>
+</attribute>
+<attribute name="returned">
+<p>If the parameter is written by the function, this attribute should
+be present.</p>
+</attribute>
+<attribute name="default">
+<p>The default value, if this parameter is optional and omitted.</p>
+</attribute>
+<attribute name="optional">
+<p>This attribute is present if the parameter is optional.
+Optional means that
+the parameter will be defaulted if omitted,
+and keyword means that the parameter is
+specified with a keyword.  Both mechanisms
+are used in both DSSSL and IDL (for
+example). 
+</p>
+</attribute>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 7 Apr 2000 17:15:57 +0100 (BST)</date>
+<subject>parameter dimensions</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Apr 07 17:15:59 2000</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12dbQN-0007Fj-00; Fri, 07 Apr 2000 17:15:59 +0100</otherheader>
+<otherheader name='Received'>from lilac.csi.cam.ac.uk ([131.111.8.44] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12dbQQ-0001e4-00; Fri, 07 Apr 2000 17:16:02 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by lilac.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12dbQN-0002dQ-00; Fri, 07 Apr 2000 17:15:59 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29.ast.cam.ac.uk [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id RAA21343; Fri, 7 Apr 2000 17:15:58 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id RAA12020; Fri, 7 Apr 2000 17:15:57 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29 Rodney Warren-Smith &lt;rfws@star.rl.ac.uk></otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10004071650530.11745-100000@cass29></otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+Problem with the &lt;parameter> element:
+
+The current usage in prologues for documenting scalar parameters is to
+write something like:
+
+   *     NDF = LITERAL (Read)
+   *        The input NDF.
+
+which can be upconverted to
+
+   *     &lt;parameter given>
+   *     NDF = LITERAL 
+   *        The input NDF.
+
+which is equivalent by shortref magic to
+
+         &lt;parameter given>
+         &lt;name>NDF &lt;type>LITERAL
+            &lt;description>&lt;p>The input NDF.
+
+However this doesn't work for array-type parameters, for which the current
+usage is:
+
+   *     ORIGIN( 2 ) = _INTEGER
+   *        Position of the origin.
+
+(the contents of the parenthesis, which indicate the shape of the array,
+can take a number of forms, including a comma-separated list of integers, 
+name of another parameter, an asterisk, empty...)
+
+There are various possibilities to accommodate this:
+
+   1)  A 'shape' attribute (CDATA) on the &lt;type> or &lt;parameter> elements
+   2)  A &lt;shape> optional element (PCDATA) in the content of &lt;type>
+          or &lt;parameter>
+   3)  Just write the size as part of the PCDATA content of &lt;type>
+
+I suggest (3), so one would have
+
+   *  &lt;parameter given>
+   *     ORIGIN = _INTEGER( 3 )
+
+which means
+
+      &lt;parameter given>
+         &lt;name>ORIGIN &lt;type>_INTEGER( 3 )
+
+This actually seems to me like a more logical way round to write it, 
+but it's not the way it has been done historically.  I don't think
+the benefits of recording the dimensionality of the parameter are
+all that great.  Also, I think the shortrefs required to implement (2)
+would get a bit hairy (and impossible for (1)) - but if you feel you 
+can implement them before breakfast with one hand behind your back 
+don't let me stop you).
+
+Agree?  Disagree?
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    http://www.ast.cam.ac.uk/~mbt/        01223 337535 |
+---------------------------------------------------------------------------
+
+
+</body>
+</commentary>
+<!--splice:parameter-->
+</element>
+
+<element gi="parameterlist" status="beta">
+<p>The list of parameters to an ADAM task.  Note that this is
+different from the <elemref gi="argumentlist"/> element, which is the
+list of parameters to a function.
+</p>
+<!--splice:parameterlist-->
+</element>
+
+<element gi="programcode" status="beta">
+<p>The top level element
+</p>
+<!--splice:programcode-->
+</element>
+
+<element gi="purpose" status="beta">
+<p>A brief description of the function being documented.  If this is
+missing, then the contents of the <elemref gi="description"/> are used
+instead, but if that element has a lot of content, then you should
+provide a <elemref gi="purpose" self="self"/> element, to be used in contexts
+where only a brief function description is required.
+</p>
+<!--splice:purpose-->
+</element>
+
+<element gi="px" status="beta">
+<p>See <elemref gi="px" dtd="sundtd"/>
+</p>
+<!--splice:px-->
+</element>
+
+<element gi="quote" status="beta">
+<p>See <elemref gi="quote" dtd="sundtd"/>
+</p>
+<!--splice:quote-->
+</element>
+
+<element gi="ref" status="experimental">
+<p>See <elemref gi="ref" dtd="sundtd"/></p>
+<!--splice:ref-->
+</element>
+
+<element gi="returnvalue" status="beta">
+<p>The return value of a function.  If there is none, then the
+attribute none should be present.
+</p>
+<attribute name="none">
+<p>If there is no return value, then supply this attribute.</p>
+</attribute>
+<attribute name="type">
+<p>A string indicating the type of the return value of the function.
+</p>
+</attribute>
+<!--splice:returnvalue-->
+</element>
+
+<element gi="routine" status="beta">
+<p>The documentation for a single routine.  Most of the element
+content of this element is optional, so it can be used equally well
+to document code which does not have things like parameters,
+returnvalues, and the like.
+</p>
+<!--splice:routine-->
+</element>
+
+<element gi="routinename" status="beta">
+<p>The name of the routine being documented.
+</p>
+<!--splice:routinename-->
+</element>
+
+<element gi="routineprologue" status="beta">
+<p>This is the header which documents the routine, or other code, to follow.
+</p>
+<!--splice:routineprologue-->
+</element>
+
+<element gi="row" status="beta">
+<p>See <elemref gi="row" dtd="sundtd"/>
+</p>
+<!--splice:row-->
+</element>
+
+<element gi="softwarekeywords" status="beta">
+<p>This indicates which software group the software is a member of,
+and consists of a single group keyword.  This keyword is primarily
+intended for use internally to Starlink, although it may be used by
+users to find related software.  The <elemref gi="userkeywords"/> element
+is for user-oriented keywords.
+</p>
+<p>The list of group names and keywords is maintained by the Starlink
+Software Librarian.  The current list of categories and their
+associated keywords is maintained at
+<url>http://www.starlink.rl.ac.uk/software.html</url>, and
+currently consists of the following.
+
+</p>
+<p>Applications:
+
+Software Environment (SE),
+Spectroscopy (SP),
+Image Processing and Photometry (IP),
+Astronomical Catalogue Access (CA),
+Graphics (GR),
+Wavelengths and Instruments (WI),
+Time Series (TS),
+Polarimetry (PO).
+
+</p>
+<p>Programming:
+
+Compilers and Languages (CL),
+Tools and Standards (ST).
+
+</p>
+<p>Programming: High Level Libraries:
+Data access (DAPH),
+Graphics (GRPH),
+Mathematical (MAPH),
+Astronomical Positions and Time (PTPH),
+String manipulation (SMPH),
+Infrastructure (INPH).
+
+</p>
+<p>Programming: Low Level Libraries:
+
+Data access (DAPL),
+String manipulation (SMPL),
+Infrastructure (INPL),
+Graphics (GRPL).
+
+
+
+
+
+</p>
+<!--splice:softwarekeywords-->
+</element>
+
+<element gi="strong" status="beta">
+<p>See <elemref gi="strong" dtd="sundtd"/>
+</p>
+<!--splice:strong-->
+</element>
+
+<element gi="tabular" status="beta">
+<p>See <elemref gi="tabular" dtd="sundtd"/>
+</p>
+<!--splice:tabular-->
+</element>
+
+<element gi="tbody" status="beta">
+<p>See <elemref gi="tbody" dtd="sundtd"/>
+</p>
+<!--splice:tbody-->
+</element>
+
+<element gi="tgroup" status="beta">
+<p>See <elemref gi="tgroup" dtd="sundtd"/>
+</p>
+<!--splice:tgroup-->
+</element>
+
+<element gi="thead" status="beta">
+<p>See <elemref gi="thead" dtd="sundtd"/>
+</p>
+<!--splice:thead-->
+</element>
+
+<element gi="title" status="beta">
+<p>The title of the document, or code block.
+</p>
+<!--splice:title-->
+</element>
+
+<element gi="type" status="beta">
+<p>The type of a parameter, as a string.
+</p>
+<!--splice:type-->
+</element>
+
+<element gi="ul" status="beta">
+<p>See <elemref gi="ul" dtd="sundtd"/>
+</p>
+<!--splice:ul-->
+</element>
+
+<element gi="url" status="beta">
+<p>See <elemref gi="url" dtd="sundtd"/>
+</p>
+<!--splice:url-->
+</element>
+
+<element gi="usage" status="beta">
+<p>An example of the usage of this function (how is this different
+from `invocation'?)
+</p>
+<!--splice:usage-->
+</element>
+
+<element gi="userkeywords" status="beta">
+<p>This element lists keywords intended to help a user find
+appropriate software.  You can indicate the general area of astronomy
+which the software is intended to address, by using the `Monthly
+Notices' keyword list (which is common to A&amp;A and ApJ).  You can
+find the list in the journal, or on the Monthly Notices web pages.
+Separate keywords by semicolons.
+</p>
+<p>Since not all Starlink software will necessarily be directly and
+solely related to astronomy, you may extend the keyword at lib., as
+long as the keywords you invent are prefixed with `general: ...'.
+</p>
+<p>See also <elemref gi="softwarekeywords"/>.
+</p>
+<!--splice:userkeywords-->
+</element>
+
+<element gi="verbatim" status="beta">
+<p>See <elemref gi="verbatim" dtd="sundtd"/>
+</p>
+<!--splice:verbatim-->
+</element>
+
+<element gi="webref" status="beta">
+<p>See <elemref gi="webref" dtd="sundtd"/>
+</p>
+<!--splice:webref-->
+</element>
+
+<!--splice:general-comments-->
+</dtddescription>
