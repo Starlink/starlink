@@ -48,7 +48,13 @@ my @cards = $header->cards();
 
 # Make FitsChan
 # -------------
-my $wcsinfo = $header->get_wcs();
+my $wcsinfo;
+if ($header->can("get_wcs")) {
+  $wcsinfo = $header->get_wcs();
+} else {
+  # Use fallback position
+  $wcsinfo = get_wcs( $header );
+}
 isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Set up window
@@ -137,4 +143,14 @@ sub read_file {
    return $array;
 }
 
-1;  
+# Implementation of the get_wcs method for old versions of Astro::FITS::Header
+
+sub get_wcs {
+  my $self = shift;
+  my $fchan = Starlink::AST::FitsChan->new();
+  for my $i ( $self->cards() ) {
+    $fchan->PutFits( $i, 0);
+  }
+  $fchan->Clear( "Card" );
+  return $fchan->Read();
+}

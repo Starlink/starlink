@@ -47,7 +47,13 @@ my @cards = $header->cards();
 
 # Make FitsChan
 # -------------
-my $wcsinfo = $header->get_wcs();
+my $wcsinfo;
+if ($header->can("get_wcs")) {
+  $wcsinfo = $header->get_wcs();
+} else {
+  # Use fallback position
+  $wcsinfo = get_wcs( $header );
+}
 isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Set up window
@@ -120,9 +126,22 @@ $plot->Mark( 6, [0.6,0.5,0.4], [0.3, 0.2,0.2]  );
 #$plot->Set( Colour => 2, Width => 5 );
 $plot->PolyCurve( [0.2,0.3,0.25], [0.8,0.5,0.5]);
 
+# Plot some RA/Dec points
+my $ra1 = $wcsinfo->Unformat( 1, "0:40:00" );
+my $dec1 = $wcsinfo->Unformat( 2, "41:30:00" );
+my $ra2 = $wcsinfo->Unformat( 1, "0:44:00" );
+my $dec2 = $wcsinfo->Unformat( 2, "42:00:00" );
+$plot->Set(Current => 3);
+print "\n# Current Frame " . $plot->Get( "Domain" ) . "\n";
+print "# Plotting at $ra1, $dec1\n";
+print "# Plotting at $ra2, $dec2\n";
+
+$plot->Mark(24, [$ra1, $ra2],[$dec1,$dec2]);
+
 
 # Done!
 sleep(2);
+plspause(0);
 
 plend();
 exit;
@@ -143,4 +162,15 @@ sub read_file {
    return $array;
 }
 
-1;  
+
+# Implementation of the get_wcs method for old versions of Astro::FITS::Header
+
+sub get_wcs {
+  my $self = shift;
+  my $fchan = Starlink::AST::FitsChan->new();
+  for my $i ( $self->cards() ) {
+    $fchan->PutFits( $i, 0);
+  }
+  $fchan->Clear( "Card" );
+  return $fchan->Read();
+}

@@ -74,10 +74,12 @@ draw_and_plot ("Down Right", 0.7, 0.4, "CC", -3, 4);
 # _GFlush();
 is( Starlink::AST::PLplot::_GFlush(), 1, "Calling _GFlush()" );
 
-plend();
-
 # Done!
 sleep(1);
+plspause(0);
+
+plend();
+
 exit;
 
 

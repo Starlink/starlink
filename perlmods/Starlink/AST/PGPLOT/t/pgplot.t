@@ -12,7 +12,7 @@ BEGIN {
    plan skip_all => "PGPLOT module not installed.";
    exit;
  } else {
-   plan tests => 18;
+   plan tests => 15;
  }  
  
 };
@@ -67,10 +67,13 @@ Starlink::AST::PGPLOT::_GLine( $xb, $yb );
 my ( $chv, $chh );
 ( $status, $chv, $chh ) = Starlink::AST::PGPLOT::_GQch();
 is( $status, 1, "Calling _GQch()" );
-is( $chv, 0.224459261126449, "Height of characters from vertical baseline" );
-is( $chh, 0.316722930654433, "Height of characters from horizontal baseline" );
 
-# _GAttrb
+# These tests are unreliable at present since they vary depending
+# on screen size
+#is( $chv, 0.224459261126449, "Height of characters from vertical baseline" );
+#is( $chh, 0.316722930654433, "Height of characters from horizontal baseline" );
+
+# _GAttr
 my $old_value;
 ( $status, $old_value ) = 
   Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__COLOUR(), 3, undef );
@@ -82,7 +85,8 @@ is( $old_value, 1, "Checking old GRF__COLOUR value" );
   Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__WIDTH(), 5, undef );
 
 is( $status, 1, "Calling _GAttr()" );
-is( $old_value, 0.71376748335625, "Checking old GRF__WIDTH value" );
+# Unreliable depends on plot surface dimensions
+#is( $old_value, 0.71376748335625, "Checking old GRF__WIDTH value" );
 
 
 $x[0] = 5; $y[0] = 5;

@@ -55,7 +55,13 @@ $axes[1] = $header->value( "NAXIS2" );
 
 # Make FitsChan
 # -------------
-my $wcsinfo = $header->get_wcs();
+my $wcsinfo;
+if ($header->can("get_wcs")) {
+  $wcsinfo = $header->get_wcs();
+} else {
+  # Use fallback position
+  $wcsinfo = get_wcs( $header );
+}
 isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Create Tk test harness
@@ -182,6 +188,18 @@ sub create_window {
    $button->pack( -side => 'right' );
    
    return $canvas;
+}
+
+# Implementation of the get_wcs method for old versions of Astro::FITS::Header
+
+sub get_wcs {
+  my $self = shift;
+  my $fchan = Starlink::AST::FitsChan->new();
+  for my $i ( $self->cards() ) {
+    $fchan->PutFits( $i, 0);
+  }
+  $fchan->Clear( "Card" );
+  return $fchan->Read();
 }
 
 # read FITS file
