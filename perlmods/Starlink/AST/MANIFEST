@@ -8,6 +8,9 @@ arrays.h
 ppport.h
 typemap
 typemap.561
+PGPLOT/PGPLOT.pm
+PGPLOT/Makefile.pm
+PGPLOT/t/pgplot.t
 t/attrib.t
 t/channel.t
 t/fitschan.t
