@@ -205,6 +205,10 @@
 #     02-MAY-1999 (NG):
 #        Makefile for Starlink SGML system created.  Based on the makefile
 #        for v1.3-3 of Star2HTML.
+#     12-OCT-1999 (NG):
+#        Specialised to manage only the SGML Kit (ie, just the
+#	 specifically SGML materials, and not Jade and dvi2bitmap,
+#	 which are now in a separate SGML super-package).
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -372,11 +376,10 @@ PKG_NAME = sgmlkit
 
 PKG_VERS = 0.6-1
 
-##  List of public script files.  These are scripts which form part of
-##  the package and will be required by users of it.  They will be
-##  installed in the $(INSTALL_BIN) directory with execute permission
-##  set.
-##PUBLIC_SCRIPTS = sgml_set.sh sgml_set.csh
+#  List of public script files.  These are scripts which form part of
+#  the package and will be required by users of it.  They will be
+#  installed in the $(INSTALL_BIN) directory with execute permission
+#  set.
 #PUBLIC_SCRIPTS=
 
 #  List of files which need to be unpacked before the package can be installed.
@@ -384,9 +387,7 @@ PKG_VERS = 0.6-1
 UNPACK_FILES = lib
 
 #  List of documentation files.
-#DOCUMENTATION = $(PKG_NAME).news
-#DOCUMENTATION = NEWS ssn70.tar-htx ssn70.tar-tex
-DOCUMENTATION = NEWS doc/ssn70/ssn70.tar-htx doc/ssn70/ssn70.tar-tex
+DOCUMENTATION=$(PKG_NAME).NEWS doc/ssn70/ssn70.tar-htx doc/ssn70/ssn70.tar-tex
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -394,9 +395,9 @@ DOCUMENTATION = NEWS doc/ssn70/ssn70.tar-htx doc/ssn70/ssn70.tar-tex
 #  script and any documentation files).
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
-################################################################################
-#-------------------------------------------------------------------------------
-
+###########################################################################
+#--------------------------------------------------------------------------
+#
 #  Define files required for building the package.
 #  ==============================================
 #
@@ -411,11 +412,6 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 #  There are no files which need to be build in this package.
 BUILT_FILES = 
 
-#BUILT_FILES = jade/BUILT dvi2bitmap/BUILT
-#BUILT_FILES = sgml/doc/ssn70/ssn70.html.stamp sgml/doc/ssn70/ssn70.ps.stamp
-#BUILT_FILES = dvi2bitmap/dvi2bitmap
-
-
 #  Rules for extracting source files from the source archive.
 
 #$(PUBLIC_SCRIPTS) $(TEMPLATE_DOCS):
@@ -427,7 +423,6 @@ BUILT_FILES =
 #  most recent build for use in subsequent operations that require it.
 #  There must be no rule for generating this file; it is updated only
 #  as a side effect of building the package.
-
 DATE_STAMP = $(PKG_NAME)_datestamp
 
 #  Pathnames of directories into which files may be placed when the
@@ -438,16 +433,12 @@ DATE_STAMP = $(PKG_NAME)_datestamp
 # The INSTALL_LIB directory is deemed to be `owned'
 # by this package. The deinstallation target below deinstalls things
 # by deleting the entire contents of this directory.
+# The reason for this is that there is a large number
+# of files installed in INSTALL_LIB, so that working out what ones to
+# remove would be rather complicated, and involve possibly
+# non-portable `find' magic.
 #
 # This is not true of the INSTALL_BIN directory.
-## In the case of the INSTALL_BIN directory this is necessary since the
-## Jade installation procedure is sufficiently elaborate that it would
-## be complicated (and hence errorprone) to work out and record exactly
-## which files have been installed.
-# Similarly, there is a large number
-# of files installed in INSTALL_LIB, so that working out what ones to
-# remove would be similarly complicated, and involve possibly
-# non-portable `find' magic.
 
 INSTALL_BIN = $(INSTALL)/bin/sgml
 INSTALL_LIB = $(INSTALL)/lib/sgml
@@ -460,28 +451,26 @@ INSTALL_SHARE = $(INSTALL)/share
 
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
-#FIXME add separate docs
-
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_LIB) $(INSTALL_DOCS)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
 
 #--------------------------------------------------------------------------
-
+#
 #  Primary targets.
 #  ===============
 #
 #  These are the targets intended for normal external use (apart from
 #  help, which appears at the start of the file).
-
+#
 #  check: Check source file presence and show current state.
 #  --------------------------------------------------------
 
 check:
 	@ echo
 	@ echo \
-   '*** This is $(PACK_NAME) version V$(PKG_VERS) on system $(SYSTEM)'
+	    '*** This is $(PACK_NAME) version V$(PKG_VERS) on system $(SYSTEM)'
 	@ echo
 	@ nosource='';\
           for f in $(SOURCE_FILES); do \
@@ -497,7 +486,7 @@ check:
           fi
 	@ echo
 #
-#  Display the current state.
+#	# Display the current state.
 	@ if test -f .BUILT;\
           then echo '    The package is currently:  built for system'\
              `cat .BUILT`;\
@@ -514,7 +503,7 @@ check:
           then if test "$(SYSTEM)" != "`cat .BUILT`";\
              then echo '***  WARNING  ***';\
                 echo \
-'    The package is built for a system other than the current one';\
+	    '   The package is built for a system other than the current one';\
                 echo ;\
              else :;fi;\
           else :;fi
@@ -524,17 +513,16 @@ check:
 #
 #  Compile the source and build the required files in the source
 #  directory.
-
+#
 #  The build target first checks that the package is not installed.  If
 #  not, it then causes the .BUILT target to be made which ensures that
 #  the package has been built.
-
 build:
 	@ if test -f .INSTALLED_$(SYSTEM); then \
            echo;\
-           echo \
-   '*** The $(PACK_NAME) package is currently installed -- please use the';\
-           echo '    "deinstall" target before re-building it';\
+           echo '*** The $(PACK_NAME) package is currently installed';\
+           echo '    -- please use the "deinstall" target';\
+	   echo '    before re-building it';\
            echo;\
         elif $(MAKE) .BUILT; then \
            echo;\
@@ -550,6 +538,8 @@ build:
 #  The .BUILT target records the time of the most recent build which
 #  modified any of the built files.  It depends on all the built files
 #  being up to date (which causes them to be built).
+
+#$(DATE_STAMP): .BUILT
 
 .BUILT: $(BUILT_FILES)
 #
@@ -591,7 +581,7 @@ build:
 	@ echo ''                             >>$(DATE_STAMP)
 	@ echo ''                             >>$(DATE_STAMP)
 #
-#  Record completion of the build.
+#	# Record completion of the build.
 	@ echo '$(SYSTEM)' > .BUILT
 
 ######################################################################
@@ -613,37 +603,36 @@ build:
 install:
 	@ if test -f .INSTALLED_$(SYSTEM); then \
            echo;\
-           echo \
-   '*** The $(PACK_NAME) package has already been installed -- please use the';\
-           echo \
-   '    "deinstall" target first if you wish to reinstall it';\
+           echo '*** The $(PACK_NAME) package has already been installed';\
+	   echo '     -- please use the "deinstall" target first,';\
+	   echo '     if you wish to reinstall it';\
            echo;\
         elif test -f .BUILT; then \
            if test "`cat .BUILT`" = "$(SYSTEM)"; then \
               if $(MAKE) .INSTALLED_$(SYSTEM); then \
                  echo;\
-                 echo \
-   '*** The $(PACK_NAME) package has been installed in directory $(INSTALL)';\
+                 echo '*** The $(PACK_NAME) package has been installed';\
+		 echo '    in directory $(INSTALL)';\
                  echo;\
               else \
                  echo;\
-                 echo \
-   '*** "make" failed installing the $(PACK_NAME) package in directory $(INSTALL)';\
+                 echo '*** "make" failed installing the $(PACK_NAME)';\
+		 echo '     package in directory $(INSTALL)';\
                  echo;\
                  exit 1;\
               fi;\
            else \
               echo;\
-              echo \
-   "*** The $(PACK_NAME) package is built for system `cat .BUILT` -"\
-   'so cannot be installed on system $(SYSTEM)';\
+              echo "*** The $(PACK_NAME) package is built for system";\
+	      echo "    `cat .BUILT` -- so cannot be installed on";\
+	      echo '    system $(SYSTEM)';\
               echo;\
               exit 1;\
            fi;\
         else \
            echo;\
-           echo \
-   '*** The $(PACK_NAME) package is not built, so cannot be installed';\
+           echo '*** The $(PACK_NAME) package is not built,';\
+	   echo '    so cannot be installed';\
            echo;\
            exit 1;\
         fi
@@ -652,9 +641,6 @@ install:
 # directories into $(INSTALL_LIB), then tweaks the .../lib/*.pl files
 # to adjust the Perl path and update the ((PKG_VERS)) string. 
 #
-## It
-## installs dvi2bitmap by copying it, and Jade by invoking the Jade
-## install target.
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(UNPACK_FILES)
 #	# Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
 #	# package is installed (at least in part).
@@ -691,7 +677,6 @@ install:
 	echo "This directory is owned by the $(PACK_NAME) package.  If you install things here they will be overwritten or deleted." > $(INSTALL_LIB)/DO-NOT-INSTALL-HERE
 #	# Install documentation.
 	UNPACKDIR=$$PWD; \
-		test -r ssn70.tar-htx && \
 		cd $(INSTALL_DOCS) && \
 		tar xf $$UNPACKDIR/doc/ssn70/ssn70.tar-htx
 #	# hlink the installed documentation,
@@ -704,7 +689,7 @@ install:
 		for f in `awk '{print $$1}' MANIFEST`; do \
 			cp $$f $(INSTALL_DOCS); \
 		done
-#	rm -Rf ssn70.latex
+	rm -Rf ssn70.latex
 	- test -f $(INSTALL_DATES)/$(DATE_STAMP) && \
 		chmod 644 $(INSTALL_DATES)/$(DATE_STAMP) && \
 		rm -f $(INSTALL_DATES)/$(DATE_STAMP)
@@ -733,27 +718,30 @@ deinstall:
            if test "`cat .INSTALLED_$(SYSTEM)`" = "$(INSTALL)"; then \
               if $(MAKE) do_deinstall; then \
                  echo;\
-                 echo '*** The $(PACK_NAME) package has been deinstalled from directory $(INSTALL)';\
+                 echo '*** The $(PACK_NAME) package has been deinstalled';\
+		 echo '    from directory $(INSTALL)';\
                  echo;\
               else \
                  echo;\
-                 echo '*** "make" failed deinstalling the $(PACK_NAME) package from directory $(INSTALL)';\
+                 echo '*** "make" failed deinstalling the ';\
+		 echo '    $(PACK_NAME) package from directory $(INSTALL)';\
                  echo;\
                  exit 1;\
               fi;\
            else \
               echo;\
-              echo "*** The $(PACK_NAME) package is installed in `cat .INSTALLED_$(SYSTEM)`";\
-              echo "*** and not in your INSTALL directory ($(INSTALL))";\
+              echo '*** The $(PACK_NAME) package is installed in';\
+	      echo "    `cat .INSTALLED_$(SYSTEM)`, and not in your";\
+	      echo "    INSTALL directory ($(INSTALL))";\
               echo '*** Not deinstalled';\
               exit 1;\
            fi;\
         fi
 
 # The do_deinstall target (which should never exist) is very simple.
-# It simply deletes the entire INSTALL_LIB and INSTALL_BIN directories
-# As I warned in the note above, this assumes that the two directories
-# are `owned' by this package (see above for notes and justification).
+# It simply deletes the entire INSTALL_LIB directory.
+# As I warned in the note above, this assumes that the directory
+# is `owned' by this package (see above for notes and justification).
 do_deinstall:
 #	# Note the package will need to be tested again.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); fi
@@ -765,7 +753,8 @@ do_deinstall:
 	done
 #	# Remove the installed documentation
 	rm -Rf $(INSTALL_DOCS)/ssn70.htx
-	$(TAR_OUT) ssn70.tar-tex ssn70.latex/MANIFEST
+	test -f ssn70.latex/MANIFEST || \
+		$(TAR_OUT) doc/ssn70/ssn70.tar-tex ssn70.latex/MANIFEST
 	for f in `awk '{print $$1}' ssn70.latex/MANIFEST`; do \
 		rm -f $(INSTALL_DOCS)/$$f; \
 	done
@@ -819,7 +808,9 @@ test:
 #  Export the source plus all the built files to a new user.
 #
 #  NOTE: Since there are no `built' files for this package, the
-#  export, export_run and export_source packages are identical.
+#  export, export_run and export_source packages are identical.  They
+#  are therefore generated by building the export_source target and
+#  hard-linking the desired one to that.
 #
 #  Some package makefiles seem to include the
 #  documentation in some packages but not in others, but the
@@ -832,12 +823,12 @@ test:
 #  up to date.
 export: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
 	@ echo
-	@ echo '*** Export copy of the built $(PACK_NAME) package is in the compressed'
-	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+	@ echo '*** Export copy of the built $(PACK_NAME) package';\
+	@ echo '    is in the compressed tar file';\
+	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
 	@ echo
 
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
-#	# make a hard link
 	ln $< $@
 
 #  export_run: Export the built system (without source).
@@ -849,12 +840,12 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
 #  up to date.
 export_run: CVS-CHECK $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	@ echo
-	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
-	@ echo '    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+	@ echo '*** Export copy of the "runtime" $(PACK_NAME) package';\
+	@ echo '    is in the compressed tar file'
+	@ echo '    $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
 	@ echo
 
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(EXPORT)/$(PKG_NAME).tar.Z
-#	# make a hard link
 	ln $< $@
 
 #  export_source: Export the source.
@@ -876,9 +867,9 @@ export_source: CVS-CHECK $(EXPORT)/$(PKG_NAME).tar.Z
 $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #	# Remove any pre-existing tar files before creating new ones.
 	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+		rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+		| compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
 
 # The following target, which should never exist, tests for the
 # presence of a CVS directory.  If it finds one, it refuses to 
@@ -920,10 +911,6 @@ clean:
 #  Since there was nothing to do in building the package other than
 #  unpacking it, there's nothing to here.
 unbuild: clean
-#	test -r doc/ssn70/docset.manifest && \
-#		cd doc/ssn70; \
-#		rm `cat docset.manifest` ; \
-#		$(MAKE) clean
 	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -952,11 +939,12 @@ unbuild: clean
 # Build the documentation at export time
 doc/ssn70/ssn70.tar-htx: doc/ssn70/ssn70.sgml
 	cd doc/ssn70; $(MAKE) ssn70.tar-htx
-	#$(LINK) doc/ssn70/ssn70.tar-htx $@
 
 doc/ssn70/ssn70.tar-tex: doc/ssn70/ssn70.sgml
 	cd doc/ssn70; $(MAKE) ssn70.tar-tex
-	#$(LINK) doc/ssn70/ssn70.tar-tex $@
+
+$(PKG_NAME).NEWS:
+	$(LINK) doc/ssn70/ReleaseNotes $@
 
 #  Unpacking.  Use the presence of the $(UNPACK_FILES) variable (=lib)
 #  to determine whether we need to unpack the source tarball.  Don't
