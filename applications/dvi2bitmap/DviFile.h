@@ -85,7 +85,9 @@ public:
 	return oldv;
     }
     /**
-     * Units of length.  Used for {@link #currH} and {@link #currV}.
+     * Units of length.  Used in {@link #currH} and {@link #currV},
+     * and other conversions are available through method {@link
+     * #convertFromScaledPoints}.
      */
     enum DviUnits {
 	/**
@@ -112,7 +114,8 @@ public:
 	/**
 	 * Millimetre; 1mm=10E-3m.  One metre is the distance light
 	 * travels, in vacuum, in a time 1/299792458 seconds.
-	 * 1mm=2.84527559pt; 1pt=0.3515mm.
+	 * 
+	 * <p>Conversion factors: 1mm=2.84527559pt; 1pt=0.3515mm.
 	 */
 	unit_mm,
 	/**
@@ -125,7 +128,13 @@ public:
 	unit_cc,
 	/**
 	 * TeX `scaled points'.  These are the dimensions which TeX
-	 * itself works in, where 65536sp=1pt, or 1sp=5.363E-9 metres.
+	 * itself works in, where 65536sp=1pt, or 1sp=5.36434 .
+	 * 10<sup>-9</sup> metres.  Light at that wavelength is classed
+	 * as soft X-rays, and is a health-hazard (so don't examine
+	 * your scaled points too closely); it's also the distance light
+	 * travels in 1.78885 . 10<sup>-17</sup> seconds.
+	 *
+	 * <p>Why am I telling you this?  <em>I</em> don't know!
 	 */
 	unit_sp,
 	/** 
@@ -230,12 +239,12 @@ public:
      * @return the vertical size of the largest `page', in pixels
      */
     int vSize() const { return deepest_page_; }
+    static double convertFromScaledPoints(int sp, DviUnits units);
     /**
      * Return the net magnification factor for the DVI file
      * @return the overall magnification factor applied to lengths in
      * the DVI file.  A value of 1.0 implies no magnification at all.
      */
-    static double convertFromScaledPoints(int sp, DviUnits units);
     double magnification() const { return netmag_; }
     /**
      * Converts a length in points to one in pixels, using the current

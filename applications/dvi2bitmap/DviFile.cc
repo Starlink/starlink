@@ -742,7 +742,7 @@ int DviFile::pixel_round(int dp)
  * pixel position solely through {@link #currH} or {@link #currV}.
  *
  * @param sp the length in scaled points
- * @param unit the unit to convert it to
+ * @param units the unit to convert it to
  *
  * @return the converted unit, or zero if the target unit was,
  * erroneously, pixels or DVI units
