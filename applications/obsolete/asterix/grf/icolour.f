@@ -936,6 +936,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
 *    Global variables :
 *    Status :
       INTEGER STATUS
@@ -952,6 +953,7 @@
       INTEGER I,N
       INTEGER GCBID,ID
       INTEGER ICOL
+      INTEGER NB
       LOGICAL OK
 *-
 
