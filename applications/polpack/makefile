@@ -777,7 +777,7 @@ libpolpack.a: $(O_SUB1)
 
 $(MONOLITH): $(MONO_OBJECT) $(OBJECT_LIBRARIES) $(LINK_SCRIPT) 
 	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
-            $(ADDLIBS) $(TCLLIBS) $(LDFLAGS)
+            $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 
 #  Rules for building the help libraries.
