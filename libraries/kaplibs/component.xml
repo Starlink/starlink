@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="par">
+  <version>2.7-3</version>
+  <path>libraries/kaplibs</path>
+  <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
+  <!-- <abstract><p>KAPLIBS is a package of Fortran subroutine 
+libraries which were originally written as part of the KAPPA package (a
+package of general purpose image processing and visualization tools).
+KAPLIBS provides software developers with access to many of the internal
+KAPPA routines, so that KAPPA-like applications can be written and built
+independently of KAPPA.</p></abstract> -->
+  <dependencies >
+    <build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name>D.S. Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
