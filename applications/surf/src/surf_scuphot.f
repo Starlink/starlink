@@ -160,6 +160,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.30  2000/06/28 01:30:41  timj
+*     Reset MEAS_2_Q each time round loop
+*
 *     Revision 1.29  2000/06/28 01:10:50  timj
 *     Reset MEAS_Q each time round loop
 *
@@ -1148,6 +1151,7 @@ c
             DO BEAM = 1, SCUBA__MAX_BEAM
                MEAS_1_Q (BEAM) = 1
                MEAS_2_N (BEAM) = 0
+               MEAS_2_Q (BEAM) = 0
 
 *     Reset the coadd count and the coadd quality, else
 *     SCULIB_COADD will get confused. Do not need to reset
