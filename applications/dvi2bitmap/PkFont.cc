@@ -2,8 +2,11 @@
 // Copyright 1999, Particle Physics and Astronomy Research Council.
 // See file LICENCE for conditions.
 //
-// part of dvi2bitmap
 // $Id$
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "dvi2bitmap.h"
 #include <iostream>		// for debugging code, written to cerr
@@ -11,7 +14,7 @@
 #include <unistd.h>
 #include <vector>
 
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
 
@@ -174,13 +177,13 @@ PkFont::~PkFont()
 void PkFont::verbosity (const verbosities level)
 {
     verbosity_ = level;
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
     kpathsea::verbosity (level);
 #endif
 }
 
 // Find a font.  Basic method uses the environment variable and is somewhat
-// cruddy.  If ENABLE_KPATHSEA is defined and the first method doesn't 
+// cruddy.  If ENABLE_KPATHSEA is true and the first method doesn't 
 // produce anything (which will be true if the environment variable wasn't
 // set and the -f option wasn't given) then fall through to a call to
 // the kpathsea library.
@@ -234,7 +237,7 @@ bool PkFont::find_font (string& path)
 	}
     }
 
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
     if (! got_it)
     {
 	const char *kpse_file;

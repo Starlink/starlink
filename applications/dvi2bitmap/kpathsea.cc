@@ -1,7 +1,13 @@
-// Part of dvi2bitmap
+// Part of dvi2bitmap.
+// Copyright 1999, Particle Physics and Astronomy Research Council.
+// See file LICENCE for conditions.
 //
 // This is merely an interface to the kpathsea library
 // $Id$
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #define NULL 0
 #include <iostream>		// for cerr
@@ -14,7 +20,7 @@
 
 #include "kpathsea.h"
 
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
 // The Kpathsea library interface has to be isolated in this class because the
 // kpathsea headers typedef a `string' type, which conflicts with C++ string.
 // It would be more appropriate to put this into a namespace, but egcs

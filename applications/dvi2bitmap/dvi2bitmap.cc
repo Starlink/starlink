@@ -1,10 +1,13 @@
 // Part of dvi2bitmap.
 // Copyright 1999, Particle Physics and Astronomy Research Council.
 // See file LICENCE for conditions.
-//
-// part of dvi2bitmap
+
 static const char RCSID[] =
 	"$Id$";
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "dvi2bitmap.h"
 #include <vector>
@@ -38,7 +41,7 @@ using std::exit;
 #include "PageRange.h"
 #include "version.h"
 
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
 
@@ -95,7 +98,7 @@ main (int argc, char **argv)
 
     progname = argv[0];
 
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
     kpathsea::init (progname, resolution);
 #endif
 
@@ -314,10 +317,10 @@ main (int argc, char **argv)
 		break;
 	      case 'V':		// display version
 		cout << version_string << "\nOptions:\n";
-#ifdef ENABLE_GIF
+#if ENABLE_GIF
 		cout << "ENABLE_GIF\n";
 #endif
-#ifdef ENABLE_KPATHSEA
+#if ENABLE_KPATHSEA
 		cout << "ENABLE_KPATHSEA\n";
 #endif
 #ifdef MKTEXPK

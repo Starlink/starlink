@@ -34,6 +34,10 @@
 ** CompuServe Incorporated.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 // Minimally converted to a C++ class
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"

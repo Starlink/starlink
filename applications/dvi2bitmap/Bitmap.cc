@@ -8,6 +8,10 @@
 
 #include <iostream>		// debug code writes to cerr
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #if NO_CSTD_INCLUDE
 #include <stdarg.h>
 #include <stdio.h>

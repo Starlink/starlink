@@ -5,6 +5,10 @@
 // part of dvi2bitmap
 // $Id$
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 

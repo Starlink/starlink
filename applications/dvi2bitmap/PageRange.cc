@@ -1,3 +1,13 @@
+// Part of dvi2bitmap
+// Copyright 1999, Particle Physics and Astronomy Research Council
+// See file LICENCE for conditions
+//
+// $Id$
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "PageRange.h"
 #include <iostream>
 

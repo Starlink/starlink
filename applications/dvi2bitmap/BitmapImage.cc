@@ -6,6 +6,10 @@
 
 //#include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <string>
 #include "BitmapImage.h"
 #if ENABLE_GIF
