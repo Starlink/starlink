@@ -213,16 +213,18 @@ the data of the CITATION element.
 (define (hasbibliography?)
   (get-bibliography-name))
 
+;; Return bibliography name or #f
 (define (get-bibliography-name)
-  (attribute-string (normalize "bibliography")
-		    (getdocbody 'backmatter)))
+  (let ((bm (getdocbody 'backmatter)))
+    (and bm
+	 (attribute-string (normalize "bibliography") bm))))
 
 (element citation
   (let ((bib-name (get-bibliography-name))
 	(cit-data (trim-data (current-node))))
     (if bib-name
 	(make element gi: "a"
-`	      attributes: (list (list "href" (string-append
+	      attributes: (list (list "href" (string-append
 					      (bibliography-sys-id)
 					      "#"
 					      cit-data)))
@@ -230,9 +232,7 @@ the data of the CITATION element.
 	(error "Have CITATION but no BIBLIOGRAPHY"))))
 
 (define (make-bibliography)
-  (let* ((hasbib? (attribute-string (normalize "bibliography")
-				    (getdocbody 'backmatter)))
-	 (bibcontents (and hasbib?
+  (let* ((bibcontents (and (hasbibliography?)
 			   (read-entity (string-append (root-file-name)
 						       ".htmlbib.bbl")))))
     (if bibcontents
@@ -424,10 +424,7 @@ by BibTeX.
   (let* ((kids (select-by-class (descendants (getdocbody)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
 	 ;(bibelement (select-elements kids (normalize "bibliography")))
-	 (bm (getdocbody 'backmatter))
-	 (bibname (and bm
-		       (attribute-string (normalize "bibliography")
-					 bm)))
+	 (bibname (get-bibliography-name))
 	 )
     (if bibname
 	(if (node-list-empty? citations)
