@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.27  1998/04/23 01:34:03  timj
+*     Add bad status message to start and end.
+*
 *     Revision 1.26  1998/04/16 02:48:57  timj
 *     Add SCUMAKEWT
 *
@@ -130,6 +133,12 @@ c
 *    Local variables :
       CHARACTER*(PAR__SZNAM) NAME        ! name of action
 *.
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_SETC('TSK', NAME)
+         CALL ERR_REP(' ', 'SURF: bad status on entry to ^NAME',
+     :        STATUS)
+      END IF
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -249,5 +258,12 @@ c
      :        STATUS)
 
       END IF
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_SETC('TSK', NAME)
+         CALL ERR_REP(' ', 'SURF: bad status on exit from ^TSK',
+     :        STATUS)
+      END IF
+
 
       END
