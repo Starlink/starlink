@@ -44,8 +44,8 @@ dnl    encumbered pgplot
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    We have a SUN document, we should probably tell people its there
-STAR_LATEX_DOCUMENTATION(sun45)
-dnl STAR_DOCS_FILES(sun45fig.ps)
+dnl STAR_LATEX_DOCUMENTATION()
+dnl STAR_DOCS_FILES()
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

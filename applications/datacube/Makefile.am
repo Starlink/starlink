@@ -6,7 +6,7 @@ bin_SCRIPTS = datacube.csh datacube.icl \
 
 bin_MONOLITHS = datacube_mon
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun45fig.ps
+# stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 datacube_mon_SOURCES = datacube_mon.f 
 datacube_mon_TASKS = copyaxis getbound putaxis 
