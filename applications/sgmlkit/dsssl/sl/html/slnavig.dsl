@@ -54,7 +54,7 @@ must be a subset of the return value of <funcname/section-element-list/.
 <routinename>chunking?
 <description>
 Returns true if chunking is enabled.
-<p>Currently, this simply returns <code/ (not (or nochunks stream-output))/,
+<p>Currently, this simply returns <code/(not (or nochunks stream-output))/,
 but could be more general in future.
 <returnvalue type=boolean>True if chunking is enabled.
 <codebody>
@@ -69,6 +69,7 @@ chunking has been turned off.
 Given that chunking is on, this simply tests whether the
 node is a member of <funcname/chunk-element-list/.
 <returnvalue type=boolean>True if the node is a chunk
+<p>Note that the document element is <em/always/ deemed to be a chunk.
 <argumentlist>
 <parameter optional default='(current-node)'>
   nd
@@ -76,8 +77,9 @@ node is a member of <funcname/chunk-element-list/.
   <description>The node to test
 <codebody>
 (define (chunk? #!optional (nd (current-node)))
-  (and (chunking?)
-       (member (gi nd) (chunk-element-list))))
+  (or (node-list=? nd (document-element))
+      (and (chunking?)
+	   (member (gi nd) (chunk-element-list)))))
 
 <routine>
 <routinename>chunk-path
@@ -170,7 +172,7 @@ Returns the filename of the html file that contains the given node.
 				; root chunk.
 		      (if %override-root-file-name%
 			  %override-root-file-name%
-			  (root-file-name target_nd))
+			  (index-file-name target_nd))
 				; give target_nd as argument - this is
 				; a singleton-node-list (required
 				; argument for document-element), but
