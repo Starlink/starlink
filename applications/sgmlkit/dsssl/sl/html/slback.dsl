@@ -40,7 +40,7 @@ in mode make-manifest-mode in sl.dsl
   (empty-sosofo))
 
 (define (hasbackmatter?)
-  (or (hasnotes?) (hasbibliography?) (hashistory?)))
+  (or (hasnotes?) (hasbibliography?) (hashistory?) (hasidindex?)))
 
 ;; Do NOT call this within the context of the document-element.  It
 ;; messes up big-time if (current-node) is the document-element.
@@ -50,11 +50,13 @@ in mode make-manifest-mode in sl.dsl
 		     (make sequence
 		       (make element gi: "ul"
 			     (make-contents-backmatter))
+		       (make-idindex)
 		       (make-notecontents)
 		       (make-bibliography)
 		       (make-updatelist))
 		     system-id: (backmatter-sys-id)
-		     force-chunk?: #t)
+		     force-chunk?: #t
+		     navbars?: #f)
       (empty-sosofo)))
 
 (define (make-manifest-backmatter)
@@ -73,6 +75,10 @@ in mode make-manifest-mode in sl.dsl
 	(empty-sosofo))
     (if (hashistory?)
 	(make fi data: (string-append (updatelist-sys-id) "
+"))
+	(empty-sosofo))
+    (if (hasidindex?)
+	(make fi data: (string-append (idindex-sys-id) "
 "))
 	(empty-sosofo))))
 
@@ -112,14 +118,27 @@ in mode make-manifest-mode in sl.dsl
 			  (literal "Changes")))
 	      #f
 	      ))
-	 (contentslist (if (or noteslist biblist updateslist)
+	 (idindex
+	  (if (hasidindex?)
+	      (make element gi: "li"
+		    (make element gi: "a"
+			  attributes:
+			  (list (list "href" (string-append
+					      (idindex-sys-id)
+					      "#" (idindex-frag-id))))
+			  (literal "ID index")))
+	      #f))
+	 (contentslist (if (or noteslist biblist updateslist idindex)
 			   (sosofo-append (or noteslist (empty-sosofo))
 					  (or biblist (empty-sosofo))
-					  (or updateslist (empty-sosofo)))
+					  (or updateslist (empty-sosofo))
+					  (or idindex (empty-sosofo)))
 			   #f)))
     (if contentslist
 	(make element gi: "li"
-	      (literal "Backmatter")
+	      (make element gi: "a"
+		    attributes: (list (list "href" (backmatter-sys-id)))
+		    (literal "Backmatter"))
 	      (make element gi: "ul"
 		    contentslist))
 	(empty-sosofo))))
@@ -148,7 +167,7 @@ in mode make-manifest-mode in sl.dsl
 
 (mode section-reference
   (element backmatter
-    (make-section-reference title: (literal "Notes, etc..."))))
+    (empty-sosofo)))
 
 <routine>
 <description>
@@ -206,7 +225,8 @@ Support notes as endnotes.
 			       (with-mode extract-notecontents
 				 (process-node-list notelist))))
 		       system-id: (notes-sys-id)
-		       force-chunk?: #t))))
+		       force-chunk?: #t
+		       navbars?: #f))))
 
 <routine>
 <description>
@@ -249,7 +269,8 @@ the data of the CITATION element.
 				     (literal "Bibliography")))
 			 (make fi data: bibcontents))
 		       system-id: (bibliography-sys-id)
-		       force-chunk?: #t)
+		       force-chunk?: #t
+		       navbars?: #f)
 	(empty-sosofo))))
 
 <routine>
@@ -274,7 +295,8 @@ update elements which refer to them.
 		       (with-mode extract-updatelist
 			 (process-node-list (getdocinfo 'history))))
 		     system-id: (updatelist-sys-id)
-		     force-chunk?: #t)
+		     force-chunk?: #t
+		     navbars?: #f)
       (empty-sosofo)))
 
 ;(define (make-updatelist)
@@ -380,14 +402,85 @@ update elements which refer to them.
 		(process-node-list selupdates))
 	  (empty-sosofo)))))
 
-<![IGNORE[
 <routine>
 <description>
 Linking support.  Create a page listing all the exported IDs in the document,
 so that document authors can find them in once place.
 <codebody>
+(define (hasidindex?)
+  (not suppress-idindex))
+(define (idindex-sys-id)
+  (if (chunking?)
+      (html-file uniq: "idindex")
+      (html-file target_nd: (document-element))))
+(define (idindex-frag-id) "xref__IDINDEX")
+(define (make-idindex)
+  (if suppress-idindex
+      (empty-sosofo)
+      (html-document
+       (literal "ID Index")
+       (let ((all-els (node-list-filter-by-gi
+		       (select-by-class (descendants (getdocbody))
+					'element)
+		       (target-element-list))))
+	 (make sequence
+	   (make element gi: "h2"
+		 (make element gi: "a"
+		       attributes: (list (list "name" (idindex-frag-id)))
+		       (literal "ID Index")))
+	   (make element gi: "p"
+		 (literal "Index of IDs in this document.  Exported IDs indicated ")
+		 (make element gi: "strong"
+		       (literal "like this.")))
+	   (with-mode make-idindex-mode
+	     (process-node-list all-els))))
+       system-id: (idindex-sys-id)
+       force-chunk?: #t
+       navbars?: #f)))
+(mode make-idindex-mode
+  (default
+    (let ((id (attribute-string (normalize "id") (current-node))))
+      (if id
+	  (let* ((export (attribute-string (normalize "export")
+					   (current-node)))
+		 (format (if export "strong" "em"))
+		 (target (element-with-id id)))
+	    (make element gi: "p"
+		  (make sequence
+		    (make element gi: format
+			  (literal "<" (gi target) " id=")
+			  (make element gi: "a"
+				attributes:
+				(list (list "href" (href-to target)))
+				(literal id)))
+		    (literal ">")
+		    (with-mode section-reference
+		      (process-node-list target)))))
+	  (empty-sosofo))))
+  (element sect
+    (let ((id (attribute-string (normalize "id") (current-node))))
+      (if id
+	  (let* ((export (attribute-string (normalize "export")
+					   (current-node)))
+		 (format (if export "strong" "em"))
+		 (target (element-with-id id)))
+	    (make sequence
+	      (make empty-element gi: "hr")
+	      (make element gi: "h3"
+		    (make sequence
+		      (make element gi: format
+			    (literal "<" "sect id=")
+			    (make element gi: "a"
+				  attributes:
+				  (list (list "href" (href-to target))
+					(list "name" (string-append
+						      "xref__IDINDEX_" id)))
+				  (literal id)))
+		      (literal ">")
+		      (with-mode section-reference
+			(process-node-list target))))))
+	  (empty-sosofo)))))
 ; nothing yet
-]]>
 
 <codereference doc="lib.dsl" id="code.lib">
 <title>Library code
