@@ -31,12 +31,15 @@ proc Accept {} {
       set cy [GetPosn $i CY $REFIM_DISP $REFOBJ_DISP]
       set lab [GetPosn $i LBL $REFIM_DISP $REFOBJ_DISP]
 
-# Search for an image feature at these canvas coordinates. If one is
+# See if there is already a current feature with the same label as the
+# reference feature.
+      if { [FindPosn LBL $lab] == "" } {
+
+# If not, search for an image feature at these canvas coordinates. If one is
 # found, give it the same label as the reference feature.
-      GetFeature $cx $cy $lab
-
+         GetFeature $cx $cy $lab
+      }
    }
-
 }
 
 proc AllMappings {} {
@@ -282,17 +285,51 @@ proc B1MotionBind {x y} {
     }
 }
 
-proc BlinkMark {i option value1 value2 interval image object} {
+proc BeginUF {} {
 #+
 #  Name:
-#    BlinkMark
+#     BeginUF
 #
 #  Purpose:
-#    Blinks a position marker.
+#     Mark the start of a temporary file context. Calls to this procedure
+#     should be matched by calls to EndUF.
 #
 #  Arguments:
-#    i
-#       The index within the position list of the marker to be blinked.
+#     None
+#
+#  Returned Value:
+#     An integer context identifier which can be passed to EndUF.
+
+#  Globals:
+#     IFILE (Read)
+#        Temporary file names created by UniqueFile are stored in PolReg's
+#        temporary ADAM_USER directory so that they are deleted when
+#        PolReg terminates. They have a name of the form polreg<i> where 
+#        <i> is an integer, which is different for each file and
+#        increases monotonically throughout the execution of PolReg. IFILE
+#        records the value of i used in the previous call to UniqueFile.
+#     IFILE_STACK (Write)
+#        A stack on which is stored the value of IFILE corresponding to
+#        the first temporary file to be created in the new context.
+#-
+   global IFILE
+   global IFILE_STACK
+   set nentry [llength $IFILE_STACK]
+   Push IFILE_STACK [expr $IFILE + 1]
+   return $nentry
+}
+
+proc Blink {w option value1 value2 interval} {
+#+
+#  Name:
+#    Blink
+#
+#  Purpose:
+#    Blinks a widget option.
+#
+#  Arguments:
+#    w
+#       The widget path.
 #    option
 #       The option to be blinked (eg "-foreground").
 #    value1
@@ -301,30 +338,23 @@ proc BlinkMark {i option value1 value2 interval image object} {
 #       The second option value to use (eg "green" ).
 #    interval
 #       The interval between flashes in milliseconds.
-#    image
-#       The image from which the position is derived.
-#    object
-#       The type of object to be blinked.
 #
 #  Globals:
-#    CAN (Read)
-#       The name of the canvas containing the GWM image.
 #    STOP_BLINK (Read and Write)
 #       If this is not null on entry then the blinking is stopped, and  
 #       the option value is set to the value of STOP_BLINK (which is then
 #       reset to null).
 #-
-   global CAN
    global STOP_BLINK
 
-   set id [GetPosn $i ID $image $object]
-
-   if { $STOP_BLINK == "" } {
-      $CAN itemconfigure $id $option $value1
-      after $interval [list BlinkMark $i $option $value2 $value1 $interval $image $object]
-   } { 
-      $CAN itemconfigure $id $option $STOP_BLINK
-      set STOP_BLINK ""
+   if { [winfo exists $w] } {
+      if { $STOP_BLINK == "" } {
+         $w configure $option $value1
+         after $interval [list Blink $w $option $value2 $value1 $interval]
+      } { 
+         $w configure $option $STOP_BLINK
+         set STOP_BLINK ""
+      }
    }
 }
 
@@ -668,7 +698,7 @@ proc CheckRef {} {
    global REFOBJ_DISP
    global RRB_DISABLED
 
-# If the reference and current images are the same, then the reference
+# If the reference and current images are the same, then the reference 
 # objects cannot be of the same type as the current objects.
    if { $REFIM_DISP == $IMAGE_DISP } {
 
@@ -863,6 +893,8 @@ proc Clear {image obj} {
    global IMAGES
    global O_RAY_FEATURES 
    global O_RAY_MASK 
+   global O_RAY_SKY
+   global E_RAY_SKY
    global REDRAW
    global REFALN
    global IMMAP
@@ -922,8 +954,8 @@ proc Clear {image obj} {
          }
 
 # Loop round each object type...
-         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES \
-                              $O_RAY_MASK $E_RAY_MASK] {
+         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
 
 # Only delete them if they have been selected.
             if { $obj == $object || $obj == "" } {
@@ -1445,7 +1477,11 @@ proc CreateMask {image object} {
 #    images's mask. 
 #
 #  Arguments:
-#    None.
+#    image
+#       The image to which the mask refers.
+#    object
+#       The identifier ($O_RAY_MASK/SKY, $E_RAY_MASK/SKY ) for the
+#       mask to be created.
 #
 #  Returned Value:
 #    One if the mask is available, zero otherwise.
@@ -1462,8 +1498,11 @@ proc CreateMask {image object} {
 #        is a list of pixel X coordinates. 
 #-
    global E_RAY_MASK
+   global E_RAY_SKY
    global IMAGES
    global O_RAY_MASK
+   global O_RAY_SKY
+   global OBJTYPE
    global PNTPX
 
 # Assume success.
@@ -1473,7 +1512,7 @@ proc CreateMask {image object} {
    if { [llength $PNTPX($image,$object)] == 0 } {
 
 # Tell the user what is happening.
-      set told [SetInfo "Transforming an existing mask. Please wait... " 0]
+      set told [SetInfo "Creating the default $OBJTYPE($object). Please wait... " 0]
 
 # Assume for the moment that no mask can be created.
       set ok 0
@@ -1484,8 +1523,17 @@ proc CreateMask {image object} {
       if { $object == $O_RAY_MASK } {      
          set other $E_RAY_MASK
          set inv 0
-      } {
+
+      } elseif { $object == $E_RAY_MASK } {      
          set other $O_RAY_MASK
+         set inv 1
+
+      } elseif { $object == $O_RAY_SKY } {      
+         set other $E_RAY_SKY
+         set inv 0
+
+      } elseif { $object == $E_RAY_SKY } {      
+         set other $O_RAY_SKY
          set inv 1
       }
 
@@ -1511,7 +1559,7 @@ proc CreateMask {image object} {
 
 # If no suitable image was found, transform the supplied image's other
 # mask (if it exists - and if an OE mapping is available).
-      if { !$ok && [llength $PNTPX($image,$other)] > 0 } {
+      if { !$ok && $other != "" && [llength $PNTPX($image,$other)] > 0 } {
          set map [OEMapping $image]
          if { $map != "" } {
             TranPXY $map $inv $image $other $image $object
@@ -1521,7 +1569,7 @@ proc CreateMask {image object} {
 
 # If we still do not have a mask, go through the images again, this time
 # looking for one with the other mask and both image and OE mappings.
-      if { !$ok } {
+      if { !$ok && $other != "" } {
          set map0 [ImageMapping $image]
          if { $map0 != "" } {
             foreach im $IMAGES {
@@ -1746,8 +1794,8 @@ proc DelPosn {i all args} {
    global CUROBJ_DISP
    global IMAGE_DISP
    global IMAGES
-   global E_RAY_MASK
-   global O_RAY_MASK
+   global E_RAY_FEATURES
+   global O_RAY_FEATURES
    global PNTCY
    global PNTCX
    global PNTID
@@ -1888,7 +1936,7 @@ proc DelPosn {i all args} {
 # Indicate that the mappings based on this position list will need to be 
 # re-calculated (but not if we are modifying a mask - the mappings are
 # based on feature positions, not mask positions).
-      if { $object != $O_RAY_MASK && $object != $E_RAY_MASK } {
+      if { $object == $O_RAY_FEATURES || $object == $E_RAY_FEATURES } {
          set RECALC_OEMAP($image) 1
          set RECALC_IMMAP($image) 1
 
@@ -2686,16 +2734,19 @@ proc DrawCur {} {
    global CUROBJ_DISP
    global CUROBJ_REQ
    global E_RAY_MASK
+   global E_RAY_SKY
    global IMAGE_DISP
    global NONE
    global O_RAY_MASK
+   global O_RAY_SKY
    global TEST_ID
 
-# If a mask (O or E) has been requested, endeavour to ensure that
+# If a mask (O,E or sky) has been requested, endeavour to ensure that
 # the mask exists. If a mask does not already exist, then an attempt is
 # made to create one from the other defined masks and mappings, on the
 # assumption that all masks should be roughly the same.
-   if { $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK } {
+   if { $CUROBJ_REQ == $O_RAY_SKY || $CUROBJ_REQ == $E_RAY_SKY ||
+        $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK } {
       CreateMask $IMAGE_DISP $CUROBJ_REQ
    }
 
@@ -2743,8 +2794,10 @@ proc DrawRef {} {
 #        The value of the "Draw Aligned" checkbutton.
 #-
    global E_RAY_MASK
+   global E_RAY_SKY
    global NONE
    global O_RAY_MASK
+   global O_RAY_SKY
    global REDRAW
    global REFALIGN
    global REFALN
@@ -2766,11 +2819,12 @@ proc DrawRef {} {
          $REDRAW configure -state disabled
       }
 
-# If a reference mask (O or E) has been requested, endeavour to ensure that
+# If a reference mask (O, E or sky) has been requested, endeavour to ensure that
 # the mask exists. If a mask does not already exist, then an attempt is
 # made to create one from the other defined masks and mappings, on there
 # assumption that all masks should be roughly the same.
-      if { $REFOBJ_REQ == $O_RAY_MASK || $REFOBJ_REQ == $E_RAY_MASK } {
+      if { $REFOBJ_REQ == $O_RAY_SKY || $REFOBJ_REQ == $E_RAY_SKY || 
+           $REFOBJ_REQ == $O_RAY_MASK || $REFOBJ_REQ == $E_RAY_MASK } {
          CreateMask $REFIM_REQ $REFOBJ_REQ
       }
 
@@ -2887,6 +2941,7 @@ proc EditMapping {image mapping} {
 #-
    global B_FONT
    global CB_COL
+   global DBEAM
    global EDMAP_EXIT
    global FITTYPE
    global IMAGES
@@ -3152,12 +3207,16 @@ proc EditMapping {image mapping} {
    SetHelp $b4 ".  Press to restore the original mapping."
    SetHelp $b5 ".  Press to see more help on this window."
 
-   if { $mapping == "im" } {
+   if { $mapping == "im" && $DBEAM } {
       set state "normal"
       set help ".  Press to create a new dialog box to edit the O-E mapping associated with this image. This mapping will be used in preference to the default O-E mapping."
-      set b6 [button $butfrm.oemap -text "OEmap" -command "set EDMAP_EXIT oemap" -state $state]
-      SetHelp $b6 $help
+   } {
+      set state "disabled"
+      set help " "
    }
+
+   set b6 [button $butfrm.oemap -text "OEmap" -command "set EDMAP_EXIT oemap" -state $state]
+   SetHelp $b6 $help
    
 # Create a frame holding the write protection button, and pack them.
    set fr1b [frame $topf.fr1b -relief groove -bd 2]
@@ -3186,9 +3245,7 @@ proc EditMapping {image mapping} {
 # buttons so that they appear at the bottom of the dialog box.
    pack $butfrm -fill x -expand 1
    pack $b1 $b2 $b3 $b4 $b5 -side left -expand 1
-   if { $mapping == "im" } {
-      pack $b6 -side left -expand 1
-   }
+   pack $b6 -side left -expand 1
 
 # Ensure that closing the window from the window manager is like pressing
 # the Cancel button.
@@ -3373,6 +3430,9 @@ proc Effects {im effect nodisp} {
    global THRHI 
    global THRLO 
    global UNZOOM
+
+# Begin a temporary file context.
+   set tfc [BeginUF]
 
 # Do nothing if there is no current image.
    if { $im == "" } {
@@ -3975,6 +4035,11 @@ proc Effects {im effect nodisp} {
          UpdateDisplay gwm 
       }
    }
+
+# Delete all the temporary files created in this procedure, except for the 
+# one which was pushed on the image stack.
+   EndUF $tfc $file
+
 }
 
 proc MappingMod {image map undo} {
@@ -4032,12 +4097,14 @@ proc MappingMod {image map undo} {
 #-
    global E_RAY_FEATURES
    global E_RAY_MASK
+   global E_RAY_SKY
    global IMAGE_DISP
    global IMMAP
    global IMSEC_REQ
    global OEMAP
    global O_RAY_FEATURES
    global O_RAY_MASK
+   global O_RAY_SKY
    global PNTPX
    global PNTPY
    global SECTION_STACK
@@ -4062,7 +4129,7 @@ proc MappingMod {image map undo} {
 # Save all the current information relating to the specified image. This
 # is done so that it can be re-instated if anything goes wrong while
 # calculating new values.
-   foreach obj "$O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
+   foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
       set old_px($obj) $PNTPX($image,$obj) 
       set old_py($obj) $PNTPY($image,$obj) 
    }                     
@@ -4091,7 +4158,7 @@ proc MappingMod {image map undo} {
    }
 
 # Get the transformed positions lists. 
-   foreach obj "$O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
+   foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
       if { ![TranList $map $for $old_px($obj) $old_py($obj) \
                       PNTPX($image,$obj) \
                       PNTPY($image,$obj)] } {
@@ -4124,7 +4191,7 @@ proc MappingMod {image map undo} {
 # If anything went wrong, re-istate the original values.
    if { !$ok } {
 
-      foreach obj "$O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
+      foreach obj "$O_RAY_SKY $E_RAY_SKY $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK" {
          set PNTPX($image,$obj) $old_px($obj) 
          set PNTPY($image,$obj) $old_py($obj)
       }                     
@@ -4246,6 +4313,64 @@ proc Message {message} {
       set F_OWNER $old_f_owner
    }
 
+}
+
+proc EndUF {context leave} {
+#+
+#  Name:
+#     EndUF
+#
+#  Purpose:
+#     Mark the end of a temporary file context. Calls to this procedure
+#     should be matched by calls to BeginUF. This procedure deletes all
+#     temprary files created since the correspinding call to BeginUF, except
+#     for any files included in the argument "leave".
+#
+#  Arguments:
+#     context 
+#        A context identifier returned by BeginUF. All contexts contained
+#        with the specified context are also ended.
+#     leave
+#        A list of files which are to be escaped into the next higher
+#        context. 
+#
+#  Globals:
+#     ADAM_USER (Read)
+#       The path to the temporary ADAM_USER directory used by PolReg.
+#     IFILE (Read)
+#        Temporary file names created by UniqueFile are stored in PolReg's
+#        temporary ADAM_USER directory so that they are deleted when
+#        PolReg terminates. They have a name of the form polreg<i> where 
+#        <i> is an integer, which is different for each file and
+#        increases monotonically throughout the execution of PolReg. IFILE
+#        records the value of i used in the previous call to UniqueFile.
+#     IFILE_STACK (Write)
+#        A stack on which is stored the value of IFILE corresponding to
+#        the first temporary file created in the current context.
+#-
+   global IFILE
+   global IFILE_STACK
+   global ADAM_USER
+
+# Loop round each value of IFILE used in this context. This starts with
+# the value stored by the corresponding call to BeginUF, and ends with
+# the current value.
+   set levels [expr [llength $IFILE_STACK] - $context ]
+   set ifile_start [Pop IFILE_STACK $levels]
+   for {set i $ifile_start} {$i <= $IFILE} {incr i} {
+
+# Construct the corresponding file name (NB, make sure this next line keeps
+# in step with any changes made in rocedure UniqueFile).
+      set file "$ADAM_USER/polreg$i"
+
+# If the file exists (with any file extension), but has not been included
+# in the supplied list of files to be escaped, then delete the file.
+      if { [lsearch -exact $leave $file] == -1 } {
+         foreach f [glob -nocomplain ${file}.*] {
+            catch "exec rm -f $f"
+         }
+      }
+   }
 }
 
 proc exit {args} {
@@ -6575,8 +6700,6 @@ proc Labels {label add} {
 #      Should feature labels be generated automatically?
 #    E_RAY_FEATURES (Read)
 #      An integer representing the "E-ray features" object type.
-#    E_RAY_MASK (Read)
-#      An integer representing the "E-ray mask" object type.
 #    CUROBJ_REQ (Read)
 #      The type of the current objects to be displayed.
 #    IMAGE_DISP (Read)
@@ -6592,8 +6715,6 @@ proc Labels {label add} {
 #      each label.
 #    O_RAY_FEATURES (Read)
 #      An integer representing the "O-ray features" object type.
-#    O_RAY_MASK (Read)
-#      An integer representing the "O-ray mask" object type.
 #
 #  Notes:
 #    - This procedure also determines whether labels can be created
@@ -6604,14 +6725,12 @@ proc Labels {label add} {
    global AUTO_LABEL
    global CUROBJ_REQ
    global E_RAY_FEATURES
-   global E_RAY_MASK
    global IMAGES
    global IMAGE_DISP
    global LABELS
    global NEXT_LABEL
    global NLAB
    global O_RAY_FEATURES
-   global O_RAY_MASK
    global PNTLBL
 
 # Ignore blank labels.
@@ -7175,6 +7294,7 @@ proc MapRefs {px_name py_name} {
    global IMAGE_DISP
    global O_RAY_FEATURES
    global O_RAY_MASK
+   global O_RAY_SKY
    global PNTPX
    global PNTPY          
    global REDRAW
@@ -7190,7 +7310,8 @@ proc MapRefs {px_name py_name} {
 
 # See if the current objects refer to the O or E ray.
    if { $CUROBJ_REQ == $O_RAY_FEATURES || 
-        $CUROBJ_REQ == $O_RAY_MASK } {
+        $CUROBJ_REQ == $O_RAY_MASK ||
+        $CUROBJ_REQ == $O_RAY_SKY } {
       set cur_ray "O"
    } {
       set cur_ray "E"
@@ -7198,7 +7319,8 @@ proc MapRefs {px_name py_name} {
 
 # See if the reference objects refer to the O or E ray.
    if { $REFOBJ_REQ == $O_RAY_FEATURES || 
-        $REFOBJ_REQ == $O_RAY_MASK } {
+        $REFOBJ_REQ == $O_RAY_MASK ||
+        $REFOBJ_REQ == $O_RAY_SKY } {
       set ref_ray "O"
    } {
       set ref_ray "E"
@@ -7781,6 +7903,7 @@ proc Obey {task action params args} {
    global ACTION
    global ADAM_ERRORS
    global ATASK_OUTPUT
+   global CANCEL_WAIT
    global LOGFILE_ID
    global STATUS
 
@@ -7840,8 +7963,10 @@ proc Obey {task action params args} {
 
 # Wait until the action is finished. Check that the Rendevous file exists
 # every 200 milliseconds. If the WaitFor command aborts early, try
-# re-executing the obey command.
-   if { ![WaitFor STATUS [list CheckRF $task] 200] } {
+# re-executing the obey command. Do not re-execute the command if it was
+# terminated due to a user requested cancel (indicated by CANCEL_WAIT being
+# non-zero).
+   if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_WAIT } {
       set ADAM_ERRORS {}
       set ATASK_OUTPUT {}
 
@@ -7854,7 +7979,7 @@ proc Obey {task action params args} {
                          -endmsg {set STATUS "%S"} \
                          -paramreq $param_req
 
-      if { ![WaitFor STATUS [list CheckRF $task] 200] } {
+      if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_WAIT } {
          Message "Problems with rendevous file! Aborting..."
          exit 1
       }
@@ -7881,7 +8006,10 @@ proc Obey {task action params args} {
 # Indicate that we are no longer executing an ADAM action.
    set ACTION ""
 
-# Return the status.
+# Return the status. Return zero if the operation was cancelled by the
+# user.
+   if { $CANCEL_WAIT } { set ok 0 }
+
    return $ok
 }
 
@@ -8672,6 +8800,15 @@ proc Save {} {
 #        the last time the output images were saved. Set to a non-zero
 #        value if the output images are out-of-date with respect to the 
 #        mappings and/or masks.
+#     SKY_AREA (Read)
+#        One of the integer values which may be assigned to SKY_METHOD:
+#        indicates that sky background is to be performed by fitting
+#        surfaces to areas within the supplied object frames (i.e. the 
+#        O and E sky areas).
+#     SKY_METHOD (Read)
+#        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. Any
+#        other value results in no sky subtraction being performed (in which
+#        case the supplied input data is simply copied to the output).
 #
 #-
    global ATASK_OUTPUT
@@ -8681,19 +8818,27 @@ proc Save {} {
    global IMAGES
    global IMSECS
    global INTERP
+   global MAPTYPE
    global MAP_RX
    global MAP_RY
-   global MAPTYPE
    global OEFITTYPE
+   global OS
    global OUTIMS
    global O_RAY_MASK
-   global OS
+   global O_RAY_SKY   
    global PNTNXT
    global PNTPX 
    global PNTPY
+   global POLPACK_DIR
    global POLY
    global RESAVE
+   global SAFE
+   global SKY_AREA
+   global SKY_METHOD
+   global STOP_BLINK
 
+# Begin a temporary file context.
+   set tfc [BeginUF]
 
 # |Display a warning and return if the images have already been saved.
    if { !$RESAVE } { 
@@ -8721,19 +8866,168 @@ proc Save {} {
 # Save the name of the first (reference) image.
       set im0 [lindex $IMAGES 0]
 
-# iIf we are in dual-beam mode,  ensure that the reference image has an O-ray 
+# If we are in dual-beam mode,  ensure that the reference image has an O-ray 
 # mask. Since we already know that all mappings are available, all other 
 # masks can be created from this mask if necessary.
       if { $DBEAM && ![CreateMask $im0 $O_RAY_MASK] } {
          Message "Masks defining the O and E ray areas have not yet been supplied."
 
+# If the sky to be subtracted is defined within the object frames, 
+# ensure that sky areas have been defined.
+      } elseif { $SKY_METHOD == $SKY_AREA && ![CreateMask $im0 $O_RAY_SKY] } {
+         Message "The areas containing sky have not yet been supplied."
+
 # Otherwise, process each image section in turn...
       } {
+
+# Create the top level window for the dialogue box which displays progress.
+         set top .progress
+         set topf [MakeDialog $top "Progress,,," 1]
+         SetHelp $topf ".  This dialog box indicates the progress which has been made towards creating and saving the output images."
+
+# Create abd pack all the items in the dialog box.
+         set back "#b0b0b0"
+
+         set fr0 [frame $topf.fr0]
+         pack $fr0 -side top -fill both -expand 1
+
+         set imlist [frame $fr0.imlist -bd 2 -relief raised -background $back]
+         SetHelp $imlist ".  A list of all the input images. A tick mark is displayed next to the images which have been completed. "
+
+         set pfrm [frame $fr0.pfrm]
+         SetHelp $pfrm ".  A list of the processing stages involved in creating the output images. Tick marks are displayed next to the stages which have been completed, and the current stage is highlighted in red. "
+         pack $imlist $pfrm -side left -fill both -padx 4m -pady 4m
+
+         foreach image $IMAGES {
+            set fr [frame $imlist.$image -background $back]
+            pack $fr -side top -fill x
+
+            set lb($image) [label $fr.lb -text $image -anchor w \
+                            -background $back]
+            pack $lb($image) -side left -padx 2m -fill x
+            
+            set tick($image) [label $fr.tick -foreground $back \
+                              -background $back -bitmap @$POLPACK_DIR/tick.bit]
+            pack $tick($image) -side right
+         }
+
+         set image ""
+         set fr1 [frame $pfrm.fr1]
+         pack $fr1 -side top -anchor w -fill both -expand 1
+         set l1 [label $fr1.l1 -text "Doing image: "]
+         set l2 [label $fr1.l2 -textvariable image]
+         pack $l1 $l2 -side left -padx 6m 
+
+         set fr234 [frame $pfrm.fr234 -background $back -bd 2 -relief raised]
+         pack $fr234 -side left -padx 5m -pady 3m -fill both -expand 1
+
+         set fr2 [frame $fr234.fr2 -background $back]
+         set fr3 [frame $fr234.fr3 -background $back]
+         set fr4 [frame $fr234.fr4 -background $back]
+         pack $fr2 $fr3 $fr4 -side left -fill y -expand 1
+
+         if { $DBEAM } {
+            pack [label $fr2.r0 -text " " -background $back -height 1] \
+                 [label $fr3.r0 -text "O" -background $back -height 1] \
+                 [label $fr4.r0 -text "E" -background $back -height 1] \
+                 -side top -fill both -expand 1
+         }
+
+         set selab [label $fr2.r0b -text "Sky estimation:" -background $back]
+         set setick(O) [label $fr3.r0b -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         set setick(E) [label $fr4.r0b -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         pack $selab     -side top -anchor w -fill y -expand 1
+         pack $setick(O) -side top -anchor w -fill y -expand 1
+         pack $setick(E) -side top -anchor w -fill y -expand 1
+
+         set sslab [label $fr2.r1 -text "Sky subtraction:" -background $back]
+         set sstick(O) [label $fr3.r1 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         set sstick(E) [label $fr4.r1 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         pack $sslab     -side top -anchor w -fill y -expand 1
+         pack $sstick(O) -side top -anchor w -fill y -expand 1
+         pack $sstick(E) -side top -anchor w -fill y -expand 1
+
+         set melab [label $fr2.r2 -text "Mask extraction:" -background $back]
+         set metick(O) [label $fr3.r2 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         set metick(E) [label $fr4.r2 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         pack $melab     -side top -anchor w -fill y -expand 1
+         pack $metick(O) -side top -anchor w -fill y -expand 1
+         pack $metick(E) -side top -anchor w -fill y -expand 1
+
+         set ialab [label $fr2.r3 -text "Image alignment:" -background $back]
+         set iatick(O) [label $fr3.r3 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         set iatick(E) [label $fr4.r3 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         pack $ialab     -side top -anchor w -fill y -expand 1
+         pack $iatick(O) -side top -anchor w -fill y -expand 1
+         pack $iatick(E) -side top -anchor w -fill y -expand 1
+
+         set hilab [label $fr2.r4 -text "Header information:" -background $back]
+         set hitick(O) [label $fr3.r4 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         set hitick(E) [label $fr4.r4 -foreground $back \
+                         -background $back -bitmap @$POLPACK_DIR/tick.bit]
+         pack $hilab     -side top -anchor w -fill y -expand 1
+         pack $hitick(O) -side top -anchor w -fill y -expand 1
+         pack $hitick(E) -side top -anchor w -fill y -expand 1
+
+# Create the button bar.
+         set butfrm [frame $topf.butfrm]
+         pack $butfrm -side top -fill both -expand 1
+
+         set b1 [button $butfrm.close -text "Close" -command "destroy $top"]
+         set b2 [button $butfrm.cancel -text "Cancel" -command {set CANCEL_WAIT 1}]
+
+         SetHelp $b1 ".  Press to close the dialog box, proceeding silently with the operation."
+         SetHelp $b2 ".  Press to close the dialog box, cancelling the operation."
+
+         pack $b1 $b2 -side left -expand 1 -padx 2m -pady 2m
+
+# Ensure that closing the window from the window manager is like pressing
+# the Close button.
+         wm protocol $top WM_DELETE_WINDOW "destroy $top"
+
+# Ensure X events continue to be delived to the progress dialog box even
+# while ADAM tasks are being executed.
+         set old_safe $SAFE
+         set SAFE $top
+
+# Process each of the input images in turn.
          set ok 1
          foreach imsec $IMSECS {
 
+# Begin a temporary file context.
+            set tfci [BeginUF]
+
+# Make the ticks invisible in the progress report.
+            $setick(O) configure -foreground $back
+            $setick(E) configure -foreground $back
+            $sstick(O) configure -foreground $back
+            $sstick(E) configure -foreground $back
+            $metick(O) configure -foreground $back
+            $metick(E) configure -foreground $back
+            $iatick(O) configure -foreground $back
+            $iatick(E) configure -foreground $back
+            $hitick(O) configure -foreground $back
+            $hitick(E) configure -foreground $back
+
 # Extract the image name section string from the image-section string.
             GetSec $imsec image section
+
+# Do the sky subtraction.
+            set image2 [SkySub $imsec $image $selab $setick(O) $setick(E) \
+                                             $sslab $sstick(O) $sstick(E) ]
+            if { $image2 == "" } {
+               set ok 0
+               break
+            }
 
 # If the "align" effect has been applied to this image, the positions
 # lists and mappings will refer to the aligned image, not the original
@@ -8758,6 +9052,8 @@ proc Save {} {
             foreach ray $rays {
                upvar #0 ${ray}_RAY_MASK obj
 
+               Blink $melab -foreground red black 500
+
 # If in dual-beam mode, ensure that the mask is available.
                set got_mask [CreateMask $image $obj] 
                if { $DBEAM && !$got_mask } { 
@@ -8766,7 +9062,7 @@ proc Save {} {
                }
 
 # If we have a mask, find the upper and lower limits of the pixel coordinates 
-# for the mask.
+# for the mask and create a standard section specifier from them.
                if { $got_mask } {
                   set sect [BoundBox $PNTPX($image,$obj) $PNTPY($image,$obj) "" 0]
                   if { $sect == "" } {
@@ -8774,70 +9070,23 @@ proc Save {} {
                      break
                   }
 
-# Write the pixel coordinates of the mask to a set of text files in a format 
-# which can be used by KAPPA:SEGMENT. Each file holds a single polygon.
-                  set pntnxt $PNTNXT($image,$obj)
-                  set file [UniqueFile]
-                  set fileid [open $file w]
-                  set i 0
-                  set i0 0
-                  set npoly 0
-                  set polys ""
-   
-                  while { $i != "" } {
-                     set px [lindex $PNTPX($image,$obj) $i]
-                     set py [lindex $PNTPY($image,$obj) $i]
-                     puts $fileid "$px $py"
-   
-                     set j [lindex $pntnxt $i]
-                     set pntnxt [lreplace $pntnxt $i $i ""]
-                     set i $j
-   
-                     if { $i == $i0 } {
-                        close $fileid
-                        set pfile $file
-                        incr npoly
-                        set POLY(POLY${npoly}) $pfile
-                        append polys "POLY${npoly}=$pfile "
-   
-                        set i ""
-                        foreach nxt $pntnxt {
-                           if { $nxt != "" } {
-                              set i $nxt
-                              break
-                           }
-                        }
-   
-                        if { $i != "" } { 
-                           set i0 $i
-                           set file [UniqueFile]
-                           set fileid [open $file w]
-                        }
-                     }
-                  }
+# Extract the mask area.
+                  set maskarea [Segment ${image2}${sect} "" $image $obj]
 
-# Get the name of a temporary image in which to store the extracted mask
-# area.
+# If there is no mask, just copy the whole of the supplied image section.
+               } {
                   set maskarea [UniqueFile]
-
-# Run SEGMENT to extract the mask area into a temporary image.  NB,
-# until KAPPA:SEGMENT is available under Linux, and allows multiple
-# polygons to be specified on the command line, use POLPACK:SEGMENT instead.
-                  set in "${image}${sect}"
-                  if { ![Obey polpack segment "cosys=world in1=$in in2=! mode=file out=$maskarea $polys"] } {
-                     set ok 0
-                     break
-                  }
-
-# If there is no mask, and we are in single-beam mode, just copy the
-# whole of the supplied image section.
-               } elseif { !$DBEAM } { 
-                  set maskarea [UniqueFile]
-                  if { ![Obey ndfpack ndfcopy "in=$imsec out=$maskarea"] } {
+                  set in "${image2}${section}"
+                  if { ![Obey ndfpack ndfcopy "in=$in out=$maskarea"] } {
                      set ok 0
                      break
                   }
                }
+
+               set STOP_BLINK black
+               tkwait variable STOP_BLINK
+               $metick($ray) configure -foreground black
+               Blink $ialab -foreground red black 500
 
 # Determine the output image name.
                set outim $OUTIMS($image,$ray)
@@ -8882,6 +9131,11 @@ proc Save {} {
                      set ok 0
                      break
                   }
+
+                  set STOP_BLINK black
+                  tkwait variable STOP_BLINK
+                  $iatick($ray) configure -foreground black
+                  Blink $hilab -foreground red black 500
 
 # Get the numerical index of the fit type used between images.
                   foreach fittype [array names MAPTYPE] {
@@ -8972,6 +9226,10 @@ proc Save {} {
                      }
                   }
 
+                  set STOP_BLINK black
+                  tkwait variable STOP_BLINK
+                  $hitick($ray) configure -foreground black
+
 # Null mappings should not happen.
                } {
                   set ok 0
@@ -8989,9 +9247,27 @@ proc Save {} {
                }
             }
 
+# Set the foreground colour of the image's tick in the progress dialog
+# box to black.
+            if { [winfo exists $tick($image)] } {
+               $tick($image) configure -foreground black
+            }
+
+# Delete all the temporary files created in this pass through the loop.
+            EndUF $tfci ""
+
 # Leave the image loop if an error has occurred.
             if { !$ok } { break }
 
+         }
+
+# Ensure X events are ignored while ADAM tasks are being executed.
+         set SAFE $old_safe
+
+# Destroy the progress dialog box.
+         if { [winfo exists $top] } { 
+            after 2000
+            destroy $top 
          }
       }
    }
@@ -9012,6 +9288,9 @@ proc Save {} {
    } {
       set RESAVE 0
    }
+
+# Delete all the temporary files created in this procedure.
+   EndUF $tfc ""
 
 # Cancel the informative text set earlier in this procedure.
    if { $told } { SetInfo "" 0 }
@@ -9255,6 +9534,112 @@ proc SecList {section} {
    }
 }
 
+proc Segment {indata outdata image obj} {
+#+
+#  Name:
+#     Segment
+#
+#  Purpose:
+#     Uses KAPPA:SEGMENT to copy a region of one image into another image.
+#
+#  Arguments:
+#     indata
+#        The image section containing the data to be put inside the polygon
+#        in the output image. If this is blank then the polygon is filled
+#        with bad values.
+#     outdata
+#        The image section containing the data to be put outside the polygon
+#        in the output image. If this is blank, then the polygon is
+#        copied into an image of bad values.
+#     image
+#        The name of the supplied image which is associated with the mask
+#        which defines the polygonal areas to be copied.
+#     obj
+#        The name of the mask object which defines the polygonal areas to 
+#        be copied (eg $O_RAY_MASK, $E_RAY_SKY, etc).
+#
+#  Returned Value:
+#     The name of the output file, or blank if anything goes wrong.
+#
+#  Globals:
+#     PNTNXT (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of integers representing indices within the lists 
+#        given by PNTxxx. Each integer gives the index of the next position
+#        along the edge of a polygon. The vector starting at position
+#        index i, ends at position index given by the i'th element of
+#        PNTNXT. If this value is blank ("") then position i is not part of
+#        a polygon. If this value is -1, then the end of the vector starting
+#        position i is unspecified (in this case the polygon is not
+#        closed).
+#     PNTPX (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of pixel X coordinates. 
+#     PNTPY (Read)
+#        A 2-d array indexed by image and object type. Each element
+#        is a list of pixel Y coordinates. 
+#-
+   global PNTNXT
+   global PNTPX
+   global PNTPY
+
+# Write the pixel coordinates of the mask to a set of text files in a format 
+# which can be used by KAPPA:SEGMENT. Each file holds a single polygon.
+   set pntnxt $PNTNXT($image,$obj)
+   set file [UniqueFile]
+   set fileid [open $file w]
+   set i 0
+   set i0 0
+   set npoly 0
+   set polys ""
+
+   while { $i != "" } {
+      set px [lindex $PNTPX($image,$obj) $i]
+      set py [lindex $PNTPY($image,$obj) $i]
+      puts $fileid "$px $py"
+
+      set j [lindex $pntnxt $i]
+      set pntnxt [lreplace $pntnxt $i $i ""]
+      set i $j
+
+      if { $i == $i0 } {
+         close $fileid
+         set pfile $file
+         incr npoly
+         set POLY(POLY${npoly}) $pfile
+         append polys "POLY${npoly}=$pfile "
+
+         set i ""
+         foreach nxt $pntnxt {
+            if { $nxt != "" } {
+               set i $nxt
+               break
+            }
+         }
+
+         if { $i != "" } { 
+            set i0 $i
+            set file [UniqueFile]
+            set fileid [open $file w]
+         }
+      }
+   }
+
+# Get the name of the output image in which to store the extracted mask
+# area.
+   set maskarea [UniqueFile]
+
+# Run SEGMENT to extract the mask area into a temporary image.  NB,
+# until KAPPA:SEGMENT is available under Linux, and allows multiple
+# polygons to be specified on the command line, use POLPACK:SEGMENT instead.
+   if { $outdata == "" } { set outdata "!" }
+   if { ![Obey polpack segment "cosys=world in1=$indata in2=$outdata mode=file out=$maskarea $polys"] } {
+      set maskarea ""
+   }
+
+   return $maskarea
+}
+
 proc SelectFont {font} {
 #+
 #  Name:
@@ -9413,25 +9798,29 @@ proc SetColours {var} {
    global CURCOL
    global CUROBJ_DISP
    global DEVICE
+   global E_RAY_FEATURES
    global E_RAY_MASK
+   global E_RAY_SKY
    global IMAGE_DISP
    global NONE
    global O_RAY_FEATURES
+   global O_RAY_MASK
+   global O_RAY_SKY
    global RB_CUR
    global RB_REF
    global REFCOL
    global REFOBJ_DISP
    global SELCOL
-   global XHRCOL
    global XHAIR_IDH
    global XHAIR_IDV
+   global XHRCOL
 
 # Reconfigure the current objects if their colour has changed. Also set the 
 # colour used by the "Current:" radio buttons.
    if { $var == "CURCOL" } {
       DrawCur
 
-      for {set i $O_RAY_FEATURES} {$i <= $E_RAY_MASK} {incr i} {
+      foreach i "$O_RAY_SKY $O_RAY_FEATURES $O_RAY_MASK $E_RAY_SKY $E_RAY_FEATURES $E_RAY_MASK" {
          $RB_CUR($i) configure -selectcolor $CURCOL
       }
 
@@ -9440,7 +9829,7 @@ proc SetColours {var} {
    } elseif { $var == "REFCOL" } {
       DrawRef 
       
-      for {set i $NONE} {$i <= $E_RAY_MASK} {incr i} {
+      foreach i "$NONE $O_RAY_SKY $O_RAY_FEATURES $O_RAY_MASK $E_RAY_SKY $E_RAY_FEATURES $E_RAY_MASK" {
          $RB_REF($i) configure -selectcolor $REFCOL
       }
 
@@ -9632,15 +10021,15 @@ proc SetMode {mode} {
    set MODE $mode
 
    if { $mode == 0 } {
-      SetHelp $CAN ".  Single click to indicate an image feature.\n. Click and drag to select an area of the image." POLREG_MODE_0
+      SetHelp $CAN ".  Single click to indicate an image feature.\n.  Click and drag to select an area of the image." POLREG_MODE_0
       SetInfo "Identify star-like features in the image..." 1
 
    } elseif { $mode == 1 } {
-      SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n. Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
+      SetHelp $CAN ".  Click on a vertex and drag to move the vertex.\n.  Click on a polygon edge to insert a new vertex.\n.  Click anywhere else to start a new polygonal mask.\n.  Click anywhere else and drag to select an area." POLREG_MODE_1
       SetInfo "Edit or create a polygonal mask..." 1
 
    } elseif { $mode == 2 } {
-      SetHelp $CAN ".  Click on the first vertex to close the polygon.\n. Click anywhere else to add another vertex to the polygon.\n.  Click and drag to select an area." POLREG_MODE_2
+      SetHelp $CAN ".  Click on the first vertex to close the polygon.\n.  Click anywhere else to add another vertex to the polygon.\n.  Click and drag to select an area." POLREG_MODE_2
       $CANCEL configure -state normal
       SetInfo "Complete the construction of a polygon..." 1
 
@@ -9794,21 +10183,21 @@ proc SetPosn {i names values args} {
 #-
    global CAN
    global CUROBJ_DISP
-   global IMAGE_DISP
+   global E_RAY_FEATURES
    global IMAGES
-   global E_RAY_MASK
-   global O_RAY_MASK
+   global IMAGE_DISP
+   global O_RAY_FEATURES
    global PNTCX
    global PNTCY
    global PNTID
    global PNTLBL
-   global RECALC_OEMAP
-   global RECALC_IMMAP
-   global RESAVE
    global PNTNXT
    global PNTPX
    global PNTPY
    global PNTVID
+   global RECALC_IMMAP
+   global RECALC_OEMAP
+   global RESAVE
    global V0
    global V1
    global VCX0
@@ -9888,7 +10277,7 @@ proc SetPosn {i names values args} {
          if { [info exists array($image,$object)] } {
             set array($image,$object) [lreplace $array($image,$object) $ret $ret $val]
 
-            if { $object != $O_RAY_MASK && $object != $E_RAY_MASK } {
+            if { $object == $O_RAY_FEATURES || $object == $E_RAY_FEATURES } {
                set RECALC_OEMAP($image) 1
                set RECALC_IMMAP($image) 1
 
@@ -10229,6 +10618,294 @@ proc SingleBind {x y} {
    }
 }
 
+proc SkySub {data image args} {
+#+
+#  Name:
+#     SkySub
+#
+#  Purpose:
+#     Perform sky subtraction on a specified image.
+#
+#  Arguments:
+#     data
+#        The name of the image section containing the data from which the
+#        sky is to be subtracted. This may be the output from an Effect,
+#        or may be one of the user-supplied images.
+#     image
+#        The name of the user supplied image from which the supplied data
+#        is derived.
+#
+#  Returned Value:
+#     The name of the file containing sky subtracted data, or blank if
+#     anything went wrong.
+#
+#  Globals:
+#     DBEAM (Read)
+#        Is PolReg being run in dual-beam mode?
+#     E_RAY_MASK (Read)
+#        An integer representing the "E-ray mask" object type.
+#     O_RAY_MASK (Read)
+#        An integer representing the "O-ray mask" object type.
+#     E_RAY_SKY (Read)
+#        An integer representing the "E-ray sky" object type.
+#     O_RAY_SKY (Read)
+#        An integer representing the "O-ray sky" object type.
+#     PSF_SIZE (Read)
+#        The feature size specified by the user.
+#     SKYIMS (Read)
+#        A list of images containing sky data to be subtracted from the 
+#        supplied object frames. This variable is ignored unless $SKY_METHOD
+#        is $SKY_FRAME.
+#     SKY_AREA (Read)
+#        One of the integer values which may be assigned to SKY_METHOD:
+#        indicates that sky background is to be performed by fitting
+#        surfaces to areas within the supplied object frames (i.e. the 
+#        O and E sky areas).
+#     SKY_FRAME (Read)
+#        One of the integer values which may be assigned to SKY_METHOD:
+#        indicates that sky background is to be performed by subtracting
+#        the sky frames specified in $SKYIMS from the supplied object frames.
+#     SKY_METHOD (Read)
+#        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. Any
+#        other value results in no sky subtraction being performed (in which
+#        case the supplied input data is simply copied to the output).
+#-
+   global DBEAM
+   global E_RAY_MASK
+   global O_RAY_MASK
+   global E_RAY_SKY
+   global O_RAY_SKY
+   global PSF_SIZE
+   global SKYIMS
+   global SKY_AREA
+   global SKY_FRAME
+   global SKY_METHOD
+   global STOP_BLINK
+
+# Begin a temporary file context.
+   set tfc [BeginUF]
+
+# Extract the names of the widgets which are used to indicate progress.
+   if { [llength $args] == 6 } {
+      set report 1
+      set selab [lindex $args 0]
+      set setick(O) [lindex $args 1]
+      set setick(E) [lindex $args 2]
+      set sslab [lindex $args 3]
+      set sstick(O) [lindex $args 4]
+      set sstick(E) [lindex $args 5]
+   } {
+      set report 0
+   }
+
+# If the sky background has been supplied in a separate image, subtract
+# it from the object frame.
+   if { $SKY_METHOD == $SKY_FRAME } {
+
+# If a progress report is required, indicate that the sky areas have been
+# extracted, and blink the "sky subraction" label to indicate that the
+# sky is being subtracted.
+      if { $report } {
+         $setick(O) configure -foreground black
+         $setick(E) configure -foreground black
+         Blink $sslab -foreground red black 500
+      }
+
+# Do the subtraction.
+      set ssimage [UniqueFile]
+      if { ![Obey kappa sub "in1=$data in2=$SKYIMS($image) out=$ssimage"] } {
+         set ssimage ""
+      }
+
+# If a progress report is required, stop the "sky subraction" label
+# blinking, and indicate that the sky has been subtracted.
+      if { $report } {
+         set STOP_BLINK black
+         tkwait variable STOP_BLINK
+         $sstick(O) configure -foreground black
+         $sstick(E) configure -foreground black
+      }
+
+# If the sky background is defined by an area in the supplied object
+# frame...
+   } elseif { $SKY_METHOD == $SKY_AREA } {
+
+# In single-beam mode we just use the O-ray area, and we can manage
+# without an O-ray mask.
+      if { $DBEAM } {
+         set rays "O E"
+         set need_mask 1
+      } {
+         set rays "O"
+         set need_mask 0
+      }
+
+# Do each ray in turn...
+      set ok 1
+      foreach ray $rays {
+         upvar #0 ${ray}_RAY_SKY skyobj
+         upvar #0 ${ray}_RAY_MASK maskobj
+
+# If a progress report is required, indicate that the sky areas are being
+# extracted.
+         if { $report } {
+            Blink $selab -foreground red black 500
+         }
+
+# Issue a warning if the sky areas have not been identified.
+         if { ![CreateMask $image $skyobj] } {
+            Message "The ${ray}-ray areas containing sky have not been supplied."
+            set ok 0
+            break
+         }
+
+# Issue a warning if an O or E ray mask is needed but has not been supplied.
+         if { ![CreateMask $image $maskobj] && $need_mask } {
+            Message "The ${ray}-ray mask has not been supplied."
+            set ok 0
+            break
+         }
+
+# Extract the sky areas into a separate image.
+         set rawsky [Segment $data "" $image $skyobj]
+         if { $rawsky == "" } {
+            set ok 0
+            break
+         }
+
+# Clean any features contained within the sky areas.
+         set sky [UniqueFile]
+         set fsize [expr 3.0*$PSF_SIZE]
+         if { ![Obey kappa ffclean "in=$rawsky out=$sky clip=\[3,3,3\] box=$fsize"] } {
+            set ok 0
+            break
+         }
+
+# Fit a surface to the data within the sky areas.
+         set fit($ray) [UniqueFile]
+
+#------------ Temporary bit until SURFIT is available ----------------
+
+         if { ![Obey kappa stats "ndf=$sky"] } {
+            set ok 0
+            break
+         }
+
+         set mean [GetParam kappa stats:mean]
+         if { ![Obey kappa maths "exp=IA*0+PA ia=$data pa=$mean out=$fit($ray)"] } {
+            set ok 0
+            break
+         }
+
+#------------ End of temporary bit -----------------------------------
+
+# If a progress report is required, stop the "sky extraction" label
+# blinking, and indicate that the sky has been extracted. Then make the
+# "sky subtraction" label blink.
+         if { $report } {
+            set STOP_BLINK black
+            tkwait variable STOP_BLINK
+            $setick($ray) configure -foreground black
+         }
+      }
+
+# If a progress report is required, make the "sky subtraction" label blink.
+      if { $report } {
+         Blink $sslab -foreground red black 500
+      }
+
+# If the fits to the sky areas for the required rays were obtained ok,
+# combine them into a single sky image.
+      if { $ok } {
+
+# First deal with dual-beam cases...
+         if { $DBEAM } {
+
+# Extract the O-ray mask area from the O-ray sky fit image. 
+            set osky [Segment $fit(O) "" $image $O_RAY_MASK]
+            if { $osky == "" } { 
+               set ok 0 
+
+# If OK, insert into this image the E-ray mask area from the E-ray sky 
+# fit image.
+            } {
+               set oesky [Segment $fit(E) $osky $image $E_RAY_MASK]
+               if { $oesky == "" } { 
+                  set ok 0 
+               } {
+                  set sky $oesky
+               }
+            }
+
+# For single-beam cases. just use the whole O-ray fit.
+         } { 
+            set sky $fit(O)
+         }
+      }
+
+# See if there are any bad pixels in the image.
+      if { $ok } {
+         if { [Obey kappa stats "ndf=$sky"] } {
+            set numbad [GetParam kappa stats:numbad]
+         } {
+            set ok 0
+         }
+      }
+
+# Fill any bad values in the sky fit using a smooth function. If there
+# are no bad values in the image then FILLBAD will report an error. We
+# can handle this case ismply by passing the input image straight through
+# to the output.
+      if { $ok } {
+         if { $numbad > 0 } { 
+            set fsky [UniqueFile]
+            if { ![Obey kappa fillbad "in=$sky out=$fsky" noreport] } {
+               set ok 0
+            }
+         } {
+            set fsky $sky
+         }
+
+# Subtract the sky image from the supplied data.
+         set ssimage [UniqueFile]
+         if { ![Obey kappa sub "in1=$data in2=$fsky out=$ssimage"] } {
+            set ok 0
+         }
+
+      }
+
+# If a progress report is required, stop the "sky subtraction" label
+# blinking, and indicate that the sky has been subtracted.
+      if { $report } {
+         set STOP_BLINK black
+         tkwait variable STOP_BLINK
+         $sstick(O) configure -foreground black
+         $sstick(E) configure -foreground black
+      }
+
+# If anything went wrong, return a null string.
+      if { !$ok } { set ssimage "" }
+
+# Do no sky subtraction for any other type. 
+   } {
+      set ssimage $image
+      if { $report } {
+         $setick(O) configure -foreground grey
+         $setick(E) configure -foreground grey
+         $sstick(O) configure -foreground grey
+         $sstick(E) configure -foreground grey
+      }
+   }
+
+# Delete all the temporary files created in this procedure, except for the 
+# one being returned (if any).
+   EndUF $tfc $ssimage
+
+# Return the name of the image containing the sky subtracted data.
+   return $ssimage
+
+}
+
 proc Spacer {name h w} {
 #+
 #  Name:
@@ -10239,7 +10916,7 @@ proc Spacer {name h w} {
 #
 #  Arguments:
 #     name
-#        The patg to the widget to be created.
+#        The path to the widget to be created.
 #     h
 #        The height required (eg "4m", etc).
 #     w
@@ -10875,6 +11552,9 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 #     mapping.
 #-
    global CAN
+   global E_RAY_FEATURES
+   global IMAGES
+   global O_RAY_FEATURES
    global PNTCX
    global PNTCY
    global PNTID
@@ -10883,11 +11563,8 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
    global PNTPX
    global PNTPY
    global PNTVID
-   global RECALC_OEMAP
    global RECALC_IMMAP
-   global IMAGES
-   global O_RAY_MASK
-   global E_RAY_MASK
+   global RECALC_OEMAP
 
 # Erase any canvas items currently associated with the output list.
    for {set i 0} {$i < [llength $PNTPX($im_out,$obj_out)]} {incr i} {
@@ -10918,7 +11595,7 @@ proc TranPXY {map inv im_in obj_in im_out obj_out} {
 # Unless we are creating a mask (which do not effect mappings), indicate
 # that the mappings related to the returned positions lists will need to be
 # recalculated.
-   if { $obj_out != $O_RAY_MASK && $obj_out != $E_RAY_MASK } {
+   if { $obj_out == $O_RAY_FEATURES || $obj_out == $E_RAY_FEATURES } {
       set RECALC_OEMAP($im_out) 1
       set RECALC_IMMAP($im_out) 1
 
@@ -11192,10 +11869,12 @@ proc UpdateDisplay {args} {
    global CUROBJ_DISP
    global CUROBJ_REQ
    global E_RAY_MASK
+   global E_RAY_SKY
    global IMSEC_DISP
    global IMSEC_REQ
    global MODE
    global O_RAY_MASK
+   global O_RAY_SKY
    global PHI_DISP
    global PHI_REQ
    global PLO_DISP
@@ -11261,7 +11940,8 @@ proc UpdateDisplay {args} {
 # Do not change the mode if we are in the process of identifying an image
 # feature.
    if { $MODE != 3 } { 
-      if { $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK } {
+      if { $CUROBJ_REQ == $O_RAY_MASK || $CUROBJ_REQ == $E_RAY_MASK ||
+           $CUROBJ_REQ == $O_RAY_SKY || $CUROBJ_REQ == $E_RAY_SKY } {
          SetMode 1
       } { 
          SetMode 0
@@ -11467,7 +12147,8 @@ proc WaitFor {name args} {
 #        command returns a zero value, then the loop is aborted prematurely.
 #
 #  Returned Value:
-#     Zero if a supplied command returned a non-zero value (in which
+#     Zero if a supplied command returned a zero value or the
+#     CANCEL_WAIT variable was set to a non-zero value (in which
 #     case the delay is aborted prematurely), and one otherwise.
 #
 #  Globals:
@@ -11482,6 +12163,7 @@ proc WaitFor {name args} {
 #-
    global CAN
    global SAFE
+   global CANCEL_WAIT
 
 # Access the supplied variable using the local name "VAR".
    upvar #0 $name VAR
@@ -11515,7 +12197,7 @@ proc WaitFor {name args} {
       set delay 100
    }
 
-# Wait until the variable changes value...
+# Wait until the variable changes value, or the operation is cancelled ...
    set ret 1
    while { $VAR == $orig } {
 
@@ -11532,6 +12214,12 @@ proc WaitFor {name args} {
       if { $com != "" } {
          set ret [eval "$com"]
          if { !$ret } { break }
+      }
+
+# Break out of the loop if CANCEL_WAIT was set to a non-zero value.
+      if { $CANCEL_WAIT } { 
+         set ret 0 
+         break
       }
 
 # Pause and then repeat.

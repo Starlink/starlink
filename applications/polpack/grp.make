@@ -7,7 +7,7 @@
 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl PolReg.tcl PolReg_procs.tcl \
-adamMessageRelay adamtask.tcl dialog.tcl blank.bit feature.bit \
+adamMessageRelay adamtask.tcl dialog.tcl blank.bit tick.bit feature.bit \
 ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
 kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kpg1_trmsz.c kps1_flxyr.f \
 kps1_inxyr.f kps1_plcpx.f kps1_plcpy.f kps1_plmsk.f kps1_retr.f \

@@ -74,8 +74,9 @@
    set CHAR_STOP {.}
    set COLOURS 64
    set DEVICE "xw;polreg_$PID"
-   set E_RAY_FEATURES 2
-   set E_RAY_MASK 4
+   set E_RAY_FEATURES 1
+   set E_RAY_MASK 3
+   set E_RAY_SKY 6
    set GWM_NAME "polreg_$PID"
    set MAPTYPE(0) "<not used in single-beam mode>"
    set MAPTYPE(1) "Shift of origin only" 
@@ -84,11 +85,14 @@
    set MAPTYPE(4) "Shift, rotation and magnification"
    set MAPTYPE(5) "Full 6 parameter fit"
    set MENUBACK "#b0b0b0"
-   set NONE 0
-   set O_RAY_FEATURES 1
-   set O_RAY_MASK 3
+   set NONE 5
+   set O_RAY_FEATURES 0
+   set O_RAY_MASK 2
+   set O_RAY_SKY 4
    set RB_COL red
    set RTOD 57.29578
+   set SKY_AREA 1
+   set SKY_FRAME 2
 
 # Store object names.
    set OBJTYPE($E_RAY_FEATURES) "E-ray features" 
@@ -96,6 +100,8 @@
    set OBJTYPE($NONE) "None"
    set OBJTYPE($O_RAY_FEATURES) "O-ray features" 
    set OBJTYPE($O_RAY_MASK) "O-ray mask"
+   set OBJTYPE($O_RAY_SKY) "O-ray sky area"
+   set OBJTYPE($E_RAY_SKY) "E-ray sky area"
 
 # Initialise polreg global variables.
    set ADAM_TASKS ""
@@ -103,6 +109,7 @@
    set ATASK 0
    set BADCOL cyan
    set BASE_SECTION ""
+   set CANCEL_WAIT 0
    set CURCOL red
    set CUROBJ_DISP ""
    set CUROBJ_REQ $O_RAY_FEATURES
@@ -116,6 +123,7 @@
    set F_OWNER "."
    set HELP ""
    set IFILE 0
+   set IFILE_STACK ""
    set IMAGE_DISP ""
    set IMSEC_DISP ""
    set INV 0
@@ -350,6 +358,22 @@
       exit 1
    }
 
+# Now get the optional list of input sky images. If any sky frames have
+# been supplied, the a-task will pass them in variable sky_list. If this
+# variable does not exist then assuem that sky background are to be
+# defined within the object frames.
+   if { ![info exists sky_list] } {
+      set SKY_METHOD $SKY_AREA
+
+   } {
+      set SKY_METHOD $SKY_FRAME
+      set nsky [llength $sky_list]
+      if { $nin != $nsky } {
+         puts "PolReg: Number of sky frames ($nsky) does not equal the number of input frames ($nin)."
+         exit 1
+      }
+   }
+
 # >>>>>>>>>>>>>>>>>  SET UP THE SCREEN LAYOUT <<<<<<<<<<<<<<<<<<<<
 
 # Ensure that closing the window from the window manager is like pressing
@@ -510,7 +534,7 @@
 # Add menu items to the File menu.
    $filemenu add command -label "Save        " -command Save
    $filemenu add command -label "Exit        " -command {Finish 1}
-   $filemenu add command -label "Quit        " -command {Finish 0}
+   $filemenu add command -label "Quit        " -command {Finish 0} -accelerator "Ctrl+C"
 
    MenuHelp $filemenu "Save        " ".  Extract the mask areas from the input images, register them, and save them in the output images."
    MenuHelp $filemenu "Exit        " ".  Store the current image registration information and exit the application."
@@ -677,6 +701,11 @@
       set OUTIMS($image,O) [lindex $o_list $i]
       if { $DBEAM } { set OUTIMS($image,E) [lindex $e_list $i] }
 
+# Store the names of the SKY frame (if any) to use with this input image.
+      if { [info exists sky_list] } {
+         set SKYIMS($image) [lindex $sky_list $i]
+      }
+
 # Update the length of the longest image section and image name.
       set imwid [string length $imsec]
       if { $imwid > $maximwid } { set maximwid $imwid }
@@ -698,7 +727,7 @@
 
 # Initialise the lists holding information about the positions identified
 # in the image.
-      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK] {
+      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
          set PNTPX($image,$object) ""
          set PNTPY($image,$object) ""
          set PNTCX($image,$object) ""
@@ -749,16 +778,25 @@
 
 # Create and pack the label containing the title.
    set clab [label $cur.clab -text "Current:"]
-   pack $clab -side top -fill x -expand 1
+   pack $clab -side top -fill both -expand 1
 
-# Create radiobuttons for each object type in turn...
-   for {set i $O_RAY_FEATURES} {$i <= $E_RAY_MASK} {incr i} {
+# Create radiobuttons for each object type in turn, packing them
+# alternately into the left and right columns...
+   set frm ""
+   foreach i "$O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY" {
+      if { $frm == "" } {
+         set frm [frame $cur.$i]
+         pack $frm -side top -fill both -expand 1
+         set nxtfrm $frm
+      } {
+         set nxtfrm ""
+      }
 
 # In single-beam mode, the radiobuttons for the E-ray objects are disabled.
       if { $DBEAM } {
          set state normal
       } {
-         if { $i == $E_RAY_FEATURES || $i == $E_RAY_MASK } {
+         if { $i == $E_RAY_FEATURES || $i == $E_RAY_SKY || $i == $E_RAY_MASK } {
             set state disabled
          } {
             set state normal
@@ -767,13 +805,15 @@
 
 # Create and pack the radiobutton.
       set name $OBJTYPE($i)
-      set RB_CUR($i) [radiobutton $cur.$i -text $name -command UpdateDisplay \
-                                     -anchor w -value $i -variable CUROBJ_REQ \
-                                     -selectcolor $CURCOL -state $state]
-      pack $RB_CUR($i) -side top -fill x -expand 1 -padx 2m
+      set RB_CUR($i) [radiobutton $frm.$i -text $name -command UpdateDisplay \
+                                     -anchor nw -value $i -variable CUROBJ_REQ \
+                                     -selectcolor $CURCOL -state $state -width 14]
+      pack $RB_CUR($i) -side left -fill both -expand 1 -padx 2m
 
 # These buttons are disabled when getting a feature label from the user.
       if { $state == "normal" } { lappend LABEL_OFF $RB_CUR($i) }
+
+      set frm $nxtfrm
    }
 
    SetHelp $cur ".  Click to select the current objects being entered using the mouse." POLREG_CURRENT
@@ -786,16 +826,25 @@
 
 # Create and pack the label.
    set rlab [label $ref.rlab -text "Reference:"]
-   pack $rlab -side top -fill both -expand 1
+   pack $rlab -side top -expand 1
 
-# Create the radio buttons for each object type in turn...
-   for {set i $NONE} {$i <= $E_RAY_MASK} {incr i} {
+# Create radiobuttons for each object type in turn, packing them
+# alternately into the left and right columns...
+   set frm ""
+   foreach i "$O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY $NONE" {
+      if { $frm == "" } {
+         set frm [frame $ref.$i]
+         pack $frm -side top -fill both -expand 1
+         set nxtfrm $frm
+      } {
+         set nxtfrm ""
+      }
 
 # In single-beam mode, the radiobuttons for the E-ray objects are disabled.
       if { $DBEAM } {
          set state normal
       } {
-         if { $i == $E_RAY_FEATURES || $i == $E_RAY_MASK } {
+         if { $i == $E_RAY_SKY || $i == $E_RAY_FEATURES || $i == $E_RAY_MASK } {
             set state disabled
          } {
             set state normal
@@ -804,17 +853,32 @@
 
 # Create and pack the radiobutton.
       set name $OBJTYPE($i)
-      set RB_REF($i) [radiobutton $ref.$i -text $name -command UpdateDisplay \
-                                   -anchor w -value $i -variable REFOBJ_REQ \
-                                   -selectcolor $REFCOL -state $state]
-      pack $RB_REF($i) -side top -fill x -expand 1 -padx 2m
+      set RB_REF($i) [radiobutton $frm.$i -text $name -command UpdateDisplay \
+                                   -anchor nw -value $i -variable REFOBJ_REQ \
+                                   -selectcolor $REFCOL -state $state -width 14]
+      pack $RB_REF($i) -side left -fill both -expand 1 -padx 2m
+
+      set frm $nxtfrm
    }
+
+# Next is a frame containing the "Draw Aligned and Ref. Image buttons.
+   set bfrm [frame $ref.bfrm]
+
+# Create the "Draw Aligned" checkbutton which causes the reference objects to 
+# be drawn in registration with the frame of the current objects. The
+# associated command ensures that the mappings for this image are up to date
+# and then re-configures the reference objects.
+   set REFALIGN [checkbutton $bfrm.align -text "Draw Aligned" \
+                 -variable REFALN -selectcolor $REFCOL -font $B_FONT \
+                 -command DrawRef]
+
+   SetHelp $REFALIGN ".  Should the reference objects be mapped into the coordinate frame of the current objects before being displayed?" POLREG_DRAW_ALIGNED
 
 # The reference image menu. Use a normal "button" (instead of the more
 # obvious "menubutton") to post the menu for cosmetic purposes (so that 
 # the button looks the same as the following "Register" button).
-   set refmenu [menu $ref.menu]
-   set refim [button $ref.image -text "Ref. Image" -width 10 -relief raised -bd 2 ]
+   set refmenu [menu $bfrm.menu]
+   set refim [button $bfrm.image -text "Ref. Image" -width 10 -relief raised -bd 2 ]
    $refim configure -command "tk_popup $refmenu  \
           \[expr \[winfo rootx $refim\] + \[winfo width $refim\] \] \
           \[winfo rooty $refim\]"
@@ -827,29 +891,27 @@
    set REFIM_REQ [lindex $IMAGES 0]
    SetHelp $refim ".  Select the image from which reference objects will be displayed." POLREG_REF_IMAGE
 
-# Create the "Draw Aligned" checkbutton which causes the reference objects to 
-# be drawn in registration with the frame of the current objects. The
-# associated command ensures that the mappings for this image are up to date
-# and then re-configures the reference objects.
-   set REFALIGN [checkbutton $ref.align -text "Draw Aligned" \
-                 -variable REFALN -selectcolor $REFCOL -font $B_FONT \
-                 -command DrawRef]
+# Pack the "Draw Aligned", and "Ref. Image" "Accept" buttons.
+   pack $REFALIGN $refim -side left -pady 1m -expand 1
 
-   SetHelp $REFALIGN ".  Should the reference objects be mapped into the coordinate frame of the current objects before being displayed?" POLREG_DRAW_ALIGNED
+# Next is a frame containing the Redraw and Accept buttons.
+   set cfrm [frame $ref.cfrm]
 
 # Create the button which re-draws the reference objects.
-   set REDRAW [button $ref.redraw -text "Re-draw" -width 10 -relief raised -bd 2 -command DrawRef -state disabled]
+   set REDRAW [button $cfrm.redraw -text "Re-draw" -width 10 -relief raised -bd 2 -command DrawRef -state disabled]
    SetHelp $REDRAW ".  Click to re-draw the reference objects, taking into account any changes in the mappings since they were last drawn." POLREG_REDRAW
 
 # Create the button which searches for current features at the positions
 # of the reference features.
-   set ACCEPT [button $ref.accept -text "Accept" -width 10 -relief raised -bd 2 -command Accept -state disabled]
+   set ACCEPT [button $cfrm.accept -text "Accept" -width 10 -relief raised -bd 2 -command Accept -state disabled]
    SetHelp $ACCEPT ".  Click to search for image features at the positions of the displayed reference features." POLREG_ACCEPT
 
-# Pack the "Draw Aligned", "Re-Draw", "Ref. Image" and "Accept" buttons. Add
-# spacers above and below them to padd the items out a bit.
-   pack [Spacer $ref.sp1 2m 1m] $REFALIGN $REDRAW $refim $ACCEPT \
-        [Spacer $ref.sp2 2m 1m] -side top -pady 1m -fill y 
+# Pack the "Redraw" and "Accept" buttons. 
+   pack $REDRAW $ACCEPT -side left -pady 1m -expand 1
+
+# Pack the frame holding the buttons.
+   pack [Spacer $ref.sp1 2m 1m] $bfrm $cfrm [Spacer $ref.sp2 2m 1m] \
+         -side top -fill both -expand 1
 
 # Create the second column...
    set col2f [frame $col2.f -bd 2 -relief groove]
