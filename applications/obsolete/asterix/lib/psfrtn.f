@@ -2093,7 +2093,6 @@ C         CALL CAL_CLOSE( IGNORE )
 
       REAL                     IRIS                    ! Sort iris value
 
-      INTEGER                  BDA                     ! BDA identifier
       INTEGER                  CALFN                   ! CAL filter id
       INTEGER                  IFILT                   ! Dataset filter id
       INTEGER			TIMID			! Timing info
@@ -2127,9 +2126,6 @@ C         CALL CAL_CLOSE( IGNORE )
 *    Is locator valid
       CALL DAT_VALID( LOC, WF_DATASET(SLOT), STATUS )
       IF ( WF_DATASET(SLOT) ) THEN
-
-*      Get BDA identifier
-        CALL BDA_FIND( LOC, BDA, STATUS )
 
 *      Store locator
         WF_MCP(SLOT) = 2
@@ -2270,7 +2266,6 @@ C         CALL CAL_CLOSE( IGNORE )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_RADIAL_CMN'
@@ -2555,7 +2550,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RADIAL_CMN'
 *
@@ -2582,7 +2577,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL                    TOR               ! Conversion to radians
 
       INTEGER                 APTR              ! Ptr to axis data
-      INTEGER                 DIMS(DAT__MXDIM)  ! Size of data array
+      INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
       INTEGER			TFID			! Tabular dataset
@@ -2802,7 +2797,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RESPFILE_CMN'
@@ -3026,7 +3020,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_RESPFILE_CMN'
 *
@@ -3076,7 +3069,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
@@ -3394,7 +3386,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -3437,7 +3428,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
       INCLUDE 'PSF_ANAL_CMN'
@@ -3548,7 +3538,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
 *
@@ -3685,6 +3674,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
@@ -3712,13 +3702,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       REAL                    BASE, SCALE       ! Axis quantities
 
       INTEGER                 BDA               ! BDA identifier
-      INTEGER                 DIMS(DAT__MXDIM)  ! Size of data array
+      INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
       INTEGER			TFID			! Table identifier
 
       LOGICAL                 ELEVS_OK          ! Energy levels structure ok?
-      LOGICAL                 PSF_OK            ! PSF structure there?
       LOGICAL                 RADII_OK          ! Energy radii structure ok?
       LOGICAL                 VALID             ! Have we a valid dataset?
 *-
@@ -3779,21 +3768,19 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *    Look for energy radii
+      TB_NLEV(SLOT) = 0
+      CALL ADI1_LOCPSF( TFID, .FALSE., PLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
-        CALL BDA_CHKPSF_INT( BDA, PSF_OK, STATUS )
-        IF ( PSF_OK ) THEN
-          CALL BDA_LOCPSF_INT( BDA, PLOC, STATUS )
-          CALL DAT_THERE( PLOC, 'ELEVS', ELEVS_OK, STATUS )
-          CALL DAT_THERE( PLOC, 'RADII', RADII_OK, STATUS )
-          IF ( ELEVS_OK .AND. RADII_OK ) THEN
-            CALL CMP_GET1R( PLOC, 'ELEVS', 10, TB_ELEVS(SLOT,1),
+        CALL DAT_THERE( PLOC, 'ELEVS', ELEVS_OK, STATUS )
+        CALL DAT_THERE( PLOC, 'RADII', RADII_OK, STATUS )
+        IF ( ELEVS_OK .AND. RADII_OK ) THEN
+          CALL CMP_GET1R( PLOC, 'ELEVS', 10, TB_ELEVS(SLOT,1),
      :                                   TB_NLEV(SLOT), STATUS )
-            CALL CMP_GET1R( PLOC, 'RADII', 10, TB_RADII(SLOT,1),
+          CALL CMP_GET1R( PLOC, 'RADII', 10, TB_RADII(SLOT,1),
      :                                   TB_NLEV(SLOT), STATUS )
-          END IF
-        ELSE
-          TB_NLEV(SLOT) = 0
         END IF
+      ELSE
+        CALL ERR_ANNUL( STATUS )
       END IF
 
 *    Release from BDA
@@ -3836,7 +3823,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
 *
@@ -3890,7 +3876,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_TABULAR_CMN'
 *
@@ -4022,7 +4007,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'PSF_WFC_CMN'
 *
@@ -4090,7 +4074,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -4335,7 +4318,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
 *
 *    Import :
@@ -4580,7 +4562,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
@@ -5154,7 +5135,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_XRT_PSPC_CMN'
@@ -5206,7 +5186,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSF_PAR'
 *
 *    Global variables :
