@@ -91,5 +91,19 @@ interface IREGION
     prompt 'Input filename'
     help 'Name of object containing region mask to be loaded'
   endparameter
+  parameter MASK
+    type '_LOGICAL'
+    default Y
+    prompt 'Save copy of mask'
+  endparameter
+  parameter ARDFILE
+    type '_LOGICAL'
+    default Y
+    prompt 'Save copy of ARD text'
+  endparameter
+  parameter FILE
+    type '_CHAR'
+    prompt 'ARD file name'
+  endparameter
 endinterface
 
