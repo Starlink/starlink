@@ -1,7 +1,7 @@
       SUBROUTINE REDS_SCUCAT (STATUS)
 *+
 *  Name:
-*     REDS_SCUCAT
+*     SCUCAT
 
 *  Purpose:
 *     Routine to concatenate photometry datasets for further processing
@@ -60,11 +60,14 @@
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.7  1996/10/30 20:23:05  timj
-*     Add modern STARLINK header.
-*     Replace SCULIB_COPY? with VEC_
-*     Annul LOC after use.
+*     Revision 1.8  1996/11/02 01:24:00  timj
+*     Change Name to SCUCAT (from REDS_SCUCAT)
 *
+c Revision 1.7  1996/10/30  20:23:05  timj
+c Add modern STARLINK header.
+c Replace SCULIB_COPY? with VEC_
+c Annul LOC after use.
+c
 c Revision 1.6  1996/10/24  21:29:09  timj
 c Fixed GLOBAL default problem (use DUMMY PARAMETER)
 c
