@@ -239,7 +239,7 @@
       - TRANNDF will now (sensibly) refuse to resample into a SkyFrame.
 
 1 ASTEXP
-Exports coordinate system information from images to an AST file
+Exports coordinate system information from images
 
 Usage:
 
@@ -255,8 +255,8 @@ Description:
    which can be derived from other images to which similar framesets
    ought to apply.  The key should be generated in the same way when
    the AST file is used for importing the mapping information by
-   ASTIMP.  Currently these keys can be generated according to a
-   FITS header card or the order in which the images are presented.
+   ASTIMP or MAKESET.  Currently these keys can be generated according
+   to a FITS header card or the order in which the images are presented.
    Additional information may be written describing what use to
    make of FITS headers in the images.
 
@@ -264,8 +264,8 @@ Description:
    contain information about the positioning of images in a set of
    related images.
 
-   AST files written out by this program can be applied to
-   other images of similar origin using the ASTIMP program, so
+   AST files written out by this program can be applied to other 
+   images of similar origin using the ASTIMP or MAKESET programs, so
    that registration information present in the WCS components of
    one set of images (put there for instance by the REGISTER or
    WCSEDIT programs) can be transferred using ASTIMP and ASTEXP to
@@ -357,6 +357,10 @@ IDTYPE = LITERAL (Read)
                     INDICES parameter.  This normally gives the
                     frameset generated from the N'th image in the
                     IN list an ID with index N.
+
+      -  SET     -- ID is given by an integer taken from the Set
+                    Index attribute of the CCDPACK Set header
+                    of each input file
    [INDEX]
 3 IN
 IN = LITERAL (Read)
@@ -422,7 +426,7 @@ OUTDOMAIN = LITERAL (Read)
    parameter only gives the name that the frames will have in
    the AST file, and consequently the name by which they will be
    known when the WCS information is imported into other images
-   using ASTIMP.
+   using ASTIMP or MAKESET.
 
    The name is converted to upper case, and whitespace is removed.
    [CCD_EXPORT]
@@ -432,7 +436,7 @@ astexp reg_data* camera.ast idtype=fitsid fitsid=CHIPNUM
    This will save the information about the relative positioning
    of the images 'reg_data*' to the file 'camera.ast', calling the
    alignment domain 'CAMERA'.  The file 'camera.ast' can later be
-   used by the ASTIMP application to add the same coordinate
+   used by the ASTIMP  or MAKESET applications to add the same coordinate
    information to a different set of images from the same instrument.
    Before running this, the images 'reg_data*' should be correctly
    aligned in their Current domain.  CHIPNUM must be the name
@@ -467,8 +471,8 @@ astexp "r10595[2345]" wfc.ast outdomain=wfc
    relative alignment information.
 2 Notes
 AST file format:
-   The AST file is designed to be written by ASTEXP and read by
-   ASTIMP, and the user does not need to understand its format.
+   The AST file is designed to be written by ASTEXP and read by ASTIMP
+   or MAKESET, and the user does not need to understand its format.
    It is however a text file, and if care is taken it may be
    edited by hand.  Removing entire framesets and modifying ID
    values or domain names may be done fairly easily, but care
@@ -525,6 +529,10 @@ AST file format:
             Usually N will take the values 1,2,3,... for the
             framesets in the file.  Typically the N'th image in a
             list will match the one with an ID of "INDEX N".
+
+      -  "SET N"
+            This will match an image if the Set Index attribute
+            in its CCDPACK Set header is equal to the integer N.
 
    Modifiers:
       Modifiers describe additional modifications to be made
@@ -710,8 +718,8 @@ astimp astfile=instrum.ast in=! logto=terminal accept
    terminal only.
 2 Notes
 AST file format:
-   The AST file is designed to be written by ASTEXP and read by
-   ASTIMP, and the user does not need to understand its format.
+   The AST file is designed to be written by ASTEXP and read by ASTIMP
+   or MAKESET, and the user does not need to understand its format.
    It is however a text file, and if care is taken it may be
    edited by hand.  Removing entire framesets and modifying ID
    values or domain names may be done fairly easily, but care
@@ -768,6 +776,10 @@ AST file format:
             Usually N will take the values 1,2,3,... for the
             framesets in the file.  Typically the N'th image in a
             list will match the one with an ID of "INDEX N".
+
+      -  "SET N"
+            This will match an image if the Set Index attribute
+            in its CCDPACK Set header is equal to the integer N.
 
    Modifiers:
       Modifiers describe additional modifications to be made
@@ -842,6 +854,11 @@ CAL = LITERAL (Read)
    normalised to one exposure unit. It is expected that the
    calibration image contains dark or flash exposure CCD data
    which have been bias corrected.
+
+   If USESET is true, CAL should be a group expression referring
+   to one calibration frame matching each of the Set Index
+   attributes represented in the IN list; again the name of
+   the file produced by MAKECAL will normally be suitable.
 
    The name of this file may be specified using indirection
    through a file.
@@ -982,6 +999,21 @@ SETSAT = _LOGICAL (Read)
 TITLE = LITERAL (Read)
    Title for the output images.
    [Output from CALCOR].
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then the CAL parameter is taken to
+   refer to a group of files, and each IN file will be 
+   processed using a calibration image with a Set Index 
+   attribute which matches its own.  An IN file with no Set
+   header is considered to match a CAL file with no Set header,
+   so USESET can safely be set true (the default) when the 
+   input files contain no Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 2 Examples
 calcor frame1 frame2 calibration 250
    This example runs CALCOR in its most basic mode. The input data
@@ -1052,7 +1084,7 @@ calcor in=ngc4151r_f1 cal=flash_master out=ngc4151r_f1_dc
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, PRESERVE and CAL) have
+   Certain parameters (LOGTO, LOGFILE, USESET, PRESERVE and CAL) have
    global values. These global values will always take precedence,
    except when an assignment is made on the command line.  In general
    global values may be set and reset using the CCDSETUP and
@@ -1205,7 +1237,7 @@ NAMES = LITERAL (Read)
 
       ADC, BIAS, BOUNDS, CAL, DEFERRED, DIRECTION, EXTENT, FLAT,
       GENVAR, MASK, NDFNAMES, PRESERVE, RNOISE, SATURATE,
-      SATURATION, SETSAT
+      SATURATION, SETSAT, USESET
 
    These correspond to the parameter names used in CCDSETUP (and
    in the other applications which access these parameters).
@@ -1372,6 +1404,17 @@ FITTYPE = _INTEGER (Read)
    The value of this parameter is used to classify the
    transformation (see the CLASS parameter).
    [5]
+3 FIXWCS
+FIXWCS = _LOGICAL (Read)
+   If MODE="ERASE" and NAME="SET", then this parameter indicates
+   whether the CCD_SET coordinate frame should be removed from
+   the World Coordinate System etension of the NDF as well.
+   Since CCD_SET coordinates are usually a copy of another
+   coordinate system, and mainly intended for Set-related 
+   registration, it is usually sensible to erase this coordinate
+   frame when the rest of the Set header information has
+   been erased.
+   [TRUE]
 3 IN
 IN = image (Read)
    A list specifying the names of the images whose CCDPACK
@@ -1456,7 +1499,10 @@ MODE = LITERAL (Read)
 NAME = LITERAL (Read)
    If MODE = "ERASE" is chosen then the value of this parameter
    names the CCDPACK extension item of the input images which is to
-   be erased. Typical items are "CURRENT_LIST" and "TRANSFORM".
+   be erased. Typical items are "CURRENT_LIST", "TRANSFORM" and "SET".
+   If "SET" is used, then the FIXWCS parameter will be
+   used to decide whether to remove any CCD_SET-domain frames
+   from the WCS component.
 3 PA-PZ
 PA-PZ = _DOUBLE (Read)
    These parameters supply the values of constants used in the
@@ -1618,6 +1664,11 @@ ccdedit mode=erase in=image_with_bad_transform name=transform
    In this example the TRANSFORM structure in the CCDPACK
    extension of the image image_with_bad_transform is removed.
 
+ccdedit mode=erase fixwcs=yes in='*' 
+   All Set header information, and any CCD_SET coordinate
+   frames which are associated with it, will be removed from
+   the images in the current directory.
+
 ccdedit mode=invert in='*'
    In this example all the images in the current directory have
    their transforms inverted.
@@ -1677,6 +1728,9 @@ ccdedit mode=transform trtype=express in=map2merc
   XXX.MORE.CCDPACK has been removed.
 
 - Transforms are stored in the item .MORE.CCDPACK.TRANSFORM .
+
+- If MODE=ERASE, NAME=SET and FIXWCS=TRUE, the WCS component
+  of the NDF may also be modified.
 2 Behaviour_of_parameters
    All parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -1943,7 +1997,7 @@ Usage:
 
    ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
             direction=? deferred=? extent=? preserve=? genvar=?
-            ndfnames=?
+            ndfnames=? useset=?
 
 Description:
 
@@ -2188,6 +2242,30 @@ SAVEFILE = FILENAME (Read)
    when restoring the program parameters. Restoration files are
    described in the notes section.
    [CCDPACK_SETUP.DAT]
+3 USESET
+USESET = _LOGICAL (Read)
+   This parameter determines whether CCDPACK Set header information
+   will be used when it is available.  Most of the CCDPACK 
+   reduction and registration programs will look for Set header
+   information in the .MORE.CCDPACK extension of the NDFs they
+   are processing, and if it exists it will be used to modify
+   the way the processing is done: broadly speaking, reduction 
+   programs will group corresponding members of different Sets
+   together before processing, and registration programs will
+   make use of a CCD_SET frame for alignment between members
+   of the same Set.
+
+   This header information will only be present if it has been
+   added (to the NDF itself or to one earlier in the reduction 
+   chain from which it was produced) by running the MAKESET
+   program.  If it is not present, the programs will behave
+   as if USESET was false anyway, so it is normally quite safe
+   for USESET to be TRUE.  However, in some cases (especially
+   if intermediate files are stored in foreign, i.e. non-NDF 
+   data formats) it may be more efficient to set this parameter
+   false.  You should also set it false if you wanted CCDPACK 
+   programs to ignore existing Set information for some reason.
+   [TRUE]
 2 Notes
 - Pixel indices. The bounds supplied to DEBIAS should be given as
   pixel indices. These usually start at 1,1 for the pixel at the
@@ -2400,6 +2478,12 @@ BIAS = LITERAL (Read)
    through an ASCII file. The offered default is either the last
    used master bias name or (if one exists) the name of the image
    produced by the last run of MAKEBIAS.
+
+   If USESET is true and you are using bias calibration data
+   from a file, BIAS should be a group expression referring
+   to one master bias frame matching each of the Set Index
+   attributes represented in the IN list; again the name of
+   the file produced by MAKEBIAS will normally be suitable.
    [Global master bias or !]
 3 BOUNDS
 BOUNDS( 2 or 4 ) = _INTEGER (Read)
@@ -2513,9 +2597,13 @@ GETMASK = _LOGICAL (Read)
 IN = LITERAL (Read)
    A list of the names of the images which contain the raw CCD
    data. Note that at present the input data must have a common
-   processing mode, i.e. use the same bias frame, have the same
-   ADC factor, readout noise etc. These values are represented
-   by the parameter values of the task.
+   processing mode, i.e. have the same ADC factor, readout noise
+   etc. These values are represented by the parameter values of 
+   the task.  The input data must also use the same master bias
+   frame except if USESET is true and the input and bias images
+   contain suitable CCDPACK Set header information, in which
+   case each input image will be processed using the bias image
+   with the corresponding Set Index attribute.
 
    The image names should be separated by commas and may include
    wildcards.
@@ -2735,6 +2823,21 @@ USEEXT = _LOGICAL (Read)
    Values obtained from the CCDPACK extension are identified in
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then the BIAS parameter is 
+   taken to refer to a group of files, and each IN file will
+   be processed using a master bias image with a Set Index
+   attribute which matches its own.  An IN file with no Set
+   header is considered to match a master bias file with
+   no Set header, so USESET can safely be set true (the default)
+   when the input files contain no Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 WMODE
 WMODE = LITERAL (Read)
    The weighting method which is to be used when deriving means
@@ -2865,7 +2968,7 @@ debias in='*' out='*_debias' bounds='[3,16,912,940]' adc=1 rnoise=4
 
    Certain parameters (ADC, BIAS, BOUNDS, DEFERRED, DIRECTION,
    EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
-   SATURATION and SETSAT) have global values. These global values
+   SATURATION, SETSAT and USESET) have global values. These global values
    will always take precedence, except when an assignment is made on
    the command line.  In general global values may be set and reset
    using the CCDSETUP and CCDCLEAR commands, however, the BIAS
@@ -2908,6 +3011,14 @@ PDRAPER: Peter Draper (STARLINK)
      NDF are set to ADUs or electrons depending on whether data
      expansion has occurred or not. Processing is supported for all
      HDS (non-complex) numeric types.
+
+   - The MASK parameter, when it refers to an NDF, ought really to
+     be sensitive to Set header information if USESET is true.
+     This is currently not implemented because of difficulties
+     arising from the fact that MASK parameter can be interpreted
+     as an ARD file, an ARD description or an image according to
+     its value.
+
 1 DRAWNDF
 Draws aligned images or outlines on a graphics display.
 
@@ -4485,7 +4596,7 @@ OUTLIST = FILENAME (Write)
    These may use indirection elements as well as names separated
    by commas.
 3 OVERRIDE
-OVERRIDE = LOGICAL (Read)
+OVERRIDE = _LOGICAL (Read)
    This parameter controls whether to continue and create an
    incomplete solution. Such solutions will result when only a
    subset of the input position lists have been matched.
@@ -4506,7 +4617,7 @@ OVERRIDE = LOGICAL (Read)
    and have consequently been rejected.
    [TRUE]
 3 RESTRICT
-RESTRICT = LOGICAL (Read)
+RESTRICT = _LOGICAL (Read)
    This parameter determines whether the Current coordinate system
    is used to restrict the choice of objects to match with each
    other.  If set TRUE, then the only objects which are
@@ -4524,7 +4635,7 @@ RESTRICT = LOGICAL (Read)
    This parameter is ignored if USEWCS is FALSE.
    [FALSE]
 3 USECOMP
-USECOMP = LOGICAL (Read)
+USECOMP = _LOGICAL (Read)
    This parameter specifies whether the completeness value will
    be used to weight the number of matches between a pair, when
    determining the graph connecting all input datasets. Using
@@ -4532,8 +4643,31 @@ USECOMP = LOGICAL (Read)
    quality matches, but may reduce the chance of selecting matches
    with the highest counts in favour of those with lower counts.
    [TRUE]
+3 USESET
+USESET = _LOGICAL (Read)
+   This parameter determines whether Set header information should
+   be used in the object matching.  If USESET is true,
+   FINDOFF will try to group position lists according to
+   the Set Name attribute of the image to which they are attached.
+   All lists coming from images which share the same (non-blank)
+   Set Name attribute, and which have a CCD_SET coordinate frame
+   in their WCS component, will be grouped together and treated
+   by the program as a single position list.  Thus no attempt
+   is made to match objects between members of the same Set;
+   it is assumed that the relative alignment within a Set
+   is already known and has been fixed.
+
+   If USESET is false, all Set header information is ignored.
+   If NDFNAMES is false, USESET will be ignored.  If the input
+   images have no Set headers, or if they have no CCD_SET frame
+   in their WCS components, the setting of USESET will make
+   no difference.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 USEWCS
-USEWCS = LOGICAL (Read)
+USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
    position lists should be transformed from Pixel coordinates
    into the Current coordinate system of the associated image
@@ -4712,7 +4846,7 @@ findoff inlist='data*' outlist='*.off' restrict minmatch=2
    behaviour of the application may be restored by using the RESET
    keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+   Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line.  Global values may
    be set and reset using the CCDSETUP and CCDCLEAR commands.
@@ -4787,9 +4921,12 @@ FLAT = LITERAL (Read)
    Name of the image which contains the normalised (mean of one)
    flatfield data. This should have been produced by a program
    such as MAKEFLAT. The data should have a floating point HDS
-   data type (_REAL or _DOUBLE).
-   The name of this file may be specified using indirection
-   through a file.
+   data type (_REAL or _DOUBLE).  If USESET is true, FLAT should
+   be a group expression referring to one flatfield data file
+   matching each of the Set Index attributes represented in the 
+   IN list; again the name of the file produced by MAKEFLAT will 
+   normally be suitable.  The name of this file may be specified
+   using indirection through a file.
    [Global flatfield]
 3 IN
 IN = LITERAL (Read)
@@ -4898,6 +5035,21 @@ PRESERVE = _LOGICAL (Read)
 TITLE = LITERAL (Read)
    Title for the output images.
    [Output from FLATCOR]
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored. 
+   If USESET is true, then the FLAT parameter is taken to 
+   refer to a group of files, and each IN file will be processed
+   using a flatfield dataset with a Set Index attribute which
+   matches its own.  An IN file with no Set header is considered
+   to match a FLAT file with no Set header, so USESET can safely
+   be set true (the default) when the input files contain no 
+   Set header information.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 2 Examples
 flatcor frame1 frame1_f flatr
    In this example the data in image frame1 are corrected for the
@@ -4944,7 +5096,7 @@ flatcor in='*' out='*_flattened' flat=master_flatr
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, PRESERVE and FLAT) have
+   Certain parameters (LOGTO, LOGFILE, PRESERVE, FLAT and USESET) have
    global values. These global values will always take precedence,
    except when an assignment is made on the command line.  In general
    global values may be set and reset using the CCDSETUP and
@@ -5648,8 +5800,11 @@ NITER = _INTEGER (Read)
 3 OUT
 OUT = LITERAL (Read)
    Name of the output image. This has the master bias frame and
-   the estimated variances. This name may be specified using
-   indirection through a file.
+   the estimated variances.  If USESET is true and multiple Sets
+   are represented in the IN list, then this name will be used
+   as the name of an HDS container file containing one NDF for
+   each Set Index value.  
+   This name may be specified using indirection through a file.
 3 PRESERVE
 PRESERVE = _LOGICAL (Read)
    If TRUE then this indicates that the input data type is to be
@@ -5706,6 +5861,23 @@ USEEXT = _LOGICAL (Read)
    Values obtained from the CCDPACK extension are identified in
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then input files will be considered in
+   groups; a separate master bias frame will be constructed for
+   each group of corresponding input frames (i.e. those sharing
+   the same Set Index attribute).  If this results in multiple
+   output master bias frames, they will be written as separate
+   NDFs into a single HDS container file.  If no Set header
+   information is present in the input files, then all the
+   input files are combined together to form the master bias,
+   so USESET can usually be safely set to TRUE (the default).
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 ZERO
 ZERO = _LOGICAL (Read)
    Flag indicating whether the output master bias is to have a
@@ -5754,7 +5926,7 @@ makebias in='*' out=master_bias
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE)
+   Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE and USESET)
    have global values. These global values will always take
    precedence, except when an assignment is made on the command line.
    Global values may be set and reset using the CCDSETUP and
@@ -5964,6 +6136,10 @@ NITER = _INTEGER (Read)
 OUT = LITERAL (Write)
    Name of the output image to contain the calibration data.
    Note this image will have a type of at least _REAL.
+   If USESET is true and multiple Sets are represented in the IN
+   list then this name will be used as the name of an HDS
+   container file containing one NDF structure for each Set Index value.
+   This name may be specified using indirection through a file.
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
@@ -5984,6 +6160,23 @@ TYPE = LITERAL (Read)
    affects the output image frame type which will be set to
    "MASTER_FLASH" or "MASTER_DARK" or "MASTER_?".
    [NONE]
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then input files will be considered in
+   groups; a separate calibration frame will be constructed 
+   for each group of corresponding input frames (i.e. those
+   sharing the same Set Index attribute).  If this results in 
+   multiple output calibration files, they will be written as 
+   separate NDF structures into a single HDS container file.
+   If no Set header information is present in the input files, 
+   then calibration is done on all the input files together,
+   so USESET can usually be safely set to TRUE (the default).
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 USEEXT
 USEEXT = _LOGICAL (Read)
    If TRUE then the EXPOSE parameter of this program will not
@@ -6042,7 +6235,7 @@ makecal ^flash_frames ^flash_exposures flash_master
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO and LOGFILE) have global values. These
+   Certain parameters (LOGTO, LOGFILE and USESET) have global values. These
    global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
@@ -6258,8 +6451,12 @@ NITER = _INTEGER (Read)
 3 OUT
 OUT = LITERAL (Write)
    Name of an image to contain the output flatfield data. Note this
-   image will have a precision of at least _REAL. This name may be
-   specified using indirection through a file.
+   image will have a precision of at least _REAL.
+   If USESET is true and multiple Sets are represented in the IN
+   list then this name will be used as the name of an HDS 
+   container file containing one NDF structure for each Set Index value.
+   This name may be specified using indirection through a file.
+   [TRUE]
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
@@ -6269,6 +6466,23 @@ SIGMAS = _REAL (Read)
    variances exist then one is estimated from the population of
    values.
    [4.0]
+3 USESET
+USESET = _LOGICAL (Read)
+   Whether to use Set header information or not.  If USESET is
+   false then any Set header information will be ignored.
+   If USESET is true, then input files will be considered in
+   groups; a separate flatfield will be constructed for each
+   group of corresponding input frames (i.e. those sharing 
+   the same Set Index attribute).  If this results in multiple
+   output flatfields, they will be written as separate NDF structures 
+   into a single HDS container file.  If no Set header information 
+   is present in the input files, then flatfielding is done 
+   on all the input files together, so USESET can usually be 
+   safely set to TRUE (the default).
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 USEVAR
 USEVAR = _LOGICAL (Read)
    If TRUE and all the input images contain error information
@@ -6332,7 +6546,7 @@ makeflat in='ff*' out=master_flat gamma=10 iter=1
    The intrinsic default behaviour of the application may be
    restored by using the RESET keyword on the command line.
 
-   Certain parameters (LOGTO and LOGFILE) have global values. These
+   Certain parameters (LOGTO, LOGFILE and USESET) have global values. These
    global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.
@@ -7838,11 +8052,11 @@ Usage:
 Description:
 
    This routine draws a variety of markers (crosses, circles,
-   squares etc.) at positions specified in series of position lists.
-   Before this application can be run an image (or other graphical
-   output such as a contour image) must have been displayed using a
-   suitable routine such as KAPPA's DISPLAY (SUN/95) or CCDPACK's
-   BOUNDS.
+   squares etc.) on a graphics device at positions specified 
+   in a series of position lists.  Before this application can be 
+   run an image (or other graphical output such as a contour image)
+   must have been displayed using a suitable routine such as 
+   KAPPA's DISPLAY (SUN/95) or CCDPACK's DRAWNDF.
 
    For a more interactive display of markers on an Xwindows display,
    you can use the IDICURS program instead.
@@ -8659,6 +8873,8 @@ FITTYPE = _INTEGER (Read)
 
       - 6 -- self defined function
 
+   If more than two position lists are provided, then only the 
+   values 1-5 may be used.
    [5]
 3 FULL
 FULL = _LOGICAL (Read)
@@ -8811,6 +9027,32 @@ TOLER = _DOUBLE (Read)
    specified in coordinates with a higher accuracy or smaller
    units.
    [0.001]
+3 USESET
+USESET = _LOGICAL (Read)
+   This parameter determines whether Set header information should
+   be used in the registration.  If USESET is true, then 
+   REGISTER will try to group position lists according to
+   the Set Name attribute of the images to which they are attached.
+   All lists coming from images which share the same (non-blank)
+   Set Name attribute, and which have a CCD_SET coordinate 
+   frame in their WCS component, will be grouped together and
+   treated by the program as a single position list.  Images
+   which have no associated position list but are in the same
+   Set as ones which are successfully registered will have
+   a suitable registration frame added too, based on their
+   Set alignment relation to the registered Set member.
+   Thus the assumption is made that the relative alignment of 
+   images within a Set is already known and has been fixed.
+
+   If USESET is false, all Set header information is ignored.
+   If NDFNAMES is false, USESET will be ignored.  If the input
+   images have no Set headers, or if they have no CCD_SET frame 
+   in their WCS components, the setting of USESET will make
+   no difference.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 3 USEWCS
 USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
@@ -9009,7 +9251,7 @@ register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
    default behaviour of the application may be restored by using the
    RESET keyword on the command line.
 
-   Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+   Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
    values. These global values will always take precedence, except
    when an assignment is made on the command line.  Global values may
    be set and reset using the CCDSETUP and CCDCLEAR commands.
@@ -10576,10 +10818,10 @@ Description:
    TRANNDF applications can then be used on the resulting images.
 
    This can be of use when different kinds of alignment information
-   are available between different members of a set of images.  By
+   are available between different members of a group of images.  By
    supplying an ordered list of coordinate systems within which to
    align, the best alignment available can be made between
-   different  members of the set, falling back on second or third
+   different  members of the group, falling back on second or third
    choices of alignment types where first choices are not
    available.
 
@@ -10605,6 +10847,11 @@ Description:
    there is more than one which meets this criterion, one which
    uses domains near the head of the list is preferred.
 
+   If the USESET parameter is true, then WCSREG will take account
+   of alignment information stored in the CCDPACK Set header;
+   this means that the alignment implied when images were 
+   previously grouped into a Set can be guaranteed to be retained.
+
    If the graph is not fully connected, a list of the existing
    subgraphs is output, and the program will normally terminate,
    however it can be made to continue with registration of the
@@ -10617,7 +10864,24 @@ DOMAINS( * ) = LITERAL (Read)
    of preference for achieving alignment.  Alignment paths
    between images are selected by shortness of path, but in case
    of a tie, those using domains nearest the start of this list
-   are used by preference.
+   are used by preference.  You should not normally include the
+   CCD_SET domain in this list; for details of how this domain
+   is treated specially, see the USESET parameter.
+
+   Note that this parameter is an array of strings, so that either
+   the whole list should be surrounded by square brackets, or
+   each element should be surrounded by double quotes.  The
+   whole thing may need to be protected from the Unix shell
+   by using, e.g., single quotes.
+
+   Supplying the null value (!) is equivalent to specifying the
+   current domain of the reference NDF.  The effect of this
+   is to retain the alignment already given by the Current
+   coordinates of each image, but to ensure that the pixels
+   are aligned with the pixels of the reference image.
+   This will result in the images being aligned in a coordinate
+   system suitable for resampling with TRANNDF.
+   [!]
 3 IN
 IN = LITERAL (Read)
    A list of the names of the images which are to be aligned.  The
@@ -10661,6 +10925,13 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+3 NAMELIST
+NAMELIST = LITERAL (Read)
+   The name of an output file in which to record all the images
+   to which new coordinate systems were successfully added.
+   This may not be the same as the IN list if OVERRIDE is set
+   true.
+   [wcsreg.lis]
 3 OUTDOMAIN
 OUTDOMAIN = LITERAL (Read)
    This gives the name of the domain for the new frame which is
@@ -10679,6 +10950,10 @@ OVERRIDE = _LOGICAL (Read)
    insert new frames in those images which can be reached from the
    one indicated by REFPOS, making no change to the others, except
    to remove any frames in the domain OUTDOMAIN which already exist.
+
+   The NAMELIST parameter can be used to record which images were
+   successfully registered when OVERRIDE is true (if OVERRIDE is
+   false, then it will be the same as IN unless the program fails).
    [FALSE]
 3 REFPOS
 REFPOS = _INTEGER (Read)
@@ -10690,6 +10965,21 @@ REFPOS = _INTEGER (Read)
    when they both have frames in the same one of the entries in
    the DOMAINS list.
    [1]
+3 USESET
+USESET = _LOGICAL (Read)
+   This parameter governs whether Set-based alignment 
+   information in the images, if it exists, should be used. 
+   If it is set to true, then coordinate frames with the 
+   domain CCD_SET will take precedence over all the ones named 
+   in the DOMAINS parameter.  In this case, if two of the images
+   both have a CCD_SET coordinate frame and also share the
+   same Set Name attribute, the connection will be made in
+   CCD_SET frame.  If no CCD_SET frames are present, this
+   parameter has no effect.
+
+   If a global value for this parameter has been set using 
+   CCDSETUP then that value will be used.
+   [TRUE]
 2 Examples
 wcsreg * [ccd_reg,sky]
    In this example all the images in the current directory are
@@ -10720,16 +11010,19 @@ wcsreg "obs1_*,obs2_*" outdomain=final
    component using the ASTIMP application.  The name FINAL is
    used for the new domain added to the WCS component.
 
-wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
+wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 domains=!
    Here wcsreg is being used with a somewhat different intent.
-   The images named are already fully aligned in  SKY
+   The images named are already fully aligned in their Current
    coordinates, but executing this command has the effect of
    aligning them in a new coordinate system which is a copy of
    the pixel coordinate system of 'skyfr2'.  Since this has
    units which are the size of pixels, the resulting image files
-   are suitable for resampling using TRANNDF.  This would not
-   have been the case for the files initially, since the SKY
-   coordinates have units of radians.
+   are suitable for resampling using TRANNDF.   Supposing that
+   they were originally aligned in SKY coordinates they could
+   not have been resampled by \routine{TRANNDF} in their initial state,
+   since the SKY coordinates have units of radians, which 
+   are much too large compared to pixels.
+
 2 Behaviour_of_parameters
    Most parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -10743,7 +11036,7 @@ wcsreg "skyfr1,skyfr2,skyfr3,skyfr4" refpos=2 [sky]
    default behaviour of the application may be restored by using the
    RESET keyword on the command line.
 
-   Certain parameters (LOGTO and LOGFILE) have global values.
+   Certain parameters (LOGTO, LOGFILE and USESET) have global values.
    These global values will always take precedence, except when an
    assignment is made on the command line.  Global values may be set
    and reset using the CCDSETUP and CCDCLEAR commands.

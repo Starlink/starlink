@@ -3994,12 +3994,12 @@ each stored in a 2-HDU MEF, you can do:
 % convert
 
    CONVERT commands are now available -- (Version 1.3-5 2001 January)
- 
+
    Defaults for automatic NDF conversion are set.
- 
+
    Type conhelp for help on CONVERT commands.
    Type "showme sun55" to browse the hypertext documentation.
- 
+
 % fits2ndf 'obs*.fits' 'conv-*' container=true
 3 files selected.
 
@@ -5578,7 +5578,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       which can be derived from other images to which similar framesets
       ought to apply.  The key should be generated in the same way when
       the AST file is used for importing the mapping information by
-      \xroutine{ASTIMP}.  Currently these keys can be generated according to a
+      \xroutine{ASTIMP} or \xroutine{MAKESET}.  Currently these keys can be generated according to a
       FITS header card or the order in which the images are presented.
       Additional information may be written describing what use to
       make of FITS headers in the images.
@@ -5589,7 +5589,7 @@ The CCDPACK routine descriptions are contained in the following pages.
 
       AST files written out by this application can be applied to
       other images of similar origin using the \xroutine{ASTIMP} 
-      application, so
+      or \xroutine{MAKESET} programs, so
       that registration information present in the WCS components of
       one set of images (put there for instance by the \xroutine{REGISTER} 
       or \xroutine{WCSEDIT} applications)
@@ -5708,6 +5708,10 @@ The CCDPACK routine descriptions are contained in the following pages.
                     INDICES parameter.  This normally gives the
                     frameset generated from the N'th image in the
                     IN list an ID with index N.
+            \sstitem
+              SET     -- ID is given by an integer taken from the 
+                    Set Index attribute of the CCDPACK Set header
+                    of each input file.
          }
          [INDEX]
       }
@@ -5790,7 +5794,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          parameter only gives the name that the frames will have in
          the AST file, and consequently the name by which they will be
          known when the WCS information is imported into other images
-         using ASTIMP.
+         using \xroutine{ASTIMP} or \xroutine{MAKESET}.
 
          The name is converted to upper case, and whitespace is removed.
          [CCD\_EXPORT]
@@ -5804,7 +5808,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          This will save the information about the relative positioning
          of the images {\tt '}reg\_data$*${\tt '} to the file {\tt '}camera.ast{\tt '}, calling the
          alignment domain {\tt '}CAMERA{\tt '}.  The file {\tt '}camera.ast{\tt '} can later be
-         used by the ASTIMP application to add the same coordinate
+         used by the \xroutine{ASTIMP} or \xroutine{MAKESET} applications to add the same coordinate
          information to a different set of images from the same instrument.
          Before running this, the images {\tt '}reg\_data$*${\tt '} should be correctly
          aligned in their Current domain.  CHIPNUM must be the name
@@ -5847,11 +5851,11 @@ The CCDPACK routine descriptions are contained in the following pages.
       AST file format:
    } {
          The AST file is designed to be written by ASTEXP and read by
-         ASTIMP, and the user does not need to understand its format.
+         \xroutine{ASTIMP} or \xroutine{MAKESET}, and the user does not need to understand its format.
          It is however a text file, and if care is taken it may be
          edited by hand.  Removing entire framesets and modifying ID
          values or domain names may be done fairly easily, but care
-         should be taken (see SUN/210) if any more involved changes
+         should be taken (see \xref{SUN/210}{sun210}{ss:channels}) if any more involved changes
          are to be undertaken.  The format of the file is explained
          here.
 
@@ -5911,6 +5915,10 @@ The CCDPACK routine descriptions are contained in the following pages.
                      framesets in the file.  Typically the N{\tt '}th image in a
                      list will match the one with an ID of {\tt "}INDEX N{\tt "}.
 
+         \sstitem
+               {\tt "}SET N{\tt "} ---
+                     This will match an image if the Set Index attribute
+                     iin its CCDPACK Set header is equal to the integer N.
       }
             {\bf Modifiers:} \\
             Modifiers describe additional modifications to be made
@@ -6122,12 +6130,12 @@ The CCDPACK routine descriptions are contained in the following pages.
    \sstdiytopic{
       AST file format
    } {
-         The AST file is designed to be written by ASTEXP and read by
-         ASTIMP, and the user does not need to understand its format.
+         The AST file is designed to be written by \xroutine{ASTEXP} and read by
+         \routine{ASTIMP} or \xroutine{MAKESET}, and the user does not need to understand its format.
          It is however a text file, and if care is taken it may be
          edited by hand.  Removing entire framesets and modifying ID
          values or domain names may be done fairly easily, but care
-         should be taken (see \xref{SUN/210}{sun210}{}) if any more involved changes
+         should be taken (see \xref{SUN/210}{sun210}{ss:channels}) if any more involved changes
          are to be undertaken.  The format of the file is explained
          here.
 
@@ -6160,7 +6168,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             frame and a Current frame) and a mapping between them.
             The domains of all the Base frames should normally be the
             same, and likewise for all the Current frames.  For the
-            images to which the file will be applied by ASTIMP, their
+            images to which the file will be applied by \routine{ASTIMP}, their
             WCS components should contain frames in the same domain
             as the AST file{\tt '}s Base frame.
 
@@ -6187,6 +6195,10 @@ The CCDPACK routine descriptions are contained in the following pages.
                      framesets in the file.  Typically the N{\tt '}th image in a
                      list will match the one with an ID of {\tt "}INDEX N{\tt "}.
 
+         \sstitem
+               {\tt "}SET N{\tt "} ---
+                     This will match an image if the Set Index attribute
+                     iin its CCDPACK Set header is equal to the integer N.
       }
          {\bf Modifiers:} \\
             Modifiers describe additional modifications to be made
@@ -6260,6 +6272,11 @@ The CCDPACK routine descriptions are contained in the following pages.
          normalised to one exposure unit. It is expected that the
          calibration image contains dark or flash exposure CCD data
          which have been bias corrected.
+
+         If USESET is true, CAL should be a group expression referring
+         to one calibration frame matching each of the Set Index
+         attributes represented in the IN list; again the name of
+         the file produced by \xroutine{MAKECAL} will normally be suitable.
 
          The name of this file may be specified using indirection
          through a file.
@@ -6433,6 +6450,23 @@ The CCDPACK routine descriptions are contained in the following pages.
          Title for the output images.
          [Output from CALCOR].
       }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored.
+         If USESET is true, then the CAL parameter is taken to
+         refer to a group of files, and each IN file will be 
+         processed using a calibration image with a Set Index 
+         attribute which matches its own.  An IN file with no Set
+         header is considered to match a CAL file with no Set header,
+         so USESET can safely be set true (the default) when the 
+         input files contain no Set header information.
+
+         If a global value for this parameter has been set using 
+         \xroutine{CCDSETUP} then that value will be used.
+         [TRUE]
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -6526,7 +6560,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       The intrinsic default behaviour of the application may be
       restored by using the RESET keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE, PRESERVE and CAL) have
+      Certain parameters (LOGTO, LOGFILE, USESET, PRESERVE and CAL) have
       global values. These global values will always take precedence,
       except when an assignment is made on the command line.  In general
       global values may be set and reset using the \xroutine{CCDSETUP} and
@@ -6670,7 +6704,7 @@ The CCDPACK routine descriptions are contained in the following pages.
          \begin{myquote}
             ADC, BIAS, BOUNDS, CAL, DEFERRED, DIRECTION, EXTENT, FLAT,
             GENVAR, MASK, NDFNAMES, PRESERVE, RNOISE, SATURATE,
-            SATURATION, SETSAT
+            SATURATION, SETSAT, USESET
          \end{myquote}
          These correspond to the parameter names used in \xroutine{CCDSETUP} (and
          in the other applications which access these parameters).
@@ -6866,6 +6900,19 @@ The CCDPACK routine descriptions are contained in the following pages.
          [5]
       }
       \sstsubsection{
+         FIXWCS = \_LOGICAL (Read)
+      }{
+         If MODE=`ERASE' and NAME=`SET', then this parameter indicates
+         whether the CCD\_SET coordinate frame should be removed from
+         the World Coordinate System etension of the image as well.
+         Since CCD\_SET coordinates are usually a copy of another
+         coordinate system, and mainly intended for Set-related 
+         registration, it is usually sensible to erase this coordinate
+         frame when the rest of the Set header information has
+         been erased.
+         [TRUE]
+      }
+      \sstsubsection{
          IN = IMAGE (Read)
       }{
          A list specifying the names of the images whose CCDPACK
@@ -6972,8 +7019,10 @@ The CCDPACK routine descriptions are contained in the following pages.
       }{
          If MODE = \qt{ERASE} is chosen then the value of this parameter
          names the CCDPACK extension item of the input images which is to
-         be erased. Typical items are \qt{CURRENT\_LIST} and
-         \qt{TRANSFORM}.
+         be erased. Typical items are \qt{CURRENT\_LIST}, \qt{TRANSFORM}
+         and \qt{SET}.  If \qt{SET} is used, then the FIXWCS parameter will be
+         used to decide whether to remove any CCD\_SET-domain frames
+         from the WCS component.
       }
       \sstsubsection{
          PA-PZ = \_DOUBLE (Read)
@@ -7185,6 +7234,13 @@ The CCDPACK routine descriptions are contained in the following pages.
          extension of the image image\_with\_bad\_transform is removed.
       }
       \sstexamplesubsection{
+         ccdedit mode=erase fixwcs=yes in=\qt{*}
+      }{
+         All Set header information, and any CCD\_SET coordinate
+         frames which are associated with it, will be removed from
+         the images in the current directory.
+      }
+      \sstexamplesubsection{
          ccdedit mode=invert in=\qs{$*$}
       }{
          In this example all the images in the current directory have
@@ -7264,6 +7320,11 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          \sstitem
          Transforms are stored in the item .MORE.CCDPACK.TRANSFORM .
+
+         \sstitem
+         If MODE=ERASE, NAME=SET and FIXWCS=TRUE, the WCS component
+         of the NDF may also be modified.
+
       }
    }
    \sstdiytopic{
@@ -7625,7 +7686,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
    \sstusage{
       ccdsetup logto=? logfile=? adc=? bounds=? rnoise=? mask=?
                direction=? deferred=? extent=? preserve=? genvar=?
-               ndfnames=?
+               ndfnames=? useset=?
    }
    \sstparameters{
       \sstsubsection{
@@ -7890,6 +7951,32 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          described in the notes section.
          [CCDPACK\_SETUP.DAT]
       }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         This parameter determines whether CCDPACK Set header information
+         will be used when it is available.  Most of the CCDPACK 
+         reduction and registration programs will look for Set header
+         information in the .MORE.CCDPACK extension of the NDFs they
+         are processing, and if it exists it will be used to modify
+         the way the processing is done: broadly speaking, reduction 
+         programs will group corresponding members of different Sets
+         together before processing, and registration programs will
+         make use of a CCD\_SET frame for alignment between members
+         of the same Set.
+
+         This header information will only be present if it has been
+         added (to the image itself or to one earlier in the reduction 
+         chain from which it was produced) by running the \xroutine{MAKESET}
+         program.  If it is not present, the programs will behave
+         as if USESET was false anyway, so it is normally quite safe
+         for USESET to be TRUE.  However, in some cases (especially
+         if intermediate files are stored in foreign, i.e. non-NDF 
+         data formats) it may be more efficient to set this parameter
+         false.  You should also set it false if you wanted CCDPACK
+         programs to ignore existing Set information for some reason.
+         [TRUE]
+      }
    }
    \sstnotes{
       \sstitemlist{
@@ -8094,6 +8181,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          through an ASCII file. The offered default is either the last
          used master bias name or (if one exists) the name of the image
          produced by the last run of \xroutine{MAKEBIAS}.
+
+         If USESET is true and you are using bias calibration data
+         from a file, BIAS should be a group expression referring
+         to one master bias frame matching each of the Set Index
+         attributes represented in the IN list; again the name of
+         the file produced by \xroutine{MAKEBIAS} will normally be suitable.
          [Global master bias or !]
       }
       \sstsubsection{
@@ -8232,9 +8325,13 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          A list of the names of the images which contain the raw CCD
          data. Note that at present the input data must have a common
-         processing mode, i.e. use the same bias frame, have the same
-         ADC factor, readout noise etc. These values are represented
-         by the parameter values of the task.
+         processing mode, i.e. have the same ADC factor, readout noise
+         etc. These values are represented by the parameter values of 
+         the task.  The input data must also use the same master bias
+         frame except if USESET is true and the input and bias images
+         contain suitable CCDPACK Set header information, in which
+         case each input image will be processed using the bias image
+         with the corresponding Set Index attribute.
 
          The image names should be separated by commas and may include
          wildcards.
@@ -8504,6 +8601,23 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [FALSE]
       }
       \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored.
+         If USESET is true, then the BIAS parameter is 
+         taken to refer to a group of files, and each IN file will
+         be processed using a master bias image with a Set Index
+         attribute which matches its own.  An IN file with no Set
+         header is considered to match a master bias file with
+         no Set header, so USESET can safely be set true (the default)
+         when the input files contain no Set header information.
+
+         If a global value for this parameter has been set using 
+         CCDSETUP then that value will be used.
+         [TRUE]
+      }
+      \sstsubsection{
          WMODE = LITERAL (Read)
       } {
          The weighting method which is to be used when deriving means
@@ -8679,7 +8793,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
       Certain parameters (ADC, BIAS, BOUNDS, DEFERRED, DIRECTION,
       EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
-      SATURATION and SETSAT) have global values. These global values
+      SATURATION, SETSAT and USESET) have global values. These global values
       will always take precedence, except when an assignment is made on
       the command line.  In general global values may be set and reset
       using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands, however, the BIAS
@@ -8700,6 +8814,14 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
            NDF are set to ADUs or electrons depending on whether data
            expansion has occurred or not. Processing is supported for all
            HDS (non-complex) numeric types.
+
+        \sstitem
+        The MASK parameter, when it refers to an NDF, ought really to
+        be sensitive to Set header information if USESET is true.
+        This is currently not implemented because of difficulties
+        arising from the fact that MASK parameter can be interpreted
+        as an ARD file, an ARD description or an image according to
+        its value.
       }
    }
 }
@@ -10486,7 +10608,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          by commas.
       }
       \sstsubsection{
-         OVERRIDE = LOGICAL (Read)
+         OVERRIDE = \_LOGICAL (Read)
       } {
          This parameter controls whether to continue and create an
          incomplete solution. Such solutions will result when only a
@@ -10509,7 +10631,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
         [TRUE]
       }
       \sstsubsection{
-         RESTRICT = LOGICAL (Read)
+         RESTRICT = \_LOGICAL (Read)
       } {
          This parameter determines whether the Current coordinate system
          is used to restrict the choice of objects to match with each
@@ -10529,7 +10651,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [FALSE]
       }
       \sstsubsection{
-         USECOMP = LOGICAL (Read)
+         USECOMP = \_LOGICAL (Read)
       } {
          This parameter specifies whether the completeness value will
          be used to weight the number of matches between a pair, when
@@ -10540,7 +10662,32 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          [TRUE]
       }
       \sstsubsection{
-         USEWCS = LOGICAL (Read)
+         USESET = \_LOGICAL (Read)
+      } {
+         This parameter determines whether Set header information should
+         be used in the object matching.  If USESET is true, 
+         \routine{FINDOFF} will try to group position lists according to
+         the Set Name attribute of the image to which they are attached.
+         All lists coming from images which share the same (non-blank)
+         Set Name attribute, and which have a CCD\_SET coordinate frame 
+         in their WCS component, will be grouped together and treated
+         by the program as a single position list.  Thus no attempt
+         is made to match objects between members of the same Set;
+         it is assumed that the relative alignment within a Set 
+         is already known and has been fixed.
+
+         If USESET is false, all Set header information is ignored.
+         If NDFNAMES is false, USESET will be ignored.  If the input 
+         images have no Set headers, or if they have no CCD\_SET frame 
+         in their WCS components, the setting of USESET will make
+         no difference.
+
+         If a global value for this parameter has been set using 
+         CCDSETUP then that value will be used. 
+         [TRUE]
+      }
+      \sstsubsection{
+         USEWCS = \_LOGICAL (Read)
       } {
          This parameter specifies whether the coordinates in the
          position lists should be transformed from Pixel coordinates
@@ -10761,7 +10908,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       behaviour of the application may be restored by using the RESET
       keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+      Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line.  Global values may
       be set and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
@@ -10786,9 +10933,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          Name of the image which contains the normalised (mean of one)
          flatfield data. This should have been produced by a program
          such as \xroutine{MAKEFLAT}. The data should have a floating point
-         data type (\_REAL or \_DOUBLE).
-         The name of this file may be specified using indirection
-         through a file.
+         data type (\_REAL or \_DOUBLE).    If USESET is true, FLAT should
+         be a group expression referring to one flatfield data file
+         matching each of the Set Index attributes represented in the 
+         IN list; again the name of the file produced by \routine{MAKEFLAT} will  
+         normally be suitable.  The name of this file may be specified
+         using indirection through a file. 
          [Global flatfield]
       }
       \sstsubsection{
@@ -10928,6 +11078,23 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          Title for the output images.
          [Output from FLATCOR]
       }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored. 
+         If USESET is true, then the FLAT parameter is taken to 
+         refer to a group of files, and each IN file will be processed
+         using a flatfield dataset with a Set Index attribute which 
+         matches its own.  An IN file with no Set header is considered
+         to match a FLAT file with no Set header, so USESET can safely
+         be set true (the default) when the input files contain no 
+         Set header information.
+
+         If a global value for this parameter has been set using 
+         CCDSETUP then that value will be used. 
+         [TRUE]
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -10994,7 +11161,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       The intrinsic default behaviour of the application may be
       restored by using the RESET keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE, PRESERVE and FLAT) have
+      Certain parameters (LOGTO, LOGFILE, PRESERVE, FLAT and USESET) have
       global values. These global values will always take precedence,
       except when an assignment is made on the command line.  In general
       global values may be set and reset using the \xroutine{CCDSETUP} and
@@ -11829,8 +11996,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          OUT = LITERAL (Read)
       } {
          Name of the output image. This has the master bias frame and
-         the estimated variances. This name may be specified using
-         indirection through a file.
+         the estimated variances.  If USESET is true and multiple Sets
+         are represented in the IN list, then this name will be used
+         as the name of an HDS container file containing one NDF structure for
+         each Set Index value.  
+         This name may be specified using indirection through a file.
       }
       \sstsubsection{
          PRESERVE = \_LOGICAL (Read)
@@ -11898,6 +12068,25 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          Values obtained from the CCDPACK extension are identified in
          the output log by the presence of a trailing asterisk ($*$).
          [FALSE]
+      }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored.
+         If USESET is true, then input files will be considered in
+         groups; a separate master bias frame will be constructed for
+         each group of corresponding input frames (i.e. those sharing
+         the same Set Index attribute).  If this results in multiple
+         output master bias frames, they will be written as separate
+         NDFs into a single HDS container file.  If no Set header
+         information is present in the input files, then all the
+         input files are combined together to form the master bias, 
+         so USESET can usually be safely set to TRUE (the default).
+
+         If a global value for this parameter has been set using 
+         CCDSETUP then that value will be used. 
+         [TRUE]
       }
       \sstsubsection{
          ZERO = \_LOGICAL (Read)
@@ -11970,7 +12159,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       The intrinsic default behaviour of the application may be
       restored by using the RESET keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE)
+      Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE and USESET)
       have global values. These global values will always take
       precedence, except when an assignment is made on the command line.
       Global values may be set and reset using the \xroutine{CCDSETUP} and
@@ -12199,6 +12388,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       } {
          Name of the output image to contain the calibration data.
          Note this image will have a type of at least \_REAL.
+         If USESET is true and multiple Sets are represented in the IN
+         list then this name will be used as the name of an HDS
+         container file containing one NDF structure for each Set Index value.
+         This name may be specified using indirection through a file.
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -12226,6 +12419,25 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          affects the output image frame type which will be set to
          \qt{MASTER\_FLASH} or \qt{MASTER\_DARK} or \qt{MASTER\_?}.
          [NONE]
+      }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored.
+         If USESET is true, then input files will be considered in
+         groups; a separate calibration frame will be constructed 
+         for each group of corresponding input frames (i.e. those
+         sharing the same Set Index attribute).  If this results in 
+         multiple output calibration files, they will be written as 
+         separate NDF structures into a single HDS container file.
+         If no Set header information is present in the input files, 
+         then calibration is done on all the input files together,
+         so USESET can usually be safely set to TRUE (the default).
+
+         If a global value for this parameter has been set using 
+         \xroutine{CCDSETUP} then that value will be used.
+         [TRUE]
       }
       \sstsubsection{
          USEEXT = \_LOGICAL (Read)
@@ -12302,7 +12514,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       The intrinsic default behaviour of the application may be
       restored by using the RESET keyword on the command line.
 
-      Certain parameters (LOGTO and LOGFILE) have global values. These
+      Certain parameters (LOGTO, LOGFILE and USESET) have global values. These
       global values will always take precedence, except when an
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
@@ -12556,8 +12768,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          OUT = LITERAL (Write)
       } {
          Name of an image to contain the output flatfield data. Note this
-         image will have a precision of at least \_REAL. This name may be
-         specified using indirection through a file.
+         image will have a precision of at least \_REAL. 
+         If USESET is true and multiple Sets are represented in the IN
+         list then this name will be used as the name of an HDS 
+         container file containing one NDF structure for each Set Index value.
+         This name may be specified using indirection through a file.
+         [TRUE]
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -12569,6 +12785,25 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \qt{CLIPMED} this value is the pixel variance if one exists,
          otherwise one is etimated from the population of values.
          [4.0]
+      }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         Whether to use Set header information or not.  If USESET is
+         false then any Set header information will be ignored.
+         If USESET is true, then input files will be considered in
+         groups; a separate flatfield will be constructed for each
+         group of corresponding input frames (i.e. those sharing 
+         the same Set Index attribute).  If this results in multiple
+         output flatfields, they will be written as separate NDF structures into
+         a single HDS container file.  If no Set header information 
+         is present in the input files, then flatfielding is done  
+         on all the input files together, so USESET can usually be 
+         safely set to TRUE (the default).
+
+         If a global value for this parameter has been set using 
+         \xroutine{CCDSETUP} then that value will be used. 
+         [TRUE]
       }
       \sstsubsection{
          USEVAR = \_LOGICAL (Read)
@@ -12664,7 +12899,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       The intrinsic default behaviour of the application may be
       restored by using the RESET keyword on the command line.
 
-      Certain parameters (LOGTO and LOGFILE) have global values. These
+      Certain parameters (LOGTO, LOGFILE and USESET) have global values. These
       global values will always take precedence, except when an
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
@@ -15337,6 +15572,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
                6 -- self defined function
 
          }
+         If more than two position lists are provided, then only the 
+         values 1--5 may be used. 
          [5]
       }
       \sstsubsection{
@@ -15525,6 +15762,34 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
         specified in coordinates with a higher accuracy or smaller
         units.
         [0.001]
+      }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         This parameter determines whether Set header information should
+         be used in the registration.  If USESET is true, then
+         \routine{REGISTER} will try to group position lists according to
+         the Set Name attribute of the images to which they are attached.
+         All lists coming from images which share the same (non-blank)
+         Set Name attribute, and which have a CCD\_SET coordinate 
+         frame in their WCS component, will be grouped together and
+         treated by the program as a single position list.  Images
+         which have no associated position list but are in the same
+         Set as ones which are successfully registered will have
+         a suitable registration frame added too, based on their 
+         Set alignment relation to the registered Set member.
+         Thus the assumption is made that the relative alignment of 
+         images within a Set is already known and has been fixed.
+
+         If USESET is false, all Set header information is ignored.
+         If NDFNAMES is false, USESET will be ignored.  If the input 
+         images have no Set headers, or if they have no CCD\_SET frame 
+         in their WCS components, the setting of USESET will make
+         no difference.
+
+         If a global value for this parameter has been set using
+         \xroutine{CCDSETUP} then that value will be used.
+         [TRUE]
       }
       \sstsubsection{
          USEWCS = \_LOGICAL (Read)
@@ -15777,7 +16042,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       default behaviour of the application may be restored by using the
       RESET keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+      Certain parameters (LOGTO, LOGFILE, NDFNAMES and USESET) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line.  Global values may
       be set and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
@@ -17591,10 +17856,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       \xroutine{TRANNDF} applications can then be used on the resulting images.
 
       This can be of use when different kinds of alignment information
-      are available between different members of a set of images.  By
+      are available between different members of a group of images.  By
       supplying an ordered list of coordinate systems within which to
       align, the best alignment available can be made between
-      different  members of the set, falling back on second or third
+      different  members of the group, falling back on second or third
       choices of alignment types where first choices are not
       available.
 
@@ -17620,6 +17885,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       there is more than one which meets this criterion, one which
       uses domains near the head of the list is preferred.
 
+      If the USESET parameter is true, then \routine{WCSREG} will take account
+      of alignment information stored in the CCDPACK Set header;
+      this means that the alignment implied when images were 
+      previously grouped into a Set can be guaranteed to be retained.
+
       If the graph is not fully connected, a list of the existing
       subgraphs is output, and the program will normally terminate,
       however it can be made to continue with registration of the
@@ -17636,7 +17906,24 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          of preference for achieving alignment.  Alignment paths
          between images are selected by shortness of path, but in case
          of a tie, those using domains nearest the start of this list
-         are used by preference.
+         are used by preference.  You should not normally include the
+         CCD\_SET domain in this list; for details of how this domain
+         is treated specially, see the USESET parameter.
+
+         Note that this parameter is an array of strings, so that either
+         the whole list should be surrounded by square brackets, or
+         each element should be surrounded by double quotes.  The
+         whole thing may need to be protected from the Unix shell
+         by using, e.g., single quotes.
+
+         Supplying the null value (!) is equivalent to specifying the
+         current domain of the reference image.  The effect of this
+         is to retain the alignment already given by the Current
+         coordinates of each image, but to ensure that the pixels
+         are aligned with the pixels of the reference image.
+         This will result in the images being aligned in a coordinate
+         system suitable for resampling with \xroutine{TRANNDF}.
+         [!]
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -17693,6 +17980,15 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [BOTH]
       }
       \sstsubsection{
+         NAMELIST = LITERAL (Read)
+      } {
+         The name of an output file in which to record all the images
+         to which new coordinate systems were successfully added.
+         This may not be the same as the IN list if OVERRIDE is set
+         true.
+         [wcsreg.lis]
+      }
+      \sstsubsection{
          OUTDOMAIN = LITERAL (Read)
       } {
          This gives the lable of the new coordinate system to be attached
@@ -17713,6 +18009,10 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          insert new frames in those images which can be reached from the
          one indicated by REFPOS, making no change to the others, except
          to remove any frames in the domain OUTDOMAIN which already exist.
+
+         The NAMELIST parameter can be used to record which images were
+         successfully registered when OVERRIDE is true (if OVERRIDE is
+         false, then it will be the same as IN unless the program fails).
          [FALSE]
       }
       \sstsubsection{ 
@@ -17726,6 +18026,23 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          when they both have frames in the same one of the entries in
          the DOMAINS list.
          [1]
+      }
+      \sstsubsection{
+         USESET = \_LOGICAL (Read)
+      } {
+         This parameter governs whether Set-based alignment 
+         information in the images, if it exists, should be used. 
+         If it is set to true, then coordinate frames with the 
+         domain CCD\_SET will take precedence over all the ones named 
+         in the DOMAINS parameter.  In this case, if two of the images
+         both have a CCD\_SET coordinate frame and also share the
+         same Set Name attribute, the connection will be made in
+         CCD\_SET frame.  If no CCD\_SET frames are present, this
+         parameter has no effect.
+
+         If a global value for this parameter has been set using 
+         \xroutine{CCDSETUP} then that value will be used.
+         [TRUE]
       }
    }
    \sstexamples{
@@ -17763,17 +18080,19 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          used for the new domain added to the WCS component.
       }
       \sstexamplesubsection{
-         wcsreg {\tt "}skyfr1,skyfr2,skyfr3,skyfr4{\tt "} refpos=2 [sky]
+         wcsreg {\tt "}skyfr1,skyfr2,skyfr3,skyfr4{\tt "} refpos=2 domains=!
       }{
          Here wcsreg is being used with a somewhat different intent.
-         The images named are already fully aligned in  SKY
+         The images named are already fully aligned in their Current
          coordinates, but executing this command has the effect of
          aligning them in a new coordinate system which is a copy of
          the pixel coordinate system of {\tt '}skyfr2{\tt '}.  Since this has
          units which are the size of pixels, the resulting image files
-         are suitable for resampling using TRANNDF.  This would not
-         have been the case for the files initially, since the SKY
-         coordinates have units of radians.
+         are suitable for resampling using \xroutine{TRANNDF}.  Supposing that
+         they were originally aligned in SKY coordinates they could
+         not have been resampled by \routine{TRANNDF} in their initial state,
+         since the SKY coordinates have units of radians, which 
+         are much too large compared to pixels.
       }
    }
    \sstdiytopic{
@@ -17791,7 +18110,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       behaviour of the application may be restored by using the RESET
       keyword on the command line.
 
-      Certain parameters (LOGTO, LOGFILE and NDFNAMES) have global
+      Certain parameters (LOGTO, LOGFILE and USESET) have global
       values. These global values will always take precedence, except
       when an assignment is made on the command line.  Global values may
       be set and reset using the \xroutine{CCDSETUP} and
