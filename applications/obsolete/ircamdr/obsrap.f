@@ -56,6 +56,8 @@
       INCLUDE  'NDF_PAR'          
       INCLUDE  'NDF_ERR'          
 
+      EXTERNAL INDEX              ! so as not to confuse with the intrinsic
+
       INTEGER  STATUS             ! global status parameter
 
       CHARACTER*(PAR__SZNAM) NAME        ! action name
