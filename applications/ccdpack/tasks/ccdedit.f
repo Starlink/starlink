@@ -108,6 +108,16 @@
 *        The value of this parameter is used to classify the
 *        transformation (see the CLASS parameter).
 *        [5]
+*     FIXWCS = _LOGICAL (Read)
+*        If MODE="ERASE" and NAME="SET", then this parameter indicates
+*        whether the CCD_SET coordinate frame should be removed from
+*        the World Coordinate System etension of the NDF as well.
+*        Since CCD_SET coordinates are usually a copy of another
+*        coordinate system, and mainly intended for Set-related 
+*        registration, it is usually sensible to erase this coordinate
+*        frame when the rest of the Set header information has
+*        been erased.
+*        [TRUE]
 *     IN = NDF (Read)
 *        A list specifying the names of the NDFs whose CCDPACK
 *        extensions are to be modified. The NDF names should be
@@ -178,7 +188,10 @@
 *     NAME = LITERAL (Read)
 *        If MODE = "ERASE" is chosen then the value of this parameter
 *        names the CCDPACK extension item of the input NDFs which is to
-*        be erased. Typical items are "CURRENT_LIST" and "TRANSFORM".
+*        be erased. Typical items are "CURRENT_LIST", "TRANSFORM" and
+*        "SET".  If "SET" is used, then the FIXWCS parameter will be
+*        used to decide whether to remove any CCD_SET-domain frames
+*        from the WCS component.
 *     PA-PZ = _DOUBLE (Read)
 *        These parameters supply the values of constants used in the
 *        expressions XFOR, YFOR, XINV and YINV. Using parameters allows
@@ -330,6 +343,11 @@
 *        In this example the TRANSFORM structure in the CCDPACK
 *        extension of the NDF ndf_with_bad_transform is removed.
 *
+*     ccdedit mode=erase fixwcs=yes in='*' 
+*        All Set header information, and any CCD_SET coordinate
+*        frames which are associated with it, will be removed from
+*        the NDFs in the current directory.
+*
 *     ccdedit mode=invert in='*'
 *        In this example all the NDFs in the current directory have
 *        their transforms inverted.
@@ -375,9 +393,9 @@
 *        defaulted to 3.14159265359D0.
 
 *  Notes:
-*     -  NDF extension items.
-*        All NDF extension items dealt with by this routine are in the
-*        structure .MORE.CCDPACK.
+*     - NDF extension items.
+*       All NDF extension items dealt with by this routine are in the
+*       structure .MORE.CCDPACK.
 *
 *     - When using the MODE=ALIST option the item CURRENT_LIST in the
 *       CCDPACK extension of the input NDFs is set to the name of the
@@ -390,6 +408,9 @@
 *       XXX.MORE.CCDPACK has been removed.
 *
 *     - Transforms are stored in the item .MORE.CCDPACK.TRANSFORM .
+*
+*     - If MODE=ERASE, NAME=SET and FIXWCS=TRUE, the WCS component
+*       of the NDF may also be modified.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
@@ -423,6 +444,9 @@
 *        Sorted locator changes related to foreign data access.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     26-FEB-2001 (MBT):
+*        Upgraded for use with Sets; also replaced NDF_MSG calls
+*        by GRP_GET/MSG_SETC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -440,6 +464,8 @@
       INCLUDE 'FIO_PAR'          ! FIO parameterisations
       INCLUDE 'TRN_PAR'          ! Transform parameters
       INCLUDE 'PAR_ERR'          ! Parameter system errors
+      INCLUDE 'AST_PAR'          ! AST system constants
+      INCLUDE 'GRP_PAR'          ! GRP system constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -455,11 +481,14 @@
       CHARACTER * ( DAT__SZLOC ) LOCTRI ! Locator to input transform structure
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of component
       CHARACTER * ( FIO__SZFNM ) FNAME ! Input list filename
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! NDF name
       DOUBLE PRECISION TR( 6 )   ! Linear transformation coefficiencts
       INTEGER FIOGRP             ! FIO group identifier
       INTEGER I                  ! Loop variable
       INTEGER IDIN               ! Input NDF identifier
       INTEGER IFIT               ! Linear transformation fittype (1-5)
+      INTEGER JSET               ! Frame index of CCD_SET coordinate frame
+      INTEGER IWCS               ! AST pointer to WCS frameset
       INTEGER NDFGRP             ! NDF group identifier
       INTEGER NLIST              ! Number of input lists
       INTEGER NNDF               ! Number of input NDFs
@@ -470,6 +499,7 @@
       LOGICAL EXISTS             ! Component exists
       LOGICAL HAVCLS             ! Have classification
       LOGICAL HAVFIO             ! Have an FIO group      
+      LOGICAL RMSET              ! Remove Set info from WCS component?
 *.
 
 *  Check inherited global status.
@@ -560,6 +590,7 @@
 
 *  Access NDF.
             CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL GRP_GET( NDFGRP, I, 1, NDFNAM, STATUS )
 
 *  Get the position list name.
             IF ( NLIST .NE. 1 .OR. I .EQ. 1 ) THEN
@@ -570,7 +601,7 @@
             CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
 
 *  Tell user.
-            CALL NDF_MSG( 'NDF', IDIN )
+            CALL MSG_SETC( 'NDF', NDFNAM )
             CALL MSG_SETC( 'LIST', FNAME )
             CALL CCD1_MSG( ' ', '  Associated ^LIST with NDF ^NDF',
      :                     STATUS )
@@ -595,6 +626,12 @@
 *  item.
          CALL PAR_GET0C( 'NAME', NAME, STATUS )
          CALL CHR_UCASE( NAME )
+
+*  If it is SET, see whether we should erase CCD_SET frames.
+         RMSET = .FALSE.
+         IF ( NAME .EQ. 'SET' ) THEN
+            CALL PAR_GET0L( 'FIXWCS', RMSET, STATUS )
+         END IF
          CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Open the NDFs and look for the item. If not found then just comment
@@ -603,6 +640,7 @@
 
 *  Access NDF.
             CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL GRP_GET( NDFGRP, I, 1, NDFNAM, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -615,17 +653,44 @@
                CALL DAT_ERASE( LOCEXT, NAME, STATUS )
 
 *  Tell user that we have erased it.
-               CALL NDF_MSG( 'NDF', IDIN )
+               CALL MSG_SETC( 'NDF', NDFNAM )
                CALL MSG_SETC( 'COMP', NAME )
                CALL CCD1_MSG( ' ', '  Erased component ^COMP from'//
      :         ' CCDPACK extension of NDF ^NDF', STATUS )
             ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Or not.
-               CALL NDF_MSG( 'NDF', IDIN )
+               CALL MSG_SETC( 'NDF', NDFNAM )
                CALL MSG_SETC( 'COMP', NAME )
                CALL CCD1_MSG( ' ',
      :'  Could not erase component ^COMP in NDF ^NDF', STATUS )
+            END IF
+
+*  Remove any CCD_SET frames from the NDF if so requested.
+            IF ( STATUS .EQ. SAI__OK .AND. RMSET ) THEN
+
+*  Locate a CCD_SET frame.
+               CALL CCD1_GTWCS( IDIN, IWCS, STATUS )
+               CALL CCD1_FRDM( IWCS, 'CCD_SET', JSET, STATUS )
+
+*  Erase it and inform the user.
+               IF ( JSET .NE. AST__NOFRAME ) THEN
+                  CALL CCD1_DMPRG( IWCS, 'CCD_SET', .FALSE.,
+     :                             AST__NOFRAME, STATUS )
+                  CALL NDF_PTWCS( IWCS, IDIN, STATUS )
+                  CALL MSG_SETC( 'NDF', NDFNAM )
+                  CALL CCD1_MSG( ' ', '  Removed CCD_SET frame(s)'//
+     :            ' from WCS component of NDF ^NDF', STATUS )
+
+*  Or inform the user that there is none.
+               ELSE
+                  CALL MSG_SETC( 'NDF', NDFNAM )
+                  CALL CCD1_MSG( ' ', '  No CCD_SET frame to erase '//
+     :            ' in WCS component of NDF ^NDF', STATUS )
+               END IF
+
+*  Release the frameset.
+               CALL AST_ANNUL( IWCS, STATUS )
             END IF
 
 *  Close the NDF.
@@ -759,6 +824,7 @@
 
 *  Access NDF.
             CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL GRP_GET( NDFGRP, I, 1, NDFNAM, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -808,7 +874,7 @@
             END IF
 
 *  Comment on NDF modified.
-            CALL NDF_MSG( 'NDF', IDIN )
+            CALL MSG_SETC( 'NDF', NDFNAM )
             CALL CCD1_MSG( ' ',
      :'  Transform structure added to NDF ^NDF', STATUS )
 
@@ -841,6 +907,7 @@
 
 *  Access NDF.
             CALL NDG_NDFAS( NDFGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL GRP_GET( NDFGRP, I, 1, NDFNAM, STATUS )
 
 *  Get the NDF CCDPACK extension.
             CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', LOCEXT, STATUS )
@@ -855,13 +922,13 @@
                CALL DAT_ANNUL( LOCTR, STATUS )
 
 *  Comment on NDF modified.
-               CALL NDF_MSG( 'NDF', IDIN )
+               CALL MSG_SETC( 'NDF', NDFNAM )
                CALL CCD1_MSG( ' ', '  Inverted transform in NDF ^NDF',
      :                        STATUS )
             ELSE
 
 *  Cannot locate transformation structure in this NDF.
-               CALL NDF_MSG( 'NDF', IDIN )
+               CALL MSG_SETC( 'NDF', NDFNAM )
                CALL CCD1_MSG( ' ', '  Cannot invert transformation'//
      :         ' in NDF ^NDF (none present)', STATUS ) 
             END IF
