@@ -247,6 +247,10 @@
    
          END DO
 
+*  If the linear mappings are not allowed, we do not yet have an estimate
+*  of the distance per pixel.
+      ELSE 
+         DPP = AST__BAD
       END IF
 
 *  Arrive here if an error occurs, or the Mapping is non-linear.

@@ -176,22 +176,27 @@
 
 *  Find the next non-blank character in ELEM. This should be the opening
 *  parenthesis which marks the start of the argument list.
-         CC = ELEM( I : I )
-         DO WHILE( CC .EQ. ' ' .AND. I .LT. L ) 
-            I = I + 1
+         IF( I .LT. L ) THEN
             CC = ELEM( I : I )
-         END DO
+            DO WHILE( CC .EQ. ' ' .AND. I .LT. L ) 
+               I = I + 1
+               CC = ELEM( I : I )
+            END DO
+         ELSE
+            CC = '?'
+         END IF
 
 *  Increment the index of the next character to be checked so that it
 *  refers to the first character after the opening parenthesis.
          I = I + 1
 
-*  If the next non-blank character is an opening parenthesis, indicate
-*  that the argument list has been started by setting the number of
-*  arguments read so far to zero. Report an error if the current
-*  keyword should not have an argument list.
+*  Indicate that the argument list has been started by setting the number of
+*  arguments read so far to zero. 
+         NARG = 0
+
+*  If the next non-blank character is an opening parenthesis, report an error 
+*  if the current keyword should not have an argument list.
          IF( CC .EQ. '(' ) THEN
-            NARG = 0
 
             IF( CMN_KWARG( TYPE ) .EQ. 0 ) THEN
                STATUS = ARD__ARGS
@@ -203,7 +208,6 @@
 *  unless the keyword should not have an argument list (in which case 
 *  decrement the index of the next character to be checked so that the
 *  current character can be included as part of the next field).
-
          ELSE IF( CC .NE. ' ' ) THEN
             IF( CMN_KWARG( TYPE ) .EQ. 0 ) THEN
                KEYW = .FALSE.
@@ -278,6 +282,9 @@
             CALL ARD1_FRAAR( NDIM, CFRM, ELEM, L, IPOPND, IOPND, SZOPND,
      :                    NARG, I, KEYW, STATUS )
 
+*  If the operand requires no keywords, the argument list is complete.
+         ELSE
+             KEYW = .FALSE.
          END IF
 
 *  If the argument list is complete, store the number of values added

@@ -253,10 +253,29 @@
 
                IF( ( STAT .OR. KEYW ) .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Do not report an error if the keyword or statement does not need an
-*  argument list and no argument list has been started.
-                  IF( ( ( NOARGS.AND.NARG.GE.0 ) .OR. .NOT. NOARGS ) 
-     :                .AND. STATUS .EQ. SAI__OK ) THEN 
+
+*  If we have just finished a keyword or statement which needs no
+*  arguments, we do not report an error ...
+                  IF( NOARGS .AND. NARG .LT. 1 ) THEN
+
+*  For a keyword, complete the entry in the operands stack. Call
+*  ARD1_KEYW twice; the first time initializes things, the second one
+*  completes things.
+                     IF( KEYW ) THEN
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, 
+     :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
+     :                                  IOPND, PNARG, SZOPND, NARG, I, 
+     :                                  KEYW, STATUS )
+                        CALL ARD1_KEYW( TYPE, NEEDIM, NDIM, IWCS, 
+     :                                  WCSDAT, ELEM, L, CFRM, IPOPND, 
+     :                                  IOPND, PNARG, SZOPND, NARG, I, 
+     :                                  KEYW, STATUS )
+                     END IF
+
+*  Report an error if the keyword or statement need an argument list and 
+*  no argument list has been started, or if it does not need an argument
+*  list and an argument list has been provided.
+                  ELSE
                      STATUS = ARD__ARGS
                      CALL MSG_SETC( 'DESC', ELEM )
                      CALL ERR_REP( 'ARD1_ADANL_ERR1', 'Missing or '//
