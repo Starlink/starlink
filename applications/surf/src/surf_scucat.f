@@ -103,6 +103,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.25  1999/07/14 04:50:46  timj
+*     Correct type of ADDED variable
+*
 *     Revision 1.24  1999/05/15 01:48:42  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -224,7 +227,7 @@ c
 
 *     Local variables:
       CHARACTER*80  AXLABEL     ! Axis label
-      LOGICAL       ADDED       ! Did we add members to the group
+      INTEGER       ADDED       ! Number added to group this time
       BYTE          BADBIT      ! Bad bit mask
       CHARACTER*3   BOL(MAXCMP) ! Name of bolometers present in NDF
       INTEGER      BOL_INDEX(MAXCMP) ! Which entry in BOLUSED is the current bol
