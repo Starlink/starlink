@@ -14142,6 +14142,39 @@ plot (101k).
          {\tt "dscf"} prefix.
       }
       \sstsubsection{
+         ENCODINGS = LITERAL (Read)
+      }{
+         Determines which FITS keywords should be used to define the
+         world co-ordinate systems to be stored in the NDF's WCS
+         component. The allowed values (case-insensitive) are:
+         \ssthitemlist{
+
+         \sstitem
+            {\tt "FITS-WCS"} --- This uses keywords CRVAL\textit{i}, 
+            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc.},
+            as described in the (draft) FITS world co-ordinate system paper 
+            by E.W.Greisen and M.Calabretta (A \& A, in preparation).
+
+         \sstitem
+            {\tt "DSS"} --- This is the system used by the Digital Sky Survey,
+            and uses keywords AMDX\textit{n}, AMDY\textit{n}, PLTRAH, 
+            \emph{etc}.
+
+         \sstitem
+            {\tt "Native"} --- This is the native system used by the AST 
+            library (see 
+            \xref{SUN/210}{sun210}{}), and is the most general. The others are 
+            limited in the co-ordinate systems they can describe, and may 
+            thus not fully describe the NDF's WCS component.
+         }
+         A comma-separated list of up to three values may be supplied, in
+         which case the value actually used is in the first in the list
+         for which corresponding keywords can be found in the FITS header.
+         If a null parameter value (!) is supplied, the encoding
+         is chosen automatically on the basis of the available headers. 
+         {\tt [!]}
+     }
+      \sstsubsection{
          FILES() = LITERAL (Read)
       }{
          A list of (optionally wild-carded) file specifications which
@@ -14892,6 +14925,39 @@ plot (101k).
          of the catalogue, as written in the FITS header, with a
          {\tt "dscf"} prefix.
       }
+      \sstsubsection{
+         ENCODINGS = LITERAL (Read)
+      }{
+         Determines which FITS keywords should be used to define the
+         world co-ordinate systems to be stored in the NDF's WCS
+         component. The allowed values (case-insensitive) are:
+         \ssthitemlist{
+
+         \sstitem
+            {\tt "FITS-WCS"} --- This uses keywords CRVAL\textit{i}, 
+            CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc.},
+            as described in the (draft) FITS world co-ordinate system paper 
+            by E.W.Greisen and M.Calabretta (A \& A, in preparation).
+
+         \sstitem
+            {\tt "DSS"} --- This is the system used by the Digital Sky Survey,
+            and uses keywords AMDX\textit{n}, AMDY\textit{n}, PLTRAH, 
+            \emph{etc}.
+
+         \sstitem
+            {\tt "Native"} --- This is the native system used by the AST 
+            library (see 
+            \xref{SUN/210}{sun210}{}), and is the most general. The others are 
+            limited in the co-ordinate systems they can describe, and may 
+            thus not fully describe the NDF's WCS component.
+         }
+         A comma-separated list of up to three values may be supplied, in
+         which case the value actually used is in the first in the list
+         for which corresponding keywords can be found in the FITS header.
+         If a null parameter value (!) is supplied, the encoding
+         is chosen automatically on the basis of the available headers. 
+         {\tt [!]}
+     }
       \sstsubsection{
          FILES()  = \_CHAR (Read)
       }{
@@ -35449,6 +35515,20 @@ withdrawn, two to enable {\footnotesize KAPPA} to be NAG-free.
 \end{htmlonly}
 
 \section{Release Notes---V0.12}
+V0.12 introduces limited support for the NDF WCS component which allows
+descriptions of world coordinate systems to be stored within NDF data
+structures. Currently, this support only includes:
+
+\begin{itemize}
+\item the creation of WCS components by FITSIN and FITSDIN, on the basis of
+appropriate keywords supplied in the FITS files.
+\item the propagation of WCS components when new NDFs are created based 
+on existing NDFs. 
+\end{itemize}
+
+The applications affected by these changes are included in the list of
+modified applications below.
+
 \subsection{Modified applications}
 \begin{itemize}
   \item \htmlref{DISPLAY}{DISPLAY} changed to avoid a spurious error
@@ -35464,7 +35544,13 @@ division by zero which occurred if the variance array contained any isolated
 zeros.
   \item \htmlref{FITSEDIT}{FITSEDIT} now creates a new FITS extension if
 the specified NDF does not already contain a FITS extension.
-  \item \htmlref{LINPLOT}{LINOPLOT} changed to avoid spurious clearing of
+  \item \htmlref{FITSIN}{FITSIN} now creates an NDF WCS component (if
+possible) storing a description of any world coordinate systems defined
+in the FITS headers.
+  \item \htmlref{FITSDIN}{FITSDIN} now creates an NDF WCS component (if
+possible) storing a description of any world coordinate systems defined
+in the FITS headers.
+  \item \htmlref{LINPLOT}{LINPLOT} changed to avoid spurious clearing of
 X displays when using two or more GWM windows under ICL.
   \item \htmlref{PARGET}{PARGET} bug fixed which caused the application
 to terminate if the specified parameter is an array with only a single

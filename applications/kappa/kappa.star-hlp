@@ -3422,8 +3422,17 @@ KAPPA applications from IRAF CL.  For general advice on running
 Starlink applications from IRAF, see SUN/217.
 
 2 V0.12
-No new features or applications have been introduced with V0.12, which
-is mainly a bug-fix release. The following modifications have been made:
+V0.12 introduces limited support for the NDF WCS component which allows
+descriptions of world coordinate systems to be stored within NDF data
+structures. Currently, this support only includes:
+
+ o  the creation of WCS components by FITSIN and FITSDIN, on the basis of
+    appropriate keywords supplied in the FITS files.
+
+ o  the propagation of WCS components when new NDFs are created based 
+    on existing NDFs. 
+
+The applications affected by these, and any other, changes are:
 
   o  DISPLAY changed to avoid a spurious error previously reported if 
      double precision data is displayed which requires compression to fit 
@@ -3438,6 +3447,10 @@ is mainly a bug-fix release. The following modifications have been made:
   o  FILLBAD now ignores any input VARIANCE component if all the variances 
      are bad or zero. Also added protection against division by zero which 
      occurred if the variance array contained any isolated zeros.
+
+  o  FITSIN and FITSDIN now create an NDF WCS component (if possible) 
+     storing a description of any world coordinate systems defined in 
+     the FITS headers.
 
   o  FITSEDIT now creates a new FITS extension if the specified NDF does 
      not already contain a FITS extension.
