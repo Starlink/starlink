@@ -19,6 +19,7 @@ proc buildP4Widgets2 w {
 # Create the gwm widget with scroll bars
     global gwm
     set gwm [gwm_gwmWithScroll $w.frame -gwmname $env(PID)xwin]
+    $gwm configure -crosscolour #FF00FF
     bind $gwm <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4GwmBox1.html"
 
 # Create and pack a frame for the control buttons
