@@ -1531,17 +1531,13 @@
 
 *  Get default WCS component (just GRID, PIXEL, AXIS) for the output NDF.
                 CALL CCD1_GTWCS( IDOUT, OWCS, STATUS )
+                CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
     
 *  Remove GRID, PIXEL, AXIS frames from original frameset since they're
 *  out of date now...
-*
-*  Uses CCD1_DMSPRG rather than CCD1_DMPRG to purge the domain since
-*  the later prints annoying status messages. These routines could be
-*  combined fairly simply if needed.
-                CALL AST_SETI( IWCS, 'Current', CFRAME, STATUS )
-                CALL CCD1_DMSPRG( IWCS, 'PIXEL', 0, STATUS )
-                CALL CCD1_DMSPRG( IWCS, 'AXIS', 0, STATUS )
-                CALL CCD1_DMSPRG( IWCS, 'GRID', 0, STATUS )
+                CALL CCD1_DMPRG( IWCS, 'PIXEL', .FALSE., 0, STATUS )
+                CALL CCD1_DMPRG( IWCS, 'AXIS', .FALSE., 0, STATUS )
+                CALL CCD1_DMPRG( IWCS, 'GRID', .FALSE., 0, STATUS )
     
 *  We now just have the non-automatic frames of the input WCS component.
 *  This will contain the Current frame (which may or may not be CCD_REG)
