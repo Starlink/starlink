@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include "f77.h"
@@ -33,6 +34,7 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -40,6 +42,8 @@ F77_SUBROUTINE(kps1_luted)( CHARACTER(CMD), INTEGER(STATUS)
 *        Original version.
 *     3-JUL-2002 (DSB):
 *        Replaced use of tmpnam with mkstemp.
+*     3-SEP-2004 (TIMJ):
+*        Now -Wall clean
 *     {enter_changes_here}
 
 *  Bugs:
@@ -220,7 +224,7 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
    ret = NULL;
 
 /* Check the inherited status. */
-   if( *STATUS != SAI__OK ) return;
+   if( *STATUS != SAI__OK ) return ret;
 
 /* Find the length excluding any trailing spaces. */
    len = len - 1;
