@@ -2,6 +2,9 @@
   Added IRAF compatibility libs for Linux systems. Convert should now
   build on any ix86 Linux platform. 
 
+  Added FITS-AIPS++ encoding to FITS2NDF and NDF2FITS.
+
+
 1 CONVERT_Version_1.5
 
  SPECX2NDF has been revamped so that it now uses the new AST SpecFrame

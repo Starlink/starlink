@@ -326,6 +326,10 @@
 *        This encoding uses CROTAi and CDELTi keywords to describe axis
 *        rotation and scaling.
 *
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which allows
+*        the use of a wider range of celestial projections, as used by
+*        the AIPS++ project.
+*	    
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *        and uses keywords AMDXn, AMDYn, PLTRAH, etc.
 *
@@ -449,6 +453,8 @@
 *        what encoding was used in the original data to make the choice).
 *     21-AUG-2000 (DSB):
 *        Converted to use NDG to access the input NDFs.
+*     11-JUL-2004 (DSB):
+*        Added FITS-AIPS++ encoding.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -875,8 +881,8 @@
 *  Convert the "auto" string to a blank string which is recognised by the 
 *  lower level routines.
       CALL PAR_CHOIC( 'ENCODING', 'Auto', 'Auto,FITS-IRAF,FITS-WCS,'//
-     :                'FITS-PC,FITS-AIPS,DSS,NATIVE', .FALSE., ENCOD, 
-     :                STATUS )
+     :                'FITS-PC,FITS-AIPS,FITS-AIPS++,DSS,NATIVE', 
+     :                .FALSE., ENCOD, STATUS )
       IF( ENCOD .EQ. 'AUTO' ) ENCOD = ' '
 
 *  See if a NATIVE encoding of the WCS component is to be included in

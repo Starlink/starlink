@@ -102,6 +102,10 @@
 *           (amongst others), so its use will facilitate data exchange
 *           with AIPS.  This encoding uses CROTAi and CDELTi keywords to
 *           describe axis rotation and scaling.
+*
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which allows
+*           the use of a wider range of celestial projections, as used by
+*           the AIPS++ project.
 *	    
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
@@ -849,6 +853,8 @@
 *     20-FEB-2002 (DSB):
 *        Added WCSATTRS parameter, mainly to deal with non-standard CAR 
 *        projections.
+*     11-JUL-2004 (DSB):
+*        Added FITS-AIPS++ encoding.
 *     {enter_further_changes_here}
 
 
