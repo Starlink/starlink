@@ -2373,8 +2373,7 @@ be used, where this is the most-sensible action.  A further use is
 when an optional file may be created, such as a lookup table; a {\tt
 !} entered in response to the prompt for the filename means that no
 file is to be output.  Many tasks use null as a default for optional
-files. In some applications, {\it{e.g.}}\ \htmlref{CRELUT}{CRELUT}, a
-null ends an interactive loop.
+files. In some applications, a null ends an interactive loop.
 
 Responding to a prompt with {\tt !!} will abort the application.  This
 process includes the various tidying operations such as the unmapping
@@ -8624,13 +8623,14 @@ will save the full set of colour indices to the NDF.
 \label{se:mancoltab}}
 
 {\footnotesize KAPPA} provides a number of commands for adjusting a colour
-table.  \htmlref{LUTFLIP}{LUTFLIP}, \htmlref{LUTHILITE}{LUTHILITE},
+table.  \htmlref{LUTEDIT}{LUTEDIT} provides a complete
+graphical-user-interface which allows colour tables to be created or
+modified in many different ways. \htmlref{LUTFLIP}{LUTFLIP}, \htmlref{LUTHILITE}{LUTHILITE},
 \htmlref{LUTROT}{LUTROT}, \htmlref{LUTTWEAK}{LUTTWEAK} are all
 \IDIref-based.  Remember that only the colour table will be flipped;
 highlighted; rotated; stretched, or squashed, and/or have its origin
 moved.  Thus during flipping, colour index 16 will swap with $N-1$, 17
-with $N-2$ {\it etc.}\ \htmlref{CRELUT}{CRELUT} uses an enlarged
-\htmlref{palette}{se:coltab} to modify a lookup table.
+with $N-2$ {\it etc.}\ 
 
 \subsection{\xlabel{se_creluts}Creating Lookup Tables\label{se:creluts}}
 
@@ -8664,119 +8664,15 @@ and then run TRANDAT to make the NDF called collut6.
 \end{verbatim}
 \normalsize
 
-\subsubsection{\xlabel{se_runcrelut}Running CRELUT\label{se:runcrelut}}
+\subsubsection{\xlabel{se_runlutedit}Running LUTEDIT\label{se:runlutedit}}
 
-There is an interactive task called \htmlref{CRELUT}{CRELUT} for
-creating lookup tables.  Let's be honest; it's a bit dated compared
-with what is possible today with X-windows, but it works, and I still
-use it.
+There is an interactive task called \htmlref{LUTEDIT}{LUTEDIT} for
+creating and editing lookup tables. The LUTEDIT command fires up a
+complete graphical-user-interface, which includes its own help system 
+via a "short help" window at the bottom of the interface which describes
+the control currently under the pointer, and also via the usual "Help"
+button at the right hand end of the menu bar.
 
-CRELUT has a number of stages that cannot be expressed via the
-examples in the reference manual, so here is a walk through with
-commentary.  It would be a good idea to find an image display and
-repeat the example yourself. CRELUT asks for an initial lookup table.
-Since we don't have one we enter {\tt !}; this results in a greyscale
-being loaded in the colour table.  Next we nominate an image for which
-we want to tailor the lookup table.  In order to display it and to
-compute an histogram we must also provide scaling limits. The chosen
-limits encompass most data values.
-
-\small
-\begin{verbatim}
-     ICL> crelut
-     INLUT - NDF containing input lookup table /@$KAPPA_DIR/spectrum_lut/ > !
-     NDF - Image to be displayed /@$KAPPA_DIR/ccdframec/ >
-     LOW - Low value for image scaling /2250/ >
-     HIGH - High value for image scaling /30790.990234375/ > 3000
-\end{verbatim}
-\normalsize
-The image appears in grey above the histogram of values between 2250
-and 3000.  Notice that the histogram shows the appearance of data
-values given along the data-value axis, currently just grey
-intensities.  Had we entered {\tt !} to parameter NDF, a ramp would
-appear rather than the histogram.  Below the histogram are two rows of
-16 enumerated colours and grey levels.  The bottom line is the
-standard \htmlref{palette}{se:coltab}, as would be given by command
-\htmlref{PALDEF}{PALDEF}, and an adjustable upper line.  To manipulate
-the colour table (and hence generate a new lookup table) we select
-palette colours and data-value ranges.  First we want to add some
-colours of our own to the palette.
-
-We first add a \htmlref{named colour}{ap:colset}---sienna---to the
-palette, followed by a pale yellow given as RGB intensities.  We try
-Violetred, but don't like it so the previous grey value is restored.
-Orchid is paler than Violetred and more like what we want.  A null
-ends the loop.  Note that once you have completed this section you
-cannot add more colours to the palette.  The current RGB is given so
-minor adjustments can be made.  Also you don't have to add palette
-colours in numerical order.
-
-\small
-\begin{verbatim}
-     Now you may add to the predefined palette. Numbers 16 to 31, are available.
-     Type ! to complete the modifications.
-     PALNUM - Number of the palette entry to be modified /16/ >
-     The current RGB is 0,0,0.
-     COLOUR - New palette colour > sienna
-     OK - Accept this colour (Y/N)? /NO/ > y
-     PALNUM - Number of the palette entry to be modified /17/ >
-     The current RGB is 6.666667E-02,6.666667E-02,6.666667E-02.
-     COLOUR - New palette colour > 1.0,1.0,0.3
-     OK - Accept this colour (Y/N)? /NO/ > y
-     PALNUM - Number of the palette entry to be modified /18/ >
-     The current RGB is 0.1333333,0.1333333,0.1333333.
-     COLOUR - New palette colour > violetred
-     OK - Accept this colour (Y/N)? /NO/ >
-     PALNUM - Number of the palette entry to be modified /18/ >
-     The current RGB is 0.1333333,0.1333333,0.1333333.
-     OUR - New palette colour > orchid
-     OK - Accept this colour (Y/N)? /NO/ > y
-     PALNUM - Number of the palette entry to be modified /19/ > !
-\end{verbatim}
-\normalsize
-Now we change the colour table.  Notice the appearance of the histogram
-alters.  Between 2300 and 2380 the colour smoothly varies from blue to
-orchid. (We tried a narrower range but did not like it.)  Next a
-block of sienna represents values in the range 2375--2400.  Notice that
-the order of the colours matters, {\it{cf.}}\ the 2500--2600 range
-where 2500 appears pale yellow and 2600 is red.  A null ends the
-manipulation.
-
-\small
-\begin{verbatim}
-     Now you may interactively change the lookup table (LUT). You give ranges of
-     data values (that map to LUT pens) to be assigned colours obtained
-     by interpolation of pairs of numbered colours selected from the palette.
-     Type ! to complete the creation of the LUT.
-
-     VALRANGE - Data-value range to be assigned colours > 2300,2350
-     COLRANGE - Select one or two colours from the palette > 4,18
-
-     VALRANGE - Data-value range to be assigned colours > 2300,2380
-     COLRANGE - Select one or two colours from the palette > 4,18
- 
-     VALRANGE - Data-value range to be assigned colours > 2375,2400
-     COLRANGE - Select one or two colours from the palette > 16
- 
-     VALRANGE - Data-value range to be assigned colours > 2900,3000
-     COLRANGE - Select one or two colours from the palette > 6
- 
-     VALRANGE - Data-value range to be assigned colours > 2500,2600
-     COLRANGE - Select one or two colours from the palette > 17,2
- 
-     VALRANGE - Data-value range to be assigned colours > !
-\end{verbatim}
-\normalsize
-Finally, we save the lookup table in an NDF called YUK, but not the palette.
-The original palette is restored.
-
-\small
-\begin{verbatim}
-     Type the null character, !, if the created LUT is not to be saved.
-     OUTLUT - NDF to save the lookup table > YUK
-     OUTPAL - NDF to save the palette /!/ >
-\end{verbatim}
-\normalsize
  
 \subsection{\xlabel{se_palette}Palette\label{se:palette}}
 
@@ -11271,8 +11167,6 @@ picture.}
  Copies the bad pixel mask from one NDF to another.}
 \menuitem{CREFRAME}{
  Generates a test 2-d NDF from a  selection of several types.}
-\menuitem{CRELUT}{
- Creates or manipulates an image-display lookup table using a palette.}
 \menuitem{CSUB}{
  Subtracts a scalar from an NDF data structure.}
 \menuitem{CURSOR}{
@@ -11765,8 +11659,6 @@ functions as follows.
 %
 \item {\large\bf Lookup/Colour tables}
 \begin{description}
-\classitem{CRELUT}
- Creates or manipulates an image-display lookup table using a palette.
 \classitem{LUTABLE}
  Manipulates an image-display colour table.
 \classitem{LUTBGYRW}
@@ -16819,329 +16711,6 @@ default value.
       }
    }
 }
-
-\sstroutine{
-   CRELUT
-}{
-   Creates or manipulates an image-display lookup table using a
-   palette
-}{
-   \sstdescription{
-      This application allows a lookup table to be created or modified
-      interactively on a chosen image display from a palette of
-      colours.  All plotting is performed within the current
-      graphics-database picture for that device.  The phases in the
-      creation or manipulation of the lookup table are enumerated below.
-      \begin{enumerate}
-      \item The initial colour table is read from an NDF lookup-table file
-         or a greyscale used if there is no input lookup table.
-      \item The name of an NDF containing a 2-dimensional array is obtained and the
-         array is scaled and displayed in the top half of the picture
-         at the largest magnification without distortion.  Below this an
-         histogram of the values between the scaling limits is drawn
-         with the colour index of each bin corresponding to the bin's
-         scaled value. Thus colours in the image and the histogram
-         match.   Axes of number versus data value are plotted about
-         the histogram. If a null character, {\tt !}, is given then no NDF
-         array is read and a ramp is produced instead of the histogram.
-         An axis of pen numbers in the lookup table is drawn around the
-         ramp.
-      \item A numbered palette is drawn below the histogram.  A palette
-         created in an earlier run of CRELUT may be restored from an
-         NDF.  Otherwise the palette comprises eight coloured blocks
-         (black, white, red, green, blue, yellow, magenta and cyan)
-         with palette numbers 0--7, an eight-level greyscale (8--15)
-         and a sixteen-level greyscale (16--31).  Palette numbers
-         16--31 may be replaced randomly by colours you define.  The
-         colours are specified by either the giving the red, green, blue
-         intensities; or by name.  The loop is terminated by a null.
-      \item Inside a loop you select the palette colour(s) to be
-         assigned to the first and last pen numbers of a band within
-         the lookup table.  For convenience, where there is an image
-         and histogram the equivalent data values are entered rather
-         than pen numbers directly, though they are converted to the
-         nearest pens in the lookup table.  Linear interpolation
-         between the two palette colours yields the lookup-table
-         colours inside the band.  Should only one colour be given then
-         all the pens in the requested range are set to that colour.
-         Pen numbers may be re-used indefinitely and assigned new
-         colours if the desired effect is not obtained.  (The histogram
-         of the array is produced to assist in a sensible choice).  The
-         loop is terminated by a null in response to either of the
-         prompts.
-      \item The lookup table may be saved in an NDF.  A null response, 
-         {\tt !}, to the request for the name of the file in which the table is
-         to be stored will result in the table not being saved.
-         Likewise the palette may be saved in an NDF.
-      \end{enumerate}
-   }
-   \sstusage{
-      crelut inlut outlut ndf [comp] low high [inpal] [outpal] [device]
-   }
-   \sstparameters{
-      \sstsubsection{
-         COLOUR() = LITERAL (Read)
-      }{
-         A colour to be added to the palette at the entry given by
-         parameter PALNUM.  It is specified in one of two ways.
-         \begin{itemize}
-           \item A named colour from the standard colour set, which may
-           be abbreviated.  If the abbreviated name is ambiguous the
-           first match is selected.  The case of the name is ignored.
-           Some examples are {\tt "Seagreen"}, {\tt "Violet"}, and
-           {\tt "Orchid"}.
-
-           \item Normalised red, green, and blue intensities separated by
-           commas or spaces.  Each value must lie in the range 0.0--1.0.
-           For example, {\tt "1.0,1.0,0.5"} would give a pale yellow.
-         \end{itemize}
-         To exit the loop that obtains new palette colours enter a null
-         character ({\tt !}) in response to the prompt.
-      }
-      \sstsubsection{
-         COLRANGE() = \_INTEGER (Read)
-      }{
-         The numbers of the palette colours to be allocated to a range
-         of pens within the lookup table.  One or two palette colours
-         may be entered.  If only one is given all the range of pens
-         are assigned that colour.  If two palette colours are given
-         the colour of a pen is obtained by linear interpolation
-         between the two colours at the fractional position of the pen
-         in the range of colour indices.  Allowed values are 0--31.
-      }
-      \sstsubsection{
-         COMP = LITERAL (Read)
-      }{
-         The NDF component to be displayed.  It may be {\tt "Data"},
-         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where
-         {\tt "Error"} is the alternative to {\tt "Variance"} and causes
-         the square root of the variance values to be displayed).
-         If {\tt "Quality"} is specified, then the quality values are
-         treated as numerical values (in the range 0 to 255).  {\tt ["Data"]}
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, or WINDOW, and have at least 48 colour indices.
-         At least 120 colour indices is recommended.  The device must
-         also not reset when the device is opened (since the new colour
-         table would be lost).  {\tt [}Current image-display device{\tt ]}
-      }
-      \sstsubsection{
-         HIGH = \_DOUBLE (Read)
-      }{
-         This is the highest value in the 2-dimensional data array used for
-         scaling and computing the histogram.  All larger array values
-         are set to the highest colour index when HIGH is greater than
-         LOW, otherwise all array values greater than HIGH are set to
-         the lowest colour index.  The dynamic default is the maximum
-         data value.
-      }
-      \sstsubsection{
-         INLUT = NDF (Read)
-      }{
-         Name of the NDF containing the initial lookup table as its data
-         array.  The LUT must be 2-dimensional, the first dimension
-         being 3, and the second is arbitrary.  The method used to
-         compress or expand the colour table if the second dimension is
-         different from the number of unreserved colour indices is
-         controlled by parameter NN.  Also the LUT's values must lie in
-         the range 0.0--1.0.  If INLUT is null ({\tt !}) a
-         greyscale is used.
-      }
-      \sstsubsection{
-         INPAL = NDF (Read)
-      }{
-         Name of the NDF containing the initial palette as its data
-         array.  The palette must be 2-dimensional, the first dimension
-         being 3, and the second 32.  If the second dimension is
-         greater than 32 only the first 32 colours are used; if it has
-         less than 32 just fill as much of the palette as is possible
-         starting from the first colour.  The palette's values must lie
-         in the range 0.0--1.0.  If INPAL is null ({\tt !}) the default
-         palette is loaded.
-      }
-      \sstsubsection{
-         LOW = \_DOUBLE (Read)
-      }{
-         The array value that scales to the lowest pen in the colour
-         table, and the minimum value to be included in the histogram.
-         All smaller array values are set to the lowest colour
-         index when LOW is less than HIGH, otherwise all array values
-         smaller than LOW are set to the highest colour index.   The
-         dynamic default is the minimum data value.
-      }
-      \sstsubsection{
-         NDF = NDF (Read)
-      }{
-         Input NDF data structure containing the image to be displayed
-         to show the effect of the created colour table.
-      }
-      \sstsubsection{
-         NN = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE} the input lookup table is mapped to the colour table by
-         using the nearest-neighbour method.  This preserves sharp
-         edges and is better for lookup tables with blocks of colour.
-         If NN is {\tt FALSE}, linear interpolation is used, and this is
-         suitable for smoothly varying colour tables. {\tt [FALSE]}
-      }
-      \sstsubsection{
-         OK = \_LOGICAL (Read)
-      }{
-         {\tt TRUE} when the palette colour just produced is acceptable.
-      }
-      \sstsubsection{
-         OUTLUT = NDF (Write)
-      }{
-         The output lookup table.
-      }
-      \sstsubsection{
-         OUTPAL = NDF (Write)
-      }{
-         The palette used to create the lookup table.
-      }
-      \sstsubsection{
-         PALNUM = \_INTEGER (Read)
-      }{
-         The number of the palette entry whose colour is to be
-         modified.  (The numbers are plotted on the palette.) It is
-         used within a loop to modify up to sixteen entries in the
-         palette.  Entering a null, {\tt !}, will end that loop.  The
-         suggested default is the next palette number.  PALNUM must lie
-         in the range 16--31.
-      }
-      \sstsubsection{
-         PENRANGE() = \_INTEGER (Read)
-      }{
-         The range of pen numbers in the lookup table which is about to
-         be allocated a set of colours from the palette.  PENRANGE is
-         only used when there is no image and histogram plotted.  The
-         pen number can be read from the axis below the ramp.  If one
-         pen number is given, only this pen is altered, and it is given
-         the first palette colour of COLRANGE.  If two are supplied,
-         the first pen number entered will take the first palette
-         colour entered, and the second pen is assigned the second
-         palette colour.  The pens must lie in the range zero to the
-         maximum number of available pens.
-      }
-      \sstsubsection{
-         PTITLE = LITERAL (Read)
-      }{
-         Title for the output palette NDF. {\tt ["KAPPA - Crelut"]}
-      }
-      \sstsubsection{
-         TITLE = LITERAL (Read)
-      }{
-         Title for the output lookup table NDF. {\tt ["KAPPA - Crelut"]}
-      }
-      \sstsubsection{
-         VALRANGE() = \_DOUBLE (Read)
-      }{
-         The range of data values in the histogram/image which is to
-         be allocated a set of colours from the palette, and hence be
-         assigned to a part of the lookup table.  VALRANGE is only used
-         when there is an image and histogram plotted.  The data value
-         may be read from the axis below the histogram.  If one data
-         value is given, only the single pen in the lookup table
-         corresponding to the value is altered, and it is given the
-         first palette colour of COLRANGE.  If two values are supplied,
-         the first data value entered will take the first palette
-         colour entered, and the second data value is assigned the
-         second palette colour.  The data values must lie in the range
-         PVLO--PVHI.
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         Note:
-      }{
-         Since the application is highly interactive and contains loops
-         it is not possible to give one-line commands to perform a
-         complete operation.  Therefore the examples show how to
-         control the input and output data and not the interactive
-         manipulation of the colour table.
-      }
-      \sstexamplesubsection{
-         crelut heat bizarre hh12 $\backslash$
-      }{
-         Reads a lookup table in an NDF called heat.  If resampling of
-         the lookup table is required it achieved via linear
-         interpolation. The lookup table after the manipulation is
-         stored in NDF bizarre.  The data array in NDF hh12 is scaled
-         between its minimum and maximum values and displayed in the
-         top half of the current picture on the current image-display
-         device.  Also drawn is an histogram of the intensities.
-      }
-      \sstexamplesubsection{
-         crelut heat bizarre hh12 inpal=mypal $\backslash$
-      }{
-         As above except a palette created previously via the OUTPAL
-         parameter.  This palette is in an NDF called mypal.
-      }
-      \sstexamplesubsection{
-         crelut inlut=! deluxe hh12 v low=100 high=400 $\backslash$
-      }{
-         A greyscale lookup table is manipulated and the result
-         is stored in NDF deluxe.  The variance array in NDF hh12 is
-         scaled between 100 and 400, and displayed in the top half of
-         the current picture on the current image-display device.  Also
-         drawn is an histogram of the intensities between those limits.
-      }
-      \sstexamplesubsection{
-         crelut heat bizarre ndf=! device=xwindows $\backslash$
-      }{
-         Reads a lookup table in an NDF called heat.  If resampling of
-         the lookup table is required it achieved via the
-         nearest-neighbour method.  The lookup table after the
-         manipulation is stored in NDF bizarre.  A linear ramp is
-         displayed in the lower half of the current picture on the
-         xwindows device.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The application stores, in the order given, the following
-         pictures in the graphics database: a frame comprising the data
-         picture, the histogram or ramp and the palette; the data-array
-         picture with world co-ordinates in units of data pixels; the
-         histogram/ramp frame picture including the histogram/ramp plus
-         the annotated axes; and the histogram with world co-ordinates in
-         units of data values and number, or the ramp with units of pen
-         numbers and normalised frequency.  The NDF associated with the
-         image/histogram plots is stored by reference with the DATA
-         picture.  On exit the current database picture for the chosen
-         device reverts to the input picture.
-
-         \sstitem
-         Bad pixels will appear with the lowest colour index in the
-         plot.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: LUTABLE, LUTEDIT, LUTFLIP, LUTREAD, LUTROT, LUTSAVE, LUTTWEAK, \linebreak
-      LUTVIEW, PALREAD, PALSAVE; Figaro: COLOUR.
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         The magic-value method is used for processing bad data.
-
-         \sstitem
-         This application will handle data in all numeric types, though
-         type conversion to integer will occur for unsigned byte and word
-         images.
-      }
-   }
-}
-
 \sstroutine{
    CSUB
 }{
@@ -27084,7 +26653,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: LUTEDIT, CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
+      KAPPA: LUTEDIT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTSAVE,
       LUTTWEAK, LUTVIEW; Figaro: COLOUR.
    }
    \sstimplementationstatus{
@@ -27327,7 +26896,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTHILITE, LUTROT, LUTTWEAK.
+      KAPPA: LUTHILITE, LUTROT, LUTTWEAK.
    }
 }
 \sstroutine{
@@ -27525,7 +27094,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTFLIP, LUTROT, LUTTWEAK.
+      KAPPA: LUTFLIP, LUTROT, LUTTWEAK.
    }
 }
 \sstroutine{
@@ -27752,7 +27321,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTTWEAK.
+      KAPPA: LUTFLIP, LUTHILITE, LUTTWEAK.
    }
 }
 
@@ -27825,7 +27394,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTTWEAK.
+      KAPPA: LUTFLIP, LUTHILITE, LUTREAD, LUTROT, LUTTWEAK.
    }
 }
 
@@ -27968,7 +27537,7 @@ plot (10k).
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: CRELUT, LUTFLIP, LUTHILITE, LUTROT.
+      KAPPA: LUTFLIP, LUTHILITE, LUTROT.
    }
 }
 \sstroutine{
@@ -42461,11 +42030,13 @@ and HDS data types is as follows:
 \xlabel{QUILT}
 \xlabel{SNAPSHOT}
 \xlabel{TURBOCONT}
+\xlabel{CRELUT}
 
 The following commands used to be part of KAPPA but have now been
 ``retired'' to the \KAPRHref package:
 \begin{itemize}
 \item \xref{CONTOVER}{sun239}{CONTOVER}
+\item \xref{CRELUT}{sun239}{CRELUT}
 \item \xref{GREYPLOT}{sun239}{GREYPLOT}
 \item \xref{INSPECT}{sun239}{INSPECT}
 \item \xref{MOSAIC}{sun239}{MOSAIC}
@@ -45071,14 +44642,31 @@ linking command.
 
 \section{\xlabel{se_changes}Release Notes---V0.19\label{se:changes}}
 
-\subsection{Modified Commands}
-The following applications have been modified:
+
+\subsection{General Changes}
+\begin{itemize}
+\item Colours can now be specified as RGB intensity triplets, or as HTML
+colour codes, in addition to the previous forms.
+\end{itemize}
+
+\subsection{New Commands}
+The following new applications have been added:
 
 \begin{description}
    \item [\htmlref{LUTEDIT}{LUTEDIT}] \mbox{}
       Creates or edits an image-display colour table. It uses a graphical
       user interface to allow interactive manipulation of the colour
       table in many ways.
+\end{description}
+
+\subsection{Removed Commands}
+The following obsolete commands have been removed from KAPPA -
+alternatives are indicate below. Most of these commands have been
+archived in \KAPRHref in order to satisfy any occasional
+need that may occur for them (see SUN/239).
+
+\begin{description}
+\item [CRELUT] Use \htmlref{LUTEDIT}{LUTEDIT} instead.
 \end{description}
 
 \subsection{Modified Commands}
@@ -45260,8 +44848,6 @@ functions as follows.
 %
 \item {\large\bf Lookup/Colour tables}
 \begin{description}
-\classitem{CRELUT}
- Creates or manipulates an image-display lookup table using a palette.
 \classitem{LUTABLE}
  Manipulates an image-display colour table.
 \classitem{LUTBGYRW}

@@ -104,12 +104,8 @@
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
 
-*  Creates or manipulates an image-display lookup table using a palette.
-         IF ( NAME .EQ. 'CRELUT' ) THEN
-            CALL CRELUT ( STATUS )
-
 *  Makes memory planes of an image-display device invisible.
-         ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
+         IF ( NAME .EQ. 'IDINVISIBLE' ) THEN
             CALL IDINVISIBLE ( STATUS )
 
 *  Pans and zooms an image-display device.

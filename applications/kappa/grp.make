@@ -49,7 +49,7 @@ picframe.cl picgrid.cl piclast.cl picxy.cl add.par aperadd.par ardgen.par \
 ardmask.par axconv.par axlabel.par axunits.par block.par collapse.par cadd.par \
 calc.par calpol.par cdiv.par centroid.par chpix.par cmult.par compadd.par \
 compave.par compick.par contour.par convolve.par colcomp.par \
-creframe.par crelut.par csub.par cursor.par lutedit.par display.par drawsig.par \
+creframe.par csub.par cursor.par lutedit.par display.par drawsig.par \
 elprof.par erase.par errclip.par exp10.par expe.par expon.par ffclean.par \
 fillbad.par fitsdin.par fitsexist.par fitsexp.par fitsimp.par fitsin.par \
 fitslist.par fitsmod.par fitstext.par fitsurface.par fitsval.par \
@@ -86,7 +86,7 @@ IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
 axlabel.hlp axunits.hlp block.hlp collapse.hlp cadd.hlp calc.hlp calpol.hlp cdiv.hlp \
 centroid.hlp changes_to_kappa.hlp chpix.hlp classified_commands.hlp \
 cmult.hlp co_ordinate_systems.hlp colour_set.hlp compadd.hlp compave.hlp \
-compick.hlp contour.hlp convolve.hlp creframe.hlp crelut.hlp \
+compick.hlp contour.hlp convolve.hlp creframe.hlp \
 csub.hlp cursor.hlp custom_kappa.hlp data_structures.hlp lutedit.hlp display.hlp \
 div.hlp drawsig.hlp elprof.hlp erase.hlp errclip.hlp exp10.hlp expe.hlp \
 expon.hlp feedback.hlp ffclean.hlp fillbad.hlp fitsdin.hlp fitsedit.hlp \
@@ -146,7 +146,7 @@ paste.ifl pixdupe.ifl pow.ifl psf.ifl rift.ifl rotate.ifl \
 segment.ifl setmagic.ifl shadow.ifl slide.ifl sqorst.ifl stats.ifl \
 sub.ifl substitute.ifl surfit.ifl thresh.ifl trandat.ifl traninvert.ifl \
 tranjoin.ifl tranmake.ifl transformer.ifl trantrace.ifl trig.ifl colcomp.ifl \
-wiener.ifl zaplin.ifl contour.ifl crelut.ifl cursor.ifl \
+wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl idclear.ifl idinvisible.ifl idpazo.ifl idset.ifl \
 idstate.ifl ardplot.ifl linplot.ifl lutable.ifl lutflip.ifl luthilite.ifl \
@@ -285,7 +285,7 @@ picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
 pictrans.f picvis.f scatter.f vecplot.f colcomp.f
 
 # The contents of the kapgks_sub.tar file:
-KAPGKS_SUB = crelut.f idinvisible.f idpazo.f \
+KAPGKS_SUB = idinvisible.f idpazo.f \
 lutflip.f luthilite.f lutrot.f luttweak.f 
 
 # The contents of the ndfpack_sub.tar file:

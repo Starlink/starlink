@@ -4,7 +4,13 @@
    described fully in sun95. The following is a summary of the main
    changes since the last Starlink CD (V0.18-6):
 
+   - The following new commands have been added:
+      o LUTEDIT: Creates or edits image display colour tables via a
+      graphical-user-interface.
+
    - The following commands have been modified to use the PGPLOT
    graphics library: LUTABLE, LUTSAVE, OVSET.
 
+   - The following obsolete commands have been removed to KAPRH (see
+   SUN/239): CRELUT
 

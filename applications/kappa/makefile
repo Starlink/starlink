@@ -526,7 +526,7 @@ piclist.f picsel.f pictrans.f picvis.f \
 scatter.f vecplot.f 
 
 KAPGKS_F_ROUTINES = \
-crelut.f idinvisible.f idpazo.f lutflip.f luthilite.f \
+idinvisible.f idpazo.f lutflip.f luthilite.f \
 lutrot.f luttweak.f 
 
 # Special kappa f routines for commands which clash with the C 
@@ -2347,7 +2347,6 @@ contour.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR AST_PAR GRP_PAR
 convolve.o:	 SAE_PAR PRM_PAR PAR_ERR
 copybad.o:	 SAE_PAR NDF_PAR
 creframe.o:	 SAE_PAR DAT_PAR PAR_ERR
-crelut.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 csub.o:	         SAE_PAR NDF_PAR
 curre.o:	 SAE_PAR PAR_ERR
 cursor.o:	 SAE_PAR DAT_PAR GRP_PAR NDF_PAR AST_PAR PRM_PAR PAR_ERR AGI_ERR
