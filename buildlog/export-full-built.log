@@ -677,7 +677,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -784,4 +783,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 26 seconds
+Total time: 3 minutes 15 seconds

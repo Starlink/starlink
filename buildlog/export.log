@@ -238,7 +238,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-1.0.zip
@@ -912,4 +911,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
 
-Total time: 21 minutes 40 seconds
+Total time: 21 minutes 41 seconds
