@@ -48,8 +48,9 @@ proc main {} {
    #  Set location of startup script.
    puts $fd "-main-script \"${gaia_library}/gaiaMain.tcl\""
    
-   #  Binary is standalone.
-   puts $fd "-standalone"
+   #  Binary is standalone (only during testing). Stops sourcing of 
+   #  external files otherwise.
+   #  puts $fd "-standalone"
    
    #  Set location of Tcl and Tk.
    puts $fd "-tcl-library \"$tcl_library\""

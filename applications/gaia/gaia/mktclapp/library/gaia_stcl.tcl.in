@@ -26,8 +26,9 @@ proc main {} {
                    $itcl_library \
                    $tclx_library]
    
-   #  Binary is standalone.
-   puts $fd "-standalone"
+   #  Binary is standalone (only during testing). Stops sourcing of 
+   #  external files otherwise.
+   #  puts $fd "-standalone"
 
    #  But reads stdin.
    puts $fd "-read-stdin"
