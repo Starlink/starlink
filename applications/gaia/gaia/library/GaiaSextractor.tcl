@@ -10,7 +10,7 @@
 
 #  Description:
 #     This class creates a top-levelwidget for displaying and
-#     selecting from the list of all possible Sextractor program and
+#     selecting from the list of all possible SExtractor program and
 #     catalogue configurations (SExtractor terminology). Each of these
 #     parts can be saved and restored from files using the Sextractor
 #     standard format. The application itself may be run and the catalogue
@@ -23,6 +23,10 @@
 #     This interface will work with native and Starlink versions of
 #     SExtractor (in fact it will work with both at the same
 #     time). The native version used during development was 2.0.19
+#
+#     A specialisation of this class is the production of catalogues
+#     for use by AUTOASTROM. This restricts the file format to ASC and
+#     fixes the catalogue columns.
 
 #  Invocations:
 #
@@ -74,6 +78,8 @@
 #        Removes chance of crosstalk to other toolboxes (the unset of
 #        columns_ was doing this!) and such variables no longer need
 #        to be common for scope to work in widgets.
+#     26-SEP-2003 (PWD):
+#        Added changes to support AUTOASTROM detections.
 #     {enter_further_changes_here}
 
 #-
@@ -234,6 +240,16 @@ itcl::class gaia::GaiaSextractor {
          {Draw any isophotal radii as circles}
       set values_(draw_radii) 0
 
+      #  Add option to configure for use with AUTOASTROM.
+      $Options add checkbutton  -label {AUTOASTROM Mode} \
+         -variable [scope itk_option(-autoastrom)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this configure_autoastrom_mode_]
+      $short_help_win_ add_menu_short_help $Options \
+         {AUTOASTROM Mode}\
+         {Configure for generating detection catalogues for AUTOASTROM}
+
       #  Allow selection of the detection image.
       set lwidth 18
       itk_component add detname {
@@ -269,13 +285,7 @@ itcl::class gaia::GaiaSextractor {
       pack $itk_component(cattype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(cattype) \
          {Type of output catalogue}
-      foreach {sname lname} \
-         "SKYCAT ASCII_SKYCAT FITS FITS_1.0 ASCII ASCII_HEAD" {
-         $itk_component(cattype) add \
-            -label $sname \
-            -value $lname \
-            -command [code $this set_cattype_ from $lname]
-      }
+      set_cattypes_
 
       #  Name for configuration parameters file and the catalogue
       #  parameters file.
@@ -1788,12 +1798,21 @@ itcl::class gaia::GaiaSextractor {
 
    #  Reset catalogue columns to their builtin defaults.
    protected method reset_catalogue_ {} {
-      unset columns_
-      foreach param "$safecols_ $defcolumns_" {
-         set columns_($param) 1
+      set dofull [info exists columns_]
+      catch {unset columns_}
+      if { $itk_option(-autoastrom) } {
+         foreach param "$safecols_ $autoastromcols_ $isocols_" {
+            set columns_($param) 1
+         }
+      } else {
+         foreach param "$safecols_ $defcolumns_" {
+            set columns_($param) 1
+         }
       }
-      toggle_draw_kron_ellipses_
-      toggle_draw_iso_ellipses_
+      if { $dofull } {
+         toggle_draw_kron_ellipses_
+         toggle_draw_iso_ellipses_
+      }
    }
 
    #  Set an element of the values_ array.
@@ -2072,7 +2091,7 @@ itcl::class gaia::GaiaSextractor {
       }
       if { $deffile != "" } {
          #  Read file, but if not a local configuration file use our
-         #  unique name. 
+         #  unique name.
          set localname $values_(catname)
          read_conpars $deffile
          if { ! $localfile } {
@@ -2227,11 +2246,10 @@ itcl::class gaia::GaiaSextractor {
       #  Now display the catalogue overlaid on the image.
       catch { display_cat [get_catname_] } msg
       blt::busy release $w_
-      if { "$msg" != "" } { 
+      if { "$msg" != "" } {
          error "$msg"
       }
    }
-
 
    #  Clean any SExtractor output of known escape sequences etc.
    protected method clean_ {output} {
@@ -2288,7 +2306,7 @@ itcl::class gaia::GaiaSextractor {
             set n 0
             set i 0
             foreach param "$safecols_ $commoncols_ $kroncols_" {
-               if { [info exists columns_($param)] && 
+               if { [info exists columns_($param)] &&
                     $columns_($param) } {
                   incr i
                }
@@ -2613,6 +2631,32 @@ itcl::class gaia::GaiaSextractor {
          [list "serv_type local" "long_name $fname" "short_name $catalogue" "url $fname"]
    }
 
+   #  Set/reset the toolbox to work in AUTOASTROM mode.
+   protected method configure_autoastrom_mode_ {} {
+      set_cattypes_
+      reset_catalogue_
+   }
+
+   #  Set up the menu with the types of catalogue available. Only
+   #  get ASC for autoastrom mode.
+   protected method set_cattypes_ {} {
+      if { [info exists itk_component(cattype)] } {
+         if { $itk_option(-autoastrom) } {
+            set types "ASCII ASCII_HEAD"
+            set_cattype_ from "ASCII_HEAD"
+         } else {
+            set types "SKYCAT ASCII_SKYCAT FITS FITS_1.0 ASCII ASCII_HEAD"
+         }
+         $itk_component(cattype) clear
+         foreach {sname lname} $types {
+            $itk_component(cattype) add \
+               -label $sname \
+               -value $lname \
+               -command [code $this set_cattype_ from $lname]
+         }
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
    #  Name of canvas.
@@ -2671,6 +2715,11 @@ itcl::class gaia::GaiaSextractor {
 
    #  The filter types of images.
    itk_option define -filter_types filter_types Filter_Types {} {}
+
+   #  Whether to configure for AUTOASTROM.
+   itk_option define -autoastrom autoastrom Autoastrom 0 {
+      configure_autoastrom_mode_
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -2893,6 +2942,13 @@ itcl::class gaia::GaiaSextractor {
       FLUX_ISO FLUXERR_ISO FLUX_AUTO FLUXERR_AUTO FLUX_MAX
       ISOAREA_IMAGE CXX_IMAGE CYY_IMAGE CXY_IMAGE B_IMAGE
       THETA_IMAGE KRON_RADIUS ELLIPTICITY ELONGATION FLAGS
+   }
+
+   #  Names of AUTOASTROM catalogue parameters (includes X_IMAGE and Y_IMAGE).
+   #  Note should also include those needed for plotting.
+   protected variable autoastromcols_ {
+      FLUX_ISO A_IMAGE B_IMAGE X2_IMAGE Y2_IMAGE ERRX2_IMAGE
+      ERRY2_IMAGE ISOAREA_IMAGE
    }
 
    #  Names and descriptions of check image types.

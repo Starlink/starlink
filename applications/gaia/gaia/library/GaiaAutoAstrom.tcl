@@ -295,6 +295,25 @@ itcl::class gaia::GaiaAutoAstromSimple {
       ::bind [$itk_component(refcat) component mb] <1> \
          [code $this add_reference_catalogues_]
 
+      #  Choose a detection catalogue. This should be the results from
+      #  a run of EXTRACTOR with the standard set of parameters.
+      if { $itk_option(-expert) } {
+         itk_component add detectcat {
+            set m [util::LabelMenu $w_.detectcat \
+                      -text "Detection catalogue:" \
+                      -relief raised \
+                      -labelwidth $lwidth \
+                      -valuewidth 20 \
+                      -variable [scope values_(detectcat)]]
+         }
+         add_short_help $itk_component(detectcat) \
+            {Choose a detections catalogue (EXTRACTOR results)}
+         add_extractor_catalogues_
+         ::bind [$itk_component(detectcat) component mb] <1> \
+            [code $this add_extractor_catalogues_]
+      }
+      set values_(detectcat) "automatic"
+
       #  Region for showing the output from AUTOASTROM.
       itk_component add status {
          Scrollbox $w_.status -singleselect 0 -exportselection 1
@@ -351,6 +370,9 @@ itcl::class gaia::GaiaAutoAstromSimple {
          pack $itk_component(maxobj) -side top -fill x -pady 5 -padx 5
       }
       pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
+      if { $itk_option(-expert) } {
+         pack $itk_component(detectcat) -side top -fill x -pady 5 -padx 5
+      }
       pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
@@ -477,39 +499,20 @@ itcl::class gaia::GaiaAutoAstromSimple {
             #  Verify the reference catalogue. If this is local if
             #  needs to be available in TAB format with the current
             #  contents of the window (this can be editted).
-            if { [string match {local_*} $values_(refcat)] } {
-               regsub "local_" $values_(refcat) {} realname
-
-               #  Try to get the associated window.
-               set catwin [::cat::AstroCat::get_instance $realname]
-               set tempname "${temp_catalogues_}[incr count_].TAB"
-               if { $catwin != {} } {
-                  $catwin save_to_file $tempname
-               } else {
-                  #  Plain unopened local catalogue. Open it and
-                  #  make a copy.
-                  if { [file exists $realname] } {
-                     catch {
-                        $astrocat_ open $realname
-                        set url [$astrocat_ url $realname]
-                        file copy -force -- $url $tempname
-                     } msg
-                     if { $msg !={} } {
-                        error_dialog $msg
-                        return
-                     }
-                  } else {
-                     error_dialog "$realname doesn't exist"
-                     return
-                  }
-               }
-               set temp_files_($tempname) 1
-               set refcat "--catalogue=$tempname"
-            } else {
-               set refcat "--catalogue=$values_(refcat)"
+            set catalogue [get_or_save_catalogue_ $values_(refcat)]
+            if { $catalogue == "" } {
+               return
             }
+            set refcat "--catalogue=$catalogue"
          } else {
             set refcat "--catalogue=$values_(refcat)"
+         }
+
+         #  EXTRACTOR catalogues. These are any ASCII_SKYCAT formats around.
+         if { $itk_option(-expert) && $values_(detectcat) != "automatic" } {
+            set detectcat "--ccdcatalogue=$values_(detectcat)"
+         } else {
+            set detectcat ""
          }
 
          #  Construct WCS bootstrap source.
@@ -580,6 +583,7 @@ itcl::class gaia::GaiaAutoAstromSimple {
                 $maxobj\
                 --skycatconfig=$env(CATLIB_CONFIG)\
                 $refcat\
+                $detectcat\
                 --noinsert\
                 --keepfits=$fitssolution_\
                 --temp=autoastrom_tmp\
@@ -590,9 +594,6 @@ itcl::class gaia::GaiaAutoAstromSimple {
                 $keeptemps\
                 $defects\
                 --bestfitlog=$bestfitlog_"
-
-         #  Use local SExtractor catalogue...
-         #--xxxccdcat=ngc1275.autoext
 
          #  Report command arguments used (for repeat outside of GAIA).
          if { $values_(command) } {
@@ -715,10 +716,10 @@ itcl::class gaia::GaiaAutoAstromSimple {
       return $output
    }
 
-   #  Configure the reference catalogue window menu to show the
-   #  available catalogues. Usually these are the "remote" catalogues
-   #  available to GAIA, but in expert mode this can also include all
-   #  the local catalogues. USNO at ESO is the default as for AUTOASTROM.
+   #  Configure LabelMenu to show all the available catalogues. Usually
+   #  these are the "remote" catalogues available to GAIA, but in
+   #  expert mode this can also include all the local catalogues. USNO
+   #  at ESO is the default as for AUTOASTROM.
    protected method add_reference_catalogues_ {} {
 
       #  Get list of catalogues.
@@ -764,8 +765,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
                if { ! [info exists seen($shortname)] } {
                   $itk_component(refcat) add \
                      -label "local $shortname" \
-                     -value $shortname \
-                     -command [code $this set_value_ refcat local_${i}]
+                     -value "local_${i}" \
+                     -command [code $this set_value_ refcat "local_${i}"]
                   set seen($shortname) 1
                }
             }
@@ -779,10 +780,93 @@ itcl::class gaia::GaiaAutoAstromSimple {
                set longname [$astrocat_ longname $catalogue]
                $itk_component(refcat) add \
                   -label "local $longname" \
-                  -value $shortname \
-                  -command [code $this set_value_ refcat local_${catalogue}]
+                  -value "local_${catalogue}" \
+                  -command [code $this set_value_ refcat "local_${catalogue}"]
             }
          }
+      }
+   }
+
+   #  Make any ASCII_SKYCAT catalogues available. These should be
+   #  usable by AUTOASTROM (created by the SExtractor toolbox under
+   #  AUTOASTROM mode).
+   protected method add_extractor_catalogues_ {} {
+      puts "add_extractor_catalogues_"
+
+      if { $itk_option(-expert) } {
+
+         #  Get all local catalogues.
+         if { [catch {set catalog_list [lsort [$astrocat_ info "local"]]} msg] } {
+            error_dialog $msg
+            return
+         }
+         $itk_component(detectcat) clear
+
+         #  Always an automatic option.
+         $itk_component(detectcat) add \
+            -label "Auto" \
+            -value "automatic" \
+            -command [code $this set_value_ detectcat "automatic"]
+
+         if {[llength $catalog_list]} {
+            foreach i $catalog_list {
+               puts "Checking: $i"
+
+               #  If ASCII_HEAD format add it.
+               set extension [file extension [$astrocat_ url $i]]
+               if { $extension == "" } { 
+                  #  Might be pointing at a temporary file.
+                  set extension [file extension [$astrocat_ longname $i]]
+               }
+               puts "  extension = $extension"
+               if { $extension == ".ASC" } {
+                  set shortname [$astrocat_ shortname $i]
+                  $itk_component(detectcat) add \
+                     -label $shortname \
+                     -value $shortname \
+                     -command [code $this set_value_ detectcat $i]
+               }
+            }
+         }
+      }
+   }
+
+   #  Make a catalogue available for AUTOASTROM to use. If a locally
+   #  displayed or available catalogue is given then this save to disk
+   #  file. The name of the file is returned as the result, or "" if
+   #  something goes wrong. The "name" is a value set by
+   #  "add_reference_catalogues_".
+   protected method get_or_save_catalogue_ {name} {
+      if { [string match {local_*} $name] } {
+         regsub "local_" $name {} realname
+
+         #  Try to get the associated window.
+         set catwin [::cat::AstroCat::get_instance $realname]
+         set tempname "${temp_catalogues_}[incr count_].TAB"
+         if { $catwin != {} } {
+            $catwin save_to_file $tempname
+         } else {
+            #  Plain unopened local catalogue. Open it and
+            #  make a copy.
+            if { [file exists $realname] } {
+               catch {
+                  $astrocat_ open $realname
+                  set url [$astrocat_ url $realname]
+                  file copy -force -- $url $tempname
+               } msg
+               if { $msg !={} } {
+                  error_dialog $msg
+                  return ""
+               }
+            } else {
+               error_dialog "$realname doesn't exist"
+               return ""
+            }
+         }
+         set temp_files_($tempname) 1
+         return $tempname
+      } else {
+         return $name
       }
    }
 
