@@ -429,9 +429,9 @@
             IF (STATUS .NE. SAI__OK) GOTO 99
 
 *      Width ok?
-	    IF ( WDTH .GT. 25.0 ) THEN
+	    IF ( WDTH .GT. 64.0 ) THEN
 	      CALL MSG_PRNT('SMOOTH Error: WIDTH too large '/
-     :                           /'must be less than 25')
+     :                           /'must be less than 65')
               CALL USI_CANCL('MSK_WIDTH',STATUS)
             ELSE
               JUMPOUT=.TRUE.
