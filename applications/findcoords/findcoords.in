@@ -1,4 +1,4 @@
-#!PERL
+#!@PERL@
 #+
 #  Name:
 #     FINDCOORDS
@@ -47,26 +47,31 @@
 #     Copyright (C) 2001 Central Laboratory of the Research Councils
 #  Authors:
 #     ACD: A C Davenhall (Edinburgh)
+#     TIMJ: Tim Jenness (JAC)
 #  History:
 #     28/5/01 (ACD): Original version.
 #     29/5/01 (ACD): First stable version.
+#      3/8/04 (TIMJ): Autoconf version. Use $CURSA_DIR
 #  Bugs:
 #     None known
 #  Libraries required:
-#     None.
+#     None. [but uses cursa]
 #-
 
 #
+#  Work out where cursa may be (let $CURSA_DIR override built location)
+    my $CURSA_DIR = (exists $ENV{CURSA_DIR} ? $ENV{CURSA_DIR} 
+                     : '@bindir@/cursa');
+
 #  Set the variable holding the location of the catremote script.
 
-#    $catremote = "/home/acd/starbase/cursa/catremote/catremote";
-    $catremote = "STAR_BIN/cursa/catremote";
+    $catremote = "$CURSA_DIR/catremote";
 
 #
 #  Set the catremote environment variables.
 
 #    $ENV{"CATREM_URLREADER"} = "/home/acd/starbase/cursa/catremote/geturl/geturl";
-    $ENV{"CATREM_URLREADER"} = "STAR_BIN/cursa/geturl";
+    $ENV{"CATREM_URLREADER"} = "$CURSA_DIR/geturl";
     $ENV{"CATREM_CONFIG"} = "http://www.roe.ac.uk/acdwww/catremote/cursa.cfg";
     $ENV{"CATREM_MAXOBJ"} = "200";
     $ENV{"CATREM_ECHOURL"} = "no";
