@@ -2313,25 +2313,15 @@ c     LOGICAL UNIF,WOK
         CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR),STATUS)
         CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
         CALL DYN_MAPR(1,NVAL,I_DPTR_W,STATUS)
-        print *,'read data...'
-        call flush(6)
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
         IF (I_XSCALE.EQ.0.0) THEN
-           print *,'mapping x-axis data...'
-           call flush(6)
           CALL BDI_AXMAPR(IFID,1,'Data','READ',I_XPTR,STATUS)
-           print *,'inventing base/scale...'
-           call flush(6)
           CALL ARR_ELEM1R(I_XPTR,I_NX,1,V1,STATUS)
           CALL ARR_ELEM1R(I_XPTR,I_NX,2,V2,STATUS)
-           print *,'done...'
-           call flush(6)
           I_XBASE=V1
           I_XSCALE=V2-V1
         ELSE
-           print *,'inventing x-axis data...'
-           call flush(6)
 
           I_XBASE=1.0
           I_XSCALE=1.0
@@ -2340,8 +2330,6 @@ c     LOGICAL UNIF,WOK
         CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
         CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
         IF (I_YSCALE.EQ.0.0) THEN
-           print *,'mapping y-axis data...'
-           call flush(6)
 
           CALL BDI_AXMAPR(IFID,2,'Data','READ',I_YPTR,STATUS)
           CALL ARR_ELEM1R(I_YPTR,I_NY,1,V1,STATUS)
@@ -2355,8 +2343,6 @@ c     LOGICAL UNIF,WOK
         ENDIF
         I_XWID=ABS(I_XSCALE)
         I_YWID=ABS(I_YSCALE)
-        print *,'read axes...'
-        call flush(6)
 *  get variance and quality if there
         CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
         IF (I_VOK) THEN
@@ -2366,8 +2352,6 @@ c     LOGICAL UNIF,WOK
           CALL BDI_UNMAP(IFID,'Variance',VPTR,STATUS)
           CALL DYN_MAPR(1,NVAL,I_VPTR_W,STATUS)
         ENDIF
-        print *,'read variance...'
-        call flush(6)
         CALL BDI_CHK( IFID, 'Quality', I_QOK, STATUS )
         IF (I_QOK) THEN
           CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
@@ -2380,12 +2364,8 @@ c     LOGICAL UNIF,WOK
         ELSE
           I_BAD=.FALSE.
         ENDIF
-        print *,'read quality...'
-        call flush(6)
 *  get min and max
         CALL IMG_MINMAX(STATUS)
-        print *,'got min/max...'
-        call flush(6)
 
 *  set data slice
         I_IX1=1
@@ -2406,22 +2386,16 @@ c     LOGICAL UNIF,WOK
         I_DY=ABS(I_Y-I_YBASE)
         I_R=0.0
 
-        print *,'getting text...'
-        call flush(6)
 *  get top level text
         CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
         CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
         CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
-        print *,'done...'
-        call flush(6)
 
 *  get work area
         CALL DYN_MAPI(1,NVAL,I_WKPTR,STATUS)
 
 *  get region mask
         CALL DYN_MAPB(1,NVAL,I_REG_PTR,STATUS)
-        print *,'got work array and mask...'
-        call flush(6)
 
       ENDIF
 
