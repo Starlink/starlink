@@ -251,7 +251,21 @@ $(TCL_SUPPORT_ITK):
 	cp $(STAR_LIB)/itk$(ITCL_VERSION)/$@ $@
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERSION)/scripts/$@ $@
-$(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) ccdwish
+
+## TCL_INDEX rule: although it can in principle be generated automatically
+## from other source files as in this rule, TCL_INDEX is in fact checked
+## in as source code to the repository.  This is because building it only 
+## works when the DISPLAY environment variable points to a working X server,
+## which will not be the case in a headless environment.  If it looks like
+## the contents of TCL_INDEX are wrong, delete the file, re-make it, and
+## (if that fixes the problem) check the new file in.  This should only
+## be necessary if Tcl or perhaps CCDPACK's use of it changes in some
+## relevant way.
+## 
+## Old dependency line:
+##    $(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) \
+##                  ccdwish
+$(TCL_INDEX):
 	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
         $(srcdir)/ccdwish mkindex.tcl
 
