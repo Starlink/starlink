@@ -127,7 +127,7 @@
 *  The rest is only displayed if a full listing is required.
       IF( FULL ) THEN
 
-*  Initialise a flag to induicate that we do not have a SkyFrame or a
+*  Initialise a flag to indicate that we do not have a SkyFrame or a
 *  SpecFrame, and should therefore not display the EPOCH.
          SHOWEP = .FALSE.
 
@@ -264,7 +264,7 @@
             IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
                CALL MSG_SETC( 'SOR', '<not defined>' )
 	    
-            ELSE IF( CHR_SIMLR( SOR, 'LSR' ) ) THEN
+            ELSE IF( CHR_SIMLR( SOR, 'LSRK' ) ) THEN
                CALL MSG_SETC( 'SOR', 'Kinematical Local '//
      :                                    'Standard of Rest' )
 	    
@@ -276,14 +276,7 @@
                CALL MSG_SETC( 'SOR', 'Local group' )
 	    
             ELSE IF(  CHR_SIMLR( SOR, 'SOURCE' ) ) THEN
-               CALL AST_SETC( FRM, 'StdOfRest', 'HELIO', STATUS )
-               POSBUF = 'Source ('
-               IAT = 8
-               CALL CHR_PUTR( AST_GETR( FRM, 'SourceVel', STATUS ), 
-     :                        POSBUF, IAT )
-               CALL CHR_APPND( ' km/s - heliocentric)', POSBUF, IAT )
-               CALL MSG_SETC( 'SOR', POSBUF( : IAT ) )
-               CALL AST_SETC( FRM, 'StdOfRest', 'SOURCE', STATUS )
+               CALL MSG_SETC( 'SOR', 'Source' )
 	    
             ELSE 
                CALL MSG_SETC( 'SOR', SOR )
@@ -292,6 +285,36 @@
             CALL MSG_OUT( 'WCS_SOR', 
      :                    IND( : NIND )//'Standard of rest    : ^SOR', 
      :                    STATUS )
+
+*  Display source velocity if it is set, or if StdOfRest == source.
+            IF( SOR .EQ. 'SOURCE' .OR.
+     :          AST_TEST( FRM, 'SourceVel', STATUS ) ) THEN
+               CALL MSG_SETR( 'V', AST_GETR( FRM, 'SourceVel', 
+     :                                       STATUS ) )
+
+               SOR = AST_GETC( FRM, 'SOURCEVRF', STATUS )
+               IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
+                  CALL MSG_SETC( 'SOR', '<not defined>' )
+	       
+               ELSE IF( CHR_SIMLR( SOR, 'LSRK' ) ) THEN
+                  CALL MSG_SETC( 'SOR', 'Kinematical Local '//
+     :                                       'Standard of Rest' )
+	       
+               ELSE IF( CHR_SIMLR( SOR, 'LSRD' ) ) THEN
+                  CALL MSG_SETC( 'SOR', 'Dynamical Local '//
+     :                                       'Standard of Rest' )
+	       
+               ELSE IF(  CHR_SIMLR( SOR, 'LOCAL_GROUP' ) ) THEN
+                  CALL MSG_SETC( 'SOR', 'Local group' )
+	       
+               ELSE 
+                  CALL MSG_SETC( 'SOR', SOR )
+               END IF
+	       
+               CALL MSG_OUT( 'WCS_VELSOR', 
+     :            IND( : NIND )//'Source velocity     : ^V km/s (^SOR)', 
+     :                       STATUS )
+            END IF
 
 * Reference position...
             IF( AST_TEST( FRM, 'RefRA', STATUS ) ) THEN
