@@ -300,7 +300,7 @@
             sun4_Solaris)
                TK_VERS='4.2'
                TCL_VERS='7.6'
-               LDFLAGS=' -ljpeg'
+               LDFLAGS=' -lX -ljpeg'
                AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
