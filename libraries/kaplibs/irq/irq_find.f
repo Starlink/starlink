@@ -60,6 +60,9 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     17-JAN-2002 (DSB):
+*        Check that NDF extension is an HDS Structure before using
+*        it with HDS routines which require a structure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -131,8 +134,9 @@
          CALL NDF_XLOC( INDF, XN, 'READ', XLOC, STATUS )
 
 *  See if the extension contains a component named QUALITY_NAMES.
-         CALL DAT_THERE( XLOC, IRQ__QINAM, THERE, STATUS )
-
+         CALL DAT_STRUC( XLOC, THERE, STATUS ) 
+         IF( THERE ) CALL DAT_THERE( XLOC, IRQ__QINAM, THERE, STATUS )
+       
 *  If it does, get a locator to it, return the extension name and
 *  increment the number of structures found.
          IF( THERE ) THEN

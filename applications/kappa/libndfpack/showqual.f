@@ -154,7 +154,7 @@
 *  If no quality names are defined give a message.
       IF( NAMES .EQ. 0 ) THEN
          CALL MSG_OUT( 'SHOWQUAL_MSG2', '  No quality name '//
-     :                 'defintions found', STATUS )
+     :                 'definitions found', STATUS )
 
 *  Otherwise...
       ELSE
