@@ -7,6 +7,7 @@
      :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
      :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
      :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
+     :     LOCAL_COORDS, MAP_X, MAP_Y,
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
      :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
      :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
@@ -23,13 +24,16 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, N_BEAMS, N_BOL, N_POS, 
-*    :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
-*    :     N_MAP, N_FITS, FITS,  DEM_PNTR, LST_STRT, 
+*     SUBROUTINE SCULIB_PROCESS_BOLS(EXTINCTION, SCUOVER, N_BEAMS, 
+*    :     N_BOL, N_POS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
+*    :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
+*    :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
 *    :     IN_ROTATION, SAMPLE_MODE, SAMPLE_COORDS, OUT_COORDS,
 *    :     JIGGLE_REPEAT, JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
 *    :     JIGGLE_P_SWITCH, RA_CEN, DEC_CEN,
 *    :     RA1, RA2, DEC1, DEC2, MJD_STANDARD, IN_UT1,
+*    :     MJD1, LONG1, LAT1, MJD2, LONG2, LAT2,
+*    :     LOCAL_COORDS, MAP_X, MAP_Y,
 *    :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL, 
 *    :     NUM_CHAN, NUM_ADC, BOL_ADC, BOL_CHAN, BOL_DU3, BOL_DU4, 
 *    :     SCAN_REVERSAL, FIRST_LST, SECOND_LST, FIRST_TAU, SECOND_TAU,
@@ -154,6 +158,12 @@
 *        Longitude (apparent RA) at MJD2
 *     LAT2 = DOUBLE (Given)
 *        Latitude (apparent Dec) at MJD2
+*     LOCAL_COORDS = CHARACTER (Given)
+*        Coordinate system of offsets
+*     MAP_X = DOUBLE (Given)
+*        X offset in LOCAL_COORDS (radians)
+*     MAP_Y = DOUBLE (Given)
+*        Y offset in LOCAL_COORDS (radians)
 *     N_POINT = _INTEGER (Given)
 *        Number of pointing corrections (should be zero if EXTINCTION)
 *     POINT_DEL = _REAL (Given)
@@ -202,6 +212,12 @@
 *  Prior Requirements:
 
 *  Notes:
+*     MAP_X and MAP_Y are only used for JIGGLE modes.
+*     The SCAN/MAP offsets are wrapped into the RA1,DEC1,RA2,DEC2 
+*     numbers by the on-line system.
+*     The offsets are added to the map centre every time round the
+*     loop. This is because it is possible to have AZ offsets for
+*     RA,Dec centres.
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -260,8 +276,11 @@
      :                          N_INTEGRATIONS, N_MEASUREMENTS)
       DOUBLE PRECISION LAT1
       DOUBLE PRECISION LAT2
+      CHARACTER*(*)    LOCAL_COORDS
       DOUBLE PRECISION LONG1
       DOUBLE PRECISION LONG2
+      DOUBLE PRECISION MAP_X
+      DOUBLE PRECISION MAP_Y
       DOUBLE PRECISION MJD_STANDARD
       DOUBLE PRECISION MJD1
       DOUBLE PRECISION MJD2
@@ -319,6 +338,7 @@
       INTEGER          DATA_OFFSET      ! Offset in BOL_RA and BOL_DEC
       REAL             DEC_START        ! declination at start of SCAN 
       REAL             DEC_END          ! declination at end of SCAN
+      DOUBLE PRECISION DTEMP            ! Scratch double
       DOUBLE PRECISION ELAPSED          ! Elapsed time since start of obsn
       DOUBLE PRECISION ELEVATION        ! Elevation from CALC_BOL_COORDS
       DOUBLE PRECISION ETA              ! Tangent plane Y offset
@@ -337,6 +357,8 @@
       DOUBLE PRECISION MAP_DEC_CEN      ! Dec of Map centre
       DOUBLE PRECISION MAP_RA_CEN       ! RA of map centre
       INTEGER          MEASUREMENT      ! Loop counter for N_MEASUREMENTS
+      DOUBLE PRECISION MYLAT            ! Lat for use with MAP_X/Y offsets
+      DOUBLE PRECISION MYLONG           ! Long for use with MAP_X/Y offsets
       CHARACTER *(2)   OFFSET_COORDS    ! Coordinate system of offsets
       REAL             OFFSET_X         ! X offset of measurement in OFF_COORDS
       REAL             OFFSET_Y         ! Y offset of measurement in OFF_COORDS
@@ -541,22 +563,14 @@
 
                   STORED_OFFSET = DATA_OFFSET + 1
 
-*       Add kludge for SCUOVER - can only display zero jiggle
-*       or middle of SCAN
-               IF (SCUOVER) THEN
-                  IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+*     Add kludge for SCUOVER
+*     Only want to calculate the position for the first sample of the
+*     exposure. Note the array is displayed for the start of a SCAN
+*     in SCAN/MAP or the zero jiggle offset for JIGGLE/MAP.
 
-*       Calculate middle of scan
-                     ITEMP = (EXP_END + EXP_START) / 2
-                     EXP_LST = EXP_LST + DBLE(ITEMP - EXP_START) *
-     :                    DBLE(EXP_TIME) * 1.0027379D0 * 
-     :                    2.0D0 * PI / (3600.0D0 * 24.0D0)
-
-                     EXP_START = ITEMP
+                  IF (SCUOVER) THEN
+                     EXP_END = EXP_START
                   END IF
-
-                  EXP_END = EXP_START
-               END IF
 
 *     cycle through the measurements in the exposure
 
@@ -618,6 +632,29 @@
                      IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
                         ARRAY_RA_CENTRE = MAP_RA_CEN
                         ARRAY_DEC_CENTRE = MAP_DEC_CEN
+
+*     add on the offsets if needed
+                        IF ((MAP_X .NE. 0.0D0) .OR. 
+     :                       (MAP_Y .NE. 0.0D0)) THEN
+
+*     convert to position in local_coords frame
+*     at IN_UT1 and current LST
+*     Extinction must pass in the correct UT even if it never
+*     needs to deal with MJD_STANDARD.
+*     Planets should be done in RD local coords
+                           CALL SCULIB_APPARENT_2_MP(MAP_RA_CEN,
+     :                          MAP_DEC_CEN, LOCAL_COORDS,
+     :                          LST, IN_UT1, MYLONG, MYLAT, STATUS)
+
+*     now add on the tangent plane offset in this frame and convert
+*     back to apparent RA,Dec
+                           CALL SCULIB_CALC_APPARENT(MYLONG, MYLAT,
+     :                          0.0D0, 0.0D0, MAP_X, MAP_Y,
+     :                          LOCAL_COORDS, LST, IN_UT1, 0.0D0, 0.0D0,
+     :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                          DTEMP, STATUS)
+
+                        END IF
                         
                         IF (JIGGLE_REPEAT .EQ. 1) THEN
                            JIGGLE = (EXPOSURE-1) *
