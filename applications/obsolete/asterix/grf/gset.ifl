@@ -192,6 +192,12 @@ interface GSET
      default !
      help 'Colour number'
    endparameter
+   parameter BGCOL
+     type '_INTEGER'
+     prompt 'Background olour'
+     default !
+     help 'Colour number'
+   endparameter
    parameter SHAPE
      type '_INTEGER'
      default !
