@@ -260,7 +260,7 @@
         CALL MSG_PRNT( 'First input file will be overwritten' )
         CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
       ELSE
-        CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
+        CALL USI_ASSOC( 'INP1', ICLS, 'READ', FID1, STATUS )
       END IF
       CALL USI_ASSOC( 'INP2', ICLS, 'READ', FID2, STATUS )
 
