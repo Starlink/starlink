@@ -1,0 +1,61 @@
+## Allow 3 seconds to read each line of text (assuming a maximum line length 
+# of 68 characters), or 3 words per second. 
+
+demo v0.16 {
+
+   info "This demonstration highlights the main changes which have been
+   introduced into the <PACK KAPPA> package by version V0.16. See the
+   '<htx:sun95|se_changes <emph Release Notes>>' section of <doc SUN/95>
+   for a complete list."
+
+   env KAPPA_DIR
+
+   step {
+
+      command {exec echo "border=1" > stardemo.tmp}
+      command {exec echo "DrawAxes=0" >> stardemo.tmp}
+      command {exec echo "DrawTitle=0" >> stardemo.tmp}
+      command {exec echo "Grid=0" >> stardemo.tmp}
+      command {exec echo "NumLab=0" >> stardemo.tmp}
+      command {exec echo "MajTickLen=0" >> stardemo.tmp}
+      command {exec echo "MinTickLen=0" >> stardemo.tmp}
+      command {exec echo "TextLab(2)=0" >> stardemo.tmp}
+      command {exec echo "Label(1)=Version 0.16   " >> stardemo.tmp}
+      command {exec echo "LabelUnits=0" >> stardemo.tmp}
+      command {exec echo "TextLabGap(1)=0.25" >> stardemo.tmp}
+      command {exec echo "Size(TextLab)=2" >> stardemo.tmp}
+      command {exec echo "Width(TextLab)=2" >> stardemo.tmp}
+      command {exec echo "Colour(TextLab)=silver" >> stardemo.tmp}
+      command {exec echo "Colour(Border)=black" >> stardemo.tmp}
+      
+      command {Obey kapview display "in=$KAPPA_DIR/logo lut=$KAPPA_DIR/logo_lut axes=yes mode=scale style=^stardemo.tmp accept"}
+      command {exec rm -f stardemo.tmp}
+
+      text "This demonstration highlights the main changes which have
+      been introduced into the <PACK KAPPA> package by version V0.16. See
+      the '<htx:sun95|se_changes <emph Release Notes>>' section of <doc
+      SUN/95> for a complete list."
+
+      pause 8
+
+      command {Obey kapview gdclear ""}
+      command {Obey kapview display "in=$KAPPA_DIR/m57 lut=$KAPPA_DIR/warm_lut axes=no mode=perc percentiles=\[10,99\] accept"}
+
+      text "A new command called <command lutwarm> has been added. It
+      loads a colour table which goes from black to white, passing
+      through warm shades of yellow and brown, as popularised by
+      <htx:sun214 GAIA>. The above image of M57 is alternating between
+      the warm colour table and the grey colour table."
+
+      pause 3
+      command {Obey kapview lutable "mapping=linear coltab=grey"}
+      pause 2
+      command {Obey kapview lutable "mapping=linear coltab=external lut=$KAPPA_DIR/warm_lut"}
+      pause 3
+      command {Obey kapview lutable "mapping=linear coltab=grey"}
+      pause 2
+      command {Obey kapview lutable "mapping=linear coltab=external lut=$KAPPA_DIR/warm_lut"}
+      pause 5
+
+   }
+} 
