@@ -1265,7 +1265,8 @@ c     :                                        0,VAL__NBI,SID,STATUS)
       PARAMETER (ZERO=0)
 *    Local variables :
       CHARACTER*132 BUFFER
-      INTEGER NSCAL,NSTRUC,NCOMP,ITEMID
+      INTEGER NSCAL,ITEMID
+C      INTEGER NSTRUC,NCOMP
       INTEGER DISP,L
 *-
       IF (STATUS.EQ.SAI__OK) THEN
