@@ -1,0 +1,89 @@
+## Process this file with automake to produce Makefile.in
+
+SUBDIRS = @subdirs@
+
+bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
+
+LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_nogks_link_adam`
+
+bin_MONOLITHS = polpack_mon 
+polpack_mon_SOURCES = $(POLPACK_MONO_SOURCE) $(POLPACK_F_ROUTINES)
+polpack_mon_LDADD = $(LOCAL_LINK)
+polpack_mon_TASKS = $(POLPACK_TASKS)
+
+#  version.dat is just the package verion in a file for polversion command
+#  This is for backwards compatibility since, of course, we could make
+#  polversion have the value compiled in
+
+version.dat:
+	-rm -f version.dat
+	echo $(PACKAGE_VERSION) > version.dat
+
+#  List of Fortran routines required for building the package.  This is
+#  just a list of all the Fortran source files (excluding BLOCK DATA
+#  routines and the main routine, which are treated separately).
+
+F_ROUTINES = $(CCDPACK_F_ROUTINES) \
+             $(POLPACK_F_ROUTINES) $(POLSUB_F_ROUTINES) \
+             $(POLPACK_MONO_SOURCE) 
+
+#  Polpack f files for which there are no corresponding iraf .par files.
+POLPACK_F3_ROUTINES = polhelp.f
+
+#  All other polpack .f files.
+POLPACK_F1_ROUTINES = polbin.f polcal.f polcent.f polexp.f polexpx.f \
+polext.f polhelp.f polimage.f polimp.f polimpx.f polka.f polplot.f \
+polprep.f polrdtcl.f polsim.f polstack.f polvec.f polversion.f \
+polwrtcl.f polzconv.f
+
+#  polpack routines for which the atask action name can be derived from the 
+#  the f file name by remving the .f file suffix.
+POLPACK_F_ROUTINES = $(POLPACK_F1_ROUTINES) $(POLPACK_F3_ROUTINES)
+
+
+MONO_SOURCE = $(POLPACK_MONO_SOURCE) 
+POLPACK_MONO_SOURCE = polpack_mon.f
+
+#  List of ancillary data files (all types).
+
+DATA_FILES = test_data.sdf
+
+#  Other miscellaneous files in polpack-source.tar
+MISC_FILES = blank.bit feature.bit vertex.bit rfeature.bit rvertex.bit \
+left_arrow.bit right_arrow.bit tick.bit
+
+#  Define the tasks for each monolith.
+
+POLPACK_TASKS = $(POLPACK_F_ROUTINES:.f=) 
+
+
+#  List of public script files.  These are scripts which form part of
+#  the package and will be required by users of it.  They will be
+#  installed in the $(INSTALL_BIN) directory with execute permission
+#  set.
+
+PUBLICSCRIPTS = Polka.tcl Polka_procs.tcl \
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay polimp.csh \
+polexp.csh makecube.csh
+
+#  Define the set of all interface files.
+
+IFL_FILES = $(POLPACK_IFL_FILES) 
+
+#  Define the interface files required for compilation.
+
+POLPACK_IFL_FILES = $(POLPACK_F_ROUTINES:.f=.ifl) 
+MONO_IFL = $(MONO_SOURCE:.f=.ifl)
+
+DYNSCRIPTS = polpack.csh polpack.icl
+
+$(IFL_FILES) $(DYNSCRIPTS): polpack.ifd
+	$(IFD2STAR) polpack
+
+
+# Fixup scripts with bin location
+# The scripts needs to have installation locations edited into them
+edit = sed \
+	-e 's,@bindir\@,$(bindir),g' \
+	-e 's,@VERSION\@,$(VERSION),g'
+

@@ -1,0 +1,2393 @@
+package polpack {
+   version @PACKAGE_VERSION@
+   prefix pol
+
+   executable polpack_mon {
+#  Name:
+#     POLBIN.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polbin {
+
+         helplib {$POLPACK_HELP}
+
+         parameter box {
+            type _REAL
+            ppath CURRENT
+            prompt {Spatial bin size (pixels)}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+
+         parameter debias {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {Remove statistical bias?}
+            helpkey *
+          }
+
+         parameter integrate {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Integrate all input vectors into a single vector?}
+            helpkey *
+          }
+
+         parameter method {
+            type LITERAL
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default MEDIAN
+            prompt {Binning method}
+            helpkey *
+          }
+
+         parameter minval {
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {Min. number of good input values per bin}
+            helpkey *
+          }
+
+         parameter radec {
+            type _LOGICAL
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Produce RA & DEC columns, if possible?}
+            helpkey *
+          }
+
+         parameter sigmas {
+            type _REAL
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 4.0
+            prompt {Clipping limit (standard deviations)}
+            helpkey *
+          }
+
+         parameter zbox {
+            type _REAL
+            ppath CURRENT
+            prompt {Spectral bin size (pixels)}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLCAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     TMG: Tim Gledhill  (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-JUN-1997 (TMG):
+#     	 Original version.
+#     15-MAY-1998 (DSB):
+#        Parameters re-order. Defaults changed. CURRENT removed from
+#        VPATHs and PPATHS. TSP bits removed.
+#     9-FEB-1999 (DSB):
+#        Added DUALBEAM, NITER and NSIGMA.
+#     15-AUG-2000 (DSB):
+#        Added TRIMBAD.
+#     {enter_changes_here}
+
+#-
+
+      action polcal {
+
+         helplib {$POLPACK_HELP}
+
+         parameter dezero {
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Calculate zero-point corrections for the input data?}
+            helpkey *
+          }
+
+         parameter dualbeam {
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {Is the dual-beam algorithm to be used?}
+            helpkey *
+          }
+
+         parameter etol {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.01
+            prompt {Tolerence for E factor convergence}
+            helpkey *
+          }
+
+         parameter ilevel {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {Level of information to display}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input intensity images}
+            helpkey *
+          }
+
+         parameter maxit {
+            type _INTEGER
+            access READ
+            vpath DYNAMIC DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 30
+            prompt {Maximum number of iterations}
+            helpkey *
+          }
+
+         parameter minfrac {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {Minimum fraction of good input pixels required}
+            helpkey *
+          }
+
+         parameter nsigma {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 3.0
+            prompt {Rejection threshold in single-beam mode}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            ppath CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output Stokes cube}
+            helpkey *
+          }
+
+         parameter pmode {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default LINEAR
+            ppath DEFAULT
+            prompt {Polarimetric mode (LINEAR or CIRCULAR)}
+            helpkey *
+          }
+
+         parameter setvar {
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Store estimated variances in input images?}
+            helpkey *
+          }
+
+         parameter skysup {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 10.0
+            prompt {Sky supression factor}
+            helpkey *
+          }
+
+         parameter smbox {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 7
+            prompt {Size of Stokes vector smoothing box, in pixels}
+            helpkey *
+          }
+
+         parameter step {
+            type _INTEGER
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 1
+            prompt {Correlation length of the noise, in pixels}
+            helpkey *
+          }
+
+         parameter title {
+            type LITERAL
+            access READ
+            vpath DYNAMIC { DEFAULT}
+            default {Output from POLCAL}
+            ppath DYNAMIC DEFAULT
+            prompt {Title for output NDF}
+            helpkey *
+          }
+
+         parameter tolr {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0
+            prompt {Iterative convergence criterion in single-beam mode}
+            helpkey *
+          }
+
+         parameter tols {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.001
+            prompt {Scale factor tolerance for image inter-comparisons}
+            helpkey *
+          }
+
+         parameter tolz {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.05
+            prompt {Zero point tolerance for image inter-comparisons}
+            helpkey *
+          }
+
+         parameter trimbad {
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Trim the output cube to exclude any bad borders?}
+            helpkey *
+          }
+
+         parameter weights {
+            type _INTEGER
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 1
+            prompt {Scheme for choosing weights for input intensity values}
+            helpkey *
+          }
+
+         parameter variance {
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {Are output variance values to be generated?}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLCENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-MAY-1997 (DSB):
+#     	 Original version, derived from CCDPACK:FINDCENT.IFL
+#     {enter_changes_here}
+
+#-
+
+      action polcent {
+
+         parameter infile {
+            position 2
+            access READ
+            type LITERAL
+            prompt {Text file containing initial positions}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input NDF 
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input image}
+            helpkey *
+          }
+
+         parameter isize {
+                          # Search box size
+            type _INTEGER
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 9
+            prompt {Size of search box}
+            helpkey *
+          }
+
+         parameter maxshift {
+                             # Maximum shift in feature position
+            type _DOUBLE
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 5.5D0
+            prompt {Maximum shift in position}
+            helpkey *
+          }
+
+         parameter maxiter {
+                            # Maximum number of iterations
+            type _INTEGER
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Maximum number of refining iterations}
+            helpkey *
+          }
+
+         parameter outfile {
+            position 3
+            access READ
+            type LITERAL
+            prompt {Text file to receive accurate positions}
+            helpkey *
+          }
+
+         parameter toler {
+                          # Required tolerance
+            type _DOUBLE
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 0.05D0
+            prompt {Positional tolerance in centroid}
+            helpkey *
+          }
+
+         parameter positive {
+                             # Sign of features
+            type _LOGICAL
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Features have positive signal}
+            helpkey *
+          }
+
+         parameter xyout {
+                          # X and Y centroid positions
+            access WRITE
+            type _CHAR
+            vpath DEFAULT
+            prompt {Object to contain the x an y centroid positions}
+            default { }
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLEXP.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-DEC-1997 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polexp {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+                       # List of Input NDFs
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input images}
+            helpkey *
+          }
+
+         parameter namelist {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {File to contain a list of the NDFs}
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should all screen output be suppressed?}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLEXPX.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-MAY-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polexpx {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            prompt {Input NDF}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLEXT.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1998 (DSB):
+#     	 Original version.
+#     18-NOV-1998 (DSB):
+#        Added RAY.
+#     15-FEB-1999 (DSB):
+#        Added ANLANG, T and EPS.
+#     {enter_further_changes_here}
+
+#-
+
+      action polext {
+
+         helplib {$POLPACK_HELP}
+
+         parameter angrot {
+            type _REAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new ANGROT value}
+            helpkey *
+          }
+
+         parameter anlang {
+            type _REAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new ANLANG value}
+            helpkey *
+          }
+
+         parameter eps {
+            type _REAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new EPS value}
+            helpkey *
+          }
+
+         parameter filter {
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new FILTER value}
+            helpkey *
+          }
+
+         parameter imgid {
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {New IMGID value(s)}
+            helpkey *
+          }
+
+         parameter in {
+                       # List of Input NDFs
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input images}
+            helpkey *
+          }
+
+         parameter namelist {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {File to contain a list of the NDFs}
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should all screen output be suppressed?}
+            helpkey *
+          }
+
+         parameter ray {
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new RAY value}
+            helpkey *
+          }
+
+         parameter stokes {
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new STOKES value}
+            helpkey *
+          }
+
+         parameter t {
+            type _REAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new T value}
+            helpkey *
+          }
+
+         parameter vangrot {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vanlang {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter veps {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vfilter {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vimgid {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vray {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vstokes {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vt {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vwplate {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter vversion {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter wplate {
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {A new WPLATE value}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLHELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1997 July 1 (DSB):
+#	 Original version, copied from kaphelp.ifl written by MJC.
+#     {enter_further_changes_here}
+
+#-
+
+
+      action polhelp {
+
+         helplib {$POLPACK_HELP}
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+
+      }
+
+#  Name:
+#     POLIMAGE.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-APR-1998 (DSB):
+#     	 Original version.
+#     12-APR-1999 (DSB):
+#        Added SHAPE.
+#     7-FEB-2001 (DSB):
+#        Added COLZ.
+#     {enter_further_changes_here}
+
+#-
+
+      action polimage {
+
+         helplib {$POLPACK_HELP}
+
+         parameter box {
+            type _REAL
+            ppath CURRENT DEFAULT
+            default 1.0
+            prompt {Bin size}
+            helpkey *
+          }
+
+         parameter coldat {
+            position 3
+            type LITERAL
+            ppath CURRENT
+            prompt {Name of catalogue column holding data values}
+            helpkey *
+          }
+
+         parameter colvar {
+            position 4
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default !
+            prompt {Name of catalogue column holding variances}
+            helpkey *
+          }
+
+         parameter colx {
+            position 5
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default X
+            prompt {Name of catalogue column holding X positions}
+            helpkey *
+          }
+
+         parameter coly {
+            position 6
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default Y
+            prompt {Name of catalogue column holding Y positions}
+            helpkey *
+          }
+
+         parameter colz {
+            position 8
+            type LITERAL
+            ppath DYNAMIC DEFAULT
+            vpath DYNAMIC DEFAULT
+            default !
+            prompt {Name of catalogue column holding Z positions}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath CURRENT
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            ppath CURRENT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output image}
+            helpkey *
+          }
+
+         parameter method {
+            position 7
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default MEAN
+            prompt {Binning method}
+            helpkey *
+          }
+
+         parameter minval {
+            type _INTEGER
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Min. number of good input values per bin}
+            helpkey *
+          }
+
+         parameter shape {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Use spatial information in the input catalogue?}
+            helpkey *
+          }
+
+         parameter sigmas {
+            type _REAL
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 4.0
+            prompt {Clipping limit (standard deviations)}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLIMP.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-DEC-1997 (DSB):
+#     	 Original version, based on CCDPACK equivalent.
+#     {enter_further_changes_here}
+
+#-
+
+      action polimp {
+
+         helplib {$POLPACK_HELP}
+
+         parameter abort {
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Abort if any data file cannot be processed?}
+            helpkey *
+          }
+
+         parameter in {
+                       # List of Input NDFs
+            position 1
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input images}
+            helpkey *
+          }
+
+         parameter table {
+                          # Import control table
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Import control table}
+            helpkey *
+          }
+
+         parameter namelist {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {File to contain a list of the NDFs}
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should all screen output be suppressed?}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLIMPX.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     6-MAY-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polimpx {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            prompt {Input NDF}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLKA.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-APR-1997 (DSB):
+#     	 Original version.
+#     3-JUL-1998 (DSB):
+#        Change MODE to PMODE. Take POSITION away from SKYFRAMES.
+#     22-APR-1999 (DSB):
+#        Removed NEWCOLMAP.
+#     {enter_changes_here}
+
+#-
+
+      action polka {
+
+         helplib {$POLPACK_HELP}
+
+         parameter badcol {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default CYAN
+            prompt {Colour with which to mark missing pixel data}
+            helpkey *
+          }
+
+         parameter curcol {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default RED
+            prompt {Colour with which to mark current objects}
+            helpkey *
+          }
+
+         parameter dpi {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Screen dots per inch}
+            helpkey *
+          }
+
+         parameter dualbeam {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Run in dual-beam mode?}
+            helpkey *
+          }
+
+         parameter fittype {
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Fit type (1-5) for aligning images}
+            helpkey *
+          }
+
+         parameter helparea {
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Display the help area?}
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT CURRENT GLOBAL
+            ppath CURRENT GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {Input object frames}
+            helpkey *
+          }
+
+         parameter items {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default .0
+            prompt {Required items in the status area (private)}
+            helpkey *
+          }
+
+         parameter logfile {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {The name of a file in which to store all ATASK messages.}
+            helpkey *
+          }
+
+         parameter oefittype {
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Fit type (1-5) for aligning O and E rays}
+            helpkey *
+          }
+
+         parameter out {
+            type LITERAL
+            access WRITE
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default *_A
+            prompt {Aligned output intensity images }
+            helpkey *
+          }
+
+         parameter out_s {
+            position 2
+            type LITERAL
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output cube for Stokes parameters}
+            helpkey *
+          }
+
+         parameter out_e {
+            type LITERAL
+            access WRITE
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default *_E
+            prompt {Aligned output images holding E-ray areas}
+            helpkey *
+          }
+
+         parameter out_o {
+            type LITERAL
+            access WRITE
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            default *_O
+            prompt {Aligned output images holding O-ray areas}
+            helpkey *
+          }
+
+         parameter percentiles {
+            type _REAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 5 95
+            prompt {Percentiles for scaling}
+            helpkey *
+            size *
+          }
+
+         parameter pmode {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default Linear
+            prompt {Type of polarisation being measured}
+            helpkey *
+          }
+
+         parameter pol {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Processing polarimetry data?}
+            helpkey *
+          }
+
+         parameter psfsize {
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Typical size of star-like image features (in pixels)}
+            helpkey *
+          }
+
+         parameter refcol {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default GREEN
+            prompt {Colour with which to mark reference objects}
+            helpkey *
+          }
+
+         parameter refin {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Reference frame}
+            helpkey *
+          }
+
+         parameter selcol {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default RED
+            prompt {Colour with which to mark the selected area}
+            helpkey *
+          }
+
+         parameter skyframes {
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {Input sky frames}
+            helpkey *
+          }
+
+         parameter skypar {
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 0
+            prompt {Order of polynomial sky fit on each axis}
+            helpkey *
+          }
+
+         parameter skyoff {
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Subtract the sky background off the output images?}
+            helpkey *
+          }
+
+         parameter statusarea {
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Display the status area?}
+            helpkey *
+          }
+
+         parameter starthelp {
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Display hyper-text help automatically at start-up?}
+            helpkey *
+          }
+
+         parameter view {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default Zoomed
+            prompt {View new images zoomed or unzoomed?}
+            helpkey *
+          }
+
+         parameter xhair {
+            type _LOGICAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Use a cross-hair over the image display area?}
+            helpkey *
+          }
+
+         parameter xhaircol {
+            type LITERAL
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default YELLOW
+            prompt {Colour with which to draw the cross-hair (if required)}
+            helpkey *
+          }
+
+      }
+#  Name:
+#     POLPLOT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1998 (DSB):
+#     	 Original version.
+#     6-AUG-1998 (DSB):
+#        Changed default for LBND and UBND to !.
+#     11-NOV-1998 (DSB):
+#        Brought into line with KAPPA V0.13 graphics system.
+#     {enter_further_changes_here}
+
+#-
+
+      action polplot {
+
+         helplib {$POLPACK_HELP}
+
+         parameter angrot {
+            type _REAL
+            prompt {Orientation of reference direction}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0.0
+          }
+
+         parameter arrow {
+            type _REAL
+            prompt {Fractional size of arrow heads}
+            vpath DEFAULT
+            ppath DEFAULT
+            helpkey *
+            default 0.0
+          }
+
+         parameter axes {
+            type _LOGICAL
+            prompt {Are annotated axes to be drawn?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter cat {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter colang {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector angles}
+            helpkey *
+          }
+
+         parameter colmag {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector lengths}
+            helpkey *
+          }
+
+         parameter colx {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector X position}
+            helpkey *
+          }
+
+         parameter coly {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector Y position}
+            helpkey *
+          }
+
+         parameter colz {
+            type LITERAL
+            ppath DYNAMIC DEFAULT
+            vpath DYNAMIC DEFAULT
+            default !
+            prompt {Name of catalogue column holding vector Z position}
+            helpkey *
+          }
+
+         parameter device {
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Epoch of observation}
+            helpkey *
+          }
+
+         parameter fill {
+            type _LOGICAL
+            prompt {Fill the plotting area?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter frame {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Required co-ordinate Frame}
+            helpkey *
+            default !
+          }
+
+         parameter just {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Vector justification}
+            default CENTRE
+            helpkey *
+#     in          'CENTRE', 'START', 'END'
+          }
+
+         parameter key {
+            type _LOGICAL
+            prompt {Do you want a key showing the vector scale?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter keypos {
+            type _REAL
+            prompt {Horizontal and vertical position of key}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 0.03
+          }
+
+         parameter keystyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the key}
+            helpkey *
+            default !
+          }
+
+         parameter keyvec {
+            type _REAL
+            prompt {Key vector magnitude}
+            vpath DYNAMIC
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter lbnd {
+            type _REAL
+            prompt {Co-ordinates at lower left corner of plotting area}
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter margin {
+            type _REAL
+            prompt {Widths of margins around DATA picture}
+            vpath DYNAMIC
+            ppath DYNAMIC
+            helpkey *
+          }
+
+         parameter negate {
+            type _LOGICAL
+            prompt {Are the supplied angles to be negated?}
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the annotated axes and vectors}
+            helpkey *
+            default !
+          }
+
+         parameter ubnd {
+            type _REAL
+            prompt {Co-ordinates at upper right corner of plotting area}
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter vscale {
+            type _REAL
+            prompt {Data value for a 1-centimetre vector}
+            ppath DYNAMIC
+            vpath DYNAMIC
+            helpkey *
+          }
+
+         parameter zaxval {
+            type LITERAL
+            prompt {The Z axis value to plot}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter zcolval {
+            type LITERAL
+            prompt {The Z column value to plot}
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLPREP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JUL-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polprep {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Input NDF structure}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF structure}
+            helpkey *
+          }
+
+         parameter ref {
+            position 3
+            type _LOGICAL
+            access READ
+            prompt {Is this the reference image?}
+            helpkey *
+          }
+
+         parameter frame {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default {A default string}
+            prompt {The Domain name}
+            helpkey *
+          }
+
+      }
+#  Name:
+#     POLRDTCL.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-DEC-2000 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polrdtcl {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            prompt {Input text file}
+            helpkey *
+          }
+
+         parameter ref {
+            position 2
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Reference catalogue}
+            helpkey *
+          }
+
+         parameter out {
+            position 3
+            type LITERAL
+            association ->GLOBAL.CATALOGUE
+            prompt {Output catalogue}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLSIM.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAR-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polsim {
+
+         helplib {$POLPACK_HELP}
+
+         parameter cube {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input Stokes cube}
+            helpkey *
+          }
+
+         parameter in {
+            position 2
+            type LITERAL
+            access READ
+            vpath PROMPT CURRENT
+            ppath CURRENT
+            prompt {Input intensity images}
+            helpkey *
+          }
+
+         parameter out {
+            type LITERAL
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output intensity images}
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should all screen output be suppressed?}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLSTACK.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAY-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polstack {
+
+         helplib {$POLPACK_HELP}
+
+         parameter bin {
+            position 3
+            type _REAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Bin size, in degrees}
+            default 10
+            helpkey *
+          }
+
+         parameter ilevel {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Screen information level}
+            default 1
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input intensity frames}
+            helpkey *
+          }
+
+         parameter minin {
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Minimum number of input images per output image}
+            default 3
+            helpkey *
+          }
+
+         parameter origin {
+            type _REAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Analysis angle at start of first bin, in degrees}
+            default 0.0
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output intensity images}
+            helpkey *
+          }
+
+         parameter stack {
+            type NDF
+            access WRITE
+            vpath DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {3D output stack}
+            default !
+            helpkey *
+          }
+
+         parameter twopi {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Bin analysis angles in range 0 to 360 degrees?}
+            default FALSE
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POLVEC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JAN-1998 (DSB):
+#     	 Original version.
+#     24-JUN-1998 (DSB):
+#        Added Q, U and V.
+#     {enter_further_changes_here}
+
+#-
+
+      action polvec {
+
+         helplib {$POLPACK_HELP}
+
+         parameter ang {
+            position 5
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Polarisation angle}
+            helpkey *
+          }
+
+         parameter box {
+            type _INTEGER
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1
+            prompt {Bin size}
+            helpkey *
+          }
+
+         parameter cat {
+            position 2
+            type LITERAL
+            ppath CURRENT
+            prompt {Output catalogue}
+            association ->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter debias {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {Remove statistical bias?}
+            helpkey *
+          }
+
+         parameter i {
+            position 3
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Total intensity }
+            helpkey *
+          }
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input Stokes cube}
+            helpkey *
+          }
+
+         parameter ip {
+            position 6
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Polarised intensity}
+            helpkey *
+          }
+
+         parameter method {
+            type LITERAL
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default MEDIAN
+            prompt {Binning method}
+            helpkey *
+          }
+
+         parameter p {
+            position 4
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Percentage polarisation}
+            helpkey *
+          }
+
+         parameter q {
+            position 7
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Stokes parameter Q}
+            helpkey *
+          }
+
+         parameter radec {
+            type _LOGICAL
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Produce RA & DEC columns, if possible?}
+            helpkey *
+          }
+
+         parameter sigmas {
+            type _REAL
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 4.0
+            prompt {Clipping limit (standard deviations)}
+            helpkey *
+          }
+
+         parameter u {
+            position 8
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Stokes parameter U}
+            helpkey *
+          }
+
+         parameter v {
+            position 9
+            type NDF
+            access WRITE
+            vpath default
+            ppath default
+            default !
+            prompt {Stokes parameter V}
+            helpkey *
+          }
+
+         parameter variance {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Are variance values to be generated?}
+            helpkey *
+          }
+
+         parameter wlim {
+            type _REAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {Min. fraction of good input values per bin}
+            helpkey *
+          }
+
+      }
+      action polversion {
+         helplib {$POLPACK_HELP}
+         parameter compare {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {The version string for comparison}
+            ppath CURRENT
+            default !
+            helpkey *
+          }
+         parameter result {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+      }
+#  Name:
+#     POLWRTCL.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 2000 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-SEP-2000 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polwrtcl {
+
+         helplib {$POLPACK_HELP}
+
+         parameter in {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type LITERAL
+            prompt {Output text file}
+            helpkey *
+          }
+
+      }
+#  Name:
+#     POLZCONV.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 2001 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-2001 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action polzconv {
+
+         helplib {$POLPACK_HELP}
+
+         parameter cat {
+            position 1
+            type LITERAL
+            ppath GLOBAL
+            association <-GLOBAL.CATALOGUE
+            prompt {Input catalogue}
+            helpkey *
+          }
+
+         parameter colx {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector X position}
+            helpkey *
+          }
+
+         parameter coly {
+            type LITERAL
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Name of catalogue column holding vector Y position}
+            helpkey *
+          }
+
+         parameter colz {
+            type LITERAL
+            ppath DYNAMIC DEFAULT
+            vpath DYNAMIC DEFAULT
+            default !
+            prompt {Name of catalogue column holding vector Z position}
+            helpkey *
+          }
+
+         parameter zaxval {
+            type LITERAL
+            prompt {The Z axis value to convert}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter zcolval {
+            type LITERAL
+            prompt {The Z column value to convert}
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter zaxuse {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default {A default string}
+            prompt {The Z axis value to use}
+            helpkey *
+          }
+
+         parameter zcoluse {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default {A default string}
+            prompt {The Z column value to use}
+            helpkey *
+          }
+
+      }
+   }
+
+
+   icl {defhelp kappa $KAPPA_HELP 0}
+
+   csh {
+
+#
+#  Here look to see if there is an ADAM_USER directory.  If there is not
+#  check whether or not there is an adam file that is not a directory.
+#  If there is, issue a warning and exit.  Otherwise create the required
+#  directory.
+#
+      if (-d $HOME/adam) then
+         echo -n
+      else
+         if (-f $HOME/adam) then
+            echo "You have a file called adam in your home directory.  Please rename "
+            echo "since adam must be a directory for ADAM files."
+            exit
+         else
+            mkdir $HOME/adam
+         endif
+      endif
+#
+#
+#  Set up an environment variable pointing to the help library. This is refered
+#  to within the appliation interface files.
+      setenv POLPACK_HELP INSTALL_HELP/polpack
+
+#
+#  Set up the commands and environment variables needed to export and
+#  import POLPACK extension information to and from foreign data formats.
+#
+      if ( $?NDF_XTN ) then
+         switch ($NDF_XTN)
+            case *POLPACK*:
+               breaksw
+            default:
+               setenv NDF_XTN ${NDF_XTN},POLPACK
+         endsw
+      else
+         setenv NDF_XTN POLPACK
+      endif
+
+      setenv NDF_IMP_POLPACK 'INSTALL_BIN/polimp.csh ^ndf'
+      setenv NDF_EXP_POLPACK 'INSTALL_BIN/polexp.csh ^ndf'
+      setenv NDF_IMP_POLPACK_COMPRESSED ' '
+      setenv NDF_EXP_POLPACK_COMPRESSED ' '
+      setenv NDF_IMP_POLPACK_GZIP ' '
+      setenv NDF_EXP_POLPACK_GZIP ' '
+
+   }
+
+   display {
+
+     POLPACK commands are now available -- (Version @PACKAGE_VERSION@)
+
+     Type polhelp for help on POLPACK commands.
+     Type "showme sun223" to browse the hypertext documentation.
+
+   }
+
+
+}
