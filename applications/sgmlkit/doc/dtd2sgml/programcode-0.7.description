@@ -691,6 +691,111 @@ Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 
 </body>
 </commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 2 Jun 2000 10:12:10 +0100 (BST)</date>
+<subject>Re: script options as parameters</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 10:12:20 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 10:12:20 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xnV5-00033n-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:19 +0100</otherheader>
+<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xnV7-00081v-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:21 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xnUx-00018S-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 10:12:11 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id KAA15867 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 10:12:11 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id KAA26332 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 10:12:10 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='In-Reply-To'>&lt;Pine.LNX.4.10.10005251147490.19954-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021010450.26239-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+Can you explain what you mean by 'options'?  Do you mean command line
+flags which are not ADAM ones, or something else?
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 2 Jun 2000 17:58:58 +0100 (BST)</date>
+<subject>Re: script options as parameters</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Fri Jun 02 17:58:59 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 17:58:59 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xumg-000407-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 17:58:58 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12xumg-0005AO-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 17:58:58 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006021749300.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+Mmm, I hadn't thought of that.  I was thinking of options to scripts,
+or other programs: --like-this.  I suppose we _could_ overload the
+parameterlist element so that when the program language was a script
+type, these were formatted as options, but that's a rather shaky
+approach, I think.
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 2 Jun 2000 18:12:17 +0100 (BST)</date>
+<subject>Re: script options as parameters</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 18:12:24 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-programcode-0.7+parameter@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 18:12:24 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xuzf-00040m-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:23 +0100</otherheader>
+<otherheader name='Received'>from mauve.csi.cam.ac.uk ([131.111.8.38] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xuzh-0000yh-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:25 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by mauve.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xuzc-0006rQ-00 for sgml-programcode-0.7+parameter@astro.gla.ac.uk; Fri, 02 Jun 2000 18:12:20 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id SAA25472 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 18:12:19 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id SAA28925 for &lt;sgml-programcode-0.7+parameter@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 18:12:18 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='In-Reply-To'>&lt;Pine.LNX.4.10.10006021749300.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021802450.28856-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+No I wasn't suggesting that, I was just asking whether --like-this 
+is what you meant or not.
+
+I suppose a new optionlist element with content something like
+(option, description)* would make sense.  Because these can take
+various forms I'd be inclined not to give it any more structure
+than that.  `Option' isn't a very definite word to use (witness
+my confusion above) - `flag' might be better but does tend to 
+suggest things with leading minus signs, which could be overly 
+restrictive.  In the mean time, like you, I've been using diytopics.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
 <!--splice:parameter-->
 </element>
 
@@ -730,8 +835,19 @@ where only a brief function description is required.
 <!--splice:quote-->
 </element>
 
-<element gi="ref" status="experimental">
-<p>See <elemxref gi="ref" dtd="sundtd"/></p>
+<element gi="ref" status="alpha">
+<p>Allows you to link to another routine in the same programcode
+document.</p>
+
+<p>This is possibly slightly confusing, since in the Starlink General
+DTD (for SUNs, SSN, and the like), you <em>cannot</em> use the
+<elemxref gi="ref" dtd='sundtd'/> element to do this, but must use the
+<elemxref gi='coderef' dtd='sundtd'/> element instead.  In the
+programcode DTD, there is no <elemxref gi='coderef' dtd='sundtd'/>
+element.</p>
+
+<p>What you cannot do at all, at present, is refer to a routine in a
+<em>different</em> programcode document.</p>
 <!--splice:ref-->
 </element>
 
@@ -770,8 +886,10 @@ General DTD.
 <p>An ID for this element, which can be referred to using the
 <elemxref gi='coderef' dtd='sundtd'/> element, via the
 <elemxref gi='codecollection' dtd='sundtd'/> element in the Starlink
-General DTD.
-</p>
+General DTD.  Referring to an ID attached to a <elemref self='self'
+gi='routinename'/> is entirely equivalent to a reference to the ID
+attribute on the <elemref gi='routine'/> element, so that the document
+author can choose which is more convenient.</p>
 </attribute>
 <!--splice:routinename-->
 </element>

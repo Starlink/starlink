@@ -308,6 +308,12 @@ reference to a document which is marked up using the programcode DTD.
 The <elemref self="self" gi='coderef'/> element refers to an ID attached
 to an element in the programcode document (which will be either a
 routine or a routinename element).</p>
+
+<p>Like the <elemref gi="ref"/> element, if you do not supply any content for
+this element -- that is, you give the element as <code>&lt;coderef
+collection="cc1" id="tryxxx"/></code> -- then suitable content will be
+generated for the output.</p>
+
 <attribute name="collection">
 <p>The ID which you have assigned to a <elemref
 gi="codecollection"/>.</p>
@@ -1034,6 +1040,90 @@ just forgotten?
 ---------------------------------------------------------------------------
 </body>
 </commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Fri, 2 Jun 2000 11:14:34 +0100 (BST)</date>
+<subject>Use with span element</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Fri Jun 02 11:14:39 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+m@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 11:14:39 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xoTP-0003EM-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:39 +0100</otherheader>
+<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12xoTR-0000og-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:41 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12xoTM-0002De-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 11:14:36 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id LAA16868 for &lt;sgml-starlink-0.7+m@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 11:14:35 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id LAA26746 for &lt;sgml-starlink-0.7+m@astro.gla.ac.uk&gt;; Fri, 2 Jun 2000 11:14:35 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10006021106160.26664-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I think use of the new &lt;span&gt; element can cover this.
+You will be able to write
+
+   &lt;span media='screen,print'&gt;&lt;m&gt;(x^2 + y^2)&lt;/m&gt;&lt;/span&gt;
+   &lt;span media='tty'&gt;(x**2 + y**2)&lt;/span&gt;
+
+which does the job nicely I think.
+
+For displayed maths you'd typically want to do something like:
+
+   &lt;span media='screen,print'&gt;
+   &lt;mequation&gt;
+      x^n + y^n = z^n
+   &lt;/mequation&gt;
+   &lt;/span&gt;
+   &lt;span media='tty&gt;
+   &lt;verbatim&gt;
+      x**n + y**n = z**n
+   &lt;/verbatim&gt;
+   &lt;/span&gt;
+
+unfortunately with the current implementation of span this is not 
+possible, since it cannot contain a verbatim.
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
+<commentary>
+<from>Norman Gray</from>
+<email>norman@astro.gla.ac.uk</email>
+<date>Fri, 2 Jun 2000 15:25:42 +0100 (BST)</date>
+<subject>Use with span element</subject>
+<otherheader name='From '>norman@astro.gla.ac.uk Fri Jun 02 15:25:43 2000</otherheader>
+<otherheader name='Return-path'>&lt;norman@astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+m@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Fri, 02 Jun 2000 15:25:43 +0100</otherheader>
+<otherheader name='Received'>from goedel.astro.gla.ac.uk ([130.209.45.147] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12xsOM-0003eo-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 15:25:42 +0100</otherheader>
+<otherheader name='Received'>from norman (helo=localhost) by goedel.astro.gla.ac.uk with local-esmtp (Exim 3.13 #1) id 12xsOM-0004wf-00 for sgml-starlink-0.7+m@astro.gla.ac.uk; Fri, 02 Jun 2000 15:25:42 +0100</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.LNX.4.10.10006021523420.17541-100000@goedel.astro.gla.ac.uk&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+
+I've altered the content model of the span element, so that it can now
+include all the elements which can be in a paragraph, specifically
+including &lt;verbatim&gt; and &lt;m&gt;.
+
+Norman
+
+-- 
+---------------------------------------------------------------------------
+Norman Gray                        <url>http://www.astro.gla.ac.uk/users/norman/</url>
+Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
+
+
+
+</body>
+</commentary>
 <!--splice:m-->
 </element>
 
@@ -1147,8 +1237,11 @@ the link target.  Any element which has an ID attribute may be linked
 to.  A small subtlety is that the link is to a complete <em>element</em> of the
 document, rather than a <em>point</em> of the document.
 <example>See also &lt;ref id=other.ref&gt;&lt;/> for more details.  There's
-yet more information &lt;ref id=even.more>elsewhere&lt;/ref></example>
-</p>
+yet more information &lt;ref
+id=even.more>elsewhere&lt;/ref></example></p>
+
+<p>You cannot link to code prologues using this mechanism.  For that,
+see the <elemref gi='coderef'/> element.</p>
 <attribute name="id">
 <p>The ID of the element to link to.</p>
 </attribute>
@@ -1588,6 +1681,11 @@ to this section, with the specified key.
 in the flow of text.  At present, the only attribute it has is
 the media attribute, but it might be extended with a
 more general `class' attribute at some point.</p>
+
+<p>Note the place of this element in the element hierarchy.  It can
+include all the elements which are permitted inside a paragraph, such
+as <elemref gi="verbatim"/> or <elemref gi="dl"/> and the like, but it
+cannot be included within any of these in-paragraph elements.</p>
 
 <attribute name="media">
 <p>This attribute specifies the media type or types for which the
