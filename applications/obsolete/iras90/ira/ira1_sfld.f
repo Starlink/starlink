@@ -110,6 +110,7 @@
                                  ! following the first field.
       INTEGER SPACE2             ! Index within CONTXT of space
                                  ! following the second field.
+      CHARACTER * (80) TEMPSTR   ! Temporary string
 *.
 
 *  Check inherited global status.
@@ -149,14 +150,15 @@
 
 *  If the first field has not changed, suppress the printing of the first
 *  field and the sign.
-               IF( CONTXT( 3 : SPACE1 ) .EQ.
-     :             FTEXT( 1 )( : FLEN( 1 ) )//' ' ) THEN
+               TEMPSTR = FTEXT(1)(:FLEN(1))//' '
+               IF( CONTXT( 3 : SPACE1 ) .EQ. TEMPSTR ) THEN
                   PFLAGS( 1 ) = .FALSE.
                   PFLAGS( 5 ) = .FALSE.
 
 *  If the second field has not changed, suppress the printing of it.
+                  TEMPSTR = FTEXT( 2 )( : FLEN( 2 ) )//' '
                   IF( CONTXT( SPACE1 + 1 : SPACE2 ) .EQ.
-     :                FTEXT( 2 )( : FLEN( 2 ) )//' ' ) THEN
+     :                TEMPSTR ) THEN
                      PFLAGS( 2 ) = .FALSE.
 
 *  The third and fourth fields are always printed.
