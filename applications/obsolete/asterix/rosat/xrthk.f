@@ -479,8 +479,15 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 * Check if the HK data is complete
       IF (TIME(1) .GT. (OARR(1) + 10.)) THEN
-         CALL MSG_PRNT('** The HK file is incomplete - times not '/
-     &               /'covered by the file will be INCLUDED in the '/
+         CALL MSG_PRNT('** The HK file is incomplete **')
+         CALL MSG_SETD('T1',HEAD.TSTART(1)+HEAD.BASE_SCTIME)
+         CALL MSG_SETD('T2',HEAD.TEND(HEAD.NTRANGE)+HEAD.BASE_SCTIME)
+         CALL MSG_PRNT('   data time range: ^T1 to ^T2 ')
+         CALL MSG_SETD('T1',TIME(1))
+         CALL MSG_SETD('T2',TIME(NTIM))
+         CALL MSG_PRNT('   HK  time  range: ^T1 to ^T2 ')
+         CALL MSG_PRNT('** times not '/
+     &               /'covered will be INCLUDED in the '/
      &               /'output file **')
       ENDIF
 *
