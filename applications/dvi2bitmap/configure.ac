@@ -84,7 +84,7 @@ dnl   strstream
 AC_CHECK_HEADERS(sstream)
 
 dnl   Checks for library functions
-AC_CHECK_FUNCS(popen)
+AC_CHECK_FUNCS(pipe)
 dnl   getopt_long.c uses (and provides a replacement for)
 dnl   this glibc utility function
 AC_CHECK_FUNCS(__strchrnul)
