@@ -1,0 +1,18 @@
+Things to do in AST (not necesarily priority order):
+
+Added 17/1/05:
+
+- Changing version in configure.ac and then doing make does not result in 
+  version.h being re-made.
+- Flux conservation in Mapping resample routines
+- Extend FluxFrame to describe magnitudes and antenna temperature.
+- Add AzEl system to SkyFrame
+- Complete STC classes
+- Add support for FITS-WCS paper III "-TAB" algorithm code to FitsChan
+- Add support for HEALPIX ?? (e.g. see http://www.spacebanter.com/showthread.php?p=336715#post336715)
+- Pure Java version
+- Add Prism class
+- Correct void * arithmetic in keymap.c
+- Integrate TimeFrame
+- Monitor progresss on FITS-WCS paper IV (and eventually paper V)
+ 
