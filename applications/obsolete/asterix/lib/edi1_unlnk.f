@@ -70,8 +70,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*      2 Jan 1996 (DJA):
+*        Retype HDS object if writable
 *     {enter_changes_here}
 
 *  Bugs:
@@ -84,19 +86,12 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER                   LHS, RHS
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
-      EXTERNAL			EDI0_PRPIL
-        CHARACTER*8             EDI0_PRPIL
 
 *  Local Variables:
       INTEGER			I			! Loop over lists
@@ -109,6 +104,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Update the HDS type of the RHS if appropriate
+      CALL ADI1_LRETYP( LHS, 'EVDS', RHS, STATUS )
 
 *  Get number of lists
       CALL EDI_GETNS( LHS, NEVENT, NLIST, STATUS )
