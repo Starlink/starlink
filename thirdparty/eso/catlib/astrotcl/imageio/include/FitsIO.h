@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: FitsIO.h,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $" 
+ * "@(#) $Id: FitsIO.h,v 1.5 2003/01/20 15:52:21 brighton Exp $" 
  *
  * FitsIO.h - declarations for class FitsIO, a class representing the
  *            contents of a FITS image file (or other image source)
@@ -14,8 +14,8 @@
  * Allan Brighton  05/10/95  Created
  */
 
-#include <stdio.h>
-#include <iostream.h>
+#include <cstdio>
+#include <iostream>
 #include "ImageIO.h"
 #include "fitsio.h"
 
@@ -63,10 +63,10 @@ protected:
     static int put_keyword(FILE* f, const char* keyword, char value);
     
     // write keyword/value pair to the given stream.
-    static int put_keyword(ostream& os, const char* keyword, int value);
-    static int put_keyword(ostream& os, const char* keyword, double value);
-    static int put_keyword(ostream& os, const char* keyword, char* value);
-    static int put_keyword(ostream& os, const char* keyword, char value);
+    static int put_keyword(std::ostream& os, const char* keyword, int value);
+    static int put_keyword(std::ostream& os, const char* keyword, double value);
+    static int put_keyword(std::ostream& os, const char* keyword, char* value);
+    static int put_keyword(std::ostream& os, const char* keyword, char value);
 
     // round off file size
     static void padFile(FILE* f, int size);
@@ -160,7 +160,7 @@ public:
     static char* get(fitsfile*, const char* keyword);
 
     //  write a (ASCII formatted) copy of the FITS header to the given stream.
-    int getFitsHeader(ostream& os) const;
+    int getFitsHeader(std::ostream& os) const;
 
 
     // Insert the given FITS keyword and value and return 0 if OK

@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: FitsIO.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $" 
+ * "@(#) $Id: FitsIO.C,v 1.4 2003/01/20 15:52:21 brighton Exp $" 
  *
  * FitsIO.C - method definitions for class FitsIO, for operating on
  *            Fits files.
@@ -14,18 +14,19 @@
  *                           for bitpix=16 for H_COMPRESS.
  *                 12/03/98  Initialize WCS in constructor.
  */
-static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $";
+static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <iostream.h>
-#include <strstream.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
 #include <unistd.h>
-#include <math.h>
-#include <time.h>
+#include <cmath>
+#include <ctime>
 #include "util.h"
 #include "error.h"
 #include "fitsio.h"
@@ -291,17 +292,15 @@ FitsIO* FitsIO::read(const char* filename, int mem_options)
 int FitsIO::cfitsio_error()
 {
     char buf[81];
-    ostrstream os;
+    std::ostringstream os;
     int i = 0;
     while (fits_read_errmsg(buf)) {
-	os << buf << endl;
+	os << buf << std::endl;
 	i++;
     }
     fits_clear_errmsg();
     if (i) {
-	os << ends;
-	error("cfitsio: ", os.str());
-	free(os.str());
+	error("cfitsio: ", os.str().c_str());
     }
     return ERROR;
 }
@@ -487,7 +486,8 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
     Mem header(FITSBLOCK, 0);	// more than large enough to hold the fields below
     if (header.status() != 0) 
 	return NULL;
-    ostrstream os((char*)header.ptr(), header.length()); // stream will write to shared memory
+
+    std::ostringstream os;
  
     // generate the fits header
     double r = radius/60.0;	// radius in degrees
@@ -522,7 +522,8 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
 
     char buf[81];
     sprintf(buf, "%-80s", "END"); // mark the end of the header
-    os << buf << ends;
+
+    strncpy((char*)header.ptr(), os.str().c_str(), header.length()); // write to shared memory
 
     // generate the blank image 
     return new FitsIO(width, height, BYTE_IMAGE, 0.0, 1.0, header, data);
@@ -533,7 +534,7 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
  * write the keyword/value pair to the given stream.
  * (char* value version)
  */
-int FitsIO::put_keyword(ostream& os, const char* keyword, char* value) 
+int FitsIO::put_keyword(std::ostream& os, const char* keyword, char* value) 
 {
     char  buf1[81], buf2[81];
     sprintf(buf1, "%-8s= '%s'", keyword, value);
@@ -547,7 +548,7 @@ int FitsIO::put_keyword(ostream& os, const char* keyword, char* value)
  * write the keyword/value pair to the given stream.
  * (char value version)
  */
-int FitsIO::put_keyword(ostream& os, const char* keyword, char value) 
+int FitsIO::put_keyword(std::ostream& os, const char* keyword, char value) 
 {
     char  buf1[81], buf2[81];
     sprintf(buf1, "%-8s= %c", keyword, value);
@@ -561,7 +562,7 @@ int FitsIO::put_keyword(ostream& os, const char* keyword, char value)
  * write the keyword/value pair to the given stream.
  * (int value version)
  */
-int FitsIO::put_keyword(ostream& os, const char* keyword, int value) 
+int FitsIO::put_keyword(std::ostream& os, const char* keyword, int value) 
 {
     char  buf1[81], buf2[81];
     sprintf(buf1, "%-8s= %d", keyword, value);
@@ -574,7 +575,7 @@ int FitsIO::put_keyword(ostream& os, const char* keyword, int value)
  * write the keyword/value pair to the given stream.
  * (double value version)
  */
-int FitsIO::put_keyword(ostream& os, const char* keyword, double value) 
+int FitsIO::put_keyword(std::ostream& os, const char* keyword, double value) 
 {
     char  buf1[81], buf2[81];
     sprintf(buf1, "%-8s= %f", keyword, value);
@@ -785,9 +786,10 @@ int FitsIO::write(const char *filename) const
  *  write a (ASCII formatted) copy of the FITS header to the given stream.
  * (format it in 80 char lines and replace any NULL chars with blanks)
  */
-int FitsIO::getFitsHeader(ostream& os) const
+int FitsIO::getFitsHeader(std::ostream& os) const
 {
-    istrstream is((char*)header_.ptr(), header_.length());
+    std::string s((char*)header_.ptr(), header_.length());
+    std::istringstream is(s);
     char buf[81];
     while(is.read(buf, 80)) {
 	for (int i = 0; i < 79; i++)
@@ -798,7 +800,6 @@ int FitsIO::getFitsHeader(ostream& os) const
 	if (strncmp(buf, "END     ", 8) == 0)
 	    break;
     }
-    os << ends;
     return 0;
 }
 
