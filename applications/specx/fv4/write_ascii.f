@@ -73,7 +73,7 @@ C-----------------------------------------------------------------------
           DO I = 1, NPTS(NQ)
             NLINE = NLINE+1
             WRITE  (LUN, 100) NLINE, I, XSCALE(NOFF+I), DATA(NOFF+I)
-  100       FORMAT (1X,I4,5X,I4,5X,F9.2,5X,E12.5)
+  100       FORMAT (1X,I4,5X,I4,5X,F12.5,5X,E12.5)
           END DO
         END IF
       END DO
