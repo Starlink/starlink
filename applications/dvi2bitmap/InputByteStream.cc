@@ -45,17 +45,18 @@
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::sprintf;
+using std::endl;
 #endif
 
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
 
 /**
- * Opens the requested file.  If preload is true, then open the file and
- * read it entire into memory, since the client will be seeking a lot.
- * If the file can't be opened, then try adding <code>tryext</code> to the end of
- * it.  Certain methods below can be called only on files which have
- * been preloaded.
+ * Opens the requested file.  If preload is true, then open the file
+ * and read it entire into memory, since the client will be seeking a
+ * lot.  If the file can't be opened, then try adding
+ * <code>tryext</code> to the end of it.  Certain methods below can be
+ * called only on files which have been preloaded.
  *
  * @param filename the file to be opened
  * @param preload if true, then the file is read entirely into memory
@@ -64,7 +65,7 @@ verbosities InputByteStream::verbosity_ = normal;
  */
 InputByteStream::InputByteStream (string& filename, bool preload,
                                   string tryext)
-    : eof_(true), preloaded_(preload)
+    : eof_(true), preloaded_(preload), seekable_(true)
 {
     fname_ = filename;
     fd_ = open (fname_.c_str(), O_RDONLY);
@@ -98,7 +99,7 @@ InputByteStream::InputByteStream (string& filename, bool preload,
     {
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
-	size_t bufcontents = read (fd_, buf_, buflen_);
+	size_t bufcontents = read(fd_, buf_, buflen_);
 	if (bufcontents != buflen_)
 	{
 	    string errstr = strerror (errno);
@@ -112,7 +113,7 @@ InputByteStream::InputByteStream (string& filename, bool preload,
 
 	if (verbosity_ > normal)
 	    cerr << "InputByteStream: preloaded " << fname_
-		 << ", " << filesize_ << " bytes\n";
+		 << ", " << filesize_ << " bytes" << endl;
     }
     else
     {
@@ -123,9 +124,34 @@ InputByteStream::InputByteStream (string& filename, bool preload,
 	if (verbosity_ > normal)
 	    cerr << "InputByteStream: name=" << fname_
 		 << " filesize=" << filesize_
-		 << " buflen=" << buflen_ << '\n';
+		 << " buflen=" << buflen_ << endl;
     }
     p_ = buf_;
+}
+
+/**
+ * Prepare to read from the requested file descriptor.  The
+ * descriptor must be open, and can refer to a non-seekable file such
+ * as a pipe.
+ *
+ * @param fileno the file descriptor to read from
+ */
+InputByteStream::InputByteStream(int fileno)
+    : eof_(true), preloaded_(false), seekable_(false)
+{
+    fd_ = fileno;
+    char filenamebuf[20]; // just in case fileno is a _large_ number...
+    sprintf(filenamebuf, "fd:%d", fileno);
+    fname_ = filenamebuf;
+
+    eof_ = false;
+
+    buflen_ = 512;
+    buf_ = new Byte[buflen_];
+    p_ = eob_ = buf_;		// nothing read in yet -- eob at start
+    if (verbosity_ > normal)
+	cerr << "InputByteStream: reading from STDIN, name=" << fname_
+	     << endl;
 }
 
 /**
@@ -139,20 +165,23 @@ InputByteStream::~InputByteStream ()
 }
 
 /**
- * Reads one or more bytes from the file
+ * Reads a byte from the stream.  This method does not signal
+ * an error at end-of-file; use the {@ #eof} method to detect if the
+ * stream is at an end.
  *
- * @param n the number of bytes to read
- * @return the byte read
+ * @return the byte read, or zero if we are at the end of the file
  */
-Byte InputByteStream::getByte(int n)
+Byte InputByteStream::getByte(void)
 {
     if (eof_)
 	return 0;
 
     if (p_ < buf_)
-	throw DviBug ("InputByteStream:"+fname_+": pointer before buffer start");
+	throw DviBug ("InputByteStream:" + fname_
+		      + ": pointer before buffer start");
     if (p_ > eob_)
-	throw DviBug ("InputByteStream:"+fname_+": pointer beyond EOF");
+	throw DviBug ("InputByteStream:" + fname_
+		      + ": pointer beyond EOF");
 
     if (p_ == eob_)
     {
@@ -165,7 +194,7 @@ Byte InputByteStream::getByte(int n)
 	}
     }
     Byte result = eof_ ? static_cast<Byte>(0) : *p_;
-    p_ += n;
+    ++p_;
     return result;
 }
 
@@ -176,7 +205,8 @@ Byte InputByteStream::getByte(int n)
  * block should be read.  If <code>pos</code> is negative, then read the block from
  * an offset <code>-pos</code> from the <em>end</em> of the file.
  * @param length the number of bytes to read
- * @return a pointer to an array of bytes
+ * @return a pointer to an array of bytes, or a null pointer if we
+ * are at the end of the file
  */
 const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 {
@@ -185,8 +215,11 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 
     Byte *blockp;
 
-    if (pos < 0)		// retrieve last `length' bytes from
-				// end of file
+    if (!seekable_)
+	throw InputByteStreamError("getblock: stream " + fname_
+				   + " is not seekable");
+
+    if (pos < 0)		// retrieve last `length' bytes from EOF
     {
 	if (preloaded_)
 	{
@@ -262,6 +295,10 @@ bool InputByteStream::eof()
  */
 void InputByteStream::seek (unsigned int pos)
 {
+    if (!seekable_)
+	throw InputByteStreamError("getblock: stream " + fname_
+				   + " is not seekable");
+
     if (preloaded_)
     {
 	if (pos > buflen_)	// pos unsigned, so can't be negative
@@ -311,7 +348,7 @@ void InputByteStream::skip (unsigned int skipsize)
 
 void InputByteStream::read_buf_ ()
 {
-    ssize_t bufcontents = read (fd_, buf_, buflen_);
+    ssize_t bufcontents = read(fd_, buf_, buflen_);
     if (bufcontents < 0)
     {
 	string errmsg = strerror(errno);
@@ -320,6 +357,11 @@ void InputByteStream::read_buf_ ()
     }
     eof_ = (bufcontents == 0);
     eob_ = buf_ + bufcontents;
+    if (verbosity_ > normal)
+	cerr << "InputByteStream::read_buf_: read "
+	     << bufcontents << '/' << buflen_ << " from fd " << fd_
+	     << "; eof=" << eof_
+	     << endl;
 }
 /*
 #if (sizeof(unsigned int) != 4)
