@@ -1,179 +1,204 @@
-*+  ENMAP - Displays image as a function of mean photon energy
       SUBROUTINE ENMAP( STATUS )
-*
-*    Description :
-*
-*      Takes a spectral_image as input and finds the mean corrected
-*      amplitude channel of all the photons recorded in each image pixel.
-*      It then writes an output image containing these values
-*
-*    Environment parameters :
-*
-*      INPUT     UNIV        Name of 3-d input file
-*      OUTPUT    UNIV        Name of output 2-d file
-*      ENAXIS    INTEGER     The energy axis. Only if the energy label
-*                            is not present in the axis structure
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Richard Saxton (LTVAD::RDS)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     15 Sep 90 : V1.3-0  Original (RDS)
-*     30 Jul 91 : V1.3-2  Fixed bug causing error if
-*                         axes weren't ordered X,Y,E   (RDS)
-*      7 Jan 93 : V1.6-0  Allow a thresholding requirement (RDS)
-*     28 Jun 93 : V1.7-0  Handle quality and writes full history (DJA)
-*     28 Feb 94 : V1.7-1  Use BIT_ routines to do bit manipulations (DJA)
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     20 Apr 95 : V1.8-1  New data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-      INCLUDE 'QUAL_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*80             LABEL(3)         ! Axis labels
-      CHARACTER*80             PATH(4)          ! Input dataset path for History
-      CHARACTER*80             TEXT             ! History text
+*+
+*  Name:
+*     ENMAP
 
-      REAL                     THRESH           ! Threshold below which to zero
+*  Purpose:
+*     Computes the mean channel in X,Y plane of spectral image
 
-      INTEGER                  AXLP
-      INTEGER                  AXPTR            ! Input energy axis data
-      INTEGER                  DIMS(ADI__MXDIM) ! Data dimensions
-      INTEGER                  ENAX             ! Axis number containing energy
-      INTEGER                  IDPTR            ! Input data
-      INTEGER			IFID			! Input dataset id
-      INTEGER                  IQPTR            ! Input quality
-      INTEGER                  NDIM             ! Data dimensionality
-      INTEGER                  NLINES           ! No. of lines of history text
-      INTEGER                  ODIM(2)          ! Dimensionas of output array
-      INTEGER                  ODPTR            ! Output data
-      INTEGER			OFID			! Output dataset id
-      INTEGER                  OQPTR            ! Output quality
-      INTEGER                  ORDER(3)         ! Order of input axes
-                                                ! energy is order(3)
-      INTEGER                  QNDIM            ! Quality dimensions
-      INTEGER                  QDIMS(ADI__MXDIM)
-      INTEGER                  TLEN             ! Length of text used
-      INTEGER                  TPTR             ! Workspace
+*  Language:
+*     Starlink Fortran
 
-      BYTE                     IQMASK           ! input quality mask
+*  Type of Module:
+*     ASTERIX task
 
-      LOGICAL                  OK
-      LOGICAL                  QOK              ! Input quality present
-*
-*    Version :
-*
-      CHARACTER*30		VERSION
-        PARAMETER  		( VERSION = 'ENMAP Version 1.8-1' )
+*  Invocation:
+*     CALL ENMAP( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Takes a spectral image as input and finds the mean corrected
+*     amplitude channel of all the photons recorded in each image pixel.
+*     It then writes an output image containing these values
+
+*  Usage:
+*     enmap {parameter_usage}
+
+*  Environment Parameters:
+*      INP = CHAR (read)
+*         Name of input spectral image
+*      OUT = CHAR (read)
+*         Name of output image
+*      ENAXIS = INTEGER (read)
+*         The energy axis. Only used if the axis cannot be derived
+*         from the axis labels
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     enmap, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     RDS: Richard Saxton (Starlink, University of Leicester)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     15 Sep 1990 V1.3-0 (RDS):
+*        Original version.
+*     30 Jul 1991 V1.3-2 (RDS):
+*        Fixed bug causing error if axes weren't ordered X,Y,E
+*      7 Jan 1993 V1.6-0 (RDS):
+*        Allow a thresholding requirement
+*     28 Jun 1993 V1.7-0 (DJA):
+*        Handle quality and writes full history
+*     28 Feb 1994 V1.7-1 (DJA):
+*        Use BIT_ routines to do bit manipulations
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*      8 Dec 1995 V2.0-0 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+      INCLUDE 'QUAL_PAR'
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'ENMAP Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*80              PATH(4)                 ! Input dataset path
+      CHARACTER*80              TEXT                    ! History text
+
+      REAL                      THRESH                  ! Threshold below which to zero
+
+      INTEGER                   AXLP
+      INTEGER                   AXPTR                   ! Input energy axis data
+      INTEGER                   ENAX                    ! Energy axis number
+      INTEGER                   IDPTR                   ! Input data
+      INTEGER			IFID			! Input dataset id
+      INTEGER                   IQPTR                   ! Input quality
+      INTEGER                   NDIM, DIMS(3)           ! Data dimensions
+      INTEGER                   NLINES                  ! # history lines
+      INTEGER                   ODIM(2)                 ! O/p dimension
+      INTEGER                   ODPTR                   ! Output data
+      INTEGER			OFID			! Output dataset id
+      INTEGER                   OQPTR                   ! Output quality
+      INTEGER                   ORDER(3)                ! Order of input axes
+                                                        ! energy is order(3)
+      INTEGER                   TLEN                    ! Length of text used
+      INTEGER                   TPTR                    ! Workspace
+
+      LOGICAL                   OK
+      LOGICAL                   QOK                     ! Input quality present
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version id
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise Asterix
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-*    Get name of input file and output file
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-      IF (STATUS .NE. SAI__OK) GOTO 99
+*  Get name of input file and output file
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
-*    Is data array there ?
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+*  Is data array there ?
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, 3, DIMS, NDIM, STATUS )
       IF ( .NOT. OK ) THEN
-        CALL MSG_PRNT('Error accessing data_array')
+        CALL MSG_PRNT('Error accessing data array')
         GOTO 99
       END IF
 
-*    Check that input data is 3 dimensional
-      IF (NDIM .NE. 3) THEN
+*  Check that input data is 3 dimensional
+      IF ( NDIM .NE. 3 ) THEN
         CALL MSG_PRNT('** Input data must be 3-dimensional **')
         GOTO 99
       END IF
 
-*    Get thresholding value from the environment.
-      CALL USI_GET0R('THRESH', THRESH, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 99
+*  Get thresholding value from the environment.
+      CALL USI_GET0R( 'THRESH', THRESH, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*   Copy the relevant parts of the input file to the output file
-*    Title, label and units:
-        CALL BDI_COPTEXT(IFID, OFID, STATUS)
-*    More box:
-        CALL BDI_COPMORE(IFID, OFID, STATUS)
-*
-        IF (STATUS .NE. SAI__OK) THEN
-           CALL MSG_PRNT('Warning: Error copying auxilliary '/
-     :             /'information from the input to the output file')
-           CALL ERR_ANNUL(STATUS)
-        ENDIF
-
-*    Map the input data array
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
-      IF (STATUS .NE. SAI__OK) THEN
-        CALL MSG_PRNT('Error mapping data array')
-        GOTO 99
-      END IF
-
-*    Is quality present?
-      CALL BDI_CHKQUAL( IFID, QOK, QNDIM, QDIMS, STATUS )
-      IF ( QOK ) THEN
-        CALL BDI_MAPQUAL( IFID, 'READ', IQPTR, STATUS )
-        CALL BDI_GETMASK( IFID, IQMASK, STATUS )
-      END IF
-
-*    Find which axis is the energy axis
-      ENAX = 0
-      DO AXLP=1,3
-        CALL BDI_GETAXLABEL(IFID, AXLP, LABEL(AXLP), STATUS)
-        IF ( INDEX(LABEL(AXLP), 'ENERGY') .NE. 0 .OR.
-     :       INDEX(LABEL(AXLP), 'PH') .NE. 0 ) THEN
-          ENAX=AXLP
+*  Find which axis is the energy axis
+      CALL BDI0_FNDAXC( IFID, 'E', ENAX, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT( 'Which of these axes is the energy axis?' )
+        CALL AXIS_TLIST( IFID, NDIM, STATUS )
+        CALL USI_GET0I( 'ENAXIS', ENAX, STATUS )
+        IF ( (ENAX.LT.1) .OR. (ENAX.GT.NDIM) ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Illegal axis number', STATUS )
         END IF
-      END DO
-
-*    Ask the user which axis is energy if the label hasn't been found
-      IF ( (STATUS .NE. SAI__OK) .OR. (ENAX .EQ. 0) ) THEN
-
-*      Annul bad status
-        IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL(STATUS)
-
-*      Get axis choice from user
-        CALL AXIS_TGET( IFID, 'AMP', 'ENAXIS', 3, ENAX, STATUS )
-        IF (STATUS .NE. SAI__OK) GOTO 99
-
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Attempt to map the energy axis. NB: this routine fills the array with
-*    values 1-N if the axis isn't present in the input file
-      CALL BDI_MAPAXVAL( IFID, 'READ', ENAX, AXPTR, STATUS )
-
-*    Create order array to show where energy axis is
-      ORDER(3)=ENAX
-      IF (ENAX.EQ.1) THEN
+*  Create order array to show where energy axis is
+      ORDER(3) = ENAX
+      IF ( ENAX .EQ. 1 ) THEN
         ORDER(1) = 2
         ORDER(2) = 3
-      ELSE IF (ENAX.EQ.2) THEN
+      ELSE IF ( ENAX .EQ. 2 ) THEN
         ORDER(1) = 1
         ORDER(2) = 3
       ELSE
@@ -181,69 +206,92 @@
         ORDER(2) = 2
       END IF
 
-*    Set dimensions of output array
+*  Set dimensions of output array and link to output file
       ODIM(1) = DIMS(ORDER(1))
       ODIM(2) = DIMS(ORDER(2))
+      CALL BDI_LINK( 'BinDS', 2, ODIM, 'REAL', OFID, STATUS )
 
-*    Create output array
-      CALL BDI_CREDATA( OFID, 2, ODIM, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+*  Copy the relevant parts of the input file to the output file
+      CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
+        CALL MSG_PRNT('Warning: Error copying auxilliary '/
+     :             /'information from the input to the output file')
+        CALL ERR_ANNUL( STATUS )
+      END IF
+
+*  Map the input data array
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT('Error mapping data array')
+        GOTO 99
+      END IF
+
+*  Is quality present?
+      CALL BDI_CHK( IFID, QOK, 'Quality', STATUS )
+      IF ( QOK ) THEN
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR,
+     :                 STATUS )
+      END IF
+
+*  Attempt to map the energy axis. NB: this routine fills the array with
+*  values 1-N if the axis isn't present in the input file
+      CALL BDI_AXMAPR( IFID, ENAX, 'Data', 'READ', AXPTR, STATUS )
+
+*  Create output array
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT('Error creating and mapping output array')
         GOTO 99
       END IF
 
-*    Create output quality
+*  Create output quality
       IF ( QOK ) THEN
-        CALL BDI_CREQUAL( OFID, 2, ODIM, STATUS )
-        CALL BDI_MAPQUAL( OFID, 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
 
-*    Zero output arrays
+*  Zero output arrays
       CALL ARR_INIT1R( 0.0, ODIM(1)*ODIM(2), %VAL(ODPTR), STATUS )
       IF ( QOK ) THEN
         CALL ARR_INIT1B( QUAL__BAD, ODIM(1)*ODIM(2), %VAL(OQPTR),
      :                                                   STATUS )
       END IF
 
-*    Map some work space
+*  Map some work space and zero it
       CALL DYN_MAPR( 2, ODIM, TPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error mapping temporary space')
         GOTO 99
       END IF
-
-*    Zero temp. array
       CALL ARR_INIT1R( 0.0, ODIM(1)*ODIM(2), %VAL(TPTR), STATUS )
 
-*    Calculate ouput array
+*  Calculate output array
       CALL ENMAP_CREATE( DIMS, DIMS(1), DIMS(2), DIMS(3), %VAL(IDPTR),
      :                   QOK, %VAL(IQPTR), IQMASK, ORDER, DIMS(ENAX),
      :                   %VAL(AXPTR), ODIM(1), ODIM(2), THRESH,
      :                   %VAL(TPTR), %VAL(ODPTR), %VAL(OQPTR), STATUS )
 
-*    Create axis structure in output file and copy relevant axes from input file
-      CALL BDI_CREAXES( OFID, 2, STATUS )
-      CALL BDI_COPAXIS( IFID, OFID, ORDER(1), 1, STATUS )
-      CALL BDI_COPAXIS( IFID, OFID, ORDER(2), 2, STATUS )
+*  Create output axes
+      CALL BDI_AXCOPY( IFID, ORDER(1), OFID, 1, STATUS )
+      CALL BDI_AXCOPY( IFID, ORDER(2), OFID, 2, STATUS )
 
-*    Copy history from the original file
+*  Copy history from the original file
       CALL HSI_COPY( IFID, OFID, STATUS )
 
-*    Add history record
+*  Add history record
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Create text strings for history
+*  Create text strings for history
       CALL USI_NAMEI( NLINES, PATH, STATUS)
       CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
-*    Write threshold value
+*  Write threshold value
       CALL MSG_SETR( 'THRESH', THRESH )
       CALL MSG_MAKE( 'Threshold value ^THRESH', TEXT, TLEN )
       CALL HSI_PTXT( OFID, 1, TEXT(:TLEN), STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -277,8 +325,7 @@
       INTEGER DIMS(3)              ! Dimensions of input array
       INTEGER DIM1,DIM2,DIM3       ! Dims of input array
       REAL INDAT(DIM1,DIM2,DIM3)   ! Input data
-      BYTE INQUAL(DIM1,DIM2,DIM3)
-      BYTE                     IQMASK           ! Input quality mask
+      LOGICAL INQUAL(DIM1,DIM2,DIM3)
       LOGICAL                  QOK              ! Input quality present
 
       INTEGER ORDER(3)             ! Order of the input data - energy is
@@ -293,10 +340,6 @@
       REAL NORM(ODIM1,ODIM2)       ! Work array
       REAL OUTDAT(ODIM1,ODIM2)     ! Output data
       BYTE OUTQUAL(ODIM1,ODIM2)    ! Output quality
-*
-*    Functions :
-*
-      BYTE 			BIT_ANDUB
 *
 *    Local variables :
 *
@@ -320,8 +363,7 @@
               ALP(3)=LP3
 
 *            Good input pixel?
-              IF ( BIT_ANDUB(INQUAL(LP1,LP2,LP3),IQMASK)
-     :                    .EQ.QUAL__GOOD ) THEN
+              IF ( INQUAL(LP1,LP2,LP3) ) THEN
 
 *              Sum the energy contributions in this pixel multiplying by
 *              the energy bin number
