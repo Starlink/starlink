@@ -1,0 +1,41 @@
+#! /bin/sh -
+#
+# $Id$
+#
+# Run a series of tests on moggy.  The directory contains a collection
+# of scripts named `t<number>', and these are executed in turn and their
+# output diffed against `t<number>.correct'.  Exit status is the
+# number of failures.
+
+LS=/bin/ls
+
+filelist=`$LS | grep '^t[0-9]*$'`
+echo "filelist=$filelist"
+
+nfailures=0
+
+for name in $filelist
+do
+	echo -n "$name... "
+	sh $name >$name.stdout 2>$name.stderr
+
+	if [ -r "$name.correct" ]; then
+		diff $name.correct $name.stdout >$name.diff
+		rval=$?
+		if [ $rval != 0 ]; then
+			echo "failed (results in $name.diff)"
+			nfailures=`expr $nfailures + 1`
+		else
+			echo "ok"
+			rm $name.diff $name.stdout $name.stderr
+		fi
+	else
+		echo "apparently OK, but no correct results to compare"
+		mv $name.out $name.correct
+		echo "    (now in $name.correct)"
+	fi
+done
+
+echo "$nfailures failed tests"
+
+exit $nfailures
