@@ -91,10 +91,10 @@ interface LOBACK
     helpkey '*'
   endparameter
 
-  parameter WIDE      # Sampling box width
+  parameter WIDTH      # Sampling box width
     type '_INTEGER'
     access 'read'
-    keyword 'WIDE'
+    keyword 'WIDTH'
     position 6
     prompt 'Min. box width'
     ppath 'current,default'

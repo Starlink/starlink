@@ -284,7 +284,7 @@
       IF (STATUS.NE.SAI__OK) GOTO 9999    
 
 *   Minimum size for the width of the box to be used.
-      CALL PAR_GET0I('WIDE',WIDE,STATUS)
+      CALL PAR_GET0I('WIDTH',WIDE,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999    
 
 *   Map the source NDF data array as _REAL values for reading.
