@@ -1,5 +1,6 @@
 import org.w3c.dom.*;
 import java.io.PrintStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,16 @@ import java.util.regex.Pattern;
  * dependencies read from the input file.
  * <dt><code>--makefile[=filename]</code>
  * <dd>Names the output makefile.  If no argument is given, or if the
- * argument is "-", the makefile is written to stduot.
+ * argument is "-", the makefile is written to stdout.
+ * <dt><code>--flatdeps=filename</code>
+ * <dd>Write an XML file containing just the flattened build and
+ * sourceset dependencies.  There is no pre-defined DTD for this, but
+ * the structure should be obvious, and it will be well-formed.
  * <dt><code>--verbose</code>
- * <dd>Turn on chattering.
+ * <dd>Turn on chattering.  Lots of it.
  * </dl>
- * <p>At least one of <code>--makefile</code> or
- * <code>--buildsequence</code> must be specified.
+ * <p>At least one of <code>--makefile</code>,
+ * <code>--buildsequence</code> or <code>--flatdeps</code> must be specified.
  *
  * @author Norman Gray
  */
@@ -51,67 +56,60 @@ public class GenerateDependencies {
         String xmlinput = null;
         PrintStream makefileStream = null;
         PrintStream buildSequenceStream = null;
+        PrintStream flatdepsStream = null;
         Pattern optionPattern = Pattern.compile("^--([a-z]*)(=(.*))?");
 
-        for (int i=0; i<args.length; i++) {
-            java.util.regex.Matcher m = optionPattern.matcher(args[i]);
-            if (m.matches()) {
-                String opt = m.group(1);
-                if (opt.equals("buildsequence")) {
-                    String fn = m.group(3);
-                    if (fn == null || fn.length() == 0)
-                        // no argument
-                        Usage();
-                    try {
-                        buildSequenceStream = new PrintStream
-                                (new java.io.FileOutputStream(fn));
-                        if (verbose)
-                            System.err.println("Build sequence written to "
-                                               + fn);
-                    } catch (java.io.FileNotFoundException e) {
-                        System.err.println("Can't create file: " + e);
-                        Usage();
-                    }
-                } else if (opt.equals("makefile")) {
-                    String makefileName = m.group(3);
-                    if (makefileName == null
-                        || makefileName.length()==0
-                        || makefileName.equals("-")) {
-                        makefileStream = System.out;
-                    } else {
-                        try {
-                            makefileStream = new PrintStream
-                                (new java.io.FileOutputStream(makefileName));
-                            if (verbose)
-                                System.err.println("Makefile written to "
-                                                   + makefileName);
-                        } catch (java.io.FileNotFoundException e) {
-                            System.err.println("Can't create file: " + e);
-                            Usage();
-                        }
-                    }
-                } else if (opt.equals("test")) {
-                    testMode = true;
-                } else if (opt.equals("verbose")) {
-                    verbose = true;
-                } else {
-                    Usage();
-                }
-            } else {
-                if (xmlinput != null)
-                    Usage();
-                else
-                    xmlinput = args[i];
-            }
-        }
-
-        if (xmlinput == null)
-            Usage();
-
-        if (makefileStream == null && buildSequenceStream == null)
-            Usage();
-
         try {
+
+            for (int i=0; i<args.length; i++) {
+                java.util.regex.Matcher m = optionPattern.matcher(args[i]);
+                if (m.matches()) {
+                    String opt = m.group(1);
+                    if (opt.equals("buildsequence")) {
+                        String fn = m.group(3);
+                        if (fn == null || fn.length() == 0)
+                            // no argument
+                            Usage();
+                        buildSequenceStream = openStream
+                                (fn, (verbose ? "Build sequence" : null));
+                    } else if (opt.equals("makefile")) {
+                        String makefileName = m.group(3);
+                        if (makefileName == null
+                            || makefileName.length()==0
+                            || makefileName.equals("-")) {
+                            makefileStream = System.out;
+                        } else {
+                            makefileStream = openStream
+                                (makefileName,(verbose ? "Makefile" : null));
+                        }
+                    } else if (opt.equals("flatdeps")) {
+                        String fn = m.group(3);
+                        if (fn == null || fn.length() == 0)
+                            Usage();
+                        flatdepsStream = openStream
+                                (fn, (verbose ? "Flattened dependencies" : null));
+                    } else if (opt.equals("test")) {
+                        testMode = true;
+                    } else if (opt.equals("verbose")) {
+                        verbose = true;
+                    } else {
+                        Usage();
+                    }
+                } else {
+                    if (xmlinput != null)
+                        Usage();
+                    else
+                        xmlinput = args[i];
+                }
+            }
+
+            if (xmlinput == null)
+                Usage();
+
+            if (makefileStream == null
+                && buildSequenceStream == null
+                && flatdepsStream == null)
+                Usage();
 
             javax.xml.parsers.DocumentBuilder db 
                     = javax.xml.parsers.DocumentBuilderFactory
@@ -128,7 +126,7 @@ public class GenerateDependencies {
                 Component.newComponent((Element)componentList.item(i));
             }
             
-        } catch (java.io.IOException e) {
+        } catch (IOException e) {
             System.err.println("IOException: " + e);
         } catch (org.xml.sax.SAXException e) {
             System.err.println("SAXException: " + e);
@@ -154,12 +152,40 @@ public class GenerateDependencies {
             }
         }
 
+        if (flatdepsStream != null)
+            makeFlatdeps(flatdepsStream);
+
         System.exit(globalStatus);
     }
 
     private static void Usage() {
-        System.err.println("GenerateDependencies [--test] [--verbose] [--makefile[=filename]] [--buildsequence=filename] xml-file");
+        System.err.println("GenerateDependencies [--test] [--verbose] [--makefile[=filename]] [--buildsequence=filename] [--flatdeps=filename] xml-file");
+        System.err.println("    At least one of --makefile, --buildsequence or --flatdeps must be specified");
         System.exit(1);
+    }
+
+    /**
+     * Opens the named file as a PrintStream.
+     * @param fn the name of the file to open
+     * @param name if non-null, a message is written to System.err
+     * describing the action.
+     * @return an open PrintStream
+     * @throws IOException if there is a problem opening the stream
+     */
+    private static PrintStream openStream(String fn, String name)
+            throws IOException {
+        try {
+
+            PrintStream newStream
+                    = new PrintStream(new java.io.FileOutputStream(fn));
+            if (name != null) {
+                System.err.println(name + " written to " + fn);
+            }
+            return newStream;
+
+        } catch (java.io.FileNotFoundException e) {
+            throw new IOException("Can't create file: " + e);
+        }
     }
 
     /**
@@ -167,16 +193,31 @@ public class GenerateDependencies {
      * method.
      */
     private static String showSet(Set s) {
-        StringBuffer sb = new StringBuffer("{");
+        return showSet(s, "{", "}");
+    }
+
+    private static String showSet(Set s, String prefix, String suffix) {
+        StringBuffer sb = new StringBuffer(prefix);
         if (s == null)
             sb.append(" <null>");
         else
             for (Iterator si=s.iterator(); si.hasNext(); )
                 sb.append(' ').append(si.next().toString());
-        sb.append(" }");
+        sb.append(' ');
+        sb.append(suffix);
         return sb.toString();
     }
 
+    /**
+     * Generate a Makefile go the given stream, expressing all the
+     * various types of dependencies.  At its core, this just calls
+     * getCompleteDependencies on each component in turn, and writes
+     * those out as Makefile dependencies, but it also emits slightly
+     * variant versions for buildsupport, configure and obsolete dependencies,
+     * and adds various cosmetic and convenience targets.
+     *
+     * @param makefile an open stream to receive the makefile
+     */
     private static void makeMakefile(PrintStream makefile) {
 
         String manifestString = "$(MANIFEST)/";
@@ -223,6 +264,19 @@ public class GenerateDependencies {
         
         for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
             Component c = (Component) ci.next();
+
+            // For each component in the list, extract all the
+            // SOURCESET and BUILD dependencies and emit them as
+            // Makefile dependencies of this component.  The
+            // getCompleteDependencies method resolves any
+            // option="..." options in the input set of dependencies.
+            //
+            // Because this resolves the _complete_ set of
+            // dependencies, it includes dependencies which make could
+            // work out for itself.  This redundancy does no harm.
+            //
+            // The method getCompleteDependencies additionally checks
+            // for dependency cycles, for all except LINK dependencies.
 
             Set alldeps = c.getCompleteDependencies(Dependency.SOURCESET);
             if (alldeps == null) {
@@ -349,8 +403,7 @@ public class GenerateDependencies {
         if (confdeps.isEmpty()) {
             makefile.println("# No configure dependencies");
             makefile.println("configure-deps:");
-            makefile.println
-                    ("\techo \"There are no configure dependencies\"");
+            makefile.println("\techo \"There are no configure dependencies\"");
         } else {
             makefile.println("# Configuration dependencies");
             makefile.println("# Run 'make configure-deps' to make these components before ./configure");
@@ -415,7 +468,65 @@ public class GenerateDependencies {
         }
         buildSeq.add(cpt);
     }
-        
+
+    /**
+     * Make an XML file containing the flattened dependencies of each
+     * component.  This is very similar in its logic to {@link
+     * makeMakefile} -- see that routine for discussion.
+     */
+    private static void makeFlatdeps(PrintStream flatdeps) {
+        String[] header = {
+            "<?xml version=\"1.0\"?>",
+            "<!-- All dependencies, flattened -->",
+            "<flatdependencies>",
+            "",
+        };
+        for (int i=0; i<header.length; i++)
+            flatdeps.println(header[i]);
+
+        for (Iterator ci = Component.allComponents(); ci.hasNext(); ) {
+            Component c = (Component)ci.next();
+
+            Set ssdeps = c.getCompleteDependencies(Dependency.SOURCESET);
+            if (ssdeps == null) {
+                System.err.println
+                        ("Circularity detected in sourceset dependencies of "
+                         + c.getName());
+                globalStatus++;
+                continue;
+            }
+
+            Set builddeps = c.getCompleteDependencies(Dependency.BUILD);
+            if (builddeps == null) {
+                System.err.println
+                        ("Circularity detected in build dependencies of "
+                         + c.getName());
+                globalStatus++;
+                continue;
+            }
+            builddeps.addAll(ssdeps);
+
+            if (builddeps.isEmpty()) {
+                // implies ssdeps is empty, too
+                flatdeps.println("<!-- no dependencies for " + c + " -->");
+            } else {
+                flatdeps.println("<dependencies component='" + c + "'>");
+                if (! ssdeps.isEmpty())
+                    flatdeps.println("<sourceset>"
+                                     + showSet(ssdeps, "", "")
+                                     + "</sourceset>");
+                flatdeps.println("<build>"
+                                 + showSet(builddeps,"","")
+                                 + "</build>");
+                flatdeps.println("</dependencies>");
+            }
+            flatdeps.println();
+        }
+
+        flatdeps.println("</flatdependencies>");
+
+        return;
+    }
 
     /**
      * Represents a single component.
