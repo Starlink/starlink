@@ -272,6 +272,10 @@
       CHARACTER*(64) STEMP1            !         "
       CHARACTER*(1)  SIGN              ! + or -
 
+      INTEGER J
+      DOUBLE PRECISION SECONDS
+      DOUBLE PRECISION CHECK
+
 *  Local Constants:
 
 *.
@@ -705,7 +709,26 @@
             CALL PAR_WRUSER ('Coordinates are FK5 J2000.0', IGNORE)
          END IF
  
-         CALL SLA_DR2TF (2, RACEN, SIGN, HMSF)
+         CALL SLA_DR2TF (1, RACEN, SIGN, HMSF)
+         print *,'HMSF',HMSF(1),HMSF(2), HMSF(3),HMSF(4),RACEN
+
+*     Check self-consistency
+         SECONDS = DBLE(HMSF(3))+(DBLE(HMSF(4))/100)
+         CALL SLA_DTF2R (HMSF(1), HMSF(2), SECONDS, CHECK, J)
+
+         IF (STATUS .EQ. 0) THEN
+            IF (ABS(RACEN-CHECK) .GT. 1D-3) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETD('RA',RACEN)
+               CALL MSG_SETD('CH',CHECK)
+               CALL ERR_REP(' ','Input RA not equal to translated RA '//
+     :              '(^RA ne ^CH) - Internal error', STATUS)
+               CALL ERR_FLUSH(STATUS)
+               RETURN
+            END IF
+         END IF
+
+*     Create a string for the prompt
          STEMP = SIGN
          WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
          STEMP (4:4) = ' '
