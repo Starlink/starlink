@@ -1066,9 +1066,13 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 		$(EXPORT)/$(PKG_NAME).tar.Z
 
 # Make the source tarball, making sure that the source directories
-# are properly clean first (we ought to be doing this from a CVS-exported
-# copy of the source rather than a working directory, so this _should_ 
-# be a no-op).
+# are properly clean first by depending on the `unbuild' target (we
+# ought to be doing this from a CVS-exported copy of the source
+# rather than a working directory, so this _should_ be a no-op).
+#
+# The configure.ac within astrom requires a recent (2.50+?) version of
+# autoconf and will fail (objecting that it can't find `configure.in')
+# if one isn't available.
 #
 # It looks as if this should depend on `$(PUBLIC_SCRIPTS) astrom moggy
 # misc', but it shouldn't, since astrom and moggy in turn depend on
@@ -1077,8 +1081,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar: unbuild
-	cd astrom && ./mk unbuild
-	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd astrom && autoconf || echo "Need newer version of autoconf!" || false
 	cd moggy && make -f Makefile.in configure
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
@@ -1106,15 +1109,15 @@ clean:
 #  of the source distribution for the purposes of this makefile;
 #  therefore we shouldn't make that as part of this target.
 #
-#  Within moggy, a simple `make -f Makefile.in' won't do, since the
-#  unconfigured Makefile will fail to clean out the SkyCat directories
-#  (if the directory hasn't been configured, then there's probably not
-#  much to clean out, in fact).
-#
-#  Within catlib, Makefile.in doesn't handle distclean well.  Since, if 
-#  there's no Makefile, distclean is probably redundant, just miss it out.
+#  Invoke unbuild/distclean in the subdirectories also.  Only do this
+#  if there is actually a makefile there -- if not, the directory
+#  hasn't been configured, let alone built, so there's probably
+#  nothing there to tidy up. 
+#  [ Within moggy, a simple `make -f Makefile.in' won't do, since the
+#  unconfigured Makefile will fail to clean out the SkyCat directories.
+#  Within catlib, Makefile.in doesn't handle distclean well. ]
 unbuild: clean
-	cd astrom && ./mk unbuild
+	cd astrom && if test -f makefile; then ./mk unbuild; fi
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
