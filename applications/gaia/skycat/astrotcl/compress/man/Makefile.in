@@ -1,0 +1,24 @@
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.3 1998/01/15 22:07:44 abrighto Exp $" 
+#
+# Makefile.in
+# 
+# who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created
+#
+# ------------------------------------------------------------------------
+# 	Makefile for manual page files 
+# ------------------------------------------------------------------------
+
+TOPDIR  	= @DESTDIR@
+MANDIR  	= @MANDIR@
+MAN_SECTIONS    = 3
+SHELL    	= /bin/sh
+RM		= rm -rf
+
+all depend: 
+
+
+include ../../man.mk

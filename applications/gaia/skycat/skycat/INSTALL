@@ -1,0 +1,137 @@
+HOW TO INSTALL the Skycat Package
+---------------------------------
+
+
+1. Before you build Skycat
+--------------------------
+
+The skycat package depends on the following packages being already
+installed (included in the tarfile, also available from
+ftp://ftp.archive.eso.org/pub/skycat):
+
+	tclutil  - Tcl and C++ Utilities
+	astrotcl - Astronomical utilities for C++ and Tcl
+	rtd      - Real-Time Image Display
+	cat      - Astronomical Catalog Library
+
+These packages also assume one of the following Tcl environments are
+installed:
+
+For Tcl7.6:
+	itcl2.2    - [Incr Tcl], includes tcl7.6, tk4.2
+	BLT2.1     - BLT toolkit, graphs and other widgets 
+	tclX7.6.0  - Extended Tcl
+
+Or for Tcl8.0 (or newer, TclPro also supported - see below):
+	Tcl8.0.3   - Tcl Shell
+	Tk8.0.3    - Tk X Toolkit
+	itcl3.0.1  - [Incr Tcl]
+	BLT2.4f    - BLT toolkit, graphs and other widgets 
+	tclX8.0.3  - Extended Tcl
+
+These packages are available from the TCL archives. 
+  See: http://www.tcltk.com/ for Itcl.
+  and  http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
+  and: http://www.scriptics.com/tclpro/ for Tcl8.x, TclPro and the latest releases.
+
+You can install the standard Tcl/Tk packages anywhere, however it is
+easiest to install them all in the same directory (using the same
+-prefix argument to configure).
+
+NOTE: If you are building with Scriptics TclPro, you also need a
+"normal" Tcl8.x installation (installed from the source). The Skycat
+configure scripts depend on the $prefix/lib/tclConfig.sh and related
+files being installed.  These files are not currently part of the
+TclPro installation. Also, the names of some of the libraries are
+different in TclPro. Skycat uses the "prowrap" application and the
+Scriptics libraries to build a single binary version for tcl8.x, if
+they are found.
+
+2. Build SKYCAT
+---------------
+
+To build the software, type:
+
+	configure
+	make 
+	make install
+
+The default install dir is /usr/local. You can specify the -prefix
+argument to configure to change this:
+
+ 	configure -prefix $INSTALLDIR
+
+The compilers used are the same as those used to build the tclutil
+package. The file tclutilConfig.sh is read by configure to get the
+necessary information.
+
+If you specify the configure option --enable-shared:
+
+	configure -prefix $INSTALLDIR --enable-shared
+
+you can build a shared library and load the Tcl commands with the Tcl
+"load" command or load it as a Tcl package under the name "Skycat". 
+
+**********************************************************************
+Note: If you want to build a stand-alone binary version of skycat, you
+should also build static libraries (.a archives) for all of the required
+packages (tclutil, astrotcl, rtd, skycat, itcl, tclx, blt).
+**********************************************************************
+
+
+3 VLT Make Procedure
+--------------------
+
+As an alternative to running configure and make, you can also do this:
+
+	cd src
+	make 
+	make install
+
+The Makefile in the skycat/src directory runs configure and then make as
+described above. You can also specify options to that Makefile, for
+example:
+
+	cd src
+	make PREFIX=$INSTALLDIR CONFIGURE_FLAGS=--with-gcc
+
+The PREFIX variable defaults to /usr/local and is the prefix of the
+directory in which to install the software.
+
+
+4. Running
+----------
+
+The skycat application may be started in the following ways:
+
+Interpreted version:
+--------------------
+
+The interpreted version, in the source tree:
+
+	% cd skycat/interp/demos
+	% skycat
+or:
+        % skycat myimage.fits  
+
+the interpreted version, installed with prefix = $INSTALLDIR:
+	
+	% $INSTALLDIR/bin/skycat
+ 
+The single binary version has the OS version appended to the name,
+for example skycat-SunOS-5.5.1, and can be found in the following
+directories:
+
+  In the source tree:
+
+	skycat/et/bin        # for Tcl7.6/Tk4.2
+
+	skycat/tclpro/bin    # for Tcl8.0.3/TclPro
+
+  In the install tree:
+
+ 	$INSTALLDIR/bin
+
+--------------------------------------------------------------------------
+
+ 

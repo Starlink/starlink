@@ -1,0 +1,19 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.1 1998/04/06 23:54:20 abrighto Exp $
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# ------------------------------------------------------------------------
+
+TOPDIR  	= @DESTDIR@
+MANDIR  	= @MANDIR@
+MAN_SECTIONS    = n
+SHELL    	= /bin/sh
+RM		= rm -rf
+
+include ../../man.mk

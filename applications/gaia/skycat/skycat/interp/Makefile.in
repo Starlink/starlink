@@ -1,0 +1,191 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.19 1998/03/19 23:10:32 abrighto Exp $
+#
+# Makefile.in - Makefile
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps src man library demos
+
+# root of source tree
+SRC_ROOT     = @SRC_ROOT@
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+RTD_DIR      = @RTD_DIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+# Tcl libs
+TCLLIBS = \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+# Tk libs
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	$(TCLLIBS)
+
+# Rtd library
+RTD_LIB              = @RTD_LIB@
+RTD_LIB_STATIC       = @RTD_LIB_STATIC@
+
+# Catalog library
+CAT_LIB              = @CAT_LIB@
+CAT_LIB_STATIC       = @CAT_LIB_STATIC@
+
+# skycat lib dir
+SKYCAT_DIR   = @SKYCAT_DIR@
+
+# local skycat lib
+SKYCAT_LIB   = lib/libskycat.a
+
+# ------------------------------------------------------------------------
+
+# wish interpreter with all extensions
+WISH_INTERP    = bin/skycat_wish
+
+# tcl interpreter with itcl and tclx extensions used for local build of et
+# single binary version
+TCL_INTERP    = bin/skycat_tcl
+
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+LOCAL_LIBRARIES = $(SKYCAT_LIB)
+
+# these objects are only needed to make the skycat_wish binary for the demos
+OBJECTS      = tkAppInit.o tclAppInit.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# ------------------------------------------------------------------------
+all: $(WISH_INTERP) $(TCL_INTERP)
+
+# Make a sample wish binary with Rtd and catlib included.
+# Note: if the --enable-shared configure option was specified, 
+# we don't link -lrtd and -lcat in here, but load them at run 
+# time from Tcl. 
+$(WISH_INTERP): lib tkAppInit.o FORCE
+	@echo "linking \"$(WISH_INTERP)\"..."
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
+	         $(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(CAT_LIB) $(RTD_LIB) \
+		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@echo "making all in ./demos"
+	@(cd demos; $(MAKE))
+
+# Make a sample tcl binary without Tk, but with itcl and tclx, for
+# use in the local scripts during the build (see et dir).
+$(TCL_INTERP): lib tclAppInit.o FORCE
+	@echo "linking \"$(TCL_INTERP)\"..."
+	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) tclAppInit.o -o $(TCL_INTERP) \
+		$(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(TCLLIBS) $(EXTRA_LIBS)
+
+$(SKYCAT_LIB) lib: FORCE
+	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)); done
+
+# force recompile after configure for ifdefs
+$(OBJECTS): ../config.status
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+install-bin: 
+	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
+	chmod 0755 $(WISH_INTERP)
+	$(INSTALL) $(WISH_INTERP) $(BINDIR)
+	$(INSTALL) $(TCL_INTERP) $(BINDIR)
+	(cd $(SKYCAT_DIR); $(RM) bin; $(LN) ../../bin .)
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+# install the tcl library files.
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-bitmaps install-man
+
+clean:
+	$(RM) $(OBJECTS) $(WISH_INTERP) $(TCL_INTERP) *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+FORCE:

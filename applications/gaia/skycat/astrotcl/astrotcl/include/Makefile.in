@@ -1,0 +1,18 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Makefile.in,v 1.1 1997/11/28 01:31:14 abrighto Exp $" 
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		=  TclWorldCoords.h
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include ../../include.mk

@@ -1,0 +1,748 @@
+CHANGES to Skycat Release
+-------------------------
+
+This file contains a list of overall changes to the Skycat software
+and user interface. The latest changes are at the top.
+
+See also the CHANGES files in the tclutil, astrotcl, rtd, cat and
+skycat directories for changes specific to those packages.
+
+---------------  16.11.98 released skycat-2.2b1 -----------------------
+
+* Added support for multiple FITS HDUs. Now, when you open a FITS file
+  with multiple HDUs, a windows is displayed where you can choose
+  which parts to display. FITS tables are displayed as local
+  catalogs. Small versions of the images are displayed in a table, in
+  the correct orientation, if posible, using the values of the CRPIX*
+  keywords.  Clicking on an image displays it in the main window.
+
+* Modified the CFITSIO sources files to handle ESO HIERARCH keywords.
+
+* Ported Skycat to tcl8.0.3/BLT2.4f/Scriptics TclPro 
+  (But still compatible with tcl7.6/tk4.2/BLT2.1)
+
+  - Updated namespace syntax
+
+  - Updated BLT references where needed (for BLT-2.1 or 2.4f)
+
+  - Added a "tclpro" directory that replaces the "et" directory when
+    building a single binary version for Tcl8. The Et code doesn't work
+    with Tcl8, so the Tclpro product from Scripts is used instead, if it
+    is available (and in your shell $PATH). 
+
+* SkySearch.tcl: Fixed a problem linking catalog objects to line
+  numbers when sorting was turned on.
+
+* SkyCat.tcl: force full path names by -catalog option for local
+  catalogs, to avoid confusion over local catalog names.
+
+* Catalog window: Fixed a problem linking catalog objects to line
+  numbers when sorting was turned on.
+
+---------------  30.9.98 released skycat-2.1.3 -----------------------
+
+* Upgraded wcslib to (Doug Mink's) wcssubs-2.5b, which fixes some problems 
+  with COE projections and includes other bug fixes.
+
+* Changed the release structure of the rtd, cat and astrotcl packages
+  to include the necessary utility packages. Now the rtd and cat
+  tarfiles also contain the astrotcl and tclutil packages. The top
+  level Makefile and configure script automatically determine which
+  packages to make. This does not affect the skycat release itself,
+  since it always included the other packages.
+   
+* Rtd: Fixed a bug in the "Save region..." implementation, where FITS
+  keywords were not updated correctly in some cases.
+
+* Skycat, Catlib: fixed a bug in the handling of temporary image files
+  (from image servers or when decompressing).
+
+* Added an image history feature, for quick access to previously
+  loaded images. This includes a "Go" menu, for quick access, and
+  a "History" catalog menu item under Data-Servers. Images from
+  image servers need to be saved to a file in order to be put in the
+  history (see below). The history catalog is also used to save
+  information about each file, such as the colormap and cut level
+  settings.
+
+* Added a dialog to ask the user if an image from an image server
+  should be saved to a file before loading another image, so that file
+  can be put in the image history list.
+
+* Skycat now automatically saves and restores the main window size and
+  position between sessions.
+
+---------------  23.8.98 released skycat-2.1.2 -----------------------
+
+* Catlib: image servers: Fixed a bug introduced in the previous
+  version that caused problems when displaying images from an image
+  server.
+
+* Also made a number of minor bug fixes.
+
+---------------  7.8.98 released skycat-2.1.1 ------------------------
+
+* Skycat command line options: Changed -remote option to reuse the
+  same image window and interpret only image and catalog
+  arguments. This makes it easier to use skycat as a netscape
+  application, for example: "skycat -remote 1 %s".  For catalogs, you
+  can also do: "skycat -remote 1 -catalog %s".
+
+* Catalogs: The "Select Area" button no longer pops up a message
+  window telling you to drag out a region. It simply sets the mouse
+  cursor (for convenience).
+
+* Fixed a bug dealing with catalog name servers (SIMBAD, NED)
+  introduced in the previous version.
+
+* Removed default for limit on number of rows returned from a catalog
+  query (%n in URL).
+
+* Merged the image server interfaces with the catalog interfaces.  The
+  AstroImage and TclAstroImage classes, and the astroimage Tcl command
+  are still available for backward compatibility, but are now obsolete
+  and should no longer be used. The AstroCatalog and TclAstroCat
+  classes, and the astrocat Tcl command now handle image servers as
+  well as catalogs. The "getimage" methods/subcommands are now part of
+  the catalog classes. The merge was made to avoid duplicating large
+  chunks of code, since there are many similarities in the two
+  interfaces. 
+
+* Now it is possible to generate image server windows with custom
+  search labels and without the default search widgets (name, ra, dec,
+  radius).  This was previously only supported for catalogs. In both
+  cases, if you don't want the default search widgets, add these lines
+  to the config entry:
+     ra_col: -1
+     dec_col: -1
+     x_col: -1
+     y_col: -1
+  For catalogs, this means that there are no searchable ra,dec or x,y
+  columns. For image servers, it means that you can't search by these
+  values, so they are not displayed.
+
+* Catalog config file: Allow search columns with only one value
+  (previously only min and max values were allowed). This feature is
+  enabled if the second label is missing in the "search_cols: "
+  keyword in the catalog config file. For example, in an image server: 
+     search_cols:    patch Patch
+  will display a "Patch:" label and entry in the user interface. In
+  the URL for the image server, "%cond" will then be replaced by
+  "patch=22", if the user typed in 22.
+
+* Fixed the handling of the "maxRows" field for searching catalogs,
+  so that, if it is left blank or zero, there is no limit (previous
+  versions had a default limit).
+
+* Updated to wcssubs-2.4 (Doug Mink's wcslib, on which the SAOWCS
+  C++ class is based). This fixes some bugs in the handling of
+  world coordinates rotation. 
+
+---------------  5.8.98 released skycat-2.1 --------------------------
+
+* Added a top level configure script that runs configure in the
+  subdirectories.  This way you can just run "configure..." in place
+  of "make World...". A "Makefile.in" was also added. A top level
+  Makefile is still included in the release for backward
+  compatibility.
+
+* Changed the name of the top level directory in the source release
+  tar files to include the version number (for example: skycat-2.0.19/). 
+  This is more standard and avoids problems updating old directories.
+
+* Image previews, image servers: Added code to check the the HTTP
+  Content-Encoding of image files (instead of only the Content-type),
+  to help recognize compression types.
+
+* Added HTTP password authorization suport. If an HTTP server returns
+  the error "Authorization Required", skycat now opens a dialog box
+  and asks for the username and password. The information is cached
+  for later use.
+
+* Added support for backup URLs for image servers (was previously only
+  supported for catalogs). This is activated by using the "backup1"
+  and "backup2" keywords in the catalog config file.
+
+* "Reload Config File" now works recursively and reloads the
+  information in any remote catalog directories that were
+  open. Previously, only the top level catalogs were reloaded.
+
+* Added the X11 library directory to shared lib path in startup script.
+
+* catlib: Fixed a bug where the "id" column was still assumed to be
+  always 0 (The id column index is now always taken from catalog
+  config file).
+
+* catlib: Changed the way that rows are inserted into local
+  catalogs. They were previously appended to the end of the file after
+  removing duplicates.  Now the original row position is kept and the
+  row is updated if it already exists (same id) and appended
+  otherwise.  
+  
+* Color scaling: Added new command line option "-color_scale" to set
+  the color scaling on startup. The option takes a value: one of
+  linear, log, sqrt, histeq.  Also made changes so that the color
+  scaling setting is remembered between images and reapplied.  
+
+* Coordinates: Added new coordinate type: "chip", for detector chip or
+  CCD coordinates, that takes into account the origin of the chip and
+  binning. X,Y coordinates in the user interface are now displayed in
+  chip coordinates, which are the same as image coordinates, unless
+  the FITS keywords "HIERARCH ESO DET WIN STRX" and "...STRY" are
+  defined or special fields in the real-time image event struct are
+  set. Also added two new fields to the RTD real-time image event
+  struct in rtdImageEvent.h: startX and startY, with the same meaning
+  as the FITS keywords above.
+
+* RTD now reads cut level values from the real-time image events and
+  sets the image cut levels, unless the user set them already by hand.
+  User values override real-time event cut level values.
+
+* Implemented "histogram equalization" color scaling and added it to
+  the list of choices in the Rtd "Colors" popup window (based on
+  saoimage source code).
+
+* Added code to handle NAN values for image pixels. They are now
+  treated as blank pixels.
+
+* Updated to wcssubs-2.3.2 (Doug Mink's wcslib, on which the SAOWCS
+  C++ class is based). This fixes a number of bugs in the handling of
+  world coordinates. 
+
+* Error and info dialogs: Added code to truncate messages with too
+  many lines to be displayed and also made the dialog windows wider.
+
+* Top level windows: Fixed minor bug that prevented the code from
+  remembering the locations of top level widgets. Now, if you place a
+  window somewhere, it comes up there the next time the window is
+  created in that session.
+
+* The catalog and image server windows were using up too many file
+  descriptors. Now the files are only opened as needed and then closed
+  again immediately.
+
+---------------  07.7.98 released skycat-2.0.18 --------------------------
+
+* catlib: allow local catalog search without ra,dec columns, fixed
+  handling of default column positions for ra and dec, to allow
+  catalogs with no ra,dec or x,y columns.
+
+* Image I/O: Changed location of the temp file used when compressing
+  or decompressing an image from "file.tmp" to /tmp/fitsioXXXXXX,
+  since the directory that file is in may not be writable or might be
+  on a CD.
+
+* class HTTP: added suport for HTTP POST: new methods: HTTP::post(url,
+  data) and HTTP::post(url, data, ostream).
+
+* Other minor changes (see */CHANGES files).
+
+---------------  26.6.98 released skycat-2.0.17 --------------------------
+
+* Skycat, single binary version: Added check for correct prolog.ps
+  file in ~/.skycat dir (many users have an outdated version of this
+  file in the ~/.skycat dir, created by an earlier skycat release).
+
+* Rtd: Changed footers in postscript output to include object name,
+  file name and center position.
+
+* Tested compiling with egcs-1.0.3 (based on gcc-2.8.x) and fixed minor
+  errors and warnings that were reported by the new compiler.
+
+* Added support for HTTP proxy servers (thanks to Peter Draper for
+  implementing this).
+
+* Catalog window: added a menu (under Options) and dialog window for
+  setting a proxy server for HTTP catalog access from behind a
+  firewall.
+
+---------------  19.6.98 released skycat-2.0.16 --------------------------
+
+* Catalog window: Minor change in the way query coordinates are
+  interpreted.  If the RA value is an integer, it is assumed to be in
+  hours (as before), but if it is a decimal number (3.2, for example),
+  it is assumed to be in degrees.
+
+* Catalog window: fixed bug in the handling of the MORE URL (mostly
+  used for HST catalogs). The "M=" part before the URL was not being
+  recognized.
+
+* Rtd: Printing Images now outputs better postscript, since it no
+  longer does a screen dump, but generates postscript directly from
+  the image and graphics information (see also rtd/CHANGES).
+
+* Rtd: changed focus policy to fix problems with mouse pointer warping
+  (moving mouse with arrow keys). The previous version included some
+  code to avoid obscure problems with the CDE window manager, with the
+  "click to focus" setting.  If anyone has problems with the new
+  version, please let me know.
+
+---------------  28.5.98 released skycat-2.0.15 --------------------------
+
+* Added support for HTTP redirect "Location: ..." to HTTP class
+
+* Catalogs: MORE and PREVIEW fields can now be commands. No special
+  check is made for "http://" or "file://" as before.  For PREVIEW
+  data, the stdout of the command is assumed to be a FITS file, if it
+  starts with "SIMPLE", and otherwise catalog data to plot.
+
+* FitsIO::blankImage(...), Changed generated blank images to use the
+  normal colormap colors instead of all blank pixels, so that you can
+  change the background color of a generated image by manipulating the
+  colormap.
+
+* Catalog window: "Data-Servers/Local catalogs" menu: Added check for
+  local catalogs, to see if the file exists. If not, you are asked if
+  you want to specify a new name or remove the catalog from the menu.
+
+* Image Server window: added "Select Area..." button to to select the
+* area of the image to fetch (as with the catalog window).
+
+---------------  13.5.98 released skycat-2.0.14 --------------------------
+
+* Catalogs: Added a "help" field to the catalog config file, which may
+  optionally contain a URL pointing to information about the
+  catalog. If the "help" URL is specified, a "Help" button appears in
+  the user interface, which displays the URL in netscape (using the
+  remote interface, if netscape is already running).
+
+* Catalogs: Fixed problem with "Preview" images that was caused by
+  using the same temporary file to hold the image each time (now uses
+  a new file each time and deletes the old one).
+
+* SkyCat.tcl: remote interface proc: pick_object: fixed a minor bug
+  that reported an unknown Tcl variable.
+
+---------------  4.5.98 released skycat-2.0.13 -----------------------------
+
+* Fixed a recently introduced bug in coordinate conversion
+  that caused problems plotting catalog symbols for images with 
+  equinox != 2000.
+
+* Catalog window: Fixed "Reload Config File" menu item to remove
+  "dead" catalog entries (entries that were removed from the config
+  file since the last time it was read).
+
+* Other minor changes.
+
+---------------  28.4.98 released skycat-2.0.12 -----------------------------
+
+* Pick Object window: Merged in Peter Biereichel's changes, which
+  include using a "zoom window" for the image.  This lets you zoom in
+  and out to get the correct resolution. Also changed the default
+  layout of the window to save space. You can get the old layout by
+  specifying the command line option "-pickobjectorient horizontal".
+
+* The single binary version of skycat is now linked with the shared X
+  libraries. This is necessary in order to be able to dynamically load
+  shared libraries for skycat plugins at runtime. If this causes any
+  problems, check out ftp://ftp.archive.eso.org/pub/skycat/, where
+  we will provide tar files with the necessary libraries. 
+
+* Various minor bug fixes.
+
+---------------  15.4.98 released skycat-2.0.11 ------------------------------
+
+* Allow additional suffixes for automatic compression and
+  decompression of FITS files: ".gz" for gzip, ".Z" for UNIX
+  compression (i.e.: file.fits.Z, file.fits.gz).
+
+* Added "public", "private", and "protected" keywords in the Itcl 
+  source as well as some comments to help identify the public
+  interface, for use by skycat plugins and extensions. 
+
+* Updated the man pages for all of the Itcl classes to include the
+  Itk components and standard options used.
+
+* Minor changes in configure script and top level makefile for shared
+  libraries
+
+* Fixed a bug in image pixel coordinate conversion that caused the
+  world coordinates to be slightly shifted in images created with the
+  "File => Save region as..." menu item.
+
+* Various minor bug fixes.
+
+--------------- 31.03.98 released skycat 2.0.10 -----------------------
+
+* Updated man pages and documentation
+
+* Fixed the -shm_data and -shm_header options, which were no longer
+  working after earlier changes.
+
+--------------- 25.03.98 released skycat 2.0.9 -----------------------
+
+* This release contains a number of minor changes to make it easier
+  for plugins and subclasses to override the default behavior.
+  See the */CHANGES files for details.
+
+* Added "clone" number to window headers, to help identify related windows
+  when there is more than one main window.
+
+* Change keyboard accelerators for menu items to use <Control> instead
+  of <Alt>, since <Alt> is used in Tk for popping up a menu with the
+  keyboard (see -underline option in menubutton(n)).
+
+* Added -float_panel option to allow info panel to be in a popup
+  window (default is off, no change), usage: rtd ... -float_panel 1,
+  to enable.
+
+* Added -panel_layout option to allow changing the order of the zoom
+  and pan windows in the layout (default is the same as before, no
+  change). Usage: rtd ... -panel_layout $value, where value is one of
+  {saoimage reverse default}, for an saoimage type layout, reverse or
+  default.
+
+* Compress: Upgraded to new "press" library routines to fix bug found in
+  H-compress code (Bug was only in decompression).
+
+--------------- 05.03.98 released skycat 2.0.8 -----------------------
+
+* Added a -remote option to skycat: usage: "skycat -remote 1 file ..."
+  When "-remote 1" is specified and a skycat application is already
+  running on the same display, the existing skycat application opens a
+  new main window to display the image. In this way, you only need to
+  have one skycat application running at a time, which saves memory
+  and colors in the colormap. Note that this feature uses "Tcl send",
+  which has a special X security check and so won't work if you use
+  the "XHOST" style X security. Unless X security is disabled in the
+  binary, you need to use XAUTH style security. See the "Tcl/Tk Tools"
+  book for a good explanation of this.
+
+* For backward compatibility: Removed dependence on the Tix package
+  (now part of tclutil package).
+ 
+* For backward compatibility: Removed application dependence on the
+  tclutil and astrotcl packages by merging these into the rtd and cat
+  libraries in the installation (i.e.: the object files from astrotcl
+  and tclutil are included in the master rtd and cat libraries and the
+  include files are copied to the rtd and cat include dirs. 
+
+* Implemented rotation for canvas graphics. Since Tk doesn't support
+  this directly, it is done now in Tcl code. Polygons are now used
+  in place of rectangles, to make it posible to rotate a rectangle.
+  (The appearance and funtionality is the same). You still can't
+  rotate ovals, but you can rotate a smooth rectangle, which is
+  similar (see below).
+
+* Added a "Smooth" option in the graphics window (CanvasDraw), so you 
+  can make smooth (rounded) rectangles, polygons or polylines. 
+
+* Made it possible to "select" a catalog symbol in the image, even if
+  it is hidden by another symbol on top of it. If one symbol is hidden
+  behind another, just click again to select it. You can "cycle"
+  through a stack of symbols by clicking multiple times. Use
+  <Control>-1 to toggle the selection of a symbol.
+
+* Added a "Filter" button to the catalog display widget to filter out
+  objects that are not visible in the query result list.  This is
+  needed because the query is circular, while the image is
+  rectangular, leaving some objects in the listing that can not be
+  plotted in the image.
+
+* Added a new command line option: "-catalog $catalogName". Now you
+  can have a catalog window (local or other) opened automatically
+  when skycat starts. i.e.: "skycat file.fits -catalog file.cat".
+
+* Plugins: The SKYCAT_PLUGIN environment variable may now contain
+  a colon separated list of plugin files or directories. For 
+  directories, teh default file name for a skycat plugin is
+  SkyCat_plugin.tcl, which defines the Tcl proc SkyCat_plugin.
+
+--------------- 13.2.98 released skycat 2.0.7 -----------------------
+
+* Moved the catalog symbol plotting code from Tcl to C++ to improve the
+  performace of plotting 1000's of objects on large images. (In one test,
+  the time required to plot a large catalog was reduced from about 60
+  secs to about 3 seconds).
+
+* Removed the "unexec" directories (replaced by "et" - Embedded Tk).
+  The "unexec" code was previously used to create a single binary and
+  has been replaced by "et" now.
+
+---------------  9.2.98 released skycat 2.0.6 --------------------------------
+
+* Fixed problems with floating point precision when converting world
+  coordinates (raised from default of 6 digits to max 17 digits.)
+
+* Fixed bug in introduced in the last version that could cause a core
+  dump when setting the cut levels.
+
+---------------  3.2.98 released skycat 2.0.5 --------------------------------
+
+* Added a selection mechanism to select a region of the image or
+  canvas.  The graphics toolbox now contains a "region" item that can
+  be used to select a region of the image. Also added binding
+  <Control-Button-1> as a shortcut to select a region.
+
+* Improved selection of catalog plot symbols in the image and listbox.
+  Plot symbols are now selected in the image with mouse button 1.  If
+  the shift or control key are also down, multiple objects may be
+  selected. Objects may be selected in either the image window or the
+  table listing, with the same effect. The selected objects may be
+  added to a local catalog, etc...
+
+* Added a menu item to the "Real-Time ==> Rapid Frame menu": 
+  "Delete Rapid Frame", to delete the current rapid frame.
+
+* Added a new rtdimage subcommand: "mmap", which has a similar syntax to
+  the "shm" subcommand. The rtd "shm" subcommand is used to manipulate
+  sysV shared memory areas containing the image and header data. The
+  rtd "mmap" subcommand does the same, but with "mmap" memory, which is
+  the default, since rtd uses mmap to read image files.
+
+* Rtd now checks the value of the FITS "BLANK" or "BADPIXEL" keywords
+  and ignores these pixels when setting cutlevels or doing any 
+  calculations. The blank pixels are displayed black by default.
+
+---------------  26.1.98 released skycat 2.0.4 -------------------------------
+
+* Added support for Tcl plugins for all top level widget classes and
+  added documentation and examples in the Skycat documentation
+  (see ftp://ftp.archive.eso.org/pub/skycat/doc/skycat.ps.gz)
+
+* Updated comments in Itcl sources for automatic generation of man pages.
+  (There are now man pages for all Itcl classes).
+
+* Added postscript (framemaker) documentation for all packages
+  (tclutil, astritcl, rtd, cat, skycat), 
+  see: ftp://ftp.archive.eso.org/pub/skycat/doc
+
+* Add menu accelerators (keyboard shortcuts) in Skycat, Rtd and Cat menus
+
+* Split the "top level" AstroCat class into different "frame" classes,
+  by request. Now the AstroCat class is made up of an AstroQuery class
+  (defines the panel with the search entries) and the QueryResult
+  class (defines the table for displaying the query results). None of
+  these classes knows about images. For image support, see the Skycat
+  package, which contains classes that are derived from these and add
+  image support.
+
+---------------  released skycat 2.0.2 -------------------------------
+
+* Compilied sources with the SunPRO C++ compiler and fixed problems 
+  that showed up there and not with gcc.
+
+* Replaced "unexec" package with "ET" (Embedded Tk), for creating a
+  single binary of skycat, including Tcl sources and colormaps, etc.
+  (The unexec version is still included, but not used by default).
+
+* Reorganized sources to include 2 new packages: 
+
+  The "Tclutil" package was created by gathering "generic" Tcl and C++
+  code from various applications into a single generic Tcl package.
+
+  The "Astrotcl" package was created by gathering general astronomy
+  related Tcl and C++ code from other packages into a single, reusable
+  package.
+
+  Note: if you were using the Rtd or Cat packages in another application,
+  there are some minor changes to be made to the initialization code to
+  initialize the new packages.
+
+* Moved catalog widgets to the Cat package.
+
+* changes in skycat user interface: 
+
+  - There is a new catalog menu layout.
+
+  - added support for a hierarchy of catalog directories. There
+    is a new type of catalog called "directory" that has a URL 
+    that points to other catalog config files, possibly on other
+    hosts.
+	
+  - Added a new popup window for displaying and browsing the catalog
+    directory tree. You can select catalogs from various catalog servers
+    and save them in your own personal config file. The changes appear
+    immediately in the catalog menu.
+
+  - Added a menu item to reload the catalog config file after you have
+    edited it by hand.
+
+  - The layout of the catalog window is now dependent on the 
+    information in the catalog config file (search columns).
+
+  - Added support for editing the catalog config file. There are now
+    menu items for setting the sort columns and sort order, search
+    columns, column display order, columns to show or hide, plot symbol
+    info (see the "Options" menu - changes are automatically saved in
+    ~/.skycat/skycat.cfg)
+
+  - Added more support for plot symbols: Now you can configure the
+    color, shape, angle, size and units of the symbols to be displayed
+    in the image for a star or other object. There is a window interface
+    for editing the settings (see the Options menu).
+
+--------------- 17 Jun 97 released skycat 1.1 ------------------------
+
+* Rtd, Skycat, Catlib: added support for shared libraries, itcl2.2,
+  tk4.2, tcl7.6. blt-2.1, loadable modules, packages. 
+  Use: "configure --enable-shared ..." (see INSTALL file).
+
+* The Rtd configure script now gets information from the Tcl/Tk config
+  files (tclConfig.sh, tkConfig.sh, etc...) and generates its own
+  rtdConfig.sh file, which is used by the catlib and skycat configure
+  scripts. This makes running configure faster and hopefully more
+  portable.
+
+* added a make target "release_bin" that generates a binary/interpreted
+  release of skycat. This can be used in place of the single binary
+  "unexec" version on systems where that doesn't work.
+
+* various bug fixes in rtd and catlib (see rtd/CHANGES and cat/CHANGES)
+
+--------------- 13 Feb 97 released skycat 1.0.6 ---------------------
+
+* various bug fixes (see rtd/CHANGES, cat/CHANGES)
+
+--------------- 30 Jan 97 released skycat 1.0.5 ---------------------
+
+* (Catlib) added support for backup catalog servers and local catalog 
+  config files.
+
+* Skycat catalog windows:
+  The default catalog/archive/image server is now taken as the first
+  one in the config file and no longer hard coded to names such as
+  "Guide Star Catalog at ESO".
+
+* Added World Coordinates support to the real-time image events by
+  extending the structure used to pass images to the RTD via the 
+  rtdServer. 
+  *** (NOTE: incompatible change: clients must at least be recompiled!)
+
+--------------- 21 Nov 96 released skycat 1.0.3 ---------------------
+
+* Fixed byte-swap problems in FITS files and made Linux compatible. 
+  Skycat should now work on machines that have a byte order that is
+  different from network byte-order (such as PCs).
+  Thanks to Sidik Isani <isani@cfht.hawaii.edu> for supplying the patches
+  for this.
+
+* The "Pick Object" feature (View Menu) now also works for images that
+  do not support world coordinates.
+
+* (Rtd) Local file URLs are now supported, i.e., file:/path/name...
+  Now you can specify the URL for the catalog config file using file:/...
+
+* (Catlib) It is now possible to search GSC by Id.
+  
+--------------- 14 Nov 96 released skycat 1.0.2 ---------------------
+
+* Changed configure scripts and makefiles so that skycat can be used
+  as a separate package, assuming the correct Rtd and Catlib versions
+  have already been installed.
+
+--------------- 8 Nov 96 released skycat 1.0.1 ----------------------
+
+* (Rtd) Fixed compass to display East correctly (was reversed...)
+
+* (Skycat, Catlib) Added copyright field to catalog config file and
+  added item to the user interface to display the copyright info for
+  the current catalog or image server.
+
+--------------- 7 Nov 96 released skycat 1.0 ----------------------
+
+* (WCS lib) Major improvements in the World Coordinates handling.  The
+  WCS information for HST images should be handled correctly now, so
+  you can plot guide stars, etc. This previously worked correctly only
+  for some images (such as those from DSS). Many thanks to Doug Mink
+  (dmink@cfa.harvard.edu) for supplying the WCS library and bug fixes.
+
+* (Rtd) added a new "Grid" feature (see View menu) that displays a
+  world coordinates based grid over the image. You can also control
+  the grid size (distance in arcsecs between grid lines) in a new
+  entry in the main panel.
+
+* (Rtd) The compass widget (N-E display in panel) was removed and
+  replaced with a more correct display in the Pan window. The Pan
+  window now displays 2 arrows indicating the real north and east for
+  the image, based on the world coordinate information.
+
+* (Rtd) fixed bug in "measure band" display that caused incorrect
+  distances to be displayed for the width and height lines (the
+  diagonal was ok).
+
+* (Rtd) Added bindings to measure band so that arrow keys can be used to
+  position it.
+
+--------------- 23 Oct 96 released skycat 1.0b16 ----------------------
+
+* (skycat) fixed the single binary problem related to the tclEnv patch
+  (see below), since the original fix did not work. The tclEnv patch is 
+  still the same.
+
+--------------- 22 Oct 96 released skycat 1.0b15 ----------------------
+
+* (skycat) fixed a problem that only showed up in the single binary 
+  version of skycat: under certain circumstances, skycat would
+  crash immediately on start up. I had to patch a a Tcl source file
+  (tclEnv.c) to fix this (see skycat/CHANGES and patches/tclEnv.patch).
+
+* (Rtd) fixed bug setting cut levels (was a result of changing the
+  way the min/max pixel value is set).
+
+* (catlib) Fixed bug when saving local catalogs for images that are
+  not J2000.  (The catalog was saved as B1950, for example and later
+  treated as J2000 when loaded). Now all local catalogs are saved (the
+  ra,dec columns) in equinox J2000 and are expected to be in J2000 when
+  opened.
+
+* (Rtd) changed the bindings on the "measure band" so that it acts more like
+  a menu or the line graphics: it will stay up if you click <3>, release
+  and then drag. Clicking <3> again makes it go away.  <Shift-Button3>
+  now makes it "freeze" so you can keep it where it is.  <Ctrl-Button3>
+  (or <Ctrl-Motion>) displays just the single line mband.
+
+* (Rtd) Changed the way image cut levels are set by default. In the
+  previous version, cut levels were not changed at all when a new
+  image was loaded, which meant that you usually had to press the
+  "Auto Set Cut Levels" button to make the image visible. Now this has
+  been changed as follows: If you set the cut levels explicitly by
+  typing in a number or moving a slider bar, etc., they will not be
+  changed, even if a new image is loaded.  However, if you have the
+  cut levels calculated automatically by pressing the "Auto Set Cut
+  Levels" button or the "Median Filter" button, etc., then it is
+  assumed that new cut levels can be set automatically when a new
+  image is loaded.  (We would be interested to hear any comments on
+  this. Maybe we should make this behavior optional ny adding a
+  checkbutton somewhere...)
+
+* (Rtd) Made a number of changes designed to improve performance on very large
+  images (got test image from Kim Gillies: 170 MB, 8192 x 5464 floats):
+  
+  * the zoom window is no longer updated from the pan window, since that can
+    cause a lot of disk activity on large images (the mouse easily crosses the 
+    entire pan image, which would have to be displayed in the zoom window).
+
+  * auto set cut levels, median filter, finding min/max pixel, etc. now are 
+    only calculated for the visible part of the image and (for speed) don't 
+    examine all image pixels.
+
+* (skycat) added confirmation dialogs for entering, updating and deleting local
+  catalog entries.
+
+* (catlib) The catalog config file entry is now written to local catalogs 
+  (in the header) so that the same plot symbol is used when the file is reloaded.
+
+--------------- 1 Oct 96 released skycat 1.0b12 ----------------------
+
+* added new View menu item: "WCS Info" for setting/displaying basic
+  world coordinate information.
+
+--------------- 20 Sep 96 released skycat 1.0b11 ------------------
+
+* loading of very large images should be faster now, since "mmap(2)" is
+  used to map files to memory rather than reading them. Also, the alogorithm
+  used to get the min and max pixel values has been changed to not look
+  at every pixel (see rtd/CHANGES).
+
+* now using new SAO wcs library (wcssubs-1.0).
+
+* made improvements to the colormap handling code to avoid color flashing
+  when using a private colormap (see rtd/CHANGES).
+
+* split the "./cat" directory into "./cat" (catalog libraries only)
+  and "./skycat" (skycat application, interpreted and single binary
+  versions), by request.
+
+---- see also: rtd/CHANGES, cat/CHANGES, skycat/CHANGES -------------------

@@ -1,0 +1,15 @@
+@CAT_DIR@
+AstroCat.tcl.save
+CatalogInfo.tcl.save
+CatalogInfo.tcl.save2
+CatalogInfo.tcl.save3
+Makefile
+SearchConfig.tcl.save
+SkyCatCtrl.tcl.save
+SkySearch.tcl.save
+SymbolConfig.tcl.save
+SymbolConfig.tcl.save2
+pkgIndex.tcl
+server
+skycat.cfg
+skycat_version.tcl

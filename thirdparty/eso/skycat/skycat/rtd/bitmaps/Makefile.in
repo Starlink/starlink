@@ -1,0 +1,42 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.12 1998/03/02 21:14:19 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for RTD bitmaps directory
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+RTD_DIR      = @RTD_DIR@
+BINDIR       = @BINDIR@
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = *.xbm
+TARGET       = ../src/rtd_bitmaps.C
+srcdir	     = @srcdir@
+
+all: $(TARGET)
+
+# generate a C file that creates all of the bitmap files
+# in this directory and installs them for Tk access by basename
+$(TARGET): $(FILES) bitmaps.tcl
+	itclsh2.2 bitmaps.tcl > $(TARGET)
+
+All: 
+	cd ..; $(MAKE)
+
+# bitmaps don't have to be installed since they are now compiled in (allan)
+install: 
+
+clean:
+	$(RM) *\~ "#"* core
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+man:
+

@@ -1,0 +1,157 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.14 1998/03/25 22:32:39 abrighto Exp $
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CXXDEBUGFLAGS@
+CXX_INCLUDE	= @CXX_INCLUDE@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+TCLUTIL_LIB     = @TCLUTIL_LIB_STATIC@
+ASTROTCL_LIB    = @ASTROTCL_LIB_STATIC@
+
+EXTRA_LIBS      = @LIBS@
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
+		  @ASTROTCL_BUILD_INCLUDES@
+
+# ------------------------------------------------------------------------
+
+
+SRCS 		=  tTabTable.C tQueryResult.C tAstroCatalog.C tAstroImage.C \
+	 	   tLocalCatalog.C tTcsCatalog.C tTcsLocalCatalog.C
+
+OBJS 		=  tTabTable.o tQueryResult.o tAstroCatalog.o tAstroImage.o \
+		   tLocalCatalog.o tTcsCatalog.o tTcsLocalCatalog.o
+
+PROGS 		=  tTabTable tQueryResult tAstroCatalog tAstroImage \
+		   tLocalCatalog tTcsCatalog tTcsLocalCatalog
+
+INCLUDES	= -I../include \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/astrotcl \
+		  -I$(TOPDIR)/include/tclutil
+
+CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+LIBRARIES       = ../lib/libastrocat.a \
+		  $(ASTROTCL_LIB) \
+		  $(TCLUTIL_LIB) 
+
+DEPEND_FLAGS    = $(CC_SWITCHES) $(CXX_INCLUDE)
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: 
+
+test: $(PROGS)
+
+alltests: $(PROGS)
+	-@for i in $(PROGS); do \
+		echo "testing $$i:" ;\
+		$$i > $$i.result ;\
+		cmp $$i.result $$i.ok || echo "*** $$i: test failed: see $$i.result" ;\
+	done
+
+lib:
+	@cd ../src; $(MAKE)
+
+All:
+	cd ../..; $(MAKE); $(MAKE)
+
+install:
+
+clean:
+	$(RM) $(PROGS) $(OBJS) *.result *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+# accept all test results
+allok:
+	for i in *.result; do cp $$i `basename $$i .result`.ok; done
+
+tTabTable: tTabTable.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tQueryResult: tQueryResult.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tAstroCatalog: tAstroCatalog.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tAstroImage: tAstroImage.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tLocalCatalog: tLocalCatalog.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tTcsCatalog: tTcsCatalog.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+tTcsLocalCatalog: tTcsLocalCatalog.o $(LIBRARIES)
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	-$@ > $@.result
+	-@if cmp $@.result $@.ok; \
+	 then echo "$@: PASSED" ; \
+	 else echo "*** $@: TEST FAILED: see $@.result"; \
+	 fi
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+
+
+

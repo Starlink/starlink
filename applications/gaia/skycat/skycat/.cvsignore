@@ -1,0 +1,13 @@
+.makelog
+Makefile
+Makefile.tmp
+a.out
+config.cache
+config.log
+config.status
+configure.in-
+conftest.C
+install
+skycatConfig.sh
+tmp
+tmp

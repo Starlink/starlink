@@ -1,0 +1,122 @@
+                   CFITSIO Interface Library
+
+CFITSIO is a library of ANSI C routines for reading and writing FITS
+format data files.  A set of Fortran-callable wrapper routines are also
+included for the convenience of Fortran programmers.  This README file
+gives a brief summary of how to build and test CFITSIO, but the CFITSIO
+User's Guide, found in the files cfitsio.doc (plain text), cfitsio.tex
+(LaTeX source file), or cfitsio.ps (postscript format), should be
+referenced for the latest and most complete information.
+
+BUILDING CFITSIO
+----------------
+
+The CFITSIO code is contained in about 40 *.c source files and several *.h
+header files.  The CFITSIO library is built on Unix systems by typing:
+
+>  ./configure
+>  make
+
+at the operating system prompt.  The 'configure' command customizes
+the Makefile for your particular system, then the 'make' command
+builds the library.
+
+On VAX/VMS and ALPHA/VMS systems, the make.com command file may be used
+to build the cfitsio.olb object library.  Execute this command file by
+typing '@make' on the command line.
+
+On DOS-based PC computers, the makepc.bat file gives an example of how
+to build the CFITSIO library.  This file will probably need to be
+editted to include the appropriate command switches if a different C
+compiler or linker is used.
+
+On OS/2 systems, CFITSIO can be built using the supplied makefile by
+typing 'make -f makefile.os2'.  This makefile requires the GCC compiler
+and EMX library, which are available from many Internet sites
+containing OS/2 software, such as
+ftp-os2.nmsu.edu/pub/os2/dev/emx/v0.9c and
+ftp.leo.org/pub/comp/os/os2/leo/devtools/emx+gcc.
+
+The MacOS version of the cfitsio library can be built by (1) un binhex
+and unstuff cfitsio_mac.sit.hqx, (2) put CFitsioPPC.mcp in the cfitsio
+directory, and (3) load CFitsioPPC.mcp into CodeWarrior Pro 2 and
+make.  This builds the cfitsio library for PPC.  There are also targets
+for both the test program and the speed test program.
+
+To use the MacOS port you can add Cfitsio PPC.lib to your Codewarrior
+Pro 2 project.  Note that this only has been tested for the PPC and
+probably won't work
+ on 68k macs.
+
+TESTING CFITSIO
+---------------
+
+The CFITSIO library should be tested by building and running
+the testprog.c program that is included with the release. 
+On Unix systems, type:
+-
+    % make testprog
+    % testprog > testprog.lis
+    % diff testprog.lis testprog.out
+    % cmp testprog.fit testprog.std
+-
+ On VMS systems,
+(assuming cc is the name of the C compiler command), type:
+-
+    $ cc testprog.c
+    $ link testprog, cfitsio/lib
+    $ run testprog
+-
+The testprog program should produce a FITS file called `testprog.fit'
+that is identical to the testprog.std FITS file included in this
+release.  The diagnostic messages (which were piped to the file
+testprog.lis in the Unix example) should be identical to the listing
+contained in the file testprog.out.  The 'diff' and 'cmp' commands
+shown above should not report any differences in the files.
+
+USING CFITSIO
+-------------
+
+The CFITSIO User's Guide, contained in the files cfitsio.doc (plain
+text file) and cfitsio.ps (postscript file), provides detailed
+documentation about how to build and use the CFITSIO library.
+It contains a description of every user-callable routine in the
+CFITSIO interface.
+
+The cookbook.c file provides some sample routines for performing common
+operations on various types of FITS files.  Programmers are urged to
+examine these routines for recommended programming practices when using
+CFITSIO.  Users are free to copy or modify these routines for their own
+purposes.
+
+SUPPORTED PLATFORMS
+-------------------
+
+CFITSIO has currently been tested on the following platforms:
+
+   Operating System          Compiler
+   ----------------          --------
+   Sun OS                     gcc and cc (3.0.1)
+   Sun Solaris                gcc and cc
+   Silicon Graphics IRIX      gcc and cc
+   DECstation  Ultrix         gcc
+   Dec Alpha OSF/1            gcc
+   Dec Alpha OpenVMS          cc with /float=gfloat or /float=ieee options
+   DEC VAX/VMS                gcc and cc
+   Linux running on IBM PC    gcc
+   IBM PC w/ Windows 95       Borland C++ V4.5
+   IBM PC w/ OS/2             gcc + EMX
+   MacOS 7.1 or greater       Metrowerks 10.+
+
+CFITSIO will probably run on most other Unix platforms without
+modification.  Cray supercomputers and IBM mainframe computers are
+currently not supported.
+
+Reports of any success or failure to run CFITSIO on other platforms
+would be appreciated.  Any problem reports or suggestions for
+improvements are also welcome and should be sent to the author.
+
+-------------------------------------------------------------------------
+William D. Pence
+pence@tetra.gsfc.nasa.gov
+HEASARC, NASA/GSFC

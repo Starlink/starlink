@@ -1,0 +1,28 @@
+#!/bin/sh
+# E.S.O. - VLT project 
+# "@(#) $Id: makelinks,v 1.3 1997/04/11 10:47:20 abrighto Exp $"
+#
+# script to make some links used during development
+#
+# usage: cd RTDDIR; sh makelinks
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+#                 16/09/96  changed dir structure, removed rtdcfg dir
+
+
+if [ ! -d ./rtdimg/library ]
+then
+	echo "$0: you should be one level above the rtdimg directory"
+	exit 1
+fi
+
+echo "making links in rtd/rtdimg/library..."
+cd rtdimg/library
+for i in demos colormaps images
+do
+  rm -f $i
+  ln -s ../$i .
+done
+

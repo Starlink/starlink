@@ -1,0 +1,202 @@
+# ESO/Archive
+# $Id: Makefile.in,v 1.8 1998/05/20 19:24:53 abrighto Exp $
+#
+# Component level Makefile
+
+# directories to run make in
+SUBDIRS = gaia
+
+# make libgaia.so from these dirs
+LIBDIRS = gaia
+
+# run "make clean" in these dirs
+CLEANDIRS = $(LIBDIRS)
+
+# names of master libraries to generate
+LIBRARY_a 	= libgaia.a
+LIBRARY_sl 	= libgaia@SHLIB_SUFFIX@
+
+# temp dir used to generate master lib
+TMPDIR  	= ./tmp
+
+# install dirs
+LIBDIR  	= @LIBDIR@
+TOPDIR	        = @DESTDIR@
+BINDIR          = @BINDIR@
+
+# install programs
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+# misc system libs
+EXTRA_LIBS   = @LIBS@
+LIBS         = @LIBS@
+X_LIB        = @XLIBSW@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=$(LIBDIR)
+
+# tcl/tk and related libraries
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+SRCDIR    = @SRC_ROOT@
+
+# tcl library dir
+TCL_LIBRARY = @TCL_LIBRARY@
+
+# ------------------------------------------------------------------------
+#       Libraries required to link against Fortran source code
+#       using a C++ compiler.
+# ------------------------------------------------------------------------
+F77_LIBS = @F77_LIBS@
+STARLINK = @STARLINK@
+STAR_LIB = $(STARLINK)/lib
+STAR_INC = $(STARLINK)/include
+STAR_BIN = $(STARLINK)/bin
+
+#  Define sets of ADAM libraries we need to link against. Note that
+#  ast_link and ndf_link must be carefully managed to avoid picking up
+#  default AST libraries for errors and graphics.
+STAR_LIBS = \
+	-L$(STAR_LIB) \
+	`ast_link -myerr -mygrf` \
+	`ard_link` \
+	`ams_link_adam` \
+	`nbs_link` \
+	`fio_link` \
+	`ndf_link` \
+	-lpda
+
+# catalog lib
+CAT_LIB = @CAT_LIB@
+
+# rtd lib
+RTD_LIB = @RTD_LIB@
+
+# skycat lib
+SKYCAT_LIB = @SKYCAT_LIB@
+
+# This flag is set to 1 by configure if a shared library should be made
+SHARED  = @SHARED@
+
+# Dependent libraries added to command line to build master shared library,
+# on systems where that is needed. 
+MASTER_DEP_LIBS = $(SKYCAT_LIB) $(CAT_LIB) $(RTD_LIB) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) 
+
+# libraries for sources that belong in the shared library.
+MASTER_LIBS = $(SRCDIR)/gaia/lib/libgaia.a $(STAR_LIBS) $(EXTRA_LIBS)
+
+# -------------------------------------------------------------------------
+
+# make all in subdirs and generate shared lib if needed
+all: sub master_lib gaia_plugin
+
+# make all in subdirs
+sub:
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) all) done
+
+# generate master library
+master_lib:
+	@test -d tmp || mkdir tmp
+	@cd tmp ;\
+	 rm -f *.o ;\
+	 ar x $(SRCDIR)/gaia/lib/libgaia.a Gaia.o ; \
+	 if test $(SHARED) -eq 1 ; then \
+	   echo "making master $(LIBRARY_sl) shared library" ;\
+	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\
+	   if test "$(SHLIB_LD_LIBS)" = "" ; then \
+	       echo $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_LIBS) ;\
+	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_LIBS) ;\
+	   else \
+	       echo $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_LIBS) $(MASTER_DEP_LIBS) ;\
+	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_LIBS) $(MASTER_DEP_LIBS) ;\
+	   fi ;\
+	   chmod 555 ../$(LIBRARY_sl) ;\
+	   (cd ../gaia; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
+	 fi ;\
+	 echo "making master $(LIBRARY_a) library" ;\
+	 rm -f ../$(LIBRARY_a) ;\
+	 $(AR) ../$(LIBRARY_a) *.o ;\
+	 $(RANLIB) ../$(LIBRARY_a) ;\
+	 rm -f *.o
+
+# set up a plugin dir for testing the gaia plugin
+plugin gaia_plugin: FORCE
+	if test $(SHARED) -eq 1 ; then \
+	  rm -rf gaia_plugin ;\
+	  mkdir gaia_plugin ;\
+	  cp gaia/library/*.tcl gaia_plugin ;\
+	  cp gaia/library/tclIndex gaia_plugin ;\
+	  cp gaia/library/*.hlp gaia_plugin ;\
+	  cp gaia/demos/*.tcl gaia_plugin ;\
+	  cp gaia/demos/adamMessageRelay gaia_plugin ;\
+	  cp gaia/bin/gaia_tcl gaia_plugin/atclsh; strip gaia_plugin/atclsh ;\
+	  cp gaia/bin/ardstat* gaia_plugin; strip gaia_plugin/ardstat ;\
+	  cp gaia/bin/autocrop* gaia_plugin; strip gaia_plugin/autocrop  ;\
+	  (cd gaia_plugin; ln -s . demos) ;\
+	  cp $(LIBRARY_sl) gaia_plugin ;\
+	  sed -e 's/\[file dirname \$dir\]/$dir/' \
+	     < gaia/library/pkgIndex.tcl \
+	     > gaia_plugin/pkgIndex.tcl ;\
+	  (cd $(TCL_LIBRARY)/..; tar cf - `basename $(TCL_LIBRARY)` iwidgets* \
+	       | (cd $(SRCDIR)/gaia_plugin; tar xf -)) ;\
+	  cp $(STAR_BIN)/gaiapack/* gaia_plugin; strip gaia_plugin/ardmask; strip gaia_plugin/autophotom;\
+	fi
+
+# for quick tests
+qplug: FORCE
+	  cp gaia/library/*.tcl gaia_plugin
+	  cp gaia/demos/*.tcl gaia_plugin
+
+
+clean:
+	for i in $(CLEANDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+	rm -f $(LIBRARY_sl) $(LIBRARY_a)
+	rm -rf gaia_plugin tmp
+
+depend man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	rm -f config.status config.cache config.log config.h 
+	rm -f Makefile .makelog $(TMPDIR)/*.[ao] install
+	for i in $(CLEANDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+# run install in the subdirs
+install_gaia: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) install) done
+	cp gaiaConfig.sh $(LIBDIR)
+
+# install master libraries (archive and shared, if requested)
+install_master_lib: FORCE
+	@if test $(SHARED) -eq 1 ; then \
+	   echo "installing master $(LIBRARY_sl)" ;\
+	   rm -f $(LIBDIR)/$(LIBRARY_sl) ;\
+	   cp $(LIBRARY_sl) $(LIBDIR)/$(LIBRARY_sl) ;\
+	   chmod 555 $(LIBDIR)/$(LIBRARY_sl) ;\
+	   (cd $(LIBDIR)/gaia; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
+	fi 
+	cp $(LIBRARY_a) $(LIBDIR)/$(LIBRARY_a) 
+	$(RANLIB) $(LIBDIR)/$(LIBRARY_a)
+
+# install everything	
+install: install_gaia install_master_lib
+
+FORCE:

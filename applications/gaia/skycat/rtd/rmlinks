@@ -1,0 +1,20 @@
+#!/bin/sh
+# E.S.O. - VLT project 
+# "@(#) $Id: rmlinks,v 1.2 1997/04/11 10:47:22 abrighto Exp $"
+#
+# script to remove links before checking in with cmm
+#
+# usage: cd RTDDIR; sh rmlinks
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+# pbiereic        01/04/97  Changed according to new directory structure
+
+if [ ! -d ./rtdimg/library ]
+then
+	echo "$0: you should be one level above the rtdimg directory"
+	exit 1
+fi
+
+find . -type l -print -exec rm -f {} \; | tee .linklog

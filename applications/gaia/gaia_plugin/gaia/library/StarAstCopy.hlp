@@ -1,0 +1,18 @@
+
+     Copy astrometry (GAIA -- version 2.0)
+     =====================================
+
+This window allows you to copy an astrometric calibration from a file
+to the displayed image. It works just like the usual file selection
+window except for the additional buttons displayed at the bottom.
+
+When you have selected the file you want to copy the calibration from
+try the "Test" button and see the RA and Dec coordinates that are now
+available (you can also try to display catalogue information -- just
+to see how good the copied calibration is). When you're happy press
+the "Accept" button to make the change permanent (but remember to save
+the image to keep the new calibration permanently). You can now use
+the "Tweak an existing calibration..." toolbox to add a linear
+transformation (i.e. an offset, scale change, rotation etc.), if
+necessary (if say the copied calibration is from a slightly dithered
+image).

@@ -1,0 +1,24 @@
+#! /bin/sh
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: MakeLinks,v 1.3 1997/09/17 13:38:51 abrighto Exp $"
+#
+# who       when      what
+# --------  --------  ----------------------------------------------
+# therlin  10/11/95  created
+#
+
+cd library
+ln -s mkIndex.tcl mkIndex
+cd ../demos
+ln -s rtd.sh rtdctrl
+ln -s rtd.sh rtdimage
+ln -s rtd.sh rtd
+ln -s ../../rtdevt/bin/rtdClient rtdClient
+ln -s ../../rtdevt/bin/rtdServer rtdServer
+cd ../images
+ln -s ngc1275.gzfits test.gzfits
+
+#
+# ___oOo___

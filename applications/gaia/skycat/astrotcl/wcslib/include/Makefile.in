@@ -1,0 +1,19 @@
+# E.S.O. - VLT project 
+# @(#) $Id: Makefile.in,v 1.6 1998/11/16 21:23:02 abrighto Exp $
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+# don't install fitsio.h, since it may conflict with cfitsio...
+SRCS 		= HMS.h ImageCoords.h SAOWCS.h WCS.h WorldCoords.h WorldOrImageCoords.h \
+		  worldCoords.h wcslib.h fitshead.h 
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include ../../include.mk

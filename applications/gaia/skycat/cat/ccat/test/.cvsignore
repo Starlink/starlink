@@ -1,0 +1,7 @@
+.objs
+Makefile
+dss.fits
+tastroCatalog
+tastroCatalog.result
+tastroImage
+tastroImage.result

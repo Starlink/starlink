@@ -1,0 +1,18 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.5 1997/09/17 13:38:35 abrighto Exp $"
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		= rtdImageEvent.h rtdSem.h
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include ../../include.mk
+

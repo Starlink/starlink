@@ -1,0 +1,13 @@
+.cvslog
+Makefile
+catConfig.sh
+config.cache
+config.log
+config.status
+configure.in-
+conftest.C
+install
+make_skycatlib.sh
+sta01999
+timestamp
+tmp

@@ -1,0 +1,9 @@
+compressing test.fits (H_COMPRESS):
+decompressing (H_COMPRESS):
+compressing test.fits (GZIP):
+decompressing (GZIP):
+comparing results (GZIP):
+compressing test.fits (UNIX):
+decompressing (UNIX):
+comparing results (UNIX):
+All tests passed

@@ -1,0 +1,56 @@
+# E.S.O. - VLT project 
+# $Id: skycatConfig.sh.in,v 1.7 1998/07/28 21:23:59 abrighto Exp $
+#
+# skycatConfig.sh --
+#
+# This shell script (for sh) is generated automatically by the skycat
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by other configure scripts
+# so that they don't have to figure this all out for themselves.
+#
+# The information in this file is specific to a single platform.
+#
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  28/11/97  Created
+#
+
+# SKYCAT install dirs
+SKYCAT_DESTDIR='@DESTDIR@'
+SKYCAT_BINDIR='@BINDIR@'
+SKYCAT_LIBDIR='@LIBDIR@'
+SKYCAT_INCDIR='@INCDIR@'
+SKYCAT_MANDIR='@MANDIR@'
+SKYCAT_DIR='@SKYCAT_DIR@'
+
+# root of cat source tree
+SKYCAT_SRC_ROOT='@SRC_ROOT@'
+
+# default loskycation of Skycat library files
+SKYCAT_LIBRARY='@SKYCAT_LIBRARY@'
+
+# loskycation of Skycat library files in source tree
+SKYCAT_BUILD_LIBRARY='@SKYCAT_BUILD_LIBRARY@'
+
+# -I flags to pick up the skycat include files from the build dirs
+SKYCAT_BUILD_INCLUDES='@SKYCAT_BUILD_INCLUDES@'
+
+# version of the skycatlib library
+# version of the skycatlib library
+SKYCAT_VERSION='@SKYCAT_VERSION@'
+
+
+# String to pass to linker to pick up the Skycat library from its
+# build directory.
+SKYCAT_BUILD_LIB_SPEC='@SKYCAT_BUILD_LIB_SPEC@'
+
+# static version of above
+SKYCAT_BUILD_LIB_SPEC_STATIC='@SKYCAT_BUILD_LIB_SPEC_STATIC@'
+
+# String to pass to linker to pick up the Skycat library from its
+# installed directory.
+SKYCAT_LIB_SPEC='@SKYCAT_LIB_SPEC@'
+
+# static version of above
+SKYCAT_LIB_SPEC_STATIC='@SKYCAT_LIB_SPEC_STATIC@'

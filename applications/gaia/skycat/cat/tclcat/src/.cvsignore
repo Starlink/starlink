@@ -1,0 +1,6 @@
+.objs
+Makefile
+Makefile.tmp
+TclAstroCat.C.bad
+TclAstroCat.C.save
+make.dep

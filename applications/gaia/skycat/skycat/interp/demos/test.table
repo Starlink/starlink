@@ -1,0 +1,16 @@
+QueryResult
+
+# Config entry for original catalog server:
+serv_type: catalog
+long_name: My test catalog 1
+short_name: test1@local
+url: /home/abrighto/work/skycat/src/skycat/skycat/interp/demos/test1.cat %ra %dec %r1 %r2
+symbol: mag square 15-$mag
+id_col: 2
+ra_col: 3
+dec_col: 4
+# End config entry
+
+temp1	temp2	some_long_id	ra_value	dec_value	pos-e	mag	mag-e	mu	d'	pa
+-----	-----	------------	--------	---------	-----	---	-----	--	--	--
+junk1	junk2	GSC0285601162	03:19:51.15	+41:31:25.97	0.2	12.93	0.41	F	0.94	36;

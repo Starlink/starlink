@@ -1,0 +1,44 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.6 1998/03/02 21:14:15 abrighto Exp $
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+CAT_DIR      = @CAT_DIR@
+BINDIR       = @BINDIR@
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = *.xbm *.xpm 
+srcdir	     = @srcdir@
+TARGET       = ../src/cat_bitmaps.C
+
+all: $(TARGET)
+
+All: 
+	cd ..; $(MAKE)
+
+# generate a C file that creates all of the bitmap files
+# in this directory and installs them for Tk access by basename
+$(TARGET): $(FILES)
+	itclsh2.2 bitmaps.tcl > $(TARGET)
+
+install:
+
+clean:
+	$(RM) *\~ "#"* core
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+man:
+

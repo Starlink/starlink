@@ -1,0 +1,15 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.2 1996/04/12 13:29:08 abrighto Exp $
+#
+# Component level Makefile
+
+SUBDIRS = src include test man
+
+all install clean depend man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	rm -f Makefile
+
+FORCE:
+

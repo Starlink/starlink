@@ -1,0 +1,88 @@
+#*************************************
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.8 1998/07/30 22:20:11 abrighto Exp $" 
+#
+# Makefile.in
+# 
+# who      when     what
+#--------  -------- ------------------
+# abrighto 11/10/95 created
+#
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+SRCS 		=  HMS.C ImageCoords.C SAOWCS.C WCS.C WorldCoords.C cel.c cotr.c \
+		   dsspos.c fitsio.c hget.c hput.c iget.c imio.c iraf2fits.c \
+		   jprec.c lin.c platepos.c proj.c slasubs.c \
+		   sph.c tnxpos.c trigod.c wcs.c wcscon.c wcsinit.c wcslib.c wcstrig.c \
+	 	   worldCoords.C worldpos.c
+
+OBJS 		=  HMS.o ImageCoords.o SAOWCS.o WCS.o WorldCoords.o cel.o cotr.o \
+		   dsspos.o fitsio.o hget.o hput.o iget.o imio.o iraf2fits.o \
+		   jprec.o lin.o platepos.o proj.o slasubs.o \
+		   sph.o tnxpos.o trigod.o wcs.o wcscon.o wcsinit.o wcslib.o wcstrig.o \
+	 	   worldCoords.o worldpos.o
+
+libname  	= ../lib/libwcslib.a
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@
+
+INCLUDES	= -I../include \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/tclutil \
+		  -I$(TOPDIR)/include
+
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: dirs $(libname)
+
+All:
+	cd ../..; $(MAKE)
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+install: 
+
+dirs:
+	test -d ../lib || mkdir ../lib
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk

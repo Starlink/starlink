@@ -1,0 +1,31 @@
+# E.S.O. - VLT project 
+# $Id: configure.in,v 1.2 1998/09/30 13:42:45 abrighto Exp $
+#
+# This file is used with GNU autoconf to generate a configure script for
+# the Skycat modules.
+#
+# usage: % autoconf
+#        % configure
+#        % make
+# who             when       what
+# --------------  --------   ---------------------------------------------
+# Allan Brighton  27 Jul 98  Created
+# -----------------------------------------------------------------------
+
+AC_INIT(README)
+
+#--------------------------------------------------------------------
+#	run configure scripts in these subdirectories, if available
+#--------------------------------------------------------------------
+AC_CONFIG_SUBDIRS(tclutil astrotcl rtd cat et skycat plugins/gaia)
+
+# according to the docs, subdirs should be set to the directories
+# found, however it doesn't seem top work.
+dirs=""
+for i in $subdirs ; do
+	test -d $i && dirs="$dirs $i"
+done
+subdirs=$dirs
+AC_SUBST(subdirs)
+
+AC_OUTPUT(Makefile)

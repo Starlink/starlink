@@ -1,0 +1,16 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.1 1998/03/02 20:30:28 abrighto Exp $"
+#
+# Component level Makefile
+
+SUBDIRS = src
+
+all install clean depend: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+man:
+
+distclean: clean
+	rm -f Makefile */.objs
+
+FORCE:

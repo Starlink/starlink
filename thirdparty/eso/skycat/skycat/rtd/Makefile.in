@@ -1,0 +1,159 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.13 1998/07/28 21:23:22 abrighto Exp $"
+#
+# Component level Makefile
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+#
+
+# directories containing library sources
+SUBDIRS 	= @RTD_SUBDIRS@
+
+# directories to run make in
+ALLDIRS 	= $(SUBDIRS)
+
+# this dir
+SRCDIR = @SRC_ROOT@
+
+# subdirs in dependent packages (objects included in master lib)
+ASTROTCL_SUBDIRS = @ASTROTCL_SUBDIRS@
+TCLUTIL_SUBDIRS  = @TCLUTIL_SUBDIRS_NOTIX@
+
+# library source dirs, including dependent packages
+DEP_LIB_SUBDIRS	= $(SUBDIRS) $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS)
+
+# names of master libraries to generate
+LIBRARY_a 	= librtd.a
+LIBRARY_sl 	= librtd@SHLIB_SUFFIX@
+LIBRTD          = -lrtd
+
+# temp dir used to generate master librtd.a
+TMPDIR  	= ./tmp
+
+# install dirs
+LIBDIR  	= @LIBDIR@
+TOPDIR	        = @DESTDIR@
+BINDIR          = @BINDIR@
+RTD_DIR         = @RTD_DIR@
+BINDIR          = @BINDIR@
+INCDIR          = @INCDIR@
+
+# install programs
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+# misc system libs
+EXTRA_LIBS   = @LIBS@
+LIBS         = @LIBS@
+X_LIB        = @XLIBSW@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=$(LIBDIR)
+
+# Tcl/Tk libraries
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+# This flag is set to 1 by configure if a shared library should be made
+SHARED  = @SHARED@
+
+# Dependent libraries added to command line to build master shared library,
+# on systems where that is needed. 
+MASTER_DEP_LIBS = $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS)
+
+# ------------------------------------------------------------------------
+
+# make all in subdirs and generate shared lib if needed
+all: sub master_lib
+
+# make all in subdirs
+sub:
+	for i in $(ALLDIRS); do (cd $$i; echo "$$i:"; $(MAKE) all) done
+
+# generate master library 
+# (make .a archive and shared library, if configure --enable-shared was specified) 
+# We also make a link to the shared lib in rtdimg, for testing with "package require"
+# locally in the parent dir of the local Rtd library dir.
+master_lib:
+	test -d tmp || mkdir tmp
+	@cd tmp ;\
+	 rm -f *.o ;\
+	 for i in $(DEP_LIB_SUBDIRS); do \
+	   cp `cat $$i/src/.objs` . ; \
+	 done ;\
+	 if test $(SHARED) -eq 1 ; then \
+	   echo "making master $(LIBRARY_sl) shared library" ;\
+	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\
+	   if test "$(SHLIB_LD_LIBS)" = "" ; then \
+	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o ;\
+	   else \
+	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_DEP_LIBS) ;\
+	   fi ;\
+	   chmod 555 ../$(LIBRARY_sl) ;\
+	   (cd ../rtdimg; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
+	 fi ;\
+	 echo "making master $(LIBRARY_a) library" ;\
+	 rm -f ../$(LIBRARY_a) ;\
+	 $(AR) ../$(LIBRARY_a) *.o ;\
+	 $(RANLIB) ../$(LIBRARY_a) ;\
+	 rm -f *.o
+
+clean:
+	for i in $(ALLDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+	rm -f $(LIBRARY_sl) $(LIBRARY_a)
+
+depend man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	rm -f config.status config.cache config.log config.h 
+	rm -f Makefile .makelog $(TMPDIR)/*.[ao] install
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+
+# run install in the subdirs and also install header files from dependent 
+# packages whose object files are included in the master library.
+install_rtd: FORCE
+	for i in $(ALLDIRS); do (cd $$i; echo "$$i:"; $(MAKE) install) done
+	cp rtdConfig.sh $(LIBDIR)
+	@for i in $(ASTROTCL_SUBDIRS) $(TCLUTIL_SUBDIRS) ; do \
+	    if test -d $$i/include ; then \
+		(cd $$i/include; echo $$i/include; $(MAKE) install INCDIR=$(INCDIR)) ;\
+	    fi ; \
+	done
+
+# install master libraries (archive and shared, if requested)
+# We also make a link to the shared lib in $rtd_library for "package require"
+install_master_lib: FORCE
+	@if test $(SHARED) -eq 1 ; then \
+	   echo "installing master $(LIBRARY_sl)" ;\
+	   rm -f $(LIBDIR)/$(LIBRARY_sl) ;\
+	   cp $(LIBRARY_sl) $(LIBDIR)/$(LIBRARY_sl) ;\
+	   chmod 555 $(LIBDIR)/$(LIBRARY_sl) ;\
+	   (cd $(LIBDIR)/rtd; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
+	fi 
+	cp $(LIBRARY_a) $(LIBDIR)/$(LIBRARY_a) 
+	$(RANLIB) $(LIBDIR)/$(LIBRARY_a)
+
+# install everything	
+install: install_rtd install_master_lib
+
+FORCE:

@@ -1,0 +1,15 @@
+.objs
+CatalogInfo.C.save
+LocalCatalog.C-
+LocalCatalog.C.tmp
+Makefile
+Makefile.tmp
+QueryResult.C.save
+Starbase.C-
+TabTable.C-
+TabTable.C.bad
+TabTable.C.save
+TcsLocalCatalog.C-
+old
+tmp
+xxx

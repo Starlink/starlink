@@ -1,0 +1,21 @@
+#!/bin/sh
+# E.S.O. - VLT project/ ESO Archive 
+# "@(#) $Id: makelinks,v 1.2 1997/12/02 10:26:13 abrighto Exp $"
+#
+# script to make some links used during development
+#
+# usage: makelinks
+#
+# who             when       what
+# --------------  --------   ----------------------------------------
+# Allan Brighton  22 Nov 97  Created
+
+
+if [ ! -d ./astrotcl/library ]
+then
+	echo "$0: you should be one level above the astrotcl directory"
+	exit 1
+fi
+
+echo "making links..."
+(cd astrotcl/library;  rm -f demos;  ln -s ../demos .)

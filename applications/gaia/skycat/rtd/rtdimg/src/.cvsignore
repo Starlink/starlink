@@ -1,0 +1,10 @@
+.objs
+ImageColor.C.save
+Makefile
+Makefile.tmp
+RtdImage.C-
+RtdImage.C.bad
+RtdImage.C.flc
+RtdImage.C.save
+make.dep
+x

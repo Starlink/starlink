@@ -1,0 +1,12 @@
+This directory contains sources extracted from Tix4.1.0.  They are
+(temporarily at least) included here for backward compatibility, so
+that existing application Makefiles do not need to be modified to
+include Tix. See the Tix package for documentation, examples and
+tests.
+
+Note: Copies of the private Tcl/Tk include files are also found here,
+since Tix needs them at compile time.
+
+
+Allan Brighton
+abrighto@eso.org

@@ -1,0 +1,112 @@
+!!*************************************
+!!
+!! E.S.O. - VLT project
+!!
+!! $Id: Xdefaults,v 1.1 1996/09/16 14:56:34 abrighto Exp $ 
+!! 
+!! Xdefaults file for RtdImage demo
+!! 
+!! who      when     what
+!! -------- -------- ------------------
+!! vltsccm  03/29/95 created for cmm
+!! abrighto 06/09/95 modified for rtdimage
+!!
+!!*************************************
+
+
+*Background:	    	#c3baa9
+*highlightThickness:    0
+
+*Canvas*selectForeground:   Black
+*Canvas*selectBackground:   #d1ba96
+
+*Font:     	    	-Adobe-helvetica-medium-r-normal--14*
+*BoldFont:     	    	-Adobe-helvetica-bold-r-normal--14*
+*BigFont:     	    	12x24
+*BoldBigFont:      	12x24
+*SmallFont:	       	8x13
+*BoldSmallFont:     	8x13bold
+*SmallPropFont:     	-Adobe-helvetica-medium-r-normal--12*
+
+*Label*Foreground:      Black
+*Label*Font:    	-Adobe-helvetica-bold-r-normal--14*
+
+! TableList
+*titleFont:    		-Adobe-helvetica-bold-r-normal--14*
+
+!*Listbox*Background:	#e6cda1
+!*Listbox*Foreground:	Black
+*Listbox*selectBackground:	#d1ba96
+*Listbox*selectForeground:	Black
+!*Listbox*font:		9x15
+*Listbox*font:		-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+
+*Entry*Relief:          sunken
+*Entry*Foreground:	Black
+*Entry*Background:	#ffe4b3
+*Entry*selectBackground:	#d1ba96
+*Entry*selectForeground:	Black
+*Entry*font:		8x13
+
+*Text*Foreground:	Black
+*Text*Background:	#c3baa9
+*Text*font:		fixed
+
+*Button*Background:	#d1ba96
+*Button*Foreground:	Black
+*Button*activeForeground: Black
+*Button*activeBackground: #e6cda1
+*Button*DisabledForeground: Gray90
+
+*Radiobutton*Foreground:       Black
+*Radiobutton*activeForeground: Black
+*Radiobutton*activeBackground: #e6cda1
+*Radiobutton*Relief:	flat
+
+*Checkbutton*Background:       #d1ba96
+*Checkbutton*Foreground:       Black
+*Checkbutton*activeForeground: Black
+*Checkbutton*activeBackground: #e6cda1
+*Checkbutton*Relief:	flat
+
+!*Menubutton*Background:	#b88881
+!*Menubutton*Foreground:	White
+*Menubutton*Font:	-Adobe-helvetica-bold-r-normal--14*
+
+*menu*Background:	#b88881
+*menu*activeForeground:	White
+*menu*activeBackground:	#a37974
+
+
+*Menu*Background:	#b88881
+*Menu*Foreground:	White
+*Menu*Font:	    	-Adobe-helvetica-bold-r-normal--14*
+
+*Scrollbar*foreground: 	Gray80
+*Scrollbar*activeForeground: Gray72
+*Scrollbar*relief: raised
+*Scrollbar*width:  12
+
+*selectColor:		red
+
+! -- short help background color and font --
+*shelp*Background:	#c3baa9
+*shelp*Font:     	-Adobe-helvetica-medium-r-normal--14*
+
+
+*Message*Font: -Adobe-helvetica-medium-r-normal--14*
+*Message*Foreground: Black
+
+*Scale*Foreground: Black
+*Scale*Width: 12
+*Scale*SliderLength: 24
+*Scale*Font:    	-Adobe-helvetica-bold-r-normal--14*
+
+*Checkbutton*Relief:	flat
+
+*Blt_graph.Font: *new*century*140*
+
+*FileSelect*Listbox*font: -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+*FileSelect*Entry*font: -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+*FileSelect*Label*font: -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
+

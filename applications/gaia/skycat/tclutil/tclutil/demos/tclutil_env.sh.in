@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: tclutil_env.sh.in,v 1.1 1997/12/02 10:28:12 abrighto Exp $" 
+#
+# This script is sourced by the tclutil startup file, tclutil.sh, 
+# if present, to set up the environment for running the tclutil demo
+# from the local source dir. This arranges to have the Tcl/Tk scripts
+# and shared libraries searched for in the local source tree rather 
+# than in the install dir, which is the default otherwise.
+#
+#  who      when      what
+# -------- ---------  ------------------
+# abrighto 28 Nov 97  created 
+
+# use the local development Tcl/Tk files and shared library
+TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@
+export TCLUTIL_LIBRARY

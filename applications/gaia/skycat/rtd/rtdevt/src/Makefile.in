@@ -1,0 +1,105 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.13 1998/08/17 09:16:01 abrighto Exp $"
+#
+# ------------------------------------------------------------------------
+# 	Makefile for rtdImgEvt library
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# 	C Compiler options 
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CDEBUGFLAGS@ 
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+BINDIR          = @BINDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+# ------------------------------------------------------------------------
+# 	Directories containing Tcl and Tk include files and libraries
+# ------------------------------------------------------------------------
+
+TCL_INCLUDE   	= @TCLINCSW@
+TK_INCLUDE    	= @TKINCSW@
+X_INCLUDE     	= @XINCSW@
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@
+
+# ------------------------------------------------------------------------
+# 	Don't edit anything beyond this point
+# ------------------------------------------------------------------------
+
+SRCS 		=  rtdClient.c rtdServer.c rtdSem.c rtdImageEvent.c rtdCubeDisplay.c
+
+OBJS 		=  rtdImageEvent.o rtdSem.o
+
+PROGS           =  ../bin/rtdClient ../bin/rtdServer ../bin/rtdCubeDisplay
+
+libname  	= ../lib/librtdImgEvt.a
+
+INCLUDES	= -I../include \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/tclutil
+
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: dirs $(libname) $(PROGS)
+
+All: 
+	cd ../..; $(MAKE)
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+../bin/rtdClient: rtdClient.o
+	$(CC) $(CC_SWITCHES) $? -o $@ $(libname) @LIBS@
+
+../bin/rtdServer: rtdServer.o
+	$(CC) $(CC_SWITCHES) $? -o $@ $(libname) @LIBS@
+
+../bin/rtdCubeDisplay: rtdCubeDisplay.o
+	$(CC) $(CC_SWITCHES) $? -o $@ $(libname) @LIBS@
+
+install: $(libname) $(PROGS) install-dirs
+	$(INSTALL_DATA) $(libname) $(LIBDIR)
+	$(RANLIB) $(LIBDIR)/$(libname)
+	set -x; for i in $(PROGS); do $(INSTALL) $$i $(BINDIR); done
+
+dirs:
+	test -d ../lib || mkdir ../lib
+
+install-dirs:
+	@for i in $(TOPDIR) $(LIBDIR) $(BINDIR) ; do \
+	    if test ! -d $$i ; then \
+		mkdir $$i ; \
+	    fi ; \
+        done
+
+clean: 
+	$(RM) $(OBJS) $(PROGS) $(libname) rtdClient.o rtdServer.o rtdCubeDisplay.o *\~ "#"* 
+
+distclean: clean depclean
+	rm -f Makefile	
+
+man:
+
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+include ../../depend.mk
+

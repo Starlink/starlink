@@ -1,0 +1,98 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: error.man3,v 1.2 1998/03/29 20:29:06 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  15 Jan 98  Created
+#
+
+NAME
+error - C++ routines used for error reporting
+
+SYNOPSIS
+#include "error.h"
+
+enum {OK, ERROR};
+
+int error(const char* msg1, const char* msg2="", int code = 0);
+int sys_error(const char* msg1, const char* msg2="");
+
+int fmt_error(const char* fmt, ...);
+int fmt_sys_error(const char* fmt, ...);
+
+char* last_error();
+int last_error_code();
+void clear_error();
+
+void (*set_error_handler(void (*error_handler)(const char*)))(const char*);
+void print_error(const char* msg);
+
+void log_message(const char* fmt, ...);
+void (*set_log_message_handler(void (*message_handler)(const char*)))(const char*);
+void print_log_message(const char* msg);
+
+DESCRIPTION
+These C++ routines are used to report errors and log messages. Some of
+the routines take one or two char strings as arguments to print,
+others have a "printf" style interface, to make it easier to format
+the error messages.  In some cases the system error description
+(errno) is appended to the message. The default action is to print the
+error on stderr, however an error handler may be defined to override
+this behavior.
+
+An error handler is a C++ routine of the form:
+
+   void errhandler(const char* msg)
+
+where "msg" is the text of the error message, already formatted, if needed.
+
+ROUTINES
+error(msg1, msg2, code)
+	Concatenate msg1 and the optional msg2 and report the error
+	with the optional system error code.
+
+sys_error(msg1, msg2)
+	Concatenate msg1 and the optional msg2 and report the error,
+	including the system error code, in the same way as perror(1).
+
+fmt_error(fmt, ...)
+	Report the error with a printf(1) style interface.
+
+fmt_sys_error(fmt, ...)
+	Report a system error with a printf style interface.
+
+last_error()
+	Return the text of the previous error message.
+
+last_error_code()
+	Return the error code for the previous error.
+
+clear_error()
+	Reset the last_error buf to empty.
+
+set_error_handler(errhandler)
+	Set a routine to be called when errors occur and return a
+	pointer to the previous handler.
+
+print_error(msg)
+	Simple error handler: print the message.
+
+log_message(fmt, ...)
+	Print a message (like printf).
+
+set_log_message_handler(msghandler)
+	Set a routine to be called for log messages and return a
+	pointer to the previous handler.
+
+print_log_message(msg)
+	Simple message handler: print the message.
+
+SEE ALSO
+TclCommand
+----------------------------------------------------------------------
+

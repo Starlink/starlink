@@ -1,0 +1,104 @@
+#!/bin/sh
+#
+# E.S.O. - VLT project/ESO Archive
+# $Id: gaia.sh.in,v 1.1 1998/04/07 00:05:26 abrighto Exp $ 
+#
+# gaia.sh.in - This script is used to start Tcl/Tk applications
+#
+# To install a Tcl/Tk script, make a soft link to this file
+# in the same directory. This script will determine
+# the name of the Tcl source file to load based on the name
+# of the link and the environment variables.
+#
+# Note: this file is processed with configure to set path variables.
+#
+# See man page for a complete description.
+#
+# who         when       what
+# --------   ---------   ----------------------------------------------
+# A.Brighton 13 Mar 98   created
+#
+
+# set basic shared library runtime search path (see also below)
+@LD_VARNAME@="@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:${@LD_VARNAME@}"
+
+# when running from the source dir, set different env for local test
+test -f ../demos/gaia_env.sh && . ../demos/gaia_env.sh
+
+if [ -z "$CAT_LIBRARY" ]
+then
+  # use the installed Tcl/Tk files and shared library
+  CAT_LIBRARY=@CAT_LIBRARY@; export CAT_LIBRARY
+else
+  # use the local development Tcl/Tk files and shared library
+  @LD_VARNAME@="$CAT_LIBRARY/../..:${@LD_VARNAME@}"
+fi
+
+if [ -z "$RTD_LIBRARY" ]
+then
+  # use the installed Tcl/Tk files and shared library
+  RTD_LIBRARY=@RTD_LIBRARY@; export RTD_LIBRARY
+else
+  # use the local development Tcl/Tk files and shared library
+  @LD_VARNAME@="$RTD_LIBRARY/../..:${@LD_VARNAME@}"
+fi
+
+if [ -z "$SKYCAT_LIBRARY" ]
+then
+  # use the installed Tcl/Tk files and shared library
+  SKYCAT_LIBRARY=@SKYCAT_LIBRARY@; export SKYCAT_LIBRARY
+else
+  # use the local development Tcl/Tk files and shared library
+  @LD_VARNAME@="$SKYCAT_LIBRARY/../..:${@LD_VARNAME@}"
+fi
+
+if [ -z "$GAIA_LIBRARY" ]
+then
+  # use the installed Tcl/Tk files and shared library
+  GAIA_LIBRARY=@GAIA_LIBRARY@; export GAIA_LIBRARY
+else
+  # use the local development Tcl/Tk files and shared library
+  @LD_VARNAME@="$GAIA_LIBRARY/../..:${@LD_VARNAME@}"
+fi
+
+# name of program to run
+prog=`basename $0`
+
+# wish binary to use
+WISH=$GAIA_LIBRARY/../bin/gaia_wish
+test -f $WISH || WISH=$GAIA_LIBRARY/../../bin/gaia_wish
+
+# set environment variables for packages
+if [ -d "@TCL_LIBRARY@" ]
+then
+  TCL_LIBRARY=@TCL_LIBRARY@
+  export TCL_LIBRARY
+fi
+ 
+if [ -d "@TK_LIBRARY@" ]
+then
+  TK_LIBRARY=@TK_LIBRARY@
+  export TK_LIBRARY
+fi
+ 
+if [ -d "@BLT_LIBRARY@" ]
+then
+  BLT_LIBRARY=@BLT_LIBRARY@
+  export BLT_LIBRARY
+fi
+
+# start an interactive shell
+if [ "$prog" = "gaia.sh" ]
+then exec $WISH
+fi
+
+# determine which tcl file to start
+file=$GAIA_LIBRARY/demos/$prog.tcl
+
+# be careful about passing arguments with embedded spaces
+if [ "$#" = "0" ]
+then
+    exec $WISH -f $file
+fi
+
+exec $WISH -f $file "$@" -visual pseudocolor

@@ -1,0 +1,110 @@
+HOW TO INSTALL the Astrotcl Package
+-----------------------------------
+
+
+1. Before you build the ASTROTCL Package
+----------------------------------------
+
+The Astrotcl package assumes one of the following Tcl environments are
+installed:
+
+For Tcl7.6:
+	itcl2.2    - [Incr Tcl], includes tcl7.6, tk4.2
+	BLT2.1     - BLT toolkit, graphs and other widgets 
+	tclX7.6.0  - Extended Tcl
+
+Or for Tcl8.0 (or newer):
+	Tcl8.0.3   - Tcl Shell
+	Tk8.0.3    - Tk X Toolkit
+	itcl3.0.1  - [Incr Tcl]
+	BLT2.4f    - BLT toolkit, graphs and other widgets 
+	tclX8.0.3  - Extended Tcl
+
+These packages are available from the TCL archives. 
+  See: http://www.tcltk.com/ for Itcl.
+  and  http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
+  and: http://www.scriptics.com/tclpro/ for Tcl8.x, TclPro and the latest releases.
+
+You can install the standard Tcl/Tk packages anywhere, however it is
+easiest to install them all in the same directory (using the same
+-prefix argument to configure).
+
+You can also get a copy of the whole Tcl7.6/Tk4.2 source tree, with 
+patches already applied from ftp://ftp.archive.eso.org/pub/skycat/.
+
+Astrotcl also depends on the following package:
+
+	Tclutil - Tcl and C++ Utilities Package
+
+which is available from the same location as this package: 
+
+	ftp://ftp.archive.eso.org/pub/skycat/.
+
+It is best to place both package sources under the same directory and
+install them in the same target directory.
+
+
+2. Build the ASTROTCL Package
+-----------------------------
+
+To make the ASTROTCL package, configure and make as follows:
+
+	configure
+	make
+	make install
+
+The default install dir is /usr/local. You can specify the -prefix
+argument to configure to change this:
+
+ 	configure -prefix $INSTALLDIR
+
+Note that the Astrotcl configure script reads configure information
+produced by the Tclutil configure script. If you want to set different
+configuration options, for example, to use a different compiler or to
+enable or disable shared libraries, reconfigure the Tclutil package
+first and then this package.
+
+VLT Make Procedure
+------------------
+
+As an alternative to running configure and make, you can also do this:
+
+	cd src
+	make 
+	make install
+
+The Makefile in the $ASTROTCL/src directory runs configure and then make as
+described above. You can also specify options to that Makefile, for
+example:
+
+	cd src
+	make PREFIX=$INSTALLDIR
+
+The PREFIX variable defaults to /usr/local and is the prefix of the
+directory in which to install the software.
+
+3. Start the demo application
+-----------------------------
+To run the demo, type:
+
+	INSTALLDIR/lib/astrotcl/demos/astrotcl
+
+This package does not currently include any applications, so this just
+starts astrotcl_wish with the correct environment. 
+
+4. If you are using shared libraries
+------------------------------------
+The Astrotcl shared library libastrotcl.sl (in HPs) or libastrotcl.so
+(on Suns) is built with the same options used to build the Tclutil and
+Tcl shared libraries. The options are read from the file
+tclutilConfig.sh, which is produced the Tclutil configure script.
+
+You may need to modify the SHLIB_PATH (HP) or LD_LIBRARY_PATH (Sun)
+environment variable so that the necessary shared libraries are found
+at run time.  Both variables have the same format: a colon ":"
+separated list of directories to search for shared libraries.
+
+From a tcl script you can load the ASTROTCL library dynamically with
+the command "load <path>/libastrotcl.sl" or "load <path>/libastrotcl.so"
+or it can be loaded automatically as a package. See the Tcl man pages
+for more information.

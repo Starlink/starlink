@@ -1,0 +1,62 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.3 1997/12/03 22:26:25 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+BINDIR       = @BINDIR@
+ASTROTCL_DIR   = @ASTROTCL_DIR@
+RM           = rm -f
+SHELL        = /bin/sh
+
+# starter shell script
+SCRIPTS      = astrotcl.sh
+
+# symbolic links to install for Tcl apps
+TCL_LINKS    = astrotcl
+
+# other files to install
+FILES        = astrotcl.tcl
+
+
+all: tcl_links
+
+# make links to the startup script for starting the Tcl applications
+tcl_links:
+	@for i in $(TCL_LINKS); do rm -f $$i; ln -s astrotcl.sh $$i; done
+
+All: 
+	cd ..; $(MAKE)
+
+install-top:
+	@test -d $(BINDIR) || mkdir $(BINDIR) 
+	@test -d $(ASTROTCL_DIR) || mkdir $(ASTROTCL_DIR)
+	@test -d $(ASTROTCL_DIR)/demos || mkdir $(ASTROTCL_DIR)/demos
+
+install: install-top
+	@set -x; for i in $(SCRIPTS) ; do \
+	    $(INSTALL_DATA) -m 775 $$i $(ASTROTCL_DIR)/demos ; \
+	done 
+	@set -x; for i in $(FILES) ; do \
+	   $(INSTALL_DATA) -m 664 $$i $(ASTROTCL_DIR)/demos ; \
+	done 
+	@set -x; for i in $(TCL_LINKS); do \
+	    rm -f $(BINDIR)/$$i $(ASTROTCL_DIR)/demos/$$i; \
+	    (cd $(ASTROTCL_DIR)/demos; ln -s astrotcl.sh $$i) ; \
+	    (cd $(BINDIR); ln -s ../lib/astrotcl/demos/$$i $$i) ; \
+	done
+
+clean:
+	$(RM) *\~ "#"* core
+
+depend:
+
+distclean: clean
+	rm -f Makefile
+
+man:

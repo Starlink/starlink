@@ -1,0 +1,57 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.4 1998/10/28 17:36:09 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for Tcl library files 
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+LIBDIR       = @LIBDIR@
+ASTROTCL_DIR = @ASTROTCL_DIR@
+ITCL_VERSION = @ITCL_VERSION@
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = *.tcl tclIndex
+srcdir	     = @srcdir@
+
+all:
+
+All: 
+	cd ..; $(MAKE)
+
+# in the src tree, the tcl sources are in the "library" dir (like tcl/tk)
+# in the install tree, they are in, for example, /usr/local/lib/astrotcl
+install-top:
+	test -d $(LIBDIR) || mkdir $(LIBDIR) 
+	test -d $(ASTROTCL_DIR) || mkdir $(ASTROTCL_DIR) 
+
+install-files: install-top
+	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	    $(INSTALL_DATA) $$i $(ASTROTCL_DIR) ; \
+	done 
+
+install: install-files
+
+clean:
+	$(RM) *\~ "#"*
+
+index tclIndex: FORCE
+	itclsh$(ITCL_VERSION) ./mkIndex.tcl
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+man:
+
+# generate man pages for itcl classes
+doc:
+
+# remove generated man pages
+cleandoc:
+
+FORCE:

@@ -1,0 +1,20 @@
+For wcssubs-2.2: (allan)
+
+wcslib.h: change #include guard to use "#ifdef _wcslib_h_" in place of 
+          "#ifdef WCS" to avoid name conflict.
+
+wcs.h: added prototype for blsearch
+
+wcs.c: replaced wcsfull() with previous release version (was broken, wrong results)
+
+in proj.h:
+
+#if 0 /* ... allan: 28.5.98: don't need following decl, conflicts with ast.h */
+struct prjprm {
+   int flag;
+   int n;
+   double r0;
+   double p[10];
+   double w[10];
+};
+#endif

@@ -1,0 +1,112 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.4 1998/07/28 21:22:24 abrighto Exp $"
+#
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+
+# C compiler
+CC           	= @CC@
+
+# C++ compiler
+CXX           	= @CXX@
+
+# Compiler flags
+CFLAGS  	= @CXXDEBUGFLAGS@
+
+# install dirs
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+
+# for make depend
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+
+# Directories containing Tcl and Tk include files and libraries
+TCL_INCLUDE   	= @TCLINCSW@
+TK_INCLUDE    	= @TKINCSW@
+X_INCLUDE     	= @XINCSW@
+
+# ------------------------------------------------------------------------
+
+# source files
+SRCS 		=  Astrotcl.C TclWorldCoords.C astrotcl_bitmaps.C
+
+# object files
+OBJS 		=  Astrotcl.o TclWorldCoords.o astrotcl_bitmaps.o
+
+# name of local archive file
+libname  	= ../lib/libastrotcl.a
+
+# include flags
+INCLUDES	= -I../include  \
+	          -I../bitmaps \
+		  -I../../wcslib/include \
+		  -I../../compress/include \
+		  -I../../imageio/include \
+	          @TCLUTIL_BUILD_INCLUDES@ \
+		  -I$(TOPDIR)/include/tclutil \
+		  $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# define package versions
+DEFINES       	= \
+		-DASTROTCL_VERSION=\"@ASTROTCL_VERSION@\" \
+		-DASTROTCL_LIBRARY=\"@ASTROTCL_LIBRARY@\" \
+		-DTCLUTIL_VERSION=\"@TCLUTIL_VERSION@\"
+
+CC_SWITCHES	= $(SHLIB_CFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+# --------------------------------------------------------------------------------------
+all: dirs $(libname) 
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+All: 
+	cd ../..; $(MAKE)
+
+
+install: 
+
+dirs:
+	@test -d ../lib || mkdir ../lib
+	@test -d ../bin || mkdir ../bin
+
+clean: 
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+tags:
+	etags ../../*/*/*.[Cch]
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+

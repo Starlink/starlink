@@ -1,0 +1,89 @@
+#*************************************
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.13 1998/07/28 21:23:47 abrighto Exp $" 
+#
+# Makefile.in"
+# 
+# who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created 
+#
+# ------------------------------------------------------------------------
+# 	Makefile for RTI image library
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CXXDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+SRCS 		=  LookupTable.C ImageData.C ByteImageData.C XImageData.C ShortImageData.C \
+		   UShortImageData.C LongImageData.C FloatImageData.C NativeImageData.C \
+		   iqefunc.c mrqfit.c indexx.c sort.c gaussj.c covsrt.c \
+		   histdist.c histeql.c histlist.c histmap.c histscan.c histzero.c saoutil.c
+
+OBJS 		=  LookupTable.o ImageData.o ByteImageData.o XImageData.o ShortImageData.o \
+		   UShortImageData.o LongImageData.o FloatImageData.o  NativeImageData.o \
+		   iqefunc.o mrqfit.o indexx.o sort.o gaussj.o covsrt.o \
+		   histdist.o histeql.o histlist.o histmap.o histscan.o histzero.o saoutil.o
+
+libname  	= ../lib/librti.a
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
+		  @ASTROTCL_BUILD_INCLUDES@ 
+
+# note: we only include rtdimg below for error.h
+INCLUDES	= -I../include \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/astrotcl \
+		  -I$(TOPDIR)/include/tclutil
+
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+LD_SHFLG        = @LD_SHFLG@
+
+all: dirs $(libname) 
+
+All:
+	cd ../..; $(MAKE)
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+install: 
+
+dirs:
+	test -d ../lib || mkdir ../lib
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk

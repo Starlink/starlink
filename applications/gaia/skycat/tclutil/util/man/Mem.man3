@@ -1,0 +1,135 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Mem.man3,v 1.2 1998/03/29 20:29:06 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  10 Apr 96  Created
+#
+
+NAME
+Mem - C++ class for managing shared, unshared or mmaped memory areas
+
+SYNOPSIS
+#include "Mem.h"
+
+class Mem {
+...
+public:
+    Mem();
+    Mem(int size, int shmId, int owner, int verbose);
+    Mem(int size, int useShm, int verbose = 0);
+    Mem(const char *filename, int verbose = 0);
+    Mem(const Mem& m);
+
+    ~Mem();
+
+    Mem& operator=(const Mem&);
+
+    int shared() const;
+    int shared(int share);
+
+    static void cleanup();
+
+    int length() const;
+    int size() const;
+    void* ptr() const;
+    int shmId() const;
+    int status() const;
+    int verbose() const;
+    void offset(long newOffset);
+    long offset() const;
+};
+
+void Mem_cleanup(int);
+
+DESCRIPTION
+This class uses reference counting to help manage memory areas.  The
+memory may be allocated with the C++ "new" operator, SysV shared
+memory or mmap. The class keeps track of who owns the memory, who is
+responsible for deleting it when no longer needed and how many
+references there are to the memory area. When there are no more
+references, we can safely detach a shared memory area and if we are
+the "owner", delete it. Constructor arguments and flags determine
+whether shared memory, mmap or normal (unshared) memory is allocated
+or whether existing shared memory is used. The state can be changed at
+any time, i.e.: shared memory can be changed to unshared and unshared
+to shared.
+
+METHODS
+Mem()
+	Default constructor, create empty, unshared memory.
+
+Mem(size, shmId, owner, verbose)
+	Constructor: attach (if needed) to existing shared memory
+	area.  The size gives the expected size in bytes (for error
+	checking) and shmId is the shared memory Id to use. If owner
+	is non-zero, the memory will also be deleted when there are no
+	more references.  If "verbose" is non-zero, debugging messages
+	are printed on stdout.
+
+Mem(size, useShm, verbose)
+	Constructor: create a new memory area of the given size (in
+	bytes), using shared shared memory if "useShm" is true.  If
+	"verbose" is non-zero, debugging messages are printed on
+	stdout.
+
+Mem(filename, verbose)
+	Constructor: uses mmap to map a file to a read-only mmap area.
+
+Mem(mem)
+	Copy constructor: only copies internal pointer.
+
+~Mem()
+	Destructor: detaches and/or deletes the memory, if needed,
+	depending on the value of "owner" specified in the
+	constructor.
+
+Mem& operator=(mem)
+	Assignment operator.
+
+shared()
+	Return true if the memory is shared.
+
+shared(share)
+	Force the memory to be shared (1) or not shared (0).
+
+cleanup()
+	Remove all "owned" shared memory areas (should be called
+	before exit).
+
+void offset(long newOffset)
+	Set an offset in the memory area. two Mem objects may share
+	the same memory area, both with different offsets. this is
+	common when using mmap.
+
+long offset() const
+	Return the offset.
+	
+int length() const
+	Return the working length of the memory (size minus offset).
+
+size()
+	Return the size of the memory area in bytes.
+
+ptr()
+	Return a pointer to the memory area.
+
+shmId()
+	Return the shared memory Id or -1 if the memory is not shared.
+
+status()
+	Return the status after the constructor has completed (as
+	usual, 0 is OK, 1 means errors occured).
+
+verbose()
+	Return the value of the verbose flag.
+
+SEE ALSO
+FitsIO, ImageData(3C++), ImageIO(3C++)
+----------------------------------------------------------------------
+

@@ -1,0 +1,166 @@
+# E.S.O. - VLT project 
+# $Id: tclutilConfig.sh.in,v 1.8 1998/10/28 17:45:32 abrighto Exp $
+#
+# tclutilConfig.sh --
+#
+# This shell script (for sh) is generated automatically by the
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by other configure scripts
+# so that they don't have to figure this all out for themselves.
+#
+# The information in this file is specific to a single platform.
+#
+# who             when       what
+# --------------  --------   ---------------------------------------------
+# Allan Brighton  21 Nov 97  Created
+#
+
+# version of the Tclutil library
+TCLUTIL_VERSION='@TCLUTIL_VERSION@'
+
+# C Compiler used for TCLUTIL
+TCLUTIL_CC='@CC@'
+
+# C++ Compiler used for TCLUTIL
+TCLUTIL_CXX='@CXX@'
+
+# -I option for make depend with C++ sources
+TCLUTIL_CXX_INCLUDE='@CXX_INCLUDE@'
+
+# OS version
+TCLUTIL_OSVERSION='@OSVERSION@'
+
+# target to use for make depend
+TCLUTIL_DEPEND_TARGET='@DEPEND_TARGET@'
+
+# This expands to an environment variable name LD_LIBRARY_PATH or SHLIB_PATH
+TCLUTIL_LD_VARNAME='@LD_VARNAME@'
+
+# Flags to pass to cc when compiling the components of a shared library:
+TCLUTIL_SHLIB_CFLAGS='@SHLIB_CFLAGS@'
+
+# Base command to use for combining object files into a shared library:
+TCLUTIL_SHLIB_LD='@SHLIB_LD@'
+
+# Suffix to use for the name of a shared library.
+TCLUTIL_SHLIB_SUFFIX='@SHLIB_SUFFIX@'
+
+# Either '$LIBS' (if dependent libraries should be included when linking
+# shared libraries) or an empty string.  See Tcl's configure.in for more
+# explanation.
+TCLUTIL_SHLIB_LD_LIBS='@SHLIB_LD_LIBS@'
+
+# Library file(s) to include in tclsh and other base applications
+# in order to provide facilities needed by DLOBJ above.
+TCLUTIL_DL_LIBS='@DL_LIBS@'
+
+# Flags to pass to the compiler when linking object files into
+# an executable tclsh or tcltest binary.
+TCLUTIL_LD_FLAGS='@LD_FLAGS@'
+
+# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
+# run-time dynamic linker where to look for shared libraries such as
+# libtcl.so.  Used when linking applications.  Only works if there
+# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
+TCLUTIL_LD_SEARCH_FLAGS='@LD_SEARCH_FLAGS@'
+
+# root of tclutil source tree
+TCLUTIL_SRC_ROOT='@SRC_ROOT@'
+
+# list of tclutil subdirectory pathnames (depends on --with-notcl flag)
+TCLUTIL_SUBDIRS='@TCLUTIL_SUBDIRS@'
+
+# same as above, but without the Tix subdir
+TCLUTIL_SUBDIRS_NOTIX='@TCLUTIL_SUBDIRS_NOTIX@'
+
+# If this is true, build library with no Tcl access
+TCLUTIL_NO_TCL='@NO_TCL@'
+
+# -I flag for X include files
+TCLUTIL_XINCSW='@XINCSW@'
+
+# -L and -l flags for X libs
+TCLUTIL_XLIBSW='@XLIBSW@'
+
+# directory containing X libs
+TCLUTIL_XLIBDIR='@XLIBDIR@'
+
+# flags for linking tcl and ext libs
+TCLUTIL_TCL_LIB_SPEC='@TCL_LIB_SPEC@'
+TCLUTIL_TK_LIB_SPEC='@TK_LIB_SPEC@'
+TCLUTIL_TCLX_LIB_SPEC='@TCLX_LIB_SPEC@'
+TCLUTIL_ITCL_LIB_SPEC='@ITCL_LIB_SPEC@'
+TCLUTIL_ITK_LIB_SPEC='@ITK_LIB_SPEC@'
+TCLUTIL_BLT_LIB_SPEC='@BLT_LIB_SPEC@'
+
+# include flags
+TCLUTIL_TCLINCSW='@TCLINCSW@'
+TCLUTIL_TKINCSW='@TKINCSW@'
+
+# tcl library files
+TCLUTIL_TCL_LIBRARY='@TCL_LIBRARY@'
+TCLUTIL_TK_LIBRARY='@TK_LIBRARY@'
+TCLUTIL_BLT_LIBRARY='@BLT_LIBRARY@'
+
+# other package versions used by TCLUTIL
+TCLUTIL_TCL_VERSION='@TCL_VERSION@'
+TCLUTIL_TK_VERSION='@TK_VERSION@'
+TCLUTIL_ITCL_VERSION='@ITCL_VERSION@'
+TCLUTIL_ITK_VERSION='@ITK_VERSION@'
+TCLUTIL_TCLX_VERSION='@TCLX_VERSION@'
+TCLUTIL_BLT_VERSION='@BLT_VERSION@'
+
+# major versions
+TCLUTIL_TCL_MAJOR_VERSION='@TCL_MAJOR_VERSION@'
+TCLUTIL_TK_MAJOR_VERSION='@TK_MAJOR_VERSION@'
+TCLUTIL_ITCL_MAJOR_VERSION='@ITCL_MAJOR_VERSION@'
+
+# system libs to link
+TCLUTIL_LIBS='@LIBS@'
+
+# TCLUTIL install dirs
+TCLUTIL_DESTDIR='@DESTDIR@'
+TCLUTIL_BINDIR='@BINDIR@'
+TCLUTIL_LIBDIR='@LIBDIR@'
+TCLUTIL_INCDIR='@INCDIR@'
+TCLUTIL_MANDIR='@MANDIR@'
+TCLUTIL_DIR='@TCLUTIL_DIR@'
+
+# Tcl/Tk defines
+TCLUTIL_DEFS='@DEFS@'
+
+
+# default location of Tclutil library files
+TCLUTIL_LIBRARY='@TCLUTIL_LIBRARY@'
+
+# location of Tclutil library files in source tree
+TCLUTIL_BUILD_LIBRARY='@TCLUTIL_BUILD_LIBRARY@'
+
+# -I flags to pick up the tclutil include files from the build dirs
+TCLUTIL_BUILD_INCLUDES='@TCLUTIL_BUILD_INCLUDES@'
+
+# String to pass to linker to pick up the Tclutil library from its
+# build directory.
+TCLUTIL_BUILD_LIB_SPEC='@TCLUTIL_BUILD_LIB_SPEC@'
+
+# static version of above
+TCLUTIL_BUILD_LIB_SPEC_STATIC='@TCLUTIL_BUILD_LIB_SPEC_STATIC@'
+
+# String to pass to linker to pick up the Tclutil library from its
+# installed directory.
+TCLUTIL_LIB_SPEC='@TCLUTIL_LIB_SPEC@'
+
+# static version of above
+TCLUTIL_LIB_SPEC_STATIC='@TCLUTIL_LIB_SPEC_STATIC@'
+
+
+# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
+# run-time dynamic linker where to look for shared libraries such as
+# libtcl.so.  Used when linking applications.  Only works if there
+# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
+TCLUTIL_LIB_RUNTIME_DIR='@LIB_RUNTIME_DIR@'
+
+# The environment variable TCLTK_ROOT may be set before running configure
+# to help locate the correct Tcl/Tk installation
+TCLUTIL_TCLTK_ROOT='@TCLTK_ROOT@'

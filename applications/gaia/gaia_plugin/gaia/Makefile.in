@@ -1,0 +1,279 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.6 1998/07/28 21:23:13 abrighto Exp $
+#
+# Makefile.in - Makefile
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  16 Mar 97  Created (based on Skycat and GAIA Makefiles)
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps src man library demos
+
+# root of source tree
+SRC_ROOT     = @SRC_ROOT@
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# Fortran and atask linker command
+FC           = @FC@
+FFLAGS       = @FFLAGS@
+ALINK        = @ALINK@
+LINK         = @LINK@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+GAIA_DIR      = @GAIA_DIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+# Tcl libs
+TCLLIBS = \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+# Tk libs
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	$(TCLLIBS)
+
+# Rtd library
+RTD_LIB		= @RTD_LIB@
+
+# Catalog library
+CAT_LIB		= @CAT_LIB@
+
+# Catalog library
+SKYCAT_LIB	= @SKYCAT_LIB@
+
+# gaia lib dir
+GAIA_DIR	= @GAIA_DIR@
+
+# local gaia lib
+GAIA_LIB	= lib/libgaia.a
+
+# ------------------------------------------------------------------------
+#       Libraries required to link against Fortran source code
+#       using a C++ compiler.
+# ------------------------------------------------------------------------
+F77_LIBS = @F77_LIBS@
+# TCLADAM  = @DESTDIR@/lib/tclAdam.o
+STAR_LIB = @STARLINK@/lib
+STAR_INC = @STARLINK@/include
+COMPIFL  = @STARLINK@/bin/compifl
+#  Define sets of ADAM libraries we need to link against. Note that
+#  ast_link and ndf_link must be carefully managed to avoid picking up
+#  default AST libraries for errors and graphics.
+STAR_LIBS = \
+	-L$(STAR_LIB) \
+	`ast_link -myerr -mygrf` \
+	`ard_link` \
+	`ams_link_adam` \
+	`nbs_link` \
+	`fio_link` \
+	`ndf_link` \
+	-lpda
+
+# ARDSTAT
+ardstat = bin/ardstat
+
+# AUTOCROP
+autocrop = bin/autocrop
+
+# ------------------------------------------------------------------------
+
+# wish interpreter with all extensions
+WISH_INTERP    	= bin/gaia_wish
+
+# tcl interpreter with extensions
+TCL_INTERP    = bin/gaia_tcl
+
+INCLUDES       	= $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+CC_SWITCHES  	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+LOCAL_LIBRARIES = $(GAIA_LIB) $(STAR_LIBS)
+
+# these objects are only needed to make the gaia_wish binary for the demos
+OBJECTS      	= tkAppInit.o tclAppInit.o
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_IGNORE_MULT_DEFS=@SHLIB_IGNORE_MULT_DEFS@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@ $(SHLIB_IGNORE_MULT_DEFS)
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# ------------------------------------------------------------------------
+all: $(WISH_INTERP) $(TCL_INTERP) $(ardstat) $(autocrop)
+
+# Make a sample wish binary with Rtd, Cat and Skycat included.
+#
+# Note that if the --enable-shared configure option was specified, 
+# we don't link the package libraries in here, but load them at run 
+# time from Tcl. 
+#
+# Note also that $(TCLTKLIBS) is included twice in the unshared version
+# below, to avoid problems with different, patched, tk libs in the
+# STARLINK lib dir that may conflict with patches in the tclutil package, 
+# in both cases dealing with postscript image output.
+#
+$(WISH_INTERP): lib tkAppInit.o FORCE
+	@echo "linking \"$(WISH_INTERP)\"..."
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) tkAppInit.o -o $(WISH_INTERP) \
+	         $(TCLTKLIBS) $(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) \
+		 $(SKYCAT_LIB) $(CAT_LIB) $(RTD_LIB) \
+		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@echo "making all in ./demos"
+	@(cd demos; $(MAKE))
+
+# Make a tcl binary without Tk
+$(TCL_INTERP): lib tclAppInit.o FORCE
+	@echo "linking \"$(TCL_INTERP)\"..."
+	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) tclAppInit.o -o $(TCL_INTERP) \
+		$(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(TCLLIBS) $(EXTRA_LIBS)
+	(cd demos; rm -f atclsh; ln -s ../$(TCL_INTERP) atclsh)
+
+$(GAIA_LIB) lib: FORCE
+	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)); done
+
+# force recompile after configure for ifdefs
+$(OBJECTS): ../config.status
+
+$(ardstat): lib ardstat.o
+	echo "linking \"$(ardstat)\"..."
+	$(ALINK) ardstat.o $(FFLAGS) $(GAIA_LIB) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam` \
+           $(EXTRA_LIBS)
+	cp ardstat bin
+	$(COMPIFL) ardstat.ifl
+	$(INSTALL_DATA) ardstat.ifc bin/ardstat.ifc
+	$(RM) ardstat.ifc
+	(cd library; rm -f ardstat ardstat.ifc; ln -s ../bin/ardstat* .)
+
+
+$(autocrop): lib autocrop.o
+	echo "linking \"$(autocrop)\"..."
+	$(ALINK) autocrop.o $(FFLAGS) $(GAIA_LIB) \
+	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) `ard_link_adam` `ndf_link_adam` \
+           $(EXTRA_LIBS)
+	cp autocrop bin
+	$(COMPIFL) autocrop.ifl
+	$(INSTALL_DATA) autocrop.ifc bin/autocrop.ifc
+	$(RM) autocrop.ifc
+	(cd library; rm -f autocrop autocrop.ifc; ln -s ../bin/autocrop* .)
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+install-bin: 
+	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
+	chmod 0755 $(WISH_INTERP)
+	$(INSTALL) $(WISH_INTERP) $(BINDIR)
+	$(INSTALL) $(TCL_INTERP) $(BINDIR)
+	(cd $(GAIA_DIR); $(RM) bin; $(LN) ../../bin .)
+	$(INSTALL) $(ardstat) $(BINDIR)
+	$(INSTALL_DATA) $(ardstat).ifc $(BINDIR)
+	$(INSTALL) $(autocrop) $(BINDIR)
+	$(INSTALL_DATA) $(autocrop).ifc $(BINDIR)
+	(cd $(GAIA_DIR); rm -f autocrop autocrop.ifc; ln -s bin/autocrop* .)
+	(cd $(GAIA_DIR); rm -f ardstat ardstat.ifc; ln -s bin/ardstat* .)
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+# install the tcl library files.
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-bitmaps install-man
+
+clean:
+	$(RM) $(OBJECTS) $(WISH_INTERP) $(TCL_INTERP) *\~ "#"*
+	$(RM) $(ardstat) ardstat.o $(ardstat).ifc $(autocrop) autocrop.o $(autocrop).ifc
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+.f.o:
+	$(FC) -c $(FFLAGS) $<
+
+# Starlink include file dependencies
+FINCLUDES = GRP_PAR NDF_PAR SAE_PAR
+ardstat.o: GRP_PAR NDF_PAR SAE_PAR
+autocrop.o: NDF_PAR SAE_PAR
+SAE_PAR: $(STAR_INC)/sae_par
+	  $(LINK) $? $@
+NDF_PAR: $(STAR_INC)/ndf_par
+	  $(LINK) $? $@
+GRP_PAR: $(STAR_INC)/grp_par
+	  $(LINK) $? $@
+
+FORCE:

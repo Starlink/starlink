@@ -1,0 +1,28 @@
+Copyright (C) 1995-1998, European Southern Observatory (E.S.O.)
+                         Karl-Schwarzschild-Str.2, 85748 GARCHING, GERMANY
+
+Skycat is a copyright protected software product of the European Southern 
+Observatory, and provides a general tool for image display and astronomical
+catalog access.
+
+Skycat is available under the GNU General Public License. 
+
+This program is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free Software 
+Foundation; either version 2 of the License, or (at your option) any later 
+version. 
+
+The GNU General Public License text is included in the file GNU_PUBLIC_LICENSE
+in this directory.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details. 
+
+Correspondance concerning VLT-RTD should be addressed as follows:
+Internet e-mail: therlin@eso.org
+Postal  address: European Southern Observatory
+                 VLT Software Group 
+                 Karl-Schwarzschild-Strasse 2
+                 D-85748 Garching near Munich
+                 GERMANY

@@ -1,0 +1,80 @@
+
+Tclutil, Generic Tcl/Tk and C++ Utilities and Classes
+-----------------------------------------------------
+
+The Tclutil package was created by gathering generic Tcl, Itcl and C++
+code from various applications into a single, general purpose, utility
+package, that can be loaded dynamically into a running Tcl application
+or linked in at compile time as a general purpose library.
+
+The package contains a collection of useful Itcl and C++ utility
+classes. It also provides a shell script (TclutilConfig.sh), which is
+created by the configure script and makes it easier to write configure
+scripts for other packages by providing configuration information,
+such as the locations and names of all the Tcl extensions and
+libraries. The development environment here includes C++, Itcl, TclX,
+BLT and optionally other packages that can be linked in statically or
+dynamically as needed.
+
+--------------------------------------------
+Contact: Allan Brighton (abrighto@eso.org)
+         ESO - European Southern Observatory
+--------------------------------------------
+
+For installation instructions, see the file INSTALL in this directory.
+
+See the CHANGES file in this directory for a list of recent changes.
+
+Once everything has been compiled, the compiled "wish" application can
+be started as follows:
+
+	% cd $SRCDIR/tclutil/demos
+	% tclutil.sh
+
+Or, for the installed version:
+	
+	% $INSTALLDIR/bin/tclutil
+	
+This module provides a library and not an application, so the above
+commands only start the "wish" application with the environment needed
+to use the library.
+
+Note that if you want to run the demo from a machine other than the
+one you compiled it on, you may need to set the TCLUTIL_LIBRARY
+environment variable so that the necessary Tcl source files can be
+found at run time:
+
+	% setenv TCLUTIL_LIBRARY $INSTALLDIR/lib/tclutil
+
+For more information, please refer to the postscript documentation,
+which can be retrieved via anon ftp from:
+
+   ftp://ftp.archive.eso.org/pub/skycat/doc
+
+The sources for the man pages can be found in the source tree under
+the "man" directories.
+
+Contents of this Release
+------------------------
+
+tclutil			- top level TCLUTIL directory,
+                          contains the configure script, Makefile and related 
+	                  scripts and information (README and INSTALL files)
+
+  tclutil		- Contains Tcl related C++ and itcl classes
+
+    man                 - man pages
+
+    src			- C++ sources
+    include	         
+
+    bin			- holds tclutil_wish binary
+
+    library		- Tcl/Tk files and Itcl widget classes
+
+    demos		- demo wish startup script
+    bitmaps		- bitmaps used in user interface widgets
+
+  util                  - C++ utility classes (not Tcl related)
+
+-----------------------------------------------------------------------------------

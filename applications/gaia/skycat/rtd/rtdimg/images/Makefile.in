@@ -1,0 +1,42 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.4 1997/10/13 13:31:36 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for RTD images directory
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+RTD_DIR      = @RTD_DIR@
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = *.*fits
+srcdir	     = @srcdir@
+
+all:
+
+All: 
+	cd ..; $(MAKE)
+
+install-top:
+	-@test -d $(RTD_DIR)/images || mkdir $(RTD_DIR)/images
+
+install-files: install-top
+	-@set -x; for i in $(FILES) ; do \
+	    test -f "$$i" && $(INSTALL_DATA) $$i $(RTD_DIR)/images ; \
+	done 
+
+install: install-files
+
+clean:
+	$(RM) *\~ "#"* core
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+man:
+

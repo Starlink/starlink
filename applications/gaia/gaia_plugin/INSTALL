@@ -1,0 +1,158 @@
+HOW TO INSTALL the Gaia plugin Package
+--------------------------------------
+
+1. Before you build the Gaia plugin
+-----------------------------------
+
+Note: Building the GAIA plugin from sources requires a considerable
+software environment, including a Tcl/Tk installation, the complete
+skycat/rtd sources and parts of Starlink. Please check the skycat ftp
+site: ftp://ftp.archive.eso.org/pub/skycat also for binary versions
+for Solaris, HP-UX, and Linux.
+
+The GAIA plugin package depends on the following packages being
+already installed (from the source distributions, which are available
+from ftp://ftp.archive.eso.org/pub/skycat):
+
+	tclutil  - Tcl and C++ Utilities
+	astrotcl - Astronomical utilities for C++ and Tcl
+	rtd      - Real-Time Image Display
+	cat      - Astronomical Catalog Library
+	skycat   - Image display and catalog browser
+
+ 	starlink - Special collection of required Starlink packages
+                   (in C and FORTRAN)
+
+We also assume the following standard Tcl packages are installed:
+
+	itcl-2.2    - [Incr Tcl], includes tcl7.6, tk4.2
+	BLT-2.1     - BLT toolkit, graphs and other widgets 
+	tclX-7.6.0  - Extended Tcl
+
+These packages are available from the TCL archives. 
+  See: http://www.tcltk.com/ for Itcl.
+  and http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
+
+You can install the standard Tcl/Tk packages anywhere, however it is
+easiest to install them all in the same directory (using the same
+-prefix argument to configure).
+
+In addition, executables from the following packages are required at
+run-time for certain GAIA/Starlink features (image regions, etc...):
+
+* convert  
+    Starlink binary package to convert between FITS and NDF image
+    formats, available from:
+
+       ftp://starlink-ftp.rl.ac.uk/pub/ussc/store
+       (also ftp://ftp.archive.eso.org/pub/skycat/plugins)
+
+    Contact the starlink site managers if binaries for your system are
+    not available. Binary versions are currently available for Solaris
+    and Linux (and a few other systems), but not HP-UX.
+
+* pbmplus (v. 10dec91). 
+     Portable bitmap utilities. This package is required by
+     Starlink/convert. If you have this package, you can use
+     GAIA/Skycat to view images in other formats, such as GIF.
+
+2. Build GAIA
+---------------
+
+To build the software, type:
+
+	configure
+	make 
+	make install
+
+The default install dir is /usr/local. You can specify the -prefix
+argument to configure to change this:
+
+ 	configure -prefix $INSTALLDIR
+
+The compilers used are the same as those used to build the tclutil
+package. The file tclutilConfig.sh is read by configure to get the
+necessary information.
+
+If you specify the configure option --enable-shared:
+
+	configure -prefix $INSTALLDIR --enable-shared
+
+you can build a shared library and load the Tcl commands with the Tcl
+"load" command or load it as a Tcl package under the name "Gaia". 
+
+4. Running
+----------
+
+Note: before starting gaia, make sure to source the file convert.csh:
+
+	% source $STARLINK/bin/convert/convert.csh. 
+
+The convert.csh file defines some environment variables that are
+needed at run-time to convert between different image formats.
+
+The gaia application may be started in the following ways:
+
+Standalone version:
+--------------------
+
+The standalone version, in the source tree:
+
+	% cd gaia/gaia/demos
+	% gaia
+
+the standalone version, installed with prefix = $INSTALLDIR:
+	
+	% $INSTALLDIR/bin/gaia
+ 
+
+Dynamically loaded plugin version
+---------------------------------
+
+Set the environment variable SKYCAT_PLUGIN to the name of the
+directory containing the Gaia SkyCat_plugin.tcl file
+($INSTALLDIR/lib/gaia, for example). Then start skycat. It will
+attempt to dynamically load the Gaia package on startup.
+
+Note that the SKYCAT_PLUGIN environment variable may also be set to
+include the parent directory or the SkyCat_plugin.tcl file and may
+have multiple path names, separated by colons. See the skycat
+postscript documentation for details.
+
+
+Problems
+--------
+
+* When building the master "libgaia.sl" shared library on HP-UX, you
+  may get the error message:
+    "ld: DP relative code in file .../install/lib/libf2c.a(main.o) -
+    shared library must be position independent.  Use +z or +Z to
+    recompile."
+  I don't currently know of a way around this, except to rebuild the
+  libf2c.a library from the gcc/g77 sources with CFLAGS set to 
+  "-O -fPIC". 
+
+* If the linker complains that it can't find 'libf2c.a' when building
+  the master shared library, you may need to make a link to it in one 
+  of the directories that the linker searches, for example:
+  "ln -s /installdir/lib/libf2c.a $STARBASE/lib".
+
+* The source file gaia/gaia/src/rtd1_patch.f causes g77 to crash on
+  HP-UX if the optimize option "-O" is specified. Removing the -O
+  fixes the problem. Under Linux, the g77 compiler fails in some
+  cases if the -O option is NOT specified. The configure script
+  attempts to set the flags correctly based on the system...
+
+* If you have any problems compiling the Starlink packages, note that
+  the source files are automatically extracted from local source tar
+  files.  To replace a source file, you need to extract all of the
+  files to a temp dir first, replace the file, then remake the tar
+  file.  Don't try the tar update option "tar uf .." as it corrupts
+  the tarfile.
+
+* Once a Starlink package is built or installed, you have to "unbuild"
+  and/or "deinstall" it before you can rebuild and reinstall it.  The
+  top level Starlink Makefile target "all" does a Starlink "mk build
+  install" in each subdir. "clean" does a "mk deinstall unbuild" in
+  each subdir.
+

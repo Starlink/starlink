@@ -1,0 +1,279 @@
+CHANGES to Tclutil
+-----------------
+
+This file contains a list of changes to the Tclutil software.
+The latest changes are at the top.
+
+------------------------------------------------------------------------
+
+---------------  16.11.98 released tclutil-1.1 ------------------------
+
+* Ported to tcl8.0.3 (still compatible with tcl7.6):
+
+  - Changed the syntax used for the namespace and scope commands in
+    tcl8.
+
+  - Itcl member procs in the "util" namespace now need to be called
+    with "util::" prefix. For example: "util::TopLevelWidget::start ..."
+
+  - Updated the BLT related code to work with both BLT2.1 and 2.4f.
+
+  - Updated the configure scripts to handle Tcl8.0 and Tcl7.6.
+
+---------------  30.8.98 released tclutil-1.0.17 -----------------------
+
+* Added a "wait" command in Batch.tcl to reap background processes
+  and avoid zombies.
+
+---------------  5.8.98 released tclutil-1.0.16 -----------------------
+
+* Added authorization support to class HTTP. The class now recognizes
+  the "Authorization Required" message returned from an HTTP server
+  and provides a method "authorize(username, passwd)" for clients to
+  set user and password information. The information is optionally
+  saved in a file (by default: ~/.http_auth), indexed by server
+  host name and realm and with the username and password encoded.
+
+* Added new public methods to class HTTP: content_encoding(),
+  www_auth_realm(), authorizationRequired(), authorize(), authFile(),
+  userAgent(), and changed html_error() from a "static" to nonstatic
+  member.
+
+* Added new Itcl dialog class: PasswdDialog, and new proc that uses
+  it: passwd_dialog.
+
+* Added the X11 library directory to shared lib path in startup script
+
+* Changed DialogWidget itcl class to use a label in place of a message
+  and truncate lines from long messages.
+
+* Fixed minor bug in TopLevelWidget that prevented the code from
+  remembering the locations of top level widgets. Now, if you place a
+  window somewhere, it comes up there the next time the window is
+  created in that session.
+
+---------------  07.07.98 released tclutil-1.0.15 -----------------------
+
+* class HTTP: added suport for HTTP POST: new methods: HTTP::post(url,
+  data) and HTTP::post(url, data, ostream).
+
+---------------  26.6.98 released tclutil-1.0.14 -----------------------
+
+* Added support for HTTP proxy servers (thanks to Peter Draper for
+  implementing this).  The proxy server, if available, is defined by
+  the "http_proxy" environment variable. This should have the format:
+
+    http_proxy = "http://wwwcache.some.domain:port/"
+
+  A list of domains that do not require to be proxied (i.e. local
+  machines etc.) is defined by the variable "http_noproxy". This
+  should be a list of comma separated names, i.e.:
+
+    http_noproxy = "local.domain,national.domain"
+
+  If the given host is in one of these domains no proxy will be set
+  up.
+
+* Mem.C: added checks for file permissions to avoid problems with mmap
+  and read-only files (or files with no read permission).
+
+---------------  19.6.98 released tclutil-1.0.13 -----------------------
+
+* HTTP.C: fixed a minor bug that cut off last char of an HTTP error
+  message
+
+* Added new file: tclutil/src/tkCanvasPsImage.c, which implements Tk
+  canvas postscript printing for images. The default Tk canvas
+  postscript command does not support printing images and the
+  available patch could not handle large, zoomed in images. This
+  version does not require a patch to Tk. The extension is based on
+  the patch, with fixes provided by Peter Draper of Starlink, and is
+  activated optionally by calling the C routine TkCanvasPsImage_Init().
+ 
+---------------  28.5.98 released tclutil-1.0.12 -----------------------
+
+* Added support for HTTP redirect "Location: ..." to HTTP class
+
+* HTTP.C: check for HTTP header info in URL command output.  If a URL
+  is a command (not "file:/..." or "http:/...") its output may have an
+  optional HTTP type header containing lines such as "Content-type:
+  ...", "Content-length: ...", etc. (at most 5 lines).  If these lines
+  are found, they are noted and skipped over before accessing the
+  data.
+
+* Minor bug fix in TclCommand.C, for case when interp->result is appended
+  to itself.
+
+---------------  13.5.98 released tclutil-1.0.11 -----------------------
+-
+* FileSelect.tcl: added missing method (set_filter_type)
+
+* EntryForm.tcl: destroy window on "Enter" as well as "Cancel"
+  (previously, "Cancel" destroyed the window, but "Enter" only closed it).
+
+---------------  4.5.98 released tclutil-1.0.10 -------------------------
+
+* CanvasDraw.tcl: Changed protection on "create_done" to public
+
+---------------  28.4.98 released tclutil-1.0.9 -------------------------
+
+* Minor addition to TopLevelWidget error handling (in start_err_,
+  allow --help option to print "usage" message).
+
+---------------  15.4.98 released tclutil-1.0.8 -------------------------
+
+* itcldoc.tcl (automatic man page generation from Itcl classes)
+
+  - Added code to extract information from Itcl classes about the Itk
+    components and component options.
+
+  - Added code to document "public" and "protected" methods and
+    variables.
+
+* (doc, *.tcl): For documenting the "public interface": Updated
+  comments on all Itk component declarations and added "public",
+  "private" and "protected" keywords in the source to help identify
+  the public interface, which is documented in man pages generated
+  from the source by the itcldoc utility in this package.
+
+* Minor changes in configure script and top level makefile for shared
+  libraries
+
+* Fixed a last minute problem with calling plugin procs (needed to use
+  "uplevel #0" due to Itcl scoping/namespace hell...).
+
+-----------------  31.03.98 released tclutil-1.0.7 ----------------------
+
+* Updated man pages and documentation
+
+-----------------  25.03.98 released tclutil-1.0.6 ----------------------
+
+* Minor change in class ShellCommand (kill child process on error).
+
+* added "more_error" method to TclCommand, to append an error message.
+
+* TkImage constructor: changed options arg from reference to pointer
+  for consistency with usage.
+
+* TopLevelWidget.tcl: Added support for a simple help window to
+  TopLevelWidget, and added two new widgets: HelpWin and ScrolledText
+  (contributed by Peter Draper, Starlink).
+
+* CanvasDraw.tcl: 
+   * Make use of "init" method in CanvasDraw constructor (easier for
+     subclassing).
+   * Added -clipping option to control clipping of graphics (default
+     is the same as before).
+
+* TopLevelWidget.tcl: Added "-underline" option to add_menubutton, to
+  allow proper keyboard traversal.
+
+* Tix library: commented out global bindings (grep for "bind all" in 
+  tix/library dir), since they interfere with Tk keyboard traversal
+  in menus, etc.
+
+* TopLevelWidget: fixed bug in method "list_windows" so that it lists
+  all top level windows (previously not all windows were listed).
+
+* TopLevelWidget: added "-number" option to keep track of cloned windows.
+  This is a number that can be put in the window title to identify which
+  main window a popup window belongs to. By default the number is set
+  automatically set from the widget path name by looking for a name, such
+  as ".<appname><number>...", for example: .app1, .app2, ...
+
+* LabelEntryScale.tcl: added fixes from Peter Fraper, Starlink, to support
+  vertical and horizontal layout and keybindings and improve performance.
+
+-----------------  05.03.98 released tclutil-1.0.5 -------------------------
+
+* fixed minor problems setting and restoring the mouse cursor
+* (CanvasDraw).
+
+* For backward compatibility with existing applications: The Tclutil
+  package now contains the sources for the Tix widget set. Tix support
+  can be included in an application by calling Tixsam_Init(interp) and
+  linking -ltclutil (or the necessary object files from this package).
+  This has no effect on packages that do not use Tix. 
+  
+* Implemented rotation for canvas graphics. Since Tk doesn't support
+  this directly, it is done now in Tcl code. Polygons are now used
+  in place of rectangles, to make it posible to rotate a rectangle.
+  (The appearance and funtionality is the same). You still can't
+  rotate ovals, but you can rotate a smooth rectangle, which is
+  similar (see below).
+
+* Added a "Smooth" option in the graphics window (CanvasDraw), so you 
+  can make smooth (rounded) rectangles, polygons or polylines. 
+
+* Changed the selection mechanism, so that the graphics window always
+  displays the options for the currently selected object.
+
+* Plugins: The <CLASSNAME>_PLUGIN environment variable may now contain
+  a colon separated list of plugin files or directories containing
+  plugin files.  This way you can have multiple plugins for a
+  class. For a top level class Foo, for example, the environment
+  variable FOO_PLUGIN may contain a colon separated list of plugin
+  files or directories containing plugin files. The default file name,
+  if only a directory name is given, is then Foo_plugin.tcl, which
+  defines the Tcl proc Foo_plugin.
+   
+----------------- 13.2.98 released tclutil-1.0.4 -------------------------
+
+* Added 2 methods to TopLevelWidget: list_windows and hide_windows
+  to add support for toggling the visibility of all popup windows 
+  other than the main one.
+
+-----------------  9.2.98 released tclutil-1.0.3 -------------------------
+
+* Added "const" to "cmdname" arg in constructor for TclCommandand
+  TkImage classes.
+
+* Added (void*) cast to MAP_FAILED constant in class Mem_Map
+
+* Fixed minor bugs in bltGraph.tcl (used for zooming in a graph)
+
+* added check for "gethostname" prototype to configure script.
+
+----------------- 3.2.98 released tclutil-1.0.2 -------------------------
+
+* In class CanvasDraw, added support for selecting a region of objects,
+  and moving a group of objects. Added region icon to drawing mode
+  frame.
+
+* Added methods "append_result", "append_element", "reset_result"
+  in class TclCommand.
+
+--------------- 26.01.98 released tclutil-1.0.1 -------------------------
+
+* Added plugin support to the TopLevelWidget class, so all classes
+  derived from it can have Tcl plugins (see docs).
+
+* Added a script tclutil/demos/itcldoc that extracts man pages from
+  Itcl class sources automatically, with no special syntax needed in
+  the comments. The script simply assumes that comments precede
+  declarations.  Since Itcl sources have a simple Tcl list format, it
+  is fairly easy to parse them. The only requirement is that each
+  class, method and other important declarations are preceded by a
+  "block" comment (a group of lines starting with "#"). To run the
+  script, cd to the dir containing the tcl source files (here
+  tclutil/library) and type: "make doc".
+
+* Updated comments in Itcl sources for automatic generation of man
+  pages.
+
+* Renamed some source files to have the same name as the class
+  (TList.tcl ==> TableList.tcl, Dialog.tcl ==> DialogWidget.tcl, ...)
+
+--------------- released tclutil-1.0 ------------------------------------
+
+* Created new package Tclutil by gathering "generic" Tcl and C++ code
+  from various applications into a single generic Tcl package.  The
+  Tclutil package contains a collection of handy Itcl and C++ utility
+  classes and also provides a shell script (TclutilConfig.sh), created
+  by configure, that makes it easier to write configure scripts for
+  other packages. This package assumes the development environment
+  includes C++, Itcl, TclX, BLT and optionally other packages that can
+  be linked in statically or dynamically as needed.
+
+----------- Nov 21, 1997: begin change log for Tclutil  -----------------
+

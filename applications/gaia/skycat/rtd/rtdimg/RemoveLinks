@@ -1,0 +1,19 @@
+#! /bin/sh
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: RemoveLinks,v 1.3 1997/09/17 13:38:52 abrighto Exp $"
+#
+# who       when      what
+# --------  --------  ----------------------------------------------
+# therlin  10/11/95  created
+#
+FILE="library/mkIndex demos/rtdClient demos/rtdServer demos/rtdctrl demos/rtdimage.tcl demos/rtdimage demos/rtd demos/ngc1275.gzfits images/test.gzfits"
+
+for link in $FILE
+do
+	echo "removing link $link"
+	rm -f $link
+done
+#
+# ___oOo___

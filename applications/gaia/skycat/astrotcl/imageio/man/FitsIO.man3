@@ -1,0 +1,150 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: FitsIO.man3,v 1.3 1998/03/29 20:26:27 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  21 Feb 96  Created
+#
+
+NAME
+FitsIO - C++ Class for Reading, Writing and Managing FITS Images
+
+SYNOPSIS
+#include "FitsIO.h"
+
+class FitsIO : public ImageIORep {
+...
+public:
+    FitsIO(int width, int height, int bitpix, double bzero, 
+	   double bscale, const Mem& header, const Mem& data);
+
+    ~FitsIO() {}
+
+    int wcsinit();
+
+    int nativeByteOrder() const;
+    const char* classname() const;
+
+    static FitsIO* read(const char* filename, int memOptions = 0);
+    int write(const char *filename) const;
+
+    static FitsIO* initialize(Mem& header);
+    static FitsIO* initialize(Mem& header, Mem& data);
+
+    static FitsIO* blankImage(double ra, double dec, double equinox, 
+			      double radius, int width, int height, 
+			      unsigned long color0);
+
+    int get(const char* keyword, double& val) const;
+    int get(const char* keyword, float& val) const;
+    int get(const char* keyword, int& val) const;
+    char* get(const char* keyword) const;
+
+    static int get(const Mem& header, const char* keyword, double& val);
+    static int get(const Mem& header, const char* keyword, float& val);
+    static int get(const Mem& header, const char* keyword, int& val);
+    static char* get(const Mem& header, const char* keyword);
+
+    int getFitsHeader(ostream& os) const;
+
+    int put(const char* keyword, double val, const char* comment);
+    int put(const char* keyword, float val, const char* comment);
+    int put(const char* keyword, int val, const char* comment);
+    int put(const char* keyword, const char* val, const char* comment);
+};
+
+
+DESCRIPTION
+This class handles the reading and writing of FITS images and access
+to the FITS header and keywords. It is based in part on the saoimage
+routines in the wcslib directory. Currently the reading and writing is
+implemented in this class, but that may be replaced by a standard FITS
+I/O package in the future. 
+
+This class is a subclass of ImageIORep, which is the internal class
+used by class ImageIO for reference counting. The public interface is
+generally through the ImageIO class, although class FitsIO may be used
+directly in cases where you know that the image is already in FITS
+format or you are creating a new image in FITS format. 
+
+Besides reading and writing FITS images, this class can be used to
+create a FITS image from data in memory and to create a "blank" image
+with World Coordinate information for plotting astronomical objects.
+
+CREATING A FITSIO OBJECT
+To create a FitsIO object from a FITS file, use the read method, which
+returns a pointer to an allocated FitsIO object given the file name.
+If you have the image data in memory, you can use one of the
+constructors to create the object.
+
+You can pass a pointer to a FitsIO object to the ImageIO constructor
+to create a reference counted ImageIO object, for example:
+
+	ImageIO imio = FitsIO::read(filename);
+or
+	ImageIO imio = new FitsIO(w, h, type, bzero, bscale, header, data);
+
+COMPRESSION
+Images are compressed and decompressed automatically by the read and
+write methods based on the file name suffix: ".hfits" for H-compress,
+".gzfits" or ".gfits" for gzip compression, and ".cfits" for UNIX
+compression. See Compress for details.
+
+METHODS
+FitsIO(width, height, bitpix, bzero, bscale, header,  data)
+	This constructor is called by the static "read" method once
+	the FITS file has been read. The parameters are based on
+	values read from the FITS header. The header and data
+	arguments are instances of class Mem, which uses reference
+	counting to manage shared and unshared memory.
+
+read(filename, int memOptions = 0)
+	Read a FITS file and return an initialized FitsIO object for
+	it, or NULL if there are errors.  If filename is "-", stdin is
+	read into a temp image file and used as the input.  The Mem
+	class is used to speed up loading the file. The optional
+	mem_options argument controls whether the memory is mapped
+	read-only or read/write. See class Mem for the available
+	options.
+
+write(filename)
+	Write the data to a FITS file.
+
+blankImage(ra, dec, equinox, radius, width, height, color0)
+	Generate a blank image with a FITS header based on the given
+	fields and including support for World Coordinates. RA and DEC
+	are specified in degrees. Width and Height are in
+	pixels. "color0" is the value to use for the image pixels
+	(usually the value for "black").
+
+get(keyword, val)
+	Find and set the value for the given FITS keyword and return 0
+	if OK (found). This method is overloaded for various data types.
+
+get(keyword)
+	Find and return the string value for the given FITS keyword,
+	or NULL if not found.
+
+getFitsHeader(os)
+	Write an ASCII formatted copy of the FITS header to the given
+	stream, format it in 80 char lines and replace any NULL chars
+	with blanks.
+
+put(keyword, val, comment)
+	Insert the given FITS keyword and value with the given comment
+	in the FITS header and return 0 if all is OK. If there is not
+	enough space in the FITS header, extend the size of the FITS
+	header by one header block and if the header is part of an
+	mmap'ed file, rewrite the file with the new enlarged
+	header. This creates a temp file in the same dir as the file
+	called <file>.tmp.
+
+SEE ALSO
+ImageIO(3++), ImageData, Mem(3C++), Compress(3C++)
+----------------------------------------------------------------------
+

@@ -1,0 +1,128 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.VLT,v 1.2 1997/04/11 10:47:35 abrighto Exp $"
+#
+# who        when      what
+# ---------  --------  ----------------------------------------------
+# T.HERLIN   
+
+#*******************************************************************************
+# This Makefile follows VLT Standards (see Makefile manpage documentation).
+#*******************************************************************************
+# REMARKS
+#------------------------------------------------------------------------
+
+#
+# user definable C-compilation flags
+#USER_CFLAGS = 
+
+#
+# additional include and library search paths
+USER_INC = -I/usr/local/include
+#USER_LIB = 
+
+#
+# MODULE CODE DESCRIPTION:
+# ------------------------
+#
+# Libraries (public and local)
+# ----------------------------
+LIBRARIES     = rtdImgEvt
+
+#
+rtdImgEvt_OBJ_PUBLIC  = rtdImageEvent
+rtdImgEvt_OBJECTS     = $(rtdImgEvt_OBJ_PUBLIC)
+
+
+#
+# C programs (public and local)
+# -----------------------------
+EXECUTABLES   = rtdServer rtdClient rtdCubeDisplay
+
+#
+# brief description of the program
+
+rtdServer_OBJECTS          = rtdServer
+rtdServer_LIBS             = rtdImgEvt
+
+rtdClient_OBJECTS          = rtdClient
+rtdClient_LIBS             = rtdImgEvt
+
+rtdCubeDisplay_OBJECTS     = rtdCubeDisplay
+rtdCubeDisplay_LIBS        = rtdImgEvt
+#
+# Includes (.h) files (public only)
+# ---------------------------------
+INCLUDES      =  rtdImageEvent.h
+
+TCL_LIBRARIES   =
+
+TCL_SCRIPTS   = rtdServerTool
+
+rtdServerTool_OBJECTS  =   rtdServerTool
+rtdServerTool_TCLSH    =   /usr/local/bin/rtdWish -f
+rtdServerTool_LIBS     =   uifClass
+
+    
+
+# Scripts (public and local)
+# ----------------------------
+SCRIPTS1 = 
+SCRIPTS7 = 
+SCRIPTS  = $(SCRIPTS1) $(SCRIPTS7)
+
+SCRIPTS_L =
+
+#
+# man pages to be done
+# --------------------
+MANSECTIONS = 1 3
+MAN3 = rtdImageEvent.c
+MAN1 = rtdServer.c rtdCubeDisplay.c
+#
+# list of all possible C-sources (used to create automatic dependencies)
+# ------------------------------
+CSOURCENAMES = \
+	$(foreach exe, $(EXECUTABLES) $(EXECUTABLES_L), $($(exe)_OBJECTS)) \
+	$(foreach lib, $(LIBRARIES) $(LIBRARIES_L), $($(lib)_OBJECTS)) 
+#
+#>>>>> END OF standard rules
+
+#
+# CHOSE PLATFORM
+# --------------
+# Default is UNIX, for VxVorks application next line MUST BE UNCOMMENTED
+#MAKE_VXWORKS = on   
+
+#
+# INCLUDE STANDARDS
+# -----------------
+MAKEDIR = $(VLTROOT)/include
+include $(MAKEDIR)/vltMakefile
+
+#
+# TARGETS
+# -------
+all:	do_all
+	@echo " . . . 'all' done" 
+
+clean : clean_all 
+	@echo " . . . clean done"
+
+man   : do_man 
+	@echo " . . . man page(s) done"
+
+install : install_all
+	@echo " . . . installation done"
+
+#___oOo___
+
+
+
+
+
+
+
+
+

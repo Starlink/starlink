@@ -1,0 +1,27 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.7 1996/10/15 15:02:55 abrighto Exp $
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		=  AstroCatalog.h AstroImage.h AstroQuery.h LocalCatalog.h \
+		   CatalogInfo.h TabTable.h QueryResult.h \
+		   TcsCatalog.h TcsCatalogObject.h TcsQueryResult.h \
+		   TcsLocalCatalog.h 
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+# ------------------------------------------------------------------------
+
+include ../../include.mk

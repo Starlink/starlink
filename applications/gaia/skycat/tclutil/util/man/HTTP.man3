@@ -1,0 +1,247 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: HTTP.man3,v 1.6 1998/07/22 19:58:12 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  10 Apr 96  Created
+#                 25 Jun 98  Updated for proxy and redirect info.
+#
+
+NAME
+HTTP - utility class for communicating with the HTTP 
+
+SYNOPSIS
+#include "HTTP.h"
+
+class HTTP {
+...
+public:
+    HTTP();
+    ~HTTP();
+    int status();
+
+    int get(const char* url);
+    char* get(const char* url, int& nlines, int freeFlag = 1);
+    int get(const char* url, ostream&);
+
+    int post(const char* url, const char* data);
+    int post(const char* url, const char* data, ostream&);
+
+    int copy(ostream& os);
+    int readline(char* ptr, int maxlen);
+    char* getNext();
+    const char* result();
+
+    void feedback(FILE* f);
+    FILE* feedback();
+
+    const char* hostname();
+    int fd();
+
+    char* content_type();
+    char* content_encoding() const;
+    int content_length();
+
+    const char* www_auth_realm() const;
+
+    int authorizationRequired();
+
+    static void authorize(const char* user, const char* passwd,
+           const char* realm = NULL, const char* server = NULL);
+
+    int html_error(istream& is);
+    int html_error(char* s);
+
+    static int allowUrlExec();
+    static void allowUrlExec(int i);
+
+    static const char* userAgent();
+    static void userAgent(const char* s);
+
+    static const char* authFile();
+    static void authFile(const char* s);
+};
+
+
+DESCRIPTION
+This class is used to access data over the network via HTTP.  Methods
+are available to get the data, given the URL and to step through the
+data line by line or return the entire result in a buffer.  HTTP GET
+and POST operations are supported and well as HTTP redirects and proxy
+servers. Username/password authorization is also supported for
+restricted servers.
+
+The syntax of a URL may be one of the following:
+  
+     http://host:port/path        (:port is optional)
+
+     file://path
+
+     command args
+
+In the first case, an HTTP GET (or POST) is done to retrieve the data
+for the URL. If the URL starts with "file:", the contents of the local
+file is returned. If the URL does not start with "file:" or "http:",
+it may be a local command to execute. In this case, the command is
+executed and the output of the command is returned. This last case is
+only allowed if explicitly enabled with the allowUrlExec()
+method. This should only be done if you know that it is safe to
+execute the command.
+
+PROXY SERVERS
+A proxy server, if available, is defined by the "http_proxy"
+environment variable. This should have the format:
+
+    http_proxy = "http://wwwcache.some.domain:port/"
+
+A list of domains that do not require to be proxied (i.e. local
+machines etc.) is defined by the variable "http_noproxy". This should
+be a list of comma separated names, i.e.:
+
+    http_noproxy = "local.domain,national.domain"
+
+If the given host is in one of these domains no proxy will be set up
+otherwise the member variables "proxyname_" and "proxyport_" will be
+defined (specifically proxyport_ will be set to -1 for no proxy).
+
+HTTP REDIRECTS
+This class supports HTTP redirects. If the result of a HTTP GET
+contains a header line matching: "Location: <URL>", then a recursive
+HTTP GET is done on the new URL and the result is returned to the
+caller in the normal way.
+
+AUTHORIZATION
+If an HTTP server returns the error "401 Authorization Required",
+the "realm" string from the message is noted and a special error
+message is generated: 
+
+    "Authorization Required for <realm> at <hostname>"
+
+Applications can look for this error message after an HTTP GET or
+check with the method: authorizationRequired() or www_auth_realm().
+Typically, at this point, a user interface will ask for a username and
+passwd for the given realm and hostname. These can then be supplied by
+calling HTTP::authorize(username, passwd, realm, server). The last two
+arguments are optional, but if supplied, the information is saved in
+an authorization file (auth_file) for later reference. The username
+and password are encoded in the file, which has the following format
+for each line:
+
+    <server>:<realm>:<base64 encoded username:passwd>
+
+The file is consulted in future sessions, so that the user doesn't
+have to retype the information every time. The default location of the
+file is ~/.http_auth and it is created with permissions so that
+only the owner can read it.
+
+METHODS
+
+get(url)
+	Do an HTTP GET with the given URL and position the read fd
+	after the result HTTP header. Returns 0 if OK. Use readNext()
+	to read the result lines.
+
+get(url, nlines&, freeFlag)
+	Do an HTTP get on the given URL and return the result as a
+	buffer.  nlines is set to the number of result lines (use
+	getNext() to fetch the result lines from the buffer.
+
+get(url, ostream&)
+	Do an HTTP get on the given URL and write the results to the
+	given stream.
+
+copy(ostream&)
+	Copy the results of a previous get(url) to the given stream.
+
+readline(ptr, maxlen)
+	Read a line of the results after a call to get(url, nlines).
+
+getNext()
+	Return the next result line after a call to get(url) or NULL
+	if there are no more lines. A null char is inserted in place of 
+	the newline so that the line can be treated as a single string.
+
+result()
+	Return a pointer to the result buffer from http.
+
+feedback(file)
+feedback()
+	Set (or get) the file ptr to use for feedback during http
+	transfers.  This can be used to give "netscape" like feedback
+	in a progress bar while the transfer is in progress.
+
+status()
+	Return status after constructor.
+
+hostname()
+	Return the hostname of the http server for the last URL.
+    
+fd()
+	Return file desc from last call to get(url).
+
+
+content_type()
+content_encoding()
+content_length()
+	Return http header values from last GET or POST.
+
+www_auth_realm()
+	If we see: WWW-Authenticate: Basic realm="somedomain" in the
+	HTTP header, we assume a username and password are required
+	and www_auth_realm_ is set to the "somedomain" value.
+
+authorizationRequired()
+	Returns true if a username/passwd is needed for the previous
+	HTTP GET operation.
+
+authorize(const char* user, const char* passwd,
+	  const char* realm = NULL, const char* server = NULL);
+
+	Set the username and password to use for authorization and, if
+	realm and server are given, save an entry in the auth_file for
+	later reference.
+
+	This is normally called after an HTTP GET returned "401
+	Authorization Required" and the user interface asked the user
+	to type in a username and password, but could also be called
+	at other times, if the necessary information is available.
+
+	The server name can be obtained via the hostname() method
+	after calling get(). The realm string is returned by the
+	method www_auth_realm() after a get(). These values are also
+	included in the error message generated when the "401
+	Authorization Required" HTTP result is received.
+
+html_error(istream& is);
+	Read an error message in HTML format and pass it on to
+	error(), stripped of HTML syntax.
+
+html_error(char* s);
+	Take an error message string in HTML format and pass it on to
+	error(), stripped of HTML syntax.
+
+allowUrlExec()
+allowUrlExec(int)
+	Get or set the flag value to allow a URL to be a local command.
+	If the argument is non-zero, URLs not starting with "http:" or
+	"file:" may be local commands to be executed.
+
+userAgent()
+userAgent(const char* s);
+	Get or set the value of the HTTP User-Agent to use with
+	requests (default: "SkyCat/1.0").
+
+authFile()
+authFile(const char* s)
+	Get or set the value of the file used to remember
+	authorization info (default: ~/.http_auth).
+
+SEE ALSO
+error
+----------------------------------------------------------------------
+

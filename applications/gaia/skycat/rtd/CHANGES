@@ -1,0 +1,1009 @@
+CHANGES to the RTD Sources
+--------------------------
+
+This file contains a list of changes to the RTD software and user
+interface. The latest changes are at the top.
+
+---------------  16.11.98 released rtd-2.19.22 ----------------------------
+
+* Ported to tcl8.0.3 (still compatible with tcl7.6/tk4.2)
+
+  - Updated namespace syntax
+
+  - Changed "class" to "itcl::class" for Itcl class declarations
+
+  - Use full namespace pathnames for itcl member procs
+
+  - Changed color initialization to be compatible with tcl8.0
+    (colormap is now initialized in Rtd_Init() and set for all windows)
+
+  - Added code to handle vectors in the old and new BLT versions
+    (The BLT vector interface changed)
+
+  - Updated Makefiles and configure scripts to work in both versions
+
+  - For backward compatibility, Rtd_Init automatically imports all of
+    the required namespaces (rtd::*, util::*, blt::*, itcl::*, itk::*).
+    (Use "namespace import -force" to avoid errors importing the same
+    namespace twice.)
+
+   - set tk_strictMotif to 1 (changes colors in menu selection)
+
+* the RTD is now using the CFITSIO library for FITS access (see the
+  astrotcl package). No incompatible changes were introduced. Only the
+  internal implementation of the FitsIO class was changed and some new
+  methods were added for handling FITS tables and HDUs. The FITS files
+  are still memory mapped (the cfitsio "memory" interface is
+  used). Note that the cfitsio library routines are only used to
+  access the FITS headers and extensions.  Since there are no FITS
+  headers involved in "real-time" mode, there is no performace penalty
+  from using the library (the cfitsio routines are not called at all
+  in that case).
+
+* RtdImage.C, ImageData.C: Minor changes to handle FITS files with
+  multiple HDU.  The RTD only displays the first HDU in a FITS
+  file. If the first HDU is empty, a blank image is displayed. The
+  Skycat application (based on the RTD) contains full support for
+  displaying multiple HDUs and FITS tables, which are treated like
+  local catalogs. 
+
+---------------  30.9.98 released rtd-2.19.21 ----------------------------
+
+* Minor change to rtdimage cmap and itt commands so that "$im cmap
+  file" returns the current colormap file and "$im itt file" returns
+  the current itt file.
+
+* Changed the release structure of the rtd package to include the
+  necessary utility packages. Now the rtd tarfile also contains the
+  astrotcl and tclutil packages. The top level Makefile and configure
+  script automatically determine which packages to make.
+
+---------------  23.9.98 released rtd-2.19.20 ----------------------------
+
+* Made some minor changes in the rtd colormap and display code to help
+  support 16 and 24 bit color. It is still not directly supported
+  though, since some changes would still need to be made in the
+  ImageData and derived classes to deal with short and int pixel
+  values and byte swapping, etc. For now, you can use 24 bit color
+  only if your display also supports 8-bit pseudocolor while in 24-bit
+  mode (see the Tk command "winfo visuals ."). This works, for example
+  on a Sun Ultra, but not on my Linux machine.
+
+* Changed error message given when X visual is not supported.
+  (For now, we still need 8 bit pseudocolor).
+
+* Removed menu accelerator Control-w, since it conflicted with 
+  the text bindings in entries.
+
+---------------  7.9.98 released rtd-2.19.19 ------------------------------
+
+* Removed trailing "\" in rtdevt/src/Makefile.in
+
+* For ESO detector chip coordinates: Changed "HIERARCH ESO DET WIN  ..." 
+  to "HIERARCH ESO DET WIN1 ...", since the former keyword is not
+  used. A number is always appended to WIN.  For now, we only consider 
+  the first WIN.
+
+---------------  5.8.98 released rtd-2.19.18 ------------------------------
+
+* Color scaling: Added new command line option "-color_scale" to set
+  the color scaling on startup. The option takes a value: one of
+  linear, log, sqrt, histeq.  Also made changes so that the color
+  scaling setting is remembered between images and reapplied.  (Source
+  files changed: Rtdimage.tcl, Rtd.tcl, RtdImage.C, ImageData.[Ch])
+
+* Coordinates: Added new coordinate type: "chip", for detector chip or
+  CCD coordinates, that takes into account the origin of the chip and
+  binning. X,Y coordinates in the user interface are now displayed in
+  chip coordinates, which are the same as image coordinates, unless
+  the FITS keywords "HIERARCH ESO DET WIN STRX" and "...STRY" are
+  defined or special fields in the real-time image event struct are
+  set (see below).
+
+* Added two new fields to the RTD real-time image event struct in
+  rtdImageEvent.h: startX and startY, with the same meaning as the
+  FITS keywords "HIERARCH ESO DET WIN STRX" and "...STRY" above.
+  These fields are used, along with the existing binningX and binningY
+  fields, to calculate and display the detector chip coordinates.  The
+  change is backward compatible, since it uses previously reserved
+  space in the structure. If the values are set to 0, they have no
+  effect.
+
+* RTD now reads cut level values from the real-time image events and
+  sets the image cut levels, unless the user set them already by hand.
+  User values override real-time event cut level values.
+
+* Changed the arguments to the RtdImage::displayImageEvent() method.
+  This is an internal method, so this should not be an incompatible
+  change.
+
+* Implemented "histogram equalization" color scaling and added it to
+  the list of choices in the Rtd "Colors" popup window. The code to
+  implement this was taken from saoimage-1.23.2 and modified only
+  slightly.  In order to be able to use histogram equalization code on
+  "byte" images (BITPIX=8), also, the lookup table size had to be
+  changed to 64k, from 256 bytes, which it was previously.
+
+* Added the X11 library directory to shared lib path in startup script.
+
+* Added code to handle NAN values for image pixels. They are now
+  treated as blank pixels.
+
+---------------  26.6.98 released rtd-2.19.17 ------------------------------
+
+* RtdImage.tcl, RtdImagePrint.tcl: Changed footers in postscript output
+  to include object name, file name and center position.
+
+* Compiling: rtdevt/*.c: fixed calls to semctl to avoid errors
+  reported by egcs-1.0.3 (gcc-2.8.x). Removed "void" from "main()".
+
+---------------  19.6.98 released rtd-2.19.16 ------------------------------
+
+* RtdImageCtrl.tcl: fixed minor bug in pack command that showed up
+  only when the options -float_panel and -with_grid were used
+  together.
+
+* RtdImage.tcl, RtdImagePrint.tcl: went back to using the tk
+  postscript command for printing images and graphics. This improves
+  the quality of the postscript output over the screendump version,
+  which used the "xgrabsc" utility to do a screendump. The default Tk
+  canvas postscript command does not support printing images and the
+  available patch could not handle large, zoomed in images. This
+  version is now based on a Tk canvas extention I added to the tclutil
+  package and does not require a patch to Tk. The extension is based
+  on the patch, with fixes provided by Peter Draper of Starlink, who
+  also modified the rtd print dialog box. The new dialog box has
+  optional footers in place of headers and has a new option to print
+  the whole canvas window, including any graphics that extend outside
+  the image boundaries.
+
+* RtdImage.tcl: changed focus policy to fix problems with mouse
+  pointer warping (moving mouse with arrow keys). The previous version
+  included some code to avoid obscure problems with the CDE window
+  manager, with the "click to focus" setting.  If anyone has problems
+  with the new version, please let me know.
+
+---------------  28.5.98 released rtd-2.19.15 ------------------------------
+
+* Added C++ method: RtdImage::makeImage(), replacing calls to
+  ImageData::makeImage() to help simplify the code for derived classes
+  and avoid duplicating code. No change in funtionality or interface.
+
+* RtdImage.C: added method isclear(), returns true if image is cleared.
+
+* Fixed bug in RtdImageColors.tcl that caused the colormap listing
+  to be empty in certain cases. The colormap files are compiled in
+  and no longer searched for in $RTD_LIBRARY/colormaps.
+
+---------------  4.5.98 released rtd-2.19.14 ------------------------------
+
+* Changed the RtdImage convertCoords() and convertCoordsStr() methods
+  to fix bug in handling images with equinox != 2000.
+
+* Changed default zoom limits to -10..20 (was -5..9), (-min_scale, -max_scale)
+
+---------------  28.4.98 released rtd-2.19.13 ------------------------------
+
+* Increased label width for Rtd panel (RtdImagePanel), since labels
+  were being cut off on some screens.
+
+* RtdImagePick.tcl (Pick Object): Merged in Peter Biereichel's
+  changes, which include using the RtdImageZoomView class for the
+  image (same as zoom window).  This lets you zoom in and out to get
+  the correct resolution.  Also Fixed a bug in the "scale_changed"
+  method that showed up on images that were not square.
+
+* RtdImage.C: rtdimage "statistics" subcommand (used by Pick Object window):
+  If the user clicks on the image background, so that no FWHM can be calculated,
+  the x,y and ra,dec coordinates of the point selected are returned and 
+  fwhmX and fwhmY are set to 0 (Previously, the results were undefined in
+  this case).
+
+---------------  15.4.98 released rtd-2.19.12 ------------------------------
+
+* (doc, *.tcl): For documenting the "public interface": Updated
+  comments on all Itk component declarations and added "public",
+  "private" and "protected" keywords in the source to help identify
+  the public interface, which is documented in man pages generated
+  from the source by the itcldoc utility (tclutil package).
+
+* Minor changes in configure script and top level makefile for shared
+  libraries
+
+* RtdImagePick.tcl (PickObject window), added "-orient" option, to change
+  layout to "horizontal" or "vertical". Default is same as before
+  (by request, to save window space).
+  
+* RtdImagePick.tcl: moved initialization from constructor to "init"
+  method, for easier subclassing.
+
+* Added command line option for "Pick Object" window layout: 
+  usage: "rtd -pickobjectorient vertical" (default: horizontal).
+  (Option also added option to RtdImage.tcl and Rtd.tcl).
+
+* ImageData::write(): fixed a bug in image pixel coordinate conversion
+  that caused the world coordinates to be slightly shifted in images
+  created with the "Save region as..." Rtd menu.  
+
+* Increased some buffer sizes in class RtdRPTool, since specifying a long
+  file name caused the buffers to overflow (defaults were set too low).
+
+---------------  31.03.98 released rtd-2.19.11 ------------------------------
+
+* Updated man pages and documentation
+
+* RtdImage.C: Fixed the -shm_data and -shm_header options, which were
+  no longer working after earlier changes.
+
+* Added -usexshm option to RtdImageColormap so that it follows the convention
+  of the other rtd images.
+
+---------------  25.03.98 released rtd-2.19.10 ------------------------------
+
+* Made minor changes in the C++ class RtdImage, to make it easier to
+  derive a subclass with its own configuration options (Added 2
+  optional arguments to RtdImage constructor).
+ 
+* Changed "blank image" size from 10x10 to 2x2 image, since people
+  really seem to use 10x10 pixel images. (The size is sometimes used
+  to determine if the image is "blank").
+
+* ImageData.C: modified setScale so that dispWidth and dispHeight
+  cannot be zero when using very large negative scales (this happens
+  for extremely thin images, i.e. 5000x37),
+
+* Removed ImageData::read, use ImageData::makeImage() instead, since
+  it allows different image types through subclassing.
+
+* Moved the WCS object (for managing world coordinates) from the
+  ImageData to the ImageIO class (in astrotcl/wcslib). No change to
+  the public interface. This makes it possible for a derived class (of
+  ImageIORep) to replace the WCS implementation with a new one.
+
+* RtdImage.h now defines the RTD_OPTIONS macro, which can be used by
+  derived classes to add new options to the rtdimage command.
+
+* Rtd.tcl: changed clone method (Menu: "New Window") to not reload 
+  the original image again.
+
+* RtdImage.tcl: Fixed bindings for -with_warp option to use "+" to
+  not overwrite previous bindings.
+
+* Rtd.tcl: Change keyboard accelerators for menu items to use
+  <Control> instead of <Alt>, since <Alt> is used in Tk for popping up
+  a menu with the keyboard (see -underline option in menubutton(n)).
+
+* RtdImage.tcl: Fixed focus code to allow warping the mouse cursor and
+  menu traversal without conflict.
+
+* Rtd.tcl, RtdImageCtrl.tcl:
+  - Added -float_panel option to allow info panel to be in a popup
+    window (default is off, no change),
+    usage: rtd ... -float_panel 1, to enable.
+
+  - Added -panel_layout option to allow changing the order of the zoom
+    and pan windows in the layout (default is the same as before, no
+    change). Usage: rtd ... -panel_layout $value, where value is one
+    of {saoimage reverse default}, for an saoimage type layout, reverse
+    or default.
+
+* Added "clone" number to window headers, to help identify related windows
+  when there is more than one main window.
+
+---------------   05.03.98 released rtd-2.19.9 ------------------------------
+
+* Made minor change in the color ramp Tcl code, so that you can now
+  scale and shift the colormap, without it always reverting to the
+  original state. Previously, the colormap shift and scale operations
+  caused the colormap to revert to the original state at the start.
+
+* For backward compatibility with applications using the rtd
+  library: The dependency on the astrotcl and tclutil packages is now
+  hidden from applications. librtd.a (.so, .sl, etc.), now contains
+  the astrotcl and tclutil object files, the $prefix/include/rtd dir
+  contains copies of the astrotcl and tclutil header files, and 
+  the Rtd_Init() routine also initializes these packages.
+
+* Minor changes/bug fixes: 
+  - added check in pan window widget (RtdImagePan.tcl) in case there are
+    problems converting world coords ("catch draw_compass").
+
+  - propagate -min_scale and -max_scale options to the rapid frame popup
+    (determines the min and max magnification).
+
+---------------  13.2.98 released rtd-2.19.8 ------------------------------
+
+* Fixed a bug in the "pick object" window that showed up when the main
+  image was rotated (minor change made in RtdImagePick.tcl::update_rect.
+
+* Fixed the "Hide/Show Popup Windows" feature (moved the
+  implementation to the tclutil package: class TopLevelWidget). The
+  new implementation is more general and less error prone.
+
+---------------  9.2.98 released rtd-2.19.7 ------------------------------
+
+* Fixed problems with floating point precision when converting world
+  coordinates (raised from default of 6 digits to max 17 digits.)
+
+* Fixed bug in introduced in the last version that could cause a core
+  dump when setting the cut levels (in ImageTemplates::getMinMax).
+
+* Fixed minor syntax error in RtdImage.C that was not found by g++.
+
+* Fixed problem with "gethostname" prototype on solaris-2.6 in RtdRemote.C.
+
+--------------- 3.2.98 released rtd-2.19.6 ------------------------------
+
+* Added selection mechanism to select a region of the image or canvas.
+  The graphics toolbox now contains a "region" item that can be used
+  to select a region of the image. The new RtdImage -regioncommand
+  option can be used to have a tcl command evaluated whenever a region
+  is selected. Also added binding <Control-Button-1> as a shortcut
+  to select a region
+
+* Added a menu item to the "Real-Time ==> Rapid Frame menu": 
+  "Delete Rapid Frame", to delete the current rapid frame.
+
+* Added a new rtdimage subcommand: "mmap", which has a similar syntax to
+  the "shm" subcommand. The rtd "shm" subcommand is used to manipulate
+  sysV shared memory areas containing the image and header data. The
+  rtd "mmap" subcommand does the same, but with "mmap" memory, which is
+  the default, since rtd uses mmap to read image files.
+
+* Fixed bugs in the rtd shm "create" and "delete" subcommand 
+  (check for number of arguments was wrong, transformation settings were
+   not being saved).
+
+* Added options to rtd (class and command line) to change the magnification
+  range allowed in the user interface: -min_scale and -max_scale, and 
+  changed the default range from (-5, 9) to (-10, 20).
+
+* Rtd now checks the value of the FITS "BLANK" or "BADPIXEL" keywords
+  and ignores these pixels when setting cutlevels or doing any 
+  calculations. The blank pixels are displayed black by default.
+
+--------------- 26.01.98 released rtd-2.19.5 ----------------------------
+
+* Updated comments in Itcl sources for automatic generation of man pages.
+  (There are now man pages for all Itcl classes).
+
+* Added menu accelerators, keyboard shortcuts for menus
+
+--------------- released rtd-2.19.4 -------------------------------------
+
+* Fixed image printing problems (rtd now no longer creates a copy of the
+  image and graphics, but just makes sure the window is not covered 
+  by other windows before doing a screendump of the image window).
+
+* Compilied sources with the SunPRO C++ compiler and fixed problems 
+  that showed up there and not with gcc.
+
+* Changes in source configuration: Rtd previously contained a lot of
+  generic code that was not Rtd specific. In order to make simplify
+  the Rtd package and make the generic code available for other
+  applications, 2 new packages were added (see below). Each package
+  can be dynamically loaded and handled in the same was as the Rtd
+  package.
+
+  The Tclutil package was created by gathering "generic" Tcl and C++
+  code from various applications into a single generic Tcl package.
+
+  The Astrotcl package was created by gathering general astronomy
+  related Tcl and C++ code from other packages into a single, reusable
+  package.
+	
+  If you were previously loading the Rtd package dynamically, you will
+  need to add "package require" statements for the Tclutil and
+  Astrotcl packages.
+
+  If you were linking the package statically, you will need to add
+  calls to Tclutil_Init and Astrotcl_Init in tkAppInit.C.
+
+  If you were using the rtd C++ classes directly, you will need to add
+  some -I compiler options to your Makefiles:
+  (-I$(INSTALLDIR)/astrotcl -I$(INSTALLDIR)/tclutil).
+
+* renamed CanvasPrint to RtdImagePrint, since it is now rtd specific, 
+  and made minor changes to the options (pass rtd image obj as option).
+  Restored earlier version of CanvasPrint that does not use xgrabc, for
+  use for generic canvas printing. Added code to print the line graphics
+  when printing an RTD image (was missing after previous changes by
+  P. Biereichel).
+
+* Colormap files are now compiled in. This is slightly more efficient
+  and makes it easier to create a single binary application to deliver.
+  You can still load colormap files, but any found in the rtdimg/colormaps
+  directory are compiled in statically.
+
+* Added plug-in capability for top level widgets.
+  The basic idea is this: for each top level widget, you have the
+  possibility to specify a plugin file to be sourced after the widget has
+  been created. This is done automatically by the common base class.
+
+  For any class XYZ, the default initialisation file is ~/.xyzrc and may
+  be overridden by the environment variable $XYZRC. The file should
+  define a Tcl proc named "xyz_plugin".
+
+  If the plugin file is found, it is sourced and the plugin proc is
+  called with one argument: the name of the widget ($this).
+
+  If there are multiple instances of a widget, the plugin proc is called
+  once for each. The plugin proc can use Itcl methods and Tcl commands
+  to add menu buttons and other widgets, make changes or additions to
+  the user interface or even replace the contents of key methods.
+
+* Tcl scripts: made a number of minor changes in the general purpose
+  Itk widgets that were need for skycat.
+
+* RtdImage.C, FitsIO.C: the rtd "clear" command now optionally creates
+  a blank image without world coordinates (previously it always created
+  one with world coords). This change was needed to allow catalogs in
+  skycat that are based on image coords.
+
+* FitsIO.C: Files are written in compressed format if they have the
+  extension .hfits, .gfits or .cfits
+
+* fixed some bugs for image event synchronization via semaphores
+
+* Merged changes from D.Hopkinson (RMP nulticasting, statistics,
+  etc.), P. Biereichel and A. Brighton into a single version.
+
+* Mem.C, RtdImage.C, configure.in: added code to handle the different
+  prototypes for the semctl(2) system call on Linux, Solaris and HP.
+
+* RtdImage.C: replaced "sigignore(SIGFPE)" with "signal(SIGFPE,
+  SIG_IGN)" for linux support.
+
+* rtdwcs: fixed a number of bugs in class FitsIO and related wcslib C
+  functions, mostly dealing with inserting Fits keywords (not used by
+  RTD, but used elsewhere...).
+
+* class Mem: added various changes and bug fixes; added a length field
+  (used to indicate the length of the FITS header when the header and
+  image are both mmapped from the same file).
+
+--------------- 04 Aug 97 released rtd-2.19 --------------------------------------
+* fixed a minor bug in Mem_Map.C (added check in destructor for failed mmap)
+
+* Default option itk_option(-disp_image_icon) set to 0
+
+* New option itk_option(-with_warp). Default is 1 for main image only.
+  The option is used to make arrow keys move mouse pointer by one pixel.
+
+* The remote interface was extended: the new rtdimage command "remotetcl"
+  eval's Tcl commands in Rtd's Tcl interpreter. For an example see files
+  rtdimg/demos/tRemoteTcl* and rtdimg/library/RtdRemoteTcl.tcl.
+  The proc's connect_to_rtd {} and send_to_rtd {rtd_fd args} are
+  contained in rtdimg/library/tclutil.tcl
+
+* Bug fixed in postscript print itk classes (xgrabsc)
+
+* The updated RTD PostScript document is in rtd/doc/rtd.ps
+
+* New RTD Performance measurement tool in menu "Real-time". To run it use
+  rtd -debug 1; "Attach to camera"; Start Performance Tool from menu "Real-time"
+
+* New Recorder/Playback tool in menu "Real-time". This tool works on FITS cubes.
+
+* BITPIX=-16 converts to standard FITS format
+
+* Support for image event synchronization via semaphores
+
+* X synchronisation option implemented for X11R6
+
+* The Rtd image event structure had to be changed because of the new options
+  X synchronisation and image event synchronization via semaphores.
+
+* fixed bugs in rtdServer.c and rtdImageEvent.c
+
+* Value display in Cuts...; Pixel table with statistics
+
+* various bug fixes in the handling of Fits keywords (class FitsIO)
+  and mmap files (class Mem) as well as in the wcslib (hget.c, hput.c)
+
+--------------- 17 Jun 97 released rtd-2.18.2 -----------------------------------
+
+* fixed bug in rtdutl/src/Mem.C, method shared(int) (use length() rather than size()).
+
+* LabelEntry.tcl, RtdImageCut.tcl:
+  replaced references to the Iwidgets class "entryfield" with equivalent local code
+  in LabelEntry.tcl. This is needed so that we don't have to load the entire iwidgets
+  sources in the single binary version of skycat. The added features include a
+  -validate option of the LabelEntry and derived classes.
+
+* CanvasPrint.tcl: allow for the XGRABSCBIN variable to not be set. This is needed
+  for the binary skycat release. By default, look for xgrabsc in the shell $PATH if
+  $XGRABSCBIN is not set
+
+--------------- 30 April 97 released rtd-2.18.1 ----------------------------------
+
+* class HTTP: added new feature to HTTP::get(url) (can be used in catalog
+  config file URLs): 
+
+  Now the get method accepts 3 types of URL:
+
+  - http://host/path - URL: do an HTTP get
+
+  - file:/path - get the file
+
+  - /path - command: exec the command and read the standard output.
+
+  This was a request from Andreas (awicenec@eso.org).
+
+* Minor configure script additions, for creating binary release of skycat
+
+--------------- 22 April 97 released rtd-2.18 ------------------------------------
+
+* More minor changes in the configure scripts and makefiles for
+  dealing with shared libraries on HP.
+
+* Tested on Linux 2.x (watch out for old /usr/lib/libBLT.a, which can
+  be linked in by mistake instead of the new BLT2.1 library).
+
+* Updated the Mem class (rtd/rtdutl) with a newer version that handles
+  the case on HP where the same file is mmapped twice, which returns an
+  error under HP-UX. The new version keeps a list of Mem objects and
+  reuses an existing object if needed.
+
+--------------- 16 April 97 released rtd-2.17 ------------------------------------
+
+* fixed bug that showed up when you "attach" a camera after viewing
+  an image of the same size. The problem was in the way the image data
+  size was checked: the size (data.size()) was used rather than the
+  length (data.length()), which can be different if the FITS header
+  is also stored in the same shared memory object (class Mem).
+
+* minor configure/Makefile changes. Tested with Sun-CC.
+
+--------------- 11 April 97 released rtd-2.16 ------------------------------------
+
+* changed the name of the Tcl init routine for Rtd from RtdImage_Init
+  to Rtd_init, to comply with the standards for loadable modules in
+  the new Tcl version (The old version is still supported for backward
+  compat.)
+
+* changed the configure script and Makefiles to get information from
+  the from the installed Tcl configuration files:
+     tclConfig.sh, tkconfig.sh, itclConfig.sh, tclxConfig.sh, ...
+  rather than try to guess the correct values. Rtd also produces its
+  own rtdConfig.sh script, which can be used by other applications to
+  find out library and path names for Rtd as well as X and Tcl/Tk.
+  The tclConfig.sh script also contains information on how to generate
+  and use shared libraries on each OS, which is non-trivial and very
+  system dependent.
+
+* To set the version number for a new Rtd release, you only have to
+  edit the VERSION file now. The configure script picks this up and
+  generates the necessary #defines and make variables, etc.
+
+* replaced GNU make, gcc, Solaris and HP-UX specific features from the
+  Makefiles and configure scripts that were added in rtd-2.15. These
+  are OK for use at ESO, but would cause problems for anyone else who
+  didn't use GNU make or gcc, etc.
+
+--------------- 08 April 97 released rtd-2.15 ------------------------------------
+
+* Peter Biereichel ported Rtd to Itcl2.2 and added initial support for
+  shared libraries and modules (based on work done by Kim Gillies).
+  use: configure --enable-shared to create the shared library
+  (librtd.so or librtd.sl).
+
+--------------- 01 April 97 released rtd-2.14 ------------------------------------
+
+* adapted for new Tcl/Tk release (tcl 7.6, tk 4.2, [incr Tcl] 2.2, [incr Tk] 2.2...)
+  (see file genTclTk on this directory for a sample installation script for Tcl/Tk)
+
+* support for shared libraries: configure tcl/tk, BLT and rtd-2.14 with --enable-shared
+  The Makefiles will create shared libraries as well as archive library files.
+
+* master shared library (librtd.so or librtd.sl) can be dynamically loaded
+  with the tcl "load" command (RtdImage_Init was renamed to Rtd_Init)
+
+* uses xgrabsc.2_41 (screen dump) for canvas image print
+
+--------------- 10 Feb 97 released rtd-2.13 (intern) -----------------------------
+
+* fixed another bug related to shared memory. It seems that the destroy_notify
+  routine in RtdImage.C, which was supposed to cleanup any shared memory it 
+  created before exiting, was actually being called at other times, such as when
+  the mouse enters the image window. Seems to be some kind of Tk4.0 bug?
+  Commented out for now. This bug did not affect most users. It only turned up
+  if you were using the RTD remote interface and/or the "shm" subcommand to access
+  image shared memory using SysV shared memory.
+
+--------------- 05 Feb 97 released rtd-2.12 (intern) -----------------------------
+
+* fixed bug in [rtdimage shm get] (rtdimage tcl subcommand to return shared memory
+  id, and/or force image to be in shared memory)
+
+--------------- 30 Jan 97 released rtd-2.11 --------------------------------------
+
+* Added World Coordinates support to the real-time image events by
+  extending the rtdIMAGE_INFO struct in rtd/rtdevt/rtdImageEvent.h and
+  using the new info in RtdImage.C to set the world coordinates
+  information for the image.
+
+  The following fields were added to the image event:
+    double            ra;	     /* Center right ascension in degrees */
+    double            dec;	     /* Center declination in degrees */
+    double            secpix;	     /* Number of arcseconds per pixel */
+    double            xrefpix;	     /* Reference pixel X coordinate */
+    double            yrefpix;	     /* Reference pixel Y coordinate */
+    double            rotate;	     /* Rotation angle (clockwise positive) in degrees */
+    int               equinox;	     /* Equinox of coordinates, 1950 and 2000 supported */
+    double            epoch;	     /* Epoch of coordinates, used for FK4/FK5 conversion, no effect if 0 */
+    char              proj[8];	     /* Projection: one of: "-SIN", "-TAN", "-ARC", "-NCP", "-GLS", 
+                                        "-MER", "-AIT", "-STG", "PLATE", "LINEAR", "PIXEL" */
+
+  (I think the projection (proj) is only used for display and does not
+  have any effect. I included it because it is part of the function
+  interface (in Doug Mink's wcslib).
+
+  *** (NOTE: incompatible change: clients must at least be recompiled!)
+
+
+--------------- 21 Nov 96 released rtd-2.9 --------------------------------------
+
+* Made configure scripts and sources Linux compatible. Fixed byte-swap
+  problems on machines that have a byte order different from the network. 
+  Thanks to Sidik Isani <isani@cfht.hawaii.edu> for supplying the patches
+  for this.
+
+* The "Pick Object" feature (View Menu) now also works for images that
+  do not support world coordinates (RtdImage.C, RtdImagePick.tcl).
+  
+* rtdutl: class HTTP: Local file URLs are now supported, i.e.,
+  file:/path/name... 
+
+--------------- 8 Nov 96 released as rtd-2.8, part of skycat 1.0.1 ---------------
+
+* (Rtd) Fixed compass to display East correctly (was reversed...)
+
+--------------- 7 Nov 96 released as rtd-2.7, part of skycat 1.0 ------------------
+
+* (WCS lib) Major improvements in the World Coordinates handling.  The
+  WCS information for HST images should be handled correctly now, so
+  you can plot guide stars, etc. This previously worked correctly only
+  for some images (such as those from DSS). Many thanks to Doug Mink
+  (dmink@cfa.harvard.edu) for supplying the WCS library and bug fixes.
+
+* (Rtd) added a new "Grid" feature (see View menu) that displays a
+  world coordinates based grid over the image. You can also control
+  the grid size (distance in arcsecs between grid lines) in a new
+  entry in the main panel.
+
+* (Rtd) The compass widget (N-E display in panel) was removed and
+  replaced with a more correct display in the Pan window. The Pan
+  window now displays 2 arrows indicating the real north and east for
+  the image, based on the world coordinate information.
+
+* fixed bug in "measure band" display that caused incorrect distances
+  to be displayed for the width and height lines (the diagonal was ok).
+  (Needed to convert all 3 points from canvas to world coordinates rather
+  than using only 2 points and assuming a linear coordinate system...) 
+  (in RtdImage.C).
+
+* Added bindings to measure band so that arrow keys can be used to
+  position it.
+
+* fixed bug in conversion between world coordinate and pixel distances 
+  (in WCS.C).
+
+--------------- 18 Oct 96 released as rtd-2.6, part of skycat 1.0b15 ------------------
+
+* rapid frame was being deleting by the "Graphics:clear" menu item: fixed.
+
+* graphics: added code to disable line graphics (menu and popup) when image
+  is cleared.
+
+* fixed syntax problems in HMS.h and WorldCoords.h reported by mcomin@eso.org 
+  that show up when using g++/libg++ and the file <function.h> is included, 
+  which defines templates for operator functions...
+
+--------------- 15 Oct 96 released as rtd-2.5, part of skycat 1.0b14 ------------------
+
+* got new version of SAO WCS lib from Doug Mink with some fixes for images
+  where the equinox and epoch were not set.
+
+* (Rtd) Changed the way image cut levels are set by default. In the
+  previous version, cut levels were not changed at all when a new
+  image was loaded, which meant that you usually had to press the
+  "Auto Set Cut Levels" button to make the image visible. Now this has
+  been changed as follows: If you set the cut levels explicitly by
+  typing in a number or moving a slider bar, etc., they will not be
+  changed, even if a new image is loaded.  However, if you have the
+  cut levels calculated automatically by pressing the "Auto Set Cut
+  Levels" button or the "Median Filter" button, etc., then it is
+  assumed that new cut levels can be set automatically when a new
+  image is loaded.  (We would be interested to hear any comments on
+  this. Maybe we should make this behavior optional ny adding a
+  checkbutton somewhere...)
+
+* changed bindings on the "measure band" (RtdImageMBand.tcl) so that it
+  acts more like a menu or the line graphics: it will stay up if you
+  click <3>, release and then drag. Clicking <3> again makes it go away.
+  <Shift-Button3> now makes it "freeze" so you can keep it where it is.
+  <Ctrl-Button3> (or <Ctrl-Motion>) displays just the single line mband.
+
+* Made a number of changes designed to improve performance on very large
+  images (got test image from Kim Gillies: 170 MB, 8192 x 5464 floats):
+  
+  * the zoom window is no longer updated from the pan window, since that can
+    cause a lot of disk activity on large images (the mouse easily crosses the 
+    entire pan image, which would have to be displayed in the zoom window).
+
+  * auto set cut levels, median filter, finding min/max pixel, etc. now are 
+    only calculated for the visible part of the image and (for speed) don't 
+    examine all image pixels. (modified getDist() and medianFilter() methods).
+
+  * added a check and a warning dialog for the case where a very large image
+    is zoomed so that the canvas scroll area exceeds the range of a "short"
+    (32k pixels in X or Y), since there is an internal Tk limit there.
+    I could get around this with a hack, but it would require access to Tk
+    internals that would cause compilation problems in the VLT environment.
+
+* fixed problems propagating cut level changes to zoom window (RtdImage.C)
+
+* added rcs keywords as static constants to source files (for Giorgio).
+
+* added a "Reset" button to the EntryForm class - used to enter WCS data (rtd)
+  and local catalog data (skycat).
+  
+
+--------------- 1 Oct 96 released as rtd-2.4, part of skycat 1.0b12 ------------------
+
+* Class ImageData/WCS/RtdImage: removed wcs* routines and replaced
+  them with a new class called "WCS" (module rtdwcs) that is the
+  interface to Doug Mink's SAO WCS lib.  Class ImageData now has a
+  method "wcs()" that returns a reference to the WCS object rather than
+  implementing methods like "wcs2pix()" itself. The WCS class uses
+  reference counting so that it is easier to share the information in
+  different rtdimage views.
+
+* added a Tcl/Tk interface for setting and displaying the basic WCS info
+  (using the rtdimage wcsset subcommand) and added a new View menu item
+   "WCS Information".
+
+* added 2 new rtd subcommands for setting WCS information from outside:
+  "wcsset" (to set WCS parameters) and "wcsshift" to shift the WCS center
+  of the image. See the rtdimage(n) man page for details.
+
+* fixed bugs in Mem/Mem_Map classes: 
+    do read-only mmap (was read/write: bad for read-only image files), 
+    report errors correctly (inserted missing error messages), 
+    initialize status_ member variable (was missing).
+
+* added error checking in FitsIO.C to catch incomplete FITS files or
+  files that have the wrong type.
+
+* added global Tcl variable "rtd_version", set to the version number: "2.4", ...
+
+* ImageColor: made changes in colormap handling in an attempt to avoid flashing
+  when using a private colormap. Added new tcl command: "rtd_set_cmap" to set
+  colormap for popup windows to be the same as rtdimage.
+
+* FitsIO: Display of FITS header (item in View menu) changed so that displayed
+  copy of header is formatted for ASCII display (with newlines, no NULL chars).
+
+* FitsIO: loading large FITS files should be faster now, due to use of mmap(2)
+  in place of reading the file.
+
+* wcslib, rtilib: started using new SAO wcslib (wcssubs-1.0) version. 
+  Changes in the wcslib pix2wcst routine (converts image pixel
+  coords to a WCS string) caused problems (coords are sometimes output
+  in degrees, sometimes HMS).  Replaced calls to pix2wcst with pix2wcs.
+
+--------------- 20 Sep 96 released as rtd-2.4b1, part of skycat 1.0b11 ------------------
+
+* Added range checks in LookupTable.C to fix problems caused by keeping
+  previous cut levels for different image data types
+
+* rtdutl: non-ANSI-C "press" sources: removed -traditional option from
+  Makefile.in (not available with "cc") and fixed declarations in C
+  sources (taken from "press" module) so that gcc doesn't complain.
+  (was reported by K. Gillies).
+
+* min/max pixel values: (ImageTemplates.C): changed algorithm to not examine
+  every pixel on large images. On smaller images, the time is not so important,
+  but on very large images it can take a long time. Now only every nth pixel
+  is examined, which should give an estimate of the min/max pixel values.
+
+* All transformations (flipX,Y, rotate, scale) and cut level settings are now
+  kept between image loads and after a "clear" operation (requested by P.Biereichel).
+
+* fixed bugs that sometimes caused the values displayed in the upper panel
+  (X, Y, pixel value) to be off by 1 with respect to the zoom window.
+  The problem showed up when the image was at zoom factor 1 and with certain
+  transformations applied and also in rapid frames. It should work correctly now.
+  (Changes in RtdImage.C, ImageData.C, ImageTemplates.C)
+
+* RtdImage.C: RtdImageCamera::display(): added "frameId" arg to calls to the pre and
+  post camera commands to differentiate between rapid frames and the main frame.
+  (requested by pbiereic). This affects calls to the pre and post commands specified 
+  in the rtdimage "camera attach" command.
+
+* RtdImage.C: configureNotify(): fixed bug that sometimes caused the
+  image to not be redrawn correctly after a window manager maximize/minimize 
+  resize operation.
+
+* RtdImageCtrl.tcl: new_image_cmd: added code to destroy "spectrum" window when
+  a new image is loaded (problem was reported in SPR Nr: 960518 when new image was
+  smaller in real-time mode: could not reproduce)
+
+* Real-time interface: in RtdImage.tcl: detach_camera: inserted a call to 
+  "$image_ update" to make sure all image windows are up to date with the shared  
+  memory image.
+  (This might be needed due to timing problems between the shared memory image and
+   the socket being read from the rtdServer.) 
+
+* RtdImage.C: added new rtdimage subcommand: "$image update" forces the image to 
+  be updated from memory, where it may have been changed by a separate process
+  accessing shared memory...
+
+* spectrum (View::Cuts..." menu item): ignore errors when line is too small
+  (was reported as SPR Nr: 960536, forwarded by P. Biereichel)
+
+* added code (from P. Biereichel) to make sure zoom window gets cleared when
+  the mouse leaves the image window (see RtdImageZoomView.tcl)
+
+---------------- 14 Aug 96 released rtd as part of skycat-1.0b10 ------------------
+
+* added check for "SIMPLE = ..." keyword/line at beginning of FITS files
+
+* rtdimage: "Open File" now recognizes suffixes for compression: 
+	hfits (H_COMPRESS), gfits, gzfits (GZIP), cfits (UNIX_COMPRESS)
+
+* fixed bug when FITS keyword "CTYPE1" was not "RA --", as described in mail from 
+  Alberto Micol (just removed restriction in CTYPE1 being "RA--")
+
+* rtilib: class ImageData: added a new class "LookupTable" to make it easier to
+  share and manage color lookup tables. Also changed the way the "Blank" pixel
+  is implemented (more efficient now).
+
+* Cut levels and transformations (flipXY, rotate, scale) are now kept even when
+  a new image is loaded.
+
+* rapid frame: embedded rapid frames (in main image) get the cut levels
+  and transformations (but no image data) from the main image.
+  Popup rapid frames (in separate window) can have their own transformations
+  and cut levels (but transformations from the main image still propagate).
+
+* It is now allowed to set the cut levels outside of the min/max pixel
+  range.
+
+* added new "View" menu item "Hide Control Panel" to toggle the visibility of
+  the top control panel.
+
+* added new "View" menu item "Magnification" to set the image scale when the
+  control panel is not visible.
+
+* changed default bindings in canvas so that you can scroll with button <2> when 
+  the control panel is not visible.
+
+* added support for "mmap" in Mem class (rtdutl), using code from the ACE class
+  library (modified by Kim Gillies). mmap is now used to read files more efficiently
+  for local catalogs and decompression. Later it will also be used to load image
+  files (need to first start using new sao-wcslib).
+
+---------------- 6 Aug 96 released rtd as part of skycat-1.0b9  ------------------
+
+* added decompression algorithms (H-compress, gzip, unix) the PREVIEW
+  field in catalog query results is now interpreted as an image OR a tab
+  table to plot, based on the "Content-type" field of the preview data
+  returned.
+  The current implementation is based on the document:
+      http://arch-http.hq.eso.org/~amicol/asu_94.html
+  If the "Content-type" of the preview is recognized, it is plotted as
+  a graph or loaded as an image...
+
+
+---------------- 1 Aug 96 released rtd as part of skycat-1.0b8  ------------------
+
+* Added an interface for selecting an object/star in the image
+  and calculating the center, FWHM and angle
+  (see View menu, "Pick object")
+
+* Fixed problems with world coordinates where (hour == -0.0).
+  (0:0:1 -0:0:1) should work correctly now.
+
+* removed the "wcs2pix" and "pix2wcs" tcl subcommands
+  (use the "convert coords" subcommand instead...)
+
+* Graphic items are now clipped to (about) the size of the image
+  (incuding rapid frame rect and panning rect)
+
+* Cut levels for rapid frames are no longer set from the master
+  image. Rapid frames can have thier own cut levels and transformations.
+
+---------------- 24 Jul 96 released as part of skycat-1.0b6  ------------------
+
+* rapid frames are now assumed to start at 0,0
+
+* you can set the cut levels separately for rapid frames
+
+* you can rotate/flip/scale rapid frames separately
+
+* you can no longer move a rapid frame outside of the image
+
+* I added a test utility for rapid frames that you can
+  access as follows:
+    rtd -debug 1 
+  This uses a test program (tRtd) that is installed with rtd.
+  You can change the update interval by specifying the -interval
+  option:
+    rtd -debug 1 -interval 200
+  The default is 100 ms.
+
+---------------- 28 May 96 released as part of skycat-1.0a10  ------------------
+ 
+* The main visible changes are some new menu items and support
+  for a private colormap...  
+
+---------------- 23 May 96 released as part of skycat-1.0a9  ------------------
+
+* private colormaps are used when there are not enough
+  colors. The default minimum amount of colors is 30 and
+  the default max is 60. You can set these via the -min_color
+  and -max_color options.  If min_colors colors are not found,
+  a private colormap is installed. I tried to save the GUI
+  colors to avoid flashing...
+
+* There is a new menu item under File for "cloning" the main
+  window. The main windows share the same colors, but otherwise
+  are like 2 different applications.
+
+* I added a menu item to the View menu to hide/show the popup
+   windows.
+
+---------------- 12 Apr 96 released as part of skycat-1.0a8  ------------------
+
+* added pop up rapid frame window with zoom controls
+
+* added a new zoom window (the old one is still available with an option)
+   which works over any rtd image (pan window, rapid frame,...)
+ 
+* added a remote control interface (see man page rtdRemote(3))
+
+* added some new Rtd commands to allow remote access to the image and header
+   in shared memory (see RtdImage(n), commands: shm, remote)
+
+* new Rtd subcommands for converting between any 2 coordinate
+   systems (see RtdImage(n): convert command). 
+
+* RtdImage now understands the following coordinate systems:
+	canvas coordinates
+	screen coordinates
+	image coordinates
+	world coordinates (H:M:S and degrees, any equinox)
+  For example, coordinates may now be specified as: 
+	$x $y canvas 
+  or:
+	$ra $dec "wcs 1950"
+          
+
+---------------- 21 Feb 96 released as part of skycat-1.0a4  ------------------
+
+* negative world coordinates are now handled correctly
+
+* bzero and bscale Fits keywords are now used
+
+* support for the BLANK fits keyword for blank pixels
+
+* the Pixel table has been implemented in C++
+
+* We are now using the new saoimage-1.18 wcslib
+   (mixed with the DSS plate code from 1-15, due to problems
+    in the new version)
+
+---------------- 6 Feb 96 released rtd as part of skycat-1.0a2  ------------------
+
+* lots of bug fixes
+
+* added a menu item for viewing the FITS header
+
+---------------- 25 Feb 96 released rtd as part of skycat-1.0a1  ------------------
+
+* Added versions for Solaris (with shared libs) and HP
+
+----------- Sep 18, 1995: begin change log for RTD  ----------
+

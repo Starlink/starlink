@@ -1,0 +1,61 @@
+# E.S.O. - VLT project 
+# $Id: catConfig.sh.in,v 1.7 1998/03/25 22:32:29 abrighto Exp $
+#
+# catConfig.sh --
+#
+# This shell script (for sh) is generated automatically by the catlib
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by other configure scripts
+# so that they don't have to figure this all out for themselves.
+#
+# The information in this file is specific to a single platform.
+#
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  08/04/97  Created
+#
+
+# version of the catlib library
+# version of the catlib library
+CAT_VERSION='@CAT_VERSION@'
+
+# root of cat source tree
+CAT_SRC_ROOT='@SRC_ROOT@'
+
+# list of cat subdirectory pathnames (depends on --with-notcl flag)
+CAT_SUBDIRS='@CAT_SUBDIRS@'
+
+# If this is true, build library with no Tcl access
+CAT_NO_TCL='@NO_TCL@'
+
+# CAT install dirs
+CAT_DESTDIR='@DESTDIR@'
+CAT_BINDIR='@BINDIR@'
+CAT_LIBDIR='@LIBDIR@'
+CAT_INCDIR='@INCDIR@'
+CAT_MANDIR='@MANDIR@'
+CAT_DIR='@CAT_DIR@'
+
+# default location of Cat library files
+CAT_LIBRARY='@CAT_LIBRARY@'
+
+# location of Cat library files in source tree
+CAT_BUILD_LIBRARY='@CAT_BUILD_LIBRARY@'
+
+# -I flags to pick up the cat include files from the build dirs
+CAT_BUILD_INCLUDES='@CAT_BUILD_INCLUDES@'
+
+# String to pass to linker to pick up the Cat library from its
+# build directory.
+CAT_BUILD_LIB_SPEC='@CAT_BUILD_LIB_SPEC@'
+
+# static version of above
+CAT_BUILD_LIB_SPEC_STATIC='@CAT_BUILD_LIB_SPEC_STATIC@'
+
+# String to pass to linker to pick up the Cat library from its
+# installed directory.
+CAT_LIB_SPEC='@CAT_LIB_SPEC@'
+
+# static version of above
+CAT_LIB_SPEC_STATIC='@CAT_LIB_SPEC_STATIC@'

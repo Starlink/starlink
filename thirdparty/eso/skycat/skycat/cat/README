@@ -1,0 +1,81 @@
+
+CAT, A Library for Accessing Astronomical Catalogs in C++, C and Tcl
+---------------------------------------------------------------------
+
+This directory contains the source code for a set of libraries for
+accessing astronomical catalogs locally and over the network. The core
+is written in C++. In addition, Tcl and "plain" C interfaces are
+supported.
+
+See the CHANGES file in this directory for a list of recent changes.
+
+--------------------------------------
+Contacts: Allan Brighton (abrighto@eso.org)
+          Miguel Albrecht (malbrech@eso.org)
+
+ESO - European Southern Observatory
+--------------------------------------
+
+For installation instructions, see the file INSTALL in this directory.
+
+See the CHANGES file in this directory for a list of recent changes.
+
+Note: This software has been tested on HP-UX, Solaris, and Linux
+with gcc (version 2.7.2.x).
+
+Once everything has been compiled, the astrocat application may be
+started as follows:
+
+	% cd $SRCDIR/tclcat/demos
+	% astrocat 
+
+Or, for the installed version:
+	
+	% $INSTALLDIR/bin/astrocat 
+	
+You can specify a catalog to search by specifying the name on the
+command line, or by selecting one from the Data-Servers menu when the
+application comes up.
+
+Note: if you want to run the application from a machine other than the
+one you compiled it on, you may need to set the CAT_LIBRARY
+environment variable so that the necessary Tcl source files can be
+found at run time:
+
+	% setenv CAT_LIBRARY $INSTALLDIR/lib/cat
+
+For more information, please refer to the postscript documentation,
+which can be retrieved via anon ftp from:
+
+   ftp://ftp.archive.eso.org/pub/skycat/doc 
+
+The sources for the man pages can be found in the source tree under
+the "man" directories.
+
+Contents of this Release
+------------------------
+
+./cat			- top level directory for catalog libraries
+
+  astrocat		- C++ class library for accessing catalogs
+	
+    src			- C++ sources for astrocat lib
+    include
+    test                - test cases for C++ classes
+    man			- sources for man pages
+
+  tclcat		- Tcl interface to astrocat lib
+
+    src			- C++ sources defining Tcl interface to catalog lib
+    include
+    library             - Tcl sources for Catalog widgets
+    test		- test scripts for TCL interface
+    man			- sources for man pages
+
+  ccat			- C interface to astrocat C++ library.
+
+    src			- C wrapper sources and include files
+    include
+    test		- test cases for C interface
+    man			- sources for man pages
+

@@ -1,0 +1,189 @@
+# E.S.O. - VLT project/ESO Archive
+# $Id: Makefile.in,v 1.12 1998/03/02 20:28:55 abrighto Exp $
+#
+# Makefile.in - Makefile
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  24 Nov 97  Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps src man library demos
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@ @DEFS@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+# Tk libs
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+# cat lib dir
+CAT_DIR   = @CAT_DIR@
+
+# Tclutil library
+TCLUTIL_LIB     = @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC  = @TCLUTIL_LIB_STATIC@
+
+# Astrotcl library
+ASTROTCL_LIB     = @ASTROTCL_LIB@
+ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
+
+# ------------------------------------------------------------------------
+
+# name of wish binary to generate
+demo_wish    = bin/cat_wish
+
+# include flags
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# compiler flags
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# local library base names
+ASTROCAT_LIB = astrocat
+TCLCAT_LIB  = tclastrocat
+
+# local library path names
+TCLCAT_LIBDIR  = ./lib
+ASTROCAT_LIBDIR = ../astrocat/lib
+
+# local library full names
+TCLCAT_LIBRARY  = $(TCLCAT_LIBDIR)/lib$(TCLCAT_LIB).a
+ASTROCAT_LIBRARY = $(ASTROCAT_LIBDIR)/lib$(ASTROCAT_LIB).a
+
+LOCAL_LIBRARIES = \
+	$(TCLCAT_LIBRARY) \
+	$(ASTROCAT_LIBRARY) \
+	$(ASTROTCL_LIB_STATIC) \
+	$(TCLUTIL_LIB_STATIC)
+
+# local library search paths and flags
+LIBS_CAT_SEARCH  = -L$(TCLCAT_LIBDIR) -L$(ASTROCAT_LIBDIR) 
+LIBS_CAT  = -l$(TCLCAT_LIB) -l$(ASTROCAT_LIB)
+
+# these objects are only needed to make the cat_wish binary for the demos
+OBJECTS      = tkAppInit.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# ------------------------------------------------------------------------
+# Make a sample wish binary with catlib included.
+# Note: if the --enable-shared configure option was specified, 
+# we don't link -lcat in here, but load it at run time from Tcl. 
+# Otherwise it is linked in as a static library.
+all $(demo_wish): lib $(LOCAL_LIBRARIES) $(OBJECTS)
+	@echo "linking \"$(demo_wish)\"..."
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(LIBS_CAT_SEARCH) \
+		 $(LIBS_CAT) $(ASTROTCL_LIB) $(TCLUTIL_LIB) \
+		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@echo "making all in ./demos"
+	@(cd demos; $(MAKE))
+
+$(TCLCAT_LIBRARY) lib: FORCE
+	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)); done
+
+# force recompile after configure for ifdefs
+tkAppInit.o: ../config.status
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+install-bin: 
+	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
+	chmod 0755 $(demo_wish)
+	$(INSTALL) $(demo_wish) $(BINDIR)
+	(cd $(CAT_DIR); $(RM) bin; $(LN) ../../bin .)
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+# install the tcl library files.
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-bitmaps install-man
+
+clean:
+	$(RM) $(OBJECTS) $(demo_wish) *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+FORCE:

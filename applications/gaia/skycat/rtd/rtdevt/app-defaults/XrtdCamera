@@ -1,0 +1,88 @@
+
+*Background:	    	#768ca1
+
+*Font:     	    	-Adobe-helvetica-medium-r-normal--14*
+*BoldFont:     	    	-Adobe-helvetica-bold-r-normal--14*
+*BigFont:     	    	12x24
+*BoldBigFont:      	12x24
+*SmallFont:	       	8x13
+*BoldSmallFont:     	8x13bold
+*SmallPropFont:     	-Adobe-helvetica-medium-r-normal--12*
+
+*Canvas*selectForeground:   #8098ad
+*Canvas*selectBackground:   White
+
+#*Frame*Background:	#7accb4
+
+*Label*Foreground:      White
+
+*Listbox*Background:	#8098ad
+*Listbox*Foreground:	White
+*Listbox*selectBackground:	White
+*Listbox*selectForeground:	#8098ad
+*Listbox*font:		9x15
+
+*Entry*Relief:      sunken
+*Entry*Background:	#8098ad
+*Entry*Foreground:	White
+*Entry*selectBackground:	White
+*Entry*selectForeground:	#8098ad
+*Entry*font:		8x13
+
+*Text*Foreground:	White
+*Text*Background:	#768ca1
+*Text*font:		fixed
+
+*Button*Background:	#78a0d5
+*Button*Foreground:	White
+*Button*activeForeground: White
+*Button*activeBackground: #3297c7
+*Button*padY:	    	2
+*Button*DisabledForeground: Gray90
+
+*Radiobutton*Foreground:       White
+*Radiobutton*activeForeground: White
+*Radiobutton*activeBackground: #3297c7
+*Radiobutton*Relief:	flat
+
+*Checkbutton*Foreground:       White
+*Checkbutton*activeForeground: White
+*Checkbutton*activeBackground: #3297c7
+*Checkbutton*Relief:	flat
+
+*Menubutton*Background:	#9f9bbf
+*Menubutton*Foreground:	White
+*Menubutton*Font:	-Adobe-helvetica-bold-r-normal--14*
+#*Menubutton*Width:	9
+
+*Menu*Background:	#9f9bbf
+*Menu*Foreground:	White
+*Menu*Font:	    	-Adobe-helvetica-bold-r-normal--14*
+
+*Scrollbar*foreground: 	Gray80
+*Scrollbar*activeForeground: Gray72
+*Scrollbar*relief: raised
+*Scrollbar*width:  12
+
+#*Cancel*Foreground:	yellow
+#*Apply*Foreground:	OrangeRed2
+
+*selector:			green
+
+
+*shelp*Background:	 #8098ad
+
+*menub*Background:	#6d8194
+*menub*activeForeground:	White
+*menub*activeBackground:	#9f9bbf
+
+*Message*Font: -Adobe-helvetica-medium-r-normal--*-240*
+*Message*Foreground: White
+
+#*Scale*activeForeground: aquamarine2
+*Scale*Foreground: White
+*Scale*Width: 12
+*Scale*SliderLength: 24
+
+
+*RealTimeDisplay*Background:	black

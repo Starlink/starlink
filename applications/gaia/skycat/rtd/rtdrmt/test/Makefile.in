@@ -1,0 +1,73 @@
+# E.S.O. - VLT project/ESO Archive
+# "@(#) $Id: Makefile.in,v 1.7 1997/09/17 13:40:20 abrighto Exp $"
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  07 Mar 96  Created
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+EXTRA_LIBS      = @LIBS@
+
+SRCS 		=  trtdRemote.c 
+
+OBJS 		=  trtdRemote.o
+
+PROGS 		=  trtdRemote
+
+INCLUDES	= -I../include
+
+CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+LIBRARIES       = ../lib/librtdRemote.a \
+	          $(EXTRA_LIBS)
+
+DEPEND_FLAGS    = $(CC_SWITCHES)
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: 
+
+test: $(PROGS)
+
+lib:
+	@cd ../src; $(MAKE)
+
+All:
+	cd ../..; $(MAKE); $(MAKE)
+
+install:
+
+clean: depclean
+	$(RM) $(PROGS) $(OBJS) *\~ "#"* *.o
+
+distclean: clean depclean
+	rm -f Makefile	
+
+trtdRemote: lib trtdRemote.o 
+	$(CC) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES)
+	@echo "start $@ by hand (rtd should be running first)"	
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+
+
+

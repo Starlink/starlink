@@ -1,0 +1,17 @@
+/*
+ * config.h.in - global configuration values, set by configure
+ */
+
+
+/* define this if the SHM (shared memory) prototypes are missing 
+ * from <sys/shm.h>, (as on SunOs-4.1.3) 
+ */
+#undef NEED_SHM_PROTO
+
+
+/* for use with tkwin under Windows */
+#ifdef	TCL_MSDOS_PORT
+#define _EXPORT _export
+#else
+#define _EXPORT 
+#endif

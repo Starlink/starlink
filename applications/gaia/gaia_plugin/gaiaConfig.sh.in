@@ -1,0 +1,56 @@
+# E.S.O. - VLT project 
+# $Id: gaiaConfig.sh.in,v 1.2 1998/07/28 21:23:09 abrighto Exp $
+#
+# gaiaConfig.sh --
+#
+# This shell script (for sh) is generated automatically by the gaia
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by other configure scripts
+# so that they don't have to figure this all out for themselves.
+#
+# The information in this file is specific to a single platform.
+#
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  28/11/97  Created
+#
+
+# GAIA install dirs
+GAIA_DESTDIR='@DESTDIR@'
+GAIA_BINDIR='@BINDIR@'
+GAIA_LIBDIR='@LIBDIR@'
+GAIA_INCDIR='@INCDIR@'
+GAIA_MANDIR='@MANDIR@'
+GAIA_DIR='@GAIA_DIR@'
+
+# root of cat source tree
+GAIA_SRC_ROOT='@SRC_ROOT@'
+
+# default logaiaion of Gaia library files
+GAIA_LIBRARY='@GAIA_LIBRARY@'
+
+# logaiaion of Gaia library files in source tree
+GAIA_BUILD_LIBRARY='@GAIA_BUILD_LIBRARY@'
+
+# -I flags to pick up the gaia include files from the build dirs
+GAIA_BUILD_INCLUDES='@GAIA_BUILD_INCLUDES@'
+
+# version of the gaialib library
+# version of the gaialib library
+GAIA_VERSION='@GAIA_VERSION@'
+
+
+# String to pass to linker to pick up the Gaia library from its
+# build directory.
+GAIA_BUILD_LIB_SPEC='@GAIA_BUILD_LIB_SPEC@'
+
+# static version of above
+GAIA_BUILD_LIB_SPEC_STATIC='@GAIA_BUILD_LIB_SPEC_STATIC@'
+
+# String to pass to linker to pick up the Gaia library from its
+# installed directory.
+GAIA_LIB_SPEC='@GAIA_LIB_SPEC@'
+
+# static version of above
+GAIA_LIB_SPEC_STATIC='@GAIA_LIB_SPEC_STATIC@'

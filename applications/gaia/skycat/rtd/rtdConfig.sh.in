@@ -1,0 +1,148 @@
+# E.S.O. - VLT project 
+# $Id: rtdConfig.sh.in,v 1.9 1998/03/25 22:33:05 abrighto Exp $
+#
+# rtdConfig.sh --
+#
+# This shell script (for sh) is generated automatically by Rtd's
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by other configure scripts
+# so that they don't have to figure this all out for themselves.
+#
+# The information in this file is specific to a single platform.
+#
+# who             when      what
+# --------------  --------  ---------------------------------------------
+# Allan Brighton  08/04/97  Created
+#
+
+# version of the Rtd library
+RTD_VERSION='@RTD_VERSION@'
+
+# C Compiler used for RTD
+RTD_CC='@CC@'
+
+# C++ Compiler used for RTD
+RTD_CXX='@CXX@'
+
+# -I option for make depend with C++ sources
+RTD_CXX_INCLUDE='@CXX_INCLUDE@'
+
+# OS version
+RTD_OSVERSION='@OSVERSION@'
+
+# target to use for make depend
+RTD_DEPEND_TARGET='@DEPEND_TARGET@'
+
+# Flags to pass to cc when compiling the components of a shared library:
+RTD_SHLIB_CFLAGS='@SHLIB_CFLAGS@'
+
+# Base command to use for combining object files into a shared library:
+RTD_SHLIB_LD='@SHLIB_LD@'
+
+# Suffix to use for the name of a shared library.
+RTD_SHLIB_SUFFIX='@SHLIB_SUFFIX@'
+
+# Either '$LIBS' (if dependent libraries should be included when linking
+# shared libraries) or an empty string.  See Tcl's configure.in for more
+# explanation.
+RTD_SHLIB_LD_LIBS='@SHLIB_LD_LIBS@'
+
+# Library file(s) to include in tclsh and other base applications
+# in order to provide facilities needed by DLOBJ above.
+RTD_DL_LIBS='@DL_LIBS@'
+
+# Flags to pass to the compiler when linking object files into
+# an executable tclsh or tcltest binary.
+RTD_LD_FLAGS='@LD_FLAGS@'
+
+# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
+# run-time dynamic linker where to look for shared libraries such as
+# libtcl.so.  Used when linking applications.  Only works if there
+# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
+RTD_LD_SEARCH_FLAGS='@LD_SEARCH_FLAGS@'
+
+# root of rtd source tree
+RTD_SRC_ROOT='@SRC_ROOT@'
+
+# list of rtd subdirectory pathnames (depends on --with-notcl flag)
+RTD_SUBDIRS='@RTD_SUBDIRS@'
+
+# If this is true, build library with no Tcl access
+RTD_NO_TCL='@NO_TCL@'
+
+# -I flag for X include files
+RTD_XINCSW='@XINCSW@'
+
+# -L and -l flags for X libs
+RTD_XLIBSW='@XLIBSW@'
+
+# flags for linking tcl and ext libs
+RTD_TCL_LIB_SPEC='@TCL_LIB_SPEC@'
+RTD_TK_LIB_SPEC='@TK_LIB_SPEC@'
+RTD_TCLX_LIB_SPEC='@TCLX_LIB_SPEC@'
+RTD_ITCL_LIB_SPEC='@ITCL_LIB_SPEC@'
+RTD_ITK_LIB_SPEC='@ITK_LIB_SPEC@'
+RTD_BLT_LIB_SPEC='@BLT_LIB_SPEC@'
+
+# include flags
+RTD_TCLINCSW='@TCLINCSW@'
+RTD_TKINCSW='@TKINCSW@'
+
+# tcl library files
+RTD_TCL_LIBRARY='@TCL_LIBRARY@'
+RTD_TK_LIBRARY='@TK_LIBRARY@'
+RTD_BLT_LIBRARY='@BLT_LIBRARY@'
+
+# other package versions used by RTD
+RTD_TCL_VERSION='@TCL_VERSION@'
+RTD_TK_VERSION='@TK_VERSION@'
+RTD_ITCL_VERSION='@ITCL_VERSION@'
+RTD_ITK_VERSION='@ITK_VERSION@'
+RTD_TCLX_VERSION='@TCLX_VERSION@'
+RTD_BLT_VERSION='@BLT_VERSION@'
+
+# system libs to link
+RTD_LIBS='@LIBS@'
+
+# RTD install dirs
+RTD_DESTDIR='@DESTDIR@'
+RTD_BINDIR='@BINDIR@'
+RTD_LIBDIR='@LIBDIR@'
+RTD_INCDIR='@INCDIR@'
+RTD_MANDIR='@MANDIR@'
+RTD_DIR='@RTD_DIR@'
+
+# default location of Rtd library files
+RTD_LIBRARY='@RTD_LIBRARY@'
+
+# location of Rtd library files in source tree
+RTD_BUILD_LIBRARY='@RTD_BUILD_LIBRARY@'
+
+# -I flags to pick up the rtd include files from the build dirs
+RTD_BUILD_INCLUDES='@RTD_BUILD_INCLUDES@'
+
+# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
+# run-time dynamic linker where to look for shared libraries such as
+# libtcl.so.  Used when linking applications.  Only works if there
+# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
+RTD_LIB_RUNTIME_DIR='@LIB_RUNTIME_DIR@'
+
+# The environment variable TCLTK_ROOT may be set before running configure
+# to help locate the correct Tcl/Tk installation
+RTD_TCLTK_ROOT='@TCLTK_ROOT@'
+
+
+# String to pass to linker to pick up the Rtd library from its
+# build directory.
+RTD_BUILD_LIB_SPEC='@RTD_BUILD_LIB_SPEC@'
+
+# static version of above
+RTD_BUILD_LIB_SPEC_STATIC='@RTD_BUILD_LIB_SPEC_STATIC@'
+
+# String to pass to linker to pick up the Rtd library from its
+# installed directory.
+RTD_LIB_SPEC='@RTD_LIB_SPEC@'
+
+# static version of above
+RTD_LIB_SPEC_STATIC='@RTD_LIB_SPEC_STATIC@'

@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: gaia_env.sh.in,v 1.1 1998/04/07 00:05:27 abrighto Exp $" 
+#
+# This script is sourced by the gaia startup file, gaia.sh, 
+# if present, to set up the environment for running the gaia demo
+# from the local source dir. This arranges to have the Tcl/Tk scripts
+# and shared libraries searched for in the local source tree rather 
+# than in the install dir, which is the default otherwise.
+#
+#  who      when      what
+# -------- ---------  ------------------
+# abrighto 28 Nov 97  created 
+
+# use the local development Tcl/Tk files and shared library
+TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@
+export TCLUTIL_LIBRARY
+
+ASTROTCL_LIBRARY=@ASTROTCL_BUILD_LIBRARY@
+export ASTROTCL_LIBRARY
+
+RTD_LIBRARY=@RTD_BUILD_LIBRARY@
+export RTD_LIBRARY
+
+CAT_LIBRARY=@CAT_BUILD_LIBRARY@
+export CAT_LIBRARY
+
+SKYCAT_LIBRARY=@SKYCAT_BUILD_LIBRARY@
+export SKYCAT_LIBRARY
+
+GAIA_LIBRARY=@GAIA_BUILD_LIBRARY@
+export GAIA_LIBRARY

@@ -1,0 +1,141 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.5 1998/10/28 17:47:31 abrighto Exp $"
+#
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+
+# C compiler
+CC           	= @CC@
+
+# C++ compiler
+CXX           	= @CXX@
+
+# Compiler flags
+CFLAGS  	= @CXXDEBUGFLAGS@
+
+# install dirs
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+TCLUTIL_DIR     = @TCLUTIL_DIR@
+TIX_DIR         = $(TCLUTIL_DIR)/../tix
+
+# for make depend
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+
+# Directories containing Tcl and Tk include files and libraries
+TCL_INCLUDE   	= @TCLINCSW@
+TK_INCLUDE    	= @TKINCSW@
+X_INCLUDE     	= @XINCSW@
+
+# TCL version (used to access local copies of Tcl include files that are not 
+# installed in $prefix/include)
+TCL_VERSION     = @TCL_VERSION@
+ITCL_MAJOR_VERSION = @ITCL_MAJOR_VERSION@
+
+# ------------------------------------------------------------------------
+
+# source files
+SRCS =  tixClass.c tixCmds.c tixCompat.c tixDItem.c tixDiITxt.c \
+	tixDiImg.c tixDiStyle.c tixDiText.c tixDiWin.c tixError.c tixForm.c \
+	tixFormMisc.c tixGeometry.c tixGrData.c tixGrFmt.c tixGrRC.c \
+	tixGrSel.c tixGrSort.c tixGrUtl.c tixGrid.c tixHLCol.c tixHLHdr.c \
+	tixHLInd.c tixHList.c tixImgCmp.c tixImgXpm.c tixInit.c tixInputO.c \
+	tixItcl.c tixList.c tixMethod.c tixMwm.c tixNBFrame.c tixOption.c \
+	tixScroll.c tixSmpLs.c tixTList.c tixUtils.c tixWidget.c \
+	tixUnixDraw.c tixUnixWm.c tixUnixXpm.c 
+
+# object files
+OBJS =  tixUnixSam.o tixClass.o tixCmds.o tixCompat.o tixDItem.o tixDiITxt.o \
+	tixDiImg.o tixDiStyle.o tixDiText.o tixDiWin.o tixError.o tixForm.o \
+	tixFormMisc.o tixGeometry.o tixGrData.o tixGrFmt.o tixGrRC.o \
+	tixGrSel.o tixGrSort.o tixGrUtl.o tixGrid.o tixHLCol.o tixHLHdr.o \
+	tixHLInd.o tixHList.o tixImgCmp.o tixImgXpm.o tixInit.o tixInputO.o \
+	tixItcl.o tixList.o tixMethod.o tixMwm.o tixNBFrame.o tixOption.o \
+	tixScroll.o tixSmpLs.o tixTList.o tixUtils.o tixWidget.o \
+	tixUnixDraw.o tixUnixWm.o tixUnixXpm.o
+
+# name of local archive file
+libname  	= ../lib/libtix.a
+
+# include flags
+INCLUDES	= -I. \
+		  -I../unix \
+		  -I../tcl$(TCL_VERSION)/unix \
+		  -I../tcl$(TCL_VERSION)/generic \
+		  $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# define package versions
+DEFINES       	= -DTIX_VERSION=\"4.1\" \
+		  -DTIX_LIBRARY=\"$(TIX_DIR)\" \
+		  -DITCL_$(ITCL_MAJOR_VERSION)=1 \
+		  @TCLUTIL_DEFS@
+
+CC_SWITCHES	= $(SHLIB_CFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+# --------------------------------------------------------------------------------------
+all: dirs $(libname) 
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+All: 
+	cd ../..; $(MAKE)
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+# create an object file containing the Tix Tcl library sources
+tixUnixSam.c: tixSamLib.c
+
+tixSamLib.c:
+	itclsh2.2 ../tools/tclc.tcl \
+	  ../library/pref/*.fsc \
+	  ../library/pref/*.csc \
+	  ../library/*.tcl > tixSamLib.c
+	$(CC) -c $(CC_SWITCHES) tixUnixSam.c
+	$(AR) $(libname) tixUnixSam.o
+	$(RANLIB) $(libname)
+
+install: 
+
+dirs:
+	@test -d ../lib || mkdir ../lib
+	@test -d ../bin || mkdir ../bin
+
+clean:
+	$(RM) $(OBJS) $(libname) tixSamLib.c *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+tags:
+	etags ../../*/*/*.[Cch]
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+

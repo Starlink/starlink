@@ -1,0 +1,210 @@
+# Borland C++ 4.5 makefile for Embedded Tk
+#
+
+# Set the following variable to the directory containing your
+# Borland C compiler
+
+BORLAND = c:\bc45
+
+# Set this to the source code directorie for Tcl7.5 and Tk4.1.  You
+# must have a complete source tree for both Tcl7.5 and Tk4.1 in order
+# to use ET.
+
+TCL75   = c:\et\tcl7.5
+TK41    = c:\et\tk4.1
+
+# The directories hold the Tcl/Tk startup scripts
+
+TCLSCRIPTS = c:\lib\tcl7.5
+TKSCRIPTS = c:\lib\tk4.1
+
+# Name of the directory where the makefile will put intermediate
+# files.
+
+TMP     = .
+
+# That should be all you have to change.
+#
+######################################################################
+
+
+IMPLIB  = Implib
+IMPLIB  = $(BORLAND)\bin\Implib
+BCC32   = $(BORLAND)\bin\Bcc32
+TLINK32 = $(BORLAND)\bin\tlink32
+RC	= $(BORLAND)\bin\brcc32
+CP      = copy
+RM      = del
+
+INCLUDES  = $(BORLAND)\include;$(TK41)\generic;$(TK41)\bitmaps;$(TK41)\xlib;$(TK41);$(TCL75)\generic
+LIBDIRS   = $(BORLAND)\lib;$(TK41)\win
+TCLLIBDIR = $(TCL75)\win
+
+
+!ifndef DEBUG
+
+# these macros cause maximum optimization and no symbols
+DEBUGLDFLAGS = 
+DEBUGCCFLAGS = -v- -vi- -O2 -w-
+
+!else
+
+# these macros enable debugging
+DEBUGLDFLAGS = -v
+DEBUGCCFLAGS = -k -Od -v
+
+!endif
+
+DEFINES        = _RTLDLL;$(DEBUGDEFINES)
+PROJECTCCFLAGS = $(DEBUGCCFLAGS) -w-par -w-stu
+
+LNFLAGS_exe = -Tpe -aa -c $(DEBUGLDFLAGS) $(BORLAND)\lib\c0w32
+LNFLAGS_dll = -Tpd -aa -c $(DEBUGLDFLAGS) $(BORLAND)\lib\c0d32
+
+LNLIBS_exe =    $(TK41)\win\tk41.lib $(TCL75)\win\tcl75.lib import32 cw32i
+#LNLIBS_dll =    $(TCLLIBDIR)\$(TCLLIB) import32 cw32i
+
+# 
+# Global makefile settings
+#
+
+.suffixes: .c .obj .exe
+
+
+#
+# Targets
+#
+
+all: cfgwc et2c cfgexe hello tkedit www httpd
+
+
+# Implicit Targets
+
+.et.c:
+        .\et2c -I$(TCLSCRIPTS) -I$(TKSCRIPTS) $< >$@
+
+.c.obj:
+        .\et2c -I$(TCLSCRIPTS) -I$(TKSCRIPTS) $< >temp.c
+        $(BCC32) -c -o$@ temp.c
+#        $(BCC32) {$< }
+
+.dll.lib:
+	$(IMPLIB) -c $@ $<
+
+.rc.res:
+	$(RC) -i$(INCLUDES) $<
+
+
+#
+# Configuration file targets - these files are implicitly used by the compiler
+#
+
+cfgexe:
+	@$(CP) &&|
+                -n$(TMP) -I$(INCLUDES) -c -W
+		-D$(DEFINES) -3 -d $(PROJECTCCFLAGS)
+| bcc32.cfg >NUL
+
+
+cfgwc:
+	@$(CP) &&|
+                -n$(TMP) -I$(INCLUDES) -c -WC
+		-D$(DEFINES) -3 -d $(PROJECTCCFLAGS)
+| bcc32.cfg >NUL
+
+#
+# Executable targets
+#
+
+et2c:   et2c.c
+        $(BCC32) -WC -w- et2c.c
+
+
+
+hello:  et41win.obj hello.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj hello.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+
+tkedit:  et41win.obj tkedit.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj tkedit.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+showevent:  et41win.obj showevent.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj showevent.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+whenstil:  et41win.obj whenstil.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj whenstil.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+whenstil.obj:   whenstil.c
+        et2c -I$(TKSCRIPTS) -I$(TCLSCRIPTS) whenstil.c >x.c
+        $(BCC32) -DTEST=1 -c x.c
+        mv x.obj whenstil.obj
+
+www:  et41win.obj www.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj www.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+www.obj:   www.c
+        et2c -I$(TKSCRIPTS) -I$(TCLSCRIPTS) www.c >x.c
+        $(BCC32) -DTEST=1 -c x.c
+        mv x.obj www.obj
+
+httpd:  et41win.obj httpd.obj
+	$(TLINK32) @&&|
+$(LNFLAGS_exe) et41win.obj httpd.obj
+$@
+-x
+$(LNLIBS_exe)
+|, &&|
+EXETYPE WINDOWS
+CODE PRELOAD MOVEABLE DISCARDABLE
+DATA PRELOAD MOVEABLE MULTIPLE
+|, $(TK41)\win\rc\wish.res
+
+httpd.obj:   httpd.c
+        et2c -I$(TKSCRIPTS) -I$(TCLSCRIPT) httpd.c >x.c
+        $(BCC32) -DTEST=1 -c x.c
+        mv x.obj httpd.obj

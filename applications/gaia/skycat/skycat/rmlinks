@@ -1,0 +1,19 @@
+#!/bin/sh
+# E.S.O. - VLT project 
+# "@(#) $Id: rmlinks,v 1.1 1997/11/28 01:36:08 abrighto Exp $"
+#
+# script to remove links before checking in with cmm
+#
+# usage: cd SKYCATDIR; sh rmlinks
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  22 Nov 97  Created
+
+if [ ! -d ./interp/library ]
+then
+	echo "$0: you should be one level above the skycat/interp directory"
+	exit 1
+fi
+
+find . -type l -print -exec rm -f {} \; | tee .linklog

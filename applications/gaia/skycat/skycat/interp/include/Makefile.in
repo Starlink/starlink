@@ -1,0 +1,19 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Makefile.in,v 1.4 1998/04/02 21:16:54 abrighto Exp $" 
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		=  Skycat.h SkySearch.h TcsSkySearch.h
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include ../../include.mk
+

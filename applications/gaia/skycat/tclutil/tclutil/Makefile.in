@@ -1,0 +1,167 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.2 1997/12/03 22:27:44 abrighto Exp $"
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps src man library demos test
+
+# root of source tree
+SRC_ROOT     = @SRC_ROOT@
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@ @DEFS@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+TCLUTIL_DIR   = @TCLUTIL_DIR@
+
+# info needed for shared libraries 
+# (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+TCLTKLIBS = @ITK_LIB_SPEC@ @TK_LIB_SPEC@ @BLT_LIB_SPEC@ \
+	    @TCLX_LIB_SPEC@ @ITCL_LIB_SPEC@ @TCL_LIB_SPEC@
+
+# name of wish binary to generate
+demo_wish    = bin/tclutil_wish
+
+# include flags
+INCLUDES     = -I. -Isrc $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# compiler flags
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# local library base names
+TCLUTIL_LIB  = tclutil
+UTIL_LIB  = util
+
+# local library path names
+TCLUTIL_LIBDIR  = ./lib
+UTIL_LIBDIR  = ../util/lib
+
+# local library full names
+TCLUTIL_LIBRARY  = $(TCLUTIL_LIBDIR)/lib$(TCLUTIL_LIB).a
+UTIL_LIBRARY  = $(UTIL_LIBDIR)/lib$(UTIL_LIB).a
+LOCAL_LIBRARIES = $(TCLUTIL_LIBRARY) $(UTIL_LIBRARY) 
+
+# local library search paths and flags
+LIBS_TCLUTIL_SEARCH  = -L$(TCLUTIL_LIBDIR) -L$(UTIL_LIBDIR)
+LIBS_TCLUTIL         = -l$(TCLUTIL_LIB) -l$(UTIL_LIB)
+
+# object files for wish binary
+OBJECTS      = tkAppInit.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# ------------------------------------------------------------------------
+
+# Make the libs and a sample wish binary.
+all $(demo_wish): lib  $(LOCAL_LIBRARIES) $(OBJECTS)
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) \
+		 $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(LIBS_TCLUTIL_SEARCH) $(LIBS_TCLUTIL) \
+		 $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@(cd demos; $(MAKE))
+
+# force recompile after configure for ifdefs
+tkAppInit.o: ../config.status
+
+$(TCLUTIL_LIBRARY) lib: FORCE
+	@set -x; for i in bitmaps src demos; do (cd $$i; $(MAKE)); done
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+install-bin:
+	test -d $(BINDIR) || mkdir $(BINDIR)
+	chmod 0755 $(demo_wish)
+	$(INSTALL) $(demo_wish) $(BINDIR)
+	$(RM) $(TCLUTIL_DIR)/bin
+	$(LN) $(BINDIR) $(TCLUTIL_DIR)/bin
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-lib:
+	@(cd src; $(MAKE) install)
+	@(cd include; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-lib install-bitmaps install-man
+
+clean:
+	$(RM) $(OBJECTS) $(demo_wish) *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+FORCE:
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+

@@ -1,0 +1,8 @@
+open failed for: ./XYZZY: No such file or directory
+mapping of file failed
+Test 1
+Attempt to map non-existent file. --->PASSED
+Test 2
+See if two shared Mems see each other's changes. --->PASSED
+Test 3
+See if two private Mems see each other's changes. --->FAILED (Change check).

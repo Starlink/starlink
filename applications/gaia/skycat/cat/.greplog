@@ -1,0 +1,79 @@
+./ccat/src/worldCoords.C:68:WC* wcInitFromHMS(WC* wc, 
+./ccat/include/worldCoords.h:27:} WC_HMS;
+./ccat/include/worldCoords.h:32:    WC_HMS ra, dec;
+./ccat/include/worldCoords.h:46:WC* wcInitFromHMS(WC*, int rh, int rm, double rs, int dd, int dm, double ds, double equinox);
+./ccat/test/tastroCatalog.c:25:    WC wc1, wc2;		/* world coords in HMS */
+./ccat/test/tastroCatalog.c:52:    wcInitFromHMS(
+./ccat/test/tastroCatalog.c:60:    wcInitFromHMS(
+./ccat/test/tastroImage.c:43:    wcInitFromHMS(&wc, 3, 19, 48, 41, 30, 39, 2000.0);
+./tclcat/src/TclWorldCoords.C:36:    {"dtohms",         &TclWorldCoords::dtohmsCmd,          2,  2},
+./tclcat/src/TclWorldCoords.C:37:    {"hmstod",         &TclWorldCoords::hmstodCmd,          2,  2}
+./tclcat/src/TclWorldCoords.C:129:int TclWorldCoords::dtohmsCmd(int argc, char* argv[])
+./tclcat/src/TclWorldCoords.C:145:int TclWorldCoords::hmstodCmd(int argc, char* argv[])
+./tclcat/include/TclWorldCoords.h:45:    int dtohmsCmd(int argc, char* argv[]);
+./tclcat/include/TclWorldCoords.h:46:    int hmstodCmd(int argc, char* argv[]);
+./astrocat/src/HMS.C:5: * HMS.C - method definitions for class HMS
+./astrocat/src/HMS.C:18:#include "HMS.h"
+./astrocat/src/HMS.C:24:HMS::HMS(int hours, int min, double sec)
+./astrocat/src/HMS.C:42:HMS::HMS(double val)
+./astrocat/src/HMS.C:65:HMS::HMS(const char* s)
+./astrocat/src/HMS.C:73:	*this = HMS(hours, min, sec);
+./astrocat/src/HMS.C:77:	    *this = HMS(val);
+./astrocat/src/HMS.C:79:	    *this = HMS(hours, 0, 0);
+./astrocat/src/HMS.C:82:	val_ = HMS_NULL;	// error
+./astrocat/src/HMS.C:90:void HMS::print(char* buf) const
+./astrocat/src/HMS.C:104:ostream& operator<<(ostream& os, const HMS& hms) 
+./astrocat/src/HMS.C:107:    hms.print(buf);
+./astrocat/src/HMS.C:114: * read an HMS object from the given stream in the format
+./astrocat/src/HMS.C:117:istream& operator>>(istream& is, HMS& hms) 
+./astrocat/src/HMS.C:123:    hms = HMS(hours, min, sec);
+./astrocat/src/WorldCoords.C:42:	ra_ = HMS(q1[0]/15);	// degrees to hours
+./astrocat/src/WorldCoords.C:43:	dec_ = HMS(q1[1]);
+./astrocat/src/WorldCoords.C:55:WorldCoords::WorldCoords(const HMS& ra, const HMS& dec, double equinox)
+./astrocat/include/WorldCoords.h:20:#include "HMS.h"
+./astrocat/include/WorldCoords.h:22:const double WCS_NULL = HMS_NULL;	// null value for double coordinate value
+./astrocat/include/WorldCoords.h:30:    HMS ra_, dec_;		// right-angle, declination
+./astrocat/include/WorldCoords.h:40:    WorldCoords(const HMS& ra, const HMS& dec, double equinox = 2000.0);
+./astrocat/include/WorldCoords.h:81:    const HMS& ra() const {return ra_;}
+./astrocat/include/WorldCoords.h:82:    const HMS& dec() const {return dec_;}
+./astrocat/include/HMS.h:2:#ifndef _HMS_h_
+./astrocat/include/HMS.h:3:#define _HMS_h_
+./astrocat/include/HMS.h:9: * HMS.h - class representing a value of the form "hours:min:sec"
+./astrocat/include/HMS.h:21:const double HMS_NULL = HUGE_VAL;	// null value for a double
+./astrocat/include/HMS.h:25: * Class HMS
+./astrocat/include/HMS.h:27:class HMS {
+./astrocat/include/HMS.h:39:    HMS() : hours_(0), min_(0), sec_(0.0), val_(HMS_NULL), show_sign_(0) {}
+./astrocat/include/HMS.h:40:    HMS(int hours, int min, double sec);
+./astrocat/include/HMS.h:41:    HMS(double val);
+./astrocat/include/HMS.h:42:    HMS(const char* s);
+./astrocat/include/HMS.h:45:    int isNull() const {return val_ == HMS_NULL;}
+./astrocat/include/HMS.h:48:    void setNull() {val_ = HMS_NULL;}
+./astrocat/include/HMS.h:63:    friend ostream& operator<<(ostream&, const HMS&);
+./astrocat/include/HMS.h:64:    friend istream& operator>>(istream&, HMS&);
+./astrocat/include/HMS.h:69:    friend int operator<(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:72:    friend int operator<=(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:75:    friend int operator>(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:78:    friend int operator>=(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:81:    friend int operator==(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:84:    friend int operator!=(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:88:    // return the difference between 2 HMS values
+./astrocat/include/HMS.h:89:    friend double operator-(const HMS& a, const HMS& b) {
+./astrocat/include/HMS.h:96:#endif /* _HMS_h_ */
+./astrocat/test/tHMS.C:5: * tHMS.C - test cases for class HMS
+./astrocat/test/tHMS.C:16:#include "HMS.h"
+./astrocat/test/tHMS.C:23:    HMS h(3, 19, 48.23);
+./astrocat/test/tHMS.C:24:    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+./astrocat/test/tHMS.C:26:    if (h != HMS(h.val()))
+./astrocat/test/tHMS.C:27:	cout << "Equality test failed: " << h << " != " << HMS(h.val()) << endl;
+./astrocat/test/tHMS.C:29:    h = HMS(41, 30, 42.2);
+./astrocat/test/tHMS.C:30:    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+./astrocat/test/tHMS.C:32:    h = HMS(-41, 30, 42.2);
+./astrocat/test/tHMS.C:33:    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+./astrocat/test/tHMS.C:35:    h = HMS(-0, 15, 33.3333);
+./astrocat/test/tHMS.C:36:    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+./astrocat/test/tHMS.C:38:    h = HMS(-0.0001);
+./astrocat/test/tHMS.C:39:    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+./astrocat/test/tWorldCoords.C:25:    WorldCoords c3(HMS(3, 19, 48.2304), HMS(41, 30, 42.228));
+./astrocat/test/tWorldCoords.C:26:    WorldCoords c4(HMS(c1.ra()), HMS(c1.dec()));
+./astrocat/test/tWorldCoords.C:44:    c3 = WorldCoords(HMS(3, 19, 48.2304), HMS(-41, 30, 42.228));
+./astrocat/test/tWorldCoords.C:45:    c4 = WorldCoords(HMS(c1.ra()), HMS(c1.dec()));

@@ -1,0 +1,309 @@
+# E.S.O. - VLT project 
+# $Id: configure.in,v 1.6 1998/10/28 17:38:32 abrighto Exp $
+#
+# This file is used with GNU autoconf to generate a configure script for
+# the Skycat modules.
+#
+# usage: % autoconf
+#        % configure
+#        % make
+# who             when       what
+# --------------  --------   ---------------------------------------------
+# Allan Brighton  13 Feb 98  Created (replaced buggy original version with 
+#                            a modified copy of the skycat configure script)
+#
+# -----------------------------------------------------------------------
+
+AC_INIT(et2c.c)
+
+# -----------------------------------------------------------------------
+#
+# Set prefix variable if one wasn't provided
+#
+# -----------------------------------------------------------------------
+if test "$prefix" = "NONE" ; then
+    #prefix=`(cd ..; pwd)`/install
+    prefix=/usr/local
+fi
+echo "using prefix = $prefix"
+AC_SUBST(prefix)
+
+# -----------------------------------------------------------------------
+#
+# Set PWD variable (/bin/sh may inherit the wrong value...)
+#
+# -----------------------------------------------------------------------
+PWD=`pwd`
+
+SRC_ROOT=$PWD
+AC_SUBST(SRC_ROOT)
+
+# -----------------------------------------------------------------------
+#
+# C compiler and debugging flags
+#
+# -----------------------------------------------------------------------
+AC_PROG_INSTALL
+AC_PROG_RANLIB
+AC_PROG_CPP
+AC_PROG_CXX
+    
+AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
+AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
+
+# -----------------------------------------------------------------------
+#
+# Read the package config files to find out where the X and Tcl/Tk 
+# and other files and libraries are and how to make shared libraries.
+#
+# -----------------------------------------------------------------------
+
+# sh procedure to find a config file: arg: 
+# $1 = name in lower case ("rtd")
+
+getConfig() {
+  name=${1}Config.sh
+  echo "checking for ${name}"
+  TCL_CONFIG_DIR=""
+  places="\
+   ../tclutil \
+   $prefix/lib/itcl \
+   $prefix/lib \
+   /vlt/dflow/lib/itcl \
+   /vlt/dflow/lib \
+   $TCL_LIBRARY/.. \
+   $PWD/../tcl \
+   /usr/local/lib/itcl \
+   /usr/local/lib"
+  for dir in $places; do
+    if test -r $dir/${name} ; then
+      TCL_CONFIG_DIR=$dir
+      break
+    fi
+  done
+  while test -z "$TCL_CONFIG_DIR" ; do
+    echo "What directory contains ${name} ?"
+    read TCL_CONFIG_DIR
+    if test ! -r $TCL_CONFIG_DIR/${name} ; then
+      echo "can't read $TCL_CONFIG_DIR/${name}"
+      TCL_CONFIG_DIR=""
+    fi
+  done
+    
+  # source the Tcl config file
+  . $TCL_CONFIG_DIR/${name}
+}
+
+# source the config files
+getConfig tclutil
+
+# get -D defines
+DEFS=$TCLUTIL_DEFS
+AC_SUBST(DEFS)
+
+# for now, just use the compiler settings used to build rtd
+CC=$TCLUTIL_CC
+CXX=$TCLUTIL_CXX
+AC_SUBST(CC)
+AC_SUBST(CXX)
+
+# pass these valaues on from the Tclutil package
+LD_VARNAME=$TCLUTIL_LD_VARNAME
+AC_SUBST(LD_VARNAME)
+
+LIB_RUNTIME_DIR=$TCLUTIL_LIB_RUNTIME_DIR
+AC_SUBST(LIB_RUNTIME_DIR)
+
+TCLTK_ROOT=$TCLUTIL_TCLTK_ROOT
+AC_SUBST(TCLTK_ROOT)
+
+# versions
+TCL_VERSION=$TCLUTIL_TCL_VERSION
+TK_VERSION=$TCLUTIL_TK_VERSION
+ITCL_VERSION=$TCLUTIL_ITCL_VERSION
+ITK_VERSION=$TCLUTIL_ITK_VERSION
+
+AC_SUBST(TCL_VERSION)
+AC_SUBST(TK_VERSION)
+AC_SUBST(ITCL_VERSION)
+AC_SUBST(ITK_VERSION)
+
+# -----------------------------------------------------------------------
+#
+# "makedepend" info
+#
+# normally, "makedepend" wants to know all of the path names and will
+# cause make errors if the include path to the C++ includes is not given.
+# Here we try to extract that information from the C++ preprocessor output.
+# The syntax of the output is different for different compilers...
+#
+# -----------------------------------------------------------------------
+CXX_INCLUDE=$TCLUTIL_CXX_INCLUDE
+AC_SUBST(CXX_INCLUDE)
+AC_SUBST(CXX_DEPEND_FLAGS)
+
+# -----------------------------------------------------------------------
+#
+# if we are using gcc, we can get better make dependencies using gcc -MM 
+# otherwise we have to use  "makedepend", which sometimes gets confused. 
+# This sets the make target to use:
+#
+# -----------------------------------------------------------------------
+DEPEND_TARGET=$TCLUTIL_DEPEND_TARGET
+AC_SUBST(DEPEND_TARGET)
+
+# -----------------------------------------------------------------------
+#
+# use CDEBUGFLAGS for C and CXXDEBUGFLAGS for C++ compiler options
+#
+# -----------------------------------------------------------------------
+if test "$CC" = "gcc" ; then
+	CDEBUGFLAGS="-g -O"
+fi
+if test "$CXX" = "g++" ; then
+	CXXDEBUGFLAGS="-g -O"
+fi
+AC_ARG_WITH(debug, [--with-debug       use debugging flag], 
+	CDEBUGFLAGS="-g"; CXXDEBUGFLAGS="-g", 
+	CDEBUGFLAGS="-O"; CXXDEBUGFLAGS="-O")
+
+AC_SUBST(CDEBUGFLAGS)
+AC_SUBST(CXXDEBUGFLAGS)
+
+# -----------------------------------------------------------------------
+#
+# Linker options
+#
+# -----------------------------------------------------------------------
+
+# Flags to pass to the compiler when linking object files into
+# an executable tclsh or tcltest binary.
+LD_FLAGS=$TCLUTIL_LD_FLAGS
+
+# Flags to pass to cc, such as "-Wl,-R,/usr/local/tcl/lib", that tell the
+# run-time dynamic linker where to look for shared libraries such as
+# libtcl.so.  Used when linking applications.  Only works if there
+# is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
+LD_SEARCH_FLAGS=$TCLUTIL_LD_SEARCH_FLAGS
+
+AC_SUBST(LD_FLAGS)
+AC_SUBST(LD_SEARCH_FLAGS)
+
+
+# -----------------------------------------------------------------------
+# Check the location of X libraries and includes.
+# -----------------------------------------------------------------------
+
+# -I switch(es) to use to make all of the X11 include files accessible:
+XINCSW=$TCLUTIL_XINCSW
+
+# Linker switch(es) to use to link with the X11 library archive.
+XLIBSW=$TCLUTIL_XLIBSW
+
+# Linker switch(es) to use to link with the static X11 library archive.
+XLIBSW=$TCLUTIL_XLIBSW
+
+AC_SUBST(XINCSW)
+AC_SUBST(XLIBSW)
+
+# -----------------------------------------------------------------------
+#
+# Tcl/Tk information
+#
+# -----------------------------------------------------------------------
+
+# get the -L and -l library flags
+
+TCL_LIB_SPEC=$TCLUTIL_TCL_LIB_SPEC
+TK_LIB_SPEC=$TCLUTIL_TK_LIB_SPEC
+ITCL_LIB_SPEC=$TCLUTIL_ITCL_LIB_SPEC
+ITK_LIB_SPEC=$TCLUTIL_ITK_LIB_SPEC
+
+AC_SUBST(TCL_LIB_SPEC)
+AC_SUBST(TK_LIB_SPEC)
+AC_SUBST(ITCL_LIB_SPEC)
+AC_SUBST(ITK_LIB_SPEC)
+
+# get the -I include flags
+
+TCLINCSW=$TCLUTIL_TCLINCSW
+TKINCSW=$TCLUTIL_TKINCSW
+
+AC_SUBST(TCLINCSW)
+AC_SUBST(TKINCSW)
+
+# -----------------------------------------------------------------------
+# tcl package library files
+# -----------------------------------------------------------------------
+TCL_LIBRARY=$TCLUTIL_TCL_LIBRARY
+AC_SUBST(TCL_LIBRARY)
+
+TK_LIBRARY=$TCLUTIL_TK_LIBRARY
+AC_SUBST(TK_LIBRARY)
+
+ITCL_LIBRARY=$TCLUTIL_ITCL_LIBRARY
+AC_SUBST(ITCL_LIBRARY)
+
+ITK_LIBRARY=$TCLUTIL_ITK_LIBRARY
+AC_SUBST(ITK_LIBRARY)
+
+AC_SUBST(TCLUTIL_LIBRARY)
+
+# -----------------------------------------------------------------------
+# system libs
+# -----------------------------------------------------------------------
+LIBS=$TCLUTIL_LIBS
+AC_SUBST(LIBS)
+
+#--------------------------------------------------------------------
+#	Propagate prefix argument as installation directory.
+#--------------------------------------------------------------------
+DESTDIR="$prefix"
+BINDIR="$DESTDIR/bin"
+LIBDIR="$DESTDIR/lib"
+INCDIR="$DESTDIR/include/skycat"
+MANDIR="$DESTDIR/man"
+
+AC_SUBST(DESTDIR)
+AC_SUBST(BINDIR)
+AC_SUBST(LIBDIR)
+AC_SUBST(INCDIR)
+AC_SUBST(MANDIR)
+
+#--------------------------------------------------------------------
+# 	These variables are also needed by the ET Makefile
+#--------------------------------------------------------------------
+
+# name of et*.c source
+case "$TCL_VERSION" in
+
+  7.6)  ET_SRC=et42i.c ;;
+
+  8.*)  ET_SRC=et80i.c ;;
+
+  *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl 7.6"; exit 1 ;;
+
+esac
+AC_SUBST(ET_SRC)
+
+# location of Tcl sources ($TCL_LIBRARY)
+TCL_LIB=$TCL_LIBRARY
+AC_SUBST(TCL_LIB)
+
+# location of Tk sources ($TK_LIBRARY)
+TK_LIB=$TK_LIBRARY
+AC_SUBST(TK_LIB)
+
+# -I flags for et compiler
+TCLTK_INC="$TCLINCSW $TKINCSW -I$TCL_LIBRARY -I$TK_LIBRARY -I$ITCL_LIBRARY -I$ITK_LIBRARY"
+AC_SUBST(TCLTK_INC)
+
+# -lm
+MATH_LIBS=$LIBS
+AC_SUBST(MATH_LIBS)
+
+# -I compiler flags for X
+XINCLUDES=$XINCSW
+AC_SUBST(XINCLUDES)
+
+AC_OUTPUT(Makefile doc/Makefile)

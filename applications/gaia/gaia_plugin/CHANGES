@@ -1,0 +1,115 @@
+CHANGES to the GAIA plugin
+--------------------------
+
+This file contains a list of changes to the GAIA plugin software and
+user interface. The latest changes are at the top.
+
+---------------  25.6.98 released gaia_plugin-1.0.6 --------------------------
+
+* StarFItsIO: Fixed a bug that caused a crash (on solaris, at least), when loading
+  a FITS file that was read-only. The problem was that, for GAIA, we want to map
+  the file read-write+private (copy on write mode). The file is not actually modified, 
+  but it needs read-write permission to do it this way (which is the most efficient).
+  The fix: If a FITS image file is read-only, a memory copy is now made.
+
+---------------  28.5.98 released gaia_plugin-1.0.5 --------------------------
+
+* class StarFitsIO: added method: byteSwapData(FitsIO*) to swap bytes
+  if needed.
+
+* class StarRtdImage: added derived method (derived from
+  RtdImage::makeImage(FitsIO*)), so that GAIA features also work when
+  the image does not come from a file.  This method is called by Rtd
+  methods for such things as blank images, real-time updates, mmap
+  images, etc., and is needed mainly to do the byte-swapping and
+  initialize WCS using class StarWCS in place of the default SAOWCS.
+
+---------------  13.5.98 released gaia_plugin-1.0.4 --------------------------
+
+* StarWCS.C: replaced with new version supplied by Peter Draper that
+  fixes previous problems when CRVAL1 and CRVAL2 are reversed.
+
+---------------  6.5.98 released gaia_plugin-1.0.3 --------------------------
+
+* SkyCat_plugin.tcl: set the NDF_FORMATS_* environment variables correctly
+  and append "-file_types $file_types" to the argv list for the application,
+  so that the file type menu in the file selection dialog works correctly. 
+
+* gaia/Makefile.in: install autocrop and ardstat in the correct places so
+  that they are found in $gaia_library at runtime.
+
+* StarBlink.tcl: fixed the "blink" feature (was a problem with "cloning"...)
+
+---------------  4.5.98 released gaia_plugin-1.0.2 --------------------------
+
+* Remove "Save region as..." from skycat menu, since the operation
+  is not supported by the StarFitsIO class (the same functionality
+  is found under "Image regions..." anyway).
+
+* Added top level makefile targets to build a binary plugin release.
+ 
+* Skycat_plugin.tcl: added code to check for and set Starlink environment
+  variables.
+
+* convert.tcl: new file, sets Starlink/convert environment variables so
+  that the user doesn't have to source "convert.csh". 
+
+* Gaia.tcl: import the ::blt namespace (needed for blt::table).
+
+* GaiaImageCtrl.tcl: Fixed "File=>Reopen" to really reload the
+  image. This works slightly different than the Skycat version, due to
+  the way the image is mapped (with the PRIVATE mmap flag).
+
+---------------  28.4.98 released gaia_plugin-1.0.1 --------------------------
+
+* StarWCS.[Ch]: Fixed xSecPix() and ySecPix() methods and added private
+  members to save the values (needed for plotting some catalog symbols).
+
+* configure.in: set FFLAGS to work around g77 bugs on HP and Linux.
+  (On HP g77 can crash on some files if you specify -O, on Linux, you
+  can get assembler errors for some files if you do not use -O...).
+
+* Added target in top level Makefile to build plugin dir for testing.
+
+* Gaia.tcl: fixed clone method to work with new skycat version.
+
+* Minor change in StarAstTable: 
+  Changed AstroCat "cget -image" to "[get_image_name]"
+
+---------------  9.4.98 released gaia_plugin-1.0 -----------------------------
+
+* Tcl library files: Merged in changes, where possible, in the Tcl
+  sources that were originally part of Rtd/Skycat and were modified
+  for GAIA, and then deleted the GAIA versions. Now there is only one
+  copy of each source file, and the GAIA changes are only implemented
+  in new classes or subclasses.
+  
+* Added the GAIA Help window feature to TopLevelWidget (renamed from
+  StarHelp to HelpWin).
+
+* StarRtdImage.C: Changed the name of the image type from
+  "starrtdimage" to "rtdimage".  This just overrides the original
+  implementationso with a derived one, so that no Tcl code changes are
+  needed to use the new image type and new features.
+
+* Renamed the modified WCS class to StarWCS and made it a subclass of
+  the new abstract WCSRep class, and added code to StarRtdImage.C to
+  make sure that the new WCS implementation is used.
+
+* StarRtdImage.C, StarFitsIO: Added class StarFitsIO to replace GAIA
+  version of FitsIO and remain compatible with the Skycat version.
+
+* StarRtdImage.C: Use of new Skycat/Rtd features supporting
+  subclassing: new constructor args, GAIA_CONFIG macro for Tk config
+  options.
+
+* Renamed defineBitmaps() to defineGaiaBitmaps(). 
+
+* Added Gaia_Init routine for the Gaia Tcl package. It calls StarRtd_Init
+  and all of the other required Init routines.
+
+* NDFIO.[Ch]: Updated for get() methods, removed static put_keyword,
+  blankImage methods (not used).  Changed constructor to initialize
+  WCS object.
+
+--- 13.03.98: Created, based on GAIA-2.0 from Peter Draper (Starlink) ----

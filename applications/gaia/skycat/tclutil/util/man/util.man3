@@ -1,0 +1,94 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: util.man3,v 1.1 1998/01/15 22:08:45 abrighto Exp $" 
+#
+# This file is processed by the ESO/VLT docDoManPages command to
+# produce a man page in nroff, TeX and MIF formats. 
+# See docDoManPages(1) for a description of the input format.
+# 
+# who             when       what
+# --------------  ---------  ----------------------------------------
+# Allan Brighton  15 Jan 98  Created
+#
+
+NAME
+util - Collection of C++ utility routines
+
+SYNOPSIS
+#include "util.h"
+
+char** copyArray(int len, char** ar);
+char* stripWhiteSpace(char* p);
+const char* fileSuffix(const char* p);
+const char* fileBasename(const char* p);
+const char* fileRealname(const char* filename, char* buf, int buflen);
+int fileSize(const char* filename);
+int fileAbsPath(const char* filename, char* path, int pathlen, int& flag);
+int readUnbufferedLine(int fd, char* ptr, int maxlen);
+int readUnbufferedBytes(int fd, char* ptr, int nbytes);
+int writeUnbufferedLine(int fd, char* ptr);
+int writeUnbufferedBytes(int fd, char* ptr, int nbytes);
+int localSockConnect(int& sock, int port);
+int localSockListen(int& sock, int& port);
+
+DESCRIPTION
+A number of general purpose C++ routines have been gathered here. Most of these
+should probably be in more specialized C++ String or File classes.
+
+ROUTINES
+copyArray(len, ar);
+	Make a copy of the given string array in a single buffer.
+
+stripWhiteSpace(p);
+	Strip white space from string p by returning offset in string
+	and setting trailing white space to '\0'.
+
+fileSuffix(p);
+	Return the suffix of the string p (part following ".", if
+	any).
+
+fileBasename(p);
+	Return the basename of the filename p (part following last
+	"/", if any).
+
+fileRealname(filename, buf, buflen);
+	Get the real name of the given file, which may be the name of
+	a symbolic link. If the file exists, the resolved name is
+	written to the given buffer and returned, otherwise a pointer
+	to the original filename is returned. No error message is
+	generated here.
+
+fileSize(filename);
+	Return the size of the file in bytes or -1 on error.
+
+fileAbsPath(filename, path, pathlen, flag);
+	If filename is not an absolute path (starting with '/'), write
+	an absolute path for it to "path". Sets flag to 1 if path was
+	changed.
+
+readUnbufferedLine(fd, ptr, maxlen);
+	Read a line from the given file descriptor one byte at a time,
+	with no buffering, into the given buffer of the given length
+	(for sockets and pipes, stdin, ...).
+
+readUnbufferedBytes(fd, ptr, nbytes);
+	Read nbytes bytes from the given file descriptor into the
+	given buffer, with no buffering.
+
+int writeUnbufferedLine(int fd, char* ptr);
+	Write the given buffer (ptr) using unbuffered I/O to the given
+	file descriptor, followed by a newline.
+
+int writeUnbufferedBytes(int fd, char* ptr, int nbytes);
+	Write nbytes bytes to the given file descriptor using
+	unbuffered I/O (for sockets and pipes, stdin,...).
+
+int localSockConnect(int& sock, int port);
+	Open a socket connection on the given port on teh local host.
+
+int localSockListen(int& sock, int& port);
+	Open a socket and start listening on the given port (or choose
+	port, if 0).
+
+----------------------------------------------------------------------
+

@@ -1,0 +1,107 @@
+#*************************************
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.4 1998/11/16 21:22:42 abrighto Exp $" 
+#
+# Makefile.in"
+# 
+# who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created 
+#
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CFLAGS@ @CXXDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+# source files (Note: see ../README for information about the source of the C files)
+SRCS 		=  ImageIO.C FitsIO.C \
+	        buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
+		drvrnet.c  editcol.c edithdu.c eval_l.c eval_y.c eval_f.c \
+		fitscore.c getcol.c getcolb.c getcold.c getcole.c \
+		getcoli.c getcolj.c getcolk.c getcoll.c getcols.c getcoluk.c \
+		getcolui.c getcoluj.c getkey.c group.c grparser.c histo.c \
+		iraffits.c \
+		modkey.c putcol.c putcolb.c putcold.c putcole.c putcoli.c \
+		putcolj.c putcolk.c putcoluk.c putcoll.c putcols.c putcolu.c \
+		putcolui.c putcoluj.c putkey.c region.c scalnull.c swapproc.c \
+		wcsutil.c f77_wrap1.c f77_wrap2.c drvrsmem.c
+
+OBJS 		=  ImageIO.o FitsIO.o \
+		buffers.o cfileio.o checksum.o compress.o drvrfile.o drvrmem.o \
+		drvrnet.o  editcol.o edithdu.o eval_l.o eval_y.o eval_f.o \
+		fitscore.o getcol.o getcolb.o getcold.o getcole.o \
+		getcoli.o getcolj.o getcolk.o getcoll.o getcols.o getcoluk.o \
+		getcolui.o getcoluj.o getkey.o group.o grparser.o histo.o \
+		iraffits.o \
+		modkey.o putcol.o putcolb.o putcold.o putcole.o putcoli.o \
+		putcolj.o putcolk.o putcoluk.o putcoll.o putcols.o putcolu.o \
+		putcolui.o putcoluj.o putkey.o region.o scalnull.o swapproc.o \
+		wcsutil.o f77_wrap1.o f77_wrap2.o drvrsmem.o
+
+libname  	= ../lib/libimageio.a
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@
+
+INCLUDES	= -I../include \
+		  -I../../wcslib/include \
+		  -I../../compress/include \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/tclutil \
+		  -I$(TOPDIR)/include
+
+# these are needed for cfitsio
+DEFINES         = @DEFS@
+
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+LD_SHFLG        = @LD_SHFLG@
+
+all: dirs $(libname) 
+
+All:
+	cd ../..; $(MAKE)
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+install: 
+
+dirs:
+	test -d ../lib || mkdir ../lib
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk

@@ -1,0 +1,21 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Makefile.in,v 1.9 1998/03/23 00:46:55 abrighto Exp $" 
+# $Id: Makefile.in,v 1.9 1998/03/23 00:46:55 abrighto Exp $
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		=  LookupTable.h ImageData.h ByteImageData.h XImageData.h ShortImageData.h \
+		   UShortImageData.h ImageTemplates.h LongImageData.h  NativeImageData.h \
+		   FloatImageData.h
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include ../../include.mk

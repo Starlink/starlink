@@ -1,0 +1,76 @@
+#*************************************
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id $" 
+#
+# Makefile.in
+# 
+# who      when     what
+#--------  -------- ------------------
+# abrighto 11/10/95 created
+#
+# ------------------------------------------------------------------------
+# 	Makefile
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+SRCS 		=  Mem.C Mem_Map.C HTTP.C ShellCommand.C error.C util.C \
+		   base64.C
+
+
+OBJS 		=  Mem.o Mem_Map.o HTTP.o ShellCommand.o error.o util.o \
+		   base64.o
+
+libname  	= ../lib/libutil.a
+
+INCLUDES	= -I../include  
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: dirs $(libname) 
+
+All:
+	cd ../..; $(MAKE)
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+install:
+
+dirs:
+	test -d ../lib || mkdir ../lib
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk

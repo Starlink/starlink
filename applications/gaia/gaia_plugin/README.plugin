@@ -1,0 +1,69 @@
+
+Gaia_plugin (Binary Release)
+----------------------------
+
+This directory contains a binary release of the GAIA plugin, which
+adds a WCS grid and many photometry related features to Skycat.  The
+original GAIA is a standalone application, developed by Peter
+W. Draper (P.W.Draper@durham.ac.uk) that is based on Skycat, Rtd and
+Starlink.  This is a modified version of GAIA that has been merged
+with a newer version of Skycat. It can be compiled as a standalone
+application or loaded dynamically as a Tcl package in a running Skycat
+application.
+
+This package contains (nearly) everything you need to use the GAIA
+plugin with skycat (version 2.0.13 or newer).
+
+In addition, the following packages are required at run-time for some
+operations (not included here):
+
+* Starlink/convert  - convert between FITS and NDF image formats
+
+* pbmplus  - portable bitmap utilities (v. 10dec91), required by
+             Starlink/convert. If you have this package, you can use
+             GAIA/Skycat to view images in other formats, such as GIF...
+
+Note: At the time of writing, the Starlink/convert package was not
+available in source form or for HP-UX. Please contact the Starlink
+people for more information.
+
+
+INSTALLATION
+------------
+
+To install this package, copy the contents to some directory and set the
+environment variable SKYCAT_PLUGIN to include it (or its parent dir).
+For example:
+
+  setenv SKYCAT_PLUGIN $gaia_plugin_dir
+
+Or: 
+
+  setenv SKYCAT_PLUGIN "$gaia_plugin_dir:$other_plugin_dir:..."
+
+If you have installed the Starlink "convert" package, you should
+either source the "convert.csh" file from that package before starting
+skycat, or set the STARLINK environment variable to the top level
+Starlink installation directory. For example:
+
+  setenv STARLINK /star
+
+Or (optionally): 
+
+  source /star/bin/convert/convert.csh
+
+To start the application, just start skycat in the normal way:
+
+  skycat file.fits ...
+
+On startup, skycat should dynamically load the GAIA plugin and add the
+new features.
+
+Please send any questions, suggestions, or bug reports to:
+
+  Allan Brighton <abrighto@eso.org> (Skycat, Rtd, plugin issues)
+
+Or:
+
+  Peter W. Draper <P.W.Draper@durham.ac.uk> (GAIA, Starlink, Photometry)
+

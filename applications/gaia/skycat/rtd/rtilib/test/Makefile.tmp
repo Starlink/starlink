@@ -1,0 +1,88 @@
+# Generated automatically from Makefile.in by configure.
+# E.S.O. - VLT project/ESO Archive
+# "@(#) $Id: Makefile.tmp,v 1.1 1997/11/28 01:35:58 abrighto Exp $"
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  08 Mar 96  Created
+# ------------------------------------------------------------------------
+
+CC           	= gcc -fwritable-strings
+CXX           	= g++
+CFLAGS  	= -g -DDEBUG
+TOPDIR      	= /home/abrighto/work/skycat/src/skycat/install
+LIBDIR      	= /home/abrighto/work/skycat/src/skycat/install/lib
+DEPEND_TARGET	= dep
+
+SRCS 		=  
+
+OBJS 		=  
+
+PROGS 		=  
+
+INCLUDES	= -I../include \
+		  -I../../../astrotcl/wcslib/include \
+		  -I../../../astrotcl/imageio/include \
+	          -I../../../tclutil/tclutil/include \
+	          -I../../../tclutil/util/include \
+		  -I$(TOPDIR)/include/astrotcl \
+		  -I$(TOPDIR)/include/tclutil
+
+CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+TCLUTIL_LIB     = -L/home/abrighto/work/skycat/src/skycat/tclutil -ltclutil
+ASTOTCL_LIB     = @ASTOTCL_LIB@
+
+LIBRARIES       = ../lib/librti.a \
+		  $(ASTOTCL_LIB) \
+		  $(TCLUTIL_LIB)
+
+EXTRA_LIBS      =  -ldl -lm
+
+DEPEND_FLAGS    = $(CC_SWITCHES)
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+all: 
+
+test: $(PROGS)
+
+lib:
+	@cd ../src; $(MAKE)
+
+All:
+	cd ../..; $(MAKE); $(MAKE)
+
+install:
+
+clean: 
+	$(RM) $(PROGS) $(OBJS) *\~ "#"* *.o
+
+distclean: clean
+	echo > make.dep
+	rm -f Makefile	
+
+tImageData: tImageData.o $(LIBRARIES)
+	#$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) $(EXTRA_LIBS)	
+	#-$@ > $@.result
+	#-@if cmp $@.result $@.ok; \
+	# then echo "$@: PASSED" ; \
+	# else echo "*** $@: TEST FAILED: see $@.result"; \
+	# fi
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+# DO NOT DELETE THIS LINE -- make depend depends on it.

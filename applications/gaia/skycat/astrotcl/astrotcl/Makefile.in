@@ -1,0 +1,197 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.3 1998/11/16 21:15:37 abrighto Exp $"
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps src man library demos test
+
+# root of source tree
+SRC_ROOT     = @SRC_ROOT@
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+ASTROTCL_DIR   = @ASTROTCL_DIR@
+
+# info needed for shared libraries 
+# (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+TCLTKLIBS = @ITK_LIB_SPEC@ @TK_LIB_SPEC@ @BLT_LIB_SPEC@ \
+	    @TCLX_LIB_SPEC@ @ITCL_LIB_SPEC@ @TCL_LIB_SPEC@
+
+# Tclutil library
+TCLUTIL_LIB     = @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC  = @TCLUTIL_LIB_STATIC@
+
+# ------------------------------------------------------------------------
+
+# name of wish binary to generate
+demo_wish    = bin/astrotcl_wish
+
+# include flags
+INCLUDES     = -I. -Isrc $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# compiler flags
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# local library base names
+ASTROTCL_LIB  = astrotcl
+COMPRESS_LIB  = compress
+WCSLIB_LIB  = wcslib
+IMAGEIO_LIB  = imageio
+
+# local library path names
+ASTROTCL_LIBDIR  = ./lib
+COMPRESS_LIBDIR  = ../compress/lib
+WCSLIB_LIBDIR  = ../wcslib/lib
+IMAGEIO_LIBDIR  = ../imageio/lib
+
+# local library full names
+ASTROTCL_LIBRARY  = $(ASTROTCL_LIBDIR)/lib$(ASTROTCL_LIB).a
+COMPRESS_LIBRARY  = $(COMPRESS_LIBDIR)/lib$(COMPRESS_LIB).a
+WCSLIB_LIBRARY  = $(WCSLIB_LIBDIR)/lib$(WCSLIB_LIB).a
+IMAGEIO_LIBRARY  = $(IMAGEIO_LIBDIR)/lib$(IMAGEIO_LIB).a
+
+LOCAL_LIBRARIES = \
+	$(ASTROTCL_LIBRARY) \
+	$(COMPRESS_LIBRARY) \
+	$(WCSLIB_LIBRARY) \
+	$(IMAGEIO_LIBRARY) \
+	$(TCLUTIL_LIB_STATIC)
+
+# local library search paths and flags
+LIBS_ASTROTCL_SEARCH  = \
+	-L$(ASTROTCL_LIBDIR) \
+	-L$(COMPRESS_LIBDIR) \
+	-L$(WCSLIB_LIBDIR) \
+	-L$(IMAGEIO_LIBDIR)
+
+LIBS_ASTROTCL = \
+	-l$(ASTROTCL_LIB) \
+	-l$(COMPRESS_LIB) \
+	-l$(WCSLIB_LIB) \
+	-l$(IMAGEIO_LIB)
+
+# object files for wish binary
+OBJECTS      = tkAppInit.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# ------------------------------------------------------------------------
+
+# Make the libs and a sample wish binary with astrotcl included.
+# Note: if the astrotcl shared lib was created, we don't link it here,
+# but load it at run time from Tcl. Otherwise it is linked in as a
+# static library.
+all $(demo_wish): lib  $(LOCAL_LIBRARIES) $(OBJECTS)
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) \
+		 $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(LIBS_ASTROTCL_SEARCH) $(LIBS_ASTROTCL) \
+		 $(TCLUTIL_LIB)  $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@(cd demos; $(MAKE))
+
+# force recompile after configure for ifdefs
+tkAppInit.o: ../config.status
+
+$(TCLUTIL_LIBRARY) lib: FORCE
+	@set -x; for i in bitmaps src demos; do (cd $$i; $(MAKE)); done
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+install-bin:
+	test -d $(BINDIR) || mkdir $(BINDIR)
+	chmod 0755 $(demo_wish)
+	$(INSTALL) $(demo_wish) $(BINDIR)
+	$(RM) $(ASTROTCL_DIR)/bin
+	$(LN) $(BINDIR) $(ASTROTCL_DIR)/bin
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-lib:
+	@(cd src; $(MAKE) install)
+	@(cd include; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-lib install-bitmaps install-man
+
+clean:
+	$(RM) $(OBJECTS) $(demo_wish) *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+FORCE:
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+

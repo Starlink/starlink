@@ -1,0 +1,211 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: Makefile.in,v 1.20 1998/05/17 15:40:42 abrighto Exp $"
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# Allan Brighton  05/12/95  Created
+# ------------------------------------------------------------------------
+
+# run make in these sub directories
+SUBDIRS      = include bitmaps colormaps src images man library demos test
+
+# C compiler
+CC 	     = @CC@
+
+# C++ compiler
+CXX          = @CXX@
+
+# -D flags
+DEFINES      = 	-DSHARED=@SHARED@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
+# install directories
+TOPDIR	     = @DESTDIR@
+BINDIR       = @BINDIR@
+LIBDIR       = @LIBDIR@
+RTD_DIR      = @RTD_DIR@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
+LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
+LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
+
+# Include directives for Tcl, Tk, and X include files 
+TCL_INCLUDE   = @TCLINCSW@
+TK_INCLUDE    = @TKINCSW@
+X_INCLUDE     = @XINCSW@
+
+# X Libraries 
+X_LIB        = @XLIBSW@
+EXTRA_LIBS   = @LIBS@
+
+TCLTKLIBS = \
+	@ITK_LIB_SPEC@ \
+	@TK_LIB_SPEC@ \
+	@BLT_LIB_SPEC@ \
+	@TCLX_LIB_SPEC@ \
+	@ITCL_LIB_SPEC@ \
+	@TCL_LIB_SPEC@
+
+# Tclutil library
+TCLUTIL_LIB     = @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC  = @TCLUTIL_LIB_STATIC@
+
+# Astrotcl library
+ASTROTCL_LIB     = @ASTROTCL_LIB@
+ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
+
+# ------------------------------------------------------------------------
+
+# name of wish binary to generate
+demo_wish    = bin/rtdimage_wish
+
+# include flags
+INCLUDES     = -I. -Iinclude -Isrc $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# compiler flags
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# local library base names
+RTDIMAGE_LIB  = rtdimage
+RTDIMGEVT_LIB = rtdImgEvt
+RTI_LIB       = rti
+
+# local library path names
+RTDIMAGE_LIBDIR  = ./lib
+RTDIMGEVT_LIBDIR = ../rtdevt/lib
+RTI_LIBDIR       = ../rtilib/lib
+
+# local library full names
+RTDIMAGE_LIBRARY = $(RTDIMAGE_LIBDIR)/lib$(RTDIMAGE_LIB).a
+RTI_LIBRARY	 = $(RTI_LIBDIR)/lib$(RTI_LIB).a
+RTDIMGEVT_LIBRARY= $(RTDIMGEVT_LIBDIR)/lib$(RTDIMGEVT_LIB).a
+
+LOCAL_LIBRARIES = \
+	$(RTDIMAGE_LIBRARY) \
+	$(RTI_LIBRARY) \
+	$(RTDIMGEVT_LIBRARY) \
+	$(ASTROTCL_LIB_STATIC) \
+	$(TCLUTIL_LIB_STATIC)
+
+# local library search paths and flags
+LIBS_RTD_SEARCH  = \
+	-L$(RTDIMAGE_LIBDIR) \
+	-L$(RTI_LIBDIR) \
+	-L$(RTDIMGEVT_LIBDIR)
+
+LIBS_RTD         = \
+	-l$(RTDIMAGE_LIB) \
+	-l$(RTI_LIB) \
+	-l$(RTDIMGEVT_LIB)
+
+# these objects are only needed to make the rtdimage_widh binary for the demos
+OBJECTS      = tkAppInit.o
+
+INSTALL      = @INSTALL@
+RANLIB 	     = @RANLIB@
+SHELL 	     = /bin/sh
+RM 	     = rm -f
+LN 	     = ln -s
+
+# ------------------------------------------------------------------------
+# Make the libs and a sample wish binary with Rtd included.
+# Note: if the Rtd shared lib was created, we don't link it here,
+# but load it at run time from Tcl. Otherwise it is linked in as a
+# static library.
+all $(demo_wish): lib  $(LOCAL_LIBRARIES) $(OBJECTS)
+	@if test @SHARED@ -eq 1 ; then \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) $(DL_LIBS) ;\
+	else \
+	  set -x; \
+	  $(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) -o $(demo_wish) \
+	         $(LD_SEARCH_FLAGS) $(LIBS_RTD_SEARCH) $(LIBS_RTD) \
+		 $(ASTROTCL_LIB) $(TCLUTIL_LIB)  $(TCLTKLIBS) \
+		 $(X_LIB) $(EXTRA_LIBS) ;\
+	fi
+	@echo "making all in ./demos"
+	@(cd demos; $(MAKE))
+	@echo "making all in ./test (for real-time simulation)"
+	@(cd test; $(MAKE) tRtd)
+	@test -f demos/tRtd || (cd demos; ln -s ../test/tRtd .)
+	@echo "make finished on `date`"
+
+# force recompile after configure for ifdefs
+$(OBJECTS): ../config.status
+
+$(RTDIMAGE_LIBRARY) lib: FORCE
+	@set -x; for i in bitmaps colormaps src demos; do (cd $$i; $(MAKE)); done
+
+install-top:
+	@test -d $(TOPDIR) || mkdir $(TOPDIR)
+	@test -d $(LIBDIR) || mkdir $(LIBDIR)
+	@test -d $(BINDIR) || mkdir $(BINDIR)
+
+# note: install the test prog tRtd so it is available to demo the real-time features
+install-bin:
+	test -d $(BINDIR) || mkdir $(BINDIR)
+	chmod 0755 $(demo_wish)
+	$(INSTALL) $(demo_wish) $(BINDIR)
+	$(RM) $(RTD_DIR)/bin
+	$(LN) $(BINDIR) $(RTD_DIR)/bin
+	$(INSTALL) test/tRtd $(BINDIR)
+
+install-man: 
+	@(cd man; $(MAKE) install)
+
+install-lib:
+	@(cd src; $(MAKE) install)
+	@(cd include; $(MAKE) install)
+
+install-demos:
+	@(cd demos; $(MAKE) install)
+
+install-images:
+	@(cd images; $(MAKE) install)
+
+install-colormaps:
+	@(cd colormaps; $(MAKE) install)
+
+install-library:
+	@(cd library; $(MAKE) install)
+
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-demos \
+	install-bin install-lib install-bitmaps install-man \
+	install-colormaps install-images 
+
+clean:
+	$(RM) $(OBJECTS) $(demo_wish) *\~ "#"*
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+	$(RM) demos/tRtd
+
+distclean: clean
+	$(RM) Makefile
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+depend:
+	-cd src; $(MAKE) depend
+
+man: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
+
+FORCE:
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+

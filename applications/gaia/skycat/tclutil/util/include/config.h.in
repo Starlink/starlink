@@ -1,0 +1,68 @@
+/*
+ * E.S.O. - VLT project 
+ * "@(#) $Id: config.h.in,v 1.4 1998/11/16 21:27:54 abrighto Exp $" 
+ *
+ * config.h.in - global configuration values, set by configure
+ * 
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * Allan Brighton  05/10/95  Created
+ *
+ */
+
+
+/* define this if the SHM (shared memory) prototypes are missing 
+ * from <sys/shm.h>, (as on SunOs-4.1.3) 
+ */
+#undef NEED_SHM_PROTO
+
+
+/* define this if the socket prototypes are missing 
+ * from <sys/socket.h>, (as on SunOs-4.1.3) 
+ */
+#undef NEED_SOCKET_PROTO
+
+/* define this if the gethostname prototype is missing 
+ * from <unistd.h> 
+ */
+#undef NEED_GETHOSTNAME_PROTO
+
+/* define this is the system has <sys/fileio.h>
+ */
+#undef HAVE_SYS_FILIO_H
+
+
+/* define this is the system has <sys/statvfs.h>
+ */
+#undef HAVE_SYS_STATVFS_H
+
+
+/* define this if the select system call uses argss of type fd_set
+ */
+#undef HAVE_SELECT_FD_SET
+
+
+/* define this is the system has <vfork.h>
+ */
+#undef HAVE_VFORK_H
+
+/* define this if the MMAP prototypes are missing 
+ * from <sys/mman.h>, (as on SunOs-4.1.3) 
+ */
+#undef NEED_MMAP_PROTO
+
+/*
+ * define this if semctl(2) takes an argument of type union semun
+ */
+#undef HAVE_UNION_SEMUN
+
+/* 
+ * define size of long in bytes
+ */
+#define SIZEOF_LONG @SIZEOF_LONG@
+
+/* 
+ * define if the ftruncate(2) function is available
+ */
+#undef HAVE_FTRUNCATE
+

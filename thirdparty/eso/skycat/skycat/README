@@ -1,0 +1,70 @@
+
+Skycat/RTD/Catlib Source Distribution
+-------------------------------------
+
+This is the top level README file for the Skycat, RTD, and catalog
+library packages. This directory contains a generic configure script
+and Makefile that will build any of the packages in the correct order.
+To simplify building the sources, the required utility packages
+(astrotcl and tclutil) are also included here.
+
+See the README files in the subdirectories for details on each
+package.
+
+The following URLs may also be of interest:
+
+Skycat home page:
+	http://archive.eso.org/skycat/
+
+Postscript, PDF, and FrameMaker Documentation:
+	ftp://ftp.archive.eso.org/pub/skycat/doc/
+
+HTML Docs:
+	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
+
+Sources and binaries:
+	ftp://ftp.archive.eso.org/pub/skycat/
+
+------------------------------------------------------------------
+Contact: Allan Brighton (abrighto@eso.org) 
+         Miguel Albrecht (malbrech@eso.org)
+         Peter Biereichel (pbiereic@eso.org) (RTD issues)
+
+ESO - European Southern Observatory
+------------------------------------------------------------------
+
+
+Installation
+------------
+
+For installation instructions, see the file INSTALL in this directory.
+
+See the CHANGES files in this directory and in the subdirectories for
+a list of recent changes. 
+
+
+Documentation
+-------------
+
+The latest documentation (in postscript, FrameMaker, and PDF formats)
+is available under:
+
+	ftp://ftp.archive.eso.org/pub/skycat/doc
+
+An HTML version is also available from:
+
+	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
+
+The Skycat application is based on the following packages:
+
+* Tclutil (Tcl and C++ Utilities)
+
+* Astrotcl (Astronomical Tcl and C++ Utilities)
+
+* Rtd (Real-Time Display) 
+
+* Cat (Catalog library) 
+
+* Skycat (The ESO Skycat Tool)
+
+See the documentation for the above packages for more information.

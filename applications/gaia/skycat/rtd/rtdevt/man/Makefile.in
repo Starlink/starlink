@@ -1,0 +1,30 @@
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.3 1997/04/11 10:47:33 abrighto Exp $" 
+#
+# Makefile.in
+# 
+# who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created
+#
+# ------------------------------------------------------------------------
+# 	Makefile for manual page files 
+# ------------------------------------------------------------------------
+
+TOPDIR  	= @DESTDIR@
+MANDIR  	= @MANDIR@
+MAN_SECTIONS    = 1 3
+SHELL    	= /bin/sh
+RM		= rm -rf
+
+all depend: links
+
+# get man page sources from C sources
+links:
+	-@test -h  rtdCubeDisplay.man1 || ln -s ../src/rtdCubeDisplay.c rtdCubeDisplay.man1
+	-@test -h rtdImageEvent.man3 || ln -s ../src/rtdImageEvent.c rtdImageEvent.man3
+	-@test -h rtdServer.man1 || ln -s ../src/rtdServer.c rtdServer.man1
+	
+include ../../man.mk
+

@@ -1,0 +1,119 @@
+#*******************************************************************************
+# E.S.O. - VLT project/ ESO Archive
+#
+# "@(#) $Id: Makefile.in,v 1.13 1998/04/02 21:17:25 abrighto Exp $"
+#
+# ------------------------------------------------------------------------
+# 	Makefile 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+
+# C compiler
+CC           	= @CC@
+
+# C++ compiler
+CXX           	= @CXX@
+
+# Compiler flags
+CFLAGS  	= @CXXDEBUGFLAGS@
+
+# install dirs
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+
+# for make depend
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+
+# Directories containing Tcl and Tk include files and libraries
+TCL_INCLUDE   	= @TCLINCSW@
+TK_INCLUDE    	= @TKINCSW@
+X_INCLUDE     	= @XINCSW@
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
+		  @ASTROTCL_BUILD_INCLUDES@ \
+		  @RTD_BUILD_INCLUDES@ \
+		  @CAT_BUILD_INCLUDES@
+
+# ------------------------------------------------------------------------
+
+# source files
+SRCS 		=  Skycat.C SkySearch.C TcsSkySearch.C skycat_bitmaps.C
+
+# object files
+OBJS 		=  Skycat.o SkySearch.o TcsSkySearch.o skycat_bitmaps.o
+
+# name of local archive file
+libname  	= ../lib/libskycat.a
+
+# include flags
+INCLUDES	= -I../include  \
+		  -I../bitmaps \
+		  $(BUILD_INCLUDES) \
+		  -I$(TOPDIR)/include/astrotcl \
+		  -I$(TOPDIR)/include/tclutil \
+		  -I$(TOPDIR)/include/cat \
+		  -I$(TOPDIR)/include/rtd \
+		  $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+# define package versions 
+DEFINES       	= \
+		-DSKYCAT_VERSION=\"@SKYCAT_VERSION@\" \
+		-DSKYCAT_LIBRARY=\"@SKYCAT_LIBRARY@\" \
+		-DCAT_VERSION=\"@CAT_VERSION@\" \
+		-DRTD_VERSION=\"@RTD_VERSION@\"
+
+CC_SWITCHES	= $(SHLIB_CFLAGS) $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+RANLIB   	= @RANLIB@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+# --------------------------------------------------------------------------------------
+all: dirs $(libname) 
+
+$(libname): $(OBJS)
+	$(RM) $@
+	$(AR) $@ $(OBJS)
+	$(RANLIB) $@
+
+All: 
+	cd ../..; $(MAKE)
+
+
+# recompile if configure is run, since -D flags might have changed
+$(OBJS): ../../config.status
+
+install: 
+
+dirs:
+	@test -d ../lib || mkdir ../lib
+	@test -d ../bin || mkdir ../bin
+
+clean:
+	$(RM) $(OBJS) $(libname) *\~ "#"*
+
+distclean: clean depclean
+	rm -f Makefile	
+
+tags:
+	etags ../../*/*/*.[Cch]
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include ../../depend.mk
+

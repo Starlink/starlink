@@ -1,0 +1,181 @@
+CHANGES to Astrotcl
+-------------------
+
+This file contains a list of changes to the Astrotcl software.
+The latest changes are at the top.
+
+---------------  16.11.98 released astrotcl-1.1 -------------------------
+
+* The FitsIO C++ class is now based on the CFITSIO package (URL:
+  http://legacy.gsfc.nasa.gov/docs/software/fitsio).  The public
+  interface is backward compatible. A number of new methods are now
+  available for accessing multiple HDUs and FITS tables. The only
+  incompatible change is that some invalid FITS files that were
+  previously allowed may cause an error message now (For example when
+  keywords contain illegal characters). 
+
+* Modified the CFITSIO sources files fitscore.c and getkey.c to handle
+  ESO HIERARCH keywords. Also added "static" to some global variables
+  in compress.c to avoid name conflicts.
+
+* Ported to Tcl8.0.3 (minor namespace changes, still compatible with
+  Tcl7.6/Tk4.2/itcl2.2).
+
+* Changed the names of 2 global variables in the compress/gzip code,
+  since the same code is being used by both cfitsio and tclpro, in
+  variously hacked versions. See gzip.h for details.
+
+---------------  30.9.98 released astrotcl-1.0.16 -------------------------
+
+* Fixed some bugs in FitsIO.C and hput.c dealing with FITS keyword insertion.
+
+* Upgraded wcslib to (Doug Mink's) wcssubs-2.5b, which fixes some problems 
+  with COE projections and includes other bug fixes.
+
+* Changed the release structure of the astrotcl package to include the
+  tclutil package. The top level Makefile and configure script
+  automatically determine which packages to make.
+
+---------------  7.9.98 released astrotcl-1.0.15 -------------------------
+
+* Updated to wcssubs-2.4 (Doug Mink's wcslib, on which the SAOWCS
+  C++ class is based). This fixes some bugs in the handling of
+  world coordinates rotation. 
+
+---------------  5.8.98 released astrotcl-1.0.14 -------------------------
+
+* Added the X11 library directory to shared lib path in startup script.
+
+* Updated to wcssubs-2.3.2 (Doug Mink's wcslib, on which the SAOWCS
+  C++ class is based). This fixes a number of bugs in the handling of
+  world coordinates. The FitsIO class was also updated, since it uses
+  the FITS header routines in hget.c and hput.c.
+
+* Added COE projection to wcssubs (in worldpos.c), based on previous
+  patches from Andreas Wicenec.
+
+---------------  07.07.98 released astrotcl-1.0.13 -------------------------
+
+* Increased buf size for print method in util/src/HMS.C to avoid potential
+  overflow when given bad data.
+
+* FitsIO.[Ch]: added new static method: "FitsIO::check_compress" (was not
+  a member before) so that it can be used from outside the class.
+
+* FitsIO.C: Changed location of the temp file used when compressing or
+  decompressing an image from "file.tmp" to /tmp/fitsioXXXXXX, since
+  the directory that file is in may not be writable or might be on a
+  CD.
+
+---------------  19.6.98 released astrotcl-1.0.12 -------------------------
+
+* HMS.C: When interpreting the RA value for world coordinates, assume
+  decimal numbers to be in degrees and integer values to be hours.
+
+---------------  28.5.98 released astrotcl-1.0.11 -------------------------
+
+* FitsIO::blankImage(...), Changed generated blank images to use the
+  normal colormap colors instead of all blank pixels, so that you can
+  change the background color of a generated image by manipulating the
+  colormap.
+
+* ImageIO: added methods: byteSwapData() and isclear().
+
+---------------  4.5.98 released astrotcl-1.0.10 -------------------------
+
+* HMS.C: print 3 digits after the decimal point for seconds for
+  RA values.
+
+---------------  28.4.98 released astrotcl-1.0.9 -------------------------
+
+* HMS.C (used by class WorldCoords): changed printing of seconds to
+  always include leading zero i.e.: (42::12:03.51 instead of
+  42:12:3.51 as before).
+
+---------------  15.4.98 released astrotcl-1.0.8 -------------------------
+
+* FitsIO.C: Added additional suffixes for automatic compression and
+  decompression: ".gz" for gzip, ".Z" for UNIX compression (i.e.:
+  file.fits.Z, file.fits.gz).
+
+* Minor changes in configure script and top level makefile for shared
+  libraries
+
+* Fixed possible bug in reference counted classes (WCS, ImageIO, Mem)
+  by adding check for null rep_ pointer. The pointer can be null in
+  some cases (WCS, for example, when there is no WCS information).
+
+---------------  31.03.98 released astrotcl-1.0.7 -------------------------
+
+* Updated man pages and documentation
+
+---------------  25.03.98 released astrotcl-1.0.6 -------------------------
+
+* The following changes were made to make it easier to add new image
+  types and new WCS functionality in derived classes and should not
+  cause any change in the external interfaces:
+
+  * Class ImageIO: removed direct dependency on FitsIO class to make
+    it possible to define new image types (by deriving a subclass of
+    class ImageIORep).
+
+  * Added a WCS object to the ImageIORep class. This can be used to
+    optionally add world coordinates support to an image. Since WCS is
+    a reference counted class, it is possible to replace the WCS
+    implementation with a new one by defining a subclass of WCSRep
+    (the internal class) that has the required interface (see below).
+
+  * Renamed the WCSRep class to SAOWCS. The new WCSRep class is now an
+    abstract base class, of which SAOWCS is a subclass. The
+    external interfaces are the same. The change just makes it
+    possible to add new WCS implementations in subclasses.
+
+* Compress: Upgraded to new "press" library routines to fix bug found in
+  H-compress code (Bug was only in decompression).
+
+---------------  05.03.98 released astrotcl-1.0.5 -------------------------
+
+* Added static method: "set_options" to class Compress, so that you can
+  specify scale and smoothing options for H_COMPRESS.
+
+---------------  13.2.98 released astrotcl-1.0.4 -------------------------
+
+* Minor changes/fixes in wcslib.
+
+---------------  9.2.98 released astrotcl-1.0.3 -------------------------
+
+* Fixed accuracy problems converting pixel to wcs distance.
+
+* Fixed problems with floating point precision when converting world
+  coordinates (raised from default of 6 digits to max 17 digits.)
+
+--------------- 3.2.98 released astrotcl-1.0.2 --------------------------
+
+* added "long int" versions of the ImageIO and FitsIO class "get" and
+  "put" methods for reading and writing keywords.
+
+* added option to Tcl wcs command to support converting a single hh:mm:ss 
+  value to floating point and back (previous version required ra and dec,
+  new version will also convert a single value, so that it can more easily
+  be used in expressions).
+
+--------------- 26.01.98 released astrotcl-1.0.1 ------------------------
+
+* WCS: There was a problem converting a WCS distance to a pixel
+  distance on certain images (HST, for example), since the CDELT1 and
+  CDELT2 keywords were not always defined. This has been changed now
+  to use wcsWidth/pixWidth, which is known.
+
+--------------- released astrotcl-1.0 -----------------------------------
+
+* Compress: Fixed bug in h_comp.h (H_COMPRESS), so that it now works
+  on Linux (inserted calls to htonl and ntohl where needed to make it
+  portable).
+
+* Created new package "Astrotcl" by gathering general astronomy
+  related Tcl and C++ code from other packages into a single, reusable
+  package.
+
+
+----------- Nov 21, 1997: begin change log for Astrotcl  ----------------
+
