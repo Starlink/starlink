@@ -279,6 +279,8 @@
 *        Added autoscale parameter.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     10-APR-2001 (MBT):
+*        Slight changes to the way it writes output lists.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -320,7 +322,8 @@
       INTEGER FDIN              ! Input file identifier
       INTEGER FDOUT             ! Output file identifier
       INTEGER FIOGR             ! Input position list name group
-      INTEGER FIOGRO            ! Input position list name group
+      INTEGER FIOGRO            ! Output position list name group
+      INTEGER FIOGRU            ! Group of non-empty output position lists
       INTEGER I                 ! Loop counter
       INTEGER IDIN              ! Input NDF identifier
       INTEGER IPDAT             ! Pointer to positions data
@@ -421,6 +424,10 @@
 *=======================================================================
       CALL CCD1_STRGR( 'OUTLIST', NDFGR, NNDF, NNDF, FIOGRO, DUMMY,
      :                 STATUS )
+
+*  Create a new group for output lists which are actually written
+*  ones with no positions in will not be.
+      CALL GRP_NEW( 'CCDPACK:LISTS', FIOGRU, STATUS )
 
 *=======================================================================
 *  Get the parameters controlling the centroiding process.
@@ -581,12 +588,12 @@
 *  Perform the centroiding.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_CENT( TYPE, IPIN, NCOL, NLINE, LBND, %VAL( IPDIN ),
-     :                %VAL( IPXIN ), %VAL( IPYIN ), NREC, ISIZES, SIGN,
-     :                MAXSHS, MAXIT, TOLERS, %VAL( IPDOUT ),
-     :                %VAL( IPXOUT ), %VAL( IPYOUT ), NOUT, STATUS )
+     :                   %VAL( IPXIN ), %VAL( IPYIN ), NREC, ISIZES,
+     :                   SIGN, MAXSHS, MAXIT, TOLERS, %VAL( IPDOUT ),
+     :                   %VAL( IPXOUT ), %VAL( IPYOUT ), NOUT, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN 
 
-*  An severe error has occured accomany the message with the file name.
+*  An severe error has occured accompany the message with the file name.
             CALL NDF_MSG( 'NDF', IDIN)
             CALL FIO_FNAME( FDIN, FNAME, STATUS )
             CALL MSG_SETC( 'POS', FNAME )
@@ -597,15 +604,24 @@
          END IF
 
 *  Get the name of the output list of positions and open it.
-         CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
-         CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, STATUS )
+         IF ( NOUT .GT. 0 ) THEN
+            CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
+            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDOUT, STATUS )
 
 *  Write the output results.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL CCD1_FIOHD( FDOUT, 'Output from FINDCENT', STATUS )
-         CALL CCD1_WRIXY( FDOUT, %VAL( IPDOUT ), %VAL( IPXOUT ),
-     :                    %VAL( IPYOUT ), NOUT, LINE, CCD1__BLEN,
-     :                    STATUS ) 
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            CALL CCD1_FIOHD( FDOUT, 'Output from FINDCENT', STATUS )
+            CALL CCD1_WRIXY( FDOUT, %VAL( IPDOUT ), %VAL( IPXOUT ),
+     :                       %VAL( IPYOUT ), NOUT, LINE, CCD1__BLEN,
+     :                       STATUS ) 
+
+*  Close the file.
+            CALL FIO_CLOSE( FDOUT, STATUS )
+
+*  Add this to the list of position lists which have actually been
+*  written.
+            CALL GRP_PUT( FIOGRU, 1, FNAME, 0, STATUS )
+         END IF
                                    
 *  Write the report about this loop. The input positions.
          CALL GRP_GET( FIOGR, I, 1, FNAME, STATUS )
@@ -617,37 +633,50 @@
          CALL MSG_SETI( 'NREC', NREC )
          CALL CCD1_MSG( ' ',        
      : '  Number of input positions: ^NREC', STATUS )
+
+*  If an output list was written then summarise it.
+         IF ( NOUT .GT. 0 ) THEN
                                     
 *  Output parameters: Name of output position list.
-         CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
-         CALL MSG_SETC( 'FDOUT', FNAME )
-         CALL CCD1_MSG( ' ',        
+            CALL GRP_GET( FIOGRO, I, 1, FNAME, STATUS )
+            CALL MSG_SETC( 'FDOUT', FNAME )
+            CALL CCD1_MSG( ' ',        
      : '  Output positions list: ^FDOUT',
      :                  STATUS )     
                                      
 *  Number of entries.                
-         CALL MSG_SETI( 'NOUT', NOUT )
-         CALL CCD1_MSG( ' ',         
+            CALL MSG_SETI( 'NOUT', NOUT )
+            CALL CCD1_MSG( ' ',         
      : '  Number of output positions: ^NOUT', STATUS )
                                
 *  Number of positions not centroided.
-         IF ( NREC - NOUT .GT. 0 ) THEN 
-            CALL MSG_SETI( 'NFAIL', NREC - NOUT )
-            CALL CCD1_MSG( ' ',
+            IF ( NREC - NOUT .GT. 0 ) THEN 
+               CALL MSG_SETI( 'NFAIL', NREC - NOUT )
+               CALL CCD1_MSG( ' ',
      :'  Number of positions NOT centroided: ^NFAIL', STATUS )
-         END IF                
+            END IF                
+
+*  If no output list was written, log this fact.
+         ELSE
+            CALL CCD1_MSG( ' ',
+     : '  No output positions list written.', STATUS )
+         END IF
 
 *  If the position list names were accessed using the NDF extension item
-*  'CURRENT_LIST' then update the NDF extensions to show the output
-*  list as current list.
+*  'CURRENT_LIST' then update the NDF extension; either associate the
+*  new list with the NDF, or if no list was generated ensure that there
+*  is no CURRENT_LIST item.
          IF ( NDFS ) THEN      
-            CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
+            IF ( NOUT .GT. 0 ) THEN
+               CALL CCG1_STO0C( IDIN, 'CURRENT_LIST', FNAME, STATUS )
+            ELSE
+               CALL CCD1_RMIT( IDIN, 'CURRENT_LIST', .TRUE., STATUS )
+            END IF
          END IF                
                                
 *  Close files and release resources used on this loop.
          CALL NDF_ANNUL( IDIN, STATUS )
          CALL FIO_CLOSE( FDIN, STATUS )
-         CALL FIO_CLOSE( FDOUT, STATUS )
          CALL CCD1_MFREE( IPDAT, STATUS )
          CALL CCD1_MFREE( IPDIN, STATUS )
          CALL CCD1_MFREE( IPXOUT, STATUS )
@@ -657,7 +686,7 @@
          CALL CCD1_MFREE( IPYIN, STATUS )
 
 *  Write terminator for Processing NDF: message.
-         CALL CCD1_MSG( ' ', '  ---',STATUS )
+         CALL CCD1_MSG( ' ', '  ---', STATUS )
                                
 *=======================================================================
 *  End of main processing loop.
@@ -672,7 +701,7 @@
 *  indirection into other applications.
          IF ( STATUS .EQ. SAI__OK ) THEN 
             CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
-     :   '# FINDCENT - output position lists', FIOGRO, .TRUE., STATUS )
+     :   '# FINDCENT - output position lists', FIOGRU, .TRUE., STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN 
                CALL ERR_ANNUL( STATUS )
                CALL CCD1_MSG( ' ', '  No namelist written', STATUS )
