@@ -103,6 +103,8 @@
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER object
       CHARACTER*(DAT__SZLOC)	INLOC			! INSTRUMENT object
 
+      INTEGER			MID			! Mission strings info
+
       LOGICAL			DOK, FOK		! Things present?
 *.
 
@@ -130,11 +132,11 @@
       IF ( FOK .OR. DOK ) THEN
 
 *    Locate INSTRUMENT structure, creating if necessary
-        CALL ADI1_LOCINSTR( ARGS(1), .TRUE., ILOC, STATUS )
+        CALL ADI1_LOCINSTR( ARGS(1), .TRUE., INLOC, STATUS )
 
 *    Copy detector and filter
-        CALL ADI1_CCA2HC( MID, 'Detector', ILOC, 'DETECTOR', STATUS )
-        CALL ADI1_CCA2HC( MID, 'Filter', ILOC, 'FILTER', STATUS )
+        CALL ADI1_CCA2HC( MID, 'Detector', INLOC, 'DETECTOR', STATUS )
+        CALL ADI1_CCA2HC( MID, 'Filter', INLOC, 'FILTER', STATUS )
 
 *    Also write FILTER to header
         CALL ADI1_CCA2HC( MID, 'Filter', HLOC, 'FILTER', STATUS )
