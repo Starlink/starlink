@@ -1,5 +1,11 @@
 1 CNF_update
 
+ CNF Version 4.1 is release.
+
+ A new Fortran routine is available, CNF_PREG, that can be used
+ to register with CNF a pointer obtained using %LOC, such that
+ it can be retrieved later using CNF_PVAL.
+
  CNF Version 4.0-2 is released.
 
  The names of the C interface functions have been changed from the form
