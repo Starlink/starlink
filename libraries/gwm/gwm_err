@@ -18,7 +18,7 @@
 * Unable to open display
 
       INTEGER GWM__NOWIN
-      PARAMTER ( GWM__NOWIN = 233340962 )
+      PARAMETER ( GWM__NOWIN = 233340962 )
 * Unable to open window
 
       INTEGER GWM__WINNF
