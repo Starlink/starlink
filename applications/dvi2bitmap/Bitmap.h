@@ -20,9 +20,8 @@ class Bitmap {
     Bitmap (const int width, const int height, const int bpp=1);
     ~Bitmap();
 
-    // make sure Left..Bottom are 0..3
-    // (I should use an iterator, I know...)
-    enum Margin { Left=0, Right=1, Top=2, Bottom=3, All, None };
+    // make sure Left..Bottom are 0..3 (I should use an iterator, I know...)
+    enum Margin { Left=0, Right=1, Top=2, Bottom=3, All};
 
     void paint (const int x, const int y, const int w, const int h,
 		const Byte* b);
@@ -84,10 +83,6 @@ class Bitmap {
     int  cropMargin[4];
     static bool cropMarginAbsDefault[4];
     bool cropMarginAbs[4];
-    // If doCropMargin is true, then crop() will crop margins, otherwise
-    // it's a no-op.
-    bool doCropMargin;
-    static bool doCropMarginDefault;
     bool transparent_;		// make bg transparent if poss.
     //Byte fg_red_, fg_green_, fg_blue_, bg_red_, bg_green_, bg_blue_;
     BitmapColour fg_, bg_;

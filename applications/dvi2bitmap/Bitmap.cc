@@ -30,7 +30,6 @@
 #include "BitmapImage.h"
 
 verbosities Bitmap::verbosity_ = normal;
-bool Bitmap::doCropMarginDefault = true;
 int  Bitmap::cropMarginDefault[4] = { 0, 0, 0, 0 };
 bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 //Byte Bitmap::def_fg_red_   = 0;
@@ -77,7 +76,6 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
-    doCropMargin	  = doCropMarginDefault;
 
     if (def_customRGB_)
     {
@@ -234,7 +232,7 @@ void Bitmap::strut (const int x, const int y,
 // as long as empty() is false.
 //
 // Code before this in this file should be called only when the bitmap
-// is unfrozen, code afterwards only when it is frozen.
+// is unfrozen, code afterwards freezes the bitmap if it is not frozen already.
 void Bitmap::freeze()
 {
     if (frozen_)
@@ -264,28 +262,28 @@ void Bitmap::freeze()
 
 void Bitmap::crop ()
 {
+    // Not idempotent, since scaleDown() requires to be able to
+    // re-call this function after scaling, which will happen only if
+    // cropped_ is true.
+
     if (!frozen_)
 	freeze();
 
-    if (doCropMargin)
-    {
-	cropL = (cropMarginAbs[Left]	? cropMargin[Left]
-		 			: bbL - cropMargin[Left]);
-	cropR = (cropMarginAbs[Right]	? cropMargin[Right]
+    cropL = (cropMarginAbs[Left]	? cropMargin[Left]
+					: bbL - cropMargin[Left]);
+    cropR = (cropMarginAbs[Right]	? cropMargin[Right]
 					: bbR + cropMargin[Right]);
-	cropT = (cropMarginAbs[Top]		? cropMargin[Top]
+    cropT = (cropMarginAbs[Top]		? cropMargin[Top]
 					: bbT - cropMargin[Top]);
-	cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
+    cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
 					: bbB + cropMargin[Bottom]);
-    }
+
     cropped_ = true;
 }
 
 void Bitmap::crop (Margin spec, int pixels, bool absolute)
 {
-    if (spec == None)
-	doCropMargin = false;
-    else if (spec == All)
+    if (spec == All)
     {
 	cropMargin[Left] = pixels;
 	cropMarginAbs[Left] = absolute;
@@ -306,9 +304,7 @@ void Bitmap::crop (Margin spec, int pixels, bool absolute)
 	
 void Bitmap::cropDefault (Margin spec, int pixels, bool absolute)
 {
-    if (spec == None)
-	doCropMarginDefault = false;
-    else if (spec == All)
+    if (spec == All)
     {
 	cropMarginDefault[Left] = pixels;
 	cropMarginAbsDefault[Left] = absolute;
@@ -517,8 +513,14 @@ void Bitmap::write (const string filename, const string format)
 		("Bitmap: can't create image with default format");
     }
     if (cropped_)
+    {
+	// Do a sanity-check on cropL..cropB, to make sure that we won't
+	// bust the bounds of B[] when writing out.
+	assert (cropT>=0 && cropB<=H && cropL>=0 && cropL<W);
+
 	for (int row=cropT; row<cropB; row++)
 	    bi->setBitmapRow(&B[row*W+cropL]);
+    }
     else
 	bi->setBitmap (B);
     if (verbosity_ > normal)
