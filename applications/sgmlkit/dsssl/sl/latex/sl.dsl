@@ -7,7 +7,8 @@
 <!ENTITY sllinks.dsl		SYSTEM "sllinks.dsl">
 <!ENTITY sltables.dsl		SYSTEM "sltables.dsl">
 
-<!ENTITY slparams.dsl		SYSTEM "sl-latex-parameters">
+<!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
+<!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN">
 
 <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
 <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
@@ -78,6 +79,7 @@ of Jade, written by me.
 &slmaths.dsl;
 &sllinks.dsl;
 &sltables.dsl;
+&commonparams.dsl;
 &slparams.dsl;
 
 <routine>

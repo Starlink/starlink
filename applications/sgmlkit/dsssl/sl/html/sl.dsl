@@ -8,7 +8,8 @@
 <!ENTITY sltables.dsl		SYSTEM "sltables.dsl">
 <!ENTITY sllinks.dsl		SYSTEM "sllinks.dsl">
 
-<!ENTITY slparams.dsl		SYSTEM "sl-html-parameters">
+<!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
+<!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
 
 <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
 <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
@@ -118,6 +119,7 @@ transformation extensions of Jade.</description>
 &sldocs.dsl
 &slsect.dsl
 &slmisc.dsl
+&commonparams.dsl
 &slparams.dsl
 &slhtml.dsl
 &slnavig.dsl

@@ -1,5 +1,6 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
-  <!ENTITY slparams.dsl		SYSTEM "slparams.dsl">
+  <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
+  <!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
   <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
 ]>
@@ -455,6 +456,7 @@ Declare the Jade Transform extensions.
 (declare-flow-object-class formatting-instruction
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 
+&commonparams.dsl;
 &slparams.dsl;
 
 <routine>

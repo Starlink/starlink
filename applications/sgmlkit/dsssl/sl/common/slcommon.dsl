@@ -1,4 +1,5 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY params.dsl PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
   <!ENTITY sl-gentext.dsl	SYSTEM "sl-gentext.dsl">
 ]>
 <!-- $Id$ -->
@@ -20,6 +21,9 @@ and
 
 <authorlist>
 <author id=ng affiliation='Glasgow'>Norman Gray
+
+;; Include common parameterisations
+&params.dsl;
 
 <routine>
 <routinename>getdocinfo
@@ -908,15 +912,24 @@ entity string passed as argument.
 Uses <funcname/sgml-parse/: see 10179, 10.1.7.
 <returnvalue type="node-list">Document element, or <code/#f/ on error.
 <argumentlist>
-<parameter>
-  ent-name
+<parameter>ent-name
   <type>string
-  <description>string containing entity declared in current context
+  <description>String containing entity declared in current context
 <codebody>
 (define (document-element-from-entity str)
-  (let ((sysid (entity-generated-system-id str)))
-    (and sysid
-	 (document-element (sgml-parse sysid)))))
+  (let* ((pubid (entity-public-id str))
+	 (fsi (debug (if pubid
+		  (entity-generated-system-id str)
+		  (string-append ;(entity-generated-system-id %starlink-decl%)
+		   "<" "OSFILE>/home/norman/s/src/sgml/w/sgml/dtd/starlink.decl"
+				 (entity-generated-system-id str))))))
+    (if fsi
+	(document-element (sgml-parse fsi))
+	(error (string-append "Can't generate file from entity " str)))))
+;(define (document-element-from-entity str)
+;  (let ((sysid (debug (entity-generated-system-id str))))
+;    (and sysid
+;	 (document-element (sgml-parse sysid)))))
 
 <routine>
 <routinename>isspace?

@@ -30,21 +30,32 @@ $Id$
 
 
 ;; Routinelist is simple
-(element routinelist ($html-section$))
+(element routinelist ($html-section$ (process-children)))
 
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
 ;; document.  We have to do it rather more by hand, therefore.
 ;; Don't yet support the IDS attribute.
 (element codecollection
-  ($html-section$ (with-mode routine-ref
-	      (process-codecollection (attribute-string (normalize "doc"))))))
+  (let ((docent (attribute-string (normalize "doc"))))
+    (if docent
+	($html-section$ (with-mode routine-ref
+			  (process-codecollection docent)))
+	(error "codecollection: missing required doc attribute"))))
 
 (define (process-codecollection docent)
-  (let ((docelem (document-element-from-entity docent)))
-      (process-node-list docelem)))
+  (if docent
+      (let ((de (document-element-from-entity docent)))
+      (and (debug (gi de)) (process-node-list de)))
+      (empty-sosofo)))
+
+(mode routine-ref-test
+  (element programcode
+    (literal "A program!")))
 
 (mode routine-ref
+  (element programcode
+    (process-children))
   (element codegroup
     (make sequence
       (make empty-element gi: "hr")
@@ -289,13 +300,13 @@ $Id$
     (process-matching-children 'title))
   (element title
     (process-children))
-  (element author
-    (let ((attrib (attribute-string (normalize "affiliation"))))
-    (make element gi: "li"
-	  (process-matching-children 'name)
-	  (if attrib
-	      (literal (string-append " (" attrib ")"))
-	      (empty-sosofo)))))
+;  (element author
+;    (let ((attrib (attribute-string (normalize "affiliation"))))
+;    (make element gi: "li"
+;	  (process-matching-children 'name)
+;	  (if attrib
+;	      (literal (string-append " (" attrib ")"))
+;	      (empty-sosofo)))))
   (element name
     (process-children)))
 

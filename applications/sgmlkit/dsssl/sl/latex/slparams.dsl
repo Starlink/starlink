@@ -16,10 +16,12 @@
   file called, say, params-mod.dsl, modify it to suit your needs, and
   create a catalogue file in the same directory which has an line like:
 
-    system "sl-latex-parameters" "params-mod.dsl"
+      PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN" 
+          ../dsssl/sl/latex/slparams.dsl
 
-  Then adjust your $SGML_CATALOG_FILES environment variable to put
-  this catalogue file early in the path.
+  (but all on a single line), giving the path to the parameterisation file,
+  relative to the catalog.  Then adjust your $SGML_CATALOG_FILES
+  environment variable to put this catalogue file early in the path.
 -->
 
 <routine>
@@ -33,14 +35,15 @@ class, preceded by an optional argument for the class options.
   (list "?twoside,11pt,a4paper" "article"))
 
 <routine>
-<routinename>show-element-ids
+<routinename>%latex-manifest%
 <description>
-If true, then display exported IDs in section (etc) titles.  This is
-useful for preparing a version of a document which you refer to while
-working on it, or another which refers to it often.
-<returnvalue type=boolean>True if we are to display exported ids.
+If not '#f' then the list of LaTeX files created by the
+stylesheet will be written to the file named by '%latex-manifest%'.
+<returnvalue type=string>Manifest filename
 <codebody>
-(define show-element-ids #f)
+(define %latex-manifest%
+	"LaTeX.manifest"
+	)
 
 <routine>
 <routinename>%latex-document-preamble%
@@ -414,35 +417,4 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 % .
 % @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 "))
-
-<routine>
-<routinename>%latex-manifest%
-<description>
-If not '#f' then the list of LaTeX files created by the
-stylesheet will be written to the file named by '%latex-manifest%'.
-<returnvalue type=string>Manifest filename
-<codebody>
-(define %latex-manifest%
-	"LaTeX.manifest"
-	)
-
-<routine>
-<routinename>%short-crossrefs%
-<description>If true, this will make the down-converter generate shorter 
-link texts for cross-references.
-<returnvalue type=boolean>Return true to generate short references
-<codebody>
-(define %short-crossrefs%
-  #t)
-
-<routine>
-<routinename>suppress-manifest
-<description>
-If true, this will suppress the generation of a manifest, even if the variable 
-<funcname/%latex-manifest%/ is given.
-(This option can conveniently be set with <code/-V suppress-manifest/ on the 
-Jade command line).
-<returnvalue type=boolean>True if the manifest is to be suppressed
-<codebody>
-(define suppress-manifest #f)
 

@@ -2,7 +2,8 @@
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
   <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
   <!ENTITY maths.dsl		SYSTEM "slmaths.dsl" SUBDOC>
-  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
+  <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
+  <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
 ]>
 <!-- $Id$ -->
 
@@ -57,6 +58,7 @@ conversion to GIFs.
   (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
 
 ;; Read in the parameter file
+&commonparams.dsl;
 &params.dsl;
 
 (root

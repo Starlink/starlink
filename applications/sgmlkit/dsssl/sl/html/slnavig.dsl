@@ -255,8 +255,14 @@ list their children.  It does not supply any header.
   <type>integer
   <description>Maximum number of levels of TOC we want.  Zero means
   return immediately.
+<parameter>include-backmatter-contents
+  <type>boolean
+  <description>If true, then include a TOC for the backmatter
 <codebody>
-(define (make-contents #!optional (start-element (current-node)) (depth 1))
+(define (make-contents #!optional
+		       (start-element (current-node))
+		       (depth 1)
+		       (include-backmatter-contents #f))
   (let ((subsects (node-list-filter-by-gi (select-by-class
 					   (children start-element)
 					   'element)
@@ -265,22 +271,24 @@ list their children.  It does not supply any header.
 	    (<= depth 0))
 	(empty-sosofo)
 	(make element gi: "ul"
-	      (node-list-reduce
-	       subsects
-	       (lambda (last el)
-		 (sosofo-append
-		  last
-		  (cond
-		    ((string=? (gi el) (normalize "backmatter"))
-		     (make-contents-backmatter))
-		    (else (make element gi: "li"
-				(make element gi: "a"
-				      attributes: (list (list "href"
-							      (href-to el)))
-				      (with-mode section-reference
-					(process-node-list el)))
-				(make-contents el (- depth 1)))))))
-	       (empty-sosofo))))))
+	      (sosofo-append
+	       (node-list-reduce
+		subsects
+		(lambda (last el)
+		  (sosofo-append
+		   last
+		   (make element gi: "li"
+			 (make element gi: "a"
+			       attributes: (list (list "href"
+						       (href-to el)))
+			       (with-mode section-reference
+				 (process-node-list el)))
+			 (make-contents el (- depth 1)))))
+		(empty-sosofo))
+	       (if (and include-backmatter-contents
+			(hasbackmatter?))
+		   (make-contents-backmatter)
+		   (empty-sosofo)))))))
 
 
 <routine>
@@ -378,7 +386,7 @@ generated HTML documents.
       (make sequence
 	(make element gi: "h3"
 	      (literal "Contents"))
-	(make-contents (getdocbody) 4))
+	(make-contents (getdocbody) 4 #t))
       (empty-sosofo)))
 
 ;(define (section-footer-navigation elemnode)

@@ -206,7 +206,7 @@ it produces an <funcname/error/.
 	 (xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
 					      " has a SYSTEM id")))
 	 (xrefent-gen-sysid (error (string-append
-				"DOCXREF: Couldn't parse " xrefent-sysid)))
+				"DOCXREF: Couldn't parse " xrefent)))
 	 (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid linktext)
 			    (error (string-append
 				    "DOCXREF: couldn't make sense of FPI '"

@@ -1,7 +1,8 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
   <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
-  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
+  <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
+  <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN">
 ]>
 <!-- $Id$ -->
 
@@ -187,6 +188,7 @@ by BibTeX.
 
 
 ;; Read in the parameter file
+&commonparams.dsl;
 &params.dsl;
 
 (root
