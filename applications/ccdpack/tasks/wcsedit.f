@@ -38,7 +38,7 @@
 *  ADAM Parameters:
 *     COEFFS( * ) = _DOUBLE (Read)
 *        If MODE is ADD, this parameter is a list of the coefficients 
-*        used for the mapping from the basis frame to the new frame.
+*        used for the mapping from the target frame to the new frame.
 *        Its meaning and the number of values required depend on the 
 *        value of MAPTYPE:
 *           -  UNIT       -- No values are required
@@ -67,14 +67,14 @@
 *        Besselian epoch if less than 1984.0 and as a Julian epoch
 *        otherwise.
 *     FRAME = LITERAL (Read)
-*        This parameter specifies the 'basis frame', which has the
+*        This parameter specifies the 'target frame', which has the
 *        following meaning according to the value of the MODE parameter:
 *           -  MODE = CURRENT -- The frame to be made Current
 *           -  MODE = REMOVE  -- The frame to remove; if it is a domain
 *                                name (see below) then all frames with
 *                                that domain will be removed.
 *           -  MODE = ADD     -- The new frame will be a copy of the 
-*                                basis frame (though Domain and Title
+*                                target frame (though Domain and Title
 *                                will be changed), and will be mapped 
 *                                from it using the mapping given.
 *           -  MODE = SET     -- The frame whose attributes are to be set
@@ -123,7 +123,7 @@
 *        [BOTH]
 *     MAPTYPE = LITERAL (Read)
 *        This parameter is required when MODE is ADD, and specifies the
-*        type of mapping which connects the basis frame to the new frame.
+*        type of mapping which connects the target frame to the new frame.
 *        It may take one of the following values:
 *           -  UNIT
 *           -  LINEAR
@@ -217,20 +217,20 @@
       CHARACTER * ( 16 ) MAPTYP  ! Type of mapping to use
       CHARACTER * ( 16 ) MODE    ! Action to perform
       CHARACTER * ( IRH__SZNAM ) NAME ! Name of NDF
-      CHARACTER * ( AST__SZCHR ) DMBASI ! Domain of basis frame
+      CHARACTER * ( AST__SZCHR ) DMTARG ! Domain of target frame
       CHARACTER * ( AST__SZCHR ) DMRMV ! Domain to remove
       CHARACTER * ( AST__SZCHR ) DOMAIN ! Domain of new frame
-      CHARACTER * ( AST__SZCHR ) FRAME ! Basis frame as specified
+      CHARACTER * ( AST__SZCHR ) FRAME ! Target frame as specified
       CHARACTER * ( AST__SZCHR ) SET ! String pass to AST_SET
       CHARACTER * ( MXMDLN ) MODIF ! List of modified NDFs
       DOUBLE PRECISION COEFFS( 6 ) ! Coefficients of mapping
-      INTEGER FRBASI             ! AST pointer to basis frame
+      INTEGER FRTARG             ! AST pointer to target frame
       INTEGER FRNEW              ! AST pointer to new frame
       INTEGER I                  ! Loop variable
       INTEGER INDF               ! NDF identifier
       INTEGER INGRP              ! IRG identifier for NDF group
       INTEGER IWCS               ! AST pointer to WCS component
-      INTEGER JBASIS             ! Index of basis frame
+      INTEGER JTARG              ! Index of target frame
       INTEGER JCUR               ! Index of Current frame in unedited WCS comp
       INTEGER JNEW               ! Index of new frame in WCS component
       INTEGER MAP                ! AST pointer to mapping
@@ -289,7 +289,7 @@
          JCUR = AST_GETI( IWCS, 'Current', STATUS )
          SUCCES = .FALSE.
 
-*  Get the index of the Basis frame, that is the one specified by the
+*  Get the index of the Target frame, that is the one specified by the
 *  FRAME (and possibly EPOCH) parameter, without disturbing the Current
 *  frame.  If FRAME is null, then use the Current frame.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -297,14 +297,14 @@
             CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, ' ', ' ', .FALSE.,
      :                       STATUS )
          END IF
-         JBASIS = AST_GETI( IWCS, 'Current', STATUS )
-         DMBASI = AST_GETC( IWCS, 'Domain', STATUS )
+         JTARG = AST_GETI( IWCS, 'Current', STATUS )
+         DMTARG = AST_GETC( IWCS, 'Domain', STATUS )
          CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             SUCCES = .FALSE.
             CALL ERR_ANNUL( STATUS )
             CALL MSG_SETC( 'FRM', FRAME )
-            CALL CCD1_MSG( ' ', '      Basis frame ''^FRM'' not found',
+            CALL CCD1_MSG( ' ', '      Target frame ''^FRM'' not found',
      :                     STATUS )
 
 *  The requested frame exists.  Now we act according to MODE type.
@@ -312,8 +312,8 @@
 
 *  Set Current frame.
             IF ( MODE .EQ. 'CURRENT' ) THEN
-               CALL AST_SETI( IWCS, 'Current', JBASIS, STATUS )
-               CALL MSG_SETC( 'DOM', DMBASI )
+               CALL AST_SETI( IWCS, 'Current', JTARG, STATUS )
+               CALL MSG_SETC( 'DOM', DMTARG )
                CALL CCD1_MSG( ' ', 
      :                        '      Current frame set to domain ^DOM',
      :                        STATUS )
@@ -321,10 +321,10 @@
 
 *  Set frame attributes.
             ELSE IF ( MODE .EQ. 'SET' ) THEN
-               FRBASI = AST_GETFRAME( IWCS, JBASIS, STATUS )
+               FRTARG = AST_GETFRAME( IWCS, JTARG, STATUS )
                CALL PAR_GET0C( 'SET', SET, STATUS )
-               CALL AST_SET( FRBASI, SET, STATUS )
-               CALL MSG_SETC( 'DOM', DMBASI )
+               CALL AST_SET( FRTARG, SET, STATUS )
+               CALL MSG_SETC( 'DOM', DMTARG )
                CALL MSG_SETC( 'SET', SET )
                CALL CCD1_MSG( ' ',  '      Setting "^SET"' //
      :                        ' applied to domain ^DOM', STATUS )
@@ -347,9 +347,9 @@
                   SUCCES = .TRUE.
                ELSE
 
-*  Otherwise we can just remove the basis frame.
-                  CALL AST_REMOVEFRAME( IWCS, JBASIS, STATUS )
-                  CALL MSG_SETC( 'DOM', DMBASI )
+*  Otherwise we can just remove the target frame.
+                  CALL AST_REMOVEFRAME( IWCS, JTARG, STATUS )
+                  CALL MSG_SETC( 'DOM', DMTARG )
                   CALL CCD1_MSG( ' ', 
      :                           '      Removed frame in domain ^DOM',
      :                           STATUS )
@@ -392,17 +392,17 @@
                   IF ( INVERT ) CALL AST_INVERT( MAP, STATUS )
                END IF
 
-*  Copy the basis frame, and add the new domain name and title, to 
+*  Copy the target frame, and add the new domain name and title, to 
 *  create the new frame.
-               FRBASI = AST_GETFRAME( IWCS, JBASIS, STATUS )
-               FRNEW = AST_COPY( FRBASI, STATUS )
+               FRTARG = AST_GETFRAME( IWCS, JTARG, STATUS )
+               FRNEW = AST_COPY( FRTARG, STATUS )
                CALL AST_SETC( FRNEW, 'Domain', 
      :                        DOMAIN( : CHR_LEN( DOMAIN ) ), STATUS )
                CALL AST_SETC( FRNEW, 'Title', 'Added by WCSEDIT', 
      :                        STATUS )
 
 *  Add the new frame to the WCS frameset.
-               CALL AST_ADDFRAME( IWCS, JBASIS, MAP, FRNEW, STATUS )
+               CALL AST_ADDFRAME( IWCS, JTARG, MAP, FRNEW, STATUS )
                CALL CCD1_MSG( ' ', '      Added new frame', STATUS )
                SUCCES = .TRUE.
 
