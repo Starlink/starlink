@@ -966,6 +966,26 @@ programcode document, to elements in another programcode document.
 	(normalize "li")))
 
 <routine>
+<routinename>idindex-element-list
+<description><p>Return a list of elements which are to be included in the 
+idindex generated in the backmatter.  In principle, this is identical
+to <funcname>target-element-list</funcname>, but in practice it
+appears to be extremely expensive to do this for the
+<code>routine</code> elements, so we here generate a different list
+which has those elements removed.  In general, we wouldn't much want
+to include these in the idindex in any case.
+<p>No, just use <funcname>target-element-list</funcname>.  Function
+<funcname>make-idindex</funcname> is amazingly slow, but for some
+different, unknown, reason than this.
+<returnvalue type='list of strings'>List of elements to include in the
+idindex
+<codebody>
+;(define (idindex-element-list)
+;  (list-difference (target-element-list) (list (normalize "routine"))))
+(define (idindex-element-list)
+  (target-element-list))
+
+<routine>
 <routinename>ref-target-element-list
 <description>This is almost the same as
   <funcname>target-element-list</>, except that it lists those elements
@@ -1811,6 +1831,22 @@ the node subtree.  Starts with a letter.
 	  (append (list (car l)) (list-true (cdr l)))
 	  (list-true (cdr l)))))
 
+<routine>
+<routinename>list-difference
+<description>
+Given two lists <code>l</code> and <code>xl</code>, return a list
+containing just those elements of <code>l</code> which are not present 
+in <code>xl</code> (I'd have thought this was a standard function, but 
+apparently not)
+<returnvalue type="list">Filtered list of elements
+<codebody>
+(define (list-difference l xl)
+  (cond ((null? l)
+	 l)
+	((member (car l) xl)
+	 (list-difference (cdr l) xl))
+	(else
+	 (append (list (car l)) (list-difference (cdr l) xl)))))
 
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
