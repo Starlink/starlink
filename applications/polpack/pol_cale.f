@@ -185,7 +185,7 @@
                                  ! in image intercomparisons
       REAL E                     ! local estimate of E 
       REAL MAXDE                 ! max change in E
-      REAL SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
+      DOUBLE PRECISION SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
       REAL EMED, ZMED            ! median scale factor and zero shift
       
       LOGICAL GETS, GETZ, BAD    ! logical flags
@@ -440,11 +440,13 @@
          DO IPOS = 1, NPOS
             IF ( NSTATE( IPOS ) .GE. ISET ) THEN
                IPAIR = IPAIR + 1
-               SENSL = 1.0 / EEST( IPAIR )
-               SENSR = SENSL / F
+               SENSL = 1.0D0 / DBLE( EEST( IPAIR ) )
+               SENSR = SENSL / DBLE( F )
+
                CALL CCG1_CMLTR( BAD, NEL,
      :              %VAL( IPDIN( 2 * IPOS - 1, ISET ) ), SENSL,
      :              %VAL( IPDOU( 2 * IPOS - 1, ISET ) ), NERR, STATUS )
+
                CALL CCG1_CMLTR( BAD, NEL,
      :              %VAL( IPDIN( 2 * IPOS, ISET ) ), SENSR,
      :              %VAL( IPDOU( 2 * IPOS, ISET ) ), NERR, STATUS )
