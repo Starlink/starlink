@@ -3062,6 +3062,61 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 
+*+ IMG_SETINV
+	SUBROUTINE IMG_SETINV(STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  set region mask
+        IF (I_REG_TYPE.NE.'NONE') THEN
+          CALL IMG_SETINV_SUB(%val(I_REG_PTR))
+          I_REG_TYPE='COMPLEX'
+        ENDIF
+
+      ENDIF
+
+      END
+
+      SUBROUTINE IMG_SETINV_SUB(REG)
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'IMG_CMN'
+
+      BYTE REG(I_NX,I_NY)
+
+
+      INTEGER I,J
+
+      DO J=I_IY1,I_IY2
+        DO I=I_IX1,I_IX2
+          IF (REG(I,J).EQ.'00'X) THEN
+            REG(I,J)='01'X
+          ELSEIF (REG(I,J).EQ.'01'X) THEN
+            REG(I,J)='00'X
+          ENDIF
+        ENDDO
+      ENDDO
+
+      END
+
+
+
 *+ IMG_SETARD
 	SUBROUTINE IMG_SETARD(MASK,I1,I2,J1,J2,EXCLUDE,STATUS)
 

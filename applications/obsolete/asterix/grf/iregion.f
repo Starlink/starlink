@@ -119,6 +119,8 @@
             CALL IREGION_EXPORT(STATUS)
           ELSEIF (MODE.EQ.'IMP') THEN
             CALL IREGION_IMPORT(STATUS)
+          ELSEIF (MODE.EQ.'INV') THEN
+            CALL IMG_SETINV(STATUS)
           ENDIF
 
 
@@ -833,6 +835,7 @@
         ELSEIF (MODE.EQ.'WHO'.OR.
      :          MODE.EQ.'SHO'.OR.
      :          MODE.EQ.'EXP'.OR.
+     :          MODE.EQ.'INV'.OR.
      :          MODE.EQ.'IMP') THEN
 
            MERGE=.FALSE.
