@@ -1,0 +1,6 @@
+# Help definitions for the kappa package
+kappa men = kappa.men,
+         hlp = ..,
+         sys = kappa.hlp,
+         pkg = kappa.hd,
+         src = kappa.cl
