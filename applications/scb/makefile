@@ -241,7 +241,7 @@ EXPORT = .
 
 #  Default macro for Perl 5.
 
-PERL5 = /usr/local/bin/perl
+PERL5 = $(STARLINK)/Perl/bin/perl
 
 #  Default macros for compiling C and Fortran source code.
 
@@ -281,7 +281,7 @@ BLD_SHR = :
 
 #  Directory for installing Perl modules
 
-PERL_MOD_DIR = $(INSTALL)/lib/perl5
+PERL_MOD_DIR = $(INSTALL)/Perl/lib/perl5/site_perl
 
 #  Default directory for storing source code index files.
 
@@ -450,7 +450,7 @@ INSTALL_HELP = $(INSTALL)/help
 INSTALL_INC = $(INSTALL)/include
 INSTALL_LIB = $(INSTALL)/lib
 INSTALL_SHARE = $(INSTALL)/share
-INSTALL_PERL_MOD = $(INSTALL_LIB)/perl5
+INSTALL_PERL_MOD = $(PERL_MOD_DIR)
 INSTALL_CGI = $(INSTALL_BIN)/cgi
 
 #  List of directories actually used for installation (selected from
@@ -570,10 +570,19 @@ build:
 	@ echo '   INSTALL : $(INSTALL)'      >>$(DATE_STAMP)
 	@ echo '   STARLINK: $(STARLINK)'     >>$(DATE_STAMP)
 	@ echo ''                             >>$(DATE_STAMP)
-	@ echo '   LINK    : $(LINK)'         >>$(DATE_STAMP)
-	@ echo '   TAR_IN  : $(TAR_IN)'       >>$(DATE_STAMP)
-	@ echo '   TAR_OUT : $(TAR_OUT)'      >>$(DATE_STAMP)
-	@ echo ''                             >>$(DATE_STAMP)
+	@ echo '   LINK            : $(LINK)'             >>$(DATE_STAMP)
+	@ echo '   TAR_IN          : $(TAR_IN)'           >>$(DATE_STAMP)
+	@ echo '   TAR_OUT         : $(TAR_OUT)'          >>$(DATE_STAMP)
+	@ echo '   PERL5           : $(PERL5)'            >>$(DATE_STAMP)
+	@ echo '   PERL_MOD_DIR    : $(PERL_MOD_DIR)'     >>$(DATE_STAMP)
+	@ echo ''                                         >>$(DATE_STAMP)
+	@ echo '   SCB_SOURCES     : $(SCB_SOURCES)'      >>$(DATE_STAMP)
+	@ echo '   SCB_INDEX       : $(SCB_INDEX)'        >>$(DATE_STAMP)
+	@ echo '   SCB_BROWSER_TMP : $(SCB_BROWSER_TMP)'  >>$(DATE_STAMP)
+	@ echo '   SCB_INDEXER_TMP : $(SCB_INDEXER_TMP)'  >>$(DATE_STAMP)
+	@ echo '   HTX_SERVER      : $(HTX_SERVER)'       >>$(DATE_STAMP)
+	@ echo '   MIMETYPES_FILE  : $(MIMETYPES_FILE)'   >>$(DATE_STAMP)
+	@ echo ''                                         >>$(DATE_STAMP)
 #
 #  Record completion of the build.
 	@ echo '$(SYSTEM)' > .BUILT
