@@ -79,6 +79,7 @@
 *     17 Nov 92 : V1.7-0  Normalisation done properly (DJA)
 *     19 Nov 92 : V1.7-1  Updated arguments to AXIS_VAL2PIX (DJA)
 *     25 Feb 94 : V1.7-2  Use BIT_ routines to do bit manipulations (DJA)
+*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
 *
 *    Type Definitions :
 *
@@ -88,7 +89,6 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -174,7 +174,7 @@
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER            ( VERSION = 'RATIO Version 1.7-2' )
+        PARAMETER            ( VERSION = 'RATIO Version 1.8-0' )
 *-
 
 *    Check status
@@ -264,7 +264,7 @@
         ELSE IF ( VARI_OK ) THEN
 
 *        Use weights?
-          CALL PAR_GET0L( 'WEIGHT', USE_WEIGHT, STATUS )
+          CALL USI_GET0L( 'WEIGHT', USE_WEIGHT, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *        Reset variance flag if no weighting
@@ -440,7 +440,7 @@
       IF ( NDIM .EQ. 1 ) THEN
         AXIS = 1
       ELSE
-        CALL PAR_GET0I( 'AXIS', AXIS, STATUS )
+        CALL USI_GET0I( 'AXIS', AXIS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF (( AXIS.LT.1 ) .OR. ( AXIS.GT.NDIM )) THEN
           CALL MSG_PRNT( 'Axis must be between 1 and ^AX' )
@@ -471,8 +471,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Normalise output?
-      CALL PAR_DEF0L( 'NORMAL', .TRUE., STATUS )
-      CALL PAR_GET0L( 'NORMAL', RENORMALISE, STATUS )
+      CALL USI_DEF0L( 'NORMAL', .TRUE., STATUS )
+      CALL USI_GET0L( 'NORMAL', RENORMALISE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    We need axis widths if either the selected axis is normalised, or if
