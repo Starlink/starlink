@@ -3,7 +3,7 @@
 #
 # $Id$
 
-SCRIPTS=img-eqlist.pl
+SCRIPTS=img-eqlist.pl abstract-star2html.pl
 
 libdocs.sgml: $(SCRIPTS)
 	cp libdocs.head $@

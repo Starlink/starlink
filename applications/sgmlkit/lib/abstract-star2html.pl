@@ -1,11 +1,13 @@
 #! /usr/bin/perl -w 
-#
-# RCS $Id$
+
+$RCSID = '$Id$';
+
 #+
-#<func>
-#<routinename>abstract-star2html.pl
-#<purpose>Obtain an SGML summary of a Star2HTML document
-#<description>
+# <routinename id=abstract-star2html>abstract-star2html.pl
+#
+# <purpose>Obtain an SGML summary of a Star2HTML document
+#
+# <description>
 # This reads a file marked up using the Star2HTML
 # extensions, plus an HTX index file, and produces a summary of the
 # document marked up using the DocumentSummary DTD.  That includes the
@@ -29,7 +31,8 @@
 #
 # <p>The parsing can cope with <code>\xlabel</code> commands either outside 
 # section headings or inside them, and copes with multiple
-# <code>\xlabel</code> commands within a heading by emitting <LABEL>
+# <code>\xlabel</code> commands within a heading by
+# emitting <code>&lt;label></>
 # elements after the heading.  It logs a message to stderr when it
 # discovers this. 
 #
@@ -47,7 +50,7 @@
 # HTX index file.
 #
 #
-# <p>Limitations:
+# <diytopic>Limitations
 #
 # <p>The result could benefit from a little editing, to insert the
 # attribute values of the AUTHOR element such as email address, which
@@ -71,16 +74,18 @@
 # <p>Because folk can do arbitrarily clever things with newcommands, I've had
 # to dumb down the parsing of them.  The code here will successfully extract
 # document number, author, etc, as long as the corresponding newcommand is
-# all on one line.  I've had to do the same with \(sub)*section parsing.
+# all on one line.  I've had to do the same with
+# <code>\(sub)*section</> parsing. 
 # This will fail sometimes, but the result will be a
-# thin but <em/valid/ SGML document, and will not cause this code to spin
-# its wheels indefinitely.  If you include the option <code/--force/, then
+# thin but <em>valid</> SGML document, and will not cause this code to spin
+# its wheels indefinitely.  If you include the option <code>--force</>, then
 # even if there's some fatal error, such as an input file not being present,
 # then the script will still return with a zero exit status.
 #
 # <returnvalue type=file>
 # A file conforming to the DocumentSummary DTD
 #
+# <argumentlist>
 #  <parameter>input-file-name
 #    <type>Star2HTML file
 #    <description>A file marked up using the Star2HTML extensions to LaTeX2HTML
@@ -94,7 +99,7 @@
 #    <description>The prefix is added to each of the filenames in the
 #      HTX index, to make the generated URLs relative to the appropriate
 #      root of the document server, which is set in the DSSSL variable 
-#      <code>%starlink-document-server%<code>, and might have the value
+#      <code>%starlink-document-server%</code>, and might have the value
 #      <code>`file:///star/docs/'</code>
 #
 #  <parameter>--output=outfile
@@ -107,8 +112,14 @@
 #    <description>If present, then any errors which emerge after this will
 #      terminate the program, but return with a zero exit status.
 #
+#  <parameter>--version
+#    <type>option
+#    <description>Print the version number and exit.
+#
+#  <authorlist>
 #  <author id=ng webpage='http://www.astro.gla.ac.uk/users/norman/'
 #    affiliation='Glasgow'>Norman Gray
+#-
 
 $ident_string = "Starlink SGML system, release ((PKG_VERS))";
 
@@ -123,6 +134,9 @@ while ($#ARGV >= 0)
 	$outputfile = $1;
     } elsif ($ARGV[0] eq '--force') { # fail quietly (ie, zero exit status)
 	$dontfail = 1;
+    } elsif ($ARGV[0] eq '--version') {
+	print "$ident_string\n$RCSID\n";
+	exit (0);
     } elsif (!defined ($inputfilename)) {
 	$inputfilename = $ARGV[0];
     } elsif (!defined ($indexfilename)) {
