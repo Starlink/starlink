@@ -1,3 +1,4 @@
+
  Begin FrameSet 	# Set of inter-related coordinate systems
     ID = "FITSID ISEQ 1" 	# Object identification string
  IsA Object 	# AST Object
@@ -58,6 +59,7 @@
              End WinMap
        End CmpMap
  End FrameSet
+
  Begin FrameSet 	# Set of inter-related coordinate systems
     ID = "FITSID ISEQ 2" 	# Object identification string
  IsA Object 	# AST Object
@@ -118,6 +120,7 @@
              End WinMap
        End CmpMap
  End FrameSet
+
  Begin FrameSet 	# Set of inter-related coordinate systems
     ID = "FITSID ISEQ 3" 	# Object identification string
  IsA Object 	# AST Object
@@ -194,3 +197,4 @@
              End CmpMap
        End CmpMap
  End FrameSet
+
