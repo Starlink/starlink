@@ -23,6 +23,7 @@
      
 *     Modifications:
 
+*     18 Mar 05 : TIMJ- A THUMPER tweak to the output formatting
 *     2  Feb 04 : TIMJ- Fix TT vs UT confusion. RJDATE now returns TT MJD
 *                       since that is the most common variant. LST calculation
 *                       now (correctly) uses UT but all other SLA routines
@@ -961,7 +962,7 @@ C  GET UT in an array
                ENDIF
 
                CALL MSG_FMTI('P1','I4',K)
-               CALL MSG_FMTD('P2','F5.1',FREQ(I,1))
+               CALL MSG_FMTD('P2','F6.1',FREQ(I,1))
                CALL MSG_FMTD('P3','F5.1',FREQ(I,2))
                CALL MSG_FMTD('P4','F9.2',FLUX(I))
                CALL MSG_FMTD('P5','F9.2',FLUXBC(I))
