@@ -1,26 +1,66 @@
-*+  ACF - Calculate an autocorrelation function for time series.
-      SUBROUTINE ACF (STATUS)
-*
-*    Description :
-*
+      SUBROUTINE ACF( STATUS )
+*+
+*  Name:
+*     ACF
+
+*  Purpose:
+*     Calculate an autocorrelation function for time series.
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL ACF( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Calculates a 1 dimensional autocorrelation function for any dataset.
 *     Extra dimensions are looped over producing a series of autocorrelation
 *     functions.
 *
 *     Errors and quality may be taken into account. The autocorrelation
 *     function(s) may be BIASSED to suppress high lag components.
-*
-*    Environment Parameters :
-*
-*     INP         - Input dataset           (_UNIV, Read)
-*     OUT         - Output dataset          (_UNIV, Write)
-*     AXIS        - Axis to correlate along (_Integer, Read)
-*     BIAS        - Bias the ACF?           (_Logical, Read)
-*     WEIGHT      - Use variance if ok?     (_Logical, Read)
-*     MXLAG       - Maximum lag             (_Integer, Read)
-*
-*    Method :
-*
+
+*  Usage:
+*     acf {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input dataset
+*     INP = CHAR (read)
+*        Output dataset
+*     AXIS = INTEGER (read)
+*        Axis to correlate along
+*     BIAS = LOGICAL (read)
+*        Bias the ACF?
+*     WEIGHT = LOGICAL (read)
+*        Use variance if ok?
+*     MXLAG = INTEGER (read)
+*        Maximum lag
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     For WEIGHTED case uses method given in Weisskopf, Kahn, &
 *     Sutherland (Ap.J. 199, L147 (1975)). This is corrected for
 *     the extra statistical noise contribution at zero lag, AND
@@ -29,111 +69,158 @@
 *
 *     UNBIASSED results are normalized by  * 1 / (NPTS - LAG)
 *     BIASSED results are normalized by * 1 / NPTS (suppressing large lags).
-*
-*    Deficiencies :
-*
-*     Only works for regularly spaced data.
-*
-*    Bugs :
-*    Authors :
-*
-*     Phil Andrews (BHVAD::PLA)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     12 Jun 89 : V1.0-0 Original (PLA)
-*     14 Jun 90 : V1.2-0 Does check for irregular axes and bad quality (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     20 Apr 95 : V1.8-1 New data interface (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'ADI_PAR'
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Local variables :
-*
-      CHARACTER*80           TEXT(2)
-      CHARACTER*80           UNITS
 
-      INTEGER                I                     ! Loop counter
-      INTEGER                IDPTR                 ! Input data pointer
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     acf, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     PLA: Phil Andrews (ROSAT,University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     12 Jun 1989 V1.0-0 (PLA):
+*        Original version.
+*     14 Jun 1990 V1.2-0 (DJA):
+*        Does check for irregular axes and bad quality
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     20 Apr 1995 V1.8-1 (DJA):
+*        New data interface
+*      4 Dec 1995 V2.0-0 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Global Variables:
+      INCLUDE '{global_variables_file}' ! [global_variables_description]
+*        {global_name}[dimensions] = {data_type} ({global_access_mode})
+*           [global_variable_purpose]
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      [external_declaration]
+      {data_type} {external_name} ! [external_description]
+
+*  Local Constants:
+      {data_type} {constant_name} ! [constant_description]
+      PARAMETER ( {constant_name} = {cons} )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'ACF Version V2.0-0' )
+
+*  Local Variables:
+      CHARACTER*80           	TEXT(2)
+      CHARACTER*80           	UNITS
+
+      REAL			SPARR(2)		! Spaced array data
+
+      INTEGER                	I                     	! Loop counter
+      INTEGER                	IDPTR                 	! Input data pointer
       INTEGER			IFID			! Input dataset id
-      INTEGER                IQPTR                 ! Input quality pointer
-      INTEGER                IVPTR                 ! Input variance pointer
-      INTEGER                ODPTR                 ! Output data pointer
+      INTEGER                	IQPTR                 	! Input quality pointer
+      INTEGER                	IVPTR                 	! Input variance pointer
+      INTEGER                	ODPTR                 	! Output data pointer
       INTEGER			OFID			! Output dataset id
-      INTEGER                OLDIMS(ADI__MXDIM)    ! Size of output dimensions
-      INTEGER                OQPTR                 ! Output quality pointer
-      INTEGER                OVPTR                 ! Output variance pointer
-      INTEGER                LDIMS(ADI__MXDIM)     ! Length of each dimension
-      INTEGER                NELM                  ! total number of data values
-      INTEGER                MXLAG                 ! Maximum lag required
-      INTEGER                NBAD                  ! # of bad points
-      INTEGER                NDIM                  ! Number of dimensions
-      INTEGER                NPTS                  ! Number of T_AXIS values
-      INTEGER                T_AXIS                ! Index of time axis
-      INTEGER                TLDIMS(ADI__MXDIM)    ! Length of each dimension
-      INTEGER                TNDIM                 ! Number of dimensions
+      INTEGER                	OLDIMS(ADI__MXDIM)    	! Size of output dimensions
+      INTEGER                	OQPTR                 	! Output quality pointer
+      INTEGER                	OVPTR                 	! Output variance pointer
+      INTEGER                	LDIMS(ADI__MXDIM)     	! Length of each dimension
+      INTEGER                	NELM                  	! total number of data values
+      INTEGER                	MXLAG                 	! Maximum lag required
+      INTEGER                	NBAD                  	! # of bad points
+      INTEGER                	NDIM                  	! Number of dimensions
+      INTEGER                	T_AXIS                	! Index of time axis
 
       REAL                   	BASE                  ! } these define the
       REAL                   	SCALE                 ! } regular axis values
 
-      LOGICAL                	BAD                   	! Any bad quality?
       LOGICAL                	BIAS                  	! Biassed autocovariance?
       LOGICAL                	OK                    	! Is data ok?
       LOGICAL                	QOK                   	! Is QUALITY ok?
       LOGICAL                	REG                   	! Regularly spaced T_AXIS?
       LOGICAL                	USEWT                 	! Use weighting?
-*
-*    Version id :
-*
-      CHARACTER*80		VERSION
-        PARAMETER            	( VERSION ='ACF Version 1.8-1' )
-*-
+*.
 
-*  Version
-      CALL MSG_PRNT (VERSION)
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
       CALL AST_INIT()
 
 *  Obtain input & output identifiers
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Check the dataset
-      CALL BDI_CHKDATA (IFID, OK, NDIM, LDIMS, STATUS)
-
-      IF (.NOT. OK) THEN
+      CALL BDI_CHK( IFID, 'DATA', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, LDIMS, NDIM, STATUS )
+      IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset', STATUS )
         GOTO 99
       END IF
 
-      IF (NDIM .GT. 1) THEN
-        CALL AXIS_TFIND( IFID, 'TIMETAG', NDIM, T_AXIS, STATUS)
+*  More than one axis?
+      IF ( NDIM .GT. 1 ) THEN
+
+*    List the axes
         CALL MSG_PRNT (' ')
         CALL MSG_PRNT (' The axes present are:-')
         CALL AXIS_TLIST( IFID, NDIM, STATUS)
         CALL MSG_PRNT (' ')
 
-        IF (T_AXIS .GT. 0) THEN
-          CALL USI_DEF0I ('AXIS', T_AXIS, STATUS)
-
+*    Try to find time axis
+        CALL BDI0_FNDAXC( IFID, 'T', T_AXIS, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+          T_AXIS = -1
         END IF
-        CALL USI_GET0I ('AXIS', T_AXIS, STATUS)
+        IF ( T_AXIS .GT. 0 ) THEN
+          CALL USI_DEF0I ('AXIS', T_AXIS, STATUS)
+        END IF
 
-*      Check status
+*    Get time axis
+        CALL USI_GET0I ('AXIS', T_AXIS, STATUS)
         IF (STATUS .NE. SAI__OK) GOTO 99
 
       ELSE
@@ -141,53 +228,44 @@
 
       END IF
 
-*    Set length of unused dimensions to 1
-      IF (NDIM .LT. ADI__MXDIM) THEN
-        DO I = NDIM + 1, ADI__MXDIM
-          LDIMS(I) = 1
-        END DO
-      END IF
+*  Set length of unused dimensions to 1
+      CALL AR7_PAD( NDIM, LDIMS, STATUS )
 
-*    Map input data
-      CALL BDI_MAPDATA (IFID, 'R', IDPTR, STATUS)
-      CALL ARR_SUMDIM( NDIM, LDIMS, NELM, STATUS )
+*  Map input data
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
+      CALL ARR_SUMDIM( NDIM, LDIMS, NELM )
 
-*    User input
-      CALL USI_GET0L ('BIAS',  BIAS,  STATUS)
-      CALL USI_GET0L ('WEIGHT', USEWT, STATUS)
-
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
+*  User input
+      CALL USI_GET0L( 'BIAS', BIAS, STATUS )
+      CALL USI_GET0L( 'WEIGHT', USEWT, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       IF (USEWT) THEN
-*      See if quality is present
-        CALL BDI_CHKQUAL (IFID, QOK, TNDIM, TLDIMS, STATUS)
 
+*    See if quality is present
+        CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAPLQUAL (IFID, 'R', BAD, IQPTR, STATUS)
+
+          CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
 
 *        Check for no bad quality events
-          IF ( BAD ) THEN
-            CALL ARR_NBAD( NELM, %VAL(IQPTR), NBAD, STATUS )
+          CALL ARR_NBAD( NELM, %VAL(IQPTR), NBAD, STATUS )
+          IF ( NBAD .GT. 0 ) THEN
             CALL MSG_SETI( 'NBAD', NBAD )
             CALL MSG_PRNT( 'There are ^NBAD bad quality points' )
-          ELSE
-            CALL BDI_UNMAPLQUAL (IFID, STATUS)
-            QOK = .FALSE.
-
           END IF
+
         END IF
 
-*      Check and map variance
-        CALL BDI_CHKVAR (IFID, OK, TNDIM, TLDIMS, STATUS)
-
+*    Check and map variance
+        CALL BDI_CHK( IFID, 'Variance', OK, STATUS )
         IF ( OK ) THEN
-          CALL BDI_MAPVAR (IFID, 'R', IVPTR, STATUS)
+          CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
 
         ELSE IF ( QOK ) THEN
 
 *        Create a dynamic array & set values to 1.0E0
-          CALL DYN_MAPR (NDIM, LDIMS, IVPTR, STATUS)
+          CALL DYN_MAPR( NDIM, LDIMS, IVPTR, STATUS )
           CALL ARR_INIT1R( 1.0, NELM, %VAL(IVPTR), STATUS )
 
         ELSE
@@ -195,24 +273,24 @@
 
         END IF
       END IF
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Check correlation axis is regularly spaced.
-      CALL BDI_CHKAXVAL (IFID, T_AXIS, OK, REG, NPTS, STATUS)
+*  Check correlation axis is regularly spaced.
+      CALL BDI_AXCHK( IFID, T_AXIS, 'Data', OK, STATUS )
       SCALE = 1.0E0
       UNITS = 'pixels'
 
       IF ( OK ) THEN
-        CALL BDI_GETAXVAL( IFID, T_AXIS, BASE, SCALE, TNDIM, STATUS )
-        CALL BDI_GETAXUNITS( IFID, T_AXIS, UNITS, STATUS )
-
-      ELSE IF (OK .AND. .NOT. REG) THEN
+        CALL BDI_AXMAPR( IFID, T_AXIS, 'Data', 'READ', APTR, STATUS )
+        CALL ARR_CHKREG( %VAL(APTR), LDIMS(T_AXIS), REG, BASE, SCALE,
+     :                   STATUS )
+        IF ( .NOT. REG ) THEN
         CALL MSG_PRNT ('WARNING: Autocorrelation axis is not regularly '
      :                                                      //'spaced!')
-        STATUS = SAI__ERROR
-        GOTO 99
+          STATUS = SAI__ERROR
+          GOTO 99
+        END IF
+        CALL BDI_AXGET0C( IFID, T_AXIS, 'Units', UNITS, STATUS )
 
       ELSE
         CALL MSG_PRNT ('WARNING: No axis information!')
@@ -221,68 +299,61 @@
 
       END IF
 
-*    Ask user for maximum lag to calculate
-      CALL USI_DEF0I ('MXLAG', NPTS - 1, STATUS)
-      CALL USI_GET0I ('MXLAG', MXLAG,    STATUS)
-
-      IF (MXLAG .GT. (NPTS - 1)) THEN
-        MXLAG = NPTS - 1
-        CALL MSG_SETI ('LAG', MXLAG)
-        CALL MSG_PRNT ('WARNING: MXLAG too large. Reduced to ^LAG')
-
+*  Ask user for maximum lag to calculate
+      CALL USI_DEF0I( 'MXLAG', LDIMS(T_AXIS) - 1, STATUS )
+      CALL USI_GET0I( 'MXLAG', MXLAG, STATUS )
+      IF ( MXLAG .GT. (LDIMS(T_AXIS) - 1) ) THEN
+        MXLAG = LDIMS(T_AXIS) - 1
+        CALL MSG_SETI( 'LAG', MXLAG )
+        CALL MSG_PRNT( 'WARNING: MXLAG too large. Reduced to ^LAG' )
       END IF
 
-*    Create output dataset
+*  Create output dataset
       DO I = 1, ADI__MXDIM
         OLDIMS(I) = LDIMS(I)
       END DO
-
       OLDIMS(T_AXIS) = MXLAG + 1
 
-      CALL BDI_PUTLABEL (OFID, 'Autocorrelation', STATUS)
-      CALL BDI_CREDATA  (OFID, NDIM, OLDIMS,      STATUS)
-      CALL BDI_MAPDATA  (OFID, 'W', ODPTR,        STATUS)
-
-      CALL BDI_CREAXES  (OFID, NDIM,              STATUS)
+*  Create interface object
+      CALL BDI_LINK( 'BinDS', NDIM, OLDIMS, 'REAL', OFID, STATUS )
+      CALL BDI_PUT0C( OFID, 'Label', 'Autocorrelation', STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
       DO I = 1, NDIM
         IF (I .NE. T_AXIS) THEN
-          CALL BDI_CHKAXVAL (IFID, I, OK, REG, TNDIM, STATUS)
-
-          IF (OK) THEN
-            CALL BDI_COPAXIS (IFID, OFID, I, I, STATUS)
-
+          CALL BDI_CHK( IFID, I, 'Data', OK, STATUS )
+          IF ( OK ) THEN
+            CALL BDI_AXCOPY( IFID, I, ' ', OFID, I, STATUS )
           END IF
+
         ELSE
-          CALL BDI_CREAXVAL (OFID, I, .TRUE.,     OLDIMS(I), STATUS)
-          CALL BDI_PUTAXVAL (OFID, I, 0.0, SCALE, OLDIMS(I), STATUS)
-
-          CALL BDI_PUTAXTEXT( OFID, I, 'Lag', UNITS, STATUS )
-
+          SPARR(1) = 0.0
+          SPARR(2) = SCALE
+          CALL BDI_AXPUT1R( OFID, I, 'Data', 2, SPARR, STATUS )
+          CALL BDI_AXPUT0C( OFID, I, 'Label', 'Lag', STATUS )
+          CALL BDI_AXPUT0C( OFID, I, 'Units', UNITS, STATUS )
         END IF
+
       END DO
 
-      IF (USEWT) THEN
-        CALL BDI_CREVAR (OFID, NDIM, OLDIMS, STATUS)
-        CALL BDI_MAPVAR (OFID, 'W', OVPTR,   STATUS)
-
-        CALL BDI_CREQUAL (OFID, NDIM, OLDIMS, STATUS)
-        CALL BDI_MAPQUAL (OFID, 'W', OQPTR,   STATUS)
-
+      IF ( USEWT ) THEN
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
+        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0,
+     :                QUAL__MASK, STATUS )
       END IF
 
-*    Copy MORE box
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check status
-      IF (STATUS .NE. SAI__OK) GOTO 99
-
-*    Send mapped array(s) to subroutine
+*  Send mapped array(s) to subroutine
       IF ( USEWT ) THEN
         CALL ACF_WITHWT (NDIM, LDIMS, LDIMS(1), LDIMS(2), LDIMS(3),
      :        LDIMS(4), LDIMS(5), LDIMS(6), LDIMS(7), OLDIMS, OLDIMS(1),
      :            OLDIMS(2), OLDIMS(3), OLDIMS(4), OLDIMS(5), OLDIMS(6),
-     :       OLDIMS(7), NPTS, MXLAG+1, T_AXIS, %VAL(IDPTR), %VAL(IVPTR),
+     :       OLDIMS(7), LDIMS(T_AXIS), MXLAG+1, T_AXIS, %VAL(IDPTR),
+     :              %VAL(IVPTR),
      :    QOK, BIAS, %VAL(IQPTR), %VAL(ODPTR), %VAL(OVPTR), %VAL(OQPTR),
      :                                                           STATUS)
 
@@ -290,15 +361,14 @@
         CALL ACF_QUICK (NDIM, LDIMS, LDIMS(1), LDIMS(2), LDIMS(3),
      :        LDIMS(4), LDIMS(5), LDIMS(6), LDIMS(7), OLDIMS, OLDIMS(1),
      :            OLDIMS(2), OLDIMS(3), OLDIMS(4), OLDIMS(5), OLDIMS(6),
-     :              OLDIMS(7), NPTS, MXLAG+1, T_AXIS, %VAL(IDPTR), BIAS,
+     :              OLDIMS(7), LDIMS(T_AXIS), MXLAG+1, T_AXIS,
+     :                      %VAL(IDPTR), BIAS,
      :                                              %VAL(ODPTR), STATUS)
 
       END IF
-
-*    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Write History
+*  Write History
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
@@ -315,7 +385,7 @@
       END IF
       CALL HSI_PTXT( OFID, 2, TEXT, STATUS )
 
-*    Exit
+*  Exit
   99  CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -430,7 +500,7 @@
 
 *    Exit
   99  IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_REP( 'EXERR', '...from ACF_WITHWT', STATUS )
+        CALL AST_REXIT( 'ACF_WITHWT', STATUS )
       END IF
 
       END
@@ -835,7 +905,7 @@
 
 *    Exit
   99  IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP( 'EXERR', '...from ACF_QUICK', STATUS )
+        CALL AST_REXIT( 'ACF_QUICK', STATUS )
       END IF
 
       END
