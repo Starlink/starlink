@@ -168,7 +168,7 @@
       CALL HSI_PTXT(OFID,2,TEXT,STATUS)
 
 *  Copy over ancillary components
-      CALL UDI_COPANC(IFID,'grf',OFID,STATUS)
+      CALL UDI_COPANC(IFID,'grf,grp',OFID,STATUS)
 
 * Tidy up
  9000 CALL USI_ANNUL('INP',STATUS)
