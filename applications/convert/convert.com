@@ -28,6 +28,8 @@ $!     1992 September 10 (MJC):
 $!        Original version.
 $!     1992 September 29 (MJC):
 $!        Added NDF2IRAF.
+$!     1992 September 30 (MJC):
+$!        Added CONHELP.
 $!     {enter_further_changes_here}
 $!
 $!  Bugs:
@@ -46,6 +48,7 @@ $!  ====================================
 $!
 $ ASCII2*NDF  :== $CONVERT_DIR:ASCII2NDF
 $ BDF2*NDF    :== $CONVERT_DIR:BDF2NDF
+$ CONH*ELP    :== HELP @CONVERT HELP
 $ DIPSO2*NDF  :== $CONVERT_DIR:DIPSO2NDF
 $ DST2*NDF    :== $CONVERT_DIR:DST2NDF
 $ UNF2*NDF    :== $CONVERT_DIR:UNF2NDF
