@@ -143,6 +143,8 @@
 *     1998 October 20 (MJC):
 *        Protect against accessing COMPRS elements with index > 2, when
 *        NDIM is <3.
+*     6-JUN-1999 (DSB):
+*        Protected against divide by zero in the case of zero variance.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -395,6 +397,7 @@
 
 *  Test for bad pixels.
                   IF ( INARR( VO ) .NE. VAL__BADD .AND.
+     :                 INVAR( VO ) .GT. 0.0D0 .AND.
      :                 INVAR( VO ) .NE. VAL__BADD ) THEN
 
 *  Determine in which bin within the output line of data the input
@@ -443,7 +446,8 @@
 
 *  The sums for the variance can only be computed if both it and the
 *  corresponding data value are not bad.
-                     IF ( INVAR( VO ) .NE. VAL__BADD ) THEN
+                     IF ( INVAR( VO ) .GT. 0.0D0 .AND.
+     :                    INVAR( VO ) .NE. VAL__BADD ) THEN
 
 *  Use another part of the workspace for the variance calculations.
                         M = M + ODIMS( 1 )
