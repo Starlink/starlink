@@ -555,7 +555,10 @@ C
 	REAL COEFF(NCMAX)
 	INTEGER NCOEFF
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CAL_IRRF=0.0
+          RETURN
+        ENDIF
 C Get coeffs from MCF
         CALL CIN_SET_PSF(DMJD,IFILT,
      +	ENERGY,AZ,EL,NCMAX,COEFF,NCOEFF,FUNC_NAME,ISTAT)
@@ -654,7 +657,10 @@ C Loop for energies
 	REAL COEFF(NCMAX)
 	INTEGER NCOEFF
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CAL_PSF=0.0
+          RETURN
+        ENDIF
 C Get coeffs from MCF
         CALL CIN_SET_PSF(DMJD,IFILT,
      +	ENERGY,AZ,EL,NCMAX,COEFF,NCOEFF,FUNC_NAME,ISTAT)
@@ -748,6 +754,7 @@ C Check that DAZH>DAZL and DELH>DELL. Inform user and exit if not.
        IF (DAZH.LE.DAZL.OR.DELH.LE.DELL) THEN
           WRITE (*,*) ' CAL_PSFT error: Corners invalid'
           WRITE (*,*) '   (DAZH must be > DAZL, DELH must be > DELL)'
+          CAL_PSFT=0.0
           RETURN
        END IF
        NX=INT(DDAZ/D)
@@ -1162,7 +1169,10 @@ C Report bad status
 	SAVE QMAP
 	LOGICAL CIN_HIT_MASK
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CAL_TVIGN=0.0
+          RETURN
+        ENDIF
 C Get linearization matrix
 	CALL CAL_SET_LIN(DMJD,IFILT,ZOOM,IDET,QMAP,ISTAT)
 C Check mask
@@ -1260,7 +1270,10 @@ C Interpolate
       INCLUDE 'DAT_PAR'
 	CHARACTER*(DAT__SZLOC) LOC,LOCA,LOCB,LOCC,LOCD,LOCE
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CIN_AREA=0.0
+          RETURN
+        ENDIF
 C Check if we need to access new data from MCF
 	IF(.NOT.(CIN_VALID(DMJD,MJDLO,MJDHI,IFILT,FNOW).AND.IDET.EQ.DNOW)) THEN
 		DNOW=IDET
@@ -1349,7 +1362,10 @@ C Check status
 	INTEGER IPTT,IPTE
 	DATA FIRSTCALL/.TRUE./
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CIN_DETEFF = 0.0
+          RETURN
+        END IF
 C Get data on first call
 	IF(FIRSTCALL) THEN
 		CALL CIN_INIT(LOC,ISTAT)
@@ -1928,7 +1944,10 @@ C interpolate in elevation
 *DAZ,DEL	input	offset from centre (radians)
 *ISTAT		in/out	returned status
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CIN_PSF = 0.0
+          RETURN
+        ENDIF
 C Evaluate fucntion
 	IF(FUNC_NAME.EQ.'EXPN2X2') THEN
 		CIN_PSF = CIN_EXPN2X2(COEFF,AZ,EL,DAZ,DEL)
@@ -1962,7 +1981,10 @@ C
 C
 C      Integrate around a circle of radius RADIUS
 C
-	IF(ISTAT.NE.0) RETURN
+	IF(ISTAT.NE.0) THEN
+          CIN_RRF = 0.0
+          RETURN
+        ENDIF
 	PT=0.0
 	DO J=1,N
           T=(FLOAT(J)*2.0*PI)/(FLOAT(N))
