@@ -27,7 +27,7 @@ UNIX_OTHERS = polpack.news mk makefile polreg.tex
 UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS)
 
 #  The contents of polpack.tar.
-UNIX_TOTAL = polreg.htx_tar ndg.tar $(UNIX_OTHERS)
+UNIX_TOTAL = polreg.htx_tar ndg.tar polpack_source.tar $(UNIX_OTHERS)
 
 #  Target for use by the grp command.
 $(action)
