@@ -1,6 +1,8 @@
 *  History:
 *      1 Aug 2000 (ajc):
 *        Change TYPE * to PRINT *
+*      12 May 2003 (timj):
+*        Protect accesso to X(0)
 *-----------------------------------------------------------------------
 
       REAL FUNCTION XSNART (X, V, NX, IFAIL)
