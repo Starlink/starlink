@@ -437,7 +437,7 @@ C            CALL NDF_HCRE( IDF, STATUS )
 
 *    Add bias to it.
             CALL CCDB1_ABIA( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
-                             WID1, WID2, SEEDB, STATUS )
+     :                       WID1, WID2, SEEDB, STATUS )
 
 *    Include FITS block.
             CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
@@ -478,4 +478,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.7 1998/06/17 15:43:04 mbt Exp $
+* $Id: ccdbgen.f,v 1.8 1998/06/17 16:47:03 mbt Exp $
