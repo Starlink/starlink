@@ -2,14 +2,14 @@ INTERFACE SEDIT
 
    PARAMETER MODEL
       POSITION 1
-      TYPE 'UNIV'
+      TYPE 'LITERAL'
       VPATH 'GLOBAL,PROMPT'
       ASSOCIATION '<->GLOBAL.FIT_MODEL'
       PROMPT 'Model'
       HELP 'Data object to contain spectral model specification'
    ENDPARAMETER
 
-   PARAMETER MODEL_SPEC
+   PARAMETER SPEC
       POSITION 2
       TYPE 'LITERAL'
       PROMPT 'Enter model specification'
@@ -47,14 +47,6 @@ INTERFACE SEDIT
       TYPE 'LITERAL'
       DEFAULT 'SPEC'
       VPATH 'DEFAULT,NOPROMPT'
-   ENDPARAMETER
-
-   PARAMETER SCREEN
-      TYPE '_LOGICAL'
-      DEFAULT N
-      PROMPT 'Work in screen mode'
-      VPATH 'DEFAULT,PROMPT'
-      PPATH 'DEFAULT'
    ENDPARAMETER
 
 ENDINTERFACE
