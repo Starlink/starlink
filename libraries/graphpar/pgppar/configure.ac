@@ -21,6 +21,10 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+dnl    Make check requires starlink monolith
+STAR_MONOLITHS
+
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package

@@ -13,7 +13,7 @@
   package.
   </p></abstract>
   <dependencies >
-    <build>sae</build><build>gks</build><build>sgs</build><build>par</build><link>gns</link><link>chr</link><link>gks</link><link>sgs</link>
+    <build>parsecon</build><build>dtask</build><build>sae</build><build>gks</build><build>sgs</build><build>par</build><link>gns</link><link>chr</link><link>gks</link><link>sgs</link>
   </dependencies>
   <developers>
     <person>

@@ -17,4 +17,22 @@ BLOCKDATA_ROUTINES = sgs1_blk.f
 
 
 # Testing
+
+
+# Testing
 # Need to know how to build adam applications
+                                                                                
+# sgs_test is ADAM monolith
+
+TESTS = sgspar_test sgs_test
+
+check_PROGRAMS = sgspar_test
+check_MONOLITHS = sgs_test
+
+# Not sure why pthread is needed on linux. Need to investigate
+sgs_test_TASKS =
+sgs_test_SOURCES = sgs_test.f
+sgs_test_LDADD = $(LDADD) `$(srcdir)/sgs_link_adam` `par_link_adam` -lpthread
+
+sgspar_test_SOURCES = sgspar_test.f
+sgspar_test_LDADD = libsgspar_adam.la `sgs_link_adam` `par_link_adam`

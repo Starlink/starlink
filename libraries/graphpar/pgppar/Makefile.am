@@ -15,4 +15,18 @@ PRIVATE_INCLUDES = pgpenv_par pgpgo_cmn pgppa_cmn
 BLOCKDATA_ROUTINES = pgp1_blk.f
 
 # Testing
-# Need to know how to build adam applications
+
+# pgp_test is ADAM monolith
+
+TESTS = pgppar_test pgp_test
+
+check_PROGRAMS = pgppar_test
+check_MONOLITHS = pgp_test
+
+# Not sure why pthread is needed on linux. Need to investigate
+pgp_test_TASKS =
+pgp_test_SOURCES = pgp_test.f
+pgp_test_LDADD = $(LDADD) `$(srcdir)/pgp_link_adam` `par_link_adam` -lpthread
+
+pgppar_test_SOURCES = pgppar_test.f
+pgppar_test_LDADD = libpgppar_adam.la `pgp_link_adam` `par_link_adam`
