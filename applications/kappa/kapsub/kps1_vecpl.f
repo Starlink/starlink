@@ -1,7 +1,8 @@
-      SUBROUTINE KPS1_VECPL( LXBND1, UXBND1, LYBND1, UYBND1, VECMAG, 
-     :                       LXBND2, UXBND2, LYBND2, UYBND2, VECORN, 
-     :                       ANGFAC, ANGROT, STEP, VSCALE, AHSIZE, 
-     :                       JUST, STATUS )
+      SUBROUTINE KPS1_VECPL( MAP, LBND, UBND, NVEC, 
+     :                       LBND1M, UBND1M, LBND2M, UBND2M, VECMAG, 
+     :                       LBND1O, UBND1O, LBND2O, UBND2O, VECORN, 
+     :                       STEP, ANGFAC, ANGROT, DSCALE, AHSIZE,
+     :                       JUST, WORK1, WORK2, STATUS )
 *+
 *  Name:
 *     KPS1_VECPL
@@ -13,49 +14,53 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_VECPL( LXBND1, UXBND1, LYBND1, UYBND1, VECMAG, LXBND2,
-*                      UXBND2, LYBND2, UYBND2, VECORN, ANGFAC, ANGROT,
-*                      STEP, VSCALE, AHSIZE, JUST, STATUS )
+*     CALL KPS1_VECPL( MAP, LBND, UBND, NVEC, LBND1M, UBND1M, 
+*                      LBND2M, UBND2M, VECMAG, LBND1O, UBND1O, LBND2O, 
+*                      UBND2O, VECORN, STEP, ANGFAC, ANGROT, DSCALE, AHSIZE,
+*                      JUST, WORK1, WORK2, STATUS )
 
 *  Description:
-*     Vectors are plotted within the region of overlap of the two input
-*     NDFs and the current SGS zone, at increments of STEP pixels along
-*     both axes.  The number of plotted vectors is reported to the user.
+*     The supplied vectors are plotted within the current PGPLOT window.
 
 *  Arguments:
-*     LXBND1 = INTEGER (Given)
-*        The lower bound of pixel indices on the x axis of VECMAG.
-*     UXBND1 = INTEGER (Given)
-*        The upper bound of pixel indices on the x axis of VECMAG.
-*     LYBND1 = INTEGER (Given)
-*        The lower bound of pixel indices on the y axis of VECMAG.
-*     UYBND1 = INTEGER (Given)
-*        The upper bound of pixel indices on the y axis of VECMAG.
-*     VECMAG( LXBND1:UXBND1, LYBND1:UYBND1 ) = REAL (Given)
-*        The data values defining the vector magnitudes.
-*     LXBND2 = INTEGER (Given)
-*        The lower bound of pixel indices on the x axis of VECORN.
-*     UXBND2 = INTEGER (Given)
-*        The upper bound of pixel indices on the x axis of VECORN.
-*     LYBND2 = INTEGER (Given)
-*        The lower bound of pixel indices on the y axis of VECORN.
-*     UYBND2 = INTEGER (Given)
-*        The upper bound of pixel indices on the y axis of VECORN.
-*     VECORN( LXBND2:UXBND2, LYBND2:UYBND2 ) = REAL (Given)
-*        The data values defining the vector orientations.  Positive
-*        values correspond to rotation in the same sense as from the x
-*        axis to the y axis.  Zero corresponds to the y axis.  The
-*        units are defined by argument ANGFAC.
-*     ANGFAC = REAL (gIVEN)
+*     MAP = INTEGER (Given)
+*        Pointer to AST Mapping from PIXEL Frame to GRAPHICS Frame.
+*     LBND( 2 ) = INTEGER (Given)
+*        Lower pixel index bound of the overlap area.
+*     UBND( 2 ) = INTEGER (Given)
+*        Upper pixel index bound of the overlap area.
+*     NVEC = INTEGER (Given)
+*        Maximum number of vectors to be plotted.
+*     LBND1M = INTEGER (Given)
+*        Lower pixel index bound on axis 1 of vector magnitude array.
+*     UBND1M = INTEGER (Given)
+*        Upper pixel index bound on axis 1 of vector magnitude array.
+*     LBND2M = INTEGER (Given)
+*        Lower pixel index bound on axis 2 of vector magnitude array.
+*     UBND2M = INTEGER (Given)
+*        Upper pixel index bound on axis 2 of vector magnitude array.
+*     VECMAG( LBNN1M : UBND1M, LBND2M : UBND2M ) = REAL (Given)
+*        The vector magnitudes.
+*     LBND1O = INTEGER (Given)
+*        Lower pixel index bound on axis 1 of vector orientation array.
+*     UBND1O = INTEGER (Given)
+*        Upper pixel index bound on axis 1 of vector orientation array.
+*     LBND2O = INTEGER (Given)
+*        Lower pixel index bound on axis 2 of vector orientation array.
+*     UBND2O = INTEGER (Given)
+*        Upper pixel index bound on axis 2 of vector orientation array.
+*     VECORN( LBNN1O : UBND1O, LBND2O : UBND2O ) = REAL (Given)
+*        The vector orientations. A value of zero refers to the positive
+*        Y pixel axis. Positive rotation is in the sense of pixel X to
+*        pixel Y.
+*     STEP = INTEGER (Given)
+*        The increment in pixels between vectors.
+*     ANGFAC = REAL (Given)
 *        The factor which converts values from VECORN into units of
 *        radians.
 *     ANGROT = REAL (Given)
-*        A value (in radians) to be added on to the vector orientation
-*        angles given by VECORN.
-*     STEP = INTEGER (Given)
-*        The increment (in pixels) between plotted vectors.   The same
-*        value is used for both axes.
-*     VSCALE = REAL (Given)
+*        An ACW angle to add on to each orientation, in radians.
+*     DSCALE = REAL (Given)
 *        A factor which converts data values in VECMAG into
 *        corresponding vector lengths in centimetres.
 *     AHSIZE = REAL (Given)
@@ -70,27 +75,23 @@
 *        'START' causes vectors to be drawn starting at the
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
+*     WORK1( NVEC, 2 ) = DOUBLE PRECISION (Returned)
+*        Work space to hold vector PIXEL positions.
+*     WORK2( NVEC, 2 ) = DOUBLE PRECISION (Returned)
+*        Work space to hold vector GRAPHICS positions.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Prior Requirements:
-*     -  It is assumed that the current SGS zone has a uniform
-*     world co-ordinate system corresponding to pixel co-ordinates.
-
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
 *  Authors:
 *     DSB: David Berry (STARLINK)
-*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
-*     12-AUG-1993 (DSB):
-*        Original version.
-*     1995 April 13 (MJC):
-*        Corrected millimetre documentation error and typo's.  Made
-*        minor stylistic changes.  Used modern-style variable
-*        declarations.  Added prologue terminator.  Changed call of
-*        KPS1_VECT to KPG1_VECT.  Made informational message
-*        conditional.
+*     4-OCT-1999 (DSB):
+*        Original PGPLOT/AST version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,141 +106,137 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
 
 *  Arguments Given:
-      INTEGER LXBND1
-      INTEGER UXBND1
-      INTEGER LYBND1
-      INTEGER UYBND1
-      REAL VECMAG( LXBND1:UXBND1, LYBND1:UYBND1 )
-      INTEGER LXBND2
-      INTEGER UXBND2
-      INTEGER LYBND2
-      INTEGER UYBND2
-      REAL VECORN( LXBND2:UXBND2, LYBND2:UYBND2 )
+      INTEGER MAP
+      INTEGER LBND( 2 )
+      INTEGER UBND( 2 )
+      INTEGER NVEC
+      INTEGER LBND1M
+      INTEGER UBND1M
+      INTEGER LBND2M
+      INTEGER UBND2M
+      REAL VECMAG( LBND1M : UBND1M, LBND2M : UBND2M )
+      INTEGER LBND1O
+      INTEGER UBND1O
+      INTEGER LBND2O
+      INTEGER UBND2O
+      REAL VECORN( LBND1O : UBND1O, LBND2O : UBND2O )
+      INTEGER STEP
       REAL ANGFAC
       REAL ANGROT
-      INTEGER STEP
-      REAL VSCALE
+      REAL DSCALE
       REAL AHSIZE
       CHARACTER * ( * ) JUST
+
+*  ARGUMENTS RETURNED
+      DOUBLE PRECISION WORK1( NVEC, 2 )
+      DOUBLE PRECISION WORK2( NVEC, 2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      REAL PIBY2                 ! 90 degrees in radians
+      PARAMETER ( PIBY2 = 1.5707963268 )
+
 *  Local Variables:
-      INTEGER I                  ! X pixel index
-      INTEGER J                  ! Y pixel index
-      INTEGER LBNDX              ! Low x-pixel-index bound of plot
-      INTEGER LBNDY              ! Low y-pixel-index bound of plot
-      INTEGER LX1                ! Low x-pixel-index bound of SGS zone
-      INTEGER LX2                ! High x-pixel-index bound of SGS zone
-      INTEGER LY1                ! Low y-pixel-index bound of SGS zone
-      INTEGER LY2                ! High y-pixel-index bound of SGS zone
+      DOUBLE PRECISION GX        ! GRAPHICS X at vector
+      DOUBLE PRECISION GY        ! GRAPHICS Y at vector
+      INTEGER I                  ! Column index
+      INTEGER IVEC               ! No. of vectors in overlap area
+      INTEGER J                  ! Row index
+      INTEGER K                  ! Vector index
       INTEGER NPLOT              ! No. of vectors plotted
-      REAL SCALE                 ! Vector scale (pixels per data unit)
-      INTEGER UBNDX              ! Upper x-pixel-index bound of plot
-      INTEGER UBNDY              ! Upper y-pixel-index bound of plot
       REAL VECANG                ! Vector position angle in radians
       REAL VECLEN                ! Vector length in pixels
-      REAL X                     ! X pixel co-ordinate
-      REAL X1                    ! Lower x bound of SGS zone
-      REAL X2                    ! Upper x bound of SGS zone
-      REAL XM                    ! X extent of SGS zone, in metres
-      REAL Y                     ! Y pixel co-ordinate
-      REAL Y1                    ! Lower y bound of SGS zone
-      REAL Y2                    ! Upper y bound of SGS zone
-      REAL YM                    ! Y extent of SGS zone, in metres
-      
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the extent of the currrent SGS zone in terms of world
-*  co-ordinates (pixels) and metres.
-      CALL SGS_IZONE( X1, X2, Y1, Y2, XM, YM )
+*  Store the pixel co-ordinate at the centre of each pixel for which a 
+*  vector is to be plotted. Loop round the plot region, storing positions 
+*  at increments given by argument STEP.  The bottom-left vector is 
+*  placed in the middle of the bottom-left increment box.
+      IVEC = 0
+      DO J = LBND( 2 ) + STEP / 2, UBND( 2 ), STEP
+         DO I = LBND( 1 ) + STEP / 2, UBND( 1 ), STEP
 
-*  Get the corresponding pixel=index bounds.
-      LX1 = NINT( X1 + 0.5 )
-      LX2 = NINT( X2 + 0.5 )
-      LY1 = NINT( Y1 + 0.5 )
-      LY2 = NINT( Y2 + 0.5 )
-
-*  Calculate the bounds of the region of overlap between the two
-*  images, and the current SGS zone.
-      LBNDX = MAX( MAX( LXBND1, LXBND2 ), LX1 )
-      LBNDY = MAX( MAX( LYBND1, LYBND2 ), LY1 )
-      UBNDX = MIN( MIN( UXBND1, UXBND2 ), LX2 )
-      UBNDY = MIN( MIN( UYBND1, UYBND2 ), LY2 )
-
-*  Check that there is some overlap.  Return without action otherwise.
-      IF ( LBNDX .LE. UBNDX .AND. LBNDY .LE. UBNDY ) THEN
-
-*  Calculate the scaling factor which converts data values into vector
-*  lengths in units of pixels.  It is assumed that the zone has a
-*  uniform co-ordinate system, and so this value should be the same for
-*  both axes.
-         SCALE = ( X2 - X1 ) / ( VSCALE * 100.0 * XM )
-
-*  Initialise the count of plotted vectors.
-         NPLOT = 0
-
-*  Loop round the overlap region, plotting a vector at increments given
-*  by argument STEP.  The bottom-left vector is placed in the middle of
-*  the bottom-left increment box.
-         DO J = LBNDY + STEP / 2, UBNDY, STEP
-            Y = REAL( J ) - 0.5
-
-            DO I = LBNDX + STEP / 2, UBNDX, STEP
-               X = REAL( I ) - 0.5
-
-*  Skip over bad data values.
-               IF ( VECMAG( I, J ) .NE. VAL__BADR .AND. 
-     :              VECORN( I, J ) .NE. VAL__BADR ) THEN
-
-*  Calculate the length of the vector in units of pixels.
-                  VECLEN = VECMAG( I, J ) * SCALE
-
-*  Calculate the vector orientation, in radians.
-                  VECANG = ANGFAC * VECORN( I, J ) + ANGROT
-
-*  Plot the vector.      
-                  CALL KPG1_VECT( X, Y, JUST, VECLEN, VECANG, AHSIZE,
-     :                            STATUS )
-
-*  Abort if an error has occurred.
-                  IF ( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Increment the count of plotted vectors.
-                  NPLOT = NPLOT + 1
-      
-               END IF
-
-            END DO
+            IVEC = IVEC + 1
+            WORK1( IVEC, 1 ) = REAL( I ) - 0.5
+            WORK1( IVEC, 2 ) = REAL( J ) - 0.5
+            IF( IVEC .EQ. NVEC ) GO TO 10
 
          END DO
+      END DO
+
+ 10   CONTINUE
+
+*  Transform these PIXEL positions into GRAPHICS positions using the
+*  supplied Mapping.
+      CALL AST_TRANN( MAP, IVEC, 2, NVEC, WORK1, .TRUE., 2, NVEC, WORK2,
+     :                STATUS ) 
+
+*  Indicate no vectors have been plotted.
+      NPLOT = 0
+
+*  Loop round each vector.
+      DO K = 1, IVEC
+
+*  Skip over bad GRAPHICS positions.
+         GX = WORK2( K, 1 ) 
+         GY = WORK2( K, 2 ) 
+         IF( GX .NE. AST__BAD .AND. GY .NE. AST__BAD ) THEN
+
+*  Find the corresponding pixel indices.
+           I = NINT( WORK1( K, 1 ) + 0.5D0 )
+           J = NINT( WORK1( K, 2 ) + 0.5D0 )
+
+*  Skip over bad data or orientation values.
+           IF( VECMAG( I, J ) .NE. VAL__BADR .AND. 
+     :         VECORN( I, J ) .NE. VAL__BADR ) THEN
+
+*  Calculate the length of the vector in units of pixels.
+               VECLEN = VECMAG( I, J ) / DSCALE
+
+*  Calculate the vector orientation, in radians. 
+               VECANG = ANGFAC * VECORN( I, J ) + ANGROT
+
+*  Plot the vector.      
+               CALL KPS1_VECT( REAL( GX ), REAL( GY ), JUST, 
+     :                         VECLEN, VECANG, AHSIZE, STATUS )
+
+*  Abort if an error has occurred.
+               IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Increment the number of vectors plotted.
+               NPLOT = NPLOT + 1
+
+            END IF
+
+         END IF
+
+      END DO
 
 *  If no vectors have been plotted, warn the user.
-         CALL MSG_BLANK( STATUS )
+      CALL MSG_BLANK( STATUS )
 
-         IF ( NPLOT .EQ. 0 ) THEN
-            CALL MSG_OUT( 'KPS1_VECPL_NOPLT', '  No vectors plotted '/
-     :        /'due to lack of good data in input NDFs.', STATUS )
-            CALL MSG_BLANK( STATUS )
+      IF ( NPLOT .EQ. 0 ) THEN
+         CALL MSG_OUT( 'KPS1_VECPL_MSG1', '  No vectors plotted.',
+     :                 STATUS )
+         CALL MSG_BLANK( STATUS )
 
 *  Otherwise, tell the user how many vectors were plotted unless at
 *  silent reporting.
-         ELSE
-            CALL MSG_SETI( 'NP', NPLOT )
-            CALL MSG_OUTIF( MSG__NORM, 'KPS1_VECPL_NPLT',
-     :                      '  ^NP vectors plotted.', STATUS )
-            CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
+      ELSE
+         CALL MSG_SETI( 'NP', NPLOT )
+         CALL MSG_OUTIF( MSG__NORM, 'KPS1_VECPL_MSG2', '  ^NP vectors'//
+     :                   ' plotted.', STATUS )
+         CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
 
-         END IF      
-
-
-      END IF
+      END IF      
 
 *  Arrive here if an error occurs.
  999  CONTINUE

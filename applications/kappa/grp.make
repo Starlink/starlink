@@ -186,7 +186,7 @@ kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
-kpg1_pgcls.f kpg1_pgopn.f
+kpg1_pgcls.f kpg1_pgopn.f kpg1_vect.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \

@@ -39937,38 +39937,34 @@ right.
       This application plots vectors defined by the values contained
       within a pair of 2-dimensional NDFs, the first holding the
       magnitude of the vector quantity at each pixel, and the second
-      holding the corresponding vector orientations.  The number of
+      holding the corresponding vector orientations.  It is assumed that
+      the two NDFs are aligned in pixel co-ordinates. The number of
       vectors in the plot is kept to a manageable value by only
       plotting vectors for pixels on a sparse regular matrix.  The
       increment (in pixels) between plotted vectors is given by
       parameter STEP.  Zero orientation may be fixed at any position
       angle within the plot by specifying an appropriate value for
       parameter ANGROT.  Each vector may be represented either by an
-      arrow or by a simple line, as selected by parameter VTYPE.
+      arrow or by a simple line, as selected by parameter ARROW.
 
-      The plot is situated within the current graphics-database
-      picture, and may reside within optional, annotated and enumerated
-      axes.  An optional, but recommended, key may be drawn to the
-      right of the plot.  It reports the data units if there are any
-      (taken from the NDF associated with parameter NDF1) and gives the
-      scale used for drawing the vectors in data units per centimetre.
-      It also displays a typical vector and the corresponding data
-      value.  The justification of the vector is indicated by a small
-      circle placed at the position of the corresponding pixel centre.
+      The plot is produced within the current graphics database picture,
+      and may be aligned with an existing DATA picture if the existing
+      picture contains suitable co-ordinate Frame information (see
+      parameter CLEAR).
+
+      Annotated axes or a simple border can be produced (see parameters
+      AXES and BORDER), and the appearance of these can be controlled in
+      detail using parameter STYLE. The axes show co-ordinates in the
+      current co-ordinate Frame of NDF1.
+
+      A key to the vector scale can be displayed to the right of the
+      vector map (see parameter KEY). The appearance and position of this
+      key may be controlled using parameters KEYSTYLE and KEYPOS.
    }
    \sstusage{
-      vecplot ndf1 ndf2 [comp] [step] [vscale] [vtype] [just] [device]
+      vecplot ndf1 ndf2 [comp] [step] [vscale] [arrow] [just] [device]
    }
    \sstparameters{
-      \sstsubsection{
-         ABSLAB  =  LITERAL (Read)
-      }{
-         Label for the plot abscissa, in which NCAR fancy founts may be
-         embedded when FONT = {\tt "}NCAR{\tt "}.  If axis information is present
-         in NDF1 the suggested default is the axis label from NDF1
-         followed by the units, in parentheses.  If an error occurs
-         obtaining the label the suggested default is {\tt "}X{\tt "}. {\tt []}
-      }
       \sstsubsection{
          ANGROT = \_REAL (Read)
       }{
@@ -39977,25 +39973,48 @@ right.
          It should be in the range 0--360. {\tt [0.0]}
       }
       \sstsubsection{
+         ARROW = LITERAL (Read)
+      }{
+         Vectors are drawn as arrows, with the size of the arrow head
+         specified by this parameter. Simple lines can be drawn by setting
+         the arrow head size to zero. The value should be expressed as a
+         fraction of the largest dimension of the vector map. {\tt [current value]}
+      }
+      \sstsubsection{
          AXES = \_LOGICAL (Read)
       }{
          TRUE if labelled and annotated axes are to be drawn around the
-         plot.  The annotations are either the data co-ordinates from
-         the axis components of NDF1, provided these are present and
-         linear and COSYS = {\tt "}Data{\tt "}; otherwise pixel co-ordinates are
-         used. {\tt [TRUE]}
+         vector map. These display co-ordinates in the current co-ordinate
+         Frame NDF1 - which may be changed using application WCSFRAME
+         (see also parameter USEAXIS). The width of the margins left for
+         the annotation may be controlled using parameter MARGIN. The
+         appearance of the axes (colours, fonts, etc) can be controlled
+         using the STYLE parameter. {\tt [TRUE]}
       }
       \sstsubsection{
          BORDER = \_LOGICAL (Read)
       }{
-         TRUE if a box is to be drawn about the plot.  This is only
-         accessed if no axes are drawn. {\tt [TRUE]}
+         TRUE if a simple border is to be drawn around the vector map.
+         The appearance of the border (colour, width, etc) can be
+         controlled using parameter STYLE. {\tt [FALSE]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
-         TRUE if the graphics device is to be cleared before display
-         of the array. {\tt [TRUE]}
+         TRUE if the graphics device is to be cleared before displaying
+         the vector map. If you want the vector map to be drawn over
+         the top of an existing DATA picture, then set CLEAR to FALSE. The
+         contour map will then be drawn in alignment with the displayed
+         data. If possible, alignment occurs within the current co-ordinate
+         Frame of the NDF. If this is not possible, (for instance if
+         suitable WCS information was not stored with the existing DATA
+         picture), then alignment is attempted in PIXEL
+         co-ordinates. If this is not possible, then alignment is
+         attempted in GRID co-ordinates. If this is not possible, then
+         alignment is attempted in the first suitable Frame found in the NDF
+         irrespective of its domain. A message is displayed indicating the
+         domain in which alignment occurred. If there are no suitable Frames
+         in the NDF then an error is reported. {\tt [TRUE]}
       }
       \sstsubsection{
          COMP = LITERAL (Read)
@@ -40004,15 +40023,7 @@ right.
          magnitudes.  It may be {\tt "}Data{\tt "}, {\tt "}Error{\tt "} or {\tt "}Variance{\tt "}.  The
          last two are not available if NDF1 does not contain a VARIANCE
          component.  The vector orientations are always defined by the
-         {\tt "}Data{\tt "} component of NDF2. {\tt [{\tt "}Data{\tt "}]}
-      }
-      \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either {\tt "}World{\tt "}
-         or {\tt "}Data{\tt "}.  {\tt "}World{\tt "} makes pixel co-ordinates to appear on axes.
-         If COSYS = {\tt "}Data{\tt "} the axis information from NDF1 is used to
-         annotate axes (if it exists).  {\tt [Current co-ordinate system]}
+         {\tt "}Data{\tt "} component of NDF2. {\tt ["Data"]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -40020,15 +40031,14 @@ right.
          The plotting device. {\tt [Current graphics device]}
       }
       \sstsubsection{
-         FONT = LITERAL (Read)
+         FILL = \_LOGICAL (Read)
       }{
-         The fount to be used for the line graphics.  It can be either
-         {\tt "}NCAR{\tt "} for the NCAR fancy characters and {\tt "}GKS{\tt "} for the standard
-         GKS san-serif fount.  The former is intended for hardcopy
-         publication-quality plots, since it is relatively slow; the
-         latter is intended for normal interactive graphics requiring
-         rapid plotting, and it is clearer on small plots.  The
-         suggested default is the current value. {\tt [{\tt "}GKS{\tt "}]}
+         The DATA picture containing the vector map is usually produced with
+         the same shape as the data. However, for maps with markedly different
+         dimensions this default behaviour may not give the clearest result.
+         When FILL is TRUE, the smaller dimension of the picture is expanded
+         to produce the largest possible picture within the current picture.
+         {\tt [FALSE]}
       }
       \sstsubsection{
          JUST = LITERAL (Read)
@@ -40036,21 +40046,85 @@ right.
          The justification for each vector; it can take any of the
          following values:
 
-          {\tt "}Centre{\tt "} - the vectors are drawn centred on the
-                     corresponding pixel,
+         \sstitemlist{
 
-          {\tt "}Start{\tt "}  - the vectors are drawn starting at the
-                     corresponding pixel,
+            \sstitem
+             {\tt "}Centre{\tt "} -- the vectors are drawn centred on the
+             corresponding pixel,
 
-          {\tt "}End{\tt "}    - the vectors are drawn ending at the corresponding
-                     pixel.
+            \sstitem
+             {\tt "}Start{\tt "}  -- the vectors are drawn starting at the
+             corresponding pixel,
 
-         {\tt [{\tt "}Centre{\tt "}]}
+            \sstitem
+             {\tt "}End{\tt "} -- the vectors are drawn ending at the corresponding
+             pixel.
+
+         }
+         {\tt ["Centre"]}
       }
       \sstsubsection{
          KEY = \_LOGICAL (Read)
       }{
-         TRUE if a key is to be produced. {\tt [TRUE]}
+         TRUE if a key indicating the vector scale is to be produced. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         KEYPOS() = \_REAL (Read)
+      }{
+         Two values giving the position of the key. The first value gives
+         the gap between the right hand edge of the contour map and the left
+         hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The
+         second value gives the vertical position of the top of the key (1.0
+         for the highest position, 0.0 for the lowest). If the second value
+         is not given, the top of the key is placed level with the top of the
+         vector map. Both values should be in the range 0.0 to 1.0. If a
+         key is produced, then the right hand margin specified by parameter
+         MARGIN is ignored. {\tt [current value]}
+      }
+      \sstsubsection{
+         KEYSTYLE = GROUP (Read)
+      }{
+         A group of attribute settings describing the plotting style to use
+         for the key (see parameter KEY).
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the text in the key is controlled using {\tt "}String{\tt "}
+         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+         TEXT can be used in place of STRINGS). Note, the Size attribute
+         specifies the size of key text relative to the size of the numerical
+         labels on the vector map axes. Thus a value of 2.0 for Size will
+         result in text which is twice the size of the numerical axis labels.
+         The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
+         attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
+         used in place of CURVES). The numerical scale value is formatted as
+         an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
+         synonym SCALE can be used in place of the value 1). The length of
+         the example vector is formatted as an axis 2 value (using attribute
+         FORMAT(2), etc - the synonym VECTOR can be used in place of the
+         value 2). The vertical space between lines in the key can be
+         controlled using attribute TextLabGap. A value of 1.0 is used if
+         no value is set for this attribute, and produces default vertical
+         spacing. Values larger than 1.0 increase the vertical space, and
+         values less than 1.0 decrease the vertical space. {\tt [current value]}
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -40060,18 +40134,20 @@ right.
          on the basis of the spread of vector lengths in the plot. {\tt [!]}
       }
       \sstsubsection{
-         MAJTIC( 2 ) = \_REAL (Read)
+         MARGIN( 4 ) = \_REAL (Read)
       }{
-         The parameter controlling the numbers of major tick marks
-         for the x and y axes.  (Number used is between MAJTIC$+$2 and
-         5$*$MAJTIC/2$+$4.) {\tt [3.,3.]}
-      }
-      \sstsubsection{
-         MINTIC( 2 ) = \_REAL (Read)
-      }{
-         The number of minor tick marks between each major tick mark
-         for the x and y axes.  A negative value forces the graphics
-         package to compute appropriate values. {\tt [-1.,-1.]}
+         The widths of the margins to leave around the vector map for axis
+         annotation. The widths should be given as fractions of the
+         corresponding dimension of the DATA picture.
+         The actual margins used may be increased to preserve the aspect
+         ratio of the DATA picture. Four values may be given, in the order;
+         bottom, right, top, left. If fewer than four values are given,
+         extra values are used equal to the first supplied value. If these
+         margins are too narrow any axis annotation may be clipped. The
+         dynamic default is 0.2 (for all edges) if annotated axes are being
+         produced, otherwise 0.06 (for all edges) if a border is being
+         produced, and zero otherwise. See also parameter KEYPOS.
+         {\tt [current value]}
       }
       \sstsubsection{
          NDF1 = NDF (Read)
@@ -40085,47 +40161,9 @@ right.
          NDF structure containing the 2-dimensional image giving the
          vector orientations.  The values are considered to be in units
          of degrees unless the UNITS component of the NDF has the value
-         {\tt "}Radians{\tt "} (case insensitive).  The positive y axis defines
-         zero orientation, and rotation from the x axis to the y axis
-         is considered positive.  The suggested default is the current
-         value.
-      }
-      \sstsubsection{
-         ORDLAB  =  LITERAL (Read)
-      }{
-         Label for the plot ordinate, in which NCAR fancy founts may be
-         embedded when FONT = {\tt "}NCAR{\tt "}.  If axis information is present
-         in NDF1 the suggested default is the axis label from NDF1
-         followed by the units, in parentheses.  If an error occurs
-         obtaining the label the suggested default is {\tt "}Y{\tt "}. {\tt []}
-      }
-      \sstsubsection{
-         OUTTIC = \_LOGICAL (Read)
-      }{
-         TRUE if the axis tick marks are to appear on the outside of
-         the axes instead of inside.  By default, the tick marks are
-         drawn outside the plotting region to eliminate
-         intersections of ticks with the vectors. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         PLTITL = LITERAL (Read)
-      }{
-         The title of the plot.  Up to about 40 characters can be
-         accommodated, and NCAR fancy founts may be embedded when FONT =
-         {\tt "}NCAR{\tt "}.  If an error occurs obtaining the title, it is
-         defaulted to {\tt "}VECPLOT map{\tt "}.  {\tt [The title from NDF1]}
-      }
-      \sstsubsection{
-         PXSIZE = \_REAL (Read)
-      }{
-         The length (x axis) of the plot in metres. [Maximum that can
-         fit in the current picture whilst preserving square pixels]
-      }
-      \sstsubsection{
-         PYSIZE = \_REAL (Read)
-      }{
-         The length (y axis) of the plot in metres. [Maximum that can
-         fit in the current picture whilst preserving square pixels]
+         {\tt "}Radians{\tt "} (case insensitive).  The positive y pixel axis defines
+         zero orientation, and rotation from the x pixel axis to the y
+         pixel is considered positive.
       }
       \sstsubsection{
          STEP = \_INTEGER (Read)
@@ -40136,48 +40174,55 @@ right.
          used gives about 30 vectors along the longest axis of the plot. {\tt [!]}
       }
       \sstsubsection{
-         THICK = \_REAL (Read)
+         STYLE = GROUP (Read)
       }{
-         The thickness of the axes and annotations in the plot, where
-         1.0 is the normal thickness.  Currently, this is only available
-         on a few devices.  It must take a value in the range 0.5--5.0.
-         {\tt [1.0]}
-      }
-      \sstsubsection{
-         VECCOL = LITERAL (Read)
-      }{
-         The colour for the vectors.  The options are described below.
-           {\tt "}MAX{\tt "}          - The maximum colour index in the image
-                            display colour lookup table.
-           {\tt "}MIN{\tt "}          - The minimum (non-reserved) colour index in
-                            the image display colour lookup table.
-           An integer     - The actual colour index. It is constrained
-                            between 0 and the maximum colour index
-                            available on the device.
-           A named colour - Uses the named colour from the palette, and
-                            if it is not present, the nearest colour
-                            from the palette is selected.
+         A group of attribute settings describing the plotting style to use
+         for the vectors and annotated axes.
 
-         If the colour is to remain unaltered as the lookup table is
-         manipulated choose an integer between 0 and 15, or a named
-         colour.  The suggested default is the current value. [The
-         current value, but equals {\tt "}MIN{\tt "} if there is no current value.]
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the vectors is controlled by the attributes
+         Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+         used in place of Curves). {\tt [current value]}
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
       }{
          The scale to be used for the vectors.  The supplied value
          should give the data value corresponding to a vector length of
-         one centimetre.  If a null (!) value is supplied, a value is used
-         which makes 5\% of all displayed vectors larger than the interval
-         between adjacent vectors. {\tt [!]}
+         one centimetre.  If a null (!) value is supplied, a default value
+         is used. {\tt [!]}
       }
       \sstsubsection{
-         VTYPE = LITERAL (Read)
+         USEAXIS = GROUP (Read)
       }{
-         The type of vector to be plotted; it can take the value {\tt "}Arrow{\tt "}
-         or {\tt "}Line{\tt "}.  Vectors are drawn as arrows or lines accordingly.
-         {\tt [{\tt "}Line{\tt "}]}
+         USEAXIS is only accessed if the current co-ordinate Frame of the
+         NDF has more than 2 axes. A group of two strings should be
+         supplied specifying the 2 axes which are to be used when annotating
+         and aligning the vector map. Each axis can be specified either by
+         its integer index within the current Frame (in the range 1 to the
+         number of axes in the current Frame), or by its Symbol attribute. A
+         list of acceptable values is displayed if an illegal value is
+         supplied. If a null (!) value is supplied, the axes with the same
+         indices as the 2 significant NDF pixel axes are used. {\tt [!]}
       }
    }
    \sstexamples{
@@ -40191,15 +40236,17 @@ right.
          the longest axis, and a key is plotted.
       }
       \sstexamplesubsection{
-         vecplot polint polang angrot=23.4
+         vecplot polint polang angrot=23.4 clear=no
       }{
          Produces a vector map in which the primary axis of the vectors
          (as defined by the value zero in the NDF polang) is at the
          position angle 23.4 degrees (measured anti-clockwise from the
-         positive y axis) in the displayed map.
+         positive y axis) in the displayed map. The map is drawn over the
+         top of the the previously drawn DATA picture, aligned in a
+         suitable co-ordinate Frame.
       }
       \sstexamplesubsection{
-         vecplot stack(,,2) stack(,,1) vtype=arrow just=start nokey
+         vecplot stack(,,2) stack(,,1) arrow=0.1 just=start nokey
       }{
          Produces a vector map in which the vectors are defined by two
          planes in the 3-dimensional NDF called stack.  There is no
@@ -40213,38 +40260,24 @@ right.
       \sstitemlist{
 
          \sstitem
-         If the current graphics-database picture is a DATA picture or
-         contains a DATA picture (such as created by the applications
-         DISPLAY, CONTOUR, \emph{etc}.), then the vector plot is overlaid on top
-         of the existing DATA plot.  In this case any requested annotation
-         and key are drawn outside the DATA picture but within the current
-         picture.  If there is insufficient room within the current
-         picture, then the annotation and/or key may not be drawn.  You
-         are warned if this happens but the application continues.  If no
-         DATA picture can be found within the current picture then you
-         specify the total size of the plot frame using parameters PXSIZE
-         and PYSIZE, but the application itself chooses how to position
-         the vector plot and key within this frame.
+         The Title component in NDF1 is used as the default title for
+         the annotated axes. If the NDF does not have a Title component, then
+         the default title is taken from current co-ordinate Frame stored in the
+         WCS component of the NDF. This default may be over-ridden by specifying
+         a value for the Title attribute using the STYLE parameter.
 
          \sstitem
          The application stores a number of pictures in the graphics
-         database in the following order: a FRAME of the specified size
-         containing the title, annotated axes, vector map and key; a DATA
-         picture which is stored with world co-ordinates in units of data
-         pixels; and a KEY picture to store the key if present.  The DATA
-         picture may also have double-precision data co-ordinates derived
-         from the axis components of NDF1 provided these are linear and
-         different from pixel co-ordinates; the data co-ordinates are
-         stored via a linear transformation.  A reference to NDF1 is
-         stored with the DATA picture.  On exit the current database
-         picture for the chosen device reverts to the input picture.
-
-         \sstitem
-         The units string in the key may be truncated with an ellipsis
-         if it cannot be accommodated in full at the smallest allowed
-         character height.  Generally the maximum length will be between
-         18 and 27 characters, the exact value depending on the number of
-         digits in the scale factors.
+         database in the following order: a FRAME picture containing the
+         annotated axes, vectors, and key; a KEY picture to store
+         the key if present; and a DATA picture containing just the vectors.
+         Note, the FRAME picture is only created if annotated axes or a key
+         has been drawn, or if non-zero margins were specified using parameter
+         MARGIN. The world co-ordinates in the DATA picture will be pixel
+         co-ordinates. A reference to NDF1, together with a copy of the WCS
+         information in the NDF are stored in the DATA picture. On exit the
+         current database picture for the chosen device reverts to the
+         input picture.
       }
    }
    \sstdiytopic{
@@ -40265,6 +40298,7 @@ right.
       }
    }
 }
+
 \begin{htmlonly}
 Click \htmladdnormallink{here}{vecplot_exam.gif} to see an example
 plot (7k).
@@ -44210,6 +44244,72 @@ The following applications have been modified:
             lost. For instance, if you rotate two aligned images by the
             same angle, they will still be aligned after the rotation.
             Negative rotation angles are now accepted.
+         \end{itemize}
+
+      \item [\htmlref{VECPLOT}{VECPLOT}] \mbox{}
+         \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
+            \item Information describing the co-ordinate Frames available
+                  in the supplied NDF is stored with the DATA picture in 
+                  the AGI graphics database.
+            \item If the screen is not cleared before plotting a vector
+                  map ({\it{i.e.}}\ if the parameter CLEAR is set to {\tt FALSE}), then
+                  an attempt will be made to align the new contour map 
+                  spatially with any existing DATA picture. This alignment
+                  occurs by preference in the current co-ordinate Frame
+                  of the supplied vector magnitude NDF, but may occur in 
+                  another Frame if the existing DATA picture does not have 
+                  suitable WCS information stored with it.
+            \item There is now much greater control over the appearance
+                  of the map. This is provided through the STYLE and
+                  KEYSTYLE parameters which allow plotting attributes to
+                  be set.
+            \item The position of the key can now be controlled both
+                  vertically and horizontally.
+            \item The following parameters have been removed (alternatives to 
+                  using these old parameters are indicated): 
+
+               \begin{description}
+                  \item[ABSLAB] -- Use the STYLE parameter to specify a
+                                   value for the plotting attribute {\tt 
+                                   Label(1)}.
+                  \item[BORDER] -- Set AXES=TRUE, and suppress everything
+                                   but the border by setting suitable plotting 
+                                   attributes (eg {\tt MajTickLen=0, 
+                                   MinTickLen=0, TextLab=0} {\it etc}).
+                  \item[COSYS] -- Use application WCSFRAME to set the required 
+                                   co-ordinate Frame first.
+                  \item[FONT] -- Use the {\tt Font} plotting attributes.
+                  \item[MAJTIC] -- Use the {\tt Gap} plotting attributes.
+                  \item[MINTIC] -- Use the {\tt MinTick} plotting attribute.
+                  \item[ORDLAB] -- Use {\tt Label(2)} plotting attribute.
+                  \item[OUTTIC] -- Use {\tt MajTickLen} and {\tt MinTickLen} 
+                                   plotting attributes.
+                  \item[PLTITL] -- Use the {\tt Title} plotting attribute.
+                  \item[PXSIZE] -- Create the picture first using PICDEF,
+                                   specifying the required picture size using 
+                                   the new parameter SIZE.
+                  \item[PYSIZE] -- See PXSIZE.
+                  \item[THICK] -- Use the {\tt Width} plotting attributes.
+                  \item[VECCOL] -- Use the {\tt Colour(vectors)} plotting attributes.
+                  \item[VTYPE] -- Use the new parameter ARROW.
+               \end{description}
+
+            \item The following new parameters have been added: ARROW,
+                  FILL, KEYPOS, KEYSTYLE, MARGIN, STYLE, USEAXIS.
+         
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [AXES] -- Axes are now annotated with the current
+                                  co-ordinate Frame of the NDF.
+                  \item [CLEAR] -- Setting CLEAR={\tt FALSE} cause the new contour map
+                               to be aligned spatially with any existing DATA 
+                               picture (if possible).
+                  \item [KEY] -- The appearance of the key can now be controlled
+                              using parameter KEYSTYLE, and the position of the
+                              key can be controlled using parameter KEYPOS.
+               \end{description}
          \end{itemize}
 
       \item [\htmlref{WCSALIGN}{WCSALIGN}] \mbox{}

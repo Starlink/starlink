@@ -23,100 +23,164 @@
 *     This application plots vectors defined by the values contained
 *     within a pair of 2-dimensional NDFs, the first holding the
 *     magnitude of the vector quantity at each pixel, and the second
-*     holding the corresponding vector orientations.  The number of
+*     holding the corresponding vector orientations.  It is assumed that
+*     the two NDFs are aligned in pixel co-ordinates. The number of
 *     vectors in the plot is kept to a manageable value by only
 *     plotting vectors for pixels on a sparse regular matrix.  The
 *     increment (in pixels) between plotted vectors is given by
 *     parameter STEP.  Zero orientation may be fixed at any position
 *     angle within the plot by specifying an appropriate value for
 *     parameter ANGROT.  Each vector may be represented either by an
-*     arrow or by a simple line, as selected by parameter VTYPE.
+*     arrow or by a simple line, as selected by parameter ARROW.
 *
-*     The plot is situated within the current graphics-database
-*     picture, and may reside within optional, annotated and enumerated
-*     axes.  An optional, but recommended, key may be drawn to the
-*     right of the plot.  It reports the data units if there are any
-*     (taken from the NDF associated with parameter NDF1) and gives the
-*     scale used for drawing the vectors in data units per centimetre.
-*     It also displays a typical vector and the corresponding data
-*     value.  The justification of the vector is indicated by a small
-*     circle placed at the position of the corresponding pixel centre.
+*     The plot is produced within the current graphics database picture,
+*     and may be aligned with an existing DATA picture if the existing
+*     picture contains suitable co-ordinate Frame information (see 
+*     parameter CLEAR). 
 *
+*     Annotated axes can be produced (see parameter AXES), and the 
+*     appearance of these can be controlled in detail using parameter 
+*     STYLE. The axes show co-ordinates in the current co-ordinate Frame 
+*     of NDF1.
+*
+*     A key to the vector scale can be displayed to the right of the 
+*     vector map (see parameter KEY). The appearance and position of this 
+*     key may be controlled using parameters KEYSTYLE and KEYPOS.
+
 *  Usage:
-*     vecplot ndf1 ndf2 [comp] [step] [vscale] [vtype] [just] [device]
+*     vecplot ndf1 ndf2 [comp] [step] [vscale] [arrow] [just] [device]
 
 *  ADAM Parameters:
-*     ABSLAB  =  LITERAL (Read)
-*        Label for the plot abscissa, in which NCAR fancy founts may be
-*        embedded when FONT = "NCAR".  If axis information is present
-*        in NDF1 the suggested default is the axis label from NDF1
-*        followed by the units, in parentheses.  If an error occurs
-*        obtaining the label the suggested default is "X". []
 *     ANGROT = _REAL (Read)
 *        A rotation angle in degrees to be added to each vector
 *        orientation before plotting the vectors (see parameter NDF2).
 *        It should be in the range 0--360. [0.0]
+*     ARROW = LITERAL (Read)
+*        Vectors are drawn as arrows, with the size of the arrow head
+*        specified by this parameter. Simple lines can be drawn by setting
+*        the arrow head size to zero. The value should be expressed as a 
+*        fraction of the largest dimension of the vector map. [current value]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot.  The annotations are either the data co-ordinates from
-*        the axis components of NDF1, provided these are present and
-*        linear and COSYS = "Data"; otherwise pixel co-ordinates are
-*        used. [TRUE]
-*     BORDER = _LOGICAL (Read)
-*        TRUE if a box is to be drawn about the plot.  This is only
-*        accessed if no axes are drawn. [TRUE]
+*        vector map. These display co-ordinates in the current co-ordinate 
+*        Frame NDF1 - which may be changed using application WCSFRAME 
+*        (see also parameter USEAXIS). The width of the margins left for
+*        the annotation may be controlled using parameter MARGIN. The
+*        appearance of the axes (colours, fonts, etc) can be controlled 
+*        using the STYLE parameter. [TRUE]
 *     CLEAR = _LOGICAL (Read)
-*        TRUE if the graphics device is to be cleared before display
-*        of the array. [TRUE]
+*        TRUE if the graphics device is to be cleared before displaying
+*        the vector map. If you want the vector map to be drawn over
+*        the top of an existing DATA picture, then set CLEAR to FALSE. The
+*        contour map will then be drawn in alignment with the displayed 
+*        data. If possible, alignment occurs within the current co-ordinate 
+*        Frame of the NDF. If this is not possible, (for instance if 
+*        suitable WCS information was not stored with the existing DATA 
+*        picture), then alignment is attempted in PIXEL 
+*        co-ordinates. If this is not possible, then alignment is
+*        attempted in GRID co-ordinates. If this is not possible, then
+*        alignment is attempted in the first suitable Frame found in the NDF
+*        irrespective of its domain. A message is displayed indicating the 
+*        domain in which alignment occurred. If there are no suitable Frames 
+*        in the NDF then an error is reported. [TRUE]
 *     COMP = LITERAL (Read)
 *        The component of NDF1 which is to be used to define the vector
 *        magnitudes.  It may be "Data", "Error" or "Variance".  The
 *        last two are not available if NDF1 does not contain a VARIANCE
 *        component.  The vector orientations are always defined by the
 *        "Data" component of NDF2. ["Data"]
-*     COSYS = LITERAL (Read)
-*        The co-ordinate system to be used.  This can be either "World"
-*        or "Data".  "World" makes pixel co-ordinates to appear on axes.
-*        If COSYS = "Data" the axis information from NDF1 is used to
-*        annotate axes (if it exists).  [Current co-ordinate system]
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
-*     FONT = LITERAL (Read)
-*        The fount to be used for the line graphics.  It can be either
-*        "NCAR" for the NCAR fancy characters and "GKS" for the standard
-*        GKS san-serif fount.  The former is intended for hardcopy
-*        publication-quality plots, since it is relatively slow; the
-*        latter is intended for normal interactive graphics requiring
-*        rapid plotting, and it is clearer on small plots.  The
-*        suggested default is the current value. ["GKS"]
+*     FILL = _LOGICAL (Read)
+*        The DATA picture containing the vector map is usually produced with 
+*        the same shape as the data. However, for maps with markedly different
+*        dimensions this default behaviour may not give the clearest result. 
+*        When FILL is TRUE, the smaller dimension of the picture is expanded
+*        to produce the largest possible picture within the current picture.  
+*        [FALSE]
 *     JUST = LITERAL (Read)
 *        The justification for each vector; it can take any of the
 *        following values:
 *
-*         "Centre" - the vectors are drawn centred on the
-*                    corresponding pixel,
+*         - "Centre" -- the vectors are drawn centred on the
+*         corresponding pixel,
 *
-*         "Start"  - the vectors are drawn starting at the
-*                    corresponding pixel,
+*         - "Start"  -- the vectors are drawn starting at the
+*         corresponding pixel,
 *
-*         "End"    - the vectors are drawn ending at the corresponding
-*                    pixel.
+*         - "End" -- the vectors are drawn ending at the corresponding
+*         pixel.
 
 *        ["Centre"]
 *     KEY = _LOGICAL (Read)
-*        TRUE if a key is to be produced. [TRUE]
+*        TRUE if a key indicating the vector scale is to be produced. [TRUE]
+*     KEYPOS() = _REAL (Read)
+*        Two values giving the position of the key. The first value gives 
+*        the gap between the right hand edge of the contour map and the left 
+*        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The 
+*        second value gives the vertical position of the top of the key (1.0 
+*        for the highest position, 0.0 for the lowest). If the second value 
+*        is not given, the top of the key is placed level with the top of the 
+*        vector map. Both values should be in the range 0.0 to 1.0. If a
+*        key is produced, then the right hand margin specified by parameter 
+*        MARGIN is ignored. [current value]
+*     KEYSTYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the key (see parameter KEY). 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the text in the key is controlled using "String" 
+*        attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+*        TEXT can be used in place of STRINGS). Note, the Size attribute 
+*        specifies the size of key text relative to the size of the numerical 
+*        labels on the vector map axes. Thus a value of 2.0 for Size will
+*        result in text which is twice the size of the numerical axis labels.
+*        The appearance of the example vector is controlled using "Curve" 
+*        attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be 
+*        used in place of CURVES). The numerical scale value is formatted as 
+*        an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the 
+*        synonym SCALE can be used in place of the value 1). The length of 
+*        the example vector is formatted as an axis 2 value (using attribute 
+*        FORMAT(2), etc - the synonym VECTOR can be used in place of the 
+*        value 2). The vertical space between lines in the key can be 
+*        controlled using attribute TextLabGap. A value of 1.0 is used if 
+*        no value is set for this attribute, and produces default vertical 
+*        spacing. Values larger than 1.0 increase the vertical space, and 
+*        values less than 1.0 decrease the vertical space. [current value] 
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        If a null (!) value is supplied, the value used is generated 
 *        on the basis of the spread of vector lengths in the plot. [!]
-*     MAJTIC( 2 ) = _REAL (Read)
-*        The parameter controlling the numbers of major tick marks
-*        for the x and y axes.  (Number used is between MAJTIC+2 and
-*        5*MAJTIC/2+4.) [3.,3.]
-*     MINTIC( 2 ) = _REAL (Read)
-*        The number of minor tick marks between each major tick mark
-*        for the x and y axes.  A negative value forces the graphics
-*        package to compute appropriate values. [-1.,-1.]
+*     MARGIN( 4 ) = _REAL (Read)
+*        The widths of the margins to leave around the vector map for axis 
+*        annotation. The widths should be given as fractions of the 
+*        corresponding dimension of the DATA picture. 
+*        The actual margins used may be increased to preserve the aspect 
+*        ratio of the DATA picture. Four values may be given, in the order;
+*        bottom, right, top, left. If fewer than four values are given, 
+*        extra values are used equal to the first supplied value. If these 
+*        margins are too narrow any axis annotation may be clipped. The
+*        dynamic default is 0.2 (for all edges) if annotated axes are being 
+*        produced, and zero otherwise. See also parameter KEYPOS. [current value]
 *     NDF1 = NDF (Read)
 *        NDF structure containing the 2-dimensional image giving the
 *        vector magnitudes.
@@ -124,69 +188,56 @@
 *        NDF structure containing the 2-dimensional image giving the
 *        vector orientations.  The values are considered to be in units
 *        of degrees unless the UNITS component of the NDF has the value
-*        "Radians" (case insensitive).  The positive y axis defines
-*        zero orientation, and rotation from the x axis to the y axis
-*        is considered positive.  The suggested default is the current
-*        value.
-*     ORDLAB  =  LITERAL (Read)
-*        Label for the plot ordinate, in which NCAR fancy founts may be
-*        embedded when FONT = "NCAR".  If axis information is present
-*        in NDF1 the suggested default is the axis label from NDF1
-*        followed by the units, in parentheses.  If an error occurs
-*        obtaining the label the suggested default is "Y". []
-*     OUTTIC = _LOGICAL (Read)
-*        TRUE if the axis tick marks are to appear on the outside of
-*        the axes instead of inside.  By default, the tick marks are
-*        drawn outside the plotting region to eliminate
-*        intersections of ticks with the vectors. [TRUE]
-*     PLTITL = LITERAL (Read)
-*        The title of the plot.  Up to about 40 characters can be
-*        accommodated, and NCAR fancy founts may be embedded when FONT =
-*        "NCAR".  If an error occurs obtaining the title, it is
-*        defaulted to "VECPLOT map".  [The title from NDF1]
-*     PXSIZE = _REAL (Read)
-*        The length (x axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
-*     PYSIZE = _REAL (Read)
-*        The length (y axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
+*        "Radians" (case insensitive).  The positive y pixel axis defines
+*        zero orientation, and rotation from the x pixel axis to the y 
+*        pixel is considered positive.  
 *     STEP = _INTEGER (Read)
 *        The number of pixels between adjacent displayed vectors (along
 *        both axes).  Increasing this value reduces the number of
 *        displayed vectors.  If a null (!) value is supplied, the value 
 *        used gives about 30 vectors along the longest axis of the plot. [!]
-*     THICK = _REAL (Read)
-*        The thickness of the axes and annotations in the plot, where
-*        1.0 is the normal thickness.  Currently, this is only available
-*        on a few devices.  It must take a value in the range 0.5--5.0.
-*        [1.0]
-*     VECCOL = LITERAL (Read)
-*        The colour for the vectors.  The options are described below.
-*          "MAX"          - The maximum colour index in the image 
-*                           display colour lookup table.
-*          "MIN"          - The minimum (non-reserved) colour index in 
-*                           the image display colour lookup table.
-*          An integer     - The actual colour index. It is constrained
-*                           between 0 and the maximum colour index
-*                           available on the device. 
-*          A named colour - Uses the named colour from the palette, and
-*                           if it is not present, the nearest colour
-*                           from the palette is selected.
+*     STYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the vectors and annotated axes. 
 *
-*        If the colour is to remain unaltered as the lookup table is
-*        manipulated choose an integer between 0 and 15, or a named
-*        colour.  The suggested default is the current value. [The
-*        current value, but equals "MIN" if there is no current value.]
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the vectors is controlled by the attributes
+*        Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+*        used in place of Curves). [current value]
 *     VSCALE = _REAL (Read)
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
-*        one centimetre.  If a null (!) value is supplied, a value is used
-*        which makes 5% of all displayed vectors larger than the interval 
-*        between adjacent vectors. [!]
-*     VTYPE = LITERAL (Read)
-*        The type of vector to be plotted; it can take the value "Arrow"
-*        or "Line".  Vectors are drawn as arrows or lines accordingly.
-*        ["Line"]
+*        one centimetre.  If a null (!) value is supplied, a default value 
+*        is used. [!]
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has more than 2 axes. A group of two strings should be
+*        supplied specifying the 2 axes which are to be used when annotating 
+*        and aligning the vector map. Each axis can be specified either by 
+*        its integer index within the current Frame (in the range 1 to the 
+*        number of axes in the current Frame), or by its Symbol attribute. A
+*        list of acceptable values is displayed if an illegal value is 
+*        supplied. If a null (!) value is supplied, the axes with the same 
+*        indices as the 2 significant NDF pixel axes are used. [!]
 
 *  Examples:
 *     vecplot polint polang
@@ -195,12 +246,14 @@
 *        orientation taken from NDF polang.  All other settings are
 *        defaulted, so for example about 20 vectors are displayed along
 *        the longest axis, and a key is plotted.
-*     vecplot polint polang angrot=23.4 
+*     vecplot polint polang angrot=23.4 clear=no
 *        Produces a vector map in which the primary axis of the vectors
 *        (as defined by the value zero in the NDF polang) is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
-*        positive y axis) in the displayed map.
-*     vecplot stack(,,2) stack(,,1) vtype=arrow just=start nokey
+*        positive y axis) in the displayed map. The map is drawn over the
+*        top of the the previously drawn DATA picture, aligned in a
+*        suitable co-ordinate Frame.
+*     vecplot stack(,,2) stack(,,1) arrow=0.1 just=start nokey
 *        Produces a vector map in which the vectors are defined by two
 *        planes in the 3-dimensional NDF called stack.  There is no
 *        need to copy the two planes into two separate NDFs before
@@ -209,34 +262,22 @@
 *        to the vector scale and justification is produced.
 
 *  Notes:
-*     -  If the current graphics-database picture is a DATA picture or
-*     contains a DATA picture (such as created by the applications
-*     DISPLAY, CONTOUR, etc.), then the vector plot is overlaid on top
-*     of the existing DATA plot.  In this case any requested annotation
-*     and key are drawn outside the DATA picture but within the current
-*     picture.  If there is insufficient room within the current
-*     picture, then the annotation and/or key may not be drawn.  You
-*     are warned if this happens but the application continues.  If no
-*     DATA picture can be found within the current picture then you
-*     specify the total size of the plot frame using parameters PXSIZE
-*     and PYSIZE, but the application itself chooses how to position
-*     the vector plot and key within this frame.
+*     -  The Title component in NDF1 is used as the default title for 
+*     the annotated axes. If the NDF does not have a Title component, then
+*     the default title is taken from current co-ordinate Frame stored in the
+*     WCS component of the NDF. This default may be over-ridden by specifying 
+*     a value for the Title attribute using the STYLE parameter. 
 *     -  The application stores a number of pictures in the graphics
-*     database in the following order: a FRAME of the specified size
-*     containing the title, annotated axes, vector map and key; a DATA
-*     picture which is stored with world co-ordinates in units of data
-*     pixels; and a KEY picture to store the key if present.  The DATA
-*     picture may also have double-precision data co-ordinates derived
-*     from the axis components of NDF1 provided these are linear and
-*     different from pixel co-ordinates; the data co-ordinates are
-*     stored via a linear transformation.  A reference to NDF1 is
-*     stored with the DATA picture.  On exit the current database
-*     picture for the chosen device reverts to the input picture.
-*     -  The units string in the key may be truncated with an ellipsis
-*     if it cannot be accommodated in full at the smallest allowed
-*     character height.  Generally the maximum length will be between
-*     18 and 27 characters, the exact value depending on the number of
-*     digits in the scale factors.
+*     database in the following order: a FRAME picture containing the 
+*     annotated axes, vectors, and key; a KEY picture to store 
+*     the key if present; and a DATA picture containing just the vectors.
+*     Note, the FRAME picture is only created if annotated axes or a key
+*     has been drawn, or if non-zero margins were specified using parameter 
+*     MARGIN. The world co-ordinates in the DATA picture will be pixel 
+*     co-ordinates. A reference to NDF1, together with a copy of the WCS 
+*     information in the NDF are stored in the DATA picture. On exit the 
+*     current database picture for the chosen device reverts to the 
+*     input picture.
 
 *  Related Applications:
 *     KAPPA: CALPOL.
@@ -269,6 +310,8 @@
 *     30-AUG-1999 (DSB):
 *        Do not cancel the DEVICE Parameter when closing the graphics
 *        system.
+*     4-OCT-1999 (DSB):
+*        Modified to use AST/PGPLOT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -283,33 +326,17 @@
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-      INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management
-                                 ! constants
-      INCLUDE 'GKS_PAR'          ! GKS constants (GSET)
+      INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
 
 *  Status:
       INTEGER STATUS
 
 *  External References:
-      LOGICAL CHR_SIMLR          ! Two strings equivalent apart from
-                                 ! case?
+      LOGICAL CHR_SIMLR          ! Two strings equivalent apart from case?
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
-      REAL AHPAR                 ! Arrowhead size normalised to long
-      PARAMETER( AHPAR = 0.01 )  ! axis
-
-      REAL  ANCLP1               ! Fraction of the frame zone in which
-      REAL  ANCLP2               ! the image will appear when there are
-      REAL  ANCLP3               ! axes
-      REAL  ANCLP4         
-      PARAMETER ( ANCLP1 = 0.19 )
-      PARAMETER ( ANCLP2 = 0.95 )
-      PARAMETER ( ANCLP3 = 0.15 )
-      PARAMETER ( ANCLP4 = 0.91 )
-
-      REAL  ASPKEY               ! Fractional aspect ratio for the key
-      PARAMETER ( ASPKEY = 0.4 )
-
       INTEGER CUNITS             ! Maximum number of characters in units
       PARAMETER( CUNITS = 30 )   ! string
 
@@ -323,63 +350,40 @@
       PARAMETER ( NVEC0 = 30.0 ) ! axis
 
 *  Local Variables:
-      CHARACTER * ( 72 ) ABSLAB  ! Label for the abscissa of the plot
-      REAL AHSIZE                ! Arrowhead size in world co-ordinates
-      REAL AHSIZM                ! Arrowhead size in metres
-      REAL ALBND( NDIM )         ! Axis lower bounds
-      REAL ANGFAC                ! NDF2 data to radians conversion factor
-      REAL ANGROT                ! Angle to add on to NDF2 values
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Numeric type for mapping AXIS
-                                 ! centres
-      REAL AUBND( NDIM )         ! Axis upper bounds
-      LOGICAL AXES               ! Annotated axes to be drawn?
-      LOGICAL BORDER             ! Border to be drawn round the plot?
-      LOGICAL CLEAR              ! Graphics device to be cleared?
-      INTEGER COLI               ! GKS colour index for current SGS pen
-      CHARACTER * ( 8 ) COMP     ! Component to be displayed
-      CHARACTER * ( 5 ) COSYS    ! Co-ordinate system
-      LOGICAL DATAVL             ! Usable data co-ordinates available?
-      REAL DEFSCA                ! Default value for VSCALE
-      DOUBLE PRECISION DOFSET( NDIM ) ! Axis co-ords at pixel co-ords
-                                 ! (0,0)
-      DOUBLE PRECISION DSCALE( NDIM ) ! Dimensions of a pixel in axis
-                                 ! units
-      REAL DXW                   ! Size of a raster unit in x
-      REAL DYW                   ! Size of a raster unit in y
+      CHARACTER COMP*8           ! Component to be displayed
+      CHARACTER JUST*6           ! Vector justification: CENTRE or START
+      CHARACTER MCOMP*8          ! Component to be mapped
+      CHARACTER NDFNAM*255       ! Full NDF specification 
+      CHARACTER TITLE*80         ! Title of the plot
+      CHARACTER UNITS1*( CUNITS )! Units of the data
+      CHARACTER UNITS2*( CUNITS )! Units of the data
+      DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
       INTEGER EL1                ! Number of elements in the first NDF
       INTEGER EL2                ! Number of elements in the second NDF
-      CHARACTER * ( 4 ) FOUNT    ! Fount type
-      REAL GRID( 4 )             ! Current AUTOGRAPH grid offsets
       INTEGER I                  ! Loop count
-      INTEGER IERR               ! GKS error code
       INTEGER INDF1              ! Identifier for first NDF
       INTEGER INDF2              ! Identifier for second NDF
-      INTEGER IPIXX              ! Maximum number of pixel columns   
-      INTEGER IPIXY              ! Maximum number of pixel lines
-      INTEGER IWKID              ! Current GKS workstation identifier
-      CHARACTER * ( 6 ) JUST     ! Vector justification: CENTRE or START
-      LOGICAL KEY                ! A key to vector scale to be plotted?
-      INTEGER LNTYPE             ! GKS line type
-      INTEGER LWIDTH             ! GKS line width
-      REAL MAJTIC( 2 )           ! Major tick mark parameters in x and y
-      CHARACTER * ( 8 ) MCOMP    ! Component to be mapped
-      REAL MINTIC( 2 )           ! Number of minor tick marks in x and y
+      INTEGER IPANG              ! Pointer to 2nd data array
+      INTEGER IPICD              ! AGI identifier for the DATA picture
+      INTEGER IPICF              ! AGI identifier for the frame picture
+      INTEGER IPICK              ! AGI identifier for the KEY picture
+      INTEGER IPIX               ! Index of PIXEL Frame within FrameSet or Plot
+      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
+      INTEGER IPMAG              ! Pointer to 1st data array
+      INTEGER IPW1               ! Pointer to workspace
+      INTEGER IPW2               ! Pointer to workspace
+      INTEGER IWCS               ! AST pointer to WCS FrameSet from NDF1
+      INTEGER MAP                ! Mapping pointer
+      INTEGER NC                 ! Number of characters in NDFNAM
       INTEGER NCU1               ! No. of characters in units of 1st NDF
       INTEGER NCU2               ! No. of characters in units of 2nd NDF
-      INTEGER NINTS              ! Number of colour indices available
-      REAL OFFSET( NDIM )        ! Offsets in world-to-data mapping
-      CHARACTER * ( 72 ) ORDLAB  ! Label for the ordinate of the plot
-      LOGICAL OUTTIC             ! Tick marks to be put outside the box?
-      INTEGER PEN                ! Current SGS pen number
-      INTEGER PICID0             ! AGI identifier on input
-      INTEGER PICIDD             ! AGI identifier for the DATA picture
-      INTEGER PICIDF             ! AGI identifier for the frame picture
-      INTEGER PICIDK             ! AGI identifier for the KEY picture
-      CHARACTER * ( 72 ) PLTITL  ! Title of the plot
-      INTEGER PNTR1              ! Pointer to 1st data array
-      INTEGER PNTR2              ! Pointer to 2nd data array
-      REAL SCALE( NDIM )         ! Scale factors in world-to-data
-                                 ! mapping
+      INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
+      INTEGER NKP                ! No. of values supplied for parameter KEYPOS
+      INTEGER NMARG              ! No. of margin values given
+      INTEGER NX                 ! No. of vectors along horizontal edge
+      INTEGER NY                 ! No. of vectors along vertical edge
       INTEGER SDIM1( NDF__MXDIM ) ! Significant dimensions of 1st NDF
       INTEGER SDIM2( NDF__MXDIM ) ! Significant dimensions of 2nd NDF
       INTEGER SLBND( NDIM )      ! Significant lower bounds of plot area
@@ -389,101 +393,82 @@
       INTEGER SUBND( NDIM )      ! Significant upper bounds of plot area
       INTEGER SUBND1( NDIM )     ! Significant upper bounds of 1st NDF
       INTEGER SUBND2( NDIM )     ! Significant upper bounds of 2nd NDF
-      REAL SXHI                  ! High x bound of data-zone pixel
-                                 ! coords
-      REAL SXLO                  ! Low x bound of data-zone pixel coords
-      REAL SYHI                  ! High y bound of data zone pixel
-                                 ! coords
-      REAL SYLO                  ! Low y bound of data zone pixel coords
-      REAL THICK                 ! The line thickness (standard is 1.0)
-      LOGICAL THERE              ! Does the requested object exist?
-      REAL TICDEF( 2 )           ! Suggested default axis-tick values
-      REAL TYPDAT                ! A typical data value from 1st input NDF
-      CHARACTER * ( CUNITS ) UNITS1 ! Units of the data
-      CHARACTER * ( CUNITS ) UNITS2 ! Units of the data
-      INTEGER VCI                ! Vector colour index
+      LOGICAL ALIGN              ! DATA pic. aligned with a previous picture?
+      LOGICAL AXES               ! Annotated axes to be drawn?
+      LOGICAL KEY                ! A key to vector scale to be plotted?
+      REAL AHSIZE                ! Arrowhead size in world co-ordinates
+      REAL AHSIZM                ! Arrowhead size in metres
+      REAL ANGFAC                ! NDF2 data to radians conversion factor
+      REAL ANGROT                ! Angle to add on to NDF2 values
+      REAL ASPECT                ! Aspect ratio for new DATA pictures
+      REAL DEFSCA                ! Default value for VSCALE
+      REAL DSCALE                ! Vector scale, viz. data units per pixel
+      REAL DUMMY                 ! Unused argument
+      REAL HGT                   ! Character height scale factor
+      REAL KEYOFF                ! Offset to top of key 
+      REAL KEYPOS( 2 )           ! Key position
+      REAL MARGIN( 4 )           ! Margins round DATA picture
+      REAL TYPDAT                ! A typical vector data value
       REAL VSCALE                ! Vector scale, viz. data units per cm
-      CHARACTER * ( 5 ) VTYPE    ! Vector type: arrow or line
-      REAL X1                    ! Lower x w.c. bound of SGS zone
-      REAL X2                    ! Upper x w.c. bound of SGS zone
-      REAL XM                    ! DATA zone x size in metres
-      REAL Y1                    ! Lower y w.c. bound of SGS zone
-      REAL Y2                    ! Upper y w.c. bound of SGS zone
-      REAL YM                    ! DATA zone y size in metres
-      INTEGER ZONE0              ! Zone id. for current picture on entry
-      INTEGER ZONED              ! Zone id. for DATA picture
-      INTEGER ZONEF              ! Zone id. for new FRAME picture
-      INTEGER ZONEG              ! Zone id. for the NCAR "graph window"
-      INTEGER ZONEK              ! Zone id. for the KEY picture
-
+      REAL X1                    ! Lower x bound of PGPLOT viewport
+      REAL X2                    ! Upper x bound of PGPLOT viewport
+      REAL XM                    ! DATA picture x size in metres
+      REAL Y1                    ! Lower y bound of PGPLOT viewport
+      REAL Y2                    ! Upper y bound of PGPLOT viewport
+      REAL YM                    ! DATA picture y size in metres
 *.
 
 *  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-*  Find which component of the first input NDF is to be used to define
-*  the vector magnitudes (the vector orientations are always defined by
-*  the DATA component of the second NDF).
-      CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Variance', .FALSE.,
-     :                COMP, STATUS )
-
-*  Most NDF routines with a component argument don't recognise 'ERROR',
-*  so we need two variables.  Thus convert 'ERROR' into 'VARIANCE' in
-*  the variable needed for such routines.  The original value is held
-*  in a variable with the prefix M for mapping, as one of the few
-*  routines that does support 'ERROR' is NDF_MAP; it is also needed for
-*  plot annotations using any NDF units.
-      MCOMP = COMP
-      IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
-
-*  Access the first input NDF.
-*  ===========================
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
-*  Obtain an identifier for the first NDF which defines the vector
-*  magnitudes.  Ensure that it has just two significant dimensions
-*  (i.e. dimensions spanning more than a single element).  An error
-*  is reported otherwise. The indices of the significant dimensions are
-*  returned in SDIM1.
-      CALL KPG1_GTNDF( 'NDF1', NDIM, .TRUE., 'READ', INDF1, SDIM1,
-     :                 SLBND1, SUBND1, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+*  Access the first input NDF.
+*  ===========================
 
-*  Report an error if the required component does not exist.
-      CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
-      IF ( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'COMP', COMP )
-         CALL NDF_MSG( 'NDF', INDF1 )
-         CALL ERR_REP( 'VECPLOT_NOCOMP', 'VECPLOT: ^NDF does not '/
-     :                 /'contain a ^COMP component.', STATUS )
-         GO TO 999
-      END IF
+*  Obtain the identifier of the NDF holding the vector magnitudes.
+      CALL LPG_ASSOC( 'NDF1', 'READ', INDF1, STATUS )
+
+*  Find which component to use.
+      CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
+
+*  Get an AST pointer to a FrameSet describing the co-ordinate Frames
+*  present in the NDF's WCS component. Modify it to ensure that the Base,
+*  PIXEL and Current frames all have 2 dimensions. The NDF must have exactly
+*  2 significant dimensions (i.e. axes spanning more than 1 pixel)
+      CALL KPG1_ASGET( INDF1, NDIM, .TRUE., .TRUE., .TRUE., SDIM1, 
+     :                 SLBND1, SUBND1, IWCS, STATUS )
+
+*  Find the index of the PIXEL Frame.
+      CALL KPG1_ASFFR( IWCS, 'PIXEL', IPIX, STATUS ) 
 
 *  Obtain the units of the requested component of the first NDF.
       CALL KPG1_DAUNI( INDF1, MCOMP, UNITS1, NCU1, STATUS )
 
 *  Map the required component as an array of _REAL values.  Note that
 *  the component may be 'Error'.
-      CALL KPG1_MAP( INDF1, MCOMP, '_REAL', 'READ', PNTR1, EL1, STATUS )
+      CALL KPG1_MAP( INDF1, MCOMP, '_REAL', 'READ', IPMAG, EL1, STATUS )
 
-*  Access the first input NDF.
+*  Access the second input NDF.
 *  ===========================
 
-*  Now do just the same for the second NDF which defines the vector
-*  orientations.  The DATA component is used.  Access the NDF and its
-*  significant bounds.
+*  Now get the second NDF which defines the vector orientations. The DATA 
+*  component is used.  It is assumed that this NDF is aligned in pixel
+*  co-ordinates with the first NDF, so no WCS FrameSet is required. Access 
+*  the NDF and its significant bounds.
       CALL KPG1_GTNDF( 'NDF2', NDIM, .TRUE., 'READ', INDF2, SDIM2,
      :                 SLBND2, SUBND2, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain the units of the DATA component of the second NDF.
       CALL KPG1_DAUNI( INDF2, 'Data', UNITS2, NCU2, STATUS )
 
 *  Map the DATA component as an array of _REAL values.
-      CALL KPG1_MAP( INDF2, 'Data', '_REAL', 'READ', PNTR2, EL2, 
+      CALL KPG1_MAP( INDF2, 'Data', '_REAL', 'READ', IPANG, EL2, 
      :               STATUS )
 
 *  Find the conversion factor for the angle data.
@@ -492,8 +477,8 @@
 *  of the second NDF into units of radians.  If the UNITS component does
 *  not have the value "RADIANS" (case insensitive), then assume the
 *  data values are in degrees.
-      IF ( NCU2 .GT. 0 ) THEN
-         IF ( CHR_SIMLR( UNITS2( : NCU2 ), 'RADIANS' ) ) THEN
+      IF( NCU2 .GT. 0 ) THEN
+         IF( CHR_SIMLR( UNITS2( : NCU2 ), 'RADIANS' ) ) THEN
             ANGFAC = 1.0
          ELSE
             ANGFAC = DTOR
@@ -517,27 +502,19 @@
       SUBND( 2 ) = MIN( SUBND1( 2 ), SUBND2( 2 ) )
 
 *  Report an error if there is no overlap between the two NDFs.
-      IF ( ( SUBND( 1 ) .LT. SLBND( 1 ) .OR.
+      IF( ( SUBND( 1 ) .LT. SLBND( 1 ) .OR.
      :       SUBND( 2 ) .LT. SLBND( 2 ) ) .AND.
      :       STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF1', INDF1 )
          CALL NDF_MSG( 'NDF2', INDF2 )
-         CALL ERR_REP( 'VECPLOT_NOOVER',
-     :                 'VECPLOT: There are no pixels in common '/
-     :                 /'between ^NDF1 and ^NDF2.', STATUS )
+         CALL ERR_REP( 'VECPLOT_ERR1', 'There are no pixels in '//
+     :                 'common between ^NDF1 and ^NDF2.', STATUS )
          GO TO 999
       END IF
 
-*  Store the corresponding pixel co-ordinate bounds.  These go to the
-*  outer edges of the pixels, not to the centres.
-      SXLO = REAL( SLBND( 1 ) - 1 )
-      SXHI = REAL( SUBND( 1 ) )
-      SYLO = REAL( SLBND( 2 ) - 1 )
-      SYHI = REAL( SUBND( 2 ) )
-
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find representative data value.
 *  ==============================
@@ -545,246 +522,121 @@
 *  used to define the default vector scaling.
       CALL KPS1_DTPCL( INDF1, SLBND, SUBND, SDIM1, TYPDAT, STATUS )
 
-*  Define axis system.
-*  ===================
-
-*  See if annotated axes are required, and if so, what sort of
-*  co-ordinates are to be displayed. Store a blank value for the
-*  co-ordinate system if no axes are required.
-      CALL PAR_GTD0L( 'AXES', .TRUE., .TRUE., AXES, STATUS )
-      IF ( AXES ) THEN
-         CALL PAR_CHOIC( 'COSYS', 'Data', 'Data,World', .FALSE., COSYS,
-     :                   STATUS )
-      ELSE
-         COSYS = ' '
-      END IF
-
-*  Find the precision needed for the system of axis arrays.
-      CALL NDF_ATYPE( INDF1, 'Centre', 0, ATYPE, STATUS )
-
-*  See if there are usable axis co-ordinate structures within the first
-*  NDF.  These provide the data co-ordinates which are plotted on the
-*  annotated axes (if required), and stored in the graphics database
-*  with the newly created data picture.  Axis co-ordinates must be
-*  monotonic to be usable.  The coefficients of the linear
-*  transformation from world to data co-ordinates are returned.  If no
-*  usable data co-ordinates are available, then a unit transformation
-*  is returned.  If the axes are non-linear a warning message is issued
-*  and a linear approximation to the axis co-ordinates is returned.
-*
-*  Note that if we were to map a single-precision axis array as double
-*  precision, the linearity might be violated merely because of the
-*  increased sensitivity of the test.  Thus the testing is done with
-*  the appropriate type.  Hereafter though the single-precision
-*  transformation is adequate for the job apart from storing the
-*  transformation in the AGI database.
-      IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_CHAXD( INDF1, NDIM, SDIM1, DATAVL, DSCALE, DOFSET,
-     :                    STATUS )
-         DO I = 1, NDIM
-            SCALE( I ) = SNGL( DSCALE( I ) )
-            OFFSET( I ) = SNGL( DOFSET( I ) )
-         END DO
-
-      ELSE
-         CALL KPG1_CHAXR( INDF1, NDIM, SDIM1, DATAVL, SCALE, OFFSET,
-     :                    STATUS )
-      END IF
-
-*  If axes with data co-ordinates were requested but no usable data
-*  co-ordinates are available, use world co-ordinates for the axes
-*  instead.
-      IF ( COSYS .EQ. 'DATA' .AND. (.NOT. DATAVL ) ) COSYS = 'WORLD'
-
 *  Start the graphics system.
 *  ==========================
 
-*  Now we set up the graphics system.  First see whether the current
-*  picture is to be cleared before creating the new plot.
-      CALL PAR_GTD0L( 'CLEAR', .TRUE., .TRUE., CLEAR, STATUS )
+*  See if annotated axes are required.
+      CALL PAR_GET0L( 'AXES', AXES, STATUS )
 
-*  Open the graphics database for the selected device, obtaining
-*  identifiers for the current AGI picture and SGS zone.
-      IF ( CLEAR ) THEN
-         CALL AGS_ASSOC( 'DEVICE', 'WRITE', ' ', PICID0, ZONE0, STATUS )
-      ELSE
-         CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID0, ZONE0,
-     :                   STATUS )
-      END IF
-
-*  Ensure that plotted lines will be solid. 
-      CALL KPG1_SOLIN( STATUS )
-
-*  Define the zones and pictures.
-*  ==============================
-
-*  See if a key to the vector magnitude scale is required.
-      CALL PAR_GTD0L( 'KEY', .TRUE., .TRUE., KEY, STATUS )
+*  See if a key to vector length is required.
+      CALL PAR_GET0L( 'KEY', KEY, STATUS )
 
 *  Abort if an error has occurred.
-      IF ( STATUS .NE. SAI__OK ) GO TO 999
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Create the zones required for the various parts of the plot (FRAME,
-*  KEY, DATA and graph window). A picture corresponding to the new FRAME
-*  zone is stored in the AGI database. If a DATA picture is contained
-*  within the current picture then it is used to define the zone in
-*  which to produce the vector plot. In this case, the bounds of the
-*  displayed DATA picture (in pixel co-ordinates) are returned in SXLO,
-*  etc.  Otherwise, the user is asked for a FRAME picture size and the
-*  DATA picture is created within it using the supplied values of SXLO,
-*  etc. The current zone is unchanged.
-      CALL KPG1_ZOPIC( 'PXSIZE', 'PYSIZE', 'KAPPA_VECPLOT', ASPKEY, 
-     :                 SXLO, SXHI, SYLO, SYHI, KEY, AXES, ZONEF, ZONED, 
-     :                 ZONEK, ZONEG, PICIDF, XM, YM, STATUS )
-
-*  Obtain the plotting style.
-*  ==========================
-
-*  Produce annotated axes if required.
-      IF ( AXES ) THEN
-
-*  Obtain the labels for each axis. First deal with axes displaying
-*  DATA co-ordinates...
-         IF ( COSYS .EQ. 'DATA' ) THEN
-
-*  Get the abscissa and ordinate labels, suggesting the value in the 
-*  axis structure of INDF1, if present, as the default.  Otherwise, use
-*  "X" and "Y" as defaults.
-            CALL KPG1_GAXLB( INDF1, SDIM1( 1 ), 'ABSLAB', 'X', ABSLAB,
-     :                       STATUS )
-            CALL KPG1_GAXLB( INDF1, SDIM2( 2 ), 'ORDLAB', 'Y', ORDLAB,
-     :                       STATUS )
-
-*  Now deal with axes displaying WORLD co-ordinates. Get the labels
-*  without reference to any axis structures.  The suggested defaults
-*  are 'X' and 'Y'.
-         ELSE
-            CALL PAR_DEF0C( 'ABSLAB', 'X', STATUS )
-            CALL PAR_GET0C( 'ABSLAB', ABSLAB, STATUS )
-            CALL PAR_DEF0C( 'ORDLAB', 'Y', STATUS )
-            CALL PAR_GET0C( 'ORDLAB', ORDLAB, STATUS )
-         END IF
-
-*  Obtain a title for the plot, using the title from the first NDF as
-*  the default.  If NDF1 does not have a title, then use "VECPLOT map"
-*  as the default.
-         CALL KPG1_GNTIT( INDF1, 'PLTITL', 'VECPLOT map', PLTITL,
-     :                    STATUS )
-
-*  Get the number of minor ticks.  Negative values for MINTIC causes
-*  NCAR to calculate default values.
-         TICDEF( 1 ) = -1.
-         TICDEF( 2 ) = -1.
-         CALL PAR_GDR1R( 'MINTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MINTIC, STATUS )
-
-*  Get the parameter controlling the number of major ticks per axis.
-         TICDEF( 1 ) = 3.0
-         TICDEF( 2 ) = 3.0
-         CALL PAR_GDR1R( 'MAJTIC', 2, TICDEF, -1., VAL__MAXR, .FALSE.,
-     :                   MAJTIC, STATUS )
-
-*  See if the tick marks are to be drawn on the outside of the axes.
-         CALL PAR_GTD0L( 'OUTTIC', .TRUE., .TRUE., OUTTIC, STATUS )
-
-*  Get the line thickness for the axes.
-         CALL PAR_GDR0R( 'THICK', 1.0, 0.5, 5.0, .TRUE., THICK, STATUS )
-
-*  See which fount is required, and select it.  Although NCAR is the
-*  default, one or the other must always be selected to prevent
-*  persistence from earlier applications.
-         CALL PAR_CHOIC( 'FONT', 'GKS', 'GKS,NCAR', .TRUE., FOUNT,
-     :                   STATUS )
-
-         IF ( FOUNT .EQ. 'GKS ' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, -100 )
-
-         ELSE IF ( FOUNT .EQ. 'NCAR' ) THEN
-            CALL AGPWRT( 0.0, 0.0, ' ', 0, 0, 0, 100 )
-         END IF
-
-*  Set up the graph co-ordinate system and draw the axes.
-*  ======================================================
-
-*  Select the zone to be used as the AUTOGRAPH "graph window" (the
-*  rectangle which contains labels, axes, grid, etc).
-         CALL SGS_SELZ( ZONEG, STATUS )
-
-*  Ensure that the graph window used by AUTOGRAPH corresponds to this
-*  zone.
-         CALL SNX_AGWV
-
-*  Ensure that the graph window zone has world co-ordinate bounds of
-*  [0,1] on each axis.
-         CALL SGS_SW( 0.0, 1.0, 0.0, 1.0, STATUS )
-
-*  Get the bounds of the DATA zone within the world co-ordinate system
-*  of the graph window zone.
-         CALL SGS_TPZ( ZONED, SXLO, SYLO, ZONEG, X1, Y1, STATUS )
-         CALL SGS_TPZ( ZONED, SXHI, SYHI, ZONEG, X2, Y2, STATUS )
-
-*  Get the current bounds of the AUTOGRAPH "grid window" (the rectanglar
-*  section of the graph window along the edges of which axes are to be
-*  drawn). These values are given as fractions of the graph window width
-*  and height, starting from the bottom left corner of the graph window.
-         CALL AGGETF( 'GRID/LEFT.', GRID( 1 ) )
-         CALL AGGETF( 'GRID/RIGHT.', GRID( 2 ) )
-         CALL AGGETF( 'GRID/BOTTOM.', GRID( 3 ) )
-         CALL AGGETF( 'GRID/TOP.', GRID( 4 ) )
-
-*  Store new values corresponding to the bounds of the DATA zone. The
-*  original values are re-instated when the axes have been produced.
-         CALL AGSETF( 'GRID/LEFT.', X1 )
-         CALL AGSETF( 'GRID/RIGHT.', X2 )
-         CALL AGSETF( 'GRID/BOTTOM.', Y1 )
-         CALL AGSETF( 'GRID/TOP.', Y2 )
-
-*  Store the bounds of the co-ordinate values (WORLD or DATA) used to
-*  annotate the axes.
-         IF ( COSYS .EQ. 'DATA' ) THEN
-            ALBND( 1 ) = SCALE( 1 ) * SXLO + OFFSET( 1 )
-            AUBND( 1 ) = SCALE( 1 ) * SXHI + OFFSET( 1 )
-            ALBND( 2 ) = SCALE( 2 ) * SYLO + OFFSET( 2 )
-            AUBND( 2 ) = SCALE( 2 ) * SYHI + OFFSET( 2 )
-
-         ELSE IF ( COSYS .EQ. 'WORLD' ) THEN
-            ALBND( 1 ) = SXLO
-            AUBND( 1 ) = SXHI
-            ALBND( 2 ) = SYLO
-            AUBND( 2 ) = SYHI
-
-         END IF
-
-*  Draw annotated axes in the graph window with the grid positioned as
-*  defined above. 
-         CALL NCRAXS( ALBND( 1 ), ALBND( 2 ), AUBND( 1 ), AUBND( 2 ),
-     :                PLTITL, ABSLAB, ORDLAB, MINTIC, MAJTIC, OUTTIC,
-     :                THICK, .FALSE., STATUS )
-
-*  Restore the original bounds of the AUTOGRAPH grid window. 
-         CALL AGSETF( 'GRID/LEFT.', GRID( 1 ) )
-         CALL AGSETF( 'GRID/RIGHT.', GRID( 2 ) )
-         CALL AGSETF( 'GRID/BOTTOM.', GRID( 3 ) )
-         CALL AGSETF( 'GRID/TOP.', GRID( 4 ) )
-
-*  If no axes are required...
+*  Set the dynamic default for MARGIN.
+      IF( AXES ) THEN
+         MARGIN( 1 ) = 0.2
       ELSE
+         MARGIN( 1 ) = 0.0
+      END IF
 
-*  Draw a border, if required.
-*  ===========================
-*  
-*  See if a border is to be produced.
-         CALL PAR_GTD0L( 'BORDER', .TRUE., .TRUE., BORDER, STATUS )
+      CALL PAR_DEF1R( 'MARGIN', 1, MARGIN( 1 ), STATUS )
 
-*  If required, find the bounds of the DATA zone within the FRAME
-*  co-ordinate system and draw a box around it.  The box is drawn one
-*  device unit inside the data box to avoid bits of it being clipped.
-         IF ( BORDER ) THEN
-            CALL SGS_TPZ( ZONED, SXLO, SYLO, ZONEF, X1, Y1, STATUS )
-            CALL SGS_TPZ( ZONED, SXHI, SYHI, ZONEF, X2, Y2, STATUS )
-            CALL SGS_SELZ( ZONEF, STATUS )
-            CALL SGS_IDUN( DXW, DYW )
-            CALL SGS_BOX( X1 + DXW, X2 - DXW, Y1 + DYW, Y2 - DYW )
+*  Get new values.
+      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+
+*  Use the default if a null value was supplied.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         NMARG = 1
+      END IF
+
+*  Ignore any suplus values.
+      NMARG = MIN( 4, NMARG )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Use the first value for any unspecified edges.
+      DO I = NMARG + 1, 4      
+         MARGIN( I ) = MARGIN( 1 )
+      END DO
+
+*  Store the pixel co-ordinates bounds for the new DATA picture. These
+*  are only used if the new DATA picture is not based on an existing DATA
+*  picture. Note, the corresponding PGPLOT window created by KPG1_PLOT will
+*  have world co-ordinates of millimetres from the bottom left corner of
+*  the view surface, NOT pixels. This box is only used to define the bounds 
+*  of the picture within the AGI database for the benefit of non-AST 
+*  applications.
+      BOX( 1 ) = DBLE( SLBND( 1 ) ) - 1.0D0
+      BOX( 2 ) = DBLE( SLBND( 2 ) ) - 1.0D0
+      BOX( 3 ) = DBLE( SUBND( 1 ) ) 
+      BOX( 4 ) = DBLE( SUBND( 2 ) ) 
+
+*  Store the aspect ratio of the data array, assuming square pixels.
+      ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
+
+*  Generate a reference for the NDF to be stored in the graphics
+*  database.
+      CALL NDF_MSG( 'NDF1', INDF1 )
+      CALL MSG_LOAD( ' ', '^NDF1', NDFNAM, NC, STATUS )
+
+*  Establish synonyms for AST graphical element names to be recognised
+*  during the following call to KPG1_PLOT.
+      CALL KPG1_ASPSY( '(VEC*TORS)', '(CURVES)', STATUS )
+
+*  Start up the graphics system. This stores a new DATA picture in the AGI 
+*  database with the given pixel co-ordinate bounds (a KEY picture is also
+*  created if necessary, together with an enclosing FRAME picture ). The 
+*  PGPLOT viewport is set so that it matches the area of the DATA picture. 
+*  World co-ordinates within the PGPLOT window are set to millimetres
+*  from the bottom left corner of the view surface. An AST Plot is returned 
+*  for drawing in the DATA picture. The Base (GRAPHICS) Frame in the Plot 
+*  corresponds to millimetres from the bottom left corner of the view
+*  port, and the Current Frame is inherited from the NDF's WCS FrameSet.
+
+*  First deal with cases where a key is required...
+      IF( KEY ) THEN
+
+*  Get the position required for the key. The margin between DATA and KEY 
+*  Frames is determined by the horizontal position requested for the key.
+         CALL PAR_GDRVR( 'KEYPOS', 2, 0.0, 1.0, KEYPOS, NKP, STATUS )
+         MARGIN( 2 ) = KEYPOS( 1 )
+  
+*  Start up the graphics system, creating a KEY picture.
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_VECPLOT', 
+     :                   NDFNAM( : NC ), MARGIN, 1, 'KEY', 'R', 0.5, 
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+     :                   IPLOT, NFRM, ALIGN, STATUS )
+
+*  Otherwise, start up the graphics system, creating no KEY picture.
+      ELSE
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_VECPLOT', 
+     :                   NDFNAM( : NC ), MARGIN, 0, ' ', ' ', 0.0, 
+     :                   ASPECT, 'PIXEL', BOX, IPICD, IPICF, IPICK, 
+     :                   IPLOT, NFRM, ALIGN, STATUS )
+      END IF
+
+*  Find the index of the NDF PIXEL Frame within the Plot.
+      IPIX = IPIX + NFRM
+
+*  If the user did not specify a Plot title (as indicated by the Plot title
+*  being the same as the WCS title), make the NDF Title the default Title for 
+*  the Plot. We have to be careful about the timing of this change to the
+*  Title. If we did it before KPG1_PLOT (i.e. if we set the Title in IWCS)
+*  it may prevent alignment ocurring within KPG1_PLOT since alignment fails 
+*  if the Title of two Frames differ.
+      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
+     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+
+         TITLE = ' '
+         CALL NDF_CGET( INDF1, 'TITLE', TITLE, STATUS ) 
+
+         IF( TITLE .NE. ' ' ) THEN
+            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
+     :                     STATUS )
          END IF
 
       END IF
@@ -805,144 +657,188 @@
 *  Find the increment between plotted vectors, in pixels, ensuring that
 *  it is not zero or negative.  A default value which gives a reasonable
 *  number of vectors along the shortest axis is used.
-      STEP = MAX( 1, NINT( MAX( SXHI - SXLO, SYHI - SYLO ) / NVEC0 ) )
+      STEP = MAX( 1, NINT( MAX( SUBND( 1 ) - SLBND( 1 ), 
+     :                          SUBND( 2 ) - SLBND( 1 ) ) / NVEC0 ) )
       CALL PAR_DEF0I( 'STEP', STEP, STATUS )
       CALL PAR_GET0I( 'STEP', STEP, STATUS )
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       STEP = MAX( 1, STEP )
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the bounds of the viewport in millimetres, and convert to metres.
+      CALL PGQVP( 2, X1, X2, Y1, Y2 )
+      XM = ( X2 - X1 )/1000.0
+      YM = ( Y2 - Y1 )/1000.0
+
+*  Get the bounds of the PGPLOT window (this will also be in meillimetres).
+      CALL PGQWIN( X1, X2, Y1, Y2 )
+
 *  Establish the default value for the vector scaling factor such that
-*  a typical data value corresponds to a vector equal to the increment
-*  size given by STEP, and then get a new (positive) value.  If a value
-*  of zero is supplied, use the default value.  XM is measured in metres
-*  so 100 time converts to centimetres.
-      DEFSCA = ABS( TYPDAT * ( SXHI - SXLO ) /
-     :              ( 100.0 * XM * REAL( STEP ) ) )
+*  a typical data value corresponds to a vector equal to one 15th of 
+*  the smallest DATA picture dimension, and then get a new (positive) value.  
+*  If a value of zero is supplied, use the default value.  XM is measured in 
+*  metres so 100 time converts to centimetres.
+      DEFSCA = ABS( NVEC0 * TYPDAT / ( 100.0 * MIN( XM, YM ) ) )
       CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Get the new parameter value.
       CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
+
+*  Annul the error if a null value was given.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          VSCALE = DEFSCA
       END IF
-      VSCALE = ABS( VSCALE )
-      IF ( VSCALE .LE. VAL__SMLR ) VSCALE = DEFSCA
 
-*  Get the type of vectors to be plotted, arrows or lines.
-      CALL PAR_CHOIC( 'VTYPE', 'LINE', 'LINE,ARROW', .TRUE., VTYPE,
-     :                STATUS )
+*  Make sure the value is larger than zero.
+      VSCALE = ABS( VSCALE )
+      IF( VSCALE .LE. VAL__SMLR ) VSCALE = VAL__SMLR
+
+*  Convert VSCALE so that it gives data units per unit distance in the
+*  graphics world coordinate system, rather than data units per centimetre.
+      DSCALE = VSCALE * 100.0 * XM / ( X2 - X1 )
 
 *  Get the vector justification to be used.
       CALL PAR_CHOIC( 'JUST', 'CENTRE', 'CENTRE,START,END', .TRUE.,
      :                JUST, STATUS )
 
-*  Set up the arrowhead size in units of pixels ("Line" vectors are
-*  considered to be "Arrow" vectors with zero sized arrowheads).
-      IF ( VTYPE .EQ. 'ARROW' ) THEN
-         AHSIZE = AHPAR * MAX( SXHI - SXLO, SYHI - SYLO )
-      ELSE
-         AHSIZE = 0.0
-      END IF
+*  Get the arrow head size, and convert it to units of DATA picture world 
+*  coordinates.
+      CALL PAR_GET0R( 'ARROW', AHSIZE, STATUS )
+      AHSIZE = AHSIZE * MAX( X2 - X1, Y2 - Y1 )
 
 *  Get the arrowhead size in metres.
-      AHSIZM = AHSIZE * XM / ( SXHI - SXLO )
+      AHSIZM = AHSIZE * XM / ( X2 - X1 )
 
-*  Select the DATA zone as the current zone.
-      CALL SGS_SELZ( ZONED, STATUS )
+*  Get the Mapping from the PIXEL Frame in the input NDFs to graphics world 
+*  coordinates.
+      MAP = AST_GETMAPPING( IPLOT, IPIX, AST__BASE, STATUS )
 
-*  Obtain the maximum number of colour indices.
-      CALL KPG1_QIDAT( 'DEVICE', 'SGS', NINTS, IPIXX, IPIXY, STATUS )
-      
-*  See what pen is to be used to draw the vectors.
-      CALL KPG1_MACOL( 'VECCOL', CTM__RSVPN, NINTS - 1, VCI, STATUS )
+*  Calculate the number of vectors to be drawn along each axis.
+      NX = ( SUBND( 1 ) - SLBND( 1 ) - STEP/2 + 1 )/STEP
+      NY = ( SUBND( 2 ) - SLBND( 2 ) - STEP/2 + 1 )/STEP
 
-*  Inquire the current SGS pen colour index.
-      CALL SGS_IPEN( PEN )
-      CALL SGS_ICURW( IWKID )
-      CALL GQPLR( IWKID, PEN, GSET, IERR, LNTYPE, LWIDTH, COLI )
+*  Allocate work space.
+      CALL PSX_CALLOC( 2*NX*NY, '_DOUBLE', IPW1, STATUS )
+      CALL PSX_CALLOC( 2*NX*NY, '_DOUBLE', IPW2, STATUS )
 
-*  Store the new colour index for this pen.
-      CALL GSPLR( IWKID, PEN, LNTYPE, LWIDTH, VCI )
-
-*  See if a GKS error has occurred.
-      CALL GKS_GSTAT( STATUS )
+*  Set the appearance of lines drawn using PGPLOT so that they mimic 
+*  curves produced using astCurves.
+      CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *  Plot the vectors.
-*  =================
-      CALL KPS1_VECPL( SLBND1( 1 ), SUBND1( 1 ), SLBND1( 2 ), 
-     :                 SUBND1( 2 ), %VAL( PNTR1 ), SLBND2( 1 ), 
-     :                 SUBND2( 1 ), SLBND2( 2 ), SUBND2( 2 ), 
-     :                 %VAL( PNTR2 ), ANGFAC, ANGROT, STEP,
-     :                 VSCALE, AHSIZE, JUST, STATUS )
+      CALL KPS1_VECPL( MAP, SLBND, SUBND, NX*NY, 
+     :                 SLBND1( 1 ), SUBND1( 1 ), SLBND1( 2 ), 
+     :                 SUBND1( 2 ), %VAL( IPMAG ),
+     :                 SLBND2( 1 ), SUBND2( 1 ), SLBND2( 2 ), 
+     :                 SUBND2( 2 ), %VAL( IPANG ),
+     :                 STEP, ANGFAC, ANGROT, DSCALE, AHSIZE, JUST, 
+     :                 %VAL( IPW1 ), %VAL( IPW2 ), STATUS )
 
-*  Flush all graphics.
-      CALL SGS_FLUSH
+*  Re-instate the previous PGPLOT attributes.
+      CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
 
-*  Re-instate the original colour index for this pen.
-      CALL GSPLR( IWKID, PEN, LNTYPE, LWIDTH, COLI )
+*  Draw the axes grid if required.
+      IF( AXES ) CALL KPG1_ASGRD( IPLOT, IPICF, .TRUE., STATUS )
 
-*  Record the pictures in the AGI database.
-*  ========================================
-
-*  Select the frame picture.
-      CALL AGI_SELP( PICIDF, STATUS )
-
-*  Record the data picture and a reference to the first NDF in the
-*  database.
-      CALL KPG1_SDTRN( 'KAPPA_VECPLOT', INDF1, PICIDD, STATUS )
-
-*  If usable data co-ordinates are available, store a transformation
-*  from data co-ordinates to world co-ordinates with the data picture in
-*  the graphics database.
-      IF ( DATAVL ) THEN
-         IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_LITRD( DSCALE, DOFSET, STATUS )
-         ELSE
-            CALL KPG1_LITRR( SCALE, OFFSET, STATUS )
-         END IF
-      END IF
-
-*  Plot and record the key.
-*  ========================
-
+*  Plot the key.
+*  =============
 *  Now produce the key if required.
-      IF ( KEY ) THEN
+      IF( KEY .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Select the key zone.
-         CALL SGS_SELZ( ZONEK, STATUS )
+*  Report an error if there is insufficient room within the current
+*  picture for the key.
+         IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'VECPLOT_ERR2', 'There is insufficient '//
+     :                    'room in the current picture for a key.', 
+     :                    STATUS )
+            GO TO 999
+         END IF
+
+*  Get the PGPLOT character height scale factor used for numerical labels 
+*  in the main vector map area.
+         CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .TRUE., ATTRS, STATUS )
+         CALL PGQCH( HGT )
+         CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .FALSE., ATTRS, STATUS )
+
+*  If no value was supplied for the vertical position of the KEY using 
+*  parameter KEYPOS, find the value which puts the top of the key level 
+*  with the top of the DATA picture.
+         IF( NKP .LT. 2 ) THEN
+
+*  We need to know the position of the top of the DATA picture so that
+*  the top of the key can be put at the same height on the screen. Get
+*  the bounds of the current PGPLOT viewport, in mm. Only the vertical
+*  position at the top is needed.
+            CALL PGQVP( 2, DUMMY, DUMMY, DUMMY, KEYOFF )
+
+*  Activate the KEY picture. This returns a pointer to an AST Plot which
+*  can be used to draw in the KEY picture.
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the vertical position in the key picture which corresponds to
+*  the top of the DATA picture, as a fraction of the height of the key
+*  picture.
+            CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
+            KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
+
+*  If the horizontal positions was given using parameter KEYPOS, just 
+*  activate the KEY picture. This returns a pointer to an AST Plot which
+*  can be used to draw in the KEY picture.
+         ELSE
+            KEYOFF = KEYPOS( 2 )
+            CALL KPG1_GDGET( IPICK, AST__NULL, .FALSE., IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+         END IF
+
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Ensure that previous synonyms are cleared.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*  Establish some synonyms for AST attribute names.
+         CALL KPG1_ASPSY( 'FORMAT(SCA*LE)', 'FORMAT(1)', STATUS )
+         CALL KPG1_ASPSY( 'FORMAT(VEC*TOR)', 'FORMAT(2)', STATUS )
+         CALL KPG1_ASPSY( '(VEC*TOR)', '(CURVES)', STATUS )
+         CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
+
+*  Set the style for plotting in the key picture.
+         CALL KPG1_ASSET( 'KAPPA_VECPLOT', 'KEYSTYLE', IPLOTK,
+     :                    STATUS )
 
 *  Now produce the key.
-         CALL KPS1_VECKY( 'KEYVEC', VSCALE, AHSIZM, ABS( TYPDAT ), 
-     :                    UNITS1, JUST, STATUS )
-
-*  Switch back to the frame picture.
-         CALL AGI_SELP( PICIDF, STATUS )
-
-*  Create a new picture in the graphics database covering the key.
-         CALL AGS_SZONE( 'KEY', 'KAPPA_VECPLOT', PICIDK, STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_REP( 'VECPLOT_DBSK', 'VECPLOT: Error while '/
-     :        /'storing the key picture in the graphics database.',
-     :        STATUS )
-         END IF
+         CALL KPS1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, KEYOFF,
+     :                    ABS( TYPDAT ), UNITS1, JUST, HGT, STATUS )
 
       END IF
-
-*  Closedown sequence.
-*  ===================
 
 *  Arrive here if an error occurs.
  999  CONTINUE
+
+*  Free work space.
+      CALL PSX_FREE( IPW1, STATUS )     
+      CALL PSX_FREE( IPW2, STATUS )     
       
-*  Shut down the graphics database.
-      CALL AGS_DEASS( 'DEVICE', .FALSE., STATUS )
+*  Shutdown PGPLOT and the graphics database.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
 
+*  End the AST context.
+      CALL AST_END( STATUS )
+
 *  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'VECPLOT_ERR',
-     :     'VECPLOT: Error producing a vector map.', STATUS )
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'VECPLOT_ERR', 'VECPLOT: Error producing a '//
+     :                 'vector map.', STATUS )
       END IF
 
       END
