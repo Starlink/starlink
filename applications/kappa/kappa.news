@@ -1,12 +1,13 @@
 1 KAPPA_Version_0.14-3
 
    A new release of KAPPA (V0.14-3) has been made. The changes are
-   described fully in sun95.14. The majority of the changes are
-   again in the field of graphics and WCS handling. More
-   applications have been changed to use AST/PGPLOT for these
-   purposes, and now have corresponding increased functionality.
-   This has involved changing the parameter lists for these
-   applications.
+   described fully in sun95.14. A demonstration of the main effects of
+   the changes can be seen by issuing the command "kapdemo v0.14-3".
+
+   The majority of the changes are again in the field of graphics and WCS
+   handling. More applications have been changed to use AST/PGPLOT for
+   these purposes, and now have corresponding increased functionality.
+   This has involved changing the parameter lists for these applications.
 
 *      Scripts which make use of any of the removed or
 *      modified parameters will fail when run with KAPPA

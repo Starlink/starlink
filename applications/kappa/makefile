@@ -903,7 +903,7 @@ kappa_display_keystyle.def
 
 #  Define the package demo files for use with stardemo.tcl
 
-DEMO_FILES = kappa.demo
+DEMO_FILES = kappa.demo v0.14-3.demo
 
 #  List of TK/TCL object libraries.
 
