@@ -24,10 +24,28 @@ $TestDir = $ENV{TESTDIR};
 $ReportFile = $ENV{REPORTFILE};
 print STDERR "TestDir=$TestDir  ReportFile=$ReportFile\n";
 
+# Find the moggy program.  Searching for it like this gives us a
+# little more flexibility in installation locations (and means that
+# the system will work for testing in its build directory).
+my $moggylocation = undef;
+foreach $loc ("$ENV{AUTOASTROM_DIR}/moggy", 
+	      "$ENV{AUTOASTROM_DIR}/moggy/moggy") {
+    if (-f $loc && -x $loc) {
+	$moggylocation = $loc;
+	last;
+    }
+}
+defined ($moggylocation)
+  || die "Can't locate moggy program\n";
+print STDERR "moggylocation=$moggylocation\n";
+
+
 open (REPORT, ">$ReportFile") || die "Can't open file $ReportFile to write";
 
 
-$cat = Moggy->new('dummy@home', "file://$TestDir/local.config");
+$cat = Moggy->new('dummy@home',
+		  "file://$TestDir/local.config",
+		  $moggylocation);
 $cat->radius("10");
 $cat->maxrow('10');
 $cat->point('17:27:9.5',     ' 74 : 20 : 8');
@@ -75,7 +93,7 @@ for ($i = 0; $i<$nrows; $i++) {
 }
 
 
-$puss = $cat->new('usno@eso');
+$puss = $cat->new('usno@eso', undef, $moggylocation);
 #$puss = Moggy->new('usno@eso');
 #$puss = Moggy->new('dummy@home',
 #  'file:///home/norman/s/src/astrom/w/autoastrom/moggy/test/local.config');
@@ -127,7 +145,9 @@ for ($i = 0; $i<$nrows; $i++) {
 }
 
 
-$felix = Moggy->new ('dummy@home', "file://$TestDir/local.config");
+$felix = Moggy->new ('dummy@home',
+		     "file://$TestDir/local.config",
+		     $moggylocation);
 #$felix->debug("asthandler moggy");
 @felixframeset = (
     "Begin FrameSet",
