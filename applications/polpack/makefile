@@ -1265,9 +1265,10 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  Execute the test script, and then remove it.
+#  Execute the test script.
 	@ echo
-	$(INSTALL_BIN)/$(PKG_NAME)_test
+	POLPACK_DIR='$(INSTALL_BIN)';export POLPACK_DIR; \
+           $(INSTALL_BIN)/$(PKG_NAME)_test
 	@ echo
 #
 #  Note the test has been run.
