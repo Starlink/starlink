@@ -13,7 +13,7 @@
       be supplied.
    }
    \sstusage{
-      UNF2NDF IN OUT [COMP] NOPEREC [SKIP] SHAPE [TYPE]
+      unf2ndf in out [comp] noperec [skip] shape [type]
    }
    \sstparameters{
       \sstsubsection{
@@ -39,7 +39,8 @@
          Name of the input sequential unformatted Fortran file.  The
          file will normally have variable-length records when there is
          a header, but always fixed-length records when there is no
-         header.  It has a default file extension of {\tt ".DAT"}.
+         header.  On VMS platforms a default file extension of {\tt ".DAT"}
+         is appended when parameter IN contains no file extension.
       }
       \sstsubsection{
          NOPEREC = \_INTEGER (Read)
@@ -88,29 +89,29 @@
    }
    \sstexamples{
       \sstexamplesubsection{
-         UNF2NDF NGC253.DAT NGC253 SHAPE=[100,60] NOPEREC=8
+         unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
       }{
-         This copies a data array from the unformatted file NGC253.DAT
-         to the NDF called NGC253.  NGC253.DAT does not contain a
+         This copies a data array from the unformatted file ngc253.DAT
+         to the NDF called ngc253.  ngc253.DAT does not contain a
          header section.  The NDF is two-dimensional: 100 elements in $x$
          by 60 in $y$.  Its data array has type \_REAL.  The data records
          each have 8 values.
       }
       \sstexamplesubsection{
-         UNF2NDF NGC253Q.DAT NGC253 Q 100 SHAPE=[100,60] UPDATE
+         unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60] update
       }{
          This copies a quality array from the unformatted file
-         NGC253Q.DAT to an existing NDF called NGC253 (such as created
-         in the first example).  NGC253Q.DAT does not contain a header
+         ngc253q.dat to an existing NDF called ngc253 (such as created
+         in the first example).  ngc253q.dat does not contain a header
          section.  The NDF is two-dimensional: 100 elements in $x$ by 60
          in $y$.  Its data array has type \_UBYTE.  The data records
          each have 100 values.
       }
       \sstexamplesubsection{
-         UNF2NDF NGC253.DAT NGC253 FITS NOPEREC=!
+         unf2ndf ngc253.dat ngc253 fits noperec=!
       }{
-         This copies a data array from the unformatted file NGC253.DAT
-         to the NDF called NGC253.  NGC253.DAT contains a FITS-like
+         This copies a data array from the unformatted file ngc253.dat
+         to the NDF called ngc253.  ngc253.dat contains a FITS-like
          header section, which is copied to the FITS extension of the
          NDF.  The shape of the NDF is controlled by the mandatory FITS
          keywords NAXIS, AXIS1, \ldots, AXIS$n$, and the data type by
@@ -118,28 +119,28 @@
          values (except perhaps for the last).
       }
       \sstexamplesubsection{
-         UNF2NDF TYPE='\_UWORD' IN=NGC253.DAT OUT=NGC253 $\backslash$
+         unf2ndf type='\_uword' in=ngc253.dat out=ngc253 $\backslash$
       }{
-         This copies a data array from the unformatted file NGC253.DAT
-         to the NDF called NGC253.  NGC253.DAT does not contain a
+         This copies a data array from the unformatted file ngc253.dat
+         to the NDF called ngc253.  ngc253.dat does not contain a
          header section.  The NDF has the current shape and data type
          is unsigned word.  The current number of values per record is
          used.
       }
       \sstexamplesubsection{
-         UNF2NDF SPECTRUM ZZ SKIP=2 SHAPE=200 NOPEREC=!
+         unf2ndf spectrum zz skip=2 shape=200 noperec=!
       }{
-         This copies a data array from the unformatted file SPECTRUM.DAT
-         to the NDF called ZZ.  SPECTRUM.DAT contains two header
+         This copies a data array from the unformatted file spectrum
+         to the NDF called zz.  spectrum contains two header
          records that are ignored.  The NDF is one-dimensional
          comprising 200 elements of type \_REAL.  There is one data
          record containing the whole array.
       }
       \sstexamplesubsection{
-         UNF2NDF SPECTRUM.LIS ZZ SKIP=1 FITS NOPEREC=20
+         unf2ndf spectrum.lis ZZ skip=1 fits noperec=20
       }{
-         This copies a data array from the unformatted file SPECTRUM.LIS
-         to the NDF called ZZ.  SPECTRUM.LIS contains one header
+         This copies a data array from the unformatted file spectrum.lis
+         to the NDF called ZZ.  spectrum.lis contains one header
          record, that is ignored, followed by a FITS-like header
          section, which is copied to the FITS extension of the NDF.
          The shape of the NDF is controlled by the mandatory FITS

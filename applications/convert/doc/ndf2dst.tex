@@ -11,6 +11,9 @@
       most files can be be converted with little or no information
       lost.
    }
+   \sstusage{
+      ndf2dst in out
+   }
    \sstparameters{
       \sstsubsection{
          IN = NDF (Read)
@@ -22,7 +25,21 @@
          OUT = Figaro (Write)
       }{
          Output Figaro file name. This excludes the file extension.
-         The file created will be given extension {\tt ".DST"}.
+         The file created will be given extension {\tt ".dst"}.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2dst old new
+      }{
+         This converts the NDF called old (in file old.sdf) to the
+         Figaro file new.dst.
+      }
+      \sstexamplesubsection{
+         ndf2dst spectre spectre
+      }{
+         This converts the NDF called spectre (in file spectre.sdf) to
+         the Figaro file spectre.dst.
       }
    }
    \sstnotes{
@@ -57,9 +74,6 @@
                           allow for a non-1-dimensional array \\
       AXIS(1) Units & $\Rightarrow$ & .X.UNITS & \\
       AXIS(1) Label & $\Rightarrow$ & .X.LABEL & \\
-      AXIS(1).MORE.FIGARO.xxx & $\Rightarrow$ & .X.xxx & \\
-      & & & Similarly for AXIS(2), \dots, AXIS(6) which are renamed to
-           .Y .T .U .V or .W \\ \hline
       \end{tabular}
       \end{center}
 
@@ -68,6 +82,10 @@
       \hline 
       \multicolumn{1}{|c}{NDF} & & Figaro file &
       \multicolumn{1}{|c|}{Comments} \\ \hline
+      AXIS(1).MORE.FIGARO.xxx & $\Rightarrow$ & .X.xxx & \\
+      & & & Similarly for AXIS(2), \dots, AXIS(6) which are renamed to
+           .Y .T .U .V or .W \\ \hline
+      & & & \\
       FIGARO extension: & & & \\
       .MORE.FIGARO.MAGFLAG & $\Rightarrow$ & .Z.MAGFLAG & \\
       .MORE.FIGARO.RANGE & $\Rightarrow$ & .Z.RANGE & \\

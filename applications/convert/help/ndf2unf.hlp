@@ -3,7 +3,7 @@ Converts an NDF to a sequential unformatted file.
 
 Usage:
 
-   NDF2UNF IN OUT [COMP] [NOPEREC]
+   ndf2unf in out [comp] [noperec]
 
 Description:
 
@@ -38,31 +38,32 @@ NOPEREC = _INTEGER (Read)
 OUT = FILENAME (Write)
    Name of the output sequential unformatted file.  The file will
    normally have variable-length records when there is a header,
-   but always fixed-length records when there is no header.  It
-   has a default file extension of ".DAT".
+   but always fixed-length records when there is no header.  On
+   VMS platforms a default file extension of ".DAT" is appended
+   when parameter OUT contains no file extension.
 2 Examples
-NDF2UNF CLUSTER CLUSTER.DAT
-   This copies the data array of the NDF called CLUSTER to an
-   unformatted file called CLUSTER.DAT.  The number of data values
+ndf2unf cluster cluster.dat
+   This copies the data array of the NDF called cluster to an
+   unformatted file called cluster.dat.  The number of data values
    per record is equal to the size of the first dimension of the
    NDF.
 
-NDF2UNF CLUSTER CLUSTER.DAT V
-   This copies the variance of the NDF called CLUSTER to an
-   unformatted file called CLUSTER.DAT.  The number of variance
+ndf2unf cluster cluster.dat v
+   This copies the variance of the NDF called cluster to an
+   unformatted file called cluster.dat.  The number of variance
    values per record is equal to the size of the first dimension
    of the NDF.
 
-NDF2UNF CLUSTER CLUSTER.DAT NOPEREC=12
-   This copies the data array of the NDF called CLUSTER to an
-   unformatted file called CLUSTER.DAT.  There are twelve data
-   values per record in CLUSTER.DAT.
+ndf2unf cluster cluster.dat noperec=12
+   This copies the data array of the NDF called cluster to an
+   unformatted file called cluster.dat.  There are twelve data
+   values per record in cluster.dat.
 
-NDF2UNF OUT=NDF234.DAT FITS IN=@234
+ndf2unf out=ndf234.dat fits in=@234
    This copies the data array of the NDF called 234 to an
-   unformatted file called NDF234.DAT.  The number of data values
+   unformatted file called ndf234.dat.  The number of data values
    per record is equal to the size of the first dimension of the
-   NDF.  If there is a FITS extension, it is copied to NDF234.DAT
+   NDF.  If there is a FITS extension, it is copied to ndf234.dat
    with substitution of certain keywords, otherwise a minimal
    FITS header is produced.
 2 Notes

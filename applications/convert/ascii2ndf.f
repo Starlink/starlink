@@ -4,7 +4,7 @@
 *     ASCII2NDF
 
 *  Purpose:
-*     Converts an ASCII file to an NDF.
+*     Converts a text file to an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,14 +20,14 @@
 *        The global status.
 
 *  Description:
-*     This application converts an ASCII file to an NDF.  Only one of
+*     This application converts a text file to an NDF.  Only one of
 *     the array components may be created from the input file.
 *     Preceding the input data there may be an optional header.  This
 *     header may be skipped, or may consist of a simple FITS header.
 *     In the former case the shape of the NDF has be to be supplied.
 
 *  Usage:
-*     ASCII2NDF IN OUT [COMP] [SKIP] SHAPE [TYPE]
+*     ascii2ndf in out [comp] [skip] shape [type]
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
@@ -42,10 +42,11 @@
 *        an END keyword; subsequent records in the input file are
 *        treated as an array component given by COMP.  [FALSE]
 *     IN = FILENAME (Read)
-*        Name of the input ASCII Fortran file.  The file will normally
+*        Name of the input Fortran text file.  The file will normally
 *        have variable-length records when there is a header, but
-*        always fixed-length records when there is no header.  It has a
-*        default file extension of ".DAT".
+*        always fixed-length records when there is no header.  On VMS
+*        platforms a default file extension of ".DAT" is appended when
+*        parameter IN contains no file extension.
 *     OUT = NDF (Read and Write)
 *        Output NDF data structure.  When COMP is not "Data" the NDF
 *        is modified rather than a new NDF created.   It becomes the
@@ -70,37 +71,37 @@
 *        NDF. The suggested default is the current value.  ["_REAL"]
 
 *  Examples:
-*     ASCII2NDF NGC253.DAT NGC253 SHAPE=[100,60]
-*        This copies a data array from the ASCII file NGC253.DAT to the
-*        NDF called NGC253.  NGC253.DAT does not contain a header
+*     ascii2ndf ngc253.dat ngc253 shape=[100,60]
+*        This copies a data array from the text file ngc253.dat to the
+*        NDF called ngc253.  ngc253.dat does not contain a header
 *        section.  The NDF is two-dimensional: 100 elements in x by 60
 *        in y.  Its data array has type _REAL.
-*     ASCII2NDF NGC253Q.DAT NGC253 Q SHAPE=[100,60]
-*        This copies a quality array from the ASCII file NGC253Q.DAT to
-*        an existing NDF called NGC253 (such as created in the first
-*        example).  NGC253Q.DAT does not contain a header section.  The
+*     ascii2ndf ngc253q.dat ngc253 q shape=[100,60]
+*        This copies a quality array from the text file ngc253q.dat to
+*        an existing NDF called ngc253 (such as created in the first
+*        example).  ngc253q.dat does not contain a header section.  The
 *        NDF is two-dimensional: 100 elements in x by 60 in y.  Its
 *        data array has type _UBYTE.
-*     ASCII2NDF NGC253.DAT NGC253 FITS
-*        This copies a data array from the ASCII file NGC253.DAT
-*        to the NDF called NGC253.  NGC253.DAT contains a FITS-like
+*     ascii2ndf ngc253.dat ngc253 fits
+*        This copies a data array from the text file ngc253.dat
+*        to the NDF called ngc253.  ngc253.dat contains a FITS-like
 *        header section, which is copied to the FITS extension of the
 *        NDF.  The shape of the NDF is controlled by the mandatory FITS
 *        keywords NAXIS, AXIS1, ..., AXISn, and the data type by
 *        keywords BITPIX and UNSIGNED.
-*     ASCII2NDF TYPE='_UWORD' IN=NGC253.DAT OUT=NGC253 \
-*        This copies a data array from the ASCII file NGC253.DAT to the
-*        NDF called NGC253.  NGC253.DAT does not contain a header
+*     ascii2ndf type='_uword' in=ngc253.dat out=ngc253 \
+*        This copies a data array from the text file ngc253.dat to the
+*        NDF called ngc253.  ngc253.dat does not contain a header
 *        section.  The NDF has the current shape and data type is
 *        unsigned word.
-*     ASCII2NDF SPECTRUM ZZ SKIP=2 SHAPE=200
-*        This copies a data array from the ASCII file SPECTRUM.DAT to
-*        the NDF called ZZ.  SPECTRUM.DAT contains two header records
+*     ascii2ndf spectrum zz skip=2 shape=200
+*        This copies a data array from the text file spectrum to
+*        the NDF called zz.  spectrum contains two header records
 *        that are ignored.  The NDF is one-dimensional comprising 200
 *        elements of type _REAL.
-*     ASCII2NDF SPECTRUM.LIS ZZ SKIP=1 FITS
-*        This copies a data array from the ASCII file SPECTRUM.LIS to
-*        the NDF called ZZ.  SPECTRUM.LIS contains one header record,
+*     ascii2ndf spectrum.lis ZZ skip=1 fits
+*        This copies a data array from the text file spectrum.lis to
+*        the NDF called ZZ.  spectrum.lis contains one header record,
 *        that is ignored, followed by a FITS-like header section, which
 *        is copied to the FITS extension of the NDF.  The shape of the
 *        NDF is controlled by the mandatory FITS keywords NAXIS, AXIS1,
@@ -108,7 +109,7 @@
 
 *  Notes:
 *     The details of the conversion are as follows:
-*        -  the ASCII-file array is written to the NDF array as
+*        -  the text-file array is written to the NDF array as
 *        selected by COMP.  When the NDF is being modified, the shape
 *        of the new component must match that of the NDF.
 *        -  If the input file contains a FITS-like header, and a new
@@ -147,7 +148,7 @@
 *           terminates a dummy header, and the actual data is in an
 *           extension.
 *        -  Other data item such as HISTORY, data ORIGIN, and axis
-*        widths are not supported, because the ASCII file has a simple
+*        widths are not supported, because the text file has a simple
 *        structure to enable a diverse set of input files to be
 *        converted to NDFs, and to limitations of the standard FITS
 *        header.
@@ -162,7 +163,9 @@
 *  History:
 *     1992 September 18 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1993 July 29 (MJC):
+*        Used lowercase examples and filenames with UNIX in mind.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -251,8 +254,8 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Open the ASCII file.
-*  =====================================
+*  Open the text file.
+*  ===================
 
 *  Open the FORTRAN file.
       CALL FIO_ASSOC( 'IN', 'READ', 'LIST', RECL, FD, STATUS )
@@ -439,10 +442,10 @@
 *  Map the input data array using the input data type.
       CALL NDF_MAP( NDF, COMP, ITYPE, 'WRITE', PNTR, EL, STATUS )
 
-*  Call a routine to read the data from the ASCII Fortran file.
-*  The selected routine depending on the data type of the array.  Note
-*  that the implemented type for the integers is used, since the
-*  subroutine called cannot process one- and two-byte integers (due to a
+*  Call a routine to read the data from the Fortran text file.  The
+*  selected routine depending on the data type of the array.  Note that
+*  the implemented type for the integers is used, since the subroutine
+*  called cannot process one- and two-byte integers (due to a
 *  limitation of the CHR library).  So we convert to an integer array
 *  and it gets converted back to the actual type when the array is
 *  unmapped.  This should not generate conversion errors, unless the
@@ -487,8 +490,8 @@
 *  If an error occurred, then report context information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ASCII2NDF_ERR',
-     :     'ASCII2NDF: Error converting an ASCII file '/
-     :     /'to an NDF.', STATUS )
+     :     'ASCII2NDF: Error converting a text file to an NDF.',
+     :     STATUS )
       END IF
 
       END

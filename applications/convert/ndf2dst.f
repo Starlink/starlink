@@ -20,19 +20,30 @@
 *        Global status value.
 
 *  Description:
-*     This application converts an NDF to a Figaro (Version 2) DST'
+*     This application converts an NDF to a Figaro (Version 2) `DST'
 *     file.  The rules for converting the various components of a DST
-*     are listed in the notes.  Since both are hierarchical formats
+*     are listed in the Notes.  Since both are hierarchical formats
 *     most files can be be converted with little or no information
 *     lost.
+
+*   Usage:
+*      ndf2dst in out
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        Input NDF data structure.  The suggested default is the
 *        current NDF if one exists, otherwise it is the current value.
 *     OUT = Figaro (Write)
-*        Output Figaro file name. This excludes the file extension.
-*        The file created will be given extension ".DST".
+*        Output Figaro file name.  This excludes the file extension.
+*        The file created will be given extension ".dst".
+
+*  Examples:
+*     ndf2dst old new
+*        This converts the NDF called old (in file old.sdf) to the
+*        Figaro file new.dst.
+*     ndf2dst spectre spectre
+*        This converts the NDF called spectre (in file spectre.sdf) to
+*        the Figaro file spectre.dst.
 
 *  Notes:
 *     The rules for the conversion are as follows:

@@ -1,13 +1,13 @@
 1 NDF2ASCII
-Converts an NDF to an ASCII file.
+Converts an NDF to a text file.
 
 Usage:
 
-   NDF2ASCII IN OUT [COMP] [RECLEN] NOPEREC=?
+   ndf2ascii in out [comp] [reclen] noperec=?
 
 Description:
 
-   This application converts an NDF to an ASCII file.  Only one of
+   This application converts an NDF to a text file.  Only one of
    the array components may be copied to the output file.  Preceding
    the data there is an optional header consisting of either the
    FITS extension with the values of certain keywords replaced by
@@ -23,7 +23,7 @@ COMP = LITERAL (Read)
 FITS = _LOGICAL (Read)
    If true, any FITS extension is written to start of the output
    file, unless there is no extension whereupon a minimal FITS
-   header is written to the ASCII file. [FALSE]
+   header is written to the text file. [FALSE]
 3 FIXED
 FIXED = _LOGICAL (Read)
    If true, the output file allocates a fixed number of
@@ -46,8 +46,9 @@ NOPEREC = _INTEGER (Read)
 OUT = FILENAME (Write)
    Name of the output formatted Fortran file.  The file will
    normally have variable-length records when there is a header,
-   but always fixed-length records when there is no header.  It
-   has a default file extension of ".DAT".
+   but always fixed-length records when there is no header.  On
+   VMS platforms a default file extension of ".DAT" is appended
+   when parameter OUT contains no file extension.
 3 RECLEN
 RECLEN = _INTEGER (Read)
    The maximum record length in bytes of the output file.  This
@@ -59,34 +60,34 @@ RECLEN = _INTEGER (Read)
    length is the product of the number of bytes per value plus
    one (for the space), times the number of values per record. []
 2 Examples
-NDF2ASCII CLUSTER CLUSTER.DAT
-   This copies the data array of the NDF called CLUSTER to an
-   ASCII file called CLUSTER.DAT.  The maximum recordlength of
-   CLUSTER.DAT is 512 bytes, and the data values are packed into
+ndf2ascii cluster cluster.dat
+   This copies the data array of the NDF called cluster to a text
+   file called cluster.dat.  The maximum recordlength of
+   cluster.dat is 512 bytes, and the data values are packed into
    these records as efficiently as possible.
 
-NDF2ASCII CLUSTER CLUSTER.DAT V
-   This copies the variance of the NDF called CLUSTER to an
-   ASCII file called CLUSTER.DAT.  The maximum recordlength of
-   CLUSTER.DAT is 512 bytes, and the variance values are packed
+ndf2ascii cluster cluster.dat v
+   This copies the variance of the NDF called cluster to a text
+   file called cluster.dat.  The maximum recordlength of
+   cluster.dat is 512 bytes, and the variance values are packed
    into these records as efficiently as possible.
 
-NDF2ASCII CLUSTER CLUSTER.DAT FIXED NOPEREC=12
-   This copies the data array of the NDF called CLUSTER to an
-   ASCII file called CLUSTER.DAT.  There are twelve data values
-   per record in CLUSTER.DAT.
+ndf2ascii cluster cluster.dat fixed noperec=12
+   This copies the data array of the NDF called cluster to a text
+   file called cluster.dat.  There are twelve data values per
+   record in cluster.dat.
 
-NDF2ASCII OUT=NDF234.DAT FITS RECLEN=128 IN=@234
-   This copies the data array of the NDF called 234 to an
-   ASCII file called NDF234.DAT.  The maximum recordlength of
-   CLUSTER.DAT is 128 bytes, and the data values are packed into
+ndf2ascii out=ndf234.dat fits reclen=128 in=@234
+   This copies the data array of the NDF called 234 to a text
+   file called ndf234.dat.  The maximum recordlength of
+   ndf234.dat is 128 bytes, and the data values are packed into
    these records as efficiently as possible.  If there is a FITS
-   extension, it is copied to NDF234.DAT with substitution of
+   extension, it is copied to ndf234.dat with substitution of
    certain keywords, otherwise a minimal FITS header is produced.
 2 Notes
 The details of the conversion are as follows:
 
-   -  the NDF array as selected by COMP is written to the ASCII
+   -  the NDF array as selected by COMP is written to the text
    file in records following an optional header.  When FIXED is
    FALSE all records are padded out to the recordlength.
 
@@ -143,7 +144,7 @@ images as follows:
    value T is added when the array data type is one of the HDS
    unsigned integer types.  This is done because standard FITS
    does not support unsigned integers, and allows (in conjunction
-   with BITPIX) applications reading the ASCII file to determine
+   with BITPIX) applications reading the text file to determine
    the data type of the array.
 
    -  The last header record card will be the standard FITS END.

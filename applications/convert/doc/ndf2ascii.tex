@@ -2,10 +2,10 @@
 \sstroutine{
    NDF2ASCII
 }{
-   Converts an NDF to an ASCII file
+   Converts an NDF to a text file
 }{
    \sstdescription{
-      This application converts an NDF to an ASCII file.  Only one of
+      This application converts an NDF to a text file.  Only one of
       the array components may be copied to the output file.  Preceding
       the data there is an optional header consisting of either the
       FITS extension with the values of certain keywords replaced by
@@ -13,7 +13,7 @@
       derived from the NDF.  The output file uses LIST carriagecontrol.
    }
    \sstusage{
-      NDF2ASCII IN OUT [COMP] [RECLEN] NOPEREC=?
+      ndf2ascii in out [comp] [reclen] noperec=?
    }
    \sstparameters{
       \sstsubsection{
@@ -58,8 +58,9 @@
       }{
          Name of the output formatted Fortran file.  The file will
          normally have variable-length records when there is a header,
-         but always fixed-length records when there is no header.  It
-         has a default file extension of {\tt ".DAT"}.
+         but always fixed-length records when there is no header.   On
+         VMS platforms a default file extension of {\tt ".DAT"} is appended
+         when parameter OUT contains no file extension.
       }
       \sstsubsection{
          RECLEN = \_INTEGER (Read)
@@ -77,36 +78,36 @@
    }
    \sstexamples{
       \sstexamplesubsection{
-         NDF2ASCII CLUSTER CLUSTER.DAT
+         ndf2ascii cluster cluster.dat
       }{
-         This copies the data array of the NDF called CLUSTER to an
-         ASCII file called CLUSTER.DAT.  The maximum recordlength of
-         CLUSTER.DAT is 512 bytes, and the data values are packed into
+         This copies the data array of the NDF called cluster to a text
+         file called cluster.dat.  The maximum recordlength of
+         cluster.dat is 512 bytes, and the data values are packed into
          these records as efficiently as possible.
       }
       \sstexamplesubsection{
-         NDF2ASCII CLUSTER CLUSTER.DAT V
+         ndf2ascii cluster cluster.dat v
       }{
-         This copies the variance of the NDF called CLUSTER to an
-         ASCII file called CLUSTER.DAT.  The maximum recordlength of
-         CLUSTER.DAT is 512 bytes, and the variance values are packed
+         This copies the variance of the NDF called cluster to a
+         text file called cluster.dat.  The maximum recordlength of
+         cluster.dat is 512 bytes, and the variance values are packed
          into these records as efficiently as possible.
       }
       \sstexamplesubsection{
-         NDF2ASCII CLUSTER CLUSTER.DAT FIXED NOPEREC=12
+         ndf2ascii cluster cluster.dat fixed noperec=12
       }{
-         This copies the data array of the NDF called CLUSTER to an
-         ASCII file called CLUSTER.DAT.  There are twelve data values
-         per record in CLUSTER.DAT.
+         This copies the data array of the NDF called cluster to a
+         text file called cluster.dat.  There are twelve data values
+         per record in cluster.dat.
       }
       \sstexamplesubsection{
-         NDF2ASCII OUT=NDF234.DAT FITS RECLEN=128 IN=@234
+         ndf2ascii out=ndf234.dat fits reclen=128 in=@234
       }{
-         This copies the data array of the NDF called 234 to an
-         ASCII file called NDF234.DAT.  The maximum recordlength of
-         CLUSTER.DAT is 128 bytes, and the data values are packed into
+         This copies the data array of the NDF called 234 to a
+         text file called ndf234.dat.  The maximum recordlength of
+         ndf234.dat is 128 bytes, and the data values are packed into
          these records as efficiently as possible.  If there is a FITS
-         extension, it is copied to NDF234.DAT with substitution of
+         extension, it is copied to ndf234.dat with substitution of
          certain keywords, otherwise a minimal FITS header is produced.
       }
    }

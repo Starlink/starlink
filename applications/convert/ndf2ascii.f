@@ -4,7 +4,7 @@
 *     NDF2ASCII
 
 *  Purpose:
-*     Converts an NDF to an ASCII file.
+*     Converts an NDF to a text file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,7 +20,7 @@
 *        The global status.
 
 *  Description:
-*     This application converts an NDF to an ASCII file.  Only one of
+*     This application converts an NDF to a text file.  Only one of
 *     the array components may be copied to the output file.  Preceding
 *     the data there is an optional header consisting of either the
 *     FITS extension with the values of certain keywords replaced by
@@ -28,7 +28,7 @@
 *     derived from the NDF.  The output file uses LIST carriagecontrol.
 
 *  Usage:
-*     NDF2ASCII IN OUT [COMP] [RECLEN] NOPEREC=?
+*     ndf2ascii in out [comp] [reclen] noperec=?
 
 *  ADAM Parameters:
 *     COMP = LITERAL (Read)
@@ -37,7 +37,7 @@
 *     FITS = _LOGICAL (Read)
 *        If true, any FITS extension is written to start of the output
 *        file, unless there is no extension whereupon a minimal FITS
-*        header is written to the ASCII file. [FALSE]
+*        header is written to the text file. [FALSE]
 *     FIXED = _LOGICAL (Read)
 *        If true, the output file allocates a fixed number of
 *        characters per data value.  The number of characters chosen is
@@ -56,8 +56,9 @@
 *     OUT = FILENAME (Write)
 *        Name of the output formatted Fortran file.  The file will
 *        normally have variable-length records when there is a header,
-*        but always fixed-length records when there is no header.  It
-*        has a default file extension of ".DAT".
+*        but always fixed-length records when there is no header.  On
+*        VMS platforms a default file extension of ".DAT" is appended
+*        when parameter OUT contains no file extension.
 *     RECLEN = _INTEGER (Read)
 *        The maximum record length in bytes of the output file.  This
 *        must be between 32 and 32766.  The lower limit is further
@@ -69,31 +70,31 @@
 *        one (for the space), times the number of values per record. []
 
 *  Examples:
-*     NDF2ASCII CLUSTER CLUSTER.DAT
-*        This copies the data array of the NDF called CLUSTER to an
-*        ASCII file called CLUSTER.DAT.  The maximum recordlength of
-*        CLUSTER.DAT is 512 bytes, and the data values are packed into
+*     ndf2ascii cluster cluster.dat
+*        This copies the data array of the NDF called cluster to a text
+*        file called cluster.dat.  The maximum recordlength of
+*        cluster.dat is 512 bytes, and the data values are packed into
 *        these records as efficiently as possible.
-*     NDF2ASCII CLUSTER CLUSTER.DAT V
-*        This copies the variance of the NDF called CLUSTER to an
-*        ASCII file called CLUSTER.DAT.  The maximum recordlength of
-*        CLUSTER.DAT is 512 bytes, and the variance values are packed
+*     ndf2ascii cluster cluster.dat v
+*        This copies the variance of the NDF called cluster to a text
+*        file called cluster.dat.  The maximum recordlength of
+*        cluster.dat is 512 bytes, and the variance values are packed
 *        into these records as efficiently as possible.
-*     NDF2ASCII CLUSTER CLUSTER.DAT FIXED NOPEREC=12
-*        This copies the data array of the NDF called CLUSTER to an
-*        ASCII file called CLUSTER.DAT.  There are twelve data values
-*        per record in CLUSTER.DAT. 
-*     NDF2ASCII OUT=NDF234.DAT FITS RECLEN=128 IN=@234
-*        This copies the data array of the NDF called 234 to an
-*        ASCII file called NDF234.DAT.  The maximum recordlength of
-*        CLUSTER.DAT is 128 bytes, and the data values are packed into
+*     ndf2ascii cluster cluster.dat fixed noperec=12
+*        This copies the data array of the NDF called cluster to a text
+*        file called cluster.dat.  There are twelve data values per
+*        record in cluster.dat.
+*     ndf2ascii out=ndf234.dat fits reclen=128 in=@234
+*        This copies the data array of the NDF called 234 to a text
+*        file called ndf234.dat.  The maximum recordlength of
+*        ndf234.dat is 128 bytes, and the data values are packed into
 *        these records as efficiently as possible.  If there is a FITS
-*        extension, it is copied to NDF234.DAT with substitution of
+*        extension, it is copied to ndf234.dat with substitution of
 *        certain keywords, otherwise a minimal FITS header is produced.
 
 *  Notes:
 *     The details of the conversion are as follows:
-*        -  the NDF array as selected by COMP is written to the ASCII
+*        -  the NDF array as selected by COMP is written to the text
 *        file in records following an optional header.  When FIXED is
 *        FALSE all records are padded out to the recordlength.
 *        -  HISTORY is not propagated.
@@ -143,7 +144,7 @@
 *        value T is added when the array data type is one of the HDS
 *        unsigned integer types.  This is done because standard FITS
 *        does not support unsigned integers, and allows (in conjunction
-*        with BITPIX) applications reading the ASCII file to determine
+*        with BITPIX) applications reading the text file to determine
 *        the data type of the array.
 *        -  The last header record card will be the standard FITS END.
 *        -  Other extensions are not propagated.
@@ -206,7 +207,7 @@
       INTEGER COMLN              ! The used length of COMLIS
       CHARACTER*( 8 ) COMP       ! The component of NDF to plot
       LOGICAL CPFITS             ! True if there is a FITS extension to
-                                 ! copy to the ASCII file's header
+                                 ! copy to the text file's header
       CHARACTER DESCR * ( SZDESC ) ! Accommodates descriptor name
       CHARACTER * ( NDF__SZFTP ) DTYPE ! Processing type for
                                  ! integer array (not used)
@@ -233,9 +234,9 @@
       INTEGER NUMPRE             ! Number of data values per record
       LOGICAL OPEN               ! Output file opened successfully
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
-      INTEGER RECL               ! Maximum recordlength of ASCII file
+      INTEGER RECL               ! Maximum recordlength of text file
                                  ! in bytes
-      INTEGER RECMIN             ! Minimum record length of the ASCII
+      INTEGER RECMIN             ! Minimum record length of the text
                                  ! file
       LOGICAL THERE              ! FITS extension is present
       LOGICAL TITFND             ! True if NDF TITLE found
@@ -355,8 +356,8 @@
      :                   STATUS )
       END IF
 
-*  Open the ASCII file.
-*  ====================
+*  Open the text file.
+*  ===================
 
 *  Open the FORTRAN file.
       CALL FIO_ASSOC( 'OUT', 'WRITE', 'LIST', RECL, FD, STATUS )
@@ -428,7 +429,7 @@
      :        ( INDEX( DESCR, 'BUNITS') .EQ. 0 .OR. .NOT. UNTFND ) .AND.
      :        ( INDEX( DESCR, 'TITLE') .EQ. 0 .OR. .NOT. TITFND ) ) THEN
 
-*  Write the FITS card to the ASCII file.
+*  Write the FITS card to the text file.
                CALL FIO_WRITE( FD, FITSTR, STATUS )
 
 *  This code assumes that the FITS header will begin with the mandatory
@@ -465,7 +466,7 @@
             FITSTR = ' '
             FITSTR( 1:3 ) = 'END'
 
-*  Write the FITS card to the ASCII file.
+*  Write the FITS card to the text file.
             CALL FIO_WRITE( FD, FITSTR, STATUS )
 
          END IF
@@ -482,7 +483,7 @@
          FITSTR( 1:9 ) = 'SIMPLE  ='
          FITSTR( 30: ) = 'T / File is simple'
 
-*  Write the FITS card to the ASCII file.
+*  Write the FITS card to the text file.
          CALL FIO_WRITE( FD, FITSTR, STATUS )
 
 *  Insert NAXIS, AXISn, and optional keywords to the header. 
@@ -493,7 +494,7 @@
          FITSTR = ' '
          FITSTR( 1:3 ) = 'END'
 
-*  Write the FITS card to the ASCII file.
+*  Write the FITS card to the text file.
          CALL FIO_WRITE( FD, FITSTR, STATUS )
 
       END IF
@@ -508,7 +509,7 @@
 *  Map the input data array using the implementation data type.
       CALL NDF_MAP( NDF, COMP, ITYPE, 'READ', PNTR, EL, STATUS )
 
-*  Call a routine to write the data to the ASCII Fortran file.  The
+*  Call a routine to write the data to the Fortran text file.  The
 *  selected routine depending on the data type of the array.  Note
 *  that the implemented type for the integers is used, since the
 *  subroutine called cannot process one- and two-byte integers
@@ -540,7 +541,7 @@
 *  If an error occurred, then report context information.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'NDF2ASCII_ERR',
-     :     'NDF2ASCII: Error converting an NDF to an ASCII file.',
+     :     'NDF2ASCII: Error converting an NDF to a text file.',
      :     STATUS )
       END IF
 
