@@ -77,7 +77,7 @@
      :    TYP_LOG = 3, TYP_REAL = 4 )
 
       CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='HGET Version 1.7-0' )
+        PARAMETER            ( VERSION='HGET Version 2.1-0' )
 *
 *    Local variables :
 *

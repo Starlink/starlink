@@ -51,7 +51,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HMODIFY Version 1.8-0')
+        PARAMETER (VERSION='HMODIFY Version 2.1-0')
 *-
 
 *    write out version number to terminal

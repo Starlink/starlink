@@ -70,7 +70,7 @@
 *    Version :
 *
       CHARACTER*40             VERSION
-        PARAMETER              ( VERSION = 'HDISPLAY Version 1.8-1' )
+        PARAMETER              ( VERSION = 'HDISPLAY Version 2.1-0' )
 *-
 
 *    Version id

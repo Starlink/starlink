@@ -42,7 +42,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HCREATE Version 1.8-0')
+        PARAMETER (VERSION='HCREATE Version 2.1-0')
 *-
 
 *    Version number
