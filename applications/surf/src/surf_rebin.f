@@ -249,6 +249,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.79  2005/03/23 03:49:28  timj
+*     No longer use wavelength + diameter for determining resolution element. Use
+*     the effective radius of influence for SPLINE and SCALE for weight function.
+*
 *     Revision 1.78  2005/03/18 06:27:53  timj
 *     + initialise some variables
 *     + add some status check protection
@@ -602,6 +606,7 @@ c
       LOGICAL          DOREBIN         ! True if we are rebinning the data
       DOUBLE PRECISION DTEMP           ! Scratch double
       INTEGER          EACHBOL         ! Bolometer loop counter
+      REAL             EFF_RADIUS      ! EFfective radius of influence for spline
       INTEGER          FD              ! File descriptor
       INTEGER          FILE            ! number of input files read
       CHARACTER*128    FILENAME (MAX_FILE)
@@ -2212,7 +2217,7 @@ c
 *     Rebin the data using weighting function
                      CALL SCULIB_WTFN_REGRID( GUARD, NFILES, N_PTS,
      :                    WTFN_MAXRAD, WTFNRES, WEIGHTSIZE, SCALE, 
-     :                    DIAMETER, WAVELENGTH,  OUT_PIXEL, MAP_SIZE(1), 
+     :                    OUT_PIXEL, MAP_SIZE(1), 
      :                    MAP_SIZE(2), I_CENTRE, J_CENTRE, WTFN, WEIGHT,
      :                    BOLWT, N_BOL, SCUBA__NUM_ADC*SCUBA__NUM_CHAN,
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, 
@@ -2225,7 +2230,6 @@ c
                   ELSE IF (METHOD .EQ. 'MEDIAN') THEN
 
                      CALL SURFLIB_MEDIAN_REGRID(NFILES, N_PTS,
-     :                    DIAMETER, WAVELENGTH,
      :                    OUT_PIXEL, MAP_SIZE(1), MAP_SIZE(2),
      :                    I_CENTRE, J_CENTRE, 
      :                    ABOL_RA_PTR, ABOL_DEC_PTR,
@@ -2253,9 +2257,17 @@ c
 *     Note that for INTREBIN we need to supply a different
 *     N_INTS and INT_LIST
 
+*     Calculate the effective radius of influence that each data point
+*     contributes to the final map. This controls how filled the final
+*     spline filled image will be for sparse data sets
+                     EFF_RADIUS = WAVELENGTH*1.0E-6 / (2.0*DIAMETER)
+                     IF (2*EFF_RADIUS .LT. OUT_PIXEL) THEN
+                        EFF_RADIUS = OUT_PIXEL / 2.0
+                     END IF
+
                      CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR, 
      :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT, 
-     :                    NINTS, DIAMETER, WAVELENGTH,OUT_PIXEL,
+     :                    NINTS, EFF_RADIUS, OUT_PIXEL,
      :                    MAP_SIZE(1), MAP_SIZE(2),
      :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
