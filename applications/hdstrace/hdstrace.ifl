@@ -1,4 +1,4 @@
-## TRACE - Trace through the contents of a data structure.
+## TRACE - Examines the contents of a data-system object.
 
 #+
 #  Name:
@@ -20,10 +20,9 @@
 
 interface TRACE
 
-   helplib     TRACE_DIR:TRACE
+   helplib     TRACE_HELP:
 
    parameter      OBJECT         # Input HDS object to be traced.
-      keyword     'OBJECT'
       position    1
       type        'UNIV'
       access      'READ'
@@ -35,7 +34,6 @@ interface TRACE
    endparameter
 
    parameter      FULL           # Trace through arrays of structures?
-      keyword     'FULL'
       position    2
       type        '_LOGICAL'
       access      'READ'
@@ -47,7 +45,6 @@ interface TRACE
    endparameter
 
    parameter      NEWLINE        # Values to start on a new line?
-      keyword     'NEWLINE'
       position    8
       type        '_LOGICAL'
       access      'READ'
@@ -59,7 +56,6 @@ interface TRACE
    endparameter
 
    parameter      NLINES         # Maximum number of lines of values
-      keyword     'NLINES'
       position    3
       type        'LITERAL'
       vpath       'DEFAULT'
@@ -71,7 +67,6 @@ interface TRACE
 
    parameter      WIDEPAGE       # 80- or 132-character output
       position    9
-      keyword     'WIDEPAGE'
       type        '_LOGICAL'
       access      'READ'
       vpath       'DEFAULT'
@@ -82,7 +77,6 @@ interface TRACE
    endparameter
 
    parameter      TYPIND         # Type indentation
-      keyword     'TYPIND'
       position    4
       type        '_INTEGER'
       access      'READ'
@@ -94,7 +88,6 @@ interface TRACE
    endparameter
 
    parameter      VALIND         # Value indentation
-      keyword     'VALIND'
       position    5
       type        '_INTEGER'
       access      'READ'
@@ -107,9 +100,7 @@ interface TRACE
 
    parameter      EACHLINE       # Character-array elements one to a line?
       position    7
-      keyword     'EACHLINE'
       type        '_LOGICAL'
-      access      'READ'
       vpath       'DEFAULT'
       default     NO
       ppath       'CURRENT,DEFAULT'
@@ -119,7 +110,6 @@ interface TRACE
 
    parameter      LOGFILE        # The log file
       position    6
-      keyword     'LOGFILE'
       type        'FILENAME'
       access      'READ'
       vpath       'DEFAULT'
