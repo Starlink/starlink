@@ -858,21 +858,20 @@ $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 
 #  This target depends on the resulting compressed tar file being up to
 #  date.
-export_source: $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME)-export_source-$(PKG_VERS).tar.Z
 	@ echo
 	@ echo '*** Export copy of the $(PACK_NAME) package source'
 	@ echo '    is in the compressed tar file'
-	@ echo '    $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z'
+	@ echo '    $?'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
-$(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME)-export_source-$(PKG_VERS).tar.Z: $(SOURCE_FILES)
 	# Remove any pre-existing tar files before creating new ones.
-	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+	test ! -f $@ || rm -f $@
 	$(TAR_IN) - $(SOURCE_FILES) \
-		| compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z
+		| compress -v > $@
 
 # Use the unconfigured Makefile.in here, since this target could be
 # built at a time when the directory has not been configured.
