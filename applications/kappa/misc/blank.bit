@@ -1,0 +1,4 @@
+#define blank.bit_width 7
+#define blank.bit_height 7
+static unsigned char blank.bit_bits[] = {
+   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
