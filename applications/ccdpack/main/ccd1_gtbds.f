@@ -77,6 +77,9 @@
 *        Added USEEXT and ID.
 *     18-JAN-1994 (PDRAPER):
 *        Added FRMEXT argument.
+*     17-AUG-2000 (PDRAPER):
+*        Fixed problem obtaining just two values from NDF extension
+*        (this wasn't allowed and a prompt followed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,6 +143,10 @@
                NBOUND = 4
                BOUNDS( 3 ) = UPPER( 1 )
                BOUNDS( 4 ) = UPPER( 2 )
+            ELSE 
+
+*  Second lot not present, but first are, so that's OK.
+               OK = .TRUE.
             END IF
          END IF
       END IF
