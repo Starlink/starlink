@@ -7,7 +7,7 @@
 
 *  Purpose:
 *     To divide one NDF by a Flatfield NDF, allowing for saturated
-*     values and differrent types.
+*     values and different types.
 
 *  Language:
 *     Starlink Fortran 77
@@ -117,7 +117,6 @@
 
 *  Set BAD numeric type flag.
       ERROR = .FALSE.
-
 *  Call the appropriate routine.
 
 *  SINGLE PRECISION flatfield.
@@ -360,7 +359,7 @@
      :   STATUS )
       END IF
 
-*  report the number of numeric errors which have occurred. If the
+*  Report the number of numeric errors which have occurred. If the
 *  number is equal to a significant fraction of the value EL then test
 *  the whole array for complete BADness and issue a warning.
       IF ( NERR .NE. 0 ) THEN
@@ -368,25 +367,21 @@
 *  If nerr/el gt 0.75 test for complete BADness.
          IF ( REAL( NERR ) / REAL( EL ) .GT. 0.75 ) THEN
             CALL CCD1_TSTB( DTYPE, IPDOUT, EL, ALLBAD,
-     :      STATUS )
+     :                      STATUS )
             IF ( ALLBAD ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'DTYPE', DTYPE )
                CALL ERR_REP( 'CCD1_FFCOR2',
-     :         '  CCD1_FFCOR: Complete numeric failure, ALL'//
-     :         ' elements of array set BAD. Output data cannot be'//
-     :         ' represented within the permissable range of HDS'//
-     :         ' data type ^DTYPE', STATUS )
+     :         '  CCD1_FFCOR: Complete numeric failure -- ALL'//
+     :         ' elements of output array set BAD (invalid).', STATUS )
             END IF
          END IF
 
 *  Just issue a warning about number of numeric failures.
-         CALL MSG_SETR( 'PERCENT', REAL( NERR ) / REAL ( EL ) * 100.0 )
          CALL MSG_SETI( 'NERR', NERR )
          CALL CCD1_MSG( ' ',
      :   '  Warning -- ^NERR numeric errors occurred'//
-     :   ' (^PERCENT %% of total), when dividing by '//
-     :   'flatfield.', STATUS )
+     :   ' when dividing by flatfield.', STATUS )
       END IF
 
 
