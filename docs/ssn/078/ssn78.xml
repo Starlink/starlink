@@ -1594,39 +1594,10 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           installation of starconf, and choose which one to invoke,
           but there is unlikely any need for that).</p>
 
-        <p>Two very important variables are
-          <code>STARCONF_DEFAULT_PREFIX</code><index>environment
-          variables!STARCONF_DEFAULT_PREFIX</index> and
-          <code>STARCONF_DEFAULT_STARLINK</code><index>environment
-          variables!STARCONF_DEFAULT_STARLINK</index>.  The first is
-          the default installation prefix of the software you are
-          building; the second is the location of a currently built
-          Starlink tree, which will be used for applications and
-          include files if they are not found under
-          <code>STARCONF_DEFAULT_PREFIX</code>.  The value for each of
-          these was set when starconf was itself built and installed,
-          most typically at bootstrap time (see <kbd>./configure
-          --help</kbd> within <code>buildsupport/starconf</code>:
-          having different values for this is one possible reason why
-          you might have more than one starconf installation), but
-          their value is typically something like <code>/star</code>.
-          These variables are important at <em>bootstrap time</em>,
-          either the whole-tree bootstrap from the top level, or the
-          per-component bootstrap within a single directory.  When you
-          configure a particular package, you can set the installation
-          prefix with the <code>--prefix</code> option to
-          <code>./configure</code>, and you can set the location of
-          the `backup' Starlink directory by setting the
-          <code>STARLINK</code><index>environment
-          variables!STARLINK</index> environment variable.  Thus the
-          <code>--prefix</code> option and the <code>STARLINK</code>
-          variable are important at <em>configure</em> time rather
-          than bootstrap time, and gain their defaults from the
-          <code>STARCONF_DEFAULT_...</code> variables.</p>
-
-        <p>In general, however, we recommend that you do not adjust
-          <code>--prefix</code>, and that you leave the
-          <code>STARLINK</code> variable unset.</p>
+<p>Two very important variables are
+<code>STARCONF_DEFAULT_PREFIX</code> and
+<code>STARCONF_DEFAULT_STARLINK</code>, discussed in <ref
+id="starconf-default-variables"/> below.</p>
 
         <p>A companion to the starconf application is the
           <em>starconf-validate</em><index>starconf-validate</index>
@@ -1672,6 +1643,78 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <code>component.xml</code> and
           <code>component.xml.in</code> should both be
           checked in.</p>
+
+<subsubsect id="starconf-default-variables">
+<subhead>
+<title><code>STARCONF_DEFAULT_PREFIX</code> and
+<code>STARCONF_DEFAULT_STARLINK</code></title>
+</subhead>
+
+<p>Two very important variables are
+<code>STARCONF_DEFAULT_PREFIX</code><index>environment
+variables!STARCONF_DEFAULT_PREFIX</index> and
+<code>STARCONF_DEFAULT_STARLINK</code><index>environment
+variables!STARCONF_DEFAULT_STARLINK</index>.  The first is the default
+installation prefix of the software you are building; the second is
+the location of a currently built Starlink tree, which will be used
+for applications and include files if they are not found under
+<code>STARCONF_DEFAULT_PREFIX</code>.</p>
+
+<p>The value for each of these was frozen when starconf was itself
+built and installed, most typically at the time of the tree-wide
+bootstrap, and you can see the values for these with the command
+<kbd>starconf --show STARCONF_DEFAULT_PREFIX</kbd> for example.  You
+can also see the results of this configuration in the
+<code>./configure</code> script itself, as the command
+<kbd>./configure --help</kbd> indicates within its output where
+material will be installed by default.  It is not unreasonable to have
+more than one starconf installation, depending on your path, if you
+wish to have different frozen-in defaults here.  The value of each of
+these two variables is typically something like
+<code>/star</code>.</p>
+
+<p>It is important to emphasise that these parameters are
+<em>frozen</em> when starconf is built, and their values are ignored
+when a component is itself bootstrapped.  If you need to change either
+value, then there are two ways you can do this.</p>
+
+<p>The first, much more common, way is to provide the
+<code>--prefix</code> option when you run <code>./configure</code> in
+a component (this overrides the frozen-in value of
+<code>STARCONF_DEFAULT_PREFIX</code>), or you can set the
+<code>STARLINK</code> variable<index>environment
+variables!STARLINK</index> as a <code>./configure</code> argument line
+(or less securely default it from the environment, see <ref
+id="configure-script"/> for discussion), overriding the frozen-in
+value of <code>STARCONF_DEFAULT_STARLINK</code>.</p>
+
+<p>Specifying <code>--prefix</code> or <code>STARLINK</code> each time you run
+<code>./configure</code> might be troublesome when you are working on
+a component's configuration script, especially as doing this
+inconsistently would produce very confusing results.  You might want
+to do this if you are working on a repository branch, and so want
+built material from the current directory to be installed in one
+branch-specific place, while using a Starlink tree based on the trunk.
+You can default this on a per-directory basis by using a m4
+back-door.  Create a file <code>acinclude.m4</code> in the
+directory in question, and include in it a line like:
+<verbatim>
+m4_define([OVERRIDE_PREFIX],[/my-branch/star])
+</verbatim>
+(or <code>OVERRIDE_STARLINK</code> to override that variable).  Then
+run <code>./bootstrap</code>, which invokes `autoreconf' in turn, and
+the generated <code>./configure</code> file will have the named directory
+as its default prefix.</p>
+
+<p>In general, however, we recommend that you do not adjust
+<code>--prefix</code>, and that you leave the
+<code>STARLINK</code> variable unset.  Also, since they are ignored at
+all times except when the whole tree is being configures, it might be
+wise <em>not</em> to have the <code>STARCONF_DEFAULT_...</code>
+variables set, which could trick you into believing that they are
+(not) having some effect.</p>
+
+</subsubsect>
 
         <subsubsect id="components" indexkey="components">
           <subhead>
