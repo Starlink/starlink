@@ -8,9 +8,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {152.4}
 \newcommand{\stardocauthors}   {Dave Mills, John Webb \& Martin Clayton}
-\newcommand{\stardocdate}      {13 June 1997}
+%\newcommand{\stardocdate}      {13 June 1997}
+\newcommand{\stardocdate}      {2002 January 20}
 \newcommand{\stardoctitle}     {ECHOMOP---Echelle Data Reduction Package}
-\newcommand{\stardocversion}   {Version 3.3-0}
+\newcommand{\stardocversion}   {Version 3.3-6b1}	%%VERSION%%
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 {\sc echomop} provides facilities for the extraction of spectra from 2-D data
@@ -326,8 +327,10 @@ and 2-D distortion fitting and extraction.
 %%S2HPOST#!/bin/csh
 %%S2HPOST
 %%S2HPOST# Definitions.
-%%S2HPOST    set AUTH_NAME = 'Martin Clayton';
-%%S2HPOST    set AUTH_EMAIL = 'mjc@star.ucl.ac.uk';
+%%S2HPOST    #set AUTH_NAME = 'Martin Clayton';
+%%S2HPOST    #set AUTH_EMAIL = 'mjc@star.ucl.ac.uk';
+%%S2HPOST    set AUTH_NAME = 'Norman Gray';
+%%S2HPOST    set AUTH_EMAIL = 'norman@astro.gla.ac.uk';
 %%S2HPOST    set DOC_CODE = sun152;
 %%S2HPOST    set DOC_TITLE = 'ECHOMOP-Echelle Data Reduction Package';
 %%S2HPOST
@@ -517,15 +520,18 @@ and 2-D distortion fitting and extraction.
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
       \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      {Rutherford Appleton Laboratory}\\
+      % This link is now broken, and the current CCLRC RAL link
+      % <http://www.cclrc.ac.uk/Activity/ACTIVITY=RAL;> looks temporary
+      %\htmladdnormallink{Rutherford Appleton Laboratory}
+      %                  {http://www.cclrc.ac.uk/ral} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents.
 %  ================================
@@ -696,8 +702,9 @@ possible solutions.
 
 \subsection{\mlabel{demonstration}Demonstration}
 
-You can obtain an on-line introduction to the use of {\sc echomop} by typing
-the command
+You can obtain an on-line introduction to the use of {\sc echomop},
+after you have setup {\sc echomop} as described in
+section~\ref{getting_started}, by typing the command
 
 \begin{verbatim}
    % ech_demo -graphics-device-
@@ -712,7 +719,7 @@ wavelength-calibrated spectrum.  The text of the demonstration is also
 available for printing in the file
 
 \begin{verbatim}
-   $ECHOMOP_DEMO/ECH_DEMO.TXT
+   $ECHOMOP_DEMO/ech_demo.txt
 \end{verbatim}
 
 for those who prefer to read from a paper copy whilst running the demo.
