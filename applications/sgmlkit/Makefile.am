@@ -30,11 +30,25 @@ stardocs_DATA = doc/ssn70/ssn70.htx_tar
 # in file dtd/manifest.  Install them by copying the tree into place.
 install-data-local: dtd/manifest
 	$(mkdir_p) $(DESTDIR)$(pkglibdir)
-	@PAX@ -r -w -v $(DESTDIR)$(pkglibdir) \
+	if test -n "$(PAX)"; then \
+	    $(PAX) -r -w -v $(DESTDIR)$(pkglibdir) \
 		<dtd/manifest \
-		2>>$${MANIFEST_FILE=/dev/null}
+		2>&$${MANIFEST_FD-2}; \
+	else \
+	    cat dtd/manifest | while read f; do \
+	        $(INSTALL_DATA) $$f $(DESTDIR)$(pkglibdir)/$$f; \
+	    done; \
+	    if test -n "$(MANIFEST_FD)"; then \
+	        sed 's+^+$(DESTDIR)$(pkglibdir)/+' dtd/manifest >&$(MANIFEST_FD); \
+	    fi; \
+	fi
 
 EXTRA_DIST = dsssl dtd
+
+clean: clean-am
+	for d in dtd doc/dtd2sgml doc/ssn70 misc; do \
+	    (cd $$d; $(MAKE) clean); \
+	done
 
 SL_COMMON = \
 	dsssl/sl/common/sl-gentext.dsl \
