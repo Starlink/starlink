@@ -410,6 +410,7 @@
 
 *  Authors:
 *     Malcolm Currie STARLINK (RAL::CUR)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -455,6 +456,11 @@
 *     1997 April 7 (MJC):
 *        Fixed bug for reversed abscissa.  Reimplemented 1997 November
 *        22. 
+*     6-MAY-1998 (DSB):
+*        Update the GKS workstation after changing polyline
+*        representations, and do not re-instate original representations
+*        at end. This prevents the screen being cleared when the
+*        workstation is closed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1021,6 +1027,12 @@
          CALL GSPLR( IWKID, SYMPEN, SLNTYP, THICK, SYMCI )
          SPLR = .TRUE.
       END IF
+
+*  Ensure that the pen changes have been applied. This may cause GKS to 
+*  redraw or clear the screen. It must be done now because otherwise, it
+*  would be done when the workstation is closed, resulting in the newly
+*  drawn graphics being erased.
+      CALL GUWK( IWKID, 1 )
 
 *  Obtain the ordinate limits.
 *  ===========================
@@ -1894,11 +1906,6 @@
 *  Watch out for any error.
          CALL GKS_GSTAT( STATUS )
       END IF
-
-*  Restore pens to their former state.
-      CALL GSPLR( IWKID, LINPEN, LLNTYP, LLWIDT, LCOLI )
-      IF ( EPLR ) CALL GSPLR( IWKID, ERRPEN, ELNTYP, ELWIDT, ECOLI )
-      IF ( SPLR ) CALL GSPLR( IWKID, SYMPEN, SLNTYP, SLWIDT, SCOLI )
 
 *  Close the device.
       CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
