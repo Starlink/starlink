@@ -856,7 +856,7 @@
          CALL KPG1_ASPSY( '(TEXT)', '(TITLE)', STATUS )
 
 *  Set the style for plotting in the key picture. 
-         CALL KPG1_ASSET( 'CONTOUR', 'KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'KAPPA_CONTOUR', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Draw the key to the right of the contour plot and aligned with
 *  the top axis.

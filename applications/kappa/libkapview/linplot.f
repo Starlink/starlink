@@ -1290,7 +1290,7 @@
       CALL KPG1_PLTLN( DIM, ILO, IHI, %VAL( IPXCEN ), %VAL( IPYCEN ), 
      :                 XVAR, YVAR, %VAL( IPXBAR ), %VAL( IPYBAR ), 
      :                 %VAL( IPSTEP ), 'STYLE', IPLOT, IMODE, MTYPE, 
-     :                 ISHAPE, FREQ, 'LINPLOT', STATUS )
+     :                 ISHAPE, FREQ, 'KAPPA_LINPLOT', STATUS )
 
 *  Produce the Key (but only if we have not aligned the picture with an
 *  existing DATAPLOT.
