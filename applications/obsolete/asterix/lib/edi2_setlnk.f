@@ -119,6 +119,7 @@
       INTEGER			TPOS			! Type code index
 
       LOGICAL			GOTMAX, GOTMIN		! Got extrema?
+      LOGICAL			RDF			! RDF data?
 *.
 
 *  Check inherited global status.
@@ -126,10 +127,23 @@
 
 *  Initialise
       OARG = ADI__NULLID
+      RDF = .FALSE.
 
 *  Try to locate the EVENTS extension
       CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), 'STDEVT', EVHDU, STATUS )
+        RDF = .TRUE.
+      END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Write the event extension name as property
+      IF ( RDF ) THEN
+        CALL ADI_CPUT0C( ARGS(2), '.Etable', 'STDEVT', STATUS )
+      ELSE
+        CALL ADI_CPUT0C( ARGS(2), '.Etable', 'EVENTS', STATUS )
+      END IF
 
 *  Read the keywords defining the number of events and columns
       CALL ADI2_HGKYI( EVHDU, 'TFIELDS', NLIST, STATUS )

@@ -97,6 +97,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*6               ETABLE                  ! Name of events HDU
       CHARACTER*20		LIST
 
       INTEGER			BCOL			! Column number
@@ -112,7 +113,8 @@
       OARG = ADI__NULLID
 
 *  Locate the EVENTS hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'EVENTS', EVHDU, STATUS )
+      CALL ADI_CGET0C( ARGS(2), '.Etable', ETABLE, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ETABLE, EVHDU, STATUS )
 
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), LIST, STATUS )
