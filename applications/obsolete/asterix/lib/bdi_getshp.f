@@ -135,10 +135,10 @@
 *    How big is dimensions array
         CALL ADI_CSIZE( ID, 'SHAPE', NDIM, STATUS )
         IF ( NDIM .GT. MXNDIM ) THEN
-          STATUS = SAI__ERROR
           CALL BDI0_DESCID( ID, 'ID', STATUS )
           CALL MSG_SETI( 'ND', NDIM )
           CALL MSG_SETI( 'NA', MXNDIM )
+          STATUS = SAI__ERROR
           CALL ERR_REP( 'BDI_GETSHP_0', 'Input object ^ID has '/
      :                  /'^ND dimensions, whereas the calling '/
      :                  /'program can only cope with ^NA', STATUS )

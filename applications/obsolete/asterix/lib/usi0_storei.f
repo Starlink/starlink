@@ -45,6 +45,8 @@
           DS(I).USED=.TRUE.
           DS(I).IO=IO
           DS(I).ADI_ID = ID
+          CALL ADI_CPUT0C( ID, '.USI_PAR', PAR, STATUS )
+
         ELSE
           STATUS=SAI__ERROR
           CALL ERR_REP(' ', 'Maximum number of datasets exceeded',
@@ -52,7 +54,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from USI0_STOREI',STATUS)
+          CALL AST_REXIT( 'USI0_STOREI', STATUS )
         ENDIF
       ENDIF
       END
