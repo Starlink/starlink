@@ -27,17 +27,10 @@
 *
       INCLUDE 'SSO_CMN'
 *
-*    Status :
-*
-      INTEGER STATUS
-*
 *    Local variables :
 *
       INTEGER                    I                  ! Loop over SSO resources
 *-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Reset use flags
 
@@ -50,5 +43,7 @@
       DO I = 1, SSO__MXMI
         SSO.MI(I).USED = .FALSE.
       END DO
+
+      SSO_INIT_Q = .TRUE.
 
       END
