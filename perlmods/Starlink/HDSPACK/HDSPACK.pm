@@ -23,6 +23,8 @@ and for deleting structures.
 use Carp;
 use strict;
 use NDF;
+use File::Basename;
+use File::Spec;
 use base qw/Exporter/;
 
 use vars qw/ $VERSION @EXPORT_OK $DEBUG/;
@@ -81,15 +83,18 @@ sub retrieve_locs {
     return ($status);
   }
 
-  # Split the name into components
-  my @components = split(/\./, $name);
+  # First get the root directory
+  my ($hdspath, $dir) = fileparse( $name );
+
+  # Split the name into HDS components
+  my @components = split(/\./, $hdspath);
+
+  # Open the file
+  my $file = File::Spec->catfile($dir,shift(@components));
+  hds_open($file, $mode, my $ploc, $status);
 
   # Store for the locators
   my @locators = ();
-
-  # Open the file
-  my $file = shift(@components);
-  hds_open($file, $mode, my $ploc, $status);
 
   # Now get the locators from the lower levels
   if ($status == SAI__OK) {
@@ -101,7 +106,6 @@ sub retrieve_locs {
 
   # Store the component locators
   push(@locators, @sublocs) if $status == SAI__OK;
-
   # Return them
   return ($status, @locators);
 
@@ -311,7 +315,7 @@ sub _find_loc {
 
    my $parent = shift;
    my $status = shift;
-   return undef if $status != SAI__OK;
+   return ($status) if $status != SAI__OK;
 
    my $nextcmp = shift;
 

@@ -1,3 +1,8 @@
+2001-03-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* HDSPACK.pm (retrieve_locs): Fix problem when file name uses ./
+	(_find_loc): Return status rather than undef
+
 1999-10-13  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* HDSPACK.pm (copobj): Properly deal with a new root by using
