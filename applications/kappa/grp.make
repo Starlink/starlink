@@ -83,7 +83,7 @@ wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
 scatter.par lutcont.par lutheat.par lutramps.par picbase.par piclast.par \
 lutbgyrw.par lutwarm.par lutcold.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
-lutgrey.par lutneg.par lutzebra.par picframe.par kapversion.par
+lutgrey.par lutneg.par lutzebra.par picframe.par kapversion.par setqual.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
@@ -114,7 +114,7 @@ palread.hlp palsave.hlp parameters.hlp parget.hlp paste.hlp picbase.hlp \
 piccur.hlp picdata.hlp picdef.hlp picempty.hlp picentire.hlp picframe.hlp \
 picgrid.hlp picin.hlp piclabel.hlp piclast.hlp piclist.hlp picsel.hlp \
 pictrans.hlp picvis.hlp picxy.hlp pixdupe.hlp problems_problems.hlp \
-procedures.hlp psf.hlp requests.hlp rift.hlp sub.hlp \
+procedures.hlp psf.hlp requests.hlp rift.hlp sub.hlp setqual.hlp \
 role_of_kappa.hlp regrid.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb.hlp \
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
@@ -155,7 +155,7 @@ ardplot.ifl linplot.ifl lutable.ifl \
 lutsave.ifl lutview.ifl mlinplot.ifl \
 paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
-picsel.ifl pictrans.ifl picvis.ifl vecplot.ifl \
+picsel.ifl pictrans.ifl picvis.ifl vecplot.ifl setqual.ifl \
 axconv.ifl axlabel.ifl axunits.ifl erase.ifl fitsdin.ifl fitsexp.ifl \
 fitsimp.ifl fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl hiscom.ifl \
 hislist.ifl hisset.ifl native.ifl ndfcopy.ifl ndftrace.ifl setaxis.ifl \
@@ -281,7 +281,7 @@ kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
 kps1_gliwd.f kps1_glibr.f kps1_glibd.f kps1_glidr.f kps1_ltaba.f \
 kps1_gliwr.f kps1_gligt.f kps1_saxlk.f kps1_look.f \
 kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look1.f kps1_look2.f \
-kps1_msa.f kps1_mss.f 
+kps1_msa.f kps1_mss.f kps1_stqa0.f kps1_stqa1.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
@@ -298,7 +298,7 @@ fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
 settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
-wcsremove.f wcsshow.f chain.f reshape.f 
+wcsremove.f wcsshow.f chain.f reshape.f setqual.f 
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 

@@ -500,7 +500,8 @@ EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
 		    IDI_ERR CTM_PAR FIO_ERR NUM_DEC_CVT NDF_ERR IDI_PAR \
 		    FIO_PAR KPG_AST AGI_ERR NUM_DEF_CVT NDF_PAR GNS_PAR \
 		    PAR_ERR GRP_PAR NUM_DEC_R PAR_PAR MAG_ERR CHR_ERR \
-		    NUM_DEC_D IRA_PAR SUBPAR_PAR NUM_DEF_R GKS_PAR PSX_ERR
+		    NUM_DEC_D IRA_PAR SUBPAR_PAR NUM_DEF_R GKS_PAR PSX_ERR \
+                    IRQ_PAR IRQ_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -670,7 +671,7 @@ kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
 kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f \
 kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f \
-kps1_rs1b.f kps1_rs1d.f \
+kps1_rs1b.f kps1_rs1d.f kps1_stqa0.f kps1_stqa1.f \
 kps1_rs1i.f kps1_rs1r.f kps1_rs1ub.f kps1_rs1uw.f kps1_rs1w.f
 
 MEM_F_ROUTINES = mem2d.f
@@ -686,7 +687,7 @@ setext.f setlabel.f setnorm.f setorigin.f \
 setsky.f settitle.f settype.f \
 setunits.f setvar.f \
 wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
-chain.f reshape.f 
+chain.f reshape.f setqual.f
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
               $(NDFPACK_MONO_SOURCE)
@@ -917,6 +918,8 @@ GRP_PAR:	$(STAR_INC)/grp_par;	$(LINK) $? $@
 HLPCMD:		$(STAR_INC)/hlpcmd;	$(LINK) $? $@
 IDI_ERR:	$(STAR_INC)/idi_err;	$(LINK) $? $@
 IDI_PAR:	$(STAR_INC)/idi_par;	$(LINK) $? $@
+IRQ_PAR:        $(STAR_INC)/irq_par;    $(LINK) $? $@
+IRQ_ERR:        $(STAR_INC)/irq_err;    $(LINK) $? $@
 IRA_PAR:	$(STAR_INC)/ira_par;	$(LINK) $? $@
 KPG_AST:	$(STAR_INC)/kpg_ast;	$(LINK) $? $@
 MAG_ERR:	$(STAR_INC)/mag_err;	$(LINK) $? $@
@@ -2837,6 +2840,7 @@ regrid.o:	 SAE_PAR NDF_PAR PRM_PAR AST_PAR PAR_ERR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
 scatter.o:	 SAE_PAR NDF_PAR PRM_PAR
 segment.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_PAR PAR_ERR AST_PAR
+setqual.o:       SAE_PAR DAT_PAR PRM_PAR PAR_ERR NDF_PAR GRP_PAR IRQ_PAR IRQ_ERR
 setaxis.o:	 SAE_PAR NDF_PAR DAT_PAR PRM_PAR PAR_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 setbad.o:	 SAE_PAR PAR_ERR
 setbb.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT

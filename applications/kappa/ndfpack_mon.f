@@ -229,9 +229,13 @@
          ELSE IF ( NAME .EQ. 'SETORIGIN' ) THEN
             CALL SETORIGIN ( STATUS )
 
-*  Makes an IRAS astrometry extension.
+*  Add WCS info.
          ELSE IF ( NAME .EQ. 'SETSKY' ) THEN
             CALL SETSKY ( STATUS )
+
+*  Add quality names
+         ELSE IF ( NAME .EQ. 'SETQUAL' ) THEN
+            CALL SETQUAL ( STATUS )
 
 *  Sets a new value for the title component of an NDF data structure.
          ELSE IF ( NAME .EQ. 'SETTITLE' ) THEN

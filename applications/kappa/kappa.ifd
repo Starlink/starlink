@@ -1776,6 +1776,109 @@ package kappa {
 
       }
 
+      action setqual {
+         alias {setqu(al)}
+         helplib {$KAPPA_HELP}
+
+         parameter ardfile {
+            position 1
+            type FILENAME
+            access READ
+            vpath PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <->GLOBAL.ARDFILE
+            prompt {ARD file}
+            default ardfile.dat
+            helpkey *
+         }
+
+         parameter comment {
+            position 3
+            type LITERAL
+            access READ
+            ppath CURRENT
+            prompt {A short description of the assigned quality}
+            helpkey *
+          }
+
+         parameter function {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default HS
+            prompt {Function to be performed by SETQUAL}
+            helpkey *
+          }
+
+         parameter list {
+            type LITERAL
+            access READ
+            ppath CURRENT
+            prompt {A list of pixel indices}
+            helpkey *
+          }
+
+         parameter mask {
+            position 4
+            type NDF
+            access READ
+            ppath CURRENT
+            prompt {NDF which defines the selected pixels}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF in which to store quality information}
+            helpkey *
+          }
+
+         parameter qname {
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Quality name}
+            helpkey *
+          }
+
+         parameter select {
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            ppath DEFAULT
+            default Mask
+            prompt {How do you want to identified select pixels?}
+            helpkey *
+          }
+
+         parameter xname {
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xtype {
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+      }
+
       action setsky {
          helplib {$KAPPA_HELP}
          parameter coords {
