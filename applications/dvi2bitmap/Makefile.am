@@ -68,7 +68,7 @@ EXTRA_DIST = $(libdocdir) $(man1_MANS) VERSION
 libdocdir = @DOXYGEN_OUTPUT_DIRECTORY@
 $(libdocdir): Doxyfile
 	if test -n "@DOXYGEN@"; then \
-	  @DOXYGEN@; \
+	  X=@DOXYGEN@; ${X-:};\
 	else \
 	  mkdir $(libdocdir); \
 	  echo "No doxygen available -- library documentation not generated" >$(libdocdir)/stamp; \
