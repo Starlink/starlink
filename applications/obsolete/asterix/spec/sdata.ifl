@@ -1,7 +1,6 @@
 INTERFACE SDATA
-  parameter REF_OBJ
+  parameter OUT
     position 1
-    keyword 'OUT'
     type 'UNIV'
     vpath 'prompt'
     association '->global.fit_data'

@@ -9,27 +9,24 @@ INTERFACE SLICE
       HELP     'Either an Asterix88 dataset or a primitive data array'
    ENDPARAMETER
 
-   PARAMETER RANGE_MIN
+   PARAMETER MIN
       POSITION 2
       TYPE     '_REAL'
-      KEYWORD  'MIN'
       PPATH    'GLOBAL'
       PROMPT   'Lowest data value to display'
       HELP     'Only data points within values in range MIN to MAX are shown.'
    ENDPARAMETER
 
-   PARAMETER RANGE_MAX
+   PARAMETER MAX
       POSITION 3
       TYPE     '_REAL'
-      KEYWORD  'MAX'
       PPATH    'GLOBAL'
       PROMPT   'Highest data value to display'
       HELP     'Only data points within values in range MIN to MAX are shown.'
    ENDPARAMETER
 
-  PARAMETER DEVICE
+  PARAMETER DEV
     TYPE        'LITERAL'
-    KEYWORD     'DEV'
     VPATH       'DEFAULT,PROMPT'
     DEFAULT     'TERMINAL'
     PROMPT      'Output device'

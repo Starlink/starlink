@@ -91,8 +91,7 @@ Interface QUALITY
     Help      'Convert magic values to QUALITY'
   EndParameter
 
-  Parameter OVERWRITE
-    Keyword   OVER
+  Parameter OVER
     Type      '_logical'
     Vpath     'default'
     Default   F
@@ -124,64 +123,55 @@ Interface QUALITY
     Help      'Only quality with specified existing value will be altered.'
   EndParameter
 
-  Parameter SELAX
-    Keyword   'AXES'
+  Parameter AXES
     Type      '_Char'
     Prompt    'Enter indices of axes to have ranges applied'
     Help      'e.g. 1 2 3'
   EndParameter
 
-  Parameter AXRNG1
-    Keyword   'AXIS1'
+  Parameter AXIS1
     Type      '_CHAR'
     Prompt    'Enter range(s) for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG2
-    Keyword   'AXIS2'
+  Parameter AXIS2
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG3
-    Keyword   'AXIS3'
+  Parameter AXIS3
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG4
-    Keyword   'AXIS4'
+  Parameter AXIS4
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG5
-    Keyword   'AXIS5'
+  Parameter AXIS5
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG6
-    Keyword   'AXIS6'
+  Parameter AXIS6
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter AXRNG7
-    Keyword   'AXIS7'
+  Parameter AXIS7
     Type      '_CHAR'
     Prompt    'Enter ranges for this axis'
     Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
   EndParameter
 
-  Parameter DATRNG
-    Keyword   'DATA'
+  Parameter DATA
     Type      '_CHAR'
     Prompt    'Enter ranges for the data values'
     Help      'Lower bounds inclusive, upper exclusive (unless max)'

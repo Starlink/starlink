@@ -3,7 +3,6 @@ INTERFACE SSANOT
      position 1
      type 'UNIV'
      ppath 'GLOBAL'
-     keyword 'INP'
      prompt 'Dataset'
      association '<->GLOBAL.BINDS'
    endparameter
