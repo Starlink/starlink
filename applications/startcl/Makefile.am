@@ -127,7 +127,7 @@ tclIndex: $(LIBRARY_FILES)
 	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
 	echo >> tclIndex \
-           'set auto_index(gwm) [list load [file join $$dir libgwm.la] tkGwm]'
+           'set auto_index(gwm) [list load [file join $$dir libgwm] tkGwm]'
 	echo >> tclIndex \
-           'set auto_index(adam_start) [list load [file join $$dir libadam.la] tclAdam]'
+           'set auto_index(adam_start) [list load [file join $$dir libadam] tclAdam]'
 	
