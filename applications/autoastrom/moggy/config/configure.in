@@ -40,8 +40,21 @@ AC_CHECK_HEADERS(sstream)
 dnl   Do we have a map implementation?
 AC_CHECK_HEADERS(map)
 
-dnl   Check other functions
-AC_CHECK_FUNCS(setenv)
+dnl   Check whether setenv is present.  On Tru64, even though setenv
+dnl   is present in the library, it appears not to be properly
+dnl   declared in stdlib.h (it's bracketed off by an `#ifdef
+dnl   AES_SOURCE', which isn't documented anywhere obvious): check for
+dnl   this situation, and define DECLARE_SETENV if we're going to have
+dnl   to include our own setenv definition.
+AC_CHECK_FUNC(setenv,
+  AC_DEFINE(HAVE_SETENV,1)
+  AC_MSG_CHECKING(whether setenv is properly declared)
+  AC_EGREP_HEADER(setenv,stdlib.h,
+    AC_DEFINE(DECLARE_SETENV,0)
+    AC_MSG_RESULT(yes),
+    AC_DEFINE(DECLARE_SETENV,1)
+    AC_MSG_RESULT(no)),
+  AC_DEFINE(HAVE_SETENV,0))
 
 dnl   Take a `copy' of the means autoconf uses to echo a string
 dnl   without a newline.  This will be a Makefile variable, so double
@@ -93,23 +106,59 @@ AC_TRY_COMPILE([#include <string>], [string t;],
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(ARGHH -- error compiling)))
 
-dnl   Add the Starlink include and library paths.  The following
-dnl   components are standard Starlink components (or semi-standard,
-dnl   in the case of cat), so should be in standard places.  Don't add 
-dnl   in much configuration flexibility here -- it's probably won't be 
-dnl   necessary.  Use the STARLINK environment variable.
-AC_SUBST(SLASHSTAR)
-AC_MSG_CHECKING(whether we can find a Starlink installation)
-SLASHSTAR=`(test -n "$STARLINK" && echo $STARLINK) || (test -d /star && echo /star) || (test -d /stardev && echo /stardev)`
-if test -z "$SLASHSTAR"; then
-    AC_MSG_ERROR(No!  Eeek! Giving up.)
-    exit 1
-fi
-AC_MSG_RESULT($SLASHSTAR)
-dnl CPPFLAGS="$CPPFLAGS -I$STARLINK/include"
-dnl LIBS="$LIBS -L$STARLINK/lib"
+dnl   Add the Starlink include and library paths, taking the location
+dnl   of the /star directory from, in order, the argument to --with-starlink, 
+dnl   the $STARLINKS variable, the $STARLINK variable, and finally just /star.
+dnl   The --with-starlink and $STARLINKS can be a colon-separated list
+dnl   of directories.
+AC_ARG_WITH(starlink,
+[  --with-starlink=path    Give non-default /star (can be colon-sep'd list)],
+  if test "$withval" = "yes"; then
+    # equivalent to default
+    stardirs=
+  elif test "$withval" = "no"; then
+    AC_MSG_ERROR(You can't build moggy without Starlink)
+  else
+    stardirs=$withval
+  fi,
+  stardirs=)
+test -n "$stardirs" || stardirs=$STARLINKS
+test -n "$stardirs" || stardirs=$STARLINK
+test -n "$stardirs" || stardirs=/star
+set `echo $stardirs | sed 's/:/ /g'`
+while test $# -gt 0; do
+  AC_MSG_CHECKING(Starlink directory $1)
+  if test -d "$1" -a -d "$1/include" -a -d "$1/lib"; then
+    AC_MSG_RESULT(ok)
+    CPPFLAGS="$CPPFLAGS -I$1/include"
+    LIBS="$LIBS -L$1/lib"
+  else
+    AC_MSG_RESULT(not found -- ignored)
+  fi
+  shift
+done
+
+dnl   We can't actually make the following checks, since there doesn't
+dnl   seem to be a way of using the LIBS and CPPFLAGS settings which
+dnl   we've produced above.
+dnl dnl   Now that we've found the /star directories, check that ast.h is
+dnl dnl   there.  There was a problem with ast.h which meant it caused the
+dnl dnl   Tru64 C++ compiler to object.  This is certainly fixed by AST
+dnl dnl   1.8-1.  As an imperfect test, check if AST_MAJOR_VERS is defined.
 dnl AC_CHECK_HEADER(ast.h)
+dnl AC_MSG_CHECKING(whether your AST library is new enough)
+dnl AC_EGREP_CPP(yes,
+dnl [#include <ast.h>
+dnl #ifdef AST_MAJOR_VERS
+dnl yes
+dnl #endif],
+dnl   AC_MSG_RESULT(ok),
+dnl   AC_MSG_RESULT(no)
+dnl   AC_MSG_WARN([Your AST library APPEARS to be too old.
+dnl I'll keep going but if there's a problem building the software this
+dnl might be the cause]))
 dnl AC_CHECK_LIB(ast, astIsAFrameSet)
+
 
 AC_SUBST(CATLIBDIR)
 dnl   Find where the SkyCat cat library has been installed.
