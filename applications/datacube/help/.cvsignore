@@ -16,3 +16,7 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+version.dat
+datacube.shl
+datacube_help.ifc
+datacube_help
