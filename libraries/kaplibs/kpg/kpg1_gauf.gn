@@ -70,6 +70,8 @@
 *        Returns values even if the iteration loop is completed without
 *        convergence to the tolerance.  Assumes oscillation and takes
 *        mean of last two values.
+*     1996 January 26 (MJC):
+*        Removed NAG calls.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,15 +122,12 @@
 *  Local Variables:
       DOUBLE PRECISION
      :  A( NPAR, NPAR ),         ! LHS of normal equations
-     :  AA( NPAR, NPAR ),        ! Work space for NAG routine
-     :  DX( NPAR ),              ! Solutions to normal equations
-     :  R( NPAR ),               ! RHS of normal equations
+     :  R( NPAR ),               ! RHS and solutions of normal equations
      :  SUM0,                    ! Sum of Gaussian deviations
      :  SUM1,                    ! Sum zero-order  moment
      :  SUM2,                    ! Sum first-order moment
      :  SUM3,                    ! Sum second-order moment
-     :  WKS1( NPAR ),            ! Work space for NAG routine
-     :  WKS2( NPAR )             ! Work space for NAG routine
+     :  WKS1( NPAR )             ! Work space for PDA routine
 
       REAL
      :  C( NPAR ),               ! Parameters of the fit
@@ -152,11 +151,13 @@
                                  ! 3=sigma, 4=background
 
       INTEGER
+     :  ERRCO,                   ! PDA error indicator
      :  I, J,                    ! Loop counters
-     :  IFAIL,                   ! NAG status
+     :  IFAIL,                   ! PDA-routine status
      :  ITER,                    ! Iteration loop counter
-     :  NQUART                   ! Index of lower quartile (or 25th
+     :  NQUART,                  ! Index of lower quartile (or 25th
                                  ! pixel if smaller)
+     :  WKS2( NPAR )             ! Work space for PDA routine
 
       <LTYPE>
      :  STAK( 25 )               ! The smallest data values
@@ -368,43 +369,45 @@
          A( 2, 4 ) = A( 4, 2 )
          A( 3, 4 ) = A( 4, 3 )
 
-*       Call NAG routine F04ATF to solve the linearised normal
-*       equations.
+*       Call a PDA routine to solve the linearised normal equations.
+*       Contain its limited error handling in a new error context,
+*       and report specific messages.  The fit is returned in R.
 
-         IFAIL = 1
-         CALL F04ATF( A, NPAR, R, NPAR, DX, AA, NPAR, WKS1, WKS2,
-     :                IFAIL )
+         CALL ERR_MARK
+         IFAIL = 0
+         CALL PDA_DGEFS( A, NPAR, NPAR, R, 1, ERRCO, WKS1, WKS2, IFAIL )
+         IF ( IFAIL .NE. 0 ) CALL ERR_ANNUL( IFAIL )
+         CALL ERR_RLSE
 
 *       Watch for an error.
 
-         IF ( IFAIL .GT. 0 ) THEN
+         IF ( ERRCO .EQ. -4 ) THEN
             STATUS = SAI__ERROR
-            CALL MSG_SETI( 'IFAIL', IFAIL )
+            CALL MSG_SETI( 'IFAIL', ERRCO )
             CALL ERR_REP( 'KPG1_GAUFx_NORMEQ',
      :        'Error solving the normal equations for the Gaussian '/
-     :        /'fit.  F04ATF failed with error ^IFAIL.', STATUS )
+     :        /'fit.  Normal-equation matrix is singular.', STATUS )
             GO TO 100
-
          END IF
 
 *       Apply the corrections to the Gaussian parameters with damping
 *       factors for large amplitude changes.
 
-         X( 1 ) = X( 1 ) - DX( 1 ) / ( 1.0 + 2.0 * ABS( DX( 1 ) /
+         X( 1 ) = X( 1 ) - R( 1 ) / ( 1.0 + 2.0 * ABS( R( 1 ) /
      :            MAX( X( 1 ), 1.0E-20 ) ) )
-         X( 2 ) = X( 2 ) - DX( 2 ) / ( 1.0 + 2.0 * ABS( DX( 2 ) /
+         X( 2 ) = X( 2 ) - R( 2 ) / ( 1.0 + 2.0 * ABS( R( 2 ) /
      :            POINTS ) )
-         X( 3 ) = X( 3 ) - DX( 3 ) / ( 1.0 + 2.0 * ABS( DX( 3 ) /
+         X( 3 ) = X( 3 ) - R( 3 ) / ( 1.0 + 2.0 * ABS( R( 3 ) /
      :            MAX( X( 3 ), 1.0E-20 ) ) )
-         X( 4 ) = X( 4 ) - DX( 4 ) / ( 1.0 + 2.0 * ABS( DX( 4 ) /
+         X( 4 ) = X( 4 ) - R( 4 ) / ( 1.0 + 2.0 * ABS( R( 4 ) /
      :            MAX( X( 1 ), 1.0E-20 ) ) )
 
 *       If the accuracy criterion is met, exit from the iteration loop.
 
-         IF ( ( ABS( DX( 1 ) ) .LE. TOLL * X( 1 ) ) .AND.
-     :        ( ABS( DX( 2 ) ) .LE. TOLL ) .AND.
-     :        ( ABS( DX( 3 ) ) .LE. TOLL * X( 3 ) ) .AND.
-     :        ( ABS( DX( 4 ) ) .LE. TOLL * X( 1 ) ) ) THEN
+         IF ( ( ABS( R( 1 ) ) .LE. TOLL * X( 1 ) ) .AND.
+     :        ( ABS( R( 2 ) ) .LE. TOLL ) .AND.
+     :        ( ABS( R( 3 ) ) .LE. TOLL * X( 3 ) ) .AND.
+     :        ( ABS( R( 4 ) ) .LE. TOLL * X( 1 ) ) ) THEN
 
 *          Equation required parameters with the statistics.
 
@@ -420,18 +423,25 @@
 
          ELSE IF ( ITER .EQ. NITER ) THEN
 
-            AMP  = X( 1 ) + DX( 1 ) / ( 2.0 + 4.0 * ABS( DX( 1 ) /
+            AMP  = X( 1 ) + R( 1 ) / ( 2.0 + 4.0 * ABS( R( 1 ) /
      :             MAX( X( 1 ), 1.0E-20 ) ) )
-            X0 = X( 2 ) + DX( 2 ) / ( 2.0 + 4.0 * ABS( DX( 2 ) /
+            X0 = X( 2 ) + R( 2 ) / ( 2.0 + 4.0 * ABS( R( 2 ) /
      :           POINTS ) )
-            SIGMA = X( 3 ) + DX( 3 ) / ( 2.0 + 4.0 * ABS( DX( 3 ) /
+            SIGMA = X( 3 ) + R( 3 ) / ( 2.0 + 4.0 * ABS( R( 3 ) /
      :              MAX( X( 3 ), 1.0E-20 ) ) )
-            BACK = X( 4 ) + DX( 4 ) / ( 2.0 + 4.0 * ABS( DX( 4 ) /
+            BACK = X( 4 ) + R( 4 ) / ( 2.0 + 4.0 * ABS( R( 4 ) /
      :             MAX( X( 1 ), 1.0E-20 ) ) )
 
          END IF
 
       END DO
+
+*    Issue a warning if the final solution is poorly determined.
+
+      IF ( ERRCO .EQ. -10 ) THEN
+         CALL MSG_OUT( 'INSIGNIF',
+     :     'The least-squares fit solution may be inaccurate.', STATUS )
+      END IF
 
   100 CONTINUE
 
