@@ -162,7 +162,7 @@
       CALL CHR_FILL( '-', DASHES )
 
 *    Get input object from user
-      CALL USI_ASSOC( 'INP', 'SSDS', 'READ', SFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'SSDSset|SSDS', 'READ', SFID, STATUS )
       CALL ADI1_GETLOC( SFID, SLOC, STATUS )
 
 *  Get number of sources
@@ -174,8 +174,8 @@
 *  Open device
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, DEVWID, STATUS )
 
-*    Locate book-keeping structure
-      CALL SSO_CHKBOOK( SLOC, OK, NCOMP, STATUS )
+*  Locate book-keeping structure
+      CALL ADI_CGET0I( SFID, 'NFILE', NCOMP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Number of sources defines width of first column
@@ -319,7 +319,7 @@
       END IF
 
 *    Symmetric errors?
-      CALL SSO_GETPAR0L( SLOC, 1, 'SYMMETRIC', SYMMETRIC, STATUS )
+      CALL SSI_GETPAR0L( SFID, 1, 'SYMMETRIC', SYMMETRIC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         SYMMETRIC = .TRUE.
@@ -356,8 +356,8 @@
         WRITE( TEXT, '(5X,A,T10,A,T90,A)' ) 'N', 'Searched Dataset','At'
         CALL AIO_WRITE( OCH, TEXT, STATUS )
         DO I = 1, NCOMP
-          CALL SSO_GETPAR0C( SLOC, I, 'SEARCHED', FILENAME, STATUS )
-          CALL SSO_GETPAR0C( SLOC, I, 'CREATED', DATE, STATUS )
+          CALL SSI_GETPAR0C( SFID, I, 'SEARCHED', FILENAME, STATUS )
+          CALL SSI_GETPAR0C( SFID, I, 'CREATED', DATE, STATUS )
           WRITE( TEXT, '(3X,I3,T10,A,T90,A)' ) I, FILENAME
      :                         (:CHR_LEN(FILENAME)), DATE
           CALL AIO_WRITE( OCH, TEXT, STATUS )
@@ -365,7 +365,7 @@
         CALL AIO_BLNK( OCH, STATUS )
 
 *      Tell user about program which generated data
-        CALL SSO_GETPAR0C( SLOC, 1, 'CREATOR', PROGNAME, STATUS )
+        CALL SSI_GETPAR0C( SFID, 1, 'CREATOR', PROGNAME, STATUS )
         CALL AIO_WRITE( OCH, '   Dataset was searched by '//PROGNAME,
      :                  STATUS )
         CALL AIO_BLNK( OCH, STATUS )
@@ -1034,7 +1034,7 @@
 
 
 *+  SSDUMP_EFMT - Sets ELEVS token equal to the formatted error levels of FIELD
-      SUBROUTINE SSDUMP_EFMT( LOC, FIELD, STATUS )
+      SUBROUTINE SSDUMP_EFMT( FID, FIELD, STATUS )
 *
 *    Description :
 *
@@ -1060,11 +1060,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)         LOC              ! SSDS dataset
+      INTEGER			FID			! SSDS file
       CHARACTER*(*)                  FIELD            ! Field name
 *
 *    Status :
@@ -1091,7 +1090,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Get levels
-      CALL SSO_GETFITEM1R( LOC, FIELD, 'ELEVS', MXLEV,
+      CALL SSI_GETFITEM1R( FID, FIELD, 'ELEVS', MXLEV,
      :                            LEVS, NLEV, STATUS )
 
       TEXT = ' '

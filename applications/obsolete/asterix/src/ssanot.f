@@ -107,7 +107,7 @@
      :                STATUS )
 
 *  Get source list
-      CALL USI_ASSOC( 'LIST', 'SSDS', 'READ', SID, STATUS )
+      CALL USI_ASSOC( 'LIST', 'SSDSset|SSDS', 'READ', SID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get number of sources in source list
