@@ -1637,7 +1637,8 @@ MLABEL child in the document instance.
   to be referred to.
 <codebody>
 (define (img-eqnref #!optional (nd (current-node)))
-  (let* ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY")))
+  (let* ((refable-ancestor (ancestor-member nd `(,(normalize "mequation")
+						 ,(normalize "meqnarray"))))
 	 (de (document-element nd))
 	 (docprefix (if (string=? (gi de) (normalize "programcode"))
 			(hash-of-tree de)
