@@ -12780,15 +12780,10 @@ propagating QUALITY has been corrected.
 \subsection{This release 2.3-0}
 A minor update to CCDPACK.
 \begin{itemize}
-\item  The MEDIAN combination method is now much faster when combining many 
-  images. This equates to a speed up of 100\% when combining 50 images
-  with variances. Combining 15 images or less remains at the same speed as
-  before.
-
-\item  A even faster combination method FASTMED has been introduced. This
-  is a plain median which does not use weights. This is about 50\%
-  faster than MEDIAN when combining 50 images and is within 10\% of
-  MEAN for this number of images. 
+  \item A new median stacking method ``FASTMED'' has been introduced. When
+  used on stacks of 50 images this is typically about 60-70\% faster
+  than the existing weighted median. This is very fast as it also
+  usually lies within 10\% of the time taken to calculate the mean.
 
 \item  The \xroutine{CCDALIGN} application has been changed so that images of
   different sizes are displayed at different scales.
@@ -12799,6 +12794,9 @@ A minor update to CCDPACK.
 \item  The \xroutine{FINDOBJ} application has been changed so that the
   error resulting from not detecting objects on an image may be
   overriden. 
+
+\item There was a problem, under Linux, with the \xroutine{DEBIAS} 
+      application not accepting a saturation value. This is now fixed.
 \end{itemize}
 
 \begin{latexonly}
