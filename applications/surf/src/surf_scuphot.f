@@ -118,13 +118,16 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
  
-*    History :
+*  History:
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.5  1996/11/02 01:25:10  timj
-*     Change Naem: to SCUPHOT from REDS_SCUPHOT in header.
+*     Revision 1.6  1996/11/02 01:43:25  timj
+*     Fix bug in history header
 *
+c Revision 1.5  1996/11/02  01:25:10  timj
+c Change Naem: to SCUPHOT from REDS_SCUPHOT in header.
+c
 c Revision 1.4  1996/11/01  21:46:04  timj
 c Change name to SCUPHOT
 c
