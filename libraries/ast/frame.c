@@ -149,7 +149,7 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     10-OCT-2002 (DSB):
 *        Added Top and Bottom.
 *     15-NOV-2002 (DSB):
-*        Moved the System and Epoch attributes from the SkyFrame class to 
+*        Moved the System and Epoch attributes from the SkyFrame class to
 *        this class. Added virtual method astValidateSystem, astSystemString,
 *        astSystemCode. Added attribute AlignSystem.
 *     17-DEC-2002 (DSB):
@@ -157,6 +157,10 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitFrameVtab
 *        method.
+*     15-SEP-2003 (DSB):
+*        Allow Frame attribute names to include an axis specifier within
+*        GetAttrib, SetAttrib, TestAttrib and ClearAttrib (eg "Domain(1)"
+*        is now accepted as equivalent to "Domain").
 *class--
 */
 
@@ -861,7 +865,7 @@ static void AddUnderscores( char *string ) {
    }
 }
 
-static double Angle( AstFrame *this, const double a[], 
+static double Angle( AstFrame *this, const double a[],
                      const double b[], const double c[] ) {
 /*
 *++
@@ -885,11 +889,11 @@ f     RESULT = AST_ANGLE( THIS, A, B, C, STATUS )
 *     Frame method.
 
 *  Description:
-c     This function 
-f     This routine 
-*     finds the angle at point B between the line joining points A and B, 
-*     and the line joining points C and B. These lines will in fact be 
-*     geodesic curves appropriate to the Frame in use. For instance, in 
+c     This function
+f     This routine
+*     finds the angle at point B between the line joining points A and B,
+*     and the line joining points C and B. These lines will in fact be
+*     geodesic curves appropriate to the Frame in use. For instance, in
 *     SkyFrame, they will be great circles.
 
 *  Parameters:
@@ -919,8 +923,8 @@ c     astAngle
 f     AST_ANGLE = DOUBLE PRECISION
 *        The angle in radians, from the line AB to the line CB. If the
 *        Frame is 2-dimensional, it will be in the range $\pm \pi$,
-*        and positive rotation is in the same sense as rotation from 
-*        the positive direction of axis 2 to the positive direction of 
+*        and positive rotation is in the same sense as rotation from
+*        the positive direction of axis 2 to the positive direction of
 *        axis 1. If the Frame has more than 2 axes, a positive value will
 *        always be returned in the range zero to $\pi$.
 
@@ -971,7 +975,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
       slc = 0.0;
       for( axis = 0; axis < naxes; axis++ ) {
          if( a[ axis ] == AST__BAD || b[ axis ] == AST__BAD ||
-             c[ axis ] == AST__BAD ) { 
+             c[ axis ] == AST__BAD ) {
             ok = 0;
             break;
          } else {
@@ -1051,11 +1055,11 @@ f     RESULT = AST_AXANGLE( THIS, A, B, AXIS, STATUS )
 *     Frame method.
 
 *  Description:
-c     This function 
-f     This routine 
+c     This function
+f     This routine
 *     finds the angle, as seen from point A, between the positive
-*     direction of a specified axis, and the geodesic curve joining point 
-*     A to point B. 
+*     direction of a specified axis, and the geodesic curve joining point
+*     A to point B.
 
 *  Parameters:
 c     this
@@ -1082,12 +1086,12 @@ f        The global status.
 c     astAxAngle
 f     AST_AXANGLE = DOUBLE PRECISION
 *        The angle in radians, from the positive direction of the
-*        specified axis, to the line AB. If the Frame is 2-dimensional, 
-*        it will be in the range $\pm \pi$, and positive rotation is in 
-*        the same sense as rotation from the positive direction of axis 2 
-*        to the positive direction of axis 1. If the Frame has more than 2 
-*        axes, a positive value will always be returned in the range zero 
-*        to $\pi$. 
+*        specified axis, to the line AB. If the Frame is 2-dimensional,
+*        it will be in the range $\pm \pi$, and positive rotation is in
+*        the same sense as rotation from the positive direction of axis 2
+*        to the positive direction of axis 1. If the Frame has more than 2
+*        axes, a positive value will always be returned in the range zero
+*        to $\pi$.
 
 *  Notes:
 c     - The geodesic curve used by this function is the path of
@@ -1126,7 +1130,7 @@ f     AST_DISTANCE function.
    aa = (double *) astMalloc( sizeof(double)*naxes );
 
 /* Create a position which is offset slightly from point A in the
-   positive direction of the specified axis. Also get the largest absolute 
+   positive direction of the specified axis. Also get the largest absolute
    value of any component of the vector AB. */
    if( astOK ) {
       ok = 1;
@@ -1186,19 +1190,19 @@ f     AST_AXDISTANCE
 
 *  Synopsis:
 c     #include "frame.h"
-c     double astAxDistance( AstFrame *this, int axis, double v1, double v2 ) 
+c     double astAxDistance( AstFrame *this, int axis, double v1, double v2 )
 f     RESULT = AST_AXDISTANCE( THIS, AXIS, V1, V2, STATUS )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-c     This function returns a signed value representing the axis increment 
-f     This routine returns a signed value representing the axis increment 
+c     This function returns a signed value representing the axis increment
+f     This routine returns a signed value representing the axis increment
 *     from axis value v1 to axis value v2.
 *
 *     For a simple Frame, this is a trivial operation returning the
-*     difference between the two axis values. But for other derived classes 
+*     difference between the two axis values. But for other derived classes
 *     of Frame (such as a SkyFrame) this is not the case.
 
 *  Parameters:
@@ -1269,7 +1273,7 @@ f     AST_AXOFFSET
 
 *  Synopsis:
 c     #include "frame.h"
-c     double astAxOffset( AstFrame *this, int axis, double v1, double dist ) 
+c     double astAxOffset( AstFrame *this, int axis, double v1, double dist )
 f     RESULT = AST_AXOFFSET( THIS, AXIS, V1, DIST, STATUS )
 
 *  Class Membership:
@@ -1281,7 +1285,7 @@ f     This routine returns an axis value formed by adding a signed axis
 *     increment onto a supplied axis value.
 *
 *     For a simple Frame, this is a trivial operation returning the
-*     sum of the two supplied values. But for other derived classes 
+*     sum of the two supplied values. But for other derived classes
 *     of Frame (such as a SkyFrame) this is not the case.
 
 *  Parameters:
@@ -1540,12 +1544,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_attrib;            /* Pointer to axis attribute name */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Axis index within primary frame */
+   int used;                     /* Could the setting string be used? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1699,10 +1707,53 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
       (void) astValidateAxis( this, axis - 1, "astClear" );
       axis_attrib = astString( attrib, axis_nc );
 
-/* Obtain a pointer to the Axis object and use its astClearAttrib method
-   to clear the attribute value. */
+/* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+
+/* Assume that we will be able to use the attribute name. */
+      used = 1;
+
+/* Temporarily switch off error reporting so that if the following attempt 
+   to access the axis attribute fails, we can try to interpret the
+   attribute name as an attribute of the primary Frame containing the
+   specified axis. Any errors reported in this context will simply be
+   ignored, in particularly they are not deferred for later delivery. */
+      oldrep = astReporting( 0 );
+
+/* Use the Axis astClearAttrib method to clear the attribute value. */
       astClearAttrib( ax, axis_attrib );
+
+/* If the above call failed with a status of AST__BADAT, indicating that
+   the attribute name was not recognised, clear the status so that we can 
+   try to interpret the attribute name as an attribute of the primary Frame 
+   containing the specified axis. */
+      if( astStatus == AST__BADAT ) {
+         astClearStatus;
+
+/* Find the primary Frame containing the specified axis. */
+         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Attempt to clear the attribute as an attribute of the primary Frame. */
+         astClearAttrib( pfrm, axis_attrib );
+
+/* If this failed, clear the status and indicate that we have not managed to 
+   use the attribute name. */
+         if( !astOK ) {
+            astClearStatus;
+            used = 0;
+         }
+
+/* Annul the primary Frame pointer. */
+         pfrm = astAnnul( pfrm );
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* If we could not use the attribute name, attempt to clear the axis 
+   attribute again, this time retaining the error report. This is done 
+   to ensure the user gets an appropriate error message. */
+      if( !used ) astClearAttrib( ax, axis_attrib );
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
@@ -1743,7 +1794,7 @@ static void ClearUnit( AstFrame *this, int axis ) {
 *     this
 *        Pointer to the Frame.
 *     axis
-*        The number of the axis (zero-based) for which the Unit value is to 
+*        The number of the axis (zero-based) for which the Unit value is to
 *        be cleared.
 *     unit
 *        The new value to be set.
@@ -1756,7 +1807,7 @@ static void ClearUnit( AstFrame *this, int axis ) {
    AstAxis *ax;                  /* Pointer to Axis object */
    const char *units;            /* Pointer to units string */
    char *old_units;              /* Pointer to copy of original units */
-   
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -2178,7 +2229,7 @@ c        conversion was possible, "cvt" will point at a new FrameSet
 f        conversion was possible, CVT will point at a new FrameSet
 *        describing the conversion.
 *
-*        The Base attributes of the two FrameSets 
+*        The Base attributes of the two FrameSets
 c        will be set by astConvert to indicate which of their Frames was
 f        will be set by AST_CONVERT to indicate which of their Frames was
 *        used for the intermediate coordinate system. This means that
@@ -2187,7 +2238,7 @@ f        will be set by AST_CONVERT to indicate which of their Frames was
 
 *  Notes:
 *     -  The Mapping represented by the returned FrameSet results in
-*     alignment taking place in the coordinate system specified by the 
+*     alignment taking place in the coordinate system specified by the
 c     AlignSystem attribute of the "to" Frame. See the description of the
 f     AlignSystem attribute of the TO Frame. See the description of the
 *     AlignSystem attribute for further details.
@@ -2953,7 +3004,7 @@ f        (e.g. with AST_PERMAXES).
 
 *  Notes:
 *     -  The Mapping represented by the returned FrameSet results in
-*     alignment taking place in the coordinate system specified by the 
+*     alignment taking place in the coordinate system specified by the
 c     AlignSystem attribute of the "template" Frame. See the description
 f     AlignSystem attribute of the TEMPLATE Frame. See the description
 *     of the AlignSystem attribute for further details.
@@ -3075,7 +3126,7 @@ f     DOMAINLIST string provides an alternative way of restricting the
                }
                domain_copy[ j++ ] = ',';
                domain_copy[ j ] = '\0';
-            
+
 /* Test if the domain appears in the domains list (with added
    commas). If not, test if a blank domain (which permits the result
    Frame to have any Domain) appears instead. */
@@ -3136,7 +3187,7 @@ const char *astFmtDecimalYr_( double year, int digits ) {
 
 *  Description:
 *     This function formats an epoch expressed in years as a decimal string
-*     and returns a pointer to the result. It is intended for formatting 
+*     and returns a pointer to the result. It is intended for formatting
 *     Frame Epoch values, etc, for display.
 
 *  Parameters:
@@ -3383,9 +3434,9 @@ f     RESULT = AST_GETACTIVEUNIT( THIS, STATUS )
 *     Frame method.
 
 *  Description:
-c     This function 
-f     This routine 
-*     returns the current value of the ActiveUnit flag for a Frame. See 
+c     This function
+f     This routine
+*     returns the current value of the ActiveUnit flag for a Frame. See
 c     the description of the astSetActiveUnit function
 f     the description of the AST_SETACTIVEUNIT routine
 *     for a description of the ActiveUnit flag.
@@ -3420,7 +3471,7 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get the value from the Frame. If it has not yet been assigned a value 
+/* Get the value from the Frame. If it has not yet been assigned a value
    return the value zero. */
    result = this->active_unit;
    if( result == -INT_MAX ) result = 0;
@@ -3483,6 +3534,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system;         /* System code */
    char *axis_attrib;            /* Pointer to axis attribute name */
@@ -3499,8 +3551,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int min_axes;                 /* MinAxes attribute value */
    int naxes;                    /* Naxes attribute value */
    int nc;                       /* No. characters read by astSscanf */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Axis index within primary frame */
    int permute;                  /* Permute attribute value */
    int preserve_axes;            /* PreserveAxes attribute value */
+   int used;                     /* Could the setting string be used? */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -3738,10 +3793,53 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       (void) astValidateAxis( this, axis - 1, "astGet" );
       axis_attrib = astString( attrib, axis_nc );
 
-/* Obtain a pointer to the Axis object and use its astGetAttrib method
-   to obtain the result. */
+/* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+
+/* Assume that we will be able to use the attribute name. */
+      used = 1;
+
+/* Temporarily switch off error reporting so that if the following attempt 
+   to access the axis attribute fails, we can try to interpret the
+   attribute name as an attribute of the primary Frame containing the
+   specified axis. Any errors reported in this context will simply be
+   ignored, in particularly they are not deferred for later delivery. */
+      oldrep = astReporting( 0 );
+
+/* Use the Axis astGetAttrib method to obtain the result. */
       result = astGetAttrib( ax, axis_attrib );
+
+/* If the above call failed with a status of AST__BADAT, indicating that
+   the attribute name was not recognised, clear the status so that we can 
+   try to interpret the attribute name as an attribute of the primary Frame 
+   containing the specified axis. */
+      if( astStatus == AST__BADAT ) {
+         astClearStatus;
+
+/* Find the primary Frame containing the specified axis. */
+         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Attempt to use the Axis astGetAttrib method to obtain the result. */
+         result = astGetAttrib( pfrm, axis_attrib );
+
+/* If this failed, clear the status and indicate that we have not managed to 
+   use the attribute name. */
+         if( !astOK ) {
+            astClearStatus;
+            used = 0;
+         }
+
+/* Annul the primary Frame pointer. */
+         pfrm = astAnnul( pfrm );
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* If we could not use the attribute name, attempt to get the axis 
+   attribute again, this time retaining the error report. This is done 
+   to ensure the user gets an appropriate error message. */
+      if( !used ) result = astGetAttrib( ax, axis_attrib );
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
@@ -4106,7 +4204,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
 *        been initialised.
 *     name
 *        Pointer to a constant null-terminated character string which contains
-*        the name of the class to which the virtual function table belongs (it 
+*        the name of the class to which the virtual function table belongs (it
 *        is this pointer value that will subsequently be returned by the Object
 *        astClass function).
 *-
@@ -4468,7 +4566,7 @@ static int Match( AstFrame *template, AstFrame *target,
 
 /* Obtain a pointer to the target domain. */
             target_domain = astGetDomain( target );
-            
+
 /* Compare the domain strings for equality. Then free the memory
    allocated above. */
             match = astOK && !strcmp( template_domain, target_domain );
@@ -4497,7 +4595,7 @@ static int Match( AstFrame *template, AstFrame *target,
 /* Loop through each of the result axes. */
          for ( result_axis = 0; result_axis < result_naxes; result_axis++ ) {
 
-/* Set up the axis associations. By default, associate the first result axis 
+/* Set up the axis associations. By default, associate the first result axis
    with the first template/target axis. */
             (*template_axes)[ result_axis ] = result_axis;
             (*target_axes)[ result_axis ] = result_axis;
@@ -4557,23 +4655,23 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
 
 *  Synopsis:
 *     #include "frame.h"
-*     void NewUnit( AstAxis *ax, const char *old_units, const char *new_units, 
+*     void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
 *                   const char *method, const char *class )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-*     This function modifies the Label and Symbol attributes of an Axis 
+*     This function modifies the Label and Symbol attributes of an Axis
 *     to reflect a new Unit value. This function should only be called if
 *     the ActiveUnit flag of the parent Frame is non-zero (this is not
 *     checked within this function).
 *
-*     If the axis has a set label, then we may be able to modify it to 
+*     If the axis has a set label, then we may be able to modify it to
 *     correctly describe the axis in the supplied new units. For instance,
 *     if the original units were "Hz", the original label was "frequency",
 *     and the new units are "log(Hz)", then the label is modified to become
-*     "log( frequency )". 
+*     "log( frequency )".
 *
 *     The Axis Format attribute is cleared if the supplied units are
 *     different to the old units (because any set format is probably not
@@ -4611,11 +4709,11 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
 /* Check that the axis label is set. We relay on sub-classes to return
    appropriate default labels if the label is not set. */
    if( astTestAxisLabel( ax ) ) {
-      
-/* See if it is possible to map the old units into the new units. 
-   If it is, then a Mapping is returned together with an appropriately 
+
+/* See if it is possible to map the old units into the new units.
+   If it is, then a Mapping is returned together with an appropriately
    modified label. */
-      map = astUnitMapper( old_units, new_units, astGetAxisLabel( ax ), 
+      map = astUnitMapper( old_units, new_units, astGetAxisLabel( ax ),
                            &new_lab );
 
 /* If succesfull, annul the Mapping (which we do not need), and store the
@@ -4632,7 +4730,7 @@ static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
 
 /* Do the same for the axis symbol. */
    if( astTestAxisSymbol( ax ) ) {
-      map = astUnitMapper( old_units, new_units, astGetAxisSymbol( ax ), 
+      map = astUnitMapper( old_units, new_units, astGetAxisSymbol( ax ),
                            &new_sym );
       if( map ) {
          map = astAnnul( map );
@@ -4739,7 +4837,7 @@ f     (using AST_FORMAT).
    }
 }
 
-static double Offset2( AstFrame *this, const double point1[2], double angle, 
+static double Offset2( AstFrame *this, const double point1[2], double angle,
                      double offset, double point2[2] ){
 /*
 *++
@@ -4755,7 +4853,7 @@ f     AST_OFFSET2
 
 *  Synopsis:
 c     #include "frame.h"
-c     double Offset2( AstFrame *this, const double point1[2], double angle, 
+c     double Offset2( AstFrame *this, const double point1[2], double angle,
 c                   double offset, double point2[2] );
 f     RESULT = AST_OFFSET2( THIS, POINT1, ANGLE, OFFSET, POINT2, STATUS )
 
@@ -4787,15 +4885,15 @@ c     angle
 f     ANGLE = DOUBLE PRECISION (Given)
 *        The angle (in radians) from the positive direction of the second
 *        axis, to the direction of the required position, as seen from
-*        the starting position. Positive rotation is in the sense of 
-*        rotation from the positive direction of axis 2 to the positive 
+*        the starting position. Positive rotation is in the sense of
+*        rotation from the positive direction of axis 2 to the positive
 *        direction of axis 1.
 c     offset
 f     OFFSET = DOUBLE PRECISION
 *        The required offset from the first point along the geodesic
 *        curve. If this is positive, it will be in the direction of the
 *        given angle. If it is negative, it will be in the opposite
-*        direction. 
+*        direction.
 c     point2
 f     POINT2( * ) = DOUBLE PRECISION (Returned)
 c        An array of double, with one element for each Frame axis
@@ -4807,11 +4905,11 @@ f        The global status.
 *  Returned Value:
 c     astOffset2
 f     AST_OFFSET2 = DOUBLE PRECISION
-*        The direction of the geodesic curve at the end point. That is, the 
+*        The direction of the geodesic curve at the end point. That is, the
 *        angle (in radians) between the positive direction of the second
 *        axis and the continuation of the geodesic curve at the requested
 *        end point. Positive rotation is in the sense of rotation from
-*        the positive direction of axis 2 to the positive direction of axis 
+*        the positive direction of axis 2 to the positive direction of axis
 *        1.
 
 *  Notes:
@@ -4849,12 +4947,12 @@ f     AST_DISTANCE function.
    }
 
 /* Check the supplied values. */
-   if ( astOK && point1[ 0 ] != AST__BAD && point1[ 1 ] != AST__BAD && 
+   if ( astOK && point1[ 0 ] != AST__BAD && point1[ 1 ] != AST__BAD &&
         angle != AST__BAD && offset != AST__BAD ) {
 
 /* Store the results. */
-      point2[ 0 ] = point1[ 0 ] + sin( angle )*offset;      
-      point2[ 1 ] = point1[ 1 ] + cos( angle )*offset;      
+      point2[ 0 ] = point1[ 0 ] + sin( angle )*offset;
+      point2[ 1 ] = point1[ 1 ] + cos( angle )*offset;
 
 /* The position angle of the curve does not vary in cartesian coordinates */
       result = angle;
@@ -5852,7 +5950,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
    this = (AstFrame *) this_mapping;
 
 /* Obtain the numbers of points and coordinates associated with each
-   PointSet. */ 
+   PointSet. */
    npoint_in = astGetNpoint( in_points );
    npoint_out = astGetNpoint( out_points );
    ncoord_in = astGetNcoord( in_points );
@@ -5891,7 +5989,7 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
    }
 }
 
-static void Resolve( AstFrame *this, const double point1[], 
+static void Resolve( AstFrame *this, const double point1[],
                        const double point2[], const double point3[],
                        double point4[], double *d1, double *d2 ){
 /*
@@ -5908,10 +6006,10 @@ f     AST_RESOLVE
 
 *  Synopsis:
 c     #include "frame.h"
-c     void astResolve( AstFrame *this, const double point1[], 
+c     void astResolve( AstFrame *this, const double point1[],
 c                      const double point2[], const double point3[],
 c                      double point4[], double *d1, double *d2 );
-f     CALL AST_RESOLVE( THIS, POINT1, POINT2, POINT3, POINT4, D1, D2, 
+f     CALL AST_RESOLVE( THIS, POINT1, POINT2, POINT3, POINT4, D1, D2,
 f                       STATUS )
 
 *  Class Membership:
@@ -5921,9 +6019,9 @@ f                       STATUS )
 c     This function resolves a vector into two perpendicular components.
 f     This routine resolves a vector into two perpendicular components.
 *     The vector from point 1 to point 2 is used as the basis vector.
-*     The vector from point 1 to point 3 is resolved into components 
-*     parallel and perpendicular to this basis vector. The lengths of the 
-*     two components are returned, together with the position of closest 
+*     The vector from point 1 to point 3 is resolved into components
+*     parallel and perpendicular to this basis vector. The lengths of the
+*     two components are returned, together with the position of closest
 *     aproach of the basis vector to point 3.
 
 *  Parameters:
@@ -5957,8 +6055,8 @@ c     d1
 f     D1 = DOUBLE PRECISION (Returned)
 c        The address of a location at which to return the distance from
 f        The distance from
-*        point 1 to point 4 (that is, the length of the component parallel 
-*        to the basis vector). Positive values are in the same sense as 
+*        point 1 to point 4 (that is, the length of the component parallel
+*        to the basis vector). Positive values are in the same sense as
 *        movement from point 1 to point 2.
 c     d2
 f     D2 = DOUBLE PRECISION (Returned)
@@ -6009,7 +6107,7 @@ f     AST_DISTANCE function.
 /* Check the supplied values. */
    if ( ok ) {
 
-/* Find the dot product of the basis vector with the vector joining point 1 
+/* Find the dot product of the basis vector with the vector joining point 1
    and point 3. At the same time form the squared length of the basis
    vector. */
       dp = 0.0;
@@ -6031,9 +6129,9 @@ f     AST_DISTANCE function.
 
 /* Offset away from point 1 towards point 2 by a distance of d1. */
          for( axis = 0; axis < naxes; axis++ ){
-            point4[ axis ] = point1[ axis ] + 
+            point4[ axis ] = point1[ axis ] +
                              (*d1/bv)*( point2[ axis ] - point1[ axis ] );
-         }   
+         }
 
 /* Finally, form the required length d2. */
          *d2 = 0.0;
@@ -6072,23 +6170,23 @@ f     CALL AST_SETACTIVEUNIT( THIS, VALUE, STATUS )
 *     Frame method.
 
 *  Description:
-c     This function 
-f     This routine 
-*     sets the current value of the ActiveUnit flag for a Frame, which 
+c     This function
+f     This routine
+*     sets the current value of the ActiveUnit flag for a Frame, which
 *     controls how the Frame
 c     behaves when it is used (by astFindFrame) as a template to match
 c     another (target) Frame, or is used as the "to" Frame by astConvert.
 f     behaves when it is used (by AST_FINDFRAME) as a template to match
 f     another (target) Frame, or is used as the TO Frame by AST_CONVERT.
-*     It determines if the Mapping between the template and target Frames 
-*     should take differences in axis units into account. The default value 
-*     for simple Frames is zero, which preserves the behaviour of versions 
+*     It determines if the Mapping between the template and target Frames
+*     should take differences in axis units into account. The default value
+*     for simple Frames is zero, which preserves the behaviour of versions
 *     of AST prior to version 2.0.
 *
 c     If the ActiveUnit flag of the template Frame is zero, then the
 f     If the ActiveUnit flag of the template Frame is .FALSE., then the
 *     Mapping will ignore any difference in the Unit attributes of
-*     corresponding template and target axes. In this mode, the Unit 
+*     corresponding template and target axes. In this mode, the Unit
 *     attributes are purely descriptive commentary for the benefit of
 *     human readers and do not influence the Mappings between Frames.
 *     This is the behaviour which all Frames had in older version of AST,
@@ -6096,37 +6194,37 @@ f     If the ActiveUnit flag of the template Frame is .FALSE., then the
 *
 c     If the ActiveUnit flag of the template Frame is non-zero, then the
 f     If the ActiveUnit flag of the template Frame is .TRUE., then the
-*     Mapping from template to target will take account of any difference 
+*     Mapping from template to target will take account of any difference
 *     in the axis Unit attributes, where-ever possible. For instance, if
-*     corresponding target and template axes have Unit strings of "km" and 
+*     corresponding target and template axes have Unit strings of "km" and
 *     "m", then the FrameSet class will use a ZoomMap to connect them
 *     which introduces a scaling of 1000. If no Mapping can be found
 *     between the corresponding units string, then an error is reported.
-*     In this mode, it is assumed that values of the Unit attribute conform 
+*     In this mode, it is assumed that values of the Unit attribute conform
 *     to the syntax for units strings described in the FITS WCS Paper I
-*     "Representations of world coordinates in FITS" (Greisen & Calabretta). 
+*     "Representations of world coordinates in FITS" (Greisen & Calabretta).
 *     Particularly, any of the named unit symbols, functions, operators or
-*     standard multiplier prefixes listed within that paper can be used within 
+*     standard multiplier prefixes listed within that paper can be used within
 *     a units string. A units string may contain symbols for unit which are
-*     not listed in the FITS paper, but transformation to any other units 
-*     will then not be possible (except to units which depend only on the 
+*     not listed in the FITS paper, but transformation to any other units
+*     will then not be possible (except to units which depend only on the
 *     same unknown units - thus "flops" can be transformed to "Mflops"
 *     even though "flops" is not a standard FITS unit symbol).
 *
-c     If the ActiveUnit flag is non-zero, setting a new Unit value for an 
-f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an 
-*     axis may also change its Label and Symbol attributes. For instance, if 
+c     If the ActiveUnit flag is non-zero, setting a new Unit value for an
+f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an
+*     axis may also change its Label and Symbol attributes. For instance, if
 *     an axis has Unit "Hz" and Label "frequency", then changing its Unit to
 *     "log(Hz)" will change its Label to "log( frequency )". In addition,
-*     the Axis Format attribute will be cleared when-ever a new value 
+*     the Axis Format attribute will be cleared when-ever a new value
 *     is assigned to the Unit attribute.
 *
 c     Note, if a non-zero value is set for the ActiveUnit flag, then changing a
-*     Note, if a .TRUE. value is set for the ActiveUnit flag, then changing a 
-*     Unit value for the current Frame within a FrameSet will result in the 
-*     Frame being re-mapped (that is, the Mappings which define the 
-*     relationships between Frames within the FrameSet will be modified to 
-*     take into account the change in Units). 
+*     Note, if a .TRUE. value is set for the ActiveUnit flag, then changing a
+*     Unit value for the current Frame within a FrameSet will result in the
+*     Frame being re-mapped (that is, the Mappings which define the
+*     relationships between Frames within the FrameSet will be modified to
+*     take into account the change in Units).
 
 *  Parameters:
 c     this
@@ -6147,7 +6245,7 @@ f        supplied using this routine is ignored).
 
 *  Notes:
 *     - The ActiveUnit flag resembles a Frame attribute, except that it
-*     cannot be tested or cleared, and it cannot be accessed using the 
+*     cannot be tested or cleared, and it cannot be accessed using the
 c     generic astGet<X> and astSet<X> functions.
 f     generic AST_GET<X> and AST_SET<X> routines.
 c     - The astGetActiveUnit function can be used to retrieve the current
@@ -6212,6 +6310,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Vaiables: */
    AstAxis *ax;                  /* Pointer to Axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system_code;    /* System code */
    char *axis_setting;           /* Pointer to axis attribute setting string */
@@ -6231,13 +6330,16 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int max_axes;                 /* Maximum number of axes matched */
    int min_axes;                 /* Minimum number of axes matched */
    int nc;                       /* Number of characters read by astSscanf */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Axis index within primary frame */
    int permute;                  /* Permute axes in order to match? */
    int preserve_axes;            /* Preserve matched target axes? */
    int symbol;                   /* Offset of axis Symbol string */
    int system;                   /* Offset of System string */
    int title;                    /* Offset of Title string */
    int unit;                     /* Offset of axis Unit string */
-
+   int used;                     /* Could the setting string be used? */
+  
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -6470,10 +6572,54 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    assigned. */
          (void) strcpy( axis_setting + axis_nc, setting + axis_value );
 
-/* Obtain a pointer to the Axis object and use its astSetAttrib method
-   to set the value. */
+/* Obtain a pointer to the Axis object. */
          ax = astGetAxis( this, axis - 1 );
+
+/* Assume that we will be able to use the setting. */
+         used = 1;
+
+/* Temporarily switch off error reporting so that if the following attempt 
+   to access the axis attribute fails, we can try to interpret the
+   attribute name as an attribute of the primary Frame containing the
+   specified axis. Any errors reported in this context will simply be
+   ignored, in particularly they are not deferred for later delivery. */
+         oldrep = astReporting( 0 );
+
+/* Use the Axis astSetAttrib method
+   to set the value. */
          astSetAttrib( ax, axis_setting );
+
+/* If the above call failed with a status of AST__BADAT, indicating that
+   the attribute name was not recognised, clear the status so that we can 
+   try to interpret the attribute name as an attribute of the primary Frame 
+   containing the specified axis. */
+         if( astStatus == AST__BADAT ) {
+            astClearStatus;
+
+/* Find the primary Frame containing the specified axis. */
+            astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Attempt to set the attribute within the primary Frame. */
+            astSetAttrib( pfrm, axis_setting );
+
+/* If this failed, clear the status and indicate that we have not managed to 
+   use the attribute setting. */
+            if( !astOK ) {
+               astClearStatus;
+               used = 0;
+            }
+
+/* Free the setting string, and annul the primary Frame pointer. */
+            pfrm = astAnnul( pfrm );
+         }
+
+/* Re-instate the original error reporting state. */
+         astReporting( oldrep );
+
+/* If we could not use the setting, attempt to set the axis attribute again,
+   this time retaining the error report. This is done to ensure the user
+   gets an appropriate error message. */
+         if( !used ) astSetAttrib( ax, axis_setting );
 
 /* Annul the Axis pointer and free the memory holding the attribute
    setting. */
@@ -6569,7 +6715,7 @@ static void SetUnit( AstFrame *this, int axis, const char *unit ) {
 *     this
 *        Pointer to the Frame.
 *     axis
-*        The number of the axis (zero-based) for which the Unit value is to 
+*        The number of the axis (zero-based) for which the Unit value is to
 *        be set.
 *     unit
 *        The new value to be set.
@@ -6598,7 +6744,7 @@ static void SetUnit( AstFrame *this, int axis, const char *unit ) {
    the Unit attribute is not set. */
       oldunit = astGetUnit( this, axis );
 
-/* Assign the new Unit value. This modifies labels and/or Symbols if 
+/* Assign the new Unit value. This modifies labels and/or Symbols if
    necessary. */
       NewUnit( ax, oldunit, unit, "astSetUnit", astGetClass( this ) );
    }
@@ -6849,25 +6995,25 @@ static int SubFrame( AstFrame *target, AstFrame *template,
 /* Note that coordinate conversion is possible. */
          match = 1;
 
-/* If the ActiveUnit flag in the template Frame is non-zero, we now 
-   modify the Mapping to take account of any differences in the Units 
+/* If the ActiveUnit flag in the template Frame is non-zero, we now
+   modify the Mapping to take account of any differences in the Units
    attributes of the target and results Frames. */
          if( template && astGetActiveUnit( template ) ) {
 
-/* Loop round the axes of the results Frame, accumulating a parallel CmpMap  
-   ("umap") in which each Mapping is the 1-D Mapping which transforms the 
-   Units of the corresponding target axis into the Units of the results 
+/* Loop round the axes of the results Frame, accumulating a parallel CmpMap
+   ("umap") in which each Mapping is the 1-D Mapping which transforms the
+   Units of the corresponding target axis into the Units of the results
    axis. */
             umap = NULL;
             uunit = 1;
-            for( result_axis = 0; result_axis < result_naxes; result_axis++ ) { 
+            for( result_axis = 0; result_axis < result_naxes; result_axis++ ) {
 
 /* Find the index of the corresponding target axis. */
                if( unit ) {
                   target_axis = result_axis;
                } else {
                   target_axis = outperm[ result_axis ];
-               }               
+               }
 
 /* Get the Unit string for both axes, and attempt to find a Mapping which
    transforms values in the target units into the corresponding value in the
@@ -6881,8 +7027,8 @@ static int SubFrame( AstFrame *target, AstFrame *template,
                   aumap = NULL;
                }
 
-/* If no Mapping could be found, annull the Mapping and leave the loop. 
-   Otherwise, see if the Mapping is a UnitMap. If not, set a flag to indicate 
+/* If no Mapping could be found, annull the Mapping and leave the loop.
+   Otherwise, see if the Mapping is a UnitMap. If not, set a flag to indicate
    that we have at least one non-unit map. */
                if( !aumap ) {
                   if( umap ) umap = astAnnul( umap );
@@ -6950,14 +7096,14 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstSystemType SystemCode( AstFrame *this, const char *system ) 
+*     AstSystemType SystemCode( AstFrame *this, const char *system )
 
 *  Class Membership:
 *     Frame method.
 
 *  Description:
-*     This function converts a string used for the external description of 
-*     a coordinate system into a Frame coordinate system type code (System 
+*     This function converts a string used for the external description of
+*     a coordinate system into a Frame coordinate system type code (System
 *     attribute value). It is the inverse of the astSystemString function.
 
 *  Parameters:
@@ -6971,7 +7117,7 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
 *     The System type code.
 
 *  Notes:
-*     - A value of AST__BADSYSTEM is returned if the coordinate system 
+*     - A value of AST__BADSYSTEM is returned if the coordinate system
 *     description was not recognised. This does not produce an error.
 *     - A value of AST__BADSYSTEM is also returned if this function
 *     is invoked with the global error status set or if it should fail
@@ -7013,7 +7159,7 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
 *  Synopsis:
 *     #include "frame.h"
-*     const char *astSystemString( AstFrame *this, AstSystemType system ) 
+*     const char *astSystemString( AstFrame *this, AstSystemType system )
 
 *  Class Membership:
 *     Frame method.
@@ -7086,8 +7232,8 @@ static int TestActiveUnit( AstFrame *this ){
 *     Frame method.
 
 *  Description:
-*     This function tests the current value of the ActiveUnit flag for a 
-*     Frame. See the description of the astSetActiveUnit function for a 
+*     This function tests the current value of the ActiveUnit flag for a
+*     Frame. See the description of the astSetActiveUnit function for a
 *     description of the ActiveUnit flag.
 
 *  Parameters:
@@ -7160,13 +7306,17 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis */
+   AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_attrib;            /* Pointer to axis attribute name */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
+   int oldrep;                   /* Original error reporting state */
+   int paxis;                    /* Axis index within primary frame */
    int result;                   /* Result value to return */
+   int used;                     /* Could the setting string be used? */
 
 /* Initialise. */
    result = 0;
@@ -7321,10 +7471,53 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
       (void) astValidateAxis( this, axis - 1, "astTest" );
       axis_attrib = astString( attrib, axis_nc );
 
-/* Obtain a pointer to the Axis object and use its astTestAttrib
-   method to test the attribute value. */
+/* Obtain a pointer to the Axis object. */
       ax = astGetAxis( this, axis - 1 );
+
+/* Assume that we will be able to use the attribute name. */
+      used = 1;
+
+/* Temporarily switch off error reporting so that if the following attempt 
+   to access the axis attribute fails, we can try to interpret the
+   attribute name as an attribute of the primary Frame containing the
+   specified axis. Any errors reported in this context will simply be
+   ignored, in particularly they are not deferred for later delivery. */
+      oldrep = astReporting( 0 );
+
+/* Use the Axis astTestAttrib method to test the attribute value. */
       result = astTestAttrib( ax, axis_attrib );
+
+/* If the above call failed with a status of AST__BADAT, indicating that
+   the attribute name was not recognised, clear the status so that we can 
+   try to interpret the attribute name as an attribute of the primary Frame 
+   containing the specified axis. */
+      if( astStatus == AST__BADAT ) {
+         astClearStatus;
+
+/* Find the primary Frame containing the specified axis. */
+         astPrimaryFrame( this, axis - 1, &pfrm, &paxis );
+
+/* Attempt to test the attribute as an attribute of the primary Frame. */
+         result = astTestAttrib( pfrm, axis_attrib );
+
+/* If this failed, clear the status and indicate that we have not managed to 
+   use the attribute name. */
+         if( !astOK ) {
+            astClearStatus;
+            used = 0;
+         }
+
+/* Annul the primary Frame pointer. */
+         pfrm = astAnnul( pfrm );
+      }
+
+/* Re-instate the original error reporting state. */
+      astReporting( oldrep );
+
+/* If we could not use the attribute name, attempt to test the axis 
+   attribute again, this time retaining the error report. This is done 
+   to ensure the user gets an appropriate error message. */
+      if( !used ) result = astTestAttrib( ax, axis_attrib );
 
 /* Annul the Axis pointer and free the memory holding the attribute
    name. */
@@ -7411,7 +7604,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* Create a unit Mapping with one coordinate for each Frame axis. */
    unitmap = astUnitMap( astGetNaxes( this ), "" );
 
-/* Use the Mapping to transform (i.e. copy) the coordinate values. */   
+/* Use the Mapping to transform (i.e. copy) the coordinate values. */
    result = astTransform( unitmap, in, forward, out );
 
 /* Annul the Mapping. */
@@ -7713,7 +7906,7 @@ static void ValidateAxisSelection( AstFrame *this, int naxes, const int *axes,
 
 /* Check the global error status. */
    if ( !astOK ) return;
-   
+
 /* Check to see if no axes have been selected. If so, there is nothing to
    do. */
    if ( naxes ) {
@@ -7780,7 +7973,7 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 
 *  Synopsis:
 *     #include "frame.h"
-*     int astValidateSystem( AstFrame *this, AstSystemType system, 
+*     int astValidateSystem( AstFrame *this, AstSystemType system,
 *                            const char *method )
 
 *  Class Membership:
@@ -7795,7 +7988,7 @@ static int ValidateSystem( AstFrame *this, AstSystemType system, const char *met
 *     this
 *        Pointer to the Frame.
 *     system
-*        The system value to be checked. 
+*        The system value to be checked.
 *     method
 *        Pointer to a constant null-terminated character string
 *        containing the name of the method that invoked this function
@@ -7912,10 +8105,10 @@ MAKE_TEST(Direction)
 *     Floating point.
 
 *  Description:
-*     This attribute is used to qualify the coordinate systems described by 
-*     a Frame, by giving the moment in time when the coordinates are known 
-*     to be correct. Often, this will be the date of observation, and is 
-*     important in cases where coordinates systems move with respect to each 
+*     This attribute is used to qualify the coordinate systems described by
+*     a Frame, by giving the moment in time when the coordinates are known
+*     to be correct. Often, this will be the date of observation, and is
+*     important in cases where coordinates systems move with respect to each
 *     other over the course of time.
 *
 *     The Epoch attribute is stored as a Modified Julian Date, but
@@ -7963,46 +8156,46 @@ MAKE_TEST(Direction)
 
 *  Applicability:
 *     Frame
-*        All Frames have this attribute. The basic Frame class provides 
+*        All Frames have this attribute. The basic Frame class provides
 *        a default of J2000.0 (Julian) but makes no use of the Epoch value.
 *        This is because the Frame class does not distinguish between
 *        different Cartesian coordinate systems (see the System attribute).
 *     CmpFrame
 *        The default Epoch value for a CmpFrame is selected as follows;
-*        if the Epoch attribute has been set in the first component Frame 
+*        if the Epoch attribute has been set in the first component Frame
 *        then the Epoch value from the first component Frame is used as
-*        the default for the CmpFrame. Otherwise, if the Epoch attribute has 
-*        been set in the second component Frame then the Epoch value from the 
-*        second component Frame is used as the default for the CmpFrame. 
+*        the default for the CmpFrame. Otherwise, if the Epoch attribute has
+*        been set in the second component Frame then the Epoch value from the
+*        second component Frame is used as the default for the CmpFrame.
 *        Otherwise, the default Epoch value from the first component
-*        Frame is used as the default for the CmpFrame. 
+*        Frame is used as the default for the CmpFrame.
 *     FrameSet
-*        The Epoch attribute of a FrameSet is the same as that of its current 
-*        Frame (as specified by the Current attribute). 
+*        The Epoch attribute of a FrameSet is the same as that of its current
+*        Frame (as specified by the Current attribute).
 *     SkyFrame
 *        The coordinates of sources within a SkyFrame can changed with time
 *        for various reasons, including: (i) changing aberration of light
-*        caused by the observer's velocity (e.g. due to the Earth's motion 
-*        around the Sun), (ii) changing gravitational deflection by the Sun 
-*        due to changes in the observer's position with time, (iii) fictitious 
-*        motion due to rotation of non-inertial coordinate systems (e.g. the 
+*        caused by the observer's velocity (e.g. due to the Earth's motion
+*        around the Sun), (ii) changing gravitational deflection by the Sun
+*        due to changes in the observer's position with time, (iii) fictitious
+*        motion due to rotation of non-inertial coordinate systems (e.g. the
 *        old FK4 system), and (iv) proper motion of the source itself (although
 *        this last effect is not handled by the SkyFrame class because it
 *        affects individual sources rather than the coordinate system as
 *        a whole).
 *
-*        The default Epoch value in a SkyFrame is B1950.0 (Besselian) for the 
+*        The default Epoch value in a SkyFrame is B1950.0 (Besselian) for the
 *        old FK4-based coordinate systems (see the System attribute) and
 *        J2000.0 (Julian) for all others.
 *
-*        Care must be taken to distinguish the Epoch value, which relates to 
-*        motion (or apparent motion) of the source, from the superficially 
-*        similar Equinox value. The latter is used to qualify a coordinate 
-*        system which is itself in motion in a (notionally) predictable way 
-*        as a result of being referred to a slowly moving reference plane 
-*        (e.g. the equator). 
+*        Care must be taken to distinguish the Epoch value, which relates to
+*        motion (or apparent motion) of the source, from the superficially
+*        similar Equinox value. The latter is used to qualify a coordinate
+*        system which is itself in motion in a (notionally) predictable way
+*        as a result of being referred to a slowly moving reference plane
+*        (e.g. the equator).
 *
-*        See the description of the System attribute for details of which 
+*        See the description of the System attribute for details of which
 *        qualifying attributes apply to each celestial coordinate system.
 *att--
 */
@@ -8040,11 +8233,11 @@ f     instance, by the AST_GRID method).
 
 *  Applicability:
 *     Frame
-*        The default supplied by the Frame class is to display all axis 
+*        The default supplied by the Frame class is to display all axis
 *        values, without any limit.
 *     SkyFrame
-*        The SkyFrame class re-defines the default Top value to +90 degrees 
-*        for latitude axes, and 180 degrees for co-latitude axes. The 
+*        The SkyFrame class re-defines the default Top value to +90 degrees
+*        for latitude axes, and 180 degrees for co-latitude axes. The
 *        default for longitude axes is to display all axis values.
 
 *  Notes:
@@ -8081,11 +8274,11 @@ f     instance, by the AST_GRID method).
 
 *  Applicability:
 *     Frame
-*        The default supplied by the Frame class is to display all axis 
+*        The default supplied by the Frame class is to display all axis
 *        values, without any limit.
 *     SkyFrame
-*        The SkyFrame class re-defines the default Bottom value to -90 degrees 
-*        for latitude axes, and 0 degrees for co-latitude axes. The 
+*        The SkyFrame class re-defines the default Bottom value to -90 degrees
+*        for latitude axes, and 0 degrees for co-latitude axes. The
 *        default for longitude axes is to display all axis values.
 
 *  Notes:
@@ -8831,26 +9024,26 @@ astMAKE_TEST(Frame,PreserveAxes,( this->preserve_axes != -INT_MAX ))
 c     astFindFrame or astConvert) as a template to match another (target)
 f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *     Frame. It identifies the coordinate system in which the two Frames
-*     will be aligned by the match. 
+*     will be aligned by the match.
 *
 *     The values which may be assigned to this attribute, and its default
 *     value, depend on the class of Frame and are described in the
-*     "Applicability" section below. In general, the AlignSystem attribute 
-*     will accept any of the values which may be assigned to the System 
+*     "Applicability" section below. In general, the AlignSystem attribute
+*     will accept any of the values which may be assigned to the System
 *     attribute.
 *
 *     The Mapping returned by AST_FINDFRAME or AST_CONVERT will use the
-*     coordinate system specified by the AlignSystem attribute as an 
-*     intermediate coordinate system. The total returned Mapping will first 
-*     map positions from the first Frame into this intermediate coordinate 
-*     system, using the attributes of the first Frame. It will then map 
-*     these positions from the intermediate coordinate system into the 
-*     second Frame, using the attributes of the second Frame. 
+*     coordinate system specified by the AlignSystem attribute as an
+*     intermediate coordinate system. The total returned Mapping will first
+*     map positions from the first Frame into this intermediate coordinate
+*     system, using the attributes of the first Frame. It will then map
+*     these positions from the intermediate coordinate system into the
+*     second Frame, using the attributes of the second Frame.
 
 *  Applicability:
 *     Frame
 *        The AlignSystem attribute for a basic Frame always equals "Cartesian",
-*        and may not be altered. 
+*        and may not be altered.
 *     CmpFrame
 *        The AlignSystem attribute for a CmpFrame always equals "Compound",
 *        and may not be altered.
@@ -8917,38 +9110,38 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        The System attribute for a CmpFrame always equals "Compound",
 *        and may not be altered. In addition, the CmpFrame class allows
 *        the System attribute to be referenced for a component Frame by
-*        including the index of an axis within the required component 
-*        Frame. For instance, "System(3)" refers to the System attribute 
+*        including the index of an axis within the required component
+*        Frame. For instance, "System(3)" refers to the System attribute
 *        of the component Frame which includes axis 3 of the CmpFrame.
 *     FrameSet
 *        The System attribute of a FrameSet is the same as that of its
 *        current Frame (as specified by the Current attribute).
 *     SkyFrame
-*        The SkyFrame class supports the following System values and 
+*        The SkyFrame class supports the following System values and
 *        associated celestial coordinate systems:
 *
 *        - "ICRS": The Internation Celestial Reference System, realised
 *        through the Hipparcos catalogue. Whilst not an equatorial system
 *        by definition, the ICRS is very close to the FK5 (J2000) system
 *        and is usually treated as an equatorial system. The distinction
-*        between ICRS and FK5 (J2000) only becomes important when accuracies 
-*        of 50 milli-arcseconds or better are required. ICRS need not be 
+*        between ICRS and FK5 (J2000) only becomes important when accuracies
+*        of 50 milli-arcseconds or better are required. ICRS need not be
 *        qualified by an Equinox value.
-*   
+*
 *        - "FK4": The old FK4 (barycentric) equatorial coordinate system,
 *        which should be qualified by an Equinox value. The underlying
 *        model on which this is based is non-inertial and rotates slowly
 *        with time, so for accurate work FK4 coordinate systems should
 *        also be qualified by an Epoch value.
-*   
+*
 *        - "FK4-NO-E" or "FK4_NO_E": The old FK4 (barycentric) equatorial
 *        system but without the "E-terms of aberration" (e.g. some radio
 *        catalogues). This coordinate system should also be qualified by
 *        both an Equinox and an Epoch value.
-*   
+*
 *        - "FK5" or "EQUATORIAL": The modern FK5 (barycentric) equatorial
 *        coordinate system. This should be qualified by an Equinox value.
-*   
+*
 *        - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
 *        equatorial coordinate system, which gives the apparent positions
 *        of sources relative to the true plane of the Earth's equator and
@@ -8969,15 +9162,15 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        motion of the Earth's centre with respect to the barycentre
 *        (larger), and the precession and nutation of the Earth's spin
 *        axis (normally larger still).
-*   
+*
 *        - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
 *        ecliptic and mean equinox specified by the qualifying Equinox
 *        value.
-*   
+*
 *        - "GALACTIC": Galactic coordinates (IAU 1958).
-*   
+*
 *        - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.
-*   
+*
 *        - "UNKNOWN": Any other general spherical coordinate system. No
 *        Mapping can be created between a pair of SkyFrames if either of the
 *        SkyFrames has System set to "Unknown".
@@ -8990,7 +9183,7 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        change in future). If you intend to use the ICRS system
 *        indefinitely, then you should specify it explicitly.
 *     SpecFrame
-*        The SpecFrame class supports the following System values and 
+*        The SpecFrame class supports the following System values and
 *        associated spectral coordinate systems (the default is "WAVE" -
 *        wavelength):
 *
@@ -9006,9 +9199,9 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        - "VELO" or "VREL": Relativistic velocity (km/s)
 *
 *        The default value for the Unit attribute for each system is shown
-*        in parentheses. Note that the default value for the ActiveUnit flag 
-c        is non-zero 
-f        is .TRUE. 
+*        in parentheses. Note that the default value for the ActiveUnit flag
+c        is non-zero
+f        is .TRUE.
 *        for a SpecFrame, meaning that changes to the Unit attribute for
 *        a SpecFrame will result in the SpecFrame being re-mapped within
 *        its enclosing FrameSet in order to reflect the change in units
@@ -9313,7 +9506,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    } else if( astIsAFrameSet( this ) ) {
       cfrm = astGetFrame( (AstFrameSet *) this, AST__CURRENT );
       isFrame = !strcmp( astGetClass( cfrm ), "Frame" );
-      cfrm = astAnnul( cfrm );      
+      cfrm = astAnnul( cfrm );
    } else if( astIsACmpFrame( this ) ) {
       isFrame = 1;
    } else {
@@ -10151,7 +10344,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
             if ( ival != -INT_MAX ) {
                astSetAxisDirection( new->axis[ axis ], ival );
             }
-            
+
 /* Top. */
 /*----- */
             (void) sprintf( key, "top%d", axis + 1 );
@@ -10159,7 +10352,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
             if ( dval != AST__BAD ) {
                astSetAxisTop( new->axis[ axis ], dval );
             }
-            
+
 /* Bottom. */
 /*----- -- */
             (void) sprintf( key, "bot%d", axis + 1 );
@@ -10167,7 +10360,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size,
             if ( dval != AST__BAD ) {
                astSetAxisBottom( new->axis[ axis ], dval );
             }
-            
+
 /* Digits. */
 /* ------- */
             (void) sprintf( key, "dig%d", axis + 1 );
@@ -10434,7 +10627,7 @@ void astPrimaryFrame_( AstFrame *this, int axis1,
    (**astMEMBER(this,Frame,PrimaryFrame))( this, axis1, frame, axis2 );
 }
 void astResolve_( AstFrame *this, const double point1[], const double point2[],
-                 const double point3[], double point4[], double *d1, 
+                 const double point3[], double point4[], double *d1,
                  double *d2 ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,Resolve))( this, point1, point2, point3, point4, d1, d2 );

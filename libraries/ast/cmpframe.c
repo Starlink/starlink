@@ -2498,7 +2498,7 @@ static AstSystemType GetSystem( AstFrame *this_frame ) {
 
 *  Parameters:
 *     this
-*        Pointer to the SkyFrame.
+*        Pointer to the CmpFrame.
 
 *  Returned Value:
 *     The System value.

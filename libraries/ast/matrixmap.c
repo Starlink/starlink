@@ -91,7 +91,7 @@ f     The MatrixMap class does not define any new routines beyond those
 *        method.
 *     11-SEP-2003 (DSB):
 *        Increased tolerance on checks for unit matrices within
-*        CompressMatrix. Now uses 100*DBL_EPSILON*diag (previously was 
+*        CompressMatrix. Now uses sqrt(DBL_EPSILON)*diag (previously was 
 *        DBL_EPSILON*DIAG ).
 *class--
 */
@@ -516,14 +516,14 @@ static void CompressMatrix( AstMatrixMap *this ){
       new_form = UNIT;
 
 /* Get the length of the diagonal vector. Off-diagonal elements are
-   considered to be equivalent to zero if they are less than 100*DBL_EPSILON
-   times the length of the diagonal vector. */
+   considered to be equivalent to zero if they are less than
+   SQRT(DBL_EPSILON) times the length of the diagonal vector. */
       minv = 0.0;
       for( i = 0; i < ncol*nrow; i += ncol + 1 ){
          mval = (this->f_matrix)[ i ];
          if( mval != AST__BAD ) minv += mval*mval;
       }
-      minv = 100.0*sqrt( ( minv > 0.0 ) ? minv : 0.0 )*DBL_EPSILON;
+      minv = sqrt( ( minv > 0.0 ) ? minv*DBL_EPSILON: 0.0 );
 
 /* Store the index of the next diagonal term within the forward matrix 
    array. */

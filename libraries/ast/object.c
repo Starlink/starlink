@@ -24,6 +24,7 @@
 *
 *     - Class: Object class name
 *     - ID: Object identification string
+*     - Ident: Permanent Object identification string.
 *     - Nobject: Number of Objects in class
 *     - RefCount: Count of active Object pointers
 
