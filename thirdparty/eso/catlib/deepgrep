@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# search sources for given string
+#
+
+# fgrep "$@" `find . \( -name '*.[Cchf]' -o -name '*.tcl' -o -name '*.in' \) -print`
+
+find . \( -name '*.[Cchf]' -o -name '*.tcl' -o -name '*.in' \) -exec fgrep "$@" {} /dev/null \;

@@ -1,0 +1,64 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.9 2001/08/27 10:10:35 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for CAT demo directory
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+BINDIR       = @BINDIR@
+CAT_DIR      = @CAT_DIR@
+RM           = rm -f
+SHELL        = /bin/sh
+
+# starter shell script
+START_SCRIPT = cat.sh
+
+# local Tcl applications
+TCL_APPS     = astrocat
+
+# local Tcl applications to install
+INST_TCL_APPS  = astrocat 
+
+all: tcl_apps
+
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo "Making $$i" ; \
+	    echo '#!/bin/sh' > $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    echo '# E.S.O. - VLT project' >> $$i; \
+	    echo "# $$i version @CAT_VERSION@" >> $$i; \
+	    echo "# Installation date: `date`" >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $(START_SCRIPT) | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
+
+install-top:
+	@test -d $(BINDIR) || mkdir $(BINDIR) 
+	@test -d $(CAT_DIR) || mkdir $(CAT_DIR)
+	@test -d $(CAT_DIR)/demos || mkdir $(CAT_DIR)/demos
+
+install: install-top
+	@for i in $(INST_TCL_APPS); do \
+	    $(INSTALL_DATA) -m 775 $$i $(BINDIR)/$$i ; \
+	done
+
+clean:
+	$(RM) *\~ "#"* core $(TCL_APPS)
+
+depend:
+
+distclean: clean
+	rm -f Makefile $(START_SCRIPT) cat_env.sh
+
+include @SRC_ROOT@/makefile.mk
+

@@ -1,0 +1,23 @@
+QueryResult
+
+# Config entry for original catalog server:
+serv_type: catalog
+long_name: Guide Star Catalog at ESO
+short_name: gsc@eso
+url: http://archive.eso.org/skycat/servers/gsc-server?%ra%dec&r=%r1,%r2&%cond&n=%n&f=8&s=R&F=*
+symbol: mag {square {} {} {} {}} {{(25-$mag)/3600.} {deg 2000}}
+search_cols: mag {Brightest (min)} {Faintest (max)}
+# End config entry
+
+gsc_id	ra	dec	pos-e	mag	mag-e	mu	d'	pa
+------	--	---	-----	---	-----	--	--	--
+GSC0285601078	49.95096	41.51173	0.2	9.23	0.40	F	0.07	39;
+GSC0285600314	49.93518	41.51617	0.2	13.98	0.40	F	0.74	296;
+GSC0285601162	49.96313	41.52388	0.2	12.93	0.40	F	0.98	37;
+GSC0285601446	49.98142	41.52326	0.2	13.72	0.40	F	1.60	62;
+GSC0285600342	49.98859	41.52631	0.2	12.31	0.40	F	1.97	62;
+GSC0285600334	49.95082	41.54726	0.2	11.77	0.40	F	2.19	1;
+GSC0285600886	49.90073	41.49948	0.2	10.86	0.40	F	2.32	253;
+GSC0285600672	49.89633	41.51102	0.2	13.39	0.40	F	2.41	270;
+GSC0285601758	49.95232	41.46929	0.2	13.78	0.40	F	2.49	178;
+GSC0285601402	49.96867	41.55001	0.2	14.67	0.40	F	2.50	20;

@@ -1,0 +1,5 @@
+#!/bin/csh -f
+
+cd src; make all install
+
+

@@ -1,0 +1,8 @@
+#!/bin/csh -f
+
+
+set dir = $PWD
+
+configure -prefix $dir/../install --with-gcc
+make
+

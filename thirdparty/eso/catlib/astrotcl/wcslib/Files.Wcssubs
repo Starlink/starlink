@@ -1,0 +1,94 @@
+cel.c
+  WCSLIB spherical coordinate transformation drivers
+dsspos.c
+  dsspos() uses the WCS structure to compute sky coordinates given
+  image pixel X and Y for images with Digitized Sky Survey plate solutions
+  in their headers.  dsspix() uses the WCS structure to compute image
+  pixel X and Y given sky coordinates for DSS images.  Algorithms from
+  StSCI CASB.
+fitsio.c
+  FITS header and image reading and writing subroutines, including FITS
+  table support.
+hget.c
+  Subroutines to extract values from FITS headers by keyword.
+  Subroutines for parsing RA and Dec strings are included.
+hput.c
+  Subroutines to implant values into FITS headers by keyword (and to
+  delete headers).
+iget.c
+  Subroutines to extract values from IRAF multi-keyword header parameters
+imio.c
+  Subroutines to get, put, and move pixels of various data types between images
+  im memory and a program.
+imhio.c
+  IRAF header and image reading and writing subroutines.  IRAF headers
+  are converted to FITS headers for use by other programs and can be
+  derived from FITS headers for writing.  Use iraf2fits.c if you only want
+  to read IRAF headers.
+iraf2fits.c
+  IRAF header to FITS header conversion routine which makes IRAF header
+  accessible to WCS subroutines.  Use this if you only want to read IRAF headers.
+lin.c
+  WCSLIB linear transformation subroutines
+platepos.c
+  platepos() uses the WCS structure to compute sky coordinates given
+  image pixel X and Y for images with polynomial plate solutions
+  in their headers.  platepix() uses the WCS structure to compute image
+  pixel X and Y given sky coordinates for such images.  Algorithms are based
+  on those in dsspos.c, but go straight from pixels to angles without an
+  intermediate plate coordinate.
+proj.c
+  WCSLIB spherical map projection subroutines
+slasubs.c
+  Coordinate transformation subroutines direct from Starlink's SLA_Lib
+sph.c
+  WCSLIB spherical coordinate transformation subroutines
+tnxpos.c
+  tnxpos() uses the WCS keywords set up for IRAF's TNX projection to compute
+  sky coordinates given image pixel X and Y.  tnxpix() uses the WCS structure
+  to compute image pixel X and Y given sky coordinates for such images.  The
+  projection is a tangent plane with corrections between the rotation and
+  scaling and the actual projection.
+wcs.c
+  Subroutines for using FITS or IRAF header spatial world coordinate
+  system information.
+wcscon.c
+  Subroutines for converting between B1950, J2000, and galactic
+  coordinates, based on Starlink SLA_LIB subroutines.
+wcslib.c
+  WCSLIB high level driver subroutines
+wcstrig.c
+  WCSLIB trig and inverse trig functions using angles in degrees
+worldpos.c
+  worldpos() uses the WCS structure to compute sky coordinates given
+  image pixel X and Y for images with header information for any of 8
+  standard world coordinate systems.  worldpix() uses the WCS structure
+  to compute image pixel X and Y given sky coordinates for the same images.
+  Mostly from NRAO.
+
+cel.h
+  Declarations for WCSLIB spherical coordinate transformation drivers
+fitshead.h
+  Declarations of FITS header and image access subroutines and FITS
+  table data structure.
+lin.h
+  Declarations for WCSLIB linear transformation subroutines
+proj.h
+  Declarations for WCSLIB spherical map projection subroutines
+wcs.h
+  Declaration of WCS data structure and useful conversions.
+wcslib.h
+  Declarations for WCSLIB high level driver subroutines
+wcstrig.h
+  Declarations for WCSLIB trig and inverse trig functions
+
+* Notes:
+  slasubs.c contains unmodified subroutines from Pat Wallace's Starlink
+            astrometry library and may be omitted if that library is
+            being linked.
+  WCSLIB subroutines were written by Mark Calabretta of CSIRO and have
+         been modified in two ways:
+         1) His distributed wcs.h has been changed to wcslib.h, and
+         2) wcstrig.c subroutine names have been changed from <function>d()
+            to <function>deg() to avoid name conflicts on some operating
+            systems.

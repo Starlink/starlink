@@ -1,0 +1,71 @@
+top=/home/te16b/abrighto/work
+target=/home/te16b/abrighto/work/release/rtdcatlib
++ cd /home/te16b/abrighto/work 
++ cp /home/te16b/abrighto/work/rtd/cat/astrocat/include/AstroCatalog.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/AstroImage.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/AstroObject.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/AstroQuery.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/CatalogInfo.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/DSS.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/GSC.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/HMS.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/HTTP.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/QueryResult.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/TclTable.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/WorldCoords.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/config.h /home/te16b/abrighto/work/rtd/cat/astrocat/include/error.h /home/te16b/abrighto/work/release/rtdcatlib/include 
++ cp /home/te16b/abrighto/work/rtd/cat/ccat/include/astroCatalog.h /home/te16b/abrighto/work/rtd/cat/ccat/include/astroImage.h /home/te16b/abrighto/work/rtd/cat/ccat/include/worldCoords.h /home/te16b/abrighto/work/release/rtdcatlib/include 
++ cp /home/te16b/abrighto/work/rtd/cat/astrocat/man/man3/AstroCatalog.3 /home/te16b/abrighto/work/rtd/cat/astrocat/man/man3/AstroImage.3 /home/te16b/abrighto/work/rtd/cat/astrocat/man/man3/HMS.3 /home/te16b/abrighto/work/rtd/cat/astrocat/man/man3/WorldCoords.3 /home/te16b/abrighto/work/release/rtdcatlib/man/man3 
++ cp /home/te16b/abrighto/work/rtd/cat/ccat/man/man3/astroCatalog.3 /home/te16b/abrighto/work/rtd/cat/ccat/man/man3/astroImage.3 /home/te16b/abrighto/work/rtd/cat/ccat/man/man3/worldCoords.3 /home/te16b/abrighto/work/release/rtdcatlib/man/man3 
++ cp /home/te16b/abrighto/work/rtd/cat/astrocat/test/tDSS.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tGSC.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tHMS.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tHTTP.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tPPM.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tQueryResult.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tTclTable.C /home/te16b/abrighto/work/rtd/cat/astrocat/test/tWorldCoords.C /home/te16b/abrighto/work/release/rtdcatlib/test 
++ cp /home/te16b/abrighto/work/rtd/cat/ccat/test/main.C /home/te16b/abrighto/work/rtd/cat/ccat/test/tastroCatalog.c /home/te16b/abrighto/work/rtd/cat/ccat/test/tastroImage.c /home/te16b/abrighto/work/release/rtdcatlib/test 
++ cd /home/te16b/abrighto/work/rtd/cat/astrocat/lib 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.hp 
++ tar cvf - libastrocat.a 
++ tar xvf - 
+a libastrocat.a 500 blocks
+x libastrocat.a, 255632 bytes, 500 tape blocks
++ cd /home/te16b/abrighto/work/rtd/cat/ccat/lib 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.hp 
++ tar cvf - libcastrocat.a 
+a libcastrocat.a 37 blocks
++ tar xvf - 
+x libcastrocat.a, 18436 bytes, 37 tape blocks
++ cd /home/te16b/abrighto/work/release/solaris/cat/astrocat/lib 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.sun4s 
++ tar cvf - libastrocat.a 
+a libastrocat.a 115 blocks
++ tar xvf - 
+x libastrocat.a, 58648 bytes, 115 tape blocks
++ cd /home/te16b/abrighto/work/release/solaris/cat/ccat/lib 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.sun4s 
++ tar cvf - libcastrocat.a 
+a libcastrocat.a 20 blocks
++ tar xvf - 
+x libcastrocat.a, 10146 bytes, 20 tape blocks
++ remsh ac3 cd /diskc/rtd/release/sunos/cat/astrocat/lib; tar cvf - libastrocat.a 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.sun4 
++ tar xvf - 
+a libastrocat.a 467 blocks
+x libastrocat.a, 238632 bytes, 467 tape blocks
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib/lib.sun4 
++ remsh ac3 cd /diskc/rtd/release/sunos/cat/ccat/lib; tar cvf - libcastrocat.a 
++ tar xvf - 
+a libcastrocat.a 108 blocks
+x libcastrocat.a, 54982 bytes, 108 tape blocks
++ cd /home/te16b/abrighto/work/install/simbad/lib 
++ cd /home/te16b/abrighto/work/release/rtdcatlib/lib 
++ tar xvf - 
++ tar cvf - lib.hp lib.sun4 lib.sun4s 
+a lib.hp/libsimcli.a 66 blocks
+x lib.hp/libsimcli.a, 33768 bytes, 66 tape blocks
+a lib.hp/libtc.a 446 blocks
+x lib.hp/libtc.a, 228344 bytes, 446 tape blocks
+a lib.hp/libos.a 331 blocks
+x lib.hp/libos.a, 169016 bytes, 331 tape blocks
+a lib.hp/libas.a 248 blocks
+x lib.hp/libas.a, 126848 bytes, 248 tape blocks
+a lib.sun4/libsimcli.a 58 blocks
+x lib.sun4/libsimcli.a, 29388 bytes, 58 tape blocks
+a lib.sun4/libtc.a 673 blocks
+x lib.sun4/libtc.a, 344122 bytes, 673 tape blocks
+a lib.sun4/libos.a 578 blocks
+x lib.sun4/libos.a, 295852 bytes, 578 tape blocks
+a lib.sun4/libas.a 246 blocks
+x lib.sun4/libas.a, 125736 bytes, 246 tape blocks
+a lib.sun4s/libsimcli.a 212 blocks
+x lib.sun4s/libsimcli.a, 108370 bytes, 212 tape blocks
+a lib.sun4s/libtc.a 960 blocks
+x lib.sun4s/libtc.a, 491114 bytes, 960 tape blocks
+a lib.sun4s/libos.a 768 blocks
+x lib.sun4s/libos.a, 393184 bytes, 768 tape blocks
+a lib.sun4s/libas.a 304 blocks
+x lib.sun4s/libas.a, 155312 bytes, 304 tape blocks

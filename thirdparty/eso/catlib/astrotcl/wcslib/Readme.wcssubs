@@ -1,0 +1,31 @@
+WCSsubs Subroutines
+
+These subroutines constitute a self-contained package for accessing
+the world coordinate systems of FITS or IRAF(.imh) images, with image
+header I/O contained in fitsfile.c and imhfile.c, and WCS initialization
+and use through the subroutines in wcs.c.  WCS information for an
+image is kept in a single data structure defined in wcs.h.  Pixel
+to WCS translations are done by calls to pix2wcst() or pix2wcs().
+WCS to pixel translations are done by calls to wcs2pix() or wcsc2pix().
+The contents of the files are briefly described in Files.
+Dependencies between these files are given in Makefile.
+These subroutines are part of a larger package of utilities called
+WCSTools.  Documentation, to some extent, is online at
+
+http://tdc-www.harvard.edu/software/wcstools/libwcs.
+
+Projection code in wcspos.c is by Bill Cotton of NRAO and is
+protected by the Gnu Copyleft.  Projection code in wcslib.c,
+cel.c, lin.c, proj.c, wcstrig.c, and sph.c is by Mark Calabretta
+of CSIRO and is also protected by the Gnu Copyleft.  Code in
+slasubs.c is by Pat Wallace of the Starlink project at Cambridge
+University.  Doug Mink is responsible for the rest of the code,
+unless otherwise noted in the source file.  Unless otherwise
+noted, this code is Copyright 2000 by the Smithsonian Institution,
+and noncommercial use is permitted.  If you which to incorporate
+any of this code into commercial software, contact dmink@cfa.harvard.edu
+
+-Doug Mink (dmink@cfa.harvard.edu)
+ Telescope Data Center
+ Harvard-Smithsonian Center for Astrophysics
+ Cambridge, Massachusetts

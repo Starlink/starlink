@@ -1,0 +1,11 @@
+#!/bin/csh -f
+
+echo "configuring skycat for CC and cc with installdir = $PWD"
+
+set dir = $PWD
+
+setenv CC cc
+setenv CXX CC
+
+configure -prefix $dir/../install --with-debug --with-cc
+make

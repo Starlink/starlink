@@ -1,0 +1,37 @@
+#!/bin/sh
+#\
+test -f ../demos/cat_env.sh && . ../demos/cat_env.sh
+#\
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=$PWD; cd $P
+#\
+if [ -z "$CAT_LIBRARY" ] ; then
+#\
+   WISH=cat_wish; L=`dirname $XP`; CAT_LIBRARY="$L/lib/cat" ; export CAT_LIBRARY
+#\
+   else WISH=$CAT_LIBRARY/../bin/cat_wish
+#\
+fi
+#\
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${INSTALL_TARGET}/lib:/vlt/tcltk-new/lib:/vlt/tcltk-new/lib/itcl:/usr/X11R6/lib"
+#\
+exec $WISH "$0" ${1+"$@"}
+# --------------------------------------------------
+source test.tcl
+
+
+puts "testing the astrocat Tcl command with an image server..."
+astrocat cat
+cat open dss@eso
+puts "getting image..."
+
+if {[catch {
+    set filename [cat getimage -pos {3:19:48 +41:30:39} -width 1 -height 1]
+} msg]} {
+    puts "getimage returned error: '$msg'"
+    exit 1
+}
+
+puts "getimage returns filename = '$filename', renaming to ./dss.fits..."
+exec mv $filename ./dss.fits
+
+exit 0

@@ -1,0 +1,130 @@
+opening gsc@eso...
+
+testing acGetDescription()...
+gsc@eso has 9 columns:
+columns:  gsc_id ra dec pos-e mag mag-e mu d' pa
+
+
+testing acCircularSearch()...
+acCircularSearch returned 10 rows (10), 9 cols (9):
+row 0, col 0: gsc_id = GSC0286902722
+row 0, col 1: ra = 50.06755
+row 0, col 2: dec = 41.41473
+row 0, col 3: pos-e = 0.2
+row 0, col 4: mag = 13.30
+row 0, col 5: mag-e = 0.40
+row 0, col 6: mu = F
+row 0, col 7: d' = 0.80
+row 0, col 8: pa = 145;
+row 1, col 0: gsc_id = GSC0286902944
+row 1, col 1: ra = 50.05112
+row 1, col 2: dec = 41.41135
+row 1, col 3: pos-e = 0.2
+row 1, col 4: mag = 13.97
+row 1, col 5: mag-e = 0.40
+row 1, col 6: mu = F
+row 1, col 7: d' = 0.90
+row 1, col 8: pa = 198;
+row 2, col 0: gsc_id = GSC0286902474
+row 2, col 1: ra = 50.06464
+row 2, col 2: dec = 41.39870
+row 2, col 3: pos-e = 0.2
+row 2, col 4: mag = 12.15
+row 2, col 5: mag-e = 0.40
+row 2, col 6: mu = F
+row 2, col 7: d' = 1.65
+row 2, col 8: pa = 168;
+row 3, col 0: gsc_id = GSC0286902570
+row 3, col 1: ra = 50.11334
+row 3, col 2: dec = 41.39969
+row 3, col 3: pos-e = 0.2
+row 3, col 4: mag = 12.69
+row 3, col 5: mag-e = 0.40
+row 3, col 6: mu = F
+row 3, col 7: d' = 2.97
+row 3, col 8: pa = 122;
+row 4, col 0: gsc_id = GSC0286902564
+row 4, col 1: ra = 50.11210
+row 4, col 2: dec = 41.46054
+row 4, col 3: pos-e = 0.2
+row 4, col 4: mag = 13.81
+row 4, col 5: mag-e = 0.40
+row 4, col 6: mu = F
+row 4, col 7: d' = 3.24
+row 4, col 8: pa = 50;
+row 5, col 0: gsc_id = GSC0286902856
+row 5, col 1: ra = 50.08727
+row 5, col 2: dec = 41.37378
+row 5, col 3: pos-e = 0.2
+row 5, col 4: mag = 14.05
+row 5, col 5: mag-e = 0.40
+row 5, col 6: mu = F
+row 5, col 7: d' = 3.39
+row 5, col 8: pa = 157;
+row 6, col 0: gsc_id = GSC0286902776
+row 6, col 1: ra = 50.05037
+row 6, col 2: dec = 41.36709
+row 6, col 3: pos-e = 0.2
+row 6, col 4: mag = 11.00
+row 6, col 5: mag-e = 0.40
+row 6, col 6: mu = F
+row 6, col 7: d' = 3.53
+row 6, col 8: pa = 185;
+row 7, col 0: gsc_id = GSC0285601584
+row 7, col 1: ra = 49.98170
+row 7, col 2: dec = 41.40847
+row 7, col 3: pos-e = 0.2
+row 7, col 4: mag = 14.35
+row 7, col 5: mag-e = 0.40
+row 7, col 6: mu = F
+row 7, col 7: d' = 3.55
+row 7, col 8: pa = 253;
+row 8, col 0: gsc_id = GSC0286902744
+row 8, col 1: ra = 50.03461
+row 8, col 2: dec = 41.36635
+row 8, col 3: pos-e = 0.2
+row 8, col 4: mag = 13.11
+row 8, col 5: mag-e = 0.40
+row 8, col 6: mu = F
+row 8, col 7: d' = 3.70
+row 8, col 8: pa = 196;
+row 9, col 0: gsc_id = GSC0286902405
+row 9, col 1: ra = 50.10083
+row 9, col 2: dec = 41.37231
+row 9, col 3: pos-e = 0.2
+row 9, col 4: mag = 10.64
+row 9, col 5: mag-e = 0.40
+row 9, col 6: mu = F
+row 9, col 7: d' = 3.75
+row 9, col 8: pa = 148;
+
+testing acGetArea() ...
+acGetArea returned 10 rows
+
+testing acGetObject() ...
+acGetObject results :
+col 0: gsc_id = GSC0286902474
+col 1: ra = 50.06464
+col 2: dec = 41.39870
+col 3: pos-e = 0.2
+col 4: mag = 12.15
+col 5: mag-e = 0.40
+col 6: mu = F
+col 7: d' = 0.00
+col 8: pa = 0;
+
+testing acSearchClosestStar()...
+acSearchClosestStar results :
+col 0: gsc_id = GSC0286902722
+col 1: ra = 50.06755
+col 2: dec = 41.41473
+col 3: pos-e = 0.2
+col 4: mag = 13.30
+col 5: mag-e = 0.40
+col 6: mu = F
+col 7: d' = 0.80
+col 8: pa = 145;
+testing other utility routines...
+value for 'mag' by col name is 13.300000
+value for 'dec'as float  by col name is 41.414730
+value for ra (degrees) and dec from acrGetWC: 50.067550 41.414730

@@ -1,0 +1,65 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.5 2001/08/27 10:10:08 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for ASTROTCL demo directory
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+BINDIR       = @BINDIR@
+ASTROTCL_DIR = @ASTROTCL_DIR@
+RM           = rm -f
+SHELL        = /bin/sh
+
+# starter shell script
+START_SCRIPT = astrotcl.sh
+
+# local Tcl applications
+TCL_APPS     = astrotcl
+
+# local Tcl applications to install
+INST_TCL_APPS =
+
+# other files to install
+FILES        =
+
+
+all: tcl_apps
+
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo "Making $$i" ; \
+	    echo '#!/bin/sh' > $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    echo '# E.S.O. - VLT project' >> $$i; \
+	    echo "# $$i version @ASTROTCL_VERSION@" >> $$i; \
+	    echo "# Installation date: `date`" >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $(START_SCRIPT) | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
+
+install-top:
+	@test -d $(BINDIR) || mkdir $(BINDIR) 
+	@test -d $(ASTROTCL_DIR) || mkdir $(ASTROTCL_DIR)
+	@test -d $(ASTROTCL_DIR)/demos || mkdir $(ASTROTCL_DIR)/demos
+
+install: install-top
+
+clean:
+	$(RM) *\~ "#"* core $(TCL_APPS)
+
+depend:
+
+distclean: clean
+	rm -f Makefile $(START_SCRIPT) astrotcl_env.sh
+
+include @SRC_ROOT@/makefile.mk
+

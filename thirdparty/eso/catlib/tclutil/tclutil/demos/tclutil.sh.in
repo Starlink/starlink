@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# E.S.O. - VLT project
+#
+# "@(#) $Id: tclutil.sh.in,v 1.7 2001/08/27 10:11:08 abrighto Exp $" 
+#
+# This script is used by the Makefile to create a startup script
+# for Tcl/Tk applications.
+#
+#  who      when     what
+# -------- -------- ------------------
+# abrighto 11/10/95 created 
+# abrighto 26/11/97 modified to use astrotcl and tclutil pkgs
+# pbiereic 05/08/99 to be used with the appended tcl file (see Makefile)
+
+# when running from the source dir, set different env for local test
+test -f ../demos/tclutil_env.sh && . ../demos/tclutil_env.sh
+
+# During development, set TCLUTIL_LIBRARY to your local library path 
+# (see demos/tclutil_env.sh), otherwise the tcl/tk scripts are taken
+# from the installed versions
+
+# get absolute path from which this script was started from
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
+
+# wish binary to use
+if [ -z "$TCLUTIL_LIBRARY" ] ; then
+   WISH=tclutil_wish; L=`dirname $XP`; TCLUTIL_LIBRARY="$L/lib/tclutil" ; export TCLUTIL_LIBRARY
+   else WISH=$TCLUTIL_LIBRARY/../bin/tclutil_wish
+fi
+
+# append basic shared library runtime search path to @LD_VARNAME@ (only for users
+# who have not set it properly)
+@LD_VARNAME@="${@LD_VARNAME@}:@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:@XLIBDIR@"
+
+# start the application 
+exec $WISH "$0" ${1+"$@"}
+

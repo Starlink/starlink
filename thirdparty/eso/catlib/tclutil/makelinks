@@ -1,0 +1,22 @@
+#!/bin/sh
+# E.S.O. - VLT project/ ESO Archive 
+# "@(#) $Id: makelinks,v 1.5 2001/08/27 10:11:07 abrighto Exp $"
+#
+# script to make some links used during development
+#
+# usage: makelinks
+#
+# who             when       what
+# --------------  --------   ----------------------------------------
+# Allan Brighton  22 Nov 97  Created
+
+
+if [ ! -d ./tclutil/library ]
+then
+	echo "$0: you should be one level above the tclutil directory"
+	exit 1
+fi
+
+echo "making links..."
+
+(cd tclutil/library;  rm -f demos;  ln -s ../demos .; make index)

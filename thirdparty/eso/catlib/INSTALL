@@ -1,0 +1,184 @@
+Installing the Skycat/RTD/Catlib Software
+-----------------------------------------
+
+The configure script and Makefile in this directory can be used to
+build any or all of the following packages:
+
+	tclutil      - Tcl and C++ Utilities Package
+	astrotcl     - Astronomical Tcl and C++ Utilities
+	rtd          - Real-Time Display 
+ 	cat          - Catalog library
+	skycat       - The ESO Skycat Tool
+
+
+1. Requirements
+---------------
+
+One of the following Tcl environments should be installed:
+
+For Tcl7.6:
+	itcl2.2    - [Incr Tcl], includes tcl7.6, tk4.2
+	BLT2.1     - BLT toolkit, graphs and other widgets 
+	tclX7.6.0  - Extended Tcl
+
+Or for Tcl8.0 (TclPro-1.2):
+	Tcl8.0.5   - Tcl Shell  (*** NOTE: bug in init.tcl, see below)
+	Tk8.0.5    - Tk Toolkit
+	itcl3.0.1  - [Incr Tcl]
+	BLT2.4g    - BLT toolkit, graphs and other widgets 
+	tclX8.0.4  - Extended Tcl
+
+Or for Tcl8.2 (TclPro-1.3):
+	Tcl8.2.3   - Tcl Shell
+	Tk8.2.3    - Tk Toolkit
+	itcl3.1.0  - [Incr Tcl]
+	BLT2.4o    - BLT toolkit, graphs and other widgets 
+	tclX8.2.0  - Extended Tcl (*** NOTE: see below for possible problems)
+
+Or for Tcl8.3 (TclPro-1.4):
+	Tcl8.3.3   - Tcl Shell
+	Tk8.3.3    - Tk Toolkit
+	itcl3.2    - [Incr Tcl]
+	BLT2.4u    - BLT toolkit, graphs and other widgets 
+	tclX8.3    - Extended Tcl
+
+These packages are available from the TCL archives: 
+  http://www.scriptics.com/
+
+Note the former Scriptics (now Ajuba) product TclPro, which is used to
+make the Skycat single binary version, is now free.  See
+http://www.scriptics.com/software/tclpro/ for download information.
+
+You can install the standard Tcl/Tk packages anywhere, however it is
+easiest to install them all in the same directory (using the same
+-prefix argument to configure).
+
+Special Notes:
+-------------
+
+* There is a bug in the tcl8.0.5 init.tcl script (also in tclpro-1.2).
+  See bug# 1481 at www.scriptics.com for a description and patch. This
+  bug causes problems generating the tclIndex files for Itcl
+  classes. The skycat configure scripts do this automatically, so you
+  will need this patch if you are using tcl-8.0.5.
+
+* I had to fix a few TclX8.2.0 bugs under SuSE Linux-6.3: I had to
+  edit tclxConfig.sh in the install dir and remove extra "-L ", which
+  caused the following library name to be ignored. I also had to edit
+  the source file tclX8.2.0/unix/Common.mk to remove extra reference to
+  -lieee, which caused a linker error under SuSe-Linux-6.3.
+
+* If you are building with Scriptics TclPro, you also need a
+  "normal" Tcl8.x installation (installed from the source). The Skycat
+  configure scripts depend on the $prefix/lib/tclConfig.sh and related
+  files being installed.  These files are not currently part of the
+  TclPro installation. Also, the names of some of the libraries are
+  different in TclPro. Skycat uses the "prowrap" application and the
+  Scriptics libraries to build a single binary version for tcl8.x, if
+  they are found.
+
+* In order to build a "single binary" version of skycat correctly,
+  the static ".a" Tcl/Tk libraries must be installed. 
+
+
+2. Building the Software
+------------------------
+
+Optionally define the environment variable TCLTK_ROOT to point to the
+top level install directory for Tcl (for example, /usr/local):
+
+	% setenv TCLTK_ROOT /usr/local              # for csh, tcsh
+
+or:     
+	% TCLTK_ROOT=/usr/local; export TCLTK_ROOT  # for sh, ksh, bash
+
+To compile the sources, type the following from the top level directory:
+
+	% configure -prefix $INSTALLDIR --with-gcc
+	% make all
+	% make install
+
+$INSTALLDIR should be the name of the top level directory (such as
+/usr/local or $PWD/install) in which to install the software. The
+default install directory is /usr/local.
+
+The configure option --with-gcc says to use GNU gcc and g++.
+If you want to use CC and cc instead, specify the --with-cc option:
+
+	% configure -prefix $INSTALLDIR --with-cc
+
+If you prefer using shared libraries and loadable Tcl modules
+add the option:
+
+	--enable-shared
+
+Note that if you are using g++, you must also have libg++ compiled as
+a shared library for this to work (libg++-2.7.2.x also has the 
+"--enable-shared" option). Also, if you use --enable-shared, both
+static and shared libraries will be generated, otherwise only the
+static versions.
+
+3. If you run into Problems...
+------------------------------
+
+The top level configure script actually runs "configure" in each of
+the package subdirectories found (tclutil, astrotcl, rtd, cat, et, and
+skycat).  If there are errors, you might try to run configure and make
+manually in a subdirectory. As an alternative to configure, you can
+also use one of the scripts config.debug, config.shared, etc, which do
+the same thing, but with different options. You might want to copy one
+of the scripts and edit it first, to set the install directory or
+other options. See the */README and */INSTALL files for more
+information.
+
+- Solaris cc
+
+  On Solaris, make sure the correct C compiler is being used
+  (not /usr/ucb/cc). We have tested with Solaris SunPRO CC/cc
+  and gcc (2.95.3).
+
+- HP-UX message "out of memory"
+
+   ON HP-UX: If you get the message "not enough memory" when running
+   skycat with shared libraries, it doesn't necessarily mean that you
+   have to buy more memory. This is the informative message that HP
+   prints when there is an undefined symbol in a shared library....
+
+   One way to find out what the symbol is, is to compile and use this
+   little program with the C++ compiler: (I got this from Peter
+   Biereichel): 
+
+---------------------------------------------------------------------
+#include <dl.h>
+#include <errno.h>
+#include <stdio.h>
+main(int argc, char *argv[])
+{
+  shl_t handle;
+  handle = shl_load(argv[1], BIND_IMMEDIATE | BIND_VERBOSE, 0L);
+  if (handle == 0)
+    {
+    printf("shl_load failed %s\n", argv[1]);
+    perror("");
+    }
+  else
+    printf("shl_load ok\n");
+}
+----------------------------------------------------------------------
+
+   For example: % g++ shlload.C -o g++ shlload
+                % shlload librtd.sl
+                % shlload libcat.sl
+
+   shlload should report the name of the undefined symbol
+   in the given shared library.
+                
+------------------------------------------------------------------------
+
+Please report any problems to me: 
+
+Allan Brighton
+abrighto@eso.org
+
+
+

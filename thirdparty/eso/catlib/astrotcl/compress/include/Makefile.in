@@ -1,0 +1,20 @@
+# E.S.O. - VLT project 
+#
+# "@(#) $Id: Makefile.in,v 1.4 2001/08/27 10:10:09 abrighto Exp $" 
+# $Id: Makefile.in,v 1.4 2001/08/27 10:10:09 abrighto Exp $
+#
+# ------------------------------------------------------------------------
+# 	Makefile for include dir
+# ------------------------------------------------------------------------
+
+TOPDIR      	= @DESTDIR@
+INCDIR      	= @INCDIR@
+
+SRCS 		= Compress.h gzip.h h_comp.h local_press.h press.h util.h ux_press.h
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+SHELL    	= /bin/sh
+
+include @SRC_ROOT@/makefile.mk
+include ../../include.mk

@@ -1,0 +1,7 @@
+#!/bin/csh -f
+
+
+set dir = $PWD
+
+configure -prefix $dir/../install --enable-shared --with-debug --with-gcc
+make

@@ -1,0 +1,10 @@
+World Coordinates Library
+-------------------------
+"@(#) $Id: README,v 1.6 2001/08/27 10:10:22 abrighto Exp $"
+
+Note: some of the C sources here were taken from Doug Mink's 
+WCS library (ftp://cfa-ftp.harvard.edu/pub/gsc/WCSTools/) 
+Any bug fixes or changes are commented with "allan".
+
+Version: wcssubs-2.8.3
+

@@ -1,0 +1,3 @@
+Be sure to re-run make if you add or modify a bitmap in this directory. 
+This will create ../src/bitmaps.c which defines the bitmaps in C code.
+

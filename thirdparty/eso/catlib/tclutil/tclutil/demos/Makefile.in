@@ -1,0 +1,73 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.7 2001/08/27 10:11:07 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for Tclutil demo directory
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+BINDIR       = @BINDIR@
+TCLUTIL_DIR  = @TCLUTIL_DIR@
+RM           = rm -f
+SHELL        = /bin/sh
+
+# starter shell script
+START_SCRIPT = tclutil.sh
+
+# local Tcl applications
+TCL_APPS     = tclutil itcldoc
+
+# local Tcl applications to install
+INST_TCL_APPS  =
+
+# other files to install
+FILES        =
+
+
+all: tcl_apps
+
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo "Making $$i" ; \
+	    echo '#!/bin/sh' > $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    echo '# E.S.O. - VLT project' >> $$i; \
+	    echo "# $$i version @TCLUTIL_VERSION@" >> $$i; \
+	    echo "# Installation date: `date`" >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $(START_SCRIPT) | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
+
+install-top:
+	@test -d $(BINDIR) || mkdir $(BINDIR) 
+	@test -d $(TCLUTIL_DIR) || mkdir $(TCLUTIL_DIR)
+	@test -d $(TCLUTIL_DIR)/demos || mkdir $(TCLUTIL_DIR)/demos
+
+install: install-top
+
+# generate man pages for itcl classes
+doc: 
+	itcldoc ../library/[A-Z]*.tcl
+
+# remove generated man pages
+cleandoc:
+	rm -f ../man/[A-Z]*.mann
+
+clean:
+	$(RM) *\~ "#"* core $(TCL_APPS)
+
+depend:
+
+distclean: clean
+	rm -f Makefile $(START_SCRIPT) tclutil_env.sh
+
+include @SRC_ROOT@/makefile.mk
+

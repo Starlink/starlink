@@ -1,0 +1,5 @@
+these coords should be the same (or very close):
+123.456 654.321
+123.456 654.321
+
+box of radius 10 with center at (100, 200) ==> (92.9289 192.929), (107.071 207.071)

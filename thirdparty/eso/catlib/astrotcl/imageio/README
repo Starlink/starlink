@@ -1,0 +1,17 @@
+Image I/O Library
+-----------------
+"@(#) $Id: README,v 1.5 2001/08/27 10:10:10 abrighto Exp $"
+
+Note: the plain C sources here were taken from the "cfitsio" package
+(version: cfitsio2027), which was written by William D. Pence
+(pence@tetra.gsfc.nasa.gov) of HEASARC, NASA/GSFC.
+
+  URL: http://legacy.gsfc.nasa.gov/docs/software/fitsio
+
+See the URL above for a complete description of the cfitsio library.
+
+I wrote the FitsIO C++ class and then modified it to work with the
+cfitsio library. It is a kind of wrapper class, to be used by
+other C++ classes to access FITS files, although it does not provide
+all of the functionality of the C library.
+

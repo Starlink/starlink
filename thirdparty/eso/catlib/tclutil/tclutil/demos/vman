@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# generate and view the man page for teh given tcl source file
+# 
+# usage: vman $filename
+
+file=$1
+if [ "$file" = "" ]
+then
+	exit
+fi
+
+dir=`dirname $file`
+man=`dirname $dir`/man/`basename $file .tcl`.mann
+rm -f $man
+./itcldoc $file
+more $man

@@ -1,0 +1,50 @@
+#*******************************************************************************
+# E.S.O. - VLT project
+#
+# "@(#) $Id: Makefile.in,v 1.5 2001/08/27 10:11:14 abrighto Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for Tcl library files 
+# ------------------------------------------------------------------------
+
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+LIBDIR       = @LIBDIR@
+TCLUTIL_DIR  = @TCLUTIL_DIR@
+TIX_DIR      = $(TCLUTIL_DIR)/../tix
+RM           = rm -f
+SHELL        = /bin/sh
+FILES        = *.tcl tclIndex
+srcdir	     = @srcdir@
+
+all:
+
+All: 
+	cd ..; $(MAKE)
+
+# don't have to install files, since they are compiled into the library
+install: 
+
+clean:
+	$(RM) *\~ "#"*
+
+index tclIndex: FORCE
+	test -x tixindex || chmod +x tixindex
+	tclsh@TCL_VERSION@ ../tools/tixindex *.tcl
+
+depend:
+
+distclean: clean
+	rm -f Makefile	
+
+# see Tix package for docs
+man:
+
+doc:
+
+cleandoc:
+
+FORCE:
+
+include @SRC_ROOT@/makefile.mk
+
