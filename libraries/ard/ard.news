@@ -1,13 +1,6 @@
 1 ARD_library
                                              Expires: ???
 
-The initial release (V1.0) of the ARD library is now available. Details
-can be found in SUN/183.
-
-   The ARD (ASCII Region Definition) system provides a textual language 
-   for describing regions within a data array, together with software for
-   converting a textual description into a pixel mask. The textual language 
-   is based on a set of keywords identifying simple shapes (boxes, circles, 
-   lines, etc). These keywords can be combined together using Boolean-style 
-   operators (AND, OR, NOT, etc) to create more complex shapes. Data arrays 
-   can be multi-dimensional.
+A minor upgrade to the ARD library has been made. The current release
+(V1.0-3) fixes a bug which caused inappropriate error messages to be
+reported if a blank ARD expresson was supplied.
