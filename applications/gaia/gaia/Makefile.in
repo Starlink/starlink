@@ -19,7 +19,7 @@ SRC_ROOT     = @SRC_ROOT@
 SRCDIR       = $(SRC_ROOT)/src
 
 # C compiler
-CC 	     = @CC@
+CC           = @CC@
 
 # C++ compiler
 CXX          = @CXX@
@@ -35,13 +35,13 @@ LDFLAG1 =
 LDFLAG2 =
 
 # -D flags
-DEFINES      = 	-DSHARED=@SHARED@ @TCLUTIL_DEFS@
+DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
 
 # other flags to pass to compiler
 CFLAGS       = @CXXDEBUGFLAGS@
 
 # install directories
-TOPDIR	     = @DESTDIR@
+TOPDIR       = @DESTDIR@
 BINDIR       = @BINDIR@
 LIBDIR       = @LIBDIR@
 RTD_DIR      = @RTD_DIR@
@@ -57,7 +57,7 @@ EXTRA_LIBS   = @LIBS@
 
 # Tk libs
 TCLTKLIBS = @ITK_LIB_SPEC@ \
-	    @TIX_LIB_SPEC@ \
+            @TIX_LIB_SPEC@ \
             @TK_LIB_SPEC@ \
             @BLT_LIB_SPEC@ \
             @TCLX_LIB_SPEC@ \
@@ -81,7 +81,7 @@ CAT_LIB              = -lcat
 CAT_LIB_STATIC       = @CAT_LIB_STATIC@
 
 # Skycat libraries
-SKYCAT_LIB	     = -lskycat
+SKYCAT_LIB           = -lskycat
 SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
 
 #  Local library.
@@ -123,10 +123,12 @@ GAIAMON = bin/gaiaMon
 
 #  Tasks in GAIA monolith.
 GAIA_TASKS = ardstat asc2tab autocrop cat2tab tab2asc tab2cat 
+TASK_LINKS = bin/ardstat bin/asc2tab bin/autocrop bin/cat2tab \
+             bin/tab2asc bin/tab2cat 
 
 #  Interface files for individual applications.
 IFL_FILES = src/ardstat.ifl src/asc2tab.ifl src/autocrop.ifl \
-	    src/cat2tab.ifl src/tab2asc.ifl src/tab2cat.ifl
+            src/cat2tab.ifl src/tab2asc.ifl src/tab2cat.ifl
 IFC_FILES = $(IFL_FILES:.ifl=)
 
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
@@ -138,10 +140,10 @@ OBJECTS      = tkAppInit.o tclAppInit.o
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-RANLIB 	     = @RANLIB@
-SHELL 	     = /bin/sh
-RM 	     = rm -f
-LN 	     = ln -s
+RANLIB       = @RANLIB@
+SHELL        = /bin/sh
+RM           = rm -f
+LN           = ln -s
 
 # ------------------------------------------------------------------------
 all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
@@ -163,7 +165,7 @@ $(DEMO_TCL): normallib tclAppInit.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
 	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(DEMO_TCL) \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
-               $(ADDLIBS) $(ADAM_LIBS) \
+	       $(ADDLIBS) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
@@ -180,8 +182,9 @@ $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	done
 	for f in $(GAIA_TASKS); do \
 	    (cd bin; \
-             if test -f $$f; then $(RM) -f $$f; else :; fi;\
-	     ln -s gaiaMon $$f);\
+	       if test -f $$f; then $(RM) -f $$f; else :; fi;\
+	     $(LN) gaiaMon $$f;\
+	    );\
 	done
 
 #  Rule to create the monolith interface file from the source.
@@ -201,8 +204,24 @@ install-bin:
 	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
 	chmod 0755 $(DEMO_WISH)
 	$(INSTALL) $(DEMO_WISH) $(BINDIR)
+	chmod 0755 $(DEMO_TCL)
+	$(INSTALL) $(DEMO_TCL) $(BINDIR)
 	$(INSTALL) $(GAIAMON) $(BINDIR)
-	$(INSTALL_DATA) $(GAIAMON).ifc $(BINDIR)
+	for f in gaiaMon $(IFC_FILES) ""; do \
+	   (cd bin; \
+	   if test -f "$${f}.ifl"; then \
+	      $(COMPIFL) $$f; \
+	      $(INSTALL_DATA) $${f}.ifc $(BINDIR)/; \
+	      $(RM) $${f}.ifc; \
+	   else :; fi;\
+	   );\
+	done
+	for f in $(GAIA_TASKS); do \
+	    (cd $(BINDIR); \
+	       if test -f $$f; then $(RM) -f $$f; else :; fi;\
+	     $(LN) gaiaMon $$f;\
+	    );\
+	done
 	@(cd mktclapp; $(MAKE) install)
 
 install-man:
@@ -224,10 +243,8 @@ install-bitmaps:
 install: install-top install-library install-bin install-colormaps install-bitmaps
 
 clean:
-	$(RM) $(OBJECTS) $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON) \
-	      $(GAIAMON)ifc 
-	      $(ardstat).ifc $(autocrop).ifc $(cat2tab).ifc $(tab2cat).ifc \
-	      $(asc2tab).ifc $(tab2asc).ifc *\~ "#"*
+	$(RM) $(OBJECTS) $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON) $(GAIAMON).ifc \
+	      $(IFC_FILES) $(TASK_LINKS) $(TASK_LINKS:=.ifc)
 	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
 
 distclean: clean
