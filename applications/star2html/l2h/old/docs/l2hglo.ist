@@ -1,0 +1,60 @@
+%% 
+%% This is file `l2hglo.ist,
+%% adapted from the `gglo.ist' distributed with LaTex
+%% by Ross Moore <ross@mpce.mq.edu.au> on 7 March 1996.
+%% 
+%% `gglo.ist' has copyright...
+%%
+%% Copyright 1993 1994 1995 The LaTeX3 Project and any individual 
+%% authors listed elsewhere in this file. 
+%% 
+%% For further copyright information, and conditions for modification 
+%% and distribution, see the file legal.txt, and any other copyright 
+%% notices in this file. 
+%% 
+
+actual '@'
+quote '"'
+level '!'
+item_0   "\n  \\item[]\\gn{"
+item_01   "\n  \\subitem\\gn{"
+item_x1   "}\\quad{\\getgdata}\\efill \n \\subitem\\texttt{"
+item_x2   "\\ "
+delim_0   "}\\quad{\\getgdata}\\pfill "
+delim_1   "}\\quad{\\getgdata}\\pfill "
+delim_2   "\\pfill "
+indent_length	"0"
+% The next lines will produce some warnings when
+% running Makeindex as they try to cover two different
+% versions of the program:
+lethead_prefix   "{\\bfseries\\hfil "
+lethead_suffix   "\\hfil}\\nopagebreak\n"
+lethead_flag       0
+heading_prefix   "{\\bfseries\\hfil "
+heading_suffix   "\\hfil}\\nopagebreak\n"
+headings_flag       0
+preamble
+"\\section*{Glossary of variables and file-names}
+ \\addcontentsline{toc}{section}%
+  {\\protect\\numberline{}Glossary of variables and file-names}
+ \\newread\\glossdata \\openin\\glossdata=l2hfiles.dat
+ \\def\\reopengloss{\\immediate\\closein\\glossdata\\relax
+	\\immediate\\openin\\glossdata=l2hfiles.dat \\relax}
+ \\begin{theglossary} 
+	\\def\\gn#1{\\def\\thisitem{#1}\\texttt{#1}}%
+	\\def\\appl{\\textit}\\def\\gsl{\\textsl}%
+	\\def\\getgdata{\\ifeof\\glossdata\\noglossitem\\else\\expandafter\\getgdataA\\fi}%
+	\\def\\getgdataA{\\read\\glossdata to\\glossitem\\relax\\expandafter
+		\\ifx\\expandafter\\par\\glossitem\\relax\\expandafter\\getgdata
+		\\else\\expandafter\\getgdataB\\fi}%
+	\\def\\getgdataB{\\expandafter\\getgdataC\\glossitem\\relax}%
+	\\def\\getgdataC\\item[\\gn#1]#2\\relax{\\def\\tmp{#1}\\ifx\\tmp\\thisitem
+		\\def\\next{#2}\\else\\def\\next{\\getgdata}\\fi\\next}%
+	\\def\\noglossitem{\\typeout{^^J*** glossary data not found for \\thisitem^^J}%
+		\\reopengloss}\n"
+postamble
+"\n\n \\end{theglossary}\n
+ \\closein\\glossdata"
+keyword "\\glossaryentry"
+%% 
+%% End of file `l2hglo.ist'.

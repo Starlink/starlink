@@ -1,0 +1,173 @@
+#! @PERL@
+# @edited_input@
+#+
+#  Name:
+#     latex2html
+
+#  Purpose:
+#     Wrapper script to run up a version of LaTeX2HTML.
+
+#  Type of Module:
+#     Perl script
+
+#  Description:
+#     This script sets up the environment so that one of the versions
+#     of LaTeX2HTML that are bundled in Star2HTML can be run (without
+#     using the install-test script method). It has one parameter
+#     -vers which should be set to either "current" (the default) or
+#     "old".  The actual locations of the current and old LaTeX2HTML
+#     versions is set within this script at installation time. All
+#     other command-line options are passed onto the real LaTeX2HTML
+#     script.
+
+#  Parameters:
+#     -vers
+#        The version of LaTeX2HTML to use. This is either "current" or
+#        "old". The default is "current".
+
+#  Authors:
+#     PDRAPER: P.W.Draper (Starlink - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-AUG-1998 (PDRAPER):
+#        Original version.
+#     31-OCT-2000 (PDRAPER):
+#        Changed so that this script and the real latex2html are run
+#        using the Starlink version of Perl.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  These two variables are set when the script is installed and locate the
+#  current and previous versions of the LaTeX2HTML directory used by
+#  Star2HTML.
+$CURRENT_L2H = $ENV{'CURRENT_L2H'} || "@l2hdir@/current";
+$OLD_L2H = $ENV{'OLD_L2H'} || "@l2hdir@/old";
+
+#  Installation check.
+if ( $CURRENT_L2H =~ /@/) {
+   die "Fatal: latex2html script not installed correctly";
+}
+
+#  Use the current executable as default.
+$VERSION = "current";
+
+#  Library search PATH.
+$GS_LIB = '';
+
+#  Location of landscape script.
+$GSLANDSCAPE='';
+
+#  Name of ghostscript command.
+$GS = $ENV{'GS'} || 'gs';
+
+#  Get name of gs executable.
+if ( ! ( -x $GS && ! -d $GS ) ) {
+
+#  Search PATH for binary.
+   $found = 0;
+   foreach ( split(/:/, $ENV{'PATH'} ) ) {
+      $executable = join( '', $_, '/', $GS );
+      if ( -x $executable && ! -d $executable ) {
+ 
+#  Trackdown the real name of the executable if this is a symbolic link.
+	 if ( -l $executable ) { 
+	    $tmpfile='NULL';
+	    while ( $tmpfile ne '' ) {
+	       $tmpfile = readlink($executable);
+	       if ( $tmpfile ne '' ) { 
+                  $executable = join( '', $_, '/', $tmpfile )
+               }
+	    }
+	 }
+         $GS = $executable;
+         $found = 1;
+         last;
+      }
+   }
+   if ( ! $found ) {
+       die "Fatal: failed to locate ghostscript on path\n";
+   }
+}
+
+#  Locate the libraries and postscript files needed for pstoimg.
+#  Do this by parsing the output from "gs -h" command.
+#|| die "Fatal: execution of \"$gs -h\" failed\n";
+
+open( GS, "$GS -h |" ); 
+$flag = 0;
+while ( <GS> ) {
+    if( /^\s*Search path/i ) {
+
+# Now look for the gs lib path
+	$flag = 1; 
+    } elsif ( $flag == 1 ) {
+
+# If line starts with whitespace, then we're in the search path list
+	if ( /^\s+/ ) {
+	    chop;
+	    push( @gs_lib_path, split( ":", $_ ) );
+	} else { 
+
+# No more path entries
+	    $flag = 0; 
+	}
+    }
+}
+close( GS );
+
+#  Look for the ghostscript library. If not available then add guesses.
+if(!@gs_lib_path) {
+    @gs_lib_path = ('/usr/share/ghostscript','/usr/lib/ghostscript/',
+		    '/usr/local/ghostscript','/usr/local/share/ghostscript',
+		    '/usr/local/lib/ghostscript');
+}
+$GS_LIB = join(":", @gs_lib_path);
+
+#  Look for landscape postscript file.
+foreach $path (@gs_lib_path) {
+    $path =~ s/^\s*(\S*)\s*$/$1/; # strip whitespace
+    if(-d "$path" && -f "$path/landscap.ps") {
+	$GSLANDSCAPE = "$path/landscap.ps";
+    }
+}
+
+#  Look for the parameter -vers. Everything else goes to LaTeX2HTML.
+while (@ARGV) {
+   $next_element = shift;
+   if ( $next_element =~ /^-vers$/ ) {
+     $VERSION = shift;
+   }
+   else {
+      push(@EXTRAS, $next_element);
+   }
+}
+
+#  Set main LaTeX2HTML directory.
+if ( $VERSION eq "old" ) {
+    $LATEX2HTML = $OLD_L2H;
+} else {
+    $LATEX2HTML = $CURRENT_L2H;
+}
+
+#  Set the environment variables.
+$ENV{'L2HMODULE'} = $LATEX2HTML;
+$ENV{'GS_LIB'} = $GS_LIB;
+$ENV{'GSLANDSCAPE'} = $GSLANDSCAPE;
+
+#  Use the same version of Perl as this script, just add our Perl to
+#  head of PATH. 
+($perldir = '@PERL@') =~ s{/[^/]*$}{};
+$ENV{'PATH'} = "$perldir:" . $ENV{'PATH'};
+
+#  And execute.
+system( "$LATEX2HTML/latex2html @EXTRAS" );
+if ( $? ) {
+    exit( 1 );
+} else {
+    exit( 0 );
+}

@@ -1,0 +1,291 @@
+
+%this font is used in  features.tex
+\font\wncyr = wncyr10
+
+
+\begin{htmlonly}
+ \usepackage[dvips]{graphicx}
+ \usepackage[dvips]{color}
+ \usepackage[dvips,leftbars]{changebar}
+ \newcommand{\FoilTeX}{\env{FoilTeX}}
+%
+ \def\url#1{\htmladdnormallink{#1}{#1}}
+ \def\Email#1{\htmladdnormallink{<#1>}{mailto:#1}}
+ \def\path#1{\texttt{#1}}
+% \def\urldef#1#2#3{\def#1{#2{#3}}}
+ \def\onlinedoc{\url{http://www-dsed.llnl.gov/files/programs/unix/latex2html/manual/}}
+ \def\patches{\url{http://www-dsed.llnl.gov/files/programs/unix/latex2html/}}
+ \def\sourceA{%
+  \url{http://www-dsed.llnl.gov/files/programs/unix/latex2html/sources/}}
+% \def\sourceB{\url{ftp://ftp.mpn.com/pub/nikos/latex2html-98.1.tar.gz}}
+ \def\sourceB{\CTANtug{\CTANA}}
+ \def\sourceC{\url{http://ftp.rzg.mpg.de/pub/software/latex2html/sources/}}
+ \def\CVSsite{\url{http://cdc-server.cdc.informatik.tu-darmstadt.de/\~{}latex2html/}}
+ \def\CVSrepos{\url{http://cdc-server.cdc.informatik.tu-darmstadt.de/\~{}latex2html/user/}}
+ \def\CVSlatest{\url{http://cdc-server.cdc.informatik.tu-darmstadt.de/\~{}latex2html/l2h-latest.tar.gz}}
+ \newcommand{\CTANtug}[1]{\path{http://ctan.tug.org/ctan/#1}}
+ \def\CTANA{tex-archive/support/latex2html}
+ \def\tugURL{\url{http://www.tug.org}}
+ \def\danteURL{\url{http://www.dante.de}}
+ \def\ListURL{\url{http://www.rosat.mpe-garching.mpg.de/mailing-lists/LaTeX2HTML/}}
+%
+ \def\glossary#1{\index{#1@\texttt{#1} \label{III#1}\htmlref{(G)}{GGG#1}}}
+ \def\Glossary#1#2{\index{#1@{#2} \label{III#1}\htmlref{(G)}{GGG#1}}}
+%
+% hack to suppress changebar entries read from .aux file  !!! bug in changebar.perl !!! 
+ \makeatletter
+ \def\cb@barpoint#1#2#3{}
+ \makeatother
+%
+\newcommand{\sameas}[1]{\textcolor{red}{Same as setting: #1}}
+\newcommand{\onlinedocRM}{\url{http://www-math.mpce.mq.edu.au/\~{}ross/latex/manual/manual.html}}
+\newcommand{\EXcolors}{\url{http://www-math.mpce.mq.edu.au/\~{}ross/latex/crayola/crayola.html}}
+%
+\newcommand{\Lc}[1]{\texttt{\char92#1}} % LaTeX command
+\newcommand{\Tc}[1]{\texttt{\char92#1}} % TeX command
+\newcommand{\Cs}[1]{ \texttt{-#1} }   % command-line switch
+\newcommand{\Ve}[1]{\index{#1@\texttt{#1}}\texttt{#1}} % version extension
+\newcommand{\gsl}[1]{#1}
+\newcommand{\indexentry}[2]{\item #1 #2}
+
+%
+\internal{}%
+\internal{O}%
+\internal{S}%
+\internal{E}%
+\internal{M}%
+\internal{H}%
+\internal{P}%
+
+\newcommand{\texdev}[1]{\htmladdnormallink
+ {\texdevURL/#1}{\texdevURL/#1}}
+\newcommand{\ctan}{http://ctan.tug.org/ctan}
+\newcommand{\ctanTUG}{\htmladdnormallinkfoot
+ {TUG's searchable CTAN site}{\ctan}}
+\newcommand{\ctanURL}[1]{\htmladdnormallink
+ {CTAN:\texttt{.../#1}}{\ctan/tex-archive/#1}}
+\newcommand{\ctanURLbr}[1]{\htmladdnormallink
+ {CTAN:\texttt{.../#1}}{\ctan/tex-archive/#1}}
+\newcommand{\ctanTUGurl}[2]{\ctanURL{#2}}
+\newcommand{\indichtml}{l2h/indic/IndicHTML/}
+
+\end{htmlonly}
+
+\newcommand{\texdevURL}{http://www-texdev.mpce.mq.edu.au/}
+\newcommand{\Unicode}{\htmladdnormallinkfoot
+ {Unicode}{http://www.unicode.org/}}
+\newcommand{\IndicHTML}{\htmladdnormallinkfoot
+ {Indic\TeX/HTML}{\texdevURL{\indichtml}}}
+
+%begin{latexonly}
+\usepackage{array}
+
+\newcommand{\Cs}[1]{{\upshape`\,\texttt{-#1}\,'}}
+\newcommand{\Ve}[1]{\index{#1@\texttt{#1}}{\upshape`\,\texttt{#1}\,'}}
+\newcommand{\Lc}[1]{{\upshape\ttfamily\char92#1}}
+\newcommand{\Tc}[1]{{\upshape\ttfamily\char92#1}}
+
+\newcommand{\ctanTUG}[1]{TUG's searchable CTAN site\footnote{\ctanTUGurl}}
+\newcommand{\ctanURL}{CTAN: \penalty-200\ctanurl}
+\newcommand{\ctanURLbr}{CTAN: \newline\ctanurl}
+\urldef\texdev\url{http://www-texdev.mpce.mq.edu.au/}
+\urldef\ctanurl\url{.../tex-archive/}
+\urldef\ctanTUGurl\url{http://ctan.tug.org/ctan/tex-archive/}
+\urldef\indichtml\url{l2h/indic/IndicHTML/}
+
+\def\mathsmiley{\smiley}
+%end{latexonly}
+
+% thanks to \KrisRose for this macro:
+\def\smiley{\hbox{\rlap{$\bigcirc$}\kern1.3pt$\scriptstyle\ddot\smile$}}
+
+\begin{imagesonly}
+\def\mathsmiley{\smiley}
+\end{imagesonly}
+
+
+\newcommand{\Lcs}[1]{{\upshape\ttfamily\char92#1}}
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+
+%\newcommand{\godown}[1]{{\htmlref
+% {\htmladdimg[left BORDER=0]{../psfiles/dn.gif}}{#1}}}
+\newcommand{\godown}[1]{}
+
+%\newcommand{\goback}[1]{{\htmlref
+% {\htmladdimg[left BORDER=0]{../psfiles/up.gif}}{#1}}}
+\newcommand{\goback}[1]{}
+
+
+\newcommand{\WiiiC}{\htmladdnormallinkfoot{World Wide Web Consortium}{http://www.w3c.org/}}
+\newcommand{\latextohtmlNG}{\latextohtml-NG}
+\newcommand{\maillist}{\htmladdnormallinkfoot{\latextohtml{} mailing list}%
+{http://cbl.leeds.ac.uk/nikos/tex2html/doc/mail/mail.html}}
+%
+\newcommand{\HTMLiii}{\textup{\texttt{HTML} 3.2}}%
+\newcommand{\HTMLIII}{\htmladdnormallink{\HTMLiii}%
+{http://www.w3.org/TR/REC-html32.html}}%
+
+\newcommand{\HTMLiv}{\textup{\texttt{HTML} 4.0}}%
+\newcommand{\HTMLIV}{\htmladdnormallink{\HTMLiv}%
+{http://www.w3.org/TR/REC-html40/}}%
+
+%\newcommand{\latextohtml}{\textup{\LaTeX 2{\ttfamily HTML}}}%
+\newcommand{\Perl}{\htmlref{\textsl{Perl}}{GGGPerl}}%  
+\newcommand{\PS}{\htmlref{\textup{Post\-Script}}{GGGpostscript}\Glossary{PostScript}{PostScript}{}}%
+\newcommand{\MF}{\htmlref{\textsl{Metafont}}{GGGMetafont}\Glossary{Metafont}{\textsl{Metafont}}{}}%
+\newcommand{\fn}[1]{\htmlref{\texttt{#1}}{GGG#1}\glossary{#1}}%  file names, with link to glossary
+\newcommand{\gn}[1]{\texttt{#1}\label{GGG#1}\htmlref{\^{}}{III#1}}%  file names, labelled within glossary
+%\newcommand{\appl}[1]{\htmlref{\textsl{#1}}{GGG#1}\Glossary{#1}{\textsl{#1}}{}}%  application software names
+\newcommand{\appl}[1]{\htmlref{\textsl{#1}}{GGG#1}\Glossary{#1}{\gsl{#1}}{}}%  application software names
+%
+\newcommand{\env}[1]{{\upshape\sffamily #1}}%  LaTeX environment and package names
+\newcommand{\HTMLtag}[1]{\path{<#1>}}%  HTML tag
+\newcommand{\Meta}[1]{\texttt{\upshape<\textit{#1}>}}%  Meta string
+
+%
+% developer names and addresses:
+%
+\newcommand{\NikosDrakos}{\index{Nikos Drakos}%\Email{nikos@cbl.leeds.ac.uk}
+\htmladdnormallink{Nikos Drakos}{http://www.cbl.leeds.ac.uk/nikos/personal.html}}
+%
+\newcommand{\RossMoore}{\index{Ross Moore}%\Email{ross@mpce.mq.edu.au}
+\htmladdnormallink{Ross Moore}{http://www.mpce.mq.edu.au/\~{}ross/}}
+\newcommand{\Macquarie}{\htmladdnormallink
+{Macquarie University}{http://www.mq.edu.au/}}
+%
+\newcommand{\Hennecke}{\index{Marcus Hennecke}%\Email{hennecke@dbag.ulm.DaimlerBenz.COM}
+\htmladdnormallink{Marcus Hennecke}{http://www.crc.ricoh.com/\~{}marcush/}}
+%
+\newcommand{\Noworolski}{\index{Mark Noworolski}%\Email{jmn@eecs.berkeley.edu}
+\htmladdnormallink{Mark Noworolski}{http://www-power.eecs.berkeley.edu/\~{}jmn/}}
+%
+\newcommand{\Isani}{\index{Sidik Isani}%\Email{isani@cfht.hawaii.edu}
+\htmladdnormallink{Sidik Isani}{http://www.cfht.hawaii.edu/\~{}isani/si.html}}
+%
+\newcommand{\Goossens}{\index{Michel Goossens}%\Email{goossens@cern.ch}
+\htmladdnormallink{Michel Goossens}{http://wwwcn1.cern.ch/\~{}goossens/}}
+%
+\newcommand{\Wilck}{\index{Martin Wilck}%\Email{martin@tropos.de}
+\htmladdnormallink{Martin Wilck}{http://www.tropos.de/personal/wilck.html}}
+%
+\newcommand{\PatrickDaly}{\index{Patrick Daly}%\Email{daly@linmpi.dnet.gwdg.de}
+\htmladdnormallink{Patrick Daly}{mailto:daly@linmpi.dnet.gwdg.de}}
+%
+\newcommand{\HerbSwan}{\index{Herb Swan}%\Email{herb.swan@perc.Arco.COM}
+%\htmladdnormallink{Herb Swan}{mailto:herb.swan@perc.Arco.COM}}
+\htmladdnormallink{Herb Swan}{mailto:lanhws@expl.aai.arco.com}}
+%
+\newcommand{\Lippmann}{\index{Jens Lippmann}%\Email{lippmann@cdc.informatik.tu-darmstadt.de}
+\htmladdnormallink{Jens Lippmann}{http://www-jb.cs.uni-sb.de/\~{}www/people/lippmann}}
+%
+\newcommand{\Rouchal}{\index{Marek Rouchal}%\Email{marek@hl.siemens.de}
+\htmladdnormallink{Marek Rouchal}{mailto:marek@hl.siemens.de}}
+%
+\newcommand{\Bohnet}{\index{Achim Bohnet}%\Email{ach@rosat.mpe-garching.mpg.de}
+\htmladdnormallink{Achim Bohnet}{mailto:ach@rosat.mpe-garching.mpg.de}}
+%
+\newcommand{\Nelson}{\index{Scott Nelson}%\Email{nelson18@llnl.gov}
+\htmladdnormallink{Scott Nelson}{mailto:nelson18@llnl.gov}}
+%
+\newcommand{\AxelRamge}{\index{Axel Ramge}%\Email{axel@ramge.de}
+\htmladdnormallink{Axel Ramge}{mailto:axel@ramge.de}}
+%
+\newcommand{\Popineau}{\index{Fabrice Popineau}%\Email{popineau@esemetz.ese-metz.fr}
+\htmladdnormallink{Fabrice Popineau}{mailto:popineau@esemetz.ese-metz.fr}}
+%
+\newcommand{\Wortmann}{\index{Uli Wortmann}%\Email{uli12@bonk.ethz.ch}
+\htmladdnormallink{Uli Wortmann}{mailto:uli12@bonk.ethz.ch}}
+%
+\newcommand{\Veytsman}{\index{Boris Veytsman}%\Email{boris@plmsc.psu.edu}
+\htmladdnormallink{Boris Veytsman}{mailto:boris@plmsc.psu.edu}}
+%
+\newcommand{\Taupin}{\index{Daniel Taupin}%\Email{taupin@lps.u-psud.fr}
+\htmladdnormallink{Daniel Taupin}{mailto:taupin@lps.u-psud.fr}}
+%
+%\endinput
+
+%
+% (La)TeX related URLs
+%
+\newcommand{\CSEP}{\index{Computer Science Education Project!CSEP}%
+\htmladdnormallinkfoot{Computer Science Education Project}%
+{http://csep1.phy.ornl.gov/csep.html}} 
+%
+\newcommand{\CBLU}{\index{Computer Based Learning Unit!CBLU}%
+\htmladdnormallinkfoot{Computer Based Learning Unit}%
+{http://cbl.leeds.ac.uk/\~{}www/home.html}}
+%
+\newcommand{\CERN}{\index{CERN}%
+\htmladdnormallink{CERN}{http://wwwcn.cern.ch/Welcome.html}} 
+%
+\newcommand{\KrisRose}{\index{Kristoffer Rose}%\Email{krisrose@brics.dk}
+\htmladdnormallink{Kristoffer Rose}{http://www.brics.dk/\~{}krisrose/}}
+%
+\newcommand{\XypicDK}{\index{Xy-pic@\protect\Xy-pic graphics package}%
+\index{Xy-pic@\protect\Xy-pic graphics package!home page}%
+\htmladdnormallink{Xy-pic}{http://www.brics.dk/\~{}krisrose/Xy-pic.html}}
+\newcommand{\XypicAUS}{\index{Xy-pic@\protect\Xy-pic graphics package!home page, down under}%
+\htmladdnormallink{Ross Moore}{http://www.mpce.mq.edu.au/\~{}ross/Xy-pic.html}}
+%
+\newcommand{\LiPS}{\index{LiPS Design Team}%
+\htmladdnormallink{LiPS Design Team}{http://www-jb.cs.uni-sb.de/LiPS/node2.html}}
+\newcommand{\FIDarmstadt}{\index{Fachbereich Informatik, Darmstadt}%
+\htmladdnormallink{Fachbereich Informatik}{http://www.informatik.tu-darmstadt.de/}}
+\newcommand{\Darmstadt}{\index{Darmstadt!Fachbereich Informatik}%
+\htmladdnormallink{Darmstadt}{http://www.tu-darmstadt.de/Welcome.de.html}}
+%
+\newcommand{\DANTE}{\index{DANTE}%
+\htmladdnormallink{DANTE e.V.}{http://www.dante.de/}}
+\newcommand{\Praesidium}{\index{DANTE!Praesidium}%
+\htmladdnormallink{Praesidium}{http://www.dante.de/dante/Organe.html}}
+\newcommand{\LaTeXiii}{\index{LaTeX@\LaTeX!LaTeX3@\LaTeX{3}}%
+\htmladdnormallink{\LaTeX{3}}{http://www.tex.ac.uk/CTAN/latex/latex3}}
+%
+\newcommand{\Engberg}{\index{Uffe Engberg}%
+\htmladdnormallinkfoot{Uffe Engberg}{http://www.brics.dk/\~{}engberg}} 
+
+\newcommand{\texdevINDIC}{\texdev\indic}
+%\endinput
+
+
+%% earlier contributions from...
+\newcommand{\AndrewCole}{\index{Computer Based Learning Unit!Andrew Cole}%
+\htmladdnormallink{Andrew Cole}{http://www.cbl.leeds.ac.uk/ajcole/personal.html}}
+%
+\newcommand{\AnaPaiva}{\index{Computer Based Learning Unit!Ana Maria Paiva}%
+\htmladdnormallink{Ana Maria Paiva}{http://www.cbl.leeds.ac.uk/amp/personal.html}}
+%
+\newcommand{\RodWilliams}{\index{Computer Based Learning Unit!Roderick Williams}%
+\htmladdnormallink{Roderick Williams}{http://www.cbl.leeds.ac.uk/rodw/personal.html}}
+%
+\newcommand{\JamilSawar}{\index{Computer Based Learning Unit!Jamil Sawar}%
+\htmladdnormallink{Jamil Sawar}{http://www.cbl.leeds.ac.uk/sawar/personal.html}}
+
+\newcommand{\RobertThau}{\index{Robert S. Thau}%
+\htmladdnormallink{Robert S. Thau}{mailto: rst@edu.mit.ai}}
+
+\endinput
+
+
+
+
+%
+\newcommand{\RobertThau}{\index{Robert S. Thau}%
+\htmladdnormallink{Robert S. Thau}{mailto: rst@edu.mit.ai}}
+
+
+%
+% Ian Foster \Email{itf@mcs.anl.gov}
+% Bob Olson \Email{olson@mcs.anl.gov}
+% Verena Umar \Email{verena@edu.vanderbilt.cas.compsci}
+% Axel Belinfante \Email{Axel.Belinfante@cs.utwente.nl}
+% Todd Little \Email{little@com.dec.enet.nuts2u}
+% Franz Vojik \Email{vojik@de.tu-muenchen.informatik}
+% Eric Carroll \Email{eric@ca.utoronto.utcc.enfm}
+% Roderick Williams \Email{rodw@cbl.leeds.ac.uk}
+% Robert Cailliau \Email{cailliau@cernnext.cern.ch}
+% Toni Lantunen at CERN
+% Ana Maria Paiva, Jamil Sawar, Andrew Cole at CBLU Leeds
+% Phillip Conrad (Perfect Byte, Inc.)
+% L. Peter Deutsch (

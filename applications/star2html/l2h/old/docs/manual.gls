@@ -1,0 +1,382 @@
+\section*{Glossary of variables and file-names}
+ \addcontentsline{toc}{section}%
+  {\protect\numberline{}Glossary of variables and file-names}
+ \newread\glossdata \openin\glossdata=l2hfiles.dat
+ \def\reopengloss{\immediate\closein\glossdata\relax
+	\immediate\openin\glossdata=l2hfiles.dat \relax}
+ \begin{theglossary} 
+	\def\gn#1{\def\thisitem{#1}\texttt{#1}}%
+	\def\appl{\textit}\def\gsl{\textsl}%
+	\def\getgdata{\ifeof\glossdata\noglossitem\else\expandafter\getgdataA\fi}%
+	\def\getgdataA{\read\glossdata to\glossitem\relax\expandafter
+		\ifx\expandafter\par\glossitem\relax\expandafter\getgdata
+		\else\expandafter\getgdataB\fi}%
+	\def\getgdataB{\expandafter\getgdataC\glossitem\relax}%
+	\def\getgdataC\item[\gn#1]#2\relax{\def\tmp{#1}\ifx\tmp\thisitem
+		\def\next{#2}\else\def\next{\getgdata}\fi\next}%
+	\def\noglossitem{\typeout{^^J*** glossary data not found for \thisitem^^J}%
+		\reopengloss}
+
+  \item[]\gn{.dvipsrc}\quad{\getgdata}\pfill 7, 10
+  \item[]\gn{.latex2html-init}\quad{\getgdata}\pfill 11, 57, 58, 61, 66, 
+		69, 72, 80, 86
+  \item[]\gn{\$ACCENT\_IMAGES}\quad{\getgdata}\pfill 68
+  \item[]\gn{\$ADDRESS}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$ANTI\_ALIAS}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$ANTI\_ALIAS\_TEXT}\quad{\getgdata}\pfill 63, 64
+  \item[]\gn{\$ASCII\_MODE}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$AUTO\_LINK}\quad{\getgdata}\pfill 59, 68
+  \item[]\gn{\$AUTO\_NAVIGATION}\quad{\getgdata}\pfill 64, 69
+  \item[]\gn{\$AUTO\_PREFIX}\quad{\getgdata}\pfill 10, 52, 59
+  \item[]\gn{\$BODYTEXT}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$BOTTOM\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$CHARSET}\quad{\getgdata}\pfill 68
+  \item[]\gn{\$CHILDLINE}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$CONTENTS}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$CONTENTS\_IN\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$CRAYOLAFILE}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$CUSTOM\_BUTTONS}\quad{\getgdata}\pfill 74
+  \item[]\gn{\$CUSTOM\_TITLES}\quad{\getgdata}\pfill 58
+  \item[]\gn{\$DEBUG}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$DESTDIR}\quad{\getgdata}\pfill 58
+  \item[]\gn{\$DISCARD\_PS}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$DISP\_SCALE\_FACTOR}\quad{\getgdata}\pfill 17, 19, 61, 
+		69, 70
+  \item[]\gn{\$DONT\_INCLUDE}\quad{\getgdata}\pfill 68, 76, 84
+  \item[]\gn{\$DO\_INCLUDE}\quad{\getgdata}\pfill 68
+  \item[]\gn{\$DVIPS}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$DVIPS\_MODE}\quad{\getgdata}\pfill 10, 61, 67
+  \item[]\gn{\$EXTERNAL\_BIBLIO}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_CONTENTS}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_DOWN\_LINK}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_DOWN\_TITLE}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_FILE}\quad{\getgdata}\pfill 61
+  \item[]\gn{\$EXTERNAL\_IMAGES}\quad{\getgdata}\pfill 62, 63
+  \item[]\gn{\$EXTERNAL\_INDEX}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_PREV\_LINK}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_PREV\_TITLE}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_UP\_LINK}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTERNAL\_UP\_TITLE}\quad{\getgdata}\pfill 65
+  \item[]\gn{\$EXTN}\quad{\getgdata}\pfill 68
+  \item[]\gn{\$EXTRA\_IMAGE\_SCALE}\quad{\getgdata}\pfill 19, 20, 70
+  \item[]\gn{\$FIGURE\_SCALE\_FACTOR}\quad{\getgdata}\pfill 19, 21, 61, 
+		69
+  \item[]\gn{\$FILE}\quad{\getgdata}\pfill 62, 68
+  \item[]\gn{\$FONT\_SIZE}\quad{\getgdata}\pfill 61
+  \item[]\gn{\$GS}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$GS\_DEVICE}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$GS\_LIB}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$HOME/.latex2html-init}\quad{\getgdata}\pfill 11, 61, 71, 
+		73, 76
+  \item[]\gn{\$HOWTO\_INTERLACE\_GIF}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$HOWTO\_TRANSPARENT\_GIF}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$HTML\_VERSION}\quad{\getgdata}\pfill 60
+  \item[]\gn{\$ICONSERVER}\quad{\getgdata}\pfill 11, 68
+  \item[]\gn{\$IMAGES\_ONLY}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$IMAGE\_TYPE}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$INDEX}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$INDEX\_IN\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$INFO}\quad{\getgdata}\pfill 48, 62
+  \item[]\gn{\$INTERLACE}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$LANGUAGE\_TITLES}\quad{\getgdata}\pfill 14
+  \item[]\gn{\$LATEX}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$LATEX2HTMLDIR}\quad{\getgdata}\pfill 9, 67, 76, 86, 
+		89--93
+  \item[]\gn{\$LATEX2HTMLDIR/latex2html.config}\quad{\getgdata}\pfill 
+		71, 73
+  \item[]\gn{\$LATEX2HTMLDIR/local.pm}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$LATEX2HTMLDIR/styles/german.perl}\quad{\getgdata}\pfill 
+		25
+  \item[]\gn{\$LATEX2HTMLSTYLES}\quad{\getgdata}\pfill 67, 69
+  \item[]\gn{\$LATEX2HTMLVERSIONS}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$LINE\_WIDTH}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$LINKNAME}\quad{\getgdata}\pfill 59, 68, 84
+  \item[]\gn{\$LINKPOINT}\quad{\getgdata}\pfill 59, 68, 84
+  \item[]\gn{\$LOCAL\_ICONS}\quad{\getgdata}\pfill 11, 61
+  \item[]\gn{\$LONG\_TITLES}\quad{\getgdata}\pfill 58
+  \item[]\gn{\$MATH\_SCALE\_FACTOR}\quad{\getgdata}\pfill 17, 19, 61, 
+		69, 70, 84
+  \item[]\gn{\$MAX\_LINK\_DEPTH}\quad{\getgdata}\pfill 59
+  \item[]\gn{\$MAX\_SPLIT\_DEPTH}\quad{\getgdata}\pfill 59, 74
+  \item[]\gn{\$METAFONT\_DPI}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$NAV\_BORDER}\quad{\getgdata}\pfill 68
+  \item[]\gn{\$NETSCAPE\_HTML}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$NEXT}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$NEXT\_GROUP}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$NEXT\_GROUP\_TITLE}\quad{\getgdata}\pfill 74
+  \item[]\gn{\$NEXT\_PAGE\_IN\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$NEXT\_TITLE}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$NOLATEX}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$NO\_FOOTNODE}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$NO\_IMAGES}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$NO\_NAVIGATION}\quad{\getgdata}\pfill 64, 84, 86--88
+  \item[]\gn{\$NO\_SIMPLE\_MATH}\quad{\getgdata}\pfill 15, 61
+  \item[]\gn{\$NO\_SUBDIR}\quad{\getgdata}\pfill 58
+  \item[]\gn{\$PAPERSIZE}\quad{\getgdata}\pfill 70, 79
+  \item[]\gn{\$PBMMAKE}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PBMPLUSDIR}\quad{\getgdata}\pfill 71
+  \item[]\gn{\$PK\_GENERATION}\quad{\getgdata}\pfill 10, 61, 67
+  \item[]\gn{\$PNMCAT}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PNMCROP}\quad{\getgdata}\pfill 71
+  \item[]\gn{\$PNMFILE}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PNMFLIP}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PPMQUANT}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PPMTOGIF}\quad{\getgdata}\pfill 70
+  \item[]\gn{\$PREFIX}\quad{\getgdata}\pfill 58, 59
+  \item[]\gn{\$PREVIOUS}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$PREVIOUS\_GROUP}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$PREVIOUS\_GROUP\_TITLE}\quad{\getgdata}\pfill 74
+  \item[]\gn{\$PREVIOUS\_PAGE\_IN\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$PREVIOUS\_TITLE}\quad{\getgdata}\pfill 74
+  \item[]\gn{\$PSTOIMG}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$PS\_IMAGES}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$REUSE}\quad{\getgdata}\pfill 63
+  \item[]\gn{\$RGBCOLORFILE}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$SCALABLE\_FONTS}\quad{\getgdata}\pfill 61
+  \item[]\gn{\$SERVER}\quad{\getgdata}\pfill 11
+  \item[]\gn{\$SHORTEXTN}\quad{\getgdata}\pfill 58, 68
+  \item[]\gn{\$SHORT\_INDEX}\quad{\getgdata}\pfill 29, 62
+  \item[]\gn{\$SHOW\_SECTION\_NUMBERS}\quad{\getgdata}\pfill 60
+  \item[]\gn{\$TEXDEFS}\quad{\getgdata}\pfill 60
+  \item[]\gn{\$TEXEXPAND}\quad{\getgdata}\pfill 67
+  \item[]\gn{\$TEXINPUTS}\quad{\getgdata}\pfill 10, 68
+  \item[]\gn{\$TITLE}\quad{\getgdata}\pfill 58
+  \item[]\gn{\$TITLES\_LANGUAGE}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$TMP}\quad{\getgdata}\pfill 10, 71
+  \item[]\gn{\$TOC\_DEPTH}\quad{\getgdata}\pfill 59
+  \item[]\gn{\$TOC\_STARS}\quad{\getgdata}\pfill 59
+  \item[]\gn{\$TOP\_NAVIGATION}\quad{\getgdata}\pfill 64
+  \item[]\gn{\$TRANSPARENT\_FIGURES}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$UP}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$UP\_TITLE}\quad{\getgdata}\pfill 73
+  \item[]\gn{\$USENETPBM}\quad{\getgdata}\pfill 71
+  \item[]\gn{\$VERBOSITY}\quad{\getgdata}\pfill 57, 66, 76, 77
+  \item[]\gn{\$WORDS\_IN\_NAVIGATION\_PANEL\_TITLES}\quad{\getgdata}\pfill 
+		69, 74
+  \item[]\gn{\$WORDS\_IN\_PAGE}\quad{\getgdata}\pfill 64, 69
+  \item[]\gn{\$cb\_version}\quad{\getgdata}\pfill 27
+  \item[]\gn{\$dd}\quad{\getgdata}\pfill 66
+  \item[]\gn{\$default\_language}\quad{\getgdata}\pfill 69
+  \item[]\gn{\$depth}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$file}\quad{\getgdata}\pfill 62
+  \item[]\gn{\$title}\quad{\getgdata}\pfill 62
+
+  \indexspace
+
+  \item[]\gn{amsfonts.perl}\quad{\getgdata}\pfill 25
+  \item[]\gn{amstex.perl}\quad{\getgdata}\pfill 25
+  \item[]\gn{\textsl  {anonymous ftp}}\quad{\getgdata}\pfill 6
+  \item[]\gn{\textsl  {Archie}}\quad{\getgdata}\pfill 6, 7, 77, 83
+  \item[]\gn{\textsl  {Arena}}\quad{\getgdata}\pfill 14
+
+  \indexspace
+
+  \item[]\gn{bash}\quad{\getgdata}\pfill 8
+  \item[]\gn{bibtex}\quad{\getgdata}\pfill 79
+
+  \indexspace
+
+  \item[]\gn{\textsl  {CERN}}\quad{\getgdata}\pfill 50
+  \item[]\gn{changebar.sty}\quad{\getgdata}\pfill iii, 12, 27
+  \item[]\gn{Changes}\quad{\getgdata}\pfill 12
+  \item[]\gn{chmod}\quad{\getgdata}\pfill 9, 76
+  \item[]\gn{color.perl}\quad{\getgdata}\pfill 49, 68, 84, 87
+  \item[]\gn{configure-pstoimg}\quad{\getgdata}\pfill 7, 9, 70, 71, 86, 
+		91
+  \item[]\gn{credits.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{csh}\quad{\getgdata}\pfill 8
+  \item[]\gn{\textsl  {CVS}}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{\textsl  {DBM}}\quad{\getgdata}\pfill 7, 8, 77, 78
+  \item[]\gn{docs/ }\quad{\getgdata}\pfill 7, 11, 12, 92
+  \item[]\gn{docs/manual.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{dot.latex2html-init}\quad{\getgdata}\pfill 7, 11
+  \item[]\gn{dvips}\quad{\getgdata}\pfill 7, 9, 10, 54, 58, 67, 77, 79, 
+		84, 85, 89, 91
+  \item[]\gn{dvipsk}\quad{\getgdata}\pfill 7, 8
+
+  \indexspace
+
+  \item[]\gn{example/ }\quad{\getgdata}\pfill 7
+
+  \indexspace
+
+  \item[]\gn{features.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{floatfig.sty}\quad{\getgdata}\pfill 27
+  \item[]\gn{french.perl}\quad{\getgdata}\pfill 25
+  \item[]\gn{french.sty}\quad{\getgdata}\pfill 89
+  \item[]\gn{\textsl  {ftp}}\quad{\getgdata}\pfill 6
+  \item[]\gn{\textsl  {FTP search}}\quad{\getgdata}\pfill 6, 7
+
+  \indexspace
+
+  \item[]\gn{german.perl}\quad{\getgdata}\pfill 25
+  \item[]\gn{german.sty}\quad{\getgdata}\pfill 25, 86, 89
+  \item[]\gn{\textsl  {Ghostscript}}\quad{\getgdata}\pfill v, 7, 8, 81
+  \item[]\gn{ghostscript}\quad{\getgdata}\pfill 90
+  \item[]\gn{\textsl  {Ghostscript 3.x}}\quad{\getgdata}\pfill 80
+  \item[]\gn{grep}\quad{\getgdata}\pfill 78
+  \item[]\gn{gs}\quad{\getgdata}\pfill 8, 10
+  \item[]\gn{\textsl  {GS-Preview}}\quad{\getgdata}\pfill 10
+  \item[]\gn{gs\_fonts.ps}\quad{\getgdata}\pfill 10
+
+  \indexspace
+
+  \item[]\gn{heqn.perl}\quad{\getgdata}\pfill 90
+  \item[]\gn{heqn.sty}\quad{\getgdata}\pfill 18
+  \item[]\gn{HTML}\quad{\getgdata}\pfill i
+  \item[]\gn{html.perl}\quad{\getgdata}\pfill 32, 33, 47
+  \item[]\gn{html.sty}\quad{\getgdata}\pfill 1, 8, 10, 12, 19, 23, 
+		32, 33, 43, 47, 80, 90
+  \item[]\gn{htmllist.perl}\quad{\getgdata}\pfill 32
+  \item[]\gn{htmllist.sty}\quad{\getgdata}\pfill 12, 26, 32
+  \item[]\gn{hypextra.tex}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{icons.gif/ }\quad{\getgdata}\pfill 7
+  \item[]\gn{icons.png/ }\quad{\getgdata}\pfill 7
+  \item[]\gn{icons/ }\quad{\getgdata}\pfill 11
+  \item[]\gn{image-test.tex}\quad{\getgdata}\pfill 82
+  \item[]\gn{images.dvi}\quad{\getgdata}\pfill 84
+  \item[]\gn{images.log}\quad{\getgdata}\pfill 79, 82
+  \item[]\gn{images.tex}\quad{\getgdata}\pfill 32, 42, 82, 83, 85--87, 
+		90
+  \item[]\gn{index.html}\quad{\getgdata}\pfill 59, 96
+  \item[]\gn{install-test}\quad{\getgdata}\pfill 7, 9, 10, 67, 76, 80, 
+		99
+
+  \indexspace
+
+  \item[]\gn{justify.perl}\quad{\getgdata}\pfill 90
+  \item[]\gn{justify.sty}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{l2hfiles.dat}\quad{\getgdata}\pfill 12, 30, 31
+  \item[]\gn{l2hglo.ist}\quad{\getgdata}\pfill 11, 31, 91
+  \item[]\gn{l2hidx.ist}\quad{\getgdata}\pfill 11, 91
+  \item[]\gn{l2hman.sty}\quad{\getgdata}\pfill 12
+  \item[]\gn{labels.pl}\quad{\getgdata}\pfill 45--47, 50, 51
+  \item[]\gn{latex}\quad{\getgdata}\pfill 8--12, 54, 67, 79, 82
+  \item[]\gn{\LaTeX  }\quad{\getgdata}\pfill i
+  \item[]\gn{\LaTeXe  }\quad{\getgdata}\pfill i
+  \item[]\gn{latex2html}\quad{\getgdata}\pfill 6, 9, 10, 33, 54, 58, 65, 
+		67, 71, 76, 77
+  \item[]\gn{\LaTeX  2HTML}\quad{\getgdata}\pfill i
+  \item[]\gn{latex2html-97.1.tar.gz}\quad{\getgdata}\pfill 6
+  \item[]\gn{latex2html.config}\quad{\getgdata}\pfill 7, 9--11, 14, 17, 
+		59, 60, 62, 66--68, 79, 80, 88
+  \item[]\gn{licence.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{\textsl  {Linux}}\quad{\getgdata}\pfill 10
+  \item[]\gn{local.pm}\quad{\getgdata}\pfill 7, 9, 88
+  \item[]\gn{lslide.sty}\quad{\getgdata}\pfill 83
+  \item[]\gn{\textsl  {lynx}}\quad{\getgdata}\pfill 9, 62
+
+  \indexspace
+
+  \item[]\gn{make}\quad{\getgdata}\pfill 54, 58, 91
+  \item[]\gn{Makefile}\quad{\getgdata}\pfill 54, 58, 64, 65, 89, 101
+  \item[]\gn{makeidx.perl}\quad{\getgdata}\pfill ii, 29
+  \item[]\gn{makeindex}\quad{\getgdata}\pfill 11, 30, 90, 91
+  \item[]\gn{makemap}\quad{\getgdata}\pfill 7, 9, 11, 50, 92
+  \item[]\gn{MakeTeXPK}\quad{\getgdata}\pfill 10, 67
+  \item[]\gn{manhtml.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{manual.aux}\quad{\getgdata}\pfill 11, 12
+  \item[]\gn{manual.glo}\quad{\getgdata}\pfill 29, 30, 91
+  \item[]\gn{manual.gls}\quad{\getgdata}\pfill 11, 12, 31
+  \item[]\gn{manual.idx}\quad{\getgdata}\pfill 91
+  \item[]\gn{manual.ind}\quad{\getgdata}\pfill 11, 12
+  \item[]\gn{manual.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{\textsl  {Metafont}}\quad{\getgdata}\pfill 67, 85, 86, 91, 
+		93
+  \item[]\gn{misc/ }\quad{\getgdata}\pfill 67
+  \item[]\gn{modes.mf}\quad{\getgdata}\pfill 10, 67, 91
+  \item[]\gn{\textsl  {Mosaic}}\quad{\getgdata}\pfill 83
+  \item[]\gn{mybutton.gif}\quad{\getgdata}\pfill 73
+
+  \indexspace
+
+  \item[]\gn{natbib.perl}\quad{\getgdata}\pfill 44
+  \item[]\gn{\textsl  {NCSA}}\quad{\getgdata}\pfill 50
+  \item[]\gn{\textsl  {NCSA Mosaic}}\quad{\getgdata}\pfill 56
+  \item[]\gn{\textsl  {NDBM}}\quad{\getgdata}\pfill 7, 8, 77, 78
+  \item[]\gn{netpbm}\quad{\getgdata}\pfill 7, 8
+  \item[]\gn{\textsl  {Netscape Navigator}}\quad{\getgdata}\pfill 14, 
+		56
+
+  \indexspace
+
+  \item[]\gn{overview.tex}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{pbmmake}\quad{\getgdata}\pfill 87
+  \item[]\gn{pbmplus}\quad{\getgdata}\pfill 8, 92
+  \item[]\gn{\textsl  {Perl}}\quad{\getgdata}\pfill i
+  \item[]\gn{pnmcat}\quad{\getgdata}\pfill 87
+  \item[]\gn{pnmcrop}\quad{\getgdata}\pfill 87
+  \item[]\gn{pnmfile}\quad{\getgdata}\pfill 87
+  \item[]\gn{pnmflip}\quad{\getgdata}\pfill 20, 87
+  \item[]\gn{PostScript}\quad{\getgdata}\pfill ii, 8, 10, 12, 18, 19, 
+		57, 61, 63, 67, 78, 79, 81, 84, 85, 87, 89, 90, 92, 93, 97, 98
+  \item[]\gn{ppmquant}\quad{\getgdata}\pfill 87
+  \item[]\gn{ppmtogif}\quad{\getgdata}\pfill 87
+  \item[]\gn{problems.tex}\quad{\getgdata}\pfill 12
+  \item[]\gn{psfiles/ }\quad{\getgdata}\pfill 12
+  \item[]\gn{pstogif}\quad{\getgdata}\pfill ii, v, 7, 9, 80
+  \item[]\gn{pstoimg}\quad{\getgdata}\pfill v, 7, 9, 67, 70, 76, 85, 
+		87, 88, 91, 92
+  \item[]\gn{pstoppm.ps}\quad{\getgdata}\pfill ii, 80, 81
+  \item[]\gn{pstoppm3.ps}\quad{\getgdata}\pfill 81
+
+  \indexspace
+
+  \item[]\gn{README}\quad{\getgdata}\pfill 6
+  \item[]\gn{report.map}\quad{\getgdata}\pfill 50
+  \item[]\gn{report.ps}\quad{\getgdata}\pfill 54
+  \item[]\gn{report.tex}\quad{\getgdata}\pfill 53, 54, 93
+  \item[]\gn{report/ }\quad{\getgdata}\pfill 55
+
+  \indexspace
+
+  \item[]\gn{sec1.tex}\quad{\getgdata}\pfill 53, 54
+  \item[]\gn{sec2.html}\quad{\getgdata}\pfill 54
+  \item[]\gn{sec2.tex}\quad{\getgdata}\pfill 53, 54
+  \item[]\gn{styles/ }\quad{\getgdata}\pfill 7, 67, 86
+  \item[]\gn{support.tex}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{tar}\quad{\getgdata}\pfill 6
+  \item[]\gn{tcsh}\quad{\getgdata}\pfill 8
+  \item[]\gn{texdefs.perl}\quad{\getgdata}\pfill 60, 88
+  \item[]\gn{texexpand}\quad{\getgdata}\pfill ii, iv, 6, 9, 67, 76, 88
+  \item[]\gn{TEXINPUTS}\quad{\getgdata}\pfill 10, 79, 80
+  \item[]\gn{texinputs/ }\quad{\getgdata}\pfill 7, 10
+  \item[]\gn{TMP-part1}\quad{\getgdata}\pfill 78
+  \item[]\gn{toshiba}\quad{\getgdata}\pfill 10
+
+  \indexspace
+
+  \item[]\gn{url.sty}\quad{\getgdata}\pfill iii, 12
+  \item[]\gn{urls.bib}\quad{\getgdata}\pfill 44
+  \item[]\gn{userman.tex}\quad{\getgdata}\pfill 12
+
+  \indexspace
+
+  \item[]\gn{versions/ }\quad{\getgdata}\pfill 7, 60, 86
+
+  \indexspace
+
+  \item[]\gn{wrapfig.sty}\quad{\getgdata}\pfill 27
+
+  \indexspace
+
+  \item[]\gn{xv}\quad{\getgdata}\pfill 50
+
+ \end{theglossary}
+
+ \closein\glossdata
