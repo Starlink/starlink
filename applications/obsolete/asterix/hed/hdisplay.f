@@ -82,7 +82,7 @@
 
 *    Get locator to data object and validate it
       CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
-      CALL ADI!_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
       CALL HDISPLAY_VALIDOBJ( OBJLOC, OBJOK, STATUS )
 
 *    If OK so far carry on
