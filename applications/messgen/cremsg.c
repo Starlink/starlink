@@ -50,8 +50,10 @@
 
  *- */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 
 #define MAXLINE 101
@@ -73,10 +75,9 @@ process_file(char *filename)
  * Process an error include file.
  */
     FILE *fp, *fp0;
-    char buffer[MAXLINE], message[MAXLINE], file_name[20];
+    char buffer[MAXLINE], message[MAXLINE];
     char out_file[20];
-    char ident[10];
-    char *p, **ptr;
+    char *p;
 
 
 /*  Open the input file */
@@ -113,7 +114,7 @@ process_file(char *filename)
            mess_number = ( errcode = errcode >> 3 ) & 0xfff;
            mess_code = ( errcode >> 13 ) & 0x7ff;
            if ( verify ) {
-              printf("ERRCODE %d\n", errcode);
+              printf("ERRCODE %d\n", (int)errcode);
               printf("   messno %d\n", mess_number);
               printf("   severity %d\n",mess_severity);
               printf("   fac_code %d\n", mess_code);
