@@ -214,7 +214,6 @@
       REAL RLOW				! donor bin lower range
       REAL RUPP				! donor bin upper range
       REAL DIR(ADI__MXDIM)		! axis direction indicator (input)
-      REAL SCALEO
       REAL BNDS(2,MXBIN,ADI__MXDIM)	! required boundaries (irregular)
       REAL DUMAXVAL(ADI__MXDIM)		! dummy axis values for coerced dims
       REAL DUMAXWID(ADI__MXDIM)		! dummy axis widths
@@ -439,7 +438,7 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
             SPARR(1) = (BNDS(1,1,I)+BNDS(2,1,I))/2.0
             SPARR(2) = BNDS(2,1,I) - BNDS(1,1,I)
             CALL BDI_AXPUT1R( OFID, I, 'SpacedData', 2, SPARR, STATUS )
-            CALL BDI_AXPUT0R( OFID, I, 'ScalarWidth', ABS(SCALEO),
+            CALL BDI_AXPUT0R( OFID, I, 'ScalarWidth', ABS(SPARR(2)),
      :                        STATUS )
 
           ELSE
