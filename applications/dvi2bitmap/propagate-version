@@ -13,17 +13,56 @@ if [ $# -le 0 ]; then
     exit 1
 fi
 
-# Work through the non-zero argument list doing the edit.
+# Work through the non-empty argument list doing the edit.
 while [ $# -gt 0 ]; do
     f=$1
-    if test VERSION -nt $f; then
-	echo -n "Updating $f..."
-	sed '/%%VERSION%%/{N;s/[0-9][0-9.-]\+[a-z]*/'`cat VERSION`'/;}' \
-		$f >$f.tmp && mv $f.tmp $f && echo "ok"
+
+    echo -n "Updating $f..."
+    mv $f $f~
+    sed '/%%VERSION%%/{N;s/[0-9][0-9]*\.[0-9][0-9a-zA-Z.-]*/'`cat VERSION`'/;}' $f~ >$f
+    if test $? = 0; then
+	echo "ok"
+    else
+	echo "failed!"
     fi
+
     shift
 done
 
 exit 0
 
 # $Id$
+
+
+# Regression test:
+#
+# With file VERSION containing `1.3e', for example,
+# this should successfully turn
+#
+#----------------------
+# 1.2.3 %%VERSION%%
+# 
+# version 1 has version 1.2-3-B7, %%VERSION%%
+# 
+# Date: 2001/06/01, Version 1.2-17 %%VERSION%%
+# Along with version 1.2
+# 
+# The version number is %%VERSION%%
+# Release 12.3b4
+# 
+#----------------------
+#
+# into
+#
+#----------------------
+# 1.3e %%VERSION%%
+# 
+# version 1 has version 1.3e, %%VERSION%%
+# 
+# Date: 2001/06/01, Version 1.3e %%VERSION%%
+# Along with version 1.2
+# 
+# The version number is %%VERSION%%
+# Release 1.3e
+# 
+#----------------------
