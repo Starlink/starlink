@@ -1,3 +1,7 @@
+2005-02-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Add support for ndfGtwcs and ndfPtwcs
+
 2003-05-06  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm: Release V1.45 to Starlink

@@ -22,6 +22,11 @@ extern "C" {
 }
 #endif
 
+/* C interface to NDF */
+#include "ndf.h"
+
+/* For AST object creation */
+#include "ast.h"
 
 /* I use a string handling routine (strdup) so read in prototype */
 #include <string.h>
@@ -385,6 +390,48 @@ stringCtof77 (char*c, int len) {
  
 }
 
+/* Source function to deliver the text lines to AST */
+/* The source is an AV*. Returns NULL when no more lines */
+static char *astsource( const char *(*source)() ) {
+  AV * buffer = (AV*)source;
+  SV * nextline;
+  char * RETVAL = NULL;
+  char * contents = NULL;
+  STRLEN len;
+
+  /* get the next line */
+  nextline = av_shift( buffer );
+
+  /* Make sure it is not undef */
+  if (!SvOK( nextline ) ) return NULL;
+
+  /* and as a string */
+  contents = SvPV(nextline, len);
+
+  /* The source function must return the line in memory
+     allocated using the AST memory allocator */
+  RETVAL = astMalloc( len + 1 );
+  if ( RETVAL != NULL ) {
+    strcpy( RETVAL, contents );
+  }
+  return RETVAL;
+}
+
+/* Sink function to receive the lines from the AST object.
+ * Called for each line.
+ */
+static void astsink(  void (*sink)(const char *), const char *line ) {
+
+  /* recast the buffer */
+  SV * buffer = (SV*) sink;
+
+  /* append the line */
+  sv_catpvn( buffer, line, strlen(line) );
+
+  /* and newline */
+  sv_catpvn( buffer, "\n", 1);
+
+}
  
  
 MODULE = NDF    PACKAGE = NDF
@@ -2045,6 +2092,60 @@ ndf_tune(tpar, value, status)
  OUTPUT:
   status
 
+
+# The complication here is that any AST object created by
+# this routine is not necessarily an AST object that Starlink::AST
+# will understand because of shared library issues (and libast
+# static space linked into AST.so will not be the same as that 
+# loaded by NDF.so). We use a char* gateway to act as intermediary
+# since we know that AST framesets can be stringified without loss
+
+SV *
+ndfGtwcs_(indf, status)
+  ndfint indf
+  ndfint status
+ PROTOTYPE: $$
+ PREINIT:
+  AstFrameSet * iwcs;
+  AstChannel * chan;
+  SV * buffer;
+ CODE:
+  /* Read the framset */
+  ndfGtwcs(indf, &iwcs, &status);
+
+  /* An SV to hold the output buffer */
+  /* It will be mortalized when it is returned */
+  buffer = newSVpv("",0);
+
+  /* Create a output channel. Use a thread safe version that 
+      takes the SV as argument */
+  chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer, 
+			astsink,"" );
+  astWrite( chan, iwcs );
+
+  RETVAL = buffer;
+ OUTPUT:
+  RETVAL
+  status
+
+void
+ndfPtwcs_(wcsarr, indf, status)
+  AV * wcsarr
+  ndfint indf
+  ndfint status
+ PROTOTYPE: $$$
+ PREINIT:
+  AstChannel * chan;
+  AstFrameSet * iwcs;
+ CODE:
+  /* Create a output channel. Use a thread safe version that 
+      takes the SV as argument */
+  chan = astChannelFor( (const char *(*)())wcsarr, astsource, NULL, NULL, "");
+
+  iwcs = astRead( chan );
+  ndfPtwcs(iwcs, indf, &status);
+ OUTPUT:
+  status
 
 ###############  D A T ###############
 # These are the raw HDS routines

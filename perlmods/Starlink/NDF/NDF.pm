@@ -8,15 +8,16 @@ use vars qw($VERSION @ISA $AUTOLOAD %EXPORT_TAGS);
 
 #grep "dat_.*(" NDF.xs | grep -v ';' | awk -F'(' '{print $1}' | grep -v '_r$' | sort | fmt -50
 
+use Starlink::AST;
 require Exporter;
 require DynaLoader;
 require AutoLoader;
- 
+
 @ISA = qw(Exporter DynaLoader);
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.45';
+$VERSION = '1.46';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -48,6 +49,7 @@ $VERSION = '1.45';
 			ndf_xgt0d ndf_xgt0i ndf_xgt0l ndf_xgt0r ndf_xiary
 			ndf_xloc ndf_xname ndf_xnew ndf_xnumb ndf_xpt0c
 			ndf_xpt0d ndf_xpt0i ndf_xpt0l ndf_xpt0r ndf_xstat
+			ndfGtwcs ndfPtwcs
 			/],
 
 		'ary'=>[qw/ary_annul ary_dim ary_find ary_map ary_ndim
@@ -212,7 +214,6 @@ sub cmp_putvc ($$$\@$) {
 
 # NDF_QMASK(QUAL, BADBIT)
 
-	      
 sub ndf_qmask ($$) {
   croak 'Usage: ndf_qmask(qual, badbit)' if (scalar(@_)!=2);
   return(1) if (($_[0] & $_[1]) == 0);
@@ -248,6 +249,27 @@ sub mem2array ($$$) {
 
 }
 
+# AST wrappers
+#  $frameset = ndfGtwcs( $indf, $status );
+sub ndfGtwcs {
+  my $buffer = ndfGtwcs_( $_[0], $_[1]);
+  my @strings = split(/\n/, $buffer);
+  my $chan = new Starlink::AST::Channel( 
+					source => sub { 
+					  return shift(@strings); 
+					}
+				       );
+  return $chan->Read();
+}
+
+# ndfPtwcs( $wcs, $indf, $status )
+sub ndfPtwcs {
+  my $wcs = shift;
+  my @buffer;
+  my $chan = new Starlink::AST::Channel( sink => sub { push(@buffer,$_[0]."\n")});
+  $chan->Write( $wcs );
+  ndfPtwcs_( \@buffer, $_[0], $_[1]);
+}
 
 
 # Now put in some general PERL sub routines
