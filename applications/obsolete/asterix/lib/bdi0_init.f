@@ -89,6 +89,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			BDI0_SCARCHK
+
       EXTERNAL			BDI1_CHK
       EXTERNAL			BDI1_CREAT
       EXTERNAL			BDI1_GET
@@ -97,6 +99,25 @@
       EXTERNAL			BDI1_MAPLQ
       EXTERNAL			BDI1_PUT
       EXTERNAL			BDI1_UNMAP
+
+      EXTERNAL			BDI2_SCMAP
+
+      EXTERNAL			BDI2_ARMAP
+
+      EXTERNAL			BDI2_SPCHK
+      EXTERNAL			BDI2_SPGET
+      EXTERNAL			BDI2_SPMAP
+      EXTERNAL			BDI2_SPMAPLQ
+
+      EXTERNAL			BDI2_TICHK
+      EXTERNAL			BDI2_TIGET
+      EXTERNAL			BDI2_TIMAP
+
+      EXTERNAL			BDI2_IMCHK
+      EXTERNAL			BDI2_IMGET
+      EXTERNAL			BDI2_IMMAP
+
+      EXTERNAL			BDI2_UNMAP
 
 *  Local Variables:
       INTEGER			DID			! Dummy identifier
@@ -110,6 +131,14 @@
 
 *    Requires the data models package
         CALL ADI_REQPKG( 'dsmodels', STATUS )
+
+*    General file format independent methods
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_Scalar,_,_CHAR)',
+     :                   BDI0_SCARCHK, DID, STATUS )
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_Array,_,_CHAR)',
+     :                   BDI0_SCARCHK, DID, STATUS )
 
 *    HDS general binned dataset interface
         CALL ADI_DEFFUN(
@@ -143,6 +172,64 @@
         CALL ADI_DEFFUN(
      :       'FileItemPut(_,_HDSfile,_CHAR,_)',
      :                   BDI1_PUT, DID, STATUS )
+
+*    FITS spectral interface
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_Spectrum,_FITSfile,_CHAR)',
+     :                   BDI2_SPCHK, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemGet(_Spectrum,_FITSfile,_CHAR)',
+     :                   BDI2_SPGET, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_Spectrum,_FITSfile,_CHAR,_CHAR,_CHAR)',
+     :                   BDI2_SPMAP, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_Spectrum,_FITSfile,"LogicalQuality",'/
+     :                   /'_CHAR,_CHAR)', BDI2_SPMAPLQ, DID, STATUS )
+
+*    FITS times series interface
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_TimeSeries,_FITSfile,_CHAR)',
+     :                   BDI2_TICHK, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemGet(_TimeSeries,_FITSfile,_CHAR)',
+     :                   BDI2_TIGET, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_TimeSeries,_FITSfile,_CHAR,_CHAR,_CHAR)',
+     :                   BDI2_TIMAP, DID, STATUS )
+
+*    FITS image interface
+        CALL ADI_DEFFUN(
+     :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
+     :                   BDI2_IMCHK, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
+     :                   BDI2_IMGET, DID, STATUS )
+
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
+     :                   BDI2_IMMAP, DID, STATUS )
+
+*    FITS Scalar interface
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_Scalar,_FITSfile,"Data",_CHAR,_CHAR)',
+     :                   BDI2_SCMAP, DID, STATUS )
+
+*    FITS Array interface
+        CALL ADI_DEFFUN(
+     :       'FileItemMap(_Array,_FITSfile,"Data",_CHAR,_CHAR)',
+     :                   BDI2_ARMAP, DID, STATUS )
+
+*    All FITS unmapping for BDI goes through BDI2_UNMAP
+        CALL ADI_DEFFUN(
+     :       'FileItemUnmap(_,_FITSfile,_CHAR,_INTEGER)',
+     :                   BDI2_UNMAP, DID, STATUS )
 
 *    Mark as initialised
         BDI_INIT = .TRUE.

@@ -91,9 +91,9 @@
       EXTERNAL        		ADI2_FCLOSE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
-c      EXTERNAL        		BDI2_SETLNK
+      EXTERNAL        		BDI2_SETLNK
 
-c      EXTERNAL        		EDI2_SETLNK
+      EXTERNAL        		EDI2_SETLNK
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
@@ -115,7 +115,7 @@ c      EXTERNAL        		EDI2_SETLNK
 *  File system methods
       CALL ADI_DEFMTH( 'FileClose(_FITSfile)', ADI2_FCLOSE, DID,
      :                   STATUS )
-      CALL ADI_DEFMTH( 'FileComit(_FITSfile)', ADI2_FCOMIT, DID,
+      CALL ADI_DEFMTH( 'FileCommit(_FITSfile)', ADI2_FCOMIT, DID,
      :                   STATUS )
       CALL ADI_DEFMTH( 'FileTrace(_FITSfile)', ADI2_FTRACE, DID,
      :                   STATUS )
@@ -124,11 +124,17 @@ c      EXTERNAL        		EDI2_SETLNK
      :                   DID, STATUS )
 
 *  Define BDI interface
-c      CALL ADI_DEFMTH( 'SetLink(_BinDS,_FITSfile)', BDI2_SETLNK,
-c     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_BinDS,_FITSfile)', BDI2_SETLNK,
+     :                 DID, STATUS )
 
-c      CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
-c     :                 DID, STATUS )
+      CALL ADI_DEFMTH( 'SetLink(_Array,_FITSfile)', BDI2_SETLNK,
+     :                 DID, STATUS )
+
+      CALL ADI_DEFMTH( 'SetLink(_Scalar,_FITSfile)', BDI2_SETLNK,
+     :                 DID, STATUS )
+
+      CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
+     :                 DID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_INIT', STATUS )
