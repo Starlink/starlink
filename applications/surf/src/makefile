@@ -1,4 +1,4 @@
-# makefile for REDS package
+# makefile for SURF package
 
 .SUFFIXES : .ifl .ifc
 
@@ -7,10 +7,12 @@ SCULIB = /jcmt_sw/sun4_Solaris/lib
 
 # Libraries
 
-LIBS = -L$(SCULIB) -lsculib -lV77
-IRAS = -L/star/iras90 -lira -L/star/kappa -lkapsub -lkapgen
-STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam`
-ADAMLIBS = $(IRAS) $(STARLINK)
+LIBS = -L$(SCULIB) -lsculib
+IRAS = -L/star/iras90 -lira -L/jcmt_sw/scuba/surf_kap -lsurf_kap
+# -L/star/kappa -lkapsub -lkapgen
+IRAS = -L/jcmt_sw/scuba/surf_kap -lsurf_kap
+STARLINK = -L/star/lib `ndf_link_adam` `fio_link_adam` `sla_link_adam` `agi_link_adam` `hlp_link_adam` `pda_link_adam`
+ADAMLIBS = $(IRAS) `surf_link_adam`
 
 # Includes
 
@@ -18,12 +20,12 @@ STARINC = /star/include
 
 
 # Linker
-LINK  = alink
-LDFLAGS =
+LINK  = alink -xdbx
+LDFLAGS =  -C -g
 
 # Compiler flags
 
-FFLAGS = -O3
+FFLAGS = -C -g -DHAS_IRAS90
 FC    = f77
 COMPIFL = compifl
 
@@ -34,23 +36,32 @@ INSTDIR = /jcmt_sw/sun4_Solaris/bin
 INSTOPTS = -s -g jcmtsw
 
 # Source code
-FSOURCES= reds.f reds_wtfn_rebin.f reds_crosstalk.f reds_extinction.f \
-	reds_flatfield.f reds_get_demod.f reds_get_flat.f reds_modify.f \
-	reds_scuphot.f reds_rebin.f reds_reduce_switch.f reds_restore.f \
-	reds_write_demod.f reds_write_flat.f reds_write_photom.f \
-	reds_skydip.f reds_scucat.f kstest.f drawsig.f \
-	reds_chgpnt.f reds_chgflat.f reds_chgqual.f\
-	kpg1_ivci.f scuhelp.f reds_remsky.f reds_scuover.f lsq_fit.f \
-	lsq_matinv.f
+# Remove these lines:
+# reds_get_demod.f reds_get_flat.f kpg1_ivci.f reds_crosstalk.f
+# reds_write_demod.f reds_write_flat.f
+FSOURCES= surf_mon.f surf_extinction.f surf_flatfield.f \
+	surf_scuphot.f surf_rebin.f surf_reduce_switch.f surf_restore.f \
+	surf_write_photom.f surf_write_data.f surf_read_rebin_ndf.f\
+	surf_skydip.f surf_scucat.f \
+	surf_chgpnt.f surf_chgflat.f surf_chgqual.f \
+	surf_scuhelp.f surf_remsky.f surf_scuover.f surf_chgdata.f\
+	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f
 
-IFL=    reds.ifl extinction.ifl modify.ifl reduce_switch.ifl flatfield.ifl \
-	rebin.ifl scucat.ifl kstest.ifl scuphot.ifl skydip.ifl drawsig.ifl \
+FCPP=	surf_write_map_info.F
+
+IFL=    surf.ifl extinction.ifl reduce_switch.ifl flatfield.ifl \
+	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl drawsig.ifl \
 	change_pointing.ifl change_flat.ifl change_quality.ifl\
+	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
 	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl
 
 OBJS = ${FSOURCES:.f=.o}
+FCPPOBJ = ${FCPP:.F=.o}
 IFC  = ${IFL:.ifl=.ifc}
 
+
+.F.o:
+	${FC} ${FFLAGS} -c $<
 
 .f.o:
 	${FC} ${FFLAGS} -c $<
@@ -60,10 +71,12 @@ IFC  = ${IFL:.ifl=.ifc}
 
 # Some targets
 
-all:	reds ifc
+all:	surf ifc
 
-reds:	${OBJS} ${SCULIB}/libsculib.a
-	${LINK} ${OBJS} ${LIBS} ${ADAMLIBS}
+# objects: ${OBJS} ${FCPPOBJ}
+
+surf:	${OBJS} ${FCPPOBJ} ${SCULIB}/libsculib.a
+	${LINK} ${OBJS} ${FCPPOBJ} ${LDFLAGS} ${LIBS} ${ADAMLIBS}
 
 ifc:	${IFC}
 
@@ -91,7 +104,7 @@ PRM_PAR:
 	ln -s ${STARINC}/prm_par $@
 
 REDS_SYS:
-	ln -s reds_sys $@
+	ln -s surf_par $@
 
 reds_chgflat.f:      REDS_SYS    
 reds_chgpnt.f:       REDS_SYS
