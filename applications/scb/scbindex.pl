@@ -162,6 +162,7 @@ tie %locate, SDBM_File, $indexfile, O_CREAT | O_RDWR, 0644;
 
 chdir $srcdir or die "Couldn't enter $srcdir\n";
 index_dir "SOURCE#", ".";
+write_entry "SOURCE#", $srcdir;
 
 #  Index files from include directory.
 
@@ -237,7 +238,7 @@ sub index_list {
 #  tarfile or a directory.
 
    local $package;
-   $path =~ s%([/#>])./%$1%g;    #  Tidy it up.
+   $path =~ s%([/#>])./%$1%g;    #  Tidy up the path.
    $path =~ s%//*%/%g;           #
    if ($path =~ s%^SOURCE#([^./>]+)(.tar.Z>|.tar.gz>|.tar>|/)$% 
               ($package = uc $1) . '#' %e) {
@@ -444,11 +445,13 @@ sub index_h {
 
 #  Strip head part of path.
 
-   $file =~ s%^.*/%%;
+   my $include = $file;
+   $include =~ s%^.*/%%;
+   $file =~ s%^./%%;
 
 #  Write to index.
 
-   write_entry $file, "$path$file";
+   write_entry $include, "$path$file";
 }
 
 
