@@ -4,10 +4,10 @@
 if test -f configure -a configure -nt configure.ac; then
     : nothing to do
 else
-    autoconf
+    autoreconf
 fi
 if test ! -x configure; then
-    echo "Ooooh dear, autoconf didn't work -- I can't find ./configure"
+    echo "Ooooh dear, autoreconf didn't work -- I can't find ./configure"
     exit 1
 fi
 
