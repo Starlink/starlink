@@ -1,3 +1,14 @@
+<subsect id=rn-0.8 export>Release 0.8
+
+<p>Added support for palettised PNG output.  This was intended to
+allow me to support full transparency on PNGs, but the particular case
+which is appropriate for this seems to be very poorly supported in PNG
+viewers, so, although I believe the output to be correct, you can't
+see the benefit in most cases.
+
+<p>That made it easy to support changing the foreground and background
+colours for output text, so I did that as an encore.
+
 <subsect id=rn-0.7 export>Release 0.7
 
 <p>Version number fiddling: this is still beta software, and as such

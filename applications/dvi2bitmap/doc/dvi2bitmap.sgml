@@ -52,6 +52,11 @@ New release.  Documentation tidyups.  Mentioned new support for PNG graphics.
 Described problems finding fonts.
 </distribution>
 
+<distribution string="0.8" date="??-June-2000" author="ng" versionid=v0-8>
+Documented changes to list of specials (foreground and background
+colours).
+</distribution>
+
 </history>
 
 <copyright>
@@ -92,7 +97,7 @@ This HTML documentation is also available as a
 <webref url='dvi2bitmap.single.html' >single file</webref>
 ]]>
 
-<p>This document matches version 0.7-1 of the program (you can see
+<p>This document matches version 0.8 of the program (you can see
 what version you have with the command <kbd/dvi2bitmap -V>).  This
 should currently be regarded as beta software.
 
@@ -103,7 +108,7 @@ make things a little clearer.</update>
 <p>Synopsis:
 <verbatim>
 dvi2bitmap 
-    [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
+    [-f font-path] [-r resolution] [-m magnification] [-P[BbTt]]
     [-s scalefactor] [-t pbm|gif|xbm] [-o output] [-b(h|w) size]
     [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFt]]
     [-p num] [-l num] [-pp ranges]
@@ -262,17 +267,19 @@ dvi2bitmap -pp 3,6-10 ... # process only the specified pages
 dvi2bitmap -pp :2,1 ... # process only pages where \count2 was 1
 </verbatim>
 
-<dt><code/-P[bt]>
+<dt><code/-P[BbTt]>
 <dd>Specifies processing of the output bitmap.
-<code/-Pb> blurs the bitmap, making a half-hearted attempt to make a
+<code/-PB> blurs the bitmap, making a half-hearted attempt to make a
 low-resolution bitmap look better.  This really isn't up to much -- if
 you have the fonts available, or are prepared to wait for them to be
 generated, a better way is to use the <code/-m> option to magnify the
 DVI file, and then the <code/-s> option to scale it back down to the
 correct size.
-<code/-Pt> makes the output bitmap have a transparent background, if
+<code/-PT> makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
-<code/-t>
+<code/-t>.  The options <code/-Pb> and <code/-Pt> disable blurring and
+transparency, respectively.  By default, bitmaps are not blurred, but
+are transparent if possible.
 
 <dt><code/-q>
 <dd>Quiet mode -- suppress chatter.  
@@ -388,6 +395,14 @@ specify <code/imageformat>; this is for consistency, and makes it
 clear that this is setting a default format rather than setting the
 format only for the next image (that's not implemented at present, but
 could be added).
+
+<dt><code>default foreground|background red green blue</code>
+<dd>Sets the (default) foreground and background colours for text.
+This works, as long as you specify the colour change before any text
+is output, since you can't, at present, change the colours after
+that.  Specifically, you can't change the colours for a fragment of
+text in the middle of a page.  The colours are specified as a set of
+three integers in the (inclusive) range 0--255.
 
 </dl>
 
