@@ -91,6 +91,7 @@
 *  External References:
       EXTERNAL			EDI1_ALTLEN
       EXTERNAL			EDI1_CREAT
+      EXTERNAL			EDI1_LUPDT
       EXTERNAL			EDI1_MAP
       EXTERNAL			EDI1_UNMAP
 
@@ -116,6 +117,9 @@
      :                               EDI1_CREAT, DID, STATUS )
         CALL ADI_DEFFUN( 'ListAlterLength(_EventDS,_HDSfile,_INTEGER)',
      :                               EDI1_ALTLEN, DID, STATUS )
+        CALL ADI_DEFFUN( 'ListModify(_EventDS,_HDSfile,_CHAR,'/
+     :                     /'_EventList)',
+     :                               EDI1_LUPDT, DID, STATUS )
 
 *    Mark as initialised
         EDI_INIT = .TRUE.
