@@ -1,5 +1,5 @@
 *+  IMG_POLIDX - Fill index array with polar bin number
-      SUBROUTINE IMG_POLIDX( NX, NY, POLX, POLY, RBIN,
+      SUBROUTINE IMG_POLIDX( NX, NY, POLX, POLY, REG, RBIN, RBNDS,
      :                      AZANG, NRAD, NSECTOR, INDEX, STATUS )
      :
 *
@@ -30,6 +30,8 @@
       INTEGER			NX,NY            	! Input dimensions
 							! square axis units
       REAL 			POLX,POLY               ! Centre of polar
+      LOGICAL			REG			! Regular bins?
+      REAL			RBNDS(*)		! Bin boundaries
       REAL 			RBIN                    ! Radial binsize (pixels)
       REAL 			AZANG                   ! Initial azimuthal angle (degs)
       INTEGER 			NRAD,NSECTOR            ! Output dimensions
@@ -78,8 +80,17 @@
 
 *      Calculate radius of element
 	  RAD = SQRT(XOLD**2+YOLD**2)
-          KK = INT( RAD / RBIN ) + 1
-          KK = MIN( NRAD, KK )
+
+*      Determine radial bin number
+          IF ( REG ) THEN
+            KK = INT( RAD / RBIN ) + 1
+            KK = MIN( NRAD, KK )
+          ELSE
+            KK = 1
+            DO WHILE ( (KK.LE.NRBIN) .AND. (RAD.GT.RBNDS(KK*2-1))
+              KK = KK + 1
+            END DO
+          END IF
 
 *      Find position angle of element
           IF ( NSECTOR .GT. 1 ) THEN
