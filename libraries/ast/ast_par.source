@@ -45,6 +45,8 @@
 *        Added new values for WcsMap projections.
 *     30-APR-2003 (DSB):
 *        Added AST_VERSION.
+*     15-JUL-2003 (DSB):
+*        Added AST_RATE.
 *-
 
 *  Length of character string returned by a character function.
@@ -134,6 +136,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_RESAMPLEW
       INTEGER AST_SIMPLIFY
       LOGICAL AST_ISAMAPPING
+      DOUBLE PRECISION AST_RATE
 
 *  CmpMap class.
       INTEGER AST_CMPMAP
