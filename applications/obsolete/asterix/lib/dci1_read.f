@@ -150,7 +150,9 @@
 *    Check for datasets without fullo info
       IF ( IOK ) THEN
         CALL ADI1_LOCSORT( ARGS(1), .FALSE., SOLOC, STATUS )
-        IF ( INSTRUM .EQ. 'WFC' ) THEN
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+        ELSE IF ( INSTRUM .EQ. 'WFC' ) THEN
           MOK = .TRUE.
           MISSION = 'ROSAT'
           CALL ADI1_CGET0C( SOLOC, 'DETECTOR', DOK, DET, STATUS )

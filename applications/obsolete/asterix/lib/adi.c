@@ -2692,6 +2692,9 @@ void adix_mtacop( ADImta *ind, ADImta *outd, ADIstatus status )
   int           ooffset = 0;            /* Offset from o/p frame to origin */
   int           osecskip = 1;           /* O/p values to skip per section */
 
+/* Check status */
+  _chk_stat;
+
 /* Output is not truncated by default */
   outd->trunc = ADI__false;
 
