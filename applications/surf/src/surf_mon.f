@@ -12,10 +12,15 @@
 *    Bugs :
 *    Authors :
 *     J.Lightfoot (REVAD::JFL)
+*     Tim Jenness (timj@JACH)
 *    History :
 *     $Id$
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
+*     $Log$
+*     Revision 1.2  1996/07/31 18:53:16  timj
+*     Add skydip option
+*
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -79,6 +84,10 @@
       ELSE IF (NAME .EQ. 'RESTORE') THEN
 
          CALL REDS_RESTORE (STATUS)
+
+      ELSE IF (NAME .EQ. 'SKYDIP') THEN
+
+         CALL REDS_SKYDIP (STATUS)
 
       END IF
 
