@@ -503,7 +503,7 @@ export:
 prepare:
 
 check_packages:
-[available] Nov 28, 2003 4:23:32 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] 28-Nov-2003 14:36:57 uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -568,18 +568,18 @@ javadocs:
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstNumberLabels.java:99: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java:71: warning - The first sentence is interpreted to be:
+  [javadoc] "The suggested gap resolution (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/src/main/uk/ac/starlink/ast/gui/GraphicsEdges.java:54: warning - The first sentence is interpreted to be:
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
-  [javadoc] "The suggested gap resolution (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
@@ -1377,10 +1377,10 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/package.html: warning - The first sentence is interpreted to be:
   [javadoc] our term for complex data structures that evolve with time."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "This package contains general utilities for applications that use
   [javadoc] recognition, such as:
   [javadoc] <ol>
@@ -1427,22 +1427,22 @@ javadocs:
   [javadoc]  node, i.e. it can contain children."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/modular/ModularGraphModel.java:132: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the given object is a composite
+  [javadoc]  node in this model, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node in this model, i.e. it contains children."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
+  [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node in this model, i.e. it contains children."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node in this model, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node in this model, i.e. it contains children."
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
   [javadoc]  this classifier can support multiple calls to "train"."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
   [javadoc] "Return whether this classifier is incremental, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return whether this classifier is incremental, i.e. whether
@@ -1888,17 +1888,17 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graph/tutorial/SimpleTutorial.java:25: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeAdapter.java:41: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:26: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/AttributeProxy.html...
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/AttributeProxy.html...
   [javadoc] "Return true if this attribute is "visible." This tells
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeAdapter.java:46: warning - @rating is an unknown tag.
   [javadoc]  attribute editors and so on whether or not to display
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
   [javadoc]  this attribute."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
   [javadoc] "Return true if this attribute is "visible." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeAdapter.java:46: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/GraphModel.html...
@@ -2681,13 +2681,13 @@ javadocs:
   [javadoc]  "
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
   [javadoc] "Update the shape to match a new radius etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Update the shape to match a new radius etc. in the various
   [javadoc]  components."
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/ExceptionDialog.java:50: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:63: warning - @created is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
@@ -2795,7 +2795,7 @@ execute_mk_script:
      [exec] Processing /apps/cvsbuild/star/lib/libems.a
      [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/java/source/..//lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
      [exec] rm -r -f temp
 
 jars:
@@ -2979,40 +2979,6 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
   [javadoc] Constructing Javadoc information...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java:5: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarEntry;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:16: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarEntry;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:17: package org.apache.tools.tar does not exist
-  [javadoc] import org.apache.tools.tar.TarInputStream;
-  [javadoc]                             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:330: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private InputStream getEntryInputStream( TarEntry reqEnt ) 
-  [javadoc]                                              ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:348: cannot resolve symbol
-  [javadoc] symbol  : class TarInputStream 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private TarInputStream getTarInputStream() throws IOException {
-  [javadoc]             ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:361: cannot resolve symbol
-  [javadoc] symbol  : class TarInputStream 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private static TarEntry getNextEntry( TarInputStream tstrm ) {
-  [javadoc]                                           ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java:361: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarStreamDataNode
-  [javadoc]     private static TarEntry getNextEntry( TarInputStream tstrm ) {
-  [javadoc]                    ^
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java:20: cannot resolve symbol
-  [javadoc] symbol  : class TarEntry 
-  [javadoc] location: class uk.ac.starlink.treeview.TarBranchDataNode
-  [javadoc]     public TarBranchDataNode( TarStreamDataNode tarnode, TarEntry entry ) {
-  [javadoc]                                                          ^
   [javadoc] Standard Doclet version 1.4.2_02
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
@@ -3043,7 +3009,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java:530: warning - @param argument "topNode" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/ZipArchiveDataNode.java:36: warning - @param argument "name" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 33 warnings
+  [javadoc] 25 warnings
 
 webstart:
 
@@ -3179,7 +3145,7 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
      [exec] g77: temp/*.o: No such file or directory
 
@@ -4017,4 +3983,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.1a.tar
 
 BUILD SUCCESSFUL
-Total time: 17 minutes 5 seconds
+Total time: 16 minutes 20 seconds

@@ -218,7 +218,7 @@ build:
 prepare:
 
 check_packages:
-[available] Nov 28, 2003 4:09:17 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] 28-Nov-2003 14:24:39 uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -477,7 +477,7 @@ execute_mk_script:
      [exec] Processing /apps/cvsbuild/star/lib/libems.a
      [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/java/source/..//lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
      [exec] rm -r -f temp
      [echo] Executing Mirage target: build
 
@@ -579,9 +579,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 12 seconds
+Total time: 1 minute 8 seconds

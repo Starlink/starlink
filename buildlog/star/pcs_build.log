@@ -809,7 +809,7 @@ ln -fs ../string/libstring_adam.a libstring_adam.a
 ln -fs ../subpar/libsubpar_adam.a libsubpar_adam.a
 tar -xf parsecon_source.tar compifl.f
 mv libparsecon_adam.so tmp_share;
-PATH=../string:/apps/cvsbuild/star/bin:/usr/bin:/bin;export PATH;\
+PATH=../string:/apps/cvsbuild/star/bin:/bin:/usr/bin:/usr/local/bin:/usr/bin/X11:/usr/X11R6/bin:/apps/jdk/bin;export PATH;\
           g77 -fno-second-underscore -O -fPIC  -o compifl compifl.f \
              -L.  \
             -L/apps/cvsbuild/star/lib -L/apps/cvsbuild/star/lib \
