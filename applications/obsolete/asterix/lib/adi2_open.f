@@ -70,6 +70,8 @@
 *        Original version.
 *     24 Feb 1997 (RB):
 *        Add MODE and REP values.
+*     4 Mar 1887 (RB):
+*        Use IMODE in FTOPEN (not MODE!).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,7 +134,7 @@
 
 *    Try to open file
         FITSTAT = 0
-        CALL FTOPEN( LUN, FSPEC(:LFILEC), MODE, BSIZE, FITSTAT )
+        CALL FTOPEN( LUN, FSPEC(:LFILEC), IMODE, BSIZE, FITSTAT )
 
 *    Opened ok?
         IF ( FITSTAT .EQ. 0 ) THEN
