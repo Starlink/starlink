@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "f77.h"
 #include "sae_par.h"
 #include "merswrap.h"
@@ -39,6 +40,10 @@ extern F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
                                   INTEGER(status) TRAIL(item) TRAIL(value) );
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
+
+extern F77_SUBROUTINE(cat_rapnd)( INTEGER(ciout), INTEGER(status) );
+extern F77_SUBROUTINE(cat_put0r)( INTEGER(gid), REAL(val), LOGICAL(no), INTEGER(status) );
+
 
 static Tcl_Interp *interp=NULL;
 
@@ -1175,7 +1180,8 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
 
 *  Description:
 *     This C function obtains the value of a Tcl list element from a Tcl 
-*     interpreter created earlier (e.g. using POL1_TCLEX).
+*     interpreter created earlier (e.g. using POL1_TCLEX). Note, this is
+*     slow for large lists!!!
 
 *  Parameters:
 *     VARNAM = CHARACTER * ( * ) (Given)
@@ -1237,7 +1243,7 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
          }
 
 /* Execute this Tcl command. */
-         code = Tcl_Eval( interp, buf );
+         code = Tcl_Eval( interp, buf ); 
 
 /* Check for error in the tcl script */
          if( code != TCL_OK ){
@@ -1316,5 +1322,175 @@ char *cstring( const char *fstring, int len, int *STATUS ) {
    }
 
    return ret;
+}
+
+
+F77_SUBROUTINE(pol1_rdtdt)( CHARACTER(FILNAM), INTEGER(NCOL),
+                            INTEGER_ARRAY(COLID), INTEGER(CIOUT),
+                            INTEGER(STATUS) TRAIL(FILNAM) ){
+/*
+*  Name:
+*     POL1_TDTDT
+
+*  Purpose:
+*     Read the data from the specified Tcl file.
+
+*  Description:
+*     This C function reads the row/column data stored in the tcl variable 
+*     data_ in the supplied Tcl file, and copies it into a CAT catalogue.
+*     It is implemented in a very low level way to avoid copying the data
+*     into a big dynamic array, which is very slow for large data arrays.
+
+*  Parameters:
+*     FILENAM = CHARACTER * ( * ) (Given)
+*        The name of the Tcl file.
+*     NCOL = INTEGER (Given
+*        The number of columns in the Tcl table.
+*     COLID( NCOL ) = INTEGER (Given)
+*        The CAT identifier for the column in which to store each Tcl
+*        column. Columns which are not required in the CAT catalogue
+*        should be assigned the value -1.
+*     CIOUT = INTEGER (Returned)
+*        The CAT identifier for the output catalogue.
+*     STATUS = INTEGER (Given and Returned)
+*        The inherited global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     7-DEC-2000 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*/
+
+/* Arguments: */
+   GENPTR_CHARACTER(FILNAM)
+   GENPTR_INTEGER(NCOL)
+   GENPTR_INTEGER_ARRAY(COLID)
+   GENPTR_INTEGER(CIOUT)
+   GENPTR_INTEGER(STATUS)
+
+/* Local Variables: */
+   DECLARE_LOGICAL(no);
+   DECLARE_INTEGER(gid);
+   DECLARE_REAL(val);
+   char mess[255];
+   char *file;
+   int i, ok, n, use, nc;
+   char buf[81];
+   char numbuf[81];
+   char *p, *e, *q;
+   FILE *fd;
+
+/* Define an f77 false value. */
+   no = F77_FALSE;
+
+/* Check the inherited status */
+   if( *STATUS != SAI__OK ) return;
+
+/* Get a null terminated copy of the file name. */
+   file = cstring( FILNAM, FILNAM_length, STATUS );
+   if ( file ) {
+
+/* Open the file. */
+      fd = fopen( file, "r" );
+      if( !fd ) {
+         *STATUS = SAI__ERROR;
+         sprintf( mess, "pol1_rdtdt: Error opening file '%s'.\n", file );
+         Error( mess, STATUS );
+         return;
+      }
+
+/* Initialize things. */
+      buf[81] = 0;
+      e = buf + 81;
+      p = e;
+      ok = 0;
+      q = numbuf;
+      *q = 0;
+      nc = 0;
+   
+/* Loop round reading the data stream from the file. */
+      while( 1 ) {
+
+/* We we have reached the end of the buffer, re-fill it from the file. If
+   the end of the file is reached, abort. */
+         if( ! *p ) {
+            n = fread( (void *) buf, 1, 81, fd );
+            if( !n ) break;
+
+/* If we have not yet found a line containing the string "set data_",
+   check the buffer now. If the buffer does not contain the string, 
+   continue on for a new buffer. Otherwise, move p on to point to the
+   text following the string.*/
+            if( !ok ) {
+               p = strstr( buf, "set data_" );
+               if( !p ){
+                  p = e;
+                  continue;
+               } else {
+                  p += 9;
+                  ok = 1;
+               }
+            } else {
+               p = buf;
+            }
+         } 
+
+/*  Count how many number characters there are at the start of the
+    remaining part of the buffer. */
+         use = strspn( p, "0123456789.-+DEde" );
+   
+/*  If any, copy them to the number buffer. */
+         if( use ) {
+            memcpy( q, p, use );
+            p += use;
+            q += use;
+         }
+   
+/*  If we are still within the buffer, store the number in the number
+    buffer in the current row buffer for the output catalogue. */
+         if( *p ){
+            *q = 0;
+            if( numbuf[0] ) {
+               sscanf( numbuf, "%f", &val );
+
+               gid = COLID[nc];
+               if( gid != -1 ) {
+                  F77_CALL(cat_put0r)( INTEGER_ARG(&gid), REAL_ARG(&val),
+                                 LOGICAL_ARG(&no), INTEGER_ARG(STATUS) ); 
+                  if( *STATUS != SAI__OK ) break;
+               }
+               nc++;
+
+/* Write out the row buffer when it is full. */
+               if( nc == *NCOL ) {
+                  F77_CALL(cat_rapnd)( INTEGER_ARG(CIOUT), INTEGER_ARG(STATUS) ); 
+                  if( *STATUS != SAI__OK ) break;
+                  nc = 0;
+               }
+
+            }
+            q = numbuf;
+   
+/*  Skip fowward to the next number character */
+            p += strcspn( p, "0123456789.-+DEde" );
+   
+         }
+
+      }
+
+/*  Close the file. */
+      fclose( fd);
+
+/*  Free memory used to hold the null-terminated file name */
+      free( file );
+   }
 }
 

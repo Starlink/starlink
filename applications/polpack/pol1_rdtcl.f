@@ -69,11 +69,13 @@
       CHARACTER CNAMCI( 30 )*(MXCOL)! Column names in ref catalogue
       CHARACTER TEXT*(MXCOL*(VAL__SZD+3)+5)  ! A text buffer
       CHARACTER WORDS( MXCOL )*(VAL__SZD+3) ! Words in a row of data 
+      INTEGER DECCOL             ! Zero based index of DEC column in Tcl file
       INTEGER GI( MXCOL )        ! Column identifier in ref catalogue
       INTEGER GOTWCS             ! Non-zero if Tcl file has RA/DEC columns 
       INTEGER I                  ! Column index in ref catalogue
       INTEGER II                 ! CAT identifier for a parameter
       INTEGER J                  ! Column index in tcl file
+      INTEGER COLID( MXCOL )     ! Output column ID for for each tcl col
       INTEGER JCOLCI( MXCOL )    ! Col no. in tcl file for eahc ref cat col
       INTEGER K                  ! Row index
       INTEGER LSTAT              ! Secondary status value
@@ -82,8 +84,10 @@
       INTEGER NCOLCI             ! No of columns in ref catalogue
       INTEGER NROW               ! No of rows in tcl file 
       INTEGER NWRD               ! No. of words in a row of data from Tcl file 
+      INTEGER RACOL              ! Zero-based index of RA column in Tcl file
       INTEGER START( MXCOL )     ! Word starts in a row of data from Tcl file 
       INTEGER STOP( MXCOL )      ! Word ends in a row of data from Tcl file 
+      LOGICAL USEWCS             ! Add equinox/epoch parameters to output?
       REAL VAL                   ! A data value
 *.
 
@@ -131,26 +135,6 @@
          END DO
       END IF
 
-*  If the input file contains WCS, save the epoch and equinox values in
-*  the output catalogue.
-      IF( GOTWCS .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
-
-         CALL POL1_TCLGT( 'equinox_', -1, TEXT, NC, STATUS )
-         IF( TEXT .NE. ' ' ) THEN
-            CALL CAT_PPTSC( CIOUT, 'EQUINOX', TEXT( : NC ), 'Epoch of'//
-     :                      ' reference equinox', II, STATUS )
-            CALL CAT_TATTI( II, 'CSIZE', NC, STATUS ) 
-         END IF
-
-         CALL POL1_TCLGT( 'epoch_', -1, TEXT, NC, STATUS )
-         IF( TEXT .NE. ' ' ) THEN
-            CALL CAT_PPTSC( CIOUT, 'EPOCH', TEXT( : NC ), 'Epoch of '//
-     :                      'observation', II, STATUS )
-            CALL CAT_TATTI( II, 'CSIZE', NC, STATUS ) 
-         END IF
-
-      END IF
-
 *  If any of the strings could not be converted by CHR, STATUS will not be
 *  SAI__OK but no call to ERR_REP wil have been made. CHeck for this and
 *  call ERR_REP now if required.
@@ -166,11 +150,16 @@
 
 *  Find the index within the tcl catalogue of each column in the CAT
 *  catalogue.
+      DO J = 1, NCOL
+         COLID( J ) = -1
+      END DO
+
       DO I = 1, NCOLCI
          JCOLCI( I ) = 0
          DO J = 1, NCOL
             IF( CNAM( J ) .EQ. CNAMCI( I ) ) THEN
                JCOLCI( I ) = J 
+               COLID( J ) = GI( I )
             END IF
          END DO
 
@@ -185,56 +174,87 @@
 
       END DO
 
-*  Copy the data from the Tcl file into the CAT catalogue.
-      DO K = 0, NROW - 1
+*  If the input file contains WCS, see if we need to save the equinox and
+*  epoch in the output catalogue.
+      IF( GOTWCS .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Get a string holding the column data for this row.
-         CALL POL1_TCLGT( 'data_', K, TEXT, NC, STATUS )
+*  Get the ra and dec column indices in the Tcl file, convert from zero
+*  to one based.
+         CALL POL1_TCLGT( 'ra_col_', -1, TEXT, NC, STATUS )
+         CALL CHR_CTOI( TEXT, RACOL, STATUS )
+         RACOL = RACOL + 1
 
-*  Split it up into consitituent words.
-         CALL CHR_DCWRD( TEXT, NCOL, NWRD, START, STOP, WORDS, LSTAT ) 
+         CALL POL1_TCLGT( 'dec_col_', -1, TEXT, NC, STATUS )
+         CALL CHR_CTOI( TEXT, DECCOL, STATUS )
+         DECCOL = DECCOL + 1
 
-*  Check the number of columns.
-         IF( NWRD .NE. NCOL .AND. STATUS .EQ. SAI__OK ) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI( 'N', NWRD )
-            CALL MSG_SETI( 'M', NCOL )
-            CALL MSG_SETI( 'R', I )
-            CALL ERR_REP( 'POL1_RDTCL_ERR4', 'Only ^N values found in'//
-     :                    ' row ^R. ^M are required.', STATUS )
+*  Check that the conversions from text to integer went OK.
+         IF( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_STAT( LSTAT )
+            IF( LSTAT .EQ. SAI__OK ) THEN
+               CALL MSG_SETC( 'T', TEXT )
+               CALL ERR_REP( 'POL1_RDTCL_ERR4', 'Unable to interpret '//
+     :                       'string ''^T''.', STATUS )
+            END IF
             GO TO 999
          END IF
 
-*  Loop round each column in the output catalogue.
+*  See if the RA and DEC columns are needed in the output catalogue.
+         USEWCS = .FALSE.
          DO I = 1, NCOLCI
-
-*  Abort if an error has occurred.
-            IF( STATUS .NE. SAI__OK ) GO TO 999
-
-*  Find the corresponding column in the Tcl catalogue.
-            J = JCOLCI( I )
-
-*  Decode the value for this column.
-            CALL CHR_CTOR( WORDS( J ), VAL, STATUS )
-            IF( STATUS .NE. SAI__OK ) THEN
-               CALL MSG_SETC( 'T', WORDS( J ) )
-               CALL ERR_REP( 'POL1_RDTCL_ERR5', 'Unable to interpret '//
-     :                       'string ''^T''.', STATUS )
-               GO TO 999
+            IF( JCOLCI( I ) .EQ. RACOL .OR. 
+     :          JCOLCI( I ) .EQ. DECCOL ) THEN
+               USEWCS = .TRUE.
             END IF
-
-*  Store it in the current row buffer for the output catalogue.
-            CALL CAT_PUT0R( GI( I ), VAL, .FALSE., STATUS )
-
          END DO
 
-*  Append the current row buffer to the output catalogue.
-         CALL CAT_RAPND( CIOUT, STATUS )
+*  If the WCS columns are used, copy the EQUINOX and EPOCH to the output
+*  catalogue. First get the value from the Tcl file.
+         IF( USEWCS ) THEN
+            CALL POL1_TCLGT( 'equinox_', -1, TEXT, NC, STATUS )
 
-* Abort if an error has occurred.
-         IF( STATUS .NE. SAI__OK ) GO TO 999  
+*  Check a value was obtained OK.
+            IF( NC .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
 
-      END DO
+*  Try to get a CAT identifier for a pre-existing EQUINOX parameter.
+               CALL CAT_TIDNT( CIOUT, 'EQUINOX', II, STATUS )
+
+*  If this was succesful, set the parameter value.
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS ) 
+
+*  If an error occurred looking for a pre-existing parameter, creata a
+*  new one, setting its value.
+               ELSE
+                  CALL CAT_PPTSC( CIOUT, 'EQUINOX', TEXT( : NC ), 
+     :                           'Epoch of reference equinox', II, 
+     :                           STATUS )
+               END IF
+
+*  Relase the identifier
+               CALL CAT_TRLSE( II, STATUS )
+
+            END IF
+
+*  Do the same for the epoch.
+            CALL POL1_TCLGT( 'epoch_', -1, TEXT, NC, STATUS )
+            IF( NC .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+               CALL CAT_TIDNT( CIOUT, 'EPOCH', II, STATUS )
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  CALL CAT_TATTC( II, 'VALUE', TEXT( : NC ), STATUS ) 
+               ELSE
+                  CALL CAT_PPTSC( CIOUT, 'EPOCH', TEXT( : NC ), 
+     :                            'Epoch of observation', II, STATUS )
+               END IF
+               CALL CAT_TRLSE( II, STATUS )
+            END IF
+
+         END IF
+
+      END IF
+
+*  Read the row/column data into the catalogue.
+      CALL POL1_RDTDT( FILE, NCOL, COLID, CIOUT, STATUS )
 
 *  Arrive here if an error occurs.
  999  CONTINUE      

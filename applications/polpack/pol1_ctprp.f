@@ -74,8 +74,8 @@
 *  Local Variables:
       BYTE BVAL                  ! Component value
       CHARACTER COMM*250         ! Component comment
-      CHARACTER CVAL*(MXCSIZ)      ! Component value
-      CHARACTER EXTFMT*50        ! Column external format string
+      CHARACTER CVAL*(MXCSIZ)    ! Component value
+      CHARACTER EXFMT*50        ! Column external format string
       CHARACTER NAME*50          ! Component name
       CHARACTER UNITS*50         ! Column units string
       DOUBLE PRECISION DVAL      ! Component value
@@ -115,11 +115,11 @@
             DONE = .TRUE.
          ELSE
 
-*  Create a  parameter with the same name, comment and value in the 
-*  output catalogue.
+*  Create a  parameter with the same name, comment and value in the output 
+*  catalogue.
             CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS ) 
-            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
             CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS ) 
+            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
 
             IF( DTYPE .EQ. CAT__TYPEB ) THEN
                CALL CAT_TIQAB( GI1, 'VALUE', BVAL, STATUS ) 
@@ -153,6 +153,17 @@
      :                         STATUS ) 
             END IF
 
+*  Set the external format string for the parameter, if it is defined in
+*  the input.
+            IF( STATUS .EQ. SAI__OK ) THEN 
+               CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS ) 
+               IF( STATUS. EQ. SAI__OK ) THEN 
+                  CALL CAT_TATTC( GI2, 'EXFMT', EXFMT, STATUS ) 
+               ELSE 
+                  CALL ERR_ANNUL( STATUS )
+               END IF
+            END IF
+
 *  Release the identifiers.
             CALL CAT_TRLSE( GI1, STATUS )
             CALL CAT_TRLSE( GI2, STATUS )
@@ -176,13 +187,37 @@
          ELSE
 
 *  Create a column in the output catalogue with the same attributes.
+*  Take care to check for the possibility of attributes not existing.
             CALL CAT_TIQAC( GI1, 'NAME', NAME, STATUS ) 
             CALL CAT_TIQAI( GI1, 'DTYPE', DTYPE, STATUS ) 
-            CALL CAT_TIQAI( GI1, 'CSIZE', CSIZE, STATUS ) 
-            CALL CAT_TIQAC( GI1, 'UNITS', UNITS, STATUS ) 
-            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
 
-            CALL CAT_CNEWS( CI2, NAME, DTYPE, CSIZE, UNITS, ' ', 
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+            CALL CAT_TIQAI( GI1, 'CSIZE', CSIZE, STATUS ) 
+            IF( STATUS .NE. SAI__OK ) THEN
+               CSIZE = 0
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+            CALL CAT_TIQAC( GI1, 'UNITS', UNITS, STATUS ) 
+            IF( STATUS .NE. SAI__OK ) THEN
+               UNITS = ' '
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+            CALL CAT_TIQAC( GI1, 'COMM', COMM, STATUS ) 
+            IF( STATUS .NE. SAI__OK ) THEN
+               COMM = ' '
+               CALL ERR_ANNUL( STATUS )
+            END IF
+   
+            CALL CAT_TIQAC( GI1, 'EXFMT', EXFMT, STATUS ) 
+            IF( STATUS .NE. SAI__OK ) THEN
+               EXFMT = ' '
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+            CALL CAT_CNEWS( CI2, NAME, DTYPE, CSIZE, UNITS, EXFMT, 
      :                      COMM, GI2, STATUS ) 
 
 *  Release the identifiers.
@@ -191,6 +226,9 @@
 
          END IF
       END DO
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
 
 *  Release the returned catalogue identifier if an eror occurred.
       IF( STATUS .NE. SAI__OK ) THEN
