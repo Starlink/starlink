@@ -1890,8 +1890,7 @@ do_deinstall:
 #  Relink the hypertext.
 	HTX_PATH='$(STAR_DOCS):$(INSTALL)/help';\
 	export HTX_PATH;\
-#	$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL)/help
-	hlink $(INSTALL_DOCS) $(INSTALL)/help
+	$(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL)/help
 #
 #  Deinstall the date stamp file after setting its protection so it may
 #  be removed.
