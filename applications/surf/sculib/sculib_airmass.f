@@ -25,9 +25,12 @@
 *     $Id$
 *     5-AUG-1993: Original version.
 *     $Log$
-*     Revision 1.2  1996/08/01 21:24:03  timj
-*     Change AIRMASS def to 1/SIN from 1/COS
+*     Revision 1.3  1996/08/02 01:55:11  timj
+*     Z was zenith distance NOT elevation so change back to COS
 *
+c Revision 1.2  1996/08/01  21:24:03  timj
+c Change AIRMASS def to 1/SIN from 1/COS
+c
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -73,7 +76,7 @@
      :     STATUS)
       ELSE
  
-         AIRMASS = 1.0D0 / SIN (ZZ)
+         AIRMASS = 1.0D0 / COS (ZZ)
 
          IF (AIRMASS .GT. 2.0) THEN
  
