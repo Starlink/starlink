@@ -351,7 +351,7 @@ D	        type*,'  energy bounds values dont agree'
             IF ( GENUS .NE. 'SPEC' ) THEN
               STATUS = SAI__ERROR
               CALL MSG_SETC( 'GENUS', GENUS )
-              CALL ERR_REP( ' ', 'Full Raymonth-Smith grid not '/
+              CALL ERR_REP( ' ', 'Full Raymond & Smith grid not '/
      :                  /'available for ^GENUS fitting', STATUS )
               GOTO 9000
             END IF
