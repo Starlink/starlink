@@ -47,11 +47,23 @@ mode make-manifest-mode in sl.dsl.
 			    (string-append "?" (data firstpara)))
 	  (process-children))))
 
+;; Changes here might need matching changes in 
+;; mode make-manifest-mode in sl.dsl.
+;;
+;; NOTE that the ent-sysid which is used is _stripped_ of its path.
+;; It is the responsibility of this stylesheet's harness to make sure
+;; that the positions of entities like this are resolved post-hoc.
 (element figurecontent
   (let* ((ent (attribute-string (normalize "image")
 				(current-node)))
+	 ;;(ent-sysid (and ent
+	 ;;		 (entity-system-id ent)))
 	 (ent-sysid (and ent
-			 (entity-system-id ent)))
+			 (car (reverse
+			       (tokenise-string
+				(entity-system-id ent)
+				boundary-char?: (lambda (c)
+						  (char=? c #\/)))))))
 	 (ent-notation (and ent-sysid
 			    (entity-notation ent))))
     (if ent-notation
