@@ -135,8 +135,8 @@ itcl::class gaia::StarBlink {
 
       #  Add menu bar for help.
       add_menubar
-      global env
-      add_help_button $env(GAIA_DIR)/StarBlink.hlp "On Window..."
+      global gaia_library
+      add_help_button $gaia_library/StarBlink.hlp "On Window..."
 
       #  Frame for buttons.
       itk_component add Bframe {

@@ -104,7 +104,7 @@ itcl::class gaia::StarAppFilter {
        #  Evaluate any configuration options.
        eval configure $args
 
-       #  Look for the gaFilter files. First in GAIA_DIR and then
+       #  Look for the gaFilter files. First in gaia_library and then
        #  in the HOME directory.
        if { [file readable $gaia_library/.gaFilters] } {
 	   if { ![catch {set ios [open $gaia_library/.gaFilters]}] } {

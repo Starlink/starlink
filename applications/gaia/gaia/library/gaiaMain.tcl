@@ -41,10 +41,14 @@ wm withdraw .
 
 #  Set the auto_load path for all the GAIA source TCL files. Note GAIA
 #  goes first so we can override files from anywhere else.
-set gaia_library $env(GAIA_DIR)
+if { [info exists env(GAIA_DIR)] } { 
+   set gaia_library $env(GAIA_DIR)
+} else {
+   if { ![info exists gaia_library] } { 
+      set gaia_library "/star/bin/gaia"
+   }
+}
 set auto_path [concat $gaia_library $auto_path]
-#set rtd_library $env(RTD_LIBRARY)
-#set skycat_library $env(SKYCAT_LIBRARY)
 
 #  Add blt library to auto_path.
 if {[info exists env(BLT_LIBRARY)]} {

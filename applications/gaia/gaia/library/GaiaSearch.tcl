@@ -88,10 +88,10 @@ itcl::class gaia::GaiaSearch {
             -command [code $this centre_selected_object_]
 
       #  Add option for a some help on this window (not image servers).
-         global env
-         set m [add_help_button $env(GAIA_DIR)/Catalogue.hlp "Catalogues Overview..." \
+         global gaia_library
+         set m [add_help_button $gaia_library/Catalogue.hlp "Catalogues Overview..." \
                    {General information about catalogues}   ]
-         set m [add_help_button $env(GAIA_DIR)/GaiaSearch.hlp "On Window..." \
+         set m [add_help_button $gaia_library/GaiaSearch.hlp "On Window..." \
                    {Display help on using this window}   ]
       }
 
