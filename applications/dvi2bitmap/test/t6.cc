@@ -129,13 +129,10 @@ int exercise_IBS(InputByteStream& IBS)
 
 	teststring.clear();
 	IBS.skip(75);		// to 490
-	while (! IBS.eof())
+	for (i=0; i<10; i++)
 	    teststring += IBS.getByte();
 	compareStrings("!end:56789", teststring, nfails);
 	
-	if (! IBS.eof())
-	    cerr << "Expected EOF, didn't get it" << endl;
-
     } catch (DviError& e) {
 	cerr << "DviError: " << e.problem() << endl;
 	nfails++;
@@ -180,16 +177,29 @@ int exercise_FBS(FileByteStream& FBS)
         for (i=0; i<10; i++)
             teststring += *block++;
 	compareStrings("!end:56789", teststring, nfails);
-	if (! FBS.eof())
-	    cerr << "Expected EOF, didn't get it" << endl;
 	
 	teststring.clear();
 	FBS.seek(-10);
         for (i=0; i<10; i++)
-            teststring += getByte();
+            teststring += FBS.getByte();
 	compareStrings("!end:56789", teststring, nfails);
-	if (! FBS.eof())
+
+	Byte last = FBS.getByte(); // read past EOF
+	if (last != 0) {
+	    cerr << "Expected last-byte=0, got " << last << endl;
+	    nfails++;
+	}
+	if (! FBS.eof()) {
 	    cerr << "Expected EOF, didn't get it" << endl;
+	    nfails++;
+	}
+
+	teststring.clear();
+	FBS.seek(0);
+	for (i=0; i<10; i++)
+	    teststring += FBS.getByte();
+	checkEOF(FBS);
+	compareStrings("!000:56789", teststring, nfails);
 	
     } catch (DviError& e) {
 	cerr << "DviError: " << e.problem() << endl;
@@ -284,10 +294,13 @@ int main (int argc, char **argv)
 	    // Test 4 -- with PipeStream
 	    if (verbosity > normal)
 		cerr << "===== Test 4" << endl;
-	    //PipeStream PBS(progname);
 	    PipeStream PBS("./t6.test -g 500");
 	    totalfails += exercise_IBS(PBS);
-	    cerr << "t6 status = " << PBS.getStatus() << endl;
+	    int status = PBS.getStatus();
+	    if (status != 0) {
+		cerr << "Pipe status non zero, was " << status << endl;
+		totalfails++;
+	    }
 	}
     } catch (DviError& e) {
 	cerr << "DviError: " << e.problem() << endl;
