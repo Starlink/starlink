@@ -25,7 +25,7 @@ beginfig(1);
   (y0t + y1t)/2 = y0;
   y1t - y0t = 1vu;
 
-  label.lft("acinclude.m4", z1t);
+  label.lft("starconf.m4", z1t);
   label.lft("configure.ac", z0t);
   drawarrow (z0t--tool.c) cutafter bpath tool;
   drawarrow (z1t--tool.c) cutafter bpath tool;
@@ -41,7 +41,7 @@ beginfig(2);
   (y0t + y1t)/2 = y0;
   y1t - y0t = 1vu;
 
-  label.lft("acinclude.m4", z1t);
+  label.lft("starconf.m4", z1t);
   label.lft("configure.ac", z0t);
   drawarrow (z0t--tool.c) cutafter bpath tool;
   drawarrow (z1t--tool.c) cutafter bpath tool;
