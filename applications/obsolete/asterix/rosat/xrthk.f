@@ -115,7 +115,6 @@
 * Attempt to open the eventrate file
       CALL RAT_HDLOOKUP(HEAD,'EVRATE','EXTNAME',EXT,STATUS)
       ERFILE = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
-	print*,erfile
 *
       CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
 *
@@ -133,7 +132,6 @@
 *
 *   Read eventrates times
          CALL RAT_HDLOOKUP(HEAD,'EVRATE','TIME',COL,STATUS)
-	print*,col
          CALL DAT_FIND(ERLOC, COL, EVTLOC, STATUS)
          CALL DAT_SIZE(EVTLOC, ENTIM, STATUS)
 *
@@ -150,7 +148,6 @@
 * Attempt to open the attitude file
       CALL RAT_HDLOOKUP(HEAD,'ASPECT','EXTNAME',EXT,STATUS)
       ATTFIL = SRT.ROOTNAME(1:CHR_LEN(SRT.ROOTNAME))//EXT
-	print*,attfil
 *
       CALL HDS_OPEN(ATTFIL, 'READ', ATTLOC, STATUS)
 *
@@ -168,7 +165,6 @@
 *
 *   Read attitude times
          CALL RAT_HDLOOKUP(HEAD,'ASPECT','TIME',COL,STATUS)
-	print*,col
          CALL DAT_FIND(ATTLOC, COL, AFTLOC, STATUS)
          CALL DAT_SIZE(AFTLOC, ANTIM, STATUS)
 *
@@ -483,7 +479,6 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *
 * Check if the HK data is complete
       IF (TIME(1) .GT. (OARR(1) + 10.)) THEN
-	print *,time(1),oarr(1)
          CALL MSG_PRNT('** The HK file is incomplete - times not '/
      &               /'covered by the file will be INCLUDED in the '/
      &               /'output file **')
