@@ -324,11 +324,14 @@
 	>
 
 <!--========== Document head ==========-->
+<![ %Feature.Everything [
+    <!entity % history ',history,docdate'>
+]]>
 <![ %Feature.Versioning [
     <!entity % history ',history'>
     <!entity % update 'update*,'>
 ]]>
-<!entity % history ',docdate' -- %Internal.Feature.Dateonly must have been set -->
+<!entity % history ',docdate'>
 <!entity % update ''>
 <!-- either HISTORY or DOCDATE elements will be present in DTD -->
 
