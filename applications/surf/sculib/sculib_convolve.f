@@ -56,12 +56,12 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
 *    Import :
+      INTEGER N_A
+      INTEGER N_B
       REAL    A_DATA (N_A)
       REAL    A_VARIANCE (N_A)
       INTEGER A_QUALITY (N_A)
       REAL    B (N_B)
-      INTEGER N_A
-      INTEGER N_B
       INTEGER N_MIDDLE
       REAL    NORM
 *    Import-Export :
