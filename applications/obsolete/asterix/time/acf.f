@@ -125,22 +125,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
 
-*  Global Variables:
-      INCLUDE '{global_variables_file}' ! [global_variables_description]
-*        {global_name}[dimensions] = {data_type} ({global_access_mode})
-*           [global_variable_purpose]
-
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-      [external_declaration]
-      {data_type} {external_name} ! [external_description]
-
 *  Local Constants:
-      {data_type} {constant_name} ! [constant_description]
-      PARAMETER ( {constant_name} = {cons} )
-
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'ACF Version V2.0-0' )
 
