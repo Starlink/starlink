@@ -369,7 +369,6 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
-      integer dummy
 
       IF (STATUS.NE.SAI__OK) RETURN
 
