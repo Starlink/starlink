@@ -261,4 +261,5 @@ $(TCL_SUPPORT_MSGRLY): Makefile
 	chmod +x $(TCL_SUPPORT_MSGRLY).tmp
 	mv $(TCL_SUPPORT_MSGRLY).tmp $(TCL_SUPPORT_MSGRLY)
 
+BUILT_SOURCES = ccdhelp.ifl
 
