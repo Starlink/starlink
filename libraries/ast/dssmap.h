@@ -101,6 +101,9 @@
 *        Removed copy of supplied FitsChan from DssMap structure.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitDssMapVtab method.
+*     21-OCT-2004 (DSB):
+*        Removed wcstools prototypes which clash with the MS Windows
+*        runtime library.
 *-
 */
 
@@ -201,23 +204,12 @@ struct WorldCoor {
 #define hrrad(x)	degrad(hrdeg(x))
 #define radhr(x)	deghr(raddeg(x))
 
+
 /* WCS subroutines in wcs.c */
-struct WorldCoor *wcsinit (); /* set up a WCS structure from a FITS image header */
-struct WorldCoor *wcsninit (); /* set up a WCS structure from a FITS image header */
-struct WorldCoor *wcsset (); /* set up a WCS structure */
-int iswcs ();		/* Return 1 if WCS structure is filled, else 0 */
-int nowcs ();		/* Return 0 if WCS structure is filled, else 1 */
-void wcsshift ();	/* Reset the center of a WCS structure */
-void wcscent ();
-void wcssize ();	/* Return RA and Dec of image center, size in RA and Dec */
-void wcsfull ();	/* Return RA and Dec of image center, size in degrees */
-double wcsdist ();	/* Distance in degrees between two sky coordinates */
-void wcscominit ();	/* Initialize catalog search command set by -wcscom */
-void wcscom ();		/* Execute catalog search command set by -wcscom */
-void wcsoutinit ();	/* Initialize WCS output coordinate system set by -wcsout */
-int pix2wcst ();	/* Convert pixel coordinates to World Coordinate string */
-void pix2wcs ();	/* Convert pixel coordinates to World Coordinates */
-void wcs2pix ();	/* Convert World Coordinates to pixel coordinates */
+
+/* >>>>> DSB: Prototypes for "subroutines in wcs.c" have been removed since 
+   they clash with prototypes defined by the MS windows runtime library and
+   are not needed by AST. */ 
 
 /* Oct 26 1994	New file
  * Dec 21 1994	Add rotation matrix
