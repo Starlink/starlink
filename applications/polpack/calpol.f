@@ -1,0 +1,729 @@
+      SUBROUTINE CALPOL( STATUS )
+*+
+*  Name:
+*     CALPOL
+
+*  Purpose:
+*     Calculate polarisation parameters for 2-channel imaging
+*     linear and circular polarimetry.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL CALPOL( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Calculate polarisation parameters for 2-channel imaging
+*     polarimetry. This routine accesses a list of input NDF data
+*     structures which should contain processed polarimetric
+*     information. It is assumed that the input data are bias/dark
+*     corrected, flatfielded, sky subtracted and mutually aligned.
+*
+*     Each input NDF should contain an image recorded in a
+*     single polarisation state. The polarisation state should be
+*     indicated by two descriptors WPLATE (the waveplate position, one of
+*     0.0,45.0,22.5,67.5) and RAY (either O (ordinary) or E
+*     (extraordinary)) which should reside in a POLPACK NDF extension.
+*     The descriptors are checked for validity and used to sort the
+*     input data into polarimetric sets. In addition, a third
+*     descriptor, IMGID, should be present to indicate which images were
+*     recorded on the same exposure.
+*
+*     The input data files are first validated using the descriptor
+*     information in their POLPACK extensions. They are then sorted into
+*     sets that can be used to calculate the output polarisation
+*     parameters.
+*
+*     The instrumental polarisation efficiency (F factor) is calculated
+*     by intercomparing images to calculate the scale factors and zero
+*     levels. All possible intercomparisons are used and a weighted mean
+*     F factor calculated.
+*
+*     The time dependent efficiencies (E factors) due, for example, to
+*     changes in integration time or sky conditions between exposures,
+*     are calculated. The E factors are calculated by comparing total
+*     intensity images against an iteratively refined median image.
+*
+*     The input data is `corrected' by the polarisation and time
+*     dependent efficiencies and the stokes images (I,Q,U) or (I,V) are
+*     calculated. The output stokes images are formed by median stacking
+*     all possible estimates.
+*
+*     In LINEAR polarimetry mode the output NDF contains I, Q and U
+*     stokes images. In CIRCULAR polarimetry mode the output NDF
+*     contains I, V stokes images.
+
+*  Usage:
+
+*  ADAM Parameters:
+
+*  Examples:
+
+*  Authors:
+*     TMG: Tim Gledhill (tmg@star.herts.ac.uk)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-JUL-1997 (TMG):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'DAT_PAR'          ! ONLY TEMPORARY FOR TSP
+      
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER MAXIN              ! Maximim number of input images
+      PARAMETER ( MAXIN = 1024 )
+      INTEGER MAXSET             ! Maximum number of polarsation sets
+      PARAMETER ( MAXSET = 256 )
+      CHARACTER * ( 1 ) LEFT     ! Determines the order of the O and E
+                                 ! ray in the calculations.
+      PARAMETER ( LEFT = 'O' )
+
+*  Local Variables:
+      INTEGER NDFIN( MAXIN )     ! Input NDF identifiers
+      INTEGER NIM, NVAL, NSET    ! Number of input images, validated
+                                 ! input images and resulting
+                                 ! polarisation data sets.
+      INTEGER LBND( 3 ), UBND( 3) ! image bounds
+      INTEGER NDIM               ! image dimensionality
+      INTEGER NPOS               ! Number of waveplate positions (2 for
+                                 ! circular and 4 for linear).
+      INTEGER I, J, IVAL, IPOS,
+     :     PVAL, ISET            ! Loop counters
+      INTEGER NDFVAL( MAXIN )    ! Validated NDF identifiers
+      INTEGER IPAIR( MAXIN )     ! List of pairs
+      INTEGER NSTATE( 4 )        ! Number of valid images at each
+                                 ! waveplate position
+      INTEGER PSET( 8, MAXSET )  ! List of validated images sorted
+                                 ! into polarisation states.
+      INTEGER NPAIR              ! number of polarimetric pairs
+      INTEGER IVAL_L, IVAL_R
+      INTEGER NI, NQ, NU         ! number of possible estimates of I, Q
+                                 ! and U
+      INTEGER IPDIN( 8, MAXSET ), IPVIN( 8, MAXSET )
+                                 ! pointers to mapped data and variance
+      INTEGER IPDCOR( 8, MAXSET ), IPVCOR( 8, MAXSET )
+                                 ! pointers to mapped data corrected
+                                 ! with E and F factors
+      INTEGER NDFOUT             ! output NDF identifer.
+      INTEGER IPDOUT, IPVOUT     ! pointers to output data and variance
+      INTEGER NEL, NOUT          ! number of mapped elements.
+      INTEGER MAXIT              ! maximum number of iterations for
+                                 ! image intercomparisons
+      INTEGER ILEVEL             ! user information level
+      INTEGER IPFEST, IPVFEST    ! workspace for F factor estimates
+      INTEGER IPTI1, IPTI2       ! workspace for total intensity images
+      INTEGER IPEEST, IPZEST     ! workspace for E factor and zero
+                                 ! shift estimates
+      INTEGER IPDE               ! workspace for E factor convergence
+                                 ! estimates
+      INTEGER IPVEEST, IPVZEST   ! workspace for variances on E factor
+                                 ! and zero shift estimates
+      INTEGER IPWEIGHT           ! workspace for image weightings
+      INTEGER IPIEST, IPQEST, IPUEST
+                                 ! workspace for estimates of I, Q U
+      INTEGER IPVIEST, IPVQEST, IPVUEST
+                                 ! workspace for variances on estimates
+                                 ! of I, Q and U
+
+      REAL WPLATE( MAXIN )       ! Waveplate positions of images 
+      REAL TOLS, TOLZ            ! tolerances for image intercomparisons
+      REAL SKYSUP                ! sky supression factor
+      REAL ETOL                  ! tolerance for E factor convergences
+      REAL F, VF                 ! F factor and its variance
+      
+      CHARACTER * ( 8 )  MODE    ! Polarimetry mode (LINEAR or CIRCULAR)
+      CHARACTER * ( 10 ) IMGID( MAXIN )
+                                 ! Image ID descriptor
+      CHARACTER * ( 1 ) RAY( MAXIN )
+                                 ! Image ray identifer.
+      CHARACTER * ( NDF__SZTYP ) TYPE
+                                 ! NDF data type
+      CHARACTER * ( 10 ) ID( 4, MAXSET )
+                                 ! Image ID string
+      
+      LOGICAL DESCOK             ! Image descriptors OK?
+      LOGICAL VAR                ! Variance information present and
+                                 ! required in output?
+      LOGICAL USED( MAXIN )      ! flag for images that have been
+                                 ! processed
+
+
+* TEMPORARY TSP SECTION FOR DIAGNOSTIC OUTPUT!!!!!!
+* 
+      INTEGER MP_INDEX,MP_I,MP_Q,MP_U
+      INTEGER NX,NY,IERR,NERR
+      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
+      
+*  Local Data:
+      REAL WPREF( 4 )            ! The actual waveplate positions that
+                                 ! are expected
+      DATA WPREF / 0.0,45.0,22.5,67.5 /
+*      DATA WPREF / 22.5,67.5,0.0,45.0 / 
+      
+      
+*  Internal References:
+      LOGICAL PAIRED             ! define an internal function to
+                                 ! determine if two images are
+                                 ! polarimetric pairs.
+      PAIRED( I, J ) = ( IMGID( I ) .EQ. IMGID( J ) .AND.
+     :                   WPLATE( I ) .EQ. WPLATE( J ) .AND.
+     :                   RAY( I ) .NE. RAY( J ) )
+
+      
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Defer error reports.
+      CALL ERR_MARK
+
+*  Start an NDF context.
+      CALL NDF_BEGIN
+
+*  Find out whether we are doing linear or circular polarimetry. In
+*  circular polarimetry mode there are 2 waveplate positions and in
+*  linear polarimetry mode 4 waveplate positions.
+      CALL PAR_CHOIC( 'MODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
+     :                MODE, STATUS )
+      NPOS = 4
+      IF ( MODE .EQ. 'CIRCULAR' ) NPOS = 2
+      
+*  Access the input NDFs using 'READ' access so that they will not be
+*  deleted when released. The minimum number of images allowed is 2
+*  in circular mode and 4 in linear mode although in order to calculate
+*  the instrumental polarisation efficiency twice this number of images
+*  are needed.
+      CALL NDFAC( 'IN', 'READ', NPOS, MAXIN, NIM, NDFIN, STATUS )
+
+*  Replace the identifiers to the supplied NDFs with identifiers for
+*  sections of the supplied NDFs which have equal bounds. Abort if there
+*  is an error since this means that some of the images do not overlap.
+      CALL NDF_MBNDN( 'TRIM', NIM, NDFIN, STATUS )      
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      
+*  Get the image dimensions and data type by looking at the first mapped
+*  NDF.
+      CALL NDF_BOUND( NDFIN( 1 ), 2, LBND, UBND, NDIM, STATUS )
+      CALL NDF_TYPE( NDFIN( 1 ), 'DATA', TYPE, STATUS )
+
+*  Obtain the required descriptor information from the images. The
+*  descriptors should have been inserted into a polarimetry extension by
+*  previous stages of processing. We may want to access history
+*  information here as well to check whether previous mandatory
+*  processing stages have been completed successfully (not done at
+*  the moment).  
+      IVAL = 1
+      DO I = 1, NIM
+
+*  Initialise the descriptor items.
+         WPLATE( IVAL ) = VAL__BADR
+         IMGID( IVAL ) = ' '
+         RAY( IVAL ) = ' '
+         DESCOK = .FALSE.
+
+*  Get the descriptor items for this image.
+         CALL NDF_XGT0R( NDFIN( I ), 'POLPACK', 'WPLATE',
+     :                   WPLATE( IVAL ), STATUS )
+         CALL NDF_XGT0C( NDFIN( I ), 'POLPACK', 'IMGID',
+     :                   IMGID( IVAL ), STATUS )
+         CALL NDF_XGT0C( NDFIN( I ), 'POLPACK', 'RAY', RAY( IVAL ),
+     :                   STATUS )
+
+*  If the descriptors were obtained, check them for validity. The
+*  WPLATE descriptor is checked against a constant array containing
+*  the accepted values. The RAY descriptor should be either O or E
+*  (corresponding to Ordinary and Extraordinary rays). The IMGID should
+*  simply be a non-null character identifier.
+         IF ( STATUS .EQ. SAI__OK ) THEN
+            DO IPOS = 1, NPOS
+               IF ( WPLATE( IVAL ) .EQ. WPREF( IPOS ) ) THEN
+                  DESCOK = .TRUE.
+               ENDIF
+            ENDDO
+            DESCOK = DESCOK .AND. ( RAY( IVAL ) .EQ. 'O' .OR.
+     :               RAY( IVAL ) .EQ. 'E' ) .AND. IMGID( IVAL )
+     :               .NE. ' '
+
+*  If this image has valid descriptors then add it to the list of
+*  validated images and increment the number of valid images.
+            IF ( DESCOK ) THEN
+               NDFVAL( IVAL ) = NDFIN( I )
+               IVAL = IVAL + 1
+
+*  If the descriptors are NOT valid then give a warning message but
+*  continue looking for other valid images.
+            ELSE
+               CALL NDF_MSG( 'NDF', NDFIN( I ) )
+               CALL MSG_OUT( ' ', 'CALPOL: Input NDF ^NDF has invalid'//
+     :                            ' polarimetry descriptors', STATUS )
+            ENDIF
+
+*  If an error occured whilst obtaining the descriptors, then notify the
+*  user but contine with the other images by flushing the error now.
+         ELSE
+            CALL ERR_FLUSH( STATUS )
+            CALL NDF_MSG( 'NDF', NDFIN( I ) )
+            CALL MSG_OUT( ' ', 'CALPOL: Cannot access polarimetry '//
+     :                         'extension for image ^NDF', STATUS )
+         ENDIF
+      ENDDO
+
+*  Determine the number of validated input images.
+      NVAL = IVAL - 1
+
+*  See if the user wants variance information to be propagated through
+*  to the output data.
+      CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
+
+*  If the user does want variance information to be propagated then
+*  check that variances are present in the input data. All input images
+*  must have variance information for it to be propagated. If this is
+*  not the case then warn the user.
+      IF ( VAR ) THEN
+         CALL NDF_STATE( NDFVAL( 1 ), 'VARIANCE', VAR, STATUS )
+         DO IVAL = 2, NVAL
+            IF ( VAR ) CALL NDF_STATE( NDFVAL( IVAL ), 'VARIANCE', VAR,
+     :                                 STATUS )
+         ENDDO
+         IF ( .NOT. VAR ) THEN
+            CALL MSG_OUT( ' ', 'CALPOL: VARIANCE information was ' //
+     :           'requested in the output. However, not all of the ' //
+     :           'input images have VARIANCES so NO output VARIANCE ' //
+     :           'can be calculated', STATUS )
+         ENDIF
+      ENDIF
+
+*  Get the parmeter values for image intercomparisons.
+      CALL PAR_GET0R( 'TOLS', TOLS, STATUS )
+      CALL PAR_GET0R( 'TOLZ', TOLZ, STATUS )
+      CALL PAR_GET0I( 'MAXIT', MAXIT, STATUS )
+      CALL PAR_GET0R( 'SKYSUP', SKYSUP, STATUS )
+      CALL PAR_GET0R( 'ETOL', ETOL, STATUS )
+      
+*  Get the information level determining how much information is sent to
+*  the user.
+      CALL PAR_GET0I( 'ILEVEL', ILEVEL, STATUS )
+
+*  If user information is required, print out the number of input and
+*  validated images.
+      IF ( ILEVEL .GT. 0 ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETI( 'NIM', NIM )
+         CALL MSG_OUT( ' ', 'CALPOL: ^NIM Input NDFs accessed', STATUS )
+         CALL MSG_SETI( 'NVAL', NVAL )
+         CALL MSG_OUT( ' ', 'CALPOL: ^NVAL Input NDFs validated',
+     :                 STATUS )
+      ENDIF
+            
+*  The images are now sorted into groups from which the polarisation
+*  parameters can be calculated. For linear polarimetry this corresponds
+*  to groups of 8 (4 waveplate positions) to calculate I, Q and U and for
+*  circular polarimetry to groups of 4 (2 waveplate positions) to
+*  calculate I and V. However sets can be partially filled as long as the
+*  missing information is present somewhere in another set. First
+*  initialise flags to show that none of the images have been treated yet.
+      DO IVAL = 1, NVAL
+         USED( IVAL ) = .FALSE.
+      ENDDO
+
+*  Each image should have a polarimetric pair - an image from the same
+*  exposure (same IMGID, same WPLATE) but orthogonal polarisation state
+*  (different RAY). Find each image's pair. Count the number of valid
+*  pairs. In principle it is possible to use unpaired images in the
+*  processing, but at some cost to the final error - however this is
+*  not supported here, unpaired images are not used.
+      NPAIR = 0
+      DO IVAL = 1, NVAL
+         DO PVAL = 1, NVAL
+            IF ( PAIRED( IVAL, PVAL ) ) THEN
+               IPAIR( IVAL ) = PVAL
+               NPAIR = NPAIR + 1
+               GOTO 1
+            ENDIF
+         ENDDO
+               
+*  If an image does not have a pair give a warning and flag it as 'used'
+*  so that it will not take part in the processing.
+         CALL NDF_MSG( 'NDF', NDFVAL( IVAL ) )
+         CALL MSG_OUT( ' ', ' CALPOL: WARNING! Input NDF ^NDF does '//
+     :                 'not have a polarimetric pair and will not '//
+     :                 'be used.', STATUS )
+         USED( IVAL ) = .TRUE.
+ 1       CONTINUE
+      ENDDO
+      NPAIR = NPAIR / 2
+      
+*  If there are no valid pairs then quit.
+      IF ( NPAIR .EQ. 0 ) THEN
+         CALL ERR_REP( 'CALPOL_NOPAIRS', ' CALPOL: There are no ' //
+     :        'valid polarimetry images. Cannot continue.', STATUS )
+         STATUS = SAI__ERROR
+         GO TO 99
+      ENDIF
+         
+*  This section sorts the validated images into data sets than can be
+*  processed into polarimetric information. Each data set will contain
+*  2*NPOS images, consisting of pairs from each waveplate position.
+*  First clear the counters for images in each polarisation state.
+
+*  Initialise an array to hold counts of the number of images in each
+*  waveplate position.
+      DO IPOS = 1, 4
+         NSTATE( IPOS ) = 0
+      ENDDO
+
+*  Initialise an array to hold the NDF identifiers of input images
+*  according to their polarisation state (2 for each waveplate position
+*  corresponding to O and E ray).
+      DO ISET = 1, MAXSET
+         DO IPOS = 1, NPOS
+            PSET( 2 * IPOS - 1, ISET ) = 0
+            PSET( 2 * IPOS, ISET ) = 0
+         ENDDO
+      ENDDO
+
+*  Loop through the images looking for images that have not been used
+*  yet.
+      DO IVAL = 1, NVAL
+         IF ( .NOT. USED( IVAL ) ) THEN
+
+*  Sort the image into a polarisation state and do the same for its
+*  pair. Record the image as used. Remember the image identifers in each
+*  state so that we can easily reference the image IDs later on.
+            DO IPOS = 1, NPOS
+               IF ( WPLATE( IVAL ) .EQ. WPREF( IPOS ) ) THEN
+                  NSTATE( IPOS ) = NSTATE( IPOS ) + 1
+                  IF ( RAY( IVAL ) .EQ. LEFT ) THEN
+                     PSET( 2 * IPOS - 1, NSTATE( IPOS ) ) = IVAL
+                     PSET( 2 * IPOS, NSTATE( IPOS ) ) = IPAIR( IVAL )
+                  ELSE
+                     PSET( 2 * IPOS - 1, NSTATE( IPOS ) ) =
+     :                    IPAIR( IVAL )
+                     PSET( 2 * IPOS, NSTATE( IPOS ) ) = IVAL
+                  ENDIF
+                  USED( IVAL ) = .TRUE.
+                  USED( IPAIR( IVAL ) ) = .TRUE.
+                  ID( IPOS, NSTATE( IPOS ) ) = IMGID( IVAL )
+               ENDIF
+            ENDDO
+         ENDIF
+      ENDDO
+
+*  Find out the maximum number of images in any polarisation state. Also
+*  find out how many estimates of I, Q and U are possible. In circular
+*  mode the Q estimates will be estimates of V.
+      NSET = 0
+      DO IPOS = 1, NPOS
+         NSET = MAX( NSET, NSTATE( IPOS ) )
+      ENDDO
+      NQ = NSTATE( 1 ) + NSTATE( 2 )
+      NU = NSTATE( 3 ) + NSTATE( 4 )
+      NI = NQ + NU
+
+*  Consistency check: In linear mode both NQ and NU should be non-zero
+*  otherwise the polarisation cannot be calculated. In circular mode
+*  only NQ should ne non-zero.
+      IF ( NQ .EQ. 0 ) THEN
+         CALL ERR_REP( 'CALPOL_BADLIN', 'CALPOL: There is not ' //
+     :        'enough information to calculate the ' //
+     :        'polarisation. Cannot continue', STATUS )
+         STATUS = SAI__ERROR
+      ELSE IF ( MODE .EQ. 'LINEAR' .AND. NU .EQ. 0 ) THEN
+         CALL ERR_REP( 'CALPOL_BADLIN', 'CALPOL: There is not ' //
+     :        'enough information to calculate the linear ' //
+     :        'polarisation. Cannot continue', STATUS )
+         STATUS = SAI__ERROR
+      ELSE IF ( MODE .EQ. 'CIRCULAR' .AND. NU .NE. 0 ) THEN
+         CALL ERR_REP( 'CALPOL_BADCIR', 'CALPOL: The detected ' //
+     :        'images are compatible with linear polarimetry ' //
+     :        'but MODE=CIRCULAR is selected. Cannot continue', STATUS )
+         STATUS = SAI__ERROR
+      ENDIF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+         
+*  Loop to map the input data and variances (if required). Loop through
+*  the polarisation data sets including partially complete ones.
+      DO ISET = 1, NSET
+
+*  Map the data arrays of each NDF section, and if all NDFs have
+*  VARIANCE components, also map the VARIANCE components. If variances
+*  are not required then assign the pointers to mapped variance arrays
+*  to the data arrays, since they will not be used.
+         DO IPOS = 1, NPOS
+            IF ( NSTATE( IPOS ) .GE. ISET ) THEN
+               IVAL_L = PSET( 2 * IPOS -1, ISET )
+               IVAL_R = PSET( 2 * IPOS, ISET )
+               CALL NDF_MAP( NDFVAL( IVAL_L ), 'DATA', TYPE, 'READ',
+     :              IPDIN( 2 * IPOS - 1, ISET ), NEL, STATUS )
+               CALL NDF_MAP( NDFVAL( IVAL_R ), 'DATA', TYPE, 'READ',
+     :              IPDIN( 2 * IPOS, ISET ), NEL, STATUS )
+               IF( VAR ) THEN
+                  CALL NDF_MAP( NDFVAL( IVAL_L ), 'VARIANCE', TYPE,
+     :                 'READ', IPVIN( 2 * IPOS - 1, ISET ), NEL,
+     :                 STATUS )
+                  CALL NDF_MAP( NDFVAL( IVAL_R ), 'VARIANCE', TYPE,
+     :                 'READ', IPVIN( 2 * IPOS, ISET ), NEL, STATUS )
+               ELSE
+                  IPVIN( 2 * IPOS - 1, ISET ) = IPDIN( 2 * IPOS - 1,
+     :                   ISET )
+                  IPVIN( 2 * IPOS, ISET ) = IPDIN( 2 * IPOS, ISET ) 
+               ENDIF
+
+*  Allocate workspace to hold the images that have been corrected for E
+*  and F factors. If variance information is required then allocate space
+*  for the corrected variance arrays as well (otherwise point the
+*  variance arrays at the data).
+               CALL PSX_CALLOC( NEL, '_REAL',
+     :              IPDCOR( 2 * IPOS - 1, ISET ), STATUS )
+               CALL PSX_CALLOC( NEL, '_REAL', IPDCOR( 2 * IPOS, ISET ),
+     :                          STATUS )
+               IF ( VAR ) THEN
+                  CALL PSX_CALLOC( NEL, '_REAL',
+     :              IPVCOR( 2 * IPOS - 1, ISET ), STATUS )
+                  CALL PSX_CALLOC( NEL, '_REAL',
+     :                 IPVCOR( 2 * IPOS, ISET ), STATUS )
+               ELSE
+                  IPVCOR( 2 * IPOS - 1, ISET ) =
+     :                 IPDCOR( 2 * IPOS - 1, ISET )
+                  IPVCOR( 2 * IPOS, ISET ) = IPDCOR( 2 * IPOS, ISET )
+               ENDIF
+            ENDIF
+         ENDDO
+      ENDDO
+
+*  Abort if an error has occured.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+* Allocate some workspace to hold estimates of the F factor and its
+* variance.
+      CALL PSX_CALLOC( 2 * NSET, '_REAL', IPFEST, STATUS )
+      CALL PSX_CALLOC( 2 * NSET, '_REAL', IPVFEST, STATUS )
+      
+*  Calculate the polarisation-dependent instrumental efficiency (F
+*  factor). This gives the relative efficiency of the right hand
+*  polarimeter channel relative to the left hand channel.
+      CALL POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR, TOLS,
+     :               TOLZ, MAXIT, SKYSUP, ID, ILEVEL, %VAL( IPFEST ),
+     :               %VAL( IPVFEST ), F, VF, STATUS )
+
+* Release unwanted workspace. Abort if an error has occurred.
+      CALL PSX_FREE( IPFEST, STATUS )
+      CALL PSX_FREE( IPVFEST, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      
+*  Allocate workspace to hold total intensity image pairs when
+*  calculating the E factors. 
+      CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI1, STATUS )
+      CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI2, STATUS )
+
+* Allocate space for scale factor and zero shift estimate, used during
+* image intercomparisons when calculating the E factor. If variances are
+* required then allocate space for the variances on these quantities as
+* well. If variances are not required then allocate an array to hold
+* weighting factors used instead of the variances when forming median
+* images.
+      CALL PSX_CALLOC( NPAIR, '_REAL', IPEEST, STATUS )
+      CALL PSX_CALLOC( NPAIR, '_REAL', IPZEST, STATUS )
+      CALL PSX_CALLOC( NPAIR, '_REAL', IPDE, STATUS )
+      CALL PSX_CALLOC( NPAIR, '_DOUBLE', IPWEIGHT, STATUS )
+      IF ( VAR ) THEN
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPVEEST, STATUS )
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPVZEST, STATUS )
+      ELSE
+         IPVEEST = IPEEST
+         IPVZEST = IPZEST
+      ENDIF
+      
+*  Calculate the time-dependent instrumental efficiency (E factor). This
+*  gives the relative efficiency of the instrument between exposures.
+*  This routine also produces E and F factor corrected output images.
+      CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
+     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, ID, ILEVEL, F,
+     :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
+     :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
+     :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
+     :               %VAL( IPTI2 ), STATUS )
+
+*   Release unwanted workspace. Keep the weight array (if defined) for
+*   use when calculating the stokes parameters.
+
+      CALL PSX_FREE( IPEEST, STATUS )
+      CALL PSX_FREE( IPZEST, STATUS )
+      CALL PSX_FREE( IPDE, STATUS )
+      IF ( VAR ) THEN
+         CALL PSX_FREE( IPVEEST, STATUS )
+         CALL PSX_FREE( IPVZEST, STATUS )
+      ENDIF
+      
+*  At this point we can release the input images since we now have
+*  versions corrected with the efficiency factors. Do this by ending the
+*  current NDF context.
+      CALL NDF_END( STATUS )
+
+*  Release the workspace that was used to hold the total intensity image
+*  pairs. Abort on error.
+      CALL PSX_FREE( IPTI1, STATUS )
+      CALL PSX_FREE( IPTI2, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      
+*  Alloacate space for the I and Q and U estimates. If no U estimates are
+*  possible ( circular mode) then assign a dummy pointer.
+      CALL PSX_CALLOC( NEL * NI, '_REAL', IPIEST, STATUS )
+      CALL PSX_CALLOC( NEL * NI, '_REAL', IPQEST, STATUS )
+      IF ( NU .GT. 0 ) THEN
+         CALL PSX_CALLOC( NEL * NI, '_REAL', IPUEST, STATUS )
+      ELSE
+         IPUEST = IPQEST
+      ENDIF
+        
+*  If variance information is required then allocate space for the
+*  variance estimates on each of the stokes parameters. These will be
+*  used to form the weighted median images. Again, only allocate space
+*  for the U variance if we can calculate U.
+      IF ( VAR ) THEN
+         CALL PSX_CALLOC( NEL * NI, '_REAL', IPVIEST, STATUS )
+         CALL PSX_CALLOC( NEL * NI, '_REAL', IPVQEST, STATUS )
+         IF ( NU .GT. 0 ) THEN
+            CALL PSX_CALLOC( NEL * NI, '_REAL', IPVUEST, STATUS )
+         ELSE
+            IPVUEST = IPVQEST
+         ENDIF
+ 
+*  If variance information is not to be calculated then assign dummy
+*  pointers.
+      ELSE
+         IPVIEST = IPIEST
+         IPVQEST = IPQEST
+         IF ( NU .GT. 0 ) THEN
+            IPVUEST = IPUEST
+         ENDIF
+      ENDIF
+
+* Obtain an output data cube to hold the polarisation images. In linear
+* mode the output cube will contain I, Q, U. In circular mode it will
+* contain I, V. If variances have been calculated then the variance
+* information will be propagated to the output. Begin another NDF
+* context.
+      CALL NDF_BEGIN
+      LBND( 3 ) = 1
+      IF ( MODE .EQ. 'LINEAR' ) THEN
+         UBND( 3 ) = 3
+      ELSE
+         UBND( 3 ) = 2
+      ENDIF
+      CALL NDF_CREAT( 'OUT', '_REAL', 3, LBND, UBND, NDFOUT, STATUS )
+
+* Set the LABEL component for the output.
+      CALL NDF_CPUT( 'Output from POLPACK: '//MODE//' Polarimetry',
+     :     NDFOUT, 'LABEL', STATUS )
+
+* Map the output DATA array and if necessary, the VARIANCE array.
+      CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, NOUT,
+     :              STATUS )
+      IF( VAR ) THEN
+         CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE/BAD',
+     :                        IPVOUT, NOUT, STATUS )
+      ELSE
+         IPVOUT = IPDOUT
+      ENDIF
+
+* Pass the images and parameters to the routine that calculates the
+* polarisation. Put the results directly into the output array.
+      CALL POL_CALP( NEL, NSET, NPOS, NI,  IPDCOR, IPVCOR, NSTATE,
+     :               VAR, %VAL( IPIEST ), %VAL( IPVIEST ),
+     :               %VAL( IPQEST ), %VAL( IPVQEST ), %VAL( IPUEST ),
+     :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
+     :               %VAL( IPVOUT ), STATUS )
+
+
+* TEMPORARY SECTION TO CREATE AN OUTPUT TSP STRUVCTURE.
+* =====================================================
+
+* Create an output TSP data structure.
+
+      NX = UBND( 1 ) - LBND( 1 ) + 1
+      NY = UBND( 2 ) - LBND( 2 ) + 1 
+      CALL DAT_CREAT( 'TSPOUT', 'NDF', 0, 0, STATUS )
+      CALL DAT_ASSOC( 'TSPOUT', 'WRITE', TSPLOC, STATUS )
+      CALL TSP_CREATE_2D( TSPLOC, NX, NY, 'QU', .FALSE.,
+     :                    .FALSE., STATUS )
+
+* Map the stokes components.
+
+      CALL TSP_MAP_DATA( TSPLOC, 'WRITE', MP_I, ILOC, STATUS )
+      CALL TSP_GET_STOKES( TSPLOC, 'Q', SLOC, STATUS )
+      CALL TSP_MAP_DATA( SLOC, 'WRITE', MP_Q, QLOC, STATUS )
+      CALL DAT_ANNUL( SLOC, STATUS )
+      CALL TSP_GET_STOKES( TSPLOC, 'U', SLOC, STATUS )
+      CALL TSP_MAP_DATA( SLOC, 'WRITE', MP_U, ULOC, STATUS )
+      CALL DAT_ANNUL( SLOC, STATUS )
+
+* Copy the results into the TSP structures.
+
+      CALL VEC_RTOR( .TRUE., NEL, %VAL( IPDOUT ), %VAL( MP_I ), IERR,
+     :     NERR, STATUS )
+      MP_INDEX = IPDOUT + 4 * NEL
+      CALL VEC_RTOR( .TRUE., NEL, %VAL( MP_INDEX ), %VAL( MP_Q ), IERR,
+     :     NERR, STATUS )
+      MP_INDEX = MP_INDEX + 4 * NEL
+      CALL VEC_RTOR( .TRUE., NEL, %VAL( MP_INDEX ), %VAL( MP_U ), IERR,
+     :     NERR, STATUS )
+
+* Unmap and annul TSP locators.
+
+      CALL TSP_UNMAP( ILOC, STATUS )
+      CALL TSP_UNMAP( QLOC, STATUS )
+      CALL TSP_UNMAP( ULOC, STATUS )
+      CALL DAT_ANNUL( TSPLOC, STATUS )
+      
+* Release unwanted workspace.
+      CALL PSX_FREE( IPIEST, STATUS )
+      CALL PSX_FREE( IPQEST, STATUS )
+      IF ( NU .GT. 0 ) THEN
+         CALL PSX_FREE( IPUEST, STATUS )
+      ENDIF
+      IF ( VAR ) THEN
+         CALL PSX_FREE( IPVIEST, STATUS )
+         CALL PSX_FREE( IPVQEST, STATUS )
+         IF ( NU .GT. 0 ) THEN
+            CALL PSX_FREE( IPVUEST, STATUS )
+         ENDIF
+      ELSE
+         CALL PSX_FREE( IPWEIGHT, STATUS )
+      ENDIF
+
+* Close down.
+ 99   CONTINUE
+      
+*  End the NDF context.
+      CALL NDF_END( STATUS )
+
+*  Release the error stack.
+      CALL ERR_RLSE
+
+      END
