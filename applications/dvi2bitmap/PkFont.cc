@@ -143,7 +143,7 @@ PkFont::PkFont(unsigned int dvimag,
 	//	 << ": DVI font checksum=" << c << '\n';
 
 	if (preamble_.cs != c)
-	    if (verbosity_ > silent)
+	    if (verbosity_ > quiet)
 		cerr << "Warning: Font " << name_
 		     << "found : expected checksum " << c
 		     << ", got checksum " << preamble_.cs
@@ -153,7 +153,7 @@ PkFont::PkFont(unsigned int dvimag,
     }
     catch (InputByteStreamError& e)
     {
-	if (verbosity_ > silent)
+	if (verbosity_ > quiet)
 	    cerr << "Warning: Font " << name << " at "
 		 << dpiScaled() << "dpi ("
 		 << path_ << ") not found ("
@@ -785,8 +785,11 @@ string_list break_path (string path)
 
 string PkFont::fontgenCommand (void)
 {
-    SSTREAM cmd;
+    string rval;
+
 #if defined(MKTEXPK)
+
+    SSTREAM cmd;
     cmd << MKTEXPK
 	<< " --dpi " << dpi()
 	<< " --bdpi " << dpiBase()
@@ -794,7 +797,11 @@ string PkFont::fontgenCommand (void)
 	<< " --mfmode " << missingFontMode_
 	<< ' ' << name_
 	<< '\0';
+    rval = C_STR(cmd);
+
 #elif defined(MAKETEXPK)
+
+    SSTREAM cmd;
     cmd << MAKETEXPK	<< ' '
 	<< name		<< ' '
 	<< dpi()	<< ' '
@@ -802,8 +809,13 @@ string PkFont::fontgenCommand (void)
 	<< dvimag_/1000.0	<< ' '
 	<< missingFontMode_
 	<< '\0';
+    rval = C_STR(cmd);
+
 #else
-    cmd = "";
+
+    rval = "";
+
 #endif
-    return C_STR(cmd);
+
+    return rval;
 }
