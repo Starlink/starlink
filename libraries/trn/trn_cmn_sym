@@ -1,0 +1,143 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*   Constant and common block definitions for the symbol data table    *
+*   ---------------------------------------------------------------    *
+*     used during compilation of function definition expressions       *
+*     ----------------------------------------------------------       *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith
+*
+*    History :
+*     20-MAY-1988:  Original version (DUVAD::RFWS)
+*     25-MAY-1988:  Added SYM_COMMA, SYM_LDVAR & SYM_LDCON variables
+*                                                          (DUVAD::RFWS)
+*     9-JUN-1988:  Added SYM_UNEXT and SYM_UNOPR arrays to control use
+*                  of unary operators (DUVAD::RFWS)
+*    endhistory
+*
+
+
+
+****************************
+*   Constant definitions   *
+****************************
+
+
+*   Lowest symbol entry number.
+      INTEGER SYM_MNSYM
+      PARAMETER ( SYM_MNSYM = -1 )
+
+
+*   Highest symbol entry number.
+      INTEGER SYM_MXSYM
+      PARAMETER ( SYM_MXSYM = 39 )
+
+
+*   Maximum length of a symbol name in an expression.
+      INTEGER SYM_SZNAM
+      PARAMETER ( SYM_SZNAM = 7 )
+
+
+
+******************************************
+*   Common block variable declarations   *
+******************************************
+
+
+*   Whether a symbol looks like an operator (or operand) from the left -
+*   set to 1 (or 0).
+      INTEGER SYM_OPERL( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Whether a symbol looks like an operator (or operand) from the right
+*   - set to 1 (or 0).
+      INTEGER SYM_OPERR( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Operation evaluation priority (seen from the left).
+      INTEGER SYM_LPRI( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Operation evaluation priority (seen from the right).
+      INTEGER SYM_RPRI( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Whether a symbol may be followed by a unary (+ or -) operator.
+      INTEGER SYM_UNEXT( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Whether a symbol is a unary operator.
+      INTEGER SYM_UNOPR( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Change in parenthesis level due to operation.
+      INTEGER SYM_DPAR( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Change in evaluation stack size due to operation.
+      INTEGER SYM_DSTK( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Number of function arguments associated with operation.
+      INTEGER SYM_NARGS( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Operation code associated with each symbol.
+      INTEGER SYM_OPCOD( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Number of characters in each symbol.
+      INTEGER SYM_SIZE( SYM_MNSYM : SYM_MXSYM )
+
+
+*   The character sequence for each symbol name recognised in
+*   expressions.
+      CHARACTER * ( SYM_SZNAM ) SYM_NAME( SYM_MNSYM : SYM_MXSYM )
+
+
+*   Symbol entry number for a comma.
+      INTEGER SYM_COMMA
+
+
+*   Symbol entry number for a LDVAR (load variable) operation.
+      INTEGER SYM_LDVAR
+
+
+*   Symbol entry number for a LDCON (load constant) operation.
+      INTEGER SYM_LDCON
+
+
+
+********************************
+*   Common block definitions   *
+********************************
+
+
+*   Common block to hold non-character data.
+      COMMON /TRN_SYM1/ SYM_OPERL, SYM_OPERR, SYM_LPRI, SYM_RPRI,
+     :                  SYM_UNEXT, SYM_UNOPR, SYM_DPAR, SYM_DSTK,
+     :                  SYM_NARGS, SYM_OPCOD, SYM_SIZE, SYM_COMMA,
+     :                  SYM_LDVAR, SYM_LDCON
+
+
+*   Common block to hold character data.
+      COMMON /TRN_SYM2/ SYM_NAME
+
+
+*   Save the common block contents.
+      SAVE /TRN_SYM1/, /TRN_SYM2/
+
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*   Constant and common block definitions for the symbol data table    *
+*     used during compilation of function definition expressions       *
+*                                                                      *
+*                               END                                    *
+************************************************************************

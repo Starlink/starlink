@@ -1,0 +1,34 @@
+FACILITY TRN
+100,BADCN,"bad" constant explicitly specified
+200,OPNOS,operation not supported
+300,CLSIN,classification information invalid
+301,CMPER,compilation error
+302,CMTOF,compiled mapping table overflow
+303,CONIN,constant syntax invalid
+304,DELIN,delimiting comma invalid
+305,DIMIN,dimensions invalid
+306,DSTIN,definition status invalid
+307,DUVAR,duplicate variable name
+308,EXPUD,expression undefined
+309,ICDIR,incompatible transformation directions
+310,MAPUD,mapping undefined
+311,MIDIN,compiled mapping identifier invalid
+312,MIOPA,missing or invalid operand
+313,MIOPR,missing or invalid operator
+314,MISVN,missing variable name
+315,MLPAR,missing left parenthesis
+316,MRPAR,missing right parenthesis
+317,NDCMM,number of data coordinates mis-matched
+318,NMVMM,number of module variables mis-matched
+319,NTVMM,number of transformation variables mis-matched
+320,NVRIN,number of variables invalid
+321,OPCIN,operation code invalid
+322,PRCIN,precision invalid
+323,TOKIN,token name invalid
+324,TRNUD,transformation undefined
+325,TRUNC,character string truncated
+326,TYPIN,type invalid
+327,VARIN,variable name invalid
+328,VARUD,variable name undefined
+329,VERMM,software version mis-match
+330,WRNFA,wrong number of function arguments

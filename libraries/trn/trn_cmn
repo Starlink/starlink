@@ -1,0 +1,96 @@
+************************************************************************
+*                               BEGIN                                  *
+*                                                                      *
+*            Common block definitions for the TRN_ facility            *
+*            ----------------------------------------------            *
+*                                                                      *
+*                               BEGIN                                  *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith
+*
+*    History :
+*     6-MAY-1988:  Original version (DUVAD::RFWS)
+*     9-MAY-1988:  Added TRN_PCTTC variable (DUVAD::RFWS)
+*     9-MAY-1988:  Added workspace pointers for each data type
+*                                                         (DUVAD::RFWS)
+*    endhistory
+*
+
+
+
+*****************
+*   Workspace   *
+*****************
+
+
+*   Locator to the temporary object containing the arrays mapped as
+*   workspace at startup.
+      CHARACTER * ( DAT__SZLOC ) TRN_LWRK
+
+
+*   Pointer to mapped workspace arrays for each data type.
+      INTEGER TRN_PWRKI
+      INTEGER TRN_PWRKR
+      INTEGER TRN_PWRKD
+
+
+
+*************************************
+*   Compiled transformation table   *
+*************************************
+
+
+*   Locator to the top level temporary structure containing the compiled
+*   transformation table (CTT).
+      CHARACTER * ( DAT__SZLOC ) TRN_LCTT
+
+
+*   Pointer to CTT mapped integer array.
+      INTEGER TRN_PCTTI
+
+
+*   Pointer to CTT mapped locator list.
+      INTEGER TRN_PCTTL
+
+
+*   Pointer to CTT mapped classification array list.
+      INTEGER TRN_PCTTC
+
+
+*   Current size of CTT.
+      INTEGER TRN_SZCTT
+
+
+*   Count of the number of compiled transformation IDs issued.
+      INTEGER TRN_IDCNT
+
+
+
+*********************
+*   Common blocks   *
+*********************
+
+
+*   Common block for character data.
+      COMMON / TRN1_CMN1 / TRN_LCTT, TRN_LWRK
+
+
+*   Common block for integer data.
+      COMMON / TRN1_CMN2 / TRN_PCTTI, TRN_PCTTL, TRN_PCTTC, TRN_SZCTT,
+     :                     TRN_IDCNT, TRN_PWRKI, TRN_PWRKR, TRN_PWRKD
+
+
+*   Save the common block contents.
+      SAVE /TRN1_CMN1/, /TRN1_CMN2/
+
+
+
+************************************************************************
+*                               END                                    *
+*                                                                      *
+*            Common block definitions for the TRN_ facility            *
+*                                                                      *
+*                               END                                    *
+************************************************************************

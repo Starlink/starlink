@@ -1,0 +1,145 @@
+************************************************************************
+*                             BEGIN                                    *
+*                                                                      *
+*  Private constant definitions for the routines in the TRN_ facility  *
+*  ------------------------------------------------------------------  *
+*              which process standard transformation modules           *
+*              ---------------------------------------------           *
+*                                                                      *
+*                             BEGIN                                    *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith
+*
+*    History :
+*     6-MAY-1988:  Original version (DUVAD::RFWS)
+*     18-MAY-1988:  Added LDBAD constant (DUVAD::RFWS)
+*    endhistory
+*
+
+
+
+****************************
+*   Index array contents   *
+****************************
+
+
+*   Size of the index array.
+      INTEGER TRN_IN_NITEM
+      PARAMETER ( TRN_IN_NITEM = 2 )
+
+
+*   Location of a pointer to the mapped CODE array.
+      INTEGER TRN_IN_CODE
+      PARAMETER ( TRN_IN_CODE = 1 )
+
+
+*   Location of a pointer to the mapped CONSTANTS array.
+      INTEGER TRN_IN_CONST
+      PARAMETER ( TRN_IN_CONST = 2 )
+
+
+
+**********************************
+*   Arithmetic operation codes   *
+**********************************
+
+
+*   A sequence of these values is produced by TRN1_CMPEX when an
+*   expression is compiled. This sequence may later be used to evaluate
+*   the expression using the TRN1_EVEXx routines.
+
+*   Names of arithmetic operation codes.
+      INTEGER TRN_OP_NULL               ! No operation
+      INTEGER TRN_OP_MINOP              ! Minimum executable code value
+      INTEGER TRN_OP_LDCON              ! Load a constant on to stack
+      INTEGER TRN_OP_LDVAR              ! Load a variable on to stack
+      INTEGER TRN_OP_ADD                ! Add two values
+      INTEGER TRN_OP_SUB                ! Subtract two values
+      INTEGER TRN_OP_MULT               ! Multiply two values
+      INTEGER TRN_OP_DIV                ! Divide two values
+      INTEGER TRN_OP_PWR                ! Raise value to a power
+      INTEGER TRN_OP_NEG                ! Negate value
+      INTEGER TRN_OP_SQRT               ! Take square root
+      INTEGER TRN_OP_LOG                ! Take log (base e)
+      INTEGER TRN_OP_LG10               ! Take log (base 10)
+      INTEGER TRN_OP_EXP                ! Exponential exp(x) function
+      INTEGER TRN_OP_SIN                ! Sine function in radians
+      INTEGER TRN_OP_COS                ! Cosine function in radians
+      INTEGER TRN_OP_TAN                ! Tangent function in radians
+      INTEGER TRN_OP_SIND               ! Sine function in degrees
+      INTEGER TRN_OP_COSD               ! Cosine function in degrees
+      INTEGER TRN_OP_TAND               ! Tangent function in degrees
+      INTEGER TRN_OP_ASIN               ! Arcsine function in radians
+      INTEGER TRN_OP_ACOS               ! Arcosine function in radians
+      INTEGER TRN_OP_ATAN               ! Arctangent function in radians
+      INTEGER TRN_OP_ASND               ! Arcsine function in degrees
+      INTEGER TRN_OP_ACSD               ! Arcosine function in degrees
+      INTEGER TRN_OP_ATND               ! Arctangent function in degrees
+      INTEGER TRN_OP_SINH               ! Hyperbolic sine function
+      INTEGER TRN_OP_COSH               ! Hyperbolic cosine function
+      INTEGER TRN_OP_TANH               ! Hyperbolic tangent function
+      INTEGER TRN_OP_ABS                ! Absolute value
+      INTEGER TRN_OP_NINT               ! Nearest integer value
+      INTEGER TRN_OP_MIN                ! Minimum of two values
+      INTEGER TRN_OP_MAX                ! Maximum of two values
+      INTEGER TRN_OP_DIM                ! Fortran DIM function
+      INTEGER TRN_OP_MOD                ! Fortran MOD function
+      INTEGER TRN_OP_SIGN               ! Fortran SIGN function
+      INTEGER TRN_OP_ATN2               ! Fortran ATAN2 in radians
+      INTEGER TRN_OP_AT2D               ! Fortran ATAN2 in degrees
+      INTEGER TRN_OP_LDBAD              ! Load "bad" value on to stack
+
+
+*   Operation code values.
+      PARAMETER ( TRN_OP_NULL  = -2 )
+      PARAMETER ( TRN_OP_MINOP = -1 )
+      PARAMETER ( TRN_OP_LDCON = -1 )
+      PARAMETER ( TRN_OP_LDVAR =  0 )
+      PARAMETER ( TRN_OP_ADD   =  1 )
+      PARAMETER ( TRN_OP_SUB   =  2 )
+      PARAMETER ( TRN_OP_MULT  =  3 )
+      PARAMETER ( TRN_OP_DIV   =  4 )
+      PARAMETER ( TRN_OP_PWR   =  5 )
+      PARAMETER ( TRN_OP_NEG   =  6 )
+      PARAMETER ( TRN_OP_SQRT  =  7 )
+      PARAMETER ( TRN_OP_LOG   =  8 )
+      PARAMETER ( TRN_OP_LG10  =  9 )
+      PARAMETER ( TRN_OP_EXP   = 10 )
+      PARAMETER ( TRN_OP_SIN   = 11 )
+      PARAMETER ( TRN_OP_COS   = 12 )
+      PARAMETER ( TRN_OP_TAN   = 13 )
+      PARAMETER ( TRN_OP_SIND  = 14 )
+      PARAMETER ( TRN_OP_COSD  = 15 )
+      PARAMETER ( TRN_OP_TAND  = 16 )
+      PARAMETER ( TRN_OP_ASIN  = 17 )
+      PARAMETER ( TRN_OP_ACOS  = 18 )
+      PARAMETER ( TRN_OP_ATAN  = 19 )
+      PARAMETER ( TRN_OP_ASND  = 20 )
+      PARAMETER ( TRN_OP_ACSD  = 21 )
+      PARAMETER ( TRN_OP_ATND  = 22 )
+      PARAMETER ( TRN_OP_SINH  = 23 )
+      PARAMETER ( TRN_OP_COSH  = 24 )
+      PARAMETER ( TRN_OP_TANH  = 25 )
+      PARAMETER ( TRN_OP_ABS   = 26 )
+      PARAMETER ( TRN_OP_NINT  = 27 )
+      PARAMETER ( TRN_OP_MIN   = 28 )
+      PARAMETER ( TRN_OP_MAX   = 29 )
+      PARAMETER ( TRN_OP_DIM   = 30 )
+      PARAMETER ( TRN_OP_MOD   = 31 )
+      PARAMETER ( TRN_OP_SIGN  = 32 )
+      PARAMETER ( TRN_OP_ATN2  = 33 )
+      PARAMETER ( TRN_OP_AT2D  = 34 )
+      PARAMETER ( TRN_OP_LDBAD = 35 )
+
+
+
+************************************************************************
+*                              END                                     *
+*                                                                      *
+*  Private constant definitions for the routines in the TRN_ facility  *
+*              which process standard transformation modules           *
+*                                                                      *
+*                              END                                     *
+************************************************************************

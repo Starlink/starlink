@@ -1,0 +1,124 @@
+************************************************************************
+*                             BEGIN                                    *
+*                                                                      *
+*         Public constant definitions for the TRANSFORM facility       *
+*         ------------------------------------------------------       *
+*                                                                      *
+*                             BEGIN                                    *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith
+*
+*    History :
+*     6-MAY-1988:  Original version (DUVAD::RFWS)
+*     9-MAY-1988:  Added TRN__SZPRC constant (DUVAD::RFWS)
+*     17-AUG-1988:  Added TRN__NOID constant (DUVAD::RFWS)
+*     6-DEC-1988:  Version 0.9 (DUVAD::RFWS)
+*    endhistory
+*
+
+
+
+************************
+*   Software version   *
+************************
+
+
+*   Software version number.
+      REAL TRN__VERSN
+      PARAMETER ( TRN__VERSN = 0.9 )
+
+
+
+*************************************
+*   Classification array elements   *
+*************************************
+
+
+*   Number of classification array elements.
+      INTEGER TRN__MXCLS
+      PARAMETER ( TRN__MXCLS = 8 )
+
+
+*   Linear transformation.
+      INTEGER TRN__LIN
+      PARAMETER ( TRN__LIN = 1 )
+
+
+*   Coordinates remain independent.
+      INTEGER TRN__INDEP
+      PARAMETER ( TRN__INDEP = 2 )
+
+
+*   Jacobian matrix is diagonal.
+      INTEGER TRN__DIAG
+      PARAMETER ( TRN__DIAG = 3 )
+
+
+*   Transformation is (locally) isotropic.
+      INTEGER TRN__ISOT
+      PARAMETER ( TRN__ISOT = 4 )
+
+
+*   Determinant of Jacobian matrix is always positive.
+      INTEGER TRN__POSDT
+      PARAMETER ( TRN__POSDT = 5 )
+
+
+*   Determinant of Jacobian matrix is always negative.
+      INTEGER TRN__NEGDT
+      PARAMETER ( TRN__NEGDT = 6 )
+
+
+*   Determinant of Jacobian matrix is constant.
+      INTEGER TRN__CONDT
+      PARAMETER ( TRN__CONDT = 7 )
+
+
+*   Determinant of Jabobian matrix has absolute value unity.
+      INTEGER TRN__UNIDT
+      PARAMETER ( TRN__UNIDT = 8 )
+
+
+
+********************************
+*   Transformation precision   *
+********************************
+
+
+*   Size of a precision string.
+      INTEGER TRN__SZPRC
+      PARAMETER ( TRN__SZPRC = 9 )
+
+
+
+*********************
+*   System limits   *
+*********************
+
+
+*   Maximum number of simultaneously active compiled transformations.
+      INTEGER TRN__MXCTR
+      PARAMETER ( TRN__MXCTR = 46340 )
+
+
+
+*********************
+*   Miscellaneous   *
+*********************
+
+
+*   Null transformation identifier.
+      INTEGER TRN__NOID
+      PARAMETER ( TRN__NOID = -1 )
+
+
+
+************************************************************************
+*                              END                                     *
+*                                                                      *
+*         Public constant definitions for the TRANSFORM facility       *
+*                                                                      *
+*                              END                                     *
+************************************************************************

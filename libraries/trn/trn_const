@@ -1,0 +1,190 @@
+************************************************************************
+*                             BEGIN                                    *
+*                                                                      *
+*    Private (internal) constant definitions for the TRN_ facility     *
+*    -------------------------------------------------------------     *
+*                                                                      *
+*                             BEGIN                                    *
+************************************************************************
+*
+*    Authors :
+*     R.F. Warren-Smith
+*
+*    History :
+*     6-MAY-1988:  Original version (DUVAD::RFWS)
+*     9-MAY-1988:  Added constants for precision handling (DUVAD::RFWS)
+*    endhistory
+*
+
+
+
+*************************************************************
+*   Names of _LOGICAL components in a TRN_CLASS structure   *
+*************************************************************
+
+
+*   Transformation is linear?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_LIN
+      PARAMETER ( TRN_CN_LIN = 'LINEAR' )
+
+
+*   Coordinates transform independently?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_INDEP
+      PARAMETER ( TRN_CN_INDEP = 'INDEPENDENT' )
+
+
+*   Jacobian matrix is diagonal?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_DIAG
+      PARAMETER ( TRN_CN_DIAG = 'DIAGONAL' )
+
+
+*   Transformation is (locally) isotropic?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_ISOT
+      PARAMETER ( TRN_CN_ISOT = 'ISOTROPIC' )
+
+
+*   Determinant of Jacobian matrix is always positive?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_POSDT
+      PARAMETER ( TRN_CN_POSDT = 'POSITIVE_DET' )
+
+
+*   Determinant of Jacobian matrix is always negative?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_NEGDT
+      PARAMETER ( TRN_CN_NEGDT = 'NEGATIVE_DET' )
+
+
+*   Determinant of Jacobian matrix has constant absolute value?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_CONDT
+      PARAMETER ( TRN_CN_CONDT = 'CONSTANT_DET' )
+
+
+*   Determinant of Jacobian matrix has absolute value of unity?
+      CHARACTER * ( DAT__SZNAM ) TRN_CN_UNIDT
+      PARAMETER ( TRN_CN_UNIDT = 'UNIT_DET' )
+
+
+
+***********************************************
+*   Transformation definition status values   *
+***********************************************
+
+
+*   Transformation is defined.
+      INTEGER TRN_DS_DEF
+      PARAMETER ( TRN_DS_DEF = 2 )
+
+
+*   Transformation is undefined.
+      INTEGER TRN_DS_UDEF
+      PARAMETER ( TRN_DS_UDEF = 1 )
+
+
+
+****************************************
+*   Constants for precision handling   *
+****************************************
+
+
+*   "Elastic" precision codes for each precision type.
+      INTEGER TRN_PR_EI
+      PARAMETER ( TRN_PR_EI = 1 )
+      INTEGER TRN_PR_ER
+      PARAMETER ( TRN_PR_ER = 2 )
+      INTEGER TRN_PR_ED
+      PARAMETER ( TRN_PR_ED = 3 )
+
+
+*   Fixed precision codes for each precision type.
+      INTEGER TRN_PR_I
+      PARAMETER ( TRN_PR_I = 4 )
+      INTEGER TRN_PR_R
+      PARAMETER ( TRN_PR_R = 5 )
+      INTEGER TRN_PR_D
+      PARAMETER ( TRN_PR_D = 6 )
+
+
+
+****************************************************************
+*   Constants for the internal workspace allocation strategy   *
+****************************************************************
+
+
+*   Amount of workspace normally allocated at startup for transforming
+*   data.
+      INTEGER TRN__NWRK
+      PARAMETER ( TRN__NWRK = 1024 )
+
+
+*   Preferred minimum number of data points to be processed at once
+*   (minimum batch size).
+      INTEGER TRN__MNBAT
+      PARAMETER ( TRN__MNBAT = 64 )
+
+
+
+*****************************************************
+*   Compiled transformation table (CTT) constants   *
+*****************************************************
+
+
+*   Number of data items stored in the CTT integer array.
+      INTEGER TRN_CT_NITEM
+      PARAMETER( TRN_CT_NITEM = 7 )
+
+
+*   Number of slots by which the table size is incremented when
+*   necessary.
+      INTEGER TRN_CT_SZINC
+      PARAMETER ( TRN_CT_SZINC = 8 )
+
+
+*   Location of a pointer to a mapped character array containing a list
+*   of locators associated with the compiled modules in a
+*   transformation.
+      INTEGER TRN_CT_PLOCM
+      PARAMETER( TRN_CT_PLOCM = 1 )
+
+
+*   Location of a pointer to a mapped integer array containing a list
+*   of pointers to the compiled module INDEX arrays.
+      INTEGER TRN_CT_PPIND
+      PARAMETER( TRN_CT_PPIND = 2 )
+
+
+*   Location of a pointer to a mapped integer array containing a list
+*   of the number of coordinate variables in the data stream between
+*   each pair of modules.
+      INTEGER TRN_CT_PNVAR
+      PARAMETER( TRN_CT_PNVAR  = 3 )
+
+
+*   Location of a pointer to a mapped integer array containing a list of
+*   the precision codes for each module in a compiled transformation.
+      INTEGER TRN_CT_PIPRC
+      PARAMETER( TRN_CT_PIPRC = 4 )
+
+
+*   Location of the workspace requirement count for the transformation.
+      INTEGER TRN_CT_MXWRK
+      PARAMETER( TRN_CT_MXWRK = 5 )
+
+
+*   Location of the number of modules count for the transformation.
+      INTEGER TRN_CT_NMOD
+      PARAMETER( TRN_CT_NMOD  = 6 )
+
+
+*   Location of the ID for the transformation; used as a security check
+*   for valid IDs.
+      INTEGER TRN_CT_CHECK
+      PARAMETER( TRN_CT_CHECK = 7 )
+
+
+
+************************************************************************
+*                              END                                     *
+*                                                                      *
+*    Private (internal) constant definitions for the TRN_ facility     *
+*                                                                      *
+*                              END                                     *
+************************************************************************

@@ -1,0 +1,1 @@
+echo -ltrn `hds_link_adam` `err_link_adam` `chr_link` `prm_link_adam`
