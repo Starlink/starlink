@@ -997,7 +997,6 @@ c     INTEGER           G05EYF
       DOUBLE PRECISION  SS                      !
       DOUBLE PRECISION  SSMIN                   !
       DOUBLE PRECISION  SSMAX                   !
-      DOUBLE PRECISION  XX                      !
 
       INTEGER           I        		! Loop over sources
       INTEGER           IFAIL        		! NAG status code

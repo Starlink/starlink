@@ -168,6 +168,7 @@
 
 *  Version
       CALL MSG_PRNT( VERSION )
+      CALL NAG_MISSING( 'G05DRF (broken)', STATUS )
 
 *  Initialise Asterix
       CALL AST_INIT()
