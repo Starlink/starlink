@@ -62,6 +62,7 @@
 *    24-Apr-1994   (v1.7-0) for new asterix release
 *    15-Aug-1994   V1.7-1 Fix when NOVR=0 in XRTSUB_PARTCNT (DJA)
 *    11 Jan 1996   V1.8-2 ADI port (DJA)
+*     7 Apr 98     v2.2-2 linux port (rjv)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -135,7 +136,7 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTSUB Version 2.2-1')
+      PARAMETER (VERSION = 'XRTSUB Version 2.2-2')
 *-
       CALL AST_INIT
 *
@@ -1324,6 +1325,8 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
 *    Export :
       REAL SARRAY(TDIM,EDIM,RDIM)            ! Subtraction array
       REAL SVAR(TDIM,EDIM,RDIM)              ! Subtraction variance array
+*    Functions :
+      BYTE BIT_ANDUB
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
@@ -1344,7 +1347,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
       IF (INDEX(CHEAD_DET, 'PSPCB') .NE. 0) THEN
          DETB = .TRUE.
       ELSE
-         DETB = .FALSE.
+         DETB = .FALSE.
       ENDIF
 *
 * Loop over each output time bin, Energy bin and radial bin
@@ -1364,7 +1367,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
                   DO XLP = 1,XDIM
 *
 *        Add in this pixel if its quality is good
-                     IF ((BQUAL(XLP,YLP,TLP,ELP,1) .AND. BMASK)
+                     IF (BIT_ANDUB(BQUAL(XLP,YLP,TLP,ELP,1),BMASK)
      &                            .EQ. QUAL_GOOD) THEN
 *
                         BSUM = BSUM + BARRAY(XLP,YLP,TLP,ELP,1)
@@ -1398,7 +1401,7 @@ CC     &                           PE2(LPE), PE3(LPE), BPART)
                DO YLP = 1,YDIM
                   DO XLP = 1,XDIM
 
-                     IF ((BQUAL(XLP,YLP,TLP,ELP,1) .AND. BMASK)
+                     IF (BIT_ANDUB(BQUAL(XLP,YLP,TLP,ELP,1),BMASK)
      &                                     .EQ. QUAL_GOOD) THEN
 *
                         VSUM = VSUM + BVAR(XLP,YLP,TLP,ELP,1)
@@ -2004,6 +2007,8 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
       REAL PE1(NE)                            ! Internal particles
       REAL PE2(NE)                            ! Al parts.
       REAL PE3(NE)                            ! External parts.
+*    Functions :
+      BYTE BIT_ANDUB
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
@@ -2027,7 +2032,7 @@ C      INCLUDE 'XRT_CORR_SUB_CMN'
           DO XLP=1,NX
 *
 *     Sum the photons if good quality pixels
-             IF ( (BQUAL(XLP,YLP,TLP,ELP,RLP) .AND. BMASK) .EQ.
+             IF (BIT_ANDUB(BQUAL(XLP,YLP,TLP,ELP,RLP),BMASK) .EQ.
      &                            QUAL_GOOD ) THEN
                 BPHOT(ELP) = BPHOT(ELP) + BDATA(XLP,YLP,TLP,ELP,RLP)
 *
@@ -3224,6 +3229,8 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
 *     <declarations and descriptions for imported/exported arguments>
 *    Export :
       REAL AREA                         ! Box area in square arcmins
+*    Functions :
+      BYTE BIT_ANDUB
 *    Local constants :
       REAL PI
         PARAMETER (PI=3.14159265)
@@ -3260,7 +3267,7 @@ c    &           (PART1(TLP,ELP)+PART2(TLP,ELP)+PART3(TLP,ELP))
          DO LPY=1,NY
             DO LPX=1,NX
 *
-               IF ( (QUAL(LPX,LPY,1,1,1) .AND. MASK)
+               IF (BIT_ANDUB(QUAL(LPX,LPY,1,1,1),MASK)
      &                                         .EQ. QUAL__GOOD ) THEN
                   PCOUNT = PCOUNT + 1
 *
