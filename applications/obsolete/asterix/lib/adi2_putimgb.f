@@ -121,10 +121,15 @@
 
 *  Write the data
       FSTAT = 0
-      CALL FTPPRB( LUN, 1, 1, NELEM, DATA, STATUS )
+      CALL FTPPRB( LUN, 1, 1, NELEM, DATA, FSTAT )
 
 *  Free the buffer
       CALL ADI_ERASE( HID, STATUS )
+
+*  Translate any FITSIO error code
+      IF ( FSTAT .NE. 0 ) THEN
+        CALL ADI2_FITERP( FSTAT, STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
