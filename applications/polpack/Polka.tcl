@@ -53,6 +53,10 @@
 #        A-task. This is necessary so that different AMS processes will
 #        be used for the script<->KAPPA/CCDPACK communication, and the 
 #        atask<->ICL (or IRAF) communication. 
+#     23-NOV-1999 (DSB):
+#        Fixed a bug which caused the names of the output NDFs to get out
+#        of sync by 1 with the names of the input NDFs, when the first
+#        input image is used for reference only.
 #-
 
 # Uncomment this section to see the names of all procedure as they are 
@@ -950,11 +954,13 @@
    MenuHelp $imagesmenu "Transfer..." ".  Transfer the features from the current image to a group of other images."
    $imagesmenu add separator
 
+# Initialise the i variable which indexes the lists of output and sky images. 
+   set i 0
+
 # Go through every supplied image section.
    set maximwid 0
    set maxrimwid 0
    set maxsfwid 15
-   set i 0
    foreach imsec $IMSECS {
       set doing "Preparing input images ( [expr $nin - $i] to go)\n\nPlease wait..."
 
@@ -1089,9 +1095,14 @@
       set EFFECTS_MAPPINGS($image) ""
       set EFFECTS_STACK($image) ""
 
+# The i variable indexes the lists of output and sky images. If the input
+# image we have just processed was for "reference purposes only", it will
+# not have had any associated output or sky images. So we only increment i 
+# if the input image just processed was *not* for reference purposes only.
+      if { !$ref } { incr i }
+
 # The next image is not the reference image.
       set ref 0
-      incr i   
    }
 
 # Pack the menu buttons.
