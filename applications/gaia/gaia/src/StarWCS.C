@@ -73,7 +73,7 @@ extern "C" {
                              int indim, const double (*in)[1], int forward,
                              int ncoord_out, int outdim, double (*out)[1] )
     {
-#if (AST_MAJOR_VERS >= 1) && (AST_MINOR_VERS < 7)
+#if !defined( AST_MAJOR_VERS) || ( (AST_MAJOR_VERS>=1) && (AST_MINOR_VERS<7))
         astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
                   forward, ncoord_out, outdim, (double (*)[])out );
 #else

@@ -1468,7 +1468,7 @@ GenEllipse( XPoint *ellipse, double centerX, double centerY,
     step = PI * 2.0 / (double)( SEGMENTS - 1 );
 
     /* Convert angle to radians */
-    rpa = angle * D2R;// + 0.5 * PI;
+    rpa = angle * D2R;
     cosRpa = cos( rpa );
     sinRpa = sin( rpa );
 

@@ -496,7 +496,7 @@ void Contour::contPlot( const AstPlot *plot, const int npts,
       }
       
       //  Draw the geodesic.
-#if (AST_MAJOR_VERS >= 1) && (AST_MINOR_VERS < 7)
+#if !defined( AST_MAJOR_VERS) || ((AST_MAJOR_VERS>=1) && (AST_MINOR_VERS<7))
       astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
 #else
       astPolyCurve( plot, npts, 2, MAXPTS, (const double *) xydata );
