@@ -1306,5 +1306,88 @@ interface SEGMENT
    endparameter
 
 endinterface
+#+
+#  Name:
+#     POLVEC.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JAN-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLVEC
+
+   helplib 'POLPACK_HELP:'
+
+   parameter      DEBIAS         # Remove statistical bias?
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
+      prompt      'Remove statistical bias?'
+      helpkey     '*'
+   endparameter
+
+   parameter      I              # Total intensity
+      position    2
+      type        NDF
+      access      WRITE
+      prompt      'Total intensity '
+      helpkey     '*'
+   endparameter
+
+   parameter      IN
+      position    1
+      type        NDF
+      access      READ
+      ppath       'GLOBAL'
+      association <-GLOBAL.DATA_ARRAY
+      prompt      'Input Stokes cube'
+      helpkey     '*'
+   endparameter
+
+   parameter      IP             # Polarised intensity 
+      position    5
+      type        NDF
+      access      WRITE
+      prompt      'Polarised intensity'
+      helpkey     '*'
+   endparameter
+
+   parameter      P              # Percentage polarisation
+      position    3
+      type        NDF
+      access      WRITE
+      prompt      'Percentage polarisation'
+      helpkey     '*'
+   endparameter
+
+   parameter      THETA          # Polarisation angle
+      position    4
+      type        NDF
+      access      WRITE
+      prompt      'Polarisation angle'
+      helpkey     '*'
+   endparameter
+
+   parameter      VARIANCE       # Variances required?
+      type        _LOGICAL
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     YES
+      prompt      'Are variance values to be generated?'
+      helpkey     '*'
+   endparameter
+
+endinterface
 
 endmonolith

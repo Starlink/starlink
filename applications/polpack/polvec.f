@@ -195,7 +195,8 @@
 *  Propagate WCS information from the input.
          CALL POL1_PRWCS( INDF1, INDFI, STATUS )
 
-*  Set the LABEL in the output NDF to 'Total Intensity'.
+*  Set the LABEL and TITLE in the output NDF to 'Total Intensity'.
+         CALL NDF_CPUT( 'Total Intensity', INDFI, 'TITLE', STATUS )
          CALL NDF_CPUT( 'Total Intensity', INDFI, 'LABEL', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
@@ -228,8 +229,10 @@
 *  Propagate WCS information from the input.
          CALL POL1_PRWCS( INDF1, INDFP, STATUS )
 
-*  Set the LABEL in the output NDF to 'Percentage polarisation'.
+*  Set the LABEL and TITLE in the output NDF to 'Percentage polarisation'.
          CALL NDF_CPUT( 'Percentage Polarisation', INDFP, 'LABEL',
+     :                  STATUS )
+         CALL NDF_CPUT( 'Percentage Polarisation', INDFP, 'TITLE',
      :                  STATUS )
 
 *  Store "%" in the output NDF UNITS component.
@@ -266,8 +269,9 @@
 *  Propagate WCS information from the input.
          CALL POL1_PRWCS( INDF1, INDFT, STATUS )
 
-*  Set the LABEL in the output NDF to 'Polarisation Angle'.
+*  Set the LABEL and TITLE in the output NDF to 'Polarisation Angle'.
          CALL NDF_CPUT( 'Polarisation Angle', INDFT, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'Polarisation Angle', INDFT, 'TITLE', STATUS )
 
 *  Store "Degrees" in the output NDFs UNITS component.
          CALL NDF_CPUT( 'Degrees', INDFT, 'UNITS', STATUS )
@@ -302,8 +306,9 @@
 *  Propagate WCS information from the input.
          CALL POL1_PRWCS( INDF1, INDFIP, STATUS )
 
-*  Set the LABEL in the output NDF to 'Polarised Intensity'.
+*  Set the LABEL and TITLE in the output NDF to 'Polarised Intensity'.
          CALL NDF_CPUT( 'Polarised Intensity', INDFIP, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'Polarised Intensity', INDFIP, 'TITLE', STATUS )
 
 *  Map the DATA array and if necessary, the VARIANCE array.
          CALL NDF_MAP( INDFIP, 'DATA', '_REAL', 'WRITE', IPIP, EL,

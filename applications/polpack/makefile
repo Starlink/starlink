@@ -423,7 +423,8 @@ ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
 ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
-pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f
+pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f polexp.f pol1_setft.f \
+polvec.f pol1_plvec.f pol1_prwcs.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -461,7 +462,8 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polmap polka datapic polcent segment polcal polimp polexp
+TASKS = polhelp polmap polka datapic polcent segment polcal polimp \
+polexp polvec
 
 #  Monolith routine source name.
 
@@ -478,7 +480,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 #  List of task interface files.
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polka.ifl \
-segment.ifl polcal.ifl polimp.ifl polexp.ifl
+segment.ifl polcal.ifl polimp.ifl polexp.ifl polvec.ifl
 
 #  List of help library sources.
 
@@ -1556,6 +1558,13 @@ wrndf.o:	PAR_ERR
 wrndf.o:	MSG_PAR     
 wrndf.o:	GRP_PAR     
 wrndf.o:	NDG_ERR     
+polvec.f:	SAE_PAR
+polvec.f:	PAR_ERR
+polvec.f:	NDF_PAR
+pol1_plvec.f:	SAE_PAR
+pol1_plvec.f:	PRM_PAR
+pol1_prwcs.f:	SAE_PAR
+pol1_prwcs.f:	NDF_PAR
 polpack_mon.o: SAE_PAR PAR_PAR
 
 #-------------------------------------------------------------------------------

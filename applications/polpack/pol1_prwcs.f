@@ -71,7 +71,7 @@
       CALL NDF_SECT( INDF1, NDIM, LBND, UBND, INDF1A, STATUS )      
 
 *  Copy the WCS information from this section to the second NDF.
-      CALL NDF_GTWSC( INDF1A, IWCS, STATUS )
+      CALL NDF_GTWCS( INDF1A, IWCS, STATUS )
       CALL NDF_PTWCS( IWCS, INDF2, STATUS )
 
       END
