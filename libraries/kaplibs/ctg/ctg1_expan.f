@@ -56,6 +56,9 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     12-APR-2000 (DSB):
+*        Corrected code which chooses whether to pruge duplicate file
+*        names.
 *     {enter_further_changes_here}
 
 *-
@@ -176,14 +179,23 @@
      :    TEMPLT( L : L ) .EQ. '`' ) THEN
          CALL CTG1_APPEN( IGRP2, IGRP3, TEMPLT, ' ', STATUS )
 
+*  Indicate that duplicate file names should not be purged.
+         PURGE = .FALSE.
+
 *  Otherwise, split the template into directory, basename, suffix and
 *  FITS extension. 
       ELSE
         CALL CTG1_FPARS( TEMPLT, DIR, BN, SUF, EXT, STATUS )
 
-*  If no suffix was given, use ".*" so that we pick up files with any of 
-*  the types included in the list of known catalogue formats.
-         IF( SUF .EQ. ' ' ) SUF = '.*'
+*  From now on, if no suffix was given, use ".*" so that we pick up files 
+*  with any of the known catalogue formats. But indicate that duplicate 
+*  files with different file types should be purged.
+         IF( SUF .EQ. ' ' ) THEN
+            SUF = '.*'
+            PURGE = .TRUE.
+         ELSE
+            PURGE = .FALSE.
+         END IF
 
 *  Initialise the total file search string.
          SEARCH = ' '
