@@ -1,0 +1,93 @@
+## NDF2ASCII - Converts an NDF to an ASCII file.
+
+#+
+#  Name:
+#     NDF2ASCII.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1991 January 28 (MJC):
+#	 Original version.
+#     1992 September 16 (MJC):
+#	 Added parameters to provide more control of the formatting of
+#	 the output file.
+#     {enter_further_changes_here}
+
+#-
+
+interface NDF2ASCII
+
+   helplib        'CONVERT_DIR:CONVERT'
+
+   parameter      COMP           # Data, quality or variance?
+      position    3
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Array component to copy to the ASCII file'
+      helpkey     '*'
+#     in          'Data', 'Quality', 'Variance'
+      default     'Data'
+   endparameter
+
+   parameter      FITS           # Extract the FITS file
+      type        '_LOGICAL'
+      prompt      'Write a FITS header in the ASCII file?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      FIXED          # Fixed formatting of the data values
+      type        '_LOGICAL'
+      prompt      'Fixed format of the array values?'
+      vpath       'DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF data structure'
+      helpkey     '*'
+   endparameter
+
+   parameter      NOPEREC        # Number of values per ASCII record
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of data values per ASCII record'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output ASCII file
+      position    2
+      type        'FILENAME'
+      access      'WRITE'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'ASCII file'
+      helpkey     '*'
+   endparameter
+
+   parameter      RECLEN         # ASCII file recordlength
+      position    4 
+      type        '_INTEGER'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      prompt      'Maximum recordsize of the ASCII file.'
+      helpkey     '*'
+   endparameter
+
+endinterface
