@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.26  1998/04/16 02:48:57  timj
+*     Add SCUMAKEWT
+*
 *     Revision 1.25  1998/01/08 20:08:51  timj
 *     Add SCUBA2MEM
 *
@@ -187,6 +190,10 @@ c
       ELSE IF (NAME .EQ. 'INTREBIN') THEN
 
          CALL SURF_REBIN (NAME, STATUS)
+
+      ELSE IF (NAME .EQ. 'SCUMAKEWT') THEN
+
+         CALL SURF_MAKE_WEIGHT( STATUS )
 
       ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
