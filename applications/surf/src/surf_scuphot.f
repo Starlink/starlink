@@ -39,21 +39,21 @@
 *       is the coadd of all the individual fits to the data.
 
 *  Usage:
-*     scuphot [analysis=] [in=] [out=] [file=]
+*     scuphot analysis in out file
 
 *  ADAM Parameters:
 *     ANALYSIS = _CHAR (Read)
 *        The method used to detemine peak. Either average or parabola.
-*                                        [average]
 *     FILE = NDF (Write)
 *        The name of the ASCII output file.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated (extinction
-*       (corrected) SCUBA data. [global value]
+*        corrected) SCUBA data.
 *     OUT = _CHAR (Write)
-*        The name of the HDS output file to contain the ndfs described above.
+*        The name of the HDS output file to contain the NDFs described above.
 *        This file will have the extension .sdf but this should not be
 *        specified in the name.
+
 
 *  Algorithm:
 *        In more detail the routine works as follows. If status is good on
@@ -110,9 +110,6 @@
 *     FILE.
 *        Lastly, the IN and OUT files are closed.
 
-*  Implementation status:
-*     Quality handling is used.
-
 *  Authors:
 *     JFL: John Lightfoot (ROE)
 *     TIMJ: Tim Jenness (JACH)
@@ -122,10 +119,14 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.7  1996/12/10 02:12:43  timj
-*     Fix for non-square jiggles.
-*     Change 'ANALYSIS' to PAR_CHOIC.
+*     Revision 1.8  1997/03/20 21:41:30  timj
+*     Update header.
+*     Remove NDF_SCOPY and replace with NDF_NEW
 *
+c Revision 1.7  1996/12/10  02:12:43  timj
+c Fix for non-square jiggles.
+c Change 'ANALYSIS' to PAR_CHOIC.
+c
 c Revision 1.6  1996/11/02  01:43:25  timj
 c Fix bug in history header
 c
@@ -842,9 +843,8 @@ c
 	       NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
 
 	       CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-               CALL NDF_SCOPY (IN_NDF, 'NOEXTENSION(SCUBA)', PLACE, 
-     :           IBEAM, STATUS)
-               CALL NDF_SBND (N_OBSDIM, LBND, UBND, IBEAM, STATUS)
+               CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
+     :              IBEAM, STATUS)
 
 	       CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
      :           MAP_Q_PTR, NELM, STATUS)
@@ -908,9 +908,8 @@ c
 	       NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_peak'
 
 	       CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-               CALL NDF_SCOPY (IN_NDF, 'NOEXTENSION(SCUBA)', PLACE, 
-     :           IPEAK, STATUS)
-               CALL NDF_SBND (1, 1, N_INTEGRATIONS, IPEAK, STATUS)
+               CALL NDF_NEW('_REAL',1,1,N_INTEGRATIONS, PLACE, 
+     :              IPEAK, STATUS)
 
                CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
      :           PEAK_Q_PTR, NELM, STATUS)
