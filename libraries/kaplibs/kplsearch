@@ -11,16 +11,29 @@
 #  Language:
 #     tcl
 
+#  Description:
+#     This script displays names of kaplibs routines which contain
+#     a given search phrase (or any of its sub-strings) in their 
+#     "Purpose" information. By default, routines from all the KAPLIB 
+#     libraries are included, but the search can be restricted to 
+#     particular libraries by specifying one or more of the library 
+#     selection options (-aif, -ctg, etc).
+
 #  Invocation:
 #     kplsearch [options] <search phrase>
 
 #  Options:
 #     -exact       match whole search phrase only
-#                  (default is to match any sub-phrases)
+#                  (default is to match any sub-phrases).
 #     -alpha       sort matching routine names alphabetically
-#                  (default is to sort by relevance)
+#                  (default is to sort by relevance).
 #     -whole       match only whole words
-#                  (default is to match sub-words)
+#                  (default is to match sub-words).
+#     -aif         include AIF_ routines in the results
+#     -ctg         include CTG_ routines in the results
+#     -lpg         include LPG_ routines in the results
+#     -fts         include FTS1_ routines in the results
+#     -kpg         include KPG1_ routines in the results
 
 #  Authors:
 #     DSB: David S. Berry (Starlink)
@@ -149,6 +162,7 @@ proc search {test words} {
    set whole 0
    set wholeword 0
    set sort "w"
+   set prefs ""
 
 #  Check each command line argument.
    set ok 1
@@ -162,6 +176,24 @@ proc search {test words} {
 
       } elseif { $arg == "-alpha" } {
          set sort "a"
+
+      } elseif { $arg == "-aif" } {
+         lappend prefs "AIF"
+
+      } elseif { $arg == "-ctg" } {
+         lappend prefs "CTG"
+
+      } elseif { $arg == "-lpg" } {
+         lappend prefs "LPG"
+
+      } elseif { $arg == "-fts" } {
+         lappend prefs "FTS"
+
+      } elseif { $arg == "-ira" } {
+         lappend prefs "IRA"
+
+      } elseif { $arg == "-kpg" } {
+         lappend prefs "KPG"
 
       } elseif { [regexp {^-} $arg] } {
          set ok 0
@@ -181,8 +213,12 @@ proc search {test words} {
 #  display help and abort.
    if { !$ok || ![info exists phrase] } {
       puts ""
-      puts "Searches for kaplibs routines (see SUN/238) which contain a"
-      puts "given search phrase in their \"Purpose\" string."
+      puts "Displays names of kaplibs routines (see SUN/238) which contain"
+      puts "a given search phrase (or any of its sub-strings) in their"
+      puts "\"Purpose\" information. By default, routines from all the KAPLIB"
+      puts "libraries are included, but the search can be restricted to"
+      puts "particular libraries by specifying one or more of the library"
+      puts "selection options (-aif, -ctg, etc)."
       puts ""
       puts "usage: kplsearch \[options\] <search phrase>"
       puts ""
@@ -193,6 +229,11 @@ proc search {test words} {
       puts "               (default is to sort by relevance)"
       puts "  -whole       match only whole words"
       puts "               (default is to match sub-words)"
+      puts "  -aif         include AIF_ routines in the results"
+      puts "  -ctg         include CTG_ routines in the results"
+      puts "  -lpg         include LPG_ routines in the results"
+      puts "  -fts         include FTS1_ routines in the results"
+      puts "  -kpg         include KPG1_ routines in the results"
       puts ""
       exit
    }
@@ -203,8 +244,18 @@ proc search {test words} {
 
 <purposes placeholder>
 
-#  Store a list of the available routine names. 
-   set routines [array names purpose]
+#  Store a list of the routine names to be searched. 
+   if { $prefs == "" } { 
+      set routines [array names purpose]
+   } else 
+      foreach rout [array names purpose] {
+         foreach pref $prefs { 
+            if { [string match "$pref*" $rout] } {
+               lappend routines $rout
+            }
+         }
+      }
+   }
 
 #  Removing leading and trailing spaces from the search phrase.
    set phrase [string trim $phrase]
