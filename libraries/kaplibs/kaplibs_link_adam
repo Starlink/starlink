@@ -1,5 +1,42 @@
 
-      echo -lkapgen -lira -llpg -lctg -lfits -laif -lkapgrf \
+#  Initialise linking options.
+      nogks=''
+
+#  Interpret command line switches.
+#  --------------------------------
+      while :; do
+         case "${1}" in
+
+#  -nogks - Requests linking with native pgplot and without GKS or IDI
+         -nogks)
+            nogks='y'
+            shift;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         '') break;;
+
+#  Catch unrecognised arguments and report an error.
+         *)
+            echo >&2 "kaplibs_link_adam: unknown argument \""${1}"\" given"
+            exit 1;;
+         esac
+      done
+
+#  Form list of graphics libraries.
+      if test "${nogks}" = 'y'; then 
+         echo -lkapgen -lira -llpg -lctg -lfits -laif -lkapgrf \
+           `cat_link_adam` `ndg_link_adam` \
+           `ndf_link_adam` `ast_link_adam -mygrf` \
+           `agp_link_adam` `fio_link_adam` \
+           `grp_link_adam` `trn_link_adam` \
+           `prm_link_adam` `mag_link_adam` \
+           `psx_link_adam` `pda_link_adam` \
+           -lkapgrf `pgplot_link_adam`  \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+      else
+         echo -lkapgen -lira -llpg -lctg -lfits -laif -lkapgrf \
            `cat_link_adam` `snx_link_adam` \
            `sgs_link_adam` `ndg_link_adam` \
            `gks_link_adam` `gns_link_adam` \
@@ -12,3 +49,4 @@
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+      fi
