@@ -26,9 +26,9 @@
 #     which could be referred to by other programs (e.g. functions and
 #     subroutines).  For each instance of such a module, the name of 
 #     the module and information about its location is written to a 
-#     DBM file ($indexfile).
+#     DBM file ($func_indexfile).
 #
-#     The resulting DBM file $indexfile can then be read by a separate 
+#     The resulting DBM file $func_indexfile can then be read by a separate 
 #     program to locate the source code for a module, using no 
 #     information other than its name, and perhaps what package it is
 #     part of.
@@ -46,7 +46,7 @@
 #     then instead these are taken as package locations.
 #
 #  Index DBM file format.
-#     The index file is named $indexfile and stored as a Perl SDBM file.  
+#     The index file is named $func_indexfile and stored as a Perl SDBM file.  
 #     This resembles a Unix dbm(3) file and is therefore an unordered 
 #     set of (key, value) pairs.
 #
@@ -100,7 +100,7 @@
 #        package: task1 task2 task3 ...
 #
 #     where 'package' is a package name as defined above (every task
-#     containing at least one module indexed in $indexfile is included
+#     containing at least one module indexed in $func_indexfile is included
 #     exactly once) and the tasks are supposed to be modules of 
 #     particular importance.  Their meaning is not defined other than 
 #     that, but they should typically be commands which can be invoked
@@ -136,7 +136,6 @@ $generic = "generic";
 
 use Fcntl;
 use Cwd;
-use SDBM_File;
 use Scb;
 use FortranTag;
 use CTag;
@@ -166,7 +165,7 @@ system "mkdir -p $tmpdir" and die "Couldn't create $tmpdir: $?\n";
 
 #  Initialise index object containing locations of all modules.
 
-$index = Directory->new($indexfile, O_CREAT | O_RDWR);
+$func_index = Directory->new($func_indexfile, O_CREAT | O_RDWR);
 
 #  If task file exists, read values from it into @tasks.
 
@@ -186,7 +185,7 @@ if (@ARGV) {
    }
 }
 else {
-   $index->put('SOURCE#', $srcdir);
+   $func_index->put('SOURCE#', $srcdir);
    foreach $package_file (glob "$srcdir/*") {
       index_pack $package_file;
    }
@@ -202,7 +201,8 @@ $verbose = 0;
 
 #  Write checked task names out to text file.
 #  Currently, a task is identified as the text of any entry in a .hlp file
-#  for which a module of the same name exists in the same package.
+#  for which a module of the same name (possibly with appended underscore)
+#  exists in the same package.
 
 my ($line, $module);
 open TASKS, ">$taskfile" or die "Couldn't open $taskfile\n";
@@ -210,9 +210,14 @@ foreach $pack (sort keys %tasks) {
    $npackages++;
    $line = "$pack:";
    foreach $task (uniq sort @{$tasks{$pack}}) {
+
+#     Look for an indexed module called "$task_", then "$task".  Add to
+#     tasks line only if one of these is found.
+
       $module = $task;
-      $module .= '_' unless ($index->get($module, packmust => $pack));
-      $line .= " $task"  if ($index->get($module, packmust => $pack));
+      $module .= "_" if ($module !~ /_$/);
+      chop $module unless ($func_index->get($module, packmust => $pack));
+      $line .= " $module"  if ($func_index->get($module, packmust => $pack));
    }
    print TASKS "$line\n";
    print       "$line\n" if $verbose;
@@ -260,13 +265,13 @@ sub index_pack {
    my ($dir, $tarext);
    ($dir, $package, $tarext) = ($1, $2, $3);
    print "PACKAGE: $package\n";
-   $index->put("$package#", $pack_file);
+   $func_index->put("$package#", $pack_file);
 
 #  If any records for this package already exist in the index, delete them.
 
    my ($key, $value);
-   while (($key, $value) = $index->each($package)) {
-      $index->delete($key, $package);
+   while (($key, $value) = $func_index->each($package)) {
+      $func_index->delete($key, $package);
    }
 
 #  If any tasks exist for this package delete them.
@@ -556,7 +561,7 @@ sub index_h {
 
 #  Write to index.
 
-   write_entry $include, $path;
+   write_entry "INCLUDE-$include", $path;
 
 #  Index source (e.g. for #defines).
 
@@ -617,7 +622,7 @@ sub write_entry {
 
 #  Write entry to database.
 
-   $index->put($name, $location);
+   $func_index->put($name, $location);
 
 #  Optionally log entry to stdout.
 
