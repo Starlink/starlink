@@ -72,6 +72,9 @@
 *     1998 April 7 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.7  2004/07/14 21:52:29  timj
+*     Remove reference to MAX_BOLS
+*
 *     Revision 1.6  2002/09/14 03:57:41  timj
 *     Fix uninitilaized variable warning
 *
@@ -130,8 +133,6 @@
 *  External references:
 
 *  Local Constants:
-      REAL    MAX_BOLS               ! Maximum number of bolometers
-      PARAMETER (MAX_BOLS = 144)      ! A kludge since I cant use SURF_PAR
 
 *  Local Variables:
       INTEGER BOL                    ! Loop counter
