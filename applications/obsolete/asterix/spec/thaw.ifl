@@ -11,7 +11,7 @@ INTERFACE THAW
 
    PARAMETER PAR
       POSITION 1
-      TYPE '_INTEGER'
+      TYPE 'LITERAL'
       PROMPT 'Parameter numbers'
       HELP 'Numbers of parameters to be thawed (in square brackets if >1)'
    ENDPARAMETER
