@@ -37199,47 +37199,198 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
   Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
 \end{manroutinedescription}
 
-\manroutine {{\manheadstyle{SQORST}}}{ Squashes or stretches a 2-d
-  data array in either or both axes.}
-\begin{manroutinedescription}
-\manroutineitem {Description }{}
-  The output data array, written to an {\mantt{IMAGE}} structure, is produced
-  by either squashing or stretching the 2-d data array, in the input
-  {\mantt{IMAGE}} structure, in either or both of the {$x$} and {$y$} axes.
-  The dimensions of the output data array, are given by the user. The
-  stretching is performed by keeping the edge pixels fixed and
-  calculating the intervening pixels by bi-linear interpolation. The
-  squashing is performed by calculating each pixel in the output
-  array as the mean of the corresponding pixels in the input array.
 
-  The magic-value method is used for processing bad data.
+\sstroutine{
+   SQORST
+}{
+   Squashes or stretches an NDF
+}{
+   \sstdescription{
+      An output NDF is produced by squashing or stretching an input
+      NDF along one or more of its dimensions.  The shape of the
+      output NDF can be specified in one of two ways, according to
+      the value of the MODE parameter; either a distortion factor
+      is given for each dimension, or its lower and upper pixel
+      bounds are given explicitly.
+   }
+   \sstusage{
+      sqorst in out factors
+   }
+   \sstparameters{
+      \sstsubsection{
+         FACTORS( ) = \_DOUBLE (Read)
+      }{
+         The factor by which each dimension will be distorted to
+         produce the output NDF.  A factor greater than one is a stretch
+         and less than one is a squash.  The number of values supplied
+         must be the same as the number of dimensions of the NDF.
+         Only used if MODE={\tt "}Factors{\tt "}.
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF to be squashed or stretched.
+      }
+      \sstsubsection{
+         LBOUND( ) = \_INTEGER
+      }{
+         The lower pixel index values of the output NDF.  The number of
+         values supplied must be the same as the number of dimensions
+         of the NDF.  If null (!) is given, the lower pixel bounds of
+         the input NDF will be used.  Only used if MODE={\tt "}Bounds{\tt "}.
+      }
+      \sstsubsection{
+         METHOD = LITERAL (Read)
+      }{
+         The interpolation method used to perform the 1-dimensional
+         resampling operations which constitute the squash or stretch.
+         The following values are permitted:
 
-\manroutineitem {Invocation }{}
-  SQORST
+         \sstitemlist{
 
-\manroutineitem {Parameters }{}
-\begin{manparametertable}
-\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}  }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure containing the 2-d data array to be squashed
-  or stretched.
-\manparameterentry {{\mantt{READ}} }{{\mantt{XDIM}}  }{{\mantt{\_INTEGER}}}
-  First dimension for the output 2-d data array.
-\manparameterentry {{\mantt{READ}} }{{\mantt{YDIM}}  }{{\mantt{\_INTEGER}}}
-  Second dimension for the output 2-d data array.
-\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}} }{{\mantt{IMAGE}}}
-  {\mantt{IMAGE}} structure to contain the 2-d data array after being
-  squashed or stretched.
-\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}} }{{\mantt{\_CHAR}}}
-  Will form the {\mantt{TITLE}} component for the output {\mantt{IMAGE}}
-  structure. \mbox{{\mantt ['KAPPA - Sqorst']}}
-\end{manparametertable}
-\manroutineitem {Bugs }{}
-  None known.
+            \sstitem
+            {\tt "}Auto{\tt "}      -- Equivalent to {\tt "}BlockAve{\tt "} with an appropriate
+                              PARAMS for squashes by a factor of 2 or more,
+                              otherwise equivalent to {\tt "}Linear{\tt "}.
 
-\manroutineitem {Authors }{}
-  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
-  Dave Baines ({\mantt{ROE}}::{\mantt{ASOC5}})
-\end{manroutinedescription}
+            \sstitem
+            {\tt "}Nearest{\tt "}   -- Nearest neighbour sampling.
+
+            \sstitem
+            {\tt "}Linear{\tt "}    -- Linear interpolation.
+
+            \sstitem
+            {\tt "}Sinc{\tt "}      -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincSinc{\tt "}  -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$sinc(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincCos{\tt "}   -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$cos(k$*$pi$*$x) kernel.
+
+            \sstitem
+            {\tt "}SincGauss{\tt "} -- Sum of surrounding pixels weighted using
+                              a 1-d sinc(pi$*$x)$*$exp(-k$*$x$*$x) kernel.
+
+            \sstitem
+            {\tt "}BlockAve{\tt "}  -- Block averaging over surrounding pixels.
+
+         }
+         In the above, sinc(z)=sin(z)/z.  Some of these schemes will
+         require additional parameters to be supplied via the PARAMS
+         parameter.  A more detailed discussion of these schemes is
+         given in the {\tt "}Sub-Pixel Interpolation Schemes{\tt "} section below.
+         {\tt ["Auto"]}
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         Determines how the shape of the output NDF is to be specified.
+         If MODE={\tt "}Factors{\tt "} (the default) then the FACTORS parameter
+         will be used to determine the factor by which each dimension
+         should be multiplied.  If MODE={\tt "}Bounds{\tt "} then the LBOUND and
+         UBOUND parameters will be used to get the lower and upper
+         pixel bounds of the output NDF. {\tt ["Factors"]}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The squashed or stretched NDF.
+      }
+      \sstsubsection{
+         PARAMS( ) = \_DOUBLE (Read)
+      }{
+         Parameters required to control the resampling scheme.  One or
+         more values may be required to specify the exact resampling
+         behaviour, according to the value of the METHOD parameter.
+         See the section on {\tt "}Sub-Pixel Interpolation Schemes{\tt "}.
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output NDF. A null (!) value causes the input
+         title to be used.  {\tt [!]}
+      }
+      \sstsubsection{
+         UBOUND( ) = \_INTEGER
+      }{
+         The upper pixel index values of the output NDF.  The number of
+         values supplied must be the same as the number of dimensions
+         of the NDF.  If null (!) is given, the upper pixel bounds of
+         the input NDF will be used.  Only used if MODE={\tt "}Bounds{\tt "}.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         sqorst block blocktall [1,2,1]
+      }{
+         The 3-dimensional NDF called block is stretched by a factor
+         of two along its second axis to produce an NDF called
+         blocktall with twice as many pixels.  The same data block
+         is represented, but each pixel in the output NDF corresponds
+         to half a pixel in the input NDF.  The default resampling
+         scheme, linear interpolation in the stretch direction, is used.
+      }
+      \sstexamplesubsection{
+         sqorst block blocktall [1,2,1] method=sincsinc params=[2,2]
+      }{
+         The same operation as the previous example is performed,
+         except that a Lanczos kernel is used for the interpolation.
+      }
+      \sstexamplesubsection{
+         sqorst cygnus1 squish1 mode=bounds lbound=[1,1] ubound=[50,50]
+      }{
+         This turns the 2-dimensional NDF cygnus1 into a new NDF squish1
+         which has 50 pixels along each side.  The same region of sky
+         is represented, but the input image is squashed along both
+         axes to fit the specified dimensions.
+      }
+      \sstexamplesubsection{
+         sqorst cygnus1 exp1 [501,501] [1500,1500]
+      }{
+         This turns the same input NDF into one called exp1 which has
+         1000 pixels along each side, with a pixel index origin of
+         (501,501).
+      }
+   }
+   \sstnotes{
+      If the input NDF contains a Variance component, a Variance
+      component will be written to the output NDF.  It will be
+      calculated on the assumption that errors on the input data
+      values are statistically independent and that their variance
+      estimates may simply be summed (with appropriate weighting
+      factors) when several input pixels contribute to an output data
+      value. If this assumption is not valid, then the output error
+      estimates may be biased. In addition, note that the statistical
+      errors on neighbouring output data values (as well as the
+      estimates of those errors) may often be correlated, even if the
+      above assumption about the input data is correct, because of
+      the sub-pixel interpolation schemes employed.
+   }
+   \sstdiytopic{
+      Sub-Pixel Interpolation Schemes
+   }{
+      When squashing or stretching an NDF, a separate one-dimensional
+      resampling operation is performed for each of the dimensions
+      in which a resize is being done.  By default (when METHOD={\tt "}Auto{\tt "})
+      this is done using linear interpolation, unless it is a
+      squash of a factor of FACT=2 or more, in which case a block
+      averaging scheme which averages over FACT pixels.  For many
+      purposes this default scheme will be adequate, but for greater
+      control over the resampling process the METHOD and PARAMS
+      parameters can be used.  Detailed discussion of the use of these
+      parameters can be found in the {\tt "}Sub-pixel Interpolation Schemes{\tt "}
+      section of the REGRID task documentation.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: REGRID, SLIDE, WCSADD
+   }
+}
 
 \sstroutine{
    STATS
@@ -43942,6 +44093,12 @@ The following applications have been modified:
       \begin{itemize}
          \item Can now create either an IRAS90 astrometry extension or a
          standard NDF WCS component.
+      \end{itemize}
+
+   \item [\htmlref{SQORST}{SQORST}] \mbox{}
+      \begin{itemize}
+         \item Modified to use the full NDF data structure, including
+         variances and WCS. All parameters have been changed.
       \end{itemize}
 
    \item [\htmlref{TRIG}{TRIG}] \mbox{}

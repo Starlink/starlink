@@ -669,7 +669,9 @@ kps1_agnch.f kps1_agndw.f kps1_agnwc.f kps1_look.f kps1_look1.f kps1_look2.f \
 kps1_ltaba.f kps1_apadb.f kps1_apadub.f kps1_apadd.f kps1_apaduw.f \
 kps1_apadi.f kps1_apadw.f kps1_apadr.f kps1_laplb.f kps1_lapld.f \
 kps1_lapli.f kps1_laplub.f kps1_lapluw.f kps1_laplr.f kps1_laplw.f \
-kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f 
+kps1_msa.f kps1_mss.f kps1_mmvr.f kps1_mmvd.f kps1_medr.f kps1_medd.f \
+kps1_rs1b.f kps1_rs1d.f \
+kps1_rs1i.f kps1_rs1r.f kps1_rs1ub.f kps1_rs1uw.f kps1_rs1w.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -2672,6 +2674,13 @@ kps1_skyf3.o:	 SAE_PAR PRM_PAR NDF_PAR IRA_PAR SFT_COM
 kps1_skyf4.o:	 SAE_PAR NDF_PAR PRM_PAR IRA_PAR
 kps1_skyfn.o:	 IRA_PAR SFT_COM
 kps1_skyft.o:	 SAE_PAR IRA_PAR PRM_PAR SFT_COM
+kps1_rs1b.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1d.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1i.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1r.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1ub.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1uw.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
+kps1_rs1w.o:	 SAE_PAR PRM_PAR NDF_PAR AST_PAR
 kps1_sparb.o:	 SAE_PAR PRM_PAR AST_PAR
 kps1_spard.o:	 SAE_PAR PRM_PAR AST_PAR
 kps1_spari.o:	 SAE_PAR PRM_PAR AST_PAR

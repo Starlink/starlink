@@ -8053,6 +8053,7 @@ package kappa {
           }
 
          parameter lbound {
+            size *
             position 3
             type _INTEGER
             prompt {Lower bounds of the output NDF}
@@ -8185,6 +8186,7 @@ package kappa {
           }
 
          parameter ubound {
+            size *
             position 4
             type _INTEGER
             prompt {Upper bounds of the output NDF}
@@ -9815,6 +9817,7 @@ iraf! {
           }
 
          parameter lbound {
+            size *
             type LITERAL
             prompt {Position at the bottom left corner of the listing}
             ppath DYNAMIC CURRENT DEFAULT
@@ -9894,6 +9897,7 @@ iraf! {
           }
 
          parameter ubound {
+            size *
             type LITERAL
             prompt {Position at the top right corner of the listing}
             ppath DYNAMIC CURRENT DEFAULT
@@ -10113,6 +10117,7 @@ iraf! {
          }
 
          parameter lbound {
+            size *
             type _INTEGER
             access READ
             vpath PROMPT
@@ -10143,6 +10148,7 @@ iraf! {
          }
 
          parameter ubound {
+            size *
             type _INTEGER
             access READ
             vpath PROMPT
@@ -10170,6 +10176,7 @@ iraf! {
           }
 
          parameter lbound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC DEFAULT
@@ -10219,6 +10226,7 @@ iraf! {
           }
 
          parameter ubound {
+            size *
             type _INTEGER
             vpath PROMPT
             ppath DYNAMIC DEFAULT
@@ -13536,53 +13544,99 @@ iraf! {
       action sqorst {
          alias {sqor(st)}
 
-         parameter inpic {
+         helplib {$KAPPA_HELP}
+
+         parameter factors {
+            size *
+            position 3
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Expansion factors for each axis}
+            helpkey *
+         }
+            
+         parameter in {
             position 1
-            type IMAGE
+            type NDF
             access READ
             vpath PROMPT
             ppath GLOBAL
             association <-GLOBAL.DATA_ARRAY
-            prompt {Input image}
-            help "Name of the IMAGE structure containing the 2-d data array to be modified"
-          }
+            prompt {Input NDF}
+            helpkey *
+         }
 
-         parameter xdim {
+         parameter lbound {
+            size *
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            default !
+            prompt {Lower pixel index bounds for output NDF}
+            helpkey *
+         }
+
+         parameter method {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Re-sampling method}
+            helpkey *
+            default {Auto}
+         }
+
+         parameter mode {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Method of specifying output NDF shape}
+            helpkey *
+            default Factors
+         }
+
+         parameter out {
             position 2
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {First dimension of output image}
-            help "First scaling factor is this value divided by the first dimension of the input data array"
-          }
-
-         parameter ydim {
-            position 3
-            type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Second dimension of output image}
-            help "Second scaling factor is this value divided by the second dimension of the input data array"
-          }
-
-         parameter outpic {
-            position 4
-            type IMAGE
+            type NDF
             access WRITE
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
-            prompt {Output image}
-            help "Name of the IMAGE structure to contain the data array after modification"
-          }
+            prompt {Output NDF}
+            helpkey *
+         }
 
-         parameter otitle {
-            position 5
-            type _CHAR
+         parameter params {
+            size *
+            type _DOUBLE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Auxiliary resampling parameters}
+            helpkey *
+         }
+
+         parameter title {
+            type LITERAL
+            access READ
             vpath DEFAULT
-            prompt {Title for output image}
-            default {KAPPA - Sqorst}
-            help "Character string to be used as a title for the output IMAGE structure"
-          }
+            prompt {Title for output NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+         }
+
+         parameter ubound {
+            size *
+            type _INTEGER
+            access READ
+            vpath PROMPT
+            ppath DEFAULT
+            default !
+            prompt {Upper pixel index bounds for output NDF}
+            helpkey *
+         }
 
       }
 

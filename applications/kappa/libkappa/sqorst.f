@@ -91,7 +91,8 @@
 *        behaviour, according to the value of the METHOD parameter.
 *        See the section on "Sub-Pixel Interpolation Schemes".
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF. ["KAPPA - Sqorst"]
+*        Title for the output NDF. A null (!) value causes the input
+*        title to be used. [!]
 *     UBOUND( ) = _INTEGER
 *        The upper pixel index values of the output NDF.  The number of
 *        values supplied must be the same as the number of dimensions
