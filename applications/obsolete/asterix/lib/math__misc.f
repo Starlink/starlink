@@ -67,9 +67,6 @@
 *    Export :
       DOUBLE PRECISION    ANSWER            ! value of the integral
 
-*    Fucntions
-      INTEGER		  SPIX2
-
 *    Local variables :
       Integer             size              ! 2^k
       Integer             k                 ! 2^k panels
@@ -271,6 +268,10 @@
       INTEGER                  XSUB, YSUB              ! Sub-pixel factors
 
       LOGICAL                  SYMMETRIC               ! Symmetric about centre?
+*
+*    Functions
+*
+      INTEGER		  SPIX2
 *-
 
 *    Check status
