@@ -17,13 +17,13 @@
 {Copyright \copyright\ 2000, 2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {3.1-1}
+\newcommand{\stardocnumber}    {3.2-0} %%VERSION%%
 \newcommand{\stardocauthors}   {Martin Clayton}
 \newcommand{\stardocdate}      {10 July 2003}
 \newcommand{\stardoctitle}     {Echelle Data Reduction Cookbook}
-\newcommand{\stardocversion}   {[software-version]}
-\newcommand{\stardocmanual}    {[manual-type]}
-\newcommand{\stardocabstract}  {[Text of abstract]}
+%\newcommand{\stardocversion}   {[software-version]}
+%\newcommand{\stardocmanual}    {[manual-type]}
+%\newcommand{\stardocabstract}  {[Text of abstract]}
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
@@ -175,6 +175,7 @@
 % Location of echelle help pages
 %{\catcode`\~=12 \gdef\EchelleHomePage{http://www.star.ucl.ac.uk/~mjc/echelle}}
 \newcommand{\EchelleHomePage}{http://www.starlink.ac.uk/echomop/echelle/}
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -2526,15 +2527,15 @@ spectrum.
 \item [{\bf Source code:}] \mbox{} \\
 \begin{latexonly}
 In a standard Starlink installation the source code for ECHTRIM can be found
-in the file:
-\begin{verbatim}
-   /star/examples/sc3/echtrim.cl
-\end{verbatim}
+in the file \texttt{/star/examples/sc3/echtrim.cl}.
 \end{latexonly}
 \begin{htmlonly}
       The script source code is available
-      \htmlref{{\bf here}}{se_echtrim_source}.
+      %\htmlref{{\bf here}}{se_echtrim_source}.
+      \htmladdnormallink{here}{echtrim.cl}.
 \end{htmlonly}
+The complete set of scripts is available in the file
+\texttt{sc\stardocnumber -scripts.tar}
 
 \newpage
 \item [{\bf Notes:}] \mbox{}
@@ -2571,9 +2572,10 @@ in the file:
 \end{verbatim}
 \end{description}
 
-\begin{htmlonly}
-\input ../sc3a.tex
-\end{htmlonly}
+% What was ../sc3a.tex???
+%\begin{htmlonly}
+%\input ../sc3a.tex
+%\end{htmlonly}
 
 %\typeout{  }
 %\typeout{*****************************************************}
