@@ -1,0 +1,5558 @@
+package iras90 {
+   version 1.1-2
+   prefix iras90
+
+   executable iras90_pm {
+#+
+#  Name:
+#     BACKCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-OCT-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action backcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter clip {
+                         # The no. of standard deviations at
+				 # which to clip data.
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 3.0
+            prompt {Number of standard deviations at which to clip data}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output CRDD files}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input CRDD files}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving output CRDD files}
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output CRDD files}
+            helpkey *
+          }
+
+         parameter outback {
+                            # Background surface brightness after 
+                                 # background subtraction.
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0.0
+            prompt {Final background surface brightness (in MJy/sr)}
+            helpkey *
+          }
+
+         parameter outtype {
+                            # Type of output NDF required.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default DATA
+            prompt {Type of output NDF required; DATA or BACKGROUND}
+            helpkey *
+          }
+
+         parameter qexp {
+                         # Quality expression defining data to
+				 # be included in the output CRDD file.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default ANY
+            association ->GLOBAL.QUALITY_EXP
+            prompt {Quality expression specifying usable CRDD}
+            helpkey *
+          }
+
+         parameter qname {
+                          # Quality name with which to flag
+				 # un-used samples.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default { }
+            prompt {Quality name to assign to un-used samples}
+            helpkey *
+          }
+
+         parameter type {
+                         # Type of background to use.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default UNIFORM
+            prompt {Type of background to use}
+            helpkey *
+          }
+
+         parameter xname {
+                          # The NDF extension name.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xtype {
+                          # The NDF extension type.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     COADDCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-DEC-1992 (WG):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action coaddcrdd {
+
+         helplib {IRAS90_DIR:IRAS90_HELP}
+
+         parameter add_source {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Prompt for additional sources?}
+            helpkey *
+          }
+
+         parameter automatic {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Run application automatically?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system used
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default EQUATORIAL(B1950.0)
+            prompt {Sky coordinate system }
+            helpkey *
+          }
+
+         parameter distance {
+                             # Distance effect flag
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Weight according to distance from source?}
+            helpkey *
+          }
+
+         parameter gvdteg {
+                           # Gaussian value at detector edges
+            type _REAL
+            access READ
+            vpath CURRENT { DEFAULT }
+            ppath DEFAULT
+            default 0.5
+            range 0.1 1.0
+            prompt {Gaussian function value at detector edges:}
+            helpkey *
+          }
+
+         parameter in {
+                       # String expressing input CRDD file
+            position 1
+            type NDF
+            vpath {PROMPT }
+            ppath CURRENT GLOBAL
+            association <-GLOBAL.DATA_ARRAY 
+            prompt {CRDD file(s) to coadd}
+            helpkey *
+          }
+
+         parameter inter {
+                          # Method used to interpolate data
+            type LITERAL
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Method of interpolation: }
+            helpkey *
+          }
+
+         parameter logfile {
+                            # Name of logging file
+            type FILENAME
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Name of Log file}
+            default coaddcrdd.log
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ofiltxt {
+                            # File containing names of coadded
+				 # trace NDFs
+            type FILENAME
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default outndf.dat
+            prompt {File to contain names of output coadded NDFs: }
+            helpkey *
+          }
+
+         parameter out {
+                        # Name of output coadded trace NDFs
+            type LITERAL
+            vpath PROMPT DYNAMIC
+            ppath DYNAMIC
+            prompt {Name of output coadded trace NDFs:}
+            helpkey *
+          }
+
+         parameter scnlen {
+                           # Scan length extracted around sources
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 80.0
+            prompt {Scan length to be extracted around sources (in arcmin):}
+            helpkey *
+          }
+
+         parameter source_lat {
+                               # Latitude of source position
+            type LITERAL
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Latitude of the source position}
+            helpkey *
+          }
+
+         parameter source_lon {
+                               # Longitude of source position
+            type LITERAL
+            vpath PROMPT
+            ppath DYNAMIC
+            prompt {Longitude of the source position}
+            helpkey *
+          }
+
+         parameter source_name {
+                                # Name of sources
+            type LITERAL
+            access READ
+            vpath PROMPT { DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {Name of the additional source (! for no more sources) }
+            helpkey *
+          }
+
+         parameter title {
+                          # Title of NDF
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Title of the output NDF}
+            helpkey *
+          }
+
+         parameter weight {
+                           # Method to weight traces to be coadded
+            type LITERAL
+            access READ
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Weighting scheme:}
+            helpkey *
+          }
+
+         parameter widext {
+                           # Detector width extension factor
+            type _REAL
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 0.0
+            range -1.0 1.0
+            prompt {Detector width extension factor}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     COLCORR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAY-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action colcorr {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter band {
+                         # Output waveband
+            type _INTEGER
+            position 3
+            access READ
+            ppath DEFAULT
+            default 12
+            prompt {Output wavelength in microns}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDF.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter out {
+                        # Temperature NDF.
+            position 4
+            type NDF
+            access WRITE
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output NDF to contain colour corrected image}
+            helpkey *
+          }
+
+         parameter tau {
+                        # Optical depth input NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Optical depth map}
+            helpkey *
+          }
+
+         parameter temp {
+                         # Temperature NDF.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Temperature map}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     COLTEMP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-APR-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action coltemp {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+
+         parameter beta {
+                         # Emmisivity spectral index.
+            position 3
+            type _REAL
+            access READ
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {The emissivity spectral index}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDF.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter in1 {
+                        # First input NDF.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {First input image}
+            helpkey *
+          }
+
+         parameter in2 {
+                        # Second input NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Second input image}
+            helpkey *
+          }
+
+         parameter lerr {
+                         # Wavelength shift.
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0.0
+            prompt {Spectral response wavelength shift, in microns}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter rerr {
+                         # Response factor
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 1.0
+            prompt {Factor to apply to standard spectral response data}
+            helpkey *
+          }
+
+         parameter tau {
+                        # Output NDF.
+            position 5
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output optical depth map}
+            helpkey *
+          }
+
+         parameter temp {
+                         # Output NDF.
+            position 4
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output temperature map}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+
+         parameter wavel {
+                          # Optical depth wavelength
+            position 6
+            type _REAL
+            access READ
+            ppath CURRENT DEFAULT
+            default 12
+            prompt {Wavelength in microns at which optical depth is required}
+            helpkey *
+          }
+
+         parameter varout {
+                           # True if output variances required.
+            type _LOGICAL
+            access READ
+            ppath DYNAMIC DEFAULT
+            vpath DYNAMIC DEFAULT
+            default FALSE
+            prompt {Wavelength in microns at which optical depth is required}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     DEGLCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-JUN-1993 (WG):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action deglcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter box {
+                        # Smoothing filter box
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 2.0
+            prompt {Size of smoothing box given as times of point source width}
+            helpkey *
+          }
+
+         parameter clip {
+                         # The no. of standard deviations at
+				 # which to clip data out.
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 3.0
+            prompt {Number of standard deviations at which to clip data}
+            helpkey *
+          }
+
+         parameter comment {
+                            # Comments associated with the quality
+				 # name added to the CRDD NDF
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default {Samples in the detected glitches}
+            prompt {Comments associated with the quality name}
+            helpkey *
+          }
+
+         parameter glwid {
+                          # Width of glitches
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0.3
+            range 0.01 1.0
+            prompt {Width of glitches}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the
+                                 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output CRDD files}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input CRDD files}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter niter {
+                          # No. of rejection iterations to
+                                 # perform.
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 8
+            prompt {Number of cleaning iterations to perform}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output CRDD files}
+            helpkey *
+          }
+
+         parameter profiles {
+                             # File name of point source template NDF file
+            type NDF
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {NDF containing point source templates:}
+            default {$IRAS90_DIR/profiles}
+            helpkey *
+          }
+
+         parameter qname {
+                          # Quality name.
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default GLITCH
+            prompt {Quality name assigned to samples in glitches}
+            helpkey *
+          }
+
+         parameter setbad {
+                           # Set sample in glitches as BAD
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Set samples in the glitches as BAD?}
+            helpkey *
+          }
+
+         parameter xname {
+                          # The NDF extension name.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xtype {
+                          # The NDF extension type.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     DESTCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-OCT-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action destcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter backmean {
+                             # The mean background surface
+				 # brightness over all CRDD files.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter BACKMEAN}
+            helpkey *
+          }
+
+         parameter backsigma {
+                              # The ST. DEV. of the background 
+                                 # surface brightness estimates in BACKMEAN.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter BACKSIGMA}
+            helpkey *
+          }
+
+         parameter box {
+                        # Smoothing box size in samples.
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 40
+            prompt {Size of the smoothing box given as a number of samples}
+            helpkey *
+          }
+
+         parameter clip {
+                         # The no. of standard deviations at
+				 # which to clip data in the cleaning
+				 # algorithm.
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1.0
+            prompt {Number of standard deviations at which to clip data}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output CRDD files}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input CRDD files}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving output CRDD files}
+          }
+
+         parameter niter {
+                          # No. of rejection iterations to
+				 # perform.
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 4
+            prompt {Number of cleaning iterations to perform}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output CRDD files}
+            helpkey *
+          }
+
+         parameter qexp {
+                         # Quality expression defining data to
+				 # be included in the output CRDD file.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default ANY
+            association ->GLOBAL.QUALITY_EXP
+            prompt {Quality expression specifying usable CRDD}
+            helpkey *
+          }
+
+         parameter qname {
+                          # Quality name with which to flag
+				 # un-used samples.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default { }
+            prompt {Quality name to assign to un-used samples}
+            helpkey *
+          }
+
+         parameter xname {
+                          # The NDF extension name.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xtype {
+                          # The NDF extension type.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     FINDCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DCP: Diana Parsons (IPMAF/RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JAN-1991 (DCP):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+      action findcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter confirmreq {
+                               # If .TRUE. then added and edited
+				 # sources are confirmed
+            type _LOGICAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Are added and edited sources to be confirmed ? }
+            default TRUE
+            helpkey *
+          }
+   
+         parameter displayorfile {
+                                  # Controls whether major source
+				 # listings are displayed on the
+				 # terminal or written to a file
+				 # D = display on terminal
+				 # F = file
+				 # B = both
+				 # A = ask user at time of display
+            type LITERAL
+            vpath {DEFAULT }
+            ppath DYNAMIC DEFAULT
+            prompt {list to:- display(D), file(F), both(B), ask at each list(A)}
+            default A
+            in D F B A
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Interaction level
+            type _INTEGER 
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Interaction level }
+            default 3
+            range 0 4
+            helpkey *
+          }
+
+         parameter nextpage {
+                             # Scroll to next page of source list
+            type _LOGICAL
+            vpath PROMPT {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Scroll to next page of sources}
+            helpkey *
+          }
+
+
+         parameter pagelength {
+                               # Number of lines per page on display
+            type _INTEGER
+            vpath PROMPT { DEFAULT }
+            ppath DEFAULT
+            default 7
+            range 5 19
+            prompt {Number of lines per page on display}
+            helpkey *
+          }
+
+         parameter mainchoice {
+                               # Main menu choice
+            type LITERAL
+            vpath PROMPT {DEFAULT }
+            ppath DEFAULT
+            default I
+                     # Defaults to input sources
+            in I S Q
+            prompt {Choice from main menu}
+            helpkey *
+          }
+
+         parameter confirmaddedit {
+                                   # Confirmation that the details of the
+				 # added or edited source are correct [Y]
+            type _LOGICAL
+            vpath PROMPT {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Source details O.K. ?}
+            helpkey *
+          }
+
+         parameter confirmdelete {
+                                  # Confirmation that the source printed
+				 # is to be deleted [Y]
+            type _LOGICAL
+            vpath PROMPT {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Delete this source ?}
+            helpkey *
+          }
+
+         parameter deletesoname {
+                                 # Name of the source to be deleted
+            type LITERAL
+            vpath {PROMPT }
+            prompt {Source name to be deleted ( or ! for no more )}
+            helpkey *
+          }
+
+         parameter editsourcename {
+                                   # Name of the source to be edited
+            type LITERAL
+            vpath {PROMPT }
+            prompt {Source name to be edited ( or ! for no more )}
+            helpkey *
+          }
+
+         parameter insourcefile1 {
+                                  # Name of a file containing source
+				 # positions created in this or a
+				 # previous run of FINDCRDD. Used as input
+				 # to the input or edit source option
+            type FILENAME
+            vpath PROMPT
+            ppath CURRENT
+            prompt {File containing saved source positions}
+            helpkey *
+          }
+
+         parameter menu11choice {
+                                 # Option from select-data-to-use menu
+				 # in input or edit source positions 
+            type LITERAL
+            vpath PROMPT {CURRENT }
+            ppath CURRENT
+            in N C F L P Y R
+            prompt {Choice from select data to use menu}
+            helpkey *
+          }
+
+         parameter menu12choice {
+                                 # Option from type-of-data-edit menu 
+				 # in input or edit source positions [N]
+            type LITERAL
+            vpath {PROMPT }
+            ppath CURRENT
+            in A E D L P C Y R
+            prompt {Choice from type of input/edit menu}
+            helpkey *
+          }
+
+
+         parameter outsourcefile1 {
+                                   # Name of file in which to save source
+				 # positions created in input or edit
+				 # source positions.
+            type FILENAME
+            vpath PROMPT { DYNAMIC }
+            ppath DYNAMIC
+                         # Name set in program to
+				 # INSOURCEFILE1 name plus a version
+				 # number
+            prompt {File to save source posn (! = do not file)}
+            helpkey *
+          }
+
+         parameter sourcecoord1 {
+                                 # First coordinate of source position
+				 # (in user selected coordinate system). 
+				 # The format is defined as one of those
+				 # available in IRA_CTOR. 
+            type LITERAL
+            vpath PROMPT { DYNAMIC} { CURRENT }
+            ppath DYNAMIC CURRENT
+            prompt {First coord of source pos. eg RA}
+            helpkey *
+          }
+
+         parameter sourcecoord2 {
+                                 # Second coordinate of source position
+				 # (in user selected coordinate system). 
+				 # The format is defined as one of those
+				 # available in IRA_CTOR. 
+            type LITERAL
+            vpath PROMPT { DYNAMIC} { CURRENT }
+            ppath DYNAMIC CURRENT
+            prompt {Second coord of source pos. eg Dec}
+            helpkey *
+          }
+
+         parameter sourcecoordsys {
+                                   # The coordinate system in which the
+				 # source cooordinates are defined.
+				 # The options available are defined in
+				 # IRA_COORD
+				 # [EQUATORIAL(1950)]
+            type LITERAL
+            vpath PROMPT DYNAMIC CURRENT
+            ppath DYNAMIC CURRENT
+            prompt {Sky coordinate system }
+            helpkey *
+          }
+
+         parameter sourcelistfile {
+                                   # Name of file in which to create a
+				 # printable list of source positions
+            type FILENAME
+            vpath PROMPT
+            ppath CURRENT
+            prompt {File to contain printable list of sources}
+            helpkey *
+          }
+
+         parameter sourcename {
+                               # Up to eight character source name
+				 # used as an identification prefix for
+				 # all files relating to that source. 
+            type LITERAL
+            vpath {PROMPT }
+            prompt {Source name (8 Chars - valid filename) (! for no more)}
+            helpkey *
+          }
+
+         parameter sourcetitle {
+                                # Full title of source for printout
+				 # headings etc.
+            type LITERAL
+            vpath PROMPT {DYNAMIC }
+            ppath DYNAMIC
+                         # Set in program to be SOURCENAME
+            prompt {Full title for source}
+            helpkey *
+          }
+
+         parameter augmentname {
+                                # Name of source to be augmented with 
+			    # size and wavebands
+            type LITERAL
+            vpath {PROMPT }
+            prompt {Source to be given size + wavebands (! for no more) }
+            helpkey *
+          }
+
+         parameter bandsreq {
+                             # Bands required entered as 12,25 etc..
+				 # [12,25,60,100]
+            type LITERAL
+            vpath PROMPT DYNAMIC CURRENT {DEFAULT }
+            ppath DYNAMIC CURRENT DEFAULT
+            default 12,25,60,100
+            prompt {Bands required entered as 12,25 etc..}
+            helpkey *
+          }
+
+         parameter crosscan {
+                             # Size of required region in cross scan
+				 # direction given in arcmins. [120]
+            type _REAL
+            vpath PROMPT DYNAMIC {DEFAULT }
+            ppath DYNAMIC
+            default 0.0
+                       # Default is minimum size gives one
+				 # scan
+            prompt {Cross Scan size of required region (in arcmin)}
+            helpkey *
+          }
+
+         parameter datatype {
+                             # Survey data type
+				 # 2 = PASS 2 UKP TAPE
+				 # 3 = PASS 3 Exobyte
+				 # 0 = Don't Know
+            type _INTEGER
+            vpath {PROMPT }
+            ppath DEFAULT
+            default 2
+            in 0 2 3
+            prompt {Survey Data Type:- Pass2 (2), Pass3 (3), Don't know (0)}
+            helpkey *
+          }
+
+         parameter inscan {
+                           # Size of required region in in_scan
+				 # direction given in arcmins.
+            type _REAL
+            vpath PROMPT DYNAMIC {DEFAULT }
+            ppath DYNAMIC
+            default 120.0
+            prompt {In Scan size of required region (in arcmin)}
+            helpkey *
+          }
+
+         parameter menu2choice {
+                                # Option from input-size-and-waveband
+				 # menu in raw data option
+            type LITERAL
+            vpath {PROMPT }
+            ppath CURRENT
+            in Z W I L P R Y
+            prompt {Choice from input size and waveband menu}
+            helpkey *
+          }
+
+         parameter offedgefile {
+                                # Name of file to contain details of
+				 # off edge source region for printing
+            type LITERAL
+            vpath PROMPT {DYNAMIC }
+            ppath DYNAMIC
+            prompt {File to contain off edge details}
+            helpkey *
+          }
+
+         parameter outdescfile {
+                                # Name of file to contain messages
+				 # about plate files created and tapes
+				 # to be used in subsequent EXCRDD runs
+            type LITERAL
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            default IRASFIND_PLATES_REQ
+            prompt {File to contain plate file messages}
+            helpkey *
+          }
+
+         parameter outsourcefile2 {
+                                   # Name of file in which to save source
+				 # positions created in input size and
+				 # wavebands part of the raw data
+				 # option.
+            type FILENAME
+            vpath PROMPT { DYNAMIC }
+            ppath DYNAMIC
+                         # Name set in program to
+				 # INSOURCEFILE8 name plus a version
+				 # number
+            prompt {File for source posn and size (! = do not file)}
+            helpkey *
+          }
+
+         parameter returnmain {
+                               # Option to return to main menu
+				 # (.TRUE.) if at the end of the
+				 # subroutine which find what plates
+				 # the sources are on, it has found
+				 # a part of a source region off the
+				 # edge of the plate. It allows the
+				 # user to put in a dummy source in
+				 # the next plate.
+
+            type _LOGICAL
+            vpath PROMPT CURRENT {DEFAULT }
+            ppath CURRENT
+            default FALSE
+            prompt {Return to main menu=.TRUE. continue=.FALSE.}
+            helpkey *
+          }
+
+         parameter returnswmenu {
+                                 # Set .TRUE. if on finding some sources
+				 # without size or wavebands the user
+				 # wants to return to the Size and
+				 # Wavebands Menu to add them. 
+            type _LOGICAL
+            vpath PROMPT {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Return to size/wavebands menu= YES, continue= NO}
+            helpkey *
+          }
+
+         parameter spfarchfile {
+                                # The name of the SPFARCH SDF file
+            type FILENAME
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default {$IRAS90_DIR/NEWSPFARCH}
+            prompt {Name of SDF version of SPFARCH file}
+            helpkey *
+          }
+
+#   [parameter_specification]...
+
+#   [message_specification]...
+
+      }
+#+
+#  Name:
+#     HISTORY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JAN-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action history {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter before {
+                           # Date and time of last record to be
+				 # displayed.
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC { PROMPT }
+            ppath DYNAMIC CURRENT DEFAULT
+            default !
+            prompt {Date and time of last record to be displayed}
+            helpkey *
+          }
+
+         parameter command {
+                            # Command which produced records to be
+				 # displayed.
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC { PROMPT }
+            ppath DYNAMIC CURRENT DEFAULT
+            default !
+            prompt {Command which produced records to be displayed}
+            helpkey *
+          }
+
+         parameter function {
+                             # Operation to perform.
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC { PROMPT }
+            ppath DYNAMIC CURRENT DEFAULT
+            default DISPLAY
+            prompt {Operation to perform}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            position 3
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed history information}
+            helpkey *
+          }
+
+         parameter loop {
+                         # True if multiple operations required.
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {More than one operation to perform on NDF history?}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input NDFs.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The NDF(s)}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+         parameter since {
+                          # Date and time of first record to be
+				 # displayed.
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC { PROMPT }
+            ppath DYNAMIC CURRENT DEFAULT
+            default !
+            prompt {Date and time of first record to be displayed}
+            helpkey *
+          }
+
+         parameter text {
+                         # A line of text to be added to history.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {A line of new history text}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     I90HELP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-SEP-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action i90help {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter library {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help library}
+            default {$IRAS90_HELP/iras90_help.shl}
+            helpkey *
+          }
+
+         parameter subsubsubtopic {
+            position 4
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subsubtopic {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subsubtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter subtopic {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help subtopic}
+            default {         }
+            helpkey *
+          }
+
+         parameter topic {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            prompt {Help topic}
+            default {         }
+            helpkey *
+          }
+
+      }
+      action ifield {
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter again {
+            type _LOGICAL
+            helpkey *
+          }
+
+         parameter csys {
+            type literal
+            prompt {Enter the coordinate system (and equinox)}
+            helpkey *
+          }
+
+         parameter hcon {
+            type _integer
+            prompt {Enter the HCon}
+            default 0
+            vpath dynamic
+            ppath current default
+            access read
+            helpkey *
+          }
+
+         parameter lat {
+            type literal
+            prompt {Enter the Latitude}
+            vpath dynamic
+            ppath current default
+            access read
+            helpkey *
+          }
+
+         parameter logfile {
+            type literal
+            prompt {Enter the name of the logfile}
+            helpkey *
+          }
+
+         parameter lon {
+            type literal
+            prompt {Enter the Longitude}
+            vpath dynamic
+            ppath current default
+            access read
+            helpkey *
+          }
+
+         parameter plate {
+            type _integer
+            access write
+            helpkey *
+          }
+
+         parameter size {
+            type _double
+            prompt {Enter the box size in arcminutes}
+            ppath current
+            default 0.0
+            access read
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     IRASTRACE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-OCT-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action irastrace {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF(s)}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            position 2
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed information}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+      }
+#+
+#  Name:
+#     MAKEPROF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-NOV-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action makeprof {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter out {
+                        # The output NDF.
+            position 1
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The output NDF}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     MAKERESP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-OCT-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action makeresp {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter band {
+                         # Wavelength of required band.
+            position 2
+            type _INTEGER
+            access READ
+            vpath PROMPT {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Wavelength of required IRAS survey band, in microns}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter out {
+                        # The output NDF.
+            position 1
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The output NDF}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     MAPCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-NOV-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action mapcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter boxsize {
+                            # Map dimensions in arcmins.
+            position 5
+            type _REAL
+            access READ
+            vpath PROMPT {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Dimensions of output image in arc-minutes}
+            helpkey *
+          }
+
+         parameter centre_lat {
+                               # Sky latitude of map centre.
+            position 4
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Sky latitude at image centre}
+            helpkey *
+          }
+
+         parameter centre_lon {
+                               # Sky longitude of map centre.
+            position 3
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Sky longitude at image centre}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter exclude {
+                            # Detectors to exlude.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default SMALL
+            prompt {A set of detectors to exclude from the map}
+            helpkey *
+          }
+
+         parameter fwhm {
+                         # Cross- and in-scan FWHMs of Gaussian weighting function.
+            type _REAL
+            access READ
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Cross- and in- scan FWHMs of Gaussian weighting function (arc-minutes)}
+            helpkey *
+          }
+
+         parameter gaussian {
+                             # True if Gaussian weighting required.
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {True if Gaussian weighting is to be used}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input CRDD files.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input CRDD files}
+            helpkey *
+          }
+
+         parameter include {
+                            # Detectors to inlude.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {The set of detectors to include in the map}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter orient {
+                           # Orientation of output map.
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0.0
+            prompt {Position angle of the second image axis (the "Y axis")}
+            helpkey *
+          }
+
+         parameter out {
+                        # The NDF containing the output map.
+            position 6
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {The output NDF containing the mapped CRDD}
+            helpkey *
+          }
+
+         parameter pixsize {
+                            # Pixel dimensions in arcmins.
+            position 2
+            type _REAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Output pixel dimensions in arc-minutes}
+            helpkey *
+          }
+
+         parameter projtype {
+                             # Projection type.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default GNOMONIC
+            prompt {The map projection to use}
+            helpkey *
+          }
+
+         parameter qexp {
+                         # Quality expression defining data to
+				 # be included in the output map.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default ANY
+            association ->GLOBAL.QUALITY_EXP
+            prompt {Quality expression specifying usable CRDD}
+            helpkey *
+          }
+
+         parameter secsize {
+                            # Cross- and in- scan sizes of a sector.
+            type _REAL
+            access READ
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Cross- and in- scan sizes of a "sector" in arc-miutes}
+            helpkey *
+          }
+
+         parameter title {
+                          # Title for output NDF.
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC {DEFAULT }
+            ppath DYNAMIC DEFAULT
+            default {Output from MAPCRDD}
+            prompt {Title for output map}
+            helpkey *
+          }
+
+         parameter units {
+                          # Units of output image.
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            ppath DEFAULT
+            default MJy/sr
+            prompt {Units for the output image}
+            helpkey *
+          }
+
+         parameter varout {
+                           # Type of output variances required.
+            type LITERAL
+            access UPDATE
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Type of output VARIANCE values required}
+            helpkey *
+          }
+
+         parameter weight {
+                           # True if each sample is given a 
+                                 # varying weight dependant on its 
+                                 # variance.
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {True if more accurate samples are to be given greater weight}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     NEWUNITS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-DEC-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action newunits {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDFs}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDFs}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving sucessfully created output NDFs}
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output NDFs}
+            helpkey *
+          }
+
+         parameter units {
+                          # New units.
+            position 3
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            prompt {New units}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     POINTCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DCP: Diana Parsons (FIIS/RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-MAR-1993 (WG):
+#     	 Original version.
+#     19-OCT-1994 (DCP):
+#        Completely rewritten
+#     {enter_changes_here}
+
+#-
+
+      action pointcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+   
+         parameter automatic {
+            type _LOGICAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Accept default source positions and search length (y/n)}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter det_choice {
+                               # method of selecting detectors
+            type LITERAL
+            vpath {PROMPT }
+            ppath CURRENT DEFAULT
+            prompt {Choose detectors - all(A), nearest(N), user choice(C)}
+            default N
+            in A N C ALL NEAREST CHOOSE
+            helpkey *
+          }
+
+         parameter det_req {
+                            # User answers y or n to the question 
+                                 # do you want this detector
+            type _LOGICAL
+            vpath {PROMPT }
+            ppath DEFAULT
+            prompt {Search this detector (y/n)}
+            default TRUE
+            helpkey *
+          }
+
+         parameter in {
+                       # Input CRDD file.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {CRDD file(s) to search}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # Output position file
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default pointcrdd.log
+            prompt {Logfile name}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter noise_smpl {
+                               # Number of samples required in calculating
+                                 # local noise
+            type _INTEGER
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 80
+            prompt {Number of samples required for local noise estimate}
+            helpkey *
+          }
+
+         parameter profiles {
+                             # File name of point source template NDF file
+            type NDF
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {NDF containing point source templates:}
+            default {$IRAS90_DIR/PROFILES}
+            helpkey *
+          }
+
+         parameter scan_north {
+                               # Length of the scan searched north
+                                 # of expected source position
+            type _REAL
+            access READ
+            vpath PROMPT DEFAULT
+            ppath CURRENT DEFAULT
+            default 40.0
+            prompt {Length to be searched North of exp. source ( arcmin )}
+            helpkey *
+          }
+
+         parameter scan_south {
+                               # Length of the scan searched north
+                                 # of expected source position
+            type _REAL
+            access READ
+            vpath PROMPT DEFAULT
+            ppath CURRENT DEFAULT
+            default 40.0
+            prompt {Length to be searched South of exp. source ( arcmin )}
+            helpkey *
+          }
+
+         parameter source_lat {
+                               # Sky latitude of exp. source.
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Latitude of expected source (in current coord. system)}
+            helpkey *
+          }
+
+         parameter source_lon {
+                               # Sky longitude of exp. source.
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Longitude of expected source (in current coord. system)}
+            helpkey *
+          }
+
+
+         parameter thresh_corr {
+                                # Correlation Coefficient threshold
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 0.9
+            prompt {Correlation coefficient threshold}
+            helpkey *
+          }
+
+         parameter thresh_filter {
+                                  # Square wave filter signal to noise
+                                 # threshold
+            type _REAL 
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 1.0
+            prompt {Filter threshold ( see ? for more info )}
+            helpkey *
+          }
+
+         parameter thresh_sd {
+                              # Threshold for rejecting samples in
+                                 # noise calculations
+            type _REAL 
+            access READ
+            vpath {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 3.0
+            prompt {Noise calculation - sample ommission threshold }
+            helpkey *
+          }
+
+         parameter thresh_s2n {
+                               # Threshold of signal to local noise at
+				 # which a candidate point source will
+				 # be accepted or ! if do not apply
+				 # this test
+            type _REAL 
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 2.5
+            prompt {Signal to Noise threshold (! accept all candidate sources)}
+            helpkey *
+          }
+
+         parameter units {
+                          # Units of the output
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default Jy
+            prompt {Output units:}
+            helpkey *
+          }
+
+      }
+ 
+#+
+#  Name:
+#     POSCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-DEC-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action poscrdd {
+
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude of map centre.
+            position 3
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Sky latitude at image centre}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed history information}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude of map centre.
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Sky longitude at image centre}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath DYNAMIC GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input CRDD file(s)}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+      }
+#+
+#  Name:
+#     PREPARE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-SEP-1991 (WG):
+#     	 Original version.
+#     7-DEC-1992 (DSB):
+#     	 Modified for changes to code made by DSB.
+#     {enter_further_changes_here}
+
+#-
+
+      action prepare {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter factor {
+                           # Scale used to convert units
+            type _REAL
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Scale factor which converts input units to output units:}
+            helpkey *
+          }
+
+         parameter fieldlat {
+                             # Latitude of the field position
+            type LITERAL
+            vpath DEFAULT
+            prompt {Latitude of the field position}
+            default !
+            helpkey *
+          }
+
+         parameter fieldlon {
+                             # Longitude of the field position
+            type LITERAL
+            vpath DEFAULT
+            prompt {Longitude of the field position}
+            default !
+            helpkey *
+          }
+ 
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDFs}
+            helpkey *
+          }
+
+         parameter label {
+                          # Label of modified NDF
+            type LITERAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Labels for the output NDFs}
+            default !
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving sucessfully created output NDFs}
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output NDFs}
+            helpkey *
+          }
+
+         parameter projtype {
+                             # Projection type.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default GNOMONIC
+            prompt {The map projection to assume for unknown image types}
+            helpkey *
+          }
+
+         parameter title {
+                          # title for output NDFs
+            type LITERAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Titles for the output NDFs}
+            default !
+            helpkey *
+          }
+
+         parameter units {
+                          # Data units
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Units for the output NDFs:}
+            default !
+            helpkey *
+          }
+
+         parameter varout {
+                           # True if VARIANCE components are
+				 # required in the output NDFs.
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {True if output VARIANCE components are required}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     QUALTOBAD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-SEP-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action qualtobad {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDFs}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDFs}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving sucessfully created output NDFs}
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output NDFs}
+            helpkey *
+          }
+
+         parameter qexp {
+                         # Quality expression.
+            position 3
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL DEFAULT
+            default ANY
+            association <->GLOBAL.QUALITY_EXP
+            prompt {Quality expression}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     REMQUAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-SEP-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action remqual {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the 
+                                 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDFs}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input NDF.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDFs from which to remove quality information}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+         parameter qnames {
+                           # Quality names to be removed.
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            prompt {Quality names to be removed}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SETIMAGE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-JUN-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action setimage {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the 
+                                 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDFs}
+            helpkey *
+          }
+
+         parameter like {
+                         # Input NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {NDFs to read new values from}
+            helpkey *
+          }
+
+         parameter list {
+                         # Group of items to be modified.
+            position 3
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath DEFAULT
+            default UNITS,BAND,TYPE
+            prompt {Items to be modified}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input NDF.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDFs to be modified}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+      }
+#+
+#  Name:
+#     SETQUAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     31-JUL-1991 (DSB):
+#     	 Original version.
+#     12-DEC-1994 (DSB):
+#        Added ARDDESC.
+#     {enter_changes_here}
+
+#-
+
+      action setqual {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter arddesc {
+                            # An ARD description identifying the
+                                 # selected pixels.
+            type LITERAL
+            access READ
+            vpath PROMPT
+            prompt {ARD description for selected pixels}
+            helpkey *
+          }
+
+         parameter comment {
+                            # Comment describing the quality name.
+            position 3
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath CURRENT
+            prompt {A short description of the assigned quality}
+            helpkey *
+          }
+
+         parameter function {
+                             # The operation to be performed on the
+				 # selected pixels.
+            type LITERAL
+            access UPDATE
+            vpath DEFAULT
+            ppath DEFAULT
+            default HS
+            prompt {Function to be performed by SETQUAL}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDF}
+            helpkey *
+          }
+
+         parameter list {
+                         # List of selected pixel coordinates.
+            type LITERAL
+            access READ
+            vpath {PROMPT }
+            prompt {A list of pixel indices}
+            helpkey *
+          }
+
+         parameter mask {
+                         # Mask NDF.
+            position 4
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {NDFs which defines the selected pixels}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input NDFs.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDFs in which to store quality information}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+ 
+         parameter qname {
+                          # Quality name.
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Quality name}
+            helpkey *
+          }
+
+         parameter select {
+                           # Method used to select pixels.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default MASK
+            prompt {How do you want to identified select pixels?}
+            helpkey *
+          }
+
+         parameter xname {
+                          # The NDF extension name.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xtype {
+                          # The NDF extension type.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SHOWQUAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-SEP-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action showqual {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter count {
+                          # True if pixel count required.
+            position 2
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Is a count of pixels holding each quality required?}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDFs}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+
+      }
+#+
+#  Name:
+#     SIMCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     8-JAN-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action simcrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter history {
+                            # True if HISTORY required in the
+				 # output NDFs.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output CRDD files}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDFs.
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input CRDD files}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving output CRDD files}
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 3
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            prompt {Output CRDD files}
+            helpkey *
+          }
+
+         parameter psf {
+                        # Prefix for PSF NDFs
+            type LITERAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default {$IRAS90_DIR/psf}
+            prompt {Prefix for NDFs giving detector Point Spread Functions}
+            helpkey *
+          }
+
+         parameter sky {
+                        # Input sky image.
+            position 2
+            type NDF
+            access READ
+            vpath {PROMPT }
+            prompt {Sky image}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYALIGN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-FEB-1993 (DSB):
+#     	 Original version.
+#     1-OCT-1993 (DSB):
+#        Suggested default for REF set to null value !
+#     {enter_changes_here}
+
+#-
+
+      action skyalign {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter acc {
+                        # Positional accuracy.
+            type _REAL
+            ppath DEFAULT
+            vpath {DEFAULT }
+            default 0.5
+            prompt {Positional accuracy in pixels}
+            helpkey *
+          }
+
+         parameter centre_lat {
+                               # Sky latitude of map centre.
+            type LITERAL
+            prompt {Sky latitude at projection centre}
+            helpkey *
+          }
+
+         parameter centre_lon {
+                               # Sky longitude of map centre.
+            type LITERAL
+            prompt {Sky longitude at projection centre}
+            helpkey *
+          }
+
+         parameter centre_xy {
+                              # Image coordinates at map centre.
+            type _REAL
+            ppath DEFAULT
+            vpath {DEFAULT }
+            default 0 0
+            prompt {Image coordinates at projection centre}
+            helpkey *
+            size *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            ppath DEFAULT
+            default 1983.5
+            prompt {Julian epoch of observations}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be added to the output NDFs}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input images.
+            position 1
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input images}
+            helpkey *
+          }
+
+         parameter method {
+                           # Interpolation method
+            type LITERAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default NEAREST
+            prompt {Interpolation method}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining created
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving sucessfully created output NDFs}
+          }
+
+         parameter orient {
+                           # Orientation of output map.
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0.0
+            prompt {Position angle of the second image axis (the "Y axis")}
+            helpkey *
+          }
+
+         parameter out {
+                        # Output NDFs.
+            position 5
+            type NDF
+            access WRITE
+            prompt {Output images}
+            helpkey *
+          }
+
+         parameter pixsize {
+                            # Pixel dimensions in arcmins.
+            type _REAL
+            access READ
+            prompt {Output pixel dimensions in arc-minutes}
+            helpkey *
+          }
+
+         parameter projtype {
+                             # Projection type.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default GNOMONIC
+            prompt {The map projection to use}
+            helpkey *
+          }
+
+         parameter ref {
+                        # Reference image.
+            position 2
+            type NDF
+            access READ
+            ppath DEFAULT
+            default !
+            prompt {The reference image}
+            helpkey *
+          }
+
+         parameter xy1 {
+                        # Bottom left corner.
+            position 3
+            type _INTEGER
+            access READ
+            ppath DEFAULT
+            default !
+            prompt {Pixel indices of the bottom left corner of the output images}
+            helpkey *
+          }
+
+         parameter xy2 {
+                        # Top right corner.
+            position 4
+            type _INTEGER
+            access READ
+            ppath DEFAULT
+            default !
+            prompt {Pixel indices of the upper right corner of the output images}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYBOX.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-FEB-1993 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+      action skybox {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter boxsize {
+                            # Box dimensions in arcmins or pixels
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Dimensions of box in arc-minutes or pixels}
+            helpkey *
+          }
+
+         parameter centre_lat {
+                               # Sky latitude at box centre
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky latitude at box centre}
+            helpkey *
+          }
+
+         parameter centre_lon {
+                               # Sky longitude at box centre
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky longitude at box centre}
+            helpkey *
+          }
+
+         parameter centre_xy {
+                              # Image coordinates at box centre
+            type _REAL
+            access READ
+            ppath CURRENT
+            prompt {Pixel coordinates (X,Y) at box centre}
+            helpkey *
+          }
+
+         parameter clear {
+                          # Clear graphic surface flag
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Clear the graphics window?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL DYNAMIC {DEFAULT }
+            ppath GLOBAL DYNAMIC DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter cosys {
+                          # Type of coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default SKY
+            prompt {Type of coordinate system to use}
+            helpkey *
+          }
+
+         parameter cursor {
+                           # True if cursor to be used
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Should positions be given using the cursor?}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            position 1
+            ptype DEVICE
+            vpath GLOBAL {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter in {
+                       # Displayed NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            prompt {The NDF}
+            helpkey *
+          }
+
+         parameter lat1 {
+                         # Sky latitude at a box corner
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky latitude at a box corner}
+            helpkey *
+          }
+
+         parameter lon1 {
+                         # Sky longitude at a box corner
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky longitude at a box corner}
+            helpkey *
+          }
+
+         parameter lat2 {
+                         # Sky latitude at a box corner
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky latitude at opposite box corner}
+            helpkey *
+          }
+
+         parameter lon2 {
+                         # Sky longitude at a box corner
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky longitude at opposite box corner}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter outline {
+                            # True if outline of box to be drawn
+            type _LOGICAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Is the outline of the box to be drawn?}
+            helpkey *
+          }
+
+         parameter pen {
+                        # Pen number 
+            type _INTEGER
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 2
+            prompt {Pen number used to write text}
+            helpkey *
+          }
+
+         parameter pic {
+                        # True if picture to be added to database
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should a new picture be stored in the graphics database?}
+            helpkey *
+          }
+
+         parameter piclab {
+                           # Label for new AGI picture
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default !
+            prompt {A label to store with the new picture}
+            helpkey *
+          }
+
+         parameter picnam {
+                           # Name for new AGI picture
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default DATA
+            prompt {A name to store with the new picture}
+            helpkey *
+          }
+
+         parameter xy1 {
+                        # Image coordinates at a box corner
+            type _REAL
+            access READ
+            ppath CURRENT
+            prompt {Pixel coordinates (X,Y) at a box corner}
+            helpkey *
+          }
+
+         parameter xy2 {
+                        # Image coordinates at a box corner
+            type _REAL
+            access READ
+            ppath CURRENT
+            prompt {Pixel coordinates (X,Y) at opposite box corner}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYGRID.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAR-1992 (WG):
+#     	 Original version.
+#     18-JAN-1993 (DSB):
+#     	 Modified for inclusion in the IRAS90 package.
+#     {enter_further_changes_here}
+
+#-
+
+      action skygrid {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter clear {
+                          # Clear graphic surface flag
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Clear the graphics window?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL DYNAMIC {DEFAULT }
+            ppath GLOBAL DYNAMIC DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter coordsize {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.01
+            prompt {Size of text used for formatted coordinate values.}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            position 1
+            ptype DEVICE
+            vpath {GLOBAL }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter in {
+                       # Displayed NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            prompt {The displayed NDF}
+            helpkey *
+          }
+
+         parameter label {
+                          # Sky grid annotation flag 
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default TRUE
+            prompt {Annotate the coordinate grid?}
+            helpkey *
+          }
+
+         parameter latacc {
+                           # Accuracy of displayed latitude values.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0
+            prompt {Accuracy of displayed latitude values}
+            helpkey *
+          }
+
+         parameter latint {
+                           # Latitude interval
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0
+            prompt {Interval between latitude lines}
+            helpkey *
+          }
+
+         parameter lines {
+                          # Sky grid annotation flag 
+            type _LOGICAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Grid lines across the image?}
+            helpkey *
+          }
+
+         parameter lonacc {
+                           # Accuracy of displayed longitude values.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0
+            prompt {Accuracy of displayed longitude values}
+            helpkey *
+          }
+
+         parameter lonint {
+                           # Longitude interval
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 0
+            prompt {Interval between longitude lines}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter pena {
+            type _INTEGER
+            access READ
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Pen number used to draw boundary}
+            helpkey *
+          }
+
+         parameter penb {
+            type _INTEGER
+            access READ
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Pen number used to draw curves and tick marks}
+            helpkey *
+          }
+
+         parameter penc {
+            type _INTEGER
+            access READ
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Pen number used to draw text labels}
+            helpkey *
+          }
+
+         parameter pend {
+            type _INTEGER
+            access READ
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Pen number used to draw coordinate labels}
+            helpkey *
+          }
+
+         parameter textsize {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.02
+            prompt {Size of annotation text.}
+            helpkey *
+          }
+
+         parameter tolerance {
+                              # The accuracy of the sky grid lines
+            type _INTEGER
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 6
+            prompt {Tolerance for the plotting of the grid lines}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYLINE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-JUL-1992 (WG):
+#     	 Original version.
+#     9-FEB-1993 (DSB):
+#     	 Modified for inclusion in IRAS90.
+#     {enter_further_changes_here}
+
+#-
+
+      action skyline {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter angle {
+                          # Position angle of great circle
+            type _REAL
+            access READ
+            ppath CURRENT DEFAULT
+            default 0.0
+            prompt {Position angle (in degrees) of the great circle arc}
+            helpkey *
+          }
+
+         parameter arclen {
+                           # Arc-length to be drawn.
+            type _REAL
+            access READ
+            ppath DEFAULT
+            default 0.0
+            prompt {Arc-length to be drawn (in degrees)}
+            helpkey *
+          }
+
+         parameter clear {
+                          # Clear graphic surface flag
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Clear the graphics window?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL DYNAMIC {DEFAULT }
+            ppath GLOBAL DYNAMIC DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            position 1
+            ptype DEVICE
+            vpath GLOBAL {CURRENT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter erase {
+                          # Curve to erase.
+            type LITERAL
+            access READ
+            ppath CURRENT
+            prompt {Curve to erase}
+            helpkey *
+          }
+
+         parameter file {
+                         # The input text file.
+            type FILENAME
+            access READ
+            prompt {Text file containing specifications of curves to be drawn}
+            helpkey *
+          }
+
+         parameter in {
+                       # Displayed NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            prompt {The displayed NDF}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude.
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky latitude at start of curve}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # Output position file
+            type LITERAL
+            access READ
+            ppath CURRENT DEFAULT
+            default skyline.log
+            prompt {Output text file}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude.
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky longitude at start of curve}
+            helpkey *
+          }
+
+         parameter loop {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Are multiple operations to be performed?}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Mode of operation.
+            type LITERAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Source of curve specifications}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter option {
+                           # Mode of operation.
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            default CONTINUE
+            prompt {Next operation}
+            helpkey *
+          }
+
+         parameter pen {
+                        # Pen number 
+            type _INTEGER
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default 1
+            prompt {Pen number used to draw curves}
+            helpkey *
+          }
+
+         parameter tolerance {
+                              # The accuracy of the lines
+            type _INTEGER
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 6
+            prompt {Tolerance for the plotting of the curves}
+            helpkey *
+          }
+
+         parameter type {
+                         # Type of curve to draw.
+            type LITERAL
+            access READ
+            ppath CURRENT
+            prompt {Type of curve to draw}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYMARK.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-JUN-1992 (WG):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action skymark {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter clear {
+                          # Clear graphic surface flag
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Clear the graphics window?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            position 1
+            ptype DEVICE
+            vpath GLOBAL {CURRENT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Julian epoch of observations}
+            helpkey *
+          }
+
+         parameter file {
+                         # The input text file.
+            type FILENAME
+            access READ
+            vpath PROMPT
+            prompt {A text file containing input coordinates}
+            helpkey *
+          }
+
+         parameter in {
+                       # Displayed NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            prompt {The displayed NDF}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky latitude}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed information}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky longitude}
+            helpkey *
+          }
+
+         parameter loop {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Are multiple operations to be performed?}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Mode of operation.
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default KEYBOARD
+            prompt {Source of input coordinates}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter option {
+                           # Mode of operation.
+            type LITERAL
+            access READ
+            vpath PROMPT
+            prompt {Next operation}
+            helpkey *
+          }
+
+         parameter pen {
+            type _INTEGER
+            access READ
+            vpath CURRENT { DEFAULT}
+            ppath CURRENT DEFAULT
+            default 3
+            prompt {Pen number used to draw markers}
+            helpkey *
+          }
+
+         parameter polyline {
+                             # True if polyline required.
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Poly-line required instead of markers?}
+            helpkey *
+          }
+
+         parameter size {
+                         # Size of markers
+            type _REAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default 1.0
+            prompt {Size of markers}
+            helpkey *
+          }
+
+         parameter type {
+                         # Type of markers
+            type LITERAL
+            access READ
+            vpath CURRENT {DEFAULT }
+            ppath CURRENT DEFAULT
+            default +
+            prompt {Marker to use}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYPHOT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JUL-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+      action skyphot {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter backval {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 0.0
+            prompt {Background surface brightness in MJy/sr}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            ptype DEVICE
+            vpath GLOBAL {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter file {
+                         # The input text file.
+            type FILENAME
+            access READ
+            vpath PROMPT
+            prompt {A text file containing input coordinates}
+            helpkey *
+          }
+
+         parameter flux {
+                         # Last flux density value displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter FLUX}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDF.
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky latitude}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed information}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky longitude}
+            helpkey *
+          }
+
+         parameter loop {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Are multiple operations to be performed?}
+            helpkey *
+          }
+
+         parameter mean {
+                         # Last mean surface brightness value displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter MEAN}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Mode of operation.
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default CURSOR
+            prompt {Source of input coordinates}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter option {
+                           # Mode of operation.
+            type LITERAL
+            access READ
+            vpath PROMPT
+            prompt {Next operation}
+            helpkey *
+          }
+
+         parameter pen {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default 3
+            prompt {SGS pen number for graphics}
+            helpkey *
+          }
+
+         parameter plot {
+                         # Type of graphics.
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Are graphics to be produced?}
+            helpkey *
+          }
+
+         parameter shape {
+                          # Shape of aperture
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default ELLIPSE
+            prompt {Aperture shape}
+            helpkey *
+          }
+
+         parameter sigma {
+                          # Last standard deviation value displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter SIGMA}
+            helpkey *
+          }
+
+         parameter single {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should the application exit after a single position?}
+            helpkey *
+          }
+
+         parameter size {
+            type _REAL
+            access READ
+            ppath DYNAMIC CURRENT
+            prompt {Aperture size in arc-minutes}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYPOS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-JAN-1993 (DSB):
+#     	 Original version.
+#     1-OCT-1993 (DSB):
+#        Parameter INSIDE added.
+#     {enter_changes_here}
+
+#-
+
+      action skypos {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            ptype DEVICE
+            vpath GLOBAL {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath DYNAMIC CURRENT
+            prompt {Julian epoch of observations}
+            helpkey *
+          }
+
+         parameter file {
+                         # The input text file.
+            type FILENAME
+            access READ
+            vpath PROMPT
+            prompt {A text file containing input coordinates}
+            helpkey *
+          }
+
+         parameter in {
+                       # Input NDF.
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            default !
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The NDF to which image coordinates refer}
+            helpkey *
+          }
+
+         parameter inside {
+                           # Last position inside the NDF?
+            type _LOGICAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {A dummy value to be replaced by the value of parameter INSIDE}
+            helpkey *
+          }
+
+         parameter inverse {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Is an inverse transformation to be performed?}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky latitude}
+            helpkey *
+          }
+
+         parameter latout {
+                           # Last latitude value displayed.
+            type _CHAR
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default xxxxxxxxxxxxxxxxxxx
+            prompt {A dummy value to be replaced by the value of parameter LATOUT}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            type FILENAME
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed information}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            prompt {Sky longitude}
+            helpkey *
+          }
+
+         parameter lonout {
+                           # Last longitude value displayed.
+            type _CHAR
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default xxxxxxxxxxxxxxxxxxx
+            prompt {A dummy value to be replaced by the value of parameter LONOUT}
+            helpkey *
+          }
+
+         parameter loop {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Are multiple operations to be performed?}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Mode of operation.
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default CURSOR
+            prompt {Source of input coordinates}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter option {
+                           # Mode of operation.
+            type LITERAL
+            access READ
+            vpath PROMPT
+            prompt {Next operation}
+            helpkey *
+          }
+
+         parameter orient {
+                           # Last orientation displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter ORIENT}
+            helpkey *
+          }
+
+         parameter pen {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 3
+            prompt {SGS pen number for graphics}
+            helpkey *
+          }
+
+         parameter pixsize {
+                            # Last pixel dimensions displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0 0.0
+            prompt {A dummy value to be replaced by the value of parameter PIXSIZE}
+            helpkey *
+            size *
+          }
+
+         parameter plot {
+                         # Type of graphics.
+            type LITERAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Type of graphics to mark cursor positions}
+            helpkey *
+          }
+
+         parameter single {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Should the application exit after a single position?}
+            helpkey *
+          }
+
+         parameter x {
+            type _REAL
+            access READ
+            vpath PROMPT
+            prompt {X image coordinate}
+            helpkey *
+          }
+
+         parameter xout {
+                         # Last X value displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter XOUT}
+            helpkey *
+          }
+
+         parameter y {
+            type _REAL
+            access READ
+            vpath PROMPT
+            prompt {Y image coordinate}
+            helpkey *
+          }
+
+         parameter yout {
+                         # Last Y value displayed.
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            default 0.0
+            prompt {A dummy value to be replaced by the value of parameter YOUT}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     SKYWRITE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     3-JUL-1992 (WG):
+#     	 Original version.
+#     9-FEB-1993 (DSB):
+#     	 Modified for inclusion in IRAS90.
+#     {enter_further_changes_here}
+
+#-
+
+      action skywrite {
+
+         helplib {$IRAS90_HELP/iras90_help.shl}
+
+         parameter attribute {
+                              # Text attribute to change.
+            type LITERAL
+            access UPDATE
+            ppath DEFAULT
+            vpath {DEFAULT }
+            default DEFAULT
+            prompt {Text attribute to set}
+            helpkey *
+          }
+
+         parameter clear {
+                          # Clear graphic surface flag
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Clear the graphics window?}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL DYNAMIC {DEFAULT }
+            ppath GLOBAL DYNAMIC DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphic device
+            position 1
+            ptype DEVICE
+            vpath GLOBAL {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of display device}
+            helpkey *
+          }
+
+         parameter direction {
+                              # Up-vector
+            type _REAL
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Text up-vector}
+            helpkey *
+          }
+
+         parameter epoch {
+            type _DOUBLE
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default 1983.5
+            prompt {Julian epoch of observations}
+            helpkey *
+          }
+
+         parameter file {
+                         # The input text file.
+            type FILENAME
+            access READ
+            prompt {Text file containing specifications of text to be written}
+            helpkey *
+          }
+
+         parameter font {
+                         # Font
+            type _INTEGER
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {GKS font number}
+            helpkey *
+          }
+
+         parameter height {
+                           # Up-vector
+            type _REAL
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Text height}
+            helpkey *
+          }
+
+         parameter in {
+                       # Displayed NDF.
+            position 2
+            type NDF
+            access READ
+            vpath {DEFAULT }
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            prompt {The displayed NDF}
+            helpkey *
+          }
+
+         parameter just {
+                         # Text justification
+            type LITERAL
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Text justification}
+            helpkey *
+          }
+
+         parameter lat {
+                        # Sky latitude.
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky latitude }
+            helpkey *
+          }
+
+         parameter logfile {
+                            # Output position file
+            type LITERAL
+            access READ
+            ppath CURRENT DEFAULT
+            default skywrite.log
+            prompt {Output text file}
+            helpkey *
+          }
+
+         parameter lon {
+                        # Sky longitude.
+            type LITERAL
+            access UPDATE
+            ppath CURRENT
+            prompt {Sky longitude}
+            helpkey *
+          }
+
+         parameter loop {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default FALSE
+            prompt {Are multiple operations to be performed?}
+            helpkey *
+          }
+
+         parameter mode {
+                         # Mode of operation.
+            type LITERAL
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Source of text specifications}
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter option {
+                           # Mode of operation.
+            type LITERAL
+            access READ
+            ppath DEFAULT
+            default CONTINUE
+            prompt {Next operation}
+            helpkey *
+          }
+
+         parameter pen {
+                        # Pen number 
+            type _INTEGER
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Pen number used to write text}
+            helpkey *
+          }
+
+         parameter ratio {
+                          # Aspect ratio
+            type _REAL
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Character aspect ratio (width/height)}
+            helpkey *
+          }
+
+         parameter space {
+                          # space between characters
+            type _REAL
+            access READ
+            ppath CURRENT DYNAMIC
+            prompt {Space between characters}
+            helpkey *
+          }
+
+         parameter text {
+                         # Text to be written
+            type LITERAL
+            access READ
+            prompt {Text to be written}
+            helpkey *
+          }
+
+      }
+#+
+#  Name:
+#     TRACECRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     {enter_new_authors_here}
+
+#  History:
+#     22-NOV-1990 (WG):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+      action tracecrdd {
+
+         helplib {$IRAS90_HELP/iras90_help.shl }
+
+         parameter comment {
+                            # Comment describing the quality name.
+            type LITERAL
+            access UPDATE
+            vpath {PROMPT }
+            ppath CURRENT
+            prompt {Comment describing the new quality}
+            helpkey *
+          }
+
+         parameter coords {
+                           # Sky coordinate system to use.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            default EQUATORIAL(B1950)
+            association <->GLOBAL.SKY_COORDS
+            prompt {Sky coordinate system}
+            helpkey *
+          }
+
+         parameter cursor {
+                           # Cursor flag
+            type _LOGICAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default FALSE
+            prompt {Obtained commands using the graphics cursor? }
+            helpkey *
+          }
+
+         parameter data {
+                         # Data value of a trace at a position
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {A dummy value to be replaced by the value of parameter DATA}
+            default 0.0
+            helpkey *
+          }
+
+         parameter datdet {
+                           # Detector number of a trace
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {A dummy value to be replaced by the value of parameter DATDET}
+            default 0
+            helpkey *
+          }
+
+         parameter dets {
+                         # String expressing detectors to be displayed
+            position 2
+            type LITERAL
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Detectors to display }
+            helpkey *
+          }
+
+         parameter device {
+                           # Graphics device
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter history {
+                            # True if HISTORY required in the output.
+            type _LOGICAL
+            access READ
+            vpath GLOBAL DEFAULT
+            ppath GLOBAL DEFAULT
+            default FALSE
+            association <->GLOBAL.IRAS90_HISTORY
+            prompt {True if HISTORY is to be present in the output NDF}
+            helpkey *
+          }
+
+         parameter logfile {
+                            # The log file.
+            type FILENAME
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default !
+            prompt {A log file for storing displayed information}
+            helpkey *
+          }
+
+         parameter loop {
+                         # Looping flag.
+            type _LOGICAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Prompt for further actions after displaying the data?}
+            default TRUE
+            helpkey *
+          }
+
+         parameter msg_filter {
+                               # Information level to be displayed.
+            type LITERAL
+            access UPDATE
+            vpath GLOBAL {DEFAULT }
+            ppath GLOBAL DEFAULT
+            association <->GLOBAL.MSG_FILTER
+            default NORMAL
+            prompt {Level of information to be displayed on the screen}
+            helpkey *
+          }
+
+         parameter ndf {
+                        # Input CRDD file.
+            position 1
+            type NDF
+            access UPDATE
+            vpath {PROMPT }
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {CRDD file to display}
+            helpkey *
+          }
+
+         parameter ndflist {
+                            # Group expression defining accessed
+            type NDF
+                    # NDFs.
+            access WRITE
+            ppath DYNAMIC
+            vpath DYNAMIC NOPROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Group expression giving processed NDFs}
+          }
+ 
+         parameter next {
+                         # Next action to perform in interactive mode
+            type LITERAL
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Next action }
+            helpkey *
+          }
+
+         parameter offset {
+                           # User specified offsets for each trace
+            type _REAL
+            vpath {PROMPT }
+            prompt {Offset value for each detector }
+            helpkey *
+          }
+
+         parameter omit {
+                         # Display sections to be omitted
+            type LITERAL
+            vpath DYNAMIC DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Group of display sections to be omitted}
+            default NOTHING
+            helpkey *
+          }
+
+         parameter param {
+                          # Parameter to be changed
+            type LITERAL
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Parameter to be given a new value }
+            helpkey *
+          }
+
+         parameter peak {
+                         # Strength of source
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {A dummy value to be replaced by the value of parameter PEAK}
+            default 0.0
+            helpkey *
+          }
+
+         parameter profiles {
+                             # File name of point source template NDF file
+            type NDF
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {NDF containing point source templates:}
+            default {$IRAS90_DIR/profiles}
+            helpkey *
+          }
+
+         parameter ptitle {
+                           # Title of the display
+            type LITERAL
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Title for the display }
+            helpkey *
+          }
+
+         parameter pxsize {
+                           # Horizontal size of plot in metres
+            type _REAL
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {Horizontal size of plot in metres}
+            helpkey *
+          }
+
+         parameter pysize {
+                           # Vertical size of plot in metres
+            type _REAL
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Vertical size of plot in metres}
+            helpkey *
+          }
+
+         parameter qexp {
+                         # Quality expression defining data to
+				 # be included in the display.
+            type LITERAL
+            access READ
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default ANY
+            association ->GLOBAL.QUALITY_EXP
+            prompt {Quality expression specifying samples to be displayed}
+            helpkey *
+          }
+
+         parameter qname {
+                          # Quality name.
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Quality name}
+            helpkey *
+          }
+
+         parameter scnpsn {
+                           # In- and cross-scan position of source
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Dummy values to be replaced by the values of parameter SCNPSN}
+            default 0.0 0.0
+            helpkey *
+            size *
+          }
+   
+         parameter skypsn {
+                           # Sky position of the source
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            ppath DEFAULT
+            prompt {Dummy values to be replaced by the values of parameter SKYPSN}
+            default 0.0 0.0
+            helpkey *
+            size *
+          }
+
+         parameter space {
+                          # Way to offset the traces 
+            type LITERAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            prompt {Method for determining vertical offsets between traces}
+            default AVERAGE
+            helpkey *
+          }
+
+         parameter srcdet {
+                           # Detector to look for source on
+            type _INTEGER
+            vpath {PROMPT }
+            prompt {The detector containing the source}
+            helpkey *
+          }
+
+         parameter srcpeak {
+                            # User specified source peak value.
+            type _REAL
+            vpath {PROMPT }
+            prompt {Source peak value in displayed units}
+            helpkey *
+          }
+
+         parameter srcpsn {
+                           # User specified source position
+            type _REAL
+            vpath {PROMPT }
+            prompt {Source in-scan position }
+            helpkey *
+          }
+
+         parameter units {
+                          # Units of the display
+            type LITERAL
+            vpath DEFAULT DYNAMIC
+            ppath DEFAULT DYNAMIC
+            default Jy
+            prompt {Units in which to display the data}
+            helpkey *
+          }
+   
+         parameter xlimit {
+                           # In-scan display limits
+            position 3
+            type _REAL
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {In-scan display limits in arcmin}
+            helpkey *
+          }
+
+         parameter xname {
+                          # The NDF extension name.
+            type LITERAL
+            access UPDATE
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default QUALITY_NAMES
+            prompt {NDF extension name}
+            helpkey *
+          }
+
+         parameter xscan {
+                          # Max. cross-scan distance for detectors.
+            type _REAL
+            vpath {DEFAULT }
+            ppath DEFAULT
+            default -5.0 5.0
+            prompt {Cross-scan range for displayed detectors}
+            helpkey *
+            size *
+          }
+
+         parameter xtype {
+                          # The NDF extension type.
+            type LITERAL
+            access UPDATE
+            vpath {DYNAMIC }
+            ppath DYNAMIC
+            prompt {NDF extension type}
+            helpkey *
+          }
+
+         parameter ylimit {
+                           # Vertical display limits
+            position 4
+            type _REAL
+            vpath {PROMPT }
+            ppath DYNAMIC
+            prompt {Vertical display limits }
+            helpkey *
+          }
+
+      }
+
+   }
+
+    icl {defhelp iras90 $IRAS90_HELP 0}
+
+   display {
+
+     IRAS90 commands are now available -- (Version 1.1-2)
+
+     Type i90help for help on IRAS90 commands.
+     Type "showme sun161", "showme sun163" and
+     "showme sun165" to browse the hypertext documentation.
+
+   }
+
+}
