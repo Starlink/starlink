@@ -239,6 +239,18 @@
         CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRCR','_REAL',0,VAL__NBR,
      :                                                   SID,STATUS)
 
+*  general parameters
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R1','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R2','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R3','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R4','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_R5','_REAL',0,VAL__NBR,
+     :                                                   SID,STATUS)
+
 *  colour table
         CNAME='DATA'
         DO I=1,9
@@ -328,6 +340,16 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'COLOUR',ITEMID,STATUS)
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBI,0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PAR_R1',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PAR_R2',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PAR_R3',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PAR_R4',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'PAR_R5',ITEMID,STATUS)
+        CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CNAME='DATA'
         DO I=1,9
           DO J=1,9
