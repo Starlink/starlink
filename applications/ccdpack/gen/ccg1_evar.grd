@@ -31,6 +31,11 @@
 *     VAR( NEL ) =<COMM> (Given and Returned)
 *        The estimate variance array.
 *        The global status.
+
+*  Notes:
+*     This routine is only designed for use with REAL and DOUBLE
+*     PRECISION generic types. Do not use it for INTEGER types.
+
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     {enter_new_authors_here}
