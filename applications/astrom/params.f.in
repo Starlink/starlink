@@ -1,0 +1,9 @@
+      BLOCK DATA ASTROM_PARAMS
+      
+      INCLUDE 'params.inc'
+      
+      DATA UNITIN/@FUNITIN@/
+      DATA UNITOUT/@FUNITOUT@/
+      DATA DEFWCSSTYLE/'@DEFWCSSTYLE@'/
+
+      END
