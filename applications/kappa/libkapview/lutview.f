@@ -214,6 +214,9 @@
 *  History:
 *     15-OCT-1999 (DSB):
 *        Original AST/PGPLOT version. Based on previous version by MJC.
+*     2-FEB-2000 (DSB):
+*        Added code to ensure the supplied points are in the correct
+*        order.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -255,6 +258,7 @@
       DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords at corner
       DOUBLE PRECISION IN( 2, 2 )! GRAPHICS Frame corners
       DOUBLE PRECISION OUT( 2, NDF__MXDIM )! Current Frame corners
+      DOUBLE PRECISION TEMP    ! Used for swapping values
       INTEGER ACT( 2 )         ! Actions used to terminate input
       INTEGER I                ! General variable
       INTEGER IFRM             ! Frame index
@@ -437,6 +441,20 @@
          C2( 1 ) = DBLE( X2 )
          C2( 2 ) = DBLE( Y2 )
 
+      END IF
+
+*  Ensure the values are in the correct order (C1 should be the lower
+*  bounds, and C2 should be the upper bounds).
+      IF( C1( 1 ) .GT. C2( 1 ) ) THEN
+         TEMP = C1( 1 )
+         C1( 1 ) = C2( 1 )
+         C2( 1 ) = TEMP
+      END IF
+
+      IF( C1( 2 ) .GT. C2( 2 ) ) THEN
+         TEMP = C1( 2 )
+         C1( 2 ) = C2( 2 )
+         C2( 2 ) = TEMP
       END IF
 
 *  Set the PGPLOT viewport to these bounds.
