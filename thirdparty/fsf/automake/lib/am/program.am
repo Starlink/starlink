@@ -23,4 +23,4 @@
 ## Or maybe not... sadly, incremental linkers are rarer than losing
 ## systems.
 	@rm -f %PROGRAM%%EXEEXT%
-	$(%XLINK%) $(%XPROGRAM%_LDFLAGS) $(%XPROGRAM%_OBJECTS) $(%XPROGRAM%_LDADD) $(LIBS)
+	$(%XLINK%) $(%XPROGRAM%_LDFLAGS) $(%XPROGRAM%_OBJECTS) $(%XPROGRAM%_LDADD) $(LIBS) %LINKMAGIC%

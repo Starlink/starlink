@@ -2291,6 +2291,8 @@ sub handle_programs
 	  $xlink = $linker ? $linker : 'LINK';
 	}
 
+      my $linkmagic = derive_linkmagic ($xlink);
+
       # If the resulting program lies into a subdirectory,
       # make sure this directory will exist.
       my $dirstamp = require_build_directory_maybe ($one_file);
@@ -2301,7 +2303,8 @@ sub handle_programs
 				       XPROGRAM => $xname,
 				       XLINK    => $xlink,
 				       DIRSTAMP => $dirstamp,
-				       EXEEXT   => '$(EXEEXT)');
+				       EXEEXT   => '$(EXEEXT)',
+                                       LINKMAGIC => $linkmagic);
 
       if ($seen_libobjs || $seen_global_libobjs)
 	{
@@ -2774,33 +2777,7 @@ sub handle_ltlibraries
 	  $xlink = $linker ? $linker : 'LINK';
 	}
 
-      my $linkmagic = '';
-      if ($xlink ne 'LINK')
-        {
-          # We're about to use a non-C linker.  Do we need any other
-          # linking magic?  In the case of C and Fortran on the Mac,
-          # yes we do.  The following outputs the hooks which allow us to
-          # handle this case, but is quite general in fact.
-          # Make a sorted list of all the
-          # languages uses, and IF there's more than one, make a
-          # variable lang_lang_..._$link_MAGIC (eg C_FC_FCLINK_MAGIC)
-          # and include this in the generated link line.  Only
-          # include those languages which have a linker, thus
-          # excluding languages like `header' which present no link
-          # problems at all.  After this, it is up to the configure.ac
-          # to sort out which, if any, of the ..._MAGIC variables it
-          # needs to define.
-          my @langlist = sort map { my $l = $languages{$extension_map{$_}};
-                                    $l->linker ? $l->name : () }
-                                  keys %extension_seen;
-
-          if ($#langlist > 0)
-            {
-              $linkmagic = '$('
-                . uc(join('_', @langlist) . '_' . $xlink . '_magic')
-                . ')';
-            }
-        }
+      my $linkmagic = derive_linkmagic ($xlink);
 
       my $rpath;
       if ($instdirs{$onelib} eq 'EXTRA'
@@ -2843,6 +2820,48 @@ sub handle_ltlibraries
 	    }
 	}
     }
+}
+
+
+sub derive_linkmagic ($)
+{
+  # Determine any link magic required.  Return a $(lang_lang_linker_MAGIC)
+  # variable or blank.
+  my ($xlink) = @_;
+  my $linkmagic;
+
+  if ($xlink ne 'LINK')
+    {
+      # We're about to use a non-C linker.  Do we need any other
+      # linking magic?  In the case of C and Fortran on the Mac,
+      # yes we do.  The following outputs the hooks which allow us to
+      # handle this case, but is quite general in fact.
+      # Make a sorted list of all the
+      # languages uses, and IF there's more than one, make a
+      # variable lang_lang_..._$link_MAGIC (eg C_FC_FCLINK_MAGIC)
+      # and include this in the generated link line.  Only
+      # include those languages which have a linker, thus
+      # excluding languages like `header' which present no link
+      # problems at all.  After this, it is up to the configure.ac
+      # to sort out which, if any, of the ..._MAGIC variables it
+      # needs to define.
+      my @langlist = sort map { my $l = $languages{$extension_map{$_}};
+                                $l->linker ? $l->name : () }
+                                keys %extension_seen;
+
+      if ($#langlist > 0)
+        {
+          $linkmagic = '$('
+            . uc(join('_', @langlist) . '_' . $xlink . '_magic')
+            . ')';
+        }
+    }
+  else
+    {
+      $linkmagic = '';
+    }
+
+  return $linkmagic;
 }
 
 # See if any _SOURCES variable were misspelled.
