@@ -116,8 +116,23 @@
          }
       }
 
+#  Prepare for constructing the NDF chooser widget.  Since it may contain
+#  multiple GWM widgets, on a pseudocolor display it will probably run out
+#  of colormap entries.  The Ndfchoose widget itself attempts to deal
+#  with this (via the Ccdtop container mechanism), but makes a somewhat
+#  messy job of it.  To make things work more smoothly, we ensure here
+#  that the Ndfchoose widget is parented by a window with a non-pseudocolor
+#  colormap, if at all possible.
+      if { [ winfo visual . ] == "pseudocolor" } {
+         set visual [ Ccdtop::bestvisual . {truecolor 12} {staticgray 8} \
+                                           {staticcolor 8} {pseudocolor 8} ]
+         set base [ frame .f -visual $visual ]
+      } else {
+         set base [ frame .f ]
+      }
+
 #  Create an NDF chooser widget.
-      set chooser [ eval ndfchoose .c $ndflist ]
+      set chooser [ eval ndfchoose $base.c $ndflist ]
       $chooser configure \
                          -title "PAIRNDF chooser" \
                          -watchstate choosestate \
@@ -125,7 +140,7 @@
                          -choosewcsframe 0 \
                          -validpair [ code pairok %A %B ] \
                          -viewport [ list $PREVX $PREVY ] \
-                         -percentiles [ list $PERCLO $PERCHI ]
+                         -percentiles [ list $PERCLO $PERCHI ] 
 
 #  Create an exit confirmation widget which may or may not be used.
 #  We construct it here rather than at time of use since this allows it
@@ -134,7 +149,7 @@
       set confirmtext "Not enough images have been paired\n"
       append confirmtext "to register them all.\n"
       append confirmtext "Do you really wish to exit?"
-      set quitdialog [ iwidgets::messagedialog .qd \
+      set quitdialog [ iwidgets::messagedialog $chooser.qd \
                           -modality application \
                           -bitmap questhead \
                           -title "PAIRNDF: Confirm exit" \

@@ -100,6 +100,13 @@ class Ccdtop {
  
 #  Public procedures:
 #
+#     bestvisual window visual ...
+#        Returns a visual (in the form {visualtype depth}) which represents
+#        the best choice among those indicated of the ones available in 
+#        the window specified.  There may be any number of visual arguments,
+#        of the form {visualtype mindepth}; the first which can be 
+#        satisfied is returned.
+#        
 #     max num ...
 #        Gives the maximum of all the (numeric) arguments supplied.
 #        Just here because it's useful.
@@ -226,35 +233,19 @@ class Ccdtop {
 #  most at home using (though possibly one could be smarter about making
 #  this decision).  If it's not suitable though, pick something from
 #  what is available.
-         set parentvisual [ winfo visual $parent ]
-         set visual $parent
-         set pseudo 0
-         if { $parentvisual == "pseudocolor" } {
-            set visual $parent
-            set pseudo 1
-         } elseif { $parentvisual == "truecolor" } {
+         if { [ winfo visual $parent ] == "pseudocolor" } {
+            set visual [ bestvisual {truecolor 12} {staticgray 8} \
+                                    {staticcolor 8} {pseudocolor 8} ]
+            set pseudo [ regexp pseudo $visual ]
+         } else {
             set visual $parent
             set pseudo 0
-         } else {
-            foreach vis [ winfo visualsavailable $parent ] {
-               set type [ lindex $vis 0 ]
-               set depth [ lindex $vis 1 ]
-               if { $type == "pseudocolor" && $depth >= 8 } {
-                  set visual $vis
-                  set pseudo 1
-                  break
-               } elseif { $type == "truecolor" && $depth >= 12 } {
-                  set visual $vis
-                  set pseudo 0
-                  break
-               }
-            }
          }
 
 #  If it's not going to be PseudoColor, we just need to create a frame.
          if { ! $pseudo } {
             itk_component add $component {
-               frame $path
+               frame $path -visual $visual
             }
 
 #  It will be PseudoColor.  Create a frame with a new colormap, and
@@ -262,16 +253,16 @@ class Ccdtop {
 #  we're going to need in the first few slots.
          } else {
             itk_component add $component {
-               frame $path -colormap new
+               frame $path -visual $visual -colormap new
             }
             iwidgets::pushbutton $path.but -text T
             # button $path.but -text T
+         }
 
 #  If required, notify the window manager that this colormap should be the
 #  one used for the toplevel window.
-            if { $install } {
-               wm colormapwindows $itk_interior $path
-            }
+         if { $install && $visual != $parent } {
+            wm colormapwindows $itk_interior $path
          }
       }
 
@@ -313,6 +304,28 @@ class Ccdtop {
 ########################################################################
 #  Public procedures.
 ########################################################################
+
+#-----------------------------------------------------------------------
+      public proc bestvisual { window args } {
+#-----------------------------------------------------------------------
+         foreach vgot [ winfo visualsavailable $window ] {
+            set vis [ lindex $vgot 0 ]
+            set depth [ lindex $vgot 1 ]
+            if { [ array names visual $vis ] == "" || \
+                 $visual($vis) < $depth } {
+               set visual($vis) $depth
+            }
+         }
+         foreach vwant $args {
+            set vis [ lindex $vwant 0 ]
+            set depth [ lindex $vwant 1 ]
+            if { [ array names visual $vis ] != "" && \
+                 $visual($vis) >= $depth } {
+               return [ list $vis $visual($vis) ]
+            }
+         }
+         return [ lindex [ winfo visualsavailable $window ] 0 ]
+      }
 
 #-----------------------------------------------------------------------
       public proc max { num args } {
