@@ -565,17 +565,22 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     // Make sure that we use the StarWCS class and not the inherited default
     // SAOWCS class
     WCSRep* rep = imio.wcs().rep();
-    if ( ! rep || strcmp(rep->classname(), "StarWCS" ) != 0) {
-        const char* header = "";
-        if (! imio.isclear())  // if image is not cleared, set WCS header
-            header = (const char*)imio.header().ptr();
-        WCS wcs(new StarWCS(header));
-        if (wcs.status() != 0)
-            return (ImageData*)NULL;
-        imio.wcs(wcs);  // this sets the WCS object to use for this image
+    if ( ! rep || strcmp( rep->classname(), "StarWCS" ) != 0 ) {
+        char* header = "";
+        int lheader = 0;
+        if ( ! imio.isclear() )  {
+            // if image is not cleared, set WCS header
+            header = (char *) imio.header().ptr();
+            lheader = imio.header().size();
+        }
+        WCS wcs( new StarWCS( header, lheader ) );
+        if ( wcs.status() != 0 ) {
+            return (ImageData*) NULL;
+        }
+        imio.wcs( wcs );  // this sets the WCS object to use for this image
     }
 
-    return ImageData::makeImage(name(), imio, verbose());
+    return ImageData::makeImage( name(), imio, verbose() );
 }
 
 //+
@@ -654,13 +659,13 @@ int StarRtdImage::loadFile()
 //+
 // Return a pointer to the StarWCS object for the image, or NULL on error
 //-
-StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
+StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
 {
     if (!image) {
         image = image_;
     }
     WCSRep *p = image->wcs().rep();
-    if ( p && strcmp(p->classname(), "StarWCS" ) == 0) {
+    if ( p && strcmp(p->classname(), "StarWCS" ) == 0 ) {
         return (StarWCS *) p;
     }
     error( "internal error: expected class StarWCS, not ",
@@ -707,9 +712,11 @@ int StarRtdImage::isCelestial()
 //   Two encodings of the WCS can be written. The first is uses the
 //   default encoding of a channel that contains the image FITS
 //   headers.  Normally this is a native encoding which is accurate
-//   and can be output to an NDF WCS component. A second attempt to
-//   encode the WCS is made if a suitable encoding form passed as an
-//   optional argument (normally this will be FITS-WCS or DSS).
+//   and can be output to an NDF WCS component, unless the destination
+//   file is FITS, in which case FITS-WCS overrides Native as the
+//   default. A second attempt to encode the WCS is made if a suitable
+//   encoding form passed as an optional argument (normally this will
+//   be FITS-WCS or DSS). 
 //
 //   The return from this function is either TCL_OK for success 
 //   or TCL_ERROR for failure. Either way the return may have
@@ -783,6 +790,19 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 // permanent default for writing back.
                 astSet( chan, "Encoding=%s", default_encoding );
             }
+            else {
+                // Nothing read from the channel. So default encoding
+                // is untrustworthy. If this was a FITS file with no
+                // WCS then writing a Native encoding is bad, but is
+                // the correct thing to do for an NDF, but NDF
+                // channels should always read since they have PIXEL
+                // etc., so just need to test for FITS image.
+                ImageIO imio = image_->image();
+                if ( strcmp( imio.rep()->classname(), "NDFIO" ) != 0 ) {
+                    astSet( chan, "Encoding=FITS-WCS" );
+                    default_encoding = astGetC( chan, "Encoding" );
+                }
+            }
 
             //  If the card position is still at the beginning for any
             //  reason then we should move it past the standard
@@ -797,10 +817,11 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
             //  Now we can try to add the WCS encoding. The encoding
             //  type of the channel is set to the type of the WCS
-            //  object just read (or native). The first attempt to
-            //  update will use whatever this is set to. If this fails
-            //  then an attempt to write a native encoding will be
-            //  made, if the default type wasn't native already.
+            //  object just read (or Native and FITS-WCS for NDFs and
+            //  FITS). The first attempt to update will use whatever
+            //  this is set to. If this fails then an attempt to write
+            //  a native encoding will be made, if the default type
+            //  wasn't native already.
             StarWCS* wcsp = getStarWCSPtr();
             if ( !wcsp ) {
                 return TCL_ERROR;
@@ -911,7 +932,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             }
             message << ends;
             set_result( message.str() );
-            delete message.str();
+            delete [] message.str();
         }
         return result;
     } else {
@@ -3000,7 +3021,9 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
         make_label(os, label, cx, cy, label_tags, fg);
 
     os << ends;
-    return eval(os.str());
+    int result = eval( os.str() );
+    delete [] os.str();
+    return result;
 }
 
 //
@@ -3050,7 +3073,9 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
         make_label(os, label, cx, cy, label_tags, fg);
 
     os << ends;
-    return eval(os.str());
+    int result = eval( os.str() );
+    delete [] os.str();
+    return result;
 }
 
 //+
@@ -4275,7 +4300,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
     os << ends;
     set_result( os.str() );
-    delete os.str();
+    delete [] os.str();
     return TCL_OK;
 }
 
@@ -4963,10 +4988,10 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
         char *slice;
         char *path;
         if ( parseName( file(), &name, &fitsext, &slice, &path ) != TCL_OK ) {
-            if ( name ) delete name;
-            if ( fitsext ) delete fitsext;
-            if ( slice ) delete slice;
-            if ( path ) delete path;
+            if ( name ) delete [] name;
+            if ( fitsext ) delete [] fitsext;
+            if ( slice ) delete [] slice;
+            if ( path ) delete [] path;
             return error( file(), " is not a known NDF (internal error)" );
         }
 
@@ -4994,9 +5019,9 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
             strcat( buffer, ndfpath );
             set_result( buffer );
         }
-        if ( name ) delete name;
-        if ( slice ) delete slice;
-        if ( path ) delete path;
+        if ( name ) delete [] name;
+        if ( slice ) delete [] slice;
+        if ( path ) delete [] path;
     } else {
 
         //  FITS file, just need the name and the HDU number (if any).

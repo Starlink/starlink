@@ -107,17 +107,29 @@ proc gaia::setXdefaults {} {
     #  code, these are the Solaris Xsun optimised names).
     option add *Fonts {
        -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+       -*-times-medium-r-*-*-*-120-*-*-*-*-*-*
        -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*
+       -*-times-medium-o-*-*-*-120-*-*-*-*-*-*
        -adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*
+       -*-times-bold-r-*-*-*-120-*-*-*-*-*-*
        -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+       -*-times-medium-r-*-*-*-140-*-*-*-*-*-*
        -adobe-courier-medium-o-*-*-*-140-*-*-*-*-*-*
+       -*-times-medium-o-*-*-*-140-*-*-*-*-*-*
        -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
+       -*-times-bold-r-*-*-*-140-*-*-*-*-*-*
        -adobe-courier-medium-r-*-*-*-180-*-*-*-*-*-*
+       -*-times-medium-r-*-*-*-180-*-*-*-*-*-*
        -adobe-courier-medium-o-*-*-*-180-*-*-*-*-*-*
+       -*-times-medium-o-*-*-*-180-*-*-*-*-*-*
        -adobe-courier-bold-r-*-*-*-180-*-*-*-*-*-*
+       -*-times-bold-r-*-*-*-180-*-*-*-*-*-*
        -adobe-courier-medium-r-*-*-*-240-*-*-*-*-*-*
+       -*-times-medium-r-*-*-*-240-*-*-*-*-*-*
        -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
+       -*-times-medium-o-*-*-*-240-*-*-*-*-*-*
        -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
+       -*-times-bold-r-*-*-*-240-*-*-*-*-*-*
     }
 
     #  Stop fixed font being used in on Canvas (this doesn't print).

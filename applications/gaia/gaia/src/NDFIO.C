@@ -104,7 +104,7 @@ NDFIO::~NDFIO() {
 //-
 int NDFIO::wcsinit()
 {
-   wcs_ = WCS( new StarWCS( (const char *) header_.ptr() ) );
+   wcs_ = WCS( new StarWCS( (const char *) header_.ptr(), header_.size() ) );
    return wcs_.status();
 }
 

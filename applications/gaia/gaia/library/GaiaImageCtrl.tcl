@@ -424,9 +424,7 @@ itcl::class gaia::GaiaImageCtrl {
       set warn [$image_ astwarnings]
       if { $warn != {} } {
          set message \
-            "The astrometric calibration of your image produced the following warnings:\n\n$warn"
-      } else {
-         set message "There are no known issues with your astrometry calibration"
+            "Reading your image produced the following messages:\n\n$warn"
       }
       set existed [winfo exists $w_.astwarn]
       utilReUseWidget util::TextDialog $w_.astwarn \

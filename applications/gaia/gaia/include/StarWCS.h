@@ -86,7 +86,8 @@ protected:
   int issky_;
 
   //  Construct a single warning from all warning cards.
-  void constructWarning( AstFitsChan *fitschan );
+  void constructWarning( const char *encoding, int failed,
+                         AstFitsChan *fitschan );
 
   //  Pointer to warnings string.
   char *warnings_;
@@ -94,7 +95,7 @@ protected:
 public:
 
   //  Constructor (derived classes call this)
-  StarWCS(const char* header);
+  StarWCS( const char* header, const int lheader );
 
   //  Destructor
   virtual ~StarWCS();

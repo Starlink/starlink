@@ -223,10 +223,11 @@ int StarFitsIO::wcsinit()
    //   the extension header to get all of the WCS info.
    if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
       mergeHeader();
-      wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr() ) );
+      wcs_ = WCS( new StarWCS( (const char *)mergedHeader_.ptr(),
+                               mergedHeader_.size() ) );
       return wcs_.status();
    }
-   wcs_ = WCS(new StarWCS( (const char *)header_.ptr() ) );
+   wcs_ = WCS(new StarWCS( (const char *)header_.ptr(), header_.size() ) );
    return wcs_.status();
 }
 
