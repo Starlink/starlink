@@ -1016,6 +1016,9 @@
                      JSET = AST_GETI( IWCS, 'Nframe', STATUS )
                      CALL AST_SETI( IWCS, 'Current', JSET, STATUS )
 
+*  Ensure that we don't try to add the frame again.
+                     JSET = AST__NOFRAME
+
 *  Write the modified WCS component back to the NDF.
                      CALL NDF_PTWCS( IWCS, INDF, STATUS )
                   END IF
