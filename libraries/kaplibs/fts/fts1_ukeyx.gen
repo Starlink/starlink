@@ -27,11 +27,11 @@
 *     than once in the header, only the first occurence will be used.
 *
 *     The name may be compound to permit writing of hierarchical
-*     keywords. 
+*     keywords.
 *
 *     The buffer of FITS header card image should be mapped in the
 *     'UPDATE' mode.
-*     
+*
 *  Arguments:
 *     NCARD = INTEGER (Given)
 *        The number of card images in the buffer.
@@ -58,7 +58,7 @@
 *        when it is blank, no comment will be appended to the keyword.
 *     COMNT = CHARACTER * ( * ) (Given)
 *        The comment string of the keyword.  It may be truncated at the
-*        end to put into the space left after writing keyword value. 
+*        end to put into the space left after writing keyword value.
 *     THERE = LOGICAL (Returned)
 *        If true, the specified keyword is present.
 *     CARD = INTEGER (Returned)
@@ -108,7 +108,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -227,7 +227,7 @@
 *  Set the found flag and get the position of the equals sign.
                THERE = .TRUE.
                EQUALS = INDEX( BUFFER( CARD ), '=' )
-      
+
 *  Otherwise go to the next card in the buffer.
             ELSE
                CARD = CARD + 1
