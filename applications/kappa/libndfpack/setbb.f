@@ -104,7 +104,7 @@
 *     issued if this should occur.
 
 *  Related Applications:
-*     Figaro: Q2BAD; IRAS90: QUALTOBAD, REMQUAL, SETQUAL, SHOWQUAL.
+*     KAPPA: QUALTOBAD, REMQUAL, SETQUAL, SHOWQUAL; Figaro: Q2BAD.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)

@@ -169,6 +169,9 @@
 *     NDF then REMQUAL can be used to remove a quality name in order to
 *     make room for the new quality names.
       
+*  Related Applications:
+*     KAPPA: QUALTOBAD, REMQUAL, SHOWQUAL.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}

@@ -131,7 +131,7 @@
 *     -  There can be an arbitrary number of NDF dimensions.
 
 *  Related Applications:
-*     KAPPA: REGRID, SQORST, WCSADD
+*     KAPPA: REGRID, SQORST, WCSADD.
 
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
