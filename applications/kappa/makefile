@@ -2006,9 +2006,9 @@ do_deinstall:
 #
 #  Remove the links to the .par files of applications whose name clashes 
 #  with the C run-time library.
-	-rm -f $(INSTALL_BIN)/div.par
-	-rm -f $(INSTALL_BIN)/log10.par
-	-rm -f $(INSTALL_BIN)/pow.par
+	-rm -f $(INSTALL_IRAF)/div.par
+	-rm -f $(INSTALL_IRAF)/log10.par
+	-rm -f $(INSTALL_IRAF)/pow.par
 #
 #  Deinstall the IRAF-special interface files, if installed versions exist.
 	- for f in $(IRAF_IFC_FILES) ""; do \
