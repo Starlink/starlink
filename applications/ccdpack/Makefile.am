@@ -28,8 +28,6 @@ bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
 
 starhelp_DATA = ccdpack.shl
 
-stardocs_DATA = $(POSTSCRIPT_FIGURES)
-
 dist_pkgdata_DATA = ccdpack.news
 
 ccdpack_red_SOURCES = ccdpack_red.f
@@ -79,12 +77,6 @@ STARTUP_SCRIPT = ccdpack.csh
 ICL_STARTUP_SCRIPT = ccdpack.icl
 IRAF_STARTUP_SCRIPT = ccdpack.cl
 
-
-#  List of figures associated with the LaTeX documentation.
-
-POSTSCRIPT_FIGURES = sun139geo.eps sun139reg.eps sun139red.eps \
-                     sun139mos.eps sun139driz.eps sun139outsky.eps \
-                     sun139outclear.eps sun139outim.eps
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
