@@ -159,7 +159,7 @@
         ELSE
           CALL FIO_PUNIT( LUN, STATUS )
 
-          STATUS = SAI__ERROR
+          STATUS = ADI__RETRY
           CALL FTGERR( FITSTAT, ERRTEXT )
           CALL MSG_SETC( 'REASON', ERRTEXT )
           CALL ERR_REP( ' ', '^REASON', STATUS )

@@ -145,17 +145,26 @@
         DP = 0
       END IF
 
-*    Simple HDS file name?
+*  Simple HDS file name?
       IF ( DP .EQ. 0 ) THEN
 
-*      Try to open top level file
+*    Try to open top level file
         CALL HDS_OPEN( FSPEC(:FLEN), MODE, FLOC, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          STATUS = ADI__RETRY
+          GOTO 99
+        END IF
 
-*    Components or slicing specified?
+*  Components or slicing specified?
       ELSE
 
-*      Try to open top level file
+*     Try to open top level file
         CALL HDS_OPEN( FSPEC(:DP-1), MODE, TLOC, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          STATUS = ADI__RETRY
+          GOTO 99
+        END IF
+
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Locate sub-component
@@ -172,7 +181,7 @@
       END IF
 
 *    Opened ok?
-      IF ( STATUS .EQ. SAI__OK ) THEN
+ 99   IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Store the locator
         CALL ADI1_PUTLOC( FLOC, ID, STATUS )

@@ -2299,9 +2299,11 @@ F77_SUBROUTINE(adifn(getlst))( INTEGER(id), INTEGER(aid), INTEGER(bid),
   GENPTR_INTEGER(bid)
   GENPTR_INTEGER(status)
 
+  ADIobj	car,cdr;
+
   _chk_init;
 
-  _GET_CARCDR(aid,bid,*id);
+  _GET_CARCDR(car,cdr,*id); *aid = car; *bid = cdr;
 
   _ERR_REP( "ADI_GETLST", Estr__GetObjDat );
   }
