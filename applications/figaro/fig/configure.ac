@@ -16,7 +16,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
-dnl STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
