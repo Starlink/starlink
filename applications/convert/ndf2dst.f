@@ -577,6 +577,18 @@
          ELSE IF ( TYPE .EQ. '_INTEGER') THEN
             CALL VEC_SQRTI( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
      :                      IERR, NERR, STATUS )
+         ELSE IF ( TYPE .EQ. '_BYTE') THEN
+            CALL VEC_SQRTB( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+     :                      IERR, NERR, STATUS )
+         ELSE IF ( TYPE .EQ. '_WORD') THEN
+            CALL VEC_SQRTW( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+     :                      IERR, NERR, STATUS )
+         ELSE IF ( TYPE .EQ. '_UBYTE') THEN
+            CALL VEC_SQRTUB( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+     :                      IERR, NERR, STATUS )
+         ELSE IF ( TYPE .EQ. '_UWORD') THEN
+            CALL VEC_SQRTUW( BAD, NELM, %VAL(NVPTR), %VAL(FEPTR),
+     :                      IERR, NERR, STATUS )
          END IF
          
 *      Unmap .Z.ERRORS and the variance.
@@ -600,7 +612,7 @@
          CALL NDF_ASTAT( NDF, 'Centre', IAXIS, EXIST, STATUS )
          IF ( EXIST ) THEN
 
-*         Initialise flags to indicate that standard componennts have
+*         Initialise flags to indicate that standard components have
 *         not been copied.
             AXDATA = .FALSE.
             AXWIDT = .FALSE.
