@@ -369,6 +369,7 @@ proc adamtask.exit {{n 0}} {
 
 # First re-instate the original exit command to avoid calling this procedure
 # recirsively if anything goes wrong within it.
+    rename exit {}
     rename adamtask.realExit exit
 
     upvar #0 adamtask_priv priv
