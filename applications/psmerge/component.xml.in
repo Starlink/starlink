@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/psmerge</path>
+  <description>Merge EPS files</description>
+  <abstract><p>
+   This program merges one or more Encapsulated Postscript (EPS) files
+   into a single postscript file that can be sent to a printer.
+   Arbritrary origin shifts scaling and rotations can be applied to each
+   EPS file independently.
+   </p>
+   <p>It should not be confused with the completely different psmerge
+   utility that ships as part of the psutils package.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+    <person>
+      <name>R T Platon</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

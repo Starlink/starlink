@@ -43,6 +43,7 @@
    bounding box for each file, apply any transformation that is
    specified on the command line and "add" the individual bounding boxes
    to construct an overall bounding box for the whole output file.
+*/
 
 /*
  *  This is a posix conforming program
