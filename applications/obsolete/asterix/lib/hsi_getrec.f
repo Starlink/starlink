@@ -119,7 +119,7 @@
       CALL ADI_NEWV0I( IREC, IARG(2), STATUS )
 
 *  Simply invoke the method
-      CALL AST_EXEC( 'GetHistoryRec', 2, IARG, HRID, STATUS )
+      CALL ADI_EXEC( 'GetHistoryRec', 2, IARG, HRID, STATUS )
 
 *  Release temporary object
       CALL ADI_ERASE( IARG(2), STATUS )

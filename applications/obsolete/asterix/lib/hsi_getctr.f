@@ -111,7 +111,7 @@
       IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
 *  Simply invoke the method
-      CALL AST_EXEC( 'GetHistoryCtrl', 1, FID, HCID, STATUS )
+      CALL ADI_EXEC( 'GetHistoryCtrl', 1, FID, HCID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_GETCTR', STATUS )
