@@ -33,7 +33,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="atools">
-  <version>1.6-3</version>
+  <version>1.7</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -104,8 +104,32 @@ high-level interface to the AST library.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="coco">
+  <version>2.2-8</version>
+  <path>applications/coco</path>
+  <description>Conversion of Celestial Coordinates</description>
+  <abstract><p>
+The COCO program converts star coordinates from one system to
+another.  Both the improved IAU system, post-1976, and the old pre-1976
+system are supported.
+    </p></abstract>
+  <dependencies >
+    <build>sla</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Patrick Wallace</name>
+      <uname>ptw</uname>
+    </person>
+  </developers>
+  <documentation> sun56</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="convert">
-  <version>1.5-4</version>
+  <version>1.5-5</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -229,6 +253,96 @@ on-line catalogues via the Internet.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="docfind">
+  <version>1.3-1</version>
+  <path>applications/docfind</path>
+  <description>Starlink document index searching</description>
+  <abstract><p>
+   Simplify searching of Starlink documents. See also findme/showme.
+  </p></abstract>
+  <dependencies >
+    <build>info</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter Allan</name>
+    </person>
+    <person>
+      <name>Martin Bly</name>
+    </person>
+  </developers>
+  <documentation> sun38</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="echwind">
+  <version>3.1-4</version>
+  <path>applications/echwind</path>
+  <description>UCL Echelle Spectrograph Observation Planning</description>
+  <abstract><p>
+ECHWIND is used to assist in the planning of observations with either the
+Utrecht Echelle Spectrograph (UES) or the UCL coude echelle spectrograph
+(UCLES). It can be run at your home institution, when preparing an observing
+proposal, or before or during an observing run.
+  </p></abstract>
+  <dependencies >
+    <build>pgplot</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Marion Fisher</name>
+    </person>
+    <person>
+      <name>William Lupton</name>
+    </person>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+  </developers>
+  <documentation> sun53</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="esp">
+  <version>0.11</version>
+  <path>applications/esp</path>
+  <description>Extended Surface Photometry</description>
+  <abstract><p>ESP (Extended Surface Photometry) is a package of
+      application programs developed to allow you to determine the
+      photometric properties of galaxies and other extended objects.</p>
+    <p>It has applications that: detect flatfielding faults, remove
+  cosmic rays, median filter images, determine image statistics,
+  determine local background values, perform galaxy profiling, fit 2-D
+  Gaussian profiles to galaxies,  generate  pie slice cross-sections
+  of galaxies and display profiling results.</p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>ast</build><build>cat</build><build>chr</build><build>fio</build><build>grp</build><build>hds</build><build>ndf</build><build>par</build><build>mers</build><build>pda</build><build>prm</build><build>psx</build><build>sae</build><build>sgs</build><build>subpar</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+    </person>
+    <person>
+      <name>Grant Privett</name>
+    </person>
+  </developers>
+  <documentation> sun180</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="extractor">
   <version>2.3</version>
   <path>applications/extractor</path>
@@ -240,7 +354,7 @@ flexible configuration facilities and can handle images and catalogues in a
 variety of formats.
 </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>ast</build><build>ndf</build><build>sae</build><link>ndf</link>
+    <build>parsecon</build><build>dtask</build><build>ast</build><build>ndf</build><build>sae</build><link>ndf</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -255,7 +369,7 @@ variety of formats.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="scb">
+<component id="extreme">
   <version>0.1-1</version>
   <path>applications/extreme</path>
   <description>Handling Extreme Data Sets</description>
@@ -350,6 +464,30 @@ wide range of images and spectra.
     </person>
   </developers>
   <documentation> sun86</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="findcoords">
+  <version>1.0-1</version>
+  <path>applications/findcoords</path>
+  <description>Find the coordinates of a named object</description>
+  <abstract><p>
+findcoords is a utility for finding the equatorial coordinates of
+a named astronomical object.  You simply enter the name of the object
+and its coordinates are displayed.
+  </p></abstract>
+  <dependencies >
+    <build>cursa</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Clive Davenhall</name>
+      <uname>acd</uname>
+    </person>
+  </developers>
+  <documentation> sun240</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -550,7 +688,7 @@ Traces an HDS file
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="kappa">
-  <version>1.3-2</version>
+  <version>1.4</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -570,7 +708,7 @@ packages.
     </person>
     <person>
       <name>Malcolm Currie</name>
-      <uname>dsb</uname>
+      <uname>mjc</uname>
     </person>
   </developers>
   <documentation> sun95 sun221</documentation>
@@ -671,6 +809,105 @@ them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="chart">
+  <version>4.0-1</version>
+  <path>applications/obsolete/chart</path>
+  <description>CHART - Finding chart and stellar data system</description>
+  <abstract><p>
+The CHART package extracts positions, magnitudes and other data from
+certain stellar and non-stellar astronomical catalogues.  The results
+may be listed on a terminal or printer, or used to plot finding charts
+or perform astrometric reductions.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>mers</build><build>sgs</build><build>gks</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+      <uname>pma</uname>
+    </person>
+    <person>
+      <name>Ken Hartley</name>
+    </person>
+    <person>
+      <name>Joe Vickerstaff</name>
+    </person>
+    <person>
+      <name>Tim Wilkins</name>
+    </person>
+    <person>
+      <name>J V Carey</name>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+    </person>
+  </developers>
+  <documentation> sun32</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="email">
+  <version>1.4-1</version>
+  <path>applications/email</path>
+  <description>Astronomy email address searching</description>
+  <abstract><p>
+One of the most common activities on networked computers is the sending
+and receiving of personal electronic mail (email).  Starlink nodes are
+connected to the worldwide Internet network.  This document describes
+how to find email addresses to communicate with other astronomers
+and astronomy groups in the UK and the rest of the world.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M J Bly</name>
+    </person>
+    <person>
+      <name>G R Mellor</name>
+    </person>
+  </developers>
+  <documentation> sun182</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="iras90">
+  <version>1.1-2</version>
+  <path>applications/obsolete/iras90</path>
+  <description>IRAS90 - IRAS data processing</description>
+  <abstract><p>
+IRAS90 is a suite of programs for processing IRAS data.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>ard</build><build>agi</build><build>fio</build><build>snx</build><build>ndf</build><build>ary</build><build>sla</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Diana Parsons</name>
+    </person>
+    <person>
+      <name>W Gong</name>
+    </person>
+    <person>
+      <name>H J Walker</name>
+    </person>
+  </developers>
+  <documentation> sun161 sun163 sun165</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="photom">
   <version>1.9-0</version>
   <path>applications/photom</path>
@@ -705,7 +942,7 @@ them.
       
   </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build>
+    <build>parsecon</build><build>dtask</build><build>agi</build><build>cat</build><build>chr</build><build>fio</build><build>ndf</build><build>par</build><build>pda</build><build>prm</build><build>sae</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -744,6 +981,36 @@ display of vector maps.
     </person>
   </developers>
   <documentation> sun223</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="psmerge">
+  <version>1.0-6</version>
+  <path>applications/psmerge</path>
+  <description>Merge EPS files</description>
+  <abstract><p>
+   This program merges one or more Encapsulated Postscript (EPS) files
+   into a single postscript file that can be sent to a printer.
+   Arbritrary origin shifts scaling and rotations can be applied to each
+   EPS file independently.
+   </p>
+   <p>It should not be confused with the completely different psmerge
+   utility that ships as part of the psutils package.
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+    <person>
+      <name>R T Platon</name>
+    </person>
+  </developers>
+  <documentation> sun164</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -834,6 +1101,33 @@ display of vector maps.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
+<component id="spt">
+  <version>1.3-1</version>
+  <path>applications/spt</path>
+  <description>Software Porting Tools</description>
+  <abstract><p>
+SPT is an inhomogeneous set ofsoftware tools designed to assist in the
+conversion of code from one operating system to another (principally
+from VMS to UNIX and vice-versa, and between different flavours of
+UNIX).
+    </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D L Terrett</name>
+    </person>
+    <person>
+      <name>P M Allan</name>
+    </person>
+  </developers>
+  <documentation> sun111</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
 <component id="sst">
   <version>1.1</version>
   <path>applications/sst</path>
@@ -913,9 +1207,8 @@ display of vector maps.
     graphics user interfaces for Starlink applications in Tcl/Tk.</p>
   </abstract>
   <dependencies >
-    <build>starx</build><build>pcs</build><build>ems</build><build>gwm</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
+    <build>starx</build><build>adam</build><build>ams</build><build>dtask</build><build>ems</build><build>gwm</build><build>messys</build><build>mers</build><build>tcl</build><build>tk</build><build>nbs</build><build>sae</build><sourceset>star2html</sourceset><sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Dave Terrett</name>
@@ -923,8 +1216,7 @@ display of vector maps.
       <email>dlt@star.rl.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun186 sun219</documentation> -->
+  <documentation> sun186 sun219</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -946,6 +1238,36 @@ display of vector maps.
     </person>
   </developers>
   <documentation> ssn21</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="xdisplay">
+  <version>2.2</version>
+  <path>applications/xdisplay</path>
+  <description>Automatically determine how to set the DISPLAY variable</description>
+  <abstract><p>
+   This C shell script will set up the DISPLAY environment variable to
+   point to the machine that you logged in from. This allow X displays
+   created on a remote X client to be pointed back to your own terminal
+   or computer. Generally not needed since ssh does this automatically.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter Allan</name>
+    </person>
+    <person>
+      <name>Paul Collison</name>
+    </person>
+    <person>
+      <name>Brian McIlwrath</name>
+    </person>
+  </developers>
+  <documentation> sun129</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -984,6 +1306,28 @@ display of vector maps.
   </developers>
   <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="info">
+  <version>2004.1-1</version>
+  <path>etc/info</path>
+  <description>General admin files and doc index</description>
+  <abstract>
+    <p>These files contain the document index and general admin information.
+    </p>
+  </abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>USSC</name>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@starlink.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
@@ -1093,7 +1437,7 @@ display of vector maps.
 </component>
 
 <component id="ast">
-  <version>3.3-3</version>
+  <version>3.4</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -1756,16 +2100,15 @@ understand.
   <version>2.7-3</version>
   <path>libraries/kaplibs</path>
   <description>KAPLIBS - Internal subroutines used within the KAPPA package.</description>
-  <!-- <abstract><p>KAPLIBS is a package of Fortran subroutine 
+  <abstract><p>KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
 package of general purpose image processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
 KAPPA routines, so that KAPPA-like applications can be written and built
-independently of KAPPA.</p></abstract> -->
+independently of KAPPA.</p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>pcs</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>cnf</build><build>sae</build><build>mers</build><build>subpar</build><build>gks</build><build>gns</build><build>idi</build><build>agi</build><build>ast</build><build>cat</build><build>ndg</build><build>hds</build><build>chr</build><build>fio</build><build>grp</build><build>ndf</build><build>prm</build><build>par</build><build>psx</build><build>tcl</build><link>cat</link><link>mers</link><link>subpar</link><link>psx</link><link>ndg</link><link>ndf</link><link>ast</link><link>agi</link><link>fio</link><link>grp</link><link>trn</link><link>prm</link><link>mag</link><link>psx</link><link>pda</link><link>pgplot</link><sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>D.S. Berry</name>
@@ -1773,8 +2116,7 @@ independently of KAPPA.</p></abstract> -->
       <email>dsb@ast.man.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun238</documentation> -->
+  <documentation> sun238</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
@@ -1838,7 +2180,7 @@ Ultrix and for SunOS and may still work for them.
       used specifically for reporting error messages.</p>
   </abstract>
   <dependencies >
-    <build>cnf</build><build>ems</build><build>sae</build><link>chr</link><link>ems</link><link>psx</link><link>subpar</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
+    <build>cnf</build><build>ems</build><build>sae</build><build>psx</build><link>chr</link><link>ems</link><link>psx</link><sourceset>messgen</sourceset><sourceset>messgen</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2118,35 +2460,6 @@ Ultrix and for SunOS and may still work for them.
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
-<component id="pcs">
-  <version>4.1-1</version>
-  <path>libraries/pcs</path>
-  <description>The Parameter and Communication Subsystems</description>
-  <abstract><p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other
-      programs. The Parameter and Communication Subsystems (PCS) are a
-      set of closely-related subroutine libraries which provide these
-      facilities for many Starlink applications and the associated
-      user-interfaces.</p>
-    <p>The PCS libraries will not generally be called directly by
-      application programs, but form a basic part of the Starlink
-      Software Environment</p></abstract>
-  <dependencies >
-    <build>adam</build><build>ams</build><build>dtask</build><build>hdspar</build><build>lex</build><build>messys</build><build>misc</build><build>msp</build><build>parsecon</build><build>sock</build><build>string</build><build>subpar</build><build>task</build><sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-  <!-- <notes><p></p></notes> -->
-</component>
-<!-- component.xml.  Generated from component.xml.in by configure. -->
-
 <component id="dtask">
   <version>3.0</version>
   <path>libraries/pcs/dtask</path>
@@ -2318,6 +2631,29 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Documented in passing in SSN/29</p></notes>
+</component>
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pcs-docs">
+  <version>1.0</version>
+  <path>libraries/pcs/pcs-docs</path>
+  <description>PCS documentation</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+   <documentation> ssn29 ssn77 sun115 sun134 sun144 sun224 sun241</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
 </component>
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
@@ -2753,7 +3089,7 @@ Ultrix and for SunOS and may still work for them.
   <description>Native PGPLOT</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <build>cnf</build><build>gwm</build><link>gwm</link><link>cnf</link>
   </dependencies>
   <!--
   <developers>
