@@ -11,6 +11,7 @@
 *      7 Apr 95: V1.8-0 list entry and selection (RJV)
 *     20 NOV 95: V2.0-0 GUI version (RJV)
 *      2 May 96: V2.0-1 improved GUI version (RJV)
+*      8 May 96: V2.0-2 MODE parameter (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -24,14 +25,12 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*12 OPTION
-      INTEGER OID,NB
-      LOGICAL ENTER,SEL,SHOW
+      CHARACTER*8 MODE
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 2.0-1')
+      PARAMETER (VERSION='IPOSIT Version 2.0-2')
 *-
       CALL USI_INIT()
 
@@ -43,39 +42,23 @@
         CALL MSG_PRNT('AST_ERR: no image currently displayed')
       ELSE
 
+*  get operating mode
+        CALL USI_GET0C('MODE',MODE,STATUS)
+        CALL CHR_UCASE(MODE)
+        MODE=MODE(:3)
 
-*  see if dealing with multiple positions
-        CALL USI_GET0L('ENTER',ENTER,STATUS)
-        IF (ENTER) THEN
-
-          CALL IPOSIT_ENTER(STATUS)
-
-        ELSEIF (I_NPOS.GT.0) THEN
-          CALL USI_GET0L('SHOW',SHOW,STATUS)
-          IF (SHOW) THEN
-
-            CALL IPOSIT_SHOW(STATUS)
-
-          ELSE
-            CALL USI_GET0L('SEL',SEL,STATUS)
-            IF (SEL) THEN
-
-              CALL IPOSIT_SELECT(STATUS)
-
-            ENDIF
-          ENDIF
-
-        ELSE
-          SHOW=.FALSE.
-          SEL=.FALSE.
-        ENDIF
-
-*  single position mode
-        IF (.NOT.(ENTER.OR.SHOW.OR.SEL)) THEN
-
-          CALL IPOSIT_SINGLE(STATUS)
-
-
+        IF (MODE.EQ.'POI') THEN
+          CALL IPOSIT_POINT(STATUS)
+        ELSEIF (MODE.EQ.'ENT') THEN
+          CALL IPOSIT_ENTER(.FALSE.,STATUS)
+        ELSEIF (MODE.EQ.'APP') THEN
+          CALL IPOSIT_ENTER(.TRUE.,STATUS)
+        ELSEIF (MODE.EQ.'SEL') THEN
+          CALL IPOSIT_SELECT(STATUS)
+        ELSEIF (MODE.EQ.'SHO') THEN
+          CALL IPOSIT_SHOW(STATUS)
+        ELSEIF (MODE.EQ.'SAV')
+          CALL IPOSIT_SAVE(STATUS)
         ENDIF
 
 
@@ -86,8 +69,8 @@
       END
 
 
-*+  IPOSIT_SINGLE - set current position to given single position
-      SUBROUTINE IPOSIT_SINGLE(STATUS)
+*+  IPOSIT_POINT - set current position to selected point
+      SUBROUTINE IPOSIT_POINT(STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -269,7 +252,7 @@
 
 
 *+  IPOSIT_ENTER - enter a list of positions
-      SUBROUTINE IPOSIT_ENTER(STATUS)
+      SUBROUTINE IPOSIT_ENTER(APPEND,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -281,6 +264,7 @@
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIO_ERR'
 *    Import :
+      LOGICAL APPEND
 *    Import-Export :
 *    Export :
 *    Status :
@@ -301,7 +285,6 @@
       INTEGER L,SFID
       LOGICAL EXIST
       LOGICAL RADEC
-      LOGICAL APPEND
       LOGICAL REPEAT
 *    Global Variables :
       INCLUDE 'IMG_CMN'
@@ -315,7 +298,6 @@
           CALL GRP_NEW('Source list',I_POS_ID,STATUS)
 *  or append to or reset  existing one
         ELSE
-          CALL USI_GET0L('APPEND',APPEND,STATUS)
           IF (.NOT.APPEND) THEN
             CALL GRP_SETSZ(I_POS_ID,0,STATUS)
             I_NPOS=0
