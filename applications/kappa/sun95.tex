@@ -44362,6 +44362,21 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{ARDGEN}{ARDGEN}] \mbox{}
+      \begin{itemize}
+         \item Re-written to use the PGPLOT graphics library.
+         \item The output ARD file now contains WCS information.
+         \item A new parameter called STYLE has been added to specify
+         the plotting style.
+         \item The PALNUM and POICOL parameters have been removed. Use the
+         new STYLE parameter instead.
+         \item Three new options have been added for parameter OPTION:
+	 ``Undo'' removes the changes in the list of regions produced by
+	 the previous command; ``Draw'' draw the outline of the union of
+	 a specified selection of regions; ``style'' allows the plotting
+	 style to be changed.
+      \end{itemize}
+
    \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
       \begin{itemize}
          \item The COSYS parameter has been removed. Unless the ARD file

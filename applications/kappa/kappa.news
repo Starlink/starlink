@@ -3,13 +3,11 @@
    A new release of KAPPA (V.18) has been made. The changes are
    described fully in sun95.
 
+   - The following new commands have been added: ARDPLOT
+
    - The following commands have been converted to use the WCS component
-   of the NDF structure:
-
-   ARDMASK
-
-   COSYS parameters for the above commands have been removed.
-
+   of the NDF structure (COSYS parameters have been removed from these
+   commands): ARDMASK
 
    - The following obsolete commands have been removed from KAPPA -
    alternatives are indicate in SUN/95:
@@ -20,14 +18,19 @@
    KAPRH in order to satisfy any occasional need that may occur for them
    (see SUN/239):
 
+   - The ARDGEN command has been re-written to use the PGPLOT graphics library.
+   A new parameter called STYLE has been added, and the PALNUM and POICOL 
+   parameters have been removed. Three new options have been added for 
+   parameter OPTION: "Undo", "Draw", and "Style".
+
    - The PSF command now has a parameter PROFOUT which allows the
    displayed profile to be saved in a 1-dimensional NDF.
-
-   - The WCSALIGN command can now be used with 1-dimensonal NDFs.
 
    - The SETAXIS command will now create AXIS arrays by copying values
    from the corresponding axis of the current Frame in the WCS component
    of the NDF.
+
+   - The WCSALIGN command can now be used with 1-dimensonal NDFs.
 
    - Many of the internal subroutines used within KAPPA are of potential
    use to people developing their own applications. To make it easier for
