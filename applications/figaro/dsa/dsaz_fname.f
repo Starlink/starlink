@@ -1,5 +1,5 @@
 C+
-C                      D S A Z _ F N A M E _ I X 8 6 _ L I N U X
+C                      D S A Z _ F N A M E
 C
 C  Routine name:
 C     DSAZ_FNAME
@@ -136,6 +136,7 @@ C     19th Oct 1992  HME / UoE, Starlink.  Changed DTAZ_VERSNAME to
 C                    DTA_*, is a dummy routine anyway.
 C     28th Jul 1993  HME / UoE, Starlink.  Changed PSX_GETCWD to GEN_*.
 C     14th Jan 1994  HME / UoE, Starlink.  Fix small typo in prologue.
+C      1st Jul 2004  AA / Exeter, Starlink. Non-platform specific version
 C+
       SUBROUTINE DSAZ_FNAME (OBJECT,NEW,DEFEXTS,NEXTS,FILENAME,STRUCT,
      :                                                  ALTFILE,STATUS)
