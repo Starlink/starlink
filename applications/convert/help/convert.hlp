@@ -1,0 +1,6 @@
+1 CONVERT
+CONVERT is a package for converting common image formats to and from
+the Starlink standard data format---the NDF.  CONVERT commands are
+available from ICL and DCL.
+
+Type <CR> ? to see the main help topics.
