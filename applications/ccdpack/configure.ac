@@ -13,10 +13,19 @@ STAR_CHECK_PROGS(atclsh)
 STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(ifd2star)
 STAR_FC_LIBRARY_LDFLAGS
-AC_CHECK_LIB(tcl8.2,Tcl_Init)
-AC_CHECK_LIB(tk8.2,Tk_Init)
-AC_CHECK_LIB(itcl3.1,Itcl_Init)
-AC_CHECK_LIB(itk3.1,Itk_Init)
+
+TCL_VERSION=8.2
+ITCL_VERSION=3.1
+IWIDGETS_VERSION=3.0.0
+
+AC_SUBST(TCL_VERSION)
+AC_SUBST(ITCL_VERSION)
+AC_SUBST(IWIDGETS_VERSION)
+
+AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
+AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init)
+AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init)
+AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init)
 
 # Note that the starlink Tcl, Tk and ITcl are required, since we need
 # some somewhat-private include files.  I'm not sure how naughty 

@@ -5,9 +5,10 @@ SUBDIRS = @subdirs@
 
 ccdsupportdir = $(bindir)
 
-ccdsupport_DATA = $(DATA_FILES) ccdpack.shl
+ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
+                  $(TCL_SUPPORT_NOEXE) $(TCL_SUPPORT_EXE)
 
-bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SCR)
+bin_SCRIPTS = $(PUBLIC_SCR)
 
 bin_PROGRAMS = ccdwish
 
@@ -144,7 +145,51 @@ TCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
  Checkcontrol.tcl Markercontrol.tcl \
  raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
- ccdwishrc mkindex.tcl
+ ccdwishrc \
+ mkindex.tcl
+
+TCL_INDEX = tclIndex
+
+TCL_SUPPORT_BIN = atclsh
+
+TCL_SUPPORT_TCL = auto.tcl history.tcl init.tcl package.tcl parray.tcl \
+ safe.tcl word.tcl
+
+TCL_SUPPORT_TK = bgerror.tcl button.tcl clrpick.tcl comdlg.tcl console.tcl \
+ dialog.tcl entry.tcl focus.tcl listbox.tcl menu.tcl msgbox.tcl \
+ obsolete.tcl optMenu.tcl palette.tcl safetk.tcl scale.tcl scrlbar.tcl \
+ tearoff.tcl text.tcl tk.tcl tkfbox.tcl xmfbox.tcl
+
+TCL_SUPPORT_STARTCL = adamtask.tcl colourDialog.tcl dialogShow.tcl \
+ dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl printDialog.tcl
+
+TCL_SUPPORT_MSGRLY = adamMessageRelay
+
+TCL_SUPPORT_ITCL = itcl.tcl
+
+TCL_SUPPORT_ITK = Archetype.itk Toplevel.itk Widget.itk itk.tcl
+
+TCL_SUPPORT_IWIDGETS = buttonbox.itk calendar.itk canvasprintbox.itk \
+ canvasprintdialog.itk checkbox.itk colors.itcl combobox.itk dateentry.itk \
+ datefield.itk dialog.itk dialogshell.itk disjointlistbox.itk \
+ entryfield.itk extfileselectionbox.itk extfileselectiondialog.itk \
+ feedback.itk fileselectionbox.itk fileselectiondialog.itk finddialog.itk \
+ hierarchy.itk hyperhelp.itk labeledframe.itk labeledwidget.itk \
+ mainwindow.itk menubar.itk messagebox.itk messagedialog.itk notebook.itk \
+ optionmenu.itk pane.itk panedwindow.itk promptdialog.itk pushbutton.itk \
+ radiobox.itk regexpfield.itk roman.itcl scopedobject.itcl \
+ scrolledcanvas.itk scrolledframe.itk scrolledhtml.itk scrolledlistbox.itk \
+ scrolledtext.itk scrolledwidget.itk selectionbox.itk selectiondialog.itk \
+ shell.itk spindate.itk spinint.itk spinner.itk spintime.itk \
+ tabnotebook.itk tabset.itk timeentry.itk timefield.itk toolbar.itk \
+ unknownimage.gif watch.itk
+
+TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
+
+TCL_SUPPORT_NOEXE = $(TCL_SCRIPTS) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
+ $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
+ $(TCL_SUPPORT_IWIDGETS) $(TCL_INDEX)
+
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
@@ -157,6 +202,11 @@ IFD_FILES = ccdpack.ifd $(REDTASKS:=.ifd) $(REGTASKS:=.ifd) \
 
 
 #  Rules.
+
+
+$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) ccdwish
+	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
+        $(srcdir)/ccdwish mkindex.tcl
 
 ccdpack.shl: ccdpack.hlp
 	$(HLIB) ccdpack.hlp
@@ -172,6 +222,30 @@ $(IFL_FILES) $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT): $(IFD_FILES)
 IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
             $(SCRTASKS:=.ifl) ccdhelp.ifl
 
+
+#  Rules for copying versions of the files in the TCL_SUPPORT macro from
+#  elsewhere in the Starlink tree.
+STAR_LIB = $(STARLINK)/lib
+STAR_BIN = $(STARLINK)/bin
+
+$(TCL_SUPPORT_BIN):
+	cp $(STAR_BIN)/$@ $@
+$(TCL_SUPPORT_TCL):
+	cp $(STAR_LIB)/tcl$(TCL_VERSION)/$@ $@
+$(TCL_SUPPORT_TK):
+	cp $(STAR_LIB)/tk$(TCL_VERSION)/$@ $@
+$(TCL_SUPPORT_STARTCL):
+	cp $(STAR_LIB)/startcl/$@ $@
+$(TCL_SUPPORT_MSGRLY):
+	cp $(STAR_LIB)/startcl/$@ $@
+$(TCL_SUPPORT_ITCL):
+	cp $(STAR_LIB)/itcl$(ITCL_VERSION)/$@ $@
+$(TCL_SUPPORT_ITK):
+	cp $(STAR_LIB)/itk$(ITCL_VERSION)/$@ $@
+$(TCL_SUPPORT_IWIDGETS):
+	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERSION)/scripts/$@ $@
+$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
+	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; ./$(WISH) mkindex.tcl
 
 
 
