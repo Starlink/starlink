@@ -34,6 +34,7 @@ $result = GetOptions("help"    => \$h,
 		     "notau"   => \$notau,
 		     "tau=f"   => \$tauz,
 		     "sub=s"   => \$subinst,
+		     "clip"    => \$clip,
                      "noflat"  => \$noflat
 );
 
@@ -172,6 +173,31 @@ $status = &NDF::SAI__OK;
 
 (-e "$in.sdf") || die "REDUCE_SWITCH finished abnormally...stopping ($in.sdf was not created)\n";
 
+########################################################################
+# Before going further I need to find out some stuff about the 
+# observation.
+#   - Is this a SKYDIP?
+#   - Later on we need to know the number of subinstruments
+
+
+ndf_begin;
+ndf_find(&NDF::DAT__ROOT, $in, $indf, $status);
+ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+@fits = ();
+dat_get1c($xloc, 200, @fits, $nfits, $status);
+dat_annul($xloc, $status);
+ndf_annul($indf, $status);
+ndf_end($status);
+
+$mode = fits_get_item(@fits, "MODE");
+
+# This is a kludge for now until a real pipeline appears
+if ($mode eq "SKYDIP") {
+  undef $modify;
+  $noflat = 1;
+}
+
+
 
 ########################################################################
 #Modify
@@ -220,20 +246,6 @@ unless ($noflat) {
   $outflat = $in;
 }
 
-########################################################################
-# Before EXTINCTION can be run I need to find out some stuff about the 
-# observation.
-
-ndf_begin;
-ndf_find(&NDF::DAT__ROOT, $outflat, $indf, $status);
-ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
-@fits = ();
-dat_get1c($xloc, 200, @fits, $nfits, $status);
-dat_annul($xloc, $status);
-ndf_annul($indf, $status);
-ndf_end($status);
-
-$mode = fits_get_item(@fits, "MODE");
 
 $n_subs = fits_get_item(@fits, "N_SUBS");
 
@@ -266,6 +278,28 @@ foreach $onesub (@subs) {
   $subname = substr($subname, 0, 3);
   $outext = $in."_${subname}_ext";
 
+  # A nasty kludge for skydip data
+  if ($mode eq "SKYDIP") {
+    
+    @parlist = ('MSG_FILTER');
+    undef $modpars;
+    foreach $par (@parlist) {
+      $modpars = $modpars." $par=\\\"".$params{$par} . "\\\"" 
+	if ($params{$par} =~ /./);
+    }
+    $modpars .= " SUB_INSTRUMENT=$onesub";
+
+    $exstat = system("$root/skydip IN=$outflat $modpars");
+    die "SKYDIP finished abnormally...stopping (status = $exstat)\n"
+      if ($exstat != 0);
+
+    # Loop round
+    next;
+
+  }
+
+
+
   ########################################################################
   # Extinction
 
@@ -282,6 +316,8 @@ foreach $onesub (@subs) {
 
   $modpars .= " SUB_INSTRUMENT=$onesub";
 
+  $modpars .= " accept" if $quick;
+
   $exstat = system("$root/extinction IN=$outflat $modpars OUT=$outext");
   die "EXTINCTION finished abnormally...stopping (status = $exstat)\n"
     if ($exstat != 0);
@@ -291,16 +327,46 @@ foreach $onesub (@subs) {
   print "Extinction corrected data has been written to file $outext.sdf\n"
     unless $quiet;
 
+  ########################################################################
+  # SCUCLIP
 
+  if ($clip) {
+
+    $outclip = $in . "_" . $subname . "_clip";
+  
+    @parlist = ('MSG_FILTER', 'NSIGMA');
+
+    undef $modpars;
+    foreach $par (@parlist) {
+      $modpars = $modpars." $par=".$params{$par} 
+      if ($params{$par} =~ /./);
+    }
+    
+    $modpars .= " accept" if $quick;
+
+    $exstat = system("$root/scuclip IN=$outext $modpars OUT=$outclip");
+    die "SCUCLIP finished abnormally...stopping (status = $exstat)\n"
+      if ($exstat != 0);
+    
+    (-e "$outclip.sdf") || 
+      die "REMSKY finished abnormally...stopping ($outclip.sdf was not created)\n";
+
+
+    print "Sky corrected data has been written to file $outclip.sdf\n"
+      unless $quiet;
+
+    $outext = $outclip;
+
+  }
 
   ########################################################################
   # REMSKY
 
   if ($remsky) {
 
-    $outsky = $in."_sky_$subname";
+    $outsky = $in."_".$subname."_sky";
 
-    @parlist = ('BOLOMETERS','CLIP','MODE', 'NSIGMA');
+    @parlist = ('BOLOMETERS','MODE', 'MSG_FILTER','ITER_SIGMA','ADD');
     
     undef $modpars;
     foreach $par (@parlist) {
@@ -343,12 +409,12 @@ if ($mode eq 'PHOTOM') {
 
   $modpars .= " accept" if $quick;
 
-  $outphot = $in."_pht_$subname";
+  $outphot = $in."_".$subname . "_pht";
 
  $file = "$outphot.dat";
   if (-e $file) {
     unlink $file;
-    print "Removing old version of $outphot.dat\n" unless $quick;
+    print "Removing old version of $outphot.dat\n" unless $quiet;
   } 
 
   $exstat = system("$root/scuphot IN=$outext OUT=$outphot FILE=$outphot.dat $modpars");
@@ -386,7 +452,7 @@ if (($mode eq 'MAP' | $mode eq 'POINTING' | $mode eq 'PHOTOM') && $rebin){
   $modpars .= " accept" if $quick;
   $modpars .= " NOLOOP";
 
-  $outreb = $in."_reb_$subname";
+  $outreb = $in."_".$subname."_reb";
   $exstat = system("$root/rebin REF=$outext $modpars OUT=$outreb");
   die "REBIN finished abnormally...stopping (status = $exstat)\n"
     if ($exstat != 0);
@@ -426,6 +492,8 @@ __END__
 *    scuquick [-quick] [-tau|notau] NDF [PARAM=value]
 
 *  ADAM Parameters:
+*    -clip
+*	 Invoke the SCUCLIP task after EXTINCTION and before REMSKY.
 *    -help
 *        Print the help message.
 *    -quick
@@ -451,7 +519,7 @@ __END__
 *    -change_flat
 *        Invoke the CHANGE_FLATFIELD task after REDUCE_SWITCH
 *    -remsky
-*        Invoke the REMSKY task after EXTINCTION
+*        Invoke the REMSKY task after EXTINCTION (or SCUCLIP)
 *    -rebin
 *        Invoke the REBIN package after EXTINCTION (or REMSKY)
 *    NDF
@@ -506,6 +574,7 @@ __END__
 *    - Command line options can be abbreviated.
 *    - Options that take values can be used either as `-flag option' or
 *      as `--flag=option'
+*    - Supports SKYDIP files.
 
 *  Prior requirements:
 *    - The NDF perl module must exist (this should be installed by
@@ -513,7 +582,7 @@ __END__
 
 *  Related Applications:
 *    SURF: REDUCE_SWITCH, CHANGE_FLAT, FLATFIELD, EXTINCTION, REBIN, REMSKY,
-*          SCUPHOT
+*          SCUPHOT, SCUCLIP
 
 *-
 
