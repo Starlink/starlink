@@ -289,13 +289,16 @@
           END IF
         ELSE
 c  	  PRINT *, 'Irregular axes, not yet!'
+          HASPIX = .FALSE.
         END IF
       END IF
 
 *  Create the output structure
       CALL ADI_NEW0( 'STRUC', OARG, STATUS )
-      IF ( HASPIX ) THEN
+      IF ( HASPIX .AND. PIXID .GT. 0 ) THEN
         CALL ADI_CPUTID( OARG, 'Pix', PIXID, STATUS )
+      ELSE
+        CALL ADI_CPUTID( OARG, 'Pix', ADI__NULLID, STATUS )
       END IF
       CALL ADI_CPUTID( OARG, 'Proj', PRJID, STATUS )
       CALL ADI_CPUTID( OARG, 'Sys', SYSID, STATUS )
