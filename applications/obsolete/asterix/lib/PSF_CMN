@@ -27,7 +27,6 @@
         PARAMETER               ( PGRID_MAXR = 30 )
 
 *  Psf system initialised
-      LOGICAL                 	PSFINIT			! System initialised?
       LOGICAL                   PSFAUTO                 ! Automatic mode
 
 *  Spatial model
@@ -82,4 +81,4 @@
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :            P_FID, P_PSID, P_PLIST,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
-     :          PSFAUTO,PSFINIT				! System initialised flag
+     :          PSFAUTO
