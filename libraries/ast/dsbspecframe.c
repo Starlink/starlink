@@ -903,9 +903,11 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Otherwise report an error. */
          } else if( astOK ) {
-            astError( AST__ATTIN, "astSetAttrib(%s): DSBCentre given in an "
-                      "unsupported system of units \"%g %s\".", 
-                      astGetClass( this ), dval, setting + off );
+            astError( AST__ATTIN, "astSetAttrib(%s): Value supplied for "
+                      "attribute \"DSBCentre\" (%s) uses units which are "
+                      "inappropriate for the current spectral system (%s).", 
+                       astGetClass( this ), setting + 10, 
+                       astGetTitle( this ) );
          }
       }
 
@@ -960,8 +962,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Otherwise report an error. */
       } else if( astOK ) {
-         astError( AST__ATTIN, "astSetAttrib(%s): Intermediate frequency given in an "
-                   "unsupported system of units \"%g %s\".", 
+         astError( AST__ATTIN, "astSetAttrib(%s): Intermediate frequency given "
+                   "in an inappropriate system of units \"%g %s\".", 
                    astGetClass( this ), dval, setting + off );
       }
 
@@ -1509,6 +1511,12 @@ static AstMapping *USBMapping( AstDSBSpecFrame *this, const char *method ){
 *     DSBSpecFrame
 *        All DSBSpecFrames have this attribute.
 
+*  Note:
+*     - The attributes which define the transformation to or from topocentric 
+*     frequency should be assigned their correct values before accessing
+*     this attribute. These potentially include System, Unit, StdOfRest, 
+*     GeoLon, GeoLat, Epoch, RefRA, RefDec and RestFreq.
+
 *att--
 */
 /* The central frequency (topocentric frequency in Hz). */
@@ -1584,8 +1592,8 @@ astMAKE_TEST(DSBSpecFrame,IF,( this->ifr != AST__BAD ))
 *  Description:
 *     This attribute indicates whether the DSBSpecFrame currently
 *     represents its lower or upper sideband. It may take one of the
-*     case insensitive values "lsb" (for lower sideband) or "usb" (for 
-*     upper sideband). The default value is "usb".
+*     values "lsb" or "usb" (case insensitive). The default value is
+*     "usb".
 
 *  Applicability:
 *     DSBSpecFrame
@@ -1663,7 +1671,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* --------- */
    set = TestDSBCentre( this );
    dval = set ? GetDSBCentre( this ) : astGetDSBCentre( this );
-   astWriteDouble( channel, "DSBCen", set, 1, dval, "Central frequency (Hz)" );
+   astWriteDouble( channel, "DSBCen", set, 1, dval, "Central frequency (Hz topo)" );
 
 /* IF */
 /* -- */

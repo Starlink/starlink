@@ -2128,8 +2128,13 @@ f        AST_TRAN2), then it provides a means of converting coordinates
 *        destination coordinate system.
 
 *  Applicability:
+*     DSBSpecFrame
+*        Alignment occurs in the upper sideband expressed within the
+*        spectral system and standard of rest given by attributes AlignSystem 
+*        and AlignStdOfRest.
 *     Frame
-*        This function applies to all Frames.
+*        This function applies to all Frames. Alignment occurs within the
+*        coordinate system given by attribute AlignSystem.
 *     FrameSet
 c        If either of the "from" or "to" parameters is a pointer to a
 f        If either of the FROM or TO arguments is a pointer to a
@@ -2195,6 +2200,9 @@ c        it by specifying its domain in the "domainlist" string, or (b)
 f        it by specifying its domain in the DOMAINLIST string, or (b)
 *        making it the base Frame, since this is always considered
 *        first.
+*     SpecFrame
+*        Alignment occurs within the spectral system and standard of rest 
+*        given by attributes AlignSystem and AlignStdOfRest.
 
 *  Examples:
 c     cvt = astConvert( a, b, "" );
