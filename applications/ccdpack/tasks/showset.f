@@ -4,7 +4,7 @@
 *     SHOWSET
 
 *  Purpose:
-*     Output NDF Set membership characteristics.
+*     Output NDF Set membership attributes.
 
 *  Language:
 *     Starlink Fortran 77
@@ -24,14 +24,14 @@
 *     of NDFs.  It will show the Set Name and Set Index attributes for
 *     each NDF, and whether it contains a CCD_SET coordinate frame
 *     in its WCS component.  The NDFs are output grouped by Set Name
-*     or Set Index.  If required, a subset of the NDFs, those with 
-*     certain Name and/or Index attributes, may be examined; in this
-*     case the acceptable Names/Indexes can be given explicitly or
-*     as a list of NDFs whose values they have to match.  The names
-*     of the NDFs selected for output may be written to a list file.
-*     SHOWSET can therefore be used to construct files listing
-*     those NDFs in a given Set, or corresponding NDFs in different
-*     Sets.
+*     or Set Index.  If required, a restricted list of NDFs, those with 
+*     certain Name and/or Index attributes, may be selected for output;
+*     in this case the acceptable Names/Indexes can be given explicitly
+*     or as a list of template NDFs whose attributes they have to match.
+*     The names of the NDFs selected for output may be written to a 
+*     list file.  SHOWSET can therefore be used to construct files 
+*     listing those NDFs in a given Set, or corresponding NDFs in 
+*     different Sets.
 
 *  Usage:
 *     showset in
@@ -40,24 +40,18 @@
 *     IN = LITERAL (Read)
 *        A list of NDFs to examine.
 *     INDEX = LITERAL (Read)
-*        This parameter restricts NDFs which will be output; only those
-*        with a Set Name attribute corresponding to this parameter
-*        will be selected.  If it has the null value (!) then all
-*        Indices will be used.  Otherwise it must be a group expression
-*        whose interpretation depends on the INDEXLIKE parameter:
-*        if INDEXLIKE is true then all NDFs with the same Index
-*        attribute as those listed by this parameter will be selected,
-*        but if INDEXLIKE is false then only NDFs with the Index 
-*        attributes explicitly listed in this parameter will be 
-*        selected.  Specifying an Index value multiple times in the
-*        list has no additional effect.
-*        [!]
-*     INDEXLIKE = _LOGICAL (Read)
-*        Affects the interpretation of the INDEX parameter: if true
-*        then INDEX gives a list of NDFs used to select output NDFs
-*        with the same Index attribute, and if false then INDEX gives
-*        a list of literal Index attribute values.
-*        [FALSE]
+*        If PICKINDEX=EQUAL this parameter restricts which files will
+*        be selected for output.  It must be a group expression
+*        (a comma-separated list) each member of which is an acceptable
+*        INDEX value.  Only files with a Set Index value equal to 
+*        one of these will be selected.
+*     INDEXLIKE = LITERAL (Read)
+*        If PICKINDEX=LIKE this parameter restricts which files will
+*        be selected for output.  It must be a group expression 
+*        (a comma-separated list which may employ wildcards or 
+*        indirection) each member of which represents an image to
+*        be used as a template.  Only images with a Set Index value 
+*        matching that of one of the template images will be selected.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -84,43 +78,57 @@
 *        default is "BOTH".
 *        [BOTH]
 *     NAME = LITERAL (Read)
-*        This parameter restricts which NDFs will be output; only those
-*        with a Set Name attribute corresponding to this parameter
-*        will be selected.  If it has the null value (!) then all
-*        Names will be used.  Otherwise it must be a group expression
-*        whose interpretation depends on the LIKENDF parameter: 
-*        if NAMELIKE is true then all NDFs with the same Name
-*        attribute as those listed by this parameter will be selected,
-*        but if NAMELIKE is false then only NDFs with the Name
-*        attributes explicitly listed in this parameter will be 
-*        selected.  Specifying a Name value multiple times in the 
-*        list has no additional effect.
-*        [!]
-*     NAMELIKE = _LOGICAL (Read)
-*        Affects the interpretation of the NAME parameter: if true
-*        then NAME gives a list of NDFs used to select output NDFs
-*        with the same Name attribute, and if false then NAME gives
-*        a list of literal Name attribute values.
-*        [FALSE]
+*        If PICKNAME=EQUAL this parameter restricts which files will
+*        be selected for output.  It must be a group expression
+*        (a comma-separated list) each member of which is a string.
+*        Only files with a Set Name value the same as one of these 
+*        will be selected.
+*     NAMELIKE = LITERAL (Read)
+*        If PICKNAME=LIKE this parameter restricts which files will
+*        be selected for output.  It must be a group expression 
+*        (a comma-separated list which may employ wildcards or 
+*        indirection) each member of which represents an image to
+*        be used as a template.  Only images with a Set Name value 
+*        matching that of one of the template images will be selected.
 *     NAMELIST = LITERAL (Read)
 *        The name of an output file in which to write the names of
-*        the NDFs selected for output.  Only the NDF names and not 
+*        the images selected for output.  Only the image names and not 
 *        the Set attributes will be written to this file, so it 
 *        can be used as an indirection file for input to other 
 *        CCDPACK commands.
-*        [SHOWSET.LIS]
+*        [showset.lis]
+*     PICKINDEX = LITERAL (Read)
+*        Indicates how NDFs are to be filtered by Set Index attribute for
+*        output.  Takes one of the following values:
+*           - ALL     -- All Index values are acceptable
+*           - EQUAL   -- Only Index values listed in the INDEX parameter
+*                        value are acceptable
+*           - LIKE    -- Only Index values the same as those of the images
+*                        listed in the INDEXLIKE parameter are acceptable.
+*
+*        [ALL]
+*     PICKNAME = LITERAL (Read)
+*        Indicates how NDFs are to be filtered by Set Name attribute for
+*        output.  Takes one of the following values:
+*           - ALL     -- All Name values are acceptable
+*           - EQUAL   -- Only Name values listed in the NAME parameter
+*                        value are acceptable
+*           - LIKE    -- Only Name values the same as those of the images
+*                        listed in the NAMELIKE parameter are acceptable.
+*
+*        [ALL]
 *     SETLESS = _LOGICAL (Read)
 *        If there are no restrictions on which Sets to display, because
-*        NAME and INDEX are both set to null, this parameter determines
-*        what happens to NDFs which have no Set headers.  If SETLESS
-*        is true, they are selected for output, but if SETLESS is false,
-*        they are discarded.
+*        PICKNAME and PICKINDEX are both set to ALL, this parameter
+*        determines what happens to NDFs which have no Set headers.
+*        If SETLESS is true, they are selected for output, but if 
+*        SETLESS is false, they are discarded.
 *        [FALSE]
-*     SORTBY = LITERAL (Read)
+*     LISTBY = LITERAL (Read)
 *        Indicates the way in which NDFs should be grouped for output.
 *        It may take the value 'NAME' or 'INDEX'; if NDFs which differ
-*        in both Name and Index attribute are being output, the 
-*        then those with the same Name, or those with the same Index,
+*        in both Name and Index attribute are being output, then
+*        those with the same Name, or those with the same Index,
 *        will be grouped together according to the value of this
 *        parameter.  If only NDFs with the same Name or with the
 *        same Index are being output, this will have no effect.
@@ -137,19 +145,21 @@
 *        those NDFs with no Set header information will be displayed
 *        as well.
 *
-*     showset * namelike=true name="gc6235a,gc4021a" namelist=gc.lis
+*     showset * pickname=like namelike="gc6235a,gc4021a" namelist=gc.lis
 *        This will list all the NDFs in the current directory which
 *        are in the same Set as the NDFs gc6235a and gc4021a.
 *        As well as showing the Set information of these files on
 *        the screen, the names of the files thus selected will be
 *        written to the file gc.lis.
 *
-*     showset fdata reset
+*     showset fdata setless reset
 *        This will just show the Name and Set information of the file
 *        fdata.  If fdata is a container file, it will show the
-*        Set information for all the datasets within it.
+*        Set information for all the datasets within it.  Since the
+*        SETLESS parameter is given, even if it has no Set header
+*        output will be written.
 *
-*     showset dat* indexlike=false index=3 logto=neither namelist=out.lis
+*     showset dat* pickindex=equal index=3 logto=neither namelist=out.lis
 *        This will write a list of NDF names to the file out.lis
 *        choosing only those which have a Set Index attribute value
 *        of 3.  There will be no output to the screen or log file.
@@ -220,6 +230,7 @@
       INTEGER KEYGRP             ! GRP identifier for keys
       INTEGER NAMGRP             ! GRP identifier for allowed Set Name atts
       INTEGER NCHAR              ! Number of characters in conversion
+      INTEGER NEWGRP             ! Temporary GRP identifier
       INTEGER NGRP               ! Number of elements in IGRP
       INTEGER NIND               ! Number of elements in INDGRP
       INTEGER NNAM               ! Number of elements in NAMGRP
@@ -230,8 +241,6 @@
       INTEGER NSPLIT             ! Number of subgroups
       INTEGER OKGRP              ! GRP identifier for selected NDFs
       INTEGER SPLGRP( CCD1__MXNDF ) ! NDG identifiers for subgroups of INGRP
-      LOGICAL ILIKE              ! Treat INDEX parameter as list of NDFs?
-      LOGICAL NLIKE              ! Treat NAME parameter as list of NDFs?
       LOGICAL NOSET              ! Does NDF have no Set headers?
       LOGICAL OK                 ! Can current NDF be selected?
       LOGICAL SETLES             ! Output NDFs with no Set headers?
@@ -239,6 +248,8 @@
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for character output
       CHARACTER * ( VAL__SZI ) SINDEX ! String representation of INDEX att
+      CHARACTER * ( 12 ) IPICK   ! How to filter by Index
+      CHARACTER * ( 12 ) NPICK   ! How to filter by Name
       CHARACTER * ( 12 ) SRTKEY  ! Primary sort type ('NAME' or 'INDEX')
 
 *.
@@ -270,98 +281,122 @@
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NNDF, STATUS )
 
 *  Get the primary sort key.
-      CALL PAR_CHOIC( 'SORTBY', ' ', 'INDEX,NAME', .FALSE., SRTKEY,
+      CALL PAR_CHOIC( 'LISTBY', ' ', 'INDEX,NAME', .FALSE., SRTKEY,
      :                STATUS )
 
-*  Get the interpretation of the INDEX restriction.
-      CALL PAR_GET0L( 'INDEXLIKE', ILIKE, STATUS )
+*  How will we filter by Set Name?
+      CALL PAR_CHOIC( 'PICKNAME', 'ALL', 'ALL,EQUAL,LIKE', .TRUE.,
+     :                NPICK, STATUS )
 
-*  Get the group of allowed Set Index attribute values.
-      NSPLIT = 0
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-      INDGRP = GRP__NOID
-
-*  If selecting Index attributes by similarity to a group of NDFs, 
-*  get the group.
-      IF ( ILIKE ) THEN
-         CALL CCD1_NDFGL( 'INDEX', 1, CCD1__MXNDF, INDFGR, NIND,
-     :                    STATUS )
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            NIND = 0
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Construct from the group of NDFs a group of acceptable Index values.
-            CALL GRP_NEW( 'CCD:INDICES', INDGRP, STATUS )
-            DO I = 1, NIND
-               CALL NDG_NDFAS( INDFGR, I, 'READ', INDF, STATUS )
-               CALL CCD1_SETRD( INDF, AST__NULL, NAME, INDEX, JSET,
-     :                          STATUS )
-               CALL NDF_ANNUL( INDF, STATUS )
-               CALL CHR_ITOC( INDEX, SINDEX, NCHAR )
-               CALL GRP_PUT( INDGRP, 1, SINDEX( 1:NCHAR ), 0, STATUS )
-            END DO
-         END IF
-         CALL CCD1_GRDEL( INDFGR, STATUS )
-
-*  If selecting Indexes given explicitly, generate a group of acceptable
-*  Index values directly.
-      ELSE
-         CALL CCD1_STRGR( 'INDEX', GRP__NOID, 1, CCD1__MXNDF, INDGRP,
-     :                    NIND, STATUS )
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            CALL CCD1_GRDEL( INDGRP, STATUS )
-            NIND = 0
-         END IF
-      END IF
-
-*  Get the interpretation of the NAME restriction.
-      CALL PAR_GET0L( 'NAMELIKE', NLIKE, STATUS )
-
-*  Get the group of allowed Set Name attribute values.
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-      NAMGRP = GRP__NOID
-
-*  If selecting Name attributes by similarity to a group of NDFs,
-*  get the group.
-      IF ( NLIKE ) THEN
-         CALL CCD1_NDFGL( 'NAME', 1, CCD1__MXNDF, NNDFGR, NNAM,
-     :                    STATUS )
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            NNAM = 0
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-
-*  Construct from the group of NDFs a group of acceptable Name values.
-            CALL GRP_NEW( 'CCD:NAMES', NAMGRP, STATUS )
-            DO I = 1, NNAM
-               CALL NDG_NDFAS( NNDFGR, I, 'READ', INDF, STATUS )
-               CALL CCD1_SETRD( INDF, AST__NULL, NAME, INDEX, JSET,
-     :                          STATUS )
-               CALL NDF_ANNUL( INDF, STATUS )
-               CALL GRP_PUT( NAMGRP, 1, NAME( 1:CHR_LEN( NAME ) ), 0,
-     :                       STATUS )
-            END DO
-         END IF
-         CALL CCD1_GRDEL( NNDFGR, STATUS )
-
-*  If selecting Names given explicitly, generate a group of acceptable
-*  Name values directly.
-      ELSE
+*  Get a list of acceptable Name values.
+*  If the list of acceptable Names is to be supplied explicitly, get it
+*  directly from the parameter.
+      IF ( NPICK .EQ. 'EQUAL' ) THEN
          CALL CCD1_STRGR( 'NAME', GRP__NOID, 1, CCD1__MXNDF, NAMGRP,
      :                    NNAM, STATUS )
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            CALL CCD1_GRDEL( NAMGRP, STATUS )
-            NNAM = 0
+
+*  If the list is by similarity to a template group of NDFs, get the
+*  group and construct the list.
+      ELSE IF ( NPICK .EQ. 'LIKE' ) THEN
+         CALL CCD1_NDFGL( 'NAMELIKE', 1, CCD1__MXNDF, NNDFGR, NNAM,
+     :                    STATUS )
+         CALL GRP_NEW( 'CCD:NAMES', NAMGRP, STATUS )
+         DO I = 1, NNAM
+            CALL NDG_NDFAS( NNDFGR, I, 'READ', INDF, STATUS )
+            CALL CCD1_SETRD( INDF, AST__NULL, NAME, INDEX, JSET,
+     :                       STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
+            CALL GRP_PUT( NAMGRP, 1, NAME( 1:CHR_LEN( NAME ) ), 0,
+     :                    STATUS )
+         END DO
+         CALL CCD1_GRDEL( NNDFGR, STATUS )
+
+*  No restrictions on Name.
+      ELSE
+         NNAM = 0
+      END IF
+
+*  Purge the Name group of duplicate entries if it exists.
+      IF ( NAMGRP .NE. GRP__NOID ) THEN
+         CALL GRP_PURGE( NAMGRP, NEWGRP, STATUS )
+         CALL CCD1_GRDEL( NAMGRP, STATUS )
+         NAMGRP = NEWGRP
+         CALL GRP_GRPSZ( NAMGRP, NNAM, STATUS )
+      END IF
+
+*  How will we filter by Set Index?
+      CALL PAR_CHOIC( 'PICKINDEX', 'ALL', 'ALL,EQUAL,LIKE', .TRUE.,
+     :                IPICK, STATUS )
+
+*  Get a list of acceptable Index values.
+*  If the list of acceptable Indices is to be supplied explicitly,
+*  get it directly from the parameter.
+      IF ( IPICK .EQ. 'EQUAL' ) THEN
+         CALL CCD1_STRGR( 'INDEX', GRP__NOID, 1, CCD1__MXNDF, INDGRP,
+     :                    NIND, STATUS )
+
+*  If the list is by similarity to a template group of NDFs, get the
+*  group and construct the list.
+      ELSE IF ( IPICK .EQ. 'LIKE' ) THEN
+         CALL CCD1_NDFGL( 'INDEXLIKE', 1, CCD1__MXNDF, INDFGR, NIND,
+     :                    STATUS )
+         CALL GRP_NEW( 'CCD:INDICES', INDGRP, STATUS )
+         DO I = 1, NIND
+            CALL NDG_NDFAS( INDFGR, I, 'READ', INDF, STATUS )
+            CALL CCD1_SETRD( INDF, AST__NULL, NAME, INDEX, JSET,
+     :                       STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
+            CALL CHR_ITOC( INDEX, SINDEX, NCHAR )
+            CALL GRP_PUT( INDGRP, 1, SINDEX( 1:NCHAR ), 0, STATUS )
+         END DO
+
+*  No restrictions on Index.
+      ELSE
+         NIND = 0
+      END IF
+
+*  Purge the Index group of duplicate entries if it exists.
+      IF ( INDGRP .NE. GRP__NOID ) THEN
+         CALL GRP_PURGE( INDGRP, NEWGRP, STATUS )
+         CALL CCD1_GRDEL( INDGRP, STATUS )
+         INDGRP = NEWGRP
+         CALL GRP_GRPSZ( INDGRP, NIND, STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  If the question might arise, see what we should do with NDFs which 
+*  have no Set headers.
+      SETLES = .TRUE.
+      IF ( INDGRP .EQ. GRP__NOID .AND. NAMGRP .EQ. GRP__NOID ) THEN
+         CALL PAR_GET0L( 'SETLESS', SETLES, STATUS )
+
+*  Log setless selection criteria.
+         IF ( .NOT. SETLES ) THEN
+            CALL CCD1_MSG( ' ', 
+     :      '  Selection excludes NDFs with no Set headers.', STATUS )
          END IF
       END IF
 
-*  If it might happen, see what we should do with NDFs which have
-*  no Set headers.
-      IF ( INDGRP .EQ. GRP__NOID .AND. NAMGRP .EQ. GRP__NOID ) THEN
-         CALL PAR_GET0L( 'SETLESS', SETLES, STATUS )
+*  Log Set Name selection criteria.
+      IF ( NAMGRP .NE. GRP__NOID ) THEN
+         LINE = '  Selection restricted to Set Name values: '
+         DO I = 1, NNAM
+            CALL GRP_GET( NAMGRP, I, 1, LINE( 44: ), STATUS )
+            CALL MSG_SETC( 'LINE', LINE )
+            CALL CCD1_MSG( ' ', '^LINE', STATUS ) 
+            LINE = ' '
+         END DO
+      END IF
+
+*  Log Set Index selection criteria.
+      IF ( INDGRP .NE. GRP__NOID ) THEN
+         LINE = '  Selection restricted to Set Index values: '
+         DO I = 1, NIND
+            CALL GRP_GET( INDGRP, I, 1, LINE( 45: ), STATUS )
+            CALL MSG_SETC( 'LINE', LINE )
+            CALL CCD1_MSG( ' ', '^LINE', STATUS )
+            LINE = ' '
+         END DO
       END IF
          
 *  Split the NDFs up by Set.
@@ -475,11 +510,19 @@
                IF ( SRTKEY .EQ. 'NAME' ) THEN
                   LINE( 12:21 ) = SINDEX
                   LINE( 24:66 ) = NDFNAM
-                  IF ( JSET .GT. 0 ) LINE( 70: ) = 'yes'
+                  IF ( JSET .GT. 0 ) THEN
+                     LINE( 70: ) = 'yes'
+                  ELSE
+                     LINE( 70: ) = 'no '
+                  END IF
                ELSE
                   LINE( 10:38 ) = NAME
                   LINE( 40:66 ) = NDFNAM
-                  IF ( JSET .GT. 0 ) LINE( 70: ) = 'yes'
+                  IF ( JSET .GT. 0 ) THEN
+                     LINE( 70: ) = 'yes'
+                  ELSE
+                     LINE( 70: ) = 'no '
+                  END IF
                END IF
                CALL CCD1_MSG( ' ', LINE, STATUS )
             END IF
