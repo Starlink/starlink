@@ -909,7 +909,7 @@ silently mapped.</p>
 
 <element gi="meqnarray" status="stable">
 <p>Displayed maths equation.  It consists of a sequence of <elemref gi="mline"/> elements, each of which is a line of a LaTeX
-<code>\\begin{eqnarray}...\\end{eqnarray}</code> environment, and which
+<code>\begin{eqnarray}...\end{eqnarray}</code> environment, and which
 must, therefore, have two ampersands within it.
 </p>
 </element>
@@ -917,7 +917,7 @@ must, therefore, have two ampersands within it.
 
 <element gi="mequation" status="stable">
 <p>Displayed equation.  Use LaTeX notation, as if you were writing
-inside a <code>\\begin{equation}...\\end{equation}</code> pair in a LaTeX
+inside a <code>\begin{equation}...\end{equation}</code> pair in a LaTeX
 document.</p>
 <p>You may include a <elemref gi="mlabel"/> element within the equation
 to number and possibly refer to the equation.
@@ -939,9 +939,9 @@ elsewhere.</p>
 <element gi="mline" status="stable">
 <p>A single line of a <elemref gi="meqnarray"/> element.  It consists of
 a line of a LaTeX 
-<code>\\begin{eqnarray}...\\end{eqnarray}</code> environment, and
+<code>\begin{eqnarray}...\end{eqnarray}</code> environment, and
 must, therefore, have two ampersands within it.  It is not terminated
-by <code>\\\\</code>
+by <code>\\</code>
 </p>
 </element>
 
@@ -949,15 +949,16 @@ by <code>\\\\</code>
 <element gi="mdefs" status="beta">
 <p>This element allows you to make definitions which are global to the
 maths elements in your document.  That is, you may put in these
-elements <code>\\def</code> and <code>\\newcommand</code> commands which will
+elements <code>\def</code> and <code>\newcommand</code> commands which will
 be in effect for all the <elemref gi="m"/>, <elemref gi="mequation"/>,
 <elemref gi="meqnarray"/> and <elemref gi="mline"/> elements which
-follow it.</p>
+follow them.</p>
 
-<p>In different versions of the down-converters, it may or may not be
-true that definitions in one maths element remain valid in later
-ones.  Do not rely on this, as it is unsupported behaviour, and may
-change without warning.</p>
+<p>Don't put any definitions in the other maths elements.  In
+different versions of the down-converters, it may or may not be true
+that such definitions remain in effect in subsequent elements: do not rely
+on either behaviour, as it is unsupported, and may change without
+warning.</p>
 
 <p>The contents of this element are processed as arbitrary LaTeX.
 However, you should not include anything other than definition
@@ -971,7 +972,7 @@ mess up your document in the present and, what is much worse,
 down-converter, which <em>will</em> assume you have done nothing hacky
 here.</p>
 
-<p>That is <em>Do Not Hack This!</em></p>
+<p>In other words: <em>Do Not Hack This!</em></p>
 </element>
 
 
