@@ -1,3 +1,7 @@
+ERRNO_ERR
+fiotest.ifc
+make-errno-err
+starconf.status
 config.h
 config.h.in
 sun143.ps

@@ -2,6 +2,7 @@
 
 lib_LTLIBRARIES = libfio.la libfio_adam.la
 bin_SCRIPTS = fio_link fio_link_adam
+noinst_PROGRAMS = make-errno-err
 
 libfio_la_SOURCES = \
 	$(BLOCK_DATA_STANDALONE) \
@@ -13,6 +14,8 @@ libfio_adam_la_SOURCES = \
 	$(F_ROUTINES_ADAM)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
+
+make_errno_err_SOURCES = make-errno-err.c
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -83,7 +86,16 @@ PRIVATE_INCLUDES = \
 	FIOGOPA_CMN \
 	FIOUNT_CMN \
         FIOPAR_SYS \
-	FIOPA_CMN
+	FIOPA_CMN \
+	ERRNO_ERR
+
+# ERRNO_ERR is generated from make-errno-err
+ERRNO_ERR:  make-errno-err
+	-rm -f ERRNO_ERR
+	$(srcdir)/make-errno-err
+
+# and required by fio1_serr
+fio1_serr.lo: ERRNO_ERR
 
 # fiotest is an ADAM monolith
 # Note that fio_test.f is not used anywhere but there is no calling
