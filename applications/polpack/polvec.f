@@ -796,7 +796,7 @@
       ELSE IF ( DEBIAS .AND. ( .NOT. VAR ) .AND. 
      :          STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_OUT( 'POLVEC_ERR3', 'Vectors will not be '/
+         CALL ERR_REP( 'POLVEC_ERR3', 'Vectors will not be '/
      :                 /'corrected for statistical bias because no '/
      :                 /'variance values are available.', STATUS )
          CALL ERR_FLUSH( STATUS )
