@@ -24,6 +24,9 @@
 *     Lines with no references to the %VAL directive are left alone,
 *     except that trailing whitespace may be stripped.
 *
+*     The program must also insert a line including the CNF_PAR 
+*     include file.
+*
 *     Attention is paid to fortran 77 source format, so that lines are
 *     more than 72 characters long are avoided (unless they were there
 *     in the first place.
@@ -56,6 +59,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
 #define MAXCONT 100                     /* Maximum continuation lines        */
 #define MAXNEST 100                     /* Deepest level of bracket nesting  */
@@ -63,8 +68,11 @@
 
 
 /* Local function prototypes. */
-   void outbuf( char *buffer, char *interp[], int leng );
+   void addcpv( char *buffer, char *interp[], int leng );
    void inscnf();
+   void writeout();
+   void outchar( char c );
+   void interpnow();
 
 /* Global variables. */
    char *name;                          /* Name of the program               */
@@ -126,6 +134,208 @@
 
 
 
+   int tokmatch( int *toks, ... ) {   /* Last arg should be zero. */
+       va_list ap;
+       int mtok;
+
+       va_start( ap, toks );
+       while ( mtok = va_arg( ap, int ) ) {
+          if ( mtok != *(toks++) ) {
+             va_end( ap );
+             return 0;
+          }
+       }
+       va_end( ap );
+       return 1;
+   }
+
+
+
+#include "tag.h"
+
+
+   struct outchr {
+      char *interp;
+      short flag;
+      unsigned char indent;
+      char chr;
+   };
+
+
+   void outbuf( struct outchr *buf, int leng ) {
+      char c;
+      char chr;
+      char ebuf[ LBUFSIZ ];
+      int eindent[ LBUFSIZ ];
+      char *interp;
+      int col;
+      int done;
+      int epos;
+      int flag;
+      int hadint;
+      int i;
+      int ind;
+      int indent;
+      int j;
+      int k;
+      int level;
+      int ninterp = 0;
+      int nonblank;
+      int oc;
+      int started;
+      int we;
+
+      epos = -1;
+      hadint = 0;
+      for ( oc = 0; oc < leng; oc++ ) {
+
+         chr = buf[ oc ].chr;
+         interp = buf[ oc ].interp;
+         flag = buf[ oc ].flag;
+         indent = buf[ oc ].indent;
+
+         if ( flag == LINE_START ) {
+            epos = 0;
+            level = 0;
+            hadint = 0;
+         }
+
+/* Outside a line, interpolations are output without special care. */
+         if ( epos < 0 ) {
+            if ( interp != NULL ) {
+               while ( c = *( interp++ ) ) 
+                  putchar( c );
+               hadint = 1;
+            }
+            putchar( chr );
+         }
+
+/* Within a line it is ensured that interpolations do not cause characters
+   to overflow beyond column 72. */
+         else {
+
+            if ( interp != NULL ) {
+               while ( c = *( interp++ ) ) {
+                  ebuf[ epos ] = c;
+                  eindent[ epos ] = indent;
+                  epos++;
+               }
+               hadint = 1;
+            }
+
+/* It's not a line end; just add it to the buffer. */
+            if ( chr != '\n' ) {
+               ebuf[ epos ] = chr;
+               eindent[ epos ] = indent;
+               epos++;
+            }
+
+/* It's a line end.  Process the line now. */
+            else {
+
+/* Strip trailing whitespace if there have been interpolations, as it
+   simplifies matters later on. */
+               if ( hadint )
+                  while ( epos >= 0 && ebuf[ epos - 1 ] == ' ' ) epos--;
+
+/* There are no interpolations, or any interpolations do not cause the
+   line to overflow 72 columns.  Output it without further ado. */
+               if ( ! hadint || epos < 72 ) {
+                  for ( i = 0; i < epos; i++ ) putchar( ebuf[ i ] );
+               }
+
+/* Interpolations cause the line to overflow.  We will have to break the 
+   line. */
+               else {
+
+/* The procedure is to identify 'word boundaries'; if all text up to the
+   next boundary can be output on the current line do so, otherwise
+   introduce a line break and continue with the rest of the input.
+   A word starts at a '%' and ends at the first character at the same
+   level of bracketing which is none of ')', ',' or ' '.  */
+                  i = 0;
+                  col = 1;
+                  while ( i < epos ) {
+
+/* Find the next place a line break could occur. */
+                     done = 0;
+                     level = 0;
+                     started = 0;
+                     for ( j = i; !done && j < epos; j++ ) {
+                        if ( ebuf[ i ] == '%' ) {
+                           switch ( ebuf[ j + 1 ] ) {
+                              case '(':
+                                 level++;
+                                 started = 1;
+                                 break;
+                              case ')':
+                                 level--;
+                                 break;
+                              case ' ':
+                              case ',':
+                                 break;
+                              case '\n':
+                                 done = 1;
+                                 break;
+                              default:
+                                 done = ( started && level <= 0 );
+                           }
+                        }
+                        else {
+                           done = ( ebuf[ j + 1 ] == '%' ) || col + j == 6;
+                        }
+                     }
+                     j--;
+                     for ( we = j; isspace( ebuf[ we ] ) && we > i; we-- );
+      
+/* If this word won't fit on the current line, output a line break now. */
+                     if ( we - i + col > 72 ) {
+      
+/* Set best indent value. */
+                        ind = eindent[ i ];
+                        if ( ind < 6 ) ind = 6;
+                        if ( we - i + ind + 1 > 72 ) ind = 9;
+                        if ( we - i + ind + 1 > 72 ) ind = 6;
+                        if ( we - i + ind + 1 > 72 )
+                           fprintf( stderr, 
+                                    "%s: Failed to break line\n", name );
+      
+/* Output the line break, unless we've just done one. */
+                        if ( col != 7 ) {
+                           putchar( '\n' );
+                           for ( k = 1; k <= ind; k++ )
+                              putchar( k == 6 ? ':' : ' ' );
+                           col = ind;
+                        }
+                     }
+      
+/* Now output the word. */
+                     while ( i <= j ) {
+                        if ( 1 ) {
+                           putchar( ebuf[ i ] );
+                           col++;
+                        }
+                        i++;
+                     }
+                  }
+
+               }
+
+               putchar( '\n' );
+               epos = 0;
+               hadint = 0;
+            }
+         }
+
+         if ( flag == LINE_END ) {
+               for ( i = 0; i < epos; i++ ) putchar( ebuf[ i ] );
+               epos = -1;
+         }
+
+      }
+   }
+
+
    void inscnf() {
 /*
 *+
@@ -145,24 +355,32 @@
 *     function.
 *-
 */
+#define MAXTOK 1000                          /* Maximum tokens in a line     */
+#define LINELENG 160
+#define MAXLEVEL 100
 
-/* Declare local variables. */
-      char *cpc[ 4 ];                   /* CNF_PVAL closer strings           */
-      char *cpo[ 4 ];                   /* CNF_PVAL opener strings           */
-      char *interp[ LBUFSIZ ];          /* Pointers to interpolated strings  */
-      char buffer[ LBUFSIZ ];           /* Buffer for raw input text         */
-      char c;                           /* Character read                    */
-      char lastc;                       /* Previous character read           */
-      int column;                       /* Column of input text              */
-      int comment;                      /* Is it a comment line?             */
-      int flush;                        /* Is it time to process buffer?     */
-      int leng;                         /* Length of buffer                  */
-      int level;                        /* Level of bracket nesting          */
-      int scase;                        /* Apparent case of source code      */
-      int sspace;                       /* Apparent spacing convention       */
-      int spotcpv;                      /* Have we found CNF_PVAL string?    */
-      int spotval;                      /* Have we found %VAL string?        */
-      int valat[ MAXNEST ];             /* Nesting level of %VAL start       */
+      int tokid[ MAXTOK ];
+      int tokpos[ MAXTOK ];
+      char c;
+      char *tokstr[ MAXTOK ];
+      int col;
+      int incpos = 0;
+      int i;
+      int j;
+      int leng;
+      int level;
+      int ntok;
+      int nval = 0;
+      int stcol[ MAXLEVEL ];
+      int tok;
+      int yleng;
+      int bufsiz = 0;
+      struct outchr *buf;
+      char *cpo[ 4 ];
+      char *cpc[ 4 ];
+      char *pc;
+      int scase;
+      int sspace;
 
 /* Set up strings for output. */
 #define CASE_UPPER 0
@@ -177,384 +395,157 @@
       cpc[ CASE_UPPER | SPACE_NO  ] = ")";
       cpc[ CASE_LOWER | SPACE_YES ] = " )";
       cpc[ CASE_LOWER | SPACE_NO  ] = ")";
+      scase = CASE_UPPER;
+      sspace = SPACE_YES;
 
-/* Initialise values for source code processing. */
+/* Initialise. */
+      ntok = 0;
       leng = 0;
-      level = 0;
-      column = 0;
-      comment = 0;
-      spotval = 0;
-      spotcpv = 0;
 
-/* Cycle through characters of source file. */
-      while ( ( c = getchar() ) != EOF ) {
+      while ( tok = yylex() ) {
 
-/* Increment source column and buffer position. */
-         leng++;
-         column++;
-
-/* Copy character to output buffer. */
-         buffer[ leng - 1 ] = c;
-         interp[ leng - 1 ] = NULL;
-
-/* Work out whether this is a suitable time to process the current contents
-   of the buffer.  Suitable is when it contains a whole source line, give
-   or take some ignorable characters near the start or finish.  This will
-   be the case when a comment line has just started or finished, or when
-   we see the start of a source line which is not a continuation line. */
-         flush = 0;
-         if ( column == 1 && strchr( "*cCdD!", c ) ) { 
-            comment = 1;
-            flush = 1;
-         }
-         if ( comment && ( c == '\n' || c == '\r' ) ) {
-            comment = 0;
-            flush = 1;
-         }
-         if ( column == 6 && strchr( " 0", c ) ) {
-            flush = 1;
-         }
-
-/* If the buffer is ready to be processed, then process it and reset 
-   some values appropriately. */
-         if ( flush ) {
-            outbuf( buffer, interp, leng );
-            leng = 0;
-            level = 0;
-            spotval = 0;
-            spotcpv = 0;
-         }
-
-/* Significant part of source card. */
-         if ( column > 6 && column < 73 && ! comment ) {
-
-/* Act appropriately for each significant character. */
-            switch( c ) {
-
-               case '(':
-                  level++;
-                  valat[ level ] = 0;
-                  if ( spotval == 4 ) valat[ level ] = leng;
-                  if ( spotcpv == 8 ) valat[ level - 1 ] = 0;
-                  spotval = spotcpv = 0;
-                  break;
-               case ')':
-                  sspace = ( lastc == ' ' ) ? SPACE_YES : SPACE_NO;
-                  if ( valat[ level ] ) {
-                     interp[ valat[ level ] - 1 ] = cpo[ scase | sspace ];
-                     interp[ leng - 1 ] = cpc[ scase | sspace ];
-                  }
-                  if ( level > 0 ) level--;
-                  spotval = spotcpv = 0;
-                  break;
-               case '%':
-                  spotval = 1;
-                  spotcpv = 0;
-                  break;
-               case 'v':
-               case 'V':
-                  spotval = ( spotval == 1 ) ? 2 : 0;
-                  spotcpv = ( spotcpv == 5 ) ? 6 : 0;
-                  break;
-               case 'a':
-               case 'A':
-                  spotval = ( spotval == 2 ) ? 3 : 0;
-                  spotcpv = ( spotcpv == 6 ) ? 7 : 0;
-                  break;
-               case 'l':
-               case 'L':
-                  spotval = ( spotval == 3 ) ? 4 : 0;
-                  spotcpv = ( spotcpv == 7 ) ? 8 : 0;
-                  scase = ( c == 'l' ) ? CASE_LOWER : CASE_UPPER;
-                  break;
-
-               case 'c':
-               case 'C':
-                  spotcpv = ( spotcpv == 0 ) ? 1 : 0;
-                  spotval = 0;
-                  break;
-               case 'n':
-               case 'N':
-                  spotcpv = ( spotcpv == 1 ) ? 2 : 0;
-                  spotval = 0;
-                  break;
-               case 'f':
-               case 'F':
-                  spotcpv = ( spotcpv == 2 ) ? 3 : 0;
-                  spotval = 0;
-                  break;
-               case '_':
-                  spotcpv = ( spotcpv == 3 ) ? 4 : 0;
-                  spotval = 0;
-                  break;
-               case 'p':
-               case 'P':
-                  spotcpv = ( spotcpv == 4 ) ? 5 : 0;
-                  spotval = 0;
-                  break;
-            
-               case ' ':
-               case '\n':
-               case '\t':
-               case '\r':
-                  break;
-
-               default:
-                  spotval = spotcpv = 0;
-            }
-         }
-         lastc = c;
-         if ( c == '\n' || c == '\r' ) column = 0;
-      }
-
-/* Flush any remaining text in buffer. */
-      outbuf( buffer, interp, leng );
-
-/* Warn about dangerous characters. */
-      if ( tabwarn )
-         fprintf( stderr, 
-                  "%s: Warning - %d '%s's in modified lines.\n", 
-                  name, tabwarn, "\\t" );
-   }
-
-
-   void outbuf( char *buffer, char *interp[], int leng ) {
-/*
-*+
-*  Name:
-*     outbuf
-*
-*  Purpose:
-*     Output text with interpolations.
-*
-*  Usage:
-*     outbuf( char *buffer, char *interp[], int leng )
-*
-*  Description:
-*     This routine outputs a small chunk of text with interpolations
-*     as given by its arguments.  Where necessary it will make suitable
-*     line breaks.
-*
-*     If any interpolated text is present, this routine should be called 
-*     with a single line of source code (i.e. a set of continuation lines
-*     with matched brackets and so on).  Otherwise line breaks may get
-*     put in ugly (though not incorrect) places.  If there is
-*     no interpolation to be done, then output is identical to input,
-*     so it doesn't matter.
-*
-*  Arguments:
-*     buffer = char *
-*        A pointer to the start of the raw input text.
-*     interp[] = char *
-*        Interp is an array containing one pointer to char for each 
-*        character in buffer.  If any of its elements is non-NULL,
-*        then it is interpreted as a pointer to a null-terminated string
-*        to interpolate after the corresponding character of buffer in
-*        the output text.  (Note the term `interpolate' is used here in
-*        its textual sense, and has nothing to do with, e.g. linear
-*        interpolation - cf. Perl documentation etc).
-*     leng = int
-*        The number of characters in buffer, and also the number of 
-*        valid pointers in interp.
-*-
-*/
-
-/* Declare local variables. */
-      char c;                           /* Character read                    */
-      char *ls[ MAXCONT ];              /* Start of line                     */
-      char *pc;                         /* Pointer to character              */
-      char *qc;                         /* Pointer to character              */
-      char *rc;                         /* Pointer to character              */
-      char *we;                         /* Pointer to end of word            */
-      char ebuf[ LBUFSIZ ];             /* Buffer holding expanded text      */
-      static int col = 1;               /* Current output column             */
-      int done;                         /* Has a line break been found?      */
-      int eindent[ LBUFSIZ ];           /* Preferred indentation at each char*/
-      int eleng;                        /* Length of ebuf                    */
-      int i;                            /* Loop counter                      */
-      int isinterp[ MAXCONT ];          /* Does line contain interpolations? */
-      int istab[ MAXCONT ];             /* Does line contain tab characters? */
-      int indent;                       /* Characters of indent              */
-      int j;                            /* Loop counter                      */
-      int lcol;                         /* Temporary column counter          */
-      int line;                         /* Index of current line             */
-      int lines;                        /* Number of lines in buffer         */
-      int ll[ MAXCONT ];                /* Length of lines                   */
-      int level;                        /* Parenthesis nesting level         */
-      int nonblank;                     /* Is line so far blank?             */
-      int started;                      /* Has word count got started?       */
-      int stcol[ MAXNEST ];             /* Start column of nesting level     */
-
-/* Copy the input buffer, with interpolations, into an expanded buffer.
-   Identify line starts, line lengths, and whether each line contains any 
-   interpolations. */
-      line = 0;
-      qc = ebuf;
-      isinterp[ line ] = 0;
-      istab[ line ] = 0;
-      ls[ line ] = ebuf;
-      ll[ line ] = 0;
-      for ( i = 0; i < leng; i++ ) {
-         *(qc++) = buffer[ i ];
-         if ( interp[ i ] != NULL ) {
-            isinterp[ line ] = 1;
-            for ( pc = interp[ i ]; *pc; pc++ )
-               *(qc++) = *pc;
-         }
-         if ( buffer[ i ] == '\t' ) {
-            istab[ line ] = 1;
-         }
-         if ( buffer[ i ] == '\n' || i == leng - 1 ) {
-
-/* If there are any interpolations on this line, strip trailing whitespace
-   to simplify matters later on. */
-            if ( isinterp[ line ] && buffer[ i ] == '\n' ) {
-               while ( qc[ -1 ] == ' ' && qc > ls[ line ] ) {
-                  qc[ -1 ] = '\n';
-                  qc--;
-               }
-            }
-            if ( isinterp[ line ] && istab[ line ] ) {
-               tabwarn++;
-            }
-            ll[ line ] = qc - ls[ line ];
-            line++;
-            if ( line >= MAXCONT - 1 ) {
-               fprintf( stderr, "%s: ERROR - too many continuation lines.\n",
-                        name );
-               exit( 1 );
-            }
-            isinterp[ line ] = 0;
-            istab[ line ] = 0;
-            ls[ line ] = qc;
-            ll[ line ] = 0;
-         }
-         if ( ( qc - ebuf ) >= LBUFSIZ ) {
-            fprintf( stderr, "%s: ERROR - buffer too small.\n", name );
+/* Assemble a line in terms of tokens. */
+         tokid[ ntok ] = tok;
+         tokpos[ ntok ] = leng;
+         tokstr[ ntok ] = yylval;
+         tokid[ ++ntok ] = 0;
+         if ( ntok >= MAXTOK ) {
+            fprintf( stderr, "%s: Too many tokens in line\n", name );
             exit( 1 );
          }
-      }
-      lines = line + 1;
-      eleng = qc - ebuf;
 
-/* Set the natural indent level at each position of the buffer.  This is
-   to do with brackets. */
-      level = 0;
-      lcol = col;
-      stcol[ level ] = 0;
-      for ( pc = ebuf; pc - ebuf < eleng; pc++ ) {
-         if ( lcol > 6 ) {
-            switch ( *pc ) {
-               case '(':
-                  level++;
-                  stcol[ level ] = 0;
-                  break;
-               case ')':
-                  level--;
-                  break;
-               case ' ':
-               case '\t':
-               case '\n':
-                  break;
-               default:
-                  if ( stcol[ level ] == 0 ) stcol[ level ] = lcol - 1;
+/* Add text to output buffer. */
+         yleng = strlen( yylval );
+         if ( leng + yleng >= bufsiz ) {
+            bufsiz += BUFINC;
+            buf = memok( realloc( buf, bufsiz * sizeof( struct outchr ) ) );
+            for ( i = 0; i < BUFINC; i++ ) {
+               buf[ bufsiz - i - 1 ].interp = NULL;
+               buf[ bufsiz - i - 1 ].chr = '\0';
+               buf[ bufsiz - i - 1 ].flag = 0;
+               buf[ bufsiz - i - 1 ].indent = 0;
             }
          }
-         eindent[ pc - ebuf ] = stcol[ level ];
-         if ( *pc == '\n' ) lcol = 0;
-         lcol++;
-      }
-
-/* Process expanded buffer a line at a time. */
-      for ( line = 0; line < lines; line++ ) {
-
-/* If there are no interpolations in this line, or the line including 
-   interpolations can fit on the source card, then output it unchanged. */
-         if ( ! isinterp[ line ] || col + ll[ line ] < 73 ) {
-            for ( i = 0; i < ll[ line ]; i++ ) {
-               putchar( ls[ line ][ i ] );
-               if ( ls[ line ][ i ] == '\n' ) col = 0;
-               col++;
-            }
+         for ( i = 0; i < yleng; i++ ) {
+            buf[ leng + i ].chr = yylval[ i ];
          }
+         switch( tok ) {
+            case LINE_START:
+            case LINE_END:
+            case '(':
+            case ')':
+               buf[ leng ].flag = tok;
+            default:
+         }
+         leng += yleng;
 
-/* The expanded line will not fit in 72 columns.  We need to add some 
-   line breaks. */
-         else {
+/* If we have reached the end of a line, process the line. */
+         if ( tok == LINE_END || tok == COMMENT_LINE || tok == BLANK_LINE ) {
 
-/* The procedure is to identify 'word boundaries'; if all text up to the
-   next boundary can be output on the current line do so, otherwise 
-   introduce a line break and continue with the rest of the input.
-   A word starts at a '%' and ends at the first character at the same
-   level of bracketing which is none of ')', ',' or ' '.  */
-            pc = ls[ line ];
-            while ( pc < ls[ line ] + ll[ line ] ) {
+/* INCLUDE line - mark as spot for interpolating "INCLUDE 'CNF_PVAL'". */
+            if ( tokmatch( tokid, LINE_START, INCLUDE, STRING_CONSTANT, 
+                                  LINE_END, 0 ) ) { 
+               if ( incpos ) buf[ incpos ].interp = NULL;
+               incpos = tokpos[ 3 ] + yleng;
+               buf[ incpos ].interp = pc = calloc( LINELENG, 1 );
+               strcpy( pc, "      " );
+               pc += 6;
+               for ( i = tokpos[ 1 ]; ( *(pc++) = buf[ i ].chr ) != '\''; i++ );
+               strcpy( pc, "CNF_PAR'" );
+               for ( j = 0; ( c = buf[ i + j ].chr ) != '\n' && c != '!' ; j++);
+               if ( c == '!' ) {
+                  while ( --j > 8 ) strcat( pc, " " );
+                  strcat( pc, "! For CNF_PVAL function" );
+               }
+               strcat( pc, "\n" );
+            }
 
-/* Find the next place a line break could occur. */
-               done = 0;
-               level = 0;
-               started = 0;
-               for ( qc = pc; qc - ls[ line ] < ll[ line ] - 1; qc++ ) {
-                  if ( *pc == '%' ) {
-                     switch ( qc[ 1 ] ) {
-                        case '(':
+/* END line - reset some counters. */
+            else if ( tokmatch( tokid, LINE_START, END, LINE_END, 0 ) ) {
+               buf[ tokpos[ 1 ] ].flag = END;
+               if ( nval == 0 ) {
+                  if ( incpos ) 
+                     buf[ incpos ].interp = NULL;
+               }
+               else {
+                  if ( ! incpos ) 
+                     fprintf( stderr, "%s: Failed to include CNF_PAR\n", name );
+               }
+               nval = 0;
+               incpos = 0;
+            }
+
+/* Otherwise, it is potentially an executable line. */
+            else {
+
+/* Check if it contains a %VAL invocation. */
+               for ( i = 0; i < ntok; i++ ) {
+                  if ( tokmatch( tokid + i, (int) '%', VAL, (int) '(', 0 )
+                     && tokid[ i + 3 ] != CNF_PVAL ) {
+                     scase = islower( buf[ tokpos[ i + 1 ] ].chr )
+                                ? CASE_LOWER : CASE_UPPER;
+                     sspace = buf[ tokpos[ i + 2 ] + 1 ].chr == ' '
+                                ? SPACE_YES : SPACE_NO;
+                     level = 1;
+                     for ( j = i + 3; j < ntok; j++ ) {
+                        if ( tokid[ j ] == '(' ) {
                            level++;
-                           started = 1;
-                           break;
-                        case ')':
+                        }
+                        else if ( tokid[ j ] == ')' ) {
                            level--;
-                           break;
-                        case ' ':
-                        case ',':
-                           break;
-                        case '\n':
-                           done = 1;
-                           break;
-                        default:
-                           done = ( started && level <= 0 );
+                           if ( level == 0 ) {
+                              buf[ tokpos[ i + 3 ] ].interp = 
+                                 cpo[ scase | sspace ];
+                              buf[ tokpos[ j ] ].interp = cpc[ scase | sspace ];
+                              nval++;
+                              break;
+                           }
+                        }
                      }
                   }
-                  else {
-                     done = ( qc[ 1 ] == '%' );
+               }
+
+/* Set natural indent levels. */
+               level = 0;
+               col = 0;
+               for ( i = tokpos[ 0 ]; i <= tokpos[ ntok - 1 ]; i++ ) {
+                  if ( ! isspace( buf[ i ].chr ) && col > 6 ) {
+                     if ( stcol[ level ] > col ) stcol[ level ] = col;
                   }
-                  if ( done ) break;
-               }
-               for ( we = qc; isspace( *we ) && we > pc; we-- );
-
-/* If this word won't fit on the current line, output a line break now. */
-               if ( we - pc + col > 73 ) {
-
-/* If no non-blank output so far this line, discard leading blanks. */
-                  nonblank = 0;
-                  for ( rc = pc; rc <= qc; rc++ ) 
-                     if ( col + rc - pc != 6 && *rc != ' ' ) nonblank = 1;
-                  if ( ! nonblank ) pc = qc;
-
-/* Set best indent value. */
-                  indent = eindent[ pc - ebuf ];
-                  if ( indent < 6 ) indent = 6;
-                  if ( we - pc + indent > 73 ) indent = 9;
-                  if ( we - pc + indent > 73 ) indent = 6;
-                  if ( we - pc + indent > 73 ) 
-                     fprintf( stderr, "%s: Failed to break line\n", name );
-
-/* Output the line break. */
-                  putchar( '\n' );
-                  for ( i = 1; i <= indent; i++ )
-                     putchar( i == 6 ? ':' : ' ' );
-                  col = indent;
-               }
-
-/* Now output the word. */
-               while ( pc <= qc ) {
-                  putchar( *pc );
-                  if ( *pc == '\n' ) col = 0;
-                  pc++;
+                  if ( buf[ i ].flag == '(' ) {
+                     level++;
+                     stcol[ level ] = 99999;
+                  }
+                  else if ( buf[ i ].flag == ')' ) {
+                     level--;
+                  }
                   col++;
+                  if ( buf[ i ].chr == '\n' ) {
+                     col = 0;
+                  }
+                  buf[ i ].indent = stcol[ level ] < 72 ? stcol[ level ] : 0;
                }
+
             }
+            ntok = 0;
          }
       }
+
+/* End of text; ensure that the INCLUDE lines are in the right place. */
+      if ( nval == 0 ) {
+         if ( incpos ) 
+            buf[ incpos ].interp = NULL;
+      }
+      else {
+         if ( ! incpos ) 
+            fprintf( stderr, "%s: Failed to include CNF_PAR.\n", name );
+      }
+
+/* Pass control to the output routine. */
+      outbuf( buf, leng );
    }
 
-/* $Id$ */
+
+
+
+
