@@ -323,11 +323,11 @@ objs: ${OBJS}
 
 
 wish$(EXEEXT): $(WISH_OBJS) $(TK_LIB_FILE)
-	$(CC) @LD_FLAGS@ $(WISH_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
+	$(CC) @LD_FLAGS@ ${CFLAGS} $(WISH_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
 		$(TK_CC_SEARCH_FLAGS) -o wish
 
 tktest$(EXEEXT): $(TKTEST_OBJS) $(TK_LIB_FILE)
-	${CC} @LD_FLAGS@ $(TKTEST_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
+	${CC} @LD_FLAGS@ ${CFLAGS} $(TKTEST_OBJS) @TK_BUILD_LIB_SPEC@ $(LIBS) \
 		$(TK_CC_SEARCH_FLAGS) -o tktest
 
 xttest: test.o tkTest.o tkSquare.o $(TK_LIB_FILE)
