@@ -7,9 +7,10 @@
 # -------------------------
 # Defaults for Starlink configure.ac files.  The optional OPTIONS
 # argument holds a space-separated list of option keywords, of which
-# the only one at present is `per-package-dirs', which causes
+# the only ones at present are `per-package-dirs', which causes
 # applications and help to be installed in a package-specific
-# directory.
+# directory, and 'docs-only', which indicates that the component contains
+# only documentation.
 #
 # Certain features of this macro are documented in SSN/78, in particular
 #   - Sets STARLINK
@@ -20,21 +21,27 @@
 # the earlier behaviour.  Everything else is, in principle, private
 # (not that that's going to stop folk).
 AC_DEFUN([STAR_DEFAULTS],
-[#
-_star_per_package_dirs=false
-for opt in $1 NONE
-do
-    case $opt in
-        per-package-dirs)
-            _star_per_package_dirs=:
-            ;;
-        NONE)
-            ;;
-        *)
-            echo "Unrecognised [STAR_DEFAULTS] option $1 ignored"
-            ;;
-    esac
-done
+[##
+## Options must be parsed at autoconf time, so that we define
+## _poss_STAR_RESTFP_FIX as a macro.  That must be defined exactly once
+## during this option processing.
+m4_ifval([$1],
+         [AC_FOREACH([Option], [$1],
+                     [m4_case(Option,
+                              [per-package-dirs], [_star_per_package_dirs=:],
+                              [docs-only], [m4_define([_poss_STAR_RESTFP_FIX],
+                                                      [])dnl
+                                           _star_docs_only=:],
+                              [AC_FATAL([$0: unrecognised option $1])])
+                      ])],
+         [])
+m4_ifdef([_poss_STAR_RESTFP_FIX],
+         [],
+         [m4_define([_poss_STAR_RESTFP_FIX], [_STAR_RESTFP_FIX])])
+
+test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
+test -n "$_star_docs_only"        || _star_docs_only=false
+
 
 # Ensure that STARLINK has a value, defaulting to
 # @STARCONF_DEFAULT_STARLINK@.  Note that this directory may be
@@ -113,6 +120,14 @@ AC_ARG_WITH(stardocs,
                  _star_build_docs=:
              fi])
 
+if $_star_docs_only; then
+    if $_star_build_docs; then
+        : OK
+    else
+        AC_MSG_WARN([Building without documentation in a docs-only directory])
+    fi
+fi
+
 # Everything depends on where /star is.  Declare STARLINK as a
 # `precious variable'.  Amongst other things, this will make
 # ./configure squeal if the package is re-configured with an
@@ -143,9 +158,9 @@ if test -n "$STARLINK"; then
     LDFLAGS="$LDFLAGS -L$STARLINK/lib"
 fi
 
-# Fixups for the notorious restFP link problem on OSX+g77.
-# This macro does nothing on other platforms.
-_STAR_RESTFP_FIX
+## If the docs-only option was given, this expands to nothing,
+## else to the _STAR_RESTFP_FIX macro. 
+_poss_STAR_RESTFP_FIX
 
 # Installation directory options.  This must match the variables handled
 # by _STAR_EXTRADIR_COMMON
@@ -298,6 +313,8 @@ test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 AC_DEFUN([STAR_MESSGEN],
          [#
           m4_ifval([$1], [], [AC_FATAL([$0: called with no message file])])dnl
+          $_star_docs_only &&
+              AC_MSG_ERROR([STAR[]_MESSGEN in docs-only directory])
           AC_FOREACH([MsgFileName], [$1],
                      [m4_define([MsgFacCode],
                                 m4_normalize(esyscmd([sed -n '/\.FACILITY/{s/.*, *\([0-9]*\).*/\1/p;q;}' ]MsgFileName)))dnl
@@ -399,7 +416,9 @@ done
 # to the end of C symbols.
 #
 AC_DEFUN([STAR_CNF_COMPATIBLE_SYMBOLS],
-         [AC_CACHE_CHECK([how to make Fortran and C play nicely],
+         [$_star_docs_only &&
+              AC_MSG_ERROR([STAR[]_CNF_COMPATIBLE_SYMBOLS in docs-only dir])
+          AC_CACHE_CHECK([how to make Fortran and C play nicely],
                          [star_cv_cnf_compatible_symbols],
                          [AC_REQUIRE([AC_PROG_FC])dnl
                           AC_REQUIRE([AC_PROG_CC])dnl
@@ -843,7 +862,9 @@ dnl    AC_PATH_PROG(PAX, pax)dnl
 # possibility that the tasks and .ifl files longer have the
 # one-task-per-file relationship they have now.
 AC_DEFUN([STAR_MONOLITHS],
-         [dnl Installation in monoliths.am uses $(LN_S)
+         [$_star_docs_only &&
+             AC_MSG_ERROR([STAR[]_MONOLITHS in docs-only directory])
+          dnl Installation in monoliths.am uses $(LN_S)
           AC_REQUIRE([AC_PROG_LN_S])dnl
 
           # To build monoliths, we need both compifl to build the .ifc
@@ -1025,6 +1046,7 @@ AC_DEFUN([STAR_DECLARE_DEPENDENCIES],
 #
 AC_DEFUN([STAR_PLATFORM_SOURCES],
          [
+$_star_docs_only && AC_MSG_ERROR([STAR_[]PLATFORM_SOURCES in docs-only dir])
 AC_REQUIRE([AC_CANONICAL_BUILD])dnl
 AC_REQUIRE([AC_PROG_LN_S])dnl
 m4_ifval([$1], [], [AC_FATAL([$0: no target-file-list given])])dnl
