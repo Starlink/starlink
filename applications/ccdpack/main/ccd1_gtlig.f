@@ -202,10 +202,8 @@
 *  Report that this NDF will be ignored and add it to the group of 
 *  NDFs with no associated list.
                CALL MSG_SETC( 'NDF', NNAME )
-               CALL MSG_SETC( 'ITEM', ITEM )
                CALL CCD1_MSG( ' ',
-     :'  The CCDPACK extension of NDF ^NDF has no item ^ITEM.', STATUS )
-               CALL CCD1_MSG( ' ', ' ', STATUS )
+     :'  There is no associated list for NDF ^NDF.', STATUS )
             ELSE
 
 *  Enter the file name and the NDF name into the new groups, appending 
