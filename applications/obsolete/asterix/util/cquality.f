@@ -78,13 +78,13 @@
       CHARACTER*80           TEXT(5)                ! History text
       CHARACTER*40           UNITS                  ! Axis units
 
-      REAL                   XC(MX_PTS), YC(MX_PTS) ! Circular centres
-      REAL                   RC(MX_PTS)             ! Circular radii
+      REAL                   	XC(MX_PTS), YC(MX_PTS) 	! Circular centres
+      REAL                   	RC(MX_PTS)             	! Circular radii
 
-      INTEGER                AORDER(ADI__MXDIM)     !
-      INTEGER                TCPTR, CPTR            ! Pointer to dynamic
-                                                    ! array
-      INTEGER                DIMS(ADI__MXDIM)       ! Length of each dimension
+      INTEGER                	AORDER(ADI__MXDIM)     	!
+      INTEGER                	TCPTR, CPTR            	! Pointer to dynamic
+							! array
+      INTEGER                	DIMS(ADI__MXDIM)       ! Length of each dimension
       INTEGER                FSTAT                  ! i/o status
       INTEGER                I                      ! Loop counters
       INTEGER			IFID			! Input dataset id
@@ -95,17 +95,14 @@
       INTEGER                NFROM                  ! # selected points
       INTEGER                NRPTS, NXPTS, NYPTS    ! # values entered
       INTEGER			OFID			! Output dataset id
-      INTEGER                QDIMS(ADI__MXDIM)      ! Length of each dimension
-      INTEGER                QNDIM                  ! Number of dimensions
-      INTEGER                QPTR                   ! Pointer to mapped
-                                                    ! QUALITY
-      INTEGER                TDIMS(ADI__MXDIM)      ! Working dimensions
-      INTEGER                TQPTR                  ! Temp quality array
-      INTEGER                XPTR, YPTR             ! Spatial axis data
+      INTEGER                	QPTR                   	! Pointer to mapped
+							! QUALITY
+      INTEGER                TDIMS(ADI__MXDIM)      	! Working dimensions
+      INTEGER                TQPTR                  	! Temp quality array
+      INTEGER                XPTR, YPTR             	! Spatial axis data
 
-      BYTE                   BQVAL		    ! Quality value
+      BYTE                   BQVAL		    	! Quality value
 
-      LOGICAL                INPRIM                 ! Is input primitive?
       LOGICAL                MODESET                ! Mode selected
       LOGICAL                MOVE_AXES              ! Move axes?
       LOGICAL                NOTON                  ! Point on X,Y plane?
@@ -177,38 +174,21 @@
 
 *    Get input
       IF ( OVERWRITE ) THEN
-        CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+        CALL USI_ASSOC( 'INP', 'BinDS', 'UPDATE', IFID, STATUS )
         OFID = IFID
       ELSE
-        CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
-      END IF
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-
-*    Create output
-      IF ( .NOT. OVERWRITE ) THEN
-        CALL ADI_FCOPY( IFID, OFID, STATUS )
-      END IF
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*    Validate dataset
-      IF ( INPRIM ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Input is primitive, must be a dataset',
-     :                STATUS )
-      ELSE
-        CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
-        IF ( ( STATUS .EQ. SAI__OK ) .AND. .NOT. OK ) THEN
-          STATUS = SAI__ERROR
-          CALL ERR_REP( ' ', 'Invalid data', STATUS )
-        END IF
+        CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
+        CALL USI_CREAT( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check axes
-      CALL AXIS_TGETORD( OFID, 'X,Y', MOVE_AXES, AORDER,
-     :                             NDIM, TDIMS, STATUS )
+*  Validate dataset
+      CALL BDI_GETSHP( OFID, ADI__MXDIM, DIMS, NDIM, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Check axes
+      CALL BDI0_FNDAXC( OFID, 'X', AXORDER(1), STATUS )
+      CALL BDI0_FNDAXC( OFID, 'Y', AXORDER(2), STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
@@ -219,38 +199,32 @@
         DO I = 1, NDIM
           TDIMS(I) = DIMS(I)
         END DO
-        DO I = NDIM+1, ADI__MXDIM
-          TDIMS(I) = 1
-        END DO
+        CALL AR7_PAD( NDIM, TDIMS, STATUS )
       END IF
 
-*    Find length of array
+*  Find length of array
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Check QUALITY
-      CALL BDI_CHKQUAL( OFID, OK, QNDIM, QDIMS, STATUS )
-
+*  Check QUALITY
+      CALL BDI_CHK( OFID, 'Quality', OK, STATUS )
       IF ( .NOT. OK ) THEN
         IF ( Q_SET .OR. Q_IGNORE ) THEN
-          CALL BDI_CREQUAL( OFID, NDIM, DIMS, STATUS )
-          CALL BDI_MAPQUAL( OFID, 'WRITE', QPTR, STATUS )
+          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
-          CALL BDI_PUTMASK( OFID, QUAL__MASK, STATUS )
+          CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
         ELSE
           STATUS = SAI__ERROR
           CALL ERR_REP( ' ', 'No input quality!', STATUS )
         END IF
       ELSE
-        CALL BDI_MAPQUAL( OFID, 'UPDATE', QPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', QPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Adjust size of array to 7 D
-      DO I = NDIM + 1, ADI__MXDIM
-        DIMS(I) = 1
-      END DO
+*  Adjust size of array to 7 D
+      CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*    Quality needing moved due to axis order?
+*  Quality needing moved due to axis order?
       IF ( MOVE_AXES ) THEN
         CALL MSG_PRNT( 'Changing axis order to X,Y...' )
         CALL DYN_MAPB( NDIM, TDIMS, TQPTR, STATUS )
@@ -261,15 +235,15 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get axis units for message
-      CALL BDI_GETAXUNITS( OFID, AORDER(1), UNITS, STATUS )
+*  Get axis units for message
+      CALL BDI_AXGET0C( OFID, AORDER(1), 'Units', UNITS, STATUS )
       IF ( UNITS .GT. ' ' ) THEN
         CALL CHR_UCASE( UNITS )
         CALL MSG_SETC( 'UNIT', UNITS )
         CALL MSG_PRNT( 'Specify circular regions in ^UNIT' )
       END IF
 
-*    Get centres and radii for positions
+*  Get centres and radii for positions
       CALL USI_GET1R( 'CX', MX_PTS, XC, NXPTS, STATUS )
       CALL USI_GET1R( 'CY', MX_PTS, YC, NYPTS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -292,24 +266,23 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Set up temporary array for flagging selections - initialised to
-*    selected
+*  Set up temporary array for flagging selections - initialised to selected
       CALL DYN_MAPL( 1, NELM, CPTR, STATUS )
       CALL DYN_MAPL( 1, NELM, TCPTR, STATUS )
       CALL ARR_INIT1L( .TRUE., NELM, %VAL(CPTR), STATUS )
 
-*    Map two spatial axes
-      CALL BDI_MAPAXVAL( OFID, 'READ', AORDER(1), XPTR, STATUS )
-      CALL BDI_MAPAXVAL( OFID, 'READ', AORDER(2), YPTR, STATUS )
+*  Map two spatial axes
+      CALL BDI_AXMAPR( OFID, AORDER(1), 'Data', 'READ', XPTR, STATUS )
+      CALL BDI_AXMAPR( OFID, AORDER(2), 'Data', 'READ', YPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Initialise local selection array
+*  Initialise local selection array
       CALL ARR_INIT1L( .FALSE., NELM, %VAL(TCPTR), STATUS )
 
-*    For each area
+*  For each area
       DO I = 1, NXPTS
 
-*      Set elements of selection array
+*    Set elements of selection array
         CALL CQUALITY_CIRSEL( TDIMS, XC(I), YC(I), RC(I), %VAL(XPTR),
      :                       %VAL(YPTR), %VAL(TCPTR), NOTON, STATUS )
         IF ( NOTON ) THEN
@@ -320,24 +293,24 @@
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Combine local with global selection
+*  Combine local with global selection
       CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
 
-*    Selecting on value?
+*  Selecting on value?
       IF ( QSEL ) THEN
 
-*      Get quality value to modify
+*    Get quality value to modify
         CALL QUALITY_GETQV( 'MODQUAL', ' ', MODQUAL, BQVAL, STATUS )
         CALL QUALITY_SETQSEL( NELM, BQVAL, %VAL(TQPTR), %VAL(TCPTR),
      :                                                      STATUS )
 
-*      Combine local with global selection
+*    Combine local with global selection
         CALL QUALITY_ANDSEL( NELM, %VAL(TCPTR), %VAL(CPTR), STATUS )
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Write the output quality
+*  Write the output quality
       IF ( Q_SET ) THEN
         CALL QUALITY_GETQV( 'QVAL', 'New quality value', QVAL,
      :                                         BQVAL, STATUS )
@@ -385,7 +358,7 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Unmap quality, restoring axes if necessary
+*  Unmap quality, restoring axes if necessary
       IF ( MOVE_AXES ) THEN
         CALL MSG_PRNT( 'Restoring axis order...' )
         CALL AXIS_ORDINV( NDIM, AORDER, INORDER )
@@ -393,17 +366,17 @@
      :                                   %VAL(QPTR), STATUS )
         CALL DYN_UNMAP( TQPTR, STATUS )
       END IF
-      CALL BDI_UNMAPQUAL( OFID, STATUS )
+      CALL BDI_UNMAP( OFID, 'Quality', %VAL(QPTR), STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Count points selected
-      CALL QUALITY_CNTSEL( NELM, %VAL(CPTR), NFROM, STATUS )
+*  Count points selected
+      CALL ARR_NBAD( NELM, %VAL(CPTR), NFROM, STATUS )
 
-*    Inform user of altered points
+*  Inform user of altered points
       CALL MSG_SETI( 'NFROM', NFROM )
       CALL MSG_PRNT( '^NFROM points had quality modified' )
 
-*    Write history
+*  Write history
       CALL HSI_ADD( OFID, VERSION, STATUS )
       IF ( QSEL ) THEN
         TEXT(2) = ' Only points having QUALITY = '//MODQUAL//' altered'
@@ -414,10 +387,10 @@
       WRITE( TEXT(4), 80, IOSTAT=FSTAT ) 'Y-pos : ',(YC(I),I=1,NXPTS)
       WRITE( TEXT(5), 80, IOSTAT=FSTAT ) 'Radii : ',(RC(I),I=1,NRPTS)
 
-*    Write history
+*  Write history
       CALL HSI_PTXT( OFID, 5, TEXT, STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
