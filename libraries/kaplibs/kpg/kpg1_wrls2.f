@@ -61,6 +61,8 @@
 *  History:
 *     15-SEP-1998 (DSB):
 *        Original version.
+*     7-AUG-2003 (DSB):
+*        Normalise axis values before appending to the output catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,6 +102,7 @@
       CHARACTER LAB*50           ! Axis label
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
+      DOUBLE PRECISION C( NDF__MXDIM) ! Buffer for a single position
       INTEGER CI                 ! CAT identifier for catalogue
       INTEGER COLID( 0:NDF__MXDIM )! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
@@ -218,10 +221,16 @@
             CALL CAT_PUT0I( COLID( 0 ), IDENTS( I ), .FALSE., STATUS )
          END IF
 
-*  Loop round each axis...
+*  Normalise the position.
          DO J = 1, NAX
-            CALL CAT_PUT0D( COLID( J ), POS( I, J ), 
-     :                      ( POS( I, J ) .EQ. AST__BAD ), STATUS )
+            C( J ) = POS( I, J )
+         END DO
+         CALL AST_NORM( FRM, C, STATUS )
+
+*  Put each normalised axis value into the current row buffer.
+         DO J = 1, NAX
+            CALL CAT_PUT0D( COLID( J ), C( J ), 
+     :                      ( C( J ) .EQ. AST__BAD ), STATUS )
          END DO
 
 *  Append the current row buffer to the catalogue.

@@ -6,13 +6,13 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.3}
+\newcommand{\stardocnumber}    {238.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {1st May 2003}
+\newcommand{\stardocdate}      {7th August 2003}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
                                 Internal subroutines used within\\
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 2.3}
+\newcommand{\stardocversion}   {Version 2.4}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
 libraries which were originally written as part of the KAPPA package (a
@@ -524,6 +524,13 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 
 This will include native PGPLOT in the link list, and cause all GKS and IDI 
 related items to be removed.
+
+
+\section{Changes in Version 2.4}
+\begin{itemize}
+\item The KPG1\_WRLST routine now normalises the supplied positions (using
+AST\_NORM) before writing them to the output catalogue.
+\end{itemize}
 
 \section{Changes in Version 2.3}
 \begin{itemize}

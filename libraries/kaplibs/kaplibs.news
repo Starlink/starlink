@@ -6,14 +6,8 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
-Version 2.3. includes the following changes:
+Version 2.4. includes the following changes:
 
-   - The GETHLP routine has been moved from KAPPA to the KAPLIBS:KAPGEN
-   library.
-
-   - Script kaplibs_link added for linking standalone applications.
-
-   - kpg1_dsfrm modified to include details of AST SpecFrames
-
-   - kpg1_asmrg modified to attempt alignment in Domain SPECTRAL
+   - The KPG1_WRLST routine now normalises the supplied positions (using
+   AST_NORM) before writing them to the output catalogue.
 
