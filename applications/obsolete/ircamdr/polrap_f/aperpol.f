@@ -120,6 +120,8 @@
 *     18-May-1994  Changed DAT and CMP calls to NDF (SKL@JACH)
 *     24_JUN-1994  Changed TYPE statements to ERR_REP,
 *                  STR$ to CHR_, LIB$ TO FIO_ (SKL@JACH)
+*     11-AUG-2004  Use FIO for open and close (TIMJ@JACH)
+
 *
 *      Type definitions :
 	IMPLICIT  NONE              ! no implicit typing allowed
@@ -825,19 +827,15 @@
 	      END IF
 	    END IF
 
-*          get lun for open of ascii file
-	    CALL FIO_GUNIT( LUN1, STATUS )
+*          open the output data list file
+            CALL FIO_OPEN( FNAME1, 'READ','LIST',0, LUN1,
+     :           STATUS)
 
-*          open input data file
-	    OPEN( UNIT=LUN1, FILE=FNAME1, STATUS='OLD', 
-     :	          CARRIAGECONTROL='LIST', ERR=999)
+            IF (STATUS .NE. SAI__OK) GO TO 999
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
      :	        TERMOUT( 1:1) .EQ. 'B') THEN 
-
-*            get lun for open of OUTPUT ascii file
-              CALL FIO_GUNIT( LUN2, STATUS )
 
 *            create output filename
 	      L1 = INDEX( FNAME1, '.')
@@ -856,8 +854,10 @@
 	      CALL CHR_UCASE( FNAME2 )
 
 *            open output data file
-	      OPEN( UNIT=LUN2, FILE=FNAME2, STATUS='NEW', 
-     :	            CARRIAGECONTROL='LIST', ERR=998)
+              CALL FIO_OPEN( FNAME2, 'WRITE','LIST',0, LUN2,
+     :             STATUS)
+
+              IF (STATUS .NE. SAI__OK) GO TO 998
 
 *            write header line to output file
 	      LINE1 = 
@@ -868,7 +868,7 @@
               CALL CHR_CLEAN( LINE1 )
               L1 = 0
               CALL CHR_APPND( LINE1, LINE1, L1 ) 
-	      WRITE( LUN2, '(A)') LINE1( 1:L1)
+              CALL FIO_WRITE( LUN2, LINE1(1:L1), STATUS)
 
 	    END IF
 
@@ -884,7 +884,7 @@
 	      CALL CHECK_COMMENT( LINE1, IS_COMMENT)
 
 *            test if current line is a comment or not
-	      IF( IS_COMMENT .EQ. .FALSE.) THEN
+	      IF( .NOT. IS_COMMENT ) THEN
 
 *              read input variables from input line
 	        READ( LINE1, *, ERR=997, END=996) XCEN, YCEN, ECC,
@@ -1217,7 +1217,7 @@
                   CALL CHR_CLEAN( LINE1 )
                   L1 = 0
 	          CALL CHR_APPND( LINE1, LINE1, L1 ) 
-	          WRITE( LUN2, '(A)') LINE1( 1:L1)
+                  CALL FIO_WRITE(LUN2, LINE1(1:L1), STATUS)
 
 	        END IF
 
@@ -1225,17 +1225,17 @@
 
 	    END DO
 
+ 100        CONTINUE
+
 *          here when input file empty, close files and free lun
-  100	    CLOSE( LUN1)
-	    CALL FIO_PUNIT( LUN1, STATUS )
+            CALL FIO_CLOSE( LUN1, STATUS )
 
 *          check if user wants terminal, file or both output
 	    IF( TERMOUT( 1:1) .EQ. 'F' .OR.
      :	        TERMOUT( 1:1) .EQ. 'B') THEN 
 
 *            close output files and free lun
-	      CLOSE( LUN2)
-              CALL FIO_PUNIT( LUN2, STATUS )
+              CALL FIO_CLOSE( LUN2, STATUS )
 
 *            tell user the name of the output file
 	      CALL MSG_OUT( 'BLANK', ' ', STATUS)
