@@ -1,5 +1,5 @@
 *+  BINMERGE - Merge 2 or more binned datasets
-      SUBROUTINE BINMERGE(STATUS)
+      SUBROUTINE BINMERGE( STATUS )
 *    Description :
 *      Merges up to 10 binned datasets. All must have the same number
 *     of dimensions, and the axes must be in the same order.
@@ -39,23 +39,20 @@
 *
 *      2 Sep 88 : V1.0-1 Original adapted from ASTERIX routine (ADM)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*      7 Feb 95 : V1.8-1 Various bugs fixed (DJA)
 *
 *    Type Definitions :
+*
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
-*    Structure definitions:
-      STRUCTURE/axesdef/
-         INTEGER             T                 ! Index to Time axis
-         INTEGER             X                 ! Index to X axis
-         INTEGER             Y                 ! Index to Y axis
-      END STRUCTURE
-
-      RECORD/axesdef/        AXES              ! Indicies to X, Y, & T axes
+*
 *    Status :
+*
       INTEGER STATUS
 *    External references :
       INTEGER CHR_LEN
@@ -65,19 +62,18 @@
 *
 *    Local variables :
 *
-      CHARACTER              C                 ! character value
-      CHARACTER*(DAT__SZLOC) HEADER            ! ASTERIX HEADER locator
+      CHARACTER              		C               ! character value
+      CHARACTER*(DAT__SZLOC)		HLOC		! HEADER locator
       CHARACTER*(DAT__SZLOC) ILOC(MXINP)       ! input dataset locators
-      CHARACTER*(DAT__SZLOC) MORE              ! MORE box locator
       CHARACTER*(DAT__SZLOC) OLOC              ! output dataset locator
-      CHARACTER*(DAT__SZNAM) PARNAM            ! parameter name
+      CHARACTER*(PAR__SZNAM) 		PARNAM            ! parameter name
       CHARACTER*(DAT__SZTYP) TYPE1             ! data type, 1st input dataset
       CHARACTER*(DAT__SZTYP) TYPEN             ! data type
       CHARACTER*1            LAST              ! number of axis to be merged
       CHARACTER*80           TEXT(4*MXINP+2)   ! History text
       CHARACTER*80           LABEL             ! An axis label
-      CHARACTER*80           LABEL1(7)         ! Axis labels for first dataset
-      CHARACTER*80           UNITS(7,MXINP)    ! Axis units
+      CHARACTER*80           LABEL1(DAT__MXDIM)! Axis labels for first dataset
+      CHARACTER*80           UNITS(DAT__MXDIM,MXINP)    ! Axis units
       CHARACTER*80           TESTUN1,TESTUN    ! Dummy tests for unit values
 
       DOUBLE PRECISION       AXIS_DEC(MXINP)   ! AXIS_DEC of datasets
@@ -90,7 +86,11 @@
       DOUBLE PRECISION       F_RA1             ! Field_RA of first dataset
       DOUBLE PRECISION       POSITION_ANGLE(MXINP) ! POSITION_ANGLE of datasets
 
-      INTEGER                AXOFF(7)          ! axis(N) offset
+      REAL                   ADD               ! Add to timetag of current dataset
+      REAL                   YMIN              ! Minimium Y axis value
+      REAL                   XMIN              ! Minimium X axis value
+
+      INTEGER                AXOFF(DAT__MXDIM) ! axis(N) offset
       INTEGER                DSETS             ! number of input datasets
       INTEGER                EQUINOX1          ! EQUINOX of 1st dataset
       INTEGER                EQUINOX           ! EQUINOX of dataset
@@ -100,45 +100,43 @@
       INTEGER                INAXW             ! pointer to input AXIS(n) WIDTH
       INTEGER                INP, AX ,I        ! loop counters
       INTEGER                IQPTR             ! pointer to input QUALITY
-      INTEGER                LDIMS(7, MXINP)   ! dimensions of datasets' DATA_ARRAYs
+      INTEGER                LDIMS(DAT__MXDIM, MXINP)   ! dimensions of datasets' DATA_ARRAYs
       INTEGER                LENGTH            ! Of character strings
       INTEGER                NDIMS             ! # of dimensions of a dataset DATA_ARRAY
       INTEGER                NDIMS1            ! # of dimensions of dataset 1 DATA_ARRAY
       INTEGER                NLINES            ! Number of history TEXT lines
       INTEGER                NPTS              ! Number of points in output dataset
-      INTEGER                OAXPTR(7)         ! pointer to output AXISn_DATA
-      INTEGER                OAXW(7)           ! pointer to output AXIS(n) WIDTH
+      INTEGER                OAXPTR(DAT__MXDIM)! pointer to output AXISn_DATA
+      INTEGER                OAXW(DAT__MXDIM)  ! pointer to output AXIS(n) WIDTH
       INTEGER                ODPTR             ! pointer to output DATA_ARRAY
-      INTEGER                OFFSET(7)         ! output data array offset
+      INTEGER                OFFSET(DAT__MXDIM)! output data array offset
       INTEGER                OLDIMS(DAT__MXDIM)! dimensions of output dataset.
       INTEGER                OQPTR             ! pointer to output QUALITY
       INTEGER                SIZ               ! Dummy variable
       INTEGER                IVPTR             ! pointer to input VARIANCE
       INTEGER                OVPTR            ! pointer to output VARIANCE
-      INTEGER                YAXPTR            ! pointer to mapped y axis
+      INTEGER			X_AX, Y_AX, T_AX	! Axis numbers
       INTEGER                XAXPTR            ! pointer to mapped x axis
+      INTEGER                YAXPTR            ! pointer to mapped y axis
 
-      LOGICAL                AXISOK            ! axis data present
-      LOGICAL                AXWOK             ! axis width present
-      LOGICAL                CHKLABEL(DAT__MXDIM) ! Check axis label?
-      LOGICAL                CHKUNITS(DAT__MXDIM) ! Check axis units?
-      LOGICAL                CONTINUE          ! controls copying of axis info
-      LOGICAL                DONE              ! Coppied the X &/or Y axes
-      LOGICAL                INPRIM            ! Is input primitive?
-      LOGICAL                INPUT             ! Loops over input
-      LOGICAL                OK                ! data item acceptable
-      LOGICAL                QUAL              ! data quality present
-      LOGICAL                REG               ! Regular axis data
-      LOGICAL                VAROK             ! data errors present
-
-      REAL                   ADD               ! Add to timetag of current dataset
-      REAL                   YMIN              ! Minimium Y axis value
-      REAL                   XMIN              ! Minimium X axis value
+      LOGICAL                	AXISOK            	! Axis data present
+      LOGICAL                	AXWOK             	! Axis width present
+      LOGICAL                	CHKLABEL(DAT__MXDIM) 	! Check axis label?
+      LOGICAL                	CHKUNITS(DAT__MXDIM) 	! Check axis units?
+      LOGICAL                	CONTINUE          ! controls copying of axis info
+      LOGICAL                	DONE              ! Copied the X &/or Y axes
+      LOGICAL                	INPRIM            	! Is input primitive?
+      LOGICAL                	INPUT             	! Loops over input
+      LOGICAL                	OK                	! Data item acceptable
+      LOGICAL                	QUAL              	! Data quality present
+      LOGICAL                	REG               	! Regular axis data
+      LOGICAL			TO_SAME			! Assume T origin same?
+      LOGICAL                	VAROK             	! Data errors present?
 *
 *    Version id :
 *
       CHARACTER*24           VERSION
-         PARAMETER          (VERSION = ' BINMERGE version 1.8-0')
+         PARAMETER          (VERSION = 'BINMERGE version 1.8-1' )
 *-
 
 *    Version announcement
@@ -194,28 +192,36 @@
         END DO
 
         IF (AXISOK) THEN
-          CALL AXIS_FINDXYT (ILOC(1), NDIMS1, AXES.X, AXES.Y, AXES.T,
-     :                                                           STATUS)
+          CALL AXIS_FINDXYT( ILOC(1), NDIMS1, X_AX, Y_AX, T_AX, STATUS )
 
         ELSE
-          CALL MSG_PRNT ('FATAL ERROR: Invalid dataset - Bad axis data')
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset - '/
+     :                  /'Bad axis data', STATUS )
 
         END IF
 
-        CALL BDA_LOCHEAD (ILOC(1), HEADER, STATUS)
-        CALL CMP_GET0I (HEADER, 'EQUINOX',        EQUINOX1,      STATUS)
-        CALL CMP_GET0D (HEADER, 'POSITION_ANGLE', POSITION_ANGLE(1),
+        CALL BDA_LOCHEAD (ILOC(1), HLOC, STATUS)
+        CALL CMP_GET0I (HLOC, 'EQUINOX',        EQUINOX1,      STATUS)
+        CALL CMP_GET0D (HLOC, 'POSITION_ANGLE', POSITION_ANGLE(1),
      :                                                           STATUS)
         POSITION_ANGLE(1) = MOD (POSITION_ANGLE(1), 360.0D0)
-        CALL CMP_GET0D (HEADER, 'AXIS_RA',        AXIS_RA(1),    STATUS)
-        CALL CMP_GET0D (HEADER, 'AXIS_DEC',       AXIS_DEC(1),   STATUS)
-        CALL CMP_GET0D (HEADER, 'BASE_TAI',       BASE_TAI(1),   STATUS)
-        CALL DAT_ANNUL (HEADER,                                  STATUS)
+        CALL CMP_GET0D (HLOC, 'AXIS_RA',        AXIS_RA(1),    STATUS)
+        CALL CMP_GET0D (HLOC, 'AXIS_DEC',       AXIS_DEC(1),   STATUS)
+        CALL DAT_THERE( HLOC, 'BASE_TAI', OK, STATUS )
+        TO_SAME = (.NOT. OK)
+        IF ( OK ) THEN
+          CALL CMP_GET0D( HLOC, 'BASE_TAI', BASE_TAI(1), STATUS )
+        ELSE
+          CALL MSG_PRNT( 'No time origin in header, datasets '/
+     :                      /'assumed to have same origin...' )
+          BASE_TAI(1) = 0.0D0
+        END IF
 
       ELSE
-        CALL MSG_PRNT ('FATAL ERROR: Invalid dataset - Bad data')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: Invalid dataset - '/
+     :                /'Bad data', STATUS )
 
       END IF
 
@@ -238,7 +244,7 @@
           INPUT  = .FALSE.
 
         ELSE
-          CALL BDA_CHKDATA (ILOC(DSETS), OK, NDIMS, LDIMS(1,DSETS),
+          CALL BDA_CHKDATA( ILOC(DSETS), OK, NDIMS, LDIMS(1,DSETS),
      :                                                           STATUS)
 
           IF (OK .AND. NDIMS .EQ. NDIMS1) THEN
@@ -264,9 +270,9 @@
                   CALL MSG_PRNT ('WARNING: Axis units mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
-                  CALL USI_DEF0L ('CONT', .TRUE.)
-                  CALL USI_GET0L ('CONT', OK, STATUS)
-                  CALL USI_CANCL ('CONT',     STATUS)
+                  CALL USI_DEF0L( 'CONT', .TRUE., STATUS )
+                  CALL USI_GET0L( 'CONT', OK, STATUS )
+                  CALL USI_CANCL( 'CONT', STATUS )
 
                 END IF
 
@@ -281,30 +287,33 @@
                   CALL MSG_PRNT ('WARNING: Axis label mismatch - '//
      :                                         'OUTPUT MAY BE GARBAGE!')
 
-                  CALL USI_DEF0L ('CONT', .TRUE.)
-                  CALL USI_GET0L ('CONT', OK, STATUS)
-                  CALL USI_CANCL ('CONT',     STATUS)
+                  CALL USI_DEF0L( 'CONT', .TRUE., STATUS )
+                  CALL USI_GET0L( 'CONT', OK, STATUS )
+                  CALL USI_CANCL( 'CONT', STATUS )
 
                 END IF
               END IF
             END DO
 
-            CALL BDA_LOCHEAD (ILOC(DSETS), HEADER, STATUS)
-            CALL CMP_GET0I (HEADER, 'EQUINOX', EQUINOX, STATUS)
+            CALL BDA_LOCHEAD (ILOC(DSETS), HLOC, STATUS)
+            CALL CMP_GET0I (HLOC, 'EQUINOX', EQUINOX, STATUS)
 
             IF (EQUINOX .EQ. EQUINOX1) THEN
-              CALL CMP_GET0D (HEADER, 'POSITION_ANGLE',
+              CALL CMP_GET0D (HLOC, 'POSITION_ANGLE',
      :                                    POSITION_ANGLE(DSETS), STATUS)
               POSITION_ANGLE(DSETS) =
      :                              MOD (POSITION_ANGLE(DSETS), 360.0D0)
 
-              CALL CMP_GET0D (HEADER, 'AXIS_RA',
+              CALL CMP_GET0D (HLOC, 'AXIS_RA',
      :                                    AXIS_RA(DSETS),        STATUS)
-              CALL CMP_GET0D (HEADER, 'AXIS_DEC',
+              CALL CMP_GET0D (HLOC, 'AXIS_DEC',
      :                                    AXIS_DEC(DSETS),       STATUS)
-              CALL CMP_GET0D (HEADER, 'BASE_TAI',
-     :                                    BASE_TAI(DSETS),       STATUS)
-              CALL DAT_ANNUL (HEADER,                            STATUS)
+              IF ( TO_SAME ) THEN
+                BASE_TAI(DSETS) = BASE_TAI(1)
+              ELSE
+                CALL CMP_GET0D( HLOC, 'BASE_TAI', BASE_TAI(DSETS),
+     :                          STATUS )
+              END IF
 
             ELSE
               CALL MSG_PRNT
@@ -358,58 +367,27 @@
       END IF
 
 *    Create output dataset
-      CALL USI_ASSOCO ('OUT', TYPE1, OLOC, STATUS)
+      CALL USI_ASSOCO( 'OUT', TYPE1, OLOC, STATUS )
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Obtain output array size
-      DO INP = 1, DSETS
-        DO AX = 1, NDIMS1
-          IF (INP .NE. 1) THEN
-            OLDIMS(AX) = OLDIMS(AX) + LDIMS(AX,INP)
-
-          ELSE
-            OLDIMS(AX) = LDIMS(AX,INP)
-
-          END IF
+      DO AX = 1, NDIMS1
+        OLDIMS(AX) = LDIMS(AX,1)
+        DO INP = 2, DSETS
+          OLDIMS(AX) = OLDIMS(AX) + LDIMS(AX,INP)
         END DO
       END DO
 
 *    Find length of output dataset
-      NPTS = 1
-
-      DO AX = 1, NDIMS1
-        NPTS = NPTS * OLDIMS(AX)
-
-      END DO
+      CALL ARR_SUMDIM( NDIMS1, OLDIMS, NPTS )
 
 *    Copy across subsidiary data from first input dataset
-      CALL BDA_GETTITLE (ILOC(1), LABEL, STATUS)
+      CALL BDA_COPTEXT( ILOC(1), OLOC, STATUS )
+      CALL BDA_COPMORE( ILOC(1), OLOC, STATUS )
 
-      IF (CHR_LEN(LABEL) .GT. 0) THEN
-        CALL BDA_PUTTITLE (OLOC, LABEL, STATUS)
-
-      END IF
-
-      CALL BDA_GETLABEL (ILOC(1), LABEL, STATUS)
-
-      IF (CHR_LEN(LABEL) .GT. 0) THEN
-        CALL BDA_PUTLABEL (OLOC, LABEL, STATUS)
-
-      END IF
-
-      CALL BDA_GETUNITS (ILOC(1), LABEL, STATUS)
-
-      IF (CHR_LEN(LABEL) .GT. 0) THEN
-        CALL BDA_PUTUNITS (OLOC, LABEL, STATUS)
-
-      END IF
-
-      CALL DAT_FIND (ILOC(1), 'MORE', MORE, STATUS)
-      CALL DAT_COPY (MORE, OLOC, 'MORE',    STATUS)
-
-      CALL HIST_COPY (ILOC(1), OLOC, STATUS)
+      CALL HIST_COPY( ILOC(1), OLOC, STATUS )
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 99
@@ -424,31 +402,26 @@
       CALL ARR_INIT1R( 0.0, NPTS, %VAL(ODPTR), STATUS )
 
 *    Create output axes
-      CALL BDA_CREAXES (OLOC, NDIMS1, STATUS)
+      CALL BDA_CREAXES( OLOC, NDIMS1, STATUS )
 
 *    Check AXIS WIDTH
-      CALL BDA_CHKAXWID (ILOC(1), NDIMS1, AXWOK, REG, SIZ, STATUS)
+      CALL BDA_CHKAXWID( ILOC(1), NDIMS1, AXWOK, REG, SIZ, STATUS )
 
       DO AX = 1, NDIMS1
-        CALL BDA_CREAXVAL (OLOC, AX, .FALSE., OLDIMS(AX), STATUS)
-        CALL BDA_MAPAXVAL (OLOC, 'WRITE', AX, OAXPTR(AX), STATUS)
+        CALL BDA_CREAXVAL( OLOC, AX, .FALSE., OLDIMS(AX), STATUS )
+        CALL BDA_MAPAXVAL( OLOC, 'WRITE', AX, OAXPTR(AX), STATUS )
 
-        CALL BDA_PUTAXUNITS (OLOC, AX, UNITS(AX,1),       STATUS)
+        CALL BDA_COPAXTEXT( ILOC(1), OLOC, AX, AX, STATUS )
 
-        IF (CHKLABEL(AX)) THEN
-          CALL BDA_PUTAXLABEL (OLOC, AX, LABEL1(AX), STATUS)
-
+        IF ( AXWOK ) THEN
+          CALL BDA_CREAXWID( OLOC, AX, .FALSE., OLDIMS(AX), STATUS )
+          CALL BDA_MAPAXWID( OLOC, 'WRITE', AX, OAXW(AX), STATUS )
         END IF
 
-        IF (AXWOK) THEN
-          CALL BDA_CREAXWID (OLOC, AX, .FALSE., OLDIMS(AX),  STATUS)
-          CALL BDA_MAPAXWID (OLOC, 'WRITE', AX, OAXW(AX),    STATUS)
-
-        END IF
       END DO
 
 *    Check QUALITY
-      CALL BDA_CHKQUAL (ILOC(1), QUAL, NDIMS, ILDIMS, STATUS)
+      CALL BDA_CHKQUAL( ILOC(1), QUAL, NDIMS, ILDIMS, STATUS )
 
       IF ( QUAL ) THEN
         CALL BDA_CREQUAL( OLOC, NDIMS1,  OLDIMS, STATUS )
@@ -475,15 +448,14 @@
 
       END IF
 
-
 *    Loop through input objects merging arrays
       DO INP = 1, DSETS
-        CALL MSG_SETI ('INP', INP)
-        CALL MSG_PRNT (' Writing input dataset ^INP to output file')
+        CALL MSG_SETI( 'INP', INP )
+        CALL MSG_PRNT( ' Writing input dataset ^INP to output file' )
 
         AX = 0
 
-        IF (AXES.X .GT. -1 .OR. AXES.Y .GT. -1) THEN
+        IF (X_AX .GT. -1 .OR. Y_AX .GT. -1) THEN
           IF (POSITION_ANGLE(1) .EQ. POSITION_ANGLE(INP) .AND.
      :        AXIS_DEC(1)       .EQ. AXIS_DEC(INP)       .AND.
      :        AXIS_RA (1)       .EQ. AXIS_RA (INP)) THEN
@@ -492,9 +464,9 @@
           ELSE
             DONE = .TRUE.
 
-            IF (AXES.X .GT. -1) THEN
-              CALL BINMERGE_GET_MIN (ILOC(INP), UNITS(AXES.X,1),
-     :             UNITS(AXES.X,INP), LDIMS(AXES.X,INP), AXES.X, XMIN,
+            IF (X_AX .GT. -1) THEN
+              CALL BINMERGE_GET_MIN (ILOC(INP), UNITS(X_AX,1),
+     :             UNITS(X_AX,INP), LDIMS(X_AX,INP), X_AX, XMIN,
      :                                                   XAXPTR, STATUS)
 
             ELSE
@@ -502,9 +474,9 @@
 
             END IF
 
-            IF (AXES.Y .GT. -1) THEN
-              CALL BINMERGE_GET_MIN (ILOC(INP), UNITS(AXES.Y,1),
-     :             UNITS(AXES.Y,INP), LDIMS(AXES.Y,INP), AXES.Y, YMIN,
+            IF (Y_AX .GT. -1) THEN
+              CALL BINMERGE_GET_MIN (ILOC(INP), UNITS(Y_AX,1),
+     :             UNITS(Y_AX,INP), LDIMS(Y_AX,INP), Y_AX, YMIN,
      :                                                   YAXPTR, STATUS)
 
             ELSE
@@ -512,7 +484,7 @@
 
             END IF
 
-            IF (AXES.X .GT. -1) THEN
+            IF (X_AX .GT. -1) THEN
               C1 = COSD(POSITION_ANGLE(1))
               C2 = COSD(POSITION_ANGLE(INP))
               C3 = (AXIS_RA(INP) - AXIS_RA(1))
@@ -523,11 +495,11 @@
      :                      + (YMIN * COSD(POSITION_ANGLE(INP)))
 
               CALL BINMERGE_ALTER (C1, C2, C3, C4, C5, C6,
-     :            LDIMS(AXES.X,INP), %VAL(XAXPTR), %VAL(OAXPTR(AXES.X)))
+     :            LDIMS(X_AX,INP), %VAL(XAXPTR), %VAL(OAXPTR(X_AX)))
 
             END IF
 
-            IF (AXES.Y .GT. -1) THEN
+            IF (Y_AX .GT. -1) THEN
               C1 = SIND(POSITION_ANGLE(1))
               C2 = - SIND(POSITION_ANGLE(INP))
               C3 = (AXIS_RA(INP) - AXIS_RA(1))
@@ -538,19 +510,15 @@
      :                      + (XMIN * COSD(POSITION_ANGLE(INP)))
 
               CALL BINMERGE_ALTER (C1, C2, C3, C4, C5, C6,
-     :            LDIMS(AXES.Y,INP), %VAL(YAXPTR), %VAL(OAXPTR(AXES.Y)))
+     :            LDIMS(Y_AX,INP), %VAL(YAXPTR), %VAL(OAXPTR(Y_AX)))
 
             END IF
           END IF
         ELSE IF (AXIS_DEC(1) .NE. AXIS_DEC(INP) .OR.
      :           AXIS_RA (1) .NE. AXIS_RA (INP)) THEN
-          CALL BDA_LOCHEAD (ILOC(1), HEADER, STATUS)
-          CALL CMP_GET0D (HEADER, 'FIELD_DEC', F_DEC1, STATUS)
-          CALL CMP_GET0D (HEADER, 'FIELD_RA',  F_RA1,  STATUS)
-
-          CALL BDA_LOCHEAD (ILOC(AXES.X), HEADER, STATUS)
-          CALL CMP_GET0D (HEADER, 'FIELD_DEC', F_DEC1, STATUS)
-          CALL CMP_GET0D (HEADER, 'FIELD_RA',  F_RA1,  STATUS)
+          CALL BDA_LOCHEAD( ILOC(1), HLOC, STATUS )
+          CALL CMP_GET0D (HLOC, 'FIELD_DEC', F_DEC1, STATUS)
+          CALL CMP_GET0D (HLOC, 'FIELD_RA',  F_RA1,  STATUS)
 
           IF (F_DEC1 .NE. F_DEC .OR. F_RA1 .NE. F_RA) THEN
             CALL MSG_SETI ('INP', INP)
@@ -571,7 +539,7 @@
           AX       = AX + 1
           CONTINUE = .TRUE.
 
-          IF (AX .EQ. AXES.X .OR. AX .EQ. AXES.Y) THEN
+          IF (AX .EQ. X_AX .OR. AX .EQ. Y_AX) THEN
             IF (DONE) CONTINUE = .FALSE.
 
           END IF
@@ -602,9 +570,9 @@
             END IF
 
 *          Allow for possible diffence in BASE_TAI.
-            IF (AX .EQ. AXES.T .AND. BASE_TAI(1)
+            IF (AX .EQ. T_AX .AND. BASE_TAI(1)
      :                                          .NE. BASE_TAI(INP)) THEN
-              ADD = REAL((BASE_TAI(1) - BASE_TAI(INP)) * 86400.0D0) !Assumes AXES.T is in seconds.
+              ADD = REAL((BASE_TAI(1) - BASE_TAI(INP)) * 86400.0D0) !Assumes T_AX is in seconds.
               CALL MSG_PRNT('Assuming BASE_TAI in seconds')
               CALL BINMERGE_AXCOPYA (%VAL(IAXPTR), ADD, AXOFF(AX),
      :                                 LDIMS(AX, INP), %VAL(OAXPTR(AX)))
@@ -625,11 +593,11 @@
             IF (OK) THEN
               CALL BDA_MAPAXWID (ILOC(INP), 'READ', AX, INAXW, STATUS)
 
-              IF (AX .EQ. AXES.X) THEN
+              IF (AX .EQ. X_AX) THEN
                 CALL BINMERGE_SCALEXY (UNITS(AX,1), UNITS(AX,INP),
      :                      LDIMS(AX,INP), INAXW, .TRUE., INAXW, STATUS)
 
-              ELSE IF (AX .EQ. AXES.Y) THEN
+              ELSE IF (AX .EQ. Y_AX) THEN
                 CALL BINMERGE_SCALEXY (UNITS(AX,1), UNITS(AX,INP),
      :                     LDIMS(AX,INP), INAXW, .FALSE., INAXW, STATUS)
 
@@ -655,14 +623,14 @@
         END DO
 
 *      Merge DATA_ARRAY
-        CALL BDA_MAPDATA   (ILOC(INP), 'READ', IDPTR, STATUS)
+        CALL BDA_MAPDATA( ILOC(INP), 'READ', IDPTR, STATUS )
         CALL BINMERGE_COPY (%VAL(IDPTR), OFFSET, LDIMS(1,INP),
      :                   LDIMS(2,INP), LDIMS(3,INP), LDIMS(4,INP),
      :                   LDIMS(5,INP), LDIMS(6,INP), LDIMS(7,INP),
      :                   OLDIMS(1),OLDIMS(2),OLDIMS(3),OLDIMS(4),
      :                   OLDIMS(5),OLDIMS(6),OLDIMS(7), %VAL(ODPTR))
 
-        CALL BDA_UNMAPDATA (ILOC(INP), STATUS)
+        CALL BDA_UNMAPDATA( ILOC(INP), STATUS )
 
 *      Merge QUALITY - if missing from odd data sets then assume it is good
         IF (QUAL) THEN
@@ -716,9 +684,8 @@
 
           DO AX = 1, NDIMS1
             OFFSET(AX) = OFFSET(AX) + LDIMS(AX, INP)
-
           END DO
-          CALL BDA_UNMAP (ILOC(INP), STATUS)
+C          CALL BDA_UNMAP (ILOC(INP), STATUS)
 
 C        ELSE
 C          CALL MSG_SETI ('NSET', INP)
@@ -927,8 +894,6 @@ C        END IF
 
 
 
-
-
 *+  BINMERGE_GET_MIN - Find min of axis AX, also adjust for units if necessary.
       SUBROUTINE BINMERGE_GET_MIN (LOC, OUTUNITS, UNITS, LEN, AX, XAX,
      :                                                 MIN, PTR, STATUS)
@@ -950,13 +915,10 @@ C        END IF
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*    Structure definitions :
 *    Import :
       CHARACTER*(DAT__SZLOC) LOC               ! Locator to NDF
-      CHARACTER*(80)         OUTUNITS          ! Output units
-      CHARACTER*(80)         UNITS             ! Units of axis
+      CHARACTER*(*)          OUTUNITS          ! Output units
+      CHARACTER*(*)          UNITS             ! Units of axis
 
       INTEGER                LEN               ! Length of axis
       INTEGER                AX                ! Axis identifier
@@ -1001,7 +963,6 @@ C        END IF
         ELSE
           CALL BINMERGE_SCALEXY (OUTUNITS, UNITS, LEN, TPTR, XAX, PTR,
      :                                                          STATUS)
-          CALL BDA_UNMAP (LOC, TPTR, STATUS)
 
         END IF
       ELSE IF (XAX) THEN
@@ -1015,12 +976,10 @@ C        END IF
 
 *    Exit
  999  IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP ('E', '...from BINMERGE_GET_MIN', STATUS)
+        CALL AST_REXIT( 'BINMERGE_GET_MIN', STATUS )
       END IF
 
       END
-
-
 
 
 *+  BINMERGE_SCALEXY - Rescales x or y axis accordig to units.
@@ -1043,11 +1002,9 @@ C        END IF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Import :
-      CHARACTER*(80)         OUTUNITS          ! Output units
-      CHARACTER*(80)         UNITS             ! Units of axis
+      CHARACTER*(*)		OUTUNITS          	! Output units
+      CHARACTER*(*)         	UNITS             	! Units of axis
 
       INTEGER                LEN               ! Length of axis
       INTEGER                INPTR             ! pointer to mapped values
@@ -1114,60 +1071,18 @@ C        END IF
         IF (CONTINUE) THEN
           CALL DYN_MAPR (1, LEN, OUTPTR, STATUS)
 
-*        Check status
-          IF (STATUS .NE. SAI__OK) GOTO 999
-
-          CALL BINMERGE_SCALE (LEN, OUTVAL, INVAL, %VAL(INPTR),
-     :                                                     %VAL(OUTPTR))
+          CALL ARR_MULT1R( LEN, %VAL(INPTR), INVAL/OUTVAL,
+     :                     %VAL(OUTPTR), STATUS )
 
         END IF
       END IF
 
 *    Exit
  999  IF (STATUS .NE. SAI__OK) THEN
-        CALL ERR_REP ('E', '...from BINMERGE_SCALEXY', STATUS)
-
+        CALL AST_REXIT( 'BINMERGE_SCALEXY', STATUS )
       END IF
+
       END
-
-
-
-
-
-
-
-*+  BINMERGE_SCALE - Alter axis data to correct units.
-      SUBROUTINE BINMERGE_SCALE (LEN, OUTVAL, INVAL, IN, OUT)
-*    Description :
-*     Alters the array IN according to the OUTVAL & INVAL values
-*     to produce OUT.
-*    Authors :
-*     Phil Andrews
-*    History :
-*     16-DEC-1988 :  Original  (PLA_AST88@uk.ac.bham.sr.star)
-*    Type Definitions :
-      IMPLICIT NONE
-*    Import :
-      INTEGER                LEN               ! Length of axis
-
-      REAL                   OUTVAL           ! output units value
-      REAL                   INVAL            ! input units value
-      REAL                   IN(*)            ! input array
-
-*    Export :
-      REAL                   OUT(*)           ! output array
-
-*    Local variables :
-      INTEGER                I                ! loop counter
-
-*-
-      DO I = 1, LEN
-        OUT(I) = IN(I) * INVAL / OUTVAL
-
-      END DO
-      END
-
-
 
 
 *+  BINMERGE_ALTER - Transform input axis values to output axis values
@@ -1181,7 +1096,6 @@ C        END IF
 *     16-DEC-1988 :  Original  (PLA_AST88@uk.ac.bham.sr.star)
 *    Type Definitions :
       IMPLICIT NONE
-*    Structure definitions :
 *    Import :
       DOUBLE PRECISION     C1,C2,C3,C4,C5,C6  ! constants of the
                                               ! transformation
