@@ -62,7 +62,9 @@ install-exec-local: dtask_main.o
 # ../subpar/subpar_link adam internally, so we have to add that to
 # the PATH.
 #
-# Substitute ORIG_AM_FCFLAGS: see notes in ailink.in.m4
+## Substitute ORIG_AM_FCFLAGS: see notes in ailink.in.m4
+## This is currently substituted with FCFLAGS -- should be AM_FCFLAGS when
+## that whole mess is sorted out
 edit = sed \
     -e 's,@staretcdir\@,$(staretcdir),g' \
     -e 's,@bindir\@,$(bindir),g' \
@@ -70,7 +72,7 @@ edit = sed \
     -e 's,@CC\@,$(CC),g' \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
     -e 's,@FC\@,$(FC),g' \
-    -e 's,@ORIG_AM_FCFLAGS\@,@AM_FCFLAGS@,g' \
+    -e 's,@ORIG_AM_FCFLAGS\@,@FCFLAGS@,g' \
     -e 's,@FCLIBS\@,$(FCLIBS),g' \
     -e 's,@C_FC_FCLINK_MAGIC\@,$(C_FC_FCLINK_MAGIC),g' \
     -e "s\#@DTASK_LINK_ADAM\@\#`PATH=../subpar:$$PATH ./dtask_link_adam`\#g" \
