@@ -11,8 +11,8 @@
 			-- Star2HTML -->
 
   <!-- Figures -->
-  <!ENTITY sgmlsystem.eps SYSTEM 'SGMLsystem.eps' NDATA eps>
-  <!ENTITY sgmlsystem.gif SYSTEM 'SGMLsystem.gif' NDATA gif89a>
+  <!ENTITY sgmlsystem.eps SYSTEM 'ssn70_SGMLsystem.eps' NDATA eps>
+  <!ENTITY sgmlsystem.gif SYSTEM 'ssn70_SGMLsystem.gif' NDATA gif89a>
 
   <!-- Local text files included -->
   <!ENTITY starlinkdtddoc	
