@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.6  1998/12/10 21:51:40  timj
+#        Support new directory structure at JAC. (RPT)
+#
 #        Revision 1.5  1998/11/20 02:12:13  timj
 #        Fix domain names. Make sure works with output of SURF REDUCE_NOISE (rpt)
 #
@@ -234,13 +237,13 @@ sub set_disks {
 
   push(@disk,".");
   if ($domain eq "jach" || $domain eq "Hilo") {
-    push(@disk,"/net/luu/scubadata/observe");
+    push(@disk,"/net/luu/scubadata");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
   } elsif ($domain eq "jcmt") {
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
-    push(@disk,"/net/luu/scubadata/observe");
+    push(@disk,"/net/luu/scubadata");
   }
 
   if ($debug) {
@@ -702,7 +705,12 @@ sub scandisk {
         }
 
         $location = $disk[$i];
-        $location = "${location}/${obsdate}/ro" if ($location =~ /\/net/);
+	if ($location =~ /luu/) {
+	  $sem = find_sem($obsdate);
+	  $location = "${location}/${sem}/${obsdate}";
+	} elsif ($location =~ /^\/net/) {
+	  $location = "${location}/${obsdate}";
+	}
 
 	print "Trying directory '${location}/'..." if ($debug);
 	@files = ();
@@ -816,7 +824,12 @@ sub getfile {
 	    }
 
 	    $location = $disk[$i];
-	    $location = "${location}/${obsdate}/ro" if ($location =~ /\/net/);
+	    if ($location =~ /luu/) {
+              $sem = find_sem($obsdate);
+	      $location = "${location}/${sem}/${obsdate}";
+	    } elsif ($location =~ /^\/net/) {
+	      $location = "${location}/${obsdate}";
+	    }
 
 	    print "Trying ${location}/$rofile...\n" if ($debug);
 	    if (-e "${location}/$rofile") {
@@ -1485,6 +1498,36 @@ sub area_save {
 
 #----------------------------------------------------------------------
 # We write good unix utilities ergo the -v and -h flags work
+
+
+# ----------------------------------------------------------------------
+# Figure out semester and previous
+sub find_sem {
+
+   my $obsdate = shift;
+
+   print "DEBUG: find_sem obsdate is ${obsdate}\n" if $debug;
+
+
+   my $sem = "unknown";
+   $year = substr($obsdate,2,2);
+   $pyear = $year - 1;
+   $monthday= substr($obsdate,4,4);
+
+   if ( $monthday > 201 && $monthday < 802 ) {
+     $sem = "m${year}a";
+   } elsif  ( $monthday < 202 ) {
+     $sem = "m${pyear}b";
+   } else {
+     $sem = "m${year}b";
+   }
+
+   print "DEBUG: ..... is mapped to semester ${sem}\n" if $debug;
+
+   $sem = $sem;
+
+}
+
  
 sub ver_text {
 
@@ -1659,3 +1702,4 @@ __END__
 *    are searched for files when the program is run outside of JAC.
 
 *-
+
