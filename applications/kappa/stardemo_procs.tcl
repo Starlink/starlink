@@ -2848,6 +2848,7 @@ proc Agitate {} {
          file delete $fl
       }
    }
+   return 1
 }
 
 proc Alpha {state} {
