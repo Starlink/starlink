@@ -17,14 +17,21 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AM_PROG_LEX
 AC_PROG_CC
 AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 
-dnl    Don't want bison, want yacc!
-dnl  AC_PROG_YACC
+dnl    If you write AC_PROG_YACC here, autoconf may try to use bison -y.
+dnl    This doesn't seem to work for some reason, but yacc does, so get
+dnl    it by hand.
 AC_PATH_PROG(YACC, yacc)
+
+dnl    Locate lex, and customise it to use a local skel flag if it's flex.
+AM_PROG_LEX
+if test $LEX = "flex"
+then
+   LEX="$LEX -Sflex.skl"
+fi
 
 dnl    Set up with defaults some variables which configure where files are
 dnl    found.
