@@ -30,6 +30,7 @@
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
 #     MBT: Mark Taylor (Starlink)
+#     AA: Alasdair Allan (Starlink)
 #     {enter_new_authors_here}
 
 #  History:
@@ -42,6 +43,8 @@
 #        Added check for generic script location.
 #     6-JUL-2004 (MBT):
 #        Modified for use with configure.
+#     10-OCT-2004 (AA):
+#        Updated to use FGENERIC token
 #     {enter_changes_here}
 
 #-
@@ -78,9 +81,9 @@
 
 #  Generic this.
      if ( $2 == "" ) then 
-        @GENERIC@ -t n dgeneric.gen
+        @FGENERIC@ -t n dgeneric.gen
      else
-        @GENERIC@ -t $2 dgeneric.gen
+        @FGENERIC@ -t $2 dgeneric.gen
      endif
 
 #  Second tokens. 
@@ -99,9 +102,9 @@
 #  -s flag
      if ( $3 == "" ) then
         if ( $2 == "" ) then 
-           @GENERIC@ -t n dgeneric2.gen
+           @FGENERIC@ -t n dgeneric2.gen
         else
-           @GENERIC@ -t $2 dgeneric2.gen
+           @FGENERIC@ -t $2 dgeneric2.gen
         endif
 
 #  Set the output file name.
@@ -118,9 +121,9 @@
            endif
         end
         if ( $2 == "" ) then 
-           @GENERIC@ -t n  -s dgeneric2.gen
+           @FGENERIC@ -t n  -s dgeneric2.gen
         else
-           @GENERIC@ -t $2 -s dgeneric2.gen
+           @FGENERIC@ -t $2 -s dgeneric2.gen
         endif
 
 #  Now look for all dgeneric2* files. Get the * value and rename.
