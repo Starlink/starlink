@@ -321,6 +321,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     6-OCT-2000 (DSB):
 *        Increased size of buffers used to store CTYPE values to take
 *        account of the possiblity of lots of trailing spaces.
+*     5-DEC-2000 (DSB):
+*        Add support for the WCSNAME FITS keyword.
 *class--
 */
 
@@ -537,6 +539,7 @@ typedef struct FitsStore {
    char ***ctype_com;
    char ***cunit;
    char ***radesys;
+   char ***wcsname;
    double ***cd;
    double ***crpix;
    double ***crval;
@@ -4719,6 +4722,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->ctype_com = NULL;
       ret->cunit = NULL;
       ret->radesys = NULL;
+      ret->wcsname = NULL;
       ret->cd = NULL;
       ret->crpix = NULL;
       ret->crval = NULL;
@@ -4944,6 +4948,7 @@ static FitsStore *FreeStore( FitsStore *store ){
    FreeItemC( &(store->ctype_com) );
    FreeItemC( &(store->cunit) );
    FreeItemC( &(store->radesys) );
+   FreeItemC( &(store->wcsname) );
 
    FreeItem( &(store->cd) );
    FreeItem( &(store->crpix) );
@@ -5310,6 +5315,7 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
       ret->ctype_com = NULL;
       ret->cunit = NULL;
       ret->radesys = NULL;
+      ret->wcsname = NULL;
       ret->cd = NULL;
       ret->crpix = NULL;
       ret->crval = NULL;
@@ -12576,6 +12582,12 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
    always take the default value of degrees). */
       SetItemC( &(store->cunit), axlat, s, NULL );
       SetItemC( &(store->cunit), axlon, s, NULL );
+
+   }
+
+/* Store the Domain name as the WCSNAME keyword (if set). */
+   if( astTestDomain( skyfrm ) ) { 
+      SetItemC( &(store->wcsname), 0, s, (char *) astGetDomain( skyfrm ) );
    }
 
    if( !astOK ) ret = 0;
@@ -15573,6 +15585,22 @@ static void WCSFcRead( AstFitsChan *fc, FitsStore *store, const char *method,
          j = 0;
          im = 0;
          s = ' ';
+
+/* Is this a primary WCSNAME keyword? */
+      } else if( Match( keynam, "WCSNAME", 0, fld, &nfld, method, class ) ){
+         item = &(store->wcsname);
+         type = AST__STRING;
+         j = 0;
+         im = 0;
+         s = ' ';
+
+/* Is this a secondary WCSNAME keyword? */
+      } else if( Match( keynam, "WCSNAME%1c", 0, fld, &nfld, method, class ) ){
+         item = &(store->wcsname);
+         type = AST__STRING;
+         j = 0;
+         im = 0;
+         s = keynam[ strlen( keynam ) - 1 ];
       }
 
 /* If this keyword was recognized, store it in the FitsStore, and mark it
@@ -15979,6 +16007,13 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
       }
    }   
 
+/* If the header contained a WCSNAME keyword use it as the Domain name
+   for the Frame. */
+   ckeyval = GetItemC( &(store->wcsname), 0, s, NULL, method, class );
+   if( ckeyval ){
+      astSetDomain( ret, ckeyval );
+   }
+
 /* If an error has occurred, annul the Frame. */
    if( !astOK ) ret = astAnnul( ret );
    
@@ -16148,6 +16183,12 @@ static int WCSFromStore( AstFitsChan *this, FitsStore *store,
                       combuf );
          }
       }
+
+/* Get and save WCSNAME. This is NOT required, so do not return if it is 
+   not available. */
+      cval = GetItemC( &(store->wcsname), 0, s, NULL, method, class );
+      if( cval ) SetValue( this, FormatKey( "WCSNAME", -1, -1, s ), &cval, 
+                           AST__STRING, "Reference name for the coord. frame" );
 
 /* Get and save RADESYS. This is NOT required, so do not return if it is 
    not available. */
@@ -17336,6 +17377,11 @@ static int WcsNoWcs( AstMapping *map, AstFrame *phyfrm, int naxis,
                SetItem( &(store->crval), j, 0, s, 0.0 );
             }
          }
+      }
+
+/* Store the Domain name as the WCSNAME keyword (if set). */
+      if( astTestDomain( phyfrm ) ) { 
+         SetItemC( &(store->wcsname), 0, s, (char *) astGetDomain( phyfrm ) );
       }
 
 /* Indicate that the FrameSet has been succesfully represented using
