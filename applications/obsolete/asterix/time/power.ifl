@@ -1,0 +1,41 @@
+Interface POWER
+   Parameter    INPUT
+      position    1
+      type        'UNIV'
+      keyword     'INP'
+      ppath       'GLOBAL'
+      association '<->GLOBAL.ANAL_DATA'
+      prompt      'Enter name of input dataset'
+      help        'Must be an HDS structure'
+   EndParameter
+
+   Parameter    OUTPUT
+      position    2
+      type        'UNIV'
+      keyword     'OUT'
+      association '->GLOBAL.GRAFDS'
+      prompt      'Enter name for the output dataset'
+      help        'This will be an HDS file'
+   EndParameter
+
+   Parameter    TRUNCATE
+      type        '_LOGICAL'
+      default     T
+      prompt      'Do you wish to truncate the data? '
+      help        'This is to prevent prime numbers of data points'
+   EndParameter
+
+   Parameter    TAPER
+      type        '_LOGICAL'
+      default     T
+      prompt      'Do you wish to taper the ends of the data? '
+      help        'This reduces spurious effects due to assuming periodicity'
+   EndParameter
+
+   Parameter    REMOVE_MEAN
+      type        '_LOGICAL'
+      default     T
+      prompt      'Do you wish to remove the mean value? '
+      help        'This is to avoid a large zero order power component'
+   EndParameter
+EndInterface

@@ -1,0 +1,40 @@
+INTERFACE CORRECT
+
+  PARAMETER INP
+    POSITION    1
+    TYPE        'UNIV'
+    PROMPT      'First input data object'
+    HELP        'May be N-d binned dataset, or even a scalar'
+  ENDPARAMETER
+
+  PARAMETER OUT
+    POSITION    2
+    TYPE        'UNIV'
+    PROMPT      'Output dataset'
+    HELP        'This will be a corrected copy of the input'
+  ENDPARAMETER
+
+  PARAMETER OVER
+    TYPE        '_LOGICAL'
+    DEFAULT      N
+    VPATH       'DEFAULT'
+    PROMPT      'Overwrite input data object?'
+    HELP        'If TRUE output object overwrites first input object'
+  ENDPARAMETER
+
+  PARAMETER POISS
+    TYPE        '_LOGICAL'
+    DEFAULT      Y
+    VPATH       'PROMPT'
+    PPATH       'DEFAULT'
+    PROMPT      'Create Poisson distributed variance from data array'
+    HELP        'Having a variance array will help to run other s/w, eg. spectral fitting'
+  ENDPARAMETER
+
+  PARAMETER TEXP
+    TYPE        '_REAL'
+    PROMPT      'Exposure time (seconds)'
+    HELP        'Will be used to correct data, and will be written to output'
+  ENDPARAMETER
+
+ENDINTERFACE

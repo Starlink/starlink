@@ -1,0 +1,45 @@
+Interface ACF
+  Parameter INP
+    Type        'UNIV'
+    Position    1
+    Ppath       'Global'
+    Association '<- GLOBAL.ANAL'
+    Prompt      'Enter the name of the input dataset'
+    Help        'Any ASTERIX binned dataset will do!'
+  EndParameter
+
+  Parameter OUT
+    Type        'UNIV'
+    Position    2
+    Prompt      'Enter the name of the output dataset'
+    Help        'This will contain the autocorrelation function(s).'
+  EndParameter
+
+  Parameter AXIS
+    Type        '_integer'
+    Prompt      'Enter index number of axis to perform autocorrelation along'
+    Help        'Suggested default (if present) is the time axis.'
+  EndParameter
+
+  Parameter MXLAG
+    Type        '_Integer'
+    Position    3
+    Prompt      'Enter maximum lag to be calculated'
+    Help        'Suggested default is the maximum allowed value'
+  EndParameter
+
+  Parameter BIAS
+    Type        '_logical'
+    Ppath       'current'
+    Prompt      'Bias the autocorrelation? (y/n)'
+    Help        'Suppresses the ampiltude of high lag values'
+  EndParameter
+
+  Parameter WEIGHT
+    Type        '_logical'
+    Vpath       'default'
+    Default     Y
+    Prompt      'Use variance &/or quality information if present? (y/n)'
+    Help        'Will the faster algorithm if no variance or bad quality are present'
+  EndParameter
+EndInterface

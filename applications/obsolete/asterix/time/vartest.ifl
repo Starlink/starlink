@@ -1,0 +1,28 @@
+  INTERFACE VARTEST
+
+    PARAMETER INP
+       TYPE      'UNIV'
+       PPATH     'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Source time series'
+    ENDPARAMETER
+
+    PARAMETER BACK
+       TYPE      'UNIV'
+       PROMPT 'Background time series'
+    ENDPARAMETER
+
+    PARAMETER AREA
+       TYPE      '_REAL'
+       PPATH     'DEFAULT'
+       DEFAULT   1.0
+       VPATH     'PROMPT'
+       PROMPT    'Ratio of source to background area'
+    ENDPARAMETER
+
+    PARAMETER PFUNC
+       TYPE      '_REAL'
+       VPATH     'INTERNAL,NOPROMPT'
+    ENDPARAMETER
+
+ ENDINTERFACE

@@ -1,0 +1,279 @@
+ INTERFACE TIMSIM
+    PARAMETER OUT
+       TYPE      '_UNIVERSAL'
+       POSITION  1
+       PROMPT    'Enter name of output file'
+       HELP      'No file name extension (e.g. .sdf) is needed'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   TIMESERIES
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER AXIS
+       POSITION  2
+       TYPE      '_LOGICAL'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   N
+       HELP      'If no, then a regular axis can be specified'
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+       PROMPT    'Do you wish to use a time axis from another file?'
+    ENDPARAMETER
+
+    PARAMETER INP
+       TYPE      '_UNIVERSAL'
+       PROMPT    'Enter name of input file containing axis required'
+       HELP      'No file name extension (e.g. .sdf) is needed'
+       PPATH     'CURRENT'
+       VPATH     'PROMPT,CURRENT'
+    ENDPARAMETER
+
+    PARAMETER DUR
+       TYPE      '_REAL'
+       PROMPT    'Enter duration of time series in seconds'
+       HELP      'Maximum value of 100,000'
+       RANGE     0.0,100000.0
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   1000
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER WID
+       TYPE      '_REAL'
+       PROMPT    'Enter required bin width'
+       HELP      'Maximum value of 10,000'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   10.0
+       RANGE     0.0,10000.0
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER INIT
+       TYPE      '_REAL'
+       PROMPT    'Enter time of centre of first bin'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   0.0
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER OPT
+       TYPE      '_CHAR'
+       PROMPT    'Enter options separated by spaces'
+       HELP      'Only 1 to 7 possible'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER LEV1
+       TYPE      '_REAL'
+       PROMPT    'Enter level of background in count/s'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   10.0
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER RAM1
+       TYPE      '_REAL'
+       PROMPT    'Enter level in count/s at start of time series'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER RAM2
+       TYPE      '_REAL'
+       PROMPT    'Enter level in count/s at end of time series'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER NUMSIN
+       TYPE      '_INTEGER'
+       PROMPT    'Enter number of sine waves required'
+       HELP      'Maximum number 5'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   1
+       RANGE     1,5
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PER1
+       TYPE      '_REAL'
+       PROMPT    'Enter period of sine wave in secs'
+       HELP      'Maximum is 100,000'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   100
+       RANGE     0,100000
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PHA1
+       TYPE      '_REAL'
+       PROMPT    'Enter phase at initial time value'
+       HELP      'In degrees, zero is defined in the usual way for sine'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   0
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+       RANGE     -360,360
+    ENDPARAMETER
+
+    PARAMETER AMP1
+       TYPE      '_REAL'
+       PROMPT    'Enter amplitude of sine wave'
+       HELP      'Amp is defined as half difference between extreme values'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   10
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER NUMSQU
+       TYPE      '_INTEGER'
+       PROMPT    'Enter number of square waves required'
+       HELP      'Maximum number 5'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   1
+       RANGE     1,5
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PER2
+       TYPE      '_REAL'
+       PROMPT    'Enter period of square wave in secs'
+       HELP      'Maximum is 100,000'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   100
+       RANGE     0,100000
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PHA2
+       TYPE      '_REAL'
+       PROMPT    'Enter phase at initial time value'
+       HELP      'In degrees, zero is defined at the rise point'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   0
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+       RANGE     -360,360
+    ENDPARAMETER
+
+    PARAMETER AMP2
+       TYPE      '_REAL'
+       PROMPT    'Enter amplitude of square wave'
+       HELP      'Amp is defined as half difference between extreme values'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   10
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER NUMSAW
+       TYPE      '_INTEGER'
+       PROMPT    'Enter number of saw tooth waves required'
+       HELP      'Maximum number 5'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   1
+       RANGE     1,5
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PER3
+       TYPE      '_REAL'
+       PROMPT    'Enter period of saw tooth wave in secs'
+       HELP      'Maximum is 100,000'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   100
+       RANGE     0,100000
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER PHA3
+       TYPE      '_REAL'
+       PROMPT    'Enter phase at initial time value'
+       HELP      'In degrees, zero is defined at maximum'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   -90
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+       RANGE     -360,360
+    ENDPARAMETER
+
+    PARAMETER AMP3
+       TYPE      '_REAL'
+       PROMPT    'Enter amplitude of saw tooth wave'
+       HELP      'Amp is defined as half difference between extreme values'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   10
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER NUMFLA
+       TYPE      '_INTEGER'
+       PROMPT    'Enter number of flares required'
+       HELP      'Maximum number 20'
+       PPATH     'CURRENT,DEFAULT'
+       DEFAULT   1
+       RANGE     1,20
+       VPATH     'PROMPT,CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER RIS
+       TYPE      '_REAL'
+       PROMPT    'Enter rise time in secs'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER DEC
+       TYPE      '_REAL'
+       PROMPT    'Enter decay-time in secs'
+       HELP      'Decaytime is e-folding time of decay'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER AMP4
+       TYPE      '_REAL'
+       PROMPT    'Enter amplitude of flare'
+       HELP      'Amp is defined as maximum value of flux in count/s'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER TIM
+       TYPE      '_REAL'
+       PROMPT    'Enter time of maximum of flare in secs'
+       VPATH     'PROMPT'
+    ENDPARAMETER
+
+    PARAMETER DLAB
+       TYPE      '_CHAR'
+       DEFAULT   'Intensity'
+       VPATH     'DEFAULT,PROMPT'
+       PROMPT    'Data label'
+       PPATH     'CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER DUNI
+       TYPE      '_CHAR'
+       DEFAULT   'count/s'
+       VPATH     'DEFAULT,PROMPT'
+       PROMPT    'Data Units'
+       PPATH     'CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER AXLAB
+       TYPE      '_CHAR'
+       DEFAULT   'Time'
+       VPATH     'DEFAULT,PROMPT'
+       PROMPT    'Axis Label'
+       PPATH     'CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER AXUNI
+       TYPE      '_CHAR'
+       DEFAULT   's'
+       VPATH     'DEFAULT,PROMPT'
+       PROMPT    'Axis Units'
+       PPATH     'CURRENT,DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER BSF
+       TYPE      '_INTEGER'
+       DEFAULT   100
+       VPATH     'DEFAULT,PROMPT'
+       PROMPT    'Bin splitting factor'
+       PPATH     'CURRENT,DEFAULT'
+       HELP      'The number of sections each bin is split into for integration purposes'
+    ENDPARAMETER
+
+ ENDINTERFACE

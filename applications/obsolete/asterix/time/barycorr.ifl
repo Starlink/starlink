@@ -1,0 +1,60 @@
+INTERFACE BARYCORR
+
+ PARAMETER INP
+   POSITION    1
+   TYPE        'UNIV'
+   ASSOCIATION '<->GLOBAL.EVDS'
+   VPATH       'PROMPT'
+   PPATH       'GLOBAL'
+   PROMPT      'Input dataset to be barycentrically corrected'
+   HELP        'Name of the input file you would like barycentric corrections applied to '
+ ENDPARAMETER
+
+ PARAMETER OUT
+   POSITION    2
+   TYPE        'UNIV'
+   VPATH       'PROMPT'
+   PPATH       'GLOBAL'
+   PROMPT      'barycentrically corrected output dataset'
+   HELP        'Name of the output file created by BARYCORR '
+ ENDPARAMETER
+
+ PARAMETER SIMPLE_MODE
+   TYPE        '_LOGICAL'
+   VPATH       'PROMPT'
+   PPATH       'CURRENT,DEFAULT'
+   PROMPT      'Apply a single correction to Header of file?'
+   DEFAULT     Y
+   HELP        'Will not allow for any differential barycentric correction that occurs during the observation'
+ ENDPARAMETER
+
+
+
+ PARAMETER ABORT
+   TYPE        '_LOGICAL'
+   PPATH       'DEFAULT'
+   VPATH       'PROMPT'
+   DEFAULT     N
+   PROMPT      '(N)Applies barycentric on basis of header data. (Y) ABORTS'
+   HELP        'if you do not abort, a single correction based on header components will be computed '
+ ENDPARAMETER
+
+ PARAMETER UPDATE_PRD
+   TYPE        '_REAL'
+   DEFAULT     20.0
+   PPATH       'DYNAMIC,DEFAULT'
+   VPATH       'PROMPT'
+   PROMPT      'Period after which BaryCorr is recalculated'
+   HELP        'How often do you wish to account for satellite/Earth motion (secs)'
+ ENDPARAMETER
+
+ PARAMETER UPDATE_INT
+   TYPE        '_REAL'
+   DEFAULT     20.0
+   PPATH       'DYNAMIC,DEFAULT'
+   VPATH       'PROMPT'
+   PROMPT      'Period after which BaryCorr is recalculated'
+   HELP        'How often do you wish to account for satellite/Earth motion (secs)'
+ ENDPARAMETER
+
+ENDINTERFACE

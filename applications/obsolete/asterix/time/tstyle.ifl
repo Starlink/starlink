@@ -1,0 +1,27 @@
+interface TSTYLE
+  parameter POLY
+    type '_LOGICAL'
+    default !
+    prompt 'Polyline'
+    help 'Reply with Y, N or ! to leave unchanged'
+  endparameter
+  parameter STEP
+    type '_LOGICAL'
+    default !
+    prompt 'Stepped line'
+    help 'Reply with Y, N or ! to leave unchanged'
+  endparameter
+  parameter ERR
+    type '_LOGICAL'
+    default !
+    prompt 'Error bars'
+    help 'Reply with Y, N or ! to leave unchanged'
+  endparameter
+  parameter SYMBOL
+    type '_INTEGER'
+    position 1
+    default !
+    prompt 'Symbol number'
+    help 'PGPLOT symbol number or 0 for none - ! leaves unchanged'
+  endparameter
+endinterface

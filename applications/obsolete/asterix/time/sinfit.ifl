@@ -1,0 +1,61 @@
+Interface SINFIT
+   Parameter    INPUT
+      POSITION       1
+      TYPE           'UNIV'
+      keyword        'INP'
+      vpath          'PROMPT'
+      ppath          'GLOBAL'
+      association    '<->GLOBAL.BINDS'
+      prompt         'Enter name of input dataset'
+      help           'Must contain a DATA_ARRAY component or be a vector'
+   EndParameter
+
+   Parameter    OUTPUT
+      POSITION       2
+      TYPE           'UNIV'
+      keyword        'OUT'
+      association    '->GLOBAL.GRAFDS'
+      prompt         'Enter name of output dataset'
+      help           'This will be an HDS object'
+   EndParameter
+
+   Parameter    BASE_FREQ
+      position       3
+      keyword        'BASE'
+      type           '_REAL'
+      prompt         'Base frequency (time units)**-1'
+      help           'Lowest frequency to be fitted to the data'
+   EndParameter
+
+   Parameter    FREQ_INCREMENT
+      POSITION       4
+      KEYWORD        'INC'
+      type           '_REAL'
+      prompt         'Frequency increment (time units)**-1'
+      help           'Between frequencies fitted to the data'
+   EndParameter
+
+   Parameter    NO_OF_FREQS
+      POSITION       5
+      KEYWORD        'NUM'
+      type           '_INTEGER'
+      prompt         'Number of frequencies to be fitted to the data'
+      help           'There is no limit - except the time taken!'
+   EndParameter
+
+   Parameter   PHASE
+      type           '_LOGICAL'
+      vpath          'DEFAULT'
+      default        N
+      prompt         'Write PHASE information ?'
+      help           'Written to <file>.MORE.ASTERIX.PHASE_SPECTRUM'
+   EndParameter
+
+   Parameter   DEMEAN
+      type           '_LOGICAL'
+      vpath          'DEFAULT'
+      default        Y
+      PROMPT         'Subtract data mean?'
+      HELP           'Answer NO only if the dataset is already mean subtracted'
+   EndParameter
+EndInterface

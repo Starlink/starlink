@@ -1,0 +1,19 @@
+ Interface difdat
+    Parameter Inp
+       position  1
+       type      'univ'
+       ppath     'global'
+       association '<->global.BINDS'
+       prompt    'Input object '
+       help      'This must either be a primitive object, or a binned dataset.'
+    EndParameter
+
+    Parameter out
+       position  2
+       type      'univ'
+       association '->global.grafds'
+       vpath     'default'
+       prompt    'Output object '
+    EndParameter
+
+ EndInterface

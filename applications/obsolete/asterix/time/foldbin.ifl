@@ -1,0 +1,53 @@
+Interface FOLDBIN
+   Parameter    INP
+      position    1
+      type        'univ'
+      ppath       'GLOBAL'
+      association '<->GLOBAL.BINDS'
+      prompt      'Enter name of input file'
+      help        'This may be the pathname of a primitive array object.'
+   EndParameter
+
+   Parameter    FOLD_OBJ
+      position    2
+      type        'univ'
+      keyword     'OUT'
+      PPATH       'CURRENT'
+      association '->GLOBAL.BINDS'
+      prompt      'Enter name of output file'
+      help        'A new .SDF file will be created with this name.'
+   EndParameter
+
+   Parameter    PERIOD
+      position    3
+      keyword     'PERIOD'
+      type        '_real'
+      prompt      'Enter period for folding'
+      help        'This should be in the same units as the axis 1 data'
+   EndParameter
+
+   Parameter    PHASE_0_EPOCH
+      position    4
+      keyword     'EPOCH'
+      type        '_double'
+      prompt      'Enter epoch of phase zero (days)'
+      help        'The default value is the start time in the file header'
+   EndParameter
+
+   Parameter    N_PHASE_BINS
+      position    5
+      keyword     'BINS'
+      type        '_integer'
+      prompt      'Enter number of phase bins'
+      help        'This is the number of elements in the output DATA_ARRAY.'
+   EndParameter
+
+   Parameter    WEIGHT
+      keyword     'WEIGHTED'
+      TYPE        '_LOGICAL'
+      prompt      'Are weighted means required?'
+      default     N
+      ppath       'DEFAULT'
+      vpath       'PROMPT'
+   EndParameter
+EndInterface

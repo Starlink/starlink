@@ -1,0 +1,101 @@
+	INTERFACE CLEANPOW
+
+	    PARAMETER INPUT
+		POSITION 	1
+		TYPE 		'UNIV'
+		PROMPT  	'Input datafile'
+                PPATH           'GLOBAL,CURRENT'
+                HELP            '1-dimensional datafile'
+                ASSOCIATION     '<->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER AVSUB
+		POSITION 	2
+		TYPE 		'_LOGICAL'
+		PROMPT  	'Subtract average'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER OUTPUT
+		POSITION 	3
+		TYPE 		'UNIV'
+		PROMPT  	'Output datafile'
+                PPATH           'CURRENT'
+                HELP            'Without the extension'
+                ASSOCIATION     '->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER CHANGE
+		POSITION 	4
+		TYPE 		'_LOGICAL'
+		PROMPT  	'Change any of these values'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+                HELP 'Enter yes to change any of the above values'
+	    ENDPARAMETER
+
+	    PARAMETER VAR0
+		TYPE 		'_REAL'
+		PROMPT  	'additional weighting factor'
+                PPATH           'CURRENT'
+		VPATH		'DEFAULT'
+                DEFAULT         0
+                HELP 'Weights are defined: W(i) = 1/(variance(i) + VAR0)'
+	    ENDPARAMETER
+
+	    PARAMETER GAIN
+		TYPE 		'_DOUBLE'
+		PROMPT  	'Gain'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                HELP 'The GAIN of the CLEAN loop (0.1-0.5 is suitable)'
+	    ENDPARAMETER
+
+	    PARAMETER MAXITE
+		TYPE 		'_INTEGER'
+		PROMPT  	'Max no. of iterations (<10000)'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                HELP 'Must be less than 10000'
+	    ENDPARAMETER
+
+	    PARAMETER MAXFR
+		TYPE 		'_REAL'
+		PROMPT  	'Max. frequency'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                DEFAULT         0
+                HELP 'Maximum frequency to calculate CLEAN periodogram to'
+	    ENDPARAMETER
+
+	    PARAMETER HPBW
+		TYPE 		'_REAL'
+		PROMPT  	'Half power beam width'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                DEFAULT         0
+                HELP 'Half power beam width'
+	    ENDPARAMETER
+
+	    PARAMETER NPHPBW
+		TYPE 		'_REAL'
+		PROMPT  	'Resolution: points per HPBW'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                DEFAULT         0
+                HELP ' '
+	    ENDPARAMETER
+
+	    PARAMETER CLNLIM
+		TYPE 		'_REAL'
+		PROMPT  	'CLEAN limit'
+                PPATH           'DYNAMIC,CURRENT'
+		VPATH		'PROMPT'
+                DEFAULT         0
+                HELP 'The noise limit to which the spectrum is cleaned'
+	    ENDPARAMETER
+
+	ENDINTERFACE

@@ -1,0 +1,65 @@
+	INTERFACE FOLDAOV
+
+	    PARAMETER INPUT
+		POSITION 	1
+		TYPE 		'UNIV'
+                KEYWORD         'INP'
+		PROMPT  	'Input datafile'
+                PPATH           'GLOBAL,CURRENT'
+                HELP            '1-dimensional datafile'
+                ASSOCIATION     '<->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER PERIOD
+		POSITION 	2
+		TYPE 		'_REAL'
+		PROMPT  	'Initial search period'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER PINC
+		POSITION 	3
+		TYPE 		'_REAL'
+		PROMPT  	'Period increment'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER NPER
+		POSITION 	4
+		TYPE 		'_INTEGER'
+		PROMPT  	'Number of periods'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER NPBIN
+		POSITION 	5
+		TYPE 		'_INTEGER'
+		PROMPT  	'Number of phase bins'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER PER
+		POSITION 	6
+		TYPE 		'UNIV'
+		PROMPT  	'Name of output periodogram file'
+                PPATH           'CURRENT'
+                HELP            'Name of output file'
+                ASSOCIATION     '->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER FOLD
+		POSITION 	7
+		TYPE 		'UNIV'
+		PROMPT  	'Name of output phase file'
+                PPATH           'CURRENT'
+                HELP            'Name of output file'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	ENDINTERFACE

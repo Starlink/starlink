@@ -1,0 +1,44 @@
+*+  TIM_CMN - common block for TIM system
+
+      INTEGER T_MAXSECT
+      PARAMETER (T_MAXSECT=100)
+
+      COMMON /TIM_CMN/ T_NSECT,T_SECTPIX,T_SECTNDC,T_SECTXAX,
+     :                 T_SCALE,T_NVAL,T_YMIN,T_YMAX,
+     :                 T_DPTR,T_VPTR,T_APTR,T_WPTR,T_QPTR,
+     :                 T_AAPTR,T_WAPTR,
+     :                 T_OPEN,T_DISP,T_MODE,T_CLEAR,
+     :                 T_VOK,T_QOK,
+     :                 T_XZONES,T_YZONES,
+     :                 T_SEL,T_NSEL,
+     :                 T_CHOPPED,
+     :                 T_POLY,T_STEP,T_ERR,T_SYMBOL,
+     :                 T_NORM,T_REG,T_ABASE,T_ASCALE,T_UNIF,T_AWIDTH,
+     :                 T_TITLE,T_LABEL,T_UNITS,T_ALABEL,T_AUNITS,
+     :                 T_DEV,T_LOC,T_MASK
+
+      INTEGER T_NSECT
+      INTEGER T_SECTPIX(2,T_MAXSECT)
+      REAL T_SECTNDC(2,T_MAXSECT)
+      REAL T_SECTXAX(2,T_MAXSECT)
+      INTEGER T_NSEL
+      LOGICAL T_SEL(T_MAXSECT)
+      REAL T_SCALE
+      REAL T_YMIN,T_YMAX
+      INTEGER T_NVAL
+      INTEGER T_DPTR,T_VPTR,T_APTR,T_WPTR,T_QPTR
+      INTEGER T_AAPTR,T_WAPTR
+      LOGICAL T_OPEN,T_DISP,T_CLEAR
+      INTEGER T_MODE
+      LOGICAL T_VOK,T_QOK
+      INTEGER T_XZONES,T_YZONES
+      LOGICAL T_CHOPPED
+      LOGICAL T_POLY,T_STEP,T_ERR
+      INTEGER T_SYMBOL
+      LOGICAL T_NORM,T_REG,T_UNIF
+      REAL T_ABASE,T_ASCALE,T_AWIDTH
+      BYTE T_MASK
+      CHARACTER*80 T_TITLE,T_LABEL,T_UNITS,T_ALABEL,T_AUNITS
+      CHARACTER*(DAT__SZLOC) T_LOC
+      CHARACTER*30 T_DEV
+*-

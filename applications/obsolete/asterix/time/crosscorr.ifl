@@ -1,0 +1,45 @@
+Interface CROSSCORR
+   Parameter      OBJ1
+      position    1
+      type        'UNIV'
+      keyword     'INP1'
+      prompt      'Input object 1'
+   EndParameter
+
+   Parameter      OBJ2
+      position    2
+      type        'UNIV'
+      keyword     'INP2'
+      prompt      'Input object 2'
+   EndParameter
+
+   Parameter    XCORR_OBJ
+      position    3
+      type        'UNIV'
+      keyword     'OUT'
+      association '->GLOBAL.GRAFDS'
+      prompt      'Output object'
+   EndParameter
+
+   Parameter    MAX_LAG
+      position    4
+      type        '_INTEGER'
+      keyword     'LAG'
+      prompt      'Maximum lag to be computed (in bins)'
+      help        'This must be less than the number of data points!'
+   EndParameter
+
+   Parameter    WEIGHTED
+      type        '_LOGICAL'
+      keyword     'WEIGHT'
+      prompt      'Weighted cross-correlation?'
+      help        'Data variances will be used as weights in the usual way'
+   EndParameter
+
+   Parameter    NOISE_CORRECTED
+      type        '_LOGICAL'
+      keyword     'NOISE'
+      prompt      'Remove expected noise bias?'
+      help        'This will give an estimate of the source (not the data) XCF'
+   EndParameter
+EndInterface

@@ -1,0 +1,53 @@
+	INTERFACE LOMBSCAR
+
+	    PARAMETER INPUT
+		POSITION 	1
+		TYPE 		'UNIV'
+                KEYWORD         'INP'
+		PROMPT  	'Input datafile'
+                PPATH           'GLOBAL,CURRENT'
+                HELP            '1-dimensional datafile'
+                ASSOCIATION     '<->GLOBAL.BINDS'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER OFAC
+		POSITION 	2
+		TYPE 		'_REAL'
+		PROMPT  	'Oversampling factor'
+                PPATH           'CURRENT,DEFAULT'
+		VPATH		'PROMPT'
+HELP  'Oversampling increases the low frequency range - typical value 4 or more'
+                DEFAULT         4
+	    ENDPARAMETER
+
+	    PARAMETER HIFAC
+		POSITION 	3
+		TYPE 		'_REAL'
+		PROMPT  	'High frequency factor'
+                PPATH           'CURRENT'
+		VPATH		'PROMPT'
+                HELP 'HIFAC=2 extrapolates the spectrum out to twice Nyquist'
+                DEFAULT          1
+	    ENDPARAMETER
+
+	    PARAMETER OUTPUT
+		POSITION 	4
+		TYPE 		'UNIV'
+                KEYWORD         'OUT'
+		PROMPT  	'Output datafile'
+                PPATH           'CURRENT'
+                HELP            'Output filename w/o extension'
+		VPATH		'PROMPT'
+	    ENDPARAMETER
+
+	    PARAMETER WFREQ
+		TYPE 		'_REAL'
+		PROMPT  	'Window frequency'
+                PPATH           'CURRENT'
+		VPATH		'DEFAULT'
+                HELP 'F1=0 means dont use a window function'
+                DEFAULT          0.0
+	    ENDPARAMETER
+
+	ENDINTERFACE
