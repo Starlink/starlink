@@ -959,7 +959,7 @@ package kappa {
             helpkey *
           }
 
-         parameter title {
+          parameter title {
             type LITERAL
             access READ
             vpath DEFAULT
@@ -967,6 +967,26 @@ package kappa {
             default !
             prompt {Title for output NDF}
             helpkey *
+          }
+
+          parameter trim {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Remove insignificant output pixel axes?}
+            helpkey *
+            default FALSE
+          }
+
+          parameter trimwcs {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Remove surplus output WCS axes?}
+            helpkey *
+            default TRUE
           }
 
       }

@@ -21233,7 +21233,7 @@ Description:
 
    This application copies an NDF to a new location.  By supplying an
    NDF section as input it may be used to extract a subset, or to
-   change the size or dimensionality of an NDF.  A second NDF may
+   change the size or dimensionality of an NDF. A second NDF may
    also be supplied to act as a shape template, and hence to define
    the region of the first NDF which is to be copied.
 
@@ -21264,6 +21264,52 @@ TITLE = LITERAL (Read)
    A title for the output NDF.  A null value (the default) will
    cause the title of the NDF supplied for parameter IN to be
    used instead. [!]
+3 TRIM
+TRIM = _LOGICAL (Read)
+   If TRUE, then the number of pixel axes in the output NDF will be
+   reduced if necessary to remove any pixel axes which span only a
+   single pixel. For instance if "stokes" is a 3D data cube with
+   pixel bounds (1:100,-50:40,1:3), and the parameter IN is given the
+   value "stokes(,,2)", then the dimensionality of the output depends
+   on the setting of TRIM: if TRIM=NO the output is 3D with pixel
+   bounds (1:100,-50:40,2:2) and if TRIM=YES the output is 2D with
+   pixel bounds (1:100,-50:40). In this example, the third pixel
+   axis spans only a single pixel and is consequently removed if
+   TRIM=YES.  [FALSE]
+3 TRIMWCS
+TRIMWCS = _LOGICAL (Read)
+   This parameter is only accessed if parameter TRIM is TRUE. It
+   controls the number of axes in the current WCS co-ordinate Frame
+   of the output NDF. If TRIMWCS=YES, then the current Frame in the
+   output NDF will have the same number of axes as there are pixel
+   axes in the output NDF. If this involves removing axes, then the
+   axes to ratain are specified by parameter USEAXIS. If TRIMWCS=NO
+   then all axes are retained in the current WCS Frame of the
+   output NDF. Using the example in the description of the TRIM
+   parameter, if the input NDF "stokes" has a 3D current WCS Frame
+   with axes (Ra,Dec,Stokes) and TRIMWSC=YES, then an axis will be
+   removed from the current Frame to make it 2 dimensional (that
+   is, to match the number of pixel axes remaining after the
+   removal of insignificant pixel axes). The choice of which two
+   axes to retain is controlled by parameter USEAXIS. If, on the
+   other hand, TRIMWCS was set to FALSE, then the output NDF would
+   still have two pixel axes, but the current WCS Frame would retain
+   all three axes from the input NDF. If one or more current Frame
+   axes are removed, the transformation from the current Frame to
+   pixel Frame may become undefined resulting in some WCS operations
+   being unusable. The inverse of this transformation (from pixel
+   Frame to current Frame) is unchanged however. [TRUE]
+3 USEAXIS
+USEAXIS = LITERAL (Read)
+   This parameter is only accessed if TRIM and TRIMWCS are both TRUE
+   and some axes need to be removed from the current WCS Frame of
+   the output NDF. It gives the axes which are to be retained in
+   the current WCS Frame of the output NDF. Each axis can be
+   specified either by giving its index within the Current Frame
+   of the input NDF in the range 1 to the number of axes in the Frame,
+   or by giving its symbol. The dynamic default selects the axes with
+   the same indices as the pixel axes being copied. The value should
+   be given as a comma separated list. []
 2 Examples
 ndfcopy infile outfile
    Copies the contents of the NDF structure infile to the new
@@ -21314,6 +21360,9 @@ DSB: David S. Berry (STARLINK)
 
  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
+
+ 12-APR-2000 (DSB):
+    Added TRIM, TRIMWCS and USEAXIS parameters.
 2 Implementation_Status
    If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
    QUALITY, AXIS WCS and HISTORY components are copied by this routine,
