@@ -9,15 +9,21 @@ ExtUtils::F77 - Simple interface to F77 libs
 
 =head1 DESCRIPTION
 
-Simple interface to F77 libs based on 'rule-of-thumb' knowledge of
-various flavours of UNIX systems.
+This module tries to figure out how to link C programs with
+Fortran subroutines on your system. Basically one must add a list
+of Fortran runtime libraries. The problem is their location
+and name varies with each OS/compiler combination!
 
-Includes a simple self-documenting Perl database of knowledge/code
+This module tries to implement a simple  
+'rule-of-thumb' database for various flavours of UNIX systems.
+A simple self-documenting Perl database of knowledge/code
 for figuring out how to link for various combinations of OS and
-compiler. Please help save the world by sending database entries for
+compiler is embedded in the modules Perl code. Please help 
+save the world by sending database entries for
 your system to kgb@aaoepp.aao.gov.au
 
-The libs can be explicitly overridden by setting the environment 
+The library list which the module returns 
+can be explicitly overridden by setting the environment 
 variable F77LIBS, e.g.
 
   % setenv F77LIBS "-lfoo -lbar"
@@ -26,7 +32,7 @@ variable F77LIBS, e.g.
 
 =cut
 
-$VERSION = "1.08";
+$VERSION = "1.10";
 
 # Database starts here. Basically we have a large hash specifying
 # entries for each os/compiler combination. Entries can be code refs
@@ -86,13 +92,27 @@ $F77config{Solaris}{DEFAULT} = 'F77';
 ### Generic GNU-77 or F2C system ###
 
 $F77config{Generic}{G77}{Link} = sub {
-    my $dir = `g77 -print-file-name=libf2c.a`;
-    if( $dir ) {
-        $dir =~ s,/libf2c.a$,,;
+    my @libs = ( 'f2c', 'g2c');
+    my ($dir, $lib);
+    foreach my $test (@libs) {
+      $dir = `g77 -print-file-name=lib$test.a`;
+      chomp $dir;
+      # Note that -print-file-name returns just the library name
+      # if it cant be found - make sure that we only accept the
+      # directory if it returns a proper path (or matches a /)
+      if (defined $dir && $dir ne "lib$test.a") {
+        $lib = $test; # Found an existing library
+        last; 
+      }
+    }
+
+    if( defined $dir  && defined $lib) {
+        $dir =~ s,/lib$lib.a$,,;
     } else {
         $dir = "/usr/local/lib";
+        $lib = "f2c";
     }    
-    return( "-L$dir -L/usr/lib -lf2c -lm" );
+    return( "-L$dir -L/usr/lib -l$lib -lm" );
 };
 $F77config{Generic}{G77}{Trail_} = 1;
 $F77config{Generic}{G77}{Compiler} = find_in_path('g77','f77','fort77');
@@ -124,9 +144,37 @@ $F77config{Hpux}{DEFAULT}     = 'F77';
 
 ### IRIX ###
 
-$F77config{Irix}{F77}{Link}   =  $Config{cc} =~ /-n32/ ? '-L/usr/lib32 -lftn -lm' :
-   "-L/usr/lib -lF77 -lI77 -lU77 -lisam -lm" ;
+if ($Config{'cc'} =~ /-n32/)	# Modified by Allen Smith
+  {
+    if (($Config{'cc'} =~ /-mips4/) && (-r "/usr/lib32/mips4") && (-d _) && (-x _))
+      {
+	$F77config{Irix}{F77}{Cflags} = "-n32 -mips4";
+	if ((-r "/usr/lib32/mips4") && (-d _) && (-x _))
+	  {
+	    $F77config{Irix}{F77}{Link} = "-L/usr/lib32/mips4 -L/usr/lib32 -lftn -lm";
+	  }
+      }
+    elsif (($Config{'cc'} =~ /-mips3/) && (-r "/usr/lib32/mips3") && (-d _) && (-x _))
+      {
+	$F77config{Irix}{F77}{Cflags} = "-n32 -mips3";
+	if ((-r "/usr/lib32/mips3") && (-d _) && (-x _))
+	  {
+	    $F77config{Irix}{F77}{Link} = "-L/usr/lib32/mips4 -L/usr/lib32 -lftn -lm";
+	  }
+      }
+    else
+      {
+	$F77config{Irix}{F77}{Cflags} = "-n32";
+	$F77config{Irix}{F77}{Link} = "-L/usr/lib32 -lftn -lm";
+      }
+  }
+else
+  {
+    $F77config{Irix}{F77}{Link} = "-L/usr/lib -lF77 -lI77 -lU77 -lisam -lm";
+  }
 $F77config{Irix}{F77}{Trail_} = 1;
+$F77config{Irix}{F77}{Compiler} = $Config{cc} =~ /-n32/ ?
+    'f77 -n32' : 'f77 -o32';
 $F77config{Irix}{DEFAULT}     = 'F77';
 
 ### AIX ###
@@ -155,6 +203,7 @@ $F77config{VMS}{Fortran}{Compiler} = 'Fortran';
   use ExtUtils::F77;               # Automatic guess 
   use ExtUtils::F77 qw(sunos);     # Specify system
   use ExtUtils::F77 qw(linux g77); # Specify system and compiler
+  $fortranlibs = ExtUtils::F77->runtime;
 
 =cut
 
@@ -193,27 +242,28 @@ sub import {
      # Try this combination
 
      if (defined( $F77config{$system} )){
-        my $flibs = get ($F77config{$system}{$compiler}{Link});
-        $Runtime = $flibs . gcclibs();
-        $ok = validate_libs($Runtime) if $flibs ne "";
+     	my $flibs = get ($F77config{$system}{$compiler}{Link});
+     	$Runtime = $flibs . gcclibs();
+        $ok = 1;
+     	$ok = validate_libs($Runtime) if $flibs ne "";
      }else {
-        $Runtime = $ok = "";
+     	$Runtime = $ok = "";
      }
 
      # If it doesn't work try Generic + GNU77
 
      unless (defined($Runtime) && $ok) {
-        print <<"EOD";
+     	print <<"EOD";
 $Pkg: Unable to guess and/or validate system/compiler configuration
 $Pkg: Will try system=Generic Compiler=G77
 EOD
-         $system   = "Generic";
-         $compiler = "G77";
-         my $flibs = get ($F77config{$system}{$compiler}{Link});
-         $Runtime =  $flibs. gcclibs();
-         $ok = validate_libs($Runtime) if $flibs ne "";
-         print "$Pkg: Well that didn't appear to validate. Well I will try it anyway.\n"
-              unless $Runtime && $ok;
+    	 $system   = "Generic";
+    	 $compiler = "G77";
+    	 my $flibs = get ($F77config{$system}{$compiler}{Link});
+    	 $Runtime =  $flibs. gcclibs();
+    	 $ok = validate_libs($Runtime) if $flibs ne "";
+    	 print "$Pkg: Well that didn't appear to validate. Well I will try it anyway.\n"
+    	      unless $Runtime && $ok;
        }
  
       $RuntimeOK = $ok;
@@ -235,44 +285,69 @@ EOD
    }
   
    if (defined( $F77config{$system}{$compiler}{Compiler} )) {
-        $Compiler = $F77config{$system}{$compiler}{Compiler};
+	$Compiler = $F77config{$system}{$compiler}{Compiler};
    } else {
-        print << "EOD";
+	print << "EOD";
 $Pkg: There does not appear to be any configuration info about
 $Pkg: the F77 compiler name. Will assume 'f77'.
 EOD
-        $Compiler = 'f77';
+	$Compiler = 'f77';
    }
 print "$Pkg: Compiler: $Compiler\n";
 
    if (defined( $F77config{$system}{$compiler}{Cflags} )) {
-        $Cflags = $F77config{$system}{$compiler}{Cflags};
+	$Cflags = $F77config{$system}{$compiler}{Cflags};
    } else {
-        print << "EOD";
+	print << "EOD";
 $Pkg: There does not appear to be any configuration info about
 $Pkg: the options for the F77 compiler. Will assume none
 $Pkg: necessary.
 EOD
-        $Cflags = '';
+	$Cflags = '';
    }
 
    print "$Pkg: Cflags: $Cflags\n";
    
 } # End of import ()
 
-=head2 METHODS
+=head1 METHODS
 
- runtime()    - Returns list of F77 runtime libraries
- runtimeok()  - Returns TRUE only if runtime libraries have been found successfully
- trail_()     - Returns true if F77 names have trailing underscores
- compiler()   - Returns command to execute the compiler (e.g. 'f77')
- cflags()     - Returns compiler flags
- testcompiler - Test to see if compiler actually works
+The following methods are provided:
 
- [probably more to come.]
+=over 4
+
+=item * B<runtime>
+
+Returns a list of F77 runtime libraries.
+
+  $fortranlibs = ExtUtils::F77->runtime;
+
+=item * B<runtimeok>
+
+Returns TRUE only if runtime libraries have been found successfully.
+
+=item * B<trail_>
+
+Returns true if F77 names have trailing underscores.
+
+=item * B<compiler>
+
+Returns command to execute the compiler (e.g. 'f77').
+
+=item * B<cflags>
+
+Returns compiler flags.
+
+=item * B<testcompiler>
+
+Test to see if compiler actually works.
+
+=back
+
+More methods  will probably be added in the future.
 
 =cut
-        
+	
 sub runtime { return $Runtime; }
 sub runtimeok { return $RuntimeOK; }
 sub trail_  { return $Trail_; }
@@ -375,10 +450,16 @@ sub testcompiler {
 sub gcclibs {
    my $isgcc = $Config{'cc'} eq 'gcc';
    if (!$isgcc && $^O ne 'VMS') {
-      print "Checking for gcc in disguise\n";
+      print "Checking for gcc in disguise:\n";
       $isgcc = 1 if $Config{gccversion};
-      print "Compiler is gcc version $Config{gccversion}" if $isgcc;
-      print "Not gcc\n" unless $isgcc;
+      my $string;
+      if ($isgcc) {
+        $string = "Compiler is gcc version $Config{gccversion}";
+        $string .= "\n" unless $string =~ /\n$/;
+      } else {
+        $string = "Not gcc\n";
+      }
+      print $string;
    }
    if ($isgcc) {
        $gccdir = `gcc -print-libgcc-file-name`; chomp $gccdir;
@@ -397,16 +478,25 @@ sub find_in_path {
    for my $name (@names) {
       for my $dir (@path) {
          if (-x $dir."/$name") {
-            print "Found compiler $name\n";
-            return $name;
-          }
+	    print "Found compiler $name\n";
+	    return $name;
+	  }
       }
    }
+   return '' if $^O eq 'VMS';
    die "Unable to find a fortran compiler using names: ".join(" ",@names);
 }
-   
+
+
+=head1 AUTHOR
+
+Karl Glazebrook (kgb@aaoepp.aao.GOV.AU).
+
+=cut
 
 
 1; # Return true
+
+
 
 
