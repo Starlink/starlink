@@ -192,7 +192,11 @@
       public variable state {} {
 #-----------------------------------------------------------------------
          if { $state == "normal" } {
+            $itk_component(toolbar) configure -balloondelay1 1200
+            $itk_component(toolbar) configure -balloondelay2 1200
          } elseif { $state == "disabled" } {
+            $itk_component(toolbar) configure -balloondelay1 999999
+            $itk_component(toolbar) configure -balloondelay2 999999
          } else {
             error "Unknown control state"
          }
