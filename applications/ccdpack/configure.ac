@@ -38,8 +38,8 @@ AC_CHECK_HEADERS([fpu_control.h])
 # but we'll get along without it if it's not there because it couldn't
 # be built.
 have_itcl=1
-AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl])
-AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk -ltcl])
+AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl$TCL_VERSION])
+AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk$TCL_VERSION -ltcl$TCL_VERSION])
 AC_MSG_CHECKING([whether to use incr tcl])
 if test -n "$have_itcl"
 then
