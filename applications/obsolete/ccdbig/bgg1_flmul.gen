@@ -1,0 +1,81 @@
+      SUBROUTINE BGG1_FLMUL<T>( IMAGE, NCOLS, NLINES, STATUS )
+*+
+*  Name:
+*     BGG1_FLMUL<T>
+
+*  Purpose:
+*     Multiplies an image in place by a ramp.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL BIG1_FLMUL<T>( IMAGE, NCOLS, NLINES, STATUS )
+
+*  Arguments:
+*     IMAGE( 1 ) = unknown array (Given and returned)
+*        The image to be multiplied by the flatfield.
+*     NCOLS = INTEGER (Given)
+*        Number of columns in IMAGE.
+*     NLINES = INTEGER (Given)
+*        Number of lines in IMAGE.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     Assumes there are no bad pixels.  Since multiplication is by a 
+*     value between 0 and 1, this means that no bad pixels will result
+*     in the output either.
+
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-JUN-1998 (MBT):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NCOLS
+      INTEGER NLINES
+
+*  Arguments Given and Returned:
+      <TYPE> IMAGE( NCOLS, NLINES )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External references:
+      INCLUDE 'DCV_EXT'          ! Generic type conversion functions
+
+*  Local Variables:
+      REAL INTER
+      INTEGER I, J
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      INTER  = 1.0 / REAL ( NCOLS - 1 )
+      DO  J  =  1, NLINES
+         DO  I  =  1, NCOLS
+            IMAGE( I, J ) = DCV_RTO<T>( DCV_<T>TOR( IMAGE( I, J ) )
+     :                      * ( 0.5 + ( INTER * REAL ( I - 1 ) ) ) )
+         END DO
+      END DO
+
+      END
+* $Id: big1_flmul.f,v 1.4 1998/06/17 15:43:04 mbt Exp $
