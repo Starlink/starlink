@@ -396,7 +396,8 @@
 *    Abort if end of string reached
       IF ( BEG .EQ. LEN(FORM) ) THEN
         STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Unrecognised format '//FORM, STATUS )
+        CALL MSG_SETC( 'FMT', FORM )
+        CALL ERR_REP( ' ', 'Unrecognised format ^FMT', STATUS )
 
       ELSE
 
@@ -413,8 +414,9 @@
         READ( FORM(BEG:END), '(I)', IOSTAT=FSTAT ) WID
         IF ( FSTAT .NE. 0 ) THEN
           CALL FIO_SERR( FSTAT, STATUS )
+          CALL MSG_SETC( 'FMT', FORM )
           CALL ERR_REP( ' ', 'Cannot find display width from format '/
-     :                                                 /FORM, STATUS )
+     :                                               /'^FMT', STATUS )
         ELSE
 
 *        Add brackets

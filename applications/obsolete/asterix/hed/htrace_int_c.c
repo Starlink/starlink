@@ -1,5 +1,5 @@
 #include "sae_par.h"
-#include "/star/starlink/lib/hds/dat_par.h"
+#include "dat_par.h"
 
 #include "f77.h"
 #include "cnf.h"

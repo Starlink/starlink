@@ -74,7 +74,10 @@
 *
       INTEGER                TYP_INT, TYP_CHAR, TYP_REAL, TYP_LOG
         PARAMETER            ( TYP_INT = 1, TYP_CHAR = 2,
-     :                         TYP_LOG = 3, TYP_REAL = 4 )
+     :    TYP_LOG = 3, TYP_REAL = 4 )
+
+      CHARACTER*40           VERSION
+        PARAMETER            ( VERSION='HGET Version 1.7-0' )
 *
 *    Local variables :
 *
@@ -102,16 +105,6 @@
       LOGICAL                LVALUE           ! Logical attribute
       LOGICAL                OK               ! Validity check
       LOGICAL                PRIM             ! Input primitive?
-*
-*    Local data :
-*
-      CHARACTER*5            TRUTH(-1:1)
-        DATA                 TRUTH/'TRUE','FALSE','TRUE'/
-*
-*    Version id :
-*
-      CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='HGET Version 1.7-0' )
 *-
 
 *    Check status
@@ -232,7 +225,11 @@ c     CALL MSG_PRNT( VERSION )
         CALL USI_PUT0I( 'ATTR', IVALUE, TSTAT )
         IF ( ECHO ) CALL MSG_SETI( 'VAL', IVALUE )
       ELSE IF ( ATYPE .EQ. TYP_LOG ) THEN
-        CVALUE = TRUTH(LVALUE)
+        IF ( LVALUE ) THEN
+          CVALUE = 'TRUE'
+        ELSE
+          CVALUE = 'FALSE'
+        END IF
         CALL USI_PUT0C( 'ATTR', CVALUE(:5), TSTAT )
         IF ( ECHO ) CALL MSG_SETC( 'VAL', CVALUE(1:5) )
       ELSE IF ( ATYPE .EQ. TYP_REAL ) THEN
