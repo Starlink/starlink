@@ -83,7 +83,7 @@
 *        STYLE. [!]
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [current image-display device]
-*     FAST = _LOGICAL (Given)
+*     FAST = _LOGICAL (Read)
 *        If TRUE, then a faster, but in certain cases less accurate, method 
 *        is used to draw the contours. In fast mode, contours may be
 *        incorrectly placed on the display if the mapping between graphics 

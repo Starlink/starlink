@@ -151,7 +151,7 @@
 *        Attributes" in SUN/95 for a description of the available
 *        attributes. Any unrecognised attributes are ignored (no error is
 *        reported). [current value] 
-*     MARGIN(4) = _REAL (Read)
+*     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
 *        as fractions of the corresponding dimension of the DATA picture. 
 *        Four values may be given, in the order - bottom, right, top, left. 

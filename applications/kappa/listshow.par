@@ -15,5 +15,6 @@ marker,i,h,2,,,"The PGPLOT type for position markers"
 number,i,h,0,,,""
 outlist,s,h,INDEF,,,"Name for output positions list"
 posns,struct,h,,,,""
+
 quiet,b,h,n,,,"Is screen output to be suppressed?"
 style,s,h,INDEF,,,"Style for graphics and formatted axis values"

@@ -171,7 +171,7 @@
 *        different from the number of unreserved colour indices is
 *        controlled by parameter NN.  Also the LUT's values must lie in 
 *        the range 0.0--1.0. [!]
-*     MARGIN( 4 ) = _REAL (Write)
+*     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave around the image for axis 
 *        annotations, given as fractions of the corresponding dimension 
 *        of the DATA picture. The actual margins used may be increased to 
