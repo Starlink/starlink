@@ -73,6 +73,16 @@
          CALL ERR_REP (' ', 'SCULIB_MALLOC: bad pointer value '//
      :     'on entry', STATUS)
 
+      ELSE IF (SIZE .LE. 0) THEN
+
+*     Protect against a request for negative memory.
+
+         STATUS = SAI__ERROR
+         CALL MSG_SETI('SIZ',SIZE)
+         CALL ERR_REP(' ', 'SCULIB_MALLOC: Cannot allocate ^SIZ '//
+     :        'bytes of memory', STATUS)
+
+
       ELSE
 
 
