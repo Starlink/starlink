@@ -32,7 +32,7 @@
         PARAMETER     ( PSS__MXDIM = 4 )
 
       CHARACTER*30    PSS__VERSION
-        PARAMETER     ( PSS__VERSION = 'PSS Version 1.7-5' )
+        PARAMETER     ( PSS__VERSION = 'PSS Version 1.8-0' )
 
       INTEGER         PSS__MXEL                        ! Max # error levels
         PARAMETER     ( PSS__MXEL = 3)
