@@ -44,6 +44,9 @@ TKX_YES: TOOLS
 
 TKX_NO:
 
+TOOLS:
+	(cd tools && ${MAKE} ${PASS_FLAGS} all)
+
 #------------------------------------------------------------------------------
 # Static executables.
 
