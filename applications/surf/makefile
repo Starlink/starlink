@@ -19,7 +19,7 @@ DIST = src/surf_mon.f src/surf_mon.ifl src/surf_par src/surf_link_adam \
 docs/hlp/surf.hlp \
 scripts/surf.csh scripts/surf.icl \
 scripts/sculog scripts/scuquick scripts/sigclip scripts/qdraw \
-scripts/sdip.csh scripts/scupa.csh scripts/scuplot.csh \
+scripts/sdip.csh scripts/scupa.csh scripts/scuplot.csh scripts/scusetenv.csh \
 scripts/remdbm.pl scripts/setbolwt.pl scripts/change_nacentre.pl \
 scripts/scunoise scripts/scushift \
 misc/calsig_450_850_photom.sdf \
@@ -27,6 +27,7 @@ misc/calsig_450_850_bp2.sdf     \
 misc/calsig_450_map.sdf \
 misc/calsig_450_850_map.sdf \
 misc/calsig_850_map.sdf \
+misc/ipfile.dat \
 surf_kap/ctm_com \
 surf_kap/ctm_par \
 surf_kap/hlpcmd
