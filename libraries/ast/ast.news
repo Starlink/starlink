@@ -24,4 +24,7 @@ Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another \emph{etc}.
 
-9/11/04
+- Methods have been added to the FitsChan class to allow values for named
+keywords to be changed or added.
+
+17/11/04

@@ -449,41 +449,41 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    ra = modf( 60.0*ra, &ram );
    ras = 60.0*ra;
 
-   astFitsSetI( ret, "PLTRAH", NINT( rah ), "Plate centre RA", 0 );
-   astFitsSetI( ret, "PLTRAM", NINT( ram ), " ", 0 );
-   astFitsSetF( ret, "PLTRAS", ras, " ", 0 );
+   astSetFitsI( ret, "PLTRAH", NINT( rah ), "Plate centre RA", 0 );
+   astSetFitsI( ret, "PLTRAM", NINT( ram ), " ", 0 );
+   astSetFitsF( ret, "PLTRAS", ras, " ", 0 );
 
 /* Plate centre DEC. */
    dec = wcs->plate_dec/AST__DD2R;
    if( dec < 0.0 ) {
       dec = -dec;
-      astFitsSetS( ret, "PLTDECSN", "-", "Plate centre DEC", 0 );
+      astSetFitsS( ret, "PLTDECSN", "-", "Plate centre DEC", 0 );
    } else {
-      astFitsSetS( ret, "PLTDECSN", "+", "Plate centre DEC", 0 );
+      astSetFitsS( ret, "PLTDECSN", "+", "Plate centre DEC", 0 );
    }
 
    dec = modf( dec, &decd );
    dec = modf( 60.0*dec, &decm );
    decs = 60.0*dec;
 
-   astFitsSetI( ret, "PLTDECD", NINT( decd ), " ", 0 );
-   astFitsSetI( ret, "PLTDECM", NINT( decm ), " ", 0 );
-   astFitsSetF( ret, "PLTDECS", decs, " ", 0 );
+   astSetFitsI( ret, "PLTDECD", NINT( decd ), " ", 0 );
+   astSetFitsI( ret, "PLTDECM", NINT( decm ), " ", 0 );
+   astSetFitsF( ret, "PLTDECS", decs, " ", 0 );
 
 /* Plate Scale arcsec per mm  */
-   astFitsSetF( ret, "PLTSCALE", wcs->plate_scale, "Plate Scale arcsec per mm",
+   astSetFitsF( ret, "PLTSCALE", wcs->plate_scale, "Plate Scale arcsec per mm",
                 0 );
 
 /* X and Y corners (in pixels) */
-   astFitsSetI( ret, "CNPIX1", NINT( wcs->x_pixel_offset ), 
+   astSetFitsI( ret, "CNPIX1", NINT( wcs->x_pixel_offset ), 
                 "X corner  (pixels)", 0 );
-   astFitsSetI( ret, "CNPIX2", NINT( wcs->y_pixel_offset ), 
+   astSetFitsI( ret, "CNPIX2", NINT( wcs->y_pixel_offset ), 
                 "Y corner", 0 );
 
 /* X and Y pixel sizes (microns). */
-   astFitsSetF( ret, "XPIXELSZ", wcs->x_pixel_size, 
+   astSetFitsF( ret, "XPIXELSZ", wcs->x_pixel_size, 
                 "X pixel size (microns)", 0 );
-   astFitsSetF( ret, "YPIXELSZ", wcs->y_pixel_size, 
+   astSetFitsF( ret, "YPIXELSZ", wcs->y_pixel_size, 
                 "Y pixel size (microns)", 0 );
 
 /* Orientation Coefficients. */
@@ -491,7 +491,7 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    comm = "Orientation Coefficients";
    for ( i = 0; i < 6; i++ ) {
       sprintf( name_buff, "PPO%d", i + 1 );
-      astFitsSetF( ret, name, wcs->ppo_coeff[i], comm, 0 );
+      astSetFitsF( ret, name, wcs->ppo_coeff[i], comm, 0 );
       comm = " ";
    }
 
@@ -499,14 +499,14 @@ static AstFitsChan *DssFits( AstDssMap *this ) {
    comm = "Plate solution x coefficients";
    for( i = 0; i < 19; i++ ){ 
       sprintf( name_buff, "AMDX%d", i + 1 );
-      astFitsSetF( ret, name, wcs->amd_x_coeff[i], comm, 0 );
+      astSetFitsF( ret, name, wcs->amd_x_coeff[i], comm, 0 );
       comm = " ";
    }
 
    comm = "Plate solution y coefficients";
    for( i = 0; i < 19; i++ ){ 
       sprintf( name_buff, "AMDY%d", i + 1 );
-      astFitsSetF( ret, name, wcs->amd_y_coeff[i], comm, 0 );
+      astSetFitsF( ret, name, wcs->amd_y_coeff[i], comm, 0 );
       comm = " ";
    }
 
@@ -816,28 +816,28 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
                   astClearCard( fits );
                   if( astFindFits( fits, "CNPIX1", NULL, 0 ) ){
-                     astFitsSetI( fits, "CNPIX1", NINT( cnpix1 ), NULL, 1 );
+                     astSetFitsI( fits, "CNPIX1", NINT( cnpix1 ), NULL, 1 );
                   } else {
                      ok = 0;
                   }                  
 
                   astClearCard( fits );
                   if( astFindFits( fits, "CNPIX2", NULL, 0 ) ){
-                     astFitsSetI( fits, "CNPIX2", NINT( cnpix2 ), NULL, 1 );
+                     astSetFitsI( fits, "CNPIX2", NINT( cnpix2 ), NULL, 1 );
                   } else {
                      ok = 0;
                   }                  
 
                   astClearCard( fits );
                   if( astFindFits( fits, "XPIXELSZ", NULL, 0 ) ){
-                     astFitsSetF( fits, "XPIXELSZ", xpixelsz, NULL, 1 );
+                     astSetFitsF( fits, "XPIXELSZ", xpixelsz, NULL, 1 );
                   } else {
                      ok = 0;
                   }                  
 
                   astClearCard( fits );
                   if( astFindFits( fits, "YPIXELSZ", NULL, 0 ) ){
-                     astFitsSetF( fits, "YPIXELSZ", ypixelsz, NULL, 1 );
+                     astSetFitsF( fits, "YPIXELSZ", ypixelsz, NULL, 1 );
                   } else {
                      ok = 0;
                   }                  

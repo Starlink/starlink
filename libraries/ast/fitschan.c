@@ -28,11 +28,11 @@ f     AST_WRITE) will, if the Object is suitable, generate a
 *     the FitsChan's integer Card attribute, which identifies a "current"
 *     card, to which subsequent operations apply. Searches
 c     based on keyword may be performed (using astFindFits), new
-c     cards may be inserted (astPutFits, astPutCards) and existing ones may be
-c     deleted (astDelFits).
+c     cards may be inserted (astPutFits, astPutCards, astSetFits<X>) and 
+c     existing ones may be deleted (astDelFits) or changed (astSetFits<X>).
 f     based on keyword may be performed (using AST_FINDFITS), new
-f     cards may be inserted (AST_PUTFITS, AST_PUTCARDS) and existing ones may be
-f     deleted (AST_DELFITS).
+f     cards may be inserted (AST_PUTFITS, AST_PUTCARDS, AST_SETFITS<X>) and 
+f     existing ones may be deleted (AST_DELFITS) or changed (AST_SETFITS<X>).
 *
 *     When you create a FitsChan, you have the option of specifying
 *     "source" and "sink" functions which connect it to external data
@@ -118,13 +118,15 @@ c     - astDelFits: Delete the current FITS card in a FitsChan
 f     - AST_DELFITS: Delete the current FITS card in a FitsChan
 c     - astFindFits: Find a FITS card in a FitsChan by keyword
 f     - AST_FINDFITS: Find a FITS card in a FitsChan by keyword
+c     - astSetFits<X>: Store a new keyword value in a FitsChan
+f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
 c     - astPutFits: Store a FITS header card in a FitsChan
 f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 c     - astPutCards: Stores a set of FITS header card in a FitsChan
 f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 
 *  Copyright:
-*     Copyright (C) 2004 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: David Berry (Starlink)
@@ -210,7 +212,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        current card. Previously, this could cause new cards to be 
 *        written to the wrong place in a FITS-WCS encoded FitsChan.
 *        o  Description of argument "value" corrected in prologue of
-*        function FitsSet.
+*        function SetFits.
 *        o  Argument "lastkey" removed from function SetValue since it
 *        was never used (it was a relic from a previous method of
 *        determining where to store new cards). Corresponding changes 
@@ -444,7 +446,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Extensive changes to allow foreign encodings to be produced in
 *        cases where the Base Frame has fewer axes than the Current Frame.
 *     12-FEB-2003 (DSB)
-*        - Modified FitsSet so that the existing card comment is retained
+*        - Modified SetFits so that the existing card comment is retained
 *        if the new data value equals the existing data value.
 *     30-APR-2003 (DSB):
 *        - Revert to standard "TAN" code for distorted tan projections,
@@ -610,6 +612,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        have already been translated into equivalent good forms.
 *        - SpecTrans: If both PROJP and PV keywords are present, use PV
 *        in favour of PROJP only if the PV values look correct.
+*     17-NOV-2004 (DSB):
+*        - Make astSetFits<X> public.
 *class--
 */
 
@@ -1065,7 +1069,7 @@ static int FitsGetF( AstFitsChan *, const char *, double * );
 static int FitsGetI( AstFitsChan *, const char *, int * );
 static int FitsGetL( AstFitsChan *, const char *, int * );
 static int FitsGetS( AstFitsChan *, const char *, char ** );
-static int FitsSet( AstFitsChan *, const char *, void *, int, const char *, int );
+static int SetFits( AstFitsChan *, const char *, void *, int, const char *, int );
 static int FullForm( const char *, const char *, int );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
 static int GetFull( AstChannel * );
@@ -1118,14 +1122,14 @@ static void DistortMaps( AstFitsChan *, FitsStore *, char, int , AstMapping **, 
 static void Dump( AstObject *, AstChannel * );
 static void Empty( AstFitsChan * );
 static void FindWcs( AstFitsChan *, int, const char *, const char * );
-static void FitsSetCF( AstFitsChan *, const char *, double *, const char *, int );
-static void FitsSetCI( AstFitsChan *, const char *, int *, const char *, int );
-static void FitsSetCN( AstFitsChan *, const char *, const char *, const char *, int );
-static void FitsSetCom( AstFitsChan *, const char *, const char *, int );
-static void FitsSetF( AstFitsChan *, const char *, double, const char *, int );
-static void FitsSetI( AstFitsChan *, const char *, int, const char *, int );
-static void FitsSetL( AstFitsChan *, const char *, int, const char *, int );
-static void FitsSetS( AstFitsChan *, const char *, const char *, const char *, int );
+static void SetFitsCF( AstFitsChan *, const char *, double *, const char *, int );
+static void SetFitsCI( AstFitsChan *, const char *, int *, const char *, int );
+static void SetFitsCN( AstFitsChan *, const char *, const char *, const char *, int );
+static void SetFitsCom( AstFitsChan *, const char *, const char *, int );
+static void SetFitsF( AstFitsChan *, const char *, double, const char *, int );
+static void SetFitsI( AstFitsChan *, const char *, int, const char *, int );
+static void SetFitsL( AstFitsChan *, const char *, int, const char *, int );
+static void SetFitsS( AstFitsChan *, const char *, const char *, const char *, int );
 static void FixNew( AstFitsChan *, int, int, const char *, const char * );
 static void FixUsed( AstFitsChan *, int, int, int, const char *, const char * );
 static void FormatCard( AstFitsChan *, char *, const char * );
@@ -11730,11 +11734,11 @@ static int FitsGetCom( AstFitsChan *this, const char *name,
 
 }
 
-static int FitsSet( AstFitsChan *this, const char *keyname, void *value, 
+static int SetFits( AstFitsChan *this, const char *keyname, void *value, 
                     int type, const char *comment, int overwrite ){
 /*
 *  Name:
-*     FitsSet
+*     SetFits
 
 *  Purpose:
 *     Store a keyword value of any type in a FitsChan.
@@ -11744,7 +11748,7 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int FitsSet( AstFitsChan *this, const char *keyname, void *value, 
+*     int SetFits( AstFitsChan *this, const char *keyname, void *value, 
 *                  int type, const char *comment, int overwrite )
 
 *  Class Membership:
@@ -11820,12 +11824,12 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
 /* If the data value has not changed, and the card has a coment, 
    set the comment pointer NULL so that the existing comment will be
    retained. */
-         if( overwrite && CnvValue( this, type, &edval, "FitsSet" ) && 
+         if( overwrite && CnvValue( this, type, &edval, "SetFits" ) && 
              CardComm( this ) ) {
             if( EQUAL( edval, dval ) ) comment = NULL;
          }
 
-         astFitsSetF( this, keyname, dval, comment, overwrite );
+         astSetFitsF( this, keyname, dval, comment, overwrite );
       } else {
          ret = 0;
       }
@@ -11835,7 +11839,7 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
       if( cval ){      
 
 /* If the data value has not changed, retain the original comment. */
-         if( overwrite && CnvValue( this, type, &ecval, "FitsSet" ) && 
+         if( overwrite && CnvValue( this, type, &ecval, "SetFits" ) && 
              CardComm( this ) ) {
             if( Similar( ecval, cval ) ) comment = NULL;
          }
@@ -11843,7 +11847,7 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
 /* Ignore comments if they are identical to the keyword value. */
          if( comment && !strcmp( cval, comment ) ) comment = NULL;
 
-         astFitsSetS( this, keyname, cval, comment, overwrite );
+         astSetFitsS( this, keyname, cval, comment, overwrite );
       } else {
          ret = 0;
       }
@@ -11851,37 +11855,37 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
    } else if( type == AST__CONTINUE ){
       cval = *( (char **) value);
       if( cval ){      
-         astFitsSetCN( this, keyname, cval, comment, overwrite );
+         astSetFitsCN( this, keyname, cval, comment, overwrite );
       } else {
          ret = 0;
       }
 
    } else if( type == AST__COMMENT ){
-      astFitsSetCom( this, keyname, comment, overwrite );
+      astSetFitsCom( this, keyname, comment, overwrite );
 
    } else if( type == AST__INT ){
       ival = *( (int *) value );
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, &eival, "FitsSet" ) && 
+      if( overwrite && CnvValue( this, type, &eival, "SetFits" ) && 
          CardComm( this ) ) {
          if( eival == ival ) comment = NULL;
       }
 
-      astFitsSetI( this, keyname, ival, comment, overwrite );
+      astSetFitsI( this, keyname, ival, comment, overwrite );
 
    } else if( type == AST__COMPLEXF ){
       if( ( (double *) value )[0] != AST__BAD &&
           ( (double *) value )[1] != AST__BAD ) {
 
 /* If the data value has not changed, retain the original comment. */
-         if( overwrite && CnvValue( this, type, ecdval, "FitsSet" ) && 
+         if( overwrite && CnvValue( this, type, ecdval, "SetFits" ) && 
              CardComm( this ) ) {
             if( EQUAL( ecdval[ 0 ], ( (double *) value )[ 0 ] ) &&
                 EQUAL( ecdval[ 1 ], ( (double *) value )[ 1 ] ) ) comment = NULL;
          }
 
-         astFitsSetCF( this, keyname, (double *) value, comment, overwrite );
+         astSetFitsCF( this, keyname, (double *) value, comment, overwrite );
       } else {
          ret = 0;
       }
@@ -11889,24 +11893,24 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
    } else if( type == AST__COMPLEXI ){
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, ecival, "FitsSet" ) && 
+      if( overwrite && CnvValue( this, type, ecival, "SetFits" ) && 
           CardComm( this ) ) {
          if( ecival[ 0 ] == ( (int *) value )[ 0 ] &&
              ecival[ 1 ] == ( (int *) value )[ 1 ] ) comment = NULL;
       }
 
-      astFitsSetCI( this, keyname, (int *) value, comment, overwrite );
+      astSetFitsCI( this, keyname, (int *) value, comment, overwrite );
 
    } else if( type == AST__LOGICAL ){
       ival = ( *( (int *) value ) != 0 );
 
 /* If the data value has not changed, retain the original comment. */
-      if( overwrite && CnvValue( this, type, &eival, "FitsSet" ) && 
+      if( overwrite && CnvValue( this, type, &eival, "SetFits" ) && 
           CardComm( this ) ) {
          if( eival == ival ) comment = NULL;
       }
 
-      astFitsSetL( this, keyname, ival, comment, overwrite );
+      astSetFitsL( this, keyname, ival, comment, overwrite );
 
    } 
 
@@ -11914,99 +11918,132 @@ static int FitsSet( AstFitsChan *this, const char *keyname, void *value,
 }
 
 /*
-*+
+*++
 *  Name:
-*     astFitsSet<X>
+c     astSetFits<X>
+f     AST_SETFITS<X>
 
 *  Purpose:
 *     Store a keyword value in a FitsChan.
 
 *  Type:
-*     Protected virtual function.
+*     Public virtual function.
 
 *  Synopsis:
-*     #include "fitschan.h"
-*     void astFitsSet<X>( AstFitsChan *this, const char *name, <X>type value, 
-*                         const char *comment, int overwrite )
+c     #include "fitschan.h"
+c     void astSetFits<X>( AstFitsChan *this, const char *name, <X>type value, 
+c                         const char *comment, int overwrite )
+f     CALL AST_SETFITS<X>( THIS, NAME, VALUE, COMMENT, OVERWRITE )
 
 *  Class Membership:
 *     FitsChan method.
 
 *  Description:
-*     This is a family of functions which store values for named keywords
+c     This is a family of functions which store values for named keywords
+f     This is a family of routines which store values for named keywords
 *     within a FitsChan at the current card position. The supplied keyword 
 *     value can either over-write an existing keyword value, or can be 
 *     inserted as a new header card into the FitsChan.
 *
-*     The keyword data type is selected by replacing <X> in the function name 
+c     The keyword data type is selected by replacing <X> in the function name 
+f     The keyword data type is selected by replacing <X> in the routine name 
 *     by one of the following strings representing the recognised FITS data 
 *     types:
 *
-*     CF - Complex floating point values.
-*     CI - Complex integer values.
-*     F  - Floating point values.
-*     I  - Integer values.
-*     L  - Logical (i.e. boolean) values.
-*     S  - String values.
-*     CN - A "CONTINUE" value, these are treated like string values, but
-*          are encoded without an equals sign.
+*     - CF - Complex floating point values.
+*     - CI - Complex integer values.
+*     - F  - Floating point values.
+*     - I  - Integer values.
+*     - L  - Logical (i.e. boolean) values.
+*     - S  - String values.
+*     - CN - A "CONTINUE" value, these are treated like string values, but
+*            are encoded without an equals sign.
 *
 *     The data type of the "value" parameter depends on <X> as follows:
 *
-*     CF - "double *" (a pointer to a 2 element array holding the real and
-*          imaginary parts of the complex value).
-*     CI - "int *" (a pointer to a 2 element array holding the real and
-*          imaginary parts of the complex value).
-*     F  - "double".
-*     I  - "int".
-*     L  - "int".
-*     S  - "const char *".
-*     CN - "const char *".
+c     - CF - "double *" (a pointer to a 2 element array holding the real and
+c            imaginary parts of the complex value).
+c     - CI - "int *" (a pointer to a 2 element array holding the real and
+c            imaginary parts of the complex value).
+c     - F  - "double".
+c     - I  - "int".
+c     - L  - "int".
+c     - S  - "const char *".
+c     - CN - "const char *".
+*
+f     - CF - DOUBLE PRECISION(2) (a 2 element array holding the real and
+f            imaginary parts of the complex value).
+f     - CI - INTEGER(2) (a 2 element array holding the real and imaginary 
+f            parts of the complex value).
+f     - F  - DOUBLE PRECISION.
+f     - I  - INTEGER
+f     - L  - LOGICAL
+f     - S  - CHARACTER
+f     - CN - CHARACTER
 
 *  Parameters:
-*     this
+c     this
+f     THIS = INTEGER (Given)
 *        Pointer to the FitsChan.
-*     name
-*        A pointer to a 
-*        string holding the keyword name. This may be a complete FITS
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+c        Pointer to a null-terminated character string
+f        A character string 
+*        containing the FITS keyword name. This may be a complete FITS
 *        header card, in which case the keyword to use is extracted from 
 *        it. No more than 80 characters are read from this string.
-*     value
+c     value
+f     VALUE = <X>type (Given)
 *        The keyword value to store with the named keyword. The data type
 *        of this parameter depends on <X> as described above.
-*     comment
-*        A pointer to a string holding a comment to associated with the 
-*        keyword. If a NULL pointer or a blank string is supplied, then
-*        any comment included in the string supplied for the "name" parameter 
-*        is used instead. If "name" contains no comment, then any existing 
-*        comment in the card being over-written is retained, or a NULL
-*        pointer is stored if a new card is being inserted.
-*     overwrite
-*        If non-zero, the new card formed from the supplied keyword name,
-*        value and comment string over-writes the current card, and the 
-*        current card is incremented to refer to the next card. If zero, the 
-*        new card is inserted in front of the current card and the current 
-*        card is left unchanged. In either case, if the current card on 
-*        entry points to the "end-of-file", the new card is appended to the 
-*        end of the list. 
+c     comment
+f     COMMENT = CHARACTER * ( * ) (Given)
+c        A pointer to a null terminated string 
+f        A string 
+*        holding a comment to associated with the keyword. 
+c        If a NULL pointer or 
+f        If 
+*        a blank string is supplied, then any comment included in the string 
+*        supplied for the 
+c        "name" parameter is used instead. If "name" 
+f        NAME parameter is used instead. If NAME
+*        contains no comment, then any existing comment in the card being 
+*        over-written is retained. Otherwise, no comment is stored with
+*        the card.
+c     overwrite
+f     OVERWRITE = LOGICAL (Given)
+c        If non-zero, 
+f        If .TRUE.,
+*        the new card formed from the supplied keyword name, value and comment 
+*        string over-writes the current card, and the current card is 
+*        incremented to refer to the next card (see the "Card" attribute). If 
+c        zero, 
+f        .FALSE.,
+*        the new card is inserted in front of the current card and the current 
+*        card is left unchanged. In either case, if the current card on entry 
+*        points to the "end-of-file", the new card is appended to the end of 
+*        the list. 
 
 *  Notes:
 *     -  To assign a new value for an existing keyword within a FitsChan,
-*     first find the card describing the keyword using astFindFits, and
-*     then use one of the astFitsSet<X> family to over-write the old value.
+c     first find the card describing the keyword using astFindFits, and
+c     then use one of the astSetFits<X> family to over-write the old value.
+f     first find the card describing the keyword using AST_FINDFITS, and
+f     then use one of the AST_FITSET<X> family to over-write the old value.
 *     -  If, on exit, there are no cards following the card written by
-*     this function, then the current card is left pointing at the 
+d     this function, then the current card is left pointing at the 
+f     this routine, then the current card is left pointing at the 
 *     "end-of-file".
 *     -  An error will be reported if the keyword name does not conform
 *     to FITS requirements.
-*-
+*--
 */
 
-/* Define a macro which expands to the implementation of the astFitsSet<X>
+/* Define a macro which expands to the implementation of the astSetFits<X>
    routine for a given data type. */
 
 #define MAKE_FSET(code,ctype,ftype,valexp) \
-static void FitsSet##code( AstFitsChan *this, const char *name, ctype value, const char *comment, int overwrite ) { \
+static void SetFits##code( AstFitsChan *this, const char *name, ctype value, const char *comment, int overwrite ) { \
 \
 /* Local variables: */ \
    const char *class;     /* Object class */ \
@@ -12022,7 +12059,7 @@ static void FitsSet##code( AstFitsChan *this, const char *name, ctype value, con
 \
 /* Store the object clas and calling method. */ \
    class = astGetClass( this ); \
-   method = "astFitsSet"#code; \
+   method = "astSetFits"#code; \
 \
 /* Extract the keyword name from the supplied string. */ \
    (void) astSplit( name, &lname, &lvalue, &lcom, method, class ); \
@@ -12059,7 +12096,7 @@ static void FitsSet##code( AstFitsChan *this, const char *name, ctype value, con
 \
 }
 
-/* Use the above macro to give defintions for the astFitsSet<X> method
+/* Use the above macro to give defintions for the astSetFits<X> method
    for each FITS data type. */
 
 MAKE_FSET(I,int,AST__INT,(void *)&value)
@@ -12073,12 +12110,12 @@ MAKE_FSET(L,int,AST__LOGICAL,(void *)&value)
 #undef MAKE_FSET
 
 
-static void FitsSetCom( AstFitsChan *this, const char *name, 
+static void SetFitsCom( AstFitsChan *this, const char *name, 
                         const char *comment, int overwrite ){
 /*
 *+
 *  Name:
-*     astFitsSetCom
+*     astSetFitsCom
 
 *  Purpose:
 *     Store a comment for a keyword in a FitsChan.
@@ -12088,7 +12125,7 @@ static void FitsSetCom( AstFitsChan *this, const char *name,
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     void astFitsSetCom( AstFitsChan *this, const char *name, 
+*     void astSetFitsCom( AstFitsChan *this, const char *name, 
 *                         const char *comment, int overwrite ) 
 
 *  Class Membership:
@@ -12155,7 +12192,7 @@ static void FitsSetCom( AstFitsChan *this, const char *name,
    if ( !astOK ) return;
 
 /* Store the calling method and object class. */
-   method = "astFitsSetCom";
+   method = "astSetFitsCom";
    class = astGetClass( this );
 
 /* Extract the keyword name, etc, from the supplied string. */ 
@@ -13998,14 +14035,14 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    vtab->FitsGetS = FitsGetS;
    vtab->FitsGetCN = FitsGetCN;
    vtab->FitsGetCom = FitsGetCom;
-   vtab->FitsSetCom = FitsSetCom;
-   vtab->FitsSetCF = FitsSetCF;
-   vtab->FitsSetCI = FitsSetCI;
-   vtab->FitsSetF = FitsSetF;
-   vtab->FitsSetI = FitsSetI;
-   vtab->FitsSetL = FitsSetL;
-   vtab->FitsSetS = FitsSetS;
-   vtab->FitsSetCN = FitsSetCN;
+   vtab->SetFitsCom = SetFitsCom;
+   vtab->SetFitsCF = SetFitsCF;
+   vtab->SetFitsCI = SetFitsCI;
+   vtab->SetFitsF = SetFitsF;
+   vtab->SetFitsI = SetFitsI;
+   vtab->SetFitsL = SetFitsL;
+   vtab->SetFitsS = SetFitsS;
+   vtab->SetFitsCN = SetFitsCN;
    vtab->ClearCard = ClearCard;
    vtab->TestCard = TestCard;
    vtab->SetCard = SetCard;
@@ -15959,7 +15996,7 @@ static void MakeIntoComment( AstFitsChan *this, const char *method,
 /* Write the resulting string to the FitsChan as the contents of a COMMENT 
    card, overwriting the existing card. The current card is incremented
    by this call so that it refers to the same card as on entry. */
-   astFitsSetCom( this, "COMMENT", card, 1 );
+   astSetFitsCom( this, "COMMENT", card, 1 );
 
 }
 
@@ -19097,7 +19134,7 @@ f        The global status.
    common are strings, etc). */
       if( type == AST__FLOAT ){
          if( 1 == astSscanf( value, " %lf %n", &fval, &nc ) && nc >= len ){
-            astFitsSetF( this, name, fval, comment, overwrite );
+            astSetFitsF( this, name, fval, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read a floating point "
                       "FITS keyword value.", method, class );
@@ -19105,20 +19142,20 @@ f        The global status.
 
 /* Read and store string values from the value string. */
       } else if( type == AST__STRING ){
-         astFitsSetS( this, name, value, comment, overwrite );
+         astSetFitsS( this, name, value, comment, overwrite );
 
 /* Read and store string values from the value string. */
       } else if( type == AST__CONTINUE ){
-         astFitsSetCN( this, name, value, comment, overwrite );
+         astSetFitsCN( this, name, value, comment, overwrite );
 
 /* Store comment card. */
       } else if( type == AST__COMMENT ){
-         astFitsSetCom( this, name, comment, overwrite );
+         astSetFitsCom( this, name, comment, overwrite );
 
 /* Read and store integer values from the value string. */
       } else if( type == AST__INT ){
          if( 1 == astSscanf( value, " %d %n", &ival, &nc ) && nc >= len ){
-            astFitsSetI( this, name, ival, comment, overwrite );
+            astSetFitsI( this, name, ival, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read an integer FITS "
                       "keyword value.", method, class );
@@ -19126,13 +19163,13 @@ f        The global status.
 
 /* Read and store logical values from the value string. */
       } else if( type == AST__LOGICAL ){
-         astFitsSetL( this, name, (*value == 'T'), comment, overwrite );
+         astSetFitsL( this, name, (*value == 'T'), comment, overwrite );
 
 /* Read and store complex floating point values from the value string. */
       } else if( type == AST__COMPLEXF ){
          if( 2 == astSscanf( value, " %lf %lf %n", cfval, cfval + 1, &nc ) && 
              nc >= len ){
-            astFitsSetCF( this, name, cfval, comment, overwrite );
+            astSetFitsCF( this, name, cfval, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read a complex pair "
                       "of floating point FITS keyword values.", method, class );
@@ -19142,7 +19179,7 @@ f        The global status.
       } else if( type == AST__COMPLEXI ){
          if( 2 == astSscanf( value, " %d %d %n", cival, cival + 1, &nc ) && 
              nc >= len ){
-            astFitsSetCI( this, name, cival, comment, overwrite );
+            astSetFitsCI( this, name, cival, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read a complex pair "
                       "of integer FITS keyword values.", method, class );
@@ -20549,7 +20586,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
 
 /* Comment card are always inserted in-front of the current card. */
    if ( type == AST__COMMENT ) {
-      FitsSet( this, keyname, value, type, comment, 0 );
+      SetFits( this, keyname, value, type, comment, 0 );
 
 /* Otherwise... */
    } else {
@@ -20583,7 +20620,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
          newcard = ( card == (FitsCard *) this->card );
 
 /* Replace the current card with a card holding the supplied information. */
-         FitsSet( this, keyname, value, type, comment, 1 );
+         SetFits( this, keyname, value, type, comment, 1 );
          stored = 1;
 
 /* If we have just replaced the original current card, back up a card 
@@ -20603,7 +20640,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
       if( !stored ) {
          this->card = (void *) card;
          MoveCard( this, 1, "astWrite", astGetClass( this ) );
-         FitsSet( this, keyname, value, type, comment, 0 );
+         SetFits( this, keyname, value, type, comment, 0 );
          MoveCard( this, -1, "astWrite", astGetClass( this ) );
       }
 
@@ -25226,7 +25263,7 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
 
 /* Break the text into lines using the same algorithm as above, and store 
    each line as a new ASTWARN card. Start with a blank ASTWARN card. */
-         astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+         astSetFitsS( this, "ASTWARN", " ", NULL, 0 );
 
 /* Loop until the entire text has been written out. */
          a = text;
@@ -25255,14 +25292,14 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text,
             buff[ nc ] = 0;         
 
 /* Store the buffer as the next card. */
-            astFitsSetS( this, "ASTWARN", buff, NULL, 0 );
+            astSetFitsS( this, "ASTWARN", buff, NULL, 0 );
 
 /* Set the start of the next bit of the text. */
             a = c + 1;
          }
 
 /* Include a final blank card. */
-         astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+         astSetFitsS( this, "ASTWARN", " ", NULL, 0 );
 
       }
    }
@@ -29526,25 +29563,25 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
    an appropriate banner of FITS comments, unless comments have been
    suppressed. */
       if ( !write_nest && comm ) {
-         astFitsSetCom( this, "        ", "", 0 );
+         astSetFitsCom( this, "        ", "", 0 );
          MakeBanner( 
 "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++",
                      "", "", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
 
          if( astIsAFrameSet( object ) ) {
             MakeBanner( "WCS information in AST format", "", "", banner );
-            astFitsSetCom( this, "COMMENT", banner, 0 );
+            astSetFitsCom( this, "COMMENT", banner, 0 );
             MakeBanner( "See http://www.starlink.ac.uk/ast/", "", "", banner );
-            astFitsSetCom( this, "COMMENT", banner, 0 );
+            astSetFitsCom( this, "COMMENT", banner, 0 );
          }
 
          MakeBanner( HEADER_TEXT, astGetClass( object ), " object", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
          MakeBanner(
 "................................................................",
                      "", "", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
       }
 
 /* Invoke the parent astWrite method to write out the Object data. */
@@ -29556,13 +29593,13 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
          MakeBanner(
 "................................................................",
                      "", "", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
          MakeBanner( FOOTER_TEXT, astGetClass( object ), " object", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
          MakeBanner(
 "----------------------------------------------------------------",
                      "", "", banner );
-         astFitsSetCom( this, "COMMENT", banner, 0 );
+         astSetFitsCom( this, "COMMENT", banner, 0 );
       }
 
 /* Return the nesting level to its previous value. */
@@ -29717,7 +29754,7 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
    card with a blank keyword. */
    if ( write_nest && ( astGetFull( this ) >= 0 ) ) {
       MakeIndentedComment( current_indent, '+', "Beginning of ", class, buff );
-      astFitsSetCom( this, "        ", buff, 0 );
+      astSetFitsCom( this, "        ", buff, 0 );
    }
 
 /* Create a unique FITS keyword for this "Begin" item, basing it on
@@ -29729,7 +29766,7 @@ static void WriteBegin( AstChannel *this_channel, const char *class,
 
 /* Write the "Begin" item to the FitsChan as a keyword and string
    value. */
-   astFitsSetS( this, keyword, buff,
+   astSetFitsS( this, keyword, buff,
                      astGetComment( this ) ? comment : NULL, 0 );
 
 /* Clear the count of items written. */
@@ -29842,7 +29879,7 @@ static void WriteDouble( AstChannel *this_channel, const char *name,
       CreateKeyword( this, name, keyword );
 
 /* Write the value to the FitsChan as a keyword and value */
-      astFitsSetF( this, keyword, value,
+      astSetFitsF( this, keyword, value,
                        astGetComment( this ) ? comment : NULL, 0 );
 
 /* If the value is not "set", replace the card just written by a COMMENT
@@ -29908,7 +29945,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
 
 /* Write the "End" item to the FitsChan as a keyword and string
    value. */
-   astFitsSetS( this, keyword, buff,
+   astSetFitsS( this, keyword, buff,
                      astGetComment( this ) ? "End of object definition" : NULL,
                      0 );
 
@@ -29918,7 +29955,7 @@ static void WriteEnd( AstChannel *this_channel, const char *class ) {
    card with a blank keyword. */
    if ( write_nest && ( astGetFull( this ) >= 0 ) ) {
       MakeIndentedComment( current_indent, '-', "End of ", class, buff );
-      astFitsSetCom( this, "        ", buff, 0 );
+      astSetFitsCom( this, "        ", buff, 0 );
    }
 
 /* Decrement the indentation level for comments. */
@@ -30032,7 +30069,7 @@ static void WriteInt( AstChannel *this_channel, const char *name,
       CreateKeyword( this, name, keyword );
 
 /* Write the value to the FitsChan as a keyword and value */
-      astFitsSetI( this, keyword, value,
+      astSetFitsI( this, keyword, value,
                    astGetComment( this ) ? comment : NULL, 0 );
 
 /* If the value is not "set", replace the card just written by a COMMENT
@@ -30116,7 +30153,7 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
 
 /* Write the "IsA" item to the FitsChan as a keyword and string
    value. */
-      astFitsSetS( this, keyword, buff,
+      astSetFitsS( this, keyword, buff,
                         astGetComment( this ) ? comment : NULL, 0 );
 
 /* If helpful information has not been suppressed, generate an
@@ -30125,7 +30162,7 @@ static void WriteIsA( AstChannel *this_channel, const char *class,
       if ( astGetFull( this ) >= 0 ) {
          MakeIndentedComment( current_indent, '.', "Class boundary", "",
                               buff );
-         astFitsSetCom( this, "        ", buff, 0 );
+         astSetFitsCom( this, "        ", buff, 0 );
       }
    }
 
@@ -30241,7 +30278,7 @@ static void WriteObject( AstChannel *this_channel, const char *name,
 /* Write the value to the FitsChan as a keyword and a blank string value, 
    not pre-quoted (this "null" value indicates that an Object description 
    follows). */
-      astFitsSetS( this, keyword, "",
+      astSetFitsS( this, keyword, "",
                         astGetComment( this ) ? comment : NULL, 0 );
 
 /* If the value is "set", write out the Object description. */
@@ -30521,7 +30558,7 @@ static void WriteString( AstChannel *this_channel, const char *name,
 /* On the first pass through this loop, write the value to the FitsChan as 
    a keyword and value */
          if( first ){
-            astFitsSetS( this, keyword, buff2,
+            astSetFitsS( this, keyword, buff2,
                          astGetComment( this ) ? comment : NULL, 0 );
 
 /* If the value is not "set", replace the card just written by a COMMENT
@@ -30532,7 +30569,7 @@ static void WriteString( AstChannel *this_channel, const char *name,
    keyword, with type AST__CONTINUE (this type is like AST__STRING but is 
    formatted without an equals sign). */
          } else {
-            astFitsSetCN( this, "CONTINUE", buff2, NULL, 0 );
+            astSetFitsCN( this, "CONTINUE", buff2, NULL, 0 );
          }
 
          first = 0;
@@ -32051,11 +32088,11 @@ f     AST_WRITE) will, if the Object is suitable, generate a
 *     the FitsChan's integer Card attribute, which identifies a "current"
 *     card, to which subsequent operations apply. Searches
 c     based on keyword may be performed (using astFindFits), new
-c     cards may be inserted (astPutCards, astPutFits) and existing ones may be
-c     deleted (astDelFits).
+c     cards may be inserted (astPutFits, astPutCards, astSetFits<X>) and 
+c     existing ones may be deleted (astDelFits) or changed (astSetFits<X>).
 f     based on keyword may be performed (using AST_FINDFITS), new
-f     cards may be inserted (AST_PUTCARDS, AST_PUTFITS) and existing ones may be
-f     deleted (AST_DELFITS).
+f     cards may be inserted (AST_PUTFITS, AST_PUTCARDS, AST_SETFITS<X>) and 
+f     existing ones may be deleted (AST_DELFITS) or changed (AST_SETFITS<X>).
 *
 *     When you create a FitsChan, you have the option of specifying
 *     "source" and "sink" functions which connect it to external data
@@ -33025,52 +33062,52 @@ int astFitsEof_( AstFitsChan *this ){
    return (**astMEMBER(this,FitsChan,FitsEof))( this );
 }
 
-void astFitsSetCom_( AstFitsChan *this, const char *name, 
+void astSetFitsCom_( AstFitsChan *this, const char *name, 
                          const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetCom))( this, name, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsCom))( this, name, comment, overwrite );
 }
 
-void astFitsSetI_( AstFitsChan *this, const char *name, int value, 
+void astSetFitsI_( AstFitsChan *this, const char *name, int value, 
                      const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetI))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsI))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetF_( AstFitsChan *this, const char *name, double value, 
+void astSetFitsF_( AstFitsChan *this, const char *name, double value, 
                        const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetF))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsF))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetS_( AstFitsChan *this, const char *name, const char *value, 
+void astSetFitsS_( AstFitsChan *this, const char *name, const char *value, 
                         const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetS))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsS))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetCN_( AstFitsChan *this, const char *name, const char *value, 
+void astSetFitsCN_( AstFitsChan *this, const char *name, const char *value, 
                     const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetCN))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsCN))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetCF_( AstFitsChan *this, const char *name, double *value, 
+void astSetFitsCF_( AstFitsChan *this, const char *name, double *value, 
                           const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetCF))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsCF))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetCI_( AstFitsChan *this, const char *name, int *value, 
+void astSetFitsCI_( AstFitsChan *this, const char *name, int *value, 
                           const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetCI))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsCI))( this, name, value, comment, overwrite );
 }
 
-void astFitsSetL_( AstFitsChan *this, const char *name, int value, 
+void astSetFitsL_( AstFitsChan *this, const char *name, int value, 
                          const char *comment, int overwrite ) {
    if ( !astOK ) return;
-   (**astMEMBER(this,FitsChan,FitsSetL))( this, name, value, comment, overwrite );
+   (**astMEMBER(this,FitsChan,SetFitsL))( this, name, value, comment, overwrite );
 }
 
 void astClearCard_( AstFitsChan *this ){

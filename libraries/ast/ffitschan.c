@@ -20,6 +20,7 @@
 *     AST_ISAFITSCHAN
 *     AST_PUTCARDS
 *     AST_PUTFITS
+*     AST_SETFITS<X>
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -39,6 +40,8 @@
 *     10-SEP-2004 (TIMJ):
 *        Only copy the fits header to fortran string if it was found
 *        by astFindFits.
+*     17-NOV-2004 (DSB):
+*        Added AST_SETFITS<X>
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -345,3 +348,208 @@ F77_LOGICAL_FUNCTION(ast_findfits)( INTEGER(THIS),
    )
    return RESULT;
 }
+
+
+F77_SUBROUTINE(ast_setfitsf)( INTEGER(THIS),
+                              CHARACTER(NAME),
+                              DOUBLE(VALUE),
+                              CHARACTER(COMMENT),
+                              LOGICAL(OVERWRITE),
+                              INTEGER(STATUS)
+                              TRAIL(NAME)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_DOUBLE(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSF", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsF( astI2P( *THIS ), name, *VALUE, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+F77_SUBROUTINE(ast_setfitsi)( INTEGER(THIS),
+                              CHARACTER(NAME),
+                              INTEGER(VALUE),
+                              CHARACTER(COMMENT),
+                              LOGICAL(OVERWRITE),
+                              INTEGER(STATUS)
+                              TRAIL(NAME)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_INTEGER(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSI", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsI( astI2P( *THIS ), name, *VALUE, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+F77_SUBROUTINE(ast_setfitscf)( INTEGER(THIS),
+                               CHARACTER(NAME),
+                               DOUBLE_ARRAY(VALUE),
+                               CHARACTER(COMMENT),
+                               LOGICAL(OVERWRITE),
+                               INTEGER(STATUS)
+                               TRAIL(NAME)
+                               TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_DOUBLE_ARRAY(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSCF", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsCF( astI2P( *THIS ), name, VALUE, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+F77_SUBROUTINE(ast_setfitsci)( INTEGER(THIS),
+                               CHARACTER(NAME),
+                               INTEGER_ARRAY(VALUE),
+                               CHARACTER(COMMENT),
+                               LOGICAL(OVERWRITE),
+                               INTEGER(STATUS)
+                               TRAIL(NAME)
+                               TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_INTEGER_ARRAY(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSCI", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsCI( astI2P( *THIS ), name, VALUE, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+F77_SUBROUTINE(ast_setfitsl)( INTEGER(THIS),
+                              CHARACTER(NAME),
+                              LOGICAL(VALUE),
+                              CHARACTER(COMMENT),
+                              LOGICAL(OVERWRITE),
+                              INTEGER(STATUS)
+                              TRAIL(NAME)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_LOGICAL(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite, value;
+   char *name, *comment;
+
+   astAt( "AST_SETFITSL", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      value = F77_ISTRUE( *VALUE );
+      astSetFitsL( astI2P( *THIS ), name, value, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+F77_SUBROUTINE(ast_setfitss)( INTEGER(THIS),
+                              CHARACTER(NAME),
+                              CHARACTER(VALUE),
+                              CHARACTER(COMMENT),
+                              LOGICAL(OVERWRITE),
+                              INTEGER(STATUS)
+                              TRAIL(NAME)
+                              TRAIL(VALUE)
+                              TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_CHARACTER(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment, *value;
+
+   astAt( "AST_SETFITSS", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      value = astString( VALUE, VALUE_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsS( astI2P( *THIS ), name, value, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) value );
+      (void) astFree( (void *) comment );
+   )
+}
+
+F77_SUBROUTINE(ast_setfitscn)( INTEGER(THIS),
+                               CHARACTER(NAME),
+                               CHARACTER(VALUE),
+                               CHARACTER(COMMENT),
+                               LOGICAL(OVERWRITE),
+                               INTEGER(STATUS)
+                               TRAIL(NAME)
+                               TRAIL(VALUE)
+                               TRAIL(COMMENT) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(NAME)
+   GENPTR_CHARACTER(VALUE)
+   GENPTR_CHARACTER(COMMENT)
+   GENPTR_LOGICAL(OVERWRITE)
+   int overwrite;
+   char *name, *comment, *value;
+
+   astAt( "AST_SETFITSS", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      value = astString( VALUE, VALUE_length );
+      comment = astString( COMMENT, COMMENT_length );
+      overwrite = F77_ISTRUE( *OVERWRITE );
+      astSetFitsCN( astI2P( *THIS ), name, value, comment, overwrite );   
+      (void) astFree( (void *) name );
+      (void) astFree( (void *) value );
+      (void) astFree( (void *) comment );
+   )
+}
+
+
+
