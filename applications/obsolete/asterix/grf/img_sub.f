@@ -2198,22 +2198,22 @@ c        ENDIF
 
 *  create or adjust space for data
         NVAL=I_N_1D
-	print *,1
-        call flush(6)
         CALL IMG_GET1D(NVAL,STATUS)
-	print *,2
-        call flush(6)
 
 *  map data and  axis values
         CALL BDI_MAPR( IFID, 'Data', 'READ', DPTR, STATUS )
         CALL ARR_COP1R(NVAL,%VAL(DPTR),%VAL(I_DPTR_1D),STATUS)
         CALL BDI_UNMAP(IFID,'Data',DPTR,STATUS)
-	print *,3
-        call flush(6)
 
 *  axis values
+	print *,1
+        call flush(6)
         CALL BDI_AXMAPR(IFID,1,'READ',XPTR,STATUS)
+	print *,2
+        call flush(6)
         CALL ARR_COP1R(NVAL,%VAL(XPTR),%VAL(I_APTR_1D),STATUS)
+	print *,3
+        call flush(6)
         CALL BDI_AXUNMAP(IFID,1,XPTR,STATUS)
 	print *,4
         call flush(6)
