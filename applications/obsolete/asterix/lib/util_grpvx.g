@@ -113,7 +113,7 @@
       LOGICAL			QOK, VOK, QUAL(*)
 
 *  Arguments Returned:
-      <TYPE>			GDATA(*), GWGHT(*)
+      <TYPE>			GDATA(*), GVAR(*)
       LOGICAL			GQUAL(*)
 
 *  Status:
