@@ -82,12 +82,12 @@ sextractor/src/sex:
 
 ##  Clean recurses into these directories.
 clean-local:
-	(cd extract; make clean )
-	(cd sextractor; make clean )
+	- (cd extract; make clean )
+	- (cd sextractor; make clean )
 
 distclean-local:
-	(cd extract; make distclean )
-	(cd sextractor; make distclean )
+	- (cd extract; make distclean )
+	- (cd sextractor; make distclean )
 
 extractor.ifl: extract/src/extractor.ifl
 	cp -p extract/src/extractor.ifl .
@@ -120,3 +120,4 @@ extractor.csh: extractor.csh.in
 	-rm -f extractor.csh
 	$(edit) $(srcdir)/extractor.csh.in > extractor.csh.tmp
 	mv extractor.csh.tmp extractor.csh
+
