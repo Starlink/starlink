@@ -5,6 +5,7 @@
 <!NOTATION XML SYSTEM ''>
 <!-- commentary actually in /home/norman/s/commentary/sgml -->
 <!ENTITY dtdcomm SYSTEM "starlink-0.7.commentary" NDATA XML>
+<!ENTITY progdtd SYSTEM 'programcode-0.7.description' NDATA XML>
 ]>
 <!-- $Id$ -->
 
@@ -970,12 +971,14 @@ the same as the list of elements which have `id' attributes, and is currently
 <elemref gi="figure"/>,
 <elemref gi="table"/>,
 <elemref gi="mlabel"/>,
-<elemref gi="routine"/>,
+<elemxref gi="routine" dtd="progdtd"/>,
 <elemref gi="dt"/>, and
 <elemref gi="li"/>.
 You can also refer to <elemref gi="p"/> elements, though in this case
 the reference will actually be to the section which contains the
-paragraph.</p>
+paragraph.  The fact that you can refer to routine elements using this
+means only that you can do cross-references <em>within</em>
+programcode documents.</p>
 
 <p>When you give the element no content, the generated text will be of
 the form `section XXX', or `equation XXX'.  That is, the generated
