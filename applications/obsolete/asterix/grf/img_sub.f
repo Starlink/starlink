@@ -2041,14 +2041,13 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
           ENDIF
 
           IF (I_GUI) THEN
-            CALL NBS_FIND_ITEM(I_NBID,'WTODEG',SID,STATUS)
             IF ( I_SPATIALIMAGE ) THEN
-              CALL NBS_PUT_VALUE(SID,0,VAL__NBR,I_WTORAD*MATH__RTOD,
+              CALL IMG_NBPUT0R('WTODEG',I_WTORAD*MATH__RTOD,
      :                 STATUS)
             ELSE
-              CALL NBS_PUT_VALUE(SID,0,VAL__NBR,-1.0,STATUS)
-            END IF
-          END IF
+              CALL IMG_NBPUT0R('WTODEG',-1.0,STATUS)
+            ENDIF
+          ENDIF
 
           CALL BDI_AXGET0C( IFID, I_XAX, 'Label', I_XLABEL, STATUS )
           CALL BDI_AXGET0C( IFID, I_YAX, 'Label', I_YLABEL, STATUS )
@@ -3562,6 +3561,8 @@ c        INTEGER STATUS
 *  Status :
         INTEGER STATUS
 *  Local constants :
+      BYTE ONE
+      PARAMETER (ONE='01'X)
 *  Local variables :
         INTEGER I,J
         INTEGER I1,I2,J1,J2
@@ -3580,7 +3581,7 @@ c        INTEGER STATUS
           J2=1
           DO J=1,I_NY
             DO I=1,I_NX
-              IF (REG(I,J).EQ.'01'X) THEN
+              IF (REG(I,J).EQ.ONE) THEN
                 I1=MIN(I1,I)
                 I2=MAX(I2,I)
                 J1=MIN(J1,J)
@@ -3708,15 +3709,18 @@ c        INTEGER STATUS
 
       BYTE REG(I_NX,I_NY)
 
+      BYTE ZERO,ONE
+      PARAMETER (ONE='01'X,ZERO='00'X)
+
 
       INTEGER I,J
 
       DO J=I_IY1,I_IY2
         DO I=I_IX1,I_IX2
-          IF (REG(I,J).EQ.'00'X) THEN
-            REG(I,J)='01'X
-          ELSEIF (REG(I,J).EQ.'01'X) THEN
-            REG(I,J)='00'X
+          IF (REG(I,J).EQ.ZERO) THEN
+            REG(I,J)=ONE
+          ELSEIF (REG(I,J).EQ.ONE) THEN
+            REG(I,J)=ZERO
           ENDIF
         ENDDO
       ENDDO
@@ -4326,6 +4330,8 @@ c        REAL XX,XP,YP
         INTEGER I1,I2,J1,J2
 *  Status :
 *  Local constants :
+      BYTE ZERO
+      PARAMETER (ZERO='00'X)
 *  Local variables :
       INTEGER I,J
 *-
@@ -4339,7 +4345,7 @@ c        REAL XX,XP,YP
       DO WHILE (J.LE.I_NY.AND.J1.NE.1.AND.J2.NE.I_NY)
         I=1
         DO WHILE (I.LE.I_NX.AND.I1.NE.1.AND.I2.NE.I_NX)
-          IF (REG(I,J).NE.'00'X) THEN
+          IF (REG(I,J).NE.ZERO) THEN
             I1=MIN(I1,I)
             I2=MAX(I2,I)
             J1=MIN(J1,J)
@@ -4987,6 +4993,8 @@ c        REAL XX,XP,YP
 *  Export :
 *  Status :
 *  Local constants :
+      BYTE ONE
+      PARAMETER (ONE='01'X)
 *  Local variables :
       INTEGER ISTAT
       BYTE REG
@@ -4999,7 +5007,7 @@ c        REAL XX,XP,YP
 
         ISTAT=SAI__OK
         CALL IMG_GETREG(I,J,REG,ISTAT)
-        IMG_INREG=(REG.EQ.'01'X)
+        IMG_INREG=(REG.EQ.ONE)
 
       ENDIF
 
@@ -6606,6 +6614,63 @@ c     INTEGER ISTAT
           CALL NBS_GET_VALUE(ID,0,VAL__NBI,FLAG,NB,STATUS)
         ENDDO
         OK=(FLAG.EQ.1)
+
+      ENDIF
+
+      END
+
+
+*+ IMG_CHKSTL - check if file is Small Text List
+	SUBROUTINE IMG_CHKSTL(IFD,STL,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'FIO_ERR'
+*    Global variables :
+*  Import :
+        INTEGER IFD
+*  Export :
+        LOGICAL STL
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+        INTEGER MAXTEST
+        PARAMETER (MAXTEST=100)
+*  Local variables :
+        CHARACTER*132 REC
+        INTEGER IREC
+        LOGICAL EOF
+
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IREC=0
+        STL=.FALSE.
+        EOF=.FALSE.
+        DO WHILE (.NOT.(STL.OR.EOF) )
+          CALL FIO_READF(IFD,REC,STATUS)
+          IF (STATUS.EQ.SAI__OK) THEN
+*  remove leading blanks
+            CALL CHR_LDBLK(REC)
+
+*  look for keyword 'BEGINTABLE'
+            IF (REC(:10).EQ.'BEGINTABLE') THEN
+              STL=.TRUE.
+            ENDIF
+            IREC=IREC+1
+            IF (IREC.GE.MAXTEST) THEN
+              EOF=.TRUE.
+            ENDIF
+          ELSE
+            CALL ERR_ANNUL(STATUS)
+            EOF=.TRUE.
+          ENDIF
+        ENDDO
+
+
+        CALL FIO_RWIND(IFD,STATUS)
 
       ENDIF
 

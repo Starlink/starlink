@@ -13,6 +13,7 @@
 *      1 Jul 93: V1.7-1 GTR used (RJV)
 *     16 Aug 93: V1.7-2 Check status after USI_GETs to stop crash (DJA)
 *     14 Mar 97: V2.1-0 GUI version (RJV)
+*     23 May 97: V2.1-1 GUI form entry (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -45,7 +46,7 @@
 *                                        ! pixel and square axis unit
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IAZIMUTH Version 2.1-0')
+      PARAMETER (VERSION = 'IAZIMUTH Version 2.1-0b')
 *-
       CALL MSG_PRNT(VERSION)
 
@@ -77,62 +78,13 @@
         CALL GCB_ATTACH('IMAGE',STATUS)
         CALL IMG_2DGCB(STATUS)
 
-*  cursor mode
-        IF (I_MODE.EQ.1) THEN
-*  get centre
-          CALL MSG_PRNT(' ')
-          XC=I_X
-          YC=I_Y
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          ELSE
-            CALL MSG_SETR('X',XC)
-            CALL MSG_SETR('Y',YC)
-            CALL MSG_PRNT('Select centre/^X,^Y/...')
-            CALL PGCURSE(XC,YC,CH)
-            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-              XC=I_X
-              YC=I_Y
-            ENDIF
-          ENDIF
-          CALL PGPOINT(1,XC,YC,2)
-          CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
+*  get circle parameters
+        CALL IMG_GETCIRC('XCENT','YCENT','RAD',XC,YC,RAD,STATUS)
 
-*  get radius
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select radius...')
-            CALL IMG_GUICURS(XR,YR,FLAG,STATUS)
-            RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-          ELSE
-            CALL MSG_SETR('R',I_R)
-            CALL MSG_PRNT('Select radius/^R/...')
-            XR=XC
-            YR=YC
-            CALL PGCURSE(XR,YR,CH)
-            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-              RAD=I_R
-              XR=XC+RAD
-              YR=YC
-            ELSE
-              RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
-            ENDIF
-          ENDIF
-          CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
-
-*  keyboard mode
-        ELSE
-          CALL USI_DEF0R('XCENT',I_X,STATUS)
-          CALL USI_GET0R('XCENT',XC,STATUS)
-          CALL USI_DEF0R('YCENT',I_Y,STATUS)
-          CALL USI_GET0R('YCENT',YC,STATUS)
-          CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
-          CALL USI_GET0R('RAD',RAD,STATUS)
-          XR=XC+RAD
-          YR=YC
-          CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
-
-        ENDIF
+        CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
+        XR=XC+RAD
+        YR=YC
+        CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
 
         PRAD=SQRT((PXR-PXC)**2 + (PYR-PYC)**2)
         NBIN=INT(PRAD+0.5)

@@ -33,9 +33,6 @@
       REAL ZMIN,ZMAX
       LOGICAL CUBE
       LOGICAL DOK
-*    Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICHECK Version 2.1-0')
 *-
 *  first invocation do global initialisation
       IF (.NOT.I_OPEN) THEN
@@ -106,6 +103,7 @@
 *  map z-axis and find range of values
           CALL BDI_AXMAPR( IFID,IZ,'Data','READ',ZPTR,STATUS )
           CALL ARR_RANG1R(NZ,%val(ZPTR),ZMIN,ZMAX,STATUS)
+          CALL BDI_AXUNMAP(IFID,IZ,'Data',ZPTR,STATUS)
 
           CALL IMG_NBPUT0C('OPTIONS','CUBE',STATUS)
           CALL IMG_NBPUT0R('PAR_R1',ZMIN,STATUS)
@@ -118,6 +116,7 @@
 
 
         CALL ADI_FCLOSE( IFID, STATUS )
+        CALL ADI_ERASE(IFID,STATUS)
 
 
       ENDIF

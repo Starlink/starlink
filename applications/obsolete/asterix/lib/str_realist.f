@@ -42,14 +42,13 @@
 	   IF (L.GT.0) THEN
 	      KOMPOS = I + L - 1
 	      LENSUB = KOMPOS - I
-	      READ(STRING(I:KOMPOS-1),1000) ARRAY(K)
-1000	      FORMAT(BN,F<LENSUB>.0)
+	      READ(STRING(I:KOMPOS-1),*) ARRAY(K)
               I = KOMPOS + 1
 *
 * No more commas
 	   ELSE
 	      LENSUB = LENMAX - I + 1
-	      READ(STRING(I:LENMAX),1000) ARRAY(K)
+	      READ(STRING(I:LENMAX),*) ARRAY(K)
 	      NVALS = K
 	      GO TO 999
 	   ENDIF

@@ -16,6 +16,7 @@
 *     31 Jan 95: V1.8-0  bug fix to keyboard mode (RJV)
 *     31 Jan 95: V1.8-1  axis units pixels->angle (RJV)
 *     11 dec 95: V2.0-0  GUI version (RJV)
+*     23 May 97: V2.1-0  GUI form entry (rjv)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -55,7 +56,7 @@
       LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISLICE Version 2.1-0')
+      PARAMETER (VERSION = 'ISLICE Version 2.1-0b')
 *-
       CALL USI_INIT()
 
@@ -88,122 +89,24 @@
         CALL GTR_RESTORE(STATUS)
         CALL GCB_ATTACH('IMAGE',STATUS)
 
-*  get centre of cut
 
-        IF (I_MODE.EQ.1) THEN
-          CALL MSG_PRNT(' ')
-          XCENT=I_X
-          YCENT=I_Y
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
-          ELSE
-            CALL MSG_SETR('X',XCENT)
-            CALL MSG_SETR('Y',YCENT)
-            CALL MSG_PRNT('Select centre/^X,^Y/...')
-            CALL PGCURSE(XCENT,YCENT,CH)
-            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-              XCENT=I_X
-              YCENT=I_Y
-            ENDIF
-          ENDIF
-          CALL PGPOINT(1,XCENT,YCENT,2)
-          CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
 
-*  get mid-point of end
-          CALL MSG_PRNT('Select end...')
-          XEND=XCENT
-          YEND=YCENT
-          IF (I_GUI) THEN
-            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
-          ELSE
-            CALL PGCURSE(XEND,YEND,CH)
-          ENDIF
-          CALL PGPOINT(1,XEND,YEND,2)
-          CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+*  get slice parameters
+        CALL IMG_GETSLICE('XCENT','YCENT','ANGLE','LENGTH','WIDTH',
+     :                        XCENT,YCENT,ANGLE,LENGTH,WIDTH,STATUS)
 
-*  calculate other end and draw centre line
-          XOEND=2.0*XCENT-XEND
-          YOEND=2.0*YCENT-YEND
-          CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
-          CALL PGPOINT(1,XOEND,YOEND,2)
-          CALL PGQLS(LS)
-          CALL PGSLS(2)
-          CALL PGDRAW(XEND,YEND)
-
-*  get width
-          CALL MSG_PRNT('Select width...')
-          XWID=XCENT
-          YWID=YCENT
-          IF (I_GUI) THEN
-            CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
-          ELSE
-            CALL PGCURSE(XWID,YWID,CH)
-          ENDIF
-          CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
-
-*  calc length
-          PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
-          PHLEN=MAX(1.0,PHLEN)
-          PLENGTH=PHLEN*2.0
-
-*  calc angle
-          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
-
-*  calc width
-          D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
-          ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
-          BETA=ALPHA-ANGLE
-          PHWID=ABS(D*SIN(BETA))
-          PHWID=MAX(0.5,PHWID)
-          PWIDTH=PHWID*2.0
-
-*  keyboard mode
-        ELSE
-          CALL USI_DEF0R('XCENT',I_X,STATUS)
-          CALL USI_GET0R('XCENT',XCENT,STATUS)
-          CALL USI_DEF0R('YCENT',I_Y,STATUS)
-          CALL USI_GET0R('YCENT',YCENT,STATUS)
-          CALL USI_GET0R('ANGLE',ANGLE,STATUS)
-          CALL USI_GET0R('LENGTH',LENGTH,STATUS)
-          CALL USI_GET0R('WIDTH',WIDTH,STATUS)
-          ANGLE=ANGLE*DTOR
 *  convert to pixel coords
-          CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
-c          PLENGTH = LENGTH/(ABS(I_XSCALE*COS(ANGLE)) +
-c     :                        ABS(I_YSCALE*SIN(ANGLE)))
-          PLENGTH=LENGTH/ABS(I_XSCALE)
-          PLENGTH=MAX(2.0,PLENGTH)
-c          PWIDTH = WIDTH/(ABS(I_XSCALE*SIN(ANGLE))   +
-c     :                        ABS(I_YSCALE*COS(ANGLE)))
-          PWIDTH=WIDTH/ABS(I_XSCALE)
-          PWIDTH=MAX(1.0,PWIDTH)
-          PHWID=PWIDTH/2.0
-          PHLEN=PLENGTH/2.0
-          PXEND=PXCENT+PHLEN*COS(ANGLE)
-          PXOEND=PXCENT-PHLEN*COS(ANGLE)
-          PYEND=PYCENT+PHLEN*SIN(ANGLE)
-          PYOEND=PYCENT-PHLEN*SIN(ANGLE)
-        ENDIF
-
-*  plot extent of cut
-        PXTR=PXEND+PHWID*SIN(ANGLE)
-        PYTR=PYEND-PHWID*COS(ANGLE)
-        PXTL=PXEND-PHWID*SIN(ANGLE)
-        PYTL=PYEND+PHWID*COS(ANGLE)
-        PXBR=PXOEND+PHWID*SIN(ANGLE)
-        PYBR=PYOEND-PHWID*COS(ANGLE)
-        PXBL=PXOEND-PHWID*SIN(ANGLE)
-        PYBL=PYOEND+PHWID*COS(ANGLE)
-        CALL IMG_PIXTOWORLD(PXBR,PYBR,XBR,YBR,STATUS)
-        CALL IMG_PIXTOWORLD(PXBL,PYBL,XBL,YBL,STATUS)
-        CALL IMG_PIXTOWORLD(PXTL,PYTL,XTL,YTL,STATUS)
-        CALL IMG_PIXTOWORLD(PXTR,PYTR,XTR,YTR,STATUS)
-        CALL PGMOVE(XBR,YBR)
-        CALL PGDRAW(XBL,YBL)
-        CALL PGDRAW(XTL,YTL)
-        CALL PGDRAW(XTR,YTR)
-        CALL PGDRAW(XBR,YBR)
+        CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+        PLENGTH=LENGTH/ABS(I_XSCALE)
+        PLENGTH=MAX(2.0,PLENGTH)
+        PWIDTH=WIDTH/ABS(I_XSCALE)
+        PWIDTH=MAX(1.0,PWIDTH)
+        PHWID=PWIDTH/2.0
+        PHLEN=PLENGTH/2.0
+        PXEND=PXCENT+PHLEN*COS(ANGLE)
+        PXOEND=PXCENT-PHLEN*COS(ANGLE)
+        PYEND=PYCENT+PHLEN*SIN(ANGLE)
+        PYOEND=PYCENT-PHLEN*SIN(ANGLE)
 
 *  create and map data array
         I_N_1D=INT(PLENGTH)

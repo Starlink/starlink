@@ -104,10 +104,9 @@
         INTEGER			CHR_LEN
 
 *  Local Constants:
-      CHARACTER*1		NUL
-        PARAMETER		( NUL = CHAR(0) )
 
 *  Local Variables:
+      CHARACTER*1		NUL
       CHARACTER*4		FSTR			! File number string
       CHARACTER*1		IO			! Access mode
       CHARACTER*1		LMODE			! Local copy of MODE
@@ -127,6 +126,9 @@
       LOGICAL			ISTEMP			! Temporary value?
       LOGICAL			THERE			! Object exists?
 *.
+
+      NUL = CHAR(0)
+
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN

@@ -165,8 +165,12 @@ c     :            STATUS )
       CHARACTER*(*)		BUF
       INTEGER			BPOS
 *
+*    Local constants :
+      CHARACTER*1 QUOTE
+      PARAMETER (QUOTE='''')
 *    Local variables :
 *
+      CHARACTER*80 LINE
       INTEGER			ILINE			! Loop over whole lines
       INTEGER			NCUT			! Amount of STR output
       INTEGER			NLINE			! Number of whole lines
@@ -195,8 +199,8 @@ c     :            STATUS )
         NLINE = (LEN(STRING)-NCUT)/65
         NCUT = NCUT + 1
         DO ILINE = 1, NLINE
-          CALL FIO_WRITE( USI_LOGFID, '     : '''//STRING(NCUT:NCUT+64)
-     :                    //'''//', STATUS )
+        LINE='     : '//QUOTE//STRING(NCUT:NCUT+64)//QUOTE
+          CALL FIO_WRITE( USI_LOGFID,LINE,STATUS)
           NCUT = NCUT + 65
         END DO
 

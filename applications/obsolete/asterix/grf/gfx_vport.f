@@ -140,6 +140,16 @@
 
         ENDIF
 
+*  check values are possible
+        IF (XX2.LE.XX1.OR.YY2.LE.YY1) THEN
+          XX1=0.1
+          XX2=0.95
+          YY1=0.1
+          YY2=0.9
+          CALL MSG_PRNT('*** Cannot fit plot on display surface'/
+     :          /' with specified layout')
+        ENDIF
+
 *  return viewport used
         X1=XX1
         X2=XX2

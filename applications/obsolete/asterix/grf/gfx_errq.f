@@ -61,7 +61,7 @@
         ENDIF
         CALL GCB_GETI('ERR_COLOUR',OK,COLOUR,STATUS)
         IF (OK) THEN
-          CALL PGSCI(WIDTH)
+          CALL PGSCI(COLOUR)
         ENDIF
 
 *  simple case of lin/lin axes

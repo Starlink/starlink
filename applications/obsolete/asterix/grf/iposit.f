@@ -30,7 +30,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IPOSIT Version 2.1-0')
+      PARAMETER (VERSION='IPOSIT Version 2.1-0b')
 *-
       CALL USI_INIT()
 
@@ -274,6 +274,9 @@
 *    Functions :
       INTEGER CHR_LEN
 *    Local Constants :
+      DOUBLE PRECISION PI, DTOR
+      PARAMETER (PI = 3.141592654D0, DTOR = PI/180.0D0)
+
 *    Local variables :
       CHARACTER*132 TEXT
       CHARACTER*80 REC
@@ -282,12 +285,17 @@
       DOUBLE PRECISION RA,DEC
       REAL X,Y
       INTEGER IFD
+      INTEGER RAI,DECI
       INTEGER RAPTR,DECPTR
       INTEGER ISRC,NSRC
       INTEGER L,SFID
+      INTEGER ROW,ROWS
       LOGICAL EXIST
+      LOGICAL STL
       LOGICAL RADEC
       LOGICAL REPEAT
+      LOGICAL MORE
+      LOGICAL NULFLG
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
@@ -354,36 +362,104 @@
 
 *  see if file exists in form given
             INQUIRE(FILE=TEXT,EXIST=EXIST)
-*  if it does - assume it to be text file
+*  if it does - assume it to be text file unless told it is Small Text List
             IF (EXIST) THEN
-              CALL FIO_OPEN(TEXT,'READ','NONE',0,IFD,STATUS)
-              DO WHILE ( STATUS .EQ. SAI__OK )
-                CALL FIO_READF(IFD,REC,STATUS)
-                IF (STATUS.EQ.SAI__OK) THEN
-*  ignore blank lines
-                  IF (REC.GT.' ') THEN
-*  remove leading blanks
-                    CALL CHR_LDBLK( REC )
 
-*  split record into ra and dec
-                    CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
-*  parse
-                    CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+              CALL FIO_OPEN(TEXT,'READ','NONE',0,IFD,STATUS)
+
+*  check if file is Small Text List
+              CALL IMG_CHKSTL(IFD,STL,STATUS)
+
+
+              IF (STL) THEN
+
+                CALL FIO_CLOSE(IFD,STATUS)
+
+                CALL CAT_TOPEN (TEXT, 'OLD', 'READ', IFD, STATUS)
+
+                IF (STATUS.EQ.SAI__OK) THEN
+
+*  find Ra/Dec
+                  CALL CAT_TIDNT (IFD, 'RA', RAI, STATUS)
+                  CALL CAT_TIDNT (IFD, 'DEC', DECI, STATUS)
+
+
+                  CALL CAT_TROWS (IFD, ROWS, STATUS)
+
+*
+*  Process all the row in the list (or until an error occurs).
+
+
+                  ROW = 1
+                  MORE = .TRUE.
+
+                  DO WHILE (MORE.AND.ROW.LE.ROWS)
+
+
+                    CALL CAT_RGET (IFD, ROW, STATUS)
+                    IF (STATUS .EQ. SAI__OK) THEN
+
+*   Attempt to get the basic plotting attributes.
+
+                      CALL CAT_EGT0D (RAI, RA, NULFLG, STATUS)
+                      CALL CAT_EGT0D (DECI, DEC, NULFLG, STATUS)
+                      RA=RA/DTOR
+                      DEC=DEC/DTOR
 
 *  and store
-                   CALL IMG_PUTPOS( RA, DEC, STATUS )
+                      CALL IMG_PUTPOS( RA, DEC, STATUS )
 
-*  make the first one the current position
-                    IF (I_NPOS.EQ.1) THEN
-                      CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
-                      CALL IMG_SETPOS(X,Y,STATUS)
+
+
+                    ELSE
+                      MORE=.FALSE.
+
                     ENDIF
 
-                  ENDIF
+                    ROW=ROW+1
+
+                  ENDDO
+
+*  close catalogue file
+                  CALL CAT_TRLSE (IFD, STATUS)
+
                 ENDIF
-              ENDDO
-              IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
-              CALL FIO_CLOSE(IFD,STATUS)
+
+
+              ELSE
+
+                DO WHILE ( STATUS .EQ. SAI__OK )
+                  CALL FIO_READF(IFD,REC,STATUS)
+                  IF (STATUS.EQ.SAI__OK) THEN
+*  ignore blank lines
+                    IF (REC.GT.' ') THEN
+*  remove leading blanks
+                      CALL CHR_LDBLK( REC )
+
+*  split record into ra and dec
+                      CALL CONV_SPLIT(REC,RAS,DECS,STATUS)
+*  parse
+                      CALL CONV_RADEC(RAS,DECS,RA,DEC,STATUS)
+
+*  and store
+                     CALL IMG_PUTPOS( RA, DEC, STATUS )
+
+*  make the first one the current position
+                      IF (I_NPOS.EQ.1) THEN
+                        CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
+                        CALL IMG_SETPOS(X,Y,STATUS)
+                      ENDIF
+
+                    ENDIF
+                  ENDIF
+                ENDDO
+                IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+                CALL FIO_CLOSE(IFD,STATUS)
+
+
+
+              ENDIF
+
 
 *  otherwise assume HDS file in PSS format
             ELSE
