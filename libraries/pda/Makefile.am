@@ -80,10 +80,10 @@ pda_d1mach.f pda_i1mach.f pda_drann.f pda_r1mach.f
 # do we make the test conditional on the presence of these libraries
 
 TESTS = pda_test Covartest Lintest Nonlin2test Normtest \
-	Randtest Sf2dtest Simann Sorttest Subplex
+	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Subplex
 
 check_PROGRAMS = pda_test Covartest Lintest Nonlin2test Normtest \
-	Randtest Sf2dtest Simann Sorttest Subplex
+	Randtest Sf2dtest Sf2dtest2 Simann Sorttest Subplex
 
 pda_test_SOURCES = pda_test.f
 Covartest_SOURCES = Covartest.f
@@ -93,6 +93,7 @@ Nonlin2test_SOURCES = Nonlin2test.f
 Normtest_SOURCES = Normtest.f
 Randtest_SOURCES = Randtest.f
 Sf2dtest_SOURCES = Sf2dtest.f
+Sf2dtest2_SOURCES = Sf2dtest2.f
 Simann_SOURCES = Simann.f
 Sorttest_SOURCES = Sorttest.f
 Subplex_SOURCES = Subplex.f
@@ -105,6 +106,7 @@ Nonlin2test_LDADD = `$(srcdir)/pda_link`
 Normtest_LDADD = `$(srcdir)/pda_link`
 Randtest_LDADD = `$(srcdir)/pda_link`
 Sf2dtest_LDADD = `$(srcdir)/pda_link`
+Sf2dtest2_LDADD = `$(srcdir)/pda_link`
 Simann_LDADD = `$(srcdir)/pda_link`
 Sorttest_LDADD = `$(srcdir)/pda_link`
 Subplex_LDADD = `$(srcdir)/pda_link`
