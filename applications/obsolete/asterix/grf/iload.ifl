@@ -17,6 +17,13 @@ interface ILOAD
     prompt 'Device'
     help 'Name of graphics device to display image'
   endparameter
+  parameter SPLIT
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Split display'
+    help 'Display image and 1D derivatives together on split display'
+  endparameter
   parameter NX
     position 3
     type '_INTEGER'
