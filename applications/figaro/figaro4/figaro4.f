@@ -28,6 +28,7 @@
 *  Authors:
 *     HME: Horst Meyerdierks (UoE, Starlink)
 *     ACC: Anne Charles (RAL, Starlink)
+*     MJC: Malcolm J. Currie (RAL, Starlink)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        Change RESAMPLE to RESAMP because of conflict with FIGARO.
 *     25 Nov 1997 (acc):
 *        Change GROW to GROWS because of name clash with FIGARO.
+*     2004 July 16 (MJC):
+*        GOODVAR removed as it was transferred to Figaro in 2001 July.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,10 +157,6 @@
 *  23-JUL-1992
       ELSE IF ( ACTION .EQ. 'FITTRI' ) THEN
          CALL FITTRI( STATUS )
-
-*  24-JUL-1991
-      ELSE IF ( ACTION .EQ. 'GOODVAR' ) THEN
-         CALL GOODVAR( STATUS )
 
 *  05-JUL-1991
       ELSE IF ( ACTION .EQ. 'GROW' ) THEN
