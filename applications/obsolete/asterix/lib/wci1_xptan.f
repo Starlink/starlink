@@ -134,7 +134,7 @@
 *    Convert linear x,y to native sphericals
         IF ( (PROJ(1).EQ.0.0D0) .AND. (PROJ(2).EQ.0.0D0) ) THEN
           UNPROJ(1) = 0.0
-          UNPROJ(2) = 90.0D) * MATH__DDTOR
+          UNPROJ(2) = 90.0D0 * MATH__DDTOR
         ELSE
 
 *      Distance from special point
