@@ -191,6 +191,10 @@
          ELSE IF ( NAME .EQ. 'NDFTRACE' ) THEN
             CALL NDFTRACE ( STATUS )
 
+*  Set pixels bad which have a given set of qualities.
+         ELSE IF ( NAME .EQ. 'QUALTOBAD' ) THEN
+            CALL QUALTOBAD ( STATUS )
+
 *  Reshapes an NDF, treating its arrays as vectors.
          ELSE IF ( NAME .EQ. 'RESHAPE' ) THEN
             CALL RESHAPE ( STATUS )

@@ -64,7 +64,7 @@ hislist.par hisset.par histat.par histeq.par histogram.par \
 div.par \
 log10.par pow.par kappa.par kstest.par laplace.par permaxes.par \
 linplot.par logar.par loge.par look.par lucy.par lutable.par \
-lutread.par lutsave.par lutview.par \
+lutread.par lutsave.par lutview.par qualtobad.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
 ardplot.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
 noglobals.par nomagic.par normalize.par numb.par outset.par\
@@ -119,7 +119,7 @@ role_of_kappa.hlp regrid.hlp rotate.hlp segment.hlp setaxis.hlp setbad.hlp setbb
 setbound.hlp setext.hlp setlabel.hlp setmagic.hlp setnorm.hlp \
 setorigin.hlp setsky.hlp settitle.hlp settype.hlp setunits.hlp setvar.hlp \
 shadow.hlp slide.hlp sqorst.hlp stats.hlp substitute.hlp \
-summary.hlp surfit.hlp thresh.hlp trandat.hlp trig.hlp \
+qualtobad.hlp summary.hlp surfit.hlp thresh.hlp trandat.hlp trig.hlp \
 unix_usage.hlp using_help.hlp vecplot.hlp wiener.hlp zaplin.hlp \
 automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
@@ -164,7 +164,7 @@ setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
 reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
-kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
+qualtobad.ifl kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl kapversion.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -298,7 +298,7 @@ fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
 settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
-wcsremove.f wcsshow.f chain.f reshape.f setqual.f 
+wcsremove.f wcsshow.f chain.f reshape.f setqual.f qualtobad.f
 
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KAPSUB_GEN) 
