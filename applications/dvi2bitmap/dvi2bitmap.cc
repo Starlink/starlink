@@ -35,15 +35,13 @@ static const char RCSID[] =
 // the documentation (SGML and roff), and the usage message at the
 // bottom of this file, are consistent with the new options.
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#include <config.h>
 
 #include <vector>
 #include <iostream>
 #include <string>
 
-#if HAVE_CSTD_INCLUDE
+#ifdef HAVE_CSTD_INCLUDE
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
@@ -59,7 +57,7 @@ static const char RCSID[] =
 #include <unistd.h>		// for getsubopt
 #include "getopt_long.h"
 
-#if HAVE_STD_NAMESPACE
+#ifdef HAVE_STD_NAMESPACE
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -76,10 +74,10 @@ using std::vector;
 #include "stringstream.h"
 #include "version.h"
 
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
 #include "kpathsea.h"
 #endif
-#if ENABLE_PNG
+#ifdef ENABLE_PNG
 #include "PNGBitmap.h"		// for PNGBitmap::libpng_version
 #endif
 
@@ -112,6 +110,12 @@ string get_ofn_pattern (string dviname);
 bool parse_boolean_string(char *s);
 void Usage (void);
 char *progname;
+
+#if !HAVE_DECL_GETSUBOPT
+extern "C" {
+    extern int getsubopt(char** options, char*const* tokens, char** value);
+}
+#endif
 
 verbosities verbosity = normal;
 int bitmapH = -1;
@@ -193,7 +197,7 @@ int main (int argc, char **argv)
 
     progname = argv[0];
 
-#if ENABLE_KPATHSEA
+#ifdef ENABLE_KPATHSEA
     kpathsea::init (progname, resolution);
 #endif
 
@@ -594,27 +598,38 @@ int main (int argc, char **argv)
 	  case 'V':		// --version
 	    cout << version_string << endl << "Options:" << endl;
 
-	    cout << "ENABLE_GIF           "
-		 << (ENABLE_GIF ? "yes" : "no") << endl;
-	    cout << "ENABLE_PNG           "
-		 << (ENABLE_PNG ? "yes" : "no") << endl;
-#if ENABLE_PNG
-	    cout << "  libpng: "
-		 << PNGBitmap::version_string() << endl;
+            cout << "ENABLE_GIF           " <<
+#ifdef ENABLE_GIF
+                 "yes"
+#else
+                 "no"
 #endif
+                 << endl;
 
-	    cout << "ENABLE_KPATHSEA      "
-		 << (ENABLE_KPATHSEA ? "yes" : "no") << endl;
-#if ENABLE_KPATHSEA
-	    cout << "  libkpathsea: "
-		 << kpathsea::version_string() << endl;
+	    cout << "ENABLE_PNG           " << 
+#ifdef ENABLE_PNG
+                "yes" << endl << "  libpng: " << PNGBitmap::version_string()
+#else
+                "no"
 #endif
+            << endl;
+
+	    cout << "ENABLE_KPATHSEA      " << 
+#ifdef ENABLE_KPATHSEA
+                "yes" << endl << "  libkpathsea: " << kpathsea::version_string()
+#else
+                "no"
+#endif
+                 << endl;
+
 #ifdef DEFAULT_TEXMFCNF
 	    cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << endl;
 #endif
+
 #ifdef FAKE_PROGNAME
 	    cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << endl;
 #endif
+
 #ifdef FONT_SEARCH_SCRIPT
 	    cout << "FONT_SEARCH_SCRIPT   " << FONT_SEARCH_SCRIPT << endl;
 #endif
@@ -1371,10 +1386,10 @@ void Usage (void)
 "        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]" << endl <<
 "        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]" << endl <<
 "        [-t xbm"
-#if ENABLE_GIF
+#ifdef ENABLE_GIF
 	 << "|gif"
 #endif
-#if ENABLE_PNG
+#ifdef ENABLE_PNG
 	 << "|png"
 #endif
 	 << "] [-V]" << endl <<
