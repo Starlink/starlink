@@ -59,101 +59,121 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jniast/.jniast.install
      [echo] Executing ASTGUI target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/astgui/.astgui.install
      [echo] Executing JNIHDS target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jnihds/.jnihds.install
      [echo] Executing HDX target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/hdx/.hdx.install
      [echo] Executing compatibility NDArray target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/oldarray/.oldarray.install
      [echo] Executing NDArray target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/array/.array.install
      [echo] Executing NDX target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/ndx/.ndx.install
      [echo] Executing Table target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/table/.table.install
      [echo] Executing NDTools target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/ndtools/.ndtools.install
      [echo] Executing HDS target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/hds/.hds.install
      [echo] Executing FITS target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/.jaiutil.install
      [echo] Executing SOAPSERVER target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/sog/.sog.install
      [echo] Executing SPLAT target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
      [echo] Executing Pal target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/coco/.coco.install
      [echo] Executing RV target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/rv/.rv.install
 
 clean:
 
@@ -811,7 +831,6 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jniast
     [mkdir] Created dir: /apps/cvsbuild/star/docs/jniast
-    [mkdir] Created dir: /apps/cvsbuild/star/lib/i386
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 67 files to /apps/cvsbuild/star/docs
      [echo] Executing ASTGUI target: install
@@ -819,7 +838,7 @@ install:
 prepare:
 
 check_packages:
-[available] Mar 28, 2003 4:14:43 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Mar 29, 2003 4:15:16 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1357,7 +1376,6 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/ndtools
     [mkdir] Created dir: /apps/cvsbuild/star/lib/ndtools
-    [mkdir] Created dir: /apps/cvsbuild/star/etc/ndtools
     [mkdir] Created dir: /apps/cvsbuild/star/docs/ndtools
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
@@ -2532,7 +2550,6 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/splat
     [mkdir] Created dir: /apps/cvsbuild/star/lib/splat
-    [mkdir] Created dir: /apps/cvsbuild/star/etc/splat
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 7 files to /apps/cvsbuild/star/lib
