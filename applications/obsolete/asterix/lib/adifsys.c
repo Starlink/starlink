@@ -469,6 +469,9 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
   {
   ADIlogical		found = ADI__false;
   ADIobj		rval = id;
+  ADIobj		ocls;
+  ADIlogical  		atend;
+  int			icp,jcp,fjcp;
 
 /* Check inherited global status. Return input argument if bad */
   _chk_stat_ret(id);
@@ -476,24 +479,48 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Import strings resolving lengths */
   _GET_NAME(cls,clen);
 
-/* If the user has specified wildcard type then we're done */
-  if ( *cls != '*' ) {
-
-    ADIobj	ocls;
-    ADIlogical  atend;
-    int		icp,jcp,fjcp;
-
-/* Import the class name string */
-    _GET_NAME(cls,clen);
-
 /* Class name of opened object */
-    ocls = _DTDEF(id)->aname;
+  ocls = _DTDEF(id)->aname;
 
 /* Loop over class list supplied to see if we have a match */
-    icp = 0;
-    while ( (icp < clen) && _ok(status) && ! found ) {
+  icp = 0;
+  while ( (icp < clen) && _ok(status) && ! found ) {
 
 /* Find end of this class name */
+    jcp = icp;
+    atend = ADI__false;
+    while ( (jcp<clen) && ! atend ) {
+      if ( cls[jcp] == '|' )
+	atend = ADI__true;
+      else
+	jcp++;
+      }
+
+/* Store end of first word for later */
+    if ( ! icp ) fjcp = jcp;
+
+/* Doesn't match what we've got? Advance to next class name */
+    if ( (cls[icp] == '*') && ((jcp-icp) == 1) ) {
+      found = ADI__true;
+      }
+    else {
+      if ( strx_cmpc( cls + icp, jcp - icp, ocls ) )
+	icp = jcp + 1;
+      else
+	found = ADI__true;
+      }
+    }
+
+/* We haven't matched any of the requested classes? */
+  if ( ! found ) {
+    ADIobj newid;
+
+/* Loop over supplied classes trying to create the link */
+    icp = 0;
+    found = ADI__false;
+    while ( (icp < clen) && _ok(status) && ! found ) {
+
+/*   Find end of this class name */
       jcp = icp;
       atend = ADI__false;
       while ( (jcp<clen) && ! atend ) {
@@ -506,78 +533,48 @@ ADIobj adix_link_efile( ADIobj id, char *cls, int clen, ADIstatus status )
 /* Store end of first word for later */
       if ( ! icp ) fjcp = jcp;
 
-/* Doesn't match what we've got? Advance to next class name */
-      if ( strx_cmpc( cls + icp, jcp - icp, ocls ) )
-	icp = jcp + 1;
-      else
-	found = ADI__true;
-      }
-
-/* We haven't matched any of the requested classes? */
-    if ( ! found ) {
-      ADIobj newid;
-
-/* Loop over supplied classes trying to create the link */
-      icp = 0;
-      found = ADI__false;
-      while ( (icp < clen) && _ok(status) && ! found ) {
-
-/*   Find end of this class name */
-	jcp = icp;
-	atend = ADI__false;
-	while ( (jcp<clen) && ! atend ) {
-	  if ( cls[jcp] == '|' )
-	    atend = ADI__true;
-	  else
-	    jcp++;
-	  }
-
-/*   Store end of first word for later */
-	if ( ! icp ) fjcp = jcp;
-
-/*   Create instance of class */
-	adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
+/* Create instance of class */
+      adix_newn( ADI__nullid, NULL, 0, cls+icp, jcp-icp, 0, NULL,
 		   &newid, status );
 
-/*   Try to link them */
-	newid = adix_setlnk( newid, id, cls, clen, status );
+/* Try to link them */
+      newid = adix_setlnk( newid, id, cls, clen, status );
 
-/*   Linkage worked? Return new object */
-	if ( _ok(status) ) {
-	  found = ADI__true;
-	  rval = newid;
-	  }
+/* Linkage worked? Return new object */
+      if ( _ok(status) ) {
+	found = ADI__true;
+	rval = newid;
+	}
 
-/*   Retry? Link routine has safely decided it can't handle our data */
-	else if ( *status == ADI__RETRY ) {
+/* Retry? Link routine has safely decided it can't handle our data */
+      else if ( *status == ADI__RETRY ) {
 
 /*   Cancel the bad status */
-	  adic_erranl( status );
+	adic_erranl( status );
 
 /*   Destroy the object we don't want */
-	  adic_erase( &newid, status );
+	adic_erase( &newid, status );
 
 /*   Next class */
-	  icp = jcp + 1;
-	  }
+	icp = jcp + 1;
+	}
 
-/*   Failed to link */
-	else if ( ! _ok(status) ) {
+/* Failed to link */
+      else if ( ! _ok(status) ) {
 
 /* Destroy temp object */
-	  ems_begin_c( status );
-	  adic_erase( &newid, status );
-	  ems_end_c( status );
-	  }
-
+	ems_begin_c( status );
+	adic_erase( &newid, status );
+	ems_end_c( status );
 	}
+
       }
+    }
 
 /* Report error if no linkage */
-    if ( ! found )
-      adic_setecs( ADI__NOMTH, "Unable to link object of class %S to any of %*s",
+  if ( ! found )
+    adic_setecs( ADI__NOMTH, "Unable to link object of class %S to any of %*s",
 		   status, ocls, clen, cls );
-    }
 
 /* Set return object */
   return rval;
