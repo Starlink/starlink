@@ -934,25 +934,33 @@ $(MANIFEST)/iras90: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/ndg \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/obsolete/iras90 \
 	  && $(MAKE_CPT)
 
