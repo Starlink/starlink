@@ -32,19 +32,32 @@ This directory contains the following directories:
 To build the COMPLETE set of Starlink classic applications the
 following steps are required:
 
- - Specify where you want the installed files to end up (_PREFIX)
-   and where you want the build to find previously installed files (_STARLINK).
-   This defaults to /star.  Here and below we use /local-star as an
-   example; in the examples below substitute your own choice for this
-   directory.
+ - Specify where you want the installed files to end up (_PREFIX) and
+   where you want the build to find any previously installed Starlink
+   tree (_STARLINK).  If there is no previously existing tree, then
+   set the two variables to the same value.  Both variables default to
+   /star.  You must have write access to the directory you name here.
 
-      % setenv STARCONF_DEFAULT_STARLINK /local-star
+   Here and below we use /local-star as an example; in the examples
+   below substitute your own choice for this directory.
+
+      % setenv STARCONF_DEFAULT_STARLINK /local-star  # csh
       % setenv STARCONF_DEFAULT_PREFIX   /local-star
+
+   or
+ 
+      % export STARCONF_DEFAULT_STARLINK=/local-star  # sh
+      % export STARCONF_DEFAULT_PREFIX=/local-star
 
 -  Delete any previous Starlink environment variables. 
 
-      % unsetenv INSTALL
+      % unsetenv INSTALL  # csh
       % unsetenv STARLINK
+
+   or
+
+      % unset INSTALL     # sh
+      % unset STARLINK
 
    and also make sure that an old-style Starlink system is not in your
    path (since tools like messgen will get very confused). 
@@ -53,9 +66,10 @@ following steps are required:
    the ${STARLINK}/etc/login and ${STARLINK}/etc/cshrc scripts that
    existed from a previous classic mk-build Starlink install, as
    even with $STARLINK removed from your path some applications may
-   still get confused at build time. A Starlink login from
-   a previous autoconf install into the same tree will likely be fine.
-   (although you may need to remove installed manifest files).
+   still get confused at build time.  If the login script in question
+   is a `new' one, from a previous autoconf install, you will
+   probably be fine (although you may need to remove installed
+   manifest files).
    
  - Review any other environment variables that might affect the build.
    For example, the variables F77, FC and CC will force the build
@@ -68,26 +82,32 @@ following steps are required:
    these variables before building the software.  See './configure
    --help' for a list of `some influential environment variables'.
 
- - First build the buildsupport system (the tools in the buildsupport
-   directory, plus third-party applications autoconf, automake and
-   libtool).  Some of these applications have been patched
-   specifically for building Starlink applications so the default
-   versions shipped with the OS will not work.  These applications
-   will be installed into $STARCONF_DEFAULT_PREFIX/buildsupport, so
-   you should add $STARCONF_DEFAULT_PREFIX/buildsupport/bin to your
-   path at this point, BEFORE you run the ./bootstrap script.  In
-   order for the `make' below to work, you also need to add the
-   default bin directory to your path, so you should do that now.
+ - First bootstrap the system.  This builds and installs the
+   buildsupport system (the tools in the buildsupport directory, plus
+   third-party applications autoconf, automake and libtool), and then
+   goes on to generate the configure scripts which will be used in the
+   next step.  The autoconf, automake and libtool applications have
+   been patched specifically for building this tree so any versions
+   shipped with the OS, or installed by you, will _not_ work.  These
+   applications will be installed into
+   $STARCONF_DEFAULT_PREFIX/buildsupport, so you should add
+   $STARCONF_DEFAULT_PREFIX/buildsupport/bin to your path at this
+   point, BEFORE you run the ./bootstrap script.  In order for the
+   `make' below to work, you also need to add the default bin
+   directory to your path, so you should do that now.
 
+      # csh-like
       % setenv PATH $STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
       % ./bootstrap
 
- - If you need to give ./configure some help to find include
-   files and libraries (for example, you are on a Mac and have
-   installed Fink in /sw or OpenDarwin in /opt/local, or are on a Sun
-   and have extra software in /opt), then do so by setting (for
-   example) CFLAGS=-I/opt/local/include and LDFLAGS=-L/opt/local/lib
-   in the environment.  Don't do this unless you discover you have to.
+   or
+
+      # sh-like
+      % PATH=$STARCONF_DEFAULT_PREFIX/bin:$STARCONF_DEFAULT_PREFIX/buildsupport/bin:$PATH
+      % ./bootstrap
+
+   This step takes a long while; it can be an hour on a moderately
+   fast system.
 
  - There are a _few_ components which have to be built and installed
    before the main tree is configured.  You will have been advised of
@@ -102,12 +122,28 @@ following steps are required:
       % ./configure -C   # -C means caching results
       % make world
  
+   If you need to give ./configure some help to find include files and
+   libraries (for example, you are on a Mac and have installed Fink in
+   /sw or OpenDarwin in /opt/local, or are on a Sun and have extra
+   software in /opt), then do so by setting (for example)
+   CFLAGS=-I/opt/local/include and LDFLAGS=-L/opt/local/lib either in
+   the environment or, better, as arguments to the ./configure script.
+   Don't do this unless you discover you have to.
+
+   Each of these steps also takes around an hour.
+
  - If you wish to disable the building of shared libraries you should
+   use the --disable-shared configure option
  
       % ./configure -C --disable-shared
-      
-   currently (as of 27-Jun-04) this is necessary for the build to work
-   under Mac OSX.
+
+ - By default, the system will be configured so that all
+   documentation is built at the same time as the software.  For this
+   to work, you must have LaTeX installed on your machine.  Building
+   the documentation is rather slow, and you can speed up the build
+   somewhat by omitting it.  You do that as follows:
+
+      % ./configure -C --without-stardocs
 
  - If you wish to build only as far as a given component, then specify
    it by giving the name of the associated `manifest' file.
@@ -134,13 +170,15 @@ specific component, the instructions are slightly different.
 
  - If you have already built the buildsupport tools (autoconf,
    automake, libtool and starconf), then make sure these are in your
-   path.  If not, you can build just these by going to the top-level
-   of your checkout and giving the command
+   path.  If they are not built, or if you are not sure they are
+   up-to-date, you can build just these by going to the top-level of
+   your checkout and giving the command
 
       % ./bootstrap --buildsupport
 
- - Now you can go into a specific directory and build the library/application
-   as normal (a bootstrap is required if building from CVS)
+ - Now you can go into a specific directory and build the library or
+   application as normal (a bootstrap is required in the directory if
+   you are building from a CVS checkout)
 
       % ./bootstrap
       % ./configure -C
