@@ -41,6 +41,15 @@
 #           - maxcanv  -- If given and non-zero, the GWM widget will not 
 #                         be more than maxcanv pixels in either direction.
 #
+#     maxcanvas
+#        Returns a number a bit bigger than the larger of the width and
+#        the height of a GWM item big enough to hold the two currently
+#        loaded NDFs just after the two loadndf calls at the current
+#        zoom factor.  This may not be the same that given by the most
+#        recently created GWM item, which is what we would get if we 
+#        just inherited the Gwmview maxcanvas method, since the two 
+#        NDFs may overlap or be far from each other when this is called. 
+#
 #     offset
 #        Returns a two-element list giving the X and Y position of the
 #        origin of the B image in CURRENT frame coordinates of the A image.
@@ -282,6 +291,22 @@
 
 
 #-----------------------------------------------------------------------
+      public method maxcanvas {} {
+#-----------------------------------------------------------------------
+         foreach slot { A B } {
+            set bb [ $ndf($slot) bbox CURRENT ]
+            set x($slot) [ expr [ lindex [ lindex $bb 0 ] 1 ] - \
+                                [ lindex [ lindex $bb 0 ] 0 ] ]
+            set y($slot) [ expr [ lindex [ lindex $bb 1 ] 1 ] - \
+                                [ lindex [ lindex $bb 1 ] 0 ] ]
+         }
+         set xsize [ expr ( $x(A) + $x(B) ) * $zoomfactor + $pixgap ]
+         set ysize [ max $y(A) $y(B) ]
+         return [ expr [ max $xsize $ysize ] * 1.4 ]
+      }
+
+
+#-----------------------------------------------------------------------
       public method activate {} {
 #-----------------------------------------------------------------------
 
@@ -439,7 +464,7 @@
          refreshpoints
 
 #  Do bad bug magic.
-         jiggle
+         # jiggle
 
 #  Set up key bindings for dragging, dropping and marking points.
          foreach slot { A B } {
