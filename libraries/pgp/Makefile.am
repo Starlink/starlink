@@ -13,7 +13,7 @@ libpgp_la_SOURCES = $(F_ROUTINES) \
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-
+PUBLIC_INCLUDES = PGP_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
