@@ -13,7 +13,7 @@ using std::exit;
 #endif
 #include <iostream>
 
-// #include <string>
+#include <string>
 
 #include "PkFont.h"
 
@@ -32,6 +32,7 @@ int main (int argc, char **argv)
     int dpi = atoi (argv[4]);
     int basedpi = atoi (argv[5]);
     double magnification = atof (argv[6]);
+
 
     cout << PkFont::substitute_font_string (fmt, mode, fontname,
 					    dpi, basedpi, magnification)
