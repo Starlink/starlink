@@ -1798,11 +1798,9 @@
         END IF
         CALL BDI_PUT0UB( OFID, 'QualityMask', QMASK, STATUS )
 
-*    Map it
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', PTR_QUAL, STATUS )
-
-*    Initialise quality values to MISSING
-        CALL ARR_INIT1B( QUAL__MISSING, NELM, %VAL(PTR_QUAL), STATUS )
+*    Map it and initialise to mssing
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QMISSING', PTR_QUAL,
+     :                  STATUS )
 
       END IF
 

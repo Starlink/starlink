@@ -114,9 +114,9 @@
         EXTERNAL		AST_QPKGI
 
 *  Local Variables:
-      CHARACTER*4               INIT                    ! Initialiser
+      CHARACTER*10              INIT                    ! Initialiser
       CHARACTER*20		LITEM			! Local item name
-      CHARACTER*12              LMODE			! Local copy of mode
+      CHARACTER*20              LMODE			! Local copy of mode
       CHARACTER*7 		LTYPE			! Local copy of type
 
       INTEGER			ARGS(5)			! Function args

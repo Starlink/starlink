@@ -421,8 +421,7 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Create output data
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
-      CALL ARR_INIT1R( 0.0, NPTS, %VAL(ODPTR), STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Get first lot of axis data
@@ -447,16 +446,14 @@
 *  Check quality
       CALL BDI_CHK( IFID(1), 'Quality', QUAL, STATUS )
       IF ( QUAL ) THEN
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
-        CALL ARR_INIT1B( QUAL__GOOD, NPTS, %VAL(OQPTR), STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QGOOD', OQPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check variance
       CALL BDI_CHK( IFID(1), 'Variance', VAROK, STATUS )
       IF ( VAROK ) THEN
-        CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OVPTR, STATUS )
-        CALL ARR_INIT1R( 0.0, NPTS, %VAL(OVPTR), STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', OVPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 

@@ -210,8 +210,8 @@
       CALL ADI_CMAPR( RMFID, 'Channels', 'READ', RCPTR, STATUS )
       CALL BDI_AXMAPR( OFID, 1, 'Data', 'WRITE', OAVPTR, STATUS )
       CALL BDI_AXMAPR( OFID, 1, 'Width', 'WRITE', OAWPTR, STATUS )
-      CALL FOLDGRID_B2VW( ODIMS(1), %VAL(RCPTR), %VAL(OAVPTR),
-     :                    %VAL(OAWPTR), STATUS )
+      CALL ARR_BND2CWR( ODIMS(1), %VAL(RCPTR), %VAL(OAVPTR),
+     :                  %VAL(OAWPTR), STATUS )
 
 *  Write channel bounds component too
       CALL DAT_NEW1R( OLOC, 'CHANNEL_BOUNDS', ODIMS(1)+1, STATUS )
@@ -229,116 +229,5 @@
 *  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
-
-      END
-
-
-
-      SUBROUTINE FOLDGRID_B2VW( NCHAN, BND, VAL, WID, STATUS )
-*+
-*  Name:
-*     FOLDGRID_B2VW
-
-*  Purpose:
-*     Convert bounds array to axis centres and widths
-
-*  Language:
-*     Starlink Fortran
-
-*  Invocation:
-*     CALL FOLDGRID_B2VW( NCHAN, BND, VAL, WID, STATUS )
-
-*  Description:
-*     {routine_description}
-
-*  Arguments:
-*     {argument_name}[dimensions] = {data_type} ({argument_access_mode})
-*        {argument_description}
-*     STATUS = INTEGER ({status_access_mode})
-*        The global status.
-
-*  Examples:
-*     {routine_example_text}
-*        {routine_example_description}
-
-*  Pitfalls:
-*     {pitfall_description}...
-
-*  Notes:
-*     {routine_notes}...
-
-*  Prior Requirements:
-*     {routine_prior_requirements}...
-
-*  Side Effects:
-*     {routine_side_effects}...
-
-*  Algorithm:
-*     {algorithm_description}...
-
-*  Accuracy:
-*     {routine_accuracy}
-
-*  Timing:
-*     {routine_timing}
-
-*  External Routines Used:
-*     {name_of_facility_or_package}:
-*        {routine_used}...
-
-*  Implementation Deficiencies:
-*     {routine_deficiencies}...
-
-*  References:
-*     {task_references}...
-
-*  Keywords:
-*     FOLDGRID, usage:private
-
-*  Copyright:
-*     Copyright (C) University of Birmingham, 1996
-
-*  Authors:
-*     DJA: David J. Allan (Jet-X, University of Birmingham)
-*     {enter_new_authors_here}
-
-*  History:
-*     11 Mar 1996 (DJA):
-*        Original version.
-*     {enter_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
-*-
-
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Arguments Given:
-      INTEGER			NCHAN
-      REAL			BND(*)
-
-*  Arguments Returned:
-      REAL			VAL(*), WID(*)
-
-*  Status:
-      INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      INTEGER			I			! Loop over channels
-*.
-
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Loop over channel bounds
-      DO I = 1, NCHAN
-        VAL(I) = (BND(I) + BND(I+1))/2.0
-        WID(I) = (BND(I+1)-BND(I))
-      END DO
 
       END

@@ -251,19 +251,17 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Map the data array in the output file and zero it.
-      CALL BDI_MAPR( OFID, 'Data', 'UPDATE', ODP, STATUS )
-      CALL ARR_INIT1R(0.0, NELS, %VAL(ODP), STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODP, STATUS )
 
 *  Map the variance array if variances being used, otherwise delete any
 *  variance array
       IF ( LVAR ) THEN
 
-        CALL BDI_MAPR( OFID, 'Variance', 'UPDATE', OVP, STATUS )
+        CALL BDI_MAPR( OFID, 'Variance', 'WRITE/ZERO', OVP, STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 99
-        CALL ARR_INIT1R(0.0, NELS, %VAL(OVP), STATUS)
 
       ELSE
-c         CALL BDI_DELETE( OFID, 'Variance', STATUS )
+        CALL BDI_DELETE( OFID, 'Variance', STATUS )
         IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
 
       END IF
@@ -271,15 +269,12 @@ c         CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *  Map the quality array if quality being used, otherwise delete any quality
 *  structure
       IF ( LQUAL ) THEN
-        CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', OQP, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QGOOD', OQP, STATUS )
         IF (STATUS .NE. SAI__OK) GOTO 99
-
-*    Zero the quality array
-        CALL ARR_INIT1B( QUAL__GOOD, NELS, %VAL(OQP), STATUS )
 
       ELSE
 
-c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
+        CALL BDI_DELETE( OFID, 'Quality', STATUS )
         IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
 
       END IF

@@ -282,8 +282,7 @@
       CALL BDI_CHK( OFID, 'Quality', OK, STATUS )
       IF ( .NOT. OK ) THEN
         IF ( Q_SET .OR. Q_IGNORE ) THEN
-          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTR, STATUS )
-          CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
+          CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QGOOD', QPTR, STATUS )
           CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
 
         ELSE

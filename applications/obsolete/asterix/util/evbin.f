@@ -557,8 +557,8 @@
 
 *  Map quality
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
-        CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QMISSING', OQPTR,
+     :                  STATUS )
         CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99

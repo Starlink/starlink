@@ -370,7 +370,7 @@ C        END IF
 *  Create output dataset
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       CALL BDI_LINK( 'BinDS', NDIM, ODIMS, 'REAL', OFID, STATUS )
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODPTR, STATUS )
 
 *  Create AXIS structure
       IF ( REG ) THEN
@@ -401,13 +401,10 @@ C        END IF
 *  Initialise quality to data missing
       CALL ARR_SUMDIM( NDIM, ODIMS, ONELM )
       IF ( QUALITY .AND. QKEEP ) THEN
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QMISSING', OQPTR,
+     :                 STATUS )
         CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
-        CALL ARR_INIT1B( QUAL__MISSING, ONELM, %VAL(OQPTR), STATUS )
       END IF
-
-*  Zero bin counts
-      CALL ARR_INIT1R( 0.0, ONELM, %VAL(ODPTR), STATUS )
 
 *  Bin the events
       IF ( REG ) THEN

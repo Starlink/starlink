@@ -560,11 +560,10 @@
 
         END IF
 
-*      Map output data
-        CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
-        CALL ARR_INIT1R( 0.0, ODIMS(1)*ODIMS(2), %VAL(ODPTR), STATUS )
+*    Map output data
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODPTR, STATUS )
 
-*      Dump counts to user
+*    Dump counts to user
         CALL MSG_SETI( 'NB', NBACK )
         CALL MSG_OUT( ' ', 'Background ^NB counts', STATUS )
         DO ISRC = 1, NSRC
@@ -573,7 +572,7 @@
           CALL MSG_OUT( ' ', 'Source ^N ^SC counts', STATUS )
         END DO
 
-*      Generate random positions
+*    Generate random positions
         IF ( LOGNS ) THEN
           DO ISRC = 1, NSRC
             XPOS(ISRC) = XBASE - XSCALE/2.0 + XSCALE

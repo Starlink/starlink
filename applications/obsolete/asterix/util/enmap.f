@@ -237,23 +237,13 @@
       CALL BDI_AXMAPR( IFID, ENAX, 'Data', 'READ', AXPTR, STATUS )
 
 *  Create output array
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL MSG_PRNT('Error creating and mapping output array')
-        GOTO 99
-      END IF
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', ODPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Create output quality
       IF ( QOK ) THEN
-        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QBAD', OQPTR, STATUS )
         CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
-      END IF
-
-*  Zero output arrays
-      CALL ARR_INIT1R( 0.0, ODIM(1)*ODIM(2), %VAL(ODPTR), STATUS )
-      IF ( QOK ) THEN
-        CALL ARR_INIT1B( QUAL__BAD, ODIM(1)*ODIM(2), %VAL(OQPTR),
-     :                                                   STATUS )
       END IF
 
 *  Map some work space and zero it

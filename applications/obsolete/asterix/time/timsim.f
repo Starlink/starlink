@@ -156,8 +156,7 @@
       CALL BDI_AXMAPR( OFID, 1, 'Width', 'READ', WIPTR, STATUS )
 
 *  Data Simulation
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', OPTR, STATUS )
-      CALL ARR_INIT1R(0.0,DIM,%VAL(OPTR),STATUS)
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE/ZERO', OPTR, STATUS )
       CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 9000
 
@@ -203,8 +202,7 @@
  9000 CONTINUE
 
 *  Set output quality to good
-      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', QPTR, STATUS )
-      CALL ARR_INIT1B( QUAL__GOOD, DIM, %VAL(QPTR), STATUS )
+      CALL BDI_MAPUB( OFID, 'Quality', 'WRITE/QGOOD', QPTR, STATUS )
       CALL BDI_PUT0UB( OFID, 'QualityMask', QUAL__MASK, STATUS )
 
 *  History :
