@@ -254,6 +254,11 @@
 *       ends of the scans. The bug is recreated and inverted in order
 *       to compensate. (SCULIB_FIX_SCAN_V10)
 
+*     Also, LO chopping for jiggle maps was broken until 19980730
+*     such that the initial chop pa was calculated in Az but never
+*     updated as the sky rotated. This fix is only important for SCUBA2MEM
+*     where the positions of the off-beams are returned.
+
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
@@ -262,6 +267,10 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.2  1999/07/13 06:31:23  timj
+*     Correct for CHOP TRACKING problem.
+*     Pass in LAT_OBS to some routines.
+*
 *     Revision 1.1  1999/02/27 04:33:47  timj
 *     Transfer from SCULIB_PROCESS_BOLS.
 *     Move waveplate and IP information through file.
@@ -569,8 +578,40 @@
       CALL SCULIB_GET_FITS_C (N_FITS, N_FITS, FITS, 
      :     'CHOP_FUN', CHOP_FUN, STATUS)
 
+*     Decide whether we have to fix the chop tracking bug or not
+*     The chop tracking bug for LO Jiggle maps was fixed on
+*     19981230 - the specified MJD is from the observation 104 taken
+*     on that night to prove the fix.
+      IF (IN_UT1 .LT. 51024.805D0 .AND. SAMPLE_MODE .EQ. 'JIGGLE'
+     :     .AND. CHOP_CRD .EQ. 'LO') THEN
+
+*     Okay this data requires the chop track fix for the off-beams
+*     first need to calculate the Azimuth angle for the start of the
+*     observation - use CALC_BOL_COORDS since that already calculates
+*     par_angle
+
+         CALL SCULIB_CALC_BOL_COORDS('AZ', RA_CEN, DEC_CEN,
+     :        LST_STRT(1,1,1,1), LAT_OBS, 'AZ', 0.0, 0.0, 0.0D0,
+     :        0, 0, 0.0D0, 0.0, 0.0, 0, 0, 0, 0, 0, 0.0, 0.0,
+     :        0.0, 0.0, 0.0D0, 0.0D0, ELEVATION, PAR_ANGLE, STATUS)
+
+*     The PAR_ANGLE as returned can now be treated as the new 
+*     CHOP_PA in a AZ coordinate frame
+         CHOP_PA = SNGL(PAR_ANGLE) - CHOP_PA
+         CHOP_CRD = 'AZ'
+
+*     If this information is relevant, print some information
+         IF (N_POS_BEAMS .NE. 1 .OR. BEAMS(1) .NE. 'M') THEN
+            CALL MSG_SETR('CHOPPA', CHOP_PA * 180.0 / SNGL(PI) )
+            CALL MSG_OUT(' ','SURFLIB_PROCESS_BOLS: Chop tracking'//
+     :           ' bug detected - converting chop parameters to'//
+     :           ' AZ at PA ^CHOPPA', STATUS)
+         END IF
+
+      END IF
+
 *     Translate LO to a real coordinate system
-*     Rembmer that for SCAN map data LO ALWAYS means RJ
+*     Remember that for SCAN map data LO ALWAYS means RJ
       IF (CHOP_CRD .EQ. 'LO') THEN
          IF (SAMPLE_MODE .EQ. 'RASTER') THEN
             CHOP_CRD = 'RJ'
@@ -585,8 +626,6 @@
       IF (SAMPLE_MODE .EQ. 'RASTER') THEN
          CHOP_THROW = CHOP_THROW / 2.0
       END IF
-
-
 
 *     Determine the offset coordinate system
 
@@ -627,6 +666,7 @@
             AZNASCAN_PL = .TRUE.
          END IF
       END IF
+
 
 *     Set up the default value for flipping
 *     This assumes the first scan is the reference
@@ -842,7 +882,8 @@
 *     Planets should be done in RD local coords
                            CALL SCULIB_APPARENT_2_MP(MAP_RA_CEN,
      :                          MAP_DEC_CEN, LOCAL_COORDS,
-     :                          LST, IN_UT1, MYLONG, MYLAT, STATUS)
+     :                          LST, IN_UT1, LAT_OBS, MYLONG, MYLAT, 
+     :                          STATUS)
 
 *     now add on the tangent plane offset in this frame and convert
 *     back to apparent RA,Dec
@@ -924,7 +965,7 @@
                         CALL SCULIB_SCAN_2_RD(SCUCD_VERSION, 
      :                       CENTRE_COORDS, MAP_RA_CEN, MAP_DEC_CEN,
      :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
-     :                       LST, IN_UT1,
+     :                       LST, IN_UT1, LAT_OBS,
      :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
      :                       STATUS)
                         
