@@ -45,6 +45,7 @@ EXTERN int		Tktest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 Tcl_ObjCmdProc NdfDrawpair;
 Tcl_ObjCmdProc NdfCentroffset;
 Tcl_ObjCmdProc CcdputsCmd;
+Tcl_ObjCmdProc IntersectCmd;
 
 
 /*
@@ -165,6 +166,8 @@ Tcl_AppInit(interp)
     Tcl_CreateObjCommand( interp, "ndfcentroffset", NdfCentroffset,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "ccdputs", CcdputsCmd,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "intersect", IntersectCmd,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     /*
