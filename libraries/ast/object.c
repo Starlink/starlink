@@ -98,6 +98,8 @@ f     - AST_TEST: Test if an attribute value is set for an Object
 *     12-APR-2000 (DSB):
 *        Zero all memory allocated for a new Object in InitObject before
 *        storing any new values in the memory.
+*     3-APR-2001 (DSB):
+*        Added the Ident attribute. 
 *class--
 */
 
@@ -143,14 +145,18 @@ static AstObjectVtab class_vtab; /* Virtual function table */
 static const char *Get( AstObject *, const char * );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetID( AstObject * );
+static const char *GetIdent( AstObject * );
 static int TestAttrib( AstObject *, const char * );
 static int TestID( AstObject * );
+static int TestIdent( AstObject * );
 static unsigned long Magic( const AstObject *, size_t );
 static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearID( AstObject * );
+static void ClearIdent( AstObject * );
 static void SetAttrib( AstObject *, const char * );
 static void SetID( AstObject *, const char * );
+static void SetIdent( AstObject *, const char * );
 static void Show( AstObject * );
 static void VSet( AstObject *, const char *, va_list );
 
@@ -390,6 +396,11 @@ static void ClearAttrib( AstObject *this, const char *attrib ) {
    if ( !strcmp( attrib, "id" ) ) {
       astClearID( this );
 
+/* Ident. */
+/* ------ */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      astClearIdent( this );
+
 /* Read-only attributes. */
 /* --------------------- */
 /* Test if the attribute string matches any of the read-only
@@ -551,7 +562,7 @@ f     function is invoked with STATUS set to an error value, or if it
       new->check = Magic( new, new->size );
       new->dynamic = 1;
       new->ref_count = 1;
-      new->id = NULL;            /* ID attribute is not copied */
+      new->id = NULL;   /* ID attribute is not copied (but Ident is copied) */
 
 /* Loop to execute any copy constructors declared by derived classes. */
       for ( i = 0; i < this->vtab->ncopy; i++ ) {
@@ -766,6 +777,16 @@ static void Dump( AstObject *this, AstChannel *channel ) {
    helpful = ( sval && *sval );
    astWriteString( channel, "ID", set, helpful, sval,
                    "Object identification string" );
+
+/* Ident. */
+/* --- */
+   set = TestIdent( this );
+   sval = set ? GetIdent( this ) : astGetIdent( this );
+
+/* Don't show an un-set Ident value if it is blank. */
+   helpful = ( sval && *sval );
+   astWriteString( channel, "Ident", set, helpful, sval,
+                   "Permanent Object identification string" );
 
 /* RefCnt. */
 /* ------- */
@@ -984,6 +1005,11 @@ static const char *GetAttrib( AstObject *this, const char *attrib ) {
 /* --- */
    } else if ( !strcmp( attrib, "id" ) ) {
       result = astGetID( this );
+
+/* Ident. */
+/* --- */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      result = astGetIdent( this );
 
 /* Nobject. */
 /* -------- */
@@ -1625,6 +1651,12 @@ static void SetAttrib( AstObject *this, const char *setting ) {
                 && ( nc >= len ) ) {
       astSetID( this, setting + id );
 
+/* Ident. */
+/* ------ */
+   } else if ( nc = 0, ( 0 == sscanf( setting, "ident=%n%*[^\n]%n", &id, &nc ) )
+                && ( nc >= len ) ) {
+      astSetIdent( this, setting + id );
+
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class and use this to report an error
    if it does. */
@@ -2217,6 +2249,11 @@ static int TestAttrib( AstObject *this, const char *attrib ) {
    if ( !strcmp( attrib, "id" ) ) {
       result = astTestID( this );
 
+/* Ident. */
+/* ------ */
+   } else if ( !strcmp( attrib, "ident" ) ) {
+      result = astTestIdent( this );
+
 /* Test if the attribute string matches any of the read-only
    attributes of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "class" ) ||
@@ -2516,6 +2553,48 @@ astMAKE_SET(Object,ID,const char *,id,astStore( this->id, value,
 
 /* The ID value is set if the pointer to it is not NULL. */
 astMAKE_TEST(Object,ID,( this->id != NULL ))
+
+/*
+*att++
+*  Name:
+*     Ident
+
+*  Purpose:
+*     Permanent Object identification string.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute is like the ID attribute, in that it contains a 
+*     string which may be used to identify the Object to which it is 
+*     attached. The only difference between ID and Ident is that Ident 
+*     is transferred when an Object is copied, but ID is not.
+
+*  Applicability:
+*     Object
+*        All Objects have this attribute.
+
+*att--
+*/
+/* Clear the Ident value by freeing the allocated memory and assigning a
+   NULL pointer. */
+astMAKE_CLEAR(Object,Ident,ident,astFree( this->ident ))
+
+/* If the Ident value is not set, supply a default in the form of a
+   pointer to the constant string "". */
+astMAKE_GET(Object,Ident,const char *,NULL,( this->ident ? this->ident : "" ))
+
+/* Set an Ident value by freeing any previously allocated memory,
+   allocating new memory and storing the string. */
+astMAKE_SET(Object,Ident,const char *,ident,astStore( this->ident, value,
+                                                strlen( value ) + (size_t) 1 ))
+
+/* The Ident value is set if the pointer to it is not NULL. */
+astMAKE_TEST(Object,Ident,( this->ident != NULL ))
 
 /*
 *att++
@@ -2829,14 +2908,18 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          vtab->Clear = Clear;
          vtab->ClearAttrib = ClearAttrib;
          vtab->ClearID = ClearID;
+         vtab->ClearIdent = ClearIdent;
          vtab->Dump = Dump;
          vtab->GetAttrib = GetAttrib;
          vtab->GetID = GetID;
+         vtab->GetIdent = GetIdent;
          vtab->SetAttrib = SetAttrib;
          vtab->SetID = SetID;
+         vtab->SetIdent = SetIdent;
          vtab->Show = Show;
          vtab->TestAttrib = TestAttrib;
          vtab->TestID = TestID;
+         vtab->TestIdent = TestIdent;
          vtab->VSet = VSet;
 
 /* Store the pointer to the class name. */
@@ -3014,6 +3097,7 @@ AstObject *astLoadObject_( void *mem, size_t size, int init,
 /* Now read each individual data item from this list and use it to
    initialise the appropriate instance variable(s) for this class. */
       new->id = astReadString( channel, "id", NULL );
+      new->ident = astReadString( channel, "ident", NULL );
 
 /* We simply read the values for the read-only attributes (just in
    case they've been un-commented in the external representation) and

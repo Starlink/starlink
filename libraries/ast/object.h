@@ -40,6 +40,10 @@
 *        Object (e.g.) in debugging output, or when stored in an
 *        external medium such as a data file. There is no restriction
 *        on the string's contents. The default is an empty string.
+*     Ident (string)
+*        Like ID, this is an identification string which may be used 
+*        to identify the Object. Unlike ID, Ident is transferred when an
+*        Object is copied.
 *     Nobject (integer)
 *        This is a read-only attribute which gives the total number of
 *        Objects currently in existence in the same class as the
@@ -96,6 +100,8 @@
 *           Clear the value of a specified attribute for an Object.
 *        astClearID
 *           Clear the value of the ID attribute for an Object.
+*        astClearIdent
+*           Clear the value of the Ident attribute for an Object.
 *        astDump
 *           Write an Object to a Channel.
 *        astGetAttrib
@@ -104,6 +110,8 @@
 *           Obtain the value of the Class attribute for an Object.
 *        astGetID
 *           Obtain the value of the ID attribute for an Object.
+*        astGetIdent
+*           Obtain the value of the Ident attribute for an Object.
 *        astGetNobject
 *           Obtain the value of the Nobject attribute for an Object.
 *        astGetRefCount
@@ -118,10 +126,14 @@
 *           Declare a dump function for an Object.
 *        astSetID
 *           Set the value of the ID attribute for an Object.
+*        astSetIdent
+*           Set the value of the Ident attribute for an Object.
 *        astTestAttrib
 *           Test if a specified attribute value is set for an Object.
 *        astTestID
 *           Test whether the ID attribute for an Object is set.
+*        astTestIdent
+*           Test whether the Ident attribute for an Object is set.
 *        astVSet
 *           Set values for an Object's attributes.
 
@@ -210,6 +222,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     30-JAN-1996 (RFWS):
@@ -228,6 +241,8 @@
 *        Make the astClear and astVSet methods virtual.
 *     15-SEP-1999 (RFWS):
 *        Made the astAnnulId function accessible to protected code.
+*     3-APR-2001 (DSB):
+*        Added Ident attribute.
 *--
 */
 
@@ -1044,6 +1059,7 @@ typedef struct AstObject {
    int dynamic;                  /* Memory allocated dynamically? */
    int ref_count;                /* Number of active pointers to the Object */
    char *id;                     /* Pointer to ID string */
+   char *ident;                  /* Pointer to Ident string */
 } AstObject;
 
 /* Virtual function table. */
@@ -1061,15 +1077,19 @@ typedef struct AstObjectVtab {
 
 /* Properties specific to this class. */
    const char *( *GetID )( AstObject * );
+   const char *( *GetIdent )( AstObject * );
    const char *(* GetAttrib)( AstObject *, const char * );
    int (* TestAttrib)( AstObject *, const char * );
    int (* TestID)( AstObject * );
+   int (* TestIdent)( AstObject * );
    void (* Clear)( AstObject *, const char * );
    void (* ClearAttrib)( AstObject *, const char * );
    void (* ClearID)( AstObject * );
+   void (* ClearIdent)( AstObject * );
    void (* Dump)( AstObject *, struct AstChannel * );
    void (* SetAttrib)( AstObject *, const char * );
    void (* SetID)( AstObject *, const char * );
+   void (* SetIdent)( AstObject *, const char * );
    void (* Show)( AstObject * );
    void (* VSet)( AstObject *, const char *, va_list );
    const char *class;            /* Pointer to class name string */
@@ -1164,18 +1184,22 @@ void astShow_( AstObject * );
 const char *astGetAttrib_( AstObject *, const char * );
 const char *astGetClass_( const AstObject * );
 const char *astGetID_( AstObject * );
+const char *astGetIdent_( AstObject * );
 int astGetNobject_( const AstObject * );
 int astGetRefCount_( const AstObject * );
 int astTestAttrib_( AstObject *, const char * );
 int astTestID_( AstObject * );
+int astTestIdent_( AstObject * );
 void astClearAttrib_( AstObject *, const char * );
 void astClearID_( AstObject * );
+void astClearIdent_( AstObject * );
 void astDump_( AstObject *, AstChannel * );
 void astSetAttrib_( AstObject *, const char * );
 void astSetCopy_( AstObjectVtab *, void (*)( const AstObject *, AstObject * ) );
 void astSetDelete_( AstObjectVtab *, void (*)( AstObject * ) );
 void astSetDump_( AstObjectVtab *, void (*)( AstObject *, AstChannel * ), const char *, const char * );
 void astSetID_( AstObject *, const char * );
+void astSetIdent_( AstObject *, const char * );
 void astVSet_( AstObject *, const char *, va_list );
 #endif
 
@@ -1277,12 +1301,14 @@ astINVOKE(V,astTest_(astCheckObject(this),attrib))
 #define astClearAttrib(this,attrib) \
 astINVOKE(V,astClearAttrib_(astCheckObject(this),attrib))
 #define astClearID(this) astINVOKE(V,astClearID_(astCheckObject(this)))
+#define astClearIdent(this) astINVOKE(V,astClearIdent_(astCheckObject(this)))
 #define astDump(this,channel) \
 astINVOKE(V,astDump_(astCheckObject(this),astCheckChannel(channel)))
 #define astGetAttrib(this,attrib) \
 astINVOKE(V,astGetAttrib_(astCheckObject(this),attrib))
 #define astGetClass(this) astINVOKE(V,astGetClass_((const AstObject *)(this)))
 #define astGetID(this) astINVOKE(V,astGetID_(astCheckObject(this)))
+#define astGetIdent(this) astINVOKE(V,astGetIdent_(astCheckObject(this)))
 #define astGetNobject(this) astINVOKE(V,astGetNobject_(astCheckObject(this)))
 #define astGetRefCount(this) astINVOKE(V,astGetRefCount_(astCheckObject(this)))
 #define astSetAttrib(this,setting) \
@@ -1294,11 +1320,13 @@ astINVOKE(V,astSetDelete_((AstObjectVtab *)(vtab),delete))
 #define astSetDump(vtab,dump,class,comment) \
 astINVOKE(V,astSetDump_((AstObjectVtab *)(vtab),dump,class,comment))
 #define astSetID(this,id) astINVOKE(V,astSetID_(astCheckObject(this),id))
+#define astSetIdent(this,id) astINVOKE(V,astSetIdent_(astCheckObject(this),id))
 #define astVSet(this,settings,args) \
 astINVOKE(V,astVSet_(astCheckObject(this),settings,args))
 #define astTestAttrib(this,attrib) \
 astINVOKE(V,astTestAttrib_(astCheckObject(this),attrib))
 #define astTestID(this) astINVOKE(V,astTestID_(astCheckObject(this)))
+#define astTestIdent(this) astINVOKE(V,astTestIdent_(astCheckObject(this)))
 
 /* Deprecated synonym. */
 #define astClass(this) astGetClass(this)

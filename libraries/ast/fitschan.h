@@ -38,6 +38,9 @@
 *        the next Object to read.
 
 *  New Attributes Defined:
+*     AllWarnings
+*        A read-only string holding a space sperated list of all the
+*        available condition names.
 *     Card
 *        This attribute gives the index of the current card in a FitsChan
 *        (i.e. the next card to be read). The first card in the FitsChan has 
@@ -197,7 +200,7 @@
 *        provided for external calls to the AST library.
 
 *  Copyright:
-*     Copyright (C) 1999 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     DSB: D.S. Berry (Starlink)
@@ -215,6 +218,8 @@
 *        Changes for CDi_j based FITS-WCS standard.
 *     18-MAY-2000 (DSB):
 *        Added Warnings attribute.
+*     4-APR-2001 (DSB):
+*        Added AllWarnings attribute.
 *-
 */
 
@@ -322,6 +327,7 @@ typedef struct AstFitsChanVtab {
    void (* SetEncoding)( AstFitsChan *, int );
    void (* ClearEncoding)( AstFitsChan * );
    const char *(* GetWarnings)( AstFitsChan * );
+   const char *(* GetAllWarnings)( AstFitsChan * );
    int (* TestWarnings)( AstFitsChan * );
    void (* ClearWarnings)( AstFitsChan * );
    void (* SetWarnings)( AstFitsChan *, const char * );
@@ -406,6 +412,8 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int astTestFitsDigits_( AstFitsChan * );
    void astSetFitsDigits_( AstFitsChan *, int );
    void astClearFitsDigits_( AstFitsChan * );
+
+   const char *astGetAllWarnings_( AstFitsChan * );
 
    const char *astGetWarnings_( AstFitsChan * );
    int astTestWarnings_( AstFitsChan * );
@@ -562,6 +570,9 @@ astINVOKE(V,astGetWarnings_(astCheckFitsChan(this)))
 astINVOKE(V,astSetWarnings_(astCheckFitsChan(this),warnings))
 #define astTestWarnings(this) \
 astINVOKE(V,astTestWarnings_(astCheckFitsChan(this)))
+
+#define astGetAllWarnings(this) \
+astINVOKE(V,astGetAllWarnings_(astCheckFitsChan(this)))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this)))

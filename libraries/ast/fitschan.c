@@ -96,11 +96,12 @@ f     encodings), then write operations using AST_WRITE will
 *     In addition to those attributes common to all Channels, every
 *     FitsChan also has the following attributes:
 *
+*     - AllWarnings: A list of the available conditions
 *     - Card: Index of current FITS card in a FitsChan
 *     - Encoding: System for encoding Objects as FITS headers
 *     - FitsDigits: Digits of precision for floating-point FITS values
 *     - Ncard: Number of FITS header cards in a FitsChan
-*     - Warnings: Produces warnings about defaulted keywords
+*     - Warnings: Produces warnings about selected conditions
 
 *  Functions:
 c     In addition to those functions applicable to all Channels, the
@@ -326,6 +327,19 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     12-DEC-2000 (DSB):
 *        Add a title to each physical, non-celestial coord Frame based on 
 *        its Domain name (if any).
+*     3-APR-2001 (DSB):
+*        -  Use an "unknown" celestial coordinate system, instead of a
+*        Cartesian coordinate system, if the CTYPE keywords specify an
+*        unknown celestial coordinate system.
+*        -  Do not report an error if there are no CTYPE keywords in the 
+*        header (assume a unit mapping, like in La Palma FITS files).
+*        -  Add a NoCTYPE warning condition.
+*        -  Added AllWarnings attribute.
+*        -  Ensure multiple copies of identical warnings are not produced.
+*        -  Use the Object Ident attribute to store the identifier letter
+*        associated with each Frame read from a secondary axis description,
+*        so that they can be given the same letter when they are written
+*        out to a new FITS file.
 *class--
 */
 
@@ -430,6 +444,7 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
+#define ALLWARNINGS       " noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype "
 
 /* Each card in the fitschan has a set of flags associated with it,
    stored in different bits of the "flags" item within each FitsCard
@@ -644,6 +659,7 @@ static int TestWarnings( AstFitsChan * );
 static void SetWarnings( AstFitsChan *, const char * );
 
 static int GetNcard( AstFitsChan * );
+static const char *GetAllWarnings( AstFitsChan * );
 
 static AstObject *FsetFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static AstObject *Read( AstChannel * );
@@ -747,7 +763,7 @@ static void SetItemC( char ****, int, char, char * );
 static void SetValue( AstFitsChan *, char *, void *, int, char * );
 static void SinkWrap( void (*)( const char * ), const char * );
 static AstFitsChan *SpecTrans( AstFitsChan *, int, const char *, const char * );
-static void Warn( AstFitsChan *, const char *, const char * );
+static void Warn( AstFitsChan *, const char *, const char *, const char *, const char * );
 static void WriteBegin( AstChannel *, const char *, const char * );
 static void WriteDouble( AstChannel *, const char *, int, int, double, const char * );
 static void WriteEnd( AstChannel *, const char * );
@@ -759,7 +775,7 @@ static void WriteToSink( AstFitsChan * );
 static AstWinMap *WcsShift( FitsStore *, char, const char *, const char * );
 static AstMapping *WcsMapping( AstFitsChan *, FitsStore *, char, char **, int *, int *, int *, const char *, const char * );
 static AstMatrixMap *WcsMatrix( FitsStore *, char, const char *, const char * );
-static AstWcsMap *WcsDeproj( FitsStore *, char, char **, const char *, const char * );
+static AstWcsMap *WcsDeproj( AstFitsChan *, FitsStore *, char, char **, const char *, const char * );
 static AstWinMap *WcsAddRef( FitsStore *, int, char, int *, const char *, const char *  );
 static AstFrame *WcsFrame( AstFitsChan *, FitsStore *, char, int, char *, int, int, const char *, const char * );
 static AstCmpMap *WcsNative( AstFitsChan *, FitsStore *, char, AstWcsMap *, const char *, const char * );
@@ -1500,7 +1516,8 @@ static void *CardData( AstFitsChan *this, size_t *size ){
 *        Pointer to the FitsChan.
 *     size
 *        A pointer to a location at which to return the number of bytes
-*        occupied by the data value.
+*        occupied by the data value. NULL can be supplied if this
+*        information is not required.
 
 *  Returned Value:
 *     A pointer to the keyword data, or NULL if the FitsChan is at
@@ -2017,7 +2034,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the name was not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then report an
    error. */
-   } else if ( astOK && !strcmp( attrib, "ncard" ) ){
+   } else if ( astOK && ( !strcmp( attrib, "ncard" ) || 
+                          !strcmp( attrib, "allwarnings" ) ) ){
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", attrib, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -4807,7 +4825,7 @@ static void FreeItem( double ****item ){
 */
 
 /* Local Variables: */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
    int j;                /* Intermediate co-ordinate axis index */
 
 /* Check the supplied pointer */
@@ -4880,7 +4898,7 @@ static void FreeItemC( char ****item ){
 */
 
 /* Local Variables: */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
    int j;                /* Intermediate co-ordinate axis index */
 
 /* Check the supplied pointer */
@@ -5297,6 +5315,11 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
 */
 
 /* Local Variables: */
+   AstFrame *frame;     /* A Frame */
+   const char *id;      /* Frame Ident string */
+   int nfrm;            /* Number of Frames in FrameSet */
+   char *sid;           /* Pointer to array of version letters */
+   int frms[ 'Z' + 1 ]; /* Array of Frame indices */
    FitsStore *ret;      /* Returned FitsStore */
    char s;              /* Co-ordinate version character */
    int ibase;           /* Base Frame index */
@@ -5344,23 +5367,70 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
    descriptions could not be produced. */
       if( primok && astOK ) {
 
-/* Now go through all the other Frames in the FrameSet, attempting to
-   create alternate axis descriptions for each one, with a different 
-   co-ordinate version character (note, Frame indices are one-based). */
-         s = 'A';
-         for( ifrm = 1; ifrm <= astGetNframe( fset ) && s <= 'Z'; ifrm++ ){
+/* Get the number of Frames in the FrameSet. */
+         nfrm = astGetNframe( fset );
 
-/* Do not create descriptions of either the original base or current
-   Frames. */
-            if( ifrm != ibase && ifrm != icurr ){        
-               secok = AddVersion( fset, ibase, ifrm, ret, naxis, dim, NULL,
-                                   NULL, s, method, class );
+/* We now need to allocate a version letter to each Frame. Allocate
+   memory to hold the version letter assigned to each Frame. */
+         sid = (char *) astMalloc( ( nfrm + 1 )*sizeof( char ) );
 
-/* If the Frame was written out, move on to the next co-ordinate version
-   character. */
-               if( secok ) s++;
+/* The frms array has an entry for each of the 26 possible version
+   letters (starting at A and ending at Z). Each entry holds the index of 
+   the Frame which has been assigned that version character. Initialise
+   this array to indicate that no version letters have yet been assigned. */
+         for( s = 'A'; s <= 'Z'; s++ ) {
+            frms[ s ] = 0;
+         }
+
+/* Loop round all frames (excluding the current and base Frames which do not 
+   need version letters). If the Frame has an Ident attribute consisting of a
+   single upper case letter, use it as its version letter unless that
+   letter has already been given to an earlier frame. */
+         for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
+            sid[ ifrm ] = 0;
+            if( ifrm != icurr && ifrm != ibase ) { 
+               frame = astGetFrame( fset, ifrm );
+               id = astGetIdent( frame );
+               if( strlen( id ) == 1 && isupper( id[ 0 ] ) ) {
+                  if( frms[ id[ 0 ] ] == 0 ) {
+                     frms[ id[ 0 ] ] = ifrm;
+                     sid[ ifrm ] = id[ 0 ];
+                  }
+               }
+               astAnnul( frame );
             }
          }
+
+/* Now go round all the Frames again, looking for Frames which did not
+   get a version letter assigned to it on the previous loop. Assign them
+   letters now, selected them from the letters not already assigned
+   (lowest to highest). */
+         s = 'A' - 1;
+         for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
+            if( sid[ ifrm ] == 0 ){
+               if( ifrm != icurr && ifrm != ibase ) { 
+                  while( frms[ ++s ] != 0 );
+                  if( s <= 'Z' ) { 
+                     sid[ ifrm ] = s;
+                     frms[ s ] = ifrm;
+                  }
+               }
+            }
+         }
+
+/* Now go through all the other Frames in the FrameSet, attempting to
+   create alternate axis descriptions for each one. */
+         for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
+            s = sid[ ifrm ];
+            if( s != 0 ) {
+               secok = AddVersion( fset, ibase, ifrm, ret, naxis, dim, NULL,
+                                   NULL, s, method, class );
+            }
+         }
+
+/* Free memory holding version letters */
+         sid = (char *) astFree( (void *) sid );
+
       }
 
 /* If an error has occurred, or if the primary Frame could not be cerated, 
@@ -5426,6 +5496,8 @@ static int GetEncoding( AstFitsChan *this ){
 /* Local Variables... */
    int ret;            /* Returned value */
    int icard;          /* Index of current card on entry */
+
+   int a, b, c, d;
 
 /* Check the global status. */
    if( !astOK ) return UNKNOWN_ENCODING;
@@ -5577,7 +5649,7 @@ static double GetItem( double ****item, int j, int im, char s, char *name,
 
 /* Local Variables: */
    double ret;           /* Returned keyword value */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
 
 /* Initialise */
    ret = AST__BAD;
@@ -5863,7 +5935,7 @@ static char *GetItemC( char ****item, int j, char s, char *name,
 
 /* Local Variables: */
    char *ret;            /* Returned keyword value */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
 
 /* Initialise */
    ret = NULL;
@@ -5998,9 +6070,7 @@ static int GoodWarns( const char *value ){
    The word in the buffer is delimited by spaces and so it will not match 
    a substring within a condition. If it is legal increment the number of 
    conditions found. */
-         if( strstr( " noequinox noradesys nomjd-obs nolonpole "
-                     "nolatpole tnx zpx badcel ",
-                     buf ) ){         
+         if( strstr( ALLWARNINGS, buf ) ){         
             n++;
 
 /* Otherwise, report an error and break. */
@@ -7719,6 +7789,47 @@ static int FullForm( const char *list, const char *test, int abbrev ){
    return ret;
 }
 
+static const char *GetAllWarnings( AstFitsChan *this ){
+/*
+*+
+*  Name:
+*     astGetAllWarnings
+
+*  Purpose:
+*     Return a list of all condition names.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     const char *GetAllWarnings( AstFitsChan *this )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function returns a space separated lits of the condition names
+*     currently recognized by the Warnings attribute.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     A pointer to a static string holding the condition names.
+
+*  Notes:
+*     - This routine does not check the inherited status.
+
+*-
+*/
+
+/* Return the result. */
+   return ALLWARNINGS;
+
+}
+
 const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -7842,6 +7953,11 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
       }
+
+/* AllWarnings */
+/* ----------- */
+   } else if ( !strcmp( attrib, "allwarnings" ) ) {
+      result = astGetAllWarnings( this );
 
 /* Warnings. */
 /* -------- */
@@ -8791,6 +8907,7 @@ static void InitVtab( AstFitsChanVtab *vtab ) {
    vtab->SetWarnings = SetWarnings;
    vtab->GetWarnings = GetWarnings;
    vtab->GetNcard = GetNcard;
+   vtab->GetAllWarnings = GetAllWarnings;
    vtab->ClearEncoding = ClearEncoding;
    vtab->TestEncoding = TestEncoding;
    vtab->SetEncoding = SetEncoding;
@@ -11880,7 +11997,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* If the attribute was not recognised, use this macro to report an error
    if a read-only attribute has been specified. */
-   } else if ( MATCH( "ncard" ) ){
+   } else if ( MATCH( "ncard" ) ||
+               MATCH( "allwarnings" ) ){
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
                 setting, astGetClass( this ) );
       astError( AST__NOWRT, "This is a read-only attribute." );
@@ -11998,7 +12116,7 @@ static void SetItem( double ****item, int j, int im, char s, double val ){
 /* Local Variables: */
    int el;               /* Array index */
    int nel;              /* Number of elements in array */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
 
 /* Check the inherited status. */
    if( !astOK ) return;
@@ -12151,7 +12269,7 @@ static void SetItemC( char ****item, int j, char s, char *val ){
 /* Local Variables: */
    int el;               /* Array index */
    int nel;              /* Number of elements in array */
-   int si;               /* Integer co-oridnate version index */
+   int si;               /* Integer co-ordinate version index */
 
 /* Check the inherited status. Also return if a null pointer was supplied */
    if( !astOK || !val ) return;
@@ -12459,12 +12577,18 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
    char lontype[MXCTYPELEN];/* Longitude axis CTYPE value */
    const char *prj_name;    /* Pointer to projection name string */
    const char *sys;         /* Celestal coordinate system */
+   const char *latsym;      /* SkyFrame latitude axis symbol */
+   const char *lonsym;      /* SkyFrame longitude axis symbol */
    double ep;               /* Epoch of observation (MJD) */
    double eq;               /* Epoch of reference equinox (MJD) */
    int defdate;             /* Can the date keywords be defaulted? */
+   int i;                   /* Character count */
    int isys;                /* Celestial coordinate system */
    int radesys;             /* RA/DEC reference frame */
    int ret;                 /* Returned flag */
+   int latax;               /* Index of latitude axis in SkyFrame */
+   int lonax;               /* Index of longitude axis in SkyFrame */
+
 
 /* Initialise */
    ret = 0;
@@ -12567,15 +12691,34 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
          strcpy( lontype, "SLON" );
          strcpy( lattype, "SLAT" );
 
+/* For unknown systems, use the axis symbols within CTYPE */
       } else {
-         strcpy( lontype, "LON-" );
-         strcpy( lattype, "LAT-" );
+
+         latax = astGetLatAxis( skyfrm );         
+         lonax = 2 - latax;
+
+         latsym = astGetSymbol( skyfrm, latax );
+         lonsym = astGetSymbol( skyfrm, lonax );
+
+         if( astOK ) { 
+            strncpy( lontype, lonsym, 4 );
+            for( i = strlen( lonsym ); i < 4; i++ ) {
+               lontype[ i ] = '-';
+            }
+
+            strncpy( lattype, latsym, 4 );
+            for( i = strlen( latsym ); i < 4; i++ ) {
+               lattype[ i ] = '-';
+            }
+         }
       }                  
 
 /* Store the projection strings. */
       prj_name = astWcsPrjName( wcstype );
-      strcpy( lontype + 4, prj_name );
-      strcpy( lattype + 4, prj_name );
+      if( astOK ) {
+         strcpy( lontype + 4, prj_name );
+         strcpy( lattype + 4, prj_name );
+      }
 
 /* Store the total CTYPE strings */
       SetItemC( &(store->ctype), axlon, s, lontype );
@@ -12857,7 +13000,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    axlat = -1;
    while( j < naxis && astOK ){
       if( GetValue( this, FormatKey( "CTYPE", j + 1, -1, ' ' ),
-                    AST__STRING, (void *) &cval, 1, method, 
+                    AST__STRING, (void *) &cval, 0, method, 
                     class ) ){
          if( !strncmp( cval, "RA--", 4 ) ||
              !strncmp( cval + 1, "LON", 3 ) ||
@@ -13411,7 +13554,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                      "derived from, a ZPN projection which requires "
                      "unsupported IRAF-specific corrections (lngcor "
                      "and/or latcor). The WCS information may therefore "
-                     "be incorrect." );
+                     "be incorrect.", method, class );
             }
       
 /*  Release the memory used to hold the concatenated WAT keywords. */
@@ -13536,7 +13679,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                Warn( this, "tnx", "This FITS header includes, or was "
                      "derived from, a TNX projection which requires "
                      "unsupported IRAF-specific corrections. The WCS "
-                     "information may therefore be incorrect." );
+                     "information may therefore be incorrect.", method, class );
             }
    
 /*  Release the memory used to hold the concatenated WAT keywords. */
@@ -14457,7 +14600,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the name is not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then return
    zero. */
-   } else if ( !strcmp( attrib, "ncard" ) ){
+   } else if ( !strcmp( attrib, "ncard" ) ||
+               !strcmp( attrib, "allwarnings" ) ){
       result = 0;
 
 /* If the attribute is still not recognised, pass it on to the parent
@@ -14840,7 +14984,8 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 
 }
 
-static void Warn( AstFitsChan *this, const char *condition, const char *text ){
+static void Warn( AstFitsChan *this, const char *condition, const char *text, 
+                  const char*method, const char *class ){
 /*
 *  Name:
 *     Warn
@@ -14853,7 +14998,8 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     int Warn( AstFitsChan *this, const char *condition, const char *text )
+*     int Warn( AstFitsChan *this, const char *condition, const char *text,
+*               const char*method, const char *class );
 
 *  Class Membership:
 *     FitsChan member function.
@@ -14872,14 +15018,23 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text ){
 *        Pointer to a string holding a lower case condition name.
 *     text
 *        Pointer to a string holding the text of the warning.
+*     method
+*        Pointer to a string holding the name of the calling method.
+*        This is only for use in constructing error messages.
+*     class 
+*        Pointer to a string holding the name of the supplied object class.
+*        This is only for use in constructing error messages.
 
 */
 
 /* Local Variables: */
-   char buff[ 80 ];      /* Buffer for card text */
+   char buff[ FITSCARDLEN + 1 ]; /* Buffer for new card text */
+   char card[ FITSCARDLEN + 1 ]; /* Buffer for existing card text */
    const char *a;        /* Pointer to 1st character in next card */
    const char *b;        /* Pointer to terminating null character */
    const char *c;        /* Pointer to last character in next card */
+   int exists;           /* Has the supplied warning already been issued? */
+   int icard;            /* Index of original card */
    int nc;               /* No. of characters in next card */
 
 /* Check the inherited status, warning text and FitsChan. */
@@ -14889,11 +15044,14 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text ){
    reported (given by the Warnings attribue). */
    if( FullForm( astGetWarnings( this ), condition, 0 ) >= 0 ){
 
-/* If found break the text into lines and store each line as a new
-   ASTWARN card. */
-      astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+/* If found, save the current card index, and rewind the FitsChan. */
+      icard = astGetCard( this );
+      astClearCard( this );
 
-/* Loop until the entire text has been written out. */
+/* Break the supplied text into lines and check the FitsChan to see if 
+   a block of adjacent ASTWARN cards with these lines already exist
+   within the FitsChan. Assume they do until proven otherwise. */
+      exists = 1;
       a = text;
       b = a + strlen( text );
       while( a < b ){
@@ -14919,18 +15077,86 @@ static void Warn( AstFitsChan *this, const char *condition, const char *text ){
          strncpy( buff, a, nc );
          buff[ nc ] = 0;         
 
-/* Store the buffer as the next card. */
-         astFitsSetS( this, "ASTWARN", buff, NULL, 0 );
+/* If this is the first line, search the entire FitsChan for an ASTWARN card 
+   with this text. If not, indiate that the supplied text needs to be
+   stored in the FitsChan, and break out of the loop. */
+         if( a == text ) {
+            exists = 0;
+
+            while( !exists && 
+                   FindKeyCard( this, "ASTWARN", method, class ) ) {
+               if( !strcmp( (const char *) CardData( this, NULL ), buff ) ) {
+                  exists = 1;
+               }         
+               MoveCard( this, 1, method, class );
+            }
+            if( !exists ) break;
+
+/* If this is not the first line, see if the next card in the FitsChan is
+   an ASTWARN card with this text. If not, indiate that the supplied text 
+   needs to be stored in the FitsChan, and break out of the loop. */
+         } else {
+            if( !strcmp( CardName( this ), "ASTWARN" ) &&
+                !strcmp( (const char *) CardData( this, NULL ), buff ) ) {
+               MoveCard( this, 1, method, class );
+            } else {
+               exists = 0;
+               break;
+            }
+         }
 
 /* Set the start of the next bit of the text. */
          a = c + 1;
       }
 
+/* Reinstate the original current card index. */
+      astSetCard( this, icard );
+
+/* We only add new cards to the FitsChan if they do not already exist. */
+      if( !exists ) {
+
+/* Break the text into lines using the same algorithm as above, and store 
+   each line as a new ASTWARN card. Start with a blank ASTWARN card. */
+         astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+
+/* Loop until the entire text has been written out. */
+         a = text;
+         b = a + strlen( text );
+         while( a < b ){
+
+/* Each card contains about 60 characters of the text. Get a pointer to
+   the nominal last character in the next card. */
+            c = a + 60;
+
+/* If this puts the last character beyond the end of the text, use the
+   last character before the null as the last character in the card. */
+            if( c >= b ) {
+               c = b - 1;
+
+/* Otherwise, if the last character is not a space, move the last
+   character backwards to the first space. This avoids breaking words 
+   across cards. */
+            } else {
+               while( !isspace( *c ) && c > a ) c--;
+            }
+
+/* Copy the text into a null terminated buffer. */
+            nc = c - a + 1;
+            strncpy( buff, a, nc );
+            buff[ nc ] = 0;         
+
+/* Store the buffer as the next card. */
+            astFitsSetS( this, "ASTWARN", buff, NULL, 0 );
+
+/* Set the start of the next bit of the text. */
+            a = c + 1;
+         }
+
 /* Include a final blank card. */
-      astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
+         astFitsSetS( this, "ASTWARN", " ", NULL, 0 );
 
+      }
    }
-
 }
 
 static AstWinMap *WcsAddRef( FitsStore *store, int noncel, char s, 
@@ -15071,8 +15297,8 @@ static AstWinMap *WcsAddRef( FitsStore *store, int noncel, char s,
 
 }
 
-static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys, 
-                             const char *method, const char *class ){
+static AstWcsMap *WcsDeproj( AstFitsChan *this, FitsStore *store, char s, 
+                           char **sys, const char *method, const char *class ){
 /*
 *  Name:
 *     WcsDeproj
@@ -15085,7 +15311,7 @@ static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys,
 *     Private function.
 
 *  Synopsis:
-*     AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys, 
+*     AstWcsMap *WcsDeproj( AstFitsChan *this, FitsStore *store, char s, char **sys, 
 *                           const char *method, const char *class )
 
 *  Class Membership:
@@ -15099,6 +15325,8 @@ static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys,
 *     all other axes unchanged.
 
 *  Parameters:
+*     this
+*        The FitsChan.
 *     store 
 *        A structure containing values for FITS keywords relating to 
 *        the World Coordinate System.
@@ -15126,6 +15354,7 @@ static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys,
    AstWcsMap *new;                 /* The created WcsMap */
    char *ctype;                    /* Pointer to CTYPE string */
    char *keyname;                  /* Pointer to keyword name string */
+   char buf[300];                  /* Text buffer */
    char latctype[MXCTYPELEN];      /* Latitude CTYPE keyword value */
    char latkey[10];                /* Latitude CTYPE keyword name */
    char lattype[4];                /* Buffer for celestial system */
@@ -15159,14 +15388,21 @@ static AstWcsMap *WcsDeproj( FitsStore *store, char s, char **sys,
    the type of projection to use. This also tells us which axes are the 
    longitude and latitude axes, and what the celestial co-ordinate system
    is (this is returned via the "sys" argument). Loop round the intermediate 
-   axes, getting each CTYPE value, reporting an error if any are missing. */
+   axes, getting each CTYPE value. */
    for( j = 0; j < store->naxis && astOK; j++ ){
       keyname =  FormatKey( "CTYPE", j + 1, -1, s );
-      ctype = GetItemC( &(store->ctype), j, s, keyname, method, class );
+      ctype = GetItemC( &(store->ctype), j, s, NULL, method, class );
+
+/* Issue a warning if no CTYPE value was found. */
+      if( !ctype ) {
+         sprintf( buf, "Axis type keywords (CTYPE, etc) were not found "
+                  "for one or more axes in the original FITS header. These "
+                  "axes will be assumed to be linear." );
+         Warn( this, "noctype", buf, method, class );
 
 /* We are looking for celestial axes. Celestial axes must have a "-" as the 
    fifth character in CTYPE. */
-      if( ctype && ctype[4] == '-' ) {
+      } else if( ctype[4] == '-' ) {
 
 /* Find the projection type as specified by the last 4 characters 
    in the CTYPE keyword value. AST__WCSBAD is stored in "prj" if the
@@ -15653,11 +15889,11 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
 *  Description:
 *     A Frame is returned describing the physical coordinate system of
 *     a WCS system. This will be a SkyFrame if the physical
-*     coordinate system consists of a pair of recognised celestial
+*     coordinate system consists of a pair of celestial
 *     longitude and latitude axes.  If there are any other axes, then a
 *     CmpFrame will be returned holding a SkyFrame for the celestial
 *     axes, and a simple Frame for the other axes. If there are no
-*     recognised celestial axes in the FitsChan, then a simple Frame will 
+*     celestial axes in the FitsChan, then a simple Frame will 
 *     be returned.
 
 *  Parameters:
@@ -15707,6 +15943,8 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
    char *lontype;                 /* Pointer to longitude CTYPE value */
    char bj;                       /* Besselian/Julian selector */
    char buf[300];                 /* Text buffer */
+   char id[2];                    /* ID string for returned Frame */
+   char sym[10];                  /* Axis symbol */
    double equinox;                /* EQUINOX value */
    double eqmjd;                  /* MJD equivalent of equinox */
    double mjdobs;                 /* MJD-OBS value */
@@ -15797,7 +16035,7 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
                sprintf( buf, "The original FITS header did not specify the "
                         "RA/DEC reference frame. A default value of %s was "
                         "assumed.", ( radesys == FK4 ) ? "FK4" : "FK5" );
-               Warn( this, "noradesys", buf );
+               Warn( this, "noradesys", buf, method, class );
             }
          }
 
@@ -15822,7 +16060,7 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             if( !strcmp( sys, "EQU" ) ){
                Warn( this, "noradesys", "The original FITS header did not "
                      "specify the RA/DEC reference frame. A default value of "
-                     "FK4 was assumed.");
+                     "FK4 was assumed.", method, class );
             }
          }
 
@@ -15832,7 +16070,7 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             sprintf( buf, "The original FITS header did not specify the "
                      "reference equinox. A default value of %c%.8g was "
                      "assumed.", bj, equinox );
-            Warn( this, "noequinox", buf );
+            Warn( this, "noequinox", buf, method, class );
          }
       }
 
@@ -15851,7 +16089,7 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
          sprintf( buf, "The original FITS header did not specify the "
                   "date of observation. A default value of %c%.8g was "
                   "assumed.", bj, equinox );
-         Warn( this, "nomjd-obs", buf );
+         Warn( this, "nomjd-obs", buf, method, class );
 
       }
 
@@ -15892,17 +16130,30 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
 
 /* If an unknown celestial co-ordinate system was specified by the CTYPE 
    keywords, add warning messages to the FitsChan and treat the axes as
-   non-celestial. */
+   a general spherical coordinate system. */
       } else if( astOK ){
+         skyframe = astSkyFrame( "System=UNKNOWN" );
+         strcpy( sym, sys );
+         if( strlen( sys ) == 1 ) {
+            strcpy( sym + 1, "LON" );                        
+            astSetSymbol( skyframe, 0, sym );
+            strcpy( sym + 1, "LAT" );                        
+            astSetSymbol( skyframe, 1, sym );
+         } else {
+            strcpy( sym + 2, "LN" );                        
+            astSetSymbol( skyframe, 0, sym );
+            strcpy( sym + 2, "LT" );                        
+            astSetSymbol( skyframe, 1, sym );
+         }
+
          lontype = GetItemC( &(store->ctype), axlon, s, NULL, method, class );
          lattype = GetItemC( &(store->ctype), axlat, s, NULL, method, class );
          if( lontype && lattype ){
-            sprintf( buf, "This FITS header is based on an unknown "
-                     "celestial co-ordinate system specified in the " 
-                     "CTYPE values '%s' and '%s'. The corresponding axes "
-                     "will be treated as normal Cartesian axes instead of "
-                     "as longitude and latitude axes.", lontype, lattype );
-            Warn( this, "badcel", buf );
+            sprintf( buf, "This FITS header contains references to an unknown "
+                     "spherical co-ordinate system specified in the values " 
+                     "%s and %s. It may not be possible to convert to "
+                     "other standard co-ordinate systems.", lontype, lattype );
+            Warn( this, "badcel", buf, method, class );
          }
       }
    }
@@ -16049,6 +16300,14 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
         astTestDomain( ret ) ) {
       sprintf( buf, "%s coordinates", astGetDomain( ret ) );
       astSetTitle( ret, buf );
+   }
+
+/* Unless this is the primary coordinate system, store the coordinate version 
+   character as the Ident attribute for the returned Frame. */
+   if ( s != ' ' ) { 
+       id[ 0 ] = s;
+       id[ 1 ] = 0;
+       astSetIdent( ret, id );
    }
 
 /* If an error has occurred, annul the Frame. */
@@ -16423,7 +16682,7 @@ static AstMapping *WcsMapping( AstFitsChan *this, FitsStore *store, char s,
 /* Now try to create a WcsMap which describes the deprojection for celestial
    axes from "Relative Physical Coords" to "Native Spherical Coords".
    Non-celestial axes are just copied without change. */
-   map3 = WcsDeproj( store, s, sys, method, class );
+   map3 = WcsDeproj( this, store, s, sys, method, class );
 
 /* Return the projection type and axis indices. */
    if( map3 ){
@@ -16953,7 +17212,7 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
 
 *  Parameters:
 *     this
-*        The FItsCHan in which to store any warning cards.
+*        The FitsChan in which to store any warning cards.
 *     wcsmap 
 *        A mapping describing the deprojection being used (i.e. the
 *        mapping from Relative Physical Coords to Native Spherical Coords).
@@ -17034,7 +17293,7 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
       sprintf( buf, "The original FITS header did not specify the "
                "longitude of the native north pole. A default value "
                "of %.8g degrees was assumed.", (*phip)*AST__DR2D );
-      Warn( this, "nolonpole", buf );
+      Warn( this, "nolonpole", buf, "astRead", "FitsChan" );
 
    }
 
@@ -17131,7 +17390,7 @@ static int WcsNatPole( AstFitsChan *this, AstWcsMap *wcsmap, double alpha0,
                               "the latitude of the native north pole. A "
                               "default value of %.8g degrees was assumed.",
                               (*deltap)*AST__DR2D );
-                     Warn( this, "nolatpole", buf );
+                     Warn( this, "nolatpole", buf, "astRead", "FitsChan" );
 
                   }
                }
@@ -17286,7 +17545,7 @@ static int WcsNoWcs( AstMapping *map, AstFrame *phyfrm, int naxis,
 
 /* Choose the reference pixel. Since the Mapping is assumed to be
    linear, the choice of reference pixel is not critical. If the "pixref"
-   array has been supplied use the supplied cooridnates. Otherwise, if the 
+   array has been supplied use the supplied coordinates. Otherwise, if the 
    image dimensions have been supplied, place the reference pixel at the 
    middle of the array. Otherwise, put it at the origin. Store the reference 
    pixel in the PointSet. */
@@ -19683,8 +19942,9 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     This attribute controls the issuing of warnings about selected
 *     conditions when an Object is read from or written to a FitsChan.
 *     The value supplied for the Warnings attribute should consist of a
-*     space separated list of condition names chosen from the list below. 
-*     Each name indicates a condition which should be reported. The default 
+*     space separated list of condition names (see the AllWarnings
+*     attribute for a list of the currently defined names). Each name 
+*     indicates a condition which should be reported. The default 
 *     value for Warnings is the string "Tnx Zpx BadCel".
 *
 *     The text of any warning will be stored within the FitsChan in the
@@ -19697,6 +19957,53 @@ f     (using AST_FINDFITS) after the call to AST_READ or AST_WRITE has been
 c     deleted from the FitsChan using astDelFits.
 f     deleted from the FitsChan using astDelFits.
 
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+/* Clear the Warnings value by freeing the allocated memory and assigning
+   a NULL pointer. */
+astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
+
+/* If the Warnings value is not set, supply a default in the form of a
+   pointer to the constant string "Tnx Zpx BadCel". */
+astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
+                                                            "Tnx Zpx BadCel" ))
+
+/* Set a Warnings value by freeing any previously allocated memory, allocating
+   new memory, storing the string and saving the pointer to the copy.
+   First check that the list does not contain any unknown conditions. If
+   it does, an error is reported by GoodWarns and the current attribute value 
+   is retained. */
+astMAKE_SET(FitsChan,Warnings,const char *,warnings,( GoodWarns( value ) ? 
+                                astStore( this->warnings, value, strlen( value ) + (size_t) 1 ) :
+                                this->warnings))
+
+/* The Warnings value is set if the pointer to it is not NULL. */
+astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
+
+/* AllWarnings. */
+/* ============ */
+/*
+*att++
+*  Name:
+*     AllWarnings
+
+*  Purpose:
+*     A list of all currently available condition names.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only
+
+*  Description:
+*     This read-only attribute is a space separated list of all the conditions
+*     names recognized by the Warnings attribute. The names are listed
+*     below.
+
 *  Conditions:
 *     The following conditions are currently recognised (all are
 *     case-insensitive):
@@ -19704,6 +20011,11 @@ f     deleted from the FitsChan using astDelFits.
 *     - "BadCel": This condition arises when reading a FrameSet from a
 *     non-Native encoded FitsChan if an unknown celestial co-ordinate 
 *     system is specified by the CTYPE keywords.
+*
+*     - "NoCTYPE": This condition arises if a default CTYPE value is used 
+c     within astRead, due to no value being present in the supplied FitsChan.
+f     within AST_READ, due to no value being present in the supplied FitsChan.
+*     This condition is only tested for when using non-Native encodings.
 *
 *     - "NoEquinox": This condition arises if a default equinox value is used 
 c     within astRead, due to no value being present in the supplied FitsChan.
@@ -19749,26 +20061,6 @@ f     the date of observation within AST_READ, due to no value being present
 *        All FitsChans have this attribute.
 *att--
 */
-/* Clear the Warnings value by freeing the allocated memory and assigning
-   a NULL pointer. */
-astMAKE_CLEAR(FitsChan,Warnings,warnings,astFree( this->warnings ))
-
-/* If the Warnings value is not set, supply a default in the form of a
-   pointer to the constant string "Tnx Zpx BadCel". */
-astMAKE_GET(FitsChan,Warnings,const char *,NULL,( this->warnings ? this->warnings :
-                                                            "Tnx Zpx BadCel" ))
-
-/* Set a Warnings value by freeing any previously allocated memory, allocating
-   new memory, storing the string and saving the pointer to the copy.
-   First check that the list does not contain any unknown conditions. If
-   it does, an error is reported by GoodWarns and the current attribute value 
-   is retained. */
-astMAKE_SET(FitsChan,Warnings,const char *,warnings,( GoodWarns( value ) ? 
-                                astStore( this->warnings, value, strlen( value ) + (size_t) 1 ) :
-                                this->warnings))
-
-/* The Warnings value is set if the pointer to it is not NULL. */
-astMAKE_TEST(FitsChan,Warnings,( this->warnings != NULL ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -21189,6 +21481,11 @@ int astGetCard_( AstFitsChan *this ){
 int astGetNcard_( AstFitsChan *this ){
    if( !this ) return 0;
    return (**astMEMBER(this,FitsChan,GetNcard))( this );
+}
+
+const char *astGetAllWarnings_( AstFitsChan *this ){
+   if( !this ) return NULL;
+   return (**astMEMBER(this,FitsChan,GetAllWarnings))( this );
 }
 
 int astFitsGetCF_( AstFitsChan *this, const char *name, double *value ){
