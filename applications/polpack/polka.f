@@ -134,8 +134,11 @@
 *
 *              Y_out = C4  +  C5 * X_in  +  C6 * Y_in
 *
-*        Only mapping types 1 and 3 are available when processing
-*        polarimeter data (see parameter POL). [1]
+*         Only mapping types 1 and 3 are available when processing
+*         dual-beam polarimeter data. Mapping types 2 and 4 are also
+*         available when processing single-beam data. Mapping type 5 
+*         is only available when processing non-polarimetric data (see 
+*         parameter POL). [1]
 *     HELPAREA = _LOGICAL (Update)
 *        If a TRUE value is supplied, then dynamic help information will be
 *        displayed in a box at the bottom of the GUI. This information
