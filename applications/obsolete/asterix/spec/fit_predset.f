@@ -117,18 +117,22 @@ c	RECORD /PREDICTION/ PREDDAT	! Data predicted by model
 	PREDICTION_NMDAT(IPRED) = DATASET_NDAT(IDAT)
 
 *    Set up model bounds using axis values from observed data
-        DO I = 1, PREDICTION_NMDIM(IPRED)
-          IDIMM(I) =  PREDICTION_IDIMM(IPRED, I)
-        END DO
 	CALL DYN_MAPR(1,PREDICTION_NMBOUND(IPRED),
      :                                PREDICTION_MLBNDPTR(IPRED),STATUS)
 	CALL DYN_MAPR(1,PREDICTION_NMBOUND(IPRED),
      :                                PREDICTION_MUBNDPTR(IPRED),STATUS)
 
+*    Copy over local data then restore
+        DO I = 1, PREDICTION_NMDIM(IPRED)
+          IDIMM(I) =  PREDICTION_IDIMM(IPRED, I)
+        END DO
 	CALL FIT_PREDSET_AXBOUND( DID, NDS,PREDICTION_NMDIM(IPRED),
      :    IDIMM,PREDICTION_NMBOUND(IPRED),
      :    %VAL(PREDICTION_MLBNDPTR(IPRED)),
      :    %VAL(PREDICTION_MUBNDPTR(IPRED)),STATUS)
+        DO I = 1, PREDICTION_NMDIM(IPRED)
+           PREDICTION_IDIMM(IPRED, I) = IDIMM(I)
+        END DO
 
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99

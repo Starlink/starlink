@@ -124,6 +124,11 @@ c     RECORD/PREDICTION/PREDDAT(NDS)	! Data predicted by model
 
       END IF
 
+*  Restore the axis pointers
+      DO I = 1, FIT__MXDIM
+        PREDICTION_IDIMM(N, I) = IDIMM(I)
+      END DO
+
 *  Scale by vignetting array if present
 c      IF ( OBDAT(N).V_ID .NE. ADI__NULLID ) THEN
 c       CALL VEC_MULR( .FALSE., DATASET_NDAT(N), %VAL(DATASET_VIGPTR(N)),
