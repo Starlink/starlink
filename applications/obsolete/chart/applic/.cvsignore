@@ -1,9 +1,5 @@
-chart.ifd
-crepar
-chart.csh
-chart.sh
-chart.icl
-bootstrap.tmp
+*.la
+version.dat
 *.lo
 *.ifl
 *.ifc
