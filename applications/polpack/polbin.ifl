@@ -25,7 +25,7 @@ interface POLBIN
    parameter      BOX          
       type        '_REAL'
       ppath       'CURRENT'
-      prompt      'Bin size'
+      prompt      'Spatial bin size (pixels)'
       helpkey     '*'
    endparameter
 
@@ -97,6 +97,13 @@ interface POLBIN
       ppath       'CURRENT,DEFAULT '
       default     4.0
       prompt      'Clipping limit (standard deviations)'
+      helpkey     '*'
+   endparameter
+
+   parameter      ZBOX          
+      type        '_REAL'
+      ppath       'CURRENT'
+      prompt      'Spectral bin size (pixels)'
       helpkey     '*'
    endparameter
 

@@ -26,16 +26,17 @@
 *
 *     The bins used form a grid of equally sized rectangular cells, the
 *     dimensions of each cell being specified by the parameter BOX in
-*     terms of the X and Y columns in the catalogue. The grid contains 
-*     sufficient cells to span the entire range of X and Y covered by the
-*     input catalogue. Each position in the output catalogue corresponds
-*     to one of these cells. The Stokes parameters for the cell are formed
-*     by combining together the Stokes parameters of all input positions
-*     which fall within the cell, using the method specified by the
-*     parameter METHOD. The degree of polarization, angle of polarization, 
-*     and polarized intensity are then derived from these combined Stokes 
-*     parameters. The (X,Y) positions in the output catalogue are the 
-*     positions at the centre of each of the cells.
+*     terms of the X and Y columns in the catalogue. Spectropolarimetry
+*     data can also be binned in the frequency axis (see parameter ZBOX).
+*     The grid contains sufficient cells to include all the vector
+*     positions included in the input catalogue. Each position in the output 
+*     catalogue corresponds to one of these cells. The Stokes parameters for 
+*     the cell are formed by combining together the Stokes parameters of all 
+*     input positions which fall within the cell, using the method specified 
+*     by the parameter METHOD. The degree of polarization, angle of 
+*     polarization, and polarized intensity are then derived from these 
+*     combined Stokes parameters. The vector position in the output catalogue 
+*     is the position at the centre of the corresponding cell.
 
 *  Usage:
 *     polbin in out box [method]
@@ -45,6 +46,8 @@
 *        The x and y bin sizes. These values refer to the coordinate Frame 
 *        defined by columns "X" and "Y" and will usually be in units of pixels.
 *        This parameter is not accessed if parameter INTEGRATE is TRUE.
+*        Parameter ZBOX specifies binning along the frequency axis when
+*        dealing with spectropolarimeter data.
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
 *        percentage polarization and polarized intensity. The returned 
@@ -82,6 +85,11 @@
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
+*     ZBOX = _REAL (Read)
+*        The bin size along the third (Z) axis in the input catalogue. 
+*        a Z column. The supplied value should usually be in units of pixels.
+*        This parameter is not accessed if parameter INTEGRATE is TRUE, or
+*        if the input catalogue does not contain a Z column.
 
 *  Notes:
 *     -  The reference direction for the Stokes vectors and polarization
@@ -91,7 +99,8 @@
 *     Frame in the WCS information of the output catalogue is updated to
 *     describe the new reference direction.
 *     -  The bottom left corner of each bin is chosen so that the origin
-*     of the (X,Y) Frame would correspond to a bin corner. 
+*     of the (X,Y) Frame (or (X,Y,Z) Frame if the data is 3D) would 
+*     correspond to a bin corner. 
 
 *  Examples:
 *     polbin intab outtab 4
@@ -123,6 +132,8 @@
 *        origin of the (X,Y) Frame would correspond to a bin corner. 
 *     17-DEC-2000 (DSB):
 *        Added parameter INTEGRATE.
+*     5-FEB-2001 (DSB):
+*        Added support for 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -148,35 +159,8 @@
       INTEGER KPG1_FLOOR         ! Returns largest integer <= X
 
 *  Local Constants:
-      INTEGER X_ID               
-      PARAMETER ( X_ID = 1 )
-
-      INTEGER Y_ID
-      PARAMETER ( Y_ID = 2 )
-
-      INTEGER I_ID
-      PARAMETER ( I_ID = 3 )
-
-      INTEGER V_ID
-      PARAMETER ( V_ID = 4 )
-
-      INTEGER Q_ID
-      PARAMETER ( Q_ID = 4 )
-
-      INTEGER U_ID
-      PARAMETER ( U_ID = 5 )
-
-      INTEGER DI_ID
-      PARAMETER ( DI_ID = 6 )
-
-      INTEGER DV_ID
-      PARAMETER ( DV_ID = 5 )
-
-      INTEGER DQ_ID
-      PARAMETER ( DQ_ID = 7 )
-
-      INTEGER DU_ID
-      PARAMETER ( DU_ID = 8 )
+      INTEGER MAX_ID               
+      PARAMETER ( MAX_ID = 11 )
 
 *  Local Variables:
       CHARACTER FIELDS( 5 )*50   ! Individual fields of catalogue specification
@@ -187,9 +171,13 @@
       CHARACTER UNITS*( CAT__SZUNI )! Units of the total intensity column
       INTEGER CIIN               ! CAT identifier for input catalogue
       INTEGER CIOUT              ! CAT identifier for output catalogue
-      INTEGER GI( 8 )            ! CAT identifiers for columns to be read
-      INTEGER GTTL               ! CAT identifier for TITLE parameter
+      INTEGER DI_ID              ! Index of the DI column in the GI array
+      INTEGER DQ_ID              ! Index of the DQ column in the GI array
+      INTEGER DU_ID              ! Index of the DU column in the GI array
+      INTEGER DV_ID              ! Index of the DV column in the GI array
       INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping
+      INTEGER GI( MAX_ID )       ! CAT identifiers for columns to be read
+      INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -230,12 +218,16 @@
       INTEGER IPWRK2             ! Pointer to workspace
       INTEGER IPX                ! Pointer to i/p X values
       INTEGER IPY                ! Pointer to i/p Y values
+      INTEGER IPZ                ! Pointer to i/p Z values
       INTEGER IROW               ! Row index
       INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
       INTEGER IXHI               ! Upper pixel index on X axis
       INTEGER IXLO               ! Lower pixel index on X axis
       INTEGER IYHI               ! Upper pixel index on Y axis
       INTEGER IYLO               ! Lower pixel index on Y axis
+      INTEGER IZHI               ! Upper pixel index on Z axis
+      INTEGER IZLO               ! Lower pixel index on Z axis
+      INTEGER I_ID               ! Index of the I column in the GI array
       INTEGER MAXPOS             ! Position of maximum value
       INTEGER MINPOS             ! Position of minimum value
       INTEGER MINVAL             ! Min. no. of good i/p positions per cell
@@ -244,11 +236,20 @@
       INTEGER NBIN               ! Total no. of output bins
       INTEGER NCIN               ! No. of vectors in catalogue
       INTEGER NCOL               ! No. of columns to be read
+      INTEGER NDIMO              ! No. of dimensions in output NDFs
+      INTEGER NEXTID             ! Next Id to use
       INTEGER NMAT               ! Size of workspace 
       INTEGER NSTOKE             ! No. of planes in cube
       INTEGER NVAL               ! No. of BOX values supplied
       INTEGER NXBIN              ! No. of output bins along X axis
       INTEGER NYBIN              ! No. of output bins along Y axis
+      INTEGER NZBIN              ! No. of output bins along Z axis
+      INTEGER Q_ID               ! Index of the Q column in the GI array
+      INTEGER U_ID               ! Index of the U column in the GI array
+      INTEGER V_ID               ! Index of the V column in the GI array
+      INTEGER X_ID               ! Index of the X column in the GI array
+      INTEGER Y_ID               ! Index of the Y column in the GI array
+      INTEGER Z_ID               ! Index of the Z column in the GI array
       LOGICAL CIRC               ! Doing circular polarimetry?
       LOGICAL DEBIAS             ! Statistical de-biassing required?
       LOGICAL INTGRT             ! Integrate all vectors?
@@ -256,12 +257,13 @@
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
       LOGICAL RADEC              ! Are RA/DEC columns required?
+      LOGICAL SPEC               ! Is there a Z axis?
       LOGICAL VAR                ! Producing variances?
       LOGICAL VERB               ! Verose errors required?
       REAL ANG                   ! Stored angle in input catalogue
       REAL ANGROT                ! ACW angle from X axis to i/p ref dirn (degs)
       REAL ANGRT                 ! ACW angle from X axis to o/p ref dirn (degs)
-      REAL BOX( 2 )              ! Bin size
+      REAL BOX( 3 )              ! Bin size
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL Q                     ! Stored Q in input catalogue
       REAL RTOD                  ! Conversion factor; radians to degrees
@@ -269,13 +271,17 @@
       REAL SXLO                  ! Lower bound of used region of X axis 
       REAL SYHI                  ! Upper bound of used region of Y axis 
       REAL SYLO                  ! Lower bound of used region of Y axis 
-      REAL TR( 4 )               ! Coeff.s of (X,Y) -> cell indices mapping
-      REAL TR2( 4 )              ! Coeff.s of cell indices -> (X,Y) mapping
+      REAL SZHI                  ! Upper bound of used region of Z axis 
+      REAL SZLO                  ! Lower bound of used region of Z axis 
+      REAL TR( 6 )               ! Coeff.s of (X,Y,Z) -> cell indices mapping
+      REAL TR2( 6 )              ! Coeff.s of cell indices -> (X,Y,Z) mapping
       REAL U                     ! Stored U in input catalogue
       REAL X0                    ! X at bottom left of bottom left cell
       REAL XC                    ! X at centre of input catalogue
       REAL Y0                    ! Y at bottom left of bottom left cell
       REAL YC                    ! Y at centre of input catalogue
+      REAL Z0                    ! Z at bottom left of bottom left cell
+      REAL ZC                    ! Z at centre of input catalogue
 *.
 
 *  Check the inherited global status.
@@ -295,9 +301,30 @@
 
 *  Get CAT identifiers for the required columns. First get position columns
 *  (X and Y) and total intensity (I).
+      X_ID = 1
       CALL POL1_GTCOL( CIIN, 'X', .TRUE., GI( X_ID ), STATUS )       
+      Y_ID = 2
       CALL POL1_GTCOL( CIIN, 'Y', .TRUE., GI( Y_ID ), STATUS )       
+      I_ID = 3
       CALL POL1_GTCOL( CIIN, 'I', .TRUE., GI( I_ID ), STATUS )       
+
+      NEXTID = 4
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  If there is a column named "Z" we are dealing with spectropolarimetry.
+*  Attempt to get a CAT identifier for the "Z" column. 
+      CALL POL1_GTCOL( CIIN, 'Z', .FALSE., GI( NEXTID ), STATUS )       
+      IF( GI( NEXTID ) .EQ. CAT__NOID ) THEN
+         SPEC = .FALSE.
+         NDIMO = 2
+      ELSE
+         SPEC = .TRUE.
+         NDIMO = 3
+         Z_ID = NEXTID
+         NEXTID = NEXTID + 1
+      END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -306,27 +333,32 @@
 *  Attempt to get a CAT identifier for the "V" column. Otherwise, 
 *  assume we are dealing with linear polarimetry. In this case get columns 
 *  for Q and U instead. 
-      CALL POL1_GTCOL( CIIN, 'V', .FALSE., GI( V_ID ), STATUS )       
-      IF( GI( V_ID ) .EQ. CAT__NOID ) THEN
+      CALL POL1_GTCOL( CIIN, 'V', .FALSE., GI( NEXTID ), STATUS )       
+      IF( GI( NEXTID ) .EQ. CAT__NOID ) THEN
          CIRC = .FALSE.
+         Q_ID = NEXTID
+         U_ID = NEXTID + 1
          CALL POL1_GTCOL( CIIN, 'Q', .TRUE., GI( Q_ID ), STATUS )       
          CALL POL1_GTCOL( CIIN, 'U', .TRUE., GI( U_ID ), STATUS )       
+         NEXTID = NEXTID + 2
       ELSE
          CIRC = .TRUE.
+         V_ID = NEXTID
+         NEXTID = NEXTID + 1
       END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Try to find corresponding error columns for these columns (except X
-*  and Y). 
-      CALL POL1_GTCOL( CIIN, 'DI', .TRUE., GI( DI_ID ), STATUS )       
+*  and Y (and Z) ). 
+      CALL POL1_GTCOL( CIIN, 'DI', .TRUE., GI( NEXTID ), STATUS )       
 
       IF( CIRC ) THEN
-         CALL POL1_GTCOL( CIIN, 'DV', .TRUE., GI( DV_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'DV', .TRUE., GI( NEXTID + 1 ), STATUS ) 
       ELSE
-         CALL POL1_GTCOL( CIIN, 'DQ', .TRUE., GI( DQ_ID ), STATUS )       
-         CALL POL1_GTCOL( CIIN, 'DU', .TRUE., GI( DU_ID ), STATUS )       
+         CALL POL1_GTCOL( CIIN, 'DQ', .TRUE., GI( NEXTID + 1 ), STATUS )
+         CALL POL1_GTCOL( CIIN, 'DU', .TRUE., GI( NEXTID + 2 ), STATUS )
       END IF
 
 *  If any of these error columns could not be found, do not use any of
@@ -336,14 +368,14 @@
          VAR = .FALSE.
          CALL ERR_BEGIN( STATUS )
 
-         CALL CAT_TRLSE( GI( DI_ID ), STATUS )       
+         CALL CAT_TRLSE( GI( NEXTID ), STATUS )       
 
          IF( CIRC ) THEN
-            CALL CAT_TRLSE( GI( DV_ID ), STATUS )       
+            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )       
             NCOL = 4
          ELSE
-            CALL CAT_TRLSE( GI( DQ_ID ), STATUS )       
-            CALL CAT_TRLSE( GI( DU_ID ), STATUS )       
+            CALL CAT_TRLSE( GI( NEXTID + 1 ), STATUS )       
+            CALL CAT_TRLSE( GI( NEXTID + 2 ), STATUS )       
             NCOL = 5
          END IF
 
@@ -351,13 +383,22 @@
          CALL ERR_ANNUL( STATUS )
 
       ELSE
+         DI_ID = NEXTID
+
          VAR = .TRUE.
          IF( CIRC ) THEN
+            DV_ID = NEXTID + 1
+            NEXTID = NEXTID + 2
             NCOL = 6
          ELSE
+            DQ_ID = NEXTID + 1
+            DU_ID = NEXTID + 2
+            NEXTID = NEXTID + 3
             NCOL = 8
          END IF
       END IF
+
+      IF( SPEC ) NCOL = NCOL + 1
 
 *  Allocate work space to hold the data from the required columns.
       CALL PSX_CALLOC( NCIN*NCOL, '_REAL', IP, STATUS )
@@ -366,6 +407,12 @@
       IPX = IP + NCIN*VAL__NBR*( X_ID - 1 )
       IPY = IP + NCIN*VAL__NBR*( Y_ID - 1 )
       IPI = IP + NCIN*VAL__NBR*( I_ID - 1 )
+
+      IF( SPEC ) THEN
+         IPZ = IP + NCIN*VAL__NBR*( Z_ID - 1 )
+      ELSE
+         IPZ = IPX
+      END IF
 
       IF( CIRC ) THEN
          IPV = IP + NCIN*VAL__NBR*( V_ID - 1 )
@@ -449,20 +496,30 @@
          DEBIAS = .FALSE.
       END IF
 
-*  Get the coefficients of the linear transformation from (X,Y) position
-*  to bin indices.
-*  =====================================================================
+*  Get the coefficients of the linear transformation from (X,Y(,Z)) 
+*  position to bin indices.
+*  =================================================================
 *  Find the maximum and minimum X value.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPX ), NBAD, SXHI,
-     :                     SXLO, MAXPOS, MINPOS, STATUS )
+     :                 SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum Y value.
       CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPY ), NBAD, SYHI,
-     :                     SYLO, MAXPOS, MINPOS, STATUS )
+     :                 SYLO, MAXPOS, MINPOS, STATUS )
+
+*  If required find min and max Z values.
+      IF( SPEC ) THEN 
+         CALL KPG1_MXMNR( .TRUE., NCIN, %VAL( IPZ ), NBAD, SZHI,
+     :                    SZLO, MAXPOS, MINPOS, STATUS )
+      ELSE
+         SZHI = 1.0
+         SZLO = 0.0
+      END IF
 
 *  Find the coords of the centre.
       XC = 0.5*( SXLO + SXHI )
       YC = 0.5*( SYLO + SYHI )
+      ZC = 0.5*( SZLO + SZHI )
 
 *  See if we are integrating all vectors into a single vector, or into a
 *  grid of vectors.
@@ -478,10 +535,19 @@
 *  Duplicate the value if only a single value was given.  
          IF ( NVAL .LT. 2 ) BOX( 2 ) = BOX( 1 )
 
+*  If required, get the spectral bin size.
+         IF( SPEC ) THEN
+            CALL PAR_GET0R( 'ZBOX', BOX( 3 ), STATUS )
+            BOX( 3 ) = MAX( 1.0, BOX( 3 ) )
+         ELSE
+            BOX( 3 ) = 1.0
+         END IF
+
 *  Limit the box dimensions to be no bigger than the span of the data,
 *  plus 5%.
          BOX( 1 ) = MIN( BOX( 1 ), INT( 1.05*( SXHI - SXLO ) ) )
          BOX( 2 ) = MIN( BOX( 2 ), INT( 1.05*( SYHI - SYLO ) ) )
+         BOX( 3 ) = MIN( BOX( 3 ), INT( 1.05*( SZHI - SZLO ) ) )
 
 *  Find the indices of the first and last bins on each axis. This
 *  assumes that the origin on each axis is at a bin edge.
@@ -489,49 +555,63 @@
          IXHI = KPG1_CEIL( SXHI / BOX( 1 ) )
          IYLO = KPG1_FLOOR( SYLO / BOX( 2 ) )
          IYHI = KPG1_CEIL( SYHI / BOX( 2 ) )
+         IZLO = KPG1_FLOOR( SZLO / BOX( 3 ) )
+         IZHI = KPG1_CEIL( SZHI / BOX( 3 ) )
 
 *  Find the number of bins along each axis.
          NXBIN = IXHI - IXLO + 1
          NYBIN = IYHI - IYLO + 1
+         NZBIN = IZHI - IZLO + 1
 
 *  Find the total number of bins.
-         NBIN = NXBIN*NYBIN
+         NBIN = NXBIN*NYBIN*NZBIN
 
-*  Find the X and Y values corresponding to the bottom left corner of the 
+*  Find the X, Y and Z values corresponding to the bottom left corner of the 
 *  bottom left bin. Again, this assumes that the origin on each axis is at
 *  a bin edge.
          X0 = IXLO*BOX( 1 )
          Y0 = IYLO*BOX( 2 )
+         Z0 = IZLO*BOX( 3 )
 
 *  Find the coefficients of the transformation. The X cell index for a
-*  position (X,Y) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
-*  index is given by INT( TR( 3 ) + TR( 4 )*Y ).
+*  position (X,Y,Z) is given by INT( TR( 1 ) + TR( 2 )*X ), the Y cell
+*  index is given by INT( TR( 3 ) + TR( 4 )*Y ), the Z cell index is given 
+*  by INT( TR( 5 ) + TR( 6 )*Z ).
          TR( 1 ) = 1.0 - X0/BOX( 1 )
          TR( 2 ) = 1.0/BOX( 1 )
          TR( 3 ) = 1.0 - Y0/BOX( 2 )
          TR( 4 ) = 1.0/BOX( 2 )
+         TR( 5 ) = 1.0 - Z0/BOX( 3 )
+         TR( 6 ) = 1.0/BOX( 3 )
 
 *  Store the coefficients of the transformation from cell indices to
-*  (X,Y) coordinates at the cell centre.
+*  (X,Y,Z) coordinates at the cell centre.
          TR2( 1 ) = X0 - 0.5*BOX( 1 )
          TR2( 2 ) = BOX( 1 )
          TR2( 3 ) = Y0 - 0.5*BOX( 2 )
          TR2( 4 ) = BOX( 2 )
+         TR2( 5 ) = Z0 - 0.5*BOX( 3 )
+         TR2( 6 ) = BOX( 3 )
 
 *  If we are integrating all vectors in the catalogue, set up values which
 *  result in all vectors being placed in a single bin.
       ELSE
          NXBIN = 1
          NYBIN = 1
+         NZBIN = 1
          NBIN = 1
          TR( 1 ) = 1.0 
          TR( 2 ) = 0.0
          TR( 3 ) = 1.0 
          TR( 4 ) = 0.0
+         TR( 5 ) = 1.0 
+         TR( 6 ) = 0.0
          TR2( 1 ) = XC
          TR2( 2 ) = 0.0
          TR2( 3 ) = YC
          TR2( 4 ) = 0.0
+         TR2( 5 ) = ZC
+         TR2( 6 ) = 0.0
       END IF
 
 *  Now find the largest number of input positions inn any bin.
@@ -545,7 +625,8 @@
 
 *  Count the number of input catalogue positions contained in each output
 *  cell. The largest number in any one cell is returned.
-      CALL POL1_CLCNT( NCIN, %VAL( IPX ), %VAL( IPY ), TR, NXBIN, NYBIN,
+      CALL POL1_CLCNT( NCIN, SPEC, %VAL( IPX ), %VAL( IPY ), 
+     :                 %VAL( IPZ ), TR, NXBIN, NYBIN, NZBIN,
      :                 %VAL( IPW1 ), MXCNT, STATUS )
 
 *  Now copy the input Stokes parameters into arrays suitable for binning
@@ -561,33 +642,36 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Copy the total intensity values from the input catalogue to the work array.
-      CALL POL1_STK2( NCIN, %VAL( IPI ), %VAL( IPX ), %VAL( IPY ), 
-     :                NXBIN, NYBIN, MXCNT, TR, %VAL( IPIST ), 
-     :                %VAL( IPW1 ), STATUS )
+      CALL POL1_STK2( NCIN, SPEC, %VAL( IPI ), %VAL( IPX ), %VAL( IPY ), 
+     :                %VAL( IPZ ), NXBIN, NYBIN, NZBIN, MXCNT, TR, 
+     :                %VAL( IPIST ), %VAL( IPW1 ), STATUS )
 
 *  Do the same for the other required Stokes vectors (V, or Q and U).
       IF( CIRC ) THEN
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, %VAL( IPV ), %VAL( IPX ), %VAL( IPY ),
-     :                   NXBIN, NYBIN, MXCNT, TR, %VAL( IPVST ), 
-     :                   %VAL( IPW1 ), STATUS )
+         CALL POL1_STK2( NCIN, SPEC, %VAL( IPV ), %VAL( IPX ), 
+     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                   NZBIN, MXCNT, TR, %VAL( IPVST ), %VAL( IPW1 ), 
+     :                   STATUS )
 
       ELSE
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPQST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, %VAL( IPQ ), %VAL( IPX ), %VAL( IPY ), 
-     :                   NXBIN, NYBIN, MXCNT, TR, %VAL( IPQST ), 
-     :                   %VAL( IPW1 ), STATUS )
+         CALL POL1_STK2( NCIN, SPEC, %VAL( IPQ ), %VAL( IPX ), 
+     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                   NZBIN, MXCNT, TR, %VAL( IPQST ), %VAL( IPW1 ), 
+     :                   STATUS )
 
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPUST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, %VAL( IPU ), %VAL( IPX ), %VAL( IPY ), 
-     :                   NXBIN, NYBIN, MXCNT, TR, %VAL( IPUST ), 
-     :                   %VAL( IPW1 ), STATUS )
+         CALL POL1_STK2( NCIN, SPEC, %VAL( IPU ), %VAL( IPX ), 
+     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                   NZBIN, MXCNT, TR, %VAL( IPUST ), %VAL( IPW1 ), 
+     :                   STATUS )
       END IF
 
 *  If required, do the same for the variances.
@@ -595,32 +679,37 @@
          CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVIST, STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-         CALL POL1_STK2( NCIN, %VAL( IPVI ), %VAL( IPX ), %VAL( IPY ), 
-     :                   NXBIN, NYBIN, MXCNT, TR, %VAL( IPVIST ), 
-     :                   %VAL( IPW1 ), STATUS )
+         CALL POL1_STK2( NCIN, SPEC, %VAL( IPVI ), %VAL( IPX ), 
+     :                   %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                   NZBIN, MXCNT, TR, %VAL( IPVIST ), %VAL( IPW1 ), 
+     :                   STATUS )
 
          IF( CIRC ) THEN
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVVST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, %VAL( IPVV ), %VAL( IPX ), 
-     :                      %VAL( IPY ), NXBIN, NYBIN, MXCNT, 
-     :                      TR, %VAL( IPVVST ), %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVV ), %VAL( IPX ), 
+     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                      NZBIN, MXCNT, TR, %VAL( IPVVST ), 
+     :                      %VAL( IPW1 ), STATUS )
 
          ELSE
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVQST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, %VAL( IPVQ ), %VAL( IPX ), 
-     :                      %VAL( IPY ), NXBIN, NYBIN, MXCNT, 
-     :                      TR, %VAL( IPVQST ), %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVQ ), %VAL( IPX ), 
+     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                      NZBIN, MXCNT, TR, %VAL( IPVQST ), 
+     :                      %VAL( IPW1 ), STATUS )
 
             CALL PSX_CALLOC( NBIN*MXCNT, '_REAL', IPVUST, STATUS )
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-            CALL POL1_STK2( NCIN, %VAL( IPVU ), %VAL( IPX ), 
-     :                      %VAL( IPY ), NXBIN, NYBIN, MXCNT, 
-     :                      TR, %VAL( IPVUST ), %VAL( IPW1 ), STATUS )
+            CALL POL1_STK2( NCIN, SPEC, %VAL( IPVU ), %VAL( IPX ), 
+     :                      %VAL( IPY ), %VAL( IPZ ), NXBIN, NYBIN, 
+     :                      NZBIN, MXCNT, TR, %VAL( IPVUST ), 
+     :                      %VAL( IPW1 ), STATUS )
+
          END IF
 
       END IF
@@ -663,12 +752,13 @@
          IPCOV = IPNCON
       END IF
 
-*  Allocate an array to hold the binned values. This array is accessed as 
-*  a cube by POL1_PLVEC. The cube consists of 2 or 3 planes (depending on
-*  whether or not we are doing circular polarimetry), each spanned by the X
-*  and Y axes (having NXBIN and NYBIN elements respectively). The first
-*  plane contains total intensity, the second contains V or Q, and the
-*  third (if used) contains U. Get pointers to the start of each plane.
+*  Allocate an array to hold the binned values. This array is accessed 
+*  as a 4D hyper-cube by POL1_PLVEC. The hyper-cube consists of 2 or 3 
+*  cubes (depending on whether or not we are doing circular polarimetry), 
+*  each spanned by the X, Y and Z axes (having NXBIN, NYBIN and NZBIN 
+*  elements respectively). The first cube contains total intensity, the 
+*  second contains V or Q, and the third (if used) contains U. Get pointers 
+*  to the start of each cube.
       IF( CIRC ) THEN
          CALL PSX_CALLOC( NBIN*2, '_REAL', IPBIN, STATUS )
          IPIBN = IPBIN
@@ -821,33 +911,29 @@
 *  ====================================================================
 *  Allocate work arrays.
       IF( EQMAP .NE. AST__NULL ) THEN
-         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
-         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW3, STATUS )
+         CALL PSX_CALLOC( NXBIN*NYBIN*NDIMO, '_DOUBLE', IPW2, STATUS )
       ELSE 
          IPW2 = IPI
-         IPW3 = IPI
       END IF
 
 *  Calculate the polarization vectors. POL1_PLVEC has the cabability to
 *  produce output images containing the polarization parameters, These
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
-      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
-     :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, ANGROT, 
-     :                 ANGRT, .FALSE., .FALSE., .FALSE., .FALSE.,
-     :                  .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
+      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NZBIN, NSTOKE, 
+     :                 NXBIN*NYBIN, %VAL( IPBIN ), %VAL( IPVBIN ), 
+     :                 STOKES, DEBIAS, VAR, ANGROT, ANGRT, NDIMO,
+     :                 .FALSE., .FALSE., .FALSE., .FALSE.,
+     :                 .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPW2 ),
-     :                 %VAL( IPW3 ), STATUS )
+     :                 STATUS )
 
 *  Free the work space.
-      IF( EQMAP .NE. AST__NULL ) THEN
-         CALL PSX_FREE( IPW2, STATUS )   
-         CALL PSX_FREE( IPW3, STATUS )   
-      END IF
+      IF( EQMAP .NE. AST__NULL ) CALL PSX_FREE( IPW2, STATUS )   
 
 *  Closedown sequence.
 *  ===================

@@ -85,6 +85,7 @@
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
 
+
 *  Get the number of axes in the Base Frame.
       NDIM = AST_GETI( IWCS, 'NIN', STATUS )
 
