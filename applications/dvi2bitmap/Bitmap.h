@@ -76,7 +76,8 @@ class Bitmap {
     bool cropMarginAbs[4];
     bool transparent_;		// make bg transparent if poss.
     int bpp_;			// bits-per-pixel
-    int max_colour_;		// ==> max colour index
+    Byte max_colour_;		// ==> max colour index (must fit into
+				// a Byte)
     static verbosities verbosity_;
 };
 

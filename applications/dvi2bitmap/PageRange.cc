@@ -79,7 +79,7 @@ bool PageRange::addSpec (const char *type, const char *spec)
 	    {
 		spec++;
 		char *endp;
-		int countnum = strtol (spec, &endp, 10);
+		int countnum = static_cast<int>(strtol (spec, &endp, 10));
 		spec = endp;
 		if (*spec != ',')
 		{
@@ -110,12 +110,12 @@ bool PageRange::addSpec (const char *type, const char *spec)
 		rangeType_ = ranges;
 
 	    char *endp;
-	    long p1=0, p2;
+	    int p1=0, p2;
 	    endp = const_cast<char*>(spec);
 	    char lastsep = ',';
 	    while (*endp != '\0' && parseOK)
 	    {
-		p2 = strtol (spec, &endp, 10);
+		p2 = static_cast<int>(strtol (spec, &endp, 10));
 		if (endp == spec)	// no digits found
 		{
 		    parseOK = false;

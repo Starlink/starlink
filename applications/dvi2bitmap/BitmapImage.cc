@@ -29,10 +29,10 @@ const char *BitmapImage::formats[] = {
 #if ENABLE_PNG
     "png",
 #endif
-    "xbm",
 #if ENABLE_GIF
     "gif",
 #endif
+    "xbm",
 };
 const int BitmapImage::nformats = sizeof(formats)/sizeof(formats[0]);
 int BitmapImage::iterator_index = 0;
@@ -44,7 +44,7 @@ BitmapImage::BitmapImage(const int w, const int h, const int bpp)
       bitmap_(0), allocBitmap_(0), myBitmap_(false), bitmapRows_(0),
       isTransparent_(false)
 {
-};
+}
 
 BitmapImage::~BitmapImage ()
 {

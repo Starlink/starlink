@@ -57,7 +57,7 @@ InputByteStream::InputByteStream (string& s, bool preload, string tryext)
     {
 	buflen_ = filesize_;
 	buf_ = new Byte[buflen_];
-	unsigned int bufcontents = read (fd_, buf_, buflen_);
+	size_t bufcontents = read (fd_, buf_, buflen_);
 	if (bufcontents != buflen_)
 	    throw InputByteStreamError ("Couldn't preload file");
 	eob_ = buf_ + bufcontents;
@@ -108,7 +108,7 @@ Byte InputByteStream::getByte(int n)
 	    p_ = buf_;
 	}
     }
-    Byte result = eof_ ? 0 : *p_;
+    Byte result = eof_ ? static_cast<Byte>(0) : *p_;
     p_ += n;
     return result;
 }
@@ -200,7 +200,7 @@ int InputByteStream::pos ()
 {
     if (!preloaded_)
 	throw DviBug ("Can't get pos in non-preloaded file");
-    return p_ - buf_;
+    return static_cast<int>(p_ - buf_);
 }
 void InputByteStream::skip (unsigned int skipsize)
 {
@@ -211,7 +211,7 @@ void InputByteStream::skip (unsigned int skipsize)
 
 void InputByteStream::read_buf_ ()
 {
-    int bufcontents = read (fd_, buf_, buflen_);
+    ssize_t bufcontents = read (fd_, buf_, buflen_);
     if (bufcontents < 0)
 	throw DviBug ("InputByteStream::read_buf_: can't read");
     eof_ = (bufcontents == 0);

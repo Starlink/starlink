@@ -159,7 +159,9 @@ PkFont::PkFont(unsigned int dvimag,
 	if (verbosity_ > silent)
 	    cerr << "Warning: Font " << name << " at "
 		 << dpiScaled() << "dpi ("
-		 << path_ << ") not found\n";
+		 << path_ << ") not found ("
+		 << e.problem()
+		 << ")\n";
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }
@@ -367,7 +369,7 @@ void PkFont::read_font (InputByteStream& pkf)
 	if (opcode <= 239)	// character definition
 	{
 	    bool two_byte = opcode & 4;
-	    Byte pl_prefix = opcode & 3;
+	    Byte pl_prefix = static_cast<Byte>(opcode & 3);
 	    unsigned int packet_length;
 	    unsigned int pos;	// primarily for debugging output
 
@@ -617,7 +619,7 @@ PkRasterdata::PkRasterdata(Byte opcode,
     : len_(len), w_(w), h_(h),
       bitmap_(0), highnybble_(false)
 {
-    dyn_f_ = opcode >> 4;
+    dyn_f_ = static_cast<Byte>(opcode >> 4);
     start_black_ = opcode&8;
     rasterdata_ = new Byte[len];
     (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
@@ -668,10 +670,10 @@ Byte PkRasterdata::nybble() {
     {
 	if (rasterdata_ == eob_)
 	    throw DviBug ("Run out of nybbles (snackattack!)");
-	res = (*rasterdata_)>>4;
+	res = static_cast<Byte>((*rasterdata_)>>4);
     }
     else
-	res = (*rasterdata_++)&0xf;
+	res = static_cast<Byte>((*rasterdata_++)&0xf);
     if (verbosity_ > debug)
 	cerr << '<' << static_cast<int>(res) << '\n';
     return res;
@@ -694,7 +696,7 @@ void PkRasterdata::construct_bitmap()
 	while (nbits_req >= 8)
 	{
 	    for (int i=7, b=*r; i>=0; i--, b>>=1)
-		p[i] = b&1;
+		p[i] = static_cast<Byte>(b&1);
 	    p += 8;
 	    r++;
 	    nbits_req -= 8;
@@ -702,9 +704,9 @@ void PkRasterdata::construct_bitmap()
 	if (nbits_req > 0)
 	{
 	    // get the last few bits
-	    b = *r >> (8-nbits_req);
+	    b = static_cast<Byte>(*r >> (8-nbits_req));
 	    for (int i=nbits_req-1; i>=0; i--, b>>=1)
-		p[i] = b&1;
+		p[i] = static_cast<Byte>(b&1);
 	}
     }
     else
@@ -761,7 +763,7 @@ void PkRasterdata::construct_bitmap()
 		    rowstart = rowp;
 		}
 	    }
-	    pixelcolour = (pixelcolour==0 ? 1 : 0);
+	    pixelcolour = static_cast<Byte>(pixelcolour==0 ? 1 : 0);
 	}
     }
 }

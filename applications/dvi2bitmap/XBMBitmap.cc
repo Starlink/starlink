@@ -35,13 +35,13 @@ void XBMBitmap::write (const string filename)
     FILE *op;
     if ((op = fopen (filename.c_str(), "w")) == NULL)
 	throw BitmapError ("can't open XBM file"+filename+" to write");
-    int dotpos = filename.find_last_of('.');
-    int seppos = filename.find_last_of(path_separator);
-    if (seppos < 0) seppos = 0;
-    if (dotpos < 0) dotpos = filename.length();
+    size_t dotpos = filename.find_last_of('.');
+    size_t seppos = filename.find_last_of(path_separator);
+    if (seppos == string::npos) seppos = 0;
+    if (dotpos == string::npos) dotpos = filename.length();
     //cerr << "seppos="<<seppos<<" dotpos="<<dotpos<<'\n';
     string fnroot_str = "";
-    for (int charno=seppos; charno<dotpos; charno++)
+    for (int charno=(int)seppos; charno<dotpos; charno++)
 	fnroot_str += (isalnum(filename[charno]) ? filename[charno] : '_');
     const char *fnroot = fnroot_str.c_str();
 
@@ -56,7 +56,7 @@ void XBMBitmap::write (const string filename)
 	for (int col=0; col<w_; col++)
 	{
 	    if (*p++)
-		b |= (1<<bitno);
+		b |= static_cast<Byte>(1<<bitno);
 	    if (bitno == 7)
 	    {
 		fprintf (op, "0x%02x, ", b);

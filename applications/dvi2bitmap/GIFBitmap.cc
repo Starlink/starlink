@@ -570,7 +570,7 @@ nomatch:
 #else /*SIGNED_COMPARE_SLOW*/
         if ( free_ent < maxmaxcode ) {  /* } */
 #endif /*SIGNED_COMPARE_SLOW*/
-            CodeTabOf (i) = free_ent++; /* code -> hashtable */
+            CodeTabOf (i) = (short)free_ent++; /* code -> hashtable */
             HashTabOf (i) = fcode;
         } else
                 cl_block();
@@ -750,7 +750,7 @@ void GIFBitmap::char_init()
  */
 void GIFBitmap::char_out( int c )
 {
-        accum[ a_count++ ] = c;
+        accum[ a_count++ ] = (char)c;
         if( a_count >= 254 )
                 flush_char();
 }

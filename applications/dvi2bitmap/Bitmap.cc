@@ -7,6 +7,7 @@
 #include "dvi2bitmap.h"
 
 #include <iostream>		// debug code writes to cerr
+#include <string>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -64,7 +65,10 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
 
     cropped_ = false;
-    max_colour_ = (1<<bpp_) - 1;
+    if (bpp_ > 8)
+	// too big for a Byte...
+	bpp_ = 8;
+    max_colour_ = static_cast<Byte>((1<<bpp_) - 1);
 
     if (verbosity_ > normal)
 	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")\n";
@@ -234,7 +238,7 @@ void Bitmap::blur ()
     memset ((void*)newB, 0, W*H);
 
     int newbpp = (bpp_ < 2 ? 2 : bpp_);
-    int new_max_colour = (1<<newbpp) - 1;
+    Byte new_max_colour = static_cast<Byte>((1<<newbpp) - 1);
     double scale = (double)((1<<newbpp) - 1)/(double)max_colour_;
     // Blur leaving a 1-pixel margin, to avoid edge effects.  Do edge later.
     // This could be made more efficient, but it doesn't really matter just now
@@ -249,7 +253,7 @@ void Bitmap::blur ()
 				   * scale
 				   + 0.5);
 		*/
-		= static_cast<int>((  B[row*W+col-1]   + B[row*W+col+1]
+		= static_cast<Byte>((  B[row*W+col-1]   + B[row*W+col+1]
 				    + B[(row+1)*W+col] + B[(row-1)*W+col]
 				    + B[row*W+col]*2)
 				   / 6.0 // weighting
@@ -303,7 +307,7 @@ void Bitmap::scaleDown (const int factor)
     // (=8*8) levels of grey.  This is crude, but acceptable as a first-go
     // heuristic
     int newbpp = (bpp_ < 6 ? 6 : bpp_);
-    int new_max_colour = (1<<newbpp) - 1;
+    Byte new_max_colour = static_cast<Byte>((1<<newbpp) - 1);
 #if SCALEDOWN_COMPLETE_AVERAGE
     double scale = (double)new_max_colour/(double)(factor*factor);
 #endif
@@ -420,7 +424,7 @@ void Bitmap::write (const string filename, const string format)
     string outfilename = filename;
     if (fileext.length() != 0)
     {
-	unsigned int extlen = fileext.length();
+	size_t extlen = fileext.length();
 	if (extlen > outfilename.length() ||
 	    outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;

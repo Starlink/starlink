@@ -34,8 +34,8 @@ class InputByteStream {
     static void verbosity (const verbosities level) { verbosity_ = level; }
  private:
     int fd_;
-    unsigned int filesize_;
-    unsigned int buflen_;
+    size_t filesize_;
+    size_t buflen_;
     Byte *buf_;			// buffer
     Byte *p_;			// current position in buffer 
     Byte *eob_;			// end of buffer

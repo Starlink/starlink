@@ -1,9 +1,8 @@
 // Part of dvi2bitmap.
 // Copyright 1999, 2000 Council for the Central Laboratory of the Research Councils.
 // See file LICENCE for conditions.
-
-static const char RCSID[] =
-	"$Id$";
+//
+// $Id$
 
 #define NULL 0
 #include <iostream>
@@ -684,9 +683,10 @@ void DviFile::read_postamble()
     dvif_->seek(q);
     if (getByte() != 248)
 	throw DviError ("DviFile::read_postamble: expected post command");
-    unsigned int int4 = dvif_->getUIU(4); // final bop
-    int4 = dvif_->getUIU(4);	// numerator
-    int4 = dvif_->getUIU(4);	// denominator
+    // Read and discard four integers
+    unsigned int unused_int4 = dvif_->getUIU(4); // final bop
+    unused_int4 = dvif_->getUIU(4);	// numerator
+    unused_int4 = dvif_->getUIU(4);	// denominator
     unsigned int dvimag = dvif_->getUIU(4);	// mag
     // immediately multiply it by magmag
     postamble_.mag = dvimag;

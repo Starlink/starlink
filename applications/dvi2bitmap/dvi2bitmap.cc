@@ -12,6 +12,7 @@ static const char RCSID[] =
 #include "dvi2bitmap.h"
 #include <vector>
 #include <iostream>
+#include <string>
 
 #if NO_CSTD_INCLUDE
 #include <stdio.h>		// for vsprintf
@@ -83,7 +84,7 @@ int bitmapW = -1;
 int resolution = PkFont::dpiBase();// in pixels-per-inch
 int oneInch = resolution;
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
     string dviname;
     double magmag = 1.0;	// magnification of file magnification factor
@@ -502,7 +503,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
     int pagenum = 0;
     Bitmap *bitmap = 0;
     bool end_of_file = false;
-    int outcount = 0;		// characters written to output current line
+    size_t outcount = 0;	// characters written to output current line
     bool initialisedInch = false;
     bool skipPage = false;
 
@@ -875,14 +876,15 @@ DviBug::DviBug(const char *fmt,...)
 string get_ofn_pattern (string dviname)
 {
     // strip path and extension from filename
-    int string_index = dviname.rfind(path_separator);
+    size_t string_index = dviname.rfind(path_separator);
     string dvirootname;
-    if (string_index < 0)
+    //if (string_index < 0)
+    if (string_index == string::npos)
 	dvirootname = dviname;
     else
 	dvirootname = dviname.substr(string_index+1);
     string_index = dvirootname.rfind('.');
-    if (string_index >= 0) // it's there
+    if (string_index != string::npos) // there is an extension -- skip it
 	dvirootname = dvirootname.substr(0,string_index);
 
     return dvirootname + "-page%d";
