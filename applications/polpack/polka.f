@@ -346,6 +346,9 @@
 *  History:
 *     18-APR-1997 (DSB):
 *        Original version.
+*     22-JUN-1998 (DSB):
+*        Only save final value of MODE if polarimetric data has been
+*        processed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -706,7 +709,6 @@
       CALL PAR_PUT0I( 'PSFSIZE', PSF, STATUS )    
       CALL PAR_PUT0C( 'ITEMS', SI( : CHR_LEN( SI ) ), STATUS )
       CALL PAR_PUT0I( 'FITTYPE', FIT, STATUS )
-      IF( POL ) CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
       CALL CHR_UCASE( BADCOL )
       CALL PAR_PUT0C( 'BADCOL', BADCOL, STATUS )
       CALL CHR_UCASE( CURCOL )
@@ -720,8 +722,12 @@
       CALL PAR_PUT1R( 'PERCENTILES', 2, PERCNT, STATUS )
       CALL PAR_PUT0C( 'VIEW', VIEW, STATUS )
       CALL PAR_PUT0I( 'SKYPAR', SKYPAR, STATUS )
-      CALL CHR_UCASE( MODE )
-      CALL PAR_PUT0C( 'MODE', MODE, STATUS )
+
+      IF( POL ) THEN
+         CALL PAR_PUT0I( 'OEFITTYPE', OEFIT, STATUS )
+         CALL CHR_UCASE( MODE )
+         CALL PAR_PUT0C( 'MODE', MODE, STATUS )
+      END IF
 
 *  Delete the groups.
  999  CONTINUE
