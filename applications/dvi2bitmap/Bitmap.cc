@@ -24,6 +24,8 @@
 #include "BitmapImage.h"
 
 verbosities Bitmap::verbosity_ = normal;
+int  Bitmap::cropMargin[4] = { 0, 0, 0, 0 };
+bool Bitmap::cropMarginAbs[4] = {false, false, false, false };
 
 
 // Indecision: Within scaleDown, it seems sensible to average the
@@ -40,13 +42,19 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
 {
     B = new Byte[W*H];
     memset ((void*)B, 0, W*H);
-    ibbL = ibbT = INT_MAX;	// numeric_limits<int>::max();
-    ibbR = ibbB = INT_MIN;	// numeric_limits<int>::min();
+    bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
+    bbR = bbB = INT_MIN;	// numeric_limits<int>::min();
 
     cropL = 0;
     cropR = W;
     cropT = 0;
     cropB = H;
+#if 0
+    cropMargin[Left] = cropMargin[Right] =
+	cropMargin[Top] = cropMargin[Bottom] = 0;
+    cropMarginAbs[Left] = cropMarginAbs[Right] =
+	cropMarginAbs[Top] = cropMarginAbs[Bottom] = false;
+#endif
     cropped_ = false;
     max_colour_ = (1<<bpp_) - 1;
 
@@ -61,7 +69,7 @@ Bitmap::~Bitmap()
 
 // Paint the bitmap b, which is w x h pixels in size onto the master bitmap, 
 // starting with pixel (x,y).
-// Update ibb? as a side-effect.
+// Update bb? as a side-effect.
 // Set to max_colour_ any pixels in the master which are non-zero in the 
 // new bitmap, and crop any parts of the new bitmap
 // falling outside the boundary of the master
@@ -94,23 +102,23 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     // Note that we update the bounding box to the border of the
     // newly painted bitmap, rather than the position of the first
     // black pixels within the bitmap.
-    if (x   < ibbL) ibbL = x;
-    if (x+w > ibbR) ibbR = x+w;
-    if (y   < ibbT) ibbT = y;
-    if (y+h > ibbB) ibbB = y+h;
+    if (x   < bbL) bbL = x;
+    if (x+w > bbR) bbR = x+w;
+    if (y   < bbT) bbT = y;
+    if (y+h > bbB) bbB = y+h;
 
     if (verbosity_ > normal)
 	cerr << "Bitmap @ (" << x << ',' << y << "): (0:"
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
-	     << "). BB now [" << ibbL << ':' << ibbR << "), ["
-	     << ibbT << ':' << ibbB << ")\n";
+	     << "). BB now [" << bbL << ':' << bbR << "), ["
+	     << bbT << ':' << bbB << ")\n";
 }
 
 
 // Draw a block of height h and width w pixels, with its bottom left corner
 // occupying pixel (x,y).
-// Update ibb? as a side-effect.
+// Update bb? as a side-effect.
 // OR the new pixels into place, and crop any parts of the new bitmap
 // falling outside the boundary of the master
 void Bitmap::rule (const int x, const int y, const int w, const int h)
@@ -128,28 +136,51 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	for (int col=col1; col<col2; col++)
 	    B[row*W+col] = max_colour_;
 
-    if (x   < ibbL) ibbL = x;
-    if (x+w > ibbR) ibbR = x+w;
-    if (y   < ibbT) ibbT = y;
-    if (y+h > ibbB) ibbB = y+h;
+    if (x   < bbL) bbL = x;
+    if (x+w > bbR) bbR = x+w;
+    if (y   < bbT) bbT = y;
+    if (y+h > bbB) bbB = y+h;
 
     if (verbosity_ > normal)
 	cerr << "Rule @ (" << x << ',' << y << "): ("
 	     << w << "x" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
-	     << "). BB now [" << ibbL << ':' << ibbR << "), ["
-	     << ibbT << ':' << ibbB << ")\n";
+	     << "). BB now [" << bbL << ':' << bbR << "), ["
+	     << bbT << ':' << bbB << ")\n";
 }
 
+// Freeze the bitmap and bounding box, simply by setting the frozen_ flag
+// to be true.  At the same time, normalise the bounding box by requiring
+// that (0 <= bbL < bbR <= W) and (0 <= bbT < bbB <= H).  If, however, the 
+// bitmap is empty (according to empty()), then don't change anything.
+// Code following this may therefore take these assertions to be valid 
+// as long as empty() is false.
+//
+// Code before this in this file should be called only when the bitmap
+// is unfrozen, code afterwards only when it is frozen.
 void Bitmap::freeze()
 {
     if (frozen_)
-	return;
+	return;			// idempotent
 
+    if (!empty())		// do nothing if the bitmap is empty
+    {
+	if (bbL < 0) bbL = 0;
+	if (bbR > W) bbR = W;
+	if (bbT < 0) bbT = 0;
+	if (bbB > H) bbB = H;
+
+	if ((bbL >= bbR) || (bbT >= bbB))
+	    throw BitmapError
+		("Bitmap::freeze bitmap not empty, but bounds crossed");
+    }
+
+#if 0
     bbL = (ibbL < 0 ? 0 : ibbL);
     bbR = (ibbR > W ? W : ibbR);
     bbT = (ibbT < 0 ? 0 : ibbT);
     bbB = (ibbB > H ? H : ibbB);
+#endif
 
     frozen_ = true;
 }
@@ -158,12 +189,32 @@ void Bitmap::crop ()
 {
     if (!frozen_)
 	freeze();
+
+    cropL = (cropMarginAbs[Left]	? cropMargin[Left]
+					: bbL - cropMargin[Left]);
+    cropR = (cropMarginAbs[Right]	? cropMargin[Right]
+					: bbR + cropMargin[Right]);
+    cropT = (cropMarginAbs[Top]		? cropMargin[Top]
+					: bbT - cropMargin[Top]);
+    cropB = (cropMarginAbs[Bottom]	? cropMargin[Bottom]
+					: bbB + cropMargin[Bottom]);
+
+#if 0
     cropL = bbL;
     cropR = bbR;
     cropT = bbT;
     cropB = bbB;
+#endif
+
     cropped_ = true;
 }
+
+void Bitmap::crop (Margin spec, int pixels, bool absolute)
+{
+    cropMargin[spec] = pixels;
+    cropMarginAbs[spec] = absolute;
+}	
+	
 
 void Bitmap::blur ()
 {
@@ -298,6 +349,11 @@ void Bitmap::scaleDown (const int factor)
 	crop();			// re-crop
     bpp_ = newbpp;
     max_colour_ = new_max_colour;
+
+    if (verbosity_ > normal)
+	cerr << "Bitmap::scaleDown: factor=" << factor
+	     << ". BB now [" << bbL << ':' << bbR << "), ["
+	     << bbT << ':' << bbB << ")\n";
 }
 
 void Bitmap::write (const string filename, const string format)
