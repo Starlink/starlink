@@ -303,7 +303,8 @@
 #-lfor -lFutil -lUfor -lm -lots -lc; f'
                CC='cc'
                CXX='cxx'
-               CFLAGS='-I$(STAR_INC) -O -std1'
+               CFLAGS='-O -std1'
+               #CFLAGS='-I$(STAR_INC) -O -std1'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -321,7 +322,8 @@
                AR_IN='ar -r'
                AR_OUT='ar -x'
                CC='c89'
-               CFLAGS='-I$(STAR_INC) -O -common'
+               CFLAGS='-O -common'
+               #CFLAGS='-I$(STAR_INC) -O -common'
                FC='f77'
                FFLAGS='-O'
                LINK='ln -s'
@@ -339,7 +341,8 @@
                AR_OUT='ar x'
                BLD_SHR='f() ld -assert pure-text -o $$1 $$2; f'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O -fPIC'
+               CFLAGS='-O -fPIC'
+               #CFLAGS='-I$(STAR_INC) -O -fPIC'
                FC='f77'
                FFLAGS='-O -PIC'
                LINK='ln -s'
@@ -357,7 +360,8 @@
                BLD_SHR='f() ld -G -o $$1 $$2; f'
                CC='cc'
 	       CXX='CC'  # requires /opt/SUNWspro
-               CFLAGS='-I$(STAR_INC) -O'
+               CFLAGS='-O'
+               #CFLAGS='-I$(STAR_INC) -O'
                #CFLAGS='-I$(STAR_INC) -O -K PIC -I/usr/openwin/include -Dmapunit=__mapunit'
                FC='f77'
                FFLAGS='-O -PIC'
@@ -399,6 +403,11 @@
 #  Set TMPDIR to current working directory (.)
 
          TMPDIR='.'
+
+#  Remove environment variables which are sometimes set (why!?) and which 
+#  can wreak havoc with makefiles (this matters, because we're about to
+#  invoke make with the -e option).
+         unset CPPFLAGS CXXFLAGS LIBS DEFS
 
 #  Invoke make with the appropriate environment variables set to override
 #  default macros defined in the makefile.
