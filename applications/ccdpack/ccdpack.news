@@ -1,18 +1,71 @@
 1 CCDPACK_minor_update
- 
-  This is a minor update to CCDPACK. 
 
-  The applications MAKEMOS and MAKEFLAT have been modified to generate
-  output variances based on the scatter of the input images.
+  This is a minor update to CCDPACK.
 
-  A parameter OVERRIDE has been added to FINDOFF. This now stops
-  the program if a partial solution to the registration is found.
+  * CCDPACK has been revised to be aware of, and use, the World Coordinate
+    System (WCS) components of NDFs - see SUN/95 and SUN/210.  This has 
+    the following effects on the package:
+
+     - Some new applications have been introduced.
+          New tasks:
+             ASTEXP - Exports AST frameset information from NDFs to file
+             ASTIMP - Imports AST frameset information from file to NDFs
+             WCSREG - Aligns NDFs using multiple WCS component frames
+          New script:
+             WCSEXERCISE - test WCS-related functionality (not IRAF)
+
+     - The default way of handling coordinate mappings is now using 
+       frames in the WCS components of NDFs, rather than using 
+       TRANSFORM structures stored in the .MORE.CCDPACK extension.
+       All applications retain the option of using the previous
+       functionality for backwards compatibility however.
+          Affected tasks:
+             FINDOFF   (new parameters MAXDISP, RESTRICT, MAXDISP)
+             REGISTER  (new parameters OUTDOMAIN, OUTFORMAT)
+             TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
+                                       EPOCHOUT, WCSFILE)
+          Affected private task:
+             CCDGENERATE
+          Affected script:
+             CCDEXERCISE
+
+     - All applications now propagate WCS components where appropriate.
+          Affected tasks:
+             CALCOR
+             DEBIAS
+             FLATCOR
+             MAKEBIAS
+             MAKECAL
+             MAKEFLAT
+
+     - The package now requires AST 1.2 to build.
 
 
-  CCDPACK is fully described in SUN/139 and can be viewed on-line using 
-  the "showme sun139" command. The latest information about CCDPACK 
-  problems is always available at:
+  * FINDOFF will now deal with position lists having as few as one object
+    in common.  This capability will principally be of use in conjunction
+    with the new WCS awareness of the package.
 
-     <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
 
-  Peter Draper 20 November 1998, (P.W.Draper@durham.ac.uk).
+  * The package will no longer attempt to make use of NAG routines where
+    present.
+
+     - Withdrawn routine:
+          NAGMAKEMOS - MAKEMOS can be used instead.
+  
+
+  * There are some minor changes in behaviour:
+
+     - REGISTER: output to screen has changed slightly for readability.
+
+     - Some routines fail differently when objects cannot be matched:
+          FINDOFF erases the associated position list of NDFs which
+             cannot be matched instead of leaving the previously 
+             associated list.
+          REGISTER ignores NDFs without associated position lists 
+             instead of exiting.
+
+
+
+  (at v2.3-2:
+     FINDCENT and PAIRNDF modified to improve centroiding for large images.)
+
