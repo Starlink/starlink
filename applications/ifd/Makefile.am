@@ -5,6 +5,10 @@
 bin_SCRIPTS = ifd2iraf ifd2star ifd2irafifl ifl2ifd ifd_irafhlpgen \
               ifd_front.tcl
 
+## Test script.
+
+TESTS = tester.sh
+
 ## Arrange to edit the installation binary directory into script files
 ## which need it.  This cannot be done by autoconf because it needs to
 ## be changable at make time - see the autoconf manual section on 

@@ -1,7 +1,7 @@
 monolith TEST
 # ADAM Interface file
 # Created automatically from test.ifd using ifd2star
-# Fri Jun 13 15:52:26 BST 1997
+# Wed May 12 16:53:48 BST 2004
 interface TEST1
    parameter A
       position 1
