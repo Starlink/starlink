@@ -294,6 +294,11 @@
     </xsl:if>
   </xsl:template>
 
+  <xsl:template match="url">
+    <a><xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
+      <xsl:value-of select="."/></a>
+  </xsl:template>
+
   <xsl:template match="elemref">
     <code>&lt;<a><xsl:attribute name="href">#<xsl:value-of
     select="@gi"/></xsl:attribute><xsl:value-of select="@gi"/></a>&gt;</code>
