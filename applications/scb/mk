@@ -315,7 +315,6 @@
 #  DEC Alpha machines running OSF1.
 #  -------------------------------
             alpha_OSF1)
-               PERL5=/usr/local/bin/perl
                MIMETYPES_FILE=/usr/local/etc/httpd/conf/mime.types
                AR_IN='ar -r'
                CC='cc'
@@ -334,7 +333,6 @@
 #  DECstations running Ultrix.
 #  --------------------------
             mips)
-               PERL5=/usr/local/bin/perl
                AR_IN='ar -r'
                CC='c89'
                CFLAGS='-I$(STAR_INC) -O'
@@ -352,7 +350,6 @@
 #  SUN Sparcstations running SunOS 4.x.
 #  -----------------------------------
             sun4)
-               PERL5=/usr/local/bin/perl
                AR_IN='ar r'
                CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'
@@ -368,7 +365,6 @@
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
             sun4_Solaris)
-               PERL5=/usr/local/bin/perl
                MIMETYPES_FILE=/etc/http/mime.types
                AR_IN='ar -r'
                CC='cc'
@@ -386,7 +382,6 @@
 #  Intel PC running Linux.
 #  ----------------------
             ix86_Linux)
-               PERL5=/usr/bin/perl
                MIMETYPES_FILE=/etc/mime.types
                AR_IN='ar r'
                CC='gcc'
