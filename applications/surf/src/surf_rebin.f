@@ -207,6 +207,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.61  1999/02/27 04:39:58  timj
+*     Add polarimeter support (ANG_MEAS, ANG_INT).
+*     Make sure that INTREBIN writes passes WPLATE and ANGROT to header.
+*     Close INTREBIN output file.
+*
 *     Revision 1.60  1998/12/10 19:58:07  timj
 *     Rename parameter USEGRD to GUARD
 *
@@ -445,6 +450,13 @@ c
                                        ! Pointer to bolometer var end
       INTEGER          ABOL_VAR_PTR(MAX_FILE)
                                        ! Pointer to bolometer variance
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2) 
+                                       ! Angles (wplate,angrot) for each
+                                       ! integration (polarimetry) 
+      REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
+                                       ! Angles (wplate,angrot) for each
+                                       ! measurement (polarimetry) 
+      REAL             ANGROT          ! POLPACK ANGROT (degrees)
       BYTE             BADB            ! Bad bit mask for despiking
       INTEGER          BITNUM          ! Bit set by DESPIKE
       LOGICAL          BOLREBIN        ! Am I rebinning bols separately?
@@ -543,6 +555,8 @@ c
                                        ! corner of output image
       CHARACTER * (5)  MAPNAME         ! Name of each bolometer
       INTEGER          MAP_SIZE(2)     ! Number of pixels in map (x,y)
+      INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
+                                       ! pointers to start of each measurement 
       CHARACTER* (15)  METHOD          ! rebinning method
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
@@ -559,6 +573,8 @@ c
       INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
       INTEGER          N_FITS(MAX_FILE)! Number of FITS entries per file
       INTEGER          N_INTS(MAX_FILE)! Number of integrations per input file
+      INTEGER          NINTS(MAX_FILE) ! N_INTS for INTREBIN support
+      INTEGER          N_MEAS(MAX_FILE)! Number of measurements per input file
       INTEGER          N_PIXELS        ! Number of pixels in output map
       INTEGER          N_POS (MAX_FILE)! number of positions measured in input
                                        ! files
@@ -610,6 +626,7 @@ c
       REAL             RTEMP           ! Scratch real
       CHARACTER*10     SAMPLE_MODE     ! Sample mode for maps
       REAL             SCALE           ! Size of 1 scale length for WT rebin
+      INTEGER          SECNDF          ! NDF id to section
       REAL             SFACTOR         ! Smoothing factor for spline PDA_SURFIT
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
@@ -645,6 +662,7 @@ c
                                        ! weights assigned to each input file
       LOGICAL          WEIGHTS         ! Store the weights array
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
+      REAL             WPLATE          ! Waveplate angle (for POLPACK)
       REAL             WTFN (WTFN_MAXRAD * WTFN_MAXRAD * 
      :     WTFNRES * WTFNRES + 1)
                                        ! Weighting function
@@ -812,7 +830,7 @@ c
 
             CALL SURF_RECURSE_READ( RLEV, IN, MAX_FILE,
      :           OUT_COORDS, FILE, N_BOL, N_POS, 
-     :           N_INTS, IN_UT1, IN_RA_CEN, 
+     :           N_INTS, N_MEAS, IN_UT1, IN_RA_CEN, 
      :           IN_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :           SUB_INSTRUMENT, OBJECT, UTDATE, 
      :           UTSTART, FILENAME, BOL_ADC, BOL_CHAN,
@@ -820,7 +838,8 @@ c
      :           BOL_DEC_END, IN_DATA_PTR, IN_DATA_END, 
      :           IN_VARIANCE_PTR, IN_VARIANCE_END,
      :           QMF, IN_QUALITY_PTR, IN_QUALITY_END, QBITS,
-     :           INT_LIST, BOLWT, WEIGHT, SHIFT_DX, 
+     :           ANG_INT, ANG_MEAS,
+     :           INT_LIST, MEAS_LIST, BOLWT, WEIGHT, SHIFT_DX, 
      :           SHIFT_DY, NPARS, PARS,
      :           STATUS)
 
@@ -1678,13 +1697,22 @@ c
 
       CALL PAR_DEF0C('OUT', STEMP, STATUS)
 
+      OUT_LOC = DAT__NOLOC ! Assign to null value
+
       IF (BOLREBIN .OR. INTREBIN) THEN
 *  create the output file that will contain the reduced data in NDFs
+*     The 'type' depends on BOL or INT rebin
  
          CALL PAR_GET0C ('OUT', OUT, STATUS)
 
+         IF (BOLREBIN) THEN
+            STEMP = 'SURF_BOLMAPS'
+         ELSE
+            STEMP = 'SURF_INTMAPS'
+         END IF
+
          HDSNAME = OUT(1:DAT__SZNAM)
-         CALL HDS_NEW (OUT, HDSNAME, 'SURF_BOLMAPS', 0, 0, OUT_LOC, 
+         CALL HDS_NEW (OUT, HDSNAME, STEMP, 0, 0, OUT_LOC, 
      :        STATUS)
 
       END IF
@@ -1809,6 +1837,8 @@ c
 
                NFILES = 1       ! All lower subroutines assume one input file
 
+               NINTS(1) = 1     ! All lower subs assume one integration
+               
             ELSE
 *     Normal rebin just needs to loop once
                N_FILE_LOOPS = 1
@@ -1817,6 +1847,10 @@ c
                END DO
 
                NFILES = FILE    ! Lower subroutines see all FILES
+
+               DO I = 1, FILE   ! Lower subs see all integrations
+                  NINTS(I)  = N_INTS(I)
+               END DO
             END IF
 
 *     Start looping over integrations if necessary
@@ -1843,6 +1877,17 @@ c
                      N_PTS(1)  = (INT_NEXT - INT_START) * 
      :                    N_BOL(CURR_FILE)
 
+*     Modify INT_LIST so that the first integration in INT_LIST
+*     actually points to the current integration. This is needed
+*     for SPLINE fitting which calculates an integration at a time
+*     and then coadds. NINTS has already been set to 1
+
+                     INT_LIST(CURR_FILE,1) = 1
+                     INT_LIST(CURR_FILE,2) = INT_NEXT - INT_START + 1
+
+*     Force the weight to be 1 in INTREBIN regardless of what
+*     was specified
+                     WEIGHT(1) = 1.0
 
 *     Print some information concerning the regrid
                      CALL MSG_SETC('PKG', PACKAGE)
@@ -1880,8 +1925,32 @@ c
                      CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
      :                    OUT_NDF, STATUS)
                   ELSE
-                     CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, 
-     :                    OUT_NDF, STATUS)
+
+*     If we have a single input file and a single output file
+*     (ie not coadding multiple observations and not generating
+*     images a la BOLREBIN/INTREBIN) then we should propogate from
+*     the input file so that the HISTORY is retained
+
+                     IF (FILE .EQ. 1) THEN
+*     Open the input file and get a section the right size
+                        CALL NDF_FIND (DAT__ROOT, FILENAME(1), ITEMP, 
+     :                       STATUS) 
+                        CALL NDF_SECT(ITEMP, 2, LBND, UBND,
+     :                       SECNDF, STATUS)
+*     Ask for the new file name
+                        CALL NDF_PROP(SECNDF,
+     :                       'NOEXTENSION(SCUCD,FIGARO,SCUBA,REDS,FITS)'
+     :                       ,'OUT',OUT_NDF, STATUS)
+                        CALL NDF_ANNUL(SECNDF, STATUS)
+                        CALL NDF_ANNUL(ITEMP, STATUS)
+
+                     ELSE
+*     Multiple input images so just create a file via the parameter
+*     system
+
+                        CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, 
+     :                       OUT_NDF, STATUS)
+                     END IF
                   END IF
 
 *     There will be bad pixels in the output map.
@@ -1973,9 +2042,13 @@ c
                      END IF
 
 *     Regrid with SPLINE interpolation
+
+*     Note that for INTREBIN we need to supply a different
+*     N_INTS and INT_LIST
+
                      CALL SCULIB_SPLINE_REGRID(SPMETHOD, SFACTOR, 
      :                    MAX_FILE, NFILES, N_BOL, SCUBA__MAX_INT, 
-     :                    N_INTS, DIAMETER, WAVELENGTH,OUT_PIXEL,
+     :                    NINTS, DIAMETER, WAVELENGTH,OUT_PIXEL,
      :                    MAP_SIZE(1), MAP_SIZE(2),
      :                    I_CENTRE, J_CENTRE, WEIGHT, INT_LIST, 
      :                    ABOL_DATA_PTR, ABOL_VAR_PTR, ABOL_RA_PTR, 
@@ -2033,14 +2106,27 @@ c
                      CALL CHR_APPND('_', OUT_TITLE, IPOSN)
                      CALL CHR_APPND(MAPNAME, OUT_TITLE, IPOSN)
                   END IF
+
+*     Extract FILT_1 from the first FITS header so that we can write
+*     the FILTER name to the output FITS
+
+                  CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS(1), 
+     :                 FITS(1,1), 'FILT_1', STEMP, STATUS)
+
+*     Retrieve the waveplate and rotation angles
+                  IF (INTREBIN) THEN
+                     WPLATE = ANG_INT(CURR_FILE, CURR_INT,1)
+                     ANGROT = ANG_INT(CURR_FILE, CURR_INT,2)
+                  END IF
                   
-*     Now write the axis
+*     Now write the axis and FITS header
 
                   CALL SURF_WRITE_MAP_INFO (OUT_NDF, OUT_COORDS, 
      :                 OUT_TITLE, MJD_STANDARD, FILE, FILENAME, 
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
-     :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, 
+     :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
+     :                 WPLATE, ANGROT,
      :                 STATUS )
                   
 
@@ -2164,6 +2250,9 @@ c
             
          END DO
       END IF
+
+*     Close the HDS container file if one was opened
+      IF (OUT_LOC .NE. DAT__NOLOC) CALL DAT_ANNUL(OUT_LOC, STATUS)
 
 *     This is the end of the BOLOMETER looping
 
