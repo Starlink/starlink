@@ -367,12 +367,15 @@ KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f \
 kps1_sparr.f kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f \
 kps1_pgftd.f kps1_pgfti.f kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f \
-kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f
+kps1_pgftw.f kps1_clpsr.f kps1_clpsd.f kps1_dsclb.f kps1_dscld.f kps1_dscli.f \
+kps1_dsclr.f kps1_dsclw.f kps1_stpab.f kps1_stpad.f kps1_stpai.f kps1_stpar.f \
+kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f 
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen
+KAPSUB_GEN = kps1_spar.gen kps1_pgft.gen kps1_clps.gen kps1_dscl.gen \
+kps1_stpa.gen
 
-# Non-generic source files needed for kapsub_sub.tar:
+# Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
 ftsize.f ftsizt.f gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f \
 hstlo.f hstrep.f imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f \
@@ -382,8 +385,7 @@ kps1_ardmi.f kps1_ardmr.f kps1_ardmub.f kps1_ardmuw.f kps1_ardmw.f \
 kps1_bafid.f kps1_bafir.f kps1_cff2d.f kps1_cff2r.f kps1_clnsd.f \
 kps1_clnsi.f kps1_clnsr.f kps1_clpal.f kps1_cnsed.f kps1_cnser.f \
 kps1_cntdr.f kps1_cntur.f kps1_cnvfp.f kps1_cnvlv.f kps1_cnvrp.f \
-kps1_cuxyr.f kps1_dsbor.f kps1_dsclb.f kps1_dscld.f kps1_dscli.f \
-kps1_dsclr.f kps1_dsclw.f kps1_dtpcl.f kps1_elgau.f kps1_elpr1.f \
+kps1_cuxyr.f kps1_dsbor.f kps1_dtpcl.f kps1_elgau.f kps1_elpr1.f \
 kps1_elpr2.f kps1_elpr3.f kps1_elpr4.f kps1_errcl.f kps1_fainb.f \
 kps1_faind.f kps1_faini.f kps1_fainr.f kps1_fainw.f kps1_fspe2.f \
 kps1_fspf2.f kps1_fofod.f kps1_fofor.f kps1_fohed.f kps1_foher.f \
@@ -419,8 +421,7 @@ kps1_rorar.f kps1_roraub.f kps1_rorauw.f kps1_roraw.f kps1_rorbb.f \
 kps1_rorbd.f kps1_rorbi.f kps1_rorbr.f kps1_rorbub.f kps1_rorbuw.f \
 kps1_rorbw.f kps1_rosiz.f kps1_rprfb.f kps1_rprfd.f kps1_rprfi.f \
 kps1_rprfr.f kps1_rprfub.f kps1_rprfuw.f kps1_rprfw.f kps1_skyft.f \
-kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_stpab.f kps1_stpad.f kps1_stpai.f kps1_stpar.f \
-kps1_stpaub.f kps1_stpauw.f kps1_stpaw.f kps1_subid.f kps1_subir.f \
+kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f kps1_skyfn.f kps1_subid.f kps1_subir.f \
 kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f \
 kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f \
 kps1_suskd.f kps1_suskr.f kps1_thgtb.f kps1_thgtd.f kps1_thgti.f \

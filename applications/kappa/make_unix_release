@@ -84,7 +84,8 @@
 
 #  Ensure all files are accessable.
       echo "Setting protection for all files"
-      chmod 777 *
+      chmod 644 *
+      chmod 755 mk
 
 #  Edit in the current package version number into any required source files.
       echo "Editing the current package version number into source files"
