@@ -33,9 +33,11 @@
 *     OUT = NDF (Write)
 *        The name of the NDF to be produced.
 *     PROFITS = _LOGICAL (Read)
-*        If TRUE, the headers of the IRAF file are written
+*        If TRUE, the user headers of the IRAF file are written
 *        verbatim to the NDF's FITS extension.  Any IRAF history
-*        records are also appended to FITS extension. [TRUE]
+*        records are also appended to the FITS extension.  The FITS
+*        extension is not created if there are no user headers
+*        present in the IRAF file. [TRUE]
 *     PROHIS = _LOGICAL (Read)
 *        This parameter decides whether or not to create NDF HISTORY
 *        records.  Only the IRAF headers with keyword HISTORY, and
@@ -180,6 +182,9 @@
 *        information, and the NDF label and units.  Expanded and
 *        corrected the documentation, including a second example.
 *        Improved the code structure.
+*     1997 September 25 (MJC):
+*        Protect against case where PROFITS=TRUE but there are no
+*        headers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -395,7 +400,7 @@
 *  whether or not they are NDF-style HISTORY records.  This uses a
 *  logical work array to flag whether or not to propagate the header to
 *  the airlock.
-      IF ( PROFIT .OR. PROHIS ) THEN
+      IF ( ( PROFIT .OR. PROHIS ) .AND. NHDRLI .GT. 0 ) THEN
          CALL PSX_CALLOC( NHDRLI, '_LOGICAL', REPNTR, STATUS )
          CALL CON_CONSL( .TRUE., NHDRLI, %VAL( REPNTR ), STATUS )
       END IF
@@ -405,12 +410,12 @@
 *  that these headers should not to be propagated to the FITS airlock.
 *  This is to avoid growing duplication of potentially bulky text
 *  especially if a user is mixing Starlink and IRAF tasks.
-      IF ( PROHIS )
+      IF ( PROHIS .AND. NHDRLI .GT. 0 )
      :   CALL COI_CHISR( IMDESC, NDF, NHDRLI, %VAL( REPNTR ), STATUS )
 
 *  Propagate the FITS headers, and include mandatory headers too.
-      IF ( PROFIT ) CALL COI_HEADS( IMDESC, IRAFIL, NDF, NHDRLI,
-     :  %VAL( REPNTR ), PROHIS, STATUS )
+      IF ( PROFIT .AND. NHDRLI .GT. 0 ) CALL COI_HEADS( IMDESC, IRAFIL,
+     :  NDF, NHDRLI, %VAL( REPNTR ), PROHIS, STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( REPNTR, STATUS )
@@ -474,7 +479,7 @@
 *
 *  Obtain workspace for multi-line MWCS header values, and spec1
 *  parameter.
-      BUFLEN = 68 * ( NHDRLI - 10 )
+      BUFLEN = 68 * MAX( NHDRLI, 1 )
       CALL PSX_MALLOC( BUFLEN, BUPNTR, STATUS )
       CALL PSX_MALLOC( BUFLEN, SPNTR, STATUS )
 
@@ -524,4 +529,3 @@
       END IF
 
       END
-
