@@ -27,7 +27,7 @@
 *       Once the data specification has been decoded the application will
 *     read from parameter VALUE the value of the data that should be used.
 *     All data specified by the section (or by the inverse of this section
-*     depending on parameter USE_SECTION) will be set to this value.
+*     if specified) will be set to this value.
 
 *  Usage:
 *     change_data ndf{spec1}{spec2}{specn} value=??
@@ -64,19 +64,25 @@
 *         system will split multiple entries on commas unless the entire
 *         section is quoted:
 *
-*               SECTION > [ '{b3,5}' , {i2} ]
+*               SECTION > [ "{b3,5}" , {i2} ]
+*
+*         If necessary the negation character should come after a
+*         section (ie after the closing curly bracket) and that 
+*         negation applies to the combined section and not just the string 
+*         containing the negation character:
+*
+*             SECTION > [ {b3}-, {i2} ]
+*
+*         implies that the section consists of everything except bolometer 3
+*         and integration 2.
 *
 *         This parameter is only used when no SCUBA section was specified
 *         via the IN parameter.
-*     USE_SECTION = LOGICAL (Read)
-*         This parameter specified whether the specified SCUBA section
-*         should be changed (.TRUE.) or the data not specified by the
-*         section (.FALSE.). Default is .TRUE.
 *     VALUE = LITERAL (Read)
 *         Value to which all selected data points should be set. A value
-*         of 'bad' will set the data point to VAL__BAD (Starlink bad data
-*         value). For COMP='Quality' only numbers 0 to 255 are allowed -
-*         numbers outside this range are taken to be bad.
+*         of `bad' will set the data point to VAL__BAD (Starlink bad data
+*         value). For COMP=Quality only numbers 0 to 255 are allowed -
+*         numbers outside this range are assumed to be bad values.
 
 *  Examples:
 *     change_data 'ndf{b2}' value=bad out=changed
@@ -90,11 +96,14 @@
 *         this to a value of 1.02. This method of selecting a section is not
 *         recommended given the complication using commas and square
 *         brackets.
+*     change_data test2 section='["{b2,5}", {i2}-]' value=0.2 comp=err
+*         Select everything except integration 2 and bolometers 2 and 5.
+*         Set the error for this section to 0.2
 *     change_data 'phot{i2:6}{b3}' comp=quality value=8
 *         Explicitly set the quality array to 8 for integrations 2 through
 *         6 and bolometer 3. The task CHANGE_QUALITY is recommended in this 
 *         case since then only bit 3 is affected.
-*     change_data 'map{i2,5}' value=0.0 use_section=no
+*     change_data 'map{i2,5}-' value=0.0 
 *         Set everything except integrations 2 and 5 to zero.
 
 
@@ -109,7 +118,7 @@
 *       via the IN parameter.
 
 *  Related Application:
-*     SURF: CHANGE_QUALITY; REBIN, SCUPHOT
+*     SURF: CHANGE_QUALITY, REBIN, SCUPHOT
 
 *  Authors:
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
@@ -145,6 +154,8 @@
 *    Local Constants :
       INTEGER          MAX__DIM           ! max number of dimensions in
       PARAMETER (MAX__DIM = 4)            ! array
+      CHARACTER * 1    NEGCHAR            ! Character used to negate a section
+      PARAMETER (NEGCHAR = '-')           ! 
       CHARACTER * 14   TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'CHANGE_DATA')
 
@@ -174,6 +185,7 @@
       LOGICAL          ISQUAL             ! Is there a QUALITY component
       INTEGER          IVALUE             ! Integer form of value
       INTEGER          NDIM               ! number of dimensions in array
+      INTEGER          NEGPOS             ! Position of NEGCHAR
       INTEGER          NREC               ! number of history records in
                                           ! input file
       INTEGER          N_BEAM             ! the 'beam' dimension of the
@@ -240,7 +252,7 @@
 
 *     Split up into filename and data spec
       CALL SCULIB_SPLIT_FILE_SPEC(IN, SCUBA__MAX_SECT, FILE, N_SPEC,
-     :     DATA_SPEC, STATUS)
+     :     DATA_SPEC, USE_SECT, STATUS)
 
 *     open the data NDF
 
@@ -490,6 +502,33 @@
          CALL PAR_GET1C('SECTION', SCUBA__MAX_SECT, DATA_SPEC,
      :        N_SPEC, STATUS)
 
+*     Check to see if someone has slipped a NEGCHAR in there to negate it
+
+         USE_SECT = .TRUE.
+
+         DO I = 1, N_SPEC
+
+            NEGPOS = 1
+            CALL CHR_FIND(DATA_SPEC(I), NEGCHAR, .TRUE., NEGPOS)
+
+*     If the string contains the character remove it and set USE_SECT
+            IF (NEGPOS .LE. CHR_LEN(DATA_SPEC(I))) THEN
+               USE_SECT = .FALSE.
+               CALL CHR_RMCHR(NEGCHAR, DATA_SPEC(I))
+            END IF
+
+         END DO
+
+      END IF
+
+*     Report that we are using an inverted section if necessary
+      IF (.NOT.USE_SECT) THEN
+
+         CALL MSG_SETC('TASK', TSKNAME)
+
+         CALL MSG_OUTIF(MSG__NORM,' ','^TASK: The inverse section '//
+     :        'has been selected', STATUS)
+
       END IF
 
 *     Get the new value. Some complication with bytes
@@ -527,9 +566,6 @@
             END IF
          END IF
       END IF
-
-*     Are we setting the section or the inverse section
-      CALL PAR_GET0L('USE_SECTION', USE_SECT, STATUS)
 
 *     decode each data specification
 
