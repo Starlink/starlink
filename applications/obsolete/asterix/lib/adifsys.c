@@ -176,14 +176,6 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
  * Data system routines
  */
 
-void adix_fclose_int( ADIobj rtn, ADIobj id, ADIstatus status )
-  {
-  if ( _eprc_c(rtn) ) 			/* C routine? */
-    ((ADIoCB) _eprc_prc(rtn))( id, status );
-  else					/* Fortran routine */
-    ((ADIfoCB) _eprc_prc(rtn))( &id, status );
-  }
-
 void ADIfsysFileClose( ADIobj id, ADIstatus status )
   {
   ADIobj	fid;			/* File object at end of chain */
@@ -207,7 +199,39 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
               _CSM, &ortn, status );
 
 /* Try to close the file */
-    adix_fclose_int( ortn, fid, status );
+    ADIkrnlExecO( ortn, fid, status );
+    }
+
+  }
+
+/*
+ * Data system routines
+ */
+
+void ADIfsysFileTrace( ADIobj id, ADIstatus status )
+  {
+  ADIobj	fid;			/* File object at end of chain */
+  ADIobj	ortn;			/* Close routine */
+  ADIobj        repid;
+  ADIlogical	there;
+
+  _chk_stat;
+
+/* Get file object */
+  adix_getfile( id, &fid, status );
+
+/* Extract representation id from file object */
+  adic_cget0i( fid, "REP", &repid, status );
+
+/* Representation has supplied a closure routine? */
+  adic_there( repid, "TRACE_RTN", &there, status );
+
+  if ( there ) {
+    adix_locrcb( repid, "TRACE_RTN",	/* Locate the opening routine */
+              _CSM, &ortn, status );
+
+/* Try to close the file */
+    ADIkrnlExecO( ortn, fid, status );
     }
 
   }
@@ -215,12 +239,12 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
 void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
                       ADIstatus status )
   {
-  _chk_stat;
-
-  if ( _eprc_c(rtn) ) 			/* C routine? */
-    ((ADIcCreatRCB) _eprc_prc(rtn))( fspec, id, fileid, status );
-  else					/* Fortran routine */
-    ((ADIfCreatRCB) _eprc_prc(rtn))( &fspec, &id, fileid, status );
+  if ( _ok(status) ) {
+    if ( _eprc_c(rtn) ) 			/* C routine? */
+      ((ADIcCreatRCB) _eprc_prc(rtn))( fspec, id, fileid, status );
+    else					/* Fortran routine */
+      ((ADIfCreatRCB) _eprc_prc(rtn))( &fspec, &id, fileid, status );
+    }
   }
 
 void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
@@ -235,7 +259,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
   _chk_stat;				/* Check status on entry */
 
-  _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
+  _GET_NAME(fspec,flen);		/* Import strings resolving lengths */
 
   adic_newv0c_n( fspec, flen, &fid,	/* Construct ADI strings */
                           status );
@@ -248,9 +272,11 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
     adix_locrep( ppos+1, rlen, &rid,	/* Look for representation */
 		 status );
 
-    if ( _null_q(rid) )
+    if ( _null_q(rid) ) {
+      adic_setetc( "REP", ppos+1, rlen );
       adic_setecs( ADI__INVARG, "File representation /^REP/ not known",
                    status );
+      }
     else {
 
 /* Locate the file creation routine */
@@ -270,6 +296,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
       ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
+       adic_print( rid, status );
 
       adic_there( rid, "CREAT_RTN", &there, status );
 
@@ -469,9 +496,8 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
     adix_findmem( cid, "NAME", 4,       /* Find NAME member insertion */
 		  &nid, NULL, status );
 
-    if ( ! strx_cmpc( name, nlen,       /* Found the one we want? */
-		      *nid ) )
-      {
+/* Found the one we want? */
+    if ( ! strx_cmpic( name, nlen, *nid ) ) {
       found = ADI__true;
       *id = cid;
       }
@@ -520,7 +546,6 @@ void adix_defrcb( ADIobj rid, char *name, int nlen,
 		  ADIobj rtn, ADIstatus status )
   {
   _chk_stat;
-
   adix_cputid( rid, name, nlen,		/* Store rtn in the appropriate member */
 	       rtn, status );
   }
@@ -533,11 +558,6 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
 
   *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
                     status );
-
-  if ( _null_q(*rtn) ) {
-    adic_setetc( "RTN", name, nlen );
-    adic_setecs( ADI__NOMTH, "No representation method for ^RTN", status );
-    }
   }
 
 
@@ -585,8 +605,8 @@ void ADIfsysInit( ADIstatus status )
 /* Add our common strings to the system */
   ADIkrnlAddCommonStrings( stringtable, status );
 
-  adic_defcls( "FileRepresentation",
-	       "", "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN",
+  adic_defcls( "FileRepresentation", "",
+           "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN,TRACE_RTN",
 	       &DsysFileRep, status );
 
   adic_defcls( "FileObject",

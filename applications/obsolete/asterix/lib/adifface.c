@@ -595,7 +595,7 @@ F77_SUBROUTINE(adifn(print))( INTEGER(id), INTEGER(status) )
 
   _chk_init_err; _chk_stat;
 
-  adix_print( ADIcvStdOut, *id, ADI__false, status );
+  adix_print( ADIcvStdOut, *id, 0, ADI__false, status );
 
   _ERR_OUT;
   }
@@ -2217,8 +2217,7 @@ F77_SUBROUTINE(adifn(defrcb))( INTEGER(rid), CHARACTER(name),
   _ERR_IN("ADI_DEFRCB");		/* Mark routine for error reporting */
 
   adix_defrcb( *rid, name, name_length,
-	       adix_neweprc( ADI__false,
-                  (ADICB) rtn, status ),
+	       adix_neweprc( ADI__false, (ADICB) rtn, status ),
 	       status );
 
   _ERR_OUT;

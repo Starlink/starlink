@@ -118,7 +118,6 @@ ADIobj ADIaryCell( ADIarrayPtr ary, int index[], ADIstatus status )
   int		*bdims;			/* Dimensions of base array */
   int		offset = 0;		/* Scalar offset from base array */
   int		origind[ADI__MXDIM];	/* Indices in base array */
-  ADIobj	rval;			/* Handle of returned object */
 
   _chk_stat_ret(ADI__nullid);		/* Check status on entry */
 
@@ -129,29 +128,24 @@ ADIobj ADIaryCell( ADIarrayPtr ary, int index[], ADIstatus status )
   offset = ADIaryOffset( ary->ndim, bdims, origind );
 
 /* Construct new block address from base data address and offset */
-  _FORM_ID( rval, _ID_IBLK(bdata), _ID_SLOT(bdata)+offset);
-
-  return rval;				/* Return new block/slot address */
+  return ADImemIdAddOff( bdata, offset, status );
   }
 
 
-void ADIaryDel( ADIobj id, int nval, ADIstatus status )
+void ADIaryDel( ADIobj id, ADIstatus status )
   {
-  int           ia;
   int           naval;
   KT_CTYPE_ary  *adata = _ary_data(id);
 
-  for( ia=0; ia<nval; ia++, adata++ ) {
-    naval = ADIaryCountNelm( adata->ndim,   /* How many objects to free */
-			adata->dims );
+/* How many objects to free */
+  naval = ADIaryCountNelm( adata->ndim, adata->dims );
 
-    if ( _valid_q(adata->parent) )
-      adix_erase( &adata->parent, 1,	/* Remove parent object */
+  if ( _valid_q(adata->parent) )
+    adix_erase( &adata->parent, 1,	/* Remove parent object */
 		  status );
-    else
-      adix_erase( &adata->data, naval,  /* Remove array elements */
+  else
+    adix_erase( &adata->data, naval,  /* Remove array elements */
 		  status );
-    }
   }
 
 

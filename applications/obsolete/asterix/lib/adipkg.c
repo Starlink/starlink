@@ -85,8 +85,8 @@ void adix_prs_cmd( ADIobj pstream, ADIstatus status )
   else if ( ADIcurrentToken(pstream) == TOK__END )
     ADInextToken( pstream, status );
 
-  if( _ok(status) && _valid_q(sdat) )
-    adic_print( sdat, status );
+/*  if( _ok(status) && _valid_q(sdat) )
+    adic_print( sdat, status ); */
   }
 
 

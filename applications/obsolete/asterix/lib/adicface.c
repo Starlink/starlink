@@ -532,7 +532,7 @@ void adic_copy( ADIobj id, ADIobj *cid, ADIstatus status )
 void adic_print( ADIobj id, ADIstatus status )
   {
   _chk_init_err; _chk_stat;
-  adix_print( ADIcvStdOut, id, ADI__false, status );
+  adix_print( ADIcvStdOut, id, 0, ADI__false, status );
   }
 
 void adic_setlnk( ADIobj id, ADIobj lid, ADIstatus status )

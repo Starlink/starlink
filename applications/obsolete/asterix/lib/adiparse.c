@@ -216,6 +216,8 @@ void prsx_init( ADIstatus status )
   }
 
 
+#define FILEBUF 256
+
 ADIobj prsx_symname( ADIobj stream, ADIstatus status )
   {
   ADIstream	*str = _strm_data(stream);
@@ -280,14 +282,14 @@ void prsx_namvalcmp( ADIobj stream, ADIobj id, ADIstatus status )
   {
   ADIobj    	cnam;
   ADIobj    	cval;
+  ADIstream	*str = _strm_data(stream);
 
   _chk_stat;
 
-/* While more identifiers */
-  while ( (ADIcurrentToken(stream) == TOK__SYM) && _ok(status) ) {
+  while ( (str->ctok.t == TOK__SYM) && 	/* While more identifiers */
+		  _ok(status) ) {
 
-/* Take the component name from stream */
-    cnam = prsx_symname( stream, status );
+    cnam = prsx_symname( stream, status ); /* Take the component name from stream */
 
     ADInextToken( stream, status );
 
@@ -314,7 +316,7 @@ void ADIaddDeviceToStream( ADIobj stream, ADIdeviceType type, ADIstatus status )
   if ( _ok(status) ) {
     if ( str->dev )
       dev = (ADIdevicePtr)
-	adix_mem_alloc( sizeof(ADIdevice), status );
+	ADImemAlloc( sizeof(ADIdevice), status );
     else
       dev = &str->basedev;
 
@@ -323,6 +325,7 @@ void ADIaddDeviceToStream( ADIobj stream, ADIdeviceType type, ADIstatus status )
     dev->type = type;
     dev->dstatic = ADI__false;
     dev->pstatic = ADI__false;
+    dev->bufsiz = dev->bnc = 0;
     str->dev = dev;
     }
   }
@@ -386,61 +389,216 @@ ADIobj ADIstrmNew( ADIstatus status )
 
 
 /*
- * Write a character to a stream
+ * Flush a device
  */
-void ADIstrmPutCh( ADIobj stream, char ch, ADIstatus status )
+void ADIstrmFlushDev( ADIdevice *dev, ADIstatus status )
+  {
+/* Null terminate so that we can use the fputs call rather than */
+/* many fputc's. This is always safe to do because the buffer is */
+/* always allocated one byte bigger than dev->bufsiz */
+  dev->buf[dev->bnc] = 0;
+  switch( dev->type ) {
+    case ADIdevFile:
+      fputs( dev->buf, dev->f );
+      break;
+    }
+
+  dev->bnc = 0;
+  }
+
+/*
+ * Flush a stream
+ */
+void ADIstrmFlush( ADIobj stream, ADIstatus status )
   {
   if ( _ok(status) ) {
     ADIstream	*pstr = _strm_data(stream);
 
-    switch( pstr->dev->type ) {
-      case ADIdevFile:
-	fputc( ch, pstr->dev->f );
-	break;
+    if ( pstr->dev->bufsiz )
+      ADIstrmFlushDev( pstr->dev, status );
+    }
+  }
+
+void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
+  {
+  char	*buf = dev->buf;
+  int	i;
+  char	*scur = str;
+  int	sleft = dev->bufsiz - dev->bnc;	/* Amount of space left */
+
+/* Null terminated */
+  if ( slen == _CSM ) {
+    while ( *scur ) {
+      while ( *scur && (dev->bnc<dev->bufsiz) ) {
+	dev->buf[dev->bnc++] = *scur++;
+	}
+      if ( *scur )
+	ADIstrmFlushDev( dev, status );
       }
+    }
+
+/* Fast check if we won't fill the device buffer */
+  else if ( slen <= sleft ) {
+    for( i=0; i<slen; i++ )
+      buf[dev->bnc++] = *scur++;
+    }
+
+/* We will fill the buffer (and maybe more than once) */
+  else {
+    int		nmove,nleft = slen;
+
+    while ( nleft > 0 ) {
+      nmove = _MIN(sleft,nleft);
+      for( i=0; i<nmove; i++ )
+	buf[dev->bnc++] = *scur++;
+      ADIstrmFlushDev( dev, status );
+      nleft -= sleft;
+      sleft = dev->bufsiz;
+      }
+    }
+  }
+
+void ADIstrmPutCh( ADIobj stream, char ch, ADIstatus status )
+  {
+  if ( _ok(status) ) {
+    ADIstream	*pstr = _strm_data(stream);
+    ADIdevice	*dev = pstr->dev;
+
+    if ( dev->bnc == dev->bufsiz )
+      ADIstrmFlushDev( dev, status );
+    dev->buf[dev->bnc++] = ch;
     }
   }
 
 void ADIstrmPutStr( ADIobj stream, char *str, int slen, ADIstatus status )
   {
-  if ( _ok(status) ) {
-    int		i;
-    ADIstream	*pstr = _strm_data(stream);
-    char	*scur = str;
-
-    switch( pstr->dev->type ) {
-      case ADIdevFile:
-	if ( slen == _CSM )
-          fputs( str, pstr->dev->f );
-	else
-	  for( i=slen; i; i-- )
-	    fputc( *scur++, pstr->dev->f );
-	break;
-      }
-    }
+  if ( _ok(status) )
+    ADIstrmPutInt( _strm_data(stream)->dev, str, slen, status );
   }
 
 void ADIstrmPutStrI( ADIobj stream, ADIobj str, ADIstatus status )
   {
-  ADIstrmPutStr( stream, _str_dat(str), _str_len(str), status );
+  if ( _ok(status) )
+    ADIstrmPutInt( _strm_data(stream)->dev, _str_dat(str), _str_len(str), status );
   }
 
 
+/*
+ * 'printf' like formatting function. Supports the following formatting
+ * codes
+ *
+ *   %%		- the percent character
+ *   %d		- decimal integer
+ *   %c		- a single character
+ *   %s		- null terminated C string
+ *   %S		- an ADI string
+ *   \n		- new line
+ *   \t		- tab character
+ */
 void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
   {
   if ( _ok(status) ) {
     va_list	ap;
+    ADIobj	as_arg;
+    char	*cp_arg;
+    double	d_arg;
+    char	fc;
+    char	fct;
+    char	*fptr = format;
+    int		i_arg;
+    long	l_arg;
+    char	*lbegin = NULL;
+    char	lbuf[30];
+    int		nlit = 0;
     ADIstream	*pstr = _strm_data(stream);
+    ADIdevice	*dev = pstr->dev;
+    ADIstring	*sdata;
+    short	sh_arg;
+    void	*vp_arg;
 
 /* Start variable arg processing */
     va_start(ap,status);
 
-/* Switch on device type */
-    switch( pstr->dev->type ) {
-      case ADIdevFile:
-	vfprintf( pstr->dev->f, format, ap );
-	break;
+/* Loop over the format */
+    while ( *fptr ) {
+
+/* Extract the next format character */
+      fc = *fptr++;
+
+/* Formatting? */
+      if ( fc == '%' ) {
+
+/* Extract the next format character */
+	fct = *fptr++;
+
+/* Flush literal data to buffer */
+	if ( nlit ) {
+	  ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
+	  }
+
+/* Switch on the control character */
+	switch ( fct ) {
+	  case 's':
+	    cp_arg = va_arg(ap,char *);
+	    ADIstrmPutInt( dev, cp_arg, _CSM, status );
+	    break;
+	  case 'S':
+	    as_arg = va_arg(ap,ADIobj);
+	    sdata = _str_data(as_arg);
+	    if ( sdata->len )
+	      ADIstrmPutInt( dev, sdata->data, sdata->len, status );
+	    break;
+	  case 'd':
+	    i_arg = va_arg(ap,int);
+	    sprintf( lbuf, "%d", i_arg );
+	    ADIstrmPutInt( dev, lbuf, _CSM, status );
+	    break;
+	  case 'c':
+            sh_arg = va_arg(ap,short);
+	    fct = sh_arg;
+	    ADIstrmPutInt( dev, &fct, 1, status );
+	    break;
+	  case 'O':
+	    as_arg = va_arg(ap,ADIobj);
+	    adix_print( stream, as_arg, 1, ADI__true, status );
+	    break;
+	  case 'p':
+	    vp_arg = va_arg(ap,void *);
+	    sprintf( lbuf, "%p", vp_arg );
+	    ADIstrmPutInt( dev, lbuf, _CSM, status );
+	    break;
+	  case 'f':
+	    d_arg = va_arg(ap,double);
+	    sprintf( lbuf, "%f", d_arg );
+	    ADIstrmPutInt( dev, lbuf, _CSM, status );
+	    break;
+	  case '%':
+	    ADIstrmPutInt( dev, &fct, 1, status );
+	    break;
+	  }
 	}
+
+/* Special characters */
+      else if ( fc == '\\' ) {
+
+/* Flush literal data to buffer */
+	if ( nlit ) {
+	  ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
+	  }
+
+	}
+
+/* Otherwise literal */
+      else {
+	if ( ! nlit++ )
+	  lbegin = fptr - 1;
+	}
+      }
+
+/* Flush literal data */
+    if ( nlit ) {
+      ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
+      }
 
 /* End variable arg list processing */
     va_end(ap);
@@ -454,14 +612,20 @@ void ADIdropDeviceInt( ADIstream *str, ADIstatus status )
 
   if ( _ok(status) ) {
     if ( dev ) {
-      if ( dev->type == ADIdevFile )
+      if ( dev->type == ADIdevFile ) {
+	if ( dev->bufsiz ) {
+	  if ( dev->bnc )
+	    ADIstrmFlushDev( dev, status );
+	  ADImemFree( dev->buf, dev->bufsiz+1, status );
+	  }
 	if ( ! dev->pstatic )
 	  fclose( dev->f );
+	}
       else if ( dev->type == ADIdevCin )
-	adix_mem_free( dev->buf, dev->bufsiz, status );
+	ADImemFree( dev->buf, dev->bufsiz, status );
       str->dev = dev->last;
       if ( dev != &str->basedev )
-	adix_mem_free( dev->buf, sizeof(ADIdevice), status );
+	ADImemFree( dev->buf, sizeof(ADIdevice), status );
 /*      if ( str->dev )
 	ADInextToken( str, status ); */
       }
@@ -489,14 +653,12 @@ void ADIresetStream( ADIobj stream, ADIstatus status )
   }
 
 
-void ADIstrmDel( ADIobj stream, int nval, ADIstatus status )
+void ADIstrmDel( ADIobj stream, ADIstatus status )
   {
   ADIstream	*str = _strm_data(stream);
-  int		ival;
 
-  for( ival=0; ival<nval; ival++, str++ )
-    if ( str->dev )
-      ADIresetStreamInt( str, status );
+  if ( str->dev )
+    ADIresetStreamInt( str, status );
   }
 
 
@@ -537,7 +699,7 @@ ADIobj ADIstrmExtendCin( ADIobj stream, int bufsiz, ADIstatus status )
 
     ADIaddDeviceToStream( stream, ADIdevCin, status );
     str->dev->bufsiz = bufsiz;
-    str->dev->buf = (char *) adix_mem_alloc( (size_t) bufsiz, status );
+    str->dev->buf = (char *) ADImemAlloc( (size_t) bufsiz, status );
     str->dev->buf[0] = '\0';
     str->dev->ptr = str->dev->buf;
     }
@@ -555,6 +717,9 @@ ADIobj ADIstrmExtendFile( ADIobj stream, FILE *f, ADIstatus status )
 
     str->dev->f = f;
     str->dev->pstatic = ADI__true;
+    str->dev->buf = ADImemAlloc( FILEBUF, status );
+    str->dev->bufsiz = FILEBUF - 1;
+    str->dev->bnc = 0;
     }
 
   return stream;
@@ -678,14 +843,16 @@ ADItokenType ADIisTokenInSet( ADIobj stream, ADItokenType tlist[],
 			      ADIstatus status )
   {
   int                   it;
-  ADItokenType  rtype = TOK__NULL;
-  ADIstream	*str = _strm_data(stream);
+  ADItokenType  	ct;
+  ADItokenType  	rtype = TOK__NULL;
 
   if ( !_ok(status) )
     return rtype;                       /* Check status */
 
+  ct = ADIcurrentToken( stream );
+
   for ( it =0;
-	((tlist[it]!=TOK__TRAP) && (tlist[it]!=str->ctok.t)) ;
+	((tlist[it]!=TOK__TRAP) && (tlist[it]!=ct)) ;
 	it++ ) ;
 
   if ( tlist[it]==TOK__TRAP )

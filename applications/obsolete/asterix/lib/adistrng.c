@@ -66,13 +66,14 @@ char *strx_alloc( int len, ADIstatus status )
       curp = curp->link;
     }
 
-  if ( ! found )                        /* Didn't find space? */
-    {
-    curp = (StrStorePtr)                /* Allocate a new one */
-        adix_mem_alloc( sizeof(StrStore), status );
+/* No space found ? */
+  if ( ! found ) {
 
-    if ( curp )                         /* Allocated ok? */
-      {
+/* Allocate a new one */
+    curp = (StrStorePtr) ADImemAlloc( sizeof(StrStore), status );
+
+/* Allocated new block ok? */
+    if ( curp ) {
       curp->nfree = SS_CHARS;
       curp->nhit = 0;
       curp->link = NULL;
@@ -82,8 +83,8 @@ char *strx_alloc( int len, ADIstatus status )
       }
     }
 
-  if ( curp )                           /* We have a valid block now? */
-    {
+/* We have a valid block now? */
+  if ( curp ) {
     rval = curp->data + SS_CHARS - curp->nfree;
     curp->nfree -= len;
     curp->nhit++;
@@ -141,8 +142,8 @@ void strx_free( char *ptr, ADIstatus status )
           ss_insert = &ss_first;
         }
 
-      adix_mem_free( (char *) dblock,   /* Deallocate memory */
-          sizeof(StrStore), status );
+/* Deallocate memory */
+      ADImemFree( (char *) dblock, sizeof(StrStore), status );
       }
     }
   else
@@ -155,12 +156,10 @@ void strx_init( ADIstatus status )
   _chk_stat;
 
   adix_def_mcon( UT_ALLOC_c,            /* Install the string constructor */
-		 strx_newmta,
-		 status );
+		 strx_newmta, status );
 
   adix_def_destruc( UT_ALLOC_c,         /* Install the string destructor */
-		 strx_dstrc,
-		 status );
+		 strx_dstrc, status );
   }
 
 
@@ -290,6 +289,11 @@ int strx_cmpi( ADIobj str1, ADIobj str2 )
 		      _str_len(str2) );
   }
 
+int strx_cmpic( char *str1, int len1, ADIobj str2 )
+  {
+  return strx_cmpi2c( str1, len1, _str_dat(str2), _str_len(str2) );
+  }
+
 
 /* adix_str_hash - case sensitive string hash
  *
@@ -316,10 +320,9 @@ void strx_exit( ADIstatus status )
   {
   StrStorePtr   curp = ss_first,ncurp;
 
-  while ( curp )
-    {
+  while ( curp ) {
     ncurp = curp->link;
-    adix_mem_free( (char *) curp, sizeof(StrStore), status );
+    ADImemFree( (char *) curp, sizeof(StrStore), status );
     curp = ncurp;
     }
   }
@@ -390,14 +393,11 @@ void strx_newmta( ADIobj id, ADImtaPtr mta, ADIstatus status )
   }
 
 
-void strx_dstrc( ADIobj str, int nval, ADIstatus status )
+void strx_dstrc( ADIobj str, ADIstatus status )
   {
-  int                   i;
   ADIsegmentPtr         sptr = _seg_data(str);
 
-  for( i=0; i<nval; i++, sptr++ )
-    strx_free( sptr->data,
-               status );
+  strx_free( sptr->data, status );
   }
 
 

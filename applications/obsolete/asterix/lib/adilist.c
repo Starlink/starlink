@@ -53,7 +53,7 @@ void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
     ADIstrmPutCh( stream, '{', status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
-	adix_print( stream, _CAR(curp), ADI__true, status );
+	adix_print( stream, _CAR(curp), 1, ADI__true, status );
 
 	curp = _CDR(curp);
 	if ( _valid_q(curp) )
@@ -62,9 +62,9 @@ void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
       while ( _valid_q(curp) );
       }
     else {				/* It's a dotted pair */
-      adix_print( stream, _CAR(curp), ADI__true, status );
+      adix_print( stream, _CAR(curp), 1, ADI__true, status );
       ADIstrmPutCh( stream, '.', status );
-      adix_print( stream, _CDR(curp), ADI__true, status );
+      adix_print( stream, _CDR(curp), 1, ADI__true, status );
       }
     ADIstrmPutCh( stream, '}', status );
     }

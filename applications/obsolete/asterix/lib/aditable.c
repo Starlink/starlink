@@ -25,7 +25,7 @@ void tblx_prnt( ADIobj stream, ADIobj tbl, ADIstatus status )
 
   for( i=_tbl_htsize(tbl); i>0; i--, heads++ )
     if ( ! _null_q(*heads) )
-      adix_print( stream, *heads, ADI__true, status );
+      adix_print( stream, *heads, 1, ADI__true, status );
   }
 
 
