@@ -121,7 +121,15 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 \\let\\@Copyright\\@empty
 \\long\\def\\setCopyright#1{\\def\\@Copyright{#1}}
 \\let\\@Coverimage\\@empty
-\\long\\def\\setCoverimage#1{\\def\\@Coverimage{#1}}
+%\\long\\def\\setCoverimage#1{\\def\\@Coverimage{#1}}
+% \\setCoverimage* does not put the document in a minipage (use for images)
+\\def\\setCoverimage{\\@ifnextchar*\\@tempswatrue\\@tempswafalse
+    \\@dosetCoverimage}
+\\long\\def\\@dosetCoverimage#1{\\if@tempswa \\def\\@Coverimage{#1}\\else
+    \\def\\@Coverimage{\\@tempdima\\textwidth
+        \\multiply\\@tempdima 9 \\divide\\@tempdima 10
+        \\begin{minipage}{\\@tempdima}\\parskip=\\smallskipamount
+           \\parindent=0pt #1\\end{minipage}}\\fi}
 % Now create the title page
 \\newenvironment{FrontMatter}{\\renewcommand\\thepage{\\roman{page}}}
   {\\cleardoublepage
