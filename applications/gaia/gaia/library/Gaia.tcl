@@ -1297,6 +1297,10 @@ itcl::class gaia::Gaia {
             }
          }
       }
+      
+      #  Initialise any proxy server.
+      cat::AstroCat::check_proxies
+
       if { ! $native } {
          setup_starlink_env [file dirname [info nameofexecutable]]
       }
