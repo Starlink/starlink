@@ -119,6 +119,9 @@
 *     16-JAN-1998 (DSB):
 *        Declaration of RE, SENSL, SENSR, SENS2L and SENS2R changed from REAL 
 *        to DOUBLE PRECISION.
+*     11-MAY-1998 (DSB):
+*        Introduced lagging into the iterative estimation of the E factors
+*        to suppress instability in the process.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -171,6 +174,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      REAL LAG                   ! The E-factor lagging coefficient
+      PARAMETER ( LAG = 0.5 )
       
 *  Local Variables:
       INTEGER NWRK1, NWRK2, NWRK3, NWRK4
@@ -199,6 +205,7 @@
                                  ! scale and zero on final iteration.
 
       CHARACTER * ( 80 ) STRING  ! output information buffer
+      REAL EOLD
 *.
 
 * Check inherited global status.
@@ -321,20 +328,29 @@
             VE( IPAIR ) = SNGL( DSCALE ) ** 2
             ZEST( IPAIR ) = SNGL( ZERO )
             VZ( IPAIR ) = SNGL( DZERO ) ** 2
-            
+
+* Instabilty can occur in this iterative process, for instance causing E
+* values to oscillate between two values. This prevents convergence. To
+* overcome this, do not allow the E factor to change quickly. This is 
+* achieved by lagging the estimate of E found above with some faction of
+* the previous estimate. Also not the resulting change in E factor, and
+* save the estimate.
+            IF( ITER .GT. 0 ) THEN
+
+               EOLD = EEST( IPAIR ) * EMED
+               E = EOLD + LAG*( E - EOLD )
+
+               DE( IPAIR ) = ABS( E - EOLD )
+
+            ENDIF
+            EEST( IPAIR ) = E
+
 * Apply the E factor estimate.
 
             RE = 1.0D0 / DBLE( E )
             CALL CCG1_CMLTR( BAD, NEL, TI1( 1, IPAIR ), RE,
      :                       TI2( 1, IPAIR ), NERR, STATUS )
 
-* Calculate the change in this estimate of the E factor since the
-* previous estimate. Save the estimate.
-
-            IF ( ITER .GT. 0 ) THEN
-               DE( IPAIR ) = ABS( E - EEST( IPAIR ) * EMED )
-            ENDIF
-            EEST( IPAIR ) = E
          ENDDO
 
 * If an error has occurred then abort.
