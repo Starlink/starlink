@@ -99,6 +99,8 @@
 *  History:
 *     28-SEP-1999 (DSB):
 *        Original version.
+*     5-SEP-2000 (DSB):
+*        Replaced calls to KPG1_GHSTx/KPG1_HSTFx with KPG1_FRACx.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,18 +130,10 @@
 *  Status:
       INTEGER STATUS          ! Global status
 
-*  Local Constants:
-      INTEGER HISTSZ          ! Size of histogram used for percentiles
-      PARAMETER( HISTSZ = 2048 )
-
 *  Local Variables:
       CHARACTER PVALS( 3 )*20 ! Array of parameter values
-      INTEGER HIST( HISTSZ )  ! Array containing histogram
       INTEGER I               ! Loop count
       INTEGER IPW1            ! Pointer to work space
-      INTEGER MAXPOS          ! Position of the maximum (not used)
-      INTEGER MINPOS          ! Position of the minimum (not used)
-      INTEGER NINVAL          ! No. of bad values found
       INTEGER NLIM            ! No. of limits reqired.
       INTEGER NVAL            ! Number of parameter values supplied
       REAL DMAX               ! Max data value
@@ -148,6 +142,7 @@
       REAL FRAC( 2 )          ! Percentiles as fractions
       REAL MEAN               ! Mean of data values
       REAL PERVAL( 2 )        ! Data values at corresponding percentiles
+      REAL CLPVAL( 2 )        ! Clipped data values at percentiles
       REAL RANGE              ! Range of data values
       REAL S1                 ! Sum of data values
       REAL S2                 ! Sum of squared data values
@@ -279,20 +274,9 @@
             FRAC( 1 ) = V1*0.01
             FRAC( 2 ) = V2*0.01
 
-*  Obtain the maximum and minimum values to define the bounds of the 
-*  histogram.
-            CALL KPG1_MXMNR( .TRUE., N, %VAL( IPW1 ), NINVAL, DMAX, 
-     :                       DMIN, MAXPOS, MINPOS, STATUS )
-
-*  Generate the histogram between those bounds. The number of bad pixels 
-*  has been counted so it might be possible to save future processing.
-            CALL KPG1_GHSTR( ( NINVAL .EQ. 0 ), N, %VAL( IPW1 ), HISTSZ, 
-     :                       DMAX, DMIN, HIST, STATUS )
-
-*  Estimate the values at the percentiles. On exit, the values in FRAC
-*  are re-arranged into ascending order.
-            CALL KPG1_HSTFR( HISTSZ, HIST, DMAX, DMIN, 2, FRAC, PERVAL, 
-     :                    STATUS )
+*  Estimate the values at the percentiles. 
+            CALL KPG1_FRACR( N, %VAL( IPW1 ), 2, FRAC, .TRUE., CLPVAL,
+     :                       PERVAL, STATUS )
 
 *  Swap the percentiles back if they were flipped.
             IF ( V2 .LT. V1 ) THEN
