@@ -58,6 +58,7 @@
       CHARACTER*80             TEXT                    !
       CHARACTER*40             UNITS                   ! Background units
 
+      DOUBLE PRECISION		CELPOS(2)		! Source position
       DOUBLE PRECISION         FLEV(PSS__MXEL)         ! Flux error levels in %
       DOUBLE PRECISION         PLEV(PSS__MXEL)         ! Pos error levels in %
 
@@ -462,11 +463,11 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
           APOS(1) = S_CP(1,ID)
           APOS(2) = S_CP(2,ID)
           CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
-          S_RA(ID) = CELPOS(1)*RTOD
-          S_DEC(ID) = CELPOS(2)*RTOD
+          S_RA(ID) = CELPOS(1)*MATH__DRTOD
+          S_DEC(ID) = CELPOS(2)*MATH__DRTOD
         ELSE
-          S_RA(ID) = S_RA(ID)*RTOD
-          S_DEC(ID) = S_DEC(ID)*RTOD
+          S_RA(ID) = S_RA(ID)*MATH__DRTOD
+          S_DEC(ID) = S_DEC(ID)*MATH__DRTOD
         END IF
 
       END DO
@@ -1150,8 +1151,8 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Find celestial coordinates
  65     IF ( IFILE .EQ. 1 ) THEN
-          S_RA(ID) = S_RA(ID)*RTOD
-          S_DEC(ID) = S_DEC(ID)*RTOD
+          S_RA(ID) = S_RA(ID)*MATH__RTOD
+          S_DEC(ID) = S_DEC(ID)*MATH__RTOD
         END IF
 
       END DO

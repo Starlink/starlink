@@ -416,12 +416,12 @@
           IF ( ASYMM ) THEN
             XERR = (S_XERR(1,ILEV,ID) + S_XERR(2,ILEV,ID))/2.0
             YERR = (S_YERR(1,ILEV,ID) + S_YERR(2,ILEV,ID))/2.0
-            S_PERR(ILEV,ID) = SQRT(XERR**2+YERR**2)*RTOD*60.0
+            S_PERR(ILEV,ID) = SQRT(XERR**2+YERR**2)*MATH__DRTOD*60.0
 
 *        Average the errors
           ELSE
             S_PERR(ILEV,ID) = SQRT(S_XERR(1,ILEV,ID)**2 +
-     :                             S_YERR(1,ILEV,ID)**2)*RTOD*60.0
+     :                     S_YERR(1,ILEV,ID)**2)*MATH__DRTOD*60.0
           END IF
 
         END IF
