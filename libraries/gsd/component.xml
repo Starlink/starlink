@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="gsd">
+  <version>1.0-1</version>
+  <path>libraries/gsd</path>
+  <description>Global Section Datafile (GSD) access library</description>
+  <abstract><p>This library provides read-only access to GSD files created at the James Clerk Maxwell Telescope. It is mainly useful for accessing JCMT archive data.
+    </p></abstract>
+  <dependencies >
+    <build>prm</build><build>cnf</build><link>prm</link><link>cnf</link><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Remo P J Tilanus</name>
+      <uname>rpt</uname>
+    </person>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>Jon Fairclough</name>
+      <uname>jhf</uname>
+    </person>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+    </person>
+    <person>
+      <name>Rachel Padman</name>
+      <uname>rp</uname>
+    </person>
+  </developers>
+  <documentation> sun229</documentation>
+  <bugreports>t.jenness@jach.hawaii.edu</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

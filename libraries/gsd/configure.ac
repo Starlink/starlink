@@ -18,6 +18,7 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
+AC_C_BIGENDIAN
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
@@ -30,6 +31,9 @@ dnl    Documentation is in the parent directory
 STAR_LATEX_DOCUMENTATION(sun229)
 
 dnl    There is no .msg file in this directory. 
+
+dnl   Header checks. 
+AM_CONFIG_HEADER(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

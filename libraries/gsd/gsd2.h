@@ -48,6 +48,10 @@
  *-
  */
 
+/* System specfic defines */
+#include <config.h>
+
+/* General gsd definitions */
 #include "gsd1.h"
 
 
@@ -71,13 +75,23 @@
 #define  IEEE      1            /* IEEE floating point format */
 #define  IEEEBS    2            /* IEEE floating point format byte swapped */
 
+/* Since I have not worked out how configure will tell me the form
+   of floating point numbers (real and double) assume IEEE */
+
 static const int host_order[GSD_NTYPES] =
+#ifdef WORDS_BIGENDIAN
+ { BIGEND, BIGEND, BIGEND, BIGEND, IEEE, IEEE, 0 };
+#else
+   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, IEEEBS, IEEEBS, 0 };
+#endif
+
+/* These are the old way of doing things */
 /* sun4_Solaris.
  * sun4.
  { BIGEND, BIGEND, BIGEND, BIGEND, IEEE, IEEE, 0 }; */
 /* alpha_OSF1.
-   ix86_Linux */
-   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, IEEEBS, IEEEBS, 0 };
+   ix86_Linux
+   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, IEEEBS, IEEEBS, 0 }; */
 /* vax.
    { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, VAXF, VAXF, 0 }; */
 

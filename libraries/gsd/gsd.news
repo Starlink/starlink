@@ -1,3 +1,8 @@
+GSD Version 1.0-1                           9 March 2004
+
+  Switch build system to GNU configure
+
+
 GSD Version 1.0 released
 
 This is the first standalone release of the GSD library.
