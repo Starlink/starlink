@@ -163,7 +163,13 @@ proc cred4Display {} {
     global dwidgetlist
     set dwidgetlist [list $ifliptop $ofliptop $gfliptop $sfliptop]
     trace variable Cred4Widgets(DTYPE) w "CNewDisplayType $flip"
-    set Cred4Widgets(DTYPE) "NONE"
+
+# If NONE< default to OBS otherwise re-write same value so trace will work
+    if {$Cred4Widgets(DTYPE) == "NONE"} { 
+      set Cred4Widgets(DTYPE) "OBS"
+    } else {
+      set Cred4Widgets(DTYPE) $Cred4Widgets(DTYPE)
+    }
 
 # Display the widget
     set bv [dialogShow .cred4Dialogue .cred4Dialogue]
@@ -177,7 +183,7 @@ proc cred4Display {} {
           nbs put ${Cred4NoticeBoard}.display.int_p$ifr NO
         } else {
           set istring [string toupper [string trim [$Cred4Widgets(DIS_IP$ifr) get]]]
-          if {$istring == "" || $istring == "OVERGRAPH CUT=X SPOS= EPOS= COLOUR="} {
+          if {$istring == "" || $istring == "OVERGRAPH PORT= CUT=X SPOS= EPOS= COLOUR="} {
             nbs put ${Cred4NoticeBoard}.display.int_p$ifr YES
           } else {
             nbs put ${Cred4NoticeBoard}.display.int_p$ifr $istring
@@ -193,7 +199,7 @@ proc cred4Display {} {
           nbs put ${Cred4NoticeBoard}.display.obs_p$ofr NO
         } else {
           set ostring [string toupper [string trim [$Cred4Widgets(DIS_OP$ofr) get]]]
-          if {$ostring == "" || $ostring == "OVERGRAPH CUT=X SPOS= EPOS= COLOUR="} {
+          if {$ostring == "" || $ostring == "OVERGRAPH PORT= CUT=X SPOS= EPOS= COLOUR="} {
             nbs put ${Cred4NoticeBoard}.display.obs_p$ofr YES
           } else {
             nbs put ${Cred4NoticeBoard}.display.obs_p$ofr $ostring
@@ -209,7 +215,7 @@ proc cred4Display {} {
           nbs put ${Cred4NoticeBoard}.display.grp_p$gfr NO
         } else {
           set gstring [string toupper [string trim [$Cred4Widgets(DIS_GP$gfr) get]]]
-          if {$gstring == "" || $gstring == "OVERGRAPH CUT=X SPOS= EPOS= COLOUR="} {
+          if {$gstring == "" || $gstring == "OVERGRAPH PORT= CUT=X SPOS= EPOS= COLOUR="} {
             nbs put ${Cred4NoticeBoard}.display.grp_p$gfr YES
           } else {
             nbs put ${Cred4NoticeBoard}.display.grp_p$gfr $gstring
@@ -225,7 +231,7 @@ proc cred4Display {} {
           nbs put ${Cred4NoticeBoard}.display.spc_p$sfr NO
         } else {
           set sstring [string toupper [string trim [$Cred4Widgets(DIS_SP$sfr) get]]]
-          if {$sstring == "" || $sstring == "OVERGRAPH CUT=X SPOS= EPOS= COLOUR="} {
+          if {$sstring == "" || $sstring == "OVERGRAPH PORT= CUT=X SPOS= EPOS= COLOUR="} {
             nbs put ${Cred4NoticeBoard}.display.spc_p$sfr YES
           } else {
             nbs put ${Cred4NoticeBoard}.display.spc_p$sfr $sstring
@@ -235,7 +241,8 @@ proc cred4Display {} {
       }
     }
 
-# Remove the dialog box
+# Remove the trace and dialogue box
+    trace vdelete Cred4Widgets(DTYPE) w "CNewDisplayType $flip"
     cgs4drCursor arrow green black
     destroy .cred4Dialogue
 }
