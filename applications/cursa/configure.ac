@@ -26,6 +26,7 @@ STAR_CHECK_PROGS([awish])
 STAR_CHECK_PROGS([atclsh])
 
 AC_CHECK_FUNCS([inet_ntop inet_pton])
+AC_CHECK_FUNCS([memset bzero])
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp])

@@ -50,10 +50,10 @@ typedef int logical;
 
 void     ErrorMsg(char *);
 int GetHostAndPage (int status,  char *queryUrl,  char *queryHost,
-		    int *queryPort, char *queryPage);
+		    int *queryPort, char *queryPage, int bufsize);
 int GetHostNumber (int status,  char *queryHost, char *hostNumber);
-int RetrieveUrl (int status,  char *hostNumber,  int queryPort,
-		 char *queryPage, logical echoHttpHead);
+int RetrieveUrl (int status,  const char *hostNumber,  int queryPort,
+		 const char *queryPage, logical echoHttpHead);
 
 /* In general most modern systems will have these functions */
 #if !HAVE_INET_NTOP
@@ -135,6 +135,8 @@ int      queryPort;        /* Port number.  */
 
 logical  echoHttpHead;     /* Flag; echo the HTTP header?  */
 
+size_t   maxcp;            /* Max number of chars to copy */
+
 /*.  */
 
 
@@ -162,14 +164,15 @@ logical  echoHttpHead;     /* Flag; echo the HTTP header?  */
 
 /*    Copy the first command-line argument to a local string.  */
 
-       strcpy(queryUrl, argv[1]);
-
+       strncpy(queryUrl, argv[1],BUFFER_SIZE - 1);
+       queryUrl[BUFFER_SIZE-1] = '\0';
 
 /*    Obtain the host and Web page (+query) parts of the URL and proceed  */
 /*    if all is ok.  */
 
        status = GetHostAndPage(status, queryUrl, queryHost, &queryPort,
-         queryPage);
+         queryPage, BUFFER_SIZE);
+
        if (status == 0)
        {
 
@@ -177,7 +180,6 @@ logical  echoHttpHead;     /* Flag; echo the HTTP header?  */
 /*       Translate the host name into the corresponding number.  */
 
           status = GetHostNumber(status, queryHost, hostNumber);
-
 
 /*       Retrieve the URL.  */
 
@@ -189,8 +191,11 @@ logical  echoHttpHead;     /* Flag; echo the HTTP header?  */
 /*    Report any error.  */
 
        if (status != 0)
-       {  strcpy(errorText, "unable to retrieve URL ");
-          strcat(errorText, queryUrl);
+       {
+          strcpy(errorText, "unable to retrieve URL ");
+          maxcp = BUFFER_SIZE - 1 - strlen( errorText );
+          strncat(errorText, queryUrl, maxcp);
+	  errorText[BUFFER_SIZE-1] = '\0';
           ErrorMsg(errorText);
 	  return EXIT_FAILURE;
        }
@@ -278,7 +283,7 @@ char errnoText[80];    /* Text for translated errno code.  */
 
 
 int GetHostAndPage (int status,  char *queryUrl,  char *queryHost,
-int *queryPort, char *queryPage)
+int *queryPort, char *queryPage, int bufsize)
 {
 /*+  */
 /*  Name:  */
@@ -300,6 +305,8 @@ int *queryPort, char *queryPage)
 /*        Pointer to the port number.  */
 /*     char *queryPage  (RETURNED)  */
 /*        Pointer to the Web page (+ query).  */
+/*     int bufsize (GIVEN) */
+/*        Size of string arrays to be filled */
 /*  Algorithm:  */
 /*     If the first 7 characters are 'http://' then  */
 /*       Extract the URL beyond the 'http://'.  */
@@ -341,11 +348,12 @@ char   *query;       /* Pointer to the URL (without the leading 'http://').  */
 char   *strokestr;   /* Pointer to the first '/' in the URL.  */
 char   *colonstr;    /* Pointer to the first ':' in the URL.  */
 
-char   hostAndPort[500]; /* Buffer for the host and port string.  */
+char   hostAndPort[BUFFER_SIZE]; /* Buffer for the host and port string.  */
 char   charPort[10];     /* Buffer for the port number as a string.  */
-char   errorBuff[80];    /* Buffer for error message.  */
+char   errorBuff[BUFFER_SIZE];    /* Buffer for error message.  */
 
 size_t hostLen;      /* Length of the host name.  */
+size_t maxcp;        /* Max number of chars to copy */
 
 int port;            /* Port number.  */
 /*.  */
@@ -382,16 +390,23 @@ int port;            /* Port number.  */
 
             hostLen = strokestr - query;
 
+	    if (hostLen > bufsize ) {
+	      ErrorMsg( "Length of URL exceeded buffer size\n" );
+	      return 1;
+	    }
+
             strncpy(hostAndPort, query, hostLen);
             hostAndPort[hostLen] = '\0';
 
 
 /*         Extract the Web page (+ query).  */
 
-            strcpy(queryPage, strokestr);
+            strncpy(queryPage, strokestr, bufsize-1);
+	    queryPage[bufsize-1] = '\0';
          }
          else
-         {  strcpy(hostAndPort, query);
+         {  strncpy(hostAndPort, query, BUFFER_SIZE - 1);
+            hostAndPort[BUFFER_SIZE -1 ] = '\0';
             strcpy(queryPage, "/");
          }
 
@@ -410,6 +425,11 @@ int port;            /* Port number.  */
 
             hostLen = colonstr - hostAndPort;
 
+	    if (hostLen > bufsize ) {
+	      ErrorMsg( "Length of URL exceeded buffer size\n" );
+	      return 1;
+	    }
+
             strncpy(queryHost, hostAndPort, hostLen);
             queryHost[hostLen] = '\0';
 
@@ -418,11 +438,15 @@ int port;            /* Port number.  */
 
             colonstr = colonstr + 1;
 
-            strcpy(charPort, colonstr);
+            strncpy(charPort, colonstr, bufsize-1);
+	    charPort[bufsize-1] = '\0';
+
             sscanf(charPort, "%d", &port);
          }
          else
-         {  strcpy(queryHost, hostAndPort);
+         {  
+            strncpy(queryHost, hostAndPort, bufsize-1);
+	    queryHost[bufsize-1] = '\0';
             port = 80;
          }
 
@@ -437,12 +461,12 @@ int port;            /* Port number.  */
 
       if (status != 0)
       {  strcpy(errorBuff, "bad URL: ");
-         strcat(errorBuff, queryUrl);
-
+         maxcp = BUFFER_SIZE - 1 - strlen( errorBuff );
+         strncat(errorBuff, queryUrl, maxcp);
+         errorBuff[BUFFER_SIZE-1] = '\0';
          ErrorMsg(errorBuff);
-      }
-   }
-
+      } 
+  }
 
 /*Set the return status.  */
 
@@ -498,11 +522,26 @@ char   errorBuff[80];             /* Buffer for error message.  */
 /*.  */
 
    if (status == 0)
-   {  hptr = gethostbyname(queryHost);
+   {  
+     /* if the host name is greater than 100 characters we probably 
+	have a problem. Need to do this since on linux gethostbyname
+	core dumps if we pass in a large string. Do not know what the
+	maximum length should be.
+     */
+     if (strlen(queryHost) > 100 ) {
+       status = 1;
+       strcpy(errorBuff, "host name seems to be unreasonably large: ");
+       strncat(errorBuff, queryHost, 80 - 1 - strlen(errorBuff));
+       errorBuff[80] = '\0';
+       ErrorMsg(errorBuff);
+       return status;
+     }
+
+      hptr = gethostbyname(queryHost);
       if (errno == 0)
       {  addlptr = hptr->h_addr_list;
          inet_ntop(AF_INET, *addlptr, numBuff, sizeof(numBuff));
-         strcpy(hostNumber, numBuff);
+         strncpy(hostNumber, numBuff, sizeof(numBuff) );
          hostNumber[strlen(numBuff)] = '\0';
       }
 
@@ -510,8 +549,8 @@ char   errorBuff[80];             /* Buffer for error message.  */
       {  status = 1;
 
          strcpy(errorBuff, "unable to translate host name ");
-         strcat(errorBuff, queryHost);
-
+         strncat(errorBuff, queryHost, 80 - 1 - strlen(errorBuff));
+	 errorBuff[80] = '\0';
          ErrorReport(errorBuff);
       }
    }
@@ -689,8 +728,8 @@ int     start;      /* First character to be listed (after skipped header).  */
 /* ----------------------------------------------------------   */
 
 
-int RetrieveUrl (int status,  char *hostNumber,  int queryPort,
-  char *queryPage, logical echoHttpHead)
+int RetrieveUrl (int status,  const char *hostNumber,  int queryPort,
+  const char *queryPage, logical echoHttpHead)
 {
 /*+  */
 /*  Name:  */
@@ -758,7 +797,7 @@ int    sockfd;                    /* Socket descriptor.  */
 
 struct sockaddr_in   servaddr;    /* Server details structure.  */
 
-char   httpBuffer[1000];          /* Buffer for HTTP GET string.  */
+char   httpBuffer[BUFFER_SIZE];   /* Buffer for HTTP GET string.  */
 char   errorBuff[80];             /* Buffer for error message.  */
 /*.  */
 
@@ -775,7 +814,13 @@ char   errorBuff[80];             /* Buffer for error message.  */
 
 /*      Assemble the structure containing the server details.  */
 
+#if HAVE_MEMSET
+ 	 memset(&servaddr, 0, sizeof(servaddr));
+#elif HAVE_BZERO
          bzero(&servaddr, sizeof(servaddr));
+#else
+#  error "Do not know how to set memory to fixed value"
+#endif
 
          servaddr.sin_family = AF_INET;
          servaddr.sin_port   = htons(queryPort);
@@ -799,14 +844,25 @@ char   errorBuff[80];             /* Buffer for error message.  */
 /*            Assemble the HTTP request to GET the contents of the   */
 /*            Web page.  */
 
+	      /* Abort if we do not think we can do this without a 
+		 buffer overflow. Be safe rather than accurate
+		 since being accurate will be ugly for now.
+	      */
+	      /* Assume rest of header is < 100 characters */
+	      if ((strlen(queryPage)+100) > BUFFER_SIZE -1 ) {
+		 status = 1;
+		 ErrorMsg("Buffer overflow forming http request!\n");
+		 return status;
+	      }
+
                strcpy(httpBuffer, "GET ");
                strcat(httpBuffer, queryPage);
                strcat(httpBuffer, " HTTP/1.0\n");
-
+ 
                strcat(httpBuffer, "Accept: text/plain\n");
                strcat(httpBuffer, "Accept: text/html\n");
                strcat(httpBuffer, "User-Agent: geturl\n\n");
-
+	      
 /*               printf("httpBuffer: %s", httpBuffer);  */
 
 
