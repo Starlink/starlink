@@ -9,6 +9,11 @@
 #include "config.h"
 #endif
 
+// Put the entire module inside #if ENABLE_KPATHSEA.
+// We _shouldn't_ be compiling this is that's false, but we obviously are,
+// if we get here, so make it a no-op.
+#if ENABLE_KPATHSEA
+
 #define NULL 0
 #include <iostream>		// for cerr
 
@@ -20,7 +25,6 @@
 
 #include "kpathsea.h"
 
-#if ENABLE_KPATHSEA
 // The Kpathsea library interface has to be isolated in this class because the
 // kpathsea headers typedef a `string' type, which conflicts with C++ string.
 // It would be more appropriate to put this into a namespace, but egcs
@@ -42,7 +46,6 @@ extern "C" {
 }
 #undef STDC_HEADERS
 #undef HAVE_PROTOTYPES
-#endif
 
 
 bool kpathsea::initialised_ = false;
@@ -50,14 +53,14 @@ verbosities kpathsea::verbosity_ = normal;
 
 void kpathsea::init (const char *program_name, const int basedpi)
 {
-    if (initialised_ && verbosity_ > silent)
+    if (initialised_ && verbosity_ > quiet)
 	cerr << "Warning: kpathsea doubly initialised.  Ignored\n";
 #ifdef DEFAULT_TEXMFCNF
     // if the TEXMFCNF variable isn't set in the environment, set it to this
     char *texmfcnf = getenv ("TEXMFCNF");
     if (texmfcnf == NULL)
     {
-	if (setenv ("TEXMFCNF", DEFAULT_TEXMFCNF, 1))
+	if (setenv ("TEXMFCNF", DEFAULT_TEXMFCNF, 1) && verbosity_ > quiet)
 	    cerr << "Warning: couldn't set TEXMFCNF\n";
     }
     else
@@ -96,7 +99,7 @@ const char *kpathsea::find (const char *fontname, int resolution)
 {
     if (! initialised_ && verbosity_ > silent)
     {
-	cerr << "Warning: kpathsea not initialised\n";
+	cerr << "Error: kpathsea not initialised\n";
 	return 0;
     }
 
@@ -125,3 +128,4 @@ void kpathsea::verbosity (const verbosities level)
 
 
 
+#endif // if ENABLE_KPATHSEA
