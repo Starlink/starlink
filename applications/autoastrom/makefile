@@ -1041,6 +1041,7 @@ unbuild: clean
 	cd astrom && ./mk unbuild
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd catlib && if test -f Makefile; then make distclean; fi
+	test ! -d catlib-install || rm -Rf catlib-install
 	cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
@@ -1075,32 +1076,38 @@ sun242.xml: doc/sun242.xml
 moggy/moggy: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a
 	cd moggy && unset INSTALL; make
 
-moggy/Makefile: moggy
+moggy/Makefile: moggy/Makefile.in
 	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
 	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd moggy && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --with-catlib=$$INST
 
 #  Build and install the SkyCat cat library.  We install it into the
-#  directory $(CATLIBINSTALLDIR), which moggy knows about.  We have to 
-#  create the installation directories `by hand', since the catlib
+#  directory $(CATLIBINSTALLDIR), which moggy knows about.
+$(CATLIBINSTALLDIR)/lib/libcat.a: $(CATLIBINSTALLDIR) catlib/Makefile
+	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
+	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
+
+#  Target to configure catlib
+catlib/Makefile: $(CATLIBINSTALLDIR)
+	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --prefix=$$INST --with-notcl
+
+#  We have to create the installation directories `by hand', since the catlib
 #  installation script is a bit stupid.
-$(CATLIBINSTALLDIR)/lib/libcat.a:
+#  $(CATLIBINSTALLDIR) directory is proxy for all directories under it
+$(CATLIBINSTALLDIR):
 	test -d $(CATLIBINSTALLDIR) || mkdir $(CATLIBINSTALLDIR)
 	for dir in include lib man man/man3; \
 	do \
 		test -d $(CATLIBINSTALLDIR)/$$dir || \
 			mkdir $(CATLIBINSTALLDIR)/$$dir; \
 	done
-	INST=`cd $(CATLIBINSTALLDIR);pwd`; cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) ./configure --prefix=$$INST --with-notcl
-	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make
-	cd catlib && unset INSTALL; CXX=$(CXX) CC=$(CC) make install
 
-astrom/astrom.x: astrom
+astrom/astrom.x: astrom/astrom.f
 	cd astrom && ./mk build
 
 #  Unpack the source tarball.  The extra test is because the makefile
 #  (always/sometimes?) wants to execute this twice.  Things get
 #  circular if this depends explicitly on the source tarball
-moggy astrom:
+moggy/Makefile.in astrom/astrom.f:
 	if test ! -f $(PKG_NAME)_source.tar; then \
 		echo "Eh!? Don't have source, and don't have source tarball"; \
 		exit 1; \
