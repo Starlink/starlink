@@ -1,0 +1,13 @@
+.deps
+irc_test
+*.ifc
+*.la
+libtool
+.libs
+Makefile
+Makefile.in
+autom4te.cache
+configure
+config.*
+*.lo
+*.m4
