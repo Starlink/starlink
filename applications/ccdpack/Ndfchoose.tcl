@@ -380,23 +380,41 @@
             error "Invalid index argument \"$index\" to ndfplotwindow"
          }
 
+#  Ensure that the corresponding info window exists (certain widgets
+#  on this are interrogated to do the display).
+            ndfinfowindow $index
+
+#  Get characteristics of the plot.
+            set width [ lindex $viewport 0 ]
+            set height [ lindex $viewport 1 ]
+            if { $isndf } {
+               set percs [ percentiles $index ]
+               set scalevals [ $ndf percentile [ lindex $percs 0 ] \
+                                            [ lindex $percs 1 ] ]
+            } else {
+               set scalevals 0
+               set style 0
+            }
+
+#  Check whether the window exists and is out of date.  If so, destroy
+#  it preparatory to generating a new one.
+         if { [ array names itk_component plot$index ] != "" && \
+              ( $plotted($index,width) != $width || \
+                $plotted($index,height) != $height || \
+                $plotted($index,scalevals) != $scalevals || \
+                $plotted($index,displaystyle) != $displaystyle ) } {
+            destroy $itk_component(plot$index)
+            unset itk_component(plot$index)
+         }
+
 #  Check whether the window already exists.  If it does, all we need
 #  to do is return the name.
          if { [ array names itk_component plot$index ] == "" } {
 
 #  The window does not currently exist; we need to create and fill it.
-
-#  First ensure that the corresponding info window exists (certain widgets
-#  on this are interrogated to do the display).
-         ndfinfowindow $index
-
 #  Create the containing frame.
             container plot$index $itk_component(choosearea) \
                       [ expr "{$index}" == "{1}" ]
-
-#  Get the dimensions of the windows in which NDFs are to be displayed.
-            set width [ lindex $viewport 0 ]
-            set height [ lindex $viewport 1 ]
 
 #  Create the GWM widget.
             if { $isndf } {
@@ -407,10 +425,8 @@
                       -height $height \
                       -name $gwmname
                }
+
 #  Plot the NDF inside the GWM.
-               set percs [ percentiles $index ]
-               set scalevals [ $ndf percentile [ lindex $percs 0 ] \
-                                               [ lindex $percs 1 ] ]
                set devname "xw;$gwmname"
                taskrun lutable \
                   "coltab=grey mapping=linear device=$devname reset"
@@ -451,6 +467,13 @@
                   -side $side -anchor n -expand 1 -fill both
             }
             pack $itk_component(plot$index:display) -expand 1 -fill both
+
+#  Store characteristics of this plot so that we know whether subsequent 
+#  plot requests are out of date.
+            set plotted($index,width) $width
+            set plotted($index,height) $height
+            set plotted($index,scalevals) $scalevals
+            set plotted($index,displaystyle) $displaystyle
          }
 
 #  Return the name of the window.
@@ -477,6 +500,23 @@
             error "Invalid index argument \"$index\" to ndfinfowindow"
          }
 
+#  Get characteristics of the info window (only values which might change,
+#  so fundamentals of the NDF are not necessary here).
+         if { $isndf } {
+            set domain [ $ndf frameatt domain CURRENT ]
+         } else {
+            set domain ""
+         }
+
+#  Check whether the window exists and is out of date.  If so, destroy
+#  it preparatory to generating a new one.
+         if { [ array names itk_component info$index ] != "" && \
+              ( $noted($index,domain) != $domain || \
+                $noted($index,showfits) != $showfits ) } {
+            destroy $itk_component(info$index)
+            unset itk_component(info$index)
+         }
+
 #  Check whether the window already exists.  If it does not, all we need
 #  to do is return the name.
          if { [ array names itk_component info$index ] == "" } {
@@ -491,10 +531,8 @@
             set dims ""
             set name ""
             set val ""
-            set domain ""
             if { $isndf } { 
                set name [ $ndf name ]
-               set domain [ $ndf frameatt domain CURRENT ]
                foreach dim [ $ndf bounds ] {
                   append dims "[ lindex $dim 0 ]:[ lindex $dim 1 ] x "
                }
@@ -515,7 +553,7 @@
                      $itk_component(info$index:key_percentile) childsite ].val \
                      -allowcustom 1 \
                      -value $percentiles \
-                     -command [ code $this refreshplot $index ]
+                     -command [ code $this refresh $index ]
                }
                set percentilecontrol($index) \
                   $itk_component(info$index:val_percentile)
@@ -560,6 +598,12 @@
 #  Pack and align the labeled widgets.
             eval pack $lws -side top -anchor w
             eval iwidgets::Labeledwidget::alignlabels $lws
+
+
+#  Store characteristics of this info window so that we know whether 
+#  subsequent info window requests are out of date.
+            set noted($index,domain) $domain
+            set noted($index,showfits) $showfits
          }
 
 #  Return the name of the window.
@@ -568,39 +612,10 @@
 
 
 #-----------------------------------------------------------------------
-      private method refreshinfo { index } {
+      private method refresh { index } {
 #-----------------------------------------------------------------------
-         if { $index == "all" } {
-            set pattern {info[0-9AB]*}
-         } else {
-            set pattern "info${index}*"
-         }
-         foreach comp [ array names itk_component $pattern ] {
-            destroy $itk_component($comp)
-            unset itk_component($comp)
-         }
-         foreach slot { A B } {
-            if { $inview($slot) == $slot } {
-               ndfselect $slot 0
-            } else {
-               ndfselect $slot $inview($slot)
-            }
-         }
-      }
-
-
-#-----------------------------------------------------------------------
-      private method refreshplot { index } {
-#-----------------------------------------------------------------------
-         if { $index == "all" } {
-            set pattern {plot[0-9AB]*}
-         } else {
-            set pattern "plot${index}*"
-         }
-         foreach comp [ array names itk_component $pattern ] {
-            destroy $itk_component($comp)
-            unset itk_component($comp)
-         }
+#  Should be called if some of the displayed (selected) plot or info
+#  windows may have become out of date.
          foreach slot { A B } {
             if { $inview($slot) == $slot } {
                ndfselect $slot 0
@@ -741,7 +756,7 @@
          }
 
 #  Cause the display to be updated.
-         refreshinfo all
+         refresh all
       }
 
 
@@ -764,7 +779,7 @@
                    -width [ lindex $viewport 0 ] -height [ lindex $viewport 1 ]
             }
             if { $state == "active" } {
-               refreshplot all
+               refresh all
             }
          }
          set lastvp $viewport
@@ -780,7 +795,7 @@
 #-----------------------------------------------------------------------
       public variable displaystyle { } {
 #-----------------------------------------------------------------------
-         refreshplot all
+         refresh all
       }
 
 
@@ -798,10 +813,12 @@
       private variable allfits         ;# List of available FITS header lines
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed NDFs
+      private variable noted           ;# Array containing info characteristics
       private variable lastvp { 0 0 }  ;# Last value of viewport variable
       private variable nndf            ;# Number of NDFs under chooser control
       private variable ndflist         ;# List of ndf objects
       private variable percentilecontrol;# Perc control widgets for each NDF
+      private variable plotted         ;# Array containing plot characteristics
       private variable showfits {}     ;# FITS headers to display for each NDF 
 
    }
