@@ -29,7 +29,9 @@ import java.nio.*;
  * @version $Id$
  */
 
-public class GSDVAXBytes {
+// Note that this class should only be visible in the gsd package
+// and is not part of the public API.
+class GSDVAXBytes {
 
     // These constants specify the sizes of the fundamental data types
     // as seen from the VAX side
@@ -63,6 +65,12 @@ public class GSDVAXBytes {
      * a VAX double precision floating point number.
      */
     public static final int VAX__SZDOUBLE  = 8;
+
+    // Have a private constructor since this class does not export
+    // any instance methods
+    private GSDVAXBytes() {
+	// empty
+    }
 
     /**
      * Convert 4 bytes in VAX floating point format to a Java float.
