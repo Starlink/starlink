@@ -48,7 +48,7 @@ if (-e ${out}.sdf) then
    linplot $out mode=2 symcol=white device=xwindows
 
    # Now overlay the model 
-   linplot ${out}_m mode=line lincol=red device=xwindows noclear ordlab="''"
+   linplot ${out}_m mode=line lincol=red device=xwindows noclear ordlab="''" pltitl="''"
 
 endif
 
@@ -105,6 +105,9 @@ exit
 *  History:
 *    1997 June 20 (TIMJ):
 *       Original version
+*    1997 July 7 (TIMJ):
+*       Make sure that the plot title from the second plot does not get in
+*       in the way.
 *     {enter_further_changes_here}
 *
 *  Bugs:
