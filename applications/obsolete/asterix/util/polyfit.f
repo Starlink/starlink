@@ -148,6 +148,7 @@
       CHARACTER*12              NAME
 
       REAL                      PARAM(12)
+      REAL			SPARR(2)
 
       INTEGER                AXPTR           ! Pointers to mapped axis values
       INTEGER                BLEN            ! No. of fits to be performed
@@ -160,9 +161,8 @@
       INTEGER                NDAT            ! Total number of data points
       INTEGER                NDEG            ! Degree of polynomial fitted
       INTEGER                NDIM            ! Dimensionality of data
-      INTEGER                NVAL            ! Number of values mapped
       INTEGER			OFID			! Input dataset id
-      INTEGER                QPTR            ! Pointer to data quality
+      INTEGER                	QPTR            	! Pointer to data quality
       INTEGER                   VPTR                    ! Pointer to data variances
       INTEGER                WTPTR           ! Data weights (=1/variance**2)
 

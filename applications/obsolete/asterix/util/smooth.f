@@ -788,9 +788,9 @@
 	    END IF
 
 *        Fill out start with first value and end with last value
-            CALL SMOOTH_SETENDS(EMETH, START1, END1, START2, END2,
-     :                   START_DATA, END_DATA, START_ERR, END_ERR,
-     :                   NWORK, LM2, LDIM, QBUF, ABUF, EBUF)
+            CALL SMOOTH_SETENDS( EMETH, START1, END1, START2, END2,
+     :                    START_DATA, END_DATA, START_ERR, END_ERR,
+     :                 NWORK, LM2, LDIM, QBUF, ABUF, EBUF, STATUS )
 
 *        Do the crosscorrelation
 	    CALL SMOOTH_CORR(ABUF(1-(LM2-1)),RMASK,LMASK,LDIM,RES)
