@@ -16,3 +16,6 @@ libtool
 starconf.m4
 starconf.status
 starconf.status.local
+datacube_demo.csh
+datacube_test.csh
+version.dat

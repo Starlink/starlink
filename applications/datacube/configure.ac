@@ -32,7 +32,7 @@ AC_CHECK_LIB(cc_dynamic, restFP)
 dnl dependances on starlink packages, depends on kappa, figaro and convert
 dnl for the scripts in th epacage to work, so may as well declare them as
 dnl dependancies for build.
-STAR_DECLARE_DEPENDENCIES(build, [ ndf kappa figaro convert])
+STAR_DECLARE_DEPENDENCIES(build, [ndf kappa figaro convert])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
@@ -47,7 +47,7 @@ dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml datacube.csh datacube.icl)
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([subs tasks help])
+AC_CONFIG_SUBDIRS([subs tasks help demo])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
