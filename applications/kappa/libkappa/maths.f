@@ -317,6 +317,7 @@
 *     MJC: Malcolm Currie (STARLINK)
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -340,6 +341,9 @@
 *        Evaluates the FA-FZ tokens before any others.  Previously
 *        this was done after the IA-IZ and VA-VZ were expanded, hence
 *        sub-expressions could not contain these array tokens.
+*     1999 May 4 (TDCA):
+*        Fixed bug in the way _DOUBLE variance arrays are copied into
+*        the work arrays: now behaves as for _REAL data. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -872,6 +876,15 @@
                END IF
             END IF
 
+*  If necessary, copy the variance values in the same way into the
+*  IVAR'th row of the appropriate work array. Update IVAR to take
+*  account of input NDFs which may not have variance information.
+               IF ( VARI( I ) ) THEN
+                  IVAR = IVAR + 1
+                  CALL KPG1_PROWD( EL, %VAL( PNTR1( 2 ) ), IVAR,
+     :                             %VAL( PNTRW( 2 ) ), STATUS )
+               END IF
+
 *  Unmap the input arrays once their values have been copied.
             CALL NDF_UNMAP( NDF( I ), COMPI( I ), STATUS )
   70     CONTINUE
@@ -1119,3 +1132,4 @@
       END IF
 
       END
+
