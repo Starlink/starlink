@@ -29,7 +29,7 @@ For information on individual parameters, select from the list below:
 
 COMMENT
 
-COMMENT = LITERAL (Given)
+COMMENT = LITERAL (Read)
    The comments to be written to the KEYWORD keyword for the
    "Update" and "Write" editing commands.  A null value (!)
    gives a blank comment.  The special value "$C" means use the
@@ -49,6 +49,7 @@ EDIT = LITERAL (Read)
 
    "Exist" reports TRUE to standard output if the named keyword
    exists in the header, and FALSE if the keyword is not present.
+   The same value is also stored in output parameter EXISTS.
 
    "Move" relocates a named keyword to be immediately before a
    second keyword (see parameter POSITION).  When this positional
@@ -73,9 +74,15 @@ EDIT = LITERAL (Read)
    command.  The FITS extension is created first should it not
    exist.
 
+EXISTS
+
+EXISTS = _LOGICAL (Write)
+   An output parameter which is set to the result of the final
+   "Exist" operation (see parameter EDIT).
+
 KEYWORD
 
-KEYWORD = LITERAL (Given)
+KEYWORD = LITERAL (Read)
    The name of the keyword to be edited in the FITS extension.  A
    name may be compound to handle hierarchical keywords, and it
    has the form keyword1.keyword2.keyword3 etc.  The maximum
@@ -83,7 +90,7 @@ KEYWORD = LITERAL (Given)
    no longer than 8 characters, and be a valid FITS keyword
    comprising only alphanumeric characters, hyphen, and
    underscore.  Any lowercase letters are converted to uppercase
-   and blanks are removed before inserted or comparison with the
+   and blanks are removed before insertion, or comparison with the
    existing keywords.
 
    The keywords " ", "COMMENT", and "HISTORY" are comment cards
@@ -117,7 +124,7 @@ NDF = NDF (Read and Write)
 
 NEWKEY
 
-NEWKEY = LITERAL (Given)
+NEWKEY = LITERAL (Read)
    The name of the keyword to replace the KEYWORD keyword.  It is
    only accessed when EDIT="Rename".  A name may be compound to
    handle hierarchical keywords, and it has the form
@@ -128,7 +135,7 @@ NEWKEY = LITERAL (Given)
 
 POSITION
 
-POSITION = LITERAL (Given)
+POSITION = LITERAL (Read)
    The position keyword name.  A position name may be compound to
    handle hierarchical keywords, and it has the form
    keyword1.keyword2.keyword3 etc.  The maximum number of
@@ -169,7 +176,7 @@ TABLE = FILENAME (Read)
 
 VALUE
 
-VALUE = LITERAL (Given)
+VALUE = LITERAL (Read)
    The new value of the KEYWORD keyword for the "Update" and
    "Write" editing commands.  The special value "$V" means use the
    current value of the KEYWORD keyword.  This makes it possible
@@ -266,11 +273,6 @@ desired, you should inspect it using the command FITSLIST before
 exporting the data.  If there is something wrong, you may find it
 convenient to use command FITSEDIT to make minor corrections.
 
-Parameter_Defaults
-
-   All the parameters have a suggested default of their current
-   value, except NDF, which uses the global current dataset.
-
 Timing
 
    Approximately proportional to the number of FITS keywords to be
@@ -285,7 +287,7 @@ File_Format
 
    The format is summarised below:
 
-     command keyword{[occur]{(keyword{[occur]) {value {comment
+     command keyword{[occur]}{(keyword{[occur]})} {value {comment}}
 
    where braces indicate optional values, and occur is the
    occurrence of the keyword.  In effect there are four fields
@@ -336,7 +338,7 @@ File_Format
       COMMENT or HISTORY.  Any text between the brackets other than
       a positive integer is interpreted as the first occurrence.
 
-      Use a null value (" or "") if you want the card to be a
+      Use a null value ('' or "") if you want the card to be a
       comment with keyword other than COMMENT or HISTORY.  As blank
       keywords are used for hierarchical keywords, to write a
       comment in a blank keyword you must give a null edit keyword.
@@ -439,12 +441,12 @@ Examples_of_the_File_Format
    the comment being "Following values apply to mid-observation".
    Note the full stop.
 
-       W DROCOM(AIRMASS) " Following values apply to mid-observation
+       W DROCOM(AIRMASS) '' Following values apply to mid-observation
    As the preceding example but this writes to a non-standard
    comment keyword called DROCOM.  Note the need to supply a null
    value.
 
-       W (AIRMASS) " Following values apply to mid-observation
+       W (AIRMASS) '' Following values apply to mid-observation
    As the preceding example but this writes to a blank-keyword
    comment.
 
@@ -478,8 +480,15 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1996 November 8 (MJC):
     Original version.
+
+ 22-SEP-1999 (DSB):
+    Added EXISTS parameter.
+
+ {enter_any_changes_here}
 .endhelp

@@ -17,7 +17,6 @@ calpol        hlp = doc$calpol.hlp
 cdiv        hlp = doc$cdiv.hlp
 centroid        hlp = doc$centroid.hlp
 chain        hlp = doc$chain.hlp
-changes_to_kappa        hlp = doc$changes_to_kappa.hlp
 chpix        hlp = doc$chpix.hlp
 classified_commands        hlp = doc$classified_commands.hlp
 cmult        hlp = doc$cmult.hlp

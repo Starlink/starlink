@@ -17,23 +17,24 @@ Parameters
 
 For information on individual parameters, select from the list below:
 
-ABSLAB
+AXES
 
-ABSLAB = LITERAL (Read)
-   Label for the plot's abscissa.  NCAR fancy founts may be
-   embedded when FONT = "NCAR".  Only the first 50 characters are
-   used.  If axis information is present in the NDF the suggested
-   default is the NDF's axis label followed by the units, in
-   parentheses.  If an error occurs obtaining the label or there
-   is no axis information, the label takes its current value,
-   which initially is "COMP values", where COMP is the value of
-   parameter COMP.  []
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   plot. The width of the margins left for the annotation may be
+   controlled using parameter MARGIN. The appearance of the axes
+   (colours, fonts, etc) can be controlled using the parameter
+   STYLE. [TRUE]
 
 CLEAR
 
 CLEAR = _LOGICAL (Read)
-   Determines if the graphics workstation is to be cleared before
-   producing the plot. [TRUE]
+   If TRUE the current picture is cleared before the plot is
+   drawn. If CLEAR is FALSE not only is the existing plot retained,
+   but also an attempt is made to align the new picture with the
+   existing picture. Thus you can generate a composite plot within
+   a single set of axes, say using different colours or modes to
+   distinguish data from different datasets. [TRUE]
 
 COMP
 
@@ -50,19 +51,7 @@ DEVICE
 
 DEVICE = DEVICE (Read)
    The graphics workstation on which to produce the plot.  If it
-   is null, !, there will be no plot made.
-   [Current graphics device]
-
-FONT
-
-FONT = LITERAL (Read)
-   The fount to be used for the histogram plot.  It can be either
-   "NCAR" for the NCAR fancy characters and "GKS" for the standard
-   GKS san-serif fount.  The former is intended for hardcopy
-   publication-quality plots, since it is relatively slow; the
-   latter is intended for normal interactive graphics requiring
-   rapid plotting, and it is clearer on small plots.  The
-   suggested default is the current value. ["GKS"]
+   is null (!), no plot will be made. [Current graphics device]
 
 IN
 
@@ -76,19 +65,17 @@ LOGFILE = FILENAME (Write)
    value is supplied (the default), then no logging of results
    will take place. [!]
 
-MAJTIC
+MARGIN
 
-MAJTIC( 2 ) = _REAL (Read)
-   The parameter controlling the numbers of major tick marks
-   for the x and y axes.  (Number used is between MAJTIC+2 and
-   5*MAJTIC/2+4.) [4.,4.]
-
-MINTIC
-
-MINTIC( 2 ) = _REAL (Read)
-   The number of minor tick marks between each major tick mark
-   for the x and y axes.  A negative value forces the graphics
-   package to compute appropriate values. [-1.,-1.]
+MARGIN( 4 ) = _REAL (Read)
+   The widths of the margins to leave for axis annotation, given
+   as fractions of the corresponding dimension of the DATA picture.
+   Four values may be given, in the order - bottom, right, top, left.
+   If less than four values are given, extra values are used equal to
+   the first supplied value. If these margins are too narrow any axis
+   annotation may be clipped. If a null (!) value is supplied, the
+   value used is 0.18 (for all edges) if either annotated axes or
+   a key are produced, and zero otherwise. [current value]
 
 NUMBIN
 
@@ -96,46 +83,12 @@ NUMBIN = _INTEGER (Read)
    The number of histogram bins to be used. This must lie in the
    range 2 to 10000.  The suggested default is the current value.
 
-ORDLAB
-
-ORDLAB = LITERAL (Read)
-   A label for the plot's ordinate axis.  NCAR fancy founts may be
-   embedded when FONT = "NCAR".  Only the first 50 characters are
-   used.  ["Number"]
-
 OUT
 
 OUT = NDF (Read)
    Name of the NDF structure to save the histogram in its data
-   array.  If null, !, is entered the histogram NDF is not
+   array.  If null (!) is entered the histogram NDF is not
    created. [!]
-
-OUTTIC
-
-OUTTIC = _LOGICAL (Read)
-   TRUE if the axis tick marks are to appear on the outside of
-   the axes instead of inside. [FALSE]
-
-PLTITL
-
-PLTITL = LITERAL (Read)
-   A title for the histogram plot, in which NCAR fancy founts may
-   be embedded.  The default is to use the NDF's title if present
-   and no error occurs, otherwise the current value becomes the
-   suggested default.  This is initially "Histogram".  Only the
-   first 50 characters are used.  []
-
-PXSIZE
-
-PXSIZE = _REAL (Read)
-   The length (x axis) of the plot in metres. [Maximum that can
-   fit in the current picture whilst preserving square pixels]
-
-PYSIZE
-
-PYSIZE = _REAL (Read)
-   The length (y axis) of the plot in metres. [Maximum that can
-   fit in the current picture whilst preserving square pixels]
 
 RANGE
 
@@ -146,31 +99,85 @@ RANGE( 2 ) = _DOUBLE (Write)
    are not calculated and reported.  The suggested defaults are
    the current values, or ! if these do not exist.
 
-THICK
+STYLE
 
-THICK = _REAL (Read)
-   The thickness of the axes and annotations in the histogram
-   plots, where 1.0 is the normal thickness.  Currently,
-   this is only available on a few devices.  It must take a value
-   in the range 0.5--5.0. [1.0]
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   when drawing the annotated axes and data values.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the histogram curve is controlled by the
+   attributes Colour(Curves), Width(Curves), etc (the synonym Line
+   may be used in place of Curves). [current value]
 
 TITLE
 
 TITLE = LITERAL (Read)
    Title for the histogram NDF.  ["KAPPA - Histogram"]
 
+XLEFT
+
+XLEFT = _REAL (Read)
+   The axis value to place at the left hand end of the horizontal
+   axis of the plot. If a null (!) value is supplied, the minimum data
+   value in the histogram is used. The value supplied may be greater
+   than or less than the value supplied for XRIGHT. [!]
+
 XLOG
 
 XLOG = _LOGICAL (Read)
-   TRUE if the plot abscissa is to be logarithmic.  It is
-   unlikely that you would want to do this.  By default, the
-   abscissa is linear. [FALSE]
+   TRUE if the plot X axis is to be logarithmic. Any histogram bins
+   which have negative or zero central data values are omitted from
+   the plot. [FALSE]
+
+XRIGHT
+
+XRIGHT = _REAL (Read)
+   The axis value to place at the right hand end of the horizontal
+   axis of the plot. If a null (!) value is supplied, the maximum data
+   value in the histogram is used. The value supplied may be greater
+   than or less than the value supplied for XLEFT. [!]
+
+YBOT
+
+YBOT = _REAL (Read)
+   The axis value to place at the bottom end of the vertical axis of
+   the plot. If a null (!) value is supplied, the lowest count in
+   the histogram is used. The value supplied may be greater than or
+   less than the value supplied for YTOP. [!]
 
 YLOG
 
 YLOG = _LOGICAL (Read)
-   TRUE if the plot ordinate is to be logarithmic.  By default,
-   the ordinate is linear.  [FALSE]
+   TRUE if the plot Y axis is to be logarithmic. Empty bins are
+   removed from the plot if the Y axis is logarithmic. [FALSE]
+
+YTOP
+
+YTOP = _REAL (Read)
+   The axis value to place at the top end of the vertical axis of
+   the plot. If a null (!) value is supplied, the largest count in the
+   histogram is used. The value supplied may be greater than or less
+   than the value supplied for YBOT. [!]
 
 Examples
 
@@ -192,16 +199,16 @@ histogram cube(3,4,) 10 ! out=c3_4_hist device=!
    data values.  The histogram is written to a one-dimensional
    NDF called c3_4_hist.
 
-histogram cube numbin=32 ! device=xwindows
+histogram cube numbin=32 ! device=xwindows style="'title=cube'"
    Computes and reports the histogram for the data array in
    the NDF called cube.  The histogram has 32 bins and spans the
    full range of data values.  A plot of the histogram is made to
-   the XWINDOWS device.
+   the XWINDOWS device, and is titled "cube".
 
-histogram cube numbin=32 ! device=xwindows ylog pltitl="Taurus 2"
+histogram cube numbin=32 ! device=xwindows ylog style=^style.dat
    As in the previous example except the logarithm of the number
-   in each histogram bin is plotted, and the plot title is
-   "Taurus 2".
+   in each histogram bin is plotted, and the contents of the text
+   file style.dat control the style of the resulting graph.
 
 histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
    Computes the histogram for the central 200 by 300 elements of
@@ -212,11 +219,15 @@ histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
 
 Related_Applications
 
-   KAPPA: HISTAT, INSPECT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
+   KAPPA: HISTAT, MSTATS, NUMB, STATS; Figaro: HIST, ISTAT.
 
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
+
+TDCA: Tim Ash (STARLINK)
 
 History
 
@@ -229,6 +240,17 @@ History
     getting the range values.  Used PSX for workspace.  Fixed a
     bug in RANGE reporting.  Allowed for Error as a COMP option.
     Added PXSIZE and PYSIZE parameters.
+
+ 27-FEB-1998 (DSB):
+    Corrected the reporting of the upper limit of _DOUBLE data by
+    replacing call to CHR_PUTI by CHR_PUTD.
+
+ 12-JUL-1999 (TDCA):
+    Converted graphics to AST/PGPLOT
+
+ 17-SEP-1999 (DSB):
+    Tidied up. NDF calls changed to LPG to use auto-looping. Dynamic
+    default parameters changed to use null default.
 
 Implementation_Status
 
