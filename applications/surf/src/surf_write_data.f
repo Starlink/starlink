@@ -88,7 +88,9 @@
 *     - The application can read in up to 100 separate input datasets. 
 *     - No data is returned if the DATA or positions are bad.
 *     Data is still returned if Variance is bad.
-*     - The REF and IN parameters accept ASCII text files as input. These
+
+*  ASCII input files:
+*     The REF and IN parameters accept ASCII text files as input. These
 *     text files may contain comments (signified by a #), NDF names,
 *     values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
 *     and names of other ASCII files. There is one data file per line.
@@ -96,7 +98,7 @@
 *
 *         file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
 *         file2                        # Read file 2 but you will still be
-*                                      # prompted fro WEIGHT, and shifts.
+*                                      # prompted for WEIGHT, and shifts.
 *         file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
 *         test.bat                     # Read in another text file
 *
