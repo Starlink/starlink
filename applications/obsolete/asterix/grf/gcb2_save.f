@@ -125,16 +125,17 @@
      :                                                       STATUS )
 
 *  Define an image extension
-      CALL ADI2_DEFIMG( FID, 'GCB', 1, NBYTE, 'BYTE', STATUS )
+      CALL ADI2_DEFIMG( ARGS(1), 'GCB', 1, NBYTE, 'BYTE', STATUS )
 
 *  Write keywords to define contents of HDU
-      CALL ADI2_PKEY0C( FID, 'GCB', 'CONTENT', 'GRAFIX CONTROL',
+      CALL ADI2_PKEY0C( ARGS(1), 'GCB', 'CONTENT', 'GRAFIX CONTROL',
      :                  'Version of GCB description', STATUS )
-      CALL ADI2_PKEY0R( FID, 'GCB', 'GCBVERSN', G_VERSION,
+      CALL ADI2_PKEY0R( ARGS(1), 'GCB', 'GCBVERSN', G_VERSION,
      :                  'Version of GCB description', STATUS )
 
 *  Write the data to the HDU
-      CALL ADI2_PUTIMGB( FID, 'GCB', 1, NBYTE, %VAL(GCBPTR), STATUS )
+      CALL ADI2_PUTIMGB( ARGS(1), 'GCB', 1, NBYTE, %VAL(GCBPTR),
+     :                   STATUS )
 
 *  Free the workspace
       CALL DYN_UNMAP( GCBPTR, STATUS )
