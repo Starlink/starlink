@@ -299,6 +299,9 @@
 *        the code, and various minor stylistic changes.
 *     1995 March 30 (MJC):
 *        Made to work on single precision too.
+*     27-FEB-1998 (DSB):
+*        Mistaken calls to KPS1_FOPPx to perform filling and padding
+*        corrected so that they call KPS1_FOPRx.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1464,7 +1467,7 @@
      :                                              %VAL( IPINH ),
      :                                              DFILL, STATUS )
 
-                     CALL KPS1_FOPPD( RDIM( 1 ), RDIM( 2 ),
+                     CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
      :                                %VAL( IPINH ), DIM( 1 ), DIM( 2 ),
      :                                DFILL, .FALSE., %VAL( IPH ),
      :                                STATUS )
@@ -1481,7 +1484,7 @@
                         END IF
 
 *  Now do the filling and padding or set to zeros.
-                        CALL KPS1_FOPPD( RDIM( 1 ), RDIM( 2 ),
+                        CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
      :                                   %VAL( IPINR ), DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. REALI,
      :                                   %VAL( IPR ), STATUS )
@@ -1495,7 +1498,7 @@
                         END IF
 
 *  Now do the filling and padding or set to zeros.
-                        CALL KPS1_FOPPD( RDIM( 1 ), RDIM( 2 ),
+                        CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
      :                                   %VAL( IPINI ), DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. IMAGI,
      :                                   %VAL( IPI ), STATUS )
@@ -1514,7 +1517,7 @@
                         END IF
 
 *  Now do the filling and padding or set to zeros.
-                        CALL KPS1_FOPPD( RDIM( 1 ), RDIM( 2 ),
+                        CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
      :                                   %VAL( IPINR ), DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. POWERI,
      :                                   %VAL( IPR ), STATUS )
@@ -1529,7 +1532,7 @@
                         END IF
 
 *  Now do the filling and padding or set to zeros.
-                        CALL KPS1_FOPPD( RDIM( 1 ), RDIM( 2 ),
+                        CALL KPS1_FOPRD( RDIM( 1 ), RDIM( 2 ),
      :                                   %VAL( IPINI ), DIM( 1 ),
      :                                   DIM( 2 ), DFILL, .NOT. PHASEI,
      :                                   %VAL( IPI ), STATUS )
