@@ -14,10 +14,10 @@
 
   If you want to change any other parameters, then make a copy of this
   file called, say, params-mod.dsl, modify it to suit your needs, and
-  create a catalogue file in the same directory which has an line like:
+  create a catalogue file in the same directory which has a line like:
 
-      PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN" 
-          ../dsssl/sl/latex/slparams.dsl
+      PUBLIC "-//Starlink//TEXT DSSSL TeXML Parameterisation//EN" 
+          ../dsssl/sl/texml/slparams.dsl
 
   (but all on a single line), giving the path to the parameterisation file,
   relative to the catalog.  Then adjust your $SGML_CATALOG_FILES
@@ -35,14 +35,14 @@ class, preceded by an optional argument for the class options.
   (list "?twoside,11pt,a4paper" "article"))
 
 <routine>
-<routinename>%latex-manifest%
+<routinename>%texml-manifest%
 <description>
-If not '#f' then the list of LaTeX files created by the
-stylesheet will be written to the file named by '%latex-manifest%'.
+If not '#f' then the list of files created by the
+stylesheet will be written to the file named by '%texml-manifest%'.
 <returnvalue type=string>Manifest filename
 <codebody>
-(define %latex-manifest%
-	"LaTeX.manifest"
+(define %texml-manifest%
+	"texml.manifest"
 	)
 
 <routine>
