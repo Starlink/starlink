@@ -2133,7 +2133,7 @@ AstAxis *astLoadAxis_( void *mem, size_t size, int init,
 
 /* Bottom. */
 /* ---- */
-      new->bottom = astReadDouble( channel, "bottom", AST__BAD );
+      new->bottom = astReadDouble( channel, "bot", AST__BAD );
       if ( TestAxisBottom( new ) ) SetAxisBottom( new, new->bottom );
 
 /* If an error occurred, clean up by deleting the new Axis. */
