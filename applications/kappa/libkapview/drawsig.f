@@ -28,7 +28,8 @@
 *     You can plot the lines horizontally or vertically as appropriate.
 *     The lines extend the full width or height of the plot's data
 *     area.  Up to five different multiples of the standard deviation
-*     may be presented in this fashion.
+*     may be presented in this fashion. Each line can be drawn with a
+*     different style.
 *
 *     The application also computes statistics for those array values
 *     that lie between each pair of plotted lines.  In other words it
@@ -64,16 +65,6 @@
 *     DEVICE = DEVICE (Read)
 *        The graphics device to draw the sigma lines on.
 *        [Current graphics device]
-*     LINESTYLE = _INTEGER (Read)
-*        Line style to be used.  The allowed values produce the
-*        following styles.
-*             1 = solid
-*             2 = dashed
-*             3 = dotted
-*             4 = dot-dashed
-*
-*        LINESTYLE defaults to the current value, which is initially 3,
-*        giving dotted lines. []
 *     NDF = NDF (Read)
 *        The NDF structure containing the data array whose error limits
 *        are to be plotted.  Usually this parameter is not defined
@@ -86,31 +77,46 @@
 *        Number of standard deviations about the mean at which the
 *        lines should be drawn.  The null value or 0.0 causes a line to
 *        be drawn at the mean value.
-*     SIGCOL = _INTEGER (Read)
-*        The colour in which to draw any graphics specified by
-*        parameter LINESTYLE.  The options are described below.
+*     STYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the lines.
 *
-*          "MAX"          - The maximum colour index used for the
-*                           display of the image.
-*          "MIN"          - The minimum colour index used for the
-*                           display of the image.
-*          An integer     - The actual colour index.  It is constrained
-*                           between 0 and the maximum colour index
-*                           available on the device. 
-*          A named colour - Uses the named colour from the palette, and
-*                           if it is not present, the nearest colour
-*                           from the palette is selected.
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
 *
-*        If the colour is to remain unaltered as the lookup table is
-*        manipulated choose an integer between 0 and 15, or a named
-*        colour.  The suggested default is the current value.
-*     THICK = _REAL (Read)
-*        The thickness of the lines in the plot, where 1.0 is the
-*        normal thickness.  It must take a value in the range
-*        0.5--10.0.  [1.0]
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The attributes Colour(Curves), Width(Curves), etc, can be used
+*        to specify the style for the lines. These values apply to all
+*        lines unless subsequent attributes over-ride them. Attributes for
+*        individual clipping levels can be given by replacing "Curves" above 
+*        by a string of the form "Nsig<i>" where "<i>" is an integer
+*        index into the list of clipping levels supplied for parameter
+*        NSIGMA. Thus, "Colour(Nsig1)" will set the colour for the lines
+*        associated with the first clipping level, etc. The attribute 
+*        settings can be restricted to one of the two lines by appending
+*        either a "+" or a "-" to the "Nsig<i>" string. Thus,
+*        "Width(Nsig2-)" sets the line width for the lower of the two
+*        lines associated with the second clipping level, and "Width(Nsig2-)"
+*        sets the width for the upper of the two lines. [current value]
 
 *  Examples:
-*     drawsig nsigma=3 linestyle=1
+*     drawsig nsigma=3 style='style=1'
 *        This draws solid horizontal lines on the last DATA picture on
 *        the current graphics device located at plus and minus 3
 *        standard deviations about the mean.  The statistics come from
@@ -119,11 +125,14 @@
 *        This draws horizontal plus and minus 2.5 standard-deviation
 *        lines about the mean for the data in the NDF called phot on
 *        the default graphics device.
+*     drawsig phot 2.5 style='"colour(nsig1-)=red,colour(nsig1+)=green"'
+*        As above, but the lower line is drawn in red and the upper line
+*        is drawn in green.
 *     drawsig cluster [2,3] X Error
 *        This draws vertical lines at plus and minus 2 and 3
 *        standard deviations about the mean for the error data in the
 *        NDF called cluster on the default graphics device.
-*     drawsig device=xwindows phot(20:119) 3 linestyle=3 sigcol=red
+*     drawsig device=xwindows phot(20:119) 3 style="'colour=red,style=4'"
 *        This draws red dotted horizontal lines on the xwindows device
 *        at +/- 3 standard deviations using the 100 pixels in NDF
 *        phot(20:119).
@@ -132,11 +141,6 @@
 *     There must be an existing DATA picture stored within the graphics
 *     database for the chosen device.  Lines will only be plotted
 *     within this picture.
-
-*  Algorithm:
-*     - Obtain the plot information from the graphics database
-*     - Calculate the mean and standard deviation
-*     - Plot lines at requested standard-deviation multiples.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, and
@@ -168,6 +172,8 @@
 *        representations, and do not re-instate original representations
 *        at end. This prevents the screen being cleared when the
 *        workstation is closed.
+*     27-OCT-1999 (DSB):
+*        Major changes to use AST/PGPLOT for the graphics.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,12 +186,11 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
-      INCLUDE 'DAT_PAR'          ! Data-system constants
-      INCLUDE 'GKS_PAR'          ! GKS constants (e.g. GSET)
-      INCLUDE 'NDF_PAR'          ! NDF_ public constants
-      INCLUDE 'PAR_ERR'          ! PAR_ error codes
+      INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! PAR error codes
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Status:
       INTEGER STATUS             ! Global Status
@@ -194,245 +199,159 @@
       INTEGER MXCLIP             ! Maximum number of clipping levels
       PARAMETER ( MXCLIP = 5 )
 
-      INTEGER MPEN               ! SGS pen number used to draw graphics
-      PARAMETER ( MPEN = 3 )
-
 *  Local Variables:
-      CHARACTER * ( 10 ) AXIS    ! Data-value axis/orientation in plot
-      LOGICAL BAD                ! Bad pixels may be present?
-      CHARACTER * ( 75 ) BUFFER  ! Buffer for the results
-      INTEGER CI                 ! Colour index required for graphics
-      REAL CLIP( MXCLIP )        ! Array of clipping limits
-      INTEGER COLI               ! Original colour index of current pen
-      CHARACTER * ( 28 ) COMLIS  ! List of available array components
-      INTEGER COMLN              ! Length of component list
-      CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
-      LOGICAL DEVCAN             ! The device parameter is to be
-                                 ! cancelled?
+      CHARACTER AXIS*10          ! Data-value axis/orientation in plot
+      CHARACTER BUFFER*75        ! Buffer for the results
+      CHARACTER COMP*8           ! Name of array component to analyse
+      CHARACTER LOCI*( DAT__SZLOC ) ! Locator for input data structure
+      CHARACTER MCOMP*8          ! Component name for mapping arrays
+      CHARACTER REFNAM*256       ! Reference name
+      CHARACTER SYN*10           ! Synonym for an AST attribute
+      CHARACTER TYPE*( NDF__SZTYP ) ! Numeric type for processing
       DOUBLE PRECISION DMAX      ! Maximum value of pixels in array
       DOUBLE PRECISION DMAXC     ! Maximum pixel value after clipping
       DOUBLE PRECISION DMIN      ! Minimum value of pixels in array
       DOUBLE PRECISION DMINC     ! Minimum pixel value after clipping
-      INTEGER EL                 ! Number of array elements mapped
-      LOGICAL GOTLOC             ! A locator to the NDF has been
-                                 ! obtained?
-      LOGICAL GOTNAM             ! A reference name of the NDF has been
-                                 ! obtained?
-      INTEGER I                  ! Counter
-      INTEGER IERR               ! GKS error indicator
-      INTEGER IMAX( 1 )          ! Vector index of maximum pixel
-      INTEGER IMAXC( 1 )         ! Vector index of maximum clipped pixel
-      INTEGER IMIN( 1 )          ! Vector index of minimum pixel
-      INTEGER IMINC( 1 )         ! Vector index of minimum clipped pixel
-      INTEGER IWKID              ! GKS workstation identifier
-      INTEGER LNTYPE             ! Line type to be used
-      INTEGER LNTYPI             ! Initial line type for current SGS pen
-      CHARACTER * ( DAT__SZLOC ) LOCI ! Locator for input data structure
-      REAL LWIDTH                ! The width of the current SGS pen
+      DOUBLE PRECISION FINISH( 2 )! Current Frame coords at end of line
+      DOUBLE PRECISION LBNDIN( 2 )! GRAPHICS lower bounds of viewport
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
-      CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
-      INTEGER NCLIP              ! Number of clipping iterations
-      INTEGER NDF                ! NDF identifier
-      INTEGER NGOOD              ! Number of valid pixels in array
-      INTEGER NGOODC             ! Number of valid pixels after clipping
-      INTEGER NSIGMA             ! Number of sigma values
-      INTEGER PEN                ! Current SGS pen
-      INTEGER PICID              ! Input picture identifier
-      INTEGER PICIDI             ! Data image picture identifier
-      INTEGER PNTR( 1 )          ! Pointer to input DATA_ARRAY component
-      CHARACTER * ( 256 ) REFNAM ! Reference name
-      LOGICAL SETPLR             ! Polyline representation to be reset?
-      REAL SIGLOW                ! Y position of lower line
-      REAL SIGTOP                ! Y position of upper line
+      DOUBLE PRECISION START( 2 )! Current Frame coords at start of line
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
       DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
       DOUBLE PRECISION SUM       ! Sum of pixels in array
       DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
-      LOGICAL THERE              ! Array component exists?
-      REAL THICK                 ! Line thickness
-      CHARACTER * ( NDF__SZTYP ) TYPE ! Numeric type for processing
-      REAL WX1                   ! World co-ordinate of LHS of DATA zone
-      REAL WX2                   ! World co-ordinate of RHS of DATA zone
-      REAL WY1                   ! World co-ordinate of bottom DATA zone
-      REAL WY2                   ! World co-ordinate of top of DATA zone
-      INTEGER ZONEO              ! SGS zone of the displayed image
-      INTEGER ZONEOV             ! SGS zone of the input picture
+      DOUBLE PRECISION UBNDIN( 2 )! GRAPHICS upper bounds of viewport
+      DOUBLE PRECISION XL( 2 )   ! GRAPHICS Frame coords
+      DOUBLE PRECISION XU( 2 )   ! GRAPHICS Frame coords
+      INTEGER DATAX              ! Index of data axis in Current Frame of Plot
+      INTEGER EL                 ! Number of array elements mapped
+      INTEGER I                  ! Counter
+      INTEGER IAT                ! Used length of SYN
+      INTEGER IMAX( 1 )          ! Vector index of maximum pixel
+      INTEGER IMAXC( 1 )         ! Vector index of maximum clipped pixel
+      INTEGER IMIN( 1 )          ! Vector index of minimum pixel
+      INTEGER IMINC( 1 )         ! Vector index of minimum clipped pixel
+      INTEGER INDF               ! NDF identifier
+      INTEGER IPIC0              ! Input picture identifier
+      INTEGER IPICD              ! Data image picture identifier
+      INTEGER IPIN               ! Pointer to input array 
+      INTEGER IPLOT              ! Plot for drawing over DATA picture
+      INTEGER NCLIP              ! Number of clipping iterations
+      INTEGER NGOOD              ! Number of valid pixels in array
+      INTEGER NGOODC             ! Number of valid pixels after clipping
+      INTEGER NSIGMA             ! Number of sigma values
+      INTEGER OTHAX              ! Index of other axis in Current Frame of Plot
+      LOGICAL BAD                ! Bad pixels may be present?
+      LOGICAL GOTLOC             ! A locator to the NDF has been obtained?
+      LOGICAL GOTNAM             ! A reference name of the NDF has been obtained?
+      REAL CLIP( MXCLIP )        ! Array of clipping limits
+      REAL X1                    ! World co-ordinate of LHS of viewport
+      REAL X2                    ! World co-ordinate of RHS of viewport
+      REAL Y1                    ! World co-ordinate of bottom viewport
+      REAL Y2                    ! World co-ordinate of top of viewport
 
 *.
 
 *  Check the global inherited status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF( STATUS .NE. SAI__OK ) RETURN
 
-      DEVCAN = .FALSE.
-      GOTLOC = .FALSE.
-      GOTNAM = .FALSE.
+*  Begin an AST Context.
+      CALL AST_BEGIN( STATUS )
 
-*  Obtain an SGS zone for the last DATA picture.
-*  =============================================
+*  Begin an NDF context.
+      CALL NDF_BEGIN( STATUS )
 
-*  Associate graphics device and start database activity.  Update access
-*  is used so that line can be drawn without destroying the existing
-*  plot.
-      CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID, ZONEOV, STATUS )
-      
-*  Find the last DATA picture.
-      CALL KPG1_AGFND( 'DATA', PICIDI, STATUS )
-      
-*  Obtain the SGS zone identifier for the current DATA picture.
-      CALL AGS_NZONE( ZONEO, STATUS )
-      
+*  Open the graphics device and workstation. An error is reported if no
+*  existing DATA picture can be found. An AST Plot is returned which
+*  can be used to draw in the existing Plot.
+      CALL KPG1_PLOTA( AST__NULL, 'OLD', ' ', IPIC0, IPICD, IPLOT, 
+     :                 STATUS )
+
 *  Report the name, comment, and label, if one exists, for the current
 *  picture.
       CALL KPG1_AGATC( STATUS )
 
 *  Obtain a reference to the NDF.
-*  ==============================
-      CALL KPG1_AGREF( PICIDI, 'READ', GOTNAM, REFNAM, STATUS )
-      
-*  See whether the reference is a name or locator.  The latter should
-*  be phased out, but there may be some old databases and software in
-*  circulation.
+      CALL KPG1_AGREF( IPICD, 'READ', GOTNAM, REFNAM, STATUS )
+
+*  See whether the reference is a name or locator.  The latter should be
+*  phased out, but there may be some old databases and software
+*  in circulation.
       CALL DAT_VALID( REFNAM, GOTLOC, STATUS )
-      IF ( GOTLOC ) LOCI = REFNAM
+      IF( GOTLOC ) LOCI = REFNAM
       
 *  End immediately if there was an error.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         DEVCAN = .TRUE.
-         GOTO 980
-      END IF
+      IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Obtain the NDF.
-*  ===============
-      
-*  Begin an NDF context.
-      CALL NDF_BEGIN
-      
 *  Obtain the NDF.  If the name is given on the command line it will be
 *  used.  If not, the database data reference is used, if there is one.
 *  Otherwise, the user is prompted.
-      CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, NDF, STATUS )
+      CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, INDF, STATUS )
 
 *  Find which array component to use.
-*  ==================================
-*  Inquire which arrays are available and form a comma-separated list
-*  of them.
-      CALL KPG1_ARCOL( NDF, 'Data,Quality,Error,Variance', COMLIS,
-     :                 COMLN, STATUS )
-
-*  Find which component to plot.  No need to inquire the value, if the
-*  only array component is Data.  Note the mixed-case returned in the
-*  list is for attractive error reports.  See below why there is a
-*  MCOMP.
-      IF ( COMLIS .EQ. 'Data' ) THEN
-         COMP = 'DATA'
-         MCOMP = COMP
-      ELSE
-         CALL PAR_CHOIC( 'COMP', 'Data', COMLIS( :COMLN ), .FALSE.,
-     :                   COMP, STATUS )
-
-*  Most NDF routines with a component argument don't recognise 'ERROR',
-*  so we need two variables.  Thus convert 'ERROR' into 'VARIANCE' in
-*  the variable needed for such routines.  The original value is held
-*  in a variable with the prefix M for mapping, as one of the few
-*  routines that does support 'ERROR' is NDF_MAP.
-         MCOMP = COMP
-         IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
-
-      END IF
-
-*  Map the array.
-*  ==============
+      CALL KPG1_ARCOG( 'COMP', INDF, MCOMP, COMP, STATUS )
 
 *  This application supports all the non-complex numeric types
 *  directly.  Therefore for the given type of the image find in which
 *  type it should be processed.
-      CALL NDF_TYPE( NDF, COMP, TYPE, STATUS )
+      CALL NDF_TYPE( INDF, COMP, TYPE, STATUS )
 
 *  Map the input array.
-      CALL KPG1_MAP( NDF, MCOMP, TYPE, 'READ', PNTR, EL, STATUS )
+      CALL KPG1_MAP( INDF, MCOMP, TYPE, 'READ', IPIN, EL, STATUS )
 
 *  Find whether there may be bad pixels present.  There is no explicit
 *  check.  It just relies on the current value.
-      CALL NDF_BAD( NDF, COMP, .FALSE., BAD, STATUS )
+      CALL NDF_BAD( INDF, COMP, .FALSE., BAD, STATUS )
 
-*  Defer error reporting and obtain an array of clipping limits to be
-*  applied. Constrain the values to be positive.
+*  End immediately if there was an error.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Obtain an array of clipping limits to be applied. Constrain the values to 
+*  be positive.
       NCLIP = 0
-      CALL ERR_MARK
-      CALL PAR_GDRVR( 'NSIGMA', MXCLIP, 0.0, VAL__MAXR, CLIP,
-     :                NSIGMA, STATUS )
+      CALL PAR_GDRVR( 'NSIGMA', MXCLIP, 0.0, VAL__MAXR, CLIP, NSIGMA, 
+     :                STATUS )
 
-*  Interpret a null value as indicating that a line at the mean
-*  be drawn.
-      IF ( STATUS .EQ. PAR__NULL ) THEN
+*  Interpret a null value as indicating that a line at the mean be drawn.
+      IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          NSIGMA = 1
          CLIP( 1 ) = 0.0
       END IF
-      CALL ERR_RLSE
 
 *  Obtain the data-value axis.
-*  ===========================
       CALL PAR_CHOIC( 'AXIS', 'Y', 'X,Y,Horizontal,Vertical', .FALSE.,
      :                AXIS, STATUS )
 
-*  Get information on line style and colour.
-*  =========================================
+*  Get the index of the data axis (IAXIS), and the other axis (JAXIS).
+      IF( AXIS .EQ. 'Y' .OR. AXIS( 1:1 ) .EQ. 'H' ) THEN
+         DATAX = 2
+         OTHAX = 1
+      ELSE
+         DATAX = 1
+         OTHAX = 2
+      END IF
 
-*  Get the line thickness.
-      CALL PAR_GDR0R( 'THICK', 1.0, 0.5, 10.0, .TRUE., THICK, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 980
+*  Get the extent of the DATA picture in GRAPHICS co-ordinates.
+      CALL PGQWIN( X1, X2, Y1, Y2 )
 
-*  Inquire the workstation identifier for GKS inquiries.
-      CALL SGS_ICURW( IWKID )
-      SETPLR = .FALSE.
+*  Get the range of values on the other axis covered by the DATA picture.
+      LBNDIN( 1 ) = X1
+      LBNDIN( 2 ) = Y1
+      UBNDIN( 1 ) = X2
+      UBNDIN( 2 ) = Y2
 
-*  Obtain the colour index for the desired colour of the lines.
-*  Do not restrict the colours to the palette.
-      CALL KPG1_IVCI( 'DEVICE', 'SIGCOL', .FALSE., CI, STATUS )
+      CALL AST_MAPBOX( IPLOT, LBNDIN, UBNDIN, .TRUE., OTHAX, 
+     :                 START( OTHAX ), FINISH( OTHAX ), XL, XU, STATUS )
 
-*  Obtain the line style.
-      CALL PAR_GDR0I( 'LINESTYLE', 1, 1, 4, .TRUE., LNTYPE, STATUS )
-
-*  Set the linestyle and colour of the pen used to draw the lines.
-*  ===============================================================
-
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-      CALL GQPLR( IWKID, MPEN, GSET, IERR, LNTYPI, LWIDTH, COLI )
- 
-*  Store the new colour index, line style and thickness for this pen.
-      CALL GSPLR( IWKID, MPEN, LNTYPE, THICK, CI )
-      SETPLR = .TRUE.
-
-*  Ensure that the pen changes have been applied. This may cause GKS to 
-*  redraw or clear the screen. It must be done now because otherwise, it
-*  would be done when the workstation is closed, resulting in the newly
-*  drawn graphics being erased.
-      CALL GUWK( IWKID, 1 )
-
-*  See if a GKS error has occurred.
-      CALL GKS_GSTAT( STATUS )
-
-*  Inquire the current SGS pen, and then select the pen used to draw
-*  markers.
-      CALL SGS_IPEN( PEN )
-      CALL SGS_SPEN( MPEN )
-
-*  Now get some information on the plot bounds.
-      CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS )
-
-*  Find Some Statistics
-*  ====================
-
-*  If the clipped mean and standard deviaiton is to be reported
-*  (verbose message reporting), print some headings.
-      CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'HEADING',
+*  Find Some Statistics. If the clipped mean and standard deviaiton is to be 
+*  reported (verbose message reporting), print some headings.
+      CALL MSG_OUT( 'BLANK', ' ', STATUS )
+      CALL MSG_OUT( 'HEADING',
      :  '      Clip (+/-)         '/
      :  /'mean          std. deviation    Error in mean', STATUS )
-      CALL MSG_OUTIF( MSG__NORM, 'HEADING2',
+      CALL MSG_OUT( 'HEADING2',
      :  '      ----------         '/
      :  /'----          --------------    -------------', STATUS )
 
@@ -440,135 +359,153 @@
       DO I = 1, NSIGMA
 
 *  Define the number of clipping iterations.
-         IF ( CLIP( I ) .GT. 0.0 ) THEN
+         IF( CLIP( I ) .GT. 0.0 ) THEN
             NCLIP = 1
          ELSE
             NCLIP = 0
          END IF
 
 *  Call the routine of the appropriate data type.
-         IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPG1_STATB( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         IF( TYPE .EQ. '_BYTE' ) THEN
+            CALL KPG1_STATB( BAD, EL, %VAL( IPIN ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL KPG1_STATUB( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
+            CALL KPG1_STATUB( BAD, EL, %VAL( IPIN ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                        IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                        IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC,
      :                        SUMC, MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STATD( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPG1_STATD( BAD, EL, %VAL( IPIN ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG1_STATI( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP, 
+         ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
+            CALL KPG1_STATI( BAD, EL, %VAL( IPIN ), NCLIP, 
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG1_STATR( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         ELSE IF( TYPE .EQ. '_REAL' ) THEN
+            CALL KPG1_STATR( BAD, EL, %VAL( IPIN ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL KPG1_STATW( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         ELSE IF( TYPE .EQ. '_WORD' ) THEN
+            CALL KPG1_STATW( BAD, EL, %VAL( IPIN ), NCLIP,
      :                       CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                       IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                       IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC, SUMC,
      :                       MEANC, STDEVC, STATUS )
  
-         ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL KPG1_STATUW( BAD, EL, %VAL( PNTR( 1 ) ), NCLIP,
+         ELSE IF( TYPE .EQ. '_UWORD' ) THEN
+            CALL KPG1_STATUW( BAD, EL, %VAL( IPIN ), NCLIP,
      :                        CLIP( I ), NGOOD, IMIN( 1 ), DMIN,
      :                        IMAX( 1 ), DMAX, SUM, MEAN, STDEV, NGOODC,
      :                        IMINC( 1 ), DMINC, IMAXC( 1 ), DMAXC,
      :                        SUMC, MEANC, STDEVC, STATUS )
          END IF
 
-*  Work out where the horizontal lines should be and draw them across
-*  the full extent of the picture.  Do not plot two lines where the
-*  clipping value is zero (NCLIP=0).
-         IF ( AXIS .EQ. 'Y' .OR. AXIS( 1:1 ) .EQ. 'H' ) THEN
-            SIGTOP = REAL( MEAN + ( STDEV * CLIP( I ) ) )
-            SIGLOW = REAL( MEAN - ( STDEV * CLIP( I ) ) )
+*  Ensure that any previous synonyms for AST attributes are cleared.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
-            IF ( SIGTOP .LT. WY2. AND. SIGTOP .GT. WY1 ) THEN
-               CALL SGS_LINE( WX1, SIGTOP, WX2, SIGTOP )
-            END IF
-            IF ( SIGLOW .GT. WY1 .AND. SIGLOW .LT. WY2 .AND.
-     :           NCLIP .EQ. 1 ) THEN
-               CALL SGS_LINE( WX1, SIGLOW, WX2, SIGLOW )
-            END IF
+*  Make the synonymns "(NSIG<i>)" and "(NSIG<i>+)" equate to "(Curve)"
+         SYN = '(NSIG'
+         IAT = 5
+         CALL CHR_PUTI( I, SYN, IAT )
+         CALL CHR_APPND( ')', SYN, IAT )
+         CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
+         
+         IAT = IAT - 1
+         CALL CHR_APPND( '+)', SYN, IAT )
+         CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
+         
+*  Set the plotting style for the upper (positive) line.
+         CALL KPG1_ASPSY( '(LINE+)', '(CURVE)', STATUS )
+         CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
 
-*  Work out where the vertical lines should be and draw them across the
-*  full extent of the picture.  Do not plot two lines where the clipping
-*  value is zero (NCLIP=0).
-         ELSE IF ( AXIS .EQ. 'X' .OR. AXIS( 1:1 ) .EQ. 'V' ) THEN
-            SIGTOP = REAL( MEAN + ( STDEV * CLIP( I ) ) )
-            SIGLOW = REAL( MEAN - ( STDEV * CLIP( I ) ) )
+*  Draw the first line.
+         START( DATAX ) = MEAN + STDEV*CLIP( I )
+         FINISH( DATAX ) = START( DATAX )
+         CALL AST_CURVE( IPLOT, START, FINISH, STATUS )
 
-            IF ( SIGTOP .LT. WX2. AND. SIGTOP .GT. WX1 ) THEN
-               CALL SGS_LINE( SIGTOP, WY1, SIGTOP, WY2 )
-            END IF
-            IF ( SIGLOW .GT. WX1 .AND. SIGLOW .LT. WX2 .AND.
-     :           NCLIP .EQ. 1 ) THEN
-               CALL SGS_LINE( SIGLOW, WY1, SIGLOW, WY2 )
-            END IF
+*  Draw the second line if the clipping limit is not zero.
+         IF( NCLIP .EQ. 1 ) THEN
+
+*  Ensure that any previous synonyms for AST attributes are cleared.
+            CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*  Make the synonymns "(NSIG<i>)" and "(NSIG<i>-)" equate to "(Curve)"
+            SYN = '(NSIG'
+            IAT = 5
+            CALL CHR_PUTI( I, SYN, IAT )
+            CALL CHR_APPND( ')', SYN, IAT )
+            CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
+            
+            IAT = IAT - 1
+            CALL CHR_APPND( '-)', SYN, IAT )
+            CALL KPG1_ASPSY( SYN( : IAT ), '(CURVE)', STATUS )
+         
+*  Set the plotting style for the upper (positive) line.
+            CALL KPG1_ASPSY( '(LINE+)', '(CURVE)', STATUS )
+            CALL KPG1_ASSET( 'KAPPA_DRAWSIG', 'STYLE', IPLOT, STATUS )
+
+*  Draw the line.
+            START( DATAX ) = MEAN - STDEV*CLIP( I )
+            FINISH( DATAX ) = START( DATAX )
+            CALL AST_CURVE( IPLOT, START, FINISH, STATUS )
 
          END IF
 
-*  Report the clipped mean and standard deviation.
-*  ===============================================
-
-*  Report the unclipped values first.
-         IF ( I .EQ. 1 .AND. NGOOD .GT. 0 ) THEN
+*  Report the clipped mean and standard deviation. Report the unclipped 
+*  values first.
+         IF( I .EQ. 1 .AND. NGOOD .GT. 0 ) THEN
             WRITE( BUFFER, '(16X,3(5X,G13.6))' ) MEAN, STDEV,
      :             STDEV / SQRT( DBLE( NGOOD ) )
-            CALL MSG_OUTIF( MSG__NORM, 'RESULTS', BUFFER, STATUS )
+            CALL MSG_OUT( 'RESULTS', BUFFER, STATUS )
          END IF
 
 *  Now report the clipped values.
-         IF ( NCLIP .EQ. 1 .AND. NGOODC .GT. 0 ) THEN
+         IF( NCLIP .EQ. 1 .AND. NGOODC .GT. 0 ) THEN
             WRITE( BUFFER, '(8X,F6.3,2X,3(5X,G13.6))' )
      :             CLIP( I ), MEANC, STDEVC,
      :             STDEVC / SQRT( DBLE( NGOODC ) )
-            CALL MSG_OUTIF( MSG__NORM, 'RESULTS', BUFFER, STATUS )
+            CALL MSG_OUT( 'RESULTS', BUFFER, STATUS )
          END IF
+
       END DO
 
-*  Tidy up the input data structure.
-      CALL NDF_ANNUL( NDF, STATUS )
-      IF ( GOTLOC ) CALL REF_ANNUL( LOCI, STATUS )
+*  Tidy up.
+ 999  CONTINUE
+
+*  Tidy up the locators.
+      IF( GOTLOC ) CALL REF_ANNUL( LOCI, STATUS )
       CALL DAT_VALID( LOCI, GOTLOC, STATUS )
-      IF ( GOTLOC ) CALL DAT_ANNUL( LOCI, STATUS )
+      IF( GOTLOC ) CALL DAT_ANNUL( LOCI, STATUS )
+
+*  Shutdown PGPLOT and the graphics database.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
 
-*  If necessary, re-instate the original colour index for the marker
-*  pen.
-      CALL SGS_SPEN( PEN )
+*  End the AST Context.
+      CALL AST_BEGIN( STATUS )
 
-*  AGI closedown
-*  =============
- 
-  980 CONTINUE
- 
-*  Need to tidy up the graphics database before exiting.
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
- 
-  999 CONTINUE
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'DRAWSIG_ERR', 'DRAWSIG: Failed to draw N-'//
+     :                 'sigma lines over an existing plot.', STATUS )
+      END IF
 
       END

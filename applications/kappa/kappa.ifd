@@ -3515,16 +3515,6 @@ package kappa {
             helpkey *
           }
 
-         parameter linestyle {
-            position 6
-            type _INTEGER
-            vpath CURRENT DEFAULT
-            ppath CURRENT
-            default 2
-            prompt {Line style}
-            helpkey *
-          }
-
          parameter ndf {
             position 1
             type NDF
@@ -3547,22 +3537,13 @@ package kappa {
             helpkey *
           }
 
-         parameter sigcol {
-            position 5
+         parameter style {
             type LITERAL
-            prompt {Colour of graph lines}
+            ppath CURRENT DEFAULT
             vpath CURRENT DEFAULT
-            ppath CURRENT
-            default 1
+            prompt {Plotting style for the lines}
             helpkey *
-          }
-
-         parameter thick {
-            type _REAL
-            prompt {Give the relative thickness of plotted lines}
-            vpath DEFAULT
-            default 1.0
-            helpkey *
+            default !
           }
 
       }
