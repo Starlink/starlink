@@ -205,12 +205,15 @@ Extract and align O and E ray areas from a set of images.
 
 Usage:
 
-   polreg in out_o out_e
+   polreg in out_o out_e [skyframes]
 
 Description:
 
-   This routine extacts and aligns areas containing corresponding rays
+   This routine extracts and aligns areas containing corresponding rays
    from a set of images containing dual or single beam polarimetry data.
+   It can also perform sky subtraction based either on a set of
+   supplied sky frames, or on user-specified background areas within
+   the object frames.
 
    In dual-beam mode, two output images are created for each
    supplied input image, one containing the O-ray areas and the other
@@ -377,13 +380,30 @@ SELCOL = LITERAL (Update)
    This should be one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK.
    Any unambiguous abbreviation can be supplied, and the value is
    case-insensitive. [RED]
+3 SKYFRAMES
+SKYFRAMES = NDF (Read)
+   A list of sky frames. These frames are subtracted from the
+   supplied object frames before the output images are created. If only
+   one sky frame is supplied, then it is used for all the object
+   frames. Otherwise, the number of sky frames must equal the
+   number of supplied object frames, and must be given in the same
+   order. If a null value (!) is given for SKYFRAMES, then the sky
+   background to be subtracted from each output image is determined
+   by fitting a surface to sky areas identified by the user within
+   the supplied object frames. [!]
+3 SKYOFF
+SKYOFF = _LOGICAL (Update)
+   If a true value is supplied, then the sky background is removed
+   from each output image. Otherwise, no sky background is removed.
+   The method used to estimate the sky background is determined by
+   the SKYFRAMES parameter. [TRUE]
 3 STARTHELP
 STARTHELP = _LOGICAL (Read)
    If a true value is supplied, then a hyper-text browser will be
    created with the GUI, displaying the contents page of the PolReg
    on-line help documentation. Otherwise, the browser is only created
    if the user accesses the on-line help information explicitly
-   from within the GUI by using the "Help" menu or the F1 key on 
+   from within the GUI by using the "Help" menu or the F1 key on
    the keyboard. [TRUE]
 3 STATUSAREA
 STATUSAREA = _LOGICAL (Update)
@@ -418,14 +438,16 @@ XHAIRCOL = LITERAL (Update)
 2 Examples
 polreg 'im1,im2' '*_o' '*_e'
    This example aligns and extracts the O and E ray areas from the two
-   images `im1` and `im2`, and stores them in the images `im1_o`,
-   `im1_e`, `im2_o` and `im2_e`. The current values for all other
-   parameters are used.
+   images `im1` and `im2`, subtracts a sky background (estimated
+   from areas within the object frames), and stores the results in
+   the images `im1_o`, `im1_e`, `im2_o` and `im2_e`. The current
+   values for all other parameters are used.
 
-polreg ^in_files.lis out=^out_files.lis dualbeam=no reset
+polreg ^in.lis out=^out.lis dualbeam=no skyframes=^sky.lis reset
    This example uses single-beam mode. It reads the names of input
-   images from the text file `in_files.lis`, aligns them and stores
-   them in the images named in the text file `out_files.lis`. All
+   images from the text file `in.lis`, subtracts the sky frames
+   read from the text file `sky.lis`, aligns them and stores
+   them in the images named in the text file `out.lis`. All
    other parameters are reset to their initial default values listed
    in the parameter descriptions above.
 2 Notes
@@ -452,20 +474,13 @@ RAY (_CHAR): A label identifying which of the two rays the image
 contains. This will be either "O" or "E". This is only written in
 dual-beam mode (see parameter DUALBEAM).
 
-IMGID (_CHAR): An identifier for the input image from which the output
-image was derived. If the input image already contains a POLPACK
-extension with a IMGID value, then the IMGID value is copied unchanged to
-the corresponding output images. Otherwise, the name of the input image
-(without a directoty path) is used.
+IMGID (_CHAR): An identifier for the input image from which the
+output image was derived. If the input image already contains a
+POLPACK extension with a IMGID value, then the IMGID value is copied
+unchanged to the corresponding output images. Otherwise, the name of
+the input image (without a directoty path) is used.
 2 Authors
 DSB: David Berry (STARLINK)
 2 History
  18-APR-1997 (DSB):
     Original version.
-2 Implementation_Status
-   - The output images are created from the input images using KAPPA
-   application SEGMENT (to extract the mask areas), and the CCDPACK
-   application TRANNDF (to align them). The documentation for these
-   applications should be consulted for details of which NDF components
-   are processed, what numerical data types are used for the processing,
-   etc.

@@ -1353,6 +1353,7 @@ polhelp.f: PAR_ERR
 polhelp.f: SAE_PAR
 polreg.f: PAR_ERR
 polreg.f: SAE_PAR
+polreg.f: GRP_PAR
 rdndf.f: GRP_PAR
 rdndf.f: MSG_PAR
 rdndf.f: NDG_ERR
