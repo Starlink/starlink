@@ -281,6 +281,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.11  2001/02/22 02:49:35  timj
+*     Don't reverse the sign of DATA when using SCUBA2MEM
+*
 *     Revision 1.10  2000/08/10 20:59:47  timj
 *     Remove code to put the LST into range 0..2PI when applying clock correction
 *     since that does not work with sources that cross LST day boundaries.
@@ -1323,8 +1326,11 @@
 
 *     If we are using SCAN_REVERSAL then multiply every other
 *     exposure by -1 (but only is CHOP is SC)
-
-                  IF (SCAN_REVERSAL .AND. CHOP_CRD .EQ. 'SC') THEN
+*     We only want to do this if we are rebinning the image.
+*     If this is SCUBA2MEM and we are requesting multiple beams
+*     then we do not want to fiddle with the data
+                  IF (SCAN_REVERSAL .AND. CHOP_CRD .EQ. 'SC'
+     :                 .AND. N_POS_BEAMS .GT. 1) THEN
                      IF (FLIP) THEN
                         IF (STATUS .EQ. SAI__OK) THEN
                            ITEMP = N_BOL * (EXP_END - EXP_START + 1)
