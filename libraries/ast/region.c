@@ -754,6 +754,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseGrid( AstRegion * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *BndBaseMesh( AstRegion *, double *, double * );
+static AstPointSet *RegGrid( AstRegion * );
 static AstPointSet *RegMesh( AstRegion * );
 static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
@@ -3388,6 +3389,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegBaseMesh = RegBaseMesh;
    vtab->RegBaseBox = RegBaseBox;
    vtab->RegCentre = RegCentre;
+   vtab->RegGrid = RegGrid;
    vtab->RegMesh = RegMesh;
    vtab->GetDefUnc = GetDefUnc;
    vtab->GetUnc = GetUnc;
@@ -5533,6 +5535,90 @@ static double *RegCentre( AstRegion *this, double *cen, double **ptr,
    return NULL;
 }
 
+
+static AstPointSet *RegGrid( AstRegion *this ){
+/*
+*+
+*  Name:
+*     astRegGrid
+
+*  Purpose:
+*     Return a PointSet containing points spread through the volume of a 
+*     Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstPointSet *astRegGrid( AstRegion *this )
+
+*  Class Membership:
+*     Region virtual function.
+
+*  Description:
+*     This function returns a PointSet containing a mesh of points spread
+*     throughout the volume of the Region. The points refer to the current 
+*     Frame of the encapsulated FrameSet.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     Pointer to the PointSet. The axis values in this PointSet will have 
+*     associated accuracies derived from the uncertainties which were
+*     supplied when the Region was created. Annul the pointer using
+*     astAnnul when it is no longer needed.
+
+*  Notes:
+*    - It should not be assumed that the returned points are evenly
+*    spaced withint he volume.
+*    - A NULL pointer is returned if an error has already occurred, or if
+*    this function should fail for any reason.
+*-
+*/
+
+/* Local Variables; */
+   AstMapping *map;          /* Base -> current Frame Mapping */
+   AstPointSet *result;      /* Pointer to returned PointSet */
+
+/* Initialise the returned pointer */
+   result = NULL;
+
+/* Check the local error status. */
+   if ( !astOK ) return result;
+
+/* If the Region structure does not contain a pointer to a PointSet holding 
+   positions evenly spread over the volume of the Region in the base
+   Frame, create one now. Note, we cannot cache the grid in the current
+   Frame in this way since the current Frame grid depends on the proprties
+   of the current Frame (e.g. System) which can be changed at any time. */
+   if( !this->basegrid ) this->basegrid = astRegBaseGrid( this );
+
+/* Get the simplified base->current Mapping */
+   map = RegMapping( this );
+
+/* If the Mapping is a UnitMap, just return a clone of the PointSet
+   pointer stored in the Region structure. */
+   if( astIsAUnitMap( map ) ){
+      result = astClone( this->basegrid );
+
+/* Otherwise, create a new PointSet holding the above points transformed 
+   into the current Frame. */
+   } else {
+      result = astTransform( map, this->basegrid, 1, NULL );
+   }
+
+/* Free resources.*/
+   map = astAnnul( map );
+
+/* If an error has occurred, annul the returned PointSet. */
+   if( !astOK ) result = astAnnul( result );
+
+/* Return the result. */
+   return result;
+}
 
 static AstPointSet *RegMesh( AstRegion *this ){
 /*
@@ -8891,6 +8977,10 @@ void astRegCurBox_( AstRegion *this, double *lbnd, double *ubnd ){
 void astRegOverlay_( AstRegion *this, AstRegion *that ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,RegOverlay))( this, that );
+}
+AstPointSet *astRegGrid_( AstRegion *this ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,RegGrid))( this );
 }
 AstPointSet *astRegMesh_( AstRegion *this ){
    if ( !astOK ) return NULL;
