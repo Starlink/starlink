@@ -91,6 +91,11 @@
 				   in this summary? --
 		(automatic | explicit | none)
 		#required
+	urlpath			-- what is the URL of the `head'
+				   document?  Required only if
+				   URLLINKPOLICY is `explicit' --
+		cdata
+		#implied
 	exportedlinkpolicy	-- may we refer to non-exported targets? --
 		(onlyexported | all)
 		onlyexported
@@ -159,13 +164,15 @@
 
 <!--
   I don't need to include routinelist in this content model, since my
-  focus right is on this DTD as a summary of links into the document,
+  focus right now is on this DTD as a summary of links into the document,
   and routinelists aren't currently linkable in the General DTD.
 -->
 
 
-<!element DOCBODY 	o o ((docxref | label)*, sect*, appendices?)>
+<!element DOCBODY 	o o ((docxref | label)*,
+				abstract?, sect*, appendices?)>
 
+<!element ABSTRACT	- - (#pcdata)>
 <!element SECT          - o (title, (docxref | label)*, subsect*)>
 <!element SUBSECT       - o (title, (docxref | label)*, subsubsect*)>
 <!element SUBSUBSECT    - o (title, (docxref | label)*, subsubsubsect*)>
