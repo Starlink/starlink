@@ -1065,10 +1065,14 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS).tar.Z \
 		$(EXPORT)/$(PKG_NAME).tar.Z
 
-# Make the source tarball, making sure that the source directories
-# are properly clean first by depending on the `unbuild' target (we
-# ought to be doing this from a CVS-exported copy of the source
-# rather than a working directory, so this _should_ be a no-op).
+# Make the source tarball.  This should really only be run in a copy
+# of the source which has been freshly exported from CVS, rather than
+# a working directory.  However, we do not want to guarantee this by
+# making this depend on `unbuild', since that ends up preventing us
+# from _re_making autoastrom_source.tar when in a directory which has
+# been unpacked.  We do want to do this in fact (the complete build
+# system is indeed daft enough to require this), so this target is in
+# fact able to be built in a directory with a built system.
 #
 # The configure.ac within astrom requires a recent (2.50+?) version of
 # autoconf and will fail (objecting that it can't find `configure.in')
@@ -1080,7 +1084,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # this is a target which is invoked only during bundling for
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
-$(PKG_NAME)_source.tar: unbuild
+$(PKG_NAME)_source.tar:
 	cd astrom && make -f makefile.in configure || echo "Need newer version of autoconf!" || false
 	cd moggy && make -f Makefile.in configure
 	cd catlib && if test -f Makefile; then make distclean; fi
@@ -1129,12 +1133,19 @@ unbuild: clean
 #------------------------------------------------------------------------------
 #
 # Documentation.  Make hard links to files in doc directory.
-sun242.tar-htx sun242.tar-tex: doc/sun242.xml
+#
+# These two targets obviously do depend on doc/sun242.xml, but we
+# can't express that in this makefile.  If we do, then it stops us
+# rebuilding the export_source tarball when in a directory which has
+# been unpacked from such a tarball (which happens, bizarrely enough,
+# in the main build system), since the doc/ directory is not
+# distributed in that tarball.
+sun242.tar-htx sun242.tar-tex:
 	cd doc; make
 	$(RMF) $@
 	ln doc/$@ $@
 
-sun242.xml: doc/sun242.xml
+sun242.xml:
 	ln doc/$@ $@
 
 #------------------------------------------------------------------------------
