@@ -106,6 +106,9 @@
 
 *  Arguments Returned:
       INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*80		CMT			! Comment
 *.
 
 *  Check inherited global status.
