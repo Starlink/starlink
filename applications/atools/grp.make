@@ -18,7 +18,7 @@ astpermmap.ifl astpermmap.f astremapframe.ifl astremapframe.f \
 astremoveframe.f astremoveframe.ifl astset.f astset.ifl astshow.tcl \
 astskyframe.ifl astskyframe.f asttest.f asttest.ifl astunitmap.f \
 astunitmap.ifl atl1_gtgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
-atl1_ptobj.f atl1_rm.c atl1_setop.f atl1_notif.f atlhelp.f atlhelp.ifl atools.csh \
+atl1_prnt2.f atl1_ptobj.f atl1_rm.c atl1_setop.f atl1_notif.f atlhelp.f atlhelp.ifl atools.csh \
 atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
 atl1_rdgrp.f atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f \
 astlutmap.ifl astpcdmap.f astpcdmap.ifl astwinmap.f astshiftmap.f \

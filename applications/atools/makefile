@@ -464,7 +464,7 @@ astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f \
 atl1_rdch.f atl1_rdfch.f astlutmap.f atl1_gtofl.f astpcdmap.f astwinmap.f \
 astpickaxes.f astsimplify.f asttrann.f atl1_cpcol.f astmapbox.f astinvert.f \
 astspecframe.f astsetrefpos.f astgetrefpos.f astshiftmap.f atl1_notif.f \
-astformat.f asttran2.f astmathmap.f
+astformat.f asttran2.f astmathmap.f atl1_prnt2.f
 
 F_SUB2 = 
 
@@ -1400,6 +1400,7 @@ atl1_gtgrp.o: SAE_PAR GRP_PAR
 atl1_gtobj.o: SAE_PAR AST_PAR NDF_PAR 
 atl1_gtofl.o: SAE_PAR GRP_PAR 
 atl1_notif.o: SAE_PAR 
+atl1_prnt2.o: SAE_PAR AST_PAR PAR_ERR
 atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_rdch.o : SAE_PAR AST_PAR
 atl1_rdfch.o: SAE_PAR AST_PAR
