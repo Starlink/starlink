@@ -117,7 +117,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AST2QDP Version V2.0-0' )
+        PARAMETER		( VERSION = 'AST2QDP Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*80              LABEL              	!
