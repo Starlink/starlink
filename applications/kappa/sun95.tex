@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.23}
 \newcommand{\stardocnumber}    {95.23}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {24th February 2003}
+\newcommand{\stardocdate}      {30th April 2003}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -38339,8 +38339,11 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
       This routine sets a new value for the units component of an
       existing NDF data structure. The NDF is accessed in update mode
       and any pre-existing units component is over-written with a new
-      value.  Alternatively, if a `null' value ({\tt !}) is given for the
-      UNITS parameter, then the NDF's units component will be erased.
+      value.  Alternatively, if a `null{\tt '} value (!) is given for the
+      UNITS parameter, then the NDF{\tt '}s units component will be erased.
+
+      There is also an option to modify the pixel values within the NDF
+      to reflect the change in units (see parameter MODIFY).
    }
    \sstusage{
       setunits ndf units
@@ -38353,38 +38356,65 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
          modified.
       }
       \sstsubsection{
+         MODIFY = \_LOGICAL (Read)
+      }{
+         If a TRUE value is supplied, then the pixel values in the DATA and
+         VARIANCE components of the NDF will be modified to reflect the
+         change in units. For this to be possible, both the original
+         Units value in the NDF and the new Units value must both correspond
+         to the format for units strings described in the FITS WCS standard
+         (see {\tt "}Representations of world coordinates in FITS{\tt "}, Greisen \&
+         Calabretta, 2002, A\&A - available at http://www.aoc.nrao.edu/$\sim$egreisen/wcs\_AA.ps.gz)
+         If either of the two units strings are not of this form, or if it is
+         not possible to find a transformation between them (for instance,
+         because they represent different quantities), an error is
+         reported. {\tt [FALSE]}
+      }
+      \sstsubsection{
          UNITS = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's units component ({\it e.g.}
-         {\tt "J/(m**2*Ang*s)"} or {\tt "count/s"}).  This value
-         may later be used by other applications for labelling graphs
-         and other forms of display where the NDF's data values are
-         shown.  The suggested default is the current value.
+         The value to be assigned to the NDF{\tt '}s units component (\emph{e.g.}
+         {\tt "}J/(m$*$$*$2$*$Angstrom$*$s){\tt "} or {\tt "}count/s{\tt "}).  This value may later be used
+         by other applications for labelling graphs and other forms of
+         display where the NDF{\tt '}s data values are shown.  The suggested
+         default is the current value.
       }
    }
    \sstexamples{
       \sstexamplesubsection{
-         setunits ngc1342 "count/s"
+         setunits ngc1342 {\tt "}count/s{\tt "}
       }{
          Sets the units component of the NDF structure ngc1342 to have
-         the value {\tt "count/s"}.
+         the value {\tt "}count/s{\tt "}. The pixel values are not changed.
       }
       \sstexamplesubsection{
-         setunits ndf=spect units="J/(m**2*Ang*s)"
+         setunits ndf=spect units={\tt "}J/(m$*$$*$2$*$Angstrom$*$s){\tt "}
       }{
          Sets the units component of the NDF structure spect to have
-         the value \linebreak {\tt "J/(m**2*Ang*s)"}.
+         the value {\tt "}J/(m$*$$*$2$*$Angstrom$*$s){\tt "}. The pixel values are not changed.
       }
       \sstexamplesubsection{
          setunits datafile units=!
       }{
-         By specifying a null value ({\tt !}), this example erases any
+         By specifying a null value (!), this example erases any
          previous value of the units component in the NDF structure
-         datafile.
+         datafile. The pixel values are not changed.
+      }
+      \sstexamplesubsection{
+         setunits ndf=spect units={\tt "}MJy{\tt "} modify
+      }{
+         Sets the units component of the NDF structure spect to have
+         the value {\tt "}MJy{\tt "}. If possible, the pixel values are changed from
+         their old units to the new units. For instance, if the units
+         component of the NDF was original {\tt "}J/(m$*$$*$2$*$s$*$GHz){\tt "}, the DATA
+         values will be multiplied by 1.0E11, and the VARIANCE values by
+         1.0E22. However, if the original units component was (say) {\tt "}K{\tt "}
+         (Kelvin) then an error would be reported since there is no
+         direct conversion from Kelvin to MegaJansky.
       }
    }
    \sstdiytopic{
-      Related Applications:
+      Related Applications
    }{
       KAPPA: AXUNITS, SETLABEL, SETTITLE.
    }
@@ -46962,6 +46992,12 @@ The following applications have been modified:
                old DATAPLOT pictures is now used (previously a unit
                mapping was always used). The changed behaviour is described 
                in the documentation for LINPLOT.
+      \end{itemize}
+
+   \item [\htmlref{SETUNITS}{SETUNITS}] \mbox{}
+      \begin{itemize}
+         \item An option to modify the pixel values to reflect the change
+               in units (if possible) has been added.
       \end{itemize}
 
    \item [\htmlref{WCSADD}{WCSADD}] \mbox{}
